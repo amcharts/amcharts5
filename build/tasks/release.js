@@ -1,5 +1,5 @@
 const $path = require("path");
-const { spawn, readdir, rm, cp, readFile, writeFile, checkUncommitted, gitInitSubmodules, gitFetchSubmodule } = require("../util");
+const { spawn, readdir, rm, cp, readFile, writeFile, checkUncommitted, gitInitSubmodules, gitFetchSubmodule, gitTag } = require("../util");
 
 const DRY = false;
 
