@@ -1,0 +1,397 @@
+import type { Root } from "../../core/Root";
+import type { RadarChart } from "./RadarChart";
+import type { Grid } from "../xy/axes/Grid";
+import type { IPoint } from "../../core/util/IPoint";
+import type { Graphics } from "../../core/render/Graphics";
+import type { AxisTick } from "../xy/axes/AxisTick";
+import type { AxisBullet } from "../xy/axes/AxisBullet";
+import type { Tooltip } from "../../core/render/Tooltip";
+
+import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "../xy/axes/AxisRenderer";
+import { Percent, p100 } from "../../core/util/Percent";
+import { AxisLabelRadial } from "../xy/axes/AxisLabelRadial";
+import { arc } from "d3-shape";
+import { ListTemplate } from "../../core/util/List";
+import { Template } from "../../core/util/Template";
+
+import * as $utils from "../../core/util/Utils";
+import * as $type from "../../core/util/Type";
+import * as $math from "../../core/util/Math";
+
+
+export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
+
+	/**
+	 * Outer radius of the axis.
+	 *
+	 * If set in percent, it will be relative to chart's own `radius`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 */
+	radius?: number | Percent;
+
+	/**
+	 * Inner radius of the axis.
+	 *
+	 * If set in percent, it will be relative to chart's own `innerRadius`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 */
+	innerRadius?: number | Percent;
+
+	/**
+	 * Series start angle.
+	 *
+	 * If not set, will use chart's `startAngle.`
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 */
+	startAngle?: number;
+
+	/**
+	 * Series end angle.
+	 *
+	 * If not set, will use chart's `endAngle.`
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 */
+	endAngle?: number;
+
+
+	/**
+	 * @todo am: needs description
+	 */
+	axisAngle?: number;
+
+}
+
+export interface IAxisRendererRadialPrivate extends IAxisRendererPrivate {
+	radius?: number;
+	innerRadius?: number;
+	startAngle?: number;
+	endAngle?: number;
+}
+
+/**
+ * Renderer for radial axes.
+ */
+export class AxisRendererRadial extends AxisRenderer {
+
+	/**
+	 * Chart this renderer is for.
+	 */
+	declare public chart: RadarChart | undefined;
+
+	/**
+	 * Use this method to create an instance of this class.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @param   root      Root element
+	 * @param   settings  Settings
+	 * @param   template  Template
+	 * @return            Instantiated object
+	 */
+	public static new(root: Root, settings: AxisRendererRadial["_settings"], template?: Template<AxisRendererRadial>): AxisRendererRadial {
+		settings.themeTags = $utils.mergeTags(settings.themeTags, ["renderer", "radial"]);
+		const x = new AxisRendererRadial(root, settings, true, template);
+		x._afterNew();
+		return x;
+	}
+
+	public static className: string = "AxisRendererRadial";
+	public static classNames: Array<string> = AxisRenderer.classNames.concat([AxisRendererRadial.className]);
+
+	declare public _settings: IAxisRendererRadialSettings;
+	declare public _privateSettings: IAxisRendererRadialPrivate;
+
+	protected _fillGenerator = arc();
+
+	/**
+	 * A [[TemplateList]] with all the labels attached to the axis.
+	 *
+	 * `labels.template` can be used to configure appearance of the labels.
+	 *
+	 * @default new ListTemplate<AxisLabelRadial>
+	 */
+	public readonly labels: ListTemplate<AxisLabelRadial> = new ListTemplate(
+		Template.new({}),
+		() => AxisLabelRadial.new(this._root, {
+			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
+		}, this.labels.template)
+	);
+
+	public _afterNew() {
+		super._afterNew();
+		this._setPrivate("letter", "Y");
+		this.setRaw("position", "absolute");
+	}
+
+	public _changed() {
+		super._changed();
+
+		if (this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle")) {
+			this.updateLayout();
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public processAxis() {
+		super.processAxis();
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateLayout() {
+		const chart = this.chart;
+		if (chart) {
+			const radius = chart.getPrivate("radius", 0);
+
+			const axisRadius = $utils.relativeToValue(this.get("radius", p100), radius);
+			const axisInnerRadius = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1);
+
+			this.setPrivate("radius", axisRadius);
+			this.setPrivate("innerRadius", axisInnerRadius);
+			let startAngle = this.get("startAngle", chart.get("startAngle", -90));
+			let endAngle = this.get("endAngle", chart.get("endAngle", 270));
+
+			this.setPrivate("startAngle", startAngle);
+			this.setPrivate("endAngle", endAngle);
+
+			const axisAngle = this.get("axisAngle", 0);
+
+			this.set("draw", (display) => {
+				display.moveTo(axisInnerRadius * $math.cos(axisAngle), axisInnerRadius * $math.sin(axisAngle));
+				display.lineTo(axisRadius * $math.cos(axisAngle), axisRadius * $math.sin(axisAngle));
+			});
+
+			this.axis.markDirtySize();
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateGrid(grid?: Grid, position?: number, endPosition?: number) {
+		if (grid) {
+
+			if (!$type.isNumber(position)) {
+				position = 0;
+			}
+
+			let location = grid.get("location", 0.5);
+			if ($type.isNumber(endPosition) && endPosition != position) {
+				position = position + (endPosition - position) * location;
+			}
+
+			let radius = this.positionToCoordinate(position) + this.getPrivate("innerRadius", 0);
+
+			this.toggleVisibility(grid, position, 0, 1);
+
+			if ($type.isNumber(radius)) {
+				grid.set("draw", (display) => {
+					let startAngle = this.getPrivate("startAngle", 0) * $math.RADIANS;
+					let endAngle = this.getPrivate("endAngle", 0) * $math.RADIANS;
+					display.arc(0, 0, Math.max(0, radius), Math.min(startAngle, endAngle), Math.max(startAngle, endAngle));
+				})
+			}
+		}
+	}
+
+	// do not delete
+	protected _handleOpposite() { }
+
+	/**
+	 * Converts relative position to X/Y point.
+	 * 
+	 * @param   position  Position
+	 * @return            Point
+	 */
+	public positionToPoint(position: number): IPoint {
+		const innerRadius = this.getPrivate("innerRadius", 0);
+		const radius = this.positionToCoordinate(position) + innerRadius;
+		const axisAngle = this.get("axisAngle", 0);
+		return { x: radius * $math.cos(axisAngle), y: radius * $math.sin(axisAngle) };
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateLabel(label?: AxisLabelRadial, position?: number, endPosition?: number, count?: number) {
+		if (label) {
+			if (!$type.isNumber(position)) {
+				position = 0;
+			}
+
+			let location = 0.5;
+			if ($type.isNumber(count) && count > 1) {
+				location = label.get("multiLocation", location);
+			}
+			else {
+				location = label.get("location", location);
+			}
+
+			if ($type.isNumber(endPosition) && endPosition != position) {
+				position = position + (endPosition - position) * location;
+			}
+
+			const point = this.positionToPoint(position);
+
+			let radius = Math.hypot(point.x, point.y);
+
+			label.set("baseRadius", radius);
+			label.set("labelAngle", this.get("axisAngle"));
+
+			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));
+		}
+	}
+
+	protected fillDrawMethod(fill: Graphics, y0: number, y1: number) {
+		fill.set("draw", (display) => {
+			y0 = Math.max(0, y0);
+			y1 = Math.max(0, y1);
+			this._fillGenerator.context(display as any);
+			let startAngle = (this.getPrivate("startAngle", 0) + 90) * $math.RADIANS;
+			let endAngle = (this.getPrivate("endAngle", 0) + 90) * $math.RADIANS;
+
+			if (endAngle < startAngle) {
+				[startAngle, endAngle] = [endAngle, startAngle];
+			}
+
+			this._fillGenerator({ innerRadius: y0, outerRadius: y1, startAngle: startAngle, endAngle: endAngle });
+		})
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateTick(tick?: AxisTick, position?: number, endPosition?: number, count?: number) {
+		if (tick) {
+
+			if (!$type.isNumber(position)) {
+				position = 0;
+			}
+
+			let location = 0.5;
+			if ($type.isNumber(count) && count > 1) {
+				location = tick.get("multiLocation", location);
+			}
+			else {
+				location = tick.get("location", location);
+			}
+
+			if ($type.isNumber(endPosition) && endPosition != position) {
+				position = position + (endPosition - position) * location;
+			}
+
+			const point = this.positionToPoint(position);
+
+			tick.set("x", point.x);
+			tick.set("y", point.y);
+
+			let length = tick.get("length", 0);
+			const inside = tick.get("inside");
+
+			if (inside) {
+				length *= -1
+			}
+
+			const axisAngle = this.get("axisAngle", 0) + 90;
+
+			tick.set("draw", (display) => {
+				display.moveTo(0, 0);
+				display.lineTo(length * $math.cos(axisAngle), length * $math.sin(axisAngle));
+			})
+
+			this.toggleVisibility(tick, position, tick.get("minPosition", 0), tick.get("maxPosition", 1));
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateBullet(bullet?: AxisBullet, position?: number, endPosition?: number) {
+		if (bullet) {
+			if (!$type.isNumber(position)) {
+				position = 0;
+			}
+
+			let location = bullet.get("location", 0.5);
+			if ($type.isNumber(endPosition) && endPosition != position) {
+				position = position + (endPosition - position) * location;
+			}
+
+			const point = this.positionToPoint(position);
+
+			bullet.setAll({ x: point.x, y: point.y });
+
+			this.toggleVisibility(bullet, position, 0, 1);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateFill(fill?: Graphics, position?: number, endPosition?: number) {
+		if (fill) {
+			if (!$type.isNumber(position)) {
+				position = 0;
+			}
+			if (!$type.isNumber(endPosition)) {
+				endPosition = 1;
+			}
+
+			const innerRadius = this.getPrivate("innerRadius", 0);
+
+			let y0 = this.positionToCoordinate(position) + innerRadius;
+			let y1 = this.positionToCoordinate(endPosition) + innerRadius;
+
+			this.fillDrawMethod(fill, y0, y1);
+		}
+	}
+
+	/**
+	 * Returns axis length in pixels.
+	 * 
+	 * @return Length
+	 */
+	public axisLength(): number {
+		return this.getPrivate("radius", 0) - this.getPrivate("innerRadius", 0);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public updateTooltipBounds(_tooltip: Tooltip) {
+
+	}
+
+	/**
+	 * Converts relative position to pixels.
+	 * 
+	 * @param   position  Position
+	 * @return            Pixels
+	 */
+	public positionToCoordinate(position: number): number {
+		if (this._inversed) {
+			position = Math.min(this._end, position);
+			return (this._end - position) * this._axisLength;
+		}
+		else {
+			position = Math.max(this._start, position);
+			return (position - this._start) * this._axisLength;
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public positionTooltip(tooltip: Tooltip, position: number) {
+		let radius = this.getPrivate("innerRadius", 0) + this.positionToCoordinate(position);
+		const angle = this.get("axisAngle", 0);
+		//return tooltip.set("pointTo", this.axis._display.toGlobal({ x: radius * $math.cos(angle), y: radius * $math.sin(angle) }));
+		this._positionTooltip(tooltip, { x: radius * $math.cos(angle), y: radius * $math.sin(angle) });
+	}
+}

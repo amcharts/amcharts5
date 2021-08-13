@@ -1,0 +1,36 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "importsNotUsedAsValues": "error",
+        "useDefineForClassFields": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "sourceMap": true,
+        "inlineSources": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "moduleResolution": "node",
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "noEmitOnError": true,
+        "module": "esnext",
+        "target": "es5",
+        "rootDir": "src",
+        "pretty": true,
+        "declarationMap": true,
+        "lib": ["es6", "es2015", "dom"],
+        "outDir": "./dist/es2015",
+        "declarationDir": "./dist/es2015"
+    },
+    "include": [
+        "src/**/*",
+        "src/.internal/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "src/geodata/**/*",
+    ]
+}

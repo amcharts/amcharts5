@@ -1,0 +1,129 @@
+import type { Root } from "../../core/Root";
+import type { DataItem } from "../../core/render/Component";
+import type { Template } from "../../core/util/Template";
+import type { IPoint } from "../../core/util/IPoint";
+
+import { LinkedHierarchy, ILinkedHierarchyPrivate, ILinkedHierarchySettings, ILinkedHierarchyDataItem, ILinkedHierarchyEvents } from "./LinkedHierarchy";
+
+import * as d3hierarchy from "d3-hierarchy";
+
+export interface ITreeDataObject {
+	name?: string,
+	value?: number,
+	children?: ITreeDataObject[],
+	dataItem?: DataItem<ITreeDataItem>
+};
+
+export interface ITreeDataItem extends ILinkedHierarchyDataItem {
+
+	/**
+	 * An array of children data items.
+	 */
+	children: Array<DataItem<ITreeDataItem>>;
+
+	/**
+	 * Parent data item.
+	 * @type {DataItem<ITreeDataItem>}
+	 */
+	parent: DataItem<ITreeDataItem>;
+
+}
+
+export interface ITreeSettings extends ILinkedHierarchySettings {
+
+	/**
+	 * Orientation of the diagram.
+	 *
+	 * @default "vertical"
+	 */
+	orientation?: "horizontal" | "vertical";
+
+}
+
+export interface ITreePrivate extends ILinkedHierarchyPrivate {
+
+	/**
+	 * Current horizontal scale.
+	 */
+	scaleX?: number;
+
+	/**
+	 * Current vertical scale.
+	 */
+	scaleY?: number;
+}
+
+export interface ITreeEvents extends ILinkedHierarchyEvents {
+}
+
+/**
+ * Displays a tree diagram.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/tree/} for more info
+ * @important
+ */
+export class Tree extends LinkedHierarchy {
+
+	declare public _settings: ITreeSettings;
+	declare public _privateSettings: ITreePrivate;
+	declare public _dataItemSettings: ITreeDataItem;
+
+	protected _tag: string = "tree";
+
+	/**
+	 * Use this method to create an instance of this class.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @param   root      Root element
+	 * @param   settings  Settings
+	 * @param   template  Template
+	 * @return            Instantiated object
+	 */
+	public static new(root: Root, settings: Tree["_settings"], template?: Template<Tree>): Tree {
+		const x = new Tree(root, settings, true, template);
+		x._afterNew();
+		return x;
+	}
+
+	public static className: string = "Tree";
+	public static classNames: Array<string> = LinkedHierarchy.classNames.concat([Tree.className]);
+
+	public _hierarchyLayout = d3hierarchy.tree();
+	declare public _rootNode: d3hierarchy.HierarchyCircularNode<ITreeDataObject> | undefined;
+	public _packData: ITreeDataObject | undefined;
+
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		if (this.isDirty("orientation")) {
+			this._updateVisuals();
+		}
+	}
+
+	protected _updateVisuals() {
+		if (this._rootNode) {
+			const layout = this._hierarchyLayout;
+
+			if (this.get("orientation") == "vertical") {
+				layout.size([this.innerWidth(), this.innerHeight()]);
+			}
+			else {
+				layout.size([this.innerHeight(), this.innerWidth()]);
+			}
+
+			layout(this._rootNode);
+		}
+
+		super._updateVisuals();
+	}
+
+	protected _getPoint(hierarchyNode: this["_dataItemSettings"]["d3HierarchyNode"]): IPoint {
+		if (this.get("orientation") == "vertical") {
+			return { x: hierarchyNode.x, y: hierarchyNode.y };
+		}
+		else {
+			return { x: hierarchyNode.y, y: hierarchyNode.x };
+		}
+	}
+
+}
