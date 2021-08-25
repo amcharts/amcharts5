@@ -63,7 +63,7 @@ export interface IPackEvents extends IHierarchyEvents {
 /**
  * Builds a pack diagram.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/sunburst/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/sunburst/} for more info
  * @important
  */
 export class Pack extends Hierarchy {

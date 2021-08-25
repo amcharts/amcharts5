@@ -8,6 +8,7 @@ import type { XYChart } from "../XYChart";
 import type { XYSeries, IXYSeriesDataItem } from "../series/XYSeries";
 import type { Animation } from "../../../core/util/Entity";
 import type { Tooltip } from "../../../core/render/Tooltip";
+import type { Root } from "../../../core/Root";
 
 import { DataItem } from "../../../core/render/Component";
 import { Component, IComponentSettings, IComponentPrivate, IComponentEvents } from "../../../core/render/Component";
@@ -25,7 +26,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	/**
 	 * A renderer object which is responsible of rendering visible axis elements.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/#Axis_renderer} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
 	 */
 	renderer: R;
 
@@ -34,7 +35,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 *
 	 * E.g. stting it to `0.1` will pre-zoom axis to 10% from the start.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
 	 */
 	start?: number;
 
@@ -43,7 +44,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 *
 	 * E.g. stting it to `0.9` will pre-zoom axis to 10% from the end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
 	 */
 	end?: number;
 
@@ -64,7 +65,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 *
 	 * The axis will not allow to be zoomed out beyond this number.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Limiting_zoom_scope} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Limiting_zoom_scope} for more info
 	 */
 	maxZoomCount?: number;
 
@@ -76,7 +77,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 *
 	 * The axis will not allow to be zoomed in beyond this number.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Limiting_zoom_scope} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Limiting_zoom_scope} for more info
 	 */
 	minZoomCount?: number;
 
@@ -89,7 +90,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * If set to `false` the axis will be exempt when chart is panned
 	 * horizontally, and will keep its current position.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	panX?: boolean;
 
@@ -97,7 +98,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * If set to `false` the axis will be exempt when chart is panned
 	 * vertically, and will keep its current position.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	panY?: boolean;
 
@@ -105,7 +106,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * If set to `false` the axis will be exempt when chart is zoomed
 	 * horizontally, and will keep its current zoom/position.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	zoomX?: boolean;
 
@@ -113,7 +114,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * If set to `false` the axis will be exempt when chart is zoomed
 	 * vertically, and will keep its current zoom/position.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	zoomY?: boolean;
 
@@ -122,7 +123,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * actual scope.
 	 *
 	 * @default 0.1
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/zoom-and-pan/#Over_zooming} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Over_zooming} for more info
 	 */
 	maxDeviation?: number;
 
@@ -153,6 +154,9 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * @default true
 	 */
 	fixAxisSize?: boolean;
+
+	// @todo description
+	bullet?: (root: Root, axis:Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
 
 }
 
@@ -212,13 +216,11 @@ export interface IAxisDataItem {
 /**
  * A base class for all axes.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/#Adding_axes} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Adding_axes} for more info
  */
 export abstract class Axis<R extends AxisRenderer> extends Component {
 	public static className: string = "Axis";
 	public static classNames: Array<string> = Component.classNames.concat([Axis.className]);
-
-	protected _dirtySize: boolean = false;
 
 	declare public _settings: IAxisSettings<R>;
 	declare public _privateSettings: IAxisPrivate;
@@ -237,18 +239,25 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public readonly labelsContainer: Container = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A [[Container]] that holds all the axis grid elements.
+	 * A [[Container]] that holds all the axis grid and fill elements.
 	 * 
 	 * @default Container.new()
 	 */
 	public readonly gridContainer: Container = Container.new(this._root, { width: p100, height: p100 });
 
 	/**
+	 * A [[Container]] that holds axis grid elements which goes above the series.
+	 * 
+	 * @default Container.new()
+	 */
+	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100 });	
+
+	/**
 	 * A [[Container]] that holds all the axis bullet elements.
 	 *
 	 * @default new Container
 	 */
-	public readonly bulletsContainer: Container = Container.new(this._root, { width: p100, height: p100 });
+	public readonly bulletsContainer: Container = Container.new(this._root, { isMeasured:false, width: p100, height: p100, position:"absolute" });
 
 	/**
 	 * A referenece to the the chart the axis belongs to.
@@ -266,7 +275,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * A list of axis ranges.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-ranges/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 * @default new List()
 	 */
 	public readonly axisRanges: List<DataItem<this["_dataItemSettings"]>> = new List();
@@ -287,7 +296,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * A container above the axis that can be used to add additional stuff into
 	 * it. For example a legend, label, or an icon.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-headers/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/} for more info
 	 * @default new Container
 	 */
 	public axisHeader: Container = this.children.push(Container.new(this._root, {
@@ -484,10 +493,20 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 
 	public _processAxisRange(dataItem: DataItem<this["_dataItemSettings"]>) {
+		dataItem.set("isRange", true);
 		this._createAssets(dataItem);
 		this._rangesDirty = true;
-		dataItem.set("isRange", true);
 		this._prepareDataItem(dataItem);
+
+		const grid = dataItem.get("grid");
+		if(grid){
+			this.topGridContainer.children.push(grid);
+		}
+
+		const fill = dataItem.get("axisFill");
+		if(fill){
+			this.topGridContainer.children.push(fill);
+		}		
 	}
 
 	public _prepareDataItem(_dataItem: DataItem<this["_dataItemSettings"]>, _index?: number) {
@@ -622,8 +641,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 */
 	public processChart(chart: XYChart) {
 		this.chart = chart;
-		this.get("renderer").chart = chart;
+		const renderer = this.get("renderer");
+
+		renderer.chart = chart;
 		chart.gridContainer.children.push(this.gridContainer);
+		chart.topGridContainer.children.push(this.topGridContainer);
 		chart.bulletsContainer.children.push(this.bulletsContainer);
 
 		chart.axisHeadersContainer.children.push(this.axisHeader);
@@ -633,6 +655,13 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		});
 		this.on("end", () => {
 			chart._handleAxisSelection(this);
+		});
+
+		chart.plotContainer.onPrivate("width", ()=>{
+			this.markDirtySize()
+		});
+		chart.plotContainer.onPrivate("height", ()=>{
+			this.markDirtySize()
 		});
 
 		chart.processAxis(this);
@@ -710,18 +739,27 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			renderer.makeAxisFill(dataItem);
 		}
 
-		let bullet = dataItem.get("bullet");
+		this._processBullet(dataItem);
+	}
 
-		if (!bullet && renderer.bulletTemplate) {
-			bullet = renderer.makeBullet();
+	protected _processBullet(dataItem: DataItem<this["_dataItemSettings"]>) {
+		let bullet = dataItem.get("bullet");
+		let axisBullet = this.get("bullet");
+
+		if (!bullet && axisBullet) {
+			bullet = axisBullet(this._root, this, dataItem);
 		}
 
 		if (bullet) {
-			bullet._setDataItem(dataItem);
-			dataItem.set("bullet", bullet);
-			this.bulletsContainer.children.push(bullet as Container);
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+				sprite._setDataItem(dataItem);
+				dataItem.setRaw("bullet", bullet);
+				if (!sprite.parent) {
+					this.bulletsContainer.children.push(sprite);
+				}
+			}
 		}
-
 	}
 
 	public _afterChanged() {
@@ -913,7 +951,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * Creates and returns an axis range object.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-ranges/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 * @param   axisDataItem  Axis data item
 	 * @return                Axis range
 	 */

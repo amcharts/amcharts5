@@ -26,7 +26,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 *
 	 * If set in percent, it will be relative to chart's own `radius`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	radius?: number | Percent;
 
@@ -35,7 +35,9 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 *
 	 * If set in percent, it will be relative to chart's own `innerRadius`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * If value is negative, inner radius will be calculated from the outer edge.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	innerRadius?: number | Percent;
 
@@ -44,7 +46,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 *
 	 * If not set, will use chart's `startAngle.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	startAngle?: number;
 
@@ -53,7 +55,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 *
 	 * If not set, will use chart's `endAngle.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	endAngle?: number;
 
@@ -149,11 +151,15 @@ export class AxisRendererRadial extends AxisRenderer {
 		if (chart) {
 			const radius = chart.getPrivate("radius", 0);
 
-			const axisRadius = $utils.relativeToValue(this.get("radius", p100), radius);
-			const axisInnerRadius = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1);
+			let r = $utils.relativeToValue(this.get("radius", p100), radius);
+			let ir = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1);
 
-			this.setPrivate("radius", axisRadius);
-			this.setPrivate("innerRadius", axisInnerRadius);
+			if (ir < 0) {
+				ir = r + ir;
+			}
+
+			this.setPrivate("radius", r);
+			this.setPrivate("innerRadius", ir);
 			let startAngle = this.get("startAngle", chart.get("startAngle", -90));
 			let endAngle = this.get("endAngle", chart.get("endAngle", 270));
 
@@ -163,8 +169,8 @@ export class AxisRendererRadial extends AxisRenderer {
 			const axisAngle = this.get("axisAngle", 0);
 
 			this.set("draw", (display) => {
-				display.moveTo(axisInnerRadius * $math.cos(axisAngle), axisInnerRadius * $math.sin(axisAngle));
-				display.lineTo(axisRadius * $math.cos(axisAngle), axisRadius * $math.sin(axisAngle));
+				display.moveTo(ir * $math.cos(axisAngle), ir * $math.sin(axisAngle));
+				display.lineTo(r * $math.cos(axisAngle), r * $math.sin(axisAngle));
 			});
 
 			this.axis.markDirtySize();
@@ -314,20 +320,26 @@ export class AxisRendererRadial extends AxisRenderer {
 	 */
 	public updateBullet(bullet?: AxisBullet, position?: number, endPosition?: number) {
 		if (bullet) {
-			if (!$type.isNumber(position)) {
-				position = 0;
+
+			const sprite = bullet.get("sprite");
+
+			if (sprite) {
+
+				if (!$type.isNumber(position)) {
+					position = 0;
+				}
+
+				let location = bullet.get("location", 0.5);
+				if ($type.isNumber(endPosition) && endPosition != position) {
+					position = position + (endPosition - position) * location;
+				}
+
+				const point = this.positionToPoint(position);
+
+				sprite.setAll({ x: point.x, y: point.y });
+
+				this.toggleVisibility(sprite, position, 0, 1);
 			}
-
-			let location = bullet.get("location", 0.5);
-			if ($type.isNumber(endPosition) && endPosition != position) {
-				position = position + (endPosition - position) * location;
-			}
-
-			const point = this.positionToPoint(position);
-
-			bullet.setAll({ x: point.x, y: point.y });
-
-			this.toggleVisibility(bullet, position, 0, 1);
 		}
 	}
 

@@ -25,7 +25,7 @@ export interface ISmoothedYLineSeriesPrivate extends ILineSeriesPrivate {
 /**
  * Smoothed line series suitable for vertical plots.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/smoothed-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/} for more info
  */
 export class SmoothedYLineSeries extends LineSeries {
 	public static className: string = "SmoothedYLineSeries";

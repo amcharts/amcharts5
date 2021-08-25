@@ -7,6 +7,7 @@ import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $time from "../../core/util/Time";
 import type { Root } from "../../core/Root";
+import { p100 } from "../../core/util/Percent";
 import type { Chart } from "./Chart";
 import type { Bullet } from "./Bullet";
 import { Container } from "../../core/render/Container";
@@ -235,7 +236,7 @@ export abstract class Series extends Component {
 	 *
 	 * @default Container.new()
 	 */
-	public readonly bulletsContainer: Container = Container.new(this._root, {});
+	public readonly bulletsContainer: Container = Container.new(this._root, {isMeasured:false, width:p100, height:p100, position:"absolute"});
 
 	protected _afterNew() {
 		this.valueFields.push("value");
@@ -692,7 +693,7 @@ export abstract class Series extends Component {
 				valueLabel._setDataItem(dataItem);
 				txt = this.get("legendValueText", text.get("text", ""));
 
-				text.set("text", txt);
+				valueLabel.set("text", txt);
 				text.markDirtyText();
 			}
 
@@ -703,7 +704,7 @@ export abstract class Series extends Component {
 				label._setDataItem(dataItem);
 				txt = this.get("legendLabelText", text.get("text", ""));
 
-				text.set("text", txt);
+				label.set("text", txt);
 				text.markDirtyText();
 			}
 		}

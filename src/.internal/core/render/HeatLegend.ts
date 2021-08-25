@@ -1,29 +1,75 @@
-import { Container, IContainerSettings, IContainerPrivate } from "./Container";
 import type { Root } from "../../core/Root";
+import type { IPoint } from "../../core/util/IPoint";
+
+import { Container, IContainerSettings, IContainerPrivate } from "./Container";
 import { Label } from "../../core/render/Label";
 import { p100 } from "../../core/util/Percent";
 import { RoundedRectangle } from "../../core/render/RoundedRectangle";
 import { Template } from "../../core/util/Template";
+import { ListTemplate } from "../../core/util/List";
 import { Color } from "../../core/util/Color";
-import * as $utils from "../../core/util/Utils";
-import type { IPoint } from "../../core/util/IPoint";
 import { Tooltip } from "../../core/render/Tooltip";
 import { LinearGradient } from "../../core/render/gradients/LinearGradient";
 
+import * as $utils from "../../core/util/Utils";
+
 export interface IHeatLegendSettings extends IContainerSettings {
+
+	/**
+	 * Starting (lowest value) color.
+	 */
 	startColor: Color;
+
+	/**
+	 * Ending (highest value) color.
+	 */
 	endColor: Color;
+
+	/**
+	 * Start (lowest) value.
+	 */
 	startValue?: number;
+
+	/**
+	 * End (highest) value.
+	 */
 	endValue?: number;
+
+	/**
+	 * Text for start label.
+	 */
 	startText?: string;
+
+	/**
+	 * Text for end label.
+	 */
 	endText?: string;
+
+	/**
+	 * Number of steps 
+	 *
+	 * @default 1
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Gradient_or_steps} for more info
+	 */
 	stepCount?: number;
+
+	/**
+	 * Orientation of the heat legend.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Orientation} for more info
+	 */
 	orientation: "horizontal" | "vertical";
+
 }
 
 export interface IHeatLegendPrivate extends IContainerPrivate {
 }
 
+/**
+ * Heat legend.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/} for more info
+ */
 export class HeatLegend extends Container {
 
 	/**
@@ -85,25 +131,26 @@ export class HeatLegend extends Container {
 	}
 
 	/**
-	 * A template that can be used to configure heat legend's markers.
-	 */
-	public readonly markerTemplate: Template<Container> = Template.new({});
-
-	/**
 	 * @ignore
 	 */
-	public makeMarker(): Container {
-		const tags = this.markerTemplate.get("themeTags", []);
-		const marker = Container.new(this._root, {
-			themeTags: $utils.mergeTags(tags, [this.get("orientation"), "heatlegend", "marker"]),
-			background: RoundedRectangle.new(this._root, {
-				themeTags: $utils.mergeTags(tags, [this.get("orientation"), "heatlegend", "marker", "background"])
-			})
-		}, this.markerTemplate);
+	public makeMarker(): RoundedRectangle {
+		const marker = this.markers.make();
 		marker.states.create("disabled", {});
-		console.log(marker.get("themeTags"))
 		return marker;
 	}
+
+	/**
+	 * List of rectangle elements used for default legend markers.
+	 *
+	 * @default new ListTemplate<RoundedRectangle>
+	 */
+	public readonly markers: ListTemplate<RoundedRectangle> = new ListTemplate(
+		Template.new({}),
+		() => RoundedRectangle.new(this._root, {
+			themeTags: $utils.mergeTags(this.markers.template.get("themeTags", []), [this.get("orientation"), "heatlegend", "marker"])
+		}, this.markers.template)
+	);
+
 
 	/**
 	 * Moves and shows tooltip at specific value.
@@ -192,7 +239,6 @@ export class HeatLegend extends Container {
 			if (stepCount > 1) {
 				for (let i = 0; i < stepCount; i++) {
 					const marker = this.makeMarker();
-					const bg = marker.get("background");
 
 					if (orientation == "vertical") {
 						this.markerContainer.children.moveValue(marker, 0);
@@ -201,15 +247,14 @@ export class HeatLegend extends Container {
 						this.markerContainer.children.push(marker);
 					}
 
-					if (bg && startColor && endColor) {
-						bg.set("fill", Color.interpolate(i / stepCount, startColor, endColor));
+					if (startColor && endColor) {
+						marker.set("fill", Color.interpolate(i / stepCount, startColor, endColor));
 					}
 				}
 			}
 			else if (stepCount == 1) {
 				const marker = this.makeMarker();
 				this.markerContainer.children.push(marker);
-				const bg = marker.get("background");
 				const gradient = LinearGradient.new(this._root, { stops: [{ color: startColor }, { color: endColor }] });
 
 				if (orientation == "vertical") {
@@ -219,8 +264,11 @@ export class HeatLegend extends Container {
 						stops.reverse();
 					}
 				}
-				if (bg && startColor && endColor) {
-					bg.set("fillGradient", gradient);
+				else {
+					gradient.set("rotation", 0);
+				}
+				if (startColor && endColor) {
+					marker.set("fillGradient", gradient);
 				}
 			}
 		}

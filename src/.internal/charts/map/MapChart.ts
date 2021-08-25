@@ -1,34 +1,40 @@
 import type { IPointerEvent } from "../../core/render/backend/Renderer";
-import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
-import { Rectangle } from "../../core/render/Rectangle";
-import { p100 } from "../../core/util/Percent";
 import type { MapSeries } from "./MapSeries";
 import type { Root } from "../../core/Root";
-import { geoPath } from "d3-geo";
 import type { GeoProjection, GeoPath } from "d3-geo";
-import * as $math from "../../core/util/Math";
-import * as $array from "../../core/util/Array";
 import type { IPoint } from "../../core/util/IPoint";
 import type { Template } from "../../core/util/Template";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
-import * as $type from "../../core/util/Type";
 import type { Time } from "../../core/util/Animation";
 import type { ZoomControl } from "./ZoomControl";
-import { Color } from "../../core/util/Color";
 import type { Animation } from "../../core/util/Entity";
-import * as $mapUtils from "./MapUtils";
 
+import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
+import { Rectangle } from "../../core/render/Rectangle";
+import { p100 } from "../../core/util/Percent";
+import { geoPath } from "d3-geo";
+import { Color } from "../../core/util/Color";
+import { registry } from "../../core/Registry";
+
+import * as $math from "../../core/util/Math";
+import * as $array from "../../core/util/Array";
+import * as $type from "../../core/util/Type";
+import * as $mapUtils from "./MapUtils";
+import * as $object from "../../core/util/Object";
+import * as $utils from "../../core/util/Utils";
 
 export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * A projection to use when plotting the map.
 	 *
-	 * @see (@link https://www.amcharts.com/docs/v5/getting-started/map-chart/#Projections} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Projections} for more info
 	 */
 	projection?: GeoProjection;
 
-
+	/**
+	 * Current zoom level.
+	 */
 	zoomLevel?: number;
 
 	/**
@@ -38,11 +44,28 @@ export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * @ignore
-	 */	
+	 */
 	translateY?: number;
 
+	/**
+	 * Vertical centering of the map.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 */
 	rotationY?: number;
+
+	/**
+	 * Horizontal centering of the map.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 */
 	rotationX?: number;
+
+	/**
+	 * Depth centering of the map.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 */
 	rotationZ?: number;
 
 	/**
@@ -67,27 +90,109 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 */
 	zoomStep?: number;
 
+	/**
+	 * Defines what happens when map is being dragged horizontally.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning} for more info
+	 * @default "translateX"
+	 */
 	panX?: "none" | "rotateX" | "translateX";
+
+	/**
+	 * Defines what happens when map is being dragged vertically.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning} for more info
+	 * @default "translateY"
+	 */
 	panY?: "none" | "rotateY" | "translateY";
 
+	/**
+	 * Enables pinch-zooming of the map on multi-touch devices.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Pinch_zoom} for more info
+	 * @default true
+	 */
+	pinchZoom?: boolean;
+
+	/**
+	 * Defines what happens when mouse wheel is turned horizontally.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
+	 * @default "none"
+	 */
 	wheelX?: "none" | "zoom" | "rotateX" | "rotateY";
+
+	/**
+	 * Defines what happens when mouse wheel is turned vertically.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
+	 * @default "zoom"
+	 */
 	wheelY?: "none" | "zoom" | "rotateX" | "rotateY";
 
-	animationDuration?: number;
-	animationEasing?: (t: Time) => Time;
-
-	wheelDuration?: number;
-	wheelEasing?: (t: Time) => Time;
-
-	// @todo maybe there will be some mouse options?
+	/**
+	 * Sensitivity of a mouse wheel.
+	 * 
+	 * @default 1
+	 */
 	wheelSensitivity?: number;
 
+	/**
+	 * Duration of mouse-wheel action animation, in milliseconds.
+	 */
+	wheelDuration?: number;
+
+	/**
+	 * An easing function to use for mouse wheel action animations.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @default am5.ease.out($ease.cubic)
+	 */
+	wheelEasing?: (t: Time) => Time;
+
+	/**
+	 * Duration of zoom/pan animations, in milliseconds.
+	 */
+	animationDuration?: number;
+
+	/**
+	 * An easing function to use for zoom/pan animations.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @default am5.ease.out($ease.cubic)
+	 */
+	animationEasing?: (t: Time) => Time;
+
+
+	/**
+	 * A [[ZoomControl]] instance.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Zoom_control} for more info
+	 */
 	zoomControl?: ZoomControl;
 
+	/**
+	 * Initial/home zoom level.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 */
 	homeZoomLevel?: number;
+
+	/**
+	 * Initial coordinates to center map on load or `goHome()` call.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 */
 	homeGeoPoint?: IGeoPoint;
 
+	/**
+	 * How much of a map can go outside the viewport.
+	 *
+	 * @default 0.4
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
+	 */
 	maxPanOut?: number;
+
 }
 
 export interface IMapChartPrivate extends ISerialChartPrivate {
@@ -104,6 +209,17 @@ export interface IMapChartPrivate extends ISerialChartPrivate {
 
 }
 
+
+export interface IMapChartEvents extends ISerialChartEvents {
+
+	/**
+	 * Invoked when geo bounds of the map change, usually after map is iniitalized
+	 */
+	geoboundschanged: {};
+
+}
+
+
 export class MapChart extends SerialChart {
 	/**
 	 * Use this method to create an instance of this class.
@@ -115,6 +231,7 @@ export class MapChart extends SerialChart {
 	 * @return            Instantiated object
 	 */
 	public static new(root: Root, settings: MapChart["_settings"], template?: Template<MapChart>): MapChart {
+		settings.themeTags = $utils.mergeTags(settings.themeTags, ["map"]);
 		const x = new MapChart(root, settings, true, template);
 		x._afterNew();
 		return x;
@@ -126,6 +243,7 @@ export class MapChart extends SerialChart {
 	declare public _settings: IMapChartSettings;
 	declare public _privateSettings: IMapChartPrivate;
 	declare public _seriesType: MapSeries;
+	declare public _events: IMapChartEvents;
 
 	protected _downTranslateX: number | undefined;
 	protected _downTranslateY: number | undefined;
@@ -134,6 +252,10 @@ export class MapChart extends SerialChart {
 	protected _downRotationZ: number | undefined;
 	protected _pLat: number = 0;
 	protected _pLon: number = 0;
+
+	protected _movePoints: { [index: number]: IPoint } = {};
+	protected _downZoomLevel: number = 1;
+	protected _doubleDownDistance: number = 0;
 
 	protected _dirtyGeometries: boolean = false;
 	protected _geometryColection: GeoJSON.GeometryCollection = { type: "GeometryCollection", geometries: [] };
@@ -151,20 +273,27 @@ export class MapChart extends SerialChart {
 	protected _geoCentroid: IGeoPoint = { longitude: 0, latitude: 0 };
 	protected _centroid: IPoint = { x: 0, y: 0 };
 	protected _geoBounds: { left: number, right: number, top: number, bottom: number } = { left: 0, right: 0, top: 0, bottom: 0 };
+	protected _prevGeoBounds: { left: number, right: number, top: number, bottom: number } = { left: 0, right: 0, top: 0, bottom: 0 };
 
+	protected _dispatchBounds: boolean = false;
 
 	protected makeGeoPath() {
 		const projection = this.get("projection")!;
-
 		const path = geoPath();
 		path.projection(projection);
 		this.setPrivateRaw("geoPath", path);
 	}
 
+	/**
+	 * Returns coordinates to geographical center of the map.
+	 */
 	public geoCentroid() {
 		return this._geoCentroid;
 	}
 
+	/**
+	 * Returns geographical bounds of the map.
+	 */
 	public geoBounds() {
 		return this._geoBounds;
 	}
@@ -263,12 +392,35 @@ export class MapChart extends SerialChart {
 				this.markDirtyProjection();
 			}
 		}
+
+		if (this._dispatchBounds) {
+			this._dispatchBounds = false; this
+			const type = "geoboundschanged";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this });
+			}
+		}
 	}
 
+	/**
+	 * Repositions the map to the "home" zoom level and center coordinates.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Resetting_position_level} for more info
+	 * @param  duration  Animation duration in milliseconds
+	 */
 	public goHome(duration?: number) {
-		this.zoomToGeoBounds(this._geoBounds, duration);
-	}
+		const geoBounds = this._geoBounds;
 
+		const homeGeoPoint = this.get("homeGeoPoint", { longitude: geoBounds.left + (geoBounds.right - geoBounds.left) / 2, latitude: geoBounds.top + (geoBounds.bottom - geoBounds.top) / 2 });
+		const homeZoomLevel = this.get("homeZoomLevel", 1);
+
+		if (homeGeoPoint) {
+			this.zoomToGeoPoint(homeGeoPoint, homeZoomLevel, undefined, duration);
+		}
+		else {
+			this.zoomToGeoBounds(this._geoBounds, duration);
+		}
+	}
 
 	public _updateChildren() {
 		const projection = this.get("projection")!;
@@ -294,13 +446,34 @@ export class MapChart extends SerialChart {
 		this._geoCentroid = $mapUtils.getGeoCentroid(this._geometryColection);
 		this._geoBounds = $mapUtils.getGeoBounds(this._geometryColection);
 
+		if (this._geometryColection.geometries.length > 0) {
+
+			this._geoBounds.left = $math.round(this._geoBounds.left, 3);
+			this._geoBounds.right = $math.round(this._geoBounds.right, 3);
+			this._geoBounds.top = $math.round(this._geoBounds.top, 3);
+			this._geoBounds.bottom = $math.round(this._geoBounds.bottom, 3);
+
+			const prevGeoBounds = this._prevGeoBounds;
+
+			if (prevGeoBounds && JSON.stringify(this._geoBounds) != JSON.stringify(prevGeoBounds)) {
+				this._dispatchBounds = true;
+				this._prevGeoBounds = this._geoBounds;
+			}
+		}
+
 	}
 
+	/**
+	 * @ignore
+	 */
 	public markDirtyGeometries() {
 		this._dirtyGeometries = true;
 		this.markDirty();
 	}
 
+	/**
+	 * @ignore
+	 */
 	public markDirtyProjection() {
 		this.series.each((series) => {
 			series.markDirtyProjection();
@@ -388,51 +561,75 @@ export class MapChart extends SerialChart {
 
 	protected _handleChartDown(event: IPointerEvent) {
 
-		let bg = this.chartContainer.get("background");
-		if (bg) {
-			bg.events.enableType("click");
-		}
+		this._downZoomLevel = this.get("zoomLevel", 1);
 
-		if (this.get("panX") || this.get("panY")) {
 
-			if (this._za) {
-				this._za.stop();
-			}
-			if (this._txa) {
-				this._txa.stop();
-			}
-			if (this._tya) {
-				this._tya.stop();
-			}
-			if (this._rxa) {
-				this._rxa.stop();
-			}
-			if (this._rya) {
-				this._rya.stop();
-			}
-
-			const downPoint = this.chartContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
-			this._downPoint = downPoint;
-
+		let count = $object.keys(this.chartContainer._downPoints).length;
+		if (count > 0) {
 			this._downTranslateX = this.get("translateX");
 			this._downTranslateY = this.get("translateY");
 			this._downRotationX = this.get("rotationX");
 			this._downRotationY = this.get("rotationY");
 			this._downRotationZ = this.get("rotationZ");
 
-			let projection = this.get("projection")!;
+			const downId = this.chartContainer._getDownPointId();
+			if (downId) {
+				let movePoint = this._movePoints[downId];
+				if (movePoint) {
+					this.chartContainer._downPoints[downId] = movePoint;
+				}
+			}
+		}
+		else if (count == 0) {
 
-			if (projection.invert) {
-				let l0 = projection.invert([downPoint.x, downPoint.y]);
-				let l1 = projection.invert([downPoint.x + 1, downPoint.y + 1]);
-				if (l0 && l1) {
-					this._pLon = Math.abs(l1[0] - l0[0]);
-					this._pLat = Math.abs(l1[1] - l0[1]);
+			let bg = this.chartContainer.get("background");
+			if (bg) {
+				bg.events.enableType("click");
+			}
+
+			if (this.get("panX") || this.get("panY")) {
+
+				if (this._za) {
+					this._za.stop();
+				}
+				if (this._txa) {
+					this._txa.stop();
+				}
+				if (this._tya) {
+					this._tya.stop();
+				}
+				if (this._rxa) {
+					this._rxa.stop();
+				}
+				if (this._rya) {
+					this._rya.stop();
+				}
+
+				const downPoint = this.chartContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+
+				this._downTranslateX = this.get("translateX");
+				this._downTranslateY = this.get("translateY");
+				this._downRotationX = this.get("rotationX");
+				this._downRotationY = this.get("rotationY");
+				this._downRotationZ = this.get("rotationZ");
+
+				let projection = this.get("projection")!;
+
+				if (projection.invert) {
+					let l0 = projection.invert([downPoint.x, downPoint.y]);
+					let l1 = projection.invert([downPoint.x + 1, downPoint.y + 1]);
+					if (l0 && l1) {
+						this._pLon = Math.abs(l1[0] - l0[0]);
+						this._pLat = Math.abs(l1[1] - l0[1]);
+					}
 				}
 			}
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
 	public invert(point: IPoint): IGeoPoint {
 		let projection = this.get("projection")!;
 
@@ -446,10 +643,14 @@ export class MapChart extends SerialChart {
 		return { longitude: 0, latitude: 0 };
 	}
 
+	/**
+	 * @ignore
+	 */
 	public convert(point: IGeoPoint): IPoint {
 		let projection = this.get("projection")!;
 
 		const xy = projection([point.longitude, point.latitude]);
+
 		if (xy) {
 			return { x: xy[0], y: xy[1] };
 		}
@@ -458,81 +659,146 @@ export class MapChart extends SerialChart {
 	}
 
 	protected _handleChartUp(_event: IPointerEvent) {
-		this._downPoint = undefined;
+		this.chartContainer._downPoints = {}
+	}
+
+	protected _handlePinch() {
+		let i = 0;
+		let downPoints: Array<IPoint> = [];
+		let movePoints: Array<IPoint> = [];
+
+		$object.each(this.chartContainer._downPoints, (k, point) => {
+			downPoints[i] = point;
+			let movePoint = this._movePoints[k];
+			if (movePoint) {
+				movePoints[i] = this._movePoints[k];
+			}
+			i++;
+		});
+
+		if (downPoints.length > 1 && movePoints.length > 1) {
+			let downPoint0 = downPoints[0];
+			let downPoint1 = downPoints[1];
+
+			let movePoint0 = movePoints[0];
+			let movePoint1 = movePoints[1];
+
+			if (downPoint0 && downPoint1 && movePoint0 && movePoint1) {
+
+				let initialDistance = Math.hypot(downPoint1.x - downPoint0.x, downPoint1.y - downPoint0.y);
+				let currentDistance = Math.hypot(movePoint1.x - movePoint0.x, movePoint1.y - movePoint0.y);
+
+				let level = currentDistance / initialDistance * this._downZoomLevel;
+
+				let moveCenter = { x: movePoint0.x + (movePoint1.x - movePoint0.x) / 2, y: movePoint0.y + (movePoint1.y - movePoint0.y) / 2 };
+				let downCenter = { x: downPoint0.x + (downPoint1.x - downPoint0.x) / 2, y: downPoint0.y + (downPoint1.y - downPoint0.y) / 2 };
+
+				let tx = this._downTranslateX || 0;
+				let ty = this._downTranslateY || 0;
+
+				let zoomLevel = this._downZoomLevel;
+
+				let xx = moveCenter.x - (moveCenter.x - tx - moveCenter.x + downCenter.x) / zoomLevel * level;
+				let yy = moveCenter.y - (moveCenter.y - ty - moveCenter.y + downCenter.y) / zoomLevel * level;
+
+				this.set("zoomLevel", level)
+				this.set("translateX", xx);
+				this.set("translateY", yy);
+			}
+		}
 	}
 
 	protected _handleChartMove(event: IPointerEvent) {
-		const downPoint = this._downPoint!;
-		if (downPoint) {
-			const panX = this.get("panX");
-			const panY = this.get("panY");
-			if (panX != "none" || panY != "none") {
-				let local = this.chartContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+		const downPoint = this.chartContainer._getDownPoint();
+		const downPointId = this.chartContainer._getDownPointId();
 
-				let x = this._downTranslateX;
-				let y = this._downTranslateY;
 
-				if (Math.hypot(downPoint.x - local.x, downPoint.y - local.y) > 5) {
-					let bg = this.chartContainer.get("background");
-					if (bg) {
-						bg.events.disableType("click");
-					}
+		const pointerId = (event as any).pointerId;
+		if (this.get("pinchZoom")) {
+			if (pointerId) {
+				this._movePoints[pointerId] = { x: event.clientX, y: event.clientY };
+				if ($object.keys(this.chartContainer._downPoints).length > 1) {
+					this._handlePinch();
+					return;
+				}
+			}
+		}
 
-					if ($type.isNumber(x) && $type.isNumber(y)) {
-						let projection = this.get("projection")!;
+		if (downPointId && pointerId && pointerId != downPointId) {
+			return;
+		}
+		else {
+			if (downPoint) {
+				const panX = this.get("panX");
+				const panY = this.get("panY");
+				if (panX != "none" || panY != "none") {
+					let local = this.chartContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
-						if (panX == "translateX") {
-							x += local.x - downPoint.x;
-						}
-						if (panY == "translateY") {
-							y += local.y - downPoint.y;
-						}
+					let x = this._downTranslateX;
+					let y = this._downTranslateY;
 
-						const bounds = this._mapBounds;
-
-						const w = this.width();
-						const h = this.height();
-
-						const ww = bounds[1][0] - bounds[0][0];
-						const hh = bounds[1][1] - bounds[0][1];
-
-						const zoomLevel = this.get("zoomLevel", 1);
-
-						let cx = this._centroid.x - w / 2;
-						let cy = this._centroid.y - h / 2;
-
-						cx *= zoomLevel;
-						cy *= zoomLevel;
-
-						const maxPanOut = this.get("maxPanOut", 0);
-
-						let xs = 1;
-						if (w < ww * zoomLevel) {
-							xs = -1
+					if (Math.hypot(downPoint.x - local.x, downPoint.y - local.y) > 5) {
+						let bg = this.chartContainer.get("background");
+						if (bg) {
+							bg.events.disableType("click");
 						}
 
-						let ys = 1;
-						if (h < hh * zoomLevel) {
-							ys = -1
-						}
+						if ($type.isNumber(x) && $type.isNumber(y)) {
+							let projection = this.get("projection")!;
 
-						x = Math.min(x, cx + xs * (w - ww) / 2 * zoomLevel + (w / 2) * zoomLevel + ww * maxPanOut);
-						x = Math.max(x, cx + xs * -1 * (w - ww) / 2 * zoomLevel + w - (w / 2) * zoomLevel - ww * maxPanOut);
+							if (panX == "translateX") {
+								x += local.x - downPoint.x;
+							}
+							if (panY == "translateY") {
+								y += local.y - downPoint.y;
+							}
 
-						y = Math.min(y, cy + ys * (h - hh) / 2 * zoomLevel + (h / 2) * zoomLevel + hh * maxPanOut);
-						y = Math.max(y, cy + ys * -1 * (h - hh) / 2 * zoomLevel + h - (h / 2) * zoomLevel - hh * maxPanOut);
+							const bounds = this._mapBounds;
 
-						this.set("translateX", x);
-						this.set("translateY", y);
+							const w = this.width();
+							const h = this.height();
 
-						if (projection.invert) {
-							let downLocation = projection.invert([downPoint.x, downPoint.y]);
-							if (location && downLocation) {
-								if (panX == "rotateX") {
-									this.set("rotationX", this._downRotationX! - (downPoint.x - local.x) * this._pLon);
-								}
-								if (panY == "rotateY") {
-									this.set("rotationY", this._downRotationY! + (downPoint.y - local.y) * this._pLat);
+							const ww = bounds[1][0] - bounds[0][0];
+							const hh = bounds[1][1] - bounds[0][1];
+
+							const zoomLevel = this.get("zoomLevel", 1);
+
+							let cx = this._centroid.x - w / 2;
+							let cy = this._centroid.y - h / 2;
+
+							cx *= zoomLevel;
+							cy *= zoomLevel;
+
+							const maxPanOut = this.get("maxPanOut", 0);
+
+							let xs = 1;
+							if (w < ww * zoomLevel) {
+								xs = -1
+							}
+
+							let ys = 1;
+							if (h < hh * zoomLevel) {
+								ys = -1
+							}
+
+							x = Math.min(x, cx + xs * (w - ww) / 2 * zoomLevel + (w / 2) * zoomLevel + ww * maxPanOut);
+							x = Math.max(x, cx + xs * -1 * (w - ww) / 2 * zoomLevel + w - (w / 2) * zoomLevel - ww * maxPanOut);
+
+							y = Math.min(y, cy + ys * (h - hh) / 2 * zoomLevel + (h / 2) * zoomLevel + hh * maxPanOut);
+							y = Math.max(y, cy + ys * -1 * (h - hh) / 2 * zoomLevel + h - (h / 2) * zoomLevel - hh * maxPanOut);
+
+							this.set("translateX", x);
+							this.set("translateY", y);
+
+							if (projection.invert) {
+								let downLocation = projection.invert([downPoint.x, downPoint.y]);
+								if (location && downLocation) {
+									if (panX == "rotateX") {
+										this.set("rotationX", this._downRotationX! - (downPoint.x - local.x) * this._pLon);
+									}
+									if (panY == "rotateY") {
+										this.set("rotationY", this._downRotationY! + (downPoint.y - local.y) * this._pLat);
+									}
 								}
 							}
 						}
@@ -566,26 +832,39 @@ export class MapChart extends SerialChart {
 		}
 	}
 
+	/**
+	 * Zoom the map to geographical bounds.
+	 * 
+	 * @param  geoBounds  Bounds
+	 * @param  duration   Animation duration in milliseconds
+	 */
 	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number) {
 		if (geoBounds.right < geoBounds.left) {
 			geoBounds.right = 180;
 			geoBounds.left = -180;
 		}
 
-		if (geoBounds.bottom <= -89) {
-			geoBounds.bottom = -89;
-		}
+		const geoPath = this.getPrivate("geoPath");
+		const mapBounds = geoPath.bounds(this._geometryColection);
 
 		let p0 = this.convert({ longitude: geoBounds.left, latitude: geoBounds.top });
 		let p1 = this.convert({ longitude: geoBounds.right, latitude: geoBounds.bottom });
 
-		let bounds = { left: p0.x, right: p1.x, top: p0.y, bottom: p1.y };
+		if (p0.y < mapBounds[0][1]) {
+			p0.y = mapBounds[0][1];
+		}
+
+		if (p1.y > mapBounds[1][1]) {
+			p1.y = mapBounds[1][1];
+		}
 
 		let zl = this.get("zoomLevel", 1);
 
+		let bounds = { left: p0.x, right: p1.x, top: p0.y, bottom: p1.y };
+
 		let seriesContainer = this.seriesContainer;
 
-		let zoomLevel = 0.9 * Math.min(seriesContainer.innerWidth() / (bounds.right - bounds.left) * zl, seriesContainer.innerHeight() / (bounds.bottom - bounds.top) * zl);
+		let zoomLevel = .9 * Math.min(seriesContainer.innerWidth() / (bounds.right - bounds.left) * zl, seriesContainer.innerHeight() / (bounds.bottom - bounds.top) * zl);
 		let x = bounds.left + (bounds.right - bounds.left) / 2;
 		let y = bounds.top + (bounds.bottom - bounds.top) / 2;
 
@@ -594,9 +873,15 @@ export class MapChart extends SerialChart {
 		this.zoomToGeoPoint(geoPoint, zoomLevel, true, duration);
 	}
 
-
+	/**
+	 * Zooms the map to specific screen point.
+	 * 
+	 * @param  point    Point
+	 * @param  level    Zoom level
+	 * @param  center   Center the map
+	 * @param  duration Duration of the animation in milliseconds
+	 */
 	public zoomToPoint(point: IPoint, level: number, center?: boolean, duration?: number) {
-
 		if (level) {
 			level = $math.fitToRange(level, this.get("minZoomLevel", 1), this.get("maxZoomLevel", 32));
 		}
@@ -624,7 +909,6 @@ export class MapChart extends SerialChart {
 		let xx = cx - ((x - tx) / zoomLevel * level);
 		let yy = cy - ((y - ty) / zoomLevel * level);
 
-
 		this._txa = this.animate({ key: "translateX", to: xx, duration: duration, easing: easing });
 		this._tya = this.animate({ key: "translateY", to: yy, duration: duration, easing: easing });
 		this._za = this.animate({ key: "zoomLevel", to: level, duration: duration, easing: easing });
@@ -634,6 +918,14 @@ export class MapChart extends SerialChart {
 		}
 	}
 
+	/**
+	 * Zooms the map to specific geographical point.
+	 * 
+	 * @param  geoPoint  Point
+	 * @param  level     Zoom level
+	 * @param  center    Center the map
+	 * @param  duration  Duration of the animation in milliseconds
+	 */
 	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number) {
 		const xy = this.convert(geoPoint);
 		if (xy) {
@@ -641,10 +933,16 @@ export class MapChart extends SerialChart {
 		}
 	}
 
+	/**
+	 * Zooms the map in.
+	 */
 	public zoomIn() {
 		this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.get("zoomLevel", 1) * this.get("zoomStep", 2));
 	}
 
+	/**
+	 * Zooms the map out.
+	 */
 	public zoomOut() {
 		this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.get("zoomLevel", 1) / this.get("zoomStep", 2));
 	}
@@ -652,5 +950,30 @@ export class MapChart extends SerialChart {
 	public _clearDirty() {
 		super._clearDirty();
 		this._dirtyGeometries = false;
+	}
+
+	/**
+	 * To all the clever heads out there. Yes, we did not make any attempts to
+	 * scramble this.
+	 *
+	 * This is a part of a tool meant for our users to manage their commercial
+	 * licenses for removal of amCharts branding from charts.
+	 *
+	 * The only legit way to do so is to purchase a commercial license for amCharts:
+	 * https://www.amcharts.com/online-store/
+	 * 
+	 * Removing or altering this code, or disabling amCharts branding in any other
+	 * way is against the license and thus illegal.
+	 */
+	protected _hasLicense(): boolean {
+		if (!super._hasLicense()) {
+			return false;
+		}
+		for (let i = 0; i < registry.licenses.length; i++) {
+			if (registry.licenses[i].match(/^AM5M.{5,}/i)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

@@ -46,6 +46,7 @@ export class ColumnSeries extends BaseColumnSeries {
 	public readonly columns: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle.new(this._root, {
+			position:"absolute",
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["series", "column"])
 		}, this.columns.template)
 	);
@@ -73,7 +74,7 @@ export class ColumnSeries extends BaseColumnSeries {
 		super._processAxisRange(axisRange);
 		axisRange.columns = new ListTemplate(
 			Template.new({}),
-			() => RoundedRectangle.new(this._root, { themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["series", "column"]) }, axisRange.columns.template)
+			() => RoundedRectangle.new(this._root, { position:"absolute", themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["series", "column"]) }, axisRange.columns.template)
 		);
 	}
 }

@@ -8,7 +8,7 @@ import { Grid } from "./Grid";
 import { AxisLabel } from "./AxisLabel";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Tooltip } from "../../../core/render/Tooltip";
-import { AxisBullet } from "./AxisBullet";
+import type { AxisBullet } from "./AxisBullet";
 import type { XYChart } from "../XYChart";
 import type { DataItem } from "../../../core/render/Component";
 import * as $utils from "../../../core/util/Utils";
@@ -18,7 +18,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	/**
 	 * The minimum distance between grid lines in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Grid_density} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Grid_density} for more info
 	 */
 	minGridDistance?: number;
 
@@ -26,7 +26,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * Set to `true` to invert direction of the axis.
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Inversed_axes} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Inversed_axes} for more info
 	 */
 	inversed?: boolean;
 
@@ -36,7 +36,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * `0` - beginning, `1` - end, or anything in-between.
 	 * 
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Cell_start_end_locations} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
 	 */
 	cellStartLocation?: number;
 
@@ -46,7 +46,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * `0` - beginning, `1` - end, or anything in-between.
 	 * 
 	 * @default 1
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Cell_start_end_locations} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
 	 */
 	cellEndLocation?: number;
 
@@ -61,7 +61,7 @@ export interface IAxisRendererPrivate extends IGraphicsPrivate {
  *
  * Should not be used on its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/#Axis_renderer} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
  */
 export abstract class AxisRenderer extends Graphics {
 	public static className: string = "AxisRenderer";
@@ -146,7 +146,7 @@ export abstract class AxisRenderer extends Graphics {
 	 *
 	 * `axisFills.template` can be used to configure axis fills.
 	 *
-	 * @default new ListTemplate<AxisTick>
+	 * @default new ListTemplate<Graphics>
 	 */
 	public readonly axisFills: ListTemplate<Graphics> = new ListTemplate(
 		Template.new({}),
@@ -159,7 +159,7 @@ export abstract class AxisRenderer extends Graphics {
 	 * @ignore
 	 */
 	public makeLabel(dataItem: DataItem<IAxisDataItem>): AxisLabel {
-		const label = this.axis.labelsContainer.children.push(this.labels.make());
+		const label = this.axis.labelsContainer.children.moveValue(this.labels.make(), 0);
 		label._setDataItem(dataItem);
 		dataItem.set("label", label);
 		this.labels.push(label);
@@ -180,23 +180,6 @@ export abstract class AxisRenderer extends Graphics {
 		}, this.labels.template)
 	);
 
-	/**
-	 * Default settings for axis bullets.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Bullets} for more information
-	 */
-	public readonly bulletTemplate: Template<AxisBullet> | undefined;
-
-	/**
-	 * @ignore
-	 */
-	public makeBullet(): AxisBullet | undefined {
-		if (this.bulletTemplate) {
-			return AxisBullet.new(this._root, {
-				themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
-			}, this.bulletTemplate);
-		}
-	}
 
 	declare public _settings: IAxisRendererSettings;
 	declare public _privateSettings: IAxisRendererPrivate;

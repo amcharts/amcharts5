@@ -1,11 +1,13 @@
-import { Percent } from "../../core/util/Percent";
-import { PercentChart, IPercentChartPrivate, IPercentChartSettings } from "../percent/PercentChart";
 import type { PieSeries } from "./PieSeries";
 import type { Root } from "../../core/Root";
 import type { Template } from "../../core/util/Template";
+
+import { Percent } from "../../core/util/Percent";
+import { PercentChart, IPercentChartPrivate, IPercentChartSettings } from "../percent/PercentChart";
+import { p50 } from "../../core/util/Percent";
+
 import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
-import { p50 } from "../../core/util/Percent";
 
 
 export interface IPieChartSettings extends IPercentChartSettings {
@@ -16,7 +18,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 * Can be set in fixed pixel value, or relative to chart container size in
 	 * percent.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/#Pie_radius} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
 	 * @default 80%
 	 */
 	radius?: number | Percent;
@@ -27,15 +29,17 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 *
 	 * Can be set in fixed pixel value, or relative to chart container size in
 	 * percent.
+	 *
+	 * Setting to negative number will mean pixels from outer radius.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/#Pie_radius} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
 	 */
 	innerRadius?: number | Percent;
 
 	/**
 	 * A start angle of the chart in degrees.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/#Start_end_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Start_end_angles} for more info
 	 * @default -90
 	 */
 	startAngle?: number;
@@ -43,7 +47,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	/**
 	 * An end angle of the chart in degrees.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/#Start_end_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Start_end_angles} for more info
 	 * @default 270
 	 */
 	endAngle?: number;
@@ -62,7 +66,7 @@ export interface IPieChartPrivate extends IPercentChartPrivate {
 /**
  * Creates a pie chart.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
  * @important
  */
 export class PieChart extends PercentChart {
@@ -179,8 +183,12 @@ export class PieChart extends PercentChart {
 	 * @return          Radius in pixels
 	 */
 	public innerRadius(series?: PieSeries): number {
-		let innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), this.radius());
-		let radius = this.radius();
+		const radius = this.radius();
+		let innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), radius);
+
+		if (innerRadius < 0) {
+			innerRadius = radius + innerRadius;
+		}
 
 		if (series) {
 			let index = this.series.indexOf(series);

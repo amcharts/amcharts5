@@ -4,6 +4,7 @@ import type { RadarChart } from "./RadarChart";
 import type { Grid } from "../xy/axes/Grid";
 import type { IPoint } from "../../core/util/IPoint";
 import type { Graphics } from "../../core/render/Graphics";
+import { Slice } from "../../core/render/Slice";
 import type { AxisTick } from "../xy/axes/AxisTick";
 import type { AxisBullet } from "../xy/axes/AxisBullet";
 import type { Tooltip } from "../../core/render/Tooltip";
@@ -21,13 +22,13 @@ import * as $math from "../../core/util/Math";
 
 
 export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
-	
+
 	/**
 	 * Outer radius of the axis.
 	 *
 	 * If set in percent, it will be relative to chart's own `radius`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	radius?: number | Percent;
 
@@ -36,7 +37,9 @@ export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 	 *
 	 * If set in percent, it will be relative to chart's own `innerRadius`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * If value is negative, inner radius will be calculated from the outer edge.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	innerRadius?: number | Percent;
 
@@ -45,7 +48,7 @@ export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 	 *
 	 * If not set, will use chart's `startAngle.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	startAngle?: number;
 
@@ -54,7 +57,7 @@ export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 	 *
 	 * If not set, will use chart's `endAngle.`
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	endAngle?: number;
 
@@ -112,6 +115,22 @@ export class AxisRendererCircular extends AxisRenderer {
 		}, this.labels.template)
 	);
 
+
+	/**
+	 * A list of fills in the axis.
+	 *
+	 * `axisFills.template` can be used to configure axis fills.
+	 *
+	 * @default new ListTemplate<Slice>
+	 */
+	public readonly axisFills: ListTemplate<Slice> = new ListTemplate(
+		Template.new({}),
+		() => Slice.new(this._root, {
+			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["fill"]), this.get("themeTags", []))
+		}, this.axisFills.template)
+	);
+
+
 	public static className: string = "AxisRendererCircular";
 	public static classNames: Array<string> = AxisRenderer.classNames.concat([AxisRendererCircular.className]);
 
@@ -142,8 +161,16 @@ export class AxisRendererCircular extends AxisRenderer {
 		if (chart) {
 			const radius = chart.getPrivate("radius", 0);
 
-			this.setPrivate("radius", $utils.relativeToValue(this.get("radius", p100), radius));
-			this.setPrivate("innerRadius", $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1));
+			let r = $utils.relativeToValue(this.get("radius", p100), radius);
+			this.setPrivate("radius", r);
+
+			let ir = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1);
+
+			if (ir < 0) {
+				ir = r + ir;
+			}
+
+			this.setPrivate("innerRadius", ir);
 
 			let startAngle = this.get("startAngle", chart.get("startAngle", -90));
 			let endAngle = this.get("endAngle", chart.get("endAngle", 270));
@@ -336,33 +363,32 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public updateBullet(bullet?: AxisBullet, position?: number, endPosition?: number) {
 		if (bullet) {
+			const sprite = bullet.get("sprite");
 
-			if (!bullet.parent) {
+			if (sprite) {
+				if (!$type.isNumber(position)) {
+					position = 0;
+				}
 
+				let location = bullet.get("location", 0.5);
+				if ($type.isNumber(endPosition) && endPosition != position) {
+					position = position + (endPosition - position) * location;
+				}
+
+				let radius = this.getPrivate("radius", 0);
+				let angle = this.positionToAngle(position);
+
+				this.toggleVisibility(sprite, position, 0, 1);
+
+				sprite.setAll({ rotation: angle, x: radius * $math.cos(angle), y: radius * $math.sin(angle) });
 			}
-
-			if (!$type.isNumber(position)) {
-				position = 0;
-			}
-
-			let location = bullet.get("location", 0.5);
-			if ($type.isNumber(endPosition) && endPosition != position) {
-				position = position + (endPosition - position) * location;
-			}
-
-			let radius = this.getPrivate("radius", 0);
-			let angle = this.positionToAngle(position);
-
-			this.toggleVisibility(bullet, position, 0, 1);
-
-			bullet.setAll({ rotation: angle, x: radius * $math.cos(angle), y: radius * $math.sin(angle) });
 		}
 	}
 
 	/**
 	 * @ignore
 	 */
-	public updateFill(fill?: Graphics, position?: number, endPosition?: number) {
+	public updateFill(fill?: Slice, position?: number, endPosition?: number) {
 		if (fill) {
 			if (!$type.isNumber(position)) {
 				position = 0;
@@ -370,7 +396,13 @@ export class AxisRendererCircular extends AxisRenderer {
 			if (!$type.isNumber(endPosition)) {
 				endPosition = 1;
 			}
-			this.fillDrawMethod(fill, this.fitAngle(this.positionToAngle(position)), this.fitAngle(this.positionToAngle(endPosition)));
+
+			let startAngle = this.fitAngle(this.positionToAngle(position));
+			let endAngle = this.fitAngle(this.positionToAngle(endPosition));
+			fill.setAll({ startAngle: startAngle, arc: endAngle - startAngle });
+
+			fill._setSoft("innerRadius", this.getPrivate("innerRadius"));
+			fill._setSoft("radius", this.getPrivate("radius"));
 		}
 	}
 

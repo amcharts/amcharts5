@@ -1,7 +1,10 @@
+import type { Percent } from "./Percent";
+import type { IPointerEvent } from "../render/backend/Renderer";
+
 import * as $type from "./Type";
 import * as $array from "./Array";
 import * as $object from "./Object";
-import type { Percent } from "./Percent";
+
 import { Disposer, IDisposer } from "./Disposer";
 
 /**
@@ -10,6 +13,12 @@ import { Disposer, IDisposer } from "./Disposer";
  * ============================================================================
  * @hidden
  */
+
+export function removeElement(el: HTMLElement): void {
+	if (el.parentNode) {
+		el.parentNode.removeChild(el);
+	}
+}
 
 /**
  * Function that adds a disposable event listener directly to a DOM element.
@@ -30,6 +39,9 @@ export function addEventListener<E extends Event>(dom: EventTarget, type: string
 	});
 }
 
+/**
+ * @ignore
+ */
 export function supports(cap: "touchevents" | "pointerevents" | "mouseevents" | "wheelevents" | "keyboardevents"): boolean {
 	switch (cap) {
 		case "touchevents":
@@ -49,6 +61,15 @@ export function supports(cap: "touchevents" | "pointerevents" | "mouseevents" | 
 			return window.hasOwnProperty("KeyboardEvent");
 	}
 	return false;
+}
+
+/**
+ * @ignore
+ */
+export function getPointerId(event: IPointerEvent) {
+	let id = (<any>event).pointerId || 0;
+	//console.log(event);
+	return id;
 }
 
 /**

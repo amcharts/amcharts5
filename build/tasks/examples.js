@@ -1,6 +1,5 @@
 const $path = require("path");
-const { cp, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, exists } = require("../util");
-const $sucrase = require("sucrase");
+const { cp, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, exists, removeTypeScriptTypes } = require("../util");
 
 
 const geodata_message = `Map geodata could not be loaded. Please download the latest <a href=\\"https://www.amcharts.com/download/download-v5/\\">amcharts geodata</a> and extract its contents into the same directory as your amCharts files.`;
@@ -37,13 +36,6 @@ ${config.extraCSS}`));
 }
 
 
-function removeTypeScriptTypes(template) {
-	return $sucrase.transform(template, {
-		disableESTransforms: true,
-		transforms: ["typescript"],
-	}).code;
-}
-
 function replaceSubstitutions(template) {
 	return template.replace(/%__GEODATA_MESSAGE__%/g, geodata_message);
 }
@@ -64,7 +56,7 @@ function get_es2015_imports(template, path_to_v5) {
 		let package;
 
 		if (split[0] === "@amcharts" && split[1] === "amcharts5") {
-			const json = require("../../packages/es2015/package.json");
+			const json = require("../../package.json");
 			//package = `"@amcharts/amcharts5": "file:${path_to_v5}"`;
 			package = `"@amcharts/amcharts5": "^${json.version}"`;
 
@@ -96,7 +88,7 @@ async function write_es2015_shared(config, base, dir) {
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>amCharts V5 Example - ${$path.basename(dir)}</title>
+    <title>amCharts 5 Example - ${$path.basename(dir)}</title>
     <link rel="stylesheet" href="index.css" />${config.extraHeadElements.map((x) => `
     ${x}`).join("")}
   </head>
@@ -337,7 +329,7 @@ async function transpile_js(config, base, root_dir, dir, template) {
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>amCharts V5 Example - ${$path.basename(dir)}</title>
+    <title>amCharts 5 Example - ${$path.basename(dir)}</title>
     <link rel="stylesheet" href="index.css" />${config.extraHeadElements.map((x) => `
     ${x}`).join("")}
   </head>

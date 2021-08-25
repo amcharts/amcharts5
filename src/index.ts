@@ -1,5 +1,6 @@
 export { Root } from "./.internal/core/Root";
 export { Theme } from "./.internal/core/Theme";
+export { addLicense } from "./.internal/core/Registry";
 
 export { Bullet } from "./.internal/core/render/Bullet";
 export { Button } from "./.internal/core/render/Button";

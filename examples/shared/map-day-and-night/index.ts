@@ -1,39 +1,115 @@
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
-import { worldLow } from "@amcharts/amcharts5/geodata/worldLow";
+import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * Create root element
+ * https://www.amcharts.com/docs/v5/getting-started/#Root_element
+ */
 const root = am5.Root.new("chartdiv");
 
+/**
+ * Set themes
+ * https://www.amcharts.com/docs/v5/concepts/themes/
+ */
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+/**
+ * Create the map chart
+ * https://www.amcharts.com/docs/v5/charts/map-chart/
+ */
+const chart = root.container.children.push(
+  am5map.MapChart.new(root, {
+    panX: "rotateX",
+    panY: "rotateY",
+    projection: am5map.geoMercator()
+  })
+);
 
-const chart = root.container.children.push(am5map.MapChart.new(root, { panX: "rotateX", panY: "rotateY", projection: am5map.geoMercator() }));
-const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, { geoJSON: worldLow as any }));
 
-const sunSeries = chart.series.push(am5map.MapPointSeries.new(root, {}));
+/**
+ * Create main polygon series for countries
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+ */
+const polygonSeries = chart.series.push(
+  am5map.MapPolygonSeries.new(root, {
+    geoJSON: am5geodata_worldLow as any
+  })
+);
+
+/**
+ * Create point series for Sun icon
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+ */
+const sunSeries = chart.series.push(
+  am5map.MapPointSeries.new(root, {})
+);
+
 sunSeries.bullets.push(() => {
-  const circle = am5.Circle.new(root, { radius: 18, fill: am5.color(0xffba00), filter: "blur(5px)" });
-  circle.animate({ key: "radius", duration: 2000, to: 23, loops: Infinity, easing: am5.ease.yoyo(am5.ease.linear) });
-  return am5.Bullet.new(root, { sprite: circle })
-})
+  const circle = am5.Circle.new(root, {
+    radius: 18,
+    fill: am5.color(0xffba00),
+    filter: "blur(5px)"
+  });
+
+  circle.animate({
+    key: "radius",
+    duration: 2000,
+    to: 23,
+    loops: Infinity,
+    easing: am5.ease.yoyo(am5.ease.linear)
+  });
+
+  return am5.Bullet.new(root, {
+    sprite: circle
+  });
+});
 
 sunSeries.bullets.push(() => {
-  return am5.Bullet.new(root, { sprite: am5.Circle.new(root, { radius: 14, fill: am5.color(0xffba00) }) })
-})
+  return am5.Bullet.new(root, {
+    sprite:
+      am5.Circle.new(root, {
+        radius: 14, fill:
+          am5.color(0xffba00)
+      })
+  });
+});
 
-const sunDataItem = sunSeries.pushDataItem({})
+const sunDataItem = sunSeries.pushDataItem({});
 
-const nightSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
-nightSeries.mapPolygons.template.setAll({ fill: am5.color(0x000000), fillOpacity: 0.25, strokeOpacity: 0 });
+/**
+ * Create polygon series for night-time polygons
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+ */
+const nightSeries = chart.series.push(
+  am5map.MapPolygonSeries.new(root, {})
+);
+
+nightSeries.mapPolygons.template.setAll({
+  fill: am5.color(0x000000),
+  fillOpacity: 0.25,
+  strokeOpacity: 0
+});
 
 const nightDataItem0 = nightSeries.pushDataItem({});
 const nightDataItem1 = nightSeries.pushDataItem({});
 const nightDataItem2 = nightSeries.pushDataItem({});
 
-const container = chart.children.push(am5.Container.new(root, { y: am5.percent(95), centerX: am5.p50, x: am5.p50, width: am5.percent(80), layout: root.horizontalLayout }));
+/**
+ * Create controls
+ */
+const container = chart.children.push(
+  am5.Container.new(root, {
+    y: am5.percent(95),
+    centerX: am5.p50,
+    x: am5.p50,
+    width: am5.percent(80),
+    layout: root.horizontalLayout
+  })
+);
 
 const playButton = container.children.push(am5.Button.new(root, {
   themeTags: ["play"],
@@ -49,24 +125,45 @@ playButton.events.on("click", () => {
     slider.set("start", slider.get("start") + 0.0001);
   }
   else {
-    slider.animate({ key: "start", to: 1, duration: 15000 * (1 - slider.get("start")) });
+    slider.animate({
+      key: "start",
+      to: 1,
+      duration: 15000 * (1 - slider.get("start"))
+    });
   }
 })
 
-const slider = container.children.push(am5.Slider.new(root, {orientation:"horizontal", start:0.5, centerY:am5.p50}));
-slider.on("start", (start)=>{
-  if(start === 1){
+const slider = container.children.push(
+  am5.Slider.new(root, {
+    orientation: "horizontal",
+    start: 0.5,
+    centerY: am5.p50
+  })
+);
+
+slider.on("start", (start) => {
+  if (start === 1) {
     playButton.set("active", false);
   }
 })
 
-slider.events.on("rangechanged", ()=>{
-  updateDateNight((slider.get("start" , 0) - 0.5)  * am5.time. getDuration( "day", 2) + new Date().getTime());
+slider.events.on("rangechanged", () => {
+  updateDateNight((slider.get("start", 0) - 0.5) * am5.time.getDuration("day", 2) + new Date().getTime());
 })
 
 
-const cont = chart.children.push(am5.Container.new(root, { layout: root.horizontalLayout, x: 20, y: 40 }));
-cont.children.push(am5.Label.new(root, { centerY: am5.p50, text: "Map" }))
+const cont = chart.children.push(
+  am5.Container.new(root, {
+    layout: root.horizontalLayout,
+    x: 20,
+    y: 40
+  })
+);
+
+cont.children.push(am5.Label.new(root, {
+  centerY: am5.p50,
+  text: "Map"
+}));
 
 const switchButton = cont.children.push(am5.Button.new(root, {
   themeTags: ["switch"],
@@ -84,7 +181,12 @@ switchButton.on("active", () => {
     chart.set("projection", am5map.geoOrthographic());
   }
 })
-cont.children.push(am5.Label.new(root, { centerY: am5.p50, text: "Globe" }))
+cont.children.push(
+  am5.Label.new(root, {
+    centerY: am5.p50,
+    text: "Globe"
+  })
+);
 
 
 function updateDateNight(time) {
@@ -92,10 +194,10 @@ function updateDateNight(time) {
   sunDataItem.set("longitude", sunPosition.longitude);
   sunDataItem.set("latitude", sunPosition.latitude);
 
-  const nightPosition = {longitude:sunPosition.longitude + 180, latitude:-sunPosition.latitude}
+  const nightPosition = { longitude: sunPosition.longitude + 180, latitude: -sunPosition.latitude }
 
-  nightDataItem0.set("geometry",  am5map.getGeoCircle(nightPosition, 92 )) ;
-  nightDataItem1.set("geometry", am5map.getGeoCircle(nightPosition, 90));  nightDataItem2.set("geometry", am5map.getGeoCircle(nightPosition, 88));
+  nightDataItem0.set("geometry", am5map.getGeoCircle(nightPosition, 92));
+  nightDataItem1.set("geometry", am5map.getGeoCircle(nightPosition, 90)); nightDataItem2.set("geometry", am5map.getGeoCircle(nightPosition, 88));
 }
 
 var offset = new Date().getTimezoneOffset() * 60 * 1000;
@@ -107,7 +209,10 @@ function solarPosition(time) {
   let centuries = (time - Date.UTC(2000, 0, 1, 12)) / 864e5 / 36525; // since J2000
   let longitude = (am5.time.round(new Date(time), "day", 1).getTime() - time - offset) / 864e5 * 360 - 180;
 
-  return am5map.normalizeGeoPoint({ longitude: longitude - equationOfTime(centuries) * am5.math.DEGREES, latitude: solarDeclination(centuries) * am5.math.DEGREES });
+  return am5map.normalizeGeoPoint({
+    longitude: longitude - equationOfTime(centuries) * am5.math.DEGREES,
+    latitude: solarDeclination(centuries) * am5.math.DEGREES
+  });
 };
 
 

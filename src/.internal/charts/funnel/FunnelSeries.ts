@@ -30,7 +30,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	 * `1` - means the full width of the slice, resulting in a rectangle.
 	 * `0` - means using width of the next slice, resulting in a trapezoid.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/funnel-series/#Slice_bottom_width} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Slice_bottom_width} for more info
 	 * @default 1
 	 */
 	bottomRatio?: number;
@@ -38,7 +38,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	/**
 	 * Orientation of the series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/#Series_orientation} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Series_orientation} for more info
 	 * @default "vertical"
 	 */
 	orientation: "horizontal" | "vertical";
@@ -61,7 +61,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	 *
 	 * `0` - beginning, `1` - end, or any intermediate value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
 	 * @default 0
 	 */
 	startLocation?: number;
@@ -71,7 +71,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	 *
 	 * `0` - beginning, `1` - end, or any intermediate value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
 	 * @default 0
 	 */
 	endLocation?: number;
@@ -84,7 +84,7 @@ export interface IFunnelSeriesPrivate extends IPercentSeriesPrivate {
 /**
  * Creates a funnel series for use in a [[SlicedChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/funnel-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/} for more info
  * @important
  */
 export class FunnelSeries extends PercentSeries {
@@ -132,7 +132,7 @@ export class FunnelSeries extends PercentSeries {
 	 *
 	 * `links.template` can also be used to configure slice links.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/funnel-series/#Slice_links} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Slice_links} for more info
 	 */
 	public readonly links: ListTemplate<this["_sliceType"]> = this._makeLinks();
 
@@ -308,7 +308,9 @@ export class FunnelSeries extends PercentSeries {
 				const color = colors.next();
 
 				slice._setDefault("fill", color);
+				slice._setDefault("stroke", color);
 				link._setDefault("fill", color);
+				link._setDefault("stroke", color);
 
 				const value = dataItem.get("value");
 				if ($type.isNumber(value)) {

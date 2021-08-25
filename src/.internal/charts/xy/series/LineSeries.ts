@@ -7,7 +7,6 @@ import type { Root } from "../../../core/Root";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
 import { DataItem } from "../../../core/render/Component";
-import type { Bullet } from "../../../core/render/Bullet";
 import type { Axis } from "../axes/Axis";
 import type { AxisRenderer } from "../axes/AxisRenderer";
 import * as $utils from "../../../core/util/Utils";
@@ -24,7 +23,7 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	 * If set to `true` the line will connect over "gaps" - categories or time
 	 * intervals with no data.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/line-series/#Gaps} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Gaps} for more info
 	 * @default true
 	 */
 	connect?: boolean;
@@ -33,7 +32,7 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	 * If there are more than `autoGapCount` base time intervals (e.g. days) with
 	 * no data, the line will break and will display gap.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/line-series/#Auto_gaps_with_dates} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Auto_gaps_with_dates} for more info
 	 * @default 1.1
 	 */
 	autoGapCount?: number;
@@ -50,7 +49,7 @@ export interface ILineSeriesPrivate extends IXYSeriesPrivate {
 /**
  * Interface representing a [[LineSeries]] axis range.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
  */
 export interface ILineSeriesAxisRange extends IXYSeriesAxisRange {
 
@@ -70,7 +69,7 @@ export interface ILineSeriesAxisRange extends IXYSeriesAxisRange {
 /**
  * Used to plot line and/or area series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/line-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/} for more info
  * @important
  */
 export class LineSeries extends XYSeries {
@@ -174,10 +173,6 @@ export class LineSeries extends XYSeries {
 	// custom set from data
 	protected _fillTemplate: Template<Graphics> | undefined;
 	protected _strokeTemplate: Template<Graphics> | undefined;
-
-	protected _legendStroke: Graphics | undefined;
-	protected _legendFill: Graphics | undefined;
-	protected _legendBullet: Bullet | undefined;
 
 	public _updateChildren() {
 
@@ -360,7 +355,8 @@ export class LineSeries extends XYSeries {
 
 		let i: number;
 
-		const fillVisible = this.fills.template.get("visible");
+		let fillVisible = this.fills.template.get("visible");
+
 		let getOpen = false;
 		if (stacked || xOpenFieldValue || yOpenFieldValue) {
 			getOpen = true;
@@ -614,11 +610,10 @@ export class LineSeries extends XYSeries {
 
 		if (legendDataItem) {
 			const marker = legendDataItem.get("marker");
-			if (marker) {
-				const bg = marker.get("background")
-				if (bg) {
-					bg.setPrivate("visible", false);
-				}
+
+			const markerRectangle = legendDataItem.get("markerRectangle");
+			if (markerRectangle) {
+				markerRectangle.setPrivate("visible", false);
 			}
 
 			const legendStroke = marker.children.push(Graphics.new(this._root, {
@@ -628,9 +623,6 @@ export class LineSeries extends XYSeries {
 			const legendFill = marker.children.push(Graphics.new(this._root, {
 				themeTags: ["line", "series", "legend", "marker", "fill"]
 			}, this.fills.template));
-
-			this._legendFill = legendFill;
-			this._legendStroke = legendStroke;
 
 			const disabledColor = this._root.interfaceColors.get("disabled");
 
@@ -645,8 +637,6 @@ export class LineSeries extends XYSeries {
 					if (sprite instanceof Graphics) {
 						sprite.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
 					}
-
-					this._legendBullet = bullet;
 
 					if (sprite) {
 						marker.children.push(sprite);

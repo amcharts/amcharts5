@@ -1,5 +1,21 @@
 const $path = require("path");
-const { cp, rm, mkdir, readdir, writeFile, posixPath, webpack } = require("../util");
+const { cp, cpMaybe, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, geodataToScript, removeTypeScriptTypes } = require("../util");
+
+
+async function removeFiles(path) {
+	const files = await readdir(path);
+
+	if (files === null) {
+		if (path.endsWith(".LICENSE.txt")) {
+			await rm(path);
+		}
+
+	} else {
+		await Promise.all(files.map((name) => {
+			return removeFiles($path.join(path, name));
+		}));
+	}
+}
 
 
 async function getEntriesSub(entries, input, output, path, defaultImport) {
@@ -161,6 +177,21 @@ async function getEntries(input, output) {
 }
 
 
+async function buildWorldLow(state) {
+	const file = removeTypeScriptTypes(await readFile(state.path("src", "geodata", "worldLow.ts")));
+
+	await mkdir(state.path("dist", "script", "geodata"));
+
+	await writeFile(state.path("dist", "script", "geodata", "worldLow.js"), geodataToScript("_worldLow", file));
+}
+
+
+async function copyFiles(state, output) {
+	await cp(state.path("packages", "shared"), output);
+	await cpMaybe(state.path("packages", "script"), output);
+}
+
+
 module.exports = async (state) => {
 	await state.task("build");
 
@@ -190,6 +221,8 @@ module.exports = async (state) => {
 		stats: "errors-warnings",
 
 		target: ["web", "es5"],
+
+		context: $path.resolve(state.cwd),
 
 		performance: {
 			hints: false,
@@ -267,6 +300,9 @@ module.exports = async (state) => {
 
 	await webpack(config);
 
-	await cp(state.path("packages", "shared"), output);
-	await cp(state.path("packages", "script"), output);
+	await Promise.all([
+		buildWorldLow(state),
+		removeFiles(output),
+		copyFiles(state, output),
+	]);
 };

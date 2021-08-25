@@ -37,7 +37,7 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings { }
 /**
  * Creates a map series for displaying lines on the map.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/map-chart/map-line-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/} for more info
  * @important
  */
 export class MapLineSeries extends MapSeries {
@@ -103,36 +103,36 @@ export class MapLineSeries extends MapSeries {
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 
-		const mapLine = this.makeMapLine(dataItem);
-		if (mapLine) {
-			dataItem.set("mapLine", mapLine);
-			const pointsToConnect = dataItem.get("pointsToConnect");
-			if (pointsToConnect) {
-				$array.each(pointsToConnect, (point) => {
-					point.on("longitude", () => {
-						this._markDirtyValues(dataItem);
-					})
-
-					point.on("latitude", () => {
-						this._markDirtyValues(dataItem);
-					})
-
-					point.on("geometry", () => {
-						this._markDirtyValues(dataItem);
-					})
-				})
-			}
-
-			mapLine.setPrivate("series", this);
+		let mapLine = dataItem.get("mapLine");
+		if (!mapLine) {
+			mapLine = this.makeMapLine(dataItem);
 		}
+
+		dataItem.set("mapLine", mapLine);
+		const pointsToConnect = dataItem.get("pointsToConnect");
+		if (pointsToConnect) {
+			$array.each(pointsToConnect, (point) => {
+				point.on("longitude", () => {
+					this._markDirtyValues(dataItem);
+				})
+
+				point.on("latitude", () => {
+					this._markDirtyValues(dataItem);
+				})
+
+				point.on("geometry", () => {
+					this._markDirtyValues(dataItem);
+				})
+			})
+		}
+
+		mapLine.setPrivate("series", this);
+
 	}
 
 	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._markDirtyValues();
 		if (dataItem) {
-			if (dataItem.isDirty("value")) {
-				super._markDirtyValues();
-			}
-
 			const mapLine = dataItem.get("mapLine");
 			if (mapLine) {
 				const pointsToConnect = dataItem.get("pointsToConnect");
@@ -148,9 +148,6 @@ export class MapLineSeries extends MapSeries {
 					mapLine.set("geometry", dataItem.get("geometry"));
 				}
 			}
-		}
-		else {
-			super._markDirtyValues();
 		}
 	}
 

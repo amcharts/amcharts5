@@ -2,31 +2,71 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * Create root element
+ * https://www.amcharts.com/docs/v5/getting-started/#Root_element
+ */
 const root = am5.Root.new("chartdiv");
 
+/**
+ * Set themes
+ * https://www.amcharts.com/docs/v5/concepts/themes/
+ */
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+/**
+ * Create chart
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/
+ */
 const chart = root.container.children.push(
-  am5xy.XYChart.new(
-    root,
-    {
-      panX: true,
-      panY: true,
-      wheelY: "zoomXY"
-    }
-  )
+  am5xy.XYChart.new(root, {
+    panX: true,
+    panY: true,
+    wheelY: "zoomXY"
+  })
 );
 
+/**
+ * Create axes
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+ */
+const xAxis = chart.xAxes.push(
+  am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererX.new(root, {}),
+    tooltip: am5.Tooltip.new(root, {
+      themeTags: ["axis"],
+      animationDuration: 300
+    })
+  })
+);
 
-const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, { renderer: am5xy.AxisRendererX.new(root, {}) }));
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, { renderer: am5xy.AxisRendererY.new(root, { inversed: false }) }));
-xAxis.set("tooltip", am5.Tooltip.new(root, { themeTags: ["axis"], animationDuration: 300 }))
-xAxis.children.moveValue(am5.Label.new(root, { text: "GDP per Capita, USD", x: am5.p50, centerX:am5.p50 }), xAxis.children.length - 1);
+xAxis.children.moveValue(am5.Label.new(root, {
+  text: "GDP per Capita, USD",
+  x: am5.p50,
+  centerX: am5.p50
+}), xAxis.children.length - 1);
 
-yAxis.set("tooltip", am5.Tooltip.new(root, { themeTags: ["axis"], animationDuration: 300 }))
-yAxis.children.moveValue(am5.Label.new(root, { rotation: -90, text: "Life expectancy, years", y: am5.p50, centerX:am5.p50 }), 0);
+const yAxis = chart.yAxes.push(
+  am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererY.new(root, {
+      inversed: false
+    }),
+    tooltip: am5.Tooltip.new(root, {
+      themeTags: ["axis"],
+      animationDuration: 300
+    })
+  })
+);
+
+yAxis.children.moveValue(am5.Label.new(root, {
+  rotation: -90,
+  text: "Life expectancy, years",
+  y: am5.p50,
+  centerX: am5.p50
+}), 0);
+
 
 const series = chart.series.push(am5xy.LineSeries.new(root, { calculateAggregates: true, xAxis: xAxis, yAxis: yAxis, valueYField: "y", valueXField: "x", valueField: "value" }));
 series.strokes.template.set("visible", false);
@@ -1574,9 +1614,9 @@ var tooltip = am5.Tooltip.new(root, { pointerOrientation: "horizontal" });
 tooltip.label.set("text", "[bold]{title}[/]\nLife expectancy: {valueY.formatNumber('#.0')}\nGDP: {valueX.formatNumber('#,###.')}\nPopulation: {value.formatNumber('#,###.')}");
 const background = tooltip.get("background");
 background.set("stroke", root.interfaceColors.get("alternativeBackground"));
-background.adapters.add("fill", (fill, target)=>{
+background.adapters.add("fill", (fill, target) => {
   let dataItem = target.dataItem;
-  if(dataItem && dataItem.dataContext){
+  if (dataItem && dataItem.dataContext) {
     return am5.Color.fromString(dataItem.dataContext.color);
   }
   return fill
@@ -1585,8 +1625,17 @@ series.set("tooltip", tooltip);
 
 chart.set("cursor", am5xy.XYCursor.new(root, { xAxis: xAxis, yAxis: yAxis, snapToSeries: [series] }));
 
-chart.set("scrollbarX", am5.Scrollbar.new(root, { orientation: "horizontal" }));
-chart.set("scrollbarY", am5.Scrollbar.new(root, { orientation: "vertical" }));
+/**
+ * Add scrollbars
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+ */
+chart.set("scrollbarX", am5.Scrollbar.new(root, {
+  orientation: "horizontal"
+}));
+
+chart.set("scrollbarY", am5.Scrollbar.new(root, {
+  orientation: "vertical"
+}));
 
 series.appear(1500);
 chart.appear(1500);

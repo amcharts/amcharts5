@@ -9,7 +9,7 @@ export interface IGridSettings extends IGraphicsSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
 	 */
 	location?: number;
 
@@ -21,7 +21,7 @@ export interface IGridPrivate extends IGraphicsPrivate {
 /**
  * Creates an axis grid line.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Grid} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Grid} for more info
  * @important
  */
 export class Grid extends Graphics {

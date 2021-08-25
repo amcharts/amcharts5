@@ -157,7 +157,7 @@ export class MapPolygon extends Graphics {
 	}
 
 
-	protected _getTooltipPoint(): IPoint {
+	public _getTooltipPoint(): IPoint {
 		const series = this.series;
 
 		if (series) {

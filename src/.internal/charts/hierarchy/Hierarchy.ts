@@ -79,28 +79,28 @@ export interface IHierarchySettings extends ISeriesSettings {
 	/**
 	 * A [[ColorSet]] to use when asigning colors for nodes.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/#Node_colors} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Node_colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
 	 * Number of child levels to open when clicking on a node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/#Drill_down} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
 	 */
 	downDepth?: number;
 
 	/**
 	 * Number of levels parent levels to show from currently selected node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/#Drill_down} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
 	 */
 	upDepth?: number;
 
 	/**
 	 * Number of levels to show on chart's first load.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/#Tree_depth} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Tree_depth} for more info
 	 */
 	initialDepth?: number;
 
@@ -110,7 +110,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	 * It could be used to eliminate top level branches, that do not need to be
 	 * shown.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/#Tree_depth} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Tree_depth} for more info
 	 */
 	topDepth?: number;
 
@@ -123,7 +123,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	/**
 	 * A data item for currently selected node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/#Pre_selected_branch} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch} for more info
 	 */
 	selectedDataItem?: DataItem<IHierarchyDataItem>;
 
@@ -157,7 +157,7 @@ export interface IHierarchyEvents extends ISeriesEvents {
 /**
  * A base class for all hierarchy charts.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/} for more info
  */
 export abstract class Hierarchy extends Series {
 	public static className: string = "Hierarchy";

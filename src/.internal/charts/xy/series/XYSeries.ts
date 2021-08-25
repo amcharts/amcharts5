@@ -9,6 +9,7 @@ import * as $type from "../../../core/util/Type";
 import * as $object from "../../../core/util/Object";
 import type { Color } from "../../../core/util/Color";
 import type { IPoint } from "../../../core/util/IPoint";
+import type { Sprite } from "../../../core/render/Sprite";
 import type { ILegendDataItem } from "../../../core/render/Legend";
 import type { Bullet } from "../../../core/render/Bullet";
 import type { XYChart } from "../XYChart";
@@ -57,7 +58,7 @@ function max(left: number | undefined, right: number | undefined): number | unde
 /**
  * Interface representing a series axis range.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
  */
 export interface IXYSeriesAxisRange {
 
@@ -216,7 +217,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * If data items are closer than this, bullets are turned off to avoid
 	 * overcrowding.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Bullets} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets} for more info
 	 */
 	minBulletDistance?: number;
 
@@ -234,7 +235,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * If set to `true` series will be stacked to other series that also have
 	 * this setting set to `true`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Stacked_series} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Stacked_series} for more info
 	 */
 	stacked?: boolean;
 
@@ -242,7 +243,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Whether to stack negative values from zero (`true`) or from whatever
 	 * previous series value is (`false`).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Negative_value_stacking} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Negative_value_stacking} for more info
 	 */
 	stackToNegative?: boolean;
 
@@ -251,21 +252,21 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 *
 	 * A base axis will dictate direction series plot.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Base_axis} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Base_axis} for more info
 	 */
 	baseAxis?: IXYAxis;
 
 	/**
 	 * Input data field for X value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	valueXField?: string;
 
 	/**
 	 * Input data field for Y value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	valueYField?: string;
 
@@ -279,14 +280,14 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	/**
 	 * Display data field for X value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	valueXShow?: "valueXWorking" | "valueXChange" | "valueXChangePercent" | "valueXChangeSelection" | "valueXChangeSelectionPercent" | "valueXChangePrevious" | "valueXChangePreviousPercent" | "valueXTotal" | "valueXTotalPercent" | "valueXSum";
 
 	/**
 	 * Display data field for Y value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	valueYShow?: "valueYWorking" | "valueYChange" | "valueYChangePercent" | "valueYChangeSelection" | "valueYChangeSelectionPercent" | "valueYChangePrevious" | "valueYChangePreviousPercent" | "valueYTotal" | "valueYTotalPercent" | "valueYSum";
 
@@ -294,7 +295,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Indicates what aggregate value to use for collective data item, when
 	 * aggregating X values from several data items.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	valueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
@@ -302,91 +303,91 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Indicates what aggregate value to use for collective data item, when
 	 * aggregating X values from several data items.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	valueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
 	 * Input data field for X open value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueXField?: string;
 
 	/**
 	 * Input data field for X open value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueYField?: string;
 
 	/**
 	 * Display data field for X open value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueXShow?: "openValueXWorking" | "openValueXChange" | "openValueXChangePercent" | "openValueXChangeSelection" | "openValueXChangeSelectionPercent" | "openValueXChangePrevious" | "openValueXChangePreviousPercent";
 
 	/**
 	 * Display data field for Y open value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueYShow?: "openValueYWorking" | "openValueYChange" | "openValueYChangePercent" | "openValueYChangeSelection" | "openValueYChangeSelectionPercent" | "openValueYChangePrevious" | "openValueYChangePreviousPercent";
 
 	/**
 	 * Display data field for Y open value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	openValueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
 	 * Display data field for Y open value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	openValueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
 	 * Input data field for X category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	categoryXField?: string;
 
 	/**
 	 * Input data field for Y category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	categoryYField?: string;
 
 	/**
 	 * Display data field for X category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openCategoryXField?: string;
 
 	/**
 	 * Display data field for Y category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openCategoryYField?: string;
 
 	/**
 	 * Series stroke color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Series_colors} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
 	 */
 	stroke?: Color;
 
 	/**
 	 * Series fill color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/#Series_colors} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
 	 */
 	fill?: Color;
 
@@ -420,7 +421,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/line-series/#Data_item_location} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Data_item_location} for more info
 	 * @default 0.5
 	 */
 	locationX?: number;
@@ -430,7 +431,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/line-series/#Data_item_location} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Data_item_location} for more info
 	 * @default 0.5
 	 */
 	locationY?: number;
@@ -473,6 +474,11 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 */
 	legendRangeValueText?: string;
 
+
+	/**
+	 * If set to `true`, series bullets will be masked by plot area.
+	 */
+	maskBullets?: boolean;
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {
@@ -566,7 +572,7 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 /**
  * A base class for all XY chart series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/} for more info
  */
 export abstract class XYSeries extends Series {
 	public static className: string = "XYSeries";
@@ -609,7 +615,7 @@ export abstract class XYSeries extends Series {
 	/**
 	 * A list of axis ranges that affect the series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-ranges/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 */
 	public readonly axisRanges: List<this["_axisRangeType"]> = new List();
 
@@ -914,11 +920,20 @@ export abstract class XYSeries extends Series {
 	}
 
 
+	protected _handleMaskBullets() {
+		if (this.isDirty("maskBullets")) {
+			this.bulletsContainer.set("maskContent", this.get("maskBullets"));
+		}
+	}
+
+
 	public _prepareChildren() {
 		super._prepareChildren();
 
 		this.set("width", this.get("xAxis").width());
 		this.set("height", this.get("yAxis").height());
+
+		this._handleMaskBullets();
 
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
@@ -1002,7 +1017,7 @@ export abstract class XYSeries extends Series {
 
 			this._markStakedDirtyStack();
 
-			this.updateLegendMarker(undefined);
+			//this.updateLegendMarker(undefined); // causes legend marker to change color instantly when on
 			this.updateLegendValue(undefined);
 		}
 
@@ -1078,25 +1093,22 @@ export abstract class XYSeries extends Series {
 
 		if (this.isDirty("fill") || this.isDirty("stroke")) {
 
-			let markerBackground: Graphics | undefined;
+			let markerRectangle: Graphics | undefined;
 			const legendDataItem = this.get("legendDataItem");
 			if (legendDataItem) {
-				const marker = legendDataItem.get("marker");
-				if (marker instanceof Container) {
-					markerBackground = marker.get("background");
-				}
-			}
+				markerRectangle = legendDataItem.get("markerRectangle");
 
-			if (this.isDirty("stroke")) {
-				let stroke = this.get("stroke");
-				if (markerBackground) {
-					markerBackground.set("stroke", stroke);
-				}
-			}
-			if (this.isDirty("fill")) {
-				let fill = this.get("fill");
-				if (markerBackground) {
-					markerBackground.set("fill", fill);
+				if (markerRectangle) {
+
+					if (this.isDirty("stroke")) {
+						let stroke = this.get("stroke");
+						markerRectangle.set("stroke", stroke);
+					}
+					if (this.isDirty("fill")) {
+						let fill = this.get("fill");
+						markerRectangle.set("fill", fill);
+					}
+
 				}
 			}
 			this.updateLegendMarker(undefined);
@@ -1634,7 +1646,7 @@ export abstract class XYSeries extends Series {
 						if ($type.isNumber(value)) {
 							tooltip._setDataItem(dataItem);
 							tooltip.label.text.markDirtyText();
-							tooltip.set("tooltipTarget", this);
+							tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
 							tooltip.show();
 							tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));
 						}
@@ -1650,6 +1662,10 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
+	protected _getTooltipTarget(_dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
+		return this;
+	}
+
 	/**
 	 * @ignore
 	 */
@@ -1660,33 +1676,32 @@ export abstract class XYSeries extends Series {
 
 			const label = legendDataItem.get("label");
 			if (label) {
-				const text = label.text;
 				let txt = "";
 				if (dataItem) {
 					label._setDataItem(dataItem);
-					txt = this.get("legendLabelText", text.get("text", this.get("name", "")));
+					txt = this.get("legendLabelText", label.get("text", this.get("name", "")));
 				}
 				else {
 					label._setDataItem(this.makeDataItem({}));
-					txt = this.get("legendRangeLabelText", this.get("legendLabelText", text.get("text", this.get("name", ""))));
+					txt = this.get("legendRangeLabelText", this.get("legendLabelText", label.get("text", this.get("name", ""))));
 				}
-				text.set("text", txt);
+
+				label.set("text", txt);
 			}
 
 			const valueLabel = legendDataItem.get("valueLabel");
 			if (valueLabel) {
-				const text = valueLabel.text;
 				let txt = "";
 				if (dataItem) {
 					valueLabel._setDataItem(dataItem);
-					txt = this.get("legendValueText", text.get("text", ""));
+					txt = this.get("legendValueText", valueLabel.get("text", ""));
 				}
 				else {
 					valueLabel._setDataItem(this.makeDataItem({}));
-					txt = this.get("legendRangeValueText", text.get("text", ""));
+					txt = this.get("legendRangeValueText", valueLabel.get("text", ""));
 				}
 
-				text.set("text", txt);
+				valueLabel.set("text", txt);
 			}
 		}
 	}
@@ -1746,7 +1761,7 @@ export abstract class XYSeries extends Series {
 	/**
 	 * Creates and returns an axis range object.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/axis-ranges/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 * @param   axisDataItem  Axis data item
 	 * @return                Axis range
 	 */

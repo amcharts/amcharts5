@@ -15,7 +15,7 @@ export interface IXYChartScrollbarPrivate extends IScrollbarPrivate {
 /**
  * Creates a scrollbar with chart preview in it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/scrollbars/#Scrollbar_with_chart_preview} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/#Scrollbar_with_chart_preview} for more info
  * @important
  */
 export class XYChartScrollbar extends Scrollbar {
@@ -31,7 +31,7 @@ export class XYChartScrollbar extends Scrollbar {
 	 */
 	public static new(root: Root, settings: XYChartScrollbar["_settings"], template?: Template<XYChartScrollbar>): XYChartScrollbar {
 		this._addOrientationClass(root, settings);
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["scrollbar", "xy", settings.orientation]);
+		settings.themeTags = $utils.mergeTags(settings.themeTags, ["scrollbar", "xy", "chart", settings.orientation]);
 		const x = new XYChartScrollbar(root, settings, true, template);
 		x._afterNew();
 		return x;

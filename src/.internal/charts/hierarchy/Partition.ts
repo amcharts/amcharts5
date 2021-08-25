@@ -81,7 +81,7 @@ export interface IPartitionPrivate extends IHierarchyPrivate {
 /**
  * Partition series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/partition/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/partition/} for more info
  */
 export class Partition extends Hierarchy {
 

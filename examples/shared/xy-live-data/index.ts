@@ -2,8 +2,16 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * Create root element
+ * https://www.amcharts.com/docs/v5/getting-started/#Root_element
+ */
 const root = am5.Root.new("chartdiv");
 
+/**
+ * Set themes
+ * https://www.amcharts.com/docs/v5/concepts/themes/
+ */
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
@@ -32,24 +40,47 @@ function generateChartData() {
 
 const data = generateChartData();
 
+/**
+ * Create chart
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/
+ */
 const chart = root.container.children.push(
-  am5xy.XYChart.new(
-    root,
-    {
-      focusable: true,
-      panX: true,
-      panY: true,
-      wheelX: "panX",
-      wheelY: "zoomX"
-    }
-  )
+  am5xy.XYChart.new(root, {
+    focusable: true,
+    panX: true,
+    panY: true,
+    wheelX: "panX",
+    wheelY: "zoomX"
+  })
 );
 
 let easing = am5.ease.linear;
 
-const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, { maxDeviation: 0.5, groupData: false, baseInterval: { timeUnit: "day", count: 1 }, renderer: am5xy.AxisRendererX.new(root, { minGridDistance:50 }) }));
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, { renderer: am5xy.AxisRendererY.new(root, {}) }));
-xAxis.set("tooltip", am5.Tooltip.new(root, { themeTags: ["axis"], animationDuration: 300 }))
+/**
+ * Create axes
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+ */
+const xAxis = chart.xAxes.push(
+  am5xy.DateAxis.new(root, {
+    maxDeviation: 0.5,
+    groupData: false,
+    baseInterval: { timeUnit: "day", count: 1 },
+    renderer: am5xy.AxisRendererX.new(root, {
+      minGridDistance: 50
+    }),
+    tooltip: am5.Tooltip.new(root, {
+      themeTags: ["axis"],
+      animationDuration: 300
+    })
+  })
+);
+
+const yAxis = chart.yAxes.push(
+  am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererY.new(root, {})
+  })
+);
+
 
 const series = chart.series.push(am5xy.LineSeries.new(root, { minBulletDistance: 10, name: "Series 1", xAxis: xAxis, yAxis: yAxis, "valueYField": "value", "valueXField": "date" }));
 series.data.setAll(data);
@@ -88,7 +119,7 @@ function addData() {
     let tooltip = xAxis.get("tooltip");
     if (tooltip && !tooltip.isHidden()) {
       animation.events.on("stopped", () => {
-         xAxis.updateTooltip();
+        xAxis.updateTooltip();
       })
     }
   }

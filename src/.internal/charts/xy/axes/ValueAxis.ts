@@ -18,7 +18,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * NOTE: the axis might modify the minimum value to fit into its scale better,
 	 * unless `strictMinMax` is set to `true`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Custom_scope} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	min?: number;
 
@@ -28,21 +28,21 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * NOTE: the axis might modify the maximum value to fit into its scale better,
 	 * unless `strictMinMax` is set to `true`.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Custom_scope} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	max?: number;
 
 	/**
 	 * Force axis scale to be precisely at values as set in `min` and/or `max`.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Custom_scope} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	strictMinMax?: boolean;
 
 	/**
 	 * If set to `true` axis will use logarithmic scale.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
 	 */
 	logarithmic?: boolean;
 
@@ -52,7 +52,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Useful in situations where zero would result in error, i.e. logarithmic
 	 * scale.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
 	 */
 	treatZeroAs?: number;
 
@@ -63,7 +63,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * E..g. `0.1` will extend the scale by 10%, so if max value is `1000` and
 	 * minimum value is `0`, the new minimum value will be `-100`.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
 	 */
 	extraMin?: number;
 
@@ -74,7 +74,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * E..g. `0.1` will extend the scale by 10%, so if max value is `1000`, the
 	 * axis will now show maximum value of `1100`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
 	 */
 	extraMax?: number;
 
@@ -83,7 +83,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * values.
 	 * 
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Base_value} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Base_value} for more info
 	 */
 	baseValue?: number;
 
@@ -93,14 +93,14 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * This setting not only affects formatting of the labels, but also where and
 	 * how many grid/labels are placed on the axis.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Label_format} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
 	 */
 	maxPrecision?: number;
 
 	/**
 	 * A function that can be used to specify how to configure axis fills.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Axis_fills} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_fills} for more info
 	 */
 	fillRule?: (dataItem: DataItem<IValueAxisDataItem>) => void;
 
@@ -109,14 +109,14 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * If not set, will use format set in global number formatter.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Label_format} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
 	 */
 	numberFormat?: string;
 
 	/**
 	 * A numeric format used for numbers displayed in axis tooltip.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
 	tooltipNumberFormat?: string;
 
@@ -127,7 +127,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * E.g. if axis displays labels with one decimal (`1.0`, `1.1`, `1.2`) setting
 	 * this setting to `1` would allow two decimals in axis tooltip, e.g. `1.15`.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
 	extraTooltipPrecision?: number;
 
@@ -135,7 +135,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * If your series relies on dynamically calculated values, like value
 	 * changes, percents, or total sums, set this to `true`.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/#Calculated_values} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Calculated_values} for more info
 	 */
 	calculateTotals?: boolean;
 
@@ -179,7 +179,7 @@ export interface IValueAxisEvents extends IAxisEvents {
 /**
  * Creates a value axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/value-axis/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/} for more info
  * @important
  */
 export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
@@ -375,7 +375,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		const grid = dataItem.get("grid");
 		renderer.updateGrid(grid, position, endPosition);
 		if (grid) {
-			if (value == this.baseValue()) {
+			if (value == this.get("baseValue", 0)) {
 				grid.addTag("base");
 				grid._applyThemes();
 			}
@@ -387,6 +387,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		renderer.updateTick(dataItem.get("tick"), position, endPosition, count);
 		renderer.updateFill(dataItem.get("axisFill"), position, fillEndPosition);
+		this._processBullet(dataItem);
 		renderer.updateBullet(dataItem.get("bullet"), position, endPosition);
 
 		if (!dataItem.get("isRange")) {
@@ -1086,14 +1087,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		exponent = Math.log(Math.abs(difference)) * Math.LOG10E;
 		power = Math.pow(10, Math.floor(exponent));
-		power = power / 10;
+		power = power / 100; // used to be 10 in v4, but this caused issue that there could be limited number of grids with even very small minGridDistance
 
 		// approximate difference between two grid lines
 		let step = Math.ceil((difference / gridCount) / power) * power;
-
 		let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(step)) * Math.LOG10E));
 
-		// TODO: in v3 I had fixStepE here, ommiting it for a while, need to think about other solution
 		// the step should divide by  2, 5, and 10.
 		let stepDivisor: number = Math.ceil(step / stepPower); // number 0 - 10
 

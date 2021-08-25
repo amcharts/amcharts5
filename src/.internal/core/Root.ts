@@ -1,39 +1,47 @@
+import type { IAnimation } from "./util/Animation";
+import type { Entity } from "./util/Entity";
+import type { Sprite } from "./render/Sprite";
+import type { Text } from "./render/Text";
+import type { Theme } from "./Theme";
+import type { IPoint } from "./util/IPoint";
+import type { IRenderer } from "./render/backend/Renderer";
+
 import { Container } from "./render/Container";
 import { HorizontalLayout } from "./render/HorizontalLayout";
 import { VerticalLayout } from "./render/VerticalLayout";
 import { GridLayout } from "./render/GridLayout";
-import type { IAnimation } from "./util/Animation";
 import { IDisposer, Disposer } from "./util/Disposer";
 import { ResizeSensor } from "./util/ResizeSensor";
-import type { Entity } from "./util/Entity";
 import { InterfaceColors } from "./util/InterfaceColors";
-import type { Sprite } from "./render/Sprite";
-import type { Text } from "./render/Text";
+import { Graphics } from "./render/Graphics";
+import { Rectangle } from "./render/Rectangle";
 import { Tooltip } from "./render/Tooltip";
-import type { Theme } from "./Theme";
 import { NumberFormatter } from "./util/NumberFormatter";
 import { DateFormatter } from "./util/DateFormatter";
 import { DurationFormatter } from "./util/DurationFormatter";
 import { ILocale, Language } from "./util/Language";
 import { Events, EventDispatcher } from "./util/EventDispatcher";
 import { DefaultTheme } from "../themes/DefaultTheme";
-import type { IPoint } from "./util/IPoint";
-import type { IRenderer } from "./render/backend/Renderer";
 import { CanvasRenderer } from "./render/backend/CanvasRenderer";
+import { p100, percent } from "./util/Percent";
+import { color } from "./util/Color";
+import { populateString } from "./util/PopulateString";
+
 import * as $order from "./util/Order";
-import { p100 } from "./util/Percent";
 import * as $array from "./util/Array";
 import * as $object from "./util/Object";
 import * as $utils from "./util/Utils";
+
 import en from "../../locales/en";
-import { populateString } from "./util/PopulateString";
 
 
+/**
+ * @ignore
+ */
 interface IParent extends Entity {
 	_prepareChildren(): void;
 	_updateChildren(): void;
 }
-
 
 interface IBounds extends Entity {
 	depth(): number;
@@ -48,8 +56,14 @@ export interface IRootEvents {
 
 
 // TODO implement Disposer
+/**
+ * Root element of the chart.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/getting-started/#Root_element} for more info
+ */
 export class Root implements IDisposer {
 	public _dom: HTMLElement;
+	public _inner: HTMLElement;
 
 	protected _isDirty: boolean = false;
 	protected _isDirtyParents: boolean = false;
@@ -79,6 +93,9 @@ export class Root implements IDisposer {
 
 	public _rootContainer!: Container;
 
+	/**
+	 * Main content container.
+	 */
 	public container!: Container;
 
 	/**
@@ -86,10 +103,7 @@ export class Root implements IDisposer {
 	 */
 	public tooltipContainer!: Container
 
-	/**
-	 * @ignore deprecated?
-	 */
-	public static useCanvas: boolean = false;
+	public _tooltip!: Tooltip;
 
 	/**
 	 * Default theme.
@@ -170,6 +184,8 @@ export class Root implements IDisposer {
 	protected _tooltipElementContainer: HTMLDivElement | undefined;
 	protected _readerAlertElement: HTMLDivElement | undefined;
 
+	public _logo?: Container;
+
 	/**
 	 * Used for dynamically-created CSS and JavaScript with strict source policies.
 	 */
@@ -189,13 +205,20 @@ export class Root implements IDisposer {
 
 	public _tooltips: Array<Tooltip> = [];
 
-	protected constructor(id: string, isReal: boolean) {
+	protected constructor(id: string | HTMLElement, isReal: boolean) {
 
 		if (!isReal) {
 			throw new Error("You cannot use `new Class()`, instead use `Class.new()`");
 		}
 
-		const dom = document.getElementById(id);
+		let dom: HTMLElement | null;
+
+		if (id instanceof HTMLElement) {
+			dom = id;
+		}
+		else {
+			dom = document.getElementById(id);
+		}
 
 		this.interfaceColors = InterfaceColors.new(this, {});
 
@@ -203,18 +226,84 @@ export class Root implements IDisposer {
 			throw new Error("Could not find HTML element with id `" + id + "`");
 		}
 
-		// TODO: is this right? We need chart container to be "positioned"
-		if (!dom.style.position) {
-			dom.style.position = "relative";
-		}
-
 		this._dom = dom;
+
+		let inner: HTMLDivElement = document.createElement("div");
+		inner.style.position = "relative";
+		dom.appendChild(inner);
+
+		this._inner = inner;
 	}
 
-	public static new(id: string): Root {
+	public static new(id: string | HTMLElement): Root {
 		const root = new Root(id, true);
 		root._init();
 		return root;
+	}
+
+
+	protected _handleLogo(): void {
+		if (this._logo) {
+			if (this._rootContainer.getPrivate("width", 0) <= 150 || this._rootContainer.getPrivate("height", 0) <= 60) {
+				this._logo.hide();
+			}
+			else {
+				this._logo.show();
+			}
+		}
+	}
+
+	public _showBranding(): void {
+		if (!this._logo) {
+			const logo = this.tooltipContainer.children.push(Container.new(this, {
+				interactive: true,
+				interactiveChildren: false,
+				position: "absolute",
+				setStateOnChildren: true,
+				scale: .6,
+				y: percent(100),
+				paddingBottom: 9,
+				paddingLeft: 9,
+				paddingRight: 9,
+				paddingTop: 9,
+				centerY: p100,
+				tooltipText: "Chart created using amCharts 5",
+				cursorOverStyle: "pointer",
+				background: Rectangle.new(this, {
+					fill: color(0x474758),
+					fillOpacity: 0,
+					tooltipY: 5
+				})
+			}));
+
+			logo.events.on("click", () => {
+				window.open("https://www.amcharts.com/", "_blank");
+			});
+
+			logo.states.create("hover", {});
+
+			const m = logo.children.push(Graphics.new(this, {
+				stroke: color(0xcccccc),
+				strokeWidth: 3,
+				svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6"
+			}));
+
+			m.states.create("hover", { stroke: color(0x3CABFF) });
+
+			const a = logo.children.push(Graphics.new(this, {
+				stroke: color(0x888888),
+				strokeWidth: 3,
+				svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0"
+			}));
+
+			a.states.create("hover", { stroke: color(0x474758) });
+
+			logo.set("tooltip", this._tooltip);
+			logo.setPrivate("tooltipTarget", logo.get("background"));
+			this._logo = logo;
+
+			this._handleLogo();
+		}
 	}
 
 	protected _init(): void {
@@ -228,7 +317,7 @@ export class Root implements IDisposer {
 		renderer.resize(this._dom.clientWidth, this._dom.clientHeight);
 
 		//@todo: better appendChild - refer
-		this._dom.appendChild(renderer.view);
+		this._inner.appendChild(renderer.view);
 
 		// TODO: TMP TMP TMP for testing only, remove
 		//document.body.appendChild((<any>renderer)._ghostView);
@@ -236,26 +325,39 @@ export class Root implements IDisposer {
 
 		this._disposers.push(new ResizeSensor(this._dom, () => {
 			const dom = this._dom;
+			this._focusElementContainer!.style.width = dom.clientWidth + "px";
+			this._focusElementContainer!.style.height = dom.clientHeight + "px";
 			renderer.resize(dom.clientWidth, dom.clientHeight);
-			this._rootContainer.set("width", dom.clientWidth);
-			this._rootContainer.set("height", dom.clientHeight);
+			this._rootContainer.setPrivate("width", dom.clientWidth);
+			this._rootContainer.setPrivate("height", dom.clientHeight);
 			this._render();
+			this._handleLogo();
 		}));
 
 		// Create element which is used to make announcements to screen reader
-		this._readerAlertElement = document.createElement("div");
-		this._readerAlertElement.setAttribute("role", "alert");
-		this._readerAlertElement.style.zIndex = "-100000";
-		this._readerAlertElement.style.opacity = "0";
-		this._readerAlertElement.style.position = "absolute";
-		this._readerAlertElement.style.top = "0";
-		this._dom.appendChild(this._readerAlertElement);
+		const readerAlertElement = document.createElement("div");
+		readerAlertElement.setAttribute("role", "alert");
+		readerAlertElement.style.zIndex = "-100000";
+		readerAlertElement.style.opacity = "0";
+		readerAlertElement.style.position = "absolute";
+		readerAlertElement.style.top = "0";
+		this._readerAlertElement = readerAlertElement;
+		this._inner.appendChild(this._readerAlertElement);
 
-		this._focusElementContainer = document.createElement("div");
-		this._dom.appendChild(this._focusElementContainer);
+		const focusElementContainer = document.createElement("div");
+		focusElementContainer.style.position = "absolute";
+		focusElementContainer.style.pointerEvents = "non";
+		focusElementContainer.style.top = "0px";
+		focusElementContainer.style.left = "0px";
+		focusElementContainer.style.overflow = "hidden";
+		focusElementContainer.style.width = this._dom.clientWidth + "px";
+		focusElementContainer.style.height = this._dom.clientHeight + "px";
+		$utils.setInteractive(focusElementContainer, false);
+		this._focusElementContainer = focusElementContainer;
+		this._inner.appendChild(this._focusElementContainer);
 
 		this._tooltipElementContainer = document.createElement("div");
-		this._dom.appendChild(this._tooltipElementContainer);
+		this._inner.appendChild(this._tooltipElementContainer);
 
 		// Add keyboard events for accessibility, e.g. simulating drag with arrow
 		// keys and click with ENTER
@@ -401,7 +503,7 @@ export class Root implements IDisposer {
 		this._renderer.render(this._rootContainer._display);
 
 		if (this._focusElementDirty) {
-			this.updateCurrentFocus();
+			this._updateCurrentFocus();
 			this._focusElementDirty = false;
 		}
 	}
@@ -419,7 +521,7 @@ export class Root implements IDisposer {
 	}
 
 	private _runDirties() {
-		console.log("tick **************************************************************");
+		//console.log("tick **************************************************************");
 
 		let allParents: { [id: number]: IParent } = {};
 
@@ -591,14 +693,27 @@ export class Root implements IDisposer {
 		});
 	}
 
+	/**
+	 * Returns width of the target container, in pixels.
+	 * 
+	 * @return Width
+	 */
 	public width(): number {
 		return this._dom.clientWidth;
 	}
 
+	/**
+	 * Returns height of the target container, in pixels.
+	 * 
+	 * @return Height
+	 */
 	public height(): number {
 		return this._dom.clientHeight;
 	}
 
+	/**
+	 * Disposes root and all the content in it.
+	 */
 	public dispose(): void {
 		if (!this._isDisposed) {
 			this._isDisposed = true;
@@ -611,9 +726,18 @@ export class Root implements IDisposer {
 			$array.each(this._disposers, (x) => {
 				x.dispose();
 			});
+
+			if (this._inner) {
+				$utils.removeElement(this._inner);
+			}
 		}
 	}
 
+	/**
+	 * Returns `true` if root element is disposed.
+	 * 
+	 * @return Disposed?
+	 */
 	public isDisposed(): boolean {
 		return this._isDisposed;
 	}
@@ -621,6 +745,7 @@ export class Root implements IDisposer {
 	/**
 	 * Triggers screen reader read out a message.
 	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
 	 * @param  text  Alert text
 	 */
 	public readerAlert(text: string): void {
@@ -645,17 +770,24 @@ export class Root implements IDisposer {
 		if (tooltipContainer) {
 			tooltipContainer._applyThemes();
 		}
+
+		// @todo review this
+		const interfaceColors = this.interfaceColors;
+		if (interfaceColors) {
+			interfaceColors._applyThemes();
+		}
 	}
 
 	protected _addTooltip() {
 		if (!this.tooltipContainer) {
-			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false }));
+			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100 }));
 			tooltipContainer.set("layer", 100);
 			this.tooltipContainer = tooltipContainer;
 
 			const tooltip = tooltipContainer.children.push(Tooltip.new(this, {}));
 			this.container.set("tooltip", tooltip);
 			tooltip.hide(0);
+			this._tooltip = tooltip;
 		}
 	}
 
@@ -663,22 +795,22 @@ export class Root implements IDisposer {
 	 * Accesibility
 	 */
 
-	public registerTabindexOrder(target: Sprite): void {
+	public _registerTabindexOrder(target: Sprite): void {
 		if (target.get("focusable")) {
 			$array.pushOne(this._tabindexes, target);
 		}
 		else {
 			$array.remove(this._tabindexes, target);
 		}
-		this.invalidateTabindexes();
+		this._invalidateTabindexes();
 	}
 
-	public unregisterTabindexOrder(target: Sprite): void {
+	public _unregisterTabindexOrder(target: Sprite): void {
 		$array.remove(this._tabindexes, target);
-		this.invalidateTabindexes();
+		this._invalidateTabindexes();
 	}
 
-	public invalidateTabindexes(): void {
+	public _invalidateTabindexes(): void {
 
 		this._tabindexes.sort((a: Sprite, b: Sprite) => {
 			const aindex = a.get("tabindexOrder", 0);
@@ -707,7 +839,7 @@ export class Root implements IDisposer {
 		// }
 	}
 
-	public updateCurrentFocus(): void {
+	public _updateCurrentFocus(): void {
 		if (this._focusedSprite) {
 			this._decorateFocusElement(this._focusedSprite);
 			this._positionFocusElement(this._focusedSprite);
@@ -898,7 +1030,9 @@ export class Root implements IDisposer {
 		this._focusedSprite = undefined;
 	}
 
-
+	/**
+	 * @ignore
+	 */
 	public updateTooltip(target: Text): void {
 		const text = target._getText();
 		let tooltipElement = target.getPrivate("tooltipElement");
@@ -930,7 +1064,7 @@ export class Root implements IDisposer {
 		return tooltipElement;
 	}
 
-	public invalidateAccessibility(target: Sprite): void {
+	public _invalidateAccessibility(target: Sprite): void {
 		this._focusElementDirty = true;
 		const focusElement = target.getPrivate("focusElement");
 		if (target.get("focusable")) {
@@ -948,10 +1082,22 @@ export class Root implements IDisposer {
 		//this.updateCurrentFocus();
 	}
 
+	/**
+	 * Returns `true` if `target` is currently focused.
+	 * 
+	 * @param   target  Target
+	 * @return          Focused?
+	 */
 	public focused(target: Sprite): boolean {
 		return this._focusedSprite === target;
 	}
 
+	/**
+	 * Converts document coordinates to coordinates withing root element.
+	 * 
+	 * @param   point  Document point
+	 * @return         Root point
+	 */
 	public documentPointToRoot(point: IPoint): IPoint {
 		const bbox = this._dom.getBoundingClientRect();
 		return {
@@ -960,6 +1106,9 @@ export class Root implements IDisposer {
 		};
 	}
 
+	/**
+	 * @ignore
+	 */
 	public addDisposer<T extends IDisposer>(disposer: T): T {
 		this._disposers.push(disposer);
 		return disposer;

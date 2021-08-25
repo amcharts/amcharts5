@@ -26,7 +26,7 @@ export interface ISankeyLinkSettings extends IFlowLinkSettings {
 	/**
 	 * Type of fill to use for links.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/flow-charts/sankey-diagram/#Color_mode} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/sankey-diagram/#Color_mode} for more info
 	 * @default "gradient"
 	 */
 	fillStyle?: "solid" | "gradient" | "source" | "target";
@@ -34,7 +34,7 @@ export interface ISankeyLinkSettings extends IFlowLinkSettings {
 	/**
 	 * A relative distance from node for link "elbow" (bend point).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/flow-charts/sankey-diagram/#Bend_point} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/sankey-diagram/#Bend_point} for more info
 	 * @default 0.2
 	 */
 	controlPointDistance?: number;

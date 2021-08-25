@@ -1,7 +1,6 @@
-/** @ignore *//** */
+import type { Root } from "../../core/Root"
 
 import { StyleRule } from "../../core/util/Utils"
-import type { Root } from "../../core/Root"
 import { MultiDisposer, IDisposer, CounterDisposer } from "../../core/util/Disposer";
 
 /**

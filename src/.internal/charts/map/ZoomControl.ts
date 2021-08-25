@@ -1,10 +1,11 @@
 import type { Root } from "../../core/Root";
+import type { Template } from "../../core/util/Template";
+import type { MapChart } from "./MapChart";
+
 import { Container, IContainerPrivate, IContainerSettings } from "../../core/render/Container";
 import { Button } from "../../core/render/Button";
-import type { Template } from "../../core/util/Template";
 import { Graphics } from "../../core/render/Graphics";
-import { p50, p100 } from "../../core/util/Percent";
-import type { MapChart } from "./MapChart";
+import { p100 } from "../../core/util/Percent";
 import { MultiDisposer } from "../../core/util/Disposer";
 
 export interface IZoomControlSettings extends IContainerSettings {
@@ -23,20 +24,24 @@ export interface IZoomControlPrivate extends IContainerPrivate {
 /**
  * A control that displays button for zooming [[MapChart]] in and out.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/map-chart/map-pan-zoom/#Zoom_control} for more information
+ * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control} for more information
  * @important
  */
 export class ZoomControl extends Container {
 
 	/**
 	 * A [[Button]] for zoom in.
+	 * 
+	 * @default Button.new()
 	 */
-	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36 }));
+	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36, themeTags: ["plus"] }));
 
 	/**
 	 * A [[Button]] for zoom out.
+	 *
+	 * @default Button.new()
 	 */
-	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36 }));
+	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36, themeTags: ["minus"] }));
 
 	/**
 	 * Use this method to create an instance of this class.
@@ -76,33 +81,16 @@ export class ZoomControl extends Container {
 		this.set("paddingRight", 10);
 		this.set("paddingBottom", 10);
 
-		const l = 4;
+		this.plusButton.setAll({
+			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
+			layout: undefined
+		});
 
-		const plusButton = this.plusButton;
-		const plusIcon = plusButton.set("icon", Graphics.new(this._root, {
-			themeTags: ["icon"],
-			x: p50,
-			y: p50
-		}));
-		plusIcon.set("draw", (display) => {
-			display.moveTo(-l, 0);
-			display.lineTo(l, 0);
-			display.moveTo(0, -l);
-			display.lineTo(0, l);
-		})
-		plusButton.set("layout", undefined);
+		this.minusButton.setAll({
+			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
+			layout: undefined
+		});
 
-		const minusButton = this.minusButton;
-		const minusIcon = minusButton.set("icon", Graphics.new(this._root, {
-			themeTags: ["icon"],
-			x: p50,
-			y: p50
-		}));
-		minusIcon.set("draw", (display) => {
-			display.moveTo(-l, 0);
-			display.lineTo(l, 0);
-		})
-		minusButton.set("layout", undefined);
 	}
 
 	public _prepareChildren() {

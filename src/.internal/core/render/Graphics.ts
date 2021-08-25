@@ -94,6 +94,7 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 *
 	 * @default BlendMode.NORMAL ("source-over")
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation} for more information
+	 * @ignore
 	 */
 	blendMode?: BlendMode;
 

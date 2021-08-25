@@ -73,7 +73,6 @@ export interface IMapPointSeriesDataItem extends IMapSeriesDataItem {
 	 * An ID of the [[MapPolygon]] to use for centering the point.
 	 */
 	polygonId?: string;
-
 }
 
 export interface IMapPointSeriesSettings extends IMapSeriesSettings {
@@ -86,12 +85,18 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 */
 	polygonIdField?: string;
 
+	//@todo description
+	clipFront?:boolean;
+
+	//@todo description
+	clipBack?:boolean;
+
 };
 
 /**
  * Creates a map series for displaying markers on the map.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/map-chart/map-point-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/} for more info
  * @important
  */
 export class MapPointSeries extends MapSeries {
@@ -133,16 +138,10 @@ export class MapPointSeries extends MapSeries {
 	}
 
 	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._markDirtyValues();
+
 		if (dataItem) {
-			if (dataItem.isDirty("value")) {
-				super._markDirtyValues();
-			}
-			else {
-				this._positionBullets(dataItem);
-			}
-		}
-		else {
-			super._markDirtyValues();
+			this._positionBullets(dataItem);
 		}
 	}
 
@@ -275,18 +274,26 @@ export class MapPointSeries extends MapSeries {
 			const geoPath = chart.getPrivate("geoPath");
 			const dataItem: DataItem<IMapPointSeriesDataItem> = sprite.dataItem as DataItem<IMapPointSeriesDataItem>;
 
-			if (geoPath(geometry)) {
-				const xy = projection(coordinates as any);
+			const xy = projection(coordinates as any);
 
-				if (xy) {
-					sprite.set("x", xy[0]);
-					sprite.set("y", xy[1]);
-					sprite.setPrivate("visible", true);
+			if (xy) {
+				sprite.set("x", xy[0]);
+				sprite.set("y", xy[1]);
+
+			}
+
+			let visible = true;
+			if (geoPath(geometry)) {
+				if(this.get("clipFront")){
+					visible = false;
 				}
 			}
 			else {
-				sprite.setPrivate("visible", false);
+				if(this.get("clipBack")){
+					visible = false;
+				}
 			}
+			sprite.setPrivate("visible", visible);
 
 			if (dataItem && dataItem.get("autoRotate")) {
 				sprite.set("rotation", dataItem.get("autoRotateAngle", 0));

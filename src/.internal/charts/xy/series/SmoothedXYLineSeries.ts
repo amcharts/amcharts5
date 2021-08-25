@@ -34,7 +34,7 @@ export interface SmoothedXYLineSeriesPrivate extends ILineSeriesPrivate {
 /**
  * Smoothed line series suitable for XY (scatter) charts
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/smoothed-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/} for more info
  */
 export class SmoothedXYLineSeries extends LineSeries {
 	public static className: string = "SmoothedXYLineSeries";

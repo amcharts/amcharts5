@@ -1,15 +1,18 @@
-import { XYSeries, IXYSeriesPrivate, IXYSeriesSettings, IXYSeriesDataItem, IXYSeriesAxisRange } from "./XYSeries";
 import type { DataItem } from "../../../core/render/Component";
 import type { Graphics } from "../../../core/render/Graphics";
-import * as $array from "../../../core/util/Array";
-import * as $type from "../../../core/util/Type";
 import type { Template } from "../../../core/util/Template";
 import type { ListTemplate } from "../../../core/util/List";
-import { Percent } from "../../../core/util/Percent";
 import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
 import type { ValueAxis } from "../axes/ValueAxis";
 import type { ILegendDataItem } from "../../../core/render/Legend";
+import type { Sprite } from "../../../core/render/Sprite";
+
+import { XYSeries, IXYSeriesPrivate, IXYSeriesSettings, IXYSeriesDataItem, IXYSeriesAxisRange } from "./XYSeries";
+import { Percent } from "../../../core/util/Percent";
+
+import * as $array from "../../../core/util/Array";
+import * as $type from "../../../core/util/Type";
 
 export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 	graphics?: Graphics;
@@ -24,7 +27,7 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 * series (`true`; default) or take up the whole available space (`false`).
 	 *
 	 * @default true
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/column-series/#Clustering} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Clustering} for more info
 	 */
 	clustered?: boolean;
 
@@ -34,9 +37,16 @@ export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate {
 }
 
 export interface IBaseColumnSeriesAxisRange extends IXYSeriesAxisRange {
-	columns: ListTemplate<Graphics>
+
+	/**
+	 * List of columns.
+	 */
+	columns: ListTemplate<Graphics>;
 }
 
+/**
+ * Base class for all "column-based" series
+ */
 export abstract class BaseColumnSeries extends XYSeries {
 
 	declare public _settings: IBaseColumnSeriesSettings;
@@ -52,7 +62,10 @@ export abstract class BaseColumnSeries extends XYSeries {
 	 */
 	public abstract makeColumn(dataItem: DataItem<this["_dataItemSettings"]>, listTemplate: ListTemplate<Graphics>): Graphics
 
-	public abstract columns: ListTemplate<Graphics>
+	/**
+	 * List of columns in series.
+	 */
+	public abstract columns: ListTemplate<Graphics>;
 
 	protected _makeGraphics(listTemplate: ListTemplate<Graphics>, dataItem: DataItem<this["_dataItemSettings"]>): Graphics {
 		return this.makeColumn(dataItem, listTemplate);
@@ -201,10 +214,10 @@ export abstract class BaseColumnSeries extends XYSeries {
 			graphics._setDataItem(dataItem);
 
 			const legendDataItem = dataItem.get("legendDataItem");
-			if(legendDataItem){
+			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
-				if(markerRectangle){
-					markerRectangle.setAll({fill:graphics.get("fill"), stroke:graphics.get("stroke")});
+				if (markerRectangle) {
+					markerRectangle.setAll({ fill: graphics.get("fill"), stroke: graphics.get("stroke") });
 				}
 			}
 
@@ -364,7 +377,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 			let rangeGraphics = dataItem.get("rangeGraphics")!;
 			if (rangeGraphics) {
-				$array.each(rangeGraphics, (graphics) => {		
+				$array.each(rangeGraphics, (graphics) => {
 					this._updateSeriesGraphics(dataItem, graphics, l, r, t, b);
 				})
 			}
@@ -502,8 +515,6 @@ export abstract class BaseColumnSeries extends XYSeries {
 		}
 	}
 
-
-
 	/**
 	 * @ignore
 	 */
@@ -561,21 +572,30 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const legendDataItem = this.get("legendDataItem");
 
 		if (legendDataItem) {
+
+			let graphics: Template<Graphics> | Graphics = this.columns.template;
+			if (dataItem) {
+				let column = dataItem.get("graphics");
+				if (column) {
+					graphics = column;
+				}
+			}
+
 			const markerRectangle = legendDataItem.get("markerRectangle");
 
 			if (markerRectangle) {
-				let graphics: Template<Graphics> | Graphics = this.columns.template;
-				if (dataItem) {
-					let column = dataItem.get("graphics");
-					if (column) {
-						graphics = column;
-					}
-				}
-
 				if (!legendDataItem.get("itemContainer").get("disabled")) {
-					markerRectangle.setAll({ fill: graphics.get("fill", this.get("fill")), fillOpacity: graphics.get("fillOpacity"), fillGradient: graphics.get("fillGradient"), stroke: graphics.get("stroke", this.get("stroke")), strokeOpacity: graphics.get("strokeOpacity"), strokeGradient: graphics.get("strokeGradient"), strokeDasharray: graphics.get("strokeDasharray") });
+					markerRectangle.setAll({ fill: graphics.get("fill", this.get("fill")), fillOpacity: graphics.get("fillOpacity"), fillGradient: graphics.get("fillGradient"), stroke: graphics.get("stroke", this.get("stroke")), strokeOpacity: graphics.get("strokeOpacity"), strokeGradient: graphics.get("strokeGradient"), strokeDasharray: graphics.get("strokeDasharray"), fillPattern: graphics.get("fillPattern") });
 				}
 			}
 		}
+	}
+
+	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
+		let column = dataItem.get("graphics");
+		if (column) {
+			return column
+		}
+		return this;
 	}
 }

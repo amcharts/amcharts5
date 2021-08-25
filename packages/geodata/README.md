@@ -1,6 +1,6 @@
 ## amCharts 5 Geodata package
 
-This package is a collection of geodata - map files for amCharts 4.
+This package is a collection of geodata - map files for amCharts 5.
 
 Those are meant for use with `MapChart`. (not included in this package)
 
@@ -45,7 +45,7 @@ yarn add @amcharts/amcharts5-geodata
 ### Documentation
 
 For extensive documentation, including getting started tutorials, as well
-as class reference visit [V4 documentation website](https://www.amcharts.com/docs/v5).
+as class reference visit [V5 documentation website](https://www.amcharts.com/docs/v5).
 
 
 ### amCharts 5 and geodata are available as

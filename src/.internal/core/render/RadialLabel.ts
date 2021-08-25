@@ -57,7 +57,7 @@ export class RadialLabel extends Label {
 	protected _flipped: boolean = false;
 
 	protected _afterNew() {
-		this._textKeys.push("textType", "radius", "startAngle", "inside", "orientation", "kerning");
+		this._textKeys.push("textType", "kerning");
 		super._afterNew();
 	}
 
@@ -90,15 +90,15 @@ export class RadialLabel extends Label {
 
 			if (textType == "circular") {
 
-				// @todo am, review why this braks text radius
-				// this.setAll({
-				// 	paddingTop: 0,
-				// 	paddingBottom: 0,
-				// 	paddingLeft: 0,
-				// 	paddingRight: 0
-				// });
+				this.setAll({
+					paddingTop: 0,
+					paddingBottom: 0,
+					paddingLeft: 0,
+					paddingRight: 0
+				});
 
 				// Circular labels are handled and positioned differently
+
 				this._text.set("orientation", orientation);
 				this._text.set("radius", radius);
 

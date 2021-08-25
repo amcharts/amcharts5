@@ -50,7 +50,8 @@ export type Easing = (time: Time) => Time;
  * @hidden
  */
 
-
+/**
+ */
 export function linear(t: Time): Time {
 	return t;
 }
@@ -71,7 +72,7 @@ export function exp(t: Time): Time {
 	return Math.pow(2, 10 * (t as number) - 10);
 }
 
-export function sin(t: Time): Time {
+export function sine(t: Time): Time {
 	return 1 - Math.cos((t as number) * $math.HALFPI);
 }
 
@@ -84,6 +85,9 @@ export function circle(t: Time): Time {
  * TRANSFORMERS
  * ============================================================================
  * @hidden
+ */
+
+/**
  */
 export function yoyo(ease: Easing): Easing {
 	return function (t: Time) {
@@ -134,6 +138,9 @@ export function bounce(t: Time): Time {
 	return 1 - (bounceOut(1 - (t as number)) as number);
 }
 
+/**
+ * @ignore
+ */
 function bounceOut(t: Time): Time {
 	t = t as number;
 	if (t < b1) {

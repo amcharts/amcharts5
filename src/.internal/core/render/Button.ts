@@ -44,9 +44,11 @@ export class Button extends Container {
 		settings.themeTags = $utils.mergeTags(settings.themeTags, ["button"]);
 		const x = new Button(root, settings, true, template);
 		x._afterNew();
-		x.set("background", RoundedRectangle.new(root, {
-			themeTags: $utils.mergeTags(settings.themeTags, ["background"])
-		}));
+		if(!settings.background){
+			x.set("background", RoundedRectangle.new(root, {
+				themeTags: $utils.mergeTags(settings.themeTags, ["background"])
+			}));
+		}
 		return x;
 	}
 

@@ -38,28 +38,28 @@ export interface ICandlestickSeriesSettings extends IColumnSeriesSettings {
 	/**
 	 * Input data field for X low value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	lowValueXField?: string;
 
 	/**
 	 * Input data field for Y low value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	lowValueYField?: string;
 
 	/**
 	 * Input data field for X high value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	highValueXField?: string;
 
 	/**
 	 * Input data field for Y high value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	highValueYField?: string;
 
@@ -226,7 +226,7 @@ export interface ICandlestickSeriesAxisRange extends IColumnSeriesAxisRange {
 /**
  * Candlestick series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/candlestick-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
  */
 export class CandlestickSeries extends ColumnSeries {

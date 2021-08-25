@@ -1,7 +1,6 @@
 import type { Root } from "../Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 import * as $type from "../util/Type";
-import * as $utils from "../util/Utils";
 import { Percent } from "../util/Percent";
 import type { IPoint } from "../util/IPoint";
 import { arc } from "d3-shape";
@@ -85,7 +84,7 @@ export class Slice extends Graphics {
 
 	protected _generator = arc();
 
-	protected _getTooltipPoint(): IPoint {
+	public _getTooltipPoint(): IPoint {
 		let tooltipX = this.get("tooltipX");
 		let tooltipY = this.get("tooltipY");
 
@@ -101,7 +100,11 @@ export class Slice extends Graphics {
 		}
 
 		let radius = this.get("radius", 0);
-		let innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), radius);
+		let innerRadius = this.get("innerRadius", 0);
+
+		if (innerRadius < 0) {
+			innerRadius = radius + innerRadius;
+		}
 
 		if (tooltipX instanceof Percent) {
 			x = this.ix * (innerRadius + (radius - innerRadius) * tooltipX.value)
@@ -110,6 +113,12 @@ export class Slice extends Graphics {
 		if (tooltipY instanceof Percent) {
 			y = this.iy * (innerRadius + (radius - innerRadius) * tooltipY.value)
 		}
+
+		if (this.get("arc") >= 360 && innerRadius == 0) {
+			x = 0;
+			y = 0;
+		}
+
 
 		return { x, y };
 	}
@@ -130,7 +139,16 @@ export class Slice extends Graphics {
 			const generator = this._generator;
 			generator.cornerRadius(this.get("cornerRadius", 0));
 			generator.context(this._display as any);
-			generator({ innerRadius: this.get("innerRadius", 0), outerRadius: this.get("radius", 0), startAngle: (startAngle + 90) * $math.RADIANS, endAngle: (startAngle + arc + 90) * $math.RADIANS });
+
+
+			let radius = this.get("radius", 0);
+			let innerRadius = this.get("innerRadius", 0);
+
+			if (innerRadius < 0) {
+				innerRadius = radius + innerRadius;
+			}
+
+			generator({ innerRadius: innerRadius, outerRadius: radius, startAngle: (startAngle + 90) * $math.RADIANS, endAngle: (startAngle + arc + 90) * $math.RADIANS });
 
 			let middleAngle = startAngle + arc / 2;
 

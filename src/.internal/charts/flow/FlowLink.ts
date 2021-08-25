@@ -64,7 +64,7 @@ export abstract class FlowLink extends Graphics {
 
 	public abstract getPoint(location: number): IOrientationPoint;
 
-	protected _getTooltipPoint(): IPoint {
+	public _getTooltipPoint(): IPoint {
 		let tooltipY = this.get("tooltipY");
 		let position = 0.5;
 		if (tooltipY instanceof Percent) {

@@ -53,7 +53,7 @@ export interface IRadarCursorEvents extends IXYCursorEvents {
 /**
  * Creates a cursor for a [[RadarChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/#Cursor} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor} for more info
  */
 export class RadarCursor extends XYCursor {
 	public static className: string = "RadarCursor";
@@ -88,17 +88,21 @@ export class RadarCursor extends XYCursor {
 
 	protected _getPosition(point: IPoint): IPoint {
 		const radius = Math.hypot(point.x, point.y);
-		const angle = Math.atan2(point.y, point.x) * $math.DEGREES;
+		const angle = $math.normalizeAngle(Math.atan2(point.y, point.x) * $math.DEGREES);
 		const innerRadius = this.getPrivate("innerRadius");
 
-		const startAngle = this.getPrivate("startAngle");
-		const endAngle = this.getPrivate("endAngle");
+		let startAngle = $math.normalizeAngle(this.getPrivate("startAngle"));
+		let endAngle = $math.normalizeAngle(this.getPrivate("endAngle"));
+
+		if (endAngle < startAngle) {
+			endAngle = endAngle + 360;
+		}
 
 		let xPos = (angle - startAngle) / (endAngle - startAngle);
 
-		if (xPos < 0) {
-			xPos = 1 + xPos;
-		}
+		//if (xPos < 0) {
+		//	xPos = 1 + xPos;
+		//}
 
 		return { x: xPos, y: (radius - innerRadius) / (this.getPrivate("radius") - innerRadius) };
 	}
@@ -125,7 +129,13 @@ export class RadarCursor extends XYCursor {
 			const radius = chart.getPrivate("radius", 0);
 
 			this.setPrivate("radius", $utils.relativeToValue(this.get("radius", p100), radius));
-			this.setPrivate("innerRadius", $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius));
+
+			let innerRadius = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius);
+			if (innerRadius < 0) {
+				innerRadius = radius + innerRadius;
+			}
+
+			this.setPrivate("innerRadius", innerRadius);
 
 			let startAngle = this.get("startAngle", chart.get("startAngle", -90));
 			let endAngle = this.get("endAngle", chart.get("endAngle", 270));
@@ -148,6 +158,7 @@ export class RadarCursor extends XYCursor {
 		const innerRadius = this.getPrivate("innerRadius");
 		const radius = this.getPrivate("radius");
 		const angle = Math.atan2(y, x);
+
 		this.lineX.set("draw", (display) => {
 			display.moveTo(innerRadius * Math.cos(angle), innerRadius * Math.sin(angle));
 			display.lineTo(radius * Math.cos(angle), radius * Math.sin(angle));
@@ -158,7 +169,7 @@ export class RadarCursor extends XYCursor {
 		const positionRadius = Math.hypot(x, y);
 
 		this.lineY.set("draw", (display) => {
-			display.arc(0, 0, positionRadius, this.getPrivate("startAngle", 0), this.getPrivate("endAngle", 0));
+			display.arc(0, 0, positionRadius, this.getPrivate("startAngle", 0) * $math.RADIANS, this.getPrivate("endAngle", 0) * $math.RADIANS);
 		})
 	}
 
@@ -178,6 +189,14 @@ export class RadarCursor extends XYCursor {
 		}
 	}
 
+	protected _inPlot(point: IPoint): boolean {
+		const chart = this.chart;
+		if (chart) {
+			return chart.inPlot(point, this.getPrivate("radius"), this.getPrivate("innerRadius"));
+		}
+		return false;
+	}
+
 	protected _updateSelection(point: IPoint) {
 
 		this.selection.set("draw", (display) => {
@@ -186,8 +205,12 @@ export class RadarCursor extends XYCursor {
 			const downPoint = this._downPoint;
 			const cursorStartAngle = this.getPrivate("startAngle");
 			const cursorEndAngle = this.getPrivate("endAngle");
-			const cursorRadius = this.getPrivate("radius");
-			const cursorInnerRadius = this.getPrivate("innerRadius");
+			let cursorRadius = this.getPrivate("radius");
+			let cursorInnerRadius = this.getPrivate("innerRadius");
+
+			if(cursorRadius < cursorInnerRadius){
+				[cursorRadius, cursorInnerRadius] = [cursorInnerRadius, cursorRadius];
+			}
 
 			let startAngle = cursorStartAngle;
 			let endAngle = cursorEndAngle;

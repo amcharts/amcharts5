@@ -64,7 +64,6 @@ export class TemplateStates<E extends Entity> {
 	}
 
 	public _apply(entity: E): void {
-		// TODO handle animationOptions ?
 		$object.each(this._states, (key, _state) => {
 			entity.states.create(key as string, {});
 		});

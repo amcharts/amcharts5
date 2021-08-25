@@ -87,14 +87,15 @@ export interface IEntitySettings {
 
 
 	/**
-	 * Duration of transition from one state to another
+	 * Duration of transition from one state to another.
 	 */
 	stateAnimationDuration?:number;
 
 	/**
-	 * Easing of transition from one state to another
+	 * Easing of transition from one state to another.
 	 */
 	stateAnimationEasing?:$ease.Easing;
+
 }
 
 export interface IEntityPrivate {
@@ -306,9 +307,6 @@ export abstract class Settings implements IDisposer, IAnimation {
 	public _prevSettings: this["_settings"] = {};
 	public _prevPrivateSettings: this["_privateSettings"] = {};
 
-	public _dirty: Dirty<this["_settings"]> = {};
-	public _dirtyPrivate: Dirty<this["_privateSettings"]> = {};
-
 	protected _animatingSettings: Animated<this["_settings"]> = {};
 	protected _animatingPrivateSettings: Animated<this["_privateSettings"]> = {};
 	protected _animatingCount: number = 0;
@@ -398,38 +396,12 @@ export abstract class Settings implements IDisposer, IAnimation {
 	protected abstract _startAnimation(): void;
 	protected abstract _animationTime(): number | null;
 
-	public _markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
-		this._dirty[key] = true;
+	public _markDirtyKey<Key extends keyof this["_settings"]>(_key: Key) {
 		this.markDirty();
 	}
 
-	public _markDirtyPrivateKey<Key extends keyof this["_privateSettings"]>(key: Key) {
-		this._dirtyPrivate[key] = true;
+	public _markDirtyPrivateKey<Key extends keyof this["_privateSettings"]>(_key: Key) {
 		this.markDirty();
-	}
-
-	public _clearDirty() {
-		$object.keys(this._dirty).forEach((key) => {
-			this._dirty[key] = false;
-		});
-
-		$object.keys(this._dirtyPrivate).forEach((key) => {
-			this._dirtyPrivate[key] = false;
-		});
-	}
-
-	/**
-	 * @ignore
-	 */
-	public isDirty<Key extends keyof this["_settings"]>(key: Key): boolean {
-		return !!this._dirty[key];
-	}
-
-	/**
-	 * @ignore
-	 */
-	public isPrivateDirty<Key extends keyof this["_privateSettings"]>(key: Key): boolean {
-		return !!this._dirtyPrivate[key];
 	}
 
 	/**
@@ -564,6 +536,7 @@ export abstract class Settings implements IDisposer, IAnimation {
 			this._markDirtyKey(key);
 		}
 	}
+
 
 	protected _stopAnimation<Key extends keyof this["_settings"]>(key: Key): void {
 		const animation = this._animatingSettings[key];
@@ -831,6 +804,9 @@ export abstract class Entity extends Settings implements IDisposer {
 
 	protected _userPrivateProperties: Dirty<this["_privateSettings"]> = {};
 
+	public _dirty: Dirty<this["_settings"]> = {};
+	public _dirtyPrivate: Dirty<this["_privateSettings"]> = {};
+
 	private _template: Template<this> | undefined;
 
 	// Templates for the themes
@@ -913,6 +889,40 @@ export abstract class Entity extends Settings implements IDisposer {
 		if (!(key in this._settings)) {
 			super.setRaw(key, value);
 		}
+	}
+
+	public _clearDirty() {
+		$object.keys(this._dirty).forEach((key) => {
+			this._dirty[key] = false;
+		});
+
+		$object.keys(this._dirtyPrivate).forEach((key) => {
+			this._dirtyPrivate[key] = false;
+		});
+	}
+
+	/**
+	 * @ignore
+	 */
+	public isDirty<Key extends keyof this["_settings"]>(key: Key): boolean {
+		return !!this._dirty[key];
+	}
+
+	/**
+	 * @ignore
+	 */
+	public isPrivateDirty<Key extends keyof this["_privateSettings"]>(key: Key): boolean {
+		return !!this._dirtyPrivate[key];
+	}
+
+	public _markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
+		this._dirty[key] = true;
+		super._markDirtyKey(key);
+	}
+
+	public _markDirtyPrivateKey<Key extends keyof this["_privateSettings"]>(key: Key) {
+		this._dirtyPrivate[key] = true;
+		super._markDirtyKey(key);
 	}
 
 	/**
@@ -1027,6 +1037,21 @@ export abstract class Entity extends Settings implements IDisposer {
 		this._userProperties[key] = true;
 		return super.set(key, value);
 	}
+
+	/**
+	 * Sets a setting `value` for the specified `key` only if the value for this key was not set previously using set method, and returns the same `value`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
+	 * @param   key       Setting key
+	 * @param   value     Setting value
+	 * @return            Setting value
+	 */
+	public _setSoft<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
+		if(!this._userProperties[key]){
+			return super.set(key, value);
+		}
+		return value;
+	}	
 
 	/**
 	 * Removes a setting value for the specified `key`.

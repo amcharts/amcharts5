@@ -1,30 +1,81 @@
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
-import { worldLow } from "@amcharts/amcharts5/geodata/worldLow";
+import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * Create root element
+ * https://www.amcharts.com/docs/v5/getting-started/#Root_element
+ */
 const root = am5.Root.new("chartdiv");
 
+/**
+ * Set themes
+ * https://www.amcharts.com/docs/v5/concepts/themes/
+ */
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
+/**
+ * Create the map chart
+ * https://www.amcharts.com/docs/v5/charts/map-chart/
+ */
+const chart = root.container.children.push(
+  am5map.MapChart.new(root, {
+    panX: "rotateX",
+    panY: "rotateY",
+    projection: am5map.geoOrthographic()
+  })
+);
 
-const chart = root.container.children.push(am5map.MapChart.new(root, { panX: "rotateX", panY: "rotateY", projection: am5map.geoOrthographic() }));
+/**
+ * Create series for background fill
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
+ */
+const backgroundSeries = chart.series.push(
+  am5map.MapPolygonSeries.new(root, {})
+);
+backgroundSeries.mapPolygons.template.setAll({
+  fill: root.interfaceColors.get("alternativeBackground"),
+  fillOpacity: 0.1,
+  strokeOpacity: 0
+});
+backgroundSeries.data.push({geometry:
+  am5map.getGeoRectangle(90, 180, -90, -180)
+});
 
-const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
-backgroundSeries.mapPolygons.template.setAll({ fill: root.interfaceColors.get("alternativeBackground"), fillOpacity: 0.1, strokeOpacity: 0 });
-backgroundSeries.data.push({geometry:am5map.getGeoRectangle(90, 180, -90, -180)})
+/**
+ * Create main polygon series for countries
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+ */
+const polygonSeries = chart.series.push(
+  am5map.MapPolygonSeries.new(root, {
+    geoJSON: am5geodata_worldLow as any
+  })
+);
+polygonSeries.mapPolygons.template.setAll({
+  fill: root.interfaceColors.get("alternativeBackground"),
+  fillOpacity: 0.15,
+  strokeWidth: 0.5,
+  stroke: root.interfaceColors.get("background")
+});
 
-const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, { geoJSON: worldLow as any }));
-polygonSeries.mapPolygons.template.setAll({ fill: root.interfaceColors.get("alternativeBackground"), fillOpacity: 0.15, strokeWidth: 0.5, stroke: root.interfaceColors.get("background") });
+/**
+ * Create polygon series for projected circles
+ */
+const circleSeries = chart.series.push(
+  am5map.MapPolygonSeries.new(root, {})
+);
+circleSeries.mapPolygons.template.setAll({
+  templateField: "polygonTemplate",
+  tooltipText: "{name}:{value}"
+});
 
-
-const circleSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
-circleSeries.mapPolygons.template.set("templateField", "polygonTemplate");
-circleSeries.mapPolygons.template.set("tooltipText", "{name}:{value}");
-
+/**
+ * Define data
+ */
 const colors = am5.ColorSet.new(root, {});
 
 const data = [
@@ -216,6 +267,9 @@ for (let i = 0; i < data.length; i++) {
 const minRadius = 0.5;
 const maxRadius = 5;
 
+/**
+ * Create circles when data for countries is fully loaded.
+ */
 polygonSeries.events.on("datavalidated", () => {
   circleSeries.data.clear();
 
@@ -230,8 +284,12 @@ polygonSeries.events.on("datavalidated", () => {
 
     if (countryPolygon) {
       const geometry = am5map.getGeoCircle(countryPolygon.visualCentroid(), radius);
-      const data = { name:dataContext.name, value: dataContext.value, polygonTemplate: dataContext.polygonTemplate, geometry: geometry }
-      circleSeries.data.push(data);
+      circleSeries.data.push({
+        name:dataContext.name,
+        value: dataContext.value,
+        polygonTemplate: dataContext.polygonTemplate,
+        geometry: geometry
+      });
     }
   }
 })

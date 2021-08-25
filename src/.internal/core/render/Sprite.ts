@@ -20,6 +20,7 @@ import { waitForAnimations } from "../util/Animation";
 import * as $utils from "../util/Utils";
 import * as $array from "../util/Array";
 import * as $type from "../util/Type";
+import * as $object from "../util/Object";
 //import { populateString } from "../util/PopulateString";
 
 
@@ -438,7 +439,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * If set to `true` the element will be hidden regardless of `visible` or
 	 * even if `show()` is called.
 	 */
-	forceHidden?:boolean;
+	forceHidden?: boolean;
 
 }
 
@@ -475,7 +476,7 @@ export interface ISpritePrivate extends IEntityPrivate {
 	focusElement?: HTMLDivElement;
 
 
-	tooltipTarget?:Graphics;
+	tooltipTarget?: Graphics;
 }
 
 /**
@@ -529,17 +530,17 @@ export interface ISpriteEvents extends IEntityEvents {
 	/**
 	 * Invoked when element dragging starts.
 	 */
-	dragstart: { event: ISpritePointerEvent };
+	dragstart: ISpritePointerEvent;
 
 	/**
 	 * Invoked when element dragging stops.
 	 */
-	dragstop: { event: ISpritePointerEvent };
+	dragstop: ISpritePointerEvent;
 
 	/**
 	 * Invoked when element ois being dragged.
 	 */
-	dragged: { event: ISpritePointerEvent };
+	dragged: ISpritePointerEvent;
 
 	/**
 	 * Invoked when element is clicked or tapped.
@@ -653,6 +654,8 @@ export abstract class Sprite extends Entity {
 
 	protected _isDown: boolean = false;
 	protected _downPoint: IPoint | undefined;
+
+	public _downPoints: { [index: number]: IPoint } = {};
 
 	protected _toggleDp: IDisposer | undefined;
 
@@ -1002,10 +1005,10 @@ export abstract class Sprite extends Entity {
 		// Accessibility
 		if (this.isDirty("tabindexOrder")) {
 			if (this.get("focusable")) {
-				this._root.registerTabindexOrder(this);
+				this._root._registerTabindexOrder(this);
 			}
 			else {
-				this._root.unregisterTabindexOrder(this);
+				this._root._unregisterTabindexOrder(this);
 			}
 		}
 
@@ -1041,10 +1044,10 @@ export abstract class Sprite extends Entity {
 
 		if (this.isDirty("focusable")) {
 			if (this.get("focusable")) {
-				this._root.registerTabindexOrder(this);
+				this._root._registerTabindexOrder(this);
 			}
 			else {
-				this._root.unregisterTabindexOrder(this);
+				this._root._unregisterTabindexOrder(this);
 			}
 			this.markDirtyAccessibility();
 		}
@@ -1088,9 +1091,9 @@ export abstract class Sprite extends Entity {
 						}
 
 						if (this._isDown) {
-							this._handleUp();
+							this._handleUp(ev);
 						}
-						this._isDown = false;
+						//this._isDown = false;
 					}),
 
 					this.events.on("pointerover", () => {
@@ -1139,7 +1142,13 @@ export abstract class Sprite extends Entity {
 
 			const type = "dragstop";
 			if (this.events.isEnabled(type)) {
-				this.events.dispatch(type, { type: type, target: this, event: e });
+				this.events.dispatch(type, {
+					type: type,
+					target: this,
+					originalEvent: e.originalEvent,
+					point: e.point,
+					simulated: e.simulated,
+				});
 			}
 		}
 	}
@@ -1167,12 +1176,14 @@ export abstract class Sprite extends Entity {
 				this.states.applyAnimate("disabled");
 			}
 			else {
-				this.states.applyAnimate("default");
+				if (this.states.lookup("hover") || this.states.lookup("hoverActive")) {
+					this.states.applyAnimate("default");
+				}
 			}
 		}
 	}
 
-	protected _handleUp() {
+	protected _handleUp(e: ISpritePointerEvent) {
 		if (!this.isHidden()) {
 			if (this.get("active") && this.states.lookup("active")) {
 				this.states.applyAnimate("active");
@@ -1180,19 +1191,44 @@ export abstract class Sprite extends Entity {
 			else if (this.get("disabled") && this.states.lookup("disabled")) {
 				this.states.applyAnimate("disabled");
 			}
-			else {
-				this.states.applyAnimate("default");
+			else if (this.states.lookup("down")) {
+				if (this.isHover()) {
+					this.states.applyAnimate("hover");
+				}
+				else {
+					this.states.applyAnimate("default");
+				}
 			}
+
+
+			// @todo remove this once migrated to _downPoints
 			this._downPoint = undefined;
+
+			const pointerId = $utils.getPointerId(e.originalEvent);
+			delete this._downPoints[pointerId];
+
+			if ($object.keys(this._downPoints).length == 0) {
+				this._isDown = false;
+			}
 		}
 	}
 
 	public _hasMoved(e: ISpritePointerEvent): boolean {
-		if (this._downPoint) {
-			const x = Math.abs(this._downPoint.x - e.point.x);
-			const y = Math.abs(this._downPoint.y - e.point.y);
+		// @todo remove this once migrated to _downPoints
+		// if (this._downPoint) {
+		// 	const x = Math.abs(this._downPoint.x - e.point.x);
+		// 	const y = Math.abs(this._downPoint.y - e.point.y);
+		// 	return (x > 5) || (y > 5);
+		// }
+
+		const pointerId = $utils.getPointerId(e.originalEvent);
+		const downPoint = this._downPoints[pointerId];
+		if (downPoint) {
+			const x = Math.abs(downPoint.x - e.point.x);
+			const y = Math.abs(downPoint.y - e.point.y);
 			return (x > 5) || (y > 5);
 		}
+
 		return false;
 	}
 
@@ -1205,7 +1241,15 @@ export abstract class Sprite extends Entity {
 				x: e.point.x,
 				y: e.point.y
 			};
+
+			// @todo remove this once migrated to _downPoints
 			this._isDown = true;
+
+			const pointerId = $utils.getPointerId(e.originalEvent);
+			this._downPoints[pointerId] = {
+				x: e.point.x,
+				y: e.point.y
+			};
 		}
 	}
 
@@ -1231,7 +1275,13 @@ export abstract class Sprite extends Entity {
 
 				const type = "dragstart";
 				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, { type: type, target: this, event: e });
+					this.events.dispatch(type, {
+						type: type,
+						target: this,
+						originalEvent: e.originalEvent,
+						point: e.point,
+						simulated: e.simulated,
+					});
 				}
 			}
 
@@ -1243,7 +1293,13 @@ export abstract class Sprite extends Entity {
 
 				const type = "dragged";
 				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, { type: type, target: this, event: e });
+					this.events.dispatch(type, {
+						type: type,
+						target: this,
+						originalEvent: e.originalEvent,
+						point: e.point,
+						simulated: e.simulated,
+					});
 				}
 
 			} else {
@@ -1258,7 +1314,13 @@ export abstract class Sprite extends Entity {
 
 					const type = "dragstart";
 					if (this.events.isEnabled(type)) {
-						this.events.dispatch(type, { type: type, target: this, event: e });
+						this.events.dispatch(type, {
+							type: type,
+							target: this,
+							originalEvent: e.originalEvent,
+							point: e.point,
+							simulated: e.simulated,
+						});
 					}
 				}
 			}
@@ -1325,7 +1387,7 @@ export abstract class Sprite extends Entity {
 	 */
 	public markDirtyAccessibility(): void {
 		//if (this._root.focused(this)) {
-		this._root.invalidateAccessibility(this);
+		this._root._invalidateAccessibility(this);
 		//}
 	}
 
@@ -1333,7 +1395,8 @@ export abstract class Sprite extends Entity {
 	 * @ignore
 	 */
 	public markDirtyLayer() {
-		this._display.markDirtyLayer(this.isDirty("opacity") || this.isDirty("visible"));
+		//this._display.markDirtyLayer(this.isDirty("opacity") || this.isDirty("visible")); https://codepen.io/team/amcharts/pen/gOWZPmP <- problems
+		this._display.markDirtyLayer(true);
 	}
 
 	/**
@@ -1446,13 +1509,14 @@ export abstract class Sprite extends Entity {
 
 		if (tooltipText && tooltip) {
 			const tooltipPosition = this.get("tooltipPosition");
+			const tooltipTarget = this.getPrivate("tooltipTarget", this);
 
 			if (tooltipPosition == "fixed" || !point) {
-				point = this._display.toGlobal(this._getTooltipPoint());
+				point = this._display.toGlobal(tooltipTarget._getTooltipPoint());
 			}
 
 			tooltip.set("pointTo", point);
-			tooltip.set("tooltipTarget", this.getPrivate("tooltipTarget"));
+			tooltip.set("tooltipTarget", tooltipTarget);
 
 			if (!tooltip.get("x")) {
 				tooltip.set("x", point.x);
@@ -1486,8 +1550,7 @@ export abstract class Sprite extends Entity {
 		}
 	}
 
-
-	protected _getTooltipPoint(): IPoint {
+	public _getTooltipPoint(): IPoint {
 		const bounds = this._adjustedLocalBounds!;
 		if (bounds) {
 			const x = bounds.left + $utils.relativeToValue(this.get("tooltipX", 0), Math.max(bounds.right - bounds.left, this.width()));
@@ -1568,8 +1631,6 @@ export abstract class Sprite extends Entity {
 				}
 			}
 		}
-
-
 
 		if (this._display.x != xx || this._display.y != yy) {
 			this._display.invalidateBounds();
@@ -1715,11 +1776,22 @@ export abstract class Sprite extends Entity {
 	 * or visible.
 	 *
 	 * @param   duration  Duration of the animation in milliseconds
-	 * @return  Promise
+	 * @param   delay     Delay showing of the element by X milliseconds
+	 * @return            Promise
 	 */
-	public async appear(duration?: number): Promise<void> {
+	public async appear(duration?: number, delay?: number): Promise<void> {
 		await this.hide(0);
-		await this.show(duration);
+		if (delay) {
+			return new Promise<void>((success, _error) => {
+				this.setTimeout(() => {
+					success(this.show(duration));
+				}, delay);
+			});
+
+		}
+		else {
+			return this.show(duration);
+		}
 	}
 
 	/**
@@ -2105,6 +2177,29 @@ export abstract class Sprite extends Entity {
 	 */
 	public toLocal(point: IPoint): IPoint {
 		return this._display.toLocal(point);
+	}
+
+	public _getDownPoint(): IPoint | undefined {
+		const id = this._getDownPointId();
+		if (id) {
+			return this._downPoints[id];
+		}
+
+	}
+
+	public _getDownPointId(): number | undefined {
+		if (this._downPoints) {
+			return $object.keysOrdered(this._downPoints, (a, b) => {
+				if (a > b) {
+					return 1;
+				}
+				if (a < b) {
+					return -1;
+				}
+				return 0;
+			})[0];
+		}
+
 	}
 
 }

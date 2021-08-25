@@ -17,7 +17,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	/**
 	 * Indicates granularity of data.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Data_granularity} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
@@ -39,7 +39,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * Should axis group data items togeter dynamically?
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupData?: boolean;
 
@@ -47,28 +47,28 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * Maximum number of data items in the view before data grouping kicks in.
 	 * 
 	 * @default 500
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupCount?: number;
 
 	/**
 	 * Force data item grouping to specific interval.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupInterval?: ITimeInterval;
 
 	/**
 	 * A list of intervals the axis is allowed to group data items into.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupIntervals?: Array<ITimeInterval>;
 
 	/**
 	 * A list of intervals the axis is allowed to show grid/labels on.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Grid_granularity} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
 
@@ -85,14 +85,14 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	/**
 	 * Date formats used for intermediate labels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	dateFormats?: { [index: string]: string };
 
 	/**
 	 * Date formats used for "period change" labels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	periodChangeDateFormats?: { [index: string]: string };
 
@@ -128,7 +128,7 @@ export interface IDateAxisEvents extends IValueAxisEvents {
 /**
  * Creates a date axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/} for more info
  * @important
  */
 export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
@@ -183,15 +183,16 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				this.setPrivateRaw("baseInterval", this.get("baseInterval"));
 			}
 
-			if (!this._dataGrouped) {
-				if (this.isDirty("groupInterval")) {
-					let groupInterval = this.get("groupInterval")!;
-					if (groupInterval) {
-						this.setRaw("groupIntervals", [groupInterval]);
-					}
-				}
 
-				if (this.isDirty("groupData")) {
+			if (this.isDirty("groupInterval")) {
+				let groupInterval = this.get("groupInterval")!;
+				if (groupInterval) {
+					this.setRaw("groupIntervals", [groupInterval]);
+				}
+			}
+
+			if (this.isDirty("groupData")) {
+				if (!this._dataGrouped) {
 					if (this.get("groupData")) {
 						$array.each(this.series, (series) => {
 							this._groupSeriesData(series);
@@ -199,9 +200,23 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 								this._groupSeriesData(series);
 							})
 						})
+
+						this.markDirtySize();
 					}
+					else {
+						let baseInterval = this.get("baseInterval");
+						let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
+
+						$array.each(this.series, (series) => {
+							series.setDataSet(mainDataSetId);
+						})
+
+						this.setPrivateRaw("baseInterval", baseInterval);
+						this.setPrivateRaw("groupInterval", undefined);
+						this.markDirtyExtremes();
+					}
+					this._dataGrouped = true;
 				}
-				this._dataGrouped = true;
 			}
 		}
 	}
@@ -221,11 +236,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				intervals.push(interval);
 			}
 		})
-
-		//for(let k in series._dataSets){
-		// clear data sets
-		//	console.log(k);
-		//}
 
 		series._dataSets = {};
 
@@ -356,6 +366,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public _clearDirty() {
 		super._clearDirty();
 		this._groupingCalculated = false;
+		this._dataGrouped = false;
 	}
 
 	protected _handleRangeChange() {

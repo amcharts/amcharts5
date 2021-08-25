@@ -1,5 +1,5 @@
 const $path = require("path");
-const { cp, rm, readdir, readFile, writeFile, tsc } = require("../util");
+const { cp, cpMaybe, rm, readdir, readFile, writeFile, tsc } = require("../util");
 
 async function writePackage(state) {
 	const root = JSON.parse(await readFile(state.path("package.json")));
@@ -34,7 +34,7 @@ async function removeMapFiles(dir) {
 
 async function copyDirs(state, output) {
 	await cp(state.path("packages", "shared"), output);
-	await cp(state.path("packages", "es2015"), output);
+	await cpMaybe(state.path("packages", "es2015"), output);
 }
 
 module.exports = async (state) => {

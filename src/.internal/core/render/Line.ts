@@ -48,7 +48,7 @@ export class Line extends Graphics {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("points")) {
+		if (this.isDirty("points") || this._sizeDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
 			this._clear = true;
 		}
 	}
@@ -65,6 +65,13 @@ export class Line extends Graphics {
 
 				this._display.moveTo(point.x, point.y);
 				$draw.segmentedLine(this._display, [[points]]);
+			}
+			else {
+				let w = this.width();
+				let h = this.height();
+
+				this._display.moveTo(0, 0);
+				this._display.lineTo(w, h);
 			}
 		}
 	}

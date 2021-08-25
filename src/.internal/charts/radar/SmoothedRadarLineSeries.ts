@@ -11,7 +11,7 @@ export interface ISmoothedRadarLineSeriesSettings extends IRadarLineSeriesSettin
 	/**
 	 * Tension of curve.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/smoothed-series/#Line_tension} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/#Line_tension} for more info
 	 * @default 0.5
 	 */
 	tension?: number;

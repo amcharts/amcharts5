@@ -1638,7 +1638,7 @@ export class CanvasText extends CanvasContainer implements IText {
 							// Check fit
 							if ((lineInfo.width + chunkWidth) > maxWidth) {
 								const excessWidth = maxWidth - lineInfo.width;
-								const tmpText = this._truncateText(context, chunk.text, excessWidth, firstTextChunk, false);
+								const tmpText = this._truncateText(context, chunk.text, excessWidth, false, firstTextChunk);
 								//skipFurtherText = true;
 
 								//Add remaining chunks for the next line
@@ -1784,24 +1784,9 @@ export class CanvasText extends CanvasContainer implements IText {
 		};
 
 		// We need to fit?
-		if (oversizedBehavior) {
+		if (oversizedBehavior !== "none") {
 			const ratio = this._fitRatio(bounds);
 			if (ratio < 1) {
-
-				switch (this.style.textAlign) {
-					case "right":
-					case "end":
-						bounds.left = maxWidth;
-						bounds.right = 0;
-						break;
-					case "center":
-						bounds.left = -maxWidth / 2;
-						bounds.right = maxWidth / 2;
-						break;
-					default:
-						bounds.left = 0;
-						bounds.right = maxWidth;
-				}
 				if (oversizedBehavior == "fit") {
 					if ($type.isNumber(this.style.minScale) && (ratio < this.style.minScale)) {
 						this._textVisible = false;
@@ -1818,6 +1803,22 @@ export class CanvasText extends CanvasContainer implements IText {
 					this._textVisible = false;
 				}
 				else {
+
+					switch (this.style.textAlign) {
+						case "right":
+						case "end":
+							bounds.left = maxWidth;
+							bounds.right = 0;
+							break;
+						case "center":
+							bounds.left = -maxWidth / 2;
+							bounds.right = maxWidth / 2;
+							break;
+						default:
+							bounds.left = 0;
+							bounds.right = maxWidth;
+					}
+
 					this.scale = this._originalScale || 1;
 					this._originalScale = undefined;
 					this._textVisible = true;

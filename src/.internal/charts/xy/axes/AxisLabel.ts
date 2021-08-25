@@ -10,7 +10,7 @@ export interface IAxisLabel extends Label {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
 	 */
 	location?: number;
 
@@ -20,7 +20,7 @@ export interface IAxisLabel extends Label {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Multi_location} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Multi_location} for more info
 	 */
 	multiLocation?: number;
 
@@ -65,7 +65,7 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
 	 */
 	location?: number;
 
@@ -75,14 +75,14 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Multi_location} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Multi_location} for more info
 	 */
 	multiLocation?: number;
 
 	/**
 	 * If set to `true` the label will be shown inside plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
 	 * @default false
 	 */
 	inside?: boolean | undefined;
@@ -95,7 +95,7 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 * beginning of the axis than 10%.
 	 * 
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Start_end_labels_and_ticks} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 */
 	minPosition?: number;
 
@@ -107,7 +107,7 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 * end of the axis than 10%.
 	 * 
 	 * @default 1
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Start_end_labels_and_ticks} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 */
 	maxPosition?: number;
 
@@ -119,7 +119,7 @@ export interface IAxisLabelPrivate extends ILabelPrivate {
 /**
  * Draws an axis label.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Labels} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels} for more info
  * @important
  */
 export class AxisLabel extends Label implements IAxisLabel {

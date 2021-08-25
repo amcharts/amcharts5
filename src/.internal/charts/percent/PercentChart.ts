@@ -18,9 +18,7 @@ export abstract class PercentChart extends SerialChart {
 	protected _afterNew() {
 		super._afterNew();
 
-		const seriesContainer = this.seriesContainer!;
-		this.chartContainer.children.push(seriesContainer);
-		seriesContainer.children.push(this.bulletsContainer);
-		seriesContainer.setAll({ isMeasured: true, layout: this._root.horizontalLayout });
+		this.chartContainer.children.push(this.seriesContainer);
+		this.seriesContainer.children.push(this.bulletsContainer);
 	}
 }

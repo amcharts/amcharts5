@@ -175,7 +175,6 @@ export class State<E extends Entity> {
 					}
 				}
 
-				// @todo: what should we do with objects, like parent is also saved to states. it's a question about states too
 				const animation = this._entity.animate({
 					key: key,
 					to: value,

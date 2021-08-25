@@ -18,7 +18,7 @@ export interface IAxisRendererYSettings extends IAxisRendererSettings {
 	 * If set to `true` the axis will be drawn on the opposite side of the plot
 	 * area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Axis_position} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_position} for more info
 	 * @default false
 	 */
 	opposite?: boolean;
@@ -39,7 +39,7 @@ export interface IAxisRendererYPrivate extends IAxisRendererPrivate {
 /**
  * Used to render vertical axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/#Axis_renderer} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
  * @important
  */
 export class AxisRendererY extends AxisRenderer {
@@ -87,7 +87,7 @@ export class AxisRendererY extends AxisRenderer {
 			display.lineTo(graphics.width(), 0);
 		});
 
-		this.setAll({ width: 0, height: p100 });
+		//this.setAll({ width: 0, height: p100 });
 		this.set("draw", (display, graphics) => {
 			display.moveTo(0, 0);
 			display.lineTo(0, graphics.height());
@@ -139,7 +139,6 @@ export class AxisRendererY extends AxisRenderer {
 		}
 		axis.set("layout", this._root.horizontalLayout);
 		axis.labelsContainer.set("height", p100);
-		axis.labelsContainer._user_id = "axx";
 		axis.axisHeader.set("layout", this._root.horizontalLayout);
 	}
 
@@ -160,7 +159,7 @@ export class AxisRendererY extends AxisRenderer {
 			else {
 				axisHeader.set("height", height);
 			}
-			axisHeader.setAll({ y: axis.y() - height, width: plotContainer.width() });
+			axisHeader.setAll({ y: axis.y() - height, x: -1, width: plotContainer.width() + 2 });
 		}
 	}
 
@@ -307,18 +306,24 @@ export class AxisRendererY extends AxisRenderer {
 	 */
 	public updateBullet(bullet?: AxisBullet, position?: number, endPosition?: number) {
 		if (bullet) {
-			if (!$type.isNumber(position)) {
-				position = 0;
+
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+
+				if (!$type.isNumber(position)) {
+					position = 0;
+				}
+
+				let location = bullet.get("location", 0.5);
+				if ($type.isNumber(endPosition) && endPosition != position) {
+					position = position + (endPosition - position) * location;
+				}
+
+				sprite.set("y", this.positionToCoordinate(position));
+				sprite.set("x", this.axis.bulletsContainer.toLocal(this.toGlobal({ x: 0, y: 0 })).x);
+
+				this.toggleVisibility(sprite, position, 0, 1);
 			}
-
-			let location = bullet.get("location", 0.5);
-			if ($type.isNumber(endPosition) && endPosition != position) {
-				position = position + (endPosition - position) * location;
-			}
-
-			bullet.set("y", this.positionToCoordinate(position));
-
-			this.toggleVisibility(bullet, position, 0, 1);
 		}
 	}
 

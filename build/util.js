@@ -1,10 +1,7 @@
 const $path = require("path");
 const $fs = require("fs");
-const $os = require("os");
 const $child = require("child_process");
-const $rimraf = require("rimraf");
-const $cpr = require("cpr");
-const $webpack = require("webpack");
+const $c = require("ansi-colors");
 
 
 function posixPath(path) {
@@ -14,9 +11,56 @@ function posixPath(path) {
 exports.posixPath = posixPath;
 
 
+function removeTypeScriptTypes(template) {
+	return require("sucrase").transform(template, {
+		disableESTransforms: true,
+		transforms: ["typescript"],
+	}).code;
+}
+
+function geodataToScript(name, file) {
+	return `window.am5geodata${name} = (function () {\n${file.replace(/export default /g, "return ")}})();`;
+}
+
+async function mapFiles1(from, to, dirs, name, f) {
+	const files = await readdir(from);
+
+	if (files === null) {
+		if ($path.extname(from) === ".js") {
+			const file = await readFile(from);
+
+			const mangledName = dirs + "_" + $path.basename(name, ".js").replace(/\-/g, "_");
+
+			await writeFile(to, f(mangledName, file));
+		}
+
+	} else {
+		await mkdir(to);
+
+		if (name !== null) {
+			dirs = dirs + "_" + name;
+		}
+
+		await Promise.all(files.map(async (file) => {
+			if (file !== ".internal") {
+				await mapFiles1($path.join(from, file), $path.join(to, file), dirs, file, f);
+			}
+		}));
+	}
+}
+
+function mapFiles(from, to, f) {
+	return mapFiles1(from, to, "", null, f);
+}
+
+exports.removeTypeScriptTypes = removeTypeScriptTypes;
+exports.geodataToScript = geodataToScript;
+exports.mapFiles = mapFiles;
+
+
 function webpack(config) {
 	return new Promise(function (resolve, reject) {
-		$webpack(config, (err, stats) => {
+		require("webpack")(config, (err, stats) => {
 			if (err) {
 				reject(err);
 
@@ -40,57 +84,6 @@ function webpack(config) {
 
 exports.webpack = webpack;
 
-
-function cached(f) {
-	let run = false;
-	let output;
-
-	return function (...args) {
-		if (run) {
-			return output;
-
-		} else {
-			run = true;
-			output = f(...args);
-			return output;
-		}
-	};
-}
-
-exports.cached = cached;
-
-
-// TODO code duplication with spawn
-/*function spawnSync(name, args, options = {}) {
-	const command = (process.platform === "win32" ? name + ".cmd" : name);
-
-	var spawn = $child.spawnSync(command, args, {
-		cwd: options.cwd,
-		env: Object.assign({}, process.env, options.env),
-		stdio: "inherit",
-		shell: true
-	});
-
-	if (spawn.status !== 0) {
-		throw new Error("Command `" + name + " " + args.join(" ") + "` failed with error code: " + spawn.status);
-	}
-}*/
-
-function exec(command, options = {}) {
-	return new Promise((resolve, reject) => {
-		$child.exec(command, options, function (err, stdout, stderr) {
-			if (err) {
-				reject(err);
-
-			} else if (stderr.length) {
-				reject(new Error(stderr));
-
-			} else {
-				resolve(stdout);
-			}
-		});
-	});
-}
 
 // TODO error if stderr has any output
 function spawnStatus(name, args, options = {}) {
@@ -131,7 +124,6 @@ async function spawnSilent(name, args, options = {}) {
 	await spawn(name, args, options);
 }
 
-exports.exec = exec;
 exports.spawnStatus = spawnStatus;
 exports.spawn = spawn;
 exports.spawnSilent = spawnSilent;
@@ -165,7 +157,7 @@ exports.withLinkTargets = withLinkTargets;
 
 function cp(from, to) {
 	return new Promise(function (resolve, reject) {
-		$cpr(from, to, {
+		require("cpr")(from, to, {
 			deleteFirst: false,
 			overwrite: true,
 			confirm: false // TODO maybe make this true ?
@@ -178,17 +170,17 @@ function cp(from, to) {
 			}
 		});
 	});
+}
 
-	/*return new Promise(function (resolve, reject) {
-		$fs.copyFile(from, to, $fs.constants.COPYFILE_EXCL, function (err) {
-			if (err) {
-				reject(err);
+async function cpMaybe(from, to) {
+	try {
+		await cp(from, to);
 
-			} else {
-				resolve();
-			}
-		});
-	});*/
+	} catch (e) {
+		if (e.message !== "From should be a file or directory") {
+			throw e;
+		}
+	}
 }
 
 function mv(from, to) {
@@ -206,7 +198,7 @@ function mv(from, to) {
 
 function rm(path) {
 	return new Promise(function (resolve, reject) {
-		$rimraf(path, { glob: false, disableGlob: true }, function (err) {
+		require("rimraf")(path, { glob: false, disableGlob: true }, function (err) {
 			if (err) {
 				reject(err);
 
@@ -251,7 +243,7 @@ function readdir(path) {
 	return new Promise(function (resolve, reject) {
 		$fs.readdir(path, function (err, files) {
 			if (err) {
-				if (err.code === "ENOTDIR") {
+				if (err.code === "ENOTDIR" || err.code === "ENOENT") {
 					resolve(null);
 
 				} else {
@@ -278,19 +270,6 @@ function mkdir(path) {
 	});
 }
 
-/*function isDir(path) {
-	return new Promise(function (resolve, reject) {
-		$fs.stat(path, function (err, stat) {
-			if (err) {
-				reject(err);
-
-			} else {
-				resolve(state.isDirectory());
-			}
-		});
-	});
-}*/
-
 function exists(path) {
 	return new Promise((resolve, reject) => {
 		$fs.access(path, $fs.constants.R_OK, (err) => {
@@ -310,6 +289,7 @@ function exists(path) {
 }
 
 exports.cp = cp;
+exports.cpMaybe = cpMaybe;
 exports.mv = mv;
 exports.rm = rm;
 exports.readFile = readFile;
@@ -318,7 +298,6 @@ exports.writeFile = writeFile;
 exports.readdir = readdir;
 exports.mkdir = mkdir;
 exports.exists = exists;
-//exports.isDir = isDir;
 
 
 async function tsc(cwd, config, force) {
@@ -334,177 +313,82 @@ async function tsc(cwd, config, force) {
 exports.tsc = tsc;
 
 
-function makeTemporaryDirectory(prefix) {
-	return new Promise(function (resolve, reject) {
-		$fs.mkdtemp($path.join($os.tmpdir(), prefix), function (err, folder) {
-			if (err) {
-				reject(err);
-
-			} else {
-				resolve(folder);
-			}
-		});
-	});
-}
-
-async function withTemporaryDirectory(prefix, f) {
-	var path = await makeTemporaryDirectory(prefix);
-
-	try {
-		return await f(path);
-
-	} finally {
-		await rm(path);
-	}
-}
-
-exports.withTemporaryDirectory = withTemporaryDirectory;
-
-
-/*function compare(a, b) {
-	if (a === b) {
-		return 0;
-	} else if (a < b) {
-		return -1;
-	} else {
-		return 1;
-	}
-}*/
-
-
-function writeZipFile(info) {
-	return new Promise(function (resolve, reject) {
-		const output = $fs.createWriteStream(info.output);
-
-		const archive = require("archiver")("zip", {
-			zlib: { level: 9 } // Sets the compression level.
-		});
-
-		archive.on("warning", (err) => {
-			console.warn(err);
-		});
-
-		archive.on("error", (err) => {
-			reject(err);
-		});
-
-		output.on("error", (err) => {
-			reject(err);
-		});
-
-		output.on("close", () => {
-			resolve();
-		});
-
-		archive.pipe(output);
-
-		archive.directory(info.input, info.folder);
-
-		archive.finalize();
-	});
-}
-
-exports.writeZipFile = writeZipFile;
-
-
-async function checkUncommitted(cwd) {
-	// This checks that there aren't any uncommitted changes
-	// https://stackoverflow.com/a/3879077/449477
-	// https://stackoverflow.com/a/39937070/449477
-	const status = await spawnStatus("git", ["diff-index", "--quiet", "HEAD", "--", ":(exclude,top)public/package.json"], { cwd, transformCommand: false });
-
-	if (status !== 0) {
-		throw new Error("You have uncommitted changes");
-	}
-}
-
-exports.checkUncommitted = checkUncommitted;
-
-
-async function gitInitSubmodules(cwd) {
-	await spawnSilent("git", ["submodule", "update", "--init", "--recursive"]);
-}
-
-async function gitFetchSubmodule(cwd) {
-	await spawnSilent("git", ["checkout", "master"], { cwd });
-	await spawnSilent("git", ["pull", "--ff-only"], { cwd });
-	//run("git", ["submodule", "update", "--init", "--remote", "--rebase", "."]);
-}
-
-async function gitTag(cwd, s) {
-	// TODO use signed tags ?
-	await spawnSilent("git", ["tag", "--annotate", "-m", s, s], { cwd });
-	await spawnSilent("git", ["push", "origin", s], { cwd });
-}
-
-async function releaseSubPackage(name, gitName) {
-	const distDir = $path.resolve(`dist/${name}`);
-
-	const json = require(`../../${name}/package.json`);
-
-	{
-		const cwd = $path.join("git", gitName);
-		await gitFetchSubmodule(cwd);
-
-		//await rm($path.join(cwd, "dist"));
-		await cp($path.join(cwd, distDir), $path.join(cwd, "dist"));
-
-		await spawnSilent("git", ["add", "."], { cwd });
-		await spawnSilent("git", ["commit", "-m", `"Version ${json.version}"`], { cwd });
-		await spawnSilent("git", ["push"], { cwd });
-		await gitTag(cwd, json.version);
+class Tasks {
+	constructor(tasks, args, cwd) {
+		this.tasks = tasks;
+		this.args = args;
+		this.cwd = cwd;
+		this.dev = false;
+		this.clean = false;
+		this.verbose = false;
+		this.force = false;
+		this.taskDepth = 0;
 	}
 
-	{
-		const cwd = $path.join("git", gitName, "dist", "es2015");
-		await spawnSilent("yarn", ["publish", "--new-version", json.version], { cwd });
-	}
+	static run(cwd, tasks) {
+		const args = require("minimist")(process.argv.slice(3));
 
-	const cwd = process.cwd();
-	await spawnSilent("git", ["add", `git/${gitName}`, `package/${name}/package.json`], { cwd });
-	await spawnSilent("git", ["commit", "-m", `"Published ${gitName} ${json.version}"`], { cwd });
-	await spawnSilent("git", ["push"], { cwd });
-	await gitTag(cwd, `${name}-${json.version}`);
-}
+		const name = args._[0];
 
-exports.gitInitSubmodules = gitInitSubmodules;
-exports.gitFetchSubmodule = gitFetchSubmodule;
-exports.gitTag = gitTag;
-exports.releaseSubPackage = releaseSubPackage;
-
-
-class Lock {
-	constructor() {
-		this.locked = false;
-		this.pending = [];
-	}
-
-	async lock(f) {
-		if (this.locked) {
-			await new Promise(function (resolve, reject) {
-				this.pending.push(resolve);
-			});
-
-			if (this.locked) {
-				throw new Error("Invalid lock state");
-			}
+		if (!name) {
+			throw new Error("Unknown task: " + name);
 		}
 
-		this.locked = true;
+		const state = new Tasks(tasks, args._.slice(1), cwd);
+		state.dev = !!args.dev;
+		state.clean = !!args.clean;
+		state.verbose = !!args.verbose;
+		state.force = !!args.force;
 
-		try {
-			return await f();
+		console.log("");
 
-		} finally {
-			this.locked = false;
+		state.task(name).catch((e) => {
+			state.error(e);
+			console.log("");
+			process.exit(1);
+		});
+	}
 
-			if (this.pending.length !== 0) {
-				const resolve = this.pending.shift();
-				// Wake up pending task
-				resolve();
-			}
+	copy() {
+		const state = new Tasks(this.tasks, this.args, this.cwd);
+		state.dev = this.dev;
+		state.clean = this.clean;
+		state.verbose = this.verbose;
+		state.force = this.force;
+		state.taskDepth = this.taskDepth;
+		return state;
+	}
+
+	dir(...dirs) {
+		return $path.join(this.cwd, ...dirs);
+	}
+
+	path(...segments) {
+		return $path.join(this.cwd, ...segments);
+	}
+
+	async task(name) {
+		return this.subtask(name, (state) => state.tasks[name](state));
+	}
+
+	async subtask(name, f) {
+		console.log($c.green(`${">".repeat(this.taskDepth + 1)} ${name}`));
+		const state = this.copy();
+		++state.taskDepth;
+		return await f(state);
+	}
+
+	warn(...args) {
+		console.warn($c.yellow(`${">".repeat(this.taskDepth + 1)} ${args.join(" ")}`));
+	}
+
+	error(e) {
+		if (this.verbose) {
+			console.error($c.red(`${">".repeat(this.taskDepth + 1)} ${e.stack}`));
+		} else {
+			console.error($c.red(`${">".repeat(this.taskDepth + 1)} ${e.message}`));
 		}
 	}
 }
 
-exports.Lock = Lock;
+exports.Tasks = Tasks;

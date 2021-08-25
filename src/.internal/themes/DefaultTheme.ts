@@ -1,14 +1,3 @@
-import { Theme } from "../core/Theme";
-import { percent, p100, p50 } from "../core/util/Percent";
-import { ColorSet } from "../core/util/ColorSet";
-import { Color } from "../core/util/Color";
-import * as $ease from "../core/util/Ease";
-import * as $type from "../core/util/Type";
-import * as $math from "../core/util/Math";
-import * as $object from "../core/util/Object";
-import * as $array from "../core/util/Array";
-import { geoMercator } from "d3-geo";
-import { GridLayout } from "../core/render/GridLayout"
 import type { ITimeInterval } from "../core/util/Time";
 import type { DataItem } from "../core/render/Component";
 import type { IValueAxisDataItem, ValueAxis } from "../charts/xy/axes/ValueAxis";
@@ -16,6 +5,33 @@ import type { AxisRenderer } from "../charts/xy/axes/AxisRenderer";
 import type { DateAxis } from "../charts/xy/axes/DateAxis";
 import type { ICategoryAxisDataItem } from "../charts/xy/axes/CategoryAxis";
 import type { IFlowNodesDataItem } from "../charts/flow/FlowNodes";
+import type { InterfaceColors, IInterfaceColorsSettings } from "../core/util/InterfaceColors";
+
+import { Theme } from "../core/Theme";
+import { percent, p100, p50 } from "../core/util/Percent";
+import { ColorSet } from "../core/util/ColorSet";
+import { Color } from "../core/util/Color";
+import { geoMercator } from "d3-geo";
+import { GridLayout } from "../core/render/GridLayout"
+
+import * as $ease from "../core/util/Ease";
+import * as $type from "../core/util/Type";
+import * as $math from "../core/util/Math";
+import * as $object from "../core/util/Object";
+import * as $array from "../core/util/Array";
+
+interface Settable<A> {
+	_settings: A;
+	set<K extends keyof A>(key: K, value: A[K]): void;
+}
+
+function setColor<A, K extends keyof A>(rule: Settable<A>, key: K, ic: InterfaceColors, name: keyof IInterfaceColorsSettings) {
+	rule.set(key, ic.get(name) as any);
+
+	ic.on(name, (value) => {
+		rule.set(key, value as any);
+	});
+}
 
 /**
  * @ignore
@@ -28,55 +44,6 @@ export class DefaultTheme extends Theme {
 
 		const ic = this._root.interfaceColors;
 
-		const stroke = Color.fromHex(0xe5e5e5);
-		const fill = Color.fromHex(0xf3f3f3);
-		const primaryButton = Color.fromHex(0x6794dc);
-		const primaryButtonHover = Color.fromHex(0x6771dc);
-		const primaryButtonDown = Color.fromHex(0x33f2c9);
-		const primaryButtonActive = Color.fromHex(0x68dc75);
-		const primaryButtonText = Color.fromHex(0xFFFFFF);
-		const primaryButtonStroke = Color.fromHex(0xFFFFFF);
-		const secondaryButton = Color.fromHex(0xd9d9d9);
-		const secondaryButtonHover = Color.fromHex(0xa3a3a3);
-		const secondaryButtonDown = Color.fromHex(0x8d8d8d);
-		const secondaryButtonActive = Color.fromHex(0xe6e6e6);
-		const secondaryButtonText = Color.fromHex(0x000000);
-		const secondaryButtonStroke = Color.fromHex(0xFFFFFF);
-		const grid = Color.fromHex(0x000000);
-		const background = Color.fromHex(0xffffff);
-		const alternativeBackground = Color.fromHex(0x000000);
-		const text = Color.fromHex(0x000000);
-		const alternativeText = Color.fromHex(0xFFFFFF);
-		const disabled = Color.fromHex(0xadadad);
-		const positive = Color.fromHex(0x50b300);
-		const negative = Color.fromHex(0xb30000);
-
-		ic.setAll({
-			stroke,
-			fill,
-			primaryButton,
-			primaryButtonHover,
-			primaryButtonDown,
-			primaryButtonActive,
-			primaryButtonText,
-			primaryButtonStroke,
-			secondaryButton,
-			secondaryButtonHover,
-			secondaryButtonDown,
-			secondaryButtonActive,
-			secondaryButtonText,
-			secondaryButtonStroke,
-			grid,
-			background,
-			alternativeBackground,
-			text,
-			alternativeText,
-			disabled,
-			positive,
-			negative
-		});
-
-
 		const horizontalLayout = this._root.horizontalLayout;
 		const verticalLayout = this._root.verticalLayout;
 		const gridLayout = this._root.gridLayout;
@@ -88,16 +55,40 @@ export class DefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
+		this.rule("InterfaceColors").setAll({
+			stroke: Color.fromHex(0xe5e5e5),
+			fill: Color.fromHex(0xf3f3f3),
+			primaryButton: Color.fromHex(0x6794dc),
+			primaryButtonHover: Color.fromHex(0x6771dc),
+			primaryButtonDown: Color.fromHex(0x68dc76),
+			primaryButtonActive: Color.fromHex(0x68dc76),
+			primaryButtonText: Color.fromHex(0xffffff),
+			primaryButtonStroke: Color.fromHex(0xffffff),
+			secondaryButton: Color.fromHex(0xd9d9d9),
+			secondaryButtonHover: Color.fromHex(0xa3a3a3),
+			secondaryButtonDown: Color.fromHex(0x8d8d8d),
+			secondaryButtonActive: Color.fromHex(0xe6e6e6),
+			secondaryButtonText: Color.fromHex(0x000000),
+			secondaryButtonStroke: Color.fromHex(0xffffff),
+			grid: Color.fromHex(0x000000),
+			background: Color.fromHex(0xffffff),
+			alternativeBackground: Color.fromHex(0x000000),
+			text: Color.fromHex(0x000000),
+			alternativeText: Color.fromHex(0xffffff),
+			disabled: Color.fromHex(0xadadad),
+			positive: Color.fromHex(0x50b300),
+			negative: Color.fromHex(0xb30000)
+		});
+
 		this.rule("Entity").setAll({
 			stateAnimationDuration: 0,
 			stateAnimationEasing: $ease.out($ease.cubic)
-		})
+		});
 
 		this.rule("Component").setAll({
 			interpolationDuration: 0,
 			interpolationEasing: $ease.out($ease.cubic)
-		})
-
+		});
 
 		this.rule("Sprite").setAll({
 			visible: true,
@@ -120,6 +111,12 @@ export class DefaultTheme extends Theme {
 
 		this.rule("Graphics").setAll({
 			strokeWidth: 1
+		});
+
+
+		this.rule("Chart").setAll({
+			width: p100,
+			height: p100
 		});
 
 
@@ -230,10 +227,15 @@ export class DefaultTheme extends Theme {
 			ariaLabel: language.translate("Press ENTER to toggle")
 		});
 
-		this.rule("Rectangle", ["legend", "item", "background"]).setAll({
-			fillOpacity: 0,
-			fill: background
-		});
+		{
+			const rule = this.rule("Rectangle", ["legend", "item", "background"]);
+
+			rule.setAll({
+				fillOpacity: 0,
+			});
+
+			setColor(rule, "fill", ic, "background");
+		}
 
 		this.rule("Container", ["legend", "marker"]).setAll({
 			setStateOnChildren: true,
@@ -241,19 +243,25 @@ export class DefaultTheme extends Theme {
 			paddingLeft: 0,
 			paddingRight: 0,
 			paddingBottom: 0,
-			paddingTop: 0
+			paddingTop: 0,
+			width: 18,
+			height: 18
 		});
 
 		this.rule("RoundedRectangle", ["legend", "marker", "rectangle"]).setAll({
-			width: 18,
-			height: 18,
+			width: p100,
+			height: p100,
 			cornerRadiusBL: 3,
 			cornerRadiusTL: 3,
 			cornerRadiusBR: 3,
 			cornerRadiusTR: 3
 		});
 
-		this.rule("RoundedRectangle", ["legend", "marker", "rectangle"]).states.create("disabled", { fill: disabled, stroke: disabled });
+		{
+			const rule = this.rule("RoundedRectangle", ["legend", "marker", "rectangle"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "disabled");
+			setColor(rule, "stroke", ic, "disabled");
+		}
 
 		this.rule("Label", ["legend", "label"]).setAll({
 			centerY: p50,
@@ -265,7 +273,10 @@ export class DefaultTheme extends Theme {
 			populateText: true
 		});
 
-		this.rule("Label", ["legend", "label"]).states.create("disabled", { fill: disabled });
+		{
+			const rule = this.rule("Label", ["legend", "label"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "disabled");
+		}
 
 		this.rule("Label", ["legend", "value", "label"]).setAll({
 			centerY: p50,
@@ -280,7 +291,10 @@ export class DefaultTheme extends Theme {
 			populateText: true
 		});
 
-		this.rule("Label", ["legend", "value", "label"]).states.create("disabled", { fill: disabled });
+		{
+			const rule = this.rule("Label", ["legend", "value", "label"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "disabled");
+		}
 
 
 
@@ -294,22 +308,19 @@ export class DefaultTheme extends Theme {
 			stepCount: 1
 		});
 
-		this.rule("Container", ["heatlegend", "marker"]).setAll({
-		});
-
-		this.rule("RoundedRectangle", ["heatlegend", "marker", "background"]).setAll({
+		this.rule("RoundedRectangle", ["heatlegend", "marker"]).setAll({
 			cornerRadiusTR: 0,
 			cornerRadiusBR: 0,
 			cornerRadiusTL: 0,
 			cornerRadiusBL: 0
 		});
 
-		this.rule("Container", ["vertical", "heatlegend", "marker"]).setAll({
+		this.rule("RoundedRectangle", ["vertical", "heatlegend", "marker"]).setAll({
 			height: p100,
 			width: 15
 		});
 
-		this.rule("Container", ["horizontal", "heatlegend", "marker"]).setAll({
+		this.rule("RoundedRectangle", ["horizontal", "heatlegend", "marker"]).setAll({
 			width: p100,
 			height: 15
 		});
@@ -343,17 +354,22 @@ export class DefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Label").setAll({
-			layout: horizontalLayout,
-			paddingTop: 8,
-			paddingBottom: 8,
-			paddingLeft: 10,
-			paddingRight: 10,
-			fill: ic.get("text"),
-			fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
-			fontSize: "1em",
-			populateText: false
-		});
+		{
+			const rule = this.rule("Label");
+
+			rule.setAll({
+				layout: horizontalLayout,
+				paddingTop: 8,
+				paddingBottom: 8,
+				paddingLeft: 10,
+				paddingRight: 10,
+				fontFamily: "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+				fontSize: "1em",
+				populateText: false
+			});
+
+			setColor(rule, "fill", ic, "text");
+		}
 
 		this.rule("RadialLabel").setAll({
 			textType: "regular",
@@ -389,13 +405,18 @@ export class DefaultTheme extends Theme {
 			shiftRadius: 0
 		});
 
-		this.rule("Tick").setAll({
-			stroke: ic.get("grid"),
-			strokeOpacity: .15,
-			isMeasured: false,
-			length: 5,
-			position: "absolute"
-		});
+		{
+			const rule = this.rule("Tick");
+
+			rule.setAll({
+				strokeOpacity: .15,
+				isMeasured: false,
+				length: 5,
+				position: "absolute"
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
 
 		this.rule("Bullet").setAll({
 			locationX: 0.5,
@@ -426,24 +447,34 @@ export class DefaultTheme extends Theme {
 			//layer: 100
 		});
 
-		this.rule("PointedRectangle", ["tooltip", "background"]).setAll({
-			stroke: background,
-			strokeOpacity: 0.9,
-			cornerRadius: 4,
-			pointerLength: 4,
-			pointerBaseWidth: 8,
-			fillOpacity: 0.9
-		});
+		{
+			const rule = this.rule("PointedRectangle", ["tooltip", "background"]);
 
-		this.rule("Label", ["tooltip"]).setAll({
-			role: "tooltip",
-			populateText: true,
-			fill: alternativeText,
-			paddingRight: 0,
-			paddingTop: 0,
-			paddingLeft: 0,
-			paddingBottom: 0
-		});
+			rule.setAll({
+				strokeOpacity: 0.9,
+				cornerRadius: 4,
+				pointerLength: 4,
+				pointerBaseWidth: 8,
+				fillOpacity: 0.9
+			});
+
+			setColor(rule, "stroke", ic, "background");
+		}
+
+		{
+			const rule = this.rule("Label", ["tooltip"]);
+
+			rule.setAll({
+				role: "tooltip",
+				populateText: true,
+				paddingRight: 0,
+				paddingTop: 0,
+				paddingLeft: 0,
+				paddingBottom: 0
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
 
 
 		/**
@@ -468,21 +499,36 @@ export class DefaultTheme extends Theme {
 		this.rule("Button").states.create("down", { stateAnimationDuration: 0 });
 		this.rule("Button").states.create("active", {});
 
-		this.rule("RoundedRectangle", ["button", "background"]).setAll({
-			fill: primaryButton,
-			stroke: primaryButtonStroke
-		});
-		this.rule("RoundedRectangle", ["button", "background"]).states.create("hover", { fill: primaryButtonHover });
-		this.rule("RoundedRectangle", ["button", "background"]).states.create("down", { fill: primaryButtonDown, stateAnimationDuration: 0 });
-		this.rule("RoundedRectangle", ["button", "background"]).states.create("active", { fill: primaryButtonActive });
+		{
+			const rule = this.rule("RoundedRectangle", ["button", "background"]);
+			setColor(rule, "fill", ic, "primaryButton");
+			setColor(rule, "stroke", ic, "primaryButtonStroke");
+		}
 
-		this.rule("Graphics", ["button", "icon"]).setAll({
-			stroke: primaryButtonText
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["button", "background"]).states.create("hover", {});
+			setColor(rule, "fill", ic, "primaryButtonHover");
+		}
 
-		this.rule("Label", ["button"]).setAll({
-			fill: primaryButtonText
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["button", "background"]).states.create("down", { stateAnimationDuration: 0 });
+			setColor(rule, "fill", ic, "primaryButtonDown");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["button", "background"]).states.create("active", {});
+			setColor(rule, "fill", ic, "primaryButtonActive");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["button", "icon"]);
+			setColor(rule, "stroke", ic, "primaryButtonText");
+		}
+
+		{
+			const rule = this.rule("Label", ["button"]);
+			setColor(rule, "fill", ic, "primaryButtonText");
+		}
 
 
 		/**
@@ -504,27 +550,44 @@ export class DefaultTheme extends Theme {
 			ariaLabel: language.translate("Use up and down arrows to move selection")
 		});
 
-		this.rule("RoundedRectangle", ["background", "resize", "button"]).setAll({
-			fill: secondaryButton,
-			cornerRadiusBL: 40,
-			cornerRadiusBR: 40,
-			cornerRadiusTL: 40,
-			cornerRadiusTR: 40
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["background", "resize", "button"]);
 
-		this.rule("Graphics", ["background", "resize", "button"]).states.create("hover", { fill: secondaryButtonHover });
-		this.rule("Graphics", ["background", "resize", "button"]).states.create("down", { fill: secondaryButtonDown, stateAnimationDuration: 0 });
+			rule.setAll({
+				cornerRadiusBL: 40,
+				cornerRadiusBR: 40,
+				cornerRadiusTL: 40,
+				cornerRadiusTR: 40
+			});
 
-		this.rule("Graphics", ["resize", "button", "icon"]).setAll({
-			stroke: secondaryButtonText,
-			strokeOpacity: 0.7,
-			draw: (display: any) => {
-				display.moveTo(0, 0);
-				display.lineTo(0, 12);
-				display.moveTo(4, 0);
-				display.lineTo(4, 12);
-			}
-		});
+			setColor(rule, "fill", ic, "secondaryButton");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["background", "resize", "button"]).states.create("hover", {});
+			setColor(rule, "fill", ic, "secondaryButtonHover");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["background", "resize", "button"]).states.create("down", { stateAnimationDuration: 0 });
+			setColor(rule, "fill", ic, "secondaryButtonDown");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["resize", "button", "icon"]);
+
+			rule.setAll({
+				strokeOpacity: 0.7,
+				draw: (display: any) => {
+					display.moveTo(0, 0);
+					display.lineTo(0, 12);
+					display.moveTo(4, 0);
+					display.lineTo(4, 12);
+				}
+			});
+
+			setColor(rule, "stroke", ic, "secondaryButtonText");
+		}
 
 		this.rule("Button", ["resize", "vertical"]).setAll({
 			rotation: 90,
@@ -552,26 +615,36 @@ export class DefaultTheme extends Theme {
 			toggleKey: "active"
 		});
 
-		this.rule("RoundedRectangle", ["play", "background"]).setAll({
-			fill: primaryButton,
-			strokeOpacity: 0.5,
-			cornerRadiusBL: 100,
-			cornerRadiusBR: 100,
-			cornerRadiusTL: 100,
-			cornerRadiusTR: 100
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["play", "background"]);
 
-		this.rule("Graphics", ["play", "icon"]).setAll({
-			fill: primaryButtonText,
-			stateAnimationDuration: 0,
-			dx: 1,
-			draw: (display: any) => {
-				display.moveTo(0, -5);
-				display.lineTo(8, 0);
-				display.lineTo(0, 5);
-				display.lineTo(0, -5);
-			}
-		});
+			rule.setAll({
+				strokeOpacity: 0.5,
+				cornerRadiusBL: 100,
+				cornerRadiusBR: 100,
+				cornerRadiusTL: 100,
+				cornerRadiusTR: 100
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["play", "icon"]);
+
+			rule.setAll({
+				stateAnimationDuration: 0,
+				dx: 1,
+				draw: (display: any) => {
+					display.moveTo(0, -5);
+					display.lineTo(8, 0);
+					display.lineTo(0, 5);
+					display.lineTo(0, -5);
+				}
+			});
+
+			setColor(rule, "fill", ic, "primaryButtonText");
+		}
 
 		this.rule("Graphics", ["play", "icon"]).states.create("default", {
 			stateAnimationDuration: 0
@@ -612,22 +685,32 @@ export class DefaultTheme extends Theme {
 			height: 24
 		});
 
-		this.rule("RoundedRectangle", ["switch", "background"]).setAll({
-			fill: primaryButton,
-			strokeOpacity: 0.5,
-			cornerRadiusBL: 100,
-			cornerRadiusBR: 100,
-			cornerRadiusTL: 100,
-			cornerRadiusTR: 100
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["switch", "background"]);
 
-		this.rule("Circle", ["switch", "icon"]).setAll({
-			fill: primaryButtonText,
-			radius: 8,
-			centerY: 0,
-			centerX: 0,
-			dx: 0
-		});
+			rule.setAll({
+				strokeOpacity: 0.5,
+				cornerRadiusBL: 100,
+				cornerRadiusBR: 100,
+				cornerRadiusTL: 100,
+				cornerRadiusTR: 100
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = this.rule("Circle", ["switch", "icon"]);
+
+			rule.setAll({
+				radius: 8,
+				centerY: 0,
+				centerX: 0,
+				dx: 0
+			});
+
+			setColor(rule, "fill", ic, "primaryButtonText");
+		}
 
 		this.rule("Graphics", ["switch", "icon"]).states.create("active", {
 			dx: 16
@@ -660,24 +743,42 @@ export class DefaultTheme extends Theme {
 			width: p100
 		});
 
-		this.rule("RoundedRectangle", ["scrollbar", "background"]).setAll({
-			cornerRadiusTL: 8,
-			cornerRadiusBL: 8,
-			cornerRadiusTR: 8,
-			cornerRadiusBR: 8,
-			fillOpacity: 0.8,
-			fill: fill
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["scrollbar", "background"]);
 
-		this.rule("RoundedRectangle", ["scrollbar", "thumb"]).setAll({
-			role: "slider",
-			ariaLive: "polite",
-			position: "absolute",
-			fill: secondaryButton,
-			draggable: true
-		});
-		this.rule("RoundedRectangle", ["scrollbar", "thumb"]).states.create("hover", { fill: secondaryButtonHover });
-		this.rule("RoundedRectangle", ["scrollbar", "thumb"]).states.create("down", { fill: secondaryButtonDown, stateAnimationDuration: 0 });
+			rule.setAll({
+				cornerRadiusTL: 8,
+				cornerRadiusBL: 8,
+				cornerRadiusTR: 8,
+				cornerRadiusBR: 8,
+				fillOpacity: 0.8,
+			});
+
+			setColor(rule, "fill", ic, "fill");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["scrollbar", "thumb"]);
+
+			rule.setAll({
+				role: "slider",
+				ariaLive: "polite",
+				position: "absolute",
+				draggable: true
+			});
+
+			setColor(rule, "fill", ic, "secondaryButton");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["scrollbar", "thumb"]).states.create("hover", {});
+			setColor(rule, "fill", ic, "secondaryButtonHover");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["scrollbar", "thumb"]).states.create("down", { stateAnimationDuration: 0 });
+			setColor(rule, "fill", ic, "secondaryButtonDown");
+		}
 
 		this.rule("RoundedRectangle", ["scrollbar", "thumb", "vertical"]).setAll({
 			x: p50,
@@ -739,25 +840,42 @@ export class DefaultTheme extends Theme {
 			layer: 40
 		});
 
-		this.rule("RoundedRectangle", ["background", "button", "zoom"]).setAll({
-			fill: primaryButton,
-			cornerRadiusBL: 40,
-			cornerRadiusBR: 40,
-			cornerRadiusTL: 40,
-			cornerRadiusTR: 40
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["background", "button", "zoom"]);
 
-		this.rule("RoundedRectangle", ["background", "button", "zoom"]).states.create("hover", { fill: primaryButtonHover });
-		this.rule("RoundedRectangle", ["background", "button", "zoom"]).states.create("down", { fill: primaryButtonDown, stateAnimationDuration: 0 });
+			rule.setAll({
+				cornerRadiusBL: 40,
+				cornerRadiusBR: 40,
+				cornerRadiusTL: 40,
+				cornerRadiusTR: 40
+			});
 
-		this.rule("Graphics", ["icon", "button", "zoom"]).setAll({
-			stroke: primaryButtonText,
-			strokeOpacity: 0.7,
-			draw: (display: any) => {
-				display.moveTo(0, 0);
-				display.lineTo(12, 0);
-			}
-		});
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["background", "button", "zoom"]).states.create("hover", {});
+			setColor(rule, "fill", ic, "primaryButtonHover");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["background", "button", "zoom"]).states.create("down", { stateAnimationDuration: 0 });
+			setColor(rule, "fill", ic, "primaryButtonDown");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["icon", "button", "zoom"]);
+
+			rule.setAll({
+				strokeOpacity: 0.7,
+				draw: (display: any) => {
+					display.moveTo(0, 0);
+					display.lineTo(12, 0);
+				}
+			});
+
+			setColor(rule, "stroke", ic, "primaryButtonText");
+		}
 
 
 		/**
@@ -776,10 +894,15 @@ export class DefaultTheme extends Theme {
 			})
 		});
 
-		this.rule("Graphics", ["scrollbar", "overlay"]).setAll({
-			fillOpacity: 0.5,
-			fill: background
-		});
+		{
+			const rule = this.rule("Graphics", ["scrollbar", "overlay"]);
+
+			rule.setAll({
+				fillOpacity: 0.5
+			});
+
+			setColor(rule, "fill", ic, "background");
+		}
 
 		// Class: RoundedRectangle
 		this.rule("RoundedRectangle", ["xy", "scrollbar", "thumb"]).setAll({
@@ -798,6 +921,13 @@ export class DefaultTheme extends Theme {
 			cornerRadiusBL: 0,
 			cornerRadiusTR: 0,
 			cornerRadiusBR: 0
+		});
+
+		this.rule("RoundedRectangle", ["xy", "scrollbar", "chart", "background", "resize", "button"]).setAll({
+			cornerRadiusBL: 40,
+			cornerRadiusBR: 40,
+			cornerRadiusTL: 40,
+			cornerRadiusTR: 40
 		});
 
 		this.rule("AxisRendererX", ["xy", "chart", "scrollbar"]).setAll({
@@ -845,22 +975,37 @@ export class DefaultTheme extends Theme {
 			layer: 20
 		});
 
-		this.rule("Grid", ["cursor", "x"]).setAll({
-			strokeOpacity: 0.8,
-			stroke: alternativeBackground,
-			strokeDasharray: [2, 2]
-		});
+		{
+			const rule = this.rule("Grid", ["cursor", "x"]);
 
-		this.rule("Grid", ["cursor", "y"]).setAll({
-			strokeOpacity: 0.8,
-			stroke: alternativeBackground,
-			strokeDasharray: [2, 2]
-		});
+			rule.setAll({
+				strokeOpacity: 0.8,
+				strokeDasharray: [2, 2]
+			});
 
-		this.rule("Graphics", ["cursor", "selection"]).setAll({
-			fillOpacity: 0.15,
-			fill: alternativeBackground
-		});
+			setColor(rule, "stroke", ic, "alternativeBackground");
+		}
+
+		{
+			const rule = this.rule("Grid", ["cursor", "y"]);
+
+			rule.setAll({
+				strokeOpacity: 0.8,
+				strokeDasharray: [2, 2]
+			});
+
+			setColor(rule, "stroke", ic, "alternativeBackground");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["cursor", "selection"]);
+
+			rule.setAll({
+				fillOpacity: 0.15,
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
 
 
 		/**
@@ -908,10 +1053,15 @@ export class DefaultTheme extends Theme {
 			layer: 30
 		});
 
-		this.rule("AxisRenderer").setAll({
-			stroke: grid,
-			strokeOpacity: 0
-		});
+		{
+			const rule = this.rule("AxisRenderer");
+
+			rule.setAll({
+				strokeOpacity: 0
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
 
 		this.rule("AxisRendererX").setAll({
 			minGridDistance: 120,
@@ -929,42 +1079,62 @@ export class DefaultTheme extends Theme {
 			cellEndLocation: 1
 		});
 
-		this.rule("Grid").setAll({
-			location: 0,
-			strokeOpacity: 0.15,
-			stroke: grid
-		});
+		{
+			const rule = this.rule("Grid");
+
+			rule.setAll({
+				location: 0,
+				strokeOpacity: 0.15,
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
 
 		this.rule("Grid", ["base"]).setAll({
 			strokeOpacity: 0.3
 		});
 
-		this.rule("Graphics", ["axis", "fill"]).setAll({
-			visible: false,
-			isMeasured: false,
-			position: "absolute",
-			fillOpacity: 0.05,
-			fill: alternativeBackground
-		});
+		{
+			const rule = this.rule("Graphics", ["axis", "fill"]);
 
-		this.rule("PointedRectangle", ["axis", "tooltip", "background"]).setAll({
-			cornerRadius: 0,
-			fill: alternativeBackground
-		});
+			rule.setAll({
+				visible: false,
+				isMeasured: false,
+				position: "absolute",
+				fillOpacity: 0.05,
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
+
+		{
+			const rule = this.rule("PointedRectangle", ["axis", "tooltip", "background"]);
+
+			rule.setAll({
+				cornerRadius: 0,
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
 
 		this.rule("Label", ["axis", "tooltip"]).setAll({
 			role: undefined
 		});
 
-		this.rule("AxisTick").setAll({
-			location: 0.5,
-			multiLocation: 0,
-			stroke: grid,
-			strokeOpacity: 1,
-			isMeasured: false,
-			position: "absolute",
-			visible: false
-		});
+		{
+			const rule = this.rule("AxisTick");
+
+			rule.setAll({
+				location: 0.5,
+				multiLocation: 0,
+				strokeOpacity: 1,
+				isMeasured: false,
+				position: "absolute",
+				visible: false
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
 
 		this.rule("CategoryAxis").setAll({
 			startLocation: 0,
@@ -1144,6 +1314,7 @@ export class DefaultTheme extends Theme {
 		});
 
 		this.rule("XYSeries").setAll({
+			maskBullets: true,
 			stackToNegative: true,
 
 			locationX: 0.5,
@@ -1191,7 +1362,7 @@ export class DefaultTheme extends Theme {
 
 		this.rule("Graphics", ["series", "fill"]).setAll({
 			visible: false,
-			fillOpacity: 0.2,
+			fillOpacity: 0,
 			position: "absolute",
 			strokeWidth: 0,
 			strokeOpacity: 0,
@@ -1210,7 +1381,10 @@ export class DefaultTheme extends Theme {
 			}
 		});
 
-		this.rule("Graphics", ["line", "series", "legend", "marker", "stroke"]).states.create("disabled", { stroke: disabled });
+		{
+			const rule = this.rule("Graphics", ["line", "series", "legend", "marker", "stroke"]).states.create("disabled", {});
+			setColor(rule, "stroke", ic, "disabled");
+		}
 
 		this.rule("Graphics", ["line", "series", "legend", "marker", "fill"]).setAll({
 			draw: (display: any, sprite: any) => {
@@ -1227,7 +1401,10 @@ export class DefaultTheme extends Theme {
 			}
 		});
 
-		this.rule("Graphics", ["line", "series", "legend", "marker", "fill"]).states.create("disabled", { stroke: disabled });
+		{
+			const rule = this.rule("Graphics", ["line", "series", "legend", "marker", "fill"]).states.create("disabled", {});
+			setColor(rule, "stroke", ic, "disabled");
+		}
 
 		this.rule("SmoothedXYLineSeries").setAll({
 			tension: 0.5
@@ -1273,8 +1450,17 @@ export class DefaultTheme extends Theme {
 		})
 
 		// These rules can be used for regular columns, too
-		this.rule("Rectangle", ["column", "autocolor"]).states.create("riseFromOpen", { fill: positive, stroke: positive });
-		this.rule("Rectangle", ["column", "autocolor"]).states.create("dropFromOpen", { fill: negative, stroke: negative });
+		{
+			const rule = this.rule("Rectangle", ["column", "autocolor"]).states.create("riseFromOpen", {});
+			setColor(rule, "fill", ic, "positive");
+			setColor(rule, "stroke", ic, "positive");
+		}
+
+		{
+			const rule = this.rule("Rectangle", ["column", "autocolor"]).states.create("dropFromOpen", {});
+			setColor(rule, "fill", ic, "negative");
+			setColor(rule, "stroke", ic, "negative");
+		}
 
 		this.rule("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromPrevious", { fillOpacity: 1 });
 		this.rule("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromPrevious", { fillOpacity: 0 });
@@ -1579,15 +1765,25 @@ export class DefaultTheme extends Theme {
 			pinRadius: 10
 		});
 
-		this.rule("Graphics", ["clock", "hand"]).setAll({
-			fill: alternativeBackground,
-			fillOpacity: 1
-		});
+		{
+			const rule = this.rule("Graphics", ["clock", "hand"]);
 
-		this.rule("Graphics", ["clock", "pin"]).setAll({
-			fill: alternativeBackground,
-			fillOpacity: 1
-		});
+			rule.setAll({
+				fillOpacity: 1
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
+
+		{
+			const rule = this.rule("Graphics", ["clock", "pin"]);
+
+			rule.setAll({
+				fillOpacity: 1
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
 
 
 		/**
@@ -1600,6 +1796,7 @@ export class DefaultTheme extends Theme {
 			projection: geoMercator(),
 			panX: "translateX",
 			panY: "translateY",
+			pinchZoom: true,
 			zoomStep: 2,
 			zoomLevel: 1,
 			rotationX: 0,
@@ -1615,22 +1812,57 @@ export class DefaultTheme extends Theme {
 			maxPanOut: 0.4
 		});
 
-		this.rule("MapLine").setAll({
-			precision: 0.5,
-			role: "figure",
-			stroke: grid
+		{
+			const rule = this.rule("MapLine");
+
+			rule.setAll({
+				precision: 0.5,
+				role: "figure",
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
+
+		this.rule("MapPointSeries").setAll({
+			clipFront: false,
+			clipBack: true
+		})
+
+		{
+			const rule = this.rule("MapPolygon");
+
+			rule.setAll({
+				precision: 0.5,
+				isMeasured: false,
+				role: "figure",
+				fillOpacity: 1,
+				position: "absolute",
+				strokeWidth: 0.2,
+				strokeOpacity: 1,
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+			setColor(rule, "stroke", ic, "background");
+		}
+
+		this.rule("Graphics", ["map", "button", "plus", "icon"]).setAll({
+			x: p50,
+			y: p50,
+			draw: (display) => {
+				display.moveTo(-4, 0);
+				display.lineTo(4, 0);
+				display.moveTo(0, -4);
+				display.lineTo(0, 4);
+			}
 		});
 
-		this.rule("MapPolygon").setAll({
-			precision: 0.5,
-			isMeasured: false,
-			role: "figure",
-			fillOpacity: 1,
-			fill: primaryButton,
-			position: "absolute",
-			strokeWidth: 0.2,
-			strokeOpacity: 1,
-			stroke: background
+		this.rule("Graphics", ["map", "button", "minus", "icon"]).setAll({
+			x: p50,
+			y: p50,
+			draw: (display) => {
+				display.moveTo(-4, 0);
+				display.lineTo(4, 0);
+			}
 		});
 
 
@@ -1673,30 +1905,40 @@ export class DefaultTheme extends Theme {
 			tooltipText: "{category}: {sum}"
 		});
 
-		this.rule("Label", ["hierarchy", "node"]).setAll({
-			centerX: p50,
-			centerY: p50,
-			position: "absolute",
-			paddingBottom: 1,
-			paddingTop: 1,
-			paddingRight: 4,
-			paddingLeft: 4,
-			fill: alternativeText,
-			text: "{category}",
-			populateText: true,
-			oversizedBehavior: "fit",
-			minScale: 0.3
-		});
+		{
+			const rule = this.rule("Label", ["hierarchy", "node"]);
 
-		this.rule("HierarchyLink").setAll({
-			isMeasured: false,
-			position: "absolute",
-			strokeWidth: 1,
-			strokeOpacity: 1,
-			stroke: grid,
-			strength: 0.9,
-			distance: 1.1
-		});
+			rule.setAll({
+				centerX: p50,
+				centerY: p50,
+				position: "absolute",
+				paddingBottom: 1,
+				paddingTop: 1,
+				paddingRight: 4,
+				paddingLeft: 4,
+				text: "{category}",
+				populateText: true,
+				oversizedBehavior: "fit",
+				minScale: 0.3
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
+
+		{
+			const rule = this.rule("HierarchyLink");
+
+			rule.setAll({
+				isMeasured: false,
+				position: "absolute",
+				strokeWidth: 1,
+				strokeOpacity: 1,
+				strength: 0.9,
+				distance: 1.1
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
 
 		this.rule("Circle", ["linkedhierarchy", "shape"]).setAll({
 			position: "absolute",
@@ -1735,30 +1977,52 @@ export class DefaultTheme extends Theme {
 			layout: gridLayout
 		});
 
-		this.rule("Label", ["breadcrumb"]).setAll({
-			paddingRight: 4,
-			paddingLeft: 4,
-			cursorOverStyle: "pointer",
-			populateText: true,
-			text: "{category}:",
-			fill: primaryButton
-		});
+		{
+			const rule = this.rule("Label", ["breadcrumb"]);
 
-		this.rule("Label", ["breadcrumb"]).states.create("hover", { fill: primaryButtonHover });
-		this.rule("Label", ["breadcrumb"]).states.create("down", { fill: primaryButtonDown, stateAnimationDuration: 0 });
+			rule.setAll({
+				paddingRight: 4,
+				paddingLeft: 4,
+				cursorOverStyle: "pointer",
+				populateText: true,
+				text: "{category}:",
+			});
 
-		this.rule("Label", ["breadcrumb", "last"]).setAll({
-			populateText: true,
-			text: "{category}",
-			fontWeight: "bold",
-			fill: primaryButton,
-			cursorOverStyle: "default"
-		});
+			setColor(rule, "fill", ic, "primaryButton");
+		}
 
-		this.rule("RoundedRectangle", ["breadcrumb", "label", "background"]).setAll({
-			fillOpacity: 0,
-			fill: background
-		});
+		{
+			const rule = this.rule("Label", ["breadcrumb"]).states.create("hover", {});
+			setColor(rule, "fill", ic, "primaryButtonHover");
+		}
+
+		{
+			const rule = this.rule("Label", ["breadcrumb"]).states.create("down", { stateAnimationDuration: 0 });
+			setColor(rule, "fill", ic, "primaryButtonDown");
+		}
+
+		{
+			const rule = this.rule("Label", ["breadcrumb", "last"]);
+
+			rule.setAll({
+				populateText: true,
+				text: "{category}",
+				fontWeight: "bold",
+				cursorOverStyle: "default"
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = this.rule("RoundedRectangle", ["breadcrumb", "label", "background"]);
+
+			rule.setAll({
+				fillOpacity: 0,
+			});
+
+			setColor(rule, "fill", ic, "background");
+		}
 
 
 		/**
@@ -1782,36 +2046,46 @@ export class DefaultTheme extends Theme {
 			visible: true
 		});
 
-		this.rule("Label", ["partition", "node"]).setAll({
-			x: p50,
-			y: p50,
-			centerY: p50,
-			centerX: p50,
-			paddingBottom: 1,
-			paddingTop: 1,
-			paddingLeft: 1,
-			paddingRight: 1,
-			rotation: 90,
-			populateText: true,
-			fill: alternativeText,
-			text: "{category}",
-			oversizedBehavior: "fit",
-			minScale: 0.4
-		});
+		{
+			const rule = this.rule("Label", ["partition", "node"]);
+
+			rule.setAll({
+				x: p50,
+				y: p50,
+				centerY: p50,
+				centerX: p50,
+				paddingBottom: 1,
+				paddingTop: 1,
+				paddingLeft: 1,
+				paddingRight: 1,
+				rotation: 90,
+				populateText: true,
+				text: "{category}",
+				oversizedBehavior: "fit",
+				minScale: 0.4
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
 
 		this.rule("Label", ["horizontal", "partition", "node"]).setAll({
 			rotation: 0
 		});
 
-		this.rule("RoundedRectangle", ["partition", "node", "shape"]).setAll({
-			strokeOpacity: 1,
-			strokeWidth: 1,
-			stroke: background,
-			cornerRadiusBR: 0,
-			cornerRadiusTR: 0,
-			cornerRadiusBL: 0,
-			cornerRadiusTL: 0
-		});
+		{
+			const rule = this.rule("RoundedRectangle", ["partition", "node", "shape"]);
+
+			rule.setAll({
+				strokeOpacity: 1,
+				strokeWidth: 1,
+				cornerRadiusBR: 0,
+				cornerRadiusTR: 0,
+				cornerRadiusBL: 0,
+				cornerRadiusTL: 0
+			});
+
+			setColor(rule, "stroke", ic, "background");
+		}
 
 		this.rule("RoundedRectangle", ["partition", "node", "shape", "last"]).setAll({
 			fillOpacity: 0.75
@@ -1832,30 +2106,40 @@ export class DefaultTheme extends Theme {
 			setStateOnChildren: false
 		});
 
-		this.rule("Slice", ["sunburst", "node", "shape"]).setAll({
-			strokeOpacity: 1,
-			strokeWidth: 1,
-			stroke: background,
-			cornerRadius: 0
-		});
+		{
+			const rule = this.rule("Slice", ["sunburst", "node", "shape"]);
+
+			rule.setAll({
+				strokeOpacity: 1,
+				strokeWidth: 1,
+				cornerRadius: 0
+			});
+
+			setColor(rule, "stroke", ic, "background");
+		}
 
 		this.rule("Slice", ["sunburst", "node", "shape", "last"]).setAll({
 			fillOpacity: 0.75
 		});
 
-		this.rule("RadialLabel", ["sunburst", "node"]).setAll({
-			textType: "radial",
-			paddingBottom: 1,
-			paddingTop: 1,
-			paddingLeft: 1,
-			paddingRight: 1,
-			centerX: p50,
-			populateText: true,
-			fill: alternativeText,
-			text: "{category}",
-			oversizedBehavior: "fit",
-			minScale: 0.4
-		});
+		{
+			const rule = this.rule("RadialLabel", ["sunburst", "node"]);
+
+			rule.setAll({
+				textType: "radial",
+				paddingBottom: 1,
+				paddingTop: 1,
+				paddingLeft: 1,
+				paddingRight: 1,
+				centerX: p50,
+				populateText: true,
+				text: "{category}",
+				oversizedBehavior: "fit",
+				minScale: 0.4
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
 
 
 		/**
@@ -1913,26 +2197,36 @@ export class DefaultTheme extends Theme {
 			paddingRight: 20
 		});
 
-		this.rule("Label", ["pack", "node"]).setAll({
-			centerY: p50,
-			centerX: p50,
-			paddingBottom: 1,
-			paddingTop: 1,
-			paddingLeft: 1,
-			paddingRight: 1,
-			populateText: true,
-			fill: alternativeText,
-			text: "{category}",
-			oversizedBehavior: "fit",
-			minScale: 0.4
-		});
+		{
+			const rule = this.rule("Label", ["pack", "node"]);
 
-		this.rule("Circle", ["pack", "node", "shape"]).setAll({
-			strokeOpacity: 0.5,
-			fillOpacity: 0.8,
-			strokeWidth: 1,
-			stroke: background
-		});
+			rule.setAll({
+				centerY: p50,
+				centerX: p50,
+				paddingBottom: 1,
+				paddingTop: 1,
+				paddingLeft: 1,
+				paddingRight: 1,
+				populateText: true,
+				text: "{category}",
+				oversizedBehavior: "fit",
+				minScale: 0.4
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
+
+		{
+			const rule = this.rule("Circle", ["pack", "node", "shape"]);
+
+			rule.setAll({
+				strokeOpacity: 0.5,
+				fillOpacity: 0.8,
+				strokeWidth: 1,
+			});
+
+			setColor(rule, "stroke", ic, "background");
+		}
 
 
 		this.rule("LinkedHierarchyNode").setAll({
@@ -1953,36 +2247,46 @@ export class DefaultTheme extends Theme {
 			layoutAlgorithm: "binary"
 		});
 
-		this.rule("Label", ["treemap", "node"]).setAll({
-			x: p50,
-			y: p50,
-			centerY: p50,
-			centerX: p50,
-			paddingBottom: 1,
-			paddingTop: 1,
-			paddingLeft: 1,
-			paddingRight: 1,
-			populateText: true,
-			fill: alternativeText,
-			text: "{category}",
-			oversizedBehavior: "fit",
-			minScale: 0.4
-		});
+		{
+			const rule = this.rule("Label", ["treemap", "node"]);
+
+			rule.setAll({
+				x: p50,
+				y: p50,
+				centerY: p50,
+				centerX: p50,
+				paddingBottom: 1,
+				paddingTop: 1,
+				paddingLeft: 1,
+				paddingRight: 1,
+				populateText: true,
+				text: "{category}",
+				oversizedBehavior: "fit",
+				minScale: 0.4
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
 
 		this.rule("HierarchyNode", ["treemap", "node"]).setAll({
 			tooltipY: percent(40)
-		})
-
-		this.rule("RoundedRectangle", ["treemap", "node", "shape"]).setAll({
-			strokeOpacity: 1,
-			strokeWidth: 1,
-			stroke: background,
-			cornerRadiusBR: 0,
-			cornerRadiusTR: 0,
-			cornerRadiusBL: 0,
-			cornerRadiusTL: 0,
-			fillOpacity: 1
 		});
+
+		{
+			const rule = this.rule("RoundedRectangle", ["treemap", "node", "shape"]);
+
+			rule.setAll({
+				strokeOpacity: 1,
+				strokeWidth: 1,
+				cornerRadiusBR: 0,
+				cornerRadiusTR: 0,
+				cornerRadiusBL: 0,
+				cornerRadiusTL: 0,
+				fillOpacity: 1
+			});
+
+			setColor(rule, "stroke", ic, "background");
+		}
 
 
 		/**
@@ -2108,13 +2412,18 @@ export class DefaultTheme extends Theme {
 			draggable: true
 		});
 
-		this.rule("Graphics", ["sankey", "link"]).setAll({
-			fill: grid,
-			fillOpacity: 0.2,
-			strokeOpacity: 0,
-			interactive: true,
-			tooltipText: "{sourceId} - {targetId}: {value}"
-		});
+		{
+			const rule = this.rule("Graphics", ["sankey", "link"]);
+
+			rule.setAll({
+				fillOpacity: 0.2,
+				strokeOpacity: 0,
+				interactive: true,
+				tooltipText: "{sourceId} - {targetId}: {value}"
+			});
+
+			setColor(rule, "fill", ic, "grid");
+		}
 
 		this.rule("Graphics", ["sankey", "link"]).states.create("hover", { fillOpacity: 0.5 });
 
@@ -2184,13 +2493,18 @@ export class DefaultTheme extends Theme {
 		});
 
 		// Class: Graphics
-		this.rule("Graphics", ["chord", "link", "shape"]).setAll({
-			fill: grid,
-			fillOpacity: 0.2,
-			strokeOpacity: 0,
-			stroke: grid,
-			interactive: true
-		});
+		{
+			const rule = this.rule("Graphics", ["chord", "link", "shape"]);
+
+			rule.setAll({
+				fillOpacity: 0.2,
+				strokeOpacity: 0,
+				interactive: true
+			});
+
+			setColor(rule, "fill", ic, "grid");
+			setColor(rule, "stroke", ic, "grid");
+		}
 
 		this.rule("Graphics", ["chord", "link", "shape"]).states.create("hover", { fillOpacity: 0.5 });
 

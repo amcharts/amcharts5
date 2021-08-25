@@ -50,7 +50,7 @@ export interface IAxisLabelRadialPrivate extends IRadialLabelPrivate {
 /**
  * Draws a label on a circular axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Labels} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels} for more info
  */
 export class AxisLabelRadial extends RadialLabel {
 

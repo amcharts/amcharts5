@@ -15,7 +15,7 @@ export interface ISliderEvents extends IScrollbarEvents {
  * A control that allows zooming chart's axes, or other uses requiring range
  * selection.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/Sliders/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/Sliders/} for more info
  */
 export class Slider extends Scrollbar {
 

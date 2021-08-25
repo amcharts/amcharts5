@@ -14,14 +14,14 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	/**
 	 * Indicates granularity of data.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Data_granularity} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
 	/**
 	 * A list of intervals the axis is allowed to show grid/labels on.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Grid_granularity} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
 
@@ -38,14 +38,14 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	/**
 	 * Date formats used for intermediate labels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	dateFormats?: { [index: string]: string };
 
 	/**
 	 * Date formats used for "period change" labels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	periodChangeDateFormats?: { [index: string]: string };
 
@@ -77,7 +77,7 @@ export interface ICategoryDateAxisEvents extends ICategoryAxisEvents {
 /**
  * Category-based date axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/category-date-axis/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-date-axis/} for more info
  * @important
  */
 export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {

@@ -1,17 +1,20 @@
-import { BaseColumnSeries, IBaseColumnSeriesPrivate, IBaseColumnSeriesSettings, IBaseColumnSeriesDataItem, IBaseColumnSeriesAxisRange } from "../xy/series/BaseColumnSeries";
 import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { IPoint } from "../../core/util/IPoint";
 import type { AxisRendererCircular } from "./AxisRendererCircular";
 import type { AxisRendererRadial } from "./AxisRendererRadial";
-import { Slice } from "../../core/render/Slice";
-import type { Graphics } from "../../core/render/Graphics";
-import * as $math from "../../core/util/Math";
-import { Template } from "../../core/util/Template";
-import { ListTemplate } from "../../core/util/List";
 import type { Bullet } from "../../core/render/Bullet";
 import type { RadarChart } from "./RadarChart";
+
+import { BaseColumnSeries, IBaseColumnSeriesPrivate, IBaseColumnSeriesSettings, IBaseColumnSeriesDataItem, IBaseColumnSeriesAxisRange } from "../xy/series/BaseColumnSeries";
+import { Slice } from "../../core/render/Slice";
+import { Graphics } from "../../core/render/Graphics";
+import { Template } from "../../core/util/Template";
+import { ListTemplate } from "../../core/util/List";
+
+import * as $math from "../../core/util/Math";
 import * as $utils from "../../core/util/Utils";
+
 
 export interface IRadarColumnSeriesDataItem extends IBaseColumnSeriesDataItem {
 	slice: Slice
@@ -64,6 +67,7 @@ export class RadarColumnSeries extends BaseColumnSeries {
 	public readonly columns: ListTemplate<Slice> = new ListTemplate(
 		Template.new({}),
 		() => Slice.new(this._root, {
+			position: "absolute",
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["radar", "series", "column"])
 		}, this.columns.template)
 	);
@@ -94,8 +98,13 @@ export class RadarColumnSeries extends BaseColumnSeries {
 	protected _afterNew() {
 		super._afterNew();
 		this.set("maskContent", false);
+		this.bulletsContainer.set("maskContent", false);
+		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
 	}
 
+	/**
+	 * @ignore
+	 */
 	public getPoint(positionX: number, positionY: number): IPoint {
 
 		const yAxis = this.get("yAxis");
@@ -193,11 +202,15 @@ export class RadarColumnSeries extends BaseColumnSeries {
 		}
 	}
 
+	protected _handleMaskBullets() {
+
+	}
+
 	protected _processAxisRange(axisRange: this["_axisRangeType"]) {
 		super._processAxisRange(axisRange);
 		axisRange.columns = new ListTemplate(
 			Template.new({}),
-			() => Slice.new(this._root, { themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["radar", "series", "column"]) }, axisRange.columns.template)
+			() => Slice.new(this._root, { position: "absolute", themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["radar", "series", "column"]) }, axisRange.columns.template)
 		);
 	}
 }

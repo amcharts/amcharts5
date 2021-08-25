@@ -2,14 +2,40 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * Create root element
+ * https://www.amcharts.com/docs/v5/getting-started/#Root_element
+ */
 const root = am5.Root.new("chartdiv");
 
+/**
+ * Set themes
+ * https://www.amcharts.com/docs/v5/concepts/themes/
+ */
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-const chart = root.container.children.push(am5xy.XYChart.new(root, { panX: false, panY: false, wheelX: "panX", wheelY: "zoomX" }));
-chart.set("scrollbarX", am5.Scrollbar.new(root, { orientation: "horizontal" }));
+/**
+ * Create chart
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/
+ */
+const chart = root.container.children.push(
+  am5xy.XYChart.new(root, {
+    panX: false,
+    panY: false,
+    wheelX: "panX",
+    wheelY: "zoomX"
+  })
+);
+
+/**
+ * Add scrollbar
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+ */
+chart.set("scrollbarX", am5.Scrollbar.new(root, {
+  orientation: "horizontal"
+}));
 
 chart.set("layout", root.verticalLayout);
 const legend = chart.children.push(am5.Legend.new(root, { centerX: am5.p50, x: am5.p50 }))
@@ -40,17 +66,35 @@ const data = [{
   "africa": 0.1
 }]
 
+/**
+ * Create axes
+ * https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+ */
+const xAxis = chart.xAxes.push(
+  am5xy.CategoryAxis.new(root, {
+    categoryField: "year",
+    renderer: am5xy.AxisRendererX.new(root, {})
+  })
+);
 
-const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, { categoryField: "year", renderer: am5xy.AxisRendererX.new(root, {}) }));
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, { min:0, renderer: am5xy.AxisRendererY.new(root, {}) }));
+const yAxis = chart.yAxes.push(
+  am5xy.ValueAxis.new(root, {
+    min: 0,
+    renderer: am5xy.AxisRendererY.new(root, {})
+  })
+);
 
-xAxis.set("tooltip", am5.Tooltip.new(root, { themeTags: ["axis"], animationDuration: 200 }))
+xAxis.set("tooltip", am5.Tooltip.new(root, {
+  themeTags: ["axis"],
+  animationDuration: 200
+}));
+
 xAxis.data.setAll(data);
 
 function makeSeries(name: string, fieldName: string) {
   const series = chart.series.push(am5xy.ColumnSeries.new(root, { name: name, stacked: true, sequencedInterpolation: true, xAxis: xAxis, yAxis: yAxis, valueYField: fieldName, categoryXField: "year" }));
 
-  series.columns.template.setAll({tooltipText: "{name}, {categoryX}:{valueY}", tooltipY:am5.percent(10)});
+  series.columns.template.setAll({ tooltipText: "{name}, {categoryX}:{valueY}", tooltipY: am5.percent(10) });
   series.data.setAll(data);
   series.appear();
 

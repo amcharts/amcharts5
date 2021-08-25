@@ -1,13 +1,15 @@
 import type { Exporting, ExportingFormats, ExportingTypes } from "./Exporting"
-import exportingCSS from "./ExportingCSS";
-import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../core/util/Entity"
 import type { Template } from "../../core/util/Template";
 import type { Root } from "../../core/Root"
+
+import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../core/util/Entity"
 import { IDisposer, Disposer } from "../../core/util/Disposer";
+import exportingCSS from "./ExportingCSS";
+
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
 
-export interface IMenuItem {
+export interface IExportingMenuItem {
 
 	/**
 	 * Indicates type of the menu item:
@@ -18,7 +20,7 @@ export interface IMenuItem {
 	type: "format" | "separator" | "custom";
 
 	/**
-	 * If `type`` is set to `"format"`, clicking item will initiate export in
+	 * If `type` is set to `"format"`, clicking item will initiate export in
 	 * that format.
 	 */
 	format?: ExportingFormats;
@@ -83,11 +85,10 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	/**
 	 * A list of menu items.
 	 */
-	items?: IMenuItem[];
+	items?: IExportingMenuItem[];
 
 	/**
 	 * A reference to related [[Exporting]] object.
-	 * @type {[type]}
 	 */
 	exporting?: Exporting;
 
@@ -112,7 +113,7 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	 * 
 	 * @default true
 	 */
-	inactivateRoot?: boolean;
+	deactivateRoot?: boolean;
 
 }
 
@@ -160,7 +161,7 @@ export class ExportingMenu extends Entity {
 	private _itemElements?: HTMLLIElement[] = [];
 
 	private _cssDisposer?: IDisposer;
-	private _activeItem?: IMenuItem;
+	private _activeItem?: IExportingMenuItem;
 
 	public isOpen: boolean = false;
 
@@ -168,12 +169,12 @@ export class ExportingMenu extends Entity {
 
 	protected _afterNew() {
 		super._afterNew();
-		this._setRawDefault("container", this._root._dom);
+		this._setRawDefault("container", this._root._inner);
 		this._setRawDefault("align", "right");
 		this._setRawDefault("valign", "top");
 		this._setRawDefault("useDefaultCSS", true);
 		this._setRawDefault("autoClose", true);
-		this._setRawDefault("inactivateRoot", true);
+		this._setRawDefault("deactivateRoot", true);
 		this._setRawDefault("items", [{
 			type: "separator",
 			label: this._root.language.translate("Export")
@@ -309,25 +310,25 @@ export class ExportingMenu extends Entity {
 		menuElement.appendChild(this._iconElement);
 		menuElement.appendChild(this._listElement);
 
-		this._root._dom.appendChild(this._menuElement);
+		this._root._inner.appendChild(this._menuElement);
 
 		menuElement.addEventListener($utils.getRendererEvent("pointerover"), (_ev) => {
 			this._isOver = true;
-			if (this.get("inactivateRoot")) {
+			if (this.get("deactivateRoot")) {
 				this._root._renderer.interactionsEnabled = false;
 			}
 		});
 
 		menuElement.addEventListener($utils.getRendererEvent("pointerout"), (_ev) => {
 			this._isOver = false;
-			if (this.get("inactivateRoot")) {
+			if (this.get("deactivateRoot")) {
 				this._root._renderer.interactionsEnabled = true;
 			}
 		});
 
 		this._disposers.push(new Disposer(() => {
 			if (this._menuElement) {
-				this._root._dom.removeChild(this._menuElement);
+				this._root._inner.removeChild(this._menuElement);
 			}
 		}));
 
@@ -347,8 +348,8 @@ export class ExportingMenu extends Entity {
 		});
 	}
 
-	public _beforeChanged() {
-		super._beforeChanged();
+	public _afterChanged() {
+		super._afterChanged();
 
 		if (this._itemElements!.length == 0) {
 			this.createItems();
@@ -392,6 +393,9 @@ export class ExportingMenu extends Entity {
 		this._listElement!.className = "am5exporting am5exporting-list am5exporting-align-" + align + " am5exporting-valign-" + valign;
 	}
 
+	/**
+	 * @ignore
+	 */
 	public createItems(): void {
 		const exporting = this.get("exporting");
 		if (!exporting) {
@@ -461,7 +465,7 @@ export class ExportingMenu extends Entity {
 		});
 	}
 
-	private _handleClick(item: IMenuItem): void {
+	private _handleClick(item: IExportingMenuItem): void {
 		const exporting = this.get("exporting")!;
 		if (this.get("autoClose")) {
 			this.close();
@@ -474,7 +478,7 @@ export class ExportingMenu extends Entity {
 		}
 	}
 
-	private _handleItemFocus(item: IMenuItem): void {
+	private _handleItemFocus(item: IExportingMenuItem): void {
 		if (item != this._activeItem) {
 			if (this._activeItem) {
 				this._activeItem.element!.className = "";
@@ -485,7 +489,7 @@ export class ExportingMenu extends Entity {
 		}
 	}
 
-	private _handleItemBlur(item: IMenuItem): void {
+	private _handleItemBlur(item: IExportingMenuItem): void {
 		item.element!.className = "";
 		if (item == this._activeItem) {
 			this._activeItem = undefined
@@ -513,6 +517,9 @@ export class ExportingMenu extends Entity {
 		// }
 	}
 
+	/**
+	 * Opens menu.
+	 */
 	public open(): void {
 		this.isOpen = true;
 		this._applyClassNames();
@@ -522,6 +529,9 @@ export class ExportingMenu extends Entity {
 		});
 	}
 
+	/**
+	 * Closes menu.
+	 */
 	public close(): void {
 		this.isOpen = false;
 		$utils.blur();
@@ -532,6 +542,9 @@ export class ExportingMenu extends Entity {
 		});
 	}
 
+	/**
+	 * Toggles menu open and close.
+	 */
 	public toggle(): void {
 		if (this.isOpen) {
 			this.close();

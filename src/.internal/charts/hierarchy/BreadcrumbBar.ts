@@ -29,7 +29,7 @@ export interface IBreadcrumbBarEvents extends IContainerEvents {
 /**
  * Creates a breadcrumb navigation control.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/breadcrumbs/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/breadcrumbs/} for more info
  * @important
  */
 export class BreadcrumbBar extends Container {

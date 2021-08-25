@@ -16,7 +16,7 @@ export interface ILinearGradientSettings extends IGradientSettings {
 	/**
 	 * Gradient rotation, in degrees.
 	 * 
-	 * @default 0
+	 * @default 90
 	 */
 	rotation?: number;
 

@@ -18,7 +18,7 @@ export interface IStepLineSeriesSettings extends ILineSeriesSettings {
 	 * disabled: `noRisers: true`
 	 * 
 	 * @default 100%
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/step-line-series/#Step_width} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/#Step_width} for more info
 	 */
 	stepWidth?: Percent;
 
@@ -26,7 +26,7 @@ export interface IStepLineSeriesSettings extends ILineSeriesSettings {
 	 * Disables vertical connecting lines for the steps.
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/step-line-series/#Disabling_risers} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/#Disabling_risers} for more info
 	 */
 	noRisers?: boolean;
 

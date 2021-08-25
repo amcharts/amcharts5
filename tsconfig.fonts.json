@@ -1,0 +1,19 @@
+{
+    "extends": "./tsconfig.build.json",
+    "compilerOptions": {
+        "declarationDir": "./dist/fonts/es2015",
+        "rootDir": "src/fonts",
+        "outDir": "./dist/fonts/es2015",
+        "sourceMap": false,
+        "inlineSources": false,
+        "inlineSourceMap": false,
+        "declarationMap": false,
+    },
+    "include": [
+        "src/fonts/**/*",
+        "src/fonts/.internal/**/*",
+    ],
+    "exclude": [
+        "node_modules",
+    ]
+}

@@ -88,9 +88,19 @@ export abstract class PercentSeries extends Series {
 	 */
 	public makeSlice(dataItem: DataItem<this["_dataItemSettings"]>): this["_sliceType"] {
 		const slice = this.slicesContainer.children.push(this.slices.make());
+
+		slice.on("fill", () => {
+			this.updateLegendMarker(dataItem);
+		})
+
+		slice.on("stroke", () => {
+			this.updateLegendMarker(dataItem);
+		})		
+
 		slice._setDataItem(dataItem);
 		dataItem.set("slice", slice);
 		this.slices.push(slice);
+
 		return slice;
 	}
 
@@ -232,10 +242,11 @@ export abstract class PercentSeries extends Series {
 	 */
 	public _updateChildren() {
 		super._updateChildren();
-		$array.each(this._dataItems, (dataItem) => {
-			this.updateLegendMarker(dataItem);
-			dataItem.get("label").text.markDirtyText();
-		});
+		if (this._valuesDirty) {
+			$array.each(this._dataItems, (dataItem) => {
+				dataItem.get("label").text.markDirtyText();
+			});
+		}
 
 		this._arrangeDown(this._lLabels);
 		this._arrangeUp(this._lLabels);
@@ -351,11 +362,8 @@ export abstract class PercentSeries extends Series {
 	 * @ignore
 	 */
 	public updateLegendMarker(dataItem: DataItem<this["_dataItemSettings"]>) {
-		if (dataItem.isHidden()) {
-			return;
-		}
-
 		const slice = dataItem.get("slice");
+
 		if (slice) {
 			const legendDataItem = dataItem.get("legendDataItem");
 			if (legendDataItem) {

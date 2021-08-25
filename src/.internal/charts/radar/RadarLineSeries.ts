@@ -5,6 +5,7 @@ import type { AxisRendererCircular } from "./AxisRendererCircular";
 import type { AxisRendererRadial } from "./AxisRendererRadial";
 import type { Template } from "../../core/util/Template";
 import type { Bullet } from "../../core/render/Bullet";
+import { Graphics } from "../../core/render/Graphics";
 import type { RadarChart } from "./RadarChart";
 import type { DataItem } from "../../core/render/Component";
 import * as $math from "../../core/util/Math";
@@ -18,7 +19,7 @@ export interface IRadarLineSeriesSettings extends ILineSeriesSettings {
 	 * If set to `true` (default), series will connect its last data point to the
 	 * first one with a line, thus completing full circle.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/radar-chart/radar-series/#Connecting_ends} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-series/#Connecting_ends} for more info
 	 * @default @true
 	 */
 	connectEnds?: boolean;
@@ -69,7 +70,13 @@ export class RadarLineSeries extends LineSeries {
 	protected _afterNew() {
 		super._afterNew();
 		this.set("maskContent", false);
+		this.bulletsContainer.set("maskContent", false);
+		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
 	}
+
+	protected _handleMaskBullets() {
+
+	}	
 
 	public getPoint(positionX: number, positionY: number): IPoint {
 

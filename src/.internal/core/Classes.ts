@@ -56,6 +56,7 @@ import type { Hierarchy } from "./../charts/hierarchy/Hierarchy";
 import type { HierarchyLink } from "./../charts/hierarchy/HierarchyLink";
 import type { HierarchyNode } from "./../charts/hierarchy/HierarchyNode";
 import type { HorizontalLayout } from "./render/HorizontalLayout";
+import type { InterfaceColors } from "./util/InterfaceColors";
 import type { Label } from "./render/Label";
 import type { Layout } from "./render/Layout";
 import type { Legend } from "./render/Legend";
@@ -179,6 +180,7 @@ export interface IClasses {
 	"HierarchyLink": HierarchyLink;
 	"HierarchyNode": HierarchyNode;
 	"HorizontalLayout": HorizontalLayout;
+	"InterfaceColors": InterfaceColors;
 	"Label": Label;
 	"Layout": Layout;
 	"Legend": Legend;

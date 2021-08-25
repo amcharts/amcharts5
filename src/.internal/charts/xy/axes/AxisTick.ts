@@ -1,7 +1,8 @@
 import type { Root } from "../../../core/Root";
-import { Tick, ITickSettings, ITickPrivate } from "../../../core/render/Tick";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Template } from "../../../core/util/Template";
+
+import { Tick, ITickSettings, ITickPrivate } from "../../../core/render/Tick";
 
 
 export interface IAxisTickSettings extends ITickSettings {
@@ -11,7 +12,7 @@ export interface IAxisTickSettings extends ITickSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
 	 */
 	location?: number;
 
@@ -21,14 +22,14 @@ export interface IAxisTickSettings extends ITickSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Multi_location} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Multi_location} for more info
 	 */
 	multiLocation?: number;
 
 	/**
 	 * If set to `true` the tick will be shown inside plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
 	 * @default false
 	 */
 	inside?: boolean | undefined;
@@ -41,7 +42,7 @@ export interface IAxisTickSettings extends ITickSettings {
 	 * beginning of the axis than 10%.
 	 * 
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Start_end_labels_and_ticks} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 */
 	minPosition?: number;
 
@@ -52,7 +53,7 @@ export interface IAxisTickSettings extends ITickSettings {
 	 * E.g. `0.9` will mean that tick will not be shown if it's closer to the
 	 * end of the axis than 10%.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Start_end_labels_and_ticks} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 * @default 1
 	 */
 	maxPosition?: number;
@@ -65,7 +66,7 @@ export interface IAxisTickPrivate extends ITickPrivate {
 /**
  * Draws an axis tick.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Ticks} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Ticks} for more info
  * @important
  */
 export class AxisTick extends Tick {

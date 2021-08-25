@@ -46,7 +46,6 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	 * @ignore
 	 */
 	geometryTypeField?: string;
-
 }
 
 export interface IMapSeriesPrivate extends ISeriesPrivate {

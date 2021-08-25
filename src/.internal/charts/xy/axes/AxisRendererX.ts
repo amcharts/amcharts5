@@ -19,7 +19,7 @@ export interface IAxisRendererXSettings extends IAxisRendererSettings {
 	 * If set to `true` the axis will be drawn on the opposite side of the plot
 	 * area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Axis_position} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_position} for more info
 	 * @default false
 	 */
 	opposite?: boolean;
@@ -28,7 +28,7 @@ export interface IAxisRendererXSettings extends IAxisRendererSettings {
 	 * If set to `true`, all axis elements (ticks, labels) will be drawn inside
 	 * plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
 	 * @default false
 	 */
 	inside?: boolean;
@@ -41,7 +41,7 @@ export interface IAxisRendererXPrivate extends IAxisRendererPrivate {
 /**
  * Used to render horizontal axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/#Axis_renderer} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
  * @important
  */
 export class AxisRendererX extends AxisRenderer {
@@ -86,7 +86,7 @@ export class AxisRendererX extends AxisRenderer {
 			display.lineTo(0, graphics.height());
 		});
 
-		this.setAll({ height: 0, width: p100 })
+		//this.setAll({ height: 0, width: p100 })
 		this.set("draw", (display, graphics) => {
 			display.moveTo(0, 0);
 			display.lineTo(graphics.width(), 0);
@@ -140,7 +140,7 @@ export class AxisRendererX extends AxisRenderer {
 			else {
 				axisHeader.set("width", width);
 			}
-			axisHeader.setAll({ x: axis.x() - width, height: plotContainer.height() });
+			axisHeader.setAll({ x: axis.x() - width, y: -1, height: plotContainer.height() + 2 });
 		}
 	}
 
@@ -153,7 +153,7 @@ export class AxisRendererX extends AxisRenderer {
 		axis.set("width", p100);
 		axis.set("layout", this._root.verticalLayout);
 		axis.labelsContainer.set("width", p100);
-		axis.axisHeader.set("layout", this._root.verticalLayout);
+		axis.axisHeader.setAll({ layout: this._root.verticalLayout });
 	}
 
 	/**
@@ -288,7 +288,7 @@ export class AxisRendererX extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			grid.set("x", this.positionToCoordinate(position));
+			grid.set("x", Math.round(this.positionToCoordinate(position)));
 
 			this.toggleVisibility(grid, position, 0, 1);
 		}
@@ -299,18 +299,23 @@ export class AxisRendererX extends AxisRenderer {
 	 */
 	public updateBullet(bullet?: AxisBullet, position?: number, endPosition?: number) {
 		if (bullet) {
-			if (!$type.isNumber(position)) {
-				position = 0;
+
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+				if (!$type.isNumber(position)) {
+					position = 0;
+				}
+
+				let location = bullet.get("location", 0.5);
+				if ($type.isNumber(endPosition) && endPosition != position) {
+					position = position + (endPosition - position) * location;
+				}
+
+				sprite.set("x", this.positionToCoordinate(position));
+				sprite.set("y", this.axis.bulletsContainer.toLocal(this.toGlobal({ x: 0, y: 0 })).y);
+
+				this.toggleVisibility(sprite, position, 0, 1);
 			}
-
-			let location = bullet.get("location", 0.5);
-			if ($type.isNumber(endPosition) && endPosition != position) {
-				position = position + (endPosition - position) * location;
-			}
-
-			bullet.set("x", this.positionToCoordinate(position));
-
-			this.toggleVisibility(bullet, position, 0, 1);
 		}
 	}
 

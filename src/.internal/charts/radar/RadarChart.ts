@@ -1,26 +1,67 @@
 import type { AxisRendererCircular } from "./AxisRendererCircular";
 import type { AxisRendererRadial } from "./AxisRendererRadial";
 import type { Axis } from "../xy/axes/Axis";
+import type { XYSeries } from "../xy/series/XYSeries";
 import type { RadarCursor } from "./RadarCursor";
 import type { RadarColumnSeries } from "./RadarColumnSeries";
 import type { RadarLineSeries } from "./RadarLineSeries";
-import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import type { Root } from "../../core/Root";
+import type { IPoint } from "../../core/util/IPoint";
+import type { Template } from "../../core/util/Template";
+
+import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import { Percent, p50, percent } from "../../core/util/Percent";
-import * as $utils from "../../core/util/Utils";
 import { Container } from "../../core/render/Container";
 import { Graphics } from "../../core/render/Graphics";
 import { arc } from "d3-shape";
-import type { IPoint } from "../../core/util/IPoint";
-import type { Template } from "../../core/util/Template";
+
+import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
 
 export interface IRadarChartSettings extends IXYChartSettings {
+
+	/**
+	 * Outer radius of the chart. Can be set in pixels or percent, relative to
+	 * available space.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Chart_radius} for more info
+	 * @default 80%
+	 */
 	radius?: number | Percent;
+
+	/**
+	 * Inner radius of the chart. Can be set in pixels or percent, relative to
+	 * outer radius.
+	 *
+	 * Setting to negative number will mean pixels from outer radius.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Chart_radius} for more info
+	 */
 	innerRadius?: number | Percent;
+
+	/**
+	 * Chart start angle in degress.
+	 *
+	 * @default -90
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
+	 */
 	startAngle?: number;
+
+	/**
+	 * Chart end angle in degress.
+	 *
+	 * @default 270
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
+	 */
 	endAngle?: number;
+
+	/**
+	 * [[RadarCursor]] instance.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor} for more info
+	 */
 	cursor?: RadarCursor;
+
 }
 
 export interface IRadarChartPrivate extends IXYChartPrivate {
@@ -32,7 +73,6 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
 
 	/**
 	 * Inner radius in pixels.
-	 * @type {[type]}
 	 */
 	innerRadius?: number;
 
@@ -43,6 +83,12 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
 
 }
 
+/**
+ * Radar chart.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/} for more info
+ * @important
+ */
 export class RadarChart extends XYChart {
 
 	/**
@@ -60,6 +106,11 @@ export class RadarChart extends XYChart {
 		return x;
 	}
 
+	/**
+	 * [[Container]] where radar-related elements go.
+	 * 
+	 * @default Container.new()
+	 */
 	public readonly radarContainer = this.plotContainer.children.push(Container.new(this._root, { x: p50, y: p50 }));
 
 	public static className: string = "RadarChart";
@@ -77,13 +128,13 @@ export class RadarChart extends XYChart {
 		super._afterNew();
 		const radarContainer = this.radarContainer;
 		const gridContainer = this.gridContainer;
+		const topGridContainer = this.topGridContainer;
 		const seriesContainer = this.seriesContainer;
 		const bulletsContainer = this.bulletsContainer;
 
-		radarContainer.children.pushAll([gridContainer, seriesContainer, bulletsContainer]);
+		radarContainer.children.pushAll([gridContainer, seriesContainer, topGridContainer, bulletsContainer]);
 
 		seriesContainer.set("mask", Graphics.new(this._root, {}));
-		bulletsContainer.set("mask", Graphics.new(this._root, {}));
 		gridContainer.set("mask", Graphics.new(this._root, {}));
 
 		this._disposers.push(this.plotContainer.events.on("boundschanged", () => {
@@ -144,7 +195,12 @@ export class RadarChart extends XYChart {
 		const radius = $utils.relativeToValue(this.get("radius", percent(80)), this._maxRadius);
 		this.setPrivateRaw("radius", radius);
 
-		const innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), radius);
+		let innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), radius);
+
+		if (innerRadius < 0) {
+			innerRadius = radius + innerRadius;
+		}
+
 		this.setPrivateRaw("innerRadius", innerRadius);
 
 		this.xAxes.each((axis) => {
@@ -158,8 +214,16 @@ export class RadarChart extends XYChart {
 		})
 
 		this._updateMask(this.seriesContainer, innerRadius, radius);
-		this._updateMask(this.bulletsContainer, innerRadius, radius);
 		this._updateMask(this.gridContainer, innerRadius, radius);
+
+		this.series.each((series) => {
+			if ((series as XYSeries).get("maskBullets")) {
+				this._updateMask(series.bulletsContainer, innerRadius, radius);
+			}
+			else {
+				series.bulletsContainer.set("mask", undefined);
+			}
+		})
 
 		const cursor = this.get("cursor");
 		if (cursor) {
@@ -167,7 +231,10 @@ export class RadarChart extends XYChart {
 		}
 	}
 
-	protected _updateMask(container: Container, innerRadius: number, radius: number) {
+	/**
+	 * @ignore
+	 */
+	public _updateMask(container: Container, innerRadius: number, radius: number) {
 		const mask = container.get("mask");
 		if (mask) {
 			mask.set("draw", (display) => {
@@ -177,15 +244,57 @@ export class RadarChart extends XYChart {
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
 	public processAxis(axis: Axis<AxisRendererRadial | AxisRendererCircular>) {
 		this.radarContainer.children.push(axis);
 	}
 
-	public inPlot(point: IPoint): boolean {
-		const radius = Math.hypot(point.x, point.y);
+	/**
+	 * @ignore
+	 */
+	public inPlot(point: IPoint, radius?: number, innerRadius?: number): boolean {
+		const r = Math.hypot(point.x, point.y);
+		const angle = $math.normalizeAngle(Math.atan2(point.y, point.x) * $math.DEGREES);
 
-		if (radius <= this.getPrivate("radius", 0) + .5 && radius >= this.getPrivate("innerRadius", 0) - .5) {
-			return true
+		let startAngle = $math.normalizeAngle(this.get("startAngle", 0));
+		let endAngle = $math.normalizeAngle(this.get("endAngle", 0));
+
+		let inArc = false;
+		if (startAngle < endAngle) {
+			if (startAngle < angle && angle < endAngle) {
+				inArc = true;
+			}
+		}
+
+		if (startAngle > endAngle) {
+			if (angle > startAngle) {
+				inArc = true;
+			}
+			if (angle < endAngle) {
+				inArc = true;
+			}
+		}
+
+		if (!inArc) {
+			return false;
+		}
+
+		if (radius == null) {
+			radius = this.getPrivate("radius", 0);
+		}
+
+		if (innerRadius == null) {
+			innerRadius = this.getPrivate("innerRadius", 0);
+		}
+
+		if(innerRadius > radius){
+			[innerRadius, radius] = [radius, innerRadius];
+		}
+
+		if (r <= radius + .5 && r >= innerRadius - .5) {
+			return true;
 		}
 		return false;
 	}

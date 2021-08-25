@@ -292,12 +292,6 @@ export class Legend extends Series {
 
 				const useDefaultMarker = this.get("useDefaultMarker");
 
-				if (!useDefaultMarker) {
-					if (item && item.createLegendMarker) {
-						item.createLegendMarker();
-					}
-				}
-
 				const markerRectangle = marker.children.push(this.makeMarkerRectangle());
 
 				let fill = dataItem.get("fill");
@@ -312,6 +306,12 @@ export class Legend extends Series {
 
 				if (!stroke) {
 					stroke = fill;
+				}
+
+				if (!useDefaultMarker) {
+					if (item && item.createLegendMarker) {
+						item.createLegendMarker();
+					}
 				}
 
 				markerRectangle.setAll({ fill, stroke });

@@ -26,14 +26,14 @@ export interface ITreemapSettings extends IHierarchySettings {
 	/**
 	 * Gap between nodes. In pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/#Margins}
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingInner?: number;
 
 	/**
 	 * Gap between nodes and outer edge of the chart. In pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/#Margins}
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingOuter?: number;
 
@@ -42,7 +42,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * 
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/#Margins}
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingTop?: number;
 
@@ -51,7 +51,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * 
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/#Margins}
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingBottom?: number;
 
@@ -60,7 +60,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * 
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/#Margins}
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingLeft?: number;
 
@@ -69,7 +69,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * 
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/#Margins}
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingRight?: number;
 
@@ -100,7 +100,7 @@ export interface ITreemapPrivate extends IHierarchyPrivate {
 /**
  * Treemap series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/treemap/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/} for more info
  */
 export class Treemap extends Hierarchy {
 

@@ -13,7 +13,7 @@ export interface ISlicedChartPrivate extends IPercentChartPrivate {
 /**
  * Creates a sliced chart for use with [[FunnelSeries]], [[PyramidSeries]], or [[PictorialStackedSeries]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
  * @important
  */
 export class SlicedChart extends PercentChart {
@@ -32,6 +32,12 @@ export class SlicedChart extends PercentChart {
 		x._afterNew();
 		return x;
 	}
+
+	protected _afterNew() {
+		super._afterNew();
+
+		this.seriesContainer.setAll({ isMeasured:true, layout: this._root.horizontalLayout });
+	}	
 
 	public static className: string = "SlicedChart";
 	public static classNames: Array<string> = PercentChart.classNames.concat([SlicedChart.className]);

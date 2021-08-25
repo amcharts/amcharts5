@@ -1,13 +1,17 @@
-import { Chart, IChartSettings, IChartPrivate } from "./Chart";
+import type { Series } from "./Series";
+
+import { Chart, IChartSettings, IChartPrivate, IChartEvents } from "./Chart";
 import { Container } from "../../core/render/Container";
 import { List } from "../../core/util/List";
-import type { Series } from "./Series";
 import { p100 } from "../../core/util/Percent";
 
 export interface ISerialChartSettings extends IChartSettings {
 }
 
 export interface ISerialChartPrivate extends IChartPrivate {
+}
+
+export interface ISerialChartEvents extends IChartEvents {
 }
 
 /**
@@ -20,8 +24,7 @@ export abstract class SerialChart extends Chart {
 	declare public _settings: ISerialChartSettings;
 	declare public _privateSettings: ISerialChartPrivate;
 	declare public _seriesType: Series;
-
-	protected _series: List<this["_seriesType"]> = new List();
+	declare public _events: ISerialChartEvents;
 
 	/**
 	 * A [[Container]] where chart will store all series.
@@ -32,12 +35,8 @@ export abstract class SerialChart extends Chart {
 
 	/**
 	 * A list of chart's series.
-	 * 
-	 * @return List of series
 	 */
-	public get series():List<this["_seriesType"]>{
-		return this._series;
-	}
+	public readonly series: List<this["_seriesType"]> = new List();
 
 	protected _afterNew() {
 		super._afterNew();

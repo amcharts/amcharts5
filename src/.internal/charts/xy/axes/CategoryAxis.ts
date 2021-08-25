@@ -16,7 +16,7 @@ export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSett
 	/**
 	 * A function that can be used to specify how to configure axis fills.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/#Axis_fills} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_fills} for more info
 	 */
 	fillRule?: (dataItem: DataItem<ICategoryAxisDataItem>, index?: number) => void;
 
@@ -91,7 +91,7 @@ export interface ICategoryAxisEvents extends IAxisEvents {
 /**
  * Creates a category axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/axes/category-axis/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-axis/} for more info
  * @important
  */
 export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
@@ -336,6 +336,8 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		renderer.updateGrid(dataItem.get("grid"), position, endPosition);
 		renderer.updateTick(dataItem.get("tick"), position, endPosition, count);
 		renderer.updateFill(dataItem.get("axisFill"), position, fillEndPosition);
+
+		this._processBullet(dataItem);
 		renderer.updateBullet(dataItem.get("bullet"), position, endPosition);
 
 		const fillRule = this.get("fillRule");

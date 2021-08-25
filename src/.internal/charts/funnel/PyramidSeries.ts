@@ -18,7 +18,7 @@ export interface IPyramidSeriesSettings extends IFunnelSeriesSettings {
 	 * Can either be a fixed pixel value or percent relative to the space
 	 * available to the series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/pyramid-series/#Tip_and_base} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/#Tip_and_base} for more info
 	 * @default 0
 	 */
 	topWidth?: number | Percent;
@@ -29,7 +29,7 @@ export interface IPyramidSeriesSettings extends IFunnelSeriesSettings {
 	 * Can either be a fixed pixel value or percent relative to the space
 	 * available to the series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/pyramid-series/#Tip_and_base} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/#Tip_and_base} for more info
 	 * @default 0
 	 */
 	bottomWidth?: number | Percent;
@@ -37,7 +37,7 @@ export interface IPyramidSeriesSettings extends IFunnelSeriesSettings {
 	/**
 	 * Determines calculation mechanism for the slice area based on value.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/pyramid-series/#Slice_size} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/#Slice_size} for more info
 	 * @default "area"
 	 */
 	valueIs?: "area" | "height";
@@ -50,7 +50,7 @@ export interface IPyramidSeriesPrivate extends IFunnelSeriesPrivate {
 /**
  * Creates a pyramid series for use in a [[SlicedChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/sliced-chart/pyramid-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/} for more info
  * @important
  */
 export class PyramidSeries extends FunnelSeries {

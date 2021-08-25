@@ -35,7 +35,7 @@ export interface IChordDirectedEvents extends IChordEvents {
 /**
  * Directed chord series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/flow-charts/} for more information
+ * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important
  */
 export class ChordDirected extends Chord {

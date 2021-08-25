@@ -70,6 +70,8 @@ export interface ISunburstSettings extends IPartitionSettings {
 	/**
 	 * Inner radius of the suburst pie.
 	 *
+	 * Setting to negative number will mean pixels from outer radius.
+	 *
 	 * @default 0
 	 */
 	innerRadius?: number | Percent;
@@ -110,7 +112,7 @@ export interface ISunburstPrivate extends IPartitionPrivate {
 /**
  * Builds a sunburst diagram.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/sunburst/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/sunburst/} for more info
  * @important
  */
 export class Sunburst extends Partition {
@@ -187,18 +189,34 @@ export class Sunburst extends Partition {
 	protected _updateVisuals() {
 		if (this._rootNode) {
 			const partitionLayout = this._partitionLayout;
+
+			let bounds = $math.getArcBounds(0, 0, this.get("startAngle", 0), this.get("endAngle", 360), 1);
+
 			let w = this.innerWidth();
 			let h = this.innerHeight();
-			let s = Math.min(w, h) / 2;
 
-			const r = $utils.relativeToValue(this.get("radius", p100), s);
-			const ir = $utils.relativeToValue(this.get("innerRadius", 0), r);
+			const wr = w / (bounds.right - bounds.left);
+			const hr = h / (bounds.bottom - bounds.top);
+
+			let s = Math.min(wr, hr);
+
+			let r = $utils.relativeToValue(this.get("radius", p100), s);
+			let ir = $utils.relativeToValue(this.get("innerRadius", 0), r);
+
+			if (ir < 0) {
+				ir = r + ir;
+			}			
+			
 			s = r - ir;
 
 			this.setPrivateRaw("innerRadius", ir);
 			this.setPrivateRaw("hierarchySize", s);
 
 			partitionLayout.size([s, s]);
+
+			this.nodesContainer.setAll({
+				dy: -r * (bounds.bottom + bounds.top) / 2, dx: -r * (bounds.right + bounds.left) / 2
+			})			
 
 			const nodePadding = this.get("nodePadding");
 

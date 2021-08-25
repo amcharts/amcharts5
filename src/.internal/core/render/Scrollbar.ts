@@ -68,7 +68,7 @@ export interface IScrollbarEvents extends IContainerEvents {
  * A control that allows zooming chart's axes, or other uses requiring range
  * selection.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/scrollbars/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/} for more info
  */
 export class Scrollbar extends Container {
 

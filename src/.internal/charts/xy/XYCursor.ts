@@ -36,7 +36,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 	/**
 	 * What should cursor do when dragged across plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/cursor/#Behavior} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Behavior} for more info
 	 * @default "none"
 	 */
 	behavior?: "zoomX" | "zoomY" | "zoomXY" | "selectX" | "selectY" | "selectXY" | "none";
@@ -141,7 +141,7 @@ export interface IXYCursorEvents extends IContainerEvents {
 /**
  * Creates a chart cursor for an [[XYChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/cursor/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/} for more info
  * @important
  */
 export class XYCursor extends Container {
@@ -208,7 +208,7 @@ export class XYCursor extends Container {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.setAll({ "width": p100, height: p100, isMeasured: true });
+		this.setAll({ "width": p100, height: p100, isMeasured: true, position: "absolute" });
 		this.states.create("hidden", { visible: true, opacity: 0 });
 
 		//this.lineX.states.create("hidden", { visible: true, opacity: 0 });
@@ -315,13 +315,20 @@ export class XYCursor extends Container {
 		}));
 	}
 
+	protected _inPlot(point: IPoint): boolean {
+		const chart = this.chart;
+		if (chart) {
+			return chart.inPlot(point);
+		}
+		return false;
+	}
+
 	protected _handleCursorDown(event: IPointerEvent) {
 		// TODO: handle multitouch
 		const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 		let local = this._display.toLocal(rootPoint);
 		const chart = this.chart;
-		if (chart && chart.inPlot(local)) {
-
+		if (chart && this._inPlot(local)) {
 			this._downPoint = local;
 
 			if (this.get("behavior") != "none") {
@@ -413,7 +420,7 @@ export class XYCursor extends Container {
 		let local = this._display.toLocal(point);
 		let chart = this.chart;
 
-		if (chart && chart.inPlot(local)) {
+		if (chart && this._inPlot(local)) {
 			chart._movePoint = point;
 
 			if (this.isHidden()) {
@@ -452,6 +459,7 @@ export class XYCursor extends Container {
 			y = xy.y;
 
 			chart.xAxes.each((axis) => {
+
 				axis._handleCursorPosition(positionX, snapToSeries);
 				if (alwaysShow) {
 					axis.handleCursorShow();

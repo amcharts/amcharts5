@@ -80,7 +80,7 @@ export interface ISankeyEvents extends IFlowEvents {
 /**
  * Sankey series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/flow-charts/} for more information
+ * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important
  */
 export class Sankey extends Flow {

@@ -1,16 +1,18 @@
 import type { DataItem } from "../../core/render/Component";
 import type { PieChart } from "./PieChart";
-import { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem, IPercentSeriesPrivate } from "../percent/PercentSeries";
 import type { Root } from "../../core/Root";
+
+import { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem, IPercentSeriesPrivate } from "../percent/PercentSeries";
 import { Template } from "../../core/util/Template";
 import { Slice } from "../../core/render/Slice";
 import { Tick } from "../../core/render/Tick";
 import { RadialLabel } from "../../core/render/RadialLabel";
 import { ListTemplate } from "../../core/util/List";
+import { p100, Percent } from "../../core/util/Percent";
+
 import * as $array from "../../core/util/Array";
 import * as $math from "../../core/util/Math";
 import * as $utils from "../../core/util/Utils";
-import { p100, Percent } from "../../core/util/Percent";
 
 export interface IPieSeriesDataItem extends IPercentSeriesDataItem {
 	slice: Slice;
@@ -27,6 +29,8 @@ export interface IPieSeriesSettings extends IPercentSeriesSettings {
 
 	/**
 	 * Radius of the series in pixels or percent.
+	 *
+	 * Setting to negative number will mean pixels from outer radius.
 	 */
 	innerRadius?: Percent | number;
 
@@ -52,7 +56,7 @@ export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
 /**
  * Creates a series for a [[PieChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/percent-charts/pie-chart/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
  * @important
  */
 export class PieSeries extends PercentSeries {
@@ -160,7 +164,11 @@ export class PieSeries extends PercentSeries {
 				let currentAngle = startAngle;
 
 				const radius = chart.radius(this);
-				const innerRadius = chart.innerRadius(this) * chart.getPrivate("irModifyer", 1);
+				let innerRadius = chart.innerRadius(this) * chart.getPrivate("irModifyer", 1);
+
+				if (innerRadius < 0) {
+					innerRadius = radius + innerRadius;
+				}
 
 				if (radius > 0) {
 					const colors = this.get("colors")!;
@@ -177,11 +185,10 @@ export class PieSeries extends PercentSeries {
 							slice.set("startAngle", currentAngle);
 
 							slice.set("arc", currentArc);
-							slice.set("fill", colors.next());
 
-							if (slice.get("stroke") == null) {
-								slice.setRaw("stroke", slice.get("fill")); // setRaw for the userProperty not to be saved
-							}
+							const color = colors.next();
+							slice._setDefault("fill", color);
+							slice._setDefault("stroke", color);
 						}
 
 						let middleAngle = $math.normalizeAngle(currentAngle + currentArc / 2);

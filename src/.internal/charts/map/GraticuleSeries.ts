@@ -24,7 +24,7 @@ export interface IGraticuleSeriesSettings extends IMapLineSeriesSettings {
 /**
  * A [[MapChart]] series to draw a map grid.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/map-chart/graticule-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/graticule-series/} for more info
  * @important
  */
 export class GraticuleSeries extends MapLineSeries {
@@ -58,8 +58,8 @@ export class GraticuleSeries extends MapLineSeries {
 		this._generate();
 	}
 
-	public _prepareChildren() {
-		super._prepareChildren();
+	public _updateChildren() {
+		super._updateChildren();
 
 		if (this.isDirty("step")) {
 			this._generate();

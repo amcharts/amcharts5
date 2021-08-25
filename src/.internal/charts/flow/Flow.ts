@@ -102,7 +102,7 @@ export interface IFlowEvents extends ISeriesEvents {
 /**
  * A base class for all flow type series: [[Sankey]] and [[Chord]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/flow-charts/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more info
  */
 export abstract class Flow extends Series {
 	public static className: string = "Flow";

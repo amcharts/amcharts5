@@ -1,15 +1,27 @@
 import * as am5 from "@amcharts/amcharts5";
 import * as am5map from "@amcharts/amcharts5/map";
-import { worldLow } from "@amcharts/amcharts5/geodata/worldLow";
+import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * Create root element
+ * https://www.amcharts.com/docs/v5/getting-started/#Root_element
+ */
 const root = am5.Root.new("chartdiv");
 
+/**
+ * Set themes
+ * https://www.amcharts.com/docs/v5/concepts/themes/
+ */
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
+/**
+ * Create the map chart
+ * https://www.amcharts.com/docs/v5/charts/map-chart/
+ */
 const chart = root.container.children.push(
   am5map.MapChart.new(root, {
     panX: "rotateX",
@@ -26,6 +38,10 @@ const cont = chart.children.push(
   })
 );
 
+
+/**
+ * Add labels and controls
+ */
 cont.children.push(
   am5.Label.new(root, {
     centerY: am5.p50,
@@ -55,21 +71,33 @@ cont.children.push(am5.Label.new(root, {
   text: "Globe"
 }));
 
+/**
+ * Create main polygon series for countries
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+ */
 const polygonSeries = chart.series.push(
   am5map.MapPolygonSeries.new(root, {
-    geoJSON: worldLow as any
+    geoJSON: am5geodata_worldLow as any
   })
 );
 
+/**
+ * Create line series for trajectory lines
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
+ */
 const lineSeries = chart.series.push(am5map.MapLineSeries.new(root, {}));
 lineSeries.mapLines.template.setAll({
   stroke: root.interfaceColors.get("alternativeBackground"),
   strokeOpacity: 0.3
 });
 
+/**
+ * Create point series for markers
+ * https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+ */
 const pointSeries = chart.series.push(
   am5map.MapPointSeries.new(root, {})
- );
+);
 
 pointSeries.bullets.push(() => {
   const circle = am5.Circle.new(root, {
@@ -84,10 +112,10 @@ pointSeries.bullets.push(() => {
   });
 
   circle.events.on("dragged", (event) => {
-    const dataItem = event.event.target.dataItem;
+    const dataItem = event.target.dataItem;
     const projection = chart.get("projection")!
     const geoPoint = chart.invert({ x: circle.x(), y: circle.y() })
-    
+
     dataItem.setAll({
       longitude: geoPoint.longitude,
       latitude: geoPoint.latitude

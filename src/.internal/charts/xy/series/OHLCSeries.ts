@@ -23,7 +23,7 @@ export interface IOHLCSeriesAxisRange extends ICandlestickSeriesAxisRange {
 /**
  * OHLC series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/xy-chart/series/candlestick-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
  */
 export class OHLCSeries extends CandlestickSeries {

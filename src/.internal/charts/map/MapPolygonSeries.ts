@@ -26,12 +26,14 @@ export interface IMapPolygonSeriesDataItem extends IMapSeriesDataItem {
 
 }
 
-export interface IMapPolygonSeriesSettings extends IMapSeriesSettings { }
+export interface IMapPolygonSeriesSettings extends IMapSeriesSettings {
+
+}
 
 /**
  * Creates a map series for displaying polygons.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/map-chart/map-polygon-series/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/} for more info
  * @important
  */
 export class MapPolygonSeries extends MapSeries {
@@ -98,18 +100,19 @@ export class MapPolygonSeries extends MapSeries {
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 
-		const mapPolygon = this.makeMapPolygon(dataItem);
-
-		if (mapPolygon) {
-			dataItem.set("mapPolygon", mapPolygon);
-			const geometry = dataItem.get("geometry")!;
-
-			if (geometry) {
-				mapPolygon.set("geometry", geometry);
-			}
-
-			mapPolygon.series = this;
+		let mapPolygon = dataItem.get("mapPolygon");
+		if (!mapPolygon) {
+			mapPolygon = this.makeMapPolygon(dataItem);
 		}
+
+		dataItem.set("mapPolygon", mapPolygon);
+		const geometry = dataItem.get("geometry")!;
+
+		if (geometry) {
+			mapPolygon.set("geometry", geometry);
+		}
+
+		mapPolygon.series = this;
 	}
 
 	/**
@@ -125,18 +128,12 @@ export class MapPolygonSeries extends MapSeries {
 	}
 
 	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._markDirtyValues();
 		if (dataItem) {
-			if (dataItem.isDirty("value")) {
-				super._markDirtyValues();
-			}
-
 			const mapPolygon = dataItem.get("mapPolygon");
 			if (mapPolygon) {
 				mapPolygon.set("geometry", dataItem.get("geometry"));
 			}
-		}
-		else {
-			super._markDirtyValues();
 		}
 	}
 
@@ -144,7 +141,7 @@ export class MapPolygonSeries extends MapSeries {
 	 * Centers and zooms in on the specific polygon.
 	 * 
 	 * @param  dataItem  Target data item
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
 	 */
 	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>) {
 		const polygon = dataItem.get("mapPolygon");

@@ -107,7 +107,7 @@ export class ChordNodes extends FlowNodes {
 		dataItem.set("label", label);
 
 		node.events.on("dragstart", (e) => {
-			let point = this.toLocal(e.event.point)
+			let point = this.toLocal(e.point);
 			const angle = $math.getAngle({ x: 0, y: 0 }, point);
 			if (this.flow) {
 				this._dAngle = this.flow.get("startAngle", 0) - angle;
@@ -115,7 +115,7 @@ export class ChordNodes extends FlowNodes {
 		})
 
 		node.events.on("dragged", (e) => {
-			let point = this.toLocal(e.event.point)
+			let point = this.toLocal(e.point);
 			const angle = $math.getAngle({ x: 0, y: 0 }, point);
 
 			node.setAll({ x: 0, y: 0 });

@@ -59,7 +59,7 @@ export interface ITreeEvents extends ILinkedHierarchyEvents {
 /**
  * Displays a tree diagram.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/hierarchy/tree/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/tree/} for more info
  * @important
  */
 export class Tree extends LinkedHierarchy {
