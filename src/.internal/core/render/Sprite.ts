@@ -1551,10 +1551,23 @@ export abstract class Sprite extends Entity {
 	}
 
 	public _getTooltipPoint(): IPoint {
-		const bounds = this._adjustedLocalBounds!;
+		const bounds = this._localBounds!;
 		if (bounds) {
-			const x = bounds.left + $utils.relativeToValue(this.get("tooltipX", 0), Math.max(bounds.right - bounds.left, this.width()));
-			const y = bounds.top + $utils.relativeToValue(this.get("tooltipY", 0), Math.max(bounds.bottom - bounds.top, this.height()));
+			//const x = bounds.left + $utils.relativeToValue(this.get("tooltipX", 0), Math.max(bounds.right - bounds.left, this.width()));
+			//const y = bounds.top + $utils.relativeToValue(this.get("tooltipY", 0), Math.max(bounds.bottom - bounds.top, this.height()));
+
+			let x = 0;
+			let y = 0;
+
+			if (!this.get("isMeasured")) {
+				x = $utils.relativeToValue(this.get("tooltipX", 0), this.width());
+				y = $utils.relativeToValue(this.get("tooltipY", 0), this.height());
+			}
+			else {
+				x = bounds.left + $utils.relativeToValue(this.get("tooltipX", 0), bounds.right - bounds.left);
+				y = bounds.top + $utils.relativeToValue(this.get("tooltipY", 0), bounds.bottom - bounds.top);
+			}
+
 			return { x, y };
 		}
 		return { x: 0, y: 0 };

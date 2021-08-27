@@ -2802,21 +2802,26 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	}
 
 	_getHitTarget(point: IPoint): CanvasDisplayObject | undefined | false {
-		const pixel = this._ghostContext.getImageData(
-			// TODO should this round ?
-			Math.round(point.x * this.resolution),
-			Math.round(point.y * this.resolution),
-			1,
-			1,
-		);
-
-		if (pixel.data[0] === 0 && pixel.data[1] === 0 && pixel.data[2] === 0) {
-			return false;
+		if (point.x < 0 || point.x > this._width / this.resolution || point.y < 0 || point.y > this._height / this.resolution) {
+			return;
 		}
-		const colorId = Color.fromRGB(pixel.data[0], pixel.data[1], pixel.data[2]).toCSS();
-		const hit = this._colorMap[colorId];
+		else {
+			const pixel = this._ghostContext.getImageData(
+				// TODO should this round ?
+				Math.round(point.x * this.resolution),
+				Math.round(point.y * this.resolution),
+				1,
+				1
+			);
 
-		return hit;
+			if (pixel.data[0] === 0 && pixel.data[1] === 0 && pixel.data[2] === 0) {
+				return false;
+			}
+			const colorId = Color.fromRGB(pixel.data[0], pixel.data[1], pixel.data[2]).toCSS();
+			const hit = this._colorMap[colorId];
+
+			return hit;
+		}
 	}
 
 	_dispatchEventAll<Key extends keyof IRendererEvents>(key: Key, event: IRendererEvents[Key]): void {
@@ -2888,6 +2893,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 	_dispatchGlobalMousemove(originalEvent: IPointerEvent): void {
 		const event = this.getEvent(originalEvent);
+
 		const target = this._getHitTarget(event.point);
 		this._lastPointerMoveEvent = originalEvent;
 

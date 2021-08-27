@@ -1,4 +1,3 @@
-import type { IPointerEvent } from "../../core/render/backend/Renderer";
 import type { MapSeries } from "./MapSeries";
 import type { Root } from "../../core/Root";
 import type { GeoProjection, GeoPath } from "d3-geo";
@@ -22,6 +21,8 @@ import * as $type from "../../core/util/Type";
 import * as $mapUtils from "./MapUtils";
 import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
+
+import type { ISpritePointerEvent } from "../../core/render/Sprite";
 
 export interface IMapChartSettings extends ISerialChartSettings {
 
@@ -511,7 +512,7 @@ export class MapChart extends SerialChart {
 
 			if (wheelX != "none" || wheelY != "none") {
 				const chartContainer = this.chartContainer;
-				const point = chartContainer._display.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }));
+				const point = chartContainer._display.toLocal(event.point);
 
 				if ((wheelY == "zoom")) {
 					this._handleWheelZoom(wheelEvent.deltaY, point);
@@ -546,20 +547,30 @@ export class MapChart extends SerialChart {
 		}));
 
 		this._disposers.push(this.chartContainer.events.on("pointerdown", (event) => {
-			this._handleChartDown(event.originalEvent);
+			this._handleChartDown(event);
 		}));
 
 		this._disposers.push(this.chartContainer.events.on("globalpointerup", (event) => {
-			this._handleChartUp(event.originalEvent);
+			this._handleChartUp(event);
 		}));
 
 		this._disposers.push(this.chartContainer.events.on("globalpointermove", (event) => {
-			this._handleChartMove(event.originalEvent);
+			this._handleChartMove(event);
 		}));
+
+		let license = false;
+		for (let i = 0; i < registry.licenses.length; i++) {
+			if (registry.licenses[i].match(/^AM5M.{5,}/i)) {
+				license = true;
+			}
+		}
+		if (!license) {
+			this._root._showBranding();
+		}
 
 	}
 
-	protected _handleChartDown(event: IPointerEvent) {
+	protected _handleChartDown(event: ISpritePointerEvent) {
 
 		this._downZoomLevel = this.get("zoomLevel", 1);
 
@@ -605,7 +616,7 @@ export class MapChart extends SerialChart {
 					this._rya.stop();
 				}
 
-				const downPoint = this.chartContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+				const downPoint = this.chartContainer._display.toLocal(event.point);
 
 				this._downTranslateX = this.get("translateX");
 				this._downTranslateY = this.get("translateY");
@@ -658,16 +669,17 @@ export class MapChart extends SerialChart {
 		return { x: 0, y: 0 };
 	}
 
-	protected _handleChartUp(_event: IPointerEvent) {
+	protected _handleChartUp(_event: ISpritePointerEvent) {
 		this.chartContainer._downPoints = {}
 	}
 
 	protected _handlePinch() {
+		const chartContainer = this.chartContainer;
 		let i = 0;
 		let downPoints: Array<IPoint> = [];
 		let movePoints: Array<IPoint> = [];
 
-		$object.each(this.chartContainer._downPoints, (k, point) => {
+		$object.each(chartContainer._downPoints, (k, point) => {
 			downPoints[i] = point;
 			let movePoint = this._movePoints[k];
 			if (movePoint) {
@@ -676,7 +688,11 @@ export class MapChart extends SerialChart {
 			i++;
 		});
 
+		console.log(downPoints.length, movePoints.length);
+
 		if (downPoints.length > 1 && movePoints.length > 1) {
+			const display = chartContainer._display;
+
 			let downPoint0 = downPoints[0];
 			let downPoint1 = downPoints[1];
 
@@ -684,6 +700,12 @@ export class MapChart extends SerialChart {
 			let movePoint1 = movePoints[1];
 
 			if (downPoint0 && downPoint1 && movePoint0 && movePoint1) {
+
+				downPoint0 = display.toLocal(downPoint0);
+				downPoint1 = display.toLocal(downPoint1);
+
+				movePoint0 = display.toLocal(movePoint0);
+				movePoint1 = display.toLocal(movePoint1);
 
 				let initialDistance = Math.hypot(downPoint1.x - downPoint0.x, downPoint1.y - downPoint0.y);
 				let currentDistance = Math.hypot(movePoint1.x - movePoint0.x, movePoint1.y - movePoint0.y);
@@ -701,23 +723,28 @@ export class MapChart extends SerialChart {
 				let xx = moveCenter.x - (moveCenter.x - tx - moveCenter.x + downCenter.x) / zoomLevel * level;
 				let yy = moveCenter.y - (moveCenter.y - ty - moveCenter.y + downCenter.y) / zoomLevel * level;
 
-				this.set("zoomLevel", level)
+				console.log(xx, yy);
+
+				this.set("zoomLevel", level);
 				this.set("translateX", xx);
 				this.set("translateY", yy);
 			}
 		}
 	}
 
-	protected _handleChartMove(event: IPointerEvent) {
-		const downPoint = this.chartContainer._getDownPoint();
-		const downPointId = this.chartContainer._getDownPointId();
+	protected _handleChartMove(event: ISpritePointerEvent) {
+		const chartContainer = this.chartContainer;
+		let downPoint = chartContainer._getDownPoint();
+		const downPointId = chartContainer._getDownPointId();
+		const originalEvent = event.originalEvent as any;
 
+		const pointerId = originalEvent.pointerId;
 
-		const pointerId = (event as any).pointerId;
 		if (this.get("pinchZoom")) {
 			if (pointerId) {
-				this._movePoints[pointerId] = { x: event.clientX, y: event.clientY };
-				if ($object.keys(this.chartContainer._downPoints).length > 1) {
+				this._movePoints[pointerId] = event.point;
+
+				if ($object.keys(chartContainer._downPoints).length > 1) {
 					this._handlePinch();
 					return;
 				}
@@ -732,13 +759,16 @@ export class MapChart extends SerialChart {
 				const panX = this.get("panX");
 				const panY = this.get("panY");
 				if (panX != "none" || panY != "none") {
-					let local = this.chartContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+					const display = chartContainer._display;
+					let local = display.toLocal(event.point);
+					downPoint = display.toLocal(downPoint);
+
 
 					let x = this._downTranslateX;
 					let y = this._downTranslateY;
 
 					if (Math.hypot(downPoint.x - local.x, downPoint.y - local.y) > 5) {
-						let bg = this.chartContainer.get("background");
+						let bg = chartContainer.get("background");
 						if (bg) {
 							bg.events.disableType("click");
 						}
@@ -952,28 +982,4 @@ export class MapChart extends SerialChart {
 		this._dirtyGeometries = false;
 	}
 
-	/**
-	 * To all the clever heads out there. Yes, we did not make any attempts to
-	 * scramble this.
-	 *
-	 * This is a part of a tool meant for our users to manage their commercial
-	 * licenses for removal of amCharts branding from charts.
-	 *
-	 * The only legit way to do so is to purchase a commercial license for amCharts:
-	 * https://www.amcharts.com/online-store/
-	 * 
-	 * Removing or altering this code, or disabling amCharts branding in any other
-	 * way is against the license and thus illegal.
-	 */
-	protected _hasLicense(): boolean {
-		if (!super._hasLicense()) {
-			return false;
-		}
-		for (let i = 0; i < registry.licenses.length; i++) {
-			if (registry.licenses[i].match(/^AM5M.{5,}/i)) {
-				return true;
-			}
-		}
-		return false;
-	}
 }

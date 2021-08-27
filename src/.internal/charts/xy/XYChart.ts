@@ -648,14 +648,11 @@ export class XYChart extends SerialChart {
 		this.series.each((series) => {
 
 			const colorSet = this.get("colors")!;
-			const color = colorSet.next();
-
-			if (series.get("stroke") == null) {
-				series.set("stroke", color);
-			}
-
 			if (series.get("fill") == null) {
-				series.set("fill", color);
+				const color = colorSet.next();
+
+				series._setSoft("stroke", color);
+				series._setSoft("fill", color);
 			}
 		})
 

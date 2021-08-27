@@ -34,7 +34,7 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	 * @ignore
 	 */
 	valueWorking: number;
-	
+
 	valuePercentTotal: number;
 	sum: number;
 	category: string;
@@ -793,4 +793,5 @@ export abstract class Hierarchy extends Series {
 			sprite.set("y", node.height() * locationY);
 		}
 	}
+
 }

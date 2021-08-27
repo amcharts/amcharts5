@@ -455,10 +455,9 @@ export class DefaultTheme extends Theme {
 				cornerRadius: 4,
 				pointerLength: 4,
 				pointerBaseWidth: 8,
-				fillOpacity: 0.9
+				fillOpacity: 0.9,
+				stroke:Color.fromHex(0xffffff)
 			});
-
-			setColor(rule, "stroke", ic, "background");
 		}
 
 		{
@@ -812,8 +811,8 @@ export class DefaultTheme extends Theme {
 			colors: ColorSet.new(this._root, {}),
 			paddingLeft: 20,
 			paddingRight: 20,
-			paddingTop: 15,
-			paddingBottom: 15,
+			paddingTop: 16,
+			paddingBottom: 16,
 			panX: false,
 			panY: false,
 			wheelStep: 0.25

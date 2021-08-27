@@ -2,9 +2,9 @@ import type { DataItem } from "../../core/render/Component";
 import type { Color } from "../../core/util/Color";
 import type { FlowLink } from "./FlowLink";
 import type { FlowNodes, IFlowNodesDataItem } from "./FlowNodes";
-import type * as d3sankey from "d3-sankey";
 import type { ListTemplate } from "../../core/util/List";
 import type { Bullet } from "../../core/render/Bullet";
+import type * as d3sankey from "d3-sankey";
 
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
 import { Container } from "../../core/render/Container";
@@ -142,6 +142,7 @@ export abstract class Flow extends Series {
 		if (this.nodes) {
 			this.nodes.flow = this;
 		}
+
 		super._afterNew();
 
 		this.children.push(this.bulletsContainer);
@@ -463,4 +464,5 @@ export abstract class Flow extends Series {
 			}
 		}
 	}
+
 }

@@ -8,6 +8,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 
+## [5.0.1] - 2021-08-25
+
+### Changed
+- Version bump.
+
+
 ## [5.0.0] - 2021-08-20
 
 ### Added

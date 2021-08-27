@@ -26,6 +26,7 @@ import { CanvasRenderer } from "./render/backend/CanvasRenderer";
 import { p100, percent } from "./util/Percent";
 import { color } from "./util/Color";
 import { populateString } from "./util/PopulateString";
+import { registry } from "./Registry";
 
 import * as $order from "./util/Order";
 import * as $array from "./util/Array";
@@ -497,6 +498,10 @@ export class Root implements IDisposer {
 		this.setThemes([]);
 
 		this._addTooltip();
+
+		if (!this._hasLicense()) {
+			this._showBranding();
+		}
 	}
 
 	private _render() {
@@ -1112,6 +1117,28 @@ export class Root implements IDisposer {
 	public addDisposer<T extends IDisposer>(disposer: T): T {
 		this._disposers.push(disposer);
 		return disposer;
+	}
+
+		/**
+	 * To all the clever heads out there. Yes, we did not make any attempts to
+	 * scramble this.
+	 *
+	 * This is a part of a tool meant for our users to manage their commercial
+	 * licenses for removal of amCharts branding from charts.
+	 *
+	 * The only legit way to do so is to purchase a commercial license for amCharts:
+	 * https://www.amcharts.com/online-store/
+	 * 
+	 * Removing or altering this code, or disabling amCharts branding in any other
+	 * way is against the license and thus illegal.
+	 */
+	protected _hasLicense(): boolean {
+		for (let i = 0; i < registry.licenses.length; i++) {
+			if (registry.licenses[i].match(/^AM5C.{5,}/i)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
