@@ -277,6 +277,10 @@ export class RadarChart extends XYChart {
 			}
 		}
 
+		if(startAngle == endAngle){
+			inArc = true;	
+		}		
+
 		if (!inArc) {
 			return false;
 		}
