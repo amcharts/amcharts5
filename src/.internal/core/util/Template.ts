@@ -64,8 +64,9 @@ export class TemplateStates<E extends Entity> {
 	}
 
 	public _apply(entity: E): void {
-		$object.each(this._states, (key, _state) => {
-			entity.states.create(key as string, {});
+		$object.each(this._states, (key, state) => {
+			const other = entity.states.create(key as string, {});
+			other.setAll(state._settings);
 		});
 	}
 }
@@ -274,6 +275,8 @@ export class Template<E extends Entity> {
 				disposers.push(entity.onPrivate(key, event));
 			});
 		});
+
+		this.states._apply(entity);
 
 		disposers.push(this.adapters._apply(entity));
 		disposers.push(entity.events.copyFrom(this.events));

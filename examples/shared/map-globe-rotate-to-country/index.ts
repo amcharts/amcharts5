@@ -3,24 +3,18 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create the map chart
- * https://www.amcharts.com/docs/v5/charts/map-chart/
- */
+// Create the map chart
+// https://www.amcharts.com/docs/v5/charts/map-chart/
 const chart = root.container.children.push(
   am5map.MapChart.new(root, {
     panX: "rotateX",
@@ -33,10 +27,8 @@ const chart = root.container.children.push(
   })
 );
 
-/**
- * Create main polygon series for countries
- * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
- */
+// Create main polygon series for countries
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(
   am5map.MapPolygonSeries.new(root, {
     geoJSON: am5geodata_worldLow as any
@@ -57,10 +49,8 @@ polygonSeries.mapPolygons.template.states.create("active", {
   fill: root.interfaceColors.get("primaryButtonHover")
 });
 
-/**
- * Create series for background fill
- * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
- */
+// Create series for background fill
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
 const backgroundSeries = chart.series.push(
   am5map.MapPolygonSeries.new(root, {})
 );
@@ -73,9 +63,7 @@ backgroundSeries.data.push({
   geometry: am5map.getGeoRectangle(90, 180, -90, -180)
 });
 
-/**
- * Set up events
- */
+// Set up events
 
 let previousPolygon;
 
@@ -95,4 +83,4 @@ polygonSeries.mapPolygons.template.on("active", (active, target) => {
 })
 
 
-chart.appear();
+chart.appear(1000, 100);

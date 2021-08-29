@@ -326,13 +326,23 @@ export class Root implements IDisposer {
 
 		this._disposers.push(new ResizeSensor(this._dom, () => {
 			const dom = this._dom;
-			this._focusElementContainer!.style.width = dom.clientWidth + "px";
-			this._focusElementContainer!.style.height = dom.clientHeight + "px";
-			renderer.resize(dom.clientWidth, dom.clientHeight);
-			this._rootContainer.setPrivate("width", dom.clientWidth);
-			this._rootContainer.setPrivate("height", dom.clientHeight);
-			this._render();
-			this._handleLogo();
+			const w = dom.clientWidth;
+			const h = dom.clientHeight;
+			if (w > 0 && h > 0) {
+				const focusElementContainer = this._focusElementContainer!;
+
+				focusElementContainer.style.width = w + "px";
+				focusElementContainer.style.height = h + "px";
+
+				renderer.resize(w, h);
+
+				const rootContainer = this._rootContainer;
+
+				rootContainer.setPrivate("width", w);
+				rootContainer.setPrivate("height", h);
+				this._render();
+				this._handleLogo();
+			}
 		}));
 
 		// Create element which is used to make announcements to screen reader
@@ -1119,19 +1129,19 @@ export class Root implements IDisposer {
 		return disposer;
 	}
 
-		/**
-	 * To all the clever heads out there. Yes, we did not make any attempts to
-	 * scramble this.
-	 *
-	 * This is a part of a tool meant for our users to manage their commercial
-	 * licenses for removal of amCharts branding from charts.
-	 *
-	 * The only legit way to do so is to purchase a commercial license for amCharts:
-	 * https://www.amcharts.com/online-store/
-	 * 
-	 * Removing or altering this code, or disabling amCharts branding in any other
-	 * way is against the license and thus illegal.
-	 */
+	/**
+ * To all the clever heads out there. Yes, we did not make any attempts to
+ * scramble this.
+ *
+ * This is a part of a tool meant for our users to manage their commercial
+ * licenses for removal of amCharts branding from charts.
+ *
+ * The only legit way to do so is to purchase a commercial license for amCharts:
+ * https://www.amcharts.com/online-store/
+ * 
+ * Removing or altering this code, or disabling amCharts branding in any other
+ * way is against the license and thus illegal.
+ */
 	protected _hasLicense(): boolean {
 		for (let i = 0; i < registry.licenses.length; i++) {
 			if (registry.licenses[i].match(/^AM5C.{5,}/i)) {

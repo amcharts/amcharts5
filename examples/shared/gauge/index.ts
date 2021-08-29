@@ -3,24 +3,18 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create chart
- * https://www.amcharts.com/docs/v5/charts/radar-chart/
- */
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/radar-chart/
 const chart = root.container.children.push(
   am5radar.RadarChart.new(root, {
     panX: false,
@@ -30,10 +24,8 @@ const chart = root.container.children.push(
   })
 );
 
-/**
- * Create axis and its renderer
- * https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
- */
+// Create axis and its renderer
+// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
 const axisRenderer = am5radar.AxisRendererCircular.new(root, {
   innerRadius: -10,
   strokeOpacity: 0.1
@@ -49,10 +41,8 @@ const xAxis = chart.xAxes.push(
   })
 );
 
-/**
- * Add clock hand
- * https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
- */
+// Add clock hand
+// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
 const axisDataItem = xAxis.makeDataItem({});
 axisDataItem.set("value", 0);
 
@@ -74,3 +64,5 @@ setInterval(() => {
     easing: am5.ease.out(am5.ease.cubic)
   });
 }, 2000);
+
+chart.appear(1000, 100);

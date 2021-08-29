@@ -1647,12 +1647,8 @@ export abstract class XYSeries extends Series {
 							tooltip._setDataItem(dataItem);
 							tooltip.label.text.markDirtyText();
 							tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
-							tooltip.show();
 							tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));
 						}
-					}
-					else {
-						tooltip.hide();
 					}
 				}
 			}

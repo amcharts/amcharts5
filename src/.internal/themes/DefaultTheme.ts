@@ -26,6 +26,7 @@ interface Settable<A> {
 }
 
 function setColor<A, K extends keyof A>(rule: Settable<A>, key: K, ic: InterfaceColors, name: keyof IInterfaceColorsSettings) {
+	// TODO this shouldn't use get, figure out a better way
 	rule.set(key, ic.get(name) as any);
 
 	ic.on(name, (value) => {
@@ -264,6 +265,7 @@ export class DefaultTheme extends Theme {
 		}
 
 		this.rule("Label", ["legend", "label"]).setAll({
+			layout:null,
 			centerY: p50,
 			marginLeft: 5,
 			paddingRight: 0,
@@ -279,6 +281,7 @@ export class DefaultTheme extends Theme {
 		}
 
 		this.rule("Label", ["legend", "value", "label"]).setAll({
+			layout:null,
 			centerY: p50,
 			marginLeft: 5,
 			paddingRight: 0,
@@ -358,7 +361,6 @@ export class DefaultTheme extends Theme {
 			const rule = this.rule("Label");
 
 			rule.setAll({
-				layout: horizontalLayout,
 				paddingTop: 8,
 				paddingBottom: 8,
 				paddingLeft: 10,

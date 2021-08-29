@@ -176,24 +176,33 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 				let endIndex = Math.min(this.getPrivate("endIndex", len) + 1, len);
 
-				for (let i = 0; i < startIndex; i++) {
-					let graphics = this.dataItems[i].get("graphics");
-					if (graphics) {
-						graphics.setPrivate("visible", false);
+				for (let i = 0; i < startIndex - 1; i++) {
+					let di = this.dataItems[i];
+					if (di) {
+						let graphics = di.get("graphics");
+						if (graphics) {
+							graphics.setPrivate("visible", false);
+						}
 					}
 				}
 
 				let previous = this.dataItems[startIndex];
 
-				for (let i = startIndex; i < endIndex; i++) {
-					this._updateGraphics(this.dataItems[i], previous);
-					previous = this.dataItems[i];
+				for (let i = startIndex - 1; i <= endIndex; i++) {
+					let di = this.dataItems[i];
+					if (di) {
+						this._updateGraphics(di, previous);
+						previous = this.dataItems[i];
+					}
 				}
 
-				for (let i = endIndex; i < len; i++) {
-					let graphics = this.dataItems[i].get("graphics");
-					if (graphics) {
-						graphics.setPrivate("visible", false);
+				for (let i = endIndex + 1; i < len; i++) {
+					let di = this.dataItems[i];
+					if (di) {
+						let graphics = di.get("graphics");
+						if (graphics) {
+							graphics.setPrivate("visible", false);
+						}
 					}
 				}
 			}

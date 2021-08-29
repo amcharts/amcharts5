@@ -435,7 +435,7 @@ export class XYCursor extends Container {
 
 			this.setPrivate("point", local);
 
-			const snapToSeries = this.get("snapToSeries")
+			const snapToSeries = this.get("snapToSeries");
 
 			let userPositionX = this.get("positionX");
 			let positionX = xyPos.x;
@@ -484,12 +484,6 @@ export class XYCursor extends Container {
 			this._updateLines(x, y);
 
 			chart.arrangeTooltips();
-			setTimeout(() => {
-				let chart = this.chart;
-				if (chart) {
-					chart.arrangeTooltips();
-				}
-			}, 100)
 		}
 		else if (!this._downPoint) {
 			if (!alwaysShow) {
@@ -523,6 +517,22 @@ export class XYCursor extends Container {
 		const behavior = this.get("behavior");
 		const w = this.width();
 		const h = this.height();
+
+		if (point.x < 0) {
+			point.x = 0;
+		}
+
+		if (point.x > w) {
+			point.x = w;
+		}
+
+		if (point.y < 0) {
+			point.y = 0;
+		}
+
+		if (point.y > h) {
+			point.y = h;
+		}
 
 		selection.set("draw", (display) => {
 			const downPoint = this._downPoint;

@@ -2,6 +2,7 @@ import type { Root } from "../Root";
 import { Text } from "../render/Text";
 import type { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
+import { p50, p100 } from "../util/Percent";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
 import type { Template } from "../../core/util/Template";
 import * as  $array from "../../core/util/Array";
@@ -261,6 +262,25 @@ export class Label extends Container {
 		if (this.isDirty("rotation")) {
 			this._setMaxDimentions();
 		}
+
+		if (this.isDirty("textAlign") || this.isDirty("width")) {
+			const textAlign = this.get("textAlign");
+			let x: number | Percent | undefined;
+			if (this.get("width") != null) {	
+
+				if (textAlign == "right") {
+					x = p100;
+				}
+				else if (textAlign == "center") {
+					x = p50;
+				}
+				else {
+					x = 0;
+				}
+			}
+
+			this.text.set("x", x);
+		}
 	}
 
 	protected _setMaxDimentions() {
@@ -274,7 +294,7 @@ export class Label extends Container {
 		else {
 			this.text.set(vertical ? "maxHeight" : "maxWidth", undefined);
 		}
-		
+
 		const maxHeight = this.get("maxHeight", Infinity);
 		if (maxHeight) {
 			this.text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));

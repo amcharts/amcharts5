@@ -143,8 +143,12 @@ export class Tooltip extends Container {
 		this._label = this.children.push(Label.new(this._root, {}));
 
 		this._disposers.push(this._label.events.on("boundschanged", () => {
-			this._updateBackground()
+			this._updateBackground();
 		}))
+
+		this.on("bounds", () => {
+			this._updateBackground();
+		})
 
 		this._updateTextColor();
 
@@ -182,8 +186,17 @@ export class Tooltip extends Container {
 		// 	}
 		// }
 
-		if (this.isDirty("pointTo") || this.isDirty("bounds")) {
-			this._updateBackground();
+		if (this.isDirty("pointTo")) {
+
+			let pointTo = this.get("pointTo");
+			let previous = this._prevSettings.pointTo;
+
+			if (pointTo && previous && previous.x == pointTo.x && previous.y == pointTo.y) {
+				// void
+			}
+			else {
+				this._updateBackground();
+			}
 
 			// not good for maps
 			//const pointTo = this.get("pointTo");
@@ -218,7 +231,7 @@ export class Tooltip extends Container {
 
 			if (fill == null) {
 				fill = stroke;
-			}			
+			}
 
 			if (this.get("getFillFromSprite")) {
 

@@ -321,37 +321,38 @@ export class MapChart extends SerialChart {
 			this._fitMap();
 		}
 
-		let w = this.innerWidth();
-		let h = this.innerHeight();
-
 		if (this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("paddingTop") || this.isDirty("paddingLeft")) {
-			let hw = w / 2;
-			let hh = h / 2;
+			const w = this.innerWidth();
+			const h = this.innerHeight();
 
-			projection.fitSize([w, h], this._geometryColection);
-			const newScale = projection.scale();
+			if (w > 0 && h > 0) {
+				let hw = w / 2;
+				let hh = h / 2;
 
-			this.setPrivateRaw("mapScale", newScale);
-			projection.scale(newScale * this.get("zoomLevel", 1));
+				projection.fitSize([w, h], this._geometryColection);
+				const newScale = projection.scale();
 
-			if (this._centerLocation) {
-				let xy = projection(this._centerLocation);
-				if (xy) {
-					let translate = projection.translate();
+				this.setPrivateRaw("mapScale", newScale);
+				projection.scale(newScale * this.get("zoomLevel", 1));
 
-					let xx = hw - ((xy[0] - translate[0]));
-					let yy = hh - ((xy[1] - translate[1]));
+				if (this._centerLocation) {
+					let xy = projection(this._centerLocation);
+					if (xy) {
+						let translate = projection.translate();
 
-					projection.translate([xx, yy])
+						let xx = hw - ((xy[0] - translate[0]));
+						let yy = hh - ((xy[1] - translate[1]));
 
-					this.setRaw("translateX", xx);
-					this.setRaw("translateY", yy);
+						projection.translate([xx, yy])
 
-					this.markDirtyProjection();
+						this.setRaw("translateX", xx);
+						this.setRaw("translateY", yy);
+
+						this.markDirtyProjection();
+					}
 				}
+				this.markDirtyProjection();
 			}
-
-			this.markDirtyProjection();
 		}
 
 		if (this.isDirty("zoomControl")) {
@@ -426,42 +427,52 @@ export class MapChart extends SerialChart {
 	public _updateChildren() {
 		const projection = this.get("projection")!;
 		if (projection.invert) {
-			this._centerLocation = projection.invert([this.innerWidth() / 2, this.innerHeight() / 2]);
+			let w = this.innerWidth();
+			let h = this.innerHeight();
+			if (w & 0 && h > 0) {
+				this._centerLocation = projection.invert([this.innerWidth() / 2, this.innerHeight() / 2]);
+			}
 		}
 	}
 
 	protected _fitMap() {
 		const projection = this.get("projection")!;
-		projection.fitSize([this.innerWidth(), this.innerHeight()], this._geometryColection);
-		this.setPrivateRaw("mapScale", projection.scale());
 
-		const translate = projection.translate();
-		this.setRaw("translateX", translate[0]);
-		this.setRaw("translateY", translate[1]);
+		let w = this.innerWidth();
+		let h = this.innerHeight();
+		if (w > 0 && h > 0) {
+			projection.fitSize([w, h], this._geometryColection);
+			this.setPrivateRaw("mapScale", projection.scale());
 
-		this._centroid = { x: translate[0], y: translate[1] };
+			const translate = projection.translate();
+			this.setRaw("translateX", translate[0]);
+			this.setRaw("translateY", translate[1]);
 
-		const geoPath = this.getPrivate("geoPath");
-		this._mapBounds = geoPath.bounds(this._geometryColection);
+			this._centroid = { x: translate[0], y: translate[1] };
 
-		this._geoCentroid = $mapUtils.getGeoCentroid(this._geometryColection);
-		this._geoBounds = $mapUtils.getGeoBounds(this._geometryColection);
+			const geoPath = this.getPrivate("geoPath");
+			this._mapBounds = geoPath.bounds(this._geometryColection);
 
-		if (this._geometryColection.geometries.length > 0) {
+			this._geoCentroid = $mapUtils.getGeoCentroid(this._geometryColection);
 
-			this._geoBounds.left = $math.round(this._geoBounds.left, 3);
-			this._geoBounds.right = $math.round(this._geoBounds.right, 3);
-			this._geoBounds.top = $math.round(this._geoBounds.top, 3);
-			this._geoBounds.bottom = $math.round(this._geoBounds.bottom, 3);
+			const bounds = $mapUtils.getGeoBounds(this._geometryColection);
+			this._geoBounds = bounds;
 
-			const prevGeoBounds = this._prevGeoBounds;
+			if (this._geometryColection.geometries.length > 0) {
 
-			if (prevGeoBounds && JSON.stringify(this._geoBounds) != JSON.stringify(prevGeoBounds)) {
-				this._dispatchBounds = true;
-				this._prevGeoBounds = this._geoBounds;
+				bounds.left = $math.round(this._geoBounds.left, 3);
+				bounds.right = $math.round(this._geoBounds.right, 3);
+				bounds.top = $math.round(this._geoBounds.top, 3);
+				bounds.bottom = $math.round(this._geoBounds.bottom, 3);
+
+				const prevGeoBounds = this._prevGeoBounds;
+
+				if (prevGeoBounds && JSON.stringify(bounds) != JSON.stringify(prevGeoBounds)) {
+					this._dispatchBounds = true;
+					this._prevGeoBounds = bounds;
+				}
 			}
 		}
-
 	}
 
 	/**
@@ -490,6 +501,7 @@ export class MapChart extends SerialChart {
 
 		this.set("width", p100);
 		this.set("height", p100);
+
 		if (this.get("translateX") == null) {
 			this.set("translateX", this.width() / 2);
 		}
@@ -688,8 +700,6 @@ export class MapChart extends SerialChart {
 			i++;
 		});
 
-		console.log(downPoints.length, movePoints.length);
-
 		if (downPoints.length > 1 && movePoints.length > 1) {
 			const display = chartContainer._display;
 
@@ -722,8 +732,6 @@ export class MapChart extends SerialChart {
 
 				let xx = moveCenter.x - (moveCenter.x - tx - moveCenter.x + downCenter.x) / zoomLevel * level;
 				let yy = moveCenter.y - (moveCenter.y - ty - moveCenter.y + downCenter.y) / zoomLevel * level;
-
-				console.log(xx, yy);
 
 				this.set("zoomLevel", level);
 				this.set("translateX", xx);

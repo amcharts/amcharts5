@@ -145,6 +145,26 @@ export class RadarColumnSeries extends BaseColumnSeries {
 		dataItem.set("innerRadius", innerRadius);
 		dataItem.set("radius", radius);
 
+		let axisStartAngle = 0;
+		let axisEndAngle = 360;
+
+		if (yAxis == this.get("baseAxis")) {
+			axisStartAngle = rendererY.getPrivate("startAngle", 0);
+			axisEndAngle = rendererY.getPrivate("endAngle", 360);
+		}
+		else {
+			axisStartAngle = rendererX.getPrivate("startAngle", 0);
+			axisEndAngle = rendererX.getPrivate("endAngle", 360);
+		}
+
+		if (axisStartAngle > axisEndAngle) {
+			[axisStartAngle, axisEndAngle] = [axisEndAngle, axisStartAngle];
+		}
+
+		if ((endAngle <= axisStartAngle) || (startAngle >= axisEndAngle) || (radius <= axisInnerRadius && innerRadius <= axisInnerRadius)) {
+			slice.setPrivate("visible", false);
+		}
+
 		slice.setAll({ innerRadius, radius, startAngle, arc: endAngle - startAngle });
 	}
 

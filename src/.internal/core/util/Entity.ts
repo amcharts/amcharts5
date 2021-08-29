@@ -1136,8 +1136,6 @@ export abstract class Entity extends Settings implements IDisposer {
 	protected _applyTemplate(template: Template<this>, settings: Dirty<this["_settings"]>, privateProperties: Dirty<this["_privateSettings"]>): void {
 		this._templateDisposers.push(template._apply(this));
 
-		template.states._apply(this);
-
 		$object.each(template._settings, (key, value) => {
 			if (!this._userProperties[key] && !settings[key]) {
 				settings[key] = true;

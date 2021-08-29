@@ -96,7 +96,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Indicates maximum distance from pointer (moust or touch) to points
 	 * tooltips need to be shown for.
 	 *
-	 * Points that are furher from pointer than this setting will not be shown.
+	 * Points that are further from pointer than this setting will not be shown.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
 	 */
@@ -260,8 +260,9 @@ export class XYChart extends SerialChart {
 		this._disposers.push(this._processAxis(this.xAxes, this.bottomAxesContainer));
 		this._disposers.push(this._processAxis(this.yAxes, this.leftAxesContainer));
 
-		this.plotContainer.children.push(this.bulletsContainer);
+
 		this.plotContainer.children.push(this.topGridContainer);
+		this.plotContainer.children.push(this.bulletsContainer);
 
 		// Setting trasnparent background so that full body of the plot container
 		// is interactive
@@ -586,7 +587,6 @@ export class XYChart extends SerialChart {
 	public _handleCursorPosition() {
 		const cursor = this.get("cursor");
 		if (cursor) {
-
 			const cursorPoint = cursor.getPrivate("point");
 
 			const snapToSeries = cursor.get("snapToSeries");
@@ -981,51 +981,49 @@ export class XYChart extends SerialChart {
 					}
 				}
 			})
+		}
 
-			this.series.each((series) => {
-				const tooltip = series.get("tooltip");
-				if (tooltip) {
+		this.series.each((series) => {
+			const tooltip = series.get("tooltip")!;
+
+			if (tooltip) {
+				let hidden = false;
+				let point = tooltip.get("pointTo")!;
+				if (point) {
 					if (maxTooltipDistance >= 0) {
 						let point = tooltip.get("pointTo")!;
 						if (point) {
 							if (series != closest) {
 								let distance = Math.hypot(closestPoint.x - point.x, closestPoint.y - point.y);
 								if (distance > maxTooltipDistance) {
-									tooltip.hide(0);
+									hidden = true;
 								}
 							}
 						}
 					}
-					else {
-						if (series != closest) {
-							tooltip.hide(0);
-						}
-					}
-				}
-			})
 
-		}
-
-		this.series.each((series) => {
-			const tooltip = series.get("tooltip")!;
-
-			if (tooltip && !tooltip.isHidden()) {
-				let point = tooltip.get("pointTo")!;
-				if (point) {
 					let local = this.plotContainer._display.toLocal(point);
 					if (local.y < 0 || local.y > h || local.x < 0 || local.x > w) {
-						tooltip.hide(0);
+						hidden = true;
 					}
 					else {
-						tooltips.push(tooltip);
 						let pointTo = tooltip.get("pointTo");
 						if (pointTo) {
 							sum += pointTo.y;
 						}
 					}
+
+					if (hidden) {
+						tooltip.hide(0);
+					}
+					else {
+						tooltip.show();
+						tooltips.push(tooltip);						
+					}
 				}
 			}
 		})
+
 
 		let tooltipContainer = this._root.tooltipContainer;
 
@@ -1044,7 +1042,9 @@ export class XYChart extends SerialChart {
 					height *= centerY.value;
 				}
 				height += tooltip.get("marginBottom", 0);
+
 				tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
+
 				prevY = Math.min(prevY - height, tooltip._fy - height);
 				tooltipContainer.children.moveValue(tooltip, 0);
 			})

@@ -3,16 +3,12 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
@@ -134,9 +130,7 @@ var temperatures = {
   ]
 }
 
-/**
- * Modify defaults
- */
+// Modify defaults
 root.defaultTheme.rule("Label").set("fontSize", 10);
 root.defaultTheme.rule("Grid").set("strokeOpacity", 0.06);
 root.numberFormatter.set("numberFormat", "+#.0°C|#.0°C|0.0°C");
@@ -149,10 +143,8 @@ var div = document.getElementById("chartdiv");
 
 var colorSet = am5.ColorSet.new(root, {});
 
-/**
- * Create chart
- * https://www.amcharts.com/docs/v5/charts/radar-chart/
- */
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/radar-chart/
 const chart = root.container.children.push(
   am5radar.RadarChart.new(root, {
     panX: false,
@@ -166,10 +158,8 @@ const chart = root.container.children.push(
   })
 );
 
-/**
- * Add cursor
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor
- */
+// Add cursor
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor
 const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
   behavior: "zoomX",
   radius: am5.percent(40),
@@ -177,10 +167,8 @@ const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
 }));
 cursor.lineY.set("visible", false);
 
-/**
- * Create axes and their renderers
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
- */
+// Create axes and their renderers
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
 const xRenderer = am5radar.AxisRendererCircular.new(root, {
   minGridDistance: 10
 });
@@ -216,10 +204,8 @@ const valueAxis = chart.yAxes.push(
   })
 );
 
-/**
- * Create series
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
- */
+// Create series
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
 const series = chart.series.push(
   am5radar.RadarColumnSeries.new(root, {
     calculateAggregates: true,
@@ -236,10 +222,8 @@ series.columns.template.set("strokeOpacity", 0);
 const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
 tooltip.label.set("text", "{categoryX}:{valueY}");
 
-/**
- * Set up heat rules
- * https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
- */
+// Set up heat rules
+// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
 series.set("heatRules", [{
   target: series.columns.template,
   key: "fill",
@@ -248,16 +232,12 @@ series.set("heatRules", [{
   dataField: "valueY"
 }]);
 
-/**
- * Add scrollbars
- * https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
- */
+// Add scrollbars
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
 chart.set("scrollbarX", am5.Scrollbar.new(root, { orientation: "horizontal" }));
 chart.set("scrollbarY", am5.Scrollbar.new(root, { orientation: "vertical" }));
 
-/**
- * Add year label
- */
+// Add year label
 const yearLabel = chart.radarContainer.children.push(
   am5.Label.new(root, {
     fontSize: "2em",
@@ -268,16 +248,14 @@ const yearLabel = chart.radarContainer.children.push(
   })
 );
 
-/**
- * Generate and set data
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
- */
+// Generate and set data
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
 var data = generateRadarData();
 series.data.setAll(data);
 categoryAxis.data.setAll(data);
 
-series.appear();
-chart.appear();
+series.appear(1000);
+chart.appear(1000, 100);
 
 function generateRadarData() {
   var data = [];
@@ -341,9 +319,7 @@ function createRange(name, continentData, index) {
 }
 
 
-/**
- * Create controls
- */
+// Create controls
 const container = chart.children.push(
   am5.Container.new(root, {
     y: am5.percent(95),

@@ -125,7 +125,7 @@ export class Scrollbar extends Container {
 	protected _makeButton(): Button {
 		return this.children.push(Button.new(this._root, {
 			themeTags: ["resize", "button", this.get("orientation")], icon: Graphics.new(this._root, {
-				themeTags: ["resize", "button", "icon", this.get("orientation")]
+				themeTags: ["icon"]
 			})
 		}));
 	}

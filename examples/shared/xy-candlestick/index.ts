@@ -2,16 +2,12 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
@@ -44,10 +40,8 @@ function generateChartData() {
 
 const data = generateChartData();
 
-/**
- * Create chart
- * https://www.amcharts.com/docs/v5/charts/xy-chart/
- */
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
 const chart = root.container.children.push(
   am5xy.XYChart.new(root, {
     focusable: true,
@@ -58,10 +52,8 @@ const chart = root.container.children.push(
   })
 );
 
-/**
- * Create axes
- * https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
- */
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(
   am5xy.DateAxis.new(root, {
     groupData: true,
@@ -84,7 +76,7 @@ const yAxis = chart.yAxes.push(
 const color = root.interfaceColors.get("background");
 
 const series = chart.series.push(am5xy.CandlestickSeries.new(root, { fill: color, calculateAggregates: true, stroke: color, name: "MDXI", xAxis: xAxis, yAxis: yAxis, valueYField: "value", openValueYField: "open", lowValueYField: "low", highValueYField: "high", valueXField: "date", lowValueYGrouped: "low", highValueYGrouped: "high", openValueYGrouped: "open", valueYGrouped: "close" }));
-series.set("legendValueText", "open:{openValueY} low:{lowValueY} high:{highValueY} close:{valueY}");
+series.set("legendValueText", "open: {openValueY} low: {lowValueY} high: {highValueY} close: {valueY}");
 series.set("legendRangeValueText", "{valueYClose}");
 series.data.setAll(data);
 
@@ -110,10 +102,8 @@ cursor.lineY.set("visible", false);
 
 chart.leftAxesContainer.set("layout", root.verticalLayout);
 
-/**
- * Add scrollbar
- * https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
- */
+// Add scrollbar
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
 const scrollbar = am5xy.XYChartScrollbar.new(root, {
   orientation: "horizontal",
   height: 50
@@ -153,7 +143,7 @@ const legend = yAxis.axisHeader.children.push(am5.Legend.new(root, {}))
 legend.data.push(series);
 legend.markers.template.setAll({ width: 10 });
 
-root.defaultTheme.rule<any>("LegendMarkerBackground").setAll({ cornerRadiusTR: 0, cornerRadiusBR: 0, cornerRadiusTL: 0, cornerRadiusBL: 0 })
+legend.markerRectangles.template.setAll({ cornerRadiusTR: 0, cornerRadiusBR: 0, cornerRadiusTL: 0, cornerRadiusBL: 0 });
 
-series.appear();
-chart.appear();
+series.appear(1000);
+chart.appear(1000, 100);

@@ -2,24 +2,18 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create chart
- * https://www.amcharts.com/docs/v5/charts/xy-chart/
- */
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
 const chart = root.container.children.push(
   am5xy.XYChart.new(root, {
     panX: true,
@@ -61,10 +55,8 @@ function generateDatas(count: number) {
   return data;
 }
 
-/**
- * Create axes
- * https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
- */
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(
   am5xy.DateAxis.new(root, {
     baseInterval: { timeUnit: "day", count: 1 },
@@ -95,10 +87,8 @@ tooltip1.label.set("text", "{valueY}");
 const tooltip2 = series2.set("tooltip", am5.Tooltip.new(root, {}));
 tooltip2.label.set("text", "{valueY}");
 
-/**
- * Add scrollbar
- * https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
- */
+// Add scrollbar
+// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
 }));
@@ -108,4 +98,4 @@ series1.data.setAll(data);
 series2.data.setAll(data);
 series1.appear(1000);
 series2.appear(1000);
-chart.appear(1000);
+chart.appear(1000, 100);

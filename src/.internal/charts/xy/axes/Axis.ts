@@ -300,7 +300,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @default new Container
 	 */
 	public axisHeader: Container = this.children.push(Container.new(this._root, {
-		themeTags: ["header"],
+		themeTags: ["axis", "header"],
 		position: "absolute",
 		background: Rectangle.new(this._root, {
 			themeTags: ["header", "background"],
@@ -752,6 +752,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 		if (bullet) {
 			const sprite = bullet.get("sprite");
+
 			if (sprite) {
 				sprite._setDataItem(dataItem);
 				dataItem.setRaw("bullet", bullet);

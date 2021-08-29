@@ -2,23 +2,17 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5hierarchy from "@amcharts/amcharts5/hierarchy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create wrapper container
- */
+// Create wrapper container
 const container = root.container.children.push(
   am5.Container.new(root, {
     width: am5.percent(100),
@@ -27,10 +21,8 @@ const container = root.container.children.push(
   })
 );
 
-/**
- * Create series
- * https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
- */
+// Create series
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
 const series = container.children.push(
   am5hierarchy.ForceDirected.new(root, {
     singleBranchOnly: false,
@@ -42,10 +34,8 @@ const series = container.children.push(
   })
 );
 
-/**
- * Generate and set data
- * https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
- */
+// Generate and set data
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
 const maxLevels = 2;
 const maxNodes = 3;
 const maxValue = 100;
@@ -88,3 +78,5 @@ function generateLevel(data: any, name: string, level: number) {
   level++;
   return data;
 }
+
+series.appear(1000, 100);

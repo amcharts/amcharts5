@@ -3,25 +3,19 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
-/**
- * Create the map chart
- * https://www.amcharts.com/docs/v5/charts/map-chart/
- */
+// Create the map chart
+// https://www.amcharts.com/docs/v5/charts/map-chart/
 const chart = root.container.children.push(
   am5map.MapChart.new(root, {
     panX: "rotateX",
@@ -39,9 +33,7 @@ const cont = chart.children.push(
 );
 
 
-/**
- * Add labels and controls
- */
+// Add labels and controls
 cont.children.push(
   am5.Label.new(root, {
     centerY: am5.p50,
@@ -71,30 +63,24 @@ cont.children.push(am5.Label.new(root, {
   text: "Globe"
 }));
 
-/**
- * Create main polygon series for countries
- * https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
- */
+// Create main polygon series for countries
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(
   am5map.MapPolygonSeries.new(root, {
     geoJSON: am5geodata_worldLow as any
   })
 );
 
-/**
- * Create line series for trajectory lines
- * https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
- */
+// Create line series for trajectory lines
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
 const lineSeries = chart.series.push(am5map.MapLineSeries.new(root, {}));
 lineSeries.mapLines.template.setAll({
   stroke: root.interfaceColors.get("alternativeBackground"),
   strokeOpacity: 0.3
 });
 
-/**
- * Create point series for markers
- * https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
- */
+// Create point series for markers
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
 const pointSeries = chart.series.push(
   am5map.MapPointSeries.new(root, {})
 );
@@ -183,3 +169,5 @@ function addCity(coords, title) {
     longitude: coords.longitude
   });
 }
+
+chart.appear(1000, 100);

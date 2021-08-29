@@ -1860,7 +1860,7 @@ export abstract class Sprite extends Entity {
 	 * @return Promise
 	 */
 	public async hide(duration?: number): Promise<void> {
-		if (!this._isHiding) {
+		if (!this._isHiding && !this._isHidden) {
 			this._isHiding = true;
 			this._isShowing = false;
 			let state = this.states.lookup("hidden");

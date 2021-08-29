@@ -51,7 +51,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Layout} for more info
 	 */
-	layout?: Layout;
+	layout?: Layout | null;
 
 	/**
 	 * An element to use as a container's mask (clipping region).

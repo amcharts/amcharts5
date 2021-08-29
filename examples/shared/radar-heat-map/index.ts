@@ -3,24 +3,18 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create chart
- * https://www.amcharts.com/docs/v5/charts/radar-chart/
- */
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/radar-chart/
 const chart = root.container.children.push(
   am5radar.RadarChart.new(root, {
     innerRadius: am5.percent(50),
@@ -33,10 +27,8 @@ const chart = root.container.children.push(
   })
 );
 
-/**
- * Create axes and their renderers
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
- */
+// Create axes and their renderers
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
 const yRenderer = am5radar.AxisRendererRadial.new(root, {
   visible: false,
   axisAngle: 90,
@@ -79,10 +71,8 @@ const xAxis = chart.xAxes.push(
   })
 );
 
-/**
- * Create series
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
- */
+// Create series
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
 const series = chart.series.push(
   am5radar.RadarColumnSeries.new(root, {
     calculateAggregates: true,
@@ -117,10 +107,8 @@ series.events.on("datavalidated", () => {
 });
 
 
-/**
- * Set up heat rules
- * https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
- */
+// Set up heat rules
+// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
 series.set("heatRules", [{
   target: series.columns.template,
   min: am5.color(0xfffb77),
@@ -129,10 +117,8 @@ series.set("heatRules", [{
   key: "fill"
 }]);
 
-/**
- * Add heat legend
- * https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
- */
+// Add heat legend
+// https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
 const heatLegend = chart.children.push(
   am5.HeatLegend.new(root, {
     orientation: "horizontal",
@@ -141,10 +127,8 @@ const heatLegend = chart.children.push(
   })
 );
 
-/**
- * Set data
- * https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
- */
+// Set data
+// https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
 const data = [{
   hour: "12pm",
   weekday: "Sunday",
@@ -859,8 +843,6 @@ xAxis.data.setAll([
   { hour: "11pm" }
 ]);
 
-/**
- * Animate series in
- * https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
- */
-series.appear();
+
+// https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
+chart.appear(1000, 100);

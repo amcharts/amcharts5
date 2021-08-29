@@ -2,24 +2,18 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create chart
- * https://www.amcharts.com/docs/v5/charts/xy-chart/
- */
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
 const chart = root.container.children.push(
   am5xy.XYChart.new(root, {
     panX: false,
@@ -58,10 +52,8 @@ const data = [{
   "africa": 0.5
 }]
 
-/**
- * Create axes
- * https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
- */
+// Create axes
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(
   am5xy.CategoryAxis.new(root, {
     categoryField: "year",
@@ -108,4 +100,4 @@ makeSeries("Middle East", "meast", true);
 makeSeries("Africa", "africa", true);
 
 
-chart.appear();
+chart.appear(1000, 100);

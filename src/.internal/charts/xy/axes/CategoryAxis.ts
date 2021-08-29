@@ -260,7 +260,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
 
-		let frequency = Math.min(len, Math.ceil((endIndex - startIndex) / maxCount));
+		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
 		startIndex = Math.floor(startIndex / frequency) * frequency;
 		this._frequency = frequency;
 

@@ -2,24 +2,18 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5flow from "@amcharts/amcharts5/flow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-/**
- * Create root element
- * https://www.amcharts.com/docs/v5/getting-started/#Root_element
- */
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
 
-/**
- * Set themes
- * https://www.amcharts.com/docs/v5/concepts/themes/
- */
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-/**
- * Create series
- * https://www.amcharts.com/docs/v5/charts/flow-charts/
- */
+// Create series
+// https://www.amcharts.com/docs/v5/charts/flow-charts/
 const series = root.container.children.push(
   am5flow.ChordNonRibbon.new(root, {
     sourceIdField: "from",
@@ -69,10 +63,8 @@ series.nodes.bullets.push((_root, _series, dataItem) => {
 
 series.children.moveValue(series.bulletsContainer, 0);
 
-/**
- * Set data
- * https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
- */
+// Set data
+// https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
 series.data.setAll([
   { from: "A", to: "D", value: 10 },
   { from: "B", to: "D", value: 8 },
@@ -83,3 +75,5 @@ series.data.setAll([
   { from: "C", to: "A", value: 4 },
   { from: "G", to: "A", value: 7 }
 ]);
+
+series.appear(1000, 100);

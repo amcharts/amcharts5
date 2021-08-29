@@ -697,7 +697,9 @@ class Arc extends Op {
 	) { super(); }
 
 	public path(context: CanvasRenderingContext2D): void {
-		context.arc(this.cx, this.cy, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
+		if(this.radius > 0){
+			context.arc(this.cx, this.cy, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
+		}
 	}
 
 	public addBounds(bounds: IBounds): void {
@@ -720,7 +722,9 @@ class ArcTo extends Op {
 	) { super(); }
 
 	public path(context: CanvasRenderingContext2D): void {
-		context.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius);
+		if(this.radius > 0){
+			context.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius);
+		}
 	}
 
 	// TODO: add points
@@ -2485,7 +2489,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	public view: HTMLElement = document.createElement("div");
 	protected _layerDom: HTMLElement = document.createElement("div");
 
-	public layers: Array<CanvasLayer | undefined> = [];
+	public layers: Array<CanvasLayer> = [];
 	public _dirtyLayers: Array<CanvasLayer> = [];
 	public defaultLayer: CanvasLayer = this.getLayer(0);
 
@@ -2686,36 +2690,51 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		return layer;
 	}
 
-	getLayer(order: number, visible: boolean = true): CanvasLayer {
+	getLayerByOrder(order: number): CanvasLayer | undefined {
 		const layers = this.layers;
-
-		if (layers.length > order) {
-			const layer = layers[order];
-
-			if (layer) {
+		const length = layers.length;
+		for(let i = 0; i < length; i++) {
+			const layer = layers[i];
+			if (layer.order == order) {
 				return layer;
 			}
+		}
+	}
+
+	getLayer(order: number, visible: boolean = true): CanvasLayer {
+		const layers = this.layers;
+		
+		let existingLayer = this.getLayerByOrder(order);
+		if (existingLayer) {
+			return existingLayer;
 		}
 
 		const layer = this.createDetachedLayer();
 		layer.order = order;
 		layer.visible = visible;
 
-		layers[order] = layer;
+		layers.push(layer);
 
-		let next;
-
-		const length = layers.length;
-
-		// This finds the next layer
-		for (let i = order + 1; i < length; ++i) {
-			next = layers[i];
-
-			if (next !== undefined && next.visible) {
-				break;
+		layers.sort((a, b) => {
+			if (a.order > b.order) {
+				return 1;
+			}
+			else if (a.order < b.order) {
+				return -1;
 			}
 			else {
-				next = undefined;
+				return 0;
+			}
+		});
+
+		const length = layers.length;
+		const layerIndex = $array.indexOf(layers, layer);
+		let next;
+
+		for (let i = layerIndex + 1; i < length; i++) {
+			if (layers[i].visible) {
+				next = layers[i];
+				break;
 			}
 		}
 
@@ -2737,7 +2756,6 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
-				//console.log(layer.order, layer.dirty);
 
 				if (layer.dirty && layer.visible) {
 					this._dirtyLayers.push(layer);
