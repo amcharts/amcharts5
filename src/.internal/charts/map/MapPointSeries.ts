@@ -150,6 +150,8 @@ export class MapPointSeries extends MapSeries {
 		if (!dataItem.get("geometry")) {
 			dataItem.set("geometry", { type: "Point", coordinates: [dataItem.get("longitude", 0), dataItem.get("latitude", 0)] });
 		}
+
+		this._addGeometry(dataItem.get("geometry"));
 	}
 
 	protected _makeBullets(dataItem: DataItem<this["_dataItemSettings"]>) {

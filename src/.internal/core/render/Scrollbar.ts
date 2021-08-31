@@ -92,7 +92,7 @@ export class Scrollbar extends Container {
 		settings.themeTags = $utils.mergeTags(settings.themeTags, ["scrollbar", settings.orientation]);
 		if (!settings.background) {
 			settings.background = RoundedRectangle.new(root, {
-				themeTags: $utils.mergeTags(settings.themeTags, ["background"])
+				themeTags: $utils.mergeTags(settings.themeTags, ["main", "background"])
 			});
 		}
 	}

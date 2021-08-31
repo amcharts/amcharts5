@@ -117,4 +117,6 @@ function addData() {
   }
 }
 
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
 chart.appear(1000, 100);

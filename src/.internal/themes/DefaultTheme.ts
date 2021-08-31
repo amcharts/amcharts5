@@ -213,7 +213,7 @@ export class DefaultTheme extends Theme {
 		});
 
 		// Class: Container
-		this.rule("Container", ["legend", "item"]).setAll({
+		this.rule("Container", ["legend", "item", "itemcontainer"]).setAll({
 			toggleKey: "disabled",
 			paddingLeft: 5,
 			paddingRight: 5,
@@ -265,7 +265,6 @@ export class DefaultTheme extends Theme {
 		}
 
 		this.rule("Label", ["legend", "label"]).setAll({
-			layout:null,
 			centerY: p50,
 			marginLeft: 5,
 			paddingRight: 0,
@@ -281,7 +280,6 @@ export class DefaultTheme extends Theme {
 		}
 
 		this.rule("Label", ["legend", "value", "label"]).setAll({
-			layout:null,
 			centerY: p50,
 			marginLeft: 5,
 			paddingRight: 0,
@@ -445,7 +443,8 @@ export class DefaultTheme extends Theme {
 			pointerOrientation: "vertical",
 			centerX: p50,
 			centerY: p50,
-			animationEasing: $ease.out($ease.cubic)
+			animationEasing: $ease.out($ease.cubic),
+			exportable: false
 			//layer: 100
 		});
 
@@ -458,7 +457,7 @@ export class DefaultTheme extends Theme {
 				pointerLength: 4,
 				pointerBaseWidth: 8,
 				fillOpacity: 0.9,
-				stroke:Color.fromHex(0xffffff)
+				stroke: Color.fromHex(0xffffff)
 			});
 		}
 
@@ -745,7 +744,7 @@ export class DefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("RoundedRectangle", ["scrollbar", "background"]);
+			const rule = this.rule("RoundedRectangle", ["scrollbar", "main", "background"]);
 
 			rule.setAll({
 				cornerRadiusTL: 8,
@@ -973,7 +972,8 @@ export class DefaultTheme extends Theme {
 
 		this.rule("XYCursor").setAll({
 			behavior: "none",
-			layer: 20
+			layer: 20,
+			exportable: false
 		});
 
 		{
@@ -1309,10 +1309,6 @@ export class DefaultTheme extends Theme {
 		 * charts/xy: Series
 		 * ------------------------------------------------------------------------
 		 */
-
-		this.rule("Series").setAll({
-			"maxFocusItems": 100
-		});
 
 		this.rule("XYSeries").setAll({
 			maskBullets: true,

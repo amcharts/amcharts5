@@ -32,7 +32,10 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 
 }
 
-export interface IMapLineSeriesSettings extends IMapSeriesSettings { }
+export interface IMapLineSeriesSettings extends IMapSeriesSettings {
+	//@todo description
+	clipBack?:boolean;	
+}
 
 /**
  * Creates a map series for displaying lines on the map.
@@ -112,6 +115,11 @@ export class MapLineSeries extends MapSeries {
 		const pointsToConnect = dataItem.get("pointsToConnect");
 		if (pointsToConnect) {
 			$array.each(pointsToConnect, (point) => {
+
+				point.on("geometry", () => {
+					this._markDirtyValues(dataItem);
+				})
+
 				point.on("longitude", () => {
 					this._markDirtyValues(dataItem);
 				})
@@ -119,15 +127,14 @@ export class MapLineSeries extends MapSeries {
 				point.on("latitude", () => {
 					this._markDirtyValues(dataItem);
 				})
-
-				point.on("geometry", () => {
-					this._markDirtyValues(dataItem);
-				})
 			})
+
+			this._markDirtyValues(dataItem);
 		}
 
 		mapLine.setPrivate("series", this);
 
+		this._addGeometry(dataItem.get("geometry"));
 	}
 
 	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -139,10 +146,22 @@ export class MapLineSeries extends MapSeries {
 				if (pointsToConnect) {
 					let coordinates: Array<Array<number>> = [];
 					$array.each(pointsToConnect, (point) => {
-						coordinates.push([point.get("longitude", 0), point.get("latitude", 0)]);
+						let geometry = point.get("geometry");
+						if (geometry) {
+							let coords = geometry.coordinates;
+							if (coords) {
+								coordinates.push([coords[0] as any, coords[1] as any]);
+							}
+						}
+						else {
+							coordinates.push([point.get("longitude", 0), point.get("latitude", 0)]);
+						}
 					})
 
-					mapLine.set("geometry", { type: "LineString", coordinates: coordinates });
+					let geometry:any = { type: "LineString", coordinates: coordinates };
+
+					dataItem.setRaw("geometry", geometry);
+					mapLine.set("geometry", geometry);
 				}
 				else {
 					mapLine.set("geometry", dataItem.get("geometry"));

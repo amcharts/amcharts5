@@ -357,7 +357,7 @@ export class Root implements IDisposer {
 
 		const focusElementContainer = document.createElement("div");
 		focusElementContainer.style.position = "absolute";
-		focusElementContainer.style.pointerEvents = "non";
+		focusElementContainer.style.pointerEvents = "none";
 		focusElementContainer.style.top = "0px";
 		focusElementContainer.style.left = "0px";
 		focusElementContainer.style.overflow = "hidden";
@@ -1006,12 +1006,15 @@ export class Root implements IDisposer {
 	protected _positionFocusElement(target: Sprite): void {
 		const bounds = target.globalBounds();
 
-		//const bounds = target._display.getGlobalBounds();
+		const width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
+		const height = bounds.top == bounds.bottom ? target.height() : bounds.bottom - bounds.top;
+
 		const focusElement = target.getPrivate("focusElement")!;
 		focusElement.style.top = (bounds.top - 2) + "px";
 		focusElement.style.left = (bounds.left - 2) + "px";
-		focusElement.style.width = (bounds.right - bounds.left + 4) + "px";
-		focusElement.style.height = (bounds.bottom - bounds.top + 4) + "px";
+		focusElement.style.width = (width + 4) + "px";
+		focusElement.style.height = (height + 4) + "px";
+
 	}
 
 	protected _handleFocus(ev: FocusEvent, index: number): void {

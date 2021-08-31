@@ -704,10 +704,13 @@ export abstract class Sprite extends Entity {
 		if (field) {
 
 			if (dataItem) {
-				template = (dataItem.dataContext as any)[field];
+				const context = dataItem.dataContext;
+				if(context){
+					template = (context as any)[field];
 
-				if (!(template instanceof Template) && template) {
-					template = Template.new(template);
+					if (!(template instanceof Template) && template) {
+						template = Template.new(template);
+					}
 				}
 			}
 		}

@@ -149,11 +149,18 @@ export class State<E extends Entity> {
 	 * @return           Animations
 	 */
 	public applyAnimate(duration?: number): Animations<E["_settings"]> {
+
+		if (duration == null) {
+			duration = this._settings.stateAnimationDuration;
+		}
 		if (duration == null) {
 			duration = this._get("stateAnimationDuration", this._entity.get("stateAnimationDuration", 0));
 		}
 
-		let easing = this._get("stateAnimationEasing", this._entity.get("stateAnimationEasing", $ease.cubic));
+		let easing = this._settings.stateAnimationEasing;
+		if (easing == null) {
+			easing = this._get("stateAnimationEasing", this._entity.get("stateAnimationEasing", $ease.cubic));
+		}
 
 		const defaultState = this._entity.states.lookup("default")!;
 

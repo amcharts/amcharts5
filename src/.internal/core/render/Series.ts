@@ -126,14 +126,6 @@ export interface ISeriesSettings extends IComponentSettings {
 	valueField?: string;
 
 	/**
-	 * If series data item count does not exceed `maxFocusItems`, then series
-	 * elements (e.g. columns) will be focusable.
-	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
-	 */
-	maxFocusItems?: number;
-
-	/**
 	 * A text template to be used for label in legend.
 	 */
 	legendLabelText?: string;
@@ -290,10 +282,6 @@ export abstract class Series extends Component {
 	protected _makeBullets(dataItem: DataItem<this["_dataItemSettings"]>) {
 		if(this._shouldMakeBullet(dataItem)){
 			dataItem.bullets = [];
-
-			if (this.dataItems.length < this.get("maxFocusItems")) {
-				// TODO: make bullets focusable
-			}
 
 			this.bullets.each((bulletFunction) => {
 				this._makeBullet(dataItem, bulletFunction);

@@ -9,7 +9,7 @@ import type { IPoint } from "../../util/IPoint";
 import { Color } from "../../util/Color";
 import { Matrix } from "../../util/Matrix";
 import { Percent, percent } from "../../util/Percent";
-//import { Throttler } from "../../util/Throttler";
+import { Throttler } from "../../util/Throttler";
 import { Disposer, IDisposer, CounterDisposer } from "../../util/Disposer";
 import { TextFormatter, ITextChunk } from "../../util/TextFormatter";
 import * as $utils from "../../util/Utils";
@@ -2520,6 +2520,9 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	public _mousedown: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 
 	protected _lastPointerMoveEvent!: IPointerEvent;
+	protected _mouseMoveThrottler: Throttler = new Throttler(() => {
+		this._dispatchGlobalMousemove(this._lastPointerMoveEvent);
+	});
 
 	constructor() {
 		super(() => {
@@ -2785,7 +2788,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		//}, 100)
 
 		if (this._hovering.size && this._lastPointerMoveEvent) {
-			this._dispatchGlobalMousemove(this._lastPointerMoveEvent);
+			this._mouseMoveThrottler.run();
 		}
 	}
 
@@ -2913,7 +2916,6 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		const event = this.getEvent(originalEvent);
 
 		const target = this._getHitTarget(event.point);
-		this._lastPointerMoveEvent = originalEvent;
 
 		if (target) {
 			this._hovering.forEach((obj) => {
@@ -2939,7 +2941,8 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 				return true;
 			});
 
-		} else if (target === false) {
+		//} else if (target === false) {
+		} else {
 			this._hovering.forEach((obj) => {
 				if (obj.cursorOverStyle) {
 					$utils.setStyle(document.body, "cursor", obj._replacedCursorStyle!);
@@ -3049,8 +3052,9 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 					// TODO handle throttling properly for multitouch
 					return onPointerEvent(window, "pointermove", (ev) => {
+						this._lastPointerMoveEvent = ev;
+						this._mouseMoveThrottler.run();
 						//throttler.throttle(() => {
-						this._dispatchGlobalMousemove(ev);
 						//});
 					});
 				});

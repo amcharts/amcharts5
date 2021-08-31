@@ -19,12 +19,19 @@ const chart = root.container.children.push(
     panX: false,
     panY: false,
     wheelX: "panX",
-    wheelY: "zoomX"
+    wheelY: "zoomX",
+    layout: root.verticalLayout
   })
 );
 
-chart.set("layout", root.verticalLayout);
-const legend = chart.children.push(am5.Legend.new(root, { centerX: am5.p50, x: am5.p50 }))
+// Add legend
+// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+const legend = chart.children.push(
+  am5.Legend.new(root, {
+    centerX: am5.p50,
+    x: am5.p50
+  })
+);
 
 const data = [{
   "year": "2021",
@@ -83,6 +90,9 @@ function makeSeries(name: string, fieldName: string) {
 
   series.columns.template.setAll({ tooltipText: "{name}, {categoryX}:{valueY}", width:am5.percent(90), tooltipY: 0 });
   series.data.setAll(data);
+
+  // Make stuff animate on load
+  // https://www.amcharts.com/docs/v5/concepts/animations/
   series.appear();
 
   series.bullets.push(() => {
@@ -99,4 +109,6 @@ makeSeries("Latin America", "lamerica");
 makeSeries("Middle East", "meast");
 makeSeries("Africa", "africa");
 
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
 chart.appear(1000, 100);

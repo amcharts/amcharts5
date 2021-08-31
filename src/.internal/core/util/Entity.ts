@@ -76,6 +76,15 @@ export interface IEntitySettings {
 	themeTags?: Array<string>;
 
 	/**
+	 * Tags which can be used by the theme rules.
+	 *
+	 * These tags only apply to this object, not any children.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+	 */
+	themeTagsSelf?: Array<string>;
+
+	/**
 	 * A list of themes applied to the element.
 	 */
 	themes?: Array<Theme>;
@@ -1261,6 +1270,14 @@ export abstract class Entity extends Settings implements IDisposer {
 		let isConnected = false;
 		const themes: Array<Array<Theme>> = [];
 		const themeTags: Set<string> = new Set();
+
+		const tags = this.get("themeTagsSelf");
+
+		if (tags) {
+			$array.each(tags, (tag) => {
+				themeTags.add(tag);
+			});
+		}
 
 		this._walkParents((entity) => {
 			if (entity === this._root._rootContainer) {

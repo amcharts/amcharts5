@@ -416,12 +416,7 @@ export class MapChart extends SerialChart {
 		const homeGeoPoint = this.get("homeGeoPoint", { longitude: geoBounds.left + (geoBounds.right - geoBounds.left) / 2, latitude: geoBounds.top + (geoBounds.bottom - geoBounds.top) / 2 });
 		const homeZoomLevel = this.get("homeZoomLevel", 1);
 
-		if (homeGeoPoint) {
-			this.zoomToGeoPoint(homeGeoPoint, homeZoomLevel, undefined, duration);
-		}
-		else {
-			this.zoomToGeoBounds(this._geoBounds, duration);
-		}
+		this.zoomToGeoPoint(homeGeoPoint, homeZoomLevel, true, duration);
 	}
 
 	public _updateChildren() {

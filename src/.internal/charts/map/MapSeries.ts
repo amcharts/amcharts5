@@ -3,7 +3,6 @@ import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
 import type { GeoProjection, GeoPath } from "d3-geo";
-import type { DataItem } from "../../core/render/Component";
 
 export interface IMapSeriesDataItem extends ISeriesDataItem {
 	geometry?: GeoJSON.Geometry;
@@ -76,7 +75,7 @@ export abstract class MapSeries extends Series {
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = [];
 
 	public _geometries: Array<GeoJSON.Geometry> = [];
-	protected _geoJSONparsed:boolean = false;
+	protected _geoJSONparsed: boolean = false;
 
 	protected _afterNew() {
 		this.fields.push("geometry", "geometryType");
@@ -91,7 +90,7 @@ export abstract class MapSeries extends Series {
 		super._prepareChildren();
 
 		if (this._valuesDirty || this.isDirty("geoJSON") || this.isDirty("include") || this.isDirty("exclude")) {
-			if(!this._geoJSONparsed){
+			if (!this._geoJSONparsed) {
 				this._parseGeoJSON();
 				this._geoJSONparsed = true;
 			}
@@ -162,9 +161,9 @@ export abstract class MapSeries extends Series {
 								return value.get("id") == id;
 							})
 
-							let dataObject:any;
+							let dataObject: any;
 
-							if(dataItem){
+							if (dataItem) {
 								dataObject = dataItem.dataContext;
 							}
 
@@ -232,9 +231,7 @@ export abstract class MapSeries extends Series {
 		}
 	}
 
-	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
-		super.processDataItem(dataItem);
-		const geometry = dataItem.get("geometry")!;
+	protected _addGeometry(geometry: any) {
 		if (geometry) {
 			this._geometries.push(geometry);
 

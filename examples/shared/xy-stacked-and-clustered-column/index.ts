@@ -83,6 +83,9 @@ function makeSeries(name: string, fieldName: string, stacked: boolean) {
 
   series.columns.template.setAll({ tooltipText: "{name}, {categoryX}:{valueY}", width: am5.percent(90), tooltipY: am5.percent(10) });
   series.data.setAll(data);
+
+  // Make stuff animate on load
+  // https://www.amcharts.com/docs/v5/concepts/animations/
   series.appear();
 
   series.bullets.push(() => {
@@ -99,5 +102,6 @@ makeSeries("Latin America", "lamerica", true);
 makeSeries("Middle East", "meast", true);
 makeSeries("Africa", "africa", true);
 
-
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
 chart.appear(1000, 100);

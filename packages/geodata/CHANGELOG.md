@@ -7,6 +7,11 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Fixed
+- Fixed Svalbard map.
+- Fixed Nigeria map.
+- Fixed US Congressional maps: Alabama, Florida, Maine, Massachusetts, New Jersey, Michigan, Virginia, Washington.
+
 
 ## [5.0.1] - 2021-08-25
 

@@ -264,6 +264,8 @@ export class XYChart extends SerialChart {
 		this.plotContainer.children.push(this.topGridContainer);
 		this.plotContainer.children.push(this.bulletsContainer);
 
+		this.plotContainer.children.moveValue(this.zoomOutButton);
+
 		// Setting trasnparent background so that full body of the plot container
 		// is interactive
 		this.plotContainer.set("interactive", true);
@@ -1071,9 +1073,12 @@ export class XYChart extends SerialChart {
 	 */
 	public zoomOut() {
 		this.xAxes.each((axis) => {
+			axis.setPrivate("updateScrollbar", true);
 			axis.zoom(0, 1);
 		})
+
 		this.yAxes.each((axis) => {
+			axis.setPrivate("updateScrollbar", true);
 			axis.zoom(0, 1);
 		})
 	}

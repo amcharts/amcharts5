@@ -45,7 +45,15 @@ dateAxis.set("tooltip", am5.Tooltip.new(root, { themeTags: ["axis"] }));
 
 const valueSeries1 = chart.series.push(am5xy.LineSeries.new(root, { name: "XTD", valueYField: "price1", calculateAggregates: true, valueYShow: "valueYChangeSelectionPercent", valueXField: "date", xAxis: dateAxis, yAxis: valueAxis, legendValueText: "{valueY}" }));
 
-const valueLegend = valueAxis.axisHeader.children.push(am5.Legend.new(root, { useDefaultMarker: true }));
+// Add legend to axis header
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/
+// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+const valueLegend = valueAxis.axisHeader.children.push(
+  am5.Legend.new(root, {
+    useDefaultMarker: true
+  })
+);
+
 valueLegend.data.setAll([valueSeries1]);
 
 const valueTooltip = valueSeries1.set("tooltip", am5.Tooltip.new(root, { getFillFromSprite: false, getStrokeFromSprite: true, getLabelFillFromSprite: true, autoTextColor: false, pointerOrientation: "horizontal" }));
@@ -59,7 +67,15 @@ volumeSeries.columns.template.setAll({ strokeWidth: 0.2, strokeOpacity: 1, strok
 const volumeTooltip = volumeSeries.set("tooltip", am5.Tooltip.new(root, {}));
 volumeTooltip.label.set("text", "{valueY}");
 
-const volumeLegend = volumeAxis.axisHeader.children.push(am5.Legend.new(root, { useDefaultMarker: true }));
+// Add legend to axis header
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/
+// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+const volumeLegend = volumeAxis.axisHeader.children.push(
+  am5.Legend.new(root, {
+    useDefaultMarker: true
+  })
+);
+
 volumeLegend.data.setAll([volumeSeries]);
 
 chart.leftAxesContainer.set("layout", root.verticalLayout);
@@ -126,4 +142,6 @@ valueSeries1.data.setAll(data);
 volumeSeries.data.setAll(data);
 sbSeries.data.setAll(data);
 
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
 chart.appear(1000, 100);

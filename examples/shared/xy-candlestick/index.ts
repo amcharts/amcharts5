@@ -139,11 +139,26 @@ const sbseries = scrollbar.chart.series.push(
 
 sbseries.data.setAll(data);
 
-const legend = yAxis.axisHeader.children.push(am5.Legend.new(root, {}))
+// Add legend
+// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+const legend = yAxis.axisHeader.children.push(
+  am5.Legend.new(root, {})
+);
+
 legend.data.push(series);
-legend.markers.template.setAll({ width: 10 });
 
-legend.markerRectangles.template.setAll({ cornerRadiusTR: 0, cornerRadiusBR: 0, cornerRadiusTL: 0, cornerRadiusBL: 0 });
+legend.markers.template.setAll({
+  width: 10
+});
 
+legend.markerRectangles.template.setAll({
+  cornerRadiusTR: 0,
+  cornerRadiusBR: 0,
+  cornerRadiusTL: 0,
+  cornerRadiusBL: 0
+});
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);

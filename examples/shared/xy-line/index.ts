@@ -76,5 +76,7 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 let data = generateDatas(1200);
 series.data.setAll(data);
 
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);

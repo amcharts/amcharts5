@@ -67,7 +67,10 @@ export class MapLine extends Graphics {
 					const chart = series.chart;
 					if (chart) {
 						const projection = chart.get("projection");
+						let clipAngle: number | null = null;
+
 						if (projection) {
+							clipAngle = projection.clipAngle();
 							projection.precision(this.get("precision", 0.5));
 						}
 
@@ -76,9 +79,17 @@ export class MapLine extends Graphics {
 							this._clear = true;
 
 							this.set("draw", (_display) => {
+								if (projection && series.get("clipBack") === false) {
+									projection.clipAngle(180);
+								}
+
 								geoPath.context(this._display as any);
 								geoPath(geometry);
 								geoPath.context(null);
+
+								if (projection) {
+									projection.clipAngle(clipAngle as any);
+								}
 							})
 						}
 					}
