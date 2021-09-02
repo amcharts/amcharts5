@@ -3,9 +3,11 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -13,10 +15,10 @@ root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/radar-chart/
-const chart = root.container.children.push(
-  am5radar.RadarChart.new(root, {
+const chart = root.container.children.push(  am5radar.RadarChart.new(root, {
     innerRadius: am5.percent(50),
     panX: false,
     panY: false,
@@ -24,8 +26,8 @@ const chart = root.container.children.push(
     wheelY: "zoomX",
     maxTooltipDistance: 0,
     layout: root.verticalLayout
-  })
-);
+  }));
+
 
 // Create axes and their renderers
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
@@ -44,13 +46,11 @@ yRenderer.labels.template.setAll({
 
 yRenderer.grid.template.set("visible", false);
 
-const yAxis = chart.yAxes.push(
-  am5xy.CategoryAxis.new(root, {
+const yAxis = chart.yAxes.push(  am5xy.CategoryAxis.new(root, {
     maxDeviation: 0,
     renderer: yRenderer,
     categoryField: "weekday"
-  })
-);
+  }));
 
 const xRenderer = am5radar.AxisRendererCircular.new(root, {
   visible: false,
@@ -64,17 +64,15 @@ xRenderer.labels.template.setAll({
 
 xRenderer.grid.template.set("visible", false);
 
-const xAxis = chart.xAxes.push(
-  am5xy.CategoryAxis.new(root, {
+const xAxis = chart.xAxes.push(  am5xy.CategoryAxis.new(root, {
     renderer: xRenderer,
     categoryField: "hour"
-  })
-);
+  }));
+
 
 // Create series
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
-const series = chart.series.push(
-  am5radar.RadarColumnSeries.new(root, {
+const series = chart.series.push(  am5radar.RadarColumnSeries.new(root, {
     calculateAggregates: true,
     stroke: am5.color(0xffffff),
     clustered: false,
@@ -83,8 +81,7 @@ const series = chart.series.push(
     categoryXField: "hour",
     categoryYField: "weekday",
     valueField: "value"
-  })
-);
+  }));
 
 series.columns.template.setAll({
   tooltipText: "{value}",
@@ -117,15 +114,15 @@ series.set("heatRules", [{
   key: "fill"
 }]);
 
+
 // Add heat legend
 // https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
-const heatLegend = chart.children.push(
-  am5.HeatLegend.new(root, {
+const heatLegend = chart.children.push(  am5.HeatLegend.new(root, {
     orientation: "horizontal",
     endColor: am5.color(0xfffb77),
     startColor: am5.color(0xfe131a)
-  })
-);
+  }));
+
 
 // Set data
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
@@ -843,6 +840,6 @@ xAxis.data.setAll([
   { hour: "11pm" }
 ]);
 
-
+// Make stuff animate on load
 // https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
 chart.appear(1000, 100);

@@ -3,9 +3,11 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -16,21 +18,19 @@ root.setThemes([
 
 // Create the map chart
 // https://www.amcharts.com/docs/v5/charts/map-chart/
-const chart = root.container.children.push(
-  am5map.MapChart.new(root, {
-    panX: "translateX",
-    panY: "translateY",
-    projection: am5map.geoMercator()
-  })
-);
+const chart = root.container.children.push(am5map.MapChart.new(root, {
+  panX: "translateX",
+  panY: "translateY",
+  projection: am5map.geoMercator()
+}));
+
 
 // Create main polygon series for countries
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
-const polygonSeries = chart.series.push(
-  am5map.MapPolygonSeries.new(root, {
-    geoJSON: am5geodata_worldLow as any
-  })
-);
+const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+  geoJSON: am5geodata_worldLow as any
+}));
+
 polygonSeries.mapPolygons.template.setAll({
   fill: root.interfaceColors.get("alternativeBackground"),
   fillOpacity: 0.15,
@@ -45,13 +45,11 @@ const circleTemplate = am5.Template.new<am5.Circle>({
   tooltipText: "{name}: {value}"
 });
 
-const bubbleSeries = chart.series.push(
-  am5map.MapPointSeries.new(root, {
-    calculateAggregates: true,
-    valueField: "value",
-    polygonIdField: "id"
-  })
-);
+const bubbleSeries = chart.series.push(am5map.MapPointSeries.new(root, {
+  calculateAggregates: true,
+  valueField: "value",
+  polygonIdField: "id"
+}));
 
 bubbleSeries.bullets.push(() => {
   return am5.Bullet.new(root, {
@@ -244,14 +242,13 @@ bubbleSeries.data.setAll([
   { "id": "ZW", "name": "Zimbabwe", "value": 12754378, circleTemplate: { fill: colors.getIndex(2) } }
 ]);
 
+
 // Add globe/map switch
-const cont = chart.children.push(
-  am5.Container.new(root, {
-    layout: root.horizontalLayout,
-    x: 20,
-    y: 40
-  })
-);
+const cont = chart.children.push(am5.Container.new(root, {
+  layout: root.horizontalLayout,
+  x: 20,
+  y: 40
+}));
 
 cont.children.push(am5.Label.new(root, {
   centerY: am5.p50,
@@ -279,11 +276,11 @@ switchButton.on("active", () => {
   }
 });
 
-cont.children.push(
-  am5.Label.new(root, {
-    centerY: am5.p50,
-    text: "Globe"
-  })
-);
+cont.children.push(am5.Label.new(root, {
+  centerY: am5.p50,
+  text: "Globe"
+}));
 
+
+// Make stuff animate on load
 chart.appear(1000, 100);

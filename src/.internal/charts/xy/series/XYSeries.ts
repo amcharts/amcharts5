@@ -184,11 +184,11 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 	 */
 	openValueYWorkingClose?: number;
 
-	categoryX?: number;
-	categoryY?: number;
+	categoryX?: string;
+	categoryY?: string;
 
-	openCategoryX?: number;
-	openCategoryY?: number;
+	openCategoryX?: string;
+	openCategoryY?: string;
 
 	locationX?: number;
 	locationY?: number;
@@ -1743,6 +1743,12 @@ export abstract class XYSeries extends Series {
 		this.setPrivate("startIndex", 0);
 		this.setPrivate("endIndex", this.dataItems.length);
 
+		this.resetExtremes();
+	}
+
+
+	// todo description
+	public resetExtremes() {
 		this.setPrivate("selectionMinX", undefined);
 		this.setPrivate("selectionMaxX", undefined);
 		this.setPrivate("selectionMinY", undefined);

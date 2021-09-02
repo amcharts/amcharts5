@@ -830,7 +830,6 @@ export class DefaultTheme extends Theme {
 			paddingBottom: 18,
 			paddingLeft: 12,
 			paddingRight: 12,
-			draggable: true,
 			centerX: 46,
 			centerY: -10,
 			y: 0,
@@ -949,6 +948,40 @@ export class DefaultTheme extends Theme {
 			fontSize: "0.8em"
 		});
 
+		this.rule("AxisLabel", ["x"]).setAll({
+			centerY: 0
+		});
+
+		this.rule("AxisLabel", ["x", "inside"]).setAll({
+			centerY: p100
+		});
+
+		this.rule("AxisLabel", ["x", "inside", "opposite"]).setAll({
+			centerY: 0
+		});
+
+		this.rule("AxisLabel", ["x", "opposite"]).setAll({
+			centerY: p100
+		});
+
+
+		this.rule("AxisLabel", ["y"]).setAll({
+			centerX: p100
+		});
+
+		this.rule("AxisLabel", ["y", "inside"]).setAll({
+			centerX: 0
+		});
+
+		this.rule("AxisLabel", ["y", "inside", "opposite"]).setAll({
+			centerX: p100
+		});
+
+		this.rule("AxisLabel", ["y", "opposite"]).setAll({
+			centerX: 0
+		});
+
+
 		this.rule("AxisLabel", ["xy", "scrollbar", "y"]).setAll({
 			visible: false
 		});
@@ -962,6 +995,8 @@ export class DefaultTheme extends Theme {
 		this.rule("Grid", ["xy", "scrollbar", "x"]).setAll({
 			opacity: 0.5
 		});
+
+
 
 
 		/**

@@ -3,9 +3,11 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -143,20 +145,20 @@ var div = document.getElementById("chartdiv");
 
 var colorSet = am5.ColorSet.new(root, {});
 
+
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/radar-chart/
-const chart = root.container.children.push(
-  am5radar.RadarChart.new(root, {
-    panX: false,
-    panY: false,
-    wheelX: "panX",
-    wheelY: "zoomX",
-    innerRadius: am5.percent(40),
-    radius: am5.percent(65),
-    startAngle: 270 - 170,
-    endAngle: 270 + 170
-  })
-);
+const chart = root.container.children.push(am5radar.RadarChart.new(root, {
+  panX: false,
+  panY: false,
+  wheelX: "panX",
+  wheelY: "zoomX",
+  innerRadius: am5.percent(40),
+  radius: am5.percent(65),
+  startAngle: 270 - 170,
+  endAngle: 270 + 170
+}));
+
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor
@@ -166,6 +168,7 @@ const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
   innerRadius: -25
 }));
 cursor.lineY.set("visible", false);
+
 
 // Create axes and their renderers
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
@@ -187,40 +190,36 @@ yRenderer.labels.template.setAll({
   centerX: am5.p50
 });
 
-const categoryAxis = chart.xAxes.push(
-  am5xy.CategoryAxis.new(root, {
-    maxDeviation: 0,
-    categoryField: "country",
-    renderer: xRenderer
-  })
-);
+const categoryAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+  maxDeviation: 0,
+  categoryField: "country",
+  renderer: xRenderer
+}));
 
-const valueAxis = chart.yAxes.push(
-  am5xy.ValueAxis.new(root, {
-    min: -3,
-    max: 6,
-    extraMax: 0.1,
-    renderer: yRenderer
-  })
-);
+const valueAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+  min: -3,
+  max: 6,
+  extraMax: 0.1,
+  renderer: yRenderer
+}));
+
 
 // Create series
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
-const series = chart.series.push(
-  am5radar.RadarColumnSeries.new(root, {
-    calculateAggregates: true,
-    name: "Series",
-    xAxis: categoryAxis,
-    yAxis: valueAxis,
-    valueYField: "value" + currentYear,
-    categoryXField: "country"
-  })
-);
+const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
+  calculateAggregates: true,
+  name: "Series",
+  xAxis: categoryAxis,
+  yAxis: valueAxis,
+  valueYField: "value" + currentYear,
+  categoryXField: "country"
+}));
 
 series.columns.template.set("strokeOpacity", 0);
 
 const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
 tooltip.label.set("text", "{categoryX}:{valueY}");
+
 
 // Set up heat rules
 // https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
@@ -238,15 +237,14 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, { orientation: "horizontal" }));
 chart.set("scrollbarY", am5.Scrollbar.new(root, { orientation: "vertical" }));
 
 // Add year label
-const yearLabel = chart.radarContainer.children.push(
-  am5.Label.new(root, {
-    fontSize: "2em",
-    text: currentYear.toString(),
-    centerX: am5.p50,
-    centerY: am5.p50,
-    fill: am5.color(0x673AB7)
-  })
-);
+const yearLabel = chart.radarContainer.children.push(am5.Label.new(root, {
+  fontSize: "2em",
+  text: currentYear.toString(),
+  centerX: am5.p50,
+  centerY: am5.p50,
+  fill: am5.color(0x673AB7)
+}));
+
 
 // Generate and set data
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
@@ -320,15 +318,13 @@ function createRange(name, continentData, index) {
 
 
 // Create controls
-const container = chart.children.push(
-  am5.Container.new(root, {
-    y: am5.percent(95),
-    centerX: am5.p50,
-    x: am5.p50,
-    width: am5.percent(80),
-    layout: root.horizontalLayout
-  })
-);
+const container = chart.children.push(am5.Container.new(root, {
+  y: am5.percent(95),
+  centerX: am5.p50,
+  x: am5.p50,
+  width: am5.percent(80),
+  layout: root.horizontalLayout
+}));
 
 const playButton = container.children.push(am5.Button.new(root, {
   themeTags: ["play"],
@@ -352,13 +348,11 @@ playButton.events.on("click", () => {
   }
 })
 
-const slider = container.children.push(
-  am5.Slider.new(root, {
-    orientation: "horizontal",
-    start: 0.5,
-    centerY: am5.p50
-  })
-);
+const slider = container.children.push(am5.Slider.new(root, {
+  orientation: "horizontal",
+  start: 0.5,
+  centerY: am5.p50
+}));
 
 slider.on("start", (start) => {
   if (start === 1) {

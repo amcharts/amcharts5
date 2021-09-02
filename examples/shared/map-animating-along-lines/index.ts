@@ -3,9 +3,11 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -16,30 +18,24 @@ root.setThemes([
 
 // Create the map chart
 // https://www.amcharts.com/docs/v5/charts/map-chart/
-const chart = root.container.children.push(
-  am5map.MapChart.new(root, {
-    panX: "rotateX",
-    panY: "rotateY",
-    projection: am5map.geoMercator()
-  })
-);
+const chart = root.container.children.push(am5map.MapChart.new(root, {
+  panX: "rotateX",
+  panY: "rotateY",
+  projection: am5map.geoMercator()
+}));
 
-const cont = chart.children.push(
-  am5.Container.new(root, {
-    layout: root.horizontalLayout,
-    x: 20,
-    y: 40
-  })
-);
+const cont = chart.children.push(am5.Container.new(root, {
+  layout: root.horizontalLayout,
+  x: 20,
+  y: 40
+}));
 
 
 // Add labels and controls
-cont.children.push(
-  am5.Label.new(root, {
-    centerY: am5.p50,
-    text: "Map"
-  })
-);
+cont.children.push(am5.Label.new(root, {
+  centerY: am5.p50,
+  text: "Map"
+}));
 
 const switchButton = cont.children.push(am5.Button.new(root, {
   themeTags: ["switch"],
@@ -56,20 +52,20 @@ switchButton.on("active", () => {
   else {
     chart.set("projection", am5map.geoOrthographic());
   }
-})
+});
 
 cont.children.push(am5.Label.new(root, {
   centerY: am5.p50,
   text: "Globe"
 }));
 
+
 // Create main polygon series for countries
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
-const polygonSeries = chart.series.push(
-  am5map.MapPolygonSeries.new(root, {
-    geoJSON: am5geodata_worldLow as any
-  })
-);
+const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+  geoJSON: am5geodata_worldLow as any
+}));
+
 
 // Create line series for trajectory lines
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
@@ -78,6 +74,7 @@ lineSeries.mapLines.template.setAll({
   stroke: root.interfaceColors.get("alternativeBackground"),
   strokeOpacity: 0.3
 });
+
 
 // Create point series for markers
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
@@ -170,4 +167,6 @@ function addCity(coords, title) {
   });
 }
 
+
+// Make stuff animate on load
 chart.appear(1000, 100);

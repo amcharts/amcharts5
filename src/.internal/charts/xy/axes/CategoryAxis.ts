@@ -68,6 +68,15 @@ export interface ICategoryAxisDataItem extends IAxisDataItem {
 	 */
 	endCategoryLocation?: number;
 
+	/**
+	 * A distance to shift data item relative to its original position.
+	 *
+	 * The value is 0 to 1, where 1 is full witdth of the axis.
+	 * 
+	 * Can be used to sort data items without modifying order of the actual data.
+	 */
+	deltaPosition?: number;
+
 }
 
 export interface ICategoryAxisPrivate extends IAxisPrivate {
@@ -153,7 +162,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivate("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));
 		}
 
-		if (this._sizeDirty || (this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("endIndex") || this.isPrivateDirty("startIndex") || this.isPrivateDirty("width") || this.isPrivateDirty("height"))) {
+		if (this._sizeDirty || this._valuesDirty || (this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("endIndex") || this.isPrivateDirty("startIndex") || this.isPrivateDirty("width") || this.isPrivateDirty("height"))) {
 			if (this.dataItems.length > 0) {
 				this._handleRangeChange();
 				this._prepareAxisItems();
@@ -461,7 +470,14 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		len -= startLocation;
 		len -= (1 - endLocation);
 
-		return (index + location - startLocation) / len;
+		let position = (index + location - startLocation) / len;
+
+		let dataItem = this.dataItems[index];
+		if (dataItem) {
+			position += dataItem.get("deltaPosition", 0);
+		}
+
+		return position;
 	}
 
 	/**
@@ -566,5 +582,5 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	public zoomToCategories(startCategory: string, endCategory: string, duration?: number) {
 		this.zoomToIndexes(this.categoryToIndex(startCategory), this.categoryToIndex(endCategory) + 1, duration);
-	}	
+	}
 }

@@ -1,11 +1,13 @@
-import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
-import { MapLine } from "./MapLine";
 import type { IMapPointSeriesDataItem } from "./MapPointSeries";
 import type { Root } from "../../core/Root";
-import * as $array from "../../core/util/Array";
 import type { DataItem } from "../../core/render/Component";
+
+import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
+import { MapLine } from "./MapLine";
 import { ListTemplate } from "../../core/util/List";
 import { Template } from "../../core/util/Template";
+
+import * as $array from "../../core/util/Array";
 
 /**
  * @ignore
@@ -33,8 +35,10 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 }
 
 export interface IMapLineSeriesSettings extends IMapSeriesSettings {
+
 	//@todo description
-	clipBack?:boolean;	
+	clipBack?: boolean;
+
 }
 
 /**
@@ -158,7 +162,7 @@ export class MapLineSeries extends MapSeries {
 						}
 					})
 
-					let geometry:any = { type: "LineString", coordinates: coordinates };
+					let geometry: any = { type: "LineString", coordinates: coordinates };
 
 					dataItem.setRaw("geometry", geometry);
 					mapLine.set("geometry", geometry);

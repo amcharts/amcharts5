@@ -159,7 +159,19 @@ export abstract class AxisRenderer extends Graphics {
 	 * @ignore
 	 */
 	public makeLabel(dataItem: DataItem<IAxisDataItem>): AxisLabel {
-		const label = this.axis.labelsContainer.children.moveValue(this.labels.make(), 0);
+	
+		const label = this.labels.make()
+
+		let themeTags = [];
+		if (this.get("opposite" as any)) {
+			themeTags.push("opposite");
+		}
+		if (this.get("inside" as any)) {
+			themeTags.push("inside");
+		}
+		label.set("themeTags", $utils.mergeTags(label.get("themeTags"), themeTags));
+		this.axis.labelsContainer.children.moveValue(label, 0);
+
 		label._setDataItem(dataItem);
 		dataItem.set("label", label);
 		this.labels.push(label);

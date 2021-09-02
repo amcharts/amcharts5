@@ -2,9 +2,11 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5hierarchy from "@amcharts/amcharts5/hierarchy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -12,27 +14,26 @@ root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+
 // Create wrapper container
-const container = root.container.children.push(
-  am5.Container.new(root, {
-    width: am5.percent(100),
-    height: am5.percent(100),
-    layout: root.verticalLayout
-  })
-);
+const container = root.container.children.push(am5.Container.new(root, {
+  width: am5.percent(100),
+  height: am5.percent(100),
+  layout: root.verticalLayout
+}));
+
 
 // Create series
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
-const series = container.children.push(
-  am5hierarchy.ForceDirected.new(root, {
-    singleBranchOnly: false,
-    downDepth: 1,
-    initialDepth: 2,
-    valueField: "value",
-    categoryField: "name",
-    childDataField: "children"
-  })
-);
+const series = container.children.push(am5hierarchy.ForceDirected.new(root, {
+  singleBranchOnly: false,
+  downDepth: 1,
+  initialDepth: 2,
+  valueField: "value",
+  categoryField: "name",
+  childDataField: "children"
+}));
+
 
 // Generate and set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
@@ -79,4 +80,6 @@ function generateLevel(data: any, name: string, level: number) {
   return data;
 }
 
+
+// Make stuff animate on load
 series.appear(1000, 100);

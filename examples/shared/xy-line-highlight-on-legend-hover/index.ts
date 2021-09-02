@@ -35,7 +35,10 @@ let value = 100;
 function generateData() {
   value = Math.round((Math.random() * 10 - 4.2) + value);
   am5.time.add(date, "day", 1);
-  return { date: date.getTime(), value: value };
+  return {
+    date: date.getTime(),
+    value: value
+  };
 }
 
 function generateDatas(count) {
@@ -52,9 +55,15 @@ function generateDatas(count) {
 let xAxis = chart.xAxes.push(
   am5xy.DateAxis.new(root, {
     maxDeviation: 0,
-    baseInterval: { timeUnit: "day", count: 1 },
+    baseInterval: {
+      timeUnit: "day",
+      count: 1
+    },
     renderer: am5xy.AxisRendererX.new(root, {}),
-    tooltip: am5.Tooltip.new(root, { themeTags: ["axis"], animationDuration: 200 })
+    tooltip: am5.Tooltip.new(root, {
+      themeTags: ["axis"],
+      animationDuration: 200
+    })
   })
 );
 
@@ -65,11 +74,21 @@ let yAxis = chart.yAxes.push(
 );
 
 
-
+// Add series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
 for (let i = 0; i < 10; i++) {
-  let series = chart.series.push(am5xy.LineSeries.new(root, { name: "Series " + i, xAxis: xAxis, yAxis: yAxis, valueYField: "value", valueXField: "date", legendValueText: "{valueY}" }));
+  let series = chart.series.push(am5xy.LineSeries.new(root, {
+    name: "Series " + i,
+    xAxis: xAxis,
+    yAxis: yAxis,
+    valueYField: "value",
+    valueXField: "date",
+    legendValueText: "{valueY}"
+  }));
 
-  let tooltip = series.set("tooltip", am5.Tooltip.new(root, { pointerOrientation: "horizontal" }));
+  let tooltip = series.set("tooltip", am5.Tooltip.new(root, {
+    pointerOrientation: "horizontal"
+  }));
   tooltip.label.set("text", "{valueY}");
 
   date = new Date();
@@ -84,7 +103,12 @@ for (let i = 0; i < 10; i++) {
   series.appear();
 }
 
-let cursor = chart.set("cursor", am5xy.XYCursor.new(root, { behavior: "zoomX" }));
+
+// Add cursor
+// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+  behavior: "zoomX"
+}));
 cursor.lineY.set("visible", false);
 
 
@@ -112,7 +136,7 @@ let legend = chart.rightAxesContainer.children.push(
 // When legend item container is hovered, dim all the series except the hovered one
 legend.itemContainers.template.events.on("pointerover", function(e) {
   let itemContainer = e.target;
-  
+
   // As series list is data of a legend, dataContext is series
   let series = itemContainer.dataItem.dataContext;
 
@@ -122,8 +146,7 @@ legend.itemContainers.template.events.on("pointerover", function(e) {
         strokeOpacity: 0.15,
         stroke: am5.color(0x000000)
       });
-    }
-    else {
+    } else {
       chartSeries.strokes.template.setAll({
         strokeWidth: 3
       });
@@ -153,6 +176,7 @@ legend.valueLabels.template.setAll({
 
 // It's is important to set legend data after all the events are set on template, otherwise events won't be copied
 legend.data.setAll(chart.series.values);
+
 
 // Make stuff animate on load
 // https://www.amcharts.com/docs/v5/concepts/animations/

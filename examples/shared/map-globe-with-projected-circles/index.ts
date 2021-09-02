@@ -3,9 +3,11 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -16,13 +18,12 @@ root.setThemes([
 
 // Create the map chart
 // https://www.amcharts.com/docs/v5/charts/map-chart/
-const chart = root.container.children.push(
-  am5map.MapChart.new(root, {
-    panX: "rotateX",
-    panY: "rotateY",
-    projection: am5map.geoOrthographic()
-  })
-);
+const chart = root.container.children.push(am5map.MapChart.new(root, {
+  panX: "rotateX",
+  panY: "rotateY",
+  projection: am5map.geoOrthographic()
+}));
+
 
 // Create series for background fill
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
@@ -34,17 +35,17 @@ backgroundSeries.mapPolygons.template.setAll({
   fillOpacity: 0.1,
   strokeOpacity: 0
 });
-backgroundSeries.data.push({geometry:
-  am5map.getGeoRectangle(90, 180, -90, -180)
+backgroundSeries.data.push({
+  geometry:
+    am5map.getGeoRectangle(90, 180, -90, -180)
 });
+
 
 // Create main polygon series for countries
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
-const polygonSeries = chart.series.push(
-  am5map.MapPolygonSeries.new(root, {
-    geoJSON: am5geodata_worldLow as any
-  })
-);
+const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+  geoJSON: am5geodata_worldLow as any
+}));
 polygonSeries.mapPolygons.template.setAll({
   fill: root.interfaceColors.get("alternativeBackground"),
   fillOpacity: 0.15,
@@ -52,10 +53,9 @@ polygonSeries.mapPolygons.template.setAll({
   stroke: root.interfaceColors.get("background")
 });
 
+
 // Create polygon series for projected circles
-const circleSeries = chart.series.push(
-  am5map.MapPolygonSeries.new(root, {})
-);
+const circleSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
 circleSeries.mapPolygons.template.setAll({
   templateField: "polygonTemplate",
   tooltipText: "{name}:{value}"
@@ -269,7 +269,7 @@ polygonSeries.events.on("datavalidated", () => {
     if (countryPolygon) {
       const geometry = am5map.getGeoCircle(countryPolygon.visualCentroid(), radius);
       circleSeries.data.push({
-        name:dataContext.name,
+        name: dataContext.name,
         value: dataContext.value,
         polygonTemplate: dataContext.polygonTemplate,
         geometry: geometry
@@ -278,4 +278,6 @@ polygonSeries.events.on("datavalidated", () => {
   }
 })
 
+
+// Make stuff animate on load
 chart.appear(1000, 100);

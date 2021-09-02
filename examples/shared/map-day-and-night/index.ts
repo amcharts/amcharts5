@@ -3,9 +3,11 @@ import * as am5map from "@amcharts/amcharts5/map";
 import am5geodata_worldLow from "@amcharts/amcharts5/geodata/worldLow";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -13,30 +15,26 @@ root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+
 // Create the map chart
 // https://www.amcharts.com/docs/v5/charts/map-chart/
-const chart = root.container.children.push(
-  am5map.MapChart.new(root, {
-    panX: "rotateX",
-    panY: "rotateY",
-    projection: am5map.geoMercator()
-  })
-);
+const chart = root.container.children.push(am5map.MapChart.new(root, {
+  panX: "rotateX",
+  panY: "rotateY",
+  projection: am5map.geoMercator()
+}));
 
 
 // Create main polygon series for countries
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
-const polygonSeries = chart.series.push(
-  am5map.MapPolygonSeries.new(root, {
-    geoJSON: am5geodata_worldLow as any
-  })
-);
+const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+  geoJSON: am5geodata_worldLow as any
+}));
+
 
 // Create point series for Sun icon
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
-const sunSeries = chart.series.push(
-  am5map.MapPointSeries.new(root, {})
-);
+const sunSeries = chart.series.push(am5map.MapPointSeries.new(root, {}));
 
 sunSeries.bullets.push(() => {
   const circle = am5.Circle.new(root, {
@@ -70,11 +68,10 @@ sunSeries.bullets.push(() => {
 
 const sunDataItem = sunSeries.pushDataItem({});
 
+
 // Create polygon series for night-time polygons
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
-const nightSeries = chart.series.push(
-  am5map.MapPolygonSeries.new(root, {})
-);
+const nightSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
 
 nightSeries.mapPolygons.template.setAll({
   fill: am5.color(0x000000),
@@ -86,16 +83,15 @@ const nightDataItem0 = nightSeries.pushDataItem({});
 const nightDataItem1 = nightSeries.pushDataItem({});
 const nightDataItem2 = nightSeries.pushDataItem({});
 
+
 // Create controls
-const container = chart.children.push(
-  am5.Container.new(root, {
-    y: am5.percent(95),
-    centerX: am5.p50,
-    x: am5.p50,
-    width: am5.percent(80),
-    layout: root.horizontalLayout
-  })
-);
+const container = chart.children.push(am5.Container.new(root, {
+  y: am5.percent(95),
+  centerX: am5.p50,
+  x: am5.p50,
+  width: am5.percent(80),
+  layout: root.horizontalLayout
+}));
 
 const playButton = container.children.push(am5.Button.new(root, {
   themeTags: ["play"],
@@ -117,7 +113,7 @@ playButton.events.on("click", () => {
       duration: 15000 * (1 - slider.get("start"))
     });
   }
-})
+});
 
 const slider = container.children.push(
   am5.Slider.new(root, {
@@ -131,20 +127,18 @@ slider.on("start", (start) => {
   if (start === 1) {
     playButton.set("active", false);
   }
-})
+});
 
 slider.events.on("rangechanged", () => {
   updateDateNight((slider.get("start", 0) - 0.5) * am5.time.getDuration("day", 2) + new Date().getTime());
-})
+});
 
 
-const cont = chart.children.push(
-  am5.Container.new(root, {
-    layout: root.horizontalLayout,
-    x: 20,
-    y: 40
-  })
-);
+const cont = chart.children.push(am5.Container.new(root, {
+  layout: root.horizontalLayout,
+  x: 20,
+  y: 40
+}));
 
 cont.children.push(am5.Label.new(root, {
   centerY: am5.p50,

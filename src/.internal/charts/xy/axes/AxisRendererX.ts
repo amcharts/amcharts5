@@ -74,10 +74,6 @@ export class AxisRendererX extends AxisRenderer {
 		super._afterNew();
 		this._setPrivate("letter", "X");
 
-		const labelTemplate = this.labels.template;
-		labelTemplate.set("centerY", 0);
-		labelTemplate.set("y", 0);
-
 		const gridTemplate = this.grid.template;
 		gridTemplate.set("height", p100);
 		gridTemplate.set("width", 0);
@@ -86,7 +82,6 @@ export class AxisRendererX extends AxisRenderer {
 			display.lineTo(0, graphics.height());
 		});
 
-		//this.setAll({ height: 0, width: p100 })
 		this.set("draw", (display, graphics) => {
 			display.moveTo(0, 0);
 			display.lineTo(graphics.width(), 0);
@@ -244,24 +239,20 @@ export class AxisRendererX extends AxisRenderer {
 				if (!inside) {
 					label.set("position", "relative");
 					label.set("y", p100);
-					label.set("centerY", p100);
 				}
 				else {
 					label.set("position", "absolute");
 					label.set("y", 0)
-					label.set("centerY", 0);
 				}
 			}
 			else {
 				if (!inside) {
 					label.set("y", undefined);
 					label.set("position", "relative");
-					label.set("centerY", 0);
 				}
 				else {
 					label.set("y", 0)
 					label.set("position", "absolute");
-					label.set("centerY", p100);
 				}
 			}
 

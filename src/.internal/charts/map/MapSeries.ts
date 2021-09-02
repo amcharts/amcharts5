@@ -1,8 +1,10 @@
 import type { MapChart } from "./MapChart";
+import type { GeoProjection, GeoPath } from "d3-geo";
+
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
+
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
-import type { GeoProjection, GeoPath } from "d3-geo";
 
 export interface IMapSeriesDataItem extends ISeriesDataItem {
 	geometry?: GeoJSON.Geometry;

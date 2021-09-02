@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.8] - 2021-09-02
+
+### Added
+- `deltaPosition` added to data item of a `CategoryAxis`. Can be used for sorting series columns without modifying data order.
+- `resetExtremes()` method added to `XYSeries`. Resets series extremes to `undefined`. Can be used when values of a series are changed from outside.
+
+
 ## [5.0.0-beta.7] - 2021-08-31
 
 ### Added

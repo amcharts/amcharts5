@@ -1,8 +1,9 @@
 import type { Root } from "../../core/Root";
-import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import type { MapLineSeries } from "./MapLineSeries";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { Template } from "../../core/util/Template";
+
+import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
 
 export interface IMapLineSettings extends IGraphicsSettings {
@@ -40,6 +41,7 @@ export class MapLine extends Graphics {
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
 	 * @param   root      Root element
 	 * @param   settings  Settings
+	 * @param   template  Template
 	 * @param   template  Template
 	 * @return            Instantiated object
 	 */

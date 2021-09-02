@@ -75,10 +75,6 @@ export class AxisRendererY extends AxisRenderer {
 		super._afterNew();
 		this._setPrivate("letter", "Y");
 
-		const labelTemplate = this.labels.template;
-		labelTemplate.set("centerX", 0);
-		//labelTemplate.set("x", p100);
-
 		const gridTemplate = this.grid.template;
 		gridTemplate.set("width", p100);
 		gridTemplate.set("height", 0);
@@ -201,7 +197,6 @@ export class AxisRendererY extends AxisRenderer {
 			const inside = label.get("inside", this.get("inside", false));
 
 			if (opposite) {
-				label.set("centerX", 0);
 				label.set("x", 0);
 
 				if (inside) {
@@ -215,12 +210,10 @@ export class AxisRendererY extends AxisRenderer {
 				if (inside) {
 					label.set("x", 0);
 					label.set("position", "absolute");
-					label.set("centerX", 0);
 				}
 				else {
 					label.set("x", undefined);
 					label.set("position", "relative");
-					label.set("centerX", p100);
 				}
 			}
 
