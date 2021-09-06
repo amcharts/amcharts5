@@ -634,6 +634,7 @@ export class LineSeries extends XYSeries {
 				if (bulletFunction) {
 					const bullet = bulletFunction(this._root, this, new DataItem(this, {}, {}));
 					const sprite = bullet.get("sprite");
+
 					if (sprite instanceof Graphics) {
 						sprite.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
 					}

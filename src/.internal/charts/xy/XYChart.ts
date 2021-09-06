@@ -240,6 +240,8 @@ export class XYChart extends SerialChart {
 
 	public _movePoint: IPoint = { x: 0, y: 0 };
 
+	protected _wheelDp: IDisposer | undefined;
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -287,18 +289,18 @@ export class XYChart extends SerialChart {
 		this._disposers.push(this.plotContainer.events.on("globalpointermove", (event) => {
 			this._handlePlotMove(event.originalEvent);
 		}));
+	}
 
-		// TODO: maybe set this on-demand only and if wheelX/wheelY are actually set
-		// TODO: also properly dispose those events if wheelX/wheelY is disabled
-		this.plotContainer.set("wheelable", true);
-		this._disposers.push(this.plotContainer.events.on("wheel", (event) => {
+	protected _handleSetWheel() {
+		const wheelX = this.get("wheelX");
+		const wheelY = this.get("wheelY");
+		const plotContainer = this.plotContainer;
 
-			const wheelX = this.get("wheelX");
-			const wheelY = this.get("wheelY");
-
-			if (wheelX !== "none" || wheelY !== "none") {
+		if (wheelX !== "none" || wheelY !== "none") {
+			this.plotContainer.set("wheelable", true);
+			this._wheelDp = plotContainer.events.on("wheel", (event) => {
 				const wheelEvent = event.originalEvent;
-				const plotContainer = this.plotContainer;
+
 				const plotPoint = plotContainer._display.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
 				const wheelStep = this.get("wheelStep", 0.2);
 
@@ -440,8 +442,16 @@ export class XYChart extends SerialChart {
 						}
 					})
 				}
+			});
+
+			this._disposers.push(this._wheelDp);
+		}
+		else {
+			plotContainer.set("wheelable", false);
+			if (this._wheelDp) {
+				this._wheelDp.dispose();
 			}
-		}));
+		}
 	}
 
 	protected _handlePlotDown(event: IPointerEvent) {
@@ -646,18 +656,13 @@ export class XYChart extends SerialChart {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		// this can't go to process series as theme is not know for SB chart add the moment
 		this.series.each((series) => {
-
-			const colorSet = this.get("colors")!;
-			if (series.get("fill") == null) {
-				const color = colorSet.next();
-
-				series._setSoft("stroke", color);
-				series._setSoft("fill", color);
-			}
+			this._colorize(series);
 		})
 
+		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
+			this._handleSetWheel();
+		}
 
 		if (this.isDirty("cursor")) {
 			const previous = this._prevSettings.cursor;
@@ -758,6 +763,23 @@ export class XYChart extends SerialChart {
 		}
 
 		this._handleZoomOut();
+	}
+
+	protected _processSeries(series: this["_seriesType"]) {
+		super._processSeries(series);
+		this._colorize(series);
+	}
+
+	protected _colorize(series: this["_seriesType"]) {
+		const colorSet = this.get("colors")!;
+		if (colorSet) {
+			if (series.get("fill") == null) {
+				const color = colorSet.next();
+
+				series._setSoft("stroke", color);
+				series._setSoft("fill", color);
+			}
+		}
 	}
 
 	protected _handleCursorSelectEnd() {
@@ -941,7 +963,7 @@ export class XYChart extends SerialChart {
 	 */
 	public inPlot(point: IPoint): boolean {
 		const plotContainer = this.plotContainer;
-		if (point.x >= 0 && point.y >= 0 && point.x <= plotContainer.width() && point.y <= plotContainer.height()) {
+		if (point.x >= -0.1 && point.y >= -0.1 && point.x <= plotContainer.width() + 0.1 && point.y <= plotContainer.height() + 0.1) {
 			return true
 		}
 		return false;
@@ -1005,7 +1027,7 @@ export class XYChart extends SerialChart {
 					}
 
 					let local = this.plotContainer._display.toLocal(point);
-					if (local.y < 0 || local.y > h || local.x < 0 || local.x > w) {
+					if (!this.inPlot(local) || !tooltip.dataItem) {
 						hidden = true;
 					}
 					else {
@@ -1020,7 +1042,7 @@ export class XYChart extends SerialChart {
 					}
 					else {
 						tooltip.show();
-						tooltips.push(tooltip);						
+						tooltips.push(tooltip);
 					}
 				}
 			}

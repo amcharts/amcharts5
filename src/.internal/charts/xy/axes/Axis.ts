@@ -156,7 +156,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	fixAxisSize?: boolean;
 
 	// @todo description
-	bullet?: (root: Root, axis:Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
+	bullet?: (root: Root, axis: Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
 
 }
 
@@ -250,14 +250,14 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * 
 	 * @default Container.new()
 	 */
-	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100 });	
+	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100 });
 
 	/**
 	 * A [[Container]] that holds all the axis bullet elements.
 	 *
 	 * @default new Container
 	 */
-	public readonly bulletsContainer: Container = Container.new(this._root, { isMeasured:false, width: p100, height: p100, position:"absolute" });
+	public readonly bulletsContainer: Container = Container.new(this._root, { isMeasured: false, width: p100, height: p100, position: "absolute" });
 
 	/**
 	 * A referenece to the the chart the axis belongs to.
@@ -461,9 +461,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			}
 
 			if (duration > 0) {
+				let easing = this.get("interpolationEasing");
 
-				let sAnimation = this.animate({ key: "start", to: start, duration: duration, easing: this.get("interpolationEasing") });
-				let eAnimation = this.animate({ key: "end", to: end, duration: duration, easing: this.get("interpolationEasing") });
+				let sAnimation = this.animate({ key: "start", to: start, duration: duration, easing: easing });
+				let eAnimation = this.animate({ key: "end", to: end, duration: duration, easing: easing });
 
 				this._sAnimation = sAnimation;
 				this._eAnimation = eAnimation;
@@ -499,14 +500,14 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this._prepareDataItem(dataItem);
 
 		const grid = dataItem.get("grid");
-		if(grid){
+		if (grid) {
 			this.topGridContainer.children.push(grid);
 		}
 
 		const fill = dataItem.get("axisFill");
-		if(fill){
+		if (fill) {
 			this.topGridContainer.children.push(fill);
-		}		
+		}
 	}
 
 	public _prepareDataItem(_dataItem: DataItem<this["_dataItemSettings"]>, _index?: number) {
@@ -657,10 +658,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			chart._handleAxisSelection(this);
 		});
 
-		chart.plotContainer.onPrivate("width", ()=>{
+		chart.plotContainer.onPrivate("width", () => {
 			this.markDirtySize()
 		});
-		chart.plotContainer.onPrivate("height", ()=>{
+		chart.plotContainer.onPrivate("height", () => {
 			this.markDirtySize()
 		});
 

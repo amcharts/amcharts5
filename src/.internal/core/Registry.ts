@@ -10,10 +10,15 @@ export class Registry {
 	 */
 	licenses: String[] = [];
 
+	/**
+	 * Entities that have their `id` setting set.
+	 */
+	entitiesById: { [index: string]: any } = {};
+
 }
 
 /**
-  * @ignore
+	* @ignore
  */
 export const registry = new Registry();
 

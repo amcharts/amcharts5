@@ -85,11 +85,24 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 */
 	polygonIdField?: string;
 
-	//@todo description
-	clipFront?:boolean;
+	/**
+	 * If set to `true` will hide all points that are in the visible range of
+	 * the map.
+	 */
+	clipFront?: boolean;
 
-	//@todo description
-	clipBack?:boolean;
+	/**
+	 * If set to `true` will hide all points that are in the invisible range of
+	 * the map.
+	 *
+	 * For example on the side of the globe facing away from the viewer when
+	 * used with Orthographic projection.
+	 *
+	 * NOTE: not all projections have invisible side.
+	 *
+	 * @default true
+	 */
+	clipBack?: boolean;
 
 };
 
@@ -286,12 +299,12 @@ export class MapPointSeries extends MapSeries {
 
 			let visible = true;
 			if (geoPath(geometry)) {
-				if(this.get("clipFront")){
+				if (this.get("clipFront")) {
 					visible = false;
 				}
 			}
 			else {
-				if(this.get("clipBack")){
+				if (this.get("clipBack")) {
 					visible = false;
 				}
 			}

@@ -36,7 +36,15 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 
 export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 
-	//@todo description
+	/**
+	 * If set to `true` will hide line segments that are in the invisible range
+	 * of the map.
+	 *
+	 * For example on the side of the globe facing away from the viewer when
+	 * used with Orthographic projection.
+	 *
+	 * NOTE: not all projections have invisible side.
+	 */
 	clipBack?: boolean;
 
 }

@@ -22,6 +22,7 @@ import * as $mapUtils from "./MapUtils";
 import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
 
+import type { IDisposer } from "../../core/util/Disposer";
 import type { ISpritePointerEvent } from "../../core/render/Sprite";
 
 export interface IMapChartSettings extends ISerialChartSettings {
@@ -278,6 +279,8 @@ export class MapChart extends SerialChart {
 
 	protected _dispatchBounds: boolean = false;
 
+	protected _wheelDp: IDisposer | undefined;
+
 	protected makeGeoPath() {
 		const projection = this.get("projection")!;
 		const path = geoPath();
@@ -299,6 +302,59 @@ export class MapChart extends SerialChart {
 		return this._geoBounds;
 	}
 
+	protected _handleSetWheel() {
+
+		const wheelX = this.get("wheelX");
+		const wheelY = this.get("wheelY");
+		const chartContainer = this.chartContainer;
+
+		if (wheelX != "none" || wheelY != "none") {
+
+			chartContainer.set("wheelable", true);
+			this._wheelDp = chartContainer.events.on("wheel", (event) => {
+				const wheelEasing = this.get("wheelEasing")!;
+				const wheelSensitivity = this.get("wheelSensitivity", 1);
+				const wheelDuration = this.get("wheelDuration", 0);
+
+				const wheelEvent = event.originalEvent;
+
+
+				const chartContainer = this.chartContainer;
+				const point = chartContainer._display.toLocal(event.point);
+
+				if ((wheelY == "zoom")) {
+					this._handleWheelZoom(wheelEvent.deltaY, point);
+				}
+				else if (wheelY == "rotateY") {
+					this._handleWheelRotateY(wheelEvent.deltaY / 5 * wheelSensitivity, wheelDuration, wheelEasing);
+				}
+				else if (wheelY == "rotateX") {
+					this._handleWheelRotateX(wheelEvent.deltaY / 5 * wheelSensitivity, wheelDuration, wheelEasing);
+				}
+
+				if ((wheelX == "zoom")) {
+					this._handleWheelZoom(wheelEvent.deltaX, point);
+				}
+				else if (wheelX == "rotateY") {
+					this._handleWheelRotateY(wheelEvent.deltaX / 5 * wheelSensitivity, wheelDuration, wheelEasing);
+				}
+				else if (wheelX == "rotateX") {
+					this._handleWheelRotateX(wheelEvent.deltaX / 5 * wheelSensitivity, wheelDuration, wheelEasing);
+				}
+
+			});
+
+			this._disposers.push(this._wheelDp);
+		}
+		else {
+			chartContainer.set("wheelable", false);
+			console.log("dispose")
+			if (this._wheelDp) {
+				this._wheelDp.dispose();
+			}
+		}
+	}
+
 	public _prepareChildren() {
 		super._prepareChildren();
 
@@ -310,6 +366,9 @@ export class MapChart extends SerialChart {
 			this._fitMap();
 		}
 
+		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
+			this._handleSetWheel();
+		}
 
 		if (this._dirtyGeometries) {
 			this._geometryColection.geometries = [];
@@ -503,45 +562,6 @@ export class MapChart extends SerialChart {
 		if (this.get("translateY") == null) {
 			this.set("translateY", this.height() / 2);
 		}
-
-		// TODO: maybe set this on-demand only and if wheelX/wheelY are actually set
-		// TODO: also properly dispose those events if wheelX/wheelY is disabled
-		this.chartContainer.set("wheelable", true);
-		this._disposers.push(this.chartContainer.events.on("wheel", (event) => {
-			const wheelX = this.get("wheelX");
-			const wheelY = this.get("wheelY");
-
-			const wheelEasing = this.get("wheelEasing")!;
-			const wheelSensitivity = this.get("wheelSensitivity", 1);
-			const wheelDuration = this.get("wheelDuration", 0);
-
-			const wheelEvent = event.originalEvent;
-
-			if (wheelX != "none" || wheelY != "none") {
-				const chartContainer = this.chartContainer;
-				const point = chartContainer._display.toLocal(event.point);
-
-				if ((wheelY == "zoom")) {
-					this._handleWheelZoom(wheelEvent.deltaY, point);
-				}
-				else if (wheelY == "rotateY") {
-					this._handleWheelRotateY(wheelEvent.deltaY / 5 * wheelSensitivity, wheelDuration, wheelEasing);
-				}
-				else if (wheelY == "rotateX") {
-					this._handleWheelRotateX(wheelEvent.deltaY / 5 * wheelSensitivity, wheelDuration, wheelEasing);
-				}
-
-				if ((wheelX == "zoom")) {
-					this._handleWheelZoom(wheelEvent.deltaX, point);
-				}
-				else if (wheelX == "rotateY") {
-					this._handleWheelRotateY(wheelEvent.deltaX / 5 * wheelSensitivity, wheelDuration, wheelEasing);
-				}
-				else if (wheelX == "rotateX") {
-					this._handleWheelRotateX(wheelEvent.deltaX / 5 * wheelSensitivity, wheelDuration, wheelEasing);
-				}
-			}
-		}));
 
 		// Setting trasnparent background so that full body of the plot container
 		// is interactive

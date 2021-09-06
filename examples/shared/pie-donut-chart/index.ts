@@ -37,6 +37,10 @@ series.labels.template.setAll({
   centerY: 0
 });
 
+series.ticks.template.setAll({
+  forceHidden: true
+});
+
 
 // Set data
 // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data

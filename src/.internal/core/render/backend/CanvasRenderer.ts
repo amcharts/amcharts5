@@ -2472,6 +2472,7 @@ interface Event<Key extends keyof IRendererEvents> {
 	object: CanvasDisplayObject;
 	context: unknown;
 	callback: (event: IRendererEvents[Key]) => void;
+	disposed: boolean;
 }
 
 /**
@@ -2480,6 +2481,8 @@ interface Event<Key extends keyof IRendererEvents> {
 interface Events<Key extends keyof IRendererEvents> {
 	disposer: IDisposer;
 	callbacks: Array<Event<Key>>;
+	dispatching: boolean;
+	cleanup: boolean;
 }
 
 /**
@@ -2716,6 +2719,14 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		layer.order = order;
 		layer.visible = visible;
 
+
+		if (layer.visible) {
+			layer.view.width = this._width;
+			layer.view.style.width = this._width + "px";
+			layer.view.height = this._height;
+			layer.view.style.height = this._height + "px";
+		}
+
 		layers.push(layer);
 
 		layers.sort((a, b) => {
@@ -2845,18 +2856,46 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		}
 	}
 
+	_withEvents<Key extends keyof IRendererEvents>(key: Key, f: (events: Events<Key>) => void): void {
+		const events = this._events[key] as Events<Key> | undefined;
+
+		if (events !== undefined) {
+			events.dispatching = true;
+
+			try {
+				f(events);
+
+			} finally {
+				events.dispatching = false;
+
+				if (events.cleanup) {
+					events.cleanup = false;
+
+					$array.keepIf(events.callbacks, (callback) => {
+						return !callback.disposed;
+					});
+
+					if (events.callbacks.length === 0) {
+						events.disposer.dispose();
+						delete this._events[key];
+					}
+				}
+			}
+		}
+	}
+
 	_dispatchEventAll<Key extends keyof IRendererEvents>(key: Key, event: IRendererEvents[Key]): void {
 		if (!this.interactionsEnabled) {
 			return;
 		}
 
-		const events = this._events[key] as Events<Key> | undefined;
-
-		if (events !== undefined) {
+		this._withEvents(key, (events) => {
 			$array.each(events.callbacks, (callback) => {
-				callback.callback.call(callback.context, event);
+				if (!callback.disposed) {
+					callback.callback.call(callback.context, event);
+				}
 			});
-		}
+		});
 	}
 
 	_dispatchEvent<Key extends keyof IRendererEvents>(key: Key, target: CanvasDisplayObject, event: IRendererEvents[Key]): boolean {
@@ -2864,18 +2903,17 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 			return false;
 		}
 
-		const events = this._events[key] as Events<Key> | undefined;
 		let dispatched = false;
 
-		if (events !== undefined) {
+		this._withEvents(key, (events) => {
 			$array.each(events.callbacks, (callback) => {
 				//console.log(key, callback.object === target)
-				if (callback.object === target) {
+				if (!callback.disposed && callback.object === target) {
 					callback.callback.call(callback.context, event);
 					dispatched = true;
 				}
 			});
-		}
+		});
 
 		return dispatched;
 	}
@@ -3119,19 +3157,28 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 			events = this._events[key] = {
 				disposer: this._initEvent(key)!,
 				callbacks: [],
+				dispatching: false,
+				cleanup: false,
 			};
 		}
 
-		const listener = { object, context, callback };
+		const listener = { object, context, callback, disposed: false };
 
 		events!.callbacks.push(listener);
 
 		return new Disposer(() => {
-			$array.removeFirst(events!.callbacks, listener);
+			listener.disposed = true;
 
-			if (events!.callbacks.length === 0) {
-				events!.disposer.dispose();
-				delete this._events[key];
+			if (events!.dispatching) {
+				events!.cleanup = true;
+
+			} else {
+				$array.removeFirst(events!.callbacks, listener);
+
+				if (events!.callbacks.length === 0) {
+					events!.disposer.dispose();
+					delete this._events[key];
+				}
 			}
 		});
 	}

@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.9] - 2021-09-06
+
+### Added
+- `id` setting to all entities. If set, will also appear in `am5.registry.entitiesById`.
+- `show()` and `hide()` methods of `DataItem` now accept duration param.
+
+### Fixed
+- Stacking of horizontal bars was not working properly.
+- Children of a `Container` were not being disposed properly together with the container itself.
+- Tooltip for a series close to the top/bottom of a plot area sometimes was not being displayed.
+- `PieSeries` was overriding label `textType` setting.
+- `XYChart` and `MapChart` were taking over mouse wheel action even when `wheelY` and `wheelX` were set to `"none"`.
+- `XYCursor` was not showing series tooltips if Y axis was not a `ValueAxis`.
+- `XYCursor` was showing previous data point tooltip if currently hovered position did not have data item or value was null.
+- Percent chart could go to SO if there were no values in data.
+- Changing `layer` value dynamically was not working properly.
+
+
 ## [5.0.0-beta.8] - 2021-09-02
 
 ### Added

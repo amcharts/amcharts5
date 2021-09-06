@@ -409,6 +409,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * IMPORTANT: SVG filters are not supported in some browsers, e.g. Safari.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter} for more info
+	 * @ignore todo: figure out if we still need this
 	 */
 	filter?: string;
 
@@ -730,7 +731,7 @@ export abstract class Sprite extends Entity {
 
 	// TODO change this to run before the element is added to the parent, so that way
 	//      it doesn't need to apply the themes twice
-	public _setDataItem(dataItem: DataItem<unknown>): void {
+	public _setDataItem(dataItem: DataItem<unknown> | undefined): void {
 		const oldDataItem = this._dataItem
 		this._dataItem = dataItem;
 		this._processTemplateField();

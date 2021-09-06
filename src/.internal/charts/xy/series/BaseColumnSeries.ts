@@ -364,7 +364,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 					if (stacked) {
 						let stackToItemX = dataItem.get("stackToItemX")!;
 						if (stackToItemX) {
-							l = xAxis.getDataItemPositionY(stackToItemX, xField, openLocationX, (stackToItemX.component as XYSeries).get("vcx"));
+							l = xAxis.getDataItemPositionX(stackToItemX, xField, openLocationX, (stackToItemX.component as XYSeries).get("vcx"));
 						}
 						else {
 							l = xAxis.basePosition();

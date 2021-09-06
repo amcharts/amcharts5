@@ -1,10 +1,13 @@
 import type { Root } from "../Root";
+import type { Template } from "./Template";
+import type { Theme } from "../Theme";
+
 import { IDisposer, Disposer } from "./Disposer";
 import { EventDispatcher, Events } from "./EventDispatcher";
 import { Time, IAnimation, getInterpolate } from "./Animation";
 import { States } from "./States";
-import type { Template } from "./Template";
-import type { Theme } from "../Theme";
+import { registry } from "../Registry";
+
 import * as $object from "./Object";
 import * as $ease from "./Ease";
 import * as $array from "./Array";
@@ -104,6 +107,15 @@ export interface IEntitySettings {
 	 * Easing of transition from one state to another.
 	 */
 	stateAnimationEasing?:$ease.Easing;
+
+	/**
+	 * A custom string ID for the element.
+	 *
+	 * If set, element can be looked up via `am5.registry.entitiesById`.
+	 *
+	 * Will raise error if an element with the same ID already exists.
+	 */
+	id?: string;
 
 }
 
@@ -551,9 +563,9 @@ export abstract class Settings implements IDisposer, IAnimation {
 		const animation = this._animatingSettings[key];
 
 		if (animation) {
-			animation.stop();
 			delete this._animatingSettings[key];
 			--this._animatingCount;
+			animation.stop();
 		}
 	}
 
@@ -566,8 +578,8 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 * @return            Setting value
 	 */
 	public set<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
-		this._stopAnimation(key);
 		this._set(key, value);
+		this._stopAnimation(key);
 		return value;
 	}
 
@@ -578,8 +590,6 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 * @param   key       Setting key
 	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key): void {
-		this._stopAnimation(key);
-
 		if (key in this._settings) {
 			this._prevSettings[key] = (<any>this._settings)[key];
 
@@ -588,6 +598,8 @@ export abstract class Settings implements IDisposer, IAnimation {
 			this._sendKeyEvent(key, undefined as any);
 			this._markDirtyKey(key);
 		}
+
+		this._stopAnimation(key);
 	}
 
 	/**
@@ -659,8 +671,8 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 * @ignore
 	 */
 	public setPrivate<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
-		this._stopAnimationPrivate(key);
 		this._setPrivate(key, value);
+		this._stopAnimationPrivate(key);
 		return value;
 	}
 
@@ -668,8 +680,6 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 * @ignore
 	 */
 	public removePrivate<Key extends keyof this["_privateSettings"]>(key: Key): void {
-		this._stopAnimationPrivate(key);
-
 		if (key in this._privateSettings) {
 			this._prevPrivateSettings[key] = (<any>this._privateSettings)[key];
 
@@ -677,6 +687,8 @@ export abstract class Settings implements IDisposer, IAnimation {
 
 			this._markDirtyPrivateKey(key);
 		}
+
+		this._stopAnimationPrivate(key);
 	}
 
 	/**
@@ -1321,7 +1333,24 @@ export abstract class Entity extends Settings implements IDisposer {
 
 	public _changed(): void { }
 
-	public _beforeChanged(): void {	}
+	public _beforeChanged(): void {
+
+		if (this.isDirty("id")) {
+			const id = this.get("id")!;
+			if (id) {
+				if (registry.entitiesById[id]) {
+					throw new Error("An entity with id \"" + id + "\" already exists.");
+				}
+				registry.entitiesById[id] = this;
+			}
+			console.log(registry.entitiesById);
+			
+			const prevId = this._prevSettings.id;
+			if(prevId) {
+				delete registry.entitiesById[prevId];
+			}
+		}
+	}
 
 	public _afterChanged(): void { }
 
@@ -1356,6 +1385,11 @@ export abstract class Entity extends Settings implements IDisposer {
 				disposer.dispose();
 			});
 		});
+
+		const id = this.get("id")!;
+		if (id) {
+			delete registry.entitiesById[id];
+		}
 	}
 
 	/**

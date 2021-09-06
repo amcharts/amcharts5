@@ -198,7 +198,7 @@ export abstract class PercentSeries extends Series {
 					percentTotal = 0;
 				}
 
-				dataItem.set("valuePercentTotal", percentTotal * 100);
+				dataItem.setRaw("valuePercentTotal", percentTotal * 100);
 			});
 
 			this.setPrivateRaw("valueLow", valueLow);

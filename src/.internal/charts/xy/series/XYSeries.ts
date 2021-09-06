@@ -1616,38 +1616,41 @@ export abstract class XYSeries extends Series {
 		this.updateLegendValue(dataItem);
 
 		if (this.get("tooltip")) {
-			if (dataItem && !this.isHidden()) {
+			if (!this.isHidden()) {
 				const tooltip = this.get("tooltip")!;
 				if (tooltip) {
-					let locationX = this.get("locationX", 0);
-					let locationY = this.get("locationY", 1);
+					tooltip._setDataItem(dataItem);
+					if (dataItem) {
+						let locationX = this.get("locationX", 0);
+						let locationY = this.get("locationY", 1);
 
-					let itemLocationX = dataItem.get("locationX", locationX);
-					let itemLocationY = dataItem.get("locationY", locationY);
+						let itemLocationX = dataItem.get("locationX", locationX);
+						let itemLocationY = dataItem.get("locationY", locationY);
 
-					const xAxis = this.get("xAxis");
-					const yAxis = this.get("yAxis");
+						const xAxis = this.get("xAxis");
+						const yAxis = this.get("yAxis");
 
-					const vcx = this.get("vcx", 1);
-					const vcy = this.get("vcy", 1);
+						const vcx = this.get("vcx", 1);
+						const vcy = this.get("vcy", 1);
 
-					const xPos = xAxis.getDataItemPositionX(dataItem, this._xField, this._aLocationX0 + (this._aLocationX1 - this._aLocationX0) * itemLocationX, vcx);
-					const yPos = yAxis.getDataItemPositionY(dataItem, this._yField, this._aLocationY0 + (this._aLocationY1 - this._aLocationY0) * itemLocationY, vcy);
+						const xPos = xAxis.getDataItemPositionX(dataItem, this._xField, this._aLocationX0 + (this._aLocationX1 - this._aLocationX0) * itemLocationX, vcx);
+						const yPos = yAxis.getDataItemPositionY(dataItem, this._yField, this._aLocationY0 + (this._aLocationY1 - this._aLocationY0) * itemLocationY, vcy);
 
-					const point = this.getPoint(xPos, yPos);
+						const point = this.getPoint(xPos, yPos);
 
-					const chart = this.chart;
-
-					if (chart && chart.inPlot(point)) {
-
-						// TODO: should we display tooltip if there is no value?
-						let value = dataItem.get("valueY");
-
-						if ($type.isNumber(value)) {
-							tooltip._setDataItem(dataItem);
-							tooltip.label.text.markDirtyText();
-							tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
-							tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));
+						let show = false;
+						$array.each(this._valueFields, (field) => {
+							if (dataItem.get(field as any) != null) {
+								show = true;
+							}
+						})
+						if (show) {
+							const chart = this.chart;
+							if (chart && chart.inPlot(point)) {
+								tooltip.label.text.markDirtyText();
+								tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
+								tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));
+							}
 						}
 					}
 				}

@@ -156,6 +156,14 @@ export class Container extends Sprite {
 		this._display.addChild(this._childrenDisplay);
 	}
 
+	protected _dispose() {
+		super._dispose();
+
+		this.eachChildren((child) => {
+			child.dispose();
+		});
+	}
+
 	public _changed() {
 		super._changed();
 
@@ -268,22 +276,7 @@ export class Container extends Sprite {
 
 	public _applyThemes(): boolean {
 		if (super._applyThemes()) {
-			const background = this.get("background");
-			if (background) {
-				background._applyThemes();
-			}
-
-			const verticalScrollbar = this.get("verticalScrollbar");
-			if (verticalScrollbar) {
-				verticalScrollbar._applyThemes();
-			}
-
-			const mask = this.get("mask");
-			if (mask) {
-				mask._applyThemes();
-			}
-
-			$array.each(this.children.values, (child) => {
+			this.eachChildren((child) => {
 				child._applyThemes();
 			});
 
@@ -298,19 +291,9 @@ export class Container extends Sprite {
 		super._applyState(name);
 
 		if (this.get("setStateOnChildren")) {
-			this.children.values.forEach((child) => {
+			this.eachChildren((child) => {
 				child.states.apply(name);
 			});
-
-			const background = this.get("background");
-			if (background) {
-				background.states.apply(name);
-			}
-
-			const mask = this.get("mask");
-			if (mask) {
-				mask.states.apply(name);
-			}
 		}
 	}
 
@@ -318,19 +301,9 @@ export class Container extends Sprite {
 		super._applyStateAnimated(name, duration);
 
 		if (this.get("setStateOnChildren")) {
-			this.children.values.forEach((child) => {
+			this.eachChildren((child) => {
 				child.states.applyAnimate(name, duration);
 			});
-
-			const background = this.get("background");
-			if (background) {
-				background.states.applyAnimate(name, duration);
-			}
-
-			const mask = this.get("mask");
-			if (mask) {
-				mask.states.applyAnimate(name, duration);
-			}
 		}
 	}
 
@@ -635,4 +608,24 @@ export class Container extends Sprite {
 		});
 	}
 
+	public eachChildren(f: (child: Sprite) => void): void {
+		const background = this.get("background");
+		if (background) {
+			f(background);
+		}
+
+		const verticalScrollbar = this.get("verticalScrollbar");
+		if (verticalScrollbar) {
+			f(verticalScrollbar);
+		}
+
+		const mask = this.get("mask");
+		if (mask) {
+			f(mask);
+		}
+
+		this.children.values.forEach((child) => {
+			f(child);
+		});
+	}
 }

@@ -119,7 +119,6 @@ export class Root implements IDisposer {
 
 	/**
 	 * @ignore
-	 * @todo is this need to be user-facing?
 	 */
 	public language: Language = Language.new(this, {});
 
@@ -261,14 +260,15 @@ export class Root implements IDisposer {
 				interactiveChildren: false,
 				position: "absolute",
 				setStateOnChildren: true,
-				scale: .6,
-				y: percent(100),
+				paddingTop: 9,
+				paddingRight: 9,
 				paddingBottom: 9,
 				paddingLeft: 9,
-				paddingRight: 9,
-				paddingTop: 9,
+				scale: .6,
+				y: percent(100),
 				centerY: p100,
 				tooltipText: "Chart created using amCharts 5",
+				tooltipX: p100,
 				cursorOverStyle: "pointer",
 				background: Rectangle.new(this, {
 					fill: color(0x474758),
@@ -276,6 +276,23 @@ export class Root implements IDisposer {
 					tooltipY: 5
 				})
 			}));
+
+			const tooltip = Tooltip.new(this, {
+				pointerOrientation: "horizontal",
+				paddingTop: 4,
+				paddingRight: 7,
+				paddingBottom: 4,
+				paddingLeft: 7
+			});
+			tooltip.label.setAll({
+				fontSize: 12
+			});
+			tooltip.get("background")!.setAll({
+				fill: this.interfaceColors.get("background"),
+				stroke: this.interfaceColors.get("grid"),
+				strokeOpacity: 0.3
+			})
+			logo.set("tooltip", tooltip);
 
 			logo.events.on("click", () => {
 				window.open("https://www.amcharts.com/", "_blank");
@@ -299,8 +316,8 @@ export class Root implements IDisposer {
 
 			a.states.create("hover", { stroke: color(0x474758) });
 
-			logo.set("tooltip", this._tooltip);
-			logo.setPrivate("tooltipTarget", logo.get("background"));
+			//logo.set("tooltip", this._tooltip);
+			//logo.setPrivate("tooltipTarget", logo.get("background"));
 			this._logo = logo;
 
 			this._handleLogo();
@@ -733,6 +750,7 @@ export class Root implements IDisposer {
 		if (!this._isDisposed) {
 			this._isDisposed = true;
 
+			this._rootContainer.dispose();
 			this._renderer.dispose();
 			this.horizontalLayout.dispose();
 			this.verticalLayout.dispose();

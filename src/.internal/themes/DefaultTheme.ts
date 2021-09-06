@@ -1544,7 +1544,7 @@ export class DefaultTheme extends Theme {
 		});
 
 		this.rule("Slice", ["pie"]).states.create("active", { shiftRadius: 20 });
-		this.rule("Slice", ["pie"]).states.create("hover", { scale: 1.05 });
+		this.rule("Slice", ["pie"]).states.create("hover", { scale: 1.04 });
 
 		this.rule("RadialLabel", ["pie"]).setAll({
 			textType: "aligned",
@@ -1837,6 +1837,7 @@ export class DefaultTheme extends Theme {
 			maxZoomLevel: 32,
 			minZoomLevel: 1,
 			wheelY: "zoom",
+			wheelX: "none",
 			animationEasing: $ease.out($ease.cubic),
 			wheelEasing: $ease.out($ease.cubic),
 			wheelDuration: 0,

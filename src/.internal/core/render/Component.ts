@@ -79,18 +79,18 @@ export class DataItem<P> extends Settings {
 	/**
 	 * Shows a data item that's currently hidden.
 	 */
-	public show() {
+	public show(duration?: number) {
 		if (this.component) {
-			this.component.showDataItem(this);
+			this.component.showDataItem(this, duration);
 		}
 	}
 
 	/**
 	 * Hides a data item that's currently visible.
 	 */
-	public hide() {
+	public hide(duration?: number) {
 		if (this.component) {
-			this.component.hideDataItem(this);
+			this.component.hideDataItem(this, duration);
 		}
 	}
 }

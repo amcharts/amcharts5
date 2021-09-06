@@ -112,7 +112,7 @@ tooltip.label.setAll({
 const tooltipBg = tooltip.get("background");
 tooltipBg.set("strokeWidth", 2);
 tooltipBg.adapters.add("stroke", (stroke, target) => {
-  let dataItem = tooltip.dataItem as am5.DataItem<am5xy.ICandlestickSeriesDataItem>;
+  let dataItem = tooltip.dataItem as am5.DataItem<am5xy.IOHLCSeriesDataItem>;
   if (dataItem) {
     let column = dataItem.get("graphics");
     if (column) {

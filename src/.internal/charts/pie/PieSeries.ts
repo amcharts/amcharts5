@@ -51,6 +51,7 @@ export interface IPieSeriesSettings extends IPercentSeriesSettings {
 }
 
 export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
+	radius?:number;
 }
 
 /**
@@ -156,7 +157,21 @@ export class PieSeries extends PercentSeries {
 		super._prepareChildren();
 		const chart = this.chart;
 		if (chart) {
-			if (this._valuesDirty || this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle") || this.isDirty("alignLabels")) {
+
+			if (this.isDirty("alignLabels")) {
+				let labelsTemplate = this.labels.template;
+				if (this.get("alignLabels")) {
+					labelsTemplate.set("textType", "aligned");
+				}
+				else {
+					if (labelsTemplate.get("textType") == null) {
+						labelsTemplate.set("textType", "adjusted");
+					}
+				}
+			}
+
+
+			if (this._valuesDirty || this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle")) {
 				this.markDirtyBounds();
 				const startAngle = this.get("startAngle", chart.get("startAngle", -90));
 				const endAngle = this.get("endAngle", chart.get("endAngle", 270));
@@ -164,6 +179,7 @@ export class PieSeries extends PercentSeries {
 				let currentAngle = startAngle;
 
 				const radius = chart.radius(this);
+				this.setPrivateRaw("radius", radius);
 				let innerRadius = chart.innerRadius(this) * chart.getPrivate("irModifyer", 1);
 
 				if (innerRadius < 0) {
@@ -195,14 +211,6 @@ export class PieSeries extends PercentSeries {
 
 						const label = dataItem.get("label");
 						if (label) {
-
-							if (this.get("alignLabels")) {
-								label.set("textType", "aligned");
-							}
-							else {
-								label.set("textType", "adjusted");
-							}
-
 							label.set("baseRadius", radius);
 							label.set("labelAngle", middleAngle);
 
@@ -232,11 +240,11 @@ export class PieSeries extends PercentSeries {
 							}
 						}
 						currentAngle += currentArc;
+						this._updateTick(dataItem);
 					})
 				}
 			}
 		}
-
 	}
 
 	protected _updateTick(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -259,6 +267,13 @@ export class PieSeries extends PercentSeries {
 
 			x = label.x();
 			y = label.y();
+
+			if (label.get("textType") == "circular") {
+				const labelRadius = label.get("radius", 0) + label.get("baseRadius", 0) - label.get("paddingBottom", 0);
+				const labelAngle = label.get("labelAngle", 0);
+				x = labelRadius * $math.cos(labelAngle);
+				y = labelRadius * $math.sin(labelAngle);
+			}
 
 			let dx = -pr;
 			if (label.getPrivate("left")) {
