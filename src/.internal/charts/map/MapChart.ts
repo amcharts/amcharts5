@@ -470,10 +470,21 @@ export class MapChart extends SerialChart {
 	 * @param  duration  Animation duration in milliseconds
 	 */
 	public goHome(duration?: number) {
-		const geoBounds = this._geoBounds;
-
-		const homeGeoPoint = this.get("homeGeoPoint", { longitude: geoBounds.left + (geoBounds.right - geoBounds.left) / 2, latitude: geoBounds.top + (geoBounds.bottom - geoBounds.top) / 2 });
+		let homeGeoPoint = this.get("homeGeoPoint");
 		const homeZoomLevel = this.get("homeZoomLevel", 1);
+
+		if (!homeGeoPoint) {
+			const geoPath = this.getPrivate("geoPath");
+			const bounds = geoPath.bounds(this._geometryColection);
+
+			const left = bounds[0][0];
+			const top = bounds[0][1];
+
+			const right = bounds[1][0];
+			const bottom = bounds[1][1];
+
+			homeGeoPoint = this.invert({ x: left + (right - left) / 2, y: top + (bottom - top) / 2 });
+		}
 
 		this.zoomToGeoPoint(homeGeoPoint, homeZoomLevel, true, duration);
 	}

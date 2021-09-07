@@ -2505,6 +2505,9 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	protected _width: number = 0;
 	protected _height: number = 0;
 
+	protected _clientWidth: number = 0;
+	protected _clientHeight: number = 0;
+
 	public resolution: number = window.devicePixelRatio;
 	public interactionsEnabled: boolean = true;;
 
@@ -2641,6 +2644,8 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	}
 
 	resize(width: number, height: number): void {
+		this._clientWidth = width;
+		this._clientHeight = height;
 		this._width = Math.floor(width * this.resolution);
 		this._height = Math.floor(height * this.resolution);
 
@@ -2719,12 +2724,11 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		layer.order = order;
 		layer.visible = visible;
 
-
-		if (layer.visible) {
+		if (layer.visible && this._width) {
 			layer.view.width = this._width;
-			layer.view.style.width = this._width + "px";
+			layer.view.style.width = this._clientWidth + "px";
 			layer.view.height = this._height;
-			layer.view.style.height = this._height + "px";
+			layer.view.style.height = this._clientHeight + "px";
 		}
 
 		layers.push(layer);

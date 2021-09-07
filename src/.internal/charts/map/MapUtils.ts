@@ -27,8 +27,14 @@ export function getGeoCentroid(geometry: GeoJSON.GeometryObject): IGeoPoint {
  */
 export function getGeoBounds(geometry: GeoJSON.GeometryObject): { left: number, right: number, top: number, bottom: number } {
 	const bounds = geoBounds(geometry);
+
 	if (bounds) {
-		return { left: bounds[0][0], right: bounds[1][0], top: bounds[1][1], bottom: bounds[0][1] };
+		const geoBounds = { left: bounds[0][0], right: bounds[1][0], top: bounds[1][1], bottom: bounds[0][1] };
+		if(geoBounds.right < geoBounds.left){
+			geoBounds.right = 180;
+			geoBounds.left = -180;
+		}
+		return geoBounds;
 	}
 	return { left: 0, right: 0, top: 0, bottom: 0 };
 }

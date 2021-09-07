@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.10] - 2021-09-07
+
+### Fixed
+- A quick flash of chart position fixed (introduced in `5.0.0-beta.9`).
+- MapChart.goHome() method fixed.
+
+
 ## [5.0.0-beta.9] - 2021-09-06
 
 ### Added
