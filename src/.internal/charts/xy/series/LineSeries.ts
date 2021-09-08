@@ -176,6 +176,9 @@ export class LineSeries extends XYSeries {
 
 	public _updateChildren() {
 
+		this._strokeTemplate = undefined;
+		this._fillTemplate = undefined;
+
 		let xAxis = this.get("xAxis");
 		let yAxis = this.get("yAxis");
 
@@ -237,7 +240,7 @@ export class LineSeries extends XYSeries {
 					}
 				}
 
-				let len = this.dataItems.length
+				let len = this.dataItems.length;
 				let endIndex = this.getPrivate("endIndex", len);
 
 				if (endIndex < len) {
@@ -251,13 +254,16 @@ export class LineSeries extends XYSeries {
 							}
 						})
 						if (hasValues) {
-							endIndex = i;
+							endIndex = i + 1;
 							break;
 						}
 					}
 				}
 
 				this._endIndex = endIndex;
+
+				this.strokes.clear();
+				this.fills.clear();
 
 				this._startSegment(0, startIndex);
 			}
@@ -276,30 +282,21 @@ export class LineSeries extends XYSeries {
 		const autoGapCount = this.get("autoGapCount")!;
 		const connect = this.get("connect");
 
-		let fill: Graphics | undefined;
-		fill = this.fills.getIndex(segmentIndex);
-		if (!fill) {
-			fill = this.makeFill(this.fills);
-			this.fills.push(fill);
+		const fill = this.makeFill(this.fills);
+
+		const fillTemplate = this._fillTemplate;
+		if (fillTemplate && fillTemplate != this.fills.template) {
+			fill.template = fillTemplate;
 		}
-		//const fillTemplate = this._fillTemplate;
-		//if (fillTemplate && fillTemplate != this.fillTemplate) {
-		//fill.template = fillTemplate;
-		//}
 
 		fill.setPrivate("visible", true);
 
-		let stroke: Graphics | undefined;
-		stroke = this.strokes.getIndex(segmentIndex);
-		if (!stroke) {
-			stroke = this.makeStroke(this.strokes);
-			this.strokes.push(stroke);
-		}
+		const stroke = this.makeStroke(this.strokes);
 
-		//const strokeTemplate = this._strokeTemplate;
-		//if (strokeTemplate && strokeTemplate != this.strokeTemplate) {
-		//	stroke.template = strokeTemplate;
-		//}
+		const strokeTemplate = this._strokeTemplate;
+		if (strokeTemplate && strokeTemplate != this.strokes.template) {
+			stroke.template = strokeTemplate;
+		}
 
 		stroke.setPrivate("visible", true);
 
@@ -383,9 +380,13 @@ export class LineSeries extends XYSeries {
 				this._getPoints(dataItem, o);
 			}
 
-			if (strokeTemplateField && stroke) {
-				const strokeTemplate = (dataItem.dataContext as any)[strokeTemplateField]
+			if (strokeTemplateField) {
+				let strokeTemplate = (dataItem.dataContext as any)[strokeTemplateField]
 				if (strokeTemplate) {
+					if (!(strokeTemplate instanceof Template)) {
+						strokeTemplate = Template.new(strokeTemplate);
+					}
+
 					this._strokeTemplate = strokeTemplate;
 					if (i > dataItemIndex) {
 						currentEndIndex = i;
@@ -397,9 +398,13 @@ export class LineSeries extends XYSeries {
 				}
 			}
 
-			if (fillTemplateField && fill) {
-				const fillTemplate = (dataItem.dataContext as any)[fillTemplateField]
+			if (fillTemplateField) {
+				let fillTemplate = (dataItem.dataContext as any)[fillTemplateField]
 				if (fillTemplate) {
+					if (!(fillTemplate instanceof Template)) {
+						fillTemplate = Template.new(fillTemplate);
+					}
+
 					this._fillTemplate = fillTemplate;
 					if (i > dataItemIndex) {
 						currentEndIndex = i;
@@ -423,52 +428,42 @@ export class LineSeries extends XYSeries {
 			}
 		}
 
-		if (points.length > 0) {
-			if (i === endIndex) {
-				this._endLine(points, segments[0][0]);
+
+		if (i === endIndex) {
+			this._endLine(points, segments[0][0]);
+		}
+
+		if (stroke) {
+			this._drawStroke(stroke, segments);
+		}
+
+		if (fill) {
+			this._drawFill(fill, segments);
+		}
+
+		this.axisRanges.each((axisRange) => {
+			const container = axisRange.container;
+			const fills = axisRange.fills!;
+			let fill = this.makeFill(fills);
+			if (container) {
+				container.children.push(fill);
 			}
 
-			if (stroke) {
-				this._drawStroke(stroke, segments);
+			fill.setPrivate("visible", true);
+			this._drawFill(fill, segments);
+
+			const strokes = axisRange.strokes!;
+			let stroke = this.makeStroke(strokes);
+			if (container) {
+				container.children.push(stroke);
 			}
 
-			if (fill) {
-				this._drawFill(fill, segments);
-			}
+			stroke.setPrivate("visible", true);
+			this._drawStroke(stroke, segments);
+		})
 
-			this.axisRanges.each((axisRange) => {
-				const container = axisRange.container;
-				const fills = axisRange.fills!;
-				let fill = fills.getIndex(segmentIndex);
-				if (!fill) {
-					fill = this.makeFill(fills);
-					fills.push(fill);
-					if (container) {
-						container.children.push(fill);
-					}
-				}
-
-				fill.setPrivate("visible", true);
-				this._drawFill(fill, segments);
-
-				const strokes = axisRange.strokes!;
-				let stroke = strokes.getIndex(segmentIndex);
-
-				if (!stroke) {
-					stroke = this.makeStroke(strokes);
-					strokes.push(stroke);
-					if (container) {
-						container.children.push(stroke);
-					}
-				}
-
-				stroke.setPrivate("visible", true);
-				this._drawStroke(stroke, segments);
-			})
-
-			if (currentEndIndex < endIndex) {
-				this._startSegment(segmentIndex + 1, endIndex);
-			}
+		if (currentEndIndex < endIndex) {
+			this._startSegment(segmentIndex + 1, currentEndIndex);
 		}
 	}
 
@@ -546,15 +541,6 @@ export class LineSeries extends XYSeries {
 
 				point[2] = closeIPoint.x;
 				point[3] = closeIPoint.y;
-
-				//if (o.xAxis == o.baseAxis) {
-				//	dataItem.set("top", point[1]);
-				//	dataItem.set("bottom", point[3]);
-				//}
-				//else if (o.yAxis == o.baseAxis) {
-				//	dataItem.set("right", point[0]);
-				//	dataItem.set("left", point[2]);
-				//}
 			}
 
 			points.push(point);

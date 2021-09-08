@@ -1,5 +1,5 @@
 import type { Root } from "../Root";
-import type { Template } from "./Template";
+import type { Template, ApplyState } from "./Template";
 import type { Theme } from "../Theme";
 
 import { IDisposer, Disposer } from "./Disposer";
@@ -870,7 +870,11 @@ export abstract class Entity extends Settings implements IDisposer {
 
 		if (template) {
 			template._setObjectTemplate(this);
-			this._applyTemplate(template, {}, {});
+			this._applyTemplate(template, {
+				settings: {},
+				privateSettings: {},
+				states: {},
+			});
 		}
 
 		this.states.create("default", {});
@@ -1154,19 +1158,39 @@ export abstract class Entity extends Settings implements IDisposer {
 		f(this);
 	}
 
-	protected _applyTemplate(template: Template<this>, settings: Dirty<this["_settings"]>, privateProperties: Dirty<this["_privateSettings"]>): void {
-		this._templateDisposers.push(template._apply(this));
+	// TODO faster version of this method which is specialized to just 1 key
+	public _applyStateByKey(name: string): void {
+		const other = this.states.create(name, {});
+		const seen: Dirty<this["_settings"]> = {};
+
+		this._eachTemplate((template) => {
+			const state = template.states.lookup(name);
+
+			if (state) {
+				state._apply(other, seen);
+			}
+		});
+
+		$object.each(other._settings, (key) => {
+			if (!seen[key] && !other._userSettings[key]) {
+				other.remove(key);
+			}
+		});
+	}
+
+	protected _applyTemplate(template: Template<this>, state: ApplyState<this>): void {
+		this._templateDisposers.push(template._apply(this, state));
 
 		$object.each(template._settings, (key, value) => {
-			if (!this._userProperties[key] && !settings[key]) {
-				settings[key] = true;
+			if (!state.settings[key] && !this._userProperties[key]) {
+				state.settings[key] = true;
 				super.set(key, value);
 			}
 		});
 
 		$object.each(template._privateSettings, (key, value) => {
-			if (!this._userPrivateProperties[key] && !privateProperties[key]) {
-				privateProperties[key] = true;
+			if (!state.privateSettings[key] && !this._userPrivateProperties[key]) {
+				state.privateSettings[key] = true;
 				super.setPrivate(key, value);
 			}
 		});
@@ -1200,21 +1224,24 @@ export abstract class Entity extends Settings implements IDisposer {
 	public _applyTemplates(): void {
 		this._disposeTemplates();
 
-		const settings: Dirty<this["_settings"]> = {};
-		const privateProperties: Dirty<this["_privateSettings"]> = {};
+		const state: ApplyState<this> = {
+			settings: {},
+			privateSettings: {},
+			states: {},
+		};
 
 		this._eachTemplate((template) => {
-			this._applyTemplate(template, settings, privateProperties);
+			this._applyTemplate(template, state);
 		});
 
 		$object.each(this._settings, (key) => {
-			if (!this._userProperties[key] && !settings[key]) {
+			if (!this._userProperties[key] && !state.settings[key]) {
 				super.remove(key);
 			}
 		});
 
 		$object.each(this._privateSettings, (key) => {
-			if (!this._userPrivateProperties[key] && !privateProperties[key]) {
+			if (!this._userPrivateProperties[key] && !state.privateSettings[key]) {
 				super.removePrivate(key);
 			}
 		});
@@ -1343,7 +1370,6 @@ export abstract class Entity extends Settings implements IDisposer {
 				}
 				registry.entitiesById[id] = this;
 			}
-			console.log(registry.entitiesById);
 			
 			const prevId = this._prevSettings.id;
 			if(prevId) {

@@ -72,8 +72,6 @@ export class Star extends Graphics {
 			const step = Math.PI / spikes;
 			let angle = Math.PI / 2 * 3;
 
-			console.log(spikes, step)
-
 			display.moveTo(0, - r)
 
 			for (let i = 0; i < spikes; i++) {

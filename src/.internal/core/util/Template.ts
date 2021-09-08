@@ -1,4 +1,5 @@
-import type { Entity } from "./Entity";
+import type { Entity, Dirty } from "./Entity";
+import type { State } from "./States";
 import { EventDispatcher, Events } from "./EventDispatcher";
 import { IDisposer, Disposer, MultiDisposer } from "./Disposer";
 import * as $array from "./Array";
@@ -7,7 +8,12 @@ import * as $object from "./Object";
 export class TemplateState<E extends Entity> {
 	public _settings: Partial<E["_settings"]>;
 
-	constructor(settings: Partial<E["_settings"]>) {
+	private _name: string;
+	private _template: Template<E>;
+
+	constructor(name: string, template: Template<E>, settings: Partial<E["_settings"]>) {
+		this._name = name;
+		this._template = template;
 		this._settings = settings;
 	}
 
@@ -24,22 +30,40 @@ export class TemplateState<E extends Entity> {
 
 	public set<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
 		this._settings[key] = value;
+		this._template._stateChanged(this._name);
 	}
 
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
 		delete this._settings[key];
+		this._template._stateChanged(this._name);
 	}
 
 	public setAll(settings: this["_settings"]) {
 		$object.keys(settings).forEach((key) => {
 			this._settings[key] = settings[key];
 		});
+
+		this._template._stateChanged(this._name);
+	}
+
+	public _apply(other: State<E>, seen: Dirty<E["_settings"]>): void {
+		$object.each(this._settings, (key, value) => {
+			if (!seen[key] && !other._userSettings[key]) {
+				seen[key] = true;
+				other.setRaw(key, value);
+			}
+		});
 	}
 }
 
 
 export class TemplateStates<E extends Entity> {
+	private _template: Template<E>;
 	private _states: { [key: string]: TemplateState<E> } = {};
+
+	constructor(template: Template<E>) {
+		this._template = template;
+	}
 
 	public lookup(name: string): TemplateState<E> | undefined {
 		return this._states[name];
@@ -53,20 +77,28 @@ export class TemplateStates<E extends Entity> {
 			return state;
 
 		} else {
-			const state = new TemplateState(settings);
+			const state = new TemplateState(name, this._template, settings);
 			this._states[name] = state;
+			this._template._stateChanged(name);
 			return state;
 		}
 	}
 
 	public remove(name: string) {
 		delete this._states[name];
+		this._template._stateChanged(name);
 	}
 
-	public _apply(entity: E): void {
-		$object.each(this._states, (key, state) => {
+	public _apply(entity: E, state: ApplyState<E>): void {
+		$object.each(this._states, (key, value) => {
+			let seen = state.states[key];
+
+			if (seen == null) {
+				seen = state.states[key] = {};
+			}
+
 			const other = entity.states.create(key as string, {});
-			other.setAll(state._settings);
+			value._apply(other, seen);
 		});
 	}
 }
@@ -99,6 +131,13 @@ export class TemplateAdapters<E extends Entity> {
 }
 
 
+export interface ApplyState<E extends Entity> {
+	settings: Dirty<E["_settings"]>;
+	privateSettings: Dirty<E["_privateSettings"]>;
+	states: { [name: string]: Dirty<E["_settings"]> };
+}
+
+
 // TODO maybe extend from Properties ?
 export class Template<E extends Entity> {
 	public _settings: Partial<E["_settings"]>;
@@ -110,7 +149,7 @@ export class Template<E extends Entity> {
 
 	public _entities: Array<E> = [];
 
-	public readonly states: TemplateStates<E> = new TemplateStates();
+	public readonly states: TemplateStates<E> = new TemplateStates(this);
 
 	public readonly adapters: TemplateAdapters<E> = new TemplateAdapters();
 	public readonly events: EventDispatcher<Events<E, E["_events"]>> = new EventDispatcher();
@@ -261,7 +300,7 @@ export class Template<E extends Entity> {
 		});
 	}
 
-	public _apply(entity: E): IDisposer {
+	public _apply(entity: E, state: ApplyState<E>): IDisposer {
 		const disposers: Array<IDisposer> = [];
 
 		$object.each(this._settingEvents, (key, events) => {
@@ -276,7 +315,7 @@ export class Template<E extends Entity> {
 			});
 		});
 
-		this.states._apply(entity);
+		this.states._apply(entity, state);
 
 		disposers.push(this.adapters._apply(entity));
 		disposers.push(entity.events.copyFrom(this.events));
@@ -290,5 +329,11 @@ export class Template<E extends Entity> {
 
 	public _removeObjectTemplate(entity: E) {
 		$array.keepIf(this._entities, (x) => x !== entity);
+	}
+
+	public _stateChanged(name: string): void {
+		this._entities.forEach((entity) => {
+			entity._applyStateByKey(name);
+		});
 	}
 }

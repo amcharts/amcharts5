@@ -9,12 +9,11 @@ import * as $ease from "./Ease";
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/states/} for more info
  */
 export class State<E extends Entity> {
-	private _name: string;
 	private _entity: E;
 	public _settings: Partial<E["_settings"]>;
+	public _userSettings: Dirty<E["_settings"]> = {};
 
-	constructor(name: string, entity: E, settings: Partial<E["_settings"]>) {
-		this._name = name;
+	constructor(entity: E, settings: Partial<E["_settings"]>) {
 		this._entity = entity;
 		this._settings = settings;
 	}
@@ -41,6 +40,13 @@ export class State<E extends Entity> {
 	}
 
 	/**
+	 * @ignore
+	 */
+	public setRaw<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
+		this._settings[key] = value;
+	}
+
+	/**
 	 * Sets a setting `value` for the specified `key` to be set when the state
 	 * is applied.
 	 *
@@ -49,7 +55,8 @@ export class State<E extends Entity> {
 	 * @return            Setting value
 	 */
 	public set<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
-		this._settings[key] = value;
+		this._userSettings[key] = true;
+		this.setRaw(key, value);
 	}
 
 	/**
@@ -59,6 +66,7 @@ export class State<E extends Entity> {
 	 * @param   key       Setting key
 	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
+		delete this._userSettings[key];
 		delete this._settings[key];
 	}
 
@@ -72,41 +80,12 @@ export class State<E extends Entity> {
 	 */
 	public setAll(settings: this["_settings"]) {
 		$object.keys(settings).forEach((key) => {
-			this._settings[key] = settings[key];
+			this.set(key, settings[key]);
 		});
 	}
 
 	private _eachSetting<Key extends keyof E["_settings"], Value extends E["_settings"][Key]>(f: (key: Key, value: Value) => void): void {
 		$object.each(this._settings, f as any);
-
-		this._entity._eachTemplate((template) => {
-			const state = template.states.lookup(this._name);
-
-			if (state) {
-				$object.each(state._settings, f as any);
-			}
-		});
-	}
-
-	protected _get<Key extends keyof E["_settings"]>(key: Key, fallback?: any) {
-		let value = this._settings[key];
-
-		this._entity._eachTemplate((template) => {
-			const state = template.states.lookup(this._name);
-
-			if (state) {
-				let stateValue = state._settings[key];
-				if (stateValue !== undefined) {
-					value = stateValue;
-				}
-			}
-		});
-
-		if (value === undefined) {
-			value = fallback;
-		}
-
-		return value;
 	}
 
 	/**
@@ -154,12 +133,12 @@ export class State<E extends Entity> {
 			duration = this._settings.stateAnimationDuration;
 		}
 		if (duration == null) {
-			duration = this._get("stateAnimationDuration", this._entity.get("stateAnimationDuration", 0));
+			duration = this.get("stateAnimationDuration", this._entity.get("stateAnimationDuration", 0));
 		}
 
 		let easing = this._settings.stateAnimationEasing;
 		if (easing == null) {
-			easing = this._get("stateAnimationEasing", this._entity.get("stateAnimationEasing", $ease.cubic));
+			easing = this.get("stateAnimationEasing", this._entity.get("stateAnimationEasing", $ease.cubic));
 		}
 
 		const defaultState = this._entity.states.lookup("default")!;
@@ -239,7 +218,7 @@ export class States<E extends Entity> {
 			return state;
 
 		} else {
-			const state = new State(name, this._entity, settings);
+			const state = new State(this._entity, settings);
 			this._states[name] = state;
 			return state;
 		}

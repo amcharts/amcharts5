@@ -959,24 +959,27 @@ export abstract class XYSeries extends Series {
 			$array.each(this.dataItems, (dataItem) => {
 				$array.each(this._valueXShowFields, (key) => {
 					let value = dataItem.get(<any>key);
+					if (value != null) {
+						if (stacked) {
+							value += this.getStackedXValue(dataItem, key);
+						}
 
-					if (stacked) {
-						value += this.getStackedXValue(dataItem, key);
+						this._min("minX", value);
+						this._max("maxX", value);
 					}
-
-					this._min("minX", value);
-					this._max("maxX", value);
 				})
 
 				$array.each(this._valueYShowFields, (key) => {
 					let value = dataItem.get(<any>key);
+					if (value != null) {
 
-					if (stacked) {
-						value += this.getStackedYValue(dataItem, key);
+						if (stacked) {
+							value += this.getStackedYValue(dataItem, key);
+						}
+
+						this._min("minY", value);
+						this._max("maxY", value);
 					}
-
-					this._min("minY", value);
-					this._max("maxY", value);
 				})
 
 				xAxis.processSeriesDataItem(dataItem, this._valueXFields);
@@ -1230,13 +1233,14 @@ export abstract class XYSeries extends Series {
 	protected processXSelectionDataItem(dataItem: DataItem<this["_dataItemSettings"]>, vcx: number, stacked: boolean) {
 		$array.each(this.__valueXShowFields, (key) => {
 			let value = dataItem.get(<any>key);
+			if (value != null) {
+				if (stacked) {
+					value += this.getStackedXValueWorking(dataItem, key);
+				}
 
-			if (stacked) {
-				value += this.getStackedXValueWorking(dataItem, key);
+				this._min("selectionMinX", value);
+				this._max("selectionMaxX", value * vcx);
 			}
-
-			this._min("selectionMinX", value);
-			this._max("selectionMaxX", value * vcx);
 		})
 	}
 
@@ -1244,13 +1248,14 @@ export abstract class XYSeries extends Series {
 		$array.each(this.__valueYShowFields, (key) => {
 
 			let value = dataItem.get(<any>key);
+			if (value != null) {
+				if (stacked) {
+					value += this.getStackedYValueWorking(dataItem, key);
+				}
 
-			if (stacked) {
-				value += this.getStackedYValueWorking(dataItem, key);
+				this._min("selectionMinY", value);
+				this._max("selectionMaxY", value * vcy);
 			}
-
-			this._min("selectionMinY", value);
-			this._max("selectionMaxY", value * vcy);
 		})
 	}
 
@@ -1585,12 +1590,13 @@ export abstract class XYSeries extends Series {
 
 						const point = this.getPoint(xPos, yPos);
 
-						let show = false;
+						let show = true;
 						$array.each(this._valueFields, (field) => {
-							if (dataItem.get(field as any) != null) {
-								show = true;
+							if (dataItem.get(field as any) == null) {
+								show = false;
 							}
 						})
+
 						if (show) {
 							const chart = this.chart;
 							if (chart && chart.inPlot(point)) {
@@ -1598,6 +1604,9 @@ export abstract class XYSeries extends Series {
 								tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
 								tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));
 							}
+						}
+						else {
+							tooltip._setDataItem(undefined);
 						}
 					}
 				}

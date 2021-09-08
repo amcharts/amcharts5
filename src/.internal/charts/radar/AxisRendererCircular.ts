@@ -162,6 +162,11 @@ export class AxisRendererCircular extends AxisRenderer {
 			const radius = chart.getPrivate("radius", 0);
 
 			let r = $utils.relativeToValue(this.get("radius", p100), radius);
+
+			if(r < 0){
+				r = radius + r;
+			}
+
 			this.setPrivate("radius", r);
 
 			let ir = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1);
@@ -186,7 +191,7 @@ export class AxisRendererCircular extends AxisRenderer {
 					[startAngle, endAngle] = [endAngle, startAngle];
 				}
 
-				display.arc(0, 0, radius, startAngle * $math.RADIANS, endAngle * $math.RADIANS);
+				display.arc(0, 0, r, startAngle * $math.RADIANS, endAngle * $math.RADIANS);
 			});
 
 			this.axis.markDirtySize();

@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.12] - 2021-09-08
+
+### Added
+- `AxisRendererCircular` now supports negative radius values.
+
+### Changed
+- When a template state is changed, it now automatically updates related `Entity`'s state as well.
+
+### Fixed
+- `LineSeries` was not working properly with `templateField` set on `strokes` or `fills`.
+- `LineSeries` could stop drawing line while zooming if there were gaps in the data.
+
 
 ## [5.0.0-beta.11] - 2021-09-08
 
