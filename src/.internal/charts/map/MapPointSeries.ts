@@ -160,11 +160,26 @@ export class MapPointSeries extends MapSeries {
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
-		if (!dataItem.get("geometry")) {
+		const geometry = dataItem.get("geometry");
+		if (!geometry) {
 			dataItem.set("geometry", { type: "Point", coordinates: [dataItem.get("longitude", 0), dataItem.get("latitude", 0)] });
 		}
-
-		this._addGeometry(dataItem.get("geometry"));
+		else {
+			if (geometry.type == "Point") {
+				const coordinates = geometry.coordinates;
+				if (coordinates) {
+					dataItem.set("longitude", coordinates[0]);
+					dataItem.set("latitude", coordinates[1]);
+				}
+			}
+			else if (geometry.type == "MultiPoint") {
+				const coordinates = geometry.coordinates;
+				if (coordinates && coordinates[0]) {
+					dataItem.set("longitude", coordinates[0][0]);
+					dataItem.set("latitude", coordinates[0][1]);
+				}
+			}
+		}
 	}
 
 	protected _makeBullets(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -329,4 +344,5 @@ export class MapPointSeries extends MapSeries {
 			chart.zoomToGeoPoint({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) }, zoomLevel, true);
 		}
 	}
+
 }

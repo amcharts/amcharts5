@@ -263,9 +263,6 @@ export abstract class Component extends Container {
 		}
 
 		if (this.fields) {
-			this._fields = [];
-			this._fieldsF = {};
-
 			let dirty = false;
 			$array.eachContinue(this.fields, (field) => {
 				if (this.isDirty(field + "Field" as any)) {
@@ -275,6 +272,10 @@ export abstract class Component extends Container {
 				return true;
 			})
 			if (dirty) {
+
+				this._fields = [];
+				this._fieldsF = {};
+
 				$array.each(this.fields as Array<keyof this["_settings"]>, (key) => {
 					const field = this.get(<any>(key + "Field"));
 					if (field) {
@@ -309,7 +310,6 @@ export abstract class Component extends Container {
 	public _makeDataItem(data: unknown): this["_dataItemSettings"] {
 		//const output: this["_dataItemSettings"] = {};
 		const output: any = {}; // temporary to solve error
-
 		if (this._valueFields) {
 			$array.each(this._valueFields, (key) => {
 				const field = this.get(<any>(this._valueFieldsF[key].fieldKey));

@@ -246,6 +246,7 @@ export class Tooltip extends Container {
 				this._fillDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
 						background.set("fill", fill as any);
+						this._updateTextColor(fill);
 					}
 				})
 			}

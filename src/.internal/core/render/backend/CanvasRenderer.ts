@@ -697,7 +697,7 @@ class Arc extends Op {
 	) { super(); }
 
 	public path(context: CanvasRenderingContext2D): void {
-		if(this.radius > 0){
+		if (this.radius > 0) {
 			context.arc(this.cx, this.cy, this.radius, this.startAngle, this.endAngle, this.anticlockwise);
 		}
 	}
@@ -722,7 +722,7 @@ class ArcTo extends Op {
 	) { super(); }
 
 	public path(context: CanvasRenderingContext2D): void {
-		if(this.radius > 0){
+		if (this.radius > 0) {
 			context.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius);
 		}
 	}
@@ -2704,7 +2704,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	getLayerByOrder(order: number): CanvasLayer | undefined {
 		const layers = this.layers;
 		const length = layers.length;
-		for(let i = 0; i < length; i++) {
+		for (let i = 0; i < length; i++) {
 			const layer = layers[i];
 			if (layer.order == order) {
 				return layer;
@@ -2714,7 +2714,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 	getLayer(order: number, visible: boolean = true): CanvasLayer {
 		const layers = this.layers;
-		
+
 		let existingLayer = this.getLayerByOrder(order);
 		if (existingLayer) {
 			return existingLayer;
@@ -2923,6 +2923,12 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	}
 
 	_dispatchMousedown(originalEvent: IPointerEvent): void {
+
+		if ((<PointerEvent>originalEvent).button > 0) {
+			// Ignore non-primary mouse buttons
+			return;
+		}
+
 		const event = this.getEvent(originalEvent);
 		const target = this._getHitTarget(event.point);
 
@@ -2983,7 +2989,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 				return true;
 			});
 
-		//} else if (target === false) {
+			//} else if (target === false) {
 		} else {
 			this._hovering.forEach((obj) => {
 				if (obj.cursorOverStyle) {
@@ -3018,8 +3024,15 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	}
 
 	_dispatchDragEnd(originalEvent: IPointerEvent): void {
+
+		if ((<PointerEvent>originalEvent).button > 0) {
+			// Ignore non-primary mouse buttons
+			return;
+		}
+
 		const event = this.getEvent(originalEvent);
 		const id = event.id;
+
 
 		if (this._mousedown.length !== 0) {
 			const target = this._getHitTarget(event.point);

@@ -97,6 +97,17 @@ export class MapPolygonSeries extends MapSeries {
 		})
 	}
 
+	public _prepareChildren(){
+		super._prepareChildren();
+
+		if (this.isDirty("fill")) {
+			this.mapPolygons.template.set("fill", this.get("fill"));
+		}
+		if (this.isDirty("stroke")) {
+			this.mapPolygons.template.set("stroke", this.get("stroke"));
+		}		
+	}
+
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 
@@ -127,7 +138,9 @@ export class MapPolygonSeries extends MapSeries {
 			this.mapPolygons.removeValue(mapPolygon);
 			mapPolygon.dispose();
 		}
+		this._removeGeometry(dataItem.get("geometry"));
 	}
+
 
 	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super._markDirtyValues();

@@ -115,6 +115,14 @@ export class MapLineSeries extends MapSeries {
 		})
 	}
 
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		if (this.isDirty("stroke")) {
+			this.mapLines.template.set("stroke", this.get("stroke"));
+		}
+	}
+
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 
@@ -145,8 +153,6 @@ export class MapLineSeries extends MapSeries {
 		}
 
 		mapLine.setPrivate("series", this);
-
-		this._addGeometry(dataItem.get("geometry"));
 	}
 
 	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {

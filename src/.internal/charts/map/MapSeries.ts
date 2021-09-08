@@ -243,4 +243,15 @@ export abstract class MapSeries extends Series {
 			}
 		}
 	}
+
+	protected _removeGeometry(geometry: any) {
+		if (geometry) {
+			$array.remove(this._geometries, geometry);
+
+			const chart = this.chart;
+			if (chart) {
+				chart.markDirtyGeometries();
+			}
+		}
+	}
 }

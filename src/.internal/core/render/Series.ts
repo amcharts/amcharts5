@@ -11,6 +11,7 @@ import { p100 } from "../../core/util/Percent";
 import type { Chart } from "./Chart";
 import type { Bullet } from "./Bullet";
 import { Container } from "../../core/render/Container";
+import type { Graphics } from "../../core/render/Graphics";
 import type { ILegendDataItem } from "./Legend";
 import type { Template } from "../../core/util/Template";
 import type { Sprite } from "../../core/render/Sprite";
@@ -166,6 +167,27 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * display data fields, heat rules, or similar.
 	 */
 	calculateAggregates?: boolean;
+
+	/**
+	 * Series stroke color.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
+	 */
+	stroke?: Color;
+
+	/**
+	 * Series fill color.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
+	 */
+	fill?: Color;
+
+	/**
+	 * A data item representing series in a [[Legend]].
+	 *
+	 * @readonly
+	 */
+	legendDataItem?: DataItem<ILegendDataItem>;	
 
 }
 
@@ -368,6 +390,29 @@ export abstract class Series extends Component {
 				this._hideBullets(this.dataItems[i]);
 			}
 		}
+
+		if (this.isDirty("fill") || this.isDirty("stroke")) {
+
+			let markerRectangle: Graphics | undefined;
+			const legendDataItem = this.get("legendDataItem");
+			if (legendDataItem) {
+				markerRectangle = legendDataItem.get("markerRectangle");
+
+				if (markerRectangle) {
+
+					if (this.isDirty("stroke")) {
+						let stroke = this.get("stroke");
+						markerRectangle.set("stroke", stroke);
+					}
+					if (this.isDirty("fill")) {
+						let fill = this.get("fill");
+						markerRectangle.set("fill", fill);
+					}
+
+				}
+			}
+			this.updateLegendMarker(undefined);
+		}		
 	}
 
 	protected _calculateAggregates(startIndex: number, endIndex: number) {
@@ -697,4 +742,11 @@ export abstract class Series extends Component {
 			}
 		}
 	}
+
+	/**
+	 * @ignore
+	 */
+	public updateLegendMarker(_dataItem?: DataItem<this["_dataItemSettings"]>) {
+
+	}	
 }

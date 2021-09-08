@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+
+## [5.0.0-beta.11] - 2021-09-08
+
+### Changed 
+- `fill` and `stroke` settings moved from `XYSeries` to `Series`, so that all series like `MapSeries` could be shown in Legend.
+- Text of a tooltip text will now adaptively change color based on current background color.
+
+### Fixed
+- `"click"` event is no longer fired on right-click.
+- Changing data dynamically on map-related series was not working properly.
+- Switching projection on a zoomed-in/translated map was resulting in new map to be in a wrong position.
+
+
 ## [5.0.0-beta.10] - 2021-09-07
 
 ### Fixed

@@ -348,7 +348,7 @@ export class MapChart extends SerialChart {
 		}
 		else {
 			chartContainer.set("wheelable", false);
-			console.log("dispose")
+
 			if (this._wheelDp) {
 				this._wheelDp.dispose();
 			}
@@ -359,11 +359,41 @@ export class MapChart extends SerialChart {
 		super._prepareChildren();
 
 		const projection = this.get("projection")!;
+		const w = this.innerWidth();
+		const h = this.innerHeight();		
 
 		if (this.isDirty("projection")) {
 			this.makeGeoPath();
 			this.markDirtyProjection();
 			this._fitMap();
+
+			projection.scale(this.getPrivate("mapScale") * this.get("zoomLevel", 1));
+			projection.rotate([this.get("rotationX", 0), this.get("rotationY", 0), this.get("rotationZ", 0)])
+
+			let prev = this._prevSettings.projection;
+			if (prev && prev != projection) {
+				let hw = w / 2;
+				let hh = h / 2;
+				if(prev.invert){
+					let centerLocation = prev.invert([hw, hh]);
+
+					if (centerLocation) {
+
+						let xy = projection(centerLocation);
+						if (xy) {
+							let translate = projection.translate();
+
+							let xx = hw - ((xy[0] - translate[0]));
+							let yy = hh - ((xy[1] - translate[1]));
+
+							projection.translate([xx, yy])
+
+							this.setRaw("translateX", xx);
+							this.setRaw("translateY", yy);
+						}
+					}
+				}
+			}			
 		}
 
 		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
@@ -381,8 +411,6 @@ export class MapChart extends SerialChart {
 		}
 
 		if (this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("paddingTop") || this.isDirty("paddingLeft")) {
-			const w = this.innerWidth();
-			const h = this.innerHeight();
 
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
@@ -406,8 +434,6 @@ export class MapChart extends SerialChart {
 
 						this.setRaw("translateX", xx);
 						this.setRaw("translateY", yy);
-
-						this.markDirtyProjection();
 					}
 				}
 				this.markDirtyProjection();
@@ -494,7 +520,7 @@ export class MapChart extends SerialChart {
 		if (projection.invert) {
 			let w = this.innerWidth();
 			let h = this.innerHeight();
-			if (w & 0 && h > 0) {
+			if (w > 0 && h > 0) {
 				this._centerLocation = projection.invert([this.innerWidth() / 2, this.innerHeight() / 2]);
 			}
 		}
@@ -1015,5 +1041,4 @@ export class MapChart extends SerialChart {
 		super._clearDirty();
 		this._dirtyGeometries = false;
 	}
-
 }

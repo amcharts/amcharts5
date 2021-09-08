@@ -7,10 +7,8 @@ import * as $utils from "../../../core/util/Utils";
 import { List } from "../../../core/util/List";
 import * as $type from "../../../core/util/Type";
 import * as $object from "../../../core/util/Object";
-import type { Color } from "../../../core/util/Color";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Sprite } from "../../../core/render/Sprite";
-import type { ILegendDataItem } from "../../../core/render/Legend";
 import type { Bullet } from "../../../core/render/Bullet";
 import type { XYChart } from "../XYChart";
 import { Container } from "../../../core/render/Container";
@@ -378,33 +376,12 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	openCategoryYField?: string;
 
 	/**
-	 * Series stroke color.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
-	 */
-	stroke?: Color;
-
-	/**
-	 * Series fill color.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
-	 */
-	fill?: Color;
-
-	/**
 	 * If set to `true` this series will be ignored when calculating scale of the
 	 * related axes.
 	 *
 	 * @default false
 	 */
 	ignoreMinMax?: boolean;
-
-	/**
-	 * A data item representing series in a [[Legend]].
-	 *
-	 * @readonly
-	 */
-	legendDataItem?: DataItem<ILegendDataItem>;
 
 	/**
 	 * @ignore
@@ -1090,29 +1067,6 @@ export abstract class XYSeries extends Series {
 				// this.updateLegendValue(undefined); flickers while panning
 			}
 		}
-
-		if (this.isDirty("fill") || this.isDirty("stroke")) {
-
-			let markerRectangle: Graphics | undefined;
-			const legendDataItem = this.get("legendDataItem");
-			if (legendDataItem) {
-				markerRectangle = legendDataItem.get("markerRectangle");
-
-				if (markerRectangle) {
-
-					if (this.isDirty("stroke")) {
-						let stroke = this.get("stroke");
-						markerRectangle.set("stroke", stroke);
-					}
-					if (this.isDirty("fill")) {
-						let fill = this.get("fill");
-						markerRectangle.set("fill", fill);
-					}
-
-				}
-			}
-			this.updateLegendMarker(undefined);
-		}
 	}
 
 
@@ -1348,13 +1302,6 @@ export abstract class XYSeries extends Series {
 			return stackToItem.get(key as any) + this.getStackedXValue(stackToItem, key);
 		}
 		return 0;
-	}
-
-	/**
-	 * @ignore
-	 */
-	public updateLegendMarker(_dataItem?: DataItem<this["_dataItemSettings"]>) {
-
 	}
 
 	/**
