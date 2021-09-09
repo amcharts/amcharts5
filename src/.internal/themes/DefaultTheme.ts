@@ -726,7 +726,8 @@ export class DefaultTheme extends Theme {
 		this.rule("Scrollbar").setAll({
 			start: 0,
 			end: 1,
-			layer: 5
+			layer: 5,
+			animationEasing: $ease.out($ease.cubic)
 		});
 
 		this.rule("Scrollbar", ["vertical"]).setAll({

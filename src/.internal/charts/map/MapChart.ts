@@ -360,7 +360,7 @@ export class MapChart extends SerialChart {
 
 		const projection = this.get("projection")!;
 		const w = this.innerWidth();
-		const h = this.innerHeight();		
+		const h = this.innerHeight();
 
 		if (this.isDirty("projection")) {
 			this.makeGeoPath();
@@ -368,13 +368,15 @@ export class MapChart extends SerialChart {
 			this._fitMap();
 
 			projection.scale(this.getPrivate("mapScale") * this.get("zoomLevel", 1));
-			projection.rotate([this.get("rotationX", 0), this.get("rotationY", 0), this.get("rotationZ", 0)])
+			if (projection.rotate) {
+				projection.rotate([this.get("rotationX", 0), this.get("rotationY", 0), this.get("rotationZ", 0)])
+			}
 
 			let prev = this._prevSettings.projection;
 			if (prev && prev != projection) {
 				let hw = w / 2;
 				let hh = h / 2;
-				if(prev.invert){
+				if (prev.invert) {
 					let centerLocation = prev.invert([hw, hh]);
 
 					if (centerLocation) {
@@ -393,7 +395,7 @@ export class MapChart extends SerialChart {
 						}
 					}
 				}
-			}			
+			}
 		}
 
 		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {

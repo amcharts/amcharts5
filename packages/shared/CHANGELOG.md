@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+
+## [5.0.0-beta.13] - 2021-09-09
+
+### Added
+- `Star` now supports inner radius set in percent.
+
+### Fixed
+- Tooltips for radar series were not show with `RadarCursor`.
+- In some cases, Scrollbars were not being updated when zoomed-in with cursor.
+- Clicking on scrollbar's background resulted in scrollbar animation, but the scrollbar did not update its axis.
+- Dynamically changing `geoJSON` on a `MapSeries` was not working
+
+
 ## [5.0.0-beta.12] - 2021-09-08
 
 ### Added

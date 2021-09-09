@@ -1,6 +1,8 @@
 import type { Root } from "../Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 import type { Template } from "../../core/util/Template";
+import type { Percent } from "../../core/util/Percent";
+import * as $utils from "../../core/util/Utils";
 
 export interface IStarSettings extends IGraphicsSettings {
 
@@ -12,7 +14,7 @@ export interface IStarSettings extends IGraphicsSettings {
 	/**
 	 * Star's inner radius in pixels.
 	 */
-	innerRadius?: number;
+	innerRadius?: number | Percent;
 
 	/**
 	 * Number of spikes
@@ -67,7 +69,7 @@ export class Star extends Graphics {
 		if (this._clear) {
 			const display = this._display;
 			const r = this.get("radius", 0);
-			const ir = this.get("innerRadius", 0);
+			const ir = $utils.relativeToValue(this.get("innerRadius", 0), r);
 			const spikes = this.get("spikes", 0);
 			const step = Math.PI / spikes;
 			let angle = Math.PI / 2 * 3;

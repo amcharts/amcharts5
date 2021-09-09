@@ -277,9 +277,9 @@ export class RadarChart extends XYChart {
 			}
 		}
 
-		if(startAngle == endAngle){
-			inArc = true;	
-		}		
+		if (startAngle == endAngle) {
+			inArc = true;
+		}
 
 		if (!inArc) {
 			return false;
@@ -293,7 +293,7 @@ export class RadarChart extends XYChart {
 			innerRadius = this.getPrivate("innerRadius", 0);
 		}
 
-		if(innerRadius > radius){
+		if (innerRadius > radius) {
 			[innerRadius, radius] = [radius, innerRadius];
 		}
 
@@ -301,5 +301,9 @@ export class RadarChart extends XYChart {
 			return true;
 		}
 		return false;
+	}
+
+	protected _tooltipToLocal(point: IPoint): IPoint {
+		return this.radarContainer._display.toLocal(point);
 	}
 }

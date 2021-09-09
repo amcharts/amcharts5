@@ -92,6 +92,15 @@ export abstract class MapSeries extends Series {
 		super._prepareChildren();
 
 		if (this._valuesDirty || this.isDirty("geoJSON") || this.isDirty("include") || this.isDirty("exclude")) {
+			const geoJSON = this.get("geoJSON");
+			let previous = this._prevSettings.geoJSON;
+
+			if (previous && previous != geoJSON) {
+				this._prevSettings.geoJSON = undefined;
+				this._geoJSONparsed = false;
+				this.data.clear();
+			}
+
 			if (!this._geoJSONparsed) {
 				this._parseGeoJSON();
 				this._geoJSONparsed = true;

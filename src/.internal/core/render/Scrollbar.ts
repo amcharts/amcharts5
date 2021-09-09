@@ -88,7 +88,7 @@ export class Scrollbar extends Container {
 		return x;
 	}
 
-	public static _addOrientationClass(root: Root, settings: Scrollbar["_settings"]){
+	public static _addOrientationClass(root: Root, settings: Scrollbar["_settings"]) {
 		settings.themeTags = $utils.mergeTags(settings.themeTags, ["scrollbar", settings.orientation]);
 		if (!settings.background) {
 			settings.background = RoundedRectangle.new(root, {
@@ -121,6 +121,12 @@ export class Scrollbar extends Container {
 	public endGrip: Button = this._makeButton();
 
 	protected _thumbBusy: boolean = false;
+
+	protected _startDown: boolean = false;
+
+	protected _endDown: boolean = false;
+
+	protected _thumbDown: boolean = false;
 
 	protected _makeButton(): Button {
 		return this.children.push(Button.new(this._root, {
@@ -187,7 +193,9 @@ export class Scrollbar extends Container {
 					key = "x";
 				}
 
+
 				this._thumbBusy = true;
+
 				const animation = this.thumb.animate({ key: key, to: newCoordinate, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") });
 				if (animation) {
 					animation.events.on("stopped", () => {
@@ -207,26 +215,38 @@ export class Scrollbar extends Container {
 
 		this._disposers.push(startGrip.events.on("pointerdown", () => {
 			this._setPrivate("isBusy", true);
+			this._startDown = true;
 		}))
 
 		this._disposers.push(endGrip.events.on("pointerdown", () => {
 			this._setPrivate("isBusy", true);
+			this._endDown = true;
 		}))
 
 		this._disposers.push(thumb.events.on("pointerdown", () => {
 			this._setPrivate("isBusy", true);
+			this._thumbDown = true;
 		}))
 
 		this._disposers.push(startGrip.events.on("globalpointerup", () => {
-			this._setPrivate("isBusy", false);
+			if (this._startDown) {
+				this._setPrivate("isBusy", false);
+			}
+			this._startDown = false;
 		}))
 
 		this._disposers.push(endGrip.events.on("globalpointerup", () => {
-			this._setPrivate("isBusy", false);
+			if (this._endDown) {
+				this._setPrivate("isBusy", false);
+			}
+			this._endDown = false;
 		}))
 
 		this._disposers.push(thumb.events.on("globalpointerup", () => {
-			this._setPrivate("isBusy", false);
+			if (this._thumbDown) {
+				this._setPrivate("isBusy", false);
+			}
+			this._thumbDown = false;
 		}))
 
 		this._disposers.push(startGrip.on("x", () => {

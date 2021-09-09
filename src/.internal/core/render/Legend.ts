@@ -268,9 +268,8 @@ export class Legend extends Series {
 			if (item && item.set) {
 				item.set(<any>"legendDataItem", dataItem);
 			}
-
-			itemContainer.events.on("click", () => {
-				if (item && item.show) {
+			if (item && item.show) {
+				itemContainer.events.on("click", () => {
 					const labelText = dataItem.get("label").text._getText();
 					if (item.isHidden()) {
 						item.show();
@@ -280,8 +279,8 @@ export class Legend extends Series {
 						item.hide();
 						this._root.readerAlert(this._root.language.translate("%1 hidden", this._root.locale, labelText));
 					}
-				}
-			})
+				})
+			}
 
 			itemContainer._setDataItem(dataItem);
 			dataItem.set("itemContainer", itemContainer);

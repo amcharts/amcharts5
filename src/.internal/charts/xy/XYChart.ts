@@ -792,22 +792,27 @@ export class XYChart extends SerialChart {
 		const positionX = cursor.getPrivate("positionX", 0.5);
 		const positionY = cursor.getPrivate("positionY", 0.5);
 
-		if (behavior === "zoomX" || behavior === "zoomXY") {
-			this.xAxes.each((axis) => {
+
+		this.xAxes.each((axis) => {
+			if (behavior === "zoomX" || behavior === "zoomXY") {
 				let position0 = axis.toAxisPosition(downPositionX);
 				let position1 = axis.toAxisPosition(positionX);
-
 				axis.zoom(position0, position1);
-			})
-		}
+			}
+			axis.setPrivate("updateScrollbar", true);
+		})
 
-		if (behavior === "zoomY" || behavior === "zoomXY") {
-			this.yAxes.each((axis) => {
+
+
+		this.yAxes.each((axis) => {
+			if (behavior === "zoomY" || behavior === "zoomXY") {
 				let position0 = axis.toAxisPosition(downPositionY);
 				let position1 = axis.toAxisPosition(positionY);
 				axis.zoom(position0, position1);
-			})
-		}
+			}
+			axis.setPrivate("updateScrollbar", true);
+		})
+
 	}
 
 	protected _handleScrollbar(axes: List<Axis<any>>, start: number, end: number) {
@@ -1026,15 +1031,12 @@ export class XYChart extends SerialChart {
 						}
 					}
 
-					let local = this.plotContainer._display.toLocal(point);
-					if (!this.inPlot(local) || !tooltip.dataItem) {
+
+					if (!this.inPlot(this._tooltipToLocal(point)) || !tooltip.dataItem) {
 						hidden = true;
 					}
 					else {
-						let pointTo = tooltip.get("pointTo");
-						if (pointTo) {
-							sum += pointTo.y;
-						}
+						sum += point.y;
 					}
 
 					if (hidden) {
@@ -1088,6 +1090,10 @@ export class XYChart extends SerialChart {
 				prevY = Math.max(prevY + height, tooltip._fy + height);
 			})
 		}
+	}
+
+	protected _tooltipToLocal(point: IPoint): IPoint {
+		return this.plotContainer._display.toLocal(point);
 	}
 
 	/**

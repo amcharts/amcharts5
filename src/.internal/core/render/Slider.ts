@@ -57,5 +57,6 @@ export class Slider extends Scrollbar {
 		super.updateGrips();
 		const startGrip = this.startGrip;
 		this.endGrip.setAll({ x: startGrip.x(), y: startGrip.y() });
+		this.setRaw("end", this.get("start"));
 	}
 }
