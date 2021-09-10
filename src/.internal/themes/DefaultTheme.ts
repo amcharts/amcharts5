@@ -564,12 +564,12 @@ export class DefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("Graphics", ["background", "resize", "button"]).states.create("hover", {});
+			const rule = this.rule("RoundedRectangle", ["background", "resize", "button"]).states.create("hover", {});
 			setColor(rule, "fill", ic, "secondaryButtonHover");
 		}
 
 		{
-			const rule = this.rule("Graphics", ["background", "resize", "button"]).states.create("down", { stateAnimationDuration: 0 });
+			const rule = this.rule("RoundedRectangle", ["background", "resize", "button"]).states.create("down", { stateAnimationDuration: 0 });
 			setColor(rule, "fill", ic, "secondaryButtonDown");
 		}
 

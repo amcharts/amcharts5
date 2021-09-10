@@ -630,6 +630,13 @@ export class XYChart extends SerialChart {
 					}
 				})
 
+				$array.each(snapToSeries, (series) => {
+					const tooltip = series.get("tooltip");
+					if (tooltip) {
+						tooltip._setDataItem(undefined);
+					}
+				})
+
 				if (closestItem) {
 					let series = closestItem.component as XYSeries;
 					series.showDataItemTooltip(closestItem);
