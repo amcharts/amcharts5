@@ -47,7 +47,7 @@ export class MonotoneYTension {
 
     [x, y] = [y, x]
 
-    var t1 = NaN;
+    let t1 = NaN;
 
     x = +x, y = +y;
     if (x === this._x1 && y === this._y1) return; // Ignore coincident points.
@@ -104,7 +104,7 @@ function slope3(that: MonotoneYTension, x2: number, y2: number) {
  * @ignore
  */
 function slope2(that: MonotoneYTension, t: number) {
-  var h = that._x1 - that._x0;
+  let h = that._x1 - that._x0;
   return h ? (3 * (that._y1 - that._y0) / h - t) / 2 : t;
 }
 
@@ -112,7 +112,7 @@ function slope2(that: MonotoneYTension, t: number) {
  * @ignore
  */
 function point(that: MonotoneYTension, t0: number, t1: number) {
-  var x0 = that._x0,
+  let x0 = that._x0,
     y0 = that._y0,
     x1 = that._x1,
     y1 = that._y1,

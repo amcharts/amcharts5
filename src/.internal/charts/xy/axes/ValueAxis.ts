@@ -140,10 +140,15 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 */
 	calculateTotals?: boolean;
 
-
 	/**
-	 * Another value axis to which this axis grid must be synced. Note, there is no 100% guarantee that axes will always be synced, under
-	 * some rare cases it simply can not be done.  
+	 * This setting can be set to an instance of another [[ValueAxis]].
+	 *
+	 * If set the grid of this axis will be synced with grid of the target axis.
+	 *
+	 * NOTE: this is not 100% guaranteed to work. In some rare cases perfect
+	 * sync might not be possible.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid} for more info
 	 */
 	syncWithAxis?: ValueAxis<AxisRenderer>;
 

@@ -560,7 +560,7 @@ export class MapChart extends SerialChart {
 
 				const prevGeoBounds = this._prevGeoBounds;
 
-				if (prevGeoBounds && JSON.stringify(bounds) != JSON.stringify(prevGeoBounds)) {
+				if (prevGeoBounds && !$utils.sameBounds(bounds, prevGeoBounds)) {
 					this._dispatchBounds = true;
 					this._prevGeoBounds = bounds;
 				}

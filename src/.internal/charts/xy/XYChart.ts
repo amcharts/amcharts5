@@ -899,14 +899,6 @@ export class XYChart extends SerialChart {
 
 		this.topAxesContainer.set("paddingLeft", left);
 		this.topAxesContainer.set("paddingRight", right);
-
-		this.xAxes.each((axis) => {
-			axis._updateTooltipBounds();
-		})
-
-		this.yAxes.each((axis) => {
-			axis._updateTooltipBounds();
-		})
 	}
 
 	/**

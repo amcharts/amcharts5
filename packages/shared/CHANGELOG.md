@@ -5,10 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.16] - 2021-09-14
+
+### Fixed
+- Fills for axis ranges could go out of plot area bounds.
+- Tooltip of Y axis could be displayed out of bounds in some cases.
+
+
 ## [5.0.0-beta.15] - 2021-09-14
 
 ### Added
-- `dynamic` setting added to `Bullet`, for the bullets that need their `sprite` element redrawn when axis changes.
+- `dynamic` setting added to `Bullet`, for the bullets that need their `sprite` element redrawn when related series changes in any way.
 - `ClockHand` now supports negative radius value (distance from the target axis outer radius in pixels).
 - `syncWithAxis` added to `ValueAxis`. If enabled, will sync grid between the axes.
 

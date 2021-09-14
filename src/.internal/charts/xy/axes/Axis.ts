@@ -620,11 +620,6 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		renderer._axisLength = renderer.axisLength() / (renderer._end - renderer._start);
 	}
 
-	public _updatePosition() {
-		super._updatePosition();
-		this._updateTooltipBounds();
-	}
-
 	public _updateTooltipBounds() {
 		const tooltip = this.get("tooltip")!;
 		if (tooltip) {
@@ -851,6 +846,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			}
 
 			if (tooltip) {
+				renderer.updateTooltipBounds(tooltip);
+
 				if (this.get("snapTooltip")) {
 					position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
 				}

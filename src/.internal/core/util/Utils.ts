@@ -4,6 +4,7 @@ import type { IPointerEvent } from "../render/backend/Renderer";
 import * as $type from "./Type";
 import * as $array from "./Array";
 import * as $object from "./Object";
+import type { IBounds } from "./IBounds";
 
 import { Disposer, IDisposer } from "./Disposer";
 
@@ -1015,4 +1016,26 @@ export function mergeTags(tags1: string[] | undefined, tags2: string[]): string[
 		tags1 = [];
 	}
 	return [...tags1, ...tags2];
+}
+
+/**
+ * @ignore
+ */
+export function sameBounds(a: IBounds, b?: IBounds): boolean {
+	if(!b){
+		return false;
+	}
+	if (a.left != b.left) {
+		return false
+	}
+	if (a.right != b.right) {
+		return false
+	}
+	if (a.top != b.top) {
+		return false
+	}
+	if (a.bottom != b.bottom) {
+		return false
+	}
+	return true;
 }

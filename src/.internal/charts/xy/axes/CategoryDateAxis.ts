@@ -167,7 +167,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 		let selectedItems: Array<{ format: string, dataItem: DataItem<ICategoryDateAxisDataItem> }> = [];
 		let changed = false;
 
-		for (var i = startIndex; i < endIndex; i++) {
+		for (let i = startIndex; i < endIndex; i++) {
 			let dataItem = this.dataItems[i];
 			let index = dataItem.get("index")!;
 			let skip = false;

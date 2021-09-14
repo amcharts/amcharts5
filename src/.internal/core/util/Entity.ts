@@ -643,8 +643,8 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 */
 	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
 		this._prevPrivateSettings[key] = (<any>this._privateSettings)[key];
-		this._sendPrivateKeyEvent(key, value);
 		(<any>this._privateSettings)[key] = value;
+		this._sendPrivateKeyEvent(key, value);
 		return value;
 	}
 

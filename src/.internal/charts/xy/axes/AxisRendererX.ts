@@ -334,6 +334,18 @@ export class AxisRendererX extends AxisRenderer {
 			//display.drawRect(x0, 0, x1 - x0, this.axis!.gridContainer.height());
 			// using for holes, so can not be rectangle
 			const h = this.axis!.gridContainer.height();
+			const w = this.width();
+
+			if (x1 < x0) {
+				[x1, x0] = [x0, x1];
+			}
+			if(x0 > w || x1 < 0){
+				return;
+			}
+
+			x0 = Math.max(0, x0);
+			x1 = Math.min(w, x1);
+
 			display.moveTo(x0, 0);
 			display.lineTo(x1, 0);
 			display.lineTo(x1, h);
@@ -389,7 +401,12 @@ export class AxisRendererX extends AxisRenderer {
 			}
 		}
 
-		tooltip.set("bounds", { left: x, right: x + w, top: y, bottom: y + h });
-		tooltip.set("pointerOrientation", pointerOrientation);
+		const bounds = { left: x, right: x + w, top: y, bottom: y + h };
+		const oldBounds = tooltip.get("bounds");
+
+		if (!$utils.sameBounds(bounds, oldBounds)) {
+			tooltip.set("bounds", bounds);
+			tooltip.set("pointerOrientation", pointerOrientation);
+		}
 	}
 }

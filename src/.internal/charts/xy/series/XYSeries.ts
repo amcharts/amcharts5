@@ -1189,7 +1189,7 @@ export abstract class XYSeries extends Series {
 		this._reallyStackedTo = {};
 
 		$array.each(this.dataItems, (dataItem) => {
-			for (var s = 0; s < len; s++) {
+			for (let s = 0; s < len; s++) {
 				let stackToSeries = this._couldStackTo[s];
 				let stackToItem = stackToSeries.dataItems[index];
 

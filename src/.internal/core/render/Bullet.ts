@@ -25,7 +25,14 @@ export interface IBulletSettings extends IEntitySettings {
 	 */
 	sprite: Sprite;
 
+	/**
+	 * If set to `true`, the bullet will redraw its `sprite` element whenever
+	 * anything in its parent series changes.
+	 *
+	 * @default false
+	 */
 	dynamic?:boolean;
+
 }
 
 export interface IBulletPrivate extends IEntityPrivate {

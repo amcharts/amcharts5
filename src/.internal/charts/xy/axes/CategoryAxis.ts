@@ -279,7 +279,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let f = this.dataItems[startIndex].get("index", 0);
 
-		for (var i = startIndex; i < endIndex; i = i + frequency) {
+		for (let i = startIndex; i < endIndex; i = i + frequency) {
 			let dataItem = this.dataItems[i];
 
 			this._createAssets(dataItem);
@@ -557,7 +557,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			// if not found, try looking
-			for (var i = 0, len = series.dataItems.length; i < len; i++) {
+			for (let i = 0, len = series.dataItems.length; i < len; i++) {
 				let dataItem = series.dataItems[i];
 				if (dataItem.get(fieldName) === category) {
 					return dataItem;

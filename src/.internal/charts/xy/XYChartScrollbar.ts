@@ -87,14 +87,22 @@ export class XYChartScrollbar extends Scrollbar {
 			const startGrip = this.startGrip;
 			const endGrip = this.endGrip;
 
-			const x0 = startGrip.x();
-			const y0 = startGrip.y();
+			let x0 = startGrip.x();
+			let y0 = startGrip.y();
 
-			const x1 = endGrip.x();
-			const y1 = endGrip.y();
+			let x1 = endGrip.x();
+			let y1 = endGrip.y();
 
 			const h = this.height();
 			const w = this.width();
+
+			if (x0 > x1) {
+				[x0, x1] = [x1, x0]
+			}
+
+			if (y0 > y1) {
+				[y0, y1] = [y1, y0]
+			}
 
 			if (this.get("orientation") === "horizontal") {
 				display.moveTo(0, 0);

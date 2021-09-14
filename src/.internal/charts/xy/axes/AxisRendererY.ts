@@ -82,7 +82,7 @@ export class AxisRendererY extends AxisRenderer {
 			display.moveTo(0, 0);
 			display.lineTo(graphics.width(), 0);
 		});
-		
+
 		this.set("draw", (display, renderer) => {
 			display.moveTo(0, 0);
 			display.lineTo(0, renderer.height());
@@ -340,7 +340,26 @@ export class AxisRendererY extends AxisRenderer {
 
 	protected fillDrawMethod(fill: Graphics, y0: number, y1: number) {
 		fill.set("draw", (display) => {
-			display.drawRect(0, y0, this.axis!.gridContainer.width(), y1 - y0);
+			// using for holes, so can not be rectangle
+			const w = this.axis!.gridContainer.width();
+			const h = this.height();
+
+			if (y1 < y0) {
+				[y1, y0] = [y0, y1];
+			}
+
+			if (y0 > h || y1 < 0) {
+				return;
+			}
+
+			y0 = Math.max(0, y0);
+			y1 = Math.min(h, y1);
+
+			display.moveTo(0, y0);
+			display.lineTo(0, y1);
+			display.lineTo(w, y1);
+			display.lineTo(w, y0);
+			display.lineTo(0, y0);
 		})
 	}
 
@@ -406,8 +425,13 @@ export class AxisRendererY extends AxisRenderer {
 			}
 		}
 
-		tooltip.set("bounds", { left: x, right: x + w, top: y, bottom: y + h });
-		tooltip.set("pointerOrientation", pointerOrientation);
+		const bounds = { left: x, right: x + w, top: y, bottom: y + h };
+		const oldBounds = tooltip.get("bounds");
+
+		if (!$utils.sameBounds(bounds, oldBounds)) {
+			tooltip.set("bounds", bounds);
+			tooltip.set("pointerOrientation", pointerOrientation);
+		}
 	}
 
 	/**
