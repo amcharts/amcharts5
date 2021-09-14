@@ -1,6 +1,6 @@
 import type { Root } from "../Root";
 import type { Template, ApplyState } from "./Template";
-import type { Theme } from "../Theme";
+import type { Theme, IRule } from "../Theme";
 
 import { IDisposer, Disposer } from "./Disposer";
 import { EventDispatcher, Events } from "./EventDispatcher";
@@ -11,6 +11,7 @@ import { registry } from "../Registry";
 import * as $object from "./Object";
 import * as $ease from "./Ease";
 import * as $array from "./Array";
+import * as $order from "./Order";
 
 /**
  * @ignore
@@ -1076,7 +1077,7 @@ export abstract class Entity extends Settings implements IDisposer {
 			return super.set(key, value);
 		}
 		return value;
-	}	
+	}
 
 	/**
 	 * Removes a setting value for the specified `key`.
@@ -1247,25 +1248,6 @@ export abstract class Entity extends Settings implements IDisposer {
 		});
 	}
 
-	protected _addTheme(theme: Theme, themeTags: Set<string>) {
-		$array.eachReverse(this.classNames, (name) => {
-			const rules = theme._lookupRules<this>(name);
-
-			if (rules) {
-				$array.eachReverse(rules, (rule) => {
-					const matches = rule.tags.every((tag) => {
-						return themeTags.has(tag);
-					});
-
-					if (matches) {
-						rule.template._setObjectTemplate(this);
-						this._templates.push(rule.template);
-					}
-				});
-			}
-		});
-	}
-
 	protected _findTemplate(f: (template: Template<this>) => boolean): Template<this> | undefined {
 		const value = this._findStaticTemplate(f);
 
@@ -1341,9 +1323,42 @@ export abstract class Entity extends Settings implements IDisposer {
 		this._removeTemplates();
 
 		if (isConnected) {
-			$array.eachReverse(themes, (themes) => {
-				$array.eachReverse(themes, (theme) => {
-					this._addTheme(theme, themeTags);
+			$array.eachReverse(this.classNames, (name) => {
+				const allRules: Array<IRule<this>> = [];
+
+				$array.each(themes, (themes) => {
+					$array.each(themes, (theme) => {
+						const rules = theme._lookupRules<this>(name);
+
+						if (rules) {
+							$array.eachReverse(rules, (rule) => {
+								const matches = rule.tags.every((tag) => {
+									return themeTags.has(tag);
+								});
+
+								if (matches) {
+									rule.template._setObjectTemplate(this);
+
+									const result = $array.getFirstSortedIndex(allRules, (x) => {
+										const order = $order.compare(rule.tags.length, x.tags.length);
+
+										if (order === 0) {
+											return $order.compareArray(rule.tags, x.tags, $order.compare);
+
+										} else {
+											return order;
+										}
+									});
+
+									allRules.splice(result.index, 0, rule);
+								}
+							});
+						}
+					});
+				});
+
+				$array.each(allRules, (rule) => {
+					this._templates.push(rule.template);
 				});
 			});
 		}
@@ -1370,7 +1385,7 @@ export abstract class Entity extends Settings implements IDisposer {
 				}
 				registry.entitiesById[id] = this;
 			}
-			
+
 			const prevId = this._prevSettings.id;
 			if(prevId) {
 				delete registry.entitiesById[prevId];

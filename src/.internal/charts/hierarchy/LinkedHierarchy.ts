@@ -177,11 +177,11 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const circle = node.children.moveValue(this.circles.make(), 0);
 		this.circles.push(circle);
 		node.setPrivate("tooltipTarget", circle);
-		dataItem.set("circle", circle);
+		dataItem.setRaw("circle", circle);
 
 		const outerCircle = node.children.moveValue(this.outerCircles.make(), 0);
 		this.outerCircles.push(outerCircle);
-		dataItem.set("outerCircle", outerCircle);
+		dataItem.setRaw("outerCircle", outerCircle);
 
 		const label = dataItem.get("label");
 
@@ -205,8 +205,8 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	}
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
-		dataItem.set("childLinks", []);
-		dataItem.set("links", []);
+		dataItem.setRaw("childLinks", []);
+		dataItem.setRaw("links", []);
 		super.processDataItem(dataItem);
 	}
 
@@ -216,7 +216,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const parentDataItem = dataItem.get("parent");
 		if (parentDataItem) {
 			const link = this.linkDataItems(parentDataItem, dataItem);
-			dataItem.set("parentLink", link);
+			dataItem.setRaw("parentLink", link);
 		}
 
 		const node = dataItem.get("node");

@@ -198,7 +198,7 @@ export class LineSeries extends XYSeries {
 		}
 
 		if (xAxis.inited && yAxis.inited) {
-			if (this._axesDirty || this._valuesDirty || this._stackDirty || this.isDirty("vcx") || this.isDirty("vcy") || this._sizeDirty || this.isDirty("connect")) {
+			if (this._axesDirty || this._valuesDirty || this._stackDirty || this.isDirty("vcx") || this.isDirty("vcy") || this._sizeDirty || this.isDirty("connect") || this.isDirty("curveFactory")) {
 
 				this.fills.each((fill) => {
 					fill.setPrivate("visible", false);

@@ -146,7 +146,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		let i = 0;
 		if (this._valuesDirty) {
 			$array.each(this.dataItems, (dataItem) => {
-				dataItem.set("index", i);
+				dataItem.setRaw("index", i);
 				this._itemMap[dataItem.get("category") as string] = dataItem;
 				i++;
 			})

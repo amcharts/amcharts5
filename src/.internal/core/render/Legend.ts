@@ -270,14 +270,16 @@ export class Legend extends Series {
 			}
 			if (item && item.show) {
 				itemContainer.events.on("click", () => {
-					const labelText = dataItem.get("label").text._getText();
-					if (item.isHidden()) {
-						item.show();
-						this._root.readerAlert(this._root.language.translate("%1 shown", this._root.locale, labelText));
-					}
-					else {
-						item.hide();
-						this._root.readerAlert(this._root.language.translate("%1 hidden", this._root.locale, labelText));
+					if (itemContainer.get("toggleKey") != "none") {
+						const labelText = dataItem.get("label").text._getText();
+						if (item.isHidden()) {
+							item.show();
+							this._root.readerAlert(this._root.language.translate("%1 shown", this._root.locale, labelText));
+						}
+						else {
+							item.hide();
+							this._root.readerAlert(this._root.language.translate("%1 hidden", this._root.locale, labelText));
+						}
 					}
 				})
 			}

@@ -293,8 +293,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					$array.each(fields, (field) => {
 						let value = dataItem.get(field as any);
 						if ($type.isNumber(value)) {
-							newDataItem.set(field as any, value);
-							newDataItem.set(workingFields[field] as any, value);
+							newDataItem.setRaw(field as any, value);
+							newDataItem.setRaw(workingFields[field] as any, value);
 							count[field]++;
 							sum[field] += value;
 						}
@@ -310,11 +310,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 							switch (groupKey) {
 								case "close":
-									newDataItem.set(field as any, value);
+									newDataItem.setRaw(field as any, value);
 									break;
 
 								case "sum":
-									newDataItem.set(field as any, currentValue + value);
+									newDataItem.setRaw(field as any, currentValue + value);
 									break;
 
 								case "open":
@@ -322,13 +322,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 								case "low":
 									if (value < currentValue) {
-										newDataItem.set(field as any, value);
+										newDataItem.setRaw(field as any, value);
 									}
 									break;
 
 								case "high":
 									if (value > currentValue) {
-										newDataItem.set(field as any, value);
+										newDataItem.setRaw(field as any, value);
 									}
 									break;
 
@@ -336,17 +336,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 									count[field]++;
 									sum[field] += value;
 									let average = sum[field] / count[field];
-									newDataItem.set(field as any, average);
+									newDataItem.setRaw(field as any, average);
 									break;
 
 								case "extreme":
 									if (Math.abs(value) > Math.abs(currentValue)) {
-										newDataItem.set(field as any, value);
+										newDataItem.setRaw(field as any, value);
 									}
 									break;
 							}
 
-							newDataItem.set(workingFields[field] as any, newDataItem.get(field as any));
+							newDataItem.setRaw(workingFields[field] as any, newDataItem.get(field as any));
 							let dataContext: any = $object.copy(dataItem.dataContext);
 							dataContext[key as any] = roundedTime
 							newDataItem.dataContext = dataContext;
@@ -492,8 +492,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					dataItem.show();
 				}
 
-				dataItem.set("value", value);
-				dataItem.set("endValue", value + intervalDuration);
+				dataItem.setRaw("value", value);
+				dataItem.setRaw("endValue", value + intervalDuration);
 				let date = new Date(value);
 
 				format = formats[gridInterval.timeUnit];

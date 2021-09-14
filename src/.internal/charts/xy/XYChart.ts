@@ -616,6 +616,7 @@ export class XYChart extends SerialChart {
 						}
 					}
 				})
+
 				let minDistance = Infinity;
 				let closestItem: DataItem<IXYSeriesDataItem> | undefined;
 				$array.each(dataItems, (dataItem) => {
@@ -809,8 +810,6 @@ export class XYChart extends SerialChart {
 			axis.setPrivate("updateScrollbar", true);
 		})
 
-
-
 		this.yAxes.each((axis) => {
 			if (behavior === "zoomY" || behavior === "zoomXY") {
 				let position0 = axis.toAxisPosition(downPositionY);
@@ -831,15 +830,22 @@ export class XYChart extends SerialChart {
 
 			let zoomAnimation = axis.zoom(axisStart, axisEnd);
 
-			axis.setPrivate("updateScrollbar", false);
+			const updateScrollbar = "updateScrollbar";
+
+			axis.setPrivate(updateScrollbar, false);
 
 			if (zoomAnimation) {
-				zoomAnimation.events.on("stopped", () => {
-					axis.setPrivate("updateScrollbar", true);
-				});
+				if (!zoomAnimation.stopped) {
+					zoomAnimation.events.on("stopped", () => {
+						axis.setPrivate(updateScrollbar, true);
+					});
+				}
+				else {
+					axis.setPrivate(updateScrollbar, true);
+				}
 			}
 			else {
-				axis.setPrivate("updateScrollbar", true);
+				axis.setPrivate(updateScrollbar, true);
 			}
 		})
 	}

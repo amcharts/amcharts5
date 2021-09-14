@@ -694,7 +694,7 @@ export abstract class XYSeries extends Series {
 		axisRange.series = this;
 
 		const axisDataItem = axisRange.axisDataItem;
-		axisDataItem.set("isRange", true);
+		axisDataItem.setRaw("isRange", true);
 
 		const axis = <Axis<AxisRenderer>>axisDataItem.component;
 		if (axis) {
@@ -1160,8 +1160,8 @@ export abstract class XYSeries extends Series {
 
 		this._reallyStackedTo = {};
 		$array.each(this.dataItems, (dataItem) => {
-			dataItem.set("stackToItemY", undefined);
-			dataItem.set("stackToItemX", undefined);
+			dataItem.setRaw("stackToItemY", undefined);
+			dataItem.setRaw("stackToItemX", undefined);
 		})
 	}
 
@@ -1200,13 +1200,13 @@ export abstract class XYSeries extends Series {
 						if ($type.isNumber(value)) {
 							if ($type.isNumber(stackValue)) {
 								if (value >= 0 && stackValue >= 0) {
-									dataItem.set(stackToItemKey, stackToItem);
+									dataItem.setRaw(stackToItemKey, stackToItem);
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 									stackToSeries._stackedSeries[this.uid] = this;
 									break;
 								}
 								if (value < 0 && stackValue < 0) {
-									dataItem.set(stackToItemKey, stackToItem);
+									dataItem.setRaw(stackToItemKey, stackToItem);
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 									stackToSeries._stackedSeries[this.uid] = this;
 									break;
@@ -1218,7 +1218,7 @@ export abstract class XYSeries extends Series {
 						}
 					}
 					else {
-						dataItem.set(stackToItemKey, stackToItem);
+						dataItem.setRaw(stackToItemKey, stackToItem);
 						this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 						stackToSeries._stackedSeries[this.uid] = this;
 						break;

@@ -97,7 +97,7 @@ export class MapPolygonSeries extends MapSeries {
 		})
 	}
 
-	public _prepareChildren(){
+	public _prepareChildren() {
 		super._prepareChildren();
 
 		if (this.isDirty("fill")) {
@@ -105,7 +105,7 @@ export class MapPolygonSeries extends MapSeries {
 		}
 		if (this.isDirty("stroke")) {
 			this.mapPolygons.template.set("stroke", this.get("stroke"));
-		}		
+		}
 	}
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -116,7 +116,7 @@ export class MapPolygonSeries extends MapSeries {
 			mapPolygon = this.makeMapPolygon(dataItem);
 		}
 
-		dataItem.set("mapPolygon", mapPolygon);
+		dataItem.setRaw("mapPolygon", mapPolygon);
 		const geometry = dataItem.get("geometry")!;
 
 		if (geometry) {

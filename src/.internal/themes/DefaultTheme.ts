@@ -1105,7 +1105,8 @@ export class DefaultTheme extends Theme {
 			opposite: false,
 			inversed: false,
 			cellStartLocation: 0,
-			cellEndLocation: 1
+			cellEndLocation: 1,
+			width:p100
 		});
 
 		this.rule("AxisRendererY").setAll({
@@ -1113,7 +1114,8 @@ export class DefaultTheme extends Theme {
 			opposite: false,
 			inversed: false,
 			cellStartLocation: 0,
-			cellEndLocation: 1
+			cellEndLocation: 1,
+			height:p100
 		});
 
 		{

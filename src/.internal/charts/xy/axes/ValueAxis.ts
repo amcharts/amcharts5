@@ -8,6 +8,7 @@ import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $math from "../../../core/util/Math";
 import * as $utils from "../../../core/util/Utils";
+import { MultiDisposer } from "../../../core/util/Disposer";
 //import * as $order from "../../../core/util/Order";
 
 export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
@@ -139,6 +140,13 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 */
 	calculateTotals?: boolean;
 
+
+	/**
+	 * Another value axis to which this axis grid must be synced. Note, there is no 100% guarantee that axes will always be synced, under
+	 * some rare cases it simply can not be done.  
+	 */
+	syncWithAxis?: ValueAxis<AxisRenderer>;
+
 }
 
 export interface IValueAxisDataItem extends IAxisDataItem {
@@ -168,6 +176,9 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	maxFinal?: number;
 	selectionMin?: number;
 	selectionMax?: number;
+	selectionMinFinal?: number;
+	selectionMaxFinal?: number;
+	selectionStepFinal?: number;
 	step?: number;
 	stepDecimalPlaces?: number;
 }
@@ -215,6 +226,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _maxReal: number | undefined;
 
 	protected _baseValue: number = 0;
+	protected _syncDp?: MultiDisposer;
 
 	/**
 	 * @ignore
@@ -239,6 +251,27 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		if (this.isDirty("syncWithAxis")) {
+			let previousValue = this._prevSettings.syncWithAxis;
+			if (previousValue) {
+				if (this._syncDp) {
+					this._syncDp.dispose();
+				}
+			}
+			let syncWithAxis = this.get("syncWithAxis");
+			if (syncWithAxis) {
+				this._syncDp = new MultiDisposer([
+					syncWithAxis.onPrivate("selectionMinFinal", () => {
+						this._dirtySelectionExtremes = true;
+					}),
+					syncWithAxis.onPrivate("selectionMaxFinal", () => {
+						this._dirtySelectionExtremes = true;
+					})
+				])
+			}
+		}
+
 		//if (this._dirtyExtremes || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision")) {
 		if (this._sizeDirty || this._dirtyExtremes || this._valuesDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision") || this.isDirty("numberFormat")) {
 			this._getMinMax();
@@ -282,7 +315,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let value = selectionMin - step;
 			let i = 0;
 
-			if(logarithmic){
+			if (logarithmic) {
 				value = selectionMin;
 			}
 
@@ -303,7 +336,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					dataItem.show();
 				}
 
-				dataItem.set("value", value);
+				dataItem.setRaw("value", value);
 
 				const label = dataItem.get("label");
 				if (label) {
@@ -795,6 +828,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			selectionMin = minMaxStep.min;
 			selectionMax = minMaxStep.max;
 
+			const syncWithAxis = this.get("syncWithAxis");
+			if (syncWithAxis) {
+				minMaxStep = this._syncAxes(selectionMin, selectionMax, minMaxStep.step, syncWithAxis.getPrivate("selectionMinFinal", syncWithAxis.getPrivate("minFinal", 0)), syncWithAxis.getPrivate("selectionMaxFinal", syncWithAxis.getPrivate("maxFinal", 1)), syncWithAxis.getPrivate("selectionStepFinal", syncWithAxis.getPrivate("step", 1)));
+
+				selectionMin = minMaxStep.min;
+				selectionMax = minMaxStep.max;
+			}
+
 			if (strictMinMax) {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = Math.max(selectionMin, minDefined);
@@ -806,6 +847,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 			let start = this.valueToFinalPosition(selectionMin);
 			let end = this.valueToFinalPosition(selectionMax);
+
+			this.setPrivateRaw("selectionMinFinal", selectionMin);
+			this.setPrivateRaw("selectionMaxFinal", selectionMax);
+			this.setPrivateRaw("selectionStepFinal", minMaxStep.step);
 
 			this.zoom(start, end);
 		}
@@ -981,6 +1026,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		if (minDiff == Infinity) {
 			minDiff = (max - min)
+		}
+
+		const syncWithAxis = this.get("syncWithAxis");
+		if (syncWithAxis) {
+			minMaxStep = this._syncAxes(min, max, minMaxStep.step, syncWithAxis.getPrivate("minFinal", syncWithAxis.getPrivate("min", 0)), syncWithAxis.getPrivate("maxFinal", syncWithAxis.getPrivate("max", 1)), syncWithAxis.getPrivate("step", 1));
+			min = minMaxStep.min;
+			max = minMaxStep.max;
 		}
 
 		this.setPrivateRaw("maxZoomFactor", (max - min) / minDiff * this.get("maxZoomFactor", 100));
@@ -1224,5 +1276,80 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		if (this.getPrivate("min") != null && this.getPrivate("max") != null) {
 			this.zoom((start - min) / (max - min), (end - min) / (max - min), duration);
 		}
+	}
+
+
+
+	/**
+	 * Syncs with a target axis.
+	 *
+	 * @param  min  Min
+	 * @param  max  Max
+	 * @param  step Step
+	 */
+	protected _syncAxes(min: number, max: number, step: number, syncMin: number, syncMax: number, syncStep: number) {
+		let axis = this.get("syncWithAxis");
+		if (axis) {
+			let count: number = Math.round(syncMax - syncMin) / syncStep;
+			let currentCount = Math.round((max - min) / step);
+
+			let gridCount = this.get("renderer").gridCount();
+
+			if ($type.isNumber(count) && $type.isNumber(currentCount)) {
+				let synced = false;
+				let c = 0
+				let diff = (max - min) * 0.01;
+				let omin = min;
+				let omax = max;
+				let ostep = step;
+
+				while (synced != true) {
+					synced = this._checkSync(omin, omax, ostep, count);
+					c++;
+					if (c > 500) {
+						synced = true;
+					}
+					if (!synced) {
+						if (c / 3 == Math.round(c / 3)) {
+							omin = min - diff * c;
+							if (min >= 0 && omin < 0) {
+								omin = 0;
+							}
+						}
+						else {
+							omax = max + diff * c;
+							if (omax <= 0 && omax > 0) {
+								omax = 0;
+							}
+						}
+
+						let minMaxStep = this._adjustMinMax(omin, omax, gridCount, true);
+						omin = minMaxStep.min;
+						omax = minMaxStep.max;
+						ostep = minMaxStep.step;
+					}
+					else {
+						min = omin;
+						max = omax;
+						step = ostep;
+					}
+				}
+			}
+		}
+
+		return { min: min, max: max, step: step };
+	}
+
+	/**
+	 * Returns `true` if axis needs to be resunced with some other axis.
+	 */
+	protected _checkSync(min: number, max: number, step: number, count: number): boolean {
+		let currentCount = (max - min) / step;
+		for (let i = 1; i < count; i++) {
+			if ($math.round(currentCount / i, 1) == count || currentCount * i == count) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

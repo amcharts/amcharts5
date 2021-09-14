@@ -25,6 +25,7 @@ export interface IBulletSettings extends IEntitySettings {
 	 */
 	sprite: Sprite;
 
+	dynamic?:boolean;
 }
 
 export interface IBulletPrivate extends IEntityPrivate {

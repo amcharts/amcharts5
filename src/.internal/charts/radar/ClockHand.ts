@@ -128,9 +128,13 @@ export class ClockHand extends Container {
 					if (axis) {
 						const chart = axis.chart as RadarChart;
 						if (chart) {
-							const radius = $utils.relativeToValue(parent.get("pinRadius", 0), chart.getPrivate("radius", 0));;
+							const cr = chart.getPrivate("radius", 0);
+							let r = $utils.relativeToValue(parent.get("pinRadius", 0), cr);
+							if(r < 0){
+								r = cr + r;
+							}
 							display.moveTo(5, 0)
-							display.arc(0, 0, radius, 0, 360);
+							display.arc(0, 0, r, 0, 360);
 						}
 					}
 				}
@@ -158,7 +162,11 @@ export class ClockHand extends Container {
 							const bw = parent.get("bottomWidth", 10) / 2;
 							const tw = parent.get("topWidth", 0) / 2;
 							const cr = chart.getPrivate("radius", 0);
-							const r = $utils.relativeToValue(parent.get("radius", 0), cr);
+							let r = $utils.relativeToValue(parent.get("radius", 0), cr);
+
+							if(r < 0){
+								r = cr + r;
+							}
 
 							let ir = parent.get("innerRadius", 0);
 

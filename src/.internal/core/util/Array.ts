@@ -561,7 +561,7 @@ export interface SortResult {
 }
 
 /**
- * Orders an array using specific `ordering` function and returns index of
+ * Orders an array using specific `ordering` function and returns right-most index of
  * the `value`.
  *
  * @ignore Exclude from docs
@@ -598,6 +598,48 @@ export function getSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) => Or
 	return {
 		found: found,
 		index: (found ? start - 1 : start)
+	};
+}
+
+
+/**
+ * Orders an array using specific `ordering` function and returns left-most index of
+ * the `value`.
+ *
+ * @ignore Exclude from docs
+ * @param array     Source array
+ * @param ordering  An ordering function
+ * @returns Result of the search
+ */
+export function getFirstSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) => Ordering): SortResult {
+	let start = 0;
+	let end   = array.length;
+	let found = false;
+
+	while (start < end) {
+		// TODO is this faster/slower than using Math.floor ?
+		const pivot = (start + end) >> 1;
+
+		const order = ordering(array[pivot]);
+
+		// less
+		if (order < 0) {
+			start = pivot + 1;
+
+		// equal
+		} else if (order === 0) {
+			found = true;
+			end = pivot;
+
+		// more
+		} else {
+			end = pivot;
+		}
+	}
+
+	return {
+		found: found,
+		index: start
 	};
 }
 

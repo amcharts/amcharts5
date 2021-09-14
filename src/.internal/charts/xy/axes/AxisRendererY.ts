@@ -82,11 +82,10 @@ export class AxisRendererY extends AxisRenderer {
 			display.moveTo(0, 0);
 			display.lineTo(graphics.width(), 0);
 		});
-
-		//this.setAll({ width: 0, height: p100 });
-		this.set("draw", (display, graphics) => {
+		
+		this.set("draw", (display, renderer) => {
 			display.moveTo(0, 0);
-			display.lineTo(0, graphics.height());
+			display.lineTo(0, renderer.height());
 		});
 	}
 

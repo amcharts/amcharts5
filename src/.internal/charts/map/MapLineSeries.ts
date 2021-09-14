@@ -131,7 +131,7 @@ export class MapLineSeries extends MapSeries {
 			mapLine = this.makeMapLine(dataItem);
 		}
 
-		dataItem.set("mapLine", mapLine);
+		dataItem.setRaw("mapLine", mapLine);
 		const pointsToConnect = dataItem.get("pointsToConnect");
 		if (pointsToConnect) {
 			$array.each(pointsToConnect, (point) => {
@@ -164,15 +164,19 @@ export class MapLineSeries extends MapSeries {
 				if (pointsToConnect) {
 					let coordinates: Array<Array<number>> = [];
 					$array.each(pointsToConnect, (point) => {
-						let geometry = point.get("geometry");
-						if (geometry) {
-							let coords = geometry.coordinates;
-							if (coords) {
-								coordinates.push([coords[0] as any, coords[1] as any]);
-							}
+						const longitude = point.get("longitude");
+						const latitude = point.get("latitude");
+						if (longitude != null && latitude != null) {
+							coordinates.push([longitude, latitude]);
 						}
 						else {
-							coordinates.push([point.get("longitude", 0), point.get("latitude", 0)]);
+							const geometry = point.get("geometry");
+							if (geometry) {
+								const coords = geometry.coordinates;
+								if (coords) {
+									coordinates.push([coords[0] as any, coords[1] as any]);
+								}
+							}
 						}
 					})
 

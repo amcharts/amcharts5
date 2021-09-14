@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.15] - 2021-09-14
+
+### Added
+- `dynamic` setting added to `Bullet`, for the bullets that need their `sprite` element redrawn when axis changes.
+- `ClockHand` now supports negative radius value (distance from the target axis outer radius in pixels).
+- `syncWithAxis` added to `ValueAxis`. If enabled, will sync grid between the axes.
+
+### Changed
+- If legend items container toggle key is set to `"none"`, clicking on the legend item will not do anything now.
+- In `MapLineSeries`, if a data item had `pointsToConnect` set, map line now first looks at the point's longitude/latitude setting and then at the geometry.
+
+### Fixed
+- Play button was not chaning to default state instantly.
+- Change of `curveFactory` of `LineSeries` was not forcing redraw of the series.
+- `StepLineSeries` was not drawn properly when both X and Y axes were `ValueAxis`.
+- `StepLineSeries` was not showing tooltip when it was set as a `snapToSeries` on chart Cursor.
+- Theme rules now have the correct priority no matter where they are defined.
+
+
 ## [5.0.0-beta.14] - 2021-09-10
 
 ### Fixed
@@ -39,7 +58,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [5.0.0-beta.11] - 2021-09-08
 
-### Changed 
+### Changed
 - `fill` and `stroke` settings moved from `XYSeries` to `Series`, so that all series like `MapSeries` could be shown in Legend.
 - Text of a tooltip text will now adaptively change color based on current background color.
 

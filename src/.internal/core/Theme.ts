@@ -5,7 +5,7 @@ import type { IClasses } from "./Classes";
 import * as $order from "./util/Order";
 import * as $array from "./util/Array";
 
-interface IRule<A extends Entity> {
+export interface IRule<A extends Entity> {
 	tags: Array<string>;
 	template: Template<A>;
 }

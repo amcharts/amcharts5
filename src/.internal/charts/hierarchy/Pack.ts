@@ -192,7 +192,7 @@ export class Pack extends Hierarchy {
 		const circle = node.children.moveValue(this.circles.make(), 0);
 		node.setPrivate("tooltipTarget", circle);
 		this.circles.push(circle);
-		dataItem.set("circle", circle);
+		dataItem.setRaw("circle", circle);
 
 		const label = dataItem.get("label");
 

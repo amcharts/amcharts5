@@ -86,7 +86,7 @@ export abstract class AxisRenderer extends Graphics {
 	public makeTick(dataItem: DataItem<IAxisDataItem>): AxisTick {
 		const tick = this.axis.labelsContainer.children.push(this.ticks.make());
 		tick._setDataItem(dataItem);
-		dataItem.set("tick", tick);
+		dataItem.setRaw("tick", tick);
 		this.ticks.push(tick);
 		return tick;
 	}
@@ -111,7 +111,7 @@ export abstract class AxisRenderer extends Graphics {
 	public makeGrid(dataItem: DataItem<IAxisDataItem>): Grid {
 		const grid = this.axis.gridContainer.children.push(this.grid.make());
 		grid._setDataItem(dataItem);
-		dataItem.set("grid", grid);
+		dataItem.setRaw("grid", grid);
 		this.grid.push(grid);
 		return grid;
 	}
@@ -136,7 +136,7 @@ export abstract class AxisRenderer extends Graphics {
 	public makeAxisFill(dataItem: DataItem<IAxisDataItem>): Grid {
 		const axisFill = this.axis.gridContainer.children.push(this.axisFills.make());
 		axisFill._setDataItem(dataItem);
-		dataItem.set("axisFill", axisFill);
+		dataItem.setRaw("axisFill", axisFill);
 		this.axisFills.push(axisFill);
 		return axisFill;
 	}
@@ -173,7 +173,7 @@ export abstract class AxisRenderer extends Graphics {
 		this.axis.labelsContainer.children.moveValue(label, 0);
 
 		label._setDataItem(dataItem);
-		dataItem.set("label", label);
+		dataItem.setRaw("label", label);
 		this.labels.push(label);
 		return label;
 	}

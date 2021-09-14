@@ -74,7 +74,7 @@ export class GraticuleSeries extends MapLineSeries {
 
 			graticule.stepMinor([360, 360]);
 			graticule.stepMajor([step, step]);
-			this._dataItem.set("geometry", graticule());
+			this._dataItem.setRaw("geometry", graticule());
 		}
 	}
 }

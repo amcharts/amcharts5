@@ -207,11 +207,11 @@ export abstract class Hierarchy extends Series {
 		node.series = this;
 		node._setDataItem(dataItem);
 		this.nodes.push(node);
-		dataItem.set("node", node);
+		dataItem.setRaw("node", node);
 
 		const label = this.labels.make();
 		label._setDataItem(dataItem);
-		dataItem.set("label", label);
+		dataItem.setRaw("label", label);
 		this.labels.push(label);
 
 		if (!childData || childData.length == 0) {
@@ -365,10 +365,10 @@ export abstract class Hierarchy extends Series {
 		let colors = this.get("colors");
 
 		if (!dataItem.get("parent")) {
-			dataItem.set("depth", 0);
+			dataItem.setRaw("depth", 0);
 
 			if (colors) {
-				dataItem.set("fill", colors.next());
+				dataItem.setRaw("fill", colors.next());
 			}
 		}
 
@@ -381,23 +381,23 @@ export abstract class Hierarchy extends Series {
 
 		if (childData) {
 			const children: Array<DataItem<this["_dataItemSettings"]>> = [];
-			dataItem.set("children", children);
+			dataItem.setRaw("children", children);
 
 			$array.each(childData, (child) => {
 				const childDataItem = new DataItem(this, child, this._makeDataItem(child));
 
 				children.push(childDataItem);
 
-				childDataItem.set("parent", dataItem);
-				childDataItem.set("depth", depth + 1);
+				childDataItem.setRaw("parent", dataItem);
+				childDataItem.setRaw("depth", depth + 1);
 
 				if (this.dataItems.length == 1 && depth == 0) {
 					if (colors) {
-						childDataItem.set("fill", colors.next());
+						childDataItem.setRaw("fill", colors.next());
 					}
 				}
 				else {
-					childDataItem.set("fill", dataItem.get("fill"));
+					childDataItem.setRaw("fill", dataItem.get("fill"));
 				}
 
 				this.processDataItem(childDataItem);

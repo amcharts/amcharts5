@@ -579,6 +579,18 @@ export abstract class Series extends Component {
 		if(dataItem.bullets){
 			$array.each(dataItem.bullets, (bullet) => {
 				this._positionBullet(bullet);
+
+				if(bullet.get("dynamic")){
+					const sprite = bullet.get("sprite");
+					if(sprite){						
+						sprite._markDirtyKey("fill" as any);
+					}
+					if(sprite instanceof Container){
+						sprite.walkChildren((child)=>{						
+							child._markDirtyKey("fill" as any);
+						})
+					}
+				}	
 			})
 		}
 

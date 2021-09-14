@@ -271,7 +271,7 @@ export class Partition extends Hierarchy {
 	protected _makeNode(dataItem: DataItem<this["_dataItemSettings"]>, node: HierarchyNode) {
 		const rectangle = node.children.moveValue(this.rectangles.make(), 0);
 		node.setPrivate("tooltipTarget", rectangle);
-		dataItem.set("rectangle", rectangle);
+		dataItem.setRaw("rectangle", rectangle);
 
 		const label = dataItem.get("label");
 

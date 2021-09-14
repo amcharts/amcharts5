@@ -20,9 +20,9 @@ export class AnimatedTheme extends Theme {
 		this.rule("MapChart").set("wheelDuration", 300);
 
 		this.rule("Entity").setAll({
-			stateAnimationDuration:600
+			stateAnimationDuration: 600
 		});
 
-		this.rule("Sprite").states.create("default", { stateAnimationDuration:600 });
+		this.rule("Sprite").states.create("default", { stateAnimationDuration: 600 });
 	}
 }

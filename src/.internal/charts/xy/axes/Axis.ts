@@ -494,7 +494,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 
 	public _processAxisRange(dataItem: DataItem<this["_dataItemSettings"]>) {
-		dataItem.set("isRange", true);
+		dataItem.setRaw("isRange", true);
 		this._createAssets(dataItem);
 		this._rangesDirty = true;
 		this._prepareDataItem(dataItem);

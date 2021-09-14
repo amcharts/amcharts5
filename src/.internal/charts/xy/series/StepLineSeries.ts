@@ -5,6 +5,7 @@ import type { Axis } from "../axes/Axis";
 import type { Template } from "../../../core/util/Template";
 import { Percent, p100 } from "../../../core/util/Percent";
 import type { DataItem } from "../../../core/render/Component";
+import { curveStepAfter } from "d3-shape";
 
 export interface IStepLineSeriesDataItem extends ILineSeriesDataItem {
 }
@@ -57,6 +58,11 @@ export class StepLineSeries extends LineSeries {
 		x._afterNew();
 		return x;
 	}
+
+	protected _afterNew() {
+		this._setDefault("curveFactory", curveStepAfter);
+		super._afterNew();
+	}	
 
 
 	protected _getPoints(dataItem: DataItem<this["_dataItemSettings"]>, o: { points: Array<Array<number>>, segments: number[][][], stacked: boolean | undefined, getOpen: boolean, basePosX: number, basePosY: number, fillVisible: boolean | undefined, xField: string, yField: string, xOpenField: string, yOpenField: string, vcx: number, vcy: number, baseAxis: Axis<AxisRenderer>, xAxis: Axis<AxisRenderer>, yAxis: Axis<AxisRenderer>, locationX: number, locationY: number, openLocationX: number, openLocationY: number }) {
@@ -182,6 +188,8 @@ export class StepLineSeries extends LineSeries {
 
 			points.push(point0);
 			points.push(point1);
+
+			dataItem.set("point", {x:point0[0] + (point1[0] - point0[0]) / 2, y:point0[1] + (point1[1] - point0[1]) / 2 });
 		}
 
 		if (this.get("noRisers")) {

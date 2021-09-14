@@ -1,4 +1,4 @@
-import { FeatureCollection } from "../../../.internal/Geodata";
+import type { FeatureCollection } from "../../../.internal/Geodata";
 
 const map: FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":null,"properties":{"name":"Congressional District 4","id":"0904","STATEID":"09","CD116":"04","CDSESSION":"116","STATENAME":"Connecticut"},"id":"0904"},

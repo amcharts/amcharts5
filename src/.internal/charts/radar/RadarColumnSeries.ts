@@ -140,10 +140,10 @@ export class RadarColumnSeries extends BaseColumnSeries {
 
 		const slice = graphics as Slice;
 
-		dataItem.set("startAngle", startAngle);
-		dataItem.set("endAngle", endAngle);
-		dataItem.set("innerRadius", innerRadius);
-		dataItem.set("radius", radius);
+		dataItem.setRaw("startAngle", startAngle);
+		dataItem.setRaw("endAngle", endAngle);
+		dataItem.setRaw("innerRadius", innerRadius);
+		dataItem.setRaw("radius", radius);
 
 		let axisStartAngle = 0;
 		let axisEndAngle = 360;

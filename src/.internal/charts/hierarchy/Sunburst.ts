@@ -327,7 +327,7 @@ export class Sunburst extends Partition {
 	protected _makeNode(dataItem: DataItem<this["_dataItemSettings"]>, node: HierarchyNode) {
 		const slice = node.children.moveValue(this.slices.make(), 0);
 		node.setPrivate("tooltipTarget", slice);
-		dataItem.set("slice", slice);
+		dataItem.setRaw("slice", slice);
 
 		slice.on("arc", () => {
 			this._updateLabel(dataItem);
