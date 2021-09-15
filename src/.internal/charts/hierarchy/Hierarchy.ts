@@ -25,6 +25,7 @@ export interface IHierarchyDataObject {
 	value?: number,
 	children?: IHierarchyDataObject[],
 	dataItem?: DataItem<IHierarchyDataItem>
+	customValue?: boolean;
 };
 
 export interface IHierarchyDataItem extends ISeriesDataItem {
@@ -410,7 +411,6 @@ export abstract class Hierarchy extends Series {
 			node.setAll({ toggleKey: undefined, cursorOverStyle: "default" });
 		}
 
-
 		if (dataItem.get("disabled") == null) {
 			if (depth >= topDepth + initialDepth) {
 				this.disableDataItem(dataItem, 0);
@@ -438,7 +438,13 @@ export abstract class Hierarchy extends Series {
 
 			dataItem.get("node").set("disabled", dataItem.get("disabled"));
 
-			const value = d3HierarchyNode.value;
+			let dataValue = d3HierarchyNode.data.value;
+			let value = d3HierarchyNode.value
+		
+			if(dataValue != null){				
+				value = dataValue;
+			}
+
 			if ($type.isNumber(value)) {
 				dataItem.setRaw("sum", value);
 
@@ -474,6 +480,11 @@ export abstract class Hierarchy extends Series {
 				childrenDataArray.push(childData);
 				this._makeHierarchyData(childData, childDataItem);
 			})
+
+			const value = dataItem.get("valueWorking");
+			if ($type.isNumber(value)) {
+				data.value = value;
+			}
 		}
 		else {
 			const value = dataItem.get("valueWorking");

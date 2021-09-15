@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.17] - 2021-09-15
+
+### Changed
+- Default for `Treemap` setting `layoutAlgorithm` changed to `"squarify"`.
+- Providing value in Hierarchy node's data will override sum of its children (except for `Pack`). 
+
+### Fixed
+- `ForceDirected` nodes were linked to invisible top node even though `topLevel` was set to `1` meaning top node should not be visible. This was causing issues with the layout of such nodes.
+
+
 ## [5.0.0-beta.16] - 2021-09-14
 
 ### Fixed

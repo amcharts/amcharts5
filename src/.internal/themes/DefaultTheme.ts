@@ -2188,8 +2188,8 @@ export class DefaultTheme extends Theme {
 			minRadius: percent(1),
 			maxRadius: percent(8),
 			initialFrames: 500,
-			centerStrength: 0.5,
-			manyBodyStrength: -15,
+			centerStrength: 0.8,
+			manyBodyStrength: -14,
 			velocityDecay: 0.5,
 			linkWithStrength: 0.5,
 			showOnFrame: 10,
@@ -2280,7 +2280,7 @@ export class DefaultTheme extends Theme {
 
 		this.rule("Treemap").setAll({
 			upDepth: 0,
-			layoutAlgorithm: "binary"
+			layoutAlgorithm: "squarify"
 		});
 
 		{

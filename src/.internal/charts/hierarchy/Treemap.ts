@@ -77,7 +77,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * An algorithm to use when laying out node rectangles.
 	 *
 	 * @see {@link }
-	 * @default "binary"
+	 * @default "squarify"
 	 */
 	layoutAlgorithm?: "binary" | "squarify" | "slice" | "dice" | "sliceDice";
 
