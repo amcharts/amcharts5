@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-69.8992,12.4517],[-69.9421,12.4385],[-70.0662,12.5466],[-70.035,12.6143],[-69.9733,12.5677],[-69.8992,12.4517]]]},"properties":{"name":"Aruba","id":"AW","Continent":"Caribbean"},"id":"AW"},
 {"type":"Feature","geometry":{"type":"MultiPolygon","coordinates":[[[[-61.7471,17.5748],[-61.7621,17.5485],[-61.844,17.5959],[-61.8689,17.6851],[-61.8524,17.7141],[-61.7766,17.6908],[-61.7495,17.6614],[-61.7471,17.5748]]],[[[-61.7162,17.0369],[-61.748,16.9974],[-61.8596,17.0132],[-61.8873,17.098],[-61.8172,17.1692],[-61.7386,17.1384],[-61.686,17.0985],[-61.7162,17.0369]]]]},"properties":{"name":"Antigua and Barbuda","id":"AG","Continent":"Caribbean"},"id":"AG"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-63.0011,18.2221],[-63.16,18.1712],[-63.1534,18.2002],[-63.0259,18.27],[-63.0011,18.2221]]]},"properties":{"name":"Anguilla","id":"AI","Continent":"Caribbean"},"id":"AI"},

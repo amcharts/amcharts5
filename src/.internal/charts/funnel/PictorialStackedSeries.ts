@@ -62,6 +62,8 @@ export class PictorialStackedSeries extends PyramidSeries {
 	 */
 	public readonly seriesMask: Graphics = Graphics.new(this._root, { position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 });
 
+	public readonly seriesGraphics: Graphics = this.slicesContainer.children.push(Graphics.new(this._root, { themeTags: ["pictorial", "background"], position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 }));
+
 	protected _afterNew() {
 		super._afterNew();
 		this.set("topWidth", p100);
@@ -77,6 +79,7 @@ export class PictorialStackedSeries extends PyramidSeries {
 		let h = slicesContainer.innerHeight();
 
 		let seriesMask = this.seriesMask;
+		let seriesGraphics = this.seriesGraphics;
 		let scale = seriesMask.get("scale", 1);
 
 		const bounds = seriesMask.localBounds();
@@ -93,14 +96,20 @@ export class PictorialStackedSeries extends PyramidSeries {
 			seriesMask.set("scale", scale);
 			seriesMask.set("x", w / 2);
 			seriesMask.set("y", h / 2);
+
+			seriesGraphics.set("scale", scale);
+			seriesGraphics.set("x", w / 2);
+			seriesGraphics.set("y", h / 2);			
 		}
 	}
 
 	public _prepareChildren() {
 		super._prepareChildren();
 		if (this.isDirty("svgPath")) {
-			this.seriesMask.set("svgPath", this.get("svgPath"));
-		}
+			const svgPath = this.get("svgPath");
+			this.seriesMask.set("svgPath", svgPath);
+			this.seriesGraphics.set("svgPath", svgPath);
+		}	
 
 		this._updateScale();
 	}

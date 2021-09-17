@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-83.113,40.993],[-83.111,40.703],[-83.305,40.702],[-83.42,40.687],[-83.497,40.702],[-83.496,40.818],[-83.516,40.818],[-83.515,40.905],[-83.477,40.905],[-83.456,40.992],[-83.42,40.992],[-83.113,40.993]]]},"properties":{"name":"Wyandot","id":"39175","STATE":"OH","TYPE":"County","CNTRY":"USA"},"id":"39175"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-83.415,41.5],[-83.42,41.254],[-83.421,41.167],[-83.881,41.168],[-83.883,41.418],[-83.797,41.442],[-83.711,41.499],[-83.699,41.534],[-83.609,41.575],[-83.57,41.617],[-83.416,41.62],[-83.415,41.5]]]},"properties":{"name":"Wood","id":"39173","STATE":"OH","TYPE":"County","CNTRY":"USA"},"id":"39173"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-84.343,41.486],[-84.342,41.428],[-84.806,41.426],[-84.807,41.696],[-84.399,41.707],[-84.381,41.617],[-84.381,41.514],[-84.343,41.486]]]},"properties":{"name":"Williams","id":"39171","STATE":"OH","TYPE":"County","CNTRY":"USA"},"id":"39171"},

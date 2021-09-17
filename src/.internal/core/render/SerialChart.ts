@@ -31,7 +31,7 @@ export abstract class SerialChart extends Chart {
 	 *
 	 * @default Container.new()
 	 */
-	public readonly seriesContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured:false });
+	public readonly seriesContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured: false });
 
 	/**
 	 * A list of chart's series.
@@ -58,7 +58,8 @@ export abstract class SerialChart extends Chart {
 				seriesContainer.children.insertIndex(change.index, change.newValue);
 				this._processSeries(change.newValue);
 			} else if (change.type === "removeIndex") {
-				seriesContainer.children.removeIndex(change.index);
+				seriesContainer.children.removeValue(change.oldValue);
+				this._removeSeries(change.oldValue);
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}
@@ -70,7 +71,14 @@ export abstract class SerialChart extends Chart {
 		series._placeBulletsContainer(this);
 	}
 
-	protected _removeSeries(series:this["_seriesType"]){
+	protected _removeSeries(series: this["_seriesType"]) {
 		series._removeBulletsContainer();
+		const tooltip = series.get("tooltip");
+		if (tooltip) {
+			tooltip.hide(0);
+		}
+		if (series.get("autoDispose")) {
+			series.dispose();
+		}
 	}
 }

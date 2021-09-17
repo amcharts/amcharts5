@@ -188,7 +188,6 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		circle.on("radius", () => {
 			const d = circle.get("radius", this.width()) * 2;
 			label.setAll({ maxWidth: d, maxHeight: d })
-
 			outerCircle.set("radius", d / 2);
 
 			this._handleRadiusChange();
@@ -290,7 +289,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	}
 
 	/**
-	 * Link two data items wit a link element.
+	 * Link two data items with a link element.
 	 *
 	 * @param   source    Source node data item
 	 * @param   target    Target node data item
@@ -344,6 +343,84 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		return link;
 	}
 
+
+	/**
+	 * Unlink two data items
+	 *
+	 * @param   source    Source node data item
+	 * @param   target    Target node data item
+	 * @param   strength  Link strength
+	 * @return            Link element
+	 */
+	public unlinkDataItems(source: DataItem<this["_dataItemSettings"]>, target: DataItem<this["_dataItemSettings"]>) {
+
+		let link!: HierarchyLink;
+
+		const sourceLinks = source.get("links");
+
+		if (sourceLinks) {
+			$array.each(sourceLinks, (lnk) => {
+				if (lnk && lnk.get("target") == target) {
+					link = lnk;
+					$array.remove(sourceLinks, link);
+				}
+			})
+		}
+
+		const targetLinks = target.get("links");
+
+		if (targetLinks) {
+			$array.each(targetLinks, (lnk) => {
+				if (lnk && lnk.get("target") == source) {
+					link = lnk;
+					$array.remove(targetLinks, link);
+				}
+			})
+		}
+
+		if (link) {
+			this._disposeLink(link);
+		}
+
+		this._handleUnlink();
+	}
+
+	protected _handleUnlink() {
+
+	}
+
+	protected _disposeLink(link: HierarchyLink) {
+		this.links.removeValue(link);
+		link.dispose();
+	}
+
+	/**
+	 * Returns `true` if two nodes are linked with each other.
+	 */
+	public areLinked(source: DataItem<this["_dataItemSettings"]>, target: DataItem<this["_dataItemSettings"]>): boolean {
+		const sourceLinks = source.get("links");
+		let linked = false;
+		if (sourceLinks) {
+			$array.each(sourceLinks, (lnk) => {
+				if (lnk.get("target") == target) {
+					linked = true;
+				}
+			})
+		}
+
+		const targetLinks = target.get("links");
+
+		if (targetLinks) {
+			$array.each(targetLinks, (lnk) => {
+				if (lnk.get("target") == source) {
+					linked = true;
+				}
+			})
+		}
+
+		return linked;
+	}
+
 	protected _processLink(_link: HierarchyLink, _source: DataItem<this["_dataItemSettings"]>, _target: DataItem<this["_dataItemSettings"]>) {
 
 	}
@@ -356,8 +433,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const links = dataItem.get("links");
 		if (links) {
 			$array.each(links, (link) => {
-				this.links.removeValue(link);
-				link.dispose();
+				this._disposeLink(link)
 			})
 		}
 	}

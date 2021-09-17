@@ -134,7 +134,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * Sensitivity of a mouse wheel.
-	 * 
+	 *
 	 * @default 1
 	 */
 	wheelSensitivity?: number;
@@ -146,7 +146,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * An easing function to use for mouse wheel action animations.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 * @default am5.ease.out($ease.cubic)
 	 */
@@ -159,7 +159,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * An easing function to use for zoom/pan animations.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 * @default am5.ease.out($ease.cubic)
 	 */
@@ -168,7 +168,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * A [[ZoomControl]] instance.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Zoom_control} for more info
 	 */
 	zoomControl?: ZoomControl;
@@ -182,7 +182,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
 	 * Initial coordinates to center map on load or `goHome()` call.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
 	 */
 	homeGeoPoint?: IGeoPoint;
@@ -193,7 +193,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * @default 0.4
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
 	 */
-	maxPanOut?: number;
+	 maxPanOut?: number;
 
 }
 
@@ -273,7 +273,6 @@ export class MapChart extends SerialChart {
 	protected _mapBounds = [[0, 0], [0, 0]];
 
 	protected _geoCentroid: IGeoPoint = { longitude: 0, latitude: 0 };
-	protected _centroid: IPoint = { x: 0, y: 0 };
 	protected _geoBounds: { left: number, right: number, top: number, bottom: number } = { left: 0, right: 0, top: 0, bottom: 0 };
 	protected _prevGeoBounds: { left: number, right: number, top: number, bottom: number } = { left: 0, right: 0, top: 0, bottom: 0 };
 
@@ -438,6 +437,7 @@ export class MapChart extends SerialChart {
 						this.setRaw("translateY", yy);
 					}
 				}
+
 				this.markDirtyProjection();
 			}
 		}
@@ -540,8 +540,6 @@ export class MapChart extends SerialChart {
 			const translate = projection.translate();
 			this.setRaw("translateX", translate[0]);
 			this.setRaw("translateY", translate[1]);
-
-			this._centroid = { x: translate[0], y: translate[1] };
 
 			const geoPath = this.getPrivate("geoPath");
 			this._mapBounds = geoPath.bounds(this._geometryColection);
@@ -683,7 +681,6 @@ export class MapChart extends SerialChart {
 				}
 
 				const downPoint = this.chartContainer._display.toLocal(event.point);
-
 				this._downTranslateX = this.get("translateX");
 				this._downTranslateY = this.get("translateY");
 				this._downRotationX = this.get("rotationX");
@@ -825,7 +822,6 @@ export class MapChart extends SerialChart {
 					let local = display.toLocal(event.point);
 					downPoint = display.toLocal(downPoint);
 
-
 					let x = this._downTranslateX;
 					let y = this._downTranslateY;
 
@@ -845,7 +841,7 @@ export class MapChart extends SerialChart {
 								y += local.y - downPoint.y;
 							}
 
-							const bounds = this._mapBounds;
+/*							const bounds = this._mapBounds;
 
 							const w = this.width();
 							const h = this.height();
@@ -855,30 +851,20 @@ export class MapChart extends SerialChart {
 
 							const zoomLevel = this.get("zoomLevel", 1);
 
-							let cx = this._centroid.x - w / 2;
-							let cy = this._centroid.y - h / 2;
+							const maxPanOut = 1 - Math.min(1, this.get("maxPanOut", 0));
 
-							cx *= zoomLevel;
-							cy *= zoomLevel;
+							let center = this.convert(this.geoCentroid());
 
-							const maxPanOut = this.get("maxPanOut", 0);
-
-							let xs = 1;
-							if (w < ww * zoomLevel) {
-								xs = -1
+							if (panX == "translateX") {
+								//x = Math.min(x, w / 2 + (ww / 2 - 1) * zoomLevel - ww / 2 * maxPanOut);
+								//x = Math.max(x, w / 2 - (ww / 2 - 1) * zoomLevel + ww / 2 * maxPanOut);
 							}
 
-							let ys = 1;
-							if (h < hh * zoomLevel) {
-								ys = -1
+							if (panY == "translateY") {
+								//y = Math.min(y, h / 2 + (hh / 2 - 1) * zoomLevel - hh / 2 * maxPanOut);
+								//y = Math.max(y, h / 2 - (hh / 2 - 1) * zoomLevel + hh / 2 * maxPanOut);
 							}
-
-							x = Math.min(x, cx + xs * (w - ww) / 2 * zoomLevel + (w / 2) * zoomLevel + ww * maxPanOut);
-							x = Math.max(x, cx + xs * -1 * (w - ww) / 2 * zoomLevel + w - (w / 2) * zoomLevel - ww * maxPanOut);
-
-							y = Math.min(y, cy + ys * (h - hh) / 2 * zoomLevel + (h / 2) * zoomLevel + hh * maxPanOut);
-							y = Math.max(y, cy + ys * -1 * (h - hh) / 2 * zoomLevel + h - (h / 2) * zoomLevel - hh * maxPanOut);
-
+*/		
 							this.set("translateX", x);
 							this.set("translateY", y);
 
@@ -926,7 +912,7 @@ export class MapChart extends SerialChart {
 
 	/**
 	 * Zoom the map to geographical bounds.
-	 * 
+	 *
 	 * @param  geoBounds  Bounds
 	 * @param  duration   Animation duration in milliseconds
 	 */
@@ -967,7 +953,7 @@ export class MapChart extends SerialChart {
 
 	/**
 	 * Zooms the map to specific screen point.
-	 * 
+	 *
 	 * @param  point    Point
 	 * @param  level    Zoom level
 	 * @param  center   Center the map
@@ -1012,7 +998,7 @@ export class MapChart extends SerialChart {
 
 	/**
 	 * Zooms the map to specific geographical point.
-	 * 
+	 *
 	 * @param  geoPoint  Point
 	 * @param  level     Zoom level
 	 * @param  center    Center the map

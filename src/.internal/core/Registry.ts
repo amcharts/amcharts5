@@ -15,6 +15,11 @@ export class Registry {
 	 */
 	entitiesById: { [index: string]: any } = {};
 
+	/**
+	 * Entities that have their `id` setting set.
+	 */
+	rootElements: any[] = [];
+
 }
 
 /**
@@ -38,4 +43,15 @@ export const registry = new Registry();
  */
 export function addLicense(license: string): void {
 	registry.licenses.push(license);
+}
+
+
+/**
+ * Disposes all [[Root]] elements.
+ */
+export function disposeAllRootElements(): void {
+	let root;
+	while(root = registry.rootElements.pop()) {
+		root.dispose();
+	}
 }

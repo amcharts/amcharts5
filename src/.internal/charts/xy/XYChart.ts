@@ -291,6 +291,18 @@ export class XYChart extends SerialChart {
 		}));
 	}
 
+	protected _removeSeries(series: this["_seriesType"]) {
+		const xAxis = series.get("xAxis");
+		if (xAxis) {
+			$array.remove(xAxis.series, series);
+		}
+		const yAxis = series.get("yAxis");
+		if (yAxis) {
+			$array.remove(yAxis.series, series);
+		}
+		super._removeSeries(series);
+	}
+
 	protected _handleSetWheel() {
 		const wheelX = this.get("wheelX");
 		const wheelY = this.get("wheelY");
@@ -870,18 +882,27 @@ export class XYChart extends SerialChart {
 				container.children.insertIndex(change.index, change.newValue);
 				change.newValue.processChart(this);
 			} else if (change.type === "removeIndex") {
-				const axis = axes.getIndex(change.index);
+				const axis = change.oldValue;
 				if (axis) {
 					const axisParent = axis.parent
 					if (axisParent) {
 						axisParent.children.removeIndex(change.index);
 					}
 
+					const gridContainer = axis.gridContainer;
+					const gridParent = gridContainer.parent;
+					if (gridParent) {
+						gridParent.children.removeValue(gridContainer);
+					}
+
+					const topGridContainer = axis.topGridContainer;
+					const topGridParent = topGridContainer.parent;
+					if (topGridParent) {
+						topGridParent.children.removeValue(topGridContainer);
+					}
+
 					if (axis.get("autoDispose")) {
 						axis.dispose();
-					}
-					else {
-
 					}
 				}
 			} else {

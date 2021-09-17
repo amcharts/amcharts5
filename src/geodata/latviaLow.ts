@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "./.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[26.5928,55.954],[26.6164,55.92],[26.6285,55.8687],[26.5422,55.8398],[26.4987,55.841],[26.4759,55.8615],[26.4937,55.8759],[26.4439,55.9155],[26.4702,55.9292],[26.5222,55.9116],[26.5579,55.916],[26.5928,55.954]]]},"properties":{"name":"Daugavpils","id":"LV-DGV","CNTRY":"Latvia","TYPE":"Republican City"},"id":"LV-DGV"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[23.7818,56.6452],[23.7789,56.6248],[23.6734,56.6117],[23.6791,56.6374],[23.6401,56.6567],[23.7124,56.6902],[23.7265,56.6946],[23.7894,56.6892],[23.7989,56.6599],[23.7818,56.6452]]]},"properties":{"name":"Jelgava","id":"LV-JEL","CNTRY":"Latvia","TYPE":"Republican City"},"id":"LV-JEL"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[25.8249,56.4836],[25.8239,56.4871],[25.8334,56.5252],[25.8839,56.5301],[25.9089,56.4966],[25.8916,56.4769],[25.8249,56.4836]]]},"properties":{"name":"Jēkabpils","id":"LV-JKB","CNTRY":"Latvia","TYPE":"Republican City"},"id":"LV-JKB"},

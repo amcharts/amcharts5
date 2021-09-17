@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "./.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-176.6329,0.8084],[-176.6311,0.7952],[-176.6433,0.7934],[-176.6429,0.808],[-176.6329,0.8084]]]},"properties":{"id":"UTC-12:00","TIMEZONE":"UTC-12:00"},"id":"UTC-12:00"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-169.8034,-19.0832],[-169.9039,-19.1376],[-169.9483,-19.073],[-169.834,-18.9659],[-169.8034,-19.0832]]]},"properties":{"id":"UTC-11:00","TIMEZONE":"UTC-11:00"},"id":"UTC-11:00"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-155.5353,19.1088],[-155.8814,19.0707],[-156.0487,19.7499],[-155.8316,20.2759],[-155.1989,19.9944],[-154.8043,19.5245],[-155.5353,19.1088]]]},"properties":{"id":"UTC-10:00","TIMEZONE":"UTC-10:00"},"id":"UTC-10:00"},

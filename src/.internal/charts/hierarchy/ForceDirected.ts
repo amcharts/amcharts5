@@ -259,6 +259,8 @@ export class ForceDirected extends LinkedHierarchy {
 		const index = this._nodes.push(d3ForceNode) - 1;
 		d3ForceNode.index = index;
 
+		this.d3forceSimulation.nodes(this._nodes);
+
 		dataItem.set("d3ForceNode", d3ForceNode);
 		super.processDataItem(dataItem);
 
@@ -507,6 +509,21 @@ export class ForceDirected extends LinkedHierarchy {
 	}
 
 	protected _processLink(link: HierarchyLink, source: DataItem<this["_dataItemSettings"]>, target: DataItem<this["_dataItemSettings"]>) {
-		this._links.push({ link: link, source: source.get("d3ForceNode").index, target: target.get("d3ForceNode").index, sourceDataItem: source, targetDataItem: target });
+		const d3Link = { link: link, source: source.get("d3ForceNode").index, target: target.get("d3ForceNode").index, sourceDataItem: source, targetDataItem: target };
+		this._links.push(d3Link);
+		link.setPrivate("d3Link", d3Link);
+
+		this.linkForce = d3Force.forceLink(this._links);
+		this.d3forceSimulation.force("link", this.linkForce);
+		this.restartSimulation(0.5);
+	}
+
+	protected _disposeLink(link: HierarchyLink) {
+		super._disposeLink(link);
+		$array.remove(this._links, link.getPrivate("d3Link"));
+	}
+
+	protected _handleUnlink() {
+		this.restartSimulation(0.5);
 	}
 }

@@ -779,6 +779,7 @@ export abstract class XYSeries extends Series {
 	}
 
 	protected _dispose() {
+		super._dispose();
 		$array.removeFirst(this.get("xAxis").series, this);
 		$array.removeFirst(this.get("yAxis").series, this);
 	}

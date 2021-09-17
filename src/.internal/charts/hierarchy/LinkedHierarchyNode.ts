@@ -44,11 +44,6 @@ export class LinkedHierarchyNode extends HierarchyNode {
 	public static className: string = "LinkedHierarchyNode";
 	public static classNames: Array<string> = HierarchyNode.classNames.concat([LinkedHierarchyNode.className]);
 
-	/*
-		public readonly circle: Circle = this.children.push(Circle.new(this._root, { themeClasses: ["LinkedHierarchyNodeCircle"] }))
-		public readonly outerCircle: Circle = this.children.push(Circle.new(this._root, { themeClasses: ["LinkedHierarchyNodeOuterCircle"] }))
-		public readonly label: Label = this.children.push(Label.new(this._root, { themeClasses: ["LinkedHierarchyNodeLabel"] }));
-	*/
 	declare protected _dataItem: DataItem<ILinkedHierarchyDataItem> | undefined;
 
 	protected _afterNew() {

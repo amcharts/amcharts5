@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-96.8265,17.1469],[-96.8003,17.1606],[-96.7997,17.161],[-96.7783,17.1237],[-96.8287,17.0891],[-96.8326,17.0961],[-96.8265,17.1469]]]},"properties":{"id":"20227","COUNTYID":"227","COUNTY":"San Lorenzo Cacaotepec","STATEID":"20","STATE":"Oaxaca","CNTRY":"Mexico"},"id":"20227"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-99.0904,19.5095],[-99.0639,19.4988],[-99.0509,19.4502],[-99.1222,19.4598],[-99.1431,19.4651],[-99.1572,19.5028],[-99.1435,19.5723],[-99.1237,19.5928],[-99.1179,19.5906],[-99.1129,19.5733],[-99.0904,19.5095]]]},"properties":{"id":"09005","COUNTYID":"005","COUNTY":"Gustavo A. Madero","STATEID":"09","STATE":"Ciudad de México","CNTRY":"Mexico"},"id":"09005"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-99.0509,19.4502],[-99.0639,19.4988],[-99.0288,19.4846],[-98.9905,19.426],[-98.9659,19.3733],[-98.9919,19.3676],[-99.0581,19.4007],[-99.0558,19.4221],[-99.0509,19.4502]]]},"properties":{"id":"15058","COUNTYID":"058","COUNTY":"Nezahualcóyotl","STATEID":"15","STATE":"México","CNTRY":"Mexico"},"id":"15058"},

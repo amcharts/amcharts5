@@ -30,6 +30,7 @@ export interface IHierarchyLinkSettings extends IGraphicsSettings {
 }
 
 export interface IHierarchyLinkPrivate extends IGraphicsPrivate {
+	d3Link:any;
 }
 
 /**

@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "./.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[101.6559,2.8808],[101.6435,2.9418],[101.7036,2.9392],[101.7248,2.9074],[101.7222,2.8782],[101.6665,2.8649],[101.6559,2.8808]]]},"properties":{"name":"Putrajaya","id":"MY-16","CNTRY":"Malaysia","TYPE":"Federal Territory"},"id":"MY-16"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[115.2399,5.3861],[115.2342,5.3453],[115.2665,5.2837],[115.2436,5.2705],[115.1561,5.2652],[115.1599,5.2922],[115.1944,5.3535],[115.2399,5.3861]]]},"properties":{"name":"Labuan","id":"MY-15","CNTRY":"Malaysia","TYPE":"Federal Territory"},"id":"MY-15"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[101.7323,3.0378],[101.7028,3.03],[101.6532,3.0435],[101.6426,3.0824],[101.6028,3.1328],[101.6028,3.1567],[101.6384,3.2198],[101.704,3.2144],[101.7266,3.2314],[101.7522,3.2015],[101.7394,3.1214],[101.754,3.1008],[101.7503,3.0544],[101.7323,3.0378]]]},"properties":{"name":"Kuala Lumpur","id":"MY-14","CNTRY":"Malaysia","TYPE":"Federal Territory"},"id":"MY-14"},

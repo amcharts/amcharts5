@@ -706,7 +706,7 @@ export abstract class Sprite extends Entity {
 
 			if (dataItem) {
 				const context = dataItem.dataContext;
-				if(context){
+				if (context) {
 					template = (context as any)[field];
 
 					if (!(template instanceof Template) && template) {
@@ -989,7 +989,7 @@ export abstract class Sprite extends Entity {
 			this._sizeDirty = true;
 		}
 
-		if (this.isDirty("maxHeight") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
 			this.markDirtyBounds();
 			this._sizeDirty = true;
 		}
@@ -1364,10 +1364,11 @@ export abstract class Sprite extends Entity {
 	 * @ignore
 	 */
 	public markDirtyBounds(): void {
+		const display = this._display;
 		if (this.get("isMeasured")) {
 			this._root._addDirtyBounds(this);
-			this._display.isMeasured = true;
-			this._display.invalidateBounds();
+			display.isMeasured = true;
+			display.invalidateBounds();
 
 			const parent = this.parent;
 
@@ -1382,7 +1383,7 @@ export abstract class Sprite extends Entity {
 			}
 		}
 		else {
-			this._display.isMeasured = true;
+			display.isMeasured = false;
 		}
 	}
 
@@ -1723,6 +1724,12 @@ export abstract class Sprite extends Entity {
 		this._display.dispose();
 		this._removeTemplateField();
 		this._removeParent(this.parent);
+
+		const tooltip = this.get("tooltip");
+		if (tooltip) {
+			tooltip.dispose();
+		}
+
 		this.markDirty();
 	}
 

@@ -1494,11 +1494,11 @@ export class CanvasText extends CanvasContainer implements IText {
 
 	public _addBounds(bounds: IBounds): void {
 		if (this.visible && this.isMeasured) {
-			if (this._textVisible) {
+			//if (this._textVisible) {
 				const x = this._measure(this.getLayer());
 				setPoint(bounds, { x: x.left, y: x.top });
 				setPoint(bounds, { x: x.right, y: x.bottom });
-			}
+			//}
 		}
 	}
 

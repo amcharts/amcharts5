@@ -233,6 +233,8 @@ export class Root implements IDisposer {
 		dom.appendChild(inner);
 
 		this._inner = inner;
+
+		registry.rootElements.push(this);
 	}
 
 	public static new(id: string | HTMLElement): Root {
@@ -763,6 +765,8 @@ export class Root implements IDisposer {
 			if (this._inner) {
 				$utils.removeElement(this._inner);
 			}
+
+			$array.remove(registry.rootElements, this);
 		}
 	}
 

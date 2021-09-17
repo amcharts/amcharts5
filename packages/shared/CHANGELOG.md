@@ -5,14 +5,35 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.18] - 2021-09-17
+
+### Added
+- `areLinked()` method added to `LinkedHierarchy`.
+- `unlinkDataItems()` method added to `LinkedHierarchy`.
+- Global function `am5.disposeAllRootElements()` added. Disposes all charts.
+- `am5.registry.rootElements` added which holds an array with instances of all active `Root` elements.
+- `seriesGraphics` property added to `PictorialStackedSeries`. It's a `Graphics` which shows `svgPath` shape under all slices. Useful when `startLocation`/`endLocation` is used to make slices not occupy whole shape area.
+
+### Changed
+- `maxPanOut` of `MapChart` is temporarily disabled until we figure out proper behavior for it.
+
+### Fixed
+- Linking nodes with `linkDataItems` of `LinkedHierarchy` was not working if called after the data was set.
+- `Micro` theme was not removing padding from charts.
+- Adding in `@types/geojson` as a dependency.
+- Map could jump to unpredictable position after the chart's container size changed and user zoomed or panned the map.
+- In some cases `Label` with `oversizedBehavior = "fit"` could be incorrectly positioned.
+- Removing series and axes from a serial chart was not working properly.
+
+
 ## [5.0.0-beta.17] - 2021-09-15
 
 ### Changed
 - Default for `Treemap` setting `layoutAlgorithm` changed to `"squarify"`.
-- Providing value in Hierarchy node's data will override sum of its children (except for `Pack`). 
+- Providing value in Hierarchy node's data will override sum of its children (except for `Pack`).
 
 ### Fixed
-- `ForceDirected` nodes were linked to invisible top node even though `topLevel` was set to `1` meaning top node should not be visible. This was causing issues with the layout of such nodes.
+- `ForceDirected` nodes were linked to invisible top node even though `topDepth` was set to `1` meaning top node should not be visible. This was causing issues with the layout of such nodes.
 
 
 ## [5.0.0-beta.16] - 2021-09-14

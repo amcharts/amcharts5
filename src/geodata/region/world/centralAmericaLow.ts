@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-88.8941,15.8908],[-89.2373,15.8944],[-89.1615,17.8148],[-88.2956,18.4722],[-88.0972,18.1215],[-88.2716,17.61],[-88.3134,16.6326],[-88.8941,15.8908]]]},"properties":{"name":"Belize","id":"BZ","Continent":"Central America"},"id":"BZ"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-83.642,10.9171],[-83.4482,10.4658],[-82.5636,9.5768],[-82.94,9.4493],[-82.8793,8.0708],[-83.1626,8.588],[-83.7341,8.6144],[-83.6372,9.0354],[-84.6589,9.6471],[-85.1146,9.5816],[-85.6248,9.9024],[-85.8305,10.3981],[-85.7443,11.0621],[-83.642,10.9171]]]},"properties":{"name":"Costa Rica","id":"CR","Continent":"Central America"},"id":"CR"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-89.1615,17.8148],[-89.2373,15.8944],[-88.8941,15.8908],[-88.2284,15.7291],[-89.2224,14.866],[-89.3626,14.416],[-90.0952,13.7366],[-91.1461,13.9256],[-92.2353,14.5452],[-92.1872,15.3209],[-91.7365,16.0701],[-90.4472,16.0728],[-90.4171,16.3909],[-90.993,17.2527],[-90.9892,17.8161],[-89.1615,17.8148]]]},"properties":{"name":"Guatemala","id":"GT","Continent":"Central America"},"id":"GT"},

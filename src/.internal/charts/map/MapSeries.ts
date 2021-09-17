@@ -149,6 +149,7 @@ export abstract class MapSeries extends Series {
 			}
 
 			if (features) {
+
 				for (let i = 0, len = features.length; i < len; i++) {
 					let feature: any = features[i];
 					let geometry: any = feature.geometry;
@@ -167,10 +168,14 @@ export abstract class MapSeries extends Series {
 								continue;
 							}
 
-							// find data object in user-provided data
-							let dataItem: any = $array.find(this.dataItems, (value: any) => {
-								return value.get("id") == id;
-							})
+							let dataItem: any;
+
+							if (id != null) {
+								// find data object in user-provided data
+								dataItem = $array.find(this.dataItems, (value: any) => {
+									return value.get("id") == id;
+								})
+							}
 
 							let dataObject: any;
 

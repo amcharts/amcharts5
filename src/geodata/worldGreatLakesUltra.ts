@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "./.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[179.2223,-8.5541],[179.2023,-8.4652],[179.2312,-8.5047],[179.2223,-8.5541]]]},"properties":{"name":"Tuvalu","id":"TV"},"id":"TV"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[3.4624,-54.4471],[3.346,-54.4511],[3.3669,-54.3997],[3.4437,-54.3841],[3.4814,-54.4002],[3.4624,-54.4471]]]},"properties":{"name":"Bouvet Island","id":"BV"},"id":"BV"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-5.3345,36.1623],[-5.3383,36.1122],[-5.3562,36.1264],[-5.3551,36.1455],[-5.3345,36.1623]]]},"properties":{"name":"Gibraltar","id":"GI"},"id":"GI"},

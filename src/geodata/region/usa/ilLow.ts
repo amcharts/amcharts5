@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-88.931,40.928],[-88.93,40.754],[-88.987,40.754],[-88.985,40.665],[-89.046,40.664],[-89.045,40.628],[-89.102,40.626],[-89.133,40.598],[-89.268,40.595],[-89.269,40.616],[-89.328,40.615],[-89.331,40.749],[-89.55,40.748],[-89.56,40.779],[-89.553,40.806],[-89.499,40.874],[-89.472,40.921],[-89.34,40.922],[-89.124,40.927],[-89.048,40.926],[-88.931,40.928]]]},"properties":{"name":"Woodford","id":"17203","STATE":"IL","TYPE":"County","CNTRY":"USA"},"id":"17203"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-88.94,42.155],[-89.172,42.153],[-89.173,42.207],[-89.399,42.204],[-89.399,42.415],[-89.403,42.503],[-88.939,42.498],[-88.94,42.155]]]},"properties":{"name":"Winnebago","id":"17201","STATE":"IL","TYPE":"County","CNTRY":"USA"},"id":"17201"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-88.705,37.864],[-88.707,37.602],[-88.832,37.599],[-89.041,37.598],[-89.154,37.601],[-89.151,37.865],[-88.932,37.862],[-88.705,37.864]]]},"properties":{"name":"Williamson","id":"17199","STATE":"IL","TYPE":"County","CNTRY":"USA"},"id":"17199"},

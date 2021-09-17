@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-89.725,44.248],[-89.898,44.249],[-90.312,44.25],[-90.316,44.25],[-90.316,44.425],[-90.316,44.685],[-89.845,44.685],[-89.845,44.512],[-89.727,44.511],[-89.725,44.248]]]},"properties":{"name":"Wood","id":"55141","STATE":"WI","TYPE":"County","CNTRY":"USA"},"id":"55141"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-88.404,44.244],[-88.403,43.939],[-88.404,43.892],[-88.645,43.895],[-88.886,43.895],[-88.886,43.983],[-88.887,44.243],[-88.74,44.243],[-88.404,44.244]]]},"properties":{"name":"Winnebago","id":"55139","STATE":"WI","TYPE":"County","CNTRY":"USA"},"id":"55139"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-89.598,44.246],[-89.488,44.244],[-89.225,44.243],[-88.887,44.243],[-88.886,43.983],[-89.166,43.983],[-89.598,43.982],[-89.598,44.246]]]},"properties":{"name":"Waushara","id":"55137","STATE":"WI","TYPE":"County","CNTRY":"USA"},"id":"55137"},

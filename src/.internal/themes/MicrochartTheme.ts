@@ -15,6 +15,41 @@ export class MicrochartTheme extends Theme {
 			paddingLeft: 0
 		});
 
+		this.rule("XYChart").setAll({
+			paddingTop: 0,
+			paddingRight: 0,
+			paddingBottom: 0,
+			paddingLeft: 0
+		});
+
+		this.rule("SlicedChart").setAll({
+			paddingTop: 0,
+			paddingRight: 0,
+			paddingBottom: 0,
+			paddingLeft: 0
+		});
+
+		this.rule("Tree").setAll({
+			paddingTop: 0,
+			paddingRight: 0,
+			paddingBottom: 0,
+			paddingLeft: 0
+		});
+
+		this.rule("Pack").setAll({
+			paddingTop: 0,
+			paddingRight: 0,
+			paddingBottom: 0,
+			paddingLeft: 0
+		});
+
+		this.rule("Flow").setAll({
+			paddingTop: 0,
+			paddingRight: 0,
+			paddingBottom: 0,
+			paddingLeft: 0
+		});
+
 		this.rule("Button", ["resize"]).setAll({
 			visible: false
 		});

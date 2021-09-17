@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-69.8992,12.4517],[-69.9421,12.4385],[-70.0662,12.5466],[-69.9733,12.5677],[-69.8992,12.4517]]]},"properties":{"name":"Aruba","id":"AW","Continent":"Caribbean"},"id":"AW"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-61.7162,17.0369],[-61.8596,17.0132],[-61.8172,17.1692],[-61.7162,17.0369]]]},"properties":{"name":"Antigua and Barbuda","id":"AG","Continent":"Caribbean"},"id":"AG"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-63.0011,18.2221],[-63.16,18.1712],[-63.1534,18.2002],[-63.0259,18.27],[-63.0011,18.2221]]]},"properties":{"name":"Anguilla","id":"AI","Continent":"Caribbean"},"id":"AI"},

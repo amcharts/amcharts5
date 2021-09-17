@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "./.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[47.8087,29.2245],[47.8299,29.251],[47.8636,29.2609],[47.8659,29.3038],[47.8665,29.3037],[47.9802,29.3091],[47.9886,29.2737],[47.9886,29.2574],[48.0152,29.2074],[47.9956,29.1886],[47.9848,29.1884],[47.9144,29.1879],[47.882,29.1927],[47.8687,29.2007],[47.8354,29.2103],[47.8087,29.2245]]]},"properties":{"id":"KW-FA","name":"Al Farwānīyah","TYPE":"Muhafazah","TYPE_ENG":"Governorate","CNTRY":"Kuwait"},"id":"KW-FA"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[47.9956,29.1886],[48.0152,29.2074],[47.9886,29.2574],[47.9886,29.2737],[48.0726,29.2747],[48.0928,29.2809],[48.097,29.2615],[48.1149,29.2202],[48.1205,29.1953],[48.0905,29.1917],[48.0667,29.1822],[48.0467,29.1812],[48.0267,29.1898],[48.0062,29.1888],[47.9956,29.1886]]]},"properties":{"id":"KW-MU","name":"Mubārak al Kabīr","TYPE":"Muhafazah","TYPE_ENG":"Governorate","CNTRY":"Kuwait"},"id":"KW-MU"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[48.0928,29.2809],[48.0726,29.2747],[47.9886,29.2737],[47.9802,29.3091],[48.0221,29.3111],[48.0019,29.3385],[48.0279,29.3567],[48.0521,29.3421],[48.0917,29.3509],[48.0976,29.3467],[48.0901,29.3033],[48.0928,29.2809]]]},"properties":{"id":"KW-HA","name":"Ḩawallī","TYPE":"Muhafazah","TYPE_ENG":"Governorate","CNTRY":"Kuwait"},"id":"KW-HA"},

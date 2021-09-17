@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[47.3027,-11.575],[47.282,-11.5746],[47.279,-11.5574],[47.2971,-11.5543],[47.3027,-11.575]]]},"properties":{"name":"Glorioso Islands","id":"GO","Continent":"Africa"},"id":"GO"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[42.7579,-17.0752],[42.7417,-17.0744],[42.7382,-17.0519],[42.7609,-17.0651],[42.7579,-17.0752]]]},"properties":{"name":"Juan De Nova Island","id":"JU","Continent":"Africa"},"id":"JU"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[31.2877,-22.4023],[29.663,-22.1465],[29.3647,-22.194],[29.0373,-21.8112],[28.0455,-21.573],[27.6697,-21.0642],[27.6996,-20.5307],[26.1685,-19.5382],[25.2589,-17.7937],[25.8636,-17.9523],[27.0207,-17.9585],[27.9326,-16.8963],[28.7604,-16.532],[28.913,-15.988],[29.7299,-15.6447],[30.396,-15.643],[30.4379,-15.9954],[31.2363,-16.024],[31.9399,-16.4287],[32.9479,-16.7121],[32.9932,-18.3597],[32.7164,-19.0017],[33.0069,-19.8737],[32.4777,-20.7129],[32.3714,-21.3352],[31.2877,-22.4023]]]},"properties":{"name":"Zimbabwe","id":"ZW","Continent":"Africa"},"id":"ZW"},

@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[179.2223,-8.5541],[179.2023,-8.4653],[179.2307,-8.5048],[179.2223,-8.5541]]]},"properties":{"name":"Tuvalu","id":"TV","Continent":"Oceania"},"id":"TV"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[166.6588,19.2828],[166.6087,19.3072],[166.6278,19.3245],[166.6588,19.3117],[166.6588,19.2828]]]},"properties":{"name":"Wake Island","id":"UM-WQ","Continent":"Oceania"},"id":"UM-WQ"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[166.7458,-14.8263],[167.1316,-15.1348],[167.1995,-15.4855],[166.8257,-15.6351],[166.6313,-15.406],[166.5274,-14.8503],[166.7458,-14.8263]]]},"properties":{"name":"Vanuatu","id":"VU","Continent":"Oceania"},"id":"VU"},

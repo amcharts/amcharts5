@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-92.249,37.063],[-92.523,37.066],[-92.632,37.069],[-92.682,37.07],[-92.677,37.265],[-92.69,37.265],[-92.687,37.483],[-92.415,37.479],[-92.342,37.478],[-92.251,37.476],[-92.252,37.431],[-92.252,37.359],[-92.252,37.258],[-92.245,37.258],[-92.249,37.063]]]},"properties":{"name":"Wright","id":"29229","STATE":"MO","TYPE":"County","CNTRY":"USA"},"id":"29229"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-94.633,40.571],[-94.496,40.57],[-94.234,40.571],[-94.231,40.47],[-94.214,40.469],[-94.216,40.382],[-94.33,40.383],[-94.552,40.384],[-94.601,40.385],[-94.611,40.386],[-94.611,40.472],[-94.634,40.472],[-94.633,40.571]]]},"properties":{"name":"Worth","id":"29227","STATE":"MO","TYPE":"County","CNTRY":"USA"},"id":"29227"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-92.687,37.483],[-92.69,37.265],[-92.677,37.265],[-92.682,37.07],[-92.902,37.072],[-92.902,37.089],[-93.065,37.09],[-93.064,37.162],[-93.059,37.273],[-93.077,37.273],[-93.073,37.418],[-93.073,37.488],[-92.853,37.485],[-92.687,37.483]]]},"properties":{"name":"Webster","id":"29225","STATE":"MO","TYPE":"County","CNTRY":"USA"},"id":"29225"},

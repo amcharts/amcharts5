@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "./.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-70.0528,12.5287],[-69.9275,12.4485],[-69.9042,12.3425],[-70.0528,12.4256],[-70.0528,12.5287]]]},"properties":{"name":"Aruba","id":"AW","CNTRY":"Aruba","TYPE":"Nation"},"id":"AW"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-68.2489,12.162],[-68.2576,11.9813],[-68.3218,11.9927],[-68.3276,12.0874],[-68.3975,12.1591],[-68.3917,12.2451],[-68.2489,12.162]]]},"properties":{"name":"Bonaire, Saint Eustachius and Saba","id":"BQ","CNTRY":"Bonaire, Saint Eustachius and Saba","TYPE":"Nation"},"id":"BQ"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-68.9687,12.1362],[-68.8725,12.1017],[-68.8172,11.9899],[-68.9221,11.987],[-69.0998,12.1218],[-69.1989,12.268],[-69.1261,12.2995],[-69.0707,12.1906],[-68.9687,12.1362]]]},"properties":{"name":"Curaçao","id":"CW","CNTRY":"Curaçao","TYPE":"Nation"},"id":"CW"},

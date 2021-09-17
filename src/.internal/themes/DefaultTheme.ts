@@ -1106,7 +1106,7 @@ export class DefaultTheme extends Theme {
 			inversed: false,
 			cellStartLocation: 0,
 			cellEndLocation: 1,
-			width:p100
+			width: p100
 		});
 
 		this.rule("AxisRendererY").setAll({
@@ -1115,7 +1115,7 @@ export class DefaultTheme extends Theme {
 			inversed: false,
 			cellStartLocation: 0,
 			cellEndLocation: 1,
-			height:p100
+			height: p100
 		});
 
 		{
@@ -1723,6 +1723,16 @@ export class DefaultTheme extends Theme {
 		this.rule("Tick", ["pictorial"]).setAll({
 			location: 0.5
 		});
+		
+		{
+			const rule = this.rule("Graphics", ["pictorial", "background"]);
+
+			rule.setAll({
+				fillOpacity: 0.2
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
 
 
 		/**
@@ -1989,16 +1999,15 @@ export class DefaultTheme extends Theme {
 			opacity: 1,
 			fillOpacity: 0,
 			strokeDasharray: 0,
-			strokeWidth: 1,
 			strokeOpacity: 1,
 			radius: 15,
 			scale: 1.1,
 			interactive: false
 		})
 
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("disabled", { opacity: 1, strokeWidth: 1, scale: 1.1, strokeDasharray: 2 });
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hoverDisabled", { strokeWidth: 1, scale: 1.2, opacity: 1, strokeDasharray: 2 });
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hover", { strokeWidth: 1, scale: 1.05, strokeDasharray: 0 });
+		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("disabled", { opacity: 1, scale: 1.1, strokeDasharray: 2 });
+		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hoverDisabled", { scale: 1.2, opacity: 1, strokeDasharray: 2 });
+		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hover", { scale: 1.05, strokeDasharray: 0 });
 		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hidden", { opacity: 0, strokeDasharray: 0 });
 
 
@@ -2305,7 +2314,9 @@ export class DefaultTheme extends Theme {
 		}
 
 		this.rule("HierarchyNode", ["treemap", "node"]).setAll({
-			tooltipY: percent(40)
+			tooltipY: percent(40),
+			isMeasured: false,
+			position: "absolute"
 		});
 
 		{

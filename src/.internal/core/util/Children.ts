@@ -57,6 +57,8 @@ export class Children<A extends Sprite> extends List<A> implements IDisposer {
 
 	protected _onRemoved(child: A) {
 		this._container._childrenDisplay.removeChild(child._display);
+		this._container.markDirtyBounds();
+		this._container.markDirty();
 	}
 
 	/**

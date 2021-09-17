@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-98.96,36.507],[-98.956,36.159],[-99.382,36.164],[-99.598,36.164],[-99.603,36.246],[-99.605,36.592],[-99.296,36.594],[-99.296,36.81],[-99.258,36.789],[-99.157,36.785],[-99.049,36.698],[-99.022,36.645],[-98.959,36.599],[-98.96,36.507]]]},"properties":{"name":"Woodward","id":"40153","STATE":"OK","TYPE":"County","CNTRY":"USA"},"id":"40153"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-98.532,36.462],[-98.552,36.411],[-98.597,36.39],[-98.661,36.4],[-98.71,36.436],[-98.817,36.457],[-98.832,36.5],[-98.96,36.507],[-98.959,36.599],[-99.022,36.645],[-99.049,36.698],[-99.157,36.785],[-99.258,36.789],[-99.296,36.81],[-99.324,36.86],[-99.37,36.881],[-99.452,37],[-98.546,37],[-98.541,36.943],[-98.541,36.595],[-98.532,36.462]]]},"properties":{"name":"Woods","id":"40151","STATE":"OK","TYPE":"County","CNTRY":"USA"},"id":"40151"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-98.621,35.464],[-98.622,35.204],[-98.618,35.099],[-98.748,35.117],[-99.36,35.116],[-99.363,35.465],[-98.621,35.464]]]},"properties":{"name":"Washita","id":"40149","STATE":"OK","TYPE":"County","CNTRY":"USA"},"id":"40149"},

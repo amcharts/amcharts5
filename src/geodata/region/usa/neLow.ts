@@ -1,6 +1,4 @@
-import type { FeatureCollection } from "../../.internal/Geodata";
-
-const map: FeatureCollection = {"type":"FeatureCollection", "features": [
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection", "features": [
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-97.368,40.699],[-97.825,40.699],[-97.828,41.047],[-97.368,41.047],[-97.368,40.699]]]},"properties":{"name":"York","id":"31185","STATE":"NE","TYPE":"County","CNTRY":"USA"},"id":"31185"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-98.296,41.742],[-98.753,41.74],[-98.759,41.74],[-98.761,42.087],[-98.3,42.089],[-98.295,41.915],[-98.296,41.742]]]},"properties":{"name":"Wheeler","id":"31183","STATE":"NE","TYPE":"County","CNTRY":"USA"},"id":"31183"},
 {"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-98.278,40.351],[-98.274,40.351],[-98.275,40.004],[-98.729,40.003],[-98.727,40.352],[-98.724,40.352],[-98.278,40.351]]]},"properties":{"name":"Webster","id":"31181","STATE":"NE","TYPE":"County","CNTRY":"USA"},"id":"31181"},

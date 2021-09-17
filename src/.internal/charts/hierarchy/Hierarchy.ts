@@ -364,18 +364,17 @@ export abstract class Hierarchy extends Series {
 
 		const childData = dataItem.get("childData");
 		let colors = this.get("colors");
+		const topDepth = this.get("topDepth", 0);
 
 		if (!dataItem.get("parent")) {
 			dataItem.setRaw("depth", 0);
-
-			if (colors) {
+			if (colors && topDepth == 0) {
 				dataItem.setRaw("fill", colors.next());
 			}
 		}
 
 		let depth = dataItem.get("depth");
 		const initialDepth = this.get("initialDepth", 1);
-		const topDepth = this.get("topDepth", 0);
 
 		this.makeNode(dataItem);
 		this._processDataItem(dataItem);
@@ -440,8 +439,8 @@ export abstract class Hierarchy extends Series {
 
 			let dataValue = d3HierarchyNode.data.value;
 			let value = d3HierarchyNode.value
-		
-			if(dataValue != null){				
+
+			if (dataValue != null) {
 				value = dataValue;
 			}
 
@@ -532,10 +531,12 @@ export abstract class Hierarchy extends Series {
 		const hiddenState = this.states.create("hidden", {})
 
 		if (!$type.isNumber(duration)) {
-			duration = hiddenState.get("stateAnimationDuration", this.get("stateAnimationDuration", 0));
+			const stateAnimationDuration = "stateAnimationDuration"
+			duration = hiddenState.get(stateAnimationDuration, this.get(stateAnimationDuration, 0));
 		}
 
-		const easing = hiddenState.get("stateAnimationEasing", this.get("stateAnimationEasing"));
+		const stateAnimationEasing = "stateAnimationEasing";
+		const easing = hiddenState.get(stateAnimationEasing, this.get(stateAnimationEasing));
 
 		const children = dataItem.get("children");
 
