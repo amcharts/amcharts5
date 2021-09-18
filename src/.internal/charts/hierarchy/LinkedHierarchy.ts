@@ -345,12 +345,10 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 
 	/**
-	 * Unlink two data items
+	 * Unlink two linked data items.
 	 *
-	 * @param   source    Source node data item
-	 * @param   target    Target node data item
-	 * @param   strength  Link strength
-	 * @return            Link element
+	 * @param   source  Source node data item
+	 * @param   target  Target node data item
 	 */
 	public unlinkDataItems(source: DataItem<this["_dataItemSettings"]>, target: DataItem<this["_dataItemSettings"]>) {
 

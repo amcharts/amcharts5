@@ -886,7 +886,7 @@ export class XYChart extends SerialChart {
 				if (axis) {
 					const axisParent = axis.parent
 					if (axisParent) {
-						axisParent.children.removeIndex(change.index);
+						axisParent.children.removeValue(axis);
 					}
 
 					const gridContainer = axis.gridContainer;

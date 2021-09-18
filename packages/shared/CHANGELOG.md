@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.19] - 2021-09-18
+
+### Fixed
+- Eemoving an axis from `xAxes` or `yAxes` was not working properly in some cases.
+- If a `templateField` was set on some child of a bullet's `sprite`, it was being ignored.
+
+
 ## [5.0.0-beta.18] - 2021-09-17
 
 ### Added

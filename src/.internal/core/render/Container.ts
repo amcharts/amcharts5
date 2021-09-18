@@ -596,6 +596,13 @@ export class Container extends Sprite {
 		}
 	}
 
+	public _processTemplateField(): void {
+		super._processTemplateField();
+		this.children.each((child)=>{
+			child._processTemplateField();
+		})
+	}	
+
 	/**
 	 * @ignore
 	 */

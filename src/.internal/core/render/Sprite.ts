@@ -696,7 +696,7 @@ export abstract class Sprite extends Entity {
 		return new SpriteEventDispatcher(this);
 	}
 
-	protected _processTemplateField(): void {
+	public _processTemplateField(): void {
 		let template;
 
 		const field = this.get("templateField");
