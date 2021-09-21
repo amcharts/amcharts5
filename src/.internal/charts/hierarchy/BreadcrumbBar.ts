@@ -79,7 +79,6 @@ export class BreadcrumbBar extends Container {
 	declare public _events: IBreadcrumbBarEvents;
 
 	protected _disposer: IDisposer | undefined;
-
 	/**
 	 * Use this method to create an instance of this class.
 	 *
@@ -95,7 +94,6 @@ export class BreadcrumbBar extends Container {
 		x._afterNew();
 		return x;
 	}
-
 
 	public _changed() {
 		super._changed();
@@ -118,6 +116,7 @@ export class BreadcrumbBar extends Container {
 	}
 
 	protected _handleDataItem(dataItem: DataItem<IHierarchyDataItem> | undefined) {
+		this.set("minHeight", this.height());
 		this.children.clear();
 		this.labels.clear();
 
@@ -134,6 +133,5 @@ export class BreadcrumbBar extends Container {
 			}
 		}
 	}
-
 }
 

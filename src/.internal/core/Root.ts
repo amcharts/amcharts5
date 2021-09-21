@@ -576,8 +576,7 @@ export class Root implements IDisposer {
 		}
 
 		$object.keys(allParents).forEach((key) => {
-			const parent = allParents[key];
-			parent._updateChildren();
+			allParents[key]._updateChildren();
 		});
 
 		const objects: Array<Entity> = [];
@@ -626,10 +625,11 @@ export class Root implements IDisposer {
 		});
 
 		//		console.log("_updatePosition")
-		$object.keys(this._dirtyPositions).forEach((key) => {
-			const sprite = this._dirtyPositions[key];
+		const dirtyPositions = this._dirtyPositions;
+		$object.keys(dirtyPositions).forEach((key) => {
+			const sprite = dirtyPositions[key];
 
-			delete this._dirtyPositions[key];
+			delete dirtyPositions[key];
 
 			if (!sprite.isDisposed()) {
 				sprite._updatePosition();

@@ -96,14 +96,15 @@ export class ChordDirected extends Chord {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("linkHeadRadius")) {
-			const headRadius = this.get("linkHeadRadius");
+		const linkHeadRadius = "linkHeadRadius";
+		if (this.isDirty(linkHeadRadius)) {
+			const headRadius = this.get(linkHeadRadius);
 			if (headRadius == null) {
 				this._ribbon = ribbon();
 			}
 			else {
 				let ribbon = ribbonArrow();
-				ribbon.headRadius(this.get("linkHeadRadius", 0));
+				ribbon.headRadius(headRadius);
 				this._ribbon = ribbon;
 			}
 		}

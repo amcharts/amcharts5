@@ -187,12 +187,13 @@ export class FunnelSeries extends PercentSeries {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.slicesContainer.setAll({ isMeasured: true, position: "relative", width: percent(100), height: percent(100) });
-		this.slicesContainer.onPrivate("width", () => {
+		const slicesContainer = this.slicesContainer;
+		slicesContainer.setAll({ isMeasured: true, position: "relative", width: percent(100), height: percent(100) });
+		slicesContainer.onPrivate("width", () => {
 			this.markDirtySize();
 		})
 
-		this.slicesContainer.onPrivate("height", () => {
+		slicesContainer.onPrivate("height", () => {
 			this.markDirtySize();
 		})
 
@@ -280,12 +281,14 @@ export class FunnelSeries extends PercentSeries {
 
 		if (this._total > 0 && (this._valuesDirty || this._sizeDirty)) {
 
+			const slicesContainer = this.slicesContainer;
+
 			let h: number;
 			if (this.get("orientation") == "vertical") {
-				h = this.slicesContainer.innerHeight();
+				h = slicesContainer.innerHeight();
 			}
 			else {
-				h = this.slicesContainer.innerWidth();
+				h = slicesContainer.innerWidth();
 			}
 
 			this._nextCoord = this.get("startLocation", 0) * h;

@@ -5,7 +5,7 @@ import type { IAccessibilitySettings } from "../util/Accessibility";
 import type { NumberFormatter } from "../util/NumberFormatter";
 import type { DateFormatter } from "../util/DateFormatter";
 import type { DurationFormatter } from "../util/DurationFormatter";
-import type { DataItem } from "./Component";
+import type { DataItem, IComponentDataItem } from "./Component";
 import type { Tooltip } from "./Tooltip";
 import type { Graphics } from "./Graphics";
 import type { IPoint } from "../util/IPoint";
@@ -514,8 +514,8 @@ export interface ISpriteEvents extends IEntityEvents {
 	 * Invoked when element's data item changes.
 	 */
 	dataitemchanged: {
-		oldDataItem: DataItem<unknown> | undefined,
-		newDataItem: DataItem<unknown> | undefined
+		oldDataItem: DataItem<IComponentDataItem> | undefined,
+		newDataItem: DataItem<IComponentDataItem> | undefined
 	};
 
 	/**
@@ -633,7 +633,7 @@ export abstract class Sprite extends Entity {
 	public static classNames: Array<string> = Entity.classNames.concat([Sprite.className]);
 
 	public _parent: Container | undefined;
-	protected _dataItem: DataItem<unknown> | undefined;
+	protected _dataItem: DataItem<IComponentDataItem> | undefined;
 	protected _templateField: Template<this> | undefined;
 
 	protected _sizeDirty: boolean = false;
@@ -658,7 +658,7 @@ export abstract class Sprite extends Entity {
 
 	public _downPoints: { [index: number]: IPoint } = {};
 
-	protected _toggleDp: IDisposer | undefined;
+	public _toggleDp: IDisposer | undefined;
 
 	protected _dragDp: MultiDisposer | undefined;
 
@@ -700,10 +700,9 @@ export abstract class Sprite extends Entity {
 		let template;
 
 		const field = this.get("templateField");
-		const dataItem = this.dataItem;
 
 		if (field) {
-
+			const dataItem = this.dataItem;
 			if (dataItem) {
 				const context = dataItem.dataContext;
 				if (context) {
@@ -731,7 +730,7 @@ export abstract class Sprite extends Entity {
 
 	// TODO change this to run before the element is added to the parent, so that way
 	//      it doesn't need to apply the themes twice
-	public _setDataItem(dataItem: DataItem<unknown> | undefined): void {
+	public _setDataItem(dataItem: DataItem<IComponentDataItem> | undefined): void {
 		const oldDataItem = this._dataItem
 		this._dataItem = dataItem;
 		this._processTemplateField();
@@ -751,7 +750,7 @@ export abstract class Sprite extends Entity {
 	 *
 	 * @return DataItem
 	 */
-	public get dataItem(): DataItem<unknown> | undefined {
+	public get dataItem(): DataItem<IComponentDataItem> | undefined {
 		if (this._dataItem) {
 			return this._dataItem;
 
@@ -817,11 +816,9 @@ export abstract class Sprite extends Entity {
 		super._beforeChanged();
 
 		if (this.isDirty("tooltip")) {
-			const tooltip = this.get("tooltip")!;
-			if (!tooltip) {
-				if (this._prevSettings.tooltip) {
-					this._prevSettings.tooltip.dispose();
-				}
+			const previous = this._prevSettings.tooltip;
+			if (previous) {
+				previous.dispose();
 			}
 		}
 
@@ -831,12 +828,16 @@ export abstract class Sprite extends Entity {
 		}
 
 		if (this.isDirty("tooltipPosition")) {
-			if (this._tooltipMoveDp) {
-				this._tooltipMoveDp.dispose();
+			const tooltipMoveDp = this._tooltipMoveDp;
+			if (tooltipMoveDp) {
+				tooltipMoveDp.dispose();
+				this._tooltipMoveDp = undefined;
 			}
 
-			if (this._tooltipPointerDp) {
-				this._tooltipPointerDp.dispose();
+			const tooltipPointerDp = this._tooltipPointerDp;
+			if (tooltipPointerDp) {
+				tooltipPointerDp.dispose();
+				this._tooltipPointerDp = undefined;
 			}
 
 			if (this.get("tooltipPosition") == "pointer") {
@@ -848,8 +849,10 @@ export abstract class Sprite extends Entity {
 					}),
 
 					this.events.on("pointerout", () => {
-						if (this._tooltipMoveDp) {
-							this._tooltipMoveDp.dispose();
+						const tooltipMoveDp = this._tooltipMoveDp;
+						if (tooltipMoveDp) {
+							tooltipMoveDp.dispose();
+							this._tooltipMoveDp = undefined;
 						}
 					})])
 			}
@@ -859,21 +862,24 @@ export abstract class Sprite extends Entity {
 	public _changed() {
 		super._changed();
 
+		const display = this._display;
+		const events = this.events;
+
 		if (this.isDirty("draggable")) {
 			const draggable = this.get("draggable");
 			if (draggable) {
 				this.set("interactive", true);
 
 				this._dragDp = new MultiDisposer([
-					this.events.on("pointerdown", (ev) => {
+					events.on("pointerdown", (ev) => {
 						this.dragStart(ev);
 					}),
 
-					this.events.on("globalpointermove", (ev) => {
+					events.on("globalpointermove", (ev) => {
 						this.dragMove(ev);
 					}),
 
-					this.events.on("globalpointerup", (ev) => {
+					events.on("globalpointerup", (ev) => {
 						this.dragStop(ev);
 					})])
 
@@ -890,10 +896,10 @@ export abstract class Sprite extends Entity {
 			const tooltipText = this.get("tooltipText");
 			if (tooltipText) {
 				this._tooltipDp = new MultiDisposer([
-					this.events.on("pointerover", () => {
+					events.on("pointerover", () => {
 						this.showTooltip()
 					}),
-					this.events.on("pointerout", () => {
+					events.on("pointerout", () => {
 						this.hideTooltip()
 					})])
 			}
@@ -908,7 +914,7 @@ export abstract class Sprite extends Entity {
 		if (this.isDirty("toggleKey")) {
 			let toggleKey = this.get("toggleKey") as any;
 			if (toggleKey && toggleKey != "none") {
-				this._toggleDp = this.events.on("click", () => {
+				this._toggleDp = events.on("click", () => {
 					if (!this._isDragging) {
 						this.set(toggleKey, !this.get(toggleKey));
 					}
@@ -951,17 +957,17 @@ export abstract class Sprite extends Entity {
 		}
 
 		if (this.isDirty("opacity")) {
-			this._display.alpha = Math.max(0, this.get("opacity", 1));
+			display.alpha = Math.max(0, this.get("opacity", 1));
 		}
 
 		if (this.isDirty("rotation")) {
 			this.markDirtyBounds();
-			this._display.angle = this.get("rotation", 0);
+			display.angle = this.get("rotation", 0);
 		}
 
 		if (this.isDirty("scale")) {
 			this.markDirtyBounds();
-			this._display.scale = this.get("scale", 0);
+			display.scale = this.get("scale", 0);
 		}
 
 		if (this.isDirty("centerX") || this.isDirty("centerY")) {
@@ -971,10 +977,10 @@ export abstract class Sprite extends Entity {
 
 		if (this.isDirty("visible") || this.isPrivateDirty("visible") || this.isDirty("forceHidden")) {
 			if (!this.get("visible") || !this.getPrivate("visible") || this.get("forceHidden")) {
-				this._display.visible = false;
+				display.visible = false;
 			}
 			else {
-				this._display.visible = true;
+				display.visible = true;
 			}
 
 			this.markDirtyBounds();
@@ -1003,7 +1009,7 @@ export abstract class Sprite extends Entity {
 			if (wheelable) {
 				this.set("interactive", true);
 			}
-			this._display.wheelable = wheelable ? true : false;
+			display.wheelable = wheelable ? true : false;
 		}
 
 		// Accessibility
@@ -1018,22 +1024,22 @@ export abstract class Sprite extends Entity {
 
 		if (this.isDirty("filter")) {
 			//this.markDirtyBounds();
-			this._display.filter = this.get("filter");
+			display.filter = this.get("filter");
 		}
 
 		if (this.isDirty("cursorOverStyle")) {
-			this._display.cursorOverStyle = this.get("cursorOverStyle");
+			display.cursorOverStyle = this.get("cursorOverStyle");
 		}
 
 		if (this.isDirty("hoverOnFocus")) {
 			if (this.get("hoverOnFocus")) {
 				this._focusDp = new MultiDisposer([
-					this.events.on("focus", () => {
+					events.on("focus", () => {
 						// TODO: proper hover, not just tooltip
 						this.showTooltip();
 					}),
 
-					this.events.on("blur", () => {
+					events.on("blur", () => {
 						// TODO: proper hover, not just tooltip
 						this.hideTooltip();
 					})])
@@ -1057,19 +1063,20 @@ export abstract class Sprite extends Entity {
 		}
 
 		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel")) {
-			//this._display.accessibility.ariaLabel = populateString(this, this.get("ariaLabel", ""));
+			// display.accessibility.ariaLabel = populateString(this, this.get("ariaLabel", ""));
 			// @todo make sure ariaLabel gets populated in Root
 			this.markDirtyAccessibility();
 		}
 
 		if (this.isDirty("exportable")) {
-			this._display.exportable = this.get("exportable");
+			display.exportable = this.get("exportable");
 		}
 
 		if (this.isDirty("interactive")) {
+			const events = this.events;
 			if (this.get("interactive")) {
 				this._hoverDp = new MultiDisposer([
-					this.events.on("click", (ev) => {
+					events.on("click", (ev) => {
 						if ($utils.isTouchEvent(ev.originalEvent)) {
 							if (!this.getPrivate("touchHovering")) {
 								this.setTimeout(() => {
@@ -1083,7 +1090,7 @@ export abstract class Sprite extends Entity {
 						}
 					}),
 
-					this.events.on("globalpointerup", (ev) => {
+					events.on("globalpointerup", (ev) => {
 						if ($utils.isTouchEvent(ev.originalEvent)) {
 							if (this.getPrivate("touchHovering")) {
 								this._handleOut();
@@ -1100,15 +1107,15 @@ export abstract class Sprite extends Entity {
 						//this._isDown = false;
 					}),
 
-					this.events.on("pointerover", () => {
+					events.on("pointerover", () => {
 						this._handleOver();
 					}),
 
-					this.events.on("pointerout", () => {
+					events.on("pointerout", () => {
 						this._handleOut();
 					}),
 
-					this.events.on("pointerdown", (e) => {
+					events.on("pointerdown", (e) => {
 						this._handleDown(e);
 					})
 				])
@@ -1268,6 +1275,8 @@ export abstract class Sprite extends Entity {
 			const x = e.point.x - dragEvent.point.x;
 			const y = e.point.y - dragEvent.point.y;
 
+			const events = this.events;
+
 			if (dragEvent.simulated && !this._isDragging) {
 				this._isDragging = true;
 				this._dragEvent = e;
@@ -1278,8 +1287,8 @@ export abstract class Sprite extends Entity {
 				};
 
 				const type = "dragstart";
-				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, {
+				if (events.isEnabled(type)) {
+					events.dispatch(type, {
 						type: type,
 						target: this,
 						originalEvent: e.originalEvent,
@@ -1296,8 +1305,8 @@ export abstract class Sprite extends Entity {
 				this.set("y", dragPoint.y + y);
 
 				const type = "dragged";
-				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, {
+				if (events.isEnabled(type)) {
+					events.dispatch(type, {
 						type: type,
 						target: this,
 						originalEvent: e.originalEvent,
@@ -1317,8 +1326,8 @@ export abstract class Sprite extends Entity {
 					};
 
 					const type = "dragstart";
-					if (this.events.isEnabled(type)) {
-						this.events.dispatch(type, {
+					if (events.isEnabled(type)) {
+						events.dispatch(type, {
 							type: type,
 							target: this,
 							originalEvent: e.originalEvent,
@@ -1558,9 +1567,6 @@ export abstract class Sprite extends Entity {
 	public _getTooltipPoint(): IPoint {
 		const bounds = this._localBounds!;
 		if (bounds) {
-			//const x = bounds.left + $utils.relativeToValue(this.get("tooltipX", 0), Math.max(bounds.right - bounds.left, this.width()));
-			//const y = bounds.top + $utils.relativeToValue(this.get("tooltipY", 0), Math.max(bounds.bottom - bounds.top, this.height()));
-
 			let x = 0;
 			let y = 0;
 
@@ -1650,10 +1656,12 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		if (this._display.x != xx || this._display.y != yy) {
-			this._display.invalidateBounds();
-			this._display.x = xx;
-			this._display.y = yy;
+		const display = this._display;
+
+		if (display.x != xx || display.y != yy) {
+			display.invalidateBounds();
+			display.x = xx;
+			display.y = yy;
 
 			const eventType = "positionchanged";
 			if (this.events.isEnabled(eventType)) {
@@ -1726,7 +1734,7 @@ export abstract class Sprite extends Entity {
 		this._removeParent(this.parent);
 
 		const tooltip = this.get("tooltip");
-		if (tooltip) {
+		if (tooltip && tooltip.get("autoDispose")) {
 			tooltip.dispose();
 		}
 
@@ -2124,7 +2132,6 @@ export abstract class Sprite extends Entity {
 		if (parent !== prevParent) {
 			this.markDirtyBounds();
 
-			// TODO is this needed ?
 			parent.markDirty();
 
 			this._parent = parent;
@@ -2223,7 +2230,28 @@ export abstract class Sprite extends Entity {
 				return 0;
 			})[0];
 		}
+	}
 
+	/**
+	 * Moves sprite to front in the children array
+	 * @todo review
+	 */
+	public toFront() {
+		const parent = this.parent;
+		if (parent) {
+			parent.children.moveValue(this, parent.children.length - 1);
+		}
+	}
+
+	/**
+	 * Moves sprite to the back in the children array
+	 * @todo review
+	 */
+	public toBack() {
+		const parent = this.parent;
+		if (parent) {
+			parent.children.moveValue(this, 0);
+		}
 	}
 
 }

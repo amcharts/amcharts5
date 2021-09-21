@@ -55,7 +55,7 @@ export class ChordLink extends FlowLink {
 
 	public getPoint(location: number): IOrientationPoint {
 		if (this._p0 && this._p1) {
-			if (this._type == "line") {
+			if (this._type === "line") {
 				let p = $math.getPointOnLine(this._p0, this._p1, location);
 				return { x: p.x, y: p.y, angle: $math.getAngle(this._p0, this._p1) };
 			}

@@ -280,7 +280,7 @@ export class MapChart extends SerialChart {
 
 	protected _wheelDp: IDisposer | undefined;
 
-	protected makeGeoPath() {
+	protected _makeGeoPath() {
 		const projection = this.get("projection")!;
 		const path = geoPath();
 		path.projection(projection);
@@ -362,7 +362,7 @@ export class MapChart extends SerialChart {
 		const h = this.innerHeight();
 
 		if (this.isDirty("projection")) {
-			this.makeGeoPath();
+			this._makeGeoPath();
 			this.markDirtyProjection();
 			this._fitMap();
 
@@ -586,7 +586,7 @@ export class MapChart extends SerialChart {
 	protected _afterNew() {
 		super._afterNew();
 
-		this.makeGeoPath();
+		this._makeGeoPath();
 
 		this.chartContainer.children.push(this.seriesContainer);
 

@@ -143,7 +143,7 @@ const resizeButton = am5.Button.new(root, {
 
 // restrict from being dragged vertically
 resizeButton.adapters.add("y", () => {
-  return chart.plotContainer.height();
+  return 0;
 });
 
 // restrict from being dragged outside of plot

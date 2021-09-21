@@ -91,10 +91,6 @@ export interface IXYAxis extends Axis<AxisRenderer> {
  */
 export interface IXYSeriesDataItem extends ISeriesDataItem {
 	valueX?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueXWorking?: number;
 	valueXChange?: number;
 	valueXChangePercent?: number;
@@ -102,45 +98,21 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 	valueXChangeSelectionPercent?: number;
 	valueXChangePrevious?: number;
 	valueXChangePreviousPercent?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueXWorkingOpen?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueXWorkingClose?: number;
 
 	valueY?: number;
 	valueYChange?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueYWorking?: number;
 	valueYChangePercent?: number;
 	valueYChangeSelection?: number;
 	valueYChangeSelectionPercent?: number;
 	valueYChangePrevious?: number;
 	valueYChangePreviousPercent?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueYWorkingOpen?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueYWorkingClose?: number;
 
 	openValueX?: number;
-
-	/**
-	 * @ignore
-	 */
 	openValueXWorking?: number;
 	openValueXChange?: number;
 	openValueXChangePercent?: number;
@@ -148,22 +120,9 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 	openValueXChangeSelectionPercent?: number;
 	openValueXChangePrevious?: number;
 	openValueXChangePreviousPercent?: number;
-
-	/**
-	 * @ignore
-	 */
 	openValueXWorkingOpen?: number;
-
-	/**
-	 * @ignore
-	 */
 	openValueXWorkingClose?: number;
-
 	openValueY?: number;
-
-	/**
-	 * @ignore
-	 */
 	openValueYWorking?: number;
 	openValueYChange?: number;
 	openValueYChangePercent?: number;
@@ -171,15 +130,7 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 	openValueYChangeSelectionPercent?: number;
 	openValueYChangePrevious?: number;
 	openValueYChangePreviousPercent?: number;
-
-	/**
-	 * @ignore
-	 */
 	openValueYWorkingOpen?: number;
-
-	/**
-	 * @ignore
-	 */
 	openValueYWorkingClose?: number;
 
 	categoryX?: string;
@@ -204,8 +155,6 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 
 	point?: IPoint;
 }
-
-//type IXYSeriesDataItemSettings = { [K in keyof IXYSeriesDataItem]?: string; };
 
 export interface IXYSeriesSettings extends ISeriesSettings {
 
@@ -570,7 +519,6 @@ export abstract class XYSeries extends Series {
 	protected _yLowField!: string;
 	protected _yHighField!: string;
 
-
 	protected _axesDirty: boolean = false;
 	protected _stackDirty: boolean = false;
 
@@ -638,7 +586,7 @@ export abstract class XYSeries extends Series {
 
 		this._setRawDefault("vcx", 1);
 		this._setRawDefault("vcy", 1);
-		// this can;t go to themes, as data might be parsed before theme
+		// this can't go to themes, as data might be parsed before theme
 		this._setRawDefault("valueXShow", "valueXWorking");
 		this._setRawDefault("valueYShow", "valueYWorking");
 
@@ -670,10 +618,9 @@ export abstract class XYSeries extends Series {
 			}
 		}))
 
-
 		if (!this.get("baseAxis")) {
-			let xAxis = this.get("xAxis");
-			let yAxis = this.get("yAxis");
+			const xAxis = this.get("xAxis");
+			const yAxis = this.get("yAxis");
 
 			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") || yAxis.isType<DateAxis<any>>("DateAxis")) {
 				this.set("baseAxis", yAxis);
@@ -699,18 +646,7 @@ export abstract class XYSeries extends Series {
 		const axis = <Axis<AxisRenderer>>axisDataItem.component;
 		if (axis) {
 			axis._processAxisRange(axisDataItem);
-			const label = axisDataItem.get("label");
-			if (label) {
-				label.set("visible", false);
-			}
-			const tick = axisDataItem.get("tick");
-			if (tick) {
-				tick.set("visible", false);
-			}
-			const grid = axisDataItem.get("grid");
-			if (grid) {
-				grid.set("visible", false);
-			}
+			axis._toggleDataItem(axisDataItem, false);
 
 			const axisFill = axisDataItem.get("axisFill");
 			if (axisFill) {
@@ -729,53 +665,56 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
-	public _updateFields() {
-		super._updateFields();
+	protected _updateFields(): boolean {
+		let dirty = super._updateFields();
+		if (dirty) {
+			this._valueXFields = [];
+			this._valueYFields = [];
+			this._valueXShowFields = [];
+			this._valueYShowFields = [];
 
-		this._valueXFields = [];
-		this._valueYFields = [];
-		this._valueXShowFields = [];
-		this._valueYShowFields = [];
+			this.__valueXShowFields = [];
+			this.__valueYShowFields = [];
 
-		this.__valueXShowFields = [];
-		this.__valueYShowFields = [];
+			if (this.valueXFields) {
+				$array.each(this.valueXFields as Array<keyof this["_settings"]>, (key) => {
+					const field = this.get(<any>(key + "Field"));
+					if (field) {
+						this._valueXFields.push(<any>key);
+						let field = this.get(<any>(key + "Show"));
+						this.__valueXShowFields.push(field);
 
-		if (this.valueXFields) {
-			$array.each(this.valueXFields as Array<keyof this["_settings"]>, (key) => {
-				const field = this.get(<any>(key + "Field"));
-				if (field) {
-					this._valueXFields.push(<any>key);
-					let field = this.get(<any>(key + "Show"));
-					this.__valueXShowFields.push(field);
-
-					if (field.indexOf("Working") != -1) {
-						this._valueXShowFields.push(field.split("Working")[0]);
+						if (field.indexOf("Working") != -1) {
+							this._valueXShowFields.push(field.split("Working")[0]);
+						}
+						else {
+							this._valueYShowFields.push(field);
+						}
 					}
-					else {
-						this._valueYShowFields.push(field);
+				});
+			}
+
+			if (this.valueYFields) {
+				$array.each(this.valueYFields as Array<keyof this["_settings"]>, (key) => {
+					const field = this.get(<any>(key + "Field"));
+
+					if (field) {
+						this._valueYFields.push(<any>key);
+						let field = this.get(<any>(key + "Show"));
+						this.__valueYShowFields.push(field);
+
+						if (field.indexOf("Working") != -1) {
+							this._valueYShowFields.push(field.split("Working")[0]);
+						}
+						else {
+							this._valueYShowFields.push(field);
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 
-		if (this.valueYFields) {
-			$array.each(this.valueYFields as Array<keyof this["_settings"]>, (key) => {
-				const field = this.get(<any>(key + "Field"));
-
-				if (field) {
-					this._valueYFields.push(<any>key);
-					let field = this.get(<any>(key + "Show"));
-					this.__valueYShowFields.push(field);
-
-					if (field.indexOf("Working") != -1) {
-						this._valueYShowFields.push(field.split("Working")[0]);
-					}
-					else {
-						this._valueYShowFields.push(field);
-					}
-				}
-			});
-		}
+		return dirty
 	}
 
 	protected _dispose() {
@@ -794,30 +733,6 @@ export abstract class XYSeries extends Series {
 	protected _max<Key extends keyof this["_privateSettings"]>(key: Key, value: number | undefined) {
 		let newValue = max(this.getPrivate(key) as any, value);
 		this.setPrivate(key, newValue as any);
-	}
-
-	protected fieldsDirty(): boolean {
-		let dirty = false;
-		$array.eachContinue(this.fields, (field) => {
-			if (this.isDirty((field + "Field") as any)) {
-				dirty = true;
-				return false;
-			}
-			else {
-				return true;
-			}
-		})
-		$array.eachContinue(this.valueFields, (field) => {
-			if (this.isDirty((field + "Field") as any)) {
-				dirty = true;
-				return false;
-			}
-			else {
-				return true;
-			}
-		})
-
-		return dirty;
 	}
 
 	protected _shouldMakeBullet(dataItem: DataItem<this["_dataItemSettings"]>): boolean {
@@ -930,7 +845,7 @@ export abstract class XYSeries extends Series {
 			this.bulletsContainer.set("x", this.x());
 		}
 
-		if (this.fieldsDirty()) {
+		if (this._valueFieldsDirty() || this._fieldsDirty()) {
 			this._makeFieldNames();
 		}
 
@@ -1079,6 +994,7 @@ export abstract class XYSeries extends Series {
 			if (!this._mainContainerMask) {
 				const mainContainerMask = this.children.push(Graphics.new(this._root, {}));
 				this._mainContainerMask = mainContainerMask;
+
 
 				mainContainerMask!.set("draw", (display) => {
 					const parent = this.parent;

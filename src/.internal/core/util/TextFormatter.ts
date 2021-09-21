@@ -73,25 +73,25 @@ export class TextFormatter {
 	}
 
 	/**
- * Splits string into chunks. (style blocks, quoted blocks, regular blocks)
- *
- * If the second parameter `quotedBlocks` is set to `true` this method will
- * also single out text blocks enclosed within single quotes that no
- * formatting should be applied to, and they should be displayed as is.
- *
- * Default for the above is `false`, so that you can use single quote in text
- * without escaping it.
- *
- * If enabled, single quotes can be escaped by doubling it - adding two
- * single quotes, which will be replaced by a one single quote in the final
- * output.
- *
- * @ignore Exclude from docs
- * @param text          Text to chunk
- * @param quotedBlocks  Use quoted blocks
- * @param noFormatting  Formatting blocks will be treated as regular text
- * @return Array of string chunks
- */
+	 * Splits string into chunks. (style blocks, quoted blocks, regular blocks)
+	 *
+	 * If the second parameter `quotedBlocks` is set to `true` this method will
+	 * also single out text blocks enclosed within single quotes that no
+	 * formatting should be applied to, and they should be displayed as is.
+	 *
+	 * Default for the above is `false`, so that you can use single quote in text
+	 * without escaping it.
+	 *
+	 * If enabled, single quotes can be escaped by doubling it - adding two
+	 * single quotes, which will be replaced by a one single quote in the final
+	 * output.
+	 *
+	 * @ignore Exclude from docs
+	 * @param text          Text to chunk
+	 * @param quotedBlocks  Use quoted blocks
+	 * @param noFormatting  Formatting blocks will be treated as regular text
+	 * @return Array of string chunks
+	 */
 	public static chunk(text: string, quotedBlocks: boolean = false, noFormatting: boolean = false): ITextChunk[] {
 
 		// Init result

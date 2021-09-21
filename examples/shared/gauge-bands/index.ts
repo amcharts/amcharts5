@@ -140,12 +140,11 @@ const bandsData = [{
 }];
 
 am5.array.each(bandsData, (data) => {
-  const axisRange = xAxis.createAxisRange(xAxis.makeDataItem({}));
-
-  axisRange.setAll({
+  const axisRange = xAxis.createAxisRange(xAxis.makeDataItem({
+    above: true,
     value: data.lowScore,
     endValue: data.highScore
-  });
+  }));
 
   axisRange.get("axisFill").setAll({
     visible: true,

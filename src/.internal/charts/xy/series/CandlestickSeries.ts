@@ -29,8 +29,6 @@ export interface ICandlestickSeriesDataItem extends IColumnSeriesDataItem {
 	highValueYChangePreviousPercent?: number;
 	highValueYWorkingOpen?: number;
 	highValueYWorkingClose?: number;
-
-	column?: Candlestick;
 }
 
 export interface ICandlestickSeriesSettings extends IColumnSeriesSettings {

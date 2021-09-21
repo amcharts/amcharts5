@@ -17,7 +17,6 @@ import { Template } from "../../core/util/Template";
 import { arc } from "d3-shape";
 
 import * as $utils from "../../core/util/Utils";
-import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
 
 
@@ -163,7 +162,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 			let r = $utils.relativeToValue(this.get("radius", p100), radius);
 
-			if(r < 0){
+			if (r < 0) {
 				r = radius + r;
 			}
 
@@ -204,12 +203,12 @@ export class AxisRendererCircular extends AxisRenderer {
 	public updateGrid(grid?: Grid, position?: number, endPosition?: number) {
 		if (grid) {
 
-			if (!$type.isNumber(position)) {
+			if (position == null) {
 				position = 0;
 			}
 
 			let location = grid.get("location", 0.5);
-			if ($type.isNumber(endPosition) && endPosition != position) {
+			if (endPosition != null && endPosition != position) {
 				position = position + (endPosition - position) * location;
 			}
 
@@ -219,7 +218,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 			this.toggleVisibility(grid, position, 0, 1);
 
-			if ($type.isNumber(radius)) {
+			if (radius != null) {
 				grid.set("draw", (display) => {
 					display.moveTo(innerRadius * $math.cos(angle), innerRadius * $math.sin(angle));
 					display.lineTo(radius * $math.cos(angle), radius * $math.sin(angle));
@@ -276,24 +275,24 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public updateLabel(label?: AxisLabelRadial, position?: number, endPosition?: number, count?: number) {
 		if (label) {
-			if (!$type.isNumber(position)) {
+			if (position == null) {
 				position = 0;
 			}
 
 			let location = 0.5;
-			if ($type.isNumber(count) && count > 1) {
+			if (count != null && count > 1) {
 				location = label.get("multiLocation", location);
 			}
 			else {
 				location = label.get("location", location);
 			}
 
-			if ($type.isNumber(endPosition) && endPosition != position) {
+			if (endPosition != null && endPosition != position) {
 				position = position + (endPosition - position) * location;
 			}
 
-			let radius = this.getPrivate("radius", 0);
-			let angle = this.positionToAngle(position);
+			const radius = this.getPrivate("radius", 0);
+			const angle = this.positionToAngle(position);
 
 			label.set("baseRadius", radius);
 			label.set("labelAngle", angle);
@@ -307,10 +306,10 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public fillDrawMethod(fill: Graphics, startAngle?: number, endAngle?: number) {
 		fill.set("draw", (display) => {
-			if (!$type.isNumber(startAngle)) {
+			if (startAngle == null) {
 				startAngle = this.getPrivate("startAngle", 0);
 			}
-			if (!$type.isNumber(endAngle)) {
+			if (endAngle == null) {
 				endAngle = this.getPrivate("endAngle", 0);
 			}
 			const y0 = this.getPrivate("innerRadius", 0);
@@ -325,19 +324,19 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public updateTick(tick?: AxisTick, position?: number, endPosition?: number, count?: number) {
 		if (tick) {
-			if (!$type.isNumber(position)) {
+			if (position == null) {
 				position = 0;
 			}
 
 			let location = 0.5;
-			if ($type.isNumber(count) && count > 1) {
+			if (count != null && count > 1) {
 				location = tick.get("multiLocation", location);
 			}
 			else {
 				location = tick.get("location", location);
 			}
 
-			if ($type.isNumber(endPosition) && endPosition != position) {
+			if (endPosition != null && endPosition != position) {
 				position = position + (endPosition - position) * location;
 			}
 
@@ -353,7 +352,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 			this.toggleVisibility(tick, position, tick.get("minPosition", 0), tick.get("maxPosition", 1));
 
-			if ($type.isNumber(radius)) {
+			if (radius != null) {
 				tick.set("draw", (display) => {
 					display.moveTo(radius * $math.cos(angle), radius * $math.sin(angle));
 					radius += length;
@@ -371,12 +370,12 @@ export class AxisRendererCircular extends AxisRenderer {
 			const sprite = bullet.get("sprite");
 
 			if (sprite) {
-				if (!$type.isNumber(position)) {
+				if (position == null) {
 					position = 0;
 				}
 
 				let location = bullet.get("location", 0.5);
-				if ($type.isNumber(endPosition) && endPosition != position) {
+				if (endPosition != null && endPosition != position) {
 					position = position + (endPosition - position) * location;
 				}
 
@@ -395,10 +394,10 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public updateFill(fill?: Slice, position?: number, endPosition?: number) {
 		if (fill) {
-			if (!$type.isNumber(position)) {
+			if (position == null) {
 				position = 0;
 			}
-			if (!$type.isNumber(endPosition)) {
+			if (endPosition == null) {
 				endPosition = 1;
 			}
 

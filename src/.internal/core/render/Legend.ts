@@ -7,7 +7,7 @@ import { RoundedRectangle } from "../../core/render/RoundedRectangle";
 import { Rectangle } from "../../core/render/Rectangle";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
-import type { Entity } from "../../core/util/Entity";
+import type { Entity, IEntitySettings } from "../../core/util/Entity";
 import type { Color } from "../../core/util/Color";
 import * as $utils from "../../core/util/Utils";
 
@@ -56,10 +56,15 @@ export interface ILegendDataItem extends ISeriesDataItem {
 
 }
 
+export interface ILegendItemSettings extends IEntitySettings {
+	visible?: boolean;
+}
+
 /**
  * @ignore
  */
 export interface ILegendItem extends Entity {
+	_settings: ILegendItemSettings;
 	isHidden: () => boolean;
 	show: () => void;
 	hide: () => void;
@@ -268,16 +273,35 @@ export class Legend extends Series {
 			if (item && item.set) {
 				item.set(<any>"legendDataItem", dataItem);
 			}
+
 			if (item && item.show) {
+
+				this._disposers.push(item.on("visible", (visible) => {
+					itemContainer.set("disabled", !visible)
+				}));
+
+				if (!item.get("visible")) {
+					itemContainer.set("disabled", false);
+				}
+
 				itemContainer.events.on("click", () => {
+
+					const toggleDp = itemContainer._toggleDp;
+					if (toggleDp) {
+						toggleDp.dispose();
+					}
+
 					if (itemContainer.get("toggleKey") != "none") {
 						const labelText = dataItem.get("label").text._getText();
+
 						if (item.isHidden()) {
 							item.show();
+							itemContainer.set("disabled", false);
 							this._root.readerAlert(this._root.language.translate("%1 shown", this._root.locale, labelText));
 						}
 						else {
 							item.hide();
+							itemContainer.set("disabled", true);
 							this._root.readerAlert(this._root.language.translate("%1 hidden", this._root.locale, labelText));
 						}
 					}

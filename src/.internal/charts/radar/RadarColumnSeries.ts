@@ -17,7 +17,6 @@ import * as $utils from "../../core/util/Utils";
 
 
 export interface IRadarColumnSeriesDataItem extends IBaseColumnSeriesDataItem {
-	slice: Slice
 	startAngle?: number;
 	endAngle?: number;
 	innerRadius?: number;

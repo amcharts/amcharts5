@@ -444,7 +444,8 @@ export class DefaultTheme extends Theme {
 			centerX: p50,
 			centerY: p50,
 			animationEasing: $ease.out($ease.cubic),
-			exportable: false
+			exportable: false,
+			autoDispose: true
 			//layer: 100
 		});
 
@@ -1723,7 +1724,7 @@ export class DefaultTheme extends Theme {
 		this.rule("Tick", ["pictorial"]).setAll({
 			location: 0.5
 		});
-		
+
 		{
 			const rule = this.rule("Graphics", ["pictorial", "background"]);
 

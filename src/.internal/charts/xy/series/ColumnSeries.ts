@@ -6,15 +6,11 @@ import { ListTemplate } from "../../../core/util/List";
 import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
 import * as $utils from "../../../core/util/Utils";
 
-export interface IColumnSeriesDataItem extends IBaseColumnSeriesDataItem {
-	column?: RoundedRectangle
-}
+export interface IColumnSeriesDataItem extends IBaseColumnSeriesDataItem { }
 
-export interface IColumnSeriesSettings extends IBaseColumnSeriesSettings {
-}
+export interface IColumnSeriesSettings extends IBaseColumnSeriesSettings { }
 
-export interface IColumnSeriesPrivate extends IBaseColumnSeriesPrivate {
-}
+export interface IColumnSeriesPrivate extends IBaseColumnSeriesPrivate { }
 
 export interface IColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
 	columns: ListTemplate<RoundedRectangle>
@@ -46,7 +42,7 @@ export class ColumnSeries extends BaseColumnSeries {
 	public readonly columns: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle.new(this._root, {
-			position:"absolute",
+			position: "absolute",
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["series", "column"])
 		}, this.columns.template)
 	);
@@ -74,7 +70,7 @@ export class ColumnSeries extends BaseColumnSeries {
 		super._processAxisRange(axisRange);
 		axisRange.columns = new ListTemplate(
 			Template.new({}),
-			() => RoundedRectangle.new(this._root, { position:"absolute", themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["series", "column"]) }, axisRange.columns.template)
+			() => RoundedRectangle.new(this._root, { position: "absolute", themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["series", "column"]) }, axisRange.columns.template)
 		);
 	}
 }

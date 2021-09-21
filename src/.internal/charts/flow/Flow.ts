@@ -323,69 +323,76 @@ export abstract class Flow extends Series {
 		link.set("fillGradient", undefined);
 		link.set("strokeGradient", undefined);
 
-		if (fillStyle == "solid") {
-			// TODO why does this apply all the templates ?
-			link._applyTemplates();
-		}
-		else if (fillStyle == "source") {
-			link.set("fill", sourceFill);
-		}
-		else if (fillStyle == "target") {
-			link.set("fill", targetFill);
-		}
-		else if (fillStyle == "gradient") {
-			let gradient = link._fillGradient;
-			if (!gradient) {
-				gradient = LinearGradient.new(this._root, {});
-				const sourceStop: any = { color: sourceFill }
-				if (source.get("unknown")) {
-					sourceStop.opacity = 0;
-				}
-				const targetStop: any = { color: targetFill };
-				if (target.get("unknown")) {
-					targetStop.opacity = 0;
-				}
+		switch (fillStyle) {
 
-				gradient.set("stops", [sourceStop, targetStop]);
-				link._fillGradient = gradient;
-			}
-			link.set("fillGradient", gradient);
-		}
-		else if (fillStyle == "none") {
-			link.set("fill", undefined);
-		}
+			case "solid":
+				link._applyTemplates();
+				break;
+			case "source":
+				link.set("fill", sourceFill);
+				break;
 
+			case "target":
+				link.set("fill", targetFill);
+				break;
 
-		if (strokeStyle == "solid") {
-			// TODO why does this apply all the templates ?
-			link._applyTemplates();
-		}
-		else if (strokeStyle == "source") {
-			link.set("stroke", sourceFill);
-		}
-		else if (strokeStyle == "target") {
-			link.set("stroke", targetFill);
-		}
-		else if (strokeStyle == "gradient") {
-			let gradient = link._strokeGradient;
-			if (!gradient) {
-				gradient = LinearGradient.new(this._root, {});
-				const sourceStop: any = { color: sourceFill }
-				if (source.get("unknown")) {
-					sourceStop.opacity = 0;
+			case "gradient":
+				let gradient = link._fillGradient;
+				if (!gradient) {
+					gradient = LinearGradient.new(this._root, {});
+					const sourceStop: any = { color: sourceFill }
+					if (source.get("unknown")) {
+						sourceStop.opacity = 0;
+					}
+					const targetStop: any = { color: targetFill };
+					if (target.get("unknown")) {
+						targetStop.opacity = 0;
+					}
+
+					gradient.set("stops", [sourceStop, targetStop]);
+					link._fillGradient = gradient;
 				}
-				const targetStop: any = { color: targetFill };
-				if (target.get("unknown")) {
-					targetStop.opacity = 0;
-				}
-
-				gradient.set("stops", [sourceStop, targetStop]);
-				link._strokeGradient = gradient;
-			}
-			link.set("strokeGradient", gradient);
+				link.set("fillGradient", gradient);
+				break;
+			case "none":
+				link.set("fill", undefined);
+				break;
 		}
-		else if (strokeStyle == "none") {
-			link.set("stroke", undefined);
+
+		switch (strokeStyle) {
+			case "solid":
+				link._applyTemplates();
+				break;
+
+			case "source":
+				link.set("stroke", sourceFill);
+				break;
+
+			case "target":
+				link.set("stroke", targetFill);
+
+			case "gradient":
+				let gradient = link._strokeGradient;
+				if (!gradient) {
+					gradient = LinearGradient.new(this._root, {});
+					const sourceStop: any = { color: sourceFill }
+					if (source.get("unknown")) {
+						sourceStop.opacity = 0;
+					}
+					const targetStop: any = { color: targetFill };
+					if (target.get("unknown")) {
+						targetStop.opacity = 0;
+					}
+
+					gradient.set("stops", [sourceStop, targetStop]);
+					link._strokeGradient = gradient;
+				}
+				link.set("strokeGradient", gradient);
+				break;
+
+			case "none":
+				link.set("stroke", undefined);
+				break;
 		}
 	}
 
@@ -411,11 +418,14 @@ export abstract class Flow extends Series {
 		const promises = [super.hideDataItem(dataItem, duration)];
 		const hiddenState = this.states.create("hidden", {})
 
+		const stateAnimationDuration = "stateAnimationDuration";
+		const stateAnimationEasing = "stateAnimationEasing";
+
 		if (!$type.isNumber(duration)) {
-			duration = hiddenState.get("stateAnimationDuration", this.get("stateAnimationDuration", 0));
+			duration = hiddenState.get(stateAnimationDuration, this.get(stateAnimationDuration, 0));
 		}
 
-		const easing = hiddenState.get("stateAnimationEasing", this.get("stateAnimationEasing"));
+		const easing = hiddenState.get(stateAnimationEasing, this.get(stateAnimationEasing));
 
 		promises.push(dataItem.animate({ key: "valueWorking" as any, to: 0, duration: duration, easing: easing }).waitForStop());
 

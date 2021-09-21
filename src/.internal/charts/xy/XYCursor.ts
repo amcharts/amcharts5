@@ -210,11 +210,12 @@ export class XYCursor extends Container {
 		super._afterNew();
 		this.setAll({ "width": p100, height: p100, isMeasured: true, position: "absolute" });
 		this.states.create("hidden", { visible: true, opacity: 0 });
-
-		//this.lineX.states.create("hidden", { visible: true, opacity: 0 });
-		//this.lineY.states.create("hidden", { visible: true, opacity: 0 });
-
 		this._drawLines();
+		this.setPrivateRaw("visible", false);
+
+		this._disposers.push(this.setTimeout(() => {
+			this.setPrivate("visible", true)
+		}, 500))
 	}
 
 	public _prepareChildren() {
@@ -383,18 +384,20 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleMove(event: IPointerEvent) {
-		// TODO: handle multitouch
-		const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
+		if(this.getPrivate("visible")){
+			// TODO: handle multitouch
+			const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 
-		const lastPoint = this._lastPoint;
+			const lastPoint = this._lastPoint;
 
-		if (Math.round(lastPoint.x) === Math.round(rootPoint.x) && Math.round(lastPoint.y) === Math.round(rootPoint.y)) {
-			return;
+			if (Math.round(lastPoint.x) === Math.round(rootPoint.x) && Math.round(lastPoint.y) === Math.round(rootPoint.y)) {
+				return;
+			}
+
+			this._lastPoint = rootPoint;
+
+			this.handleMove({ x: rootPoint.x, y: rootPoint.y });
 		}
-
-		this._lastPoint = rootPoint;
-
-		this.handleMove({ x: rootPoint.x, y: rootPoint.y });
 	}
 
 	protected _getPosition(point: IPoint): IPoint {
@@ -459,7 +462,6 @@ export class XYCursor extends Container {
 			y = xy.y;
 
 			chart.xAxes.each((axis) => {
-
 				axis._handleCursorPosition(positionX, snapToSeries);
 				if (alwaysShow) {
 					axis.handleCursorShow();

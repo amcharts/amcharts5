@@ -499,33 +499,6 @@ export class XYChart extends SerialChart {
 	protected _handlePlotUp(_event: IPointerEvent) {
 		// TODO: handle multitouch
 		this._downPoint = undefined;
-
-		/*
-		this.xAxes.each((axis) => {
-			let start = axis.get("start");
-			let end = axis.get("end");
-
-			if(start < 0){
-				axis.zoom(0, end - start);
-			}
-
-			if(end > 1){
-				axis.zoom(start - (end - 1), 1);
-			}
-		})
-
-		this.yAxes.each((axis) => {
-			let start = axis.get("start");
-			let end = axis.get("end");
-
-			if(start < 0){
-				axis.zoom(0, end - start);
-			}
-
-			if(end > 1){
-				axis.zoom(start - (end - 1), 1);
-			}
-		})*/
 	}
 
 	protected _handlePlotMove(event: IPointerEvent) {

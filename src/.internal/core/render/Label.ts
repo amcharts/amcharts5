@@ -6,7 +6,7 @@ import { p50, p100 } from "../util/Percent";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
 import type { Template } from "../../core/util/Template";
 import * as  $array from "../../core/util/Array";
-import type { DataItem } from "./Component";
+import type { DataItem, IComponentDataItem } from "./Component";
 
 
 export interface ILabelSettings extends IContainerSettings {
@@ -114,7 +114,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 * label.set("ellipsis", "...");
 	 * ```
 	 *
-	 * 
+	 *
 	 * @default "…"
 	 */
 	ellipsis?: string;
@@ -135,6 +135,14 @@ export interface ILabelSettings extends IContainerSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Data_placeholders} for more info
 	 */
 	populateText?: boolean;
+
+	/**
+	 * If set to `true`, will ignore in-line formatting blocks and will display
+	 * text exactly as it is.
+	 *
+	 * @default false
+	 */
+	ignoreFormatting?: boolean;
 
 	// The following migh be supported some day:
 	// padding?: number;
@@ -214,7 +222,8 @@ export class Label extends Container {
 		"ellipsis",
 		"minScale",
 		"populateText",
-		"role"
+		"role",
+		"ignoreFormatting"
 	];
 
 	public static className: string = "Label";
@@ -266,7 +275,7 @@ export class Label extends Container {
 		if (this.isDirty("textAlign") || this.isDirty("width")) {
 			const textAlign = this.get("textAlign");
 			let x: number | Percent | undefined;
-			if (this.get("width") != null) {	
+			if (this.get("width") != null) {
 
 				if (textAlign == "right") {
 					x = p100;
@@ -304,7 +313,7 @@ export class Label extends Container {
 		}
 	}
 
-	public _setDataItem(dataItem: DataItem<unknown>): void {
+	public _setDataItem(dataItem: DataItem<IComponentDataItem>): void {
 		super._setDataItem(dataItem);
 		if (this.text.get("populateText")) {
 			this.text.markDirtyText();
@@ -314,7 +323,7 @@ export class Label extends Container {
 	/**
 	 * Returns text with populated placeholders and formatting if `populateText` is
 	 * set to `true`.
-	 * 
+	 *
 	 * @return Populated text
 	 */
 	public getText(): string {

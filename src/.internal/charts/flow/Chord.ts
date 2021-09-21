@@ -180,7 +180,7 @@ export class Chord extends Flow {
 				let value = 0;
 				if (outgoing) {
 					$array.each(outgoing, (outgoingLink) => {
-						if (outgoingLink.get("target") == targetDataItem) {
+						if (outgoingLink.get("target") === targetDataItem) {
 							value = outgoingLink.get("valueWorking");
 						}
 					})
@@ -206,10 +206,10 @@ export class Chord extends Flow {
 			this._d3chord.padAngle(this.get("padAngle", 0) * $math.RADIANS);
 			const sort = this.get("sort");
 
-			if (sort == "ascending") {
+			if (sort === "ascending") {
 				this._d3chord.sortGroups(ascending);
 			}
-			else if (sort == "descending") {
+			else if (sort === "descending") {
 				this._d3chord.sortGroups(descending);
 			}
 

@@ -5,10 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.20] - 2021-09-21
+
+### Added
+- `toFront()` and `toBack()` methods added to `Sprite`.
+- `"above"` setting added to `AxisDataItem`. Allows putting `AxisRange` grid and fill elements above the series.
+- New setting `ignoreFormatting` for `Label` added. If set to `true`, it will ignore square-bracketed style blocks and will display text as it is.
+
+### Fixed
+- Elements in chart will not generate hover events if they are obstructed by some other DOM element anymore.
+- `XYSeries` with a vertical axis range was fully visible, even the part covered by an axis range.
+- Axis bullets were not being hidden when axis data item was hidden.
+- Labels in `BreadcrumbBar` were sometimes misaligned in Safari browser.
+- Legend item of an initially-hidden series/slices/columns was being shown as enabled.
+
+
 ## [5.0.0-beta.19] - 2021-09-18
 
 ### Fixed
-- Eemoving an axis from `xAxes` or `yAxes` was not working properly in some cases.
+- Removing an axis from `xAxes` or `yAxes` was not working properly in some cases.
 - If a `templateField` was set on some child of a bullet's `sprite`, it was being ignored.
 
 

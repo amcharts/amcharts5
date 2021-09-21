@@ -73,7 +73,7 @@ export class ChordNonRibbon extends Chord {
 			$array.each(this.nodes.dataItems, (targetDataItem) => {
 				let value = 1;
 
-				if (sourceDataItem == targetDataItem) {
+				if (sourceDataItem === targetDataItem) {
 					value = 0;
 				}
 

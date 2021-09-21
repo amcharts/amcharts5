@@ -41,7 +41,7 @@ series.labelsContainer.set("paddingTop", 30)
 
 // Set up adapters for variable slice radius
 // https://www.amcharts.com/docs/v5/concepts/settings/adapters/
-series.slices.template.adapters.add("radius", (radius, target) => {
+series.slices.template.adapters.add("radius", (radius, target: any) => {
   const dataItem = target.dataItem;
   const high = series.getPrivate("valueHigh");
 

@@ -11,7 +11,7 @@ import type { Tooltip } from "../../../core/render/Tooltip";
 import type { Root } from "../../../core/Root";
 
 import { DataItem } from "../../../core/render/Component";
-import { Component, IComponentSettings, IComponentPrivate, IComponentEvents } from "../../../core/render/Component";
+import { Component, IComponentSettings, IComponentPrivate, IComponentEvents, IComponentDataItem } from "../../../core/render/Component";
 import { Container } from "../../../core/render/Container";
 import { p100 } from "../../../core/util/Percent";
 import { List } from "../../../core/util/List";
@@ -179,7 +179,7 @@ export interface IAxisPrivate extends IComponentPrivate {
 
 }
 
-export interface IAxisDataItem {
+export interface IAxisDataItem extends IComponentDataItem {
 
 	/**
 	 * Axis label element.
@@ -211,6 +211,16 @@ export interface IAxisDataItem {
 	 */
 	isRange?: boolean;
 
+
+	/**
+	 * Indicates if grid and axis fill of this data item should be above the series.
+	 * Usually used to bring up axis ranges grid or fill. By default, they go below series. Note, you must set above to true before creating
+	 * series range. Changing it later won't do anything. In case you need all your grids to be above series, simply move gridContainer
+	 * to the front: chart.gridContainer.toFront();
+	 *
+	 * @todo review
+	 */
+	above?: boolean
 }
 
 /**
@@ -240,14 +250,14 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	/**
 	 * A [[Container]] that holds all the axis grid and fill elements.
-	 * 
+	 *
 	 * @default Container.new()
 	 */
 	public readonly gridContainer: Container = Container.new(this._root, { width: p100, height: p100 });
 
 	/**
 	 * A [[Container]] that holds axis grid elements which goes above the series.
-	 * 
+	 *
 	 * @default Container.new()
 	 */
 	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100 });
@@ -257,7 +267,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 *
 	 * @default new Container
 	 */
-	public readonly bulletsContainer: Container = Container.new(this._root, { isMeasured: false, width: p100, height: p100, position: "absolute" });
+	public readonly bulletsContainer: Container = this.children.push(Container.new(this._root, { isMeasured: false, width: p100, height: p100, position: "absolute" }));
 
 	/**
 	 * A referenece to the the chart the axis belongs to.
@@ -499,20 +509,23 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this._rangesDirty = true;
 		this._prepareDataItem(dataItem);
 
+		let container = this.gridContainer;
+		if (dataItem.get("above")) {
+			container = this.topGridContainer;
+		}
+
 		const grid = dataItem.get("grid");
 		if (grid) {
-			this.topGridContainer.children.push(grid);
+			container.children.push(grid);
 		}
 
 		const fill = dataItem.get("axisFill");
 		if (fill) {
-			this.topGridContainer.children.push(fill);
+			container.children.push(fill);
 		}
 	}
 
-	public _prepareDataItem(_dataItem: DataItem<this["_dataItemSettings"]>, _index?: number) {
-
-	}
+	public _prepareDataItem(_dataItem: DataItem<this["_dataItemSettings"]>, _index?: number) { }
 
 	/**
 	 * @ignore
@@ -576,17 +589,15 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	public _prepareChildren() {
 		super._prepareChildren();
-		if (this.isDirty("fixAxisSize")) {
-			if (this.get("fixAxisSize")) {
-				this.ghostLabel.set("visible", true);
-			}
-			else {
-				this.ghostLabel.set("visible", false);
-			}
+
+		if (this.get("fixAxisSize")) {
+			this.ghostLabel.set("visible", true);
+		}
+		else {
+			this.ghostLabel.set("visible", false);
 		}
 
 		if (this.isDirty("start") || this.isDirty("end")) {
-
 			this.chart!._updateCursor();
 
 			let start = this.get("start", 0);
@@ -642,7 +653,6 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		renderer.chart = chart;
 		chart.gridContainer.children.push(this.gridContainer);
 		chart.topGridContainer.children.push(this.topGridContainer);
-		chart.bulletsContainer.children.push(this.bulletsContainer);
 
 		chart.axisHeadersContainer.children.push(this.axisHeader);
 
@@ -654,10 +664,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		});
 
 		chart.plotContainer.onPrivate("width", () => {
-			this.markDirtySize()
+			this.markDirtySize();
 		});
 		chart.plotContainer.onPrivate("height", () => {
-			this.markDirtySize()
+			this.markDirtySize();
 		});
 
 		chart.processAxis(this);
@@ -667,48 +677,44 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @ignore
 	 */
 	public hideDataItem(dataItem: DataItem<IAxisDataItem>): Promise<void> {
-		const promises = super.hideDataItem(dataItem);
-		const label = dataItem.get("label");
-		if (label) {
-			label.setPrivate("visible", false);
-		}
-		const grid = dataItem.get("grid");
-		if (grid) {
-			grid.setPrivate("visible", false);
-		}
-		const tick = dataItem.get("tick");
-		if (tick) {
-			tick.setPrivate("visible", false);
-		}
-		const axisFill = dataItem.get("axisFill");
-		if (axisFill) {
-			axisFill.setPrivate("visible", false);
-		}
-		return promises;
+		this._toggleDataItem(dataItem, false);
+		return super.hideDataItem(dataItem);
 	}
 
 	/**
 	 * @ignore
 	 */
 	public showDataItem(dataItem: DataItem<IAxisDataItem>): Promise<void> {
-		const promises = super.showDataItem(dataItem);
+		this._toggleDataItem(dataItem, true);
+		return super.showDataItem(dataItem);
+	}
+
+
+	public _toggleDataItem(dataItem: DataItem<IAxisDataItem>, visible: boolean) {
 		const label = dataItem.get("label");
 		if (label) {
-			label.setPrivate("visible", true);
+			label.setPrivate("visible", visible);
 		}
 		const grid = dataItem.get("grid");
 		if (grid) {
-			grid.setPrivate("visible", true);
+			grid.setPrivate("visible", visible);
 		}
 		const tick = dataItem.get("tick");
 		if (tick) {
-			tick.setPrivate("visible", true);
+			tick.setPrivate("visible", visible);
 		}
 		const axisFill = dataItem.get("axisFill");
 		if (axisFill) {
-			axisFill.setPrivate("visible", true);
+			axisFill.setPrivate("visible", visible);
 		}
-		return promises;
+
+		const bullet = dataItem.get("bullet");
+		if (bullet) {
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+				sprite.setPrivate("visible", visible);
+			}
+		}
 	}
 
 	/**
@@ -742,11 +748,12 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		let bullet = dataItem.get("bullet");
 		let axisBullet = this.get("bullet");
 
-		if (!bullet && axisBullet) {
+		if (!bullet && axisBullet && !dataItem.get("isRange")) {
 			bullet = axisBullet(this._root, this, dataItem);
 		}
 
 		if (bullet) {
+			bullet.axis = this;
 			const sprite = bullet.get("sprite");
 
 			if (sprite) {
@@ -918,7 +925,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * @ignore
+	 * Converts relative position of the plot area to relative position of the axis with zoom taken into account.
+	 * @param position Position
+	 * @return Relative position
+	 * @todo review
 	 */
 	public toAxisPosition(position: number) {
 		return this.get("renderer").toAxisPosition(position);
@@ -926,6 +936,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	/**
 	 * @ignore
+	 * Adjusts position with inversed taken into account
 	 */
 	public fixPosition(position: number): number {
 		return this.get("renderer").fixPosition(position);

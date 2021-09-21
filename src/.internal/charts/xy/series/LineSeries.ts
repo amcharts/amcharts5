@@ -226,15 +226,40 @@ export class LineSeries extends XYSeries {
 
 				let startIndex = this.getPrivate("startIndex", 0);
 
+				let strokeTemplateField = this.strokes.template.get("templateField");
+				let fillTemplateField = this.fills.template.get("templateField");
+
+				let strokeTemplateFound = true;
+				let fillTemplateFound = true;
+
+				if (strokeTemplateField) {
+					strokeTemplateFound = false;
+				}
+				if (fillTemplateField) {
+					fillTemplateFound = false;
+				}
+
 				for (let i = startIndex - 1; i >= 0; i--) {
 					let dataItem = this.dataItems[i];
 					let hasValues = true;
+					let dataContext = dataItem.dataContext as any;
+					if (strokeTemplateField) {
+						if (dataContext[strokeTemplateField]) {
+							strokeTemplateFound = true;
+						}
+					}
+					if (fillTemplateField) {
+						if (dataContext[fillTemplateField]) {
+							fillTemplateFound = true;
+						}
+					}
+
 					$array.each(this._valueFields, (field) => {
 						if (!$type.isNumber(dataItem.get(field as any))) {
 							hasValues = false;
 						}
 					})
-					if (hasValues) {
+					if (hasValues && strokeTemplateFound && fillTemplateFound) {
 						startIndex = i;
 						break
 					}
@@ -285,7 +310,8 @@ export class LineSeries extends XYSeries {
 		const fill = this.makeFill(this.fills);
 
 		const fillTemplate = this._fillTemplate;
-		if (fillTemplate && fillTemplate != this.fills.template) {
+		const originalTemplate = this.fills.template;
+		if (fillTemplate && fillTemplate != originalTemplate) {
 			fill.template = fillTemplate;
 		}
 
@@ -353,6 +379,9 @@ export class LineSeries extends XYSeries {
 		let i: number;
 
 		let fillVisible = this.fills.template.get("visible");
+		if (this.axisRanges.length > 0) {
+			fillVisible = true;
+		}
 
 		let getOpen = false;
 		if (stacked || xOpenFieldValue || yOpenFieldValue) {
@@ -483,7 +512,7 @@ export class LineSeries extends XYSeries {
 
 			dataItem.set("point", iPoint);
 
-			if (o.fillVisible || this.axisRanges.length > 0) {
+			if (o.fillVisible) {
 				let xPos0: number = xPos;
 				let yPos0: number = yPos;
 

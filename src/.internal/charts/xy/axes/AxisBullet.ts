@@ -58,9 +58,10 @@ export class AxisBullet extends Entity {
 
 	public _beforeChanged() {
 		super._beforeChanged();
-
-		if (this.isDirty("sprite")) {
-			const sprite = this.get("sprite");
+		
+		const sprite = this.get("sprite");
+		
+		if (this.isDirty("sprite")) {			
 			if (sprite) {
 				sprite.setAll({ position: "absolute", role: "figure" });
 				this._disposers.push(sprite);
@@ -68,8 +69,9 @@ export class AxisBullet extends Entity {
 		}
 
 		if (this.isDirty("location")) {
-			if (this.axis) {
-			//	this.axis._positionBullet(this);
+			const dataItem = sprite.dataItem;
+			if (this.axis && sprite && dataItem) {				
+				this.axis._prepareDataItem(dataItem as any)
 			}
 		}
 	}	

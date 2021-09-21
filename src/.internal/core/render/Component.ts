@@ -9,7 +9,7 @@ import type { Bullet } from "./Bullet";
 /**
  * A base element that holds data bit (data item) for any [[Component]].
  */
-export class DataItem<P> extends Settings {
+export class DataItem<P extends IComponentDataItem> extends Settings {
 	declare public _settings: P;
 
 	/**
@@ -21,8 +21,6 @@ export class DataItem<P> extends Settings {
 	 * A reference to actual item in source data this item is based on.
 	 */
 	public dataContext: unknown;
-
-	public _isHidden: boolean = false;
 
 	/**
 	 * @todo requires description
@@ -44,14 +42,8 @@ export class DataItem<P> extends Settings {
 
 		this.dataContext = dataContext;
 		this.component = component;
+		this._settings.visible = true;
 		this._checkDirty();
-	}
-
-	/**
-	 * Returns `true` if this item is currently hidden.
-	 */
-	public isHidden(): boolean {
-		return this._isHidden;
 	}
 
 	/**
@@ -80,6 +72,7 @@ export class DataItem<P> extends Settings {
 	 * Shows a data item that's currently hidden.
 	 */
 	public show(duration?: number) {
+		this.setRaw("visible", true);
 		if (this.component) {
 			this.component.showDataItem(this, duration);
 		}
@@ -89,14 +82,20 @@ export class DataItem<P> extends Settings {
 	 * Hides a data item that's currently visible.
 	 */
 	public hide(duration?: number) {
+		this.setRaw("visible", false);
 		if (this.component) {
 			this.component.hideDataItem(this, duration);
 		}
+	}
+
+	public isHidden() {
+		return !this.get("visible");
 	}
 }
 
 
 export interface IComponentDataItem {
+	visible?: boolean;
 }
 
 export interface IComponentSettings extends IContainerSettings {
@@ -237,16 +236,38 @@ export abstract class Component extends Container {
 		}));
 	}
 
-	public _updateFields() {
-		if (this.valueFields) {
-			let dirty = false;
-			$array.eachContinue(this.valueFields, (field) => {
-				if (this.isDirty(field + "Field" as any)) {
-					dirty = true;
-					return false;
-				}
+	protected _fieldsDirty(): boolean {
+		let dirty = false;
+		$array.eachContinue(this.fields, (field) => {
+			if (this.isDirty((field + "Field") as any)) {
+				dirty = true;
+				return false;
+			}
+			else {
 				return true;
-			})
+			}
+		})
+		return dirty;
+	}
+
+	protected _valueFieldsDirty(): boolean {
+		let dirty = false;
+		$array.eachContinue(this.valueFields, (field) => {
+			if (this.isDirty((field + "Field") as any)) {
+				dirty = true;
+				return false;
+			}
+			else {
+				return true;
+			}
+		})
+		return dirty;
+	}
+
+	protected _updateFields(): boolean {
+		let dirty = false;
+		if (this.valueFields) {
+			dirty = this._valueFieldsDirty();
 
 			if (dirty) {
 				this._valueFields = [];
@@ -263,16 +284,9 @@ export abstract class Component extends Container {
 		}
 
 		if (this.fields) {
-			let dirty = false;
-			$array.eachContinue(this.fields, (field) => {
-				if (this.isDirty(field + "Field" as any)) {
-					dirty = true;
-					return false;
-				}
-				return true;
-			})
-			if (dirty) {
+			let dirty = this._fieldsDirty();
 
+			if (dirty) {
 				this._fields = [];
 				this._fieldsF = {};
 
@@ -285,13 +299,14 @@ export abstract class Component extends Container {
 				});
 			}
 		}
+
+		return dirty;
 	}
 
 
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		// @todo monitor all fields? does it worth it?
 		this._updateFields();
 	}
 
@@ -359,7 +374,7 @@ export abstract class Component extends Container {
 	 * @return             Promise
 	 */
 	public async showDataItem(dataItem: DataItem<this["_dataItemSettings"]>, _duration?: number): Promise<void> {
-		dataItem._isHidden = false;
+		dataItem.set("visible", true);
 	}
 
 	/**
@@ -370,7 +385,7 @@ export abstract class Component extends Container {
 	 * @return             Promise
 	 */
 	public async hideDataItem(dataItem: DataItem<this["_dataItemSettings"]>, _duration?: number): Promise<void> {
-		dataItem._isHidden = true;
+		dataItem.set("visible", false);
 	}
 
 	public _clearDirty() {

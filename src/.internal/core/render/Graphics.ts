@@ -9,6 +9,8 @@ import * as $type from "../util/Type";
 import * as $array from "../util/Array";
 
 
+export const visualSettings = ["fill", "fillOpacity", "stroke", "strokeOpacity", "fillPattern", "strokePattern", "fillGradient", "strokeGradient", "strokeDasharray", "strokeDashoffset"];
+
 export interface IGraphicsSettings extends ISpriteSettings {
 
 	/**

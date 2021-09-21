@@ -1,4 +1,4 @@
-import { Component, IComponentSettings, IComponentPrivate, DataItem, IComponentEvents } from "../../core/render/Component";
+import { Component, IComponentSettings, IComponentPrivate, DataItem, IComponentEvents, IComponentDataItem } from "../../core/render/Component";
 import { List } from "../../core/util/List";
 import { Color } from "../../core/util/Color";
 import { percentInterpolate } from "../../core/util/Animation";
@@ -78,7 +78,7 @@ export interface IHeatRule {
 }
 
 
-export interface ISeriesDataItem {
+export interface ISeriesDataItem extends IComponentDataItem {
 	id?: string;
 
 	value?: number;

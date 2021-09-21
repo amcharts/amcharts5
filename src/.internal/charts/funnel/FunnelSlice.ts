@@ -82,10 +82,8 @@ export class FunnelSlice extends Graphics {
 			display.moveTo(this._tlx, this._tly);
 			display.lineTo(this._trx, this._try);
 			display.quadraticCurveTo(this._cprx, this._cpry, this._brx, this._bry);
-			//display.lineTo(this._brx, this._bry);
 			display.lineTo(this._blx, this._bly);
 			display.quadraticCurveTo(this._cplx, this._cply, this._tlx, this._tly);
-			//display.lineTo(this._tlx, this._tly);
 		})
 	}
 

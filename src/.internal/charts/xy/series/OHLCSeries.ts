@@ -7,7 +7,7 @@ import type { DataItem } from "../../../core/render/Component";
 import * as $utils from "../../../core/util/Utils";
 
 export interface IOHLCSeriesDataItem extends ICandlestickSeriesDataItem {
-	column?: OHLC;
+	
 }
 
 export interface IOHLCSeriesSettings extends ICandlestickSeriesSettings {

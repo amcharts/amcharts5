@@ -1332,7 +1332,7 @@ export class CanvasText extends CanvasContainer implements IText {
 
 	}
 
-	protected _prerender(layer: CanvasLayer, ignoreGhost = false): void {
+	protected _prerender(layer: CanvasLayer, ignoreGhost = false, ignoreFontWeight = false): void {
 		super._render(layer);
 
 		const context = layer.context;
@@ -1341,7 +1341,7 @@ export class CanvasText extends CanvasContainer implements IText {
 		// Font style
 
 		const style = this.style;
-		let fontStyle = this._getFontStyle();
+		let fontStyle = this._getFontStyle(undefined, ignoreFontWeight);
 
 		context.font = fontStyle;
 		if (this._isInteractive() && !ignoreGhost) {
@@ -1365,7 +1365,7 @@ export class CanvasText extends CanvasContainer implements IText {
 		}
 	}
 
-	protected _getFontStyle(style2?: ITextStyle): string {
+	protected _getFontStyle(style2?: ITextStyle, ignoreFontWeight = false): string {
 
 		// Process defaults
 		const style = this.style;
@@ -1378,11 +1378,13 @@ export class CanvasText extends CanvasContainer implements IText {
 			fontStyle.push(style.fontVariant);
 		}
 
-		if (style2 && style2.fontWeight) {
-			fontStyle.push(style2.fontWeight);
-		}
-		else if (style.fontWeight) {
-			fontStyle.push(style.fontWeight);
+		if (!ignoreFontWeight) {
+			if (style2 && style2.fontWeight) {
+				fontStyle.push(style2.fontWeight);
+			}
+			else if (style.fontWeight) {
+				fontStyle.push(style.fontWeight);
+			}
 		}
 
 		if (style2 && style2.fontStyle) {
@@ -1495,9 +1497,9 @@ export class CanvasText extends CanvasContainer implements IText {
 	public _addBounds(bounds: IBounds): void {
 		if (this.visible && this.isMeasured) {
 			//if (this._textVisible) {
-				const x = this._measure(this.getLayer());
-				setPoint(bounds, { x: x.left, y: x.top });
-				setPoint(bounds, { x: x.right, y: x.bottom });
+			const x = this._measure(this.getLayer());
+			setPoint(bounds, { x: x.left, y: x.top });
+			setPoint(bounds, { x: x.right, y: x.bottom });
 			//}
 		}
 	}
@@ -1518,7 +1520,7 @@ export class CanvasText extends CanvasContainer implements IText {
 		// Pre-render
 		context.save();
 		ghostContext.save();
-		this._prerender(layer, true);
+		this._prerender(layer, true, true);
 
 		// Get default font metrix
 		const refText = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
@@ -1534,7 +1536,7 @@ export class CanvasText extends CanvasContainer implements IText {
 		$array.each(lines, (line, _index) => {
 
 			// Split up line into format/value chunks
-			let chunks = TextFormatter.chunk(line);
+			let chunks = TextFormatter.chunk(line, false, this.style.ignoreFormatting);
 
 			while (chunks.length > 0) {
 
@@ -1671,6 +1673,8 @@ export class CanvasText extends CanvasContainer implements IText {
 
 						}
 
+
+
 						// Chunk width?
 						let leftBoundMod = 1;
 						let rightBoundMod = 1;
@@ -1693,6 +1697,8 @@ export class CanvasText extends CanvasContainer implements IText {
 						}
 
 						const chunkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+
 						if (chunkHeight > lineInfo.height) {
 							lineInfo.height = chunkHeight;
 						}
@@ -1949,6 +1955,7 @@ export class CanvasTextStyle implements ITextStyle {
 	public maxWidth?: number;
 	public maxHeight?: number;
 	public minScale?: number;
+	public ignoreFormatting?: boolean = false;
 }
 
 /**
@@ -2205,7 +2212,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		$array.each(lines, (line, _index) => {
 
 			// Split up line into format/value chunks
-			let chunks = TextFormatter.chunk(line);
+			let chunks = TextFormatter.chunk(line, false, this.style.ignoreFormatting);
 
 			// Init line object
 			let lineInfo: ILine = {
@@ -2976,18 +2983,20 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 				}
 			});
 
-			eachTargets(target, (obj) => {
-				if (!this._hovering.has(obj)) {
-					this._hovering.add(obj);
-					if (obj.cursorOverStyle) {
-						obj._replacedCursorStyle = $utils.getStyle(document.body, "cursor");
-						$utils.setStyle(document.body, "cursor", obj.cursorOverStyle);
+			if (this._isNativeEvent(originalEvent)) {
+				eachTargets(target, (obj) => {
+					if (!this._hovering.has(obj)) {
+						this._hovering.add(obj);
+						if (obj.cursorOverStyle) {
+							obj._replacedCursorStyle = $utils.getStyle(document.body, "cursor");
+							$utils.setStyle(document.body, "cursor", obj.cursorOverStyle);
+						}
+						this._dispatchEvent("pointerover", obj, event);
 					}
-					this._dispatchEvent("pointerover", obj, event);
-				}
 
-				return true;
-			});
+					return true;
+				});
+			}
 
 			//} else if (target === false) {
 		} else {
@@ -3002,6 +3011,13 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		}
 
 		this._dispatchEventAll("globalpointermove", event);
+	}
+
+	_isNativeEvent(event: IPointerEvent): boolean {
+		if (event.target) {
+			return (<any>event.target).parentNode === this._layerDom;
+		}
+		return true;
 	}
 
 	_dispatchGlobalMouseup(originalEvent: IPointerEvent): void {

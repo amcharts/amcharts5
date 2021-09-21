@@ -230,12 +230,14 @@ export class ForceDirected extends LinkedHierarchy {
 			}
 		}
 
+		const d3forceSimulation = this.d3forceSimulation;
+
 		if (this.isDirty("velocityDecay")) {
-			this.d3forceSimulation.velocityDecay(this.get("velocityDecay", 0));
+			d3forceSimulation.velocityDecay(this.get("velocityDecay", 0));
 		}
 
 		if (this.isDirty("initialFrames")) {
-			this.d3forceSimulation.alphaDecay(1 - Math.pow(0.001, 1 / this.get("initialFrames", 500)));
+			d3forceSimulation.alphaDecay(1 - Math.pow(0.001, 1 / this.get("initialFrames", 500)));
 		}
 	}
 

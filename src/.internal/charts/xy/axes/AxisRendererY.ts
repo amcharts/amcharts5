@@ -140,6 +140,7 @@ export class AxisRendererY extends AxisRenderer {
 	public _updatePositions() {
 		const axis = this.axis;
 		axis.gridContainer.set("y", axis.y() - $utils.relativeToValue(axis.get("centerY", 0), axis.height()));
+		axis.bulletsContainer.set("x", this.x());
 
 		const chart = axis.chart;
 		if (chart) {
@@ -312,7 +313,6 @@ export class AxisRendererY extends AxisRenderer {
 				}
 
 				sprite.set("y", this.positionToCoordinate(position));
-				sprite.set("x", this.axis.bulletsContainer.toLocal(this.toGlobal({ x: 0, y: 0 })).x);
 
 				this.toggleVisibility(sprite, position, 0, 1);
 			}
@@ -356,9 +356,9 @@ export class AxisRendererY extends AxisRenderer {
 			y1 = Math.min(h, y1);
 
 			display.moveTo(0, y0);
-			display.lineTo(0, y1);
-			display.lineTo(w, y1);
 			display.lineTo(w, y0);
+			display.lineTo(w, y1);
+			display.lineTo(0, y1);			
 			display.lineTo(0, y0);
 		})
 	}
@@ -438,8 +438,8 @@ export class AxisRendererY extends AxisRenderer {
 	 * @ignore
 	 */
 	public toAxisPosition(position: number): number {
-		const start = this.axis.get("start")!;
-		const end = this.axis.get("end")!;
+		const start = this._start || 0;
+		const end = this._end || 1;
 
 		position = position * (end - start);
 		if (this.get("inversed")) {

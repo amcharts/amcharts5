@@ -282,8 +282,8 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	public toAxisPosition(position: number): number {
-		const start = this.axis.get("start")!;
-		const end = this.axis.get("end")!;
+		const start = this._start || 0;
+		const end = this._end || 1;
 
 		position = position * (end - start);
 		if (!this.get("inversed")) {

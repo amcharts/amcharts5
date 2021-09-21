@@ -7,7 +7,7 @@ import * as $array from "../util/Array";
 import type { IBounds } from "../util/IBounds";
 import type { Template } from "../../core/util/Template";
 import { populateString } from "../util/PopulateString";
-import type { DataItem } from "./Component";
+import type { DataItem, IComponentDataItem } from "./Component";
 
 /**
  * @ignore Text is an internal class. Use Label instead.
@@ -44,6 +44,7 @@ export interface ITextSettings extends ISpriteSettings {
 	ellipsis?: string;
 	minScale?: number;
 	populateText?: boolean;
+	ignoreFormatting?: boolean;
 }
 
 /**
@@ -178,6 +179,11 @@ export class Text extends Sprite {
 			this.markDirtyBounds();
 		}
 
+		if (this.isDirty("ignoreFormatting")) {
+			textStyle.ignoreFormatting = this.get("ignoreFormatting", false);
+			this.markDirtyBounds();
+		}
+
 		if (this.isDirty("minScale")) {
 			textStyle.minScale = this.get("minScale", 0);
 			this.markDirtyBounds();
@@ -230,7 +236,7 @@ export class Text extends Sprite {
 		this.markDirty();
 	}
 
-	public _setDataItem(dataItem: DataItem<unknown>): void {
+	public _setDataItem(dataItem: DataItem<IComponentDataItem>): void {
 		super._setDataItem(dataItem);
 		if (this.get("populateText")) {
 			this.markDirtyText();

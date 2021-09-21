@@ -1,5 +1,6 @@
 import type { DataItem } from "../../../core/render/Component";
 import type { Graphics } from "../../../core/render/Graphics";
+import { visualSettings } from "../../../core/render/Graphics";
 import type { Template } from "../../../core/util/Template";
 import type { ListTemplate } from "../../../core/util/List";
 import type { CategoryAxis } from "../axes/CategoryAxis";
@@ -15,9 +16,24 @@ import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
 export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
+	/**
+	 * DataItem graphics (Column/Slice/Candlestick/OHLC).
+	 * @todo review
+	 */
 	graphics?: Graphics;
+
+	/**
+	 * In case axis ranges are added to the series, it creates a separate graphics for each. This array holds them all.
+	 * @todo review
+	 */
 	rangeGraphics?: Array<Graphics>;
-	legendDataItem: DataItem<ILegendDataItem>;
+
+	/**
+	 * In case data of your Legend is data items of this series, this is a reference to the legend data item.
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/#Data_item_list} for more info
+	 * @todo review
+	 */
+	legendDataItem?: DataItem<ILegendDataItem>;
 }
 
 export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
@@ -30,16 +46,15 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Clustering} for more info
 	 */
 	clustered?: boolean;
-
 }
 
-export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate {
-}
+export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }
 
 export interface IBaseColumnSeriesAxisRange extends IXYSeriesAxisRange {
 
 	/**
-	 * List of columns.
+	 * ListTemplate of columns. You can use it to adjust the look of columns of the axis range.
+	 * @todo review
 	 */
 	columns: ListTemplate<Graphics>;
 }
@@ -63,7 +78,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 	public abstract makeColumn(dataItem: DataItem<this["_dataItemSettings"]>, listTemplate: ListTemplate<Graphics>): Graphics
 
 	/**
-	 * List of columns in series.
+	 * ListTemplate of columns in series.
 	 */
 	public abstract columns: ListTemplate<Graphics>;
 
@@ -71,31 +86,34 @@ export abstract class BaseColumnSeries extends XYSeries {
 		return this.makeColumn(dataItem, listTemplate);
 	}
 
-	public _updateFields() {
-		super._updateFields();
+	public _makeFieldNames() {
+		super._makeFieldNames();
 
-		let xAxis = this.get("xAxis");
-		let yAxis = this.get("yAxis");
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
 
-		if (xAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
+		const categoryAxis = "CategoryAxis";
+		const valueAxis = "ValueAxis";
+
+		if (xAxis.isType<CategoryAxis<any>>(categoryAxis)) {
 			if (!this.get("openCategoryXField")) {
 				this._xOpenField = this._xField;
 			}
 		}
 
-		if (xAxis.isType<DateAxis<any>>("ValueAxis")) {
+		if (xAxis.isType<DateAxis<any>>(valueAxis)) {
 			if (!this.get("openValueXField")) {
 				this._xOpenField = this._xField;
 			}
 		}
 
-		if (yAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
+		if (yAxis.isType<CategoryAxis<any>>(categoryAxis)) {
 			if (!this.get("openCategoryYField")) {
 				this._yOpenField = this._yField;
 			}
 		}
 
-		if (yAxis.isType<DateAxis<any>>("ValueAxis")) {
+		if (yAxis.isType<DateAxis<any>>(valueAxis)) {
 			if (!this.get("openValueYField")) {
 				this._yOpenField = this._yField;
 			}
@@ -103,21 +121,23 @@ export abstract class BaseColumnSeries extends XYSeries {
 	}
 
 	public _updateChildren() {
-		let xAxis = this.get("xAxis");
-		let yAxis = this.get("yAxis");
-		let baseAxis = this.get("baseAxis")!;
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
+		const baseAxis = this.get("baseAxis")!;
 
+		const columnsTemplate = this.columns.template;
 		if (this.isDirty("fill")) {
-			this.columns.template.set("fill", this.get("fill"));
+			columnsTemplate.set("fill", this.get("fill"));
 		}
 
 		if (this.isDirty("stroke")) {
-			this.columns.template.set("stroke", this.get("stroke"));
+			columnsTemplate.set("stroke", this.get("stroke"));
 		}
 
 		let index = 0;
 		let clusterCount = 0;
 		let i = 0;
+
 		$array.each(baseAxis.series, (series) => {
 			if (series instanceof BaseColumnSeries) {
 				const stacked = series.get("stacked");
@@ -150,11 +170,14 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const xRenderer = xAxis.get("renderer");
 		const yRenderer = yAxis.get("renderer");
 
-		const cellLocationX0 = xRenderer.get("cellStartLocation", 0);
-		const cellLocationX1 = xRenderer.get("cellEndLocation", 1);
+		const cellStartLocation = "cellStartLocation";
+		const cellEndLocation = "cellEndLocation";
 
-		const cellLocationY0 = yRenderer.get("cellStartLocation", 0);
-		const cellLocationY1 = yRenderer.get("cellEndLocation", 1);
+		const cellLocationX0 = xRenderer.get(cellStartLocation, 0);
+		const cellLocationX1 = xRenderer.get(cellEndLocation, 1);
+
+		const cellLocationY0 = yRenderer.get(cellStartLocation, 0);
+		const cellLocationY1 = yRenderer.get(cellEndLocation, 1);
 
 		this._aLocationX0 = cellLocationX0 + (index / clusterCount) * (cellLocationX1 - cellLocationX0);
 		this._aLocationX1 = cellLocationX0 + (index + 1) / clusterCount * (cellLocationX1 - cellLocationX0);;
@@ -164,46 +187,25 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 		if (xAxis.inited && yAxis.inited) {
 			if (this._axesDirty || this._valuesDirty || this._stackDirty || this.isDirty("vcx") || this.isDirty("vcy") || this._sizeDirty) {
-				this.axisRanges.each((axisRange) => {
-					axisRange.columns.each((column) => {
-						column.setPrivate("visible", false);
-					})
-				})
-
 				const len = this.dataItems.length;
 
-				let startIndex = Math.max(0, this.getPrivate("startIndex", 0) - 1);
+				let startIndex = Math.max(0, this.getPrivate("startIndex", 0) - 2);
+				let endIndex = Math.min(this.getPrivate("endIndex", len) + 2, len - 1);
 
-				let endIndex = Math.min(this.getPrivate("endIndex", len) + 1, len);
-
-				for (let i = 0; i < startIndex - 1; i++) {
-					let di = this.dataItems[i];
-					if (di) {
-						let graphics = di.get("graphics");
-						if (graphics) {
-							graphics.setPrivate("visible", false);
-						}
-					}
+				for (let i = 0; i < startIndex; i++) {
+					this._toggleColumn(this.dataItems[i], false);
 				}
 
 				let previous = this.dataItems[startIndex];
 
-				for (let i = startIndex - 1; i <= endIndex; i++) {
-					let di = this.dataItems[i];
-					if (di) {
-						this._updateGraphics(di, previous);
-						previous = this.dataItems[i];
-					}
+				for (let i = startIndex; i <= endIndex; i++) {
+					let dataItem = this.dataItems[i];
+					this._updateGraphics(dataItem, previous);
+					previous = dataItem;
 				}
 
 				for (let i = endIndex + 1; i < len; i++) {
-					let di = this.dataItems[i];
-					if (di) {
-						let graphics = di.get("graphics");
-						if (graphics) {
-							graphics.setPrivate("visible", false);
-						}
-					}
+					this._toggleColumn(this.dataItems[i], false);
 				}
 			}
 		}
@@ -244,24 +246,24 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const xField = this._xField;
 		const yField = this._yField;
 
-		const xOpenField = this._xOpenField;
-		const yOpenField = this._yOpenField;
-
-		let valueX = dataItem.get(xField as any);
-		let valueY = dataItem.get(yField as any);
-
-		let locationX = this.get("locationX", dataItem.get("locationX", 0.5));
-		let locationY = this.get("locationY", dataItem.get("locationY", 0.5));
-
-		let openLocationX = this.get("openLocationX", dataItem.get("openLocationX", locationX));
-		let openLocationY = this.get("openLocationY", dataItem.get("openLocationY", locationY));
-
-		let width = graphics.get("width");
-		let height = graphics.get("height");
-
-		const stacked = this.get("stacked");
+		const valueX = dataItem.get(xField as any);
+		const valueY = dataItem.get(yField as any);
 
 		if (valueX != null && valueY != null) {
+			const xOpenField = this._xOpenField;
+			const yOpenField = this._yOpenField;
+
+			const locationX = this.get("locationX", dataItem.get("locationX", 0.5));
+			const locationY = this.get("locationY", dataItem.get("locationY", 0.5));
+
+			const openLocationX = this.get("openLocationX", dataItem.get("openLocationX", locationX));
+			const openLocationY = this.get("openLocationY", dataItem.get("openLocationY", locationY));
+
+			const width = graphics.get("width");
+			const height = graphics.get("height");
+
+			const stacked = this.get("stacked");
+
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
 			const baseAxis = this.get("baseAxis");
@@ -280,7 +282,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 			let vcy = this.get("vcy", 1);
 			let vcx = this.get("vcx", 1);
 
-			if (xAxis.isType<CategoryAxis<any>>("CategoryAxis") && yAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
+			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") && xAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
 
 				let startLocation = this._aLocationX0 + openLocationX - 0.5;
 				let endLocation = this._aLocationX1 + locationX - 0.5;
@@ -323,7 +325,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 				r = xAxis.getDataItemPositionX(dataItem, xField, endLocation, vcx);
 				t = yAxis.getDataItemPositionY(dataItem, yField, locationY, vcy);
 
-				if (this._yOpenField != this._yField) {
+				if (this._yOpenField !== this._yField) {
 					b = yAxis.getDataItemPositionY(dataItem, yOpenField, openLocationY, vcy);
 				}
 				else {
@@ -357,7 +359,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 				b = yAxis.getDataItemPositionY(dataItem, yField, endLocation, vcy);
 				r = xAxis.getDataItemPositionX(dataItem, xField, locationX, vcx);
 
-				if (this._xOpenField != this._xField) {
+				if (this._xOpenField !== this._xField) {
 					l = xAxis.getDataItemPositionX(dataItem, xOpenField, openLocationX, vcx);
 				}
 				else {
@@ -378,11 +380,11 @@ export abstract class BaseColumnSeries extends XYSeries {
 				dataItem.set("point", { x: r, y: t + (b - t) / 2 });
 			}
 
-			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b < yStart) || (t > yEnd && b > yEnd)) {
-				graphics.setPrivate("visible", false);
-			}
-
 			this._updateSeriesGraphics(dataItem, graphics!, l, r, t, b);
+
+			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b < yStart) || (t > yEnd && b > yEnd)) {
+				this._toggleColumn(dataItem, false);
+			}
 
 			let rangeGraphics = dataItem.get("rangeGraphics")!;
 			if (rangeGraphics) {
@@ -397,10 +399,10 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 	protected _updateSeriesGraphics(dataItem: DataItem<this["_dataItemSettings"]>, graphics: Graphics, l: number, r: number, t: number, b: number) {
 
-		let width = graphics.get("width");
-		let height = graphics.get("height");
-		let maxWidth = graphics.get("maxWidth");
-		let maxHeight = graphics.get("maxHeight");
+		const width = graphics.get("width");
+		const height = graphics.get("height");
+		const maxWidth = graphics.get("maxWidth");
+		const maxHeight = graphics.get("maxHeight");
 
 		graphics.setPrivate("visible", true);
 
@@ -413,33 +415,26 @@ export abstract class BaseColumnSeries extends XYSeries {
 		t = ptl.y;
 		b = pbr.y;
 
-		//if (t > b) {
-		//	[t, b] = [b, t];
-		//}
-		//if (l > r) {
-		//	[l, r] = [r, l];
-		//}
-
 		if ($type.isNumber(width)) {
-			let offset: number = ((r - l) - width) / 2;
+			const offset: number = ((r - l) - width) / 2;
 			l += offset;
 			r -= offset;
 		}
 
 		if ($type.isNumber(maxWidth) && maxWidth < Math.abs(r - l)) {
-			let offset: number = ((r - l) - maxWidth) / 2;
+			const offset: number = ((r - l) - maxWidth) / 2;
 			l += offset;
 			r -= offset;
 		}
 
 		if ($type.isNumber(height)) {
-			let offset: number = ((b - t) - height) / 2;
+			const offset: number = ((b - t) - height) / 2;
 			t += offset;
 			b -= offset;
 		}
 
 		if ($type.isNumber(maxHeight) && maxHeight < Math.abs(b - t)) {
-			let offset: number = ((b - t) - maxHeight) / 2;
+			const offset: number = ((b - t) - maxHeight) / 2;
 			t += offset;
 			b -= offset;
 		}
@@ -458,16 +453,13 @@ export abstract class BaseColumnSeries extends XYSeries {
 	protected _handleDataSetChange() {
 		super._handleDataSetChange();
 		$array.each(this._dataItems, (dataItem) => {
-			const graphics = dataItem.get("graphics");
-			if (graphics) {
-				graphics.setPrivate("visible", false);
-			}
+			this._toggleColumn(dataItem, false);
 		})
 	}
 
 	protected _applyGraphicsStates(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
 
-		let graphics = dataItem.get("graphics")!;
+		const graphics = dataItem.get("graphics")!;
 
 		const dropFromOpen = graphics.states.lookup("dropFromOpen");
 		const riseFromOpen = graphics.states.lookup("riseFromOpen");
@@ -476,9 +468,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const riseFromPrevious = graphics.states.lookup("riseFromPrevious");
 
 		if (dropFromOpen || dropFromPrevious || riseFromOpen || riseFromPrevious) {
-			let xAxis = this.get("xAxis");
-			let yAxis = this.get("yAxis");
-			let baseAxis = this.get("baseAxis");
+			const xAxis = this.get("xAxis");
+			const yAxis = this.get("yAxis");
+			const baseAxis = this.get("baseAxis");
 
 			let open: number | undefined;
 			let close: number | undefined;
@@ -555,7 +547,29 @@ export abstract class BaseColumnSeries extends XYSeries {
 		if (graphics) {
 			promises.push(graphics.hide(duration));
 		}
+
+		const rangeGraphics = dataItem.get("rangeGraphics")!;
+		if (rangeGraphics) {
+			$array.each(rangeGraphics, (graphics) => {
+				promises.push(graphics.hide(duration));
+			})
+		}
+
 		await Promise.all(promises);
+	}
+
+	protected _toggleColumn(dataItem: DataItem<this["_dataItemSettings"]>, visible: boolean) {
+		const graphics = dataItem.get("graphics");
+		if (graphics) {
+			graphics.setPrivate("visible", visible);
+		}
+
+		const rangeGraphics = dataItem.get("rangeGraphics")!;
+		if (rangeGraphics) {
+			$array.each(rangeGraphics, (graphics) => {
+				graphics.setPrivate("visible", visible);
+			})
+		}
 	}
 
 	/**
@@ -571,6 +585,14 @@ export abstract class BaseColumnSeries extends XYSeries {
 		if (graphics) {
 			promises.push(graphics.show(duration));
 		}
+
+		const rangeGraphics = dataItem.get("rangeGraphics")!;
+		if (rangeGraphics) {
+			$array.each(rangeGraphics, (graphics) => {
+				promises.push(graphics.show(duration));
+			})
+		}
+
 		await Promise.all(promises);
 	}
 
@@ -594,7 +616,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 			if (markerRectangle) {
 				if (!legendDataItem.get("itemContainer").get("disabled")) {
-					markerRectangle.setAll({ fill: graphics.get("fill", this.get("fill")), fillOpacity: graphics.get("fillOpacity"), fillGradient: graphics.get("fillGradient"), stroke: graphics.get("stroke", this.get("stroke")), strokeOpacity: graphics.get("strokeOpacity"), strokeGradient: graphics.get("strokeGradient"), strokeDasharray: graphics.get("strokeDasharray"), fillPattern: graphics.get("fillPattern") });
+					$array.each(visualSettings, (setting: any) => {
+						markerRectangle.set(setting, graphics.get(setting, this.get(setting)));
+					})
 				}
 			}
 		}
@@ -603,7 +627,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
 		let column = dataItem.get("graphics");
 		if (column) {
-			return column
+			return column;
 		}
 		return this;
 	}

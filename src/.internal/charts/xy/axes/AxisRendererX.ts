@@ -121,6 +121,7 @@ export class AxisRendererX extends AxisRenderer {
 	public _updatePositions() {
 		const axis = this.axis;
 		axis.gridContainer.set("x", axis.x() - $utils.relativeToValue(axis.get("centerX", 0), axis.width()) - axis.parent!.get("paddingLeft", 0));
+		axis.bulletsContainer.set("y", this.y());
 
 		const chart = axis.chart;
 		if (chart) {
@@ -298,13 +299,13 @@ export class AxisRendererX extends AxisRenderer {
 				}
 
 				let location = bullet.get("location", 0.5);
+
 				if ($type.isNumber(endPosition) && endPosition != position) {
 					position = position + (endPosition - position) * location;
 				}
 
-				sprite.set("x", this.positionToCoordinate(position));
-				sprite.set("y", this.axis.bulletsContainer.toLocal(this.toGlobal({ x: 0, y: 0 })).y);
 
+				sprite.set("x", this.positionToCoordinate(position));
 				this.toggleVisibility(sprite, position, 0, 1);
 			}
 		}
