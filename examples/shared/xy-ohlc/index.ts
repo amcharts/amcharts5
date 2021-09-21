@@ -194,6 +194,6 @@ legend.markerRectangles.template.setAll({
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000);
 chart.appear(1000, 100);

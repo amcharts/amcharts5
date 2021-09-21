@@ -1199,10 +1199,11 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				context.beginPath();
 			}
 
-			const color = (interactive ? this._getColorId() : undefined);
+			let color: string | undefined;
 
 			if (interactive) {
 				ghostContext.beginPath();
+				color = this._getColorId();
 			}
 
 			$array.each(this._operations, (op) => {
@@ -1418,10 +1419,6 @@ export class CanvasText extends CanvasContainer implements IText {
 		}
 
 		return fontStyle.join(" ");
-	}
-
-	public render(parentLayer: CanvasLayer): void {
-		super.render(parentLayer);
 	}
 
 	protected _render(parentLayer: CanvasLayer): void {

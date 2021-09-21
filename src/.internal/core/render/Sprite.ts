@@ -2138,10 +2138,8 @@ export abstract class Sprite extends Entity {
 
 			if (updateChildren) {
 				this._removeParent(prevParent);
-			}
 
-			if (parent) {
-				if (updateChildren) {
+				if (parent) {
 					this._addPercentageSizeChildren();
 					this._addPercentagePositionChildren();
 				}
@@ -2233,8 +2231,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Moves sprite to front in the children array
-	 * @todo review
+	 * Moves sprite to the end of the parent's children array.
+	 *
+	 * Depending on `layout` setting of the parten container, it may effect the
+	 * positioning or overlapping order of the elements.
 	 */
 	public toFront() {
 		const parent = this.parent;
@@ -2244,8 +2244,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Moves sprite to the back in the children array
-	 * @todo review
+	 * Moves sprite to the beginning of the parent's children array.
+	 *
+	 * Depending on `layout` setting of the parten container, it may effect the
+	 * positioning or overlapping order of the elements.
 	 */
 	public toBack() {
 		const parent = this.parent;

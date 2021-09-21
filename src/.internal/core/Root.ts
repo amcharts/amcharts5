@@ -821,7 +821,7 @@ export class Root implements IDisposer {
 			tooltipContainer.set("layer", 100);
 			this.tooltipContainer = tooltipContainer;
 
-			const tooltip = tooltipContainer.children.push(Tooltip.new(this, {}));
+			const tooltip = Tooltip.new(this, {});
 			this.container.set("tooltip", tooltip);
 			tooltip.hide(0);
 			this._tooltip = tooltip;

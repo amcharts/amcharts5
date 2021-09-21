@@ -111,6 +111,6 @@ xAxis.data.setAll(data);
 
 
 // Animate chart and series in
-// https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000);
 chart.appear(1000, 100);

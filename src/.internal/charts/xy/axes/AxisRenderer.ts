@@ -160,7 +160,7 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public makeLabel(dataItem: DataItem<IAxisDataItem>): AxisLabel {
 	
-		const label = this.labels.make()
+		const label = this.labels.make();
 
 		let themeTags = [];
 		if (this.get("opposite" as any)) {

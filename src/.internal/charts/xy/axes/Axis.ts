@@ -211,16 +211,21 @@ export interface IAxisDataItem extends IComponentDataItem {
 	 */
 	isRange?: boolean;
 
-
 	/**
-	 * Indicates if grid and axis fill of this data item should be above the series.
-	 * Usually used to bring up axis ranges grid or fill. By default, they go below series. Note, you must set above to true before creating
-	 * series range. Changing it later won't do anything. In case you need all your grids to be above series, simply move gridContainer
-	 * to the front: chart.gridContainer.toFront();
+	 * If set to `true`, the grid and axis fill of this data item will be drawn
+	 * above series.
 	 *
-	 * @todo review
+	 * NOTE: this needs to be set **before** crating an axis range. Updating this
+	 * dynamically won't have any effect.
+	 *
+	 * NOTE: if you need all grid to be drawn above series, you can brig it to
+	 * front with `chart.gridContainer.toFront();`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Grid_fill_above_series} for more info
+	 * @default false
 	 */
 	above?: boolean
+
 }
 
 /**
@@ -347,7 +352,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			renderer.processAxis();
 		}
 		this.children.push(renderer);
-		this.ghostLabel = this.labelsContainer.children.push(renderer.makeLabel(new DataItem(this, undefined, {})));
+		this.ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}));
 		this.ghostLabel.set("opacity", 0);
 	}
 
@@ -509,19 +514,17 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this._rangesDirty = true;
 		this._prepareDataItem(dataItem);
 
-		let container = this.gridContainer;
-		if (dataItem.get("above")) {
-			container = this.topGridContainer;
-		}
+		const above = dataItem.get("above");
+		const container = this.topGridContainer;
 
 		const grid = dataItem.get("grid");
-		if (grid) {
-			container.children.push(grid);
+		if (above && grid) {
+			container.children.moveValue(grid);
 		}
 
 		const fill = dataItem.get("axisFill");
-		if (fill) {
-			container.children.push(fill);
+		if (above && fill) {
+			container.children.moveValue(fill);
 		}
 	}
 
@@ -925,18 +928,20 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Converts relative position of the plot area to relative position of the axis with zoom taken into account.
+	 * Converts relative position of the plot area to relative position of the
+	 * axis with zoom taken into account.
+	 * 
 	 * @param position Position
 	 * @return Relative position
-	 * @todo review
 	 */
-	public toAxisPosition(position: number) {
+	public toAxisPosition(position: number): number {
 		return this.get("renderer").toAxisPosition(position);
 	}
 
 	/**
+	 * Adjusts position with inversed taken into account.
+	 * 
 	 * @ignore
-	 * Adjusts position with inversed taken into account
 	 */
 	public fixPosition(position: number): number {
 		return this.get("renderer").fixPosition(position);

@@ -249,44 +249,46 @@ export class XYChart extends SerialChart {
 
 		let verticalLayout = this._root.verticalLayout;
 
-		this.zoomOutButton.events.on("click", () => {
+		const zoomOutButton = this.zoomOutButton;
+		zoomOutButton.events.on("click", () => {
 			this.zoomOut();
 		})
-		this.zoomOutButton.set("opacity", 0);
-		this.zoomOutButton.states.lookup("default")!.set("opacity", 1);
+		zoomOutButton.set("opacity", 0);
+		zoomOutButton.states.lookup("default")!.set("opacity", 1);
 
 		this.chartContainer.set("layout", verticalLayout);
 
-		this.plotContainer.children.push(this.seriesContainer);
+		const plotContainer = this.plotContainer;
+		plotContainer.children.push(this.seriesContainer);
 
 		this._disposers.push(this._processAxis(this.xAxes, this.bottomAxesContainer));
 		this._disposers.push(this._processAxis(this.yAxes, this.leftAxesContainer));
 
 
-		this.plotContainer.children.push(this.topGridContainer);
-		this.plotContainer.children.push(this.bulletsContainer);
+		plotContainer.children.push(this.topGridContainer);
+		plotContainer.children.push(this.bulletsContainer);
 
-		this.plotContainer.children.moveValue(this.zoomOutButton);
+		plotContainer.children.moveValue(zoomOutButton);
 
 		// Setting trasnparent background so that full body of the plot container
 		// is interactive
-		this.plotContainer.set("interactive", true);
-		this.plotContainer.set("interactiveChildren", false);
-		this.plotContainer.set("background", Rectangle.new(root, {
+		plotContainer.set("interactive", true);
+		plotContainer.set("interactiveChildren", false);
+		plotContainer.set("background", Rectangle.new(root, {
 			themeTags: ["xy", "background"],
 			fill: Color.fromHex(0x000000),
 			fillOpacity: 0
 		}));
 
-		this._disposers.push(this.plotContainer.events.on("pointerdown", (event) => {
+		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {
 			this._handlePlotDown(event.originalEvent);
 		}));
 
-		this._disposers.push(this.plotContainer.events.on("globalpointerup", (event) => {
+		this._disposers.push(plotContainer.events.on("globalpointerup", (event) => {
 			this._handlePlotUp(event.originalEvent);
 		}));
 
-		this._disposers.push(this.plotContainer.events.on("globalpointermove", (event) => {
+		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
 			this._handlePlotMove(event.originalEvent);
 		}));
 	}
@@ -309,7 +311,7 @@ export class XYChart extends SerialChart {
 		const plotContainer = this.plotContainer;
 
 		if (wheelX !== "none" || wheelY !== "none") {
-			this.plotContainer.set("wheelable", true);
+			plotContainer.set("wheelable", true);
 			this._wheelDp = plotContainer.events.on("wheel", (event) => {
 				const wheelEvent = event.originalEvent;
 
@@ -508,7 +510,7 @@ export class XYChart extends SerialChart {
 		if (downPoint) {
 			const plotContainer = this.plotContainer;
 
-			let local = this.plotContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+			let local = plotContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
 			const panX = this.get("panX");
 			const panY = this.get("panY");
@@ -885,14 +887,16 @@ export class XYChart extends SerialChart {
 	}
 
 	public _updateChartLayout() {
-		let left = this.leftAxesContainer.width();
-		let right = this.rightAxesContainer.width();
+		const left = this.leftAxesContainer.width();
+		const right = this.rightAxesContainer.width();
 
-		this.bottomAxesContainer.set("paddingLeft", left);
-		this.bottomAxesContainer.set("paddingRight", right);
+		const bottomAxesContainer = this.bottomAxesContainer;
+		bottomAxesContainer.set("paddingLeft", left);
+		bottomAxesContainer.set("paddingRight", right);
 
-		this.topAxesContainer.set("paddingLeft", left);
-		this.topAxesContainer.set("paddingRight", right);
+		const topAxesContainer = this.topAxesContainer;
+		topAxesContainer.set("paddingLeft", left);
+		topAxesContainer.set("paddingRight", right);
 	}
 
 	/**
@@ -1056,38 +1060,40 @@ export class XYChart extends SerialChart {
 		let count = tooltips.length;
 		let average = sum / count;
 
-		if (average > h / 2 + plotT.y) {
-			tooltips.reverse();
-			let prevY = plotB.y;
+		if (tooltips.length > 1) {
+			if (average > h / 2 + plotT.y) {
+				tooltips.reverse();
+				let prevY = plotB.y;
 
-			$array.each(tooltips, (tooltip) => {
-				let height = tooltip.height();
-				let centerY = tooltip.get("centerY");
-				if (centerY instanceof Percent) {
-					height *= centerY.value;
-				}
-				height += tooltip.get("marginBottom", 0);
+				$array.each(tooltips, (tooltip) => {
+					let height = tooltip.height();
+					let centerY = tooltip.get("centerY");
+					if (centerY instanceof Percent) {
+						height *= centerY.value;
+					}
+					height += tooltip.get("marginBottom", 0);
 
-				tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
+					tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
 
-				prevY = Math.min(prevY - height, tooltip._fy - height);
-				tooltipContainer.children.moveValue(tooltip, 0);
-			})
-		}
-		else {
-			let prevY = 0;
-			$array.each(tooltips, (tooltip) => {
-				let height = tooltip.height();
-				let centerY = tooltip.get("centerY");
-				if (centerY instanceof Percent) {
-					height *= centerY.value;
-				}
-				height += tooltip.get("marginBottom", 0);
+					prevY = Math.min(prevY - height, tooltip._fy - height);
+					tooltipContainer.children.moveValue(tooltip, 0);
+				})
+			}
+			else {
+				let prevY = 0;
+				$array.each(tooltips, (tooltip) => {
+					let height = tooltip.height();
+					let centerY = tooltip.get("centerY");
+					if (centerY instanceof Percent) {
+						height *= centerY.value;
+					}
+					height += tooltip.get("marginBottom", 0);
 
-				tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
-				tooltipContainer.children.moveValue(tooltip, 0);
-				prevY = Math.max(prevY + height, tooltip._fy + height);
-			})
+					tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
+					tooltipContainer.children.moveValue(tooltip, 0);
+					prevY = Math.max(prevY + height, tooltip._fy + height);
+				})
+			}
 		}
 	}
 

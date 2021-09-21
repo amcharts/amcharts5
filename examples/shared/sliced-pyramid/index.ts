@@ -44,11 +44,6 @@ series.data.setAll([
 ].reverse());
 
 
-// Play initial series animation
-// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
-series.appear();
-
-
 // Create legend
 // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
@@ -62,5 +57,6 @@ legend.data.setAll(am5.array.copy(series.dataItems).reverse());
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation#Forcing_appearance_animation
+series.appear();
 chart.appear(1000, 100);

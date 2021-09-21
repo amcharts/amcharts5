@@ -1,4 +1,4 @@
-import type { DataItem } from "../../../core/render/Component";
+import { DataItem } from "../../../core/render/Component";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../../core/render/Series";
 import type { Axis, IAxisPrivate, IAxisDataItem } from "../axes/Axis";
 import type { AxisRenderer } from "../axes/AxisRenderer";
@@ -579,6 +579,8 @@ export abstract class XYSeries extends Series {
 	// used for selection (uses working)
 	protected __valueXShowFields!: Array<string>;
 	protected __valueYShowFields!: Array<string>;
+
+	protected _emptyDataItem = new DataItem(this, undefined, {})
 
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
@@ -1557,7 +1559,7 @@ export abstract class XYSeries extends Series {
 					txt = this.get("legendLabelText", label.get("text", this.get("name", "")));
 				}
 				else {
-					label._setDataItem(this.makeDataItem({}));
+					label._setDataItem(this._emptyDataItem);
 					txt = this.get("legendRangeLabelText", this.get("legendLabelText", label.get("text", this.get("name", ""))));
 				}
 
@@ -1572,7 +1574,7 @@ export abstract class XYSeries extends Series {
 					txt = this.get("legendValueText", valueLabel.get("text", ""));
 				}
 				else {
-					valueLabel._setDataItem(this.makeDataItem({}));
+					valueLabel._setDataItem(this._emptyDataItem);
 					txt = this.get("legendRangeValueText", valueLabel.get("text", ""));
 				}
 

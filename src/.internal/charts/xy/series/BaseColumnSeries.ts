@@ -1,6 +1,5 @@
 import type { DataItem } from "../../../core/render/Component";
 import type { Graphics } from "../../../core/render/Graphics";
-import { visualSettings } from "../../../core/render/Graphics";
 import type { Template } from "../../../core/util/Template";
 import type { ListTemplate } from "../../../core/util/List";
 import type { CategoryAxis } from "../axes/CategoryAxis";
@@ -11,29 +10,32 @@ import type { Sprite } from "../../../core/render/Sprite";
 
 import { XYSeries, IXYSeriesPrivate, IXYSeriesSettings, IXYSeriesDataItem, IXYSeriesAxisRange } from "./XYSeries";
 import { Percent } from "../../../core/util/Percent";
+import { visualSettings } from "../../../core/render/Graphics";
 
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
 export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
+
 	/**
-	 * DataItem graphics (Column/Slice/Candlestick/OHLC).
-	 * @todo review
+	 * An actual [[Graphics]] element (Column/Slice/Candlestick/OHLC).
 	 */
 	graphics?: Graphics;
 
 	/**
-	 * In case axis ranges are added to the series, it creates a separate graphics for each. This array holds them all.
-	 * @todo review
+	 * In case axis ranges are added to the series, it creates a separate
+	 * element ([[Graphics]]) for each axis range. This array holds them all.
 	 */
 	rangeGraphics?: Array<Graphics>;
 
 	/**
-	 * In case data of your Legend is data items of this series, this is a reference to the legend data item.
+	 * If data items from this series are used to feed a [[Legend]], this
+	 * will hold a reference to the equivalent Legend data item.
+	 * 
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/#Data_item_list} for more info
-	 * @todo review
 	 */
 	legendDataItem?: DataItem<ILegendDataItem>;
+
 }
 
 export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
@@ -46,6 +48,7 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Clustering} for more info
 	 */
 	clustered?: boolean;
+
 }
 
 export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }
@@ -53,10 +56,12 @@ export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }
 export interface IBaseColumnSeriesAxisRange extends IXYSeriesAxisRange {
 
 	/**
-	 * ListTemplate of columns. You can use it to adjust the look of columns of the axis range.
-	 * @todo review
+	 * A list of actual [[Graphics]] elements for an axis range.
+	 *
+	 * Can be used to ajust the look of the axis range columns.
 	 */
 	columns: ListTemplate<Graphics>;
+
 }
 
 /**
