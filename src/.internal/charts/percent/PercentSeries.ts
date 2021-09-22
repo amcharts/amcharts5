@@ -5,20 +5,52 @@ import type { Tick } from "../../core/render/Tick";
 import type { ListTemplate } from "../../core/util/List";
 import type { ColorSet } from "../../core/util/ColorSet";
 import type { ILegendDataItem } from "../../core/render/Legend";
+import type { Color } from "../../core/util/Color";
 
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../core/render/Series";
 import { Container } from "../../core/render/Container";
+import { visualSettings } from "../../core/render/Graphics";
 
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 
 export interface IPercentSeriesDataItem extends ISeriesDataItem {
+
+	/**
+	 * Percent of the series value total.
+	 */
 	valuePercentTotal: number;
+
+	/**
+	 * Category.
+	 */
 	category: string;
+
+	/**
+	 * Slice visaul element.
+	 */
 	slice: Graphics;
+
+	/**
+	 * Slice label.
+	 */
 	label: Label;
+
+	/**
+	 * Slice tick.
+	 */
 	tick: Tick;
+
+	/**
+	 * A related legend data item.
+	 */
 	legendDataItem: DataItem<ILegendDataItem>;
+
+	/**
+	 * Fill color used for the slice and related elements, e.g. legend marker.
+	 */
+	fill: Color;
+
 }
 
 //type IPercentSeriesDataItemSettings = { [K in keyof IPercentSeriesDataItem]?: string; };
@@ -39,6 +71,12 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 	 * Should slice labelsbe aligned in columns/rows?
 	 */
 	alignLabels?: boolean;
+
+
+	/**
+	 * @todo review
+	 */
+	fillField?: string;
 
 }
 
@@ -95,7 +133,7 @@ export abstract class PercentSeries extends Series {
 
 		slice.on("stroke", () => {
 			this.updateLegendMarker(dataItem);
-		})		
+		})
 
 		slice._setDataItem(dataItem);
 		dataItem.set("slice", slice);
@@ -153,8 +191,15 @@ export abstract class PercentSeries extends Series {
 	}
 
 	protected _afterNew() {
-		this.fields.push("category");
+		this.fields.push("category", "fill");
 		super._afterNew();
+	}
+
+	protected _onDataClear() {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
 	}
 
 	public _prepareChildren() {
@@ -256,6 +301,17 @@ export abstract class PercentSeries extends Series {
 
 		this._arrangeLeft(this._hLabels);
 		this._arrangeRight(this._hLabels);
+	}
+
+	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.processDataItem(dataItem);
+
+		if (dataItem.get("fill") == null) {
+			let colors = this.get("colors");
+			if (colors) {
+				dataItem.setRaw("fill", colors.next());
+			}
+		}
 	}
 
 	/**
@@ -368,9 +424,9 @@ export abstract class PercentSeries extends Series {
 			const legendDataItem = dataItem.get("legendDataItem");
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
-				if (markerRectangle) {
-					markerRectangle.setAll({ fill: slice.get("fill"), fillOpacity: slice.get("fillOpacity"), stroke: slice.get("stroke"), strokeOpacity: slice.get("strokeOpacity") });
-				}
+				$array.each(visualSettings, (setting: any) => {
+					markerRectangle.set(setting, slice.get(setting));
+				})
 			}
 		}
 	}

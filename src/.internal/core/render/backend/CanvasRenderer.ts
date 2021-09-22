@@ -2545,6 +2545,11 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		this._ghostContext = this._ghostView.getContext("2d", { alpha: false })!;
 		this._ghostContext.imageSmoothingEnabled = false;
 
+		// Monitor for possible pixel ratio changes (when page is zoomed)
+		window.addEventListener("resize", (_ev) => {
+			this.resolution = window.devicePixelRatio;
+		});
+
 		// We need this in order top prevent default touch gestures when dragging
 		// draggable elements
 		if ($utils.supports("touchevents")) {

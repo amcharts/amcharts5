@@ -633,6 +633,8 @@ export abstract class XYSeries extends Series {
 		}
 
 		this.states.create("hidden", <any>{ opacity: 1, visible: false });
+
+		this._makeFieldNames();
 	}
 
 	protected _processAxisRange(axisRange: this["_axisRangeType"]) {
@@ -667,56 +669,53 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
-	protected _updateFields(): boolean {
-		let dirty = super._updateFields();
-		if (dirty) {
-			this._valueXFields = [];
-			this._valueYFields = [];
-			this._valueXShowFields = [];
-			this._valueYShowFields = [];
+	protected _updateFields() {
+		super._updateFields();
 
-			this.__valueXShowFields = [];
-			this.__valueYShowFields = [];
+		this._valueXFields = [];
+		this._valueYFields = [];
+		this._valueXShowFields = [];
+		this._valueYShowFields = [];
 
-			if (this.valueXFields) {
-				$array.each(this.valueXFields as Array<keyof this["_settings"]>, (key) => {
-					const field = this.get(<any>(key + "Field"));
-					if (field) {
-						this._valueXFields.push(<any>key);
-						let field = this.get(<any>(key + "Show"));
-						this.__valueXShowFields.push(field);
+		this.__valueXShowFields = [];
+		this.__valueYShowFields = [];
 
-						if (field.indexOf("Working") != -1) {
-							this._valueXShowFields.push(field.split("Working")[0]);
-						}
-						else {
-							this._valueYShowFields.push(field);
-						}
+		if (this.valueXFields) {
+			$array.each(this.valueXFields as Array<keyof this["_settings"]>, (key) => {
+				const field = this.get(<any>(key + "Field"));
+				if (field) {
+					this._valueXFields.push(<any>key);
+					let field = this.get(<any>(key + "Show"));
+					this.__valueXShowFields.push(field);
+
+					if (field.indexOf("Working") != -1) {
+						this._valueXShowFields.push(field.split("Working")[0]);
 					}
-				});
-			}
-
-			if (this.valueYFields) {
-				$array.each(this.valueYFields as Array<keyof this["_settings"]>, (key) => {
-					const field = this.get(<any>(key + "Field"));
-
-					if (field) {
-						this._valueYFields.push(<any>key);
-						let field = this.get(<any>(key + "Show"));
-						this.__valueYShowFields.push(field);
-
-						if (field.indexOf("Working") != -1) {
-							this._valueYShowFields.push(field.split("Working")[0]);
-						}
-						else {
-							this._valueYShowFields.push(field);
-						}
+					else {
+						this._valueYShowFields.push(field);
 					}
-				});
-			}
+				}
+			});
 		}
 
-		return dirty
+		if (this.valueYFields) {
+			$array.each(this.valueYFields as Array<keyof this["_settings"]>, (key) => {
+				const field = this.get(<any>(key + "Field"));
+
+				if (field) {
+					this._valueYFields.push(<any>key);
+					let field = this.get(<any>(key + "Show"));
+					this.__valueYShowFields.push(field);
+
+					if (field.indexOf("Working") != -1) {
+						this._valueYShowFields.push(field.split("Working")[0]);
+					}
+					else {
+						this._valueYShowFields.push(field);
+					}
+				}
+			});
+		}
 	}
 
 	protected _dispose() {
@@ -845,10 +844,6 @@ export abstract class XYSeries extends Series {
 		else if (yAxis === baseAxis) {
 			this.set("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
 			this.bulletsContainer.set("x", this.x());
-		}
-
-		if (this._valueFieldsDirty() || this._fieldsDirty()) {
-			this._makeFieldNames();
 		}
 
 		const stacked = this.get("stacked");

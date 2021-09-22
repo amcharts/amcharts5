@@ -96,7 +96,7 @@ export class ChordNodes extends FlowNodes {
 
 		const slice = node.children.insertIndex(0, this.rectangles.make());
 		dataItem.set("slice", slice);
-		slice.set("fill", dataItem.get("fill"));
+		slice._setSoft("fill", dataItem.get("fill"));
 
 		const label = this.labels.make();
 		label.addTag("flow");
@@ -123,6 +123,9 @@ export class ChordNodes extends FlowNodes {
 				this.flow.set("startAngle", angle + this._dAngle);
 			}
 		})
+
+		label._setDataItem(dataItem);
+		slice._setDataItem(dataItem);
 
 		return node;
 	}

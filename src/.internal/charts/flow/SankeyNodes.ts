@@ -74,20 +74,18 @@ export class SankeyNodes extends FlowNodes {
 
 		const rectangle = node.children.insertIndex(0, this.rectangles.make());
 		this.rectangles.push(rectangle);
+		rectangle._setSoft("fill", dataItem.get("fill"));		
 		dataItem.set("rectangle", rectangle);
-		rectangle.set("fill", dataItem.get("fill"));
 
 		node.events.on("dragged", () => {
 			const d3SankeyNode = (node.dataItem as DataItem<ISankeyNodesDataItem>).get("d3SankeyNode");
 			if (d3SankeyNode) {
 				if (flow) {
 					if (flow.get("orientation") == "horizontal") {
-						//node.setRaw("x", d3SankeyNode.x0);
 						d3SankeyNode.x0 = node.x();
 						d3SankeyNode.y0 = node.y();
 					}
 					else {
-						//node.setRaw("y", d3SankeyNode.x0);
 						d3SankeyNode.x0 = node.y();
 						d3SankeyNode.y0 = node.x();
 					}
@@ -103,6 +101,9 @@ export class SankeyNodes extends FlowNodes {
 		}
 		node.children.push(label);
 		dataItem.set("label", label);
+
+		label._setDataItem(dataItem);
+		rectangle._setDataItem(dataItem);
 
 		return node;
 	}

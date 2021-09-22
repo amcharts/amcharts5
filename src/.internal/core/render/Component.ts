@@ -181,6 +181,10 @@ export abstract class Component extends Container {
 		this._data.decrementRef();
 	}
 
+	protected _onDataClear() {
+
+	}
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -196,7 +200,7 @@ export abstract class Component extends Container {
 				});
 
 				this._dataItems.length = 0;
-
+				this._onDataClear();
 			} else if (change.type === "push") {
 				const dataItem = new DataItem(this, change.newValue, this._makeDataItem(change.newValue));
 				this._dataItems.push(dataItem);
@@ -236,78 +240,32 @@ export abstract class Component extends Container {
 		}));
 	}
 
-	protected _fieldsDirty(): boolean {
-		let dirty = false;
-		$array.eachContinue(this.fields, (field) => {
-			if (this.isDirty((field + "Field") as any)) {
-				dirty = true;
-				return false;
-			}
-			else {
-				return true;
-			}
-		})
-		return dirty;
-	}
-
-	protected _valueFieldsDirty(): boolean {
-		let dirty = false;
-		$array.eachContinue(this.valueFields, (field) => {
-			if (this.isDirty((field + "Field") as any)) {
-				dirty = true;
-				return false;
-			}
-			else {
-				return true;
-			}
-		})
-		return dirty;
-	}
-
-	protected _updateFields(): boolean {
-		let dirty = false;
+	protected _updateFields() {
 		if (this.valueFields) {
-			dirty = this._valueFieldsDirty();
+			this._valueFields = [];
+			this._valueFieldsF = {};
 
-			if (dirty) {
-				this._valueFields = [];
-				this._valueFieldsF = {};
-
-				$array.each(this.valueFields as Array<keyof this["_settings"]>, (key) => {
-					const field = this.get(<any>(key + "Field"));
-					if (field) {
-						this._valueFields.push(<any>key);
-						this._valueFieldsF[key as string] = { fieldKey: key + "Field", workingKey: key + "Working" };
-					}
-				});
-			}
+			$array.each(this.valueFields as Array<keyof this["_settings"]>, (key) => {
+				const field = this.get(<any>(key + "Field"));
+				if (field) {
+					this._valueFields.push(<any>key);
+					this._valueFieldsF[key as string] = { fieldKey: key + "Field", workingKey: key + "Working" };
+				}
+			});
 		}
 
 		if (this.fields) {
-			let dirty = this._fieldsDirty();
+			this._fields = [];
+			this._fieldsF = {};
 
-			if (dirty) {
-				this._fields = [];
-				this._fieldsF = {};
-
-				$array.each(this.fields as Array<keyof this["_settings"]>, (key) => {
-					const field = this.get(<any>(key + "Field"));
-					if (field) {
-						this._fields.push(<any>key);
-						this._fieldsF[key as string] = key + "Field";
-					}
-				});
-			}
+			$array.each(this.fields as Array<keyof this["_settings"]>, (key) => {
+				const field = this.get(<any>(key + "Field"));
+				if (field) {
+					this._fields.push(<any>key);
+					this._fieldsF[key as string] = key + "Field";
+				}
+			});
 		}
-
-		return dirty;
-	}
-
-
-	public _prepareChildren() {
-		super._prepareChildren();
-
-		this._updateFields();
 	}
 
 	/**

@@ -295,8 +295,6 @@ export class FunnelSeries extends PercentSeries {
 
 			this.markDirtyBounds();
 
-			const colors = this.get("colors")!;
-			colors.reset();
 			let i = 0;
 			$array.each(this._dataItems, (dataItem) => {
 				this.updateLegendValue(dataItem);
@@ -308,7 +306,7 @@ export class FunnelSeries extends PercentSeries {
 				const tick = dataItem.get("tick");
 				const label = dataItem.get("label");
 				const link = dataItem.get("link");
-				const color = colors.next();
+				const color = dataItem.get("fill");
 
 				slice._setDefault("fill", color);
 				slice._setDefault("stroke", color);

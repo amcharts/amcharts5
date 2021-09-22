@@ -78,6 +78,12 @@ export interface IHierarchySettings extends ISeriesSettings {
 	disabledField?: string;
 
 	/**
+	 * A field in data that holds color used for fills for various elements, such
+	 * as nodes.
+	 */
+	fillField?: string;
+
+	/**
 	 * A [[ColorSet]] to use when asigning colors for nodes.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Node_colors} for more info
@@ -241,7 +247,7 @@ export abstract class Hierarchy extends Series {
 	public _currentDownDepth: number | undefined;
 
 	protected _afterNew() {
-		this.fields.push("category", "childData", "disabled");
+		this.fields.push("category", "childData", "disabled", "fill");
 
 		this.children.push(this.bulletsContainer);
 
@@ -359,16 +365,23 @@ export abstract class Hierarchy extends Series {
 		this._updateVisuals();
 	}
 
+	protected _onDataClear() {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+	}
+
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 
 		const childData = dataItem.get("childData");
-		let colors = this.get("colors");
+		const colors = this.get("colors");
 		const topDepth = this.get("topDepth", 0);
 
 		if (!dataItem.get("parent")) {
 			dataItem.setRaw("depth", 0);
-			if (colors && topDepth == 0) {
+			if (colors && topDepth == 0 && dataItem.get("fill") == null) {
 				dataItem.setRaw("fill", colors.next());
 			}
 		}
@@ -392,7 +405,7 @@ export abstract class Hierarchy extends Series {
 				childDataItem.setRaw("depth", depth + 1);
 
 				if (this.dataItems.length == 1 && depth == 0) {
-					if (colors) {
+					if (colors && childDataItem.get("fill") == null) {
 						childDataItem.setRaw("fill", colors.next());
 					}
 				}
@@ -442,6 +455,7 @@ export abstract class Hierarchy extends Series {
 
 			if (dataValue != null) {
 				value = dataValue;
+				(d3HierarchyNode as any)["value"] = value;
 			}
 
 			if ($type.isNumber(value)) {

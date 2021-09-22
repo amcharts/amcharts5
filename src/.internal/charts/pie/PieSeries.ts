@@ -187,8 +187,6 @@ export class PieSeries extends PercentSeries {
 				}
 
 				if (radius > 0) {
-					const colors = this.get("colors")!;
-					colors.reset();
 					$array.each(this._dataItems, (dataItem) => {
 
 						this.updateLegendValue(dataItem);
@@ -202,7 +200,7 @@ export class PieSeries extends PercentSeries {
 
 							slice.set("arc", currentArc);
 
-							const color = colors.next();
+							const color = dataItem.get("fill");
 							slice._setDefault("fill", color);
 							slice._setDefault("stroke", color);
 						}

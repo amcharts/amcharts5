@@ -179,31 +179,9 @@ export class Tooltip extends Container {
 	public _changed() {
 		super._changed();
 
-		// if (this.isDirty("textProperties")) {
-		// 	let properties = this.get("textProperties")!;
-		// 	if (properties) {
-		// 		this._text.setAll(properties);
-		// 	}
-		// }
-
 		if (this.isDirty("pointTo")) {
-
-			let pointTo = this.get("pointTo");
-			let previous = this._prevSettings.pointTo;
-
-			if (pointTo && previous && previous.x == pointTo.x && previous.y == pointTo.y) {
-				// void
-			}
-			else {
-				this._updateBackground();
-			}
-
-			// not good for maps
-			//const pointTo = this.get("pointTo");
-			//const parent = this.parent;
-			//if (parent && pointTo && (pointTo.x < 0 || pointTo.x > parent.maxWidth() || pointTo.y < 0 || pointTo.y > parent.maxHeight())) {
-			//	this.hide();
-			//}
+			// can't compare to previous, as sometimes pointTo is set twice (when pointer moves, so the position won't be udpated)
+			this._updateBackground();			
 		}
 
 		if (this.isDirty("tooltipTarget")) {

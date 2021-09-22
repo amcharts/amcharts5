@@ -9,7 +9,7 @@ import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
 import { FlowNode } from "./FlowNode";
-import { ColorSet } from "../../core/util/ColorSet";
+import type { ColorSet } from "../../core/util/ColorSet";
 
 import * as $array from "../../core/util/Array";
 
@@ -93,7 +93,27 @@ export interface IFlowNodesDataItem extends ISeriesDataItem {
 }
 
 export interface IFlowNodesSettings extends ISeriesSettings {
+
+	/**
+	 * A field in data boolean setting if the node is "unknown".
+	 *
+	 * @default "unknown"
+	 */
 	unknownField?: string;
+
+	/**
+	 * A field in data that holds name for the node.
+	 *
+	 * @default "id"
+	 */
+	nameField?: string;
+
+	/**
+	 * A field in data that holds color used for fills nodes.
+	 *
+	 * @default "fill"
+	 */
+	fillField?: string;
 
 	/**
 	 * A [[ColorSet]] that series will use to apply to its nodes.
@@ -148,29 +168,37 @@ export abstract class FlowNodes extends Series {
 	public abstract flow: Flow | undefined;
 
 	protected _afterNew() {
-		this.fields.push("unknown");
-		this.set("idField", "id");
-		this.set("unknownField", "unknown");
+		this.fields.push("unknown", "name", "fill");
 
-		//@todo remove this when it will be possible to set it from theme
-		this.set("colors", ColorSet.new(this._root, {}));
+		this.set("idField", "id");
+		this.set("nameField", "id");
+		this.set("fillField", "fill");
+		this.set("unknownField", "unknown");
 
 		this.children.push(this.bulletsContainer);
 
 		super._afterNew();
 	}
 
+	protected _onDataClear() {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+	}
+
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
-		dataItem.set("d3SankeyNode", { name: dataItem.get("id"), dataItem: dataItem });
+		dataItem.setRaw("d3SankeyNode", { name: dataItem.get("id"), dataItem: dataItem });
 
-		let colors = this.get("colors");
-
-		if (colors) {
-			dataItem.set("fill", colors.next());
+		if (dataItem.get("fill") == null) {
+			let colors = this.get("colors");
+			if (colors) {
+				dataItem.setRaw("fill", colors.next());
+			}
 		}
 
-		dataItem.set("node", this.makeNode(dataItem));
+		dataItem.setRaw("node", this.makeNode(dataItem));
 	}
 
 	/**
