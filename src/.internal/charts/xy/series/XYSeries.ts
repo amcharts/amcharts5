@@ -1227,7 +1227,7 @@ export abstract class XYSeries extends Series {
 	 * @ignore
 	 */
 	public createLegendMarker(_dataItem?: DataItem<this["_dataItemSettings"]>) {
-
+		this.updateLegendMarker();
 	}
 
 	public _markDirtyAxes() {

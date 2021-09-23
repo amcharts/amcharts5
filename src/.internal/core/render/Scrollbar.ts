@@ -7,6 +7,7 @@ import { Button } from "./Button";
 import type { Time } from "../util/Animation";
 import type { Template } from "../../core/util/Template";
 import * as $utils from "../util/Utils";
+import type { Animation } from "../util/Entity";
 
 export interface IScrollbarSettings extends IContainerSettings {
 
@@ -141,6 +142,15 @@ export class Scrollbar extends Container {
 		}));
 	}
 
+	protected _handleAnimation(animation: Animation<any>) {
+		if (animation) {
+			animation.events.on("stopped", () => {
+				this._setPrivate("isBusy", false);
+				this._thumbBusy = false;
+			})
+		}
+	}
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -152,32 +162,20 @@ export class Scrollbar extends Container {
 		if (background) {
 			background.events.on("click", (event) => {
 				this._setPrivate("isBusy", true);
-
 				const point = this._display.toLocal(event.point);
-
-				const start = this.get("start", 0);
-				const end = this.get("end", 1);
 
 				const w = this.width();
 				const h = this.height();
 
 				const orientation = this.get("orientation");
 
-				let diff = (end - start) / 2;
 				let newMiddle: number;
 
 				if (orientation == "vertical") {
-					newMiddle = point.y / h;
+					newMiddle = (point.y - thumb.height() / 2) / h;
 				}
 				else {
-					newMiddle = point.x / w;
-				}
-
-				if (newMiddle - diff < 0) {
-					newMiddle = diff
-				}
-				if (newMiddle + diff > 1) {
-					newMiddle = 1 - diff;
+					newMiddle = (point.x - thumb.width() / 2) / w;
 				}
 
 				let newCoordinate: number;
@@ -192,22 +190,15 @@ export class Scrollbar extends Container {
 					key = "x";
 				}
 
-
 				this._thumbBusy = true;
-
-				const animation = this.thumb.animate({ key: key, to: newCoordinate, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") });
-				if (animation) {
-					animation.events.on("stopped", () => {
-						this._setPrivate("isBusy", false);
-						this._thumbBusy = false;
-					})
-				}
+				this._handleAnimation(this.thumb.animate({ key: key, to: newCoordinate, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") }));
 			})
 		}
 
 		thumb.events.on("dblclick", () => {
 			const duration = this.get("animationDuration", 0);
 			const easing = this.get("animationEasing");
+
 			this.animate({ key: "start", to: 0, duration: duration, easing: easing });
 			this.animate({ key: "end", to: 1, duration: duration, easing: easing });
 		});

@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.23] - 2021-09-23
+
+### Fixed
+- Scrollbar was doing some unneeded animations when grip was released while axis was still animating.
+- Double-clicking on scrollbar thumb did not always result full zoomout.
+- Clicking on Scrollbar background did not always result in animating to the clicked position.
+- `stroke` & `fill` set on `ColumnSeries`' `columns.template` was being overriden by series `stroke` and `fill`.
+- Not all settings of `columns.template` were copied to `ColumnSeries`' legend marker.
+
+
 ## [5.0.0-beta.22] - 2021-09-22
 
 ### Added

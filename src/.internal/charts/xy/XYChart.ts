@@ -818,21 +818,15 @@ export class XYChart extends SerialChart {
 			let zoomAnimation = axis.zoom(axisStart, axisEnd);
 
 			const updateScrollbar = "updateScrollbar";
-
-			axis.setPrivate(updateScrollbar, false);
+			axis.setPrivateRaw(updateScrollbar, false);
 
 			if (zoomAnimation) {
-				if (!zoomAnimation.stopped) {
-					zoomAnimation.events.on("stopped", () => {
-						axis.setPrivate(updateScrollbar, true);
-					});
-				}
-				else {
-					axis.setPrivate(updateScrollbar, true);
-				}
+				zoomAnimation.events.on("stopped", () => {
+					axis.setPrivateRaw(updateScrollbar, true);
+				});
 			}
 			else {
-				axis.setPrivate(updateScrollbar, true);
+				axis.setPrivateRaw(updateScrollbar, true);
 			}
 		})
 	}

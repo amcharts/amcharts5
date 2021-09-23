@@ -132,11 +132,15 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 		const columnsTemplate = this.columns.template;
 		if (this.isDirty("fill")) {
-			columnsTemplate.set("fill", this.get("fill"));
+			if (columnsTemplate.get("fill") == null) {
+				columnsTemplate.set("fill", this.get("fill"));
+			}
 		}
 
 		if (this.isDirty("stroke")) {
-			columnsTemplate.set("stroke", this.get("stroke"));
+			if (columnsTemplate.get("stroke") == null) {
+				columnsTemplate.set("stroke", this.get("stroke"));
+			}
 		}
 
 		let index = 0;
