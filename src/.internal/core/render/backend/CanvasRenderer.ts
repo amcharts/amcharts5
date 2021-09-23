@@ -1801,9 +1801,9 @@ export class CanvasText extends CanvasContainer implements IText {
 					else {
 						if (!this._originalScale || this._originalScale == 1) {
 							this._originalScale = this.scale;
-							this.scale = ratio;
-							this._textVisible = true;
 						}
+						this.scale = ratio;
+						this._textVisible = true;
 					}
 				}
 				else if (oversizedBehavior == "hide") {
@@ -2819,7 +2819,6 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	paintId(obj: CanvasDisplayObject): string {
 		const id = distributeId(++this._colorId);
 		const color = Color.fromHex(id).toCSS();
-		//console.log("ASSIGNING", color);
 		this._colorMap[color] = obj;
 		return color;
 	}
@@ -2920,7 +2919,6 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 		this._withEvents(key, (events) => {
 			$array.each(events.callbacks, (callback) => {
-				//console.log(key, callback.object === target)
 				if (!callback.disposed && callback.object === target) {
 					callback.callback.call(callback.context, event);
 					dispatched = true;

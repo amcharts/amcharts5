@@ -3,7 +3,6 @@ import type { IMapPolygonSeriesDataItem, MapPolygonSeries } from "./MapPolygonSe
 import type { Root } from "../../core/Root";
 import type { Bullet } from "../../core/render/Bullet";
 import type { DataItem } from "../../core/render/Component";
-import type { Sprite } from "../../core/render/Sprite";
 import type { Template } from "../../core/util/Template";
 import type { MapLine } from "./MapLine";
 import type { MapPolygon } from "./MapPolygon";
@@ -257,6 +256,8 @@ export class MapPointSeries extends MapSeries {
 			const positionOnLine = dataItem.get("positionOnLine");
 			let coordinates: [number, number] | undefined;
 
+			let angle: number | undefined;
+
 			if (polygon) {
 				let geoPoint = polygon.visualCentroid();
 				coordinates = [geoPoint.longitude, geoPoint.latitude];
@@ -265,14 +266,15 @@ export class MapPointSeries extends MapSeries {
 				let geoPoint = line.positionToGeoPoint(positionOnLine);
 				coordinates = [geoPoint.longitude, geoPoint.latitude];
 
-				if (dataItem.get("autoRotate") && chart) {
+				if (dataItem.get("autoRotate", bullet.get("autoRotate")) && chart) {
 					const geoPoint0 = line.positionToGeoPoint(positionOnLine - 0.002);
 					const geoPoint1 = line.positionToGeoPoint(positionOnLine + 0.002);
 
 					const point0 = chart.convert(geoPoint0);
 					const point1 = chart.convert(geoPoint1);
 
-					dataItem.set("autoRotateAngle", $math.getAngle(point0, point1));
+					//dataItem.set("autoRotateAngle", $math.getAngle(point0, point1));
+					angle = $math.getAngle(point0, point1);
 				}
 			}
 			else if ($type.isNumber(longitude) && $type.isNumber(latitude)) {
@@ -282,7 +284,7 @@ export class MapPointSeries extends MapSeries {
 				const geometry = dataItem.get("geometry")!;
 				if (geometry) {
 					if (geometry.type == "Point") {
-						this._positionBulletReal(sprite, geometry, geometry.coordinates as [number, number]);
+						this._positionBulletReal(bullet, geometry, geometry.coordinates as [number, number], angle);
 					}
 					else if (geometry.type == "MultiPoint") {
 						let index = bullet._index || 0;
@@ -292,12 +294,13 @@ export class MapPointSeries extends MapSeries {
 			}
 
 			if (coordinates) {
-				this._positionBulletReal(sprite, { type: "Point", coordinates: coordinates }, coordinates);
+				this._positionBulletReal(bullet, { type: "Point", coordinates: coordinates }, coordinates, angle);
 			}
 		}
 	}
 
-	protected _positionBulletReal(sprite: Sprite, geometry: GeoJSON.Geometry, coordinates: [number, number]) {
+	protected _positionBulletReal(bullet: Bullet, geometry: GeoJSON.Geometry, coordinates: [number, number], angle?: number) {
+		const sprite = bullet.get("sprite");
 		const chart = this.chart;
 		if (chart) {
 			const projection = chart.get("projection")!;
@@ -325,8 +328,8 @@ export class MapPointSeries extends MapSeries {
 			}
 			sprite.setPrivate("visible", visible);
 
-			if (dataItem && dataItem.get("autoRotate")) {
-				sprite.set("rotation", dataItem.get("autoRotateAngle", 0));
+			if (dataItem && angle != null && dataItem.get("autoRotate", bullet.get("autoRotate"))) {
+				sprite.set("rotation", angle + dataItem.get("autoRotateAngle", bullet.get("autoRotateAngle", 0)));
 			}
 		}
 	}

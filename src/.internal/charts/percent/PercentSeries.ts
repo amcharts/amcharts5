@@ -72,9 +72,8 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 	 */
 	alignLabels?: boolean;
 
-
 	/**
-	 * @todo review
+	 * A field that holds color for slice fill.
 	 */
 	fillField?: string;
 

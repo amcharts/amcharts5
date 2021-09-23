@@ -324,6 +324,7 @@ export class SankeyLink extends FlowLink {
 					let middleSegment = [[xm0, ym0], [kxm0, kym0], [kxm1, kym1], [xm1, ym1]];
 
 					const path = this.series!._strokeGenerator(middleSegment as [number, number][]);
+
 					if (path) {
 						this._svgPath.setAttribute("d", path);
 						this._totalLength = this._svgPath.getTotalLength();
@@ -341,8 +342,7 @@ export class SankeyLink extends FlowLink {
 			if (this._svgPath.getAttribute("d")) {
 				let p0 = this._svgPath.getPointAtLength(location * this._totalLength - 0.1);
 				let p1 = this._svgPath.getPointAtLength(location * this._totalLength + 0.1);
-
-				let p = this._svgPath.getPointAtLength(location * this._totalLength);
+				let p = this.toGlobal(this._svgPath.getPointAtLength(location * this._totalLength));
 				return { x: p.x, y: p.y, angle: $math.getAngle(p0, p1) };
 			}
 		}

@@ -134,8 +134,7 @@ export abstract class Flow extends Series {
 	protected _linksData: { source: d3sankey.SankeyNodeMinimal<{}, {}>, target: d3sankey.SankeyNodeMinimal<{}, {}>, value: number }[] = [];
 	protected _index = 0;
 
-	protected _linksByIndex: { [index: string]: any } = {}
-
+	protected _linksByIndex: { [index: string]: any } = {};
 	protected _afterNew() {
 		this.fields.push("disabled", "sourceId", "targetId");
 
@@ -461,6 +460,7 @@ export abstract class Flow extends Series {
 
 	public _positionBullet(bullet: Bullet) {
 		const sprite = bullet.get("sprite");
+
 		if (sprite) {
 			const dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
 			if (dataItem) {
@@ -469,10 +469,17 @@ export abstract class Flow extends Series {
 
 				if (sprite) {
 					const point = link.getPoint(bullet.get("locationY", 0));
-					sprite.setAll({ x: point.x, y: point.y, rotation: point.angle + 90 });
+					sprite.setAll({ x: point.x, y: point.y });
+
+					if (bullet.get("autoRotate")) {
+						sprite.set("rotation", point.angle + bullet.get("autoRotateAngle", 0));
+					}
 				}
 			}
 		}
 	}
 
+	protected _getBulletLocation(bullet: Bullet): number {
+		return bullet.get("locationY", 0);
+	}
 }

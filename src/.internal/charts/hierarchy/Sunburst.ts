@@ -205,8 +205,8 @@ export class Sunburst extends Partition {
 
 			if (ir < 0) {
 				ir = r + ir;
-			}			
-			
+			}
+
 			s = r - ir;
 
 			this.setPrivateRaw("innerRadius", ir);
@@ -216,7 +216,7 @@ export class Sunburst extends Partition {
 
 			this.nodesContainer.setAll({
 				dy: -r * (bounds.bottom + bounds.top) / 2, dx: -r * (bounds.right + bounds.left) / 2
-			})			
+			})
 
 			const nodePadding = this.get("nodePadding");
 
@@ -354,8 +354,15 @@ export class Sunburst extends Partition {
 			label.set("baseRadius", innerRadius);
 			label.set("radius", (radius - innerRadius) / 2)
 
-			label.set("maxHeight", Math.PI * 2 * radius * arc / 360);
-			label.set("maxWidth", radius - innerRadius);
+
+			let maxWidth = radius - innerRadius;
+			let maxHeight = Math.PI * 2 * radius * arc / 360;
+			if (arc >= 360) {
+				maxWidth *= 2;
+				maxHeight = maxWidth;
+			}
+			label.set("maxHeight", maxHeight);
+			label.set("maxWidth", maxWidth);
 		}
 	}
 

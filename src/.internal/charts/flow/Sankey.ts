@@ -15,6 +15,8 @@ import * as $type from "../../core/util/Type";
 import * as $utils from "../../core/util/Utils";
 import * as d3sankey from "d3-sankey";
 
+import type { Bullet } from "../../core/render/Bullet";
+
 export interface ISankeyDataItem extends IFlowDataItem {
 
 	/**
@@ -218,6 +220,15 @@ export class Sankey extends Flow {
 			}
 		}
 
+	}
+
+	protected _getBulletLocation(bullet: Bullet): number {
+		if (this.get("orientation") == "vertical") {
+			return bullet.get("locationY", 0);
+		}
+		else {
+			return bullet.get("locationX", 0);
+		}
 	}
 
 	public _prepareChildren() {

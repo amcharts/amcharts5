@@ -31,7 +31,24 @@ export interface IBulletSettings extends IEntitySettings {
 	 *
 	 * @default false
 	 */
-	dynamic?:boolean;
+	dynamic?: boolean;
+
+	/**
+	 * If set to `true`, the bullet will be automatically rotated to face
+	 * direction of line it is attached to.
+	 *
+	 * NOTE: Works only in  [[Flow]] and [[MapPointSeries]] (when [[MapPoint]] is
+	 * attached to a [[MapLine]]).
+	 * 
+	 * @default false
+	 */
+	autoRotate?: boolean;
+
+	/**
+	 * If `autoRotate` is set to `true`, value of `autoRotateAngle` will be added
+	 * to the automatically-calculated angle.
+	 */
+	autoRotateAngle?: number;
 
 }
 
