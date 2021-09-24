@@ -74,7 +74,7 @@ export class SankeyNodes extends FlowNodes {
 
 		const rectangle = node.children.insertIndex(0, this.rectangles.make());
 		this.rectangles.push(rectangle);
-		rectangle._setSoft("fill", dataItem.get("fill"));		
+		rectangle._setSoft("fill", dataItem.get("fill"));
 		dataItem.set("rectangle", rectangle);
 
 		node.events.on("dragged", () => {
@@ -96,6 +96,8 @@ export class SankeyNodes extends FlowNodes {
 		})
 
 		const label = this.labels.make();
+		this.labels.push(label);
+
 		if (flow) {
 			label.addTag(flow.get("orientation", ""));
 		}
@@ -134,8 +136,8 @@ export class SankeyNodes extends FlowNodes {
 		super.disposeDataItem(dataItem);
 		let rectangle = dataItem.get("rectangle");
 		if (rectangle) {
-			rectangle.dispose();
 			this.rectangles.removeValue(rectangle);
+			rectangle.dispose();
 		}
 	}
 }

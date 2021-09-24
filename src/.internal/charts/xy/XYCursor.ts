@@ -372,7 +372,20 @@ export class XYCursor extends Container {
 					positionY = userPositionY;
 				}
 
-				if (Math.abs(positionX - this.getPrivate("downPositionX", 0)) > 0.002 || Math.abs(positionY - this.getPrivate("downPositionY", 0)) > 0.002) {
+				let dispatch = false;
+				if (behavior === "zoomX" || behavior === "zoomXY") {
+					if (Math.abs(positionX - this.getPrivate("downPositionX", 0)) > 0.003) {
+						dispatch = true;
+					}
+				}
+
+				if (behavior === "zoomY" || behavior === "zoomXY") {
+					if (Math.abs(positionY - this.getPrivate("downPositionY", 0)) > 0.003) {
+						dispatch = true;
+					}
+				}
+
+				if (dispatch) {
 					const type = "selectended";
 					if (this.events.isEnabled(type)) {
 						this.events.dispatch(type, { type: type, target: this });
@@ -384,7 +397,7 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleMove(event: IPointerEvent) {
-		if(this.getPrivate("visible")){
+		if (this.getPrivate("visible")) {
 			// TODO: handle multitouch
 			const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 

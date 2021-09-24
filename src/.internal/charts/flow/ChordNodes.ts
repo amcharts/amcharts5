@@ -99,6 +99,7 @@ export class ChordNodes extends FlowNodes {
 		slice._setSoft("fill", dataItem.get("fill"));
 
 		const label = this.labels.make();
+		this.labels.push(label);
 		label.addTag("flow");
 		label.addTag("chord");
 		label.addTag("node");

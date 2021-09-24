@@ -131,7 +131,7 @@ export class MapLineSeries extends MapSeries {
 			mapLine = this.makeMapLine(dataItem);
 		}
 
-		dataItem.setRaw("mapLine", mapLine);
+		dataItem.set("mapLine", mapLine);
 		const pointsToConnect = dataItem.get("pointsToConnect");
 		if (pointsToConnect) {
 			$array.each(pointsToConnect, (point) => {

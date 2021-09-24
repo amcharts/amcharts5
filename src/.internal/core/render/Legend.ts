@@ -383,32 +383,32 @@ export class Legend extends Series {
 
 		let itemContainer = dataItem.get("itemContainer");
 		if (itemContainer) {
-			itemContainer.dispose();
 			this.itemContainers.removeValue(itemContainer);
+			itemContainer.dispose();
 		}
 
 		let marker = dataItem.get("marker");
 		if (marker) {
-			marker.dispose();
 			this.markers.removeValue(marker);
+			marker.dispose();
 		}
 
 		let markerRectangle = dataItem.get("markerRectangle");
 		if (markerRectangle) {
-			markerRectangle.dispose();
 			this.markerRectangles.removeValue(markerRectangle);
+			markerRectangle.dispose();
 		}
 
 		let label = dataItem.get("label");
 		if (label) {
-			label.dispose();
 			this.labels.removeValue(label);
+			label.dispose();
 		}
 
 		let valueLabel = dataItem.get("valueLabel");
 		if (valueLabel) {
-			valueLabel.dispose();
 			this.valueLabels.removeValue(valueLabel);
+			valueLabel.dispose();
 		}
 
 	}

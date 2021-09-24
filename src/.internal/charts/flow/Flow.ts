@@ -402,6 +402,7 @@ export abstract class Flow extends Series {
 		super.disposeDataItem(dataItem);
 		let link = dataItem.get("link");
 		if (link) {
+			this.links.removeValue(link);
 			link.dispose();
 		}
 	}

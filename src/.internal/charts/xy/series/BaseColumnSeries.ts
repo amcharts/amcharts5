@@ -248,6 +248,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 				const rangeGraphics = this._makeGraphics(axisRange.columns, dataItem);
 				graphicsArray.push(rangeGraphics);
+				rangeGraphics.setPrivate("list", axisRange.columns);
 				container.children.push(rangeGraphics);
 			})
 		}
@@ -317,7 +318,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 				t = yAxis.getDataItemPositionY(dataItem, yOpenField, startLocation, vcy);
 				b = yAxis.getDataItemPositionY(dataItem, yField, endLocation, vcy);
 
-				dataItem.set("point", { x: l + (r - l) / 2, y: t + (b - t) / 2 });
+				dataItem.setRaw("point", { x: l + (r - l) / 2, y: t + (b - t) / 2 });
 			}
 			else if (xAxis === baseAxis) {
 
@@ -352,7 +353,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 					}
 				}
 
-				dataItem.set("point", { x: l + (r - l) / 2, y: t });
+				dataItem.setRaw("point", { x: l + (r - l) / 2, y: t });
 			}
 			else if (yAxis === baseAxis) {
 				let startLocation = this._aLocationY0 + openLocationY - 0.5;
@@ -386,7 +387,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 					}
 				}
 
-				dataItem.set("point", { x: r, y: t + (b - t) / 2 });
+				dataItem.setRaw("point", { x: r, y: t + (b - t) / 2 });
 			}
 
 			this._updateSeriesGraphics(dataItem, graphics!, l, r, t, b);
@@ -453,10 +454,10 @@ export abstract class BaseColumnSeries extends XYSeries {
 		graphics.set("x", l);
 		graphics.set("y", b - (b - t));
 
-		dataItem.set("left", l);
-		dataItem.set("right", r);
-		dataItem.set("top", t);
-		dataItem.set("bottom", b);
+		dataItem.setRaw("left", l);
+		dataItem.setRaw("right", r);
+		dataItem.setRaw("top", t);
+		dataItem.setRaw("bottom", b);
 	}
 
 	protected _handleDataSetChange() {
@@ -532,12 +533,17 @@ export abstract class BaseColumnSeries extends XYSeries {
 		super.disposeDataItem(dataItem);
 		const graphics = dataItem.get("graphics");
 		if (graphics) {
+			this.columns.removeValue(graphics);
 			graphics.dispose();
 		}
 
 		const rangeGraphics = dataItem.get("rangeGraphics")!;
 		if (rangeGraphics) {
 			$array.each(rangeGraphics, (graphics) => {
+				const list = graphics.getPrivate("list");
+				if (list) {
+					list.removeValue(graphics);
+				}
 				graphics.dispose();
 			})
 		}

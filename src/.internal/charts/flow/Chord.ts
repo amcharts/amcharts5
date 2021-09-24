@@ -162,6 +162,7 @@ export class Chord extends Flow {
 	 */
 	public makeLink(dataItem: DataItem<this["_dataItemSettings"]>): ChordLink {
 		const link = this.linksContainer.children.push(this.links.make());
+		this.links.push(link);
 		link._setDataItem(dataItem);
 		link.set("source", dataItem.get("source"));
 		link.set("target", dataItem.get("target"));

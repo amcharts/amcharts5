@@ -7,14 +7,20 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
-### Fixed
-- Fixed Svalbard map.
-- Fixed Nigeria map.
-- Fixed US Congressional maps: Alabama, Florida, Maine, Massachusetts, New Jersey, Michigan, Virginia, Washington.
-- Fixing type errors with `GeoJSON`.
+
+## [5.0.2] - 2021-09-24
 
 ### Added
 - JSON versions of the geodata can now be found in the `json` folder.
+
+### Changed
+- Updated province IDs to recent changes in ISO in a map of South Africa.
+
+### Fixed
+- Fixed Svalbard map.
+- Fixed Nigeria map.
+- Fixed US Congressional maps: Alabama, Florida, Maine, Maryland, Massachusetts, New Jersey, Michigan, Rhode Island, Virginia, Washington.
+- Fixed type errors with `GeoJSON`.
 
 
 ## [5.0.1] - 2021-08-25

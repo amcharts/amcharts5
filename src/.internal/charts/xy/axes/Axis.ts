@@ -784,20 +784,25 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 */
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.disposeDataItem(dataItem);
+		const renderer = this.get("renderer");
 		const label = dataItem.get("label");
 		if (label) {
+			renderer.labels.removeValue(label);
 			label.dispose();
 		}
 		const tick = dataItem.get("tick");
 		if (tick) {
+			renderer.ticks.removeValue(tick);
 			tick.dispose();
 		}
 		const grid = dataItem.get("grid");
 		if (grid) {
+			renderer.grid.removeValue(grid);
 			grid.dispose();
 		}
 		const axisFill = dataItem.get("axisFill");
 		if (axisFill) {
+			renderer.axisFills.removeValue(axisFill);
 			axisFill.dispose();
 		}
 	}

@@ -178,6 +178,9 @@ export class Sankey extends Flow {
 		link.set("source", source);
 		link.set("target", target);
 		link.series = this;
+
+		this.links.push(link);
+		
 		return link;
 	}
 

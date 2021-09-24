@@ -16,6 +16,7 @@ import { Percent } from "../util/Percent";
 import { EventDispatcher, Events, EventListener } from "../util/EventDispatcher";
 import { IDisposer, MultiDisposer, CounterDisposer } from "../util/Disposer";
 import { waitForAnimations } from "../util/Animation";
+import type { ListTemplate } from "../util/List";
 
 import * as $utils from "../util/Utils";
 import * as $array from "../util/Array";
@@ -476,8 +477,15 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 */
 	focusElement?: HTMLDivElement;
 
-
+	/**
+	 * @todo review
+	 */
 	tooltipTarget?: Graphics;
+
+	/**
+	 * @ignore
+	 */
+	list?:ListTemplate<Sprite>;
 }
 
 /**

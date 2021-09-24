@@ -232,13 +232,13 @@ export abstract class FlowNodes extends Series {
 		super.disposeDataItem(dataItem);
 		let node = dataItem.get("node");
 		if (node) {
-			node.dispose();
 			this.nodes.removeValue(node);
+			node.dispose();
 		}
 		let label = dataItem.get("label");
 		if (label) {
-			label.dispose();
 			this.labels.removeValue(label);
+			label.dispose();
 		}
 	}
 

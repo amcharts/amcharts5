@@ -134,4 +134,3 @@ export class BreadcrumbBar extends Container {
 		}
 	}
 }
-

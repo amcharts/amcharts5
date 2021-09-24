@@ -116,7 +116,7 @@ export class MapPolygonSeries extends MapSeries {
 			mapPolygon = this.makeMapPolygon(dataItem);
 		}
 
-		dataItem.setRaw("mapPolygon", mapPolygon);
+		dataItem.set("mapPolygon", mapPolygon);
 		const geometry = dataItem.get("geometry")!;
 
 		if (geometry) {
