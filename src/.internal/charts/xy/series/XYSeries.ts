@@ -650,13 +650,25 @@ export abstract class XYSeries extends Series {
 		const axis = <Axis<AxisRenderer>>axisDataItem.component;
 		if (axis) {
 			axis._processAxisRange(axisDataItem);
-			axis._toggleDataItem(axisDataItem, false);
+
+			axisDataItem.get("label")!.set("visible", false);
+			axisDataItem.get("tick")!.set("visible", false);
+			axisDataItem.get("grid")!.set("visible", false);
+			axisDataItem.get("axisFill")!.set("visible", false);
+
+			const bullet = axisDataItem.get("bullet");
+			if (bullet) {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite.setPrivate("visible", false);
+				}
+			}
 
 			const axisFill = axisDataItem.get("axisFill");
 			if (axisFill) {
 				this.children.push(axisFill);
 				container.set("mask", axisFill);
-				axisFill.set("fillOpacity", 0);
+				axisFill._setSoft("fillOpacity", 0);
 			}
 			axis._seriesAxisRanges.push(axisDataItem)
 		}

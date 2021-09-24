@@ -468,7 +468,7 @@ export abstract class Flow extends Series {
 				const sprite = bullet.get("sprite");
 
 				if (sprite) {
-					const point = link.getPoint(bullet.get("locationY", 0));
+					const point = link.getPoint(this._getBulletLocation(bullet));
 					sprite.setAll({ x: point.x, y: point.y });
 
 					if (bullet.get("autoRotate")) {

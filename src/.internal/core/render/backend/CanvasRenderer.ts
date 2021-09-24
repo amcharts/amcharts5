@@ -1430,12 +1430,15 @@ export class CanvasText extends CanvasContainer implements IText {
 		}
 
 		if (this._textVisible) {
-			this._prerender(layer);
 
 			const interactive = this._isInteractive();
 			const context = layer.context;
 			const layerDirty = layer.dirty;
 			const ghostContext = this._renderer._ghostContext;
+
+			context.save();
+			ghostContext.save();
+			this._prerender(layer);
 
 			// const lines = this.text.toString().replace(/\r/g, "").split(/\n/);
 			// const x = this._localBounds && (this._localBounds.left < 0) ? Math.abs(this._localBounds.left) : 0;
@@ -1488,6 +1491,9 @@ export class CanvasText extends CanvasContainer implements IText {
 
 				});
 			});
+
+			context.restore();
+			ghostContext.restore();
 		}
 	}
 
@@ -1533,7 +1539,16 @@ export class CanvasText extends CanvasContainer implements IText {
 		$array.each(lines, (line, _index) => {
 
 			// Split up line into format/value chunks
-			let chunks = TextFormatter.chunk(line, false, this.style.ignoreFormatting);
+			let chunks: ITextChunk[];
+			if (line == "") {
+				chunks = [{
+					type: "value",
+					text: ""
+				}];
+			}
+			else {
+				chunks = TextFormatter.chunk(line, false, this.style.ignoreFormatting);
+			}
 
 			while (chunks.length > 0) {
 
@@ -1582,6 +1597,12 @@ export class CanvasText extends CanvasContainer implements IText {
 							currentFormat = chunk.text;
 						}
 						else {
+
+							if (!styleRestored) {
+								context.restore();
+								ghostContext.restore();
+							}
+
 							let format = TextFormatter.getTextStyle(chunk.text);
 							const fontStyle = this._getFontStyle(format);
 							context.save();

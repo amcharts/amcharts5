@@ -5,13 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.25] - 2021-09-24
+
+### Added
+- New `Entity` setting: `userData`. Use it to store any kind of proprietary data with any object in amCharts 5 that extends `Entity`.
+
+### Changed
+- Series axis range will now have `visible: false` set for all axis elements (grid, fill, label, tick) by deafult. If you need to enable them, set `visible: true` on a respective range element. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Elements_on_a_series_range).
+
+### Fixed
+- Improperly closed in-line text style blocks could cause label palcement issues.
+- Using `\n\n` in text was not resulting in empty line.
+- Horizontal `Sankey` bullets were not using their `locationX` as it should.
+
+
 ## [5.0.0-beta.24] - 2021-09-23
 
 ### Added
 - `autoRotate` and `autoRotateAngle` settings added to `Bullet`. Works on `Flow` and `MapPointSeries` (when `MapPoint` is attached to a `MapLine`).
 
 ### Changed
-- `Sankey` bullets will now check `positionY` if series is vertical, and `positionX` of its a horizontal series. It was using `positionY` for all orientations previously.
+- `Sankey` bullets will now check `locationY` if series is vertical, and `locationX` of its a horizontal series. It was using `positionY` for all orientations previously.
 
 ### Fixed
 - In some cases labels with `oversizedBehavior: "fit"` were not being resized when available space was changed.

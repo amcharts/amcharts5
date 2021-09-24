@@ -118,6 +118,12 @@ export interface IEntitySettings {
 	 */
 	id?: string;
 
+	/**
+	 * A storage for any custom user data that needs to be associated with the
+	 * element.
+	 */
+	userData?: any;
+
 }
 
 export interface IEntityPrivate {
