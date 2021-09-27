@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.27] - 2021-09-27
+
+### Added
+- Root element now has publicly-accessible property: `dom`. Holds a reference to chart container (div).
+
+### Fixed
+- Gradient/pattern fills were not working on some elements (since 5.0.0-beta.18).
+
+
 ## [5.0.0-beta.26] - 2021-09-24
 
 ### Fixed

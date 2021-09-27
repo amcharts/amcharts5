@@ -508,7 +508,7 @@ export class ExportingMenu extends Entity {
 	 * @ignore Exclude from docs
 	 */
 	public loadDefaultCSS(): void {
-		const disposer = exportingCSS($utils.getShadowRoot(this._root._dom), this._root);
+		const disposer = exportingCSS($utils.getShadowRoot(this._root.dom), this._root);
 		this._disposers.push(disposer);
 		this._cssDisposer = disposer;
 

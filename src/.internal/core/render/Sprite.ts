@@ -1399,9 +1399,6 @@ export abstract class Sprite extends Entity {
 				this.markDirtyAccessibility();
 			}
 		}
-		else {
-			display.isMeasured = false;
-		}
 	}
 
 	/**

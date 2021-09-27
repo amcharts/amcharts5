@@ -63,7 +63,11 @@ export interface IRootEvents {
  * @see {@link https://www.amcharts.com/docs/v5/getting-started/#Root_element} for more info
  */
 export class Root implements IDisposer {
-	public _dom: HTMLElement;
+
+	/**
+	 * A reference to original chart container (div element).
+	 */
+	public dom: HTMLElement;
 	public _inner: HTMLElement;
 
 	protected _isDirty: boolean = false;
@@ -226,7 +230,7 @@ export class Root implements IDisposer {
 			throw new Error("Could not find HTML element with id `" + id + "`");
 		}
 
-		this._dom = dom;
+		this.dom = dom;
 
 		let inner: HTMLDivElement = document.createElement("div");
 		inner.style.position = "relative";
@@ -328,13 +332,13 @@ export class Root implements IDisposer {
 
 	protected _init(): void {
 		const renderer = this._renderer;
-		const rootContainer = Container.new(this, { visible: true, width: this._dom.clientWidth, height: this._dom.clientHeight });
+		const rootContainer = Container.new(this, { visible: true, width: this.dom.clientWidth, height: this.dom.clientHeight });
 		this._rootContainer = rootContainer;
 
 		const container = rootContainer.children.push(Container.new(this, { visible: true, width: p100, height: p100 }));
 		this.container = container;
 
-		renderer.resize(this._dom.clientWidth, this._dom.clientHeight);
+		renderer.resize(this.dom.clientWidth, this.dom.clientHeight);
 
 		//@todo: better appendChild - refer
 		this._inner.appendChild(renderer.view);
@@ -343,8 +347,8 @@ export class Root implements IDisposer {
 		//document.body.appendChild((<any>renderer)._ghostView);
 
 
-		this._disposers.push(new ResizeSensor(this._dom, () => {
-			const dom = this._dom;
+		this._disposers.push(new ResizeSensor(this.dom, () => {
+			const dom = this.dom;
 			const w = dom.clientWidth;
 			const h = dom.clientHeight;
 			if (w > 0 && h > 0) {
@@ -380,8 +384,8 @@ export class Root implements IDisposer {
 		focusElementContainer.style.top = "0px";
 		focusElementContainer.style.left = "0px";
 		focusElementContainer.style.overflow = "hidden";
-		focusElementContainer.style.width = this._dom.clientWidth + "px";
-		focusElementContainer.style.height = this._dom.clientHeight + "px";
+		focusElementContainer.style.width = this.dom.clientWidth + "px";
+		focusElementContainer.style.height = this.dom.clientHeight + "px";
 		$utils.setInteractive(focusElementContainer, false);
 		this._focusElementContainer = focusElementContainer;
 		this._inner.appendChild(this._focusElementContainer);
@@ -733,7 +737,7 @@ export class Root implements IDisposer {
 	 * @return Width
 	 */
 	public width(): number {
-		return this._dom.clientWidth;
+		return this.dom.clientWidth;
 	}
 
 	/**
@@ -742,7 +746,7 @@ export class Root implements IDisposer {
 	 * @return Height
 	 */
 	public height(): number {
-		return this._dom.clientHeight;
+		return this.dom.clientHeight;
 	}
 
 	/**
@@ -1139,7 +1143,7 @@ export class Root implements IDisposer {
 	 * @return         Root point
 	 */
 	public documentPointToRoot(point: IPoint): IPoint {
-		const bbox = this._dom.getBoundingClientRect();
+		const bbox = this.dom.getBoundingClientRect();
 		return {
 			x: point.x - bbox.left,
 			y: point.y - bbox.top

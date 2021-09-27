@@ -190,7 +190,7 @@ export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDi
 	public exportable?: boolean = true;
 	public interactive: boolean = false;
 	public wheelable: boolean = false;
-	public isMeasured: boolean = true;
+	public isMeasured: boolean = false;
 	public buttonMode: boolean = false;
 	public alpha: number = 1;
 	public compoundAlpha: number = 1;
@@ -866,6 +866,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				this._pushOp(new BeginFill(color.toCSS(alpha)));
 
 			} else {
+				this.isMeasured = true;
 				this._pushOp(new BeginFill(color));
 			}
 		} else {

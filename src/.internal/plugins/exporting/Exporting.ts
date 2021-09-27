@@ -863,7 +863,7 @@ export class Exporting extends Entity {
 		const ctx = newCanvas.getContext("2d");
 
 		// Get background
-		const background = this.get("backgroundColor", this.findBackgroundColor(this._root._dom));
+		const background = this.get("backgroundColor", this.findBackgroundColor(this._root.dom));
 
 		if (background) {
 			ctx!.fillStyle = background.toCSS();
@@ -2200,7 +2200,7 @@ export class Exporting extends Entity {
 		let scroll = document.documentElement.scrollTop || document.body.scrollTop;
 
 		// Hide all document nodes by applyin custom CSS
-		let rule = new StyleRule($utils.getShadowRoot(this._root._dom), "body > *", {
+		let rule = new StyleRule($utils.getShadowRoot(this._root.dom), "body > *", {
 			"display": "none",
 			"position": "fixed",
 			"visibility": "hidden",
