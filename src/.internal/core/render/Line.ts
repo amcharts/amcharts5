@@ -1,7 +1,5 @@
-import type { Root } from "../Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 import type { IPoint } from "../util/IPoint";
-import type { Template } from "../../core/util/Template";
 import * as $draw from "../util/Draw";
 
 export interface ILineSettings extends IGraphicsSettings {
@@ -23,21 +21,6 @@ export interface ILinePrivate extends IGraphicsPrivate {
  * @important
  */
 export class Line extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Line["_settings"], template?: Template<Line>): Line {
-		const x = new Line(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ILineSettings;
 	declare public _privateSettings: ILinePrivate;

@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 
 import { Chord, IChordSettings, IChordDataItem, IChordPrivate, IChordEvents } from "./Chord";
@@ -43,22 +42,6 @@ export class ChordDirected extends Chord {
 	public static className: string = "ChordDirected";
 	public static classNames: Array<string> = Chord.classNames.concat([ChordDirected.className]);
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ChordDirected["_settings"], template?: Template<ChordDirected>): ChordDirected {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["directed"]);
-		const x = new ChordDirected(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IChordDirectedSettings;
 	declare public _privateSettings: IChordDirectedPrivate;
 	declare public _dataItemSettings: IChordDirectedDataItem;
@@ -74,7 +57,7 @@ export class ChordDirected extends Chord {
 	 */
 	public readonly links: ListTemplate<ChordLinkDirected> = new ListTemplate(
 		Template.new({}),
-		() => ChordLinkDirected.new(this._root, {themeTags:["link", "shape"]}, this.links.template)
+		() => ChordLinkDirected._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
 	);
 	/**
 	 * @ignore
@@ -91,6 +74,7 @@ export class ChordDirected extends Chord {
 	}
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["directed"]);
 		super._afterNew();
 		this._markDirtyKey("linkHeadRadius");
 	}

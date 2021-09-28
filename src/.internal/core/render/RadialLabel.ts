@@ -1,10 +1,8 @@
-import type { Root } from "../Root";
 // import * as $object from "../util/Object";
 import * as $math from "../util/Math";
 import { p50, Percent } from "../util/Percent";
 import { Label, ILabelPrivate, ILabelSettings } from "./Label";
 import { RadialText } from "./RadialText";
-import type { Template } from "../../core/util/Template";
 
 
 export interface IRadialLabelSettings extends ILabelSettings {
@@ -30,21 +28,6 @@ export interface IRadialLabelPrivate extends ILabelPrivate {
 }
 
 export class RadialLabel extends Label {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RadialLabel["_settings"], template?: Template<RadialLabel>): RadialLabel {
-		const x = new RadialLabel(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IRadialLabelSettings;
 	declare public _privateSettings: IRadialLabelPrivate;

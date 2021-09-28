@@ -197,9 +197,9 @@ export abstract class Hierarchy extends Series {
 	 */
 	public readonly nodes: ListTemplate<HierarchyNode> = new ListTemplate(
 		Template.new({}),
-		() => HierarchyNode.new(this._root, {
+		() => HierarchyNode._new(this._root, {
 			themeTags: $utils.mergeTags(this.nodes.template.get("themeTags", []), [this._tag, "hierarchy", "node"])
-		}, this.nodes.template)
+		}, [this.nodes.template])
 	);
 
 	/**
@@ -239,9 +239,9 @@ export abstract class Hierarchy extends Series {
 	 */
 	public readonly labels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
-		() => Label.new(this._root, {
+		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag, "hierarchy", "node"])
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 	public _currentDownDepth: number | undefined;

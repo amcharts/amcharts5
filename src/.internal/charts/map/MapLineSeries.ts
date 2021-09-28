@@ -1,5 +1,4 @@
 import type { IMapPointSeriesDataItem } from "./MapPointSeries";
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 
 import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
@@ -76,23 +75,8 @@ export class MapLineSeries extends MapSeries {
 	 */
 	public readonly mapLines: ListTemplate<MapLine> = new ListTemplate(
 		Template.new({}),
-		() => MapLine.new(this._root, {}, this.mapLines.template)
+		() => MapLine._new(this._root, {}, [this.mapLines.template])
 	);
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: MapLineSeries["_settings"], template?: Template<MapLineSeries>): MapLineSeries {
-		const x = new MapLineSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "MapLineSeries";
 	public static classNames: Array<string> = MapSeries.classNames.concat([MapLineSeries.className]);

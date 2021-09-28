@@ -1151,7 +1151,7 @@ export class DefaultTheme extends Theme {
 			const rule = this.rule("PointedRectangle", ["axis", "tooltip", "background"]);
 
 			rule.setAll({
-				cornerRadius: 0,
+				cornerRadius: 0
 			});
 
 			setColor(rule, "fill", ic, "alternativeBackground");

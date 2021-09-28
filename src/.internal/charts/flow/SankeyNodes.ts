@@ -1,7 +1,6 @@
 import type { DataItem } from "../../core/render/Component";
 import type { FlowNode } from "./FlowNode";
 import type { Sankey } from "./Sankey";
-import type { Root } from "../../core/Root";
 import type { Bullet } from "../../core/render/Bullet";
 
 import { Template } from "../../core/util/Template";
@@ -29,21 +28,6 @@ export class SankeyNodes extends FlowNodes {
 	public static className: string = "SankeyNodes";
 	public static classNames: Array<string> = FlowNodes.classNames.concat([SankeyNodes.className]);
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: SankeyNodes["_settings"], template?: Template<SankeyNodes>): SankeyNodes {
-		const x = new SankeyNodes(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: ISankeyNodesSettings;
 	declare public _privateSettings: ISankeyNodesPrivate;
 	declare public _dataItemSettings: ISankeyNodesDataItem;
@@ -56,7 +40,7 @@ export class SankeyNodes extends FlowNodes {
 	 */
 	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
-		() => RoundedRectangle.new(this._root, { themeTags: ["shape"] }, this.rectangles.template)
+		() => RoundedRectangle._new(this._root, { themeTags: ["shape"] }, [this.rectangles.template])
 	);
 
 	/**

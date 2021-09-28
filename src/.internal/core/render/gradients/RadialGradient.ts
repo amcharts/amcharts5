@@ -1,8 +1,6 @@
 import type { IGradient } from "../backend/Renderer";
 import type { Sprite } from "../Sprite";
-import type { Root } from "../../Root";
 import type { Percent } from "../../util/Percent";
-import type { Template } from "../../util/Template";
 
 import { Gradient, IGradientSettings, IGradientPrivate } from "./Gradient";
 import { Color } from "../../util/Color";
@@ -39,21 +37,6 @@ export interface IRadialGradientPrivate extends IGradientPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export class RadialGradient extends Gradient {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RadialGradient["_settings"], template?: Template<RadialGradient>): RadialGradient {
-		const x = new RadialGradient(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IRadialGradientSettings;
 	declare public _privateSettings: IRadialGradientPrivate;

@@ -149,7 +149,7 @@ export abstract class FlowNodes extends Series {
 	 */
 	public readonly labels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
-		() => Label.new(this._root, {}, this.labels.template)
+		() => Label._new(this._root, {}, [this.labels.template])
 	);
 
 	/**
@@ -159,7 +159,7 @@ export abstract class FlowNodes extends Series {
 	 */
 	public readonly nodes: ListTemplate<FlowNode> = new ListTemplate(
 		Template.new({}),
-		() => FlowNode.new(this._root, { themeTags: ["node"] }, this.nodes.template)
+		() => FlowNode._new(this._root, { themeTags: ["node"] }, [this.nodes.template])
 	);
 
 	/**
@@ -268,7 +268,7 @@ export abstract class FlowNodes extends Series {
 
 	/**
 	 * Shows node's data item.
-	 * 
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
@@ -304,7 +304,7 @@ export abstract class FlowNodes extends Series {
 
 	/**
 	 * Hides series's data item.
-	 * 
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise

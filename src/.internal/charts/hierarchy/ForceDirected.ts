@@ -1,7 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
-import type { Root } from "../../core/Root";
 import type { Percent } from "../../core/util/Percent";
-import type { Template } from "../../core/util/Template";
 import type { LinkedHierarchyNode } from "./LinkedHierarchyNode";
 import type { HierarchyLink } from "./HierarchyLink";
 import type * as d3Hierarchy from "d3-hierarchy";
@@ -89,7 +87,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Resistance acting agains node speed.
 	 *
 	 * The greater the value, the more "sluggish" the nodes will be.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
 	 * @default 0.5
 	 */
@@ -166,21 +164,6 @@ export interface IForceDirectedEvents extends ILinkedHierarchyEvents {
 export class ForceDirected extends LinkedHierarchy {
 
 	protected _tag: string = "forcedirected";
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ForceDirected["_settings"], template?: Template<ForceDirected>): ForceDirected {
-		const x = new ForceDirected(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	/**
 	 * @ignore

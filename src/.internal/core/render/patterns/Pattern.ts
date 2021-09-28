@@ -1,7 +1,5 @@
 import type { IGraphics, IPattern } from "../backend/Renderer";
 import type { Color } from "../../util/Color";
-import type { Template } from "../../util/Template";
-import type { Root } from "../../Root";
 
 import { Entity, IEntitySettings, IEntityPrivate } from "../../util/Entity";
 
@@ -27,25 +25,25 @@ export interface IPatternSettings extends IEntitySettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Sizing_patterns} for more info
 	 */
-	width: number;
+	width?: number;
 
 	/**
 	 * Width of the pattern tile, in pixels.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Sizing_patterns} for more info
 	 */
-	height: number;
+	height?: number;
 
 	/**
 	 * Color of the pattern shape.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
 	 */
 	color?: Color;
 
 	/**
 	 * Opacity of the pattern shape.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
 	 */
 	colorOpacity?: number;
@@ -55,18 +53,32 @@ export interface IPatternSettings extends IEntitySettings {
 	 *
 	 * @default 1
 	 */
-	strokeWidth: number;
+	strokeWidth?: number;
+
+	/**
+	 * Stroke (border or line) dash settings.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
+	 */
+	strokeDasharray?: number[] | number;
+
+	/**
+	 * Stroke (border or line) dash offset.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
+	 */
+	strokeDashoffset?: number;
 
 	/**
 	 * Color to fill gaps between pattern shapes.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
 	 */
 	fill?: Color;
 
 	/**
 	 * Opacity of the fill for gaps between pattern shapes.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
 	 */
 	fillOpacity?: number;
@@ -91,22 +103,6 @@ export interface IPatternPrivate extends IEntityPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class Pattern extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Pattern["_settings"], template?: Template<Pattern>): Pattern {
-		const x = new Pattern(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	protected _afterNew() {
 		super._afterNew();
 
@@ -136,7 +132,7 @@ export class Pattern extends Entity {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("repetition") || this.isDirty("width") || this.isDirty("height") || this.isDirty("rotation") || this.isDirty("color") || this.isDirty("strokeWidth") || this.isDirty("colorOpacity") || this.isDirty("fill") || this.isDirty("fillOpacity")) {
+		if (this.isDirty("repetition") || this.isDirty("width") || this.isDirty("height") || this.isDirty("rotation") || this.isDirty("color") || this.isDirty("strokeWidth") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("colorOpacity") || this.isDirty("fill") || this.isDirty("fillOpacity")) {
 			this._clear = true;
 		}
 	}
@@ -146,8 +142,8 @@ export class Pattern extends Entity {
 
 		if (this._clear) {
 			const repetition = this.get("repetition", "");
-			const width = this.get("width");
-			const height = this.get("height");
+			const width = this.get("width", 100);
+			const height = this.get("height", 100);
 			const fill = this.get("fill");
 			const fillOpacity = this.get("fillOpacity", 1);
 

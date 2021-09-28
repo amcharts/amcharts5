@@ -3,8 +3,6 @@ import { Color } from "./Color"
 import * as $type from "./Type"
 import * as $object from "./Object"
 import * as $array from "./Array"
-import type { Template } from "./Template";
-import type { Root } from "../Root"
 
 
 export interface IDataProcessorSettings extends IEntitySettings {
@@ -54,22 +52,6 @@ export interface IDataProcessorEvents extends IEntityEvents {
  * @important
  */
 export class DataProcessor extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: DataProcessor["_settings"], template?: Template<DataProcessor>): DataProcessor {
-		const x = new DataProcessor(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IDataProcessorSettings;
 	declare public _privateSettings: IDataProcessorPrivate;
 

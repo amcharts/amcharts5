@@ -1,6 +1,4 @@
-import type { Root } from "../../core/Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
-import type { Template } from "../../core/util/Template";
 import type { IPoint } from "../../core/util/IPoint";
 
 export interface IMapLineSettings extends IGraphicsSettings {
@@ -36,22 +34,6 @@ export interface IMapLinePrivate extends IGraphicsPrivate {
  * Draws a slice for [[FunnelSeries]].
  */
 export class FunnelSlice extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: FunnelSlice["_settings"], template?: Template<FunnelSlice>): FunnelSlice {
-		const x = new FunnelSlice(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IMapLineSettings;
 	declare public _privateSettings: IMapLinePrivate;
 

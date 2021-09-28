@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { IPoint } from "../../core/util/IPoint";
 import type { AxisRendererCircular } from "./AxisRendererCircular";
@@ -35,7 +34,7 @@ export interface IRadarColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange 
 
 /**
  * A column series for use in a [[RadarChart]].
- * 
+ *
  * @important
  */
 export class RadarColumnSeries extends BaseColumnSeries {
@@ -65,26 +64,11 @@ export class RadarColumnSeries extends BaseColumnSeries {
 	 */
 	public readonly columns: ListTemplate<Slice> = new ListTemplate(
 		Template.new({}),
-		() => Slice.new(this._root, {
+		() => Slice._new(this._root, {
 			position: "absolute",
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["radar", "series", "column"])
-		}, this.columns.template)
+		}, [this.columns.template])
 	);
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RadarColumnSeries["_settings"], template?: Template<RadarColumnSeries>): RadarColumnSeries {
-		const x = new RadarColumnSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "RadarColumnSeries";
 	public static classNames: Array<string> = BaseColumnSeries.classNames.concat([RadarColumnSeries.className]);
@@ -229,7 +213,10 @@ export class RadarColumnSeries extends BaseColumnSeries {
 		super._processAxisRange(axisRange);
 		axisRange.columns = new ListTemplate(
 			Template.new({}),
-			() => Slice.new(this._root, { position: "absolute", themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["radar", "series", "column"]) }, axisRange.columns.template)
+			() => Slice._new(this._root, {
+				position: "absolute",
+				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["radar", "series", "column"]),
+			}, [axisRange.columns.template])
 		);
 	}
 }

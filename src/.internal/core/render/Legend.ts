@@ -1,6 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "./Series";
-import type { Root } from "../../core/Root";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
 import { RoundedRectangle } from "../../core/render/RoundedRectangle";
@@ -114,25 +113,8 @@ export interface ILegendPrivate extends ISeriesPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/} for more info
  */
 export class Legend extends Series {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Legend["_settings"], template?: Template<Legend>): Legend {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["legend"]);
-		const x = new Legend(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
-
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["legend"]);
 		this.fields.push("name", "stroke", "fill");
 		super._afterNew();
 	}
@@ -151,14 +133,14 @@ export class Legend extends Series {
 	 */
 	public readonly itemContainers: ListTemplate<Container> = new ListTemplate(
 		Template.new({}),
-		() => Container.new(this._root, {
+		() => Container._new(this._root, {
 			themeTags: $utils.mergeTags(this.itemContainers.template.get("themeTags", []), ["legend", "item"]),
 			themeTagsSelf: $utils.mergeTags(this.itemContainers.template.get("themeTagsSelf", []), ["itemcontainer"]),
 			background: Rectangle.new(this._root, {
 				themeTags: $utils.mergeTags(this.itemContainers.template.get("themeTags", []), ["legend", "item", "background"]),
 				themeTagsSelf: $utils.mergeTags(this.itemContainers.template.get("themeTagsSelf", []), ["itemcontainer"])
 			})
-		}, this.itemContainers.template)
+		}, [this.itemContainers.template])
 	);
 
 	/**
@@ -189,9 +171,9 @@ export class Legend extends Series {
 	 */
 	public readonly markers: ListTemplate<Container> = new ListTemplate(
 		Template.new({}),
-		() => Container.new(this._root, {
+		() => Container._new(this._root, {
 			themeTags: $utils.mergeTags(this.markers.template.get("themeTags", []), ["legend", "marker"])
-		}, this.markers.template)
+		}, [this.markers.template])
 	);
 
 	/**
@@ -210,9 +192,9 @@ export class Legend extends Series {
 	 */
 	public readonly labels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
-		() => Label.new(this._root, {
+		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), ["legend", "label"])
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 	/**
@@ -231,9 +213,9 @@ export class Legend extends Series {
 	 */
 	public readonly valueLabels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
-		() => Label.new(this._root, {
+		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.valueLabels.template.get("themeTags", []), ["legend", "label", "value"])
-		}, this.valueLabels.template)
+		}, [this.valueLabels.template])
 	);
 
 	/**
@@ -252,9 +234,9 @@ export class Legend extends Series {
 	 */
 	public readonly markerRectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
-		() => RoundedRectangle.new(this._root, {
+		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.markerRectangles.template.get("themeTags", []), ["legend", "marker", "rectangle"])
-		}, this.markerRectangles.template)
+		}, [this.markerRectangles.template])
 	);
 
 

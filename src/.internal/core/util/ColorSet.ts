@@ -1,6 +1,4 @@
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity";
-import type { Root } from "../Root";
-import type { Template } from "./Template";
 import { Color } from "./Color";
 
 
@@ -15,7 +13,7 @@ export interface IColorSetSettings extends IEntitySettings {
 	 * A step size when using `next()`.
 	 *
 	 * E.g. setting to `2` will make it return every second color in the list.
-	 * 
+	 *
 	 * @default 1
 	 */
 	step?: number;
@@ -28,7 +26,7 @@ export interface IColorSetSettings extends IEntitySettings {
 	/**
 	 * If set to `true`, color set will reuse existing colors from the list
 	 * inestead of generating new ones.
-	 * 
+	 *
 	 * @default false
 	 */
 	reuse?: boolean;
@@ -91,22 +89,6 @@ export interface IColorSetStepOptions {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Color_sets} for more info
  */
 export class ColorSet extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ColorSet["_settings"], template?: Template<ColorSet>): ColorSet {
-		const x = new ColorSet(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "ColorSet";
 	public static classNames: Array<string> = Entity.classNames.concat([ColorSet.className]);
 
@@ -187,7 +169,7 @@ export class ColorSet extends Entity {
 	 * Returns a [[Color]] at specific index.
 	 *
 	 * If there's no color at this index, a new color is generated.
-	 * 
+	 *
 	 * @param   index  Index
 	 * @return         Color
 	 */

@@ -1,4 +1,3 @@
-import type { Root } from "../Root";
 import type { IBounds } from "../util/IBounds";
 import { Label } from "../render/Label";
 import { PointedRectangle } from "../render/PointedRectangle";
@@ -11,7 +10,6 @@ import * as $utils from "../util/Utils";
 import { Percent } from "../util/Percent";
 import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
-import type { Template } from "../../core/util/Template";
 import type { MultiDisposer, IDisposer } from "../util/Disposer";
 import { Color } from "../util/Color";
 //import * as $utils from "../util/Utils";
@@ -38,7 +36,7 @@ export interface ITooltipSettings extends IContainerSettings {
 
 	/**
 	 * If set to `true` will use the same `fill` color as its `tooltipTarget`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
 	 * @defaul false
 	 */
@@ -106,22 +104,6 @@ export class Tooltip extends Container {
 	public _fx: number = 0;
 	public _fy: number = 0;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Tooltip["_settings"], template?: Template<Tooltip>): Tooltip {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["tooltip"]);
-		const x = new Tooltip(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: ITooltipSettings;
 	declare public _privateSettings: ITooltipPrivate;
 
@@ -134,6 +116,8 @@ export class Tooltip extends Container {
 	protected _labelDp: IDisposer | undefined;
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["tooltip"]);
+
 		super._afterNew();
 
 		this.set("background", PointedRectangle.new(this._root, {
@@ -181,7 +165,7 @@ export class Tooltip extends Container {
 
 		if (this.isDirty("pointTo")) {
 			// can't compare to previous, as sometimes pointTo is set twice (when pointer moves, so the position won't be udpated)
-			this._updateBackground();			
+			this._updateBackground();
 		}
 
 		if (this.isDirty("tooltipTarget")) {

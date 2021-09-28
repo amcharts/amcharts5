@@ -1,9 +1,7 @@
 import { LineSeries, ILineSeriesPrivate, ILineSeriesSettings, ILineSeriesDataItem, ILineSeriesAxisRange } from "../xy/series/LineSeries";
-import type { Root } from "../../core/Root";
 import type { IPoint } from "../../core/util/IPoint";
 import type { AxisRendererCircular } from "./AxisRendererCircular";
 import type { AxisRendererRadial } from "./AxisRendererRadial";
-import type { Template } from "../../core/util/Template";
 import type { Bullet } from "../../core/render/Bullet";
 import { Graphics } from "../../core/render/Graphics";
 import type { RadarChart } from "./RadarChart";
@@ -34,7 +32,7 @@ export interface IRadarLineSeriesAxisRange extends ILineSeriesAxisRange {
 
 /**
  * Draws a line series for use in a [[RadarChart]].
- * 
+ *
  * @important
  */
 export class RadarLineSeries extends LineSeries {
@@ -49,21 +47,6 @@ export class RadarLineSeries extends LineSeries {
 	 */
 	declare public chart: RadarChart | undefined;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RadarLineSeries["_settings"], template?: Template<RadarLineSeries>): RadarLineSeries {
-		const x = new RadarLineSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "RadarLineSeries";
 	public static classNames: Array<string> = LineSeries.classNames.concat([RadarLineSeries.className]);
 
@@ -76,7 +59,7 @@ export class RadarLineSeries extends LineSeries {
 
 	protected _handleMaskBullets() {
 
-	}	
+	}
 
 	public getPoint(positionX: number, positionY: number): IPoint {
 

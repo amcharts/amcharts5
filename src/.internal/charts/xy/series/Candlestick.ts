@@ -1,6 +1,3 @@
-import type { Root } from "../../../core/Root";
-import type { Template } from "../../../core/util/Template";
-
 import { RoundedRectangle, IRoundedRectangleSettings, IRoundedRectanglePrivate } from "../../../core/render/RoundedRectangle";
 
 
@@ -25,21 +22,6 @@ export interface ICandlestickPrivate extends IRoundedRectanglePrivate {
  * A candle element used in a [[CandlestickSeries]].
  */
 export class Candlestick extends RoundedRectangle {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Candlestick["_settings"], template?: Template<Candlestick>): Candlestick {
-		const x = new Candlestick(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ICandlestickSettings;
 	declare public _privateSettings: ICandlestickPrivate;

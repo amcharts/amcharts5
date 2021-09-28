@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 
 import { Flow, IFlowSettings, IFlowDataItem, IFlowPrivate, IFlowEvents } from "./Flow";
@@ -65,7 +64,7 @@ export interface ISankeySettings extends IFlowSettings {
 
 	/**
 	 * A custom function to use when sorting nodes.
-	 * 
+	 *
 	 * @todo test
 	 * @ignore
 	 */
@@ -97,26 +96,12 @@ export class Sankey extends Flow {
 	 */
 	public readonly links: ListTemplate<SankeyLink> = new ListTemplate(
 		Template.new({}),
-		() => SankeyLink.new(this._root, { themeTags: ["link", "shape"] }, this.links.template)
+		() => SankeyLink._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
 	);
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Sankey["_settings"], template?: Template<Sankey>): Sankey {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["sankey", settings.orientation || "horizontal"]);
-		const x = new Sankey(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["sankey", this._settings.orientation || "horizontal"]);
+
 		this._fillGenerator.y0(function(p: number[]) {
 			return p[3];
 		});
@@ -138,7 +123,7 @@ export class Sankey extends Flow {
 
 	/**
 	 * A series representing sankey nodes.
-	 * 
+	 *
 	 * @default SankeyNodes.new()
 	 */
 	public readonly nodes: SankeyNodes = this.children.push(SankeyNodes.new(this._root, {}));
@@ -180,7 +165,7 @@ export class Sankey extends Flow {
 		link.series = this;
 
 		this.links.push(link);
-		
+
 		return link;
 	}
 

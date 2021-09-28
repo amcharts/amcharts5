@@ -1,7 +1,5 @@
-import type { Root } from "../../core/Root";
 import type { MapLineSeries } from "./MapLineSeries";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
-import type { Template } from "../../core/util/Template";
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
@@ -34,22 +32,6 @@ export interface IMapLinePrivate extends IGraphicsPrivate {
  * A line object in a [[MapLineSeries]].
  */
 export class MapLine extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: MapLine["_settings"], template?: Template<MapLine>): MapLine {
-		const x = new MapLine(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IMapLineSettings;
 	declare public _privateSettings: IMapLinePrivate;

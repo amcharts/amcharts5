@@ -1,9 +1,7 @@
-import type { Root } from "../../../core/Root";
 import type { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
 import { Axis, IAxisSettings, IAxisPrivate, IAxisDataItem, IAxisEvents } from "./Axis";
 import type { IXYSeriesDataItem, XYSeries } from "../series/XYSeries";
-import type { Template } from "../../../core/util/Template";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
@@ -27,14 +25,14 @@ export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSett
 
 	/**
 	 * Relative location of where axis cell starts: 0 - beginning, 1 - end.
-	 * 
+	 *
 	 * @default 0
 	 */
 	startLocation?: number;
 
 	/**
 	 * Relative location of where axis cell ends: 0 - beginning, 1 - end.
-	 * 
+	 *
 	 * @default 1
 	 */
 	endLocation?: number;
@@ -72,7 +70,7 @@ export interface ICategoryAxisDataItem extends IAxisDataItem {
 	 * A distance to shift data item relative to its original position.
 	 *
 	 * The value is 0 to 1, where 1 is full witdth of the axis.
-	 * 
+	 *
 	 * Can be used to sort data items without modifying order of the actual data.
 	 */
 	deltaPosition?: number;
@@ -104,23 +102,6 @@ export interface ICategoryAxisEvents extends IAxisEvents {
  * @important
  */
 export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new<R extends AxisRenderer>(root: Root, settings: CategoryAxis<R>["_settings"], template?: Template<CategoryAxis<R>>): CategoryAxis<R> {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["axis"]);
-		const x = new CategoryAxis<R>(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "CategoryAxis";
 	public static classNames: Array<string> = Axis.classNames.concat([CategoryAxis.className]);
 
@@ -134,6 +115,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _itemMap: { [index: string]: DataItem<ICategoryAxisDataItem> } = {};
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		this.fields.push("category");
 		this._setPrivate("name", "category");
 		super._afterNew();
@@ -381,7 +363,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns X coordinate in pixels corresponding to specific category index.
-	 * 
+	 *
 	 * @param   value  Index
 	 * @return         X coordinate
 	 */
@@ -395,7 +377,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns Y coordinate in pixels corresponding to specific category index.
-	 * 
+	 *
 	 * @param   value  Index
 	 * @return         Y coordinate
 	 */
@@ -452,7 +434,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 * `location` indicates relative position within category: 0 - start, 1 - end.
 	 *
 	 * If not set, will use middle (0.5) of the category.
-	 * 
+	 *
 	 * @param   index     Index
 	 * @param   location  Location
 	 * @return            Index
@@ -482,7 +464,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns an index of a category.
-	 * 
+	 *
 	 * @param   category  Category to look up
 	 * @return            Index
 	 */
@@ -522,7 +504,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns text to be used in an axis tooltip for specific relative position.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
@@ -536,7 +518,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns a data item from series that is closest to the `position`.
-	 * 
+	 *
 	 * @param   series    Series
 	 * @param   position  Relative position
 	 * @return            Data item
@@ -570,7 +552,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 * Zooms the axis to specific `start` and `end` indexes.
 	 *
 	 * Optional `duration` specifies duration of zoom animation in milliseconds.
-	 * 
+	 *
 	 * @param  start     Start index
 	 * @param  end       End index
 	 * @param  duration  Duration in milliseconds

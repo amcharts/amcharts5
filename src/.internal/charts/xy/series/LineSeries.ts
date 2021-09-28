@@ -3,7 +3,6 @@ import { Graphics } from "../../../core/render/Graphics";
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import { CurveFactory, line, area } from "d3-shape";
-import type { Root } from "../../../core/Root";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
 import { DataItem } from "../../../core/render/Component";
@@ -79,21 +78,6 @@ export class LineSeries extends XYSeries {
 	declare public _dataItemSettings: ILineSeriesDataItem;
 	declare public _axisRangeType: ILineSeriesAxisRange;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: LineSeries["_settings"], template?: Template<LineSeries>): LineSeries {
-		const x = new LineSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "LineSeries";
 	public static classNames: Array<string> = XYSeries.classNames.concat([LineSeries.className]);
 
@@ -141,9 +125,9 @@ export class LineSeries extends XYSeries {
 	 */
 	public readonly strokes: ListTemplate<Graphics> = new ListTemplate(
 		Template.new({}),
-		() => Graphics.new(this._root, {
+		() => Graphics._new(this._root, {
 			themeTags: $utils.mergeTags(this.strokes.template.get("themeTags", []), ["line", "series", "stroke"])
-		}, this.strokes.template)
+		}, [this.strokes.template]),
 	);
 
 	/**
@@ -160,14 +144,14 @@ export class LineSeries extends XYSeries {
 	 *
 	 * `fills.template` can be used to set default settings for all segment
 	 * fills, or to change on existing ones.
-	 * 
+	 *
 	 * @default new ListTemplate<Graphics>
 	 */
 	public readonly fills: ListTemplate<Graphics> = new ListTemplate(
 		Template.new({}),
-		() => Graphics.new(this._root, {
+		() => Graphics._new(this._root, {
 			themeTags: $utils.mergeTags(this.strokes.template.get("themeTags", []), ["line", "series", "fill"])
-		}, this.fills.template)
+		}, [this.fills.template]),
 	);
 
 	// custom set from data
@@ -607,12 +591,16 @@ export class LineSeries extends XYSeries {
 		super._processAxisRange(axisRange);
 		axisRange.fills = new ListTemplate(
 			Template.new({}),
-			() => Graphics.new(this._root, { themeTags: $utils.mergeTags(axisRange.fills!.template.get("themeTags", []), ["line", "series", "fill"]) }, axisRange.fills!.template)
+			() => Graphics._new(this._root, {
+				themeTags: $utils.mergeTags(axisRange.fills!.template.get("themeTags", []), ["line", "series", "fill"]),
+			}, [axisRange.fills!.template]),
 		);
 
 		axisRange.strokes = new ListTemplate(
 			Template.new({}),
-			() => Graphics.new(this._root, { themeTags: $utils.mergeTags(axisRange.strokes!.template.get("themeTags", []), ["line", "series", "stroke"]) }, axisRange.strokes!.template)
+			() => Graphics._new(this._root, {
+				themeTags: $utils.mergeTags(axisRange.strokes!.template.get("themeTags", []), ["line", "series", "stroke"]),
+			}, [axisRange.strokes!.template])
 		);
 	}
 
@@ -631,13 +619,13 @@ export class LineSeries extends XYSeries {
 				markerRectangle.setPrivate("visible", false);
 			}
 
-			const legendStroke = marker.children.push(Graphics.new(this._root, {
+			const legendStroke = marker.children.push(Graphics._new(this._root, {
 				themeTags: ["line", "series", "legend", "marker", "stroke"]
-			}, this.strokes.template));
+			}, [this.strokes.template]));
 
-			const legendFill = marker.children.push(Graphics.new(this._root, {
+			const legendFill = marker.children.push(Graphics._new(this._root, {
 				themeTags: ["line", "series", "legend", "marker", "fill"]
-			}, this.fills.template));
+			}, [this.fills.template]));
 
 			const disabledColor = this._root.interfaceColors.get("disabled");
 

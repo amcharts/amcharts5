@@ -34,7 +34,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * Indicates relative position where "usable" space of the cell starts.
 	 *
 	 * `0` - beginning, `1` - end, or anything in-between.
-	 * 
+	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
 	 */
@@ -44,7 +44,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * Indicates relative position where "usable" space of the cell ends.
 	 *
 	 * `0` - beginning, `1` - end, or anything in-between.
-	 * 
+	 *
 	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
 	 */
@@ -100,9 +100,9 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public readonly ticks: ListTemplate<AxisTick> = new ListTemplate(
 		Template.new({}),
-		() => AxisTick.new(this._root, {
+		() => AxisTick._new(this._root, {
 			themeTags: $utils.mergeTags(this.ticks.template.get("themeTags", []), this.get("themeTags", []))
-		}, this.ticks.template)
+		}, [this.ticks.template])
 	);
 
 	/**
@@ -125,9 +125,9 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public readonly grid: ListTemplate<Grid> = new ListTemplate(
 		Template.new({}),
-		() => Grid.new(this._root, {
+		() => Grid._new(this._root, {
 			themeTags: $utils.mergeTags(this.grid.template.get("themeTags", []), this.get("themeTags", []))
-		}, this.grid.template)
+		}, [this.grid.template])
 	);
 
 	/**
@@ -150,16 +150,16 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public readonly axisFills: ListTemplate<Graphics> = new ListTemplate(
 		Template.new({}),
-		() => Graphics.new(this._root, {
+		() => Graphics._new(this._root, {
 			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["fill"]), this.get("themeTags", []))
-		}, this.axisFills.template)
+		}, [this.axisFills.template])
 	);
 
 	/**
 	 * @ignore
 	 */
 	public makeLabel(dataItem: DataItem<IAxisDataItem>): AxisLabel {
-	
+
 		const label = this.labels.make();
 
 		let themeTags = [];
@@ -187,9 +187,9 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public readonly labels: ListTemplate<AxisLabel> = new ListTemplate(
 		Template.new({}),
-		() => AxisLabel.new(this._root, {
+		() => AxisLabel._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 

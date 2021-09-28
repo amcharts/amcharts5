@@ -1,6 +1,4 @@
 import type { PieSeries } from "./PieSeries";
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 
 import { Percent } from "../../core/util/Percent";
 import { PercentChart, IPercentChartPrivate, IPercentChartSettings } from "../percent/PercentChart";
@@ -17,7 +15,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 *
 	 * Can be set in fixed pixel value, or relative to chart container size in
 	 * percent.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
 	 * @default 80%
 	 */
@@ -31,7 +29,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 * percent.
 	 *
 	 * Setting to negative number will mean pixels from outer radius.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
 	 */
 	innerRadius?: number | Percent;
@@ -70,21 +68,6 @@ export interface IPieChartPrivate extends IPercentChartPrivate {
  * @important
  */
 export class PieChart extends PercentChart {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: PieChart["_settings"], template?: Template<PieChart>): PieChart {
-		const x = new PieChart(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "PieChart";
 	public static classNames: Array<string> = PercentChart.classNames.concat([PieChart.className]);
@@ -149,7 +132,7 @@ export class PieChart extends PercentChart {
 	 *
 	 * If optional series parameter is passed in, it will return outer radius
 	 * of that particular series.
-	 * 
+	 *
 	 * @param   series  Series
 	 * @return          Radius in pixels
 	 */
@@ -178,7 +161,7 @@ export class PieChart extends PercentChart {
 	 *
 	 * If optional series parameter is passed in, it will return inner radius
 	 * of that particular series.
-	 * 
+	 *
 	 * @param   series  Series
 	 * @return          Radius in pixels
 	 */

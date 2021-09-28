@@ -1,8 +1,6 @@
-import type { Root } from "../../core/Root";
 import { FlowLink, IFlowLinkPrivate, IFlowLinkSettings } from "./FlowLink";
 import type { DataItem } from "../../core/render/Component";
 import type { IChordNodesDataItem } from "./ChordNodes";
-import type { Template } from "../../core/util/Template";
 import type { Percent } from "../../core/util/Percent";
 import type { Chord, IChordDataItem } from "./Chord";
 import type { IOrientationPoint, IPoint } from "../../core/util/IPoint";
@@ -27,21 +25,6 @@ export class ChordLink extends FlowLink {
 	public _p1: IPoint | undefined;
 
 	public _type: "line" | "curve" | undefined;
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ChordLink["_settings"], template?: Template<ChordLink>): ChordLink {
-		const x = new ChordLink(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IChordLinkSettings;
 	declare public _privateSettings: IChordLinkPrivate;

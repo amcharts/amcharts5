@@ -1,6 +1,4 @@
-import type { Root } from "../../../core/Root";
 import { Graphics, IGraphicsPrivate, IGraphicsSettings } from "../../../core/render/Graphics";
-import type { Template } from "../../../core/util/Template";
 
 export interface IGridSettings extends IGraphicsSettings {
 
@@ -25,21 +23,6 @@ export interface IGridPrivate extends IGraphicsPrivate {
  * @important
  */
 export class Grid extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Grid["_settings"], template?: Template<Grid>): Grid {
-		const x = new Grid(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IGridSettings;
 	declare public _privateSettings: IGridPrivate;

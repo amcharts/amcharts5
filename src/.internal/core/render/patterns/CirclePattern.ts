@@ -1,6 +1,3 @@
-import type { Root } from "../../Root";
-import type { Template } from "../../util/Template";
-
 import { Pattern, IPatternSettings, IPatternPrivate } from "./Pattern";
 
 import * as $math from "../../util/Math";
@@ -31,7 +28,7 @@ export interface ICirclePatternSettings extends IPatternSettings {
 
 	/**
 	 * Center circles.
-	 * 
+	 *
 	 * @default true
 	 */
 	centered?: boolean;
@@ -47,20 +44,6 @@ export interface ICirclePatternPrivate extends IPatternPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class CirclePattern extends Pattern {
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: CirclePattern["_settings"], template?: Template<CirclePattern>): CirclePattern {
-		const x = new CirclePattern(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ICirclePatternSettings;
 	declare public _privateSettings: ICirclePatternPrivate;
@@ -83,8 +66,8 @@ export class CirclePattern extends Pattern {
 		const centered = this.get("centered", true);
 		const gap = this.get("gap", 0);
 		const rotation = this.get("rotation", 0);
-		let w = this.get("width");
-		let h = this.get("height");
+		let w = this.get("width", 100);
+		let h = this.get("height", 100);
 		let radius = this.get("radius", 3);
 
 		let cellW = radius * 2 + gap;

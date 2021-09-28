@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.28] - 2021-09-28
+
+### Added
+- Two new settings in `Pattern`: `strokeDasharray` and `strokeDashoffset`.
+- `Graphics` and `Picture` can now have shadows with additional settings: `shadowColor`, `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`, and `shadowOpacity`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/).
+
+### Changed
+- `width` and `height` settings in `Pattern` are now optional.
+
+### Fixed
+- Fixed the priority of `template` and `templateField`.
+- It's now possible for the user to override the `template` of the `ListTemplate`.
+
+
 ## [5.0.0-beta.27] - 2021-09-27
 
 ### Added

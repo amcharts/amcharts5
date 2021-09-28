@@ -1,4 +1,3 @@
-import type { Root } from "../../../core/Root";
 import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./AxisRenderer";
 import { p100 } from "../../../core/util/Percent";
 import type { IPoint } from "../../../core/util/IPoint";
@@ -46,22 +45,6 @@ export interface IAxisRendererXPrivate extends IAxisRendererPrivate {
  */
 export class AxisRendererX extends AxisRenderer {
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisRendererX["_settings"], template?: Template<AxisRendererX>): AxisRendererX {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["renderer", "x"]);
-		const x = new AxisRendererX(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "AxisRendererX";
 	public static classNames: Array<string> = AxisRenderer.classNames.concat([AxisRendererX.className]);
 
@@ -71,6 +54,8 @@ export class AxisRendererX extends AxisRenderer {
 	declare public readonly labelTemplate: Template<AxisLabel>;
 
 	public _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
+
 		super._afterNew();
 		this._setPrivate("letter", "X");
 
@@ -161,7 +146,7 @@ export class AxisRendererX extends AxisRenderer {
 
 	/**
 	 * Converts axis relative position to actual coordinate in pixels.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Point
 	 */

@@ -1,6 +1,4 @@
-import type { Root } from "../Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
-import type { Template } from "../../core/util/Template";
 import type { Percent } from "../../core/util/Percent";
 import * as $utils from "../../core/util/Utils";
 
@@ -33,21 +31,6 @@ export interface IStarPrivate extends IGraphicsPrivate {
  * @important
  */
 export class Star extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Star["_settings"], template?: Template<Star>): Star {
-		const x = new Star(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IStarSettings;
 	declare public _privateSettings: IStarPrivate;

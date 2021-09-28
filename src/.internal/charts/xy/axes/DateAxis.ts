@@ -1,9 +1,7 @@
-import type { Root } from "../../../core/Root";
 import { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
 import type { XYSeries, IXYSeriesDataItem } from "../series/XYSeries";
 import { ValueAxis, IValueAxisSettings, IValueAxisPrivate, IValueAxisDataItem, IMinMaxStep, IValueAxisEvents } from "./ValueAxis";
-import type { Template } from "../../../core/util/Template";
 import * as $type from "../../../core/util/Type";
 import * as $order from "../../../core/util/Order";
 import * as $array from "../../../core/util/Array";
@@ -16,21 +14,21 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 
 	/**
 	 * Indicates granularity of data.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
 	/**
 	 * Relative location of where axis cell starts: 0 - beginning, 1 - end.
-	 * 
+	 *
 	 * @default 0
 	 */
 	startLocation?: number;
 
 	/**
 	 * Relative location of where axis cell ends: 0 - beginning, 1 - end.
-	 * 
+	 *
 	 * @default 1
 	 */
 	endLocation?: number;
@@ -45,7 +43,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 
 	/**
 	 * Maximum number of data items in the view before data grouping kicks in.
-	 * 
+	 *
 	 * @default 500
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
@@ -53,21 +51,21 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 
 	/**
 	 * Force data item grouping to specific interval.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupInterval?: ITimeInterval;
 
 	/**
 	 * A list of intervals the axis is allowed to group data items into.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupIntervals?: Array<ITimeInterval>;
 
 	/**
 	 * A list of intervals the axis is allowed to show grid/labels on.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
@@ -132,23 +130,6 @@ export interface IDateAxisEvents extends IValueAxisEvents {
  * @important
  */
 export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new<R extends AxisRenderer>(root: Root, settings: DateAxis<R>["_settings"], template?: Template<DateAxis<R>>): DateAxis<R> {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["axis"]);
-		const x = new DateAxis<R>(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "DateAxis";
 	public static classNames: Array<string> = ValueAxis.classNames.concat([DateAxis.className]);
 
@@ -162,6 +143,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _intervalDuration: number = 1;
 
 	public _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
 		this.setPrivateRaw("baseInterval", this.get("baseInterval"));
 	}
@@ -552,7 +534,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	/**
 	 * Returns a duration of currently active `baseInterval` in milliseconds.
-	 * 
+	 *
 	 * @return Duration
 	 */
 	public baseDuration(): number {
@@ -561,7 +543,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	/**
 	 * Returns a duration of user-defined `baseInterval` in milliseconds.
-	 * 
+	 *
 	 * @return Duration
 	 */
 	public baseMainDuration(): number {
@@ -645,7 +627,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	/**
 	 * Returns text to be used in an axis tooltip for specific relative position.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
@@ -658,7 +640,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	/**
 	 * Returns a data item from series that is closest to the `position`.
-	 * 
+	 *
 	 * @param   series    Series
 	 * @param   position  Relative position
 	 * @return            Data item
@@ -718,7 +700,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * Zooms the axis to specific `start` and `end` dates.
 	 *
 	 * Optional `duration` specifies duration of zoom animation in milliseconds.
-	 * 
+	 *
 	 * @param  start     Start Date
 	 * @param  end       End Date
 	 * @param  duration  Duration in milliseconds
@@ -730,7 +712,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	/**
 	 * Returns a `Date` object corresponding to specific position within plot
 	 * area.
-	 * 
+	 *
 	 * @param   position  Pposition
 	 * @return            Date
 	 */
@@ -741,7 +723,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	/**
 	 * Returns a relative position within plot area that corresponds to specific
 	 * date.
-	 * 
+	 *
 	 * @param   date  Date
 	 * @return        Position
 	 */

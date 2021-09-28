@@ -11,9 +11,7 @@
 
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import { TextFormatter } from "./TextFormatter";
-import type { Root } from "../Root"
 import type { Language } from "./Language";
-import type { Template } from "./Template";
 // import { BaseObject } from "../Base";
 // import { registry } from "../Registry";
 import * as $object from "./Object";
@@ -32,7 +30,7 @@ export interface INumberFormatterSettings extends IEntitySettings {
 
 	/**
 	 * Number format to be used when formatting numbers.
-	 * 
+	 *
 	 * @default "#,###.#####"
 	 */
 	numberFormat?: string | Intl.NumberFormatOptions;
@@ -60,7 +58,7 @@ export interface INumberFormatterSettings extends IEntitySettings {
 
 	/**
 	 * All numbers below this value are considered small.
-	 * 
+	 *
 	 * @default 1
 	 */
 	smallNumberThreshold?: number;
@@ -99,22 +97,6 @@ export interface INumberFormatterPrivate extends IEntityPrivate {
  * @important
  */
 export class NumberFormatter extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: NumberFormatter["_settings"], template?: Template<NumberFormatter>): NumberFormatter {
-		const x = new NumberFormatter(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: INumberFormatterSettings;
 	declare public _privateSettings: INumberFormatterPrivate;
 

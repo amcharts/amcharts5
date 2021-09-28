@@ -1,8 +1,6 @@
-import type { Root } from "../../../core/Root";
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "./LineSeries";
 import type { AxisRenderer } from "../axes/AxisRenderer";
 import type { Axis } from "../axes/Axis";
-import type { Template } from "../../../core/util/Template";
 import { Percent, p100 } from "../../../core/util/Percent";
 import type { DataItem } from "../../../core/render/Component";
 import { curveStepAfter } from "d3-shape";
@@ -17,7 +15,7 @@ export interface IStepLineSeriesSettings extends ILineSeriesSettings {
 	 *
 	 * NOTE: setting this to less than 100% makes sense only when risers are
 	 * disabled: `noRisers: true`
-	 * 
+	 *
 	 * @default 100%
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/#Step_width} for more info
 	 */
@@ -44,25 +42,10 @@ export class StepLineSeries extends LineSeries {
 	declare public _privateSettings: IStepLineSeriesPrivate;
 	declare public _dataItemSettings: IStepLineSeriesDataItem;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: StepLineSeries["_settings"], template?: Template<LineSeries>): StepLineSeries {
-		const x = new StepLineSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	protected _afterNew() {
 		this._setDefault("curveFactory", curveStepAfter);
 		super._afterNew();
-	}	
+	}
 
 
 	protected _getPoints(dataItem: DataItem<this["_dataItemSettings"]>, o: { points: Array<Array<number>>, segments: number[][][], stacked: boolean | undefined, getOpen: boolean, basePosX: number, basePosY: number, fillVisible: boolean | undefined, xField: string, yField: string, xOpenField: string, yOpenField: string, vcx: number, vcy: number, baseAxis: Axis<AxisRenderer>, xAxis: Axis<AxisRenderer>, yAxis: Axis<AxisRenderer>, locationX: number, locationY: number, openLocationX: number, openLocationY: number }) {

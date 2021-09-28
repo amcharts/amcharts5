@@ -1,10 +1,8 @@
-import type { Root } from "../Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 import * as $type from "../util/Type";
 import { Percent } from "../util/Percent";
 import type { IPoint } from "../util/IPoint";
 import { arc } from "d3-shape";
-import type { Template } from "../../core/util/Template";
 import * as $math from "../util/Math";
 
 export interface ISliceSettings extends IGraphicsSettings {
@@ -46,25 +44,10 @@ export interface ISlicePrivate extends IGraphicsPrivate {
 
 /**
  * Draws a slice shape.
- * 
+ *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  */
 export class Slice extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Slice["_settings"], template?: Template<Slice>): Slice {
-		const x = new Slice(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ISliceSettings;
 	declare public _privateSettings: ISlicePrivate;

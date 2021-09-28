@@ -1,6 +1,4 @@
-import type { Root } from "../Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
-import type { Template } from "../../core/util/Template";
 
 export interface IRectangleSettings extends IGraphicsSettings {
 }
@@ -15,21 +13,6 @@ export interface IRectanglePrivate extends IGraphicsPrivate {
  * @important
  */
 export class Rectangle extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Rectangle["_settings"], template?: Template<Rectangle>): Rectangle {
-		const x = new Rectangle(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IRectangleSettings;
 	declare public _privateSettings: IRectanglePrivate;

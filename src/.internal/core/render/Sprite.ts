@@ -319,12 +319,12 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	tooltipText?: string;
 
 	/**
-	 * Tooltip pointer X coordinate realtive to the element itself.
+	 * Tooltip pointer X coordinate relative to the element itself.
 	 */
 	tooltipX?: number | Percent;
 
 	/**
-	 * Tooltip pointer Y coordinate realtive to the element itself.
+	 * Tooltip pointer Y coordinate relative to the element itself.
 	 */
 	tooltipY?: number | Percent;
 
@@ -642,6 +642,7 @@ export abstract class Sprite extends Entity {
 
 	public _parent: Container | undefined;
 	protected _dataItem: DataItem<IComponentDataItem> | undefined;
+
 	protected _templateField: Template<this> | undefined;
 
 	protected _sizeDirty: boolean = false;
@@ -2100,13 +2101,15 @@ export abstract class Sprite extends Entity {
 	}
 
 	protected _findStaticTemplate(f: (template: Template<this>) => boolean): Template<this> | undefined {
-		if (this._templateField) {
-			if (f(this._templateField)) {
-				return this._templateField;
-			}
+		const output = super._findStaticTemplate(f);
+
+		if (output) {
+			return output;
 		}
 
-		return super._findStaticTemplate(f);
+		if (this._templateField && f(this._templateField)) {
+			return this._templateField;
+		}
 	}
 
 	protected _walkParents(f: (parent: Entity) => void): void {

@@ -817,7 +817,7 @@ export abstract class Settings implements IDisposer, IAnimation {
  *
  * @important
  */
-export abstract class Entity extends Settings implements IDisposer {
+export class Entity extends Settings implements IDisposer {
 	public _root: Root;
 
 	public _user_id:any; // for testing purposes
@@ -835,10 +835,13 @@ export abstract class Entity extends Settings implements IDisposer {
 	public _dirty: Dirty<this["_settings"]> = {};
 	public _dirtyPrivate: Dirty<this["_privateSettings"]> = {};
 
-	private _template: Template<this> | undefined;
+	protected _template: Template<this> | undefined;
 
 	// Templates for the themes
 	protected _templates: Array<Template<this>> = [];
+
+	// Internal templates which can be overridden by the user's templates
+	protected _internalTemplates: Array<Template<this>>;
 
 	// Disposers for all of the templates
 	protected _templateDisposers: Array<IDisposer> = [];
@@ -861,27 +864,56 @@ export abstract class Entity extends Settings implements IDisposer {
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
 	 * @ignore
 	 */
-	constructor(root: Root, settings: Entity["_settings"], isReal: boolean, template?: Template<Entity>) {
+	constructor(root: Root, settings: Entity["_settings"], isReal: boolean, templates: Array<Template<Entity>> = []) {
 		super(settings);
 		if (!isReal) {
 			throw new Error("You cannot use `new Class()`, instead use `Class.new()`");
 		}
 		this._root = root;
-		this._template = template as any;
+		this._internalTemplates = templates as Array<Template<this>>;
+	}
+
+	/**
+	 * Use this method to create an instance of this class.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @param   root      Root element
+	 * @param   settings  Settings
+	 * @param   template  Template
+	 * @return            Instantiated object
+	 */
+	static new<C extends typeof Entity, T extends InstanceType<C>>(this: C, root: Root, settings: T["_settings"], template?: Template<T>): T {
+		const x = (new this(root, settings, true)) as T;
+		x._template = template;
+		x._afterNew();
+		return x;
+	}
+
+	static _new<C extends typeof Entity, T extends InstanceType<C>>(this: C, root: Root, settings: T["_settings"], templates: Array<Template<T>> = []): T {
+		const x = (new this(root, settings, true, templates)) as T;
+		x._afterNew();
+		return x;
 	}
 
 	protected _afterNew() {
 		this._checkDirty();
 
+		let shouldApply = false;
+
 		const template = this._template;
 
 		if (template) {
+			shouldApply = true;
 			template._setObjectTemplate(this);
-			this._applyTemplate(template, {
-				settings: {},
-				privateSettings: {},
-				states: {},
-			});
+		}
+
+		$array.each(this._internalTemplates, (template) => {
+			shouldApply = true;
+			template._setObjectTemplate(this);
+		});
+
+		if (shouldApply) {
+			this._applyTemplates(false);
 		}
 
 		this.states.create("default", {});
@@ -1225,11 +1257,15 @@ export abstract class Entity extends Settings implements IDisposer {
 			return false;
 		});
 
+		$array.each(this._internalTemplates, f);
+
 		$array.each(this._templates, f);
 	}
 
-	public _applyTemplates(): void {
-		this._disposeTemplates();
+	public _applyTemplates(remove: boolean = true): void {
+		if (remove) {
+			this._disposeTemplates();
+		}
 
 		const state: ApplyState<this> = {
 			settings: {},
@@ -1241,24 +1277,33 @@ export abstract class Entity extends Settings implements IDisposer {
 			this._applyTemplate(template, state);
 		});
 
-		$object.each(this._settings, (key) => {
-			if (!this._userProperties[key] && !state.settings[key]) {
-				super.remove(key);
-			}
-		});
+		if (remove) {
+			$object.each(this._settings, (key) => {
+				if (!this._userProperties[key] && !state.settings[key]) {
+					super.remove(key);
+				}
+			});
 
-		$object.each(this._privateSettings, (key) => {
-			if (!this._userPrivateProperties[key] && !state.privateSettings[key]) {
-				super.removePrivate(key);
-			}
-		});
+			$object.each(this._privateSettings, (key) => {
+				if (!this._userPrivateProperties[key] && !state.privateSettings[key]) {
+					super.removePrivate(key);
+				}
+			});
+		}
 	}
 
 	protected _findTemplate(f: (template: Template<this>) => boolean): Template<this> | undefined {
 		const value = this._findStaticTemplate(f);
 
 		if (value === undefined) {
-			return $array.find(this._templates, f);
+			const value = $array.find(this._internalTemplates, f);
+
+			if (value === undefined) {
+				return $array.find(this._templates, f);
+
+			} else {
+				return value;
+			}
 
 		} else {
 			return value;
@@ -1417,6 +1462,10 @@ export abstract class Entity extends Settings implements IDisposer {
 		if (template) {
 			template._removeObjectTemplate(this);
 		}
+
+		$array.each(this._internalTemplates, (template) => {
+			template._removeObjectTemplate(this);
+		});
 
 		this._removeTemplates();
 		this._disposeTemplates();

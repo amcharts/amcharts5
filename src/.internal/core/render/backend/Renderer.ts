@@ -179,6 +179,7 @@ export interface IGraphics extends IDisplayObject {
 	bezierCurveTo(cpX: number, cpY: number, cpX2: number, cpY2: number, toX: number, toY: number): void;
 	quadraticCurveTo(cpX: number, cpY: number, toX: number, toY: number): void;
 	svgPath(path: string): void;
+	shadow(color: Color, blur?: number, offsetX?: number, offsetY?: number, opacity?: number): void;
 }
 
 /**
@@ -241,6 +242,11 @@ export interface IPicture extends IDisplayObject {
 	image: HTMLImageElement | undefined;
 	width?: number | undefined;
 	height?: number | undefined;
+	shadowColor?: Color;
+	shadowBlur?: number;
+	shadowOffsetX?: number;
+	shadowOffsetY?: number;
+	shadowOpacity?: number;
 }
 
 export interface IRenderer extends IDisposer {

@@ -1,4 +1,3 @@
-import type { Root } from "../Root";
 import { Text, ITextSettings, ITextPrivate } from "./Text";
 import * as $math from "../util/Math";
 import type { IRadialText } from "./backend/Renderer";
@@ -25,21 +24,6 @@ export interface IRadialTextPrivate extends ITextPrivate {
  * @ignore
  */
 export class RadialText extends Text {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RadialText["_settings"]): RadialText {
-		const x = new RadialText(root, settings, true);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IRadialTextSettings;
 	declare public _privateSettings: IRadialTextPrivate;

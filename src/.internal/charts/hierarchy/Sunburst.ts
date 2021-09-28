@@ -123,21 +123,6 @@ export class Sunburst extends Partition {
 
 	protected _tag: string = "sunburst";
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Sunburst["_settings"], template?: Template<Sunburst>): Sunburst {
-		const x = new Sunburst(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "Sunburst";
 	public static classNames: Array<string> = Partition.classNames.concat([Sunburst.className]);
 
@@ -152,9 +137,9 @@ export class Sunburst extends Partition {
 	 */
 	public readonly slices: ListTemplate<Slice> = new ListTemplate(
 		Template.new({}),
-		() => Slice.new(this._root, {
+		() => Slice._new(this._root, {
 			themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
-		}, this.slices.template)
+		}, [this.slices.template])
 	);
 
 	/**
@@ -164,9 +149,9 @@ export class Sunburst extends Partition {
 	 */
 	public readonly labels: ListTemplate<RadialLabel> = new ListTemplate(
 		Template.new({}),
-		() => RadialLabel.new(this._root, {
+		() => RadialLabel._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag, "hierarchy", "node"])
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 	protected _afterNew() {

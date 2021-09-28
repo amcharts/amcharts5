@@ -1,9 +1,7 @@
 import { Layout } from "./Layout";
 import * as $type from "../util/Type";
 import { Percent } from "../util/Percent";
-import type { Template } from "../../core/util/Template";
 import type { Container } from "./Container";
-import type { Root } from "../Root";
 
 /**
  * A horizontal children layout for [[Container]].
@@ -11,21 +9,6 @@ import type { Root } from "../Root";
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
  */
 export class HorizontalLayout extends Layout {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: HorizontalLayout["_settings"], template?: Template<HorizontalLayout>): HorizontalLayout {
-		const x = new HorizontalLayout(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "HorizontalLayout";
 	public static classNames: Array<string> = Layout.classNames.concat([HorizontalLayout.className]);

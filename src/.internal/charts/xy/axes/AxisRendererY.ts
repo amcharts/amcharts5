@@ -1,4 +1,3 @@
-import type { Root } from "../../../core/Root";
 import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./AxisRenderer";
 import { p100 } from "../../../core/util/Percent";
 import type { IPoint } from "../../../core/util/IPoint";
@@ -44,25 +43,6 @@ export interface IAxisRendererYPrivate extends IAxisRendererPrivate {
  */
 export class AxisRendererY extends AxisRenderer {
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisRendererY["_settings"], template?: Template<AxisRendererY>): AxisRendererY {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["renderer", "y"]);
-		if (settings.opposite) {
-			settings.themeTags.push("opposite");
-		}
-		const x = new AxisRendererY(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "AxisRendererY";
 	public static classNames: Array<string> = AxisRenderer.classNames.concat([AxisRendererY.className]);
 
@@ -72,6 +52,11 @@ export class AxisRendererY extends AxisRenderer {
 	declare public readonly labelTemplate: Template<AxisLabel>;
 
 	public _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "y"]);
+		if (this._settings.opposite) {
+			this._settings.themeTags.push("opposite");
+		}
+
 		super._afterNew();
 		this._setPrivate("letter", "Y");
 
@@ -168,7 +153,7 @@ export class AxisRendererY extends AxisRenderer {
 
 	/**
 	 * Converts axis relative position to actual coordinate in pixels.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Point
 	 */
@@ -358,7 +343,7 @@ export class AxisRendererY extends AxisRenderer {
 			display.moveTo(0, y0);
 			display.lineTo(w, y0);
 			display.lineTo(w, y1);
-			display.lineTo(0, y1);			
+			display.lineTo(0, y1);
 			display.lineTo(0, y0);
 		})
 	}

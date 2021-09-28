@@ -1,5 +1,3 @@
-import type { Root } from "../Root"
-import type { Template } from "./Template";
 import type { Color } from "./Color"
 
 import { Entity, IEntitySettings } from "./Entity"
@@ -126,24 +124,8 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
  * Presets for common UI elements.
  */
 export class InterfaceColors extends Entity {
-
 	public static className: string = "InterfaceColors";
 	public static classNames: Array<string> = Entity.classNames.concat([InterfaceColors.className]);
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: InterfaceColors["_settings"], template?: Template<InterfaceColors>): InterfaceColors {
-		const x = new InterfaceColors(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IInterfaceColorsSettings;
 }

@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { IDisposer } from "../../core/util/Disposer";
 import type { Hierarchy, IHierarchyDataItem } from "./Hierarchy";
@@ -63,12 +62,12 @@ export class BreadcrumbBar extends Container {
 	 */
 	public readonly labels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
-		() => Label.new(this._root, {
+		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), ["label"]),
 			background: RoundedRectangle.new(this._root, {
 				themeTags: ["background"]
 			})
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 	public static className: string = "BreadcrumbBar";
@@ -79,20 +78,11 @@ export class BreadcrumbBar extends Container {
 	declare public _events: IBreadcrumbBarEvents;
 
 	protected _disposer: IDisposer | undefined;
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: BreadcrumbBar["_settings"], template?: Template<BreadcrumbBar>): BreadcrumbBar {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["breadcrumb"]);
-		const x = new BreadcrumbBar(root, settings, true, template);
-		x._afterNew();
-		return x;
+
+	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["breadcrumb"]);
+
+		super._afterNew();
 	}
 
 	public _changed() {

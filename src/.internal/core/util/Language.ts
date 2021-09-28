@@ -1,12 +1,10 @@
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
-import type { Root } from "../Root"
-import type { Template } from "./Template";
 import * as $array from "./Array"
 import en from "../../../locales/en";
 
 /**
  * Defines properties that exist for the locale.
- * 
+ *
  * @ignore
  */
 export interface ILocaleSettings {
@@ -280,22 +278,6 @@ export interface ILanguagePrivate extends IEntityPrivate {
 }
 
 export class Language extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Language["_settings"], template?: Template<Language>): Language {
-		const x = new Language(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: ILanguageSettings;
 	declare public _privateSettings: ILanguagePrivate;
 

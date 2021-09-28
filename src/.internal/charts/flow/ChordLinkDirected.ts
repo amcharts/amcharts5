@@ -1,7 +1,5 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { ChordDirected, IChordDirectedDataItem } from "./ChordDirected";
-import type { Template } from "../../core/util/Template";
 
 import { ChordLink, IChordLinkPrivate, IChordLinkSettings } from "./ChordLink";
 
@@ -26,23 +24,6 @@ export interface IChordLinkDirectedPrivate extends IChordLinkPrivate {
  * A link element used in [[ChordDirected]] chart.
  */
 export class ChordLinkDirected extends ChordLink {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ChordLinkDirected["_settings"], template?: Template<ChordLinkDirected>): ChordLinkDirected {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["chord", "link", "directed"]);
-		const x = new ChordLinkDirected(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IChordLinkDirectedSettings;
 	declare public _privateSettings: IChordLinkDirectedPrivate;
 
@@ -53,4 +34,9 @@ export class ChordLinkDirected extends ChordLink {
 
 	declare public series: ChordDirected | undefined;
 
+	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["chord", "link", "directed"]);
+
+		super._afterNew();
+	}
 }

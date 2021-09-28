@@ -1,7 +1,6 @@
 import type { DataItem } from "../../core/render/Component";
 import type { FlowNode } from "./FlowNode";
 import type { Chord } from "./Chord";
-import type { Root } from "../../core/Root";
 import type { Bullet } from "../../core/render/Bullet";
 
 import { FlowNodes, IFlowNodesSettings, IFlowNodesDataItem, IFlowNodesPrivate, IFlowNodesEvents } from "./FlowNodes";
@@ -49,22 +48,8 @@ export class ChordNodes extends FlowNodes {
 	 */
 	public readonly labels: ListTemplate<RadialLabel> = new ListTemplate(
 		Template.new({}),
-		() => RadialLabel.new(this._root, {}, this.labels.template)
+		() => RadialLabel._new(this._root, {}, [this.labels.template])
 	);
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ChordNodes["_settings"], template?: Template<ChordNodes>): ChordNodes {
-		const x = new ChordNodes(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IChordNodesSettings;
 	declare public _privateSettings: IChordNodesPrivate;
@@ -85,7 +70,7 @@ export class ChordNodes extends FlowNodes {
 	 */
 	public readonly rectangles: ListTemplate<Slice> = new ListTemplate(
 		Template.new({}),
-		() => Slice.new(this._root, { themeTags: ["shape"] }, this.rectangles.template)
+		() => Slice._new(this._root, { themeTags: ["shape"] }, [this.rectangles.template])
 	);
 
 	/**

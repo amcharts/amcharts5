@@ -1,7 +1,5 @@
-import type { Root } from "../../../core/Root";
 import { Label, ILabelSettings, ILabelPrivate } from "../../../core/render/Label";
 import type { IPoint } from "../../../core/util/IPoint";
-import type { Template } from "../../../core/util/Template";
 
 export interface IAxisLabel extends Label {
 
@@ -37,7 +35,7 @@ export interface IAxisLabel extends Label {
 	 *
 	 * E.g. `0.1` will mean that label will not be shown if it's closer to the
 	 * beginning of the axis than 10%.
-	 * 
+	 *
 	 * @default 0
 	 */
 	minPosition?: number;
@@ -48,7 +46,7 @@ export interface IAxisLabel extends Label {
 	 *
 	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
 	 * end of the axis than 10%.
-	 * 
+	 *
 	 * @default 0
 	 */
 	maxPosition?: number;
@@ -93,7 +91,7 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 *
 	 * E.g. `0.1` will mean that label will not be shown if it's closer to the
 	 * beginning of the axis than 10%.
-	 * 
+	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 */
@@ -105,7 +103,7 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 *
 	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
 	 * end of the axis than 10%.
-	 * 
+	 *
 	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 */
@@ -123,21 +121,6 @@ export interface IAxisLabelPrivate extends ILabelPrivate {
  * @important
  */
 export class AxisLabel extends Label implements IAxisLabel {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisLabel["_settings"], template?: Template<AxisLabel>): AxisLabel {
-		const x = new AxisLabel(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IAxisLabelSettings;
 	declare public _privateSettings: IAxisLabelPrivate;

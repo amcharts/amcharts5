@@ -1,9 +1,7 @@
-import type { Root } from "../../../core/Root";
 import type { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
 import { CategoryAxis, ICategoryAxisSettings, ICategoryAxisPrivate, ICategoryAxisDataItem, ICategoryAxisEvents } from "./CategoryAxis";
 import type { ITimeInterval } from "../../../core/util/Time";
-import type { Template } from "../../../core/util/Template";
 import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
@@ -13,14 +11,14 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 
 	/**
 	 * Indicates granularity of data.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
 	/**
 	 * A list of intervals the axis is allowed to show grid/labels on.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
@@ -81,23 +79,6 @@ export interface ICategoryDateAxisEvents extends ICategoryAxisEvents {
  * @important
  */
 export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new<R extends AxisRenderer>(root: Root, settings: CategoryDateAxis<R>["_settings"], template?: Template<CategoryDateAxis<R>>): CategoryDateAxis<R> {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["axis"]);
-		const x = new CategoryDateAxis<R>(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "CategoryDateAxis";
 	public static classNames: Array<string> = CategoryAxis.classNames.concat([CategoryDateAxis.className]);
 
@@ -111,6 +92,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 	protected _itemMap: { [index: string]: DataItem<ICategoryDateAxisDataItem> } = {};
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		this.fields.push("category");
 		super._afterNew();
 	}
@@ -259,7 +241,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 
 	/**
 	 * Returns a duration of currently active `baseInterval` in milliseconds.
-	 * 
+	 *
 	 * @return Duration
 	 */
 	public baseDuration(): number {
@@ -269,7 +251,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 
 	/**
 	 * Returns text to be used in an axis tooltip for specific relative position.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */

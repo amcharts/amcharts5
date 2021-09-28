@@ -1,5 +1,4 @@
 import type { HierarchyNode } from "./HierarchyNode";
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 
 import { Hierarchy, IHierarchyPrivate, IHierarchySettings, IHierarchyDataItem, IHierarchyDataObject } from "./Hierarchy";
@@ -39,7 +38,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 
 	/**
 	 * Gap between nodes and top edge.
-	 * 
+	 *
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
@@ -48,7 +47,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 
 	/**
 	 * Gap between nodes and bottomedge.
-	 * 
+	 *
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
@@ -57,7 +56,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 
 	/**
 	 * Gap between nodes and left edge.
-	 * 
+	 *
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
@@ -66,7 +65,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 
 	/**
 	 * Gap between nodes and bottom edge.
-	 * 
+	 *
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
@@ -110,21 +109,6 @@ export class Treemap extends Hierarchy {
 
 	protected _tag: string = "treemap";
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Treemap["_settings"], template?: Template<Treemap>): Treemap {
-		const x = new Treemap(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "Treemap";
 	public static classNames: Array<string> = Hierarchy.classNames.concat([Treemap.className]);
 
@@ -141,9 +125,9 @@ export class Treemap extends Hierarchy {
 	 */
 	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
-		() => RoundedRectangle.new(this._root, {
+		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.rectangles.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
-		}, this.rectangles.template)
+		}, [this.rectangles.template])
 	);
 
 	protected _afterNew() {

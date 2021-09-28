@@ -1,5 +1,3 @@
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 import { Entity, IEntitySettings, IEntityPrivate } from "../../core/util/Entity";
 import type { Sprite } from "../../core/render/Sprite";
 import type { Series } from "../../core/render/Series";
@@ -39,7 +37,7 @@ export interface IBulletSettings extends IEntitySettings {
 	 *
 	 * NOTE: Works only in  [[Flow]] and [[MapPointSeries]] (when [[MapPoint]] is
 	 * attached to a [[MapLine]]).
-	 * 
+	 *
 	 * @default false
 	 */
 	autoRotate?: boolean;
@@ -74,21 +72,6 @@ export class Bullet extends Entity {
 	 * Target series object if it's a bullet for series.
 	 */
 	public series: Series | undefined;
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Bullet["_settings"], template?: Template<Bullet>): Bullet {
-		const x = new Bullet(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public _beforeChanged() {
 		super._beforeChanged();

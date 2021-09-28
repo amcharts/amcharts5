@@ -1,6 +1,4 @@
-import type { Root } from "../../../core/Root";
 import { RadialLabel, IRadialLabelSettings, IRadialLabelPrivate } from "../../../core/render/RadialLabel";
-import type { Template } from "../../../core/util/Template";
 import type { IPoint } from "../../../core/util/IPoint";
 
 export interface IAxisLabelRadialSettings extends IRadialLabelSettings {
@@ -26,7 +24,7 @@ export interface IAxisLabelRadialSettings extends IRadialLabelSettings {
 	 *
 	 * E.g. `0.1` will mean that label will not be shown if it's closer to the
 	 * beginning of the axis than 10%.
-	 * 
+	 *
 	 * @default 0
 	 */
 	minPosition?: number;
@@ -37,7 +35,7 @@ export interface IAxisLabelRadialSettings extends IRadialLabelSettings {
 	 *
 	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
 	 * end of the axis than 10%.
-	 * 
+	 *
 	 * @default 0
 	 */
 	maxPosition?: number;
@@ -53,21 +51,6 @@ export interface IAxisLabelRadialPrivate extends IRadialLabelPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels} for more info
  */
 export class AxisLabelRadial extends RadialLabel {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisLabelRadial["_settings"], template?: Template<AxisLabelRadial>): AxisLabelRadial {
-		const x = new AxisLabelRadial(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IAxisLabelRadialSettings;
 	declare public _privateSettings: IAxisLabelRadialPrivate;

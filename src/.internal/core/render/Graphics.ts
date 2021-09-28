@@ -1,10 +1,10 @@
-import type { Root } from "../Root";
-import { ISpriteSettings, ISpritePrivate, ISpriteEvents, Sprite } from "./Sprite";
-import { IGraphics, BlendMode } from "./backend/Renderer";
 import type { Color } from "../util/Color";
 import type { Pattern } from "../render/patterns/Pattern";
 import type { Gradient } from "../render/gradients/Gradient";
-import type { Template } from "../../core/util/Template";
+
+import { ISpriteSettings, ISpritePrivate, ISpriteEvents, Sprite } from "./Sprite";
+import { IGraphics, BlendMode } from "./backend/Renderer";
+
 import * as $type from "../util/Type";
 import * as $array from "../util/Array";
 
@@ -29,42 +29,42 @@ export interface IGraphicsSettings extends ISpriteSettings {
 
 	/**
 	 * Fill pattern.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more information
 	 */
 	fillPattern?: Pattern;
 
 	/**
 	 * Stroke (border or line) pattern.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more information
 	 */
 	strokePattern?: Pattern;
 
 	/**
 	 * Fill gradient.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
 	 */
 	fillGradient?: Gradient;
 
 	/**
 	 * Stroke (border or line) gradient.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
 	 */
 	strokeGradient?: Gradient;
 
 	/**
 	 * Stroke (border or line) dash settings.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
 	 */
 	strokeDasharray?: number[] | number;
 
 	/**
 	 * Stroke (border or line) dash offset.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
 	 */
 	strokeDashoffset?: number;
@@ -102,10 +102,52 @@ export interface IGraphicsSettings extends ISpriteSettings {
 
 	/**
 	 * Draw a shape using an SVG path.
-	 * 
+	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths} for more information
 	 */
 	svgPath?: string;
+
+	/**
+	 * Color of the element's shadow.
+	 *
+	 * For this to work at least one of the following needs to be set as well:
+	 * `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowColor?: Color | null;
+
+	/**
+	 * Blurriness of the the shadow.
+	 *
+	 * The bigger the number, the more blurry shadow will be.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowBlur?: number;
+
+	/**
+	 * Horizontal shadow offset in pixels.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowOffsetX?: number;
+
+	/**
+	 * Vertical shadow offset in pixels.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowOffsetY?: number;
+
+	/**
+	 * Opacity of the shadow (0-1).
+	 *
+	 * If not set, will use the same as `fillOpacity` of the element.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowOpacity?: number;
 
 }
 
@@ -122,21 +164,6 @@ export interface IGraphicsEvents extends ISpriteEvents {
  * @important
  */
 export class Graphics extends Sprite {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Graphics["_settings"], template?: Template<Graphics>): Graphics {
-		const x = new Graphics(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IGraphicsSettings;
 	declare public _privateSettings: IGraphicsPrivate;
@@ -156,13 +183,14 @@ export class Graphics extends Sprite {
 			this.markDirtyBounds();
 		}
 
-		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath")) {
+		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
 			this._clear = true;
 		}
 
 		if (this.isDirty("fillGradient")) {
 			const gradient = this.get("fillGradient");
 			if (gradient) {
+				this._display.isMeasured = true;
 				const gradientTarget = gradient.get("target");
 				if (gradientTarget) {
 					gradientTarget.events.on("boundschanged", () => {
@@ -178,6 +206,7 @@ export class Graphics extends Sprite {
 		if (this.isDirty("strokeGradient")) {
 			const gradient = this.get("strokeGradient");
 			if (gradient) {
+				this._display.isMeasured = true;
 				const gradientTarget = gradient.get("target");
 				if (gradientTarget) {
 					gradientTarget.events.on("boundschanged", () => {
@@ -242,7 +271,17 @@ export class Graphics extends Sprite {
 			const strokeGradient = this.get("strokeGradient");
 			const strokePattern = this.get("strokePattern");
 
+			const shadowColor = this.get("shadowColor");
+			const shadowBlur = this.get("shadowBlur");
+			const shadowOffsetX = this.get("shadowOffsetX");
+			const shadowOffsetY = this.get("shadowOffsetY");
+			const shadowOpacity = this.get("shadowOpacity");
+
 			//const bounds = this._display.getLocalBounds();
+
+			if (shadowColor && (shadowBlur || shadowOffsetX || shadowOffsetY)) {
+				this._display.shadow(shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY, shadowOpacity);
+			}
 
 			if (fillPattern) {
 				let changed = false;
@@ -344,6 +383,7 @@ export class Graphics extends Sprite {
 				}
 
 			}
+
 		}
 		this._clear = false;
 	}

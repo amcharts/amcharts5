@@ -1,5 +1,4 @@
 import type { HierarchyNode } from "./HierarchyNode";
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 
 import { Hierarchy, IHierarchyPrivate, IHierarchySettings, IHierarchyDataItem, IHierarchyDataObject } from "./Hierarchy";
@@ -91,22 +90,6 @@ export class Partition extends Hierarchy {
 
 	protected _tag: string = "partition";
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Partition["_settings"], template?: Template<Partition>): Partition {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["partition", settings.orientation || "vertical"]);
-		const x = new Partition(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "Partition";
 	public static classNames: Array<string> = Hierarchy.classNames.concat([Partition.className]);
 
@@ -117,9 +100,9 @@ export class Partition extends Hierarchy {
 	 */
 	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
-		() => RoundedRectangle.new(this._root, {
+		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.rectangles.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
-		}, this.rectangles.template)
+		}, [this.rectangles.template])
 	);
 
 	public _partitionLayout = d3hierarchy.partition();
@@ -127,6 +110,7 @@ export class Partition extends Hierarchy {
 	declare public _rootNode: d3hierarchy.HierarchyRectangularNode<IPartitionDataObject> | undefined;
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["partition", this._settings.orientation || "vertical"]);
 		super._afterNew();
 		this.setPrivate("scaleX", 1);
 		this.setPrivate("scaleY", 1);

@@ -1,9 +1,7 @@
 import { Layout, ILayoutSettings, ILayoutPrivate } from "./Layout";
 import * as $array from "../util/Array";
 import * as $math from "../util/Math";
-import type { Template } from "../../core/util/Template";
 import type { Container } from "./Container";
-import type { Root } from "../Root";
 import type { List } from "../util/List";
 import type { Sprite } from "./Sprite";
 
@@ -33,21 +31,6 @@ export interface IGridLayoutPrivate extends ILayoutPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
  */
 export class GridLayout extends Layout {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: GridLayout["_settings"], template?: Template<GridLayout>): GridLayout {
-		const x = new GridLayout(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "GridLayout";
 	public static classNames: Array<string> = Layout.classNames.concat([GridLayout.className]);

@@ -1,6 +1,3 @@
-import type { Root } from "../../Root";
-import type { Template } from "../../util/Template";
-
 import { Pattern, IPatternSettings, IPatternPrivate } from "./Pattern";
 
 import * as $math from "../../util/Math";
@@ -16,14 +13,14 @@ export interface IRectanglePatternSettings extends IPatternSettings {
 
 	/**
 	 * Maximum width of the rectangle, in pixels.
-	 * 
+	 *
 	 * @default 5
 	 */
 	maxWidth?: number;
 
 	/**
 	 * Maximum height of the rectangle, in pixels.
-	 * 
+	 *
 	 * @default 5
 	 */
 	maxHeight?: number;
@@ -38,7 +35,7 @@ export interface IRectanglePatternSettings extends IPatternSettings {
 
 	/**
 	 * Center rectangles.
-	 * 
+	 *
 	 * @default true
 	 */
 	centered?: boolean;
@@ -54,21 +51,6 @@ export interface IRectanglePatternPrivate extends IPatternPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class RectanglePattern extends Pattern {
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RectanglePattern["_settings"], template?: Template<RectanglePattern>): RectanglePattern {
-		const x = new RectanglePattern(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IRectanglePatternSettings;
 	declare public _privateSettings: IRectanglePatternPrivate;
 
@@ -90,8 +72,8 @@ export class RectanglePattern extends Pattern {
 		const centered = this.get("centered", true);
 		const gap = this.get("gap", 0);
 		const rotation = this.get("rotation", 0);
-		let w = this.get("width");
-		let h = this.get("height");
+		let w = this.get("width", 100);
+		let h = this.get("height", 100);
 		let rectW = this.get("maxWidth", 5);
 		let rectH = this.get("maxHeight", 5);
 

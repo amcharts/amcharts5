@@ -1,8 +1,6 @@
 import type { MapSeries } from "./MapSeries";
-import type { Root } from "../../core/Root";
 import type { GeoProjection, GeoPath } from "d3-geo";
 import type { IPoint } from "../../core/util/IPoint";
-import type { Template } from "../../core/util/Template";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { Time } from "../../core/util/Animation";
 import type { ZoomControl } from "./ZoomControl";
@@ -223,22 +221,6 @@ export interface IMapChartEvents extends ISerialChartEvents {
 
 
 export class MapChart extends SerialChart {
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: MapChart["_settings"], template?: Template<MapChart>): MapChart {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["map"]);
-		const x = new MapChart(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "MapChart";
 	public static classNames: Array<string> = SerialChart.classNames.concat([MapChart.className]);
 
@@ -584,6 +566,8 @@ export class MapChart extends SerialChart {
 	}
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["map"]);
+
 		super._afterNew();
 
 		this._makeGeoPath();
@@ -864,7 +848,7 @@ export class MapChart extends SerialChart {
 								//y = Math.min(y, h / 2 + (hh / 2 - 1) * zoomLevel - hh / 2 * maxPanOut);
 								//y = Math.max(y, h / 2 - (hh / 2 - 1) * zoomLevel + hh / 2 * maxPanOut);
 							}
-*/		
+*/
 							this.set("translateX", x);
 							this.set("translateY", y);
 

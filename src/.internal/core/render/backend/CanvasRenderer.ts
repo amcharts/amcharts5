@@ -588,8 +588,15 @@ class BeginFill extends Op {
  * @ignore
  */
 class EndFill extends Op {
+	constructor(public clearShadow: boolean) { super(); }
 	public colorize(context: CanvasRenderingContext2D, _forceColor: string | undefined): void {
 		context.fill();
+		if (this.clearShadow) {
+			context.shadowColor = "";
+			context.shadowBlur = 0;
+			context.shadowOffsetX = 0;
+			context.shadowOffsetY = 0;
+		}
 	}
 }
 
@@ -846,10 +853,44 @@ class QuadraticCurveTo extends Op {
 /**
  * @ignore
  */
+class Shadow extends Op {
+	constructor(
+		public color: string,
+		public blur?: number,
+		public offsetX?: number,
+		public offsetY?: number,
+		public opacity?: number
+	) { super(); }
+
+	public colorize(context: CanvasRenderingContext2D, _forceColor: string | undefined): void {
+		if (this.opacity) {
+			context.fillStyle = this.color;
+		}
+		context.shadowColor = this.color;
+		if (this.blur) {
+			context.shadowBlur = this.blur;
+		}
+		if (this.offsetX) {
+			context.shadowOffsetX = this.offsetX;
+		}
+		if (this.offsetY) {
+			context.shadowOffsetY = this.offsetY;
+		}
+	}
+}
+
+
+/**
+ * @ignore
+ */
 export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 	protected _operations: Array<Op> = [];
 
 	public blendMode: BlendMode = BlendMode.NORMAL;
+
+	protected _hasShadows: boolean = false;
+	protected _fillAlpha?: number;
+	protected _strokeAlpha?: number;
 
 	clear(): void {
 		super.clear();
@@ -861,6 +902,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 	}
 
 	beginFill(color?: Color | CanvasGradient | CanvasPattern, alpha: number = 1): void {
+		this._fillAlpha = alpha;
 		if (color) {
 			if (color instanceof Color) {
 				this._pushOp(new BeginFill(color.toCSS(alpha)));
@@ -875,7 +917,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 	}
 
 	endFill(): void {
-		this._pushOp(new EndFill());
+		this._pushOp(new EndFill(this._hasShadows));
 	}
 
 	endStroke(): void {
@@ -883,6 +925,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 	}
 
 	lineStyle(width: number = 0, color?: Color | CanvasGradient | CanvasPattern, alpha: number = 1): void {
+		this._strokeAlpha = alpha;
 		if (color) {
 			if (color instanceof Color) {
 				this._pushOp(new LineStyle(width, color.toCSS(alpha)));
@@ -936,6 +979,11 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 
 	closePath(): void {
 		this._pushOp(new ClosePath());
+	}
+
+	shadow(color: Color, blur?: number, offsetX?: number, offsetY?: number, opacity?: number): void {
+		this._hasShadows = true;
+		this._pushOp(new Shadow(opacity ? color.toCSS(opacity) : color.toCSS(this._fillAlpha || this._strokeAlpha), blur, offsetX, offsetY));
 	}
 
 	// TODO better error checking
@@ -2375,6 +2423,12 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 	public image: HTMLImageElement | undefined;
 	public tainted?: boolean;
 
+	public shadowColor?: Color;
+	public shadowBlur?: number;
+	public shadowOffsetX?: number;
+	public shadowOffsetY?: number;
+	public shadowOpacity?: number;
+
 	protected _imageMask: HTMLCanvasElement | undefined;
 
 	constructor(renderer: CanvasRenderer, image: HTMLImageElement | undefined) {
@@ -2424,6 +2478,20 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 			}
 
 			if (layer.dirty) {
+
+				if (this.shadowColor) {
+					layer.context.shadowColor = this.shadowColor.toCSS(this.shadowOpacity || 1);
+				}
+				if (this.shadowBlur) {
+					layer.context.shadowBlur = this.shadowBlur;
+				}
+				if (this.shadowOffsetX) {
+					layer.context.shadowOffsetX = this.shadowOffsetX;
+				}
+				if (this.shadowOffsetY) {
+					layer.context.shadowOffsetY = this.shadowOffsetY;
+				}
+
 				const width = this.width || this.image.naturalWidth;
 				const height = this.height || this.image.naturalHeight;
 

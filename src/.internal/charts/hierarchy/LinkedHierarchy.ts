@@ -118,11 +118,11 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	 */
 	public readonly nodes: ListTemplate<LinkedHierarchyNode> = new ListTemplate(
 		Template.new({}),
-		() => LinkedHierarchyNode.new(this._root, {
+		() => LinkedHierarchyNode._new(this._root, {
 			themeTags: $utils.mergeTags(this.nodes.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "node"]),
 			x: this.width() / 2,
 			y: this.height() / 2
-		}, this.nodes.template)
+		}, [this.nodes.template])
 	);
 
 	/**
@@ -132,9 +132,9 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	 */
 	public readonly circles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
-		() => Circle.new(this._root, {
+		() => Circle._new(this._root, {
 			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "node", "shape"])
-		}, this.circles.template)
+		}, [this.circles.template])
 	);
 
 	/**
@@ -144,9 +144,9 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	 */
 	public readonly outerCircles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
-		() => Circle.new(this._root, {
+		() => Circle._new(this._root, {
 			themeTags: $utils.mergeTags(this.outerCircles.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "node", "outer", "shape"])
-		}, this.outerCircles.template)
+		}, [this.outerCircles.template])
 	);
 
 	/**
@@ -156,9 +156,9 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	 */
 	public readonly links: ListTemplate<HierarchyLink> = new ListTemplate(
 		Template.new({}),
-		() => HierarchyLink.new(this._root, {
+		() => HierarchyLink._new(this._root, {
 			themeTags: $utils.mergeTags(this.links.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "link"])
-		}, this.links.template)
+		}, [this.links.template])
 	);
 
 	/**

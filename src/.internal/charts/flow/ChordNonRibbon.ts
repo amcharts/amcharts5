@@ -1,6 +1,4 @@
 import type { ChordLink } from "./ChordLink";
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 import type { RibbonGenerator, RibbonSubgroup, Ribbon } from "d3-chord";
 
 import { Chord, IChordSettings, IChordDataItem, IChordPrivate, IChordEvents } from "./Chord";
@@ -48,20 +46,10 @@ export class ChordNonRibbon extends Chord {
 	declare public _privateSettings: IChordNonRibbonPrivate;
 	declare public _dataItemSettings: IChordNonRibbonDataItem;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ChordNonRibbon["_settings"], template?: Template<ChordNonRibbon>): ChordNonRibbon {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["chord", "basic"]);
-		const x = new ChordNonRibbon(root, settings, true, template);
-		x._afterNew();
-		return x;
+	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["chord", "basic"]);
+
+		super._afterNew();
 	}
 
 	protected _makeMatrix(): number[][] {

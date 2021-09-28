@@ -1,5 +1,4 @@
 import type { ExportingMenu } from "./ExportingMenu"
-import type { Template } from "../../core/util/Template";
 
 import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../core/util/Entity"
 import { Color } from "../../core/util/Color";
@@ -26,7 +25,7 @@ export interface IFont {
 
 /**
  * This is used to cache the pdfmake loading.
- * 
+ *
  * @ignore
  */
 let pdfmakePromise: Promise<any>;
@@ -485,7 +484,7 @@ export interface IExportingDataOptions extends IExportingFormatOptions {
 
 	/**
 	 * Use timestamps instead of formatted dates.
-	 * 
+	 *
 	 * @default false
 	 */
 	useTimestamps?: boolean;
@@ -549,7 +548,7 @@ export interface IExportingCSVOptions extends IExportingDataOptions {
 
 	/**
 	 * Reverse order of the records in data.
-	 * 
+	 *
 	 * @default false
 	 */
 	reverse?: boolean;
@@ -591,22 +590,6 @@ export interface IExportingXLSXOptions extends IExportingDataOptions {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/} for more info
  */
 export class Exporting extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Exporting["_settings"], template?: Template<Exporting>): Exporting {
-		const x = new Exporting(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "Exporting";
 	public static classNames: Array<string> = Entity.classNames.concat([Exporting.className]);
 
@@ -660,7 +643,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Triggers a download of the chart/data in specific format.
-	 * 
+	 *
 	 * @param  format         Format
 	 * @param  customOptions  Format options
 	 */
@@ -681,7 +664,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Triggers print of the chart.
-	 * 
+	 *
 	 * @param  customOptions  Print options
 	 */
 	public async print(customOptions?: IExportingPrintOptions) {
@@ -698,7 +681,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns data uri of the chart/data in specific format.
-	 * 
+	 *
 	 * @param          format  Format
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -752,7 +735,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns chart image as a data:uri.
-	 * 
+	 *
 	 * @param   format         Image format
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -764,7 +747,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns canvas data.
-	 * 
+	 *
 	 * @param   customOptions  Image options
 	 * @return                 Promise
 	 */
@@ -775,7 +758,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a `<canvas>` element with snapshot of the chart.
-	 * 
+	 *
 	 * @param   options  Image options
 	 * @return           Promise
 	 */
@@ -910,7 +893,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri representation of a JSON file with chart data.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -920,7 +903,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns data in JSON format.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -944,7 +927,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri representation of a CSV file with chart data.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -954,7 +937,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a CSV with export data.
-	 * 
+	 *
 	 * @param   customOptions  CSV options
 	 * @return                 Promise
 	 */
@@ -1093,7 +1076,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri representation of an HTML file with chart data.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -1103,7 +1086,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns an HTML with a table with export data.
-	 * 
+	 *
 	 * @param   customOptions  HTML options
 	 * @return                 Promise
 	 */
@@ -1253,7 +1236,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri representation of an XLSX file with chart data.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -1263,7 +1246,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri of XLSX data.
-	 * 
+	 *
 	 * @param  customOptions  Format options
 	 * @return                Promise
 	 */
@@ -1427,7 +1410,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri representation of a PDF file with chart image.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -1437,7 +1420,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a data:uri representation of a PDF file with chart data.
-	 * 
+	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
 	 */
@@ -1799,7 +1782,7 @@ export class Exporting extends Entity {
 	/**
 		* Returns `true` if `dataSource` is set, and the contents are proper
 		* data (array).
-		* 
+		*
 		* @return Has data?
 		*/
 	public hasData(): boolean {
@@ -1809,7 +1792,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns processed data according to format options.
-	 * 
+	 *
 	 * @param   format         Format
 	 * @param   customOptions  Format options
 	 * @param   renameFields   Should fields be renamed?
@@ -2326,7 +2309,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a list of formats that can be exported in current browser.
-	 * 
+	 *
 	 * @return Formats
 	 */
 	public supportedFormats(): ExportingFormats[] {
@@ -2346,7 +2329,7 @@ export class Exporting extends Entity {
 
 	/**
 	 * Returns a list of supported export types: image or print.
-	 * 
+	 *
 	 * @return Supported types
 	 */
 	public supportedExportTypes(): ExportingTypes[] {

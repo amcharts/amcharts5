@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { RadialLabel } from "../../core/render/RadialLabel";
 
@@ -44,7 +43,7 @@ export interface IChordSettings extends IFlowSettings {
 
 	/**
 	 * Angle of a gap between each node, in degrees.
-	 * 
+	 *
 	 * @default 1
 	 */
 	padAngle?: number;
@@ -64,8 +63,8 @@ export interface IChordSettings extends IFlowSettings {
 	 *
 	 * @default 10
 	 */
-	nodeWidth?: number;	
-	
+	nodeWidth?: number;
+
 	/**
 	 * Starting angle in degrees.
 	 *
@@ -106,24 +105,8 @@ export class Chord extends Flow {
 	 */
 	public readonly links: ListTemplate<ChordLink> = new ListTemplate(
 		Template.new({}),
-		() => ChordLink.new(this._root, {themeTags:["link", "shape"]}, this.links.template)
+		() => ChordLink._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
 	);
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Chord["_settings"], template?: Template<Chord>): Chord {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["chord"]);
-		const x = new Chord(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	/**
 	 * A series for all chord nodes.
@@ -142,6 +125,7 @@ export class Chord extends Flow {
 	public _ribbon = ribbon();
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["chord"]);
 		this.linksContainer.setAll({ x: p50, y: p50 })
 		this.bulletsContainer.setAll({ x: p50, y: p50 });
 		super._afterNew();

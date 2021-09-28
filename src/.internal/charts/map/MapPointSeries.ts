@@ -1,9 +1,7 @@
 import type { IMapLineSeriesDataItem, MapLineSeries } from "./MapLineSeries";
 import type { IMapPolygonSeriesDataItem, MapPolygonSeries } from "./MapPolygonSeries";
-import type { Root } from "../../core/Root";
 import type { Bullet } from "../../core/render/Bullet";
 import type { DataItem } from "../../core/render/Component";
-import type { Template } from "../../core/util/Template";
 import type { MapLine } from "./MapLine";
 import type { MapPolygon } from "./MapPolygon";
 
@@ -112,21 +110,6 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
  * @important
  */
 export class MapPointSeries extends MapSeries {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: MapPointSeries["_settings"], template?: Template<MapPointSeries>): MapPointSeries {
-		const x = new MapPointSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "MapPointSeries";
 	public static classNames: Array<string> = MapSeries.classNames.concat([MapPointSeries.className]);
@@ -337,7 +320,7 @@ export class MapPointSeries extends MapSeries {
 	/**
 	 * Centers the map to specific series' data item and zooms to the level
 	 * specified in the parameters.
-	 * 
+	 *
 	 * @param  dataItem   Map point
 	 * @param  zoomLevel  Zoom level
 	 */

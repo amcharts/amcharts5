@@ -1,6 +1,4 @@
 import type { Exporting, ExportingFormats, ExportingTypes } from "./Exporting"
-import type { Template } from "../../core/util/Template";
-import type { Root } from "../../core/Root"
 
 import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../core/util/Entity"
 import { IDisposer, Disposer } from "../../core/util/Disposer";
@@ -102,7 +100,7 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	/**
 	 * If set to `true` the menu will close automatically when export operation
 	 * is initiated.
-	 * 
+	 *
 	 * @default true
 	 */
 	autoClose?: boolean;
@@ -110,7 +108,7 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	/**
 	 * Menu will disable all interactions for the underlying chart when browsing
 	 * the menu.
-	 * 
+	 *
 	 * @default true
 	 */
 	deactivateRoot?: boolean;
@@ -132,22 +130,6 @@ export interface IExportingMenuEvents extends IEntityEvents {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/} for more info
  */
 export class ExportingMenu extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ExportingMenu["_settings"], template?: Template<ExportingMenu>): ExportingMenu {
-		const x = new ExportingMenu(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "ExportingMenu";
 	public static classNames: Array<string> = Entity.classNames.concat([ExportingMenu.className]);
 

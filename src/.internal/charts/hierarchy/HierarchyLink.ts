@@ -1,7 +1,5 @@
-import type { Root } from "../../core/Root";
 import type { IHierarchyDataItem } from "./Hierarchy";
 import type { DataItem } from "../../core/render/Component";
-import type { Template } from "../../core/util/Template";
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 
@@ -37,22 +35,6 @@ export interface IHierarchyLinkPrivate extends IGraphicsPrivate {
  * Draws a link between nodes in a hierarchy series.
  */
 export class HierarchyLink extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: HierarchyLink["_settings"], template?: Template<HierarchyLink>): HierarchyLink {
-		const x = new HierarchyLink(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IHierarchyLinkSettings;
 	declare public _privateSettings: IHierarchyLinkPrivate;
 

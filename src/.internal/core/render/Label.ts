@@ -1,10 +1,8 @@
-import type { Root } from "../Root";
 import { Text } from "../render/Text";
 import type { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
 import { p50, p100 } from "../util/Percent";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
-import type { Template } from "../../core/util/Template";
 import * as  $array from "../../core/util/Array";
 import type { DataItem, IComponentDataItem } from "./Component";
 
@@ -169,21 +167,6 @@ export interface ILabelPrivate extends IContainerPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/} for more info
  */
 export class Label extends Container {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Label["_settings"], template?: Template<Label>): Label {
-		const x = new Label(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ILabelSettings;
 	declare public _privateSettings: ILabelPrivate;

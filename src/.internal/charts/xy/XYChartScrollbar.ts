@@ -1,8 +1,6 @@
-import type { Root } from "../../core/Root";
 import { Scrollbar, IScrollbarPrivate, IScrollbarSettings } from "../../core/render/Scrollbar";
 import { XYChart } from "./XYChart";
 import { Graphics } from "../../core/render/Graphics";
-import type { Template } from "../../core/util/Template";
 import * as $utils from "../../core/util/Utils";
 
 export interface IXYChartScrollbarSettings extends IScrollbarSettings {
@@ -19,23 +17,6 @@ export interface IXYChartScrollbarPrivate extends IScrollbarPrivate {
  * @important
  */
 export class XYChartScrollbar extends Scrollbar {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: XYChartScrollbar["_settings"], template?: Template<XYChartScrollbar>): XYChartScrollbar {
-		this._addOrientationClass(root, settings);
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["scrollbar", "xy", "chart", settings.orientation]);
-		const x = new XYChartScrollbar(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IXYChartScrollbarSettings;
 	declare public _privateSettings: IXYChartScrollbarPrivate;
@@ -67,15 +48,21 @@ export class XYChartScrollbar extends Scrollbar {
 	}));
 
 	protected _afterNew() {
+		this._addOrientationClass();
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["scrollbar", "xy", "chart", this._settings.orientation]);
 
-		this.children.moveValue(this.thumb);
-		this.children.moveValue(this.startGrip);
-		this.children.moveValue(this.endGrip);
+		const children = this.children;
+		children.moveValue(this.thumb);
+		children.moveValue(this.startGrip);
+		children.moveValue(this.endGrip);
+
 		this.thumb.set("opacity", 0);
 		this.thumb.states.create("hover", { opacity: 0.2 });
 
-		this.chart.plotContainer.set("interactive", false);
-		this.chart.plotContainer.children.removeValue(this.chart.zoomOutButton);
+		const plotContainer = this.chart.plotContainer;
+		plotContainer.set("interactive", false);
+		plotContainer.set("background", undefined);
+		plotContainer.children.removeValue(this.chart.zoomOutButton);
 
 		super._afterNew();
 	}

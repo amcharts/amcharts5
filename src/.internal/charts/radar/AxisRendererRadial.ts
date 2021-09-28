@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { RadarChart } from "./RadarChart";
 import type { Grid } from "../xy/axes/Grid";
 import type { IPoint } from "../../core/util/IPoint";
@@ -84,22 +83,6 @@ export class AxisRendererRadial extends AxisRenderer {
 	 */
 	declare public chart: RadarChart | undefined;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisRendererRadial["_settings"], template?: Template<AxisRendererRadial>): AxisRendererRadial {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["renderer", "radial"]);
-		const x = new AxisRendererRadial(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "AxisRendererRadial";
 	public static classNames: Array<string> = AxisRenderer.classNames.concat([AxisRendererRadial.className]);
 
@@ -117,12 +100,13 @@ export class AxisRendererRadial extends AxisRenderer {
 	 */
 	public readonly labels: ListTemplate<AxisLabelRadial> = new ListTemplate(
 		Template.new({}),
-		() => AxisLabelRadial.new(this._root, {
+		() => AxisLabelRadial._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 	public _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "radial"]);
 		super._afterNew();
 		this._setPrivate("letter", "Y");
 		this.setRaw("position", "absolute");
@@ -211,7 +195,7 @@ export class AxisRendererRadial extends AxisRenderer {
 
 	/**
 	 * Converts relative position to X/Y point.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Point
 	 */
@@ -366,7 +350,7 @@ export class AxisRendererRadial extends AxisRenderer {
 
 	/**
 	 * Returns axis length in pixels.
-	 * 
+	 *
 	 * @return Length
 	 */
 	public axisLength(): number {
@@ -382,7 +366,7 @@ export class AxisRendererRadial extends AxisRenderer {
 
 	/**
 	 * Converts relative position to pixels.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Pixels
 	 */

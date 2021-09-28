@@ -1,9 +1,7 @@
-import type { Root } from "../../../core/Root";
 import { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
 import { Axis, IAxisSettings, IAxisPrivate, IAxisDataItem, IAxisEvents } from "./Axis";
 import type { IXYSeriesDataItem, XYSeries } from "../series/XYSeries";
-import type { Template } from "../../../core/util/Template";
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $math from "../../../core/util/Math";
@@ -28,14 +26,14 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * NOTE: the axis might modify the maximum value to fit into its scale better,
 	 * unless `strictMinMax` is set to `true`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	max?: number;
 
 	/**
 	 * Force axis scale to be precisely at values as set in `min` and/or `max`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	strictMinMax?: boolean;
@@ -52,7 +50,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * Useful in situations where zero would result in error, i.e. logarithmic
 	 * scale.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
 	 */
 	treatZeroAs?: number;
@@ -63,7 +61,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * E..g. `0.1` will extend the scale by 10%, so if max value is `1000` and
 	 * minimum value is `0`, the new minimum value will be `-100`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
 	 */
 	extraMin?: number;
@@ -82,7 +80,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	/**
 	 * Base value, which indicates the threshold between "positive" and "negative"
 	 * values.
-	 * 
+	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Base_value} for more info
 	 */
@@ -109,14 +107,14 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Number format to use for axis labels.
 	 *
 	 * If not set, will use format set in global number formatter.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
 	 */
 	numberFormat?: string;
 
 	/**
 	 * A numeric format used for numbers displayed in axis tooltip.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
 	tooltipNumberFormat?: string;
@@ -127,7 +125,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * E.g. if axis displays labels with one decimal (`1.0`, `1.1`, `1.2`) setting
 	 * this setting to `1` would allow two decimals in axis tooltip, e.g. `1.15`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
 	extraTooltipPrecision?: number;
@@ -135,7 +133,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	/**
 	 * If your series relies on dynamically calculated values, like value
 	 * changes, percents, or total sums, set this to `true`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Calculated_values} for more info
 	 */
 	calculateTotals?: boolean;
@@ -199,23 +197,6 @@ export interface IValueAxisEvents extends IAxisEvents {
  * @important
  */
 export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new<R extends AxisRenderer>(root: Root, settings: ValueAxis<R>["_settings"], template?: Template<ValueAxis<R>>): ValueAxis<R> {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["axis"]);
-		const x = new ValueAxis<R>(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "ValueAxis";
 	public static classNames: Array<string> = Axis.classNames.concat([ValueAxis.className]);
 
@@ -250,6 +231,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		this._setPrivate("name", "value");
 		super._afterNew();
 	}
@@ -466,7 +448,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	/**
 	 * Converts a relative position to a corresponding numeric value from axis
 	 * scale.
-	 * 
+	 *
 	 * @param   position  Relative position
 	 * @return            Value
 	 */
@@ -484,7 +466,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Convers value to a relative position on axis.
-	 * 
+	 *
 	 * @param   value  Value
 	 * @return         Relative position
 	 */
@@ -531,7 +513,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns X coordinate in pixels corresponding to specific value.
-	 * 
+	 *
 	 * @param   value     Numeric value
 	 * @param   location  Location
 	 * @param   baseValue Base value
@@ -546,7 +528,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns X coordinate in pixels corresponding to specific value.
-	 * 
+	 *
 	 * @param   value     Numeric value
 	 * @param   location  Location
 	 * @param   baseValue Base value
@@ -611,7 +593,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns relative position of axis' `baseValue`.
-	 * 
+	 *
 	 * @return  Base value position
 	 */
 	public basePosition(): number {
@@ -621,7 +603,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	/**
 	 * Base value of the [[ValueAxis]], which determines positive and negative
 	 * values.
-	 * 
+	 *
 	 * @return Base value
 	 */
 	public baseValue(): number {
@@ -1217,7 +1199,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns text to be used in an axis tooltip for specific relative position.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
@@ -1242,7 +1224,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * Returns a data item from series that is closest to the `position`.
-	 * 
+	 *
 	 * @param   series    Series
 	 * @param   position  Relative position
 	 * @return            Data item
@@ -1270,7 +1252,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	 * Zooms the axis to specific `start` and `end` values.
 	 *
 	 * Optional `duration` specifies duration of zoom animation in milliseconds.
-	 * 
+	 *
 	 * @param  start     Start value
 	 * @param  end       End value
 	 * @param  duration  Duration in milliseconds

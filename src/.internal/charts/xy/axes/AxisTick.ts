@@ -1,6 +1,4 @@
-import type { Root } from "../../../core/Root";
 import type { IPoint } from "../../../core/util/IPoint";
-import type { Template } from "../../../core/util/Template";
 
 import { Tick, ITickSettings, ITickPrivate } from "../../../core/render/Tick";
 
@@ -40,7 +38,7 @@ export interface IAxisTickSettings extends ITickSettings {
 	 *
 	 * E.g. `0.1` will mean that tick will not be shown if it's closer to the
 	 * beginning of the axis than 10%.
-	 * 
+	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
 	 */
@@ -70,21 +68,6 @@ export interface IAxisTickPrivate extends ITickPrivate {
  * @important
  */
 export class AxisTick extends Tick {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisTick["_settings"], template?: Template<AxisTick>): AxisTick {
-		const x = new AxisTick(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IAxisTickSettings;
 	declare public _privateSettings: IAxisTickPrivate;

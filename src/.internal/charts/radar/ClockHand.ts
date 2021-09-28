@@ -1,5 +1,3 @@
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 import type { Axis } from "../xy/axes/Axis";
 import type { AxisRendererCircular } from "../radar/AxisRendererCircular";
 import type { RadarChart } from "../radar/RadarChart";
@@ -69,22 +67,6 @@ export interface IClockHandPrivate extends IContainerPrivate {
  */
 export class ClockHand extends Container {
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ClockHand["_settings"], template?: Template<ClockHand>): ClockHand {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["clock"]);
-		const x = new ClockHand(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IClockHandSettings;
 	declare public _privateSettings: IClockHandPrivate;
 
@@ -100,12 +82,14 @@ export class ClockHand extends Container {
 
 	/**
 	 * A "pin" element (hand's base).
-	 * 
+	 *
 	 * @default Graphics.new()
 	 */
 	public readonly pin: Graphics = this.children.push(Graphics.new(this._root, { themeTags: ["pin"] }));
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["clock"]);
+
 		super._afterNew();
 
 		// to be redrawn when size changes

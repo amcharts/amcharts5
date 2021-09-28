@@ -1,6 +1,4 @@
 import { PyramidSeries, IPyramidSeriesSettings, IPyramidSeriesDataItem, IPyramidSeriesPrivate } from "./PyramidSeries";
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 import { Graphics } from "../../core/render/Graphics";
 import { p100, p50 } from "../../core/util/Percent"
 
@@ -30,22 +28,6 @@ export interface IPictorialStackedSeriesPrivate extends IPyramidSeriesPrivate {
  * @important
  */
 export class PictorialStackedSeries extends PyramidSeries {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: PictorialStackedSeries["_settings"], template?: Template<PictorialStackedSeries>): PictorialStackedSeries {
-		const x = new PictorialStackedSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	protected _tag = "pictorial";
 
 	public static className: string = "PictorialStackedSeries";
@@ -99,7 +81,7 @@ export class PictorialStackedSeries extends PyramidSeries {
 
 			seriesGraphics.set("scale", scale);
 			seriesGraphics.set("x", w / 2);
-			seriesGraphics.set("y", h / 2);			
+			seriesGraphics.set("y", h / 2);
 		}
 	}
 
@@ -109,7 +91,7 @@ export class PictorialStackedSeries extends PyramidSeries {
 			const svgPath = this.get("svgPath");
 			this.seriesMask.set("svgPath", svgPath);
 			this.seriesGraphics.set("svgPath", svgPath);
-		}	
+		}
 
 		this._updateScale();
 	}

@@ -1,8 +1,6 @@
-import type { Root } from "../Root";
 import type { Label } from "../render/Label";
 import { RoundedRectangle } from "../render/RoundedRectangle";
 import type { Graphics } from "../render/Graphics";
-import type { Template } from "../../core/util/Template";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
 import * as $utils from "../../core/util/Utils";
 
@@ -30,26 +28,16 @@ export interface IButtonPrivate extends IContainerPrivate {
  * @important
  */
 export class Button extends Container {
+	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["button"]);
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Button["_settings"], template?: Template<Button>): Button {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["button"]);
-		const x = new Button(root, settings, true, template);
-		x._afterNew();
-		if(!settings.background){
-			x.set("background", RoundedRectangle.new(root, {
-				themeTags: $utils.mergeTags(settings.themeTags, ["background"])
+		super._afterNew();
+
+		if (!this._settings.background) {
+			this.set("background", RoundedRectangle.new(this._root, {
+				themeTags: $utils.mergeTags(this._settings.themeTags, ["background"])
 			}));
 		}
-		return x;
 	}
 
 	declare public _settings: IButtonSettings;

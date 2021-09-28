@@ -1,8 +1,6 @@
-import type { Root } from "../../core/Root";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import type { MapPolygonSeries } from "./MapPolygonSeries";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
-import type { Template } from "../../core/util/Template";
 import type { IPoint } from "../../core/util/IPoint";
 import * as $mapUtils from "./MapUtils";
 import $polylabel from "polylabel";
@@ -30,21 +28,6 @@ export interface IMapPolygonPrivate extends IGraphicsPrivate {
  * A polygon in a [[MapPolygonSeries]].
  */
 export class MapPolygon extends Graphics {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: MapPolygon["_settings"], template?: Template<MapPolygon>): MapPolygon {
-		const x = new MapPolygon(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IMapPolygonSettings;
 	declare public _privateSettings: IMapPolygonPrivate;
@@ -107,7 +90,7 @@ export class MapPolygon extends Graphics {
 
 	/**
 	 * Returns latitude/longitude of the geometrical center of the polygon.
-	 * 
+	 *
 	 * @return Center
 	 */
 	public geoCentroid(): IGeoPoint {
@@ -122,7 +105,7 @@ export class MapPolygon extends Graphics {
 
 	/**
 	 * Returns latitude/longitude of the visual center of the polygon.
-	 * 
+	 *
 	 * @return Center
 	 */
 	public visualCentroid(): IGeoPoint {

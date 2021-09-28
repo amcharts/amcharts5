@@ -7,11 +7,9 @@ import { Rectangle } from "../../core/render/Rectangle";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
 import { List } from "../../core/util/List";
 import type { IDisposer } from "../../core/util/Disposer";
-import type { Template } from "../../core/util/Template";
 import { p100 } from "../../core/util/Percent";
 import type { XYSeries, IXYSeriesDataItem } from "./series/XYSeries";
 import type { IPointerEvent } from "../../core/render/backend/Renderer";
-import type { Root } from "../../core/Root";
 import type { Scrollbar } from "../../core/render/Scrollbar";
 import type { ColorSet } from "../../core/util/ColorSet";
 import { Color } from "../../core/util/Color";
@@ -115,21 +113,6 @@ export interface IXYChartPrivate extends ISerialChartPrivate {
  */
 export class XYChart extends SerialChart {
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: XYChart["_settings"], template?: Template<XYChart>): XYChart {
-		const x = new XYChart(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "XYChart";
 	public static classNames: Array<string> = SerialChart.classNames.concat([XYChart.className]);
 
@@ -186,6 +169,10 @@ export class XYChart extends SerialChart {
 	/**
 	 * A [[Container]] located in the middle of the chart, used to store actual
 	 * plots (series).
+	 *
+	 * NOTE: `plotContainer` will automatically have its `background` preset. If
+	 * you need to modify background or outline for chart's plot area, you can
+	 * use `plotContainer.get("background")` for that.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()

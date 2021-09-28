@@ -1,7 +1,5 @@
 import type { IGradient } from "../backend/Renderer";
 import type { Sprite } from "../Sprite";
-import type { Root } from "../../Root";
-import type { Template } from "../../util/Template";
 
 import { Gradient, IGradientSettings, IGradientPrivate } from "./Gradient";
 import { Color } from "../../util/Color";
@@ -15,7 +13,7 @@ export interface ILinearGradientSettings extends IGradientSettings {
 
 	/**
 	 * Gradient rotation, in degrees.
-	 * 
+	 *
 	 * @default 90
 	 */
 	rotation?: number;
@@ -31,21 +29,6 @@ export interface ILinearGradientPrivate extends IGradientPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export class LinearGradient extends Gradient {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: LinearGradient["_settings"], template?: Template<LinearGradient>): LinearGradient {
-		const x = new LinearGradient(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ILinearGradientSettings;
 	declare public _privateSettings: ILinearGradientPrivate;

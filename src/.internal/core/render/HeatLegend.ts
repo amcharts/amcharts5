@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { IPoint } from "../../core/util/IPoint";
 
 import { Container, IContainerSettings, IContainerPrivate } from "./Container";
@@ -46,7 +45,7 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	endText?: string;
 
 	/**
-	 * Number of steps 
+	 * Number of steps
 	 *
 	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Gradient_or_steps} for more info
@@ -71,22 +70,6 @@ export interface IHeatLegendPrivate extends IContainerPrivate {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/} for more info
  */
 export class HeatLegend extends Container {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: HeatLegend["_settings"], template?: Template<HeatLegend>): HeatLegend {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["heatlegend", settings.orientation]);
-		const x = new HeatLegend(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	/**
 	 * A [[Container]] that all labels are placed in.
@@ -124,6 +107,7 @@ export class HeatLegend extends Container {
 
 
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["heatlegend", this._settings.orientation]);
 		super._afterNew();
 		this.set("tooltip", Tooltip.new(this._root, {
 			themeTags: ["heatlegend"]
@@ -146,9 +130,9 @@ export class HeatLegend extends Container {
 	 */
 	public readonly markers: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
-		() => RoundedRectangle.new(this._root, {
+		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.markers.template.get("themeTags", []), [this.get("orientation"), "heatlegend", "marker"])
-		}, this.markers.template)
+		}, [this.markers.template])
 	);
 
 
@@ -156,7 +140,7 @@ export class HeatLegend extends Container {
 	 * Moves and shows tooltip at specific value.
 	 *
 	 * Can also specify optional text to show in tooltip, as well as the color.
-	 * 
+	 *
 	 * @param  value  Value
 	 * @param  text   Text
 	 * @param  color  Color

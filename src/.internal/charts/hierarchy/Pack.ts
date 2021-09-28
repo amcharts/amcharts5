@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { HierarchyNode } from "./HierarchyNode";
 
@@ -74,21 +73,6 @@ export class Pack extends Hierarchy {
 
 	protected _tag: string = "pack";
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Pack["_settings"], template?: Template<Pack>): Pack {
-		const x = new Pack(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "Pack";
 	public static classNames: Array<string> = Hierarchy.classNames.concat([Pack.className]);
 
@@ -103,9 +87,9 @@ export class Pack extends Hierarchy {
 	 */
 	public readonly circles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
-		() => Circle.new(this._root, {
+		() => Circle._new(this._root, {
 			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
-		}, this.circles.template)
+		}, [this.circles.template])
 	);
 
 	protected _afterNew() {

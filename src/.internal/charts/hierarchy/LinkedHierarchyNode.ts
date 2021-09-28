@@ -1,7 +1,5 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { LinkedHierarchy, ILinkedHierarchyDataItem } from "./LinkedHierarchy";
-import type { Template } from "../../core/util/Template";
 
 import { HierarchyNode, IHierarchyNodePrivate, IHierarchyNodeSettings } from "./HierarchyNode";
 
@@ -22,21 +20,6 @@ export class LinkedHierarchyNode extends HierarchyNode {
 	 * A series node belongs to.
 	 */
 	declare public series: LinkedHierarchy | undefined;
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: LinkedHierarchyNode["_settings"], template?: Template<LinkedHierarchyNode>): LinkedHierarchyNode {
-		const x = new LinkedHierarchyNode(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ILinkedHierarchyNodeSettings;
 	declare public _privateSettings: ILinkedHierarchyNodePrivate;

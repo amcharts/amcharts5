@@ -1,7 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
 import { FunnelSeries, IFunnelSeriesSettings, IFunnelSeriesDataItem, IFunnelSeriesPrivate } from "./FunnelSeries";
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 import { Percent, p100 } from "../../core/util/Percent";
 import * as $utils from "../../core/util/Utils";
 import * as $type from "../../core/util/Type";
@@ -36,7 +34,7 @@ export interface IPyramidSeriesSettings extends IFunnelSeriesSettings {
 
 	/**
 	 * Determines calculation mechanism for the slice area based on value.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/#Slice_size} for more info
 	 * @default "area"
 	 */
@@ -54,22 +52,6 @@ export interface IPyramidSeriesPrivate extends IFunnelSeriesPrivate {
  * @important
  */
 export class PyramidSeries extends FunnelSeries {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: PyramidSeries["_settings"], template?: Template<PyramidSeries>): PyramidSeries {
-		const x = new PyramidSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	protected _tag = "pyramid";
 
 	public static className: string = "PyramidSeries";

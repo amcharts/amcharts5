@@ -1,5 +1,3 @@
-import type { Root } from "../../core/Root";
-import type { Template } from "../../core/util/Template";
 import type { MapChart } from "./MapChart";
 
 import { Container, IContainerPrivate, IContainerSettings } from "../../core/render/Container";
@@ -31,7 +29,7 @@ export class ZoomControl extends Container {
 
 	/**
 	 * A [[Button]] for zoom in.
-	 * 
+	 *
 	 * @default Button.new()
 	 */
 	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36, themeTags: ["plus"] }));
@@ -42,21 +40,6 @@ export class ZoomControl extends Container {
 	 * @default Button.new()
 	 */
 	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36, themeTags: ["minus"] }));
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: ZoomControl["_settings"], template?: Template<ZoomControl>): ZoomControl {
-		const x = new ZoomControl(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IZoomControlSettings;
 	declare public _privateSettings: IZoomControlPrivate;

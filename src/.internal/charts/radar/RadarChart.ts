@@ -5,9 +5,7 @@ import type { XYSeries } from "../xy/series/XYSeries";
 import type { RadarCursor } from "./RadarCursor";
 import type { RadarColumnSeries } from "./RadarColumnSeries";
 import type { RadarLineSeries } from "./RadarLineSeries";
-import type { Root } from "../../core/Root";
 import type { IPoint } from "../../core/util/IPoint";
-import type { Template } from "../../core/util/Template";
 
 import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import { Percent, p50, percent } from "../../core/util/Percent";
@@ -92,23 +90,8 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
 export class RadarChart extends XYChart {
 
 	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RadarChart["_settings"], template?: Template<RadarChart>): RadarChart {
-		const x = new RadarChart(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
-	/**
 	 * [[Container]] where radar-related elements go.
-	 * 
+	 *
 	 * @default Container.new()
 	 */
 	public readonly radarContainer = this.plotContainer.children.push(Container.new(this._root, { x: p50, y: p50 }));

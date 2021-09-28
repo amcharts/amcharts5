@@ -1,11 +1,9 @@
-import type { Root } from "../Root";
 import { RoundedRectangle } from "../render/RoundedRectangle";
 import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
 import * as $type from "../util/Type";
 import { Graphics } from "./Graphics";
 import { Button } from "./Button";
 import type { Time } from "../util/Animation";
-import type { Template } from "../../core/util/Template";
 import * as $utils from "../util/Utils";
 import type { Animation } from "../util/Entity";
 
@@ -72,27 +70,11 @@ export interface IScrollbarEvents extends IContainerEvents {
  */
 export class Scrollbar extends Container {
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Scrollbar["_settings"], template?: Template<Scrollbar>): Scrollbar {
-		this._addOrientationClass(root, settings);
-		const x = new Scrollbar(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
-	public static _addOrientationClass(root: Root, settings: Scrollbar["_settings"]) {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["scrollbar", settings.orientation]);
-		if (!settings.background) {
-			settings.background = RoundedRectangle.new(root, {
-				themeTags: $utils.mergeTags(settings.themeTags, ["main", "background"])
+	public _addOrientationClass() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["scrollbar", this._settings.orientation]);
+		if (!this._settings.background) {
+			this._settings.background = RoundedRectangle.new(this._root, {
+				themeTags: $utils.mergeTags(this._settings.themeTags, ["main", "background"])
 			});
 		}
 	}
@@ -152,6 +134,7 @@ export class Scrollbar extends Container {
 	}
 
 	protected _afterNew() {
+		this._addOrientationClass();
 		super._afterNew();
 
 		const startGrip = this.startGrip;

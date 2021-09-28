@@ -1,6 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
 import type { PieChart } from "./PieChart";
-import type { Root } from "../../core/Root";
 
 import { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem, IPercentSeriesPrivate } from "../percent/PercentSeries";
 import { Template } from "../../core/util/Template";
@@ -64,21 +63,6 @@ export class PieSeries extends PercentSeries {
 
 	declare public chart: PieChart | undefined;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: PieSeries["_settings"], template?: Template<PieSeries>): PieSeries {
-		const x = new PieSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	public static className: string = "PieSeries";
 	public static classNames: Array<string> = PercentSeries.classNames.concat([PieSeries.className]);
 
@@ -93,27 +77,27 @@ export class PieSeries extends PercentSeries {
 	protected _makeSlices(): ListTemplate<this["_sliceType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => Slice.new(this._root, {
+			() => Slice._new(this._root, {
 				themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), ["pie", "series"])
-			}, this.slices.template),
+			}, [this.slices.template]),
 		);
 	}
 
 	protected _makeLabels(): ListTemplate<this["_labelType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => RadialLabel.new(this._root, {
+			() => RadialLabel._new(this._root, {
 				themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), ["pie", "series"])
-			}, this.labels.template),
+			}, [this.labels.template]),
 		);
 	}
 
 	protected _makeTicks(): ListTemplate<this["_tickType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => Tick.new(this._root, {
+			() => Tick._new(this._root, {
 				themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), ["pie", "series"])
-			}, this.ticks.template),
+			}, [this.ticks.template]),
 		);
 	}
 

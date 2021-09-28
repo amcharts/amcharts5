@@ -1,9 +1,7 @@
-import type { Root } from "../Root";
 import type { Graphics } from "./Graphics";
 import type { Layout } from "./Layout";
 import type { IContainer } from "./backend/Renderer";
 import type { IBounds } from "../util/IBounds";
-import type { Template } from "../../core/util/Template";
 import type { Scrollbar } from "./Scrollbar";
 
 import { Children } from "../util/Children";
@@ -55,7 +53,7 @@ export interface IContainerSettings extends ISpriteSettings {
 
 	/**
 	 * An element to use as a container's mask (clipping region).
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Masks} for more info
 	 */
 	mask?: Graphics | null;
@@ -75,13 +73,13 @@ export interface IContainerSettings extends ISpriteSettings {
 	/**
 	 * If set to `true`, applying a state on a container will also apply the same
 	 * state on its children.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#States} for more info
 	 */
 	setStateOnChildren?: boolean;
 
 	/**
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Scrollbar} for more info
 	 */
 	verticalScrollbar?: Scrollbar;
@@ -108,21 +106,6 @@ export interface IContainerEvents extends ISpriteEvents {
  * @important
  */
 export class Container extends Sprite {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Container["_settings"], template?: Template<Container>): Container {
-		const x = new Container(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IContainerSettings;
 	declare public _privateSettings: IContainerPrivate;
@@ -309,7 +292,7 @@ export class Container extends Sprite {
 
 	/**
 	 * Returns container's inner width (width without padding) in pixels.
-	 * 
+	 *
 	 * @return Inner width (px)
 	 */
 	public innerWidth(): number {
@@ -318,7 +301,7 @@ export class Container extends Sprite {
 
 	/**
 	 * Returns container's inner height (height without padding) in pixels.
-	 * 
+	 *
 	 * @return Inner height (px)
 	 */
 	public innerHeight(): number {
@@ -601,7 +584,7 @@ export class Container extends Sprite {
 		this.children.each((child)=>{
 			child._processTemplateField();
 		})
-	}	
+	}
 
 	/**
 	 * @ignore

@@ -560,7 +560,6 @@ export class Root implements IDisposer {
 
 	private _runDirties() {
 		//console.log("tick **************************************************************");
-
 		let allParents: { [id: number]: IParent } = {};
 
 		while (this._isDirtyParents) {
@@ -644,6 +643,7 @@ export class Root implements IDisposer {
 		objects.forEach((entity) => {
 			entity._afterChanged();
 		});
+
 	}
 
 	private _runTicker(currentTime: number) {

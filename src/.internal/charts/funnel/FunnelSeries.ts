@@ -1,6 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
 import type { SlicedChart } from "./SlicedChart";
-import type { Root } from "../../core/Root";
 
 import { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem, IPercentSeriesPrivate } from "../percent/PercentSeries";
 import { Template } from "../../core/util/Template";
@@ -103,27 +102,27 @@ export class FunnelSeries extends PercentSeries {
 	protected _makeSlices(): ListTemplate<this["_sliceType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => FunnelSlice.new(this._root, {
+			() => FunnelSlice._new(this._root, {
 				themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), [this._tag, "series", "slice", this.get("orientation")])
-			}, this.slices.template)
+			}, [this.slices.template])
 		);
 	}
 
 	protected _makeLabels(): ListTemplate<this["_labelType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => Label.new(this._root, {
+			() => Label._new(this._root, {
 				themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag, "series", "label", this.get("orientation")])
-			}, this.labels.template)
+			}, [this.labels.template])
 		);
 	}
 
 	protected _makeTicks(): ListTemplate<this["_tickType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => Tick.new(this._root, {
+			() => Tick._new(this._root, {
 				themeTags: $utils.mergeTags(this.ticks.template.get("themeTags", []), [this._tag, "series", "tick", this.get("orientation")])
-			}, this.ticks.template)
+			}, [this.ticks.template])
 		);
 	}
 
@@ -139,9 +138,9 @@ export class FunnelSeries extends PercentSeries {
 	protected _makeLinks(): ListTemplate<this["_sliceType"]> {
 		return new ListTemplate(
 			Template.new({}),
-			() => FunnelSlice.new(this._root, {
+			() => FunnelSlice._new(this._root, {
 				themeTags: $utils.mergeTags(this.links.template.get("themeTags", []), [this._tag, "series", "link", this.get("orientation")])
-			}, this.links.template),
+			}, [this.links.template]),
 		);
 	}
 
@@ -154,22 +153,6 @@ export class FunnelSeries extends PercentSeries {
 		dataItem.set("link", link);
 		this.links.push(link);
 		return link;
-	}
-
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: FunnelSeries["_settings"], template?: Template<FunnelSeries>): FunnelSeries {
-		const x = new FunnelSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
 	}
 
 	public static className: string = "FunnelSeries";

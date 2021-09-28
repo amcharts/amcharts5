@@ -1,9 +1,7 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { FlowNode } from "./FlowNode";
 import type { Sankey, ISankeyDataItem } from "./Sankey";
 import type { ISankeyNodesDataItem } from "./SankeyNodes";
-import type { Template } from "../../core/util/Template";
 import type { IOrientationPoint } from "../../core/util/IPoint";
 
 import { FlowLink, IFlowLinkPrivate, IFlowLinkSettings } from "./FlowLink";
@@ -51,21 +49,6 @@ export interface ISankeyLinkPrivate extends IFlowLinkPrivate {
 }
 
 export class SankeyLink extends FlowLink {
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: SankeyLink["_settings"], template?: Template<SankeyLink>): SankeyLink {
-		const x = new SankeyLink(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: ISankeyLinkSettings;
 	declare public _privateSettings: ISankeyLinkPrivate;
 

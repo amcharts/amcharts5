@@ -1,7 +1,5 @@
-import type { Root } from "../../Root";
-import type { Template } from "../../util/Template";
-
 import { Pattern, IPatternSettings, IPatternPrivate } from "./Pattern";
+import * as $type from "../../util//Type";
 
 export interface ILinePatternSettings extends IPatternSettings {
 
@@ -19,24 +17,10 @@ export interface ILinePatternPrivate extends IPatternPrivate {
 
 /**
  * Line pattern.
- * 
+ *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class LinePattern extends Pattern {
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: LinePattern["_settings"], template?: Template<LinePattern>): LinePattern {
-		const x = new LinePattern(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ILinePatternSettings;
 	declare public _privateSettings: ILinePatternPrivate;
@@ -55,8 +39,8 @@ export class LinePattern extends Pattern {
 	protected _draw() {
 		super._draw();
 
-		const w = this.get("width");
-		const h = this.get("height");
+		const w = this.get("width", 100);
+		const h = this.get("height", 100);
 		const gap = this.get("gap", 0);
 		const strokeWidth = this.get("strokeWidth", 1);
 
@@ -76,6 +60,23 @@ export class LinePattern extends Pattern {
 		}
 
 		this._display.lineStyle(strokeWidth, this.get("color"), this.get("colorOpacity"));
+
+		let strokeDasharray = this.get("strokeDasharray");
+		if ($type.isNumber(strokeDasharray)) {
+			if (strokeDasharray < 0.5) {
+				strokeDasharray = [0];
+			}
+			else {
+				strokeDasharray = [strokeDasharray]
+			}
+		}
+		this._display.setLineDash(strokeDasharray as number[]);
+
+		const strokeDashoffset = this.get("strokeDashoffset");
+		if (strokeDashoffset) {
+			this._display.setLineDashOffset(strokeDashoffset);
+		}
+
 		this._display.endStroke();
 	}
 }

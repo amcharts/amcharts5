@@ -1,7 +1,5 @@
 import { MapLineSeries, IMapLineSeriesSettings, IMapLineSeriesPrivate, IMapLineSeriesDataItem } from "./MapLineSeries";
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
-import type { Template } from "../../core/util/Template";
 import { geoGraticule } from "d3-geo";
 
 
@@ -28,21 +26,6 @@ export interface IGraticuleSeriesSettings extends IMapLineSeriesSettings {
  * @important
  */
 export class GraticuleSeries extends MapLineSeries {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: GraticuleSeries["_settings"], template?: Template<GraticuleSeries>): GraticuleSeries {
-		const x = new GraticuleSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "GraticuleSeries";
 	public static classNames: Array<string> = MapLineSeries.classNames.concat([GraticuleSeries.className]);

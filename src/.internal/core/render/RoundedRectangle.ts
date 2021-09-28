@@ -1,8 +1,6 @@
-import type { Root } from "../Root";
 import * as $type from "../util/Type";
 import * as $math from "../util/Math";
 import * as $utils from "../util/Utils";
-import type { Template } from "../../core/util/Template";
 import { Rectangle, IRectangleSettings, IRectanglePrivate } from "./Rectangle";
 
 
@@ -40,21 +38,6 @@ export interface IRoundedRectanglePrivate extends IRectanglePrivate {
  * @important
  */
 export class RoundedRectangle extends Rectangle {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: RoundedRectangle["_settings"], template?: Template<RoundedRectangle>): RoundedRectangle {
-		const x = new RoundedRectangle(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IRoundedRectangleSettings;
 	declare public _privateSettings: IRoundedRectanglePrivate;

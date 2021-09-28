@@ -579,9 +579,10 @@ export abstract class Series extends Component {
 		if(dataItem.bullets){
 			$array.each(dataItem.bullets, (bullet) => {
 				this._positionBullet(bullet);
-
+				const sprite = bullet.get("sprite");
+				
 				if(bullet.get("dynamic")){
-					const sprite = bullet.get("sprite");
+					
 					if(sprite){						
 						sprite._markDirtyKey("fill" as any);
 					}
@@ -591,14 +592,12 @@ export abstract class Series extends Component {
 						})
 					}
 				}	
+
+				if(sprite instanceof Label && sprite.get("populateText" as any)){
+					sprite.text.markDirtyText();
+				}				
 			})
 		}
-
-		this.bulletsContainer.walkChildren((sprite)=>{
-			if(sprite instanceof Label && sprite.get("populateText" as any)){
-				sprite.text.markDirtyText();
-			}
-		})
 	}
 
 	protected _hideBullets(dataItem: DataItem<this["_dataItemSettings"]>) {

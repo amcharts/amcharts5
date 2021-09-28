@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { Axis } from "../xy/axes/Axis";
 import type { RadarChart } from "./RadarChart";
 import type { Grid } from "../xy/axes/Grid";
@@ -85,22 +84,6 @@ export class AxisRendererCircular extends AxisRenderer {
 	declare public chart: RadarChart | undefined;
 
 	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: AxisRendererCircular["_settings"], template?: Template<AxisRendererCircular>): AxisRendererCircular {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["renderer", "circular"]);
-		const x = new AxisRendererCircular(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
-	/**
 	 * A list of labels in the axis.
 	 *
 	 * `labels.template` can be used to configure labels.
@@ -109,9 +92,9 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public readonly labels: ListTemplate<AxisLabelRadial> = new ListTemplate(
 		Template.new({}),
-		() => AxisLabelRadial.new(this._root, {
+		() => AxisLabelRadial._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
-		}, this.labels.template)
+		}, [this.labels.template])
 	);
 
 
@@ -124,9 +107,9 @@ export class AxisRendererCircular extends AxisRenderer {
 	 */
 	public readonly axisFills: ListTemplate<Slice> = new ListTemplate(
 		Template.new({}),
-		() => Slice.new(this._root, {
+		() => Slice._new(this._root, {
 			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["fill"]), this.get("themeTags", []))
-		}, this.axisFills.template)
+		}, [this.axisFills.template])
 	);
 
 
@@ -139,6 +122,7 @@ export class AxisRendererCircular extends AxisRenderer {
 	protected _fillGenerator = arc();
 
 	public _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "circular"]);
 		super._afterNew();
 		this._setPrivate("letter", "X");
 		this.setRaw("position", "absolute");
@@ -229,7 +213,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 	/**
 	 * Converts relative position to angle.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Angle
 	 */
@@ -260,7 +244,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 	/**
 	 * Converts relative position to an X/Y coordinate.
-	 * 
+	 *
 	 * @param   position  Position
 	 * @return            Point
 	 */
@@ -433,7 +417,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 	/**
 	 * Returns axis length in pixels.
-	 * 
+	 *
 	 * @return Length
 	 */
 	public axisLength(): number {

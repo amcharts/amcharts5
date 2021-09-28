@@ -1,6 +1,4 @@
-import type { Root } from "../../../core/Root";
 import { Candlestick, ICandlestickSettings, ICandlestickPrivate } from "./Candlestick";
-import type { Template } from "../../../core/util/Template";
 
 
 export interface IOHLCSettings extends ICandlestickSettings {
@@ -10,21 +8,6 @@ export interface IOHLCPrivate extends ICandlestickPrivate {
 }
 
 export class OHLC extends Candlestick {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: OHLC["_settings"], template?: Template<OHLC>): OHLC {
-		const x = new OHLC(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: IOHLCSettings;
 	declare public _privateSettings: IOHLCPrivate;

@@ -1,8 +1,6 @@
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import type { ILocaleSettings } from "./Language"
 import { TextFormatter } from "./TextFormatter"
-import type { Root } from "../Root"
-import type { Template } from "./Template";
 import * as $type from "./Type"
 import * as $utils from "./Utils";
 
@@ -31,22 +29,6 @@ type Weekdays = "Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Fr
 type ShortWeekdays = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
 export class DateFormatter extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: DateFormatter["_settings"], template?: Template<DateFormatter>): DateFormatter {
-		const x = new DateFormatter(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IDateFormatterSettings;
 	declare public _privateSettings: IDateFormatterPrivate;
 

@@ -10,9 +10,7 @@
  */
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import { TextFormatter } from "./TextFormatter";
-import type { Root } from "../Root"
 import type { TimeUnit } from "./Time";
-import type { Template } from "./Template";
 // import { BaseObject } from "../Base";
 // import { registry } from "../Registry";
 import * as $object from "./Object";
@@ -41,22 +39,6 @@ export interface IDurationFormatterPrivate extends IEntityPrivate {
  * @ignore
  */
 export class DurationFormatter extends Entity {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: DurationFormatter["_settings"], template?: Template<DurationFormatter>): DurationFormatter {
-		const x = new DurationFormatter(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	declare public _settings: IDurationFormatterSettings;
 	declare public _privateSettings: IDurationFormatterPrivate;
 

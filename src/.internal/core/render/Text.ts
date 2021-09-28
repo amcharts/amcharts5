@@ -1,11 +1,9 @@
-import type { Root } from "../Root";
 import type { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
 import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
 import type { IText } from "./backend/Renderer";
 import * as $array from "../util/Array";
 import type { IBounds } from "../util/IBounds";
-import type { Template } from "../../core/util/Template";
 import { populateString } from "../util/PopulateString";
 import type { DataItem, IComponentDataItem } from "./Component";
 
@@ -63,21 +61,6 @@ export interface ITextPrivate extends ISpritePrivate {
  * @ignore Text is an internal class. Use Label instead.
  */
 export class Text extends Sprite {
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: Text["_settings"], template?: Template<Text>): Text {
-		const x = new Text(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	declare public _settings: ITextSettings;
 	declare public _privateSettings: ITextPrivate;

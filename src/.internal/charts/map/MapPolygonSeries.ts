@@ -1,4 +1,3 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 
 import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
@@ -57,24 +56,8 @@ export class MapPolygonSeries extends MapSeries {
 	 */
 	public readonly mapPolygons: ListTemplate<MapPolygon> = new ListTemplate(
 		Template.new({}),
-		() => MapPolygon.new(this._root, {}, this.mapPolygons.template)
+		() => MapPolygon._new(this._root, {}, [this.mapPolygons.template])
 	);
-
-
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: MapPolygonSeries["_settings"], template?: Template<MapPolygonSeries>): MapPolygonSeries {
-		const x = new MapPolygonSeries(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
 
 	public static className: string = "MapPolygonSeries";
 	public static classNames: Array<string> = MapSeries.classNames.concat([MapPolygonSeries.className]);
@@ -154,7 +137,7 @@ export class MapPolygonSeries extends MapSeries {
 
 	/**
 	 * Centers and zooms in on the specific polygon.
-	 * 
+	 *
 	 * @param  dataItem  Target data item
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
 	 */

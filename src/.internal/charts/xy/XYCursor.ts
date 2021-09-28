@@ -1,12 +1,10 @@
 import type { IPoint } from "../../core/util/IPoint";
 import type { XYChart } from "./XYChart"
 import type { XYSeries } from "./series/XYSeries";
-import type { Root } from "../../core/Root";
 import type { IPointerEvent } from "../../core/render/backend/Renderer";
 import type { Axis } from "./axes/Axis";
 import type { AxisRenderer } from "./axes/AxisRenderer";
 import type { Tooltip } from "../../core/render/Tooltip";
-import type { Template } from "../../core/util/Template";
 
 import { Container, IContainerSettings, IContainerPrivate, IContainerEvents } from "../../core/render/Container";
 import { p100 } from "../../core/util/Percent";
@@ -43,20 +41,20 @@ export interface IXYCursorSettings extends IContainerSettings {
 
 	/**
 	 * Cursor's horizontal position relative to plot area.
-	 * 
+	 *
 	 * If this setting is set, cursor will not react to mouse/touch and will just
 	 * sit at specified position until `positionX` is reset to `undefined`.
-	 * 
+	 *
 	 * `0` - left, `1` - right.
 	 */
 	positionX?: number;
 
 	/**
 	 * Cursor's vertical position relative to plot area.
-	 * 
+	 *
 	 * If this setting is set, cursor will not react to mouse/touch and will just
 	 * sit at specified position until `positionY` is reset to `undefined`.
-	 * 
+	 *
 	 * `0` - left, `1` - right.
 	 */
 	positionY?: number;
@@ -64,8 +62,8 @@ export interface IXYCursorSettings extends IContainerSettings {
 	/**
 	 * If set to `true`, cursor will not be hidden when mouse cursor moves out
 	 * of the plot area.
-	 * 
-	 * @default false 
+	 *
+	 * @default false
 	 */
 	alwaysShow?: boolean;
 
@@ -113,7 +111,7 @@ export interface IXYCursorEvents extends IContainerEvents {
 
 	/**
 	 * Kicks in when cursor selection starts.
-	 * 
+	 *
 	 * Only when `behavior` is set.
 	 */
 	selectended: {
@@ -122,7 +120,7 @@ export interface IXYCursorEvents extends IContainerEvents {
 
 	/**
 	 * Kicks in when cursor selection ends.
-	 * 
+	 *
 	 * Only when `behavior` is set.
 	 */
 	selectstarted: {
@@ -154,7 +152,7 @@ export class XYCursor extends Container {
 
 	/**
 	 * A [[Grid]] elment that used for horizontal line of the cursor crosshair.
-	 * 
+	 *
 	 * @default Grid.new()
 	 */
 	public readonly lineX: Grid = this.children.push(Grid.new(this._root, {
@@ -163,7 +161,7 @@ export class XYCursor extends Container {
 
 	/**
 	 * A [[Grid]] elment that used for horizontal line of the cursor crosshair.
-	 * 
+	 *
 	 * @default Grid.new()
 	 */
 	public readonly lineY: Grid = this.children.push(Grid.new(this._root, {
@@ -190,23 +188,8 @@ export class XYCursor extends Container {
 	 */
 	public chart: XYChart | undefined;
 
-	/**
-	 * Use this method to create an instance of this class.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
-	 */
-	public static new(root: Root, settings: XYCursor["_settings"], template?: Template<XYCursor>): XYCursor {
-		settings.themeTags = $utils.mergeTags(settings.themeTags, ["xy", "cursor"]);
-		const x = new XYCursor(root, settings, true, template);
-		x._afterNew();
-		return x;
-	}
-
 	protected _afterNew() {
+		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["xy", "cursor"]);
 		super._afterNew();
 		this.setAll({ "width": p100, height: p100, isMeasured: true, position: "absolute" });
 		this.states.create("hidden", { visible: true, opacity: 0 });
