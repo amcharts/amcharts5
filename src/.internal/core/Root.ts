@@ -588,7 +588,10 @@ export class Root implements IDisposer {
 		$object.keys(this._dirty).forEach((key) => {
 			const entity = this._dirty[key];
 
-			if (!entity.isDisposed()) {
+			if (entity.isDisposed()) {
+				delete this._dirty[entity.uid];
+
+			} else {
 				objects.push(entity);
 				entity._beforeChanged();
 			}
@@ -733,7 +736,7 @@ export class Root implements IDisposer {
 
 	/**
 	 * Returns width of the target container, in pixels.
-	 * 
+	 *
 	 * @return Width
 	 */
 	public width(): number {
@@ -742,7 +745,7 @@ export class Root implements IDisposer {
 
 	/**
 	 * Returns height of the target container, in pixels.
-	 * 
+	 *
 	 * @return Height
 	 */
 	public height(): number {
@@ -776,7 +779,7 @@ export class Root implements IDisposer {
 
 	/**
 	 * Returns `true` if root element is disposed.
-	 * 
+	 *
 	 * @return Disposed?
 	 */
 	public isDisposed(): boolean {
@@ -1128,7 +1131,7 @@ export class Root implements IDisposer {
 
 	/**
 	 * Returns `true` if `target` is currently focused.
-	 * 
+	 *
 	 * @param   target  Target
 	 * @return          Focused?
 	 */
@@ -1138,7 +1141,7 @@ export class Root implements IDisposer {
 
 	/**
 	 * Converts document coordinates to coordinates withing root element.
-	 * 
+	 *
 	 * @param   point  Document point
 	 * @return         Root point
 	 */
@@ -1167,7 +1170,7 @@ export class Root implements IDisposer {
  *
  * The only legit way to do so is to purchase a commercial license for amCharts:
  * https://www.amcharts.com/online-store/
- * 
+ *
  * Removing or altering this code, or disabling amCharts branding in any other
  * way is against the license and thus illegal.
  */

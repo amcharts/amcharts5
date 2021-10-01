@@ -5,13 +5,12 @@ import { Container } from "../../core/render/Container";
 import type { DataItem } from "../../core/render/Component";
 import { Rectangle } from "../../core/render/Rectangle";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
-import { List } from "../../core/util/List";
+import { ListAutoDispose } from "../../core/util/List";
 import type { IDisposer } from "../../core/util/Disposer";
 import { p100 } from "../../core/util/Percent";
 import type { XYSeries, IXYSeriesDataItem } from "./series/XYSeries";
 import type { IPointerEvent } from "../../core/render/backend/Renderer";
 import type { Scrollbar } from "../../core/render/Scrollbar";
-import type { ColorSet } from "../../core/util/ColorSet";
 import { Color } from "../../core/util/Color";
 import type { Tooltip } from "../../core/render/Tooltip";
 import { Button } from "../../core/render/Button";
@@ -23,13 +22,6 @@ import * as $type from "../../core/util/Type";
 import { Percent } from "../../core/util/Percent";
 
 export interface IXYChartSettings extends ISerialChartSettings {
-
-	/**
-	 * A [[ColorSet]] to use when asigning colors for series.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
-	 */
-	colors?: ColorSet;
 
 	/**
 	 * horizontal scrollbar.
@@ -123,12 +115,12 @@ export class XYChart extends SerialChart {
 	/**
 	 * A list of horizontal axes.
 	 */
-	public readonly xAxes: List<Axis<AxisRenderer>> = new List();
+	public readonly xAxes: ListAutoDispose<Axis<AxisRenderer>> = new ListAutoDispose();
 
 	/**
 	 * A list of vertical axes.
 	 */
-	public readonly yAxes: List<Axis<AxisRenderer>> = new List();
+	public readonly yAxes: ListAutoDispose<Axis<AxisRenderer>> = new ListAutoDispose();
 
 	/**
 	 * A [[Container]] located on top of the chart, used to store top horizontal
@@ -231,6 +223,9 @@ export class XYChart extends SerialChart {
 
 	protected _afterNew() {
 		super._afterNew();
+
+		this._disposers.push(this.xAxes);
+		this._disposers.push(this.yAxes);
 
 		const root = this._root;
 
@@ -652,15 +647,7 @@ export class XYChart extends SerialChart {
 			if (cursor !== previous) {
 				this._disposeProperty("cursor");
 				if (previous) {
-					if (previous.get("autoDispose")) {
-						previous.dispose();
-					}
-					else {
-						let parent = previous.parent;
-						if (parent) {
-							parent.children.removeValue(previous);
-						}
-					}
+					previous.dispose();
 				}
 				if (cursor) {
 					cursor._setChart(this);
@@ -671,7 +658,8 @@ export class XYChart extends SerialChart {
 					}))
 				}
 
-				this.setRaw("cursor", cursor) // to reset previous value
+				//this.setRaw("cursor", cursor) // to reset previous value
+				this._prevSettings.cursor = cursor;
 			}
 		}
 
@@ -681,18 +669,12 @@ export class XYChart extends SerialChart {
 			if (scrollbarX !== previous) {
 				this._disposeProperty("scrollbarX");
 				if (previous) {
-					if (previous.get("autoDispose")) {
-						previous.dispose();
-					}
-					else {
-						let parent = previous.parent;
-						if (parent) {
-							parent.children.removeValue(previous);
-						}
-					}
+					previous.dispose();
 				}
 				if (scrollbarX) {
-					this.topAxesContainer.children.push(scrollbarX);
+					if (!scrollbarX.parent) {
+						this.topAxesContainer.children.push(scrollbarX);
+					}
 
 					this._pushPropertyDisposer("scrollbarX", scrollbarX.events.on("rangechanged", (e) => {
 						this._handleScrollbar(this.xAxes, e.start, e.end);
@@ -706,7 +688,7 @@ export class XYChart extends SerialChart {
 
 				}
 
-				this.setRaw("scrollbarX", scrollbarX) // to reset previous value
+				this._prevSettings.scrollbarX = scrollbarX;
 			}
 		}
 
@@ -716,18 +698,12 @@ export class XYChart extends SerialChart {
 			if (scrollbarY !== previous) {
 				this._disposeProperty("scrollbarY");
 				if (previous) {
-					if (previous.get("autoDispose")) {
-						previous.dispose();
-					}
-					else {
-						let parent = previous.parent;
-						if (parent) {
-							parent.children.removeValue(previous);
-						}
-					}
+					previous.dispose();
 				}
 				if (scrollbarY) {
-					this.rightAxesContainer.children.push(scrollbarY);
+					if (!scrollbarY.parent) {
+						this.rightAxesContainer.children.push(scrollbarY);
+					}
 
 					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("rangechanged", (e) => {
 						this._handleScrollbar(this.yAxes, e.start, e.end);
@@ -740,7 +716,7 @@ export class XYChart extends SerialChart {
 					});
 
 				}
-				this.setRaw("scrollbarY", scrollbarY) // to reset previous value
+				this._prevSettings.scrollbarY = scrollbarY;
 			}
 		}
 
@@ -795,7 +771,7 @@ export class XYChart extends SerialChart {
 
 	}
 
-	protected _handleScrollbar(axes: List<Axis<any>>, start: number, end: number) {
+	protected _handleScrollbar(axes: ListAutoDispose<Axis<any>>, start: number, end: number) {
 
 		axes.each((axis) => {
 
@@ -819,14 +795,11 @@ export class XYChart extends SerialChart {
 	}
 
 
-	protected _processAxis<R extends AxisRenderer>(axes: List<Axis<R>>, container: Container): IDisposer {
+	protected _processAxis<R extends AxisRenderer>(axes: ListAutoDispose<Axis<R>>, container: Container): IDisposer {
 		return axes.events.onAll((change) => {
 			if (change.type === "clear") {
-				axes.each((axis) => {
-					const axisParent = axis.parent
-					if (axisParent) {
-						axisParent.children.removeValue(axis);
-					}
+				$array.each(change.oldValues, (axis) => {
+					this._removeAxis(axis);
 				})
 			} else if (change.type === "push") {
 				container.children.push(change.newValue);
@@ -838,33 +811,33 @@ export class XYChart extends SerialChart {
 				container.children.insertIndex(change.index, change.newValue);
 				change.newValue.processChart(this);
 			} else if (change.type === "removeIndex") {
-				const axis = change.oldValue;
-				if (axis) {
-					const axisParent = axis.parent
-					if (axisParent) {
-						axisParent.children.removeValue(axis);
-					}
+				this._removeAxis(change.oldValue);
 
-					const gridContainer = axis.gridContainer;
-					const gridParent = gridContainer.parent;
-					if (gridParent) {
-						gridParent.children.removeValue(gridContainer);
-					}
-
-					const topGridContainer = axis.topGridContainer;
-					const topGridParent = topGridContainer.parent;
-					if (topGridParent) {
-						topGridParent.children.removeValue(topGridContainer);
-					}
-
-					if (axis.get("autoDispose")) {
-						axis.dispose();
-					}
-				}
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}
 		});
+	}
+
+	protected _removeAxis(axis: Axis<AxisRenderer>) {
+		if(!axis.isDisposed()){
+			const axisParent = axis.parent
+			if (axisParent) {
+				axisParent.children.removeValue(axis);
+			}
+
+			const gridContainer = axis.gridContainer;
+			const gridParent = gridContainer.parent;
+			if (gridParent) {
+				gridParent.children.removeValue(gridContainer);
+			}
+
+			const topGridContainer = axis.topGridContainer;
+			const topGridParent = topGridContainer.parent;
+			if (topGridParent) {
+				topGridParent.children.removeValue(topGridContainer);
+			}
+		}
 	}
 
 	public _updateChartLayout() {
@@ -1041,40 +1014,38 @@ export class XYChart extends SerialChart {
 		let count = tooltips.length;
 		let average = sum / count;
 
-		if (tooltips.length > 1) {
-			if (average > h / 2 + plotT.y) {
-				tooltips.reverse();
-				let prevY = plotB.y;
+		if (average > h / 2 + plotT.y) {
+			tooltips.reverse();
+			let prevY = plotB.y;
 
-				$array.each(tooltips, (tooltip) => {
-					let height = tooltip.height();
-					let centerY = tooltip.get("centerY");
-					if (centerY instanceof Percent) {
-						height *= centerY.value;
-					}
-					height += tooltip.get("marginBottom", 0);
+			$array.each(tooltips, (tooltip) => {
+				let height = tooltip.height();
+				let centerY = tooltip.get("centerY");
+				if (centerY instanceof Percent) {
+					height *= centerY.value;
+				}
+				height += tooltip.get("marginBottom", 0);
 
-					tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
+				tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
 
-					prevY = Math.min(prevY - height, tooltip._fy - height);
-					tooltipContainer.children.moveValue(tooltip, 0);
-				})
-			}
-			else {
-				let prevY = 0;
-				$array.each(tooltips, (tooltip) => {
-					let height = tooltip.height();
-					let centerY = tooltip.get("centerY");
-					if (centerY instanceof Percent) {
-						height *= centerY.value;
-					}
-					height += tooltip.get("marginBottom", 0);
+				prevY = Math.min(prevY - height, tooltip._fy - height);
+				tooltipContainer.children.moveValue(tooltip, 0);
+			})
+		}
+		else {
+			let prevY = 0;
+			$array.each(tooltips, (tooltip) => {
+				let height = tooltip.height();
+				let centerY = tooltip.get("centerY");
+				if (centerY instanceof Percent) {
+					height *= centerY.value;
+				}
+				height += tooltip.get("marginBottom", 0);
 
-					tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
-					tooltipContainer.children.moveValue(tooltip, 0);
-					prevY = Math.max(prevY + height, tooltip._fy + height);
-				})
-			}
+				tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
+				tooltipContainer.children.moveValue(tooltip, 0);
+				prevY = Math.max(prevY + height, tooltip._fy + height);
+			})
 		}
 	}
 

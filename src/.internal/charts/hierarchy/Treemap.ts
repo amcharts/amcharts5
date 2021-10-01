@@ -242,12 +242,13 @@ export class Treemap extends Hierarchy {
 		node.animate({ key: "width", to: w, duration: duration, easing: easing })
 		node.animate({ key: "height", to: h, duration: duration, easing: easing })
 
-		const fill = dataItem.get("fill");
-
 		if (rectangle) {
+			const fill = dataItem.get("fill");
+
 			rectangle.animate({ key: "width", to: w, duration: duration, easing: easing })
 			rectangle.animate({ key: "height", to: h, duration: duration, easing: easing })
-			rectangle.setAll({ fill: fill });
+			rectangle._setDefault("fill", fill);
+			rectangle._setDefault("stroke", fill);
 		}
 	}
 

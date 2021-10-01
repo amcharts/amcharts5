@@ -6,6 +6,7 @@
  */
 import type { Entity } from "./Entity";
 import type { Template } from "./Template";
+import type { IDisposer } from "./Disposer";
 import { EventDispatcher, Events } from "./EventDispatcher";
 import * as $array from "./Array";
 import type { Optional } from "./Type";
@@ -56,7 +57,7 @@ export class List<T> {
 	/**
 	 * List values.
 	 */
-	private _values: Array<T>;
+	protected _values: Array<T>;
 
 	public events = new EventDispatcher<Events<this, IListEvents<T>>>();
 
@@ -425,13 +426,72 @@ export class List<T> {
 	}
 }
 
+
+/**
+ * A version of a [[List]] where the elements are disposed automatically when removed from the list, unless autoDispose is set to false.
+ * @todo review
+ */
+export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDisposer {
+	/**
+	 * Automatically disposes elements that are removed from the list.
+	 *
+	 * @default true
+	 */
+	public autoDispose: boolean = true;
+
+	private _disposed: boolean = false;
+
+	protected _onSetIndex(index: number, oldValue: A, newValue: A) {
+		if (this.autoDispose) {
+			oldValue.dispose();
+		}
+
+		super._onSetIndex(index, oldValue, newValue);
+	}
+
+	protected _onRemoveIndex(index: number, oldValue: A) {
+		if (this.autoDispose) {
+			oldValue.dispose();
+		}
+
+		super._onRemoveIndex(index, oldValue);
+	}
+
+	protected _onClear(oldValues: Array<A>) {
+		if (this.autoDispose) {
+			$array.each(oldValues, (x) => {
+				x.dispose();
+			});
+		}
+
+		super._onClear(oldValues);
+	}
+
+	public isDisposed(): boolean {
+		return this._disposed;
+	}
+
+	public dispose(): void {
+		if (!this._disposed) {
+			this._disposed = true;
+
+			if (this.autoDispose) {
+				$array.each(this._values, (x) => {
+					x.dispose();
+				});
+			}
+		}
+	}
+}
+
+
 /**
  * A version of a [[List]] that is able to create new elements as well as
  * apply additional settings to newly created items.
- * 
+ *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/list-templates/} for more info
  */
-export class ListTemplate<A extends Entity> extends List<A> {
+export class ListTemplate<A extends Entity> extends ListAutoDispose<A> {
 	public template: Template<A>;
 	public make: () => A;
 

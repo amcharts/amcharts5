@@ -282,7 +282,7 @@ export class Language extends Entity {
 	declare public _privateSettings: ILanguagePrivate;
 
 	protected _setDefaults() {
-		this._setPrivate("defaultLocale", en);
+		this.setPrivate("defaultLocale", en);
 		super._setDefaults();
 	}
 

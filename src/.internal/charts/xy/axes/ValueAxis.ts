@@ -117,7 +117,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
-	tooltipNumberFormat?: string;
+	tooltipNumberFormat?: string | Intl.NumberFormatOptions;
 
 	/**
 	 * If set, will use greater precision for the axis fooltip than the one for
@@ -232,7 +232,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
-		this._setPrivate("name", "value");
+		this.setPrivateRaw("name", "value");
 		super._afterNew();
 	}
 

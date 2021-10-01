@@ -58,7 +58,7 @@ export class AxisRendererY extends AxisRenderer {
 		}
 
 		super._afterNew();
-		this._setPrivate("letter", "Y");
+		this.setPrivateRaw("letter", "Y");
 
 		const gridTemplate = this.grid.template;
 		gridTemplate.set("width", p100);

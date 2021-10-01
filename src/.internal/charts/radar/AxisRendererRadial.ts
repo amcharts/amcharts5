@@ -108,7 +108,7 @@ export class AxisRendererRadial extends AxisRenderer {
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "radial"]);
 		super._afterNew();
-		this._setPrivate("letter", "Y");
+		this.setPrivate("letter", "Y");
 		this.setRaw("position", "absolute");
 	}
 

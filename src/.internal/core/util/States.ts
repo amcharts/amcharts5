@@ -31,8 +31,10 @@ export class State<E extends Entity> {
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
-		if (key in this._settings) {
-			return this._settings[key];
+		const value = this._settings[key];
+
+		if (value !== undefined) {
+			return value;
 
 		} else {
 			return fallback;

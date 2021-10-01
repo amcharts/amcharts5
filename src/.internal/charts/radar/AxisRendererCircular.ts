@@ -124,7 +124,7 @@ export class AxisRendererCircular extends AxisRenderer {
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "circular"]);
 		super._afterNew();
-		this._setPrivate("letter", "X");
+		this.setPrivateRaw("letter", "X");
 		this.setRaw("position", "absolute");
 	}
 

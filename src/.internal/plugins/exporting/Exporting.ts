@@ -152,7 +152,7 @@ export interface IExportingSettings extends IEntitySettings {
 	/**
 	 * Use this number format on numeric values.
 	 */
-	numberFormat?: string,
+	numberFormat?: string | Intl.NumberFormatOptions,
 
 	/**
 	 * Fields in data that have date/time value.
@@ -162,7 +162,7 @@ export interface IExportingSettings extends IEntitySettings {
 	/**
 	 * Use this date format on date values.
 	 */
-	dateFormat?: string,
+	dateFormat?: string | Intl.DateTimeFormatOptions,
 
 	/**
 	 * Include these images or other charts in image exports.

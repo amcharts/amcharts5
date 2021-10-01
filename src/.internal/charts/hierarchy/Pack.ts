@@ -135,11 +135,12 @@ export class Pack extends Hierarchy {
 		node.animate({ key: "x", to: x, duration: duration, easing: easing })
 		node.animate({ key: "y", to: y, duration: duration, easing: easing })
 
-		const fill = dataItem.get("fill");
-
 		if (circle) {
+			const fill = dataItem.get("fill");
+
 			circle.animate({ key: "radius", to: radius, duration: duration, easing: easing })
-			circle.setAll({ fill: fill });
+			circle._setDefault("fill", fill);
+			circle._setDefault("stroke", fill);
 		}
 	}
 

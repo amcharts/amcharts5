@@ -140,11 +140,20 @@ export class Container extends Sprite {
 	}
 
 	protected _dispose() {
-		super._dispose();
-
-		this.eachChildren((child) => {
+		$array.each(this.allChildren(), (child) => {
 			child.dispose();
 		});
+
+		const mask = this.get("mask");
+		if (mask) {
+			mask.dispose();
+		}
+
+		const background = this.get("background");
+		if (background) {
+			background.dispose();
+		}
+		super._dispose();
 	}
 
 	public _changed() {
@@ -530,7 +539,7 @@ export class Container extends Sprite {
 					}
 				}))
 
-				verticalScrollbar.events.on("rangechanged", () => {
+				this._disposers.push(verticalScrollbar.events.on("rangechanged", () => {
 					let h = this._contentHeight;
 					const childrenDisplay = this._childrenDisplay;
 					const contentMask = this._contentMask;
@@ -542,7 +551,7 @@ export class Container extends Sprite {
 						contentMask._display.y = -childrenDisplay.y;
 						childrenDisplay.mask = contentMask._display;
 					}
-				})
+				}))
 
 				this._display.addChild(verticalScrollbar._display);
 			}
@@ -564,13 +573,17 @@ export class Container extends Sprite {
 		}
 
 		if (this.isDirty("mask")) {
-			// TODO maybe this should dispose ?
+
+			const mask = this.get("mask");
+
 			const previous = this._prevSettings["mask"];
 			if (previous) {
 				this._display.removeChild(previous._display);
+				if (previous != mask) {
+					previous.dispose();
+				}
 			}
 
-			const mask = this.get("mask");
 			if (mask) {
 				mask._setParent(this);
 				this._display.addChildAt(mask._display, 0);
@@ -581,7 +594,7 @@ export class Container extends Sprite {
 
 	public _processTemplateField(): void {
 		super._processTemplateField();
-		this.children.each((child)=>{
+		this.children.each((child) => {
 			child._processTemplateField();
 		})
 	}
@@ -617,5 +630,15 @@ export class Container extends Sprite {
 		this.children.values.forEach((child) => {
 			f(child);
 		});
+	}
+
+	public allChildren(): Array<Sprite> {
+		const output: Array<Sprite> = [];
+
+		this.eachChildren((x) => {
+			output.push(x);
+		});
+
+		return output;
 	}
 }

@@ -117,7 +117,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		this.fields.push("category");
-		this._setPrivate("name", "category");
+		this.setPrivateRaw("name", "category");
 		super._afterNew();
 	}
 

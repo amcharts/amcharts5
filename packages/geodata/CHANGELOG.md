@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Fixed
+- Fixed area IDs in map of Slovenia.
+
 
 ## [5.0.2] - 2021-09-24
 

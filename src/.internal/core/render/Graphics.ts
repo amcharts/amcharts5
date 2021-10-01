@@ -193,12 +193,13 @@ export class Graphics extends Sprite {
 				this._display.isMeasured = true;
 				const gradientTarget = gradient.get("target");
 				if (gradientTarget) {
-					gradientTarget.events.on("boundschanged", () => {
+					this._disposers.push(gradientTarget.events.on("boundschanged", () => {
 						this._markDirtyKey("fill");
-					})
-					gradientTarget.events.on("positionchanged", () => {
-						this._markDirtyKey("fill");
-					})
+					}))
+					this._disposers.push(
+						gradientTarget.events.on("positionchanged", () => {
+							this._markDirtyKey("fill");
+						}))
 				}
 			}
 		}
@@ -209,12 +210,14 @@ export class Graphics extends Sprite {
 				this._display.isMeasured = true;
 				const gradientTarget = gradient.get("target");
 				if (gradientTarget) {
-					gradientTarget.events.on("boundschanged", () => {
-						this._markDirtyKey("stroke");
-					})
-					gradientTarget.events.on("positionchanged", () => {
-						this._markDirtyKey("stroke");
-					})
+					this._disposers.push(
+						gradientTarget.events.on("boundschanged", () => {
+							this._markDirtyKey("stroke");
+						}))
+					this._disposers.push(
+						gradientTarget.events.on("positionchanged", () => {
+							this._markDirtyKey("stroke");
+						}))
 				}
 			}
 		}

@@ -14,6 +14,7 @@ import { Grid } from "./axes/Grid";
 
 import * as $type from "../../core/util/Type";
 import * as $utils from "../../core/util/Utils";
+import * as $object from "../../core/util/Object";
 
 export interface IXYCursorSettings extends IContainerSettings {
 
@@ -174,7 +175,7 @@ export class XYCursor extends Container {
 	 * @default Graphics.new()
 	 */
 	public readonly selection: Graphics = this.children.push(Graphics.new(this._root, {
-		themeTags: ["selection"]
+		themeTags: ["selection", "cursor"], layer: 20
 	}));
 
 	protected _movePoint: IPoint | undefined;
@@ -295,8 +296,18 @@ export class XYCursor extends Container {
 		}));
 
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
+			if ($object.keys(plotContainer._downPoints).length == 0 && !event.native) {
+				// Ignore mouse movement if it originates on outside element and
+				// we're not dragging.
+				return;
+			}
 			this._handleMove(event.originalEvent);
 		}));
+
+		const parent = this.parent;
+		if (parent) {
+			parent.children.moveValue(this.selection);
+		}
 	}
 
 	protected _inPlot(point: IPoint): boolean {
@@ -312,6 +323,9 @@ export class XYCursor extends Container {
 		const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 		let local = this._display.toLocal(rootPoint);
 		const chart = this.chart;
+
+		this.selection.set("draw", () => { });
+
 		if (chart && this._inPlot(local)) {
 			this._downPoint = local;
 
@@ -324,8 +338,6 @@ export class XYCursor extends Container {
 				}
 			}
 
-			this.selection.set("draw", () => { });
-
 			let positionX = this._getPosition(local).x;
 			let positionY = this._getPosition(local).y;
 
@@ -337,9 +349,11 @@ export class XYCursor extends Container {
 	protected _handleCursorUp(_event: IPointerEvent) {
 		// TODO: handle multitouch
 		if (this._downPoint) {
-			const behavior = this.get("behavior");
-			if (behavior === "zoomX" || behavior === "zoomY" || behavior === "zoomXY") {
-				this.selection.hide();
+			const behavior = this.get("behavior", "none");
+			if (behavior != "none") {
+				if (behavior.charAt(0) === "z") {
+					this.selection.hide();
+				}
 
 				let userPositionX = this.get("positionX");
 				let positionX = this.getPrivate("positionX", 0);
@@ -356,13 +370,13 @@ export class XYCursor extends Container {
 				}
 
 				let dispatch = false;
-				if (behavior === "zoomX" || behavior === "zoomXY") {
+				if (behavior === "zoomX" || behavior === "zoomXY" || behavior === "selectX" || behavior === "selectXY") {
 					if (Math.abs(positionX - this.getPrivate("downPositionX", 0)) > 0.003) {
 						dispatch = true;
 					}
 				}
 
-				if (behavior === "zoomY" || behavior === "zoomXY") {
+				if (behavior === "zoomY" || behavior === "zoomXY" || behavior === "selectY" || behavior === "selectXY") {
 					if (Math.abs(positionY - this.getPrivate("downPositionY", 0)) > 0.003) {
 						dispatch = true;
 					}
@@ -424,7 +438,11 @@ export class XYCursor extends Container {
 
 			if (this.isHidden()) {
 				this.show();
-				this.selection.set("draw", () => { });
+
+				const behavior = this.get("behavior", "");
+				if (behavior.charAt(0) == "z") {
+					this.selection.set("draw", () => { });
+				}
 			}
 
 			let x = local.x;
@@ -592,5 +610,10 @@ export class XYCursor extends Container {
 			}
 		}
 		super._onShow();
+	}
+
+	protected _dispose() {
+		super._dispose();
+		this.selection.dispose();
 	}
 }

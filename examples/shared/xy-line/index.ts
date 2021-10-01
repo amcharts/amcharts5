@@ -14,6 +14,12 @@ root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+// Specify date fields, so that they are formatted accordingly in tooltips
+// https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders
+root.dateFormatter.setAll({
+  dateFields: ["valueX"]
+});
+
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
@@ -87,7 +93,7 @@ const series = chart.series.push(am5xy.LineSeries.new(root, {
 }));
 
 const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{valueY}");
+tooltip.label.set("text", "{valueX}: {valueY}");
 
 
 // Add scrollbar

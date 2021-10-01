@@ -20,8 +20,10 @@ export class TemplateState<E extends Entity> {
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
-		if (key in this._settings) {
-			return this._settings[key];
+		const value = this._settings[key];
+
+		if (value !== undefined) {
+			return value;
 
 		} else {
 			return fallback;
@@ -30,11 +32,13 @@ export class TemplateState<E extends Entity> {
 
 	public set<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
 		this._settings[key] = value;
+		// TODO maybe only do this if the value changed ?
 		this._template._stateChanged(this._name);
 	}
 
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
 		delete this._settings[key];
+		// TODO maybe only do this if the value changed ?
 		this._template._stateChanged(this._name);
 	}
 
@@ -180,8 +184,10 @@ export class Template<E extends Entity> {
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
-		if (key in this._settings) {
-			return this._settings[key];
+		const value = this._settings[key];
+
+		if (value !== undefined) {
+			return value;
 
 		} else {
 			return fallback;
@@ -221,8 +227,10 @@ export class Template<E extends Entity> {
 	public getPrivate<Key extends keyof this["_privateSettings"], F>(key: Key, fallback: F): NonNullable<this["_privateSettings"][Key]> | F;
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key): this["_privateSettings"][Key];
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key, fallback?: any): any {
-		if (key in this._privateSettings) {
-			return this._privateSettings[key];
+		const value = this._privateSettings[key];
+
+		if (value !== undefined) {
+			return value;
 
 		} else {
 			return fallback;

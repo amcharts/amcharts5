@@ -323,10 +323,19 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		})
 	}));
 
+	protected _dispose() {
+		// these could be in other parents, so disposing just in case
+		this.gridContainer.dispose();
+		this.topGridContainer.dispose();
+		this.bulletsContainer.dispose();
+		this.labelsContainer.dispose();
+		super._dispose();
+	}
+
 	protected _afterNew() {
 		super._afterNew();
 
-		this._setPrivate("updateScrollbar", true);
+		this.setPrivate("updateScrollbar", true);
 
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
 			if (change.type === "clear") {
@@ -935,7 +944,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * Converts relative position of the plot area to relative position of the
 	 * axis with zoom taken into account.
-	 * 
+	 *
 	 * @param position Position
 	 * @return Relative position
 	 */
@@ -945,7 +954,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	/**
 	 * Adjusts position with inversed taken into account.
-	 * 
+	 *
 	 * @ignore
 	 */
 	public fixPosition(position: number): number {

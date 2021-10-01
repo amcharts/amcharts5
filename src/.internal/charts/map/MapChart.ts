@@ -430,13 +430,7 @@ export class MapChart extends SerialChart {
 			if (zoomControl !== previous) {
 				this._disposeProperty("zoomControl");
 				if (previous) {
-					previous.setPrivate("chart", undefined)
-					if (previous.get("autoDispose")) {
-						previous.dispose();
-					}
-					else {
-						this.children.removeValue(previous)
-					}
+					previous.dispose();
 				}
 				if (zoomControl) {
 					zoomControl.setPrivate("chart", this);

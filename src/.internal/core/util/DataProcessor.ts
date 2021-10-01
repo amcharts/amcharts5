@@ -73,7 +73,7 @@ export class DataProcessor extends Entity {
 
 	protected _checkFeatures(): void {
 		if (this.isDirty("dateFields") || this.isDirty("dateFormat")) {
-			this._checkDates = this.get("dateFields") && this.get("dateFormat") && (this.get("dateFields")!.length > 0);
+			this._checkDates = this.get("dateFields") && (this.get("dateFields")!.length > 0);
 		}
 		if (this.isDirty("numericFields")) {
 			this._checkNumbers = this.get("numericFields") && (this.get("numericFields")!.length > 0);
@@ -152,7 +152,7 @@ export class DataProcessor extends Entity {
 
 	protected _maybeToDate(field: string, value: any): any {
 		if (this.get("dateFields")!.indexOf(field) !== -1) {
-			return this._root.dateFormatter.parse(value, this.get("dateFormat")!).getTime();
+			return this._root.dateFormatter.parse(value, this.get("dateFormat", "")).getTime();
 		}
 		return value;
 	}

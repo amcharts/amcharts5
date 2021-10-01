@@ -93,11 +93,6 @@ export interface IEntitySettings {
 	 */
 	themes?: Array<Theme>;
 
-	/**
-	 * @ignore
-	 */
-	autoDispose?:boolean;
-
 
 	/**
 	 * Duration of transition from one state to another.
@@ -501,8 +496,10 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 * @ignore
 	 */
 	public getRaw<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
-		if (key in this._settings) {
-			return (<any>this._settings)[key];
+		const value = (<any>this._settings)[key];
+
+		if (value !== undefined) {
+			return value;
 
 		} else {
 			return fallback;
@@ -548,19 +545,34 @@ export abstract class Settings implements IDisposer, IAnimation {
 	/**
 	 * @ignore
 	 */
-	public setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
-		this._prevSettings[key] = (<any>this._settings)[key];
-		(<any>this._settings)[key] = value;
+	private _setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, old: Value, value: Value) {
+		this._prevSettings[key] = old;
 		this._sendKeyEvent(key, value);
-		return value;
 	}
 
 	/**
 	 * @ignore
 	 */
-	protected _set<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
-		if ((<any>this._settings)[key] !== value) {
-			this.setRaw(key, value);
+	public setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value) {
+		const old = (<any>this._settings)[key];
+
+		(<any>this._settings)[key] = value;
+
+		if (old !== value) {
+			this._setRaw(key, old, value);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	private _set<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
+		const old = (<any>this._settings)[key];
+
+		(<any>this._settings)[key] = value;
+
+		if (old !== value) {
+			this._setRaw(key, old, value);
 			this._markDirtyKey(key);
 		}
 	}
@@ -636,8 +648,10 @@ export abstract class Settings implements IDisposer, IAnimation {
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/#Private_settings} for more info
 	 */
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key, fallback?: any): any {
-		if (key in this._privateSettings) {
-			return (<any>this._privateSettings)[key];
+		const value = (<any>this._privateSettings)[key];
+
+		if (value !== undefined) {
+			return value;
 
 		} else {
 			return fallback;
@@ -647,19 +661,34 @@ export abstract class Settings implements IDisposer, IAnimation {
 	/**
 	 * @ignore
 	 */
-	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
-		this._prevPrivateSettings[key] = (<any>this._privateSettings)[key];
-		(<any>this._privateSettings)[key] = value;
+	private _setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, old: Value, value: Value) {
+		this._prevPrivateSettings[key] = old;
 		this._sendPrivateKeyEvent(key, value);
-		return value;
 	}
 
 	/**
 	 * @ignore
 	 */
-	protected _setPrivate<Key extends keyof this["_privateSettings"]>(key: Key, value: this["_privateSettings"][Key]) {
-		if ((<any>this._privateSettings)[key] !== value) {
-			this.setPrivateRaw(key, value);
+	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value) {
+		const old = (<any>this._privateSettings)[key];
+
+		(<any>this._privateSettings)[key] = value;
+
+		if (old !== value) {
+			this._setPrivateRaw(key, old, value);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	private _setPrivate<Key extends keyof this["_privateSettings"]>(key: Key, value: this["_privateSettings"][Key]) {
+		const old = (<any>this._privateSettings)[key];
+
+		(<any>this._privateSettings)[key] = value;
+
+		if (old !== value) {
+			this._setPrivateRaw(key, old, value);
 			this._markDirtyPrivateKey(key);
 		}
 	}
@@ -917,7 +946,7 @@ export class Entity extends Settings implements IDisposer {
 		}
 
 		this.states.create("default", {});
-		this._setRawDefault("autoDispose", true);
+
 		this._setDefaults();
 	}
 
@@ -1080,8 +1109,9 @@ export class Entity extends Settings implements IDisposer {
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
-		if (key in this._settings) {
-			const value = (<any>this._settings)[key];
+		const value = (<any>this._settings)[key];
+
+		if (value !== undefined) {
 			return this.adapters.fold(key, value);
 
 		} else {
@@ -1100,6 +1130,14 @@ export class Entity extends Settings implements IDisposer {
 	public set<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
 		this._userProperties[key] = true;
 		return super.set(key, value);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value) {
+		this._userProperties[key] = true;
+		super.setRaw(key, value);
 	}
 
 	/**
@@ -1131,9 +1169,17 @@ export class Entity extends Settings implements IDisposer {
 	/**
 	 * @ignore
 	 */
-	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
+	public setPrivate<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
 		this._userPrivateProperties[key] = true;
-		return super.setPrivateRaw(key, value);
+		return super.setPrivate(key, value);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value) {
+		this._userPrivateProperties[key] = true;
+		super.setPrivateRaw(key, value);
 	}
 
 	/**
@@ -1388,8 +1434,6 @@ export class Entity extends Settings implements IDisposer {
 								});
 
 								if (matches) {
-									rule.template._setObjectTemplate(this);
-
 									const result = $array.getFirstSortedIndex(allRules, (x) => {
 										const order = $order.compare(rule.tags.length, x.tags.length);
 
@@ -1410,6 +1454,7 @@ export class Entity extends Settings implements IDisposer {
 
 				$array.each(allRules, (rule) => {
 					this._templates.push(rule.template);
+					rule.template._setObjectTemplate(this);
 				});
 			});
 		}

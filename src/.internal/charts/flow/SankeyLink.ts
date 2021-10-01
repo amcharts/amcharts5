@@ -70,18 +70,18 @@ export class SankeyLink extends FlowLink {
 			const source = this.get("source");
 			if (source) {
 				const sourceNode = source.get("node");
-				sourceNode.events.on("positionchanged", () => {
+				this._disposers.push(sourceNode.events.on("positionchanged", () => {
 					this.markDirty();
-				})
+				}))
 			}
 		}
 		if (this.isDirty("target")) {
 			const target = this.get("target");
 			if (target) {
 				const targetNode = target.get("node");
-				targetNode.events.on("positionchanged", () => {
+				this._disposers.push(targetNode.events.on("positionchanged", () => {
 					this.markDirty();
-				})
+				}))
 			}
 		}
 

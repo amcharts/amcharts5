@@ -679,6 +679,7 @@ export abstract class XYSeries extends Series {
 		if (container) {
 			container.dispose();
 		}
+		axisRange.axisDataItem.dispose();
 	}
 
 	protected _updateFields() {

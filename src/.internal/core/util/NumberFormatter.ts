@@ -1,19 +1,8 @@
-/**
- * Number formatting-related functionality.
- */
-
-/**
- * ============================================================================
- * IMPORTS
- * ============================================================================
- * @hidden
- */
+import type { Language } from "./Language";
 
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import { TextFormatter } from "./TextFormatter";
-import type { Language } from "./Language";
-// import { BaseObject } from "../Base";
-// import { registry } from "../Registry";
+
 import * as $object from "./Object";
 import * as $utils from "./Utils";
 import * as $type from "./Type";

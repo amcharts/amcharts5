@@ -98,8 +98,8 @@ export class ColorSet extends Entity {
 	//protected _currentPass: number = 0;
 
 	protected _setDefaults() {
-		this._setPrivate("currentStep", 0);
-		this._setPrivate("currentPass", 0);
+		this.setPrivate("currentStep", 0);
+		this.setPrivate("currentPass", 0);
 		this._setDefault("passOptions", {
 			hue: 0.05,
 			saturation: 0.02,

@@ -126,10 +126,12 @@ export class Scrollbar extends Container {
 
 	protected _handleAnimation(animation: Animation<any>) {
 		if (animation) {
-			animation.events.on("stopped", () => {
-				this._setPrivate("isBusy", false);
-				this._thumbBusy = false;
-			})
+			this._disposers.push(
+				animation.events.on("stopped", () => {
+					this.setPrivateRaw("isBusy", false);
+					this._thumbBusy = false;
+				})
+			)
 		}
 	}
 
@@ -143,81 +145,83 @@ export class Scrollbar extends Container {
 		const background = this.get("background");
 
 		if (background) {
-			background.events.on("click", (event) => {
-				this._setPrivate("isBusy", true);
-				const point = this._display.toLocal(event.point);
+			this._disposers.push(
+				background.events.on("click", (event) => {
+					this.setPrivateRaw("isBusy", true);
+					const point = this._display.toLocal(event.point);
 
-				const w = this.width();
-				const h = this.height();
+					const w = this.width();
+					const h = this.height();
 
-				const orientation = this.get("orientation");
+					const orientation = this.get("orientation");
 
-				let newMiddle: number;
+					let newMiddle: number;
 
-				if (orientation == "vertical") {
-					newMiddle = (point.y - thumb.height() / 2) / h;
-				}
-				else {
-					newMiddle = (point.x - thumb.width() / 2) / w;
-				}
+					if (orientation == "vertical") {
+						newMiddle = (point.y - thumb.height() / 2) / h;
+					}
+					else {
+						newMiddle = (point.x - thumb.width() / 2) / w;
+					}
 
-				let newCoordinate: number;
-				let key: "x" | "y";
+					let newCoordinate: number;
+					let key: "x" | "y";
 
-				if (orientation == "vertical") {
-					newCoordinate = newMiddle * h;
-					key = "y";
-				}
-				else {
-					newCoordinate = newMiddle * w;
-					key = "x";
-				}
+					if (orientation == "vertical") {
+						newCoordinate = newMiddle * h;
+						key = "y";
+					}
+					else {
+						newCoordinate = newMiddle * w;
+						key = "x";
+					}
 
-				this._thumbBusy = true;
-				this._handleAnimation(this.thumb.animate({ key: key, to: newCoordinate, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") }));
-			})
+					this._thumbBusy = true;
+					this._handleAnimation(this.thumb.animate({ key: key, to: newCoordinate, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") }));
+				})
+			)
 		}
 
-		thumb.events.on("dblclick", () => {
+		this._disposers.push(thumb.events.on("dblclick", () => {
 			const duration = this.get("animationDuration", 0);
 			const easing = this.get("animationEasing");
 
 			this.animate({ key: "start", to: 0, duration: duration, easing: easing });
 			this.animate({ key: "end", to: 1, duration: duration, easing: easing });
-		});
+		}));
 
 		this._disposers.push(startGrip.events.on("pointerdown", () => {
-			this._setPrivate("isBusy", true);
+			this.setPrivateRaw("isBusy", true);
 			this._startDown = true;
 		}))
 
 		this._disposers.push(endGrip.events.on("pointerdown", () => {
-			this._setPrivate("isBusy", true);
+			this.setPrivateRaw("isBusy", true);
 			this._endDown = true;
 		}))
 
 		this._disposers.push(thumb.events.on("pointerdown", () => {
-			this._setPrivate("isBusy", true);
+			this.setPrivateRaw("isBusy", true);
 			this._thumbDown = true;
 		}))
 
 		this._disposers.push(startGrip.events.on("globalpointerup", () => {
 			if (this._startDown) {
-				this._setPrivate("isBusy", false);
+				this.setPrivateRaw("isBusy", false);
 			}
 			this._startDown = false;
 		}))
 
 		this._disposers.push(endGrip.events.on("globalpointerup", () => {
 			if (this._endDown) {
-				this._setPrivate("isBusy", false);
+				this.setPrivateRaw("isBusy", false);
 			}
 			this._endDown = false;
 		}))
 
 		this._disposers.push(thumb.events.on("globalpointerup", () => {
 			if (this._thumbDown) {
-				this._setPrivate("isBusy", false);
+				this.setPrivateRaw("isBusy", false);
 			}
 			this._thumbDown = false;
 		}))

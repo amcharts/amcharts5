@@ -54,19 +54,15 @@ export class Button extends Container {
 			const icon = this.get("icon")!;
 			if (icon !== previous) {
 				this._disposeProperty("icon");
+
 				if (previous) {
-					if (previous.get("autoDispose")) {
-						previous.dispose();
-					}
-					else {
-						this.children.removeValue(previous);
-					}
+					previous.dispose();
 				}
 				if (icon) {
 					this.children.push(icon);
 				}
 
-				this.setRaw("icon", icon);
+				this._prevSettings.icon = icon;
 			}
 		}
 
@@ -76,19 +72,14 @@ export class Button extends Container {
 			if (label !== previous) {
 				this._disposeProperty("label");
 				if (previous) {
-					if (previous.get("autoDispose")) {
-						previous.dispose();
-					}
-					else {
-						this.children.removeValue(previous);
-					}
+					previous.dispose();
 				}
 
 				if (label) {
 					this.children.push(label);
 				}
 
-				this.setRaw("label", label);
+				this._prevSettings.label = label;
 			}
 		}
 	}

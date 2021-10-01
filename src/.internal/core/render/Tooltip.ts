@@ -115,6 +115,9 @@ export class Tooltip extends Container {
 	protected _strokeDp: IDisposer | undefined;
 	protected _labelDp: IDisposer | undefined;
 
+	protected _w: number = 0;
+	protected _h: number = 0;
+
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["tooltip"]);
 
@@ -303,6 +306,15 @@ export class Tooltip extends Container {
 			let w = this.width();
 			let h = this.height();
 
+			// use old w and h,as when tooltip is hidden, these are 0 and unneeded animation happens
+			if (w === 0) {
+				w = this._w;
+			}
+
+			if (h === 0) {
+				h = this._h;
+			}
+
 			let pointTo = this.get("pointTo", { x: parentW / 2, y: parentH / 2 });
 			let x = pointTo.x;
 			let y = pointTo.y;
@@ -366,7 +378,8 @@ export class Tooltip extends Container {
 			this._fy = y;
 
 			const animationDuration = this.get("animationDuration", 0);
-			if (animationDuration > 0 && this.get("visible") && this.get("opacity") > 0) {
+
+			if (animationDuration > 0 && this.get("visible") && this.get("opacity") > 0.1) {
 				const animationEasing = this.get("animationEasing");
 				this.animate({ key: "x", to: x, duration: animationDuration, easing: animationEasing });
 				this.animate({ key: "y", to: y, duration: animationDuration, easing: animationEasing });
@@ -379,6 +392,13 @@ export class Tooltip extends Container {
 			if (background instanceof PointedRectangle) {
 				background.set("pointerX", pointerX);
 				background.set("pointerY", pointerY);
+			}
+
+			if (w > 0) {
+				this._w = w;
+			}
+			if (h > 0) {
+				this._h = h;
 			}
 		}
 	}

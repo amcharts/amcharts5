@@ -197,9 +197,11 @@ export class Partition extends Hierarchy {
 
 		if (rectangle) {
 			const fill = dataItem.get("fill");
+			
 			rectangle.animate({ key: "width", to: w, duration: duration, easing: easing })
 			rectangle.animate({ key: "height", to: h, duration: duration, easing: easing })
-			rectangle.setAll({ fill: fill });
+			rectangle._setDefault("fill", fill);
+			rectangle._setDefault("stroke", fill);			
 		}
 	}
 
@@ -256,6 +258,7 @@ export class Partition extends Hierarchy {
 		const rectangle = node.children.moveValue(this.rectangles.make(), 0);
 		node.setPrivate("tooltipTarget", rectangle);
 		dataItem.setRaw("rectangle", rectangle);
+		rectangle._setDataItem(dataItem);
 
 		const label = dataItem.get("label");
 

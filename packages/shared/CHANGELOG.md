@@ -5,11 +5,32 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.29] - 2021-10-01
+
+### Added
+- Wherever date or number format can be set (`DateFormatter`, `NumberFormatter`, `DateAxis`, `ValueAxis`, `Exporting`) it can now be set as `Intl.DateTimeFormatOptions` (for date format) or `Intl.NumberFormatOptions` (for number format) object in additional to string-based format. [More info](https://www.amcharts.com/docs/v5/tutorials/formatting-date-time-and-numbers-using-intl-object/).
+- New list type `ListAutoDispose` added.
+
+### Changed
+- `XYCursor` will now ignore mouse movement if chart is obstructed by other element, unless zoomin/panning.
+- `series`, `xAxes`, and `yAxes` on an `XYChart` are now `ListAutoDispose`, which means that removing items from those lists will automatically dispose them. Set `autoDispose = false` on those lists if you are planning on removing and reusing items.
+
+### Fixed
+- `Sunburst` nodes were shown on drill-down when they were not supposed to in some cases.
+- `Hierarchy` node elements were ignoring `templateField`.
+- It was impossible to move `XYChart` scrollbars to some other container.
+- Fixed memory leaking when scrolling `LineSeries`, and when disposing series or other items.
+- `XYCursor` was not firing `selectended` event if `behavior` was set to `"selectX"`, `"selectY"`, or `"selectXY"`.
+- `XYCursor` was hiding selection when when behavior was set to `"selectX"`, `"selectY"`, or `"selectXY"`.
+- `SerialChart.series.clear()` was not working properly.
+
+
 ## [5.0.0-beta.28] - 2021-09-28
 
 ### Added
 - Two new settings in `Pattern`: `strokeDasharray` and `strokeDashoffset`.
 - `Graphics` and `Picture` can now have shadows with additional settings: `shadowColor`, `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`, and `shadowOpacity`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/).
+- New setting in `ListTemplate`: `autoDispose` (default: `true`). If set to `true` will dispose items removed from the list.
 
 ### Changed
 - `width` and `height` settings in `Pattern` are now optional.
@@ -17,6 +38,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Fixed
 - Fixed the priority of `template` and `templateField`.
 - It's now possible for the user to override the `template` of the `ListTemplate`.
+- Fixed a memory leak where series' entities were not properly disposed.
+- `DataProcessor` was not parsing dates as `Date` objects unless `dateFormat` was also set (which is completely not needed).
+- `setRaw` and `setPrivateRaw` no longer trigger events if the value didn't change.
 
 
 ## [5.0.0-beta.27] - 2021-09-27

@@ -61,7 +61,7 @@ export class XYChartScrollbar extends Scrollbar {
 
 		const plotContainer = this.chart.plotContainer;
 		plotContainer.set("interactive", false);
-		plotContainer.set("background", undefined);
+		plotContainer.remove("background");
 		plotContainer.children.removeValue(this.chart.zoomOutButton);
 
 		super._afterNew();

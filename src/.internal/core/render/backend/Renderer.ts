@@ -71,6 +71,7 @@ export interface IRendererEvent<E> {
 	point: IPoint;
 	id: Id;
 	simulated: boolean;
+	native: boolean;
 }
 
 export interface IRendererEvents {

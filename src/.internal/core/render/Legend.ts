@@ -267,7 +267,6 @@ export class Legend extends Series {
 				}
 
 				itemContainer.events.on("click", () => {
-
 					const toggleDp = itemContainer._toggleDp;
 					if (toggleDp) {
 						toggleDp.dispose();

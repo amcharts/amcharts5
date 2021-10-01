@@ -2548,6 +2548,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 export class CanvasRendererEvent<A> implements IRendererEvent<A> {
 	public id: Id;
 	public simulated: boolean = false;
+	public native: boolean = true;
 
 	constructor(public event: A, public point: IPoint) {
 		if ($utils.supports("touchevents") && event instanceof Touch) {
@@ -3061,6 +3062,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		const event = this.getEvent(originalEvent);
 
 		const target = this._getHitTarget(event.point);
+		event.native = this._isNativeEvent(originalEvent);
 
 		if (target) {
 			this._hovering.forEach((obj) => {
@@ -3073,7 +3075,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 				}
 			});
 
-			if (this._isNativeEvent(originalEvent)) {
+			if (event.native) {
 				eachTargets(target, (obj) => {
 					if (!this._hovering.has(obj)) {
 						this._hovering.add(obj);
@@ -3099,7 +3101,6 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 			this._hovering.clear();
 		}
-
 		this._dispatchEventAll("globalpointermove", event);
 	}
 

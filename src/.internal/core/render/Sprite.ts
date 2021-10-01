@@ -105,6 +105,7 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			originalEvent: event.event,
 			point: event.point,
 			simulated: event.simulated,
+			native: event.native,
 			target: this._sprite
 		};
 	}
@@ -508,6 +509,11 @@ export interface ISpritePointerEvent {
 	 * then actual user interaction.
 	 */
 	simulated: boolean;
+
+	/**
+	 * Whether event originated in chart's container or its children.
+	 */
+	native?: boolean;
 
 	/**
 	 * The element on which the event occurred.
@@ -1341,7 +1347,7 @@ export abstract class Sprite extends Entity {
 							target: this,
 							originalEvent: e.originalEvent,
 							point: e.point,
-							simulated: e.simulated,
+							simulated: e.simulated
 						});
 					}
 				}
@@ -1740,7 +1746,7 @@ export abstract class Sprite extends Entity {
 		this._removeParent(this.parent);
 
 		const tooltip = this.get("tooltip");
-		if (tooltip && tooltip.get("autoDispose")) {
+		if (tooltip) {
 			tooltip.dispose();
 		}
 

@@ -259,7 +259,11 @@ export class Sunburst extends Partition {
 			slice.animate({ key: "innerRadius", to: sliceInnerRadius, duration: duration, easing: easing })
 			slice.animate({ key: "startAngle", to: sliceStartAngle, duration: duration, easing: easing })
 			slice.animate({ key: "arc", to: arc, duration: duration, easing: easing })
-			slice.setAll({ fill: dataItem.get("fill") });
+
+			const fill = dataItem.get("fill");
+
+			slice._setDefault("fill", fill);
+			slice._setDefault("stroke", fill);
 		}
 	}
 
@@ -313,6 +317,8 @@ export class Sunburst extends Partition {
 		const slice = node.children.moveValue(this.slices.make(), 0);
 		node.setPrivate("tooltipTarget", slice);
 		dataItem.setRaw("slice", slice);
+
+		slice._setDataItem(dataItem);
 
 		slice.on("arc", () => {
 			this._updateLabel(dataItem);

@@ -444,8 +444,7 @@ export class DefaultTheme extends Theme {
 			centerX: p50,
 			centerY: p50,
 			animationEasing: $ease.out($ease.cubic),
-			exportable: false,
-			autoDispose: true
+			exportable: false
 			//layer: 100
 		});
 
@@ -2152,6 +2151,11 @@ export class DefaultTheme extends Theme {
 			setStateOnChildren: false
 		});
 
+		this.rule("HierarchyNode", ["sunburst"]).states.create("hidden", {
+			opacity: 0,
+			visible: false
+		});
+
 		{
 			const rule = this.rule("Slice", ["sunburst", "node", "shape"]);
 
@@ -2209,6 +2213,7 @@ export class DefaultTheme extends Theme {
 			initialDepth: 5,
 			topDepth: 0
 		});
+
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -2279,7 +2284,7 @@ export class DefaultTheme extends Theme {
 			draggable: true
 		});
 
-		this.rule("LinkedHierarchyNode").states.create("hidden", { scale: 0, opacity: 1 });
+		this.rule("LinkedHierarchyNode").states.create("hidden", { scale: 0, opacity: 0, visible: false });
 
 
 		/**

@@ -85,21 +85,21 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
-	dateFormats?: { [index: string]: string };
+	dateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
 	 * Date formats used for "period change" labels.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
-	periodChangeDateFormats?: { [index: string]: string };
+	periodChangeDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
 	 * A date format to use for axis tooltip.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
 	 */
-	tooltipDateFormat?: string;
+	tooltipDateFormat?: string | Intl.DateTimeFormatOptions;
 
 }
 
@@ -145,6 +145,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
+
 		this.setPrivateRaw("baseInterval", this.get("baseInterval"));
 	}
 
@@ -178,9 +179,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					if (this.get("groupData")) {
 						$array.each(this.series, (series) => {
 							this._groupSeriesData(series);
-							series.data.events.onAll(() => {
+							this._disposers.push(series.data.events.onAll(() => {
 								this._groupSeriesData(series);
-							})
+							}))
 						})
 
 						this.markDirtySize();
@@ -454,7 +455,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			const nextGridUnit = $time.getNextUnit(gridInterval.timeUnit);
 			value = $time.round(new Date(selectionMin - intervalDuration), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(min)).getTime();
 			let previousValue = value - intervalDuration;
-			let format: string;
+			let format: string | Intl.DateTimeFormatOptions;
 			const formats = this.get("dateFormats")!;
 
 			while (value < selectionMax + intervalDuration) {

@@ -319,8 +319,8 @@ export abstract class Flow extends Series {
 		const target = dataItem.get("target");
 		const sourceFill = source.get("fill");
 		const targetFill = target.get("fill");
-		link.set("fillGradient", undefined);
-		link.set("strokeGradient", undefined);
+		link.remove("fillGradient");
+		link.remove("strokeGradient");
 
 		switch (fillStyle) {
 
@@ -354,7 +354,7 @@ export abstract class Flow extends Series {
 				link.set("fillGradient", gradient);
 				break;
 			case "none":
-				link.set("fill", undefined);
+				link.set("fill", undefined); // do not use remove!
 				break;
 		}
 
@@ -390,7 +390,7 @@ export abstract class Flow extends Series {
 				break;
 
 			case "none":
-				link.set("stroke", undefined);
+				link.remove("stroke");
 				break;
 		}
 	}

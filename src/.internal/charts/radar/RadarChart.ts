@@ -204,7 +204,7 @@ export class RadarChart extends XYChart {
 				this._updateMask(series.bulletsContainer, innerRadius, radius);
 			}
 			else {
-				series.bulletsContainer.set("mask", undefined);
+				series.bulletsContainer.remove("mask");
 			}
 		})
 

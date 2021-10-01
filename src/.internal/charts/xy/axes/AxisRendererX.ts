@@ -57,7 +57,7 @@ export class AxisRendererX extends AxisRenderer {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
 
 		super._afterNew();
-		this._setPrivate("letter", "X");
+		this.setPrivateRaw("letter", "X");
 
 		const gridTemplate = this.grid.template;
 		gridTemplate.set("height", p100);

@@ -195,6 +195,9 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 		const d = circle.get("radius", this.width()) * 2;
 		label.setAll({ maxWidth: d, maxHeight: d });
+		
+		circle._setDataItem(dataItem);
+		outerCircle._setDataItem(dataItem);
 
 		return node;
 	}
@@ -274,13 +277,16 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const fill = dataItem.get("fill");
 		const circle = dataItem.get("circle");
 		const children = dataItem.get("children");
+		
 		if (circle) {
-			circle.setAll({ fill: fill, stroke: fill });
+			circle._setDefault("fill", fill);
+			circle._setDefault("stroke", fill);
 		}
 
 		const outerCircle = dataItem.get("outerCircle");
 		if (outerCircle) {
-			outerCircle.setAll({ fill: fill, stroke: fill });
+			outerCircle._setDefault("fill", fill);
+			outerCircle._setDefault("stroke", fill);
 
 			if (!children || children.length == 0) {
 				outerCircle.setPrivate("visible", false);

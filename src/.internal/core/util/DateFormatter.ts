@@ -1,6 +1,8 @@
-import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import type { ILocaleSettings } from "./Language"
+
+import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import { TextFormatter } from "./TextFormatter"
+
 import * as $type from "./Type"
 import * as $utils from "./Utils";
 
@@ -15,9 +17,34 @@ export interface DateFormatInfo {
 }
 
 export interface IDateFormatterSettings extends IEntitySettings {
+
+	/**
+	 * Should the first letter of the formatted date be capitalized?
+	 *
+	 * @default true
+	 */
 	capitalize?: boolean;
-	dateFormat?: string;
+
+	/**
+	 * A date format to be used when formatting dates.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 */
+	dateFormat?: string | Intl.DateTimeFormatOptions;
+
+	/**
+	 * An array of data fields that hold date values and should be formatted
+	 * with a [[DateFormatter]].
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates} for more info
+	 */
 	dateFields?: string[];
+
+	/**
+	 * Locales to use when formatting using `Intl.DateFormatter`.
+	 */
+	intlLocales?: string;
+
 }
 
 export interface IDateFormatterPrivate extends IEntityPrivate {
@@ -44,7 +71,7 @@ export class DateFormatter extends Entity {
 		super._beforeChanged();
 	}
 
-	public format(source: any, format?: string): string {
+	public format(source: any, format?: string | Intl.DateTimeFormatOptions): string {
 
 		// Locale?
 		// TODO
@@ -60,6 +87,24 @@ export class DateFormatter extends Entity {
 		// Cast?
 		// TODO: decide if we need to cast
 		let date: Date = source;
+
+		// Is it a built-in format or Intl.DateTimeFormat
+		if ($type.isObject(format)) {
+
+			try {
+				const locales = this.get("intlLocales");
+				if (locales) {
+					return new Intl.DateTimeFormat(locales, <Intl.DateTimeFormatOptions>format).format(date);
+				}
+				else {
+					return new Intl.DateTimeFormat(undefined, <Intl.DateTimeFormatOptions>format).format(date);
+				}
+			}
+			catch (e) {
+				return "Invalid";
+			}
+
+		}
 
 		// get format info (it will also deal with parser caching)
 		let info = this.parseFormat(format);
@@ -455,8 +500,12 @@ export class DateFormatter extends Entity {
 			if (chunk.type === "value") {
 
 				// Just "Date"?
-				if (chunk.text.match(/^date$/i) && this.get("dateFormat")) {
-					chunk.text = this.get("dateFormat", "yyyy-MM-dd");
+				if (chunk.text.match(/^date$/i)) {
+					let dateFormat = this.get("dateFormat", "yyyy-MM-dd");
+					if (!$type.isString(dateFormat)) {
+						dateFormat = "yyyy-MM-dd";
+					}
+					chunk.text = dateFormat;
 				}
 
 				// Find all possible parts

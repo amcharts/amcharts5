@@ -274,6 +274,11 @@ export abstract class Series extends Component {
 		}));
 	}
 
+	protected _dispose(){
+		this.bulletsContainer.dispose(); // can be in a different parent
+		super._dispose();
+	}
+
 	protected _handleBullets(dataItems:Array<DataItem<this["_dataItemSettings"]>>){
 		$array.each(dataItems, (dataItem)=>{
 			const bullets = dataItem.bullets;
