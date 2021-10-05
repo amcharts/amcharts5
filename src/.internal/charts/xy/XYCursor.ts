@@ -97,12 +97,12 @@ export interface IXYCursorPrivate extends IContainerPrivate {
 	positionY?: number;
 
 	/**
-	 * @ignore
+	 * Horizontal cursor position on the moment when selection started.
 	 */
 	downPositionX?: number;
 
 	/**
-	 * @ignore
+	 * Vertical cursor position on the moment when selection started.
 	 */
 	downPositionY?: number;
 

@@ -1407,6 +1407,19 @@ export class CanvasText extends CanvasContainer implements IText {
 			}
 		}
 
+		if (style.shadowColor) {
+			layer.context.shadowColor = style.shadowColor.toCSS(style.shadowOpacity || 1);
+		}
+		if (style.shadowBlur) {
+			layer.context.shadowBlur = style.shadowBlur;
+		}
+		if (style.shadowOffsetX) {
+			layer.context.shadowOffsetX = style.shadowOffsetX;
+		}
+		if (style.shadowOffsetY) {
+			layer.context.shadowOffsetY = style.shadowOffsetY;
+		}
+
 		this._shared(context);
 
 		if (this._isInteractive() && !ignoreGhost) {
@@ -1998,13 +2011,12 @@ export class CanvasTextStyle implements ITextStyle {
 	public fontSize?: string | number;
 	public fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 	public fontStyle?: 'normal' | 'italic' | 'oblique';
-	// dropShadow?: boolean;
-	// dropShadowAlpha?: number;
-	// dropShadowAngle?: number;
-	// dropShadowBlur?: number;
-	// dropShadowColor?: number;
-	// dropShadowDistance?: number;
 	public fontVariant?: "normal" | "small-caps";
+	public shadowColor?: Color | null;
+	public shadowBlur?: number;
+	public shadowOffsetX?: number;
+	public shadowOffsetY?: number;
+	public shadowOpacity?: number;
 	// leading?: number;
 	// letterSpacing?: number;
 	public lineHeight?: number | Percent = percent(120);

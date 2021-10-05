@@ -213,13 +213,13 @@ export interface ITextStyle {
 	fontSize?: string | number;
 	fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 	fontStyle?: 'normal' | 'italic' | 'oblique';
-	// dropShadow?: boolean;
-	// dropShadowAlpha?: number;
-	// dropShadowAngle?: number;
-	// dropShadowBlur?: number;
-	// dropShadowColor?: number;
-	// dropShadowDistance?: number;
 	fontVariant?: "normal" | "small-caps";
+	shadowColor?: Color | null;
+	shadowBlur?: number;
+	shadowOffsetX?: number;
+	shadowOffsetY?: number;
+	shadowOpacity?: number;
+
 	// leading?: number;
 	// letterSpacing?: number;
 	lineHeight?: number | Percent;

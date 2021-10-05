@@ -521,7 +521,7 @@ export function trim(text: string): string {
  *
  * @ignore Exclude from docs
  * @param format  Format string
- * @return Format type ("string" | "number" | "date" | "duration")
+ * @return Format type ("string" | "number" | "date")
  */
 export function getFormat(format: string): string {
 
@@ -540,7 +540,7 @@ export function getFormat(format: string): string {
 	format = format.trim();
 
 	// Check for any explicit format hints (i.e. /Date)
-	let hints: RegExpMatchArray | null = format.match(/\/(date|number|duration)$/);
+	let hints: RegExpMatchArray | null = format.match(/\/(date|number)$/);
 
 	if (hints) {
 		return hints[1];
@@ -553,10 +553,6 @@ export function getFormat(format: string): string {
 
 	if (format === "date") {
 		return "date";
-	}
-
-	if (format === "duration") {
-		return "duration";
 	}
 
 	// Detect number formatting symbols
@@ -582,7 +578,7 @@ export function getFormat(format: string): string {
  * @return Cleaned format
  */
 export function cleanFormat(format: string): string {
-	return format.replace(/\/(date|number|duration)$/i, "");
+	return format.replace(/\/(date|number)$/i, "");
 }
 
 /**

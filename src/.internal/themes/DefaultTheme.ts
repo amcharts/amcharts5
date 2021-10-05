@@ -817,7 +817,8 @@ export class DefaultTheme extends Theme {
 			paddingBottom: 16,
 			panX: false,
 			panY: false,
-			wheelStep: 0.25
+			wheelStep: 0.25,
+			arrangeTooltips: true
 		});
 
 		/**

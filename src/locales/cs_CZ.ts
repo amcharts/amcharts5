@@ -5,7 +5,7 @@
  * Language: Czech
  * Author: Bjorn Svensson
  *
- * Follow instructions in [on this page](https://www.amcharts.com/docs/v4/tutorials/creating-translations/) to make corrections or add new translations.
+ * Follow instructions in [on this page](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
  *
  * ---
  * Edit but leave the header section above this line. You can remove any
@@ -100,7 +100,7 @@ export default {
   // This should reflect official or de facto formatting universally accepted
   // in the country translation is being made for
   // Available format codes here:
-  // https://www.amcharts.com/docs/v4/concepts/formatters/formatting-date-time/#Format_codes
+  // https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#Format_codes
   //
   // This will be used when formatting date/time for particular granularity,
   // e.g. "_date_hour" will be shown whenever we need to show time as hours.
@@ -131,9 +131,7 @@ export default {
   // If we pass in `70`, which is more than a minute, the formatter will switch
   // to `"_duration_second_minute"` ("mm:ss"), resulting in "01:10" formatted
   // text.
-  //
-  // Available codes here:
-  // https://www.amcharts.com/docs/v4/concepts/formatters/formatting-duration/#Available_Codes
+
   "_duration_millisecond": "SSS",
   "_duration_millisecond_second": "ss.SSS",
   "_duration_millisecond_minute": "mm:ss SSS",

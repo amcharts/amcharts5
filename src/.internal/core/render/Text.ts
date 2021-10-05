@@ -1,11 +1,13 @@
 import type { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
-import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
 import type { IText } from "./backend/Renderer";
-import * as $array from "../util/Array";
 import type { IBounds } from "../util/IBounds";
-import { populateString } from "../util/PopulateString";
 import type { DataItem, IComponentDataItem } from "./Component";
+
+import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
+import { populateString } from "../util/PopulateString";
+
+import * as $array from "../util/Array";
 
 /**
  * @ignore Text is an internal class. Use Label instead.
@@ -18,18 +20,16 @@ export interface ITextSettings extends ISpriteSettings {
 	fontSize?: string | number;
 	fontWeight?: "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900"
 	fontStyle?: "normal" | "italic" | "oblique";
-	// dropShadow?: boolean;
-	// dropShadowAlpha?: number;
-	// dropShadowAngle?: number;
-	// dropShadowBlur?: number;
-	// dropShadowColor?: number;
-	// dropShadowDistance?: number;
 	fontVariant?: "normal" | "small-caps";
+	shadowColor?: Color | null;
+	shadowBlur?: number;
+	shadowOffsetX?: number;
+	shadowOffsetY?: number;
+	shadowOpacity?: number;
 	// leading?: number;
 	// letterSpacing?: number;
 	lineHeight?: Percent | number;
 	baselineRatio?: number;
-	// padding?: number;
 	// stroke?: number;
 	// strokeThickness?: number;
 	// trim?: number;
@@ -76,13 +76,12 @@ export class Text extends Sprite {
 		"fontStyle",
 		"fontWeight",
 		"fontStyle",
-		// "dropShadow",
-		// "dropShadowAlpha",
-		// "dropShadowAngle",
-		// "dropShadowBlur",
-		// "dropShadowColor",
-		// "dropShadowDistance",
 		"fontVariant",
+		"shadowColor",
+		"shadowBlur",
+		"shadowOffsetX",
+		"shadowOffsetY",
+		"shadowOpacity",
 		// "leading",
 		// "letterSpacing",
 		"lineHeight",

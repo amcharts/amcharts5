@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.30] - 2021-10-05
+
+### Added
+- `shadow*` settings are now available on `Label` as well.
+- `arrangeTooltips` (default: `true`) setting added to `XYChart`. If set to `false` will disable tooltip overlap check algo.
+
+### Fixed
+- Fixed type errors when importing maps (especially in Angular).
+- Fixed `templateField` to override `template`.
+
+
 ## [5.0.0-beta.29] - 2021-10-01
 
 ### Added

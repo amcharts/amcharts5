@@ -4,7 +4,6 @@ import type { Container } from "./Container";
 import type { IAccessibilitySettings } from "../util/Accessibility";
 import type { NumberFormatter } from "../util/NumberFormatter";
 import type { DateFormatter } from "../util/DateFormatter";
-import type { DurationFormatter } from "../util/DurationFormatter";
 import type { DataItem, IComponentDataItem } from "./Component";
 import type { Tooltip } from "./Tooltip";
 import type { Graphics } from "./Graphics";
@@ -380,14 +379,6 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
 	 */
 	dateFormatter?: DateFormatter | undefined;
-
-	/**
-	 * An instance of [[DurationFormatter]] that should be used instead of global
-	 * formatter object.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
-	 */
-	durationFormatter?: DurationFormatter | undefined;
 
 	/**
 	 * If set, element will toggle specified boolean setting between `true` and
@@ -2107,15 +2098,12 @@ export abstract class Sprite extends Entity {
 	}
 
 	protected _findStaticTemplate(f: (template: Template<this>) => boolean): Template<this> | undefined {
-		const output = super._findStaticTemplate(f);
-
-		if (output) {
-			return output;
-		}
-
+		// templateField overrides template
 		if (this._templateField && f(this._templateField)) {
 			return this._templateField;
 		}
+
+		return super._findStaticTemplate(f);
 	}
 
 	protected _walkParents(f: (parent: Entity) => void): void {
@@ -2186,18 +2174,6 @@ export abstract class Sprite extends Entity {
 	 */
 	public getDateFormatter(): DateFormatter {
 		return this.get("dateFormatter", this._root.dateFormatter);
-	}
-
-	/**
-	 * Returns an instance of [[DurationFormatter]] used in this element.
-	 *
-	 * If this element does not have it set, global one form [[Root]] is used.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
-	 * @return DurationFormatter instace
-	 */
-	public getDurationFormatter(): DurationFormatter {
-		return this.get("durationFormatter", this._root.durationFormatter);
 	}
 
 	/**

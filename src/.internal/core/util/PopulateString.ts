@@ -64,7 +64,6 @@ function getTagValue(target: Sprite, tagName: string, format?: string): string {
 			// Check if maybe we should force a formatter on this value
 			const dateFields = target.getDateFormatter().get("dateFields", []);
 			const numericFields = target.getNumberFormatter().get("numericFields", []);
-			const durationFields = target.getDurationFormatter().get("durationFields", []);
 			if ((<any>dateFields).indexOf(matches[3]) !== -1) {
 				parts.push({
 					method: "formatDate",
@@ -74,12 +73,6 @@ function getTagValue(target: Sprite, tagName: string, format?: string): string {
 			else if ((<any>numericFields).indexOf(matches[3]) !== -1) {
 				parts.push({
 					method: "formatNumber",
-					params: []
-				});
-			}
-			else if ((<any>durationFields).indexOf(matches[3]) !== -1) {
-				parts.push({
-					method: "formatDuration",
 					params: []
 				});
 			}
@@ -212,17 +205,6 @@ function getTagValueFromObject(target: Sprite, parts: any[], object: any, format
 						formatApplied = true;
 					}
 					break;
-				case "formatDuration":
-					let durationValue = $type.toNumber(current);
-					if (durationValue != null) {
-						current = target.getDurationFormatter().format(
-							durationValue,
-							format || part.params[0] || undefined,
-							part.params[1] || undefined
-						);
-						formatApplied = true;
-					}
-					break;
 				case "urlEncode":
 				case "encodeURIComponent":
 					current = encodeURIComponent(current);
@@ -270,9 +252,6 @@ function getTagValueFromObject(target: Sprite, parts: any[], object: any, format
 			}
 			else if (formatterType === "date") {
 				formatParts[0].method = "formatDate";
-			}
-			else if (formatterType === "duration") {
-				formatParts[0].method = "formatDuration";
 			}
 
 		}

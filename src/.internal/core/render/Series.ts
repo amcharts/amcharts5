@@ -325,9 +325,9 @@ export abstract class Series extends Component {
 		let sprite = bullet.get("sprite");
 
 		if (sprite) {
-			this.bulletsContainer.children.push(sprite);
 			sprite._setDataItem(dataItem);
 			sprite.setRaw("position", "absolute");
+			this.bulletsContainer.children.push(sprite);			
 		}
 		bullet._index = index;
 		bullet.series = this;

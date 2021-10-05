@@ -92,6 +92,17 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 */
 	maxTooltipDistance?: number;
 
+	/**
+	 * If set to `false` the chart will not check for overlapping of multiple
+	 * tooltips, and will not arrange them to not overlap.
+	 *
+	 * Will work only if chart has an `XYCursor` enabled.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
+	 * @default true
+	 */
+	arrangeTooltips?: boolean
+
 }
 
 export interface IXYChartPrivate extends ISerialChartPrivate {
@@ -820,7 +831,7 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _removeAxis(axis: Axis<AxisRenderer>) {
-		if(!axis.isDisposed()){
+		if (!axis.isDisposed()) {
 			const axisParent = axis.parent
 			if (axisParent) {
 				axisParent.children.removeValue(axis);
@@ -1006,46 +1017,47 @@ export class XYChart extends SerialChart {
 				}
 			}
 		})
+		if (this.get("arrangeTooltips")) {
 
+			const tooltipContainer = this._root.tooltipContainer;
 
-		let tooltipContainer = this._root.tooltipContainer;
+			tooltips.sort((a, b) => $order.compareNumber(a.get("pointTo")!.y, b.get("pointTo")!.y));
+			const count = tooltips.length;
+			const average = sum / count;
 
-		tooltips.sort((a, b) => $order.compareNumber(a.get("pointTo")!.y, b.get("pointTo")!.y));
-		let count = tooltips.length;
-		let average = sum / count;
+			if (average > h / 2 + plotT.y) {
+				tooltips.reverse();
+				let prevY = plotB.y;
 
-		if (average > h / 2 + plotT.y) {
-			tooltips.reverse();
-			let prevY = plotB.y;
+				$array.each(tooltips, (tooltip) => {
+					let height = tooltip.height();
+					let centerY = tooltip.get("centerY");
+					if (centerY instanceof Percent) {
+						height *= centerY.value;
+					}
+					height += tooltip.get("marginBottom", 0);
 
-			$array.each(tooltips, (tooltip) => {
-				let height = tooltip.height();
-				let centerY = tooltip.get("centerY");
-				if (centerY instanceof Percent) {
-					height *= centerY.value;
-				}
-				height += tooltip.get("marginBottom", 0);
+					tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
 
-				tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
+					prevY = Math.min(prevY - height, tooltip._fy - height);
+					tooltipContainer.children.moveValue(tooltip, 0);
+				})
+			}
+			else {
+				let prevY = 0;
+				$array.each(tooltips, (tooltip) => {
+					let height = tooltip.height();
+					let centerY = tooltip.get("centerY");
+					if (centerY instanceof Percent) {
+						height *= centerY.value;
+					}
+					height += tooltip.get("marginBottom", 0);
 
-				prevY = Math.min(prevY - height, tooltip._fy - height);
-				tooltipContainer.children.moveValue(tooltip, 0);
-			})
-		}
-		else {
-			let prevY = 0;
-			$array.each(tooltips, (tooltip) => {
-				let height = tooltip.height();
-				let centerY = tooltip.get("centerY");
-				if (centerY instanceof Percent) {
-					height *= centerY.value;
-				}
-				height += tooltip.get("marginBottom", 0);
-
-				tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
-				tooltipContainer.children.moveValue(tooltip, 0);
-				prevY = Math.max(prevY + height, tooltip._fy + height);
-			})
+					tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
+					tooltipContainer.children.moveValue(tooltip, 0);
+					prevY = Math.max(prevY + height, tooltip._fy + height);
+				})
+			}
 		}
 	}
 

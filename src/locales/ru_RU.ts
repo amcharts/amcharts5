@@ -4,7 +4,7 @@
  * Locale: ru_RU
  * Language: Russian
  *
- * Follow instructions in [on this page](https://www.amcharts.com/docs/v4/tutorials/creating-translations/) to make corrections or add new translations.
+ * Follow instructions in [on this page](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
  */
 export default {
 	// number formatter related

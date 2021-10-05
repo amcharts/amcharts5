@@ -1,10 +1,12 @@
-import { Text } from "../render/Text";
 import type { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
+import type { DataItem, IComponentDataItem } from "./Component";
+
+import { Text } from "../render/Text";
 import { p50, p100 } from "../util/Percent";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
+
 import * as  $array from "../../core/util/Array";
-import type { DataItem, IComponentDataItem } from "./Component";
 
 
 export interface ILabelSettings extends IContainerSettings {
@@ -68,7 +70,6 @@ export interface ILabelSettings extends IContainerSettings {
 	 * Opacity of the label.
 	 *
 	 * 0 - fully transparent; 1 - fully opaque.
-	 * @type {[type]}
 	 */
 	opacity?: number;
 
@@ -142,18 +143,54 @@ export interface ILabelSettings extends IContainerSettings {
 	 */
 	ignoreFormatting?: boolean;
 
+	/**
+	 * Color of the element's shadow.
+	 *
+	 * For this to work at least one of the following needs to be set as well:
+	 * `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowColor?: Color | null;
+
+	/**
+	 * Blurriness of the the shadow.
+	 *
+	 * The bigger the number, the more blurry shadow will be.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowBlur?: number;
+
+	/**
+	 * Horizontal shadow offset in pixels.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowOffsetX?: number;
+
+	/**
+	 * Vertical shadow offset in pixels.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowOffsetY?: number;
+
+	/**
+	 * Opacity of the shadow (0-1).
+	 *
+	 * If not set, will use the same as `fillOpacity` of the element.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 */
+	shadowOpacity?: number;
+
 	// The following migh be supported some day:
 	// padding?: number;
 	// stroke?: number;
 	// strokeThickness?: number;
 	// trim?: number;
 	// wordWrap?: boolean;
-	// dropShadow?: boolean;
-	// dropShadowAlpha?: number;
-	// dropShadowAngle?: number;
-	// dropShadowBlur?: number;
-	// dropShadowColor?: number;
-	// dropShadowDistance?: number;
 	// leading?: number;
 	// letterSpacing?: number;
 }
@@ -182,13 +219,12 @@ export class Label extends Container {
 		"fontStyle",
 		"fontWeight",
 		"fontStyle",
-		// "dropShadow",
-		// "dropShadowAlpha",
-		// "dropShadowAngle",
-		// "dropShadowBlur",
-		// "dropShadowColor",
-		// "dropShadowDistance",
 		"fontVariant",
+		"shadowColor",
+		"shadowBlur",
+		"shadowOffsetX",
+		"shadowOffsetY",
+		"shadowOpacity",
 		// "leading",
 		// "letterSpacing",
 		"lineHeight",

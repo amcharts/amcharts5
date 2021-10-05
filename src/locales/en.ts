@@ -102,7 +102,7 @@ export default {
 	// This should reflect official or de facto formatting universally accepted
 	// in the country translation is being made for
 	// Available format codes here:
-	// https://www.amcharts.com/docs/v4/concepts/formatters/formatting-date-time/#Format_codes
+	// https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#Format_codes
 	// 
 	// This will be used when formatting date/time for particular granularity,
 	// e.g. "_date_hour" will be shown whenever we need to show time as hours.
