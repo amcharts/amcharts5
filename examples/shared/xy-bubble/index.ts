@@ -29,7 +29,6 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererX.new(root, {}),
   tooltip: am5.Tooltip.new(root, {
-    themeTags: ["axis"],
     animationDuration: 300
   })
 }));
@@ -45,7 +44,6 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
     inversed: false
   }),
   tooltip: am5.Tooltip.new(root, {
-    themeTags: ["axis"],
     animationDuration: 300
   })
 }));

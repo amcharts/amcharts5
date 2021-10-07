@@ -64,7 +64,6 @@ const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   categoryField: "year",
   renderer: am5xy.AxisRendererX.new(root, {}),
   tooltip: am5.Tooltip.new(root, {
-    themeTags: ["axis"],
     animationDuration: 200
   })
 }));

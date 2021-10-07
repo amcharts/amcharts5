@@ -287,8 +287,7 @@ export class DefaultTheme extends Theme {
 			paddingTop: 0,
 			paddingBottom: 0,
 			width: 50,
-			centerX: p100,
-			x: p100,
+			centerX: p100,			
 			populateText: true
 		});
 
@@ -1159,6 +1158,14 @@ export class DefaultTheme extends Theme {
 
 		this.rule("Label", ["axis", "tooltip"]).setAll({
 			role: undefined
+		});
+
+		this.rule("Label", ["axis", "tooltip", "y"]).setAll({
+			textAlign: "right"
+		});
+
+		this.rule("Label", ["axis", "tooltip", "y", "opposite"]).setAll({
+			textAlign: "left"
 		});
 
 		{

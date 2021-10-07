@@ -159,13 +159,6 @@ export class Container extends Sprite {
 	public _changed() {
 		super._changed();
 
-		//if (this.isDirty("interactive") && this.get("background")) {
-		//const background = this.get("background");
-		//if (background instanceof Sprite) {
-		//	background.set("interactive", this.get("interactive"));
-		//}
-		//}
-
 		if (this.isDirty("interactiveChildren")) {
 			this._display.interactiveChildren = this.get("interactiveChildren", false);
 		}
@@ -174,8 +167,8 @@ export class Container extends Sprite {
 			this.markDirtyBounds();
 			if (this._prevSettings.layout) {
 				this.children.each((child) => {
-					child.remove("x");
-					child.remove("y");
+					child.removePrivate("x");
+					child.removePrivate("y");
 				})
 			}
 		}

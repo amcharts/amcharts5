@@ -76,7 +76,6 @@ const xAxis = chart.xAxes.push(
     },
     renderer: xRenderer,
     tooltip: am5.Tooltip.new(root, {
-      themeTags: ["axis"],
       animationDuration: 200
     })
   })

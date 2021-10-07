@@ -148,7 +148,7 @@ export class AxisRendererY extends AxisRenderer {
 	 * @ignore
 	 */
 	public axisLength(): number {
-		return this.axis.height();
+		return this.axis.innerHeight();
 	}
 
 	/**
@@ -419,6 +419,16 @@ export class AxisRendererY extends AxisRenderer {
 		}
 	}
 
+	public _updateLC() {
+		const axis = this.axis;
+		const parent = axis.parent;
+		if (parent) {
+			const h = parent.innerHeight();
+			this._lc = this.axisLength() / h;
+			this._ls = axis.y() / h;
+		}
+	}
+
 	/**
 	 * @ignore
 	 */
@@ -426,7 +436,10 @@ export class AxisRendererY extends AxisRenderer {
 		const start = this._start || 0;
 		const end = this._end || 1;
 
-		position = position * (end - start);
+		position -= this._ls;
+
+		position = position * (end - start) / this._lc;
+
 		if (this.get("inversed")) {
 			position = start + position;
 		}

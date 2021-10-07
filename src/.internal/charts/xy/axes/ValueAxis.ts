@@ -739,12 +739,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				let seriesMin: number | undefined;
 				let seriesMax: number | undefined;
 				if (series.get("xAxis") === this) {
-					seriesMin = series.getPrivate("selectionMinX");
-					seriesMax = series.getPrivate("selectionMaxX");
+					seriesMin = series.getPrivate("selectionMinX", series.getPrivate("minX"));
+					seriesMax = series.getPrivate("selectionMaxX", series.getPrivate("maxX"));
 				}
 				else if (series.get("yAxis") === this) {
-					seriesMin = series.getPrivate("selectionMinY");
-					seriesMax = series.getPrivate("selectionMaxY");
+					seriesMin = series.getPrivate("selectionMinY", series.getPrivate("minY"));
+					seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
 				}
 				if (!series.isHidden() && !series.isShowing()) {
 					if ($type.isNumber(seriesMin)) {
@@ -809,11 +809,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			selectionMin = $math.fitToRange(selectionMin, min, max);
 			selectionMax = $math.fitToRange(selectionMax, min, max);
 
-			// do it for the second time !important
+			// do it for the second time !important			
 			minMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount, true);
 
-			selectionMin = minMaxStep.min;
-			selectionMax = minMaxStep.max;
+			if (!strictMinMax) {
+				selectionMin = minMaxStep.min;
+				selectionMax = minMaxStep.max;
+			}
 
 			const syncWithAxis = this.get("syncWithAxis");
 			if (syncWithAxis) {

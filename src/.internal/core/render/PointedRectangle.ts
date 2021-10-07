@@ -96,19 +96,20 @@ export class PointedRectangle extends Graphics {
 				display.moveTo(cr, 0);
 
 				if (d1 > 0 && d2 > 0) {
-					let stemX = $math.fitToRange(x, cr + bwh, w - bwh - cr);
+					let stemX = Math.round($math.fitToRange(x, cr + bwh, w - bwh - cr));
 					y = $math.fitToRange(y, -Infinity, 0);
 
 					display.lineTo(stemX - bwh, 0);
 					display.lineTo(x, y);
 					display.lineTo(stemX + bwh, 0);
 				}
+
 				display.lineTo(w - cr, 0);
 				display.arcTo(w, 0, w, cr, cr);
 
 				// right
 				if (d1 > 0 && d2 < 0) {
-					let stemY = $math.fitToRange(y, cr + bwh, h - bwh - cr);
+					let stemY = Math.round($math.fitToRange(y, cr + bwh, h - bwh - cr));
 					x = $math.fitToRange(x, w, Infinity);
 					display.lineTo(w, cr);
 					display.lineTo(w, stemY - bwh);
@@ -120,7 +121,7 @@ export class PointedRectangle extends Graphics {
 
 				// bottom
 				if (d1 < 0 && d2 < 0) {
-					let stemX = $math.fitToRange(x, cr + bwh, w - bwh - cr);
+					let stemX = Math.round($math.fitToRange(x, cr + bwh, w - bwh - cr));
 					y = $math.fitToRange(y, h, Infinity);
 
 					display.lineTo(w - cr, h);
@@ -134,7 +135,7 @@ export class PointedRectangle extends Graphics {
 
 				// left
 				if (d1 < 0 && d2 > 0) {
-					let stemY = $math.fitToRange(y, cr + bwh, h - cr - bwh);
+					let stemY = Math.round($math.fitToRange(y, cr + bwh, h - cr - bwh));
 					x = $math.fitToRange(x, -Infinity, 0);
 					display.lineTo(0, h - cr);
 					display.lineTo(0, stemY + bwh);

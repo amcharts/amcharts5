@@ -57,7 +57,7 @@ export class HorizontalLayout extends Layout {
 				let marginLeft = child.get("marginLeft", 0);
 				let marginRight = child.get("marginRight", 0);
 				let x = prevX + marginLeft - bounds.left;
-				child.set("x", x);
+				child.setPrivate("x", x);
 				prevX = x + bounds.right + marginRight;
 			}
 		});

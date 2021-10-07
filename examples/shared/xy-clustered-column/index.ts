@@ -71,7 +71,6 @@ const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
     cellEndLocation: 0.9
   }),
   tooltip: am5.Tooltip.new(root, {
-    themeTags: ["axis"],
     animationDuration: 200
   })
 }));

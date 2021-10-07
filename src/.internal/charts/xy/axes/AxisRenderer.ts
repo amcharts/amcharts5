@@ -80,6 +80,10 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public chart: XYChart | undefined;
 
+	protected _lc = 1;
+
+	protected _ls = 0;
+
 	/**
 	 * @ignore
 	 */
@@ -304,6 +308,10 @@ export abstract class AxisRenderer extends Graphics {
 			return 1 - position;
 		}
 		return position;
+	}
+
+	public _updateLC(){
+
 	}
 
 	protected toggleVisibility(sprite: Sprite, position: number, minPosition: number, maxPosition: number): void {

@@ -70,7 +70,6 @@ const xAxis = chart.xAxes.push(
       cellEndLocation: 0.9
     }),
     tooltip: am5.Tooltip.new(root, {
-      themeTags: ["axis"],
       animationDuration: 200
     })
   })

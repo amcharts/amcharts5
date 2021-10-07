@@ -103,6 +103,35 @@ export class AxisRendererX extends AxisRenderer {
 		}
 	}
 
+
+	public toAxisPosition(position: number): number {
+		const start = this._start || 0;
+		const end = this._end || 1;
+
+		position -= this._ls;
+
+		position = position * (end - start) / this._lc;
+		if (!this.get("inversed")) {
+			position = start + position;
+		}
+		else {
+			position = end - position;
+		}
+
+		return position;
+	}
+
+
+	public _updateLC() {
+		const axis = this.axis;
+		const parent = axis.parent;
+		if (parent) {
+			const w = parent.innerWidth();
+			this._lc = this.axisLength() / w;
+			this._ls = (axis.x() - parent.get("paddingLeft", 0)) / w;
+		}
+	}
+
 	public _updatePositions() {
 		const axis = this.axis;
 		axis.gridContainer.set("x", axis.x() - $utils.relativeToValue(axis.get("centerX", 0), axis.width()) - axis.parent!.get("paddingLeft", 0));
@@ -114,6 +143,13 @@ export class AxisRendererX extends AxisRenderer {
 			const axisHeader = axis.axisHeader;
 			let width = axis.get("marginLeft", 0);
 
+			let x = axis.x() - width;
+
+			const parent = axis.parent;
+			if (parent) {
+				x -= parent.get("paddingLeft", 0);
+			}
+
 			if (axisHeader.children.length > 0) {
 				width = axis.axisHeader.width();
 				axis.set("marginLeft", width);
@@ -121,7 +157,7 @@ export class AxisRendererX extends AxisRenderer {
 			else {
 				axisHeader.set("width", width);
 			}
-			axisHeader.setAll({ x: axis.x() - width, y: -1, height: plotContainer.height() + 2 });
+			axisHeader.setAll({ x: x, y: -1, height: plotContainer.height() + 2 });
 		}
 	}
 
@@ -325,7 +361,7 @@ export class AxisRendererX extends AxisRenderer {
 			if (x1 < x0) {
 				[x1, x0] = [x0, x1];
 			}
-			if(x0 > w || x1 < 0){
+			if (x0 > w || x1 < 0) {
 				return;
 			}
 

@@ -106,8 +106,8 @@ export class GridLayout extends Layout {
 				let x = prevX + marginLeft - bounds.left;
 				let y = prevY + marginTop - bounds.top;
 
-				child.set("x", x);
-				child.set("y", y);
+				child.setPrivate("x", x);
+				child.setPrivate("y", y);
 
 				prevX += columnWidths[column] + marginRight;
 

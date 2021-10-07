@@ -78,7 +78,7 @@ function createXY(column: boolean = true) {
     })
   );
 
-  xAxis.set("tooltip", am5.Tooltip.new(root, { themeTags: ["axis"], animationDuration: 200 }))
+  xAxis.set("tooltip", am5.Tooltip.new(root, { animationDuration: 200 }))
 
   let series;
 

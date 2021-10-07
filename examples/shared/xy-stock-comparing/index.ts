@@ -97,9 +97,7 @@ const dateAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   renderer: dateAxisRenderer
 }));
 
-dateAxis.set("tooltip", am5.Tooltip.new(root, {
-  themeTags: ["axis"]
-}));
+dateAxis.set("tooltip", am5.Tooltip.new(root, {}));
 
 
 // Add series

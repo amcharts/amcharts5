@@ -19,6 +19,7 @@ import { Rectangle } from "../../../core/render/Rectangle";
 
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
+import * as $utils from "../../../core/util/Utils";
 
 
 
@@ -303,7 +304,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 */
 	public ghostLabel!: AxisLabel;
 
-	protected _cursorPosition?: number;
+	protected _cursorPosition: number = -1;
 
 	protected _snapToSeries?: Array<XYSeries>;
 
@@ -329,6 +330,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this.topGridContainer.dispose();
 		this.bulletsContainer.dispose();
 		this.labelsContainer.dispose();
+		this.axisHeader.dispose();
 		super._dispose();
 	}
 
@@ -636,11 +638,25 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			}
 		}
 
+
 		const renderer = this.get("renderer");
 		renderer._start = this.get("start")!;
 		renderer._end = this.get("end")!;
 		renderer._inversed = renderer.get("inversed", false);
 		renderer._axisLength = renderer.axisLength() / (renderer._end - renderer._start);
+		renderer._updateLC();
+
+		if (this.isDirty("tooltip")) {
+			const tooltip = this.get("tooltip");
+			if (tooltip) {
+				const rendererTags = renderer.get("themeTags");
+				tooltip.addTag("axis");
+				if (rendererTags) {
+					tooltip.set("themeTags", $utils.mergeTags(tooltip.get("themeTags"), rendererTags));
+					tooltip.label._applyThemes();
+				}
+			}
+		}
 	}
 
 	public _updateTooltipBounds() {
@@ -878,6 +894,13 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 				tooltip.label.set("text", this.getTooltipText(position));
 				renderer.positionTooltip(tooltip, position);
+
+				if (position < this.get("start") || position > this.get("end")) {
+					tooltip.hide(0);
+				}
+				else {
+					tooltip.show(0);
+				}
 			}
 		}
 	}

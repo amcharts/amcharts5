@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.31] - 2021-10-07
+
+### Changed
+- Axis will automatically add relative `themeTags` (e.g. `"axis"`, `"y"`, etc.) to a `Tooltip` when it is added. Setting `themeTags` manually is not required anymore.
+
+### Fixed
+- An adapter for a setting was not being invoked if source value was `undefined`.
+- Tooltips on vertically or horizontally stacked axes were being shown in wrong positions.
+- Tooltip background displayed some artifact in some rare cases.
+
+
 ## [5.0.0-beta.30] - 2021-10-05
 
 ### Added

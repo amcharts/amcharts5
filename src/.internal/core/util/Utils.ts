@@ -1011,14 +1011,16 @@ export function mergeTags(tags1: string[] | undefined, tags2: string[]): string[
 	if (!tags1) {
 		tags1 = [];
 	}
-	return [...tags1, ...tags2];
+	return [...tags1, ...tags2].filter((value, index, self) => {
+		return self.indexOf(value) === index;
+	});
 }
 
 /**
  * @ignore
  */
 export function sameBounds(a: IBounds, b?: IBounds): boolean {
-	if(!b){
+	if (!b) {
 		return false;
 	}
 	if (a.left != b.left) {

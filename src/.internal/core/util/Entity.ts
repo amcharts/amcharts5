@@ -1109,10 +1109,10 @@ export class Entity extends Settings implements IDisposer {
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
-		const value = (<any>this._settings)[key];
+		const value = this.adapters.fold(key, (<any>this._settings)[key]);
 
 		if (value !== undefined) {
-			return this.adapters.fold(key, value);
+			return value;
 
 		} else {
 			return fallback;

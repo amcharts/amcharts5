@@ -57,7 +57,7 @@ export class VerticalLayout extends Layout {
 				let marginTop = child.get("marginTop", 0);
 				let marginBottom = child.get("marginBottom", 0);
 				let y = prevY + marginTop - bounds.top;
-				child.set("y", y);
+				child.setPrivate("y", y);
 				prevY = y + bounds.bottom + marginBottom;
 			}
 		});

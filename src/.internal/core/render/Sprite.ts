@@ -442,6 +442,16 @@ export interface ISpritePrivate extends IEntityPrivate {
 	/**
 	 * @ignore
 	 */
+	x?: number;
+
+	/**
+	 * @ignore
+	 */
+	y?: number;
+
+	/**
+	 * @ignore
+	 */
 	width?: number;
 
 	/**
@@ -477,7 +487,7 @@ export interface ISpritePrivate extends IEntityPrivate {
 	/**
 	 * @ignore
 	 */
-	list?:ListTemplate<Sprite>;
+	list?: ListTemplate<Sprite>;
 }
 
 /**
@@ -688,6 +698,13 @@ export abstract class Sprite extends Entity {
 		if (key == "x" || key == "y" || key == "dx" || key == "dy") {
 			this.markDirtyBounds();
 			this._addPercentagePositionChildren();
+			this.markDirtyPosition();
+		}
+	}
+
+	public _markDirtyPrivateKey<Key extends keyof this["_privateSettings"]>(key: Key) {
+		super._markDirtyPrivateKey(key);
+		if (key == "x" || key == "y") {
 			this.markDirtyPosition();
 		}
 	}
@@ -1613,6 +1630,7 @@ export abstract class Sprite extends Entity {
 		let dy = this.get("dy", 0);
 
 		let x = this.get("x");
+		let _x = this.getPrivate("x");
 
 		let xx = 0;
 		let yy = 0;
@@ -1631,14 +1649,19 @@ export abstract class Sprite extends Entity {
 			xx = x + dx;
 		}
 		else {
-			if (parent) {
+			if (_x != null) {
+				xx = _x;
+			}
+			else if (parent) {
 				if (position == "relative") {
 					xx = parent.get("paddingLeft", 0) + dx;
 				}
 			}
 		}
 
+
 		let y = this.get("y");
+		let _y = this.getPrivate("y");
 
 		if (y instanceof Percent) {
 			if (parent) {
@@ -1652,7 +1675,10 @@ export abstract class Sprite extends Entity {
 			yy = y + dy;
 		}
 		else {
-			if (parent) {
+			if (_y != null) {
+				yy = _y;
+			}
+			else if (parent) {
 				if (position == "relative") {
 					yy = parent.get("paddingTop", 0) + dy;
 				}
@@ -1686,6 +1712,7 @@ export abstract class Sprite extends Entity {
 	 */
 	public x(): number {
 		let x = this.get("x");
+		let _x = this.getPrivate("x");
 
 		const parent = this.parent;
 		if (parent) {
@@ -1694,13 +1721,19 @@ export abstract class Sprite extends Entity {
 			}
 			else {
 				if (!$type.isNumber(x)) {
-					return parent.get("paddingLeft", this._display.x)
+					if (_x != null) {
+						return _x;
+					}
+					else {
+						return parent.get("paddingLeft", this._display.x)
+					}
 				}
 				else {
 					return x;
 				}
 			}
 		}
+
 		return this._display.x;
 	}
 
@@ -1710,6 +1743,13 @@ export abstract class Sprite extends Entity {
 	 * @return Y (px)
 	 */
 	public y(): number {
+
+		let _y = this.getPrivate("y");
+
+		if (_y != null) {
+			return _y;
+		}
+
 		let y = this.get("y");
 		const parent = this.parent;
 
@@ -1719,7 +1759,12 @@ export abstract class Sprite extends Entity {
 			}
 			else {
 				if (!$type.isNumber(y)) {
-					return parent.get("paddingTop", this._display.y)
+					if (_y != null) {
+						return _y;
+					}
+					else {
+						return parent.get("paddingTop", this._display.y)
+					}
 				}
 				else {
 					return y;
