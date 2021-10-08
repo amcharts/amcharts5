@@ -48,9 +48,7 @@ var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   maxDeviation: 0.3,
   categoryField: "category",
   renderer: xRenderer,
-  tooltip: am5.Tooltip.new(root, {
-    animationDuration: 200
-  })
+  tooltip: am5.Tooltip.new(root, {})
 }));
 
 var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {

@@ -66,9 +66,7 @@ const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   renderer: am5xy.AxisRendererX.new(root, {
     minGridDistance: 50
   }),
-  tooltip: am5.Tooltip.new(root, {
-    animationDuration: 300
-  })
+  tooltip: am5.Tooltip.new(root, {})
 }));
 
 const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {

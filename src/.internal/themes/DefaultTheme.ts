@@ -1168,6 +1168,10 @@ export class DefaultTheme extends Theme {
 			textAlign: "left"
 		});
 
+		this.rule("Label", ["axis", "tooltip", "x"]).setAll({
+			textAlign: "center"
+		});
+
 		{
 			const rule = this.rule("AxisTick");
 

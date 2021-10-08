@@ -651,6 +651,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			if (tooltip) {
 				const rendererTags = renderer.get("themeTags");
 				tooltip.addTag("axis");
+				tooltip._applyThemes();
 				if (rendererTags) {
 					tooltip.set("themeTags", $utils.mergeTags(tooltip.get("themeTags"), rendererTags));
 					tooltip.label._applyThemes();

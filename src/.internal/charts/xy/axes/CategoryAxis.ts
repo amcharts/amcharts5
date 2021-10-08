@@ -168,13 +168,14 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			else if (baseAxis === this) {
 				let key: string | undefined;
 				let openKey: string | undefined;
+				let otherAxis = yAxis;
 				if (xAxis === baseAxis) {
 					if (series.get("categoryXField")) {
 						key = "categoryX";
 					}
 					if (series.get("openCategoryXField")) {
 						openKey = "openCategoryX";
-					}
+					}					
 				}
 				else if (yAxis === baseAxis) {
 					if (series.get("categoryYField")) {
@@ -183,53 +184,57 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 					if (series.get("openCategoryYField")) {
 						openKey = "openCategoryY";
 					}
+					otherAxis = xAxis;
 				}
 
-				if (key || openKey) {
-					let startDataItem: DataItem<IXYSeriesDataItem> | undefined;
-					let endDataItem: DataItem<IXYSeriesDataItem> | undefined;
+				if (otherAxis.className == "ValueAxis") {
 
-					for (let i = 0, len = series.dataItems.length; i < len; i++) {
-						let dataItem = series.dataItems[i];
-						if (key) {
-							if (dataItem.get(key as any) === startCategory) {
-								startDataItem = dataItem;
-								break;
+					if (key || openKey) {
+						let startDataItem: DataItem<IXYSeriesDataItem> | undefined;
+						let endDataItem: DataItem<IXYSeriesDataItem> | undefined;
+
+						for (let i = 0, len = series.dataItems.length; i < len; i++) {
+							let dataItem = series.dataItems[i];
+							if (key) {
+								if (dataItem.get(key as any) === startCategory) {
+									startDataItem = dataItem;
+									break;
+								}
+							}
+							if (openKey) {
+								if (dataItem.get(openKey as any) === startCategory) {
+									startDataItem = dataItem;
+									break;
+								}
 							}
 						}
-						if (openKey) {
-							if (dataItem.get(openKey as any) === startCategory) {
-								startDataItem = dataItem;
-								break;
+
+						for (let i = series.dataItems.length - 1; i >= 0; i--) {
+							let dataItem = series.dataItems[i];
+							if (key) {
+								if (dataItem.get(key as any) === endCategory) {
+									endDataItem = dataItem;
+									break;
+								}
+							}
+							if (openKey) {
+								if (dataItem.get(openKey as any) === endCategory) {
+									endDataItem = dataItem;
+									break;
+								}
 							}
 						}
-					}
 
-					for (let i = series.dataItems.length - 1; i >= 0; i--) {
-						let dataItem = series.dataItems[i];
-						if (key) {
-							if (dataItem.get(key as any) === endCategory) {
-								endDataItem = dataItem;
-								break;
-							}
+						if (startDataItem) {
+							series.setPrivate("startIndex", series.dataItems.indexOf(startDataItem));
 						}
-						if (openKey) {
-							if (dataItem.get(openKey as any) === endCategory) {
-								endDataItem = dataItem;
-								break;
-							}
-						}
-					}
 
-					if (startDataItem) {
-						series.setPrivate("startIndex", series.dataItems.indexOf(startDataItem));
+						if (endDataItem) {
+							series.setPrivate("endIndex", series.dataItems.indexOf(endDataItem) + 1);
+						}						
 					}
-
-					if (endDataItem) {
-						series.setPrivate("endIndex", series.dataItems.indexOf(endDataItem) + 1);
-					}
-					series._markDirtyAxes();	// must be outside
 				}
+				series._markDirtyAxes();	// must be outside
 			}
 		})
 	}

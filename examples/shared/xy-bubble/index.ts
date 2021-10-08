@@ -28,9 +28,7 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererX.new(root, {}),
-  tooltip: am5.Tooltip.new(root, {
-    animationDuration: 300
-  })
+  tooltip: am5.Tooltip.new(root, {})
 }));
 
 xAxis.children.moveValue(am5.Label.new(root, {
@@ -43,9 +41,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {
     inversed: false
   }),
-  tooltip: am5.Tooltip.new(root, {
-    animationDuration: 300
-  })
+  tooltip: am5.Tooltip.new(root, {})
 }));
 
 yAxis.children.moveValue(am5.Label.new(root, {

@@ -68,10 +68,7 @@ let xAxis = chart.xAxes.push(
       count: 1
     },
     renderer: am5xy.AxisRendererX.new(root, {}),
-    tooltip: am5.Tooltip.new(root, {
-      themeTags: ["axis"],
-      animationDuration: 200
-    })
+    tooltip: am5.Tooltip.new(root, {})
   })
 );
 

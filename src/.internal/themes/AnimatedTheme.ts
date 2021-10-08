@@ -24,5 +24,9 @@ export class AnimatedTheme extends Theme {
 		});
 
 		this.rule("Sprite").states.create("default", { stateAnimationDuration: 600 });
+
+		this.rule("Tooltip", ["axis"]).setAll({
+			animationDuration: 200
+		});
 	}
 }

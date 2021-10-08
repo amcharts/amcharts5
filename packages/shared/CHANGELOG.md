@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.32] - 2021-10-08
+
+### Changed
+- `Exporting` plugin now imports minified version of `xlsx` library for XSLX data exports.
+- Axis tooltips have now `animationDuration: 200` set automatically by Animated theme, so there's no need to set it in code anymore.
+
+### Fixed
+- Charts with `CategoryAxis` + `DateAxis` were zooming incorrectly in some cases.
+
+
 ## [5.0.0-beta.31] - 2021-10-07
 
 ### Changed

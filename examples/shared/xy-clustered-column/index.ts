@@ -70,9 +70,7 @@ const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
     cellStartLocation: 0.1,
     cellEndLocation: 0.9
   }),
-  tooltip: am5.Tooltip.new(root, {
-    animationDuration: 200
-  })
+  tooltip: am5.Tooltip.new(root, {})
 }));
 
 xAxis.data.setAll(data);

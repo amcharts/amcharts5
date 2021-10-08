@@ -42,9 +42,7 @@ let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
     count: 1
   },
   renderer: am5xy.AxisRendererX.new(root, {}),
-  tooltip: am5.Tooltip.new(root, {
-    animationDuration: 200
-  })
+  tooltip: am5.Tooltip.new(root, {})
 }));
 
 let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
