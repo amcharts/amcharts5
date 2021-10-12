@@ -224,7 +224,7 @@ export class Container extends Sprite {
 		const background = this.get("background");
 		let bounds = this._localBounds;
 
-		if (bounds) {
+		if (bounds && !this.isHidden()) {
 			let x = bounds.left;
 			let y = bounds.top;
 			let w = bounds.right - x;

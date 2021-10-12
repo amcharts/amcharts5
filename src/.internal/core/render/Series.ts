@@ -765,4 +765,13 @@ export abstract class Series extends Component {
 	public updateLegendMarker(_dataItem?: DataItem<this["_dataItemSettings"]>) {
 
 	}	
+
+	protected _onHide(){
+		super._onHide();
+
+		const tooltip = this.getTooltip();
+		if(tooltip){
+			tooltip.hide();
+		}
+	}
 }

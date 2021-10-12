@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.33] - 2021-10-12
+
+### Fixed
+- In-line data placeholder formatting functions were not being applied when referring directly to keys in data.
+- If settings on a `DataProcessor` were set after it was created, they were being ignored when parsing data.
+- In some cases tooltips were losing their background/outline unless Animated theme was enabled.
+- In some cases tooltips for a hidden series were still showing.
+
+
 ## [5.0.0-beta.32] - 2021-10-08
 
 ### Changed

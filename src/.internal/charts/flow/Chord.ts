@@ -197,7 +197,13 @@ export class Chord extends Flow {
 			else if (sort === "descending") {
 				this._d3chord.sortGroups(descending);
 			}
-
+/*
+			this._d3chord.sortSubgroups((a, b)=>{
+				if (a != Math.round(a)) return false
+				if (b != Math.round(b)) return true
+				return b < a ? -1 : b > a ? 1 : 0;
+			})
+*/
 			this._chordLayout = this._d3chord(matrix);
 
 			chordChanged = true;

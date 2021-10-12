@@ -118,7 +118,7 @@ function getTagValue(target: Sprite, tagName: string, format?: string): string {
 		let dataContext: any = dataItem.dataContext;
 
 		if (value == null && dataContext) {
-			value = getTagValueFromObject(target, parts, dataItem);
+			value = getTagValueFromObject(target, parts, dataContext);
 
 			// Maybe it's a literal dot-separated name of the key in dataContext?
 			if (value == null) {

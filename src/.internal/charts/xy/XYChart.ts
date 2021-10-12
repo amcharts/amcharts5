@@ -1007,7 +1007,7 @@ export class XYChart extends SerialChart {
 						sum += point.y;
 					}
 
-					if (hidden) {
+					if (hidden || series.isHidden() || series.isHiding()) {
 						tooltip.hide(0);
 					}
 					else {

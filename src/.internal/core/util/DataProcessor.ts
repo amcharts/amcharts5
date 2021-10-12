@@ -64,11 +64,11 @@ export class DataProcessor extends Entity {
 	protected _afterNew() {
 		super._afterNew();
 		this._checkFeatures();
-	}
-
-	public _beforeChanged() {
-		super._beforeChanged();
-		this._checkFeatures();
+		this.on("dateFields", () => this._checkFeatures());
+		this.on("dateFormat", () => this._checkFeatures());
+		this.on("numericFields", () => this._checkFeatures());
+		this.on("colorFields", () => this._checkFeatures());
+		this.on("emptyAs", () => this._checkFeatures());
 	}
 
 	protected _checkFeatures(): void {
@@ -137,11 +137,6 @@ export class DataProcessor extends Entity {
 			}
 		});
 	}
-
-	// protected _processDeep(field: any, value: any) {
-	// 	console.log(field, value);
-	// 	return value;
-	// }
 
 	protected _maybeToNumber(field: string, value: any): any {
 		if (this.get("numericFields")!.indexOf(field) !== -1) {
