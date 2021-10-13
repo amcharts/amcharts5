@@ -574,6 +574,13 @@ export abstract class Series extends Component {
 			let startIndex = this.getPrivate("startIndex", 0);
 			let endIndex = this.getPrivate("endIndex", count);
 
+			if(endIndex < count){
+				endIndex++;
+			}
+			if(startIndex > 0){
+				startIndex--;
+			}
+
 			for (let i = startIndex; i < endIndex; i++) {
 				this._positionBullets(this.dataItems[i]);
 			}

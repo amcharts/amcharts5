@@ -31,7 +31,7 @@ export class Rectangle extends Graphics {
 	public _changed() {
 		super._changed();
 
-		if (this._clear) {
+		if (this._clear && !this.get("draw")) {
 			this._draw();
 		}
 	}

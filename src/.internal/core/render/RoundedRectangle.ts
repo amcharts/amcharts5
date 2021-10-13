@@ -53,7 +53,7 @@ export class RoundedRectangle extends Rectangle {
 		}
 	}
 
-	public _draw() {
+	public _draw() {		
 		let width = this.width();
 		let height = this.height();
 

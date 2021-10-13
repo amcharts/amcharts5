@@ -91,6 +91,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 		return this.makeColumn(dataItem, listTemplate);
 	}
 
+	protected _ph: number = 0;
+	protected _pw: number = 0;
+
 	public _makeFieldNames() {
 		super._makeFieldNames();
 
@@ -126,6 +129,12 @@ export abstract class BaseColumnSeries extends XYSeries {
 	}
 
 	public _updateChildren() {
+		const chart = this.chart;
+		if (chart) {
+			this._ph = chart.plotContainer.height();
+			this._pw = chart.plotContainer.width();
+		}
+
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 		const baseAxis = this.get("baseAxis")!;
@@ -292,6 +301,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 			let vcy = this.get("vcy", 1);
 			let vcx = this.get("vcx", 1);
 
+			let fitW = false;
+			let fitH = false;
+
 			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") && xAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
 
 				let startLocation = this._aLocationX0 + openLocationX - 0.5;
@@ -352,8 +364,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 						b = yAxis.basePosition();
 					}
 				}
-
 				dataItem.setRaw("point", { x: l + (r - l) / 2, y: t });
+
+				fitH = true;
 			}
 			else if (yAxis === baseAxis) {
 				let startLocation = this._aLocationY0 + openLocationY - 0.5;
@@ -387,19 +400,24 @@ export abstract class BaseColumnSeries extends XYSeries {
 					}
 				}
 
+				fitW = true;
+
 				dataItem.setRaw("point", { x: r, y: t + (b - t) / 2 });
 			}
 
-			this._updateSeriesGraphics(dataItem, graphics!, l, r, t, b);
+			this._updateSeriesGraphics(dataItem, graphics!, l, r, t, b, fitW, fitH);
 
 			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b < yStart) || (t > yEnd && b > yEnd)) {
 				this._toggleColumn(dataItem, false);
+			}
+			else{
+				this._toggleColumn(dataItem, true);
 			}
 
 			let rangeGraphics = dataItem.get("rangeGraphics")!;
 			if (rangeGraphics) {
 				$array.each(rangeGraphics, (graphics) => {
-					this._updateSeriesGraphics(dataItem, graphics, l, r, t, b);
+					this._updateSeriesGraphics(dataItem, graphics, l, r, t, b, fitW, fitH);
 				})
 			}
 
@@ -407,14 +425,11 @@ export abstract class BaseColumnSeries extends XYSeries {
 		}
 	}
 
-	protected _updateSeriesGraphics(dataItem: DataItem<this["_dataItemSettings"]>, graphics: Graphics, l: number, r: number, t: number, b: number) {
-
+	protected _updateSeriesGraphics(dataItem: DataItem<this["_dataItemSettings"]>, graphics: Graphics, l: number, r: number, t: number, b: number, fitW: boolean, fitH: boolean) {
 		const width = graphics.get("width");
 		const height = graphics.get("height");
 		const maxWidth = graphics.get("maxWidth");
 		const maxHeight = graphics.get("maxHeight");
-
-		graphics.setPrivate("visible", true);
 
 		const ptl = this.getPoint(l, t);
 		const pbr = this.getPoint(r, b);
@@ -449,15 +464,25 @@ export abstract class BaseColumnSeries extends XYSeries {
 			b -= offset;
 		}
 
-		graphics.setPrivate("width", r - l);
-		graphics.setPrivate("height", b - t);
-		graphics.set("x", l);
-		graphics.set("y", b - (b - t));
+		if (fitW) {
+			r = Math.min(Math.max(0, r), this._pw);
+			l = Math.min(Math.max(0, l), this._pw);
+		}
+
+		if (fitH) {
+			t = Math.min(Math.max(0, t), this._ph);
+			b = Math.min(Math.max(0, b), this._ph);
+		}
 
 		dataItem.setRaw("left", l);
 		dataItem.setRaw("right", r);
 		dataItem.setRaw("top", t);
 		dataItem.setRaw("bottom", b);
+
+		graphics.setPrivate("width", r - l);
+		graphics.setPrivate("height", b - t);
+		graphics.set("x", l);
+		graphics.set("y", b - (b - t));
 	}
 
 	protected _handleDataSetChange() {
@@ -583,6 +608,13 @@ export abstract class BaseColumnSeries extends XYSeries {
 		if (rangeGraphics) {
 			$array.each(rangeGraphics, (graphics) => {
 				graphics.setPrivate("visible", visible);
+			})
+		}
+
+		const bullets = dataItem.bullets;
+		if (bullets) {
+			$array.each(bullets, (bullet) => {
+				bullet.setPrivate("hidden", !visible);
 			})
 		}
 	}

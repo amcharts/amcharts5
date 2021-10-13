@@ -218,7 +218,7 @@ const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
 series.columns.template.set("strokeOpacity", 0);
 
 const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{categoryX}:{valueY}");
+tooltip.label.set("text", "{categoryX}: {valueY}");
 
 
 // Set up heat rules

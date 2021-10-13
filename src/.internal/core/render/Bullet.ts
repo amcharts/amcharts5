@@ -51,6 +51,7 @@ export interface IBulletSettings extends IEntitySettings {
 }
 
 export interface IBulletPrivate extends IEntityPrivate {
+	hidden?:boolean;
 }
 
 /**

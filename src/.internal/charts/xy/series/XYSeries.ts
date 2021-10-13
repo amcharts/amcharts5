@@ -1287,7 +1287,12 @@ export abstract class XYSeries extends Series {
 			let bottom = dataItem.get("bottom", point.y);
 
 			if (this._shouldShowBullet(positionX, positionY)) {
-				sprite.setPrivate("visible", true);
+				if (!bullet.getPrivate("hidden")) {
+					sprite.setPrivate("visible", true);
+				}
+				else {
+					sprite.setPrivate("visible", false);
+				}
 
 				let w = right - left;
 				let h = bottom - top;

@@ -92,7 +92,7 @@ function makeSeries(name: string, fieldName: string) {
   }));
 
   series.columns.template.setAll({
-    tooltipText: "{name}, {categoryX}:{valueY}",
+    tooltipText: "{name}, {categoryX}: {valueY}",
     width: am5.percent(90),
     tooltipY: 0
   });

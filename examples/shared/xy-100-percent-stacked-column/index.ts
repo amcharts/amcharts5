@@ -100,7 +100,7 @@ function makeSeries(name: string, fieldName: string) {
   }));
 
   series.columns.template.setAll({
-    tooltipText: "{name}, {categoryX}:{valueYTotalPercent.formatNumber('#.#')}%",
+    tooltipText: "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#')}%",
     tooltipY: am5.percent(10)
   });
   series.data.setAll(data);

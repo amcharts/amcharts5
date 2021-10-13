@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.34] - 2021-10-13
+
+### Added
+- It is now possible to pass a custom draw methods for classes like `Rectangle`, `RoundedRectangle`, `Candlestick`, etc. This allows implementing completely custom look for those elements.
+
+### Changed
+- Bullets on a `ColumnSeries` are now positioned vertically relative to visible part of the column, not the whole column.
+
+
 ## [5.0.0-beta.33] - 2021-10-12
 
 ### Fixed

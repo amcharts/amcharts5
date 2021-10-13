@@ -287,7 +287,7 @@ export class DefaultTheme extends Theme {
 			paddingTop: 0,
 			paddingBottom: 0,
 			width: 50,
-			centerX: p100,			
+			centerX: p100,
 			populateText: true
 		});
 
@@ -681,7 +681,8 @@ export class DefaultTheme extends Theme {
 			ariaLabel: language.translate("Press ENTER to toggle"),
 			toggleKey: "active",
 			width: 40,
-			height: 24
+			height: 24,
+			layout: null
 		});
 
 		{
