@@ -5,6 +5,7 @@ export { XYCursor } from "./.internal/charts/xy/XYCursor";
 export { CategoryAxis, ICategoryAxisDataItem } from "./.internal/charts/xy/axes/CategoryAxis";
 export { CategoryDateAxis } from "./.internal/charts/xy/axes/CategoryDateAxis";
 export { DateAxis, IDateAxisDataItem } from "./.internal/charts/xy/axes/DateAxis";
+export { DurationAxis, IDurationAxisDataItem } from "./.internal/charts/xy/axes/DurationAxis";
 export { ValueAxis, IValueAxisDataItem } from "./.internal/charts/xy/axes/ValueAxis";
 
 export { AxisBullet } from "./.internal/charts/xy/axes/AxisBullet";

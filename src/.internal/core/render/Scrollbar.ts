@@ -356,11 +356,11 @@ export class Scrollbar extends Container {
 			toValue = to + "%";
 		}
 
-		startGrip.set("ariaLabel", this._root.language.translate("From %1", undefined, fromValue));
+		startGrip.set("ariaLabel", this._t("From %1", undefined, fromValue));
 		startGrip.set("ariaValueNow", "" + from);
 		startGrip.set("ariaValueText", from + "%");
 
-		endGrip.set("ariaLabel", this._root.language.translate("To %1", undefined, toValue));
+		endGrip.set("ariaLabel", this._t("To %1", undefined, toValue));
 		endGrip.set("ariaValueNow", "" + to);
 		endGrip.set("ariaValueText", to + "%");
 	}
@@ -422,7 +422,7 @@ export class Scrollbar extends Container {
 			toValue = to + "%";
 		}
 
-		thumb.set("ariaLabel", this._root.language.translate("From %1 to %2", undefined, fromValue, toValue));
+		thumb.set("ariaLabel", this._t("From %1 to %2", undefined, fromValue, toValue));
 		thumb.set("ariaValueNow", "" + from);
 		thumb.set("ariaValueText", from + "%");
 	}

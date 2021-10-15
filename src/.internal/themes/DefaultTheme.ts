@@ -1354,6 +1354,10 @@ export class DefaultTheme extends Theme {
 			}
 		});
 
+		this.rule("DurationAxis").setAll({
+			baseUnit:"second"
+		})
+
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -1635,6 +1639,7 @@ export class DefaultTheme extends Theme {
 
 		this.rule("FunnelSlice", ["funnel", "link"]).setAll({
 			fillOpacity: 0.5,
+			strokeOpacity: 0,
 			expandDistance: -0.1
 		});
 

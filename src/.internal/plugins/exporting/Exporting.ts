@@ -1266,7 +1266,7 @@ export class Exporting extends Entity {
 		};
 
 		// Get sheet name
-		let sheetName = this._normalizeExcelSheetName(this.get("title", this._root.language.translate("Data")));
+		let sheetName = this._normalizeExcelSheetName(this.get("title", this._t("Data")));
 
 		// Create a workbook
 		let wb = {
@@ -1484,7 +1484,7 @@ export class Exporting extends Entity {
 		// Add page URL?
 		if (options.addURL) {
 			doc.content.push({
-				text: this._root.language.translate("Saved from") + ": " + document.location.href,
+				text: this._t("Saved from") + ": " + document.location.href,
 				fontSize: options.fontSize,
 				margin: [0, 0, 0, 15]
 			});

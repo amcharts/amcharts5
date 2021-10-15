@@ -225,6 +225,10 @@ export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDi
 		this._renderer = renderer;
 	}
 
+	public getCanvas(): HTMLCanvasElement {
+		return this.getLayer().view;
+	}
+
 	public getLayer(): CanvasLayer {
 		let self: CanvasDisplayObject = this;
 
@@ -2132,7 +2136,8 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 			const textHeight = line.height;
 
-			// Adjust radius for inside text
+			// Adjust radius (for `inside = false`)
+			// Radius adjustment for `inside = false` is below the line calculation
 			if (!inside) {
 				radius += textHeight;
 			}
@@ -2249,6 +2254,11 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 			context.restore();
 			if (interactive) {
 				ghostContext.restore();
+			}
+
+			// Adjust radius (for `inside = true`)
+			if (inside) {
+				radius -= textHeight;
 			}
 
 		});

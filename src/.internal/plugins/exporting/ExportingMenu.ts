@@ -159,66 +159,66 @@ export class ExportingMenu extends Entity {
 		this._setRawDefault("deactivateRoot", true);
 		this._setRawDefault("items", [{
 			type: "separator",
-			label: this._root.language.translate("Export")
+			label: this._t("Export")
 		}, {
 			type: "format",
 			format: "png",
 			exportType: "image",
-			label: this._root.language.translate("PNG"),
-			sublabel: this._root.language.translate("Image")
+			label: this._t("PNG"),
+			sublabel: this._t("Image")
 		}, {
 			type: "format",
 			format: "jpg",
 			exportType: "image",
-			label: this._root.language.translate("JPG"),
-			sublabel: this._root.language.translate("Image")
+			label: this._t("JPG"),
+			sublabel: this._t("Image")
 		}, {
 			type: "format",
 			format: "pdf",
 			exportType: "image",
-			label: this._root.language.translate("PDF"),
-			sublabel: this._root.language.translate("Image")
+			label: this._t("PDF"),
+			sublabel: this._t("Image")
 		}, {
 			type: "separator",
 			exportType: "data",
-			//label: this._root.language.translate("Data")
+			//label: this._t("Data")
 		}, {
 			type: "format",
 			format: "json",
 			exportType: "data",
-			label: this._root.language.translate("JSON"),
-			sublabel: this._root.language.translate("Data")
+			label: this._t("JSON"),
+			sublabel: this._t("Data")
 		}, {
 			type: "format",
 			format: "csv",
 			exportType: "data",
-			label: this._root.language.translate("CSV"),
-			sublabel: this._root.language.translate("Data")
+			label: this._t("CSV"),
+			sublabel: this._t("Data")
 		}, {
 			type: "format",
 			format: "xlsx",
 			exportType: "data",
-			label: this._root.language.translate("XLSX"),
-			sublabel: this._root.language.translate("Data")
+			label: this._t("XLSX"),
+			sublabel: this._t("Data")
 		}, {
 			type: "format",
 			format: "pdfdata",
 			exportType: "data",
-			label: this._root.language.translate("PDF"),
-			sublabel: this._root.language.translate("Data")
+			label: this._t("PDF"),
+			sublabel: this._t("Data")
 		}, {
 			type: "format",
 			format: "html",
 			exportType: "data",
-			label: this._root.language.translate("HTML"),
-			sublabel: this._root.language.translate("Data")
+			label: this._t("HTML"),
+			sublabel: this._t("Data")
 		}, {
 			type: "separator"
 		}, {
 			type: "format",
 			format: "print",
 			exportType: "print",
-			label: this._root.language.translate("Print")
+			label: this._t("Print")
 		}]);
 
 		const menuElement = document.createElement("div");
@@ -233,8 +233,8 @@ export class ExportingMenu extends Entity {
 
 		iconElement.innerHTML = '<svg fill="none" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/></svg>';
 		iconElement.setAttribute("tabindex", this._root.tabindex.toString());
-		iconElement.setAttribute("aria-label", this._root.language.translate("Export"));
-		iconElement.setAttribute("aria-description", this._root.language.translate("Press ENTER to open"));
+		iconElement.setAttribute("aria-label", this._t("Export"));
+		iconElement.setAttribute("aria-description", this._t("Press ENTER to open"));
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
@@ -409,7 +409,7 @@ export class ExportingMenu extends Entity {
 
 			const a = document.createElement("a");
 
-			let ariaLabel = this._root.language.translate("Export");
+			let ariaLabel = this._t("Export");
 			if (item.label) {
 				a.innerHTML = item.label;
 				ariaLabel += " " + item.label;

@@ -36,6 +36,7 @@ import type { ColumnSeries } from "./../charts/xy/series/ColumnSeries";
 import type { Component } from "./render/Component";
 import type { Container } from "./render/Container";
 import type { DateAxis } from "./../charts/xy/axes/DateAxis";
+import type { DurationAxis } from "./../charts/xy/axes/DurationAxis";
 import type { Entity } from "./util/Entity";
 import type { Exporting } from "./../plugins/exporting/Exporting";
 import type { ExportingMenu } from "./../plugins/exporting/ExportingMenu";
@@ -160,6 +161,7 @@ export interface IClasses {
 	"Component": Component;
 	"Container": Container;
 	"DateAxis": DateAxis<AxisRenderer>;
+	"DurationAxis": DurationAxis<AxisRenderer>;
 	"Entity": Entity;
 	"Exporting": Exporting;
 	"ExportingMenu": ExportingMenu;

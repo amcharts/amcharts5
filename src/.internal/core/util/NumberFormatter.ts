@@ -95,35 +95,39 @@ export class NumberFormatter extends Entity {
 		this._setDefault("numberFormat", "#,###.#####");
 		this._setDefault("smallNumberThreshold", 1.00);
 
+		const bns = "_big_number_suffix_";
+		const sns = "_small_number_suffix_";
+		const bs = "_byte_suffix_";
+
 		this._setDefault("bigNumberPrefixes", [
-			{ "number": 1e+3, "suffix": this._root.language.translate("_big_number_suffix_3") },
-			{ "number": 1e+6, "suffix": this._root.language.translate("_big_number_suffix_6") },
-			{ "number": 1e+9, "suffix": this._root.language.translate("_big_number_suffix_9") },
-			{ "number": 1e+12, "suffix": this._root.language.translate("_big_number_suffix_12") },
-			{ "number": 1e+15, "suffix": this._root.language.translate("_big_number_suffix_15") },
-			{ "number": 1e+18, "suffix": this._root.language.translate("_big_number_suffix_18") },
-			{ "number": 1e+21, "suffix": this._root.language.translate("_big_number_suffix_21") },
-			{ "number": 1e+24, "suffix": this._root.language.translate("_big_number_suffix_24") }
+			{ "number": 1e+3, "suffix": this._t(bns + "3") },
+			{ "number": 1e+6, "suffix": this._t(bns + "6") },
+			{ "number": 1e+9, "suffix": this._t(bns + "9") },
+			{ "number": 1e+12, "suffix": this._t(bns + "12") },
+			{ "number": 1e+15, "suffix": this._t(bns + "15") },
+			{ "number": 1e+18, "suffix": this._t(bns + "18") },
+			{ "number": 1e+21, "suffix": this._t(bns + "21") },
+			{ "number": 1e+24, "suffix": this._t(bns + "24") }
 		]);
 
 		this._setDefault("smallNumberPrefixes", [
-			{ "number": 1e-24, "suffix": this._root.language.translate("_small_number_suffix_24") },
-			{ "number": 1e-21, "suffix": this._root.language.translate("_small_number_suffix_21") },
-			{ "number": 1e-18, "suffix": this._root.language.translate("_small_number_suffix_18") },
-			{ "number": 1e-15, "suffix": this._root.language.translate("_small_number_suffix_15") },
-			{ "number": 1e-12, "suffix": this._root.language.translate("_small_number_suffix_12") },
-			{ "number": 1e-9, "suffix": this._root.language.translate("_small_number_suffix_9") },
-			{ "number": 1e-6, "suffix": this._root.language.translate("_small_number_suffix_6") },
-			{ "number": 1e-3, "suffix": this._root.language.translate("_small_number_suffix_3") }
+			{ "number": 1e-24, "suffix": this._t(sns + "24") },
+			{ "number": 1e-21, "suffix": this._t(sns + "21") },
+			{ "number": 1e-18, "suffix": this._t(sns + "18") },
+			{ "number": 1e-15, "suffix": this._t(sns + "15") },
+			{ "number": 1e-12, "suffix": this._t(sns + "12") },
+			{ "number": 1e-9, "suffix": this._t(sns + "9") },
+			{ "number": 1e-6, "suffix": this._t(sns + "6") },
+			{ "number": 1e-3, "suffix": this._t(sns + "3") }
 		]);
 
 		this._setDefault("bytePrefixes", [
-			{ "number": 1, suffix: this._root.language.translate("_byte_suffix_B") },
-			{ "number": 1024, suffix: this._root.language.translate("_byte_suffix_KB") },
-			{ "number": 1048576, suffix: this._root.language.translate("_byte_suffix_MB") },
-			{ "number": 1073741824, suffix: this._root.language.translate("_byte_suffix_GB") },
-			{ "number": 1099511627776, suffix: this._root.language.translate("_byte_suffix_TB") },
-			{ "number": 1125899906842624, suffix: this._root.language.translate("_byte_suffix_PB") }
+			{ "number": 1, suffix: this._t(bs + "B") },
+			{ "number": 1024, suffix: this._t(bs + "KB") },
+			{ "number": 1048576, suffix: this._t(bs + "MB") },
+			{ "number": 1073741824, suffix: this._t(bs + "GB") },
+			{ "number": 1099511627776, suffix: this._t(bs + "TB") },
+			{ "number": 1125899906842624, suffix: this._t(bs + "PB") }
 		]);
 
 		super._setDefaults();
@@ -221,6 +225,9 @@ export class NumberFormatter extends Entity {
 		// 	return cached;
 		// }
 
+		const thousandSeparator = language.translateEmpty("_thousandSeparator");
+		const decimalSeparator = language.translateEmpty("_decimalSeparator")
+
 		// init format parse info holder
 		let info: any = {
 			"positive": {
@@ -228,12 +235,12 @@ export class NumberFormatter extends Entity {
 					"active": -1,
 					"passive": -1,
 					"interval": -1,
-					"separator": language.translateEmpty("_thousandSeparator")
+					"separator": thousandSeparator
 				},
 				"decimals": {
 					"active": -1,
 					"passive": -1,
-					"separator": language.translateEmpty("_decimalSeparator")
+					"separator": decimalSeparator
 				},
 				"template": "",
 				"source": "",
@@ -244,12 +251,12 @@ export class NumberFormatter extends Entity {
 					"active": -1,
 					"passive": -1,
 					"interval": -1,
-					"separator": language.translateEmpty("_thousandSeparator")
+					"separator": thousandSeparator
 				},
 				"decimals": {
 					"active": -1,
 					"passive": -1,
-					"separator": language.translateEmpty("_decimalSeparator")
+					"separator": decimalSeparator
 				},
 				"template": "",
 				"source": "",
@@ -260,12 +267,12 @@ export class NumberFormatter extends Entity {
 					"active": -1,
 					"passive": -1,
 					"interval": -1,
-					"separator": language.translateEmpty("_thousandSeparator")
+					"separator": thousandSeparator
 				},
 				"decimals": {
 					"active": -1,
 					"passive": -1,
-					"separator": language.translateEmpty("_decimalSeparator")
+					"separator": decimalSeparator
 				},
 				"template": "",
 				"source": "",

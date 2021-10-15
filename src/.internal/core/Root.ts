@@ -18,6 +18,7 @@ import { Rectangle } from "./render/Rectangle";
 import { Tooltip } from "./render/Tooltip";
 import { NumberFormatter } from "./util/NumberFormatter";
 import { DateFormatter } from "./util/DateFormatter";
+import { DurationFormatter } from "./util/DurationFormatter";
 import { ILocale, Language } from "./util/Language";
 import { Events, EventDispatcher } from "./util/EventDispatcher";
 import { DefaultTheme } from "../themes/DefaultTheme";
@@ -161,6 +162,13 @@ export class Root implements IDisposer {
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	public dateFormatter: DateFormatter = DateFormatter.new(this, {});
+
+	/**
+	 * Duration formatter.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 */
+	public durationFormatter: DurationFormatter = DurationFormatter.new(this, {});
 
 
 	// Accessibility

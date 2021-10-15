@@ -286,11 +286,24 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	}
 
+	protected _formatText(value: number) {
+		const numberFormat = this.get("numberFormat");
+		const formatter = this.getNumberFormatter();
+
+		let text = "";
+
+		if (numberFormat) {
+			text = formatter.format(value, numberFormat);
+		}
+		else {
+			text = formatter.format(value, undefined, this.getPrivate("stepDecimalPlaces"));
+		}
+		return text;
+	}
+
 	protected _prepareAxisItems() {
 		const min = this.getPrivate("min");
 		const max = this.getPrivate("max");
-		const numberFormat = this.get("numberFormat");
-		const formatter = this.getNumberFormatter();
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 
@@ -327,12 +340,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 				const label = dataItem.get("label");
 				if (label) {
-					if (numberFormat) {
-						label.set("text", formatter.format(value, numberFormat));
-					}
-					else {
-						label.set("text", formatter.format(value, undefined, this.getPrivate("stepDecimalPlaces")));
-					}
+					label.set("text", this._formatText(value));
 				}
 
 				this._prepareDataItem(dataItem);

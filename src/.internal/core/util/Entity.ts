@@ -1,6 +1,7 @@
 import type { Root } from "../Root";
 import type { Template, ApplyState } from "./Template";
 import type { Theme, IRule } from "../Theme";
+import type { ILocale } from "./Language";
 
 import { IDisposer, Disposer } from "./Disposer";
 import { EventDispatcher, Events } from "./EventDispatcher";
@@ -1595,6 +1596,10 @@ export class Entity extends Settings implements IDisposer {
 			$array.remove(tags, tag);
 			this.set("themeTags", tags);
 		}
+	}
+
+	protected _t(text: any, locale?: ILocale, ...rest: Array<string>){
+		return this._root.language.translate(text, locale, ...rest);
 	}
 
 }

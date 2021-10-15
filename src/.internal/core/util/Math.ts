@@ -293,3 +293,17 @@ export function getPointOnQuadraticCurve(pointA: IPoint, pointB: IPoint, control
 export function getPointOnLine(pointA: IPoint, pointB: IPoint, position: number): IPoint {
 	return { x: pointA.x + (pointB.x - pointA.x) * position, y: pointA.y + (pointB.y - pointA.y) * position };
 }
+
+
+/**
+ * Returns the closest value from the array of values to the reference value.
+ *
+ * @param values  Array of values
+ * @param value   Reference value
+ * @return Closes value from the array
+ */
+export function closest(values: number[], referenceValue: number): number {
+	return values.reduce(function(prev, curr) {
+		return (Math.abs(curr - referenceValue) < Math.abs(prev - referenceValue) ? curr : prev);
+	});
+}

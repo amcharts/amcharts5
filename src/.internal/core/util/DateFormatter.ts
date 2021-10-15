@@ -36,7 +36,7 @@ export interface IDateFormatterSettings extends IEntitySettings {
 	 * An array of data fields that hold date values and should be formatted
 	 * with a [[DateFormatter]].
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders} for more info
 	 */
 	dateFields?: string[];
 
@@ -121,7 +121,7 @@ export class DateFormatter extends Entity {
 		// Check if it's a valid date
 		if (!$type.isNumber(date.getTime())) {
 			// TODO translation
-			//return this.this._root.language.translate("Invalid date");
+			//return this._t("Invalid date");
 			return "Invalid date";
 		}
 
@@ -189,7 +189,7 @@ export class DateFormatter extends Entity {
 			switch (info.parts[i]) {
 
 				case "G":
-					value = this._root.language.translate(
+					value = this._t(
 						fullYear < 0
 							? "_era_bc"
 							: "_era_ad"
@@ -199,7 +199,7 @@ export class DateFormatter extends Entity {
 				case "yyyy":
 					value = Math.abs(fullYear).toString();
 					if (fullYear < 0) {
-						value += this._root.language.translate("_era_bc");
+						value += this._t("_era_bc");
 					}
 					break;
 
@@ -208,7 +208,7 @@ export class DateFormatter extends Entity {
 				case "y":
 					value = Math.abs(fullYear).toString().substr(-info.parts[i].length);
 					if (fullYear < 0) {
-						value += this._root.language.translate("_era_bc");
+						value += this._t("_era_bc");
 					}
 					break;
 
@@ -228,7 +228,7 @@ export class DateFormatter extends Entity {
 						value = Math.abs(year).toString().substr(-info.parts[i].length);
 					}
 					if (year < 0) {
-						value += this._root.language.translate("_era_bc");
+						value += this._t("_era_bc");
 					}
 					break;
 
@@ -241,15 +241,15 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "MMMMM":
-					value = (<any>this._root).language.translate(this._getMonth(month)).substr(0, 1);
+					value = this._t(this._getMonth(month)).substr(0, 1);
 					break;
 
 				case "MMMM":
-					value = (<any>this._root).language.translate(this._getMonth(month));
+					value = this._t(this._getMonth(month));
 					break;
 
 				case "MMM":
-					value = (<any>this._root).language.translate(this._getShortMonth(month));
+					value = this._t(this._getShortMonth(month));
 					break;
 
 				case "MM":
@@ -311,17 +311,17 @@ export class DateFormatter extends Entity {
 
 				case "EEE":
 				case "eee":
-					value = (<any>this._root).language.translate(this._getShortWeekday(weekday));
+					value = this._t(this._getShortWeekday(weekday));
 					break;
 
 				case "EEEE":
 				case "eeee":
-					value = (<any>this._root).language.translate(this._getShortWeekday(weekday));
+					value = this._t(this._getShortWeekday(weekday));
 					break;
 
 				case "EEEEE":
 				case "eeeee":
-					value = (<any>this._root).language.translate(this._getShortWeekday(weekday)).substr(0, 1);
+					value = this._t(this._getShortWeekday(weekday)).substr(0, 1);
 					break;
 
 				case "e":
@@ -334,28 +334,28 @@ export class DateFormatter extends Entity {
 
 				case "a":
 					if (hours >= 12) {
-						value = this._root.language.translate("PM");
+						value = this._t("PM");
 					}
 					else {
-						value = this._root.language.translate("AM");
+						value = this._t("AM");
 					}
 					break;
 
 				case "aa":
 					if (hours >= 12) {
-						value = this._root.language.translate("P.M.");
+						value = this._t("P.M.");
 					}
 					else {
-						value = this._root.language.translate("A.M.");
+						value = this._t("A.M.");
 					}
 					break;
 
 				case "aaa":
 					if (hours >= 12) {
-						value = this._root.language.translate("P");
+						value = this._t("P");
 					}
 					else {
-						value = this._root.language.translate("A");
+						value = this._t("A");
 					}
 					break;
 
@@ -1144,7 +1144,7 @@ export class DateFormatter extends Entity {
 		for (let i: number = 0; i < list.length; i++) {
 			// translate?
 			if (this._root.language) {
-				res.push($utils.escapeForRgex(this._root.language.translate(list[i])));
+				res.push($utils.escapeForRgex(this._t(list[i])));
 			}
 			else {
 				res.push($utils.escapeForRgex(list[i]));

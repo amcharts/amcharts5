@@ -117,7 +117,7 @@ export class ClockHand extends Container {
 							if(r < 0){
 								r = cr + r;
 							}
-							display.moveTo(5, 0)
+							display.moveTo(r, 0)
 							display.arc(0, 0, r, 0, 360);
 						}
 					}

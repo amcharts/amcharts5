@@ -278,12 +278,12 @@ export class Legend extends Series {
 						if (item.isHidden()) {
 							item.show();
 							itemContainer.set("disabled", false);
-							this._root.readerAlert(this._root.language.translate("%1 shown", this._root.locale, labelText));
+							this._root.readerAlert(this._t("%1 shown", this._root.locale, labelText));
 						}
 						else {
 							item.hide();
 							itemContainer.set("disabled", true);
-							this._root.readerAlert(this._root.language.translate("%1 hidden", this._root.locale, labelText));
+							this._root.readerAlert(this._t("%1 hidden", this._root.locale, labelText));
 						}
 					}
 				})
@@ -334,7 +334,7 @@ export class Legend extends Series {
 				dataItem.set("label", label);
 
 				label.text.on("text", () => {
-					itemContainer.set("ariaLabel", label.text._getText() + "; " + this._root.language.translate("Press ENTER to toggle"));
+					itemContainer.set("ariaLabel", label.text._getText() + "; " + this._t("Press ENTER to toggle"));
 				});
 
 				if (item && item.get) {

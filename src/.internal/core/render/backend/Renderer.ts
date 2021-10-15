@@ -115,6 +115,7 @@ export interface IDisplayObject extends IDisposer {
 	getAdjustedBounds(bounds?:IBounds):IBounds;
 	on<C, Key extends keyof IRendererEvents>(key: Key, callback: (this: C, event: IRendererEvents[Key]) => void, context?: C): IDisposer;
 	hovering(): boolean;
+	getCanvas(): HTMLCanvasElement;
 
 	/**
 	 * @ignore

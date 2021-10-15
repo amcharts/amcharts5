@@ -970,7 +970,7 @@ export class MapChart extends SerialChart {
 		this._za = this.animate({ key: "zoomLevel", to: level, duration: duration, easing: easing });
 
 		if (zoomLevel != level) {
-			this._root.readerAlert(this._root.language.translate("Zoom level changed to %1", this._root.locale, $type.numberToString(level)));
+			this._root.readerAlert(this._t("Zoom level changed to %1", this._root.locale, $type.numberToString(level)));
 		}
 	}
 

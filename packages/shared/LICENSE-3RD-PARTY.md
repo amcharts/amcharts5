@@ -21,3 +21,4 @@
 |-------|-------------|-------|
 |pdfmake|bpampuch|[License](https://github.com/bpampuch/pdfmake/blob/master/LICENSE)|
 |SheetJS js-xlsx|SheetJS LLC|[License](https://github.com/SheetJS/js-xlsx/blob/master/LICENSE)|
+|marker.js 2|Alan Mendelevich|[License](https://github.com/ailon/markerjs2/blob/master/LICENSE)|

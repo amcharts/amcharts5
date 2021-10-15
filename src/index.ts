@@ -46,6 +46,7 @@ export { ListData, JsonData } from "./.internal/core/util/Data";
 export { JSONParser, CSVParser } from "./.internal/core/util/DataParser";
 export { DataProcessor } from "./.internal/core/util/DataProcessor";
 export { DateFormatter } from "./.internal/core/util/DateFormatter";
+export { DurationFormatter } from "./.internal/core/util/DurationFormatter";
 export { InterfaceColors } from "./.internal/core/util/InterfaceColors";
 //export { Language } from "./.internal/core/util/Language";
 //export { List } from "./.internal/core/util/List";
