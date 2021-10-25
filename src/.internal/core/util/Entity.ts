@@ -873,6 +873,9 @@ export class Entity extends Settings implements IDisposer {
 	// Internal templates which can be overridden by the user's templates
 	protected _internalTemplates: Array<Template<this>>;
 
+	// Default themes which can be overridden by the user's themes
+	public _defaultThemes: Array<Theme> = [];
+
 	// Disposers for all of the templates
 	protected _templateDisposers: Array<IDisposer> = [];
 
@@ -1387,7 +1390,11 @@ export class Entity extends Settings implements IDisposer {
 
 	public _applyThemes(): boolean {
 		let isConnected = false;
-		const themes: Array<Array<Theme>> = [];
+
+		const defaults: Array<Array<Theme>> = [];
+
+		let themes: Array<Array<Theme>> = [];
+
 		const themeTags: Set<string> = new Set();
 
 		const tags = this.get("themeTagsSelf");
@@ -1401,6 +1408,10 @@ export class Entity extends Settings implements IDisposer {
 		this._walkParents((entity) => {
 			if (entity === this._root._rootContainer) {
 				isConnected = true;
+			}
+
+			if (entity._defaultThemes.length > 0) {
+				defaults.push(entity._defaultThemes);
 			}
 
 			const theme = entity.get("themes");
@@ -1417,6 +1428,8 @@ export class Entity extends Settings implements IDisposer {
 				});
 			}
 		});
+
+		themes = defaults.concat(themes);
 
 		this._removeTemplates();
 

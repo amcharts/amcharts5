@@ -134,7 +134,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	tooltip?: Tooltip;
 
 	/**
-	 * If set to `true` tooltip will snap to the current cell. `tooltiLocation` indicates
+	 * `tooltipLocation` indicates
 	 * which relative place to snap to: `0` beginning, `0.5` - middle, `1` - end.
 	 *
 	 * @default 0.5

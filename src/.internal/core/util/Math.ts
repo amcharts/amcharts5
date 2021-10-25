@@ -307,3 +307,7 @@ export function closest(values: number[], referenceValue: number): number {
 		return (Math.abs(curr - referenceValue) < Math.abs(prev - referenceValue) ? curr : prev);
 	});
 }
+
+export function boundsOverlap (bounds1:IBounds, bounds2:IBounds) {  
+  return !(bounds1.bottom < bounds2.top || bounds2.bottom < bounds1.top || bounds1.right < bounds2.left || bounds2.right < bounds1.left);
+}

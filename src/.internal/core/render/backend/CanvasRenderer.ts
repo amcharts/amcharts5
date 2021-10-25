@@ -16,6 +16,7 @@ import * as $utils from "../../util/Utils";
 import * as $array from "../../util/Array";
 import * as $type from "../../util/Type";
 import * as $math from "../../util/Math";
+import arcToBezier from 'svg-arc-to-cubic-bezier';
 
 
 /**
@@ -44,6 +45,18 @@ function checkEvenArgs(name: string, actual: number, expected: number) {
 
 	if ((actual % expected) !== 0) {
 		throw new Error("Arguments for " + name + " must be in pairs of " + expected);
+	}
+}
+
+/**
+ * @ignore
+ */
+function assertBinary(value: number): 0 | 1 {
+	if (value === 0 || value === 1) {
+		return value;
+
+	} else {
+		throw new Error("Flag must be 0 or 1");
 	}
 }
 
@@ -990,6 +1003,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		this._pushOp(new Shadow(opacity ? color.toCSS(opacity) : color.toCSS(this._fillAlpha || this._strokeAlpha), blur, offsetX, offsetY));
 	}
 
+	// https://svgwg.org/svg2-draft/paths.html#DProperty
 	// TODO better error checking
 	svgPath(path: string): void {
 		let x = 0;
@@ -1209,9 +1223,38 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 
 				case "A":
 				case "a":
-					throw new Error("'" + name + "' command is not supported")
-					break;
+					const relative = (name === "a");
 
+					checkEvenArgs(name, args.length, 7);
+
+                    for (let i = 0; i < args.length; i += 7) {
+                    	let cx = args[i + 5];
+                    	let cy = args[i + 6];
+
+                    	if (relative) {
+                    		cx += x;
+                    		cy += y;
+                    	}
+
+                    	const bs = arcToBezier({
+							px: x,
+							py: y,
+							rx: args[i],
+							ry: args[i + 1],
+							xAxisRotation: args[i + 2],
+							largeArcFlag: assertBinary(args[i + 3]),
+							sweepFlag: assertBinary(args[i + 4]),
+							cx,
+							cy,
+						});
+
+                    	$array.each(bs, (b) => {
+							this.bezierCurveTo(b.x1, b.y1, b.x2, b.y2, b.x, b.y);
+							x = b.x;
+							y = b.y;
+						});
+                    }
+					break;
 				case "Z":
 				case "z":
 					checkArgs(name, args.length, 0);

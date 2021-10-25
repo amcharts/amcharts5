@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.36] - 2021-10-25
+
+### Added
+- New chart type: Venn. [More info](https://www.amcharts.com/docs/v5/charts/venn/).
+- New chart type: WordCloud. [More info](https://www.amcharts.com/docs/v5/charts/word-cloud/).
+
+### Changed
+- `XYSeries` will now automatically set the first bullet of a data item as the series' `tooltipTarget`. This will make the series tooltip background to change color to
+the bullet's fill.
+
+### Fixed
+- Code optimizations to reduce size of core package by 10%.
+- If data was being set for a `CategoryAxis` not instantly but after some time, the chart was not rendered properly.
+- `svgPath` with `A` or `a` commands was not being rendered properly.
+
+
 ## [5.0.0-beta.35] - 2021-10-15
 
 ### Added

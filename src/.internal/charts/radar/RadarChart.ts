@@ -7,6 +7,7 @@ import type { RadarColumnSeries } from "./RadarColumnSeries";
 import type { RadarLineSeries } from "./RadarLineSeries";
 import type { IPoint } from "../../core/util/IPoint";
 
+import { RadarDefaultTheme } from "./RadarDefaultTheme";
 import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import { Percent, p50, percent } from "../../core/util/Percent";
 import { Container } from "../../core/render/Container";
@@ -108,7 +109,10 @@ export class RadarChart extends XYChart {
 	protected _maxRadius: number = 1;
 
 	protected _afterNew() {
+		this._defaultThemes.push(RadarDefaultTheme.new(this._root));
+
 		super._afterNew();
+
 		const radarContainer = this.radarContainer;
 		const gridContainer = this.gridContainer;
 		const topGridContainer = this.topGridContainer;

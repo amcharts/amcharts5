@@ -16,7 +16,6 @@ import * as $utils from "../../core/util/Utils";
 export interface IPieSeriesDataItem extends IPercentSeriesDataItem {
 	slice: Slice;
 	label: RadialLabel;
-	tick: Tick;
 }
 
 export interface IPieSeriesSettings extends IPercentSeriesSettings {
@@ -72,7 +71,6 @@ export class PieSeries extends PercentSeries {
 
 	declare public _sliceType: Slice;
 	declare public _labelType: RadialLabel;
-	declare public _tickType: Tick;
 
 	protected _makeSlices(): ListTemplate<this["_sliceType"]> {
 		return new ListTemplate(
@@ -87,7 +85,7 @@ export class PieSeries extends PercentSeries {
 		return new ListTemplate(
 			Template.new({}),
 			() => RadialLabel._new(this._root, {
-				themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), ["pie", "series"])
+				themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), ["pie", "series"])
 			}, [this.labels.template]),
 		);
 	}
@@ -96,7 +94,7 @@ export class PieSeries extends PercentSeries {
 		return new ListTemplate(
 			Template.new({}),
 			() => Tick._new(this._root, {
-				themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), ["pie", "series"])
+				themeTags: $utils.mergeTags(this.ticks.template.get("themeTags", []), ["pie", "series"])
 			}, [this.ticks.template]),
 		);
 	}

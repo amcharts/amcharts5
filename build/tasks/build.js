@@ -35,6 +35,8 @@ async function removeMapFiles(dir) {
 async function copyDirs(state, output) {
 	await cp(state.path("packages", "shared"), output);
 	await cpMaybe(state.path("packages", "es2015"), output);
+
+	await cp(state.path("src", ".internal", "charts", "venn", "vennjs"), $path.join(output, ".internal", "charts", "venn", "vennjs"));
 }
 
 module.exports = async (state) => {

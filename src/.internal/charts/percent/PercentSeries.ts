@@ -27,7 +27,7 @@ export interface IPercentSeriesDataItem extends ISeriesDataItem {
 	category: string;
 
 	/**
-	 * Slice visaul element.
+	 * Slice visual element.
 	 */
 	slice: Graphics;
 
@@ -212,7 +212,7 @@ export abstract class PercentSeries extends Series {
 			let sum = 0;
 			let absSum = 0;
 			let valueHigh = 0;
-			let valueLow = 0;
+			let valueLow = Infinity;
 			let count = 0;
 			$array.each(this._dataItems, (dataItem) => {
 				let valueWorking = dataItem.get("valueWorking", 0);
@@ -562,4 +562,6 @@ export abstract class PercentSeries extends Series {
 	protected _updateTick(_dataItem: DataItem<this["_dataItemSettings"]>) {
 
 	}
+
+
 }

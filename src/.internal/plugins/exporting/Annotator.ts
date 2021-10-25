@@ -149,6 +149,7 @@ export class Annotator extends Entity {
 			const markerArea = new markerjs2.MarkerArea(canvas);
 			//markerArea.renderTarget = canvas;
 			markerArea.uiStyleSettings.logoPosition = "right";
+			markerArea.uiStyleSettings.zIndex = 20;
 			markerArea.targetRoot = canvas.parentElement!;
 
 			markerArea.addRenderEventListener((img: any, state: any) => {

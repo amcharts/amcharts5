@@ -4,6 +4,7 @@ import type { Bullet } from "../../core/render/Bullet";
 import type { Root } from "../../core/Root";
 import type { Easing } from "../../core/util/Ease";
 
+import { HierarchyDefaultTheme } from "./HierarchyDefaultTheme";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
 import { DataItem } from "../../core/render/Component";
 import { HierarchyNode } from "./HierarchyNode";
@@ -247,6 +248,7 @@ export abstract class Hierarchy extends Series {
 	public _currentDownDepth: number | undefined;
 
 	protected _afterNew() {
+		this._defaultThemes.push(HierarchyDefaultTheme.new(this._root));
 		this.fields.push("category", "childData", "disabled", "fill");
 
 		this.children.push(this.bulletsContainer);

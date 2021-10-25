@@ -658,11 +658,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			let second = series.dataItems[result.index];
 
 			if (first && second) {
-				let open = first.open![fieldName];
-				let close = second.close![fieldName];
+				if (first.open && second.close) {
+					let open = first.open[fieldName];
+					let close = second.close[fieldName];
 
-				if (Math.abs(value - open) > Math.abs(value - close)) {
-					return second;
+					if (Math.abs(value - open) > Math.abs(value - close)) {
+						return second;
+					}
 				}
 			}
 			return first;

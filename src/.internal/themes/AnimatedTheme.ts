@@ -28,5 +28,7 @@ export class AnimatedTheme extends Theme {
 		this.rule("Tooltip", ["axis"]).setAll({
 			animationDuration: 200
 		});
+
+		this.rule("WordCloud").set("animationDuration", 500);
 	}
 }

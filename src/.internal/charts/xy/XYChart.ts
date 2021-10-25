@@ -1,25 +1,28 @@
 import type { Axis } from "./axes/Axis";
 import type { XYCursor } from "./XYCursor";
 import type { AxisRenderer } from "./axes/AxisRenderer";
-import { Container } from "../../core/render/Container";
 import type { DataItem } from "../../core/render/Component";
-import { Rectangle } from "../../core/render/Rectangle";
-import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
-import { ListAutoDispose } from "../../core/util/List";
 import type { IDisposer } from "../../core/util/Disposer";
-import { p100 } from "../../core/util/Percent";
 import type { XYSeries, IXYSeriesDataItem } from "./series/XYSeries";
 import type { IPointerEvent } from "../../core/render/backend/Renderer";
 import type { Scrollbar } from "../../core/render/Scrollbar";
-import { Color } from "../../core/util/Color";
 import type { Tooltip } from "../../core/render/Tooltip";
+import type { IPoint } from "../../core/util/IPoint";
+
+import { XYChartDefaultTheme } from "./XYChartDefaultTheme";
+import { Container } from "../../core/render/Container";
+import { Rectangle } from "../../core/render/Rectangle";
+import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
+import { ListAutoDispose } from "../../core/util/List";
+import { p100 } from "../../core/util/Percent";
+import { Color } from "../../core/util/Color";
 import { Button } from "../../core/render/Button";
 import { Graphics } from "../../core/render/Graphics";
-import type { IPoint } from "../../core/util/IPoint";
+import { Percent } from "../../core/util/Percent";
+
 import * as $array from "../../core/util/Array";
 import * as $order from "../../core/util/Order";
 import * as $type from "../../core/util/Type";
-import { Percent } from "../../core/util/Percent";
 
 export interface IXYChartSettings extends ISerialChartSettings {
 
@@ -97,7 +100,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * tooltips, and will not arrange them to not overlap.
 	 *
 	 * Will work only if chart has an `XYCursor` enabled.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
 	 * @default true
 	 */
@@ -233,6 +236,8 @@ export class XYChart extends SerialChart {
 	protected _wheelDp: IDisposer | undefined;
 
 	protected _afterNew() {
+		this._defaultThemes.push(XYChartDefaultTheme.new(this._root));
+
 		super._afterNew();
 
 		this._disposers.push(this.xAxes);

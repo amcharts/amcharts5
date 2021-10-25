@@ -51,8 +51,12 @@ interface IBounds extends Entity {
 
 
 export interface IRootEvents {
-	framestarted: {};
-	frameended: {};
+	framestarted: {
+		timestamp: number;
+	};
+	frameended: {
+		timestamp: number;
+	};
 }
 
 
@@ -110,15 +114,6 @@ export class Root implements IDisposer {
 
 	public _tooltip!: Tooltip;
 
-	/**
-	 * Default theme.
-	 *
-	 * You can use it modify defaults.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/#Modifying_default_theme} for more info
-	 */
-	public defaultTheme!: DefaultTheme;
-
 	// Locale-related
 
 	/**
@@ -165,7 +160,7 @@ export class Root implements IDisposer {
 
 	/**
 	 * Duration formatter.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	public durationFormatter: DurationFormatter = DurationFormatter.new(this, {});
@@ -336,6 +331,7 @@ export class Root implements IDisposer {
 		const renderer = this._renderer;
 		const rootContainer = Container.new(this, { visible: true, width: this.dom.clientWidth, height: this.dom.clientHeight });
 		this._rootContainer = rootContainer;
+		this._rootContainer._defaultThemes.push(DefaultTheme.new(this));
 
 		const container = rootContainer.children.push(Container.new(this, { visible: true, width: p100, height: p100 }));
 		this.container = container;
@@ -655,10 +651,26 @@ export class Root implements IDisposer {
 		if (!this.isDisposed()) {
 			this.animationTime = currentTime;
 
+			if (this.events.isEnabled("framestarted")) {
+				this.events.dispatch("framestarted", {
+					type: "framestarted",
+					target: this,
+					timestamp: currentTime,
+				});
+			}
+
 			this._runTickers(currentTime);
 			this._runAnimations(currentTime);
 			this._runDirties();
 			this._render();
+
+			if (this.events.isEnabled("frameended")) {
+				this.events.dispatch("frameended", {
+					type: "frameended",
+					target: this,
+					timestamp: currentTime,
+				});
+			}
 
 			// No more work to do
 			if (this._tickers.length === 0 &&
@@ -805,10 +817,6 @@ export class Root implements IDisposer {
 	 * @param  themes  A list of themes
 	 */
 	public setThemes(themes: Array<Theme>): void {
-		if (!this.defaultTheme) {
-			this.defaultTheme = DefaultTheme.new(this);
-		}
-		themes.unshift(this.defaultTheme);
 		this._rootContainer.set("themes", themes);
 
 		// otherwise new themes are not applied

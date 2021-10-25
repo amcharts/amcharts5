@@ -6,6 +6,7 @@ import type { ListTemplate } from "../../core/util/List";
 import type { Bullet } from "../../core/render/Bullet";
 import type * as d3sankey from "d3-sankey";
 
+import { FlowDefaultTheme } from "./FlowDefaultTheme";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
 import { Container } from "../../core/render/Container";
 import { LinearGradient } from "../../core/render/gradients/LinearGradient";
@@ -136,6 +137,8 @@ export abstract class Flow extends Series {
 
 	protected _linksByIndex: { [index: string]: any } = {};
 	protected _afterNew() {
+		this._defaultThemes.push(FlowDefaultTheme.new(this._root));
+
 		this.fields.push("disabled", "sourceId", "targetId");
 
 		if (this.nodes) {

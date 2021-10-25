@@ -136,13 +136,8 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivateRaw("maxZoomFactor", len);
 		}
 
-		if (this.isDirty("start")) {
-			this.setPrivate("startIndex", Math.max(Math.round(this.get("start", 0) * len), 0));
-		}
-
-		if (this.isDirty("end")) {
-			this.setPrivate("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));
-		}
+		this.setPrivateRaw("startIndex", Math.max(Math.round(this.get("start", 0) * len), 0));		
+		this.setPrivateRaw("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));		
 
 		if (this._sizeDirty || this._valuesDirty || (this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("endIndex") || this.isPrivateDirty("startIndex") || this.isPrivateDirty("width") || this.isPrivateDirty("height"))) {
 			if (this.dataItems.length > 0) {

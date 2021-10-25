@@ -125,6 +125,8 @@ import type { XYChart } from "./../charts/xy/XYChart";
 import type { XYChartScrollbar } from "./../charts/xy/XYChartScrollbar";
 import type { XYCursor } from "./../charts/xy/XYCursor";
 import type { XYSeries } from "./../charts/xy/series/XYSeries";
+import type { Venn } from "./../charts/venn/Venn";
+import type { WordCloud } from "./../charts/wordcloud/WordCloud";
 import type { ZoomControl } from "./../charts/map/ZoomControl";
 
 export interface IClasses {
@@ -250,5 +252,7 @@ export interface IClasses {
 	"XYChartScrollbar": XYChartScrollbar;
 	"XYCursor": XYCursor;
 	"XYSeries": XYSeries;
+	"Venn": Venn;
+	"WordCloud": WordCloud;
 	"ZoomControl": ZoomControl;
 }

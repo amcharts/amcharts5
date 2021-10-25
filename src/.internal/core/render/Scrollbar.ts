@@ -60,6 +60,7 @@ export interface IScrollbarEvents extends IContainerEvents {
 	 * Invoked when range of the selection changes.
 	 */
 	rangechanged: { start: number, end: number };
+
 }
 
 /**

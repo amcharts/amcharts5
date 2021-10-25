@@ -179,7 +179,7 @@ export class Graphics extends Sprite {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("draw")) {
+		if (this.isDirty("draw") || this.isDirty("svgPath")) {
 			this.markDirtyBounds();
 		}
 

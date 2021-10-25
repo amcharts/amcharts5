@@ -9,10 +9,16 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 const root = am5.Root.new("chartdiv");
 
 
+// Create custom theme
+const myTheme = am5.Theme.new(root);
+myTheme.rule("Label").set("fontSize", 10);
+myTheme.rule("Grid").set("strokeOpacity", 0.06);
+
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  myTheme
 ]);
 
 var temperatures = {
@@ -133,8 +139,6 @@ var temperatures = {
 }
 
 // Modify defaults
-root.defaultTheme.rule("Label").set("fontSize", 10);
-root.defaultTheme.rule("Grid").set("strokeOpacity", 0.06);
 root.numberFormatter.set("numberFormat", "+#.0°C|#.0°C|0.0°C");
 
 var startYear = 1973;

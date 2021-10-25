@@ -1,5 +1,6 @@
-import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
 import type { PercentSeries } from "./PercentSeries";
+import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
+import { PercentDefaultTheme } from "./PercentDefaultTheme";
 
 export interface IPercentChartSettings extends ISerialChartSettings {
 }
@@ -7,6 +8,13 @@ export interface IPercentChartSettings extends ISerialChartSettings {
 export interface IPercentChartPrivate extends ISerialChartPrivate {
 }
 
+/**
+ * Base class for [[PieChart]].
+ *
+ * Also used for percent-based series, like [[FunnelSeries]], [[PyramidSeries]], etc.
+ *
+ * @important
+ */
 export abstract class PercentChart extends SerialChart {
 	public static className: string = "PercentChart";
 	public static classNames: Array<string> = SerialChart.classNames.concat([PercentChart.className]);
@@ -16,6 +24,8 @@ export abstract class PercentChart extends SerialChart {
 	declare public _seriesType: PercentSeries;
 
 	protected _afterNew() {
+		this._defaultThemes.push(PercentDefaultTheme.new(this._root));
+
 		super._afterNew();
 
 		this.chartContainer.children.push(this.seriesContainer);

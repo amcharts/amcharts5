@@ -1552,7 +1552,15 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
-	protected _getTooltipTarget(_dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
+	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
+		const bullets = dataItem.bullets;
+		if (bullets && bullets.length > 0) {
+			const bullet = bullets[0];
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+				return sprite;
+			}
+		}
 		return this;
 	}
 
@@ -1666,4 +1674,6 @@ export abstract class XYSeries extends Series {
 			axisDataItem: axisDataItem
 		})
 	}
+
+
 }

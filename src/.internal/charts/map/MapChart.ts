@@ -6,6 +6,7 @@ import type { Time } from "../../core/util/Animation";
 import type { ZoomControl } from "./ZoomControl";
 import type { Animation } from "../../core/util/Entity";
 
+import { MapChartDefaultTheme } from "./MapChartDefaultTheme";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
 import { Rectangle } from "../../core/render/Rectangle";
 import { p100 } from "../../core/util/Percent";
@@ -191,7 +192,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * @default 0.4
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
 	 */
-	 maxPanOut?: number;
+	maxPanOut?: number;
 
 }
 
@@ -560,6 +561,7 @@ export class MapChart extends SerialChart {
 	}
 
 	protected _afterNew() {
+		this._defaultThemes.push(MapChartDefaultTheme.new(this._root));
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["map"]);
 
 		super._afterNew();
@@ -819,30 +821,30 @@ export class MapChart extends SerialChart {
 								y += local.y - downPoint.y;
 							}
 
-/*							const bounds = this._mapBounds;
+							/*							const bounds = this._mapBounds;
 
-							const w = this.width();
-							const h = this.height();
+														const w = this.width();
+														const h = this.height();
 
-							const ww = bounds[1][0] - bounds[0][0];
-							const hh = bounds[1][1] - bounds[0][1];
+														const ww = bounds[1][0] - bounds[0][0];
+														const hh = bounds[1][1] - bounds[0][1];
 
-							const zoomLevel = this.get("zoomLevel", 1);
+														const zoomLevel = this.get("zoomLevel", 1);
 
-							const maxPanOut = 1 - Math.min(1, this.get("maxPanOut", 0));
+														const maxPanOut = 1 - Math.min(1, this.get("maxPanOut", 0));
 
-							let center = this.convert(this.geoCentroid());
+														let center = this.convert(this.geoCentroid());
 
-							if (panX == "translateX") {
-								//x = Math.min(x, w / 2 + (ww / 2 - 1) * zoomLevel - ww / 2 * maxPanOut);
-								//x = Math.max(x, w / 2 - (ww / 2 - 1) * zoomLevel + ww / 2 * maxPanOut);
-							}
+														if (panX == "translateX") {
+															//x = Math.min(x, w / 2 + (ww / 2 - 1) * zoomLevel - ww / 2 * maxPanOut);
+															//x = Math.max(x, w / 2 - (ww / 2 - 1) * zoomLevel + ww / 2 * maxPanOut);
+														}
 
-							if (panY == "translateY") {
-								//y = Math.min(y, h / 2 + (hh / 2 - 1) * zoomLevel - hh / 2 * maxPanOut);
-								//y = Math.max(y, h / 2 - (hh / 2 - 1) * zoomLevel + hh / 2 * maxPanOut);
-							}
-*/
+														if (panY == "translateY") {
+															//y = Math.min(y, h / 2 + (hh / 2 - 1) * zoomLevel - hh / 2 * maxPanOut);
+															//y = Math.max(y, h / 2 - (hh / 2 - 1) * zoomLevel + hh / 2 * maxPanOut);
+														}
+							*/
 							this.set("translateX", x);
 							this.set("translateY", y);
 
