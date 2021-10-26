@@ -60,12 +60,6 @@ export interface IWordCloudDataItem extends ISeriesDataItem {
 export interface IWordCloudSettings extends ISeriesSettings {
 
     /**
-     * @todo description
-     */
-    allowNested?: boolean;
-
-
-    /**
      * Duration of word animation when chart resizes.
      */
     animationDuration?: number;
@@ -272,31 +266,7 @@ export class WordCloud extends Series {
         //const rows = Math.round(this._root.height() * resolution);
         let step = this.get("step", 1) * 2;
 
-        const boundsToAdd = this._boundsToAdd;
-        if (boundsToAdd) {
-            const context = (this._ghostContainer._display.getLayer() as CanvasLayer).context;
-            const y = Math.round(boundsToAdd.top);
-            const x = Math.round(boundsToAdd.left);
-            const w = Math.round(boundsToAdd.right - boundsToAdd.left);
-            const h = Math.round(boundsToAdd.bottom - boundsToAdd.top);
-            const imageData = context.getImageData(x, y, w, h).data;
-            const buffer = this._buffer;
-
-            let n = 3;
-            for (let r = y; r < y + h; r++) {
-                for (let c = x; c < x + w; c++) {
-                    let i = ((r + 1) * cols - (cols - c));
-                    if (imageData[n] != 0) {
-                        buffer[i] = 1;
-                    }
-                    n += 4;
-                }
-            }
-            this._boundsToAdd = undefined;
-        }
-
         if (this._valuesDirty || this._sizeDirty || this.isPrivateDirty("adjustedFontSize")) {
-
             const adjustedFontSize = this.getPrivate("adjustedFontSize", 1);
 
             const w = this.innerWidth();
@@ -341,6 +311,16 @@ export class WordCloud extends Series {
                 sum += valueWorking;
                 absSum += Math.abs(valueWorking);
             });
+
+            this._dataItems.sort((a, b) => {
+                let aValue = a.get("value");
+                let bValue = b.get("value");
+
+                if (aValue > bValue) return -1;
+                if (aValue < bValue) return 1;
+                return 0;
+
+            })
 
             $array.each(this._dataItems, (dataItem) => {
 
@@ -393,11 +373,35 @@ export class WordCloud extends Series {
             this._currentIndex = 0;
 
             this._root.events.once("frameended", () => {
-                this._process = true;
                 this.setTimeout(() => {
+                    this._process = true;
                     this._markDirtyKey("progress");
-                }, 10)
+                }, 50)
             })
+        }
+
+        const boundsToAdd = this._boundsToAdd;
+        if (boundsToAdd) {
+            const context = (this._ghostContainer._display.getLayer() as CanvasLayer).context;
+            const y = Math.round(boundsToAdd.top);
+            const x = Math.round(boundsToAdd.left);
+            const w = Math.round(boundsToAdd.right - boundsToAdd.left);
+            const h = Math.round(boundsToAdd.bottom - boundsToAdd.top);
+
+            const imageData = context.getImageData(x, y, w, h).data;
+            const buffer = this._buffer;
+
+            let n = 3;
+            for (let r = y; r < y + h; r++) {
+                for (let c = x; c < x + w; c++) {
+                    let i = ((r + 1) * cols - (cols - c));
+                    if (imageData[n] != 0) {
+                        buffer[i] = 1;
+                    }
+                    n += 4;
+                }
+            }
+            this._boundsToAdd = undefined;
         }
 
         if (this._process && this.isDirty("progress")) {

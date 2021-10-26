@@ -282,7 +282,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * @ignore 
+	 * @ignore
 	 */
 	public _updateChildren() {
 		super._updateChildren();

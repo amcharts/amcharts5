@@ -9,7 +9,7 @@ export interface IGradientSettings extends IEntitySettings {
 
 	/**
 	 * A list of color steps for the gradient.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
 	 */
 	stops?: Array<IGradientStop>;
@@ -38,10 +38,8 @@ export abstract class Gradient extends Entity {
 	public static classNames: Array<string> = Entity.classNames.concat([Gradient.className]);
 
 	protected _afterNew() {
-		super._afterNew();
-
 		// Applying themes because gradient will not have parent
-		this._applyThemes();
+		super._afterNewApplyThemes();
 	}
 
 	/**
@@ -58,7 +56,7 @@ export abstract class Gradient extends Entity {
 
 		//if (this.isDirty("target") && this.get("target")) {
 		//	this.get("target")!.events.on("boundschanged", () => {
-				
+
 		//	});
 		//}
 	}

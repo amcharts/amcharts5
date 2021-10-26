@@ -269,6 +269,8 @@ export class Venn extends Series {
 						slice._setDefault("fill", color);
 						slice._setDefault("stroke", color);
 
+						this.updateLegendMarker(dataItem);
+
 						slice.set("svgPath", "M" + item.x + "," + item.y + " m -" + r + ", 0 a " + r + "," + r + " 0 1,1 " + r * 2 + ",0 a " + r + "," + r + " 0 1,1 -" + r * 2 + ",0");
 						circles[name] = item;
 					}
@@ -472,6 +474,7 @@ export class Venn extends Series {
 			const legendDataItem = dataItem.get("legendDataItem");
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
+
 				$array.each(visualSettings, (setting: any) => {
 					markerRectangle.set(setting, slice.get(setting));
 				})

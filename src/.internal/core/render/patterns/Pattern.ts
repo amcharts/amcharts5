@@ -104,10 +104,8 @@ export interface IPatternPrivate extends IEntityPrivate {
  */
 export class Pattern extends Entity {
 	protected _afterNew() {
-		super._afterNew();
-
 		// Applying themes because pattern will not have parent
-		this._applyThemes();
+		super._afterNewApplyThemes();
 	}
 
 	declare public _settings: IPatternSettings;

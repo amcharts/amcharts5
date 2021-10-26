@@ -12,6 +12,7 @@ export class PercentDefaultTheme extends Theme {
 		super.setupDefaultRules();
 
 		const ic = this._root.interfaceColors;
+		const r = this.rule.bind(this);
 
 		/**
 		 * ========================================================================
@@ -19,7 +20,7 @@ export class PercentDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("PercentSeries").setAll({
+		r("PercentSeries").setAll({
 			legendLabelText: "{category}",
 			legendValueText: "{valuePercentTotal.formatNumber('0.00')}%",
 			colors: ColorSet.new(this._root, {}),
@@ -33,21 +34,21 @@ export class PercentDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("PieChart").setAll({
+		r("PieChart").setAll({
 			radius: percent(80),
 			startAngle: -90,
 			endAngle: 270
 		})
 
-		this.rule("PieSeries").setAll({
+		r("PieSeries").setAll({
 			alignLabels: true,
 			startAngle: -90,
 			endAngle: 270
 		});
 
-		this.rule("PieSeries").states.create("hidden", { endAngle: -90, opacity: 0 });
+		r("PieSeries").states.create("hidden", { endAngle: -90, opacity: 0 });
 
-		this.rule("Slice", ["pie"]).setAll({
+		r("Slice", ["pie"]).setAll({
 			position: "absolute",
 			isMeasured: false,
 			x: 0,
@@ -59,10 +60,10 @@ export class PercentDefaultTheme extends Theme {
 			role: "figure"
 		});
 
-		this.rule("Slice", ["pie"]).states.create("active", { shiftRadius: 20 });
-		this.rule("Slice", ["pie"]).states.create("hover", { scale: 1.04 });
+		r("Slice", ["pie"]).states.create("active", { shiftRadius: 20 });
+		r("Slice", ["pie"]).states.create("hover", { scale: 1.04 });
 
-		this.rule("RadialLabel", ["pie"]).setAll({
+		r("RadialLabel", ["pie"]).setAll({
 			textType: "aligned",
 			radius: 10,
 			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
@@ -71,7 +72,7 @@ export class PercentDefaultTheme extends Theme {
 			populateText: true
 		});
 
-		this.rule("Tick", ["pie"]).setAll({
+		r("Tick", ["pie"]).setAll({
 			location: 1
 		});
 
@@ -82,7 +83,7 @@ export class PercentDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("SlicedChart").setAll({
+		r("SlicedChart").setAll({
 			paddingLeft: 10,
 			paddingRight: 10,
 			paddingTop: 10,
@@ -95,7 +96,7 @@ export class PercentDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("FunnelSeries").setAll({
+		r("FunnelSeries").setAll({
 			startLocation: 0,
 			endLocation: 1,
 			orientation: "vertical",
@@ -103,47 +104,47 @@ export class PercentDefaultTheme extends Theme {
 			sequencedInterpolation: true
 		});
 
-		this.rule("FunnelSlice").setAll({
+		r("FunnelSlice").setAll({
 			interactive: true,
 			expandDistance: 0,
 			//tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00')}%"
 		});
 
-		this.rule("FunnelSlice").states.create("hover", { expandDistance: 0.15 })
+		r("FunnelSlice").states.create("hover", { expandDistance: 0.15 })
 
-		this.rule("Label", ["funnel"]).setAll({
+		r("Label", ["funnel"]).setAll({
 			populateText: true,
 			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
 			centerY: p50
 		});
 
-		this.rule("Label", ["funnel", "horizontal"]).setAll({
+		r("Label", ["funnel", "horizontal"]).setAll({
 			centerX: 0,
 			centerY: p50,
 			rotation: -90
 		});
 
 		// Class: Label
-		this.rule("Label", ["funnel", "vertical"]).setAll({
+		r("Label", ["funnel", "vertical"]).setAll({
 			centerY: p50,
 			centerX: 0
 		});
 
-		this.rule("Tick", ["funnel"]).setAll({
+		r("Tick", ["funnel"]).setAll({
 			location: 1
 		});
 
-		this.rule("FunnelSlice", ["funnel", "link"]).setAll({
+		r("FunnelSlice", ["funnel", "link"]).setAll({
 			fillOpacity: 0.5,
 			strokeOpacity: 0,
 			expandDistance: -0.1
 		});
 
-		this.rule("FunnelSlice", ["funnel", "link", "vertical"]).setAll({
+		r("FunnelSlice", ["funnel", "link", "vertical"]).setAll({
 			height: 10,
 		});
 
-		this.rule("FunnelSlice", ["funnel", "link", "horizontal"]).setAll({
+		r("FunnelSlice", ["funnel", "link", "horizontal"]).setAll({
 			width: 10
 		});
 
@@ -154,47 +155,47 @@ export class PercentDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("PyramidSeries").setAll({
+		r("PyramidSeries").setAll({
 			valueIs: "area"
 		});
 
-		this.rule("FunnelSlice", ["pyramid", "link"]).setAll({
+		r("FunnelSlice", ["pyramid", "link"]).setAll({
 			fillOpacity: 0.5
 		});
 
-		this.rule("FunnelSlice", ["pyramid", "link", "vertical"]).setAll({
+		r("FunnelSlice", ["pyramid", "link", "vertical"]).setAll({
 			height: 0
 		});
 
-		this.rule("FunnelSlice", ["pyramid", "link", "horizontal"]).setAll({
+		r("FunnelSlice", ["pyramid", "link", "horizontal"]).setAll({
 			width: 0
 		});
 
-		this.rule("FunnelSlice", ["pyramid"]).setAll({
+		r("FunnelSlice", ["pyramid"]).setAll({
 			interactive: true,
 			expandDistance: 0
 		});
 
-		this.rule("FunnelSlice", ["pyramid"]).states.create("hover", { expandDistance: 0.15 });
+		r("FunnelSlice", ["pyramid"]).states.create("hover", { expandDistance: 0.15 });
 
-		this.rule("Label", ["pyramid"]).setAll({
+		r("Label", ["pyramid"]).setAll({
 			populateText: true,
 			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
 			centerY: p50
 		});
 
-		this.rule("Label", ["pyramid", "horizontal"]).setAll({
+		r("Label", ["pyramid", "horizontal"]).setAll({
 			centerX: 0,
 			centerY: p50,
 			rotation: -90
 		});
 
-		this.rule("Label", ["pyramid", "vertical"]).setAll({
+		r("Label", ["pyramid", "vertical"]).setAll({
 			centerY: p50,
 			centerX: 0
 		});
 
-		this.rule("Tick", ["pyramid"]).setAll({
+		r("Tick", ["pyramid"]).setAll({
 			location: 1
 		});
 
@@ -206,40 +207,40 @@ export class PercentDefaultTheme extends Theme {
 		 */
 
 		// Class: FunnelSlice
-		this.rule("FunnelSlice", ["pictorial"]).setAll({
+		r("FunnelSlice", ["pictorial"]).setAll({
 			interactive: true,
 			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00')}%"
 		});
 
-		this.rule("Label", ["pictorial"]).setAll({
+		r("Label", ["pictorial"]).setAll({
 			populateText: true,
 			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
 			centerY: p50
 		});
 
-		this.rule("Label", ["pictorial", "horizontal"]).setAll({
+		r("Label", ["pictorial", "horizontal"]).setAll({
 			centerX: 0,
 			centerY: p50,
 			rotation: -90
 		});
 
-		this.rule("Label", ["pictorial", "vertical"]).setAll({
+		r("Label", ["pictorial", "vertical"]).setAll({
 			centerY: p50,
 			centerX: 0
 		});
 
-		this.rule("FunnelSlice", ["pictorial", "link"]).setAll({
+		r("FunnelSlice", ["pictorial", "link"]).setAll({
 			fillOpacity: 0.5,
 			width: 0,
 			height: 0
 		});
 
-		this.rule("Tick", ["pictorial"]).setAll({
+		r("Tick", ["pictorial"]).setAll({
 			location: 0.5
 		});
 
 		{
-			const rule = this.rule("Graphics", ["pictorial", "background"]);
+			const rule = r("Graphics", ["pictorial", "background"]);
 
 			rule.setAll({
 				fillOpacity: 0.2

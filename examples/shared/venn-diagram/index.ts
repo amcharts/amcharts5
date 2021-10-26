@@ -18,7 +18,7 @@ let container = root.container.children.push(am5.Container.new(root, {
 }));
 
 // Create venn series
-let chart = container.children.push(am5venn.Venn.new(root, {
+let series = container.children.push(am5venn.Venn.new(root, {
   categoryField: "name",
   valueField: "value",
   intersectionsField: "sets",
@@ -29,7 +29,7 @@ let chart = container.children.push(am5venn.Venn.new(root, {
 }));
 
 // Set data
-chart.data.setAll([
+series.data.setAll([
   { name: "A", value: 10 },
   { name: "B", value: 10 },
   { name: "C", value: 5 },
@@ -40,10 +40,10 @@ chart.data.setAll([
 }]);
 
 // Set tooltip content
-chart.slices.template.set("tooltipText", "{category}: {value}");
+series.slices.template.set("tooltipText", "{category}: {value}");
 
 // Set up hover appearance
-chart.hoverGraphics.setAll({
+series.hoverGraphics.setAll({
   strokeDasharray: [3, 3],
   stroke: am5.color(0xffffff),
   strokeWidth: 2
@@ -56,4 +56,4 @@ let legend = container.children.push(
     x: am5.p50
   })
 );
-legend.data.setAll(chart.dataItems);
+legend.data.setAll(series.dataItems);

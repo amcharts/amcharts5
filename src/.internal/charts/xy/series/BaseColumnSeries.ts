@@ -410,7 +410,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b < yStart) || (t > yEnd && b > yEnd)) {
 				this._toggleColumn(dataItem, false);
 			}
-			else{
+			else {
 				this._toggleColumn(dataItem, true);
 			}
 
@@ -672,6 +672,10 @@ export abstract class BaseColumnSeries extends XYSeries {
 	}
 
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
+		if (this.get("seriesTooltipTarget") == "bullet") {
+			return super._getTooltipTarget(dataItem);
+		}
+
 		let column = dataItem.get("graphics");
 		if (column) {
 			return column;

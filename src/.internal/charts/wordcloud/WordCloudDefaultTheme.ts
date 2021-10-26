@@ -13,9 +13,9 @@ export class WordCloudDefaultTheme extends Theme {
 		super.setupDefaultRules();
 
 		const ic = this._root.interfaceColors;
+		const r = this.rule.bind(this);
 
-		this.rule("WordCloud").setAll({
-			allowNested:true,
+		r("WordCloud").setAll({
 			width: p100,
 			height: p100,
 			minFontSize: percent(2),
@@ -30,7 +30,7 @@ export class WordCloudDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Label", ["wordcloud"]);
+			const rule = r("Label", ["wordcloud"]);
 
 			rule.setAll({
 				text: "{category}",

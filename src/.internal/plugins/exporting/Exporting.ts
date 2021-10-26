@@ -108,7 +108,7 @@ export interface IExportingSettings extends IEntitySettings {
 	 * Export will try to determine background color based on the DOM styles.
 	 *
 	 * You can use this setting to explicitly specify background color for
-	 * expoted images.
+	 * exported images.
 	 */
 	backgroundColor?: Color;
 

@@ -156,7 +156,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 */
 	fixAxisSize?: boolean;
 
-	// @todo description
+	// @todo review
 	bullet?: (root: Root, axis: Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
 
 }

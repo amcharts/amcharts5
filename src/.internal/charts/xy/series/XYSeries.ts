@@ -405,6 +405,11 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * If set to `true`, series bullets will be masked by plot area.
 	 */
 	maskBullets?: boolean;
+
+	/**
+	 * @todo review
+	 */
+	seriesTooltipTarget?: "series" | "bullet"
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {
@@ -1297,11 +1302,13 @@ export abstract class XYSeries extends Series {
 				let w = right - left;
 				let h = bottom - top;
 
+				if (sprite.isType("Label")) {
+					sprite.set("maxWidth", w);
+					sprite.set("maxHeight", h);
+				}
+
 				let x = left + w * locationX;
 				let y = bottom - h * locationY;
-
-				sprite.set("maxWidth", w);
-				sprite.set("maxHeight", h);
 
 				sprite.set("x", x);
 				sprite.set("y", y);
@@ -1553,12 +1560,14 @@ export abstract class XYSeries extends Series {
 	}
 
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
-		const bullets = dataItem.bullets;
-		if (bullets && bullets.length > 0) {
-			const bullet = bullets[0];
-			const sprite = bullet.get("sprite");
-			if (sprite) {
-				return sprite;
+		if (this.get("seriesTooltipTarget") == "bullet") {
+			const bullets = dataItem.bullets;
+			if (bullets && bullets.length > 0) {
+				const bullet = bullets[0];
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					return sprite;
+				}
 			}
 		}
 		return this;

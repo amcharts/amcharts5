@@ -17,14 +17,14 @@ export class FlowDefaultTheme extends Theme {
 		super.setupDefaultRules();
 
 		const ic = this._root.interfaceColors;
-
+		const r = this.rule.bind(this);
 		/**
 		 * ========================================================================
 		 * charts/flow
 		 * ========================================================================
 		 */
 
-		this.rule("Flow").setAll({
+		r("Flow").setAll({
 			width: p100,
 			height: p100,
 			paddingLeft: 10,
@@ -33,39 +33,39 @@ export class FlowDefaultTheme extends Theme {
 			paddingBottom: 10
 		});
 
-		this.rule("FlowNodes").setAll({
+		r("FlowNodes").setAll({
 			colors: ColorSet.new(this._root, {}),
 			legendLabelText: "{name}",
 			legendValueText: "{sumOutgoing.formatNumber('#.#')}"
 		});
 
-		this.rule("FlowNode").setAll({
+		r("FlowNode").setAll({
 
 		});
 
-		this.rule("FlowNode", ["unknown"]).setAll({
+		r("FlowNode", ["unknown"]).setAll({
 			draggable: false,
 			opacity: 0
 		});
 
-		this.rule("RadialLabel", ["flow", "node"]).setAll({
+		r("RadialLabel", ["flow", "node"]).setAll({
 			text: "{name}",
 			populateText: true
 		});
 
-		this.rule("FlowLink").setAll({
+		r("FlowLink").setAll({
 			fillStyle: "gradient",
 			strokeStyle: "gradient"
 		});
 
-		this.rule("FlowLink", ["source", "unknown"]).setAll({
+		r("FlowLink", ["source", "unknown"]).setAll({
 		});
 
-		this.rule("FlowLink", ["target", "unknown"]).setAll({
+		r("FlowLink", ["target", "unknown"]).setAll({
 		});
 
 
-		this.rule("FlowNode").events.on("pointerover", (e) => {
+		r("FlowNode").events.on("pointerover", (e) => {
 			const dataItem = e.target.dataItem as DataItem<IFlowNodesDataItem>;
 			if (dataItem) {
 				const outgoing = dataItem.get("outgoingLinks")
@@ -92,7 +92,7 @@ export class FlowDefaultTheme extends Theme {
 			}
 		});
 
-		this.rule("FlowNode").events.on("pointerout", (e) => {
+		r("FlowNode").events.on("pointerout", (e) => {
 			const dataItem = e.target.dataItem as DataItem<IFlowNodesDataItem>;
 			if (dataItem) {
 				const outgoing = dataItem.get("outgoingLinks")
@@ -117,7 +117,7 @@ export class FlowDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Sankey").setAll({
+		r("Sankey").setAll({
 			orientation: "horizontal",
 			nodeAlign: "justify",
 			linkTension: 0.5,
@@ -126,23 +126,23 @@ export class FlowDefaultTheme extends Theme {
 		});
 
 		// Class: RoundedRectangle
-		this.rule("RoundedRectangle", ["sankey", "node", "shape"]).setAll({
+		r("RoundedRectangle", ["sankey", "node", "shape"]).setAll({
 			cornerRadiusTL: 0,
 			cornerRadiusBL: 0,
 			cornerRadiusTR: 0,
 			cornerRadiusBR: 0
 		});
 
-		this.rule("SankeyLink").setAll({
+		r("SankeyLink").setAll({
 			controlPointDistance: 0.2
 		});
 
-		this.rule("FlowNode", ["sankey"]).setAll({
+		r("FlowNode", ["sankey"]).setAll({
 			draggable: true
 		});
 
 		{
-			const rule = this.rule("Graphics", ["sankey", "link"]);
+			const rule = r("Graphics", ["sankey", "link"]);
 
 			rule.setAll({
 				fillOpacity: 0.2,
@@ -154,20 +154,20 @@ export class FlowDefaultTheme extends Theme {
 			setColor(rule, "fill", ic, "grid");
 		}
 
-		this.rule("Graphics", ["sankey", "link"]).states.create("hover", { fillOpacity: 0.5 });
+		r("Graphics", ["sankey", "link"]).states.create("hover", { fillOpacity: 0.5 });
 
-		this.rule("Label", ["sankey", "node"]).setAll({
+		r("Label", ["sankey", "node"]).setAll({
 			text: "{name}",
 			populateText: true
 		});
 
-		this.rule("Label", ["sankey", "horizontal"]).setAll({
+		r("Label", ["sankey", "horizontal"]).setAll({
 			y: p50,
 			centerY: p50,
 			paddingLeft: 15
 		});
 
-		this.rule("Label", ["sankey", "vertical"]).setAll({
+		r("Label", ["sankey", "vertical"]).setAll({
 			x: p50,
 			centerX: p50,
 			paddingTop: 15
@@ -179,7 +179,7 @@ export class FlowDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Chord").setAll({
+		r("Chord").setAll({
 			radius: percent(90),
 			nodeWidth: 10,
 			padAngle: 1,
@@ -187,20 +187,20 @@ export class FlowDefaultTheme extends Theme {
 			sort: "descending"
 		});
 
-		this.rule("ChordDirected").setAll({
+		r("ChordDirected").setAll({
 			linkHeadRadius: 10
 		});
 
-		this.rule("ChordNodes").setAll({
+		r("ChordNodes").setAll({
 			x: p50,
 			y: p50
 		});
 
-		this.rule("FlowNode", ["chord"]).setAll({
+		r("FlowNode", ["chord"]).setAll({
 			draggable: true
 		});
 
-		this.rule("ChordLink").setAll({
+		r("ChordLink").setAll({
 			sourceRadius: p100,
 			targetRadius: p100,
 			fillStyle: "solid",
@@ -208,22 +208,22 @@ export class FlowDefaultTheme extends Theme {
 			tooltipText: "{sourceId} - {targetId}: {value}"
 		});
 
-		this.rule("Slice", ["chord", "node", "shape"]).setAll({
+		r("Slice", ["chord", "node", "shape"]).setAll({
 			cornerRadius: 0
 		})
 
-		this.rule("RadialLabel", ["chord", "node"]).setAll({
+		r("RadialLabel", ["chord", "node"]).setAll({
 			radius: 5,
 			textType: "circular"
 		});
 
-		this.rule("ChordLinkDirected").setAll({
+		r("ChordLinkDirected").setAll({
 			headRadius: 10
 		});
 
 		// Class: Graphics
 		{
-			const rule = this.rule("Graphics", ["chord", "link", "shape"]);
+			const rule = r("Graphics", ["chord", "link", "shape"]);
 
 			rule.setAll({
 				fillOpacity: 0.2,
@@ -235,22 +235,22 @@ export class FlowDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
-		this.rule("Graphics", ["chord", "link", "shape"]).states.create("hover", { fillOpacity: 0.5 });
+		r("Graphics", ["chord", "link", "shape"]).states.create("hover", { fillOpacity: 0.5 });
 
-		this.rule("ChordNonRibbon").setAll({
+		r("ChordNonRibbon").setAll({
 			linkType: "curve" // "line" | "curve"
 		})
 
-		this.rule("ChordLink", ["basic"]).setAll({
+		r("ChordLink", ["basic"]).setAll({
 			fillStyle: "none",
 			strokeStyle: "source"
 		});
 
-		this.rule("Graphics", ["chord", "link", "shape", "basic"]).setAll({
+		r("Graphics", ["chord", "link", "shape", "basic"]).setAll({
 			strokeOpacity: 0.4
 		});
 
-		this.rule("Graphics", ["chord", "link", "shape", "basic"]).states.create("hover", { strokeWidth: 2, strokeOpacity: 1 });
+		r("Graphics", ["chord", "link", "shape", "basic"]).states.create("hover", { strokeWidth: 2, strokeOpacity: 1 });
 
 	}
 }

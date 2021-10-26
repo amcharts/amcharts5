@@ -15,6 +15,7 @@ export class HierarchyDefaultTheme extends Theme {
 
 		const ic = this._root.interfaceColors;
 		const gridLayout = this._root.gridLayout;
+		const r = this.rule.bind(this);
 
 		/**
 		 * ========================================================================
@@ -22,7 +23,7 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("Hierarchy").setAll({
+		r("Hierarchy").setAll({
 			legendLabelText: "{category}",
 			legendValueText: "{sum.formatNumber('#.#')}",
 			width: p100,
@@ -35,7 +36,7 @@ export class HierarchyDefaultTheme extends Theme {
 			animationEasing: $ease.out($ease.cubic)
 		});
 
-		this.rule("HierarchyNode").setAll({
+		r("HierarchyNode").setAll({
 			toggleKey: "disabled",
 			setStateOnChildren: true,
 			position: "absolute",
@@ -45,7 +46,7 @@ export class HierarchyDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Label", ["hierarchy", "node"]);
+			const rule = r("Label", ["hierarchy", "node"]);
 
 			rule.setAll({
 				centerX: p50,
@@ -65,7 +66,7 @@ export class HierarchyDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("HierarchyLink");
+			const rule = r("HierarchyLink");
 
 			rule.setAll({
 				isMeasured: false,
@@ -79,7 +80,7 @@ export class HierarchyDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
-		this.rule("Circle", ["linkedhierarchy", "shape"]).setAll({
+		r("Circle", ["linkedhierarchy", "shape"]).setAll({
 			position: "absolute",
 			fillOpacity: 1,
 			strokeOpacity: 0,
@@ -87,7 +88,7 @@ export class HierarchyDefaultTheme extends Theme {
 			tooltipY: 0
 		});
 
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).setAll({
+		r("Circle", ["linkedhierarchy", "shape", "outer"]).setAll({
 			position: "absolute",
 			opacity: 1,
 			fillOpacity: 0,
@@ -98,10 +99,10 @@ export class HierarchyDefaultTheme extends Theme {
 			interactive: false
 		})
 
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("disabled", { opacity: 1, scale: 1.1, strokeDasharray: 2 });
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hoverDisabled", { scale: 1.2, opacity: 1, strokeDasharray: 2 });
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hover", { scale: 1.05, strokeDasharray: 0 });
-		this.rule("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hidden", { opacity: 0, strokeDasharray: 0 });
+		r("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("disabled", { opacity: 1, scale: 1.1, strokeDasharray: 2 });
+		r("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hoverDisabled", { scale: 1.2, opacity: 1, strokeDasharray: 2 });
+		r("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hover", { scale: 1.05, strokeDasharray: 0 });
+		r("Circle", ["linkedhierarchy", "shape", "outer"]).states.create("hidden", { opacity: 0, strokeDasharray: 0 });
 
 
 		/**
@@ -110,13 +111,13 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("BreadcrumbBar").setAll({
+		r("BreadcrumbBar").setAll({
 			paddingLeft: 8,
 			layout: gridLayout
 		});
 
 		{
-			const rule = this.rule("Label", ["breadcrumb"]);
+			const rule = r("Label", ["breadcrumb"]);
 
 			rule.setAll({
 				paddingRight: 4,
@@ -130,17 +131,17 @@ export class HierarchyDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("Label", ["breadcrumb"]).states.create("hover", {});
+			const rule = r("Label", ["breadcrumb"]).states.create("hover", {});
 			setColor(rule, "fill", ic, "primaryButtonHover");
 		}
 
 		{
-			const rule = this.rule("Label", ["breadcrumb"]).states.create("down", { stateAnimationDuration: 0 });
+			const rule = r("Label", ["breadcrumb"]).states.create("down", { stateAnimationDuration: 0 });
 			setColor(rule, "fill", ic, "primaryButtonDown");
 		}
 
 		{
-			const rule = this.rule("Label", ["breadcrumb", "last"]);
+			const rule = r("Label", ["breadcrumb", "last"]);
 
 			rule.setAll({
 				populateText: true,
@@ -153,7 +154,7 @@ export class HierarchyDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("RoundedRectangle", ["breadcrumb", "label", "background"]);
+			const rule = r("RoundedRectangle", ["breadcrumb", "label", "background"]);
 
 			rule.setAll({
 				fillOpacity: 0,
@@ -169,23 +170,23 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Partition").setAll({
+		r("Partition").setAll({
 			downDepth: 1,
 			upDepth: 0,
 			initialDepth: 5
 		});
 
-		this.rule("HierarchyNode", ["partition"]).setAll({
+		r("HierarchyNode", ["partition"]).setAll({
 			setStateOnChildren: false
 		});
 
-		this.rule("HierarchyNode", ["partition"]).states.create("hidden", {
+		r("HierarchyNode", ["partition"]).states.create("hidden", {
 			opacity: 1,
 			visible: true
 		});
 
 		{
-			const rule = this.rule("Label", ["partition", "node"]);
+			const rule = r("Label", ["partition", "node"]);
 
 			rule.setAll({
 				x: p50,
@@ -206,12 +207,12 @@ export class HierarchyDefaultTheme extends Theme {
 			setColor(rule, "fill", ic, "alternativeText");
 		}
 
-		this.rule("Label", ["horizontal", "partition", "node"]).setAll({
+		r("Label", ["horizontal", "partition", "node"]).setAll({
 			rotation: 0
 		});
 
 		{
-			const rule = this.rule("RoundedRectangle", ["partition", "node", "shape"]);
+			const rule = r("RoundedRectangle", ["partition", "node", "shape"]);
 
 			rule.setAll({
 				strokeOpacity: 1,
@@ -225,7 +226,7 @@ export class HierarchyDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "background");
 		}
 
-		this.rule("RoundedRectangle", ["partition", "node", "shape", "last"]).setAll({
+		r("RoundedRectangle", ["partition", "node", "shape", "last"]).setAll({
 			fillOpacity: 0.75
 		});
 
@@ -236,21 +237,21 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Sunburst").setAll({
+		r("Sunburst").setAll({
 			singleBranchOnly: true
 		});
 
-		this.rule("HierarchyNode", ["sunburst"]).setAll({
+		r("HierarchyNode", ["sunburst"]).setAll({
 			setStateOnChildren: false
 		});
 
-		this.rule("HierarchyNode", ["sunburst"]).states.create("hidden", {
+		r("HierarchyNode", ["sunburst"]).states.create("hidden", {
 			opacity: 0,
 			visible: false
 		});
 
 		{
-			const rule = this.rule("Slice", ["sunburst", "node", "shape"]);
+			const rule = r("Slice", ["sunburst", "node", "shape"]);
 
 			rule.setAll({
 				strokeOpacity: 1,
@@ -261,12 +262,12 @@ export class HierarchyDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "background");
 		}
 
-		this.rule("Slice", ["sunburst", "node", "shape", "last"]).setAll({
+		r("Slice", ["sunburst", "node", "shape", "last"]).setAll({
 			fillOpacity: 0.75
 		});
 
 		{
-			const rule = this.rule("RadialLabel", ["sunburst", "node"]);
+			const rule = r("RadialLabel", ["sunburst", "node"]);
 
 			rule.setAll({
 				textType: "radial",
@@ -291,7 +292,7 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("ForceDirected").setAll({
+		r("ForceDirected").setAll({
 			minRadius: percent(1),
 			maxRadius: percent(8),
 			initialFrames: 500,
@@ -314,7 +315,7 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Tree").setAll({
+		r("Tree").setAll({
 			orientation: "vertical",
 			paddingLeft: 20,
 			paddingRight: 20,
@@ -334,7 +335,7 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Pack").setAll({
+		r("Pack").setAll({
 			paddingLeft: 20,
 			paddingTop: 20,
 			paddingBottom: 20,
@@ -342,7 +343,7 @@ export class HierarchyDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Label", ["pack", "node"]);
+			const rule = r("Label", ["pack", "node"]);
 
 			rule.setAll({
 				centerY: p50,
@@ -361,7 +362,7 @@ export class HierarchyDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("Circle", ["pack", "node", "shape"]);
+			const rule = r("Circle", ["pack", "node", "shape"]);
 
 			rule.setAll({
 				strokeOpacity: 0.5,
@@ -373,11 +374,11 @@ export class HierarchyDefaultTheme extends Theme {
 		}
 
 
-		this.rule("LinkedHierarchyNode").setAll({
+		r("LinkedHierarchyNode").setAll({
 			draggable: true
 		});
 
-		this.rule("LinkedHierarchyNode").states.create("hidden", { scale: 0, opacity: 0, visible: false });
+		r("LinkedHierarchyNode").states.create("hidden", { scale: 0, opacity: 0, visible: false });
 
 
 		/**
@@ -386,13 +387,13 @@ export class HierarchyDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Treemap").setAll({
+		r("Treemap").setAll({
 			upDepth: 0,
 			layoutAlgorithm: "squarify"
 		});
 
 		{
-			const rule = this.rule("Label", ["treemap", "node"]);
+			const rule = r("Label", ["treemap", "node"]);
 
 			rule.setAll({
 				x: p50,
@@ -412,14 +413,14 @@ export class HierarchyDefaultTheme extends Theme {
 			setColor(rule, "fill", ic, "alternativeText");
 		}
 
-		this.rule("HierarchyNode", ["treemap", "node"]).setAll({
+		r("HierarchyNode", ["treemap", "node"]).setAll({
 			tooltipY: percent(40),
 			isMeasured: false,
 			position: "absolute"
 		});
 
 		{
-			const rule = this.rule("RoundedRectangle", ["treemap", "node", "shape"]);
+			const rule = r("RoundedRectangle", ["treemap", "node", "shape"]);
 
 			rule.setAll({
 				strokeOpacity: 1,

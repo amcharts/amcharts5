@@ -24,6 +24,7 @@ export class XYChartDefaultTheme extends Theme {
 
 		const ic = this._root.interfaceColors;
 		const language = this._root.language;
+		const r = this.rule.bind(this);
 
 		/**
 		 * ========================================================================
@@ -31,7 +32,7 @@ export class XYChartDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("XYChart").setAll({
+		r("XYChart").setAll({
 			colors: ColorSet.new(this._root, {}),
 			paddingLeft: 20,
 			paddingRight: 20,
@@ -49,7 +50,7 @@ export class XYChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Button", ["zoom"]).setAll({
+		r("Button", ["zoom"]).setAll({
 			paddingTop: 18,
 			paddingBottom: 18,
 			paddingLeft: 12,
@@ -64,7 +65,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("RoundedRectangle", ["background", "button", "zoom"]);
+			const rule = r("RoundedRectangle", ["background", "button", "zoom"]);
 
 			rule.setAll({
 				cornerRadiusBL: 40,
@@ -77,17 +78,17 @@ export class XYChartDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("RoundedRectangle", ["background", "button", "zoom"]).states.create("hover", {});
+			const rule = r("RoundedRectangle", ["background", "button", "zoom"]).states.create("hover", {});
 			setColor(rule, "fill", ic, "primaryButtonHover");
 		}
 
 		{
-			const rule = this.rule("RoundedRectangle", ["background", "button", "zoom"]).states.create("down", { stateAnimationDuration: 0 });
+			const rule = r("RoundedRectangle", ["background", "button", "zoom"]).states.create("down", { stateAnimationDuration: 0 });
 			setColor(rule, "fill", ic, "primaryButtonDown");
 		}
 
 		{
-			const rule = this.rule("Graphics", ["icon", "button", "zoom"]);
+			const rule = r("Graphics", ["icon", "button", "zoom"]);
 
 			rule.setAll({
 				strokeOpacity: 0.7,
@@ -107,7 +108,7 @@ export class XYChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("XYChart", ["scrollbar", "chart"]).setAll({
+		r("XYChart", ["scrollbar", "chart"]).setAll({
 			paddingBottom: 0,
 			paddingLeft: 0,
 			paddingTop: 0,
@@ -118,7 +119,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Graphics", ["scrollbar", "overlay"]);
+			const rule = r("Graphics", ["scrollbar", "overlay"]);
 
 			rule.setAll({
 				fillOpacity: 0.5
@@ -128,7 +129,7 @@ export class XYChartDefaultTheme extends Theme {
 		}
 
 		// Class: RoundedRectangle
-		this.rule("RoundedRectangle", ["xy", "scrollbar", "thumb"]).setAll({
+		r("RoundedRectangle", ["xy", "scrollbar", "thumb"]).setAll({
 			cornerRadiusTR: 0,
 			cornerRadiusTL: 0,
 			cornerRadiusBR: 0,
@@ -137,34 +138,34 @@ export class XYChartDefaultTheme extends Theme {
 			focusable: true
 		});
 
-		this.rule("RoundedRectangle", ["xy", "scrollbar", "thumb"]).states.create("hover", { fillOpacity: 0.4 });
+		r("RoundedRectangle", ["xy", "scrollbar", "thumb"]).states.create("hover", { fillOpacity: 0.4 });
 
-		this.rule("RoundedRectangle", ["xy", "scrollbar", "chart", "background"]).setAll({
+		r("RoundedRectangle", ["xy", "scrollbar", "chart", "background"]).setAll({
 			cornerRadiusTL: 0,
 			cornerRadiusBL: 0,
 			cornerRadiusTR: 0,
 			cornerRadiusBR: 0
 		});
 
-		this.rule("RoundedRectangle", ["xy", "scrollbar", "chart", "background", "resize", "button"]).setAll({
+		r("RoundedRectangle", ["xy", "scrollbar", "chart", "background", "resize", "button"]).setAll({
 			cornerRadiusBL: 40,
 			cornerRadiusBR: 40,
 			cornerRadiusTL: 40,
 			cornerRadiusTR: 40
 		});
 
-		this.rule("AxisRendererX", ["xy", "chart", "scrollbar"]).setAll({
+		r("AxisRendererX", ["xy", "chart", "scrollbar"]).setAll({
 			strokeOpacity: 0,
 			inside: true
 		});
 
-		this.rule("AxisRendererY", ["xy", "chart", "scrollbar"]).setAll({
+		r("AxisRendererY", ["xy", "chart", "scrollbar"]).setAll({
 			strokeOpacity: 0,
 			inside: true,
 			minGridDistance: 5
 		});
 
-		this.rule("AxisLabel", ["xy", "scrollbar", "x"]).setAll({
+		r("AxisLabel", ["xy", "scrollbar", "x"]).setAll({
 			opacity: 0.5,
 			centerY: p100,
 			minPosition: 0.01,
@@ -172,51 +173,51 @@ export class XYChartDefaultTheme extends Theme {
 			fontSize: "0.8em"
 		});
 
-		this.rule("AxisLabel", ["x"]).setAll({
+		r("AxisLabel", ["x"]).setAll({
 			centerY: 0
 		});
 
-		this.rule("AxisLabel", ["x", "inside"]).setAll({
+		r("AxisLabel", ["x", "inside"]).setAll({
 			centerY: p100
 		});
 
-		this.rule("AxisLabel", ["x", "inside", "opposite"]).setAll({
+		r("AxisLabel", ["x", "inside", "opposite"]).setAll({
 			centerY: 0
 		});
 
-		this.rule("AxisLabel", ["x", "opposite"]).setAll({
+		r("AxisLabel", ["x", "opposite"]).setAll({
 			centerY: p100
 		});
 
 
-		this.rule("AxisLabel", ["y"]).setAll({
+		r("AxisLabel", ["y"]).setAll({
 			centerX: p100
 		});
 
-		this.rule("AxisLabel", ["y", "inside"]).setAll({
+		r("AxisLabel", ["y", "inside"]).setAll({
 			centerX: 0
 		});
 
-		this.rule("AxisLabel", ["y", "inside", "opposite"]).setAll({
+		r("AxisLabel", ["y", "inside", "opposite"]).setAll({
 			centerX: p100
 		});
 
-		this.rule("AxisLabel", ["y", "opposite"]).setAll({
+		r("AxisLabel", ["y", "opposite"]).setAll({
 			centerX: 0
 		});
 
 
-		this.rule("AxisLabel", ["xy", "scrollbar", "y"]).setAll({
+		r("AxisLabel", ["xy", "scrollbar", "y"]).setAll({
 			visible: false
 		});
 
 		// Class: Grid
-		this.rule("Grid", ["xy", "scrollbar", "y"]).setAll({
+		r("Grid", ["xy", "scrollbar", "y"]).setAll({
 			visible: false
 		});
 
 		// Class: Grid
-		this.rule("Grid", ["xy", "scrollbar", "x"]).setAll({
+		r("Grid", ["xy", "scrollbar", "x"]).setAll({
 			opacity: 0.5
 		});
 
@@ -229,14 +230,14 @@ export class XYChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("XYCursor").setAll({
+		r("XYCursor").setAll({
 			behavior: "none",
 			layer: 20,
 			exportable: false
 		});
 
 		{
-			const rule = this.rule("Grid", ["cursor", "x"]);
+			const rule = r("Grid", ["cursor", "x"]);
 
 			rule.setAll({
 				strokeOpacity: 0.8,
@@ -247,7 +248,7 @@ export class XYChartDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("Grid", ["cursor", "y"]);
+			const rule = r("Grid", ["cursor", "y"]);
 
 			rule.setAll({
 				strokeOpacity: 0.8,
@@ -258,7 +259,7 @@ export class XYChartDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("Graphics", ["cursor", "selection"]);
+			const rule = r("Graphics", ["cursor", "selection"]);
 
 			rule.setAll({
 				fillOpacity: 0.15,
@@ -274,7 +275,7 @@ export class XYChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("Axis").setAll({
+		r("Axis").setAll({
 			start: 0,
 			end: 1,
 			minZoomCount: 1,
@@ -290,7 +291,7 @@ export class XYChartDefaultTheme extends Theme {
 			fixAxisSize: true
 		});
 
-		this.rule("AxisLabel").setAll({
+		r("AxisLabel").setAll({
 			location: 0.5,
 			multiLocation: 0,
 			centerX: p50,
@@ -301,20 +302,20 @@ export class XYChartDefaultTheme extends Theme {
 			paddingRight: 5
 		});
 
-		this.rule("AxisLabel", ["y"]).setAll({
+		r("AxisLabel", ["y"]).setAll({
 			textAlign: "right"
 		});
 
-		this.rule("AxisLabel", ["y", "opposite"]).setAll({
+		r("AxisLabel", ["y", "opposite"]).setAll({
 			textAlign: "left"
 		});
 
-		this.rule("Container", ["axis", "header"]).setAll({
+		r("Container", ["axis", "header"]).setAll({
 			layer: 30
 		});
 
 		{
-			const rule = this.rule("AxisRenderer");
+			const rule = r("AxisRenderer");
 
 			rule.setAll({
 				strokeOpacity: 0
@@ -323,7 +324,7 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
-		this.rule("AxisRendererX").setAll({
+		r("AxisRendererX").setAll({
 			minGridDistance: 120,
 			opposite: false,
 			inversed: false,
@@ -332,7 +333,7 @@ export class XYChartDefaultTheme extends Theme {
 			width: p100
 		});
 
-		this.rule("AxisRendererY").setAll({
+		r("AxisRendererY").setAll({
 			minGridDistance: 40,
 			opposite: false,
 			inversed: false,
@@ -342,7 +343,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Grid");
+			const rule = r("Grid");
 
 			rule.setAll({
 				location: 0,
@@ -352,12 +353,12 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
-		this.rule("Grid", ["base"]).setAll({
+		r("Grid", ["base"]).setAll({
 			strokeOpacity: 0.3
 		});
 
 		{
-			const rule = this.rule("Graphics", ["axis", "fill"]);
+			const rule = r("Graphics", ["axis", "fill"]);
 
 			rule.setAll({
 				visible: false,
@@ -370,7 +371,7 @@ export class XYChartDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("AxisTick");
+			const rule = r("AxisTick");
 
 			rule.setAll({
 				location: 0.5,
@@ -384,7 +385,7 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
-		this.rule("CategoryAxis").setAll({
+		r("CategoryAxis").setAll({
 			startLocation: 0,
 			endLocation: 1,
 			fillRule: (dataItem: DataItem<ICategoryAxisDataItem>, index?: number) => {
@@ -467,14 +468,14 @@ export class XYChartDefaultTheme extends Theme {
 			"year": language.translate("_date_year")
 		};
 
-		this.rule("CategoryDateAxis").setAll({
+		r("CategoryDateAxis").setAll({
 			markUnitChange: true,
 			gridIntervals: $array.copy(gridIntervals),
 			dateFormats: $object.copy(dateFormats),
 			periodChangeDateFormats: $object.copy(periodChangeDateFormats)
 		});
 
-		this.rule("DateAxis").setAll({
+		r("DateAxis").setAll({
 
 			strictMinMax: true,
 			startLocation: 0,
@@ -523,7 +524,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 
-		this.rule("ValueAxis").setAll({
+		r("ValueAxis").setAll({
 
 			baseValue: 0,
 			logarithmic: false,
@@ -550,7 +551,7 @@ export class XYChartDefaultTheme extends Theme {
 			}
 		});
 
-		this.rule("DurationAxis").setAll({
+		r("DurationAxis").setAll({
 			baseUnit: "second"
 		})
 
@@ -561,7 +562,7 @@ export class XYChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("XYSeries").setAll({
+		r("XYSeries").setAll({
 			maskBullets: true,
 			stackToNegative: true,
 
@@ -573,14 +574,16 @@ export class XYChartDefaultTheme extends Theme {
 			openValueXGrouped: "open",
 			openValueYGrouped: "open",
 			valueXGrouped: "close",
-			valueYGrouped: "close"
+			valueYGrouped: "close",
+
+			seriesTooltipTarget:"series"
 		});
 
-		this.rule("ColumnSeries").setAll({
+		r("ColumnSeries").setAll({
 			clustered: true
 		});
 
-		this.rule("RoundedRectangle", ["series", "column"]).setAll({
+		r("RoundedRectangle", ["series", "column"]).setAll({
 			position: "absolute",
 			isMeasured: false,
 			width: percent(70),
@@ -595,20 +598,20 @@ export class XYChartDefaultTheme extends Theme {
 			role: "figure"
 		});
 
-		this.rule("LineSeries").setAll({
+		r("LineSeries").setAll({
 			connect: true,
 			autoGapCount: 1.1,
 			stackToNegative: false
 		});
 
-		this.rule("Graphics", ["series", "stroke"]).setAll({
+		r("Graphics", ["series", "stroke"]).setAll({
 			position: "absolute",
 			strokeWidth: 1,
 			strokeOpacity: 1,
 			isMeasured: false
 		});
 
-		this.rule("Graphics", ["series", "fill"]).setAll({
+		r("Graphics", ["series", "fill"]).setAll({
 			visible: false,
 			fillOpacity: 0,
 			position: "absolute",
@@ -617,7 +620,7 @@ export class XYChartDefaultTheme extends Theme {
 			isMeasured: false
 		});
 
-		this.rule("Graphics", ["line", "series", "legend", "marker", "stroke"]).setAll({
+		r("Graphics", ["line", "series", "legend", "marker", "stroke"]).setAll({
 			draw: (display: any, sprite: any) => {
 				const parent = sprite.parent;
 				if (parent) {
@@ -630,11 +633,11 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Graphics", ["line", "series", "legend", "marker", "stroke"]).states.create("disabled", {});
+			const rule = r("Graphics", ["line", "series", "legend", "marker", "stroke"]).states.create("disabled", {});
 			setColor(rule, "stroke", ic, "disabled");
 		}
 
-		this.rule("Graphics", ["line", "series", "legend", "marker", "fill"]).setAll({
+		r("Graphics", ["line", "series", "legend", "marker", "fill"]).setAll({
 			draw: (display: any, sprite: any) => {
 				const parent = sprite.parent;
 				if (parent) {
@@ -650,23 +653,23 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Graphics", ["line", "series", "legend", "marker", "fill"]).states.create("disabled", {});
+			const rule = r("Graphics", ["line", "series", "legend", "marker", "fill"]).states.create("disabled", {});
 			setColor(rule, "stroke", ic, "disabled");
 		}
 
-		this.rule("SmoothedXYLineSeries").setAll({
+		r("SmoothedXYLineSeries").setAll({
 			tension: 0.5
 		});
 
-		this.rule("SmoothedXLineSeries").setAll({
+		r("SmoothedXLineSeries").setAll({
 			tension: 0.5
 		});
 
-		this.rule("SmoothedYLineSeries").setAll({
+		r("SmoothedYLineSeries").setAll({
 			tension: 0.5
 		});
 
-		this.rule("Candlestick").setAll({
+		r("Candlestick").setAll({
 			position: "absolute",
 			isMeasured: false,
 			width: percent(50),
@@ -681,12 +684,12 @@ export class XYChartDefaultTheme extends Theme {
 			role: "figure"
 		});
 
-		this.rule("OHLC").setAll({
+		r("OHLC").setAll({
 			width: percent(80),
 			height: percent(80)
 		});
 
-		this.rule("CandlestickSeries").setAll({
+		r("CandlestickSeries").setAll({
 			lowValueXGrouped: "low",
 			lowValueYGrouped: "low",
 			highValueXGrouped: "high",
@@ -699,19 +702,19 @@ export class XYChartDefaultTheme extends Theme {
 
 		// These rules can be used for regular columns, too
 		{
-			const rule = this.rule("Rectangle", ["column", "autocolor"]).states.create("riseFromOpen", {});
+			const rule = r("Rectangle", ["column", "autocolor"]).states.create("riseFromOpen", {});
 			setColor(rule, "fill", ic, "positive");
 			setColor(rule, "stroke", ic, "positive");
 		}
 
 		{
-			const rule = this.rule("Rectangle", ["column", "autocolor"]).states.create("dropFromOpen", {});
+			const rule = r("Rectangle", ["column", "autocolor"]).states.create("dropFromOpen", {});
 			setColor(rule, "fill", ic, "negative");
 			setColor(rule, "stroke", ic, "negative");
 		}
 
-		this.rule("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromPrevious", { fillOpacity: 1 });
-		this.rule("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromPrevious", { fillOpacity: 0 });
+		r("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromPrevious", { fillOpacity: 1 });
+		r("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromPrevious", { fillOpacity: 0 });
 
 	}
 }

@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.37] - 2021-10-26
+
+### Added
+- Dataviz, Kelly, Moonrise, Frozen, Material and Spirited themes added.
+- `seriesTooltipTarget` setting added to `XYSeries` (possible values: `"series"` (default) and `"bullet"`). If set to `"bullet"`, first bullet of a data item will be used for as a tooltip target, making it inherit bullet's color rather than series.
+
+### Changed
+- `Scrollbar` grip buttons will now have `exportable: false` set by default, so that they are not exported to chart snapshots.
+- `WordCloud` words are now sorted by value if data was set using `series.data`.
+
+### Fixed
+- First label of the `WordCloud` could overlap with other words afer the data update.
+- `ColorSet` was ignoring values set in a theme.
+- Bullets with `Rectangle` or `RoundedRectangle` as a `sprite` were not being shown on an `XYSeries`.
+- `MapChart` was overriding width/height variables to 100%.
+
+
 ## [5.0.0-beta.36] - 2021-10-25
 
 ### Added

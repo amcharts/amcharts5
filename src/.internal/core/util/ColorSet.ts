@@ -97,32 +97,9 @@ export class ColorSet extends Entity {
 
 	//protected _currentPass: number = 0;
 
-	protected _setDefaults() {
-		this.setPrivate("currentStep", 0);
-		this.setPrivate("currentPass", 0);
-		this._setDefault("passOptions", {
-			hue: 0.05,
-			saturation: 0.02,
-			lightness: 0
-		})
-		this._setDefault("colors", [
-			Color.fromHex(0x67b7dc),
-			Color.fromHex(0x6794dc),
-			Color.fromHex(0x6771dc),
-			Color.fromHex(0x8067dc),
-			Color.fromHex(0xa367dc),
-			Color.fromHex(0xc767dc),
-			Color.fromHex(0xdc67ce),
-			Color.fromHex(0xdc67ab),
-			Color.fromHex(0xdc6788),
-			Color.fromHex(0xdc6967)]);
-
-		this._setDefault("step", 1);
-		this._setDefault("baseColor", Color.fromRGB(103, 183, 220));
-		//this._setDefault("count", 20);
-		this._setDefault("reuse", false);
-		this._setDefault("startIndex", 0);
-		super._setDefaults();
+	protected _afterNew() {
+		// Applying themes because gradient will not have parent
+		super._afterNewApplyThemes();
 	}
 
 	public _beforeChanged() {

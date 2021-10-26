@@ -17,7 +17,7 @@ root.setThemes([
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/word-cloud/
-var series = root.container.children.push(am5wc.WordCloud.new(root, {
+let series = root.container.children.push(am5wc.WordCloud.new(root, {
   maxCount: 150,
   maxFontSize: am5.percent(25),
   minWordLength: 2,

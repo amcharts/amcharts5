@@ -15,6 +15,7 @@ export class MapChartDefaultTheme extends Theme {
 		super.setupDefaultRules();
 
 		const ic = this._root.interfaceColors;
+		const r = this.rule.bind(this);
 
 		/**
 		 * ========================================================================
@@ -22,7 +23,7 @@ export class MapChartDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("MapChart").setAll({
+		r("MapChart").setAll({
 			projection: geoMercator(),
 			panX: "translateX",
 			panY: "translateY",
@@ -44,7 +45,7 @@ export class MapChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("MapLine");
+			const rule = r("MapLine");
 
 			rule.setAll({
 				precision: 0.5,
@@ -54,13 +55,13 @@ export class MapChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
-		this.rule("MapPointSeries").setAll({
+		r("MapPointSeries").setAll({
 			clipFront: false,
 			clipBack: true
 		})
 
 		{
-			const rule = this.rule("MapPolygon");
+			const rule = r("MapPolygon");
 
 			rule.setAll({
 				precision: 0.5,
@@ -76,7 +77,7 @@ export class MapChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "background");
 		}
 
-		this.rule("Graphics", ["map", "button", "plus", "icon"]).setAll({
+		r("Graphics", ["map", "button", "plus", "icon"]).setAll({
 			x: p50,
 			y: p50,
 			draw: (display) => {
@@ -87,7 +88,7 @@ export class MapChartDefaultTheme extends Theme {
 			}
 		});
 
-		this.rule("Graphics", ["map", "button", "minus", "icon"]).setAll({
+		r("Graphics", ["map", "button", "minus", "icon"]).setAll({
 			x: p50,
 			y: p50,
 			draw: (display) => {
@@ -103,7 +104,7 @@ export class MapChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
-		this.rule("GraticuleSeries").setAll({
+		r("GraticuleSeries").setAll({
 			step: 10
 		});
 

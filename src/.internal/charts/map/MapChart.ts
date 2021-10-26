@@ -9,7 +9,6 @@ import type { Animation } from "../../core/util/Entity";
 import { MapChartDefaultTheme } from "./MapChartDefaultTheme";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
 import { Rectangle } from "../../core/render/Rectangle";
-import { p100 } from "../../core/util/Percent";
 import { geoPath } from "d3-geo";
 import { Color } from "../../core/util/Color";
 import { registry } from "../../core/Registry";
@@ -569,9 +568,6 @@ export class MapChart extends SerialChart {
 		this._makeGeoPath();
 
 		this.chartContainer.children.push(this.seriesContainer);
-
-		this.set("width", p100);
-		this.set("height", p100);
 
 		if (this.get("translateX") == null) {
 			this.set("translateX", this.width() / 2);

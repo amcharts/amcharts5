@@ -16,7 +16,7 @@ export class Registry {
 	entitiesById: { [index: string]: any } = {};
 
 	/**
-	 * Entities that have their `id` setting set.
+	 * All created [[Root]] elements.
 	 */
 	rootElements: any[] = [];
 

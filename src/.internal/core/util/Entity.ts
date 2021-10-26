@@ -954,6 +954,28 @@ export class Entity extends Settings implements IDisposer {
 		this._setDefaults();
 	}
 
+	// This is the same as _afterNew, except it also applies the themes.
+	// This should only be used for classes which don't have a parent (because they extend from Entity and not Sprite).
+	protected _afterNewApplyThemes() {
+		this._checkDirty();
+
+		const template = this._template;
+
+		if (template) {
+			template._setObjectTemplate(this);
+		}
+
+		$array.each(this._internalTemplates, (template) => {
+			template._setObjectTemplate(this);
+		});
+
+		this.states.create("default", {});
+
+		this._setDefaults();
+
+		this._applyThemes();
+	}
+
 	protected _createEvents(): EventDispatcher<Events<this, this["_events"]>> {
 		return new EventDispatcher();
 	}

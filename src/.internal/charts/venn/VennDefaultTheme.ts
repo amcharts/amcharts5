@@ -9,8 +9,9 @@ import { ColorSet } from "../../core/util/ColorSet";
 export class VennDefaultTheme extends Theme {
 	protected setupDefaultRules() {
 		super.setupDefaultRules();
+		const r = this.rule.bind(this);
 
-		this.rule("Venn").setAll({
+		r("Venn").setAll({
 			legendLabelText: "{category}",
 			legendValueText: "{value}",
 			colors: ColorSet.new(this._root, {}),
@@ -19,7 +20,7 @@ export class VennDefaultTheme extends Theme {
 		});
 
 
-		this.rule("Label", ["venn"]).setAll({
+		r("Label", ["venn"]).setAll({
 			text: "{category}",
 			populateText: true,
 			centerX: p50,
