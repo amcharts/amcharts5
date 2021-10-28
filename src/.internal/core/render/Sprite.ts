@@ -1588,7 +1588,7 @@ export abstract class Sprite extends Entity {
 		const tooltip = this.getTooltip();
 		if (tooltip) {
 			const promise = tooltip.hide();
-			this.setPrivate("showingTooltip", false);
+			this.setPrivateRaw("showingTooltip", false);
 			return promise;
 		}
 	}

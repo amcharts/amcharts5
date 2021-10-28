@@ -74,6 +74,11 @@ export class Bullet extends Entity {
 	 */
 	public series: Series | undefined;
 
+	protected _afterNew() {
+		// Applying themes because bullet will not have parent
+		super._afterNewApplyThemes();
+	}
+
 	public _beforeChanged() {
 		super._beforeChanged();
 

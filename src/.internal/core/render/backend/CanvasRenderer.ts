@@ -1285,7 +1285,8 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		// 	console.log(this._operations, layer)
 		// }
 
-		if (layerDirty || interactive) {
+		if (layerDirty || interactive) {		
+			
 			const context = layer.context;
 			const ghostContext = this._renderer._ghostContext;
 
@@ -1394,7 +1395,7 @@ interface ILine {
 /**
  * @ignore
  */
-export class CanvasText extends CanvasContainer implements IText {
+export class CanvasText extends CanvasDisplayObject implements IText {
 	public text: string;
 	public style: CanvasTextStyle;
 	public resolution: number = 1;
@@ -1544,6 +1545,9 @@ export class CanvasText extends CanvasContainer implements IText {
 			const context = layer.context;
 			const layerDirty = layer.dirty;
 			const ghostContext = this._renderer._ghostContext;
+
+
+			//console.log("interactive:",  interactive, "layerDirty:", layerDirty);
 
 			context.save();
 			ghostContext.save();
@@ -2563,7 +2567,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 				layer.context.drawImage(this.image, 0, 0, width, height);
 			}
 
-			if (this._isInteractive()) {
+			if (this.interactive && this._isInteractive()) {
 				const mask = this._getMask(this.image);
 
 				this._renderer._ghostContext.drawImage(mask, 0, 0);

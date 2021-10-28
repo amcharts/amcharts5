@@ -94,6 +94,7 @@ series.set("tooltip", tooltip);
 
 series.bullets.push(() => {
   return am5.Bullet.new(root, {
+    locationX:undefined,
     sprite: am5.Circle.new(root, {
       radius: 4,
       fill: series.get("fill")

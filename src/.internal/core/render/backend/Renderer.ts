@@ -187,7 +187,7 @@ export interface IGraphics extends IDisplayObject {
 /**
  * @ignore
  */
-export interface IText extends IContainer {
+export interface IText extends IDisplayObject {
 	resolution: number;
 	text: string;
 	style: ITextStyle;

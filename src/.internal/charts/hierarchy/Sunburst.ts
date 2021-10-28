@@ -150,7 +150,7 @@ export class Sunburst extends Partition {
 	public readonly labels: ListTemplate<RadialLabel> = new ListTemplate(
 		Template.new({}),
 		() => RadialLabel._new(this._root, {
-			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag, "hierarchy", "node"])
+			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag])
 		}, [this.labels.template])
 	);
 
@@ -458,21 +458,24 @@ export class Sunburst extends Partition {
 		}
 	}
 
-	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet, index?: number) {
+	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?: number) {
 		const bullet = super._makeBullet(dataItem, bulletFunction, index);
-		const sprite = bullet.get("sprite");
-		const slice = dataItem.get("slice");
+		
+		if(bullet){
+			const sprite = bullet.get("sprite");
+			const slice = dataItem.get("slice");
 
-		if (sprite && slice) {
-			slice.on("arc", () => {
-				this._positionBullet(bullet);
-			})
+			if (sprite && slice) {
+				slice.on("arc", () => {
+					this._positionBullet(bullet);
+				})
 
-			slice.on("radius", () => {
-				this._positionBullet(bullet);
-			})
+				slice.on("radius", () => {
+					this._positionBullet(bullet);
+				})
+			}
+
+			return bullet;
 		}
-
-		return bullet;
 	}
 }

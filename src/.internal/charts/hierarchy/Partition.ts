@@ -101,7 +101,7 @@ export class Partition extends Hierarchy {
 	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, {
-			themeTags: $utils.mergeTags(this.rectangles.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
+			themeTags: $utils.mergeTags(this.rectangles.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.rectangles.template])
 	);
 

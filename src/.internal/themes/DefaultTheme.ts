@@ -79,26 +79,17 @@ export class DefaultTheme extends Theme {
 			rule.setAll({
 				passOptions: {
 					hue: 0.05,
-					saturation: 0.02,
+					saturation: 0,
 					lightness: 0
 				},
 				colors: [
-					Color.fromHex(0x67b7dc),
-					Color.fromHex(0x6794dc),
-					Color.fromHex(0x6771dc),
-					Color.fromHex(0x8067dc),
-					Color.fromHex(0xa367dc),
-					Color.fromHex(0xc767dc),
-					Color.fromHex(0xdc67ce),
-					Color.fromHex(0xdc67ab),
-					Color.fromHex(0xdc6788),
-					Color.fromHex(0xdc6967)
+					Color.fromHex(0x67b7dc)
 				],
 				step: 1,
-				baseColor: Color.fromRGB(103, 183, 220),
+				//baseColor: Color.fromRGB(103, 183, 220),
 				//count: 20,
 				reuse: false,
-				startIndex: 0,
+				startIndex: 0
 			});
 
 			rule.setPrivate("currentStep", 0);

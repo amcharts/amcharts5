@@ -133,7 +133,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	public readonly circles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
-			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "node", "shape"])
+			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.circles.template])
 	);
 
@@ -145,7 +145,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	public readonly outerCircles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
-			themeTags: $utils.mergeTags(this.outerCircles.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "node", "outer", "shape"])
+			themeTags: $utils.mergeTags(this.outerCircles.template.get("themeTags", []), [this._tag, "outer", "shape"])
 		}, [this.outerCircles.template])
 	);
 

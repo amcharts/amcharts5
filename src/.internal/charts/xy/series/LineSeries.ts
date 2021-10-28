@@ -636,15 +636,17 @@ export class LineSeries extends XYSeries {
 				const bulletFunction = this.bullets.getIndex(0);
 				if (bulletFunction) {
 					const bullet = bulletFunction(this._root, this, new DataItem(this, {}, {}));
-					const sprite = bullet.get("sprite");
+					if(bullet){
+						const sprite = bullet.get("sprite");
 
-					if (sprite instanceof Graphics) {
-						sprite.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
-					}
+						if (sprite instanceof Graphics) {
+							sprite.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
+						}
 
-					if (sprite) {
-						marker.children.push(sprite);
-						sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });
+						if (sprite) {
+							marker.children.push(sprite);
+							sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });
+						}
 					}
 				}
 			}

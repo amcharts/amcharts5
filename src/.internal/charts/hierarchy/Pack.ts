@@ -88,7 +88,7 @@ export class Pack extends Hierarchy {
 	public readonly circles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
-			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
+			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.circles.template])
 	);
 

@@ -56,6 +56,13 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 }
 
 export interface IHierarchySettings extends ISeriesSettings {
+	/**
+	 * How to sort nodes by their value.
+	 *
+	 * @default "none"
+	 */
+	sort?: "ascending" | "descending" | "none"
+
 
 	/**
 	 * A field in data that holds numeric value for the node.
@@ -211,7 +218,6 @@ export abstract class Hierarchy extends Series {
 		const childData = dataItem.get("childData");
 
 		const node = this.nodes.make();
-
 		node.series = this;
 		node._setDataItem(dataItem);
 		this.nodes.push(node);
@@ -224,8 +230,10 @@ export abstract class Hierarchy extends Series {
 
 		if (!childData || childData.length == 0) {
 			node.addTag("last");
-			label.addTag("last");
 		}
+
+		const depth = dataItem.get("depth");
+		node.addTag("depth" + depth);
 
 		this.nodesContainer.children.push(node);
 		node.children.push(label);
@@ -241,7 +249,7 @@ export abstract class Hierarchy extends Series {
 	public readonly labels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
 		() => Label.new(this._root, {
-			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag, "hierarchy", "node"])
+			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag])
 		}, this.labels.template)
 	);
 
@@ -271,7 +279,13 @@ export abstract class Hierarchy extends Series {
 					this._rootNode.sum((d) => {
 						return d.value as any;
 					});
-					//this._rootNode.sort((a, b) => (b.value as any) - (a.value as any));
+					const sort = this.get("sort")
+					if (sort == "descending") {
+						this._rootNode.sort((a, b) => (b.value as any) - (a.value as any));
+					}
+					else if (sort == "ascending") {
+						this._rootNode.sort((a, b) => (a.value as any) - (b.value as any));
+					}
 					this.setPrivateRaw("valueLow", Infinity);
 					this.setPrivateRaw("valueHigh", -Infinity);
 					this.setPrivateRaw("maxDepth", 0);
@@ -788,21 +802,22 @@ export abstract class Hierarchy extends Series {
 	}
 
 
-	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet, index?: number) {
+	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?: number) {
 		const bullet = super._makeBullet(dataItem, bulletFunction, index);
-		const sprite = bullet.get("sprite");
-		const node = dataItem.get("node");
+		if(bullet){
+			const sprite = bullet.get("sprite");
+			const node = dataItem.get("node");
 
-		if (sprite) {
-			node.children.push(sprite);
-			node.on("width", () => {
-				this._positionBullet(bullet);
-			})
-			node.on("height", () => {
-				this._positionBullet(bullet);
-			})
+			if (sprite) {
+				node.children.push(sprite);
+				node.on("width", () => {
+					this._positionBullet(bullet);
+				})
+				node.on("height", () => {
+					this._positionBullet(bullet);
+				})
+			}			
 		}
-
 		return bullet;
 	}
 

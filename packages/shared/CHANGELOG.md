@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.38] - 2021-10-28
+
+### Added
+- `"depthX"` (`depth0`, `depth1`, etc.) tags added to Hierarchy Nodes. This allows targeting node items via theme rules by the level.
+
+### Changed
+- A function that returns a Bullet can choose to return nothing, effectively ommitting bullet for the data item.
+- `Picture` elements will no inherit interactivity from its parents. If image needs to be interactive it needs to be set so directly via `interactive` setting.
+- `Picture` will now use source file's dimensions if neither `width` and `height` is set, and will also maintain aspect ratio if just one from `width` or `height` is set.
+
+### Fixed
+- Better color generation and step management in `ColorSet`.
+
+
 ## [5.0.0-beta.37] - 2021-10-26
 
 ### Added

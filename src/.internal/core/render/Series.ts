@@ -243,7 +243,7 @@ export abstract class Series extends Component {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/} for more info
 	 */
-	public bullets: List<<D extends DataItem<this["_dataItemSettings"]>>(root: Root, series:Series, dataItem: D) => Bullet> = new List();
+	public bullets: List<<D extends DataItem<this["_dataItemSettings"]>>(root: Root, series:Series, dataItem: D) => Bullet | undefined> = new List();
 
 	/**
 	 * A [[Container]] series' bullets are stored in.
@@ -320,18 +320,20 @@ export abstract class Series extends Component {
 		return true;
 	}
 
-	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction:(root: Root, series:Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet, index?:number):Bullet{
+	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction:(root: Root, series:Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?:number):Bullet | undefined{
 		const bullet = bulletFunction(this._root, this, dataItem);
-		let sprite = bullet.get("sprite");
+		if(bullet){
+			let sprite = bullet.get("sprite");
 
-		if (sprite) {
-			sprite._setDataItem(dataItem);
-			sprite.setRaw("position", "absolute");
-			this.bulletsContainer.children.push(sprite);			
+			if (sprite) {
+				sprite._setDataItem(dataItem);
+				sprite.setRaw("position", "absolute");
+				this.bulletsContainer.children.push(sprite);			
+			}
+			bullet._index = index;
+			bullet.series = this;
+			dataItem.bullets!.push(bullet);			
 		}
-		bullet._index = index;
-		bullet.series = this;
-		dataItem.bullets!.push(bullet);
 		return bullet;
 	}
 

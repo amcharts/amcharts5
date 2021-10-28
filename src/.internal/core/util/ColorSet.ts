@@ -98,7 +98,7 @@ export class ColorSet extends Entity {
 	//protected _currentPass: number = 0;
 
 	protected _afterNew() {
-		// Applying themes because gradient will not have parent
+		// Applying themes because color set will not have parent
 		super._afterNewApplyThemes();
 	}
 
@@ -119,8 +119,10 @@ export class ColorSet extends Entity {
 		if (!this.getPrivate("numColors")) {
 			this.setPrivate("numColors", colors.length);
 		}
-		const len = colors.length;
-		const start = len - this.getPrivate("numColors")!;
+		//const len = colors.length;
+		const len = this.getPrivate("numColors")!;
+		//const start = len - this.getPrivate("numColors")!;
+		const start = 0;
 		const passOptions = this.get("passOptions")!;
 		const reuse = this.get("reuse");
 		for (let i = start; i < len; i++) {
@@ -128,15 +130,18 @@ export class ColorSet extends Entity {
 				colors.push(colors[i])
 			}
 			else {
-				const hsl = colors[colors.length - 1]!.toHSL();
+				const hsl = colors[i]!.toHSL();
 				let h = hsl.h + (passOptions.hue || 0) * pass!;
-				if (h > 1) h -= Math.floor(h);
+				while (h > 1) h -= 1;
 
 				let s = hsl.s + (passOptions.saturation || 0) * pass!;
-				if (s > 1) s -= Math.floor(s);
+				//if (s > 1) s -= Math.floor(s);
+				if (s > 1) s = 1;
+				if (s < 0) s = 0;
 
 				let l = hsl.l + (passOptions.lightness || 0) * pass!;
-				if (l > 1) l -= Math.floor(l);
+				//if (l > 1) l -= Math.floor(l);
+				while (l > 1) l -= 1;
 				colors.push(Color.fromHSL(h, s, l));
 			}
 		}

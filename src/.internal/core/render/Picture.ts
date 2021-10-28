@@ -130,15 +130,45 @@ export class Picture extends Sprite {
 			image.src = src!;
 			image.decode().then(() => {
 				this._display.image = image;
-				this.markDirty();
+				this._updateSize();
 			}).catch((_error: any) => {
 				// TODO: maybe raise error?
 			});
 		}
 	}
 
-	// TODO: Needed?
-	// public _updateSize() {
-	// 	this.markDirty()
-	// }
+	public _updateSize() {
+		super._updateSize();
+
+		const image = this._display.image;
+		if (image) {
+			let w = this.getPrivate("width", this.get("width"));
+			let h = this.getPrivate("height", this.get("height"));
+			const r = image.width && image.height ? image.width / image.height : 0;
+
+			if ($type.isNumber(w) && $type.isNumber(h)) {
+				this._display.width = w;
+				this._display.height = h;
+			}
+			else if ($type.isNumber(w) && r) {
+				h = w / r;
+			}
+			else if ($type.isNumber(h) && r) {
+				w = h * r;
+			}
+			else {
+				w = image.width;
+				h = image.height;
+			}
+
+			if ($type.isNumber(w)) {
+				this._display.width = w;
+			}
+			if ($type.isNumber(h)) {
+				this._display.height = h;
+			}
+			this.markDirtyBounds();
+			//this.markDirty();
+		}
+	}
 }
