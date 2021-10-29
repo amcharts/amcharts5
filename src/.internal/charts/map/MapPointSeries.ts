@@ -10,7 +10,7 @@ import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } 
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
-
+import type { Animation } from "../../core/util/Entity";
 
 export interface IMapPointSeriesPrivate extends IMapSeriesPrivate {
 }
@@ -324,10 +324,10 @@ export class MapPointSeries extends MapSeries {
 	 * @param  dataItem   Map point
 	 * @param  zoomLevel  Zoom level
 	 */
-	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number) {
+	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number):Animation<any> | undefined {
 		const chart = this.chart;
 		if (chart) {
-			chart.zoomToGeoPoint({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) }, zoomLevel, true);
+			return chart.zoomToGeoPoint({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) }, zoomLevel, true);
 		}
 	}
 

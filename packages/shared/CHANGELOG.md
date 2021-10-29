@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.39] - 2021-10-29
+
+### Changed
+- All `MapChart`-related zoom methods will now return `Animation` object.
+
+
 ## [5.0.0-beta.38] - 2021-10-28
 
 ### Added

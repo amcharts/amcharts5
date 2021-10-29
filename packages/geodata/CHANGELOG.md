@@ -9,6 +9,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Fixed
 - Fixed area IDs in map of Slovenia.
+- Fixed JSON syntax error in `ugandaLow.json`.
 
 
 ## [5.0.2] - 2021-09-24

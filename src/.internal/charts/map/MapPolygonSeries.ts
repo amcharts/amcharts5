@@ -7,6 +7,7 @@ import { ListTemplate } from "../../core/util/List";
 
 import * as $array from "../../core/util/Array";
 import * as $mapUtils from "./MapUtils";
+import type { Animation } from "../../core/util/Entity";
 
 export interface IMapPolygonSeriesPrivate extends IMapSeriesPrivate {
 }
@@ -141,13 +142,13 @@ export class MapPolygonSeries extends MapSeries {
 	 * @param  dataItem  Target data item
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
 	 */
-	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>) {
+	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>):Animation<any> | undefined {
 		const polygon = dataItem.get("mapPolygon");
 		if (polygon) {
 			const geometry = polygon.get("geometry");
 			const chart = this.chart;
 			if (geometry && chart) {
-				chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry));
+				return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry));
 			}
 		}
 	}
