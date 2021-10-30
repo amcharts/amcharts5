@@ -936,6 +936,12 @@ export abstract class XYSeries extends Series {
 			this._markStakedDirtyStack();
 		}
 
+		if (!this._dataGrouped) {
+			xAxis._groupSeriesData(this);
+			yAxis._groupSeriesData(this);
+			this._dataGrouped = true;
+		}
+
 		if ((this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty)) {
 
 			let startIndex = this.getPrivate("startIndex", 0);
@@ -1303,8 +1309,8 @@ export abstract class XYSeries extends Series {
 				let h = bottom - top;
 
 				if (sprite.isType("Label")) {
-					sprite.set("maxWidth", w);
-					sprite.set("maxHeight", h);
+					sprite.set("maxWidth", Math.abs(w));
+					sprite.set("maxHeight", Math.abs(h));
 				}
 
 				let x = left + w * locationX;

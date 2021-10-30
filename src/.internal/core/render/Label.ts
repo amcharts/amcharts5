@@ -7,6 +7,7 @@ import { p50, p100 } from "../util/Percent";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
 
 import * as  $array from "../../core/util/Array";
+import * as  $type from "../../core/util/Type";
 
 
 export interface ILabelSettings extends IContainerSettings {
@@ -316,7 +317,7 @@ export class Label extends Container {
 		const vertical = rotation == 90 || rotation == 270;
 
 		const maxWidth = this.get("maxWidth", Infinity);
-		if (maxWidth) {
+		if ($type.isNumber(maxWidth)) {
 			this.text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
 		}
 		else {
@@ -324,7 +325,7 @@ export class Label extends Container {
 		}
 
 		const maxHeight = this.get("maxHeight", Infinity);
-		if (maxHeight) {
+		if ($type.isNumber(maxHeight)) {
 			this.text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
 		}
 		else {

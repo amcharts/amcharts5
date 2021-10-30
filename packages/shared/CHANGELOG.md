@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.40] - 2021-10-30
+
+### Fixed
+- `Label` setting `oversizedBehavior` was not working properly when heigh/with was 0.
+- `XYSeries` was not calculating `maxWidth`/`maxHeight` properly on data items with negative values.
+- Data grouping was not being applied when data was being updated after chart init.
+
+
 ## [5.0.0-beta.39] - 2021-10-29
 
 ### Changed

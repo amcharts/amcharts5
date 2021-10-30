@@ -1981,7 +1981,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 	protected _fitRatio(bounds: IBounds): number {
 		const maxW = this.style.maxWidth;
 		const maxH = this.style.maxHeight;
-		if (!maxW && !maxH) {
+		if (!$type.isNumber(maxW) && !$type.isNumber(maxH)) {
 			return 1;
 		}
 		const w = bounds.right - bounds.left;
@@ -2707,7 +2707,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 		// Monitor for possible pixel ratio changes (when page is zoomed)
 		window.addEventListener("resize", (_ev) => {
-			this.resolution = window.devicePixelRatio;
+			this.resolution = window.devicePixelRatio * 2;
 		});
 
 		// We need this in order top prevent default touch gestures when dragging

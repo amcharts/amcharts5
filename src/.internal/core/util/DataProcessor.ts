@@ -104,7 +104,9 @@ export class DataProcessor extends Entity {
 	}
 
 	/**
-	 * @ignore
+	 * Processess entire array of data.
+	 *
+	 * NOTE: calling this will modify original array!
 	 */
 	public processMany(data: { [index: string]: any }[]): void {
 		if ($type.isArray(data) && (this._checkDates || this._checkNumbers || this._checkColors || this._checkEmpty)) {
@@ -115,7 +117,9 @@ export class DataProcessor extends Entity {
 	}
 
 	/**
-	 * @ignore
+	 * Processes a row (object) of data.
+	 * 
+	 * NOTE: calling this will modify values of the original object!
 	 */
 	public processRow(row: { [index: string]: any }, prefix: string = ""): void {
 		$object.each(row, (key: any, _value) => {

@@ -179,12 +179,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					if (this.get("groupData")) {
 						$array.each(this.series, (series) => {
 							this._groupSeriesData(series);
-							this._disposers.push(series.data.events.onAll(() => {
-								this._groupSeriesData(series);
-							}))
-						})
-
-						this.markDirtySize();
+						})						
 					}
 					else {
 						let baseInterval = this.get("baseInterval");
@@ -206,144 +201,147 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 
 	public _groupSeriesData(series: XYSeries) {
+		if (this.get("groupData")) {
+			// make array of intervals which will be used;
+			let intervals: ITimeInterval[] = [];
+			let baseDuration = this.baseMainDuration();
 
-		// make array of intervals which will be used;
-		let intervals: ITimeInterval[] = [];
-		let baseDuration = this.baseMainDuration();
-
-		let groupIntervals = this.get("groupIntervals")!;
-		if (groupIntervals) { }
-		$array.each(groupIntervals, (interval) => {
-			let intervalDuration = $time.getIntervalDuration(interval);
-			if (intervalDuration > baseDuration) {
-				intervals.push(interval);
-			}
-		})
-
-		series._dataSets = {};
-
-		const key = this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!;
-		let fields: Array<string>;
-
-		const baseAxis = series.get("baseAxis");
-
-		if (series.get("xAxis") === baseAxis) {
-			fields = series._valueYFields;
-		}
-		else if (series.get("yAxis") === baseAxis) {
-			fields = series._valueXFields;
-		}
-
-		let dataItems = series.dataItems;
-		let baseInterval = this.get("baseInterval");
-		let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
-
-		series._dataSets[mainDataSetId] = series.dataItems as any;
-
-		$array.eachContinue(intervals, (interval) => {
-
-			let previousTime = -Infinity;
-			let dataSetId = interval.timeUnit + interval.count;
-			series._dataSets[dataSetId] = [];
-
-			let newDataItem: DataItem<IXYSeriesDataItem>;
-
-			let sum: { [index: string]: number } = {};
-			let count: { [index: string]: number } = {};
-
-			let groupFieldValues: { [index: string]: string } = {};
-			let workingFields: { [index: string]: string } = {};
-
-			$array.each(fields, (field) => {
-				sum[field] = 0;
-				count[field] = 0;
-				groupFieldValues[field] = series.get((field + "Grouped") as any);
-				workingFields[field] = field + "Working";
+			let groupIntervals = this.get("groupIntervals")!;
+			if (groupIntervals) { }
+			$array.each(groupIntervals, (interval) => {
+				let intervalDuration = $time.getIntervalDuration(interval);
+				if (intervalDuration > baseDuration) {
+					intervals.push(interval);
+				}
 			})
 
+			series._dataSets = {};
 
-			$array.each(dataItems, (dataItem) => {
-				let time = dataItem.get(key as any);
-				let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
-				let dataContext: any;
+			const key = this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!;
+			let fields: Array<string>;
 
-				if (previousTime < roundedTime) {
-					dataContext = $object.copy(dataItem.dataContext);
+			const baseAxis = series.get("baseAxis");
 
-					newDataItem = new DataItem(series, dataContext, series._makeDataItem(dataContext));
-					series._dataSets[dataSetId].push(newDataItem);
+			if (series.get("xAxis") === baseAxis) {
+				fields = series._valueYFields;
+			}
+			else if (series.get("yAxis") === baseAxis) {
+				fields = series._valueXFields;
+			}
 
-					$array.each(fields, (field) => {
-						let value = dataItem.get(field as any);
-						if ($type.isNumber(value)) {
-							newDataItem.setRaw(field as any, value);
-							newDataItem.setRaw(workingFields[field] as any, value);
-							count[field]++;
-							sum[field] += value;
-						}
-					})
-				}
-				else {
-					$array.each(fields, (field) => {
-						let groupKey = groupFieldValues[field];
-						let value = dataItem.get(field as any);
-						if (value !== undefined) {
+			let dataItems = series.dataItems;
+			let baseInterval = this.get("baseInterval");
+			let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 
-							let currentValue = newDataItem.get(field as any);
+			series._dataSets[mainDataSetId] = series.dataItems as any;
 
-							switch (groupKey) {
-								case "close":
-									newDataItem.setRaw(field as any, value);
-									break;
+			$array.eachContinue(intervals, (interval) => {
 
-								case "sum":
-									newDataItem.setRaw(field as any, currentValue + value);
-									break;
+				let previousTime = -Infinity;
+				let dataSetId = interval.timeUnit + interval.count;
+				series._dataSets[dataSetId] = [];
 
-								case "open":
-									break;
+				let newDataItem: DataItem<IXYSeriesDataItem>;
 
-								case "low":
-									if (value < currentValue) {
-										newDataItem.setRaw(field as any, value);
-									}
-									break;
+				let sum: { [index: string]: number } = {};
+				let count: { [index: string]: number } = {};
 
-								case "high":
-									if (value > currentValue) {
-										newDataItem.setRaw(field as any, value);
-									}
-									break;
+				let groupFieldValues: { [index: string]: string } = {};
+				let workingFields: { [index: string]: string } = {};
 
-								case "average":
-									count[field]++;
-									sum[field] += value;
-									let average = sum[field] / count[field];
-									newDataItem.setRaw(field as any, average);
-									break;
+				$array.each(fields, (field) => {
+					sum[field] = 0;
+					count[field] = 0;
+					groupFieldValues[field] = series.get((field + "Grouped") as any);
+					workingFields[field] = field + "Working";
+				})
 
-								case "extreme":
-									if (Math.abs(value) > Math.abs(currentValue)) {
-										newDataItem.setRaw(field as any, value);
-									}
-									break;
+
+				$array.each(dataItems, (dataItem) => {
+					let time = dataItem.get(key as any);
+					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
+					let dataContext: any;
+
+					if (previousTime < roundedTime) {
+						dataContext = $object.copy(dataItem.dataContext);
+
+						newDataItem = new DataItem(series, dataContext, series._makeDataItem(dataContext));
+						series._dataSets[dataSetId].push(newDataItem);
+
+						$array.each(fields, (field) => {
+							let value = dataItem.get(field as any);
+							if ($type.isNumber(value)) {
+								newDataItem.setRaw(field as any, value);
+								newDataItem.setRaw(workingFields[field] as any, value);
+								count[field]++;
+								sum[field] += value;
 							}
+						})
+					}
+					else {
+						$array.each(fields, (field) => {
+							let groupKey = groupFieldValues[field];
+							let value = dataItem.get(field as any);
+							if (value !== undefined) {
 
-							newDataItem.setRaw(workingFields[field] as any, newDataItem.get(field as any));
-							let dataContext: any = $object.copy(dataItem.dataContext);
-							dataContext[key as any] = roundedTime
-							newDataItem.dataContext = dataContext;
-						}
-					})
+								let currentValue = newDataItem.get(field as any);
+
+								switch (groupKey) {
+									case "close":
+										newDataItem.setRaw(field as any, value);
+										break;
+
+									case "sum":
+										newDataItem.setRaw(field as any, currentValue + value);
+										break;
+
+									case "open":
+										break;
+
+									case "low":
+										if (value < currentValue) {
+											newDataItem.setRaw(field as any, value);
+										}
+										break;
+
+									case "high":
+										if (value > currentValue) {
+											newDataItem.setRaw(field as any, value);
+										}
+										break;
+
+									case "average":
+										count[field]++;
+										sum[field] += value;
+										let average = sum[field] / count[field];
+										newDataItem.setRaw(field as any, average);
+										break;
+
+									case "extreme":
+										if (Math.abs(value) > Math.abs(currentValue)) {
+											newDataItem.setRaw(field as any, value);
+										}
+										break;
+								}
+
+								newDataItem.setRaw(workingFields[field] as any, newDataItem.get(field as any));
+								let dataContext: any = $object.copy(dataItem.dataContext);
+								dataContext[key as any] = roundedTime
+								newDataItem.dataContext = dataContext;
+							}
+						})
+					}
+					previousTime = roundedTime;
+				})				
+
+				if (series._dataSets[dataSetId].length < this.get("groupCount", Infinity)) {
+					return false
 				}
-				previousTime = roundedTime;
+				return true;
 			})
 
-			if (series._dataSets[dataSetId].length < this.get("groupCount", Infinity)) {
-				return false
-			}
-			return true;
-		})
+			this.markDirtySize();
+		}
 	}
 
 	public _clearDirty() {

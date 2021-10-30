@@ -153,6 +153,8 @@ export abstract class Component extends Container {
 
 	protected _dataChanged: boolean = false;
 
+	protected _dataGrouped = false;	
+
 	/**
 	 * Indicates if the component has already been initialized.
 	 */
@@ -193,6 +195,7 @@ export abstract class Component extends Container {
 
 		this._disposers.push(this.data.events.onAll((change) => {
 			this._markDirtyValues();
+			this._markDirtyGroup();
 			this._dataChanged = true;
 			if (change.type === "clear") {
 				$array.each(this._dataItems, (dataItem) => {
@@ -372,6 +375,10 @@ export abstract class Component extends Container {
 		this.markDirty();
 		this._valuesDirty = true;
 	}
+
+	public _markDirtyGroup() {		
+		this._dataGrouped = false;
+	}	
 
 	/**
 	 * @ignore

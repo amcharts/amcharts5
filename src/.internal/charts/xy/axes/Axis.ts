@@ -892,15 +892,19 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				if (this.get("snapTooltip")) {
 					position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
 				}
+				if (!$type.isNaN(position)) {
+					tooltip.label.set("text", this.getTooltipText(position));
+					renderer.positionTooltip(tooltip, position);
 
-				tooltip.label.set("text", this.getTooltipText(position));
-				renderer.positionTooltip(tooltip, position);
-
-				if (position < this.get("start") || position > this.get("end")) {
-					tooltip.hide(0);
+					if (position < this.get("start") || position > this.get("end")) {
+						tooltip.hide(0);
+					}
+					else {
+						tooltip.show(0);
+					}
 				}
 				else {
-					tooltip.show(0);
+					tooltip.hide(0);
 				}
 			}
 		}
@@ -1011,4 +1015,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public createAxisRange(axisDataItem: DataItem<IAxisDataItem>): DataItem<this["_dataItemSettings"]> {
 		return this.axisRanges.push(axisDataItem);
 	}
+
+	/**
+	 * @ignore
+	 */
+	public _groupSeriesData(_series: XYSeries) { }
 }
