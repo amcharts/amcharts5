@@ -37,6 +37,16 @@ export interface ISliceSettings extends IGraphicsSettings {
 	 */
 	shiftRadius?: number;
 
+	/**
+	 * @todo review
+	 */
+	dRadius?: number;
+
+	/**
+	 * @todo review
+	 */
+	dInnerRadius?: number;
+
 }
 
 export interface ISlicePrivate extends IGraphicsPrivate {
@@ -85,6 +95,12 @@ export class Slice extends Graphics {
 		let radius = this.get("radius", 0);
 		let innerRadius = this.get("innerRadius", 0);
 
+		let dRadius = this.get("dRadius", 0);
+		let dInnerRadius = this.get("dInnerRadius", 0);
+
+		radius += dRadius;
+		innerRadius += dInnerRadius;
+
 		if (innerRadius < 0) {
 			innerRadius = radius + innerRadius;
 		}
@@ -108,7 +124,7 @@ export class Slice extends Graphics {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("radius") || this.isDirty("arc") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("cornerRadius")) {
+		if (this.isDirty("radius") || this.isDirty("arc") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("dRadius") || this.isDirty("dInnerRadius") || this.isDirty("cornerRadius")) {
 			this._clear = true;
 		}
 	}
@@ -126,6 +142,12 @@ export class Slice extends Graphics {
 
 			let radius = this.get("radius", 0);
 			let innerRadius = this.get("innerRadius", 0);
+
+			let dRadius = this.get("dRadius", 0);
+			let dInnerRadius = this.get("dInnerRadius", 0);
+
+			radius += dRadius;
+			innerRadius += dInnerRadius;			
 
 			if (innerRadius < 0) {
 				innerRadius = radius + innerRadius;

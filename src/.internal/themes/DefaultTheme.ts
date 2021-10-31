@@ -416,7 +416,9 @@ export class DefaultTheme extends Theme {
 		});
 
 		r("Slice").setAll({
-			shiftRadius: 0
+			shiftRadius: 0,
+			dRadius:0,
+			dInnerRadius:0
 		});
 
 		{

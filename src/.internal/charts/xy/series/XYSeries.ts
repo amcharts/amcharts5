@@ -407,9 +407,13 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	maskBullets?: boolean;
 
 	/**
-	 * @todo review
+	 * Whether series' tooltip should inherit its color from series or its first
+	 * bullet.
+	 * 
+	 * @default "series"
 	 */
-	seriesTooltipTarget?: "series" | "bullet"
+	seriesTooltipTarget?: "series" | "bullet";
+
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {

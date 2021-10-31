@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.41] - 2021-10-31
+
+### Added
+- `dRadius` and `dInnerRadius` settings added to `Slice` (default: `0`). Allows tweaking `radius`/`innerRadius` values in charts where these settings are set by the chart (`PieSeries`, circular/radial axis fills, etc.).
+- `adjustBulletPosition` added to `BaseColumnSeries` (default: `true`). If set to `false`, bullets will be positioned relatively to whole width/height of the column, rather then the portion that is currently visible.
+
+### Fixed
+- `RadarChart` with `RadarLineSeries` could result a JS error when zoomed.
+
+
 ## [5.0.0-beta.40] - 2021-10-30
 
 ### Fixed

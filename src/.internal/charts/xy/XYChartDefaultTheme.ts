@@ -579,6 +579,10 @@ export class XYChartDefaultTheme extends Theme {
 			seriesTooltipTarget:"series"
 		});
 
+		r("BaseColumnSeries").setAll({
+			adjustBulletPosition:true
+		});
+
 		r("ColumnSeries").setAll({
 			clustered: true
 		});

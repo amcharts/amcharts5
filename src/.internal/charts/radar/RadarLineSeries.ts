@@ -66,9 +66,9 @@ export class RadarLineSeries extends LineSeries {
 		const yAxis = this.get("yAxis");
 		const xAxis = this.get("xAxis");
 
-		const rendererY = xAxis.get("renderer") as AxisRendererRadial;
+		const rendererY = yAxis.get("renderer") as AxisRendererRadial;
 
-		const radius = yAxis.get("renderer").positionToCoordinate(positionY) + rendererY.getPrivate("innerRadius", 0);
+		const radius = rendererY.positionToCoordinate(positionY) + rendererY.getPrivate("innerRadius", 0);
 
 		const rendererX = xAxis.get("renderer") as AxisRendererCircular;
 		const angle = rendererX.positionToAngle(positionX);
@@ -77,7 +77,7 @@ export class RadarLineSeries extends LineSeries {
 	}
 
 	protected _endLine(points: Array<Array<number>>, firstPoint: Array<number>) {
-		if (this.get("connectEnds")) {
+		if (this.get("connectEnds") && firstPoint) {
 			points.push(firstPoint);
 		}
 	}

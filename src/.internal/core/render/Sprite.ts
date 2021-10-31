@@ -489,7 +489,7 @@ export interface ISpritePrivate extends IEntityPrivate {
 	focusElement?: HTMLDivElement;
 
 	/**
-	 * @todo review
+	 * An element tooltip should inherit its colors from.
 	 */
 	tooltipTarget?: Graphics;
 
@@ -497,6 +497,7 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 * @ignore
 	 */
 	list?: ListTemplate<Sprite>;
+
 }
 
 /**

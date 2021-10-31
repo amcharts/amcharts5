@@ -156,7 +156,11 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 */
 	fixAxisSize?: boolean;
 
-	// @todo review
+	/**
+	 * A function that will be used to create bullets on each cell.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_bullets} for more info
+	 */
 	bullet?: (root: Root, axis: Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
 
 }

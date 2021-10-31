@@ -49,6 +49,15 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 */
 	clustered?: boolean;
 
+	/**
+	 * Whether positions of bullets should be calculated based on portion of
+	 * column currently visual (`true`) or the whole length/height of the
+	 * column (`false`).
+	 *
+	 * @default true
+	 */
+	adjustBulletPosition?:boolean;
+
 }
 
 export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }
@@ -464,14 +473,16 @@ export abstract class BaseColumnSeries extends XYSeries {
 			b -= offset;
 		}
 
-		if (fitW) {
-			r = Math.min(Math.max(0, r), this._pw);
-			l = Math.min(Math.max(0, l), this._pw);
-		}
+		if(this.get("adjustBulletPosition")){
+			if (fitW) {
+				r = Math.min(Math.max(0, r), this._pw);
+				l = Math.min(Math.max(0, l), this._pw);
+			}
 
-		if (fitH) {
-			t = Math.min(Math.max(0, t), this._ph);
-			b = Math.min(Math.max(0, b), this._ph);
+			if (fitH) {
+				t = Math.min(Math.max(0, t), this._ph);
+				b = Math.min(Math.max(0, b), this._ph);
+			}
 		}
 
 		dataItem.setRaw("left", l);

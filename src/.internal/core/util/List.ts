@@ -428,8 +428,8 @@ export class List<T> {
 
 
 /**
- * A version of a [[List]] where the elements are disposed automatically when removed from the list, unless autoDispose is set to false.
- * @todo review
+ * A version of a [[List]] where the elements are disposed automatically when
+ * removed from the list, unless `autoDispose` is set to `false`.
  */
 export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDisposer {
 	/**
