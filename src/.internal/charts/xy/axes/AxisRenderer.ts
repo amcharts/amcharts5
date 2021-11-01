@@ -173,6 +173,13 @@ export abstract class AxisRenderer extends Graphics {
 		if (this.get("inside" as any)) {
 			themeTags.push("inside");
 		}
+
+		const axisName = this.axis.getPrivate("name");
+
+		if(axisName){
+			themeTags.push(axisName);
+		}		
+
 		label.set("themeTags", $utils.mergeTags(label.get("themeTags"), themeTags));
 		this.axis.labelsContainer.children.moveValue(label, 0);
 

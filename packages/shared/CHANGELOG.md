@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.42] - 2021-11-01
+
+### Added
+- If a `Bullet` has `dynamic: true` set, its sprite size will be marked as dirty each time the bullet updates its position.
+- Axis name added to `AxisLabel` when created so it could be targeted by axis type in theme rules.
+
+### Changed
+- Upgraded to `marker.js` 2.16.2.
+- `Annotator` new setting: `markerState`. You can use it to pre-set annotations, or grab annotation data at any time.
+- Default text of an `AxisLabel` for `CategoryAxis` set to `"{category}"`.
+
+### Fixed
+- `Picture` was not working properly in containers in a non-default layer.
+- `locationX` or `locationY` was being ignored on `RadarLineSeries` in some specific cases.
+- `Tooltip` as not coloring its text properly with "Dark" theme enabled.
+
+
 ## [5.0.0-beta.41] - 2021-10-31
 
 ### Added

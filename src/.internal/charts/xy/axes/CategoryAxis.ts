@@ -270,11 +270,6 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 				dataItem.show();
 			}
 
-			const label = dataItem.get("label");
-			if (label) {
-				label.set("text", dataItem.get("category"));
-			}
-
 			this._prepareDataItem(dataItem, f, frequency);
 			f++;
 		}

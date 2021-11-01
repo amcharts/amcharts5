@@ -38,12 +38,14 @@ export interface ISliceSettings extends IGraphicsSettings {
 	shiftRadius?: number;
 
 	/**
-	 * @todo review
+	 * Number of pixels to add to whatever slice's `radius` value is. Negative
+	 * numbers can also be used.
 	 */
 	dRadius?: number;
 
 	/**
-	 * @todo review
+	 * Number of pixels to add to whatever slice's `innerRadius` value is.
+	 * Negative numbers can also be used.
 	 */
 	dInnerRadius?: number;
 

@@ -266,12 +266,7 @@ export class Tooltip extends Container {
 			}
 
 			if (fill instanceof Color) {
-				if ($utils.isLight(fill)) {
-					this.label.set("fill", this._root.interfaceColors.get("text"));
-				}
-				else {
-					this.label.set("fill", this._root.interfaceColors.get("alternativeText"));
-				}
+				this.label.set("fill", Color.alternative(fill, this._root.interfaceColors.get("alternativeText"), this._root.interfaceColors.get("text")));
 			}
 		}
 	}

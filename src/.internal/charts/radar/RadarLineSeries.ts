@@ -110,14 +110,14 @@ export class RadarLineSeries extends LineSeries {
 
 			let xAxis = this.get("xAxis");
 			let yAxis = this.get("yAxis");
-			let baseAxis = this.get("baseAxis");
+			//let baseAxis = this.get("baseAxis");
 
-			if(xAxis == baseAxis){
-				locationY = 1;
-			}
-			else if(yAxis == baseAxis){
-				locationX = 1;
-			}
+			//if(xAxis == baseAxis){
+			//locationY = 1;
+			//}
+			//else if(yAxis == baseAxis){
+			//locationX = 1;
+			//}
 
 			const positionX = xAxis.getDataItemPositionX(dataItem, this._xField, locationX, this.get("vcx", 1));
 			const positionY = yAxis.getDataItemPositionY(dataItem, this._yField, locationY, this.get("vcy", 1))

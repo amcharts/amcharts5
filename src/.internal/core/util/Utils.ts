@@ -979,7 +979,13 @@ export function saturate(rgb: $type.Optional<iRGB>, saturation: number): $type.O
 }
 
 export function alternativeColor(color: iRGB, lightAlternative: iRGB = { r: 255, g: 255, b: 255 }, darkAlternative: iRGB = { r: 255, g: 255, b: 255 }): iRGB {
-	return isLight(color) ? darkAlternative : lightAlternative;
+	let light = lightAlternative;
+	let dark = darkAlternative;
+	if (isLight(darkAlternative)) {
+		light = darkAlternative;
+		dark = lightAlternative;
+	}
+	return isLight(color) ? dark : light;
 }
 
 /**

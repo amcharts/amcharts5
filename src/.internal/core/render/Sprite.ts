@@ -1405,6 +1405,14 @@ export abstract class Sprite extends Entity {
 	/**
 	 * @ignore
 	 */
+	public markDirtySize(): void {
+		this._sizeDirty = true;
+		this.markDirty();
+	}
+
+	/**
+	 * @ignore
+	 */
 	public markDirtyBounds(): void {
 		const display = this._display;
 		if (this.get("isMeasured")) {

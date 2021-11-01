@@ -859,7 +859,6 @@ export class DefaultTheme extends Theme {
 			textAlign: "center"
 		});
 
-
 		/**
 		 * ------------------------------------------------------------------------
 		 * Shapes

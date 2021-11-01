@@ -173,6 +173,11 @@ export class XYChartDefaultTheme extends Theme {
 			fontSize: "0.8em"
 		});
 
+		r("AxisLabel", ["category"]).setAll({
+			text:"{category}",
+			populateText:true
+		});		
+
 		r("AxisLabel", ["x"]).setAll({
 			centerY: 0
 		});

@@ -10,7 +10,10 @@ export class RadarDefaultTheme extends Theme {
 	protected setupDefaultRules() {
 		super.setupDefaultRules();
 
+		const r = this.rule.bind(this);
+
 		const ic = this._root.interfaceColors;
+
 
 		/**
 		 * ========================================================================
@@ -18,31 +21,31 @@ export class RadarDefaultTheme extends Theme {
 		 * ========================================================================
 		 */
 
-		this.rule("RadarChart").setAll({
+		r("RadarChart").setAll({
 			radius: percent(80),
 			innerRadius: 0,
 			startAngle: -90,
 			endAngle: 270
 		});
 
-		this.rule("RadarColumnSeries").setAll({
+		r("RadarColumnSeries").setAll({
 			clustered: true
 		});
 
-		this.rule("Slice", ["radar", "column", "series"]).setAll({
+		r("Slice", ["radar", "column", "series"]).setAll({
 			width: percent(80),
 			height: percent(80)
 		});
 
-		this.rule("RadarLineSeries").setAll({
+		r("RadarLineSeries").setAll({
 			connectEnds: true
 		});
 
-		this.rule("SmoothedRadarLineSeries").setAll({
+		r("SmoothedRadarLineSeries").setAll({
 			tension: 0.5
 		});
 
-		this.rule("AxisRendererRadial").setAll({
+		r("AxisRendererRadial").setAll({
 			minGridDistance: 40,
 			axisAngle: -90,
 			inversed: false,
@@ -50,14 +53,14 @@ export class RadarDefaultTheme extends Theme {
 			cellEndLocation: 1
 		});
 
-		this.rule("AxisRendererCircular").setAll({
+		r("AxisRendererCircular").setAll({
 			minGridDistance: 100,
 			inversed: false,
 			cellStartLocation: 0,
 			cellEndLocation: 1
 		});
 
-		this.rule("RadialLabel", ["circular"]).setAll({
+		r("RadialLabel", ["circular"]).setAll({
 			textType: "circular",
 			paddingTop: 1,
 			paddingRight: 0,
@@ -68,19 +71,25 @@ export class RadarDefaultTheme extends Theme {
 			radius: 8
 		});
 
-		this.rule("RadialLabel", ["radial"]).setAll({
+
+		r("AxisLabelRadial", ["category"]).setAll({
+			text:"{category}",
+			populateText:true
+		});			
+
+		r("RadialLabel", ["radial"]).setAll({
 			textType: "regular",
 			centerX: 0,
 			textAlign: "right"
 		});
 
-		this.rule("RadarChart", ["gauge"]).setAll({
+		r("RadarChart", ["gauge"]).setAll({
 			startAngle: 180,
 			endAngle: 360,
 			innerRadius: percent(90)
 		});
 
-		this.rule("ClockHand").setAll({
+		r("ClockHand").setAll({
 			topWidth: 1,
 			bottomWidth: 10,
 			radius: percent(90),
@@ -88,7 +97,7 @@ export class RadarDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = this.rule("Graphics", ["clock", "hand"]);
+			const rule = r("Graphics", ["clock", "hand"]);
 
 			rule.setAll({
 				fillOpacity: 1
@@ -98,7 +107,7 @@ export class RadarDefaultTheme extends Theme {
 		}
 
 		{
-			const rule = this.rule("Graphics", ["clock", "pin"]);
+			const rule = r("Graphics", ["clock", "pin"]);
 
 			rule.setAll({
 				fillOpacity: 1

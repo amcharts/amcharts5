@@ -168,7 +168,7 @@ export class Picture extends Sprite {
 				this._display.height = h;
 			}
 			this.markDirtyBounds();
-			//this.markDirty();
+			this.markDirty();
 		}
 	}
 }

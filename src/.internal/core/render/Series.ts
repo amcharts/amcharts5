@@ -599,10 +599,12 @@ export abstract class Series extends Component {
 					
 					if(sprite){						
 						sprite._markDirtyKey("fill" as any);
+						sprite.markDirtySize();
 					}
 					if(sprite instanceof Container){
 						sprite.walkChildren((child)=>{						
 							child._markDirtyKey("fill" as any);
+							child.markDirtySize();
 						})
 					}
 				}	

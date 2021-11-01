@@ -13,6 +13,11 @@ export interface IAnnotatorSettings extends IEntitySettings {
 	 */
 	layer?: number;
 
+	/**
+	 * Raw annotation info saved by MarkerJS.
+	 */
+	markerState?: any;
+
 }
 
 export interface IAnnotatorPrivate extends IEntityPrivate {
@@ -40,11 +45,6 @@ export class Annotator extends Entity {
 	private _picture?: Picture;
 	private _markerArea?: any;
 
-	/**
-	 * Raw annotation info saved by MarkerJS.
-	 */
-	public markerState?: any;
-
 	//public extraImages: Array<Root | IAnnotatorImageSource> = [];
 	//public dataSources: any[] = [];
 
@@ -52,6 +52,12 @@ export class Annotator extends Entity {
 		super._afterNew();
 		this._setRawDefault("layer", 1000);
 		this._root.addDisposer(this);
+
+		if (this.get("markerState")) {
+			// Preload image
+			this.open();
+			this.close();
+		}
 	}
 
 	public _beforeChanged() {
@@ -72,8 +78,8 @@ export class Annotator extends Entity {
 		const markerArea = await this.getMarkerArea();
 		markerArea.show();
 		this._picture!.hide(0);
-		if (this.markerState) {
-			markerArea.restoreState(this.markerState);
+		if (this.get("markerState")) {
+			markerArea.restoreState(this.get("markerState"));
 		}
 	}
 
@@ -102,7 +108,7 @@ export class Annotator extends Entity {
 	 * All annotations are removed.
 	 */
 	public clear() {
-		this.markerState = undefined;
+		this.set("markerState", undefined);
 		if (this._picture) {
 			this._picture.set("src", "");
 		}
@@ -156,7 +162,7 @@ export class Annotator extends Entity {
 				const picture = this._picture!;
 				picture.set("src", img);
 				picture.show(0);
-				this.markerState = state;
+				this.set("markerState", state);
 			});
 
 			this._markerArea = markerArea;
