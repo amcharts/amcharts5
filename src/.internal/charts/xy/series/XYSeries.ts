@@ -1521,6 +1521,7 @@ export abstract class XYSeries extends Series {
 				const tooltip = this.get("tooltip")!;
 				if (tooltip) {
 					tooltip._setDataItem(dataItem);
+
 					if (dataItem) {
 						let locationX = this.get("locationX", 0);
 						let locationY = this.get("locationY", 1);
@@ -1548,7 +1549,7 @@ export abstract class XYSeries extends Series {
 
 						if (show) {
 							const chart = this.chart;
-							if (chart && chart.inPlot(point)) {
+							if (chart && chart.inPlot(point)) {								
 								tooltip.label.text.markDirtyText();
 								tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
 								tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));

@@ -64,7 +64,10 @@ var series = chart.series.push(am5xy.LineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
 series.strokes.template.setAll({
   strokeWidth: 2,
@@ -106,9 +109,6 @@ series.bullets.push(function() {
     sprite: container
   })
 })
-
-var tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{valueY}");
 
 
 // Set data

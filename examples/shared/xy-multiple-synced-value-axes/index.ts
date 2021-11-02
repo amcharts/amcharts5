@@ -84,7 +84,11 @@ function createAxisAndSeries(startValue, opposite) {
     xAxis: xAxis,
     yAxis: yAxis,
     valueYField: "value",
-    valueXField: "date"
+    valueXField: "date",
+    tooltip: am5.Tooltip.new(root, {
+      labelText: "{valueY}",
+      pointerOrientation: "horizontal"
+    })
   }));
 
   //series.fills.template.setAll({ fillOpacity: 0.2, visible: true });
@@ -106,12 +110,6 @@ function createAxisAndSeries(startValue, opposite) {
   });
 
   series.data.setAll(generateChartData(startValue));
-
-  let tooltip = am5.Tooltip.new(root, {
-    pointerOrientation: "horizontal"
-  });
-  tooltip.label.set("text", "{valueY}");
-  series.set("tooltip", tooltip);
 }
 
 

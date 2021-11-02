@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0] - 2021-11-02
+
+### Changed
+- First public release.
+
+
 ## [5.0.0-beta.44] - 2021-11-02 (release candidate)
 
 ### Added

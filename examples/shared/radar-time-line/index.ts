@@ -216,14 +216,13 @@ const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
   xAxis: categoryAxis,
   yAxis: valueAxis,
   valueYField: "value" + currentYear,
-  categoryXField: "country"
+  categoryXField: "country",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{categoryX}: {valueY}"
+  })  
 }));
 
 series.columns.template.set("strokeOpacity", 0);
-
-const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{categoryX}: {valueY}");
-
 
 // Set up heat rules
 // https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/

@@ -3,9 +3,21 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
+/**
+ * ---------------------------------------
+ * This demo was created using amCharts 5.
+ *
+ * For more information visit:
+ * https://www.amcharts.com/
+ *
+ * Documentation is available at:
+ * https://www.amcharts.com/docs/v5/
+ * ---------------------------------------
+ */
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-const root = am5.Root.new("chartdiv");
+var root = am5.Root.new("chartdiv");
 
 
 // Set themes
@@ -17,7 +29,7 @@ root.setThemes([
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
-const chart = root.container.children.push(am5xy.XYChart.new(root, {
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: false,
   panY: false,
   wheelX: "panX",
@@ -31,7 +43,7 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
 }));
 
-const data = [{
+var data = [{
   "year": "2021",
   "europe": 2.5,
   "namerica": 2.5,
@@ -60,7 +72,7 @@ const data = [{
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
+var xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   categoryField: "year",
   renderer: am5xy.AxisRendererX.new(root, {}),
   tooltip: am5.Tooltip.new(root, {})
@@ -68,7 +80,7 @@ const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
 
 xAxis.data.setAll(data);
 
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   min: 0,
   renderer: am5xy.AxisRendererY.new(root, {})
 }));
@@ -76,7 +88,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 // Add legend
 // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-const legend = chart.children.push(am5.Legend.new(root, {
+var legend = chart.children.push(am5.Legend.new(root, {
   centerX: am5.p50,
   x: am5.p50
 }));
@@ -84,8 +96,8 @@ const legend = chart.children.push(am5.Legend.new(root, {
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-function makeSeries(name: string, fieldName: string) {
-  const series = chart.series.push(am5xy.ColumnSeries.new(root, {
+function makeSeries(name, fieldName) {
+  var series = chart.series.push(am5xy.ColumnSeries.new(root, {
     name: name,
     stacked: true,
     xAxis: xAxis,
@@ -104,7 +116,7 @@ function makeSeries(name: string, fieldName: string) {
   // https://www.amcharts.com/docs/v5/concepts/animations/
   series.appear();
 
-  series.bullets.push(() => {
+  series.bullets.push(function () {
     return am5.Bullet.new(root, {
       sprite: am5.Label.new(root, {
         text: "{valueY}",
@@ -128,5 +140,5 @@ makeSeries("Africa", "africa");
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 chart.appear(1000, 100);

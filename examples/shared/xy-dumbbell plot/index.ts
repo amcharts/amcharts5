@@ -65,7 +65,10 @@ var series = chart.series.push(am5xy.ColumnSeries.new(root, {
   yAxis: yAxis,
   valueYField: "close",
   openValueYField: "open",
-  categoryXField: "category"
+  categoryXField: "category",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{openValueY} - {valueY}"
+  })
 }));
 series.columns.template.setAll({
   width: 0.5
@@ -92,10 +95,6 @@ series.bullets.push(function() {
     })
   })
 })
-
-var tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{openValueY} - {valueY}");
-
 
 // Set data
 var data = [];
@@ -148,6 +147,6 @@ series.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);

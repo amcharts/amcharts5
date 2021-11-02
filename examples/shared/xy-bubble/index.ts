@@ -60,11 +60,14 @@ const series = chart.series.push(am5xy.LineSeries.new(root, {
   yAxis: yAxis,
   valueYField: "y",
   valueXField: "x",
-  valueField: "value"
+  valueField: "value",
+  tooltip: am5.Tooltip.new(root, {
+    pointerOrientation: "horizontal",
+    labelText: "[bold]{title}[/]\nLife expectancy: {valueY.formatNumber('#.0')}\nGDP: {valueX.formatNumber('#,###.')}\nPopulation: {value.formatNumber('#,###.')}"
+  })
 }));
 
 series.strokes.template.set("visible", false);
-
 
 // Add bullet
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets
@@ -1615,16 +1618,7 @@ series.data.setAll([
   }
 ]);
 
-
-// Add series tooltip
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Tooltips
-var tooltip = am5.Tooltip.new(root, {
-  pointerOrientation: "horizontal"
-});
-
-tooltip.label.set("text", "[bold]{title}[/]\nLife expectancy: {valueY.formatNumber('#.0')}\nGDP: {valueX.formatNumber('#,###.')}\nPopulation: {value.formatNumber('#,###.')}");
-
-const background = tooltip.get("background");
+const background = series.get("tooltip").get("background");
 background.set("stroke", root.interfaceColors.get("alternativeBackground"));
 background.adapters.add("fill", (fill, target) => {
   let dataItem = target.dataItem;
@@ -1632,8 +1626,7 @@ background.adapters.add("fill", (fill, target) => {
     return am5.Color.fromString(dataItem.dataContext.color);
   }
   return fill
-})
-series.set("tooltip", tooltip);
+});
 
 
 // Add cursor

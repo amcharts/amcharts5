@@ -86,12 +86,11 @@ const series = chart.series.push(am5xy.LineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueX}: {valueY}"
+  })
 }));
-
-const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{valueX}: {valueY}");
-
 
 // Add scrollbar
 // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/

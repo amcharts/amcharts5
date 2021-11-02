@@ -6,6 +6,7 @@ import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
+import type { Tooltip } from "../../../core/render/Tooltip";
 
 export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICategoryAxisSettings<R> {
 
@@ -258,10 +259,15 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 	public getTooltipText(position: number): string | undefined {
 		//@todo number formatter + tag
 		let dataItem = this.dataItems[this.axisPositionToIndex(position)];
+
 		if (dataItem) {
 			let format = this.get("dateFormats")![this.getPrivate("baseInterval").timeUnit];
 			return this._root.dateFormatter.format(new Date(dataItem.get("category", 0)), this.get("tooltipDateFormat", format));
 		}
+	}
+
+	protected _updateTooltipText(tooltip: Tooltip, position: number) {
+		tooltip.label.set("text", this.getTooltipText(position));
 	}
 
 }

@@ -3,9 +3,10 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-const root = am5.Root.new("chartdiv");
+var root = am5.Root.new("chartdiv");
 
 
 // Set themes
@@ -17,7 +18,7 @@ root.setThemes([
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
-const chart = root.container.children.push(am5xy.XYChart.new(root, {
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: false,
   panY: false,
   wheelX: "panX",
@@ -27,16 +28,16 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
   behavior: "zoomX"
 }));
 cursor.lineY.set("visible", false);
 
 
 // Generate random data
-let date = new Date();
+var date = new Date();
 date.setHours(0, 0, 0, 0);
-let value = 100;
+var value = 100;
 
 function generateData() {
   value = Math.round((Math.random() * 10 - 5) + value);
@@ -47,9 +48,9 @@ function generateData() {
   };
 }
 
-function generateDatas(count: number) {
-  const data = [];
-  for (let i = 0; i < count; ++i) {
+function generateDatas(count) {
+  var data = [];
+  for (var i = 0; i < count; ++i) {
     data.push(generateData());
   }
   return data;
@@ -58,7 +59,7 @@ function generateDatas(count: number) {
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   groupData: true,
   maxDeviation: 0,
   baseInterval: {
@@ -69,24 +70,23 @@ const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   tooltip: am5.Tooltip.new(root, {})
 }));
 
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {})
 }));
 
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-const series = chart.series.push(am5xy.LineSeries.new(root, {
+var series = chart.series.push(am5xy.LineSeries.new(root, {
   name: "Series",
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
-
-const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{valueY}");
-
 
 // Add scrollbar
 // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
@@ -94,11 +94,11 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
 }));
 
-let data = generateDatas(50000);
+var data = generateDatas(50000);
 series.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);

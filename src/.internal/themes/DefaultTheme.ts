@@ -916,7 +916,7 @@ export class DefaultTheme extends Theme {
 			textAlign: "center"
 		});
 
-		r("Tooltip", ["axis", "category"]).setAll({
+		r("Tooltip", ["categoryaxis"]).setAll({
 			labelText: "{category}"
 		})	
 

@@ -99,10 +99,6 @@ function makeSeries(name: string, fieldName: string) {
     categoryXField: "year"
   }));
 
-  series.columns.template.setAll({
-    tooltipText: "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#')}%",
-    tooltipY: am5.percent(10)
-  });
   series.data.setAll(data);
 
   // Make stuff animate on load

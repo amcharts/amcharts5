@@ -2,10 +2,21 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+/**
+ * ---------------------------------------
+ * This demo was created using amCharts 5.
+ *
+ * For more information visit:
+ * https://www.amcharts.com/
+ *
+ * Documentation is available at:
+ * https://www.amcharts.com/docs/v5/
+ * ---------------------------------------
+ */
 
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-const root = am5.Root.new("chartdiv");
+var root = am5.Root.new("chartdiv");
 
 
 // Set themes
@@ -16,7 +27,7 @@ root.setThemes([
 
 
 // Generate random data
-let value = 100;
+var value = 100;
 
 function generateChartData() {
   var chartData = [];
@@ -38,12 +49,12 @@ function generateChartData() {
   return chartData;
 }
 
-const data = generateChartData();
+var data = generateChartData();
 
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
-const chart = root.container.children.push(am5xy.XYChart.new(root, {
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
   focusable: true,
   panX: true,
   panY: true,
@@ -51,14 +62,16 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
   wheelY: "zoomX"
 }));
 
-let easing = am5.ease.linear;
+var easing = am5.ease.linear;
 
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0.5,
   groupData: false,
+  extraMin:-0.05,
+  extraMax:0.1,
   baseInterval: {
     timeUnit: "day",
     count: 1
@@ -69,30 +82,28 @@ const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   tooltip: am5.Tooltip.new(root, {})
 }));
 
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {})
 }));
 
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-const series = chart.series.push(am5xy.LineSeries.new(root, {
+var series = chart.series.push(am5xy.LineSeries.new(root, {
   minBulletDistance: 10,
   name: "Series 1",
   xAxis: xAxis,
   yAxis: yAxis,
-  "valueYField": "value",
-  "valueXField": "date"
+  valueYField: "value",
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    pointerOrientation: "horizontal",
+    labelText: "{valueY}"
+  })
 }));
 series.data.setAll(data);
 
-var tooltip = am5.Tooltip.new(root, {
-  pointerOrientation: "horizontal"
-});
-tooltip.label.set("text", "{valueY}");
-series.set("tooltip", tooltip);
-
-series.bullets.push(() => {
+series.bullets.push(function () {
   return am5.Bullet.new(root, {
     locationX:undefined,
     sprite: am5.Circle.new(root, {
@@ -105,31 +116,31 @@ series.bullets.push(() => {
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
   xAxis: xAxis
 }));
 cursor.lineY.set("visible", false);
 
 
 // Update data every second
-setInterval(() => {
+setInterval(function () {
   addData();
 }, 1000)
 
 
 function addData() {
-  const lastDataItem = series.dataItems[series.dataItems.length - 1];
-  const lastValue = lastDataItem.get("valueY");
-  const newValue = value + Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 2);
-  const lastDate = new Date(lastDataItem.get("valueX")!);
-  let time = am5.time.add(new Date(lastDate), "day", 1).getTime();
+  var lastDataItem = series.dataItems[series.dataItems.length - 1];
+  var lastValue = lastDataItem.get("valueY");
+  var newValue = value + Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 2);
+  var lastDate = new Date(lastDataItem.get("valueX"));
+  var time = am5.time.add(new Date(lastDate), "day", 1).getTime();
   series.data.removeIndex(0);
   series.data.push({
     date: time,
     value: newValue
   })
 
-  let newDataItem = series.dataItems[series.dataItems.length - 1];
+  var newDataItem = series.dataItems[series.dataItems.length - 1];
   newDataItem.animate({
     key: "valueYWorking",
     to: newValue,
@@ -138,16 +149,16 @@ function addData() {
     easing: easing
   });
 
-  let animation = newDataItem.animate({
+  var animation = newDataItem.animate({
     key: "locationX",
     to: 0.5,
     from: -0.5,
     duration: 600
   });
   if (animation) {
-    let tooltip = xAxis.get("tooltip");
+    var tooltip = xAxis.get("tooltip");
     if (tooltip && !tooltip.isHidden()) {
-      animation.events.on("stopped", () => {
+      animation.events.on("stopped", function () {
         xAxis.updateTooltip();
       })
     }
@@ -156,5 +167,5 @@ function addData() {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 chart.appear(1000, 100);

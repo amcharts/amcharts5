@@ -5,7 +5,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-const root = am5.Root.new("chartdiv");
+var root = am5.Root.new("chartdiv");
 
 
 // Set themes
@@ -27,8 +27,9 @@ var chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
-cursor.lineY.set("visible", false);
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
+cursor.lineX.set("forceHidden", true);
+cursor.lineY.set("forceHidden", true);
 
 // Generate random data
 var date = new Date();
@@ -75,15 +76,17 @@ var series = chart.series.push(am5xy.LineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
+
 series.fills.template.setAll({
   fillOpacity: 0.2,
   visible: true
 });
 
-var tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{valueY}");
 
 // Add scrollbar
 // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
@@ -97,13 +100,13 @@ var data = generateDatas(1200);
 series.data.setAll(data);
 
 
-let rangeDate = new Date();
+var rangeDate = new Date();
 am5.time.add(rangeDate, "day", Math.round(series.dataItems.length / 2));
-let rangeTime = rangeDate.getTime();
+var rangeTime = rangeDate.getTime();
 
 // add series range
-const seriesRangeDataItem = xAxis.makeDataItem({});
-const seriesRange = series.createAxisRange(seriesRangeDataItem);
+var seriesRangeDataItem = xAxis.makeDataItem({});
+var seriesRange = series.createAxisRange(seriesRangeDataItem);
 seriesRange.fills.template.setAll({
   visible: true,
   opacity: 0.3
@@ -119,14 +122,14 @@ seriesRange.fills.template.set("fillPattern", am5.LinePattern.new(root, {
 
 seriesRange.strokes.template.set("stroke", am5.color(0xff0000));
 
-xAxis.onPrivate("max", (value) => {
+xAxis.onPrivate("max", function (value) {
   seriesRangeDataItem.set("endValue", value);
   seriesRangeDataItem.set("value", rangeTime);
 });
 
 // add axis range
-const range = xAxis.createAxisRange(xAxis.makeDataItem({}));
-const color = root.interfaceColors.get("primaryButton");
+var range = xAxis.createAxisRange(xAxis.makeDataItem({}));
+var color = root.interfaceColors.get("primaryButton");
 
 range.set("value", rangeDate.getTime());
 range.get("grid").setAll({
@@ -134,7 +137,7 @@ range.get("grid").setAll({
   stroke: color
 });
 
-const resizeButton = am5.Button.new(root, {
+var resizeButton = am5.Button.new(root, {
   themeTags: ["resize", "horizontal"],
   icon: am5.Graphics.new(root, {
     themeTags: ["icon"]
@@ -142,21 +145,21 @@ const resizeButton = am5.Button.new(root, {
 });
 
 // restrict from being dragged vertically
-resizeButton.adapters.add("y", () => {
+resizeButton.adapters.add("y", function () {
   return 0;
 });
 
 // restrict from being dragged outside of plot
-resizeButton.adapters.add("x", (x) => {
+resizeButton.adapters.add("x", function (x) {
   return Math.max(0, Math.min(chart.plotContainer.width(), x));
 });
 
 // change range when x changes
-resizeButton.events.on("dragged", () => {
-  let x = resizeButton.x();
-  let position = xAxis.toAxisPosition(x / chart.plotContainer.width());
+resizeButton.events.on("dragged", function () {
+  var x = resizeButton.x();
+  var position = xAxis.toAxisPosition(x / chart.plotContainer.width());
 
-  let value = xAxis.positionToValue(position);
+  var value = xAxis.positionToValue(position);
 
   range.set("value", value);
 
@@ -171,6 +174,6 @@ range.set("bullet", am5xy.AxisBullet.new(root, {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);

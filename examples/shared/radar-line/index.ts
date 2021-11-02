@@ -4,6 +4,7 @@ import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
+
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
@@ -60,7 +61,10 @@ const series = chart.series.push(am5radar.RadarLineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
-  categoryXField: "category"
+  categoryXField: "category",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
 
 series.bullets.push(() => {
@@ -71,9 +75,6 @@ series.bullets.push(() => {
     })
   });
 });
-
-const tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.label.set("text", "{valueY}");
 
 
 // Add scrollbars

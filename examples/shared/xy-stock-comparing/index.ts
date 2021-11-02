@@ -132,20 +132,21 @@ const valueTooltip = valueSeries1.set("tooltip", am5.Tooltip.new(root, {
   getStrokeFromSprite: true,
   getLabelFillFromSprite: true,
   autoTextColor: false,
-  pointerOrientation: "horizontal"
+  pointerOrientation: "horizontal",
+  labelText: "{name}: {valueY} {valueYChangePercent.formatNumber('[#00ff00]+#,###.##|[#ff0000]#,###.##|[#999999]0')}%"
 }));
 valueTooltip.get("background")!.set("fill", root.interfaceColors.get("background"));
-valueTooltip.label.set("text", "{name}: {valueY} {valueYChangePercent.formatNumber('[#00ff00]+#,###.##|[#ff0000]#,###.##|[#999999]0')}%");
 
 const valueTooltip2 = valueSeries2.set("tooltip", am5.Tooltip.new(root, {
   getFillFromSprite: false,
   getStrokeFromSprite: true,
   getLabelFillFromSprite: true,
   autoTextColor: false,
-  pointerOrientation: "horizontal"
+  pointerOrientation: "horizontal",
+  labelText: "{name}: {valueY} {valueYChangePercent.formatNumber('[#00ff00]+#,###.##|[#ff0000]#,###.##|[#999999]0')}%"
 }));
 valueTooltip2.get("background")!.set("fill", root.interfaceColors.get("background"));
-valueTooltip2.label.set("text", "{name}: {valueY} {valueYChangePercent.formatNumber('[#00ff00]+#,###.##|[#ff0000]#,###.##|[#999999]0')}%");
+
 
 const firstColor = chart.get("colors")!.getIndex(0);
 const volumeSeries = chart.series.push(am5xy.ColumnSeries.new(root, {
@@ -157,16 +158,16 @@ const volumeSeries = chart.series.push(am5xy.ColumnSeries.new(root, {
   valueYGrouped: "sum",
   xAxis: dateAxis,
   yAxis: volumeAxis,
-  legendValueText: "{valueY}"
+  legendValueText: "{valueY}",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
 volumeSeries.columns.template.setAll({
   strokeWidth: 0.2,
   strokeOpacity: 1,
   stroke: am5.color(0xffffff)
 });
-
-const volumeTooltip = volumeSeries.set("tooltip", am5.Tooltip.new(root, {}));
-volumeTooltip.label.set("text", "{valueY}");
 
 
 // Add legend to axis header

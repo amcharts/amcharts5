@@ -2,10 +2,9 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
-
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-let root = am5.Root.new("chartdiv");
+var root = am5.Root.new("chartdiv");
 
 
 // Set themes
@@ -17,7 +16,7 @@ root.setThemes([
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
-let chart = root.container.children.push(am5xy.XYChart.new(root, {
+var chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,
   panY: true,
   wheelX: "panX",
@@ -29,13 +28,13 @@ chart.get("colors").set("step", 3);
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
+var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false);
 
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0.3,
   baseInterval: {
     timeUnit: "day",
@@ -45,7 +44,7 @@ let xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   tooltip: am5.Tooltip.new(root, {})
 }));
 
-let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   maxDeviation: 0.3,
   renderer: am5xy.AxisRendererY.new(root, {})
 }));
@@ -53,22 +52,24 @@ let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-let series = chart.series.push(am5xy.LineSeries.new(root, {
+var series = chart.series.push(am5xy.LineSeries.new(root, {
   name: "Series 1",
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value1",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueX}: {valueY}\n{previousDate}: {value2}"
+  })
 }));
+
 series.strokes.template.setAll({
   strokeWidth: 2
 });
 
-let tooltip = series.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip.get("background").set("fillOpacity", 0.5);
-tooltip.label.set("text", "{valueX}: {valueY}\n{previousDate}: {value2}");
+series.get("tooltip").get("background").set("fillOpacity", 0.5);
 
-let series2 = chart.series.push(am5xy.LineSeries.new(root, {
+var series2 = chart.series.push(am5xy.LineSeries.new(root, {
   name: "Series 2",
   xAxis: xAxis,
   yAxis: yAxis,
@@ -80,8 +81,6 @@ series2.strokes.template.setAll({
   strokeWidth: 2
 });
 
-
-
 // Set date fields
 // https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
 root.dateFormatter.setAll({
@@ -91,7 +90,7 @@ root.dateFormatter.setAll({
 
 
 // Set data
-let data = [{
+var data = [{
   date: new Date(2019, 5, 12).getTime(),
   value1: 50,
   value2: 48,
@@ -133,7 +132,7 @@ series2.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 series2.appear(1000);
 chart.appear(1000, 100);

@@ -180,8 +180,10 @@ export interface IAxisPrivate extends IComponentPrivate {
 	 */
 	updateScrollbar?: boolean;
 
+	/**
+	 * @ignore
+	 */
 	maxZoomFactor?: number;
-
 }
 
 export interface IAxisDataItem extends IComponentDataItem {
@@ -655,7 +657,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			if (tooltip) {
 				const rendererTags = renderer.get("themeTags");
 				tooltip.addTag("axis");
-				tooltip.addTag(this.getPrivate("name", ""));
+				tooltip.addTag(this.className.toLowerCase());
 				tooltip._applyThemes();
 
 				if (rendererTags) {

@@ -80,13 +80,12 @@ for (let i = 0; i < 10; i++) {
     yAxis: yAxis,
     valueYField: "value",
     valueXField: "date",
-    legendValueText: "{valueY}"
+    legendValueText: "{valueY}",
+    tooltip: am5.Tooltip.new(root, {
+      labelText: "{valueY}",
+      pointerOrientation: "horizontal"
+    })
   }));
-
-  let tooltip = series.set("tooltip", am5.Tooltip.new(root, {
-    pointerOrientation: "horizontal"
-  }));
-  tooltip.label.set("text", "{valueY}");
 
   date = new Date();
   date.setHours(0, 0, 0, 0);

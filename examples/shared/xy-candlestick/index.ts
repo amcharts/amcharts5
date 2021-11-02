@@ -5,14 +5,11 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-const root = am5.Root.new("chartdiv");
-
+var root = am5.Root.new("chartdiv");
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
-root.setThemes([
-  am5themes_Animated.new(root)
-]);
+root.setThemes([am5themes_Animated.new(root)]);
 
 function generateChartData() {
   var chartData = [];
@@ -25,150 +22,135 @@ function generateChartData() {
     newDate.setDate(newDate.getDate() + i);
 
     value += Math.round((Math.random() < 0.5 ? 1 : -1) * Math.random() * 10);
-    let open = value + Math.round(Math.random() * 16 - 8);
-    let low = Math.min(value, open) - Math.round(Math.random() * 5);
-    let high = Math.max(value, open) + Math.round(Math.random() * 5);
+    var open = value + Math.round(Math.random() * 16 - 8);
+    var low = Math.min(value, open) - Math.round(Math.random() * 5);
+    var high = Math.max(value, open) + Math.round(Math.random() * 5);
 
     chartData.push({
       date: newDate.getTime(),
       value: value,
       open: open,
       low: low,
-      high: high,
+      high: high
     });
   }
   return chartData;
 }
 
-const data = generateChartData();
-
+var data = generateChartData();
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
-const chart = root.container.children.push(am5xy.XYChart.new(root, {
-  focusable: true,
-  panX: true,
-  panY: true,
-  wheelX: "panX",
-  wheelY: "zoomX"
-}));
-
+var chart = root.container.children.push(
+  am5xy.XYChart.new(root, {
+    focusable: true,
+    panX: true,
+    panY: true,
+    wheelX: "panX",
+    wheelY: "zoomX"
+  })
+);
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-  groupData: true,
-  baseInterval: { timeUnit: "day", count: 1 },
-  renderer: am5xy.AxisRendererX.new(root, {}),
-  tooltip: am5.Tooltip.new(root, {})
-}));
+var xAxis = chart.xAxes.push(
+  am5xy.DateAxis.new(root, {
+    groupData: true,
+    baseInterval: { timeUnit: "day", count: 1 },
+    renderer: am5xy.AxisRendererX.new(root, {}),
+    tooltip: am5.Tooltip.new(root, {})
+  })
+);
 
-const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  renderer: am5xy.AxisRendererY.new(root, {})
-}));
+var yAxis = chart.yAxes.push(
+  am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererY.new(root, {})
+  })
+);
 
-
-const color = root.interfaceColors.get("background");
-
+var color = root.interfaceColors.get("background");
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-const series = chart.series.push(am5xy.CandlestickSeries.new(root, {
-  fill: color,
-  calculateAggregates: true,
-  stroke: color,
-  name: "MDXI",
-  xAxis: xAxis,
-  yAxis: yAxis,
-  valueYField: "value",
-  openValueYField: "open",
-  lowValueYField: "low",
-  highValueYField: "high",
-  valueXField: "date",
-  lowValueYGrouped: "low",
-  highValueYGrouped: "high",
-  openValueYGrouped: "open",
-  valueYGrouped: "close",
-  legendValueText: "open: {openValueY} low: {lowValueY} high: {highValueY} close: {valueY}",
-  legendRangeValueText: "{valueYClose}"
-}));
-
-series.data.setAll(data);
-
-const tooltip = am5.Tooltip.new(root, {
-  pointerOrientation: "vertical"
-});
-
-tooltip.label.setAll({
-  fill: root.interfaceColors.get("text"),
-  text: "open: {openValueY}\nlow: {lowValueY}\nhigh: {highValueY}\nclose: {valueY}"
-});
-
-const tooltipBg = tooltip.get("background");
-tooltipBg.set("strokeWidth", 2);
-tooltipBg.adapters.add("stroke", (stroke, target) => {
-  let dataItem = tooltip.dataItem as am5.DataItem<am5xy.ICandlestickSeriesDataItem>;
-  if (dataItem) {
-    let column = dataItem.get("graphics");
-    if (column) {
-      return column.get("fill");
-    }
-  }
-  return stroke;
-})
-series.set("tooltip", tooltip);
-
+var series = chart.series.push(
+  am5xy.CandlestickSeries.new(root, {
+    fill: color,
+    calculateAggregates: true,
+    stroke: color,
+    name: "MDXI",
+    xAxis: xAxis,
+    yAxis: yAxis,
+    valueYField: "value",
+    openValueYField: "open",
+    lowValueYField: "low",
+    highValueYField: "high",
+    valueXField: "date",
+    lowValueYGrouped: "low",
+    highValueYGrouped: "high",
+    openValueYGrouped: "open",
+    valueYGrouped: "close",
+    legendValueText:
+      "open: {openValueY} low: {lowValueY} high: {highValueY} close: {valueY}",
+    legendRangeValueText: "{valueYClose}",
+    tooltip: am5.Tooltip.new(root, {
+      pointerOrientation: "horizontal",
+      labelText: "open: {openValueY}\nlow: {lowValueY}\nhigh: {highValueY}\nclose: {valueY}"
+    })
+  })
+);
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
-  xAxis: xAxis
-}));
+var cursor = chart.set(
+  "cursor",
+  am5xy.XYCursor.new(root, {
+    xAxis: xAxis
+  })
+);
 cursor.lineY.set("visible", false);
-
 
 // Stack axes vertically
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Stacked_axes
 chart.leftAxesContainer.set("layout", root.verticalLayout);
 
-
 // Add scrollbar
 // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-const scrollbar = am5xy.XYChartScrollbar.new(root, {
+var scrollbar = am5xy.XYChartScrollbar.new(root, {
   orientation: "horizontal",
   height: 50
 });
 chart.set("scrollbarX", scrollbar);
 
-const sbxAxis = scrollbar.chart.xAxes.push(am5xy.DateAxis.new(root, {
-  groupData: true,
-  groupIntervals: [{ timeUnit: "week", count: 1 }],
-  baseInterval: { timeUnit: "day", count: 1 },
-  renderer: am5xy.AxisRendererX.new(root, {
-    opposite: false,
-    strokeOpacity: 0
+var sbxAxis = scrollbar.chart.xAxes.push(
+  am5xy.DateAxis.new(root, {
+    groupData: true,
+    groupIntervals: [{ timeUnit: "week", count: 1 }],
+    baseInterval: { timeUnit: "day", count: 1 },
+    renderer: am5xy.AxisRendererX.new(root, {
+      opposite: false,
+      strokeOpacity: 0
+    })
   })
-}));
+);
 
-const sbyAxis = scrollbar.chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  renderer: am5xy.AxisRendererY.new(root, {})
-}));
+var sbyAxis = scrollbar.chart.yAxes.push(
+  am5xy.ValueAxis.new(root, {
+    renderer: am5xy.AxisRendererY.new(root, {})
+  })
+);
 
-const sbseries = scrollbar.chart.series.push(am5xy.LineSeries.new(root, {
-  xAxis: sbxAxis,
-  yAxis: sbyAxis,
-  valueYField: "value",
-  valueXField: "date"
-}));
-
-sbseries.data.setAll(data);
-
+var sbseries = scrollbar.chart.series.push(
+  am5xy.LineSeries.new(root, {
+    xAxis: sbxAxis,
+    yAxis: sbyAxis,
+    valueYField: "value",
+    valueXField: "date"
+  })
+);
 
 // Add legend
 // https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-const legend = yAxis.axisHeader.children.push(
-  am5.Legend.new(root, {})
-);
+var legend = yAxis.axisHeader.children.push(am5.Legend.new(root, {}));
 
 legend.data.push(series);
 
@@ -183,8 +165,11 @@ legend.markerRectangles.template.setAll({
   cornerRadiusBL: 0
 });
 
+// set data
+series.data.setAll(data);
+sbseries.data.setAll(data);
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);

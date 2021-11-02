@@ -81,7 +81,10 @@ const series1 = chart.series.push(am5xy.StepLineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value1",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
 series1.fills.template.setAll({
   fillOpacity: 0.5,
@@ -94,18 +97,16 @@ const series2 = chart.series.push(am5xy.StepLineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value2",
-  valueXField: "date"
+  valueXField: "date",
+  tooltip: am5.Tooltip.new(root, {
+    labelText: "{valueY}"
+  })
 }));
 series2.fills.template.setAll({
   fillOpacity: 0.5,
   visible: true
 });
 
-const tooltip1 = series1.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip1.label.set("text", "{valueY}");
-
-const tooltip2 = series2.set("tooltip", am5.Tooltip.new(root, {}));
-tooltip2.label.set("text", "{valueY}");
 
 // Add scrollbar
 // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/

@@ -71,16 +71,16 @@ series.columns.template.setAll({
 });
 
 // Make each column to be of a different color
-series.columns.template.adapters.add("fill", (fill, target) => {
-  return chart.get("colors").getIndex(series.columns.indexOf(target as any));
+series.columns.template.adapters.add("fill", function (fill, target) {
+  return chart.get("colors").getIndex(series.columns.indexOf(target ));
 });
 
-series.columns.template.adapters.add("stroke", (stroke, target) => {
-  return chart.get("colors").getIndex(series.columns.indexOf(target as any));
+series.columns.template.adapters.add("stroke", function (stroke, target) {
+  return chart.get("colors").getIndex(series.columns.indexOf(target ));
 });
 
 // Add Label bullet
-series.bullets.push(() => {
+series.bullets.push(function () {
   return am5.Bullet.new(root, {
     locationY: 1,
     sprite: am5.Label.new(root, {
@@ -137,13 +137,13 @@ xAxis.data.setAll(data);
 series.data.setAll(data);
 
 // update data with random values each 1.5 sec
-setInterval(() => {
+setInterval(function () {
   updateData();
 }, 1500)
 
 function updateData() {
-  am5.array.each(series.dataItems, (dataItem) => {
-    let value = dataItem.get("valueY") + Math.round(Math.random() * 300 - 150);
+  am5.array.each(series.dataItems, function (dataItem) {
+    var value = dataItem.get("valueY") + Math.round(Math.random() * 300 - 150);
     if (value < 0) {
       value = 10;
     }
@@ -162,9 +162,9 @@ function updateData() {
 
 
 // Get series item by category
-function getSeriesItem(category: string) {
-  for (let i = 0; i < series.dataItems.length; i++) {
-    let dataItem = series.dataItems[i];
+function getSeriesItem(category) {
+  for (var i = 0; i < series.dataItems.length; i++) {
+    var dataItem = series.dataItems[i];
     if (dataItem.get("categoryX") == category) {
       return dataItem;
     }
@@ -176,21 +176,21 @@ function getSeriesItem(category: string) {
 function sortCategoryAxis() {
 
   // Sort by value
-  series.dataItems.sort((x, y) => {
+  series.dataItems.sort(function (x, y) {
     return y.get("valueY") - x.get("valueY"); // descending
     //return y.get("valueY") - x.get("valueY"); // ascending
   })
 
   // Go through each axis item
-  am5.array.each(xAxis.dataItems, (dataItem) => {
+  am5.array.each(xAxis.dataItems, function (dataItem) {
     // get corresponding series item
-    let seriesDataItem = getSeriesItem(dataItem.get("category"));
+    var seriesDataItem = getSeriesItem(dataItem.get("category"));
 
     if (seriesDataItem) {
       // get index of series data item
-      let index = series.dataItems.indexOf(seriesDataItem);
+      var index = series.dataItems.indexOf(seriesDataItem);
       // calculate delta position
-      let deltaPosition = (index - dataItem.get("index", 0)) / series.dataItems.length;
+      var deltaPosition = (index - dataItem.get("index", 0)) / series.dataItems.length;
       // set index to be the same as series data item index
       dataItem.set("index", index);
       // set deltaPosition instanlty
@@ -208,13 +208,13 @@ function sortCategoryAxis() {
   // Sort axis items by index.
   // This changes the order instantly, but as deltaPosition is set,
   // they keep in the same places and then animate to true positions.
-  xAxis.dataItems.sort((x, y) => {
+  xAxis.dataItems.sort(function (x, y) {
     return x.get("index") - y.get("index");
   });
 }
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/
 series.appear(1000);
 chart.appear(1000, 100);
