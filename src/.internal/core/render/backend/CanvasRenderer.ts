@@ -2707,7 +2707,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 		// Monitor for possible pixel ratio changes (when page is zoomed)
 		window.addEventListener("resize", (_ev) => {
-			this.resolution = window.devicePixelRatio * 2;
+			this.resolution = window.devicePixelRatio;
 		});
 
 		// We need this in order top prevent default touch gestures when dragging
