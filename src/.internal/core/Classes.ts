@@ -95,6 +95,7 @@ import type { RadialGradient } from "./render/gradients/RadialGradient";
 import type { RadialLabel } from "./render/RadialLabel";
 import type { RadialText } from "./render/RadialText";
 import type { Rectangle } from "./render/Rectangle";
+import type { Triangle } from "./render/Triangle";
 import type { RectanglePattern } from "./render/patterns/RectanglePattern";
 import type { RoundedRectangle } from "./render/RoundedRectangle";
 import type { Sankey } from "./../charts/flow/Sankey";
@@ -222,6 +223,7 @@ export interface IClasses {
 	"RadialLabel": RadialLabel;
 	"RadialText": RadialText;
 	"Rectangle": Rectangle;
+	"Triangle": Triangle;
 	"RectanglePattern": RectanglePattern;
 	"RoundedRectangle": RoundedRectangle;
 	"Sankey": Sankey;

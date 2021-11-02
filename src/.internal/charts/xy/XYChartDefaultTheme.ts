@@ -44,63 +44,6 @@ export class XYChartDefaultTheme extends Theme {
 			arrangeTooltips: true
 		});
 
-		/**
-		 * ------------------------------------------------------------------------
-		 * charts/xy: ZoomOutButton
-		 * ------------------------------------------------------------------------
-		 */
-
-		r("Button", ["zoom"]).setAll({
-			paddingTop: 18,
-			paddingBottom: 18,
-			paddingLeft: 12,
-			paddingRight: 12,
-			centerX: 46,
-			centerY: -10,
-			y: 0,
-			x: p100,
-			role: "button",
-			ariaLabel: language.translate("Zoom Out"),
-			layer: 40
-		});
-
-		{
-			const rule = r("RoundedRectangle", ["background", "button", "zoom"]);
-
-			rule.setAll({
-				cornerRadiusBL: 40,
-				cornerRadiusBR: 40,
-				cornerRadiusTL: 40,
-				cornerRadiusTR: 40
-			});
-
-			setColor(rule, "fill", ic, "primaryButton");
-		}
-
-		{
-			const rule = r("RoundedRectangle", ["background", "button", "zoom"]).states.create("hover", {});
-			setColor(rule, "fill", ic, "primaryButtonHover");
-		}
-
-		{
-			const rule = r("RoundedRectangle", ["background", "button", "zoom"]).states.create("down", { stateAnimationDuration: 0 });
-			setColor(rule, "fill", ic, "primaryButtonDown");
-		}
-
-		{
-			const rule = r("Graphics", ["icon", "button", "zoom"]);
-
-			rule.setAll({
-				strokeOpacity: 0.7,
-				draw: (display: any) => {
-					display.moveTo(0, 0);
-					display.lineTo(12, 0);
-				}
-			});
-
-			setColor(rule, "stroke", ic, "primaryButtonText");
-		}
-
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -174,9 +117,9 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		r("AxisLabel", ["category"]).setAll({
-			text:"{category}",
-			populateText:true
-		});		
+			text: "{category}",
+			populateText: true
+		});
 
 		r("AxisLabel", ["x"]).setAll({
 			centerY: 0
@@ -581,11 +524,11 @@ export class XYChartDefaultTheme extends Theme {
 			valueXGrouped: "close",
 			valueYGrouped: "close",
 
-			seriesTooltipTarget:"series"
+			seriesTooltipTarget: "series"
 		});
 
 		r("BaseColumnSeries").setAll({
-			adjustBulletPosition:true
+			adjustBulletPosition: true
 		});
 
 		r("ColumnSeries").setAll({

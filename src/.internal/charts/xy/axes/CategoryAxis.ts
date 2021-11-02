@@ -6,8 +6,8 @@ import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
 import * as $utils from "../../../core/util/Utils";
-
-
+import { populateString } from "../../../core/util/PopulateString";
+import type { Tooltip } from "../../../core/render/Tooltip";
 
 export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
 
@@ -505,11 +505,19 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 */
 	public getTooltipText(position: number): string | undefined {
 		//@todo number formatter + tag
-		let dataItem = this.dataItems[this.axisPositionToIndex(position)];
+		const dataItem = this.dataItems[this.axisPositionToIndex(position)];
 		if (dataItem) {
-			return dataItem.get("category");
+			const label = dataItem.get("label")
+			if(label){
+				return populateString(label, this.get("tooltipText", ""));
+			}
 		}
 	}
+
+	protected _updateTooltipText(tooltip: Tooltip, position: number) {
+		tooltip._setDataItem(this.dataItems[this.axisPositionToIndex(position)]);
+		tooltip.label.text.markDirtyText();
+	}	
 
 	/**
 	 * Returns a data item from series that is closest to the `position`.

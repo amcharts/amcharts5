@@ -19,6 +19,11 @@ import { Color } from "../util/Color";
 export interface ITooltipSettings extends IContainerSettings {
 
 	/**
+	 * @todo review
+	 */
+	labelText?: string
+
+	/**
 	 * A direction of the tooltip pointer.
 	 *
 	 * https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Orientation
@@ -161,6 +166,14 @@ export class Tooltip extends Container {
 	public dispose() {
 		super.dispose();
 		$array.remove(this._root._tooltips, this);
+	}
+
+	public _updateChildren() {
+		super._updateChildren();
+		const labelText = this.get("labelText");
+		if (labelText != null) {
+			this.label.set("text", this.get("labelText"));
+		}
 	}
 
 	public _changed() {

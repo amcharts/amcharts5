@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.0-beta.44] - 2021-11-02 (release candidate)
+
+### Added
+- `Triangle` class added.
+- `labelText` setting added to `Tooltip`. If set the text will automatically be applied to tooltip's label.
+
+
 ## [5.0.0-beta.43] - 2021-11-02
 
 ### Fixed

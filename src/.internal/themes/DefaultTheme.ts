@@ -546,6 +546,63 @@ export class DefaultTheme extends Theme {
 			setColor(rule, "fill", ic, "primaryButtonText");
 		}
 
+		/**
+		 * ------------------------------------------------------------------------
+		 * charts/xy: ZoomOutButton
+		 * ------------------------------------------------------------------------
+		 */
+
+		r("Button", ["zoom"]).setAll({
+			paddingTop: 18,
+			paddingBottom: 18,
+			paddingLeft: 12,
+			paddingRight: 12,
+			centerX: 46,
+			centerY: -10,
+			y: 0,
+			x: p100,
+			role: "button",
+			ariaLabel: language.translate("Zoom Out"),
+			layer: 40
+		});
+
+		{
+			const rule = r("RoundedRectangle", ["background", "button", "zoom"]);
+
+			rule.setAll({
+				cornerRadiusBL: 40,
+				cornerRadiusBR: 40,
+				cornerRadiusTL: 40,
+				cornerRadiusTR: 40
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = r("RoundedRectangle", ["background", "button", "zoom"]).states.create("hover", {});
+			setColor(rule, "fill", ic, "primaryButtonHover");
+		}
+
+		{
+			const rule = r("RoundedRectangle", ["background", "button", "zoom"]).states.create("down", { stateAnimationDuration: 0 });
+			setColor(rule, "fill", ic, "primaryButtonDown");
+		}
+
+		{
+			const rule = r("Graphics", ["icon", "button", "zoom"]);
+
+			rule.setAll({
+				strokeOpacity: 0.7,
+				draw: (display: any) => {
+					display.moveTo(0, 0);
+					display.lineTo(12, 0);
+				}
+			});
+
+			setColor(rule, "stroke", ic, "primaryButtonText");
+		}
+
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -858,6 +915,10 @@ export class DefaultTheme extends Theme {
 		r("Label", ["axis", "tooltip", "x"]).setAll({
 			textAlign: "center"
 		});
+
+		r("Tooltip", ["axis", "category"]).setAll({
+			labelText: "{category}"
+		})	
 
 		/**
 		 * ------------------------------------------------------------------------

@@ -21,6 +21,7 @@ export { PointedRectangle } from "./.internal/core/render/PointedRectangle";
 export { RadialLabel } from "./.internal/core/render/RadialLabel";
 export { RadialText } from "./.internal/core/render/RadialText";
 export { Rectangle } from "./.internal/core/render/Rectangle";
+export { Triangle } from "./.internal/core/render/Triangle";
 export { RoundedRectangle } from "./.internal/core/render/RoundedRectangle";
 export { Scrollbar } from "./.internal/core/render/Scrollbar";
 export { Slider } from "./.internal/core/render/Slider";

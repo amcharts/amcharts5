@@ -655,7 +655,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			if (tooltip) {
 				const rendererTags = renderer.get("themeTags");
 				tooltip.addTag("axis");
+				tooltip.addTag(this.getPrivate("name", ""));
 				tooltip._applyThemes();
+
 				if (rendererTags) {
 					tooltip.set("themeTags", $utils.mergeTags(tooltip.get("themeTags"), rendererTags));
 					tooltip.label._applyThemes();
@@ -897,7 +899,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
 				}
 				if (!$type.isNaN(position)) {
-					tooltip.label.set("text", this.getTooltipText(position));
+					this._updateTooltipText(tooltip, position);
 					renderer.positionTooltip(tooltip, position);
 
 					if (position < this.get("start") || position > this.get("end")) {
@@ -912,6 +914,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				}
 			}
 		}
+	}
+
+	protected _updateTooltipText(tooltip: Tooltip, position: number) {
+		tooltip.label.set("text", this.getTooltipText(position));
 	}
 
 	/**
