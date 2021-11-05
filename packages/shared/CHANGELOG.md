@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.1] - 2021-11-05
+
+### Fixed
+- `XYChart` with panning enabled an no Animated theme was flickering while panning.
+- JS error could occur sometimes if data was updated while cursor was moving over the chart.
+
+
 ## [5.0.0] - 2021-11-02
 
 ### Changed

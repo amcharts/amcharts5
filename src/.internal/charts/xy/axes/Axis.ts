@@ -253,6 +253,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	protected _series: Array<this["_seriesType"]> = [];
 
+	public _isPanning:boolean = false;
+
 	/**
 	 * A [[Container]] that holds all the axis label elements.
 	 *

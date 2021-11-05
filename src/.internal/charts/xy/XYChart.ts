@@ -499,6 +499,12 @@ export class XYChart extends SerialChart {
 	protected _handlePlotUp(_event: IPointerEvent) {
 		// TODO: handle multitouch
 		this._downPoint = undefined;
+		this.xAxes.each((xAxis) => {
+			xAxis._isPanning = false;
+		})
+		this.yAxes.each((yAxis) => {
+			yAxis._isPanning = false;
+		})
 	}
 
 	protected _handlePlotMove(event: IPointerEvent) {
@@ -522,6 +528,7 @@ export class XYChart extends SerialChart {
 
 				this.xAxes.each((axis) => {
 					if (axis.get("panX")) {
+						axis._isPanning = true;
 						//const maxDeviation = axis.get("maxDeviation", 0);
 						let panStart = axis._panStart;
 						let panEnd = axis._panEnd;
@@ -554,6 +561,7 @@ export class XYChart extends SerialChart {
 
 				this.yAxes.each((axis) => {
 					if (axis.get("panY")) {
+						axis._isPanning = true;
 						//const maxDeviation = axis.get("maxDeviation", 0);
 
 						let panStart = axis._panStart;

@@ -265,7 +265,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._dirtyExtremes = false;
 		}
 
-		if (this._dirtySelectionExtremes) {
+		if (this._dirtySelectionExtremes && !this._isPanning) {
 			this._getSelectionMinMax();
 			this._dirtySelectionExtremes = false;
 		}

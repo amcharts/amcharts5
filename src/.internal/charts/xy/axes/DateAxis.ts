@@ -179,7 +179,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					if (this.get("groupData")) {
 						$array.each(this.series, (series) => {
 							this._groupSeriesData(series);
-						})						
+						})
 					}
 					else {
 						let baseInterval = this.get("baseInterval");
@@ -332,7 +332,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						})
 					}
 					previousTime = roundedTime;
-				})				
+				})
 
 				if (series._dataSets[dataSetId].length < this.get("groupCount", Infinity)) {
 					return false
@@ -573,8 +573,18 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @ignore
 	 */
 	public getDataItemPositionX(dataItem: DataItem<IXYSeriesDataItem>, field: string, cellLocation: number, axisLocation: number): number {
-		let openValue = dataItem.open![field];
-		let closeValue = dataItem.close![field];
+
+		let openValue;
+		let closeValue;
+
+		if (dataItem.open && dataItem.close) {
+			openValue = dataItem.open[field];
+			closeValue = dataItem.close[field];
+		}
+		else {
+			openValue = dataItem.get(field as any)
+			closeValue = openValue;
+		}
 
 		let value = openValue + (closeValue - openValue) * cellLocation;
 
@@ -594,8 +604,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @ignore
 	 */
 	public getDataItemPositionY(dataItem: DataItem<IXYSeriesDataItem>, field: string, cellLocation: number, axisLocation: number): number {
-		let openValue = dataItem.open![field];
-		let closeValue = dataItem.close![field];
+		let openValue;
+		let closeValue;
+
+		if (dataItem.open && dataItem.close) {
+			openValue = dataItem.open[field];
+			closeValue = dataItem.close[field];
+		}
+		else {
+			openValue = dataItem.get(field as any)
+			closeValue = openValue;
+		}
 
 		let value = openValue + (closeValue - openValue) * cellLocation;
 
