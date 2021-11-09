@@ -781,6 +781,17 @@ export abstract class Sprite extends Entity {
 	/**
 	 * A [[DataItem]] used for this element.
 	 *
+	 * NOTE: data item is being assigned automatically in most cases where it
+	 * matters. Use this accessor to set data item only if you know what you're
+	 * doing.
+	 * 
+	 * @param  value  Data item
+	 */
+	public set dataItem(value: DataItem<IComponentDataItem> | undefined) {
+		this._setDataItem(value);
+	}
+
+	/**
 	 * @return DataItem
 	 */
 	public get dataItem(): DataItem<IComponentDataItem> | undefined {

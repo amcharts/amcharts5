@@ -342,6 +342,9 @@ export class Sunburst extends Partition {
 			let arc = Math.abs(slice.get("arc", 0));
 			let labelAngle = angle + arc / 2;
 
+			let maxWidth = radius - innerRadius;
+			let maxHeight = radius * arc * $math.RADIANS;			
+
 			if (innerRadius == 0 && arc >= 360) {
 				radius = 1;
 				labelAngle = 0;
@@ -352,8 +355,7 @@ export class Sunburst extends Partition {
 			label.setPrivate("radius", radius);
 			label.setPrivate("innerRadius", innerRadius);
 
-			let maxWidth = radius - innerRadius;
-			let maxHeight = radius * arc * $math.RADIANS;
+
 			if (arc >= 360) {
 				maxWidth *= 2;
 				maxHeight = maxWidth;

@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.3] - 2021-11-09
+
+### Fixed
+- Incorrect sizing of a label in a central `Sunburst` node.
+
+
 ## [5.0.2] - 2021-11-09
 
 ### Added
