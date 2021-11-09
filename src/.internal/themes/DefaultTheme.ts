@@ -391,6 +391,7 @@ export class DefaultTheme extends Theme {
 			centerX: p50,
 			inside: false,
 			radius: 0,
+			baseRadius:p100,
 			orientation: "auto",
 			textAlign: "center"
 		});

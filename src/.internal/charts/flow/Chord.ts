@@ -225,7 +225,9 @@ export class Chord extends Flow {
 				slice.setAll({ radius: radius, innerRadius: radius - nodeWidth, startAngle: startAngle as number, arc: endAngle - startAngle })
 
 				const label = dataItem.get("label");
-				label.setAll({ baseRadius: radius, labelAngle: startAngle + (endAngle - startAngle) / 2 });
+				label.setAll({ labelAngle: startAngle + (endAngle - startAngle) / 2 });
+				label.setPrivate("radius", radius);
+				label.setPrivate("innerRadius", 0.1);
 				i++;
 			})
 

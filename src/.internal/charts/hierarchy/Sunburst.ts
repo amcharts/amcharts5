@@ -340,20 +340,28 @@ export class Sunburst extends Partition {
 			let radius = slice.get("radius", 0);
 			let angle = slice.get("startAngle", 0);
 			let arc = Math.abs(slice.get("arc", 0));
+			let labelAngle = angle + arc / 2;
 
-			label.set("labelAngle", angle + arc / 2);
-			label.set("baseRadius", innerRadius);
-			label.set("radius", (radius - innerRadius) / 2)
+			if (innerRadius == 0 && arc >= 360) {
+				radius = 1;
+				labelAngle = 0;
+			}
 
+			label.set("labelAngle", labelAngle);
+
+			label.setPrivate("radius", radius);
+			label.setPrivate("innerRadius", innerRadius);
 
 			let maxWidth = radius - innerRadius;
-			let maxHeight = Math.PI * 2 * radius * arc / 360;
+			let maxHeight = radius * arc * $math.RADIANS;
 			if (arc >= 360) {
 				maxWidth *= 2;
 				maxHeight = maxWidth;
 			}
-			label.set("maxHeight", maxHeight);
-			label.set("maxWidth", maxWidth);
+			label.setAll({
+				maxHeight: maxHeight,
+				maxWidth: maxWidth
+			});
 		}
 	}
 
@@ -460,8 +468,8 @@ export class Sunburst extends Partition {
 
 	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?: number) {
 		const bullet = super._makeBullet(dataItem, bulletFunction, index);
-		
-		if(bullet){
+
+		if (bullet) {
 			const sprite = bullet.get("sprite");
 			const slice = dataItem.get("slice");
 

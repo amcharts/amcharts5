@@ -15,6 +15,32 @@ import { Disposer, IDisposer } from "./Disposer";
  * @hidden
  */
 
+/**
+ * Execute a function when DOM is ready.
+ * 
+ * @since 5.0.2
+ * @param  f  Callback
+ */
+export function ready(f: () => void): void {
+	if (document.readyState !== "loading") {
+		f();
+
+	} else {
+		const listener = () => {
+			if (document.readyState !== "loading") {
+				document.removeEventListener("readystatechange", listener);
+				f();
+			}
+		};
+
+		document.addEventListener("readystatechange", listener);
+	}
+}
+
+/**
+ * Removes a DOM element.
+ * @param  el  Target element
+ */
 export function removeElement(el: HTMLElement): void {
 	if (el.parentNode) {
 		el.parentNode.removeChild(el);

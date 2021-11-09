@@ -231,7 +231,8 @@ export class AxisRendererRadial extends AxisRenderer {
 
 			let radius = Math.hypot(point.x, point.y);
 
-			label.set("baseRadius", radius);
+			label.setPrivate("radius", radius);
+			label.setPrivate("innerRadius", radius);
 			label.set("labelAngle", this.get("axisAngle"));
 
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));

@@ -279,7 +279,8 @@ export class HierarchyDefaultTheme extends Theme {
 				populateText: true,
 				text: "{category}",
 				oversizedBehavior: "fit",
-				minScale: 0.4
+				minScale: 0.4,
+				baseRadius:p50
 			});
 
 			setColor(rule, "fill", ic, "alternativeText");

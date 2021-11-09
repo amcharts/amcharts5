@@ -1,6 +1,7 @@
 export { Root } from "./.internal/core/Root";
 export { Theme } from "./.internal/core/Theme";
 export { addLicense, registry, disposeAllRootElements } from "./.internal/core/Registry";
+export { ready } from "./.internal/core/util/Utils";
 
 export { Bullet } from "./.internal/core/render/Bullet";
 export { Button } from "./.internal/core/render/Button";

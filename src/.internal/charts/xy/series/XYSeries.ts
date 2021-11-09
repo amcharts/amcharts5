@@ -1134,11 +1134,11 @@ export abstract class XYSeries extends Series {
 			for (let s = 0; s < len; s++) {
 				let stackToSeries = this._couldStackTo[s];
 				let stackToItem = stackToSeries.dataItems[index];
+				let value = dataItem.get(field);
+				let stackValue = stackToItem.get(field);
 
 				if (stackToItem) {
 					if (stackToNegative) {
-						let value = dataItem.get(field);
-						let stackValue = stackToItem.get(field);
 						if ($type.isNumber(value)) {
 							if ($type.isNumber(stackValue)) {
 								if (value >= 0 && stackValue >= 0) {
@@ -1160,10 +1160,12 @@ export abstract class XYSeries extends Series {
 						}
 					}
 					else {
-						dataItem.setRaw(stackToItemKey, stackToItem);
-						this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
-						stackToSeries._stackedSeries[this.uid] = this;
-						break;
+						if ($type.isNumber(value) && $type.isNumber(stackValue)) {
+							dataItem.setRaw(stackToItemKey, stackToItem);
+							this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
+							stackToSeries._stackedSeries[this.uid] = this;
+							break;
+						}						
 					}
 				}
 			}
@@ -1209,7 +1211,8 @@ export abstract class XYSeries extends Series {
 
 		if (stackToItem) {
 			const stackedToSeries = stackToItem.component as XYSeries;
-			return stackToItem.get(key as any) * stackedToSeries.get("vcy", 1) + this.getStackedYValueWorking(stackToItem, key);
+
+			return stackToItem.get(key as any, 0) * stackedToSeries.get("vcy", 1) + this.getStackedYValueWorking(stackToItem, key);
 		}
 		return 0;
 	}
@@ -1222,7 +1225,7 @@ export abstract class XYSeries extends Series {
 
 		if (stackToItem) {
 			const stackedToSeries = stackToItem.component as XYSeries;
-			return stackToItem.get(key as any) * stackedToSeries.get("vcx", 1) + this.getStackedXValueWorking(stackToItem, key);
+			return stackToItem.get(key as any, 0) * stackedToSeries.get("vcx", 1) + this.getStackedXValueWorking(stackToItem, key);
 		}
 		return 0;
 	}
@@ -1234,7 +1237,7 @@ export abstract class XYSeries extends Series {
 		const stackToItem = dataItem.get("stackToItemY");
 
 		if (stackToItem) {
-			return stackToItem.get(key as any) + this.getStackedYValue(stackToItem, key);
+			return stackToItem.get(key as any, 0) + this.getStackedYValue(stackToItem, key);
 		}
 		return 0;
 	}
@@ -1246,7 +1249,7 @@ export abstract class XYSeries extends Series {
 		const stackToItem = dataItem.get("stackToItemX");
 
 		if (stackToItem) {
-			return stackToItem.get(key as any) + this.getStackedXValue(stackToItem, key);
+			return stackToItem.get(key as any, 0) + this.getStackedXValue(stackToItem, key);
 		}
 		return 0;
 	}

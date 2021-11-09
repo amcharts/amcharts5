@@ -521,6 +521,9 @@ export class LineSeries extends XYSeries {
 
 							if (stackToItemX) {
 								xPos0 = o.xAxis.getDataItemPositionX(stackToItemX, o.xField, itemLocationX, (stackToItemX.component as XYSeries).get("vcx"));
+								if($type.isNaN(xPos0)){
+									xPos0 = o.basePosX;
+								}								
 							}
 							else {
 								if (o.yAxis === o.baseAxis) {
@@ -533,6 +536,9 @@ export class LineSeries extends XYSeries {
 
 							if (stackToItemY) {
 								yPos0 = o.yAxis.getDataItemPositionY(stackToItemY, o.yField, itemLocationY, (stackToItemY.component as XYSeries).get("vcy"));
+								if($type.isNaN(yPos0)){
+									yPos0 = o.basePosY;
+								}
 							}
 							else {
 								if (o.xAxis === o.baseAxis) {

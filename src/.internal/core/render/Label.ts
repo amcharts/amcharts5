@@ -318,18 +318,18 @@ export class Label extends Container {
 
 		const maxWidth = this.get("maxWidth", Infinity);
 		if ($type.isNumber(maxWidth)) {
-			this.text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
+			this.text.set(vertical ? "maxWidth" : "maxHeight", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
 		}
 		else {
-			this.text.set(vertical ? "maxHeight" : "maxWidth", undefined);
+			this.text.set(vertical ? "maxWidth" : "maxHeight", undefined);
 		}
 
 		const maxHeight = this.get("maxHeight", Infinity);
 		if ($type.isNumber(maxHeight)) {
-			this.text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
+			this.text.set(vertical ? "maxHeight" : "maxWidth", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
 		}
 		else {
-			this.text.set(vertical ? "maxWidth" : "maxHeight", undefined);
+			this.text.set(vertical ? "maxHeight" : "maxWidth", undefined);
 		}
 	}
 

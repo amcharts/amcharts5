@@ -1,20 +1,47 @@
 // import * as $object from "../util/Object";
 import * as $math from "../util/Math";
+import * as $utils from "../util/Utils";
 import { p50, Percent } from "../util/Percent";
 import { Label, ILabelPrivate, ILabelSettings } from "./Label";
 import { RadialText } from "./RadialText";
 
 
 export interface IRadialLabelSettings extends ILabelSettings {
+	/**
+	 * @todo review
+	 */
 	labelAngle?: number;
+	/**
+	 * @todo review
+	 */
 	radius?: number;
-	baseRadius?: number;
+	/**
+	 * @todo review
+	 */
+	baseRadius?: number | Percent;
+	/**
+	 * @todo review
+	 */
 	maxAngle?: number;
+	/**
+	 * @todo review
+	 */
 	orientation?: "inward" | "outward" | "auto";
+	/**
+	 * @todo review
+	 */
 	inside?: boolean;
-
+	/**
+	 * @todo review
+	 */
 	textType?: "regular" | "circular" | "radial" | "aligned" | "adjusted";
+	/**
+	 * @todo review
+	 */
 	startAngle?: number;
+	/**
+	 * @todo review
+	 */
 	kerning?: number;
 }
 
@@ -25,6 +52,15 @@ export interface IRadialLabelPrivate extends ILabelPrivate {
 	 */
 	left?: boolean;
 
+	/**
+	 * @ignore
+	 */
+	radius?: number;
+
+	/**
+	 * @ignore
+	 */
+	innerRadius?: number;
 }
 
 export class RadialLabel extends Label {
@@ -48,17 +84,32 @@ export class RadialLabel extends Label {
 	public _makeText() {
 		this._text = this.children.push(RadialText.new(this._root, {}));
 	}
+	/**
+	 * @todo review
+	 */
+	public baseRadius() {
+		const radiusPrivate = this.getPrivate("radius", 0);
+		const innerRadiusPrivate = this.getPrivate("innerRadius", 0);
+		const baseRadius = this.get("baseRadius", 0);
+		return innerRadiusPrivate + $utils.relativeToValue(baseRadius, radiusPrivate - innerRadiusPrivate);
+	}
+	/**
+	 * @todo review
+	 */
+	public radius() {
+		const inside = this.get("inside", false);
+		return this.baseRadius() + this.get("radius", 0) * (inside ? -1 : 1);
+	}
 
 	public _updateChildren() {
 		super._updateChildren();
 
-		if (this.isDirty("baseRadius") || this.isDirty("labelAngle") || this.isDirty("radius") || this.isDirty("inside") || this.isDirty("orientation") || this.isDirty("textType")) {
+		if (this.isDirty("baseRadius") || this.isPrivateDirty("radius") || this.isPrivateDirty("innerRadius") || this.isDirty("labelAngle") || this.isDirty("radius") || this.isDirty("inside") || this.isDirty("orientation") || this.isDirty("textType")) {
 
 			const textType = this.get("textType", "adjusted");
 
 			const inside = this.get("inside", false);
-			const labelRadius = this.get("radius", 0);
-			const baseRadius = this.get("baseRadius", 0);
+
 			const orientation = this.get("orientation");
 			let labelAngle = $math.normalizeAngle(this.get("labelAngle", 0));
 
@@ -67,7 +118,9 @@ export class RadialLabel extends Label {
 
 			const sin = $math.sin(labelAngle);
 			const cos = $math.cos(labelAngle);
-			let radius = baseRadius + labelRadius * (inside ? -1 : 1);
+
+			let baseRadius = this.baseRadius();
+			let radius = this.radius();
 
 			this._display.angle = 0;
 

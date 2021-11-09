@@ -276,9 +276,11 @@ export class AxisRendererCircular extends AxisRenderer {
 			}
 
 			const radius = this.getPrivate("radius", 0);
+			const innerRadius = this.getPrivate("innerRadius", 0);
 			const angle = this.positionToAngle(position);
 
-			label.set("baseRadius", radius);
+			label.setPrivate("radius", radius);
+			label.setPrivate("innerRadius", innerRadius);
 			label.set("labelAngle", angle);
 
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));

@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.2] - 2021-11-09
+
+### Added
+- `radius()` and `baseRadius()` methods added to `RadialLabel`. Return `radius`/`baseRadius` value in pixels, calculated based on all the other settings.
+- Global function `am5.ready()` added. Accepts a function as a parameter, which is executed when DOM is ready.
+
+### Changed
+- `baseRadius` of `RadialLabel` can now accept Percent values. Previously this property was set internally, now user can set it to a number or percent value.
+
+### Fixed
+- Stacking line series with missing data on some series was incorrect.
+- `oversizedBehavior` on `Label` was not handling `maxWidth` and `maxHeight` values properly.
+
+
 ## [5.0.1] - 2021-11-05
 
 ### Fixed

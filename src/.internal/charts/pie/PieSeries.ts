@@ -191,7 +191,8 @@ export class PieSeries extends PercentSeries {
 
 						const label = dataItem.get("label");
 						if (label) {
-							label.set("baseRadius", radius);
+							label.setPrivate("radius", radius);
+							label.setPrivate("innerRadius", innerRadius);
 							label.set("labelAngle", middleAngle);
 
 							if (label.get("textType") == "aligned") {
@@ -249,7 +250,7 @@ export class PieSeries extends PercentSeries {
 			y = label.y();
 
 			if (label.get("textType") == "circular") {
-				const labelRadius = label.get("radius", 0) + label.get("baseRadius", 0) - label.get("paddingBottom", 0);
+				const labelRadius = label.radius() - label.get("paddingBottom", 0);
 				const labelAngle = label.get("labelAngle", 0);
 				x = labelRadius * $math.cos(labelAngle);
 				y = labelRadius * $math.sin(labelAngle);
