@@ -12,7 +12,7 @@ import type { IPoint } from "../../core/util/IPoint";
 import { XYChartDefaultTheme } from "./XYChartDefaultTheme";
 import { Container } from "../../core/render/Container";
 import { Rectangle } from "../../core/render/Rectangle";
-import { SerialChart, ISerialChartPrivate, ISerialChartSettings } from "../../core/render/SerialChart";
+import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
 import { ListAutoDispose } from "../../core/util/List";
 import { p100 } from "../../core/util/Percent";
 import { Color } from "../../core/util/Color";
@@ -23,6 +23,7 @@ import { Percent } from "../../core/util/Percent";
 import * as $array from "../../core/util/Array";
 import * as $order from "../../core/util/Order";
 import * as $type from "../../core/util/Type";
+import type { Animation } from "../../core/util/Entity";
 
 export interface IXYChartSettings extends ISerialChartSettings {
 
@@ -111,6 +112,32 @@ export interface IXYChartSettings extends ISerialChartSettings {
 export interface IXYChartPrivate extends ISerialChartPrivate {
 }
 
+
+export interface IXYChartEvents extends ISerialChartEvents {
+
+	/**
+	 * Invoked when panning starts.
+	 *
+	 * @since 5.0.4
+	 */
+	panstarted: {};
+
+	/**
+	 * Invoked when panning ends.
+	 * 
+	 * @since 5.0.4
+	 */
+	panended: {};
+
+	/**
+	 * Invoked when wheel caused zoom ends.
+	 * 
+	 * @since 5.0.4
+	 */
+	wheelended: {};
+
+}
+
 /**
  * Creates an XY chart.
  *
@@ -125,6 +152,7 @@ export class XYChart extends SerialChart {
 	declare public _settings: IXYChartSettings;
 	declare public _privateSettings: IXYChartPrivate;
 	declare public _seriesType: XYSeries;
+	declare public _events: IXYChartEvents;
 
 	/**
 	 * A list of horizontal axes.
@@ -330,7 +358,7 @@ export class XYChart extends SerialChart {
 							let newStart = start - wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
 							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
-								axis.zoom(newStart, newEnd);
+								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
 					})
@@ -348,7 +376,7 @@ export class XYChart extends SerialChart {
 							let newStart = start - wheelStep * (end - start) * shiftY * position;
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
 							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
-								axis.zoom(newStart, newEnd);
+								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
 					})
@@ -366,7 +394,7 @@ export class XYChart extends SerialChart {
 							let newStart = start - wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
 							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
-								axis.zoom(newStart, newEnd);
+								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
 					})
@@ -384,7 +412,7 @@ export class XYChart extends SerialChart {
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
 
 							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
-								axis.zoom(newStart, newEnd);
+								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
 					})
@@ -401,8 +429,8 @@ export class XYChart extends SerialChart {
 
 							let newStart = start + wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-
-							axis.zoom(newStart, newEnd);
+							
+							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
 				}
@@ -417,8 +445,8 @@ export class XYChart extends SerialChart {
 
 							let newStart = start + wheelStep * (end - start) * shiftY * position;
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
-
-							axis.zoom(newStart, newEnd);
+							
+							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
 				}
@@ -433,8 +461,8 @@ export class XYChart extends SerialChart {
 
 							let newStart = start + wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-
-							axis.zoom(newStart, newEnd);
+							
+							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
 				}
@@ -450,7 +478,7 @@ export class XYChart extends SerialChart {
 							let newStart = start + wheelStep * (end - start) * shiftY * position;
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
 
-							axis.zoom(newStart, newEnd);
+							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
 				}
@@ -492,11 +520,44 @@ export class XYChart extends SerialChart {
 						axis._panEnd = axis.get("end")!;
 					})
 				}
+
+				const eventType = "panstarted";
+				if (this.events.isEnabled(eventType)) {
+					this.events.dispatch(eventType, { type: eventType, target: this });
+				}
 			}
 		}
 	}
 
+	protected _handleWheelAnimation(animation?: Animation<any>) {
+		if (animation) {
+			animation.events.on("stopped", () => {
+				this._dispatchWheelAnimation();
+			})
+		}
+		else {
+			this._dispatchWheelAnimation();
+		}
+	}
+
+	protected _dispatchWheelAnimation() {
+		const eventType = "wheelended";
+		if (this.events.isEnabled(eventType)) {
+			this.events.dispatch(eventType, { type: eventType, target: this });
+		}
+	}
+
 	protected _handlePlotUp(_event: IPointerEvent) {
+
+		if (this._downPoint) {
+			if (this.get("panX") || this.get("panY")) {
+				const eventType = "panended";
+				if (this.events.isEnabled(eventType)) {
+					this.events.dispatch(eventType, { type: eventType, target: this });
+				}
+			}
+		}
+
 		// TODO: handle multitouch
 		this._downPoint = undefined;
 		this.xAxes.each((xAxis) => {

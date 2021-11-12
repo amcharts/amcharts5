@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.4] - 2021-11-12
+
+### Added
+- `panstarted`, `panended`, and `wheelended` events added to `XYChart`.
+
+### Fixed
+- Fixed `RadarChart` issues when it was being created in hidden container.
+- `XYCursor` and `snapToSeries` problems fixed: was not working with `ColumnSeries`, and was not working properly with stacked axes.
+- Adding/changing data on a `DateAxis` with `groupData = true` was not working properly.
+- If non-rounded dates were used in data, `XYCursor`'s tooltips were flickering while moving cursor over plot area.
+
+
 ## [5.0.3] - 2021-11-09
 
 ### Fixed

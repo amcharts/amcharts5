@@ -140,6 +140,8 @@ export abstract class Component extends Container {
 
 	protected _dataItems: Array<DataItem<this["_dataItemSettings"]>> = [];
 
+	public _mainDataItems = this._dataItems;
+
 	protected valueFields: Array<string> = [];
 	protected fields: Array<string> = ["id"];
 
@@ -194,23 +196,24 @@ export abstract class Component extends Container {
 		this._updateFields();
 
 		this._disposers.push(this.data.events.onAll((change) => {
+			const dataItems = this._mainDataItems;
 			this._markDirtyValues();
 			this._markDirtyGroup();
 			this._dataChanged = true;
 			if (change.type === "clear") {
-				$array.each(this._dataItems, (dataItem) => {
+				$array.each(dataItems, (dataItem) => {
 					dataItem.dispose();
 				});
 
-				this._dataItems.length = 0;
+				dataItems.length = 0;
 				this._onDataClear();
 			} else if (change.type === "push") {
 				const dataItem = new DataItem(this, change.newValue, this._makeDataItem(change.newValue));
-				this._dataItems.push(dataItem);
+				dataItems.push(dataItem);
 				this.processDataItem(dataItem);
 
 			} else if (change.type === "setIndex") {
-				const dataItem = this._dataItems[change.index];
+				const dataItem = dataItems[change.index];
 				const properties = this._makeDataItem(change.newValue);
 
 				$object.keys(properties).forEach((key) => {
@@ -226,13 +229,13 @@ export abstract class Component extends Container {
 
 			} else if (change.type === "insertIndex") {
 				const dataItem = new DataItem(this, change.newValue, this._makeDataItem(change.newValue));
-				this._dataItems.splice(change.index, 0, dataItem);
+				dataItems.splice(change.index, 0, dataItem);
 				this.processDataItem(dataItem);
 
 			} else if (change.type === "removeIndex") {
-				const dataItem = this._dataItems[change.index];
+				const dataItem = dataItems[change.index];
 				dataItem.dispose();
-				this._dataItems.splice(change.index, 1);
+				dataItems.splice(change.index, 1);
 				this._markDirtyValues();
 
 			} else {
@@ -318,7 +321,7 @@ export abstract class Component extends Container {
 	 */
 	public pushDataItem(data: this["_dataItemSettings"]): DataItem<this["_dataItemSettings"]> {
 		const dataItem = this.makeDataItem(data);
-		this.dataItems.push(dataItem);
+		this._mainDataItems.push(dataItem);
 		return dataItem;
 	}
 

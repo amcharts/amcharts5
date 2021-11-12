@@ -39,15 +39,17 @@ export class HorizontalLayout extends Layout {
 			}
 		});
 
-		container.children.each((child) => {
-			if (child.get("position") == "relative") {
-				let childWidth = child.get("width");
-				if (childWidth instanceof Percent) {
-					let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
-					child.setPrivate("width", privateWidth);
+		if(availableWidth > 0){
+			container.children.each((child) => {
+				if (child.get("position") == "relative") {
+					let childWidth = child.get("width");
+					if (childWidth instanceof Percent) {
+						let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
+						child.setPrivate("width", privateWidth);
+					}
 				}
-			}
-		});
+			});
+		}
 
 		let prevX = paddingLeft;
 

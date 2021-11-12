@@ -1,17 +1,19 @@
 import type { IBounds } from "../util/IBounds";
-import { Label } from "../render/Label";
-import { PointedRectangle } from "../render/PointedRectangle";
-import { Container, IContainerPrivate, IContainerSettings } from "./Container";
 import type { IPoint } from "../util/IPoint";
 import type { Pattern } from "../render/patterns/Pattern";
-import * as $math from "../util/Math";
-import * as $array from "../util/Array";
-import * as $utils from "../util/Utils";
-import { Percent } from "../util/Percent";
 import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
 import type { MultiDisposer, IDisposer } from "../util/Disposer";
+
+import { Label } from "../render/Label";
+import { PointedRectangle } from "../render/PointedRectangle";
+import { Container, IContainerPrivate, IContainerSettings } from "./Container";
+import { Percent } from "../util/Percent";
 import { Color } from "../util/Color";
+
+import * as $math from "../util/Math";
+import * as $array from "../util/Array";
+import * as $utils from "../util/Utils";
 //import * as $utils from "../util/Utils";
 
 
@@ -19,7 +21,7 @@ import { Color } from "../util/Color";
 export interface ITooltipSettings extends IContainerSettings {
 
 	/**
-	 * @todo review
+	 * Text to use for tooltip's label.
 	 */
 	labelText?: string
 

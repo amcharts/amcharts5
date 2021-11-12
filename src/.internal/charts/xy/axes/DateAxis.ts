@@ -149,6 +149,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this.setPrivateRaw("baseInterval", this.get("baseInterval"));
 	}
 
+	public _updateChildren(){
+		if(this.isDirty("baseInterval")){
+			this.setPrivateRaw("baseInterval", this.get("baseInterval"));
+		}
+	}
+
 
 	protected _groupData() {
 		const min = this.getPrivate("min");
@@ -229,11 +235,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				fields = series._valueXFields;
 			}
 
-			let dataItems = series.dataItems;
+			let dataItems = series._mainDataItems;
 			let baseInterval = this.get("baseInterval");
 			let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 
-			series._dataSets[mainDataSetId] = series.dataItems as any;
+			series._dataSets[mainDataSetId] = dataItems;
 
 			$array.eachContinue(intervals, (interval) => {
 
@@ -339,7 +345,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 				return true;
 			})
-
+			if(series._dataSetId){
+				series.setDataSet(series._dataSetId);
+			}
 			this.markDirtySize();
 		}
 	}
@@ -667,7 +675,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let fieldName = <any>(this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!);
 		let value = this.positionToValue(position);
 		const result = $array.getSortedIndex(series.dataItems, (dataItem) => {
-			return $order.compare(dataItem.get(fieldName), value);
+			var diValue = 0;
+			if (dataItem.open) {
+				diValue = dataItem.open[fieldName];
+			}
+			
+			return $order.compare(diValue, value);
 		});
 
 		if (series.get("snapTooltip")) {

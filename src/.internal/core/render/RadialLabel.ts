@@ -1,48 +1,83 @@
 // import * as $object from "../util/Object";
-import * as $math from "../util/Math";
-import * as $utils from "../util/Utils";
 import { p50, Percent } from "../util/Percent";
 import { Label, ILabelPrivate, ILabelSettings } from "./Label";
 import { RadialText } from "./RadialText";
 
+import * as $math from "../util/Math";
+import * as $utils from "../util/Utils";
+
 
 export interface IRadialLabelSettings extends ILabelSettings {
+
 	/**
-	 * @todo review
-	 */
-	labelAngle?: number;
-	/**
-	 * @todo review
+	 * Pixel value to adjust radius with.
+	 *
+	 * Will add to (or subtract from if negative) whatever value `baseRadius` evaluates
+	 * to.
 	 */
 	radius?: number;
+
 	/**
-	 * @todo review
+	 * Radius of the label's position.
+	 *
+	 * Can be either set in absolute pixel value, or percent.
+	 *
+	 * Relative value, depending on the situation, will most often mean its
+	 * position within certain circular object, like a slice: 0% meaning inner
+	 * edge, and 100% - the outer edge.
+	 *
+	 * @default 100%
 	 */
 	baseRadius?: number | Percent;
+
 	/**
-	 * @todo review
+	 * Label anngle in degrees.
+	 *
+	 * In most cases it will be set by the chart/series and does not need to
+	 * be set manually.
 	 */
-	maxAngle?: number;
+	labelAngle?: number;
+
 	/**
-	 * @todo review
+	 * Should the text "face" inward or outward from the arc the text is
+	 * following.
+	 *
+	 * `"auto"` means that facing will be chosen automatically based on the angle
+	 * to enhance readbility.
+	 *
+	 * Only applies if `type = "circluar"`.
+	 * 
+	 * @default "auto"
 	 */
 	orientation?: "inward" | "outward" | "auto";
+
 	/**
-	 * @todo review
+	 * Should label be drawn inside (`true`) or outside (`false`) the arc.
+	 *
+	 * @default false
 	 */
 	inside?: boolean;
+
 	/**
-	 * @todo review
+	 * Label type.
+	 *
+	 * * `"regular"` (default) - normal horizontal label.
+	 * * `"circular"` - arched label.
+	 * * `"radial"` - label radiating from the center of the arc.
+	 * * `"aligned"` - horizontal label aligned with other labels horizontally.
+	 * * `"adjusted"` - horizontal label adjusted in postion.
+	 *
+	 * @default "regular"
 	 */
 	textType?: "regular" | "circular" | "radial" | "aligned" | "adjusted";
+
 	/**
-	 * @todo review
-	 */
-	startAngle?: number;
-	/**
-	 * @todo review
+	 * Extra spacing between characters, in pixels.
+	 *
+	 * @default 0
 	 */
 	kerning?: number;
+
 }
 
 export interface IRadialLabelPrivate extends ILabelPrivate {
@@ -61,6 +96,7 @@ export interface IRadialLabelPrivate extends ILabelPrivate {
 	 * @ignore
 	 */
 	innerRadius?: number;
+
 }
 
 export class RadialLabel extends Label {
@@ -84,19 +120,25 @@ export class RadialLabel extends Label {
 	public _makeText() {
 		this._text = this.children.push(RadialText.new(this._root, {}));
 	}
+
 	/**
-	 * @todo review
+	 * Returns base radius in pixels.
+	 * 
+	 * @return Base radius
 	 */
-	public baseRadius() {
+	public baseRadius(): number {
 		const radiusPrivate = this.getPrivate("radius", 0);
 		const innerRadiusPrivate = this.getPrivate("innerRadius", 0);
 		const baseRadius = this.get("baseRadius", 0);
 		return innerRadiusPrivate + $utils.relativeToValue(baseRadius, radiusPrivate - innerRadiusPrivate);
 	}
+
 	/**
-	 * @todo review
+	 * Returns radius adjustment in pixels.
+	 * 
+	 * @return Radius
 	 */
-	public radius() {
+	public radius(): number {
 		const inside = this.get("inside", false);
 		return this.baseRadius() + this.get("radius", 0) * (inside ? -1 : 1);
 	}

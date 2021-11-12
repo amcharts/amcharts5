@@ -443,6 +443,14 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const ptl = this.getPoint(l, t);
 		const pbr = this.getPoint(r, b);
 
+		const tooltipPoint = dataItem.get("point");
+		
+		if(tooltipPoint){
+			const point = this.getPoint(tooltipPoint.x, tooltipPoint.y);
+			tooltipPoint.x = point.x + this._x;
+			tooltipPoint.y = point.y + this._y;
+		}
+
 		l = ptl.x;
 		r = pbr.x;
 

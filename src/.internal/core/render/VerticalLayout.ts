@@ -37,17 +37,18 @@ export class VerticalLayout extends Layout {
 				}
 			}
 		})
+		if(availableHeight > 0){
+			container.children.each((child) => {
+				if (child.get("position") == "relative") {
+					let childHeight = child.get("height");
 
-		container.children.each((child) => {
-			if (child.get("position") == "relative") {
-				let childHeight = child.get("height");
-
-				if (childHeight instanceof Percent) {
-					let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
-					child.setPrivate("height", privateHeight);
+					if (childHeight instanceof Percent) {
+						let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
+						child.setPrivate("height", privateHeight);
+					}
 				}
-			}
-		})
+			})
+		}
 
 		let prevY = paddingTop;
 

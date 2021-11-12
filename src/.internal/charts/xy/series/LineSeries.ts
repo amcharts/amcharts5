@@ -494,6 +494,9 @@ export class LineSeries extends XYSeries {
 			const iPoint = this.getPoint(xPos, yPos);
 			const point = [iPoint.x, iPoint.y];
 
+			iPoint.x += this._x;
+			iPoint.y += this._y;
+
 			dataItem.set("point", iPoint);
 
 			if (o.fillVisible) {

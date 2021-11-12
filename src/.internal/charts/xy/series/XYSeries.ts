@@ -539,6 +539,9 @@ export abstract class XYSeries extends Series {
 
 	public _mainContainerMask: Graphics | undefined;
 
+	protected _x:number = 0;
+	protected _y:number = 0;	
+
 	/**
 	 * A [[Container]] that us used to put series' elements in.
 	 *
@@ -589,7 +592,9 @@ export abstract class XYSeries extends Series {
 	protected __valueXShowFields!: Array<string>;
 	protected __valueYShowFields!: Array<string>;
 
-	protected _emptyDataItem = new DataItem(this, undefined, {})
+	protected _emptyDataItem = new DataItem(this, undefined, {});
+
+	public _dataSetId?:string;
 
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
@@ -1058,6 +1063,10 @@ export abstract class XYSeries extends Series {
 
 	public _updateChildren() {
 		super._updateChildren();
+		// save for performance
+		this._x = this.x();
+		this._y = this.y();
+
 		this._makeRangeMask();
 	}
 
@@ -1344,6 +1353,7 @@ export abstract class XYSeries extends Series {
 			this._handleDataSetChange();
 			this._dataItems = this._dataSets[id];
 			this._markDataSetDirty();
+			this._dataSetId = id;
 		}
 	}
 
