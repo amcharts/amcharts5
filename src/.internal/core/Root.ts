@@ -204,6 +204,8 @@ export class Root implements IDisposer {
 	protected _isDisposed: boolean = false;
 	protected _disposers: Array<IDisposer> = [];
 
+	protected _resizeSensorDisposer?: IDisposer;
+
 	public _tooltips: Array<Tooltip> = [];
 
 	protected constructor(id: string | HTMLElement, isReal: boolean) {
@@ -242,6 +244,27 @@ export class Root implements IDisposer {
 		const root = new Root(id, true);
 		root._init();
 		return root;
+	}
+
+	public moveDOM(id: string | HTMLElement): void {
+		let dom: HTMLElement | null;
+
+		if (id instanceof HTMLElement) {
+			dom = id;
+		}
+		else {
+			dom = document.getElementById(id);
+		}
+
+		if (dom) {
+			while (this.dom.childNodes.length > 0) {
+				dom.appendChild(this.dom.childNodes[0]);
+			}
+			this.dom = dom;
+			this._initResizeSensor();
+			this._resize();
+		}
+
 	}
 
 
@@ -344,27 +367,7 @@ export class Root implements IDisposer {
 		// TODO: TMP TMP TMP for testing only, remove
 		//document.body.appendChild((<any>renderer)._ghostView);
 
-
-		this._disposers.push(new ResizeSensor(this.dom, () => {
-			const dom = this.dom;
-			const w = dom.clientWidth;
-			const h = dom.clientHeight;
-			if (w > 0 && h > 0) {
-				const focusElementContainer = this._focusElementContainer!;
-
-				focusElementContainer.style.width = w + "px";
-				focusElementContainer.style.height = h + "px";
-
-				renderer.resize(w, h);
-
-				const rootContainer = this._rootContainer;
-
-				rootContainer.setPrivate("width", w);
-				rootContainer.setPrivate("height", h);
-				this._render();
-				this._handleLogo();
-			}
-		}));
+		this._initResizeSensor();
 
 		// Create element which is used to make announcements to screen reader
 		const readerAlertElement = document.createElement("div");
@@ -532,6 +535,37 @@ export class Root implements IDisposer {
 
 		if (!this._hasLicense()) {
 			this._showBranding();
+		}
+	}
+
+	private _initResizeSensor(): void {
+		if (this._resizeSensorDisposer) {
+			this._resizeSensorDisposer.dispose();
+		}
+		this._resizeSensorDisposer = new ResizeSensor(this.dom, () => {
+			this._resize();
+		});
+		this._disposers.push(this._resizeSensorDisposer);
+	}
+
+	private _resize(): void {
+		const dom = this.dom;
+		const w = dom.clientWidth;
+		const h = dom.clientHeight;
+		if (w > 0 && h > 0) {
+			const focusElementContainer = this._focusElementContainer!;
+
+			focusElementContainer.style.width = w + "px";
+			focusElementContainer.style.height = h + "px";
+
+			this._renderer.resize(w, h);
+
+			const rootContainer = this._rootContainer;
+
+			rootContainer.setPrivate("width", w);
+			rootContainer.setPrivate("height", h);
+			this._render();
+			this._handleLogo();
 		}
 	}
 
@@ -834,7 +868,7 @@ export class Root implements IDisposer {
 
 	protected _addTooltip() {
 		if (!this.tooltipContainer) {
-			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100, layer:100 }));
+			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100, layer: 100 }));
 			this.tooltipContainer = tooltipContainer;
 
 			const tooltip = Tooltip.new(this, {});

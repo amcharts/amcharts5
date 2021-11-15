@@ -9,6 +9,7 @@ import type { DataItem, IComponentDataItem } from "./Component";
 import type { Tooltip } from "./Tooltip";
 import type { Graphics } from "./Graphics";
 import type { IPoint } from "../util/IPoint";
+import type { ListTemplate } from "../util/List";
 
 import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../util/Entity";
 import { Template } from "../util/Template";
@@ -16,7 +17,6 @@ import { Percent } from "../util/Percent";
 import { EventDispatcher, Events, EventListener } from "../util/EventDispatcher";
 import { IDisposer, MultiDisposer, CounterDisposer } from "../util/Disposer";
 import { waitForAnimations } from "../util/Animation";
-import type { ListTemplate } from "../util/List";
 
 import * as $utils from "../util/Utils";
 import * as $array from "../util/Array";
@@ -1036,6 +1036,15 @@ export abstract class Sprite extends Entity {
 		if (this.isDirty("width") || this.isDirty("height")) {
 			this.markDirtyBounds();
 			this._addPercentageSizeChildren();
+
+			const parent = this.parent;
+			if (parent) {				
+				if ((this.isDirty("width") && this.get("width") instanceof Percent) || (this.isDirty("height") && this.get("height") instanceof Percent)) {
+					parent.markDirty();
+					parent._prevWidth = 0;
+				}
+			}
+
 			this._sizeDirty = true;
 		}
 

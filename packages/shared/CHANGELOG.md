@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.5] - 2021-11-15
+
+### Added
+- New root element method: `moveDOM()` (accepts element id or reference as a parameter). Can be used to move whole chart to some other container within DOM.
+
+### Fixed
+- `ExportingMenu` was interfering with functionality of form elements on the same page (e.g. select).
+- Fixed issues with text kerning with styling blocks mid-word.
+- Animating values of `width`/`height` settings using percent values was not working properly.
+
+
 ## [5.0.4] - 2021-11-12
 
 ### Added

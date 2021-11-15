@@ -315,7 +315,7 @@ export class ExportingMenu extends Entity {
 		}));
 
 		this._disposers.push($utils.addEventListener(document, "click", (_ev) => {
-			if (!this._isOver) {
+			if (this.isOpen && !this._isOver) {
 				this.close();
 			}
 		}));

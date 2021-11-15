@@ -250,13 +250,14 @@ export class XYChartDefaultTheme extends Theme {
 			paddingRight: 5
 		});
 
-		r("AxisLabel", ["y"]).setAll({
-			textAlign: "right"
-		});
+		// The following is deprecated following text measuring updates in 5.0.5
+		// r("AxisLabel", ["y"]).setAll({
+		// 	textAlign: "right"
+		// });
 
-		r("AxisLabel", ["y", "opposite"]).setAll({
-			textAlign: "left"
-		});
+		// r("AxisLabel", ["y", "opposite"]).setAll({
+		// 	textAlign: "left"
+		// });
 
 		r("Container", ["axis", "header"]).setAll({
 			layer: 30

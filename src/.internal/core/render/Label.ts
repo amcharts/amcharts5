@@ -296,7 +296,6 @@ export class Label extends Container {
 			const textAlign = this.get("textAlign");
 			let x: number | Percent | undefined;
 			if (this.get("width") != null) {
-
 				if (textAlign == "right") {
 					x = p100;
 				}
@@ -305,6 +304,14 @@ export class Label extends Container {
 				}
 				else {
 					x = 0;
+				}
+			}
+			else {
+				if (textAlign == "left" || textAlign == "start") {
+					x = this.get("paddingLeft");
+				}
+				else if (textAlign == "right" || textAlign == "end") {
+					x = -this.get("paddingRight");
 				}
 			}
 

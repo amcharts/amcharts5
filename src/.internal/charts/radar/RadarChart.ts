@@ -161,7 +161,7 @@ export class RadarChart extends XYChart {
 
 			bounds = $math.mergeBounds([bounds, innerBounds]);
 
-			this._maxRadius = Math.min(wr, hr);
+			this._maxRadius = Math.max(0, Math.min(wr, hr));
 
 			const radius = $utils.relativeToValue(this.get("radius", 0), this._maxRadius);
 			this.radarContainer.setAll({

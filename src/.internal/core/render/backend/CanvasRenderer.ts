@@ -1227,16 +1227,16 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 
 					checkEvenArgs(name, args.length, 7);
 
-                    for (let i = 0; i < args.length; i += 7) {
-                    	let cx = args[i + 5];
-                    	let cy = args[i + 6];
+					for (let i = 0; i < args.length; i += 7) {
+						let cx = args[i + 5];
+						let cy = args[i + 6];
 
-                    	if (relative) {
-                    		cx += x;
-                    		cy += y;
-                    	}
+						if (relative) {
+							cx += x;
+							cy += y;
+						}
 
-                    	const bs = arcToBezier({
+						const bs = arcToBezier({
 							px: x,
 							py: y,
 							rx: args[i],
@@ -1248,12 +1248,12 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 							cy,
 						});
 
-                    	$array.each(bs, (b) => {
+						$array.each(bs, (b) => {
 							this.bezierCurveTo(b.x1, b.y1, b.x2, b.y2, b.x, b.y);
 							x = b.x;
 							y = b.y;
 						});
-                    }
+					}
 					break;
 				case "Z":
 				case "z":
@@ -1285,8 +1285,8 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		// 	console.log(this._operations, layer)
 		// }
 
-		if (layerDirty || interactive) {		
-			
+		if (layerDirty || interactive) {
+
 			const context = layer.context;
 			const ghostContext = this._renderer._ghostContext;
 
@@ -1747,7 +1747,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 					else if (chunk.type == "value" && !skipFurtherText) {
 
 						// Measure
-						const metrics = this._measureText(chunk.text.replace(/ /g, "."), context);
+						const metrics = this._measureText(chunk.text, context);
 						let chunkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
 
 						// Check for fit
@@ -1905,14 +1905,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		$array.each(this._textInfo, (lineInfo, _index: number) => {
 			let currentChunkOffset = 0
 			$array.each(lineInfo.textChunks, (chunk) => {
-
 				chunk.offsetX = currentChunkOffset + chunk.left - lineInfo.left;
-				//chunk.offsetY += Math.round(lineInfo.ascent);
 				chunk.offsetY += lineInfo.height - lineInfo.height * (this.style.baselineRatio || 0.19);
-				//chunk.offsetY += Math.round(lineInfo.height / 2) + ((lineInfo.height - chunk.height) / 2);
-				//console.log(chunk.text, chunk.ascent, lineInfo.ascent)
-				//chunk.offsetY += Math.round((lineInfo.height - chunk.height + (lineInfo.ascent - chunk.ascent)) / 2);
-				//chunk.offsetY -= Math.round((lineInfo.height - chunk.height + (lineInfo.ascent - chunk.ascent)) / 2) - lineInfo.ascent / 2;
 				currentChunkOffset += chunk.width;
 			});
 		});
@@ -2012,6 +2006,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 	protected _measureText(text: string, context: CanvasRenderingContext2D): TextMetrics {
 		let metrics = context.measureText(text);
+		let fakeMetrics: any = {};
 		if (metrics.actualBoundingBoxAscent == null) {
 			const div = document.createElement("div");
 			div.innerText = text;
@@ -2027,26 +2022,47 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			const w = metrics.width;
 			let left = 0;
 			let right = w;
-			switch (this.style.textAlign) {
-				case "right":
-				case "end":
-					left = -w;
-					right = 0;
-					break;
-				case "center":
-					left = -w / 2;
-					right = w / 2;
-			}
-			let fake = {
+
+			fakeMetrics = {
 				actualBoundingBoxAscent: h,
 				actualBoundingBoxDescent: 0,
 				actualBoundingBoxLeft: left,
 				actualBoundingBoxRight: right,
+				fontBoundingBoxAscent: h,
+				fontBoundingBoxDescent: 0,
 				width: w
 			}
-			return fake;
+			//return fake;
 		}
-		return metrics;
+		else {
+			fakeMetrics = {
+				actualBoundingBoxAscent: metrics.actualBoundingBoxAscent,
+				actualBoundingBoxDescent: metrics.actualBoundingBoxDescent,
+				actualBoundingBoxLeft: metrics.actualBoundingBoxLeft,
+				actualBoundingBoxRight: metrics.actualBoundingBoxRight,
+				fontBoundingBoxAscent: metrics.actualBoundingBoxAscent,
+				fontBoundingBoxDescent: metrics.actualBoundingBoxDescent,
+				width: metrics.width
+			}
+		}
+
+		const w = metrics.width;
+		switch (this.style.textAlign) {
+			case "right":
+			case "end":
+				fakeMetrics.actualBoundingBoxLeft = w;
+				fakeMetrics.actualBoundingBoxRight = 0;
+				break;
+			case "center":
+				fakeMetrics.actualBoundingBoxLeft = w / 2;
+				fakeMetrics.actualBoundingBoxRight = w / 2;
+				break;
+			default:
+				fakeMetrics.actualBoundingBoxLeft = 0;
+				fakeMetrics.actualBoundingBoxRight = w;
+		}
+
+		return fakeMetrics;
 	}
 
 }
@@ -2406,7 +2422,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 						const char = chunk.text[i];
 
 						// Measure
-						const metrics = this._measureText(char.replace(" ", "."), context);
+						const metrics = this._measureText(char, context);
 						let chunkWidth = metrics.width;
 
 						// Chunk width?

@@ -126,8 +126,8 @@ export class Container extends Sprite {
 	public static className: string = "Container";
 	public static classNames: Array<string> = Sprite.classNames.concat([Container.className]);
 
-	protected _prevWidth: number = 0;
-	protected _prevHeight: number = 0;
+	public _prevWidth: number = 0;
+	public _prevHeight: number = 0;
 
 	protected _contentWidth: number = 0;
 	protected _contentHeight: number = 0;
@@ -472,8 +472,8 @@ export class Container extends Sprite {
 			}
 
 			$array.each(this._percentageSizeChildren, (child) => {
-				let width = child.get("width");
 				if (!horizontal) {
+					let width = child.get("width");
 					if (width instanceof Percent) {
 						child.setPrivate("width", width.value * innerWidth);
 					}
