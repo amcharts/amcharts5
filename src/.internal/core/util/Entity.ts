@@ -1637,4 +1637,15 @@ export class Entity extends Settings implements IDisposer {
 		return this._root.language.translate(text, locale, ...rest);
 	}
 
+	/**
+	 * An instance of [[Root]] object.
+	 *
+	 * @readonly
+	 * @since 5.0.6
+	 * @return Root object
+	 */
+	public get root(): Root {
+		return this._root;
+	}
+
 }

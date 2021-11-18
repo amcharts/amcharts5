@@ -388,13 +388,10 @@ export class MapChart extends SerialChart {
 
 			this.series.each((series) => {
 				$array.pushAll(this._geometryColection.geometries, series._geometries);
-			})
-
-			this._fitMap();
+			})			
 		}
 
 		if (this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("paddingTop") || this.isDirty("paddingLeft") || this._dirtyGeometries) {
-
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;
@@ -419,6 +416,8 @@ export class MapChart extends SerialChart {
 						this.setRaw("translateY", yy);
 					}
 				}
+
+				this._fitMap();
 
 				this.markDirtyProjection();
 			}

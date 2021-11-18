@@ -280,7 +280,8 @@ export class HierarchyDefaultTheme extends Theme {
 				text: "{category}",
 				oversizedBehavior: "fit",
 				minScale: 0.4,
-				baseRadius:p50
+				baseRadius: p50,
+				rotation: 0
 			});
 
 			setColor(rule, "fill", ic, "alternativeText");

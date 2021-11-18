@@ -429,7 +429,7 @@ export class XYChart extends SerialChart {
 
 							let newStart = start + wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-							
+
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
@@ -445,7 +445,7 @@ export class XYChart extends SerialChart {
 
 							let newStart = start + wheelStep * (end - start) * shiftY * position;
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
-							
+
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
@@ -461,7 +461,7 @@ export class XYChart extends SerialChart {
 
 							let newStart = start + wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-							
+
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
 					})
@@ -673,11 +673,21 @@ export class XYChart extends SerialChart {
 
 				let minDistance = Infinity;
 				let closestItem: DataItem<IXYSeriesDataItem> | undefined;
+				const snapToSeriesBy = cursor.get("snapToSeriesBy");
 				$array.each(dataItems, (dataItem) => {
 					const point = dataItem.get("point");
 
 					if (point) {
-						let distance = Math.hypot(cursorPoint.x - point.x, cursorPoint.y - point.y);
+						let distance = 0;
+						if (snapToSeriesBy == "x") {
+							distance = Math.abs(cursorPoint.x - point.x);
+						}
+						else if (snapToSeriesBy == "y") {
+							distance = Math.abs(cursorPoint.y - point.y);
+						}
+						else {
+							distance = Math.hypot(cursorPoint.x - point.x, cursorPoint.y - point.y);
+						}
 						if (distance < minDistance) {
 							minDistance = distance;
 							closestItem = dataItem;

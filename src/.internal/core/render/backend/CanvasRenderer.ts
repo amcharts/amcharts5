@@ -3107,7 +3107,8 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 	_dispatchMousedown(originalEvent: IPointerEvent): void {
 
-		if ((<PointerEvent>originalEvent).button > 0) {
+		const button = (<PointerEvent>originalEvent).button;
+		if (button != 0 && button != 2 && button != 1) {
 			// Ignore non-primary mouse buttons
 			return;
 		}
@@ -3217,7 +3218,18 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 	_dispatchDragEnd(originalEvent: IPointerEvent): void {
 
-		if ((<PointerEvent>originalEvent).button > 0) {
+		const button = (<PointerEvent>originalEvent).button;
+		let clickevent: "click" | "rightclick" | "middleclick";
+		if (button == 0) {
+			clickevent = "click";
+		}
+		else if (button == 2) {
+			clickevent = "rightclick";
+		}
+		else if (button == 1) {
+			clickevent = "middleclick";
+		}
+		else {
 			// Ignore non-primary mouse buttons
 			return;
 		}
@@ -3225,14 +3237,13 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		const event = this.getEvent(originalEvent);
 		const id = event.id;
 
-
 		if (this._mousedown.length !== 0) {
 			const target = this._getHitTarget(event.point);
 
 			if (target) {
 				this._mousedown.forEach((obj) => {
 					if (obj.id === id && obj.value.contains(target)) {
-						this._dispatchEvent("click", obj.value, event);
+						this._dispatchEvent(clickevent, obj.value, event);
 					}
 				});
 			}
@@ -3269,9 +3280,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	_dispatchWheel(originalEvent: WheelEvent): void {
 		const event = this.getEvent(originalEvent);
 		this._hovering.forEach((obj) => {
-			if (obj.wheelable) {
-				this._dispatchEvent("wheel", obj, event);
-			}
+			this._dispatchEvent("wheel", obj, event);
 		});
 	}
 
@@ -3317,6 +3326,8 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 					});
 				});
 			case "click":
+			case "rightclick":
+			case "middleclick":
 			case "pointerdown":
 			case "pointermove":
 			case "pointerup":

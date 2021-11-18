@@ -53,7 +53,7 @@ export { InterfaceColors } from "./.internal/core/util/InterfaceColors";
 //export { Language } from "./.internal/core/util/Language";
 //export { List } from "./.internal/core/util/List";
 export { NumberFormatter } from "./.internal/core/util/NumberFormatter";
-export { Percent, percent, p100, p50 } from "./.internal/core/util/Percent";
+export { Percent, percent, p100, p50, p0 } from "./.internal/core/util/Percent";
 export { Template } from "./.internal/core/util/Template";
 export { TextFormatter } from "./.internal/core/util/TextFormatter";
 

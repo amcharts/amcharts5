@@ -91,16 +91,18 @@ export class AxisRendererY extends AxisRenderer {
 			if (chart) {
 				if (this.get("opposite")) {
 					const children = chart.rightAxesContainer.children;
-					children.removeValue(axis);
-					children.insertIndex(0, axis);
-					axisChildren.removeValue(this);
-					axisChildren.insertIndex(0, this);
+					if (children.indexOf(axis) == -1) {
+						children.moveValue(axis, 0);
+					}
+					axisChildren.moveValue(this, 0);
 					this.addTag("opposite");
 				}
 				else {
-					chart.leftAxesContainer.children.moveValue(axis);
-					axisChildren.removeValue(this);
-					axisChildren.push(this);
+					const children = chart.leftAxesContainer.children;
+					if (children.indexOf(axis) == -1) {
+						children.moveValue(axis);
+					}
+					axisChildren.moveValue(this);
 					this.removeTag("opposite");
 				}
 				axis.markDirtySize();

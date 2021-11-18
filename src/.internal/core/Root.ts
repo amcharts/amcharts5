@@ -192,14 +192,45 @@ export class Root implements IDisposer {
 	 */
 	public nonce?: string;
 
-
+	/**
+	 * Special color set to be used for various controls.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Interface_colors} for more info
+	 */
 	public interfaceColors: InterfaceColors;
 
+	/**
+	 * An instance of vertical layout object that can be used to set `layout` setting
+	 * of a [[Container]].
+	 *
+	 * @default VerticalLayout.new()
+	 */
 	public verticalLayout: VerticalLayout = VerticalLayout.new(this, {});
 
+	/**
+	 * An instance of horizontal layout object that can be used to set `layout` setting
+	 * of a [[Container]].
+	 *
+	 * @default HorizontalLayout.new()
+	 */
 	public horizontalLayout: VerticalLayout = HorizontalLayout.new(this, {});
 
+	/**
+	 * An instance of grid layout object that can be used to set `layout` setting
+	 * of a [[Container]].
+	 *
+	 * @default VerticalLayout.new()
+	 */
 	public gridLayout: VerticalLayout = GridLayout.new(this, {});
+
+	/**
+	 * Indicates whether chart should resized automatically when parent container
+	 * width and/or height changes.
+	 *
+	 * If disabled (`autoResize = false`) you can make the chart resize manually
+	 * by calling root element's `resize()` method.
+	 */
+	public autoResize: boolean = true;
 
 	protected _isDisposed: boolean = false;
 	protected _disposers: Array<IDisposer> = [];
@@ -262,7 +293,7 @@ export class Root implements IDisposer {
 			}
 			this.dom = dom;
 			this._initResizeSensor();
-			this._resize();
+			this.resize();
 		}
 
 	}
@@ -293,7 +324,7 @@ export class Root implements IDisposer {
 				scale: .6,
 				y: percent(100),
 				centerY: p100,
-				tooltipText: "Chart created using amCharts 5",
+				tooltipText: "Created using amCharts 5",
 				tooltipX: p100,
 				cursorOverStyle: "pointer",
 				background: Rectangle.new(this, {
@@ -494,7 +525,8 @@ export class Root implements IDisposer {
 			document.addEventListener("keyup", (ev: KeyboardEvent) => {
 				if (this._focusedSprite) {
 					const focusedSprite = this._focusedSprite;
-					switch (ev.keyCode) {
+					const keyCode = ev.keyCode;
+					switch (keyCode) {
 						case 37:
 						case 39:
 						case 38:
@@ -522,6 +554,21 @@ export class Root implements IDisposer {
 								// this._dispatchEvent("globalpointerup", target, upEvent);
 								return;
 							}
+							else if(focusedSprite.get("focusableGroup")) {
+								// Find next item in focusable group
+								const group = focusedSprite.get("focusableGroup");
+								const items = this._tabindexes.filter(item => item.get("focusableGroup") == group);
+								let index = items.indexOf(focusedSprite);
+								const lastIndex = items.length - 1;
+								index += (keyCode == 39 || keyCode == 40) ? 1 : -1;
+								if (index < 0) {
+									index = lastIndex;
+								}
+								else if (index > lastIndex) {
+									index = 0;
+								}
+								$utils.focus(items[index].getPrivate("focusElement")!);
+							}
 							break;
 					}
 				}
@@ -543,12 +590,18 @@ export class Root implements IDisposer {
 			this._resizeSensorDisposer.dispose();
 		}
 		this._resizeSensorDisposer = new ResizeSensor(this.dom, () => {
-			this._resize();
+			if (this.autoResize) {
+				this.resize();
+			}
 		});
 		this._disposers.push(this._resizeSensorDisposer);
 	}
 
-	private _resize(): void {
+	/**
+	 * If automatic resizing of char is disabled (`root.autoResize = false`), it
+	 * can be resized manually by calling this method.
+	 */
+	public resize(): void {
 		const dom = this.dom;
 		const w = dom.clientWidth;
 		const h = dom.clientHeight;
@@ -913,6 +966,7 @@ export class Root implements IDisposer {
 			}
 		});
 
+		const groups: Array<string | number> = [];
 		$array.each(this._tabindexes, (item, index) => {
 			if (!item.getPrivate("focusElement")) {
 				this._makeFocusElement(index, item);
@@ -920,10 +974,18 @@ export class Root implements IDisposer {
 			else {
 				this._moveFocusElement(index, item);
 			}
+			const group = item.get("focusableGroup");
+			if (group) {
+				if (groups.indexOf(group) !== -1) {
+					// Non-first element in the group, make it not directly focusable
+					item.getPrivate("focusElement")!.setAttribute("tabindex", "-1");
+				}
+				else {
+					groups.push(group);
+				}
+			}
 		});
 
-		//this._makeFocusElement(0, this._tabindexes[0], false);
-		// }
 	}
 
 	public _updateCurrentFocus(): void {
@@ -945,7 +1007,9 @@ export class Root implements IDisposer {
 		}
 
 		if (target.get("visible") && target.get("role") != "tooltip" && !target.isHidden()) {
-			focusElement.setAttribute("tabindex", "" + this.tabindex);
+			if (focusElement.getAttribute("tabindex") != "-1") {
+				focusElement.setAttribute("tabindex", "" + this.tabindex);
+			}
 		}
 		else {
 			focusElement.removeAttribute("tabindex")

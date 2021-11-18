@@ -76,6 +76,8 @@ export interface IRendererEvent<E> {
 
 export interface IRendererEvents {
 	click: IRendererEvent<IPointerEvent>;
+	rightclick: IRendererEvent<IPointerEvent>;
+	middleclick: IRendererEvent<IPointerEvent>;
 	dblclick: IRendererEvent<IPointerEvent>;
 	globalpointermove: IRendererEvent<IPointerEvent>,
 	globalpointerup: IRendererEvent<IPointerEvent>,

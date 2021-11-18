@@ -38,6 +38,18 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			}
 		},
 
+		"rightclick": function(event) {
+			if (this.isEnabled("rightclick")) {
+				this.dispatch("rightclick", this._makePointerEvent("rightclick", event));
+			}
+		},
+
+		"middleclick": function(event) {
+			if (this.isEnabled("middleclick")) {
+				this.dispatch("middleclick", this._makePointerEvent("middleclick", event));
+			}
+		},
+
 		"dblclick": function(event) {
 			this.dispatchParents("dblclick", this._makePointerEvent("dblclick", event));
 		},
@@ -574,6 +586,16 @@ export interface ISpriteEvents extends IEntityEvents {
 	click: ISpritePointerEvent;
 
 	/**
+	 * Invoked when element is clicked width the right mouse button.
+	 */
+	rightclick: ISpritePointerEvent;
+
+	/**
+	 * Invoked when element is clicked with the middle mouse button.
+	 */
+	middleclick: ISpritePointerEvent;
+
+	/**
 	 * Invoked when element is doubleclicked or tapped twice quickly.
 	 */
 	dblclick: ISpritePointerEvent;
@@ -1038,7 +1060,7 @@ export abstract class Sprite extends Entity {
 			this._addPercentageSizeChildren();
 
 			const parent = this.parent;
-			if (parent) {				
+			if (parent) {
 				if ((this.isDirty("width") && this.get("width") instanceof Percent) || (this.isDirty("height") && this.get("height") instanceof Percent)) {
 					parent.markDirty();
 					parent._prevWidth = 0;
@@ -1066,7 +1088,7 @@ export abstract class Sprite extends Entity {
 		}
 
 		// Accessibility
-		if (this.isDirty("tabindexOrder")) {
+		if (this.isDirty("tabindexOrder") || this.isDirty("focusableGroup")) {
 			if (this.get("focusable")) {
 				this._root._registerTabindexOrder(this);
 			}

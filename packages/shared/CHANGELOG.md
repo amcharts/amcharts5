@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.6] - 2021-11-18
+
+### Added
+- Accessibility: new setting on `Sprite`: `focusableGroup`. If set, TAB key will iterate through first elements of each focusable group, allowing user to select within group using arrow keys. [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#Grouping_focusable_elements).
+- New `Root` setting: `autoResize` (default: `true`). If set to `false`, the chart will not automtically resize itself when width/height of its container change. Use `resize()` method to resize manually.
+- New `Root` method: `resize()`. Resizes chart to fit container dimensions, if automatic resizing is disabled (`root.autoResize = false`).
+- Global `am5.p0` shortcut function added which returns `Percent(0)`.
+- All element will now have a read-only property `root` which holds their `Root` object.
+- New `Sprite` events: `rightclick` and `middleclick`. Please note that adding `rightclick` event will not disable possible contextual menu on right-mouse click.
+- New `XYCursor` setting: `snapToSeriesBy` (default: `"xy"`). Defines in which direction to look when searching for the nearest data item to snap to. Possible values: `"xy"` (default), `"x"`, and `"y"`.
+
+### Changed
+- If set `wheel` event will now fire even if `wheelable = false`. This allows capturing wheel events on elements without interfering with scroll of the document.
+
+### Fixed
+- `oversizedBehavior` on `Label` (still) was not handling `maxWidth` and `maxHeight` values properly (since `5.0.2`).
+- Dynamically updating `geoJSON` on a `MapPolygonSeries` was not working properly in some cases.
+
+
 ## [5.0.5] - 2021-11-15
 
 ### Added

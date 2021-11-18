@@ -29,6 +29,25 @@ export interface IAccessibilitySettings {
 	focusable?: boolean;
 
 	/**
+	 * An identifier by which to group common elements into focusable groups.
+	 *
+	 * If set, only the first element in he group will be focusable via TAB key.
+	 * When it is selected, the rest of the elements in the same group can be
+	 * selected using arrow keys.
+	 *
+	 * It allows users to TAB-through chart elements quickly without the need
+	 * to TAB into each and every element.
+	 *
+	 * It's up to implementer of the charts to provide meaningful `ariaLabel` to
+	 * the element, which advertises this capability and provides adequate
+	 * instructions.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Grouping_focusable_elements} for more info
+	 * @since 5.0.6
+	 */
+	focusableGroup?: string | number;
+
+	/**
 	 * Element's role.
 	 * 
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Roles} for more info

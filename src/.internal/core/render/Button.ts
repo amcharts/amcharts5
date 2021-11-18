@@ -1,7 +1,9 @@
 import type { Label } from "../render/Label";
-import { RoundedRectangle } from "../render/RoundedRectangle";
 import type { Graphics } from "../render/Graphics";
+
+import { RoundedRectangle } from "../render/RoundedRectangle";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
+
 import * as $utils from "../../core/util/Utils";
 
 export interface IButtonSettings extends IContainerSettings {

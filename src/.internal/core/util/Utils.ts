@@ -102,7 +102,7 @@ export function getPointerId(event: IPointerEvent) {
 /**
  * Removes focus from any element by shifting focus to body.
  *
- * @ignore Exclude from docs
+ * @ignore
  */
 export function blur(): void {
 	if (document.activeElement && document.activeElement != document.body) {
@@ -119,6 +119,17 @@ export function blur(): void {
 			input.blur();
 			document.body.removeChild(input);
 		}
+	}
+}
+
+/**
+ * Focuses element.
+ * 
+ * @ignore
+ */
+export function focus(el: HTMLElement): void {
+	if (el) {
+		el.focus();
 	}
 }
 

@@ -76,6 +76,17 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 */
 	snapToSeries?: Array<XYSeries>;
 
+	/**
+	 * Defines in which direction to look when searching for the nearest data
+	 * item to snap to.
+	 * 
+	 * Possible values: `"xy"` (default), `"x"`, and `"y"`.
+	 *
+	 * @since 5.0.6
+	 * @default "xy"
+	 */
+	snapToSeriesBy?: "xy" | "x" | "y";
+
 }
 
 
