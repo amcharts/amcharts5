@@ -68,6 +68,7 @@ export interface ILegendItem extends Entity {
 	show: () => void;
 	hide: () => void;
 	createLegendMarker?: () => {}
+	component?: Series;
 	// how to define that properties of dataItem should have legendDataItem?
 }
 
@@ -263,8 +264,21 @@ export class Legend extends Series {
 				}));
 
 				if (!item.get("visible")) {
-					itemContainer.set("disabled", false);
+					itemContainer.set("disabled", true);
 				}
+				itemContainer.events.on("pointerover", () => {
+					const component = item.component;
+					if (component && component.hoverDataItem) {
+						component.hoverDataItem(item as any)
+					}
+				})
+
+				itemContainer.events.on("pointerout", () => {
+					const component = item.component;
+					if (component && component.hoverDataItem) {
+						component.unhoverDataItem(item as any)
+					}
+				})
 
 				itemContainer.events.on("click", () => {
 					const toggleDp = itemContainer._toggleDp;
@@ -275,7 +289,7 @@ export class Legend extends Series {
 					if (itemContainer.get("toggleKey") != "none") {
 						const labelText = dataItem.get("label").text._getText();
 
-						if (item.isHidden()) {
+						if (item.isHidden() || item.get("visible") === false) {
 							item.show();
 							itemContainer.set("disabled", false);
 							this._root.readerAlert(this._t("%1 shown", this._root.locale, labelText));

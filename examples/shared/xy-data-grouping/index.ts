@@ -3,7 +3,6 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
-
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 var root = am5.Root.new("chartdiv");
@@ -61,17 +60,22 @@ function generateDatas(count) {
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   groupData: true,
-  maxDeviation: 0,
+  maxDeviation: 0.2,
   baseInterval: {
     timeUnit: "day",
     count: 1
   },
-  renderer: am5xy.AxisRendererX.new(root, {}),
+  renderer: am5xy.AxisRendererX.new(root, {
+    pan:"zoom"
+  }),
   tooltip: am5.Tooltip.new(root, {})
 }));
 
 var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  renderer: am5xy.AxisRendererY.new(root, {})
+  maxDeviation: 1,
+  renderer: am5xy.AxisRendererY.new(root, {
+    pan:"zoom"
+  })
 }));
 
 

@@ -414,6 +414,32 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
+	 * Triggers hover on a series data item.
+	 *
+	 * @since 5.0.7
+	 * @param  dataItem  Target data item
+	 */
+	public hoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const slice = dataItem.get("slice");
+		if (slice) {
+			slice.hover();
+		}
+	}
+
+	/**
+	 * Triggers un-hover on a series data item.
+	 *
+	 * @since 5.0.7
+	 * @param  dataItem  Target data item
+	 */
+	public unhoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const slice = dataItem.get("slice");
+		if (slice) {
+			slice.unhover();
+		}
+	}
+
+	/**
 	 * @ignore
 	 */
 	public updateLegendMarker(dataItem: DataItem<this["_dataItemSettings"]>) {

@@ -263,6 +263,8 @@ export class XYChart extends SerialChart {
 
 	protected _wheelDp: IDisposer | undefined;
 
+	public _otherCharts?:Array<XYChart>;
+
 	protected _afterNew() {
 		this._defaultThemes.push(XYChartDefaultTheme.new(this._root));
 
@@ -341,7 +343,7 @@ export class XYChart extends SerialChart {
 			this._wheelDp = plotContainer.events.on("wheel", (event) => {
 				const wheelEvent = event.originalEvent;
 
-				const plotPoint = plotContainer._display.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
+				const plotPoint = plotContainer.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
 				const wheelStep = this.get("wheelStep", 0.2);
 
 				const shiftY = wheelEvent.deltaY / 100;
@@ -500,7 +502,7 @@ export class XYChart extends SerialChart {
 		if (this.get("panX") || this.get("panY")) {
 			const plotContainer = this.plotContainer;
 
-			let local = plotContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+			let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
 			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= this.height()) {
 				this._downPoint = local;
@@ -575,7 +577,7 @@ export class XYChart extends SerialChart {
 		if (downPoint) {
 			const plotContainer = this.plotContainer;
 
-			let local = plotContainer._display.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+			let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
 			const panX = this.get("panX");
 			const panY = this.get("panY");
@@ -602,11 +604,10 @@ export class XYChart extends SerialChart {
 						let start = panStart + deltaX;
 						let end = panEnd + deltaX;
 
-						//axis.set("start", Math.max(-maxDeviation, start));
-						//axis.set("end", Math.min(1 + maxDeviation, end));
-
-						axis.set("start", start);
-						axis.set("end", end);
+						if(end - start < 1 + axis.get("maxDeviation", 1) * 2){
+							axis.set("start", start);
+							axis.set("end", end);							
+						}
 					}
 				})
 				if (scrollbarX) {
@@ -635,11 +636,10 @@ export class XYChart extends SerialChart {
 						let start = panStart - deltaY;
 						let end = panEnd - deltaY;
 
-						//axis.set("start", Math.max(-maxDeviation, start));
-						//axis.set("end", Math.min(1 + maxDeviation, end));
-
-						axis.set("start", start);
-						axis.set("end", end);
+						if(end - start < 1 + axis.get("maxDeviation", 1) * 2){
+							axis.set("start", start);
+							axis.set("end", end);
+						}
 					}
 				})
 
@@ -1020,9 +1020,25 @@ export class XYChart extends SerialChart {
 	 */
 	public inPlot(point: IPoint): boolean {
 		const plotContainer = this.plotContainer;
+		const otherCharts = this._otherCharts;
+		const global = plotContainer.toGlobal(point);
+		
 		if (point.x >= -0.1 && point.y >= -0.1 && point.x <= plotContainer.width() + 0.1 && point.y <= plotContainer.height() + 0.1) {
-			return true
+			return true;
 		}
+		if(otherCharts){
+			for (let i = otherCharts.length - 1; i >= 0; i--) {
+				const chart = otherCharts[i];
+				if (chart != this) {
+					const chartPlotContainer = chart.plotContainer;
+					const local = chartPlotContainer.toLocal(global);				
+					if (local.x >= -0.1 && local.y >= -0.1 && local.x <= chartPlotContainer.width() + 0.1 && local.y <= chartPlotContainer.height() + 0.1) {
+						return true;
+					}
+				}
+			}
+		}
+
 		return false;
 	}
 
@@ -1146,7 +1162,7 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _tooltipToLocal(point: IPoint): IPoint {
-		return this.plotContainer._display.toLocal(point);
+		return this.plotContainer.toLocal(point);
 	}
 
 	/**

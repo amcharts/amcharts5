@@ -63,12 +63,15 @@ function generateDatas(count: number) {
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-date-axis/
-const xRenderer = am5xy.AxisRendererX.new(root, {});
+const xRenderer = am5xy.AxisRendererX.new(root, {
+  pan:"zoom"
+});
 xRenderer.labels.template.set("minPosition", 0.01);
 xRenderer.labels.template.set("maxPosition", 0.99);
 
 const xAxis = chart.xAxes.push(
   am5xy.CategoryDateAxis.new(root, {
+    maxDeviation:0.5,
     categoryField: "date",
     baseInterval: {
       timeUnit: "day",
@@ -81,7 +84,10 @@ const xAxis = chart.xAxes.push(
 
 const yAxis = chart.yAxes.push(
   am5xy.ValueAxis.new(root, {
-    renderer: am5xy.AxisRendererY.new(root, {})
+    maxDeviation:1,
+    renderer: am5xy.AxisRendererY.new(root, {
+      pan:"zoom"
+    })
   })
 );
 

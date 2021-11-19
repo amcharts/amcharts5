@@ -12,6 +12,7 @@ import type { AxisBullet } from "./AxisBullet";
 import type { XYChart } from "../XYChart";
 import type { DataItem } from "../../../core/render/Component";
 import * as $utils from "../../../core/util/Utils";
+import type { IPointerEvent } from "../../../core/render/backend/Renderer";
 
 export interface IAxisRendererSettings extends IGraphicsSettings {
 
@@ -50,6 +51,14 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 */
 	cellEndLocation?: number;
 
+
+
+	/**
+	 * @rodo review
+	 * Works on AxisRendererX and AxisRendererY only. For a better result, set maxDeviation to 1 or so on the Axis. Will not work with inside set to true.
+	 */
+	pan?: "none" | "zoom"
+
 }
 
 export interface IAxisRendererPrivate extends IGraphicsPrivate {
@@ -83,6 +92,11 @@ export abstract class AxisRenderer extends Graphics {
 	protected _lc = 1;
 
 	protected _ls = 0;
+
+	protected _thumbDownPoint?: IPoint;
+
+	protected _downStart?: number;
+	protected _downEnd?: number;
 
 	/**
 	 * @ignore
@@ -176,9 +190,9 @@ export abstract class AxisRenderer extends Graphics {
 
 		const axisName = this.axis.getPrivate("name");
 
-		if(axisName){
+		if (axisName) {
 			themeTags.push(axisName);
-		}		
+		}
 
 		label.set("themeTags", $utils.mergeTags(label.get("themeTags"), themeTags));
 		this.axis.labelsContainer.children.moveValue(label, 0);
@@ -257,9 +271,72 @@ export abstract class AxisRenderer extends Graphics {
 	 */
 	public abstract positionToPoint(_position: number): IPoint;
 
+
+	public readonly thumb?: Graphics;
+
 	protected _afterNew() {
 		super._afterNew();
 		this.set("isMeasured", false);
+
+		const thumb = this.thumb;
+		if (thumb) {
+			this._disposers.push(thumb.events.on("pointerdown", (event) => {
+				this._handleThumbDown(event.originalEvent);
+			}));
+
+			this._disposers.push(thumb.events.on("globalpointerup", (event) => {
+				this._handleThumbUp(event.originalEvent);
+			}));
+
+			this._disposers.push(thumb.events.on("globalpointermove", (event) => {
+				this._handleThumbMove(event.originalEvent);
+			}));
+		}
+	}
+
+	public _changed() {
+		super._changed();
+
+		if (this.isDirty("pan")) {
+			const thumb = this.thumb;
+			if (thumb) {
+				const labelsContainer = this.axis.labelsContainer;
+				const pan = this.get("pan");
+				if (pan == "zoom") {
+					labelsContainer.children.push(thumb);
+				}
+				else if (pan == "none") {
+					labelsContainer.children.removeValue(thumb);
+				}
+			}
+		}
+	}
+
+	protected _handleThumbDown(event: IPointerEvent) {
+		this._thumbDownPoint = this.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+		const axis = this.axis;
+		this._downStart = axis.get("start");
+		this._downEnd = axis.get("end");
+	}
+
+	protected _handleThumbUp(_event: IPointerEvent) {
+		this._thumbDownPoint = undefined;
+	}
+
+	protected _handleThumbMove(event: IPointerEvent) {
+		const downPoint = this._thumbDownPoint;
+		if (downPoint) {
+			const point = this.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+
+			const downStart = this._downStart!;
+			const downEnd = this._downEnd!;
+			const extra = this._getPan(point, downPoint) * Math.min(1, (downEnd - downStart)) / 2;
+			this.axis.setAll({ start: downStart - extra, end: downEnd + extra });
+		}
+	}
+
+	protected _getPan(_point1: IPoint, _point2: IPoint): number{
+		return 0;
 	}
 
 	/**
@@ -317,7 +394,7 @@ export abstract class AxisRenderer extends Graphics {
 		return position;
 	}
 
-	public _updateLC(){
+	public _updateLC() {
 
 	}
 

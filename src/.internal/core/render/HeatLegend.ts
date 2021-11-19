@@ -11,6 +11,7 @@ import { Tooltip } from "../../core/render/Tooltip";
 import { LinearGradient } from "../../core/render/gradients/LinearGradient";
 
 import * as $utils from "../../core/util/Utils";
+import * as $type from "../../core/util/Type";
 
 export interface IHeatLegendSettings extends IContainerSettings {
 
@@ -147,7 +148,7 @@ export class HeatLegend extends Container {
 	 */
 	public showValue(value: number, text?: string, color?: Color) {
 		const tooltip = this.getTooltip();
-		if (tooltip) {
+		if (tooltip && $type.isNumber(value)) {
 
 			const startValue = this.get("startValue", 0);
 			const endValue = this.get("endValue", 1);

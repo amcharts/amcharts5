@@ -168,7 +168,7 @@ async function getEntries(input, output) {
 
 	await Promise.all(files.map(async (name) => {
 		if (name[0] !== "." && name !== "examples") {
-			const defaultImport = name === "lang" || name === "themes";
+			const defaultImport = name === "lang" || name === "themes" || name === "locales";
 			await getEntriesSub(entries, $path.join(input, name), $path.join(output, name), name, defaultImport);
 		}
 	}));

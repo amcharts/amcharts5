@@ -804,7 +804,7 @@ export abstract class Hierarchy extends Series {
 
 	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?: number) {
 		const bullet = super._makeBullet(dataItem, bulletFunction, index);
-		if(bullet){
+		if (bullet) {
 			const sprite = bullet.get("sprite");
 			const node = dataItem.get("node");
 
@@ -816,7 +816,7 @@ export abstract class Hierarchy extends Series {
 				node.on("height", () => {
 					this._positionBullet(bullet);
 				})
-			}			
+			}
 		}
 		return bullet;
 	}
@@ -837,4 +837,29 @@ export abstract class Hierarchy extends Series {
 		}
 	}
 
+	/**
+	 * Triggers hover on a series data item.
+	 *
+	 * @since 5.0.7
+	 * @param  dataItem  Target data item
+	 */
+	public hoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const node = dataItem.get("node");
+		if (node) {
+			node.hover();
+		}
+	}
+
+	/**
+	 * Triggers un-hover on a series data item.
+	 *
+	 * @since 5.0.7
+	 * @param  dataItem  Target data item
+	 */
+	public unhoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const node = dataItem.get("node");
+		if (node) {
+			node.unhover();
+		}
+	}
 }

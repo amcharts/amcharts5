@@ -293,6 +293,27 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
+			const rule = r("Rectangle", ["axis", "thumb"]);
+
+			rule.setAll({
+				fillOpacity: 0
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+
+			rule.states.create("hover", { fillOpacity: 0.1 })
+		}
+
+		r("Rectangle", ["axis", "thumb", "x"]).setAll({
+			cursorOverStyle: "ew-resize"
+		});
+
+		r("Rectangle", ["axis", "thumb", "y"]).setAll({
+			cursorOverStyle: "ns-resize"
+		});
+
+
+		{
 			const rule = r("Grid");
 
 			rule.setAll({

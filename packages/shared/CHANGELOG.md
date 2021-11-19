@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.7] - 2021-11-19
+
+### Added
+- New setting `pan` (default: `"none"`) added to `AxisRendererX` and `AxisRendererY`. If set to `"zoom"` will enable zoom of axis scale by dragging in axis label area.
+
+### Changed
+- Heat rules will not longer apply setting value if target data item does not have any numeric value.
+- Hovering legend item will now simulate hover on related item on some charts (e.g. `PieSeries`, `Hierarchy`, `Venn`).
+
+###
+- `HeatLegend` was acting out when its `showValue()` method was called with non-numeric parameter.
+- If series was pre-hidden before chart init, its status was not being correctly reflected in related legend item.
+- Locales in script version were not working properly.
+
+
 ## [5.0.6] - 2021-11-18
 
 ### Added

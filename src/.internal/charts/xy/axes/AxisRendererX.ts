@@ -10,6 +10,7 @@ import type { Graphics } from "../../../core/render/Graphics";
 import type { Tooltip } from "../../../core/render/Tooltip";
 import type { Template } from "../../../core/util/Template";
 import type { AxisBullet } from "./AxisBullet";
+import { Rectangle } from "../../../core/render/Rectangle";
 
 
 export interface IAxisRendererXSettings extends IAxisRendererSettings {
@@ -31,7 +32,6 @@ export interface IAxisRendererXSettings extends IAxisRendererSettings {
 	 * @default false
 	 */
 	inside?: boolean;
-
 }
 
 export interface IAxisRendererXPrivate extends IAxisRendererPrivate {
@@ -52,6 +52,8 @@ export class AxisRendererX extends AxisRenderer {
 	declare public _privateSettings: IAxisRendererXPrivate;
 
 	declare public readonly labelTemplate: Template<AxisLabel>;
+
+	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, themeTags: ["axis", "x", "thumb"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
@@ -81,6 +83,7 @@ export class AxisRendererX extends AxisRenderer {
 			axis.markDirtySize();
 		}
 
+
 		if (this.isDirty("opposite")) {
 			const chart = this.chart;
 
@@ -104,7 +107,14 @@ export class AxisRendererX extends AxisRenderer {
 				}
 				axis.markDirtySize();
 			}
-		}
+		}	
+
+		this.thumb.setPrivate("height", axis.labelsContainer.height());	
+	}
+
+
+	protected _getPan(point1: IPoint, point2: IPoint): number {
+		return (point2.x - point1.x) / this.width();
 	}
 
 

@@ -10,6 +10,7 @@ import type { Grid } from "./Grid";
 import type { AxisTick } from "./AxisTick";
 import type { Tooltip } from "../../../core/render/Tooltip";
 import type { Template } from "../../../core/util/Template";
+import { Rectangle } from "../../../core/render/Rectangle";
 
 export interface IAxisRendererYSettings extends IAxisRendererSettings {
 
@@ -29,7 +30,6 @@ export interface IAxisRendererYSettings extends IAxisRendererSettings {
 	 * @default false
 	 */
 	inside?: boolean;
-
 }
 
 export interface IAxisRendererYPrivate extends IAxisRendererPrivate {
@@ -50,6 +50,10 @@ export class AxisRendererY extends AxisRenderer {
 	declare public _privateSettings: IAxisRendererYPrivate;
 
 	declare public readonly labelTemplate: Template<AxisLabel>;
+
+	protected _downY?: number;
+
+	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, themeTags: ["axis", "y", "thumb"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "y"]);
@@ -74,6 +78,10 @@ export class AxisRendererY extends AxisRenderer {
 		});
 	}
 
+	protected _getPan(point1: IPoint, point2: IPoint): number {
+		return (point1.y - point2.y) / this.height();
+	}
+
 	public _changed() {
 		super._changed();
 
@@ -82,6 +90,8 @@ export class AxisRendererY extends AxisRenderer {
 		if (this.isDirty("inside")) {
 			axis.markDirtySize();
 		}
+
+		const thumb = this.thumb;
 
 		if (this.isDirty("opposite")) {
 
@@ -96,6 +106,7 @@ export class AxisRendererY extends AxisRenderer {
 					}
 					axisChildren.moveValue(this, 0);
 					this.addTag("opposite");
+					thumb.set("centerX", 0);
 				}
 				else {
 					const children = chart.leftAxesContainer.children;
@@ -104,10 +115,12 @@ export class AxisRendererY extends AxisRenderer {
 					}
 					axisChildren.moveValue(this);
 					this.removeTag("opposite");
+					thumb.set("centerX", p100);
 				}
 				axis.markDirtySize();
-			}
+			}			
 		}
+		thumb.setPrivate("width", axis.labelsContainer.width());
 	}
 
 	/**

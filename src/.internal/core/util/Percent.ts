@@ -11,27 +11,12 @@
  * The Percent object, can be instantiated using two ways:
  *
  * * Via `new Percent(X)`.
- * * Via `am4core.percent(X)`.
+ * * Via `am5.percent(X)`.
  *
- * `Percent` type objects can be used in a number of dual-measuring or
- * positioning properties, like `width`. E.g.:
- *
- * ```TypeScript
- * chart.paddingRight = new Percent(10);
- * // or
- * chart.paddingRight = am4core.percent(10);
- * ```
- * ```JavaScript
- * chart.paddingRight = new Percent(10);
- * // or
- * chart.paddingRight = am4core.percent(10);
- * ```
- * ```JSON
- * {
- *   // ...
- *   "paddingRight": "10%"
- * }
- * ```
+ * You can also use shortcut functions for `0%`, `50%`, and `100%`:
+ * * `am5.p0`
+ * * `am5.p50`
+ * * `am5.p1000`
  */
 export class Percent {
 
@@ -58,25 +43,25 @@ export class Percent {
 	 *
 	 * ```TypeScript
 	 * let value = 256;
-	 * let percent = new am4core.p50;
+	 * let percent = new am5.p50;
 	 * console.log(value * percent.value); // outputs 128
 	 * ```
 	 * ```JavaScript
 	 * var value = 256;
-	 * var percent = new am4core.p50;
+	 * var percent = new am5.p50;
 	 * console.log(value * percent.value); // outputs 128
 	 * ```
 	 *
-	 * Alternatively, you can use `am4core.percent()` helper function:
+	 * Alternatively, you can use `am5.percent()` helper function:
 	 *
 	 * ```TypeScript
 	 * let value = 256;
-	 * let percent = am4core.p50;
+	 * let percent = am5.p50;
 	 * console.log(value * percent.value); // outputs 128
 	 * ```
 	 * ```JavaScript
 	 * var value = 256;
-	 * var percent = am4core.p50;
+	 * var percent = am5.p50;
 	 * console.log(value * percent.value); // outputs 128
 	 * ```
 	 *
@@ -129,10 +114,10 @@ export class Percent {
  * Converts numeric percent value to a proper [[Percent]] object.
  *
  * ```TypeScript
- * pieSeries.radius = am4core.percent(80);
+ * pieSeries.set("radius", am5.percent(80));
  * ```
  * ```JavaScript
- * pieSeries.radius = am4core.percent(80);
+ * pieSeries.set("radius", am5.percent(80));
  * ```
  *
  * @param value  Percent
@@ -142,8 +127,19 @@ export function percent(value: number): Percent {
 	return new Percent(value);
 }
 
+/**
+ * A shortcut function to `am5.percent(0)`.
+ */
 export const p0 = percent(0);
+
+/**
+ * A shortcut function to `am5.percent(100)`.
+ */
 export const p100 = percent(100);
+
+/**
+ * A shortcut function to `am5.percent(50)`.
+ */
 export const p50 = percent(50);
 
 

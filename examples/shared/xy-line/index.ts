@@ -65,17 +65,22 @@ function generateDatas(count: number) {
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-  maxDeviation: 0,
+  maxDeviation: 0.5,
   baseInterval: {
     timeUnit: "day",
     count: 1
   },
-  renderer: am5xy.AxisRendererX.new(root, {}),
+  renderer: am5xy.AxisRendererX.new(root, {
+    pan:"zoom"
+  }),
   tooltip: am5.Tooltip.new(root, {})
 }));
 
 const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  renderer: am5xy.AxisRendererY.new(root, {})
+  maxDeviation:1,
+  renderer: am5xy.AxisRendererY.new(root, {
+    pan:"zoom"
+  })
 }));
 
 

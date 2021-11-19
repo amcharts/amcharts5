@@ -535,7 +535,11 @@ export abstract class Series extends Component {
 				const maxValue = rule.maxValue || this.getPrivate(<any>(rule.dataField + "High")) || 0;
 
 				$array.each(rule.target._entities, (target) => {
-					const value = target.dataItem.get(rule.dataField) || 0;
+					const value = target.dataItem.get(rule.dataField);
+
+					if (!$type.isNumber(value)) {
+						return;
+					}
 
 					let percent: number;
 					if (rule.logarithmic) {
@@ -774,8 +778,7 @@ export abstract class Series extends Component {
 	 * @ignore
 	 */
 	public updateLegendMarker(_dataItem?: DataItem<this["_dataItemSettings"]>) {
-
-	}	
+	}
 
 	protected _onHide(){
 		super._onHide();
@@ -784,5 +787,17 @@ export abstract class Series extends Component {
 		if(tooltip){
 			tooltip.hide();
 		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public hoverDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {
+	}
+
+	/**
+	 * @ignore
+	 */
+	public unhoverDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {
 	}
 }
