@@ -57,7 +57,7 @@ export class ColumnSeries extends BaseColumnSeries {
 			() => RoundedRectangle._new(this._root, {
 				position: "absolute",
 				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["series", "column"]),
-			}, [axisRange.columns.template])
+			}, [axisRange.columns.template, this.columns.template])
 		);
 	}
 }

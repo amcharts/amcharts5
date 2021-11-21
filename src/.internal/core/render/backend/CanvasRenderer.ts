@@ -1630,8 +1630,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		// Init
 		const oversizedBehavior = this.style.oversizedBehavior;
 		const maxWidth = this.style.maxWidth!;
-		const truncate = maxWidth && oversizedBehavior == "truncate";
-		const wrap = maxWidth && oversizedBehavior == "wrap";
+
+		const truncate = $type.isNumber(maxWidth) && oversizedBehavior == "truncate";
+		const wrap = $type.isNumber(maxWidth) && oversizedBehavior == "wrap";	
 
 		// Pre-render
 		context.save();

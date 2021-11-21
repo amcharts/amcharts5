@@ -254,6 +254,12 @@ export class Root implements IDisposer {
 			dom = document.getElementById(id);
 		}
 
+		$array.each(registry.rootElements, (root) => {
+			if (root.dom === dom) {
+				throw new Error("You cannot have multiple Roots on the same DOM node");
+			}
+		});
+
 		this.interfaceColors = InterfaceColors.new(this, {});
 
 		if (dom === null) {

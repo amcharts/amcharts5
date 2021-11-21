@@ -388,7 +388,7 @@ export class MapChart extends SerialChart {
 
 			this.series.each((series) => {
 				$array.pushAll(this._geometryColection.geometries, series._geometries);
-			})			
+			})		
 		}
 
 		if (this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("paddingTop") || this.isDirty("paddingLeft") || this._dirtyGeometries) {
@@ -415,9 +415,7 @@ export class MapChart extends SerialChart {
 						this.setRaw("translateX", xx);
 						this.setRaw("translateY", yy);
 					}
-				}
-
-				this._fitMap();
+				}				
 
 				this.markDirtyProjection();
 			}
@@ -463,6 +461,10 @@ export class MapChart extends SerialChart {
 			if (this.events.isEnabled(type)) {
 				this.events.dispatch(type, { type: type, target: this });
 			}
+		}
+
+		if (this._dirtyGeometries) {
+			this._fitMap();
 		}
 	}
 

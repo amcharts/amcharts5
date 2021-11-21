@@ -67,7 +67,7 @@ export class OHLCSeries extends CandlestickSeries {
 			Template.new({}),
 			() => OHLC._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["ohlc", "series", "column"]),
-			}, [axisRange.columns.template])
+			}, [axisRange.columns.template, this.columns.template])
 		);
 	}
 }

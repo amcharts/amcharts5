@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.8] - 2021-11-21
+
+### Changed
+- Trying to create a `Root` in a container that already contains a chart will result in a hard error now.
+- All `XYSeries` now use both main template and axis range template (the latter has a priority) when decorating columns/lines/etc for the sections covered by axis range.
+
+### Fixed
+- Axis fills were not working properly.
+- Since 5.0.6: Map was zoomed to incorrect position in some specific cases when `goHome()` method was called.
+
+
 ## [5.0.7] - 2021-11-19
 
 ### Added

@@ -602,14 +602,14 @@ export class LineSeries extends XYSeries {
 			Template.new({}),
 			() => Graphics._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.fills!.template.get("themeTags", []), ["line", "series", "fill"]),
-			}, [axisRange.fills!.template]),
+			}, [axisRange.fills!.template, this.strokes.template]),
 		);
 
 		axisRange.strokes = new ListTemplate(
 			Template.new({}),
 			() => Graphics._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.strokes!.template.get("themeTags", []), ["line", "series", "stroke"]),
-			}, [axisRange.strokes!.template])
+			}, [axisRange.strokes!.template, this.strokes.template])
 		);
 	}
 

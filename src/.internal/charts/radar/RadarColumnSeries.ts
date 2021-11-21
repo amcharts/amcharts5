@@ -216,7 +216,7 @@ export class RadarColumnSeries extends BaseColumnSeries {
 			() => Slice._new(this._root, {
 				position: "absolute",
 				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["radar", "series", "column"]),
-			}, [axisRange.columns.template])
+			}, [axisRange.columns.template, this.columns.template])
 		);
 	}
 }

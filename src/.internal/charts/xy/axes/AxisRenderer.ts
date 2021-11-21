@@ -51,11 +51,18 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 */
 	cellEndLocation?: number;
 
-
-
 	/**
-	 * @rodo review
-	 * Works on AxisRendererX and AxisRendererY only. For a better result, set maxDeviation to 1 or so on the Axis. Will not work with inside set to true.
+	 * If set to `"zoom"` will enable axis zoom by panning it in the axis label
+	 * area.
+	 *
+	 * Works on [[AxisRendererX]] and [[AxisRendererY]] only.
+	 * 
+	 * For a better result, set `maxDeviation` to `1` or so on the Axis.
+	 * 
+	 * Will not work if `inside` is set to `true`.
+	 *
+	 * @since 5.0.7
+	 * @default "none"
 	 */
 	pan?: "none" | "zoom"
 
@@ -169,7 +176,7 @@ export abstract class AxisRenderer extends Graphics {
 	public readonly axisFills: ListTemplate<Graphics> = new ListTemplate(
 		Template.new({}),
 		() => Graphics._new(this._root, {
-			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["fill"]), this.get("themeTags", []))
+			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["axis", "fill"]), this.get("themeTags", []))
 		}, [this.axisFills.template])
 	);
 
