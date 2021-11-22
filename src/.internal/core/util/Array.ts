@@ -479,6 +479,26 @@ export function findIndex<A>(array: ArrayLike<A>, matches: (value: A, index: num
 }
 
 /**
+ * This is the same as `findIndex` except it searches from right to left.
+ *
+ * @param array    Source array
+ * @param matches  Search function
+ * @returns Index of the item if found
+ */
+export function findIndexReverse<A>(array: ArrayLike<A>, matches: (value: A, index: number) => boolean): number {
+	let i = array.length;
+
+	while (i > 0) {
+		--i;
+		if (matches(array[i], i)) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+/**
  * Searches the array using custom function and returns item if found.
  *
  * Will call `matches` function on all items of the array. If return value
@@ -492,6 +512,21 @@ export function findIndex<A>(array: ArrayLike<A>, matches: (value: A, index: num
  */
 export function find<A>(array: ArrayLike<A>, matches: (value: A, index: number) => boolean): A | undefined {
 	const index = findIndex(array, matches);
+
+	if (index !== -1) {
+		return array[index];
+	}
+}
+
+/**
+ * This is the same as `find` except it searches from right to left.
+ *
+ * @param array    Source array
+ * @param matches  Search function
+ * @returns Item if found
+ */
+export function findReverse<A>(array: ArrayLike<A>, matches: (value: A, index: number) => boolean): A | undefined {
+	const index = findIndexReverse(array, matches);
 
 	if (index !== -1) {
 		return array[index];

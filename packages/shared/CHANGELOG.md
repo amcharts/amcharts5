@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.9] - 2021-11-22
+
+### Changed
+- `maxTooltipDistance` in `XYCursor` now accepts `-1` value, which means that only single tooltip will be shown, even if multiple data items share the same value.
+
+### Fixed
+- `GraticuleSeries` was broken.
+
+
 ## [5.0.8] - 2021-11-21
 
 ### Changed

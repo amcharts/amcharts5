@@ -262,6 +262,9 @@ export class MapChart extends SerialChart {
 
 	protected _wheelDp: IDisposer | undefined;
 
+	protected _pw?: number;
+	protected _ph?: number;
+
 	protected _makeGeoPath() {
 		const projection = this.get("projection")!;
 		const path = geoPath();
@@ -388,10 +391,10 @@ export class MapChart extends SerialChart {
 
 			this.series.each((series) => {
 				$array.pushAll(this._geometryColection.geometries, series._geometries);
-			})		
+			})
 		}
 
-		if (this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("paddingTop") || this.isDirty("paddingLeft") || this._dirtyGeometries) {
+		if (w != this._pw || h != this._ph || this._dirtyGeometries) {
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;
@@ -415,11 +418,14 @@ export class MapChart extends SerialChart {
 						this.setRaw("translateX", xx);
 						this.setRaw("translateY", yy);
 					}
-				}				
+				}
 
 				this.markDirtyProjection();
 			}
 		}
+
+		this._pw = w;
+		this._ph = h;
 
 		if (this.isDirty("zoomControl")) {
 			const previous = this._prevSettings.zoomControl;
@@ -452,14 +458,6 @@ export class MapChart extends SerialChart {
 			if (this.isDirty("rotationX") || this.isDirty("rotationY") || this.isDirty("rotationZ")) {
 				projection.rotate([this.get("rotationX", 0), this.get("rotationY", 0), this.get("rotationZ", 0)])
 				this.markDirtyProjection();
-			}
-		}
-
-		if (this._dispatchBounds) {
-			this._dispatchBounds = false; this
-			const type = "geoboundschanged";
-			if (this.events.isEnabled(type)) {
-				this.events.dispatch(type, { type: type, target: this });
 			}
 		}
 
@@ -501,6 +499,17 @@ export class MapChart extends SerialChart {
 			let h = this.innerHeight();
 			if (w > 0 && h > 0) {
 				this._centerLocation = projection.invert([this.innerWidth() / 2, this.innerHeight() / 2]);
+			}
+		}
+	}
+
+	public _afterChanged() {
+		super._afterChanged();
+		if (this._dispatchBounds) {
+			this._dispatchBounds = false;
+			const type = "geoboundschanged";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this });
 			}
 		}
 	}
@@ -893,7 +902,7 @@ export class MapChart extends SerialChart {
 	 * @param  geoBounds  Bounds
 	 * @param  duration   Animation duration in milliseconds
 	 */
-	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number):Animation<this["_settings"]["zoomLevel"]> | undefined {
+	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		if (geoBounds.right < geoBounds.left) {
 			geoBounds.right = 180;
 			geoBounds.left = -180;
@@ -936,7 +945,7 @@ export class MapChart extends SerialChart {
 	 * @param  center   Center the map
 	 * @param  duration Duration of the animation in milliseconds
 	 */
-	public zoomToPoint(point: IPoint, level: number, center?: boolean, duration?: number):Animation<this["_settings"]["zoomLevel"]> | undefined {
+	public zoomToPoint(point: IPoint, level: number, center?: boolean, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		if (level) {
 			level = $math.fitToRange(level, this.get("minZoomLevel", 1), this.get("maxZoomLevel", 32));
 		}
@@ -983,7 +992,7 @@ export class MapChart extends SerialChart {
 	 * @param  center    Center the map
 	 * @param  duration  Duration of the animation in milliseconds
 	 */
-	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number):Animation<this["_settings"]["zoomLevel"]> | undefined {
+	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		const xy = this.convert(geoPoint);
 		if (xy) {
 			return this.zoomToPoint(xy, level, center, duration);
@@ -993,14 +1002,14 @@ export class MapChart extends SerialChart {
 	/**
 	 * Zooms the map in.
 	 */
-	public zoomIn():Animation<this["_settings"]["zoomLevel"]> | undefined {
+	public zoomIn(): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		return this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.get("zoomLevel", 1) * this.get("zoomStep", 2));
 	}
 
 	/**
 	 * Zooms the map out.
 	 */
-	public zoomOut():Animation<this["_settings"]["zoomLevel"]> | undefined {
+	public zoomOut(): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		return this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.get("zoomLevel", 1) / this.get("zoomStep", 2));
 	}
 

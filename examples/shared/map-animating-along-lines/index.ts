@@ -100,6 +100,14 @@ const polygonSeries = chart.series.push(
   })
 );
 
+// graticule series
+var graticuleSeries = chart.series.push(am5map.GraticuleSeries.new(root, {}));
+graticuleSeries.mapLines.template.setAll({
+  stroke: root.interfaceColors.get("alternativeBackground"),
+  strokeOpacity: 0.08
+});
+
+
 // Create line series for trajectory lines
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
 const lineSeries = chart.series.push(am5map.MapLineSeries.new(root, {}));

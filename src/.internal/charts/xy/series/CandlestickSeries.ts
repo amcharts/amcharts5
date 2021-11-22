@@ -408,7 +408,7 @@ export class CandlestickSeries extends ColumnSeries {
 			Template.new({}),
 			() => Candlestick._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["candlestick", "series", "column"]),
-			}, [axisRange.columns.template, this.columns.template])
+			}, [this.columns.template, axisRange.columns.template])
 		);
 	}
 }

@@ -1329,8 +1329,10 @@ export class Entity extends Settings implements IDisposer {
 			return false;
 		});
 
-		$array.each(this._internalTemplates, f);
+		// _internalTemplates is sorted with most specific to the right
+		$array.eachReverse(this._internalTemplates, f);
 
+		// _templates is sorted with most specific to the left
 		$array.each(this._templates, f);
 	}
 
@@ -1368,9 +1370,11 @@ export class Entity extends Settings implements IDisposer {
 		const value = this._findStaticTemplate(f);
 
 		if (value === undefined) {
-			const value = $array.find(this._internalTemplates, f);
+			// _internalTemplates is sorted with most specific to the right
+			const value = $array.findReverse(this._internalTemplates, f);
 
 			if (value === undefined) {
+				// _templates is sorted with most specific to the left
 				return $array.find(this._templates, f);
 
 			} else {

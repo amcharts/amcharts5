@@ -526,7 +526,7 @@ export class LineSeries extends XYSeries {
 								xPos0 = o.xAxis.getDataItemPositionX(stackToItemX, o.xField, itemLocationX, (stackToItemX.component as XYSeries).get("vcx"));
 								if($type.isNaN(xPos0)){
 									xPos0 = o.basePosX;
-								}								
+								}
 							}
 							else {
 								if (o.yAxis === o.baseAxis) {
@@ -602,14 +602,14 @@ export class LineSeries extends XYSeries {
 			Template.new({}),
 			() => Graphics._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.fills!.template.get("themeTags", []), ["line", "series", "fill"]),
-			}, [axisRange.fills!.template, this.strokes.template]),
+			}, [this.strokes.template, axisRange.fills!.template]),
 		);
 
 		axisRange.strokes = new ListTemplate(
 			Template.new({}),
 			() => Graphics._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.strokes!.template.get("themeTags", []), ["line", "series", "stroke"]),
-			}, [axisRange.strokes!.template, this.strokes.template])
+			}, [this.strokes.template, axisRange.strokes!.template])
 		);
 	}
 

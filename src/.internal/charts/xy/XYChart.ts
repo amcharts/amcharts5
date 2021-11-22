@@ -263,7 +263,7 @@ export class XYChart extends SerialChart {
 
 	protected _wheelDp: IDisposer | undefined;
 
-	public _otherCharts?:Array<XYChart>;
+	public _otherCharts?: Array<XYChart>;
 
 	protected _afterNew() {
 		this._defaultThemes.push(XYChartDefaultTheme.new(this._root));
@@ -604,9 +604,9 @@ export class XYChart extends SerialChart {
 						let start = panStart + deltaX;
 						let end = panEnd + deltaX;
 
-						if(end - start < 1 + axis.get("maxDeviation", 1) * 2){
+						if (end - start < 1 + axis.get("maxDeviation", 1) * 2) {
 							axis.set("start", start);
-							axis.set("end", end);							
+							axis.set("end", end);
 						}
 					}
 				})
@@ -636,7 +636,7 @@ export class XYChart extends SerialChart {
 						let start = panStart - deltaY;
 						let end = panEnd - deltaY;
 
-						if(end - start < 1 + axis.get("maxDeviation", 1) * 2){
+						if (end - start < 1 + axis.get("maxDeviation", 1) * 2) {
 							axis.set("start", start);
 							axis.set("end", end);
 						}
@@ -1022,16 +1022,16 @@ export class XYChart extends SerialChart {
 		const plotContainer = this.plotContainer;
 		const otherCharts = this._otherCharts;
 		const global = plotContainer.toGlobal(point);
-		
+
 		if (point.x >= -0.1 && point.y >= -0.1 && point.x <= plotContainer.width() + 0.1 && point.y <= plotContainer.height() + 0.1) {
 			return true;
 		}
-		if(otherCharts){
+		if (otherCharts) {
 			for (let i = otherCharts.length - 1; i >= 0; i--) {
 				const chart = otherCharts[i];
 				if (chart != this) {
 					const chartPlotContainer = chart.plotContainer;
-					const local = chartPlotContainer.toLocal(global);				
+					const local = chartPlotContainer.toLocal(global);
 					if (local.x >= -0.1 && local.y >= -0.1 && local.x <= chartPlotContainer.width() + 0.1 && local.y <= chartPlotContainer.height() + 0.1) {
 						return true;
 					}
@@ -1098,7 +1098,11 @@ export class XYChart extends SerialChart {
 							}
 						}
 					}
-
+					else if (maxTooltipDistance == -1) {
+						if (series != closest) {
+							hidden = true;
+						}
+					}
 
 					if (!this.inPlot(this._tooltipToLocal(point)) || !tooltip.dataItem) {
 						hidden = true;
