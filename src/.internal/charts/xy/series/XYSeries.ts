@@ -1675,8 +1675,10 @@ export abstract class XYSeries extends Series {
 
 	public _afterDataChange() {
 		super._afterDataChange();
-		this.setPrivate("startIndex", 0);
-		this.setPrivate("endIndex", this.dataItems.length);
+		
+		// this causes unneeded animation on live demo and it shouldn't be needed
+		//this.setPrivate("startIndex", 0);
+		//this.setPrivate("endIndex", this.dataItems.length);
 
 		this.resetExtremes();
 	}

@@ -117,7 +117,8 @@ seriesRange.fills.template.set("fillPattern", am5.LinePattern.new(root, {
   rotation: 45,
   strokeWidth: 2,
   width: 2000,
-  height: 2000
+  height: 2000,
+  fill: am5.color(0xffffff)
 }));
 
 seriesRange.strokes.template.set("stroke", am5.color(0xff0000));

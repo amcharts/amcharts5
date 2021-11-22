@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.10] - 2021-11-22
+
+### Fixed
+- `LineSeries`' strokes in an axis range were using wrong template, which could result incorrect colors or other settings (since 5.0.9).
+- When data was updated on a live chart and the chart was not fully zoomed-out, some unnecessary Y axis animation used to happen after data update.
+
+
 ## [5.0.9] - 2021-11-22
 
 ### Changed

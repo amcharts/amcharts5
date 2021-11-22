@@ -602,7 +602,7 @@ export class LineSeries extends XYSeries {
 			Template.new({}),
 			() => Graphics._new(this._root, {
 				themeTags: $utils.mergeTags(axisRange.fills!.template.get("themeTags", []), ["line", "series", "fill"]),
-			}, [this.strokes.template, axisRange.fills!.template]),
+			}, [this.fills.template, axisRange.fills!.template]),
 		);
 
 		axisRange.strokes = new ListTemplate(
