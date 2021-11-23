@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.11] - 2021-11-23
+
+### Added
+- New `fps` property on `Root` which defines the maximum FPS that it will run at. Set it 30 or lower if performance is an issue.
+- `"range"` theme tag is now added to all axis range elements (axisFill, grid, tick and label) so you could target specific theme rules.
+- `"range"` and `"series"` theme tag is now added to all series axis range elements (axisFill, grid, tick and label) so you could target specific theme rules. 
+
+### Changed
+- A `axisFill` of an axis range will not be shown unless its `visible: true` setting is set.
+
+### Fixed
+- Adapter for `text` of a `Label` was not kicking in when data item of its `Tooltip` (or other parent of a Label) was changed.
+- Legend marker/label was not returning to a default state when clicked on a disabled item in some cases when Animated theme was not used.
+- Axis range fill tooltip was being shown in a wrong position.
+
+
 ## [5.0.10] - 2021-11-22
 
 ### Fixed

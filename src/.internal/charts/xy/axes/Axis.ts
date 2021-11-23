@@ -353,11 +353,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					dataItem.dispose();
 				});
 			} else if (change.type === "push") {
-				this._processAxisRange(change.newValue);
+				this._processAxisRange(change.newValue, ["range"]);
 			} else if (change.type === "setIndex") {
-				this._processAxisRange(change.newValue);
+				this._processAxisRange(change.newValue, ["range"]);
 			} else if (change.type === "insertIndex") {
-				this._processAxisRange(change.newValue);
+				this._processAxisRange(change.newValue, ["range"]);
 			} else if (change.type === "removeIndex") {
 				change.oldValue.dispose();
 			} else {
@@ -371,7 +371,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			renderer.processAxis();
 		}
 		this.children.push(renderer);
-		this.ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}));
+		this.ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}), []);
 		this.ghostLabel.set("opacity", 0);
 	}
 
@@ -527,9 +527,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 
-	public _processAxisRange(dataItem: DataItem<this["_dataItemSettings"]>) {
+	public _processAxisRange(dataItem: DataItem<this["_dataItemSettings"]>, themeTags:Array<string>) {
 		dataItem.setRaw("isRange", true);
-		this._createAssets(dataItem);
+		this._createAssets(dataItem, themeTags);
 		this._rangesDirty = true;
 		this._prepareDataItem(dataItem);
 
@@ -761,23 +761,23 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 */
 	public abstract basePosition(): number;
 
-	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>) {
+	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>, tags:Array<string>) {
 		const renderer = this.get("renderer");
 
 		if (!dataItem.get("label")) {
-			renderer.makeLabel(dataItem);
+			renderer.makeLabel(dataItem, tags);
 		}
 
 		if (!dataItem.get("grid")) {
-			renderer.makeGrid(dataItem);
+			renderer.makeGrid(dataItem, tags);
 		}
 
 		if (!dataItem.get("tick")) {
-			renderer.makeTick(dataItem);
+			renderer.makeTick(dataItem, tags);
 		}
 
 		if (!dataItem.get("axisFill")) {
-			renderer.makeAxisFill(dataItem);
+			renderer.makeAxisFill(dataItem, tags);
 		}
 
 		this._processBullet(dataItem);

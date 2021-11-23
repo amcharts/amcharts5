@@ -341,6 +341,28 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "fill", ic, "alternativeBackground");
 		}
 
+		r("Graphics", ["axis", "fill", "range"]).setAll({
+			isMeasured: true
+		});
+
+		// hides all elements of series axis range
+		r("Graphics", ["series", "fill", "range"]).setAll({
+			visible: false,
+			isMeasured: true
+		});
+
+		r("Grid", ["series", "range"]).setAll({
+			visible: false
+		});
+
+		r("AxisTick", ["series", "range"]).setAll({
+			visible: false
+		});
+
+		r("AxisLabel", ["series", "range"]).setAll({
+			visible: false
+		});
+
 		{
 			const rule = r("AxisTick");
 

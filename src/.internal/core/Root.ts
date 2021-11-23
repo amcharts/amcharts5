@@ -36,6 +36,18 @@ import * as $utils from "./util/Utils";
 import en from "../../locales/en";
 
 
+function rAF(fps: number | undefined, callback: (currentTime: number) => void): void {
+	if (fps == null) {
+		requestAnimationFrame(callback);
+
+	} else {
+		setTimeout(() => {
+			requestAnimationFrame(callback);
+		}, 1000 / fps);
+	}
+}
+
+
 /**
  * @ignore
  */
@@ -143,6 +155,13 @@ export class Root implements IDisposer {
 	 * @ignore timezones are not yet supported
 	 */
 	public timezone: string | null = null;
+
+	/**
+	 * The maximum FPS that the Root will run at.
+	 *
+	 * If `undefined` it will run at the highest FPS.
+	 */
+	public fps: number | undefined;
 
 	/**
 	 * Number formatter.
@@ -774,7 +793,7 @@ export class Root implements IDisposer {
 				this.animationTime = null;
 
 			} else {
-				requestAnimationFrame(this._ticker!);
+				rAF(this.fps, this._ticker!);
 			}
 		}
 	}
@@ -787,7 +806,7 @@ export class Root implements IDisposer {
 				this._runTicker(currentTime);
 			};
 
-			requestAnimationFrame(this._ticker);
+			rAF(this.fps, this._ticker!);
 		}
 	}
 

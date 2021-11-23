@@ -218,7 +218,7 @@ export class Text extends Sprite {
 		this.markDirty();
 	}
 
-	public _setDataItem(dataItem: DataItem<IComponentDataItem>): void {
+	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
 		super._setDataItem(dataItem);
 		if (this.get("populateText")) {
 			this.markDirtyText();

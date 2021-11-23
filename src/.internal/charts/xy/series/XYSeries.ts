@@ -663,12 +663,9 @@ export abstract class XYSeries extends Series {
 
 		const axis = <Axis<AxisRenderer>>axisDataItem.component;
 		if (axis) {
-			axis._processAxisRange(axisDataItem);
+			axis._processAxisRange(axisDataItem, ["range", "series"]);
 
-			axisDataItem.get("label")!.set("visible", false);
-			axisDataItem.get("tick")!.set("visible", false);
-			axisDataItem.get("grid")!.set("visible", false);
-			axisDataItem.get("axisFill")!.set("visible", false);
+			const axisFill = axisDataItem.get("axisFill");
 
 			const bullet = axisDataItem.get("bullet");
 			if (bullet) {
@@ -677,12 +674,10 @@ export abstract class XYSeries extends Series {
 					sprite.setPrivate("visible", false);
 				}
 			}
-
-			const axisFill = axisDataItem.get("axisFill");
+			
 			if (axisFill) {
 				this.children.push(axisFill);
 				container.set("mask", axisFill);
-				axisFill._setSoft("fillOpacity", 0);
 			}
 			axis._seriesAxisRanges.push(axisDataItem)
 		}

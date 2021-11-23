@@ -330,7 +330,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					dataItem = this.dataItems[i];
 				}
 
-				this._createAssets(dataItem);
+				this._createAssets(dataItem, []);
 
 				if (dataItem.isHidden()) {
 					dataItem.show();

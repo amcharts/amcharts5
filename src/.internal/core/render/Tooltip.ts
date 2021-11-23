@@ -15,7 +15,7 @@ import * as $math from "../util/Math";
 import * as $array from "../util/Array";
 import * as $utils from "../util/Utils";
 //import * as $utils from "../util/Utils";
-
+import type { DataItem, IComponentDataItem } from "./Component";
 
 
 export interface ITooltipSettings extends IContainerSettings {
@@ -285,6 +285,11 @@ export class Tooltip extends Container {
 			}
 		}
 	}
+
+	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
+		super._setDataItem(dataItem);
+		this.label._setDataItem(dataItem);
+	}	
 
 
 	protected _updateBackground() {

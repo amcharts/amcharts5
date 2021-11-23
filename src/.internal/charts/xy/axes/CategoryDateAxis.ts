@@ -220,7 +220,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 			$array.each(selectedItems, (item) => {
 				const dataItem = item.dataItem;
 				const format = item.format;
-				this._createAssets(dataItem);
+				this._createAssets(dataItem, []);
 
 				if (dataItem.isHidden()) {
 					dataItem.show();

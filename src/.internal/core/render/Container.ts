@@ -497,9 +497,12 @@ export class Container extends Sprite {
 			this._sizeDirty = true;
 			this.updateBackground();
 		}
+
+		this._handleStates();
 	}
 
-	public _updateChildren() {
+	public _updateChildren() {	
+
 		if (this.isDirty("verticalScrollbar")) {
 			const verticalScrollbar = this.get("verticalScrollbar")!;
 			if (verticalScrollbar) {

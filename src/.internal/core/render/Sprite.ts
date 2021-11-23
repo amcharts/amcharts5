@@ -720,6 +720,8 @@ export abstract class Sprite extends Entity {
 
 	protected _tooltipPointerDp: MultiDisposer | undefined;
 
+	protected _statesHandled: boolean = false;
+
 	protected _afterNew() {
 		this.setPrivateRaw("visible", true);
 		super._afterNew();
@@ -785,7 +787,7 @@ export abstract class Sprite extends Entity {
 
 	// TODO change this to run before the element is added to the parent, so that way
 	//      it doesn't need to apply the themes twice
-	public _setDataItem(dataItem: DataItem<IComponentDataItem> | undefined): void {
+	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
 		const oldDataItem = this._dataItem
 		this._dataItem = dataItem;
 		this._processTemplateField();
@@ -925,6 +927,39 @@ export abstract class Sprite extends Entity {
 		}
 	}
 
+	protected _handleStates() {
+		if (!this._statesHandled) {
+			if (this.isDirty("active")) {
+				if (this.get("active")) {
+					this.states.applyAnimate("active");
+					this.set("ariaChecked", true);
+				}
+				else {
+					if (!this.isHidden()) {
+						this.states.applyAnimate("default");
+					}
+					this.set("ariaChecked", false);
+				}
+				this.markDirtyAccessibility();
+			}
+
+			if (this.isDirty("disabled")) {
+				if (this.get("disabled")) {
+					this.states.applyAnimate("disabled");
+					this.set("ariaChecked", false);
+				}
+				else {
+					if (!this.isHidden()) {
+						this.states.applyAnimate("default");
+					}
+					this.set("ariaChecked", true);
+				}
+				this.markDirtyAccessibility();
+			}
+			this._statesHandled = true;
+		}
+	}
+
 	public _changed() {
 		super._changed();
 
@@ -994,33 +1029,7 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		if (this.isDirty("active")) {
-			if (this.get("active")) {
-				this.states.applyAnimate("active");
-				this.set("ariaChecked", true);
-			}
-			else {
-				if (!this.isHidden()) {
-					this.states.applyAnimate("default");
-				}
-				this.set("ariaChecked", false);
-			}
-			this.markDirtyAccessibility();
-		}
-
-		if (this.isDirty("disabled")) {
-			if (this.get("disabled")) {
-				this.states.applyAnimate("disabled");
-				this.set("ariaChecked", false);
-			}
-			else {
-				if (!this.isHidden()) {
-					this.states.applyAnimate("default");
-				}
-				this.set("ariaChecked", true);
-			}
-			this.markDirtyAccessibility();
-		}
+		this._handleStates();
 
 		if (this.isDirty("opacity")) {
 			display.alpha = Math.max(0, this.get("opacity", 1));
@@ -1576,6 +1585,7 @@ export abstract class Sprite extends Entity {
 	public _clearDirty() {
 		super._clearDirty();
 		this._sizeDirty = false;
+		this._statesHandled = false;
 	}
 
 	/**

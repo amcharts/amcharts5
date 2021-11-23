@@ -264,7 +264,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		for (let i = startIndex; i < endIndex; i = i + frequency) {
 			let dataItem = this.dataItems[i];
 
-			this._createAssets(dataItem);
+			this._createAssets(dataItem, []);
 
 			if (dataItem.isHidden()) {
 				dataItem.show();

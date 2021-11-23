@@ -108,10 +108,12 @@ export abstract class AxisRenderer extends Graphics {
 	/**
 	 * @ignore
 	 */
-	public makeTick(dataItem: DataItem<IAxisDataItem>): AxisTick {
-		const tick = this.axis.labelsContainer.children.push(this.ticks.make());
+	public makeTick(dataItem: DataItem<IAxisDataItem>, themeTags: Array<string>): AxisTick {
+		const tick = this.ticks.make();
 		tick._setDataItem(dataItem);
 		dataItem.setRaw("tick", tick);
+		tick.set("themeTags", $utils.mergeTags(tick.get("themeTags"), themeTags));
+		this.axis.labelsContainer.children.push(tick);
 		this.ticks.push(tick);
 		return tick;
 	}
@@ -133,10 +135,13 @@ export abstract class AxisRenderer extends Graphics {
 	/**
 	 * @ignore
 	 */
-	public makeGrid(dataItem: DataItem<IAxisDataItem>): Grid {
-		const grid = this.axis.gridContainer.children.push(this.grid.make());
+	public makeGrid(dataItem: DataItem<IAxisDataItem>, themeTags: Array<string>): Grid {
+		const grid = this.grid.make();
 		grid._setDataItem(dataItem);
 		dataItem.setRaw("grid", grid);
+		grid.set("themeTags", $utils.mergeTags(grid.get("themeTags"), themeTags));
+
+		this.axis.gridContainer.children.push(grid);
 		this.grid.push(grid);
 		return grid;
 	}
@@ -158,9 +163,12 @@ export abstract class AxisRenderer extends Graphics {
 	/**
 	 * @ignore
 	 */
-	public makeAxisFill(dataItem: DataItem<IAxisDataItem>): Grid {
-		const axisFill = this.axis.gridContainer.children.push(this.axisFills.make());
+	public makeAxisFill(dataItem: DataItem<IAxisDataItem>, themeTags: Array<string>): Grid {
+		const axisFill = this.axisFills.make();
 		axisFill._setDataItem(dataItem);
+		axisFill.set("themeTags", $utils.mergeTags(axisFill.get("themeTags"), themeTags));
+
+		this.axis.gridContainer.children.push(axisFill);
 		dataItem.setRaw("axisFill", axisFill);
 		this.axisFills.push(axisFill);
 		return axisFill;
@@ -183,11 +191,10 @@ export abstract class AxisRenderer extends Graphics {
 	/**
 	 * @ignore
 	 */
-	public makeLabel(dataItem: DataItem<IAxisDataItem>): AxisLabel {
+	public makeLabel(dataItem: DataItem<IAxisDataItem>, themeTags: Array<string>): AxisLabel {
 
 		const label = this.labels.make();
 
-		let themeTags = [];
 		if (this.get("opposite" as any)) {
 			themeTags.push("opposite");
 		}
@@ -342,7 +349,7 @@ export abstract class AxisRenderer extends Graphics {
 		}
 	}
 
-	protected _getPan(_point1: IPoint, _point2: IPoint): number{
+	protected _getPan(_point1: IPoint, _point2: IPoint): number {
 		return 0;
 	}
 
