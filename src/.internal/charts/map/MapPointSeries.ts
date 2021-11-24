@@ -101,6 +101,11 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 */
 	clipBack?: boolean;
 
+
+	latitudeField?:string;
+
+	longitudeField?:string;
+
 };
 
 /**
@@ -121,7 +126,7 @@ export class MapPointSeries extends MapSeries {
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = ["Point", "MultiPoint"];
 
 	protected _afterNew() {
-		this.fields.push("polygonId", "lineId");
+		this.fields.push("polygonId", "lineId", "longitude", "latitude");
 		super._afterNew();
 	}
 

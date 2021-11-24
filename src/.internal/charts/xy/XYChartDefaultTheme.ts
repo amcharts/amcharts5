@@ -10,6 +10,7 @@ import { percent, p50, p100 } from "../../core/util/Percent";
 import { ColorSet } from "../../core/util/ColorSet";
 import { setColor } from "../../themes/DefaultTheme";
 
+import * as $time from "../../core/util/Time";
 import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
 import * as $object from "../../core/util/Object";
@@ -500,12 +501,17 @@ export class XYChartDefaultTheme extends Theme {
 				if (axisFill) {
 					const axis = <DateAxis<AxisRenderer>>dataItem.component;
 					const value = dataItem.get("value");
-					const step = axis.getPrivate("step");
-					const min = axis.getPrivate("min", 0);
+					const endValue = dataItem.get("endValue");					
 					const intervalDuration = axis.intervalDuration();
+					const baseInterval = axis.getPrivate("baseInterval");
 
-					if ($type.isNumber(value) && $type.isNumber(step)) {
-						if (Math.round((value - min) / intervalDuration) / 2 == Math.round(Math.round((value - min) / intervalDuration) / 2)) {
+					let min = axis.getPrivate("min", 0);
+					min = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count).getTime();
+
+					if (value != null && endValue != null) {
+						const val = Math.round((value - min) / intervalDuration) / 2;
+
+						if (val == Math.round(val)) {
 							axisFill.setPrivate("visible", true);
 						}
 						else {

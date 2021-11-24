@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.12] - 2021-11-24
+
+### Added
+- `latitudeField` and `longitudeField` added to `MapPointSeries` for an easier way to add data.
+
+### Changed
+- Tooltip arrangement algorithm with many XY series was improved.
+
+### Fixed
+- Axis fill rule of `DateAxis` sometimes skipped an interval or was drawn two fills in a row. Also, with months as interval between grids, the end of the fill was not at exact position where it should have been.
+- When setting new data for a series, if new data has less items than series had before, a JS error could occur.
+
+
 ## [5.0.11] - 2021-11-23
 
 ### Added

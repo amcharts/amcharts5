@@ -346,8 +346,11 @@ export abstract class Series extends Component {
 	public _prepareChildren(){
 		super._prepareChildren();
 
-		let startIndex = this.getPrivate("startIndex", 0);
-		let endIndex = this.getPrivate("endIndex", this.dataItems.length);
+		const len = this.dataItems.length;
+
+		let startIndex = this.getPrivate("startIndex", 0);		
+		let endIndex = Math.min(len, this.getPrivate("endIndex", len));
+		this.setPrivateRaw("endIndex", endIndex); // update to handle less data
 
 		const calculateAggregates = this.get("calculateAggregates");
 		if(calculateAggregates){
@@ -380,8 +383,6 @@ export abstract class Series extends Component {
 
 		if (this.bullets.length > 0) {
 			let count = this.dataItems.length;
-			let startIndex = this.getPrivate("startIndex", 0);
-			let endIndex = this.getPrivate("endIndex", count);
 
 			for (let i = 0; i < startIndex; i++) {
 				this._hideBullets(this.dataItems[i]);

@@ -744,23 +744,25 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let selectionMax = min;
 
 			$array.each(this.series, (series) => {
-				let seriesMin: number | undefined;
-				let seriesMax: number | undefined;
-				if (series.get("xAxis") === this) {
-					seriesMin = series.getPrivate("selectionMinX", series.getPrivate("minX"));
-					seriesMax = series.getPrivate("selectionMaxX", series.getPrivate("maxX"));
-				}
-				else if (series.get("yAxis") === this) {
-					seriesMin = series.getPrivate("selectionMinY", series.getPrivate("minY"));
-					seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
-				}
-				if (!series.isHidden() && !series.isShowing()) {
-					if ($type.isNumber(seriesMin)) {
-						selectionMin = Math.min(selectionMin, seriesMin);
+				if (!series.get("ignoreMinMax")) {
+					let seriesMin: number | undefined;
+					let seriesMax: number | undefined;
+					if (series.get("xAxis") === this) {
+						seriesMin = series.getPrivate("selectionMinX", series.getPrivate("minX"));
+						seriesMax = series.getPrivate("selectionMaxX", series.getPrivate("maxX"));
 					}
+					else if (series.get("yAxis") === this) {
+						seriesMin = series.getPrivate("selectionMinY", series.getPrivate("minY"));
+						seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
+					}
+					if (!series.isHidden() && !series.isShowing()) {
+						if ($type.isNumber(seriesMin)) {
+							selectionMin = Math.min(selectionMin, seriesMin);
+						}
 
-					if ($type.isNumber(seriesMax)) {
-						selectionMax = Math.max(selectionMax, seriesMax);
+						if ($type.isNumber(seriesMax)) {
+							selectionMax = Math.max(selectionMax, seriesMax);
+						}
 					}
 				}
 			})
@@ -866,29 +868,31 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let minDiff = Infinity;
 
 		$array.each(this.series, (series) => {
-			let seriesMin: number | undefined;
-			let seriesMax: number | undefined;
-			if (series.get("xAxis") === this) {
-				seriesMin = series.getPrivate("minX");
-				seriesMax = series.getPrivate("maxX");
-			}
-			else if (series.get("yAxis") === this) {
-				seriesMin = series.getPrivate("minY");
-				seriesMax = series.getPrivate("maxY");
-			}
-
-			if ($type.isNumber(seriesMin) && $type.isNumber(seriesMax)) {
-				min = Math.min(min, seriesMin);
-				max = Math.max(max, seriesMax);
-
-				let diff = seriesMax - seriesMin;
-
-				if (diff <= 0) {
-					diff = Math.abs(seriesMax / 100);
+			if (!series.get("ignoreMinMax")) {
+				let seriesMin: number | undefined;
+				let seriesMax: number | undefined;
+				if (series.get("xAxis") === this) {
+					seriesMin = series.getPrivate("minX");
+					seriesMax = series.getPrivate("maxX");
+				}
+				else if (series.get("yAxis") === this) {
+					seriesMin = series.getPrivate("minY");
+					seriesMax = series.getPrivate("maxY");
 				}
 
-				if (diff < minDiff) {
-					minDiff = diff;
+				if ($type.isNumber(seriesMin) && $type.isNumber(seriesMax)) {
+					min = Math.min(min, seriesMin);
+					max = Math.max(max, seriesMax);
+
+					let diff = seriesMax - seriesMin;
+
+					if (diff <= 0) {
+						diff = Math.abs(seriesMax / 100);
+					}
+
+					if (diff < minDiff) {
+						minDiff = diff;
+					}
 				}
 			}
 		})

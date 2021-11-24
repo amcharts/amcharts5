@@ -1108,7 +1108,9 @@ export class XYChart extends SerialChart {
 						hidden = true;
 					}
 					else {
-						sum += point.y;
+						if (!hidden) {
+							sum += point.y;
+						}
 					}
 
 					if (hidden || series.isHidden() || series.isHiding()) {

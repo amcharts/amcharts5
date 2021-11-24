@@ -482,7 +482,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 
 				dataItem.setRaw("value", value);
-				dataItem.setRaw("endValue", value + intervalDuration);
+				dataItem.setRaw("endValue", $time.round(new Date(value + intervalDuration * 1.1), gridInterval.timeUnit, gridInterval.count).getTime());
+				
 				let date = new Date(value);
 
 				format = formats[gridInterval.timeUnit];
