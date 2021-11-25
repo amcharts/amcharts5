@@ -339,9 +339,10 @@ export class XYChart extends SerialChart {
 		const plotContainer = this.plotContainer;
 
 		if (wheelX !== "none" || wheelY !== "none") {
-			plotContainer.set("wheelable", true);
 			this._wheelDp = plotContainer.events.on("wheel", (event) => {
 				const wheelEvent = event.originalEvent;
+
+				wheelEvent.preventDefault();
 
 				const plotPoint = plotContainer.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
 				const wheelStep = this.get("wheelStep", 0.2);
@@ -489,7 +490,6 @@ export class XYChart extends SerialChart {
 			this._disposers.push(this._wheelDp);
 		}
 		else {
-			plotContainer.set("wheelable", false);
 			if (this._wheelDp) {
 				this._wheelDp.dispose();
 			}

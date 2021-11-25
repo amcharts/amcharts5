@@ -253,7 +253,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	protected _series: Array<this["_seriesType"]> = [];
 
-	public _isPanning:boolean = false;
+	public _isPanning: boolean = false;
 
 	/**
 	 * A [[Container]] that holds all the axis label elements.
@@ -527,7 +527,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 
-	public _processAxisRange(dataItem: DataItem<this["_dataItemSettings"]>, themeTags:Array<string>) {
+	public _processAxisRange(dataItem: DataItem<this["_dataItemSettings"]>, themeTags: Array<string>) {
 		dataItem.setRaw("isRange", true);
 		this._createAssets(dataItem, themeTags);
 		this._rangesDirty = true;
@@ -761,7 +761,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 */
 	public abstract basePosition(): number;
 
-	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>, tags:Array<string>) {
+	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>, tags: Array<string>) {
 		const renderer = this.get("renderer");
 
 		if (!dataItem.get("label")) {
@@ -863,7 +863,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		}
 		let start = this.get("start", 0);
 		let end = this.get("end", 1);
-		this.get("renderer").updateLabel(ghostLabel, start + (end - start) * 0.5);		
+		this.get("renderer").updateLabel(ghostLabel, start + (end - start) * 0.5);
 		ghostLabel.setPrivate("visible", true);
 	}
 
@@ -889,13 +889,20 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		const renderer = this.get("renderer");
 
 		if ($type.isNumber(position)) {
-			if (!snapToSeries) {
-				$array.each(this.series, (series) => {
-					if (series.get("baseAxis") === this) {
-						series.showDataItemTooltip(this.getSeriesItem(series, position!));
+
+			$array.each(this.series, (series) => {
+				if (series.get("baseAxis") === this) {
+					const dataItem = this.getSeriesItem(series, position!);
+					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
+						series.updateLegendMarker(dataItem);
+						series.updateLegendValue(dataItem);					
 					}
-				})
-			}
+					else {					
+						series.showDataItemTooltip(dataItem);					
+					}
+				}
+			})
+
 
 			if (tooltip) {
 				renderer.updateTooltipBounds(tooltip);

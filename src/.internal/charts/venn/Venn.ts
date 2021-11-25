@@ -430,6 +430,7 @@ export class Venn extends Series {
 		const slice = dataItem.get("slice");
 		if (slice) {
 			promises.push(slice.hide(duration));
+			slice.hideTooltip();
 		}
 
 		if (!dataItem.get("intersections")) {
@@ -490,7 +491,7 @@ export class Venn extends Series {
 	 */
 	public hoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		const slice = dataItem.get("slice");
-		if (slice) {
+		if (slice && !slice.isHidden()) {
 			slice.hover();
 		}
 	}

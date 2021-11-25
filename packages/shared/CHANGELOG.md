@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.13] - 2021-11-25
+
+### Added
+- `clickTarget` (possible vales: `"itemContainer"` (default), `"marker"`, and `"none"`) added to `Legend`. Use `clickTarget: "none"` to disable toggling of legend items.
+
+### Changed
+- Setting `wheelX`/`wheelY` on `XYChart` or `MapChart` no longer marks their plot areas as `wheelable`.
+
+### Fixed
+- In some cases using `oversizedBehavior = "wrap"` on labels in super small spaces the chart would hang.
+- Updating data on a `ForcedDirectedTree` may cause JS errors.
+- Hovering legend item of a hidden slice no longer tries to show the tooltip for it.
+- Drill-down maps were displaying country in a wrong position after drill-down.
+
+
 ## [5.0.12] - 2021-11-24
 
 ### Added

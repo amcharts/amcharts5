@@ -384,6 +384,8 @@ export abstract class PercentSeries extends Series {
 		}
 
 		const slice = dataItem.get("slice");
+		slice.hideTooltip();
+
 		if (slice) {
 			promises.push(slice.hide(duration));
 		}
@@ -421,7 +423,7 @@ export abstract class PercentSeries extends Series {
 	 */
 	public hoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		const slice = dataItem.get("slice");
-		if (slice) {
+		if (slice && !slice.isHidden()) {
 			slice.hover();
 		}
 	}

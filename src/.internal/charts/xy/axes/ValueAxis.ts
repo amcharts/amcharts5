@@ -233,6 +233,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		this.setPrivateRaw("name", "value");
+		this.addTag("value");
 		super._afterNew();
 	}
 

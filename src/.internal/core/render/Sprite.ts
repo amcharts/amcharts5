@@ -208,44 +208,44 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	/**
 	 * X position relative to parent.
 	 */
-	x?: number | Percent;
+	x?: number | Percent | null;
 
 	/**
 	 * Y position relative to parent.
 	 */
-	y?: number | Percent;
+	y?: number | Percent | null;
 
 	/**
 	 * Element's absolute width in pixels (numeric value) or relative width to
 	 * parent ([[Percent]]);
 	 */
-	width?: number | Percent;
+	width?: number | Percent | null;
 
 	/**
 	 * Element's absolute height in pixels (numeric value) or relative height to
 	 * parent ([[Percent]]);
 	 */
-	height?: number | Percent;
+	height?: number | Percent | null;
 
 	/**
 	 * Maximum allowed width in pixels.
 	 */
-	maxWidth?: number;
+	maxWidth?: number | null;
 
 	/**
 	 * Maximum allowed height in pixels.
 	 */
-	maxHeight?: number;
+	maxHeight?: number | null;
 
 	/**
 	 * Minimum allowed width in pixels.
 	 */
-	minWidth?: number;
+	minWidth?: number | null;
 
 	/**
 	 * Minimum allowed height in pixels.
 	 */
-	minHeight?: number;
+	minHeight?: number | null;
 
 	/**
 	 * Opacity. 0 - fully transparent; 1 - fully opaque.

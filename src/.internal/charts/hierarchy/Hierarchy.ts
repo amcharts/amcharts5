@@ -382,6 +382,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	protected _onDataClear() {
+		super._onDataClear();
 		const colors = this.get("colors");
 		if (colors) {
 			colors.reset();
@@ -576,6 +577,7 @@ export abstract class Hierarchy extends Series {
 
 		const node = dataItem.get("node");
 		node.hide();
+		node.hideTooltip();
 
 		if (children) {
 			$array.each(children, (childDataItem) => {
@@ -845,7 +847,7 @@ export abstract class Hierarchy extends Series {
 	 */
 	public hoverDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		const node = dataItem.get("node");
-		if (node) {
+		if (node && !node.isHidden()) {
 			node.hover();
 		}
 	}

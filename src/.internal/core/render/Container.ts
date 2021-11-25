@@ -501,7 +501,7 @@ export class Container extends Sprite {
 		this._handleStates();
 	}
 
-	public _updateChildren() {	
+	public _updateChildren() {
 
 		if (this.isDirty("verticalScrollbar")) {
 			const verticalScrollbar = this.get("verticalScrollbar")!;
@@ -523,9 +523,9 @@ export class Container extends Sprite {
 					}));
 				}
 
-				this.set("wheelable", true);
 				this._disposers.push(this.events.on("wheel", (event) => {
 					const wheelEvent = event.originalEvent;
+					wheelEvent.preventDefault();
 					const shiftY = wheelEvent.deltaY / 5000;
 					const start = verticalScrollbar.get("start", 0);
 					const end = verticalScrollbar.get("end", 1);

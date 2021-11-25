@@ -82,20 +82,21 @@ export class AxisRendererX extends AxisRenderer {
 		if (this.isDirty("inside")) {
 			axis.markDirtySize();
 		}
+		
+		const opposite = "opposite"
 
-
-		if (this.isDirty("opposite")) {
+		if (this.isDirty(opposite)) {
 			const chart = this.chart;
 
 			if (chart) {
 				const axisChildren = axis.children;
-				if (this.get("opposite")) {
+				if (this.get(opposite)) {
 					const children = chart.topAxesContainer.children;
 					if (children.indexOf(axis) == -1) {
 						children.insertIndex(0, axis);
 					}
 					axisChildren.moveValue(this);
-					this.addTag("opposite");
+					axis.addTag(opposite);
 				}
 				else {
 					const children = chart.bottomAxesContainer.children;
@@ -103,10 +104,11 @@ export class AxisRendererX extends AxisRenderer {
 						children.moveValue(axis);
 					}
 					axisChildren.moveValue(this, 0);
-					this.removeTag("opposite");
+					axis.removeTag(opposite);
 				}
 				axis.markDirtySize();
 			}
+			axis.ghostLabel._applyThemes();
 		}	
 
 		this.thumb.setPrivate("height", axis.labelsContainer.height());	
@@ -182,9 +184,10 @@ export class AxisRendererX extends AxisRenderer {
 		super.processAxis();
 		const axis = this.axis;
 		axis.set("width", p100);
-		axis.set("layout", this._root.verticalLayout);
+		const verticalLayout = this._root.verticalLayout;
+		axis.set("layout", verticalLayout);
 		axis.labelsContainer.set("width", p100);
-		axis.axisHeader.setAll({ layout: this._root.verticalLayout });
+		axis.axisHeader.setAll({ layout: verticalLayout });
 	}
 
 	/**

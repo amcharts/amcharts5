@@ -265,6 +265,8 @@ export class MapChart extends SerialChart {
 	protected _pw?: number;
 	protected _ph?: number;
 
+	protected _mapFitted:boolean = false;
+
 	protected _makeGeoPath() {
 		const projection = this.get("projection")!;
 		const path = geoPath();
@@ -294,7 +296,6 @@ export class MapChart extends SerialChart {
 
 		if (wheelX != "none" || wheelY != "none") {
 
-			chartContainer.set("wheelable", true);
 			this._wheelDp = chartContainer.events.on("wheel", (event) => {
 				const wheelEasing = this.get("wheelEasing")!;
 				const wheelSensitivity = this.get("wheelSensitivity", 1);
@@ -302,6 +303,7 @@ export class MapChart extends SerialChart {
 
 				const wheelEvent = event.originalEvent;
 
+				wheelEvent.preventDefault();
 
 				const chartContainer = this.chartContainer;
 				const point = chartContainer._display.toLocal(event.point);
@@ -331,8 +333,6 @@ export class MapChart extends SerialChart {
 			this._disposers.push(this._wheelDp);
 		}
 		else {
-			chartContainer.set("wheelable", false);
-
 			if (this._wheelDp) {
 				this._wheelDp.dispose();
 			}
@@ -385,16 +385,18 @@ export class MapChart extends SerialChart {
 		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
 			this._handleSetWheel();
 		}
-
+		var previousGeometries = this._geometryColection.geometries;
 		if (this._dirtyGeometries) {
 			this._geometryColection.geometries = [];
 
 			this.series.each((series) => {
 				$array.pushAll(this._geometryColection.geometries, series._geometries);
 			})
+
+			this._fitMap();
 		}
 
-		if (w != this._pw || h != this._ph || this._dirtyGeometries) {
+		if (previousGeometries.length != 0 && (w != this._pw || h != this._ph || this._dirtyGeometries)) {
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;
@@ -460,11 +462,51 @@ export class MapChart extends SerialChart {
 				this.markDirtyProjection();
 			}
 		}
+	}
 
-		if (this._dirtyGeometries) {
-			this._fitMap();
+
+	protected _fitMap() {
+		const projection = this.get("projection")!;
+
+		let w = this.innerWidth();
+		let h = this.innerHeight();
+
+		if (w > 0 && h > 0) {
+			projection.fitSize([w, h], this._geometryColection);
+			this.setPrivateRaw("mapScale", projection.scale());
+
+			const translate = projection.translate();
+
+			this.setRaw("translateX", translate[0]);
+			this.setRaw("translateY", translate[1]);
+
+			const geoPath = this.getPrivate("geoPath");
+			this._mapBounds = geoPath.bounds(this._geometryColection);
+
+			this._geoCentroid = $mapUtils.getGeoCentroid(this._geometryColection);
+
+			const bounds = $mapUtils.getGeoBounds(this._geometryColection);
+			this._geoBounds = bounds;
+
+			if (this._geometryColection.geometries.length > 0) {
+
+				bounds.left = $math.round(this._geoBounds.left, 3);
+				bounds.right = $math.round(this._geoBounds.right, 3);
+				bounds.top = $math.round(this._geoBounds.top, 3);
+				bounds.bottom = $math.round(this._geoBounds.bottom, 3);
+
+				const prevGeoBounds = this._prevGeoBounds;
+
+				if (prevGeoBounds && !$utils.sameBounds(bounds, prevGeoBounds)) {
+					this._dispatchBounds = true;
+					this._prevGeoBounds = bounds;
+				}
+			}
+
+			this._mapFitted = true;
 		}
 	}
+
 
 	/**
 	 * Repositions the map to the "home" zoom level and center coordinates.
@@ -514,43 +556,7 @@ export class MapChart extends SerialChart {
 		}
 	}
 
-	protected _fitMap() {
-		const projection = this.get("projection")!;
 
-		let w = this.innerWidth();
-		let h = this.innerHeight();
-		if (w > 0 && h > 0) {
-			projection.fitSize([w, h], this._geometryColection);
-			this.setPrivateRaw("mapScale", projection.scale());
-
-			const translate = projection.translate();
-			this.setRaw("translateX", translate[0]);
-			this.setRaw("translateY", translate[1]);
-
-			const geoPath = this.getPrivate("geoPath");
-			this._mapBounds = geoPath.bounds(this._geometryColection);
-
-			this._geoCentroid = $mapUtils.getGeoCentroid(this._geometryColection);
-
-			const bounds = $mapUtils.getGeoBounds(this._geometryColection);
-			this._geoBounds = bounds;
-
-			if (this._geometryColection.geometries.length > 0) {
-
-				bounds.left = $math.round(this._geoBounds.left, 3);
-				bounds.right = $math.round(this._geoBounds.right, 3);
-				bounds.top = $math.round(this._geoBounds.top, 3);
-				bounds.bottom = $math.round(this._geoBounds.bottom, 3);
-
-				const prevGeoBounds = this._prevGeoBounds;
-
-				if (prevGeoBounds && !$utils.sameBounds(bounds, prevGeoBounds)) {
-					this._dispatchBounds = true;
-					this._prevGeoBounds = bounds;
-				}
-			}
-		}
-	}
 
 	/**
 	 * @ignore
@@ -827,30 +833,6 @@ export class MapChart extends SerialChart {
 								y += local.y - downPoint.y;
 							}
 
-							/*							const bounds = this._mapBounds;
-
-														const w = this.width();
-														const h = this.height();
-
-														const ww = bounds[1][0] - bounds[0][0];
-														const hh = bounds[1][1] - bounds[0][1];
-
-														const zoomLevel = this.get("zoomLevel", 1);
-
-														const maxPanOut = 1 - Math.min(1, this.get("maxPanOut", 0));
-
-														let center = this.convert(this.geoCentroid());
-
-														if (panX == "translateX") {
-															//x = Math.min(x, w / 2 + (ww / 2 - 1) * zoomLevel - ww / 2 * maxPanOut);
-															//x = Math.max(x, w / 2 - (ww / 2 - 1) * zoomLevel + ww / 2 * maxPanOut);
-														}
-
-														if (panY == "translateY") {
-															//y = Math.min(y, h / 2 + (hh / 2 - 1) * zoomLevel - hh / 2 * maxPanOut);
-															//y = Math.max(y, h / 2 - (hh / 2 - 1) * zoomLevel + hh / 2 * maxPanOut);
-														}
-							*/
 							this.set("translateX", x);
 							this.set("translateY", y);
 
@@ -1016,5 +998,6 @@ export class MapChart extends SerialChart {
 	public _clearDirty() {
 		super._clearDirty();
 		this._dirtyGeometries = false;
+		this._mapFitted = false;
 	}
 }

@@ -318,7 +318,11 @@ export class ForceDirected extends LinkedHierarchy {
 			let node = dataItem.get("node") as LinkedHierarchyNode;
 			let circle = dataItem.get("circle");
 			let manyBodyStrength = this.get("manyBodyStrength", -15);
-			return circle.get("radius", 1) * node.get("scale", 1) * manyBodyStrength;
+
+			if(circle){
+				return circle.get("radius", 1) * node.get("scale", 1) * manyBodyStrength;
+			}
+			return 0;
 		}));
 
 		this.collisionForce.radius((d3node) => {
@@ -326,15 +330,17 @@ export class ForceDirected extends LinkedHierarchy {
 			let node = dataItem.get("node") as LinkedHierarchyNode;
 			let circle = dataItem.get("circle");
 			let outerCircle = dataItem.get("outerCircle");
-			let radius = circle.get("radius", 1);
+			if(circle && outerCircle){
+				let radius = circle.get("radius", 1);
 
-			if (!outerCircle.isHidden()) {
-				radius = radius * outerCircle.get("scale", 1.1);
+				if (!outerCircle.isHidden()) {
+					radius = radius * outerCircle.get("scale", 1.1);
+				}
+
+				radius *= node.get("scale", 1);
+
+				return radius + this.get("nodePadding", 0);
 			}
-
-			radius *= node.get("scale", 1);
-
-			return radius + this.get("nodePadding", 0);
 		})
 
 		this.restartSimulation(1);
@@ -511,4 +517,12 @@ export class ForceDirected extends LinkedHierarchy {
 	protected _handleUnlink() {
 		this.restartSimulation(0.5);
 	}
+
+	protected _onDataClear() {
+				
+		super._onDataClear();
+
+		this._nodes = [];
+		this._links = [];
+	}	
 }

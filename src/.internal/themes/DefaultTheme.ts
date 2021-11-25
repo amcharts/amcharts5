@@ -224,12 +224,12 @@ export class DefaultTheme extends Theme {
 			strokeField: "stroke",
 			nameField: "name",
 			layout: GridLayout.new(this._root, {}),
-			layer: 30
+			layer: 30,
+			clickTarget: "itemContainer"
 		});
 
 		// Class: Container
 		r("Container", ["legend", "item", "itemcontainer"]).setAll({
-			toggleKey: "disabled",
 			paddingLeft: 5,
 			paddingRight: 5,
 			paddingBottom: 5,
@@ -239,7 +239,6 @@ export class DefaultTheme extends Theme {
 			interactiveChildren: false,
 			ariaChecked: true,
 			focusable: true,
-			cursorOverStyle: "pointer",
 			ariaLabel: language.translate("Press ENTER to toggle")
 		});
 
@@ -391,7 +390,7 @@ export class DefaultTheme extends Theme {
 			centerX: p50,
 			inside: false,
 			radius: 0,
-			baseRadius:p100,
+			baseRadius: p100,
 			orientation: "auto",
 			textAlign: "center"
 		});
@@ -418,8 +417,8 @@ export class DefaultTheme extends Theme {
 
 		r("Slice").setAll({
 			shiftRadius: 0,
-			dRadius:0,
-			dInnerRadius:0
+			dRadius: 0,
+			dInnerRadius: 0
 		});
 
 		{
@@ -919,7 +918,7 @@ export class DefaultTheme extends Theme {
 
 		r("Tooltip", ["categoryaxis"]).setAll({
 			labelText: "{category}"
-		})	
+		})
 
 		/**
 		 * ------------------------------------------------------------------------

@@ -1632,7 +1632,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		const maxWidth = this.style.maxWidth!;
 
 		const truncate = $type.isNumber(maxWidth) && oversizedBehavior == "truncate";
-		const wrap = $type.isNumber(maxWidth) && oversizedBehavior == "wrap";	
+		const wrap = $type.isNumber(maxWidth) && oversizedBehavior == "wrap";
 
 		// Pre-render
 		context.save();
@@ -1772,11 +1772,16 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 						}
 						else if (wrap) {
-
 							// Check fit
 							if ((lineInfo.width + chunkWidth) > maxWidth) {
 								const excessWidth = maxWidth - lineInfo.width;
 								const tmpText = this._truncateText(context, chunk.text, excessWidth, false, firstTextChunk);
+
+								if (tmpText == "") {
+									// Unable to fit a single letter - hide the whole label
+									this._textVisible = true;
+									return false;
+								}
 								//skipFurtherText = true;
 
 								//Add remaining chunks for the next line
@@ -1804,8 +1809,6 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							}
 
 						}
-
-
 
 						// Chunk width?
 						let leftBoundMod = 1;
@@ -3366,7 +3369,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 				return this._makeSharedEvent("wheel", () => {
 					return $utils.addEventListener(window, $utils.getRendererEvent("wheel"), (event: WheelEvent) => {
 						this._dispatchWheel(event);
-					});
+					}, { passive: false });
 				});
 		}
 	}

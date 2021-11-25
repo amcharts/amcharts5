@@ -64,9 +64,9 @@ export interface ILegendItemSettings extends IEntitySettings {
  */
 export interface ILegendItem extends Entity {
 	_settings: ILegendItemSettings;
-	isHidden: () => boolean;
-	show: () => void;
-	hide: () => void;
+	isHidden?: () => boolean;
+	show?: () => void;
+	hide?: () => void;
 	createLegendMarker?: () => {}
 	component?: Series;
 	// how to define that properties of dataItem should have legendDataItem?
@@ -102,6 +102,10 @@ export interface ILegendSettings extends ISeriesSettings {
 	 */
 	strokeField?: string;
 
+	/**
+	 * @todo review
+	 */
+	clickTarget?: "itemContainer" | "marker" | "none"
 }
 
 export interface ILegendPrivate extends ISeriesPrivate {
@@ -251,56 +255,12 @@ export class Legend extends Series {
 		const strokeField = this.get("strokeField");
 
 		if (itemContainer) {
+			const clickTarget = this.get("clickTarget", "itemContainer");
+
 			const item = dataItem.dataContext as ILegendItem;
 
 			if (item && item.set) {
 				item.set(<any>"legendDataItem", dataItem);
-			}
-
-			if (item && item.show) {
-
-				this._disposers.push(item.on("visible", (visible) => {
-					itemContainer.set("disabled", !visible)
-				}));
-
-				if (!item.get("visible")) {
-					itemContainer.set("disabled", true);
-				}
-				itemContainer.events.on("pointerover", () => {
-					const component = item.component;
-					if (component && component.hoverDataItem) {
-						component.hoverDataItem(item as any)
-					}
-				})
-
-				itemContainer.events.on("pointerout", () => {
-					const component = item.component;
-					if (component && component.hoverDataItem) {
-						component.unhoverDataItem(item as any)
-					}
-				})
-
-				itemContainer.events.on("click", () => {
-					const toggleDp = itemContainer._toggleDp;
-					if (toggleDp) {
-						toggleDp.dispose();
-					}
-
-					if (itemContainer.get("toggleKey") != "none") {
-						const labelText = dataItem.get("label").text._getText();
-
-						if (item.isHidden() || item.get("visible") === false) {
-							item.show();
-							itemContainer.set("disabled", false);
-							this._root.readerAlert(this._t("%1 shown", this._root.locale, labelText));
-						}
-						else {
-							item.hide();
-							itemContainer.set("disabled", true);
-							this._root.readerAlert(this._t("%1 hidden", this._root.locale, labelText));
-						}
-					}
-				})
 			}
 
 			itemContainer._setDataItem(dataItem);
@@ -368,8 +328,61 @@ export class Legend extends Series {
 				valueLabel._setDataItem(dataItem);
 				dataItem.set("valueLabel", valueLabel);
 			}
+
+			if (item && item.show) {
+
+				this._disposers.push(item.on("visible", (visible) => {
+					itemContainer.set("disabled", !visible)
+				}));
+
+				if (!item.get("visible")) {
+					itemContainer.set("disabled", true);
+				}
+				
+				if(clickTarget != "none"){
+					var clickContainer = itemContainer;
+					if(clickTarget == "marker"){
+						clickContainer = marker;
+					}
+					this._addClickEvents(clickContainer, item, dataItem)
+				}
+			}
 		}
 	}
+
+
+	protected _addClickEvents(container: Container, item: ILegendItem, dataItem: DataItem<this["_dataItemSettings"]>) {
+		container.set("cursorOverStyle", "pointer");
+		container.events.on("pointerover", () => {
+			const component = item.component;
+			if (component && component.hoverDataItem) {
+				component.hoverDataItem(item as any)
+			}
+		})
+
+		container.events.on("pointerout", () => {
+			const component = item.component;
+			if (component && component.hoverDataItem) {
+				component.unhoverDataItem(item as any)
+			}
+		})
+
+		container.events.on("click", () => {			
+			const labelText = dataItem.get("label").text._getText();
+
+			if (item.show && item.isHidden && (item.isHidden() || item.get("visible") === false)) {
+				item.show();
+				container.set("disabled", false);
+				this._root.readerAlert(this._t("%1 shown", this._root.locale, labelText));
+			}
+			else if (item.hide) {
+				item.hide();
+				container.set("disabled", true);
+				this._root.readerAlert(this._t("%1 hidden", this._root.locale, labelText));
+			}
+		})
+	}
+
 
 	/**
 	 * @ignore
