@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.14] - 2021-12-01
+
+### Changed
+- When setting `markerState` on `Annotator` it will now automatically render annotations without the need to open annotation mode.
+
+### Fixed
+- Updating data dynamically on series in all-`ValueAxis` setups.
+- Rmoving axis range was not working properly.
+- Closing annotation mode would not make chart regain its interactivity.
+
+
 ## [5.0.13] - 2021-11-25
 
 ### Added

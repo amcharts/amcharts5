@@ -103,9 +103,16 @@ export interface ILegendSettings extends ISeriesSettings {
 	strokeField?: string;
 
 	/**
-	 * @todo review
+	 * Which legend item element will be clickable to toggle related chart item:
+	 * * `"itemContainer"` - the whole legend item (default).
+	 * * `"marker"` - legend item marker.
+	 * * `"none"` - disables toggling of legend item.
+	 *
+	 * @default "itemContainer"
+	 * @since 5.0.13
 	 */
 	clickTarget?: "itemContainer" | "marker" | "none"
+
 }
 
 export interface ILegendPrivate extends ISeriesPrivate {

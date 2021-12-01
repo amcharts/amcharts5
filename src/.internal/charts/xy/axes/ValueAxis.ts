@@ -659,14 +659,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		if (this.get("calculateTotals")) {
 			let series = this.series[0];
 			if (series) {
-				let startIndex = series.getPrivate("startIndex", 0);
+				let startIndex = series.startIndex();
 
 				if (series.dataItems.length > 0) {
 
 					if (startIndex > 0) {
 						startIndex--;
 					}
-					let endIndex = series.getPrivate("endIndex", series.dataItems.length);
+					let endIndex = series.endIndex();
 					if (endIndex < series.dataItems.length) {
 						endIndex++;
 					}

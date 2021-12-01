@@ -208,7 +208,7 @@ export class LineSeries extends XYSeries {
 					}
 				})
 
-				let startIndex = this.getPrivate("startIndex", 0);
+				let startIndex = this.startIndex();
 
 				let strokeTemplateField = this.strokes.template.get("templateField");
 				let fillTemplateField = this.fills.template.get("templateField");
@@ -250,7 +250,7 @@ export class LineSeries extends XYSeries {
 				}
 
 				let len = this.dataItems.length;
-				let endIndex = this.getPrivate("endIndex", len);
+				let endIndex = this.endIndex();
 
 				if (endIndex < len) {
 					endIndex++;

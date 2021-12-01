@@ -44,6 +44,7 @@ export class Annotator extends Entity {
 	private _container?: Container;
 	private _picture?: Picture;
 	private _markerArea?: any;
+	private _skipRender?: boolean = false;
 
 	//public extraImages: Array<Root | IAnnotatorImageSource> = [];
 	//public dataSources: any[] = [];
@@ -52,16 +53,14 @@ export class Annotator extends Entity {
 		super._afterNew();
 		this._setRawDefault("layer", 1000);
 		this._root.addDisposer(this);
-
-		if (this.get("markerState")) {
-			// Preload image
-			this.open();
-			this.close();
-		}
 	}
 
 	public _beforeChanged() {
 		super._beforeChanged();
+
+		if (this.isDirty("markerState")) {
+			this._renderState();
+		}
 	}
 
 	/**
@@ -83,13 +82,20 @@ export class Annotator extends Entity {
 		}
 	}
 
+	public async _renderState() {
+		const markerArea = await this.getMarkerArea();
+		if (this.get("markerState")) {
+			this._skipRender = true;
+			markerArea.renderState(this.get("markerState"));
+		}
+	}
+
 	/**
 	 * Exists from annotation mode. All annotations remain visible on the chart.
 	 */
 	public async close() {
-		this._root._renderer.interactionsEnabled = true;
+		//this._root._renderer.interactionsEnabled = true;
 		const markerArea = await this.getMarkerArea();
-		this._picture!.show(0);
 		markerArea!.close();
 	}
 
@@ -150,7 +156,7 @@ export class Annotator extends Entity {
 
 		// Create MarkerArea
 		if (!this._markerArea) {
-			const markerjs2 = await this._getMarkerArea();
+			const markerjs2 = await this._getMarkerJS();
 			const canvas = this._container._display.getCanvas();
 			const markerArea = new markerjs2.MarkerArea(canvas);
 			//markerArea.renderTarget = canvas;
@@ -158,11 +164,18 @@ export class Annotator extends Entity {
 			markerArea.uiStyleSettings.zIndex = 20;
 			markerArea.targetRoot = canvas.parentElement!;
 
-			markerArea.addRenderEventListener((img: any, state: any) => {
+			markerArea.addEventListener("close", () => {
+				this._root._renderer.interactionsEnabled = true;
+				this._picture!.show(0);
+			})
+
+			markerArea.addEventListener("render", (event: any) => {
 				const picture = this._picture!;
-				picture.set("src", img);
-				picture.show(0);
-				this.set("markerState", state);
+				picture.set("src", event.dataUrl);
+				if (!this._skipRender) {
+					this.set("markerState", event.state);
+				}
+				this._skipRender = false;
 			});
 
 			this._markerArea = markerArea;
@@ -172,7 +185,7 @@ export class Annotator extends Entity {
 	/**
 	 * @ignore
 	 */
-	private async _getMarkerArea(): Promise<any> {
+	private async _getMarkerJS(): Promise<any> {
 		return await import(/* webpackChunkName: "markerjs2" */ "markerjs2");
 	}
 

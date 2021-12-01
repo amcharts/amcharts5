@@ -539,8 +539,8 @@ export abstract class XYSeries extends Series {
 
 	public _mainContainerMask: Graphics | undefined;
 
-	protected _x:number = 0;
-	protected _y:number = 0;	
+	protected _x: number = 0;
+	protected _y: number = 0;
 
 	/**
 	 * A [[Container]] that us used to put series' elements in.
@@ -594,7 +594,7 @@ export abstract class XYSeries extends Series {
 
 	protected _emptyDataItem = new DataItem(this, undefined, {});
 
-	public _dataSetId?:string;
+	public _dataSetId?: string;
 
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
@@ -665,8 +665,6 @@ export abstract class XYSeries extends Series {
 		if (axis) {
 			axis._processAxisRange(axisDataItem, ["range", "series"]);
 
-			const axisFill = axisDataItem.get("axisFill");
-
 			const bullet = axisDataItem.get("bullet");
 			if (bullet) {
 				const sprite = bullet.get("sprite");
@@ -674,21 +672,25 @@ export abstract class XYSeries extends Series {
 					sprite.setPrivate("visible", false);
 				}
 			}
-			
+			const axisFill = axisDataItem.get("axisFill");
 			if (axisFill) {
-				this.children.push(axisFill);
 				container.set("mask", axisFill);
 			}
-			axis._seriesAxisRanges.push(axisDataItem)
+			axis._seriesAxisRanges.push(axisDataItem);
 		}
 	}
 
 	protected _removeAxisRange(axisRange: this["_axisRangeType"]) {
+		const axisDataItem = axisRange.axisDataItem;
+		const axis = <Axis<AxisRenderer>>axisDataItem.component;
+		axis.disposeDataItem(axisDataItem);
+
+		$array.remove(axis._seriesAxisRanges, axisDataItem);
+
 		const container = axisRange.container;
 		if (container) {
 			container.dispose();
 		}
-		axisRange.axisDataItem.dispose();
 	}
 
 	protected _updateFields() {
@@ -948,8 +950,8 @@ export abstract class XYSeries extends Series {
 
 		if ((this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty)) {
 
-			let startIndex = this.getPrivate("startIndex", 0);
-			let endIndex = this.getPrivate("endIndex", this.dataItems.length);
+			let startIndex = this.startIndex();
+			let endIndex = this.endIndex();
 			let minBulletDistance = this.get("minBulletDistance", 0);
 			if (minBulletDistance > 0 && baseAxis) {
 				if (baseAxis.get("renderer").axisLength() / (endIndex - startIndex) > minBulletDistance) {
@@ -1016,12 +1018,12 @@ export abstract class XYSeries extends Series {
 
 	protected _makeRangeMask() {
 		if (this.axisRanges.length > 0) {
-			if (!this._mainContainerMask) {
-				const mainContainerMask = this.children.push(Graphics.new(this._root, {}));
+			let mainContainerMask = this._mainContainerMask;
+			if (mainContainerMask == null) {
+				mainContainerMask = this.children.push(Graphics.new(this._root, {}));
 				this._mainContainerMask = mainContainerMask;
 
-
-				mainContainerMask!.set("draw", (display) => {
+				mainContainerMask.set("draw", (display, target) => {
 					const parent = this.parent;
 					if (parent) {
 						const w = this._root.container.width();
@@ -1040,18 +1042,21 @@ export abstract class XYSeries extends Series {
 								if (fill) {
 									let draw = fill.get("draw");
 									if (draw) {
-										draw(mainContainerMask._display, mainContainerMask);
+										draw(display, target);
 									}
 								}
 							}
 						})
 					}
-					this.mainContainer._display.mask = mainContainerMask._display;
+					this.mainContainer._display.mask = mainContainerMask!._display;
 				})
 			}
 
-			this._mainContainerMask.markDirty();
-			this._mainContainerMask._markDirtyKey("fill");
+			mainContainerMask.markDirty();
+			mainContainerMask._markDirtyKey("fill");
+		}
+		else {
+			this.mainContainer._display.mask = null;
 		}
 	}
 
@@ -1061,20 +1066,7 @@ export abstract class XYSeries extends Series {
 		// save for performance
 		this._x = this.x();
 		this._y = this.y();
-
 		this._makeRangeMask();
-	}
-
-	protected _maskBaseDraw() {
-		const mainContainerMask = this._mainContainerMask!;
-		mainContainerMask.set("draw", (display) => {
-			const parent = this.parent;
-			if (parent) {
-				const w = parent.width();
-				const h = parent.height();
-				display.drawRect(0, 0, w, h);
-			}
-		})
 	}
 
 	protected _stack() {
@@ -1169,7 +1161,7 @@ export abstract class XYSeries extends Series {
 							this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 							stackToSeries._stackedSeries[this.uid] = this;
 							break;
-						}						
+						}
 					}
 				}
 			}
@@ -1557,7 +1549,7 @@ export abstract class XYSeries extends Series {
 
 						if (show) {
 							const chart = this.chart;
-							if (chart && chart.inPlot(point)) {								
+							if (chart && chart.inPlot(point)) {
 								tooltip.label.text.markDirtyText();
 								tooltip.set("tooltipTarget", this._getTooltipTarget(dataItem));
 								tooltip.set("pointTo", this._display.toGlobal({ x: point.x, y: point.y }));
@@ -1670,11 +1662,6 @@ export abstract class XYSeries extends Series {
 
 	public _afterDataChange() {
 		super._afterDataChange();
-		
-		// this causes unneeded animation on live demo and it shouldn't be needed
-		//this.setPrivate("startIndex", 0);
-		//this.setPrivate("endIndex", this.dataItems.length);
-
 		this.resetExtremes();
 	}
 

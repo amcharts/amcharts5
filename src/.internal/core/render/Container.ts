@@ -153,6 +153,7 @@ export class Container extends Sprite {
 		if (background) {
 			background.dispose();
 		}
+
 		super._dispose();
 	}
 
@@ -581,6 +582,11 @@ export class Container extends Sprite {
 			}
 
 			if (mask) {
+				var parent = mask.parent;
+				if(parent){
+					parent.children.removeValue(mask);
+				}
+
 				mask._setParent(this);
 				this._display.addChildAt(mask._display, 0);
 				this._childrenDisplay.mask = mask._display;

@@ -279,6 +279,15 @@ export abstract class Series extends Component {
 		super._dispose();
 	}
 
+	public startIndex() {
+		return this.getPrivate("startIndex", 0);
+	}
+
+	public endIndex() {
+		let len = this.dataItems.length;
+		return Math.min(this.getPrivate("endIndex", len), len)
+	}	
+
 	protected _handleBullets(dataItems:Array<DataItem<this["_dataItemSettings"]>>){
 		$array.each(dataItems, (dataItem)=>{
 			const bullets = dataItem.bullets;
@@ -346,11 +355,8 @@ export abstract class Series extends Component {
 	public _prepareChildren(){
 		super._prepareChildren();
 
-		const len = this.dataItems.length;
-
-		let startIndex = this.getPrivate("startIndex", 0);		
-		let endIndex = Math.min(len, this.getPrivate("endIndex", len));
-		this.setPrivateRaw("endIndex", endIndex); // update to handle less data
+		let startIndex = this.startIndex();		
+		let endIndex = this.endIndex();
 
 		const calculateAggregates = this.get("calculateAggregates");
 		if(calculateAggregates){
@@ -525,8 +531,8 @@ export abstract class Series extends Component {
 	public _updateChildren() {
 		super._updateChildren();
 
-		this._psi = this.getPrivate("startIndex", 0);
-		this._pei = this.getPrivate("endIndex", this.dataItems.length);
+		this._psi = this.startIndex();
+		this._pei = this.endIndex();
 
 		// Apply heat rules
 		if (this._valuesDirty && this.get("heatRules") != null) {
@@ -578,8 +584,8 @@ export abstract class Series extends Component {
 
 		if (this.bullets.length > 0) {
 			let count = this.dataItems.length;
-			let startIndex = this.getPrivate("startIndex", 0);
-			let endIndex = this.getPrivate("endIndex", count);
+			let startIndex = this.startIndex();
+			let endIndex = this.endIndex();
 
 			if(endIndex < count){
 				endIndex++;
@@ -708,8 +714,8 @@ export abstract class Series extends Component {
 			}
 
 			if (duration > 0) {
-				const startIndex = this.getPrivate("startIndex", 0);
-				const endIndex = this.getPrivate("endIndex", this.dataItems.length);
+				const startIndex = this.startIndex();
+				const endIndex = this.endIndex();
 
 				await Promise.all($array.map(this.dataItems, async (dataItem, i) => {
 					let realDuration = duration || 0;

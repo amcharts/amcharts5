@@ -216,8 +216,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 			if (this._axesDirty || this._valuesDirty || this._stackDirty || this.isDirty("vcx") || this.isDirty("vcy") || this._sizeDirty) {
 				const len = this.dataItems.length;
 
-				let startIndex = Math.max(0, this.getPrivate("startIndex", 0) - 2);
-				let endIndex = Math.min(this.getPrivate("endIndex", len) + 2, len - 1);
+				let startIndex = Math.max(0, this.startIndex() - 2);
+				let endIndex = Math.min(this.endIndex() + 2, len - 1);
 
 				for (let i = 0; i < startIndex; i++) {
 					this._toggleColumn(this.dataItems[i], false);

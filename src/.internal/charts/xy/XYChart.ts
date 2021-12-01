@@ -660,8 +660,8 @@ export class XYChart extends SerialChart {
 				const dataItems: Array<DataItem<IXYSeriesDataItem>> = [];
 				$array.each(snapToSeries, (series) => {
 					if (!series.isHidden() && !series.isHiding()) {
-						const startIndex = series.getPrivate("startIndex", 0);
-						const endIndex = series.getPrivate("endIndex", series.dataItems.length - 1);
+						const startIndex = series.startIndex();
+						const endIndex = series.endIndex();
 						for (let i = startIndex; i < endIndex; i++) {
 							const dataItem = series.dataItems[i];
 							if (dataItem && !dataItem.isHidden()) {
