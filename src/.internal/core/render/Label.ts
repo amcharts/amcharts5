@@ -49,11 +49,19 @@ export interface ILabelSettings extends IContainerSettings {
 	 */
 	fontStyle?: "normal" | "italic" | "oblique";
 
-
 	/**
 	 * Font variant.
 	 */
 	fontVariant?: "normal" | "small-caps";
+
+	/**
+	 * Text decoration.
+	 *
+	 * The only option currently supported is `"underline"`.
+	 *
+	 * @since 5.0.15
+	 */
+	textDecoration?: "underline";
 
 	/**
 	 * Line height in percent or absolute pixels.
@@ -221,6 +229,7 @@ export class Label extends Container {
 		"fontWeight",
 		"fontStyle",
 		"fontVariant",
+		"textDecoration",
 		"shadowColor",
 		"shadowBlur",
 		"shadowOffsetX",

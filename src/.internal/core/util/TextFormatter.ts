@@ -242,6 +242,9 @@ export class TextFormatter {
 			if (b[i].match(/^(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)$/i)) {
 				(<any>format).fontWeight = b[i];
 			}
+			else if (b[i].match(/^(underline)$/i)) {
+				(<any>format).textDecoration = b[i];
+			}
 			else if (b[i] == "/") {
 				// Just closing tag
 				// Do nothing

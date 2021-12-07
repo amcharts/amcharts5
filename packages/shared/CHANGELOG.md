@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.15] - 2021-12-07
+
+### Added
+- Experimental support for underlined text added. Can be enabled via `Label` setting `fontDecoration: "underline"`, or via in-line style block (`[underline]`).
+- Three new accessibility settings added: `ariaControls`, `ariaValueMin`, and `ariaValueMax`.
+
+### Changed
+- Focus elements used for accessibility are now enclosed in a container with `role="application"` which helps avoid "scan mode" in some screen readers.
+- Tapping outside chart will now hide `XYCursor`.
+
+### Fixed
+- Sometimes `XYCursor` would stay on pointer moved out of chart area quickly.
+- Fixed memory leak.
+- Arabic text (and possibly other RTL languages) was not being displayed right on circular labels, even with `direction = "rtl"` set.
+- Arabic text (`direction = "rtl"`) was being misplaced in tooltips.
+- New line was resetting current in-line text style.
+
+
 ## [5.0.14] - 2021-12-01
 
 ### Changed
@@ -49,7 +67,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - New `fps` property on `Root` which defines the maximum FPS that it will run at. Set it 30 or lower if performance is an issue.
 - `"range"` theme tag is now added to all axis range elements (axisFill, grid, tick and label) so you could target specific theme rules.
-- `"range"` and `"series"` theme tag is now added to all series axis range elements (axisFill, grid, tick and label) so you could target specific theme rules. 
+- `"range"` and `"series"` theme tag is now added to all series axis range elements (axisFill, grid, tick and label) so you could target specific theme rules.
 
 ### Changed
 - A `axisFill` of an axis range will not be shown unless its `visible: true` setting is set.

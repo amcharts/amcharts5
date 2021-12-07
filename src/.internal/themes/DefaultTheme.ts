@@ -620,6 +620,8 @@ export class DefaultTheme extends Theme {
 			centerY: p50,
 			position: "absolute",
 			role: "slider",
+			ariaValueMin: "0",
+			ariaValueMax: "100",
 			ariaLabel: language.translate("Use up and down arrows to move selection")
 		});
 

@@ -66,6 +66,23 @@ export class Disposer implements IDisposer {
 }
 
 /**
+ * This can be extended by other classes to add a `_disposers` property.
+ *
+ * @ignore Exclude from docs
+ */
+export class ArrayDisposer extends Disposer {
+	protected _disposers: Array<IDisposer> = [];
+
+	constructor() {
+		super(() => {
+			$array.each(this._disposers, (x) => {
+				x.dispose();
+			});
+		});
+	}
+}
+
+/**
  * A collection of related disposers that can be disposed in one go.
  *
  * @ignore Exclude from docs

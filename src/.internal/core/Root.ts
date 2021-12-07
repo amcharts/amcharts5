@@ -443,6 +443,9 @@ export class Root implements IDisposer {
 		focusElementContainer.style.overflow = "hidden";
 		focusElementContainer.style.width = this.dom.clientWidth + "px";
 		focusElementContainer.style.height = this.dom.clientHeight + "px";
+
+		focusElementContainer.setAttribute("role", "application");
+
 		$utils.setInteractive(focusElementContainer, false);
 		this._focusElementContainer = focusElementContainer;
 		this._inner.appendChild(this._focusElementContainer);
@@ -453,7 +456,7 @@ export class Root implements IDisposer {
 		// Add keyboard events for accessibility, e.g. simulating drag with arrow
 		// keys and click with ENTER
 		if ($utils.supports("keyboardevents")) {
-			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+			this._disposers.push($utils.addEventListener(focusElementContainer, "keydown", (ev: KeyboardEvent) => {
 				const focusedSprite = this._focusedSprite;
 				if (focusedSprite) {
 					if (ev.keyCode == 27) {
@@ -547,7 +550,7 @@ export class Root implements IDisposer {
 				}
 			}));
 
-			document.addEventListener("keyup", (ev: KeyboardEvent) => {
+			this._disposers.push($utils.addEventListener(focusElementContainer, "keyup", (ev: KeyboardEvent) => {
 				if (this._focusedSprite) {
 					const focusedSprite = this._focusedSprite;
 					const keyCode = ev.keyCode;
@@ -592,12 +595,12 @@ export class Root implements IDisposer {
 								else if (index > lastIndex) {
 									index = 0;
 								}
-								$utils.focus(items[index].getPrivate("focusElement")!);
+								$utils.focus(items[index].getPrivate("focusElement")!.dom);
 							}
 							break;
 					}
 				}
-			});
+			}));
 		}
 
 		this._startTicker();
@@ -1003,7 +1006,7 @@ export class Root implements IDisposer {
 			if (group) {
 				if (groups.indexOf(group) !== -1) {
 					// Non-first element in the group, make it not directly focusable
-					item.getPrivate("focusElement")!.setAttribute("tabindex", "-1");
+					item.getPrivate("focusElement")!.dom.setAttribute("tabindex", "-1");
 				}
 				else {
 					groups.push(group);
@@ -1024,7 +1027,7 @@ export class Root implements IDisposer {
 
 		// Decorate with proper accessibility attributes
 		if (!focusElement) {
-			focusElement = target.getPrivate("focusElement")!;
+			focusElement = target.getPrivate("focusElement")!.dom;
 		}
 
 		if (!focusElement) {
@@ -1096,12 +1099,36 @@ export class Root implements IDisposer {
 			focusElement.removeAttribute("aria-valuenow");
 		}
 
+		const ariaValueMin = target.get("ariaValueMin");
+		if (ariaValueMin) {
+			focusElement.setAttribute("aria-valuemin", ariaValueMin);
+		}
+		else {
+			focusElement.removeAttribute("aria-valuemin");
+		}
+
+		const ariaValueMax = target.get("ariaValueMax");
+		if (ariaValueMax) {
+			focusElement.setAttribute("aria-valuemax", ariaValueMax);
+		}
+		else {
+			focusElement.removeAttribute("aria-valuemax");
+		}
+
 		const ariaValueText = target.get("ariaValueText");
 		if (ariaValueText) {
 			focusElement.setAttribute("aria-valuetext", ariaValueText);
 		}
 		else {
 			focusElement.removeAttribute("aria-valuetext");
+		}
+
+		const ariaControls = target.get("ariaControls");
+		if (ariaControls) {
+			focusElement.setAttribute("aria-controls", ariaControls);
+		}
+		else {
+			focusElement.removeAttribute("aria-controls");
 		}
 	}
 
@@ -1119,17 +1146,22 @@ export class Root implements IDisposer {
 		focusElement.style.position = "absolute";
 		$utils.setInteractive(focusElement, false);
 
-		target.setPrivate("focusElement", focusElement);
+		const disposers: Array<IDisposer> = [];
+
+		target.setPrivate("focusElement", {
+			dom: focusElement,
+			disposers,
+		});
 
 		this._decorateFocusElement(target);
 
-		focusElement.addEventListener("focus", (ev: FocusEvent) => {
+		disposers.push($utils.addEventListener(focusElement, "focus", (ev: FocusEvent) => {
 			this._handleFocus(ev, index);
-		});
+		}));
 
-		focusElement.addEventListener("blur", (ev: FocusEvent) => {
+		disposers.push($utils.addEventListener(focusElement, "blur", (ev: FocusEvent) => {
 			this._handleBlur(ev, index);
-		});
+		}));
 
 		this._moveFocusElement(index, target);
 
@@ -1140,15 +1172,17 @@ export class Root implements IDisposer {
 		// Init
 		const container = this._focusElementContainer!;
 		const focusElement = target.getPrivate("focusElement")!;
-		container.removeChild(focusElement);
-
+		container.removeChild(focusElement.dom);
+		$array.each(focusElement.disposers, (x) => {
+			x.dispose();
+		});
 	}
 
 	protected _moveFocusElement(index: number, target: Sprite): void {
 
 		// Get container
 		const container = this._focusElementContainer!;
-		const focusElement = target.getPrivate("focusElement")!;
+		const focusElement = target.getPrivate("focusElement")!.dom;
 
 		if (focusElement === this._focusElementContainer!.children[index]) {
 			// Nothing to do
@@ -1170,7 +1204,7 @@ export class Root implements IDisposer {
 		const width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
 		const height = bounds.top == bounds.bottom ? target.height() : bounds.bottom - bounds.top;
 
-		const focusElement = target.getPrivate("focusElement")!;
+		const focusElement = target.getPrivate("focusElement")!.dom;
 		focusElement.style.top = (bounds.top - 2) + "px";
 		focusElement.style.left = (bounds.left - 2) + "px";
 		focusElement.style.width = (width + 4) + "px";

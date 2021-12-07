@@ -1,6 +1,7 @@
 import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../core/util/Entity"
 import { Container } from "../../core/render/Container";
 import { Picture } from "../../core/render/Picture";
+import * as $utils from "../../core/util/Utils";
 
 import { p100 } from "../../core/util/Percent";
 
@@ -8,7 +9,7 @@ export interface IAnnotatorSettings extends IEntitySettings {
 
 	/**
 	 * Layer number to use for annotations.
-	 * 
+	 *
 	 * @default 1000
 	 */
 	layer?: number;
@@ -164,19 +165,19 @@ export class Annotator extends Entity {
 			markerArea.uiStyleSettings.zIndex = 20;
 			markerArea.targetRoot = canvas.parentElement!;
 
-			markerArea.addEventListener("close", () => {
+			this._disposers.push($utils.addEventListener(markerArea, "close", () => {
 				this._root._renderer.interactionsEnabled = true;
 				this._picture!.show(0);
-			})
+			}));
 
-			markerArea.addEventListener("render", (event: any) => {
+			this._disposers.push($utils.addEventListener(markerArea, "render", (event: any) => {
 				const picture = this._picture!;
 				picture.set("src", event.dataUrl);
 				if (!this._skipRender) {
 					this.set("markerState", event.state);
 				}
 				this._skipRender = false;
-			});
+			}));
 
 			this._markerArea = markerArea;
 		}

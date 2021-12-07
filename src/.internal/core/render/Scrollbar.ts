@@ -361,9 +361,15 @@ export class Scrollbar extends Container {
 		startGrip.set("ariaValueNow", "" + from);
 		startGrip.set("ariaValueText", from + "%");
 
+		startGrip.set("ariaValueMin", "0");
+		startGrip.set("ariaValueMax", "100");
+
 		endGrip.set("ariaLabel", this._t("To %1", undefined, toValue));
 		endGrip.set("ariaValueNow", "" + to);
 		endGrip.set("ariaValueText", to + "%");
+
+		endGrip.set("ariaValueMin", "0");
+		endGrip.set("ariaValueMax", "100");
 	}
 
 	protected _updateThumb() {

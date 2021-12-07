@@ -87,9 +87,24 @@ export interface IAccessibilitySettings {
 	ariaValueNow?: string;
 
 	/**
+	 * `aria-valuemin` setting.
+	 */
+	ariaValueMin?: string;
+
+	/**
+	 * `aria-valuemax` setting.
+	 */
+	ariaValueMax?: string;
+
+	/**
 	 * `aria-valuetext` setting.
 	 */
 	ariaValueText?: string;
+
+	/**
+	 * `aria-controls` setting.
+	 */
+	ariaControls?: string;
 
 	//ariaDescription?: string;
 	//readerControls?: string;

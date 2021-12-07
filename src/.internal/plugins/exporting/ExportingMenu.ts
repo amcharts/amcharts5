@@ -141,6 +141,7 @@ export class ExportingMenu extends Entity {
 	private _iconElement?: HTMLElement;
 	private _listElement?: HTMLUListElement;
 	private _itemElements?: HTMLLIElement[] = [];
+	private _itemDisposers: Array<IDisposer> = [];
 
 	private _cssDisposer?: IDisposer;
 	private _activeItem?: IExportingMenuItem;
@@ -284,29 +285,29 @@ export class ExportingMenu extends Entity {
 			}));
 		}
 
-		iconElement.addEventListener("click", (ev: MouseEvent) => {
+		this._disposers.push($utils.addEventListener(iconElement, "click", (ev: MouseEvent) => {
 			ev.stopImmediatePropagation();
 			this.toggle();
-		});
+		}));
 
 		menuElement.appendChild(this._iconElement);
 		menuElement.appendChild(this._listElement);
 
 		this._root._inner.appendChild(this._menuElement);
 
-		menuElement.addEventListener($utils.getRendererEvent("pointerover"), (_ev) => {
+		this._disposers.push($utils.addEventListener(menuElement, $utils.getRendererEvent("pointerover"), (_ev) => {
 			this._isOver = true;
 			if (this.get("deactivateRoot")) {
 				this._root._renderer.interactionsEnabled = false;
 			}
-		});
+		}));
 
-		menuElement.addEventListener($utils.getRendererEvent("pointerout"), (_ev) => {
+		this._disposers.push($utils.addEventListener(menuElement, $utils.getRendererEvent("pointerout"), (_ev) => {
 			this._isOver = false;
 			if (this.get("deactivateRoot")) {
 				this._root._renderer.interactionsEnabled = true;
 			}
-		});
+		}));
 
 		this._disposers.push(new Disposer(() => {
 			if (this._menuElement) {
@@ -365,6 +366,14 @@ export class ExportingMenu extends Entity {
 		}
 	}
 
+	protected _dispose(): void {
+		super._dispose();
+
+		$array.each(this._itemDisposers, (x) => {
+			x.dispose();
+		});
+	}
+
 	private _applyClassNames(): void {
 		const align = this.get("align", "right");
 		const valign = this.get("valign", "top");
@@ -388,6 +397,12 @@ export class ExportingMenu extends Entity {
 		const items = this.get("items", []);
 		const supportedFormats = exporting.supportedFormats();
 		const supportedExportTypes = exporting.supportedExportTypes();
+
+		$array.each(this._itemDisposers, (x) => {
+			x.dispose();
+		});
+
+		this._itemDisposers.length = 0;
 
 		$array.each(items, (item) => {
 
@@ -421,21 +436,21 @@ export class ExportingMenu extends Entity {
 			}
 
 			if (item.callback) {
-				a.addEventListener("click", (_ev) => {
+				this._itemDisposers.push($utils.addEventListener(a, "click", (_ev) => {
 					item.callback!.call(item.callbackTarget || this)
-				});
+				}));
 				a.setAttribute("tabindex", this._root.tabindex.toString());
 			}
 			else if (item.format && exporting) {
-				a.addEventListener("click", (_ev) => {
+				this._itemDisposers.push($utils.addEventListener(a, "click", (_ev) => {
 					this._handleClick(item);
-				});
-				a.addEventListener("focus", (_ev) => {
+				}));
+				this._itemDisposers.push($utils.addEventListener(a, "focus", (_ev) => {
 					this._handleItemFocus(item);
-				});
-				a.addEventListener("blur", (_ev) => {
+				}));
+				this._itemDisposers.push($utils.addEventListener(a, "blur", (_ev) => {
 					this._handleItemBlur(item);
-				});
+				}));
 				a.setAttribute("tabindex", this._root.tabindex.toString());
 				a.setAttribute("aria-label", ariaLabel);
 			}

@@ -304,10 +304,13 @@ export class XYCursor extends Container {
 
 		this._disposers.push(plotContainer.events.on("globalpointerup", (event) => {
 			this._handleCursorUp(event.originalEvent);
+			if (!event.native && !this.isHidden()) {
+				this._handleMove(event.originalEvent);
+			}
 		}));
 
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
-			if ($object.keys(plotContainer._downPoints).length == 0 && !event.native) {
+			if ($object.keys(plotContainer._downPoints).length == 0 && !event.native && this.isHidden()) {
 				// Ignore mouse movement if it originates on outside element and
 				// we're not dragging.
 				return;

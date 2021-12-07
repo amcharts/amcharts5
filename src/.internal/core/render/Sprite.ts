@@ -498,7 +498,10 @@ export interface ISpritePrivate extends IEntityPrivate {
 	/**
 	 * @ignore
 	 */
-	focusElement?: HTMLDivElement;
+	focusElement?: {
+		dom: HTMLDivElement,
+		disposers: Array<IDisposer>,
+	};
 
 	/**
 	 * An element tooltip should inherit its colors from.
@@ -808,7 +811,7 @@ export abstract class Sprite extends Entity {
 	 * NOTE: data item is being assigned automatically in most cases where it
 	 * matters. Use this accessor to set data item only if you know what you're
 	 * doing.
-	 * 
+	 *
 	 * @param  value  Data item
 	 */
 	public set dataItem(value: DataItem<IComponentDataItem> | undefined) {
@@ -1146,7 +1149,7 @@ export abstract class Sprite extends Entity {
 			this.markDirtyAccessibility();
 		}
 
-		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel")) {
+		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueMin") || this.isDirty("ariaValueMax") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel") || this.isDirty("ariaControls")) {
 			// display.accessibility.ariaLabel = populateString(this, this.get("ariaLabel", ""));
 			// @todo make sure ariaLabel gets populated in Root
 			this.markDirtyAccessibility();
@@ -1851,6 +1854,13 @@ export abstract class Sprite extends Entity {
 		this._removeTemplateField();
 		this._removeParent(this.parent);
 
+		const focusElement = this.getPrivate("focusElement");
+		if (focusElement) {
+			$array.each(focusElement.disposers, (x) => {
+				x.dispose();
+			});
+		}
+
 		const tooltip = this.get("tooltip");
 		if (tooltip) {
 			tooltip.dispose();
@@ -2308,7 +2318,6 @@ export abstract class Sprite extends Entity {
 	 *
 	 * @param  point  Local coordinate
 	 * @return        Global coordinate
-	 * @ignore
 	 */
 	public toGlobal(point: IPoint): IPoint {
 		return this._display.toGlobal(point);
@@ -2319,7 +2328,6 @@ export abstract class Sprite extends Entity {
 	 *
 	 * @param  point  Global coordinate
 	 * @return        Local coordinate
-	 * @ignore
 	 */
 	public toLocal(point: IPoint): IPoint {
 		return this._display.toLocal(point);

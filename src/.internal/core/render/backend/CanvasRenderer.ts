@@ -10,10 +10,11 @@ import { Color } from "../../util/Color";
 import { Matrix } from "../../util/Matrix";
 import { Percent, percent } from "../../util/Percent";
 import { Throttler } from "../../util/Throttler";
-import { Disposer, IDisposer, CounterDisposer } from "../../util/Disposer";
+import { ArrayDisposer, Disposer, IDisposer, CounterDisposer } from "../../util/Disposer";
 import { TextFormatter, ITextChunk } from "../../util/TextFormatter";
 import * as $utils from "../../util/Utils";
 import * as $array from "../../util/Array";
+import * as $object from "../../util/Object";
 import * as $type from "../../util/Type";
 import * as $math from "../../util/Math";
 import arcToBezier from 'svg-arc-to-cubic-bezier';
@@ -1377,6 +1378,7 @@ interface ILineChunk {
 	ascent: number,
 	offsetX: number,
 	offsetY: number,
+	textDecoration: string | undefined
 }
 
 /**
@@ -1546,17 +1548,12 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			const layerDirty = layer.dirty;
 			const ghostContext = this._renderer._ghostContext;
 
-
-			//console.log("interactive:",  interactive, "layerDirty:", layerDirty);
-
 			context.save();
 			ghostContext.save();
 			this._prerender(layer);
 
 			// const lines = this.text.toString().replace(/\r/g, "").split(/\n/);
 			// const x = this._localBounds && (this._localBounds.left < 0) ? Math.abs(this._localBounds.left) : 0;
-
-
 
 			// Process text info produced by _measure()
 			$array.each(this._textInfo!, (line, _index) => {
@@ -1582,6 +1579,43 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 					// Draw text
 					if (layerDirty) {
 						context.fillText(chunk.text, chunk.offsetX, line.offsetY + chunk.offsetY);
+					}
+
+					// Draw underline
+					if (chunk.textDecoration == "underline") {
+
+						let thickness = 1;
+						let offset = 1;
+						let fontSize = chunk.height;
+
+						if (chunk.style) {
+							const format = TextFormatter.getTextStyle(chunk.style);
+							switch (format.fontWeight) {
+								case "bolder":
+								case "bold":
+								case "700":
+								case "800":
+								case "900":
+									thickness = 2;
+									break;
+							}
+						}
+
+						if (fontSize) {
+							offset = fontSize / 20;
+						}
+						const y = thickness + offset * 1.5 + line.offsetY + chunk.offsetY;
+
+						context.save();
+						context.beginPath();
+						if (chunk.fill) {
+							context.strokeStyle = chunk.fill.toCSS();
+						}
+						context.lineWidth = thickness * offset;
+						context.moveTo(chunk.offsetX, y);
+						context.lineTo(chunk.offsetX + chunk.width, y);
+						context.stroke();
+						context.restore();
 					}
 
 					if (interactive && this.interactive) {
@@ -1623,6 +1657,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 	public _measure(layer: CanvasLayer): IBounds {
 		const context = layer.context;
 		const ghostContext = this._renderer._ghostContext;
+		const rtl = this.style.direction == "rtl";
 
 		// Reset text info
 		this._textInfo = [];
@@ -1650,6 +1685,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 		// Iterate through the lines
 		let offsetY = 0;
+		let currentStyle: string | undefined;
 		$array.each(lines, (line, _index) => {
 
 			// Split up line into format/value chunks
@@ -1684,8 +1720,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				lineInfo.height = height;
 				lineInfo.ascent = metrics.actualBoundingBoxAscent;
 
-				let currentStyle: string | undefined;
 				let currentFormat: string;
+				let currentDecoration: string | undefined = this.style.textDecoration;
 				let currentFill: Color | undefined;
 				let currentChunkWidth: number | undefined;
 				let skipFurtherText = false;
@@ -1708,6 +1744,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							currentFill = undefined;
 							currentStyle = undefined;
 							currentChunkWidth = undefined;
+							currentDecoration = this.style.textDecoration;
 							currentFormat = chunk.text;
 						}
 						else {
@@ -1724,6 +1761,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							context.font = fontStyle;
 							currentStyle = fontStyle;
 							currentFormat = chunk.text;
+							if (format.textDecoration) {
+								currentDecoration = format.textDecoration;
+							}
 							if (format.fill) {
 								currentFill = <Color>format.fill;
 							}
@@ -1854,7 +1894,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							right: metrics.actualBoundingBoxRight,
 							ascent: metrics.actualBoundingBoxAscent,
 							offsetX: 0,
-							offsetY: 0
+							offsetY: 0,
+							textDecoration: currentDecoration
 						});
 
 						//offsetX += chunkWidth;
@@ -1916,9 +1957,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		});
 
 		const bounds = {
-			left: -minX,
+			left: rtl ? -maxX : -minX,
 			top: 0,
-			right: maxX,
+			right: rtl ? minX : maxX,
 			bottom: offsetY,
 		};
 
@@ -2083,6 +2124,7 @@ export class CanvasTextStyle implements ITextStyle {
 	public fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 	public fontStyle?: 'normal' | 'italic' | 'oblique';
 	public fontVariant?: "normal" | "small-caps";
+	public textDecoration?: "underline";
 	public shadowColor?: Color | null;
 	public shadowBlur?: number;
 	public shadowOffsetX?: number;
@@ -2349,6 +2391,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 	public _measureCircular(layer: CanvasLayer): IBounds {
 		const context = layer.context;
 		const ghostContext = this._renderer._ghostContext;
+		const rtl = this.style.direction == "rtl";
 
 		// Reset text info
 		this._textInfo = [];
@@ -2423,7 +2466,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 					// Measure each letter
 					for (let i = 0; i < chunk.text.length; i++) {
 
-						const char = chunk.text[i];
+						const char = rtl ? chunk.text : chunk.text[i];
 
 						// Measure
 						const metrics = this._measureText(char, context);
@@ -2455,8 +2498,13 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 							right: metrics.actualBoundingBoxRight,
 							ascent: metrics.actualBoundingBoxAscent,
 							offsetX: 0,
-							offsetY: chunkHeight
+							offsetY: chunkHeight,
+							textDecoration: undefined
 						});
+
+						if (rtl) {
+							break;
+						}
 
 					}
 
@@ -2672,7 +2720,7 @@ interface Events<Key extends keyof IRendererEvents> {
 /**
  * @ignore
  */
-export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
+export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDisposer {
 	public view: HTMLElement = document.createElement("div");
 	protected _layerDom: HTMLElement = document.createElement("div");
 
@@ -2715,10 +2763,15 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 	});
 
 	constructor() {
-		super(() => {
-		});
+		super();
 
 		this.view.appendChild(this._layerDom);
+
+		this._disposers.push(new Disposer(() => {
+			$object.each(this._events, (_key, events) => {
+				events.disposer.dispose();
+			});
+		}));
 
 		// @todo : do the same for ghost
 		this._ghostView = document.createElement("canvas");
@@ -2726,23 +2779,23 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 		this._ghostContext.imageSmoothingEnabled = false;
 
 		// Monitor for possible pixel ratio changes (when page is zoomed)
-		window.addEventListener("resize", (_ev) => {
+		this._disposers.push($utils.addEventListener(window, "resize", (_ev) => {
 			this.resolution = window.devicePixelRatio;
-		});
+		}));
 
 		// We need this in order top prevent default touch gestures when dragging
 		// draggable elements
 		if ($utils.supports("touchevents")) {
-			document.addEventListener("touchstart", (ev) => {
+			this._disposers.push($utils.addEventListener(document, "touchstart", (ev) => {
 				if (this._dragging.length !== 0) {
 					ev.preventDefault();
 				}
-			}, { passive: false });
+			}, { passive: false }));
 		}
 
 		// Prevent scrolling of the window when hovering on "wheelable" object
 		if ($utils.supports("wheelevents")) {
-			this.view.addEventListener("wheel", (ev) => {
+			this._disposers.push($utils.addEventListener(this.view, "wheel", (ev) => {
 				let prevent = false;
 				this._hovering.forEach((obj) => {
 					if (obj.wheelable) {
@@ -2753,7 +2806,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 				if (prevent) {
 					ev.preventDefault();
 				}
-			}, { passive: false });
+			}, { passive: false }));
 		}
 
 	}
@@ -3203,6 +3256,7 @@ export class CanvasRenderer extends Disposer implements IRenderer, IDisposer {
 
 	_dispatchGlobalMouseup(originalEvent: IPointerEvent): void {
 		const event = this.getEvent(originalEvent);
+		event.native = this._isNativeEvent(originalEvent);
 		//const target = this._getHitTarget(event.point);
 		this._dispatchEventAll("globalpointerup", event);
 	}
