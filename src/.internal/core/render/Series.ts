@@ -387,24 +387,6 @@ export abstract class Series extends Component {
 			}
 		}
 
-		if (this.bullets.length > 0) {
-			let count = this.dataItems.length;
-
-			for (let i = 0; i < startIndex; i++) {
-				this._hideBullets(this.dataItems[i]);
-			}
-			for (let i = startIndex; i < endIndex; i++) {
-				let dataItem = this.dataItems[i];
-				if (!dataItem.bullets) {
-					this._makeBullets(dataItem);
-				}
-			}
-
-			for (let i = endIndex; i < count; i++) {
-				this._hideBullets(this.dataItems[i]);
-			}
-		}
-
 		if (this.isDirty("fill") || this.isDirty("stroke")) {
 
 			let markerRectangle: Graphics | undefined;
@@ -413,7 +395,6 @@ export abstract class Series extends Component {
 				markerRectangle = legendDataItem.get("markerRectangle");
 
 				if (markerRectangle) {
-
 					if (this.isDirty("stroke")) {
 						let stroke = this.get("stroke");
 						markerRectangle.set("stroke", stroke);
@@ -422,11 +403,24 @@ export abstract class Series extends Component {
 						let fill = this.get("fill");
 						markerRectangle.set("fill", fill);
 					}
-
 				}
 			}
 			this.updateLegendMarker(undefined);
-		}		
+		}	
+
+
+		if (this.bullets.length > 0) {
+			let startIndex = this.startIndex();
+			let endIndex = this.endIndex();
+
+			for (let i = startIndex; i < endIndex; i++) {
+				let dataItem = this.dataItems[i];
+				if (!dataItem.bullets) {
+					this._makeBullets(dataItem);
+				}
+			}
+		}
+
 	}
 
 	protected _calculateAggregates(startIndex: number, endIndex: number) {
@@ -594,8 +588,16 @@ export abstract class Series extends Component {
 				startIndex--;
 			}
 
+			for (let i = 0; i < startIndex; i++) {
+				this._hideBullets(this.dataItems[i]);
+			}
+
 			for (let i = startIndex; i < endIndex; i++) {
 				this._positionBullets(this.dataItems[i]);
+			}
+
+			for (let i = endIndex; i < count; i++) {
+				this._hideBullets(this.dataItems[i]);
 			}
 		}
 	}

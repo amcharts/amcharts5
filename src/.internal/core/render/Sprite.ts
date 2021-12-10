@@ -6,11 +6,11 @@ import type { NumberFormatter } from "../util/NumberFormatter";
 import type { DateFormatter } from "../util/DateFormatter";
 import type { DurationFormatter } from "../util/DurationFormatter";
 import type { DataItem, IComponentDataItem } from "./Component";
-import type { Tooltip } from "./Tooltip";
 import type { Graphics } from "./Graphics";
 import type { IPoint } from "../util/IPoint";
 import type { ListTemplate } from "../util/List";
 
+import type { Tooltip } from "./Tooltip";
 import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../util/Entity";
 import { Template } from "../util/Template";
 import { Percent } from "../util/Percent";
@@ -455,6 +455,20 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * even if `show()` is called.
 	 */
 	forceHidden?: boolean;
+
+
+	/**
+	 * Defines when tooltip is shown over the element.
+	 *
+	 * Available options:
+	 * * `"hover"` (default) - tooltip is shown when element is hovered by a pointer or touched. It is hidden as soon as element is not hovered anymore, or touch occurs outside it.
+	 * * `"always"` - a tooltip will always be shown over the element, without any interactions. Please note that if you need to show tooltips for multiple elements at the same time, you need to explicitly create a `Tooltip` instance and set element's `tooltip` setting with it.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Sticky_tooltips} for more info
+	 * @default "hover"
+	 * @since 5.0.16
+	 */
+	showTooltipOn?: "hover" | "always"
 
 }
 
@@ -1001,10 +1015,12 @@ export abstract class Sprite extends Entity {
 			if (tooltipText) {
 				this._tooltipDp = new MultiDisposer([
 					events.on("pointerover", () => {
-						this.showTooltip()
+						this.showTooltip();
 					}),
 					events.on("pointerout", () => {
-						this.hideTooltip()
+						if (this.get("showTooltipOn") != "always") {
+							this.hideTooltip();
+						}
 					})])
 			}
 			else {
@@ -1056,6 +1072,7 @@ export abstract class Sprite extends Entity {
 		if (this.isDirty("visible") || this.isPrivateDirty("visible") || this.isDirty("forceHidden")) {
 			if (!this.get("visible") || !this.getPrivate("visible") || this.get("forceHidden")) {
 				display.visible = false;
+				this.hideTooltip();
 			}
 			else {
 				display.visible = true;
@@ -1215,6 +1232,9 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
+		if (this.get("showTooltipOn") == "always" && this._display.visible) {
+			this.showTooltip();
+		}
 	}
 
 	/**
@@ -1619,7 +1639,8 @@ export abstract class Sprite extends Entity {
 			const tooltipTarget = this.getPrivate("tooltipTarget", this);
 
 			if (tooltipPosition == "fixed" || !point) {
-				point = this._display.toGlobal(tooltipTarget._getTooltipPoint());
+				this._display._setMatrix();
+				point = this.toGlobal(tooltipTarget._getTooltipPoint());
 			}
 
 			tooltip.set("pointTo", point);
@@ -1637,13 +1658,18 @@ export abstract class Sprite extends Entity {
 			if (dataItem) {
 				tooltip.label._setDataItem(dataItem);
 			}
+
+			if (this.get("showTooltipOn") == "always" && (point.x < 0 || point.x > this._root.width() || point.y < 0 || point.y > this._root.height())) {
+				this.hideTooltip();
+				return;
+			}
+
 			tooltip.label.text.markDirtyText();
 			const promise = tooltip.show();
 			this.setPrivateRaw("showingTooltip", true);
 			return promise;
 		}
 	}
-
 
 	/**
 	 * Hides element's [[Tooltip]].
@@ -1659,6 +1685,7 @@ export abstract class Sprite extends Entity {
 
 	public _getTooltipPoint(): IPoint {
 		const bounds = this._localBounds!;
+
 		if (bounds) {
 			let x = 0;
 			let y = 0;
@@ -1775,7 +1802,6 @@ export abstract class Sprite extends Entity {
 		if (this.getPrivate("showingTooltip")) {
 			this.showTooltip();
 		}
-
 	}
 
 	/**
@@ -1908,12 +1934,11 @@ export abstract class Sprite extends Entity {
 	 */
 	public globalBounds(): IBounds {
 		const bounds = this.localBounds();
-		const display = this._display;
 
-		const p0 = display.toGlobal({ x: bounds.left, y: bounds.top });
-		const p1 = display.toGlobal({ x: bounds.right, y: bounds.top });
-		const p2 = display.toGlobal({ x: bounds.right, y: bounds.bottom });
-		const p3 = display.toGlobal({ x: bounds.left, y: bounds.bottom });
+		const p0 = this.toGlobal({ x: bounds.left, y: bounds.top });
+		const p1 = this.toGlobal({ x: bounds.right, y: bounds.top });
+		const p2 = this.toGlobal({ x: bounds.right, y: bounds.bottom });
+		const p3 = this.toGlobal({ x: bounds.left, y: bounds.bottom });
 
 		return {
 			left: Math.min(p0.x, p1.x, p2.x, p3.x),

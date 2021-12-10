@@ -452,7 +452,9 @@ export abstract class PercentSeries extends Series {
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
 				$array.each(visualSettings, (setting: any) => {
-					markerRectangle.set(setting, slice.get(setting));
+					if(slice.get(setting) != null){
+						markerRectangle.set(setting, slice.get(setting));
+					}
 				})
 			}
 		}

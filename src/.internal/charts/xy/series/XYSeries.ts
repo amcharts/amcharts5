@@ -414,6 +414,22 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 */
 	seriesTooltipTarget?: "series" | "bullet";
 
+	/**
+	 * Indicates horizontal position at which to show series' tooltip at.
+	 *
+	 * @default "value"
+	 * @since 5.0.16
+	 */
+	tooltipPositionX?: "open" | "value" | "low" | "high";
+
+	/**
+	 * Indicates vertical position at which to show series' tooltip at.
+	 * 
+	 * @default "value"
+	 * @since 5.0.16
+	 */
+	tooltipPositionY?: "open" | "value" | "low" | "high";
+
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {
@@ -596,6 +612,9 @@ export abstract class XYSeries extends Series {
 
 	public _dataSetId?: string;
 
+	protected _tooltipFieldX?: string;
+	protected _tooltipFieldY?: string;
+
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
 		this.valueFields.push("valueX", "valueY", "openValueX", "openValueY");
@@ -761,6 +780,9 @@ export abstract class XYSeries extends Series {
 	}
 
 	protected _shouldMakeBullet(dataItem: DataItem<this["_dataItemSettings"]>): boolean {
+		if (!this.get("xAxis").inited || !this.get("yAxis").inited) {
+			return false
+		}
 		if (dataItem.get(this._xField as any) != null && dataItem.get(this._yField as any) != null) {
 			return true;
 		}
@@ -856,6 +878,41 @@ export abstract class XYSeries extends Series {
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 		const baseAxis = this.get("baseAxis");
+
+		const tooltipPositionX = this.get("tooltipPositionX");
+		let tooltipFieldX: string;
+
+		switch (tooltipPositionX) {
+			case "open":
+				tooltipFieldX = this._xOpenField;
+				break;
+			case "low":
+				tooltipFieldX = this._xLowField;
+				break;
+			case "high":
+				tooltipFieldX = this._xHighField;
+				break;
+			default:
+				tooltipFieldX = this._xField;
+		}
+		this._tooltipFieldX = tooltipFieldX;
+
+		const tooltipPositionY = this.get("tooltipPositionY");
+		let tooltipFieldY: string;
+		switch (tooltipPositionY) {
+			case "open":
+				tooltipFieldY = this._yOpenField;
+				break;
+			case "low":
+				tooltipFieldY = this._yLowField;
+				break;
+			case "high":
+				tooltipFieldY = this._yHighField;
+				break;
+			default:
+				tooltipFieldY = this._yField;
+		}
+		this._tooltipFieldY = tooltipFieldY;
 
 		if (this.isDirty("baseAxis")) {
 			this._fixVC();
@@ -1535,8 +1592,8 @@ export abstract class XYSeries extends Series {
 						const vcx = this.get("vcx", 1);
 						const vcy = this.get("vcy", 1);
 
-						const xPos = xAxis.getDataItemPositionX(dataItem, this._xField, this._aLocationX0 + (this._aLocationX1 - this._aLocationX0) * itemLocationX, vcx);
-						const yPos = yAxis.getDataItemPositionY(dataItem, this._yField, this._aLocationY0 + (this._aLocationY1 - this._aLocationY0) * itemLocationY, vcy);
+						const xPos = xAxis.getDataItemPositionX(dataItem, this._tooltipFieldX!, this._aLocationX0 + (this._aLocationX1 - this._aLocationX0) * itemLocationX, vcx);
+						const yPos = yAxis.getDataItemPositionY(dataItem, this._tooltipFieldY!, this._aLocationY0 + (this._aLocationY1 - this._aLocationY0) * itemLocationY, vcy);
 
 						const point = this.getPoint(xPos, yPos);
 
@@ -1691,6 +1748,5 @@ export abstract class XYSeries extends Series {
 			axisDataItem: axisDataItem
 		})
 	}
-
 
 }

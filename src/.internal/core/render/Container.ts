@@ -165,6 +165,8 @@ export class Container extends Sprite {
 		}
 
 		if (this.isDirty("layout")) {
+			this._prevWidth = 0;
+			this._prevHeight = 0;
 			this.markDirtyBounds();
 			if (this._prevSettings.layout) {
 				this.children.each((child) => {
@@ -583,7 +585,7 @@ export class Container extends Sprite {
 
 			if (mask) {
 				var parent = mask.parent;
-				if(parent){
+				if (parent) {
 					parent.children.removeValue(mask);
 				}
 

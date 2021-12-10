@@ -694,7 +694,11 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * @ignore
+	 * Converts screen coordinates (X and Y) within chart to latitude and
+	 * longitude.
+	 * 
+	 * @param  point  Screen coordinates
+	 * @return        Geographical coordinates
 	 */
 	public invert(point: IPoint): IGeoPoint {
 		let projection = this.get("projection")!;
@@ -710,7 +714,10 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * @ignore
+	 * Converts latitude/longitude to screen coordinates (X and Y).
+	 * 
+	 * @param  point  Geographical coordinates
+	 * @return        Screen coordinates
 	 */
 	public convert(point: IGeoPoint): IPoint {
 		let projection = this.get("projection")!;

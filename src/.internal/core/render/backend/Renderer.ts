@@ -106,6 +106,7 @@ export interface IDisplayObject extends IDisposer {
 	cursorOverStyle?: string;
 	exportable?: boolean;
 
+	_setMatrix():void;
 	getLayer(): ILayer;
 	setLayer(order: number | undefined): void;
 	markDirtyLayer(deep?: boolean): void;

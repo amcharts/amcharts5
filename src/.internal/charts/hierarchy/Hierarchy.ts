@@ -437,7 +437,7 @@ export abstract class Hierarchy extends Series {
 		const children = dataItem.get("children");
 		if (!children || children.length == 0) {
 			const node = dataItem.get("node");
-			node.setAll({ toggleKey: undefined, cursorOverStyle: "default" });
+			node.setAll({ toggleKey: undefined });
 		}
 
 		if (dataItem.get("disabled") == null) {

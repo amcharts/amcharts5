@@ -305,6 +305,12 @@ export class Legend extends Series {
 
 				markerRectangle.setAll({ fill, stroke });
 
+				// this solves if template field is set on slice
+				const component = item.component;
+				if(component && component.updateLegendMarker){
+					component.updateLegendMarker(item as any);
+				}
+
 			}
 
 			const label = this.makeLabel();

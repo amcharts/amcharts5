@@ -1,4 +1,5 @@
 import type { ExportingMenu } from "./ExportingMenu"
+import type { TimeUnit } from "../../core/util/Time";
 
 import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../core/util/Entity"
 import { Color } from "../../core/util/Color";
@@ -163,6 +164,33 @@ export interface IExportingSettings extends IEntitySettings {
 	 * Use this date format on date values.
 	 */
 	dateFormat?: string | Intl.DateTimeFormatOptions,
+
+	/**
+	 * Fields in data that need to be formatted as "duration" as per `durationFormat`.
+	 *
+	 * @since 5.0.16
+	 */
+	durationFields?: string[],
+
+	/**
+	 * Format to use when formatting values in `durationFields`.
+	 *
+	 * If not set, will use `durationFormat` as set in [[DurationFormatter]] of
+	 * the root element.
+	 * 
+	 * @since 5.0.16
+	 */
+	durationFormat?: string,
+
+	/**
+	 * Time unit to assume duration values are in.
+	 *
+	 * If not set, will use `baseUnit` as set in [[DurationFormatter]] of
+	 * the root element.
+	 * 
+	 * @since 5.0.16
+	 */
+	durationUnit?: TimeUnit;
 
 	/**
 	 * Include these images or other charts in image exports.
@@ -606,6 +634,7 @@ export class Exporting extends Entity {
 		this._setRawDefault("charset", "utf-8");
 		this._setRawDefault("numericFields", []);
 		this._setRawDefault("dateFields", []);
+		this._setRawDefault("durationFields", []);
 		this._setRawDefault("extraImages", []);
 		this._setRawDefault("pngOptions", { quality: 1, maintainPixelRatio: false });
 		this._setRawDefault("jpgOptions", { quality: 0.8, maintainPixelRatio: false });
@@ -1873,6 +1902,9 @@ export class Exporting extends Entity {
 			else if (this.isNumericField(field) && this.get("numberFormat")) {
 				return this._root.numberFormatter.format(value, this.get("numberFormat"));
 			}
+			else if (this.isDurationField(field)) {
+				return this._root.durationFormatter.format(value, this.get("durationFormat"), this.get("durationUnit"));
+			}
 		}
 
 		if (value instanceof Date) {
@@ -1904,6 +1936,13 @@ export class Exporting extends Entity {
 	 */
 	public isNumericField(field: string): boolean {
 		return this.get("numericFields")!.indexOf(field) !== -1;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public isDurationField(field: string): boolean {
+		return this.get("durationFields")!.indexOf(field) !== -1;
 	}
 
 	/**

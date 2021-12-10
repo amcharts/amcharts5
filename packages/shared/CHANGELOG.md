@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.16] - 2021-12-10
+
+### Added
+- `tooltipPositionX` and `tooltipPositionY` added to `XYSeries` (possible values: `"value"`, `"open"`, `"low"`, and `"high"`). Indicates which data item value tooltip should be anchored to.
+- New settings added to `Exporting` for formatting durations: `durationFields`, `durationFormat`, and `durationUnit`.
+- `showTooltipOn` (default: `"hover"`) added to `Sprite`. Another option is `"always"` which will show tooltip without any interaction with the element. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Sticky_tooltips).
+
+### Changed
+- `Hierarchy` will now set bottom-level node's `cursorOverStyle: "default"` via theme, instead of hardocding it, so that it can be overridden via node templates.
+
+### Fixed
+- Stacked `XYSeries` with missing values and `valueYShow` set to `"valueYTotalPercent"` or `valueXShow` set to `"valueXTotalPercent"` were not showing columns/lines.
+- Changing legend position from bottom/top to right/left was not arranging elements properly.
+- If `Slice` of a `PieSeries` had a `templateField` set, legend marker was not using all the settings of that slice properly.
+- Bullets were causing performance issues when data grouping was turned on.
+- `Label` underline was not inheriting label's color properly.
+- `Label` underline was not beign placed properly on center/right-aligned labels.
+
+
 ## [5.0.15] - 2021-12-07
 
 ### Added

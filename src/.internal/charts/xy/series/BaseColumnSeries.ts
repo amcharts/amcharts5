@@ -56,7 +56,7 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 *
 	 * @default true
 	 */
-	adjustBulletPosition?:boolean;
+	adjustBulletPosition?: boolean;
 
 }
 
@@ -133,6 +133,25 @@ export abstract class BaseColumnSeries extends XYSeries {
 		if (yAxis.isType<DateAxis<any>>(valueAxis)) {
 			if (!this.get("openValueYField")) {
 				this._yOpenField = this._yField;
+			}
+		}
+	}
+
+
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
+
+		const len = this.dataItems.length;
+		const startIndex = Math.max(0, this.startIndex() - 2);
+		const endIndex = Math.min(this.endIndex() + 2, len - 1);
+
+		if (xAxis.inited && yAxis.inited) {
+			for (let i = startIndex; i <= endIndex; i++) {
+				let dataItem = this.dataItems[i];
+				this._createGraphics(dataItem);
 			}
 		}
 	}
@@ -243,9 +262,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 		super._updateChildren();
 	}
 
-	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
+	protected _createGraphics(dataItem: DataItem<this["_dataItemSettings"]>) {
 		let graphics = dataItem.get("graphics");
-
 		if (!graphics) {
 			graphics = this._makeGraphics(this.columns, dataItem);
 			dataItem.set("graphics", graphics);
@@ -270,6 +288,15 @@ export abstract class BaseColumnSeries extends XYSeries {
 				container.children.push(rangeGraphics);
 			})
 		}
+	}
+
+	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
+		let graphics = dataItem.get("graphics")!;
+
+		//if (!graphics) {
+		//	this._createGraphics(dataItem);
+		//	graphics = dataItem.get("graphics")!;
+		//}
 
 		const xField = this._xField;
 		const yField = this._yField;
@@ -444,8 +471,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const pbr = this.getPoint(r, b);
 
 		const tooltipPoint = dataItem.get("point");
-		
-		if(tooltipPoint){
+
+		if (tooltipPoint) {
 			const point = this.getPoint(tooltipPoint.x, tooltipPoint.y);
 			tooltipPoint.x = point.x + this._x;
 			tooltipPoint.y = point.y + this._y;
@@ -481,7 +508,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 			b -= offset;
 		}
 
-		if(this.get("adjustBulletPosition")){
+		if (this.get("adjustBulletPosition")) {
 			if (fitW) {
 				r = Math.min(Math.max(0, r), this._pw);
 				l = Math.min(Math.max(0, l), this._pw);

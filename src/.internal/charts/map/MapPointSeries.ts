@@ -102,9 +102,9 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	clipBack?: boolean;
 
 
-	latitudeField?:string;
+	latitudeField?: string;
 
-	longitudeField?:string;
+	longitudeField?: string;
 
 };
 
@@ -298,9 +298,7 @@ export class MapPointSeries extends MapSeries {
 			const xy = projection(coordinates as any);
 
 			if (xy) {
-				sprite.set("x", xy[0]);
-				sprite.set("y", xy[1]);
-
+				sprite.setAll({ x: xy[0], y: xy[1] });
 			}
 
 			let visible = true;
@@ -329,7 +327,7 @@ export class MapPointSeries extends MapSeries {
 	 * @param  dataItem   Map point
 	 * @param  zoomLevel  Zoom level
 	 */
-	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number):Animation<any> | undefined {
+	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number): Animation<any> | undefined {
 		const chart = this.chart;
 		if (chart) {
 			return chart.zoomToGeoPoint({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) }, zoomLevel, true);

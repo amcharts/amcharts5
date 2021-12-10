@@ -696,7 +696,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 									if (dataItem) {
 										let value = dataItem.get(fieldWorking as any) * series.get(vc as any);
 
-										if (value != undefined) {
+										if (!$type.isNaN(value)) {
 											sum += value;
 											total += Math.abs(value);
 										}
@@ -710,7 +710,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 									if (dataItem) {
 										let value = dataItem.get(fieldWorking as any) * series.get(vc as any);
 
-										if (value != undefined) {
+										if (!$type.isNaN(value)) {
 											dataItem.set((field + "Total") as any, total);
 											dataItem.set((field + "Sum") as any, sum);
 											dataItem.set((field + "TotalPercent") as any, value / total * 100);

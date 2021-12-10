@@ -1588,6 +1588,17 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						let offset = 1;
 						let fontSize = chunk.height;
 
+						let offsetX = chunk.offsetX;
+						switch (this.style.textAlign) {
+							case "right":
+							case "end":
+								offsetX -= chunk.width;
+								break;
+							case "center":
+								offsetX -= chunk.width / 2;
+								break;
+						}
+
 						if (chunk.style) {
 							const format = TextFormatter.getTextStyle(chunk.style);
 							switch (format.fontWeight) {
@@ -1611,9 +1622,12 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						if (chunk.fill) {
 							context.strokeStyle = chunk.fill.toCSS();
 						}
+						else if (this.style.fill && this.style.fill instanceof Color) {
+							context.strokeStyle = this.style.fill.toCSS();
+						}
 						context.lineWidth = thickness * offset;
-						context.moveTo(chunk.offsetX, y);
-						context.lineTo(chunk.offsetX + chunk.width, y);
+						context.moveTo(offsetX, y);
+						context.lineTo(offsetX + chunk.width, y);
 						context.stroke();
 						context.restore();
 					}
