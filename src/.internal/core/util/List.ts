@@ -46,6 +46,11 @@ export interface IListEvents<A> {
 		index: number,
 		oldValue: A,
 	};
+	moveIndex: {
+		oldIndex: number,
+		newIndex: number,
+		value: A,
+	};
 }
 
 
@@ -198,6 +203,18 @@ export class List<T> {
 		}
 	}
 
+	protected _onMoveIndex(oldIndex: number, newIndex: number, value: T) {
+		if (this.events.isEnabled("moveIndex")) {
+			this.events.dispatch("moveIndex", {
+				type: "moveIndex",
+				target: this,
+				oldIndex,
+				newIndex,
+				value,
+			});
+		}
+	}
+
 	protected _onClear(oldValues: Array<T>) {
 		if (this.events.isEnabled("clear")) {
 			this.events.dispatch("clear", {
@@ -302,13 +319,19 @@ export class List<T> {
 
 		// TODO remove all old values rather than only the first ?
 		if (index !== -1) {
-			const oldValue = this._values[index];
-
 			$array.removeIndex(this._values, index);
-			this._onRemoveIndex(index, oldValue);
-		}
 
-		if (toIndex == null) {
+			if (toIndex == null) {
+				const toIndex = this._values.length;
+				this._values.push(value);
+				this._onMoveIndex(index, toIndex, value);
+
+			} else {
+				$array.insertIndex(this._values, toIndex, value);
+				this._onMoveIndex(index, toIndex, value);
+			}
+
+		} else if (toIndex == null) {
 			this._values.push(value);
 			this._onPush(value);
 
@@ -316,6 +339,7 @@ export class List<T> {
 			$array.insertIndex(this._values, toIndex, value);
 			this._onInsertIndex(toIndex, value);
 		}
+
 		return value;
 	}
 

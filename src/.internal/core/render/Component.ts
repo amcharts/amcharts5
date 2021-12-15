@@ -155,7 +155,7 @@ export abstract class Component extends Container {
 
 	protected _dataChanged: boolean = false;
 
-	protected _dataGrouped = false;	
+	protected _dataGrouped = false;
 
 	/**
 	 * Indicates if the component has already been initialized.
@@ -236,7 +236,11 @@ export abstract class Component extends Container {
 				const dataItem = dataItems[change.index];
 				dataItem.dispose();
 				dataItems.splice(change.index, 1);
-				this._markDirtyValues();
+
+			} else if (change.type === "moveIndex") {
+				const dataItem = dataItems[change.oldIndex];
+				dataItems.splice(change.oldIndex, 1);
+				dataItems.splice(change.newIndex, 0, dataItem);
 
 			} else {
 				throw new Error("Unknown IStreamEvent type");
@@ -379,9 +383,9 @@ export abstract class Component extends Container {
 		this._valuesDirty = true;
 	}
 
-	public _markDirtyGroup() {		
+	public _markDirtyGroup() {
 		this._dataGrouped = false;
-	}	
+	}
 
 	/**
 	 * @ignore

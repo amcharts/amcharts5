@@ -124,14 +124,14 @@ export interface IXYChartEvents extends ISerialChartEvents {
 
 	/**
 	 * Invoked when panning ends.
-	 * 
+	 *
 	 * @since 5.0.4
 	 */
 	panended: {};
 
 	/**
 	 * Invoked when wheel caused zoom ends.
-	 * 
+	 *
 	 * @since 5.0.4
 	 */
 	wheelended: {};
@@ -907,7 +907,9 @@ export class XYChart extends SerialChart {
 				change.newValue.processChart(this);
 			} else if (change.type === "removeIndex") {
 				this._removeAxis(change.oldValue);
-
+			} else if (change.type === "moveIndex") {
+				container.children.moveValue(change.value, change.newIndex);
+				change.value.processChart(this);
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}

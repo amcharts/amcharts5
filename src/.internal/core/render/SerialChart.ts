@@ -74,6 +74,9 @@ export abstract class SerialChart extends Chart {
 				this._processSeries(change.newValue);
 			} else if (change.type === "removeIndex") {
 				this._removeSeries(change.oldValue);
+			} else if (change.type === "moveIndex") {
+				children.moveValue(change.value, change.newIndex);
+				this._processSeries(change.value);
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}

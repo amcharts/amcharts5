@@ -16,6 +16,7 @@ async function writePackage(state) {
 			bugs: root.bugs,
 			repository: root.repository,
 			keywords: root.keywords,
+  			main: "index.js",
 			sideEffects: root.sideEffects,
 			dependencies: root.dependencies,
 		}, null, 2),

@@ -360,6 +360,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				this._processAxisRange(change.newValue, ["range"]);
 			} else if (change.type === "removeIndex") {
 				change.oldValue.dispose();
+			} else if (change.type === "moveIndex") {
+				this._processAxisRange(change.value, ["range"]);
 			} else {
 				throw new Error("Unknown IStreamEvent type");
 			}
@@ -895,10 +897,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					const dataItem = this.getSeriesItem(series, position!);
 					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
 						series.updateLegendMarker(dataItem);
-						series.updateLegendValue(dataItem);					
+						series.updateLegendValue(dataItem);
 					}
-					else {					
-						series.showDataItemTooltip(dataItem);					
+					else {
+						series.showDataItemTooltip(dataItem);
 					}
 				}
 			})

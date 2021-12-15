@@ -56,10 +56,10 @@ export function getGeoRectangle(north: number, east: number, south: number, west
 	if (west <= -180) {
 		west = -179.9999;
 	}
-	if (south >= -90) {
+	if (south <= -90) {
 		south = -89.9999;
 	}
-	if (north <= 90) {
+	if (north >= 90) {
 		north = 89.9999;
 	}
 	if (east >= 180) {

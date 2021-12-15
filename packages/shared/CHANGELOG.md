@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+
+## [5.0.17] - 2021-12-15
+
+### Fixed
+- `WordCloud` was not coloring words even if colors ColorSet was set or data with colors was used.
+- `WordCloud` was not showing anything if all words had the same weight.
+- Adding `type` and `main` fields to `package.json`.
+- Fixed scrollbar issue with non-animated theme where clicking on a background of a scrollbar would not move to target position.
+
+
 ## [5.0.16] - 2021-12-10
 
 ### Added

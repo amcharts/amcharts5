@@ -147,14 +147,14 @@ export interface ISeriesSettings extends IComponentSettings {
 	/**
 	 * A delay in milliseconds to wait before starting animation of next data
 	 * item.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series} for more info
 	 */
 	sequencedDelay?:number;
 
 	/**
 	 * A list of heat rules to apply on series elements.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/} for more info
 	 */
 	heatRules?:IHeatRule[];
@@ -187,7 +187,7 @@ export interface ISeriesSettings extends IComponentSettings {
 	 *
 	 * @readonly
 	 */
-	legendDataItem?: DataItem<ILegendDataItem>;	
+	legendDataItem?: DataItem<ILegendDataItem>;
 
 }
 
@@ -228,10 +228,10 @@ export abstract class Series extends Component {
 
 	protected _aggregatesCalculated: boolean = false;
 	protected _selectionAggregatesCalculated: boolean = false;
-	protected _dataProcessed: boolean = false;	
+	protected _dataProcessed: boolean = false;
 
 	protected _psi: number | undefined;
-	protected _pei: number | undefined;	
+	protected _pei: number | undefined;
 
 	/**
 	 * A chart series belongs to.
@@ -268,6 +268,8 @@ export abstract class Series extends Component {
 				this._handleBullets(this.dataItems);
 			} else if (change.type === "removeIndex") {
 				this._handleBullets(this.dataItems);
+			} else if (change.type === "moveIndex") {
+				this._handleBullets(this.dataItems);
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}
@@ -286,7 +288,7 @@ export abstract class Series extends Component {
 	public endIndex() {
 		let len = this.dataItems.length;
 		return Math.min(this.getPrivate("endIndex", len), len)
-	}	
+	}
 
 	protected _handleBullets(dataItems:Array<DataItem<this["_dataItemSettings"]>>){
 		$array.each(dataItems, (dataItem)=>{
@@ -305,7 +307,7 @@ export abstract class Series extends Component {
 
 	/**
 	 * Looks up and returns a data item by its ID.
-	 * 
+	 *
 	 * @param   id  ID
 	 * @return      Data item
 	 */
@@ -337,11 +339,11 @@ export abstract class Series extends Component {
 			if (sprite) {
 				sprite._setDataItem(dataItem);
 				sprite.setRaw("position", "absolute");
-				this.bulletsContainer.children.push(sprite);			
+				this.bulletsContainer.children.push(sprite);
 			}
 			bullet._index = index;
 			bullet.series = this;
-			dataItem.bullets!.push(bullet);			
+			dataItem.bullets!.push(bullet);
 		}
 		return bullet;
 	}
@@ -355,7 +357,7 @@ export abstract class Series extends Component {
 	public _prepareChildren(){
 		super._prepareChildren();
 
-		let startIndex = this.startIndex();		
+		let startIndex = this.startIndex();
 		let endIndex = this.endIndex();
 
 		const calculateAggregates = this.get("calculateAggregates");
@@ -367,7 +369,7 @@ export abstract class Series extends Component {
 				}
 			}
 
-			if ((this._psi != startIndex || this._pei != endIndex) && !this._selectionAggregatesCalculated) {		
+			if ((this._psi != startIndex || this._pei != endIndex) && !this._selectionAggregatesCalculated) {
 				if (startIndex === 0 && endIndex === this.dataItems.length && this._aggregatesCalculated) {
 					// void
 				}
@@ -406,7 +408,7 @@ export abstract class Series extends Component {
 				}
 			}
 			this.updateLegendMarker(undefined);
-		}	
+		}
 
 
 		if (this.bullets.length > 0) {
@@ -607,24 +609,24 @@ export abstract class Series extends Component {
 			$array.each(dataItem.bullets, (bullet) => {
 				this._positionBullet(bullet);
 				const sprite = bullet.get("sprite");
-				
+
 				if(bullet.get("dynamic")){
-					
-					if(sprite){						
+
+					if(sprite){
 						sprite._markDirtyKey("fill" as any);
 						sprite.markDirtySize();
 					}
 					if(sprite instanceof Container){
-						sprite.walkChildren((child)=>{						
+						sprite.walkChildren((child)=>{
 							child._markDirtyKey("fill" as any);
 							child.markDirtySize();
 						})
 					}
-				}	
+				}
 
 				if(sprite instanceof Label && sprite.get("populateText" as any)){
 					sprite.text.markDirtyText();
-				}				
+				}
 			})
 		}
 	}
@@ -673,7 +675,7 @@ export abstract class Series extends Component {
 
 	/**
 	 * Shows series's data item.
-	 * 
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
@@ -691,7 +693,7 @@ export abstract class Series extends Component {
 
 	/**
 	 * Hides series's data item.
-	 * 
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise

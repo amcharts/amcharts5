@@ -409,7 +409,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	/**
 	 * Whether series' tooltip should inherit its color from series or its first
 	 * bullet.
-	 * 
+	 *
 	 * @default "series"
 	 */
 	seriesTooltipTarget?: "series" | "bullet";
@@ -424,7 +424,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 
 	/**
 	 * Indicates vertical position at which to show series' tooltip at.
-	 * 
+	 *
 	 * @default "value"
 	 * @since 5.0.16
 	 */
@@ -648,6 +648,8 @@ export abstract class XYSeries extends Series {
 				this._processAxisRange(change.newValue);
 			} else if (change.type === "removeIndex") {
 				this._removeAxisRange(change.oldValue);
+			} else if (change.type === "moveIndex") {
+				this._processAxisRange(change.value);
 			} else {
 				throw new Error("Unknown IStreamEvent type");
 			}

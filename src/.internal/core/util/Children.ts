@@ -38,6 +38,10 @@ export class Children<A extends Sprite> extends List<A> implements IDisposer {
 			} else if (change.type === "removeIndex") {
 				this._onRemoved(change.oldValue);
 
+			} else if (change.type === "moveIndex") {
+				this._onRemoved(change.value);
+				this._onInserted(change.value, change.newIndex);
+
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}

@@ -177,8 +177,15 @@ export class Scrollbar extends Container {
 						key = "x";
 					}
 
-					this._thumbBusy = true;
-					this._handleAnimation(this.thumb.animate({ key: key, to: newCoordinate, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") }));
+
+					const duration = this.get("animationDuration", 0);
+					if (duration > 0) {
+						this._thumbBusy = true;
+						this._handleAnimation(this.thumb.animate({ key: key, to: newCoordinate, duration: duration, easing: this.get("animationEasing") }));
+					}
+					else {
+						this.thumb.set(key, newCoordinate);
+					}
 				})
 			)
 		}

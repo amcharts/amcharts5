@@ -18,6 +18,7 @@ import type { IBounds } from "../../core/util/IBounds";
 import * as $utils from "../../core/util/Utils";
 import * as $array from "../../core/util/Array";
 import * as $math from "../../core/util/Math";
+import * as $type from "../../core/util/Type";
 
 export interface IWordCloudDataItem extends ISeriesDataItem {
 
@@ -188,6 +189,7 @@ export class WordCloud extends Series {
         this.fields.push("category", "fill");
         this._setDefault("valueField", "value");
         this._setDefault("categoryField", "category");
+        this._setDefault("fillField", "fill");
 
         super._afterNew();
 
@@ -210,7 +212,7 @@ export class WordCloud extends Series {
     public makeLabel(dataItem: DataItem<this["_dataItemSettings"]>): Label {
         const label = this.children.push(this.labels.make());
         label._setDataItem(dataItem);
-        label._setDefault("fill", dataItem.get("fill"));
+        label.set("fill", dataItem.get("fill"));
         label.set("x", -999999); // do not change!
 
         dataItem.set("label", label);
@@ -241,7 +243,7 @@ export class WordCloud extends Series {
 
         if (dataItem.get("fill") == null) {
             let colors = this.get("colors");
-            if (colors) {
+            if (colors) {                
                 dataItem.setRaw("fill", colors.next());
             }
         }
@@ -356,9 +358,13 @@ export class WordCloud extends Series {
             $array.each(this._dataItems, (dataItem) => {
                 const value = dataItem.get("valueWorking", 0);
                 const ghostLabel = dataItem.get("ghostLabel");
-                const fontSize = minFontSize + (maxFontSize - minFontSize) * (value - valueLow) / (valueHigh - valueLow);
+                let fontSize = minFontSize + (maxFontSize - minFontSize) * (value - valueLow) / (valueHigh - valueLow);
+                if($type.isNaN(fontSize)){
+                    fontSize = maxFontSize;
+                }
 
                 const set = this._sets - 1 - Math.floor((fontSize - minFontSize) / (maxFontSize - minFontSize) * (this._sets - 1));
+
                 dataItem.setRaw("set", set);
                 dataItem.setRaw("fontSize", fontSize);
 
