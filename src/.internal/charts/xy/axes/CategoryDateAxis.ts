@@ -128,11 +128,14 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 
 		let startTime = Number(this.dataItems[startIndex].get("category"));
 		let endTime = Number(this.dataItems[endIndex - 1].get("category"));
-
-		let realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
+		let realDuration = (endTime - startTime);
+		if(endIndex - startIndex < maxCount){
+			realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
+		}
 
 		// if all items are on axis
 		let gridInterval = $time.chooseInterval(0, realDuration, maxCount, this.get("gridIntervals")!);
+
 		const nextGridUnit = $time.getNextUnit(gridInterval.timeUnit);
 		const baseInterval = this.getPrivate("baseInterval");
 

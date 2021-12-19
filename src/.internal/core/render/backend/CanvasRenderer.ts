@@ -418,23 +418,25 @@ export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDi
 				mask._setMatrix();
 			}
 
+			// TODO improve this
 			$array.each(layers, (layer) => {
 				if (layer) {
-					layer.context.save();
+					const context = layer.context;
+					context.save();
 
 					// We must apply the mask before we transform the element
 					if (mask) {
-						mask._transform(layer.context, layer.scale || resolution);
-						mask._runPath(layer.context);
-						layer.context.clip();
+						mask._transform(context, layer.scale || resolution);
+						mask._runPath(context);
+						context.clip();
 					}
 
-					layer.context.globalAlpha = this.compoundAlpha * this.alpha;
+					context.globalAlpha = this.compoundAlpha * this.alpha;
 
-					this._transform(layer.context, layer.scale || resolution);
+					this._transform(context, layer.scale || resolution);
 
 					if (this.filter) {
-						layer.context.filter = this.filter;
+						context.filter = this.filter;
 					}
 				}
 			});
@@ -2049,7 +2051,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				text = text.slice(0, -1);
 			}
 			else {
-				let tmp = text.replace(/[^,;:!?\\\/\.\s]+[,;:!?\\\/\.\s]*$/g, "");
+				let tmp = text.replace(/[^,;:!?\\\/\s]+[,;:!?\\\/\s]*$/g, "");
 				if (tmp == "" && fallbackBreakWords) {
 					breakWords = true;
 				}
@@ -3030,12 +3032,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
-
 				if (layer.dirty && layer.visible) {
+					const context = layer.context;
+
 					this._dirtyLayers.push(layer);
 
-					layer.context.save();
-					layer.context.clearRect(0, 0, this._width, this._height);
+					context.save();
+					context.clearRect(0, 0, this._width, this._height);
 				}
 			}
 		});
@@ -3051,6 +3054,17 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._ghostContext.restore();
 
 		//setTimeout(() => {
+
+		// Remove this after the Chrome bug is fixed:
+		// https://bugs.chromium.org/p/chromium/issues/detail?id=1279394
+		$array.each(this.layers, (layer) => {
+			if (layer) {
+				const context = layer.context;
+				context.beginPath();
+				context.moveTo(0, 0);
+				context.stroke();
+			}
+		});
 
 		$array.each(this._dirtyLayers, (layer) => {
 			layer.context.restore();

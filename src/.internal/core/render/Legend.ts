@@ -1,4 +1,7 @@
 import type { DataItem } from "../../core/render/Component";
+import type { Entity, IEntitySettings } from "../../core/util/Entity";
+import type { Color } from "../../core/util/Color";
+
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "./Series";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
@@ -6,8 +9,7 @@ import { RoundedRectangle } from "../../core/render/RoundedRectangle";
 import { Rectangle } from "../../core/render/Rectangle";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
-import type { Entity, IEntitySettings } from "../../core/util/Entity";
-import type { Color } from "../../core/util/Color";
+
 import * as $utils from "../../core/util/Utils";
 
 export interface ILegendDataItem extends ISeriesDataItem {
@@ -307,7 +309,7 @@ export class Legend extends Series {
 
 				// this solves if template field is set on slice
 				const component = item.component;
-				if(component && component.updateLegendMarker){
+				if (component && component.updateLegendMarker) {
 					component.updateLegendMarker(item as any);
 				}
 
@@ -351,10 +353,11 @@ export class Legend extends Series {
 				if (!item.get("visible")) {
 					itemContainer.set("disabled", true);
 				}
-				
-				if(clickTarget != "none"){
-					var clickContainer = itemContainer;
-					if(clickTarget == "marker"){
+
+				var clickContainer = itemContainer;
+				this._addHoverEvents(clickContainer, item, dataItem)
+				if (clickTarget != "none") {
+					if (clickTarget == "marker") {
 						clickContainer = marker;
 					}
 					this._addClickEvents(clickContainer, item, dataItem)
@@ -363,9 +366,7 @@ export class Legend extends Series {
 		}
 	}
 
-
-	protected _addClickEvents(container: Container, item: ILegendItem, dataItem: DataItem<this["_dataItemSettings"]>) {
-		container.set("cursorOverStyle", "pointer");
+	protected _addHoverEvents(container: Container, item: ILegendItem, _dataItem: DataItem<this["_dataItemSettings"]>) {
 		container.events.on("pointerover", () => {
 			const component = item.component;
 			if (component && component.hoverDataItem) {
@@ -379,8 +380,11 @@ export class Legend extends Series {
 				component.unhoverDataItem(item as any)
 			}
 		})
+	}
 
-		container.events.on("click", () => {			
+	protected _addClickEvents(container: Container, item: ILegendItem, dataItem: DataItem<this["_dataItemSettings"]>) {
+		container.set("cursorOverStyle", "pointer");
+		container.events.on("click", () => {
 			const labelText = dataItem.get("label").text._getText();
 
 			if (item.show && item.isHidden && (item.isHidden() || item.get("visible") === false)) {

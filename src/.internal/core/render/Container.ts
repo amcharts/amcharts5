@@ -258,6 +258,12 @@ export class Container extends Sprite {
 				if (bg) {
 					bg.setAll({ width: verticalScrollbar.width(), height: height })
 				}
+
+				let visible = true;
+				if(this._contentHeight <= height){
+					visible = false;
+				}				
+				verticalScrollbar.setPrivate("visible", visible);	
 			}
 		}
 	}

@@ -250,7 +250,7 @@ export abstract class Series extends Component {
 	 *
 	 * @default Container.new()
 	 */
-	public readonly bulletsContainer: Container = Container.new(this._root, {isMeasured:false, width:p100, height:p100, position:"absolute"});
+	public readonly bulletsContainer: Container = Container.new(this._root, {width:p100, height:p100, position:"absolute"});
 
 	protected _afterNew() {
 		this.valueFields.push("value");

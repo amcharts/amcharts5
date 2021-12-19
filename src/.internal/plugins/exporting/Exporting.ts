@@ -795,14 +795,7 @@ export class Exporting extends Entity {
 		const mainCanvas = this._root._renderer.getCanvas(this._root._rootContainer._display, options);
 		const extraImages = this.get("extraImages", []);
 
-		if (extraImages.length == 0) {
-			// Nothing to add, just use the main object canvas
-			return mainCanvas;
-		}
-
 		// Add other canvases
-		// @todo
-
 		let middleLeft = 0;
 		let middleTop = 0;
 		let middleWidth = mainCanvas.width;

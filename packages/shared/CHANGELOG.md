@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.18] - 2021-12-19
+
+### Changed
+- When auto-wrapping labels, text will no longer break on dots to prevent fractional numbers from wrapping.
+- Scrollable `Container`'s scrollbar will auto-hide if contents fit in it without scrolling.
+
+### Fixed
+- Disabling click-toggling of legend, was disabling hover events, too.
+- `ResponsiveTheme`'s custom rules were not working properly.
+- `Exporting` was not applying proper background color to exported images.
+- `CategoryDateAxis` grid and labels placing algorithm improved.
+- Sometimes bullets of XYChart were not being properly clipped by the bounds of the plot area.
+- Memory leak related to: https://bugs.chromium.org/p/chromium/issues/detail?id=1279394 was fixed.
+
 
 ## [5.0.17] - 2021-12-15
 

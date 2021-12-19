@@ -222,8 +222,8 @@ export class ResponsiveTheme extends Theme {
 		}
 
 		rule._dp = new MultiDisposer([
-			this._root._rootContainer.on("width", (_width) => { if (this._isUsed()) { this._applyRule(rule); } }),
-			this._root._rootContainer.on("height", (_height) => { if (this._isUsed()) { this._applyRule(rule); } })
+			this._root._rootContainer.onPrivate("width", (_width) => { if (this._isUsed()) { this._applyRule(rule); } }),
+			this._root._rootContainer.onPrivate("height", (_height) => { if (this._isUsed()) { this._applyRule(rule); } })
 		]);
 
 		this.responsiveRules.push(rule);
@@ -248,8 +248,8 @@ export class ResponsiveTheme extends Theme {
 	}
 
 	protected _applyRule(rule: IResponsiveRule): void {
-		const w = this._root._rootContainer.get("width");
-		const h = this._root._rootContainer.get("height");
+		const w = this._root._rootContainer.getPrivate("width");
+		const h = this._root._rootContainer.getPrivate("height");
 		const relevant = rule.relevant.call(rule, <number>w, <number>h);
 		const applied = rule.applied;
 		if (relevant) {
