@@ -1284,10 +1284,6 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		const layerDirty = layer.dirty;
 		const interactive = this._isInteractive();
 
-		// if (this.targetLayer) {
-		// 	console.log(this._operations, layer)
-		// }
-
 		if (layerDirty || interactive) {
 
 			const context = layer.context;
@@ -3408,6 +3404,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					return onPointerEvent(window, "pointerup", (ev) => {
 						//throttler.throttle(() => {
 						this._dispatchGlobalMouseup(ev);
+						this._lastPointerMoveEvent = ev;
 						//});
 					});
 				});

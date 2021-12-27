@@ -33,7 +33,7 @@ export class TextFormatter {
 	public static escape(text: string): string {
 		return text.
 			replace(/\[\[/g, this.prefix + "1").
-			replace(/([^\/]{1})\]\]/g, "$1" + this.prefix + "2").
+			replace(/([^\/\]]{1})\]\]/g, "$1" + this.prefix + "2").
 			replace(/\]\]/g, this.prefix + "2").
 			replace(/\{\{/g, this.prefix + "3").
 			replace(/\}\}/g, this.prefix + "4").
@@ -53,7 +53,7 @@ export class TextFormatter {
 			replace(new RegExp(this.prefix + "2", "g"), "]]").
 			replace(new RegExp(this.prefix + "3", "g"), "{{").
 			replace(new RegExp(this.prefix + "4", "g"), "}}").
-			replace(new RegExp(this.prefix + "5", "g"), "'");
+			replace(new RegExp(this.prefix + "5", "g"), "''");
 	}
 
 	/**

@@ -291,7 +291,10 @@ export abstract class PercentSeries extends Series {
 				dataItem.get("label").text.markDirtyText();
 			});
 		}
+		this._arrange();
+	}
 
+	protected _arrange() {
 		this._arrangeDown(this._lLabels);
 		this._arrangeUp(this._lLabels);
 
@@ -300,6 +303,16 @@ export abstract class PercentSeries extends Series {
 
 		this._arrangeLeft(this._hLabels);
 		this._arrangeRight(this._hLabels);
+
+		$array.each(this.dataItems, (dataItem) => {
+			this._updateTick(dataItem);
+		})
+	}
+
+
+	public _afterChanged() {
+		super._afterChanged();
+		this._arrange();
 	}
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -452,7 +465,7 @@ export abstract class PercentSeries extends Series {
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
 				$array.each(visualSettings, (setting: any) => {
-					if(slice.get(setting) != null){
+					if (slice.get(setting) != null) {
 						markerRectangle.set(setting, slice.get(setting));
 					}
 				})

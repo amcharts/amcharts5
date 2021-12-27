@@ -110,6 +110,10 @@ export interface IXYChartSettings extends ISerialChartSettings {
 }
 
 export interface IXYChartPrivate extends ISerialChartPrivate {
+	/**
+	 * @todo review
+	 */
+	tooltipSeries?: Array<XYSeries>
 }
 
 
@@ -1081,6 +1085,7 @@ export class XYChart extends SerialChart {
 				}
 			})
 		}
+		const tooltipSeries: Array<XYSeries> = [];
 
 		this.series.each((series) => {
 			const tooltip = series.get("tooltip")!;
@@ -1121,10 +1126,14 @@ export class XYChart extends SerialChart {
 					else {
 						tooltip.show();
 						tooltips.push(tooltip);
+						tooltipSeries.push(series);
 					}
 				}
 			}
 		})
+
+		this.setPrivate("tooltipSeries", tooltipSeries);
+
 		if (this.get("arrangeTooltips")) {
 
 			const tooltipContainer = this._root.tooltipContainer;

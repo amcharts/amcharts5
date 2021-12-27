@@ -430,6 +430,11 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 */
 	tooltipPositionY?: "open" | "value" | "low" | "high";
 
+
+	/**
+	 * @rodo review
+	 */
+	groupDataDisabled?:boolean;
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {

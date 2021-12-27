@@ -102,13 +102,6 @@ export class ColorSet extends Entity {
 		super._afterNewApplyThemes();
 	}
 
-	public _beforeChanged() {
-		super._beforeChanged();
-		if (this.isDirty("startIndex")) {
-			this.setPrivate("currentStep", this.get("startIndex", 0))
-		}
-	}
-
 	/**
 	 * @ignore
 	 */
@@ -172,7 +165,7 @@ export class ColorSet extends Entity {
 	 * If the list is out of colors, new ones are generated dynamically.
 	 */
 	public next() {
-		let currentStep = this.getPrivate("currentStep", 0);
+		let currentStep = this.getPrivate("currentStep", this.get("startIndex", 0));
 		this.setPrivate("currentStep", currentStep + this.get("step", 1));
 		return this.getIndex(currentStep);
 	}

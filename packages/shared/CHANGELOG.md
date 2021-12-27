@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.19] - 2021-12-27
+
+### Added
+- `groupDataDisabled` setting added to XYSeries. If set to `false` will exclude series from data grouping mechanism, even if it is enabled on related `DateSeries`.
+- New plugin `SliceGrouper`. Can be used to automatically group small slices on percent charts like Pie, Funnel, etc. [More info](https://www.amcharts.com/docs/v5/charts/percent-charts/grouping-slices/).
+
+### Fixed
+- If data was added to percent series after initial data was already processed, the bew slices would get colors from the start of the color set.
+- Multiple square bracket and apostrophe escaping was not working properly.
+- A JS error could occur when changing `XYSeries` data with less data items then there were before.
+- `PieSeries` were not arranging its labels properly in some cases.
+- `XYCursor` taps were not working properly after chart zoom on touch devices.
+
+
 ## [5.0.18] - 2021-12-19
 
 ### Changed

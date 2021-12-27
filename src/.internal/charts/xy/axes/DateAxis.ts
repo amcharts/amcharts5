@@ -184,7 +184,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (!this._dataGrouped) {
 					if (this.get("groupData")) {
 						$array.each(this.series, (series) => {
-							this._groupSeriesData(series);
+							if(series.get("groupDataDisabled")){
+								this._groupSeriesData(series);	
+							}							
 						})
 					}
 					else {

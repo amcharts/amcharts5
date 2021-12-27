@@ -281,11 +281,12 @@ export abstract class Series extends Component {
 		super._dispose();
 	}
 
-	public startIndex() {
-		return this.getPrivate("startIndex", 0);
+	public startIndex():number {
+		let len = this.dataItems.length;
+		return Math.min(this.getPrivate("startIndex", 0), len);
 	}
 
-	public endIndex() {
+	public endIndex():number {
 		let len = this.dataItems.length;
 		return Math.min(this.getPrivate("endIndex", len), len)
 	}
