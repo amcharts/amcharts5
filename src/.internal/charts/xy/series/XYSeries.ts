@@ -1147,6 +1147,9 @@ export abstract class XYSeries extends Series {
 					series = chart.series.getIndex(i)!;
 					if (series.get("xAxis") === this.get("xAxis") && series.get("yAxis") === this.get("yAxis") && series.className === this.className) {
 						this._couldStackTo.push(series);
+						if(!series.get("stacked")){
+							break;
+						}
 					}
 				}
 			}
@@ -1195,9 +1198,9 @@ export abstract class XYSeries extends Series {
 				let stackToSeries = this._couldStackTo[s];
 				let stackToItem = stackToSeries.dataItems[index];
 				let value = dataItem.get(field);
-				let stackValue = stackToItem.get(field);
-
+				
 				if (stackToItem) {
+					let stackValue = stackToItem.get(field);
 					if (stackToNegative) {
 						if ($type.isNumber(value)) {
 							if ($type.isNumber(stackValue)) {

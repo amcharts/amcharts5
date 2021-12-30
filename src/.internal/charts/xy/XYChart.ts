@@ -110,10 +110,12 @@ export interface IXYChartSettings extends ISerialChartSettings {
 }
 
 export interface IXYChartPrivate extends ISerialChartPrivate {
+
 	/**
-	 * @todo review
+	 * A list of [[Series]] that currently have their tooltip being displayed.
 	 */
 	tooltipSeries?: Array<XYSeries>
+
 }
 
 

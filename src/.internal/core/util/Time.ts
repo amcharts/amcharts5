@@ -16,6 +16,13 @@ export interface ITimeInterval {
 }
 
 
+/**
+ * Returns a `Promise` which can be used to execute code after number of
+ * milliseconds.
+ * 
+ * @param   ms  Sleep duration in ms
+ * @return      Promise
+ */
 export function sleep(ms: number): Promise<void> {
 	return new Promise((resolve, _reject) => {
 		setTimeout(resolve, ms);
@@ -81,7 +88,6 @@ export function getNextUnit(unit: TimeUnit): TimeUnit | undefined {
  * Available units: "millisecond", "second", "minute", "hour", "day", "week",
  * "month", and "year".
  *
- * @ignore Exclude from docs
  * @param unit   Time unit
  * @param count  Number of units
  * @return Milliseconds
@@ -124,7 +130,6 @@ export function getTime(): number {
 /**
  * Returns a copy of the `Date` object.
  *
- * @ignore Exclude from docs
  * @param date  Source date
  * @return Copy
  */
@@ -136,7 +141,6 @@ export function copy(date: Date): Date {
  * Checks if the `unit` part of two `Date` objects do not match. Two dates
  * represent a "range" of time, rather the same time date.
  *
- * @ignore Exclude from docs
  * @param dateOne  Date 1
  * @param dateTwo  Date 2
  * @param unit     Time unit to check
@@ -236,7 +240,6 @@ export function checkChange(dateOne: Date, dateTwo: Date, unit: TimeUnit, utc?: 
 /**
  * Adds `count` of time `unit` to the source date. Returns a modified `Date` object.
  *
- * @ignore Exclude from docs
  * @param date   Source date
  * @param unit   Time unit
  * @param count  Number of units to add
@@ -314,7 +317,6 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean): D
 /**
  * "Rounds" the date to specific time unit.
  *
- * @ignore Exclude from docs
  * @param date             Source date
  * @param unit             Time unit
  * @param count            Number of units to round to
@@ -465,7 +467,6 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
  * Returns a new `Date` object which corresponds to the source date in a
  * specific timezone.
  *
- * @since 4.10.1
  * @param   date      Source date
  * @param   timezone  Timezone identifier
  * @return            Recalculated new Date

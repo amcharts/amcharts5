@@ -22,6 +22,7 @@ import * as $utils from "../util/Utils";
 import * as $array from "../util/Array";
 import * as $type from "../util/Type";
 import * as $object from "../util/Object";
+import * as $math from "../util/Math";
 //import { populateString } from "../util/PopulateString";
 
 
@@ -1379,8 +1380,16 @@ export abstract class Sprite extends Entity {
 		let dragEvent = this._dragEvent;
 
 		if (dragEvent) {
-			const x = e.point.x - dragEvent.point.x;
-			const y = e.point.y - dragEvent.point.y;
+			let angle = 0;
+
+			let parent = this.parent;
+			while (parent != null) {
+				angle += parent.get("rotation", 0);
+				parent = parent.parent;
+			}
+
+			let x = e.point.x - dragEvent.point.x;
+			let y = e.point.y - dragEvent.point.y;
 
 			const events = this.events;
 
@@ -1408,8 +1417,8 @@ export abstract class Sprite extends Entity {
 			if (this._isDragging) {
 				let dragPoint = this._dragPoint!;
 
-				this.set("x", dragPoint.x + x);
-				this.set("y", dragPoint.y + y);
+				this.set("x", dragPoint.x + x * $math.cos(angle) + y * $math.sin(angle));
+				this.set("y", dragPoint.y + y * $math.cos(angle) - x * $math.sin(angle));
 
 				const type = "dragged";
 				if (events.isEnabled(type)) {
@@ -2256,13 +2265,13 @@ export abstract class Sprite extends Entity {
 		return super._findStaticTemplate(f);
 	}
 
-	protected _walkParents(f: (parent: Entity) => void): void {
+	protected _walkParents(f: (parent: Sprite) => void): void {
 		if (this._parent) {
 			this._walkParent(f);
 		}
 	}
 
-	protected _walkParent(f: (parent: Entity) => void): void {
+	protected _walkParent(f: (parent: Sprite) => void): void {
 		if (this._parent) {
 			this._parent._walkParent(f);
 		}

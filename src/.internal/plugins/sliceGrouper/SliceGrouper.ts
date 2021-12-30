@@ -55,6 +55,7 @@ export interface ISliceGrouperSettings extends IEntitySettings {
 
 export interface ISliceGrouperPrivate extends IEntityPrivate {
 	groupDataItem?: DataItem<IPercentSeriesDataItem>;
+	normalDataItems?: DataItem<IPercentSeriesDataItem>[];
 	smallDataItems?: DataItem<IPercentSeriesDataItem>[];
 }
 
@@ -153,6 +154,7 @@ export class SliceGrouper extends Entity {
 			// Recalculate group value and decorate small slices as necessary
 			const threshold = this.get("threshold", 0);
 			const limit = this.get("limit", 1000);
+			const normalDataItems: any = [];
 			const smallDataItems: any = [];
 			let groupValue = 0;
 			if (threshold || limit) {
@@ -168,10 +170,12 @@ export class SliceGrouper extends Entity {
 						}
 					}
 					else if (legendDataItem) {
+						normalDataItems.push(item);
 						legendDataItem.get("itemContainer").show(0);
 					}
 				});
 
+				this.setPrivate("normalDataItems", normalDataItems);
 				this.setPrivate("smallDataItems", smallDataItems);
 				this.updateGroupDataItem(groupValue);
 
@@ -189,8 +193,16 @@ export class SliceGrouper extends Entity {
 			groupDataItem.show();
 		}
 
-		const smallDataItems = this.getPrivate("smallDataItems", []);
-		$array.each(smallDataItems, (item) => {
+		const clickBehavior = this.get("clickBehavior");
+		if (clickBehavior == "zoom") {
+			const normalDataItems: any = this.getPrivate("normalDataItems", []);
+			$array.each(normalDataItems, (item: any, _index) => {
+				item.show();
+			});
+		}
+
+		const smallDataItems: any = this.getPrivate("smallDataItems", []);
+		$array.each(smallDataItems, (item: any, _index) => {
 			item.hide();
 		});
 

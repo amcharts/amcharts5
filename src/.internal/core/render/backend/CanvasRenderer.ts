@@ -10,7 +10,7 @@ import { Color } from "../../util/Color";
 import { Matrix } from "../../util/Matrix";
 import { Percent, percent } from "../../util/Percent";
 import { Throttler } from "../../util/Throttler";
-import { ArrayDisposer, Disposer, IDisposer, CounterDisposer } from "../../util/Disposer";
+import { ArrayDisposer, Disposer, IDisposer, CounterDisposer, MultiDisposer } from "../../util/Disposer";
 import { TextFormatter, ITextChunk } from "../../util/TextFormatter";
 import * as $utils from "../../util/Utils";
 import * as $array from "../../util/Array";
@@ -2769,9 +2769,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public _dragging: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 	public _mousedown: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 
-	protected _lastPointerMoveEvent!: IPointerEvent;
+	protected _lastPointerMoveEvent!: { event: IPointerEvent, native: boolean };
 	protected _mouseMoveThrottler: Throttler = new Throttler(() => {
-		this._dispatchGlobalMousemove(this._lastPointerMoveEvent);
+		this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
 	});
 
 	constructor() {
@@ -2798,11 +2798,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		// We need this in order top prevent default touch gestures when dragging
 		// draggable elements
 		if ($utils.supports("touchevents")) {
-			this._disposers.push($utils.addEventListener(document, "touchstart", (ev) => {
-				if (this._dragging.length !== 0) {
-					ev.preventDefault();
-				}
-			}, { passive: false }));
+			$array.each([window, this.view], (target) => {
+				this._disposers.push($utils.addEventListener(target, "touchstart", (ev) => {
+					if (this._dragging.length !== 0) {
+						ev.preventDefault();
+					}
+				}, { passive: false }));
+			})
 		}
 
 		// Prevent scrolling of the window when hovering on "wheelable" object
@@ -3225,11 +3227,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 	}
 
-	_dispatchGlobalMousemove(originalEvent: IPointerEvent): void {
+	_dispatchGlobalMousemove(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 
 		const target = this._getHitTarget(event.point);
-		event.native = this._isNativeEvent(originalEvent);
+		event.native = native;
 
 		if (target) {
 			this._hovering.forEach((obj) => {
@@ -3271,16 +3273,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._dispatchEventAll("globalpointermove", event);
 	}
 
-	_isNativeEvent(event: IPointerEvent): boolean {
-		if (event.target) {
-			return (<any>event.target).parentNode === this._layerDom;
-		}
-		return true;
-	}
-
-	_dispatchGlobalMouseup(originalEvent: IPointerEvent): void {
+	_dispatchGlobalMouseup(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
-		event.native = this._isNativeEvent(originalEvent);
+		event.native = native;
 		//const target = this._getHitTarget(event.point);
 		this._dispatchEventAll("globalpointerup", event);
 	}
@@ -3379,6 +3374,47 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return this._listeners[key].increment();
 	}
 
+	_onPointerEvent(name: string, f: (event: IPointerEvent, native: boolean) => void): IDisposer {
+		let native = false;
+		let timer: number | null = null;
+
+		function clear() {
+			timer = null;
+			native = false;
+		}
+
+		return new MultiDisposer([
+			new Disposer(() => {
+				if (timer !== null) {
+					clearTimeout(timer);
+				}
+
+				clear();
+			}),
+
+			$utils.addEventListener(this.view, $utils.getRendererEvent(name), (_) => {
+				native = true;
+
+				if (timer !== null) {
+					clearTimeout(timer);
+				}
+
+				timer = window.setTimeout(clear, 0);
+			}),
+
+			onPointerEvent(window, name, (ev) => {
+				if (timer !== null) {
+					clearTimeout(timer);
+					timer = null;
+				}
+
+				f(ev, native);
+
+				native = false;
+			}),
+		]);
+	}
+
 	// This ensures that only a single DOM event is added (e.g. only a single mousemove event listener)
 	_initEvent(key: keyof IRendererEvents): IDisposer | undefined {
 		switch (key) {
@@ -3389,8 +3425,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					//const throttler = new Throttler();
 
 					// TODO handle throttling properly for multitouch
-					return onPointerEvent(window, "pointermove", (ev) => {
-						this._lastPointerMoveEvent = ev;
+					return this._onPointerEvent("pointermove", (event, native) => {
+						this._lastPointerMoveEvent = { event, native };
 						this._mouseMoveThrottler.run();
 						//throttler.throttle(() => {
 						//});
@@ -3401,10 +3437,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					//const throttler = new Throttler();
 
 					// TODO handle throttling properly for multitouch
-					return onPointerEvent(window, "pointerup", (ev) => {
+					return this._onPointerEvent("pointerup", (event, native) => {
 						//throttler.throttle(() => {
-						this._dispatchGlobalMouseup(ev);
-						this._lastPointerMoveEvent = ev;
+						this._dispatchGlobalMouseup(event, native);
+						this._lastPointerMoveEvent = { event, native };
 						//});
 					});
 				});
@@ -3422,13 +3458,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					});
 
 					// TODO handle throttling properly for multitouch
-					const mousemove = onPointerEvent(window, "pointermove", (ev: IPointerEvent) => {
+					const mousemove = this._onPointerEvent("pointermove", (ev: IPointerEvent) => {
 						//throttler.throttle(() => {
 						this._dispatchDragMove(ev);
 						//});
 					});
 
-					const mouseup = onPointerEvent(window, "pointerup", (ev: IPointerEvent) => {
+					const mouseup = this._onPointerEvent("pointerup", (ev: IPointerEvent) => {
 						this._dispatchDragEnd(ev);
 					});
 
@@ -3440,7 +3476,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				});
 			case "dblclick":
 				return this._makeSharedEvent("dblclick", () => {
-					return onPointerEvent(window, "dblclick", (ev) => {
+					return this._onPointerEvent("dblclick", (ev) => {
 						this._dispatchDoubleClick(ev);
 					});
 				});

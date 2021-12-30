@@ -96,11 +96,12 @@ export class GridLayout extends Layout {
 		let prevX = paddingLeft;
 
 		container.children.each((child) => {
-			if (child.get("position") == "relative") {
+			if (child.get("position") == "relative" && !child.isHidden()) {
 				const marginTop = child.get("marginTop", 0);
 				const marginBottom = child.get("marginBottom", 0);
 
 				let bounds = child.adjustedLocalBounds();
+
 				let marginLeft = child.get("marginLeft", 0);
 				let marginRight = child.get("marginRight", 0);
 				let x = prevX + marginLeft - bounds.left;
@@ -134,7 +135,7 @@ export class GridLayout extends Layout {
 
 		children.each((child) => {
 			let bounds = child.adjustedLocalBounds();
-			if (child.get("position") != "absolute") {
+			if (child.get("position") != "absolute" && !child.isHidden()) {
 				if (this.get("fixedWidthGrid")) {
 					columnWidths[column] = maxCellWidth;
 				}
@@ -144,7 +145,6 @@ export class GridLayout extends Layout {
 
 				if (column < children.length - 1) {
 					column++;
-
 					if (column == columnCount) {
 						column = 0;
 					}
