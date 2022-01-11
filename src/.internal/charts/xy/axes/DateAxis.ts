@@ -188,11 +188,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 								this._groupSeriesData(series);	
 							}							
 						})
+
+						this._handleRangeChange();
 					}
 					else {
 						let baseInterval = this.get("baseInterval");
 						let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
-
 						$array.each(this.series, (series) => {
 							series.setDataSet(mainDataSetId);
 						})

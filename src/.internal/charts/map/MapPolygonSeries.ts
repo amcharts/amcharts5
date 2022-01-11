@@ -126,8 +126,13 @@ export class MapPolygonSeries extends MapSeries {
 	}
 
 
-	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
-		super._markDirtyValues();
+	/**
+	 * Forces a repaint of the element which relies on data.
+	 *
+	 * @since 5.0.21
+	 */
+	public markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.markDirtyValues();
 		if (dataItem) {
 			const mapPolygon = dataItem.get("mapPolygon");
 			if (mapPolygon) {

@@ -169,9 +169,11 @@ export class SliceGrouper extends Entity {
 							legendDataItem.get("itemContainer").hide(0);
 						}
 					}
-					else if (legendDataItem) {
+					else {
 						normalDataItems.push(item);
-						legendDataItem.get("itemContainer").show(0);
+						if (legendDataItem) {
+							legendDataItem.get("itemContainer").show(0);
+						}
 					}
 				});
 

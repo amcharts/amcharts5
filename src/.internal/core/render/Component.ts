@@ -50,7 +50,7 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 	 * @ignore
 	 */
 	public markDirty(): void {
-		this.component._markDirtyValues(this);
+		this.component.markDirtyValues(this);
 	}
 
 	protected _startAnimation(): void {
@@ -197,7 +197,7 @@ export abstract class Component extends Container {
 
 		this._disposers.push(this.data.events.onAll((change) => {
 			const dataItems = this._mainDataItems;
-			this._markDirtyValues();
+			this.markDirtyValues();
 			this._markDirtyGroup();
 			this._dataChanged = true;
 			if (change.type === "clear") {
@@ -378,7 +378,12 @@ export abstract class Component extends Container {
 		this.inited = true;
 	}
 
-	public _markDirtyValues(_dataItem?: DataItem<this["_dataItemSettings"]>) {
+	/**
+	 * Forces a repaint of the element which relies on data.
+	 *
+	 * @since 5.0.21
+	 */
+	public markDirtyValues(_dataItem?: DataItem<this["_dataItemSettings"]>) {
 		this.markDirty();
 		this._valuesDirty = true;
 	}

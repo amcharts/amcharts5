@@ -146,6 +146,13 @@ export interface IXYCursorEvents extends IContainerEvents {
 		target: XYCursor;
 	};
 
+	/**
+	 * Kicks in when cursor's is hidden when user rolls-out of the plot area
+	 */
+	cursorhidden: {
+		target: XYCursor;
+	};
+
 }
 
 /**
@@ -518,6 +525,11 @@ export class XYCursor extends Container {
 		else if (!this._downPoint) {
 			if (!alwaysShow) {
 				this.hide(0);
+
+				const type = "cursorhidden";
+				if (this.events.isEnabled(type)) {
+					this.events.dispatch(type, { type: type, target: this });
+				}
 			}
 		}
 

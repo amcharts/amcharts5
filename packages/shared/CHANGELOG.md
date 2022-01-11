@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.0.21] - 2022-01-11
+
+### Added
+- New `Sprite` setting: `forceInactive`. If set to `true`, it will override `interactive` setting as well as ignore any interaction events set on the element.
+- `cursorhidden` event added to `XYCursor`. Dispatched when user rolls-out of the chart plot area and cursor is hidden.
+- New `Component` method: `markDirtyValues()`. Forces a repaint of the element which relies on data.
+
+### Changed
+- Value (4th parameter of the Heat rule's `customFunction`) will now receive actual value of the target data item, not interpolated calculated setting value.
+
+### Fixed
+- Fixing bug when not passing the duration to the `animate` method ([Issue 181](https://github.com/amcharts/amcharts5/issues/181)).
+- Horizontal and vertical layouts with `width`/`height` set in percents plus `minWidth`/`minHeight`/`maxWidth`/`maxHeight` set were arranging items incorrectly.
+- Very small slices with `cornrerRadius > 0` were being drawn as a full circle.
+- `SliceGrouper` with was not zooming out properly if there was no legend in chart.
+- changing `groupData` from `false` to `true` on DateAxis was not working when doing so after the chart was built.
+
+
 ## [5.0.20] - 2021-12-30
 
 ### Fixed

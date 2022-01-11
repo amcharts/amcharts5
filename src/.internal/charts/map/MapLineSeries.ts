@@ -121,26 +121,31 @@ export class MapLineSeries extends MapSeries {
 			$array.each(pointsToConnect, (point) => {
 
 				point.on("geometry", () => {
-					this._markDirtyValues(dataItem);
+					this.markDirtyValues(dataItem);
 				})
 
 				point.on("longitude", () => {
-					this._markDirtyValues(dataItem);
+					this.markDirtyValues(dataItem);
 				})
 
 				point.on("latitude", () => {
-					this._markDirtyValues(dataItem);
+					this.markDirtyValues(dataItem);
 				})
 			})
 
-			this._markDirtyValues(dataItem);
+			this.markDirtyValues(dataItem);
 		}
 
 		mapLine.setPrivate("series", this);
 	}
 
-	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
-		super._markDirtyValues();
+	/**
+	 * Forces a repaint of the element which relies on data.
+	 *
+	 * @since 5.0.21
+	 */
+	public markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.markDirtyValues();
 		if (dataItem) {
 			const mapLine = dataItem.get("mapLine");
 			if (mapLine) {

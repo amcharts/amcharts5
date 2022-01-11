@@ -73,7 +73,7 @@ export interface IHeatRule {
 	 * Can be used to do custom manipulation on complex objects requiring more
 	 * than modifying a setting.
 	 */
-	customFunction?: (target: Sprite, minValue: number, maxValue: number, propertyValue?: any) => void;
+	customFunction?: (target: Sprite, minValue: number, maxValue: number, value?: any) => void;
 
 }
 
@@ -303,7 +303,7 @@ export abstract class Series extends Component {
 			}
 		})
 
-		this._markDirtyValues();
+		this.markDirtyValues();
 	}
 
 	/**
@@ -570,7 +570,7 @@ export abstract class Series extends Component {
 					}
 
 					if (rule.customFunction) {
-						rule.customFunction.call(this, target, minValue, maxValue, propertyValue);
+						rule.customFunction.call(this, target, minValue, maxValue, value);
 					}
 					else {
 						target.set(rule.key, propertyValue);

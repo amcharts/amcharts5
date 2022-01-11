@@ -29,6 +29,18 @@ export class HorizontalLayout extends Layout {
 				let childWidth = child.get("width");
 				if (childWidth instanceof Percent) {
 					totalPercent += childWidth.value;
+
+					let w = availableWidth * childWidth.value;
+					let minWidth = child.get("minWidth", -Infinity);
+					if (minWidth > w) {
+						availableWidth -= minWidth;
+						totalPercent -= childWidth.value;
+					}
+					let maxWidth = child.get("maxWidth", Infinity);
+					if (w > maxWidth) {
+						availableWidth -= maxWidth;
+						totalPercent -= childWidth.value;
+					}
 				}
 				else {
 					if (!$type.isNumber(childWidth)) {
@@ -39,12 +51,16 @@ export class HorizontalLayout extends Layout {
 			}
 		});
 
-		if(availableWidth > 0){
+		if (availableWidth > 0) {
 			container.children.each((child) => {
 				if (child.get("position") == "relative") {
 					let childWidth = child.get("width");
 					if (childWidth instanceof Percent) {
 						let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
+						let minWidth = child.get("minWidth", -Infinity);
+						let maxWidth = child.get("maxWidth", Infinity);
+						privateWidth = Math.min(Math.max(minWidth, privateWidth), maxWidth);
+
 						child.setPrivate("width", privateWidth);
 					}
 				}
@@ -58,6 +74,7 @@ export class HorizontalLayout extends Layout {
 				let bounds = child.adjustedLocalBounds();
 				let marginLeft = child.get("marginLeft", 0);
 				let marginRight = child.get("marginRight", 0);
+
 				let x = prevX + marginLeft - bounds.left;
 				child.setPrivate("x", x);
 				prevX = x + bounds.right + marginRight;

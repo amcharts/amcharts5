@@ -34,7 +34,7 @@ import * as $math from "../util/Math";
 class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> extends EventDispatcher<E> {
 	protected static RENDERER_EVENTS: { [K in keyof IRendererEvents]?: <E extends Events<Sprite, ISpriteEvents>>(this: SpriteEventDispatcher<Sprite, E>, event: IRendererEvents[K]) => void } = {
 		"click": function(event) {
-			if (this.isEnabled("click") && !this._sprite.isDragging() && !this._sprite._hasMoved(this._makePointerEvent("click", event))) {
+			if (this.isEnabled("click") && !this._sprite.isDragging() && this._sprite._hasDown() && !this._sprite._hasMoved(this._makePointerEvent("click", event))) {
 				this.dispatch("click", this._makePointerEvent("click", event));
 			}
 		},
@@ -457,6 +457,14 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 */
 	forceHidden?: boolean;
 
+	/**
+	 * If set to `true` the element will be inactive - absolutely oblivious
+	 * to all interactions, even if there are related events set, or 
+	 * the `interactive: true` is set.
+	 *
+	 * @since 5.0.21
+	 */
+	forceInactive?: boolean;
 
 	/**
 	 * Defines when tooltip is shown over the element.
@@ -1226,11 +1234,16 @@ export abstract class Sprite extends Entity {
 				])
 			}
 			else {
+				this._display.interactive = false;
 				if (this._hoverDp) {
 					this._hoverDp.dispose();
 					this._hoverDp = undefined;
 				}
 			}
+		}
+
+		if (this.isDirty("forceInactive")) {
+			this._display.inactive = this.get("forceInactive", false);
 		}
 
 		if (this.get("showTooltipOn") == "always" && this._display.visible) {
@@ -1351,8 +1364,18 @@ export abstract class Sprite extends Entity {
 		return false;
 	}
 
+	public _hasDown(): boolean {
+		return $object.keys(this._downPoints).length > 0;
+	}
+
 	protected _handleDown(e: ISpritePointerEvent) {
-		if (!this.isHidden() && !this.get("disabled")) {
+
+		const parent = this.parent;
+		if (parent && !this.get("draggable")) {
+			parent._handleDown(e);
+		}
+
+		if (this.get("interactive") && !this.isHidden()) {
 			if (this.states.lookup("down")) {
 				this.states.applyAnimate("down");
 			}
@@ -1360,6 +1383,7 @@ export abstract class Sprite extends Entity {
 				x: e.point.x,
 				y: e.point.y
 			};
+
 
 			// @todo remove this once migrated to _downPoints
 			this._isDown = true;

@@ -28,6 +28,19 @@ export class VerticalLayout extends Layout {
 				let childHeight = child.get("height");
 				if (childHeight instanceof Percent) {
 					totalPercent += childHeight.value;
+
+					let h = availableHeight * childHeight.value;
+					let minHeight = child.get("minHeight", -Infinity);
+					if (minHeight > h) {
+						availableHeight -= minHeight;
+						totalPercent -= childHeight.value;
+					}
+					let maxHeight = child.get("minHeight", Infinity);
+					if (h > maxHeight) {
+						availableHeight -= maxHeight;
+						totalPercent -= childHeight.value;
+					}
+
 				}
 				else {
 					if (!$type.isNumber(childHeight)) {
@@ -44,6 +57,11 @@ export class VerticalLayout extends Layout {
 
 					if (childHeight instanceof Percent) {
 						let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
+						
+						let minHeight = child.get("minHeight", -Infinity);
+						let maxHeight = child.get("maxHeight", Infinity);
+						privateHeight = Math.min(Math.max(minHeight, privateHeight), maxHeight);
+
 						child.setPrivate("height", privateHeight);
 					}
 				}

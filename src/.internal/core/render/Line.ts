@@ -49,7 +49,7 @@ export class Line extends Graphics {
 				this._display.moveTo(point.x, point.y);
 				$draw.segmentedLine(this._display, [[points]]);
 			}
-			else {
+			else if (!this.get("draw")) {
 				let w = this.width();
 				let h = this.height();
 

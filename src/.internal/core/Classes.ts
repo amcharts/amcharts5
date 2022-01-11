@@ -29,6 +29,7 @@ import type { ChordLinkDirected } from "./../charts/flow/ChordLinkDirected";
 import type { ChordNodes } from "./../charts/flow/ChordNodes";
 import type { ChordNonRibbon } from "./../charts/flow/ChordNonRibbon";
 import type { Circle } from "./render/Circle";
+import type { Ellipse } from "./render/Ellipse";
 import type { CirclePattern } from "./render/patterns/CirclePattern";
 import type { ClockHand } from "./../charts/radar/ClockHand";
 import type { ColorSet } from "./util/ColorSet";
@@ -165,6 +166,7 @@ export interface IClasses {
 	"Container": Container;
 	"DateAxis": DateAxis<AxisRenderer>;
 	"DurationAxis": DurationAxis<AxisRenderer>;
+	"Ellipse": Ellipse;
 	"Entity": Entity;
 	"Exporting": Exporting;
 	"ExportingMenu": ExportingMenu;

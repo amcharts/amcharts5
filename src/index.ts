@@ -6,6 +6,7 @@ export { ready } from "./.internal/core/util/Utils";
 export { Bullet } from "./.internal/core/render/Bullet";
 export { Button } from "./.internal/core/render/Button";
 export { Circle } from "./.internal/core/render/Circle";
+export { Ellipse } from "./.internal/core/render/Ellipse";
 export { Star } from "./.internal/core/render/Star";
 export { Component, DataItem } from "./.internal/core/render/Component";
 export { Container } from "./.internal/core/render/Container";

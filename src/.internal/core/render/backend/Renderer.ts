@@ -93,6 +93,7 @@ export interface IDisplayObject extends IDisposer {
 	mask: IGraphics | null;
 	visible: boolean;
 	interactive: boolean;
+	inactive: boolean;
 	wheelable: boolean;
 	isMeasured: boolean;
 	buttonMode: boolean;
@@ -176,6 +177,7 @@ export interface IGraphics extends IDisplayObject {
 
 	drawRect(x: number, y: number, width: number, height: number): void;
 	drawCircle(x: number, y: number, radius: number): void;
+	drawEllipse(x: number, y: number, radiusX: number, radiusY: number): void;
 	arc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean): void;
 	arcTo(x1: number, y1: number, x2: number, y2: number, radius: number): void;
 	lineTo(x: number, y: number): void;

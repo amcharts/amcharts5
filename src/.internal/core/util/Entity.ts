@@ -752,7 +752,7 @@ export abstract class Settings implements IDisposer, IAnimation {
 	public animate<Key extends keyof this["_settings"]>(options: AnimationOptions<Key, this["_settings"][Key]>): Animation<this["_settings"][Key]> {
 		const key = options.key;
 		const to = options.to;
-		const duration = options.duration;
+		const duration = options.duration || 0;
 		const loops = options.loops || 1;
 
 		const from = (options.from === undefined ? this.get(key) : options.from);
@@ -789,7 +789,7 @@ export abstract class Settings implements IDisposer, IAnimation {
 	public animatePrivate<Key extends keyof this["_privateSettings"]>(options: AnimationOptions<Key, this["_privateSettings"][Key]>): Animation<this["_privateSettings"][Key]> {
 		const key = options.key;
 		const to = options.to;
-		const duration = options.duration;
+		const duration = options.duration || 0;
 		const loops = options.loops || 1;
 
 		const from = (options.from === undefined ? this.getPrivate(key) : options.from);

@@ -138,9 +138,11 @@ export class Slice extends Graphics {
 			const startAngle = this.get("startAngle", 0);
 			const arc = this.get("arc", 0);
 			const generator = this._generator;
-			generator.cornerRadius(this.get("cornerRadius", 0));
-			generator.context(this._display as any);
 
+			if(arc > 0.1){ // this fixes bug with full circle when arc is very small
+				generator.cornerRadius(this.get("cornerRadius", 0));
+			}
+			generator.context(this._display as any);
 
 			let radius = this.get("radius", 0);
 			let innerRadius = this.get("innerRadius", 0);

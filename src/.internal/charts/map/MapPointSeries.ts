@@ -137,8 +137,13 @@ export class MapPointSeries extends MapSeries {
 		this.markDirty();
 	}
 
-	public _markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
-		super._markDirtyValues();
+	/**
+	 * Forces a repaint of the element which relies on data.
+	 *
+	 * @since 5.0.21
+	 */
+	public markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.markDirtyValues();
 
 		if (dataItem) {
 			this._positionBullets(dataItem);

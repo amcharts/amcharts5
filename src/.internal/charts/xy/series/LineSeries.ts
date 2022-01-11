@@ -271,8 +271,7 @@ export class LineSeries extends XYSeries {
 
 				this._endIndex = endIndex;
 
-				this.strokes.clear();
-				this.fills.clear();
+				this._clearGraphics();
 
 				this._startSegment(0, startIndex);
 			}
@@ -282,6 +281,11 @@ export class LineSeries extends XYSeries {
 		}
 
 		super._updateChildren();
+	}
+
+	protected _clearGraphics() {
+		this.strokes.clear();
+		this.fills.clear();
 	}
 
 	protected _startSegment(segmentIndex: number, dataItemIndex: number) {
@@ -376,6 +380,7 @@ export class LineSeries extends XYSeries {
 			points, segments, stacked, getOpen, basePosX, basePosY, fillVisible, xField, yField, xOpenField, yOpenField, vcx, vcy, baseAxis, xAxis, yAxis, locationX, locationY, openLocationX, openLocationY
 		}
 
+
 		for (i = dataItemIndex; i < currentEndIndex; i++) {
 			const dataItem = this._dataItems[i];
 
@@ -441,6 +446,8 @@ export class LineSeries extends XYSeries {
 			}
 		}
 
+		fill.setRaw("userData", [dataItemIndex, i]);
+		stroke.setRaw("userData", [dataItemIndex, i]);
 
 		if (i === endIndex) {
 			this._endLine(points, segments[0][0]);
@@ -457,7 +464,8 @@ export class LineSeries extends XYSeries {
 		this.axisRanges.each((axisRange) => {
 			const container = axisRange.container;
 			const fills = axisRange.fills!;
-			let fill = this.makeFill(fills);
+			const fill = this.makeFill(fills);
+
 			if (container) {
 				container.children.push(fill);
 			}
@@ -466,13 +474,16 @@ export class LineSeries extends XYSeries {
 			this._drawFill(fill, segments);
 
 			const strokes = axisRange.strokes!;
-			let stroke = this.makeStroke(strokes);
+			const stroke = this.makeStroke(strokes);
 			if (container) {
 				container.children.push(stroke);
 			}
 
 			stroke.setPrivate("visible", true);
 			this._drawStroke(stroke, segments);
+
+			fill.setRaw("userData", [dataItemIndex, i]);
+			stroke.setRaw("userData", [dataItemIndex, i]);
 		})
 
 		if (currentEndIndex < endIndex) {
@@ -524,7 +535,7 @@ export class LineSeries extends XYSeries {
 
 							if (stackToItemX) {
 								xPos0 = o.xAxis.getDataItemPositionX(stackToItemX, o.xField, itemLocationX, (stackToItemX.component as XYSeries).get("vcx"));
-								if($type.isNaN(xPos0)){
+								if ($type.isNaN(xPos0)) {
 									xPos0 = o.basePosX;
 								}
 							}
@@ -539,7 +550,7 @@ export class LineSeries extends XYSeries {
 
 							if (stackToItemY) {
 								yPos0 = o.yAxis.getDataItemPositionY(stackToItemY, o.yField, itemLocationY, (stackToItemY.component as XYSeries).get("vcy"));
-								if($type.isNaN(yPos0)){
+								if ($type.isNaN(yPos0)) {
 									yPos0 = o.basePosY;
 								}
 							}
@@ -645,7 +656,7 @@ export class LineSeries extends XYSeries {
 				const bulletFunction = this.bullets.getIndex(0);
 				if (bulletFunction) {
 					const bullet = bulletFunction(this._root, this, new DataItem(this, {}, {}));
-					if(bullet){
+					if (bullet) {
 						const sprite = bullet.get("sprite");
 
 						if (sprite instanceof Graphics) {

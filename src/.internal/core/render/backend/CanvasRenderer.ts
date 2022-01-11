@@ -203,6 +203,7 @@ export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDi
 	public visible: boolean = true;
 	public exportable?: boolean = true;
 	public interactive: boolean = false;
+	public inactive: boolean = false;
 	public wheelable: boolean = false;
 	public isMeasured: boolean = false;
 	public buttonMode: boolean = false;
@@ -295,7 +296,7 @@ export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDi
 	}
 
 	protected _isInteractive(): boolean {
-		return this.interactive || this._renderer._forceInteractive > 0;
+		return this.inactive == false && (this.interactive || this._renderer._forceInteractive > 0);
 	}
 
 	protected _isInteractiveMask(): boolean {
@@ -713,6 +714,23 @@ class DrawCircle extends Op {
 /**
  * @ignore
  */
+class DrawEllipse extends Op {
+	constructor(public x: number, public y: number, public radiusX: number, public radiusY:number) { super(); }
+
+	public path(context: CanvasRenderingContext2D): void {
+		context.ellipse(0, 0, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
+	}
+
+	// TODO handle skewing and rotation
+	public addBounds(bounds: IBounds): void {
+		setPoint(bounds, { x: this.x - this.radiusX, y: this.y - this.radiusY });
+		setPoint(bounds, { x: this.x + this.radiusX, y: this.y + this.radiusY });
+	}
+}
+
+/**
+ * @ignore
+ */
 class Arc extends Op {
 	constructor(
 		public cx: number,
@@ -972,6 +990,10 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 	drawCircle(x: number, y: number, radius: number): void {
 		this._pushOp(new DrawCircle(x, y, radius));
 	}
+
+	drawEllipse(x: number, y: number, radiusX: number, radiusY:number): void {
+		this._pushOp(new DrawEllipse(x, y, radiusX, radiusY));
+	}	
 
 	arc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, anticlockwise: boolean = false): void {
 		this._pushOp(new Arc(cx, cy, radius, startAngle, endAngle, anticlockwise));
@@ -2798,13 +2820,14 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		// We need this in order top prevent default touch gestures when dragging
 		// draggable elements
 		if ($utils.supports("touchevents")) {
-			$array.each([window, this.view], (target) => {
-				this._disposers.push($utils.addEventListener(target, "touchstart", (ev) => {
-					if (this._dragging.length !== 0) {
-						ev.preventDefault();
-					}
-				}, { passive: false }));
-			})
+			const listener = (ev: any) => {
+				if (this._dragging.length !== 0) {
+					ev.preventDefault();
+				}
+			};
+
+			this._disposers.push($utils.addEventListener(window, "touchstart", listener, { passive: false }));
+			this._disposers.push($utils.addEventListener(this.view, "touchstart", listener, { passive: false }));
 		}
 
 		// Prevent scrolling of the window when hovering on "wheelable" object
