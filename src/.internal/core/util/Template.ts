@@ -336,7 +336,7 @@ export class Template<E extends Entity> {
 	}
 
 	public _removeObjectTemplate(entity: E) {
-		$array.keepIf(this._entities, (x) => x !== entity);
+		$array.remove(this._entities, entity);
 	}
 
 	public _stateChanged(name: string): void {

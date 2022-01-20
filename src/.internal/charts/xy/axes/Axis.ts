@@ -316,6 +316,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	protected _snapToSeries?: Array<XYSeries>;
 
+	public _seriesValuesDirty = false;
+
 	/**
 	 * A container above the axis that can be used to add additional stuff into
 	 * it. For example a legend, label, or an icon.
@@ -349,8 +351,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
 			if (change.type === "clear") {
-				this.axisRanges.each((dataItem) => {
-					dataItem.dispose();
+				$array.each(change.oldValues, (dataItem) => {
+					this.disposeDataItem(dataItem);
 				});
 			} else if (change.type === "push") {
 				this._processAxisRange(change.newValue, ["range"]);
@@ -359,7 +361,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			} else if (change.type === "insertIndex") {
 				this._processAxisRange(change.newValue, ["range"]);
 			} else if (change.type === "removeIndex") {
-				change.oldValue.dispose();
+				this.disposeDataItem(change.oldValue);
 			} else if (change.type === "moveIndex") {
 				this._processAxisRange(change.value, ["range"]);
 			} else {
@@ -813,8 +815,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		const chart = this.chart;
 		if (chart) {
 			chart._updateChartLayout();
+			chart.axisHeadersContainer.markDirtySize();
 		}
-		this.get("renderer")._updatePositions();
+
+		this.get("renderer")._updatePositions();		
 	}
 
 	/**

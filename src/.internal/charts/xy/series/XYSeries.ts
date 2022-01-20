@@ -432,9 +432,9 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 
 
 	/**
-	 * @rodo review
+	 * @todo review
 	 */
-	groupDataDisabled?:boolean;
+	groupDataDisabled?: boolean;
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {
@@ -642,7 +642,7 @@ export abstract class XYSeries extends Series {
 
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
 			if (change.type === "clear") {
-				this.axisRanges.each((axisRange) => {
+				$array.each(change.oldValues, (axisRange) => {
 					this._removeAxisRange(axisRange);
 				});
 			} else if (change.type === "push") {
@@ -987,6 +987,9 @@ export abstract class XYSeries extends Series {
 				yAxis.processSeriesDataItem(dataItem, this._valueYFields);
 			})
 
+			xAxis._seriesValuesDirty = true;
+			yAxis._seriesValuesDirty = true;
+
 			if (!this.get("ignoreMinMax")) {
 				if (this.isPrivateDirty("minX") || this.isPrivateDirty("maxX")) {
 					xAxis.markDirtyExtremes();
@@ -1147,7 +1150,7 @@ export abstract class XYSeries extends Series {
 					series = chart.series.getIndex(i)!;
 					if (series.get("xAxis") === this.get("xAxis") && series.get("yAxis") === this.get("yAxis") && series.className === this.className) {
 						this._couldStackTo.push(series);
-						if(!series.get("stacked")){
+						if (!series.get("stacked")) {
 							break;
 						}
 					}
@@ -1198,7 +1201,7 @@ export abstract class XYSeries extends Series {
 				let stackToSeries = this._couldStackTo[s];
 				let stackToItem = stackToSeries.dataItems[index];
 				let value = dataItem.get(field);
-				
+
 				if (stackToItem) {
 					let stackValue = stackToItem.get(field);
 					if (stackToNegative) {

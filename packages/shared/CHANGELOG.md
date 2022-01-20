@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.0] - 2022-01-20
+
+### Added
+- New `Root` setting: `timezone`. E.g. `"America/Vancouver"`, `"Australia/Sydney"`, `"UTC"`.
+- New export CSV option: `addBOM` (default: `true`). Indicates whether to add BOM characters at start of CSV output so that data viewer (e.g. Excel) knows we're exporting UTF-8 data.
+- New methods for `Adapters`: `remove(key)`, `disable(key)`, and `enable(key)`.
+- `GaplessDateAxis` added. It's a version of `DateAxis` that removes data-less intervals from its scale. `CategoryAxis` is being deprecated in favor of `GaplessDateAxis`. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/gapless-date-axis/).
+- Timezone support added. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#Time_zone).
+- New `Component` method: `markDirtyValues()`. Will re-evaluate elements of the component that are data-reliant, such as axis labels.
+
+### Fixed
+- Clearing axis ranges from Axis and Series was not working properly.
+- Slice with negative arc was ignoring `cornerRadius` property.
+- `groupDataDisabled` on `XYSeries` was not working if set to `true`.
+- Axis header was not updating its position if axes were stacked and size of an axis was updated.
+- Disposing of charts with a lot of elements was quite slow.
+- Series stacks with all-zero values could cause all stacks to disappear on zoom.
+
+
 ## [5.0.21] - 2022-01-11
 
 ### Added

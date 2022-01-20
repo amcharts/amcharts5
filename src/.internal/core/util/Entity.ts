@@ -28,6 +28,7 @@ export type Dirty<A> = { [K in keyof A]?: boolean };
 export class Adapters<E extends Settings> {
 	private _entity: E;
 	private _callbacks: { [K in keyof E["_settings"]]?: Array<<O extends E["_settings"]>(value: O[K], target?: O, key?: K) => O[K]> } = {};
+	private _disabled: { [K in keyof E["_settings"]]?: boolean } = {};
 
 	constructor(entity: E) {
 		this._entity = entity;
@@ -50,19 +51,49 @@ export class Adapters<E extends Settings> {
 		this._entity._markDirtyKey(key);
 
 		return new Disposer(() => {
-			$array.removeFirst(callbacks!, callback);
+			if ($array.removeFirst(callbacks!, callback)) {
+				this._entity._markDirtyKey(key);
+			}
 		});
+	}
+
+	public remove<Key extends keyof E["_settings"]>(key: Key) {
+		const callbacks = this._callbacks[key];
+
+		if (callbacks !== undefined) {
+			delete this._callbacks[key];
+
+			if (callbacks.length !== 0) {
+				this._entity._markDirtyKey(key);
+			}
+		}
+	}
+
+	public enable<Key extends keyof E["_settings"]>(key: Key) {
+		if (this._disabled[key]) {
+			delete this._disabled[key];
+			this._entity._markDirtyKey(key);
+		}
+	}
+
+	public disable<Key extends keyof E["_settings"]>(key: Key) {
+		if (!this._disabled[key]) {
+			this._disabled[key] = true;
+			this._entity._markDirtyKey(key);
+		}
 	}
 
 	/**
 	 * @ignore
 	 */
 	public fold<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]): E["_settings"][Key] {
-		const callbacks = this._callbacks[key];
+		if (!this._disabled[key]) {
+			const callbacks = this._callbacks[key];
 
-		if (callbacks !== undefined) {
-			for (let i = 0, len = callbacks.length; i < len; ++i) {
-				value = callbacks[i](value, this._entity, key);
+			if (callbacks !== undefined) {
+				for (let i = 0, len = callbacks.length; i < len; ++i) {
+					value = callbacks[i](value, this._entity, key);
+				}
 			}
 		}
 

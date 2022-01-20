@@ -221,27 +221,19 @@ export function pushAll<A>(array: Array<A>, input: Array<A>) {
  */
 export function remove<A>(array: Array<A>, element: A): boolean {
 	let found: boolean = false;
-	let index: number = array.indexOf(element);
+	let index: number = 0;
 
-	if (index !== -1) {
-		found = true;
-		array.splice(index, 1);
+	for (;;) {
+		index = array.indexOf(element, index);
 
-		let length: number = array.length;
+		if (index === -1) {
+			return found;
 
-		while (index < length) {
-			// TODO handle NaN
-			if (array[index] === element) {
-				array.splice(index, 1);
-				--length;
-
-			} else {
-				++index;
-			}
+		} else {
+			found = true;
+			array.splice(index, 1);
 		}
 	}
-
-	return found;
 }
 
 export function removeFirst<A>(array: Array<A>, element: A): boolean {
@@ -680,16 +672,13 @@ export function getFirstSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) 
 
 
 export function keepIf<A>(array: Array<A>, keep: (value: A) => boolean): void {
-	let length = array.length;
-	let i = 0;
+	let i = array.length;
 
-	while (i < length) {
-		if (keep(array[i])) {
-			++i;
+	while (i > 0) {
+		--i;
 
-		} else {
+		if (!keep(array[i])) {
 			array.splice(i, 1);
-			--length;
 		}
 	}
 }

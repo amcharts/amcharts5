@@ -416,6 +416,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		renderer.updateTick(dataItem.get("tick"), position, endPosition, count);
 		renderer.updateFill(dataItem.get("axisFill"), position, fillEndPosition);
+
 		this._processBullet(dataItem);
 		renderer.updateBullet(dataItem.get("bullet"), position, endPosition);
 
@@ -923,7 +924,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 
 		// meaning no min/max found on series/ranges and no min/max was defined
-		if (min === Infinity && max === -Infinity) {
+		if (min === Infinity || max === -Infinity) {
 			return;
 		}
 

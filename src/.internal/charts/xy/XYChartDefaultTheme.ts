@@ -4,6 +4,7 @@ import type { IValueAxisDataItem, ValueAxis } from "./axes/ValueAxis";
 import type { AxisRenderer } from "./axes/AxisRenderer";
 import type { DateAxis } from "./axes/DateAxis";
 import type { ICategoryAxisDataItem } from "./axes/CategoryAxis";
+import type { IGaplessDateAxisDataItem } from "./axes/GaplessDateAxis";
 
 import { Theme } from "../../core/Theme";
 import { percent, p50, p100 } from "../../core/util/Percent";
@@ -501,12 +502,12 @@ export class XYChartDefaultTheme extends Theme {
 				if (axisFill) {
 					const axis = <DateAxis<AxisRenderer>>dataItem.component;
 					const value = dataItem.get("value");
-					const endValue = dataItem.get("endValue");					
+					const endValue = dataItem.get("endValue");
 					const intervalDuration = axis.intervalDuration();
 					const baseInterval = axis.getPrivate("baseInterval");
 
 					let min = axis.getPrivate("min", 0);
-					min = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count).getTime();
+					min = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 					if (value != null && endValue != null) {
 						const val = Math.round((value - min) / intervalDuration) / 2;
@@ -518,6 +519,21 @@ export class XYChartDefaultTheme extends Theme {
 							axisFill.setPrivate("visible", false);
 						}
 					}
+				}
+			}
+		});
+
+		r("GaplessDateAxis").setAll({
+			fillRule: (dataItem: DataItem<IGaplessDateAxisDataItem>) => {
+				const axisFill = dataItem.get("axisFill");
+				if (axisFill) {
+
+					const index = dataItem.get("index")
+					let visible = false;
+					if (!$type.isNumber(index) || index % 2 == 0) {
+						visible = true
+					}
+					axisFill.setPrivate("visible", visible);
 				}
 			}
 		});

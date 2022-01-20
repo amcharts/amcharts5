@@ -37,6 +37,7 @@ import type { ColumnSeries } from "./../charts/xy/series/ColumnSeries";
 import type { Component } from "./render/Component";
 import type { Container } from "./render/Container";
 import type { DateAxis } from "./../charts/xy/axes/DateAxis";
+import type { GaplessDateAxis } from "./../charts/xy/axes/GaplessDateAxis";
 import type { DurationAxis } from "./../charts/xy/axes/DurationAxis";
 import type { Entity } from "./util/Entity";
 import type { Exporting } from "./../plugins/exporting/Exporting";
@@ -177,6 +178,7 @@ export interface IClasses {
 	"ForceDirected": ForceDirected;
 	"FunnelSeries": FunnelSeries;
 	"FunnelSlice": FunnelSlice;
+	"GaplessDateAxis": GaplessDateAxis<AxisRenderer>;
 	"Gradient": Gradient;
 	"Graphics": Graphics;
 	"GraticuleSeries": GraticuleSeries;

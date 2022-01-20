@@ -6,7 +6,7 @@
  */
 import * as $type from "./Type";
 import * as $utils from "./Utils";
-
+import type { Timezone } from "./Timezone";
 
 export type TimeUnit = "millisecond" | "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
 
@@ -19,7 +19,7 @@ export interface ITimeInterval {
 /**
  * Returns a `Promise` which can be used to execute code after number of
  * milliseconds.
- * 
+ *
  * @param   ms  Sleep duration in ms
  * @return      Promise
  */
@@ -141,23 +141,24 @@ export function copy(date: Date): Date {
  * Checks if the `unit` part of two `Date` objects do not match. Two dates
  * represent a "range" of time, rather the same time date.
  *
- * @param dateOne  Date 1
- * @param dateTwo  Date 2
+ * @param timeOne  timestamp
+ * @param timeTwo  timestamp
  * @param unit     Time unit to check
  * @return Range?
  */
-export function checkChange(dateOne: Date, dateTwo: Date, unit: TimeUnit, utc?: boolean): boolean {
-
-	const timeOne = dateOne.getTime();
-	const timeTwo = dateTwo.getTime();
-
+export function checkChange(timeOne: number, timeTwo: number, unit: TimeUnit, utc?: boolean, timezone?: Timezone): boolean {
 	// quick
 	if ((timeTwo - timeOne) > getDuration(unit, 1.2)) {
 		return true;
 	}
 
-	dateOne = new Date(timeOne);
-	dateTwo = new Date(timeTwo);
+	let dateOne = new Date(timeOne);
+	let dateTwo = new Date(timeTwo);
+
+	if (timezone) {
+		dateOne = timezone.convertLocal(dateOne);
+		dateTwo = timezone.convertLocal(dateTwo);
+	}
 
 	let timeZoneOffset1 = 0;
 	let timeZoneOffset2 = 0;
@@ -223,14 +224,12 @@ export function checkChange(dateOne: Date, dateTwo: Date, unit: TimeUnit, utc?: 
 	}
 
 	if (changed) {
-		return true;
+		return changed;
 	}
 
-	let nextUnit: $type.Optional<TimeUnit> = getNextUnit(unit);
+	let nextUnit = getNextUnit(unit);
 	if (nextUnit) {
-		dateOne.setUTCMinutes(dateOne.getUTCMinutes() + timeZoneOffset1);
-		dateTwo.setUTCMinutes(dateTwo.getUTCMinutes() + timeZoneOffset2);
-		return checkChange(dateOne, dateTwo, nextUnit, utc);
+		return checkChange(timeOne, timeTwo, nextUnit, utc, timezone);
 	}
 	else {
 		return false;
@@ -314,6 +313,7 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean): D
 	return date;
 }
 
+
 /**
  * "Rounds" the date to specific time unit.
  *
@@ -321,159 +321,257 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean): D
  * @param unit             Time unit
  * @param count            Number of units to round to
  * @param firstDateOfWeek  First day of week
+ * @param utc              Use UTC timezone
+ * @param firstDate        First date to round to
+ * @param roundMinutes     Minutes to round to (some timezones use non-whole hour)
+ * @param timezone         Use specific named timezone when rounding
  * @return New date
  */
-export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek?: number, utc?: boolean, firstDate?: Date): Date {
+export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek?: number, utc?: boolean, firstDate?: Date, timezone?: Timezone): Date {
+	if (!timezone || utc) {
 
-	if (!$type.isNumber(count)) {
-		count = 1;
+		let timeZoneOffset = 0;
+
+		if (!utc && unit != "millisecond") {
+			timeZoneOffset = date.getTimezoneOffset();
+			date.setUTCMinutes(date.getUTCMinutes() - timeZoneOffset);
+		}
+
+		switch (unit) {
+
+			case "day":
+				let day = date.getUTCDate();
+
+				if (count > 1) {
+					//	day = Math.floor(day / count) * count;
+					if (firstDate) {
+						firstDate = round(firstDate, "day", 1);
+
+						let difference = date.getTime() - firstDate.getTime();
+						let unitCount = Math.floor(difference / getDuration("day") / count);
+						let duration = getDuration("day", unitCount * count);
+						date.setTime(firstDate.getTime() + duration - timeZoneOffset * getDuration("minute"));
+					}
+				}
+				else {
+					date.setUTCDate(day);
+				}
+				date.setUTCHours(0, 0, 0, 0);
+
+				break;
+
+			case "second":
+				let seconds = date.getUTCSeconds();
+				if (count > 1) {
+					seconds = Math.floor(seconds / count) * count;
+				}
+				date.setUTCSeconds(seconds, 0);
+				break;
+
+			case "millisecond":
+				if (count == 1) {
+					return date; // much better for perf!
+				}
+
+				let milliseconds = date.getUTCMilliseconds();
+				milliseconds = Math.floor(milliseconds / count) * count;
+				date.setUTCMilliseconds(milliseconds);
+				break;
+
+			case "hour":
+
+				let hours = date.getUTCHours();
+				if (count > 1) {
+					hours = Math.floor(hours / count) * count;
+				}
+				date.setUTCHours(hours, 0, 0, 0);
+
+				break;
+
+			case "minute":
+
+				let minutes = date.getUTCMinutes();
+				milliseconds = date.getUTCMilliseconds();
+				if (count > 1) {
+					minutes = Math.floor(minutes / count) * count;
+				}
+
+				date.setUTCMinutes(minutes, 0, 0);
+
+				break;
+
+			case "month":
+
+				let month = date.getUTCMonth();
+				if (count > 1) {
+					month = Math.floor(month / count) * count;
+				}
+
+				date.setUTCMonth(month, 1);
+				date.setUTCHours(0, 0, 0, 0);
+
+				break;
+
+			case "year":
+
+				let year = date.getUTCFullYear();
+				if (count > 1) {
+					year = Math.floor(year / count) * count;
+				}
+				date.setUTCFullYear(year, 0, 1);
+				date.setUTCHours(0, 0, 0, 0);
+				break;
+
+			case "week":
+
+				let wday = date.getUTCDate();
+				let weekDay = date.getUTCDay();
+
+				if (!$type.isNumber(firstDateOfWeek)) {
+					firstDateOfWeek = 1;
+				}
+
+				if (weekDay >= firstDateOfWeek) {
+					wday = wday - weekDay + firstDateOfWeek;
+				} else {
+					wday = wday - (7 + weekDay) + firstDateOfWeek;
+				}
+
+				date.setUTCDate(wday);
+				date.setUTCHours(0, 0, 0, 0);
+
+				break;
+		}
+		if (!utc && unit != "millisecond") {
+			date.setUTCMinutes(date.getUTCMinutes() + timeZoneOffset);
+
+			if (unit == "day" || unit == "week" || unit == "month" || unit == "year") {
+				let newTimeZoneOffset = date.getTimezoneOffset();
+				if (newTimeZoneOffset != timeZoneOffset) {
+					let diff = newTimeZoneOffset - timeZoneOffset;
+
+					date.setUTCMinutes(date.getUTCMinutes() + diff);
+				}
+			}
+		}
+
+		return date;
 	}
+	else {
+		let tzoffset = timezone.offsetUTC(date);
+		let timeZoneOffset = date.getTimezoneOffset();
+		const parsedDate = timezone.parseDate(date);
 
-	let timeZoneOffset = 0;
+		let year = parsedDate.year;
+		let month = parsedDate.month;
+		let day = parsedDate.day;
+		let hour = parsedDate.hour;
+		let minute = parsedDate.minute;
+		let second = parsedDate.second;
+		let millisecond = parsedDate.millisecond;
 
-	if (!utc && unit != "millisecond") {
-		timeZoneOffset = date.getTimezoneOffset();
-		date.setUTCMinutes(date.getUTCMinutes() - timeZoneOffset);
-	}
+		switch (unit) {
 
-	switch (unit) {
-
-		case "day":
-			let day = date.getUTCDate();
-
-			if (count > 1) {
-				//	day = Math.floor(day / count) * count;
+			case "day":
 				if (firstDate) {
 					firstDate = round(firstDate, "day", 1);
-
 					let difference = date.getTime() - firstDate.getTime();
 					let unitCount = Math.floor(difference / getDuration("day") / count);
 					let duration = getDuration("day", unitCount * count);
 					date.setTime(firstDate.getTime() + duration - timeZoneOffset * getDuration("minute"));
+					year = date.getUTCFullYear();
+					month = date.getUTCMonth();
+					day = date.getUTCDate();
 				}
-			}
-			else {
-				date.setUTCDate(day);
-			}
-			date.setUTCHours(0, 0, 0, 0);
 
-			break;
+				hour = 0;
+				minute = 0;
+				second = 0;
+				millisecond = 0;
 
-		case "second":
-			let seconds = date.getUTCSeconds();
-			if (count > 1) {
-				seconds = Math.floor(seconds / count) * count;
-			}
-			date.setUTCSeconds(seconds, 0);
-			break;
+				break;
 
-		case "millisecond":
-			if (count == 1) {
-				return date; // much better for perf!
-			}
+			case "second":
+				if (count > 1) {
+					second = Math.floor(second / count) * count;
+				}
+				millisecond = 0;
+				break;
 
-			let milliseconds = date.getUTCMilliseconds();
-			milliseconds = Math.floor(milliseconds / count) * count;
-			date.setUTCMilliseconds(milliseconds);
-			break;
+			case "millisecond":
+				if (count > 1) {
+					millisecond = Math.floor(millisecond / count) * count;
+				}
+				break;
 
-		case "hour":
+			case "hour":
+				if (count > 1) {
+					hour = Math.floor(hour / count) * count;
+				}
+				minute = 0;
+				second = 0;
+				millisecond = 0;
+				break;
 
-			let hours = date.getUTCHours();
-			if (count > 1) {
-				hours = Math.floor(hours / count) * count;
-			}
-			date.setUTCHours(hours, 0, 0, 0);
+			case "minute":
+				if (count > 1) {
+					minute = Math.floor(minute / count) * count;
+				}
+				second = 0;
+				millisecond = 0;
+				break;
 
-			break;
+			case "month":
+				if (count > 1) {
+					month = Math.floor(month / count) * count;
+				}
+				day = 1;
+				hour = 0;
+				minute = 0;
+				second = 0;
+				millisecond = 0;
 
-		case "minute":
+				break;
 
-			let minutes = date.getUTCMinutes();
-			milliseconds = date.getUTCMilliseconds();
-			if (count > 1) {
-				minutes = Math.floor(minutes / count) * count;
-			}
+			case "year":
+				if (count > 1) {
+					year = Math.floor(year / count) * count;
+				}
+				month = 0;
+				day = 1;
+				hour = 0;
+				minute = 0;
+				second = 0;
+				millisecond = 0;
+				break;
 
-			date.setUTCMinutes(minutes, 0, 0);
+			case "week":
+				if (!$type.isNumber(firstDateOfWeek)) {
+					firstDateOfWeek = 1;
+				}
 
-			break;
+				let wday = date.getUTCDate();
+				let weekDay = date.getUTCDay();
 
-		case "month":
+				if (weekDay >= firstDateOfWeek) {
+					wday = wday - weekDay + firstDateOfWeek;
+				} else {
+					wday = wday - (7 + weekDay) + firstDateOfWeek;
+				}
 
-			let month = date.getUTCMonth();
-			if (count > 1) {
-				month = Math.floor(month / count) * count;
-			}
-
-			date.setUTCMonth(month, 1);
-			date.setUTCHours(0, 0, 0, 0);
-
-			break;
-
-		case "year":
-
-			let year = date.getUTCFullYear();
-			if (count > 1) {
-				year = Math.floor(year / count) * count;
-			}
-			date.setUTCFullYear(year, 0, 1);
-			date.setUTCHours(0, 0, 0, 0);
-
-			//let nonUTCDateY = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds());
-			//timeZoneOffset = nonUTCDateY.getTimezoneOffset();
-
-			break;
-
-
-		case "week":
-
-			let wday = date.getUTCDate();
-			let weekDay = date.getUTCDay();
-
-			if (!$type.isNumber(firstDateOfWeek)) {
-				firstDateOfWeek = 1;
-			}
-
-			// todo: rounding when count is not 1
-			if (weekDay >= firstDateOfWeek) {
-				wday = wday - weekDay + firstDateOfWeek;
-			} else {
-				wday = wday - (7 + weekDay) + firstDateOfWeek;
-			}
-
-			date.setUTCDate(wday);
-			date.setUTCHours(0, 0, 0, 0);
-
-			break;
-	}
-	if (!utc && unit != "millisecond") {
-		date.setUTCMinutes(date.getUTCMinutes() + timeZoneOffset);
-
-		if (unit == "day" || unit == "week" || unit == "month" || unit == "year") {
-			let newTimeZoneOffset = date.getTimezoneOffset();
-			if (newTimeZoneOffset != timeZoneOffset) {
-				let diff = newTimeZoneOffset - timeZoneOffset;
-
-				date.setUTCMinutes(date.getUTCMinutes() + diff);
-			}
+				day = wday;
+				hour = 0;
+				minute = 0;
+				second = 0;
+				millisecond = 0;
+				break;
 		}
+
+		minute += tzoffset - timeZoneOffset;
+		date = new Date(year, month, day, hour, minute, second, millisecond);
+
+		return date;
 	}
-
-	return date;
-}
-
-/**
- * Returns a new `Date` object which corresponds to the source date in a
- * specific timezone.
- *
- * @param   date      Source date
- * @param   timezone  Timezone identifier
- * @return            Recalculated new Date
- */
-export function setTimezone(date: Date, timezone: string): Date {
-	const d = new Date(date.toLocaleString("en-US", { timeZone: timezone }));
-	return d;
 }
 
 /**
@@ -527,4 +625,3 @@ export function getUnitValue(date: Date, unit: TimeUnit) {
 			return $utils.getWeek(date);
 	}
 }
-

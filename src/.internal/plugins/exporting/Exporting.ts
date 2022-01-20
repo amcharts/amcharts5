@@ -581,6 +581,15 @@ export interface IExportingCSVOptions extends IExportingDataOptions {
 	 */
 	reverse?: boolean;
 
+	/**
+	 * Add BOM character to output file, so that it can be used with UTF-8
+	 * characters properly in Excel.
+	 *
+	 * @default false
+	 * @since 5.1.0
+	 */
+	addBOM?: boolean;
+
 }
 
 export interface IExportingHTMLOptions extends IExportingDataOptions {
@@ -640,7 +649,7 @@ export class Exporting extends Entity {
 		this._setRawDefault("jpgOptions", { quality: 0.8, maintainPixelRatio: false });
 		this._setRawDefault("printOptions", { quality: 1, maintainPixelRatio: false, delay: 500, printMethod: "iframe", imageFormat: "png" });
 		this._setRawDefault("jsonOptions", { indent: 2, renameFields: true });
-		this._setRawDefault("csvOptions", { separator: ",", addColumnNames: true, emptyAs: "" });
+		this._setRawDefault("csvOptions", { separator: ",", addColumnNames: true, emptyAs: "", addBOM: true });
 		this._setRawDefault("htmlOptions", { emptyAs: "-", addColumnNames: true });
 		this._setRawDefault("xlsxOptions", { emptyAs: "", addColumnNames: true });
 		this._setRawDefault("pdfOptions", { fontSize: 14, imageFormat: "png", align: "left", addURL: true });
@@ -688,7 +697,7 @@ export class Exporting extends Entity {
 			target: this
 		});
 		const uri = await this.export(format, options);
-		this.streamFile(uri, fileName);
+		this.streamFile(uri, fileName, (options && (<IExportingCSVOptions>options).addBOM));
 	}
 
 	/**
@@ -2021,9 +2030,10 @@ export class Exporting extends Entity {
 	 *
 	 * @param   uri       data:uri with file content
 	 * @param   fileName  File name
+	 * @param   addBOM    Should download include byte order mark?
 	 * @return            Promise
 	 */
-	public streamFile(uri: string, fileName: string): boolean {
+	public streamFile(uri: string, fileName: string, addBOM: boolean = false): boolean {
 
 		if (this.msBlobDownloadSupport()) {
 
@@ -2092,6 +2102,9 @@ export class Exporting extends Entity {
 				}
 			}
 			else {
+				if (addBOM) {
+					uri = "\ufeff" + uri;
+				}
 				let blob = new Blob([uri], { type: contentType });
 				let url = window.URL.createObjectURL(blob);
 				link.href = url;
@@ -2111,6 +2124,9 @@ export class Exporting extends Entity {
 				chars[i] = charCode;
 			}
 
+			if (addBOM) {
+				chars = [0xEF, 0xBB, 0xBF].concat(chars);
+			}
 			let blob = new Blob([new Uint8Array(chars)], { type: contentType });
 			let url = window.URL.createObjectURL(blob);
 			link.href = url;

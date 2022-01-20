@@ -140,19 +140,9 @@ export class Container extends Sprite {
 	}
 
 	protected _dispose() {
-		$array.each(this.allChildren(), (child) => {
+		$array.eachReverse(this.allChildren(), (child) => {
 			child.dispose();
 		});
-
-		const mask = this.get("mask");
-		if (mask) {
-			mask.dispose();
-		}
-
-		const background = this.get("background");
-		if (background) {
-			background.dispose();
-		}
 
 		super._dispose();
 	}
@@ -262,8 +252,8 @@ export class Container extends Sprite {
 				let visible = true;
 				if(this._contentHeight <= height){
 					visible = false;
-				}				
-				verticalScrollbar.setPrivate("visible", visible);	
+				}
+				verticalScrollbar.setPrivate("visible", visible);
 			}
 		}
 	}

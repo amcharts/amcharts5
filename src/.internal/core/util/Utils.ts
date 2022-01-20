@@ -17,7 +17,7 @@ import { Disposer, IDisposer } from "./Disposer";
 
 /**
  * Execute a function when DOM is ready.
- * 
+ *
  * @since 5.0.2
  * @param  f  Callback
  */
@@ -124,7 +124,7 @@ export function blur(): void {
 
 /**
  * Focuses element.
- * 
+ *
  * @ignore
  */
 export function focus(el: HTMLElement): void {
@@ -242,7 +242,7 @@ export function contains(a: Element, b: Element): boolean {
 
 /**
  * Disables or enables interactivity of a DOM element.
- * 
+ *
  * @param  target       Target element
  * @param  interactive  Interactive?
  */
@@ -747,7 +747,7 @@ export function get12Hours(hours: number, base?: number): number {
 }
 
 /**
- * Returns a string name of the tome zone.
+ * Returns a string name of the time zone.
  *
  * @param date     Date object
  * @param long     Should return long ("Pacific Standard Time") or short abbreviation ("PST")

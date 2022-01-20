@@ -33,6 +33,7 @@ export { Text } from "./.internal/core/render/Text";
 export { Tick } from "./.internal/core/render/Tick";
 export { Tooltip } from "./.internal/core/render/Tooltip";
 export { VerticalLayout } from "./.internal/core/render/VerticalLayout";
+export { Timezone } from "./.internal/core/util/Timezone";
 
 export { Gradient } from "./.internal/core/render/gradients/Gradient";
 export { LinearGradient } from "./.internal/core/render/gradients/LinearGradient";

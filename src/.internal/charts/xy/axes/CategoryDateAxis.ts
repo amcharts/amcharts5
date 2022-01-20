@@ -168,7 +168,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 			if (gridInterval.timeUnit != "year" && gridInterval.timeUnit != "week") {
 				if (nextGridUnit && this.get("markUnitChange") && $type.isNumber(previousValue)) {
 
-					if ($time.checkChange(date, new Date(previousValue), nextGridUnit, this._root.utc)) {
+					if ($time.checkChange(value, previousValue, nextGridUnit, this._root.utc)) {
 						format = this.get("periodChangeDateFormats")![gridInterval.timeUnit];
 
 						if (index - frequency * 0.5 < previousIndex) {

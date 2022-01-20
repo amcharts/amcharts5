@@ -5,6 +5,7 @@ import type { Text } from "./render/Text";
 import type { Theme } from "./Theme";
 import type { IPoint } from "./util/IPoint";
 import type { IRenderer } from "./render/backend/Renderer";
+import type { Timezone } from "./util/Timezone";
 
 import { Container } from "./render/Container";
 import { HorizontalLayout } from "./render/HorizontalLayout";
@@ -32,6 +33,7 @@ import * as $order from "./util/Order";
 import * as $array from "./util/Array";
 import * as $object from "./util/Object";
 import * as $utils from "./util/Utils";
+
 
 import en from "../../locales/en";
 
@@ -150,11 +152,15 @@ export class Root implements IDisposer {
 	public utc: boolean = false;
 
 	/**
-	 * Use specific time zone when formatting date/time.
+	 * If set, will format date/time in specific time zone.
 	 *
-	 * @ignore timezones are not yet supported
+	 * The value should be named time zone, e.g.:
+	 * `"America/Vancouver"`, `"Australia/Sydney"`, `"UTC"`.
+	 *
+	 * @since 5.1.0
+	 * @param  value  Timezone
 	 */
-	public timezone: string | null = null;
+	public timezone?: Timezone;
 
 	/**
 	 * The maximum FPS that the Root will run at.
@@ -326,7 +332,9 @@ export class Root implements IDisposer {
 
 	protected _handleLogo(): void {
 		if (this._logo) {
-			if (this._rootContainer.getPrivate("width", 0) <= 150 || this._rootContainer.getPrivate("height", 0) <= 60) {
+			const w = this.dom.offsetWidth;
+			const h = this.dom.offsetHeight;
+			if ((w <= 150) || (h <= 60)) {
 				this._logo.hide();
 			}
 			else {

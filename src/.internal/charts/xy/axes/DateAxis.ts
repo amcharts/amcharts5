@@ -141,18 +141,23 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _dataGrouped: boolean = false;
 	protected _groupingCalculated: boolean = false;
 	protected _intervalDuration: number = 1;
+	protected _baseDuration: number = 1;
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
-
-		this.setPrivateRaw("baseInterval", this.get("baseInterval"));
+		this._setBaseInterval(this.get("baseInterval"));
 	}
 
-	public _updateChildren(){
-		if(this.isDirty("baseInterval")){
-			this.setPrivateRaw("baseInterval", this.get("baseInterval"));
+	public _updateChildren() {
+		if (this.isDirty("baseInterval")) {
+			this._setBaseInterval(this.get("baseInterval"));
 		}
+	}
+
+	protected _setBaseInterval(interval: ITimeInterval) {
+		this.setPrivateRaw("baseInterval", interval);
+		this._baseDuration = $time.getIntervalDuration(interval);
 	}
 
 
@@ -166,10 +171,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			const groupInterval = this.getPrivate("groupInterval")!;
 			if (groupInterval) {
-				this.setPrivateRaw("baseInterval", groupInterval);
+				this._setBaseInterval(groupInterval);
 			}
 			else {
-				this.setPrivateRaw("baseInterval", this.get("baseInterval"));
+				this._setBaseInterval(this.get("baseInterval"));
 			}
 
 
@@ -184,9 +189,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (!this._dataGrouped) {
 					if (this.get("groupData")) {
 						$array.each(this.series, (series) => {
-							if(series.get("groupDataDisabled")){
-								this._groupSeriesData(series);	
-							}							
+							this._groupSeriesData(series);
 						})
 
 						this._handleRangeChange();
@@ -198,7 +201,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 							series.setDataSet(mainDataSetId);
 						})
 
-						this.setPrivateRaw("baseInterval", baseInterval);
+						this._setBaseInterval(baseInterval);
 						this.setPrivateRaw("groupInterval", undefined);
 						this.markDirtyExtremes();
 					}
@@ -210,7 +213,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 
 	public _groupSeriesData(series: XYSeries) {
-		if (this.get("groupData")) {
+		if (this.get("groupData") && !series.get("groupDataDisabled")) {
 			// make array of intervals which will be used;
 			let intervals: ITimeInterval[] = [];
 			let baseDuration = this.baseMainDuration();
@@ -265,16 +268,19 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					workingFields[field] = field + "Working";
 				})
 
+				let intervalDuration = $time.getDuration(interval.timeUnit);
 
 				$array.each(dataItems, (dataItem) => {
 					let time = dataItem.get(key as any);
-					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
+					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 					let dataContext: any;
 
-					if (previousTime < roundedTime) {
+					if (previousTime < roundedTime - intervalDuration / 24) {
 						dataContext = $object.copy(dataItem.dataContext);
 
 						newDataItem = new DataItem(series, dataContext, series._makeDataItem(dataContext));
+						newDataItem.setRaw(key as any, roundedTime);
+
 						series._dataSets[dataSetId].push(newDataItem);
 
 						$array.each(fields, (field) => {
@@ -291,6 +297,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						$array.each(fields, (field) => {
 							let groupKey = groupFieldValues[field];
 							let value = dataItem.get(field as any);
+
 							if (value !== undefined) {
 
 								let currentValue = newDataItem.get(field as any);
@@ -335,7 +342,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 								newDataItem.setRaw(workingFields[field] as any, newDataItem.get(field as any));
 								let dataContext: any = $object.copy(dataItem.dataContext);
-								dataContext[key as any] = roundedTime
+								dataContext[key as any] = roundedTime;
 								newDataItem.dataContext = dataContext;
 							}
 						})
@@ -348,7 +355,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 				return true;
 			})
-			if(series._dataSetId){
+			if (series._dataSetId) {
 				series.setDataSet(series._dataSetId);
 			}
 			this.markDirtySize();
@@ -390,7 +397,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				if (groupInterval && (!current || (current.timeUnit !== groupInterval.timeUnit || current.count !== groupInterval.count))) {
 					this.setPrivateRaw("groupInterval", groupInterval);
-					this.setPrivateRaw("baseInterval", groupInterval!);
+					this._setBaseInterval(groupInterval)
 
 					if (groupInterval) {
 						let newId = groupInterval.timeUnit + groupInterval.count;
@@ -462,7 +469,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			this._intervalDuration = intervalDuration;
 
 			const nextGridUnit = $time.getNextUnit(gridInterval.timeUnit);
-			value = $time.round(new Date(selectionMin - intervalDuration), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(min)).getTime();
+
+			value = $time.round(new Date(selectionMin - intervalDuration), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(min), this._root.timezone).getTime();
 			let previousValue = value - intervalDuration;
 			let format: string | Intl.DateTimeFormatOptions;
 			const formats = this.get("dateFormats")!;
@@ -485,15 +493,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 
 				dataItem.setRaw("value", value);
-				dataItem.setRaw("endValue", $time.round(new Date(value + intervalDuration * 1.1), gridInterval.timeUnit, gridInterval.count).getTime());
-				
+				dataItem.setRaw("endValue", $time.add(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.utc).getTime()) //$time.round(new Date(value + intervalDuration * 1.1), gridInterval.timeUnit, gridInterval.count).getTime());
+
 				let date = new Date(value);
 
 				format = formats[gridInterval.timeUnit];
-
 				if (nextGridUnit && this.get("markUnitChange") && $type.isNumber(previousValue)) {
 					if (gridInterval.timeUnit != "year") {
-						if ($time.checkChange(date, new Date(previousValue), nextGridUnit, this._root.utc)) {
+						if ($time.checkChange(value, previousValue, nextGridUnit, this._root.utc, this._root.timezone)) {
 							format = this.get("periodChangeDateFormats")![gridInterval.timeUnit];
 						}
 					}
@@ -529,27 +536,61 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	protected _fixMin(min: number) {
 		let baseInterval = this.getPrivate("baseInterval");
-		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
+		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
 
 		return startTime + (endTime - startTime) * this.get("startLocation", 0);
 	}
+	/* goes up to the year
+	protected _getFormat(timeUnit: TimeUnit, value: number, previousValue: number) {
+		const formats = this.get("dateFormats")!;
+		let format = formats[timeUnit];
 
+		if (this.get("markUnitChange")) {
+			let nextGridUnit = $time.getNextUnit(timeUnit);
+
+			while (nextGridUnit != undefined) {
+
+				if (nextGridUnit) {
+					if (timeUnit != "year") {
+						if ($time.checkChange(value, previousValue, nextGridUnit, this._root.utc, this._root.timezone)) {
+							format = this.get("periodChangeDateFormats")![timeUnit];
+							timeUnit = nextGridUnit;
+							nextGridUnit = $time.getNextUnit(nextGridUnit);
+						}
+						else {
+							nextGridUnit = undefined;
+						}
+					}
+					else {
+						nextGridUnit = undefined;
+					}
+				}
+			}
+		}
+		return format;
+	}
+	*/
 	protected _fixMax(max: number) {
 		let baseInterval = this.getPrivate("baseInterval");
-		let startTime = $time.round(new Date(max), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
+		let startTime = $time.round(new Date(max), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
 
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
 	}
 
+	protected _updateDates(_date: number) {
+
+	}
+
 	/**
 	 * Returns a duration of currently active `baseInterval` in milliseconds.
-	 *
+	 * 
 	 * @return Duration
 	 */
 	public baseDuration(): number {
-		return $time.getIntervalDuration(this.getPrivate("baseInterval"));
+		return this._baseDuration;
+		//return $time.getIntervalDuration(this.getPrivate("baseInterval"));
 	}
 
 	/**
@@ -573,10 +614,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		$array.each(fields, (field) => {
 			let value = dataItem.get(field as any);
 			if ($type.isNumber(value)) {
-				let startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
+				let startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 				let endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
 				dataItem.open![field] = startTime;
 				dataItem.close![field] = endTime;
+
+				this._updateDates(startTime);
 			}
 		})
 	}
@@ -647,7 +690,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public roundAxisPosition(position: number, location: number): number {
 		let value = this.positionToValue(position);
 		let baseInterval = this.getPrivate("baseInterval");
-		value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
+		value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endValue = value;
 		if (location > 0) {
 			endValue = $time.add(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
@@ -683,7 +726,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (dataItem.open) {
 				diValue = dataItem.open[fieldName];
 			}
-			
+
 			return $order.compare(diValue, value);
 		});
 

@@ -27,7 +27,7 @@ export interface IDateFormatterSettings extends IEntitySettings {
 
 	/**
 	 * A date format to be used when formatting dates.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	dateFormat?: string | Intl.DateTimeFormatOptions;
@@ -110,13 +110,11 @@ export class DateFormatter extends Entity {
 		let info = this.parseFormat(format);
 
 		// Should we apply custom time zone?
-		// TODO
-		// if (this.timezoneOffset != null) {
-		// 	date.setMinutes(date.getMinutes() + date.getTimezoneOffset() - this.timezoneOffset);
-		// }
-		// else if (this.timezone != null) {
-		// 	date = $time.setTimezone(date, this.timezone);
-		// }
+		const timezone = this._root.timezone;
+		if (timezone && !this._root.utc) {
+			date = timezone.convertLocal(date);
+		}
+
 
 		// Check if it's a valid date
 		if (!$type.isNumber(date.getTime())) {
