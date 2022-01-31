@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.1] - 2022-01-31
+
+## Added
+- New method `remove(key)` on Template's adapaters.
+- Each chart-type package now exports its default theme as `DefaultTheme`. E.g. `am5xy.DefaultTheme`, `am5flow.DefaultTheme`, etc.
+- TypeScript: Settings interfaces for all objects are now being exposed via bundled re-export files like `index.ts`, `xy.ts`, etc.
+- New class `am5.Modal`.
+- New `Container` setting: `reverseChildren`. If set to `true`, will start rendering from the last child, effectively flipping the order in how children of the cotainer are laid out. Useful for [right-to-left setups](
+https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
+
+## Changed
+- Charts on iOS devices will now automatically use lesser resolution to work around canvas memory restriction introduced in iOS 15 Safari.
+- Charts will now use less built-in layers, and thus less `<canvas>` elements by default, reducing memory consumption.
+- All low/high-related settings and fields moved from `CandlestickSeries` to `XYSeries`. Sometimes it could be useful to have low/high on other series even if they are not shown visually.
+
+## Fixed
+- `XYCursor` was not being hidden when its `positionX` or `positionY` was changed to `undefined` and `alwaysShow` was set to `false`.
+- Auto-wrapped right-aligned labels were being rendered in wrong position.
+- Auto-wrapped labels were not being trimmed for whitespace on each line.
+- `dropFromPrevious` and `riseFromPrevious` states on `ColumnSeries` were not working properly on a column after a gap in data in case previous data item was outside of selection.
+- Emoji characters were not being displayed on circular labels.
+
+
 ## [5.1.0] - 2022-01-20
 
 ### Added

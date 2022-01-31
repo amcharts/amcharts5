@@ -1,11 +1,14 @@
-export { PercentChart } from "./.internal/charts/percent/PercentChart";
-export { PercentSeries, IPercentSeriesDataItem } from "./.internal/charts/percent/PercentSeries";
+export { PercentChart, IPercentChartSettings } from "./.internal/charts/percent/PercentChart";
+export { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem } from "./.internal/charts/percent/PercentSeries";
 
-export { PieChart } from "./.internal/charts/pie/PieChart";
-export { PieSeries, IPieSeriesDataItem } from "./.internal/charts/pie/PieSeries";
+export { PieChart, IPieChartSettings } from "./.internal/charts/pie/PieChart";
+export { PieSeries, IPieSeriesSettings, IPieSeriesDataItem } from "./.internal/charts/pie/PieSeries";
 
-export { FunnelSeries, IFunnelSeriesDataItem } from "./.internal/charts/funnel/FunnelSeries";
+export { FunnelSeries, IFunnelSeriesSettings, IFunnelSeriesDataItem } from "./.internal/charts/funnel/FunnelSeries";
 export { FunnelSlice } from "./.internal/charts/funnel/FunnelSlice";
-export { PictorialStackedSeries, IPictorialStackedSeriesDataItem } from "./.internal/charts/funnel/PictorialStackedSeries";
-export { PyramidSeries, IPyramidSeriesDataItem } from "./.internal/charts/funnel/PyramidSeries";
-export { SlicedChart } from "./.internal/charts/funnel/SlicedChart";
+export { PictorialStackedSeries, IPictorialStackedSeriesSettings, IPictorialStackedSeriesDataItem } from "./.internal/charts/funnel/PictorialStackedSeries";
+export { PyramidSeries, IPyramidSeriesSettings, IPyramidSeriesDataItem } from "./.internal/charts/funnel/PyramidSeries";
+export { SlicedChart, ISlicedChartSettings } from "./.internal/charts/funnel/SlicedChart";
+
+import { PercentDefaultTheme } from "./.internal/charts/percent/PercentDefaultTheme";
+export { PercentDefaultTheme as DefaultTheme };

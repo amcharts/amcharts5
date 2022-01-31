@@ -1,9 +1,7 @@
-import { Layout, ILayoutSettings, ILayoutPrivate } from "./Layout";
+import { Layout, ILayoutSettings, ILayoutPrivate, eachChildren } from "./Layout";
 import * as $array from "../util/Array";
 import * as $math from "../util/Math";
 import type { Container } from "./Container";
-import type { List } from "../util/List";
-import type { Sprite } from "./Sprite";
 
 
 export interface IGridLayoutSettings extends ILayoutSettings {
@@ -57,7 +55,7 @@ export class GridLayout extends Layout {
 		let minCellWidth = availableWidth;
 		let maxCellWidth = 1;
 
-		container.children.each((child) => {
+		eachChildren(container, (child) => {
 			if (child.get("position") != "absolute") {
 				let childWidth = child.width();
 
@@ -68,7 +66,7 @@ export class GridLayout extends Layout {
 					maxCellWidth = childWidth;
 				}
 			}
-		})
+		});
 
 		minCellWidth = $math.fitToRange(minCellWidth, 1, availableWidth);
 		maxCellWidth = $math.fitToRange(maxCellWidth, 1, availableWidth);
@@ -84,7 +82,7 @@ export class GridLayout extends Layout {
 		columnCount = Math.max(1, Math.floor(columnCount));
 		columnCount = Math.min(this.get("maxColumns", Number.MAX_VALUE), columnCount);
 
-		let columnWidths = this.getColumnWidths(container.children, columnCount, maxCellWidth, availableWidth);
+		let columnWidths = this.getColumnWidths(container, columnCount, maxCellWidth, availableWidth);
 
 		let prevY = paddingTop;
 
@@ -95,7 +93,7 @@ export class GridLayout extends Layout {
 
 		let prevX = paddingLeft;
 
-		container.children.each((child) => {
+		eachChildren(container, (child) => {
 			if (child.get("position") == "relative" && !child.isHidden()) {
 				const marginTop = child.get("marginTop", 0);
 				const marginBottom = child.get("marginBottom", 0);
@@ -128,12 +126,12 @@ export class GridLayout extends Layout {
 	/**
 	 * @ignore
 	 */
-	public getColumnWidths(children: List<Sprite>, columnCount: number, maxCellWidth: number, availableWidth: number): number[] {
+	public getColumnWidths(container: Container, columnCount: number, maxCellWidth: number, availableWidth: number): number[] {
 		let totalWidth = 0;
 		let columnWidths: Array<number> = [];
 		let column = 0;
 
-		children.each((child) => {
+		eachChildren(container, (child) => {
 			let bounds = child.adjustedLocalBounds();
 			if (child.get("position") != "absolute" && !child.isHidden()) {
 				if (this.get("fixedWidthGrid")) {
@@ -143,7 +141,7 @@ export class GridLayout extends Layout {
 					columnWidths[column] = Math.max(columnWidths[column] | 0, bounds.right - bounds.left + child.get("marginLeft", 0) + child.get("marginRight", 0));
 				}
 
-				if (column < children.length - 1) {
+				if (column < container.children.length - 1) {
 					column++;
 					if (column == columnCount) {
 						column = 0;
@@ -159,7 +157,7 @@ export class GridLayout extends Layout {
 		if (totalWidth > availableWidth) {
 			if (columnCount > 2) {
 				columnCount -= 1;
-				return this.getColumnWidths(children, columnCount, maxCellWidth, availableWidth);
+				return this.getColumnWidths(container, columnCount, maxCellWidth, availableWidth);
 			}
 			else {
 				return [availableWidth];

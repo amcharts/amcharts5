@@ -883,10 +883,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this.updateTooltip();
 	}
 
-
 	/**
-	 * @todo needs description
-	 * Can be called when axis zoom changes and you need to update tooltip position
+	 * Can be called when axis zoom changes and you need to update tooltip
+	 * position.
 	 */
 	public updateTooltip() {
 		const snapToSeries = this._snapToSeries;

@@ -6,6 +6,7 @@ import type { ListTemplate } from "../../core/util/List";
 import type { ColorSet } from "../../core/util/ColorSet";
 import type { ILegendDataItem } from "../../core/render/Legend";
 import type { Color } from "../../core/util/Color";
+import type { PercentChart } from "./PercentChart";
 
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../core/render/Series";
 import { Container } from "../../core/render/Container";
@@ -119,6 +120,8 @@ export abstract class PercentSeries extends Series {
 	public readonly slices: ListTemplate<this["_sliceType"]> = this._makeSlices();
 
 	protected abstract _makeSlices(): ListTemplate<this["_sliceType"]>;
+
+	public abstract chart: PercentChart | undefined;
 
 	/**
 	 * @ignore
@@ -604,6 +607,15 @@ export abstract class PercentSeries extends Series {
 
 	protected _updateTick(_dataItem: DataItem<this["_dataItemSettings"]>) {
 
+	}
+
+	protected _dispose() {
+		super._dispose();
+
+		const chart = this.chart;
+		if (chart) {
+			chart.series.removeValue(this);
+		}
 	}
 
 

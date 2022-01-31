@@ -268,4 +268,13 @@ export abstract class MapSeries extends Series {
 			}
 		}
 	}
+
+	protected _dispose() {
+		super._dispose();
+
+		const chart = this.chart;
+		if (chart) {
+			chart.series.removeValue(this);
+		}
+	}	
 }

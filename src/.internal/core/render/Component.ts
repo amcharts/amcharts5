@@ -371,8 +371,8 @@ export abstract class Component extends Container {
 			const type = "datavalidated";
 			if (this.events.isEnabled(type)) {
 				this.events.dispatch(type, { type: type, target: this });
-				this._dataChanged = false;
 			}
+			this._dataChanged = false;			
 		}
 
 		this.inited = true;

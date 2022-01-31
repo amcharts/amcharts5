@@ -49,7 +49,7 @@ export interface IPieSeriesSettings extends IPercentSeriesSettings {
 }
 
 export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
-	radius?:number;
+	radius?: number;
 }
 
 /**

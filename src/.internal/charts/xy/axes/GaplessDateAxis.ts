@@ -1,10 +1,12 @@
 import type { AxisRenderer } from "./AxisRenderer";
+
 import { DateAxis, IDateAxisSettings, IDateAxisPrivate, IDateAxisDataItem, IDateAxisEvents } from "./DateAxis";
+import { DataItem } from "../../../core/render/Component";
+
 import * as $array from "../../../core/util/Array"
 import * as $order from "../../../core/util/Order";
 import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
-import { DataItem } from "../../../core/render/Component";
 
 export interface IGaplessDateAxisSettings<R extends AxisRenderer> extends IDateAxisSettings<R> {
 
@@ -22,9 +24,10 @@ export interface IGaplessDateAxisEvents extends IDateAxisEvents {
 }
 
 /**
- * Creates a date axis.
+ * A version of a [[DateAxis]] which removes intervals that don't have any data
+ * items in them.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/gapless-date-axis/} for more info
  * @important
  */
 export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
@@ -106,7 +109,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		}
 	}
 
-	public valueToIndex(value: number) {
+	/**
+	 * Converts numeric value from axis scale to index.
+	 * 
+	 * @param  value  Value
+	 * @return        Index
+	 */
+	public valueToIndex(value: number): number {
 		const dates = this._dates;
 		const result = $array.getSortedIndex(dates, (x) => $order.compare(x, value));
 		let index = result.index;

@@ -241,13 +241,31 @@ export abstract class BaseColumnSeries extends XYSeries {
 				for (let i = 0; i < startIndex; i++) {
 					this._toggleColumn(this.dataItems[i], false);
 				}
-
 				let previous = this.dataItems[startIndex];
 
 				for (let i = startIndex; i <= endIndex; i++) {
 					let dataItem = this.dataItems[i];
+					if (dataItem.get("valueX") != null && dataItem.get("valueY") != null) {
+						previous = dataItem;
+						if (i > 0 && startIndex > 0) {
+							for (let j = i - 1; j >= 0; j--) {
+								let dataItem = this.dataItems[j];
+								if (dataItem.get("valueX") != null && dataItem.get("valueY") != null) {
+									previous = dataItem;
+									break;
+								}
+							}
+						}
+						break;
+					}
+				}
+
+				for (let i = startIndex; i <= endIndex; i++) {
+					let dataItem = this.dataItems[i];
 					this._updateGraphics(dataItem, previous);
-					previous = dataItem;
+					if (dataItem.get("valueX") != null && dataItem.get("valueY") != null) {
+						previous = dataItem;
+					}
 				}
 
 				for (let i = endIndex + 1; i < len; i++) {

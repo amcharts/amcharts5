@@ -1,4 +1,4 @@
-import { Layout } from "./Layout";
+import { Layout, eachChildren } from "./Layout";
 import * as $type from "../util/Type";
 import { Percent } from "../util/Percent";
 import type { Container } from "./Container";
@@ -24,7 +24,7 @@ export class HorizontalLayout extends Layout {
 
 		let totalPercent = 0;
 
-		container.children.each((child) => {
+		eachChildren(container, (child) => {
 			if (child.get("position") == "relative") {
 				let childWidth = child.get("width");
 				if (childWidth instanceof Percent) {
@@ -52,7 +52,7 @@ export class HorizontalLayout extends Layout {
 		});
 
 		if (availableWidth > 0) {
-			container.children.each((child) => {
+			eachChildren(container, (child) => {
 				if (child.get("position") == "relative") {
 					let childWidth = child.get("width");
 					if (childWidth instanceof Percent) {
@@ -69,7 +69,7 @@ export class HorizontalLayout extends Layout {
 
 		let prevX = paddingLeft;
 
-		container.children.each((child) => {
+		eachChildren(container, (child) => {
 			if (child.get("position") == "relative") {
 				let bounds = child.adjustedLocalBounds();
 				let marginLeft = child.get("marginLeft", 0);

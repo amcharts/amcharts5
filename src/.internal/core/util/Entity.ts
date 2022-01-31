@@ -57,6 +57,11 @@ export class Adapters<E extends Settings> {
 		});
 	}
 
+	/**
+	 * Removes all adapters for the specific key.
+	 *
+	 * @since 5.1.0
+	 */
 	public remove<Key extends keyof E["_settings"]>(key: Key) {
 		const callbacks = this._callbacks[key];
 
@@ -69,6 +74,11 @@ export class Adapters<E extends Settings> {
 		}
 	}
 
+	/**
+	 * Enables (previously disabled) adapters for specific key.
+	 *
+	 * @since 5.1.0
+	 */
 	public enable<Key extends keyof E["_settings"]>(key: Key) {
 		if (this._disabled[key]) {
 			delete this._disabled[key];
@@ -76,6 +86,11 @@ export class Adapters<E extends Settings> {
 		}
 	}
 
+	/**
+	 * Disables all adapters for specific key.
+	 *
+	 * @since 5.1.0
+	 */
 	public disable<Key extends keyof E["_settings"]>(key: Key) {
 		if (!this._disabled[key]) {
 			this._disabled[key] = true;

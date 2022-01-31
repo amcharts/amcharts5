@@ -1,15 +1,12 @@
 import type { DataItem } from "../../core/render/Component";
-import type { Entity, IEntitySettings } from "../../core/util/Entity";
-import type { Color } from "../../core/util/Color";
-
-import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "./Series";
+import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "./Series";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
 import { RoundedRectangle } from "../../core/render/RoundedRectangle";
-import { Rectangle } from "../../core/render/Rectangle";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
-
+import type { Entity, IEntitySettings } from "../../core/util/Entity";
+import type { Color } from "../../core/util/Color";
 import * as $utils from "../../core/util/Utils";
 
 export interface ILegendDataItem extends ISeriesDataItem {
@@ -120,6 +117,10 @@ export interface ILegendSettings extends ISeriesSettings {
 export interface ILegendPrivate extends ISeriesPrivate {
 }
 
+export interface ILegendEvents extends ISeriesEvents {
+
+}
+
 /**
  * A universal legend control.
  *
@@ -139,6 +140,8 @@ export class Legend extends Series {
 	declare public _settings: ILegendSettings;
 	declare public _privateSettings: ILegendPrivate;
 	declare public _dataItemSettings: ILegendDataItem;
+	declare public _events: ILegendEvents;
+
 
 	/**
 	 * List of all [[Container]] elements for legend items.
@@ -150,7 +153,7 @@ export class Legend extends Series {
 		() => Container._new(this._root, {
 			themeTags: $utils.mergeTags(this.itemContainers.template.get("themeTags", []), ["legend", "item"]),
 			themeTagsSelf: $utils.mergeTags(this.itemContainers.template.get("themeTagsSelf", []), ["itemcontainer"]),
-			background: Rectangle.new(this._root, {
+			background: RoundedRectangle.new(this._root, {
 				themeTags: $utils.mergeTags(this.itemContainers.template.get("themeTags", []), ["legend", "item", "background"]),
 				themeTagsSelf: $utils.mergeTags(this.itemContainers.template.get("themeTagsSelf", []), ["itemcontainer"])
 			})
@@ -304,6 +307,17 @@ export class Legend extends Series {
 						item.createLegendMarker();
 					}
 				}
+				else {
+					if (item.on) {
+						item.on(fillField as any, () => {
+							markerRectangle.set("fill", item.get(fillField as any));
+						})
+
+						item.on(strokeField as any, () => {
+							markerRectangle.set("stroke", item.get(strokeField as any));
+						})
+					}
+				}
 
 				markerRectangle.setAll({ fill, stroke });
 
@@ -354,9 +368,8 @@ export class Legend extends Series {
 					itemContainer.set("disabled", true);
 				}
 
-				var clickContainer = itemContainer;
-				this._addHoverEvents(clickContainer, item, dataItem)
 				if (clickTarget != "none") {
+					var clickContainer = itemContainer;
 					if (clickTarget == "marker") {
 						clickContainer = marker;
 					}
@@ -366,7 +379,9 @@ export class Legend extends Series {
 		}
 	}
 
-	protected _addHoverEvents(container: Container, item: ILegendItem, _dataItem: DataItem<this["_dataItemSettings"]>) {
+
+	protected _addClickEvents(container: Container, item: ILegendItem, dataItem: DataItem<this["_dataItemSettings"]>) {
+		container.set("cursorOverStyle", "pointer");
 		container.events.on("pointerover", () => {
 			const component = item.component;
 			if (component && component.hoverDataItem) {
@@ -380,10 +395,7 @@ export class Legend extends Series {
 				component.unhoverDataItem(item as any)
 			}
 		})
-	}
 
-	protected _addClickEvents(container: Container, item: ILegendItem, dataItem: DataItem<this["_dataItemSettings"]>) {
-		container.set("cursorOverStyle", "pointer");
 		container.events.on("click", () => {
 			const labelText = dataItem.get("label").text._getText();
 

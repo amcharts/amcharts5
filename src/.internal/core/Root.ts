@@ -106,6 +106,7 @@ export class Root implements IDisposer {
 	public events: EventDispatcher<Events<this, IRootEvents>> = new EventDispatcher();
 
 	/**
+	 * @ignore
 	 * @todo needs description
 	 */
 	public animationTime: number | null = null;
@@ -157,8 +158,8 @@ export class Root implements IDisposer {
 	 * The value should be named time zone, e.g.:
 	 * `"America/Vancouver"`, `"Australia/Sydney"`, `"UTC"`.
 	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Time_zone} for more info
 	 * @since 5.1.0
-	 * @param  value  Timezone
 	 */
 	public timezone?: Timezone;
 
@@ -166,6 +167,8 @@ export class Root implements IDisposer {
 	 * The maximum FPS that the Root will run at.
 	 *
 	 * If `undefined` it will run at the highest FPS.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Performance} for more info
 	 */
 	public fps: number | undefined;
 
@@ -957,7 +960,7 @@ export class Root implements IDisposer {
 
 	protected _addTooltip() {
 		if (!this.tooltipContainer) {
-			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100, layer: 100 }));
+			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100, layer: 30 }));
 			this.tooltipContainer = tooltipContainer;
 
 			const tooltip = Tooltip.new(this, {});

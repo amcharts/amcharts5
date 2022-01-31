@@ -254,6 +254,8 @@ export abstract class Series extends Component {
 
 	protected _afterNew() {
 		this.valueFields.push("value");
+		// for holding some extra info which could be used when formatting legend and similar
+		this._dataItem = new DataItem(this, {}, {});
 
 		super._afterNew();
 

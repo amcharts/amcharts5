@@ -11,7 +11,7 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	stroke?: Color,
 
 	/**
-	 * Used for genmeric fills.
+	 * Used for generic fills.
 	 */
 	fill?: Color,
 

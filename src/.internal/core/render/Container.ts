@@ -79,10 +79,19 @@ export interface IContainerSettings extends ISpriteSettings {
 	setStateOnChildren?: boolean;
 
 	/**
-	 *
+	 * Setting this to an instance of [[Scrollbar]] will enable vertical
+	 * scrolling of content if it does not fit into the Container.
+	 * 
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Scrollbar} for more info
 	 */
 	verticalScrollbar?: Scrollbar;
+
+	/**
+	 * If set to `true` its children will be laid out in opposite order.
+	 *
+	 * @since 5.1.1
+	 */
+	reverseChildren?: boolean;
 
 }
 

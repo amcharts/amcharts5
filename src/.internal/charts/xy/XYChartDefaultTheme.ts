@@ -182,7 +182,7 @@ export class XYChartDefaultTheme extends Theme {
 
 		r("XYCursor").setAll({
 			behavior: "none",
-			layer: 20,
+			layer: 30,
 			exportable: false,
 			snapToSeriesBy: "xy"
 		});

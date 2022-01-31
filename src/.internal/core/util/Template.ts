@@ -111,7 +111,7 @@ export class TemplateStates<E extends Entity> {
 export class TemplateAdapters<E extends Entity> {
 	private _callbacks: { [K in keyof E["_settings"]]?: Array<<O extends E["_settings"]>(value: O[K], target?: O, key?: K) => O[K]> } = {};
 
-	public add<Key extends keyof E["_settings"]>(key: Key, callback: <O extends E["_settings"]>(value: O[Key], target?: O, key?: Key) => O[Key]) {
+	public add<Key extends keyof E["_settings"]>(key: Key, callback: <O extends E["_settings"]>(value: O[Key], target?: O, key?: Key) => O[Key]): IDisposer {
 		let callbacks = this._callbacks[key];
 
 		if (callbacks === undefined) {
@@ -119,6 +119,22 @@ export class TemplateAdapters<E extends Entity> {
 		}
 
 		callbacks.push(callback);
+
+		return new Disposer(() => {
+			$array.removeFirst(callbacks!, callback);
+
+			if (callbacks!.length === 0) {
+				delete this._callbacks[key];
+			}
+		});
+	}
+
+	public remove<Key extends keyof E["_settings"]>(key: Key) {
+		const callbacks = this._callbacks[key];
+
+		if (callbacks !== undefined) {
+			delete this._callbacks[key];
+		}
 	}
 
 	public _apply(entity: E): IDisposer {

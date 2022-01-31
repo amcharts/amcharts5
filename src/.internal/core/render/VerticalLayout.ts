@@ -1,4 +1,4 @@
-import { Layout } from "./Layout";
+import { Layout, eachChildren } from "./Layout";
 import * as $type from "../util/Type";
 import { Percent } from "../util/Percent";
 import type { Container } from "./Container";
@@ -23,7 +23,7 @@ export class VerticalLayout extends Layout {
 		let availableHeight = container.innerHeight();
 		let totalPercent = 0;
 
-		container.children.each((child) => {
+		eachChildren(container, (child) => {
 			if (child.get("position") == "relative") {
 				let childHeight = child.get("height");
 				if (childHeight instanceof Percent) {
@@ -51,13 +51,13 @@ export class VerticalLayout extends Layout {
 			}
 		})
 		if(availableHeight > 0){
-			container.children.each((child) => {
+			eachChildren(container, (child) => {
 				if (child.get("position") == "relative") {
 					let childHeight = child.get("height");
 
 					if (childHeight instanceof Percent) {
 						let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
-						
+
 						let minHeight = child.get("minHeight", -Infinity);
 						let maxHeight = child.get("maxHeight", Infinity);
 						privateHeight = Math.min(Math.max(minHeight, privateHeight), maxHeight);
@@ -65,12 +65,12 @@ export class VerticalLayout extends Layout {
 						child.setPrivate("height", privateHeight);
 					}
 				}
-			})
+			});
 		}
 
 		let prevY = paddingTop;
 
-		container.children.each((child) => {
+		eachChildren(container, (child) => {
 			if (child.get("position") == "relative") {
 				let bounds = child.adjustedLocalBounds();
 				let marginTop = child.get("marginTop", 0);

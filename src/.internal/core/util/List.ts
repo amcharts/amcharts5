@@ -448,6 +448,16 @@ export class List<T> {
 	public each(f: (value: T, index: number) => void): void {
 		$array.each(this._values, f);
 	}
+
+	/**
+	 * Calls `f` for each element in the list, from right to left.
+	 *
+	 * `f` should have at least one parameter defined which will get a current
+	 * item, with optional second argument - index.
+	 */
+	public eachReverse(f: (value: T, index: number) => void): void {
+		$array.eachReverse(this._values, f);
+	}
 }
 
 

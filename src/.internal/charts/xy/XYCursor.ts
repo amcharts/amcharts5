@@ -193,7 +193,7 @@ export class XYCursor extends Container {
 	 * @default Graphics.new()
 	 */
 	public readonly selection: Graphics = this.children.push(Graphics.new(this._root, {
-		themeTags: ["selection", "cursor"], layer: 20
+		themeTags: ["selection", "cursor"], layer: 30
 	}));
 
 	protected _movePoint: IPoint | undefined;
@@ -258,8 +258,16 @@ export class XYCursor extends Container {
 		super._updateChildren();
 
 		if (this.isDirty("positionX") || this.isDirty("positionY")) {
-			this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
-			this.handleMove();
+			const positionX = this.get("positionX");
+			const positionY = this.get("positionY");
+
+			if (positionX == null && positionY == null) {
+				this.hide(0);
+			}
+			else {
+				this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
+				this.handleMove();
+			}
 		}
 	}
 

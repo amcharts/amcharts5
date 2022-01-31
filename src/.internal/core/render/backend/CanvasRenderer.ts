@@ -715,7 +715,7 @@ class DrawCircle extends Op {
  * @ignore
  */
 class DrawEllipse extends Op {
-	constructor(public x: number, public y: number, public radiusX: number, public radiusY:number) { super(); }
+	constructor(public x: number, public y: number, public radiusX: number, public radiusY: number) { super(); }
 
 	public path(context: CanvasRenderingContext2D): void {
 		context.ellipse(0, 0, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
@@ -991,9 +991,9 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		this._pushOp(new DrawCircle(x, y, radius));
 	}
 
-	drawEllipse(x: number, y: number, radiusX: number, radiusY:number): void {
+	drawEllipse(x: number, y: number, radiusX: number, radiusY: number): void {
 		this._pushOp(new DrawEllipse(x, y, radiusX, radiusY));
-	}	
+	}
 
 	arc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, anticlockwise: boolean = false): void {
 		this._pushOp(new Arc(cx, cy, radius, startAngle, endAngle, anticlockwise));
@@ -1876,7 +1876,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 								}
 
 								// Set current chunk (truncated)
-								chunk.text = tmpText;
+								chunk.text = $utils.trim(tmpText);
 
 								chunks = [];
 								skipFurtherText = true;
@@ -1997,6 +1997,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			bottom: offsetY,
 		};
 
+
 		// We need to fit?
 		if (oversizedBehavior !== "none") {
 			const ratio = this._fitRatio(bounds);
@@ -2021,7 +2022,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 					switch (this.style.textAlign) {
 						case "right":
 						case "end":
-							bounds.left = maxWidth;
+							bounds.left = -maxWidth;
 							bounds.right = 0;
 							break;
 						case "center":
@@ -2498,9 +2499,13 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 				else if (chunk.type == "value") {
 
 					// Measure each letter
-					for (let i = 0; i < chunk.text.length; i++) {
+					const chars = chunk.text.match(/./ug) || [];
+					if (rtl) {
+						chars.reverse();
+					}
+					for (let i = 0; i < chars.length; i++) {
 
-						const char = rtl ? chunk.text : chunk.text[i];
+						const char = chars[i];
 
 						// Measure
 						const metrics = this._measureText(char, context);
@@ -2799,6 +2804,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	constructor() {
 		super();
 
+		if ((this.resolution > 1) && $utils.iOS()) {
+			this.resolution = 1;
+		}
+
 		this.view.appendChild(this._layerDom);
 
 		this._disposers.push(new Disposer(() => {
@@ -2815,6 +2824,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		// Monitor for possible pixel ratio changes (when page is zoomed)
 		this._disposers.push($utils.addEventListener(window, "resize", (_ev) => {
 			this.resolution = window.devicePixelRatio;
+			if ((this.resolution > 1) && $utils.iOS()) {
+				this.resolution = 1;
+			}
 		}));
 
 		// We need this in order top prevent default touch gestures when dragging

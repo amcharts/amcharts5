@@ -1,10 +1,19 @@
 import type { Container } from "./Container";
+import type { Sprite } from "./Sprite";
 import { Entity, IEntitySettings, IEntityPrivate } from "../util/Entity";
 
 export interface ILayoutSettings extends IEntitySettings {
 }
 
 export interface ILayoutPrivate extends IEntityPrivate {
+}
+
+export function eachChildren(container: Container, f: (sprite: Sprite) => void): void {
+    if (container.get("reverseChildren", false)) {
+        container.children.eachReverse(f);
+    } else {
+        container.children.each(f);
+    }
 }
 
 /**

@@ -1,5 +1,5 @@
 import { DataItem } from "../../../core/render/Component";
-import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../../core/render/Series";
+import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../../core/render/Series";
 import type { Axis, IAxisPrivate, IAxisDataItem } from "../axes/Axis";
 import type { AxisRenderer } from "../axes/AxisRenderer";
 import * as $array from "../../../core/util/Array";
@@ -86,6 +86,13 @@ export interface IXYAxis extends Axis<AxisRenderer> {
 	_privateSettings: IXYAxisPrivate;
 }
 
+export interface IXYSeriesEvents extends ISeriesEvents {
+	// @todo review
+	datasetchanged: {
+		id: string
+	}
+}
+
 /**
  * XY chart series data item.
  */
@@ -132,6 +139,50 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 	openValueYChangePreviousPercent?: number;
 	openValueYWorkingOpen?: number;
 	openValueYWorkingClose?: number;
+
+	lowValueX?: number;
+	lowValueXWorking?: number;
+	lowValueXChange?: number;
+	lowValueXChangePercent?: number;
+	lowValueXChangeSelection?: number;
+	lowValueXChangeSelectionPercent?: number;
+	lowValueXChangePrevious?: number;
+	lowValueXChangePreviousPercent?: number;
+	lowValueXWorkingOpen?: number;
+	lowValueXWorkingClose?: number;
+
+	highValueX?: number;
+	highValueXWorking?: number;
+	highValueXChange?: number;
+	highValueXChangePercent?: number;
+	highValueXChangeSelection?: number;
+	highValueXChangeSelectionPercent?: number;
+	highValueXChangePrevious?: number;
+	highValueXChangePreviousPercent?: number;
+	highValueXWorkingOpen?: number;
+	highValueXWorkingClose?: number;
+
+	lowValueY?: number;
+	lowValueYWorking?: number;
+	lowValueYChange?: number;
+	lowValueYChangePercent?: number;
+	lowValueYChangeSelection?: number;
+	lowValueYChangeSelectionPercent?: number;
+	lowValueYChangePrevious?: number;
+	lowValueYChangePreviousPercent?: number;
+	lowValueYWorkingOpen?: number;
+	lowValueYWorkingClose?: number;
+
+	highValueY?: number;
+	highValueYWorking?: number;
+	highValueYChange?: number;
+	highValueYChangePercent?: number;
+	highValueYChangeSelection?: number;
+	highValueYChangeSelectionPercent?: number;
+	highValueYChangePrevious?: number;
+	highValueYChangePreviousPercent?: number;
+	highValueYWorkingOpen?: number;
+	highValueYWorkingClose?: number;
 
 	categoryX?: string;
 	categoryY?: string;
@@ -296,6 +347,117 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 */
 	openValueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
+
+
+	/**
+	 * Input data field for X low value.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 */
+	lowValueXField?: string;
+
+	/**
+	 * Input data field for Y low value.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 */
+	lowValueYField?: string;
+
+	/**
+	 * Input data field for X high value.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 */
+	highValueXField?: string;
+
+	/**
+	 * Input data field for Y high value.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 */
+	highValueYField?: string;
+
+	/**
+	 * Display data field for X low value.
+	 */
+	lowValueXShow?: "lowValueXWorking" | "lowValueXChange" | "lowValueXChangePercent" | "lowValueXChangeSelection" | "lowValueXChangeSelectionPercent" | "lowValueXChangePrevious" | "lowValueXChangePreviousPercent";
+
+	/**
+	 * Display data field for Y low value.
+	 */
+	lowValueYShow?: "lowValueYWorking" | "lowValueYChange" | "lowValueYChangePercent" | "lowValueYChangeSelection" | "lowValueYChangeSelectionPercent" | "lowValueYChangePrevious" | "lowValueYChangePreviousPercent";
+
+	/**
+	 * Indicates what aggregate value to use for collective data item, when
+	 * aggregating X low values from several data items.
+	 */
+	lowValueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
+
+	/**
+	 * Indicates what aggregate value to use for collective data item, when
+	 * aggregating Y low values from several data items.
+	 */
+	lowValueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
+
+	/**
+	 * Display data field for X high value.
+	 */
+	highValueXShow?: "highValueXWorking" | "highValueXChange" | "highValueXChangePercent" | "highValueXChangeSelection" | "highValueXChangeSelectionPercent" | "highValueXChangePrevious" | "highValueXChangePreviousPercent";
+
+	/**
+	 * Display data field for Y low value.
+	 */
+	highValueYShow?: "highValueYWorking" | "highValueYChange" | "highValueYChangePercent" | "highValueYChangeSelection" | "highValueYChangeSelectionPercent" | "highValueYChangePrevious" | "highValueYChangePreviousPercent";
+
+	/**
+	 * Indicates what aggregate value to use for collective data item, when
+	 * aggregating X high values from several data items.
+	 */
+	highValueXGrouped?: "open" | "close" | "high" | "high" | "average" | "sum" | "extreme";
+
+	/**
+	 * Indicates what aggregate value to use for collective data item, when
+	 * aggregating X high values from several data items.
+	 */
+	highValueYGrouped?: "open" | "close" | "high" | "high" | "average" | "sum" | "extreme";
+
+	/**
+	 * Horizontal location of the low data point relative to its cell.
+	 *
+	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 *
+	 * @default 0.5
+	 */
+	lowLocationX?: number;
+
+	/**
+	 * Vertical location of the low data point relative to its cell.
+	 *
+	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 *
+	 * @default 0.5
+	 */
+	lowLocationY?: number;
+
+	/**
+	 * Horizontal location of the high data point relative to its cell.
+	 *
+	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 *
+	 * @default 0.5
+	 */
+	highLocationX?: number;
+
+	/**
+	 * Vertical location of the high data point relative to its cell.
+	 *
+	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 *
+	 * @default 0.5
+	 */
+	highLocationY?: number;
+
+
 	/**
 	 * Input data field for X category.
 	 *
@@ -432,9 +594,13 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 
 
 	/**
-	 * @todo review
+	 * If set to `true` data items for this series won't be grouped even if
+	 * the `groupData: true` is set on a related [[DateAxis]].
+	 * 
+	 * @since 5.0.19
 	 */
 	groupDataDisabled?: boolean;
+
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {
@@ -522,6 +688,78 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 	openValueYHighSelection?: number;
 	openValueYOpenSelection?: number;
 	openValueYCloseSelection?: number;
+
+	lowValueXAverage?: number;
+	lowValueXCount?: number;
+	lowValueXSum?: number;
+	lowValueXAbsoluteSum?: number;
+	lowValueXLow?: number;
+	lowValueXHigh?: number;
+	lowValueXlow?: number;
+	lowValueXClose?: number;
+
+	lowValueYAverage?: number;
+	lowValueYCount?: number;
+	lowValueYSum?: number;
+	lowValueYAbsoluteSum?: number;
+	lowValueYLow?: number;
+	lowValueYHigh?: number;
+	lowValueYlow?: number;
+	lowValueYClose?: number;
+
+	lowValueXAverageSelection?: number;
+	lowValueXCountSelection?: number;
+	lowValueXSumSelection?: number;
+	lowValueXAbsoluteSumSelection?: number;
+	lowValueXLowSelection?: number;
+	lowValueXHighSelection?: number;
+	lowValueXlowSelection?: number;
+	lowValueXCloseSelection?: number;
+
+	lowValueYAverageSelection?: number;
+	lowValueYCountSelection?: number;
+	lowValueYSumSelection?: number;
+	lowValueYAbsoluteSumSelection?: number;
+	lowValueYLowSelection?: number;
+	lowValueYHighSelection?: number;
+	lowValueYlowSelection?: number;
+	lowValueYCloseSelection?: number;
+
+	highValueXAverage?: number;
+	highValueXCount?: number;
+	highValueXSum?: number;
+	highValueXAbsoluteSum?: number;
+	highValueXLow?: number;
+	highValueXHigh?: number;
+	highValueXhigh?: number;
+	highValueXClose?: number;
+
+	highValueYAverage?: number;
+	highValueYCount?: number;
+	highValueYSum?: number;
+	highValueYAbsoluteSum?: number;
+	highValueYLow?: number;
+	highValueYHigh?: number;
+	highValueYhigh?: number;
+	highValueYClose?: number;
+
+	highValueXAverageSelection?: number;
+	highValueXCountSelection?: number;
+	highValueXSumSelection?: number;
+	highValueXAbsoluteSumSelection?: number;
+	highValueXLowSelection?: number;
+	highValueXHighSelection?: number;
+	highValueXhighSelection?: number;
+	highValueXCloseSelection?: number;
+
+	highValueYAverageSelection?: number;
+	highValueYCountSelection?: number;
+	highValueYSumSelection?: number;
+	highValueYAbsoluteSumSelection?: number;
+	highValueYLowSelection?: number;
+	highValueYHighSelection?: number;
+	highValueYhighSelection?: number;
+	highValueYCloseSelection?: number;
 }
 
 
@@ -538,6 +776,7 @@ export abstract class XYSeries extends Series {
 	declare public _privateSettings: IXYSeriesPrivate;
 	declare public _dataItemSettings: IXYSeriesDataItem;
 	declare public _axisRangeType: IXYSeriesAxisRange;
+	declare public _events: IXYSeriesEvents;
 
 	protected _xField!: string;
 	protected _yField!: string;
@@ -594,12 +833,16 @@ export abstract class XYSeries extends Series {
 
 	protected valueXFields = [
 		"valueX",
-		"openValueX"
+		"openValueX",
+		"lowValueX",
+		"highValueX"
 	];
 
 	protected valueYFields = [
 		"valueY",
-		"openValueY"
+		"openValueY",
+		"lowValueY",
+		"highValueY"
 	];
 
 	public _valueXFields!: Array<string>;
@@ -622,7 +865,7 @@ export abstract class XYSeries extends Series {
 
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
-		this.valueFields.push("valueX", "valueY", "openValueX", "openValueY");
+		this.valueFields.push("valueX", "valueY", "openValueX", "openValueY", "lowValueX", "lowValueY", "highValueX", "highValueY");
 
 		this._setRawDefault("vcx", 1);
 		this._setRawDefault("vcy", 1);
@@ -632,6 +875,20 @@ export abstract class XYSeries extends Series {
 
 		this._setRawDefault("openValueXShow", "openValueXWorking");
 		this._setRawDefault("openValueYShow", "openValueYWorking");
+
+		this._setRawDefault("lowValueXShow", "lowValueXWorking");
+		this._setRawDefault("lowValueYShow", "lowValueYWorking");
+
+		this._setRawDefault("highValueXShow", "highValueXWorking");
+		this._setRawDefault("highValueYShow", "highValueYWorking");
+
+		this._setRawDefault("lowValueXGrouped", "low");
+		this._setRawDefault("lowValueYGrouped", "low");
+
+		this._setRawDefault("highValueXGrouped", "high");
+		this._setRawDefault("highValueYGrouped", "high");
+
+
 
 		super._afterNew();
 
@@ -770,6 +1027,12 @@ export abstract class XYSeries extends Series {
 
 	protected _dispose() {
 		super._dispose();
+
+		const chart = this.chart;
+		if (chart) {
+			chart.series.removeValue(this);
+		}
+
 		$array.removeFirst(this.get("xAxis").series, this);
 		$array.removeFirst(this.get("yAxis").series, this);
 	}
@@ -1411,6 +1674,11 @@ export abstract class XYSeries extends Series {
 			this._dataItems = this._dataSets[id];
 			this._markDataSetDirty();
 			this._dataSetId = id;
+
+			const type = "datasetchanged";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this, id: id });
+			}
 		}
 	}
 

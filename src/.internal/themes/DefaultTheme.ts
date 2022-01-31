@@ -563,7 +563,7 @@ export class DefaultTheme extends Theme {
 			x: p100,
 			role: "button",
 			ariaLabel: language.translate("Zoom Out"),
-			layer: 40
+			layer: 30
 		});
 
 		{
@@ -802,7 +802,7 @@ export class DefaultTheme extends Theme {
 		r("Scrollbar").setAll({
 			start: 0,
 			end: 1,
-			layer: 40,
+			layer: 30,
 			animationEasing: $ease.out($ease.cubic)
 		});
 

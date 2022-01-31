@@ -489,6 +489,10 @@ export class StyleRule extends Disposer {
 
 // }
 
+export function iOS(): boolean {
+	return /apple/i.test(navigator.vendor) && "ontouchend" in document;
+}
+
 
 
 export function relativeToValue(percent: number | Percent | undefined | null, full: number): number {
@@ -542,11 +546,11 @@ export function padString(value: any, len: number = 0, char: string = "0"): stri
 }
 
 export function trimLeft(text: string): string {
-	return text.replace(/^[\n \t]+/, "");
+	return text.replace(/^[\s]*/, "");
 }
 
 export function trimRight(text: string): string {
-	return text.replace(/^[\n \t]+$/, "");
+	return text.replace(/[\s]*$/, "");
 }
 
 export function trim(text: string): string {
