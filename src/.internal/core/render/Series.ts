@@ -533,6 +533,11 @@ export abstract class Series extends Component {
 		this._psi = this.startIndex();
 		this._pei = this.endIndex();
 
+		if(this.isDirty("visible")){
+			this.bulletsContainer.set("visible", this.get("visible"));
+		}
+
+
 		// Apply heat rules
 		if (this._valuesDirty && this.get("heatRules") != null) {
 			const rules = this.get("heatRules", []);

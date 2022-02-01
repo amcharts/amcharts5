@@ -74,6 +74,14 @@ export class RadarCursor extends XYCursor {
 		super._afterNew();
 	}
 
+	protected _handleXLine() {
+
+	}
+
+	protected _handleYLine() {
+
+	}
+
 	protected _getPosition(point: IPoint): IPoint {
 		const radius = Math.hypot(point.x, point.y);
 		let angle = $math.normalizeAngle(Math.atan2(point.y, point.x) * $math.DEGREES);
@@ -83,7 +91,7 @@ export class RadarCursor extends XYCursor {
 		let endAngle = $math.normalizeAngle(this.getPrivate("endAngle"));
 
 		if (endAngle < startAngle || endAngle == startAngle) {
-			if(angle < startAngle){
+			if (angle < startAngle) {
 				angle += 360
 			}
 
@@ -201,7 +209,7 @@ export class RadarCursor extends XYCursor {
 			let cursorRadius = this.getPrivate("radius");
 			let cursorInnerRadius = this.getPrivate("innerRadius");
 
-			if(cursorRadius < cursorInnerRadius){
+			if (cursorRadius < cursorInnerRadius) {
 				[cursorRadius, cursorInnerRadius] = [cursorInnerRadius, cursorRadius];
 			}
 

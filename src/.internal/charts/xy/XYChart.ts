@@ -663,15 +663,24 @@ export class XYChart extends SerialChart {
 
 			const snapToSeries = cursor.get("snapToSeries");
 			if (snapToSeries && cursorPoint) {
+				const snapToSeriesBy = cursor.get("snapToSeriesBy");
 				const dataItems: Array<DataItem<IXYSeriesDataItem>> = [];
 				$array.each(snapToSeries, (series) => {
 					if (!series.isHidden() && !series.isHiding()) {
-						const startIndex = series.startIndex();
-						const endIndex = series.endIndex();
-						for (let i = startIndex; i < endIndex; i++) {
-							const dataItem = series.dataItems[i];
-							if (dataItem && !dataItem.isHidden()) {
-								dataItems.push(dataItem);
+						if(snapToSeriesBy != "x!" && snapToSeriesBy != "y!"){
+							const startIndex = series.startIndex();
+							const endIndex = series.endIndex();
+							for (let i = startIndex; i < endIndex; i++) {
+								const dataItem = series.dataItems[i];
+								if (dataItem && !dataItem.isHidden()) {
+									dataItems.push(dataItem);
+								}
+							}
+						}
+						else{
+							const tooltipDataItem = series.get("tooltipDataItem");
+							if(tooltipDataItem){
+								dataItems.push(tooltipDataItem);
 							}
 						}
 					}
@@ -679,16 +688,16 @@ export class XYChart extends SerialChart {
 
 				let minDistance = Infinity;
 				let closestItem: DataItem<IXYSeriesDataItem> | undefined;
-				const snapToSeriesBy = cursor.get("snapToSeriesBy");
+				
 				$array.each(dataItems, (dataItem) => {
 					const point = dataItem.get("point");
 
 					if (point) {
 						let distance = 0;
-						if (snapToSeriesBy == "x") {
+						if (snapToSeriesBy == "x" || snapToSeriesBy == "x!") {
 							distance = Math.abs(cursorPoint.x - point.x);
 						}
-						else if (snapToSeriesBy == "y") {
+						else if (snapToSeriesBy == "y" || snapToSeriesBy == "y!") {
 							distance = Math.abs(cursorPoint.y - point.y);
 						}
 						else {

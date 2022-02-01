@@ -22,6 +22,47 @@ export interface IDisposer {
  *
  * @ignore Exclude from docs
  */
+export abstract class DisposerClass implements IDisposer {
+
+	/**
+	 * Is object disposed?
+	 */
+	private _disposed: boolean;
+
+	/**
+	 * Constructor.
+	 */
+	constructor() {
+		this._disposed = false;
+	}
+
+	/**
+	 * Checks if object is disposed.
+	 *
+	 * @return Disposed?
+	 */
+	public isDisposed(): boolean {
+		return this._disposed;
+	}
+
+	protected abstract _dispose(): void;
+
+	/**
+	 * Disposes the object.
+	 */
+	public dispose(): void {
+		if (!this._disposed) {
+			this._disposed = true;
+			this._dispose();
+		}
+	}
+}
+
+/**
+ * A class for creating an IDisposer.
+ *
+ * @ignore Exclude from docs
+ */
 export class Disposer implements IDisposer {
 
 	/**
@@ -62,7 +103,6 @@ export class Disposer implements IDisposer {
 			this._dispose();
 		}
 	}
-
 }
 
 /**
@@ -70,14 +110,12 @@ export class Disposer implements IDisposer {
  *
  * @ignore Exclude from docs
  */
-export class ArrayDisposer extends Disposer {
+export class ArrayDisposer extends DisposerClass {
 	protected _disposers: Array<IDisposer> = [];
 
-	constructor() {
-		super(() => {
-			$array.each(this._disposers, (x) => {
-				x.dispose();
-			});
+	protected _dispose(): void {
+		$array.each(this._disposers, (x) => {
+			x.dispose();
 		});
 	}
 }
@@ -87,12 +125,17 @@ export class ArrayDisposer extends Disposer {
  *
  * @ignore Exclude from docs
  */
-export class MultiDisposer extends Disposer {
+export class MultiDisposer extends DisposerClass {
+	protected _disposers: Array<IDisposer>;
+
 	constructor(disposers: Array<IDisposer>) {
-		super(() => {
-			$array.each(disposers, (x) => {
-				x.dispose();
-			});
+		super();
+		this._disposers = disposers;
+	}
+
+	protected _dispose(): void {
+		$array.each(this._disposers, (x) => {
+			x.dispose();
 		});
 	}
 }
@@ -106,7 +149,7 @@ export class MultiDisposer extends Disposer {
  * @ignore Exclude from docs
  * @todo Description
  */
-export class MutableValueDisposer<T extends IDisposer> extends Disposer {
+export class MutableValueDisposer<T extends IDisposer> extends DisposerClass {
 
 	/**
 	 * Current disposer.
@@ -118,16 +161,11 @@ export class MutableValueDisposer<T extends IDisposer> extends Disposer {
 	 */
 	private _value: Optional<T>;
 
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super(() => {
-			if (this._disposer != null) {
-				this._disposer.dispose();
-				this._disposer = undefined;
-			}
-		});
+	protected _dispose(): void {
+		if (this._disposer != null) {
+			this._disposer.dispose();
+			this._disposer = undefined;
+		}
 	}
 
 	/**

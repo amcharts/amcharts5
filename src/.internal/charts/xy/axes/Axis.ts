@@ -898,6 +898,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			$array.each(this.series, (series) => {
 				if (series.get("baseAxis") === this) {
 					const dataItem = this.getSeriesItem(series, position!);
+					series.setRaw("tooltipDataItem", dataItem);
 					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
 						series.updateLegendMarker(dataItem);
 						series.updateLegendValue(dataItem);

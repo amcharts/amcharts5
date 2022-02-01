@@ -360,7 +360,7 @@ export class Legend extends Series {
 
 			if (item && item.show) {
 
-				this._disposers.push(item.on("visible", (visible) => {
+				this._disposers.push(item.on("visible", (visible) => {									
 					itemContainer.set("disabled", !visible)
 				}));
 

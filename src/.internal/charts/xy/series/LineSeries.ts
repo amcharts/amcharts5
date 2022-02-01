@@ -86,6 +86,9 @@ export class LineSeries extends XYSeries {
 	protected _strokeGenerator = line();
 	protected _fillGenerator = area();
 
+	protected _legendStroke?: Graphics;
+	protected _legendFill?: Graphics;
+
 	protected _afterNew() {
 		this._fillGenerator.y0(function(p: number[]) {
 			return p[3];
@@ -167,10 +170,20 @@ export class LineSeries extends XYSeries {
 		let yAxis = this.get("yAxis");
 
 		if (this.isDirty("stroke")) {
-			this.strokes.template.set("stroke", this.get("stroke"));
+			const stroke = this.get("stroke");
+			this.strokes.template.set("stroke", stroke);
+			const legendStroke = this._legendStroke;
+			if (legendStroke) {
+				legendStroke.states.lookup("default")!.set("stroke", stroke);
+			}
 		}
 		if (this.isDirty("fill")) {
-			this.fills.template.set("fill", this.get("fill"));
+			const fill = this.get("fill");
+			this.fills.template.set("fill", fill);
+			const legendFill = this._legendFill;
+			if (legendFill) {
+				legendFill.states.lookup("default")!.set("fill", fill);
+			}
 		}
 
 		if (this.isDirty("curveFactory")) {
@@ -639,13 +652,17 @@ export class LineSeries extends XYSeries {
 				markerRectangle.setPrivate("visible", false);
 			}
 
-			const legendStroke = marker.children.push(Graphics._new(this._root, {
+			const legendStroke = marker.children.push(Graphics._new(marker._root, {
 				themeTags: ["line", "series", "legend", "marker", "stroke"]
 			}, [this.strokes.template]));
 
-			const legendFill = marker.children.push(Graphics._new(this._root, {
+			this._legendStroke = legendStroke;
+
+			const legendFill = marker.children.push(Graphics._new(marker._root, {
 				themeTags: ["line", "series", "legend", "marker", "fill"]
 			}, [this.fills.template]));
+
+			this._legendFill = legendFill;
 
 			const disabledColor = this._root.interfaceColors.get("disabled");
 
@@ -655,15 +672,12 @@ export class LineSeries extends XYSeries {
 			if (this.bullets.length > 0) {
 				const bulletFunction = this.bullets.getIndex(0);
 				if (bulletFunction) {
-					const bullet = bulletFunction(this._root, this, new DataItem(this, {}, {}));
+					const bullet = bulletFunction(marker._root, this, new DataItem(this, {}, {}));
 					if (bullet) {
 						const sprite = bullet.get("sprite");
-
 						if (sprite instanceof Graphics) {
 							sprite.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
 						}
-
-
 
 						if (sprite) {
 							sprite.set("tooltipText", undefined);

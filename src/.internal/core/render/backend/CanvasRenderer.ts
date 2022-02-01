@@ -10,7 +10,7 @@ import { Color } from "../../util/Color";
 import { Matrix } from "../../util/Matrix";
 import { Percent, percent } from "../../util/Percent";
 import { Throttler } from "../../util/Throttler";
-import { ArrayDisposer, Disposer, IDisposer, CounterDisposer, MultiDisposer } from "../../util/Disposer";
+import { ArrayDisposer, Disposer, DisposerClass, IDisposer, CounterDisposer, MultiDisposer } from "../../util/Disposer";
 import { TextFormatter, ITextChunk } from "../../util/TextFormatter";
 import * as $utils from "../../util/Utils";
 import * as $array from "../../util/Array";
@@ -170,6 +170,18 @@ function isTainted(image: HTMLImageElement): boolean {
 }
 
 /**
+ * This is needed to workaround a bug in iOS which causes it to not GC canvas elements.
+ *
+ * @ignore
+ */
+function clearCanvas(view: HTMLCanvasElement) {
+	view.width = 0;
+	view.height = 0;
+	view.style.width = "0px";
+	view.style.height = "0px";
+}
+
+/**
  * @ignore
  */
 export class CanvasPivot implements IPoint {
@@ -196,7 +208,7 @@ export class CanvasPivot implements IPoint {
 /**
  * @ignore
  */
-export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDisposer {
+export class CanvasDisplayObject extends DisposerClass implements IDisplayObject, IDisposer {
 	public _layer?: CanvasLayer;
 
 	public mask: CanvasGraphics | null = null;
@@ -233,11 +245,12 @@ export class CanvasDisplayObject extends Disposer implements IDisplayObject, IDi
 	public _colorId: string | undefined;
 
 	constructor(renderer: CanvasRenderer) {
-		super(() => {
-			this._renderer._removeObject(this);
-		});
-
+		super();
 		this._renderer = renderer;
+	}
+
+	protected _dispose(): void {
+		this._renderer._removeObject(this);
 	}
 
 	public getCanvas(): HTMLCanvasElement {
@@ -2612,6 +2625,14 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 		this.image = image;
 	}
 
+	protected _dispose(): void {
+		super._dispose();
+
+		if (this._imageMask) {
+			clearCanvas(this._imageMask);
+		}
+	}
+
 	getLocalBounds(): IBounds {
 		if (!this._localBounds) {
 
@@ -2814,6 +2835,17 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			$object.each(this._events, (_key, events) => {
 				events.disposer.dispose();
 			});
+
+			$array.each(this.layers, (layer) => {
+				clearCanvas(layer.view);
+
+				if (layer.exportableView) {
+					clearCanvas(layer.exportableView);
+				}
+			});
+
+			clearCanvas(this._ghostView);
+			clearCanvas(this._patternCanvas);
 		}));
 
 		// @todo : do the same for ghost
@@ -2971,7 +3003,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._ghostView.style.height = height + "px";
 	}
 
-	createDetachedLayer(): CanvasLayer {
+	private createDetachedLayer(): CanvasLayer {
 		const view = document.createElement("canvas");
 		const context = view.getContext("2d")!;
 		const layer = {

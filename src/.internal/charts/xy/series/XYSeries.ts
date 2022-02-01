@@ -87,7 +87,13 @@ export interface IXYAxis extends Axis<AxisRenderer> {
 }
 
 export interface IXYSeriesEvents extends ISeriesEvents {
-	// @todo review
+
+	/**
+	 * Kicks in when axis starts using different data set, e.g. data
+	 * of different granularit on [[DateAxis]].
+	 *
+	 * @since 5.1.1
+	 */
 	datasetchanged: {
 		id: string
 	}
@@ -600,6 +606,16 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * @since 5.0.19
 	 */
 	groupDataDisabled?: boolean;
+
+	/**
+	 * A [[DataItem]] that is being used for current tooltip, e.g. by a chart
+	 * cursor.
+	 *
+	 * @since 5.1.2
+	 * @ignore not yet available
+	 * @todo review
+	 */
+	tooltipDataItem?: DataItem<IXYSeriesDataItem>
 
 }
 

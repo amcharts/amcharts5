@@ -85,7 +85,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * @since 5.0.6
 	 * @default "xy"
 	 */
-	snapToSeriesBy?: "xy" | "x" | "y";
+	snapToSeriesBy?: "xy" | "x" | "y" | "x!" | "y!";
 
 }
 
@@ -218,6 +218,32 @@ export class XYCursor extends Container {
 		this._disposers.push(this.setTimeout(() => {
 			this.setPrivate("visible", true)
 		}, 500))
+
+		this.lineX.events.on("positionchanged", () => {
+			this._handleXLine();
+		})
+
+		this.lineY.events.on("positionchanged", () => {
+			this._handleYLine();
+		})
+	}
+
+	protected _handleXLine() {
+		let x = this.lineX.x();
+		let visible = true;
+		if (x < 0 || x > this.width()) {
+			visible = false;
+		}
+		this.lineX.setPrivate("visible", visible);
+	}
+
+	protected _handleYLine() {
+		let y = this.lineY.y();
+		let visible = true;
+		if (y < 0 || y > this.height()) {
+			visible = false;
+		}
+		this.lineY.setPrivate("visible", visible);
 	}
 
 	public _prepareChildren() {

@@ -6,7 +6,7 @@ import * as $array from "./Array";
 import * as $object from "./Object";
 import type { IBounds } from "./IBounds";
 
-import { Disposer, IDisposer } from "./Disposer";
+import { Disposer, DisposerClass, IDisposer } from "./Disposer";
 
 /**
  * ============================================================================
@@ -343,7 +343,8 @@ function appendStylesheet(root: CSSStyleSheet, selector: string): CSSStyleRule {
  *
  * Can be used to dynamically add CSS to the document.
  */
-export class StyleRule extends Disposer {
+export class StyleRule extends DisposerClass {
+	private _root: CSSStyleSheet;
 
 	/**
 	 * CSS rule.
@@ -375,27 +376,29 @@ export class StyleRule extends Disposer {
 	 * @param styles    An object of style attribute - value pairs
 	 */
 	constructor(element: ShadowRoot | null, selector: string, styles: { [name: string]: string }, nonce: string = "") {
-		const root = getStylesheet(element, nonce);
+		super();
 
-		// TODO test this
-		super(() => {
-			// TODO a bit hacky
-			const index = $array.indexOf(root.cssRules, this._rule);
+		this._root = getStylesheet(element, nonce);
 
-			if (index === -1) {
-				throw new Error("Could not dispose StyleRule");
-
-			} else {
-				// TODO if it's empty remove it from the DOM ?
-				root.deleteRule(index);
-			}
-		});
-
-		this._rule = appendStylesheet(root, selector);
+		this._rule = appendStylesheet(this._root, selector);
 
 		$object.each(styles, (key, value) => {
 			this.setStyle(<string>key, value);
 		});
+	}
+
+	// TODO test this
+	protected _dispose(): void {
+		// TODO a bit hacky
+		const index = $array.indexOf(this._root.cssRules, this._rule);
+
+		if (index === -1) {
+			throw new Error("Could not dispose StyleRule");
+
+		} else {
+			// TODO if it's empty remove it from the DOM ?
+			this._root.deleteRule(index);
+		}
 	}
 
 	/**
