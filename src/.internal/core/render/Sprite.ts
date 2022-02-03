@@ -482,6 +482,10 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 }
 
 export interface ISpritePrivate extends IEntityPrivate {
+	/**
+	 * @ignore
+	 */
+	customData?: any;
 
 	/**
 	 * @ignore

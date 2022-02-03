@@ -14,6 +14,7 @@ import { Grid } from "./axes/Grid";
 
 import * as $type from "../../core/util/Type";
 import * as $utils from "../../core/util/Utils";
+import * as $math from "../../core/util/Math";
 import * as $object from "../../core/util/Object";
 
 export interface IXYCursorSettings extends IContainerSettings {
@@ -207,6 +208,9 @@ export class XYCursor extends Container {
 	 */
 	public chart: XYChart | undefined;
 
+	protected _toX?: number;
+	protected _toY?: number;
+
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["xy", "cursor"]);
 		super._afterNew();
@@ -298,11 +302,19 @@ export class XYCursor extends Container {
 	}
 
 	protected _updateXLine(tooltip: Tooltip) {
-		this.lineX.animate({ key: "x", to: this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).x, duration: tooltip.get("animationDuration", 0), easing: tooltip.get("animationEasing") });
+		let x = $math.round(this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).x, 2);
+		if (this._toX != x) {
+			this.lineX.animate({ key: "x", to: x, duration: tooltip.get("animationDuration", 0), easing: tooltip.get("animationEasing") });
+			this._toX = x;
+		}
 	}
 
 	protected _updateYLine(tooltip: Tooltip) {
-		this.lineY.animate({ key: "y", to: this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).y, duration: tooltip.get("animationDuration", 0), easing: tooltip.get("animationEasing") });
+		let y = $math.round(this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).y, 2);
+		if (this._toY != y) {
+			this.lineY.animate({ key: "y", to: y, duration: tooltip.get("animationDuration", 0), easing: tooltip.get("animationEasing") });
+			this._toY = y;
+		}
 	}
 
 	protected _drawLines() {

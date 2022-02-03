@@ -74,6 +74,11 @@ export interface IRootEvents {
 }
 
 
+export interface IRootSettings {
+	useSafeResolution?: boolean;
+}
+
+
 // TODO implement Disposer
 /**
  * Root element of the chart.
@@ -113,7 +118,7 @@ export class Root implements IDisposer {
 
 	private _animations: Array<IAnimation> = [];
 
-	public _renderer: IRenderer = new CanvasRenderer();
+	public _renderer: IRenderer;
 
 	public _rootContainer!: Container;
 
@@ -167,7 +172,7 @@ export class Root implements IDisposer {
 	 * The maximum FPS that the Root will run at.
 	 *
 	 * If `undefined` it will run at the highest FPS.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Performance} for more info
 	 */
 	public fps: number | undefined;
@@ -267,11 +272,23 @@ export class Root implements IDisposer {
 
 	public _tooltips: Array<Tooltip> = [];
 
-	protected constructor(id: string | HTMLElement, isReal: boolean) {
+	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
 		if (!isReal) {
 			throw new Error("You cannot use `new Class()`, instead use `Class.new()`");
 		}
+
+		if (settings.useSafeResolution == null) {
+			settings.useSafeResolution = true;
+		}
+
+		let resolution;
+
+		if (settings.useSafeResolution) {
+			resolution = $utils.getSafeResolution();
+		}
+
+		this._renderer = new CanvasRenderer(resolution);
 
 		let dom: HTMLElement | null;
 
@@ -305,8 +322,8 @@ export class Root implements IDisposer {
 		registry.rootElements.push(this);
 	}
 
-	public static new(id: string | HTMLElement): Root {
-		const root = new Root(id, true);
+	public static new(id: string | HTMLElement, settings?: IRootSettings): Root {
+		const root = new Root(id, settings, true);
 		root._init();
 		return root;
 	}

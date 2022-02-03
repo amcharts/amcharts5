@@ -612,8 +612,6 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * cursor.
 	 *
 	 * @since 5.1.2
-	 * @ignore not yet available
-	 * @todo review
 	 */
 	tooltipDataItem?: DataItem<IXYSeriesDataItem>
 

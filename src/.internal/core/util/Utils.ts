@@ -496,7 +496,9 @@ export function iOS(): boolean {
 	return /apple/i.test(navigator.vendor) && "ontouchend" in document;
 }
 
-
+export function getSafeResolution(): number | undefined {
+	return iOS() ? 1 : undefined;
+}
 
 export function relativeToValue(percent: number | Percent | undefined | null, full: number): number {
 	if ($type.isNumber(percent)) {

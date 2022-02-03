@@ -2800,8 +2800,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	protected _clientWidth: number = 0;
 	protected _clientHeight: number = 0;
 
-	public resolution: number = window.devicePixelRatio;
-	public interactionsEnabled: boolean = true;;
+	public resolution: number;
+	public interactionsEnabled: boolean = true;
 
 	protected _listeners: { [key: string]: CounterDisposer } = {};
 	protected _events: { [Key in keyof IRendererEvents]?: Events<Key> } = {};
@@ -2822,11 +2822,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
 	});
 
-	constructor() {
+	constructor(resolution?: number) {
 		super();
 
-		if ((this.resolution > 1) && $utils.iOS()) {
-			this.resolution = 1;
+		if (resolution == null) {
+			this.resolution = window.devicePixelRatio;
+		} else {
+			this.resolution = resolution;
 		}
 
 		this.view.appendChild(this._layerDom);
@@ -2855,9 +2857,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		// Monitor for possible pixel ratio changes (when page is zoomed)
 		this._disposers.push($utils.addEventListener(window, "resize", (_ev) => {
-			this.resolution = window.devicePixelRatio;
-			if ((this.resolution > 1) && $utils.iOS()) {
-				this.resolution = 1;
+			if (resolution == null) {
+				this.resolution = window.devicePixelRatio;
 			}
 		}));
 

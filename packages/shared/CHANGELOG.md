@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.3] - 2022-02-03
+
+## Added
+- Added second parameter to `Root` constructor which contains settings object. For now, there's only one setting: `useSafeResolution` (default: `true`). [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#settings).
+
+### Fixed
+- Dynamic data updates on `MapPolygonSeries` were not working in some cases.
+
+
 ## [5.1.2] - 2022-02-01
 
 ## Added
@@ -15,7 +24,7 @@ vertical distance and looking at the data items which are at the current X axis 
 ## Fixed
 - `LineSeries` legend markers' stroke was not using series' color if `series.appear()` was called after series was initialized.
 - `LineSeries` legend marker wasn't working properly if legend was using different `Root` element.
-- Better disposing of `<canvas>` elements to work around iOS Safri GC bug.
+- Better disposing of `<canvas>` elements to work around iOS Safari GC bug.
 
 
 ## [5.1.1] - 2022-01-31
