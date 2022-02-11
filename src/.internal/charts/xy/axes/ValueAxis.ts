@@ -164,6 +164,14 @@ export interface IValueAxisDataItem extends IAxisDataItem {
 	 */
 	endValue?: number;
 
+	/**
+	 * If set to `true` the values fo this data item will be factored in when
+	 * calculating scale of the [[ValueAxis]]. Useful for axis ranges.
+	 * 
+	 * @since 5.1.4
+	 */
+	affectsMinMax?: boolean;
+
 }
 
 export interface IMinMaxStep {
@@ -769,6 +777,21 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			})
 
+			this.axisRanges.each((range) => {
+				if (range.get("affectsMinMax")) {
+					let value = range.get("value");
+					if (value != null) {
+						selectionMin = Math.min(selectionMin, value);
+						selectionMax = Math.max(selectionMax, value);
+					}
+					value = range.get("endValue");
+					if (value != null) {
+						selectionMin = Math.min(selectionMin, value);
+						selectionMax = Math.max(selectionMax, value);
+					}
+				}
+			})
+
 			if (selectionMin > selectionMax) {
 				[selectionMin, selectionMax] = [selectionMax, selectionMin]
 			}
@@ -895,6 +918,21 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					if (diff < minDiff) {
 						minDiff = diff;
 					}
+				}
+			}
+		})
+
+		this.axisRanges.each((range) => {
+			if (range.get("affectsMinMax")) {
+				let value = range.get("value");
+				if (value != null) {
+					min = Math.min(min, value);
+					max = Math.max(max, value);
+				}
+				value = range.get("endValue");
+				if (value != null) {
+					min = Math.min(min, value);
+					max = Math.max(max, value);
 				}
 			}
 		})

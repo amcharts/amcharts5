@@ -12,13 +12,20 @@ export default {
 	"_thousandSeparator": ",",
 
 	// Default date formats for various periods
-	"_date_millisecond": "mm::ss SSS",
+	"_date_millisecond": "mm:ss SSS",
+	"_date_millisecond_full": "HH:mm:ss SSS",
 	"_date_second": "hh:mm:ss a",
+	"_date_second_full": "hh:mm:ss a",
 	"_date_minute": "hh:mm a",
+	"_date_minute_full": "hh:mm a - MMM dd, yyyy",
 	"_date_hour": "hh:mm a",
+	"_date_hour_full": "hh:mm a - MMM dd, yyyy",
 	"_date_day": "MMM dd",
+	"_date_day_full": "MMM dd, yyyy",
 	"_date_week": "ww",
+	"_date_week_full": "MMM dd, yyyy",
 	"_date_month": "MMM",
+	"_date_month_full": "MMM, yyyy",
 	"_date_year": "yyyy",
 
 	// Default duration formats for various base units

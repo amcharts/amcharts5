@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.4] - 2022-02-11
+
+## Added
+- `affectsMinMax` added to value axis range.
+- `segments` property added to `Line` class. Allows passing multiple segments instead of continous line.
+- `tooltipIntervalOffset` setting added to `DateAxis`. If not set, axis' tooltip will use value of the `-tooltipLocation` (cell start timestamp by default), so that tooltip would should rounded value, like 06:00 instead of 06:30 when interval is hourly. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip).
+- `tooltipDateFormats` setting added to `DateAxis`. Allows specifying axis' tooltip date formats for time each time unit, different from `dateFormats`. NOTE: `tooltipDateFormat` will override the format if set. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip).
+- `syncWith` setting added to `XYCursor`. Set it to an array of other `XYCursor` objects to automatically position them as the cursor moves. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors).
+
+## Changed
+- Default tooltip date formats have changed slightly for `DateAxis`. Previously, it was using formats from `dateFormats`. Now it uses defaults/user values from newly-introduced `tooltipDateFormats` setting.
+
+## Fixed
+- In some cases `DurationAxis` with "second" as its base duration was going to stack overflow.
+- Background on a `ValueAxis` was not showing.
+- Imporoved performance for charts with lots of stacked series with null.
+- Fixing mouse position when using `transform: scale` or `zoom` ([Issue 258](https://github.com/amcharts/amcharts5/issues/258)).
+- Some touch iteractions were not working in iOS 12.
+
+
 ## [5.1.3] - 2022-02-03
 
 ## Added
@@ -17,7 +37,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.1.2] - 2022-02-01
 
 ## Added
-- `"x!"` and `"y!"` options added to `XYCursor`'s `snapToSeriesBy` setting. Setting it to `"y!"` will make cursor will choose the nearest data point to snap to by measuring only 
+- `"x!"` and `"y!"` options added to `XYCursor`'s `snapToSeriesBy` setting. Setting it to `"y!"` will make cursor will choose the nearest data point to snap to by measuring only
 vertical distance and looking at the data items which are at the current X axis position (date or category). The same applies for `"x!"`.
 - `tooltipDataItem` setting added to `XYSeries`. It's a read-only reference to a data item which series tooltip currently uses.
 

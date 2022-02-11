@@ -62,40 +62,40 @@ export default {
 	"_decimalSeparator": ",",
 	"_thousandSeparator": ".",
 
-    // Suffixes for numbers
-    // When formatting numbers, big or small numers might be reformatted to
-    // shorter version, by applying a suffix.
-    //
-    // For example, 1000000 might become "1m".
-    // Or 1024 might become "1KB" if we're formatting byte numbers.
-    //
-    // This section defines such suffixes for all such cases.
-    "_big_number_suffix_3": "K",
-    "_big_number_suffix_6": "Mio",
-    "_big_number_suffix_9": "Mrd",
-    "_big_number_suffix_12": "Bio",
-    "_big_number_suffix_15": "Brd",
-    "_big_number_suffix_18": "Trill",
-    "_big_number_suffix_21": "Trd",
-    "_big_number_suffix_24": "Y",
+	// Suffixes for numbers
+	// When formatting numbers, big or small numers might be reformatted to
+	// shorter version, by applying a suffix.
+	//
+	// For example, 1000000 might become "1m".
+	// Or 1024 might become "1KB" if we're formatting byte numbers.
+	//
+	// This section defines such suffixes for all such cases.
+	"_big_number_suffix_3": "K",
+	"_big_number_suffix_6": "Mio",
+	"_big_number_suffix_9": "Mrd",
+	"_big_number_suffix_12": "Bio",
+	"_big_number_suffix_15": "Brd",
+	"_big_number_suffix_18": "Trill",
+	"_big_number_suffix_21": "Trd",
+	"_big_number_suffix_24": "Y",
 
-    "_small_number_suffix_3": "m",
-    "_small_number_suffix_6": "μ",
-    "_small_number_suffix_9": "n",
-    "_small_number_suffix_12": "p",
-    "_small_number_suffix_15": "f",
-    "_small_number_suffix_18": "a",
-    "_small_number_suffix_21": "z",
-    "_small_number_suffix_24": "y",
+	"_small_number_suffix_3": "m",
+	"_small_number_suffix_6": "μ",
+	"_small_number_suffix_9": "n",
+	"_small_number_suffix_12": "p",
+	"_small_number_suffix_15": "f",
+	"_small_number_suffix_18": "a",
+	"_small_number_suffix_21": "z",
+	"_small_number_suffix_24": "y",
 
-    "_byte_suffix_B": "B",
-    "_byte_suffix_KB": "KB",
-    "_byte_suffix_MB": "MB",
-    "_byte_suffix_GB": "GB",
-    "_byte_suffix_TB": "TB",
-    "_byte_suffix_PB": "PB",
+	"_byte_suffix_B": "B",
+	"_byte_suffix_KB": "KB",
+	"_byte_suffix_MB": "MB",
+	"_byte_suffix_GB": "GB",
+	"_byte_suffix_TB": "TB",
+	"_byte_suffix_PB": "PB",
 
-    // Default date formats for various periods.
+	// Default date formats for various periods.
 	//
 	// This should reflect official or de facto formatting universally accepted
 	// in the country translation is being made for
@@ -105,12 +105,19 @@ export default {
 	// This will be used when formatting date/time for particular granularity,
 	// e.g. "_date_hour" will be shown whenever we need to show time as hours.
 	"_date_millisecond": "mm:ss SSS",
+	"_date_millisecond_full": "HH:mm:ss SSS",
 	"_date_second": "HH:mm:ss",
+	"_date_second_full": "HH:mm:ss",
 	"_date_minute": "HH:mm",
+	"_date_minute_full": "HH:mm - dd. MMM, yyyy",
 	"_date_hour": "HH:mm",
+	"_date_hour_full": "HH:mm - dd. MMM, yyyy",
 	"_date_day": "dd. MMM",
+	"_date_day_full": "dd. MMM, yyyy",
 	"_date_week": "ww",
+	"_date_week_full": "dd. MMM, yyyy",
 	"_date_month": "MMM",
+	"_date_month_full": "MMM, yyyy",
 	"_date_year": "yyyy",
 
 	// Default duration formats for various base units.
@@ -211,7 +218,7 @@ export default {
 	// day, like in default English translation, if we pass in 2, we will receive
 	// "nd" back.
 	"_dateOrd": function(day: number): string {
-	    return day + '.';
+			return day + '.';
 	},
 
 	// Various chart controls.

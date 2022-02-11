@@ -556,7 +556,7 @@ export abstract class Settings implements IDisposer, IAnimation {
 	/**
 	 * Returns settings value for the specified `key`.
 	 *
-	 * If there is no value, `fallback` ios returned instead (if set)/
+	 * If there is no value, `fallback` is returned instead (if set).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Settings value

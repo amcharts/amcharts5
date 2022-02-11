@@ -667,7 +667,7 @@ export class XYChart extends SerialChart {
 				const dataItems: Array<DataItem<IXYSeriesDataItem>> = [];
 				$array.each(snapToSeries, (series) => {
 					if (!series.isHidden() && !series.isHiding()) {
-						if(snapToSeriesBy != "x!" && snapToSeriesBy != "y!"){
+						if (snapToSeriesBy != "x!" && snapToSeriesBy != "y!") {
 							const startIndex = series.startIndex();
 							const endIndex = series.endIndex();
 							for (let i = startIndex; i < endIndex; i++) {
@@ -677,9 +677,9 @@ export class XYChart extends SerialChart {
 								}
 							}
 						}
-						else{
+						else {
 							const tooltipDataItem = series.get("tooltipDataItem");
-							if(tooltipDataItem){
+							if (tooltipDataItem) {
 								dataItems.push(tooltipDataItem);
 							}
 						}
@@ -688,7 +688,7 @@ export class XYChart extends SerialChart {
 
 				let minDistance = Infinity;
 				let closestItem: DataItem<IXYSeriesDataItem> | undefined;
-				
+
 				$array.each(dataItems, (dataItem) => {
 					const point = dataItem.get("point");
 
@@ -1044,11 +1044,16 @@ export class XYChart extends SerialChart {
 			return true;
 		}
 		if (otherCharts) {
+
 			for (let i = otherCharts.length - 1; i >= 0; i--) {
 				const chart = otherCharts[i];
+
 				if (chart != this) {
 					const chartPlotContainer = chart.plotContainer;
-					const local = chartPlotContainer.toLocal(global);
+					const documentPoint = this._root.rootPointToDocument(global);
+					const chartRoot = chart._root.documentPointToRoot(documentPoint);
+					const local = chartPlotContainer.toLocal(chartRoot);
+
 					if (local.x >= -0.1 && local.y >= -0.1 && local.x <= chartPlotContainer.width() + 0.1 && local.y <= chartPlotContainer.height() + 0.1) {
 						return true;
 					}

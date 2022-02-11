@@ -97,9 +97,30 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	/**
 	 * A date format to use for axis tooltip.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
 	 */
 	tooltipDateFormat?: string | Intl.DateTimeFormatOptions;
+
+	/**
+	 * Time unit-specific formats to use for axis tooltip.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
+	 * @since 5.1.4
+	 */
+	tooltipDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
+
+	/**
+	 * A value which indicates relative position within axis cell to get timestamp
+	 * for the tooltip from.
+	 *
+	 * Values are from `0` (zero) to `1` (one), meaning start and end of the cell.
+	 *
+	 * If not set, it will use cell's start tiemstamp.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
+	 * @since 5.1.4
+	 */
+	tooltipIntervalOffset?: number;
 
 }
 
@@ -150,6 +171,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	public _updateChildren() {
+		super._updateChildren();
 		if (this.isDirty("baseInterval")) {
 			this._setBaseInterval(this.get("baseInterval"));
 		}
@@ -707,8 +729,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public getTooltipText(position: number): string | undefined {
 		//@todo number formatter + tag
 
-		let format = this.get("dateFormats")![this.getPrivate("baseInterval").timeUnit];
-		return this._root.dateFormatter.format(new Date(this.positionToValue(position)), this.get("tooltipDateFormat", format));
+		let format = this.get("tooltipDateFormats")![this.getPrivate("baseInterval").timeUnit];
+		return this._root.dateFormatter.format(new Date(this.positionToValue(position) + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * this.baseDuration()), this.get("tooltipDateFormat", format));
 	}
 
 	/**

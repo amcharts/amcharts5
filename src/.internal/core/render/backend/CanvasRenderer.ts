@@ -138,8 +138,12 @@ function eachTargets(hitTarget: CanvasDisplayObject, f: (target: CanvasDisplayOb
  */
 function onPointerEvent(element: EventTarget, name: string, f: (event: IPointerEvent) => void): IDisposer {
 	return $utils.addEventListener(element, $utils.getRendererEvent(name), (event: MouseEvent | TouchEvent) => {
-		if ((<any>event).touches) {
-			$array.each((<TouchEvent>event).touches, (touch) => {
+		let touches = (<any>event).touches;
+		if (touches) {
+			if (touches.length == 0) {
+				touches = (<any>event).changedTouches;
+			}
+			$array.each(<TouchList>touches, (touch) => {
 				f(touch);
 			});
 
@@ -2747,7 +2751,7 @@ export class CanvasRendererEvent<A> implements IRendererEvent<A> {
 	public simulated: boolean = false;
 	public native: boolean = true;
 
-	constructor(public event: A, public point: IPoint) {
+	constructor(public event: A, public point: IPoint, public bbox: DOMRect) {
 		if ($utils.supports("touchevents") && event instanceof Touch) {
 			this.id = event.identifier;
 
@@ -3002,6 +3006,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._ghostView.height = this._height;
 		this._ghostView.style.width = width + "px";
 		this._ghostView.style.height = height + "px";
+
+		this.view.style.width = width + "px";
+		this.view.style.height = height + "px";
 	}
 
 	private createDetachedLayer(): CanvasLayer {
@@ -3161,26 +3168,30 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	// }
 
 	public getEvent<A extends IPointerEvent>(originalEvent: A, adjustPoint: boolean = true): CanvasRendererEvent<A> {
-		const bbox = adjustPoint ? this.view.getBoundingClientRect() : { left: 0, top: 0 };
+		const bbox: DOMRect = adjustPoint ? this.view.getBoundingClientRect() : new DOMRect(0, 0, 0, 0);
 
-		return new CanvasRendererEvent(originalEvent, originalEvent.clientX || originalEvent.clientY ? {
-			x: originalEvent.clientX - (originalEvent.clientX ? bbox.left : 0),
-			y: originalEvent.clientY - (originalEvent.clientY ? bbox.top : 0),
-		} : {
-			x: 0,
-			y: 0
-		});
+		return new CanvasRendererEvent(
+			originalEvent,
+			(originalEvent.clientX || originalEvent.clientY ? {
+				x: originalEvent.clientX - (originalEvent.clientX ? bbox.left : 0),
+				y: originalEvent.clientY - (originalEvent.clientY ? bbox.top : 0),
+			} : {
+				x: 0,
+				y: 0
+			}),
+			bbox,
+		);
 	}
 
-	_getHitTarget(point: IPoint): CanvasDisplayObject | undefined | false {
-		if (point.x < 0 || point.x > this._width / this.resolution || point.y < 0 || point.y > this._height / this.resolution) {
+	_getHitTarget(point: IPoint, bbox: DOMRect): CanvasDisplayObject | undefined | false {
+		if (point.x < 0 || point.x > bbox.width || point.y < 0 || point.y > bbox.height) {
 			return;
 		}
 		else {
 			const pixel = this._ghostContext.getImageData(
 				// TODO should this round ?
-				Math.round(point.x * this.resolution),
-				Math.round(point.y * this.resolution),
+				Math.round((point.x / bbox.width) * this._width),
+				Math.round((point.y / bbox.height) * this._height),
 				1,
 				1
 			);
@@ -3259,13 +3270,14 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	_dispatchMousedown(originalEvent: IPointerEvent): void {
 
 		const button = (<PointerEvent>originalEvent).button;
-		if (button != 0 && button != 2 && button != 1) {
+		if (button != 0 && button != 2 && button != 1 && button !== undefined) {
 			// Ignore non-primary mouse buttons
 			return;
 		}
 
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.point);
+		const target = this._getHitTarget(event.point, event.bbox);
+
 
 		if (target) {
 			const id = event.id;
@@ -3288,6 +3300,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					if (!has) {
 						this._dragging.push(info);
 					}
+
 				}
 
 				return true;
@@ -3298,7 +3311,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	_dispatchGlobalMousemove(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 
-		const target = this._getHitTarget(event.point);
+		const target = this._getHitTarget(event.point, event.bbox);
 		event.native = native;
 
 		if (target) {
@@ -3362,10 +3375,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	_dispatchDragEnd(originalEvent: IPointerEvent): void {
-
 		const button = (<PointerEvent>originalEvent).button;
 		let clickevent: "click" | "rightclick" | "middleclick";
-		if (button == 0) {
+		if (button == 0 || button === undefined) {
 			clickevent = "click";
 		}
 		else if (button == 2) {
@@ -3383,7 +3395,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		const id = event.id;
 
 		if (this._mousedown.length !== 0) {
-			const target = this._getHitTarget(event.point);
+			const target = this._getHitTarget(event.point, event.bbox);
 
 			if (target) {
 				this._mousedown.forEach((obj) => {
@@ -3409,7 +3421,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	_dispatchDoubleClick(originalEvent: IPointerEvent): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.point);
+		const target = this._getHitTarget(event.point, event.bbox);
 
 		if (target) {
 			eachTargets(target, (obj) => {

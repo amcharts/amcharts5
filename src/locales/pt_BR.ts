@@ -24,12 +24,19 @@ export default {
 	// This will be used when formatting date/time for particular granularity,
 	// e.g. "_date_hour" will be shown whenever we need to show time as hours.
 	"_date_millisecond": "mm:ss SSS",
+	"_date_millisecond_full": "HH:mm:ss SSS",
 	"_date_second": "HH:mm:ss",
+	"_date_second_full": "HH:mm:ss",
 	"_date_minute": "HH:mm",
+	"_date_minute_full": "HH:mm - dd MMM",
 	"_date_hour": "HH:mm",
+	"_date_hour_full": "HH:mm - dd MMM",
 	"_date_day": "dd MMM",
+	"_date_day_full": "dd MMM",
 	"_date_week": "ww",
+	"_date_week_full": "dd MMM",
 	"_date_month": "MMM",
+	"_date_month_full": "MMM, yyyy",
 	"_date_year": "yyyy",
 
 	// Default duration formats for various base units.

@@ -449,7 +449,7 @@ export class XYChartDefaultTheme extends Theme {
 			"day": language.translate("_date_day"),
 			"week": language.translate("_date_day"),
 			"month": language.translate("_date_month"),
-			"year": language.translate("_date_year"),
+			"year": language.translate("_date_year")
 		};
 
 		const periodChangeDateFormats = {
@@ -460,6 +460,17 @@ export class XYChartDefaultTheme extends Theme {
 			"day": language.translate("_date_day"),
 			"week": language.translate("_date_day"),
 			"month": language.translate("_date_month") + " " + language.translate("_date_year"),
+			"year": language.translate("_date_year")
+		};
+
+		const tooltipDateFormats = {
+			"millisecond": language.translate("_date_millisecond_full"),
+			"second": language.translate("_date_second_full"),
+			"minute": language.translate("_date_minute_full"),
+			"hour": language.translate("_date_hour_full"),
+			"day": language.translate("_date_day_full"),
+			"week": language.translate("_date_week_full"),
+			"month": language.translate("_date_month_full"),
 			"year": language.translate("_date_year")
 		};
 
@@ -481,6 +492,7 @@ export class XYChartDefaultTheme extends Theme {
 			gridIntervals: $array.copy(gridIntervals),
 			dateFormats: $object.copy(dateFormats),
 			periodChangeDateFormats: $object.copy(periodChangeDateFormats),
+			tooltipDateFormats: tooltipDateFormats,
 
 			groupIntervals: [
 				{ timeUnit: "millisecond", count: 1 },

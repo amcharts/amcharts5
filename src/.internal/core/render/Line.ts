@@ -9,6 +9,12 @@ export interface ILineSettings extends IGraphicsSettings {
 	 */
 	points?: Array<IPoint>;
 
+	/**
+	 * A list of [[IPoint]] arrays for different segments of the line.
+	 * 
+	 * @since 5.1.4
+	 */
+	segments?: Array<Array<Array<IPoint>>>;
 }
 
 export interface ILinePrivate extends IGraphicsPrivate {
@@ -31,7 +37,7 @@ export class Line extends Graphics {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("points") || this._sizeDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
+		if (this.isDirty("points") || this.isDirty("segments") || this._sizeDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
 			this._clear = true;
 		}
 	}
@@ -41,13 +47,17 @@ export class Line extends Graphics {
 
 		if (this._clear) {
 
-			const points = this.get("points")!;
+			const points = this.get("points");
+			const segments = this.get("segments");
 
 			if (points && points.length > 0) {
 				let point = points[0];
 
 				this._display.moveTo(point.x, point.y);
 				$draw.segmentedLine(this._display, [[points]]);
+			}
+			else if (segments) {
+				$draw.segmentedLine(this._display, segments);
 			}
 			else if (!this.get("draw")) {
 				let w = this.width();

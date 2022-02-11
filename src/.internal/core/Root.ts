@@ -610,7 +610,7 @@ export class Root implements IDisposer {
 								// this._dispatchEvent("globalpointerup", target, upEvent);
 								return;
 							}
-							else if(focusedSprite.get("focusableGroup")) {
+							else if (focusedSprite.get("focusableGroup")) {
 								// Find next item in focusable group
 								const group = focusedSprite.get("focusableGroup");
 								const items = this._tabindexes.filter(item => item.get("focusableGroup") == group);
@@ -1344,6 +1344,20 @@ export class Root implements IDisposer {
 		return {
 			x: point.x - bbox.left,
 			y: point.y - bbox.top
+		};
+	}
+
+	/**
+	 * Converts root coordinates to document
+	 *
+	 * @param   point  Document point
+	 * @return         Root point
+	 */
+	public rootPointToDocument(point: IPoint): IPoint {
+		const bbox = this.dom.getBoundingClientRect();
+		return {
+			x: point.x + bbox.left,
+			y: point.y + bbox.top
 		};
 	}
 

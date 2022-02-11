@@ -803,7 +803,7 @@ export abstract class XYSeries extends Series {
 	protected _yHighField!: string;
 
 	protected _axesDirty: boolean = false;
-	protected _stackDirty: boolean = false;
+	public _stackDirty: boolean = false;
 
 	protected _selectionProcessed = false;
 
@@ -1846,7 +1846,9 @@ export abstract class XYSeries extends Series {
 		if (stackedSeries) {
 
 			$object.each(stackedSeries, (_key, value) => {
-				value._markDirtyStack();
+				if(!value._stackDirty){
+					value._markDirtyStack();
+				}
 			})
 		}
 	}

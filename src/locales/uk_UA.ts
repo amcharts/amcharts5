@@ -55,330 +55,337 @@
  * Save the file as language_LOCALE, i.e. `en_GB.ts`, `fr_FR.ts`, etc.
  */
 export default {
-  // Number formatting options.
-  //
-  // Please check with the local standards which separator is accepted to be
-  // used for separating decimals, and which for thousands.
-  "_decimalSeparator": ",",
-  "_thousandSeparator": " ",
+	// Number formatting options.
+	//
+	// Please check with the local standards which separator is accepted to be
+	// used for separating decimals, and which for thousands.
+	"_decimalSeparator": ",",
+	"_thousandSeparator": " ",
 
-  // Suffixes for numbers
-  // When formatting numbers, big or small numers might be reformatted to
-  // shorter version, by applying a suffix.
-  //
-  // For example, 1000000 might become "1m".
-  // Or 1024 might become "1KB" if we're formatting byte numbers.
-  //
-  // This section defines such suffixes for all such cases.
-  "_big_number_suffix_3": "k",
-  "_big_number_suffix_6": "M",
-  "_big_number_suffix_9": "G",
-  "_big_number_suffix_12": "T",
-  "_big_number_suffix_15": "P",
-  "_big_number_suffix_18": "E",
-  "_big_number_suffix_21": "Z",
-  "_big_number_suffix_24": "Y",
+	// Suffixes for numbers
+	// When formatting numbers, big or small numers might be reformatted to
+	// shorter version, by applying a suffix.
+	//
+	// For example, 1000000 might become "1m".
+	// Or 1024 might become "1KB" if we're formatting byte numbers.
+	//
+	// This section defines such suffixes for all such cases.
+	"_big_number_suffix_3": "k",
+	"_big_number_suffix_6": "M",
+	"_big_number_suffix_9": "G",
+	"_big_number_suffix_12": "T",
+	"_big_number_suffix_15": "P",
+	"_big_number_suffix_18": "E",
+	"_big_number_suffix_21": "Z",
+	"_big_number_suffix_24": "Y",
 
-  "_small_number_suffix_3": "m",
-  "_small_number_suffix_6": "μ",
-  "_small_number_suffix_9": "n",
-  "_small_number_suffix_12": "p",
-  "_small_number_suffix_15": "f",
-  "_small_number_suffix_18": "a",
-  "_small_number_suffix_21": "z",
-  "_small_number_suffix_24": "y",
+	"_small_number_suffix_3": "m",
+	"_small_number_suffix_6": "μ",
+	"_small_number_suffix_9": "n",
+	"_small_number_suffix_12": "p",
+	"_small_number_suffix_15": "f",
+	"_small_number_suffix_18": "a",
+	"_small_number_suffix_21": "z",
+	"_small_number_suffix_24": "y",
 
-  "_byte_suffix_B": "B",
-  "_byte_suffix_KB": "KB",
-  "_byte_suffix_MB": "MB",
-  "_byte_suffix_GB": "GB",
-  "_byte_suffix_TB": "TB",
-  "_byte_suffix_PB": "PB",
+	"_byte_suffix_B": "B",
+	"_byte_suffix_KB": "KB",
+	"_byte_suffix_MB": "MB",
+	"_byte_suffix_GB": "GB",
+	"_byte_suffix_TB": "TB",
+	"_byte_suffix_PB": "PB",
 
-  // Default date formats for various periods.
-  //
-  // This should reflect official or de facto formatting universally accepted
-  // in the country translation is being made for
-  // Available format codes here:
-  // https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#Format_codes
-  //
-  // This will be used when formatting date/time for particular granularity,
-  // e.g. "_date_hour" will be shown whenever we need to show time as hours.
-  "_date_millisecond": "mm:ss SSS",
-  "_date_second": "HH:mm:ss",
-  "_date_minute": "HH:mm",
-  "_date_hour": "HH:mm",
-  "_date_day": "MMM dd",
-  "_date_week": "ww",
-  "_date_month": "MMM",
-  "_date_year": "yyyy",
+	// Default date formats for various periods.
+	//
+	// This should reflect official or de facto formatting universally accepted
+	// in the country translation is being made for
+	// Available format codes here:
+	// https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#Format_codes
+	//
+	// This will be used when formatting date/time for particular granularity,
+	// e.g. "_date_hour" will be shown whenever we need to show time as hours.
+	"_date_millisecond": "mm:ss SSS",
+	"_date_millisecond_full": "HH:mm:ss SSS",
+	"_date_second": "HH:mm:ss",
+	"_date_second_full": "HH:mm:ss",
+	"_date_minute": "HH:mm",
+	"_date_minute_full": "HH:mm - MMM dd, yyyy",
+	"_date_hour": "HH:mm",
+	"_date_hour_full": "HH:mm - MMM dd, yyyy",
+	"_date_day": "MMM dd",
+	"_date_day_full": "MMM dd, yyyy",
+	"_date_week": "ww",
+	"_date_week_full": "MMM dd, yyyy",
+	"_date_month": "MMM",
+	"_date_month_full": "MMM, yyyy",
+	"_date_year": "yyyy",
 
-  // Default duration formats for various base units.
-  //
-  // This will be used by DurationFormatter to format numeric values into
-  // duration.
-  //
-  // Notice how each duration unit comes in several versions. This is to ensure
-  // that each base unit is shown correctly.
-  //
-  // For example, if we have baseUnit set to "second", meaning our duration is
-  // in seconds.
-  //
-  // If we pass in `50` to formatter, it will know that we have just 50 seconds
-  // (less than a minute) so it will use format in `"_duration_second"` ("ss"),
-  // and the formatted result will be in like `"50"`.
-  //
-  // If we pass in `70`, which is more than a minute, the formatter will switch
-  // to `"_duration_second_minute"` ("mm:ss"), resulting in "01:10" formatted
-  // text.
+	// Default duration formats for various base units.
+	//
+	// This will be used by DurationFormatter to format numeric values into
+	// duration.
+	//
+	// Notice how each duration unit comes in several versions. This is to ensure
+	// that each base unit is shown correctly.
+	//
+	// For example, if we have baseUnit set to "second", meaning our duration is
+	// in seconds.
+	//
+	// If we pass in `50` to formatter, it will know that we have just 50 seconds
+	// (less than a minute) so it will use format in `"_duration_second"` ("ss"),
+	// and the formatted result will be in like `"50"`.
+	//
+	// If we pass in `70`, which is more than a minute, the formatter will switch
+	// to `"_duration_second_minute"` ("mm:ss"), resulting in "01:10" formatted
+	// text.
 
-  "_duration_millisecond": "SSS",
-  "_duration_millisecond_second": "ss.SSS",
-  "_duration_millisecond_minute": "mm:ss SSS",
-  "_duration_millisecond_hour": "hh:mm:ss SSS",
-  "_duration_millisecond_day": "d'd' mm:ss SSS",
-  "_duration_millisecond_week": "d'd' mm:ss SSS",
-  "_duration_millisecond_month": "M'm' dd'd' mm:ss SSS",
-  "_duration_millisecond_year": "y'y' MM'm' dd'd' mm:ss SSS",
+	"_duration_millisecond": "SSS",
+	"_duration_millisecond_second": "ss.SSS",
+	"_duration_millisecond_minute": "mm:ss SSS",
+	"_duration_millisecond_hour": "hh:mm:ss SSS",
+	"_duration_millisecond_day": "d'd' mm:ss SSS",
+	"_duration_millisecond_week": "d'd' mm:ss SSS",
+	"_duration_millisecond_month": "M'm' dd'd' mm:ss SSS",
+	"_duration_millisecond_year": "y'y' MM'm' dd'd' mm:ss SSS",
 
-  "_duration_second": "ss",
-  "_duration_second_minute": "mm:ss",
-  "_duration_second_hour": "hh:mm:ss",
-  "_duration_second_day": "d'd' hh:mm:ss",
-  "_duration_second_week": "d'd' hh:mm:ss",
-  "_duration_second_month": "M'm' dd'd' hh:mm:ss",
-  "_duration_second_year": "y'y' MM'm' dd'd' hh:mm:ss",
+	"_duration_second": "ss",
+	"_duration_second_minute": "mm:ss",
+	"_duration_second_hour": "hh:mm:ss",
+	"_duration_second_day": "d'd' hh:mm:ss",
+	"_duration_second_week": "d'd' hh:mm:ss",
+	"_duration_second_month": "M'm' dd'd' hh:mm:ss",
+	"_duration_second_year": "y'y' MM'm' dd'd' hh:mm:ss",
 
-  "_duration_minute": "mm",
-  "_duration_minute_hour": "hh:mm",
-  "_duration_minute_day": "d'd' hh:mm",
-  "_duration_minute_week": "d'd' hh:mm",
-  "_duration_minute_month": "M'm' dd'd' hh:mm",
-  "_duration_minute_year": "y'y' MM'm' dd'd' hh:mm",
+	"_duration_minute": "mm",
+	"_duration_minute_hour": "hh:mm",
+	"_duration_minute_day": "d'd' hh:mm",
+	"_duration_minute_week": "d'd' hh:mm",
+	"_duration_minute_month": "M'm' dd'd' hh:mm",
+	"_duration_minute_year": "y'y' MM'm' dd'd' hh:mm",
 
-  "_duration_hour": "hh'h'",
-  "_duration_hour_day": "d'd' hh'h'",
-  "_duration_hour_week": "d'd' hh'h'",
-  "_duration_hour_month": "M'm' dd'd' hh'h'",
-  "_duration_hour_year": "y'y' MM'm' dd'd' hh'h'",
+	"_duration_hour": "hh'h'",
+	"_duration_hour_day": "d'd' hh'h'",
+	"_duration_hour_week": "d'd' hh'h'",
+	"_duration_hour_month": "M'm' dd'd' hh'h'",
+	"_duration_hour_year": "y'y' MM'm' dd'd' hh'h'",
 
-  "_duration_day": "d'd'",
-  "_duration_day_week": "d'd'",
-  "_duration_day_month": "M'm' dd'd'",
-  "_duration_day_year": "y'y' MM'm' dd'd'",
+	"_duration_day": "d'd'",
+	"_duration_day_week": "d'd'",
+	"_duration_day_month": "M'm' dd'd'",
+	"_duration_day_year": "y'y' MM'm' dd'd'",
 
-  "_duration_week": "w'w'",
-  "_duration_week_month": "w'w'",
-  "_duration_week_year": "w'w'",
+	"_duration_week": "w'w'",
+	"_duration_week_month": "w'w'",
+	"_duration_week_year": "w'w'",
 
-  "_duration_month": "M'm'",
-  "_duration_month_year": "y'y' MM'm'",
+	"_duration_month": "M'm'",
+	"_duration_month_year": "y'y' MM'm'",
 
-  "_duration_year": "y'y'",
+	"_duration_year": "y'y'",
 
-  // Era translations
-  "_era_ad": "н. е.",
-  "_era_bc": "до н. е.",
+	// Era translations
+	"_era_ad": "н. е.",
+	"_era_bc": "до н. е.",
 
-  // Day part, used in 12-hour formats, e.g. 5 P.M.
-  // Please note that these come in 3 variants:
-  // * one letter (e.g. "A")
-  // * two letters (e.g. "AM")
-  // * two letters with dots (e.g. "A.M.")
-  //
-  // All three need to to be translated even if they are all the same. Some
-  // users might use one, some the other.
-  "A": "дп",
-  "P": "пп",
-  "AM": "дп",
-  "PM": "пп",
-  "A.M.": "дп",
-  "P.M.": "пп",
+	// Day part, used in 12-hour formats, e.g. 5 P.M.
+	// Please note that these come in 3 variants:
+	// * one letter (e.g. "A")
+	// * two letters (e.g. "AM")
+	// * two letters with dots (e.g. "A.M.")
+	//
+	// All three need to to be translated even if they are all the same. Some
+	// users might use one, some the other.
+	"A": "дп",
+	"P": "пп",
+	"AM": "дп",
+	"PM": "пп",
+	"A.M.": "дп",
+	"P.M.": "пп",
 
-  // Date-related stuff.
-  //
-  // When translating months, if there's a difference, use the form which is
-  // best for a full date, e.g. as you would use it in "2018 January 1".
-  //
-  // Note that May is listed twice. This is because in English May is the same
-  // in both long and short forms, while in other languages it may not be the
-  // case. Translate "May" to full word, while "May(short)" to shortened
-  // version.
-  //
-  // Should month names and weekdays be capitalized or not?
-  //
-  // Rule of thumb is this: if the names should always be capitalized,
-  // regardless of name position within date ("January", "21st January 2018",
-  // etc.) use capitalized names. Otherwise enter all lowercase.
-  //
-  // The date formatter will automatically capitalize names if they are the
-  // first (or only) word in resulting date.
-  "January": "січня",
-  "February": "лютого",
-  "March": "березня",
-  "April": "квітня",
-  "May": "травня",
-  "June": "червня",
-  "July": "липня",
-  "August": "серпня",
-  "September": "вересня",
-  "October": "жовтня",
-  "November": "листопада",
-  "December": "грудня",
-  "Jan": "січ.",
-  "Feb": "лют.",
-  "Mar": "бер.",
-  "Apr": "квіт.",
-  "May(short)": "трав.",
-  "Jun": "черв.",
-  "Jul": "лип.",
-  "Aug": "серп.",
-  "Sep": "вер.",
-  "Oct": "жовт.",
-  "Nov": "лист.",
-  "Dec": "груд.",
+	// Date-related stuff.
+	//
+	// When translating months, if there's a difference, use the form which is
+	// best for a full date, e.g. as you would use it in "2018 January 1".
+	//
+	// Note that May is listed twice. This is because in English May is the same
+	// in both long and short forms, while in other languages it may not be the
+	// case. Translate "May" to full word, while "May(short)" to shortened
+	// version.
+	//
+	// Should month names and weekdays be capitalized or not?
+	//
+	// Rule of thumb is this: if the names should always be capitalized,
+	// regardless of name position within date ("January", "21st January 2018",
+	// etc.) use capitalized names. Otherwise enter all lowercase.
+	//
+	// The date formatter will automatically capitalize names if they are the
+	// first (or only) word in resulting date.
+	"January": "січня",
+	"February": "лютого",
+	"March": "березня",
+	"April": "квітня",
+	"May": "травня",
+	"June": "червня",
+	"July": "липня",
+	"August": "серпня",
+	"September": "вересня",
+	"October": "жовтня",
+	"November": "листопада",
+	"December": "грудня",
+	"Jan": "січ.",
+	"Feb": "лют.",
+	"Mar": "бер.",
+	"Apr": "квіт.",
+	"May(short)": "трав.",
+	"Jun": "черв.",
+	"Jul": "лип.",
+	"Aug": "серп.",
+	"Sep": "вер.",
+	"Oct": "жовт.",
+	"Nov": "лист.",
+	"Dec": "груд.",
 
-  // Weekdays.
-  "Sunday": "неділя",
-  "Monday": "понеділок",
-  "Tuesday": "вівторок",
-  "Wednesday": "середа",
-  "Thursday": "четвер",
-  "Friday": "пʼятниця",
-  "Saturday": "субота",
-  "Sun": "нд",
-  "Mon": "пн",
-  "Tue": "вт",
-  "Wed": "ср",
-  "Thu": "чт",
-  "Fri": "пт",
-  "Sat": "сб",
+	// Weekdays.
+	"Sunday": "неділя",
+	"Monday": "понеділок",
+	"Tuesday": "вівторок",
+	"Wednesday": "середа",
+	"Thursday": "четвер",
+	"Friday": "пʼятниця",
+	"Saturday": "субота",
+	"Sun": "нд",
+	"Mon": "пн",
+	"Tue": "вт",
+	"Wed": "ср",
+	"Thu": "чт",
+	"Fri": "пт",
+	"Sat": "сб",
 
-  // Date ordinal function.
-  //
-  // This is used when adding number ordinal when formatting days in dates.
-  //
-  // E.g. "January 1st", "February 2nd".
-  //
-  // The function accepts day number, and returns a string to be added to the
-  // day, like in default English translation, if we pass in 2, we will receive
-  // "nd" back.
-  "_dateOrd": function(_day: number): string {
-    return "";  // as per https://github.com/unicode-cldr/cldr-rbnf/blob/master/rbnf/uk.json
-  },
+	// Date ordinal function.
+	//
+	// This is used when adding number ordinal when formatting days in dates.
+	//
+	// E.g. "January 1st", "February 2nd".
+	//
+	// The function accepts day number, and returns a string to be added to the
+	// day, like in default English translation, if we pass in 2, we will receive
+	// "nd" back.
+	"_dateOrd": function(_day: number): string {
+		return "";  // as per https://github.com/unicode-cldr/cldr-rbnf/blob/master/rbnf/uk.json
+	},
 
-  // Various chart controls.
-  // Shown as a tooltip on zoom out button.
-  "Zoom Out": "Масштабування",
+	// Various chart controls.
+	// Shown as a tooltip on zoom out button.
+	"Zoom Out": "Масштабування",
 
-  // Timeline buttons
-  "Play": "Відтворювати",
-  "Stop": "Зупинка",
+	// Timeline buttons
+	"Play": "Відтворювати",
+	"Stop": "Зупинка",
 
-  // Chart's Legend screen reader title.
-  "Legend": "Легенда",
+	// Chart's Legend screen reader title.
+	"Legend": "Легенда",
 
-  // Legend's item screen reader indicator.
-  "Press ENTER to toggle": "",
+	// Legend's item screen reader indicator.
+	"Press ENTER to toggle": "",
 
-  // Shown when the chart is busy loading something.
-  "Loading": "Завантажується",
+	// Shown when the chart is busy loading something.
+	"Loading": "Завантажується",
 
-  // Shown as the first button in the breadcrumb navigation, e.g.:
-  // Home > First level > ...
-  "Home": "Головна сторінка",
+	// Shown as the first button in the breadcrumb navigation, e.g.:
+	// Home > First level > ...
+	"Home": "Головна сторінка",
 
-  // Chart types.
-  // Those are used as default screen reader titles for the main chart element
-  // unless developer has set some more descriptive title.
-  "Chart": "",
-  "Serial chart": "",
-  "X/Y chart": "",
-  "Pie chart": "",
-  "Gauge chart": "",
-  "Radar chart": "",
-  "Sankey diagram": "",
-  "Flow diagram": "",
-  "Chord diagram": "",
-  "TreeMap chart": "",
-  "Sliced chart": "",
+	// Chart types.
+	// Those are used as default screen reader titles for the main chart element
+	// unless developer has set some more descriptive title.
+	"Chart": "",
+	"Serial chart": "",
+	"X/Y chart": "",
+	"Pie chart": "",
+	"Gauge chart": "",
+	"Radar chart": "",
+	"Sankey diagram": "",
+	"Flow diagram": "",
+	"Chord diagram": "",
+	"TreeMap chart": "",
+	"Sliced chart": "",
 
-  // Series types.
-  // Used to name series by type for screen readers if they do not have their
-  // name set.
-  "Series": "",
-  "Candlestick Series": "",
-  "OHLC Series": "",
-  "Column Series": "",
-  "Line Series": "",
-  "Pie Slice Series": "",
-  "Funnel Series": "",
-  "Pyramid Series": "",
-  "X/Y Series": "",
+	// Series types.
+	// Used to name series by type for screen readers if they do not have their
+	// name set.
+	"Series": "",
+	"Candlestick Series": "",
+	"OHLC Series": "",
+	"Column Series": "",
+	"Line Series": "",
+	"Pie Slice Series": "",
+	"Funnel Series": "",
+	"Pyramid Series": "",
+	"X/Y Series": "",
 
-  // Map-related stuff.
-  "Map": "карта",
-  "Press ENTER to zoom in": "",
-  "Press ENTER to zoom out": "",
-  "Use arrow keys to zoom in and out": "",
-  "Use plus and minus keys on your keyboard to zoom in and out": "",
+	// Map-related stuff.
+	"Map": "карта",
+	"Press ENTER to zoom in": "",
+	"Press ENTER to zoom out": "",
+	"Use arrow keys to zoom in and out": "",
+	"Use plus and minus keys on your keyboard to zoom in and out": "",
 
-  // Export-related stuff.
-  // These prompts are used in Export menu labels.
-  //
-  // "Export" is the top-level menu item.
-  //
-  // "Image", "Data", "Print" as second-level indicating type of export
-  // operation.
-  //
-  // Leave actual format untranslated, unless you absolutely know that they
-  // would convey more meaning in some other way.
-  "Export": "Друк",
-  "Image": "Зображення",
-  "Data": "Дані",
-  "Print": "Друк",
-  "Press ENTER to open": "",
-  "Press ENTER to print.": "",
-  "Press ENTER to export as %1.": "",
-  "(Press ESC to close this message)": "",
-  "Image Export Complete": "",
-  "Export operation took longer than expected. Something might have gone wrong.": "",
-  "Saved from": "",
-  "PNG": "",
-  "JPG": "",
-  "GIF": "",
-  "SVG": "",
-  "PDF": "",
-  "JSON": "",
-  "CSV": "",
-  "XLSX": "",
-  "HTML": "",
+	// Export-related stuff.
+	// These prompts are used in Export menu labels.
+	//
+	// "Export" is the top-level menu item.
+	//
+	// "Image", "Data", "Print" as second-level indicating type of export
+	// operation.
+	//
+	// Leave actual format untranslated, unless you absolutely know that they
+	// would convey more meaning in some other way.
+	"Export": "Друк",
+	"Image": "Зображення",
+	"Data": "Дані",
+	"Print": "Друк",
+	"Press ENTER to open": "",
+	"Press ENTER to print.": "",
+	"Press ENTER to export as %1.": "",
+	"(Press ESC to close this message)": "",
+	"Image Export Complete": "",
+	"Export operation took longer than expected. Something might have gone wrong.": "",
+	"Saved from": "",
+	"PNG": "",
+	"JPG": "",
+	"GIF": "",
+	"SVG": "",
+	"PDF": "",
+	"JSON": "",
+	"CSV": "",
+	"XLSX": "",
+	"HTML": "",
 
-  // Scrollbar-related stuff.
-  //
-  // Scrollbar is a control which can zoom and pan the axes on the chart.
-  //
-  // Each scrollbar has two grips: left or right (for horizontal scrollbar) or
-  // upper and lower (for vertical one).
-  //
-  // Prompts change in relation to whether Scrollbar is vertical or horizontal.
-  //
-  // The final section is used to indicate the current range of selection.
-  "Use TAB to select grip buttons or left and right arrows to change selection": "",
-  "Use left and right arrows to move selection": "",
-  "Use left and right arrows to move left selection": "",
-  "Use left and right arrows to move right selection": "",
-  "Use TAB select grip buttons or up and down arrows to change selection": "",
-  "Use up and down arrows to move selection": "",
-  "Use up and down arrows to move lower selection": "",
-  "Use up and down arrows to move upper selection": "",
-  "From %1 to %2": "Від %1 до %2",
-  "From %1": "Від %1",
-  "To %1": "До %1",
+	// Scrollbar-related stuff.
+	//
+	// Scrollbar is a control which can zoom and pan the axes on the chart.
+	//
+	// Each scrollbar has two grips: left or right (for horizontal scrollbar) or
+	// upper and lower (for vertical one).
+	//
+	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
+	//
+	// The final section is used to indicate the current range of selection.
+	"Use TAB to select grip buttons or left and right arrows to change selection": "",
+	"Use left and right arrows to move selection": "",
+	"Use left and right arrows to move left selection": "",
+	"Use left and right arrows to move right selection": "",
+	"Use TAB select grip buttons or up and down arrows to change selection": "",
+	"Use up and down arrows to move selection": "",
+	"Use up and down arrows to move lower selection": "",
+	"Use up and down arrows to move upper selection": "",
+	"From %1 to %2": "Від %1 до %2",
+	"From %1": "Від %1",
+	"To %1": "До %1",
 
-  // Data loader-related.
-  "No parser available for file: %1": "",
-  "Error parsing file: %1": "",
-  "Unable to load file: %1": "",
-  "Invalid date": "",
+	// Data loader-related.
+	"No parser available for file: %1": "",
+	"Error parsing file: %1": "",
+	"Unable to load file: %1": "",
+	"Invalid date": "",
 };

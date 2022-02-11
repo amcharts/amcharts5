@@ -58,7 +58,6 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 
 	protected _adjustMinMax(min: number, max: number, gridCount: number, strictMode?: boolean): IMinMaxStep {
-
 		let minMaxStep: IMinMaxStep;
 
 		const durationFormatter = this.getDurationFormatter();
@@ -74,8 +73,8 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			gridCount = Math.round(gridCount);
 
-			let initialMin: number = min;
-			let initialMax: number = max;
+			//let initialMin: number = min;
+			//let initialMax: number = max;
 
 			let difference = max - min;
 
@@ -114,6 +113,8 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			min = Math.floor(min / step) * step;
 			max = Math.ceil(max / step) * step;
 
+			/*
+			causese SO with seconds
 			if (strictMode) {
 				min -= step;
 				if (min < 0 && initialMin >= 0) {
@@ -124,7 +125,7 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (max > 0 && initialMax <= 0) {
 					max = 0;
 				}
-			}
+			}*/
 			minMaxStep = { min: min, max: max, step: step };
 		}
 		else {

@@ -42,12 +42,19 @@ export interface ILocaleSettings {
 	// Default date formats for various periods
 	"_date"?: string;
 	"_date_millisecond"?: string;
+	"_date_millisecond_full"?: string;
 	"_date_second"?: string;
+	"_date_second_full"?: string;
 	"_date_minute"?: string;
+	"_date_minute_full"?: string;
 	"_date_hour"?: string;
+	"_date_hour_full"?: string;
 	"_date_day"?: string;
+	"_date_day_full"?: string;
 	"_date_week"?: string;
+	"_date_week_full"?: string;
 	"_date_month"?: string;
+	"_date_month_full"?: string;
 	"_date_year"?: string;
 
 	// Default duration formats for various base units

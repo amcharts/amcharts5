@@ -162,6 +162,16 @@ function getTagValue(target: Sprite, tagName: string, format?: string): string {
 /**
  * @ignore
  */
+function getCustomDataValue(target: Sprite, prop: string): any {
+	const customData = target.getPrivate("customData");
+	if ($type.isObject(customData)) {
+		return (<any>customData)[prop];
+	}
+}
+
+/**
+ * @ignore
+ */
 function getTagValueFromObject(target: Sprite, parts: any[], object: any, format?: string): any {
 	let current: any = object;
 	let formatApplied = false;
@@ -170,7 +180,7 @@ function getTagValueFromObject(target: Sprite, parts: any[], object: any, format
 		if (part.prop) {
 			// Regular property
 			if (current instanceof Sprite) {
-				current = current.get(part.prop) || current.getPrivate(part.prop) || (<any>current)[part.prop];
+				current = current.get(part.prop) || current.getPrivate(part.prop) || (<any>current)[part.prop] || getCustomDataValue(current, part.prop);
 			}
 			else if (current.get) {
 				current = current.get(part.prop) || (<any>current)[part.prop];

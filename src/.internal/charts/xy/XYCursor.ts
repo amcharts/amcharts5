@@ -15,6 +15,7 @@ import { Grid } from "./axes/Grid";
 import * as $type from "../../core/util/Type";
 import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
+import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
 
 export interface IXYCursorSettings extends IContainerSettings {
@@ -88,6 +89,16 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 */
 	snapToSeriesBy?: "xy" | "x" | "y" | "x!" | "y!";
 
+	/**
+	 * An array of other [[XYCursor]] objects to sync this cursor with.
+	 *
+	 * If set will automatically move synced cursors to the same position within
+	 * their respective axes as the this cursor.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors} for more info
+	 * @since 5.1.4
+	 */
+	syncWith?: Array<XYCursor>;
 }
 
 
@@ -284,8 +295,26 @@ export class XYCursor extends Container {
 		}
 	}
 
+	protected _handleSyncWith() {
+		const chart = this.chart;
+		if (chart) {
+			const syncWith = this.get("syncWith");
+			const otherCharts: Array<XYChart> = [];
+			if (syncWith) {
+				$array.each(syncWith, (cursor) => {
+					const chart = cursor.chart;
+					if (chart) {
+						otherCharts.push(chart)
+					}
+				})
+			}
+			chart._otherCharts = otherCharts;
+		}
+	}
+
 	public _updateChildren() {
 		super._updateChildren();
+		this._handleSyncWith();
 
 		if (this.isDirty("positionX") || this.isDirty("positionY")) {
 			const positionX = this.get("positionX");
@@ -331,6 +360,8 @@ export class XYCursor extends Container {
 	public _setChart(chart: XYChart): void {
 		this.chart = chart;
 
+		this._handleSyncWith();
+
 		const plotContainer = chart.plotContainer;
 
 		this.events.on("boundschanged", () => {
@@ -363,10 +394,12 @@ export class XYCursor extends Container {
 		}));
 
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
-			if ($object.keys(plotContainer._downPoints).length == 0 && !event.native && this.isHidden()) {
-				// Ignore mouse movement if it originates on outside element and
-				// we're not dragging.
-				return;
+			if (!this.get("syncWith")) {
+				if ($object.keys(plotContainer._downPoints).length == 0 && !event.native && this.isHidden()) {
+					// Ignore mouse movement if it originates on outside element and
+					// we're not dragging.
+					return;
+				}
 			}
 			this._handleMove(event.originalEvent);
 		}));

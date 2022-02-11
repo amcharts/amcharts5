@@ -289,6 +289,27 @@ export function getShadowRoot(a: Node): ShadowRoot | null {
 let rootStylesheet: $type.Optional<CSSStyleSheet>;
 
 /**
+ * @ignore Exclude from docs
+ */
+function createStylesheet(element: ShadowRoot | null, text: string, nonce: string = ""): HTMLStyleElement {
+	// TODO use createElementNS ?
+	const e = document.createElement("style");
+	e.type = "text/css";
+	if (nonce != "") {
+		e.setAttribute("nonce", nonce)
+	}
+	e.textContent = text;
+
+	if (element === null) {
+		document.head.appendChild(e);
+	} else {
+		element.appendChild(e);
+	}
+
+	return e;
+}
+
+/**
  * [getStylesheet description]
  *
  * @ignore Exclude from docs
@@ -430,7 +451,31 @@ export class StyleRule extends DisposerClass {
 			this._rule.style.setProperty(name, value, "");
 		}
 	}
+}
 
+/**
+ * Defines a class for an entire CSS style sheet.
+ *
+ * Can be used to dynamically add CSS to the document.
+ */
+export class StyleSheet extends DisposerClass {
+	private _element: HTMLStyleElement;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param text  CSS stylesheet
+	 */
+	constructor(element: ShadowRoot | null, text: string, nonce: string = "") {
+		super();
+		this._element = createStylesheet(element, text, nonce);
+	}
+
+	protected _dispose(): void {
+		if (this._element.parentNode) {
+			this._element.parentNode.removeChild(this._element);
+		}
+	}
 }
 
 // /**
