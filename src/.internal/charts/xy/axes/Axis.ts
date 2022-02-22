@@ -389,7 +389,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @param   duration  Duration of the zoom animation in milliseconds
 	 * @return            Zoom animation
 	 */
-	public zoom(start: number, end: number, duration?: number): Animation<this["_settings"]["start"]> | Animation<this["_settings"]["end"]> | undefined {
+	public zoom(start: number, end: number, duration?: number, priority?: "start" | "end"): Animation<this["_settings"]["start"]> | Animation<this["_settings"]["end"]> | undefined {
 
 		if (this.get("start") !== start || this.get("end") != end) {
 
@@ -414,8 +414,12 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				duration = this.get("interpolationDuration", 0);
 			}
 
-			let priority: "start" | "end" = "end";
+			if (!priority) {
+				priority = "end";
+			}
+
 			let maxZoomFactor = this.getPrivate("maxZoomFactor", this.get("maxZoomFactor", 100));
+			let maxZoomFactorReal = maxZoomFactor;
 
 			if (end === 1 && start !== 0) {
 				if (start < this.get("start")) {
@@ -439,13 +443,13 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			let maxZoomCount = this.get("maxZoomCount");
 
 			if ($type.isNumber(minZoomCount)) {
-				maxZoomFactor = maxZoomFactor / minZoomCount;
+				maxZoomFactor = maxZoomFactorReal / minZoomCount;
 			}
 
 			let minZoomFactor: number = 1;
 
 			if ($type.isNumber(maxZoomCount)) {
-				minZoomFactor = maxZoomFactor / maxZoomCount;
+				minZoomFactor = maxZoomFactorReal / maxZoomCount;
 			}
 
 			// most likely we are dragging left scrollbar grip here, so we tend to modify end
@@ -494,15 +498,27 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				start = end - 1 / maxZoomFactor;
 			}
 
+			if (maxZoomCount != null && minZoomCount != null && (start == this.get("start") && end == this.get("end"))) {
+				const chart = this.chart;
+				if (chart) {
+					chart._handleAxisSelection(this, true);
+				}
+			}
+
 			if (((sAnimation && sAnimation.playing && sAnimation.to == start) || this.get("start") == start) && ((eAnimation && eAnimation.playing && eAnimation.to == end) || this.get("end") == end)) {
 				return;
 			}
 
+
 			if (duration > 0) {
 				let easing = this.get("interpolationEasing");
-
-				let sAnimation = this.animate({ key: "start", to: start, duration: duration, easing: easing });
-				let eAnimation = this.animate({ key: "end", to: end, duration: duration, easing: easing });
+				let sAnimation, eAnimation;
+				if (this.get("start") != start) {
+					sAnimation = this.animate({ key: "start", to: start, duration: duration, easing: easing });
+				}
+				if (this.get("end") != end) {
+					eAnimation = this.animate({ key: "end", to: end, duration: duration, easing: easing });
+				}
 
 				this._sAnimation = sAnimation;
 				this._eAnimation = eAnimation;
@@ -818,7 +834,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			chart.axisHeadersContainer.markDirtySize();
 		}
 
-		this.get("renderer")._updatePositions();		
+		this.get("renderer")._updatePositions();
 	}
 
 	/**

@@ -168,6 +168,14 @@ export class Chord extends Flow {
 						if (outgoingLink.get("target") === targetDataItem) {
 							value = outgoingLink.get("valueWorking");
 						}
+
+						let valueSum = this.getPrivate("valueSum", 0);
+						let minSize = this.get("minSize", 0);
+						if(value > 0 && minSize > 0){
+							if(value < valueSum * minSize){
+								value = valueSum * minSize;
+							}
+						}							
 					})
 				}
 

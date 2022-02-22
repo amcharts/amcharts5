@@ -168,13 +168,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
 		this._setBaseInterval(this.get("baseInterval"));
-	}
-
-	public _updateChildren() {
-		super._updateChildren();
-		if (this.isDirty("baseInterval")) {
+		this.on("baseInterval", ()=>{
 			this._setBaseInterval(this.get("baseInterval"));
-		}
+		})
 	}
 
 	protected _setBaseInterval(interval: ITimeInterval) {
@@ -182,6 +178,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._baseDuration = $time.getIntervalDuration(interval);
 	}
 
+	protected _fixZoomFactor(){
+		this.setPrivateRaw("maxZoomFactor", Math.round((this.getPrivate("max", 0) - this.getPrivate("min", 0)) / this.baseMainDuration()));
+	}
 
 	protected _groupData() {
 		const min = this.getPrivate("min");
@@ -189,7 +188,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 		if (($type.isNumber(min) && $type.isNumber(max))) {
 
-			this.setPrivateRaw("maxZoomFactor", Math.round((this.getPrivate("max", 0) - this.getPrivate("min", 0)) / this.baseMainDuration()));
+			this._fixZoomFactor();
 
 			const groupInterval = this.getPrivate("groupInterval")!;
 			if (groupInterval) {

@@ -515,7 +515,13 @@ export class XYCursor extends Container {
 	}
 
 	/**
-	 * @ignore
+	 * Moves the cursor to X/Y coordinates within chart container (`point`).
+	 *
+	 * If `skipEvent` parameter is set to `true`, the move will not invoke
+	 * the `"cursormoved"` event.
+	 * 
+	 * @param  point      X/Y to move cursor to
+	 * @param  skipEvent  Do not fire "cursormoved" event
 	 */
 	public handleMove(point?: IPoint, skipEvent?: boolean) {
 		if (!point) {

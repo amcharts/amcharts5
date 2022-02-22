@@ -366,7 +366,7 @@ export class XYChart extends SerialChart {
 
 							let newStart = start - wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
+							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
@@ -379,12 +379,12 @@ export class XYChart extends SerialChart {
 							let start = axis.get("start")!;
 							let end = axis.get("end")!;
 
-
 							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
 
 							let newStart = start - wheelStep * (end - start) * shiftY * position;
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
+
+							if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
@@ -402,7 +402,7 @@ export class XYChart extends SerialChart {
 
 							let newStart = start - wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
+							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
@@ -420,7 +420,7 @@ export class XYChart extends SerialChart {
 							let newStart = start - wheelStep * (end - start) * shiftY * position;
 							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
 
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity)) {
+							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
 						}
@@ -435,9 +435,9 @@ export class XYChart extends SerialChart {
 							let end = axis.get("end")!;
 
 							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
-
-							let newStart = start + wheelStep * (end - start) * shiftX * position;
-							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
+							let delta = wheelStep * (end - start) * shiftX * position;
+							let newStart = start + delta;
+							let newEnd = end + delta;
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -451,9 +451,9 @@ export class XYChart extends SerialChart {
 							let end = axis.get("end")!;
 
 							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
-
-							let newStart = start + wheelStep * (end - start) * shiftY * position;
-							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
+							let delta = wheelStep * (end - start) * shiftY * position;
+							let newStart = start + delta;
+							let newEnd = end + delta;
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -467,9 +467,9 @@ export class XYChart extends SerialChart {
 							let end = axis.get("end")!;
 
 							let position = axis.fixPosition(plotPoint.y / plotContainer.height());
-
-							let newStart = start + wheelStep * (end - start) * shiftX * position;
-							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
+							let delta = wheelStep * (end - start) * shiftX * position;
+							let newStart = start + delta;
+							let newEnd = end + delta;
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -483,9 +483,9 @@ export class XYChart extends SerialChart {
 							let end = axis.get("end")!;
 
 							let position = axis.fixPosition(plotPoint.y / plotContainer.height());
-
-							let newStart = start + wheelStep * (end - start) * shiftY * position;
-							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
+							let delta = wheelStep * (end - start) * shiftY * position;
+							let newStart = start - delta;
+							let newEnd = end - delta;
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -787,7 +787,7 @@ export class XYChart extends SerialChart {
 					}
 
 					this._pushPropertyDisposer("scrollbarX", scrollbarX.events.on("rangechanged", (e) => {
-						this._handleScrollbar(this.xAxes, e.start, e.end);
+						this._handleScrollbar(this.xAxes, e.start, e.end, e.grip);
 					}))
 
 					// Used to populate `ariaLabel` with meaningful values
@@ -816,7 +816,7 @@ export class XYChart extends SerialChart {
 					}
 
 					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("rangechanged", (e) => {
-						this._handleScrollbar(this.yAxes, e.start, e.end);
+						this._handleScrollbar(this.yAxes, e.start, e.end, e.grip);
 					}))
 
 					// Used to populate `ariaLabel` with meaningful values
@@ -881,14 +881,14 @@ export class XYChart extends SerialChart {
 
 	}
 
-	protected _handleScrollbar(axes: ListAutoDispose<Axis<any>>, start: number, end: number) {
+	protected _handleScrollbar(axes: ListAutoDispose<Axis<any>>, start: number, end: number, priority?: "start" | "end") {
 
 		axes.each((axis) => {
 
 			let axisStart = axis.fixPosition(start);
 			let axisEnd = axis.fixPosition(end);
 
-			let zoomAnimation = axis.zoom(axisStart, axisEnd);
+			let zoomAnimation = axis.zoom(axisStart, axisEnd, undefined, priority);
 
 			const updateScrollbar = "updateScrollbar";
 			axis.setPrivateRaw(updateScrollbar, false);
@@ -970,7 +970,7 @@ export class XYChart extends SerialChart {
 	 */
 	public processAxis(_axis: Axis<AxisRenderer>) { };
 
-	public _handleAxisSelection(axis: Axis<any>) {
+	public _handleAxisSelection(axis: Axis<any>, force?: boolean) {
 
 		let start = axis.fixPosition(axis.get("start", 0));
 		let end = axis.fixPosition(axis.get("end", 1));
@@ -980,9 +980,10 @@ export class XYChart extends SerialChart {
 		}
 
 		if (this.xAxes.indexOf(axis) != -1) {
-			if (axis.getPrivate("updateScrollbar")) {
+			if (force || axis.getPrivate("updateScrollbar")) {
 				let scrollbarX = this.get("scrollbarX");
-				if (scrollbarX && !scrollbarX.getPrivate("isBusy")) {
+
+				if (scrollbarX && (!scrollbarX.getPrivate("isBusy") || force)) {
 					scrollbarX.setRaw("start", start);
 					scrollbarX.setRaw("end", end);
 					scrollbarX.updateGrips();
@@ -990,9 +991,10 @@ export class XYChart extends SerialChart {
 			}
 		}
 		else if (this.yAxes.indexOf(axis) != -1) {
-			if (axis.getPrivate("updateScrollbar")) {
+			if (force || axis.getPrivate("updateScrollbar")) {
 				let scrollbarY = this.get("scrollbarY");
-				if (scrollbarY && !scrollbarY.getPrivate("isBusy")) {
+
+				if (scrollbarY && (!scrollbarY.getPrivate("isBusy") || force)) {
 					scrollbarY.setRaw("start", start);
 					scrollbarY.setRaw("end", end);
 					scrollbarY.updateGrips();

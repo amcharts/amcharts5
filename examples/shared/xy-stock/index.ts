@@ -76,7 +76,7 @@ dateAxisRenderer.labels.template.setAll({
   minPosition: 0.01,
   maxPosition: 0.99
 });
-const dateAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+const dateAxis = chart.xAxes.push(am5xy.GaplessDateAxis.new(root, {
   groupData: true,
   baseInterval: {
     timeUnit: "day",

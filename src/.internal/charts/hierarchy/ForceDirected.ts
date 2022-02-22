@@ -251,8 +251,7 @@ export class ForceDirected extends LinkedHierarchy {
 
 		const node = dataItem.get("node");
 		node.on("scale", () => {
-			this._nodesDirty = true;
-			this.markDirty();
+			this._updateForces();
 		})
 
 		node.events.on("dragged", () => {

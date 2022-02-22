@@ -24,8 +24,10 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 			new StyleRule(element, ".am5-modal", {
 				"width": "100%",
 				"height": "100%",
-				"position": "relative",
-				"z-index": "1000"
+				"position": "absolute",
+				"z-index": "100000",
+				"top": "0",
+				"left": "0"
 			}),
 
 			new StyleRule(element, ".am5-modal-curtain", {
@@ -119,7 +121,7 @@ export class Modal extends Entity {
 		const container = document.createElement("div");
 		container.className = "am5-modal";
 		container.style.display = "none";
-		this.root.dom.appendChild(container);
+		this.root._inner.appendChild(container);
 		this.setPrivate("container", container);
 
 		const curtain = document.createElement("div");

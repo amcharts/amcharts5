@@ -85,6 +85,13 @@ export abstract class MapSeries extends Series {
 		this._setRawDefault("geometryTypeField", "geometryType");
 		this._setRawDefault("idField", "id");
 
+		this.on("geoJSON", (geoJSON) => {
+			let previous = this._prevSettings.geoJSON;
+			if (previous && previous != geoJSON) {
+				this.data.clear();
+			}
+		})
+
 		super._afterNew();
 	}
 
@@ -98,7 +105,6 @@ export abstract class MapSeries extends Series {
 			if (previous && previous != geoJSON) {
 				this._prevSettings.geoJSON = undefined;
 				this._geoJSONparsed = false;
-				this.data.clear();
 			}
 
 			if (!this._geoJSONparsed) {
@@ -276,5 +282,5 @@ export abstract class MapSeries extends Series {
 		if (chart) {
 			chart.series.removeValue(this);
 		}
-	}	
+	}
 }

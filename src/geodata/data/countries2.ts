@@ -815,7 +815,7 @@ const countries2: Countries2 = {
 		"country": "Latvia",
 		"continent_code": "EU",
 		"continent": "Europe",
-		"maps": [ "latviaLow", "latviaHigh" ]
+		"maps": [ "latvia2021Low", "latvia2021High", "latviaLow", "latviaHigh" ]
 	},
 	"LY": {
 		"country": "Libya",
@@ -1007,7 +1007,7 @@ const countries2: Countries2 = {
 		"country": "Norway",
 		"continent_code": "EU",
 		"continent": "Europe",
-		"maps": [ "norwayLow", "norwayHigh" ]
+		"maps": [ "norway2020Low", "norway2020High", "norwayLow", "norwayHigh" ]
 	},
 	"NP": {
 		"country": "Nepal",

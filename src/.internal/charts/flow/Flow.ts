@@ -89,6 +89,18 @@ export interface IFlowSettings extends ISeriesSettings {
 	 */
 	nodePadding?: number;
 
+	/**
+	 * Minimum size of the node/link.
+	 * 
+	 * It's a relative value to the sum of all values in the series. If set,
+	 * this relative value will be used for small value nodes when calculating
+	 * their size. For example, if it's set to `0.01`, small nodes will be
+	 * sized like their value is 1% of the total sum of all values in series.
+	 *
+	 * @since 5.1.5
+	 */
+	minSize?: number;
+
 }
 
 export interface IFlowPrivate extends ISeriesPrivate {
@@ -245,7 +257,8 @@ export abstract class Flow extends Series {
 			const nodes = this.nodes;
 			if (nodes) {
 				$array.each(nodes.dataItems, (dataItem) => {
-					this._nodesData.push(dataItem.get("d3SankeyNode"));
+					const d3SankeyNode = dataItem.get("d3SankeyNode");
+					this._nodesData.push(d3SankeyNode);
 
 					const incoming = dataItem.get("incomingLinks")
 
@@ -285,14 +298,10 @@ export abstract class Flow extends Series {
 				})
 			}
 			this._linksData = [];
+
 			$array.each(this.dataItems, (dataItem) => {
 				let value = dataItem.get("value");
 				if ($type.isNumber(value)) {
-					let valueWorking = dataItem.get("valueWorking");
-					let d3SankeyLink = { source: dataItem.get("source").get("d3SankeyNode"), target: dataItem.get("target").get("d3SankeyNode"), value: valueWorking };
-					dataItem.setRaw("d3SankeyLink", d3SankeyLink);
-					this._linksData.push(d3SankeyLink);
-
 					if (value < valueLow) {
 						valueLow = value;
 					}
@@ -300,9 +309,24 @@ export abstract class Flow extends Series {
 					if (value > valueHigh) {
 						valueHigh = value;
 					}
-
 					valueSum += value;
+				}
+			})
 
+			$array.each(this.dataItems, (dataItem) => {
+				let value = dataItem.get("value");
+				if ($type.isNumber(value)) {
+					let valueWorking = dataItem.get("valueWorking");
+					let minSize = this.get("minSize", 0);
+					if (minSize > 0) {
+						if (valueWorking < minSize * valueSum) {
+							valueWorking = minSize * valueSum;
+						}
+					}
+
+					let d3SankeyLink = { source: dataItem.get("source").get("d3SankeyNode"), target: dataItem.get("target").get("d3SankeyNode"), value: valueWorking };
+					dataItem.setRaw("d3SankeyLink", d3SankeyLink);
+					this._linksData.push(d3SankeyLink);
 					this.updateLegendValue(dataItem);
 				}
 			})

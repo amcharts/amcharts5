@@ -913,6 +913,9 @@ export abstract class Sprite extends Entity {
 	public _beforeChanged() {
 		super._beforeChanged();
 
+		// handling states in beforeChanged, otherwise states is not applied without animated theme
+		this._handleStates();
+
 		if (this.isDirty("tooltip")) {
 			const previous = this._prevSettings.tooltip;
 			if (previous) {
@@ -1061,7 +1064,6 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		this._handleStates();
 
 		if (this.isDirty("opacity")) {
 			display.alpha = Math.max(0, this.get("opacity", 1));

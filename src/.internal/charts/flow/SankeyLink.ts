@@ -5,7 +5,7 @@ import type { ISankeyNodesDataItem } from "./SankeyNodes";
 import type { IOrientationPoint } from "../../core/util/IPoint";
 
 import { FlowLink, IFlowLinkPrivate, IFlowLinkSettings } from "./FlowLink";
-
+import type { IPoint } from "../../core/util/IPoint";
 import * as $math from "../../core/util/Math";
 
 
@@ -330,5 +330,9 @@ export class SankeyLink extends FlowLink {
 			}
 		}
 		return { x: 0, y: 0, angle: 0 }
+	}
+
+	public _getTooltipPoint(): IPoint {
+		return this.toLocal(super._getTooltipPoint());
 	}
 }

@@ -59,7 +59,7 @@ export interface IScrollbarEvents extends IContainerEvents {
 	/**
 	 * Invoked when range of the selection changes.
 	 */
-	rangechanged: { start: number, end: number };
+	rangechanged: { start: number, end: number, grip?:"start" | "end" };
 
 }
 
@@ -110,6 +110,8 @@ export class Scrollbar extends Container {
 	protected _endDown: boolean = false;
 
 	protected _thumbDown: boolean = false;
+
+	protected _gripDown?: "start" | "end";
 
 	protected _makeButton(): Button {
 		return this.children.push(Button.new(this._root, {
@@ -201,16 +203,19 @@ export class Scrollbar extends Container {
 		this._disposers.push(startGrip.events.on("pointerdown", () => {
 			this.setPrivateRaw("isBusy", true);
 			this._startDown = true;
+			this._gripDown = "start";
 		}))
 
 		this._disposers.push(endGrip.events.on("pointerdown", () => {
 			this.setPrivateRaw("isBusy", true);
 			this._endDown = true;
+			this._gripDown = "end";
 		}))
 
 		this._disposers.push(thumb.events.on("pointerdown", () => {
 			this.setPrivateRaw("isBusy", true);
 			this._thumbDown = true;
+			this._gripDown = undefined;
 		}))
 
 		this._disposers.push(startGrip.events.on("globalpointerup", () => {
@@ -325,7 +330,7 @@ export class Scrollbar extends Container {
 		if (this.isDirty("start") || this.isDirty("end")) {
 			const eventType = "rangechanged";
 			if (this.events.isEnabled(eventType)) {
-				this.events.dispatch(eventType, { type: eventType, target: this, start: this.get("start", 0), end: this.get("end", 1) });
+				this.events.dispatch(eventType, { type: eventType, target: this, start: this.get("start", 0), end: this.get("end", 1), grip:this._gripDown });
 			}
 		}
 	}

@@ -5,29 +5,52 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.5] - 2022-02-22
+
+### Added
+- `minSize` setting added to `Flow` (`Chord` and `Sankey`) series. It's a relative value to the sum of all values in the series. If set, this relative value will be used for small-value nodes when calculating their size. For example, if it's set to `0.01`, small nodes will be sized like their value is 1% of the total sum of all values in series.
+
+### Changed
+- Direction of vertical panning with mouse wheel in an `XYChart` was inverted to make it consistent with OS native scrolling direction.
+
+### Fixed
+- Fixing ES6 module detection by BundlePhobia ([Issue 294](https://github.com/amcharts/amcharts5/issues/294)).
+- Parsing of dates using `"i"` format was not working properly when no milliseconds were supplied.
+- Using `minZoomCount` and `maxZoomCount` on a `GaplessDateAxis` was not working properly.
+- Sometimes vertical `XYChart` scrollbar was not reacting to chart's pan via mouse drag or wheel.
+- Using mouse wheel on a chart that was setup to pan was also zooming in/out in addition to pan.
+- In some cases grid on `GaplessDateAxis` was not being placed properly. Grid and Label placement improved.
+- `ForceDirectedTree` could freeze when used with Animated theme in some cases.
+- Changing of baseInterval on DateAxis was not properly working in some cases.
+- In some cases, when no animated theme was used, a state on a Sprite was not applied.
+- Setting data on `MapSeries` after `geoJSON` was updated was not working properly which resulted heat rules not to be applied.
+- It was difficult to make a selection close to the start/end of plot area on `RadarChart`.
+- When `XYChart` was fully zoomed in, using mouse wheel would start panning the chart instead of zoom.
+
+
 ## [5.1.4] - 2022-02-11
 
-## Added
+### Added
 - `affectsMinMax` added to value axis range.
 - `segments` property added to `Line` class. Allows passing multiple segments instead of continous line.
 - `tooltipIntervalOffset` setting added to `DateAxis`. If not set, axis' tooltip will use value of the `-tooltipLocation` (cell start timestamp by default), so that tooltip would should rounded value, like 06:00 instead of 06:30 when interval is hourly. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip).
 - `tooltipDateFormats` setting added to `DateAxis`. Allows specifying axis' tooltip date formats for time each time unit, different from `dateFormats`. NOTE: `tooltipDateFormat` will override the format if set. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip).
 - `syncWith` setting added to `XYCursor`. Set it to an array of other `XYCursor` objects to automatically position them as the cursor moves. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors).
 
-## Changed
+### Changed
 - Default tooltip date formats have changed slightly for `DateAxis`. Previously, it was using formats from `dateFormats`. Now it uses defaults/user values from newly-introduced `tooltipDateFormats` setting.
 
-## Fixed
+### Fixed
 - In some cases `DurationAxis` with "second" as its base duration was going to stack overflow.
 - Background on a `ValueAxis` was not showing.
-- Imporoved performance for charts with lots of stacked series with null.
+- Improved performance for charts with lots of stacked series with null.
 - Fixing mouse position when using `transform: scale` or `zoom` ([Issue 258](https://github.com/amcharts/amcharts5/issues/258)).
-- Some touch iteractions were not working in iOS 12.
+- Some touch interactions were not working in iOS 12.
 
 
 ## [5.1.3] - 2022-02-03
 
-## Added
+### Added
 - Added second parameter to `Root` constructor which contains settings object. For now, there's only one setting: `useSafeResolution` (default: `true`). [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#settings).
 
 ### Fixed
@@ -36,12 +59,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [5.1.2] - 2022-02-01
 
-## Added
+### Added
 - `"x!"` and `"y!"` options added to `XYCursor`'s `snapToSeriesBy` setting. Setting it to `"y!"` will make cursor will choose the nearest data point to snap to by measuring only
 vertical distance and looking at the data items which are at the current X axis position (date or category). The same applies for `"x!"`.
 - `tooltipDataItem` setting added to `XYSeries`. It's a read-only reference to a data item which series tooltip currently uses.
 
-## Fixed
+### Fixed
 - `LineSeries` legend markers' stroke was not using series' color if `series.appear()` was called after series was initialized.
 - `LineSeries` legend marker wasn't working properly if legend was using different `Root` element.
 - Better disposing of `<canvas>` elements to work around iOS Safari GC bug.
@@ -49,7 +72,7 @@ vertical distance and looking at the data items which are at the current X axis 
 
 ## [5.1.1] - 2022-01-31
 
-## Added
+### Added
 - New method `remove(key)` on Template's adapaters.
 - Each chart-type package now exports its default theme as `DefaultTheme`. E.g. `am5xy.DefaultTheme`, `am5flow.DefaultTheme`, etc.
 - TypeScript: Settings interfaces for all objects are now being exposed via bundled re-export files like `index.ts`, `xy.ts`, etc.
@@ -57,12 +80,12 @@ vertical distance and looking at the data items which are at the current X axis 
 - New `Container` setting: `reverseChildren`. If set to `true`, will start rendering from the last child, effectively flipping the order in how children of the cotainer are laid out. Useful for [right-to-left setups](
 https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
 
-## Changed
+### Changed
 - Charts on iOS devices will now automatically use lesser resolution to work around canvas memory restriction introduced in iOS 15 Safari.
 - Charts will now use less built-in layers, and thus less `<canvas>` elements by default, reducing memory consumption.
 - All low/high-related settings and fields moved from `CandlestickSeries` to `XYSeries`. Sometimes it could be useful to have low/high on other series even if they are not shown visually.
 
-## Fixed
+### Fixed
 - `XYCursor` was not being hidden when its `positionX` or `positionY` was changed to `undefined` and `alwaysShow` was set to `false`.
 - Auto-wrapped right-aligned labels were being rendered in wrong position.
 - Auto-wrapped labels were not being trimmed for whitespace on each line.

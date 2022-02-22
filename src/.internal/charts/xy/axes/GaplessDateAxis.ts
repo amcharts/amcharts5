@@ -155,6 +155,9 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		return this._dates[findex] + (index - findex) * this.baseDuration();
 	}
 
+	protected _fixZoomFactor() {
+		this.setPrivateRaw("maxZoomFactor", this._dates.length);
+	}
 
 	protected _prepareAxisItems() {
 		let startTime = this.getPrivate("selectionMin", 0);
@@ -180,9 +183,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			if (endIndex < len - 1) {
 				endIndex++;
 			}
-
 			let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
-
 			let frequency = Math.min(len, Math.ceil((endIndex - startIndex) / maxCount));
 
 			startIndex = Math.floor(startIndex / frequency) * frequency;
@@ -192,11 +193,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				this.dataItems[j].hide();
 			}
 
-			let realDuration = (endTime - startTime);
-
-			if (endIndex - startIndex < maxCount) {
-				realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
-			}
+			let realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
 
 			// if all items are on axis
 			let gridInterval = $time.chooseInterval(0, realDuration, maxCount, this.get("gridIntervals")!);
@@ -214,47 +211,24 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 			const formats = this.get("dateFormats")!;
 
-			let previousIndex = -Infinity;
-			let previousUnitValue = -Infinity;
-
 			let selectedItems: Array<number> = [];
-			let changed = false;
-			// 0, not a mistake, starting from start index is not good
-			for (let i = 0; i < len; i++) {
-				let index = i;
-				let skip = false;
 
-				let value = dates[i];
-				let date = new Date(value);
-				let unitValue = $time.getUnitValue(date, gridInterval.timeUnit);
+			let value = $time.round(new Date(this.getPrivate("min", 0)), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime() - intervalDuration;
+			let selectionMax = this.getPrivate("selectionMax")
 
-				let shouldAdd = false;
-				if (gridInterval.timeUnit === "day" || gridInterval.timeUnit === "week") {
-					if (index - previousIndex >= frequency) {
-						shouldAdd = true;
-					}
-				}
-				else {
-					if (unitValue % gridInterval.count === 0) {
-						if (unitValue != previousUnitValue) {
-							shouldAdd = true;
-						}
-					}
+			let previousPosition = -Infinity;
+			let minDifference = (this.get("end", 1) - this.get("start", 0)) / maxCount;
+
+			while (value <= selectionMax) {
+				let index = this.valueToIndex(value);
+				let realValue = this._dates[index];
+				let position = this.valueToPosition(realValue);
+				if (position - previousPosition >= minDifference * 0.95) {
+					$array.move(selectedItems, index);
+					previousPosition = position;
 				}
 
-				if (shouldAdd) {
-					if (index - frequency * 0.7 < previousIndex) {
-						if (changed) {
-							skip = true;
-						}
-					}
-					if (!skip) {
-						selectedItems.push(i);
-						previousIndex = index;
-						previousUnitValue = unitValue;
-					}
-					changed = false;
-				}
+				value = $time.add(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.utc).getTime();
 			}
 
 			if (selectedItems.length > 0) {
