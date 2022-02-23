@@ -21,7 +21,6 @@ import { Graphics } from "../../core/render/Graphics";
 import { Percent } from "../../core/util/Percent";
 
 import * as $array from "../../core/util/Array";
-import * as $order from "../../core/util/Order";
 import * as $type from "../../core/util/Type";
 import type { Animation } from "../../core/util/Entity";
 
@@ -1144,6 +1143,7 @@ export class XYChart extends SerialChart {
 					else {
 						tooltip.show();
 						tooltips.push(tooltip);
+
 						tooltipSeries.push(series);
 					}
 				}
@@ -1156,12 +1156,25 @@ export class XYChart extends SerialChart {
 
 			const tooltipContainer = this._root.tooltipContainer;
 
-			tooltips.sort((a, b) => $order.compareNumber(a.get("pointTo")!.y, b.get("pointTo")!.y));
 			const count = tooltips.length;
 			const average = sum / count;
 
 			if (average > h / 2 + plotT.y) {
-				tooltips.reverse();
+
+				tooltips.sort((a, b) => {
+					let ya = a.get("pointTo")!.y;
+					let yb = b.get("pointTo")!.y;
+					if (ya < yb) {
+						return 1
+					}
+					else if (ya > yb) {
+						return -1;
+					}
+					else {
+						return 1;
+					}
+				})
+
 				let prevY = plotB.y;
 
 				$array.each(tooltips, (tooltip) => {
@@ -1179,6 +1192,20 @@ export class XYChart extends SerialChart {
 				})
 			}
 			else {
+				tooltips.sort((a, b) => {
+					let ya = a.get("pointTo")!.y;
+					let yb = b.get("pointTo")!.y;
+					if (ya < yb) {
+						return -1
+					}
+					else if (ya > yb) {
+						return 1;
+					}
+					else {
+						return -1;
+					}
+				})
+
 				let prevY = 0;
 				$array.each(tooltips, (tooltip) => {
 					let height = tooltip.height();

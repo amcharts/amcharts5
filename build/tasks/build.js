@@ -16,13 +16,7 @@ async function writePackage(state) {
 			bugs: root.bugs,
 			repository: root.repository,
 			keywords: root.keywords,
-			//type: "module",
   			main: "index.js",
-  			module: "index.js",
-  			exports: {
-  				"browser": "index.js",
-  				"default": "index.js",
-  			},
 			sideEffects: root.sideEffects,
 			dependencies: root.dependencies,
 		}, null, 2),

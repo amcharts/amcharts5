@@ -1711,6 +1711,7 @@ export abstract class XYSeries extends Series {
 			})
 		}
 
+		this._selectionProcessed = false; // for totals to be calculated
 	}
 
 	/**
@@ -1846,7 +1847,7 @@ export abstract class XYSeries extends Series {
 		if (stackedSeries) {
 
 			$object.each(stackedSeries, (_key, value) => {
-				if(!value._stackDirty){
+				if (!value._stackDirty) {
 					value._markDirtyStack();
 				}
 			})

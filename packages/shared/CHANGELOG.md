@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.6] - 2022-02-23
+
+### Fixed
+- Totals were not calculated until some interaction with `XYChart` chart if data was grouped initially.
+- When tooltips of multiple series were pointing at the same point, series order was not being respected.
+- Reverting "Fixing ES6 module detection by BundlePhobia" from 5.1.5 which was causing issues.
+
+
 ## [5.1.5] - 2022-02-22
 
 ### Added
