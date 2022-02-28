@@ -10,12 +10,15 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - New map: `regions/world/africaMorocco*` (Moroccan version of the map of Africa).
 - New map: `latvia2021*` (updated in 2021 region map for Latvia).
+- New map: Taiwan.
 
 ### Fixed
 - Fixed area IDs in map of Slovenia.
 - Fixed JSON syntax error in `ugandaLow.json`.
 - Added some missing maps to `countries` and `countries2` data files.
 - Fixed some name typos in the map of Hungary.
+- Fixed names in the map of Chad.
+- Fixed Morelos (Mexico) county map.
 
 
 ## [5.0.2] - 2021-09-24

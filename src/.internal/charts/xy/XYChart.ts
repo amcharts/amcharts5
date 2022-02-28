@@ -22,6 +22,7 @@ import { Percent } from "../../core/util/Percent";
 
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
+import * as $order from "../../core/util/Order";
 import type { Animation } from "../../core/util/Entity";
 
 export interface IXYChartSettings extends ISerialChartSettings {
@@ -1160,20 +1161,7 @@ export class XYChart extends SerialChart {
 			const average = sum / count;
 
 			if (average > h / 2 + plotT.y) {
-
-				tooltips.sort((a, b) => {
-					let ya = a.get("pointTo")!.y;
-					let yb = b.get("pointTo")!.y;
-					if (ya < yb) {
-						return 1
-					}
-					else if (ya > yb) {
-						return -1;
-					}
-					else {
-						return 1;
-					}
-				})
+				tooltips.sort((a, b) => $order.compareNumber(b.get("pointTo")!.y, a.get("pointTo")!.y));
 
 				let prevY = plotB.y;
 
@@ -1192,19 +1180,8 @@ export class XYChart extends SerialChart {
 				})
 			}
 			else {
-				tooltips.sort((a, b) => {
-					let ya = a.get("pointTo")!.y;
-					let yb = b.get("pointTo")!.y;
-					if (ya < yb) {
-						return -1
-					}
-					else if (ya > yb) {
-						return 1;
-					}
-					else {
-						return -1;
-					}
-				})
+				tooltips.reverse();
+				tooltips.sort((a, b) => $order.compareNumber(a.get("pointTo")!.y, b.get("pointTo")!.y));
 
 				let prevY = 0;
 				$array.each(tooltips, (tooltip) => {

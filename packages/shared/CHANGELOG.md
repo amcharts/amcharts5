@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.7] - 2022-02-28
+
+### Fixed
+- Grouping to periods where `timeUnit` was `"day"` and `count > 1` was not working properly.
+- When tooltips of multiple series were pointing at the same point, series order was not being respected (FF only).
+- If a scrollbar was added before axes, scrolling series could result series to be out of sync with bullets.
+- Tweaked `nb_NO` locale to better correspond to Norwegian Bokmål date formats.
+
+
 ## [5.1.6] - 2022-02-23
 
 ### Fixed

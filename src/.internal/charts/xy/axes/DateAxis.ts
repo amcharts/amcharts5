@@ -168,7 +168,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
 		this._setBaseInterval(this.get("baseInterval"));
-		this.on("baseInterval", ()=>{
+		this.on("baseInterval", () => {
 			this._setBaseInterval(this.get("baseInterval"));
 		})
 	}
@@ -178,7 +178,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._baseDuration = $time.getIntervalDuration(interval);
 	}
 
-	protected _fixZoomFactor(){
+	protected _fixZoomFactor() {
 		this.setPrivateRaw("maxZoomFactor", Math.round((this.getPrivate("max", 0) - this.getPrivate("min", 0)) / this.baseMainDuration()));
 	}
 
@@ -291,9 +291,15 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				let intervalDuration = $time.getDuration(interval.timeUnit);
 
+				let firstItem = dataItems[0];
+				let firstDate: Date;
+				if (firstItem) {
+					firstDate = new Date(dataItems[0].get(key as any));
+				}
+
 				$array.each(dataItems, (dataItem) => {
 					let time = dataItem.get(key as any);
-					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc, firstDate, this._root.timezone).getTime();
 					let dataContext: any;
 
 					if (previousTime < roundedTime - intervalDuration / 24) {
@@ -711,7 +717,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public roundAxisPosition(position: number, location: number): number {
 		let value = this.positionToValue(position);
 		let baseInterval = this.getPrivate("baseInterval");
-		value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+		value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
 		let endValue = value;
 		if (location > 0) {
 			endValue = $time.add(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();

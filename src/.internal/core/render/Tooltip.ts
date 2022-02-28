@@ -338,8 +338,13 @@ export class Tooltip extends Container {
 
 			let background = this.get("background");
 			let pointerLength = 0;
+			let bgStrokeSizeY = 0;
+			let bgStrokeSizeX = 0;
+
 			if (background instanceof PointedRectangle) {
 				pointerLength = background.get("pointerLength", 0);
+				bgStrokeSizeY = background.get("strokeWidth", 0) / 2;
+				bgStrokeSizeX = bgStrokeSizeY;
 			}
 
 			let pointerX = 0;
@@ -348,14 +353,18 @@ export class Tooltip extends Container {
 			let boundsW = bounds.right - bounds.left;
 			let boundsH = bounds.bottom - bounds.top;
 
+
+
 			// horizontal
 			if (pointerOrientation == "horizontal" || pointerOrientation == "left" || pointerOrientation == "right") {
+				bgStrokeSizeY = 0;
 				if (pointerOrientation == "horizontal") {
 					if (x > bounds.left + boundsW / 2) {
 						x -= (w * (1 - cw) + pointerLength);
+						bgStrokeSizeX *= -1;
 					}
 					else {
-						x += (w * cw + pointerLength);
+						x += (w * cw + pointerLength);						
 					}
 				}
 				else if (pointerOrientation == "left") {
@@ -363,16 +372,19 @@ export class Tooltip extends Container {
 				}
 				else {
 					x -= (w * cw + pointerLength);
+					bgStrokeSizeX *= -1;
 				}
 			}
 			// vertical pointer
 			else {
+				bgStrokeSizeX = 0;
 				if (pointerOrientation == "vertical") {
 					if (y > bounds.top + h / 2 + pointerLength) {
 						y -= (h * (1 - ch) + pointerLength);
 					}
 					else {
 						y += (h * ch + pointerLength);
+						bgStrokeSizeY *= -1;
 					}
 				}
 				else if (pointerOrientation == "down") {
@@ -380,14 +392,15 @@ export class Tooltip extends Container {
 				}
 				else {
 					y += (h * ch + pointerLength);
+					bgStrokeSizeY *= -1;
 				}
 			}
 
-			x = $math.fitToRange(x, bounds.left + w * cw, bounds.left + boundsW - w * (1 - cw));
-			y = $math.fitToRange(y, bounds.top + h * ch, bounds.top + boundsH - h * (1 - ch));
+			x = $math.fitToRange(x, bounds.left + w * cw, bounds.left + boundsW - w * (1 - cw)) + bgStrokeSizeX;
+			y = $math.fitToRange(y, bounds.top + h * ch, bounds.top + boundsH - h * (1 - ch)) - bgStrokeSizeY;
 
-			pointerX = pointTo.x - x + w * cw;
-			pointerY = pointTo.y - y + h * ch;
+			pointerX = pointTo.x - x + w * cw + bgStrokeSizeX;
+			pointerY = pointTo.y - y + h * ch - bgStrokeSizeY;
 
 			this._fx = x;
 			this._fy = y;
