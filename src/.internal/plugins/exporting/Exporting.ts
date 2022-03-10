@@ -2035,48 +2035,7 @@ export class Exporting extends Entity {
 	 */
 	public streamFile(uri: string, fileName: string, addBOM: boolean = false): boolean {
 
-		if (this.msBlobDownloadSupport()) {
-
-			/**
-			 * For all IEs 10 and up we use native method `msSaveBlob`
-			 */
-
-			// Extract content type and get pure data without headers
-			let parts = uri.split(";");
-			let contentType = parts!.shift()!.replace(/data:/, "");
-			uri = decodeURIComponent(parts.join(";").replace(/^[^,]*,/, ""));
-
-
-			// Check if we need to Base64-decode
-			if (["image/svg+xml", "application/json", "text/csv"].indexOf(contentType) == -1) {
-				try {
-					let decoded = atob(uri);
-					uri = decoded;
-				} catch (e) {
-					// Error occurred, meaning string was not Base64-encoded. Do nothing.
-					return false;
-				}
-			}
-			else {
-				let blob = new Blob([uri], { type: contentType });
-				window.navigator.msSaveBlob(blob, fileName);
-				return true;
-			}
-
-			// Dissect uri into array
-			let chars = new Array(uri.length);
-			for (let i = 0; i < uri.length; ++i) {
-				let charCode = uri.charCodeAt(i);
-				chars[i] = charCode;
-			}
-
-			// Prep Blob and force the download
-			let blob = new Blob([new Uint8Array(chars)], { type: contentType });
-			window.navigator.msSaveBlob(blob, fileName);
-
-		}
-
-		else if (this.blobDownloadSupport()) {
+		if (this.blobDownloadSupport()) {
 
 			/**
 			 * Supports Blob object.
@@ -2172,7 +2131,7 @@ export class Exporting extends Entity {
 	 * @ignore
 	 */
 	public downloadSupport(): boolean {
-		return this.linkDownloadSupport() || this.msBlobDownloadSupport();
+		return this.linkDownloadSupport();
 	}
 
 	/**
@@ -2191,12 +2150,6 @@ export class Exporting extends Entity {
 		return window.Blob != null;
 	}
 
-	/**
-	 * @ignore
-	 */
-	public msBlobDownloadSupport(): boolean {
-		return window.navigator.msSaveOrOpenBlob != null;
-	}
 
 	/**
 	 * ==========================================================================

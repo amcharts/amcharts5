@@ -39,9 +39,21 @@ export interface IRadarCursorSettings extends IXYCursorSettings {
 }
 
 export interface IRadarCursorPrivate extends IXYCursorPrivate {
+	/**
+	 * @todo review
+	 */	
 	innerRadius: number;
+	/**
+	 * @todo review
+	 */	
 	radius: number;
+	/**
+	 * @todo review
+	 */	
 	startAngle: number;
+	/**
+	 * @todo review
+	 */	
 	endAngle: number;
 }
 

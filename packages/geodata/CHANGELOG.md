@@ -11,6 +11,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - New map: `regions/world/africaMorocco*` (Moroccan version of the map of Africa).
 - New map: `latvia2021*` (updated in 2021 region map for Latvia).
 - New map: Taiwan.
+- New map: `spainProvinces2*` (same as `spainProvinces*` except with overseas territories moved close to mainland).
 
 ### Fixed
 - Fixed area IDs in map of Slovenia.

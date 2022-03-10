@@ -52,11 +52,26 @@ class Native implements Sensor {
 /**
  * @ignore
  */
+interface ClientBounds {
+	width: number,
+	height: number,
+	left: number,
+	right: number,
+	top: number,
+	bottom: number,
+	x: number,
+	y: number
+}
+
+
+/**
+ * @ignore
+ */
 class Raf implements Sensor {
 	public static delay: number = 200;
 
 	private _timer: number | null = null;
-	private _targets: Array<{ target: Element, callback: () => void, size: ClientRect | DOMRect }> = [];
+	private _targets: Array<{ target: Element, callback: () => void, size: ClientRect | DOMRect | ClientBounds }> = [];
 
 	addTarget(target: Element, callback: () => void) {
 		if (this._timer === null) {
@@ -90,8 +105,7 @@ class Raf implements Sensor {
 		}
 
 		// We start off with fake bounds so that sensor always kicks in
-		//let size = target.getBoundingClientRect();
-		let size = { width: 0, height: 0, left: 0, right: 0, top: 0, bottom: 0 };
+		let size = { width: 0, height: 0, left: 0, right: 0, top: 0, bottom: 0, x: 0, y: 0 };
 		this._targets.push({ target, callback, size });
 	}
 

@@ -35,7 +35,7 @@ export class VerticalLayout extends Layout {
 						availableHeight -= minHeight;
 						totalPercent -= childHeight.value;
 					}
-					let maxHeight = child.get("minHeight", Infinity);
+					let maxHeight = child.get("maxHeight", Infinity);
 					if (h > maxHeight) {
 						availableHeight -= maxHeight;
 						totalPercent -= childHeight.value;

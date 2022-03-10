@@ -2,16 +2,43 @@ import { RoundedRectangle, IRoundedRectangleSettings, IRoundedRectanglePrivate }
 
 
 export interface ICandlestickSettings extends IRoundedRectangleSettings {
+	/**
+	 * @todo review
+	 */	
 	lowX0?: number;
+	/**
+	 * @todo review
+	 */	
 	lowY0?: number;
+	/**
+	 * @todo review
+	 */	
 	lowX1?: number;
+	/**
+	 * @todo review
+	 */	
 	lowY1?: number;
 
+	/**
+	 * @todo review
+	 */
 	highX0?: number;
+	/**
+	 * @todo review
+	 */	
 	highY0?: number;
+	/**
+	 * @todo review
+	 */	
 	highX1?: number;
+	/**
+	 * @todo review
+	 */	
 	highY1?: number;
 
+	/**
+	 * @todo review
+	 */
 	orientation?: "horizontal" | "vertical"
 }
 

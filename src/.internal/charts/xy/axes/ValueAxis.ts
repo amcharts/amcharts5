@@ -181,17 +181,103 @@ export interface IMinMaxStep {
 }
 
 export interface IValueAxisPrivate extends IAxisPrivate {
+
+	/**
+	 * Calculated current minimum value of the axis scale.
+	 * 
+	 * @readonly
+	 */
 	min?: number;
+
+	/**
+	 * Calculated current maximum value of the axis scale.
+	 * 
+	 * @readonly
+	 */
 	max?: number;
+
+	/**
+	 * A minimum value of the axis scale.
+	 *
+	 * Can be useful in cases where axis zoom is currently being animated, and
+	 * `min` is reflecting current intermediate value, whereas `minFinal` will
+	 * show target value.
+	 * 
+	 * @readonly
+	 */
 	minFinal?: number;
+
+	/**
+	 * A maximum value of the axis scale.
+	 *
+	 * Can be useful in cases where axis zoom is currently being animated, and
+	 * `max` is reflecting current intermediate value, whereas `maxFinal` will
+	 * show target value.
+	 * 
+	 * @readonly
+	 */
 	maxFinal?: number;
+
+	/**
+	 * Calculated minimum value of the currently viewable (zoomed) scope.
+	 * 
+	 * @readonly
+	 */
 	selectionMin?: number;
+
+	/**
+	 * Calculated maximum value of the currently viewable (zoomed) scope.
+	 * 
+	 * @readonly
+	 */
 	selectionMax?: number;
+
+	/**
+	 * A target minimum value of the viewable value scope.
+	 *
+	 * Can be useful in cases where axis zoom is currently being animated, and
+	 * `selectionMin` is reflecting current intermediate value,
+	 * whereas `selectionMinFinal` will show target value.
+	 * 
+	 * @readonly
+	 */
 	selectionMinFinal?: number;
+
+	/**
+	 * A target maximum value of the viewable value scope.
+	 *
+	 * Can be useful in cases where axis zoom is currently being animated, and
+	 * `selectionMax` is reflecting current intermediate value,
+	 * whereas `selectionMaxFinal` will show target value.
+	 * 
+	 * @readonly
+	 */
 	selectionMaxFinal?: number;
+
+	/**
+	 * When selection step changes, it might change during axis zoom animation.
+	 *
+	 * `selectionStepFinal` will show what step will be when animation is
+	 * finished.
+	 * 
+	 * @readonly
+	 */
 	selectionStepFinal?: number;
+
+	/**
+	 * Value step between grid lines.
+	 * 
+	 * @readonly
+	 */
 	step?: number;
+
+	/**
+	 * Decimal places used when formatting axis labels.
+	 * 
+	 * @readonly
+	 */
 	stepDecimalPlaces?: number;
+
 }
 
 export interface IValueAxisEvents extends IAxisEvents {
@@ -457,6 +543,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		selectionMax = minMaxStep.max;
 
 		if (this.getPrivate("selectionMin") !== selectionMin || this.getPrivate("selectionMax") !== selectionMax || this.getPrivate("step") !== step) {
+			// do not change to setPrivate, will cause SO
 			this.setPrivateRaw("selectionMin", selectionMin);
 			this.setPrivateRaw("selectionMax", selectionMax);
 			this.setPrivateRaw("step", step);

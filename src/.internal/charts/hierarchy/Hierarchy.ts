@@ -30,23 +30,58 @@ export interface IHierarchyDataObject {
 };
 
 export interface IHierarchyDataItem extends ISeriesDataItem {
+	/**
+	 * @todo review
+	 */	
 	value: number;
 
 	/**
 	 * @ignore
 	 */
 	valueWorking: number;
-
+	/**
+	 * @todo review
+	 */
 	valuePercentTotal: number;
+	/**
+	 * @todo review
+	 */	
 	sum: number;
+	/**
+	 * @todo review
+	 */	
 	category: string;
+	/**
+	 * @todo review
+	 */	
 	children: Array<DataItem<IHierarchyDataItem>>;
+	/**
+	 * @todo review
+	 */	
 	childData: Array<any>
+	/**
+	 * @todo review
+	 */	
 	parent: DataItem<IHierarchyDataItem>;
+	/**
+	 * @todo review
+	 */	
 	depth: number;
+	/**
+	 * @todo review
+	 */	
 	node: HierarchyNode;
+	/**
+	 * @todo review
+	 */	
 	label: Label;
+	/**
+	 * @todo review
+	 */	
 	fill: Color;
+	/**
+	 * @todo review
+	 */	
 	disabled: boolean;
 
 	/**

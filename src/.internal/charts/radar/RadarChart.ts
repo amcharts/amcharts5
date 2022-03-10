@@ -293,4 +293,8 @@ export class RadarChart extends XYChart {
 	protected _tooltipToLocal(point: IPoint): IPoint {
 		return this.radarContainer._display.toLocal(point);
 	}
+
+	protected _handlePinch(){
+		
+	}
 }

@@ -16,6 +16,9 @@ export interface IOHLCSeriesPrivate extends ICandlestickSeriesPrivate {
 }
 
 export interface IOHLCSeriesAxisRange extends ICandlestickSeriesAxisRange {
+	/**
+	 * @todo review
+	 */	
 	columns: ListTemplate<OHLC>
 }
 

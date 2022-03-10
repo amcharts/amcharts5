@@ -419,7 +419,6 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleCursorDown(event: IPointerEvent) {
-		// TODO: handle multitouch
 		const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 		let local = this._display.toLocal(rootPoint);
 		const chart = this.chart;
@@ -495,6 +494,15 @@ export class XYCursor extends Container {
 
 	protected _handleMove(event: IPointerEvent) {
 		if (this.getPrivate("visible")) {
+			const chart = this.chart;
+			if(chart && $object.keys(chart.plotContainer._downPoints).length > 1){
+				this.set("forceHidden", true)
+				return;
+			}
+			else{
+this.set("forceHidden", false)
+			}
+
 			// TODO: handle multitouch
 			const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 

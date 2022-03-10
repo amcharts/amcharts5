@@ -52,7 +52,6 @@ export interface IAxisLabel extends Label {
 	maxPosition?: number;
 
 	_tickPoints: Array<IPoint>;
-
 }
 
 

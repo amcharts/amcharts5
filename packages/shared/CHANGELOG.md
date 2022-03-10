@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.8] - 2022-03-10
+
+### Added
+- Settings `pinchZoomX` and `pinchZoomY` (defaults: `false`) added to `XYChart`. If set to `true` will allow pinch-zooming of a chart on touch devices. NOTE: these settings are not supported on `RadarChart`.
+- `topPlotContainer` added to `XYChart`. It's a `Container` that can be used to place element over plot area.
+
+### Changed
+- The types for adapters has been changed to be more intuitive and useful. ([Issue 312](https://github.com/amcharts/amcharts5/issues/312))
+- Tapping an element on a touch device will now generate `pointerover` event in addition to `click`. When tapped somewhere else, `pointerout` event will be triggered.
+
+### Fixed
+- Fixing ES6 module detection by BundlePhobia again ([Issue 294](https://github.com/amcharts/amcharts5/issues/294)).
+- Pinch-zooming of a `MapChart` was not working well in some cases.
+- `maxHeight` setting in `Sprite` was not working.
+- Change of `minWidth` was not being applied at once, only if some other changes triggered chart to be redrawn.
+- Changing or not setting data on an existing `FlowChart` was resulting in a JS error.
+- `maxPanOut` setting in `MapChart` was not working.
+
+
 ## [5.1.7] - 2022-02-28
 
 ### Fixed

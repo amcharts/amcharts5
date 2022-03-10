@@ -13,6 +13,9 @@ export interface IGaplessDateAxisSettings<R extends AxisRenderer> extends IDateA
 }
 
 export interface IGaplessDateAxisDataItem extends IDateAxisDataItem {
+	/**
+	 * @todo review
+	 */	
 	index?: number
 }
 

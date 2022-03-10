@@ -477,7 +477,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * @default "hover"
 	 * @since 5.0.16
 	 */
-	showTooltipOn?: "hover" | "always"
+	showTooltipOn?: "hover" | "always";
 
 }
 
@@ -1114,7 +1114,7 @@ export abstract class Sprite extends Entity {
 			this._sizeDirty = true;
 		}
 
-		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight")) {
 			this.markDirtyBounds();
 			this._sizeDirty = true;
 		}
@@ -1204,6 +1204,13 @@ export abstract class Sprite extends Entity {
 										this.showTooltip();
 									}
 									this.setPrivateRaw("touchHovering", true);
+									this.events.dispatch("pointerover", {
+										type: "pointerover",
+										target: ev.target,
+										originalEvent: ev.originalEvent,
+										point: ev.point,
+										simulated: ev.simulated
+									});
 								}, 10)
 							}
 						}
@@ -1218,6 +1225,13 @@ export abstract class Sprite extends Entity {
 								}
 							}
 							this.setPrivateRaw("touchHovering", false);
+							this.events.dispatch("pointerout", {
+								type: "pointerout",
+								target: ev.target,
+								originalEvent: ev.originalEvent,
+								point: ev.point,
+								simulated: ev.simulated
+							});
 						}
 
 						if (this._isDown) {

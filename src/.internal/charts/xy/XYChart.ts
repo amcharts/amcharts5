@@ -23,6 +23,7 @@ import { Percent } from "../../core/util/Percent";
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $order from "../../core/util/Order";
+import * as $object from "../../core/util/Object";
 import type { Animation } from "../../core/util/Entity";
 
 export interface IXYChartSettings extends ISerialChartSettings {
@@ -107,6 +108,30 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 */
 	arrangeTooltips?: boolean
 
+	/**
+	 * If set to `true`, using pinch gesture on the chart's plot area will zoom
+	 * chart horizontally.
+	 *
+	 * NOTE: this setting is not supported in a [[RadarChart]].
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
+	 * @since 5.1.8
+	 * @default false
+	 */
+	pinchZoomX?: boolean;
+
+	/**
+	 * If set to `true`, using pinch gesture on the chart's plot area will zoom
+	 * chart vertically.
+	 * 
+	 * NOTE: this setting is not supported in a [[RadarChart]].
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
+	 * @since 5.1.8
+	 * @default false
+	 */
+	pinchZoomY?: boolean;
+
 }
 
 export interface IXYChartPrivate extends ISerialChartPrivate {
@@ -116,6 +141,10 @@ export interface IXYChartPrivate extends ISerialChartPrivate {
 	 */
 	tooltipSeries?: Array<XYSeries>
 
+	/**
+	 * @ignore
+	 */
+	otherCharts?: Array<XYChart>
 }
 
 
@@ -220,6 +249,15 @@ export class XYChart extends SerialChart {
 	public readonly plotContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false }));
 
 	/**
+	 * A [[Container]] used for any elements that need to be displayed over
+	 * regular `plotContainer`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @default Container.new()
+	 */
+	public readonly topPlotContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, isMeasured: false, position: "absolute" }));
+
+	/**
 	 * A [[Container]] axis grid elements are stored in.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
@@ -270,6 +308,14 @@ export class XYChart extends SerialChart {
 	protected _wheelDp: IDisposer | undefined;
 
 	public _otherCharts?: Array<XYChart>;
+
+	protected _movePoints: { [index: number]: IPoint } = {};
+
+	protected _downStartX?: number;
+	protected _downEndX?: number;
+
+	protected _downStartY?: number;
+	protected _downEndY?: number;
 
 	protected _afterNew() {
 		this._defaultThemes.push(XYChartDefaultTheme.new(this._root));
@@ -503,12 +549,35 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _handlePlotDown(event: IPointerEvent) {
+		const plotContainer = this.plotContainer;
+		let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
-		// TODO: handle multitouch
+		if (this.get("pinchZoomX") || this.get("pinchZoomY")) {
+
+			const touchEvent = event as any;
+			const pointerId = touchEvent.pointerId;
+
+			if (pointerId) {
+
+				if ($object.keys(plotContainer._downPoints).length > 0) {
+					const xAxis = this.xAxes.getIndex(0);
+					const yAxis = this.yAxes.getIndex(0);
+
+
+					if (xAxis) {
+						this._downStartX = xAxis.get("start", 0);
+						this._downEndX = xAxis.get("end", 1);
+					}
+
+					if (yAxis) {
+						this._downStartY = yAxis.get("start", 0);
+						this._downEndY = yAxis.get("end", 1);
+					}
+				}
+			}
+		}
+
 		if (this.get("panX") || this.get("panY")) {
-			const plotContainer = this.plotContainer;
-
-			let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
 			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= this.height()) {
 				this._downPoint = local;
@@ -577,11 +646,25 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _handlePlotMove(event: IPointerEvent) {
-		// TODO: handle multitouch
+		const plotContainer = this.plotContainer;
+
+		if (this.get("pinchZoomX") || this.get("pinchZoomY")) {
+			const touchEvent = event as any;
+			const pointerId = touchEvent.pointerId;
+
+			if (pointerId) {
+				this._movePoints[pointerId] = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
+
+				if ($object.keys(plotContainer._downPoints).length > 1) {
+					this._handlePinch();
+					return;
+				}
+			}
+		}
+
 		const downPoint = this._downPoint!;
 
 		if (downPoint) {
-			const plotContainer = this.plotContainer;
 
 			let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
@@ -651,6 +734,113 @@ export class XYChart extends SerialChart {
 
 				if (scrollbarY) {
 					scrollbarY.events.enableType("rangechanged");
+				}
+			}
+
+
+		}
+	}
+
+	protected _handlePinch() {
+		const plotContainer = this.plotContainer;
+		let i = 0;
+		let downPoints: Array<IPoint> = [];
+		let movePoints: Array<IPoint> = [];
+
+		$object.each(plotContainer._downPoints, (k, point) => {
+			downPoints[i] = point;
+			let movePoint = this._movePoints[k];
+			if (movePoint) {
+				movePoints[i] = movePoint;
+			}
+			i++;
+		});
+
+		if (downPoints.length > 1 && movePoints.length > 1) {
+			const w = plotContainer.width();
+			const h = plotContainer.height();
+
+			let downPoint0 = downPoints[0];
+			let downPoint1 = downPoints[1];
+
+			let movePoint0 = movePoints[0];
+			let movePoint1 = movePoints[1];
+
+			if (downPoint0 && downPoint1 && movePoint0 && movePoint1) {
+
+				movePoint0 = plotContainer.toLocal(movePoint0)
+				movePoint1 = plotContainer.toLocal(movePoint1)
+
+				downPoint0 = plotContainer.toLocal(downPoint0)
+				downPoint1 = plotContainer.toLocal(downPoint1)
+
+				if (this.get("pinchZoomX")) {
+					const downStartX = this._downStartX;
+					const downEndX = this._downEndX;
+
+					if (downStartX != null && downEndX != null) {
+
+						if (downPoint0.x > downPoint1.x) {
+							[downPoint0, downPoint1] = [downPoint1, downPoint0];
+							[movePoint0, movePoint1] = [movePoint1, movePoint0];
+						}
+
+						let downPos0 = downStartX + (downPoint0.x / w) * (downEndX - downStartX);
+						let downPos1 = downStartX + (downPoint1.x / w) * (downEndX - downStartX);
+
+						let movePos0 = downStartX + (movePoint0.x / w) * (downEndX - downStartX);
+						let movePos1 = downStartX + (movePoint1.x / w) * (downEndX - downStartX);
+
+						let initialDistance = Math.max(0.001, downPos1 - downPos0);
+						let currentDistance = Math.max(0.001, movePos1 - movePos0);
+
+
+						let d = initialDistance / currentDistance;
+
+						let s = downStartX * d + downPos0 - movePos0 * d;
+						let e = downEndX * d + downPos1 - movePos1 * d;
+
+						this.xAxes.each((xAxis) => {
+							let sa = xAxis.fixPosition(s);
+							let ea = xAxis.fixPosition(e);
+
+							xAxis.zoom(sa, ea, 0);
+						})
+					}
+				}
+				if (this.get("pinchZoomY")) {
+					const downStartY = this._downStartY;
+					const downEndY = this._downEndY;
+
+					if (downStartY != null && downEndY != null) {
+
+						if (downPoint0.y < downPoint1.y) {
+							[downPoint0, downPoint1] = [downPoint1, downPoint0];
+							[movePoint0, movePoint1] = [movePoint1, movePoint0];
+						}
+
+						let downPos0 = downStartY + (1 - downPoint0.y / h) * (downEndY - downStartY);
+						let downPos1 = downStartY + (1 - downPoint1.y / h) * (downEndY - downStartY);
+
+						let movePos0 = downStartY + (1 - movePoint0.y / h) * (downEndY - downStartY);
+						let movePos1 = downStartY + (1 - movePoint1.y / h) * (downEndY - downStartY);
+
+						let initialDistance = Math.max(0.001, downPos1 - downPos0);
+						let currentDistance = Math.max(0.001, movePos1 - movePos0);
+
+						let d = initialDistance / currentDistance;
+
+						let s = downStartY * d + downPos0 - movePos0 * d;
+						let e = downEndY * d + downPos1 - movePos1 * d;
+
+						this.yAxes.each((yAxis) => {
+
+							let sa = yAxis.fixPosition(s);
+							let ea = yAxis.fixPosition(e);
+
+							yAxis.zoom(sa, ea, 0);
+						})
+					}
 				}
 			}
 		}
@@ -1039,7 +1229,7 @@ export class XYChart extends SerialChart {
 	 */
 	public inPlot(point: IPoint): boolean {
 		const plotContainer = this.plotContainer;
-		const otherCharts = this._otherCharts;
+		const otherCharts = this.getPrivate("otherCharts", this._otherCharts);
 		const global = plotContainer.toGlobal(point);
 
 		if (point.x >= -0.1 && point.y >= -0.1 && point.x <= plotContainer.width() + 0.1 && point.y <= plotContainer.height() + 0.1) {
@@ -1055,7 +1245,6 @@ export class XYChart extends SerialChart {
 					const documentPoint = this._root.rootPointToDocument(global);
 					const chartRoot = chart._root.documentPointToRoot(documentPoint);
 					const local = chartPlotContainer.toLocal(chartRoot);
-
 					if (local.x >= -0.1 && local.y >= -0.1 && local.x <= chartPlotContainer.width() + 0.1 && local.y <= chartPlotContainer.height() + 0.1) {
 						return true;
 					}

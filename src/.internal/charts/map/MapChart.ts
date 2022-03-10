@@ -267,6 +267,9 @@ export class MapChart extends SerialChart {
 
 	protected _mapFitted:boolean = false;
 
+	protected _centerX:number = 0;
+	protected _centerY:number = 0;
+
 	protected _makeGeoPath() {
 		const projection = this.get("projection")!;
 		const path = geoPath();
@@ -479,6 +482,9 @@ export class MapChart extends SerialChart {
 
 			this.setRaw("translateX", translate[0]);
 			this.setRaw("translateY", translate[1]);
+
+			this._centerX = translate[0];
+			this._centerY = translate[1];
 
 			const geoPath = this.getPrivate("geoPath");
 			this._mapBounds = geoPath.bounds(this._geometryColection);
@@ -745,7 +751,7 @@ export class MapChart extends SerialChart {
 			downPoints[i] = point;
 			let movePoint = this._movePoints[k];
 			if (movePoint) {
-				movePoints[i] = this._movePoints[k];
+				movePoints[i] = movePoint;
 			}
 			i++;
 		});
@@ -780,8 +786,8 @@ export class MapChart extends SerialChart {
 
 				let zoomLevel = this._downZoomLevel;
 
-				let xx = moveCenter.x - (moveCenter.x - tx - moveCenter.x + downCenter.x) / zoomLevel * level;
-				let yy = moveCenter.y - (moveCenter.y - ty - moveCenter.y + downCenter.y) / zoomLevel * level;
+				let xx = moveCenter.x - (- tx + downCenter.x) / zoomLevel * level;
+				let yy = moveCenter.y - (- ty + downCenter.y) / zoomLevel * level;
 
 				this.set("zoomLevel", level);
 				this.set("translateX", xx);
@@ -832,12 +838,29 @@ export class MapChart extends SerialChart {
 
 						if ($type.isNumber(x) && $type.isNumber(y)) {
 							let projection = this.get("projection")!;
+							const zoomLevel = this.get("zoomLevel", 1);
 
+							const maxPanOut = this.get("maxPanOut", 0.4);
+							const bounds = this._mapBounds;
+							const w = this.width();
+							const h = this.height();
+
+							const ww = bounds[1][0] - bounds[0][0];
+							const hh = bounds[1][1] - bounds[0][1];
+							
 							if (panX == "translateX") {
 								x += local.x - downPoint.x;
+
+								const cx = w / 2 - (w / 2- this._centerX) * zoomLevel;
+								x = Math.min(x, cx + ww * maxPanOut * zoomLevel);
+								x = Math.max(x, cx - ww * maxPanOut * zoomLevel);
+
 							}
 							if (panY == "translateY") {
 								y += local.y - downPoint.y;
+								const cy = h / 2 - (h / 2- this._centerY) * zoomLevel;
+								y = Math.min(y, cy + hh * maxPanOut * zoomLevel);
+								y = Math.max(y, cy - hh * maxPanOut * zoomLevel);								
 							}
 
 							this.set("translateX", x);

@@ -9,7 +9,7 @@ import type { IPoint } from "../../util/IPoint";
 import { Color } from "../../util/Color";
 import { Matrix } from "../../util/Matrix";
 import { Percent, percent } from "../../util/Percent";
-import { Throttler } from "../../util/Throttler";
+//import { Throttler } from "../../util/Throttler";
 import { ArrayDisposer, Disposer, DisposerClass, IDisposer, CounterDisposer, MultiDisposer } from "../../util/Disposer";
 import { TextFormatter, ITextChunk } from "../../util/TextFormatter";
 import * as $utils from "../../util/Utils";
@@ -2822,9 +2822,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public _mousedown: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 
 	protected _lastPointerMoveEvent!: { event: IPointerEvent, native: boolean };
-	protected _mouseMoveThrottler: Throttler = new Throttler(() => {
+	
+	/*protected _mouseMoveThrottler: Throttler = new Throttler(() => {
 		this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
 	});
+	*/
 
 	constructor(resolution?: number) {
 		super();
@@ -3146,7 +3148,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		//}, 100)
 
 		if (this._hovering.size && this._lastPointerMoveEvent) {
-			this._mouseMoveThrottler.run();
+			//this._mouseMoveThrottler.run();
+			this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
 		}
 	}
 
@@ -3507,7 +3510,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					// TODO handle throttling properly for multitouch
 					return this._onPointerEvent("pointermove", (event, native) => {
 						this._lastPointerMoveEvent = { event, native };
-						this._mouseMoveThrottler.run();
+						this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
+						//this._mouseMoveThrottler.run();
 						//throttler.throttle(() => {
 						//});
 					});
@@ -3528,6 +3532,14 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			case "rightclick":
 			case "middleclick":
 			case "pointerdown":
+			/*
+				return this._makeSharedEvent("pointerdown", () => {
+					return this._onPointerEvent("pointerdown", (event, native) => {
+						this._lastPointerMoveEvent = { event, native };
+						this._dispatchMousedown(event)
+					});
+				});
+			*/				
 			case "pointermove":
 			case "pointerup":
 				return this._makeSharedEvent("pointerdown", () => {

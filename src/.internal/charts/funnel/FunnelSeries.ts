@@ -15,9 +15,22 @@ import * as $utils from "../../core/util/Utils";
 
 
 export interface IFunnelSeriesDataItem extends IPercentSeriesDataItem {
+
+	/**
+	 * A related slice element.
+	 */
 	slice: FunnelSlice;
+
+	/**
+	 * A related slice link element
+	 */
 	link: FunnelSlice;
+
+	/**
+	 * Data item's index.
+	 */
 	index: number;
+
 }
 
 export interface IFunnelSeriesSettings extends IPercentSeriesSettings {

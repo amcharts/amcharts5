@@ -151,6 +151,9 @@ export interface IWordCloudSettings extends ISeriesSettings {
 }
 
 export interface IWordCloudPrivate extends ISeriesPrivate {
+    /**
+     * @todo review
+     */    
     adjustedFontSize: number;
 }
 

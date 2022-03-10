@@ -12,6 +12,9 @@ export interface IColumnSeriesSettings extends IBaseColumnSeriesSettings { }
 export interface IColumnSeriesPrivate extends IBaseColumnSeriesPrivate { }
 
 export interface IColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
+	/**
+	 * @todo review
+	 */	
 	columns: ListTemplate<RoundedRectangle>
 }
 

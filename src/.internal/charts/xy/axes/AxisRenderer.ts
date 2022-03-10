@@ -69,6 +69,9 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 }
 
 export interface IAxisRendererPrivate extends IGraphicsPrivate {
+	/**
+	 * @ignore
+	 */
 	letter?: "X" | "Y";
 }
 

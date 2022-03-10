@@ -1,26 +1,31 @@
-import { ColumnSeries, IColumnSeriesPrivate, IColumnSeriesSettings, IColumnSeriesDataItem, IColumnSeriesAxisRange } from "./ColumnSeries";
 import type { DataItem } from "../../../core/render/Component";
+
+import { ColumnSeries, IColumnSeriesPrivate, IColumnSeriesSettings, IColumnSeriesDataItem, IColumnSeriesAxisRange } from "./ColumnSeries";
 import { Candlestick } from "./Candlestick";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
+
 import * as $utils from "../../../core/util/Utils";
 import * as $array from "../../../core/util/Array";
 
 export interface ICandlestickSeriesDataItem extends IColumnSeriesDataItem {
-
 }
 
 export interface ICandlestickSeriesSettings extends IColumnSeriesSettings {
-
-
 }
 
 export interface ICandlestickSeriesPrivate extends IColumnSeriesPrivate {
-
 }
 
 export interface ICandlestickSeriesAxisRange extends IColumnSeriesAxisRange {
+
+	/**
+	 * A list of [[Candlestick]] element in series.
+	 *
+	 * @readonly
+	 */
 	columns: ListTemplate<Candlestick>
+
 }
 
 /**

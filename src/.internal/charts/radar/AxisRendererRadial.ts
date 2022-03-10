@@ -67,9 +67,21 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 }
 
 export interface IAxisRendererRadialPrivate extends IAxisRendererPrivate {
+	/**
+	 * @todo review
+	 */	
 	radius?: number;
+	/**
+	 * @todo review
+	 */	
 	innerRadius?: number;
+	/**
+	 * @todo review
+	 */	
 	startAngle?: number;
+	/**
+	 * @todo review
+	 */	
 	endAngle?: number;
 }
 

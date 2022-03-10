@@ -26,7 +26,14 @@ export interface IDurationAxisDataItem extends IValueAxisDataItem {
 }
 
 export interface IDurationAxisPrivate extends IValueAxisPrivate {
+
+	/**
+	 * A format to used by axis to format its labels.
+	 *
+	 * @readonly
+	 */
 	durationFormat: string;
+
 }
 
 export interface IDurationAxisEvents extends IValueAxisEvents {
@@ -156,5 +163,5 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const value = $math.round(this.positionToValue(position), decimals);
 
 		return formatter.format(value, this.getPrivate("durationFormat"), this.get("baseUnit"));
-	}	
+	}
 }

@@ -43,7 +43,9 @@ export class XYChartDefaultTheme extends Theme {
 			panX: false,
 			panY: false,
 			wheelStep: 0.25,
-			arrangeTooltips: true
+			arrangeTooltips: true,
+			pinchZoomX: false,
+			pinchZoomY: false
 		});
 
 

@@ -67,9 +67,21 @@ export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 }
 
 export interface IAxisRendererCircularPrivate extends IAxisRendererPrivate {
+	/**
+	 * @todo review
+	 */	
 	radius?: number;
+	/**
+	 * @todo review
+	 */	
 	innerRadius?: number;
+	/**
+	 * @todo review
+	 */	
 	startAngle?: number;
+	/**
+	 * @todo review
+	 */	
 	endAngle?: number;
 }
 

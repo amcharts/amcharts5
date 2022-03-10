@@ -81,11 +81,29 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 }
 
 export interface IPercentSeriesPrivate extends ISeriesPrivate {
+	/**
+	 * @todo review
+	 */	
 	valueAverage?: number;
+	/**
+	 * @todo review
+	 */	
 	valueCount?: number;
+	/**
+	 * @todo review
+	 */	
 	valueSum?: number;
+	/**
+	 * @todo review
+	 */	
 	valueAbsoluteSum?: number;
+	/**
+	 * @todo review
+	 */	
 	valueLow?: number;
+	/**
+	 * @todo review
+	 */	
 	valueHigh?: number;
 }
 

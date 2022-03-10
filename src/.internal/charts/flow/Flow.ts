@@ -146,6 +146,7 @@ export abstract class Flow extends Series {
 	protected _nodesData: d3sankey.SankeyNodeMinimal<{}, {}>[] = [];
 	protected _linksData: { source: d3sankey.SankeyNodeMinimal<{}, {}>, target: d3sankey.SankeyNodeMinimal<{}, {}>, value: number }[] = [];
 	protected _index = 0;
+	protected _nodesDataSet:boolean = false;
 
 	protected _linksByIndex: { [index: string]: any } = {};
 	protected _afterNew() {
@@ -244,6 +245,14 @@ export abstract class Flow extends Series {
 			this._updateLinkColor(dataItem);
 		}
 	}
+
+	protected _onDataClear() {
+		if(!this.nodes._userDataSet){
+			this.nodes.data.setAll([]);
+			this.nodes._userDataSet = false;
+		}
+
+	}		
 
 	public _prepareChildren() {
 		super._prepareChildren();

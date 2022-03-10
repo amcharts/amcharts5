@@ -119,7 +119,15 @@ export interface IFlowNodesSettings extends ISeriesSettings {
 	 * A [[ColorSet]] that series will use to apply to its nodes.
 	 */
 	colors?: ColorSet;
+
+	/**
+	 * Animation duration in ms.
+	 */
 	animationDuration?: number;
+
+	/**
+	 * Easing function to use for node animations.
+	 */
 	animationEasing?: (t: Time) => Time;
 }
 
@@ -167,6 +175,8 @@ export abstract class FlowNodes extends Series {
 	 */
 	public abstract flow: Flow | undefined;
 
+	public _userDataSet = false;
+
 	protected _afterNew() {
 		this.fields.push("unknown", "name", "fill");
 
@@ -185,6 +195,8 @@ export abstract class FlowNodes extends Series {
 		if (colors) {
 			colors.reset();
 		}
+
+		this._userDataSet = true;
 	}
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {

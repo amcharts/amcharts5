@@ -7,10 +7,27 @@ import type { IOrientationPoint, IPoint } from "../../core/util/IPoint";
 import * as $math from "../../core/util/Math";
 
 export interface IChordLinkSettings extends IFlowLinkSettings {
+
+	/**
+	 * Source data item.
+	 */
 	source?: DataItem<IChordNodesDataItem>;
+
+	/**
+	 * target data item.
+	 */
 	target?: DataItem<IChordNodesDataItem>;
+
+	/**
+	 * Radius of the link at the source.
+	 */
 	sourceRadius?: number | Percent;
+
+	/**
+	 * Radius of the link at the end (target).
+	 */
 	targetRadius?: number | Percent;
+
 }
 
 export interface IChordLinkPrivate extends IFlowLinkPrivate {
@@ -50,6 +67,6 @@ export class ChordLink extends FlowLink {
 				return { x: p.x, y: p.y, angle: $math.getAngle(p0, p1) };
 			}
 		}
-		return { x: 0, y: 0, angle:0 };
+		return { x: 0, y: 0, angle: 0 };
 	}
 }

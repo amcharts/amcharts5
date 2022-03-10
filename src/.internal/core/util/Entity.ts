@@ -27,7 +27,7 @@ export type Dirty<A> = { [K in keyof A]?: boolean };
  */
 export class Adapters<E extends Settings> {
 	private _entity: E;
-	private _callbacks: { [K in keyof E["_settings"]]?: Array<<O extends E["_settings"]>(value: O[K], target?: O, key?: K) => O[K]> } = {};
+	private _callbacks: { [K in keyof E["_settings"]]?: Array<<O extends E>(value: O["_settings"][K], target: O, key: K) => O["_settings"][K]> } = {};
 	private _disabled: { [K in keyof E["_settings"]]?: boolean } = {};
 
 	constructor(entity: E) {
@@ -39,7 +39,7 @@ export class Adapters<E extends Settings> {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/adapters/} for more info
 	 */
-	public add<Key extends keyof E["_settings"]>(key: Key, callback: <O extends E["_settings"]>(value: O[Key], target?: O, key?: Key) => O[Key]): IDisposer {
+	public add<Key extends keyof E["_settings"]>(key: Key, callback: (value: E["_settings"][Key], target: E, key: Key) => E["_settings"][Key]): IDisposer {
 		let callbacks = this._callbacks[key];
 
 		if (callbacks === undefined) {

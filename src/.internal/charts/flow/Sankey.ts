@@ -239,77 +239,78 @@ export class Sankey extends Flow {
 		}
 
 		if (this._valuesDirty || this._sizeDirty || this.isDirty("nodePadding") || this.isDirty("nodeWidth") || this.isDirty("nodeAlign") || this.isDirty("nodeSort") || this.isDirty("orientation") || this.isDirty("linkTension")) {
-			const d3Sankey = this._d3Sankey;
-			let w = this.innerWidth();
-			let h = this.innerHeight();
+			if (this._nodesData.length > 0) {
+				const d3Sankey = this._d3Sankey;
+				let w = this.innerWidth();
+				let h = this.innerHeight();
 
-			if (vertical) {
-				[w, h] = [h, w];
-			}
+				if (vertical) {
+					[w, h] = [h, w];
+				}
 
-			d3Sankey.size([w, h]);
-			d3Sankey.nodePadding(this.get("nodePadding", 10));
-			d3Sankey.nodeWidth(this.get("nodeWidth", 10));
-			d3Sankey.nodeSort(this.get("nodeSort", null) as any);
+				d3Sankey.size([w, h]);
+				d3Sankey.nodePadding(this.get("nodePadding", 10));
+				d3Sankey.nodeWidth(this.get("nodeWidth", 10));
+				d3Sankey.nodeSort(this.get("nodeSort", null) as any);
 
-			switch (this.get("nodeAlign")) {
-				case "right":
-					d3Sankey.nodeAlign(d3sankey.sankeyRight);
-					break;
-				case "justify":
-					d3Sankey.nodeAlign(d3sankey.sankeyJustify);
-					break;
-				case "center":
-					d3Sankey.nodeAlign(d3sankey.sankeyCenter);
-					break;
-				default:
-					d3Sankey.nodeAlign(d3sankey.sankeyLeft);
-					break;
-			}
+				switch (this.get("nodeAlign")) {
+					case "right":
+						d3Sankey.nodeAlign(d3sankey.sankeyRight);
+						break;
+					case "justify":
+						d3Sankey.nodeAlign(d3sankey.sankeyJustify);
+						break;
+					case "center":
+						d3Sankey.nodeAlign(d3sankey.sankeyCenter);
+						break;
+					default:
+						d3Sankey.nodeAlign(d3sankey.sankeyLeft);
+						break;
+				}
 
+				this._d3Graph = d3Sankey({ nodes: this._nodesData, links: this._linksData });
 
-			this._d3Graph = d3Sankey({ nodes: this._nodesData, links: this._linksData });
-
-			$array.each(this.dataItems, (dataItem) => {
-				const link = dataItem.get("link");
-				link.setPrivate("orientation", this.get("orientation"));
-				link.markDirty();
-			})
-
-			const d3Graph = this._d3Graph;
-
-			if (d3Graph) {
-				const nodes = d3Graph.nodes;
-
-				$array.each(nodes, (d3SankeyNode) => {
-					const dataItem = (d3SankeyNode as any).dataItem as DataItem<ISankeyNodesDataItem>;
-					const node = dataItem.get("node");
-
-					let x0: number | undefined;
-					let x1: number | undefined;
-					let y0: number | undefined;
-					let y1: number | undefined;
-
-					if (vertical) {
-						x0 = d3SankeyNode.y0;
-						x1 = d3SankeyNode.y1;
-						y0 = d3SankeyNode.x0;
-						y1 = d3SankeyNode.x1;
-					}
-					else {
-						x0 = d3SankeyNode.x0;
-						x1 = d3SankeyNode.x1;
-						y0 = d3SankeyNode.y0;
-						y1 = d3SankeyNode.y1;
-					}
-
-					if ($type.isNumber(x0) && $type.isNumber(x1) && $type.isNumber(y0) && $type.isNumber(y1)) {
-						node.setAll({ x: x0, y: y0, width: x1 - x0, height: y1 - y0 });
-
-						const rectangle = dataItem.get("rectangle");
-						rectangle.setAll({ width: x1 - x0, height: y1 - y0 });
-					}
+				$array.each(this.dataItems, (dataItem) => {
+					const link = dataItem.get("link");
+					link.setPrivate("orientation", this.get("orientation"));
+					link.markDirty();
 				})
+
+				const d3Graph = this._d3Graph;
+
+				if (d3Graph) {
+					const nodes = d3Graph.nodes;
+
+					$array.each(nodes, (d3SankeyNode) => {
+						const dataItem = (d3SankeyNode as any).dataItem as DataItem<ISankeyNodesDataItem>;
+						const node = dataItem.get("node");
+
+						let x0: number | undefined;
+						let x1: number | undefined;
+						let y0: number | undefined;
+						let y1: number | undefined;
+
+						if (vertical) {
+							x0 = d3SankeyNode.y0;
+							x1 = d3SankeyNode.y1;
+							y0 = d3SankeyNode.x0;
+							y1 = d3SankeyNode.x1;
+						}
+						else {
+							x0 = d3SankeyNode.x0;
+							x1 = d3SankeyNode.x1;
+							y0 = d3SankeyNode.y0;
+							y1 = d3SankeyNode.y1;
+						}
+
+						if ($type.isNumber(x0) && $type.isNumber(x1) && $type.isNumber(y0) && $type.isNumber(y1)) {
+							node.setAll({ x: x0, y: y0, width: x1 - x0, height: y1 - y0 });
+
+							const rectangle = dataItem.get("rectangle");
+							rectangle.setAll({ width: x1 - x0, height: y1 - y0 });
+						}
+					})
+				}
 			}
 		}
 	}

@@ -49,6 +49,9 @@ export interface IPieSeriesSettings extends IPercentSeriesSettings {
 }
 
 export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
+	/**
+	 * @todo review
+	 */	
 	radius?: number;
 }
 

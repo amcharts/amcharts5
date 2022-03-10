@@ -88,6 +88,8 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 * Drawing function.
 	 *
 	 * Must use renderer (`display` parameter) methods to draw.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/#Custom_draw_functions} for more info
 	 */
 	draw?: (display: IGraphics, graphics: Graphics) => void;
 

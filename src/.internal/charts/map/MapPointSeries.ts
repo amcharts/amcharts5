@@ -101,9 +101,14 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 */
 	clipBack?: boolean;
 
-
+	/**
+	 * A field in data that holds point's longitude.
+	 */
 	latitudeField?: string;
 
+	/**
+	 * A field in data that holds point's longitude.
+	 */
 	longitudeField?: string;
 
 };

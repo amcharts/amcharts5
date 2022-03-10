@@ -16,9 +16,21 @@ import * as $utils from "../../core/util/Utils";
 
 
 export interface IRadarColumnSeriesDataItem extends IBaseColumnSeriesDataItem {
+	/**
+	 * @todo review
+	 */	
 	startAngle?: number;
+	/**
+	 * @todo review
+	 */	
 	endAngle?: number;
+	/**
+	 * @todo review
+	 */	
 	innerRadius?: number;
+	/**
+	 * @todo review
+	 */	
 	radius?: number;
 }
 
@@ -29,6 +41,9 @@ export interface IRadarColumnSeriesPrivate extends IBaseColumnSeriesPrivate {
 }
 
 export interface IRadarColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
+	/**
+	 * @todo review
+	 */	
 	columns: ListTemplate<Slice>
 }
 
