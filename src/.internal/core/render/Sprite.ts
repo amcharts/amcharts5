@@ -459,7 +459,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 
 	/**
 	 * If set to `true` the element will be inactive - absolutely oblivious
-	 * to all interactions, even if there are related events set, or 
+	 * to all interactions, even if there are related events set, or
 	 * the `interactive: true` is set.
 	 *
 	 * @since 5.0.21

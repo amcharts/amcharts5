@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.9] - 2022-03-17
+
+### Fixed
+- Fixed the issue with resizing a chart inside of a flexbox. ([Issue 311](https://github.com/amcharts/amcharts5/issues/311))
+- Fixed jumpy axis when panning an `XYChart` with mouse wheel.
+- Panning XYChart with mouse wheel had incorrect direction if axis was inversed.
+- If axis range had a gradient fill, gradient used to spread only through visible area, making it look icorrect.
+- After pinch zooming and `XYChart` or zooming the chart with no animated theme used, CPU usage used to increase.
+- `DateAxis` with `baseIntervals` `timeUnit` set to `"month"` could show incorrect month in the axis tooltip.
+- If a `Graphics` had a gradient `fill`/`stroke` and initially was invisible, setting it to visible did not make the gradient to appear.
+- While zooming `LineSeries`, a part of the line to the left of the first visible data point could disappear.
+
+
 ## [5.1.8] - 2022-03-10
 
 ### Added

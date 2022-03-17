@@ -109,6 +109,20 @@ export function getIntervalDuration(interval: ITimeInterval | undefined) {
 	return 0;
 }
 
+
+export function getDateIntervalDuration(interval: ITimeInterval, date: Date, firstDateOfWeek?: number, utc?: boolean, timezone?: Timezone) {
+	const unit = interval.timeUnit;
+	const count = interval.count;
+	if (unit == "hour" || unit == "minute" || unit == "second" || unit == "millisecond") {
+		return timeUnitDurations[interval.timeUnit] * interval.count;
+	}
+	else {
+		const firstTime = round(new Date(date.getTime()), unit, count, firstDateOfWeek, utc, undefined, timezone).getTime();
+		const lastTime = add(new Date(firstTime), unit, count, utc).getTime();
+		return lastTime - firstTime;
+	}
+}
+
 /**
  * Returns current `Date` object.
  *

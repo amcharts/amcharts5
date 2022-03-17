@@ -371,6 +371,13 @@ export class XYChart extends SerialChart {
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
 			this._handlePlotMove(event.originalEvent);
 		}));
+
+		this._maskGrid();
+	}
+
+	protected _maskGrid(){
+		this.gridContainer.set("maskContent", true);
+		this.topGridContainer.set("maskContent", true);
 	}
 
 	protected _removeSeries(series: this["_seriesType"]) {
@@ -448,6 +455,7 @@ export class XYChart extends SerialChart {
 
 							let newStart = start - wheelStep * (end - start) * shiftX * position;
 							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
+
 							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 							}
@@ -480,10 +488,13 @@ export class XYChart extends SerialChart {
 							let start = axis.get("start")!;
 							let end = axis.get("end")!;
 
-							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
-							let delta = wheelStep * (end - start) * shiftX * position;
+							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftX;
 							let newStart = start + delta;
 							let newEnd = end + delta;
+
+							let se = this._fixWheel(newStart, newEnd);
+							newStart = se[0];
+							newEnd = se[1];
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -496,10 +507,13 @@ export class XYChart extends SerialChart {
 							let start = axis.get("start")!;
 							let end = axis.get("end")!;
 
-							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
-							let delta = wheelStep * (end - start) * shiftY * position;
+							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftY;
 							let newStart = start + delta;
 							let newEnd = end + delta;
+
+							let se = this._fixWheel(newStart, newEnd);
+							newStart = se[0];
+							newEnd = se[1];
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -512,10 +526,13 @@ export class XYChart extends SerialChart {
 							let start = axis.get("start")!;
 							let end = axis.get("end")!;
 
-							let position = axis.fixPosition(plotPoint.y / plotContainer.height());
-							let delta = wheelStep * (end - start) * shiftX * position;
+							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftX;
 							let newStart = start + delta;
 							let newEnd = end + delta;
+
+							let se = this._fixWheel(newStart, newEnd);
+							newStart = se[0];
+							newEnd = se[1];
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -528,10 +545,13 @@ export class XYChart extends SerialChart {
 							let start = axis.get("start")!;
 							let end = axis.get("end")!;
 
-							let position = axis.fixPosition(plotPoint.y / plotContainer.height());
-							let delta = wheelStep * (end - start) * shiftY * position;
+							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftY;
 							let newStart = start - delta;
 							let newEnd = end - delta;
+
+							let se = this._fixWheel(newStart, newEnd);
+							newStart = se[0];
+							newEnd = se[1];
 
 							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 						}
@@ -546,6 +566,29 @@ export class XYChart extends SerialChart {
 				this._wheelDp.dispose();
 			}
 		}
+	}
+
+	protected _getWheelSign(axis: Axis<AxisRenderer>) {
+		let sign = 1;
+		if (axis.get("renderer").get("inversed")) {
+			sign = -1;
+		}
+
+		return sign
+	}
+
+	protected _fixWheel(start: number, end: number): [number, number] {
+		const diff = end - start;
+		if (start < 0) {
+			start = 0;
+			end = start + diff;
+		}
+		if (end > 1) {
+			end = 1;
+			start = end - diff;
+		}
+
+		return [start, end];
 	}
 
 	protected _handlePlotDown(event: IPointerEvent) {

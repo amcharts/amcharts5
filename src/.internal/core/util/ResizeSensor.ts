@@ -36,7 +36,7 @@ class Native implements Sensor {
 	}
 
 	addTarget(target: Element, callback: () => void) {
-		this._observer.observe(target, { box: "content-box" });
+		this._observer.observe(target, { box: "border-box" });
 		this._targets.push({ target, callback });
 	}
 

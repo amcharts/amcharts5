@@ -281,6 +281,9 @@ export class LineSeries extends XYSeries {
 						}
 					}
 				}
+				if(startIndex > 0){
+					startIndex--
+				}
 
 				this._endIndex = endIndex;
 

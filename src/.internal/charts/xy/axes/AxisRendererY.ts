@@ -354,8 +354,8 @@ export class AxisRendererY extends AxisRenderer {
 				return;
 			}
 
-			y0 = Math.max(0, y0);
-			y1 = Math.min(h, y1);
+			//y0 = Math.max(0, y0);
+			//y1 = Math.min(h, y1);
 
 			display.moveTo(0, y0);
 			display.lineTo(w, y0);

@@ -136,19 +136,18 @@ function eachTargets(hitTarget: CanvasDisplayObject, f: (target: CanvasDisplayOb
 /**
  * @ignore
  */
-function onPointerEvent(element: EventTarget, name: string, f: (event: IPointerEvent) => void): IDisposer {
+function onPointerEvent(element: EventTarget, name: string, f: (event: Array<IPointerEvent>) => void): IDisposer {
 	return $utils.addEventListener(element, $utils.getRendererEvent(name), (event: MouseEvent | TouchEvent) => {
 		let touches = (<any>event).touches;
 		if (touches) {
 			if (touches.length == 0) {
 				touches = (<any>event).changedTouches;
 			}
-			$array.each(<TouchList>touches, (touch) => {
-				f(touch);
-			});
+
+			f($array.copy(<TouchList>touches));
 
 		} else {
-			f(<MouseEvent>event);
+			f([<MouseEvent>event]);
 		}
 	});
 }
@@ -2821,8 +2820,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public _dragging: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 	public _mousedown: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 
-	protected _lastPointerMoveEvent!: { event: IPointerEvent, native: boolean };
-	
+	protected _lastPointerMoveEvent: { events: Array<IPointerEvent>, native: boolean } | undefined;
+
 	/*protected _mouseMoveThrottler: Throttler = new Throttler(() => {
 		this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
 	});
@@ -2837,6 +2836,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			this.resolution = resolution;
 		}
 
+		this.view.style.position = "absolute";
 		this.view.appendChild(this._layerDom);
 
 		this._disposers.push(new Disposer(() => {
@@ -3149,7 +3149,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		if (this._hovering.size && this._lastPointerMoveEvent) {
 			//this._mouseMoveThrottler.run();
-			this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
+			const native = this._lastPointerMoveEvent.native;
+
+			$array.each(this._lastPointerMoveEvent.events, (event) => {
+				this._dispatchGlobalMousemove(event, native);
+			});
 		}
 	}
 
@@ -3457,7 +3461,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return this._listeners[key].increment();
 	}
 
-	_onPointerEvent(name: string, f: (event: IPointerEvent, native: boolean) => void): IDisposer {
+	_onPointerEvent(name: string, f: (event: Array<IPointerEvent>, native: boolean) => void): IDisposer {
 		let native = false;
 		let timer: number | null = null;
 
@@ -3505,27 +3509,27 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			case "pointerover":
 			case "pointerout":
 				return this._makeSharedEvent("pointermove", () => {
-					//const throttler = new Throttler();
+					const listener = (events: Array<IPointerEvent>, native: boolean) => {
+						this._lastPointerMoveEvent = { events, native };
 
-					// TODO handle throttling properly for multitouch
-					return this._onPointerEvent("pointermove", (event, native) => {
-						this._lastPointerMoveEvent = { event, native };
-						this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
-						//this._mouseMoveThrottler.run();
-						//throttler.throttle(() => {
-						//});
-					});
+						$array.each(events, (event) => {
+							this._dispatchGlobalMousemove(event, native);
+						});
+					};
+
+					return new MultiDisposer([
+						this._onPointerEvent("pointerdown", listener),
+						this._onPointerEvent("pointermove", listener),
+					]);
 				});
 			case "globalpointerup":
 				return this._makeSharedEvent("pointerup", () => {
-					//const throttler = new Throttler();
+					return this._onPointerEvent("pointerup", (events, native) => {
+						$array.each(events, (event) => {
+							this._dispatchGlobalMouseup(event, native);
+						});
 
-					// TODO handle throttling properly for multitouch
-					return this._onPointerEvent("pointerup", (event, native) => {
-						//throttler.throttle(() => {
-						this._dispatchGlobalMouseup(event, native);
-						this._lastPointerMoveEvent = { event, native };
-						//});
+						this._lastPointerMoveEvent = { events, native };
 					});
 				});
 			case "click":
@@ -3539,25 +3543,31 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 						this._dispatchMousedown(event)
 					});
 				});
-			*/				
+			*/
 			case "pointermove":
 			case "pointerup":
 				return this._makeSharedEvent("pointerdown", () => {
 					//const throttler = new Throttler();
 
-					const mousedown = onPointerEvent(this.view, "pointerdown", (ev: IPointerEvent) => {
-						this._dispatchMousedown(ev);
+					const mousedown = onPointerEvent(this.view, "pointerdown", (events) => {
+						$array.each(events, (ev) => {
+							this._dispatchMousedown(ev);
+						});
 					});
 
 					// TODO handle throttling properly for multitouch
-					const mousemove = this._onPointerEvent("pointermove", (ev: IPointerEvent) => {
+					const mousemove = this._onPointerEvent("pointermove", (ev: Array<IPointerEvent>) => {
 						//throttler.throttle(() => {
-						this._dispatchDragMove(ev);
+						$array.each(ev, (ev) => {
+							this._dispatchDragMove(ev);
+						});
 						//});
 					});
 
-					const mouseup = this._onPointerEvent("pointerup", (ev: IPointerEvent) => {
-						this._dispatchDragEnd(ev);
+					const mouseup = this._onPointerEvent("pointerup", (ev: Array<IPointerEvent>) => {
+						$array.each(ev, (ev) => {
+							this._dispatchDragEnd(ev);
+						});
 					});
 
 					return new Disposer(() => {
@@ -3569,7 +3579,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			case "dblclick":
 				return this._makeSharedEvent("dblclick", () => {
 					return this._onPointerEvent("dblclick", (ev) => {
-						this._dispatchDoubleClick(ev);
+						$array.each(ev, (ev) => {
+							this._dispatchDoubleClick(ev);
+						});
 					});
 				});
 			case "wheel":

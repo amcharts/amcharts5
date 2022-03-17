@@ -381,9 +381,13 @@ export class AxisRendererX extends AxisRenderer {
 			if (x0 > w || x1 < 0) {
 				return;
 			}
+			
+			/*
+			const limit = 10000;
 
-			x0 = Math.max(0, x0);
-			x1 = Math.min(w, x1);
+			x0 = Math.max(-limit, x0);
+			x1 = Math.min(limit, x1);
+			*/
 
 			display.moveTo(x0, 0);
 			display.lineTo(x1, 0);
