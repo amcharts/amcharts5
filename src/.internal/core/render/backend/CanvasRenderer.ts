@@ -1414,7 +1414,8 @@ interface ILineChunk {
 	ascent: number,
 	offsetX: number,
 	offsetY: number,
-	textDecoration: string | undefined
+	textDecoration: string | undefined,
+	verticalAlign?: "baseline" | "sub" | "super"
 }
 
 /**
@@ -1777,6 +1778,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				let skipFurtherText = false;
 				let firstTextChunk = true;
 				let leftoverChunks: Array<ITextChunk> = [];
+				let currentVerticalAlign: "baseline" | "sub" | "super" | undefined;
 				//let offsetX = 0;
 				//let chunk;
 
@@ -1795,6 +1797,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							currentStyle = undefined;
 							currentChunkWidth = undefined;
 							currentDecoration = this.style.textDecoration;
+							currentVerticalAlign = undefined
 							currentFormat = chunk.text;
 						}
 						else {
@@ -1819,6 +1822,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							}
 							if ((<any>format).width) {
 								currentChunkWidth = $type.toNumber((<any>format).width);
+							}
+							if (format.verticalAlign) {
+								currentVerticalAlign = format.verticalAlign;
 							}
 							styleRestored = false;
 
@@ -1945,7 +1951,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							ascent: metrics.actualBoundingBoxAscent,
 							offsetX: 0,
 							offsetY: 0,
-							textDecoration: currentDecoration
+							textDecoration: currentDecoration,
+							verticalAlign: currentVerticalAlign
 						});
 
 						//offsetX += chunkWidth;
@@ -2003,6 +2010,17 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				chunk.offsetX = currentChunkOffset + chunk.left - lineInfo.left;
 				chunk.offsetY += lineInfo.height - lineInfo.height * (this.style.baselineRatio || 0.19);
 				currentChunkOffset += chunk.width;
+
+				if (chunk.verticalAlign) {
+					switch(chunk.verticalAlign) {
+						case "super":
+							chunk.offsetY -= lineInfo.height / 2 - chunk.height / 2;
+							break;
+						case "sub":
+							chunk.offsetY += chunk.height / 2;
+							break;
+					}
+				}
 			});
 		});
 

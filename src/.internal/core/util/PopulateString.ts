@@ -180,14 +180,21 @@ function getTagValueFromObject(target: Sprite, parts: any[], object: any, format
 		if (part.prop) {
 			// Regular property
 			if (current instanceof Sprite) {
-				current = current.get(part.prop) || current.getPrivate(part.prop) || (<any>current)[part.prop] || getCustomDataValue(current, part.prop);
+				let tmp = current.get(part.prop);
+				if (tmp == null) tmp = current.getPrivate(part.prop);
+				if (tmp == null) tmp = (<any>current)[part.prop];
+				if (tmp == null) tmp = getCustomDataValue(current, part.prop);
+				current = tmp;
 			}
 			else if (current.get) {
-				current = current.get(part.prop) || (<any>current)[part.prop];
+				let tmp = current.get(part.prop);
+				if (tmp == null) tmp = (<any>current)[part.prop];
+				current = tmp;
 			}
 			else {
 				current = current[part.prop];
 			}
+
 			if (current == null) {
 				// Not set, return undefined
 				return;

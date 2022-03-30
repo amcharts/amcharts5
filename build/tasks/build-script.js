@@ -211,7 +211,9 @@ module.exports = async (state) => {
 
 	let entries = await getEntries(es2015, tmp);
 
-	//var $ChunkIdPlugin = require("webpack-hashed-chunk-id-plugin");
+	const $webpack = require("webpack");
+
+	const CheckDuplicates = require("../webpack-check-duplicates");
 
 	const config = {
 		mode: (state.dev ? "development" : "production"),
@@ -233,17 +235,32 @@ module.exports = async (state) => {
 
 			moduleIds: "deterministic",
 			chunkIds: "deterministic",
-			removeAvailableModules: !state.dev,
-			concatenateModules: !state.dev,
+			mangleExports: "deterministic",
+			flagIncludedChunks: true,
+			innerGraph: true,
+			removeAvailableModules: true,
+			concatenateModules: true,
+			mergeDuplicateChunks: true,
+			removeEmptyChunks: true,
+			realContentHash: true,
 
 			splitChunks: {
+				chunks: "all",
+				minSize: 0,
+
 				cacheGroups: {
 					// This causes the shared modules to be put into index.js
-					index: {
+					"index": {
 						name: "index",
 						chunks: "initial",
 						minChunks: 2,
+						enforce: true,
+						priority: 1,
 					},
+
+					// This disables Webpack's default behavior, which causes problems
+					defaultVendors: false,
+					default: false,
 				},
 			},
 		},
@@ -269,6 +286,11 @@ module.exports = async (state) => {
 				type: "window"
 			},
 		},
+
+		plugins: [
+			new CheckDuplicates(),
+			new $webpack.NormalModuleReplacementPlugin(/^\.\/Classes$/, "./Classes-script"),
+		],
 
 		module: {
 			rules: [

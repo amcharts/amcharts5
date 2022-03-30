@@ -12,6 +12,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - New map: `latvia2021*` (updated in 2021 region map for Latvia).
 - New map: Taiwan.
 - New map: `spainProvinces2*` (same as `spainProvinces*` except with overseas territories moved close to mainland).
+- New map: `franceDepartments2*` (mainland + overseas departments).
 
 ### Fixed
 - Fixed area IDs in map of Slovenia.

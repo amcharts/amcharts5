@@ -389,6 +389,15 @@ export class XYChart extends SerialChart {
 		if (yAxis) {
 			$array.remove(yAxis.series, series);
 		}
+
+		const cursor = this.get("cursor");
+		if(cursor){
+			const snapToSeries = cursor.get("snapToSeries");
+			if(snapToSeries){
+				$array.remove(snapToSeries, series);
+			}
+		}
+
 		super._removeSeries(series);
 	}
 

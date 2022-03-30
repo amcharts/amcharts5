@@ -3,6 +3,7 @@ export { Theme } from "./.internal/core/Theme";
 export { addLicense, registry, disposeAllRootElements } from "./.internal/core/Registry";
 export { ready } from "./.internal/core/util/Utils";
 export { Modal, IModalSettings } from "./.internal/core/util/Modal";
+export { Entity, IEntitySettings } from "./.internal/core/util/Entity";
 
 export { Bullet, IBulletSettings } from "./.internal/core/render/Bullet";
 export { Button, IButtonSettings } from "./.internal/core/render/Button";
@@ -30,6 +31,9 @@ export { Scrollbar, IScrollbarSettings } from "./.internal/core/render/Scrollbar
 export { Slider, ISliderSettings } from "./.internal/core/render/Slider";
 export { Slice, ISliceSettings } from "./.internal/core/render/Slice";
 export { Sprite, ISpriteSettings } from "./.internal/core/render/Sprite";
+export { Series, ISeriesSettings } from "./.internal/core/render/Series";
+export { Chart, IChartSettings } from "./.internal/core/render/Chart";
+export { SerialChart, ISerialChartSettings } from "./.internal/core/render/SerialChart";
 export { Text, ITextSettings } from "./.internal/core/render/Text";
 export { Tick, ITickSettings } from "./.internal/core/render/Tick";
 export { Tooltip, ITooltipSettings } from "./.internal/core/render/Tooltip";

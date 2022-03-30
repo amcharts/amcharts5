@@ -215,6 +215,7 @@ export interface ITextStyle {
 	//wordWrapWidth: number = 100;
 	fill?: Color | IGradient | IPattern;
 	textAlign?: "start" | "end" | "left" | "right" | "center";
+	verticalAlign?: "baseline" | "sub" | "super";
 	fontFamily?: string;
 	fontSize?: string | number;
 	fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
@@ -226,6 +227,7 @@ export interface ITextStyle {
 	shadowOffsetX?: number;
 	shadowOffsetY?: number;
 	shadowOpacity?: number;
+
 
 	// leading?: number;
 	// letterSpacing?: number;

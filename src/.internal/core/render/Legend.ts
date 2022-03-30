@@ -418,6 +418,15 @@ export class Legend extends Series {
 	 */
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 
+		const dataContext = dataItem.dataContext as any;
+		if(dataContext && dataContext.get){
+			const di = dataContext.get("legendDataItem");
+			if(di == dataItem){
+				dataContext.set("legendDataItem", undefined);
+			}
+		}
+
+
 		let itemContainer = dataItem.get("itemContainer");
 		if (itemContainer) {
 			this.itemContainers.removeValue(itemContainer);

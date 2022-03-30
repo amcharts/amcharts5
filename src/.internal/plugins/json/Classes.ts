@@ -3,404 +3,404 @@
  * DO NOT MANUALLY EDIT IT OR YOUR CHANGES WILL BE LOST!
  */
 
-import { Annotator } from "./../exporting/Annotator";
-import { Axis } from "./../../charts/xy/axes/Axis";
-import { AxisBullet } from "./../../charts/xy/axes/AxisBullet";
-import { AxisLabel } from "./../../charts/xy/axes/AxisLabel";
-import { AxisLabelRadial } from "./../../charts/xy/axes/AxisLabelRadial";
-import { AxisRenderer } from "./../../charts/xy/axes/AxisRenderer";
-import { AxisRendererCircular } from "./../../charts/radar/AxisRendererCircular";
-import { AxisRendererRadial } from "./../../charts/radar/AxisRendererRadial";
-import { AxisRendererX } from "./../../charts/xy/axes/AxisRendererX";
-import { AxisRendererY } from "./../../charts/xy/axes/AxisRendererY";
-import { AxisTick } from "./../../charts/xy/axes/AxisTick";
-import { BaseColumnSeries } from "./../../charts/xy/series/BaseColumnSeries";
-import { BreadcrumbBar } from "./../../charts/hierarchy/BreadcrumbBar";
-import { Bullet } from "./../../core/render/Bullet";
-import { Button } from "./../../core/render/Button";
-import { Candlestick } from "./../../charts/xy/series/Candlestick";
-import { CandlestickSeries } from "./../../charts/xy/series/CandlestickSeries";
-import { CategoryAxis } from "./../../charts/xy/axes/CategoryAxis";
-import { CategoryDateAxis } from "./../../charts/xy/axes/CategoryDateAxis";
-import { Chart } from "./../../core/render/Chart";
-import { Chord } from "./../../charts/flow/Chord";
-import { ChordDirected } from "./../../charts/flow/ChordDirected";
-import { ChordLink } from "./../../charts/flow/ChordLink";
-import { ChordLinkDirected } from "./../../charts/flow/ChordLinkDirected";
-import { ChordNodes } from "./../../charts/flow/ChordNodes";
-import { ChordNonRibbon } from "./../../charts/flow/ChordNonRibbon";
-import { Circle } from "./../../core/render/Circle";
-import { CirclePattern } from "./../../core/render/patterns/CirclePattern";
-import { ClockHand } from "./../../charts/radar/ClockHand";
-import { ColorSet } from "./../../core/util/ColorSet";
-import { ColumnSeries } from "./../../charts/xy/series/ColumnSeries";
-import { Component } from "./../../core/render/Component";
-import { Container } from "./../../core/render/Container";
-import { DateAxis } from "./../../charts/xy/axes/DateAxis";
-import { DurationAxis } from "./../../charts/xy/axes/DurationAxis";
-import { Ellipse } from "./../../core/render/Ellipse";
-import { Entity } from "./../../core/util/Entity";
-import { Exporting } from "./../exporting/Exporting";
-import { ExportingMenu } from "./../exporting/ExportingMenu";
-import { Flow } from "./../../charts/flow/Flow";
-import { FlowLink } from "./../../charts/flow/FlowLink";
-import { FlowNode } from "./../../charts/flow/FlowNode";
-import { FlowNodes } from "./../../charts/flow/FlowNodes";
-import { ForceDirected } from "./../../charts/hierarchy/ForceDirected";
-import { FunnelSeries } from "./../../charts/funnel/FunnelSeries";
-import { FunnelSlice } from "./../../charts/funnel/FunnelSlice";
-import { GaplessDateAxis } from "./../../charts/xy/axes/GaplessDateAxis";
-import { Gradient } from "./../../core/render/gradients/Gradient";
-import { Graphics } from "./../../core/render/Graphics";
-import { GraticuleSeries } from "./../../charts/map/GraticuleSeries";
-import { Grid } from "./../../charts/xy/axes/Grid";
-import { GridLayout } from "./../../core/render/GridLayout";
-import { HeatLegend } from "./../../core/render/HeatLegend";
-import { Hierarchy } from "./../../charts/hierarchy/Hierarchy";
-import { HierarchyLink } from "./../../charts/hierarchy/HierarchyLink";
-import { HierarchyNode } from "./../../charts/hierarchy/HierarchyNode";
-import { HorizontalLayout } from "./../../core/render/HorizontalLayout";
-import { InterfaceColors } from "./../../core/util/InterfaceColors";
-import { Label } from "./../../core/render/Label";
-import { Layout } from "./../../core/render/Layout";
-import { Legend } from "./../../core/render/Legend";
-import { Line } from "./../../core/render/Line";
-import { LinePattern } from "./../../core/render/patterns/LinePattern";
-import { LineSeries } from "./../../charts/xy/series/LineSeries";
-import { LinearGradient } from "./../../core/render/gradients/LinearGradient";
-import { LinkedHierarchy } from "./../../charts/hierarchy/LinkedHierarchy";
-import { LinkedHierarchyNode } from "./../../charts/hierarchy/LinkedHierarchyNode";
-import { MapChart } from "./../../charts/map/MapChart";
-import { MapLine } from "./../../charts/map/MapLine";
-import { MapLineSeries } from "./../../charts/map/MapLineSeries";
-import { MapPointSeries } from "./../../charts/map/MapPointSeries";
-import { MapPolygon } from "./../../charts/map/MapPolygon";
-import { MapPolygonSeries } from "./../../charts/map/MapPolygonSeries";
-import { MapSeries } from "./../../charts/map/MapSeries";
-import { Modal } from "./../../core/util/Modal";
-import { OHLC } from "./../../charts/xy/series/OHLC";
-import { OHLCSeries } from "./../../charts/xy/series/OHLCSeries";
-import { Pack } from "./../../charts/hierarchy/Pack";
-import { Partition } from "./../../charts/hierarchy/Partition";
-import { Pattern } from "./../../core/render/patterns/Pattern";
-import { PercentChart } from "./../../charts/percent/PercentChart";
-import { PercentSeries } from "./../../charts/percent/PercentSeries";
-import { PictorialStackedSeries } from "./../../charts/funnel/PictorialStackedSeries";
-import { Picture } from "./../../core/render/Picture";
-import { PieChart } from "./../../charts/pie/PieChart";
-import { PieSeries } from "./../../charts/pie/PieSeries";
-import { PointedRectangle } from "./../../core/render/PointedRectangle";
-import { PyramidSeries } from "./../../charts/funnel/PyramidSeries";
-import { RadarChart } from "./../../charts/radar/RadarChart";
-import { RadarColumnSeries } from "./../../charts/radar/RadarColumnSeries";
-import { RadarCursor } from "./../../charts/radar/RadarCursor";
-import { RadarLineSeries } from "./../../charts/radar/RadarLineSeries";
-import { RadialGradient } from "./../../core/render/gradients/RadialGradient";
-import { RadialLabel } from "./../../core/render/RadialLabel";
-import { RadialText } from "./../../core/render/RadialText";
-import { Rectangle } from "./../../core/render/Rectangle";
-import { RectanglePattern } from "./../../core/render/patterns/RectanglePattern";
-import { RoundedRectangle } from "./../../core/render/RoundedRectangle";
-import { Sankey } from "./../../charts/flow/Sankey";
-import { SankeyLink } from "./../../charts/flow/SankeyLink";
-import { SankeyNodes } from "./../../charts/flow/SankeyNodes";
-import { Scrollbar } from "./../../core/render/Scrollbar";
-import { SerialChart } from "./../../core/render/SerialChart";
-import { Series } from "./../../core/render/Series";
-import { Slice } from "./../../core/render/Slice";
-import { SliceGrouper } from "./../sliceGrouper/SliceGrouper";
-import { SlicedChart } from "./../../charts/funnel/SlicedChart";
-import { Slider } from "./../../core/render/Slider";
-import { SmoothedRadarLineSeries } from "./../../charts/radar/SmoothedRadarLineSeries";
-import { SmoothedXLineSeries } from "./../../charts/xy/series/SmoothedXLineSeries";
-import { SmoothedXYLineSeries } from "./../../charts/xy/series/SmoothedXYLineSeries";
-import { SmoothedYLineSeries } from "./../../charts/xy/series/SmoothedYLineSeries";
-import { Sprite } from "./../../core/render/Sprite";
-import { Star } from "./../../core/render/Star";
-import { StepLineSeries } from "./../../charts/xy/series/StepLineSeries";
-import { Sunburst } from "./../../charts/hierarchy/Sunburst";
-import { Text } from "./../../core/render/Text";
-import { Tick } from "./../../core/render/Tick";
-import { Tooltip } from "./../../core/render/Tooltip";
-import { Tree } from "./../../charts/hierarchy/Tree";
-import { Treemap } from "./../../charts/hierarchy/Treemap";
-import { Triangle } from "./../../core/render/Triangle";
-import { ValueAxis } from "./../../charts/xy/axes/ValueAxis";
-import { Venn } from "./../../charts/venn/Venn";
-import { VerticalLayout } from "./../../core/render/VerticalLayout";
-import { WordCloud } from "./../../charts/wordcloud/WordCloud";
-import { XYChart } from "./../../charts/xy/XYChart";
-import { XYChartScrollbar } from "./../../charts/xy/XYChartScrollbar";
-import { XYCursor } from "./../../charts/xy/XYCursor";
-import { XYSeries } from "./../../charts/xy/series/XYSeries";
-import { ZoomControl } from "./../../charts/map/ZoomControl";
+import type { Annotator } from "./../../../plugins/exporting";
+import type { Axis } from "./../../../xy";
+import type { AxisBullet } from "./../../../xy";
+import type { AxisLabel } from "./../../../xy";
+import type { AxisLabelRadial } from "./../../../xy";
+import type { AxisRenderer } from "./../../../xy";
+import type { AxisRendererCircular } from "./../../../radar";
+import type { AxisRendererRadial } from "./../../../radar";
+import type { AxisRendererX } from "./../../../xy";
+import type { AxisRendererY } from "./../../../xy";
+import type { AxisTick } from "./../../../xy";
+import type { BaseColumnSeries } from "./../../../xy";
+import type { BreadcrumbBar } from "./../../../hierarchy";
+import type { Bullet } from "./../../../index";
+import type { Button } from "./../../../index";
+import type { Candlestick } from "./../../../xy";
+import type { CandlestickSeries } from "./../../../xy";
+import type { CategoryAxis } from "./../../../xy";
+import type { CategoryDateAxis } from "./../../../xy";
+import type { Chart } from "./../../../index";
+import type { Chord } from "./../../../flow";
+import type { ChordDirected } from "./../../../flow";
+import type { ChordLink } from "./../../../flow";
+import type { ChordLinkDirected } from "./../../../flow";
+import type { ChordNodes } from "./../../../flow";
+import type { ChordNonRibbon } from "./../../../flow";
+import type { Circle } from "./../../../index";
+import type { CirclePattern } from "./../../../index";
+import type { ClockHand } from "./../../../radar";
+import type { ColorSet } from "./../../../index";
+import type { ColumnSeries } from "./../../../xy";
+import type { Component } from "./../../../index";
+import type { Container } from "./../../../index";
+import type { DateAxis } from "./../../../xy";
+import type { DurationAxis } from "./../../../xy";
+import type { Ellipse } from "./../../../index";
+import type { Entity } from "./../../../index";
+import type { Exporting } from "./../../../plugins/exporting";
+import type { ExportingMenu } from "./../../../plugins/exporting";
+import type { Flow } from "./../../../flow";
+import type { FlowLink } from "./../../../flow";
+import type { FlowNode } from "./../../../flow";
+import type { FlowNodes } from "./../../../flow";
+import type { ForceDirected } from "./../../../hierarchy";
+import type { FunnelSeries } from "./../../../percent";
+import type { FunnelSlice } from "./../../../percent";
+import type { GaplessDateAxis } from "./../../../xy";
+import type { Gradient } from "./../../../index";
+import type { Graphics } from "./../../../index";
+import type { GraticuleSeries } from "./../../../map";
+import type { Grid } from "./../../../xy";
+import type { GridLayout } from "./../../../index";
+import type { HeatLegend } from "./../../../index";
+import type { Hierarchy } from "./../../../hierarchy";
+import type { HierarchyLink } from "./../../../hierarchy";
+import type { HierarchyNode } from "./../../../hierarchy";
+import type { HorizontalLayout } from "./../../../index";
+import type { InterfaceColors } from "./../../../index";
+import type { Label } from "./../../../index";
+import type { Layout } from "./../../../index";
+import type { Legend } from "./../../../index";
+import type { Line } from "./../../../index";
+import type { LinePattern } from "./../../../index";
+import type { LineSeries } from "./../../../xy";
+import type { LinearGradient } from "./../../../index";
+import type { LinkedHierarchy } from "./../../../hierarchy";
+import type { LinkedHierarchyNode } from "./../../../hierarchy";
+import type { MapChart } from "./../../../map";
+import type { MapLine } from "./../../../map";
+import type { MapLineSeries } from "./../../../map";
+import type { MapPointSeries } from "./../../../map";
+import type { MapPolygon } from "./../../../map";
+import type { MapPolygonSeries } from "./../../../map";
+import type { MapSeries } from "./../../../map";
+import type { Modal } from "./../../../index";
+import type { OHLC } from "./../../../xy";
+import type { OHLCSeries } from "./../../../xy";
+import type { Pack } from "./../../../hierarchy";
+import type { Partition } from "./../../../hierarchy";
+import type { Pattern } from "./../../../index";
+import type { PercentChart } from "./../../../percent";
+import type { PercentSeries } from "./../../../percent";
+import type { PictorialStackedSeries } from "./../../../percent";
+import type { Picture } from "./../../../index";
+import type { PieChart } from "./../../../percent";
+import type { PieSeries } from "./../../../percent";
+import type { PointedRectangle } from "./../../../index";
+import type { PyramidSeries } from "./../../../percent";
+import type { RadarChart } from "./../../../radar";
+import type { RadarColumnSeries } from "./../../../radar";
+import type { RadarCursor } from "./../../../radar";
+import type { RadarLineSeries } from "./../../../radar";
+import type { RadialGradient } from "./../../../index";
+import type { RadialLabel } from "./../../../index";
+import type { RadialText } from "./../../../index";
+import type { Rectangle } from "./../../../index";
+import type { RectanglePattern } from "./../../../index";
+import type { RoundedRectangle } from "./../../../index";
+import type { Sankey } from "./../../../flow";
+import type { SankeyLink } from "./../../../flow";
+import type { SankeyNodes } from "./../../../flow";
+import type { Scrollbar } from "./../../../index";
+import type { SerialChart } from "./../../../index";
+import type { Series } from "./../../../index";
+import type { Slice } from "./../../../index";
+import type { SliceGrouper } from "./../../../plugins/sliceGrouper";
+import type { SlicedChart } from "./../../../percent";
+import type { Slider } from "./../../../index";
+import type { SmoothedRadarLineSeries } from "./../../../radar";
+import type { SmoothedXLineSeries } from "./../../../xy";
+import type { SmoothedXYLineSeries } from "./../../../xy";
+import type { SmoothedYLineSeries } from "./../../../xy";
+import type { Sprite } from "./../../../index";
+import type { Star } from "./../../../index";
+import type { StepLineSeries } from "./../../../xy";
+import type { Sunburst } from "./../../../hierarchy";
+import type { Text } from "./../../../index";
+import type { Tick } from "./../../../index";
+import type { Tooltip } from "./../../../index";
+import type { Tree } from "./../../../hierarchy";
+import type { Treemap } from "./../../../hierarchy";
+import type { Triangle } from "./../../../index";
+import type { ValueAxis } from "./../../../xy";
+import type { Venn } from "./../../../venn";
+import type { VerticalLayout } from "./../../../index";
+import type { WordCloud } from "./../../../wc";
+import type { XYChart } from "./../../../xy";
+import type { XYChartScrollbar } from "./../../../xy";
+import type { XYCursor } from "./../../../xy";
+import type { XYSeries } from "./../../../xy";
+import type { ZoomControl } from "./../../../map";
 
 export interface IClasses {
-	"Annotator": typeof Annotator;
-	"Axis": typeof Axis;
-	"AxisBullet": typeof AxisBullet;
-	"AxisLabel": typeof AxisLabel;
-	"AxisLabelRadial": typeof AxisLabelRadial;
-	"AxisRenderer": typeof AxisRenderer;
-	"AxisRendererCircular": typeof AxisRendererCircular;
-	"AxisRendererRadial": typeof AxisRendererRadial;
-	"AxisRendererX": typeof AxisRendererX;
-	"AxisRendererY": typeof AxisRendererY;
-	"AxisTick": typeof AxisTick;
-	"BaseColumnSeries": typeof BaseColumnSeries;
-	"BreadcrumbBar": typeof BreadcrumbBar;
-	"Bullet": typeof Bullet;
-	"Button": typeof Button;
-	"Candlestick": typeof Candlestick;
-	"CandlestickSeries": typeof CandlestickSeries;
-	"CategoryAxis": typeof CategoryAxis;
-	"CategoryDateAxis": typeof CategoryDateAxis;
-	"Chart": typeof Chart;
-	"Chord": typeof Chord;
-	"ChordDirected": typeof ChordDirected;
-	"ChordLink": typeof ChordLink;
-	"ChordLinkDirected": typeof ChordLinkDirected;
-	"ChordNodes": typeof ChordNodes;
-	"ChordNonRibbon": typeof ChordNonRibbon;
-	"Circle": typeof Circle;
-	"CirclePattern": typeof CirclePattern;
-	"ClockHand": typeof ClockHand;
-	"ColorSet": typeof ColorSet;
-	"ColumnSeries": typeof ColumnSeries;
-	"Component": typeof Component;
-	"Container": typeof Container;
-	"DateAxis": typeof DateAxis;
-	"DurationAxis": typeof DurationAxis;
-	"Ellipse": typeof Ellipse;
-	"Entity": typeof Entity;
-	"Exporting": typeof Exporting;
-	"ExportingMenu": typeof ExportingMenu;
-	"Flow": typeof Flow;
-	"FlowLink": typeof FlowLink;
-	"FlowNode": typeof FlowNode;
-	"FlowNodes": typeof FlowNodes;
-	"ForceDirected": typeof ForceDirected;
-	"FunnelSeries": typeof FunnelSeries;
-	"FunnelSlice": typeof FunnelSlice;
-	"GaplessDateAxis": typeof GaplessDateAxis;
-	"Gradient": typeof Gradient;
-	"Graphics": typeof Graphics;
-	"GraticuleSeries": typeof GraticuleSeries;
-	"Grid": typeof Grid;
-	"GridLayout": typeof GridLayout;
-	"HeatLegend": typeof HeatLegend;
-	"Hierarchy": typeof Hierarchy;
-	"HierarchyLink": typeof HierarchyLink;
-	"HierarchyNode": typeof HierarchyNode;
-	"HorizontalLayout": typeof HorizontalLayout;
-	"InterfaceColors": typeof InterfaceColors;
-	"Label": typeof Label;
-	"Layout": typeof Layout;
-	"Legend": typeof Legend;
-	"Line": typeof Line;
-	"LinePattern": typeof LinePattern;
-	"LineSeries": typeof LineSeries;
-	"LinearGradient": typeof LinearGradient;
-	"LinkedHierarchy": typeof LinkedHierarchy;
-	"LinkedHierarchyNode": typeof LinkedHierarchyNode;
-	"MapChart": typeof MapChart;
-	"MapLine": typeof MapLine;
-	"MapLineSeries": typeof MapLineSeries;
-	"MapPointSeries": typeof MapPointSeries;
-	"MapPolygon": typeof MapPolygon;
-	"MapPolygonSeries": typeof MapPolygonSeries;
-	"MapSeries": typeof MapSeries;
-	"Modal": typeof Modal;
-	"OHLC": typeof OHLC;
-	"OHLCSeries": typeof OHLCSeries;
-	"Pack": typeof Pack;
-	"Partition": typeof Partition;
-	"Pattern": typeof Pattern;
-	"PercentChart": typeof PercentChart;
-	"PercentSeries": typeof PercentSeries;
-	"PictorialStackedSeries": typeof PictorialStackedSeries;
-	"Picture": typeof Picture;
-	"PieChart": typeof PieChart;
-	"PieSeries": typeof PieSeries;
-	"PointedRectangle": typeof PointedRectangle;
-	"PyramidSeries": typeof PyramidSeries;
-	"RadarChart": typeof RadarChart;
-	"RadarColumnSeries": typeof RadarColumnSeries;
-	"RadarCursor": typeof RadarCursor;
-	"RadarLineSeries": typeof RadarLineSeries;
-	"RadialGradient": typeof RadialGradient;
-	"RadialLabel": typeof RadialLabel;
-	"RadialText": typeof RadialText;
-	"Rectangle": typeof Rectangle;
-	"RectanglePattern": typeof RectanglePattern;
-	"RoundedRectangle": typeof RoundedRectangle;
-	"Sankey": typeof Sankey;
-	"SankeyLink": typeof SankeyLink;
-	"SankeyNodes": typeof SankeyNodes;
-	"Scrollbar": typeof Scrollbar;
-	"SerialChart": typeof SerialChart;
-	"Series": typeof Series;
-	"Slice": typeof Slice;
-	"SliceGrouper": typeof SliceGrouper;
-	"SlicedChart": typeof SlicedChart;
-	"Slider": typeof Slider;
-	"SmoothedRadarLineSeries": typeof SmoothedRadarLineSeries;
-	"SmoothedXLineSeries": typeof SmoothedXLineSeries;
-	"SmoothedXYLineSeries": typeof SmoothedXYLineSeries;
-	"SmoothedYLineSeries": typeof SmoothedYLineSeries;
-	"Sprite": typeof Sprite;
-	"Star": typeof Star;
-	"StepLineSeries": typeof StepLineSeries;
-	"Sunburst": typeof Sunburst;
-	"Text": typeof Text;
-	"Tick": typeof Tick;
-	"Tooltip": typeof Tooltip;
-	"Tree": typeof Tree;
-	"Treemap": typeof Treemap;
-	"Triangle": typeof Triangle;
-	"ValueAxis": typeof ValueAxis;
-	"Venn": typeof Venn;
-	"VerticalLayout": typeof VerticalLayout;
-	"WordCloud": typeof WordCloud;
-	"XYChart": typeof XYChart;
-	"XYChartScrollbar": typeof XYChartScrollbar;
-	"XYCursor": typeof XYCursor;
-	"XYSeries": typeof XYSeries;
-	"ZoomControl": typeof ZoomControl;
+	"Annotator": () => Promise<typeof Annotator>;
+	"Axis": () => Promise<typeof Axis>;
+	"AxisBullet": () => Promise<typeof AxisBullet>;
+	"AxisLabel": () => Promise<typeof AxisLabel>;
+	"AxisLabelRadial": () => Promise<typeof AxisLabelRadial>;
+	"AxisRenderer": () => Promise<typeof AxisRenderer>;
+	"AxisRendererCircular": () => Promise<typeof AxisRendererCircular>;
+	"AxisRendererRadial": () => Promise<typeof AxisRendererRadial>;
+	"AxisRendererX": () => Promise<typeof AxisRendererX>;
+	"AxisRendererY": () => Promise<typeof AxisRendererY>;
+	"AxisTick": () => Promise<typeof AxisTick>;
+	"BaseColumnSeries": () => Promise<typeof BaseColumnSeries>;
+	"BreadcrumbBar": () => Promise<typeof BreadcrumbBar>;
+	"Bullet": () => Promise<typeof Bullet>;
+	"Button": () => Promise<typeof Button>;
+	"Candlestick": () => Promise<typeof Candlestick>;
+	"CandlestickSeries": () => Promise<typeof CandlestickSeries>;
+	"CategoryAxis": () => Promise<typeof CategoryAxis>;
+	"CategoryDateAxis": () => Promise<typeof CategoryDateAxis>;
+	"Chart": () => Promise<typeof Chart>;
+	"Chord": () => Promise<typeof Chord>;
+	"ChordDirected": () => Promise<typeof ChordDirected>;
+	"ChordLink": () => Promise<typeof ChordLink>;
+	"ChordLinkDirected": () => Promise<typeof ChordLinkDirected>;
+	"ChordNodes": () => Promise<typeof ChordNodes>;
+	"ChordNonRibbon": () => Promise<typeof ChordNonRibbon>;
+	"Circle": () => Promise<typeof Circle>;
+	"CirclePattern": () => Promise<typeof CirclePattern>;
+	"ClockHand": () => Promise<typeof ClockHand>;
+	"ColorSet": () => Promise<typeof ColorSet>;
+	"ColumnSeries": () => Promise<typeof ColumnSeries>;
+	"Component": () => Promise<typeof Component>;
+	"Container": () => Promise<typeof Container>;
+	"DateAxis": () => Promise<typeof DateAxis>;
+	"DurationAxis": () => Promise<typeof DurationAxis>;
+	"Ellipse": () => Promise<typeof Ellipse>;
+	"Entity": () => Promise<typeof Entity>;
+	"Exporting": () => Promise<typeof Exporting>;
+	"ExportingMenu": () => Promise<typeof ExportingMenu>;
+	"Flow": () => Promise<typeof Flow>;
+	"FlowLink": () => Promise<typeof FlowLink>;
+	"FlowNode": () => Promise<typeof FlowNode>;
+	"FlowNodes": () => Promise<typeof FlowNodes>;
+	"ForceDirected": () => Promise<typeof ForceDirected>;
+	"FunnelSeries": () => Promise<typeof FunnelSeries>;
+	"FunnelSlice": () => Promise<typeof FunnelSlice>;
+	"GaplessDateAxis": () => Promise<typeof GaplessDateAxis>;
+	"Gradient": () => Promise<typeof Gradient>;
+	"Graphics": () => Promise<typeof Graphics>;
+	"GraticuleSeries": () => Promise<typeof GraticuleSeries>;
+	"Grid": () => Promise<typeof Grid>;
+	"GridLayout": () => Promise<typeof GridLayout>;
+	"HeatLegend": () => Promise<typeof HeatLegend>;
+	"Hierarchy": () => Promise<typeof Hierarchy>;
+	"HierarchyLink": () => Promise<typeof HierarchyLink>;
+	"HierarchyNode": () => Promise<typeof HierarchyNode>;
+	"HorizontalLayout": () => Promise<typeof HorizontalLayout>;
+	"InterfaceColors": () => Promise<typeof InterfaceColors>;
+	"Label": () => Promise<typeof Label>;
+	"Layout": () => Promise<typeof Layout>;
+	"Legend": () => Promise<typeof Legend>;
+	"Line": () => Promise<typeof Line>;
+	"LinePattern": () => Promise<typeof LinePattern>;
+	"LineSeries": () => Promise<typeof LineSeries>;
+	"LinearGradient": () => Promise<typeof LinearGradient>;
+	"LinkedHierarchy": () => Promise<typeof LinkedHierarchy>;
+	"LinkedHierarchyNode": () => Promise<typeof LinkedHierarchyNode>;
+	"MapChart": () => Promise<typeof MapChart>;
+	"MapLine": () => Promise<typeof MapLine>;
+	"MapLineSeries": () => Promise<typeof MapLineSeries>;
+	"MapPointSeries": () => Promise<typeof MapPointSeries>;
+	"MapPolygon": () => Promise<typeof MapPolygon>;
+	"MapPolygonSeries": () => Promise<typeof MapPolygonSeries>;
+	"MapSeries": () => Promise<typeof MapSeries>;
+	"Modal": () => Promise<typeof Modal>;
+	"OHLC": () => Promise<typeof OHLC>;
+	"OHLCSeries": () => Promise<typeof OHLCSeries>;
+	"Pack": () => Promise<typeof Pack>;
+	"Partition": () => Promise<typeof Partition>;
+	"Pattern": () => Promise<typeof Pattern>;
+	"PercentChart": () => Promise<typeof PercentChart>;
+	"PercentSeries": () => Promise<typeof PercentSeries>;
+	"PictorialStackedSeries": () => Promise<typeof PictorialStackedSeries>;
+	"Picture": () => Promise<typeof Picture>;
+	"PieChart": () => Promise<typeof PieChart>;
+	"PieSeries": () => Promise<typeof PieSeries>;
+	"PointedRectangle": () => Promise<typeof PointedRectangle>;
+	"PyramidSeries": () => Promise<typeof PyramidSeries>;
+	"RadarChart": () => Promise<typeof RadarChart>;
+	"RadarColumnSeries": () => Promise<typeof RadarColumnSeries>;
+	"RadarCursor": () => Promise<typeof RadarCursor>;
+	"RadarLineSeries": () => Promise<typeof RadarLineSeries>;
+	"RadialGradient": () => Promise<typeof RadialGradient>;
+	"RadialLabel": () => Promise<typeof RadialLabel>;
+	"RadialText": () => Promise<typeof RadialText>;
+	"Rectangle": () => Promise<typeof Rectangle>;
+	"RectanglePattern": () => Promise<typeof RectanglePattern>;
+	"RoundedRectangle": () => Promise<typeof RoundedRectangle>;
+	"Sankey": () => Promise<typeof Sankey>;
+	"SankeyLink": () => Promise<typeof SankeyLink>;
+	"SankeyNodes": () => Promise<typeof SankeyNodes>;
+	"Scrollbar": () => Promise<typeof Scrollbar>;
+	"SerialChart": () => Promise<typeof SerialChart>;
+	"Series": () => Promise<typeof Series>;
+	"Slice": () => Promise<typeof Slice>;
+	"SliceGrouper": () => Promise<typeof SliceGrouper>;
+	"SlicedChart": () => Promise<typeof SlicedChart>;
+	"Slider": () => Promise<typeof Slider>;
+	"SmoothedRadarLineSeries": () => Promise<typeof SmoothedRadarLineSeries>;
+	"SmoothedXLineSeries": () => Promise<typeof SmoothedXLineSeries>;
+	"SmoothedXYLineSeries": () => Promise<typeof SmoothedXYLineSeries>;
+	"SmoothedYLineSeries": () => Promise<typeof SmoothedYLineSeries>;
+	"Sprite": () => Promise<typeof Sprite>;
+	"Star": () => Promise<typeof Star>;
+	"StepLineSeries": () => Promise<typeof StepLineSeries>;
+	"Sunburst": () => Promise<typeof Sunburst>;
+	"Text": () => Promise<typeof Text>;
+	"Tick": () => Promise<typeof Tick>;
+	"Tooltip": () => Promise<typeof Tooltip>;
+	"Tree": () => Promise<typeof Tree>;
+	"Treemap": () => Promise<typeof Treemap>;
+	"Triangle": () => Promise<typeof Triangle>;
+	"ValueAxis": () => Promise<typeof ValueAxis>;
+	"Venn": () => Promise<typeof Venn>;
+	"VerticalLayout": () => Promise<typeof VerticalLayout>;
+	"WordCloud": () => Promise<typeof WordCloud>;
+	"XYChart": () => Promise<typeof XYChart>;
+	"XYChartScrollbar": () => Promise<typeof XYChartScrollbar>;
+	"XYCursor": () => Promise<typeof XYCursor>;
+	"XYSeries": () => Promise<typeof XYSeries>;
+	"ZoomControl": () => Promise<typeof ZoomControl>;
 }
 
 const classes: IClasses = {
-	"Annotator": Annotator,
-	"Axis": Axis,
-	"AxisBullet": AxisBullet,
-	"AxisLabel": AxisLabel,
-	"AxisLabelRadial": AxisLabelRadial,
-	"AxisRenderer": AxisRenderer,
-	"AxisRendererCircular": AxisRendererCircular,
-	"AxisRendererRadial": AxisRendererRadial,
-	"AxisRendererX": AxisRendererX,
-	"AxisRendererY": AxisRendererY,
-	"AxisTick": AxisTick,
-	"BaseColumnSeries": BaseColumnSeries,
-	"BreadcrumbBar": BreadcrumbBar,
-	"Bullet": Bullet,
-	"Button": Button,
-	"Candlestick": Candlestick,
-	"CandlestickSeries": CandlestickSeries,
-	"CategoryAxis": CategoryAxis,
-	"CategoryDateAxis": CategoryDateAxis,
-	"Chart": Chart,
-	"Chord": Chord,
-	"ChordDirected": ChordDirected,
-	"ChordLink": ChordLink,
-	"ChordLinkDirected": ChordLinkDirected,
-	"ChordNodes": ChordNodes,
-	"ChordNonRibbon": ChordNonRibbon,
-	"Circle": Circle,
-	"CirclePattern": CirclePattern,
-	"ClockHand": ClockHand,
-	"ColorSet": ColorSet,
-	"ColumnSeries": ColumnSeries,
-	"Component": Component,
-	"Container": Container,
-	"DateAxis": DateAxis,
-	"DurationAxis": DurationAxis,
-	"Ellipse": Ellipse,
-	"Entity": Entity,
-	"Exporting": Exporting,
-	"ExportingMenu": ExportingMenu,
-	"Flow": Flow,
-	"FlowLink": FlowLink,
-	"FlowNode": FlowNode,
-	"FlowNodes": FlowNodes,
-	"ForceDirected": ForceDirected,
-	"FunnelSeries": FunnelSeries,
-	"FunnelSlice": FunnelSlice,
-	"GaplessDateAxis": GaplessDateAxis,
-	"Gradient": Gradient,
-	"Graphics": Graphics,
-	"GraticuleSeries": GraticuleSeries,
-	"Grid": Grid,
-	"GridLayout": GridLayout,
-	"HeatLegend": HeatLegend,
-	"Hierarchy": Hierarchy,
-	"HierarchyLink": HierarchyLink,
-	"HierarchyNode": HierarchyNode,
-	"HorizontalLayout": HorizontalLayout,
-	"InterfaceColors": InterfaceColors,
-	"Label": Label,
-	"Layout": Layout,
-	"Legend": Legend,
-	"Line": Line,
-	"LinePattern": LinePattern,
-	"LineSeries": LineSeries,
-	"LinearGradient": LinearGradient,
-	"LinkedHierarchy": LinkedHierarchy,
-	"LinkedHierarchyNode": LinkedHierarchyNode,
-	"MapChart": MapChart,
-	"MapLine": MapLine,
-	"MapLineSeries": MapLineSeries,
-	"MapPointSeries": MapPointSeries,
-	"MapPolygon": MapPolygon,
-	"MapPolygonSeries": MapPolygonSeries,
-	"MapSeries": MapSeries,
-	"Modal": Modal,
-	"OHLC": OHLC,
-	"OHLCSeries": OHLCSeries,
-	"Pack": Pack,
-	"Partition": Partition,
-	"Pattern": Pattern,
-	"PercentChart": PercentChart,
-	"PercentSeries": PercentSeries,
-	"PictorialStackedSeries": PictorialStackedSeries,
-	"Picture": Picture,
-	"PieChart": PieChart,
-	"PieSeries": PieSeries,
-	"PointedRectangle": PointedRectangle,
-	"PyramidSeries": PyramidSeries,
-	"RadarChart": RadarChart,
-	"RadarColumnSeries": RadarColumnSeries,
-	"RadarCursor": RadarCursor,
-	"RadarLineSeries": RadarLineSeries,
-	"RadialGradient": RadialGradient,
-	"RadialLabel": RadialLabel,
-	"RadialText": RadialText,
-	"Rectangle": Rectangle,
-	"RectanglePattern": RectanglePattern,
-	"RoundedRectangle": RoundedRectangle,
-	"Sankey": Sankey,
-	"SankeyLink": SankeyLink,
-	"SankeyNodes": SankeyNodes,
-	"Scrollbar": Scrollbar,
-	"SerialChart": SerialChart,
-	"Series": Series,
-	"Slice": Slice,
-	"SliceGrouper": SliceGrouper,
-	"SlicedChart": SlicedChart,
-	"Slider": Slider,
-	"SmoothedRadarLineSeries": SmoothedRadarLineSeries,
-	"SmoothedXLineSeries": SmoothedXLineSeries,
-	"SmoothedXYLineSeries": SmoothedXYLineSeries,
-	"SmoothedYLineSeries": SmoothedYLineSeries,
-	"Sprite": Sprite,
-	"Star": Star,
-	"StepLineSeries": StepLineSeries,
-	"Sunburst": Sunburst,
-	"Text": Text,
-	"Tick": Tick,
-	"Tooltip": Tooltip,
-	"Tree": Tree,
-	"Treemap": Treemap,
-	"Triangle": Triangle,
-	"ValueAxis": ValueAxis,
-	"Venn": Venn,
-	"VerticalLayout": VerticalLayout,
-	"WordCloud": WordCloud,
-	"XYChart": XYChart,
-	"XYChartScrollbar": XYChartScrollbar,
-	"XYCursor": XYCursor,
-	"XYSeries": XYSeries,
-	"ZoomControl": ZoomControl,
+	"Annotator": () => import(/* webpackExports: "Annotator", webpackChunkName: "json_../../../plugins/exporting" */ "./../../../plugins/exporting").then((m) => m.Annotator),
+	"Axis": () => import(/* webpackExports: "Axis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.Axis),
+	"AxisBullet": () => import(/* webpackExports: "AxisBullet", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisBullet),
+	"AxisLabel": () => import(/* webpackExports: "AxisLabel", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisLabel),
+	"AxisLabelRadial": () => import(/* webpackExports: "AxisLabelRadial", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisLabelRadial),
+	"AxisRenderer": () => import(/* webpackExports: "AxisRenderer", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisRenderer),
+	"AxisRendererCircular": () => import(/* webpackExports: "AxisRendererCircular", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.AxisRendererCircular),
+	"AxisRendererRadial": () => import(/* webpackExports: "AxisRendererRadial", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.AxisRendererRadial),
+	"AxisRendererX": () => import(/* webpackExports: "AxisRendererX", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisRendererX),
+	"AxisRendererY": () => import(/* webpackExports: "AxisRendererY", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisRendererY),
+	"AxisTick": () => import(/* webpackExports: "AxisTick", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.AxisTick),
+	"BaseColumnSeries": () => import(/* webpackExports: "BaseColumnSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.BaseColumnSeries),
+	"BreadcrumbBar": () => import(/* webpackExports: "BreadcrumbBar", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.BreadcrumbBar),
+	"Bullet": () => import(/* webpackExports: "Bullet", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Bullet),
+	"Button": () => import(/* webpackExports: "Button", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Button),
+	"Candlestick": () => import(/* webpackExports: "Candlestick", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.Candlestick),
+	"CandlestickSeries": () => import(/* webpackExports: "CandlestickSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.CandlestickSeries),
+	"CategoryAxis": () => import(/* webpackExports: "CategoryAxis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.CategoryAxis),
+	"CategoryDateAxis": () => import(/* webpackExports: "CategoryDateAxis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.CategoryDateAxis),
+	"Chart": () => import(/* webpackExports: "Chart", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Chart),
+	"Chord": () => import(/* webpackExports: "Chord", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.Chord),
+	"ChordDirected": () => import(/* webpackExports: "ChordDirected", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.ChordDirected),
+	"ChordLink": () => import(/* webpackExports: "ChordLink", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.ChordLink),
+	"ChordLinkDirected": () => import(/* webpackExports: "ChordLinkDirected", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.ChordLinkDirected),
+	"ChordNodes": () => import(/* webpackExports: "ChordNodes", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.ChordNodes),
+	"ChordNonRibbon": () => import(/* webpackExports: "ChordNonRibbon", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.ChordNonRibbon),
+	"Circle": () => import(/* webpackExports: "Circle", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Circle),
+	"CirclePattern": () => import(/* webpackExports: "CirclePattern", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.CirclePattern),
+	"ClockHand": () => import(/* webpackExports: "ClockHand", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.ClockHand),
+	"ColorSet": () => import(/* webpackExports: "ColorSet", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.ColorSet),
+	"ColumnSeries": () => import(/* webpackExports: "ColumnSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.ColumnSeries),
+	"Component": () => import(/* webpackExports: "Component", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Component),
+	"Container": () => import(/* webpackExports: "Container", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Container),
+	"DateAxis": () => import(/* webpackExports: "DateAxis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.DateAxis),
+	"DurationAxis": () => import(/* webpackExports: "DurationAxis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.DurationAxis),
+	"Ellipse": () => import(/* webpackExports: "Ellipse", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Ellipse),
+	"Entity": () => import(/* webpackExports: "Entity", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Entity),
+	"Exporting": () => import(/* webpackExports: "Exporting", webpackChunkName: "json_../../../plugins/exporting" */ "./../../../plugins/exporting").then((m) => m.Exporting),
+	"ExportingMenu": () => import(/* webpackExports: "ExportingMenu", webpackChunkName: "json_../../../plugins/exporting" */ "./../../../plugins/exporting").then((m) => m.ExportingMenu),
+	"Flow": () => import(/* webpackExports: "Flow", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.Flow),
+	"FlowLink": () => import(/* webpackExports: "FlowLink", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.FlowLink),
+	"FlowNode": () => import(/* webpackExports: "FlowNode", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.FlowNode),
+	"FlowNodes": () => import(/* webpackExports: "FlowNodes", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.FlowNodes),
+	"ForceDirected": () => import(/* webpackExports: "ForceDirected", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.ForceDirected),
+	"FunnelSeries": () => import(/* webpackExports: "FunnelSeries", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.FunnelSeries),
+	"FunnelSlice": () => import(/* webpackExports: "FunnelSlice", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.FunnelSlice),
+	"GaplessDateAxis": () => import(/* webpackExports: "GaplessDateAxis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.GaplessDateAxis),
+	"Gradient": () => import(/* webpackExports: "Gradient", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Gradient),
+	"Graphics": () => import(/* webpackExports: "Graphics", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Graphics),
+	"GraticuleSeries": () => import(/* webpackExports: "GraticuleSeries", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.GraticuleSeries),
+	"Grid": () => import(/* webpackExports: "Grid", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.Grid),
+	"GridLayout": () => import(/* webpackExports: "GridLayout", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.GridLayout),
+	"HeatLegend": () => import(/* webpackExports: "HeatLegend", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.HeatLegend),
+	"Hierarchy": () => import(/* webpackExports: "Hierarchy", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.Hierarchy),
+	"HierarchyLink": () => import(/* webpackExports: "HierarchyLink", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.HierarchyLink),
+	"HierarchyNode": () => import(/* webpackExports: "HierarchyNode", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.HierarchyNode),
+	"HorizontalLayout": () => import(/* webpackExports: "HorizontalLayout", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.HorizontalLayout),
+	"InterfaceColors": () => import(/* webpackExports: "InterfaceColors", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.InterfaceColors),
+	"Label": () => import(/* webpackExports: "Label", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Label),
+	"Layout": () => import(/* webpackExports: "Layout", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Layout),
+	"Legend": () => import(/* webpackExports: "Legend", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Legend),
+	"Line": () => import(/* webpackExports: "Line", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Line),
+	"LinePattern": () => import(/* webpackExports: "LinePattern", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.LinePattern),
+	"LineSeries": () => import(/* webpackExports: "LineSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.LineSeries),
+	"LinearGradient": () => import(/* webpackExports: "LinearGradient", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.LinearGradient),
+	"LinkedHierarchy": () => import(/* webpackExports: "LinkedHierarchy", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchy),
+	"LinkedHierarchyNode": () => import(/* webpackExports: "LinkedHierarchyNode", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchyNode),
+	"MapChart": () => import(/* webpackExports: "MapChart", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapChart),
+	"MapLine": () => import(/* webpackExports: "MapLine", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapLine),
+	"MapLineSeries": () => import(/* webpackExports: "MapLineSeries", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapLineSeries),
+	"MapPointSeries": () => import(/* webpackExports: "MapPointSeries", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapPointSeries),
+	"MapPolygon": () => import(/* webpackExports: "MapPolygon", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapPolygon),
+	"MapPolygonSeries": () => import(/* webpackExports: "MapPolygonSeries", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapPolygonSeries),
+	"MapSeries": () => import(/* webpackExports: "MapSeries", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.MapSeries),
+	"Modal": () => import(/* webpackExports: "Modal", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Modal),
+	"OHLC": () => import(/* webpackExports: "OHLC", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.OHLC),
+	"OHLCSeries": () => import(/* webpackExports: "OHLCSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.OHLCSeries),
+	"Pack": () => import(/* webpackExports: "Pack", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.Pack),
+	"Partition": () => import(/* webpackExports: "Partition", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.Partition),
+	"Pattern": () => import(/* webpackExports: "Pattern", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Pattern),
+	"PercentChart": () => import(/* webpackExports: "PercentChart", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.PercentChart),
+	"PercentSeries": () => import(/* webpackExports: "PercentSeries", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.PercentSeries),
+	"PictorialStackedSeries": () => import(/* webpackExports: "PictorialStackedSeries", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.PictorialStackedSeries),
+	"Picture": () => import(/* webpackExports: "Picture", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Picture),
+	"PieChart": () => import(/* webpackExports: "PieChart", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.PieChart),
+	"PieSeries": () => import(/* webpackExports: "PieSeries", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.PieSeries),
+	"PointedRectangle": () => import(/* webpackExports: "PointedRectangle", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.PointedRectangle),
+	"PyramidSeries": () => import(/* webpackExports: "PyramidSeries", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.PyramidSeries),
+	"RadarChart": () => import(/* webpackExports: "RadarChart", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.RadarChart),
+	"RadarColumnSeries": () => import(/* webpackExports: "RadarColumnSeries", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.RadarColumnSeries),
+	"RadarCursor": () => import(/* webpackExports: "RadarCursor", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.RadarCursor),
+	"RadarLineSeries": () => import(/* webpackExports: "RadarLineSeries", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.RadarLineSeries),
+	"RadialGradient": () => import(/* webpackExports: "RadialGradient", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.RadialGradient),
+	"RadialLabel": () => import(/* webpackExports: "RadialLabel", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.RadialLabel),
+	"RadialText": () => import(/* webpackExports: "RadialText", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.RadialText),
+	"Rectangle": () => import(/* webpackExports: "Rectangle", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Rectangle),
+	"RectanglePattern": () => import(/* webpackExports: "RectanglePattern", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.RectanglePattern),
+	"RoundedRectangle": () => import(/* webpackExports: "RoundedRectangle", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.RoundedRectangle),
+	"Sankey": () => import(/* webpackExports: "Sankey", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.Sankey),
+	"SankeyLink": () => import(/* webpackExports: "SankeyLink", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.SankeyLink),
+	"SankeyNodes": () => import(/* webpackExports: "SankeyNodes", webpackChunkName: "json_../../../flow" */ "./../../../flow").then((m) => m.SankeyNodes),
+	"Scrollbar": () => import(/* webpackExports: "Scrollbar", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Scrollbar),
+	"SerialChart": () => import(/* webpackExports: "SerialChart", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.SerialChart),
+	"Series": () => import(/* webpackExports: "Series", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Series),
+	"Slice": () => import(/* webpackExports: "Slice", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Slice),
+	"SliceGrouper": () => import(/* webpackExports: "SliceGrouper", webpackChunkName: "json_../../../plugins/sliceGrouper" */ "./../../../plugins/sliceGrouper").then((m) => m.SliceGrouper),
+	"SlicedChart": () => import(/* webpackExports: "SlicedChart", webpackChunkName: "json_../../../percent" */ "./../../../percent").then((m) => m.SlicedChart),
+	"Slider": () => import(/* webpackExports: "Slider", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Slider),
+	"SmoothedRadarLineSeries": () => import(/* webpackExports: "SmoothedRadarLineSeries", webpackChunkName: "json_../../../radar" */ "./../../../radar").then((m) => m.SmoothedRadarLineSeries),
+	"SmoothedXLineSeries": () => import(/* webpackExports: "SmoothedXLineSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.SmoothedXLineSeries),
+	"SmoothedXYLineSeries": () => import(/* webpackExports: "SmoothedXYLineSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.SmoothedXYLineSeries),
+	"SmoothedYLineSeries": () => import(/* webpackExports: "SmoothedYLineSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.SmoothedYLineSeries),
+	"Sprite": () => import(/* webpackExports: "Sprite", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Sprite),
+	"Star": () => import(/* webpackExports: "Star", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Star),
+	"StepLineSeries": () => import(/* webpackExports: "StepLineSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.StepLineSeries),
+	"Sunburst": () => import(/* webpackExports: "Sunburst", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.Sunburst),
+	"Text": () => import(/* webpackExports: "Text", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Text),
+	"Tick": () => import(/* webpackExports: "Tick", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Tick),
+	"Tooltip": () => import(/* webpackExports: "Tooltip", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Tooltip),
+	"Tree": () => import(/* webpackExports: "Tree", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.Tree),
+	"Treemap": () => import(/* webpackExports: "Treemap", webpackChunkName: "json_../../../hierarchy" */ "./../../../hierarchy").then((m) => m.Treemap),
+	"Triangle": () => import(/* webpackExports: "Triangle", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.Triangle),
+	"ValueAxis": () => import(/* webpackExports: "ValueAxis", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.ValueAxis),
+	"Venn": () => import(/* webpackExports: "Venn", webpackChunkName: "json_../../../venn" */ "./../../../venn").then((m) => m.Venn),
+	"VerticalLayout": () => import(/* webpackExports: "VerticalLayout", webpackChunkName: "json_../../../index" */ "./../../../index").then((m) => m.VerticalLayout),
+	"WordCloud": () => import(/* webpackExports: "WordCloud", webpackChunkName: "json_../../../wc" */ "./../../../wc").then((m) => m.WordCloud),
+	"XYChart": () => import(/* webpackExports: "XYChart", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.XYChart),
+	"XYChartScrollbar": () => import(/* webpackExports: "XYChartScrollbar", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.XYChartScrollbar),
+	"XYCursor": () => import(/* webpackExports: "XYCursor", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.XYCursor),
+	"XYSeries": () => import(/* webpackExports: "XYSeries", webpackChunkName: "json_../../../xy" */ "./../../../xy").then((m) => m.XYSeries),
+	"ZoomControl": () => import(/* webpackExports: "ZoomControl", webpackChunkName: "json_../../../map" */ "./../../../map").then((m) => m.ZoomControl),
 };
 
 export default classes;

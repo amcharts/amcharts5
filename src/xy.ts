@@ -1,6 +1,7 @@
 export { XYChart, IXYChartSettings } from "./.internal/charts/xy/XYChart";
 export { XYChartScrollbar, IXYChartScrollbarSettings } from "./.internal/charts/xy/XYChartScrollbar";
 export { XYCursor, IXYCursorSettings } from "./.internal/charts/xy/XYCursor";
+export { BaseColumnSeries } from "./.internal/charts/xy/series/BaseColumnSeries";
 
 export { Axis, IAxisSettings, IAxisDataItem } from "./.internal/charts/xy/axes/Axis";
 export { CategoryAxis, ICategoryAxisSettings, ICategoryAxisDataItem } from "./.internal/charts/xy/axes/CategoryAxis";

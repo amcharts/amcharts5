@@ -82,6 +82,8 @@ export class AxisRendererX extends AxisRenderer {
 		if (this.isDirty("inside")) {
 			axis.markDirtySize();
 		}
+
+		axis.ghostLabel.set("forceHidden", this.get("inside"));
 		
 		const opposite = "opposite"
 

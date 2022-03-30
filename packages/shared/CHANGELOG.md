@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.10] - 2022-03-30
+
+### Added
+- New in-line text formatting property `verticalAlign` added. Currently supports only `"super"` and `"sub"` values. E.g. `Copyright[fontSize: 8px; verticalAlign: super;]TM[\]`.
+
+### Changed
+- Logarithmic scale on `ValueAxis` was revamped with a different approach. No changes from the configration, but might influence appearance/scale.
+- When calculating derivative values for series, `low`, `high`, and `open` used previous `low`, `high`, and `open` values. Now they all use `value` instead.
+
+### Fixed
+- In some cases, using a text placehodler, an empty string was shown insteaf of a zero.
+- Some grid container masking issues fixed.
+- Sometimes `valueAxis` was zoomed-in a bit on the first render of an `XYChart`.
+- Axis ranges with `dRadius > 0` were not visible on `RadarChart`.
+- Dynamic change of `value*Show` fields of an `XYSeries` was not working.
+- Removing data from a legend could lead to JS errors in some particular cases.
+- Ghost label was creating a gap in an `XYChartScrollbar` between scrollbar bottom an scrollbar series.
+
+
 ## [5.1.9] - 2022-03-17
 
 ### Fixed

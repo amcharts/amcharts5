@@ -711,7 +711,16 @@ export abstract class BaseColumnSeries extends XYSeries {
 	 * @ignore
 	 */
 	public updateLegendMarker(dataItem?: DataItem<IBaseColumnSeriesDataItem>) {
-		const legendDataItem = this.get("legendDataItem");
+		let legendDataItem = this.get("legendDataItem");
+		/**
+		 * this would change legend marker color to the last colum in the selection
+		if(!dataItem){
+			const lastDataItem = this.dataItems[this.endIndex() - 1];
+			console.log(lastDataItem)
+			if(lastDataItem){
+				dataItem = lastDataItem;
+			}			
+		}*/
 
 		if (legendDataItem) {
 
@@ -733,6 +742,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 				}
 			}
 		}
+
 	}
 
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {

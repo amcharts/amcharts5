@@ -315,6 +315,7 @@ export class Root implements IDisposer {
 
 		let inner: HTMLDivElement = document.createElement("div");
 		inner.style.position = "relative";
+		inner.style.height = "100%";
 		dom.appendChild(inner);
 
 		this._inner = inner;

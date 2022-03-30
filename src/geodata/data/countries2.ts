@@ -407,7 +407,7 @@ const countries2: Countries2 = {
 		"country": "Spain",
 		"continent_code": "EU",
 		"continent": "Europe",
-		"maps": [ "spainLow", "spainHigh", "spainProvincesLow", "spainProvincesHigh" ]
+		"maps": [ "spainLow", "spainHigh", "spainProvincesLow", "spainProvincesHigh", "spainProvinces2Low", "spainProvinces2High" ]
 	},
 	"ET": {
 		"country": "Ethiopia",
@@ -449,7 +449,7 @@ const countries2: Countries2 = {
 		"country": "France",
 		"continent_code": "EU",
 		"continent": "Europe",
-		"maps": [ "franceLow", "franceHigh", "franceDepartmentsLow", "franceDepartmentsHigh" ]
+		"maps": [ "franceLow", "franceHigh", "franceDepartmentsLow", "franceDepartmentsHigh", "franceDepartments2Low", "franceDepartments2High" ]
 	},
 	"GA": {
 		"country": "Gabon",
@@ -1373,7 +1373,7 @@ const countries2: Countries2 = {
 		"country": "Taiwan",
 		"continent_code": "AS",
 		"continent": "Asia",
-		"maps": []
+		"maps": [ "taiwanLow", "taiwanHigh" ]
 	},
 	"TZ": {
 		"country": "Tanzania, United Republic of",

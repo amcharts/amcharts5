@@ -557,8 +557,6 @@ export class XYChartDefaultTheme extends Theme {
 
 			baseValue: 0,
 			logarithmic: false,
-			extraMin: 0,
-			extraMax: 0,
 			strictMinMax: false,
 
 			fillRule: (dataItem: DataItem<IValueAxisDataItem>) => {

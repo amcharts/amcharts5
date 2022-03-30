@@ -1154,6 +1154,13 @@ export abstract class XYSeries extends Series {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		if(this.isDirty("valueYShow") || this.isDirty("valueYShow" || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow"))){
+			this._updateFields();
+			this._makeFieldNames();
+			this.resetExtremes();
+			this._valuesDirty = true;
+		}
+
 		this.set("width", this.get("xAxis").width());
 		this.set("height", this.get("yAxis").height());
 
@@ -1250,7 +1257,6 @@ export abstract class XYSeries extends Series {
 				$array.each(this._valueYShowFields, (key) => {
 					let value = dataItem.get(<any>key);
 					if (value != null) {
-
 						if (stacked) {
 							value += this.getStackedYValue(dataItem, key);
 						}

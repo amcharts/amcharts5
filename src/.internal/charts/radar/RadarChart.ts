@@ -123,7 +123,6 @@ export class RadarChart extends XYChart {
 
 		seriesContainer.set("mask", Graphics.new(this._root, {}));
 		gridContainer.set("mask", Graphics.new(this._root, {}));
-		this.topGridContainer.set("mask", Graphics.new(this._root, {}));
 
 		this._disposers.push(this.plotContainer.events.on("boundschanged", () => {
 			this._updateRadius();
@@ -207,7 +206,6 @@ export class RadarChart extends XYChart {
 
 		this._updateMask(this.seriesContainer, innerRadius, radius);
 		this._updateMask(this.gridContainer, innerRadius, radius);
-		this._updateMask(this.topGridContainer, innerRadius, radius);
 
 		this.series.each((series) => {
 			if ((series as XYSeries).get("maskBullets")) {

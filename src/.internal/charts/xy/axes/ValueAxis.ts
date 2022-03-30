@@ -307,7 +307,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	protected _baseValue: number = 0;
 	protected _syncDp?: MultiDisposer;
-
+	protected _minLogAdjusted: number = 1;
 	/**
 	 * @ignore
 	 */
@@ -357,6 +357,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		//if (this._dirtyExtremes || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision")) {
 		if (this._sizeDirty || this._dirtyExtremes || this._valuesDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision") || this.isDirty("numberFormat")) {
 			this._getMinMax();
+			this.ghostLabel.set("text", "");
 			this._dirtyExtremes = false;
 		}
 
@@ -409,9 +410,32 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 			let value = selectionMin - step;
 			let i = 0;
+			let differencePower = 1;
+			let minLog = min;
 
 			if (logarithmic) {
-				value = selectionMin;
+				value = this._minLogAdjusted;				
+				
+				if(value < selectionMin){
+					while (value < selectionMin) {
+						value += step;
+					}
+				}
+
+				minLog = value;
+
+				if(minLog <= 0){
+					minLog = 1;
+					if(step < 1){
+						minLog = step;
+					}
+				}
+
+				differencePower = Math.log(selectionMax - step) * Math.LOG10E - Math.log(minLog) * Math.LOG10E;								
+
+				if (differencePower > 2) {
+					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 1);
+				}
 			}
 
 			while (value < selectionMax) {
@@ -444,9 +468,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					value += step;
 				}
 				else {
-					let differencePower = Math.log(max) * Math.LOG10E - Math.log(min) * Math.LOG10E;
-					if (differencePower > 1) {
-						value = Math.pow(10, Math.log(min) * Math.LOG10E + i);
+					if (differencePower > 2) {
+						value = Math.pow(10, Math.log(minLog) * Math.LOG10E + i);
 					}
 					else {
 						value += step;
@@ -828,15 +851,23 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		const minDefined = this.get("min");
 		const maxDefined = this.get("max");
 
-		const extraMin = this.get("extraMin", 0);
-		const extraMax = this.get("extraMax", 0);
+		let extraMin = this.get("extraMin", 0);
+		let extraMax = this.get("extraMax", 0);
+
+		if(this.get("logarithmic")){
+			if(this.get("extraMin") == null){
+				extraMin = 0.1;
+			}
+			if(this.get("extraMax") == null){
+				extraMax = 0.2;
+			}			
+		}
 
 		const gridCount = this.get("renderer").gridCount();
 
 		const strictMinMax = this.get("strictMinMax", false);
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
-
 			let selectionMin = max;
 			let selectionMax = min;
 
@@ -920,13 +951,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				selectionMax = minMaxStep2.max;
 			}
 
+			selectionMin -= (selectionMax - selectionMin) * extraMin;
+			selectionMax += (selectionMax - selectionMin) * extraMax;			
+
 			let minMaxStep: IMinMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount);
 
 			selectionMin = minMaxStep.min;
 			selectionMax = minMaxStep.max;
-
-			selectionMin -= (selectionMax - selectionMin) * extraMin;
-			selectionMax += (selectionMax - selectionMin) * extraMax;
 
 			selectionMin = $math.fitToRange(selectionMin, min, max);
 			selectionMax = $math.fitToRange(selectionMax, min, max);
@@ -956,6 +987,15 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 
+			if (this.get("logarithmic")) {
+				if (selectionMin < min) {
+					selectionMin = min;
+				}
+				if (selectionMax > max) {
+					selectionMax = max;
+				}
+			}
+
 			let start = this.valueToFinalPosition(selectionMin);
 			let end = this.valueToFinalPosition(selectionMax);
 
@@ -977,6 +1017,16 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let extraMin = this.get("extraMin", 0);
 		let extraMax = this.get("extraMax", 0);
+
+		if(this.get("logarithmic")){
+			if(this.get("extraMin") == null){
+				extraMin = 0.1;
+			}
+			if(this.get("extraMax") == null){
+				extraMax = 0.2;
+			}			
+		}
+
 		let minDiff = Infinity;
 
 		$array.each(this.series, (series) => {
@@ -1053,6 +1103,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			return;
 		}
 
+		const initialMin = min;
+		const initialMax = max;
+
 		// adapter
 		let minAdapted = this.adapters.fold("min", min);
 		let maxAdapted = this.adapters.fold("max", max);
@@ -1094,6 +1147,17 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// add extras
 		min -= (max - min) * extraMin;
 		max += (max - min) * extraMax;
+
+		if(this.get("logarithmic")){
+			// don't let min go below 0 if real min is >= 0
+			if (min < 0 && initialMin >= 0) {
+				min = 0;
+			}
+			// don't let max go above 0 if real max is <= 0
+			if (max > 0 && initialMax <= 0) {
+				max = 0;
+			}
+		}
 
 		this._minReal = min;
 		this._maxReal = max;
@@ -1165,6 +1229,18 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		this.setPrivateRaw("maxZoomFactor", (max - min) / minDiff * this.get("maxZoomFactor", 100));
 
+		if (this.get("logarithmic")) {
+			this._minLogAdjusted = min;
+			min = this._minReal;
+			max = this._maxReal;
+
+			if (min <= 0) {
+				min = initialMin;
+			}
+		}
+
+		
+
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			if (this.getPrivate("minFinal") !== min || this.getPrivate("maxFinal") !== max) {
 				this.setPrivate("minFinal", min);
@@ -1181,7 +1257,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 
 	protected _adjustMinMax(min: number, max: number, gridCount: number, strictMode?: boolean): IMinMaxStep {
-		const logarithmic = this.get("logarithmic");
 		// will fail if 0
 		if (gridCount <= 1) {
 			gridCount = 1;
@@ -1213,56 +1288,25 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			extra = 0;
 		}
 
-		if (!logarithmic) {
-			// round down min
-			if (strictMode) {
-				min = Math.floor(min / power) * power;
-				// round up max
-				max = Math.ceil(max / power) * power;
-			}
-			else {
-				min = Math.ceil(min / power) * power - extra;
-				// round up max
-				max = Math.floor(max / power) * power + extra;
-			}
-
-			// don't let min go below 0 if real min is >= 0
-			if (min < 0 && initialMin >= 0) {
-				min = 0;
-			}
-			// don't let max go above 0 if real max is <= 0
-			if (max > 0 && initialMax <= 0) {
-				max = 0;
-			}
+		// round down min
+		if (strictMode) {
+			min = Math.floor(min / power) * power;
+			// round up max
+			max = Math.ceil(max / power) * power;
 		}
-		// logarithmic
 		else {
-			if (min <= 0) {
-				//throw Error("Logarithmic value axis can not have values <= 0.");
-				min = this.get("baseValue", 0);
-			}
+			min = Math.ceil(min / power) * power - extra;
+			// round up max
+			max = Math.floor(max / power) * power + extra;
+		}
 
-			if (min === Infinity) {
-				min = 1;
-			}
-
-			if (max === -Infinity) {
-				max = 10;
-			}
-
-			min = Math.pow(10, Math.floor(Math.log(Math.abs(min)) * Math.LOG10E));
-			max = Math.pow(10, Math.ceil(Math.log(Math.abs(max)) * Math.LOG10E));
-
-			if (this.get("strictMinMax")) {
-				let minDefined = this.get("min");
-				let maxDefined = this.get("max");
-				if ($type.isNumber(minDefined) && minDefined > 0) {
-					min = minDefined;
-				}
-				if ($type.isNumber(maxDefined) && maxDefined > 0) {
-					max = maxDefined;
-				}
-			}
+		// don't let min go below 0 if real min is >= 0
+		if (min < 0 && initialMin >= 0) {
+			min = 0;
+		}
+		// don't let max go above 0 if real max is <= 0
+		if (max > 0 && initialMax <= 0) {
+			max = 0;
 		}
 
 		exponent = Math.log(Math.abs(difference)) * Math.LOG10E;
@@ -1275,7 +1319,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		// the step should divide by  2, 5, and 10.
 		let stepDivisor: number = Math.ceil(step / stepPower); // number 0 - 10
-
 
 		if (stepDivisor > 5) {
 			stepDivisor = 10;
@@ -1303,35 +1346,35 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			// round step
 			step = $math.round(step, decCount);
 		}
-		if (!logarithmic) {
-			// final min and max
-			let minCount = Math.floor(min / step);
 
-			min = $math.round(step * minCount, decCount);
+		// final min and max
+		let minCount = Math.floor(min / step);
 
-			let maxCount: number;
+		min = $math.round(step * minCount, decCount);
 
-			if (!strictMode) {
-				maxCount = Math.ceil(max / step);
-			}
-			else {
-				maxCount = Math.floor(max / step);
-			}
+		let maxCount: number;
 
-			if (maxCount === minCount) {
-				maxCount++;
-			}
-
-			max = $math.round(step * maxCount, decCount);
-
-			if (max < initialMax) {
-				max = max + step;
-			}
-
-			if (min > initialMin) {
-				min = min - step;
-			}
+		if (!strictMode) {
+			maxCount = Math.ceil(max / step);
 		}
+		else {
+			maxCount = Math.floor(max / step);
+		}
+
+		if (maxCount === minCount) {
+			maxCount++;
+		}
+
+		max = $math.round(step * maxCount, decCount);
+
+		if (max < initialMax) {
+			max = max + step;
+		}
+
+		if (min > initialMin) {
+			min = min - step;
+		}
+
 
 		step = this.fixSmallStep(step);
 

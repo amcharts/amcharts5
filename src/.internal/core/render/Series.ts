@@ -457,7 +457,14 @@ export abstract class Series extends Component {
 			let changePrevious = key + "ChangePrevious";
 			let changePreviousPercent = key + "ChangePreviousPercent";
 			let changeSelection = key + "ChangeSelection";
-			let ChangeSelectionPercent = key + "ChangeSelectionPercent";
+			let changeSelectionPercent = key + "ChangeSelectionPercent";
+
+			let openKey = "valueY";
+
+			if(key == "valueX" || key == "openValueX" || key == "lowValueX" || key == "highValueX"){
+				openKey = "valueX";
+			}
+
 
 			for (let i = startIndex; i < endIndex; i++) {
 				const dataItem = this.dataItems[i];
@@ -487,15 +494,14 @@ export abstract class Series extends Component {
 					}
 
 					if (startIndex === 0) {
-						dataItem.setRaw(<any>(change), value - open[key]);
-						dataItem.setRaw(<any>(changePercent), (value - open[key]) / open[key] * 100);
+						dataItem.setRaw(<any>(change), value - open[openKey]);
+						dataItem.setRaw(<any>(changePercent), (value - open[openKey]) / open[openKey] * 100);
 					}
 
-
-					dataItem.setRaw(<any>(changePrevious), value - previous[key]);
-					dataItem.setRaw(<any>(changePreviousPercent), (value - previous[key]) / previous[key] * 100);
-					dataItem.setRaw(<any>(changeSelection), value - open[key]);
-					dataItem.setRaw(<any>(ChangeSelectionPercent), (value - open[key]) / open[key] * 100);
+					dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
+					dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
+					dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
+					dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
 
 					previous[key] = value;
 				}
