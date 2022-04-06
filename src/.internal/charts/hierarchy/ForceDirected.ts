@@ -250,6 +250,7 @@ export class ForceDirected extends LinkedHierarchy {
 		super.processDataItem(dataItem);
 
 		const node = dataItem.get("node");
+		node.set("x", -10000);
 		node.on("scale", () => {
 			this._updateForces();
 		})
@@ -343,6 +344,10 @@ export class ForceDirected extends LinkedHierarchy {
 		})
 
 		this.restartSimulation(1);
+	}
+
+	protected _animatePositions(_dataItem: DataItem<this["_dataItemSettings"]>){
+		// void, do not remove
 	}
 
 	public _clearDirty() {

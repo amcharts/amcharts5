@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.11] - 2022-04-06
+
+### Added
+- `groupDataWithOriginals` and `groupDataCallback` settings added to `XYSeries`. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Custom_aggregation_functions).
+- `strictMinMaxSelection` setting added to `ValueAxis`. When set to `true`, the axis won't round `min` and `max` of a selection to the nearest round values, but will use actual min and max (`extraMin` and `extraMax` will still be added if set). This is a good feature when your series displays not actual but derivative values, like `valueYChangeSelection` as it helps to avoid frequent jumping of series to adjusted min and max of the axis.
+
+### Changed
+- Internal layout of `XYChart` containers was changed. `plotContainers` now goes to `yAxesAndPlotContainer`, and `plotContainer` and `topPlotContainer` goe into `plotContainers`.
+
+### Fixed
+- If `XYChart` was used without animated theme, and scrollbar's background was clicked to zoom to some specific spot, it resulted in scrollbar not being updated anymore when zoomed with wheel or zoom-out button.
+- Fixed and issue where nodes of `ForceDirected` series were flickering to 0,0 point when div of a chart was resized.
+- Fixed potential XSS injection issue with the accessibility of tooltips.
+- `container` setting in `ExportingMenu` was being ignored.
+- In some specific cases not all series were included in min/max calculation of a `ValueAxis` resulting not all series to be visible.
+- When whole series was out of selected scope, its last or first value (depending on seleciton) was still included when calculating min and max.
+- Layouts were allocating space for margins of hidden items.
+
+
 ## [5.1.10] - 2022-03-30
 
 ### Added
@@ -13,6 +32,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Changed
 - Logarithmic scale on `ValueAxis` was revamped with a different approach. No changes from the configration, but might influence appearance/scale.
 - When calculating derivative values for series, `low`, `high`, and `open` used previous `low`, `high`, and `open` values. Now they all use `value` instead.
+- Updated to D3 v7.
 
 ### Fixed
 - In some cases, using a text placehodler, an empty string was shown insteaf of a zero.

@@ -8,6 +8,7 @@ Tasks.run($path.join(__dirname, ".."), {
 	"build:script": require("./tasks/build-script"),
 	"docs": require("./tasks/docs"),
 	"examples": require("./tasks/examples"),
+	"run-example": require("./tasks/run-example"),
 	"generate-classes": require("./tasks/generate-classes"),
 	"typecheck": require("./tasks/typecheck"),
 });

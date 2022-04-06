@@ -253,9 +253,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		return { x: hierarchyNode.x, y: hierarchyNode.y };
 	}
 
-	protected _updateNode(dataItem: DataItem<this["_dataItemSettings"]>) {
-		super._updateNode(dataItem);
-
+	protected _animatePositions(dataItem: DataItem<this["_dataItemSettings"]>){
 		const node = dataItem.get("node");
 		const hierarchyNode = dataItem.get("d3HierarchyNode");
 
@@ -265,7 +263,15 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const easing = this.get("animationEasing");
 
 		node.animate({ key: "x", to: point.x, duration: duration, easing: easing });
-		node.animate({ key: "y", to: point.y, duration: duration, easing: easing });
+		node.animate({ key: "y", to: point.y, duration: duration, easing: easing });		
+	}
+
+	protected _updateNode(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._updateNode(dataItem);
+
+		this._animatePositions(dataItem);
+
+		const hierarchyNode = dataItem.get("d3HierarchyNode");
 
 		const hierarchyChildren = hierarchyNode.children;
 		if (hierarchyChildren) {

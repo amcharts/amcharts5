@@ -12,23 +12,18 @@ import type { IClasses } from "./Classes";
 import classes from "./Classes";
 
 
-interface IType {
-    type: string;
-    [key: string]: any;
-}
-
 interface IRef {
     [key: string]: any;
 }
 
 
-function hasType(value: object): value is IType {
-    return $type.isString((value as any).type);
+function isObject(value: any): value is { [key: string]: any } {
+    return $type.isObject(value);
 }
 
 
-async function getClass(object: { type: string }): Promise<typeof Entity> {
-    const promise = classes[object.type as keyof IClasses];
+async function getClass(name: string): Promise<typeof Entity> {
+    const promise = classes[name as keyof IClasses];
     return await promise() as typeof Entity;
 }
 
@@ -68,6 +63,7 @@ interface IParsedEntity<E extends Entity> {
     adapters: Array<IAdapter<E>> | undefined,
     children: Array<Sprite> | undefined,
     properties: IParsedProperties | undefined,
+    value: object,
 }
 
 type IParsed<E extends Entity>
@@ -106,14 +102,33 @@ async function parseProperties(root: Root, object: object, refs: Array<IRef>): P
                 mergeEntity(old, parsed);
 
             } else if (parsed.isValue) {
-                // TODO merge it if the value is an Entity
-                (entity as any)[key] = parsed.value;
+                // Merge Array into List
+                if (old && $type.isArray(parsed.value)) {
+                    $array.each(parsed.value, (value) => {
+                        (old as any).push(value);
+                    });
+
+                } else {
+                    // TODO merge it if the value is an Entity
+                    (entity as any)[key] = parsed.value;
+                }
 
             } else {
                 (entity as any)[key] = constructEntity(root, parsed);
             }
         };
     }));
+}
+
+
+async function parseRefs(root: Root, object: { [key: string]: any }, refs: Array<IRef>): Promise<IRef> {
+    const newRefs: IRef = {};
+
+    await Promise.all($array.map($object.keys(object), async (key) => {
+        newRefs[key] = await parseType(root, object[key], refs);
+    }));
+
+    return newRefs;
 }
 
 
@@ -124,39 +139,35 @@ async function parseValue<E extends Entity>(root: Root, value: any, refs: Array<
             value: await parseArray(root, value, refs),
         };
 
-    } else if ($type.isObject(value)) {
-        if (hasType(value)) {
-            if (value.type === "Color") {
-                return {
-                    isValue: true,
-                    value: Color.fromAny(value.value),
-                };
-
-            } else {
-                if (value.refs) {
-                    refs = refs.concat([value.refs]);
-                }
-
-                const [construct, settings, properties, children] = await Promise.all([
-                    (value.type ? getClass(value) : Promise.resolve(undefined)),
-                    (value.settings ? parseSettings(root, value.settings, refs) : Promise.resolve(undefined)),
-                    (value.properties ? parseProperties(root, value.properties, refs) : Promise.resolve(undefined)),
-                    (value.children ? parseArray(root, value.children, refs) : Promise.resolve(undefined)),
-                ]);
-
-                return {
-                    isValue: false,
-                    type: value.type,
-                    construct,
-                    settings,
-                    adapters: value.adapters,
-                    children,
-                    properties,
-                };
-            }
+    } else if (isObject(value)) {
+        if (value.type === "Color") {
+            return {
+                isValue: true,
+                value: Color.fromAny(value.value),
+            };
 
         } else {
-            throw new Error("Objects must have a `type` property");
+            if (value.refs) {
+                refs = refs.concat([await parseRefs(root, value.refs, refs)]);
+            }
+
+            const [construct, settings, properties, children] = await Promise.all([
+                (value.type ? getClass(value.type) : Promise.resolve(undefined)),
+                (value.settings ? parseSettings(root, value.settings, refs) : Promise.resolve(undefined)),
+                (value.properties ? parseProperties(root, value.properties, refs) : Promise.resolve(undefined)),
+                (value.children ? parseArray(root, value.children, refs) : Promise.resolve(undefined)),
+            ]);
+
+            return {
+                isValue: false,
+                type: value.type,
+                construct,
+                settings,
+                adapters: value.adapters,
+                children,
+                properties,
+                value,
+            };
         }
 
     } else if ($type.isString(value)) {
@@ -213,9 +224,9 @@ function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): voi
 }
 
 
-function constructEntity<E extends Entity>(root: Root, parsed: IParsedEntity<E>): E {
+function constructEntity<E extends Entity>(root: Root, parsed: IParsedEntity<E>): E | object {
     if (!parsed.construct) {
-        throw new Error("Could not find class `" + parsed.type + "`");
+        return parsed.value;
     }
 
     const entity = parsed.construct.new(root, parsed.settings || {}) as E;

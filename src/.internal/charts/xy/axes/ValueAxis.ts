@@ -33,10 +33,23 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 
 	/**
 	 * Force axis scale to be precisely at values as set in `min` and/or `max`.
+	 * @todo review: In case you did not specify min or max, but set strictMinMax to true, the chart will use actual min and max values
+	 * of the axis without rounding them (extraMin and extraMax will still be added). These extremes will be kept even if you 
+	 * zoom the other axis of the series (Date or Category). @see strictMinMaxSelection if you want similar behavior but need 
+	 * ValueAxis to adjust min and max when other axis is zoomed.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	strictMinMax?: boolean;
+
+	/**
+	 * @todo review
+	 * If you set this to true, the axis won't round min and max of a selection to the nearest round values but use actual min and max
+	 * (only extraMin and extraMax will be added). This is a good feature when your series displays not actual but derivative values,
+	 * like valueYChangeSelection as it helps to avoid frequent jumping of series to adjusted min and max of the axis.
+	 *
+	 */
+	strictMinMaxSelection ?: boolean;	
 
 	/**
 	 * If set to `true` axis will use logarithmic scale.
@@ -355,7 +368,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 
 		//if (this._dirtyExtremes || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision")) {
-		if (this._sizeDirty || this._dirtyExtremes || this._valuesDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision") || this.isDirty("numberFormat")) {
+		if (this._sizeDirty || this._dirtyExtremes || this._valuesDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("strictMinMaxSelection") || this.isDirty("maxPrecision") || this.isDirty("numberFormat")) {
 			this._getMinMax();
 			this.ghostLabel.set("text", "");
 			this._dirtyExtremes = false;
@@ -864,8 +877,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 
 		const gridCount = this.get("renderer").gridCount();
-
-		const strictMinMax = this.get("strictMinMax", false);
+		const selectionStrictMinMax = this.get("strictMinMaxSelection");
+		const strictMinMax = this.get("strictMinMax");
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			let selectionMin = max;
@@ -951,6 +964,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				selectionMax = minMaxStep2.max;
 			}
 
+			let selectionMinReal = selectionMin;
+			let selectionMaxReal = selectionMax;			
+
 			selectionMin -= (selectionMax - selectionMin) * extraMin;
 			selectionMax += (selectionMax - selectionMin) * extraMax;			
 
@@ -982,9 +998,16 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = Math.max(selectionMin, minDefined);
 				}
+				
 				if ($type.isNumber(maxDefined)) {
 					selectionMax = Math.min(selectionMax, maxDefined);
 				}
+			
+			}
+
+			if (selectionStrictMinMax) {
+				selectionMin = selectionMinReal - (selectionMax - selectionMin) * extraMin;
+				selectionMax = selectionMaxReal + (selectionMax - selectionMin) * extraMax;
 			}
 
 			if (this.get("logarithmic")) {
@@ -1161,8 +1184,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		this._minReal = min;
 		this._maxReal = max;
+		let strictMinMax = this.get("strictMinMax");
+		let strictMinMaxSelection = this.get("strictMinMaxSelection", false);
+		if(strictMinMaxSelection){
+			strictMinMax = strictMinMaxSelection;
+		}
 
-		let strict = this.get("strictMinMax");
+		let strict = strictMinMax;
 		if ($type.isNumber(maxDefined)) {
 			strict = true;
 		}
@@ -1181,7 +1209,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		max = minMaxStep.max;
 
 		// return min max if strict
-		if (this.get("strictMinMax")) {
+		if (strictMinMax) {
 			if ($type.isNumber(minDefined)) {
 				min = minDefined;
 			}

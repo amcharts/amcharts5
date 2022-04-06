@@ -883,6 +883,10 @@ export class Root implements IDisposer {
 		}
 	}
 
+	public _markDirty(){
+		this._isDirty = true;
+	}
+
 	public eachFrame(f: (currentTime: number) => void): IDisposer {
 		this._tickers.push(f);
 		this._startTicker();
@@ -951,7 +955,7 @@ export class Root implements IDisposer {
 	 * @param  text  Alert text
 	 */
 	public readerAlert(text: string): void {
-		this._readerAlertElement!.innerHTML = text;
+		this._readerAlertElement!.innerHTML = $utils.stripTags(text);
 	}
 
 	/**
@@ -1276,7 +1280,7 @@ export class Root implements IDisposer {
 	 * @ignore
 	 */
 	public updateTooltip(target: Text): void {
-		const text = target._getText();
+		const text = $utils.stripTags(target._getText());
 		let tooltipElement = target.getPrivate("tooltipElement");
 		if (target.get("role") == "tooltip" && text != "") {
 			if (!tooltipElement) {

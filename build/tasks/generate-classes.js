@@ -41,6 +41,10 @@ function getChunk(path) {
 	}
 }
 
+function chunkName(path) {
+	return path.replace(/\.\.\//g, "").replace(/\//g, "_");
+}
+
 async function lookup(classes, dir) {
 	const files = await readdir(dir);
 
@@ -105,7 +109,7 @@ async function writeJson(state, classes, keys) {
 
 		imports.push(`import type { ${className} } from "./${chunk}";`);
 		types.push(`\t"${key}": () => Promise<typeof ${className}>;`);
-		properties.push(`\t"${key}": () => import(/* webpackExports: "${className}", webpackChunkName: "json_${chunk}" */ "./${chunk}").then((m) => m.${className}),`);
+		properties.push(`\t"${key}": () => import(/* webpackExports: "${className}", webpackChunkName: "json_${chunkName(chunk)}" */ "./${chunk}").then((m) => m.${className}),`);
 		propertiesScript.push(`\t"${key}": () => import(/* webpackExports: "${className}", webpackMode: "weak" */ "./${chunk}").then((m) => m.${className}),`);
 	});
 

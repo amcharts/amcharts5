@@ -293,7 +293,9 @@ export class ExportingMenu extends Entity {
 		menuElement.appendChild(this._iconElement);
 		menuElement.appendChild(this._listElement);
 
-		this._root._inner.appendChild(this._menuElement);
+		const container = this.get("container", this._root._inner);
+
+		container.appendChild(this._menuElement);
 
 		this._disposers.push($utils.addEventListener(menuElement, $utils.getRendererEvent("pointerover"), (_ev) => {
 			this._isOver = true;
@@ -311,7 +313,7 @@ export class ExportingMenu extends Entity {
 
 		this._disposers.push(new Disposer(() => {
 			if (this._menuElement) {
-				this._root._inner.removeChild(this._menuElement);
+				container.removeChild(this._menuElement);
 			}
 		}));
 

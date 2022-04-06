@@ -56,14 +56,16 @@ export class GridLayout extends Layout {
 		let maxCellWidth = 1;
 
 		eachChildren(container, (child) => {
-			if (child.get("position") != "absolute") {
-				let childWidth = child.width();
+			if(child.get("visible") && child.getPrivate("visible") && !child.get("forceHidden")){
+				if (child.get("position") != "absolute") {
+					let childWidth = child.width();
 
-				if (childWidth < minCellWidth) {
-					minCellWidth = childWidth;
-				}
-				if (childWidth > maxCellWidth) {
-					maxCellWidth = childWidth;
+					if (childWidth < minCellWidth) {
+						minCellWidth = childWidth;
+					}
+					if (childWidth > maxCellWidth) {
+						maxCellWidth = childWidth;
+					}
 				}
 			}
 		});
@@ -94,7 +96,7 @@ export class GridLayout extends Layout {
 		let prevX = paddingLeft;
 
 		eachChildren(container, (child) => {
-			if (child.get("position") == "relative" && !child.isHidden()) {
+			if (child.get("position") == "relative" && child.isVisible()) {
 				const marginTop = child.get("marginTop", 0);
 				const marginBottom = child.get("marginBottom", 0);
 
@@ -133,7 +135,7 @@ export class GridLayout extends Layout {
 
 		eachChildren(container, (child) => {
 			let bounds = child.adjustedLocalBounds();
-			if (child.get("position") != "absolute" && !child.isHidden()) {
+			if (child.get("position") != "absolute" && child.isVisible()) {
 				if (this.get("fixedWidthGrid")) {
 					columnWidths[column] = maxCellWidth;
 				}

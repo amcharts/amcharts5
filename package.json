@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.1.10",
+  "version": "5.1.11",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "description": "amCharts 5",
   "homepage": "https://www.amcharts.com/",
@@ -27,6 +27,7 @@
     "build:script": "node build/build.js -- build:script",
     "build:geodata": "cross-env NODE_OPTIONS=--max_old_space_size=10240 node build/build.js -- build:geodata",
     "examples": "node build/build.js -- examples",
+    "run-example": "node build/build.js -- run-example",
     "typecheck": "node build/build.js -- typecheck",
     "generate-classes": "node build/build.js -- generate-classes",
     "docs": "node build/build.js -- docs"
@@ -57,6 +58,7 @@
     "core-js-builder": "^3.15.1",
     "cpr": "^3.0.1",
     "cross-env": "^7.0.3",
+    "http-server": "^14.1.0",
     "rimraf": "^3.0.2",
     "source-map-loader": "^3.0.0",
     "string-replace-loader": "^3.0.2",

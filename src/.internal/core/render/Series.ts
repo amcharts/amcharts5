@@ -208,6 +208,8 @@ export interface ISeriesPrivate extends IComponentPrivate {
 	valueHigh?: number;
 	valueOpen?: number;
 	valueClose?: number;
+
+	baseValueSeries?: Series;
 }
 
 export interface ISeriesEvents extends IComponentEvents {
@@ -363,6 +365,16 @@ export abstract class Series extends Component {
 		let startIndex = this.startIndex();
 		let endIndex = this.endIndex();
 
+
+		if(this.isPrivateDirty("baseValueSeries")){
+			const baseValueSeries = this.getPrivate("baseValueSeries");
+			if(baseValueSeries){
+				this._disposers.push(baseValueSeries.onPrivate("startIndex", ()=>{
+					this.markDirtyValues();
+				}))
+			}			
+		}
+
 		const calculateAggregates = this.get("calculateAggregates");
 		if(calculateAggregates){
 			if (this._valuesDirty && !this._dataProcessed) {
@@ -465,6 +477,7 @@ export abstract class Series extends Component {
 				openKey = "valueX";
 			}
 
+			const baseValueSeries = this.getPrivate("baseValueSeries");
 
 			for (let i = startIndex; i < endIndex; i++) {
 				const dataItem = this.dataItems[i];
@@ -491,6 +504,10 @@ export abstract class Series extends Component {
 					if (open[key] == null) {
 						open[key] = value;
 						previous[key] = value;
+
+						if(baseValueSeries){
+							open[openKey] = baseValueSeries._getBase(openKey);
+						}
 					}
 
 					if (startIndex === 0) {
@@ -817,12 +834,21 @@ export abstract class Series extends Component {
 	/**
 	 * @ignore
 	 */
-	public hoverDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {
-	}
+	public hoverDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {}
 
 	/**
 	 * @ignore
 	 */
-	public unhoverDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {
+	public unhoverDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {}
+
+	/**
+	 * @ignore
+	 */
+	public _getBase(key: any): number {
+		const dataItem = this.dataItems[this.startIndex()];
+		if (dataItem) {
+			return dataItem.get(key);
+		}
+		return 0;
 	}
 }

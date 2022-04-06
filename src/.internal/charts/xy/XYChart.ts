@@ -236,17 +236,25 @@ export class XYChart extends SerialChart {
 	public readonly leftAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout }));
 
 	/**
-	 * A [[Container]] located in the middle of the chart, used to store actual
-	 * plots (series).
-	 *
-	 * NOTE: `plotContainer` will automatically have its `background` preset. If
-	 * you need to modify background or outline for chart's plot area, you can
-	 * use `plotContainer.get("background")` for that.
+	 * A [[Container]] located in the middle of the chart, used to store plotContainer and topPlotContainer	 
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly plotContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false }));
+	public readonly plotsContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false }));
+
+	/**
+	 * A [[Container]] located in the middle of the chart, used to store actual
+	 * plots (series).
+	 * 
+	 * NOTE: `plotContainer` will automatically have its `background` preset. If
+	 * you need to modify background or outline for chart's plot area, you can
+	 * use `plotContainer.get("background")` for that.* 
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @default Container.new()
+	 */
+	public readonly plotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 }));
 
 	/**
 	 * A [[Container]] used for any elements that need to be displayed over
@@ -255,7 +263,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly topPlotContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, isMeasured: false, position: "absolute" }));
+	public readonly topPlotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 }));
 
 	/**
 	 * A [[Container]] axis grid elements are stored in.

@@ -16,6 +16,7 @@ import { Graphics } from "../../../core/render/Graphics";
 
 import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
+import type { ITimeInterval } from "../../../core/util/Time";
 
 /**
  * @ignore
@@ -211,6 +212,8 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 	bottom?: number;
 
 	point?: IPoint;
+
+	originals?: Array<DataItem<IXYSeriesDataItem>>;
 }
 
 export interface IXYSeriesSettings extends ISeriesSettings {
@@ -615,6 +618,16 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 */
 	tooltipDataItem?: DataItem<IXYSeriesDataItem>
 
+	/**
+	 * @todo review
+	 */
+	groupDataWithOriginals?: boolean;
+
+	/**
+	 * @todo review
+	 */
+	groupDataCallback?: (dataItem: DataItem<IXYSeriesDataItem>, interval: ITimeInterval) => void;
+
 }
 
 export interface IXYSeriesPrivate extends ISeriesPrivate {
@@ -774,6 +787,8 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 	highValueYHighSelection?: number;
 	highValueYhighSelection?: number;
 	highValueYCloseSelection?: number;
+
+	outOfSelection?: boolean;	
 }
 
 
@@ -1154,10 +1169,12 @@ export abstract class XYSeries extends Series {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if(this.isDirty("valueYShow") || this.isDirty("valueYShow" || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow"))){
+		if (this.isDirty("valueYShow") || this.isDirty("valueXShow" || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow"))) {
 			this._updateFields();
 			this._makeFieldNames();
-			this.resetExtremes();
+			if(this._prevSettings.valueXShow != undefined || this._prevSettings.valueYShow != undefined){
+				this.resetExtremes();
+			}
 			this._valuesDirty = true;
 		}
 
@@ -1251,6 +1268,8 @@ export abstract class XYSeries extends Series {
 
 						this._min("minX", value);
 						this._max("maxX", value);
+
+
 					}
 				})
 
@@ -1298,7 +1317,7 @@ export abstract class XYSeries extends Series {
 			this._dataGrouped = true;
 		}
 
-		if ((this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty)) {
+		if (this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty) {
 
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
@@ -1318,39 +1337,63 @@ export abstract class XYSeries extends Series {
 				const vcx = this.get("vcx", 1);
 				const vcy = this.get("vcy", 1);
 				const stacked = this.get("stacked", false);
+				const outOfSelection = this.getPrivate("outOfSelection");
 
 				if (baseAxis === xAxis) {
 					yAxis._calculateTotals();
 					this.setPrivateRaw("selectionMinY", undefined);
 					this.setPrivateRaw("selectionMaxY", undefined);
-					for (let i = startIndex; i < endIndex; i++) {
-						this.processYSelectionDataItem(this.dataItems[i], vcy, stacked);
+					if (!outOfSelection) {
+						for (let i = startIndex; i < endIndex; i++) {
+							this.processYSelectionDataItem(this.dataItems[i], vcy, stacked);
+						}
+					}
+					else {
+						yAxis.markDirtySelectionExtremes();
 					}
 				}
 				else if (baseAxis === yAxis) {
 					xAxis._calculateTotals();
 					this.setPrivateRaw("selectionMinX", undefined);
 					this.setPrivateRaw("selectionMaxX", undefined);
-					for (let i = startIndex; i < endIndex; i++) {
-						this.processXSelectionDataItem(this.dataItems[i], vcx, stacked);
+					if (!outOfSelection) {
+						for (let i = startIndex; i < endIndex; i++) {
+							this.processXSelectionDataItem(this.dataItems[i], vcx, stacked);
+						}
+					}
+					else {
+						yAxis.markDirtySelectionExtremes();
 					}
 				}
 
 				if (baseAxis === xAxis) {
 					if (this.get("valueYShow") !== "valueYWorking") {
-						this.setPrivateRaw("minY", this.getPrivate("selectionMinY"));
-						this.setPrivateRaw("maxY", this.getPrivate("selectionMaxY"));
-						yAxis.markDirtyExtremes();
+						const selectionMinY = this.getPrivate("selectionMinY");
+						if (selectionMinY != null) {
+							this.setPrivateRaw("minY", selectionMinY);
+							yAxis.markDirtyExtremes();
+						}
+						const selectionMaxY = this.getPrivate("selectionMaxY");
+						if (selectionMaxY != null) {
+							this.setPrivateRaw("maxY", selectionMaxY);
+							yAxis.markDirtyExtremes();
+						}
 					}
 				}
 				else if (baseAxis === yAxis) {
 					if (this.get("valueXShow") !== "valueXWorking") {
-						this.setPrivateRaw("minX", this.getPrivate("selectionMinX"));
-						this.setPrivateRaw("maxX", this.getPrivate("selectionMaxX"));
-						xAxis.markDirtyExtremes();
+						const selectionMinX = this.getPrivate("selectionMinX");
+						if (selectionMinX != null) {
+							this.setPrivateRaw("minX", selectionMinX);
+							yAxis.markDirtyExtremes();
+						}
+						const selectionMaxX = this.getPrivate("selectionMaxX")
+						if (selectionMaxX != null) {
+							this.setPrivateRaw("maxX", selectionMaxX);
+							xAxis.markDirtyExtremes();
+						}
 					}
 				}
-
 
 				if (this.isPrivateDirty("selectionMinX") || this.isPrivateDirty("selectionMaxX")) {
 					xAxis.markDirtySelectionExtremes();
@@ -2052,5 +2095,4 @@ export abstract class XYSeries extends Series {
 			axisDataItem: axisDataItem
 		})
 	}
-
 }

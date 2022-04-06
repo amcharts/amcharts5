@@ -2161,6 +2161,16 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
+	 * Returns false if public setting visible is false or private setting visible is false or private setting forceHidden is true
+	 */ 
+	public isVisible(): boolean {
+		if (this.get("visible") && this.getPrivate("visible") && !this.get("forceHidden")) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Returns width of this element in pixels.
 	 *
 	 * @return Width (px)

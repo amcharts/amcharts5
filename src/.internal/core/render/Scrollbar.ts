@@ -59,7 +59,7 @@ export interface IScrollbarEvents extends IContainerEvents {
 	/**
 	 * Invoked when range of the selection changes.
 	 */
-	rangechanged: { start: number, end: number, grip?:"start" | "end" };
+	rangechanged: { start: number, end: number, grip?: "start" | "end" };
 
 }
 
@@ -187,6 +187,9 @@ export class Scrollbar extends Container {
 					}
 					else {
 						this.thumb.set(key, newCoordinate);
+						this._root.events.on("frameended", () => {
+							this.setPrivateRaw("isBusy", false);
+						})
 					}
 				})
 			)
@@ -330,7 +333,7 @@ export class Scrollbar extends Container {
 		if (this.isDirty("start") || this.isDirty("end")) {
 			const eventType = "rangechanged";
 			if (this.events.isEnabled(eventType)) {
-				this.events.dispatch(eventType, { type: eventType, target: this, start: this.get("start", 0), end: this.get("end", 1), grip:this._gripDown });
+				this.events.dispatch(eventType, { type: eventType, target: this, start: this.get("start", 0), end: this.get("end", 1), grip: this._gripDown });
 			}
 		}
 	}

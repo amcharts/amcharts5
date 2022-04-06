@@ -538,6 +538,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				// otherwise bullets and line out of sync, as series is not redrawn
 				this._root.events.once("frameended", ()=>{
 					this._markDirtyKey("start");
+					this._root._markDirty();
 				})
 			}
 		}

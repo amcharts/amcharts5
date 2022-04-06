@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.0.3] - 2022-03-31
+
 ### Added
 - New map: `regions/world/africaMorocco*` (Moroccan version of the map of Africa).
 - New map: `latvia2021*` (updated in 2021 region map for Latvia).

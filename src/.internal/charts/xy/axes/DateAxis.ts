@@ -268,6 +268,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			series._dataSets[mainDataSetId] = dataItems;
 
+			const groupCallback = series.get("groupDataCallback");
+			let groupOriginals = series.get("groupDataWithOriginals", false);
+			if (groupCallback) {
+				groupOriginals = true;
+			}
+
 			$array.eachContinue(intervals, (interval) => {
 
 				let previousTime = -Infinity;
@@ -297,6 +303,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					firstDate = new Date(dataItems[0].get(key as any));
 				}
 
+				let prevNewDataItem: DataItem<IXYSeriesDataItem> | undefined;
+
 				$array.each(dataItems, (dataItem) => {
 					let time = dataItem.get(key as any);
 					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc, firstDate, this._root.timezone).getTime();
@@ -319,6 +327,16 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 								sum[field] += value;
 							}
 						})
+
+						if (groupOriginals) {
+							newDataItem.set("originals", [dataItem]);
+						}
+
+						if (groupCallback && prevNewDataItem) {
+							groupCallback(prevNewDataItem, interval);
+						}
+
+						prevNewDataItem = newDataItem;
 					}
 					else {
 						$array.each(fields, (field) => {
@@ -373,9 +391,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 								newDataItem.dataContext = dataContext;
 							}
 						})
+
+						if (groupOriginals) {
+							newDataItem.get("originals")!.push(dataItem);
+						}
 					}
 					previousTime = roundedTime;
 				})
+
+				if (groupCallback && prevNewDataItem) {
+					groupCallback(prevNewDataItem, interval);
+				}
 
 				if (series._dataSets[dataSetId].length < this.get("groupCount", Infinity)) {
 					return false
@@ -446,16 +472,45 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						return $order.compare(dataItem.get(fieldName), selectionMin);
 					});
 
-					if (start.index > 0) {
-						start.index -= 1;
+					let startIndex = start.index;
+
+					if (startIndex > 0) {
+						startIndex -= 1;
 					}
 
 					const end = $array.getSortedIndex(series.dataItems, (dataItem) => {
 						return $order.compare(dataItem.get(fieldName), selectionMax);
 					});
+					let endIndex = end.index;
 
-					series.setPrivate("startIndex", start.index);
-					series.setPrivate("endIndex", end.index);
+					let endIndex2 = endIndex;
+					if (endIndex2 > 0) {
+						endIndex2--;
+					}
+
+					const firstDataItem = series.dataItems[startIndex];
+					const lastDataItem = series.dataItems[endIndex2];
+
+					let lastDate: number | undefined;
+					let firstDate: number | undefined;
+					if (firstDataItem) {
+						firstDate = firstDataItem.get(fieldName);
+					}
+
+					if (lastDataItem) {
+						lastDate = lastDataItem.get(fieldName);
+					}
+
+					let outOfSelection = false;
+					if (lastDate != null && firstDate != null) {
+						if (lastDate < selectionMin || firstDate > selectionMax) {
+							outOfSelection = true;
+						}
+					}
+
+					series.setPrivate("outOfSelection", outOfSelection);
+					series.setPrivate("startIndex", startIndex);
+					series.setPrivate("endIndex", endIndex);
 				}
 			})
 		}

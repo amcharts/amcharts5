@@ -130,6 +130,11 @@ exports.spawnSilent = spawnSilent;
 
 
 async function withLinkSource(cwd, f) {
+	// Ignore any errors
+	try {
+		await spawnSilent("yarn", ["unlink"], { cwd });
+	} catch (e) {}
+
 	await spawnSilent("yarn", ["link"], { cwd });
 
 	try {
