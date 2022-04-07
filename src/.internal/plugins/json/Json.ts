@@ -3,6 +3,7 @@ import type { Sprite } from "../../core/render/Sprite";
 import { Entity } from "../../core/util/Entity";
 import { Container } from "../../core/render/Container";
 import { Color } from "../../core/util/Color";
+import { Template } from "../../core/util/Template";
 
 import * as $type from "../../core/util/Type";
 import * as $array from "../../core/util/Array";
@@ -144,6 +145,18 @@ async function parseValue<E extends Entity>(root: Root, value: any, refs: Array<
             return {
                 isValue: true,
                 value: Color.fromAny(value.value),
+            };
+
+        } else if (value.type === "Template") {
+            if (value.refs) {
+                refs = refs.concat([await parseRefs(root, value.refs, refs)]);
+            }
+
+            const settings = (value.settings ? await parseSettings(root, value.settings, refs) : {});
+
+            return {
+                isValue: true,
+                value: Template.new(settings),
             };
 
         } else {

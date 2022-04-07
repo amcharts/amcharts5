@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.12] - 2022-04-07
+
+### Fixed
+- Rounding a Date during daylight saving hour could produce incorrect result in some specific cases.
+
+
 ## [5.1.11] - 2022-04-06
 
 ### Added
