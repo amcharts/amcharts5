@@ -1,12 +1,13 @@
+import type { DataItem } from "../../../core/render/Component";
+
 import { CandlestickSeries, ICandlestickSeriesPrivate, ICandlestickSeriesSettings, ICandlestickSeriesDataItem, ICandlestickSeriesAxisRange } from "./CandlestickSeries";
 import { OHLC } from "./OHLC";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
-import type { DataItem } from "../../../core/render/Component";
+
 import * as $utils from "../../../core/util/Utils";
 
 export interface IOHLCSeriesDataItem extends ICandlestickSeriesDataItem {
-
 }
 
 export interface IOHLCSeriesSettings extends ICandlestickSeriesSettings {
@@ -16,10 +17,12 @@ export interface IOHLCSeriesPrivate extends ICandlestickSeriesPrivate {
 }
 
 export interface IOHLCSeriesAxisRange extends ICandlestickSeriesAxisRange {
+
 	/**
-	 * @todo review
-	 */	
+	 * List of [[OHLC]] columns in a range.
+	 */
 	columns: ListTemplate<OHLC>
+
 }
 
 /**

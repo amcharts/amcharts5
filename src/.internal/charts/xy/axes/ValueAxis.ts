@@ -1,13 +1,14 @@
-import { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
-import { Axis, IAxisSettings, IAxisPrivate, IAxisDataItem, IAxisEvents } from "./Axis";
 import type { IXYSeriesDataItem, XYSeries } from "../series/XYSeries";
+
+import { DataItem } from "../../../core/render/Component";
+import { Axis, IAxisSettings, IAxisPrivate, IAxisDataItem, IAxisEvents } from "./Axis";
+import { MultiDisposer } from "../../../core/util/Disposer";
+
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $math from "../../../core/util/Math";
 import * as $utils from "../../../core/util/Utils";
-import { MultiDisposer } from "../../../core/util/Disposer";
-//import * as $order from "../../../core/util/Order";
 
 export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
 
@@ -33,23 +34,36 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 
 	/**
 	 * Force axis scale to be precisely at values as set in `min` and/or `max`.
-	 * @todo review: In case you did not specify min or max, but set strictMinMax to true, the chart will use actual min and max values
-	 * of the axis without rounding them (extraMin and extraMax will still be added). These extremes will be kept even if you 
-	 * zoom the other axis of the series (Date or Category). @see strictMinMaxSelection if you want similar behavior but need 
-	 * ValueAxis to adjust min and max when other axis is zoomed.
+	 *
+	 * In case `min` and/or `max` is not set, the axis will fix its scale to
+	 * precise lowest and highest values available through all of the series
+	 * attached to it.
+	 *
+	 * This effectively locks the axis from auto-zooming itself when chart
+	 * is zoomed in.
+	 *
+	 * If you need to zoom to actual low/high values within currently visible
+	 * scope, use `strictMinMaxSelection` instead.
+	 *
+	 * Use `extraMin` and `extraMax` to add extra "padding".
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	strictMinMax?: boolean;
 
 	/**
-	 * @todo review
-	 * If you set this to true, the axis won't round min and max of a selection to the nearest round values but use actual min and max
-	 * (only extraMin and extraMax will be added). This is a good feature when your series displays not actual but derivative values,
-	 * like valueYChangeSelection as it helps to avoid frequent jumping of series to adjusted min and max of the axis.
+	 * Force axis to auto-zoom to exact lowest and highest values from attached
+	 * series' data items within ucurrently visible range.
+	 * 
+	 * This is a good feature when your series is plotted from derivative values,
+	 * like `valueYChangeSelection` as it helps to avoid frequent jumping of
+	 * series to adjusted min and max of the axis.
+	 * 
+	 * Use `extraMin` and `extraMax` to add extra "padding".
 	 *
+	 * @since 5.1.11
 	 */
-	strictMinMaxSelection ?: boolean;	
+	strictMinMaxSelection?: boolean;
 
 	/**
 	 * If set to `true` axis will use logarithmic scale.
@@ -427,9 +441,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let minLog = min;
 
 			if (logarithmic) {
-				value = this._minLogAdjusted;				
-				
-				if(value < selectionMin){
+				value = this._minLogAdjusted;
+
+				if (value < selectionMin) {
 					while (value < selectionMin) {
 						value += step;
 					}
@@ -437,14 +451,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 				minLog = value;
 
-				if(minLog <= 0){
+				if (minLog <= 0) {
 					minLog = 1;
-					if(step < 1){
+					if (step < 1) {
 						minLog = step;
 					}
 				}
 
-				differencePower = Math.log(selectionMax - step) * Math.LOG10E - Math.log(minLog) * Math.LOG10E;								
+				differencePower = Math.log(selectionMax - step) * Math.LOG10E - Math.log(minLog) * Math.LOG10E;
 
 				if (differencePower > 2) {
 					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 1);
@@ -867,13 +881,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let extraMin = this.get("extraMin", 0);
 		let extraMax = this.get("extraMax", 0);
 
-		if(this.get("logarithmic")){
-			if(this.get("extraMin") == null){
+		if (this.get("logarithmic")) {
+			if (this.get("extraMin") == null) {
 				extraMin = 0.1;
 			}
-			if(this.get("extraMax") == null){
+			if (this.get("extraMax") == null) {
 				extraMax = 0.2;
-			}			
+			}
 		}
 
 		const gridCount = this.get("renderer").gridCount();
@@ -965,10 +979,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			let selectionMinReal = selectionMin;
-			let selectionMaxReal = selectionMax;			
+			let selectionMaxReal = selectionMax;
 
 			selectionMin -= (selectionMax - selectionMin) * extraMin;
-			selectionMax += (selectionMax - selectionMin) * extraMax;			
+			selectionMax += (selectionMax - selectionMin) * extraMax;
 
 			let minMaxStep: IMinMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount);
 
@@ -998,11 +1012,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = Math.max(selectionMin, minDefined);
 				}
-				
+
 				if ($type.isNumber(maxDefined)) {
 					selectionMax = Math.min(selectionMax, maxDefined);
 				}
-			
+
 			}
 
 			if (selectionStrictMinMax) {
@@ -1041,13 +1055,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let extraMin = this.get("extraMin", 0);
 		let extraMax = this.get("extraMax", 0);
 
-		if(this.get("logarithmic")){
-			if(this.get("extraMin") == null){
+		if (this.get("logarithmic")) {
+			if (this.get("extraMin") == null) {
 				extraMin = 0.1;
 			}
-			if(this.get("extraMax") == null){
+			if (this.get("extraMax") == null) {
 				extraMax = 0.2;
-			}			
+			}
 		}
 
 		let minDiff = Infinity;
@@ -1171,7 +1185,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		min -= (max - min) * extraMin;
 		max += (max - min) * extraMax;
 
-		if(this.get("logarithmic")){
+		if (this.get("logarithmic")) {
 			// don't let min go below 0 if real min is >= 0
 			if (min < 0 && initialMin >= 0) {
 				min = 0;
@@ -1186,7 +1200,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		this._maxReal = max;
 		let strictMinMax = this.get("strictMinMax");
 		let strictMinMaxSelection = this.get("strictMinMaxSelection", false);
-		if(strictMinMaxSelection){
+		if (strictMinMaxSelection) {
 			strictMinMax = strictMinMaxSelection;
 		}
 
@@ -1267,7 +1281,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
-		
+
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			if (this.getPrivate("minFinal") !== min || this.getPrivate("maxFinal") !== max) {

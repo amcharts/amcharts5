@@ -30,64 +30,77 @@ export interface IHierarchyDataObject {
 };
 
 export interface IHierarchyDataItem extends ISeriesDataItem {
+
 	/**
-	 * @todo review
-	 */	
+	 * Value of the node as set in data.
+	 */
 	value: number;
 
 	/**
 	 * @ignore
 	 */
 	valueWorking: number;
+
 	/**
-	 * @todo review
+	 * Percent value of the node.
 	 */
 	valuePercentTotal: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Sum of child values.
+	 */
 	sum: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Category.
+	 */
 	category: string;
+
 	/**
-	 * @todo review
-	 */	
+	 * List of child node data items.
+	 */
 	children: Array<DataItem<IHierarchyDataItem>>;
+
 	/**
-	 * @todo review
-	 */	
+	 * Raw data of the node's children.
+	 */
 	childData: Array<any>
+
 	/**
-	 * @todo review
-	 */	
+	 * Data item of parent node.
+	 */
 	parent: DataItem<IHierarchyDataItem>;
+
 	/**
-	 * @todo review
-	 */	
+	 * Node's depth within the hierarchy.
+	 */
 	depth: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * A reference to the related [[HierarchyNode]].
+	 */
 	node: HierarchyNode;
+
 	/**
-	 * @todo review
-	 */	
+	 * A reference to node's [[Label]].
+	 */
 	label: Label;
+
 	/**
-	 * @todo review
-	 */	
+	 * Node's auto-assigned color.
+	 */
 	fill: Color;
+
 	/**
-	 * @todo review
-	 */	
+	 * Indicates if node is currently disabled.
+	 */
 	disabled: boolean;
 
 	/**
 	 * @ignore
 	 */
 	d3HierarchyNode: d3hierarchy.HierarchyNode<IHierarchyDataObject>;
+
 }
 
 export interface IHierarchySettings extends ISeriesSettings {

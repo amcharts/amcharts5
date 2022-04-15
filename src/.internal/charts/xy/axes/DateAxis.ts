@@ -139,6 +139,10 @@ export interface IDateAxisPrivate extends IValueAxisPrivate {
 	 */
 	baseInterval: ITimeInterval;
 
+	/**
+	 * Current grid interval.
+	 */
+	gridInterval: ITimeInterval;
 }
 
 export interface IDateAxisEvents extends IValueAxisEvents {
@@ -556,6 +560,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			let previousValue = value - intervalDuration;
 			let format: string | Intl.DateTimeFormatOptions;
 			const formats = this.get("dateFormats")!;
+
+			this.setPrivateRaw("gridInterval", gridInterval);
 
 			while (value < selectionMax + intervalDuration) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;

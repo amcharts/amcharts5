@@ -1,8 +1,10 @@
-import { BaseColumnSeries, IBaseColumnSeriesPrivate, IBaseColumnSeriesSettings, IBaseColumnSeriesDataItem, IBaseColumnSeriesAxisRange } from "./BaseColumnSeries";
 import type { DataItem } from "../../../core/render/Component";
+
+import { BaseColumnSeries, IBaseColumnSeriesPrivate, IBaseColumnSeriesSettings, IBaseColumnSeriesDataItem, IBaseColumnSeriesAxisRange } from "./BaseColumnSeries";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
 import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
+
 import * as $utils from "../../../core/util/Utils";
 
 export interface IColumnSeriesDataItem extends IBaseColumnSeriesDataItem { }
@@ -13,8 +15,8 @@ export interface IColumnSeriesPrivate extends IBaseColumnSeriesPrivate { }
 
 export interface IColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
 	/**
-	 * @todo review
-	 */	
+	 * A list of actual columns in a range.
+	 */
 	columns: ListTemplate<RoundedRectangle>
 }
 

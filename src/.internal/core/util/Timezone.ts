@@ -111,6 +111,13 @@ export class Timezone {
 		const userOffset = date.getTimezoneOffset();
 		const output = new Date(date);
 		output.setUTCMinutes(output.getUTCMinutes() - (offset - userOffset));
+
+		const newUserOffset = output.getTimezoneOffset();
+		
+		if(userOffset != newUserOffset){
+			output.setUTCMinutes(output.getUTCMinutes() + newUserOffset - userOffset)
+		}
+				
 		return output;
 	}
 

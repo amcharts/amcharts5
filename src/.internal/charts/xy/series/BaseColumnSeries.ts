@@ -35,7 +35,6 @@ export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/#Data_item_list} for more info
 	 */
 	legendDataItem?: DataItem<ILegendDataItem>;
-
 }
 
 export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
@@ -58,6 +57,10 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 */
 	adjustBulletPosition?: boolean;
 
+	/**
+	 * @todo review
+	 */
+	useLastColorForLegendMarker?: boolean
 }
 
 export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }
@@ -712,15 +715,15 @@ export abstract class BaseColumnSeries extends XYSeries {
 	 */
 	public updateLegendMarker(dataItem?: DataItem<IBaseColumnSeriesDataItem>) {
 		let legendDataItem = this.get("legendDataItem");
-		/**
-		 * this would change legend marker color to the last colum in the selection
-		if(!dataItem){
-			const lastDataItem = this.dataItems[this.endIndex() - 1];
-			console.log(lastDataItem)
-			if(lastDataItem){
-				dataItem = lastDataItem;
-			}			
-		}*/
+
+		if (this.get("useLastColorForLegendMarker")) {
+			if (!dataItem) {
+				const lastDataItem = this.dataItems[this.endIndex() - 1];
+				if (lastDataItem) {
+					dataItem = lastDataItem;
+				}
+			}
+		}
 
 		if (legendDataItem) {
 

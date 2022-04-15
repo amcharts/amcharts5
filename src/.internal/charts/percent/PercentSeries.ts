@@ -81,30 +81,37 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 }
 
 export interface IPercentSeriesPrivate extends ISeriesPrivate {
+
 	/**
-	 * @todo review
-	 */	
+	 * Calculate average value in series.
+	 */
 	valueAverage?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Count of items in series.
+	 */
 	valueCount?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Sum of values in series.
+	 */
 	valueSum?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Sum of all absolute values in series.
+	 */
 	valueAbsoluteSum?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Lowest value in series.
+	 */
 	valueLow?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Highest value in series.
+	 */
 	valueHigh?: number;
+
 }
 
 /**

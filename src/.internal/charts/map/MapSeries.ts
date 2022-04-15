@@ -47,6 +47,27 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	 * @ignore
 	 */
 	geometryTypeField?: string;
+
+	/**
+	 * Names of geodata items, such as countries, to replace by from loaded
+	 * geodata.
+	 *
+	 * Can be used to override built-in English names for countries.
+	 *
+	 * ```TypeScript
+	 * import am5geodata_lang_ES from '@amcharts5-geodata/lang/es';
+	 * // ...
+	 * map.geodataNames = am5geodata_lang_ES;
+	 * ```
+	 * ```JavaScript
+	 * map.geodataNames = am5geodata_lang_ES;
+	 * ```
+	 *
+	 * @since 5.1.13
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-translations/} for more info
+	 */
+	geodataNames?: { [index: string]: string };
+
 }
 
 export interface IMapSeriesPrivate extends ISeriesPrivate {
@@ -154,6 +175,7 @@ export abstract class MapSeries extends Series {
 				console.log("nothing found in geoJSON");
 			}
 
+			const geodataNames = this.get("geodataNames");
 			if (features) {
 
 				for (let i = 0, len = features.length; i < len; i++) {
@@ -164,10 +186,9 @@ export abstract class MapSeries extends Series {
 						let type = geometry.type;
 						let id: string = feature.id;
 
-						// @todo
-						//if (this.chart.geodataNames && this.chart.geodataNames[id]) {
-						//	feature.properties.name = this.chart.geodataNames[id];
-						//}
+						if (geodataNames && geodataNames[id]) {
+							feature.properties.name = geodataNames[id];
+						}
 
 						if (this._types.indexOf(type) != -1) {
 							if (!this.checkInclude(id, this.get("include"), this.get("exclude"))) {

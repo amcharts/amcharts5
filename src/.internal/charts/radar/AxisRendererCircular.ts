@@ -3,11 +3,11 @@ import type { RadarChart } from "./RadarChart";
 import type { Grid } from "../xy/axes/Grid";
 import type { IPoint } from "../../core/util/IPoint";
 import type { Graphics } from "../../core/render/Graphics";
-import { Slice } from "../../core/render/Slice";
 import type { AxisTick } from "../xy/axes/AxisTick";
 import type { AxisBullet } from "../xy/axes/AxisBullet";
 import type { Tooltip } from "../../core/render/Tooltip";
 
+import { Slice } from "../../core/render/Slice";
 import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "../xy/axes/AxisRenderer";
 import { AxisLabelRadial } from "../xy/axes/AxisLabelRadial";
 import { Percent, p100 } from "../../core/util/Percent";
@@ -67,22 +67,27 @@ export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 }
 
 export interface IAxisRendererCircularPrivate extends IAxisRendererPrivate {
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual radius of the label in pixels.
+	 */
 	radius?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual inner radius of the label in pixels.
+	 */
 	innerRadius?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual start angle of the label in degrees.
+	 */
 	startAngle?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual end angle of the label in degrees.
+	 */
 	endAngle?: number;
+
 }
 
 /**

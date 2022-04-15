@@ -119,15 +119,12 @@ export class MapPolygon extends Graphics {
 				coordinates = geometry.coordinates as number[][][];
 			}
 			else if (geometry.type == "MultiPolygon") {
-				if (geometry.coordinates.length > 1) {
-					for (let i = 0; i < geometry.coordinates.length; i++) {
-						let coords = geometry.coordinates[i] as number[][][];
-						let area = geoArea({ type: "Polygon", coordinates: coords });
-
-						if (area > biggestArea) {
-							coordinates = coords;
-							biggestArea = area;
-						}
+				for (let i = 0; i < geometry.coordinates.length; i++) {
+					let coords = geometry.coordinates[i] as number[][][];
+					let area = geoArea({ type: "Polygon", coordinates: coords });
+					if (area > biggestArea) {
+						coordinates = coords;
+						biggestArea = area;
 					}
 				}
 			}

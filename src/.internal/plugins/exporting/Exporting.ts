@@ -128,7 +128,7 @@ export interface IExportingSettings extends IEntitySettings {
 	/**
 	 * Charset to use for export.
 	 *
-	 * @defaul "utf-8"
+	 * @default "utf-8"
 	 */
 	charset?: string;
 

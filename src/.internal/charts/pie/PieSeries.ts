@@ -49,10 +49,12 @@ export interface IPieSeriesSettings extends IPercentSeriesSettings {
 }
 
 export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual radius of the series in pixels.
+	 */
 	radius?: number;
+
 }
 
 /**

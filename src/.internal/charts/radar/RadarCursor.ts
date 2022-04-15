@@ -39,22 +39,27 @@ export interface IRadarCursorSettings extends IXYCursorSettings {
 }
 
 export interface IRadarCursorPrivate extends IXYCursorPrivate {
+
 	/**
-	 * @todo review
-	 */	
-	innerRadius: number;
-	/**
-	 * @todo review
-	 */	
+	 * Actual radius of the cursor in pixels.
+	 */
 	radius: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual inner radius of the cursor in pixels.
+	 */
+	innerRadius: number;
+
+	/**
+	 * Actual start angle of the cursor in degrees.
+	 */
 	startAngle: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual end angle of the cursor in degrees.
+	 */
 	endAngle: number;
+
 }
 
 export interface IRadarCursorEvents extends IXYCursorEvents {
@@ -117,13 +122,13 @@ export class RadarCursor extends XYCursor {
 			xPos = 1 + xPos;
 		}
 
-		if(xPos < 0.003){
+		if (xPos < 0.003) {
 			xPos = 0;
 		}
 
-		if(xPos > 0.997){
+		if (xPos > 0.997) {
 			xPos = 1;
-		}		
+		}
 
 		return { x: xPos, y: (radius - innerRadius) / (this.getPrivate("radius") - innerRadius) };
 	}

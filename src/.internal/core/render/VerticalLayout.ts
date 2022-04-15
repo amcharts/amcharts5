@@ -75,14 +75,17 @@ export class VerticalLayout extends Layout {
 		let prevY = paddingTop;
 
 		eachChildren(container, (child) => {
-			if (child.isVisible()) {
-				if (child.get("position") == "relative") {
+			if (child.get("position") == "relative") {
+				if (child.isVisible()) {
 					let bounds = child.adjustedLocalBounds();
 					let marginTop = child.get("marginTop", 0);
 					let marginBottom = child.get("marginBottom", 0);
 					let y = prevY + marginTop - bounds.top;
 					child.setPrivate("y", y);
 					prevY = y + bounds.bottom + marginBottom;
+				}
+				else {
+					child.setPrivate("y", undefined);
 				}
 			}
 		});

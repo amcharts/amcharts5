@@ -2,44 +2,52 @@ import { RoundedRectangle, IRoundedRectangleSettings, IRoundedRectanglePrivate }
 
 
 export interface ICandlestickSettings extends IRoundedRectangleSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * X0 position of the low value in pixels.
+	 */
 	lowX0?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Y0 position of the low value in pixels.
+	 */
 	lowY0?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * X2 position of the low value in pixels.
+	 */
 	lowX1?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Y1 position of the low value in pixels.
+	 */
 	lowY1?: number;
 
 	/**
-	 * @todo review
+	 * X0 position of the high value in pixels.
 	 */
 	highX0?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Y0 position of the high value in pixels.
+	 */
 	highY0?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Xz position of the high value in pixels.
+	 */
 	highX1?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Y1 position of the high value in pixels.
+	 */
 	highY1?: number;
 
 	/**
-	 * @todo review
+	 * Orientation of the cnadlestick.
 	 */
 	orientation?: "horizontal" | "vertical"
+
 }
 
 export interface ICandlestickPrivate extends IRoundedRectanglePrivate {

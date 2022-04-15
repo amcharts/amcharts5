@@ -25,7 +25,7 @@ export class HorizontalLayout extends Layout {
 		let totalPercent = 0;
 
 		eachChildren(container, (child) => {
-			if(child.isVisible()){
+			if (child.isVisible()) {
 				if (child.get("position") == "relative") {
 					let childWidth = child.get("width");
 					if (childWidth instanceof Percent) {
@@ -55,7 +55,7 @@ export class HorizontalLayout extends Layout {
 
 		if (availableWidth > 0) {
 			eachChildren(container, (child) => {
-				if(child.isVisible()){
+				if (child.isVisible()) {
 					if (child.get("position") == "relative") {
 						let childWidth = child.get("width");
 						if (childWidth instanceof Percent) {
@@ -74,8 +74,9 @@ export class HorizontalLayout extends Layout {
 		let prevX = paddingLeft;
 
 		eachChildren(container, (child) => {
-			if(child.isVisible()){
-				if (child.get("position") == "relative") {
+
+			if (child.get("position") == "relative") {
+				if (child.isVisible()) {
 					let bounds = child.adjustedLocalBounds();
 					let marginLeft = child.get("marginLeft", 0);
 					let marginRight = child.get("marginRight", 0);
@@ -83,6 +84,9 @@ export class HorizontalLayout extends Layout {
 					let x = prevX + marginLeft - bounds.left;
 					child.setPrivate("x", x);
 					prevX = x + bounds.right + marginRight;
+				}
+				else{
+					child.setPrivate("x", undefined);
 				}
 			}
 		});

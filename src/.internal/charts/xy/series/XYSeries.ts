@@ -1,22 +1,23 @@
-import { DataItem } from "../../../core/render/Component";
-import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../../core/render/Series";
 import type { Axis, IAxisPrivate, IAxisDataItem } from "../axes/Axis";
 import type { AxisRenderer } from "../axes/AxisRenderer";
-import * as $array from "../../../core/util/Array";
-import * as $utils from "../../../core/util/Utils";
-import { List } from "../../../core/util/List";
-import * as $type from "../../../core/util/Type";
-import * as $object from "../../../core/util/Object";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { Bullet } from "../../../core/render/Bullet";
 import type { XYChart } from "../XYChart";
-import { Container } from "../../../core/render/Container";
-import { Graphics } from "../../../core/render/Graphics";
-
 import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
 import type { ITimeInterval } from "../../../core/util/Time";
+
+import { DataItem } from "../../../core/render/Component";
+import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../../core/render/Series";
+import { List } from "../../../core/util/List";
+import { Container } from "../../../core/render/Container";
+import { Graphics } from "../../../core/render/Graphics";
+
+import * as $type from "../../../core/util/Type";
+import * as $object from "../../../core/util/Object";
+import * as $array from "../../../core/util/Array";
+import * as $utils from "../../../core/util/Utils";
 
 /**
  * @ignore
@@ -619,12 +620,23 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	tooltipDataItem?: DataItem<IXYSeriesDataItem>
 
 	/**
-	 * @todo review
+	 * If set to `true`, when data is grouped, the `originals` setting of the
+	 * group data items will be populated by the original (source) data items
+	 * that fall into the group.
+	 *
+	 * Please note that if `groupDataCallback` is set, this setting is ignored
+	 * as originals will always be included, regardless of the value.
+	 *
+	 * @since 5.1.11
+	 * @default false
 	 */
 	groupDataWithOriginals?: boolean;
 
 	/**
-	 * @todo review
+	 * A custom function to call when grouping data items.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Custom_aggregation_functions} for more info
+	 * @since 5.1.11
 	 */
 	groupDataCallback?: (dataItem: DataItem<IXYSeriesDataItem>, interval: ITimeInterval) => void;
 
@@ -788,7 +800,7 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 	highValueYhighSelection?: number;
 	highValueYCloseSelection?: number;
 
-	outOfSelection?: boolean;	
+	outOfSelection?: boolean;
 }
 
 
@@ -1172,9 +1184,6 @@ export abstract class XYSeries extends Series {
 		if (this.isDirty("valueYShow") || this.isDirty("valueXShow" || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow"))) {
 			this._updateFields();
 			this._makeFieldNames();
-			if(this._prevSettings.valueXShow != undefined || this._prevSettings.valueYShow != undefined){
-				this.resetExtremes();
-			}
 			this._valuesDirty = true;
 		}
 

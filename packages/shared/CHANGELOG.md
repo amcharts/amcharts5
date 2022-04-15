@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.13] - 2022-04-15
+
+### Added
+- `useLastColorForLegendMarker` setting added to `BaseColumnSeries` (applicable to all column-based series like `ColumnSeries`, `CandlestickSeries`)
+- `geodataNames` setting added to `MapSeries`. Allows setting translations to map features, e.g. countries. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-translations/).
+- Read-only private setting `gridInterval` added to `DateAxis`.
+
+### Fixed
+- If geoJSON contained multipolygons with just one polygon, hovering over polygon was resulting in a JS error.
+- `DateAxis` displayed wrong time when time was switching to DST, when a timezone was set on a `Root` element. 
+
+
 ## [5.1.12] - 2022-04-07
 
 ### Fixed

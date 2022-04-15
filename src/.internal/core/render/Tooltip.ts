@@ -37,7 +37,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * its `tooltipTarget`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
-	 * @defaul false
+	 * @default false
 	 */
 	getFillFromSprite?: boolean;
 
@@ -45,7 +45,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * If set to `true` will use the same `fill` color as its `tooltipTarget`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
-	 * @defaul false
+	 * @default false
 	 */
 	getLabelFillFromSprite?: boolean;
 
@@ -289,7 +289,7 @@ export class Tooltip extends Container {
 	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
 		super._setDataItem(dataItem);
 		this.label._setDataItem(dataItem);
-	}	
+	}
 
 
 	protected _updateBackground() {
@@ -364,7 +364,7 @@ export class Tooltip extends Container {
 						bgStrokeSizeX *= -1;
 					}
 					else {
-						x += (w * cw + pointerLength);						
+						x += (w * cw + pointerLength);
 					}
 				}
 				else if (pointerOrientation == "left") {

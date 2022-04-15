@@ -67,22 +67,27 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 }
 
 export interface IAxisRendererRadialPrivate extends IAxisRendererPrivate {
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual radius of the label in pixels.
+	 */
 	radius?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual inner radius of the label in pixels.
+	 */
 	innerRadius?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual start angle of the label in degrees.
+	 */
 	startAngle?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Actual end angle of the label in degrees.
+	 */
 	endAngle?: number;
+
 }
 
 /**
