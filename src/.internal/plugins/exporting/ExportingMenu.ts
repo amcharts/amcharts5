@@ -306,7 +306,7 @@ export class ExportingMenu extends Entity {
 
 		this._disposers.push($utils.addEventListener(menuElement, $utils.getRendererEvent("pointerout"), (_ev) => {
 			this._isOver = false;
-			if (this.get("deactivateRoot")) {
+			if (this.get("deactivateRoot") && this.isOpen) {
 				this._root._renderer.interactionsEnabled = true;
 			}
 		}));
@@ -533,6 +533,9 @@ export class ExportingMenu extends Entity {
 	 */
 	public close(): void {
 		this.isOpen = false;
+		if (this.get("deactivateRoot")) {
+			this._root._renderer.interactionsEnabled = true;
+		}
 		$utils.blur();
 		this._applyClassNames();
 		this.events.dispatch("menuclosed", {

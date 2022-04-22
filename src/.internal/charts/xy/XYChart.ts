@@ -304,7 +304,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Zoom_out_button} for more info
 	 * @default Button.new()
 	 */
-	public readonly zoomOutButton: Button = this.plotContainer.children.push(Button.new(this._root, {
+	public readonly zoomOutButton: Button = this.topPlotContainer.children.push(Button.new(this._root, {
 		themeTags: ["zoom"],
 		icon: Graphics.new(this._root, {
 			themeTags: ["button", "icon"]
@@ -355,8 +355,6 @@ export class XYChart extends SerialChart {
 
 		plotContainer.children.push(this.topGridContainer);
 		plotContainer.children.push(this.bulletsContainer);
-
-		plotContainer.children.moveValue(zoomOutButton);
 
 		// Setting trasnparent background so that full body of the plot container
 		// is interactive

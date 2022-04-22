@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.1.14] - 2022-04-22
+
+### Fixed
+- `ValueAxis` with a logarithmic scale was not showing some of the labels in some specific cases.
+- Moved `zoomOutButton` of `XYChart` to `topPlotContainer` to solve unwanted zoom when cursor's `snapToSeries` was set.
+- Initially-hidden series legend markers were not being dimmed out unless Animated theme was in use.
+- When whole series was out of selected scope, its last or first value (depending on seleciton) was still included when calculating min and max, causing chart not to adjust min/max values to a visible series scope.
+- `Annotator` was not disabling chart interactivite when activated in Firefox.
+
+
 ## [5.1.13] - 2022-04-15
 
 ### Added

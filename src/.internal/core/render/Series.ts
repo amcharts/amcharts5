@@ -412,13 +412,15 @@ export abstract class Series extends Component {
 				markerRectangle = legendDataItem.get("markerRectangle");
 
 				if (markerRectangle) {
-					if (this.isDirty("stroke")) {
-						let stroke = this.get("stroke");
-						markerRectangle.set("stroke", stroke);
-					}
-					if (this.isDirty("fill")) {
-						let fill = this.get("fill");
-						markerRectangle.set("fill", fill);
+					if(this.isVisible()){
+						if (this.isDirty("stroke")) {												
+							let stroke = this.get("stroke");
+							markerRectangle.set("stroke", stroke);
+						}
+						if (this.isDirty("fill")) {
+							let fill = this.get("fill");						
+							markerRectangle.set("fill", fill);
+						}
 					}
 				}
 			}

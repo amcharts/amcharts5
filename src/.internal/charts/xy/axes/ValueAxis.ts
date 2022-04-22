@@ -461,7 +461,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				differencePower = Math.log(selectionMax - step) * Math.LOG10E - Math.log(minLog) * Math.LOG10E;
 
 				if (differencePower > 2) {
-					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 1);
+					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 5);
 				}
 			}
 
@@ -496,7 +496,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 				else {
 					if (differencePower > 2) {
-						value = Math.pow(10, Math.log(minLog) * Math.LOG10E + i);
+						value = Math.pow(10, Math.log(minLog) * Math.LOG10E + i - 5);
 					}
 					else {
 						value += step;
@@ -902,13 +902,18 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				if (!series.get("ignoreMinMax")) {
 					let seriesMin: number | undefined;
 					let seriesMax: number | undefined;
+					const outOfSelection = series.getPrivate("outOfSelection");
 					if (series.get("xAxis") === this) {
-						seriesMin = series.getPrivate("selectionMinX", series.getPrivate("minX"));
-						seriesMax = series.getPrivate("selectionMaxX", series.getPrivate("maxX"));
+						if (!outOfSelection) {
+							seriesMin = series.getPrivate("selectionMinX", series.getPrivate("minX"));
+							seriesMax = series.getPrivate("selectionMaxX", series.getPrivate("maxX"));
+						}
 					}
 					else if (series.get("yAxis") === this) {
-						seriesMin = series.getPrivate("selectionMinY", series.getPrivate("minY"));
-						seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
+						if (!outOfSelection) {
+							seriesMin = series.getPrivate("selectionMinY", series.getPrivate("minY"));
+							seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
+						}
 					}
 					if (!series.isHidden() && !series.isShowing()) {
 						if ($type.isNumber(seriesMin)) {
@@ -1025,6 +1030,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			if (this.get("logarithmic")) {
+
+				if (selectionMin <= 0) {
+					selectionMin = selectionMinReal * (1 - Math.min(extraMin, 0.99));
+				}
+
 				if (selectionMin < min) {
 					selectionMin = min;
 				}
@@ -1277,10 +1287,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			max = this._maxReal;
 
 			if (min <= 0) {
-				min = initialMin;
+				min = initialMin * (1 - Math.min(extraMin, 0.99));
 			}
 		}
-
 
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
