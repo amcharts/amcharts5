@@ -478,6 +478,61 @@ export class StyleSheet extends DisposerClass {
 	}
 }
 
+
+/**
+ * Adds a class name to an HTML or SVG element.
+ *
+ * @ignore Exclude from docs
+ * @param element    Element
+ * @param className  Class name to add
+ */
+export function addClass(element: HTMLElement | SVGElement, className: string): void {
+	if (!element) {
+		return;
+	}
+	if (element.classList) {
+		const classes = className.split(" ");
+		$array.each(classes, (name) => {
+			element.classList.add(name);
+		});
+	}
+	else {
+		let currentClassName = element.getAttribute("class");
+		if (currentClassName) {
+			element.setAttribute("class", currentClassName.split(" ").filter((item) => {
+				return item !== className;
+			}).join(" ") + " " + className);
+		}
+		else {
+			element.setAttribute("class", className);
+		}
+	}
+}
+
+/**
+ * Removes a class name from an HTML or SVG element.
+ *
+ * @ignore Exclude from docs
+ * @param element    Element
+ * @param className  Class name to add
+ */
+export function removeClass(element: HTMLElement, className: string): void {
+	if (!element) {
+		return;
+	}
+	if (element.classList) {
+		element.classList.remove(className);
+	}
+	else {
+		let currentClassName = element.getAttribute("class");
+		if (currentClassName) {
+			element.setAttribute("class", currentClassName.split(" ").filter((item) => {
+				return item !== className;
+			}).join(" "));
+		}
+	}
+}
+
 // /**
 //  * Applies a set of styles to an element. Stores the original styles so they
 //  * can be restored later.
@@ -744,9 +799,9 @@ export function getWeek(date: Date, utc: boolean = false): number {
 	if (week === 0) {
 		week = 53;
 	}
-	else if (week === 53) {
-		week = 1;
-	}
+	// else if (week === 53) {
+	// 	week = 1;
+	// }
 	return week;
 }
 

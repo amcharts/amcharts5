@@ -17,6 +17,8 @@ let rules: CounterDisposer | undefined;
  */
 function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDisposer {
 	const ic = root.interfaceColors;
+	const active = ic.get("secondaryButton")!.toCSS();
+	//const altbg = ic.get("alternativeBackground")!.toCSS();
 
 	if (!rules) {
 		const disposer = new MultiDisposer([
@@ -62,10 +64,84 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 
 			new StyleRule(element, ".am5-modal-content", {
 				"display": "inline-block",
-				"padding": "1em",
+				"padding": "1.2em",
 				"vertical-align": "middle",
+				"text-align": "left",
+				"white-space": "normal",
 				"background": ic.get("background")!.toCSS(),
-				"border": "1px solid " + ic.get("alternativeBackground")!.toCSS()
+				//"border": "1px solid " + ic.get("alternativeBackground")!.toCSS(),
+				"border-radius": "4px",
+				"-webkit-box-shadow": "0px 0px 36px 0px rgba(0,0,0,0.45)",
+				"box-shadow": "0px 0px 36px 0px rgba(0,0,0,0.45)"
+			}),
+
+			new StyleRule(element, ".am5-modal-content h1", {
+				"font-size": "1em",
+				"margin": "0 0 0.5em 0"
+			}),
+
+			new StyleRule(element, ".am5-modal-table", {
+				"display": "table",
+				"margin": "1em 0"
+			}),
+
+			new StyleRule(element, ".am5-modal-table-row", {
+				"display": "table-row"
+			}),
+
+			new StyleRule(element, ".am5-modal-table-heading", {
+				"display": "table-heading",
+				"padding": "3px 10px 3px 0",
+			}),
+
+			new StyleRule(element, ".am5-modal-table-cell", {
+				"display": "table-cell",
+				"padding": "3px 0 3px 0",
+			}),
+
+			new StyleRule(element, ".am5-modal-table-cell > *", {
+				"vertical-align": "middle"
+			}),
+
+			new StyleRule(element, ".am5-modal-content input[type=text], .am5-modal-content input[type=number], .am5-modal-content select", {
+				"border": "1px solid " + active,
+				"border-radius": "4px",
+				"padding": "3px 5px",
+				"margin": "2px"
+			}),
+
+			new StyleRule(element, ".am5-modal-input-narrow", {
+				"width": "50px"
+			}),
+
+			new StyleRule(element, ".am5-modal-button", {
+				"font-weight": "400",
+				"color": ic.get("secondaryButtonText")!.toCSS(),
+				"line-height": "1.5",
+				"text-align": "center",
+				"text-decoration": "none",
+				"vertical-align": "middle",
+				"cursor": "pointer",
+				"padding": "0.2em 0.8em",
+				"font-size": "1em",
+				"border-radius": "0.25em",
+				"margin": "0 0.25em 0 0",
+				"border": "1px solid " + ic.get("secondaryButtonStroke")!.toCSS(),
+				"background": ic.get("secondaryButton")!.toCSS()
+			}),
+
+			new StyleRule(element, ".am5-modal-button:hover", {
+				"background": ic.get("secondaryButtonHover")!.toCSS()
+			}),
+
+			new StyleRule(element, ".am5-modal-button.am5-modal-primary", {
+				"color": ic.get("primaryButtonText")!.toCSS(),
+				"border": "1px solid " + ic.get("primaryButtonStroke")!.toCSS(),
+				"background": ic.get("primaryButton")!.toCSS()
+			}),
+
+			new StyleRule(element, ".am5-modal-button.am5-modal-primary:hover", {
+				"background": ic.get("primaryButtonHover")!.toCSS()
 			}),
 
 		]);

@@ -277,8 +277,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (groupCallback) {
 				groupOriginals = true;
 			}
-
-			$array.eachContinue(intervals, (interval) => {
+			
+			$array.each(intervals, (interval) => {
 
 				let previousTime = -Infinity;
 				let dataSetId = interval.timeUnit + interval.count;
@@ -406,11 +406,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (groupCallback && prevNewDataItem) {
 					groupCallback(prevNewDataItem, interval);
 				}
-
-				if (series._dataSets[dataSetId].length < this.get("groupCount", Infinity)) {
-					return false
-				}
-				return true;
 			})
 			if (series._dataSetId) {
 				series.setDataSet(series._dataSetId);

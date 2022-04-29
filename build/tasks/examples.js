@@ -51,30 +51,32 @@ function get_es2015_imports(template, path_to_v5) {
 	while ((x = re.exec(template)) != null) {
 		const path = x[1];
 
-		const split = path.split(/\//g);
+        if (path[0] !== ".") {
+            const split = path.split(/\//g);
 
-		let package;
+            let package;
 
-		if (split[0] === "@amcharts" && split[1] === "amcharts5") {
-			const json = require("../../package.json");
-			//package = `"@amcharts/amcharts5": "file:${path_to_v5}"`;
-			package = `"@amcharts/amcharts5": "^${json.version}"`;
+            if (split[0] === "@amcharts" && split[1] === "amcharts5") {
+                const json = require("../../package.json");
+                //package = `"@amcharts/amcharts5": "file:${path_to_v5}"`;
+                package = `"@amcharts/amcharts5": "^${json.version}"`;
 
-		} else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
-			const json = require("../../packages/geodata/package.json");
-			package = `"@amcharts/amcharts5-geodata": "^${json.version}"`;
+            } else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
+                const json = require("../../packages/geodata/package.json");
+                package = `"@amcharts/amcharts5-geodata": "^${json.version}"`;
 
-		} else if (split[0] === "@amcharts" && split[1] === "amcharts5-fonts") {
-			const json = require("../../packages/fonts/package.json");
-			package = `"@amcharts/amcharts5-fonts": "^${json.version}"`;
+            } else if (split[0] === "@amcharts" && split[1] === "amcharts5-fonts") {
+                const json = require("../../packages/fonts/package.json");
+                package = `"@amcharts/amcharts5-fonts": "^${json.version}"`;
 
-		} else {
-			throw new Error("Unknown import: " + path);
-		}
+            } else {
+                throw new Error("Unknown import: " + path);
+            }
 
-		if (imports.indexOf(package) === -1) {
-			imports.push(package);
-		}
+            if (imports.indexOf(package) === -1) {
+                imports.push(package);
+            }
+        }
 	}
 
 	return imports;
@@ -92,8 +94,7 @@ async function write_es2015_shared(config, base, dir) {
     <link rel="stylesheet" href="index.css" />${config.extraHeadElements.map((x) => `
     ${x}`).join("")}
   </head>
-  <body>
-    <div id="chartdiv"></div>${config.extraBodyElements.map((x) => `
+  <body>${config.bodyElements.map((x) => `
     ${x}`).join("")}
     <script src="dist/index.js"></script>
   </body>
@@ -283,24 +284,29 @@ async function transpile_js(config, base, root_dir, dir, template) {
 	const path_to_v5 = posixPath($path.relative(dir, root_dir));
 
 	template = template.replace(/^ *import[^"\n\r]+"([^"\n\r]+)";[\n\r]*/gm, (_, path) => {
-		const split = path.split(/\//g);
+        if (path[0] === ".") {
+            imports.push(path);
 
-		if (split[0] === "@amcharts" && split[1] === "amcharts5") {
-			if (split.length === 2) {
-				imports.push(path_to_v5 + "/index.js");
-			} else {
-				imports.push(path_to_v5 + "/" + split.slice(2).join("/") + ".js");
-			}
+        } else {
+            const split = path.split(/\//g);
 
-		} else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
-			imports.push(path_to_v5 + "/geodata/" + split.slice(2).join("/") + ".js");
+            if (split[0] === "@amcharts" && split[1] === "amcharts5") {
+                if (split.length === 2) {
+                    imports.push(path_to_v5 + "/index.js");
+                } else {
+                    imports.push(path_to_v5 + "/" + split.slice(2).join("/") + ".js");
+                }
 
-		} else if (split[0] === "@amcharts" && split[1] === "amcharts5-fonts") {
-			imports.push(path_to_v5 + "/fonts/" + split.slice(2).join("/") + ".js");
+            } else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
+                imports.push(path_to_v5 + "/geodata/" + split.slice(2).join("/") + ".js");
 
-		} else {
-			throw new Error("Unknown import: " + path);
-		}
+            } else if (split[0] === "@amcharts" && split[1] === "amcharts5-fonts") {
+                imports.push(path_to_v5 + "/fonts/" + split.slice(2).join("/") + ".js");
+
+            } else {
+                throw new Error("Unknown import: " + path);
+            }
+        }
 
 		return "";
 	});
@@ -333,8 +339,7 @@ async function transpile_js(config, base, root_dir, dir, template) {
     <link rel="stylesheet" href="index.css" />${config.extraHeadElements.map((x) => `
     ${x}`).join("")}
   </head>
-  <body>
-    <div id="chartdiv"></div>${config.extraBodyElements.map((x) => `
+  <body>${config.bodyElements.map((x) => `
     ${x}`).join("")}
 ${imports.map((x) => `    <script src="${x}"></script>
 `).join("")}    <script src="index.js"></script>
@@ -354,7 +359,7 @@ function makeDefaultConfiguration() {
 	return {
 		extraCSS: null,
 		extraHeadElements: [],
-		extraBodyElements: [],
+		bodyElements: ["<div id=\"chartdiv\"></div>"],
 		noScript: false,
 		body: {
 			"font-family": `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
@@ -382,7 +387,7 @@ function validateConfiguration(config) {
 
 			defaults[key] = value;
 
-		} else if (key === "extraBodyElements" || key === "extraHeadElements") {
+		} else if (key === "bodyElements" || key === "extraHeadElements") {
 			if (!Array.isArray(value)) {
 				throw new Error(key + " must be an array of strings");
 			}

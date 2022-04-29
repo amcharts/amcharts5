@@ -934,5 +934,24 @@ export class DefaultTheme extends Theme {
 			innerRadius: 5,
 			radius: 10
 		})
+
+		// STOCK
+		r("Tooltip", ["stock"]).setAll({
+			paddingTop: 6,
+			paddingBottom: 5,
+			paddingLeft: 7,
+			paddingRight: 7
+		});
+
+		r("PointedRectangle", ["tooltip", "stock", "axis"]).setAll({
+			pointerLength:0, 
+			pointerBaseWidth:0,
+			cornerRadius:3		
+		});	
+
+		r("Label", ["tooltip", "stock"]).setAll({
+			fontSize:"0.8em"
+		});		
+
 	}
 }

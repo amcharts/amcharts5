@@ -5,7 +5,9 @@ import * as $array from "../../../core/util/Array";
 import { CurveFactory, line, area } from "d3-shape";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
+import { color } from "../../../core/util/Color";
 import { DataItem } from "../../../core/render/Component";
+import { Rectangle } from "../../../core/render/Rectangle";
 import type { Axis } from "../axes/Axis";
 import type { AxisRenderer } from "../axes/AxisRenderer";
 import * as $utils from "../../../core/util/Utils";
@@ -655,8 +657,10 @@ export class LineSeries extends XYSeries {
 				markerRectangle.setPrivate("visible", false);
 			}
 
+			marker.set("background", Rectangle.new(this._root, {fillOpacity:0, fill:color(0x000000)}))
+
 			const legendStroke = marker.children.push(Graphics._new(marker._root, {
-				themeTags: ["line", "series", "legend", "marker", "stroke"]
+				themeTags: ["line", "series", "legend", "marker", "stroke"], interactive:false
 			}, [this.strokes.template]));
 
 			this._legendStroke = legendStroke;

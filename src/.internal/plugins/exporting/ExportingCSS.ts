@@ -97,6 +97,7 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			new StyleRule(element, ".am5exporting-list", {
 				"display": "none",
 				"list-style": "none",
+				"list-style-type": "none",
 				"margin": "5px",
 				"background": ic.get("secondaryButton")!.toCSS(),
 				"padding": "5px 0",

@@ -308,14 +308,19 @@
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
 
 "@types/node@*":
-  version "17.0.21"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
-  integrity sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==
+  version "17.0.23"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.23.tgz#3b41a6e643589ac6442bdbd7a4a3ded62f33f7da"
+  integrity sha512-UxDxWn7dl97rKVeVS61vErvw086aCYhDLyvRQZ5Rk65rZKepaFdm53GeqXaKBuOhED4e9uWq34IC3TdSdJJ2Gw==
 
 "@types/polylabel@^1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/polylabel/-/polylabel-1.0.5.tgz#9262f269de36f1e9248aeb9dee0ee9d10065e043"
   integrity sha512-gnaNmo1OJiYNBFAZMZdqLZ3hKx2ee4ksAzqhKWBxuQ61PmhINHMcvIqsGmyCD1WFKCkwRt9NFhMSmKE6AgYY+w==
+
+"@types/regression@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@types/regression/-/regression-2.0.2.tgz#a1ad747fbcc6726643a8eb2c42bb804bbf34ce02"
+  integrity sha512-i7KOGl6xdkfpq5+p2ooC+/XFIRUMkYymZ29SD8p+Ko9lesKGUsh6860ey3YM7Y+ZG7kEDGcjzyLO3sOhozqEeA==
 
 "@types/svg-arc-to-cubic-bezier@^3.2.0":
   version "3.2.0"
@@ -1819,9 +1824,9 @@ duplexify@^3.4.2, duplexify@^3.6.0:
     stream-shift "^1.0.0"
 
 electron-to-chromium@^1.4.84:
-  version "1.4.88"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.88.tgz#ebe6a2573b563680c7a7bf3a51b9e465c9c501db"
-  integrity sha512-oA7mzccefkvTNi9u7DXmT0LqvhnOiN2BhSrKerta7HeUC1cLoIwtbf2wL+Ah2ozh5KQd3/1njrGrwDBXx6d14Q==
+  version "1.4.90"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.90.tgz#4a518590f118828d54fff045728f547fef08143f"
+  integrity sha512-ZwKgSA0mQMyEhz+NR0F8dRzkrCLeHLzLkjx/CWf16+zV85hQ6meXPQbKanvhnpkYb7b2uJNj+enQJ/N877ND4Q==
 
 elliptic@^6.5.3:
   version "6.5.4"
@@ -2162,6 +2167,11 @@ find-up@^3.0.0:
   integrity sha512-1yD6RmLI1XBfxugvORwlck6f75tYL+iR0jqwsOrOxMZyGYqUuDhJ0l4AXdO1iX/FTs9cBAMEk1gWSEx1kSbylg==
   dependencies:
     locate-path "^3.0.0"
+
+flatpickr@^4.6.9:
+  version "4.6.11"
+  resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.6.11.tgz#c92f5108269c551c6b5069ecd754be610574574c"
+  integrity sha512-/rnbE/hu5I5zndLEyYfYvqE4vPDvI5At0lFcQA5eOPfjquZLcQ0HMKTL7rv5/+DvbPM3/vJcXpXjB/DjBh+1jw==
 
 flush-write-stream@^1.0.0:
   version "1.1.1"
@@ -2990,10 +3000,10 @@ minimatch@^3.0.0, minimatch@^3.0.4:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@^1.1.3, minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+minimist@^1.1.3, minimist@^1.2.0, minimist@^1.2.5, minimist@^1.2.6:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 minimist@^1.2.6:
   version "1.2.6"
@@ -3025,11 +3035,11 @@ mixin-deep@^1.2.0:
     is-extendable "^1.0.1"
 
 "mkdirp@>=0.5.5 <1", mkdirp@^0.5.1, mkdirp@^0.5.3, mkdirp@~0.5.1:
-  version "0.5.5"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.5.tgz#d91cefd62d1436ca0f41620e251288d420099def"
-  integrity sha512-NKmAlESf6jMGym1++R0Ra7wvhV+wFW63FaSOFPwRahvea0gMUcGUhVeAg/0BC0wiv9ih5NYPB1Wn1UEI1/L+xQ==
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.6.tgz#7def03d2432dcae4ba1d611445c48396062255f6"
+  integrity sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==
   dependencies:
-    minimist "^1.2.5"
+    minimist "^1.2.6"
 
 mkdirp@^0.5.5:
   version "0.5.6"
@@ -3594,6 +3604,11 @@ regexp.prototype.flags@^1.2.0:
   dependencies:
     call-bind "^1.0.2"
     define-properties "^1.1.3"
+
+regression@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/regression/-/regression-2.0.1.tgz#8d29c3e8224a10850c35e337e85a8b2fac3b0c87"
+  integrity sha1-jSnD6CJKEIUMNeM36FqLL6w7DIc=
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"

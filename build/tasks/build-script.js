@@ -138,6 +138,7 @@ export const ${mangledName} = m;`);
 				dependOn = "percent";
 				break;
 			case "radar":
+			case "stock":
 				dependOn = "xy";
 				break;
 			default:

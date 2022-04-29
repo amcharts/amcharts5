@@ -172,7 +172,7 @@ function getCustomDataValue(target: Sprite, prop: string): any {
 /**
  * @ignore
  */
-function getTagValueFromObject(target: Sprite, parts: any[], object: any, format?: string): any {
+export function getTagValueFromObject(target: Sprite, parts: any[], object: any, format?: string): any {
 	let current: any = object;
 	let formatApplied = false;
 	for (let i = 0, len = parts.length; i < len; i++) {

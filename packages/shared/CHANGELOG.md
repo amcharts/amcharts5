@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.0] - 2022-04-29
+
+### Added
+- Initial (beta) version of `StockChart` added. Check [documentation](https://www.amcharts.com/docs/v5/charts/stock/) and [product info](https://www.amcharts.com/stock-chart/).
+
+### Fixed
+- Week numbers for "leap weeks" were not being formated properly.
+- Removing an axis range with a bullet was not removing the bullet itself.
+- If one of the series had less data than another and their date axis had data grouping enabled, data of a series with less values could be not grouped.
+- `ColumnSeries` was not coloring its legend marker initially if `useLastColorForLegendMarker` was `true`.
+- Hovering on `ExportingMenu` was permanently disabling chart interactivity.
+
+
 ## [5.1.14] - 2022-04-22
 
 ### Fixed

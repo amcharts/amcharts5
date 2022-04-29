@@ -296,6 +296,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	protected _sAnimation?: Animation<this["_settings"]["start"]>;
 	protected _eAnimation?: Animation<this["_settings"]["end"]>;
 
+	public _skipSync:boolean = false;
+
 	/**
 	 * A list of axis ranges.
 	 *
@@ -536,10 +538,18 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				this.set("start", start);
 				this.set("end", end);
 				// otherwise bullets and line out of sync, as series is not redrawn
-				this._root.events.once("frameended", ()=>{
+				this._root.events.once("frameended", () => {
 					this._markDirtyKey("start");
 					this._root._markDirty();
 				})
+			}
+		}
+		else {
+			if (this._sAnimation) {
+				this._sAnimation.stop();
+			}
+			if (this._eAnimation) {
+				this._eAnimation.stop();
 			}
 		}
 	}
@@ -869,6 +879,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		if (axisFill) {
 			renderer.axisFills.removeValue(axisFill);
 			axisFill.dispose();
+		}
+		const bullet = dataItem.get("bullet");
+
+		if (bullet) {
+			bullet.dispose();
 		}
 	}
 

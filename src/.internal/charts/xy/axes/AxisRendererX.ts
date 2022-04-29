@@ -83,7 +83,7 @@ export class AxisRendererX extends AxisRenderer {
 			axis.markDirtySize();
 		}
 
-		axis.ghostLabel.set("forceHidden", this.get("inside"));
+		axis.ghostLabel.setPrivate("visible", !this.get("inside"));
 		
 		const opposite = "opposite"
 

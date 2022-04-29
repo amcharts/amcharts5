@@ -3,7 +3,12 @@
  * DO NOT MANUALLY EDIT IT OR YOUR CHANGES WILL BE LOST!
  */
 
+import type { AccumulationDistribution } from "./../../../stock";
+import type { AccumulativeSwingIndex } from "./../../../stock";
 import type { Annotator } from "./../../../plugins/exporting";
+import type { Aroon } from "./../../../stock";
+import type { AverageSeries } from "./../../../stock";
+import type { AwesomeOscillator } from "./../../../stock";
 import type { Axis } from "./../../../xy";
 import type { AxisBullet } from "./../../../xy";
 import type { AxisLabel } from "./../../../xy";
@@ -15,14 +20,19 @@ import type { AxisRendererX } from "./../../../xy";
 import type { AxisRendererY } from "./../../../xy";
 import type { AxisTick } from "./../../../xy";
 import type { BaseColumnSeries } from "./../../../xy";
+import type { BollingerBands } from "./../../../stock";
 import type { BreadcrumbBar } from "./../../../hierarchy";
 import type { Bullet } from "./../../../index";
 import type { Button } from "./../../../index";
+import type { CalloutSeries } from "./../../../stock";
 import type { Candlestick } from "./../../../xy";
 import type { CandlestickSeries } from "./../../../xy";
 import type { CategoryAxis } from "./../../../xy";
 import type { CategoryDateAxis } from "./../../../xy";
+import type { ChaikinMoneyFlow } from "./../../../stock";
+import type { ChaikinOscillator } from "./../../../stock";
 import type { Chart } from "./../../../index";
+import type { ChartIndicator } from "./../../../stock";
 import type { Chord } from "./../../../flow";
 import type { ChordDirected } from "./../../../flow";
 import type { ChordLink } from "./../../../flow";
@@ -32,16 +42,32 @@ import type { ChordNonRibbon } from "./../../../flow";
 import type { Circle } from "./../../../index";
 import type { CirclePattern } from "./../../../index";
 import type { ClockHand } from "./../../../radar";
+import type { ColorControl } from "./../../../stock";
 import type { ColorSet } from "./../../../index";
 import type { ColumnSeries } from "./../../../xy";
+import type { CommodityChannelIndex } from "./../../../stock";
+import type { ComparisonControl } from "./../../../stock";
 import type { Component } from "./../../../index";
 import type { Container } from "./../../../index";
 import type { DateAxis } from "./../../../xy";
+import type { DateRangeSelector } from "./../../../stock";
+import type { DisparityIndex } from "./../../../stock";
+import type { DoodleSeries } from "./../../../stock";
+import type { DrawingControl } from "./../../../stock";
+import type { DrawingSeries } from "./../../../stock";
+import type { DrawingToolControl } from "./../../../stock";
+import type { Dropdown } from "./../../../stock";
+import type { DropdownColors } from "./../../../stock";
+import type { DropdownList } from "./../../../stock";
+import type { DropdownListControl } from "./../../../stock";
 import type { DurationAxis } from "./../../../xy";
 import type { Ellipse } from "./../../../index";
+import type { EllipseSeries } from "./../../../stock";
 import type { Entity } from "./../../../index";
 import type { Exporting } from "./../../../plugins/exporting";
 import type { ExportingMenu } from "./../../../plugins/exporting";
+import type { FibonacciSeries } from "./../../../stock";
+import type { FibonacciTimezoneSeries } from "./../../../stock";
 import type { Flow } from "./../../../flow";
 import type { FlowLink } from "./../../../flow";
 import type { FlowNode } from "./../../../flow";
@@ -60,8 +86,16 @@ import type { Hierarchy } from "./../../../hierarchy";
 import type { HierarchyLink } from "./../../../hierarchy";
 import type { HierarchyNode } from "./../../../hierarchy";
 import type { HorizontalLayout } from "./../../../index";
+import type { HorizontalLineSeries } from "./../../../stock";
+import type { HorizontalRaySeries } from "./../../../stock";
+import type { IconControl } from "./../../../stock";
+import type { IconSeries } from "./../../../stock";
+import type { Indicator } from "./../../../stock";
+import type { IndicatorControl } from "./../../../stock";
 import type { InterfaceColors } from "./../../../index";
+import type { IntervalControl } from "./../../../stock";
 import type { Label } from "./../../../index";
+import type { LabelSeries } from "./../../../stock";
 import type { Layout } from "./../../../index";
 import type { Legend } from "./../../../index";
 import type { Line } from "./../../../index";
@@ -70,6 +104,7 @@ import type { LineSeries } from "./../../../xy";
 import type { LinearGradient } from "./../../../index";
 import type { LinkedHierarchy } from "./../../../hierarchy";
 import type { LinkedHierarchyNode } from "./../../../hierarchy";
+import type { MACD } from "./../../../stock";
 import type { MapChart } from "./../../../map";
 import type { MapLine } from "./../../../map";
 import type { MapLineSeries } from "./../../../map";
@@ -78,19 +113,27 @@ import type { MapPolygon } from "./../../../map";
 import type { MapPolygonSeries } from "./../../../map";
 import type { MapSeries } from "./../../../map";
 import type { Modal } from "./../../../index";
+import type { MovingAverage } from "./../../../stock";
+import type { MovingAverageDeviation } from "./../../../stock";
+import type { MovingAverageEnvelope } from "./../../../stock";
 import type { OHLC } from "./../../../xy";
 import type { OHLCSeries } from "./../../../xy";
+import type { OnBalanceVolume } from "./../../../stock";
 import type { Pack } from "./../../../hierarchy";
+import type { PanelControls } from "./../../../stock";
 import type { Partition } from "./../../../hierarchy";
 import type { Pattern } from "./../../../index";
 import type { PercentChart } from "./../../../percent";
 import type { PercentSeries } from "./../../../percent";
+import type { PeriodSelector } from "./../../../stock";
 import type { PictorialStackedSeries } from "./../../../percent";
 import type { Picture } from "./../../../index";
 import type { PieChart } from "./../../../percent";
 import type { PieSeries } from "./../../../percent";
 import type { PointedRectangle } from "./../../../index";
+import type { PolylineSeries } from "./../../../stock";
 import type { PyramidSeries } from "./../../../percent";
+import type { QuadrantLineSeries } from "./../../../stock";
 import type { RadarChart } from "./../../../radar";
 import type { RadarColumnSeries } from "./../../../radar";
 import type { RadarCursor } from "./../../../radar";
@@ -100,6 +143,10 @@ import type { RadialLabel } from "./../../../index";
 import type { RadialText } from "./../../../index";
 import type { Rectangle } from "./../../../index";
 import type { RectanglePattern } from "./../../../index";
+import type { RectangleSeries } from "./../../../stock";
+import type { RegressionSeries } from "./../../../stock";
+import type { RelativeStrengthIndex } from "./../../../stock";
+import type { ResetControl } from "./../../../stock";
 import type { RoundedRectangle } from "./../../../index";
 import type { Sankey } from "./../../../flow";
 import type { SankeyLink } from "./../../../flow";
@@ -107,6 +154,10 @@ import type { SankeyNodes } from "./../../../flow";
 import type { Scrollbar } from "./../../../index";
 import type { SerialChart } from "./../../../index";
 import type { Series } from "./../../../index";
+import type { SeriesTypeControl } from "./../../../stock";
+import type { SettingsControl } from "./../../../stock";
+import type { SettingsModal } from "./../../../stock";
+import type { SimpleLineSeries } from "./../../../stock";
 import type { Slice } from "./../../../index";
 import type { SliceGrouper } from "./../../../plugins/sliceGrouper";
 import type { SlicedChart } from "./../../../percent";
@@ -116,18 +167,29 @@ import type { SmoothedXLineSeries } from "./../../../xy";
 import type { SmoothedXYLineSeries } from "./../../../xy";
 import type { SmoothedYLineSeries } from "./../../../xy";
 import type { Sprite } from "./../../../index";
+import type { SpriteResizer } from "./../../../stock";
 import type { Star } from "./../../../index";
 import type { StepLineSeries } from "./../../../xy";
+import type { StochasticOscillator } from "./../../../stock";
+import type { StockChart } from "./../../../stock";
+import type { StockControl } from "./../../../stock";
+import type { StockLegend } from "./../../../stock";
+import type { StockPanel } from "./../../../stock";
+import type { StockToolbar } from "./../../../stock";
 import type { Sunburst } from "./../../../hierarchy";
 import type { Text } from "./../../../index";
 import type { Tick } from "./../../../index";
 import type { Tooltip } from "./../../../index";
 import type { Tree } from "./../../../hierarchy";
 import type { Treemap } from "./../../../hierarchy";
+import type { TrendLineSeries } from "./../../../stock";
 import type { Triangle } from "./../../../index";
 import type { ValueAxis } from "./../../../xy";
 import type { Venn } from "./../../../venn";
 import type { VerticalLayout } from "./../../../index";
+import type { VerticalLineSeries } from "./../../../stock";
+import type { Volume } from "./../../../stock";
+import type { WilliamsR } from "./../../../stock";
 import type { WordCloud } from "./../../../wc";
 import type { XYChart } from "./../../../xy";
 import type { XYChartScrollbar } from "./../../../xy";
@@ -136,7 +198,12 @@ import type { XYSeries } from "./../../../xy";
 import type { ZoomControl } from "./../../../map";
 
 export interface IClasses {
+	"AccumulationDistribution": () => Promise<typeof AccumulationDistribution>;
+	"AccumulativeSwingIndex": () => Promise<typeof AccumulativeSwingIndex>;
 	"Annotator": () => Promise<typeof Annotator>;
+	"Aroon": () => Promise<typeof Aroon>;
+	"AverageSeries": () => Promise<typeof AverageSeries>;
+	"AwesomeOscillator": () => Promise<typeof AwesomeOscillator>;
 	"Axis": () => Promise<typeof Axis>;
 	"AxisBullet": () => Promise<typeof AxisBullet>;
 	"AxisLabel": () => Promise<typeof AxisLabel>;
@@ -148,14 +215,19 @@ export interface IClasses {
 	"AxisRendererY": () => Promise<typeof AxisRendererY>;
 	"AxisTick": () => Promise<typeof AxisTick>;
 	"BaseColumnSeries": () => Promise<typeof BaseColumnSeries>;
+	"BollingerBands": () => Promise<typeof BollingerBands>;
 	"BreadcrumbBar": () => Promise<typeof BreadcrumbBar>;
 	"Bullet": () => Promise<typeof Bullet>;
 	"Button": () => Promise<typeof Button>;
+	"CalloutSeries": () => Promise<typeof CalloutSeries>;
 	"Candlestick": () => Promise<typeof Candlestick>;
 	"CandlestickSeries": () => Promise<typeof CandlestickSeries>;
 	"CategoryAxis": () => Promise<typeof CategoryAxis>;
 	"CategoryDateAxis": () => Promise<typeof CategoryDateAxis>;
+	"ChaikinMoneyFlow": () => Promise<typeof ChaikinMoneyFlow>;
+	"ChaikinOscillator": () => Promise<typeof ChaikinOscillator>;
 	"Chart": () => Promise<typeof Chart>;
+	"ChartIndicator": () => Promise<typeof ChartIndicator>;
 	"Chord": () => Promise<typeof Chord>;
 	"ChordDirected": () => Promise<typeof ChordDirected>;
 	"ChordLink": () => Promise<typeof ChordLink>;
@@ -165,16 +237,32 @@ export interface IClasses {
 	"Circle": () => Promise<typeof Circle>;
 	"CirclePattern": () => Promise<typeof CirclePattern>;
 	"ClockHand": () => Promise<typeof ClockHand>;
+	"ColorControl": () => Promise<typeof ColorControl>;
 	"ColorSet": () => Promise<typeof ColorSet>;
 	"ColumnSeries": () => Promise<typeof ColumnSeries>;
+	"CommodityChannelIndex": () => Promise<typeof CommodityChannelIndex>;
+	"ComparisonControl": () => Promise<typeof ComparisonControl>;
 	"Component": () => Promise<typeof Component>;
 	"Container": () => Promise<typeof Container>;
 	"DateAxis": () => Promise<typeof DateAxis>;
+	"DateRangeSelector": () => Promise<typeof DateRangeSelector>;
+	"DisparityIndex": () => Promise<typeof DisparityIndex>;
+	"DoodleSeries": () => Promise<typeof DoodleSeries>;
+	"DrawingControl": () => Promise<typeof DrawingControl>;
+	"DrawingSeries": () => Promise<typeof DrawingSeries>;
+	"DrawingToolControl": () => Promise<typeof DrawingToolControl>;
+	"Dropdown": () => Promise<typeof Dropdown>;
+	"DropdownColors": () => Promise<typeof DropdownColors>;
+	"DropdownList": () => Promise<typeof DropdownList>;
+	"DropdownListControl": () => Promise<typeof DropdownListControl>;
 	"DurationAxis": () => Promise<typeof DurationAxis>;
 	"Ellipse": () => Promise<typeof Ellipse>;
+	"EllipseSeries": () => Promise<typeof EllipseSeries>;
 	"Entity": () => Promise<typeof Entity>;
 	"Exporting": () => Promise<typeof Exporting>;
 	"ExportingMenu": () => Promise<typeof ExportingMenu>;
+	"FibonacciSeries": () => Promise<typeof FibonacciSeries>;
+	"FibonacciTimezoneSeries": () => Promise<typeof FibonacciTimezoneSeries>;
 	"Flow": () => Promise<typeof Flow>;
 	"FlowLink": () => Promise<typeof FlowLink>;
 	"FlowNode": () => Promise<typeof FlowNode>;
@@ -193,8 +281,16 @@ export interface IClasses {
 	"HierarchyLink": () => Promise<typeof HierarchyLink>;
 	"HierarchyNode": () => Promise<typeof HierarchyNode>;
 	"HorizontalLayout": () => Promise<typeof HorizontalLayout>;
+	"HorizontalLineSeries": () => Promise<typeof HorizontalLineSeries>;
+	"HorizontalRaySeries": () => Promise<typeof HorizontalRaySeries>;
+	"IconControl": () => Promise<typeof IconControl>;
+	"IconSeries": () => Promise<typeof IconSeries>;
+	"Indicator": () => Promise<typeof Indicator>;
+	"IndicatorControl": () => Promise<typeof IndicatorControl>;
 	"InterfaceColors": () => Promise<typeof InterfaceColors>;
+	"IntervalControl": () => Promise<typeof IntervalControl>;
 	"Label": () => Promise<typeof Label>;
+	"LabelSeries": () => Promise<typeof LabelSeries>;
 	"Layout": () => Promise<typeof Layout>;
 	"Legend": () => Promise<typeof Legend>;
 	"Line": () => Promise<typeof Line>;
@@ -203,6 +299,7 @@ export interface IClasses {
 	"LinearGradient": () => Promise<typeof LinearGradient>;
 	"LinkedHierarchy": () => Promise<typeof LinkedHierarchy>;
 	"LinkedHierarchyNode": () => Promise<typeof LinkedHierarchyNode>;
+	"MACD": () => Promise<typeof MACD>;
 	"MapChart": () => Promise<typeof MapChart>;
 	"MapLine": () => Promise<typeof MapLine>;
 	"MapLineSeries": () => Promise<typeof MapLineSeries>;
@@ -211,19 +308,27 @@ export interface IClasses {
 	"MapPolygonSeries": () => Promise<typeof MapPolygonSeries>;
 	"MapSeries": () => Promise<typeof MapSeries>;
 	"Modal": () => Promise<typeof Modal>;
+	"MovingAverage": () => Promise<typeof MovingAverage>;
+	"MovingAverageDeviation": () => Promise<typeof MovingAverageDeviation>;
+	"MovingAverageEnvelope": () => Promise<typeof MovingAverageEnvelope>;
 	"OHLC": () => Promise<typeof OHLC>;
 	"OHLCSeries": () => Promise<typeof OHLCSeries>;
+	"OnBalanceVolume": () => Promise<typeof OnBalanceVolume>;
 	"Pack": () => Promise<typeof Pack>;
+	"PanelControls": () => Promise<typeof PanelControls>;
 	"Partition": () => Promise<typeof Partition>;
 	"Pattern": () => Promise<typeof Pattern>;
 	"PercentChart": () => Promise<typeof PercentChart>;
 	"PercentSeries": () => Promise<typeof PercentSeries>;
+	"PeriodSelector": () => Promise<typeof PeriodSelector>;
 	"PictorialStackedSeries": () => Promise<typeof PictorialStackedSeries>;
 	"Picture": () => Promise<typeof Picture>;
 	"PieChart": () => Promise<typeof PieChart>;
 	"PieSeries": () => Promise<typeof PieSeries>;
 	"PointedRectangle": () => Promise<typeof PointedRectangle>;
+	"PolylineSeries": () => Promise<typeof PolylineSeries>;
 	"PyramidSeries": () => Promise<typeof PyramidSeries>;
+	"QuadrantLineSeries": () => Promise<typeof QuadrantLineSeries>;
 	"RadarChart": () => Promise<typeof RadarChart>;
 	"RadarColumnSeries": () => Promise<typeof RadarColumnSeries>;
 	"RadarCursor": () => Promise<typeof RadarCursor>;
@@ -233,6 +338,10 @@ export interface IClasses {
 	"RadialText": () => Promise<typeof RadialText>;
 	"Rectangle": () => Promise<typeof Rectangle>;
 	"RectanglePattern": () => Promise<typeof RectanglePattern>;
+	"RectangleSeries": () => Promise<typeof RectangleSeries>;
+	"RegressionSeries": () => Promise<typeof RegressionSeries>;
+	"RelativeStrengthIndex": () => Promise<typeof RelativeStrengthIndex>;
+	"ResetControl": () => Promise<typeof ResetControl>;
 	"RoundedRectangle": () => Promise<typeof RoundedRectangle>;
 	"Sankey": () => Promise<typeof Sankey>;
 	"SankeyLink": () => Promise<typeof SankeyLink>;
@@ -240,6 +349,10 @@ export interface IClasses {
 	"Scrollbar": () => Promise<typeof Scrollbar>;
 	"SerialChart": () => Promise<typeof SerialChart>;
 	"Series": () => Promise<typeof Series>;
+	"SeriesTypeControl": () => Promise<typeof SeriesTypeControl>;
+	"SettingsControl": () => Promise<typeof SettingsControl>;
+	"SettingsModal": () => Promise<typeof SettingsModal>;
+	"SimpleLineSeries": () => Promise<typeof SimpleLineSeries>;
 	"Slice": () => Promise<typeof Slice>;
 	"SliceGrouper": () => Promise<typeof SliceGrouper>;
 	"SlicedChart": () => Promise<typeof SlicedChart>;
@@ -249,18 +362,29 @@ export interface IClasses {
 	"SmoothedXYLineSeries": () => Promise<typeof SmoothedXYLineSeries>;
 	"SmoothedYLineSeries": () => Promise<typeof SmoothedYLineSeries>;
 	"Sprite": () => Promise<typeof Sprite>;
+	"SpriteResizer": () => Promise<typeof SpriteResizer>;
 	"Star": () => Promise<typeof Star>;
 	"StepLineSeries": () => Promise<typeof StepLineSeries>;
+	"StochasticOscillator": () => Promise<typeof StochasticOscillator>;
+	"StockChart": () => Promise<typeof StockChart>;
+	"StockControl": () => Promise<typeof StockControl>;
+	"StockLegend": () => Promise<typeof StockLegend>;
+	"StockPanel": () => Promise<typeof StockPanel>;
+	"StockToolbar": () => Promise<typeof StockToolbar>;
 	"Sunburst": () => Promise<typeof Sunburst>;
 	"Text": () => Promise<typeof Text>;
 	"Tick": () => Promise<typeof Tick>;
 	"Tooltip": () => Promise<typeof Tooltip>;
 	"Tree": () => Promise<typeof Tree>;
 	"Treemap": () => Promise<typeof Treemap>;
+	"TrendLineSeries": () => Promise<typeof TrendLineSeries>;
 	"Triangle": () => Promise<typeof Triangle>;
 	"ValueAxis": () => Promise<typeof ValueAxis>;
 	"Venn": () => Promise<typeof Venn>;
 	"VerticalLayout": () => Promise<typeof VerticalLayout>;
+	"VerticalLineSeries": () => Promise<typeof VerticalLineSeries>;
+	"Volume": () => Promise<typeof Volume>;
+	"WilliamsR": () => Promise<typeof WilliamsR>;
 	"WordCloud": () => Promise<typeof WordCloud>;
 	"XYChart": () => Promise<typeof XYChart>;
 	"XYChartScrollbar": () => Promise<typeof XYChartScrollbar>;
@@ -270,7 +394,12 @@ export interface IClasses {
 }
 
 const classes: IClasses = {
+	"AccumulationDistribution": () => import(/* webpackExports: "AccumulationDistribution", webpackMode: "weak" */ "./../../../stock").then((m) => m.AccumulationDistribution),
+	"AccumulativeSwingIndex": () => import(/* webpackExports: "AccumulativeSwingIndex", webpackMode: "weak" */ "./../../../stock").then((m) => m.AccumulativeSwingIndex),
 	"Annotator": () => import(/* webpackExports: "Annotator", webpackMode: "weak" */ "./../../../plugins/exporting").then((m) => m.Annotator),
+	"Aroon": () => import(/* webpackExports: "Aroon", webpackMode: "weak" */ "./../../../stock").then((m) => m.Aroon),
+	"AverageSeries": () => import(/* webpackExports: "AverageSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.AverageSeries),
+	"AwesomeOscillator": () => import(/* webpackExports: "AwesomeOscillator", webpackMode: "weak" */ "./../../../stock").then((m) => m.AwesomeOscillator),
 	"Axis": () => import(/* webpackExports: "Axis", webpackMode: "weak" */ "./../../../xy").then((m) => m.Axis),
 	"AxisBullet": () => import(/* webpackExports: "AxisBullet", webpackMode: "weak" */ "./../../../xy").then((m) => m.AxisBullet),
 	"AxisLabel": () => import(/* webpackExports: "AxisLabel", webpackMode: "weak" */ "./../../../xy").then((m) => m.AxisLabel),
@@ -282,14 +411,19 @@ const classes: IClasses = {
 	"AxisRendererY": () => import(/* webpackExports: "AxisRendererY", webpackMode: "weak" */ "./../../../xy").then((m) => m.AxisRendererY),
 	"AxisTick": () => import(/* webpackExports: "AxisTick", webpackMode: "weak" */ "./../../../xy").then((m) => m.AxisTick),
 	"BaseColumnSeries": () => import(/* webpackExports: "BaseColumnSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.BaseColumnSeries),
+	"BollingerBands": () => import(/* webpackExports: "BollingerBands", webpackMode: "weak" */ "./../../../stock").then((m) => m.BollingerBands),
 	"BreadcrumbBar": () => import(/* webpackExports: "BreadcrumbBar", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.BreadcrumbBar),
 	"Bullet": () => import(/* webpackExports: "Bullet", webpackMode: "weak" */ "./../../../index").then((m) => m.Bullet),
 	"Button": () => import(/* webpackExports: "Button", webpackMode: "weak" */ "./../../../index").then((m) => m.Button),
+	"CalloutSeries": () => import(/* webpackExports: "CalloutSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.CalloutSeries),
 	"Candlestick": () => import(/* webpackExports: "Candlestick", webpackMode: "weak" */ "./../../../xy").then((m) => m.Candlestick),
 	"CandlestickSeries": () => import(/* webpackExports: "CandlestickSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.CandlestickSeries),
 	"CategoryAxis": () => import(/* webpackExports: "CategoryAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.CategoryAxis),
 	"CategoryDateAxis": () => import(/* webpackExports: "CategoryDateAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.CategoryDateAxis),
+	"ChaikinMoneyFlow": () => import(/* webpackExports: "ChaikinMoneyFlow", webpackMode: "weak" */ "./../../../stock").then((m) => m.ChaikinMoneyFlow),
+	"ChaikinOscillator": () => import(/* webpackExports: "ChaikinOscillator", webpackMode: "weak" */ "./../../../stock").then((m) => m.ChaikinOscillator),
 	"Chart": () => import(/* webpackExports: "Chart", webpackMode: "weak" */ "./../../../index").then((m) => m.Chart),
+	"ChartIndicator": () => import(/* webpackExports: "ChartIndicator", webpackMode: "weak" */ "./../../../stock").then((m) => m.ChartIndicator),
 	"Chord": () => import(/* webpackExports: "Chord", webpackMode: "weak" */ "./../../../flow").then((m) => m.Chord),
 	"ChordDirected": () => import(/* webpackExports: "ChordDirected", webpackMode: "weak" */ "./../../../flow").then((m) => m.ChordDirected),
 	"ChordLink": () => import(/* webpackExports: "ChordLink", webpackMode: "weak" */ "./../../../flow").then((m) => m.ChordLink),
@@ -299,16 +433,32 @@ const classes: IClasses = {
 	"Circle": () => import(/* webpackExports: "Circle", webpackMode: "weak" */ "./../../../index").then((m) => m.Circle),
 	"CirclePattern": () => import(/* webpackExports: "CirclePattern", webpackMode: "weak" */ "./../../../index").then((m) => m.CirclePattern),
 	"ClockHand": () => import(/* webpackExports: "ClockHand", webpackMode: "weak" */ "./../../../radar").then((m) => m.ClockHand),
+	"ColorControl": () => import(/* webpackExports: "ColorControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.ColorControl),
 	"ColorSet": () => import(/* webpackExports: "ColorSet", webpackMode: "weak" */ "./../../../index").then((m) => m.ColorSet),
 	"ColumnSeries": () => import(/* webpackExports: "ColumnSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.ColumnSeries),
+	"CommodityChannelIndex": () => import(/* webpackExports: "CommodityChannelIndex", webpackMode: "weak" */ "./../../../stock").then((m) => m.CommodityChannelIndex),
+	"ComparisonControl": () => import(/* webpackExports: "ComparisonControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.ComparisonControl),
 	"Component": () => import(/* webpackExports: "Component", webpackMode: "weak" */ "./../../../index").then((m) => m.Component),
 	"Container": () => import(/* webpackExports: "Container", webpackMode: "weak" */ "./../../../index").then((m) => m.Container),
 	"DateAxis": () => import(/* webpackExports: "DateAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.DateAxis),
+	"DateRangeSelector": () => import(/* webpackExports: "DateRangeSelector", webpackMode: "weak" */ "./../../../stock").then((m) => m.DateRangeSelector),
+	"DisparityIndex": () => import(/* webpackExports: "DisparityIndex", webpackMode: "weak" */ "./../../../stock").then((m) => m.DisparityIndex),
+	"DoodleSeries": () => import(/* webpackExports: "DoodleSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.DoodleSeries),
+	"DrawingControl": () => import(/* webpackExports: "DrawingControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.DrawingControl),
+	"DrawingSeries": () => import(/* webpackExports: "DrawingSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.DrawingSeries),
+	"DrawingToolControl": () => import(/* webpackExports: "DrawingToolControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.DrawingToolControl),
+	"Dropdown": () => import(/* webpackExports: "Dropdown", webpackMode: "weak" */ "./../../../stock").then((m) => m.Dropdown),
+	"DropdownColors": () => import(/* webpackExports: "DropdownColors", webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownColors),
+	"DropdownList": () => import(/* webpackExports: "DropdownList", webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownList),
+	"DropdownListControl": () => import(/* webpackExports: "DropdownListControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownListControl),
 	"DurationAxis": () => import(/* webpackExports: "DurationAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.DurationAxis),
 	"Ellipse": () => import(/* webpackExports: "Ellipse", webpackMode: "weak" */ "./../../../index").then((m) => m.Ellipse),
+	"EllipseSeries": () => import(/* webpackExports: "EllipseSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.EllipseSeries),
 	"Entity": () => import(/* webpackExports: "Entity", webpackMode: "weak" */ "./../../../index").then((m) => m.Entity),
 	"Exporting": () => import(/* webpackExports: "Exporting", webpackMode: "weak" */ "./../../../plugins/exporting").then((m) => m.Exporting),
 	"ExportingMenu": () => import(/* webpackExports: "ExportingMenu", webpackMode: "weak" */ "./../../../plugins/exporting").then((m) => m.ExportingMenu),
+	"FibonacciSeries": () => import(/* webpackExports: "FibonacciSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.FibonacciSeries),
+	"FibonacciTimezoneSeries": () => import(/* webpackExports: "FibonacciTimezoneSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.FibonacciTimezoneSeries),
 	"Flow": () => import(/* webpackExports: "Flow", webpackMode: "weak" */ "./../../../flow").then((m) => m.Flow),
 	"FlowLink": () => import(/* webpackExports: "FlowLink", webpackMode: "weak" */ "./../../../flow").then((m) => m.FlowLink),
 	"FlowNode": () => import(/* webpackExports: "FlowNode", webpackMode: "weak" */ "./../../../flow").then((m) => m.FlowNode),
@@ -327,8 +477,16 @@ const classes: IClasses = {
 	"HierarchyLink": () => import(/* webpackExports: "HierarchyLink", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.HierarchyLink),
 	"HierarchyNode": () => import(/* webpackExports: "HierarchyNode", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.HierarchyNode),
 	"HorizontalLayout": () => import(/* webpackExports: "HorizontalLayout", webpackMode: "weak" */ "./../../../index").then((m) => m.HorizontalLayout),
+	"HorizontalLineSeries": () => import(/* webpackExports: "HorizontalLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.HorizontalLineSeries),
+	"HorizontalRaySeries": () => import(/* webpackExports: "HorizontalRaySeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.HorizontalRaySeries),
+	"IconControl": () => import(/* webpackExports: "IconControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.IconControl),
+	"IconSeries": () => import(/* webpackExports: "IconSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.IconSeries),
+	"Indicator": () => import(/* webpackExports: "Indicator", webpackMode: "weak" */ "./../../../stock").then((m) => m.Indicator),
+	"IndicatorControl": () => import(/* webpackExports: "IndicatorControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.IndicatorControl),
 	"InterfaceColors": () => import(/* webpackExports: "InterfaceColors", webpackMode: "weak" */ "./../../../index").then((m) => m.InterfaceColors),
+	"IntervalControl": () => import(/* webpackExports: "IntervalControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.IntervalControl),
 	"Label": () => import(/* webpackExports: "Label", webpackMode: "weak" */ "./../../../index").then((m) => m.Label),
+	"LabelSeries": () => import(/* webpackExports: "LabelSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.LabelSeries),
 	"Layout": () => import(/* webpackExports: "Layout", webpackMode: "weak" */ "./../../../index").then((m) => m.Layout),
 	"Legend": () => import(/* webpackExports: "Legend", webpackMode: "weak" */ "./../../../index").then((m) => m.Legend),
 	"Line": () => import(/* webpackExports: "Line", webpackMode: "weak" */ "./../../../index").then((m) => m.Line),
@@ -337,6 +495,7 @@ const classes: IClasses = {
 	"LinearGradient": () => import(/* webpackExports: "LinearGradient", webpackMode: "weak" */ "./../../../index").then((m) => m.LinearGradient),
 	"LinkedHierarchy": () => import(/* webpackExports: "LinkedHierarchy", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.LinkedHierarchy),
 	"LinkedHierarchyNode": () => import(/* webpackExports: "LinkedHierarchyNode", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.LinkedHierarchyNode),
+	"MACD": () => import(/* webpackExports: "MACD", webpackMode: "weak" */ "./../../../stock").then((m) => m.MACD),
 	"MapChart": () => import(/* webpackExports: "MapChart", webpackMode: "weak" */ "./../../../map").then((m) => m.MapChart),
 	"MapLine": () => import(/* webpackExports: "MapLine", webpackMode: "weak" */ "./../../../map").then((m) => m.MapLine),
 	"MapLineSeries": () => import(/* webpackExports: "MapLineSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapLineSeries),
@@ -345,19 +504,27 @@ const classes: IClasses = {
 	"MapPolygonSeries": () => import(/* webpackExports: "MapPolygonSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygonSeries),
 	"MapSeries": () => import(/* webpackExports: "MapSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapSeries),
 	"Modal": () => import(/* webpackExports: "Modal", webpackMode: "weak" */ "./../../../index").then((m) => m.Modal),
+	"MovingAverage": () => import(/* webpackExports: "MovingAverage", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverage),
+	"MovingAverageDeviation": () => import(/* webpackExports: "MovingAverageDeviation", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageDeviation),
+	"MovingAverageEnvelope": () => import(/* webpackExports: "MovingAverageEnvelope", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageEnvelope),
 	"OHLC": () => import(/* webpackExports: "OHLC", webpackMode: "weak" */ "./../../../xy").then((m) => m.OHLC),
 	"OHLCSeries": () => import(/* webpackExports: "OHLCSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.OHLCSeries),
+	"OnBalanceVolume": () => import(/* webpackExports: "OnBalanceVolume", webpackMode: "weak" */ "./../../../stock").then((m) => m.OnBalanceVolume),
 	"Pack": () => import(/* webpackExports: "Pack", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Pack),
+	"PanelControls": () => import(/* webpackExports: "PanelControls", webpackMode: "weak" */ "./../../../stock").then((m) => m.PanelControls),
 	"Partition": () => import(/* webpackExports: "Partition", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Partition),
 	"Pattern": () => import(/* webpackExports: "Pattern", webpackMode: "weak" */ "./../../../index").then((m) => m.Pattern),
 	"PercentChart": () => import(/* webpackExports: "PercentChart", webpackMode: "weak" */ "./../../../percent").then((m) => m.PercentChart),
 	"PercentSeries": () => import(/* webpackExports: "PercentSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PercentSeries),
+	"PeriodSelector": () => import(/* webpackExports: "PeriodSelector", webpackMode: "weak" */ "./../../../stock").then((m) => m.PeriodSelector),
 	"PictorialStackedSeries": () => import(/* webpackExports: "PictorialStackedSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PictorialStackedSeries),
 	"Picture": () => import(/* webpackExports: "Picture", webpackMode: "weak" */ "./../../../index").then((m) => m.Picture),
 	"PieChart": () => import(/* webpackExports: "PieChart", webpackMode: "weak" */ "./../../../percent").then((m) => m.PieChart),
 	"PieSeries": () => import(/* webpackExports: "PieSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PieSeries),
 	"PointedRectangle": () => import(/* webpackExports: "PointedRectangle", webpackMode: "weak" */ "./../../../index").then((m) => m.PointedRectangle),
+	"PolylineSeries": () => import(/* webpackExports: "PolylineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.PolylineSeries),
 	"PyramidSeries": () => import(/* webpackExports: "PyramidSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PyramidSeries),
+	"QuadrantLineSeries": () => import(/* webpackExports: "QuadrantLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.QuadrantLineSeries),
 	"RadarChart": () => import(/* webpackExports: "RadarChart", webpackMode: "weak" */ "./../../../radar").then((m) => m.RadarChart),
 	"RadarColumnSeries": () => import(/* webpackExports: "RadarColumnSeries", webpackMode: "weak" */ "./../../../radar").then((m) => m.RadarColumnSeries),
 	"RadarCursor": () => import(/* webpackExports: "RadarCursor", webpackMode: "weak" */ "./../../../radar").then((m) => m.RadarCursor),
@@ -367,6 +534,10 @@ const classes: IClasses = {
 	"RadialText": () => import(/* webpackExports: "RadialText", webpackMode: "weak" */ "./../../../index").then((m) => m.RadialText),
 	"Rectangle": () => import(/* webpackExports: "Rectangle", webpackMode: "weak" */ "./../../../index").then((m) => m.Rectangle),
 	"RectanglePattern": () => import(/* webpackExports: "RectanglePattern", webpackMode: "weak" */ "./../../../index").then((m) => m.RectanglePattern),
+	"RectangleSeries": () => import(/* webpackExports: "RectangleSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.RectangleSeries),
+	"RegressionSeries": () => import(/* webpackExports: "RegressionSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.RegressionSeries),
+	"RelativeStrengthIndex": () => import(/* webpackExports: "RelativeStrengthIndex", webpackMode: "weak" */ "./../../../stock").then((m) => m.RelativeStrengthIndex),
+	"ResetControl": () => import(/* webpackExports: "ResetControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.ResetControl),
 	"RoundedRectangle": () => import(/* webpackExports: "RoundedRectangle", webpackMode: "weak" */ "./../../../index").then((m) => m.RoundedRectangle),
 	"Sankey": () => import(/* webpackExports: "Sankey", webpackMode: "weak" */ "./../../../flow").then((m) => m.Sankey),
 	"SankeyLink": () => import(/* webpackExports: "SankeyLink", webpackMode: "weak" */ "./../../../flow").then((m) => m.SankeyLink),
@@ -374,6 +545,10 @@ const classes: IClasses = {
 	"Scrollbar": () => import(/* webpackExports: "Scrollbar", webpackMode: "weak" */ "./../../../index").then((m) => m.Scrollbar),
 	"SerialChart": () => import(/* webpackExports: "SerialChart", webpackMode: "weak" */ "./../../../index").then((m) => m.SerialChart),
 	"Series": () => import(/* webpackExports: "Series", webpackMode: "weak" */ "./../../../index").then((m) => m.Series),
+	"SeriesTypeControl": () => import(/* webpackExports: "SeriesTypeControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.SeriesTypeControl),
+	"SettingsControl": () => import(/* webpackExports: "SettingsControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.SettingsControl),
+	"SettingsModal": () => import(/* webpackExports: "SettingsModal", webpackMode: "weak" */ "./../../../stock").then((m) => m.SettingsModal),
+	"SimpleLineSeries": () => import(/* webpackExports: "SimpleLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.SimpleLineSeries),
 	"Slice": () => import(/* webpackExports: "Slice", webpackMode: "weak" */ "./../../../index").then((m) => m.Slice),
 	"SliceGrouper": () => import(/* webpackExports: "SliceGrouper", webpackMode: "weak" */ "./../../../plugins/sliceGrouper").then((m) => m.SliceGrouper),
 	"SlicedChart": () => import(/* webpackExports: "SlicedChart", webpackMode: "weak" */ "./../../../percent").then((m) => m.SlicedChart),
@@ -383,18 +558,29 @@ const classes: IClasses = {
 	"SmoothedXYLineSeries": () => import(/* webpackExports: "SmoothedXYLineSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.SmoothedXYLineSeries),
 	"SmoothedYLineSeries": () => import(/* webpackExports: "SmoothedYLineSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.SmoothedYLineSeries),
 	"Sprite": () => import(/* webpackExports: "Sprite", webpackMode: "weak" */ "./../../../index").then((m) => m.Sprite),
+	"SpriteResizer": () => import(/* webpackExports: "SpriteResizer", webpackMode: "weak" */ "./../../../stock").then((m) => m.SpriteResizer),
 	"Star": () => import(/* webpackExports: "Star", webpackMode: "weak" */ "./../../../index").then((m) => m.Star),
 	"StepLineSeries": () => import(/* webpackExports: "StepLineSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.StepLineSeries),
+	"StochasticOscillator": () => import(/* webpackExports: "StochasticOscillator", webpackMode: "weak" */ "./../../../stock").then((m) => m.StochasticOscillator),
+	"StockChart": () => import(/* webpackExports: "StockChart", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockChart),
+	"StockControl": () => import(/* webpackExports: "StockControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockControl),
+	"StockLegend": () => import(/* webpackExports: "StockLegend", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockLegend),
+	"StockPanel": () => import(/* webpackExports: "StockPanel", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockPanel),
+	"StockToolbar": () => import(/* webpackExports: "StockToolbar", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockToolbar),
 	"Sunburst": () => import(/* webpackExports: "Sunburst", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Sunburst),
 	"Text": () => import(/* webpackExports: "Text", webpackMode: "weak" */ "./../../../index").then((m) => m.Text),
 	"Tick": () => import(/* webpackExports: "Tick", webpackMode: "weak" */ "./../../../index").then((m) => m.Tick),
 	"Tooltip": () => import(/* webpackExports: "Tooltip", webpackMode: "weak" */ "./../../../index").then((m) => m.Tooltip),
 	"Tree": () => import(/* webpackExports: "Tree", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Tree),
 	"Treemap": () => import(/* webpackExports: "Treemap", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Treemap),
+	"TrendLineSeries": () => import(/* webpackExports: "TrendLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.TrendLineSeries),
 	"Triangle": () => import(/* webpackExports: "Triangle", webpackMode: "weak" */ "./../../../index").then((m) => m.Triangle),
 	"ValueAxis": () => import(/* webpackExports: "ValueAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.ValueAxis),
 	"Venn": () => import(/* webpackExports: "Venn", webpackMode: "weak" */ "./../../../venn").then((m) => m.Venn),
 	"VerticalLayout": () => import(/* webpackExports: "VerticalLayout", webpackMode: "weak" */ "./../../../index").then((m) => m.VerticalLayout),
+	"VerticalLineSeries": () => import(/* webpackExports: "VerticalLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.VerticalLineSeries),
+	"Volume": () => import(/* webpackExports: "Volume", webpackMode: "weak" */ "./../../../stock").then((m) => m.Volume),
+	"WilliamsR": () => import(/* webpackExports: "WilliamsR", webpackMode: "weak" */ "./../../../stock").then((m) => m.WilliamsR),
 	"WordCloud": () => import(/* webpackExports: "WordCloud", webpackMode: "weak" */ "./../../../wc").then((m) => m.WordCloud),
 	"XYChart": () => import(/* webpackExports: "XYChart", webpackMode: "weak" */ "./../../../xy").then((m) => m.XYChart),
 	"XYChartScrollbar": () => import(/* webpackExports: "XYChartScrollbar", webpackMode: "weak" */ "./../../../xy").then((m) => m.XYChartScrollbar),

@@ -360,7 +360,7 @@ export class Legend extends Series {
 
 			if (item && item.show) {
 
-				this._disposers.push(item.on("visible", (visible) => {									
+				this._disposers.push(item.on("visible", (visible) => {
 					itemContainer.set("disabled", !visible)
 				}));
 
@@ -376,7 +376,25 @@ export class Legend extends Series {
 					this._addClickEvents(clickContainer, item, dataItem)
 				}
 			}
+
+			// Sort children
+			this.children.values.sort((a, b) => {
+				var targetA = a.dataItem!.dataContext;
+				var targetB = b.dataItem!.dataContext;
+				if (targetA && targetB) {
+					var indexA = this.data.indexOf(targetA);
+					var indexB = this.data.indexOf(targetB);
+					if (indexA > indexB) {
+						return 1;
+					}
+					else if (indexA < indexB) {
+						return -1;
+					}
+				}
+				return 0;
+			});
 		}
+
 	}
 
 
@@ -419,9 +437,9 @@ export class Legend extends Series {
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 
 		const dataContext = dataItem.dataContext as any;
-		if(dataContext && dataContext.get){
+		if (dataContext && dataContext.get) {
 			const di = dataContext.get("legendDataItem");
-			if(di == dataItem){
+			if (di == dataItem) {
 				dataContext.set("legendDataItem", undefined);
 			}
 		}

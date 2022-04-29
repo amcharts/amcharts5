@@ -279,7 +279,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 		else {
 			this._skipped = true;
 		}
-
+		this.updateLegendMarker();
 		super._updateChildren();
 	}
 
@@ -559,7 +559,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 		})
 	}
 
-	protected _applyGraphicsStates(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
+	public _applyGraphicsStates(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
 
 		const graphics = dataItem.get("graphics")!;
 
