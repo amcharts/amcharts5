@@ -53,7 +53,7 @@ export class AxisRendererY extends AxisRenderer {
 
 	protected _downY?: number;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, themeTags: ["axis", "y", "thumb"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, isMeasured: false, themeTags: ["axis", "y", "thumb"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "y"]);
@@ -86,24 +86,30 @@ export class AxisRendererY extends AxisRenderer {
 		super._changed();
 
 		const axis = this.axis;
-
-		if (this.isDirty("inside")) {
-			axis.markDirtySize();
-		}
+		axis.ghostLabel.setPrivate("visible", !this.get("inside"));
 
 		const thumb = this.thumb;
-		const opposite = "opposite"
-		if (this.isDirty(opposite)) {
+		const opposite = "opposite";
+		const inside = "inside";
+
+		if (this.isDirty(opposite) || this.isDirty(inside)) {
 			const chart = this.chart;
 			const axisChildren = axis.children;
+
+			if (this.get(inside)) {
+				axis.addTag(inside);
+			}
+			else {
+				axis.removeTag(inside);
+			}
 
 			if (chart) {
 				if (this.get(opposite)) {
 					const children = chart.rightAxesContainer.children;
 					if (children.indexOf(axis) == -1) {
 						children.moveValue(axis, 0);
-					}					
-					axis.addTag(opposite);					
+					}
+					axis.addTag(opposite);
 					axisChildren.moveValue(this, 0);
 					thumb.set("centerX", 0);
 				}
@@ -112,14 +118,19 @@ export class AxisRendererY extends AxisRenderer {
 					if (children.indexOf(axis) == -1) {
 						children.moveValue(axis);
 					}
-					axis.removeTag("opposite");
+					axis.removeTag(opposite);
 
 					axisChildren.moveValue(this);
 					thumb.set("centerX", p100);
 				}
-				axis.markDirtySize();
-			}			
-			axis.ghostLabel._applyThemes();
+
+				axis.ghostLabel._applyThemes();
+				this.labels.each((label) => {
+					label._applyThemes();
+				})
+				this.root._markDirtyRedraw();
+			}
+			axis.markDirtySize();
 		}
 		thumb.setPrivate("width", axis.labelsContainer.width());
 	}

@@ -53,7 +53,7 @@ export class AxisRendererX extends AxisRenderer {
 
 	declare public readonly labelTemplate: Template<AxisLabel>;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, themeTags: ["axis", "x", "thumb"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured:false, themeTags: ["axis", "x", "thumb"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
@@ -79,41 +79,53 @@ export class AxisRendererX extends AxisRenderer {
 		super._changed();
 
 		const axis = this.axis;
-		if (this.isDirty("inside")) {
-			axis.markDirtySize();
-		}
-
 		axis.ghostLabel.setPrivate("visible", !this.get("inside"));
-		
-		const opposite = "opposite"
 
-		if (this.isDirty(opposite)) {
+		const opposite = "opposite"
+		const inside = "inside";
+
+		if (this.isDirty(opposite) || this.isDirty(inside)) {
 			const chart = this.chart;
+			const axisChildren = axis.children;
+
+			if (this.get(inside)) {
+				axis.addTag(inside);
+			}
+			else {
+				axis.removeTag(inside);				
+			}
 
 			if (chart) {
-				const axisChildren = axis.children;
 				if (this.get(opposite)) {
 					const children = chart.topAxesContainer.children;
 					if (children.indexOf(axis) == -1) {
 						children.insertIndex(0, axis);
 					}
-					axisChildren.moveValue(this);
 					axis.addTag(opposite);
+					axisChildren.moveValue(this);
+
 				}
 				else {
 					const children = chart.bottomAxesContainer.children;
 					if (children.indexOf(axis) == -1) {
 						children.moveValue(axis);
 					}
-					axisChildren.moveValue(this, 0);
 					axis.removeTag(opposite);
-				}
-				axis.markDirtySize();
-			}
-			axis.ghostLabel._applyThemes();
-		}	
 
-		this.thumb.setPrivate("height", axis.labelsContainer.height());	
+					axisChildren.moveValue(this, 0);
+
+				}
+
+				axis.ghostLabel._applyThemes();
+				this.labels.each((label) => {
+					label._applyThemes();
+				})
+				this.root._markDirtyRedraw();
+			}
+			axis.markDirtySize();
+		}
+
+		this.thumb.setPrivate("height", axis.labelsContainer.height());
 	}
 
 
@@ -383,7 +395,7 @@ export class AxisRendererX extends AxisRenderer {
 			if (x0 > w || x1 < 0) {
 				return;
 			}
-			
+
 			/*
 			const limit = 10000;
 

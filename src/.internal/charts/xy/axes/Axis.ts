@@ -908,7 +908,6 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		let start = this.get("start", 0);
 		let end = this.get("end", 1);
 		this.get("renderer").updateLabel(ghostLabel, start + (end - start) * 0.5);
-		ghostLabel.setPrivate("visible", true);
 	}
 
 	public _handleCursorPosition(position: number, snapToSeries?: Array<XYSeries>) {

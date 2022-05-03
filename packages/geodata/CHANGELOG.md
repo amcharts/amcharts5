@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Added
+- New maps: Mauritius.
+
 
 ## [5.0.3] - 2022-03-31
 

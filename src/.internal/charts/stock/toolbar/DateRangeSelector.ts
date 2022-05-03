@@ -1,6 +1,3 @@
-// import type { DateAxis } from "../../xy/axes/DateAxis";
-// import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
-
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
 import { Dropdown } from "./Dropdown";
 import { StockIcons } from "./StockIcons";
@@ -30,7 +27,9 @@ export interface IDateRangeSelectorEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * Date range selector control for [[StockChart]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/} for more info
  */
 export class DateRangeSelector extends StockControl {
 	public static className: string = "DateRangeSelector";

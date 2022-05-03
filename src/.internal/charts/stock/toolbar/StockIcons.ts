@@ -5,7 +5,7 @@ export interface StockIcon {
 }
 
 /**
- * @todo review
+ * A collection of icons used in [[StockChart]].
  */
 export class StockIcons {
 	public static icons: { [index: string]: StockIcon } = {

@@ -164,9 +164,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	declare public _events: IDateAxisEvents;
 
 	protected _dataGrouped: boolean = false;
+	protected _seriesDataGrouped: boolean = false;
 	protected _groupingCalculated: boolean = false;
 	protected _intervalDuration: number = 1;
 	protected _baseDuration: number = 1;
+
+	protected _intervalMax: { [index: string]: number } = {};
+	protected _intervalMin: { [index: string]: number } = {};
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
@@ -239,6 +243,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	public _groupSeriesData(series: XYSeries) {
 		if (this.get("groupData") && !series.get("groupDataDisabled")) {
+
+			this._seriesDataGrouped = true;
+
 			// make array of intervals which will be used;
 			let intervals: ITimeInterval[] = [];
 			let baseDuration = this.baseMainDuration();
@@ -277,7 +284,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (groupCallback) {
 				groupOriginals = true;
 			}
-			
+
 			$array.each(intervals, (interval) => {
 
 				let previousTime = -Infinity;
@@ -407,6 +414,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					groupCallback(prevNewDataItem, interval);
 				}
 			})
+
 			if (series._dataSetId) {
 				series.setDataSet(series._dataSetId);
 			}
@@ -420,6 +428,46 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._dataGrouped = false;
 	}
 
+	/**
+	 * Returns a time interval axis would group data to for a specified duration.
+	 *
+	 * @since 5.2.1
+	 */
+	public getGroupInterval(duration: number): ITimeInterval {
+		let baseInterval = this.get("baseInterval");
+		let groupInterval = $time.chooseInterval(0, duration, this.get("groupCount", Infinity), this.get("groupIntervals")!);
+		if ($time.getIntervalDuration(groupInterval) < $time.getIntervalDuration(baseInterval)) {
+			groupInterval = { ...baseInterval };
+		}
+		return groupInterval;
+	}
+
+	/**
+	 * Return `max` of a specified time interval.
+	 * 
+	 * Will work only if the axis was grouped to this interval at least once.
+	 * 
+	 * @since 5.2.1
+	 * @param   interval  Interval
+	 * @return            Max
+	 */
+	public getIntervalMax(interval: ITimeInterval): number {
+		return this._intervalMax[interval.timeUnit + interval.count];
+	}
+
+	/**
+	 * Return `min` of a specified time interval.
+	 * 
+	 * Will work only if the axis was grouped to this interval at least once.
+	 * 
+	 * @since 5.2.1
+	 * @param   interval  Interval
+	 * @return            Max
+	 */
+	public getIntervalMin(interval: ITimeInterval): number {
+		return this._intervalMin[interval.timeUnit + interval.count];
+	}
+
 	protected _handleRangeChange() {
 		super._handleRangeChange();
 
@@ -430,24 +478,18 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			if (this.get("groupData") && !this._groupingCalculated) {
 				this._groupingCalculated = true;
-				let baseInterval = this.get("baseInterval");
 
 				let modifiedDifference = (selectionMax - selectionMin) + (this.get("startLocation", 0) + (1 - this.get("endLocation", 1)) * this.baseDuration());
 				let groupInterval = this.get("groupInterval");
 
 				if (!groupInterval) {
-					const groupIntervals = this.get("groupIntervals")!;
-					if (groupIntervals) {
-						groupInterval = $time.chooseInterval(0, modifiedDifference, this.get("groupCount", Infinity), groupIntervals);
-						if ($time.getIntervalDuration(groupInterval) < $time.getIntervalDuration(baseInterval)) {
-							groupInterval = { ...baseInterval };
-						}
-					}
+					groupInterval = this.getGroupInterval(modifiedDifference);
 				}
 
 				let current = this.getPrivate("groupInterval");
 
-				if (groupInterval && (!current || (current.timeUnit !== groupInterval.timeUnit || current.count !== groupInterval.count))) {
+				if (groupInterval && (!current || (current.timeUnit !== groupInterval.timeUnit || current.count !== groupInterval.count) || this._seriesDataGrouped)) {
+					this._seriesDataGrouped = false;
 					this.setPrivateRaw("groupInterval", groupInterval);
 					this._setBaseInterval(groupInterval)
 
@@ -524,6 +566,18 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 */
 	public intervalDuration(): number {
 		return this._intervalDuration;
+	}
+
+	protected _saveMinMax(min: number, max: number) {
+		let groupInterval = this.getPrivate("groupInterval");
+
+		if (!groupInterval) {
+			groupInterval = this.get("baseInterval");
+		}
+
+		let id = groupInterval.timeUnit + groupInterval.count;
+		this._intervalMin[id] = min;
+		this._intervalMax[id] = max;
 	}
 
 	protected _prepareAxisItems() {

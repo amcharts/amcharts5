@@ -198,13 +198,6 @@ export abstract class AxisRenderer extends Graphics {
 
 		const label = this.labels.make();
 
-		if (this.get("opposite" as any)) {
-			themeTags.push("opposite");
-		}
-		if (this.get("inside" as any)) {
-			themeTags.push("inside");
-		}
-
 		label.set("themeTags", $utils.mergeTags(label.get("themeTags"), themeTags));
 		this.axis.labelsContainer.children.moveValue(label, 0);
 

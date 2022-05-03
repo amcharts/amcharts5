@@ -887,6 +887,13 @@ export class Root implements IDisposer {
 		this._isDirty = true;
 	}
 
+	public _markDirtyRedraw(){
+		this.events.once("frameended", ()=>{
+			this._isDirty = true;
+			this._startTicker();
+		})
+	}	
+
 	public eachFrame(f: (currentTime: number) => void): IDisposer {
 		this._tickers.push(f);
 		this._startTicker();

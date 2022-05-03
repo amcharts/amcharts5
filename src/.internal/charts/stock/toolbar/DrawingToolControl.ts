@@ -1,4 +1,3 @@
-//import type { IDisposer } from "../../../core/util/Disposer";
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
 import { DropdownList, IDropdownListItem } from "./DropdownList";
 import { StockIcons } from "./StockIcons";
@@ -12,9 +11,6 @@ export interface IDrawingToolControlSettings extends IStockControlSettings {
 }
 
 export interface IDrawingToolControlPrivate extends IStockControlPrivate {
-	// button?: HTMLDivElement;
-	// icon?: HTMLElement;
-	// label?: HTMLDivElement;
 	list?: DropdownList;
 }
 
@@ -25,7 +21,9 @@ export interface IDrawingToolControlEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * Control which allows selecting drawing tool.
+ *
+ * Should not be instantiated directly. Use [[DrawingControl]] instead.
  */
 export class DrawingToolControl extends StockControl {
 	public static className: string = "DrawingToolControl";

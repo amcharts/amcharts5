@@ -1,4 +1,3 @@
-//import type { IDisposer } from "../../../core/util/Disposer";
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
 import { DropdownList, IDropdownListItem } from "./DropdownList";
 
@@ -25,7 +24,11 @@ export interface IDropdownListControlEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * A generic control which creates a searchable list of items in a dropdown.
+ *
+ * Can be used in a [[StockToolbar]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-list-control/} for more info
  */
 export class DropdownListControl extends StockControl {
 	public static className: string = "DropdownListControl";
@@ -145,7 +148,7 @@ export class DropdownListControl extends StockControl {
 
 	public _beforeChanged() {
 		super._beforeChanged();
-		if(this.isDirty("items")) {
+		if (this.isDirty("items")) {
 			const dropdown = this.getPrivate("dropdown");
 			if (dropdown) {
 				const items = this.get("items");

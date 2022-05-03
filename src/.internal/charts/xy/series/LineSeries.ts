@@ -657,7 +657,7 @@ export class LineSeries extends XYSeries {
 				markerRectangle.setPrivate("visible", false);
 			}
 
-			marker.set("background", Rectangle.new(this._root, {fillOpacity:0, fill:color(0x000000)}))
+			marker.set("background", Rectangle.new(marker._root, {fillOpacity:0, fill:color(0x000000)}))
 
 			const legendStroke = marker.children.push(Graphics._new(marker._root, {
 				themeTags: ["line", "series", "legend", "marker", "stroke"], interactive:false

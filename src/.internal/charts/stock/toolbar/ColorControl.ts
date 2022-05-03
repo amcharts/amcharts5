@@ -1,11 +1,10 @@
-//import type { IDisposer } from "../../../core/util/Disposer";
 import type { ColorSet } from "../../../core/util/ColorSet";
 import type { Color } from "../../../core/util/Color";
+
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
 import { DropdownColors } from "./DropdownColors";
 import { StockIcons } from "./StockIcons";
 
-//import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
 import StockToolbarCSS from "./StockToolbarCSS";
 
@@ -30,7 +29,7 @@ export interface IColorControlEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * Color picker control.
  */
 export class ColorControl extends StockControl {
 	public static className: string = "ColorControl";

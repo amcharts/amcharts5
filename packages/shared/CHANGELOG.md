@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.1] - 2022-05-03
+
+### Added
+- `centerMapOnZoomOut` setting added to `MapChart` (default: `true`). Means the map will center itself (or go to `homeGeoPoint` if set) when fully zoomed out.
+- `getGroupInterval(duration)` method added to `DateAxis`. Returns a time interval axis would group data to for a specified duration.
+- `getIntervalMax(interval)` and `getIntervalMin(interval)` methods added to `DateAxis`. These methods return `min` and `max` of a specified time interval.
+
+### Changed
+- Axis fills on a `StockChart` are now not visible by default.
+- All `Chart` elements now have `interactiveChildren: true` set by default, so that adding events on a chart does not automatically make all elements in it interactive.
+- Zooming out `MapChart` using mouse wheel will now auto-center the map by default. Set `centerMapOnZoomOut: false` to bring back old behavior.
+
+### Fixed
+- Changing `inside` and `opposite` of `AxisRendererX` or `AxisRendererY` after the axis was already initialized was not working properly.
+- `StockChart`'s' period selection buttons were not zooming to exact dates when data grouping of an X-axis was turned on.
+- `StockChart`'s' series type switcher was not switching series properly when data grouping was enabled.
+- `StockChart`'s' series type switcher was not switching series properly when comparing mode was on.
+- If a `StockChart` was in percent scale mode, adding an indicator which was not on a separate panel was resulting in the indicator using wrong scale.
+- Fixed week number calculation (again).
+- Fixed CSS of `StockToolbar` for FireFox.
+- Pinch-zoom of `MapChart` was ignoring `minZoomLevel` and `maxZoomLevel` settings.
+
+
 ## [5.2.0] - 2022-04-29
 
 ### Added

@@ -15,7 +15,12 @@ export interface IPeriod {
 }
 
 export interface IPeriodSelectorSettings extends IStockControlSettings {
+
+	/**
+	 * A list periods to choose from.
+	 */
 	periods?: IPeriod[];
+
 }
 
 export interface IPeriodSelectorPrivate extends IStockControlPrivate {
@@ -25,7 +30,9 @@ export interface IPeriodSelectorEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * A pre-defined period selector control for [[StockToolback]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/} for more info
  */
 export class PeriodSelector extends StockControl {
 	public static className: string = "PeriodSelector";
@@ -86,12 +93,35 @@ export class PeriodSelector extends StockControl {
 		}
 		else {
 			const axis = this._getAxis();
-			const end = new Date(axis.getPrivate("max"));
+			let end = new Date(axis.getPrivate("max"));
 			let start: Date;
 			if (period.timeUnit == "ytd") {
 				start = new Date(end.getFullYear(), 0, 1, 0, 0, 0, 0);
 			}
 			else {
+				// some adjustments in case data is grouped
+				if (axis.get("groupData")) {
+					// find interval which will be used after zoom
+					const interval = axis.getGroupInterval($time.getDuration(period.timeUnit, period.count))
+					if (interval) {
+						// find max of the base interval
+						let endTime = axis.getIntervalMax(axis.get("baseInterval"));
+
+						if (endTime != null) {
+							// round to the future interval
+							end = $time.round(new Date(endTime), interval.timeUnit, interval.count);
+						}
+
+						start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
+						axis.zoomToDates(start, end, 0);
+						setTimeout(() => {
+							axis.zoomToDates(start, end, 0);
+						}, 10);
+
+						return;
+					}
+				}
+
 				start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
 			}
 			axis.zoomToDates(start, end);

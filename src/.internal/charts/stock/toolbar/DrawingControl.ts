@@ -119,10 +119,30 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	 * Default label font size.
 	 */
 	labelFontSize?: number | string | undefined;
+
+	/**
+	 * Available font sizes.
+	 */
 	labelFontSizes?: Array<number | string>;
+
+	/**
+	 * Default label font.
+	 */
 	labelFontFamily?: string;
+
+	/**
+	 * Available fonts for user to choose from.
+	 */
 	labelFontFamilies?: string[];
+
+	/**
+	 * Default label font weight.
+	 */
 	labelFontWeight?: "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
+
+	/**
+	 * Default label style.
+	 */
 	labelFontStyle?: "normal" | "italic" | "oblique";
 
 	drawingIcon?: IIcon;
@@ -166,7 +186,9 @@ export interface IDrawingControlEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * A drawing tools control for [[StockChart]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/} for more info
  */
 export class DrawingControl extends StockControl {
 	public static className: string = "DrawingControl";

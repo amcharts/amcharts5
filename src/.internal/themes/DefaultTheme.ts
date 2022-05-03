@@ -132,7 +132,8 @@ export class DefaultTheme extends Theme {
 
 		r("Chart").setAll({
 			width: p100,
-			height: p100
+			height: p100,
+			interactiveChildren: false
 		});
 
 

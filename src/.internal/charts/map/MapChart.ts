@@ -193,6 +193,18 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 */
 	maxPanOut?: number;
 
+	/**
+	 * Setting `true` means that the map will automatically center itself (or go
+	 * to `homeGeoPoint` if set) when fully zoomed out.
+	 *
+	 * `false` would mean that zoom out will be centered around the mouse
+	 * cursor (when zooming using wheel), or current map position.
+	 * 
+	 * @default true
+	 * @since 5.2.1
+	 */
+	centerMapOnZoomOut?: boolean;
+
 }
 
 export interface IMapChartPrivate extends ISerialChartPrivate {
@@ -265,10 +277,10 @@ export class MapChart extends SerialChart {
 	protected _pw?: number;
 	protected _ph?: number;
 
-	protected _mapFitted:boolean = false;
+	protected _mapFitted: boolean = false;
 
-	protected _centerX:number = 0;
-	protected _centerY:number = 0;
+	protected _centerX: number = 0;
+	protected _centerY: number = 0;
 
 	protected _makeGeoPath() {
 		const projection = this.get("projection")!;
@@ -513,17 +525,11 @@ export class MapChart extends SerialChart {
 		}
 	}
 
-
 	/**
-	 * Repositions the map to the "home" zoom level and center coordinates.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Resetting_position_level} for more info
-	 * @param  duration  Animation duration in milliseconds
+	 * @todo review
 	 */
-	public goHome(duration?: number) {
+	public homeGeoPoint(): IGeoPoint {
 		let homeGeoPoint = this.get("homeGeoPoint");
-		const homeZoomLevel = this.get("homeZoomLevel", 1);
-
 		if (!homeGeoPoint) {
 			const geoPath = this.getPrivate("geoPath");
 			const bounds = geoPath.bounds(this._geometryColection);
@@ -536,8 +542,17 @@ export class MapChart extends SerialChart {
 
 			homeGeoPoint = this.invert({ x: left + (right - left) / 2, y: top + (bottom - top) / 2 });
 		}
+		return homeGeoPoint;
+	}
 
-		this.zoomToGeoPoint(homeGeoPoint, homeZoomLevel, true, duration);
+	/**
+	 * Repositions the map to the "home" zoom level and center coordinates.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Resetting_position_level} for more info
+	 * @param  duration  Animation duration in milliseconds
+	 */
+	public goHome(duration?: number) {
+		this.zoomToGeoPoint(this.homeGeoPoint(), this.get("homeZoomLevel", 1), true, duration);
 	}
 
 	public _updateChildren() {
@@ -777,6 +792,7 @@ export class MapChart extends SerialChart {
 				let currentDistance = Math.hypot(movePoint1.x - movePoint0.x, movePoint1.y - movePoint0.y);
 
 				let level = currentDistance / initialDistance * this._downZoomLevel;
+				level = $math.fitToRange(level, this.get("minZoomLevel", 1), this.get("maxZoomLevel", 32));
 
 				let moveCenter = { x: movePoint0.x + (movePoint1.x - movePoint0.x) / 2, y: movePoint0.y + (movePoint1.y - movePoint0.y) / 2 };
 				let downCenter = { x: downPoint0.x + (downPoint1.x - downPoint0.x) / 2, y: downPoint0.y + (downPoint1.y - downPoint0.y) / 2 };
@@ -847,20 +863,20 @@ export class MapChart extends SerialChart {
 
 							const ww = bounds[1][0] - bounds[0][0];
 							const hh = bounds[1][1] - bounds[0][1];
-							
+
 							if (panX == "translateX") {
 								x += local.x - downPoint.x;
 
-								const cx = w / 2 - (w / 2- this._centerX) * zoomLevel;
+								const cx = w / 2 - (w / 2 - this._centerX) * zoomLevel;
 								x = Math.min(x, cx + ww * maxPanOut * zoomLevel);
 								x = Math.max(x, cx - ww * maxPanOut * zoomLevel);
 
 							}
 							if (panY == "translateY") {
 								y += local.y - downPoint.y;
-								const cy = h / 2 - (h / 2- this._centerY) * zoomLevel;
+								const cy = h / 2 - (h / 2 - this._centerY) * zoomLevel;
 								y = Math.min(y, cy + hh * maxPanOut * zoomLevel);
-								y = Math.max(y, cy - hh * maxPanOut * zoomLevel);								
+								y = Math.max(y, cy - hh * maxPanOut * zoomLevel);
 							}
 
 							this.set("translateX", x);
@@ -968,6 +984,11 @@ export class MapChart extends SerialChart {
 		const easing = this.get("animationEasing");
 		const zoomLevel = this.get("zoomLevel", 1);
 
+		if (this.get("centerMapOnZoomOut") && level == this.get("homeZoomLevel", 1)) {
+			point = this.convert(this.homeGeoPoint());
+			center = true;
+		}		
+
 		let x = point.x;
 		let y = point.y;
 
@@ -984,6 +1005,7 @@ export class MapChart extends SerialChart {
 
 		let xx = cx - ((x - tx) / zoomLevel * level);
 		let yy = cy - ((y - ty) / zoomLevel * level);
+
 
 		this._txa = this.animate({ key: "translateX", to: xx, duration: duration, easing: easing });
 		this._tya = this.animate({ key: "translateY", to: yy, duration: duration, easing: easing });
@@ -1005,7 +1027,8 @@ export class MapChart extends SerialChart {
 	 * @param  duration  Duration of the animation in milliseconds
 	 */
 	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
-		const xy = this.convert(geoPoint);
+		let xy = this.convert(geoPoint);
+
 		if (xy) {
 			return this.zoomToPoint(xy, level, center, duration);
 		}

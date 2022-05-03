@@ -302,5 +302,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				}
 			})
 		}
+
+		this._updateGhost();
 	}
 }

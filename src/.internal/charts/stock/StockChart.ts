@@ -255,7 +255,7 @@ export class StockChart extends Container {
 		}
 	}
 
-	public _updateChildren() {
+	public _prepareChildren() {
 
 		if (this.isDirty("volumeNegativeColor") || this.isDirty("volumePositiveColor")) {
 			const volumeSeries = this.get("volumeSeries");
@@ -312,13 +312,15 @@ export class StockChart extends Container {
 							}
 						}
 					});
+				}
 
-					// mainChart.series.events.onAll((_ev) => {
-					// 	this.setComparison();
-					// })
+				if (this.getPrivate("comparing")) {
+					this.setPercentScale(true);
 				}
 			}
 		}
+
+		super._prepareChildren();
 	}
 
 	/**
@@ -495,6 +497,10 @@ export class StockChart extends Container {
 		const volumeSeries = this.get("volumeSeries");
 		if (volumeSeries) {
 			indicator.set("volumeSeries", volumeSeries);
+		}
+
+		if (this.getPrivate("comparing")) {
+			this.setPercentScale(true);
 		}
 
 		indicator.prepareData();
@@ -702,7 +708,7 @@ export class StockChart extends Container {
 				const index = volumeSeries.dataItems.indexOf(dataItem);
 				if (index > 0) {
 					let stockDataItem = stockSeries.dataItems[index];
-					if(stockDataItem){
+					if (stockDataItem) {
 						let close = stockDataItem.get("valueY");
 						if (close != null) {
 							for (let i = index - 1; i >= 0; i--) {

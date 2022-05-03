@@ -41,7 +41,8 @@ export class MapChartDefaultTheme extends Theme {
 			wheelEasing: $ease.out($ease.cubic),
 			wheelDuration: 0,
 			wheelSensitivity: 1,
-			maxPanOut: 0.4
+			maxPanOut: 0.4,
+			centerMapOnZoomOut: true
 		});
 
 		{

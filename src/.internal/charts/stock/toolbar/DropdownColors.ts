@@ -29,7 +29,9 @@ export interface IDropdownColorsEvents extends IDropdownEvents {
 }
 
 /**
- * @todo review
+ * A dropdown used for color picker control.
+ *
+ * Should not be used as standalone control.
  */
 export class DropdownColors extends Dropdown {
 	public static className: string = "DropdownColors";

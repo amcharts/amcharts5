@@ -46,7 +46,9 @@ export interface IIndicatorControlEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * A [[StockToolbar]] control for adding indicators to a [[StockChart]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/indicator-control/} for more info
  */
 export class IndicatorControl extends StockControl {
 	public static className: string = "IndicatorControl";

@@ -58,9 +58,13 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	adjustBulletPosition?: boolean;
 
 	/**
-	 * @todo review
+	 * If set to `true` will use color of the last visible column for legend
+	 * marker. Otherwise, series `fill`/`stroke` will be used.
+	 *
+	 * @since 5.1.13
 	 */
 	useLastColorForLegendMarker?: boolean
+
 }
 
 export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }

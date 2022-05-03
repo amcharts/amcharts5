@@ -124,7 +124,7 @@ export class StockChartDefaultTheme extends Theme {
 		}
 
 		r("Grid", ["renderer", "x"]).setAll({
-			forceHidden: true
+			strokeOpacity: 0.05
 		})
 
 		r("Grid", ["renderer", "y"]).setAll({
@@ -133,15 +133,6 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("Grid", ["renderer", "base", "y"]).setAll({
 			strokeOpacity: 0.15
-		})
-
-		r("Graphics", ["renderer", "x", "fill"]).setAll({
-			fillOpacity: 0.03,
-			visible: true
-		})
-
-		r("Graphics", ["renderer", "x", "fill", "scrollbar"]).setAll({
-			visible: false
 		})
 
 		r("Button", ["zoom"]).setAll({

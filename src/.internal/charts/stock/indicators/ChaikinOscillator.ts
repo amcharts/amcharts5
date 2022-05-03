@@ -10,11 +10,11 @@ export interface IChaikinOscillatorSettings extends IChartIndicatorSettings {
 
 	/**
 	 * Main volume series of the [[StockChart]].
-	 */	
+	 */
 	volumeSeries: XYSeries;
 
 	/**
-	 * @todo review
+	 * Slow period setting.
 	 */
 	slowPeriod?: number;
 
@@ -49,11 +49,11 @@ export class ChaikinOscillator extends ChartIndicator {
 		key: "period",
 		name: this.root.language.translateAny("Fast period"),
 		type: "number"
-	},{
+	}, {
 		key: "slowPeriod",
 		name: this.root.language.translateAny("Slow period"),
 		type: "number"
-	},{
+	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
 		type: "color"

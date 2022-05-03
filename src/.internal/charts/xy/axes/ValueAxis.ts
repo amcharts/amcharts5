@@ -1297,6 +1297,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this.setPrivate("minFinal", min);
 				this.setPrivate("maxFinal", max);
 
+				this._saveMinMax(min, max);
+
 				const duration = this.get("interpolationDuration", 0);
 				const easing = this.get("interpolationEasing");
 
@@ -1304,6 +1306,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this.animatePrivate({ key: "max", to: max, duration, easing });
 			}
 		}
+	}
+
+	protected _saveMinMax(_min:number, _max:number){
+
 	}
 
 
@@ -1499,7 +1505,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this.zoom((start - min) / (max - min), (end - min) / (max - min), duration);
 		}
 	}
-
 
 
 	/**
