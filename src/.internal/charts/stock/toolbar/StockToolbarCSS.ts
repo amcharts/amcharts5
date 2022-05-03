@@ -78,11 +78,15 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"min-width": "1.2em",
 				"min-height": "1.2em",
 				"max-width": "1.2em",
-				"max-height": "1.2em",
+				//"max-height": "1.2em",
 				//"margin-right": "4px",
 				"display": "inline-block",
 				"position": "relative",
 				"margin": "0 5px 0 0",
+			}),
+
+			new StyleRule(element, ".am5stock-control-icon.am5stock-icon-wide", {
+				"max-width": "60px"
 			}),
 
 			new StyleRule(element, ".am5stock-control-icon > *", {

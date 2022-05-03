@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.2] - 2022-05-03
+
+### Fixed
+- Style issue with stroke style selection button in `StockChart` drawing mode.
+
+
 ## [5.2.1] - 2022-05-03
 
 ### Added

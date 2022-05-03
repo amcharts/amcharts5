@@ -357,6 +357,7 @@ export class DrawingControl extends StockControl {
 				label: ""
 			});
 		}
+		strokeDasharrayControl.getPrivate("icon")!.setAttribute("class", "am5stock-control-icon am5stock-icon-wide")
 		toolsContainer.appendChild(strokeDasharrayControl.getPrivate("button")!);
 		this.setPrivate("strokeDasharrayControl", strokeDasharrayControl);
 		strokeDasharrayControl.events.on("selected", (ev) => {
