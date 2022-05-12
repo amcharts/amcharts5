@@ -18,6 +18,8 @@ let rules: CounterDisposer | undefined;
 function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDisposer {
 	const ic = root.interfaceColors;
 	const active = ic.get("secondaryButton")!.toCSS();
+	const text = ic.get("text")!.toCSS();
+	const shadow = ic.get("alternativeBackground")!.toCSS(0.45);
 	//const altbg = ic.get("alternativeBackground")!.toCSS();
 
 	if (!rules) {
@@ -71,8 +73,9 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"background": ic.get("background")!.toCSS(),
 				//"border": "1px solid " + ic.get("alternativeBackground")!.toCSS(),
 				"border-radius": "4px",
-				"-webkit-box-shadow": "0px 0px 36px 0px rgba(0,0,0,0.45)",
-				"box-shadow": "0px 0px 36px 0px rgba(0,0,0,0.45)"
+				"-webkit-box-shadow": "0px 0px 36px 0px " + shadow,
+				"box-shadow": "0px 0px 36px 0px " + shadow,
+				"color": text
 			}),
 
 			new StyleRule(element, ".am5-modal-content h1", {

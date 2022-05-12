@@ -637,6 +637,7 @@ export class DefaultTheme extends Theme {
 			});
 
 			setColor(rule, "fill", ic, "secondaryButton");
+			setColor(rule, "stroke", ic, "secondaryButtonStroke");
 		}
 
 		{

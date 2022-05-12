@@ -329,6 +329,8 @@ export class DateRangeSelector extends StockControl {
 		//const active = ic.get("secondaryButton")!.toCSS();
 		const primary = ic.get("primaryButton")!.toCSS();
 		const primary2 = ic.get("primaryButtonHover")!.toCSS();
+		const text = ic.get("text")!.toCSS();
+		const border = ic.get("secondaryButtonActive")!.toCSS();
 		const bg = ic.get("background")!.toCSS();
 
 		this._disposers.push(new StyleSheet(null, `
@@ -401,7 +403,7 @@ export class DateRangeSelector extends StockControl {
 }
 .flatpickr-calendar.hasTime .flatpickr-time {
   height: 40px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid ${border};
 }
 .flatpickr-calendar.noCalendar.hasTime .flatpickr-time {
   height: auto;
@@ -442,7 +444,7 @@ export class DateRangeSelector extends StockControl {
   bottom: 100%;
 }
 .flatpickr-calendar.arrowTop:before {
-  border-bottom-color: #eee;
+  border-bottom-color: ${border};
 }
 .flatpickr-calendar.arrowTop:after {
   border-bottom-color: ${bg};
@@ -452,7 +454,7 @@ export class DateRangeSelector extends StockControl {
   top: 100%;
 }
 .flatpickr-calendar.arrowBottom:before {
-  border-top-color: #eee;
+  border-top-color: ${border};
 }
 .flatpickr-calendar.arrowBottom:after {
   border-top-color: ${bg};
@@ -472,8 +474,8 @@ export class DateRangeSelector extends StockControl {
 }
 .flatpickr-months .flatpickr-month {
   background: transparent;
-  color: #3c3f40;
-  fill: #3c3f40;
+  color: ${text};
+  fill: ${text};
   height: 34px;
   line-height: 1;
   text-align: center;
@@ -497,8 +499,8 @@ export class DateRangeSelector extends StockControl {
   height: 34px;
   padding: 10px;
   z-index: 3;
-  color: #3c3f40;
-  fill: #3c3f40;
+  color: ${text};
+  fill: ${text};
 }
 .flatpickr-months .flatpickr-prev-month.flatpickr-disabled,
 .flatpickr-months .flatpickr-next-month.flatpickr-disabled {
@@ -667,10 +669,10 @@ export class DateRangeSelector extends StockControl {
   display: inline-block;
 }
 .flatpickr-current-month .numInputWrapper span.arrowUp:after {
-  border-bottom-color: #3c3f40;
+  border-bottom-color: ${text};
 }
 .flatpickr-current-month .numInputWrapper span.arrowDown:after {
-  border-top-color: #3c3f40;
+  border-top-color: ${text};
 }
 .flatpickr-current-month input.cur-year {
   background: transparent;
@@ -734,7 +736,7 @@ export class DateRangeSelector extends StockControl {
   background: rgba(0,0,0,0.05);
 }
 .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month {
-  background-color: transparent;
+  background-color: ${bg};
   outline: none;
   padding: 0;
 }
@@ -767,7 +769,7 @@ span.flatpickr-weekday {
   cursor: default;
   font-size: 90%;
   background: transparent;
-  color: rgba(0,0,0,0.54);
+  color: ${text};
   line-height: 1;
   margin: 0;
   text-align: center;
@@ -823,8 +825,8 @@ span.flatpickr-weekday {
   opacity: 1;
 }
 .dayContainer + .dayContainer {
-  -webkit-box-shadow: -1px 0 0 #eee;
-          box-shadow: -1px 0 0 #eee;
+  -webkit-box-shadow: -1px 0 0 ${border};
+          box-shadow: -1px 0 0 ${border};
 }
 .flatpickr-day {
   background: none;
@@ -832,7 +834,7 @@ span.flatpickr-weekday {
   border-radius: 150px;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
-  color: #404848;
+  color: ${text};
   cursor: pointer;
   font-weight: 400;
   width: 14.2857143%;
@@ -865,8 +867,8 @@ span.flatpickr-weekday {
 .flatpickr-day.nextMonthDay:focus {
   cursor: pointer;
   outline: 0;
-  background: #e9e9e9;
-  border-color: #e9e9e9;
+  background: ${primary2};
+  border-color: ${primary2};
 }
 .flatpickr-day.today {
   border-color: ${primary2};
@@ -924,8 +926,8 @@ span.flatpickr-weekday {
 }
 .flatpickr-day.inRange {
   border-radius: 0;
-  -webkit-box-shadow: -5px 0 0 #e9e9e9, 5px 0 0 #e9e9e9;
-          box-shadow: -5px 0 0 #e9e9e9, 5px 0 0 #e9e9e9;
+  -webkit-box-shadow: -5px 0 0 ${primary2}, 5px 0 0 ${primary2};
+          box-shadow: -5px 0 0 ${primary2}, 5px 0 0 ${primary2};
 }
 .flatpickr-day.flatpickr-disabled,
 .flatpickr-day.flatpickr-disabled:hover,
@@ -936,7 +938,7 @@ span.flatpickr-weekday {
 .flatpickr-day.notAllowed.nextMonthDay {
   color: rgba(64,72,72,0.3);
   background: transparent;
-  border-color: #e9e9e9;
+  border-color: ${primary2};
   cursor: default;
 }
 .flatpickr-day.flatpickr-disabled,
@@ -960,8 +962,8 @@ span.flatpickr-weekday {
 }
 .flatpickr-weekwrapper .flatpickr-weeks {
   padding: 0 12px;
-  -webkit-box-shadow: 1px 0 0 #eee;
-          box-shadow: 1px 0 0 #eee;
+  -webkit-box-shadow: 1px 0 0 ${border};
+          box-shadow: 1px 0 0 ${border};
 }
 .flatpickr-weekwrapper .flatpickr-weekday {
   float: none;
@@ -1024,10 +1026,10 @@ span.flatpickr-weekday {
   float: left;
 }
 .flatpickr-time .numInputWrapper span.arrowUp:after {
-  border-bottom-color: #404848;
+  border-bottom-color: ${text};
 }
 .flatpickr-time .numInputWrapper span.arrowDown:after {
-  border-top-color: #404848;
+  border-top-color: ${text};
 }
 .flatpickr-time.hasSeconds .numInputWrapper {
   width: 26%;
@@ -1046,7 +1048,7 @@ span.flatpickr-weekday {
   padding: 0;
   height: inherit;
   line-height: inherit;
-  color: #404848;
+  color: ${text};
   font-size: 14px;
   position: relative;
   -webkit-box-sizing: border-box;
@@ -1071,7 +1073,7 @@ span.flatpickr-weekday {
   height: inherit;
   float: left;
   line-height: inherit;
-  color: #404848;
+  color: ${text};
   font-weight: bold;
   width: 2%;
   -webkit-user-select: none;
@@ -1133,7 +1135,7 @@ span.flatpickr-day,
 span.flatpickr-day.prevMonthDay,
 span.flatpickr-day.nextMonthDay {
   border-radius: 0 !important;
-  border: 1px solid #e9e9e9;
+  border: 1px solid ${primary2};
   max-width: none;
   border-right-color: transparent;
 }
@@ -1160,7 +1162,7 @@ span.flatpickr-day.nextMonthDay:nth-child(-n+7) {
 span.flatpickr-day.today:not(.selected),
 span.flatpickr-day.prevMonthDay.today:not(.selected),
 span.flatpickr-day.nextMonthDay.today:not(.selected) {
-  border-color: #e9e9e9;
+  border-color: ${primary2};
   border-right-color: transparent;
   border-top-color: transparent;
   border-bottom-color: ${primary2};

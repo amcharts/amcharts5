@@ -41,13 +41,12 @@ export interface IForceDirectedDataItem extends ILinkedHierarchyDataItem {
 	/**
 	 * X coordinate.
 	 */
-	x: number;
+	x: number | undefined;
 
 	/**
 	 * Y coordinate.
 	 */
-	y: number;
-
+	y: number | undefined;
 }
 
 export interface IForceDirectedSettings extends ILinkedHierarchySettings {
@@ -470,9 +469,15 @@ export class ForceDirected extends LinkedHierarchy {
 		if (x != null) {
 			(d3Node as any).fx = $utils.relativeToValue(x, this.innerWidth());
 		}
+		else{
+			(d3Node as any).fx = undefined;
+		}
 
 		if (y != null) {
 			(d3Node as any).fy = $utils.relativeToValue(y, this.innerHeight());
+		}
+		else{
+			(d3Node as any).fx = undefined;
 		}
 	}
 

@@ -212,12 +212,6 @@ export class TextFormatter {
 			return {};
 		}
 
-		// TODO: cache
-		// let cached = registry.getCache("translateStyleShortcuts_" + style);
-		// if (cached) {
-		// 	return cached;
-		// }
-
 		// Pre-process quoted text
 		const q = style.match(/('[^']*')|("[^"]*")/gi);
 		if (q) {
@@ -233,8 +227,6 @@ export class TextFormatter {
 		if (!b) {
 			return {};
 		}
-
-		//console.log(b)
 
 		// Check each part
 		for (let i: number = 0; i < b.length; i++) {
@@ -254,16 +246,13 @@ export class TextFormatter {
 				format.fill = Color.fromString(b[i]);
 			}
 			else {
-				const p = b[i].split(/:[ ]*/);
+				const p = b[i].replace("+", " ").split(/:[ ]*/);
 				(<any>format)[p[0]] = p[1];
 				//textStyle.push(b[i].replace(/^[a-zA-Z]:[ ]*/, ""));
 				//b[i] = b[i].replace(/\+/g, " ");
 			}
 
 		}
-
-		// TODO: cache
-		// registry.setCache("translateStyleShortcuts_" + style, res);
 
 		return format;
 	}

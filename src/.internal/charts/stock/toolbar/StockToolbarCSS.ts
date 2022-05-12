@@ -15,7 +15,9 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 	const ic = root.interfaceColors;
 	const active = ic.get("secondaryButton")!.toCSS();
 	const hover = ic.get("secondaryButtonHover")!.toCSS();
-	//const text = ic.get("secondaryButtonText")!.toCSS();
+	//const border = ic.get("secondaryButtonStroke")!.toCSS();
+	const text = ic.get("text")!.toCSS();
+	const border = ic.get("secondaryButtonActive")!.toCSS();
 	const bg = ic.get("background")!.toCSS();
 
 	if (!rules) {
@@ -24,13 +26,14 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			new StyleRule(element, ".am5stock-control-button", {
 				"display": "inline-block",
 				"position": "relative",
-				"border": "1px solid " + active,
+				"border": "1px solid " + border,
 				"border-radius": "4px",
 				"padding": "3px 0 3px 5px",
 				"margin": "2px",
 				"z-index": "100000",
 				"cursor": "default",
-				"line-height": "1.5em"
+				"line-height": "1.5em",
+				"color": text
 			}),
 
 			new StyleRule(element, ".am5stock-control-button:hover", {
@@ -120,7 +123,7 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			new StyleRule(element, ".am5stock-control-button path", {
 				//fill: ic.get("secondaryButtonText")!.toCSS(),
 				"stroke-width": "0.5",
-				"stroke": ic.get("secondaryButtonText")!.toCSS(),
+				"stroke": text,
 				"fill": "none",
 				"vector-effect": "non-scaling-stroke"
 			}),
@@ -135,8 +138,8 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"left": "0",
 				"top": "100%",
 				"margin-top": "10px",
-				"background": ic.get("background")!.toCSS(),
-				"border": "1px solid " + active,
+				"background": bg,
+				"border": "1px solid " + border,
 				"border-radius": "3px"
 			}),
 
@@ -149,9 +152,9 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"position": "absolute",
 				"left": "5px",
 				"top": "-5px",
-				"border": "solid " + active,
+				"border": "solid " + border,
 				"border-width": "0 1px 1px 0",
-				"background": ic.get("background")!.toCSS(),
+				"background": bg,
 				"display": "inline-block",
 				"padding": "5px",
 				"transform": "rotate(-135deg)"
@@ -240,6 +243,13 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"padding": "6px 10px 6px 30px",
 				"margin-top": "5px",
 				"background": "url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAuNSIgY3k9IjEwLjUiIHI9IjcuNSIvPjxsaW5lIHgxPSIyMSIgeDI9IjE1LjgiIHkxPSIyMSIgeTI9IjE1LjgiLz48L3N2Zz4=) 5px / 20px 20px no-repeat",
+				"background-color": "#fff",
+				//"background-color": active,
+				"color": "#888"
+			}),
+
+			new StyleRule(element, ".am5stock-list-search input::placeholder", {
+				"color": "#888"
 			}),
 
 			new StyleRule(element, ".am5stock-control-colors, .am5stock-control-icons", {

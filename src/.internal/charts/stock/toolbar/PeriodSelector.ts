@@ -97,6 +97,15 @@ export class PeriodSelector extends StockControl {
 			let start: Date;
 			if (period.timeUnit == "ytd") {
 				start = new Date(end.getFullYear(), 0, 1, 0, 0, 0, 0);
+				end = new Date(axis.getIntervalMax(axis.get("baseInterval")));
+				if (axis.get("groupData")) {
+					axis.zoomToDates(start, end, 0);
+					setTimeout(() => {
+						axis.zoomToDates(start, end, 0);
+					}, 10);
+
+					return;
+				}
 			}
 			else {
 				// some adjustments in case data is grouped

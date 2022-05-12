@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.3] - 2022-05-12
+
+### Changed
+- Upgraded versions of `pdfmake` and `xlsx` dependencies.
+- Reseting `x` and `y` of the `ForceDirectedSeries` data item will make the node be not ifxed anymore.
+- Tweaked styles of `StockToolbar` controls to work better with theme colors.
+
+### Fixed
+- Enclosing multi-word parameters in in-line styles were not working.
+- `DateAxis` was producing an error if series had no initial data and timezone was set on a root element.
+- Vertically-stacked Y-axes was incorrectly plotting related series with Y-axis set as base axis.
+
+
 ## [5.2.2] - 2022-05-03
 
 ### Fixed

@@ -843,12 +843,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 */
 	public getTooltipText(position: number): string | undefined {
 		//@todo number formatter + tag
-
-		let format = this.get("tooltipDateFormats")![this.getPrivate("baseInterval").timeUnit];
-		let date = new Date(this.positionToValue(position));
-		let baseInterval = this.getPrivate("baseInterval");
-		let duration = $time.getDateIntervalDuration(baseInterval, date, this._root.locale.firstDayOfWeek, this._root.utc, this._root.timezone);
-		return this._root.dateFormatter.format(new Date(this.positionToValue(position) + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration), this.get("tooltipDateFormat", format));
+		if (this.getPrivate("min") != null) {
+			let format = this.get("tooltipDateFormats")![this.getPrivate("baseInterval").timeUnit];
+			let date = new Date(this.positionToValue(position));
+			let baseInterval = this.getPrivate("baseInterval");
+			let duration = $time.getDateIntervalDuration(baseInterval, date, this._root.locale.firstDayOfWeek, this._root.utc, this._root.timezone);
+			return this._root.dateFormatter.format(new Date(this.positionToValue(position) + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration), this.get("tooltipDateFormat", format));
+		}
+		return "";
 	}
 
 	/**

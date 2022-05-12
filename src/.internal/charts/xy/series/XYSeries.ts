@@ -1235,14 +1235,11 @@ export abstract class XYSeries extends Series {
 			this._fixVC();
 		}
 
-		if (xAxis === baseAxis) {
-			this.set("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
-			this.bulletsContainer.set("y", this.y());
-		}
-		else if (yAxis === baseAxis) {
-			this.set("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
-			this.bulletsContainer.set("x", this.x());
-		}
+
+		this.set("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
+		this.set("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
+		this.bulletsContainer.set("y", this.y());
+		this.bulletsContainer.set("x", this.x());
 
 		const stacked = this.get("stacked");
 

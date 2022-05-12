@@ -213,6 +213,23 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
+	 * Removes all listeners of a particular event type
+	 *
+	 * @param type  Listener's type
+	 */
+	protected removeType<Key extends keyof T>(type: Key): void {
+		if (this._disposed) {
+			throw new Error("EventDispatcher is disposed");
+		}
+
+		this._eachListener((info) => {
+			if (info.type === type) {
+				info.disposer.dispose();
+			}
+		});
+	}
+
+	/**
 	 * Checks if there's already a listener with specific parameters.
 	 *
 	 * @param type      Listener's type
