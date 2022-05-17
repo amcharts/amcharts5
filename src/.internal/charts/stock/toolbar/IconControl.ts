@@ -29,7 +29,9 @@ export interface IIconControlEvents extends IStockControlEvents {
 }
 
 /**
- * @todo review
+ * Shows selection of icons to choose from for annotating [[StockChart]].
+ *
+ * This class is instantiated automatically, and should not be used standalone.
  */
 export class IconControl extends StockControl {
 	public static className: string = "IconControl";

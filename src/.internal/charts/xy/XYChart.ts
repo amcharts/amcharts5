@@ -381,7 +381,7 @@ export class XYChart extends SerialChart {
 		this._maskGrid();
 	}
 
-	protected _maskGrid(){
+	protected _maskGrid() {
 		this.gridContainer.set("maskContent", true);
 		this.topGridContainer.set("maskContent", true);
 	}
@@ -397,14 +397,186 @@ export class XYChart extends SerialChart {
 		}
 
 		const cursor = this.get("cursor");
-		if(cursor){
+		if (cursor) {
 			const snapToSeries = cursor.get("snapToSeries");
-			if(snapToSeries){
+			if (snapToSeries) {
 				$array.remove(snapToSeries, series);
 			}
 		}
 
 		super._removeSeries(series);
+	}
+
+	/**
+	 * This method is invoked when mouse wheel is used over chart's plot
+	 * container, and handles zooming/pan.
+	 *
+	 * You can invoke this method manually, if you need to mimic chart's wheel
+	 * behavior over other elements of the chart.
+	 */
+	public handleWheel(event: { originalEvent: WheelEvent, point: IPoint, target: Container }) {
+		const wheelX = this.get("wheelX");
+		const wheelY = this.get("wheelY");
+		const plotContainer = this.plotContainer;
+
+		const wheelEvent = event.originalEvent;
+
+		wheelEvent.preventDefault()
+
+		const plotPoint = plotContainer.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
+		const wheelStep = this.get("wheelStep", 0.2);
+
+		const shiftY = wheelEvent.deltaY / 100;
+		const shiftX = wheelEvent.deltaX / 100;
+
+		if ((wheelX === "zoomX" || wheelX === "zoomXY") && shiftX != 0) {
+			this.xAxes.each((axis) => {
+				if (axis.get("zoomX")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let position = axis.fixPosition(plotPoint.x / plotContainer.width());
+
+					let newStart = start - wheelStep * (end - start) * shiftX * position;
+					let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
+					if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
+						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+				}
+			})
+		}
+
+		if ((wheelY === "zoomX" || wheelY === "zoomXY") && shiftY != 0) {
+			this.xAxes.each((axis) => {
+				if (axis.get("zoomX")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let position = axis.fixPosition(plotPoint.x / plotContainer.width());
+
+					let newStart = start - wheelStep * (end - start) * shiftY * position;
+					let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
+
+					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
+						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+				}
+			})
+		}
+
+
+		if ((wheelX === "zoomY" || wheelX === "zoomXY") && shiftX != 0) {
+			this.yAxes.each((axis) => {
+				if (axis.get("zoomY")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let position = axis.fixPosition(plotPoint.y / plotContainer.height());
+
+					let newStart = start - wheelStep * (end - start) * shiftX * position;
+					let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
+
+					if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
+						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+				}
+			})
+		}
+
+		if ((wheelY === "zoomY" || wheelY === "zoomXY") && shiftY != 0) {
+			this.yAxes.each((axis) => {
+				if (axis.get("zoomY")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let position = axis.fixPosition(plotPoint.y / plotContainer.height());
+
+					let newStart = start - wheelStep * (end - start) * shiftY * position;
+					let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
+
+					if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
+						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+				}
+			})
+		}
+
+
+		if ((wheelX === "panX" || wheelX === "panXY") && shiftX != 0) {
+			this.xAxes.each((axis) => {
+				if (axis.get("panX")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftX;
+					let newStart = start + delta;
+					let newEnd = end + delta;
+
+					let se = this._fixWheel(newStart, newEnd);
+					newStart = se[0];
+					newEnd = se[1];
+
+					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+				}
+			})
+		}
+
+		if ((wheelY === "panX" || wheelY === "panXY") && shiftY != 0) {
+			this.xAxes.each((axis) => {
+				if (axis.get("panX")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftY;
+					let newStart = start + delta;
+					let newEnd = end + delta;
+
+					let se = this._fixWheel(newStart, newEnd);
+					newStart = se[0];
+					newEnd = se[1];
+
+					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+				}
+			})
+		}
+
+		if ((wheelX === "panY" || wheelX === "panXY") && shiftX != 0) {
+			this.yAxes.each((axis) => {
+				if (axis.get("panY")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftX;
+					let newStart = start + delta;
+					let newEnd = end + delta;
+
+					let se = this._fixWheel(newStart, newEnd);
+					newStart = se[0];
+					newEnd = se[1];
+
+					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+				}
+			})
+		}
+
+		if ((wheelY === "panY" || wheelY === "panXY") && shiftY != 0) {
+			this.yAxes.each((axis) => {
+				if (axis.get("panY")) {
+					let start = axis.get("start")!;
+					let end = axis.get("end")!;
+
+					let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftY;
+					let newStart = start - delta;
+					let newEnd = end - delta;
+
+					let se = this._fixWheel(newStart, newEnd);
+					newStart = se[0];
+					newEnd = se[1];
+
+					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+				}
+			})
+		}
 	}
 
 	protected _handleSetWheel() {
@@ -414,164 +586,7 @@ export class XYChart extends SerialChart {
 
 		if (wheelX !== "none" || wheelY !== "none") {
 			this._wheelDp = plotContainer.events.on("wheel", (event) => {
-				const wheelEvent = event.originalEvent;
-
-				wheelEvent.preventDefault();
-
-				const plotPoint = plotContainer.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
-				const wheelStep = this.get("wheelStep", 0.2);
-
-				const shiftY = wheelEvent.deltaY / 100;
-				const shiftX = wheelEvent.deltaX / 100;
-
-				if ((wheelX === "zoomX" || wheelX === "zoomXY") && shiftX != 0) {
-					this.xAxes.each((axis) => {
-						if (axis.get("zoomX")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
-
-							let newStart = start - wheelStep * (end - start) * shiftX * position;
-							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
-								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-							}
-						}
-					})
-				}
-
-				if ((wheelY === "zoomX" || wheelY === "zoomXY") && shiftY != 0) {
-					this.xAxes.each((axis) => {
-						if (axis.get("zoomX")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let position = axis.fixPosition(plotPoint.x / plotContainer.width());
-
-							let newStart = start - wheelStep * (end - start) * shiftY * position;
-							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
-
-							if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
-								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-							}
-						}
-					})
-				}
-
-
-				if ((wheelX === "zoomY" || wheelX === "zoomXY") && shiftX != 0) {
-					this.yAxes.each((axis) => {
-						if (axis.get("zoomY")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let position = axis.fixPosition(plotPoint.y / plotContainer.height());
-
-							let newStart = start - wheelStep * (end - start) * shiftX * position;
-							let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
-
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
-								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-							}
-						}
-					})
-				}
-
-				if ((wheelY === "zoomY" || wheelY === "zoomXY") && shiftY != 0) {
-					this.yAxes.each((axis) => {
-						if (axis.get("zoomY")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let position = axis.fixPosition(plotPoint.y / plotContainer.height());
-
-							let newStart = start - wheelStep * (end - start) * shiftY * position;
-							let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
-
-							if (1 / (newEnd - newStart) < axis.get("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
-								this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-							}
-						}
-					})
-				}
-
-
-				if ((wheelX === "panX" || wheelX === "panXY") && shiftX != 0) {
-					this.xAxes.each((axis) => {
-						if (axis.get("panX")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftX;
-							let newStart = start + delta;
-							let newEnd = end + delta;
-
-							let se = this._fixWheel(newStart, newEnd);
-							newStart = se[0];
-							newEnd = se[1];
-
-							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-						}
-					})
-				}
-
-				if ((wheelY === "panX" || wheelY === "panXY") && shiftY != 0) {
-					this.xAxes.each((axis) => {
-						if (axis.get("panX")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftY;
-							let newStart = start + delta;
-							let newEnd = end + delta;
-
-							let se = this._fixWheel(newStart, newEnd);
-							newStart = se[0];
-							newEnd = se[1];
-
-							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-						}
-					})
-				}
-
-				if ((wheelX === "panY" || wheelX === "panXY") && shiftX != 0) {
-					this.yAxes.each((axis) => {
-						if (axis.get("panY")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftX;
-							let newStart = start + delta;
-							let newEnd = end + delta;
-
-							let se = this._fixWheel(newStart, newEnd);
-							newStart = se[0];
-							newEnd = se[1];
-
-							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-						}
-					})
-				}
-
-				if ((wheelY === "panY" || wheelY === "panXY") && shiftY != 0) {
-					this.yAxes.each((axis) => {
-						if (axis.get("panY")) {
-							let start = axis.get("start")!;
-							let end = axis.get("end")!;
-
-							let delta = this._getWheelSign(axis) * wheelStep * (end - start) * shiftY;
-							let newStart = start - delta;
-							let newEnd = end - delta;
-
-							let se = this._fixWheel(newStart, newEnd);
-							newStart = se[0];
-							newEnd = se[1];
-
-							this._handleWheelAnimation(axis.zoom(newStart, newEnd));
-						}
-					})
-				}
+				this.handleWheel(event);
 			});
 
 			this._disposers.push(this._wheelDp);

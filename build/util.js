@@ -345,11 +345,11 @@ class Tasks {
 		state.verbose = !!args.verbose;
 		state.force = !!args.force;
 
-		console.log("");
+		//console.log("");
 
 		state.task(name).catch((e) => {
 			state.error(e);
-			console.log("");
+			//console.log("");
 			process.exit(1);
 		});
 	}

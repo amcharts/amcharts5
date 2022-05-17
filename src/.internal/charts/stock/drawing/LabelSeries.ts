@@ -163,7 +163,7 @@ export class LabelSeries extends PolylineSeries {
 			input.value = "";
 
 			this._clickEvent = event;
-			console.log(event);
+			//console.log(event);
 			const inputDiv = this.getPrivate("inputContainer");
 			inputDiv.style.display = "block";
 			inputDiv.style.left = (event.point.x) + "px";

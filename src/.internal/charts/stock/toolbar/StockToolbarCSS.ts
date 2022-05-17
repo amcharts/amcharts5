@@ -30,10 +30,14 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"border-radius": "4px",
 				"padding": "3px 0 3px 5px",
 				"margin": "2px",
-				"z-index": "100000",
+				"z-index": "1",
 				"cursor": "default",
 				"line-height": "1.5em",
 				"color": text
+			}),
+
+			new StyleRule(element, ".am5stock-control-button div", {
+				"box-sizing": "initial"
 			}),
 
 			new StyleRule(element, ".am5stock-control-button:hover", {
@@ -56,22 +60,8 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 
 			new StyleRule(element, ".am5stock-control-button.am5stock-control-button-active", {
 				"background": active,
-				"z-index": "100001",
+				"z-index": "2",
 			}),
-
-			// new StyleRule(element, ".am5stock-control-button.am5stock-control-dropdown::after", {
-			// 	"position": "relative",
-			// 	"content": "\"\"",
-			// 	"display": "inline-block",
-			// 	"width": "0.3em",
-			// 	"height": "0.3em",
-			// 	"border-right": "0.1em solid " + text,
-			// 	"border-top": "0.1em solid " + text,
-			// 	"transform": "rotate(135deg)",
-			// 	"margin-left": "0.2em",
-			// 	"margin-right": "0.5em",
-			// 	"vertical-align": "middle"
-			// }),
 
 			new StyleRule(element, ".am5-modal-content .am5stock-control-button.am5stock-control-button-active, .am5-modal-content .am5stock-control-button:hover", {
 				"background": "none"
@@ -239,7 +229,7 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			}),
 
 			new StyleRule(element, ".am5stock-list-search input", {
-				"border": "1px solid " +  active,
+				"border": "1px solid " + active,
 				"padding": "6px 10px 6px 30px",
 				"margin-top": "5px",
 				"background": "url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZmlsbD0ibm9uZSIgaGVpZ2h0PSIyNCIgc3Ryb2tlPSIjMDAwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAuNSIgY3k9IjEwLjUiIHI9IjcuNSIvPjxsaW5lIHgxPSIyMSIgeDI9IjE1LjgiIHkxPSIyMSIgeTI9IjE1LjgiLz48L3N2Zz4=) 5px / 20px 20px no-repeat",

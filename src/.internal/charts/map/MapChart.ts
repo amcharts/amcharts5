@@ -526,7 +526,8 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * @todo review
+	 * Returns geographical coordinates for calculated or manual center of the
+	 * map.
 	 */
 	public homeGeoPoint(): IGeoPoint {
 		let homeGeoPoint = this.get("homeGeoPoint");

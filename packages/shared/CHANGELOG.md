@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.4] - 2022-05-17
+
+### Added
+- `handleWheel()` method added to `XYChart`. Use it to mirror the same behavior as if the wheel was used on plot area.
+- `useDefaultCSS` (default: `true`) setting added to `DateRangeSelector`.
+- `inversed` added to `Tree` series. If set to `true`, will flip the direction of the tree.
+
+### Fixed
+- `StockToolbar` default CSS was using unnecessarily high `z-index` for its buttons.
+- `StockToolbar` datepicker's style was off in some cases.
+- `GaplessDateAxis` could display the same month name label two times in a row in some cases.
+
+
 ## [5.2.3] - 2022-05-12
 
 ### Changed

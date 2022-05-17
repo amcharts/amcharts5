@@ -36,6 +36,14 @@ export interface ITreeSettings extends ILinkedHierarchySettings {
 	 */
 	orientation?: "horizontal" | "vertical";
 
+	/**
+	 * If set to `true`, will flip the tree direction.
+	 *
+	 * @default false
+	 * @since 5.2.4
+	 */
+	inversed?: boolean;
+
 }
 
 export interface ITreePrivate extends ILinkedHierarchyPrivate {
@@ -78,7 +86,7 @@ export class Tree extends LinkedHierarchy {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this.isDirty("orientation")) {
+		if (this.isDirty("orientation") || this.isDirty("inversed")) {
 			this._updateVisuals();
 		}
 	}
@@ -101,11 +109,22 @@ export class Tree extends LinkedHierarchy {
 	}
 
 	protected _getPoint(hierarchyNode: this["_dataItemSettings"]["d3HierarchyNode"]): IPoint {
+		const inversed = this.get("inversed");
 		if (this.get("orientation") == "vertical") {
-			return { x: hierarchyNode.x, y: hierarchyNode.y };
+			if (inversed) {
+				return { x: hierarchyNode.x, y: this.innerHeight() - hierarchyNode.y };
+			}
+			else {
+				return { x: hierarchyNode.x, y: hierarchyNode.y };
+			}
 		}
 		else {
-			return { x: hierarchyNode.y, y: hierarchyNode.x };
+			if (inversed) {
+				return { x: this.innerWidth() - hierarchyNode.y, y: hierarchyNode.x };
+			}
+			else {
+				return { x: hierarchyNode.y, y: hierarchyNode.x };
+			}
 		}
 	}
 

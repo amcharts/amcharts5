@@ -8,7 +8,24 @@ import * as $utils from "../../../core/util/Utils";
 import * as $type from "../../../core/util/Type";
 
 export interface IDateRangeSelectorSettings extends IStockControlSettings {
+
+	/**
+	 * Date format to use for date input fields.
+	 *
+	 * Will use global date format if not set.
+	 */
 	dateFormat?: string;
+
+	/**
+	 * If set to `false` the control will not load default CSS for Flatpickr
+	 * component. This would mean it would be unstyled, and would require
+	 * custom CSS present on the page.
+	 *
+	 * @default true
+	 * @since 5.2.4
+	 */
+	useDefaultCSS?: boolean;
+
 }
 
 export interface IDateRangeSelectorPrivate extends IStockControlPrivate {
@@ -74,7 +91,9 @@ export class DateRangeSelector extends StockControl {
 		const button = this.getPrivate("button")!;
 		button.className = button.className + " am5stock-control-dropdown";
 
-		this._loadDefaultCSS();
+		if (this.get("useDefaultCSS", true)) {
+			this._loadDefaultCSS();
+		}
 		this._initDropdown();
 	}
 

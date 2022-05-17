@@ -217,8 +217,12 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			const formats = this.get("dateFormats")!;
 
 			let selectedItems: Array<number> = [];
+			let firstDate = new Date();
+			if(this._dates[0]){
+				firstDate = new Date(this._dates[0]);
+			}
 
-			let value = $time.round(new Date(this.getPrivate("min", 0)), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime() - intervalDuration;
+			let value = $time.round(new Date(this.getPrivate("min", 0)), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, firstDate, this._root.timezone).getTime() - intervalDuration;
 			let selectionMax = this.getPrivate("selectionMax")
 
 			let previousPosition = -Infinity;
@@ -227,6 +231,17 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			while (value <= selectionMax) {
 				let index = this.valueToIndex(value);
 				let realValue = this._dates[index];
+
+				if(realValue < value){
+					for(let i = index, len = this._dates.length; i < len; i++){
+						let realValue = this._dates[i];
+						if(realValue >= value){
+							index = i;
+							break;
+						}
+					}
+				}
+
 				let position = this.valueToPosition(realValue);
 				if (position - previousPosition >= minDifference * 0.95) {
 					$array.move(selectedItems, index);
