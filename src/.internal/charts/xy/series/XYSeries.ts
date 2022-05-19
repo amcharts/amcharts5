@@ -1274,8 +1274,6 @@ export abstract class XYSeries extends Series {
 
 						this._min("minX", value);
 						this._max("maxX", value);
-
-
 					}
 				})
 
@@ -1290,7 +1288,7 @@ export abstract class XYSeries extends Series {
 						this._max("maxY", value);
 					}
 				})
-
+				
 				xAxis.processSeriesDataItem(dataItem, this._valueXFields);
 				yAxis.processSeriesDataItem(dataItem, this._valueYFields);
 			})
@@ -1408,7 +1406,6 @@ export abstract class XYSeries extends Series {
 				if (this.isPrivateDirty("selectionMinY") || this.isPrivateDirty("selectionMaxY")) {
 					yAxis.markDirtySelectionExtremes();
 				}
-
 				// this.updateLegendValue(undefined); flickers while panning
 			}
 		}

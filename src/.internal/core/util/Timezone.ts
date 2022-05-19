@@ -6,6 +6,7 @@ interface ParsedDate {
 	minute: number,
 	second: number,
 	millisecond: number,
+	weekday: number
 }
 
 function parseDate(timezone: Intl.DateTimeFormat, date: Date): ParsedDate {
@@ -16,30 +17,55 @@ function parseDate(timezone: Intl.DateTimeFormat, date: Date): ParsedDate {
 	let minute = 0;
 	let second = 0;
 	let millisecond = 0;
+	let weekday = 0;
 
 	timezone.formatToParts(date).forEach((x) => {
 		switch (x.type) {
-            case "year":
-                year = +x.value;
-                break;
-            case "month":
-                month = (+x.value) - 1;
-                break;
-            case "day":
-                day = +x.value;
-                break;
-            case "hour":
-                hour = +x.value;
-                break;
-            case "minute":
-                minute = +x.value;
-                break;
-            case "second":
-                second = +x.value;
-                break;
-            case "fractionalSecond" as any:
-                millisecond = +x.value;
-                break;
+			case "year":
+				year = +x.value;
+				break;
+			case "month":
+				month = (+x.value) - 1;
+				break;
+			case "day":
+				day = +x.value;
+				break;
+			case "hour":
+				hour = +x.value;
+				break;
+			case "minute":
+				minute = +x.value;
+				break;
+			case "second":
+				second = +x.value;
+				break;
+			case "fractionalSecond" as any:
+				millisecond = +x.value;
+				break;
+			case "weekday":
+				switch (x.value) {
+					case "Sun":
+						weekday = 0;
+						break;
+					case "Mon":
+						weekday = 1;
+						break;
+					case "Tue":
+						weekday = 2;
+						break;
+					case "Wed":
+						weekday = 3;
+						break;
+					case "Thu":
+						weekday = 4;
+						break;
+					case "Fri":
+						weekday = 5;
+						break;
+					case "Sat":
+						weekday = 6;
+						break;
+				}
 		}
 	});
 
@@ -47,7 +73,7 @@ function parseDate(timezone: Intl.DateTimeFormat, date: Date): ParsedDate {
 		hour = 0;
 	}
 
-	return { year, month, day, hour, minute, second, millisecond };
+	return { year, month, day, hour, minute, second, millisecond, weekday };
 }
 
 
@@ -63,13 +89,13 @@ export class Timezone {
 
 	public readonly name: string | undefined;
 
-    /**
-     * Use this method to create an instance of this class.
-     *
-     * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-     * @param   timezone  IANA timezone
-     * @return            Instantiated object
-     */
+	/**
+	 * Use this method to create an instance of this class.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @param   timezone  IANA timezone
+	 * @return            Instantiated object
+	 */
 	static new<C extends typeof Timezone, T extends InstanceType<C>>(this: C, timezone: string | undefined): T {
 		return (new this(timezone, true)) as T;
 	}
@@ -90,6 +116,7 @@ export class Timezone {
 			hour: "2-digit",
 			minute: "2-digit",
 			second: "2-digit",
+			weekday: "short",
 			fractionalSecondDigits: 3,
 		} as any);
 
@@ -102,6 +129,7 @@ export class Timezone {
 			hour: "2-digit",
 			minute: "2-digit",
 			second: "2-digit",
+			weekday: "short",
 			fractionalSecondDigits: 3,
 		} as any);
 	}
@@ -113,11 +141,11 @@ export class Timezone {
 		output.setUTCMinutes(output.getUTCMinutes() - (offset - userOffset));
 
 		const newUserOffset = output.getTimezoneOffset();
-		
-		if(userOffset != newUserOffset){
+
+		if (userOffset != newUserOffset) {
 			output.setUTCMinutes(output.getUTCMinutes() + newUserOffset - userOffset)
 		}
-				
+
 		return output;
 	}
 
@@ -127,7 +155,7 @@ export class Timezone {
 		return (utc - dtf) / 60000;
 	}
 
-    parseDate(date: Date): ParsedDate {
-        return parseDate(this._dtf, date)
-    }
+	parseDate(date: Date): ParsedDate {
+		return parseDate(this._dtf, date)
+	}
 }

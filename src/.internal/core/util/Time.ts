@@ -348,7 +348,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 
 		if (!utc && unit != "millisecond") {
 			timeZoneOffset = date.getTimezoneOffset();
-			date.setUTCMinutes(date.getUTCMinutes() - timeZoneOffset);			
+			date.setUTCMinutes(date.getUTCMinutes() - timeZoneOffset);
 		}
 
 		switch (unit) {
@@ -474,7 +474,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 	else {
 		let tzoffset = timezone.offsetUTC(date);
 		let timeZoneOffset = date.getTimezoneOffset();
-		const parsedDate = timezone.parseDate(date);
+		let parsedDate = timezone.parseDate(date);
 		let year = parsedDate.year;
 		let month = parsedDate.month;
 		let day = parsedDate.day;
@@ -482,6 +482,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		let minute = parsedDate.minute;
 		let second = parsedDate.second;
 		let millisecond = parsedDate.millisecond;
+		let weekday = parsedDate.weekday;
 
 		switch (unit) {
 
@@ -492,9 +493,12 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 					let unitCount = Math.floor(difference / getDuration("day") / count);
 					let duration = getDuration("day", unitCount * count);
 					date.setTime(firstDate.getTime() + duration - timeZoneOffset * getDuration("minute"));
-					year = date.getUTCFullYear();
-					month = date.getUTCMonth();
-					day = date.getUTCDate();
+
+					parsedDate = timezone.parseDate(date);
+
+					year = parsedDate.year;
+					month = parsedDate.month;
+					day = parsedDate.day;
 				}
 
 				hour = 0;
@@ -563,16 +567,12 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 					firstDateOfWeek = 1;
 				}
 
-				let wday = date.getUTCDate();
-				let weekDay = date.getUTCDay();
-
-				if (weekDay >= firstDateOfWeek) {
-					wday = wday - weekDay + firstDateOfWeek;
+				if (weekday >= firstDateOfWeek) {
+					day = day - weekday + firstDateOfWeek;
 				} else {
-					wday = wday - (7 + weekDay) + firstDateOfWeek;
+					day = day - (7 + weekday) + firstDateOfWeek;
 				}
 
-				day = wday;
 				hour = 0;
 				minute = 0;
 				second = 0;
@@ -580,11 +580,11 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 				break;
 		}
 
-		minute += tzoffset - timeZoneOffset;		
+		minute += tzoffset - timeZoneOffset;
 		date = new Date(year, month, day, hour, minute, second, millisecond);
 
 		let newOffset = date.getTimezoneOffset();
-		if(newOffset != timeZoneOffset){
+		if (newOffset != timeZoneOffset) {
 			date.setTime(date.getTime() + (timeZoneOffset - newOffset) * 60000);
 		}
 

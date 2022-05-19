@@ -244,6 +244,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public _groupSeriesData(series: XYSeries) {
 		if (this.get("groupData") && !series.get("groupDataDisabled")) {
 
+			this._dataGrouped = true; // helps to avoid double grouping
+
 			this._seriesDataGrouped = true;
 
 			// make array of intervals which will be used;
@@ -745,16 +747,29 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public processSeriesDataItem(dataItem: DataItem<IXYSeriesDataItem>, fields: Array<string>) {
 		const baseInterval = this.getPrivate("baseInterval");
 
-		dataItem.open = {};
-		dataItem.close = {};
+		if (!dataItem.open) {
+			dataItem.open = {};
+		}
+		if (!dataItem.close) {
+			dataItem.close = {};
+		}
 
 		$array.each(fields, (field) => {
 			let value = dataItem.get(field as any);
 			if ($type.isNumber(value)) {
-				let startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-				let endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
-				dataItem.open![field] = startTime;
-				dataItem.close![field] = endTime;
+				let startTime = dataItem.open![field];
+				let endTime = dataItem.close![field];
+				// this is done to save cpu, as rounding is quite expensive, especially with timezone set. 
+				// if value is between prev start and end, it means it didn't change, all is fine.
+				if (value > startTime && value < endTime) {
+
+				}
+				else {
+					startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+					endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+					dataItem.open![field] = startTime;
+					dataItem.close![field] = endTime;
+				}
 
 				this._updateDates(startTime);
 			}
@@ -827,12 +842,15 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public roundAxisPosition(position: number, location: number): number {
 		let value = this.positionToValue(position);
 		let baseInterval = this.getPrivate("baseInterval");
-		value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
-		let endValue = value;
-		if (location > 0) {
-			endValue = $time.add(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+		if (!$type.isNaN(value)) {
+			value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
+			let endValue = value;
+			if (location > 0) {
+				endValue = $time.add(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+			}
+			return this.valueToPosition(value + (endValue - value) * location);
 		}
-		return this.valueToPosition(value + (endValue - value) * location);
+		return NaN;
 	}
 
 	/**

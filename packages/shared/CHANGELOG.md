@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.5] - 2022-05-19
+
+### Fixed
+- When timezone was set, grouping days into weeks could produce some unexpected results. 
+- `GaplessDateAxis` first date of a month sometimes could go before the grid of a month.
+- Improved performance with data grouping enabled on `DateAxis`, especially when timezone was set. Please note that using timezones will still affect the performance significantly.
+
+
 ## [5.2.4] - 2022-05-17
 
 ### Added
