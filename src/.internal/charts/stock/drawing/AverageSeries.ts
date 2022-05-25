@@ -6,10 +6,14 @@ export interface IAverageSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
 
 export interface IAverageSeriesSettings extends ISimpleLineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Value field to use for calculations.
+	 *
+	 * @default "value"
+	 */
 	field: "open" | "value" | "low" | "high";
+
 }
 
 export interface IAverageSeriesPrivate extends ISimpleLineSeriesPrivate {

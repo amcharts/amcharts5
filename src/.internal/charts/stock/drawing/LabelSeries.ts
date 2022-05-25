@@ -14,13 +14,15 @@ export interface ILabelSeriesDataItem extends IPolylineSeriesDataItem {
 }
 
 export interface ILabelSeriesSettings extends IPolylineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Label font size.
+	 */
 	labelFontSize?: number | string | undefined;
+
 	/**
-	 * @todo review
-	 */	
+	 * Label font damily.
+	 */
 	labelFontFamily?: string;
 
 	/**
@@ -32,10 +34,12 @@ export interface ILabelSeriesSettings extends IPolylineSeriesSettings {
 	 * Font style.
 	 */
 	labelFontStyle?: "normal" | "italic" | "oblique";
+
 	/**
-	 * @todo review
+	 * Label color.
 	 */
 	labelFill?: Color;
+
 }
 
 export interface ILabelSeriesPrivate extends IPolylineSeriesPrivate {
@@ -83,7 +87,7 @@ export class LabelSeries extends PolylineSeries {
 			textArea.style.height = textArea.scrollHeight + "px";
 		}, false);
 
-		
+
 		div.appendChild(textArea);
 		div.appendChild(document.createElement("br"));
 		this.setPrivate("input", textArea);

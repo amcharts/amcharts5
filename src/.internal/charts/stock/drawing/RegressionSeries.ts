@@ -8,10 +8,14 @@ export interface IRegressionSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
 
 export interface IRegressionSeriesSettings extends ISimpleLineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Value field to use for calculations.
+	 *
+	 * @default "value"
+	 */
 	field: "open" | "value" | "low" | "high";
+
 }
 
 export interface IRegressionSeriesPrivate extends ISimpleLineSeriesPrivate {

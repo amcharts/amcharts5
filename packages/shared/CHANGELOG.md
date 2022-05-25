@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.6] - 2022-05-25
+
+### Added
+- `nodePadding` added to `Pack`.
+- `maxTooltipDistanceBy` with possible values `"x"`, `"y"`, and `"xy"` added. Indicates how distance from mouse pointer to the tooltip point should be measured when comparing with `maxTooltipDistance`.
+
+### Fixed
+- Exporting chart image was creating leftover canvas elements in the body of the document.
+- Further improvements in `DateAxis` performance with grouping and timezone enabled.
+
+
 ## [5.2.5] - 2022-05-19
 
 ### Fixed

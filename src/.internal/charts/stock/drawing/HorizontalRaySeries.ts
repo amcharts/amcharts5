@@ -11,10 +11,14 @@ export interface IHorizontalRaySeriesDataItem extends ISimpleLineSeriesDataItem 
 }
 
 export interface IHorizontalRaySeriesSettings extends ISimpleLineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Value field to use for calculations.
+	 *
+	 * @default "value"
+	 */
 	field: "open" | "value" | "low" | "high";
+
 }
 
 export interface IHorizontalRaySeriesPrivate extends ISimpleLineSeriesPrivate {

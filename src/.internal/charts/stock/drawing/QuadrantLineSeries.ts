@@ -4,10 +4,14 @@ export interface IQuadrantLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
 
 export interface IQuadrantLineSeriesSettings extends ISimpleLineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Value field to use for calculations.
+	 *
+	 * @default "value"
+	 */
 	field: "open" | "value" | "low" | "high";
+
 }
 
 export interface IQuadrantLineSeriesPrivate extends ISimpleLineSeriesPrivate {

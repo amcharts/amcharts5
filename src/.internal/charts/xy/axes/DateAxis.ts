@@ -761,8 +761,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				let endTime = dataItem.close![field];
 				// this is done to save cpu, as rounding is quite expensive, especially with timezone set. 
 				// if value is between prev start and end, it means it didn't change, all is fine.
-				if (value > startTime && value < endTime) {
-
+				if (value >= startTime && value <= endTime) {
+					
 				}
 				else {
 					startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();

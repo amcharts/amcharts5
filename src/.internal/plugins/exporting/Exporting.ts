@@ -780,7 +780,10 @@ export class Exporting extends Entity {
 	 */
 	public async exportImage(format: ExportingImageFormats, customOptions?: IExportingImageOptions): Promise<string> {
 		const options: any = this._getFormatOptions(format, customOptions);
-		return (await this.getCanvas(options)).toDataURL(this.getContentType(format), options.quality || 1);
+		const canvas = await this.getCanvas(options);
+		const data = canvas.toDataURL(this.getContentType(format), options.quality || 1);
+		this.disposeCanvas(canvas);
+		return data;
 	}
 
 	/**
@@ -791,7 +794,10 @@ export class Exporting extends Entity {
 	 */
 	public async exportCanvas(customOptions?: IExportingImageOptions): Promise<string> {
 		const options: any = this._getFormatOptions("canvas", customOptions);
-		return (await this.getCanvas(options)).toDataURL(this.getContentType("canvas"), options.quality || 1);
+		const canvas = await this.getCanvas(options);
+		const data = canvas.toDataURL(this.getContentType("canvas"), options.quality || 1);
+		this.disposeCanvas(canvas);
+		return data;
 	}
 
 	/**
@@ -1993,6 +1999,7 @@ export class Exporting extends Entity {
 	protected disposeCanvas(canvas: HTMLCanvasElement): void {
 		document.body.removeChild(canvas);
 	}
+
 
 	/**
 	 * @ignore

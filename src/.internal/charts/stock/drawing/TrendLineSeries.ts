@@ -4,10 +4,14 @@ export interface ITrendLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
 
 export interface ITrendLineSeriesSettings extends ISimpleLineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Value field to use for calculations.
+	 *
+	 * @default "value"
+	 */
 	field: "open" | "value" | "low" | "high";
+
 }
 
 export interface ITrendLineSeriesPrivate extends ISimpleLineSeriesPrivate {

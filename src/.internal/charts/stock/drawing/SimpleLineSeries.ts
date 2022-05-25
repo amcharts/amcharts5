@@ -10,18 +10,20 @@ import { Template } from "../../../core/util/Template";
 import * as $math from "../../../core/util/Math";
 
 export interface ISimpleLineSeriesDataItem extends IDrawingSeriesDataItem {
-
 }
 
 export interface ISimpleLineSeriesSettings extends IDrawingSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Show a dotted line extending from both ends of the drawn line.
+	 *
+	 * @default true
+	 */
 	showExtension?: boolean;
+
 }
 
 export interface ISimpleLineSeriesPrivate extends IDrawingSeriesPrivate {
-
 }
 
 export class SimpleLineSeries extends DrawingSeries {

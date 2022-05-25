@@ -4,15 +4,12 @@ import type { Line } from "../../../core/render/Line";
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
 export interface IVerticalLineSeriesDataItem extends ISimpleLineSeriesDataItem {
-
 }
 
 export interface IVerticalLineSeriesSettings extends ISimpleLineSeriesSettings {
-
 }
 
 export interface IVerticalLineSeriesPrivate extends ISimpleLineSeriesPrivate {
-
 }
 
 export class VerticalLineSeries extends SimpleLineSeries {

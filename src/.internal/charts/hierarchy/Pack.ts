@@ -45,6 +45,14 @@ export interface IPackDataItem extends IHierarchyDataItem {
 }
 
 export interface IPackSettings extends IHierarchySettings {
+
+	/**
+	 * Gap between nodes, in pixels.
+	 *
+	 * @since 5.2.6
+	 */
+	nodePadding?:number
+
 }
 
 export interface IPackPrivate extends IHierarchyPrivate {
@@ -112,6 +120,7 @@ export class Pack extends Hierarchy {
 			const packLayout = this._packLayout;
 			packLayout.size([this.innerWidth(), this.innerHeight()]);
 			packLayout(this._rootNode);
+			packLayout.padding(this.get("nodePadding", 0));
 			this._updateNodes(this._rootNode);
 		}
 	}

@@ -98,6 +98,15 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	maxTooltipDistance?: number;
 
 	/**
+	 * Indicates how the distance should be measured when assessing distance
+	 * between tooltips as set in `maxTooltipDistance`.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
+	 * @since 5.2.6
+	 */
+	maxTooltipDistanceBy?: "xy" | "x" | "y";
+
+	/**
 	 * If set to `false` the chart will not check for overlapping of multiple
 	 * tooltips, and will not arrange them to not overlap.
 	 *
@@ -1346,6 +1355,7 @@ export class XYChart extends SerialChart {
 		let minDistance = Infinity;
 		let movePoint = this._movePoint;
 		let maxTooltipDistance = this.get("maxTooltipDistance");
+		let maxTooltipDistanceBy = this.get("maxTooltipDistanceBy", "xy");
 		let closest: XYSeries;
 		let closestPoint: IPoint;
 
@@ -1356,6 +1366,13 @@ export class XYChart extends SerialChart {
 					let point = tooltip.get("pointTo")!;
 					if (point) {
 						let distance = Math.hypot(movePoint.x - point.x, movePoint.y - point.y);
+						if (maxTooltipDistanceBy == "x") {
+							distance = Math.abs(movePoint.x - point.x);
+						}
+						else if (maxTooltipDistanceBy == "y") {
+							distance = Math.abs(movePoint.y - point.y);
+						}
+
 						if (distance < minDistance) {
 							minDistance = distance;
 							closest = series;
@@ -1379,6 +1396,13 @@ export class XYChart extends SerialChart {
 						if (point) {
 							if (series != closest) {
 								let distance = Math.hypot(closestPoint.x - point.x, closestPoint.y - point.y);
+								if (maxTooltipDistanceBy == "x") {
+									distance = Math.abs(closestPoint.x - point.x);
+								}
+								else if (maxTooltipDistanceBy == "y") {
+									distance = Math.abs(closestPoint.y - point.y);
+								}
+
 								if (distance > maxTooltipDistance) {
 									hidden = true;
 								}

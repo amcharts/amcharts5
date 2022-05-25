@@ -217,7 +217,7 @@ export class EventDispatcher<T> implements IDisposer {
 	 *
 	 * @param type  Listener's type
 	 */
-	protected removeType<Key extends keyof T>(type: Key): void {
+	public removeType<Key extends keyof T>(type: Key): void {
 		if (this._disposed) {
 			throw new Error("EventDispatcher is disposed");
 		}
