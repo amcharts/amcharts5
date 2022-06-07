@@ -11,14 +11,19 @@ import { color } from "../../../core/util/Color";
 import * as $math from "../../../core/util/Math";
 
 export interface ISpriteResizerSettings extends IContainerSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Target [[Sprite]] element.
+	 */
 	sprite?: Sprite
+
 	/**
-	 * @todo review
-	 */	
+	 * Rotation increment in degrees.
+	 * 
+	 * @default 10
+	 */
 	rotationStep?: number;
+
 }
 
 export interface ISpriteResizerPrivate extends IContainerPrivate {

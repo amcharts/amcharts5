@@ -464,7 +464,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * 
 	 * @since 5.2.1
 	 * @param   interval  Interval
-	 * @return            Max
+	 * @return            Min
 	 */
 	public getIntervalMin(interval: ITimeInterval): number {
 		return this._intervalMin[interval.timeUnit + interval.count];

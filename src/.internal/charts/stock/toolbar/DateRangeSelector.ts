@@ -114,8 +114,9 @@ export class DateRangeSelector extends StockControl {
 		fromGroup.className = "am5stock-group";
 		fromColumn.appendChild(fromGroup);
 
-		const fromLabel = document.createElement("span");
-		fromLabel.innerHTML = this._root.language.translate("From %1", undefined, "") + ": ";
+		const fromLabel = document.createElement("div");
+		fromLabel.className = "am5stock-small";
+		fromLabel.innerHTML = this._root.language.translate("From %1", undefined, "");
 		fromGroup.appendChild(fromLabel);
 
 		const fromField = document.createElement("input");
@@ -132,8 +133,9 @@ export class DateRangeSelector extends StockControl {
 		toGroup.className = "am5stock-group";
 		toColumn.appendChild(toGroup);
 
-		const toLabel = document.createElement("span");
-		toLabel.innerHTML = this._root.language.translate("To %1", undefined, "") + ": ";
+		const toLabel = document.createElement("div");
+		toLabel.className = "am5stock-small";
+		toLabel.innerHTML = this._root.language.translate("To %1", undefined, "");
 		toGroup.appendChild(toLabel);
 
 		const toField = document.createElement("input");
@@ -364,7 +366,7 @@ export class DateRangeSelector extends StockControl {
           animation: none;
   direction: ltr;
   border: 0;
-  font-size: 0.7em;
+  font-size: 12px;
   line-height: 24px;
   border-radius: 5px;
   position: absolute;

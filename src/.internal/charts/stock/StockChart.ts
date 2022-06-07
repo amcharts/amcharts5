@@ -268,31 +268,6 @@ export class StockChart extends Container {
 
 		const stockSeries = this.get("stockSeries");
 
-		if (this.isDirty("stockNegativeColor") || this.isDirty("stockPositiveColor")) {
-			if (stockSeries && stockSeries.isType<BaseColumnSeries>("BaseColumnSeries")) {
-				const stockNegativeColor = this.get("stockNegativeColor", this._root.interfaceColors.get("negative"));
-				const stockPositiveColor = this.get("stockPositiveColor", this._root.interfaceColors.get("positive"));
-				let previous = stockSeries.dataItems[0];
-				$array.each(stockSeries.dataItems, (dataItem) => {
-					const column = dataItem.get("graphics");
-					if (column) {
-						const dropFromOpen = column.states.lookup("dropFromOpen");
-						if (dropFromOpen) {
-							dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
-						}
-
-						const riseFromOpen = column.states.lookup("riseFromOpen");
-						if (riseFromOpen) {
-							riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
-						}
-
-						stockSeries._applyGraphicsStates(dataItem, previous);
-						previous = dataItem;
-					}
-				})
-				stockSeries.markDirtyValues();
-			}
-		}
 
 		if (this.isDirty("stockSeries")) {
 
@@ -322,6 +297,39 @@ export class StockChart extends Container {
 
 		super._prepareChildren();
 	}
+
+	public _updateChildren() {
+		super._updateChildren()
+		const stockSeries = this.get("stockSeries");
+
+		if (this.isDirty("stockNegativeColor") || this.isDirty("stockPositiveColor") || this.isDirty("stockSeries")) {
+			if (stockSeries && stockSeries.isType<BaseColumnSeries>("BaseColumnSeries")) {
+				const stockNegativeColor = this.get("stockNegativeColor", this._root.interfaceColors.get("negative"));
+				const stockPositiveColor = this.get("stockPositiveColor", this._root.interfaceColors.get("positive"));
+				let previous = stockSeries.dataItems[0];
+
+				$array.each(stockSeries.dataItems, (dataItem) => {
+					const column = dataItem.get("graphics");
+					if (column) {
+						const dropFromOpen = column.states.lookup("dropFromOpen");
+						if (dropFromOpen) {
+							dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+						}
+
+						const riseFromOpen = column.states.lookup("riseFromOpen");
+						if (riseFromOpen) {
+							riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+						}
+
+						stockSeries._applyGraphicsStates(dataItem, previous);
+						previous = dataItem;
+					}
+				})
+				stockSeries.markDirtyValues();
+			}
+		}
+	}
+
 
 	/**
 	 * Enables or disables percent scale mode.

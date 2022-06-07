@@ -8,33 +8,34 @@ import { ColumnSeries } from "../../xy/series/ColumnSeries";
 import * as $array from "../../../core/util/Array";
 
 export interface IMACDSettings extends IChartIndicatorSettings {
+
 	/**
-	 * @todo review
+	 * Increasing color.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * @todo review
+	 * Decreasing color.
 	 */
 	decreasingColor?: Color;
 
 	/**
-	 * @todo review
+	 * Signal color.
 	 */
 	signalColor?: Color;
 
 	/**
-	 * @todo review
+	 * A value for "fast" period.
 	 */
 	fastPeriod?: number;
 
 	/**
-	 * @todo review
+	 * A value for "slow" period.
 	 */
 	slowPeriod?: number;
 
 	/**
-	 * @todo review
+	 * A value for "signal" period.
 	 */
 	signalPeriod?: number;
 

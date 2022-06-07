@@ -9,22 +9,22 @@ import { LineSeries, ILineSeriesAxisRange } from "../../xy/series/LineSeries";
 export interface ICommodityChannelIndexSettings extends IChartIndicatorSettings {
 
 	/**
-	 * @todo review
+	 * A value for "overbought" threshold.
 	 */
 	overBought?: number;
 
 	/**
-	 * @todo review
+	 * A value for "oversold" threshold.
 	 */
 	overSold?: number;
 
 	/**
-	 * @todo review
+	 * A color for "overbought" section.
 	 */
 	overBoughtColor?: Color;
 
 	/**
-	 * @todo review
+	 * A color for "oversold" section.
 	 */
 	overSoldColor?: Color;
 

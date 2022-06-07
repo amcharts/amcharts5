@@ -23,12 +23,12 @@ export interface IMovingAverageEnvelopeSettings extends IMovingAverageSettings {
 	shiftType?: "percent" | "points";
 
 	/**
-	 * @todo review
+	 * A color for upper section.
 	 */
 	upperColor?: Color;
 
 	/**
-	 * @todo review
+	 *  A color for lower section.
 	 */
 	lowerColor?: Color;
 

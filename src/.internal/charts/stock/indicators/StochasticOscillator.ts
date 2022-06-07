@@ -9,26 +9,32 @@ import { LineSeries } from "../../xy/series/LineSeries";
 import * as $array from "../../../core/util/Array";
 
 export interface IStochasticOscillatorSettings extends IChartIndicatorSettings {
+
 	/**
-	 * @todo review
+	 * A value for "overbought" threshold.
 	 */
 	overBought?: number;
+
 	/**
-	 * @todo review
+	 * A value for "oversold" threshold.
 	 */
 	overSold?: number;
+
 	/**
-	 * @todo review
+	 * A color for "slow" section.
 	 */
 	slowColor?: Color;
+
 	/**
 	 * @todo review
 	 */
 	kSmoothing?: number;
+
 	/**
 	 * @todo review
 	 */
 	dSmoothing?: number;
+
 }
 
 export interface IStochasticOscillatorPrivate extends IChartIndicatorPrivate {

@@ -9,12 +9,12 @@ import * as $array from "../../../core/util/Array";
 export interface IMovingAverageDeviationSettings extends IChartIndicatorSettings {
 
 	/**
-	 * @todo review
+	 * Increasing color.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * @todo review
+	 * Decreasing color.
 	 */
 	decreasingColor?: Color;
 

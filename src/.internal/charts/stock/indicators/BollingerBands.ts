@@ -9,17 +9,17 @@ import * as $array from "../../../core/util/Array";
 export interface IBollingerBandsSettings extends IMovingAverageSettings {
 
 	/**
-	 * @todo review
+	 * A value of standard deviations.
 	 */
 	standardDeviations?: number;
 
 	/**
-	 * @todo review
+	 * A color for upper section.
 	 */
 	upperColor?: Color;
 
 	/**
-	 * @todo review
+	 * A color for lower section.
 	 */
 	lowerColor?: Color;
 

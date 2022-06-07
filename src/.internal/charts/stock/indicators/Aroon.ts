@@ -8,12 +8,12 @@ import * as $array from "../../../core/util/Array";
 export interface IAroonSettings extends IChartIndicatorSettings {
 
 	/**
-	 * @todo review
+	 * Color for ups.
 	 */
 	upColor?: Color;
 
 	/**
-	 * @todo review
+	 * Color for downs.
 	 */
 	downColor?: Color;
 

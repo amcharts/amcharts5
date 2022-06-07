@@ -69,7 +69,7 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 	categoryField?: string;
 
 	/**
-	 * Should slice labelsbe aligned in columns/rows?
+	 * Should slice labels be aligned in columns/rows?
 	 */
 	alignLabels?: boolean;
 

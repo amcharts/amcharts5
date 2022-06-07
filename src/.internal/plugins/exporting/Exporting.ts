@@ -880,14 +880,14 @@ export class Exporting extends Entity {
 		newCanvas.width = middleLeft + middleWidth + extraRight;
 		newCanvas.height = middleTop + middleHeight + extraBottom;
 
-		const ctx = newCanvas.getContext("2d");
+		const ctx = newCanvas.getContext("2d")!;
 
 		// Get background
 		const background = this.get("backgroundColor", this.findBackgroundColor(this._root.dom));
 
 		if (background) {
-			ctx!.fillStyle = background.toCSS();
-			ctx!.fillRect(0, 0, newCanvas.width, newCanvas.height);
+			ctx.fillStyle = background.toCSS();
+			ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
 		}
 
 		let left = middleLeft;
@@ -899,25 +899,25 @@ export class Exporting extends Entity {
 		$array.each(extras, (extra) => {
 			if (extra.position == "top") {
 				top -= extra.height;
-				ctx!.drawImage(extra.canvas, middleLeft + extra.left, top + extra.top);
+				ctx.drawImage(extra.canvas, middleLeft + extra.left, top + extra.top);
 
 			} else if (extra.position == "right") {
-				ctx!.drawImage(extra.canvas, right + extra.left, middleTop + extra.top);
+				ctx.drawImage(extra.canvas, right + extra.left, middleTop + extra.top);
 				right += extra.width;
 
 			} else if (extra.position == "left") {
 				left -= extra.width;
-				ctx!.drawImage(extra.canvas, left + extra.left, middleTop + extra.top);
+				ctx.drawImage(extra.canvas, left + extra.left, middleTop + extra.top);
 
 			} else if (extra.position === "bottom") {
-				ctx!.drawImage(extra.canvas, middleLeft + extra.left, bottom + extra.top);
+				ctx.drawImage(extra.canvas, middleLeft + extra.left, bottom + extra.top);
 				bottom += extra.height;
 			}
 
 			//this.disposeCanvas(extra.canvas);
 		});
 
-		ctx!.drawImage(mainCanvas, middleLeft, middleTop);
+		ctx.drawImage(mainCanvas, middleLeft, middleTop);
 
 		return newCanvas;
 	}
@@ -1992,12 +1992,12 @@ export class Exporting extends Entity {
 		let canvas = document.createElement("canvas");
 		canvas.style.position = "fixed";
 		canvas.style.top = "-10000px";
-		document.body.appendChild(canvas);
+		this._root.dom.appendChild(canvas);
 		return canvas;
 	}
 
 	protected disposeCanvas(canvas: HTMLCanvasElement): void {
-		document.body.removeChild(canvas);
+		this._root.dom.removeChild(canvas);
 	}
 
 

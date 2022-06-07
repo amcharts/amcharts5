@@ -8,17 +8,25 @@ import { Color, color } from "../../../core/util/Color";
 import * as $ease from "../../../core/util/Ease";
 
 export interface ICalloutSeriesDataItem extends ILabelSeriesDataItem {
+
 	/**
-	 * @todo review
-	 */	
+	 * Indicates whether callout will attach itself to the closest data item, as
+	 * opposed to exact location of the click.
+	 */
 	snapToData?: boolean;
+
 }
 
 export interface ICalloutSeriesSettings extends ILabelSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * If set to `true`, callout will attach itself to the closest data item, as
+	 * opposed to exact location of the click.
+	 *
+	 * @default true
+	 */
 	snapToData?: boolean;
+
 }
 
 export interface ICalloutSeriesPrivate extends ILabelSeriesPrivate {

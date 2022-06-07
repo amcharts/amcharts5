@@ -1,15 +1,17 @@
+import type { Axis } from "../axes/Axis";
+import type { AxisRenderer } from "../axes/AxisRenderer";
+
 import { XYSeries, IXYSeriesPrivate, IXYSeriesSettings, IXYSeriesDataItem, IXYSeriesAxisRange } from "./XYSeries";
 import { Graphics } from "../../../core/render/Graphics";
-import * as $type from "../../../core/util/Type";
-import * as $array from "../../../core/util/Array";
 import { CurveFactory, line, area } from "d3-shape";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
 import { color } from "../../../core/util/Color";
 import { DataItem } from "../../../core/render/Component";
 import { Rectangle } from "../../../core/render/Rectangle";
-import type { Axis } from "../axes/Axis";
-import type { AxisRenderer } from "../axes/AxisRenderer";
+
+import * as $type from "../../../core/util/Type";
+import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
 
 export interface IPointOptions {
@@ -42,6 +44,20 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	 * @ignore
 	 */
 	curveFactory?: CurveFactory;
+
+	/**
+	 * Allows simplifying the line with many points.
+	 *
+	 * If set, the series will skip points that are closer than X pixels to each
+	 * other.
+	 *
+	 * With many data points, this allows having smoother, less cluttered lines.
+	 *
+	 * @default 0
+	 * @since 5.2.7
+	 */
+	minDistance?: number;
+
 }
 
 export interface ILineSeriesPrivate extends IXYSeriesPrivate {
@@ -163,6 +179,8 @@ export class LineSeries extends XYSeries {
 	protected _fillTemplate: Template<Graphics> | undefined;
 	protected _strokeTemplate: Template<Graphics> | undefined;
 
+	protected _previousPoint: Array<number> = [0, 0, 0, 0];
+
 	public _updateChildren() {
 
 		this._strokeTemplate = undefined;
@@ -283,14 +301,13 @@ export class LineSeries extends XYSeries {
 						}
 					}
 				}
-				if(startIndex > 0){
+				if (startIndex > 0) {
 					startIndex--
 				}
 
 				this._endIndex = endIndex;
 
 				this._clearGraphics();
-
 				this._startSegment(0, startIndex);
 			}
 		}
@@ -382,6 +399,8 @@ export class LineSeries extends XYSeries {
 		let openLocationX = this.get("openLocationX", locationX);
 		let openLocationY = this.get("openLocationY", locationY);
 
+		const minDistance = this.get("minDistance", 0);
+
 		let i: number;
 
 		let fillVisible = this.fills.template.get("visible");
@@ -395,7 +414,7 @@ export class LineSeries extends XYSeries {
 		}
 
 		const o = {
-			points, segments, stacked, getOpen, basePosX, basePosY, fillVisible, xField, yField, xOpenField, yOpenField, vcx, vcy, baseAxis, xAxis, yAxis, locationX, locationY, openLocationX, openLocationY
+			points, segments, stacked, getOpen, basePosX, basePosY, fillVisible, xField, yField, xOpenField, yOpenField, vcx, vcy, baseAxis, xAxis, yAxis, locationX, locationY, openLocationX, openLocationY, minDistance
 		}
 
 
@@ -509,7 +528,7 @@ export class LineSeries extends XYSeries {
 		}
 	}
 
-	protected _getPoints(dataItem: DataItem<this["_dataItemSettings"]>, o: { points: Array<Array<number>>, segments: number[][][], stacked: boolean | undefined, getOpen: boolean, basePosX: number, basePosY: number, fillVisible: boolean | undefined, xField: string, yField: string, xOpenField: string, yOpenField: string, vcx: number, vcy: number, baseAxis: Axis<AxisRenderer>, xAxis: Axis<AxisRenderer>, yAxis: Axis<AxisRenderer>, locationX: number, locationY: number, openLocationX: number, openLocationY: number }) {
+	protected _getPoints(dataItem: DataItem<this["_dataItemSettings"]>, o: { points: Array<Array<number>>, segments: number[][][], stacked: boolean | undefined, getOpen: boolean, basePosX: number, basePosY: number, fillVisible: boolean | undefined, xField: string, yField: string, xOpenField: string, yOpenField: string, vcx: number, vcy: number, baseAxis: Axis<AxisRenderer>, xAxis: Axis<AxisRenderer>, yAxis: Axis<AxisRenderer>, locationX: number, locationY: number, openLocationX: number, openLocationY: number, minDistance: number }) {
 		let points = o.points;
 
 		let itemLocationX = dataItem.get("locationX", o.locationX);
@@ -594,7 +613,27 @@ export class LineSeries extends XYSeries {
 				point[3] = closeIPoint.y;
 			}
 
-			points.push(point);
+			if (o.minDistance > 0) {
+				const p0 = point[0];
+				const p1 = point[1];
+				const p2 = point[2];
+				const p3 = point[3];
+
+				const prev = this._previousPoint;
+
+				const pp0 = prev[0];
+				const pp1 = prev[1];
+				const pp2 = prev[2];
+				const pp3 = prev[3];
+
+				if (Math.hypot(p0 - pp0, p1 - pp1) > o.minDistance || (p2 && p3 && Math.hypot(p2 - pp2, p3 - pp3) > o.minDistance)) {
+					points.push(point);
+					this._previousPoint = point;
+				}
+			}
+			else {
+				points.push(point);
+			}
 		}
 	}
 
@@ -657,10 +696,10 @@ export class LineSeries extends XYSeries {
 				markerRectangle.setPrivate("visible", false);
 			}
 
-			marker.set("background", Rectangle.new(marker._root, {fillOpacity:0, fill:color(0x000000)}))
+			marker.set("background", Rectangle.new(marker._root, { fillOpacity: 0, fill: color(0x000000) }))
 
 			const legendStroke = marker.children.push(Graphics._new(marker._root, {
-				themeTags: ["line", "series", "legend", "marker", "stroke"], interactive:false
+				themeTags: ["line", "series", "legend", "marker", "stroke"], interactive: false
 			}, [this.strokes.template]));
 
 			this._legendStroke = legendStroke;

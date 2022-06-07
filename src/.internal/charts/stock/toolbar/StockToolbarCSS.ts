@@ -286,7 +286,7 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			}),
 
 			new StyleRule(element, ".am5stock-column", {
-				"width": "200px",
+				"min-width": "200px",
 				"display": "inline-block",
 				"padding": "1em"
 			}),
@@ -302,7 +302,13 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			new StyleRule(element, ".am5stock-group input", {
 				"border": "none",
 				"padding": "3px 5px",
-				"margin-top": "5px"
+				//"margin-top": "5px",
+				"width": "100%",
+				"box-sizing": "border-box"
+			}),
+
+			new StyleRule(element, ".am5stock-small", {
+				"font-size": "0.7em"
 			}),
 
 			new StyleRule(element, ".am5stock-link", {

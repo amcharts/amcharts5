@@ -910,9 +910,9 @@ class QuadraticCurveTo extends Op {
 class Shadow extends Op {
 	constructor(
 		public color: string,
-		public blur?: number,
-		public offsetX?: number,
-		public offsetY?: number,
+		public blur: number,
+		public offsetX: number,
+		public offsetY: number,
 		public opacity?: number
 	) { super(); }
 
@@ -921,15 +921,9 @@ class Shadow extends Op {
 			context.fillStyle = this.color;
 		}
 		context.shadowColor = this.color;
-		if (this.blur) {
-			context.shadowBlur = this.blur;
-		}
-		if (this.offsetX) {
-			context.shadowOffsetX = this.offsetX;
-		}
-		if (this.offsetY) {
-			context.shadowOffsetY = this.offsetY;
-		}
+		context.shadowBlur = this.blur;
+		context.shadowOffsetX = this.offsetX;
+		context.shadowOffsetY = this.offsetY;
 	}
 }
 
@@ -995,8 +989,8 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		this._pushOp(new LineDash(dash ? dash : []));
 	}
 
-	setLineDashOffset(dashOffset?: number): void {
-		this._pushOp(new LineDashOffset(dashOffset || 0));
+	setLineDashOffset(dashOffset: number = 0): void {
+		this._pushOp(new LineDashOffset(dashOffset));
 	}
 
 	drawRect(x: number, y: number, width: number, height: number): void {
@@ -1039,7 +1033,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		this._pushOp(new ClosePath());
 	}
 
-	shadow(color: Color, blur?: number, offsetX?: number, offsetY?: number, opacity?: number): void {
+	shadow(color: Color, blur: number = 0, offsetX: number = 0, offsetY: number = 0, opacity?: number): void {
 		this._hasShadows = true;
 		this._pushOp(new Shadow(opacity ? color.toCSS(opacity) : color.toCSS(this._fillAlpha || this._strokeAlpha), blur, offsetX, offsetY));
 	}
@@ -2710,6 +2704,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 					layer.context.shadowOffsetY = this.shadowOffsetY;
 				}
 
+				// TODO should this round ?
 				const width = this.width || this.image.naturalWidth;
 				const height = this.height || this.image.naturalHeight;
 
@@ -2732,6 +2727,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 
 	protected _getMask(image: HTMLImageElement): HTMLCanvasElement {
 		if (this._imageMask === undefined) {
+			// TODO should this round ?
 			const width = this.width || image.naturalWidth;
 			const height = this.height || image.naturalHeight;
 
@@ -2879,6 +2875,16 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._ghostContext = this._ghostView.getContext("2d", { alpha: false })!;
 		this._ghostContext.imageSmoothingEnabled = false;
 
+		this._ghostView.style.position = "absolute";
+		this._ghostView.style.top = "0px";
+		this._ghostView.style.left = "0px";
+
+		this._disposers.push($utils.addEventListener(this._ghostView, "click", (originalEvent: MouseEvent) => {
+			const event = this.getEvent(originalEvent);
+			const target = this._getHitTarget(event.point, event.bbox);
+			console.debug(target);
+		}));
+
 		// Monitor for possible pixel ratio changes (when page is zoomed)
 		this._disposers.push($utils.addEventListener(window, "resize", (_ev) => {
 			if (resolution == null) {
@@ -2915,6 +2921,23 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			}, { passive: false }));
 		}
 
+	}
+
+	public get debugGhostView(): boolean {
+		return !!this._ghostView.parentNode;
+	}
+
+	public set debugGhostView(value: boolean) {
+		if (value) {
+			if (!this._ghostView.parentNode) {
+				this.view.appendChild(this._ghostView);
+			}
+
+		} else {
+			if (this._ghostView.parentNode) {
+				this._ghostView.parentNode.removeChild(this._ghostView);
+			}
+		}
 	}
 
 	createLinearGradient(x1: number, y1: number, x2: number, y2: number): CanvasGradient {
@@ -3064,8 +3087,6 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	getLayer(order: number, visible: boolean = true): CanvasLayer {
-		const layers = this.layers;
-
 		let existingLayer = this.getLayerByOrder(order);
 		if (existingLayer) {
 			return existingLayer;
@@ -3081,6 +3102,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			layer.view.height = this._height;
 			layer.view.style.height = this._clientHeight + "px";
 		}
+
+		const layers = this.layers;
 
 		layers.push(layer);
 
@@ -3107,7 +3130,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			}
 		}
 
-		if (visible) {
+		if (layer.visible) {
 			if (next === undefined) {
 				this._layerDom.appendChild(layer.view);
 
@@ -3461,9 +3484,17 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	_dispatchWheel(originalEvent: WheelEvent): void {
 		const event = this.getEvent(originalEvent);
-		this._hovering.forEach((obj) => {
-			this._dispatchEvent("wheel", obj, event);
-		});
+		const target = this._getHitTarget(event.point, event.bbox);
+
+		if (target) {
+			eachTargets(target, (obj) => {
+				if (this._dispatchEvent("wheel", obj, event)) {
+					return false;
+				} else {
+					return true;
+				}
+			});
+		}
 	}
 
 	_makeSharedEvent(key: string, f: () => IDisposer): IDisposer {
@@ -3588,10 +3619,17 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 						});
 					});
 
+					const pointercancel = this._onPointerEvent("pointercancel", (ev: Array<IPointerEvent>) => {
+						$array.each(ev, (ev) => {
+							this._dispatchDragEnd(ev);
+						});
+					});
+
 					return new Disposer(() => {
 						mousedown.dispose();
 						mousemove.dispose();
 						mouseup.dispose();
+						pointercancel.dispose();
 					});
 				});
 			case "dblclick":
@@ -3689,6 +3727,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			scale /= this.resolution;
 		}
 
+		// Init list canvases to remove from DOM after export
+		const canvases: HTMLCanvasElement[] = [];
+
 		// Set up new canvas for export
 		let forceRender = false;
 		let canvasWidth = this._width;
@@ -3702,6 +3743,12 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
+
+		// Add to DOM so it inherits CSS
+		canvas.style.position = "fixed";
+		canvas.style.top = "-10000px";
+		this.view.appendChild(canvas);
+		canvases.push(canvas);
 
 		// Context
 		const context = canvas.getContext("2d")!;
@@ -3719,6 +3766,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					layer.exportableContext = layer.context;
 
 					layer.view = document.createElement("canvas");
+
+					// Add to DOM so it inherits CSS
+					this.view.style.position = "fixed";
+					this.view.style.top = "-10000px";
+					this.view.appendChild(layer.view);
+					canvases.push(layer.view);
+
 					layer.view.width = canvasWidth;
 					layer.view.height = canvasHeight;
 
@@ -3767,6 +3821,12 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		canvas.style.width = width + "px";
 		canvas.style.height = height + "px";
+
+		$array.each(canvases, (canvas) => {
+			this.view.style.position = "";
+			this.view.style.top = "";
+			this.view.removeChild(canvas);
+		})
 
 		return canvas;
 	}

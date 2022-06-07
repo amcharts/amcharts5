@@ -7,14 +7,17 @@ import { Color } from "../../../core/util/Color";
 import * as $array from "../../../core/util/Array";
 
 export interface IVolumeSettings extends IChartIndicatorSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * An icreasing color.
+	 */
 	increasingColor?: Color;
+
 	/**
-	 * @todo review
-	 */	
+	 * A decreasing color.
+	 */
 	decreasingColor?: Color;
+
 }
 
 export interface IVolumePrivate extends IChartIndicatorPrivate {
@@ -78,7 +81,7 @@ export class Volume extends ChartIndicator {
 		if (this.series) {
 			const volumeSeries = this.get("volumeSeries");
 			const stockChart = this.get("stockChart");
-			if(volumeSeries && stockChart){
+			if (volumeSeries && stockChart) {
 				const dataItems = volumeSeries.dataItems;
 
 				this.setRaw("field", "close");
@@ -91,9 +94,9 @@ export class Volume extends ChartIndicator {
 				$array.each(data, (dataItem) => {
 					dataItem.volume = dataItem.value_y;
 				})
-				this.series.data.setAll(data);		
+				this.series.data.setAll(data);
 
-				$array.each(this.series.dataItems, (dataItem)=>{
+				$array.each(this.series.dataItems, (dataItem) => {
 					const dataContext = dataItem.dataContext as any;
 					dataContext.volumeColor = stockChart.getVolumeColor(dataItem, decreasingColor, increasingColor);
 				})

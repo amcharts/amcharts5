@@ -1,4 +1,5 @@
 import type { IIndicatorEditableSetting } from "./Indicator";
+
 import { Color } from "../../../core/util/Color";
 import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
 import { ColumnSeries } from "../../xy/series/ColumnSeries";
@@ -8,12 +9,12 @@ import * as $array from "../../../core/util/Array";
 export interface IAwesomeOscillatorSettings extends IChartIndicatorSettings {
 
 	/**
-	 * @todo review
+	 * Increasing color.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * @todo review
+	 * Decreasing color.
 	 */
 	decreasingColor?: Color;
 

@@ -1,27 +1,29 @@
 import type { IIndicatorEditableSetting } from "./Indicator";
-import * as $type from "../../../core/util/Type";
-import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
-import { LineSeries } from "../../xy/series/LineSeries";
-import { Color } from "../../../core/util/Color";
 import type { ILineSeriesAxisRange } from "../../xy/series/LineSeries";
 import type { DataItem } from "../../../core/render/Component";
 import type { IValueAxisDataItem } from "../../xy/axes/ValueAxis";
 
+import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
+import { LineSeries } from "../../xy/series/LineSeries";
+import { Color } from "../../../core/util/Color";
+
+import * as $type from "../../../core/util/Type";
+
 export interface IAccumulativeSwingIndexSettings extends IChartIndicatorSettings {
 
 	/**
-	 * @todo review
-	 */	
+	 * A "limit move" value.
+	 */
 	limitMoveValue?: number;
 
 	/**
-	 * @todo review
-	 */	
+	 * Positive color.
+	 */
 	positiveColor?: Color;
 
 	/**
-	 * @todo review
-	 */	
+	 * Negative color.
+	 */
 	negativeColor?: Color;
 
 }

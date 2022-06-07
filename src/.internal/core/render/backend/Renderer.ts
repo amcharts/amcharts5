@@ -260,6 +260,7 @@ export interface IPicture extends IDisplayObject {
 }
 
 export interface IRenderer extends IDisposer {
+	debugGhostView: boolean;
 	resolution: number;
 	interactionsEnabled: boolean;
 	createLinearGradient(x1: number, y1: number, x2: number, y2: number): IGradient;

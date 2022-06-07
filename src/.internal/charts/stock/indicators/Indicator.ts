@@ -12,68 +12,87 @@ import { MultiDisposer } from "../../../core/util/Disposer";
 import * as $array from "../../../core/util/Array";
 
 export interface IIndicatorEditableSetting {
+
 	/**
-	 * @todo review
-	 */	
+	 * Setting key.
+	 */
 	key: string;
+
 	/**
-	 * @todo review
-	 */	
+	 * Name of the setting (displayed in edit modal).
+	 *
+	 * Settings with the same name will be grouped in modal.
+	 */
 	name: string;
+
 	/**
-	 * @todo review
-	 */	
+	 * Type of the control to show for editing the setting in modal.
+	 */
 	type: "color" | "number" | "dropdown" | "checkbox";
+
 	/**
-	 * @todo review
-	 */	
+	 * If `type: "dropdown"`, `options` should contain a list of items it.
+	 */
 	options?: Array<string | { value: number | string, text: string }>;
+
 }
 
 export interface IIndicatorSettings extends IContainerSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * An instance of target [[StockChart]].
+	 */
 	stockChart: StockChart;
+
 	/**
-	 * @todo review
-	 */	
+	 * A main series indicator will be based on.
+	 */
 	stockSeries: XYSeries;
+
 	/**
-	 * @todo review
-	 */	
+	 * A volume series indicator will be based on, if it reaquires one.
+	 */
 	volumeSeries?: XYSeries;
+
 	/**
-	 * @todo review
-	 */	
+	 * If set to a reference to [[StockLegend]], indicator will add itself into
+	 * the legend.
+	 */
 	legend?: StockLegend;
+
 	/**
 	 * @todo review
 	 */
 	period?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * A value field to use.
+	 */
 	field?: "open" | "close" | "low" | "high" | "hl/2" | "hlc/3" | "hlcc/4" | "ohlc/4";
+
 	/**
-	 * @todo review
-	 */	
+	 * Indicator name, e.g. "Moving Average".
+	 */
 	name?: string;
+
 	/**
-	 * @todo review
-	 */	
+	 * Short name for the indicator, e.g. "MA" (for "Moving Average").
+	 *
+	 * Mainly used for the legend.
+	 */
 	shortName?: string;
+
 	/**
-	 * @todo review
-	 */	
+	 * A color to use for the indicator series.
+	 */
 	seriesColor?: Color;
+
 }
 
 export interface IIndicatorPrivate extends IContainerPrivate {
 }
 
 export interface IIndicatorEvents extends IContainerEvents {
-
 }
 
 /**

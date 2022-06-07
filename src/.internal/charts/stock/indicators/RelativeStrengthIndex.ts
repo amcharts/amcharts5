@@ -11,23 +11,23 @@ import * as $array from "../../../core/util/Array";
 export interface IRelativeStrengthIndexSettings extends IChartIndicatorSettings {
 
 	/**
-	 * @todo review
-	 */	
+	 * A value for "overbought" threshold.
+	 */
 	overBought?: number;
 
 	/**
-	 * @todo review
-	 */	
+	 * A value for "oversold" threshold.
+	 */
 	overSold?: number;
 
 	/**
-	 * @todo review
-	 */	
+	 * A color for "overbought" section.
+	 */
 	overBoughtColor?: Color;
 
 	/**
-	 * @todo review
-	 */	
+	 * A color for "oversold" section.
+	 */
 	overSoldColor?: Color;
 
 }

@@ -90,14 +90,12 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 		},
 
 		"wheel": function(event) {
-			if (this.isEnabled("wheel")) {
-				this.dispatch("wheel", {
-					type: "wheel",
-					target: this._sprite,
-					originalEvent: event.event,
-					point: event.point,
-				});
-			}
+			this.dispatchParents("wheel", {
+				type: "wheel",
+				target: this._sprite,
+				originalEvent: event.event,
+				point: event.point,
+			});
 		},
 	};
 
@@ -1932,13 +1930,7 @@ export abstract class Sprite extends Entity {
 		this._display.dispose();
 		this._removeTemplateField();
 		this._removeParent(this.parent);
-
-		const focusElement = this.getPrivate("focusElement");
-		if (focusElement) {
-			$array.each(focusElement.disposers, (x) => {
-				x.dispose();
-			});
-		}
+		this._root._removeFocusElement(this);
 
 		const tooltip = this.get("tooltip");
 		if (tooltip) {
@@ -2161,13 +2153,26 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns false if public setting visible is false or private setting visible is false or private setting forceHidden is true
-	 */ 
+	 * Returns `false` if if either public or private setting `visible` is set
+	 * to `false`, or `forceHidden` is set to `true`.
+	 * 
+	 * @return Visible?
+	 */
 	public isVisible(): boolean {
 		if (this.get("visible") && this.getPrivate("visible") && !this.get("forceHidden")) {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Same as `isVisible()`, except it checks all ascendants, too.
+	 *
+	 * @since 5.2.7
+	 * @return Visible?
+	 */
+	public isVisibleDeep(): boolean {
+		return this._parent ? (this._parent.isVisibleDeep() && this.isVisible()) : this.isVisible();
 	}
 
 	/**

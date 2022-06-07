@@ -1,13 +1,13 @@
 import type { IAnimation } from "./util/Animation";
 import type { Entity } from "./util/Entity";
 import type { Sprite } from "./render/Sprite";
-import type { Text } from "./render/Text";
 import type { Theme } from "./Theme";
 import type { IPoint } from "./util/IPoint";
 import type { IRenderer } from "./render/backend/Renderer";
 import type { Timezone } from "./util/Timezone";
 
 import { Container } from "./render/Container";
+import { Text } from "./render/Text";
 import { HorizontalLayout } from "./render/HorizontalLayout";
 import { VerticalLayout } from "./render/VerticalLayout";
 import { GridLayout } from "./render/GridLayout";
@@ -33,6 +33,7 @@ import * as $order from "./util/Order";
 import * as $array from "./util/Array";
 import * as $object from "./util/Object";
 import * as $utils from "./util/Utils";
+import * as $type from "./util/Type";
 
 
 import en from "../../locales/en";
@@ -214,6 +215,7 @@ export class Root implements IDisposer {
 	protected _focusElementDirty: boolean = false;
 	protected _focusElementContainer: HTMLDivElement | undefined;
 	protected _focusedSprite: Sprite | undefined;
+	protected _isShift: boolean | undefined;
 	protected _keyboardDragPoint: IPoint | undefined;
 	protected _tooltipElementContainer: HTMLDivElement | undefined;
 	protected _readerAlertElement: HTMLDivElement | undefined;
@@ -264,6 +266,8 @@ export class Root implements IDisposer {
 	 * by calling root element's `resize()` method.
 	 */
 	public autoResize: boolean = true;
+
+	protected _fontHash: string = "";
 
 	protected _isDisposed: boolean = false;
 	protected _disposers: Array<IDisposer> = [];
@@ -319,6 +323,8 @@ export class Root implements IDisposer {
 		dom.appendChild(inner);
 
 		this._inner = inner;
+
+		this._updateComputedStyles();
 
 		registry.rootElements.push(this);
 	}
@@ -485,6 +491,19 @@ export class Root implements IDisposer {
 		// Add keyboard events for accessibility, e.g. simulating drag with arrow
 		// keys and click with ENTER
 		if ($utils.supports("keyboardevents")) {
+
+			this._disposers.push($utils.addEventListener(window, "keydown", (ev: KeyboardEvent) => {
+				if (ev.keyCode == 16) {
+					this._isShift = true;
+				}
+			}));
+
+			this._disposers.push($utils.addEventListener(window, "keyup", (ev: KeyboardEvent) => {
+				if (ev.keyCode == 16) {
+					this._isShift = false;
+				}
+			}));
+
 			this._disposers.push($utils.addEventListener(focusElementContainer, "keydown", (ev: KeyboardEvent) => {
 				const focusedSprite = this._focusedSprite;
 				if (focusedSprite) {
@@ -803,6 +822,7 @@ export class Root implements IDisposer {
 				});
 			}
 
+			this._checkComputedStyles();
 			this._runTickers(currentTime);
 			this._runAnimations(currentTime);
 			this._runDirties();
@@ -883,16 +903,16 @@ export class Root implements IDisposer {
 		}
 	}
 
-	public _markDirty(){
+	public _markDirty() {
 		this._isDirty = true;
 	}
 
-	public _markDirtyRedraw(){
-		this.events.once("frameended", ()=>{
+	public _markDirtyRedraw() {
+		this.events.once("frameended", () => {
 			this._isDirty = true;
 			this._startTicker();
 		})
-	}	
+	}
 
 	public eachFrame(f: (currentTime: number) => void): IDisposer {
 		this._tickers.push(f);
@@ -1208,14 +1228,20 @@ export class Root implements IDisposer {
 	}
 
 	public _removeFocusElement(target: Sprite): void {
+		$array.remove(this._tabindexes, target);
+		const focusElement = target.getPrivate("focusElement");
+		if (focusElement) {
+			const container = this._focusElementContainer!;
+			container.removeChild(focusElement.dom);
+			$array.each(focusElement.disposers, (x) => {
+				x.dispose();
+			});
+		}
+	}
 
-		// Init
-		const container = this._focusElementContainer!;
+	public _hideFocusElement(target: Sprite): void {
 		const focusElement = target.getPrivate("focusElement")!;
-		container.removeChild(focusElement.dom);
-		$array.each(focusElement.disposers, (x) => {
-			x.dispose();
-		});
+		focusElement.dom.style.display = "none";
 	}
 
 	protected _moveFocusElement(index: number, target: Sprite): void {
@@ -1256,6 +1282,12 @@ export class Root implements IDisposer {
 		// Get element
 		const focused = this._tabindexes[index];
 
+		// Jump over hidden elements
+		if (!focused.isVisibleDeep()) {
+			this._focusNext(<HTMLDivElement>ev.target, this._isShift ? -1 : 1);
+			return;
+		}
+
 		// Size and position
 		this._positionFocusElement(focused);
 		//this._decorateFocusElement(focused);
@@ -1269,6 +1301,35 @@ export class Root implements IDisposer {
 				target: focused
 			});
 		}
+	}
+
+	protected _focusNext(el: HTMLDivElement, direction: 1 | -1): void {
+		var focusableElements = Array.from(document.querySelectorAll([
+			'a[href]',
+			'area[href]',
+			'button:not([disabled])',
+			'details',
+			'input:not([disabled])',
+			'iframe:not([disabled])',
+			'select:not([disabled])',
+			'textarea:not([disabled])',
+			'[contentEditable=""]',
+			'[contentEditable="true"]',
+			'[contentEditable="TRUE"]',
+			'[tabindex]:not([tabindex^="-"])',
+			//':not([disabled])'
+		].join(',')));
+
+		let index = focusableElements.indexOf(el) + direction;
+
+		if (index < 0) {
+			index = focusableElements.length - 1;
+		}
+		else if (index >= focusableElements.length) {
+			index = 0;
+		}
+
+		(<HTMLElement>focusableElements[index]).focus();
 	}
 
 	protected _handleBlur(ev: FocusEvent, _index: number): void {
@@ -1381,6 +1442,38 @@ export class Root implements IDisposer {
 		return disposer;
 	}
 
+	protected _updateComputedStyles(): boolean {
+		const styles = window.getComputedStyle(this.dom);
+		let fontHash = "";
+		$object.each(styles, (key, val) => {
+			if ($type.isString(key) && key.match(/^font/)) {
+				fontHash += val;
+			}
+		})
+		const changed = fontHash != this._fontHash;
+		if (changed) {
+			this._fontHash = fontHash;
+		}
+		return changed;
+	}
+
+	protected _checkComputedStyles(): void {
+		if (this._updateComputedStyles()) {
+			this._invalidateLabelBounds(this.container);
+		}
+	}
+
+	protected _invalidateLabelBounds(target: Sprite): void {
+		if (target instanceof Container) {
+			target.children.each((child) => {
+				this._invalidateLabelBounds(child);
+			});
+		}
+		else if (target instanceof Text) {
+			target.markDirtyBounds();
+		}
+	}
+
 	/**
 	 * To all the clever heads out there. Yes, we did not make any attempts to
 	 * scramble this.
@@ -1409,4 +1502,17 @@ export class Root implements IDisposer {
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
+	public get debugGhostView(): boolean {
+		return this._renderer.debugGhostView;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public set debugGhostView(value: boolean) {
+		this._renderer.debugGhostView = value;
+	}
 }

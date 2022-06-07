@@ -147,18 +147,20 @@ export class PieSeries extends PercentSeries {
 
 			if (this.isDirty("alignLabels")) {
 				let labelsTemplate = this.labels.template;
+
 				if (this.get("alignLabels")) {
 					labelsTemplate.set("textType", "aligned");
 				}
 				else {
-					if (labelsTemplate.get("textType") == null) {
+					let textType = labelsTemplate.get("textType");
+					if (textType == null || textType == "aligned") {
 						labelsTemplate.set("textType", "adjusted");
 					}
 				}
 			}
 
 
-			if (this._valuesDirty || this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle")) {
+			if (this._valuesDirty || this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle") || this.isDirty("alignLabels")) {
 				this.markDirtyBounds();
 				const startAngle = this.get("startAngle", chart.get("startAngle", -90));
 				const endAngle = this.get("endAngle", chart.get("endAngle", 270));

@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.7] - 2022-06-07
+
+### Added
+- `minDistance` to `LineSeries` (default: 0). If set, it will skip line points closer than X pixels, resulting in a smoother, less cluttery line.
+- `isVisibleDeep()` method to `Sprite`. Check not only if `Sprite` itself is visible, but also its all ascendants.
+
+### Changed
+- TAB press should now skip over focusable elements of hidden series.
+
+### Fixed
+- Toggling `PieSeries` `alignLabels` after the chart was initialized was not working.
+- Fixing bug where the wheel event would sometimes not trigger.
+- When setting `stockSeries` with a new series on `StockChart` it was not inheriting `stockPositiveColor`/`stockNegativeColor` values.
+- Tweaked default `StockToolbar` CSS to act better on pages with larger font sizes.
+- DOM elements for focusable series items (columns, bullets, etc.) were being left behind when data for series was updated.
+- Exporting chart to image was not inheriting document styles properly.
+- If stock series increase/decrease colors were changed and then a series type was changed, new series used to reset colors and not use the ones user set.
+- Dynamically changing page-wide font-related CSS (e.g. via media queries) could cause visual anomalies on the chart, especially on axes.
+
+
 ## [5.2.6] - 2022-05-25
 
 ### Added
@@ -19,7 +39,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.2.5] - 2022-05-19
 
 ### Fixed
-- When timezone was set, grouping days into weeks could produce some unexpected results. 
+- When timezone was set, grouping days into weeks could produce some unexpected results.
 - `GaplessDateAxis` first date of a month sometimes could go before the grid of a month.
 - Improved performance with data grouping enabled on `DateAxis`, especially when timezone was set. Please note that using timezones will still affect the performance significantly.
 
@@ -111,7 +131,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Fixed
 - If geoJSON contained multipolygons with just one polygon, hovering over polygon was resulting in a JS error.
-- `DateAxis` displayed wrong time when time was switching to DST, when a timezone was set on a `Root` element. 
+- `DateAxis` displayed wrong time when time was switching to DST, when a timezone was set on a `Root` element.
 
 
 ## [5.1.12] - 2022-04-07
