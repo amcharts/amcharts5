@@ -1613,7 +1613,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 					}
 
 					// Draw underline
-					if (chunk.textDecoration == "underline") {
+					if (chunk.textDecoration == "underline" || chunk.textDecoration == "line-through") {
 
 						let thickness = 1;
 						let offset = 1;
@@ -1646,7 +1646,15 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						if (fontSize) {
 							offset = fontSize / 20;
 						}
-						const y = thickness + offset * 1.5 + line.offsetY + chunk.offsetY;
+						
+						let y: number;
+
+						if (chunk.textDecoration == "line-through") {
+							y = thickness + line.offsetY + chunk.offsetY - chunk.height / 2;
+						}
+						else {
+							y = thickness + offset * 1.5 + line.offsetY + chunk.offsetY;
+						}
 
 						context.save();
 						context.beginPath();
@@ -2187,7 +2195,7 @@ export class CanvasTextStyle implements ITextStyle {
 	public fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 	public fontStyle?: 'normal' | 'italic' | 'oblique';
 	public fontVariant?: "normal" | "small-caps";
-	public textDecoration?: "underline";
+	public textDecoration?: "underline" | "line-through";
 	public shadowColor?: Color | null;
 	public shadowBlur?: number;
 	public shadowOffsetX?: number;

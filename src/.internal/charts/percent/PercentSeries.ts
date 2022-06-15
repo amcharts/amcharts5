@@ -319,6 +319,13 @@ export abstract class PercentSeries extends Series {
 				dataItem.get("label").text.markDirtyText();
 			});
 		}
+
+		if (this.isDirty("legendLabelText") || this.isDirty("legendValueText")) {
+			$array.each(this._dataItems, (dataItem) => {
+				this.updateLegendValue(dataItem);
+			});
+		}
+
 		this._arrange();
 	}
 

@@ -57,11 +57,11 @@ export interface ILabelSettings extends IContainerSettings {
 	/**
 	 * Text decoration.
 	 *
-	 * The only option currently supported is `"underline"`.
+	 * Supported options `"underline"`, `"line-through"`.
 	 *
 	 * @since 5.0.15
 	 */
-	textDecoration?: "underline";
+	textDecoration?: "underline" | "line-through";
 
 	/**
 	 * Line height in percent or absolute pixels.

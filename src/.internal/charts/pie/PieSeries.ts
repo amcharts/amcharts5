@@ -8,6 +8,7 @@ import { Tick } from "../../core/render/Tick";
 import { RadialLabel } from "../../core/render/RadialLabel";
 import { ListTemplate } from "../../core/util/List";
 import { p100, Percent } from "../../core/util/Percent";
+import type { Bullet } from "../../core/render/Bullet";
 
 import * as $array from "../../core/util/Array";
 import * as $math from "../../core/util/Math";
@@ -269,6 +270,29 @@ export class PieSeries extends PercentSeries {
 			}
 
 			tick.set("points", [{ x: slice.x() + radius * cos, y: slice.y() + radius * sin }, { x: x + dx, y: y }, { x: x, y: y }]);
+		}
+	}
+
+	public _positionBullet(bullet: Bullet) {
+
+		const sprite = bullet.get("sprite");
+		if (sprite) {
+			const dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
+			const slice = dataItem.get("slice");
+
+			if (slice) {
+				const innerRadius = slice.get("innerRadius", 0);
+				const radius = slice.get("radius", 0);
+				const startAngle = slice.get("startAngle", 0);
+				const arc = slice.get("arc", 0);
+				const locationX = bullet.get("locationX", 0.5);
+				const locationY = bullet.get("locationY", 0.5);
+
+				const angle = startAngle + arc * locationX;
+				const r = innerRadius + (radius - innerRadius) * locationY;
+
+				sprite.setAll({ x: $math.cos(angle) * r, y: $math.sin(angle) * r });
+			}
 		}
 	}
 }

@@ -24,6 +24,7 @@ import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $order from "../../core/util/Order";
 import * as $object from "../../core/util/Object";
+import * as $utils from "../../core/util/Utils";
 import type { Animation } from "../../core/util/Entity";
 
 export interface IXYChartSettings extends ISerialChartSettings {
@@ -88,10 +89,16 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	cursor?: XYCursor;
 
 	/**
-	 * Indicates maximum distance from pointer (moust or touch) to points
-	 * tooltips need to be shown for.
+	 * If not set (default), cursor will show tooltips for all data items in the
+	 * same category/date.
+	 * 
+	 * If set, cursor will select closest data item to pointer (mouse or touch) and
+	 * show tooltip for it.
 	 *
-	 * Points that are further from pointer than this setting will not be shown.
+	 * It will also show tooltips for all data items that are within X pixels
+	 * range (as set in `maxTooltipDistance`).
+	 *
+	 * Tooltips for data items farther then X pixels, will not be shown.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
 	 */
@@ -430,7 +437,14 @@ export class XYChart extends SerialChart {
 
 		const wheelEvent = event.originalEvent;
 
-		wheelEvent.preventDefault()
+		// Ignore wheel event if it is happening on a non-chart element, e.g. if
+		// some page element is over the chart.
+		if ($utils.isLocalEvent(wheelEvent, this)) {
+			wheelEvent.preventDefault();
+		}
+		else {
+			return;
+		}
 
 		const plotPoint = plotContainer.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
 		const wheelStep = this.get("wheelStep", 0.2);
@@ -662,7 +676,8 @@ export class XYChart extends SerialChart {
 		if (this.get("panX") || this.get("panY")) {
 
 			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= this.height()) {
-				this._downPoint = local;
+				//this._downPoint = local;
+				this._downPoint = { x: event.clientX, y: event.clientY };
 
 				const panX = this.get("panX");
 				const panY = this.get("panY");
@@ -744,10 +759,11 @@ export class XYChart extends SerialChart {
 			}
 		}
 
-		const downPoint = this._downPoint!;
+		let downPoint = this._downPoint!;
 
 		if (downPoint) {
 
+			downPoint = plotContainer.toLocal(this._root.documentPointToRoot(downPoint));
 			let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 
 			const panX = this.get("panX");

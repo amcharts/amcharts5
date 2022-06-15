@@ -221,7 +221,7 @@ export class TextFormatter {
 		}
 
 		// Get style parts
-		let b: string[] | null = style.match(/([\w\-]*:[\s]?[^;\s\]]*)|(\#[\w]{1,6})|([\w]+)|(\/)/gi);
+		let b: string[] | null = style.match(/([\w\-]*:[\s]?[^;\s\]]*)|(\#[\w]{1,6})|([\w\-]+)|(\/)/gi);
 
 		// Empty?
 		if (!b) {
@@ -234,7 +234,7 @@ export class TextFormatter {
 			if (b[i].match(/^(normal|bold|bolder|lighter|100|200|300|400|500|600|700|800|900)$/i)) {
 				(<any>format).fontWeight = b[i];
 			}
-			else if (b[i].match(/^(underline)$/i)) {
+			else if (b[i].match(/^(underline|line-through)$/i)) {
 				(<any>format).textDecoration = b[i];
 			}
 			else if (b[i] == "/") {

@@ -8,6 +8,7 @@ import { FunnelSlice } from "./FunnelSlice";
 import { Tick } from "../../core/render/Tick";
 import { Label } from "../../core/render/Label";
 import { percent, p50, p100 } from "../../core/util/Percent";
+import type { Bullet } from "../../core/render/Bullet";
 
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
@@ -586,6 +587,33 @@ export class FunnelSeries extends PercentSeries {
 		if (link) {
 			this.links.removeValue(link);
 			link.dispose();
+		}
+	}
+
+	public _positionBullet(bullet: Bullet) {
+
+		const sprite = bullet.get("sprite");
+		if (sprite) {
+			const dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
+			const slice = dataItem.get("slice");
+
+			if (slice) {
+				const width = slice.width();
+				const height = slice.height();
+				const locationX = bullet.get("locationX", 0.5);
+				const locationY = bullet.get("locationY", 0.5);
+
+				let dx = 0;
+				let dy = 0;
+				if (this.get("orientation") == "horizontal") {
+					dy = height / 2
+				}
+				else {
+					dx = width / 2
+				}
+
+				sprite.setAll({ x: slice.x() + width * locationX - dx, y: slice.y() - dy + height * locationY });
+			}
 		}
 	}
 }

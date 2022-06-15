@@ -58,7 +58,8 @@ export class MapChartDefaultTheme extends Theme {
 
 		r("MapPointSeries").setAll({
 			clipFront: false,
-			clipBack: true
+			clipBack: true,
+			autoScale: false
 		})
 
 		{

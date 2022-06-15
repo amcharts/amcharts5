@@ -221,7 +221,7 @@ export interface ITextStyle {
 	fontWeight?: 'normal' | 'bold' | 'bolder' | 'lighter' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900'
 	fontStyle?: 'normal' | 'italic' | 'oblique';
 	fontVariant?: "normal" | "small-caps";
-	textDecoration?: "underline";
+	textDecoration?: "underline" | "line-through";
 	shadowColor?: Color | null;
 	shadowBlur?: number;
 	shadowOffsetX?: number;

@@ -1,11 +1,13 @@
+import type { Animation } from "../util/Entity";
+import type { Time } from "../util/Animation";
+
 import { RoundedRectangle } from "../render/RoundedRectangle";
 import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
-import * as $type from "../util/Type";
 import { Graphics } from "./Graphics";
 import { Button } from "./Button";
-import type { Time } from "../util/Animation";
+
+import * as $type from "../util/Type";
 import * as $utils from "../util/Utils";
-import type { Animation } from "../util/Entity";
 
 export interface IScrollbarSettings extends IContainerSettings {
 
@@ -195,7 +197,12 @@ export class Scrollbar extends Container {
 			)
 		}
 
-		this._disposers.push(thumb.events.on("dblclick", () => {
+		this._disposers.push(thumb.events.on("dblclick", (event) => {
+
+			if (!$utils.isLocalEvent(event.originalEvent, this)) {
+				return;
+			}
+
 			const duration = this.get("animationDuration", 0);
 			const easing = this.get("animationEasing");
 

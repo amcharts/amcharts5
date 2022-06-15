@@ -810,42 +810,64 @@ export class Root implements IDisposer {
 
 	}
 
+	private _renderFrame(currentTime: number): boolean {
+		if (this.events.isEnabled("framestarted")) {
+			this.events.dispatch("framestarted", {
+				type: "framestarted",
+				target: this,
+				timestamp: currentTime,
+			});
+		}
+
+		this._checkComputedStyles();
+		this._runTickers(currentTime);
+		this._runAnimations(currentTime);
+		this._runDirties();
+		this._render();
+
+		if (this.events.isEnabled("frameended")) {
+			this.events.dispatch("frameended", {
+				type: "frameended",
+				target: this,
+				timestamp: currentTime,
+			});
+		}
+
+		return this._tickers.length === 0 &&
+			this._animations.length === 0 &&
+			!this._isDirty;
+	}
+
 	private _runTicker(currentTime: number) {
 		if (!this.isDisposed()) {
 			this.animationTime = currentTime;
 
-			if (this.events.isEnabled("framestarted")) {
-				this.events.dispatch("framestarted", {
-					type: "framestarted",
-					target: this,
-					timestamp: currentTime,
-				});
-			}
-
-			this._checkComputedStyles();
-			this._runTickers(currentTime);
-			this._runAnimations(currentTime);
-			this._runDirties();
-			this._render();
-
-			if (this.events.isEnabled("frameended")) {
-				this.events.dispatch("frameended", {
-					type: "frameended",
-					target: this,
-					timestamp: currentTime,
-				});
-			}
+			const done = this._renderFrame(currentTime);
 
 			// No more work to do
-			if (this._tickers.length === 0 &&
-				this._animations.length === 0 &&
-				!this._isDirty) {
-
+			if (done) {
 				this._ticker = null;
 				this.animationTime = null;
 
 			} else {
 				rAF(this.fps, this._ticker!);
+			}
+		}
+	}
+
+	public _runTickerNow() {
+		if (!this.isDisposed()) {
+			for (;;) {
+				const currentTime = performance.now();
+
+				this.animationTime = currentTime;
+
+				const done = this._renderFrame(currentTime);
+
+				if (done) {
+					this.animationTime = null;
+					break;
+				}
 			}
 		}
 	}

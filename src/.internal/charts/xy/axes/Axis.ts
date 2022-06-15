@@ -184,6 +184,13 @@ export interface IAxisPrivate extends IComponentPrivate {
 	 * @ignore
 	 */
 	maxZoomFactor?: number;
+
+
+	/**
+	 * @todo review
+	 * read only, saves position to which tooltip points
+	 */
+	tooltipPosition?:number;
 }
 
 export interface IAxisDataItem extends IComponentDataItem {
@@ -954,6 +961,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
 				}
 				if (!$type.isNaN(position)) {
+					this.setPrivateRaw("tooltipPosition", position);
 					this._updateTooltipText(tooltip, position);
 					renderer.positionTooltip(tooltip, position);
 

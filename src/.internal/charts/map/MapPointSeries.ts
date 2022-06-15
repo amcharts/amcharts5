@@ -111,6 +111,12 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 */
 	longitudeField?: string;
 
+
+	/**
+	 * @todo review
+	 * @default false
+	 */
+	autoScale?:boolean
 };
 
 /**

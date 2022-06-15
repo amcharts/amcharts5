@@ -1,5 +1,6 @@
 import type { Percent } from "./Percent";
 import type { IPointerEvent } from "../render/backend/Renderer";
+import type { Sprite } from "../render/Sprite";
 
 import * as $type from "./Type";
 import * as $array from "./Array";
@@ -238,6 +239,17 @@ export function contains(a: Element, b: Element): boolean {
 			cursor = cursor.parentNode;
 		}
 	}
+}
+
+/**
+ * Returns `true` if pointer event originated on an element within Root.
+ *
+ * @since 5.2.8
+ * @param  event   Event
+ * @param  target  Target element
+ */
+export function isLocalEvent(event: IPointerEvent, target: Sprite) {
+	return event.target && contains(target.root.dom, <Element>event.target);
 }
 
 /**

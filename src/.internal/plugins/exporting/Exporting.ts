@@ -732,28 +732,33 @@ export class Exporting extends Entity {
 			options: options,
 			target: this
 		});
+
+		// Force any randering to complete before proceeding
+		this._root._runTickerNow();
+
+		let promise: Promise<string> | string = "";
 		switch (format) {
 			case "png":
 			case "jpg":
-				return this.exportImage(format, options);
+				promise = this.exportImage(format, options);
 				break;
 			case "json":
-				return this.exportJSON(options);
+				promise = this.exportJSON(options);
 				break;
 			case "csv":
-				return this.exportCSV(options);
+				promise = this.exportCSV(options);
 				break;
 			case "html":
-				return this.exportHTML(options);
+				promise = this.exportHTML(options);
 				break;
 			case "xlsx":
-				return this.exportXLSX(options);
+				promise = this.exportXLSX(options);
 				break;
 			case "pdf":
-				return this.exportPDF(options);
+				promise = this.exportPDF(options);
 				break;
 			case "pdfdata":
-				return this.exportPDFData(options);
+				promise = this.exportPDFData(options);
 				break;
 		}
 		this.events.dispatch("exportfinished", {
@@ -762,7 +767,7 @@ export class Exporting extends Entity {
 			options: options,
 			target: this
 		});
-		return "";
+		return promise;
 	}
 
 	/**

@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.8] - 2022-06-15
+
+### Added
+- Private (read-only) setting `tooltipPosition` added to `Axis`.
+- `"line-through"` label decoration added. Works both via `Label`'s `textDecoration` setting, and in-line, e.g. `This is [line-through]a crossed out text[/]`.
+- `autoScale` (default: `false`) setting added to `MapPointSeries`. If set to `true`, bullets will resize together with a map while zooming.
+- `PieSeries` and `FunnelSeries` now properly support bullets.
+
+### Fixed
+- Changing randius or innerRadius on a PieChart was not working.
+- Changing legendValueText or legendLabel text on PercentSeries was not working.
+- `exportfinished` event was not kicking in.
+- Exporting plugin will now try to finish any ongoing rendering before genrating export image.
+- Using mouse wheel on a non-chart element that is positioned over the chart works properly now.
+- If some non-chart element was rendered over `Scrollbar`, doublicking on a thumb area would still zoom it out.
+- Adding `click` event to an `XYChart` was causing it to pan a little when clicked.
+
+
 ## [5.2.7] - 2022-06-07
 
 ### Added

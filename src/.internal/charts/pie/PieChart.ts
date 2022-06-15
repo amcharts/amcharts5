@@ -125,6 +125,12 @@ export class PieChart extends PercentChart {
 				series._markDirtyKey("startAngle");
 			})
 		}
+
+		if(this.isDirty("innerRadius") || this.isDirty("radius")){
+			this.series.each((series) => {
+				series._markDirtyKey("innerRadius");
+			})			
+		}
 	}
 
 	/**

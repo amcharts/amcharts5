@@ -653,6 +653,10 @@ export abstract class Series extends Component {
 						sprite.walkChildren((child)=>{
 							child._markDirtyKey("fill" as any);
 							child.markDirtySize();
+
+							if(child instanceof Label){
+								child.text.markDirtyText();
+							}
 						})
 					}
 				}

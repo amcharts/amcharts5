@@ -31,4 +31,9 @@ export abstract class PercentChart extends SerialChart {
 		this.chartContainer.children.push(this.seriesContainer);
 		this.seriesContainer.children.push(this.bulletsContainer);
 	}
+
+	protected _processSeries(series: this["_seriesType"]) {
+		super._processSeries(series);
+		this.seriesContainer.children.moveValue(this.bulletsContainer, this.seriesContainer.children.length - 1);	
+	}	
 }

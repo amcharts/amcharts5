@@ -14,6 +14,7 @@ import { GridLayout } from "./GridLayout";
 
 import * as $array from "../util/Array";
 import * as $type from "../util/Type";
+import * as $utils from "../util/Utils";
 
 export interface IContainerSettings extends ISpriteSettings {
 
@@ -259,7 +260,7 @@ export class Container extends Sprite {
 				}
 
 				let visible = true;
-				if(this._contentHeight <= height){
+				if (this._contentHeight <= height) {
 					visible = false;
 				}
 				verticalScrollbar.setPrivate("visible", visible);
@@ -533,7 +534,16 @@ export class Container extends Sprite {
 
 				this._disposers.push(this.events.on("wheel", (event) => {
 					const wheelEvent = event.originalEvent;
-					wheelEvent.preventDefault();
+
+					// Ignore wheel event if it is happening on a non-chart element, e.g. if
+					// some page element is over the chart.
+					if ($utils.isLocalEvent(wheelEvent, this)) {
+						wheelEvent.preventDefault();
+					}
+					else {
+						return;
+					}
+
 					const shiftY = wheelEvent.deltaY / 5000;
 					const start = verticalScrollbar.get("start", 0);
 					const end = verticalScrollbar.get("end", 1);

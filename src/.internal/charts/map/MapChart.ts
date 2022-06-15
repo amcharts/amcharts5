@@ -1,4 +1,5 @@
 import type { MapSeries } from "./MapSeries";
+import type { MapPointSeries } from "./MapPointSeries";
 import type { GeoProjection, GeoPath } from "d3-geo";
 import type { IPoint } from "../../core/util/IPoint";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
@@ -225,7 +226,8 @@ export interface IMapChartPrivate extends ISerialChartPrivate {
 export interface IMapChartEvents extends ISerialChartEvents {
 
 	/**
-	 * Invoked when geo bounds of the map change, usually after map is iniitalized
+	 * Invoked when geo bounds of the map change, usually after map is
+	 * initialized.
 	 */
 	geoboundschanged: {};
 
@@ -318,7 +320,14 @@ export class MapChart extends SerialChart {
 
 				const wheelEvent = event.originalEvent;
 
-				wheelEvent.preventDefault();
+				// Ignore wheel event if it is happening on a non-chart element, e.g. if
+				// some page element is over the chart.
+				if ($utils.isLocalEvent(wheelEvent, this)) {
+					wheelEvent.preventDefault();
+				}
+				else {
+					return;
+				}
 
 				const chartContainer = this.chartContainer;
 				const point = chartContainer._display.toLocal(event.point);
@@ -464,6 +473,24 @@ export class MapChart extends SerialChart {
 		if (this.isDirty("zoomLevel")) {
 			projection.scale(this.getPrivate("mapScale") * this.get("zoomLevel", 1));
 			this.markDirtyProjection();
+
+			this.series.each((series) => {
+				if (series.isType<MapPointSeries>("MapPointSeries")) {
+					if (series.get("autoScale")) {
+						$array.each(series.dataItems, (dataItem) => {
+							const bullets = dataItem.bullets;
+							if (bullets) {
+								$array.each(bullets, (bullet) => {
+									const sprite = bullet.get("sprite");
+									if (sprite) {
+										sprite.set("scale", this.get("zoomLevel"));
+									}
+								})
+							}
+						})
+					}
+				}
+			})
 		}
 
 		if (this.isDirty("translateX") || this.isDirty("translateY")) {
@@ -988,7 +1015,7 @@ export class MapChart extends SerialChart {
 		if (this.get("centerMapOnZoomOut") && level == this.get("homeZoomLevel", 1)) {
 			point = this.convert(this.homeGeoPoint());
 			center = true;
-		}		
+		}
 
 		let x = point.x;
 		let y = point.y;
