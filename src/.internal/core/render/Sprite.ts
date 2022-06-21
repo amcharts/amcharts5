@@ -538,6 +538,16 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 */
 	list?: ListTemplate<Sprite>;
 
+	/**
+	 * @ignore
+	 */
+	maxWidth?: number | null;
+
+	/**
+	 * @ignore
+	 */
+	maxHeight?: number | null;
+
 }
 
 /**
@@ -1022,6 +1032,7 @@ export abstract class Sprite extends Entity {
 					this._dragDp = undefined;
 				}
 			}
+			display.cancelTouch = draggable ? true : false;
 		}
 
 		if (this.isDirty("tooltipText")) {
@@ -1112,7 +1123,7 @@ export abstract class Sprite extends Entity {
 			this._sizeDirty = true;
 		}
 
-		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight") || this.isPrivateDirty("maxWidth") || this.isPrivateDirty("maxHeight")) {
 			this.markDirtyBounds();
 			this._sizeDirty = true;
 		}
@@ -2182,7 +2193,7 @@ export abstract class Sprite extends Entity {
 	 */
 	public width(): number {
 		let width = this.get("width");
-		let maxWidth = this.get("maxWidth");
+		let maxWidth = this.get("maxWidth", this.getPrivate("maxWidth"));
 		let minWidth = this.get("minWidth");
 		let privateWidth = this.getPrivate("width");
 		let w = 0;
@@ -2228,7 +2239,7 @@ export abstract class Sprite extends Entity {
 	 * @return Maximum width (px)
 	 */
 	public maxWidth(): number {
-		let maxWidth = this.get("maxWidth");
+		let maxWidth = this.get("maxWidth", this.getPrivate("maxWidth"));
 		if ($type.isNumber(maxWidth)) {
 			return maxWidth;
 		}
@@ -2251,7 +2262,7 @@ export abstract class Sprite extends Entity {
 	 * @return Maximum height (px)
 	 */
 	public maxHeight(): number {
-		let maxHeight = this.get("maxHeight");
+		let maxHeight = this.get("maxHeight", this.getPrivate("maxHeight"));
 		if ($type.isNumber(maxHeight)) {
 			return maxHeight;
 		}
@@ -2275,7 +2286,7 @@ export abstract class Sprite extends Entity {
 	 */
 	public height(): number {
 		let height = this.get("height");
-		let maxHeight = this.get("maxHeight");
+		let maxHeight = this.get("maxHeight", this.getPrivate("maxHeight"));
 		let minHeight = this.get("minHeight");
 		let privateHeight = this.getPrivate("height");
 		let h = 0;

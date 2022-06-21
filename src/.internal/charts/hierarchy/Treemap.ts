@@ -296,11 +296,11 @@ export class Treemap extends Hierarchy {
 		const label = dataItem.get("label");
 
 		rectangle.on("width", () => {
-			label.set("maxWidth", rectangle.width());
+			label.setPrivate("maxWidth", rectangle.width());
 		})
 
 		rectangle.on("height", () => {
-			label.set("maxHeight", rectangle.height());
+			label.setPrivate("maxHeight", rectangle.height());
 		})
 
 		return node;

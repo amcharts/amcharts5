@@ -395,6 +395,22 @@ export class XYChart extends SerialChart {
 		}));
 
 		this._maskGrid();
+		this._setUpTouch();
+	}
+
+	public _beforeChanged() {
+		super._beforeChanged();
+
+		if (this.isDirty("pinchZoomX") || this.isDirty("pinchZoomY") || this.get("panX") || this.get("panY")) {
+			this._setUpTouch();
+		}
+
+	}
+
+	protected _setUpTouch(): void {
+		if (!this.plotContainer._display.cancelTouch) {
+			this.plotContainer._display.cancelTouch = (this.get("pinchZoomX") || this.get("pinchZoomY") || this.get("panX") || this.get("panY")) ? true : false;
+		}
 	}
 
 	protected _maskGrid() {

@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.9] - 2022-06-21
+
+### Added
+- New properties on `Root`: `tapToActivate` (default: `false`) - if enabled, requires to tap on chart pefore gesture-based functionality (zoom/pan) works, and `tapToActivateTimeout` (default: `3000`) - milliseconds of inactivity before chart becomes "inactive" for touch gestures. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options).
+
+### Changed
+- If there are no pan/zoom functionality set on charts, they should not prevent scrolling of the page by touch anymore.
+- Bullets will no longer knock off user-set `maxWidth` on their `sprite` element.
+
+### Fixed
+- `DateRangeSelector` was not updating its label correctly when dates were picked.
+- `LineSeries` with `templateField` and a lot of data items could cause chart to crash.
+
+
 ## [5.2.8] - 2022-06-15
 
 ### Added

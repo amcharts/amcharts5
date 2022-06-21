@@ -192,10 +192,27 @@ export class DateRangeSelector extends StockControl {
 		saveButton.className = "am5-modal-button am5-modal-primary";
 		buttonsColumn.appendChild(saveButton);
 
+		const xAxis = this._getAxis();
+
+		xAxis.onPrivate("selectionMin", () => {
+			if (this.getPrivate("fromDate")) {
+				this._updateInputs();
+				this._updateLabel();
+			}
+		});
+
+		xAxis.onPrivate("selectionMax", () => {
+			if (this.getPrivate("toDate")) {
+				this._updateInputs();
+				this._updateLabel();
+			}
+		});
+
 		$utils.addEventListener(saveButton, "click", () => {
-			const xAxis = this._getAxis();
 			const from = this._parseDate(fromField.value);
 			const to = this._parseDate(toField.value);
+			this.setPrivate("fromDate", from);
+			this.setPrivate("toDate", to);
 			xAxis.zoomToDates(from, to);
 			this._updateLabel();
 			this.set("active", false);
@@ -226,8 +243,15 @@ export class DateRangeSelector extends StockControl {
 
 	protected _updateInputs(): void {
 		const xAxis = this._getAxis();
-		const from = new Date(xAxis!.getPrivate("selectionMin", 0));
-		const to = new Date(xAxis!.getPrivate("selectionMax", 0));
+		const min = xAxis.getPrivate("selectionMin", 0);
+		const max = xAxis.getPrivate("selectionMax", 0);
+
+		if (!min || !max) {
+			return;
+		}
+
+		const from = new Date(min);
+		const to = new Date(max);
 
 		this.setPrivate("fromDate", from);
 		this.setPrivate("toDate", to);

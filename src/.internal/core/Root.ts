@@ -1537,4 +1537,46 @@ export class Root implements IDisposer {
 	public set debugGhostView(value: boolean) {
 		this._renderer.debugGhostView = value;
 	}
+
+	/**
+	 * Set this to `true` if you need chart to require first a tap onto it before
+	 * touch gesture related functionality like zoom/pan is turned on.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options} for more info
+	 * @default false
+	 * @since 5.2.9
+	 * @param  value  Needs a tap to activate touch functions
+	 */
+	public set tapToActivate(value: boolean) {
+		this._renderer.tapToActivate = value;
+	}
+
+	/**
+	 * @return Needs a tap to activate touch functions
+	 */
+	public get tapToActivate(): boolean {
+		return this._renderer.tapToActivate;
+	}
+
+	/**
+	 * If `tapToActivate` is set to `true`, this setting will determine number
+	 * of milliseconds the chart will stay "active", before releasing the
+	 * controls back to the page.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options} for more info
+	 * @default 3000
+	 * @since 5.2.9
+	 * @param  value  Timeout
+	 */
+	public set tapToActivateTimeout(value: number) {
+		this._renderer.tapToActivateTimeout = value;
+	}
+
+	/**
+	 * @return Timeout
+	 */
+	public get tapToActivateTimeout(): number {
+		return this._renderer.tapToActivateTimeout;
+	}
+
 }

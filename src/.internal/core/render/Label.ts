@@ -289,11 +289,11 @@ export class Label extends Container {
 			this._text.set(property as any, this.get(property as any));
 		})
 
-		if (this.isDirty("maxWidth")) {
+		if (this.isDirty("maxWidth") || this.isPrivateDirty("maxWidth")) {
 			this._setMaxDimentions();
 		}
 
-		if (this.isDirty("maxHeight")) {
+		if (this.isDirty("maxHeight") || this.isPrivateDirty("maxHeight")) {
 			this._setMaxDimentions();
 		}
 
@@ -332,7 +332,7 @@ export class Label extends Container {
 		const rotation = this.get("rotation");
 		const vertical = rotation == 90 || rotation == 270;
 
-		const maxWidth = this.get("maxWidth", Infinity);
+		const maxWidth = this.get("maxWidth", this.getPrivate("maxWidth", Infinity));
 		if ($type.isNumber(maxWidth)) {
 			this.text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
 		}
@@ -340,7 +340,7 @@ export class Label extends Container {
 			this.text.set(vertical ? "maxHeight" : "maxWidth", undefined);
 		}
 
-		const maxHeight = this.get("maxHeight", Infinity);
+		const maxHeight = this.get("maxHeight", this.getPrivate("maxHeight", Infinity));
 		if ($type.isNumber(maxHeight)) {
 			this.text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
 		}

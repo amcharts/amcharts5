@@ -1711,8 +1711,8 @@ export abstract class XYSeries extends Series {
 				let h = bottom - top;
 
 				if (sprite.isType("Label")) {
-					sprite.set("maxWidth", Math.abs(w));
-					sprite.set("maxHeight", Math.abs(h));
+					sprite.setPrivate("maxWidth", Math.abs(w));
+					sprite.setPrivate("maxHeight", Math.abs(h));
 				}
 
 				let x = left + w * locationX;

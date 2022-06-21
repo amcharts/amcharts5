@@ -220,6 +220,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	public interactive: boolean = false;
 	public inactive: boolean = false;
 	public wheelable: boolean = false;
+	public cancelTouch: boolean = false;
 	public isMeasured: boolean = false;
 	public buttonMode: boolean = false;
 	public alpha: number = 1;
@@ -498,6 +499,20 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 	public dispose() {
 		this.getLayer().dirty = true;
+	}
+
+	public shouldCancelTouch(): boolean {
+		const renderer = this._renderer;
+		if (renderer.tapToActivate && !renderer._touchActive) {
+			return false;
+		}
+		if (this.cancelTouch) {
+			return true;
+		}
+		else if (this._parent) {
+			return this._parent.shouldCancelTouch();
+		}
+		return false;
 	}
 
 }
@@ -1646,7 +1661,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						if (fontSize) {
 							offset = fontSize / 20;
 						}
-						
+
 						let y: number;
 
 						if (chunk.textDecoration == "line-through") {
@@ -2014,7 +2029,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				currentChunkOffset += chunk.width;
 
 				if (chunk.verticalAlign) {
-					switch(chunk.verticalAlign) {
+					switch (chunk.verticalAlign) {
 						case "super":
 							chunk.offsetY -= lineInfo.height / 2 - chunk.height / 2;
 							break;
@@ -2844,6 +2859,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	protected _lastPointerMoveEvent: { events: Array<IPointerEvent>, native: boolean } | undefined;
 
+	public tapToActivate: boolean = false;
+	public tapToActivateTimeout: number = 3000;
+	public _touchActive: boolean = false;
+	protected _touchActiveTimeout?: number;
+
 	/*protected _mouseMoveThrottler: Throttler = new Throttler(() => {
 		this._dispatchGlobalMousemove(this._lastPointerMoveEvent.event, this._lastPointerMoveEvent.native);
 	});
@@ -2905,12 +2925,42 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		if ($utils.supports("touchevents")) {
 			const listener = (ev: any) => {
 				if (this._dragging.length !== 0) {
-					ev.preventDefault();
+					$array.eachContinue(this._dragging, (item) => {
+						if (item.value.shouldCancelTouch()) {
+							ev.preventDefault();
+							return false;
+						}
+						return true;
+					});
+				}
+
+				// If touch down happends, delay touch out
+				if (this._touchActiveTimeout) {
+					this._delayTouchDeactivate();
 				}
 			};
 
 			this._disposers.push($utils.addEventListener(window, "touchstart", listener, { passive: false }));
 			this._disposers.push($utils.addEventListener(this.view, "touchstart", listener, { passive: false }));
+
+			this._disposers.push($utils.addEventListener(this.view, "touchmove", () => {
+				// If touch is moving, delay touch out
+				if (this._touchActiveTimeout) {
+					this._delayTouchDeactivate();
+				}
+			}, { passive: true }));
+
+			this._disposers.push($utils.addEventListener(window, "click", (_ev: any) => {
+				this._touchActive = false;
+			}, { passive: true }));
+
+			this._disposers.push($utils.addEventListener(this.view, "click", (_ev: any) => {
+				window.setTimeout(() => {
+					this._touchActive = true;
+					this._delayTouchDeactivate();
+				}, 100);
+			}, { passive: true }));
+
 		}
 
 		// Prevent scrolling of the window when hovering on "wheelable" object
@@ -2929,6 +2979,17 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			}, { passive: false }));
 		}
 
+	}
+
+	protected _delayTouchDeactivate(): void {
+		if (this._touchActiveTimeout) {
+			clearTimeout(this._touchActiveTimeout);
+		}
+		if (this.tapToActivateTimeout > 0) {
+			this._touchActiveTimeout = window.setTimeout(() => {
+				this._touchActive = false;
+			}, this.tapToActivateTimeout);
+		}
 	}
 
 	public get debugGhostView(): boolean {
@@ -3581,12 +3642,23 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				});
 			case "globalpointerup":
 				return this._makeSharedEvent("pointerup", () => {
-					return this._onPointerEvent("pointerup", (events, native) => {
+					var mouseup = this._onPointerEvent("pointerup", (events, native) => {
 						$array.each(events, (event) => {
 							this._dispatchGlobalMouseup(event, native);
 						});
-
 						this._lastPointerMoveEvent = { events, native };
+					});
+
+					var pointercancel = this._onPointerEvent("pointercancel", (events, native) => {
+						$array.each(events, (event) => {
+							this._dispatchGlobalMouseup(event, native);
+						});
+						this._lastPointerMoveEvent = { events, native };
+					});
+
+					return new Disposer(() => {
+						mouseup.dispose();
+						pointercancel.dispose();
 					});
 				});
 			case "click":

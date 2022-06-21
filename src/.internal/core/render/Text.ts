@@ -180,13 +180,13 @@ export class Text extends Sprite {
 			}
 		}
 
-		if (this.isDirty("maxWidth")) {
-			textStyle.maxWidth = this.get("maxWidth");
+		if (this.isDirty("maxWidth") || this.isPrivateDirty("maxWidth")) {
+			textStyle.maxWidth = this.get("maxWidth", this.getPrivate("maxWidth"));
 			this.markDirtyBounds();
 		}
 
-		if (this.isDirty("maxHeight")) {
-			textStyle.maxHeight = this.get("maxHeight");
+		if (this.isDirty("maxHeight") || this.isPrivateDirty("maxHeight")) {
+			textStyle.maxHeight = this.get("maxHeight", this.getPrivate("maxHeight"));
 			this.markDirtyBounds();
 		}
 

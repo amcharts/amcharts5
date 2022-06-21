@@ -181,6 +181,9 @@ export class LineSeries extends XYSeries {
 
 	protected _previousPoint: Array<number> = [0, 0, 0, 0];
 
+	protected _dindex = 0;
+	protected _sindex = 0;
+
 	public _updateChildren() {
 
 		this._strokeTemplate = undefined;
@@ -308,7 +311,13 @@ export class LineSeries extends XYSeries {
 				this._endIndex = endIndex;
 
 				this._clearGraphics();
-				this._startSegment(0, startIndex);
+				this._sindex = 0;
+				this._dindex = startIndex;
+				// this is done to avoid recursion with a lot of segments 
+				while (this._dindex < endIndex - 1) {
+					this._startSegment(this._dindex);
+					this._sindex++;
+				}
 			}
 		}
 		else {
@@ -323,7 +332,7 @@ export class LineSeries extends XYSeries {
 		this.fills.clear();
 	}
 
-	protected _startSegment(segmentIndex: number, dataItemIndex: number) {
+	protected _startSegment(dataItemIndex: number) {
 		let endIndex = this._endIndex;
 		let currentEndIndex = endIndex;
 
@@ -419,6 +428,7 @@ export class LineSeries extends XYSeries {
 
 
 		for (i = dataItemIndex; i < currentEndIndex; i++) {
+			this._dindex = i;
 			const dataItem = this._dataItems[i];
 
 			let valueX = dataItem.get(xField as any);
@@ -522,10 +532,6 @@ export class LineSeries extends XYSeries {
 			fill.setRaw("userData", [dataItemIndex, i]);
 			stroke.setRaw("userData", [dataItemIndex, i]);
 		})
-
-		if (currentEndIndex < endIndex) {
-			this._startSegment(segmentIndex + 1, currentEndIndex);
-		}
 	}
 
 	protected _getPoints(dataItem: DataItem<this["_dataItemSettings"]>, o: { points: Array<Array<number>>, segments: number[][][], stacked: boolean | undefined, getOpen: boolean, basePosX: number, basePosY: number, fillVisible: boolean | undefined, xField: string, yField: string, xOpenField: string, yOpenField: string, vcx: number, vcy: number, baseAxis: Axis<AxisRenderer>, xAxis: Axis<AxisRenderer>, yAxis: Axis<AxisRenderer>, locationX: number, locationY: number, openLocationX: number, openLocationY: number, minDistance: number }) {

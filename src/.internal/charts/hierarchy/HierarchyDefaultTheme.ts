@@ -345,7 +345,8 @@ export class HierarchyDefaultTheme extends Theme {
 			paddingLeft: 20,
 			paddingTop: 20,
 			paddingBottom: 20,
-			paddingRight: 20
+			paddingRight: 20,
+			nodePadding: 0
 		});
 
 		{

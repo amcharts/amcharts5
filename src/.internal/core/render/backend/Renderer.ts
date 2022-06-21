@@ -95,6 +95,7 @@ export interface IDisplayObject extends IDisposer {
 	interactive: boolean;
 	inactive: boolean;
 	wheelable: boolean;
+	cancelTouch: boolean;
 	isMeasured: boolean;
 	buttonMode: boolean;
 	alpha: number;
@@ -261,6 +262,8 @@ export interface IPicture extends IDisplayObject {
 
 export interface IRenderer extends IDisposer {
 	debugGhostView: boolean;
+	tapToActivate: boolean;
+	tapToActivateTimeout: number;
 	resolution: number;
 	interactionsEnabled: boolean;
 	createLinearGradient(x1: number, y1: number, x2: number, y2: number): IGradient;

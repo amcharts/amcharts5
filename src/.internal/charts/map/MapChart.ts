@@ -504,6 +504,10 @@ export class MapChart extends SerialChart {
 				this.markDirtyProjection();
 			}
 		}
+
+		if (this.isDirty("pinchZoom") || this.get("panX") || this.get("panY")) {
+			this._setUpTouch();
+		}
 	}
 
 
@@ -605,6 +609,11 @@ export class MapChart extends SerialChart {
 		}
 	}
 
+	protected _setUpTouch(): void {
+		if (!this.chartContainer._display.cancelTouch) {
+			this.chartContainer._display.cancelTouch = (this.get("pinchZoom") || this.get("panX") || this.get("panY")) ? true : false;
+		}
+	}
 
 
 	/**
@@ -672,6 +681,8 @@ export class MapChart extends SerialChart {
 		if (!license) {
 			this._root._showBranding();
 		}
+
+		this._setUpTouch();
 
 	}
 

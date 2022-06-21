@@ -243,6 +243,13 @@ export class XYCursor extends Container {
 		})
 	}
 
+	protected _setUpTouch(): void {
+		const chart = this.chart;
+		if (chart) {
+			chart.plotContainer._display.cancelTouch = this.get("behavior") != "none" ? true : false;
+		}
+	}
+
 	protected _handleXLine() {
 		let x = this.lineX.x();
 		let visible = true;
@@ -380,6 +387,7 @@ export class XYCursor extends Container {
 					this._handleMove(event.originalEvent);
 				}
 			}));
+			this._setUpTouch();
 		}
 
 		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {

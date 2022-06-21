@@ -37,7 +37,7 @@ export class HorizontalLayout extends Layout {
 							availableWidth -= minWidth;
 							totalPercent -= childWidth.value;
 						}
-						let maxWidth = child.get("maxWidth", Infinity);
+						let maxWidth = child.get("maxWidth", child.getPrivate("maxWidth", Infinity));
 						if (w > maxWidth) {
 							availableWidth -= maxWidth;
 							totalPercent -= childWidth.value;
@@ -61,7 +61,7 @@ export class HorizontalLayout extends Layout {
 						if (childWidth instanceof Percent) {
 							let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
 							let minWidth = child.get("minWidth", -Infinity);
-							let maxWidth = child.get("maxWidth", Infinity);
+							let maxWidth = child.get("maxWidth", child.getPrivate("maxWidth", Infinity));
 							privateWidth = Math.min(Math.max(minWidth, privateWidth), maxWidth);
 
 							child.setPrivate("width", privateWidth);
