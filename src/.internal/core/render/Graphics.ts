@@ -151,6 +151,15 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 */
 	shadowOpacity?: number;
 
+	/**
+	 * A method to be used on anchor points (joints) of the multi-point line.
+	 *
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineJoin} for more info
+	 * @default "miter"
+	 * @since 5.2.10
+	 */
+	lineJoin?: "miter" | "round" | "bevel";
+
 }
 
 export interface IGraphicsPrivate extends ISpritePrivate {
@@ -185,7 +194,7 @@ export class Graphics extends Sprite {
 			this.markDirtyBounds();
 		}
 
-		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
+		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("lineJoin") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
 			this._clear = true;
 		}
 
@@ -341,6 +350,7 @@ export class Graphics extends Sprite {
 			if (stroke || strokeGradient || strokePattern) {
 				const strokeOpacity = this.get("strokeOpacity");
 				const strokeWidth = this.get("strokeWidth", 1);
+				const lineJoin = this.get("lineJoin");
 
 				if (strokePattern) {
 					let changed = false;
@@ -355,7 +365,7 @@ export class Graphics extends Sprite {
 					}
 					const pattern = strokePattern.pattern;
 					if (pattern) {
-						this._display.lineStyle(strokeWidth, pattern, strokeOpacity);
+						this._display.lineStyle(strokeWidth, pattern, strokeOpacity, lineJoin);
 						this._display.endStroke();
 					}
 				}
@@ -378,12 +388,12 @@ export class Graphics extends Sprite {
 
 					const gradient = strokeGradient.getFill(this);
 					if (gradient) {
-						this._display.lineStyle(strokeWidth, gradient, strokeOpacity);
+						this._display.lineStyle(strokeWidth, gradient, strokeOpacity, lineJoin);
 						this._display.endStroke();
 					}
 				}
 				else if (stroke) {
-					this._display.lineStyle(strokeWidth, stroke, strokeOpacity);
+					this._display.lineStyle(strokeWidth, stroke, strokeOpacity, lineJoin);
 					this._display.endStroke();
 				}
 

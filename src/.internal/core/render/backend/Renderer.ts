@@ -108,7 +108,7 @@ export interface IDisplayObject extends IDisposer {
 	cursorOverStyle?: string;
 	exportable?: boolean;
 
-	_setMatrix():void;
+	_setMatrix(): void;
 	getLayer(): ILayer;
 	setLayer(order: number | undefined): void;
 	markDirtyLayer(deep?: boolean): void;
@@ -117,7 +117,7 @@ export interface IDisplayObject extends IDisposer {
 	toLocal(point: IPoint): IPoint;
 	toGlobal(point: IPoint): IPoint;
 	getLocalBounds(): IBounds;
-	getAdjustedBounds(bounds?:IBounds):IBounds;
+	getAdjustedBounds(bounds?: IBounds): IBounds;
 	on<C, Key extends keyof IRendererEvents>(key: Key, callback: (this: C, event: IRendererEvents[Key]) => void, context?: C): IDisposer;
 	hovering(): boolean;
 	getCanvas(): HTMLCanvasElement;
@@ -125,7 +125,7 @@ export interface IDisplayObject extends IDisposer {
 	/**
 	 * @ignore
 	 */
-	getLocalMatrix():Matrix;
+	getLocalMatrix(): Matrix;
 }
 
 export interface IContainer extends IDisplayObject {
@@ -171,7 +171,7 @@ export interface IGraphics extends IDisplayObject {
 	beginFill(color?: Color | IGradient | IPattern, alpha?: number): void;
 	endFill(): void;
 
-	lineStyle(width?: number, color?: Color | IGradient | IPattern, alpha?: number): void;
+	lineStyle(width?: number, color?: Color | IGradient | IPattern, alpha?: number, lineJoin?: "miter" | "round" | "bevel"): void;
 	setLineDash(dash?: number[]): void;
 	setLineDashOffset(dashOffset?: number): void;
 	endStroke(): void;
@@ -203,7 +203,7 @@ export interface IText extends IDisplayObject {
  * @ignore
  */
 export interface IRadialText extends IText {
-	textType?: "regular" | "circular" | "radial" | "aligned"  | "adjusted";
+	textType?: "regular" | "circular" | "radial" | "aligned" | "adjusted";
 	radius?: number;
 	startAngle?: number;
 	relativeAngle?: number;

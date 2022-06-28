@@ -102,6 +102,12 @@ export class ColorSet extends Entity {
 		super._afterNewApplyThemes();
 	}
 
+	public _beforeChanged(): void {
+		if (this.isDirty("colors")) {
+			this.reset();
+		}
+	}
+
 	/**
 	 * @ignore
 	 */
@@ -176,5 +182,6 @@ export class ColorSet extends Entity {
 	 */
 	public reset() {
 		this.setPrivate("currentStep", this.get("startIndex", 0));
+		this.setPrivate("currentPass", 0);
 	}
 }

@@ -57,10 +57,12 @@ export class PercentDefaultTheme extends Theme {
 			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
 			strokeWidth: 1,
 			strokeOpacity: 1,
-			role: "figure"
+			role: "figure",
+			lineJoin:"round"
 		});
 
 		r("Slice", ["pie"]).states.create("active", { shiftRadius: 20 });
+		r("Slice", ["pie"]).states.create("hoverActive", { scale: 1 });
 		r("Slice", ["pie"]).states.create("hover", { scale: 1.04 });
 
 		r("RadialLabel", ["pie"]).setAll({

@@ -304,4 +304,9 @@ export abstract class MapSeries extends Series {
 			chart.series.removeValue(this);
 		}
 	}
+
+	protected _onDataClear() {
+		super._onDataClear();
+		this._geoJSONparsed = false;
+	}		
 }

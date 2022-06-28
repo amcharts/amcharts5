@@ -190,8 +190,10 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			}
 			let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
 			let frequency = Math.min(len, Math.ceil((endIndex - startIndex) / maxCount));
+			frequency = Math.max(1, frequency);
 
 			startIndex = Math.floor(startIndex / frequency) * frequency;
+
 			this._frequency = frequency;
 
 			for (let j = 0, length = this.dataItems.length; j < length; j++) {
@@ -233,8 +235,6 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			while (value <= selectionMax) {
 				let index = this.valueToIndex(value);
 				let realValue = this._dates[index];
-
-
 
 				if(realValue < value){
 					for(let i = index, len = this._dates.length; i < len; i++){

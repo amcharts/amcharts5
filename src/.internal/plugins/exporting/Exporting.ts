@@ -424,7 +424,7 @@ export type pageSizes = "4A0" | "2A0" | "A0" | "A1" | "A2" | "A3" | "A4" | "A5" 
 	"SRA0" | "SRA1" | "SRA2" | "SRA3" | "SRA4" |
 	"EXECUTIVE" | "FOLIO" | "LEGAL" | "LETTER" | "TABLOID";
 
-export interface IExportingPDFOptions extends IExportingFormatOptions {
+export interface IExportingPDFOptions extends IExportingImageOptions {
 
 	/**
 	 * Include data into PDF
@@ -1481,6 +1481,7 @@ export class Exporting extends Entity {
 
 		const options: any = this._getFormatOptions("pdf", customOptions);
 		const dataOptions: any = this._getFormatOptions("pdfdata", customOptions);
+		const orientation: "landscape" | "portrait" = options.pageOrientation || "portrait";
 
 		// Get image
 		let image: string;
@@ -1497,7 +1498,7 @@ export class Exporting extends Entity {
 		// Init content for PDF
 		let doc = {
 			pageSize: options.pageSize || "A4",
-			pageOrientation: options.pageOrientation || "portrait",
+			pageOrientation: orientation,
 			pageMargins: options.pageMargins || defaultMargins,
 			defaultStyle: {
 				font: options.font ? options.font.name : undefined
@@ -1540,7 +1541,7 @@ export class Exporting extends Entity {
 			doc.content.push({
 				image: image!,
 				alignment: options.align || "left",
-				fit: this.getPageSizeFit(doc.pageSize, doc.pageMargins, extraMargin)
+				fit: this.getPageSizeFit(doc.pageSize, doc.pageMargins, extraMargin, orientation)
 			});
 		}
 
@@ -1740,7 +1741,7 @@ export class Exporting extends Entity {
 	/**
 	 * @ignore
 	 */
-	public getPageSizeFit(pageSize: pageSizes, margins: number | number[], extraMargin: number = 0): number[] {
+	public getPageSizeFit(pageSize: pageSizes, margins: number | number[], extraMargin: number = 0, orientation: "landscape" | "portrait" = "portrait"): number[] {
 
 		// Check margins
 		let newMargins = [0, 0, 0, 0];
@@ -1809,7 +1810,10 @@ export class Exporting extends Entity {
 		};
 
 		// Calculate size
-		let fitSize = sizes[pageSize]
+		let fitSize = sizes[pageSize];
+		if (orientation == "landscape") {
+			fitSize.reverse();
+		}
 		fitSize[0] -= newMargins[0] + newMargins[2];
 		fitSize[1] -= newMargins[1] + newMargins[3] + extraMargin;
 		return fitSize;

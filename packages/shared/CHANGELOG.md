@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.10] - 2022-06-28
+
+### Added
+- `lineJoin` setting added to `Graphics` (default: `"miter"`). Possible values: `"miter"`, `"round"`, and `"bevel"`. [More info](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineJoin).
+
+### Fixed
+- `GaplessDateAxis` with one data item was not showing date label at all.
+- Setting `colors` on a `ColorSet` will now properly reset all iterators, so that new color generation is consistent.
+- If `data.setAll()` was called on a `MapSeries` with `geoJSON` set previously, objects from geoJSON would disappear.
+- `PieSeries` was not keeping active slice pulled out when it was hidden and then shown up again.
+- PDF export was not taking page orientation into account when auto-fitting an image.
+
+
 ## [5.2.9] - 2022-06-21
 
 ### Added
@@ -249,7 +262,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - Grouping to periods where `timeUnit` was `"day"` and `count > 1` was not working properly.
 - When tooltips of multiple series were pointing at the same point, series order was not being respected (FF only).
 - If a scrollbar was added before axes, scrolling series could result series to be out of sync with bullets.
-- Tweaked `nb_NO` locale to better correspond to Norwegian Bokmål date formats.
+- Tweaked `nb_NO` locale to better correspond to Norwegian Bokm? date formats.
 
 
 ## [5.1.6] - 2022-02-23

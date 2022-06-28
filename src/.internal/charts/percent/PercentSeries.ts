@@ -397,6 +397,10 @@ export abstract class PercentSeries extends Series {
 			promises.push(slice.show(duration));
 		}
 
+		if(slice.get("active")){
+			slice.states.applyAnimate("active");
+		}
+
 		await Promise.all(promises);
 	}
 

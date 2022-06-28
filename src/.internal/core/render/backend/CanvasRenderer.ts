@@ -665,7 +665,7 @@ class EndStroke extends Op {
  * @ignore
  */
 class LineStyle extends Op {
-	constructor(public width: number, public color: string | CanvasGradient | CanvasPattern) { super(); }
+	constructor(public width: number, public color: string | CanvasGradient | CanvasPattern, public lineJoin?: "miter" | "round" | "bevel") { super(); }
 
 	public colorize(context: CanvasRenderingContext2D, forceColor: string | undefined): void {
 		if (forceColor !== undefined) {
@@ -676,6 +676,9 @@ class LineStyle extends Op {
 		}
 
 		context.lineWidth = this.width;
+		if(this.lineJoin){
+			context.lineJoin = this.lineJoin;
+		}
 	}
 }
 
@@ -987,16 +990,16 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		this._pushOp(new EndStroke());
 	}
 
-	lineStyle(width: number = 0, color?: Color | CanvasGradient | CanvasPattern, alpha: number = 1): void {
+	lineStyle(width: number = 0, color?: Color | CanvasGradient | CanvasPattern, alpha: number = 1, lineJoin?: "miter" | "round" | "bevel"): void {
 		this._strokeAlpha = alpha;
 		if (color) {
 			if (color instanceof Color) {
-				this._pushOp(new LineStyle(width, color.toCSS(alpha)));
+				this._pushOp(new LineStyle(width, color.toCSS(alpha), lineJoin));
 			} else {
-				this._pushOp(new LineStyle(width, color));
+				this._pushOp(new LineStyle(width, color, lineJoin));
 			}
 		} else {
-			this._pushOp(new LineStyle(width, "rgba(0, 0, 0, " + alpha + ")"));
+			this._pushOp(new LineStyle(width, "rgba(0, 0, 0, " + alpha + ")", lineJoin));
 		}
 	}
 

@@ -1,7 +1,7 @@
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import type { IPoint } from "../../core/util/IPoint";
 
-export interface IMapLineSettings extends IGraphicsSettings {
+export interface IFunnelSliceSettings extends IGraphicsSettings {
 
 	/**
 	 * Top width in pixels.
@@ -27,15 +27,15 @@ export interface IMapLineSettings extends IGraphicsSettings {
 
 }
 
-export interface IMapLinePrivate extends IGraphicsPrivate {
+export interface IFunnelSlicePrivate extends IGraphicsPrivate {
 }
 
 /**
  * Draws a slice for [[FunnelSeries]].
  */
 export class FunnelSlice extends Graphics {
-	declare public _settings: IMapLineSettings;
-	declare public _privateSettings: IMapLinePrivate;
+	declare public _settings: IFunnelSliceSettings;
+	declare public _privateSettings: IFunnelSlicePrivate;
 
 	public static className: string = "FunnelSlice";
 	public static classNames: Array<string> = Graphics.classNames.concat([FunnelSlice.className]);
