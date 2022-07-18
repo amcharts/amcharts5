@@ -3,6 +3,7 @@ import type { Layout } from "./Layout";
 import type { IContainer } from "./backend/Renderer";
 import type { IBounds } from "../util/IBounds";
 import type { Scrollbar } from "./Scrollbar";
+import type { DataItem, IComponentDataItem } from "./Component";
 
 import { Children } from "../util/Children";
 import { Percent } from "../util/Percent";
@@ -11,6 +12,8 @@ import { Rectangle } from "./Rectangle";
 import { HorizontalLayout } from "./HorizontalLayout";
 import { VerticalLayout } from "./VerticalLayout";
 import { GridLayout } from "./GridLayout";
+import { populateString } from "../util/PopulateString";
+import type { IDisposer } from "../util/Disposer";
 
 import * as $array from "../util/Array";
 import * as $type from "../util/Type";
@@ -94,12 +97,18 @@ export interface IContainerSettings extends ISpriteSettings {
 	 */
 	reverseChildren?: boolean;
 
+	html?: string;
+
 }
 
 export interface IContainerEvents extends ISpriteEvents {
 }
 
 export interface IContainerPrivate extends ISpritePrivate {
+	/**
+	 * @todo review
+	 */
+	htmlElement?: HTMLDivElement;
 }
 
 export interface IContainerEvents extends ISpriteEvents {
@@ -143,6 +152,9 @@ export class Container extends Sprite {
 	protected _contentHeight: number = 0;
 
 	protected _contentMask: Rectangle | undefined;
+
+	protected _vsbd0: IDisposer | undefined;
+	protected _vsbd1: IDisposer | undefined;
 
 	protected _afterNew() {
 		super._afterNew();
@@ -204,6 +216,16 @@ export class Container extends Sprite {
 					childrenDisplay.mask = null;
 					contentMask.dispose();
 				}
+			}
+		}
+
+		if (this.isDirty("html")) {
+			const html = this.get("html");
+			if (html && html !== "") {
+				this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
+			}
+			else {
+				this._root._removeHTMLContent(this);
 			}
 		}
 	}
@@ -532,7 +554,7 @@ export class Container extends Sprite {
 					}));
 				}
 
-				this._disposers.push(this.events.on("wheel", (event) => {
+				this._vsbd0 = this.events.on("wheel", (event) => {
 					const wheelEvent = event.originalEvent;
 
 					// Ignore wheel event if it is happening on a non-chart element, e.g. if
@@ -551,9 +573,11 @@ export class Container extends Sprite {
 						verticalScrollbar.set("start", start + shiftY);
 						verticalScrollbar.set("end", end + shiftY);
 					}
-				}))
+				})
 
-				this._disposers.push(verticalScrollbar.events.on("rangechanged", () => {
+				this._disposers.push(this._vsbd0);
+
+				this._vsbd1 = verticalScrollbar.events.on("rangechanged", () => {
 					let h = this._contentHeight;
 					const childrenDisplay = this._childrenDisplay;
 					const contentMask = this._contentMask;
@@ -565,9 +589,26 @@ export class Container extends Sprite {
 						contentMask._display.y = -childrenDisplay.y;
 						childrenDisplay.mask = contentMask._display;
 					}
-				}))
+				})
+
+				this._disposers.push(this._vsbd1);
 
 				this._display.addChild(verticalScrollbar._display);
+			}
+			else {
+				const previous = this._prevSettings.verticalScrollbar
+				if (previous) {
+					this._display.removeChild(previous._display);
+					if (this._vsbd0) {
+						this._vsbd0.dispose();
+					}
+					if (this._vsbd1) {
+						this._vsbd1.dispose();
+					}
+
+					this.set("maskContent", false);
+					this.set("paddingRight", undefined);					
+				}
 			}
 		}
 
@@ -659,5 +700,14 @@ export class Container extends Sprite {
 		});
 
 		return output;
+	}
+
+	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
+		const updated = (dataItem !== this._dataItem);
+		super._setDataItem(dataItem);
+		const html = this.get("html", "");
+		if (html && html !== "" && updated) {
+			this._root._setHTMLContent(this, populateString(this, html));
+		}
 	}
 }

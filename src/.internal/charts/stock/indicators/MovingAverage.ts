@@ -18,7 +18,7 @@ export interface IMovingAverageSettings extends IIndicatorSettings {
 	/**
 	 * Offset.
 	 * 
-	 * @defaul 0
+	 * @default 0
 	 */
 	offset?: number;
 

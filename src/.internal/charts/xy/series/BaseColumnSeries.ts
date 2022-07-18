@@ -266,7 +266,6 @@ export abstract class BaseColumnSeries extends XYSeries {
 						break;
 					}
 				}
-
 				for (let i = startIndex; i <= endIndex; i++) {
 					let dataItem = this.dataItems[i];
 					this._updateGraphics(dataItem, previous);
@@ -468,7 +467,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 			this._updateSeriesGraphics(dataItem, graphics!, l, r, t, b, fitW, fitH);
 
-			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b < yStart) || (t > yEnd && b > yEnd)) {
+			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b < yStart) || (t > yEnd && b > yEnd) || $type.isNaN(l) || $type.isNaN(t)) {
 				this._toggleColumn(dataItem, false);
 			}
 			else {

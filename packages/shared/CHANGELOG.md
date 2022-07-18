@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.11] - 2022-07-18
+
+### Added
+- A new setting `deactivateRoot` (default: `true`) added to `Modal`. Indicates if any interactivity on the underlying chart should be disabled when modal is open.
+- A new setting `html` added to `Container`. Set it to a string with HTML to be used as container's content. Will work on any element inheriting from `Container`, e.g. `Label`. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/).
+- A new setting `labelHTML` added to `Tooltip`. If set, will ne used as HTML content for the tooltip. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/).
+- A new setting `tooltipHTML` added to `Sprite`. If set, will ne used as HTML content for the tooltip when element is hovered. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/).
+- `wheelZoomPositionX` and `wheelZoomPositionY` added to `XYChart`. This value is not set by default, but you can use it to fix wheel zooming, to the end (if you set it to 1) or to the start (0) or middle (0.5). In `StockChart`, it is set to 1 by default, as this is common practice in financial charts.
+- "Volume-Weighted Average Price (VWAP)" indicator added to `StockChart`.
+
+### Changed
+- Setting `id` setting when creating an object will not register it in `am5.registry.entitiesById` immediatelly, without waiting for the next frame.
+
+### Fixed
+- `RadialGradient`'s `x` and `y` settings were being ignored.
+- Labels as bullets with `oversizedBehavior` set were not being displayed properly in some cases.
+- `DateAxis` with `startLocation = 0.5` and `endLocation = 0.5` and single value only was showing a really big date range.
+- Resizing `PieChart` to a very small size with a legend positioned on the left or right could cause some anomaly in layout.
+- Updating `CategoryAxis` data with less items than there was originally was causing old columns/bullets to be shown.
+- Setting `verticalScrollbar` on `Container` to `undefined` to remove a previously set scrollbar was not working.
+
+
 ## [5.2.10] - 2022-06-28
 
 ### Added

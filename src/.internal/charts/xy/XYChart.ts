@@ -148,6 +148,24 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 */
 	pinchZoomY?: boolean;
 
+	/**
+	 * If set, will use this relative position as a "center" for mouse wheel
+	 * horizontal zooming instead of actual cursor position.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
+	 * @since 5.2.11
+	 */
+	wheelZoomPositionX?: number;
+
+	/**
+	 * If set, will use this relative position as a "center" for mouse wheel
+	 * vertical zooming instead of actual cursor position.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
+	 * @since 5.2.11
+	 */
+	wheelZoomPositionY?: number;
+
 }
 
 export interface IXYChartPrivate extends ISerialChartPrivate {
@@ -468,6 +486,9 @@ export class XYChart extends SerialChart {
 		const shiftY = wheelEvent.deltaY / 100;
 		const shiftX = wheelEvent.deltaX / 100;
 
+		const wheelZoomPositionX = this.get("wheelZoomPositionX");
+		const wheelZoomPositionY = this.get("wheelZoomPositionY");
+
 		if ((wheelX === "zoomX" || wheelX === "zoomXY") && shiftX != 0) {
 			this.xAxes.each((axis) => {
 				if (axis.get("zoomX")) {
@@ -475,6 +496,10 @@ export class XYChart extends SerialChart {
 					let end = axis.get("end")!;
 
 					let position = axis.fixPosition(plotPoint.x / plotContainer.width());
+
+					if (wheelZoomPositionX != null) {
+						position = wheelZoomPositionX;
+					}
 
 					let newStart = start - wheelStep * (end - start) * shiftX * position;
 					let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
@@ -492,6 +517,10 @@ export class XYChart extends SerialChart {
 					let end = axis.get("end")!;
 
 					let position = axis.fixPosition(plotPoint.x / plotContainer.width());
+
+					if (wheelZoomPositionX != null) {
+						position = wheelZoomPositionX;
+					}
 
 					let newStart = start - wheelStep * (end - start) * shiftY * position;
 					let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);
@@ -512,6 +541,10 @@ export class XYChart extends SerialChart {
 
 					let position = axis.fixPosition(plotPoint.y / plotContainer.height());
 
+					if (wheelZoomPositionY != null) {
+						position = wheelZoomPositionY;
+					}
+
 					let newStart = start - wheelStep * (end - start) * shiftX * position;
 					let newEnd = end + wheelStep * (end - start) * shiftX * (1 - position);
 
@@ -529,6 +562,10 @@ export class XYChart extends SerialChart {
 					let end = axis.get("end")!;
 
 					let position = axis.fixPosition(plotPoint.y / plotContainer.height());
+
+					if (wheelZoomPositionY != null) {
+						position = wheelZoomPositionY;
+					}
 
 					let newStart = start - wheelStep * (end - start) * shiftY * position;
 					let newEnd = end + wheelStep * (end - start) * shiftY * (1 - position);

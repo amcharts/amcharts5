@@ -331,6 +331,13 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	tooltipText?: string;
 
 	/**
+	 * HTML content to show in a tooltip when hovered.
+	 *
+	 * @since 5.2.11
+	 */
+	tooltipHTML?: string;
+
+	/**
 	 * Tooltip pointer X coordinate relative to the element itself.
 	 */
 	tooltipX?: number | Percent;
@@ -548,6 +555,15 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 */
 	maxHeight?: number | null;
 
+	/**
+	 * @ignore
+	 */
+	minWidth?: number | null;
+
+	/**
+	 * @ignore
+	 */
+	minHeight?: number | null;
 }
 
 /**
@@ -1035,18 +1051,22 @@ export abstract class Sprite extends Entity {
 			display.cancelTouch = draggable ? true : false;
 		}
 
-		if (this.isDirty("tooltipText")) {
+		if (this.isDirty("tooltipText") || this.isDirty("tooltipHTML")) {
 			const tooltipText = this.get("tooltipText");
-			if (tooltipText) {
-				this._tooltipDp = new MultiDisposer([
-					events.on("pointerover", () => {
-						this.showTooltip();
-					}),
-					events.on("pointerout", () => {
-						if (this.get("showTooltipOn") != "always") {
-							this.hideTooltip();
-						}
-					})])
+			const tooltipHTML = this.get("tooltipHTML");
+			if (tooltipText || tooltipHTML) {
+				if (!this._tooltipDp) {
+					this._tooltipDp = new MultiDisposer([
+						events.on("pointerover", () => {
+							this.showTooltip();
+						}),
+						events.on("pointerout", () => {
+							if (this.get("showTooltipOn") != "always") {
+								this.hideTooltip();
+							}
+						})
+					]);
+				}
 			}
 			else {
 				if (this._tooltipDp) {
@@ -1123,7 +1143,7 @@ export abstract class Sprite extends Entity {
 			this._sizeDirty = true;
 		}
 
-		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight") || this.isPrivateDirty("maxWidth") || this.isPrivateDirty("maxHeight")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight") || this.isPrivateDirty("maxWidth") || this.isPrivateDirty("maxHeight") || this.isPrivateDirty("minWidth") || this.isPrivateDirty("minHeight")) {
 			this.markDirtyBounds();
 			this._sizeDirty = true;
 		}
@@ -1209,7 +1229,7 @@ export abstract class Sprite extends Entity {
 							if (!this.getPrivate("touchHovering")) {
 								this.setTimeout(() => {
 									this._handleOver();
-									if (this.get("tooltipText")) {
+									if (this.get("tooltipText") || this.get("tooltipHTML")) {
 										this.showTooltip();
 									}
 									this.setPrivateRaw("touchHovering", true);
@@ -1229,7 +1249,7 @@ export abstract class Sprite extends Entity {
 						if ($utils.isTouchEvent(ev.originalEvent)) {
 							if (this.getPrivate("touchHovering")) {
 								this._handleOut();
-								if (this.get("tooltipText")) {
+								if (this.get("tooltipText") || this.get("tooltipHTML")) {
 									this.hideTooltip();
 								}
 							}
@@ -1632,8 +1652,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	public _fixMinBounds(bounds: IBounds) {
-		let minWidth = this.get("minWidth");
-		let minHeight = this.get("minHeight");
+		let minWidth = this.get("minWidth", this.getPrivate("minWidth"));
+		let minHeight = this.get("minHeight", this.getPrivate("minHeight"));
 
 		if ($type.isNumber(minWidth)) {
 			if (bounds.right - bounds.left < minWidth) {
@@ -1695,8 +1715,9 @@ export abstract class Sprite extends Entity {
 	public showTooltip(point?: IPoint): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
 		const tooltipText = this.get("tooltipText");
+		const tooltipHTML = this.get("tooltipHTML");
 
-		if (tooltipText && tooltip) {
+		if ((tooltipText || tooltipHTML) && tooltip) {
 			const tooltipPosition = this.get("tooltipPosition");
 			const tooltipTarget = this.getPrivate("tooltipTarget", this);
 
@@ -1715,7 +1736,12 @@ export abstract class Sprite extends Entity {
 				tooltip.set("y", point.y);
 			}
 
-			tooltip.label.set("text", tooltipText);
+			if (tooltipText) {
+				tooltip.label.set("text", tooltipText);
+			}
+			if (tooltipHTML) {
+				tooltip.label.set("html", tooltipHTML);
+			}
 			const dataItem = this.dataItem;
 			if (dataItem) {
 				tooltip.label._setDataItem(dataItem);
@@ -2187,6 +2213,17 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
+	 * Returns an actual opacity of the element, taking into account all parents.
+	 * 
+	 * @return Opacity
+	 * @since 5.2.11
+	 */
+	public compositeOpacity(): number {
+		const opacity = this.get("opacity", 1);
+		return this._parent ? (this._parent.compositeOpacity() * opacity) : opacity;
+	}
+
+	/**
 	 * Returns width of this element in pixels.
 	 *
 	 * @return Width (px)
@@ -2194,7 +2231,7 @@ export abstract class Sprite extends Entity {
 	public width(): number {
 		let width = this.get("width");
 		let maxWidth = this.get("maxWidth", this.getPrivate("maxWidth"));
-		let minWidth = this.get("minWidth");
+		let minWidth = this.get("minWidth", this.getPrivate("minWidth"));
 		let privateWidth = this.getPrivate("width");
 		let w = 0;
 
@@ -2287,7 +2324,7 @@ export abstract class Sprite extends Entity {
 	public height(): number {
 		let height = this.get("height");
 		let maxHeight = this.get("maxHeight", this.getPrivate("maxHeight"));
-		let minHeight = this.get("minHeight");
+		let minHeight = this.get("minHeight", this.getPrivate("minHeight"));
 		let privateHeight = this.getPrivate("height");
 		let h = 0;
 

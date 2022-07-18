@@ -1175,16 +1175,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this._deltaMinMax = (max - min) / 2;
 			}
 			else {
-				// the number by which we need to raise 10 to get difference
-				let exponent: number = Math.log(Math.abs(max)) * Math.LOG10E;
-
-				// here we find a number which is power of 10 and has the same count of numbers as difference has
-				let power = Math.pow(10, Math.floor(exponent));
-
-				// reduce this number by 10 times
-				power = power / 10;
-
-				this._deltaMinMax = power;
+				this._getDelta(max);
 			}
 
 			min -= this._deltaMinMax;
@@ -1306,6 +1297,19 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this.animatePrivate({ key: "max", to: max, duration, easing });
 			}
 		}
+	}
+
+	protected _getDelta(max:number){
+		// the number by which we need to raise 10 to get difference
+		let exponent: number = Math.log(Math.abs(max)) * Math.LOG10E;
+
+		// here we find a number which is power of 10 and has the same count of numbers as difference has
+		let power = Math.pow(10, Math.floor(exponent));
+
+		// reduce this number by 10 times
+		power = power / 10;
+
+		this._deltaMinMax = power;		
 	}
 
 	protected _saveMinMax(_min:number, _max:number){

@@ -93,7 +93,13 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * An array of other [[XYCursor]] objects to sync this cursor with.
 	 *
 	 * If set will automatically move synced cursors to the same position within
-	 * their respective axes as the this cursor.
+	 * their respective axes as the this cursor assumin same XY coordinates of
+	 * the pointer.
+	 *
+	 * NOTE: Syncing is performed using actual X/Y coordinates of the point of
+	 * mouse cursor's position or touch. It means that they will not sync by axis
+	 * positions, but rather by screen coordinates. For example vertical lines
+	 * will not sync across horizontally laid out charts, and vice versa.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors} for more info
 	 * @since 5.1.4
@@ -503,12 +509,12 @@ export class XYCursor extends Container {
 	protected _handleMove(event: IPointerEvent) {
 		if (this.getPrivate("visible")) {
 			const chart = this.chart;
-			if(chart && $object.keys(chart.plotContainer._downPoints).length > 1){
+			if (chart && $object.keys(chart.plotContainer._downPoints).length > 1) {
 				this.set("forceHidden", true)
 				return;
 			}
-			else{
-this.set("forceHidden", false)
+			else {
+				this.set("forceHidden", false)
 			}
 
 			// TODO: handle multitouch

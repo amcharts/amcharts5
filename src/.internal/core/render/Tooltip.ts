@@ -26,6 +26,13 @@ export interface ITooltipSettings extends IContainerSettings {
 	labelText?: string
 
 	/**
+	 * HTML content to use for tooltip's label.
+	 *
+	 * @since 5.2.11
+	 */
+	labelHTML?: string
+
+	/**
 	 * A direction of the tooltip pointer.
 	 *
 	 * https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Orientation
@@ -175,6 +182,10 @@ export class Tooltip extends Container {
 		const labelText = this.get("labelText");
 		if (labelText != null) {
 			this.label.set("text", this.get("labelText"));
+		}
+		const labelHTML = this.get("labelHTML");
+		if (labelHTML != null) {
+			this.label.set("html", this.get("labelHTML"));
 		}
 	}
 

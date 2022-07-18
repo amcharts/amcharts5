@@ -32,7 +32,7 @@ export class HorizontalLayout extends Layout {
 						totalPercent += childWidth.value;
 
 						let w = availableWidth * childWidth.value;
-						let minWidth = child.get("minWidth", -Infinity);
+						let minWidth = child.get("minWidth", child.getPrivate("minWidth", -Infinity));
 						if (minWidth > w) {
 							availableWidth -= minWidth;
 							totalPercent -= childWidth.value;
@@ -53,14 +53,18 @@ export class HorizontalLayout extends Layout {
 			}
 		});
 
-		if (availableWidth > 0) {
+		if(availableWidth < 0){
+			availableWidth = 0.01;
+		}
+
+		//if (availableWidth > 0) {
 			eachChildren(container, (child) => {
 				if (child.isVisible()) {
 					if (child.get("position") == "relative") {
 						let childWidth = child.get("width");
 						if (childWidth instanceof Percent) {
 							let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
-							let minWidth = child.get("minWidth", -Infinity);
+							let minWidth = child.get("minWidth", child.getPrivate("minWidth", -Infinity));
 							let maxWidth = child.get("maxWidth", child.getPrivate("maxWidth", Infinity));
 							privateWidth = Math.min(Math.max(minWidth, privateWidth), maxWidth);
 
@@ -69,7 +73,7 @@ export class HorizontalLayout extends Layout {
 					}
 				}
 			});
-		}
+		//}
 
 		let prevX = paddingLeft;
 

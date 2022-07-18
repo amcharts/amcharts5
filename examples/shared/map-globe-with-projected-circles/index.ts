@@ -219,7 +219,7 @@ const data = [
   { "id": "TG", "name": "Togo", "value": 6154813, polygonTemplate: { fill: colors.getIndex(2) } },
   { "id": "TT", "name": "Trinidad and Tobago", "value": 1346350, polygonTemplate: { fill: colors.getIndex(4) } },
   { "id": "TN", "name": "Tunisia", "value": 10594057, polygonTemplate: { fill: colors.getIndex(2) } },
-  { "id": "TR", "name": "Turkey", "value": 73639596, polygonTemplate: { fill: colors.getIndex(8) } },
+  { "id": "TR", "name": "Türkiye", "value": 73639596, polygonTemplate: { fill: colors.getIndex(8) } },
   { "id": "TM", "name": "Turkmenistan", "value": 5105301, polygonTemplate: { fill: colors.getIndex(0) } },
   { "id": "UG", "name": "Uganda", "value": 34509205, polygonTemplate: { fill: colors.getIndex(2) } },
   { "id": "UA", "name": "Ukraine", "value": 45190180, polygonTemplate: { fill: colors.getIndex(8) } },

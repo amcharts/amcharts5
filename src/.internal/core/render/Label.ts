@@ -275,7 +275,15 @@ export class Label extends Container {
 			if (propValue != undefined) {
 				this._text.set(property as any, propValue);
 			}
-		})
+		});
+
+		this.onPrivate("maxWidth", () => {
+			this._setMaxDimentions();
+		});
+
+		this.onPrivate("maxHeight", () => {
+			this._setMaxDimentions();
+		});
 	}
 
 	public _makeText() {
@@ -289,11 +297,11 @@ export class Label extends Container {
 			this._text.set(property as any, this.get(property as any));
 		})
 
-		if (this.isDirty("maxWidth") || this.isPrivateDirty("maxWidth")) {
+		if (this.isDirty("maxWidth")) {
 			this._setMaxDimentions();
 		}
 
-		if (this.isDirty("maxHeight") || this.isPrivateDirty("maxHeight")) {
+		if (this.isDirty("maxHeight")) {
 			this._setMaxDimentions();
 		}
 

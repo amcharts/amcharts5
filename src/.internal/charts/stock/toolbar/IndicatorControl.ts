@@ -19,6 +19,7 @@ import { RelativeStrengthIndex } from "../indicators/RelativeStrengthIndex";
 import { StochasticOscillator } from "../indicators/StochasticOscillator";
 import { WilliamsR } from "../indicators/WilliamsR";
 import { Volume } from "../indicators/Volume";
+import { VWAP } from "../indicators/VWAP";
 
 
 //import type { IDisposer } from "../../../core/util/Disposer";
@@ -28,7 +29,7 @@ import { StockIcons } from "./StockIcons";
 
 import * as $array from "../../../core/util/Array";
 
-export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Stochastic Oscillator" | "Volume" | "Williams R";
+export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Stochastic Oscillator" | "Volume" | "VWAP" | "Williams R";
 
 export interface IIndicatorControlSettings extends IStockControlSettings {
 	indicators?: Indicators[];
@@ -247,9 +248,17 @@ export class IndicatorControl extends StockControl {
 				indicator = Volume.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
-					volumeSeries: volumeSeries,
+					volumeSeries: volumeSeries
 				});
 				break;
+			case "VWAP":
+				indicator = VWAP.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					volumeSeries: volumeSeries,
+					legend:legend
+				});
+				break;				
 		}
 
 		if (indicator) {

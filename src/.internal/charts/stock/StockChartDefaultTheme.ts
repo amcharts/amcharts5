@@ -53,7 +53,8 @@ export class StockChartDefaultTheme extends Theme {
 			paddingRight: 0,
 			paddingBottom: 0,
 			paddingTop: 15,
-			minHeight: 80
+			minHeight: 80,
+			wheelZoomPositionX: 1
 		});
 
 		r("XYChart", ["stock", "scrollbar"]).setAll({
@@ -808,6 +809,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period},{field},{shiftType},{shift},{type})"
 		})
 
+		r("LineSeries", ["vwap"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName} ({period},{field})"
+		})		
+
 		r("LineSeries", ["accumulationdistribution"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({useVolume})"
@@ -962,6 +968,15 @@ export class StockChartDefaultTheme extends Theme {
 			type: "simple",
 			field: "close",
 			period: 20
+		})
+
+
+		r("VWAP").setAll({
+			name: "Volume-Weighted Average Price",
+			shortName: "VWAP",
+			seriesColor: color(0xab82da),
+			field: "hlc/3",
+			period: 30
 		})
 
 		r("AccumulationDistribution").setAll({
@@ -1119,7 +1134,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("IndicatorControl").setAll({
 			name: l.translateAny("Indicators"),
-			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Stochastic Oscillator", "Volume", "Williams R"]
+			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Stochastic Oscillator", "Volume", "VWAP", "Williams R"]
 		});
 
 		r("ComparisonControl").setAll({

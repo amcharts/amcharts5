@@ -1486,7 +1486,7 @@ series.data.setAll([
     "value": 10704948
   },
   {
-    "title": "Turkey",
+    "title": "Türkiye",
     "id": "TR",
     "color": "#d8854f",
     "continent": "europe",

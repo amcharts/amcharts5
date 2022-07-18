@@ -160,7 +160,21 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 
 
 export interface IModalSettings extends IEntitySettings {
+
+	/**
+	 * HTML content of the modal.
+	 */
 	content?: string;
+
+	/**
+	 * When modal is open, all interactions for the underlying chart will be
+	 * disabled.
+	 *
+	 * @default true
+	 * @since 5.2.11
+	 */
+	deactivateRoot?: boolean;
+
 }
 
 export interface IModalPrivate extends IEntityPrivate {
@@ -178,6 +192,8 @@ export interface IModalEvents extends IEntityEvents {
 
 /**
  * Used to display a modal dialog with HTML content.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/modal-popups/} for more info
  */
 export class Modal extends Entity {
 	public static className: string = "Modal";
@@ -192,6 +208,9 @@ export class Modal extends Entity {
 	protected _afterNew() {
 		// Applying themes because this will not have parents
 		super._afterNewApplyThemes();
+
+		// Defaults
+		this._setRawDefault("deactivateRoot", true);
 
 		// Load CSS
 		modalCSS($utils.getShadowRoot(this._root.dom), this._root);
@@ -259,6 +278,9 @@ export class Modal extends Entity {
 	 */
 	public open(): void {
 		this.getPrivate("container").style.display = "block";
+		if (this.get("deactivateRoot")) {
+			this._root._renderer.interactionsEnabled = false;
+		}
 		this.events.dispatch("opened", {
 			type: "opened",
 			target: this
@@ -270,6 +292,9 @@ export class Modal extends Entity {
 	 */
 	public close(): void {
 		this.getPrivate("container").style.display = "none";
+		if (this.get("deactivateRoot")) {
+			this._root._renderer.interactionsEnabled = true;
+		}
 		this.events.dispatch("closed", {
 			type: "closed",
 			target: this
@@ -281,6 +306,9 @@ export class Modal extends Entity {
 	 */
 	public cancel(): void {
 		this.getPrivate("container").style.display = "none";
+		if (this.get("deactivateRoot")) {
+			this._root._renderer.interactionsEnabled = true;
+		}
 		this.events.dispatch("cancelled", {
 			type: "cancelled",
 			target: this

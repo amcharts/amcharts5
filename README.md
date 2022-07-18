@@ -1,4 +1,4 @@
-## amCharts 5 source dode
+## amCharts 5 source code
 
 This repository is for amCharts 5 source code. For compiled options, look
 further down this page.

@@ -276,6 +276,9 @@ export class Root implements IDisposer {
 
 	public _tooltips: Array<Tooltip> = [];
 
+	protected _htmlElementContainer: HTMLDivElement | undefined;
+	protected _htmlEnabledContainers: Container[] = [];
+
 	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
 		if (!isReal) {
@@ -459,6 +462,11 @@ export class Root implements IDisposer {
 		//document.body.appendChild((<any>renderer)._ghostView);
 
 		this._initResizeSensor();
+
+		// HTML content holder
+		this._htmlElementContainer = document.createElement("div");
+		this._htmlElementContainer.style.overflow = "hidden";
+		this._inner.appendChild(this._htmlElementContainer);
 
 		// Create element which is used to make announcements to screen reader
 		const readerAlertElement = document.createElement("div");
@@ -682,8 +690,11 @@ export class Root implements IDisposer {
 		const w = dom.clientWidth;
 		const h = dom.clientHeight;
 		if (w > 0 && h > 0) {
-			const focusElementContainer = this._focusElementContainer!;
+			const htmlElementContainer = this._htmlElementContainer!;
+			htmlElementContainer.style.width = w + "px";
+			htmlElementContainer.style.height = h + "px";
 
+			const focusElementContainer = this._focusElementContainer!;
 			focusElementContainer.style.width = w + "px";
 			focusElementContainer.style.height = h + "px";
 
@@ -824,6 +835,7 @@ export class Root implements IDisposer {
 		this._runAnimations(currentTime);
 		this._runDirties();
 		this._render();
+		this._positionHTMLElements();
 
 		if (this.events.isEnabled("frameended")) {
 			this.events.dispatch("frameended", {
@@ -832,6 +844,7 @@ export class Root implements IDisposer {
 				timestamp: currentTime,
 			});
 		}
+
 
 		return this._tickers.length === 0 &&
 			this._animations.length === 0 &&
@@ -857,7 +870,7 @@ export class Root implements IDisposer {
 
 	public _runTickerNow() {
 		if (!this.isDisposed()) {
-			for (;;) {
+			for (; ;) {
 				const currentTime = performance.now();
 
 				this.animationTime = currentTime;
@@ -1579,4 +1592,142 @@ export class Root implements IDisposer {
 		return this._renderer.tapToActivateTimeout;
 	}
 
+	public _makeHTMLElement(target: Container): HTMLDivElement {
+
+		// Get container
+		const container = this._htmlElementContainer!;
+
+		// Init
+		const htmlElement = document.createElement("div");
+		target.setPrivate("htmlElement", htmlElement);
+
+		//htmlElement.tabIndex = this.tabindex;
+		htmlElement.style.position = "absolute";
+		htmlElement.style.overflow = "auto";
+
+		// TODO: TMP
+		// htmlElement.style.width = "1px";
+		// htmlElement.style.height = "1px";
+		// htmlElement.style.background = "rgba(255, 0, 0, 0.1)";
+		// htmlElement.style.pointerEvents = "none";
+		// /TMP
+
+		this._positionHTMLElement(target);
+
+		//this._decoratehtmlElement(htmlElement, target);
+
+		// TODO: handle resize (e.g. when images are loaded)
+		// htmlElement.addEventListener("focus", (ev: FocusEvent) => {
+		// 	this._handleFocus(ev, index);
+		// });
+
+		container.append(htmlElement);
+
+		$array.pushOne(this._htmlEnabledContainers, target);
+
+		return htmlElement;
+	}
+
+	public _positionHTMLElements(): void {
+		$array.each(this._htmlEnabledContainers, (target) => {
+			this._positionHTMLElement(target);
+		});
+	}
+
+	public _positionHTMLElement(target: Container): void {
+		const htmlElement = target.getPrivate("htmlElement");
+		if (htmlElement) {
+
+			// Deal with opacity
+			htmlElement.style.opacity = target.compositeOpacity() + "";
+
+			// Hide or show
+			if (target.isVisibleDeep()) {
+				htmlElement.style.display = "block";
+			}
+			else {
+				htmlElement.style.display = "none";
+			}
+
+			// Deal with max dimensions
+			const maxWidth = target.maxWidth();
+			const maxHeight = target.maxHeight();
+			if (maxWidth) {
+				htmlElement.style.maxWidth = maxWidth + "px";
+			}
+			if (maxHeight) {
+				htmlElement.style.maxHeight = maxHeight + "px";
+			}
+
+			// Deal with min dimensions
+			const minWidth = target.get("minWidth");
+			const minHeight = target.get("minHeight");
+			if (minWidth) {
+				htmlElement.style.maxWidth = maxWidth + "px";
+			}
+			if (minHeight) {
+				htmlElement.style.minHeight = minHeight + "px";
+			}
+
+			// Deal with position
+			const bounds = target.globalBounds();
+			htmlElement.style.top = (bounds.top) + "px";
+			htmlElement.style.left = (bounds.left) + "px";
+
+			// Use width/height if those are set
+			const width = target.get("width");
+			const height = target.get("height");
+
+			let w: number = 0;
+			let h: number = 0;
+
+			if (width) {
+				w = target.width();
+			}
+
+			if (height) {
+				h = target.height();
+			}
+
+			if (!width || !height) {
+				htmlElement.style.width = "auto";
+				htmlElement.style.height = "auto";
+				const bbox = htmlElement.getBoundingClientRect();
+				w = bbox.width;
+				h = bbox.height;
+				target.setPrivate("minWidth", w);
+				target.setPrivate("minHeight", h);
+			}
+			else {
+				target.removePrivate("minWidth");
+				target.removePrivate("minHeight");
+			}
+
+			if (w > 0) {
+				htmlElement.style.minWidth = (w) + "px";
+			}
+			if (h > 0) {
+				htmlElement.style.minHeight = (h) + "px";
+			}
+
+		}
+	}
+
+	public _setHTMLContent(target: Container, html: string): void {
+		let htmlElement = target.getPrivate("htmlElement");
+		if (!htmlElement) {
+			htmlElement = this._makeHTMLElement(target);
+		}
+		if (htmlElement.innerHTML != html) {
+			htmlElement.innerHTML = html;
+		}
+	}
+
+	public _removeHTMLContent(target: Container): void {
+		let htmlElement = target.getPrivate("htmlElement");
+		if (htmlElement) {
+			this._htmlElementContainer!.removeChild(htmlElement);
+		}
+		$array.remove(this._htmlEnabledContainers, target);
+	}
 }

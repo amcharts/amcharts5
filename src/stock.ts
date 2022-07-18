@@ -7,6 +7,7 @@ export { SettingsModal, ISettingsModalEvents, ISettingsModalPrivate, ISettingsMo
 export { Indicator, IIndicatorEditableSetting, IIndicatorEvents, IIndicatorPrivate, IIndicatorSettings } from "./.internal/charts/stock/indicators/Indicator";
 export { ChartIndicator, IChartIndicatorEvents, IChartIndicatorPrivate, IChartIndicatorSettings } from "./.internal/charts/stock/indicators/ChartIndicator";
 export { MovingAverage, IMovingAverageEvents, IMovingAveragePrivate, IMovingAverageSettings } from "./.internal/charts/stock/indicators/MovingAverage";
+export { VWAP, IVWAPEvents, IVWAPPrivate, IVWAPSettings } from "./.internal/charts/stock/indicators/VWAP";
 export { MovingAverageEnvelope, IMovingAverageEnvelopeEvents, IMovingAverageEnvelopePrivate, IMovingAverageEnvelopeSettings } from "./.internal/charts/stock/indicators/MovingAverageEnvelope";
 export { MovingAverageDeviation, IMovingAverageDeviationEvents, IMovingAverageDeviationPrivate, IMovingAverageDeviationSettings } from "./.internal/charts/stock/indicators/MovingAverageDeviation";
 export { BollingerBands, IBollingerBandsEvents, IBollingerBandsPrivate, IBollingerBandsSettings } from "./.internal/charts/stock/indicators/BollingerBands";

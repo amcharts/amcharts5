@@ -176,7 +176,7 @@ export class PieSeries extends PercentSeries {
 					innerRadius = radius + innerRadius;
 				}
 
-				if (radius > 0) {
+				//if (radius > 0) {
 					$array.each(this._dataItems, (dataItem) => {
 
 						this.updateLegendValue(dataItem);
@@ -231,7 +231,7 @@ export class PieSeries extends PercentSeries {
 						currentAngle += currentArc;
 						this._updateTick(dataItem);
 					})
-				}
+				//}
 			}
 		}
 	}

@@ -189,6 +189,7 @@ import type { Venn } from "./../charts/venn/Venn";
 import type { VerticalLayout } from "./render/VerticalLayout";
 import type { VerticalLineSeries } from "./../charts/stock/drawing/VerticalLineSeries";
 import type { Volume } from "./../charts/stock/indicators/Volume";
+import type { VWAP } from "./../charts/stock/indicators/VWAP";
 import type { WilliamsR } from "./../charts/stock/indicators/WilliamsR";
 import type { WordCloud } from "./../charts/wordcloud/WordCloud";
 import type { XYChart } from "./../charts/xy/XYChart";
@@ -384,6 +385,7 @@ export interface IClasses {
 	"VerticalLayout": VerticalLayout;
 	"VerticalLineSeries": VerticalLineSeries;
 	"Volume": Volume;
+	"VWAP": VWAP;
 	"WilliamsR": WilliamsR;
 	"WordCloud": WordCloud;
 	"XYChart": XYChart;

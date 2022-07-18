@@ -673,6 +673,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._updateGhost();
 	}
 
+	protected _getDelta(){		
+		this._deltaMinMax = this.baseDuration() / 2;
+	}	
+
 	protected _fixMin(min: number) {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();

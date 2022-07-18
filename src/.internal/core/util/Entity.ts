@@ -950,6 +950,10 @@ export class Entity extends Settings implements IDisposer {
 		}
 		this._root = root;
 		this._internalTemplates = templates as Array<Template<this>>;
+
+		if (settings.id) {
+			this._registerId(settings.id);
+		}
 	}
 
 	/**
@@ -1562,10 +1566,7 @@ export class Entity extends Settings implements IDisposer {
 		if (this.isDirty("id")) {
 			const id = this.get("id")!;
 			if (id) {
-				if (registry.entitiesById[id]) {
-					throw new Error("An entity with id \"" + id + "\" already exists.");
-				}
-				registry.entitiesById[id] = this;
+				this._registerId(id);
 			}
 
 			const prevId = this._prevSettings.id;
@@ -1573,6 +1574,13 @@ export class Entity extends Settings implements IDisposer {
 				delete registry.entitiesById[prevId];
 			}
 		}
+	}
+
+	private _registerId(id: string): void {
+		if (registry.entitiesById[id] && registry.entitiesById[id] !== this) {
+			throw new Error("An entity with id \"" + id + "\" already exists.");
+		}
+		registry.entitiesById[id] = this;
 	}
 
 	public _afterChanged(): void { }

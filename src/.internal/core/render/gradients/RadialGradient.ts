@@ -7,6 +7,7 @@ import { Color } from "../../util/Color";
 
 import * as $array from "../../util/Array";
 import * as $type from "../../util/Type";
+import * as $utils from "../../util/Utils";
 
 
 export interface IRadialGradientSettings extends IGradientSettings {
@@ -70,6 +71,16 @@ export class RadialGradient extends Gradient {
 			radius = Math.min(width, height) / 2;
 			x = width / 2;
 			y = height / 2;
+		}
+
+		let ux = this.get("x");
+		let uy = this.get("y");
+		if (ux != null) {
+			x = $utils.relativeToValue(ux, width);
+		}
+
+		if (uy != null) {
+			y = $utils.relativeToValue(uy, height);
 		}
 
 		const gradient = this._root._renderer.createRadialGradient(x, y, 0, x, y, radius);

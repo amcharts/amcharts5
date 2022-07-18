@@ -733,6 +733,7 @@ export class LineSeries extends XYSeries {
 
 						if (sprite) {
 							sprite.set("tooltipText", undefined);
+							sprite.set("tooltipHTML", undefined);
 
 							marker.children.push(sprite);
 							sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });

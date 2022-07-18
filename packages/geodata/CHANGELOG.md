@@ -10,6 +10,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - New maps: Mauritius.
 
+### Changed
+- Renamed "Turkey" to "Türkiye" in all maps.
+
 
 ## [5.0.3] - 2022-03-31
 

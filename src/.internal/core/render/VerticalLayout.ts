@@ -31,7 +31,7 @@ export class VerticalLayout extends Layout {
 						totalPercent += childHeight.value;
 
 						let h = availableHeight * childHeight.value;
-						let minHeight = child.get("minHeight", -Infinity);
+						let minHeight = child.get("minHeight", child.getPrivate("minHeight", -Infinity));
 						if (minHeight > h) {
 							availableHeight -= minHeight;
 							totalPercent -= childHeight.value;
@@ -52,7 +52,12 @@ export class VerticalLayout extends Layout {
 				}
 			}
 		})
-		if (availableHeight > 0) {
+
+		if(availableHeight < 0){
+			availableHeight = 0.01;
+		}
+
+		//if (availableHeight > 0) {
 			eachChildren(container, (child) => {
 				if (child.isVisible()) {
 					if (child.get("position") == "relative") {
@@ -61,7 +66,7 @@ export class VerticalLayout extends Layout {
 						if (childHeight instanceof Percent) {
 							let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
 
-							let minHeight = child.get("minHeight", -Infinity);
+							let minHeight = child.get("minHeight", child.getPrivate("minHeight", -Infinity));
 							let maxHeight = child.get("maxHeight", child.getPrivate("maxHeight", Infinity));
 							privateHeight = Math.min(Math.max(minHeight, privateHeight), maxHeight);
 
@@ -70,7 +75,7 @@ export class VerticalLayout extends Layout {
 					}
 				}
 			});
-		}
+		//}
 
 		let prevY = paddingTop;
 
