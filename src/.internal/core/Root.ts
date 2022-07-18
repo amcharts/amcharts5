@@ -1650,23 +1650,37 @@ export class Root implements IDisposer {
 			}
 
 			// Deal with max dimensions
-			const maxWidth = target.maxWidth();
-			const maxHeight = target.maxHeight();
+			const maxWidth = target.get("maxWidth");
+			const maxHeight = target.get("maxHeight");
 			if (maxWidth) {
 				htmlElement.style.maxWidth = maxWidth + "px";
 			}
+			else {
+				htmlElement.style.maxWidth = "";
+			}
+
 			if (maxHeight) {
 				htmlElement.style.maxHeight = maxHeight + "px";
+			}
+			else {
+				htmlElement.style.maxHeight = "";
 			}
 
 			// Deal with min dimensions
 			const minWidth = target.get("minWidth");
 			const minHeight = target.get("minHeight");
 			if (minWidth) {
-				htmlElement.style.maxWidth = maxWidth + "px";
+				htmlElement.style.minWidth = minWidth + "px";
 			}
+			else {
+				htmlElement.style.minWidth = "";
+			}
+
 			if (minHeight) {
 				htmlElement.style.minHeight = minHeight + "px";
+			}
+			else {
+				htmlElement.style.minHeight = "";
 			}
 
 			// Deal with position
@@ -1690,8 +1704,8 @@ export class Root implements IDisposer {
 			}
 
 			if (!width || !height) {
-				htmlElement.style.width = "auto";
-				htmlElement.style.height = "auto";
+				htmlElement.style.width = "";
+				htmlElement.style.height = "";
 				const bbox = htmlElement.getBoundingClientRect();
 				w = bbox.width;
 				h = bbox.height;
