@@ -76,7 +76,7 @@ export class PieChart extends PercentChart {
 	declare public _privateSettings: IPieChartPrivate;
 	declare public _seriesType: PieSeries;
 
-	protected _maxRadius: number = 1;
+	public _maxRadius: number = 1;
 
 	protected _afterNew() {
 		super._afterNew();

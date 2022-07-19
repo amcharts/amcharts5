@@ -313,10 +313,15 @@ export class LineSeries extends XYSeries {
 				this._clearGraphics();
 				this._sindex = 0;
 				this._dindex = startIndex;
-				// this is done to avoid recursion with a lot of segments 
-				while (this._dindex < endIndex - 1) {
-					this._startSegment(this._dindex);
-					this._sindex++;
+				if (this.dataItems.length == 1) {
+					this._startSegment(0);
+				}
+				else {
+					// this is done to avoid recursion with a lot of segments 
+					while (this._dindex < endIndex - 1) {
+						this._startSegment(this._dindex);
+						this._sindex++;
+					}
 				}
 			}
 		}

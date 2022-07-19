@@ -347,7 +347,7 @@ export abstract class Hierarchy extends Series {
 		}
 
 		if (this._sizeDirty) {
-			this._selectDataItem(this.get("selectedDataItem"), this._currentDownDepth);
+			this._selectDataItem(this.get("selectedDataItem"), this._currentDownDepth, false);
 		}
 	}
 
@@ -746,10 +746,12 @@ export abstract class Hierarchy extends Series {
 		}
 	}
 
-	protected _selectDataItem(dataItem?: DataItem<this["_dataItemSettings"]>, downDepth?: number) {
+	protected _selectDataItem(dataItem?: DataItem<this["_dataItemSettings"]>, downDepth?: number, skipDisptach?: boolean) {
 		if (dataItem) {
-			const type = "dataitemselected";
-			this.events.dispatch(type, { type: type, target: this, dataItem: dataItem });
+			if (!skipDisptach) {
+				const type = "dataitemselected";
+				this.events.dispatch(type, { type: type, target: this, dataItem: dataItem });
+			}
 
 			let maxDepth = this.getPrivate("maxDepth", 1);
 			const topDepth = this.get("topDepth", 0);

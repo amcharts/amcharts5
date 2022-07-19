@@ -277,6 +277,10 @@ export class Label extends Container {
 			}
 		});
 
+		if (this.get("html", "") !== "") {
+			this._text.set("text", "");
+		}
+
 		this.onPrivate("maxWidth", () => {
 			this._setMaxDimentions();
 		});
@@ -307,6 +311,14 @@ export class Label extends Container {
 
 		if (this.isDirty("rotation")) {
 			this._setMaxDimentions();
+		}
+
+		// Do not show regular text if HTML is used
+		if (this.get("html", "") !== "") {
+			this._text.set("text", "");
+		}
+		else {
+			this._text.set("text", this.get("text"));
 		}
 
 		if (this.isDirty("textAlign") || this.isDirty("width")) {

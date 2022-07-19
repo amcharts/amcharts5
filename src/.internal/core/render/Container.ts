@@ -166,6 +166,10 @@ export class Container extends Sprite {
 			child.dispose();
 		});
 
+		if (this.getPrivate("htmlElement")) {
+			this._root._removeHTMLContent(this);
+		}
+
 		super._dispose();
 	}
 

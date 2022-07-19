@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.13] - 2022-07-19
+
+### Fixed
+- Only HTML content will be shown on a `Label` with both `text` and `html` set.
+- HTML content will now respect `padding*` settings.
+- `"click"` event now works on an element that uses HTML content.
+- `snapToSeries` of `ChartCursor` was not working if target series had only one data item.
+- Labels of a `PieSeries` were being arranged incorrectly when pie was a semi-circle and `alignLabels` was set to `true`.
+- `ForcedDirected` and `Tree` charts were not working properly with `BreadcrumbBar` navigation.
+
+
 ## [5.2.12] - 2022-07-18
 
 ### Fixed

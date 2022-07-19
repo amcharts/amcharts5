@@ -3,7 +3,7 @@ import type { Entity } from "./util/Entity";
 import type { Sprite } from "./render/Sprite";
 import type { Theme } from "./Theme";
 import type { IPoint } from "./util/IPoint";
-import type { IRenderer } from "./render/backend/Renderer";
+import type { IRenderer, IPointerEvent } from "./render/backend/Renderer";
 import type { Timezone } from "./util/Timezone";
 
 import { Container } from "./render/Container";
@@ -1605,21 +1605,21 @@ export class Root implements IDisposer {
 		htmlElement.style.position = "absolute";
 		htmlElement.style.overflow = "auto";
 
-		// TODO: TMP
-		// htmlElement.style.width = "1px";
-		// htmlElement.style.height = "1px";
-		// htmlElement.style.background = "rgba(255, 0, 0, 0.1)";
-		// htmlElement.style.pointerEvents = "none";
-		// /TMP
+		// Translate events
+		if (target.events.isEnabled("click")) {
+			this._disposers.push($utils.addEventListener<PointerEvent | MouseEvent>(htmlElement, "click", (ev: IPointerEvent) => {
+				const downEvent = this._renderer.getEvent(ev);
+				target.events.dispatch("click", {
+					type: "click",
+					originalEvent: downEvent.event,
+					point: downEvent.point,
+					simulated: false,
+					target: target
+				});
+			}));
+		}
 
 		this._positionHTMLElement(target);
-
-		//this._decoratehtmlElement(htmlElement, target);
-
-		// TODO: handle resize (e.g. when images are loaded)
-		// htmlElement.addEventListener("focus", (ev: FocusEvent) => {
-		// 	this._handleFocus(ev, index);
-		// });
 
 		container.append(htmlElement);
 
@@ -1638,6 +1638,18 @@ export class Root implements IDisposer {
 		const htmlElement = target.getPrivate("htmlElement");
 		if (htmlElement) {
 
+			// Translate settings
+			const visualSettings = ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "minWidth", "minHeight", "maxWidth", "maxHeight"];
+			$array.each(visualSettings, (setting: any) => {
+				const value = target.get(setting);
+				if (value) {
+					htmlElement.style[setting] = value + "px";
+				}
+				else {
+					htmlElement.style[setting] = "";
+				}
+			});
+
 			// Deal with opacity
 			htmlElement.style.opacity = target.compositeOpacity() + "";
 
@@ -1647,40 +1659,6 @@ export class Root implements IDisposer {
 			}
 			else {
 				htmlElement.style.display = "none";
-			}
-
-			// Deal with max dimensions
-			const maxWidth = target.get("maxWidth");
-			const maxHeight = target.get("maxHeight");
-			if (maxWidth) {
-				htmlElement.style.maxWidth = maxWidth + "px";
-			}
-			else {
-				htmlElement.style.maxWidth = "";
-			}
-
-			if (maxHeight) {
-				htmlElement.style.maxHeight = maxHeight + "px";
-			}
-			else {
-				htmlElement.style.maxHeight = "";
-			}
-
-			// Deal with min dimensions
-			const minWidth = target.get("minWidth");
-			const minHeight = target.get("minHeight");
-			if (minWidth) {
-				htmlElement.style.minWidth = minWidth + "px";
-			}
-			else {
-				htmlElement.style.minWidth = "";
-			}
-
-			if (minHeight) {
-				htmlElement.style.minHeight = minHeight + "px";
-			}
-			else {
-				htmlElement.style.minHeight = "";
 			}
 
 			// Deal with position

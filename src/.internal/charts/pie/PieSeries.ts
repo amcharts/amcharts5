@@ -134,11 +134,20 @@ export class PieSeries extends PercentSeries {
 	}
 
 	protected _getNextUp() {
+		const chart = this.chart;
+		if (chart) {
+			return chart._maxRadius;
+		}
 		return this.labelsContainer.maxHeight() / 2;
 	}
 
 	protected _getNextDown() {
+		const chart = this.chart;
+		if (chart) {
+			return -chart._maxRadius;
+		}
 		return -this.labelsContainer.maxHeight() / 2;
+
 	}
 
 	public _prepareChildren() {
@@ -177,60 +186,60 @@ export class PieSeries extends PercentSeries {
 				}
 
 				//if (radius > 0) {
-					$array.each(this._dataItems, (dataItem) => {
+				$array.each(this._dataItems, (dataItem) => {
 
-						this.updateLegendValue(dataItem);
+					this.updateLegendValue(dataItem);
 
-						let currentArc = arc * dataItem.get("valuePercentTotal") / 100;
-						const slice = dataItem.get("slice");
-						if (slice) {
-							slice.set("radius", radius);
-							slice.set("innerRadius", innerRadius);
-							slice.set("startAngle", currentAngle);
+					let currentArc = arc * dataItem.get("valuePercentTotal") / 100;
+					const slice = dataItem.get("slice");
+					if (slice) {
+						slice.set("radius", radius);
+						slice.set("innerRadius", innerRadius);
+						slice.set("startAngle", currentAngle);
 
-							slice.set("arc", currentArc);
+						slice.set("arc", currentArc);
 
-							const color = dataItem.get("fill");
-							slice._setDefault("fill", color);
-							slice._setDefault("stroke", color);
-						}
+						const color = dataItem.get("fill");
+						slice._setDefault("fill", color);
+						slice._setDefault("stroke", color);
+					}
 
-						let middleAngle = $math.normalizeAngle(currentAngle + currentArc / 2);
+					let middleAngle = $math.normalizeAngle(currentAngle + currentArc / 2);
 
-						const label = dataItem.get("label");
-						if (label) {
-							label.setPrivate("radius", radius);
-							label.setPrivate("innerRadius", innerRadius);
-							label.set("labelAngle", middleAngle);
+					const label = dataItem.get("label");
+					if (label) {
+						label.setPrivate("radius", radius);
+						label.setPrivate("innerRadius", innerRadius);
+						label.set("labelAngle", middleAngle);
 
-							if (label.get("textType") == "aligned") {
-								let labelRadius = radius + label.get("radius", 0);
-								let y = radius * $math.sin(middleAngle);
+						if (label.get("textType") == "aligned") {
+							let labelRadius = radius + label.get("radius", 0);
+							let y = radius * $math.sin(middleAngle);
 
-								if (middleAngle > 90 && middleAngle <= 270) {
-									if (!label.isHidden() && !label.isHiding()) {
-										this._lLabels.push({ label: label, y: y });
-									}
-									labelRadius *= -1;
-									labelRadius -= this.labelsContainer.get("paddingLeft", 0);
-									label.set("centerX", p100);
-									label.setPrivateRaw("left", true);
+							if (middleAngle > 90 && middleAngle <= 270) {
+								if (!label.isHidden() && !label.isHiding()) {
+									this._lLabels.push({ label: label, y: y });
 								}
-								else {
-									if (!label.isHidden() && !label.isHiding()) {
-										this._rLabels.push({ label: label, y: y });
-									}
-									labelRadius += this.labelsContainer.get("paddingRight", 0);
-									label.set("centerX", 0);
-									label.setPrivateRaw("left", false);
-								}
-								label.set("x", labelRadius);
-								label.set("y", radius * $math.sin(middleAngle));
+								labelRadius *= -1;
+								labelRadius -= this.labelsContainer.get("paddingLeft", 0);
+								label.set("centerX", p100);
+								label.setPrivateRaw("left", true);
 							}
+							else {
+								if (!label.isHidden() && !label.isHiding()) {
+									this._rLabels.push({ label: label, y: y });
+								}
+								labelRadius += this.labelsContainer.get("paddingRight", 0);
+								label.set("centerX", 0);
+								label.setPrivateRaw("left", false);
+							}
+							label.set("x", labelRadius);
+							label.set("y", radius * $math.sin(middleAngle));
 						}
-						currentAngle += currentArc;
-						this._updateTick(dataItem);
-					})
+					}
+					currentAngle += currentArc;
+					this._updateTick(dataItem);
+				})
 				//}
 			}
 		}

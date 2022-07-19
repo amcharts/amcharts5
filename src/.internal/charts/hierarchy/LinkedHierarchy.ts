@@ -457,7 +457,6 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 		if (!dataItem.get("disabled")) {
 			this.set("selectedDataItem", dataItem);
-			this._selectDataItem(dataItem);
 		}
 		else {
 			if (parent) {
