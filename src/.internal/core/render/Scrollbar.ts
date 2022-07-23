@@ -189,7 +189,7 @@ export class Scrollbar extends Container {
 					}
 					else {
 						this.thumb.set(key, newCoordinate);
-						this._root.events.on("frameended", () => {
+						this._root.events.once("frameended", () => {
 							this.setPrivateRaw("isBusy", false);
 						})
 					}

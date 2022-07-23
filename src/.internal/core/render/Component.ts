@@ -53,7 +53,7 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 		this.component.markDirtyValues(this);
 	}
 
-	protected _startAnimation(): void {
+	public _startAnimation(): void {
 		this.component._root._addAnimation(this);
 	}
 
@@ -372,7 +372,7 @@ export abstract class Component extends Container {
 			if (this.events.isEnabled(type)) {
 				this.events.dispatch(type, { type: type, target: this });
 			}
-			this._dataChanged = false;			
+			this._dataChanged = false;
 		}
 
 		this.inited = true;

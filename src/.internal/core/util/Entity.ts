@@ -231,6 +231,7 @@ export interface IAnimationEvents {
  * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/} for more info
  */
 export class Animation<Value> {
+	private _animation: IStartAnimation;
 	private _from: Value;
 	private _to: Value;
 	private _duration: number;
@@ -245,7 +246,8 @@ export class Animation<Value> {
 
 	public events: EventDispatcher<Events<this, IAnimationEvents>> = new EventDispatcher();
 
-	constructor(from: Value, to: Value, duration: number, easing: $ease.Easing, loops: number, startingTime: number | null) {
+	constructor(animation: IStartAnimation, from: Value, to: Value, duration: number, easing: $ease.Easing, loops: number, startingTime: number | null) {
+		this._animation = animation;
 		this._from = from;
 		this._to = to;
 		this._duration = duration;
@@ -291,8 +293,9 @@ export class Animation<Value> {
 	}
 
 	public play(): void {
-		if (!this._stopped) {
+		if (!this._stopped && !this._playing) {
 			this._playing = true;
+			this._animation._startAnimation();
 		}
 	}
 
@@ -351,6 +354,11 @@ export class Animation<Value> {
 type Animated<P> = { [K in keyof P]?: Animation<P[K]> };
 
 
+interface IStartAnimation {
+	_startAnimation(): void;
+}
+
+
 /**
  * @ignore
  */
@@ -361,7 +369,7 @@ let counter = 0;
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
  */
-export abstract class Settings implements IDisposer, IAnimation {
+export abstract class Settings implements IDisposer, IAnimation, IStartAnimation {
 
 	/**
 	 * Unique ID.
@@ -379,7 +387,6 @@ export abstract class Settings implements IDisposer, IAnimation {
 
 	protected _animatingSettings: Animated<this["_settings"]> = {};
 	protected _animatingPrivateSettings: Animated<this["_privateSettings"]> = {};
-	protected _animatingCount: number = 0;
 
 	private _disposed: boolean = false;
 
@@ -404,6 +411,8 @@ export abstract class Settings implements IDisposer, IAnimation {
 
 	public _runAnimation(currentTime: number): boolean {
 		if (!this.isDisposed()) {
+			let playing = false;
+
 			$object.each(this._animatingSettings, (key, animation) => {
 				if (animation._stopped) {
 					this._stopAnimation(key);
@@ -418,11 +427,13 @@ export abstract class Settings implements IDisposer, IAnimation {
 							this.set(key, animation._value(1));
 
 						} else {
+							playing = true;
 							animation._reset(currentTime);
 							this._set(key, animation._value(1));
 						}
 
 					} else {
+						playing = true;
 						this._set(key, animation._value(diff));
 					}
 				}
@@ -442,28 +453,26 @@ export abstract class Settings implements IDisposer, IAnimation {
 							this.setPrivate(key, animation._value(1));
 
 						} else {
+							playing = true;
 							animation._reset(currentTime);
 							this._setPrivate(key, animation._value(1));
 						}
 
 					} else {
+						playing = true;
 						this._setPrivate(key, animation._value(diff));
 					}
 				}
 			});
 
-			if (this._animatingCount < 0) {
-				throw new Error("Invalid animation count");
-			}
-
-			return this._animatingCount === 0;
+			return playing;
 
 		} else {
-			return true;
+			return false;
 		}
 	}
 
-	protected abstract _startAnimation(): void;
+	public abstract _startAnimation(): void;
 	protected abstract _animationTime(): number | null;
 
 	public _markDirtyKey<Key extends keyof this["_settings"]>(_key: Key) {
@@ -630,7 +639,6 @@ export abstract class Settings implements IDisposer, IAnimation {
 
 		if (animation) {
 			delete this._animatingSettings[key];
-			--this._animatingCount;
 			animation.stop();
 		}
 	}
@@ -746,7 +754,6 @@ export abstract class Settings implements IDisposer, IAnimation {
 		if (animation) {
 			animation.stop();
 			delete this._animatingPrivateSettings[key];
-			--this._animatingCount;
 		}
 	}
 
@@ -812,11 +819,9 @@ export abstract class Settings implements IDisposer, IAnimation {
 				this.set(key, to);
 
 			} else {
-				++this._animatingCount;
-
 				this.set(key, from);
 
-				const animation = this._animatingSettings[key] = new Animation(from, to, duration, easing, loops, this._animationTime());
+				const animation = this._animatingSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
 
 				this._startAnimation();
 
@@ -824,7 +829,7 @@ export abstract class Settings implements IDisposer, IAnimation {
 			}
 		}
 
-		const animation = new Animation(from, to, duration, easing, loops, null);
+		const animation = new Animation(this, from, to, duration, easing, loops, null);
 		animation.stop();
 		return animation;
 	}
@@ -849,11 +854,9 @@ export abstract class Settings implements IDisposer, IAnimation {
 				this.setPrivate(key, to);
 
 			} else {
-				++this._animatingCount;
-
 				this.setPrivate(key, from);
 
-				const animation = this._animatingPrivateSettings[key] = new Animation(from, to, duration, easing, loops, this._animationTime());
+				const animation = this._animatingPrivateSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
 
 				this._startAnimation();
 
@@ -861,7 +864,7 @@ export abstract class Settings implements IDisposer, IAnimation {
 			}
 		}
 
-		const animation = new Animation(from, to, duration, easing, loops, null);
+		const animation = new Animation(this, from, to, duration, easing, loops, null);
 		animation.stop();
 		return animation;
 	}
@@ -1161,7 +1164,7 @@ export class Entity extends Settings implements IDisposer {
 		this._root._addDirtyEntity(this);
 	}
 
-	protected _startAnimation(): void {
+	public _startAnimation(): void {
 		this._root._addAnimation(this);
 	}
 

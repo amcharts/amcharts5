@@ -1765,7 +1765,8 @@ export abstract class Sprite extends Entity {
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
 		if (tooltip) {
-			const promise = tooltip.hide();
+			let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400  : undefined;
+			const promise = tooltip.hide(timeout);
 			this.setPrivateRaw("showingTooltip", false);
 			return promise;
 		}

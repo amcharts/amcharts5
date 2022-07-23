@@ -187,7 +187,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _fixZoomFactor() {
-		this.setPrivateRaw("maxZoomFactor", Math.round((this.getPrivate("max", 0) - this.getPrivate("min", 0)) / this.baseMainDuration()));
+		var maxZoomFactor = this.get("maxZoomFactor");
+		if (maxZoomFactor != null) {
+			this.setPrivateRaw("maxZoomFactor", maxZoomFactor);
+		}
+		else {
+			this.setPrivateRaw("maxZoomFactor", Math.round((this.getPrivate("max", 0) - this.getPrivate("min", 0)) / this.baseMainDuration()));
+		}
 	}
 
 	protected _groupData() {
@@ -673,9 +679,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._updateGhost();
 	}
 
-	protected _getDelta(){		
+	protected _getDelta() {
 		this._deltaMinMax = this.baseDuration() / 2;
-	}	
+	}
 
 	protected _fixMin(min: number) {
 		let baseInterval = this.getPrivate("baseInterval");
@@ -766,7 +772,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				// this is done to save cpu, as rounding is quite expensive, especially with timezone set. 
 				// if value is between prev start and end, it means it didn't change, all is fine.
 				if (value >= startTime && value <= endTime) {
-					
+
 				}
 				else {
 					startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();

@@ -314,7 +314,7 @@ export class DateFormatter extends Entity {
 
 				case "EEEE":
 				case "eeee":
-					value = this._t(this._getShortWeekday(weekday));
+					value = this._t(this._getWeekday(weekday));
 					break;
 
 				case "EEEEE":

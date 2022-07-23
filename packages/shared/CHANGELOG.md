@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.14] - 2022-07-23
+
+### Added
+- New setting `keepTargetHover` added to `Tooltip` (default: `false`). If set to `true`, hovering the tooltip will be treated like hovering its target element itself.
+
+### Fixed
+- Removing `verticalScrollbar` from a `Container` was causing some issues.
+- Labels with HTML content and horizontal padding were not being sized/centered properly.
+- Date formatting code "EEEE" was producing weekday's short version ("Tue") instead of full one ("Tuesday").
+- `Scrollbar` was not working after it was zoomed and clicked on a background to change position, if no animated theme was used.
+- Paused animations will no longer obstruct chart export.
+
+
 ## [5.2.13] - 2022-07-19
 
 ### Fixed

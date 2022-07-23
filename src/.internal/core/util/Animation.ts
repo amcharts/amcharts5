@@ -114,6 +114,7 @@ export function getInterpolate(from: any, to: any): (diff: Time, from: any, to: 
 
 
 export interface IAnimation {
+	// Returns true if the animation is still playing, or false if the animation isn't playing
 	_runAnimation(_currentTime: number): boolean;
 }
 
@@ -163,7 +164,7 @@ export class AnimationTime implements IAnimation {
 		if (this._playingDuration !== null) {
 			if (this._startingTime === null) {
 				this._startingTime = currentTime;
-				return false;
+				return true;
 			}
 			else {
 				const diff = (currentTime - this._startingTime) / this._playingDuration;
@@ -179,7 +180,7 @@ export class AnimationTime implements IAnimation {
 					if (this.events.isEnabled(type)) {
 						this.events.dispatch(type, { type: type, target: this });
 					}
-					return true;
+					return false;
 
 				} else {
 					this._current = range(diff, this._from as number, this._to as number);
@@ -190,12 +191,12 @@ export class AnimationTime implements IAnimation {
 						this.events.dispatch(type, { type: type, target: this, progress: diff });
 					}
 
-					return false;
+					return true;
 				}
 			}
 
 		} else {
-			return true;
+			return false;
 		}
 	}
 

@@ -484,7 +484,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		r("DateAxis").setAll({
-
+			maxZoomFactor: null,
 			strictMinMax: true,
 			startLocation: 0,
 			endLocation: 1,

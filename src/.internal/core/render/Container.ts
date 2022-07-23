@@ -217,8 +217,9 @@ export class Container extends Sprite {
 			else {
 				if (contentMask) {
 					childrenDisplay.removeChild(contentMask._display);
-					childrenDisplay.mask = null;
+					childrenDisplay.mask = null;					
 					contentMask.dispose();
+					this._contentMask = undefined;
 				}
 			}
 		}
@@ -609,9 +610,12 @@ export class Container extends Sprite {
 					if (this._vsbd1) {
 						this._vsbd1.dispose();
 					}
+					const childrenDisplay = this._childrenDisplay;
+					childrenDisplay.y = 0;
 
+					this.setPrivate("height", undefined);
 					this.set("maskContent", false);
-					this.set("paddingRight", undefined);					
+					this.set("paddingRight", undefined);
 				}
 			}
 		}

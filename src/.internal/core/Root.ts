@@ -726,7 +726,7 @@ export class Root implements IDisposer {
 
 	private _runAnimations(currentTime: number) {
 		$array.keepIf(this._animations, (animation) => {
-			return !animation._runAnimation(currentTime);
+			return animation._runAnimation(currentTime);
 		});
 	}
 
@@ -1604,6 +1604,7 @@ export class Root implements IDisposer {
 		//htmlElement.tabIndex = this.tabindex;
 		htmlElement.style.position = "absolute";
 		htmlElement.style.overflow = "auto";
+		htmlElement.style.boxSizing = "border-box";
 
 		// Translate events
 		if (target.events.isEnabled("click")) {

@@ -3,8 +3,8 @@ import type { IPoint } from "../util/IPoint";
 import type { Pattern } from "../render/patterns/Pattern";
 import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
-import type { MultiDisposer, IDisposer } from "../util/Disposer";
 
+import { MultiDisposer, IDisposer } from "../util/Disposer";
 import { Label } from "../render/Label";
 import { PointedRectangle } from "../render/PointedRectangle";
 import { Container, IContainerPrivate, IContainerSettings } from "./Container";
@@ -100,6 +100,14 @@ export interface ITooltipSettings extends IContainerSettings {
 	 */
 	tooltipTarget?: Sprite;
 
+	/**
+	 * If set to `true`, tooltip's target element will considered to be hovered
+	 * when mouse pointer is over tooltip itself.
+	 *
+	 * @since 5.2.14
+	 */
+	keepTargetHover?: boolean;
+
 }
 
 export interface ITooltipPrivate extends IContainerPrivate {
@@ -131,6 +139,8 @@ export class Tooltip extends Container {
 
 	protected _w: number = 0;
 	protected _h: number = 0;
+
+	protected _keepHoverDp: MultiDisposer | undefined;
 
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["tooltip"]);
@@ -199,6 +209,33 @@ export class Tooltip extends Container {
 
 		if (this.isDirty("tooltipTarget")) {
 			this.updateBackgroundColor();
+		}
+
+		if (this.isDirty("keepTargetHover")) {
+			const keephover = this.get("keepTargetHover");
+			if (keephover) {
+				const bg = this.get("background")!;
+				this._keepHoverDp = new MultiDisposer([
+					bg.events.on("pointerover", (_ev) => {
+						const target = this.get("tooltipTarget");
+						if (target) {
+							target.hover();
+						}
+					}),
+					bg.events.on("pointerout", (_ev) => {
+						const target = this.get("tooltipTarget");
+						if (target) {
+							target.unhover();
+						}
+					})
+				]);
+			}
+			else {
+				if (this._keepHoverDp) {
+					this._keepHoverDp.dispose();
+					this._keepHoverDp = undefined;
+				}
+			}
 		}
 	}
 

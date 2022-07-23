@@ -56,7 +56,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 *
 	 * @default 1000
 	 */
-	maxZoomFactor?: number;
+	maxZoomFactor?: number | null;
 
 	/**
 	 * Maximum number of axis elements to show at a time.
@@ -183,7 +183,7 @@ export interface IAxisPrivate extends IComponentPrivate {
 	/**
 	 * @ignore
 	 */
-	maxZoomFactor?: number;
+	maxZoomFactor?: number | null;
 
 
 	/**
