@@ -111,12 +111,14 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 */
 	longitudeField?: string;
 
-
 	/**
-	 * @todo review
+	 * If set to `true`, bullets will resize when zooming the [[MapChart]].
+	 * 
+	 * @since 5.2.8
 	 * @default false
 	 */
 	autoScale?:boolean
+
 };
 
 /**

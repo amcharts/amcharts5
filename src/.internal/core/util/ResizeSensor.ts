@@ -2,6 +2,7 @@
 
 import type { IDisposer } from "./Disposer";
 import * as $array from "./Array";
+import * as $utils from "./Utils";
 
 /**
  * @ignore
@@ -151,11 +152,16 @@ function makeSensor(): Sensor {
 export class ResizeSensor implements IDisposer {
 	private _sensor: Sensor;
 	private _element: Element;
+	private _listener: IDisposer;
 	private _disposed: boolean = false;
 
 	constructor(element: Element, callback: () => void) {
 		this._sensor = makeSensor();
 		this._element = element;
+
+		// This is needed because we need to know when the window is zoomed
+		this._listener = $utils.onZoom(callback);
+
 		this._sensor.addTarget(element, callback);
 	}
 
@@ -167,6 +173,7 @@ export class ResizeSensor implements IDisposer {
 		if (!this._disposed) {
 			this._disposed = true;
 			this._sensor.removeTarget(this._element);
+			this._listener.dispose();
 		}
 	}
 

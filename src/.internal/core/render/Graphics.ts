@@ -2,6 +2,7 @@ import type { Color } from "../util/Color";
 import type { Pattern } from "../render/patterns/Pattern";
 import type { Gradient } from "../render/gradients/Gradient";
 
+import { PicturePattern } from "../render/patterns/PicturePattern";
 import { ISpriteSettings, ISpritePrivate, ISpriteEvents, Sprite } from "./Sprite";
 import { IGraphics, BlendMode } from "./backend/Renderer";
 
@@ -317,6 +318,13 @@ export class Graphics extends Sprite {
 				if (pattern) {
 					this._display.beginFill(pattern, fillOpacity);
 					this._display.endFill();
+
+					if (fillPattern instanceof PicturePattern) {
+						fillPattern.events.once("loaded", () => {
+							this._clear = true;
+							this.markDirty();
+						});
+					}
 				}
 			}
 			else if (fillGradient) {
@@ -367,6 +375,13 @@ export class Graphics extends Sprite {
 					if (pattern) {
 						this._display.lineStyle(strokeWidth, pattern, strokeOpacity, lineJoin);
 						this._display.endStroke();
+
+						if (strokePattern instanceof PicturePattern) {
+							strokePattern.events.once("loaded", () => {
+								this._clear = true;
+								this.markDirty();
+							});
+						}
 					}
 				}
 				else if (strokeGradient) {

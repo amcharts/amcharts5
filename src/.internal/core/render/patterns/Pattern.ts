@@ -1,7 +1,7 @@
 import type { IGraphics, IPattern } from "../backend/Renderer";
 import type { Color } from "../../util/Color";
 
-import { Entity, IEntitySettings, IEntityPrivate } from "../../util/Entity";
+import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../util/Entity";
 
 export interface IPatternSettings extends IEntitySettings {
 
@@ -95,6 +95,9 @@ export interface IPatternSettings extends IEntitySettings {
 }
 
 export interface IPatternPrivate extends IEntityPrivate {
+}
+
+export interface IPatternEvents extends IEntityEvents {
 }
 
 /**

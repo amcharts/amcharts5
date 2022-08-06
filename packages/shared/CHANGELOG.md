@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.15] - 2022-08-06
+
+### Added
+- Added `PicturePattern` that allows using external images as patterns. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Image_patterns).
+
+### Fixed
+- Fixing issue where chart scrollbar would break when zooming.
+- Fixing chart being too large and overflowing when zooming in ([Issue 471](https://github.com/amcharts/amcharts5/issues/471)).
+- `pan:"zoom"` was not working on left-side Y Axis.
+- Removing a panel from a `StockChart` was not removing indicator from charts `indicators` list.
+- Zooming chart with custom timezone was resulting in errors in some cases.
+
+
 ## [5.2.14] - 2022-07-23
 
 ### Added
@@ -55,7 +68,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - Resizing `PieChart` to a very small size with a legend positioned on the left or right could cause some anomaly in layout.
 - Updating `CategoryAxis` data with less items than there was originally was causing old columns/bullets to be shown.
 - Setting `verticalScrollbar` on `Container` to `undefined` to remove a previously set scrollbar was not working.
-
+- On some rare cases, when all values of the series were the same or the difference was very small, ValueAxis could go into stackowerflow and hang the browser.
 
 ## [5.2.10] - 2022-06-28
 

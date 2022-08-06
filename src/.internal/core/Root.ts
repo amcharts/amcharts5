@@ -446,14 +446,17 @@ export class Root implements IDisposer {
 
 	protected _init(): void {
 		const renderer = this._renderer;
-		const rootContainer = Container.new(this, { visible: true, width: this.dom.clientWidth, height: this.dom.clientHeight });
+		const rect = this.dom.getBoundingClientRect();
+		const width = Math.floor(rect.width);
+		const height = Math.floor(rect.height);
+		const rootContainer = Container.new(this, { visible: true, width, height });
 		this._rootContainer = rootContainer;
 		this._rootContainer._defaultThemes.push(DefaultTheme.new(this));
 
 		const container = rootContainer.children.push(Container.new(this, { visible: true, width: p100, height: p100 }));
 		this.container = container;
 
-		renderer.resize(this.dom.clientWidth, this.dom.clientHeight);
+		renderer.resize(width, height);
 
 		//@todo: better appendChild - refer
 		this._inner.appendChild(renderer.view);
@@ -484,8 +487,8 @@ export class Root implements IDisposer {
 		focusElementContainer.style.top = "0px";
 		focusElementContainer.style.left = "0px";
 		focusElementContainer.style.overflow = "hidden";
-		focusElementContainer.style.width = this.dom.clientWidth + "px";
-		focusElementContainer.style.height = this.dom.clientHeight + "px";
+		focusElementContainer.style.width = width + "px";
+		focusElementContainer.style.height = height + "px";
 
 		focusElementContainer.setAttribute("role", "application");
 
@@ -687,8 +690,9 @@ export class Root implements IDisposer {
 	 */
 	public resize(): void {
 		const dom = this.dom;
-		const w = dom.clientWidth;
-		const h = dom.clientHeight;
+		const rect = dom.getBoundingClientRect();
+		const w = Math.floor(rect.width);
+		const h = Math.floor(rect.height);
 		if (w > 0 && h > 0) {
 			const htmlElementContainer = this._htmlElementContainer!;
 			htmlElementContainer.style.width = w + "px";
@@ -958,13 +962,28 @@ export class Root implements IDisposer {
 		});
 	}
 
+	public markDirtyGlobal(container?: Container): void {
+		if (!container) {
+			container = this.container;
+		}
+		console.log(this.width());
+		container.walkChildren((child) => {
+			if (child instanceof Container) {
+				this.markDirtyGlobal(child);
+			}
+			child.markDirty();
+			child.markDirtyBounds();
+		});
+	}
+
 	/**
 	 * Returns width of the target container, in pixels.
 	 *
 	 * @return Width
 	 */
 	public width(): number {
-		return this.dom.clientWidth;
+		// TODO make this more efficient, maybe just return the renderer's width ?
+		return Math.floor(this.dom.getBoundingClientRect().width);
 	}
 
 	/**
@@ -973,7 +992,8 @@ export class Root implements IDisposer {
 	 * @return Height
 	 */
 	public height(): number {
-		return this.dom.clientHeight;
+		// TODO make this more efficient, maybe just return the renderer's height ?
+		return Math.floor(this.dom.getBoundingClientRect().height);
 	}
 
 	/**

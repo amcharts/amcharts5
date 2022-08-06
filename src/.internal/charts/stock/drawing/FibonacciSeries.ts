@@ -17,14 +17,17 @@ export interface IFibonacciSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
 
 export interface IFibonacciSeriesSettings extends ISimpleLineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * Sequence.
+	 */
 	sequence?: Array<number>;
+
 	/**
-	 * @todo review
-	 */	
+	 * Array of colors to use for bands.
+	 */
 	colors?: Array<Color>
+
 }
 
 export interface IFibonacciSeriesPrivate extends ISimpleLineSeriesPrivate {
@@ -100,7 +103,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 			for (let i = 0; i < this._lines.length; i++) {
 				const line = this._lines[i];
-				if(line){
+				if (line) {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
 
@@ -168,7 +171,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 		}
 	}
 
-	protected _addPoints(event: ISpritePointerEvent, index: number):Line {
+	protected _addPoints(event: ISpritePointerEvent, index: number): Line {
 		let line = super._addPoints(event, index);
 
 		const labelArr = [];

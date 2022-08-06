@@ -945,6 +945,28 @@ class Shadow extends Op {
 	}
 }
 
+/**
+ * @ignore
+ */
+class GraphicsImage extends Op {
+	constructor(
+		public image: HTMLImageElement,
+		public width: number,
+		public height: number,
+		public x: number,
+		public y: number
+	) { super(); }
+
+	public path(context: CanvasRenderingContext2D): void {
+		context.drawImage(this.image, this.x, this.y, this.width, this.height);
+	}
+
+	// TODO: OK?
+	public addBounds(bounds: IBounds): void {
+		setPoint(bounds, { x: this.x, y: this.y });
+		setPoint(bounds, { x: this.width, y: this.height });
+	}
+}
 
 /**
  * @ignore
@@ -1054,6 +1076,10 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 	shadow(color: Color, blur: number = 0, offsetX: number = 0, offsetY: number = 0, opacity?: number): void {
 		this._hasShadows = true;
 		this._pushOp(new Shadow(opacity ? color.toCSS(opacity) : color.toCSS(this._fillAlpha || this._strokeAlpha), blur, offsetX, offsetY));
+	}
+
+	image(image: HTMLImageElement, width: number, height: number, x: number, y: number): void {
+		this._pushOp(new GraphicsImage(image, width, height, x, y));
 	}
 
 	// https://svgwg.org/svg2-draft/paths.html#DProperty
@@ -2917,7 +2943,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}));
 
 		// Monitor for possible pixel ratio changes (when page is zoomed)
-		this._disposers.push($utils.addEventListener(window, "resize", (_ev) => {
+		this._disposers.push($utils.onZoom(() => {
 			if (resolution == null) {
 				this.resolution = window.devicePixelRatio;
 			}

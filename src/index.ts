@@ -47,6 +47,7 @@ export { RadialGradient, IRadialGradientSettings, IRadialGradientPrivate } from 
 export { CirclePattern, ICirclePatternSettings, ICirclePatternPrivate } from "./.internal/core/render/patterns/CirclePattern";
 export { LinePattern, ILinePatternSettings, ILinePatternPrivate } from "./.internal/core/render/patterns/LinePattern";
 export { Pattern, IPatternSettings, IPatternPrivate } from "./.internal/core/render/patterns/Pattern";
+export { PicturePattern, IPicturePatternSettings, IPicturePatternPrivate } from "./.internal/core/render/patterns/PicturePattern";
 export { RectanglePattern, IRectanglePatternSettings, IRectanglePatternPrivate } from "./.internal/core/render/patterns/RectanglePattern";
 
 export { Color, color } from "./.internal/core/util/Color";

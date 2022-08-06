@@ -60,6 +60,12 @@ export abstract class ChartIndicator extends Indicator {
 			chart.addTag("indicator");
 			this.panel = chart;
 
+			stockChart.panels.events.on("removeIndex", (e) => {
+				if (e.oldValue == chart) {
+					stockChart.indicators.removeValue(this);
+				}
+			})
+
 			const seriesXAxis = stockSeries.get("xAxis") as any;
 
 			// xAxis
@@ -109,10 +115,13 @@ export abstract class ChartIndicator extends Indicator {
 			legendDataItem.get("settingsButton").setPrivate("customData", this);
 
 			chart.set("cursor", XYCursor.new(root, { yAxis: yAxis, xAxis: xAxis }));
+
+
 		}
 	}
 
 	protected _dispose() {
+		super._dispose();
 		const stockChart = this.get("stockChart");
 		stockChart.panels.removeValue(this.panel);
 	}

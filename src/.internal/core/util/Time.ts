@@ -472,6 +472,9 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		return date;
 	}
 	else {
+		if (isNaN(date.getTime())) {
+			return date;
+		}
 		let tzoffset = timezone.offsetUTC(date);
 		let timeZoneOffset = date.getTimezoneOffset();
 		let parsedDate = timezone.parseDate(date);

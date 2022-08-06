@@ -26,7 +26,9 @@ export interface IMovingAverageDeviationSettings extends IChartIndicatorSettings
 	type?: "simple" | "weighted" | "exponential" | "dema" | "tema";
 
 	/**
-	 * @todo review
+	 * How units are calculated.
+	 *
+	 * @default "points"
 	 */
 	unit?: "points" | "percent"
 

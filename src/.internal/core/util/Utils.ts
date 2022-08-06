@@ -68,6 +68,19 @@ export function addEventListener<E extends Event>(dom: EventTarget, type: string
 }
 
 /**
+ * Function that adds an event listener which is triggered when the browser's zoom changes.
+ *
+ * @param listener  Event listener
+ * @returns Disposable event
+ */
+export function onZoom(listener: () => void): IDisposer {
+	// TODO use matchMedia instead ?
+	return addEventListener(window, "resize", (_ev) => {
+		listener();
+	});
+}
+
+/**
  * @ignore
  */
 export function supports(cap: "touchevents" | "pointerevents" | "mouseevents" | "wheelevents" | "keyboardevents"): boolean {

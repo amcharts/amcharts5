@@ -465,6 +465,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 
+			let previous = -Infinity;
 			while (value < selectionMax) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;
 				if (this.dataItems.length < i + 1) {
@@ -503,6 +504,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					}
 				}
 
+				if (previous == value) {
+					break;
+				}
+
 				let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(step)) * Math.LOG10E));
 				if (stepPower < 1) {
 					// exponent is less then 1 too. Count decimals of exponent
@@ -511,6 +516,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					value = $math.round(value, decCount);
 				}
 				i++;
+
+				previous = value;
 			}
 
 			for (let j = i; j < this.dataItems.length; j++) {
@@ -1169,7 +1176,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		min = this._fixMin(min);
 		max = this._fixMax(max);
 
-		// this happens if starLocation and endLocation are 0.5 and DateAxis has only one date
+		// this happens if starLocation and endLocation are 0.5 and DateAxis has only one date		
 		if (max - min <= 1 / Math.pow(10, 15)) {
 			if (max - min !== 0) {
 				this._deltaMinMax = (max - min) / 2;
@@ -1299,7 +1306,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 	}
 
-	protected _getDelta(max:number){
+	protected _getDelta(max: number) {
 		// the number by which we need to raise 10 to get difference
 		let exponent: number = Math.log(Math.abs(max)) * Math.LOG10E;
 
@@ -1309,10 +1316,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// reduce this number by 10 times
 		power = power / 10;
 
-		this._deltaMinMax = power;		
+		this._deltaMinMax = power;
 	}
 
-	protected _saveMinMax(_min:number, _max:number){
+	protected _saveMinMax(_min: number, _max: number) {
 
 	}
 

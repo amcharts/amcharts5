@@ -91,9 +91,10 @@ export class AxisRendererY extends AxisRenderer {
 		const thumb = this.thumb;
 		const opposite = "opposite";
 		const inside = "inside";
+		const chart = this.chart;
 
 		if (this.isDirty(opposite) || this.isDirty(inside)) {
-			const chart = this.chart;
+
 			const axisChildren = axis.children;
 
 			if (this.get(inside)) {
@@ -111,7 +112,6 @@ export class AxisRendererY extends AxisRenderer {
 					}
 					axis.addTag(opposite);
 					axisChildren.moveValue(this, 0);
-					thumb.set("centerX", 0);
 				}
 				else {
 					const children = chart.leftAxesContainer.children;
@@ -121,7 +121,6 @@ export class AxisRendererY extends AxisRenderer {
 					axis.removeTag(opposite);
 
 					axisChildren.moveValue(this);
-					thumb.set("centerX", p100);
 				}
 
 				axis.ghostLabel._applyThemes();
@@ -132,7 +131,19 @@ export class AxisRendererY extends AxisRenderer {
 			}
 			axis.markDirtySize();
 		}
-		thumb.setPrivate("width", axis.labelsContainer.width());
+
+		var w = axis.labelsContainer.width();
+
+		if (chart) {
+			if (this.get(opposite)) {
+				thumb.set("centerX", 0);
+			}
+			else {
+				thumb.set("centerX", w);
+			}
+		}
+
+		thumb.setPrivate("width", w);
 	}
 
 	/**
