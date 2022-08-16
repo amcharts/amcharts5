@@ -5,7 +5,7 @@ import type { DataItem } from "../../../core/render/Component";
 import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolylineSeriesDataItem } from "./PolylineSeries";
 import { Label } from "../../../core/render/Label";
 import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
-import { SpriteResizer } from "./SpriteResizer";
+import { SpriteResizer } from "../../../core/render/SpriteResizer";
 import { color, Color } from "../../../core/util/Color";
 
 import * as $utils from "../../../core/util/Utils";

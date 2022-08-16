@@ -11,7 +11,7 @@ export interface IGradient {
 
 /**
  * Represents an object describing color switching point in a gradiend.
- *
+ *F
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export interface IGradientStop {
@@ -130,7 +130,7 @@ export interface IDisplayObject extends IDisposer {
 
 export interface IContainer extends IDisplayObject {
 	interactiveChildren: boolean;
-
+	_renderer:IRenderer;	
 	addChild(child: IDisplayObject): void;
 	addChildAt(child: IDisplayObject, index: number): void;
 	removeChild(child: IDisplayObject): void;
@@ -267,6 +267,7 @@ export interface IRenderer extends IDisposer {
 	tapToActivateTimeout: number;
 	resolution: number;
 	interactionsEnabled: boolean;
+	_getHitTarget(point: IPoint, bbox: DOMRect): IDisplayObject | undefined | false;
 	createLinearGradient(x1: number, y1: number, x2: number, y2: number): IGradient;
 	createRadialGradient(x1: number, y1: number, radius1: number, x2: number, y2: number, radius2: number): IGradient;
 	createPattern(graphics: IGraphics, background: IGraphics, repetition: string, width: number, height: number): IPattern;

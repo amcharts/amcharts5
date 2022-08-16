@@ -97,6 +97,12 @@ export interface IContainerSettings extends ISpriteSettings {
 	 */
 	reverseChildren?: boolean;
 
+	/**
+	 * HTML content of the container.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/} for more info
+	 * @since 5.2.11
+	 */
 	html?: string;
 
 }
@@ -105,10 +111,12 @@ export interface IContainerEvents extends ISpriteEvents {
 }
 
 export interface IContainerPrivate extends ISpritePrivate {
+
 	/**
-	 * @todo review
+	 * A `<div>` element used for HTML content of the `Container`.
 	 */
 	htmlElement?: HTMLDivElement;
+
 }
 
 export interface IContainerEvents extends ISpriteEvents {
@@ -221,16 +229,6 @@ export class Container extends Sprite {
 					contentMask.dispose();
 					this._contentMask = undefined;
 				}
-			}
-		}
-
-		if (this.isDirty("html")) {
-			const html = this.get("html");
-			if (html && html !== "") {
-				this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
-			}
-			else {
-				this._root._removeHTMLContent(this);
 			}
 		}
 	}
@@ -538,6 +536,17 @@ export class Container extends Sprite {
 	}
 
 	public _updateChildren() {
+
+		if(this.isDirty("html")){
+			const html = this.get("html");
+			if (html && html !== "") {
+				this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
+			}
+			else {
+				this._root._removeHTMLContent(this);
+			}
+			this._root._positionHTMLElement(this);
+		}		
 
 		if (this.isDirty("verticalScrollbar")) {
 			const verticalScrollbar = this.get("verticalScrollbar")!;

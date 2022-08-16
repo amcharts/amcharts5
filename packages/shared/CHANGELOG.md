@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.16] - 2022-08-16
+
+### Changed
+- A clicked `PeriodSelector` button will now stay highlighted until other button is clicked, or chart is zoomed in any other way.
+- `SpriteResizer` class moved to main package. It's now accessible via `am5.SpriteResize`.
+
+### Fixed
+- Better initial sizing of HTML-content tooltips.
+- `MapChart` pan bounds were incorrect after size of a chart's div changed significantly.
+- If a panel with a volume series of `StockChart` or volume series itself was removed, adding indicators after this was resulting in an error.
+- On a chart with a `CategoryAxis` and series with non-consistent data, some data items might become invisible in some cases.
+- Removing a point from `MapPointSeries` was not affecting the `MapLineSeries` with lines that had this point in their `pointsToConnect` setting.
+- A `Label` rotated at `-90` angle was not being properly hidden as per `oversizedBehavior: "hide"`.
+- Opening a settings modal from `StockLegend` would cause chart to be panned/zoomed when modal was claused.
+
+
 ## [5.2.15] - 2022-08-06
 
 ### Added

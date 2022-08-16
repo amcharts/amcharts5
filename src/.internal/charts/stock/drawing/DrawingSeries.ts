@@ -691,11 +691,11 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.disposeDataItem(dataItem);
 		const dataContext = dataItem.dataContext as any;
 		if (dataContext) {
 			const index = dataContext.index;
 
-			$array.removeFirst(this.dataItems, dataItem);
 			this.markDirtyValues();
 
 			const dataItems = this._di[index];

@@ -65,6 +65,8 @@ export { Percent, percent, p100, p50, p0 } from "./.internal/core/util/Percent";
 export { Template } from "./.internal/core/util/Template";
 export { TextFormatter } from "./.internal/core/util/TextFormatter";
 
+export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/core/render/SpriteResizer";
+
 export type { IBounds } from "./.internal/core/util/IBounds";
 export type { IGeoPoint } from "./.internal/core/util/IGeoPoint";
 export type { IPoint } from "./.internal/core/util/IPoint";

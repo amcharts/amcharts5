@@ -279,7 +279,9 @@ export class Modal extends Entity {
 	public open(): void {
 		this.getPrivate("container").style.display = "block";
 		if (this.get("deactivateRoot")) {
-			this._root._renderer.interactionsEnabled = false;
+			this.setTimeout(() => {
+				this._root._renderer.interactionsEnabled = false;
+			}, 10);
 		}
 		this.events.dispatch("opened", {
 			type: "opened",

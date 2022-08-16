@@ -115,7 +115,19 @@ export class MapLineSeries extends MapSeries {
 			mapLine = this.makeMapLine(dataItem);
 		}
 
+		this._handlePointsToConnect(dataItem);
+		dataItem.on("pointsToConnect", ()=>{
+			this._handlePointsToConnect(dataItem);
+		})
+
 		dataItem.set("mapLine", mapLine);
+
+
+		mapLine.setPrivate("series", this);
+	}
+
+	protected _handlePointsToConnect(dataItem: DataItem<this["_dataItemSettings"]>){
+
 		const pointsToConnect = dataItem.get("pointsToConnect");
 		if (pointsToConnect) {
 			$array.each(pointsToConnect, (point) => {
@@ -135,8 +147,6 @@ export class MapLineSeries extends MapSeries {
 
 			this.markDirtyValues(dataItem);
 		}
-
-		mapLine.setPrivate("series", this);
 	}
 
 	/**

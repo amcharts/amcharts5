@@ -1,11 +1,11 @@
 import type { PanelControls } from "./PanelControls";
 import type { StockChart } from "./StockChart"
-
-import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import type { XYSeries } from "../xy/series/XYSeries";
 
-import * as $array from "../../core/util/Array";
+import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import { ListAutoDispose } from "../../core/util/List";
+
+import * as $array from "../../core/util/Array";
 
 export interface IStockPanelSettings extends IXYChartSettings {
 }
@@ -42,17 +42,17 @@ export class StockPanel extends XYChart {
 	 * A list of drawings on panel.
 	 *
 	 */
-	public readonly drawings: ListAutoDispose<XYSeries> = new ListAutoDispose();	
+	public readonly drawings: ListAutoDispose<XYSeries> = new ListAutoDispose();
 
-	protected _afterNew() {		
+	protected _afterNew() {
 		super._afterNew();
-		
+
 		this._disposers.push(this.drawings.events.onAll((change) => {
 			if (change.type === "clear") {
 				$array.each(change.oldValues, (series) => {
 					this.series.removeValue(series);
-				})				
-			} else if (change.type === "push") {				
+				})
+			} else if (change.type === "push") {
 				this.series.push(change.newValue);
 			} else if (change.type === "setIndex") {
 				this.series.setIndex(change.index, change.newValue);
@@ -64,7 +64,7 @@ export class StockPanel extends XYChart {
 				throw new Error("Unknown IListEvent type");
 			}
 		}));
-	}	
+	}
 
 	/**
 	 * Moves panel up.

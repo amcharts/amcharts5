@@ -117,7 +117,7 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	 * @since 5.2.8
 	 * @default false
 	 */
-	autoScale?:boolean
+	autoScale?: boolean
 
 };
 
@@ -350,6 +350,33 @@ export class MapPointSeries extends MapSeries {
 		if (chart) {
 			return chart.zoomToGeoPoint({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) }, zoomLevel, true);
 		}
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const chart = this.chart;
+		if (chart) {
+			chart.series.each((series) => {
+				if (series.isType<MapLineSeries>("MapLineSeries")) {
+					$array.each(series.dataItems, (di) => {
+						const pointsToConnect = di.get("pointsToConnect");
+						if (pointsToConnect) {
+							$array.each(pointsToConnect, (point) => {
+								if (point == dataItem) {
+									$array.remove(pointsToConnect, point);
+									series.markDirtyValues(di);
+								}
+							})
+						}
+					})
+				}
+			})
+		}
+
+		super.disposeDataItem(dataItem);
 	}
 
 }

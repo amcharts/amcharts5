@@ -223,6 +223,11 @@ export abstract class Indicator extends Container {
 
 			var settingsButton = legendDataItem.get("settingsButton");
 			settingsButton.setPrivate("customData", this);
+
+			const editableSettings = this._editableSettings;
+			if (!editableSettings || editableSettings.length == 0) {
+				settingsButton.set("forceHidden", true);
+			}
 		}
 	}
 
@@ -232,6 +237,7 @@ export abstract class Indicator extends Container {
 			series.set("fill", color);
 			if (series instanceof LineSeries) {
 				series.strokes.template.set("stroke", color);
+				series.fills.template.set("fill", color);
 			}
 
 			if (series instanceof BaseColumnSeries) {

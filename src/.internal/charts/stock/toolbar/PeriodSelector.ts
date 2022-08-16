@@ -1,8 +1,9 @@
 import type { TimeUnit } from "../../../core/util/Time"
-// import type { DateAxis } from "../../xy/axes/DateAxis";
-// import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
+import type { DateAxis } from "../../xy/axes/DateAxis";
+import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
 
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
+import { MultiDisposer, IDisposer } from "../../../core/util/Disposer";
 
 import * as $utils from "../../../core/util/Utils";
 import * as $time from "../../../core/util/Time";
@@ -24,6 +25,22 @@ export interface IPeriodSelectorSettings extends IStockControlSettings {
 }
 
 export interface IPeriodSelectorPrivate extends IStockControlPrivate {
+
+	/**
+	 * @ignore
+	 */
+	axis?: DateAxis<AxisRenderer>;
+
+	/**
+	 * @ignore
+	 */
+	deferReset?: boolean;
+
+	/**
+	 * @ignore
+	 */
+	deferTimeout?: IDisposer;
+
 }
 
 export interface IPeriodSelectorEvents extends IStockControlEvents {
@@ -63,9 +80,40 @@ export class PeriodSelector extends StockControl {
 			container.appendChild(button);
 
 			this._disposers.push($utils.addEventListener(button, "click", (_ev) => {
+				this.setPrivate("deferReset", false);
+				this._resetActiveButtons();
 				this.selectPeriod(period);
+				this.setPrivate("deferReset", true);
+				$utils.addClass(button, "am5stock-active");
+				const timeout = this.getPrivate("deferTimeout");
+				if (timeout) {
+					timeout.dispose();
+				}
+				const axis = this._getAxis();
+				this.setPrivate("deferTimeout", this.setTimeout(() => this.setPrivate("deferReset", false), axis.get("interpolationDuration", 1000) + 200));
 			}));
 		});
+
+	}
+
+	protected _resetActiveButtons(): void {
+		if (this.getPrivate("deferReset") !== true) {
+			const container = this.getPrivate("label")!;
+			const buttons = container.getElementsByClassName("am5stock-active");
+			$array.each(buttons, (b) => {
+				$utils.removeClass(<HTMLElement>b, "am5stock-active");
+			});
+
+			let axis = this.getPrivate("axis");
+			if (!axis) {
+				axis = this._getAxis();
+				this.setPrivate("axis", axis);
+				this._disposers.push(new MultiDisposer([
+					axis!.on("start", () => this._resetActiveButtons()),
+					axis!.on("end", () => this._resetActiveButtons())
+				]));
+			}
+		}
 	}
 
 	// protected _getDefaultIcon(): SVGElement {

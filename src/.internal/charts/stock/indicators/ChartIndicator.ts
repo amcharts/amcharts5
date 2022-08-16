@@ -112,7 +112,13 @@ export abstract class ChartIndicator extends Indicator {
 			legendDataItem.set("panel", chart);
 			legendDataItem.get("marker").set("forceHidden", true);
 
-			legendDataItem.get("settingsButton").setPrivate("customData", this);
+			const settingsButton = legendDataItem.get("settingsButton");
+			settingsButton.setPrivate("customData", this);
+			
+			const editableSettings = this._editableSettings;			
+			if (!editableSettings || editableSettings.length == 0) {
+				settingsButton.set("forceHidden", true);
+			}			
 
 			chart.set("cursor", XYCursor.new(root, { yAxis: yAxis, xAxis: xAxis }));
 

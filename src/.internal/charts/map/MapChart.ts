@@ -443,10 +443,16 @@ export class MapChart extends SerialChart {
 
 						this.setRaw("translateX", xx);
 						this.setRaw("translateY", yy);
+
+						this._centerX = translate[0];
+						this._centerY = translate[1];								
 					}
 				}
 
 				this.markDirtyProjection();
+
+				const geoPath = this.getPrivate("geoPath");
+				this._mapBounds = geoPath.bounds(this._geometryColection);
 			}
 		}
 
@@ -897,6 +903,7 @@ export class MapChart extends SerialChart {
 
 							const maxPanOut = this.get("maxPanOut", 0.4);
 							const bounds = this._mapBounds;
+
 							const w = this.width();
 							const h = this.height();
 

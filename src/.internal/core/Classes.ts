@@ -167,7 +167,7 @@ import type { SmoothedXLineSeries } from "./../charts/xy/series/SmoothedXLineSer
 import type { SmoothedXYLineSeries } from "./../charts/xy/series/SmoothedXYLineSeries";
 import type { SmoothedYLineSeries } from "./../charts/xy/series/SmoothedYLineSeries";
 import type { Sprite } from "./render/Sprite";
-import type { SpriteResizer } from "./../charts/stock/drawing/SpriteResizer";
+import type { SpriteResizer } from "./render/SpriteResizer";
 import type { Star } from "./render/Star";
 import type { StepLineSeries } from "./../charts/xy/series/StepLineSeries";
 import type { StochasticOscillator } from "./../charts/stock/indicators/StochasticOscillator";

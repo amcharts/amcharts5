@@ -44,7 +44,6 @@ export { QuadrantLineSeries, IQuadrantLineSeriesPrivate, IQuadrantLineSeriesData
 export { FibonacciSeries, IFibonacciSeriesPrivate, IFibonacciSeriesSettings, IFibonacciSeriesDataItem } from "./.internal/charts/stock/drawing/FibonacciSeries";
 export { FibonacciTimezoneSeries, IFibonacciTimezoneSeriesPrivate, IFibonacciTimezoneSeriesSettings, IFibonacciTimezoneSeriesDataItem } from "./.internal/charts/stock/drawing/FibonacciTimezoneSeries";
 export { HorizontalRaySeries, IHorizontalRaySeriesPrivate, IHorizontalRaySeriesSettings, IHorizontalRaySeriesDataItem } from "./.internal/charts/stock/drawing/HorizontalRaySeries";
-export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/charts/stock/drawing/SpriteResizer";
 
 export { StockToolbar, IStockToolbarEvents, IStockToolbarPrivate, IStockToolbarSettings } from "./.internal/charts/stock/toolbar/StockToolbar";
 export { StockControl, IStockControlEvents, IStockControlPrivate, IStockControlSettings } from "./.internal/charts/stock/toolbar/StockControl";

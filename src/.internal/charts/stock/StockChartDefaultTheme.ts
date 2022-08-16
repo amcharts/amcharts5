@@ -425,22 +425,6 @@ export class StockChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "alternativeBackground");
 		}
 
-		{
-			const rule = r("Circle", ["drawing", "grip", "outline"]);
-
-			rule.setAll({
-				strokeOpacity: 0,
-				fillOpacity: 0,
-				strokeWidth: 5,
-				radius: 7
-			});
-
-			rule.states.create("hover", {
-				strokeOpacity: 1,
-				fillOpacity: 1
-			});
-		}
-
 		r("Circle", ["drawing", "grip", "outline", "label"]).setAll({
 			forceHidden: true
 		})
@@ -552,67 +536,7 @@ export class StockChartDefaultTheme extends Theme {
 			strokeOpacity: 0
 		});
 
-		// resizer
-		{
-			const rule = r("RoundedRectangle", ["drawing", "grip"]);
 
-			rule.setAll({
-				strokeOpacity: 0.7,
-				strokeWidth: 1,
-				fillOpacity: 1,
-				width: 12,
-				height: 12
-			});
-
-			setColor(rule, "fill", ic, "background");
-			setColor(rule, "stroke", ic, "alternativeBackground");
-		}
-
-		{
-			const rule = r("RoundedRectangle", ["drawing", "grip", "outline"]);
-
-			rule.setAll({
-				strokeOpacity: 0,
-				fillOpacity: 0,
-				width: 20,
-				height: 20
-			});
-
-			rule.states.create("hover", {
-				fillOpacity: 0.5
-			});
-
-			setColor(rule, "fill", ic, "alternativeBackground");
-		}
-
-		r("SpriteResizer").setAll({
-			rotationStep: 10
-		})
-
-		r("RoundedRectangle", ["resizer", "grip", "left"]).setAll({
-			cornerRadiusBL: 0,
-			cornerRadiusBR: 0,
-			cornerRadiusTL: 0,
-			cornerRadiusTR: 0
-		});
-
-		r("RoundedRectangle", ["resizer", "grip", "right"]).setAll({
-			cornerRadiusBL: 0,
-			cornerRadiusBR: 0,
-			cornerRadiusTL: 0,
-			cornerRadiusTR: 0
-		});
-
-		{
-			const rule = r("Rectangle", ["resizer", "rectangle"]);
-			rule.setAll({
-				strokeDasharray: [2, 2],
-				strokeOpacity: 0.5,
-				strokeWidth: 1
-			});
-
-			setColor(rule, "stroke", ic, "alternativeBackground");
-		}
 		{
 			const rule = r("Ellipse", ["drawing"]);
 			rule.setAll({

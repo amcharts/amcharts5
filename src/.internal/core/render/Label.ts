@@ -350,7 +350,7 @@ export class Label extends Container {
 
 	protected _setMaxDimentions() {
 		const rotation = this.get("rotation");
-		const vertical = rotation == 90 || rotation == 270;
+		const vertical = rotation == 90 || rotation == 270 || rotation == -90;
 
 		const maxWidth = this.get("maxWidth", this.getPrivate("maxWidth", Infinity));
 		if ($type.isNumber(maxWidth)) {

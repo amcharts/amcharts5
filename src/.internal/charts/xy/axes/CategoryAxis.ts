@@ -183,7 +183,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 					}
 					otherAxis = xAxis;
 				}
-
+				
 				if (otherAxis.className == "ValueAxis") {
 
 					if (key || openKey) {
@@ -222,13 +222,19 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 							}
 						}
 
+						let startIndex = 0;
+						let endIndex = series.dataItems.length;
+						
 						if (startDataItem) {
-							series.setPrivate("startIndex", series.dataItems.indexOf(startDataItem));
+							startIndex = series.dataItems.indexOf(startDataItem);
 						}
 
 						if (endDataItem) {
-							series.setPrivate("endIndex", series.dataItems.indexOf(endDataItem) + 1);
+							endIndex = series.dataItems.indexOf(endDataItem) + 1;
 						}						
+
+						series.setPrivate("startIndex", startIndex);
+						series.setPrivate("endIndex", endIndex);
 					}
 				}
 				series._markDirtyAxes();	// must be outside

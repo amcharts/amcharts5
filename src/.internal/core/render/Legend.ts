@@ -436,6 +436,8 @@ export class Legend extends Series {
 	 */
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 
+		super.disposeDataItem(dataItem);
+
 		const dataContext = dataItem.dataContext as any;
 		if (dataContext && dataContext.get) {
 			const di = dataContext.get("legendDataItem");

@@ -946,14 +946,81 @@ export class DefaultTheme extends Theme {
 		});
 
 		r("PointedRectangle", ["tooltip", "stock", "axis"]).setAll({
-			pointerLength:0, 
-			pointerBaseWidth:0,
-			cornerRadius:3		
-		});	
+			pointerLength: 0,
+			pointerBaseWidth: 0,
+			cornerRadius: 3
+		});
 
 		r("Label", ["tooltip", "stock"]).setAll({
-			fontSize:"0.8em"
-		});		
+			fontSize: "0.8em"
+		});
 
+		// resizer
+
+		r("SpriteResizer").setAll({
+			rotationStep: 10
+		})
+
+		{
+			const rule = r("Container", ["resizer", "grip"]);
+			rule.states.create("hover", {});
+		}
+
+		{
+			const rule = r("RoundedRectangle", ["resizer", "grip"]);
+
+			rule.setAll({
+				strokeOpacity: 0.7,
+				strokeWidth: 1,
+				fillOpacity: 1,
+				width: 12,
+				height: 12
+			});
+
+			setColor(rule, "fill", ic, "background");
+			setColor(rule, "stroke", ic, "alternativeBackground");
+		}
+
+		{
+			const rule = r("RoundedRectangle", ["resizer", "grip", "outline"]);
+
+			rule.setAll({
+				strokeOpacity: 0,
+				fillOpacity: 0,
+				width: 20,
+				height: 20
+			});
+
+			rule.states.create("hover", {
+				fillOpacity: 0.3
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+		}
+
+		r("RoundedRectangle", ["resizer", "grip", "left"]).setAll({
+			cornerRadiusBL: 0,
+			cornerRadiusBR: 0,
+			cornerRadiusTL: 0,
+			cornerRadiusTR: 0
+		});
+
+		r("RoundedRectangle", ["resizer", "grip", "right"]).setAll({
+			cornerRadiusBL: 0,
+			cornerRadiusBR: 0,
+			cornerRadiusTL: 0,
+			cornerRadiusTR: 0
+		});
+
+		{
+			const rule = r("Rectangle", ["resizer", "rectangle"]);
+			rule.setAll({
+				strokeDasharray: [2, 2],
+				strokeOpacity: 0.5,
+				strokeWidth: 1
+			});
+
+			setColor(rule, "stroke", ic, "alternativeBackground");
+		}
 	}
 }

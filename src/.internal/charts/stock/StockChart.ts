@@ -302,6 +302,20 @@ export class StockChart extends Container {
 		super._updateChildren()
 		const stockSeries = this.get("stockSeries");
 
+		if (this.isDirty("volumeSeries")) {
+			const volumeSeries = this.get("volumeSeries");
+			if (volumeSeries) {
+				const volumePanel = volumeSeries.chart;
+				if (volumePanel) {
+					volumePanel.series.events.on("removeIndex", (event) => {
+						if (event.oldValue == volumeSeries) {
+							this.set("volumeSeries", undefined);
+						}
+					})
+				}
+			}
+		}
+
 		if (this.isDirty("stockNegativeColor") || this.isDirty("stockPositiveColor") || this.isDirty("stockSeries")) {
 			if (stockSeries && stockSeries.isType<BaseColumnSeries>("BaseColumnSeries")) {
 				const stockNegativeColor = this.get("stockNegativeColor", this._root.interfaceColors.get("negative"));

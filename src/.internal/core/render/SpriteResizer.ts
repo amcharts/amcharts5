@@ -1,14 +1,13 @@
-import type { Sprite } from "../../../core/render/Sprite";
-import type { ISpritePointerEvent } from "../../../core/render/Sprite";
-import type { IDisposer } from "../../../core/util/Disposer";
+import type { Sprite, ISpritePointerEvent } from "./Sprite";
+import type { IDisposer } from "../util/Disposer";
 
-import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "../../../core/render/Container";
-import { p50, Percent } from "../../../core/util/Percent";
-import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
-import { Rectangle } from "../../../core/render/Rectangle";
-import { color } from "../../../core/util/Color";
+import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
+import { p50, Percent } from "../util/Percent";
+import { RoundedRectangle } from "./RoundedRectangle";
+import { Rectangle } from "./Rectangle";
+import { color } from "../util/Color";
 
-import * as $math from "../../../core/util/Math";
+import * as $math from "../util/Math";
 
 export interface ISpriteResizerSettings extends IContainerSettings {
 
@@ -193,8 +192,8 @@ export class SpriteResizer extends Container {
 
 			const rectangle = this.rectangle;
 
-			let cx = sprite.get("centerX");
-			let cy = sprite.get("centerY");
+			let cx = sprite.get("centerX", p50);
+			let cy = sprite.get("centerY", p50);
 
 			let cxr = 0;
 			if (cx instanceof Percent) {

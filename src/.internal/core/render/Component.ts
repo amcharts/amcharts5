@@ -332,7 +332,9 @@ export abstract class Component extends Container {
 	/**
 	 * @ignore
 	 */
-	public disposeDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) { }
+	public disposeDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {
+		
+	}
 
 	/**
 	 * Shows component's data item.

@@ -167,7 +167,7 @@ import type { SmoothedXLineSeries } from "./../../../xy";
 import type { SmoothedXYLineSeries } from "./../../../xy";
 import type { SmoothedYLineSeries } from "./../../../xy";
 import type { Sprite } from "./../../../index";
-import type { SpriteResizer } from "./../../../stock";
+import type { SpriteResizer } from "./../../../index";
 import type { Star } from "./../../../index";
 import type { StepLineSeries } from "./../../../xy";
 import type { StochasticOscillator } from "./../../../stock";
@@ -558,7 +558,7 @@ const classes: IClasses = {
 	"SmoothedXYLineSeries": () => import(/* webpackExports: "SmoothedXYLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.SmoothedXYLineSeries),
 	"SmoothedYLineSeries": () => import(/* webpackExports: "SmoothedYLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.SmoothedYLineSeries),
 	"Sprite": () => import(/* webpackExports: "Sprite", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Sprite),
-	"SpriteResizer": () => import(/* webpackExports: "SpriteResizer", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SpriteResizer),
+	"SpriteResizer": () => import(/* webpackExports: "SpriteResizer", webpackChunkName: "json_stock" */ "./../../../index").then((m) => m.SpriteResizer),
 	"Star": () => import(/* webpackExports: "Star", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Star),
 	"StepLineSeries": () => import(/* webpackExports: "StepLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.StepLineSeries),
 	"StochasticOscillator": () => import(/* webpackExports: "StochasticOscillator", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StochasticOscillator),

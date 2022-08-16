@@ -697,6 +697,8 @@ export abstract class Series extends Component {
 	 * @ignore
 	 */
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		//super.disposeDataItem(dataItem); // does nothing
+		
 		const bullets = dataItem.bullets;
 
 		if(bullets){

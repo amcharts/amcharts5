@@ -1708,6 +1708,8 @@ export class Root implements IDisposer {
 				const bbox = htmlElement.getBoundingClientRect();
 				w = bbox.width;
 				h = bbox.height;
+
+				target._adjustedLocalBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 				target.setPrivate("minWidth", w);
 				target.setPrivate("minHeight", h);
 			}

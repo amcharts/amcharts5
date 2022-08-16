@@ -241,7 +241,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	// TODO can this be replaced with _localMatrix ?
 	protected _uMatrix: Matrix = new Matrix();
 
-	protected _renderer: CanvasRenderer;
+	public _renderer: CanvasRenderer;
 	public _parent: CanvasContainer | undefined;
 
 	protected _localBounds: IBounds | undefined;

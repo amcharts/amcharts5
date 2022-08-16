@@ -726,7 +726,7 @@ export abstract class Sprite extends Entity {
 
 	public abstract _display: IDisplayObject;
 
-	protected _adjustedLocalBounds: IBounds = { left: 0, right: 0, top: 0, bottom: 0 };
+	public _adjustedLocalBounds: IBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 
 	protected _localBounds: IBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 

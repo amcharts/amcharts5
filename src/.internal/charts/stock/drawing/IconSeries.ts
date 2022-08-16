@@ -5,7 +5,7 @@ import type { DataItem } from "../../../core/render/Component";
 import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolylineSeriesDataItem } from "./PolylineSeries";
 import { Bullet } from "../../../core/render/Bullet";
 import { Graphics } from "../../../core/render/Graphics";
-import { SpriteResizer } from "./SpriteResizer";
+import { SpriteResizer } from "../../../core/render/SpriteResizer";
 
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 	/**
