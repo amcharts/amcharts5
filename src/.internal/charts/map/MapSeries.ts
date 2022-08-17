@@ -23,11 +23,13 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	 * An array of map object ids from geodata to include in the map.
 	 *
 	 * If set, only those objects listed in `include` will be shown.
+	 * If you want to change this after the map is initialized, you should call series.data.clear() before setting `include`
 	 */
 	include?: Array<string>;
 
 	/**
 	 * An array of map object ids from geodata to omit when showing the map.
+	 * If you want to change this after the map is initialized, you should call series.data.clear() before setting `exclude`
 	 */
 	exclude?: Array<string>;
 

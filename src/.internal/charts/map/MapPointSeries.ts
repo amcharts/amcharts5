@@ -267,6 +267,8 @@ export class MapPointSeries extends MapSeries {
 			if (polygon) {
 				let geoPoint = polygon.visualCentroid();
 				coordinates = [geoPoint.longitude, geoPoint.latitude];
+				dataItem.setRaw("longitude", geoPoint.longitude);
+				dataItem.setRaw("latitude", geoPoint.latitude);
 			}
 			else if (line && $type.isNumber(positionOnLine)) {
 				let geoPoint = line.positionToGeoPoint(positionOnLine);
@@ -282,6 +284,9 @@ export class MapPointSeries extends MapSeries {
 					//dataItem.set("autoRotateAngle", $math.getAngle(point0, point1));
 					angle = $math.getAngle(point0, point1);
 				}
+
+				dataItem.setRaw("longitude", geoPoint.longitude);
+				dataItem.setRaw("latitude", geoPoint.latitude);
 			}
 			else if ($type.isNumber(longitude) && $type.isNumber(latitude)) {
 				coordinates = [longitude, latitude];

@@ -28,11 +28,18 @@ import { DropdownList, IDropdownListItem } from "./DropdownList";
 import { StockIcons } from "./StockIcons";
 
 import * as $array from "../../../core/util/Array";
+import * as $type from "../../../core/util/Type";
 
 export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Stochastic Oscillator" | "Volume" | "VWAP" | "Williams R";
 
+export interface IIndicator {
+	id: string;
+	name: string;
+	callback: () => Indicator;
+}
+
 export interface IIndicatorControlSettings extends IStockControlSettings {
-	indicators?: Indicators[];
+	indicators?: Array<Indicators | IIndicator>;
 	legend?: StockLegend;
 }
 
@@ -98,11 +105,19 @@ export class IndicatorControl extends StockControl {
 		const list = this.getPrivate("list")!;
 		const indicators = this.get("indicators")!;
 		const items: IDropdownListItem[] = [];
-		$array.each(indicators, (indicator: Indicators) => {
-			items.push({
-				id: indicator,
-				label: this._root.language.translateAny(indicator)
-			});
+		$array.each(indicators, (indicator: Indicators | IIndicator) => {
+			if ($type.isObject(indicator)) {
+				items.push({
+					id: indicator.id,
+					label: indicator.name
+				});
+			}
+			else {
+				items.push({
+					id: indicator,
+					label: this._root.language.translateAny(indicator)
+				});
+			}
 		})
 		list.set("items", items);
 	}
@@ -111,8 +126,9 @@ export class IndicatorControl extends StockControl {
 		return StockIcons.getIcon("Indicator");
 	}
 
-	public _afterChanged() {
-		super._afterChanged();
+	public _beforeChanged() {
+		super._beforeChanged();
+			console.log(this.isDirty("indicators"))
 		if (this.isDirty("indicators")) {
 			this._initList();
 		}
@@ -256,9 +272,20 @@ export class IndicatorControl extends StockControl {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					volumeSeries: volumeSeries,
-					legend:legend
+					legend: legend
 				});
-				break;				
+				break;
+		}
+
+		if (!indicator) {
+			// Try searching in the list
+			$array.eachContinue(this.get("indicators", []), (item) => {
+				if ($type.isObject(item) && item.id == indicatorId) {
+					indicator = item.callback.call(this);
+					return false;
+				}
+				return true;
+			});
 		}
 
 		if (indicator) {

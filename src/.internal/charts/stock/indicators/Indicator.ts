@@ -199,11 +199,29 @@ export abstract class Indicator extends Container {
 
 	protected _dispose() {
 		super._dispose();
+
 		if (this._sDP) {
 			this._sDP.dispose();
 		}
 		if (this._vDP) {
 			this._vDP.dispose();
+		}
+
+		const series = this.series;
+		if (series) {
+			series.dispose();
+		}
+
+		const stockChart = this.get("stockChart");
+		if (stockChart) {
+			const legend = this.get("legend");
+			if (legend) {
+				const legendDataItem = series.get("legendDataItem");
+				if (legendDataItem) {
+					legend.disposeDataItem(legendDataItem as any);
+				}
+			}
+			stockChart.indicators.removeValue(this);
 		}
 	}
 

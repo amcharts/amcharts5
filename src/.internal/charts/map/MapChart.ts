@@ -6,6 +6,8 @@ import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { Time } from "../../core/util/Animation";
 import type { ZoomControl } from "./ZoomControl";
 import type { Animation } from "../../core/util/Entity";
+import type { DataItem } from "../../core/render/Component";
+import type { IMapPolygonSeriesDataItem } from "./MapPolygonSeries";
 
 import { MapChartDefaultTheme } from "./MapChartDefaultTheme";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
@@ -445,7 +447,7 @@ export class MapChart extends SerialChart {
 						this.setRaw("translateY", yy);
 
 						this._centerX = translate[0];
-						this._centerY = translate[1];								
+						this._centerY = translate[1];
 					}
 				}
 
@@ -1098,5 +1100,17 @@ export class MapChart extends SerialChart {
 		super._clearDirty();
 		this._dirtyGeometries = false;
 		this._mapFitted = false;
+	}
+
+	/**
+	 * Returns area of a mapPolygon in square pixels.
+	 */
+	public getArea(dataItem: DataItem<IMapPolygonSeriesDataItem>): number {
+		const geoPath = this.getPrivate("geoPath");
+		const geometry = dataItem.get("geometry");
+		if (geometry) {
+			return geoPath.area(geometry);
+		}
+		return 0;
 	}
 }

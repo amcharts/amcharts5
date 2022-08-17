@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.17] - 2022-08-17
+
+### Added
+- `IndicatorControl` setting `indicators` now accepts objects. [More info](https://www.amcharts.com/docs/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#Adding_to_toolbar).
+- `getArea()` method added to `MapChart`. Returns area of a `MapPolygon` in square pixels.
+
+
 ## [5.2.16] - 2022-08-16
 
 ### Changed

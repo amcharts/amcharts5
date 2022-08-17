@@ -78,23 +78,6 @@ export class VWAP extends Indicator {
 		super._prepareChildren();
 	}
 
-	protected _dispose() {
-		const stockChart = this.get("stockChart");
-
-		const series = this.series;
-		series.dispose();
-
-		if (stockChart) {
-			const legend = this.get("legend");
-			if (legend) {
-				const legendDataItem = series.get("legendDataItem");
-				if (legendDataItem) {
-					legend.disposeDataItem(legendDataItem as any);
-				}
-			}
-			stockChart.indicators.removeValue(this);
-		}
-	}
 
 	/**
 	 * @ignore
