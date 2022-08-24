@@ -53,28 +53,28 @@ export class VerticalLayout extends Layout {
 			}
 		})
 
-		if(availableHeight < 0){
+		if (availableHeight < 0) {
 			availableHeight = 0.01;
 		}
 
 		//if (availableHeight > 0) {
-			eachChildren(container, (child) => {
-				if (child.isVisible()) {
-					if (child.get("position") == "relative") {
-						let childHeight = child.get("height");
+		eachChildren(container, (child) => {
+			if (child.isVisible()) {
+				if (child.get("position") == "relative") {
+					let childHeight = child.get("height");
 
-						if (childHeight instanceof Percent) {
-							let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
+					if (childHeight instanceof Percent) {
+						let privateHeight = availableHeight * childHeight.value / totalPercent - child.get("marginTop", 0) - child.get("marginBottom", 0);
 
-							let minHeight = child.get("minHeight", child.getPrivate("minHeight", -Infinity));
-							let maxHeight = child.get("maxHeight", child.getPrivate("maxHeight", Infinity));
-							privateHeight = Math.min(Math.max(minHeight, privateHeight), maxHeight);
+						let minHeight = child.get("minHeight", child.getPrivate("minHeight", -Infinity));
+						let maxHeight = child.get("maxHeight", child.getPrivate("maxHeight", Infinity));
+						privateHeight = Math.min(Math.max(minHeight, privateHeight), maxHeight);
 
-							child.setPrivate("height", privateHeight);
-						}
+						child.setPrivate("height", privateHeight);
 					}
 				}
-			});
+			}
+		});
 		//}
 
 		let prevY = paddingTop;
@@ -84,10 +84,21 @@ export class VerticalLayout extends Layout {
 				if (child.isVisible()) {
 					let bounds = child.adjustedLocalBounds();
 					let marginTop = child.get("marginTop", 0);
+
+					let top = bounds.top;
+					let bottom = bounds.bottom;
+
+					let maxHeight = child.get("maxHeight");
+					if (maxHeight) {
+						if (bottom - top > maxHeight) {
+							bottom = top + maxHeight;
+						}
+					}
+
 					let marginBottom = child.get("marginBottom", 0);
-					let y = prevY + marginTop - bounds.top;
+					let y = prevY + marginTop - top;
 					child.setPrivate("y", y);
-					prevY = y + bounds.bottom + marginBottom;
+					prevY = y + bottom + marginBottom;
 				}
 				else {
 					child.setPrivate("y", undefined);

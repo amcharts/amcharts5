@@ -49,7 +49,7 @@ export interface IIndicatorControlPrivate extends IStockControlPrivate {
 
 export interface IIndicatorControlEvents extends IStockControlEvents {
 	selected: {
-		indicator: Indicators
+		indicator: Indicator | IIndicator
 	}
 }
 
@@ -128,7 +128,6 @@ export class IndicatorControl extends StockControl {
 
 	public _beforeChanged() {
 		super._beforeChanged();
-			console.log(this.isDirty("indicators"))
 		if (this.isDirty("indicators")) {
 			this._initList();
 		}
@@ -300,6 +299,14 @@ export class IndicatorControl extends StockControl {
 					}
 				});
 				modal.openIndicator(indicator);
+			}
+
+			if (this.events.isEnabled("selected")) {
+				this.events.dispatch("selected", {
+					type: "selected",
+					target: this,
+					indicator: indicator
+				});
 			}
 		}
 	}

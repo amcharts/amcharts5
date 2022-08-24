@@ -3,7 +3,7 @@ export { Theme } from "./.internal/core/Theme";
 export { addLicense, registry, disposeAllRootElements } from "./.internal/core/Registry";
 export { ready } from "./.internal/core/util/Utils";
 export { Modal, IModalSettings } from "./.internal/core/util/Modal";
-export { Entity, IEntitySettings } from "./.internal/core/util/Entity";
+export { Entity, IEntitySettings, IEntityEvents, IEntityPrivate } from "./.internal/core/util/Entity";
 
 export { Bullet, IBulletSettings, IBulletPrivate } from "./.internal/core/render/Bullet";
 export { Button, IButtonSettings, IButtonPrivate } from "./.internal/core/render/Button";

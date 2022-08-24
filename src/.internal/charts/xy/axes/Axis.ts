@@ -387,6 +387,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		}
 		this.children.push(renderer);
 		this.ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}), []);
+		this.ghostLabel.adapters.disable("text");
 		this.ghostLabel.set("opacity", 0);
 	}
 

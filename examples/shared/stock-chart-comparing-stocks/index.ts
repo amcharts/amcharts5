@@ -88,7 +88,7 @@ let valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
   xAxis: dateAxis,
   yAxis: valueAxis,
   legendValueText: "open: [bold]{openValueY}[/] high: [bold]{highValueY}[/] low: [bold]{lowValueY}[/] close: [bold]{valueY}[/]",
-  legendRangeValueText:""
+  legendRangeValueText: ""
 }));
 
 
@@ -226,7 +226,27 @@ let comparisonControl = am5stock.ComparisonControl.new(root, {
   stockChart: stockChart,
   searchable: true,
   searchCallback: (query) => {
-    return getTicker(query);
+    var compared = stockChart.getPrivate("comparedSeries", []);
+    if (compared.length > 4) {
+      return [{
+        label: "A maximum of 5 comparisons is already selected. Remove some to add new ones.",
+        id: "count",
+        info: true
+      }];
+    };
+
+    var comparedIds = [];
+    am5.array.each(compared, function(series) {
+      comparedIds.push(series.get("name"));
+    });
+
+    var list = getTicker(query);
+    am5.array.each(list, function(item) {
+      if (comparedIds.indexOf(item.id) !== -1) {
+        item.disabled = true;
+      }
+    })
+    return list;
   }
 });
 
@@ -234,7 +254,7 @@ comparisonControl.events.on("selected", function(ev) {
   addComparingSeries(ev.item.subLabel);
 });
 
-function addComparingSeries(label){
+function addComparingSeries(label) {
   let series = am5xy.LineSeries.new(root, {
     name: label,
     valueYField: "Close",
@@ -245,7 +265,7 @@ function addComparingSeries(label){
     legendValueText: "{valueY.formatNumber('#.00')}"
   });
   let comparingSeries = stockChart.addComparingSeries(series);
-  loadData(label, [comparingSeries], currentGranularity);  
+  loadData(label, [comparingSeries], currentGranularity);
 }
 
 function getTicker(search: string) {

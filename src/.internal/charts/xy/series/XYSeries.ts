@@ -2069,6 +2069,8 @@ export abstract class XYSeries extends Series {
 
 	public _afterDataChange() {
 		super._afterDataChange();
+		this.get("xAxis")._markDirtyKey("start");
+		this.get("yAxis")._markDirtyKey("start");
 		this.resetExtremes();
 	}
 

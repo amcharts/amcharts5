@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.18] - 2022-08-24
+
+### Added
+- `disabled` key support added to `DropdownList` item interface.
+
+### Fixed
+- Removed leftover debug code in `IndicatorControl`.
+- `selected` event in `IndicatorControl` was not firing.
+- Adding an adapter on Y-axis' labels could cause flickers on the chart.
+- `maxWidth`/`maxHeight` of a `Container` was ignored when arranging objects by Horizontal or Vertical layout.
+- `maxWidth`/`maxHeight` of a `Container` was ignored when drawing background.
+
+
 ## [5.2.17] - 2022-08-17
 
 ### Added

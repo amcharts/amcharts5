@@ -338,7 +338,7 @@ export class Color {
 	/**
 	 * Returns a new [[Color]] saturated by `percent` value.
 	 *
-	 * Use negative value to desaturate the color.
+	 * Value range is between `0` (fully desaturated), to `1` (full color).
 	 *
 	 * @param   color    Source color
 	 * @param   percent  Percent

@@ -14,6 +14,7 @@ export interface IDropdownListItem {
 	value?: string;
 	checked?: boolean;
 	options?: IDropdownListItem[];
+	disabled?: boolean;
 }
 
 export interface IDropdownListSettings extends IDropdownSettings {
@@ -250,14 +251,19 @@ export class DropdownList extends Dropdown {
 		list.appendChild(item);
 
 		// Add click event
-		this._disposers.push($utils.addEventListener(item, "click", (_ev) => {
-			this.hide();
-			this.events.dispatch("invoked", {
-				type: "invoked",
-				item: info,
-				target: this
-			});
-		}));
+		if (info.disabled) {
+			item.className += " am5stock-disabled";
+		}
+		else {
+			this._disposers.push($utils.addEventListener(item, "click", (_ev) => {
+				this.hide();
+				this.events.dispatch("invoked", {
+					type: "invoked",
+					item: info,
+					target: this
+				});
+			}));
+		}
 	}
 
 	public hide(): void {

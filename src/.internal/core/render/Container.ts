@@ -258,6 +258,21 @@ export class Container extends Sprite {
 			let w = bounds.right - x;
 			let h = bounds.bottom - y;
 
+			let maxWidth = this.get("maxWidth");
+			let maxHeight = this.get("maxHeight");
+
+			if (maxHeight) {
+				if (h > maxHeight) {
+					h = maxHeight;
+				}
+			}
+
+			if (maxWidth) {
+				if (w > maxWidth) {
+					w = maxWidth;
+				}
+			}			
+
 			let width = this.width();
 			let height = this.height();
 

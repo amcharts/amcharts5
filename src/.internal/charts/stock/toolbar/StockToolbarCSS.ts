@@ -17,6 +17,7 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 	const hover = ic.get("secondaryButtonHover")!.toCSS();
 	//const border = ic.get("secondaryButtonStroke")!.toCSS();
 	const text = ic.get("text")!.toCSS();
+	const textDisabled = ic.get("disabled")!.toCSS();
 	const border = ic.get("secondaryButtonActive")!.toCSS();
 	const bg = ic.get("background")!.toCSS();
 
@@ -191,6 +192,11 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"font-weight": "bold",
 				"color": "initial",
 				"margin-top": "0.3em"
+			}),
+
+			new StyleRule(element, ".am5stock-control-list li.am5stock-disabled:hover, .am5stock-control-list li.am5stock-disabled > *", {
+				"background": "none",
+				"color": textDisabled
 			}),
 
 			new StyleRule(element, ".am5stock-control-list li svg", {

@@ -41,9 +41,61 @@ function replaceSubstitutions(template) {
 }
 
 
-function get_es2015_imports(template, path_to_v5) {
-	const imports = [];
+async function mapFiles1(from, to, f) {
+	const files = await readdir(from);
 
+	if (files === null) {
+		await f(from, to);
+
+	} else {
+		await mkdir(to);
+
+		await Promise.all(files.map(async (file) => {
+			await mapFiles1($path.join(from, file), $path.join(to, file), f);
+		}));
+	}
+}
+
+// TODO move this into utils
+async function mapFiles(from, to, f) {
+	if (await exists(from)) {
+		await mapFiles1(from, to, f);
+	}
+}
+
+
+async function processFiles(base, dir, f) {
+	await mkdir(dir);
+
+	await Promise.all([
+		copyTemplateDir($path.join(base, "template"), dir),
+
+		f($path.join(base, "index.ts"), $path.join(dir, "index.ts")),
+
+		mapFiles($path.join(base, "src"), $path.join(dir, "src"), f),
+	]);
+}
+
+
+function mergeObjects(left, right) {
+	if (left !== null && typeof left === "object" && right !== null && typeof right === "object") {
+		for (var key in right) {
+			left[key] = mergeObjects(left[key], right[key]);
+		}
+
+		return left;
+
+	} else {
+		return right;
+	}
+}
+
+function printPackageJson(json) {
+	return JSON.stringify(json, null, 2);
+}
+
+
+function find_imports(imports, template) {
 	const re = /^ *import(?:\(|[^"\n\r]+)"([^"\n\r]+)"(?:\)|;[\n\r]*)/gm;
 
 	let x;
@@ -51,35 +103,72 @@ function get_es2015_imports(template, path_to_v5) {
 	while ((x = re.exec(template)) != null) {
 		const path = x[1];
 
-        if (path[0] !== ".") {
-            const split = path.split(/\//g);
+		if (imports.indexOf(path) === -1) {
+			imports.push(path);
+		}
+	}
+}
 
-            let package;
+
+function imports_to_packages(imports) {
+	const packages = {};
+
+	imports.forEach((path) => {
+		if (path[0] !== ".") {
+            const split = path.split(/\//g);
 
             if (split[0] === "@amcharts" && split[1] === "amcharts5") {
                 const json = require("../../package.json");
                 //package = `"@amcharts/amcharts5": "file:${path_to_v5}"`;
-                package = `"@amcharts/amcharts5": "^${json.version}"`;
+                packages["@amcharts/amcharts5"] = `^${json.version}`;
 
             } else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
                 const json = require("../../packages/geodata/package.json");
-                package = `"@amcharts/amcharts5-geodata": "^${json.version}"`;
+                packages["@amcharts/amcharts5-geodata"] = `^${json.version}`;
 
             } else if (split[0] === "@amcharts" && split[1] === "amcharts5-fonts") {
                 const json = require("../../packages/fonts/package.json");
-                package = `"@amcharts/amcharts5-fonts": "^${json.version}"`;
+                packages["@amcharts/amcharts5-fonts"] = `^${json.version}`;
 
             } else {
                 throw new Error("Unknown import: " + path);
             }
-
-            if (imports.indexOf(package) === -1) {
-                imports.push(package);
-            }
         }
-	}
+	});
 
-	return imports;
+	return packages;
+}
+
+
+async function write_typescript(imports, from, to) {
+	const file = await readFile(from);
+	const template = replaceSubstitutions(file);
+	find_imports(imports, template);
+	await writeFile(to, template);
+}
+
+async function write_es2015(imports, from, to) {
+	const file = await readFile(from);
+	const template = replaceSubstitutions(removeTypeScriptTypes(file));
+	find_imports(imports, template);
+	await writeFile(to.replace(/\.ts$/, ".js"), template);
+}
+
+async function write_js(imports, from, to) {
+	const file = await readFile(from);
+
+	let template = replaceSubstitutions(removeTypeScriptTypes(file));
+	find_imports(imports, template);
+
+	template = template.replace(/^ *import[^"\n\r]+"([^"\n\r]+)";[\n\r]*/gm, "");
+
+	// TODO make this more reliable
+	template = template.replace(/\b(?:let|const)(?= +[$_a-zA-Z][$_a-zA-Z0-9]*(?: +=| +in |;))/g, "var");
+
+	// TODO make this more reliable
+	template = template.replace(/(\([^\(\)]*\)) *=> */g, "function $1 ");
+
+	await writeFile(to.replace(/\.ts$/, ".js"), template);
 }
 
 
@@ -112,35 +201,33 @@ async function write_es2015_shared(config, base, dir) {
 }
 
 
-async function transpile_typescript(config, base, dir, template) {
-	const imports = get_es2015_imports(template, posixPath($path.relative(dir, "es2015")));
+async function transpile_typescript(config, base, dir) {
+	const imports = [];
+
+	await processFiles(base, dir, (from, to) => write_typescript(imports, from, to));
 
 	await Promise.all([
 		write_shared(config, base, dir),
 
 		write_es2015_shared(config, base, dir),
 
-		writeFile($path.join(dir, "index.ts"), template),
-
-		writeFile($path.join(dir, "package.json"),
-`{
-  "private": true,
-  "name": "amcharts5-example-${$path.basename(dir)}",
-  "version": "0.1.0",
-  "devDependencies": {${imports.map((x) => `
-    ${x},`).join("")}
-    "source-map-loader": "^3.0.0",
-    "ts-loader": "^9.2.2",
-    "typescript": "^4.3.4",
-    "webpack": "^5.1.3",
-    "webpack-cli": "^4.1.0",
-    "webpack-dev-server": "^3.11.0"
-  },
-  "scripts": {
-    "build": "webpack",
-    "start": "webpack serve --mode development"
-  }
-}`),
+		writeFile($path.join(dir, "package.json"), printPackageJson(mergeObjects({
+			"private": true,
+			"name": `amcharts5-example-${$path.basename(dir)}`,
+			"version": "0.1.0",
+			"devDependencies": Object.assign(imports_to_packages(imports), {
+				"source-map-loader": "^3.0.0",
+				"ts-loader": "^9.2.2",
+				"typescript": "^4.3.4",
+				"webpack": "^5.1.3",
+				"webpack-cli": "^4.1.0",
+				"webpack-dev-server": "^3.11.0"
+			}),
+			"scripts": {
+				"build": "webpack",
+				"start": "webpack serve --mode development"
+			}
+		}, config.packageJson))),
 
 		writeFile($path.join(dir, "webpack.config.js"),
 `var $path = require("path");
@@ -207,33 +294,31 @@ module.exports = {
 
 
 // TODO generate yarn.lock file
-async function transpile_es2015(config, base, dir, template) {
-	const imports = get_es2015_imports(template, posixPath($path.relative(dir, "es2015")));
+async function transpile_es2015(config, base, dir) {
+	const imports = [];
+
+	await processFiles(base, dir, (from, to) => write_es2015(imports, from, to));
 
 	await Promise.all([
 		write_shared(config, base, dir),
 
 		write_es2015_shared(config, base, dir),
 
-		writeFile($path.join(dir, "index.js"), template),
-
-		writeFile($path.join(dir, "package.json"),
-`{
-  "private": true,
-  "name": "amcharts5-example-${$path.basename(dir)}",
-  "version": "0.1.0",
-  "devDependencies": {${imports.map((x) => `
-    ${x},`).join("")}
-    "source-map-loader": "^3.0.0",
-    "webpack": "^5.1.3",
-    "webpack-cli": "^4.1.0",
-    "webpack-dev-server": "^3.11.0"
-  },
-  "scripts": {
-    "build": "webpack",
-    "start": "webpack serve --mode development"
-  }
-}`),
+		writeFile($path.join(dir, "package.json"), printPackageJson(mergeObjects({
+			"private": true,
+			"name": `amcharts5-example-${$path.basename(dir)}`,
+			"version": "0.1.0",
+			"devDependencies": Object.assign(imports_to_packages(imports), {
+				"source-map-loader": "^3.0.0",
+				"webpack": "^5.1.3",
+				"webpack-cli": "^4.1.0",
+				"webpack-dev-server": "^3.11.0"
+			}),
+			"scripts": {
+				"build": "webpack",
+				"start": "webpack serve --mode development"
+			}
+		}, config.packageJson))),
 
 		writeFile($path.join(dir, "webpack.config.js"),
 `var $path = require("path");
@@ -278,57 +363,43 @@ module.exports = {
 }
 
 
-async function transpile_js(config, base, root_dir, dir, template) {
+async function transpile_js(config, base, root_dir, dir) {
 	const imports = [];
+
+	await processFiles(base, dir, (from, to) => write_js(imports, from, to));
+
+	const js_imports = [];
 
 	const path_to_v5 = posixPath($path.relative(dir, root_dir));
 
-	template = template.replace(/^ *import[^"\n\r]+"([^"\n\r]+)";[\n\r]*/gm, (_, path) => {
-        if (path[0] === ".") {
-            imports.push(path);
+	imports.forEach((path) => {
+		if (path[0] === ".") {
+            js_imports.push(path);
 
         } else {
             const split = path.split(/\//g);
 
             if (split[0] === "@amcharts" && split[1] === "amcharts5") {
                 if (split.length === 2) {
-                    imports.push(path_to_v5 + "/index.js");
+                    js_imports.push(path_to_v5 + "/index.js");
                 } else {
-                    imports.push(path_to_v5 + "/" + split.slice(2).join("/") + ".js");
+                    js_imports.push(path_to_v5 + "/" + split.slice(2).join("/") + ".js");
                 }
 
             } else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
-                imports.push(path_to_v5 + "/geodata/" + split.slice(2).join("/") + ".js");
+                js_imports.push(path_to_v5 + "/geodata/" + split.slice(2).join("/") + ".js");
 
             } else if (split[0] === "@amcharts" && split[1] === "amcharts5-fonts") {
-                imports.push(path_to_v5 + "/fonts/" + split.slice(2).join("/") + ".js");
+                js_imports.push(path_to_v5 + "/fonts/" + split.slice(2).join("/") + ".js");
 
             } else {
                 throw new Error("Unknown import: " + path);
             }
         }
-
-		return "";
 	});
-
-	// TODO make this more reliable
-	template = template.replace(/\b(?:let|const)(?= +[$_a-zA-Z][$_a-zA-Z0-9]*(?: +=| +in |;))/g, "var");
-
-	// TODO make this more reliable
-	template = template.replace(/(\([^\(\)]*\)) *=> */g, "function $1 ");
-
-	/*{
-		const x = /\b(?:let|const) |=>/.exec(template);
-
-		if (x != null) {
-			throw new Error("Invalid: " + x[0] + "  (" + dir + ")");
-		}
-	}*/
 
 	await Promise.all([
 		write_shared(config, base, dir),
-
-		writeFile($path.join(dir, "index.js"), template),
 
 		writeFile($path.join(dir, "index.html"),
 `<!DOCTYPE html>
@@ -341,7 +412,7 @@ async function transpile_js(config, base, root_dir, dir, template) {
   </head>
   <body>${config.bodyElements.map((x) => `
     ${x}`).join("")}
-${imports.map((x) => `    <script src="${x}"></script>
+${js_imports.map((x) => `    <script src="${x}"></script>
 `).join("")}    <script src="index.js"></script>
   </body>
 </html>`),
@@ -371,6 +442,7 @@ function makeDefaultConfiguration() {
 			"width": "100%",
 			"height": "80vh",
 		},
+		packageJson: {},
 	};
 }
 
@@ -421,6 +493,15 @@ function validateConfiguration(config) {
 
 			defaults[key] = value;
 
+		} else if (key === "packageJson") {
+			// TODO better check for this
+			if (value == null || typeof value !== "object") {
+				throw new Error(key + " must be an object");
+			}
+
+			// TODO better checking
+			defaults[key] = value;
+
 		} else {
 			throw new Error("Invalid key: " + key);
 		}
@@ -444,13 +525,9 @@ async function getConfiguration(base) {
 }
 
 
-async function copyTemplateDir(from, es2015_dir, ts_dir, js_dir) {
+async function copyTemplateDir(from, to) {
 	if (await exists(from)) {
-		await Promise.all([
-			cp(from, es2015_dir),
-			cp(from, ts_dir),
-			cp(from, js_dir),
-		]);
+		await cp(from, to);
 	}
 }
 
@@ -473,22 +550,14 @@ module.exports = async (state) => {
 			const ts_dir = state.path("dist", "es2015", "examples", "typescript", name);
 			const js_dir = state.path("dist", "script", "examples", name);
 
-			const [index, config] = await Promise.all([
-				readFile($path.join(base, "index.ts")),
-				getConfiguration(base),
-				mkdir(es2015_dir),
-				mkdir(ts_dir),
-				mkdir(js_dir),
-			]);
-
-			const template = replaceSubstitutions(removeTypeScriptTypes(index));
-			const ts_template = replaceSubstitutions(index);
+			const config = await getConfiguration(base);
 
 			await Promise.all([
-				copyTemplateDir($path.join(base, "template"), es2015_dir, ts_dir, js_dir),
-				transpile_es2015(config, base, es2015_dir, template),
-				transpile_typescript(config, base, ts_dir, ts_template),
-				(config.noScript ? Promise.resolve() : transpile_js(config, base, state.path("dist", "script"), js_dir, template)),
+				transpile_es2015(config, base, es2015_dir),
+				transpile_typescript(config, base, ts_dir),
+				(config.noScript
+					? Promise.resolve()
+					: transpile_js(config, base, state.path("dist", "script"), js_dir)),
 			]);
 		});
 	}));

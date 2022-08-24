@@ -53,26 +53,26 @@ export class HorizontalLayout extends Layout {
 			}
 		});
 
-		if(availableWidth < 0){
+		if (availableWidth < 0) {
 			availableWidth = 0.01;
 		}
 
 		//if (availableWidth > 0) {
-			eachChildren(container, (child) => {
-				if (child.isVisible()) {
-					if (child.get("position") == "relative") {
-						let childWidth = child.get("width");
-						if (childWidth instanceof Percent) {
-							let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
-							let minWidth = child.get("minWidth", child.getPrivate("minWidth", -Infinity));
-							let maxWidth = child.get("maxWidth", child.getPrivate("maxWidth", Infinity));
-							privateWidth = Math.min(Math.max(minWidth, privateWidth), maxWidth);
+		eachChildren(container, (child) => {
+			if (child.isVisible()) {
+				if (child.get("position") == "relative") {
+					let childWidth = child.get("width");
+					if (childWidth instanceof Percent) {
+						let privateWidth = availableWidth * childWidth.value / totalPercent - child.get("marginLeft", 0) - child.get("marginRight", 0);
+						let minWidth = child.get("minWidth", child.getPrivate("minWidth", -Infinity));
+						let maxWidth = child.get("maxWidth", child.getPrivate("maxWidth", Infinity));
+						privateWidth = Math.min(Math.max(minWidth, privateWidth), maxWidth);
 
-							child.setPrivate("width", privateWidth);
-						}
+						child.setPrivate("width", privateWidth);
 					}
 				}
-			});
+			}
+		});
 		//}
 
 		let prevX = paddingLeft;
@@ -85,11 +85,21 @@ export class HorizontalLayout extends Layout {
 					let marginLeft = child.get("marginLeft", 0);
 					let marginRight = child.get("marginRight", 0);
 
-					let x = prevX + marginLeft - bounds.left;
+					let maxWidth = child.get("maxWidth");
+
+					let left = bounds.left;
+					let right = bounds.right;
+					if (maxWidth) {
+						if (right - left > maxWidth) {
+							right = left + maxWidth
+						}
+					}
+
+					let x = prevX + marginLeft - left;
 					child.setPrivate("x", x);
-					prevX = x + bounds.right + marginRight;
+					prevX = x + right + marginRight;
 				}
-				else{
+				else {
 					child.setPrivate("x", undefined);
 				}
 			}
