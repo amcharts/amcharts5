@@ -138,8 +138,8 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivateRaw("maxZoomFactor", len);
 		}
 
-		this.setPrivateRaw("startIndex", Math.max(Math.round(this.get("start", 0) * len), 0));		
-		this.setPrivateRaw("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));		
+		this.setPrivateRaw("startIndex", Math.max(Math.round(this.get("start", 0) * len), 0));
+		this.setPrivateRaw("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));
 
 		if (this._sizeDirty || this._valuesDirty || (this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("endIndex") || this.isPrivateDirty("startIndex") || this.isPrivateDirty("width") || this.isPrivateDirty("height"))) {
 			if (this.dataItems.length > 0) {
@@ -172,7 +172,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 					}
 					if (series.get("openCategoryXField")) {
 						openKey = "openCategoryX";
-					}					
+					}
 				}
 				else if (yAxis === baseAxis) {
 					if (series.get("categoryYField")) {
@@ -183,7 +183,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 					}
 					otherAxis = xAxis;
 				}
-				
+
 				if (otherAxis.className == "ValueAxis") {
 
 					if (key || openKey) {
@@ -224,17 +224,41 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 						let startIndex = 0;
 						let endIndex = series.dataItems.length;
-						
+
 						if (startDataItem) {
 							startIndex = series.dataItems.indexOf(startDataItem);
 						}
 
 						if (endDataItem) {
 							endIndex = series.dataItems.indexOf(endDataItem) + 1;
-						}						
+						}
 
 						series.setPrivate("startIndex", startIndex);
 						series.setPrivate("endIndex", endIndex);
+
+						let hasValue = false;
+						for (let i = startIndex; i < endIndex; i++) {
+							const dataItem = series.dataItems[i];
+
+							$array.each(series.__valueXShowFields, (key) => {
+								let value = dataItem.get(<any>key);
+								if (value != null) {
+									hasValue = true;
+								}
+							})
+
+							$array.each(series.__valueYShowFields, (key) => {
+								let value = dataItem.get(<any>key);
+								if (value != null) {
+									hasValue = true;
+								}
+							})
+
+							if (hasValue) {
+								break;
+							}
+						}
+						series.setPrivate("outOfSelection", !hasValue);
 					}
 				}
 				series._markDirtyAxes();	// must be outside
@@ -516,7 +540,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		const dataItem = this.dataItems[this.axisPositionToIndex(position)];
 		if (dataItem) {
 			const label = dataItem.get("label")
-			if(label){
+			if (label) {
 				return populateString(label, this.get("tooltipText", ""));
 			}
 		}
@@ -525,7 +549,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _updateTooltipText(tooltip: Tooltip, position: number) {
 		tooltip._setDataItem(this.dataItems[this.axisPositionToIndex(position)]);
 		tooltip.label.text.markDirtyText();
-	}	
+	}
 
 	/**
 	 * Returns a data item from series that is closest to the `position`.

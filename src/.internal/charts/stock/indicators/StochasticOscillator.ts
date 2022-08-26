@@ -26,12 +26,12 @@ export interface IStochasticOscillatorSettings extends IChartIndicatorSettings {
 	slowColor?: Color;
 
 	/**
-	 * @todo review
+	 * Smoothing "k" parameter.
 	 */
 	kSmoothing?: number;
 
 	/**
-	 * @todo review
+	 * Smoothing "d" parameter.
 	 */
 	dSmoothing?: number;
 

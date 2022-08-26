@@ -189,14 +189,29 @@ export interface IXYChartEvents extends ISerialChartEvents {
 	 *
 	 * @since 5.0.4
 	 */
-	panstarted: {};
+	panstarted: {
+		originalEvent: IPointerEvent
+	};
 
 	/**
 	 * Invoked when panning ends.
 	 *
 	 * @since 5.0.4
 	 */
-	panended: {};
+	panended: {
+		originalEvent: IPointerEvent
+	};
+
+	/**
+	 * Invoked if pointer is pressed down on a chart and released without moving.
+	 *
+	 * `panended` event will still kick in after that.
+	 * 
+	 * @since 5.2.19
+	 */
+	pancancelled: {
+		originalEvent: IPointerEvent
+	};
 
 	/**
 	 * Invoked when wheel caused zoom ends.
@@ -750,7 +765,7 @@ export class XYChart extends SerialChart {
 
 				const eventType = "panstarted";
 				if (this.events.isEnabled(eventType)) {
-					this.events.dispatch(eventType, { type: eventType, target: this });
+					this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event });
 				}
 			}
 		}
@@ -774,13 +789,21 @@ export class XYChart extends SerialChart {
 		}
 	}
 
-	protected _handlePlotUp(_event: IPointerEvent) {
-
-		if (this._downPoint) {
+	protected _handlePlotUp(event: IPointerEvent) {
+		const downPoint = this._downPoint;
+		if (downPoint) {
 			if (this.get("panX") || this.get("panY")) {
+				let local = this.plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+				if (local.x == downPoint.x && local.y == downPoint.y) {
+					const eventType = "pancancelled";
+					if (this.events.isEnabled(eventType)) {
+						this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event });
+					}
+				}
+
 				const eventType = "panended";
 				if (this.events.isEnabled(eventType)) {
-					this.events.dispatch(eventType, { type: eventType, target: this });
+					this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event });
 				}
 			}
 		}
@@ -1531,7 +1554,9 @@ export class XYChart extends SerialChart {
 					tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
 
 					prevY = Math.min(prevY - height, tooltip._fy - height);
-					tooltipContainer.children.moveValue(tooltip, 0);
+					if (tooltip.parent == tooltipContainer) {
+						tooltipContainer.children.moveValue(tooltip, 0);
+					}
 				})
 			}
 			else {
@@ -1548,7 +1573,9 @@ export class XYChart extends SerialChart {
 					height += tooltip.get("marginBottom", 0);
 
 					tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
-					tooltipContainer.children.moveValue(tooltip, 0);
+					if (tooltip.parent == tooltipContainer) {
+						tooltipContainer.children.moveValue(tooltip, 0);
+					}
 					prevY = Math.max(prevY + height, tooltip._fy + height);
 				})
 			}

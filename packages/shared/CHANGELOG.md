@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.19] - 2022-08-26
+
+### Added
+- `geoPoint()` method added to `MapChart`. Returns a geoPoint of the current the center of the map viewport.
+- `pancancelled` event added to `XYChart`. It will kick in if pointer is pressed down and released without moving. `panended` event will still kick in.
+- `originalEvent` added to `panstarted`, `panended`, and `pancancelled` events.
+
+### Fixed
+- Tooltips were not working properly on an `XYChart` if they were placed in a separate root element.
+- If an `XYChart` with a `CategoryAxis` had series with missing values, zooming to the part of a series with no data caused value axis not to zoom according to the selection.
+- HTML-based tooltips were leaving a visible (albeit transparent) DOM element after tooltip was hidden.
+- Clear and erase buttons were not clearing/erasing all the drawings of StockChart properly.
+
+
 ## [5.2.18] - 2022-08-24
 
 ### Added

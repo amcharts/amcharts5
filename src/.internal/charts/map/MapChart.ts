@@ -294,6 +294,17 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
+	 * Returns a geoPoint of the current zoom position.
+	 * 
+	 * You can later use it to restore zoom position, e.g.: `chart.zoomToGeoPoint(geoPoint, zoomLevel, true)`.
+	 *
+	 * @since 5.2.19
+	 */
+	public geoPoint() {
+		return this.invert({ x: this.width() / 2, y: this.height() / 2 });
+	}
+
+	/**
 	 * Returns coordinates to geographical center of the map.
 	 */
 	public geoCentroid() {

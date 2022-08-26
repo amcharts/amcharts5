@@ -7,13 +7,13 @@ import type { DateAxis } from "../../xy/axes/DateAxis";
 import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
+import type { XYSeries } from "../../xy/series/XYSeries";
 
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "../../xy/series/LineSeries";
 import { Bullet } from "../../../core/render/Bullet";
 import { Circle } from "../../../core/render/Circle";
 import { Container } from "../../../core/render/Container";
 import { Template } from "../../../core/util/Template";
-import type { XYSeries } from "../../xy/series/XYSeries";
 
 import * as $array from "../../../core/util/Array";
 import * as $time from "../../../core/util/Time";
@@ -25,46 +25,55 @@ export interface IDrawingSeriesDataItem extends ILineSeriesDataItem {
 }
 
 export interface IDrawingSeriesSettings extends ILineSeriesSettings {
+
 	/**
-	 * @todo review
-	 */	
+	 * X-Axis.
+	 */
 	xAxis: DateAxis<AxisRenderer>;
+
 	/**
-	 * @todo review
-	 */	
+	 * Y-axis.
+	 */
 	yAxis: ValueAxis<AxisRenderer>;
+
 	/**
-	 * @todo review
-	 */	
+	 * Color of the lines/borders.
+	 */
 	strokeColor?: Color;
+
 	/**
-	 * @todo review
-	 */	
+	 * Color of the fills.
+	 */
 	fillColor?: Color;
+
 	/**
-	 * @todo review
-	 */	
+	 * Opacity of the lines/borders (0-1).
+	 */
 	strokeOpacity?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Opacity of the fills (0-1).
+	 */
 	fillOpacity?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Width of the lines/borders in pixels.
+	 */
 	strokeWidth?: number;
+
 	/**
-	 * @todo review
-	 */	
+	 * Dash information for lines/borders.
+	 */
 	strokeDasharray?: Array<number>;
+
 	/**
-	 * @todo review
+	 * [[XYSeries]] used for drawing.
 	 */
 	series?: XYSeries;
+
 }
 
 export interface IDrawingSeriesPrivate extends ILineSeriesPrivate {
-
 }
 
 
@@ -268,7 +277,7 @@ export class DrawingSeries extends LineSeries {
 
 		if (dataItems) {
 			$object.each(dataItems, (_key, dataItem) => {
-				this.disposeDataItem(dataItem);
+				this.data.removeValue(dataItem.dataContext);
 			})
 		}
 	}
@@ -725,5 +734,5 @@ export class DrawingSeries extends LineSeries {
 		const min = xAxis.getPrivate("min", 0) + 1;
 		const max = xAxis.getPrivate("max", 1) - 1;
 		return $math.fitToRange(value, min, max);
-	}	
+	}
 }

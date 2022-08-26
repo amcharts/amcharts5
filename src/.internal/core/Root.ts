@@ -1672,10 +1672,11 @@ export class Root implements IDisposer {
 			});
 
 			// Deal with opacity
-			htmlElement.style.opacity = target.compositeOpacity() + "";
+			const opacity = target.compositeOpacity();
+			htmlElement.style.opacity = opacity + "";
 
 			// Hide or show
-			if (target.isVisibleDeep()) {
+			if (target.isVisibleDeep() && (opacity > 0)) {
 				htmlElement.style.display = "block";
 			}
 			else {

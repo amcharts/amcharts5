@@ -185,12 +185,11 @@ export interface IAxisPrivate extends IComponentPrivate {
 	 */
 	maxZoomFactor?: number | null;
 
-
 	/**
-	 * @todo review
-	 * read only, saves position to which tooltip points
+	 * Saves position to which tooltip points.
 	 */
 	tooltipPosition?:number;
+
 }
 
 export interface IAxisDataItem extends IComponentDataItem {
