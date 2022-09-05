@@ -3877,8 +3877,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					layer.view = document.createElement("canvas");
 
 					// Add to DOM so it inherits CSS
-					this.view.style.position = "fixed";
-					this.view.style.top = "-10000px";
+					layer.view.style.position = "fixed";
+					layer.view.style.top = "-10000px";
 					this.view.appendChild(layer.view);
 					canvases.push(layer.view);
 
@@ -3932,8 +3932,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		canvas.style.height = height + "px";
 
 		$array.each(canvases, (canvas) => {
-			this.view.style.position = "";
-			this.view.style.top = "";
+			canvas.style.position = "";
+			canvas.style.top = "";
 			this.view.removeChild(canvas);
 		})
 

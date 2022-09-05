@@ -116,6 +116,7 @@ import type { Modal } from "./util/Modal";
 import type { MovingAverage } from "./../charts/stock/indicators/MovingAverage";
 import type { MovingAverageDeviation } from "./../charts/stock/indicators/MovingAverageDeviation";
 import type { MovingAverageEnvelope } from "./../charts/stock/indicators/MovingAverageEnvelope";
+import type { StandardDeviation } from "./../charts/stock/indicators/StandardDeviation";
 import type { OHLC } from "./../charts/xy/series/OHLC";
 import type { OHLCSeries } from "./../charts/xy/series/OHLCSeries";
 import type { OnBalanceVolume } from "./../charts/stock/indicators/OnBalanceVolume";
@@ -312,6 +313,7 @@ export interface IClasses {
 	"MovingAverage": MovingAverage;
 	"MovingAverageDeviation": MovingAverageDeviation;
 	"MovingAverageEnvelope": MovingAverageEnvelope;
+	"StandardDeviation": StandardDeviation;
 	"OHLC": OHLC;
 	"OHLCSeries": OHLCSeries;
 	"OnBalanceVolume": OnBalanceVolume;

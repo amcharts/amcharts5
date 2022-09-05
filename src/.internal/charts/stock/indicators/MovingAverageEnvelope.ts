@@ -119,7 +119,7 @@ export class MovingAverageEnvelope extends MovingAverage {
 				yAxis: stockSeries.get("yAxis"),
 				groupDataDisabled: true,
 				calculateAggregates: true,
-				themeTags: ["movingaverageenvelope", "upper"]
+				themeTags: ["indicator", "movingaverageenvelope", "upper"]
 			}))
 
 			upperBandSeries.fills.template.set("visible", true);
@@ -134,7 +134,7 @@ export class MovingAverageEnvelope extends MovingAverage {
 				yAxis: stockSeries.get("yAxis"),
 				groupDataDisabled: true,
 				calculateAggregates: true,
-				themeTags: ["movingaverageenvelope", "lower"]
+				themeTags: ["indicator", "movingaverageenvelope", "lower"]
 			}))
 
 			lowerBandSeries.setPrivate("baseValueSeries", stockSeries);

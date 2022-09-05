@@ -142,7 +142,13 @@ export class LabelSeries extends PolylineSeries {
 		}
 
 		container.events.on("click", () => {
-			this.spriteResizer.set("sprite", label);
+			const spriteResizer = this.spriteResizer;
+			if (spriteResizer.get("sprite") == label) {
+				spriteResizer.set("sprite", undefined);
+			}
+			else {
+				spriteResizer.set("sprite", label);
+			}
 		})
 
 		container.events.on("pointerover", () => {
@@ -162,20 +168,22 @@ export class LabelSeries extends PolylineSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		if (!this._isHover) {
-			const input = this.getPrivate("input");
-			input.value = "";
+		if (this._drawingEnabled) {
+			if (!this._isHover) {
+				const input = this.getPrivate("input");
+				input.value = "";
 
-			this._clickEvent = event;
-			//console.log(event);
-			const inputDiv = this.getPrivate("inputContainer");
-			inputDiv.style.display = "block";
-			inputDiv.style.left = (event.point.x) + "px";
-			inputDiv.style.top = (event.point.y) + "px";
-			input.focus();
-			this.spriteResizer.set("sprite", undefined);
-			this._index++;
-			this._di[this._index] = {};
+				this._clickEvent = event;
+				//console.log(event);
+				const inputDiv = this.getPrivate("inputContainer");
+				inputDiv.style.display = "block";
+				inputDiv.style.left = (event.point.x) + "px";
+				inputDiv.style.top = (event.point.y) + "px";
+				input.focus();
+				this.spriteResizer.set("sprite", undefined);
+				this._index++;
+				this._di[this._index] = {};
+			}
 		}
 	}
 

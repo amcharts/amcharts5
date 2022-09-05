@@ -110,18 +110,20 @@ export class RectangleSeries extends DrawingSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		super._handlePointerClick(event);
+		if (this._drawingEnabled) {
+			super._handlePointerClick(event);
 
-		if (!this._isDragging) {
+			if (!this._isDragging) {
 
-			if (!this._isDrawing) {
-				this._isDrawing = true;
-				this.bulletsContainer.show();
-				this._addPoints(event, this._index);
-			}
-			else {
-				this._isDrawing = false;
-				this._index++;
+				if (!this._isDrawing) {
+					this._isDrawing = true;
+					this.bulletsContainer.show();
+					this._addPoints(event, this._index);
+				}
+				else {
+					this._isDrawing = false;
+					this._index++;
+				}
 			}
 		}
 	}

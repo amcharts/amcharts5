@@ -899,7 +899,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		if (!ghostLabel.isHidden()) {
 			const bounds = ghostLabel.localBounds();
 			const gWidth = bounds.right - bounds.left;
-
+			let text = ghostLabel.get("text");
 			$array.each(this.dataItems, (dataItem) => {
 				const label = dataItem.get("label");
 				if (label && !label.isHidden()) {
@@ -907,10 +907,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					const w = bounds.right - bounds.left;
 
 					if (w > gWidth) {
-						ghostLabel.set("text", label.text._getText());
+						text = label.text._getText();
 					}
 				}
 			})
+			ghostLabel.set("text", text);
 		}
 		let start = this.get("start", 0);
 		let end = this.get("end", 1);

@@ -95,10 +95,11 @@ export class SettingsModal extends Modal {
 
 		const l = this._root.language;
 		const stockChart = this.get("stockChart");
+		const isline = series instanceof LineSeries;
 
 		let settings: ISeriesEditableSetting[] = [];
 
-		if (series == stockChart.get("stockSeries")) {
+		if (series == stockChart.get("stockSeries") && !isline) {
 			settings.push({
 				id: "stockPositiveColor",
 				key: "stockPositiveColor",
@@ -117,7 +118,7 @@ export class SettingsModal extends Modal {
 				target: stockChart
 			});
 		}
-		else if (series == stockChart.get("volumeSeries")) {
+		else if (series == stockChart.get("volumeSeries") && !isline) {
 			settings.push({
 				id: "volumePositiveColor",
 				key: "volumePositiveColor",
@@ -160,7 +161,7 @@ export class SettingsModal extends Modal {
 				invalidateTarget: series
 			});
 		}
-		else if (series instanceof LineSeries) {
+		else if (isline) {
 			settings = [{
 				key: "stroke",
 				name: l.translateAny("Line"),
@@ -175,11 +176,11 @@ export class SettingsModal extends Modal {
 					{ value: 4, text: "4px" },
 					{ value: 10, text: "10px" }
 				],
-				currentValue: series.strokes.template.get("strokeWidth", 1),
-				target: series.strokes.template,
+				currentValue: (<LineSeries>series).strokes.template.get("strokeWidth", 1),
+				target: (<LineSeries>series).strokes.template,
 				invalidateTarget: series
 			}];
-			if (series.fills.template.get("visible")) {
+			if ((<LineSeries>series).fills.template.get("visible")) {
 				settings.push({
 					key: "fill",
 					name: l.translateAny("Fill"),

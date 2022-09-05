@@ -112,7 +112,7 @@ export class PointedRectangle extends Graphics {
 					let stemY = Math.round($math.fitToRange(y, cr + bwh, h - bwh - cr));
 					x = $math.fitToRange(x, w, Infinity);
 					display.lineTo(w, cr);
-					display.lineTo(w, stemY - bwh);
+					display.lineTo(w, Math.max(stemY - bwh, cr));
 					display.lineTo(x, y);
 					display.lineTo(w, stemY + bwh);
 				}
@@ -140,7 +140,7 @@ export class PointedRectangle extends Graphics {
 					display.lineTo(0, h - cr);
 					display.lineTo(0, stemY + bwh);
 					display.lineTo(x, y);
-					display.lineTo(0, stemY - bwh);
+					display.lineTo(0, Math.max(stemY - bwh, cr));
 				}
 				display.lineTo(0, cr);
 				display.arcTo(0, 0, cr, 0, cr);

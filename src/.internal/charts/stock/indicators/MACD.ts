@@ -109,6 +109,7 @@ export class MACD extends ChartIndicator {
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {
+			themeTags: ["indicator"],
 			xAxis: this.xAxis,
 			yAxis: this.yAxis,
 			valueXField: "valueX",
@@ -132,7 +133,7 @@ export class MACD extends ChartIndicator {
 				xAxis: this.xAxis,
 				yAxis: this.yAxis,
 				groupDataDisabled: true,
-				themeTags: ["signal"]
+				themeTags: ["indicator", "signal"]
 			}))
 
 			this.signalSeries = signalSeries;
@@ -143,7 +144,7 @@ export class MACD extends ChartIndicator {
 				xAxis: this.xAxis,
 				yAxis: this.yAxis,
 				groupDataDisabled: true,
-				themeTags: ["difference"]
+				themeTags: ["indicator", "difference"]
 			}))
 
 			this.differenceSeries = differenceSeries;

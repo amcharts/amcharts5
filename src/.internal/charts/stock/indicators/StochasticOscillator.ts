@@ -146,7 +146,7 @@ export class StochasticOscillator extends ChartIndicator {
 			xAxis: this.xAxis,
 			yAxis: this.yAxis,
 			groupDataDisabled: true,
-			themeTags: ["slow"]
+			themeTags: ["indicator", "slow"]
 		}))
 
 		this.slowSeries = slowSeries;
@@ -154,6 +154,7 @@ export class StochasticOscillator extends ChartIndicator {
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {
+			themeTags: ["indicator"],
 			xAxis: this.xAxis,
 			yAxis: this.yAxis,
 			valueXField: "valueX",

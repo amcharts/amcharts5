@@ -1242,7 +1242,6 @@ export class XYChart extends SerialChart {
 			}
 			axis.setPrivate("updateScrollbar", true);
 		})
-
 	}
 
 	protected _handleScrollbar(axes: ListAutoDispose<Axis<any>>, start: number, end: number, priority?: "start" | "end") {

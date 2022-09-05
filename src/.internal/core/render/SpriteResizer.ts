@@ -153,6 +153,7 @@ export class SpriteResizer extends Container {
 			const sprite = this.get("sprite");
 			if (sprite) {
 				this.show(0);
+				this.setPrivate("visible", true);
 
 				this._updatePositions();
 
@@ -168,6 +169,7 @@ export class SpriteResizer extends Container {
 			}
 			else {
 				this.hide(0);
+				this.setPrivate("visible", false);
 
 				if (this._positionDP) {
 					this._positionDP.dispose();

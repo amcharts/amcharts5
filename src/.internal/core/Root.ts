@@ -1675,12 +1675,9 @@ export class Root implements IDisposer {
 			const opacity = target.compositeOpacity();
 			htmlElement.style.opacity = opacity + "";
 
-			// Hide or show
-			if (target.isVisibleDeep() && (opacity > 0)) {
+			const visible = target.isVisibleDeep();
+			if (visible) {
 				htmlElement.style.display = "block";
-			}
-			else {
-				htmlElement.style.display = "none";
 			}
 
 			// Deal with position
@@ -1724,6 +1721,11 @@ export class Root implements IDisposer {
 			}
 			if (h > 0) {
 				htmlElement.style.minHeight = (h) + "px";
+			}
+
+			// Hide or show
+			if (!visible || opacity == 0) {
+				htmlElement.style.display = "none";
 			}
 
 		}

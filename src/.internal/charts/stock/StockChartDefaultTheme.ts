@@ -423,6 +423,9 @@ export class StockChartDefaultTheme extends Theme {
 
 			setColor(rule, "fill", ic, "background");
 			setColor(rule, "stroke", ic, "alternativeBackground");
+
+			const stateRule = rule.states.create("hover", { strokeWidth: 2 });
+			setColor(stateRule, "stroke", ic, "negative");
 		}
 
 		r("Circle", ["drawing", "grip", "outline", "label"]).setAll({
@@ -472,7 +475,7 @@ export class StockChartDefaultTheme extends Theme {
 		{
 			const rule = r("Line", ["drawing", "horizontal"])
 			rule.setAll({
-				strokeWidth: 2,
+				strokeWidth: 20,
 				strokeDasharray: 0
 			});
 
@@ -480,9 +483,14 @@ export class StockChartDefaultTheme extends Theme {
 			setColor(stateRule, "stroke", ic, "negative");
 		}
 		{
+			const rule = r("Line", ["drawing", "ray"])
+			const stateRule = rule.states.create("hover", {});
+			setColor(stateRule, "stroke", ic, "negative");
+		}
+		{
 			const rule = r("Line", ["drawing", "vertical"])
 			rule.setAll({
-				strokeWidth: 2,
+				strokeWidth: 20,
 				strokeDasharray: 0
 			});
 
@@ -490,9 +498,6 @@ export class StockChartDefaultTheme extends Theme {
 			setColor(stateRule, "stroke", ic, "negative");
 		}
 
-		r("Line", ["drawing", "average"]).setAll({
-
-		});
 		{
 			const rule = r("Graphics", ["series", "fill", "drawing", "doodle"])
 			rule.setAll({
@@ -736,7 +741,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["vwap"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period},{field})"
-		})		
+		})
 
 		r("LineSeries", ["accumulationdistribution"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
@@ -783,6 +788,11 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("ColumnSeries", ["movingaveragedeviation"]).setAll({
 			legendValueText: "[{deviationColor}; bold]{valueY.formatNumber('#.000a')}[/]",
+		})
+
+		r("LineSeries", ["standarddeviation"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName} ({period},{field})"
 		})
 
 		r("LineSeries", ["macd"]).setAll({
@@ -890,6 +900,14 @@ export class StockChartDefaultTheme extends Theme {
 			increasingColor: ic.get("positive"),
 			decreasingColor: ic.get("negative"),
 			type: "simple",
+			field: "close",
+			period: 20
+		})
+
+		r("StandardDeviation").setAll({
+			name: "Standard Deviation",
+			seriesColor: color(0x000000),
+			shortName: "STDEV",
 			field: "close",
 			period: 20
 		})
@@ -1058,7 +1076,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("IndicatorControl").setAll({
 			name: l.translateAny("Indicators"),
-			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Stochastic Oscillator", "Volume", "VWAP", "Williams R"]
+			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Volume", "VWAP", "Williams R"]
 		});
 
 		r("ComparisonControl").setAll({

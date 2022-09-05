@@ -236,6 +236,25 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 	}
 
+	public enableDrawing() {
+		super.enableDrawing();
+		this.showAllBullets();
+	}
+
+	public enableErasing() {
+		super.enableErasing();
+		this.showAllBullets();
+	}
+
+	protected _hideAllBullets(){
+		if(this._drawingEnabled || this._erasingEnabled){
+
+		}
+		else{
+			super._hideAllBullets();
+		}
+	}
+
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.disposeDataItem(dataItem);
 		const dataContext = dataItem.dataContext as any;

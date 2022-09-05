@@ -26,17 +26,19 @@ export class PolylineSeries extends DrawingSeries {
 	protected _tag = "polyline";
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		super._handlePointerClick(event);
+		if (this._drawingEnabled) {
+			super._handlePointerClick(event);
 
-		if (!this._isDragging) {
-			this._isDrawing = true;
+			if (!this._isDragging) {
+				this._isDrawing = true;
 
-			if (this._pIndex == 0) {
-				this.data.push({ stroke: this._getStrokeTemplate() });
-				this._addContextInfo(this._index);
+				if (this._pIndex == 0) {
+					this.data.push({ stroke: this._getStrokeTemplate() });
+					this._addContextInfo(this._index);
+				}
+
+				this._addPoint(event);
 			}
-
-			this._addPoint(event);
 		}
 	}
 

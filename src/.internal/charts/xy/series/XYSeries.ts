@@ -2050,6 +2050,22 @@ export abstract class XYSeries extends Series {
 		let x = this.get("xAxis").get("renderer").positionToCoordinate(positionX);
 		let y = this.get("yAxis").get("renderer").positionToCoordinate(positionY);
 
+		// if coordinate is super big, canvas fails to draw line, capping to some big number (won't make any visual difference)
+		let max = 999999999;
+		if (y < -max) {
+			y = -max;
+		}
+		if (y > max) {
+			y = max;
+		}
+
+		if (x < -max) {
+			x = -max;
+		}
+		if (x > max) {
+			x = max;
+		}
+
 		return { x: x, y: y };
 	}
 

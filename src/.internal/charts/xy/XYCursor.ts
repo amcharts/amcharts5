@@ -105,6 +105,18 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * @since 5.1.4
 	 */
 	syncWith?: Array<XYCursor>;
+
+	/**
+	 * Minimum distance in pixels between down and up points.
+	 * 
+	 * If a distance is less than the value of `moveThreshold`, the zoom or
+	 * selection won't happen.
+	 *
+	 * @since 5.2.20
+	 * @default 1
+	 */
+	moveThreshold?: number
+
 }
 
 
@@ -459,7 +471,7 @@ export class XYCursor extends Container {
 		}
 	}
 
-	protected _handleCursorUp(_event: IPointerEvent) {
+	protected _handleCursorUp(event: IPointerEvent) {
 		// TODO: handle multitouch
 		if (this._downPoint) {
 			const behavior = this.get("behavior", "none");
@@ -468,37 +480,30 @@ export class XYCursor extends Container {
 					this.selection.hide();
 				}
 
-				let userPositionX = this.get("positionX");
-				let positionX = this.getPrivate("positionX", 0);
+				const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
+				let local = this._display.toLocal(rootPoint);
 
-				if ($type.isNumber(userPositionX)) {
-					positionX = userPositionX;
-				}
-
-				let userPositionY = this.get("positionY");
-				let positionY = this.getPrivate("positionY", 0);
-
-				if ($type.isNumber(userPositionY)) {
-					positionY = userPositionY;
-				}
-
-				let dispatch = false;
-				if (behavior === "zoomX" || behavior === "zoomXY" || behavior === "selectX" || behavior === "selectXY") {
-					if (Math.abs(positionX - this.getPrivate("downPositionX", 0)) > 0.003) {
-						dispatch = true;
+				const downPoint = this._downPoint;
+				const moveThreshold = this.get("moveThreshold", 1);
+				if (local && downPoint) {
+					let dispatch = false;
+					if (behavior === "zoomX" || behavior === "zoomXY" || behavior === "selectX" || behavior === "selectXY") {
+						if (Math.abs(local.x - downPoint.x) > moveThreshold) {
+							dispatch = true;
+						}
 					}
-				}
 
-				if (behavior === "zoomY" || behavior === "zoomXY" || behavior === "selectY" || behavior === "selectXY") {
-					if (Math.abs(positionY - this.getPrivate("downPositionY", 0)) > 0.003) {
-						dispatch = true;
+					if (behavior === "zoomY" || behavior === "zoomXY" || behavior === "selectY" || behavior === "selectXY") {
+						if (Math.abs(local.y - downPoint.y) > moveThreshold) {
+							dispatch = true;
+						}
 					}
-				}
 
-				if (dispatch) {
-					const type = "selectended";
-					if (this.events.isEnabled(type)) {
-						this.events.dispatch(type, { type: type, target: this });
+					if (dispatch) {
+						const type = "selectended";
+						if (this.events.isEnabled(type)) {
+							this.events.dispatch(type, { type: type, target: this });
+						}
 					}
 				}
 			}

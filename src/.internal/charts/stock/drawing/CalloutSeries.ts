@@ -55,6 +55,8 @@ export class CalloutSeries extends LabelSeries {
 	protected _tweakBullet(container: Container) {
 		super._tweakBullet(container);
 
+		container.events.off("click");
+
 		const label = this.getPrivate("label");
 		if (label) {
 			label.events.on("positionchanged", () => {
@@ -62,7 +64,13 @@ export class CalloutSeries extends LabelSeries {
 			})
 
 			label.events.on("click", () => {
-				this.spriteResizer.set("sprite", label);
+				const spriteResizer = this.spriteResizer;
+				if (spriteResizer.get("sprite") == label) {
+					spriteResizer.set("sprite", undefined);
+				}
+				else {
+					spriteResizer.set("sprite", label);
+				}
 			})
 
 			label.on("scale", () => {

@@ -354,6 +354,20 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	protected showAllBullets() {
+		$array.each(this.dataItems, (dataItem) => {
+			const bullets = dataItem.bullets;
+			if (bullets) {
+				$array.each(bullets, (bullet) => {
+					const sprite = bullet.get("sprite");
+					if (sprite) {
+						sprite.show();
+					}
+				})
+			}
+		})
+	}
+
 	protected _handleFillDragStart(event: ISpritePointerEvent, index: number) {
 		const chart = this.chart;
 		if (chart) {
@@ -513,9 +527,11 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		const chart = this.chart;
-		if (chart) {
-			this._clickPointerPoint = chart.plotContainer.toLocal(event.point)
+		if (this._drawingEnabled) {
+			const chart = this.chart;
+			if (chart) {
+				this._clickPointerPoint = chart.plotContainer.toLocal(event.point)
+			}
 		}
 	}
 

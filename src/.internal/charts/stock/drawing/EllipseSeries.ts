@@ -212,16 +212,17 @@ export class EllipseSeries extends DrawingSeries {
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
 		super._handlePointerClick(event);
-
-		if (!this._isDragging) {
-			if (!this._isDrawing) {
-				this._isDrawing = true;
-				this.bulletsContainer.show();
-				this._addPoints(event, this._index);
-			}
-			else {
-				this._isDrawing = false;
-				this._index++;
+		if (this._drawingEnabled) {
+			if (!this._isDragging) {
+				if (!this._isDrawing) {
+					this._isDrawing = true;
+					this.bulletsContainer.show();
+					this._addPoints(event, this._index);
+				}
+				else {
+					this._isDrawing = false;
+					this._index++;
+				}
 			}
 		}
 	}

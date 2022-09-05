@@ -177,6 +177,18 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 */
 	syncWithAxis?: ValueAxis<AxisRenderer>;
 
+	/**
+	 * If set to `false`, the axis won't be auto-zoomed to a selection (this
+	 * works only if the other axis is a `DateAxis` or a `CategoryAxis`).
+	 * 
+	 * IMPORTANT: This setting will be ignored if both X and Y axes are
+	 * a `ValueAxis`.
+	 *
+	 * @since 5.2.20
+	 * @default true
+	 */
+	autoZoom?: boolean;
+
 }
 
 export interface IValueAxisDataItem extends IAxisDataItem {
@@ -388,7 +400,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._dirtyExtremes = false;
 		}
 
-		if (this._dirtySelectionExtremes && !this._isPanning) {
+		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
 			this._getSelectionMinMax();
 			this._dirtySelectionExtremes = false;
 		}

@@ -97,7 +97,7 @@ export class BollingerBands extends MovingAverage {
 				xAxis: stockSeries.get("xAxis"),
 				yAxis: stockSeries.get("yAxis"),
 				groupDataDisabled: true,
-				themeTags: ["bollingerbands", "upper"]
+				themeTags: ["indicator", "bollingerbands", "upper"]
 			}))
 
 			upperBandSeries.fills.template.set("visible", true);
@@ -112,7 +112,7 @@ export class BollingerBands extends MovingAverage {
 				xAxis: stockSeries.get("xAxis"),
 				yAxis: stockSeries.get("yAxis"),
 				groupDataDisabled: true,
-				themeTags: ["bollingerbands", "lower"]
+				themeTags: ["indicator", "bollingerbands", "lower"]
 			}))
 
 			lowerBandSeries.setPrivate("baseValueSeries", stockSeries);

@@ -4,6 +4,7 @@ export { addLicense, registry, disposeAllRootElements } from "./.internal/core/R
 export { ready } from "./.internal/core/util/Utils";
 export { Modal, IModalSettings } from "./.internal/core/util/Modal";
 export { Entity, IEntitySettings, IEntityEvents, IEntityPrivate } from "./.internal/core/util/Entity";
+export { IDisposer, Disposer, ArrayDisposer, MultiDisposer, MutableValueDisposer, CounterDisposer } from "./.internal/core/util/Disposer";
 
 export { Bullet, IBulletSettings, IBulletPrivate } from "./.internal/core/render/Bullet";
 export { Button, IButtonSettings, IButtonPrivate } from "./.internal/core/render/Button";

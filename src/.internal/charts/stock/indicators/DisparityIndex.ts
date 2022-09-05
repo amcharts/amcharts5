@@ -65,6 +65,7 @@ export class DisparityIndex extends ChartIndicator {
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {
+			themeTags: ["indicator"],
 			xAxis: this.xAxis,
 			yAxis: this.yAxis,
 			valueXField: "valueX",

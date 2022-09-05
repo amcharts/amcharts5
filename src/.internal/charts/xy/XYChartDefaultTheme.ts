@@ -186,7 +186,8 @@ export class XYChartDefaultTheme extends Theme {
 			behavior: "none",
 			layer: 30,
 			exportable: false,
-			snapToSeriesBy: "xy"
+			snapToSeriesBy: "xy",
+			moveThreshold: 1
 		});
 
 		{
@@ -558,6 +559,7 @@ export class XYChartDefaultTheme extends Theme {
 			baseValue: 0,
 			logarithmic: false,
 			strictMinMax: false,
+			autoZoom: true,
 
 			fillRule: (dataItem: DataItem<IValueAxisDataItem>) => {
 				const axisFill = dataItem.get("axisFill");

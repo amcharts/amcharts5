@@ -10,34 +10,34 @@ import { SpriteResizer } from "../../../core/render/SpriteResizer";
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 	/**
 	 * @todo review
-	 */	
+	 */
 	svgPath: string;
 	/**
 	 * @todo review
-	 */	
+	 */
 	snapToData?: boolean;
 }
 
 export interface IIconSeriesSettings extends IPolylineSeriesSettings {
 	/**
 	 * @todo review
-	 */	
+	 */
 	iconSvgPath: string;
 	/**
 	 * @todo review
-	 */	
+	 */
 	iconScale?: number;
 	/**
 	 * @todo review
-	 */	
+	 */
 	iconCenterX?: Percent;
 	/**
 	 * @todo review
-	 */	
+	 */
 	iconCenterY?: Percent;
 	/**
 	 * @todo review
-	 */	
+	 */
 	snapToData?: boolean;
 }
 
@@ -92,7 +92,13 @@ export class IconSeries extends PolylineSeries {
 			this._addBulletInteraction(sprite);
 
 			sprite.events.on("click", () => {
-				this.spriteResizer.set("sprite", sprite);
+				const spriteResizer = this.spriteResizer;
+				if (spriteResizer.get("sprite") == sprite) {
+					spriteResizer.set("sprite", undefined);
+				}
+				else {
+					spriteResizer.set("sprite", sprite);
+				}
 			})
 
 			sprite.events.on("pointerover", () => {
@@ -113,10 +119,12 @@ export class IconSeries extends PolylineSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		if (!this._isHover) {
-			super._handlePointerClick(event);
-			this._index++;
-			this._di[this._index] = {};
+		if (this._drawingEnabled) {
+			if (!this._isHover) {
+				super._handlePointerClick(event);
+				this._index++;
+				this._di[this._index] = {};
+			}
 		}
 	}
 
@@ -131,8 +139,8 @@ export class IconSeries extends PolylineSeries {
 	}
 
 	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
-		if(!this.get("snapToData")){
+		if (!this.get("snapToData")) {
 			this._setXLocationReal(dataItem, value);
-		}		
+		}
 	}
 }

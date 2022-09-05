@@ -205,8 +205,10 @@ export class SimpleLineSeries extends DrawingSeries {
 
 	protected _updateLine(line: Line, hitLine: Line, p11: IPoint, p22: IPoint, p1: IPoint, p2: IPoint) {
 		let segments = [[[p11, p1]], [[p2, p22]]];
+		let hitSegments = [[[p11, p22]]];
+
 		line.set("segments", segments);
-		hitLine.set("segments", segments);
+		hitLine.set("segments", hitSegments);
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
@@ -223,8 +225,10 @@ export class SimpleLineSeries extends DrawingSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		super._handlePointerClick(event);
-		this._handlePointerClickReal(event);
+		if (this._drawingEnabled) {
+			super._handlePointerClick(event);
+			this._handlePointerClickReal(event);
+		}
 	}
 
 	protected _handlePointerMove(event: ISpritePointerEvent) {

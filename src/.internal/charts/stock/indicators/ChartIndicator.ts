@@ -114,11 +114,11 @@ export abstract class ChartIndicator extends Indicator {
 
 			const settingsButton = legendDataItem.get("settingsButton");
 			settingsButton.setPrivate("customData", this);
-			
-			const editableSettings = this._editableSettings;			
+
+			const editableSettings = this._editableSettings;
 			if (!editableSettings || editableSettings.length == 0) {
 				settingsButton.set("forceHidden", true);
-			}			
+			}
 
 			chart.set("cursor", XYCursor.new(root, { yAxis: yAxis, xAxis: xAxis }));
 

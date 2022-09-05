@@ -78,72 +78,74 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 		if (chart) {
 			for (let i = 0; i < this._lines.length; i++) {
 				const line = this._lines[i];
-				const diP1 = this._di[i]["p1"];
-				const diP2 = this._di[i]["p2"];
+				if(line){
+					const diP1 = this._di[i]["p1"];
+					const diP2 = this._di[i]["p2"];
 
-				const fill1 = this.makeFill(this.fills);
-				const fill2 = this.makeFill(this.fills);
+					const fill1 = this.makeFill(this.fills);
+					const fill2 = this.makeFill(this.fills);
 
-				const index = this.dataItems.indexOf(diP1);
-				for (let j = index; j >= 0; j--) {
-					const dataContext = this.dataItems[j].dataContext as any;
-					const template = dataContext.fill;
-					if (template) {
-						fill1.template = template;
-						fill2.template = template;
+					const index = this.dataItems.indexOf(diP1);
+					for (let j = index; j >= 0; j--) {
+						const dataContext = this.dataItems[j].dataContext as any;
+						const template = dataContext.fill;
+						if (template) {
+							fill1.template = template;
+							fill2.template = template;
+						}
 					}
-				}
 
-				const userData = [this.dataItems.indexOf(diP1), this.dataItems.indexOf(diP2)];
-				const settings = { userData: userData };
+					const userData = [this.dataItems.indexOf(diP1), this.dataItems.indexOf(diP2)];
+					const settings = { userData: userData };
 
-				fill1.setAll(settings);
-				fill2.setAll(settings);
-				fill2.set("forceInactive", true);
+					fill1.setAll(settings);
+					fill2.setAll(settings);
+					fill2.set("forceInactive", true);
 
-				const p1 = diP1.get("point");
-				const p2 = diP2.get("point");
+					const p1 = diP1.get("point");
+					const p2 = diP2.get("point");
 
-				if (p1 && p2) {
-					const dy = (p2.y - p1.y) / 4;
-					const m1y = p1.y + dy;
-					const m2y = p1.y + dy * 2;
-					const m3y = p1.y + dy * 3;
+					if (p1 && p2) {
+						const dy = (p2.y - p1.y) / 4;
+						const m1y = p1.y + dy;
+						const m2y = p1.y + dy * 2;
+						const m3y = p1.y + dy * 3;
 
-					line.set("draw", (display) => {
-						display.moveTo(p1.x, p1.y);
-						display.lineTo(p2.x, p1.y);
+						line.set("draw", (display) => {
+							display.moveTo(p1.x, p1.y);
+							display.lineTo(p2.x, p1.y);
 
-						display.moveTo(p1.x, m1y);
-						display.lineTo(p2.x, m1y);
+							display.moveTo(p1.x, m1y);
+							display.lineTo(p2.x, m1y);
 
-						display.moveTo(p1.x, m2y);
-						display.lineTo(p2.x, m2y);
+							display.moveTo(p1.x, m2y);
+							display.lineTo(p2.x, m2y);
 
-						display.moveTo(p1.x, m3y);
-						display.lineTo(p2.x, m3y);
+							display.moveTo(p1.x, m3y);
+							display.lineTo(p2.x, m3y);
 
-						display.moveTo(p1.x, p2.y);
-						display.lineTo(p2.x, p2.y);
-					})
+							display.moveTo(p1.x, p2.y);
+							display.lineTo(p2.x, p2.y);
+						})
 
-					fill1.set("draw", (display) => {
-						display.moveTo(p1.x, p1.y);
-						display.lineTo(p2.x, p1.y);
+						fill1.set("draw", (display) => {
+							display.moveTo(p1.x, p1.y);
+							display.lineTo(p2.x, p1.y);
 
-						display.lineTo(p2.x, p2.y);
-						display.lineTo(p1.x, p2.y);
-						display.lineTo(p1.x, p1.y);
-					})
+							display.lineTo(p2.x, p2.y);
+							display.lineTo(p1.x, p2.y);
+							display.lineTo(p1.x, p1.y);
+						})
 
-					fill2.set("draw", (display) => {
-						display.moveTo(p1.x, m1y);
-						display.lineTo(p2.x, m1y);
+						fill2.set("draw", (display) => {
+							display.moveTo(p1.x, m1y);
+							display.lineTo(p2.x, m1y);
 
-						display.lineTo(p2.x, m3y);
-						display.lineTo(p1.x, m3y);
-						display.lineTo(p1.x, m1y);
-					})
+							display.lineTo(p2.x, m3y);
+							display.lineTo(p1.x, m3y);
+							display.lineTo(p1.x, m1y);
+						})
+					}
 				}
 			}
 		}
@@ -160,5 +162,5 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 
 	protected _updateLine() {
 
-	}
+	}	
 }

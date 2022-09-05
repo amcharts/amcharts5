@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.20] - 2022-09-05
+
+### Added
+- All indicator series will now have `"indicator"` theme tag set. Detect indicator series via `series.hasTag("indicator")`.
+- `autoZoom` added to `ValueAxis` (default: `true`). If set to `false`, the axis won't be auto-zoomed to a selection (this works only if the other axis is a `DateAxis` or a `CategoryAxis`). This setting will be ignored if both X and Y axes are a `ValueAxis`.
+- `StandardDeviation` indicator added.
+
+### Changed
+- Series edit modal on a `StockChart` would show incorrect controls if the main chart series was a `LineSeries`.
+
+### Fixed
+- Initial sizing of HTML tooltips fixed (again).
+- Exporting a chart in a `<div>` with `height: auto` was not working properly.
+- If a point in a `LineSeries` was way out of bounds (million times further than the bounds of plot area), the line could disappear.
+- In some cases, if chart was using loadable fonts, it could go into non-stop flickering mode.
+- `StockChart` with drawing mode disabled could start drawing new objects if clicked on points of an old drawing.
+- `PointedRectangle`, mostly used by a `Tooltip` was drawn incorrectly if its stem size was bigger than height. 
+- Removing a `QuadrantLineSeries` drawing from a `StockChart` resulted an error.
+- It was impossible to delete `Fibonacci` or `FibonacciTimezone` drawings one by one after switching to another drawing tool.
+
+
 ## [5.2.19] - 2022-08-26
 
 ### Added

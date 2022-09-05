@@ -67,6 +67,7 @@ export class Aroon extends ChartIndicator {
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {
+			themeTags: ["indicator"],
 			xAxis: this.xAxis,
 			yAxis: this.yAxis,
 			valueXField: "valueX",
@@ -78,6 +79,7 @@ export class Aroon extends ChartIndicator {
 	protected _afterNew() {
 		super._afterNew();
 		this.downSeries = this.panel.series.push(LineSeries.new(this._root, {
+			themeTags: ["indicator"],
 			xAxis: this.xAxis,
 			yAxis: this.yAxis,
 			valueXField: "valueX",

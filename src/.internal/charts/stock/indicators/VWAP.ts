@@ -107,7 +107,7 @@ export class VWAP extends Indicator {
 					totalVW += vw;
 					totalVolume += volume;
 
-					
+
 					if (i >= period) {
 						let volumeToRemove = data[i - period].volume;
 						let vwToRemove = data[i - period].vw;
@@ -116,9 +116,9 @@ export class VWAP extends Indicator {
 						}
 						if (vwToRemove != null) {
 							totalVW -= vwToRemove;
-						}						
+						}
 					}
-					
+
 					dataItem.totalVW = totalVW;
 					dataItem.vwap = totalVW / totalVolume;
 
