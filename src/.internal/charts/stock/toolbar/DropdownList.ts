@@ -152,7 +152,7 @@ export class DropdownList extends Dropdown {
 				items.push({
 					id: "",
 					className: "am5stock-list-info",
-					label: this._root.language.translateAny("Seach results are limited to %1.", undefined, "" + maxItems)
+					label: this._root.language.translateAny("Search results are limited to %1.", undefined, "" + maxItems)
 				});
 			}
 			this._initItems(items);

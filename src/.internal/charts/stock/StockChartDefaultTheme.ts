@@ -705,42 +705,42 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["rsi"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
 
 		r("LineSeries", ["williamsr"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
 		r("LineSeries", ["commoditychannelindex"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
 		r("LineSeries", ["stochastic"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{slowColor} bold]{slow.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
 
 		r("LineSeries", ["indicator", "bollingerbands"]).setAll({
 			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.000a')}[/] [{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{upperColor} bold]{upper.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field},{standardDeviations},{type})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{type})"
 		})
 
 		r("LineSeries", ["movingaverage"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field},{type},{offset})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
 		})
 
 		r("LineSeries", ["indicator", "movingaverageenvelope"]).setAll({
 			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.000a')}[/] [{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{upperColor} bold]{upper.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field},{shiftType},{shift},{type})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{shiftType},{shift.formatNumber('#.')},{type})"
 		})
 
 		r("LineSeries", ["vwap"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
 
 		r("LineSeries", ["accumulationdistribution"]).setAll({
@@ -750,17 +750,17 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["disparityindex"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field},{movingAverageType})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{movingAverageType})"
 		})
 
 		r("LineSeries", ["chaikinmoneyflow"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
 		r("LineSeries", ["chaikinoscillator"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{slowPeriod})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{slowPeriod.formatNumber('#.')})"
 		})
 
 		r("LineSeries", ["onbalancevolume"]).setAll({
@@ -775,7 +775,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["aroon"]).setAll({
 			legendValueText: "[{upColor} bold]{up.formatNumber('#.000a')}[/] [{downColor} bold]{down.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
 		r("ColumnSeries", ["awesomeoscillator"]).setAll({
@@ -792,12 +792,27 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["standarddeviation"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period},{field})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
+
+		r("LineSeries", ["typicalprice"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})	
+
+		r("LineSeries", ["trix"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.000')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})				
+
+		r("LineSeries", ["medianprice"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})				
 
 		r("LineSeries", ["macd"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000')}[/] [{signalColor} bold]{signal.formatNumber('#.000')}[/] [bold {differenceColor}]{difference.formatNumber('#.000')}[/b]",
-			legendLabelText: "{shortName} ({fastPeriod},{slowPeriod},{signalPeriod})"
+			legendLabelText: "{shortName} ({fastPeriod.formatNumber('#.')},{slowPeriod.formatNumber('#.')},{signalPeriod.formatNumber('#.')})"
 		})
 
 		r("RoundedRectangle", ["macd", "difference"]).setAll({
@@ -911,6 +926,32 @@ export class StockChartDefaultTheme extends Theme {
 			field: "close",
 			period: 20
 		})
+
+		r("TypicalPrice").setAll({
+			name: "Typical Price",
+			seriesColor: color(0x000000),
+			shortName: "Typical Price",
+			field: "hlc/3",
+			period: 20
+		})	
+
+		r("Trix").setAll({
+			name: "Trix",
+			seriesColor: color(0x000000),
+			signalColor: color(0xff903f),
+			shortName: "Trix",
+			field: "close",
+			period: 20,
+			signalPeriod: 9
+		})			
+
+		r("MedianPrice").setAll({
+			name: "Median Price",
+			seriesColor: color(0x000000),
+			shortName: "Median Price",
+			field: "hl/2",
+			period: 20
+		})				
 
 
 		r("VWAP").setAll({
@@ -1076,7 +1117,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("IndicatorControl").setAll({
 			name: l.translateAny("Indicators"),
-			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Volume", "VWAP", "Williams R"]
+			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R"]
 		});
 
 		r("ComparisonControl").setAll({

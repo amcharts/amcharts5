@@ -15,10 +15,13 @@ import { MovingAverage } from "../indicators/MovingAverage";
 import { MovingAverageDeviation } from "../indicators/MovingAverageDeviation";
 import { MovingAverageEnvelope } from "../indicators/MovingAverageEnvelope";
 import { StandardDeviation } from "../indicators/StandardDeviation";
+import { TypicalPrice } from "../indicators/TypicalPrice";
+import { MedianPrice } from "../indicators/MedianPrice";
 import { OnBalanceVolume } from "../indicators/OnBalanceVolume";
 import { RelativeStrengthIndex } from "../indicators/RelativeStrengthIndex";
 import { StochasticOscillator } from "../indicators/StochasticOscillator";
 import { WilliamsR } from "../indicators/WilliamsR";
+import { Trix } from "../indicators/Trix";
 import { Volume } from "../indicators/Volume";
 import { VWAP } from "../indicators/VWAP";
 
@@ -31,7 +34,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Volume" | "VWAP" | "Williams R";
+export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Trix" | "Typical Price" | "Volume" | "VWAP" | "Williams R" | "Median Price";
 
 export interface IIndicator {
 	id: string;
@@ -240,7 +243,28 @@ export class IndicatorControl extends StockControl {
 					stockSeries: stockSeries,
 					legend: legend
 				});
-				break;				
+				break;	
+			case "Trix":
+				indicator = Trix.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;					
+			case "Typical Price":
+				indicator = TypicalPrice.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;	
+			case "Median Price":
+				indicator = MedianPrice.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;												
 			case "On Balance Volume":
 				indicator = OnBalanceVolume.new(this.root, {
 					stockChart: stockChart,

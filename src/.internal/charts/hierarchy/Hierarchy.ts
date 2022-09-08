@@ -42,9 +42,16 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	valueWorking: number;
 
 	/**
-	 * Percent value of the node.
+	 * Percent value of the node, based on total sum of all nodes in upper level.
 	 */
 	valuePercentTotal: number;
+
+	/**
+	 * Percent value of the node, based on the value of its direct parent.
+	 *
+	 * @since 5.2.21
+	 */
+	valuePercent: number;
 
 	/**
 	 * Sum of child values.
@@ -525,6 +532,15 @@ export abstract class Hierarchy extends Series {
 
 			if ($type.isNumber(value)) {
 				dataItem.setRaw("sum", value);
+				dataItem.setRaw("valuePercentTotal", value / this.dataItems[0].get("sum") * 100);
+
+				let valuePercent = 100;
+				const parent = dataItem.get("parent");
+				if (parent) {
+					valuePercent = value / parent.get("sum") * 100;
+				}
+				dataItem.get("label").text.markDirtyText();
+				dataItem.setRaw("valuePercent", valuePercent);
 
 				if (this.getPrivate("valueLow") > value) {
 					this.setPrivateRaw("valueLow", value);

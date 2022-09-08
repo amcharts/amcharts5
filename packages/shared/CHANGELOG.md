@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.21] - 2022-09-08
+
+### Added
+- Trix, Median Price, and Typical Price indicators added to `StockChart`.
+- `valuePercent` was added to `Hierarchy` data items. Indicates percent value based on the value of its direct parent.
+
+### Fixed
+- Using relative height of the chart container within a fixed-width wrapper could cause flickering or scrollbars.
+- Period values in a `StockChart` indicators were shown with decimal values.
+- Fixed a typo in `StockChart` list controls.
+- `valuePercentTotal` was not working in `Hierarchy` data items.
+
+
 ## [5.2.20] - 2022-09-05
 
 ### Added

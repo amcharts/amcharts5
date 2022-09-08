@@ -55,6 +55,7 @@ export class StockIcons {
 		"Show Extension": { viewbox: "0 0 50 50", path: "M 10 15 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 30 36 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 40 41 L 50 50 M 20 20 L 30 30 M 10 10 L 0 0" },
 		"Snap": { viewbox: "0 0 50 50", path: "M 17 29 L 29 29 M 33 39 a 5 5 0 1 0 16 3 a 5 5 0 1 0 -16 -3 M 29 17 L 29 29 L 3 3" },
 		"Reset": { viewbox: "0 0 50 50", path: "M 4 25 A 1 1 0 0 0 46 25 Q 46 4 25 4 Q 18 4 11 10 L 5 4 L 5 16 L 17 16 L 11 10" },
+		"Search": { viewbox: "0 0 50 50", path: "M 5 11 A 1 1 90 0 0 36 27 A 1 1 90 0 0 5 11 M 34 30 L 49 45 L 47 47 L 32 32"}
 	};
 
 	public static getIcon(id: string): SVGElement {

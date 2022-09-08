@@ -1423,6 +1423,7 @@ export class Root implements IDisposer {
 		const container = this._tooltipElementContainer!;
 		const tooltipElement = document.createElement("div");
 		tooltipElement.style.position = "absolute";
+		tooltipElement.style.top = "-1000000px";
 		tooltipElement.style.opacity = "0.0000001";
 
 		$utils.setInteractive(tooltipElement, false);

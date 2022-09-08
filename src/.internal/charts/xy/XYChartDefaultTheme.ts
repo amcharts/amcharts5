@@ -49,6 +49,10 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 
+		r("XYSeries").setAll({
+			legendLabelText: "{name}"
+		})
+
 		/**
 		 * ------------------------------------------------------------------------
 		 * charts/xy: XYChartScrollbar

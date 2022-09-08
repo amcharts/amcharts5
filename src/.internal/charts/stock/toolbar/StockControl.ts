@@ -211,6 +211,9 @@ export class StockControl extends Entity {
 		else {
 			label.style.display = "";
 		}
+
+		const button = this.getPrivate("button")!;
+		button.setAttribute("title", this.get("description", this.get("name", "")));
 	}
 
 	public hide(): void {

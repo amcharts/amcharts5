@@ -219,6 +219,35 @@ loadData("MSFT", [valueSeries, volumeSeries, sbSeries], currentGranularity);
 addComparingSeries("AAPL");
 
 
+// Set up main indices selector
+// -------------------------------------------------------------------------------
+// https://www.amcharts.com/docs/v5/charts/stock/toolbar/comparison-control/
+var mainSeriesControl = am5stock.DropdownListControl.new(root, {
+  stockChart: stockChart,
+  name: valueSeries.get("name"),
+  icon: am5stock.StockIcons.getIcon("Search"),
+  fixedLabel: true,
+  searchable: true,
+  searchCallback: function(query) {
+    var mainSeries = stockChart.get("stockSeries");
+    var mainSeriesID = mainSeries ? mainSeries.get("name") : "";
+    var list = getTicker(query);
+    am5.array.each(list, function(item) {
+      if (item.id == mainSeriesID) {
+        item.disabled = true;
+      }
+    })
+    return list;
+  }
+});
+
+mainSeriesControl.events.on("selected", function(ev) {
+  mainSeriesControl.set("name", ev.item.subLabel);
+  valueSeries.set("name", ev.item.subLabel);
+  loadData(ev.item.subLabel, [valueSeries, volumeSeries], currentGranularity);
+});
+
+
 // Set up comparison control
 // -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock/toolbar/comparison-control/
@@ -356,6 +385,7 @@ let toolbar = am5stock.StockToolbar.new(root, {
   container: document.getElementById("chartcontrols")!,
   stockChart: stockChart,
   controls: [
+    mainSeriesControl,
     comparisonControl,
     am5stock.IndicatorControl.new(root, {
       stockChart: stockChart,

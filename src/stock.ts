@@ -25,6 +25,10 @@ export { WilliamsR, IWilliamsRPrivate, IWilliamsREvents, IWilliamsRSettings } fr
 export { Volume, IVolumeEvents, IVolumePrivate, IVolumeSettings } from "./.internal/charts/stock/indicators/Volume";
 export { CommodityChannelIndex, ICommodityChannelIndexEvents, ICommodityChannelIndexPrivate, ICommodityChannelIndexSettings } from "./.internal/charts/stock/indicators/CommodityChannelIndex";
 export { DisparityIndex, IDisparityIndexEvents, IDisparityIndexPrivate, IDisparityIndexSettings } from "./.internal/charts/stock/indicators/DisparityIndex";
+export { StandardDeviation, IStandardDeviationEvents, IStandardDeviationPrivate, IStandardDeviationSettings } from "./.internal/charts/stock/indicators/StandardDeviation";
+export { TypicalPrice, ITypicalPriceEvents, ITypicalPricePrivate, ITypicalPriceSettings } from "./.internal/charts/stock/indicators/TypicalPrice";
+export { Trix, ITrixEvents, ITrixPrivate, ITrixSettings } from "./.internal/charts/stock/indicators/Trix";
+export { MedianPrice, IMedianPriceEvents, IMedianPricePrivate, IMedianPriceSettings } from "./.internal/charts/stock/indicators/MedianPrice";
 
 export { DrawingSeries, IDrawingSeriesPrivate, IDrawingSeriesDataItem, IDrawingSeriesSettings } from "./.internal/charts/stock/drawing/DrawingSeries";
 export { PolylineSeries, IPolylineSeriesPrivate, IPolylineSeriesSettings, IPolylineSeriesDataItem } from "./.internal/charts/stock/drawing/PolylineSeries";
