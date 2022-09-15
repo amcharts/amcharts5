@@ -14,6 +14,9 @@ export interface ILocaleSettings {
 	"_decimalSeparator"?: string;
 	"_thousandSeparator"?: string;
 
+	"_percentPrefix"?: string | null;
+	"_percentSuffix"?: string | null;
+
 	"_big_number_suffix_3"?: string;
 	"_big_number_suffix_6"?: string;
 	"_big_number_suffix_9"?: string;

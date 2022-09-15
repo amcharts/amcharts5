@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.22] - 2022-09-15
+
+### Added
+- ZigZag indicator added to `StockChart`.
+
+### Changed
+- `"%"` number formatting modifier will now consider locale when choosing whether percent sign goes before or after the number. At this moment only `tr_TR` (Turkish) locale is placing percent sign before number.
+- `StockChart` indicators, that were using black (`0x000000`) color as a default series color now use `alternativeBackground` color of a theme (they'll now be white if "Dark" theme is used).
+
+### Fixed
+- Stock toolbar dropdown items will now display proper `title` attribute.
+- HTML tooltips were flashing an unpositioned content briefly.
+- The `"Z"` date formatting option was not taking into account Root element's `timezone` setting.
+- If a timezone was set on a chart and data grouping was on, the grouping was not paying attention to the timezone.
+- If a timezone which was not using DST was set on a chart, and user was in a timezone which used DST, the axis labels were shifted by 1 hour in some setups.
+- `GaplessDateAxis` was not working properly with a timezone set.
+- `DateAxis` fills that should have been visible were hidden in some cases.
+- `StockChart` was incorrectly switching to percent mode when last of the compared series was removed.
+- `"p"` number formatting modifier added. Works the same way as `"%"` except it treats numbers as absolute values and does not multiply them by 100.
+
+
 ## [5.2.21] - 2022-09-08
 
 ### Added

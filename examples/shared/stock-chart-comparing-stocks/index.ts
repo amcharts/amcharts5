@@ -244,7 +244,7 @@ var mainSeriesControl = am5stock.DropdownListControl.new(root, {
 mainSeriesControl.events.on("selected", function(ev) {
   mainSeriesControl.set("name", ev.item.subLabel);
   valueSeries.set("name", ev.item.subLabel);
-  loadData(ev.item.subLabel, [valueSeries, volumeSeries], currentGranularity);
+  loadData(ev.item.subLabel, [valueSeries, volumeSeries, sbSeries], currentGranularity);
 });
 
 

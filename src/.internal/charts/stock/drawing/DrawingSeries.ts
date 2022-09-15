@@ -709,8 +709,11 @@ export class DrawingSeries extends LineSeries {
 	protected _setXLocationReal(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
 		const xAxis = this.get("xAxis");
 		const baseInterval = xAxis.getPrivate("baseInterval");
-		const open = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc).getTime();
-		const close = $time.add(new Date(open), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+		const root = this._root;
+		const firstDayOfWeek = root.locale.firstDayOfWeek;
+		const open = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc).getTime();
+		let close = open + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1);
+		close = $time.round(new Date(close), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc).getTime();
 		const locationX = (value - open) / (close - open);
 		dataItem.set("locationX", locationX);
 	}

@@ -220,13 +220,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 			let selectedItems: Array<number> = [];
 			let firstDate = new Date();
-			if(this._dates[0]){
+			if (this._dates[0]) {
 				firstDate = new Date(this._dates[0]);
 			}
 
 			let startDate = $time.round(new Date(this.getPrivate("min", 0)), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, firstDate, this._root.timezone);
-			let value = $time.add(startDate, gridInterval.timeUnit, -1, this._root.utc).getTime();
-			
+			let value = $time.add(startDate, gridInterval.timeUnit, -1, this._root.utc, this._root.timezone).getTime();
+
 			let selectionMax = this.getPrivate("selectionMax")
 
 			let previousPosition = -Infinity;
@@ -236,10 +236,10 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				let index = this.valueToIndex(value);
 				let realValue = this._dates[index];
 
-				if(realValue < value){
-					for(let i = index, len = this._dates.length; i < len; i++){
+				if (realValue < value) {
+					for (let i = index, len = this._dates.length; i < len; i++) {
 						let realValue = this._dates[i];
-						if(realValue >= value){
+						if (realValue >= value) {
 							index = i;
 							break;
 						}
@@ -252,12 +252,18 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 					previousPosition = position;
 				}
 
-				value = $time.add(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.utc).getTime();
+				let previousValue = value;
+				value += $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.1);
+				value = $time.round(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+
+				if (value == previousValue) {
+					break;
+				}
 			}
 
 			if (selectedItems.length > 0) {
 				let i = 0;
-				let previousValue = -Infinity;
+				let previousValue = value - intervalDuration * 10;
 				const nextGridUnit = $time.getNextUnit(gridInterval.timeUnit);
 
 				$array.each(selectedItems, (index) => {

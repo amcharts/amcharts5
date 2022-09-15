@@ -2,6 +2,7 @@ import type { ILocaleSettings } from "./Language"
 
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import { TextFormatter } from "./TextFormatter"
+import { Timezone } from "./Timezone"
 
 import * as $type from "./Type"
 import * as $utils from "./Utils";
@@ -158,7 +159,6 @@ export class DateFormatter extends Entity {
 			minutes: number,
 			seconds: number,
 			milliseconds: number,
-			offset: number = date.getTimezoneOffset(),
 			timestamp: number = date.getTime();
 		if (this._root.utc) {
 			fullYear = date.getUTCFullYear();
@@ -439,6 +439,12 @@ export class DateFormatter extends Entity {
 
 				case "Z":
 				case "ZZ":
+					let timezone = this._root.utc ? "UTC" : this._root.timezone;
+					if (timezone instanceof Timezone) {
+						timezone = timezone.name;
+					}
+					const offset = timezone ? $utils.getTimezoneOffset(timezone) : date.getTimezoneOffset();
+
 					let tz = Math.abs(offset) / 60;
 					let tzh = Math.floor(tz);
 					let tzm = tz * 60 - tzh * 60;

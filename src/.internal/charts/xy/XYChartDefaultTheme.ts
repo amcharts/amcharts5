@@ -524,12 +524,14 @@ export class XYChartDefaultTheme extends Theme {
 					const endValue = dataItem.get("endValue");
 					const intervalDuration = axis.intervalDuration();
 					const baseInterval = axis.getPrivate("baseInterval");
+					const gridInterval = axis.getPrivate("gridInterval", baseInterval);
+					
 
 					let min = axis.getPrivate("min", 0);
-					min = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+					min = $time.round(new Date(min), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 					if (value != null && endValue != null) {
-						const val = Math.round((value - min) / intervalDuration) / 2;
+						const val = Math.round(Math.round((value - min) / intervalDuration)) / 2;
 
 						if (val == Math.round(val)) {
 							axisFill.setPrivate("visible", true);

@@ -335,7 +335,7 @@ export class NumberFormatter extends Entity {
 					// Parse format
 
 					// Look for codes
-					let matches: string[] | null = chunk.text.match(/[#0.,]+[ ]?[abesABES%!]?[abesABES‰!]?/);
+					let matches: string[] | null = chunk.text.match(/[#0.,]+[ ]?[abespABESP%!]?[abespABESP‰!]?/);
 
 					if (matches) {
 						if (matches === null || matches[0] === "") {
@@ -346,11 +346,11 @@ export class NumberFormatter extends Entity {
 						else {
 
 							// look for the format modifiers at the end
-							let mods: string[] | null = matches[0].match(/[abesABES%‰!]{2}|[abesABES%‰]{1}$/);
+							let mods: string[] | null = matches[0].match(/[abespABESP%‰!]{2}|[abespABESP%‰]{1}$/);
 
 							if (mods) {
 								item.mod = mods[0].toLowerCase();
-								item.modSpacing = matches[0].match(/[ ]{1}[abesABES%‰!]{1}$/) ? true : false;
+								item.modSpacing = matches[0].match(/[ ]{1}[abespABESP%‰!]{1}$/) ? true : false;
 							}
 
 							// break the format up
@@ -458,6 +458,13 @@ export class NumberFormatter extends Entity {
 			if (details.modSpacing) {
 				suffix = " " + suffix;
 			}
+		}
+		else if (mods.indexOf("p") !== -1) {
+			let ol = Math.min(value.toString().length + 2, 21);
+			//value *= 100;
+			value = parseFloat(value.toPrecision(ol));
+			prefix = this._root.language.translate("_percentPrefix");
+			suffix = this._root.language.translate("_percentSuffix");
 		}
 		else if (mods.indexOf("%") !== -1) {
 			let ol = Math.min(value.toString().length + 2, 21);

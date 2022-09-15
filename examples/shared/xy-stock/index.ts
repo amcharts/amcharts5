@@ -106,7 +106,7 @@ const valueTooltip = valueSeries1.set("tooltip", am5.Tooltip.new(root, {
   getLabelFillFromSprite: true,
   autoTextColor: false,
   pointerOrientation: "horizontal",
-  labelText: "{name}: {valueY} {valueYChangePercent.formatNumber('[#00ff00]+#,###.##|[#ff0000]#,###.##|[#999999]0')}%"
+  labelText: "{name}: {valueY} {valueYChangePercent.formatNumber('[#00ff00]+#,###.##p|[#ff0000]#,###.##p|[#999999]0')}"
 }));
 
 valueTooltip.get("background")!.set("fill", root.interfaceColors.get("background"));

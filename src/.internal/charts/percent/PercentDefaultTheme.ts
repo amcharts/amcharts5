@@ -22,7 +22,7 @@ export class PercentDefaultTheme extends Theme {
 
 		r("PercentSeries").setAll({
 			legendLabelText: "{category}",
-			legendValueText: "{valuePercentTotal.formatNumber('0.00')}%",
+			legendValueText: "{valuePercentTotal.formatNumber('0.00p')}",
 			colors: ColorSet.new(this._root, {}),
 			width: p100,
 			height: p100
@@ -54,7 +54,7 @@ export class PercentDefaultTheme extends Theme {
 			x: 0,
 			y: 0,
 			toggleKey: "active",
-			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
+			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00p')}",
 			strokeWidth: 1,
 			strokeOpacity: 1,
 			role: "figure",
@@ -68,7 +68,7 @@ export class PercentDefaultTheme extends Theme {
 		r("RadialLabel", ["pie"]).setAll({
 			textType: "aligned",
 			radius: 10,
-			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
+			text: "{category}: {valuePercentTotal.formatNumber('0.00p')}",
 			paddingTop: 5,
 			paddingBottom: 5,
 			populateText: true
@@ -109,14 +109,14 @@ export class PercentDefaultTheme extends Theme {
 		r("FunnelSlice").setAll({
 			interactive: true,
 			expandDistance: 0,
-			//tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00')}%"
+			//tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00p')}"
 		});
 
 		r("FunnelSlice").states.create("hover", { expandDistance: 0.15 })
 
 		r("Label", ["funnel"]).setAll({
 			populateText: true,
-			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
+			text: "{category}: {valuePercentTotal.formatNumber('0.00p')}",
 			centerY: p50
 		});
 
@@ -182,7 +182,7 @@ export class PercentDefaultTheme extends Theme {
 
 		r("Label", ["pyramid"]).setAll({
 			populateText: true,
-			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
+			text: "{category}: {valuePercentTotal.formatNumber('0.00p')}",
 			centerY: p50
 		});
 
@@ -211,12 +211,12 @@ export class PercentDefaultTheme extends Theme {
 		// Class: FunnelSlice
 		r("FunnelSlice", ["pictorial"]).setAll({
 			interactive: true,
-			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00')}%"
+			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00p')}"
 		});
 
 		r("Label", ["pictorial"]).setAll({
 			populateText: true,
-			text: "{category}: {valuePercentTotal.formatNumber('0.00')}%",
+			text: "{category}: {valuePercentTotal.formatNumber('0.00p')}",
 			centerY: p50
 		});
 

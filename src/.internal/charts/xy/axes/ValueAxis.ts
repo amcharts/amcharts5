@@ -562,6 +562,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			fillEndPosition = endPosition;
 		}
 
+		if(dataItem.get("isRange")){
+			if(endValue == null){
+				fillEndPosition = position;
+			}
+		}
+
 		renderer.updateLabel(dataItem.get("label"), position, endPosition, count);
 
 		const grid = dataItem.get("grid");

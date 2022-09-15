@@ -45,9 +45,9 @@ export class HierarchyDefaultTheme extends Theme {
 			tooltipText: "{category}: {sum}"
 		});
 
-		r("HierarchyNode", ["last"]).setAll({			
+		r("HierarchyNode", ["last"]).setAll({
 			cursorOverStyle: "default"
-		});		
+		});
 
 		{
 			const rule = r("Label", ["hierarchy", "node"]);

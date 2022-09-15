@@ -898,6 +898,13 @@ export function getTimeZone(date: Date, long: boolean = false, savings: boolean 
 	return wtz;
 }
 
+export function getTimezoneOffset(timezone: string): number {
+	const date = new Date(Date.UTC(2012, 0, 1, 0, 0, 0, 0));
+	const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+	const tzDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+	return (tzDate.getTime() - utcDate.getTime()) / 6e4 * -1;
+}
+
 
 export function capitalizeFirst(text: string): string {
 	return text.charAt(0).toUpperCase() + text.slice(1);

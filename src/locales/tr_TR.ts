@@ -62,6 +62,9 @@ export default {
 	"_decimalSeparator": ",",
 	"_thousandSeparator": ".",
 
+	"_percentPrefix": "%",
+	"_percentSuffix": null,
+
 	// Suffixes for numbers
 	// When formatting numbers, big or small numers might be reformatted to
 	// shorter version, by applying a suffix.

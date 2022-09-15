@@ -471,7 +471,7 @@ export class StockChart extends Container {
 			if (comparedSeries) {
 				$array.remove(comparedSeries, series);
 				if (comparedSeries.length == 0 && this.get("autoSetPercentScale")) {
-					this.setPercentScale(true);
+					this.setPercentScale(false);
 				}
 			}
 

@@ -1674,7 +1674,9 @@ export class Root implements IDisposer {
 
 			// Deal with opacity
 			const opacity = target.compositeOpacity();
-			htmlElement.style.opacity = opacity + "";
+			setTimeout(() => {
+				htmlElement.style.opacity = opacity + "";
+			}, 10);
 
 			const visible = target.isVisibleDeep();
 			if (visible) {

@@ -733,6 +733,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
 		})
 
+		r("LineSeries", ["zigzag"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName} ({deviation.formatNumber('#.')}, {depth.formatNumber('#.')})"
+		})
+
 		r("LineSeries", ["indicator", "movingaverageenvelope"]).setAll({
 			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.000a')}[/] [{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{upperColor} bold]{upper.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{shiftType},{shift.formatNumber('#.')},{type})"
@@ -798,17 +803,17 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["typicalprice"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})	
+		})
 
 		r("LineSeries", ["trix"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.000')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})				
+		})
 
 		r("LineSeries", ["medianprice"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})				
+		})
 
 		r("LineSeries", ["macd"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000')}[/] [{signalColor} bold]{signal.formatNumber('#.000')}[/] [bold {differenceColor}]{difference.formatNumber('#.000')}[/b]",
@@ -895,6 +900,14 @@ export class StockChartDefaultTheme extends Theme {
 			offset: 0
 		})
 
+		r("ZigZag").setAll({
+			name: "ZigZag",
+			shortName: "ZigZag",
+			seriesColor: ic.get("alternativeBackground"),
+			deviation: 5,
+			depth: 3
+		})
+
 		r("MovingAverageEnvelope").setAll({
 			name: "Moving Average Envelope",
 			shortName: "MA ENV",
@@ -921,7 +934,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("StandardDeviation").setAll({
 			name: "Standard Deviation",
-			seriesColor: color(0x000000),
+			seriesColor: ic.get("alternativeBackground"),
 			shortName: "STDEV",
 			field: "close",
 			period: 20
@@ -929,29 +942,29 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("TypicalPrice").setAll({
 			name: "Typical Price",
-			seriesColor: color(0x000000),
+			seriesColor: ic.get("alternativeBackground"),
 			shortName: "Typical Price",
 			field: "hlc/3",
 			period: 20
-		})	
+		})
 
 		r("Trix").setAll({
 			name: "Trix",
-			seriesColor: color(0x000000),
+			seriesColor: ic.get("alternativeBackground"),
 			signalColor: color(0xff903f),
 			shortName: "Trix",
 			field: "close",
 			period: 20,
 			signalPeriod: 9
-		})			
+		})
 
 		r("MedianPrice").setAll({
 			name: "Median Price",
-			seriesColor: color(0x000000),
+			seriesColor: ic.get("alternativeBackground"),
 			shortName: "Median Price",
 			field: "hl/2",
 			period: 20
-		})				
+		})
 
 
 		r("VWAP").setAll({
@@ -1117,7 +1130,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("IndicatorControl").setAll({
 			name: l.translateAny("Indicators"),
-			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R"]
+			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

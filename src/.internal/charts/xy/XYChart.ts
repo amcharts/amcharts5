@@ -455,10 +455,12 @@ export class XYChart extends SerialChart {
 		const xAxis = series.get("xAxis");
 		if (xAxis) {
 			$array.remove(xAxis.series, series);
+			xAxis.markDirtyExtremes();			
 		}
 		const yAxis = series.get("yAxis");
 		if (yAxis) {
 			$array.remove(yAxis.series, series);
+			yAxis.markDirtyExtremes();
 		}
 
 		const cursor = this.get("cursor");

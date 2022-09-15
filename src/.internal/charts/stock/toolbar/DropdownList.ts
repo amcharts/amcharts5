@@ -178,6 +178,7 @@ export class DropdownList extends Dropdown {
 		const list = this.getPrivate("list")!;
 		const item = document.createElement("li");
 		item.className = "am5stock-list-item";
+		item.setAttribute("title", info.subLabel || info.label);
 
 		if (info.className) {
 			item.className += " " + info.className;
@@ -204,18 +205,6 @@ export class DropdownList extends Dropdown {
 			}
 			
 			input.id = inputId;
-
-			// this._disposers.push($utils.addEventListener(input, "change", (ev) => {
-			// 	console.log("change")
-			// 	ev.preventDefault();
-			// 	this.events.dispatch("changed", {
-			// 		type: "changed",
-			// 		item: info,
-			// 		value: input.checked,
-			// 		checked: input.checked,
-			// 		target: this
-			// 	});
-			// }));
 
 			this._disposers.push($utils.addEventListener(item, "click", (ev) => {
 				//ev.preventDefault();

@@ -200,6 +200,7 @@ import type { XYChart } from "./../charts/xy/XYChart";
 import type { XYChartScrollbar } from "./../charts/xy/XYChartScrollbar";
 import type { XYCursor } from "./../charts/xy/XYCursor";
 import type { XYSeries } from "./../charts/xy/series/XYSeries";
+import type { ZigZag } from "./../charts/stock/indicators/ZigZag";
 import type { ZoomControl } from "./../charts/map/ZoomControl";
 
 export interface IClasses {
@@ -400,5 +401,6 @@ export interface IClasses {
 	"XYChartScrollbar": XYChartScrollbar;
 	"XYCursor": XYCursor;
 	"XYSeries": XYSeries;
+	"ZigZag": ZigZag;
 	"ZoomControl": ZoomControl;
 }

@@ -638,7 +638,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 
 				dataItem.setRaw("value", value);
-				dataItem.setRaw("endValue", $time.add(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.utc).getTime()) //$time.round(new Date(value + intervalDuration * 1.1), gridInterval.timeUnit, gridInterval.count).getTime());
+
+				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.1);
+				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+				dataItem.setRaw("endValue", endValue);
 
 				let date = new Date(value);
 
@@ -657,10 +660,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 
 				this._prepareDataItem(dataItem, gridInterval.count);
-
+				
 				previousValue = value;
+				value = endValue;
 
-				value = $time.add(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.utc).getTime();
+				if(value == previousValue){
+					break;
+				}
 
 				i++;
 			}
@@ -686,7 +692,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _fixMin(min: number) {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-		let endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1)
+		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 		return startTime + (endTime - startTime) * this.get("startLocation", 0);
 	}
@@ -723,7 +730,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _fixMax(max: number) {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(max), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-		let endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1)
+		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
 	}
@@ -776,7 +784,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 				else {
 					startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-					endTime = $time.add(new Date(startTime), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+					endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1);
+					endTime = $time.round(new Date(endTime), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+
 					dataItem.open![field] = startTime;
 					dataItem.close![field] = endTime;
 				}
@@ -856,7 +866,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
 			let endValue = value;
 			if (location > 0) {
-				endValue = $time.add(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.utc).getTime();
+				endValue = value + $time.getDuration(baseInterval.timeUnit, baseInterval.count) * 1.1;
+				endValue = $time.round(new Date(endValue), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
 			}
 			return this.valueToPosition(value + (endValue - value) * location);
 		}
