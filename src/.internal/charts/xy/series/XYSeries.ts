@@ -243,6 +243,9 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * If set to `true` series will be stacked to other series that also have
 	 * this setting set to `true`.
 	 *
+	 * NOTE: for series stack properly, all stacked series must have same number
+	 * of data items with the same timestamp/category.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Stacked_series} for more info
 	 */
 	stacked?: boolean;
@@ -1970,9 +1973,9 @@ export abstract class XYSeries extends Series {
 					}
 				}
 			}
-		}
-		else {
-			this.hideTooltip();
+			else {
+				this.hideTooltip();
+			}
 		}
 	}
 

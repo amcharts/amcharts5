@@ -465,6 +465,9 @@ export class NumberFormatter extends Entity {
 			value = parseFloat(value.toPrecision(ol));
 			prefix = this._root.language.translate("_percentPrefix");
 			suffix = this._root.language.translate("_percentSuffix");
+			if (prefix == "" && suffix == "") {
+				suffix = "%";
+			}
 		}
 		else if (mods.indexOf("%") !== -1) {
 			let ol = Math.min(value.toString().length + 2, 21);

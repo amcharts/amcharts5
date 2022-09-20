@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.23] - 2022-09-20
+
+### Fixed 
+- On a chart with cursor and `tooltipText` set directly on series' columns, the tooltip was not being shown (since 5.2.19).
+- On a chart with X axis `endLocation: 0`, Y axis was not autozooming properly.
+
+
 ## [5.2.22] - 2022-09-15
 
 ### Added

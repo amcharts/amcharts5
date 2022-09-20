@@ -479,11 +479,15 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _handleRangeChange() {
 		super._handleRangeChange();
 
-		const selectionMin = this.getPrivate("selectionMin");
-		const selectionMax = this.getPrivate("selectionMax");
+		let selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
+		let selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
 
 		if ($type.isNumber(selectionMin) && $type.isNumber(selectionMax)) {
 
+			if(this.get("endLocation") == 0){
+				selectionMax += 1;
+			}
+			
 			if (this.get("groupData") && !this._groupingCalculated) {
 				this._groupingCalculated = true;
 
@@ -530,6 +534,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					const end = $array.getSortedIndex(series.dataItems, (dataItem) => {
 						return $order.compare(dataItem.get(fieldName), selectionMax);
 					});
+
+
 					let endIndex = end.index;
 
 					let endIndex2 = endIndex;
@@ -593,8 +599,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const max = this.getPrivate("max");
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
-			const selectionMin = this.getPrivate("selectionMin")! as number;
-			const selectionMax = this.getPrivate("selectionMax")! as number;
+			const selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
+			const selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
 			const renderer = this.get("renderer");
 			const baseInterval = this.getPrivate("baseInterval");
 

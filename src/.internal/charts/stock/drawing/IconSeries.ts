@@ -8,35 +8,43 @@ import { Graphics } from "../../../core/render/Graphics";
 import { SpriteResizer } from "../../../core/render/SpriteResizer";
 
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
+
 	/**
-	 * @todo review
+	 * An SVG path of the icon.
 	 */
 	svgPath: string;
+
 	/**
-	 * @todo review
+	 * Should icon snap to closest data item?
 	 */
 	snapToData?: boolean;
+
 }
 
 export interface IIconSeriesSettings extends IPolylineSeriesSettings {
+
 	/**
 	 * @todo review
 	 */
 	iconSvgPath: string;
+
 	/**
 	 * @todo review
 	 */
 	iconScale?: number;
+
 	/**
 	 * @todo review
 	 */
 	iconCenterX?: Percent;
+
 	/**
 	 * @todo review
 	 */
 	iconCenterY?: Percent;
+
 	/**
-	 * @todo review
+	 * Should icon snap to closest data item?
 	 */
 	snapToData?: boolean;
 }
