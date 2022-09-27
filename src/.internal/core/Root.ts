@@ -355,7 +355,8 @@ export class Root implements IDisposer {
 			tooltipDivStyle.left = -tooltipContainerBounds.left + "px";
 			tooltipDivStyle.width = "calc(100% + " + (tooltipContainerBounds.left + tooltipContainerBounds.right) + "px)";
 			tooltipDivStyle.height = "calc(100% + " + (tooltipContainerBounds.top + tooltipContainerBounds.bottom) + "px)";
-			dom.appendChild(tooltipDiv);
+			tooltipDivStyle.zIndex = "1";
+			inner.appendChild(tooltipDiv);
 
 			this.tooltipRoot = new Root(tooltipDiv, {}, true);
 			this.tooltipRoot._init();
