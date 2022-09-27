@@ -17,6 +17,10 @@ import * as $utils from "../util/Utils";
 //import * as $utils from "../util/Utils";
 import type { DataItem, IComponentDataItem } from "./Component";
 
+import type { Root } from "../Root";
+import type { Template } from "../util/Template";
+import type { Entity } from "../util/Entity";
+
 
 export interface ITooltipSettings extends IContainerSettings {
 
@@ -141,6 +145,14 @@ export class Tooltip extends Container {
 	protected _h: number = 0;
 
 	protected _keepHoverDp: MultiDisposer | undefined;
+
+	constructor(root: Root, settings: Entity["_settings"], isReal: boolean, templates: Array<Template<Entity>> = []) {
+		super(root, settings, isReal, templates);
+		var tooltipRoot = root.tooltipRoot;
+		if (tooltipRoot) {
+			this._root = tooltipRoot;
+		}
+	}
 
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["tooltip"]);
@@ -362,7 +374,15 @@ export class Tooltip extends Container {
 			let parentW = parent.width();
 			let parentH = parent.height();
 
-			const bounds = this.get("bounds", { left: 0, top: 0, right: parentW, bottom: parentH });
+			let tooltipContainer = this.parent;
+			let xx = 0;
+			let yy = 0;
+			if (tooltipContainer) {
+				xx = tooltipContainer.x();
+				yy = tooltipContainer.y();
+			}
+
+			const bounds = this.get("bounds", { left: -xx, top: -yy, right: parentW - xx, bottom: parentH - yy });
 
 			this._updateBounds();
 

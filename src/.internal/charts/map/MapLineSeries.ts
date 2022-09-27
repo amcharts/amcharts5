@@ -11,7 +11,7 @@ import * as $array from "../../core/util/Array";
 /**
  * @ignore
  */
-export interface IMapLineSeriesPrivate extends IMapSeriesPrivate {
+export interface IMapLineSeriesPrivate extends IMapSeriesPrivate {	
 }
 
 export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
@@ -45,6 +45,17 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 	 * NOTE: not all projections have invisible side.
 	 */
 	clipBack?: boolean;
+
+	/**
+	 * A line type.
+	 *
+	 * * `"curved"` (default) - connects points using shortest distance, which will result in curved lines based on map projection.
+	 * * `"straight"` - connects points using visually straight lines, and will not cross the -180/180 longitude.
+	 * 
+	 * @default "curved"
+	 * @since 5.2.24
+	 */
+	lineType?: "curved" | "straight"
 
 }
 
@@ -116,7 +127,7 @@ export class MapLineSeries extends MapSeries {
 		}
 
 		this._handlePointsToConnect(dataItem);
-		dataItem.on("pointsToConnect", ()=>{
+		dataItem.on("pointsToConnect", () => {
 			this._handlePointsToConnect(dataItem);
 		})
 
@@ -126,7 +137,7 @@ export class MapLineSeries extends MapSeries {
 		mapLine.setPrivate("series", this);
 	}
 
-	protected _handlePointsToConnect(dataItem: DataItem<this["_dataItemSettings"]>){
+	protected _handlePointsToConnect(dataItem: DataItem<this["_dataItemSettings"]>) {
 
 		const pointsToConnect = dataItem.get("pointsToConnect");
 		if (pointsToConnect) {

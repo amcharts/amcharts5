@@ -682,7 +682,8 @@ export class DateRangeSelector extends StockControl {
   opacity: 1;
 }
 .flatpickr-current-month {
-  font-size: 135%;
+  margin-top: 1px;
+  font-size: 125%;
   line-height: inherit;
   font-weight: 300;
   color: inherit;
@@ -772,6 +773,7 @@ export class DateRangeSelector extends StockControl {
   -webkit-appearance: menulist;
   -moz-appearance: menulist;
   width: auto;
+  max-width: 95px;
 }
 .flatpickr-current-month .flatpickr-monthDropdown-months:focus,
 .flatpickr-current-month .flatpickr-monthDropdown-months:active {

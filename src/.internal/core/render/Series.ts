@@ -432,6 +432,10 @@ export abstract class Series extends Component {
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 
+			if(endIndex < this.dataItems.length){
+				endIndex++;
+			}
+
 			for (let i = startIndex; i < endIndex; i++) {
 				let dataItem = this.dataItems[i];
 				if (!dataItem.bullets) {

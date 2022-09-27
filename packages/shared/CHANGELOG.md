@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.24] - 2022-09-27
+
+### Added
+- `lineType` (`"curved"`, `"straight"`) added to `MapLineSeries`. `"curved"` (default) connects points using shortest distance, which will result in curved lines based on map projection. `"straight"` connects points using visually straight lines, and will not cross the -180/180 longitude.
+- `tooltipContainerBounds` added to `Root` settings. Allows defining margins around chart area for tooltips to go outside the chart itself.
+
+### Changed
+- If `tooltipLocation: 0` on a `DateAxis`, it will snap to the closest position now. Previously it snapped to the date over which mouse pointer was, this was not user-friendly in some setups. The same logic now applies to the `CategoryAxis` as well.
+
+### Fixed
+- WVAP indicator was showing ZigZag instead.
+- Zoom-out button sometimes used to appear while initial animation was playing. Note: if `sequencedAnimation == true`, it will appear anyway.
+- Fixed styles issue with date picker in `StockChart`.
+- The last bullet of a series could become hidden if `baseInterval` was set to `"month"` on a related `DateAxis`.
+
+
 ## [5.2.23] - 2022-09-20
 
 ### Fixed 

@@ -121,7 +121,6 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * @since 5.1.4
 	 */
 	tooltipIntervalOffset?: number;
-
 }
 
 export interface IDateAxisDataItem extends IValueAxisDataItem {
@@ -484,10 +483,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 		if ($type.isNumber(selectionMin) && $type.isNumber(selectionMax)) {
 
-			if(this.get("endLocation") == 0){
+			if (this.get("endLocation") == 0) {
 				selectionMax += 1;
 			}
-			
+
 			if (this.get("groupData") && !this._groupingCalculated) {
 				this._groupingCalculated = true;
 
@@ -666,11 +665,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 
 				this._prepareDataItem(dataItem, gridInterval.count);
-				
+
 				previousValue = value;
 				value = endValue;
 
-				if(value == previousValue){
+				if (value == previousValue) {
 					break;
 				}
 
@@ -867,6 +866,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 */
 	public roundAxisPosition(position: number, location: number): number {
 		let value = this.positionToValue(position);
+
+		value = value - (location - 0.5) * this.baseDuration();
+
 		let baseInterval = this.getPrivate("baseInterval");
 		if (!$type.isNaN(value)) {
 			value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();

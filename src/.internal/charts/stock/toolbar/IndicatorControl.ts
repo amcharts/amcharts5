@@ -305,6 +305,7 @@ export class IndicatorControl extends StockControl {
 					volumeSeries: volumeSeries,
 					legend: legend
 				});
+				break;
 			case "ZigZag":
 				indicator = ZigZag.new(this.root, {
 					stockChart: stockChart,

@@ -256,6 +256,7 @@ let comparisonControl = am5stock.ComparisonControl.new(root, {
   searchable: true,
   searchCallback: (query) => {
     var compared = stockChart.getPrivate("comparedSeries", []);
+    var main = stockChart.get("stockSeries");
     if (compared.length > 4) {
       return [{
         label: "A maximum of 5 comparisons is already selected. Remove some to add new ones.",
@@ -271,7 +272,7 @@ let comparisonControl = am5stock.ComparisonControl.new(root, {
 
     var list = getTicker(query);
     am5.array.each(list, function(item) {
-      if (comparedIds.indexOf(item.id) !== -1) {
+      if (comparedIds.indexOf(item.id) !== -1 || main.get("name") == item.id) {
         item.disabled = true;
       }
     })

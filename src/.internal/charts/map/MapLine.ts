@@ -61,20 +61,58 @@ export class MapLine extends Graphics {
 						const geoPath = chart.getPrivate("geoPath");
 						if (geoPath) {
 							this._clear = true;
+							if (series.get("lineType") == "straight") {
 
-							this.set("draw", (_display) => {
-								if (projection && series.get("clipBack") === false) {
-									projection.clipAngle(180);
+								const geometry = this.get("geometry")!;
+
+								if (geometry) {
+									let coordinates = geometry.coordinates;
+									if (coordinates) {
+
+										let segments!: number[][][];
+
+										if (geometry.type == "LineString") {
+											segments = [coordinates] as number[][][];
+										}
+										else if (geometry.type == "MultiLineString") {
+											segments = coordinates as number[][][];
+										}
+
+										this.set("draw", (display) => {
+											console.log("draw")
+											for (let s = 0; s < segments.length; s++) {
+												let segment = segments[s];
+												if (segment.length > 0) {
+													const gp0 = segment[0];
+													const p0 = chart.convert({ longitude: gp0[0], latitude: gp0[1] })
+													display.lineTo(p0.x, p0.y);
+
+													for (let p = 0; p < segment.length; p++) {
+														const gp = segment[p];
+														const pn = chart.convert({ longitude: gp[0], latitude: gp[1] })
+														display.lineTo(pn.x, pn.y);
+													}
+												}
+											}
+										})
+									}
 								}
+							}
+							else {
+								this.set("draw", (_display) => {
+									if (projection && series.get("clipBack") === false) {
+										projection.clipAngle(180);
+									}
 
-								geoPath.context(this._display as any);
-								geoPath(geometry);
-								geoPath.context(null);
+									geoPath.context(this._display as any);
+									geoPath(geometry);
+									geoPath.context(null);
 
-								if (projection) {
-									projection.clipAngle(clipAngle as any);
-								}
-							})
+									if (projection) {
+										projection.clipAngle(clipAngle as any);
+									}
+								})
+							}
 						}
 					}
 				}
@@ -104,8 +142,11 @@ export class MapLine extends Graphics {
 	public positionToGeoPoint(position: number): IGeoPoint {
 
 		const geometry = this.get("geometry")!;
+		const series = this.getPrivate("series");
+		const chart = series.chart;
 
-		if (geometry) {
+		if (geometry && series && chart) {
+			const lineType = series.get("lineType");
 			let totalDistance: number = geoLength(geometry);
 			let currentDistance: number = 0;
 
@@ -117,7 +158,6 @@ export class MapLine extends Graphics {
 
 			let coordinates = geometry.coordinates;
 			if (coordinates) {
-
 				let segments!: number[][][];
 
 				if (geometry.type == "LineString") {
@@ -146,8 +186,8 @@ export class MapLine extends Graphics {
 						}
 					}
 					else if (segment.length == 1) {
-						pointA = segment[0] as [number, number];;
-						pointB = segment[0] as [number, number];;
+						pointA = segment[0] as [number, number];
+						pointB = segment[0] as [number, number];
 						positionA = 0;
 						positionB = 1;
 					}
@@ -155,8 +195,22 @@ export class MapLine extends Graphics {
 
 				if (pointA && pointB) {
 					let positionAB: number = (position - positionA) / (positionB - positionA);
-					let location = geoInterpolate(pointA, pointB)(positionAB);
-					return { longitude: location[0], latitude: location[1] }
+					let location: number[];
+
+					if (lineType == "straight") {
+						let p0 = chart.convert({ longitude: pointA[0], latitude: pointA[1] });
+						let p1 = chart.convert({ longitude: pointB[0], latitude: pointB[1] });
+
+						let x = p0.x + (p1.x - p0.x) * positionAB;
+						let y = p0.y + (p1.y - p0.y) * positionAB;
+
+						return chart.invert({ x: x, y: y });
+					}
+					else {
+						location = geoInterpolate(pointA, pointB)(positionAB);
+						return { longitude: location[0], latitude: location[1] }
+					}
+
 				}
 			}
 		}

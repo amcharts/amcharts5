@@ -514,6 +514,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @ignore
 	 */
 	public roundAxisPosition(position: number, location: number): number {
+		position += (0.5 - location) / this.dataItems.length;
 		return this.indexToPosition(this.axisPositionToIndex(position), location);
 	}
 

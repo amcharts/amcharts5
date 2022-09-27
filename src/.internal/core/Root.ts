@@ -76,7 +76,22 @@ export interface IRootEvents {
 
 
 export interface IRootSettings {
+
+	/**
+	 * Indicates whether chart should use "safe" resolution on some memory-limiting
+	 * platforms such as Safari.
+	 *
+	 * @default true
+	 */
 	useSafeResolution?: boolean;
+
+	/**
+	 * Allows defining margins around chart area for tooltips to go outside the
+	 * chart itself.
+	 *
+	 * @since 5.2.24
+	 */
+	tooltipContainerBounds?: { top: number, left: number, right: number, bottom: number };
 }
 
 
@@ -222,6 +237,8 @@ export class Root implements IDisposer {
 
 	public _logo?: Container;
 
+	public _tooltipDiv: HTMLDivElement | undefined;
+
 	/**
 	 * Used for dynamically-created CSS and JavaScript with strict source policies.
 	 */
@@ -279,6 +296,8 @@ export class Root implements IDisposer {
 	protected _htmlElementContainer: HTMLDivElement | undefined;
 	protected _htmlEnabledContainers: Container[] = [];
 
+	public tooltipRoot?: Root;
+
 	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
 		if (!isReal) {
@@ -325,12 +344,33 @@ export class Root implements IDisposer {
 		inner.style.height = "100%";
 		dom.appendChild(inner);
 
+		const tooltipContainerBounds = settings.tooltipContainerBounds;
+		if (tooltipContainerBounds) {
+			let tooltipDiv: HTMLDivElement = document.createElement("div");
+			$utils.setInteractive(tooltipDiv, false);
+
+			let tooltipDivStyle = tooltipDiv.style;
+			tooltipDivStyle.position = "absolute";
+			tooltipDivStyle.top = -tooltipContainerBounds.top + "px";
+			tooltipDivStyle.left = -tooltipContainerBounds.left + "px";
+			tooltipDivStyle.width = "calc(100% + " + (tooltipContainerBounds.left + tooltipContainerBounds.right) + "px)";
+			tooltipDivStyle.height = "calc(100% + " + (tooltipContainerBounds.top + tooltipContainerBounds.bottom) + "px)";
+			dom.appendChild(tooltipDiv);
+
+			this.tooltipRoot = new Root(tooltipDiv, {}, true);
+			this.tooltipRoot._init();
+			this.tooltipRoot.tooltipContainer.setAll({ x: tooltipContainerBounds.left, y: tooltipContainerBounds.top });
+		}
+
 		this._inner = inner;
 
 		this._updateComputedStyles();
 
 		registry.rootElements.push(this);
 	}
+
+
+
 
 	public static new(id: string | HTMLElement, settings?: IRootSettings): Root {
 		const root = new Root(id, settings, true);
@@ -397,7 +437,12 @@ export class Root implements IDisposer {
 				})
 			}));
 
-			const tooltip = Tooltip.new(this, {
+			let tooltipRoot = this.tooltipRoot;
+			if (!tooltipRoot) {
+				tooltipRoot = this;
+			}
+
+			const tooltip = Tooltip.new(tooltipRoot, {
 				pointerOrientation: "horizontal",
 				paddingTop: 4,
 				paddingRight: 7,
@@ -1017,6 +1062,11 @@ export class Root implements IDisposer {
 				$utils.removeElement(this._inner);
 			}
 
+			var tooltipRoot = this.tooltipRoot;
+			if (tooltipRoot) {
+				tooltipRoot.dispose();
+			}
+
 			$array.remove(registry.rootElements, this);
 		}
 	}
@@ -1049,6 +1099,12 @@ export class Root implements IDisposer {
 	public setThemes(themes: Array<Theme>): void {
 		this._rootContainer.set("themes", themes);
 
+		const tooltipRoot = this.tooltipRoot;
+		if (tooltipRoot) {
+			tooltipRoot._rootContainer.set("themes", themes);
+			tooltipRoot.tooltipContainer._applyThemes();
+		}
+
 		// otherwise new themes are not applied
 		const tooltipContainer = this.tooltipContainer;
 		if (tooltipContainer) {
@@ -1060,6 +1116,8 @@ export class Root implements IDisposer {
 		if (interfaceColors) {
 			interfaceColors._applyThemes();
 		}
+
+
 	}
 
 	protected _addTooltip() {
@@ -1067,7 +1125,12 @@ export class Root implements IDisposer {
 			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100, layer: 30 }));
 			this.tooltipContainer = tooltipContainer;
 
-			const tooltip = Tooltip.new(this, {});
+			let tooltipRoot = this.tooltipRoot;
+			if (!tooltipRoot) {
+				tooltipRoot = this;
+			}
+
+			const tooltip = Tooltip.new(tooltipRoot, {});
 			this.container.set("tooltip", tooltip);
 			tooltip.hide(0);
 			this._tooltip = tooltip;

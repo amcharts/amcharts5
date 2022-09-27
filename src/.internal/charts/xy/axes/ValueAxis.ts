@@ -562,8 +562,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			fillEndPosition = endPosition;
 		}
 
-		if(dataItem.get("isRange")){
-			if(endValue == null){
+		if (dataItem.get("isRange")) {
+			if (endValue == null) {
 				fillEndPosition = position;
 			}
 		}
@@ -1288,6 +1288,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			minDiff = (max - min)
 		}
 
+		// this is to avoid floating point number error
+		let decCount = Math.round(Math.abs(Math.log(Math.abs(max - min)) * Math.LOG10E)) + 5;
+
+		min = $math.round(min, decCount);
+		max = $math.round(max, decCount);
+
 		const syncWithAxis = this.get("syncWithAxis");
 		if (syncWithAxis) {
 			minMaxStep = this._syncAxes(min, max, minMaxStep.step, syncWithAxis.getPrivate("minFinal", syncWithAxis.getPrivate("min", 0)), syncWithAxis.getPrivate("maxFinal", syncWithAxis.getPrivate("max", 1)), syncWithAxis.getPrivate("step", 1));
@@ -1312,7 +1318,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			if (this.getPrivate("minFinal") !== min || this.getPrivate("maxFinal") !== max) {
 				this.setPrivate("minFinal", min);
 				this.setPrivate("maxFinal", max);
-
 				this._saveMinMax(min, max);
 
 				const duration = this.get("interpolationDuration", 0);
