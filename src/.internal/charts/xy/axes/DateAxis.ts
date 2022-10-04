@@ -322,7 +322,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 
 				let prevNewDataItem: DataItem<IXYSeriesDataItem> | undefined;
-
 				$array.each(dataItems, (dataItem) => {
 					let time = dataItem.get(key as any);
 					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, this._root.locale.firstDayOfWeek, this._root.utc, firstDate, this._root.timezone).getTime();
@@ -341,8 +340,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 							if ($type.isNumber(value)) {
 								newDataItem.setRaw(field as any, value);
 								newDataItem.setRaw(workingFields[field] as any, value);
-								count[field]++;
-								sum[field] += value;
+								count[field] = 1;
+								sum[field] = value;
+							}
+							else {
+								sum[field] = 0;
+								count[field] = 0;
 							}
 						})
 

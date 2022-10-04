@@ -176,9 +176,12 @@ export interface IXYChartPrivate extends ISerialChartPrivate {
 	tooltipSeries?: Array<XYSeries>
 
 	/**
-	 * @ignore
+	 * Array of other [[XYChart]] objects that cursors should be synced with.
+	 * 
+	 * Note: cursors will be synced across the vertically stacked charts only.
 	 */
 	otherCharts?: Array<XYChart>
+
 }
 
 

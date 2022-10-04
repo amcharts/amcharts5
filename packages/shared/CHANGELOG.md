@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.27] - 2022-10-04
+
+### Fixed
+- `"average"` value of grouped data items was not being calculated properly.
+- `WordCloud` was ignoring the `fill` value from label `templateField`.
+
+
 ## [5.2.26] - 2022-09-27
 
 ### Fixed

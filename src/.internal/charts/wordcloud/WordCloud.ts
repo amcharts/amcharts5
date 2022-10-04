@@ -95,7 +95,7 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	categoryField?: string;
 
 	/**
-	 * A field that holds color for slice fill.
+	 * A field that holds color for label fill.
 	 */
 	fillField?: string;
 
@@ -217,7 +217,10 @@ export class WordCloud extends Series {
 	public makeLabel(dataItem: DataItem<this["_dataItemSettings"]>): Label {
 		const label = this.children.push(this.labels.make());
 		label._setDataItem(dataItem);
-		label.set("fill", dataItem.get("fill"));
+		const fill = dataItem.get("fill");
+		if (fill != null) {
+			label.set("fill", fill);
+		}
 		label.set("x", -999999); // do not change!
 
 		dataItem.set("label", label);
