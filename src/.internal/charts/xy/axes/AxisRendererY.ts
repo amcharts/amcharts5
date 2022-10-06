@@ -336,6 +336,29 @@ export class AxisRendererY extends AxisRenderer {
 					position = position + (endPosition - position) * location;
 				}
 
+
+				let bulletPosition = this.axis.roundAxisPosition(position, location);
+				let previousBullet = this.axis._bullets[bulletPosition];
+				let d = 1;
+				if (this.get("opposite")) {
+					d = -1;
+				}
+
+				if (bullet.get("stacked")) {
+					if (previousBullet) {
+						let previousSprite = previousBullet.get("sprite");
+						if (previousSprite) {
+							sprite.set("x", previousSprite.x() + previousSprite.width() * d);
+						}
+					}
+					else {
+						sprite.set("x", 0);
+					}
+				}
+
+				this.axis._bullets[bulletPosition] = bullet;
+
+
 				sprite.set("y", this.positionToCoordinate(position));
 
 				this.toggleVisibility(sprite, position, 0, 1);

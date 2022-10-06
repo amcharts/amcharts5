@@ -162,7 +162,6 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_bullets} for more info
 	 */
 	bullet?: (root: Root, axis: Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
-
 }
 
 export interface IAxisEvents extends IComponentEvents {
@@ -188,7 +187,7 @@ export interface IAxisPrivate extends IComponentPrivate {
 	/**
 	 * Saves position to which tooltip points.
 	 */
-	tooltipPosition?:number;
+	tooltipPosition?: number;
 
 }
 
@@ -302,7 +301,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	protected _sAnimation?: Animation<this["_settings"]["start"]>;
 	protected _eAnimation?: Animation<this["_settings"]["end"]>;
 
-	public _skipSync:boolean = false;
+	public _skipSync: boolean = false;
 
 	/**
 	 * A list of axis ranges.
@@ -343,6 +342,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			fill: this._root.interfaceColors.get("background")
 		})
 	}));
+
+	public _bullets: { [index: string]: AxisBullet } = {};
 
 	protected _dispose() {
 		// these could be in other parents, so disposing just in case

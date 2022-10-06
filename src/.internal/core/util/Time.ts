@@ -118,7 +118,8 @@ export function getDateIntervalDuration(interval: ITimeInterval, date: Date, fir
 	}
 	else {
 		const firstTime = round(new Date(date.getTime()), unit, count, firstDateOfWeek, utc, undefined, timezone).getTime();
-		const lastTime = add(new Date(firstTime), unit, count, utc, timezone).getTime();
+		let lastTime = firstTime + count * getDuration(unit) * 1.1;
+		lastTime = round(new Date(lastTime), unit, 1, firstDateOfWeek, utc, undefined, timezone).getTime();
 		return lastTime - firstTime;
 	}
 }
@@ -504,12 +505,12 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		switch (unit) {
 
 			case "day":
-				if (firstDate) {
+				if (count > 1 && firstDate) {
 					firstDate = round(firstDate, "day", 1, firstDateOfWeek, utc, undefined, timezone);
 					let difference = date.getTime() - firstDate.getTime();
 					let unitCount = Math.floor(difference / getDuration("day") / count);
 					let duration = getDuration("day", unitCount * count);
-					date.setTime(firstDate.getTime() + duration - timeZoneOffset * getDuration("minute"));
+					date.setTime(firstDate.getTime() + duration);
 
 					parsedDate = timezone.parseDate(date);
 

@@ -16,6 +16,18 @@ export interface IAxisBulletSettings extends IEntitySettings {
 	 * A visual element of the bullet.
 	 */
 	sprite: Sprite;
+
+	/**
+	 * Indicates if the bullet should be stacked on top of another bullet if it's
+	 * on the same position.
+	 * 
+	 * Will work on horizontal or vertical axes only.
+	 *
+	 * @since 5.2.28
+	 * @default false
+	 */
+	stacked?: boolean;
+
 }
 
 export interface IAxisBulletPrivate extends IEntityPrivate {

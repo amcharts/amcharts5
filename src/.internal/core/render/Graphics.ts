@@ -239,6 +239,7 @@ export class Graphics extends Sprite {
 		super._changed();
 
 		if (this._clear) {
+			this.markDirtyBounds();
 			this.markDirtyLayer();
 			this._display.clear();
 

@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.28] - 2022-10-06
+
+### Added
+- `stacked` setting added to `AxisBullet`. If set to `true` and multiple data items (axis ranges) were added to the same date/category, bullets will be stacked on top of each other.
+
+### Fixed
+- If a timezone was set and `baseInterval` was a `"month"`, tooltip could show incorrect date value on a month when DLS happened.
+- If a new slice was added to `PercentChart` after the initial data was set, the new slice was using first color from colorset instead of the next one.
+- Some sprites were not dispatching `boundschanged` event when their settings affecting the bounds were being changed.
+
+
 ## [5.2.27] - 2022-10-04
 
 ### Fixed

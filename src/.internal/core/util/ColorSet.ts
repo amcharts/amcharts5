@@ -100,6 +100,7 @@ export class ColorSet extends Entity {
 	protected _afterNew() {
 		// Applying themes because color set will not have parent
 		super._afterNewApplyThemes();
+		this._dirty["colors"] = false;
 	}
 
 	public _beforeChanged(): void {

@@ -600,6 +600,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const min = this.getPrivate("min");
 		const max = this.getPrivate("max");
 
+		this._bullets = {};
+
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			const selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
 			const selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
@@ -648,7 +650,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				dataItem.setRaw("value", value);
 
 				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.1);
-				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 				dataItem.setRaw("endValue", endValue);
 
 				let date = new Date(value);
@@ -701,7 +703,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1)
-		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 		return startTime + (endTime - startTime) * this.get("startLocation", 0);
 	}
@@ -739,7 +741,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(max), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1)
-		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
 	}
@@ -793,7 +795,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				else {
 					startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 					endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1);
-					endTime = $time.round(new Date(endTime), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+					endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 					dataItem.open![field] = startTime;
 					dataItem.close![field] = endTime;
@@ -869,18 +871,22 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 */
 	public roundAxisPosition(position: number, location: number): number {
 		let value = this.positionToValue(position);
-
 		value = value - (location - 0.5) * this.baseDuration();
 
 		let baseInterval = this.getPrivate("baseInterval");
 		if (!$type.isNaN(value)) {
-			value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
-			let endValue = value;
-			if (location > 0) {
-				endValue = value + $time.getDuration(baseInterval.timeUnit, baseInterval.count) * 1.1;
-				endValue = $time.round(new Date(endValue), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), this._root.timezone).getTime();
+			const timeZone = this._root.timezone;
+			const firstDayOfWeek = this._root.locale.firstDayOfWeek;
+			value = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), timeZone).getTime();
+
+			let duration = $time.getDateIntervalDuration(baseInterval, new Date(value), firstDayOfWeek, this._root.utc, this._root.timezone);
+			if (timeZone) {
+				value = $time.round(new Date(value + this.baseDuration() * 0.01), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), timeZone).getTime();
+				let newValue = value + duration * location;
+				duration = $time.getDateIntervalDuration(baseInterval, new Date(newValue), firstDayOfWeek, this._root.utc, this._root.timezone);
 			}
-			return this.valueToPosition(value + (endValue - value) * location);
+
+			return this.valueToPosition(value + duration * location);
 		}
 		return NaN;
 	}
@@ -895,10 +901,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		//@todo number formatter + tag
 		if (this.getPrivate("min") != null) {
 			let format = this.get("tooltipDateFormats")![this.getPrivate("baseInterval").timeUnit];
-			let date = new Date(this.positionToValue(position));
+			let value = this.positionToValue(position);
+			let date = new Date(value);
+
 			let baseInterval = this.getPrivate("baseInterval");
 			let duration = $time.getDateIntervalDuration(baseInterval, date, this._root.locale.firstDayOfWeek, this._root.utc, this._root.timezone);
-			return this._root.dateFormatter.format(new Date(this.positionToValue(position) + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration), this.get("tooltipDateFormat", format));
+			return this._root.dateFormatter.format(new Date(value + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration), this.get("tooltipDateFormat", format));
 		}
 		return "";
 	}

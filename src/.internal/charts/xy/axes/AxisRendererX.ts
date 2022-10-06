@@ -53,7 +53,7 @@ export class AxisRendererX extends AxisRenderer {
 
 	declare public readonly labelTemplate: Template<AxisLabel>;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured:false, themeTags: ["axis", "x", "thumb"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured: false, themeTags: ["axis", "x", "thumb"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
@@ -92,7 +92,7 @@ export class AxisRendererX extends AxisRenderer {
 				axis.addTag(inside);
 			}
 			else {
-				axis.removeTag(inside);				
+				axis.removeTag(inside);
 			}
 
 			if (chart) {
@@ -356,7 +356,26 @@ export class AxisRendererX extends AxisRenderer {
 					position = position + (endPosition - position) * location;
 				}
 
+				let bulletPosition = this.axis.roundAxisPosition(position, location);
+				let previousBullet = this.axis._bullets[bulletPosition];
+				let d = -1;
+				if(this.get("opposite")){
+					d = 1;
+				}
 
+				if (bullet.get("stacked")) {
+					if (previousBullet) {
+						let previousSprite = previousBullet.get("sprite");
+						if (previousSprite) {
+							sprite.set("y", previousSprite.y() + previousSprite.height() * d);
+						}
+					}
+					else {
+						sprite.set("y", 0);
+					}
+				}
+
+				this.axis._bullets[bulletPosition] = bullet;
 				sprite.set("x", this.positionToCoordinate(position));
 				this.toggleVisibility(sprite, position, 0, 1);
 			}
