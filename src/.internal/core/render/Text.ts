@@ -38,7 +38,7 @@ export interface ITextSettings extends ISpriteSettings {
 	opacity?: number;
 	direction?: "ltr" | "rtl";
 	textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom";
-	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "truncate";
+	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate";
 	breakWords?: boolean;
 	ellipsis?: string;
 	minScale?: number;

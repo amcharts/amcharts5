@@ -242,7 +242,7 @@ export interface ITextStyle {
 	// wordWrap?: boolean;
 	direction?: "ltr" | "rtl";
 	textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom";
-	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "truncate";
+	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate";
 	breakWords?: boolean;
 	ellipsis?: string;
 	maxWidth?: number;

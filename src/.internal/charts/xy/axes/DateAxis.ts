@@ -649,8 +649,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				dataItem.setRaw("value", value);
 
-				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.1);
+				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.05);
 				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
+
 				dataItem.setRaw("endValue", endValue);
 
 				let date = new Date(value);
@@ -702,7 +703,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _fixMin(min: number) {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1)
+		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05)
 		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 		return startTime + (endTime - startTime) * this.get("startLocation", 0);
@@ -740,7 +741,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _fixMax(max: number) {
 		let baseInterval = this.getPrivate("baseInterval");
 		let startTime = $time.round(new Date(max), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1)
+		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05)
 		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
@@ -794,7 +795,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 				else {
 					startTime = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-					endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1);
+					endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05);
 					endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 					dataItem.open![field] = startTime;
@@ -881,7 +882,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			let duration = $time.getDateIntervalDuration(baseInterval, new Date(value), firstDayOfWeek, this._root.utc, this._root.timezone);
 			if (timeZone) {
-				value = $time.round(new Date(value + this.baseDuration() * 0.01), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), timeZone).getTime();
+				value = $time.round(new Date(value + this.baseDuration() * 0.05), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, this._root.utc, new Date(this.getPrivate("min", 0)), timeZone).getTime();
 				let newValue = value + duration * location;
 				duration = $time.getDateIntervalDuration(baseInterval, new Date(newValue), firstDayOfWeek, this._root.utc, this._root.timezone);
 			}
@@ -918,9 +919,16 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @param   position  Relative position
 	 * @return            Data item
 	 */
-	public getSeriesItem(series: XYSeries, position: number): DataItem<IXYSeriesDataItem> | undefined {
+	public getSeriesItem(series: XYSeries, position: number, location?: number): DataItem<IXYSeriesDataItem> | undefined {
 		let fieldName = <any>(this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!);
 		let value = this.positionToValue(position);
+
+		if (location == null) {
+			location = 0.5;
+		}
+
+		value = value - (location - 0.5) * this.baseDuration();
+
 		const result = $array.getSortedIndex(series.dataItems, (dataItem) => {
 			var diValue = 0;
 			if (dataItem.open) {

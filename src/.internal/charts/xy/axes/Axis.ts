@@ -943,7 +943,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 			$array.each(this.series, (series) => {
 				if (series.get("baseAxis") === this) {
-					const dataItem = this.getSeriesItem(series, position!);
+					const dataItem = this.getSeriesItem(series, position!, this.get("tooltipLocation"));
 					series.setRaw("tooltipDataItem", dataItem);
 					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
 						series.updateLegendMarker(dataItem);
@@ -1071,7 +1071,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @param   position  Relative position
 	 * @return            Data item
 	 */
-	public abstract getSeriesItem(series: XYSeries, position: number): DataItem<IXYSeriesDataItem> | undefined
+	public abstract getSeriesItem(series: XYSeries, position: number, location?: number): DataItem<IXYSeriesDataItem> | undefined
 
 	/**
 	 * @ignore

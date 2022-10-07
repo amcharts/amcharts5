@@ -118,7 +118,7 @@ export function getDateIntervalDuration(interval: ITimeInterval, date: Date, fir
 	}
 	else {
 		const firstTime = round(new Date(date.getTime()), unit, count, firstDateOfWeek, utc, undefined, timezone).getTime();
-		let lastTime = firstTime + count * getDuration(unit) * 1.1;
+		let lastTime = firstTime + count * getDuration(unit) * 1.05;
 		lastTime = round(new Date(lastTime), unit, 1, firstDateOfWeek, utc, undefined, timezone).getTime();
 		return lastTime - firstTime;
 	}

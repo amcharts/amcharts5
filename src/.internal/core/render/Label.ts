@@ -99,7 +99,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Oversized_text} for more info
 	 */
-	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "truncate";
+	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate";
 
 	/**
 	 * Whether words can be broken when truncating or wrapping text.

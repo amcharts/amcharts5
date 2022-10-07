@@ -676,7 +676,7 @@ class LineStyle extends Op {
 		}
 
 		context.lineWidth = this.width;
-		if(this.lineJoin){
+		if (this.lineJoin) {
 			context.lineJoin = this.lineJoin;
 		}
 	}
@@ -1764,7 +1764,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		const maxWidth = this.style.maxWidth!;
 
 		const truncate = $type.isNumber(maxWidth) && oversizedBehavior == "truncate";
-		const wrap = $type.isNumber(maxWidth) && oversizedBehavior == "wrap";
+		const wrap = $type.isNumber(maxWidth) && (oversizedBehavior == "wrap" || oversizedBehavior == "wrap-no-break");
 
 		// Pre-render
 		context.save();
@@ -1917,7 +1917,13 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							// Check fit
 							if ((lineInfo.width + chunkWidth) > maxWidth) {
 								const excessWidth = maxWidth - lineInfo.width;
-								const tmpText = this._truncateText(context, chunk.text, excessWidth, false, firstTextChunk);
+								const tmpText = this._truncateText(
+									context,
+									chunk.text,
+									excessWidth,
+									false,
+									(firstTextChunk && this.style.oversizedBehavior != "wrap-no-break")
+								);
 
 								if (tmpText == "") {
 									// Unable to fit a single letter - hide the whole label
@@ -2154,6 +2160,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				if (tmp == "" && fallbackBreakWords) {
 					breakWords = true;
 				}
+				else if (tmp == "") {
+					return text;
+				}
 				else {
 					text = tmp;
 				}
@@ -2256,7 +2265,7 @@ export class CanvasTextStyle implements ITextStyle {
 	// wordWrap?: boolean;
 	public direction?: "ltr" | "rtl";
 	public textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom";
-	public oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "truncate" = "none";
+	public oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate" = "none";
 	public breakWords?: boolean = false;
 	public ellipsis?: string = "…";
 	public maxWidth?: number;

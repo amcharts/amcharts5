@@ -253,7 +253,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				}
 
 				let previousValue = value;
-				value += $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.1);
+				value += $time.getDuration(gridInterval.timeUnit, gridInterval.count * 1.05);
 				value = $time.round(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 
 				if (value == previousValue) {

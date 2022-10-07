@@ -712,7 +712,7 @@ export class DrawingSeries extends LineSeries {
 		const root = this._root;
 		const firstDayOfWeek = root.locale.firstDayOfWeek;
 		const open = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc).getTime();
-		let close = open + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.1);
+		let close = open + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05);
 		close = $time.round(new Date(close), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc).getTime();
 		const locationX = (value - open) / (close - open);
 		dataItem.set("locationX", locationX);
