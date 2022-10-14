@@ -1018,4 +1018,21 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public dateToPosition(date: Date): number {
 		return this.valueToPosition(date.getTime());
 	}
+
+	/**
+	 * Returns position span between start and end of a single cell in axis.
+	 *
+	 * @since 5.2.30
+	 * @return Position
+	 * @ignore
+	 */
+	public getCellWidthPosition(): number {
+		let max = this.getPrivate("selectionMax", this.getPrivate("max"));
+		let min = this.getPrivate("selectionMin", this.getPrivate("min"));
+
+		if ($type.isNumber(max) && $type.isNumber(min)) {
+			return this.baseDuration() / (max - min);
+		}
+		return 0.05;
+	}
 }

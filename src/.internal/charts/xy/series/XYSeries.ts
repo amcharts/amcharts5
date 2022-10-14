@@ -1863,13 +1863,18 @@ export abstract class XYSeries extends Series {
 			$array.each(this._valueYFields, (key) => {
 				let min = yAxis.getPrivate("min");
 				let baseValue = yAxis.baseValue();
+
 				if ($type.isNumber(min) && min > baseValue) {
 					baseValue = min;
 				}
 				if (stacked) {
 					baseValue = 0;
 				}
-				promises.push(dataItem.animate({ key: key + "Working" as any, to: baseValue, duration: duration!, easing: easing }).waitForStop());
+
+				let value = dataItem.get(key as any);
+				if (value != null) {
+					promises.push(dataItem.animate({ key: key + "Working" as any, to: baseValue, duration: duration!, easing: easing }).waitForStop());
+				}
 			})
 		}
 		if (baseAxis === yAxis || !baseAxis) {
@@ -1884,7 +1889,10 @@ export abstract class XYSeries extends Series {
 			}
 
 			$array.each(this._valueXFields, (key) => {
-				promises.push(dataItem.animate({ key: key + "Working" as any, to: baseValue, duration: duration!, easing: easing }).waitForStop());
+				let value = dataItem.get(key as any);
+				if (value != null) {
+					promises.push(dataItem.animate({ key: key + "Working" as any, to: baseValue, duration: duration!, easing: easing }).waitForStop());
+				}
 			})
 		}
 

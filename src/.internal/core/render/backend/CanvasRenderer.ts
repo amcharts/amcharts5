@@ -159,7 +159,7 @@ function isTainted(image: HTMLImageElement): boolean {
 	const canvas = document.createElement("canvas");
 	canvas.width = 1;
 	canvas.height = 1;
-	const context = canvas.getContext("2d")!;
+	const context = canvas.getContext("2d", { willReadFrequently: true })! as CanvasRenderingContext2D;
 	context.drawImage(image, 0, 0, 1, 1);
 
 	try {
@@ -2938,7 +2938,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		// @todo : do the same for ghost
 		this._ghostView = document.createElement("canvas");
-		this._ghostContext = this._ghostView.getContext("2d", { alpha: false })!;
+		this._ghostContext = this._ghostView.getContext("2d", { alpha: false, willReadFrequently: true })! as CanvasRenderingContext2D;
 		this._ghostContext.imageSmoothingEnabled = false;
 
 		this._ghostView.style.position = "absolute";
@@ -3161,9 +3161,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this.view.style.height = height + "px";
 	}
 
-	private createDetachedLayer(): CanvasLayer {
+	private createDetachedLayer(willReadFrequently: boolean = false): CanvasLayer {
 		const view = document.createElement("canvas");
-		const context = view.getContext("2d")!;
+		const context = view.getContext("2d", { willReadFrequently: willReadFrequently })! as CanvasRenderingContext2D;
 		const layer = {
 			view: view,
 			context: context,
@@ -3199,7 +3199,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			return existingLayer;
 		}
 
-		const layer = this.createDetachedLayer();
+		const layer = this.createDetachedLayer(order == 99);
 		layer.order = order;
 		layer.visible = visible;
 

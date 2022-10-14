@@ -458,7 +458,7 @@ export class XYChart extends SerialChart {
 		const xAxis = series.get("xAxis");
 		if (xAxis) {
 			$array.remove(xAxis.series, series);
-			xAxis.markDirtyExtremes();			
+			xAxis.markDirtyExtremes();
 		}
 		const yAxis = series.get("yAxis");
 		if (yAxis) {
@@ -1030,7 +1030,12 @@ export class XYChart extends SerialChart {
 		if (cursor) {
 			const cursorPoint = cursor.getPrivate("point");
 
-			const snapToSeries = cursor.get("snapToSeries");
+			let snapToSeries = cursor.get("snapToSeries");
+
+			if (cursor._downPoint) {
+				snapToSeries = undefined;
+			}
+
 			if (snapToSeries && cursorPoint) {
 				const snapToSeriesBy = cursor.get("snapToSeriesBy");
 				const dataItems: Array<DataItem<IXYSeriesDataItem>> = [];
@@ -1556,12 +1561,30 @@ export class XYChart extends SerialChart {
 					height += tooltip.get("marginBottom", 0);
 
 					tooltip.set("bounds", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
-
+					tooltip.setPrivate("customData", { left: plotT.x, top: plotT.y, right: plotB.x, bottom: prevY })
 					prevY = Math.min(prevY - height, tooltip._fy - height);
 					if (tooltip.parent == tooltipContainer) {
 						tooltipContainer.children.moveValue(tooltip, 0);
 					}
 				})
+				if (prevY < 0) {
+					tooltips.reverse();
+					let prevBottom = prevY;
+
+					$array.each(tooltips, (tooltip) => {
+						let bounds = tooltip.get("bounds");
+						if (bounds) {
+							let top = bounds.top - prevY;
+							let bottom = bounds.bottom - prevY;
+							if (top < prevBottom) {
+								top = prevBottom;
+								bottom = top + tooltip.height();
+							}
+							tooltip.set("bounds", { left: bounds.left, top: top, right: bounds.right, bottom: bottom })
+							prevBottom = bounds.bottom - prevY + tooltip.get("paddingBottom", 0);
+						}
+					})
+				}
 			}
 			else {
 				tooltips.reverse();
@@ -1582,6 +1605,25 @@ export class XYChart extends SerialChart {
 					}
 					prevY = Math.max(prevY + height, tooltip._fy + height);
 				})
+
+				if (prevY > h) {
+					tooltips.reverse();
+					let prevBottom = h;
+
+					$array.each(tooltips, (tooltip) => {
+						let bounds = tooltip.get("bounds");
+						if (bounds) {
+							let top = bounds.top - (h - prevY);
+							let bottom = bounds.bottom - (h - prevY);
+							if (bottom > prevBottom) {
+								bottom = prevBottom
+								top = bottom - tooltip.height();
+							}
+							tooltip.set("bounds", { left: bounds.left, top: top, right: bounds.right, bottom: bottom })
+							prevBottom = bottom - tooltip.height() - tooltip.get("paddingBottom", 0);
+						}
+					})
+				}
 			}
 		}
 	}

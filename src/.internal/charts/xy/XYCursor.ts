@@ -250,15 +250,27 @@ export class XYCursor extends Container {
 
 		this._disposers.push(this.setTimeout(() => {
 			this.setPrivate("visible", true)
-		}, 500))
+		}, 500));
 
 		this.lineX.events.on("positionchanged", () => {
 			this._handleXLine();
-		})
+		});
 
 		this.lineY.events.on("positionchanged", () => {
 			this._handleYLine();
-		})
+		});
+
+		this.lineX.events.on("focus", (ev) => this._handleLineFocus(ev.target));
+		this.lineX.events.on("blur", (ev) => this._handleLineBlur(ev.target));
+
+		this.lineY.events.on("focus", (ev) => this._handleLineFocus(ev.target));
+		this.lineY.events.on("blur", (ev) => this._handleLineBlur(ev.target));
+
+		if ($utils.supports("keyboardevents")) {
+			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+				this._handleLineMove(ev.keyCode);
+			}));
+		}
 	}
 
 	protected _setUpTouch(): void {
@@ -284,6 +296,67 @@ export class XYCursor extends Container {
 			visible = false;
 		}
 		this.lineY.setPrivate("visible", visible);
+	}
+
+	protected _handleLineMove(keyCode: number) {
+		let dir: any = "";
+		let position = 0;
+		let increment = 0.1;
+		const chart = this.chart;
+
+		if (this._root.focused(this.lineX)) {
+			if (chart && chart.xAxes.length) {
+				increment = chart.xAxes.getIndex(0)!.getCellWidthPosition();
+			}
+			position = this.getPrivate("positionX", 0);
+			dir = "positionX";
+			if (keyCode == 37) {
+				position -= increment;
+			}
+			else if (keyCode == 39) {
+				position += increment;
+			}
+		}
+		else if (this._root.focused(this.lineY)) {
+			if (chart && chart.yAxes.length) {
+				increment = chart.yAxes.getIndex(0)!.getCellWidthPosition();
+			}
+			position = this.getPrivate("positionY", 0);
+			dir = "positionY";
+			if (keyCode == 38) {
+				position -= increment;
+			}
+			else if (keyCode == 40) {
+				position += increment;
+			}
+		}
+
+		if (position < 0) {
+			position = 0;
+		}
+		else if (position > 1) {
+			position = 1;
+		}
+
+		if (dir != "") {
+			this.set(dir, position);
+		}
+	}
+
+	protected _handleLineFocus(_line: Grid) {
+		this.setAll({
+			positionX: this.getPrivate("positionX"),
+			positionY: this.getPrivate("positionY"),
+			alwaysShow: true
+		});
+	}
+
+	protected _handleLineBlur(_line: Grid) {
+		this.setAll({
+			positionX: undefined,
+			positionY: undefined,
+			alwaysShow: false
+		});
 	}
 
 	public _prepareChildren() {
@@ -585,7 +658,11 @@ export class XYCursor extends Container {
 
 			this.setPrivate("point", local);
 
-			const snapToSeries = this.get("snapToSeries");
+			let snapToSeries = this.get("snapToSeries");
+
+			if (this._downPoint) {
+				snapToSeries = undefined;
+			}
 
 			let userPositionX = this.get("positionX");
 			let positionX = xyPos.x;

@@ -199,7 +199,8 @@ export class XYChartDefaultTheme extends Theme {
 
 			rule.setAll({
 				strokeOpacity: 0.8,
-				strokeDasharray: [2, 2]
+				strokeDasharray: [2, 2],
+				ariaLabel: language.translate("Use left and right arrows to move selection")
 			});
 
 			setColor(rule, "stroke", ic, "alternativeBackground");
@@ -210,7 +211,8 @@ export class XYChartDefaultTheme extends Theme {
 
 			rule.setAll({
 				strokeOpacity: 0.8,
-				strokeDasharray: [2, 2]
+				strokeDasharray: [2, 2],
+				ariaLabel: language.translate("Use up and down arrows to move selection")
 			});
 
 			setColor(rule, "stroke", ic, "alternativeBackground");

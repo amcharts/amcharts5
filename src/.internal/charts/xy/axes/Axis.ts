@@ -1095,4 +1095,15 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @ignore
 	 */
 	public _groupSeriesData(_series: XYSeries) { }
+
+	/**
+	 * Returns position span between start and end of a single cell in axis.
+	 *
+	 * @since 5.2.30
+	 * @return Position
+	 * @ignore
+	 */
+	public getCellWidthPosition(): number {
+		return 0.05;
+	}
 }

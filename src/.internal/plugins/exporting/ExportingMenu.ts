@@ -116,6 +116,17 @@ export interface IExportingMenuSettings extends IEntitySettings {
 }
 
 export interface IExportingMenuPrivate extends IEntityPrivate {
+
+	/**
+	 * A `<div>` element that acts as a container for other menu elements.
+	 */
+	menuElement?: HTMLDivElement;
+
+	/**
+	 * A top-level `<ul>` element containing menu items.
+	 */
+	listElement?: HTMLUListElement;
+
 }
 
 export interface IExportingMenuEvents extends IEntityEvents {
@@ -224,18 +235,19 @@ export class ExportingMenu extends Entity {
 
 		const menuElement = document.createElement("div");
 		this._menuElement = menuElement;
+		this.setPrivate("menuElement", this._menuElement);
 
 		const iconElement = document.createElement("a");
 		this._iconElement = iconElement;
 
 		this._listElement = document.createElement("ul");
 		this._listElement.setAttribute("role", "menu");
+		this.setPrivate("listElement", this._listElement);
 		this._applyClassNames();
 
 		iconElement.innerHTML = '<svg fill="none" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/></svg>';
 		iconElement.setAttribute("tabindex", this._root.tabindex.toString());
-		iconElement.setAttribute("aria-label", this._t("Export"));
-		iconElement.setAttribute("aria-description", this._t("Press ENTER to open"));
+		iconElement.setAttribute("aria-label", this._t("Export") + "; " + this._t("Press ENTER to open"));
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {

@@ -514,6 +514,8 @@ export class Root implements IDisposer {
 
 		// HTML content holder
 		this._htmlElementContainer = document.createElement("div");
+		this._htmlElementContainer.style.position = "absolute";
+		this._htmlElementContainer.style.pointerEvents = "none";
 		this._htmlElementContainer.style.overflow = "hidden";
 		this._inner.appendChild(this._htmlElementContainer);
 
@@ -1690,6 +1692,7 @@ export class Root implements IDisposer {
 		htmlElement.style.position = "absolute";
 		htmlElement.style.overflow = "auto";
 		htmlElement.style.boxSizing = "border-box";
+		$utils.setInteractive(htmlElement, true);
 
 		// Translate events
 		if (target.events.isEnabled("click")) {

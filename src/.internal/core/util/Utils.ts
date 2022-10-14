@@ -273,7 +273,7 @@ export function isLocalEvent(event: IPointerEvent, target: Sprite) {
  */
 export function setInteractive(target: HTMLElement, interactive: boolean): void {
 	if (interactive) {
-		target.style.pointerEvents = "";
+		target.style.pointerEvents = "auto";
 	}
 	else {
 		target.style.pointerEvents = "none";

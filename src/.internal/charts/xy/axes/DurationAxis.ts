@@ -132,7 +132,7 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (max > 0 && initialMax <= 0) {
 					max = 0;
 				}
-			}*/
+			}*/			
 			minMaxStep = { min: min, max: max, step: step };
 		}
 		else {
@@ -140,7 +140,7 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		}
 
 		// choose duration formatter based on step
-		this.setPrivate("durationFormat", durationFormatter.getFormat(minMaxStep.step, minMaxStep.max, baseUnit));
+		this.setPrivateRaw("durationFormat", durationFormatter.getFormat(minMaxStep.step, minMaxStep.max, baseUnit));
 
 		return minMaxStep;
 	}

@@ -477,12 +477,13 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * Available options:
 	 * * `"hover"` (default) - tooltip is shown when element is hovered by a pointer or touched. It is hidden as soon as element is not hovered anymore, or touch occurs outside it.
 	 * * `"always"` - a tooltip will always be shown over the element, without any interactions. Please note that if you need to show tooltips for multiple elements at the same time, you need to explicitly create a `Tooltip` instance and set element's `tooltip` setting with it.
+	 * * '"click"' - a tooltip will only appear when target element is clicked/tapped. Tooltip will hide when clicking anywhere else on the page.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Sticky_tooltips} for more info
 	 * @default "hover"
 	 * @since 5.0.16
 	 */
-	showTooltipOn?: "hover" | "always";
+	showTooltipOn?: "hover" | "always" | "click";
 
 }
 
@@ -756,7 +757,7 @@ export abstract class Sprite extends Entity {
 	protected _isHiding: boolean = false;
 
 	protected _isDown: boolean = false;
-	protected _downPoint: IPoint | undefined;
+	public _downPoint: IPoint | undefined;
 
 	public _downPoints: { [index: number]: IPoint } = {};
 
@@ -1051,27 +1052,37 @@ export abstract class Sprite extends Entity {
 			display.cancelTouch = draggable ? true : false;
 		}
 
-		if (this.isDirty("tooltipText") || this.isDirty("tooltipHTML")) {
+		if (this.isDirty("tooltipText") || this.isDirty("tooltipHTML") || this.isDirty("showTooltipOn")) {
 			const tooltipText = this.get("tooltipText");
 			const tooltipHTML = this.get("tooltipHTML");
+			const showTooltipOn = this.get("showTooltipOn", "hover");
+			if (this._tooltipDp) {
+				this._tooltipDp.dispose();
+				this._tooltipDp = undefined;
+			}
 			if (tooltipText || tooltipHTML) {
-				if (!this._tooltipDp) {
+				if (showTooltipOn == "click") {
+					this._tooltipDp = new MultiDisposer([
+						events.on("click", () => {
+							this.setTimeout(() => this.showTooltip(), 10);
+						}),
+						$utils.addEventListener(document, "click", (_ev: MouseEvent) => {
+							this.hideTooltip();
+						})
+					]);
+				}
+				else if (showTooltipOn == "always") {
+					// nothing
+				}
+				else {
 					this._tooltipDp = new MultiDisposer([
 						events.on("pointerover", () => {
 							this.showTooltip();
 						}),
 						events.on("pointerout", () => {
-							if (this.get("showTooltipOn") != "always") {
-								this.hideTooltip();
-							}
+							this.hideTooltip();
 						})
 					]);
-				}
-			}
-			else {
-				if (this._tooltipDp) {
-					this._tooltipDp.dispose();
-					this._tooltipDp = undefined;
 				}
 			}
 		}
@@ -1765,7 +1776,7 @@ export abstract class Sprite extends Entity {
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
 		if (tooltip) {
-			let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400  : undefined;
+			let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
 			const promise = tooltip.hide(timeout);
 			this.setPrivateRaw("showingTooltip", false);
 			return promise;

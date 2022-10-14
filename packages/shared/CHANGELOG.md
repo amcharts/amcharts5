@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.30] - 2022-10-14
+
+### Added
+- `"click"` option added to `showTooltipOn` setting. If set, tooltip will appear when clicking/tapping the element, rather than on hover.
+- `ExportMenu` has two new private settings: `menuElement` and `listElement`. Holds actual DOM elements of the menu items.
+
+### Changed
+- Disposing `Exporting` object, will now dispose related `ExportingMenu`, if set.
+- `Legend`'s item containers will now have `role="checkbox"` set by default.
+- Setting `focusable: true` on `XYCursor`'s `lineX` and/or `lineY` will enable moving them with keyboard's arrow keys.
+- Better arrangement of tooltips on an `XYChart` with multiple tooltips on the same data point and an `XYCursor` (less chances tooltips going off-screen).
+
+### Fixed
+- In some situations chart was not resizing correctly.
+- If `sequencedAnimation` was set to `true` on a `LineSeries`, it was drawing line to 0 while animating series.
+- `ExportMenu` was using a non-existent "aria" attribute.
+- When `snapToSeries` was set on an `XYChart`, zooming to a selection with the cursor produced wrong zoom.
+- `XYChart` with `DurationAxis` could freeze the browser in certain configurations and chart sizes.
+- `LineSeries` used to draw a line to null values while series was animating (if `sequencedAnimation` was set to `true`).
+- Eliminating warnings about `getImageData()` on the new Chrome.
+
+
 ## [5.2.29] - 2022-10-07
 
 ### Added
@@ -62,7 +84,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [5.2.23] - 2022-09-20
 
-### Fixed 
+### Fixed
 - On a chart with cursor and `tooltipText` set directly on series' columns, the tooltip was not being shown (since 5.2.19).
 - On a chart with X axis `endLocation: 0`, Y axis was not autozooming properly.
 
@@ -117,7 +139,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - If a point in a `LineSeries` was way out of bounds (million times further than the bounds of plot area), the line could disappear.
 - In some cases, if chart was using loadable fonts, it could go into non-stop flickering mode.
 - `StockChart` with drawing mode disabled could start drawing new objects if clicked on points of an old drawing.
-- `PointedRectangle`, mostly used by a `Tooltip` was drawn incorrectly if its stem size was bigger than height. 
+- `PointedRectangle`, mostly used by a `Tooltip` was drawn incorrectly if its stem size was bigger than height.
 - Removing a `QuadrantLineSeries` drawing from a `StockChart` resulted an error.
 - It was impossible to delete `Fibonacci` or `FibonacciTimezone` drawings one by one after switching to another drawing tool.
 

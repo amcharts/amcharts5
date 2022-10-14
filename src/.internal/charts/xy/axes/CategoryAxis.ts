@@ -603,4 +603,15 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	public zoomToCategories(startCategory: string, endCategory: string, duration?: number) {
 		this.zoomToIndexes(this.categoryToIndex(startCategory), this.categoryToIndex(endCategory) + 1, duration);
 	}
+
+	/**
+	 * Returns position span between start and end of a single cell in axis.
+	 *
+	 * @since 5.2.30
+	 * @return Position
+	 * @ignore
+	 */
+	public getCellWidthPosition(): number {
+		return 1 / this.dataItems.length * (this.get("end", 1) - this.get("start", 0));
+	}
 }

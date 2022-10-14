@@ -240,7 +240,8 @@ export class DefaultTheme extends Theme {
 			interactiveChildren: false,
 			ariaChecked: true,
 			focusable: true,
-			ariaLabel: language.translate("Press ENTER to toggle")
+			ariaLabel: language.translate("Press ENTER to toggle"),
+			role: "checkbox"
 		});
 
 		{

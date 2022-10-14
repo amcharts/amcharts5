@@ -665,6 +665,7 @@ export class Exporting extends Entity {
 			const menu = this.get("menu");
 			if (menu) {
 				menu.set("exporting", this);
+				this._disposers.push(menu);
 			}
 		}
 	}
