@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.31] - 2022-10-18
+
+### Changed
+- The logic behind `"pro"` tag in `CandlestickSeries` has been updated to more commonly accepted standards. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/#Professional_candlesticks).
+- "Pro Candlesticks" was renamed to "Hollow Candlesticks" in series type switcher in `StockChart`.
+
+### Fixed
+- Stacked axis bullets were being positioned not right on the axis but somewhat higher, depending on the number of bullets.
+- More ARIA errors fixed in `ExportingMenu`.
+- Using arrows to move focused draggable elements was acting unpredictably if mouse was being used, too.
+- Further improvements in cursor tooltip arrangement logic.
+
+
 ## [5.2.30] - 2022-10-14
 
 ### Added

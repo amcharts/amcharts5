@@ -1447,6 +1447,8 @@ export class XYChart extends SerialChart {
 		const w = plotContainer.width();
 		const h = plotContainer.height();
 
+		const hh = this.height();
+
 		let plotT = plotContainer._display.toGlobal({ x: 0, y: 0 });
 		let plotB = plotContainer._display.toGlobal({ x: w, y: h });
 
@@ -1568,6 +1570,7 @@ export class XYChart extends SerialChart {
 					}
 				})
 				if (prevY < 0) {
+
 					tooltips.reverse();
 					let prevBottom = prevY;
 
@@ -1581,7 +1584,7 @@ export class XYChart extends SerialChart {
 								bottom = top + tooltip.height();
 							}
 							tooltip.set("bounds", { left: bounds.left, top: top, right: bounds.right, bottom: bottom })
-							prevBottom = bounds.bottom - prevY + tooltip.get("paddingBottom", 0);
+							prevBottom = bounds.bottom - prevY + tooltip.get("marginBottom", 0);
 						}
 					})
 				}
@@ -1599,28 +1602,28 @@ export class XYChart extends SerialChart {
 					}
 					height += tooltip.get("marginBottom", 0);
 
-					tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + h, prevY + height) })
+					tooltip.set("bounds", { left: plotT.x, top: prevY, right: plotB.x, bottom: Math.max(plotT.y + hh, prevY + height) })
 					if (tooltip.parent == tooltipContainer) {
 						tooltipContainer.children.moveValue(tooltip, 0);
 					}
 					prevY = Math.max(prevY + height, tooltip._fy + height);
 				})
 
-				if (prevY > h) {
+				if (prevY > hh) {
 					tooltips.reverse();
-					let prevBottom = h;
+					let prevBottom = hh;
 
 					$array.each(tooltips, (tooltip) => {
 						let bounds = tooltip.get("bounds");
 						if (bounds) {
-							let top = bounds.top - (h - prevY);
-							let bottom = bounds.bottom - (h - prevY);
+							let top = bounds.top - (hh - prevY);
+							let bottom = bounds.bottom - (hh - prevY);
 							if (bottom > prevBottom) {
 								bottom = prevBottom
 								top = bottom - tooltip.height();
 							}
 							tooltip.set("bounds", { left: bounds.left, top: top, right: bounds.right, bottom: bottom })
-							prevBottom = bottom - tooltip.height() - tooltip.get("paddingBottom", 0);
+							prevBottom = bottom - tooltip.height() - tooltip.get("marginBottom", 0);
 						}
 					})
 				}

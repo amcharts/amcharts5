@@ -271,8 +271,6 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		const renderer = this.get("renderer");
 		const len = this.dataItems.length;
 
-		this._bullets = {};
-
 		let startIndex = this.startIndex();
 		if (startIndex > 0) {
 			startIndex--;

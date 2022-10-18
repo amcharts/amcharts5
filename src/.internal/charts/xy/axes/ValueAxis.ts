@@ -440,8 +440,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		const min = this.getPrivate("min");
 		const max = this.getPrivate("max");
 
-		this._bullets = {};
-
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 
 			const logarithmic = this.get("logarithmic");

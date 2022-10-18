@@ -640,6 +640,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	protected _updateAxisRanges() {
+		this._bullets = {};
 		this.axisRanges.each((axisRange) => {
 			this._prepareDataItem(axisRange);
 		})

@@ -248,6 +248,7 @@ export class ExportingMenu extends Entity {
 		iconElement.innerHTML = '<svg fill="none" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/></svg>';
 		iconElement.setAttribute("tabindex", this._root.tabindex.toString());
 		iconElement.setAttribute("aria-label", this._t("Export") + "; " + this._t("Press ENTER to open"));
+		iconElement.setAttribute("role", "button");
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {

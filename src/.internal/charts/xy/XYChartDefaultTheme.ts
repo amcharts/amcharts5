@@ -527,7 +527,7 @@ export class XYChartDefaultTheme extends Theme {
 					const intervalDuration = axis.intervalDuration();
 					const baseInterval = axis.getPrivate("baseInterval");
 					const gridInterval = axis.getPrivate("gridInterval", baseInterval);
-					
+
 
 					let min = axis.getPrivate("min", 0);
 					min = $time.round(new Date(min), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
@@ -754,8 +754,21 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "negative");
 		}
 
-		r("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromPrevious", { fillOpacity: 1 });
-		r("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromPrevious", { fillOpacity: 0 });
+		// Hollow
+		r("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromOpen", { fillOpacity: 0 });
+		r("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromOpen", { fillOpacity: 1 });
+		
+		{
+			const rule = r("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromPrevious", {});
+			setColor(rule, "fill", ic, "positive");
+			setColor(rule, "stroke", ic, "positive");
+		}
+
+		{
+			const rule = r("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromPrevious", {});
+			setColor(rule, "fill", ic, "negative");
+			setColor(rule, "stroke", ic, "negative");
+		}
 
 	}
 }

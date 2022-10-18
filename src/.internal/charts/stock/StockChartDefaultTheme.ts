@@ -1334,7 +1334,7 @@ export class StockChartDefaultTheme extends Theme {
 				icon: StockIcons.getIcon("Candlestick Series")
 			}, {
 				id: "procandlestick",
-				label: l.translateAny("Pro Candles"),
+				label: l.translateAny("Hollow Candles"),
 				icon: StockIcons.getIcon("Pro Candlestick Series")
 			}, {
 				id: "ohlc",

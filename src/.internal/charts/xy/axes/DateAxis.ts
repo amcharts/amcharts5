@@ -600,8 +600,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const min = this.getPrivate("min");
 		const max = this.getPrivate("max");
 
-		this._bullets = {};
-
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			const selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
 			const selectionMax = Math.round(this.getPrivate("selectionMax")! as number);

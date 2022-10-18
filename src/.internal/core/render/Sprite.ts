@@ -1464,6 +1464,11 @@ export abstract class Sprite extends Entity {
 		let dragEvent = this._dragEvent;
 
 		if (dragEvent) {
+
+			if (dragEvent.simulated && !e.simulated) {
+				return true;
+			}
+
 			let angle = 0;
 
 			let parent = this.parent;
