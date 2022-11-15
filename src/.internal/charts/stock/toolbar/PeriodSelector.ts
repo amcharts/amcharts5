@@ -77,6 +77,7 @@ export class PeriodSelector extends StockControl {
 			const button = document.createElement("a");
 			button.innerHTML = period.name || (period.timeUnit.toUpperCase() + period.count || "1");
 			button.className = "am5stock-link";
+			button.setAttribute("data-period", period.timeUnit + (period.count || ""));
 			container.appendChild(button);
 
 			this._disposers.push($utils.addEventListener(button, "click", (_ev) => {
@@ -182,6 +183,22 @@ export class PeriodSelector extends StockControl {
 				start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
 			}
 			axis.zoomToDates(start, end);
+		}
+		this._highlightPeriod(period);
+	}
+
+	protected _highlightPeriod(period: IPeriod): void {
+		const id = period.timeUnit + (period.count || "");
+		const container = this.getPrivate("label")!;
+		const buttons = container.getElementsByTagName("a");
+		for(let i = 0; i < buttons.length; i++) {
+			const button = buttons[i];
+			if (button.getAttribute("data-period") == id) {
+				$utils.addClass(button, "am5stock-active");
+			}
+			else {
+				$utils.removeClass(button, "am5stock-active");
+			}
 		}
 	}
 

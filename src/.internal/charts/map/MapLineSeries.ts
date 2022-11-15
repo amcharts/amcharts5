@@ -31,6 +31,17 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 	 */
 	pointsToConnect?: Array<DataItem<IMapPointSeriesDataItem>>;
 
+	/**
+	 * A line type.
+	 *
+	 * * `"curved"` (default) - connects points using shortest distance, which will result in curved lines based on map projection.
+	 * * `"straight"` - connects points using visually straight lines, and will not cross the -180/180 longitude.
+	 * 
+	 * @default "curved"
+	 * @since 5.2.32
+	 */
+	lineType?: "curved" | "straight"	
+
 }
 
 export interface IMapLineSeriesSettings extends IMapSeriesSettings {
@@ -57,6 +68,11 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 	 */
 	lineType?: "curved" | "straight"
 
+
+	/**
+	 * @ignore
+	 */
+	lineTypeField?: string;
 }
 
 /**
@@ -66,6 +82,12 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
  * @important
  */
 export class MapLineSeries extends MapSeries {
+
+	protected _afterNew() {
+		this.fields.push("lineType");
+		this._setRawDefault("lineTypeField", "lineType");
+		super._afterNew();
+	}	
 
 	/**
 	 * @ignore

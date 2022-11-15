@@ -711,7 +711,15 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * @ignore
+	 * Returns a color for volume, based on current and previous close.
+	 *
+	 * * `positiveColor` - close is greater or euqal than close of the previous period.
+	 * * `negativeColor` - close is lower than close of the previous period.
+	 * 
+	 * @param   dataItem       Target data item
+	 * @param   negativeColor  "Negative color" (red)
+	 * @param   positiveColor  "Positive color" (green)
+	 * @return  Color
 	 */
 	public getVolumeColor(dataItem: DataItem<IXYSeriesDataItem>, negativeColor?: Color, positiveColor?: Color): Color | undefined {
 		if (dataItem) {

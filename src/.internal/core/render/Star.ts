@@ -67,6 +67,7 @@ export class Star extends Graphics {
 				angle += step
 			}
 			display.lineTo(0, -r)
+			display.closePath();
 		}
 	}
 }

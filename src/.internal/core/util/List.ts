@@ -64,7 +64,7 @@ export class List<T> {
 	 */
 	protected _values: Array<T>;
 
-	public events = new EventDispatcher<Events<this, IListEvents<T>>>();
+	public events: EventDispatcher<Events<this, IListEvents<T>>> = new EventDispatcher();
 
 	/**
 	 * Constructor

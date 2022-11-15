@@ -325,7 +325,10 @@ export class MapChart extends SerialChart {
 		const chartContainer = this.chartContainer;
 
 		if (wheelX != "none" || wheelY != "none") {
-
+			if (this._wheelDp) {
+				this._wheelDp.dispose();
+			}
+			
 			this._wheelDp = chartContainer.events.on("wheel", (event) => {
 				const wheelEasing = this.get("wheelEasing")!;
 				const wheelSensitivity = this.get("wheelSensitivity", 1);
@@ -615,6 +618,7 @@ export class MapChart extends SerialChart {
 				this._centerLocation = projection.invert([this.innerWidth() / 2, this.innerHeight() / 2]);
 			}
 		}
+		super._updateChildren();
 	}
 
 	public _afterChanged() {

@@ -42,6 +42,8 @@ async function copyDirs(state, output) {
 }
 
 module.exports = async (state) => {
+	await state.task("version");
+
 	const output = state.path("dist", "es2015");
 
 	if (state.clean) {

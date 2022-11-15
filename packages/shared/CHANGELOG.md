@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.32] - 2022-11-15
+
+### Added
+- New global property `am5.registry.version` added. Contains the version of the library.
+- `lineType` added to `IMapLineSeriesDataItem`. Allows setting `"straight"` or `"curved"` line type for each map line individually.
+
+### Fixed
+- `Label` was ignoring individually-set formatters when formatting number/date/duration values in its text.
+- Invoking `PeriodSelector` method `selectPeriod` will now properly highlight related button in selector.
+- setting wheelY and WheelX to "none" after the map chart was initialized did not remove wheel behavior.
+- Fixed flag bug with `A` and `a` commands in SVG paths.
+
+
 ## [5.2.31] - 2022-10-18
 
 ### Changed

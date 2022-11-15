@@ -44,6 +44,7 @@ export class Triangle extends Graphics {
 		display.lineTo(0, -h / 2);
 		display.lineTo(w / 2, h / 2);
 		display.lineTo(-w / 2, h / 2);
+		display.closePath();
 
 	}
 

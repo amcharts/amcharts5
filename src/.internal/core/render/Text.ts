@@ -7,6 +7,10 @@ import type { DataItem, IComponentDataItem } from "./Component";
 import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
 import { populateString } from "../util/PopulateString";
 
+import type { NumberFormatter } from "../util/NumberFormatter";
+import type { DateFormatter } from "../util/DateFormatter";
+import type { DurationFormatter } from "../util/DurationFormatter";
+
 import * as $array from "../util/Array";
 
 /**
@@ -224,6 +228,33 @@ export class Text extends Sprite {
 		super._setDataItem(dataItem);
 		if (this.get("populateText")) {
 			this.markDirtyText();
+		}
+	}
+
+	public getNumberFormatter(): NumberFormatter {
+		if (this.parent) {
+			return this.parent.getNumberFormatter();
+		}
+		else {
+			return super.getNumberFormatter();
+		}
+	}
+
+	public getDateFormatter(): DateFormatter {
+		if (this.parent) {
+			return this.parent.getDateFormatter();
+		}
+		else {
+			return super.getDateFormatter();
+		}
+	}
+
+	public getDurationFormatter(): DurationFormatter {
+		if (this.parent) {
+			return this.parent.getDurationFormatter();
+		}
+		else {
+			return super.getDurationFormatter();
 		}
 	}
 }

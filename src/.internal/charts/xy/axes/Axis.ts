@@ -345,6 +345,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	public _bullets: { [index: string]: AxisBullet } = {};
 
+	public _crispX = 0;
+	public _crispY = 0;
+
 	protected _dispose() {
 		// these could be in other parents, so disposing just in case
 		this.gridContainer.dispose();
@@ -657,6 +660,13 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		let global = this.gridContainer._display.toGlobal({ x: 0, y: 0 });
+		this._crispX = global.x - Math.round(global.x);
+		this._crispY = global.y - Math.round(global.y);
+
+		this.set("dx", this._crispX);
+		this.set("dy", this._crispY);
 
 		if (this.get("fixAxisSize")) {
 			this.ghostLabel.set("visible", true);

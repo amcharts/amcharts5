@@ -1,5 +1,7 @@
-import type { MapLineSeries } from "./MapLineSeries";
+import type { MapLineSeries, IMapLineSeriesDataItem } from "./MapLineSeries";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
+import type { DataItem } from "../../core/render/Component";
+
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
@@ -16,7 +18,6 @@ export interface IMapLineSettings extends IGraphicsSettings {
 	 * @default 0.5
 	 */
 	precision?: number;
-
 }
 
 export interface IMapLinePrivate extends IGraphicsPrivate {
@@ -57,11 +58,11 @@ export class MapLine extends Graphics {
 							clipAngle = projection.clipAngle();
 							projection.precision(this.get("precision", 0.5));
 						}
-
+						const dataItem = this.dataItem as DataItem<IMapLineSeriesDataItem>;
 						const geoPath = chart.getPrivate("geoPath");
-						if (geoPath) {
+						if (geoPath && dataItem) {
 							this._clear = true;
-							if (series.get("lineType") == "straight") {
+							if (dataItem.get("lineType", series.get("lineType")) == "straight") {
 
 								const geometry = this.get("geometry")!;
 
@@ -79,7 +80,6 @@ export class MapLine extends Graphics {
 										}
 
 										this.set("draw", (display) => {
-											console.log("draw")
 											for (let s = 0; s < segments.length; s++) {
 												let segment = segments[s];
 												if (segment.length > 0) {
@@ -144,9 +144,10 @@ export class MapLine extends Graphics {
 		const geometry = this.get("geometry")!;
 		const series = this.getPrivate("series");
 		const chart = series.chart;
+		const dataItem = this.dataItem as DataItem<IMapLineSeriesDataItem>;
 
-		if (geometry && series && chart) {
-			const lineType = series.get("lineType");
+		if (geometry && series && chart && dataItem) {
+			const lineType = dataItem.get("lineType", series.get("lineType"));
 			let totalDistance: number = geoLength(geometry);
 			let currentDistance: number = 0;
 

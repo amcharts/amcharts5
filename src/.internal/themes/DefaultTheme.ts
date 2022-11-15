@@ -429,7 +429,7 @@ export class DefaultTheme extends Theme {
 			rule.setAll({
 				strokeOpacity: .15,
 				isMeasured: false,
-				length: 5,
+				length: 4.5,
 				position: "absolute"
 			});
 

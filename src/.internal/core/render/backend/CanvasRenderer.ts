@@ -51,6 +51,53 @@ function checkEvenArgs(name: string, actual: number, expected: number) {
 
 /**
  * @ignore
+ * This splits the flag so that way 0017 will be processed as 0 0 17
+ *
+ * This is important for weird paths like `M17 5A1 1 0 0017 30 1 1 0 0017 5`
+ */
+function splitArcFlags(args: Array<string>) {
+	for (let i = 0; i < args.length; i += 7) {
+		let index = i + 3;
+		let flag = args[index];
+
+		if (flag.length > 1) {
+			const a = /^([01])([01])(.*)$/.exec(flag);
+
+			if (a !== null) {
+				args.splice(index, 0, a[1]);
+				++index;
+
+				args.splice(index, 0, a[2]);
+				++index;
+
+				if (a[3].length > 0) {
+					args[index] = a[3];
+
+				} else {
+					args.splice(index, 1);
+				}
+			}
+		}
+
+		++index;
+
+		flag = args[index];
+
+		if (flag.length > 1) {
+			const a = /^([01])(.+)$/.exec(flag);
+
+			if (a !== null) {
+				args.splice(index, 0, a[1]);
+				++index;
+
+				args[index] = a[2];
+			}
+		}
+	}
+}
+
+/**
+ * @ignore
  */
 function assertBinary(value: number): 0 | 1 {
 	if (value === 0 || value === 1) {
@@ -1101,10 +1148,10 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 			const name = match[1];
 			const rest = match[2];
 
-			const args = [];
+			const args: Array<string> = [];
 
 			while ((match = ARGS_REGEXP.exec(rest)) !== null) {
-				args.push(+match[1]);
+				args.push(match[1]);
 			}
 
 			// Reset control point
@@ -1122,25 +1169,25 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 			switch (name) {
 				case "M":
 					checkEvenArgs(name, args.length, 2);
-					x = args[0];
-					y = args[1];
+					x = +args[0];
+					y = +args[1];
 					this.moveTo(x, y);
 
 					for (let i = 2; i < args.length; i += 2) {
-						x = args[i];
-						y = args[i + 1];
+						x = +args[i];
+						y = +args[i + 1];
 						this.lineTo(x, y);
 					}
 					break;
 				case "m":
 					checkEvenArgs(name, args.length, 2);
-					x += args[0];
-					y += args[1];
+					x += +args[0];
+					y += +args[1];
 					this.moveTo(x, y);
 
 					for (let i = 2; i < args.length; i += 2) {
-						x += args[i];
-						y += args[i + 1];
+						x += +args[i];
+						y += +args[i + 1];
 						this.lineTo(x, y);
 					}
 					break;
@@ -1148,16 +1195,16 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				case "L":
 					checkEvenArgs(name, args.length, 2);
 					for (let i = 0; i < args.length; i += 2) {
-						x = args[i];
-						y = args[i + 1];
+						x = +args[i];
+						y = +args[i + 1];
 						this.lineTo(x, y);
 					}
 					break;
 				case "l":
 					checkEvenArgs(name, args.length, 2);
 					for (let i = 0; i < args.length; i += 2) {
-						x += args[i];
-						y += args[i + 1];
+						x += +args[i];
+						y += +args[i + 1];
 						this.lineTo(x, y);
 					}
 					break;
@@ -1165,14 +1212,14 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				case "H":
 					checkMinArgs(name, args.length, 1);
 					for (let i = 0; i < args.length; ++i) {
-						x = args[i];
+						x = +args[i];
 						this.lineTo(x, y);
 					}
 					break;
 				case "h":
 					checkMinArgs(name, args.length, 1);
 					for (let i = 0; i < args.length; ++i) {
-						x += args[i];
+						x += +args[i];
 						this.lineTo(x, y);
 					}
 					break;
@@ -1180,14 +1227,14 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				case "V":
 					checkMinArgs(name, args.length, 1);
 					for (let i = 0; i < args.length; ++i) {
-						y = args[i];
+						y = +args[i];
 						this.lineTo(x, y);
 					}
 					break;
 				case "v":
 					checkMinArgs(name, args.length, 1);
 					for (let i = 0; i < args.length; ++i) {
-						y += args[i];
+						y += +args[i];
 						this.lineTo(x, y);
 					}
 					break;
@@ -1195,24 +1242,24 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				case "C":
 					checkEvenArgs(name, args.length, 6);
 					for (let i = 0; i < args.length; i += 6) {
-						const x1 = args[i];
-						const y1 = args[i + 1];
-						cpx = args[i + 2];
-						cpy = args[i + 3];
-						x = args[i + 4];
-						y = args[i + 5];
+						const x1 = +args[i];
+						const y1 = +args[i + 1];
+						cpx = +args[i + 2];
+						cpy = +args[i + 3];
+						x = +args[i + 4];
+						y = +args[i + 5];
 						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
 					}
 					break;
 				case "c":
 					checkEvenArgs(name, args.length, 6);
 					for (let i = 0; i < args.length; i += 6) {
-						const x1 = args[i] + x;
-						const y1 = args[i + 1] + y;
-						cpx = args[i + 2] + x;
-						cpy = args[i + 3] + y;
-						x += args[i + 4];
-						y += args[i + 5];
+						const x1 = +args[i] + x;
+						const y1 = +args[i + 1] + y;
+						cpx = +args[i + 2] + x;
+						cpy = +args[i + 3] + y;
+						x += +args[i + 4];
+						y += +args[i + 5];
 						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
 					}
 					break;
@@ -1226,10 +1273,10 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 					for (let i = 0; i < args.length; i += 4) {
 						const x1 = 2 * x - cpx;
 						const y1 = 2 * y - cpy;
-						cpx = args[i];
-						cpy = args[i + 1];
-						x = args[i + 2];
-						y = args[i + 3];
+						cpx = +args[i];
+						cpy = +args[i + 1];
+						x = +args[i + 2];
+						y = +args[i + 3];
 						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
 					}
 					break;
@@ -1242,10 +1289,10 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 					for (let i = 0; i < args.length; i += 4) {
 						const x1 = 2 * x - cpx;
 						const y1 = 2 * y - cpy;
-						cpx = args[i] + x;
-						cpy = args[i + 1] + y;
-						x += args[i + 2];
-						y += args[i + 3];
+						cpx = +args[i] + x;
+						cpy = +args[i + 1] + y;
+						x += +args[i + 2];
+						y += +args[i + 3];
 						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
 					}
 					break;
@@ -1253,20 +1300,20 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				case "Q":
 					checkEvenArgs(name, args.length, 4);
 					for (let i = 0; i < args.length; i += 4) {
-						qcpx = args[i];
-						qcpy = args[i + 1];
-						x = args[i + 2];
-						y = args[i + 3];
+						qcpx = +args[i];
+						qcpy = +args[i + 1];
+						x = +args[i + 2];
+						y = +args[i + 3];
 						this.quadraticCurveTo(qcpx, qcpy, x, y);
 					}
 					break;
 				case "q":
 					checkEvenArgs(name, args.length, 4);
 					for (let i = 0; i < args.length; i += 4) {
-						qcpx = args[i] + x;
-						qcpy = args[i + 1] + y;
-						x += args[i + 2];
-						y += args[i + 3];
+						qcpx = +args[i] + x;
+						qcpy = +args[i + 1] + y;
+						x += +args[i + 2];
+						y += +args[i + 3];
 						this.quadraticCurveTo(qcpx, qcpy, x, y);
 					}
 					break;
@@ -1280,8 +1327,8 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 					for (let i = 0; i < args.length; i += 2) {
 						qcpx = 2 * x - qcpx;
 						qcpy = 2 * y - qcpy;
-						x = args[i];
-						y = args[i + 1];
+						x = +args[i];
+						y = +args[i + 1];
 						this.quadraticCurveTo(qcpx, qcpy, x, y);
 					}
 					break;
@@ -1294,8 +1341,8 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 					for (let i = 0; i < args.length; i += 2) {
 						qcpx = 2 * x - qcpx;
 						qcpy = 2 * y - qcpy;
-						x += args[i];
-						y += args[i + 1];
+						x += +args[i];
+						y += +args[i + 1];
 						this.quadraticCurveTo(qcpx, qcpy, x, y);
 					}
 					break;
@@ -1304,11 +1351,12 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				case "a":
 					const relative = (name === "a");
 
+					splitArcFlags(args);
 					checkEvenArgs(name, args.length, 7);
 
 					for (let i = 0; i < args.length; i += 7) {
-						let cx = args[i + 5];
-						let cy = args[i + 6];
+						let cx = +args[i + 5];
+						let cy = +args[i + 6];
 
 						if (relative) {
 							cx += x;
@@ -1318,11 +1366,11 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 						const bs = arcToBezier({
 							px: x,
 							py: y,
-							rx: args[i],
-							ry: args[i + 1],
-							xAxisRotation: args[i + 2],
-							largeArcFlag: assertBinary(args[i + 3]),
-							sweepFlag: assertBinary(args[i + 4]),
+							rx: +args[i],
+							ry: +args[i + 1],
+							xAxisRotation: +args[i + 2],
+							largeArcFlag: assertBinary(+args[i + 3]),
+							sweepFlag: assertBinary(+args[i + 4]),
 							cx,
 							cy,
 						});

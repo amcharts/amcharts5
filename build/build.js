@@ -11,4 +11,5 @@ Tasks.run($path.join(__dirname, ".."), {
 	"run-example": require("./tasks/run-example"),
 	"generate-classes": require("./tasks/generate-classes"),
 	"typecheck": require("./tasks/typecheck"),
+	"version": require("./tasks/version"),
 });

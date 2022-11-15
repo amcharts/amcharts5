@@ -144,6 +144,7 @@ export class PointedRectangle extends Graphics {
 				}
 				display.lineTo(0, cr);
 				display.arcTo(0, 0, cr, 0, cr);
+				display.closePath();
 			}
 		}
 	}

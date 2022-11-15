@@ -86,6 +86,12 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	strokeWidth?: number;
 
 	/**
+	 * Indicates if stroke of a Graphics should stay the same when it's scale changes. Note, this doesn't take into account parent container scale changes.
+	 * @default false
+	 */
+	nonScalingStroke?: boolean;
+
+	/**
 	 * Drawing function.
 	 *
 	 * Must use renderer (`display` parameter) methods to draw.
@@ -195,7 +201,7 @@ export class Graphics extends Sprite {
 			this.markDirtyBounds();
 		}
 
-		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("lineJoin") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
+		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("scale") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("lineJoin") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
 			this._clear = true;
 		}
 
@@ -358,7 +364,11 @@ export class Graphics extends Sprite {
 
 			if (stroke || strokeGradient || strokePattern) {
 				const strokeOpacity = this.get("strokeOpacity");
-				const strokeWidth = this.get("strokeWidth", 1);
+				let strokeWidth = this.get("strokeWidth", 1);
+
+				if (this.get("nonScalingStroke")) {
+					strokeWidth = strokeWidth / this.get("scale", 1)
+				}
 				const lineJoin = this.get("lineJoin");
 
 				if (strokePattern) {

@@ -53,7 +53,7 @@ export class RoundedRectangle extends Rectangle {
 		}
 	}
 
-	public _draw() {		
+	public _draw() {
 		let width = this.width();
 		let height = this.height();
 
@@ -79,23 +79,25 @@ export class RoundedRectangle extends Rectangle {
 			crbr = $math.fitToRange(crbr, 0, maxcr);
 			crbl = $math.fitToRange(crbl, 0, maxcr);
 
-			this._display.moveTo(crtl * wSign, 0);
-			this._display.lineTo(w - crtr * wSign, 0);
+			const display = this._display;
+			display.moveTo(crtl * wSign, 0);
+			display.lineTo(w - crtr * wSign, 0);
 			if (crtr > 0) {
-				this._display.arcTo(w, 0, w, crtr * hSign, crtr);
+				display.arcTo(w, 0, w, crtr * hSign, crtr);
 			}
-			this._display.lineTo(w, h - crbr * hSign);
+			display.lineTo(w, h - crbr * hSign);
 			if (crbr > 0) {
-				this._display.arcTo(w, h, w - crbr * wSign, h, crbr);
+				display.arcTo(w, h, w - crbr * wSign, h, crbr);
 			}
-			this._display.lineTo(crbl * wSign, h);
+			display.lineTo(crbl * wSign, h);
 			if (crbl > 0) {
-				this._display.arcTo(0, h, 0, h - crbl * hSign, crbl);
+				display.arcTo(0, h, 0, h - crbl * hSign, crbl);
 			}
-			this._display.lineTo(0, crtl * hSign);
+			display.lineTo(0, crtl * hSign);
 			if (crtl > 0) {
-				this._display.arcTo(0, 0, crtl * wSign, 0, crtl);
+				display.arcTo(0, 0, crtl * wSign, 0, crtl);
 			}
+			display.closePath();
 		}
 	}
 }

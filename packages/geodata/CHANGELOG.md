@@ -7,8 +7,24 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.0.6] - 2022-10-19
+
+### Fixed
+- Fixed wrong ID for Wyoming's at large district in U.S. Congressional District maps.
+
+
+## [5.0.5] - 2022-10-18
+
+### Fixed
+- Fixed duplicate IDs in U.S. Congressional District maps.
+
+
+## [5.0.4] - 2022-10-18
+
 ### Added
 - New maps: Mauritius.
+- 2022 version of U.S. Congressional District maps (/region/usa/congressional2022).
 
 ### Changed
 - Renamed "Turkey" to "Türkiye" in all maps.
