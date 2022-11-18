@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.33] - 2022-11-18
+
+### Added
+- New pattern type `PathPattern`. Allows using SVG paths as patterns. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/).
+
+### Changed
+- Circular labels (`RadialLabel` with `textType: "circular"`) now have a limited support for `oversizedBehavior`. `"hide"` and `"truncate"` are now supported. The latter will not respect `breakWords` setting, though.
+
+### Fixed
+- Hovering, clicking, and unhovering a `PieSeries` slice would not reset its size properly.
+- `Label` background was not being sized properly when `fontWeight: bold` was set.
+- Dynamically setting `include` or `exclude` on a `MapPolygonSeries` was not updating it until data was re-validated.
+- Circular labels on a `Sunburst` diagram were not being positioned properly.
+
+
 ## [5.2.32] - 2022-11-15
 
 ### Added

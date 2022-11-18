@@ -341,20 +341,23 @@ export class Sunburst extends Partition {
 			let angle = slice.get("startAngle", 0);
 			let arc = Math.abs(slice.get("arc", 0));
 			let labelAngle = angle + arc / 2;
+			let textType = label.get("textType");
 
 			let maxWidth = radius - innerRadius;
-			let maxHeight = radius * arc * $math.RADIANS;			
+			let maxHeight = radius * arc * $math.RADIANS;
 
-			if (innerRadius == 0 && arc >= 360) {
+			if (innerRadius == 0 && arc >= 360 && textType == "radial") {
 				radius = 1;
 				labelAngle = 0;
 			}
 
-			label.set("labelAngle", labelAngle);
+			if (textType == "circular") {
+				maxWidth = arc * $math.RADIANS * (innerRadius + (radius - innerRadius) / 2) - 10;
+			}
 
+			label.setAll({ labelAngle: labelAngle });
 			label.setPrivate("radius", radius);
 			label.setPrivate("innerRadius", innerRadius);
-
 
 			if (arc >= 360) {
 				maxWidth *= 2;

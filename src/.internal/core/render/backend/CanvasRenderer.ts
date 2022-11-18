@@ -1799,6 +1799,10 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		}
 	}
 
+	protected _ignoreFontWeight(): boolean {
+		return /apple/i.test(navigator.vendor);
+	}
+
 	public _measure(layer: CanvasLayer): IBounds {
 		const context = layer.context;
 		const ghostContext = this._renderer._ghostContext;
@@ -1817,7 +1821,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		// Pre-render
 		context.save();
 		ghostContext.save();
-		this._prerender(layer, true, true);
+		this._prerender(layer, true, this._ignoreFontWeight());
 
 		// Get default font metrix
 		const refText = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
@@ -2347,110 +2351,15 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 	}
 
 	public _renderCircular(parentLayer: CanvasLayer): void {
-		const layer = this._layer || parentLayer;
+		if (this._textVisible) {
+			const layer = this._layer || parentLayer;
 
-		this._prerender(layer);
+			this._prerender(layer);
 
-		const interactive = this._isInteractive();
-		const context = layer.context;
-		const layerDirty = layer.dirty;
-		const ghostContext = this._renderer._ghostContext;
-
-		// Savepoint
-		context.save();
-		if (interactive) {
-			ghostContext.save();
-		}
-
-		// Init
-		let radius = (this.radius || 0);
-		let startAngle = (this.startAngle || 0);
-		let deltaAngle = 0;
-		let orientation = this.orientation;
-		let inward = orientation == "auto" ? "auto" : orientation == "inward";
-		const inside = this.inside;
-		const align = this.style.textAlign || "left";
-		const kerning = this.kerning || 0;
-		let clockwise = align == "left" ? 1 : -1;
-		const shouldReverse = !this._textReversed;
-
-		// We need measurements in order to properly position text for alignment
-		if (!this._textInfo) {
-			this._measure(layer);
-		}
-
-		// Check if we need to invert the whole stuff
-		if (inward == "auto") {
-			// Calc max angle so we know whether we need to flip it
-			let maxAngle = 0;
-			let midAngle = 0;
-			$array.each(this._textInfo!, (line, _index) => {
-				const deltaAngle = startAngle + (line.width / (radius - line.height)) / 2 * -clockwise;
-				if (deltaAngle > maxAngle) {
-					maxAngle = deltaAngle;
-				}
-			});
-			if (align == "left") {
-				midAngle = (maxAngle + deltaAngle / 2) * $math.DEGREES;
-			}
-			else if (align == "right") {
-				midAngle = (maxAngle - deltaAngle / 2) * $math.DEGREES;
-			}
-			else {
-				midAngle = startAngle * $math.DEGREES;
-			}
-			midAngle = $math.normalizeAngle(midAngle);
-			inward = (midAngle >= 270) || (midAngle <= 90);
-		}
-
-		if (inward == true && shouldReverse) {
-			this._textInfo!.reverse();
-			this._textReversed = true;
-		}
-
-		// if ((inward == false && align == "left") || (inward == true && align == "right")) {
-		// 	clockwise *= -1;
-		// }
-
-		// Process text info produced by _measure()
-		$array.each(this._textInfo!, (line, _index) => {
-
-			const textHeight = line.height;
-
-			// Adjust radius (for `inside = false`)
-			// Radius adjustment for `inside = false` is below the line calculation
-			if (!inside) {
-				radius += textHeight;
-			}
-
-			// Reverse letters if we're painting them counter-clockwise
-			if (((clockwise == -1 && inward) || (clockwise == 1 && !inward)) && shouldReverse) {
-				line.textChunks.reverse();
-			}
-
-			// Init angles
-			let lineStartAngle = startAngle;
-			deltaAngle = 0;
-
-			// Adjust for center-align
-			if (align == "center") {
-				lineStartAngle += (line.width / (radius - textHeight)) / 2 * -clockwise;
-				deltaAngle = lineStartAngle - startAngle;
-			}
-
-			// if (inward == "auto") {
-			// 	let midAngle;
-			// 	if (align == "left") {
-			// 		midAngle = (lineStartAngle + deltaAngle / 2) * $math.DEGREES;
-			// 	}
-			// 	else if () {
-			// 		midAngle = (lineStartAngle - deltaAngle / 2) * $math.DEGREES;
-			// 	}
-			// 	inward = (midAngle >= 270) || (midAngle <= 90);
-			// }
-
-			// Rotate letters if they are facing outward
-			lineStartAngle += (Math.PI * (inward ? 0 : 1)); // Rotate 180 if outward
+			const interactive = this._isInteractive();
+			const context = layer.context;
+			const layerDirty = layer.dirty;
+			const ghostContext = this._renderer._ghostContext;
 
 			// Savepoint
 			context.save();
@@ -2458,96 +2367,193 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 				ghostContext.save();
 			}
 
-			// Assume starting angle
-			context.rotate(lineStartAngle);
-			if (interactive) {
-				ghostContext.rotate(lineStartAngle);
+			// Init
+			let radius = (this.radius || 0);
+			let startAngle = (this.startAngle || 0);
+			let deltaAngle = 0;
+			let orientation = this.orientation;
+			let inward = orientation == "auto" ? "auto" : orientation == "inward";
+			const inside = this.inside;
+			const align = this.style.textAlign || "left";
+			const kerning = this.kerning || 0;
+			let clockwise = align == "left" ? 1 : -1;
+			const shouldReverse = !this._textReversed;
+
+			// We need measurements in order to properly position text for alignment
+			if (!this._textInfo) {
+				this._measure(layer);
 			}
 
-			let angleShift = 0;
-			$array.each(line.textChunks, (chunk, _index) => {
-
-				// Draw the letter
-				const char = chunk.text;
-				const charWidth = chunk.width;
-
-				// Rotate half a letter
-				angleShift = (charWidth / 2) / (radius - textHeight) * clockwise;
-				context.rotate(angleShift);
-				if (interactive) {
-					ghostContext.rotate(angleShift);
-				}
-
-				// Set style
-				if (chunk.style) {
-					context.save();
-					ghostContext.save();
-
-					context.font = chunk.style;
-					if (interactive) {
-						ghostContext.font = chunk.style;
+			// Check if we need to invert the whole stuff
+			if (inward == "auto") {
+				// Calc max angle so we know whether we need to flip it
+				let maxAngle = 0;
+				let midAngle = 0;
+				$array.each(this._textInfo!, (line, _index) => {
+					const deltaAngle = startAngle + (line.width / (radius - line.height)) / 2 * -clockwise;
+					if (deltaAngle > maxAngle) {
+						maxAngle = deltaAngle;
 					}
+				});
+				if (align == "left") {
+					midAngle = (maxAngle + deltaAngle / 2) * $math.DEGREES;
+				}
+				else if (align == "right") {
+					midAngle = (maxAngle - deltaAngle / 2) * $math.DEGREES;
+				}
+				else {
+					midAngle = startAngle * $math.DEGREES;
+				}
+				midAngle = $math.normalizeAngle(midAngle);
+				inward = (midAngle >= 270) || (midAngle <= 90);
+			}
+
+			if (inward == true && shouldReverse) {
+				this._textInfo!.reverse();
+				this._textReversed = true;
+			}
+
+			// if ((inward == false && align == "left") || (inward == true && align == "right")) {
+			// 	clockwise *= -1;
+			// }
+
+			// Process text info produced by _measure()
+			$array.each(this._textInfo!, (line, _index) => {
+
+				const textHeight = line.height;
+
+				// Adjust radius (for `inside = false`)
+				// Radius adjustment for `inside = false` is below the line calculation
+				if (!inside) {
+					radius += textHeight;
 				}
 
-				if (chunk.fill) {
-					context.save();
-					context.fillStyle = chunk.fill.toCSS();
-					// Color does not affect ghostContext so we not set it
+				// Reverse letters if we're painting them counter-clockwise
+				if (((clockwise == -1 && inward) || (clockwise == 1 && !inward)) && shouldReverse) {
+					line.textChunks.reverse();
 				}
 
-				// Center letters
-				context.textBaseline = "middle";
-				context.textAlign = "center";
+				// Init angles
+				let lineStartAngle = startAngle;
+				deltaAngle = 0;
+
+				// Adjust for center-align
+				if (align == "center") {
+					lineStartAngle += (line.width / (radius - textHeight)) / 2 * -clockwise;
+					deltaAngle = lineStartAngle - startAngle;
+				}
+
+				// if (inward == "auto") {
+				// 	let midAngle;
+				// 	if (align == "left") {
+				// 		midAngle = (lineStartAngle + deltaAngle / 2) * $math.DEGREES;
+				// 	}
+				// 	else if () {
+				// 		midAngle = (lineStartAngle - deltaAngle / 2) * $math.DEGREES;
+				// 	}
+				// 	inward = (midAngle >= 270) || (midAngle <= 90);
+				// }
+
+				// Rotate letters if they are facing outward
+				lineStartAngle += (Math.PI * (inward ? 0 : 1)); // Rotate 180 if outward
+
+				// Savepoint
+				context.save();
 				if (interactive) {
-					ghostContext.textBaseline = "middle";
-					ghostContext.textAlign = "center";
+					ghostContext.save();
 				}
 
-				// Plop the letter
-				if (layerDirty) {
-					context.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
-				}
+				// Assume starting angle
+				context.rotate(lineStartAngle);
 				if (interactive) {
-					ghostContext.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
+					ghostContext.rotate(lineStartAngle);
 				}
 
-				if (chunk.fill) {
-					context.restore();
-					// Color does not affect ghostContext so we not set it
-				}
+				let angleShift = 0;
+				$array.each(line.textChunks, (chunk, _index) => {
 
-				// Reset style
-				if (chunk.style) {
-					context.restore();
+					// Draw the letter
+					const char = chunk.text;
+					const charWidth = chunk.width;
+
+					// Rotate half a letter
+					angleShift = (charWidth / 2) / (radius - textHeight) * clockwise;
+					context.rotate(angleShift);
+					if (interactive) {
+						ghostContext.rotate(angleShift);
+					}
+
+					// Set style
+					if (chunk.style) {
+						context.save();
+						ghostContext.save();
+
+						context.font = chunk.style;
+						if (interactive) {
+							ghostContext.font = chunk.style;
+						}
+					}
+
+					if (chunk.fill) {
+						context.save();
+						context.fillStyle = chunk.fill.toCSS();
+						// Color does not affect ghostContext so we not set it
+					}
+
+					// Center letters
+					context.textBaseline = "middle";
+					context.textAlign = "center";
+					if (interactive) {
+						ghostContext.textBaseline = "middle";
+						ghostContext.textAlign = "center";
+					}
+
+					// Plop the letter
+					if (layerDirty) {
+						context.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
+					}
+					if (interactive) {
+						ghostContext.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
+					}
+
+					if (chunk.fill) {
+						context.restore();
+						// Color does not affect ghostContext so we not set it
+					}
+
+					// Reset style
+					if (chunk.style) {
+						context.restore();
+						ghostContext.restore();
+					}
+
+					// Rotate half a letter and add spacing
+					angleShift = (charWidth / 2 + kerning) / (radius - textHeight) * clockwise;
+					context.rotate(angleShift);
+					if (interactive) {
+						ghostContext.rotate(angleShift);
+					}
+
+				});
+
+				// Restore angle
+				context.restore();
+				if (interactive) {
 					ghostContext.restore();
 				}
 
-				// Rotate half a letter and add spacing
-				angleShift = (charWidth / 2 + kerning) / (radius - textHeight) * clockwise;
-				context.rotate(angleShift);
-				if (interactive) {
-					ghostContext.rotate(angleShift);
+				// Adjust radius (for `inside = true`)
+				if (inside) {
+					radius -= textHeight;
 				}
 
 			});
 
-			// Restore angle
+			// Restore
 			context.restore();
 			if (interactive) {
 				ghostContext.restore();
 			}
-
-			// Adjust radius (for `inside = true`)
-			if (inside) {
-				radius -= textHeight;
-			}
-
-		});
-
-		// Restore
-		context.restore();
-		if (interactive) {
-			ghostContext.restore();
 		}
 	}
 
@@ -2565,7 +2571,17 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		const ghostContext = this._renderer._ghostContext;
 		const rtl = this.style.direction == "rtl";
 
+		const oversizedBehavior = this.style.oversizedBehavior;
+		const maxWidth = this.style.maxWidth!;
+
+		const truncate = $type.isNumber(maxWidth) && oversizedBehavior == "truncate";
+		const ellipsis = this.style.ellipsis || "";
+		let ellipsisMetrics: TextMetrics;
+		//const wrap = $type.isNumber(maxWidth) && (oversizedBehavior == "wrap" || oversizedBehavior == "wrap-no-break");
+
+
 		// Reset text info
+		this._textVisible = true;
 		this._textInfo = [];
 		this._textReversed = false;
 
@@ -2577,6 +2593,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		// Split up text into lines
 		const lines = this.text.toString().replace(/\r/g, "").split(/\n/);
 		let styleRestored = true;
+		let totalWidth = 0;
 
 		// Iterate through the lines
 		let offsetY = 0;
@@ -2630,6 +2647,10 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 						}
 						styleRestored = false;
 					}
+
+					if (truncate) {
+						ellipsisMetrics = this._measureText(ellipsis, context);
+					}
 				}
 
 				// Text format
@@ -2678,6 +2699,42 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 							textDecoration: undefined
 						});
 
+						totalWidth += chunkWidth;
+
+						// Handle oversized behavior
+						if (truncate) {
+							// Measure ellipsis and check if it fits
+							if (!ellipsisMetrics) {
+								ellipsisMetrics = this._measureText(ellipsis, context);
+							}
+							const ellipsisWidth = ellipsisMetrics.actualBoundingBoxLeft + ellipsisMetrics.actualBoundingBoxRight;
+							totalWidth += ellipsisWidth;
+							if ((totalWidth + ellipsisWidth) > maxWidth) {
+								if (lineInfo.textChunks.length == 1) {
+									this._textVisible = false;
+								}
+								else {
+									lineInfo.width += ellipsisWidth;
+									lineInfo.left += ellipsisMetrics.actualBoundingBoxLeft;
+									lineInfo.right += ellipsisMetrics.actualBoundingBoxRight;
+									lineInfo.textChunks.push({
+										style: currentStyle,
+										fill: currentFill,
+										text: ellipsis,
+										width: ellipsisWidth,
+										height: chunkHeight + ellipsisMetrics.actualBoundingBoxDescent,
+										left: ellipsisMetrics.actualBoundingBoxLeft,
+										right: ellipsisMetrics.actualBoundingBoxRight,
+										ascent: ellipsisMetrics.actualBoundingBoxAscent,
+										offsetX: 0,
+										offsetY: chunkHeight,
+										textDecoration: undefined
+									});
+								}
+								break;
+							}
+						}
+
 						if (rtl) {
 							break;
 						}
@@ -2705,6 +2762,11 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		if (!styleRestored) {
 			context.restore();
 			ghostContext.restore();
+		}
+
+
+		if (oversizedBehavior == "hide" && (totalWidth > maxWidth)) {
+			this._textVisible = false;
 		}
 
 		// Adjust chunk internal offsets

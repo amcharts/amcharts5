@@ -274,6 +274,8 @@ export class HierarchyDefaultTheme extends Theme {
 			const rule = r("RadialLabel", ["sunburst", "node"]);
 
 			rule.setAll({
+				x: 0,
+				y: 0,
 				textType: "radial",
 				paddingBottom: 1,
 				paddingTop: 1,

@@ -97,6 +97,9 @@ export interface ILabelSettings extends IContainerSettings {
 	/**
 	 * How to handle labels that do not fit into its designated space.
 	 *
+	 * LIMITATIONS: on circular labels, the only values supported are `"hide"` and
+	 * `"truncate"`. The latter will ignore `breakWords` setting.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Oversized_text} for more info
 	 */
 	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate";

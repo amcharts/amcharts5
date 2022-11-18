@@ -260,7 +260,7 @@ export class MapChart extends SerialChart {
 	protected _dirtyGeometries: boolean = false;
 	protected _geometryColection: GeoJSON.GeometryCollection = { type: "GeometryCollection", geometries: [] };
 
-	protected _centerLocation: [number, number] | null = null;
+	public _centerLocation: [number, number] | null = null;
 
 	protected _za?: Animation<this["_settings"]["zoomLevel"]>;
 	protected _rxa?: Animation<this["_settings"]["rotationX"]>;
@@ -432,6 +432,7 @@ export class MapChart extends SerialChart {
 			this.series.each((series) => {
 				$array.pushAll(this._geometryColection.geometries, series._geometries);
 			})
+		
 
 			this._fitMap();
 		}

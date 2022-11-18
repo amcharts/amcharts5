@@ -61,8 +61,8 @@ export class PercentDefaultTheme extends Theme {
 			lineJoin:"round"
 		});
 
-		r("Slice", ["pie"]).states.create("active", { shiftRadius: 20 });
-		r("Slice", ["pie"]).states.create("hoverActive", { scale: 1 });
+		r("Slice", ["pie"]).states.create("active", { shiftRadius: 20, scale: 1 });
+		r("Slice", ["pie"]).states.create("hoverActive", { scale: 1.04 });
 		r("Slice", ["pie"]).states.create("hover", { scale: 1.04 });
 
 		r("RadialLabel", ["pie"]).setAll({

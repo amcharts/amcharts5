@@ -23,13 +23,11 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	 * An array of map object ids from geodata to include in the map.
 	 *
 	 * If set, only those objects listed in `include` will be shown.
-	 * If you want to change this after the map is initialized, you should call series.data.clear() before setting `include`
 	 */
 	include?: Array<string>;
 
 	/**
 	 * An array of map object ids from geodata to omit when showing the map.
-	 * If you want to change this after the map is initialized, you should call series.data.clear() before setting `exclude`
 	 */
 	exclude?: Array<string>;
 
@@ -133,6 +131,34 @@ export abstract class MapSeries extends Series {
 			if (!this._geoJSONparsed) {
 				this._parseGeoJSON();
 				this._geoJSONparsed = true;
+			}
+
+			const chart = this.chart;
+			const exclude = this.get("exclude");
+
+			if (exclude) {
+				if (chart) {
+					chart._centerLocation = null;
+				}
+				$array.each(exclude, (id) => {
+					const dataItem = this.getDataItemById(id);
+					if (dataItem) {
+						this.disposeDataItem(dataItem);
+					}
+				})
+			}
+
+			const include = this.get("include");
+			if (include) {
+				if (chart) {
+					chart._centerLocation = null;
+				}
+				$array.each(this.dataItems, (dataItem) => {
+					const id = dataItem.get("id");
+					if (id && include.indexOf(id) == -1) {
+						this.disposeDataItem(dataItem);
+					}
+				})
 			}
 		}
 	}
@@ -310,5 +336,5 @@ export abstract class MapSeries extends Series {
 	protected _onDataClear() {
 		super._onDataClear();
 		this._geoJSONparsed = false;
-	}		
+	}
 }

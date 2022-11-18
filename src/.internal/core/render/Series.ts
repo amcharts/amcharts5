@@ -80,29 +80,15 @@ export interface IHeatRule {
 
 export interface ISeriesDataItem extends IComponentDataItem {
 	id?: string;
-
 	value?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueWorking?:number;
-
 	valueChange?: number;
 	valueChangePercent?: number;
 	valueChangeSelection?: number;
 	valueChangeSelectionPercent?: number;
 	valueChangePrevious?: number;
 	valueChangePreviousPercent?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueWorkingOpen?: number;
-
-	/**
-	 * @ignore
-	 */
 	valueWorkingClose?: number;
 }
 
