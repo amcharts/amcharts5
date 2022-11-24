@@ -246,9 +246,9 @@ export class MapPointSeries extends MapSeries {
 		const sprite = bullet.get("sprite");
 		if (sprite) {
 			const dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
-			if(dataItem && dataItem.get("fixed")){
+			if (dataItem && dataItem.get("fixed")) {
 				return;
-			}			
+			}
 
 			const latitude = dataItem.get("latitude");
 			const longitude = dataItem.get("longitude");
@@ -422,4 +422,68 @@ export class MapPointSeries extends MapSeries {
 		super.disposeDataItem(dataItem);
 	}
 
+	/**
+	 * @ignore
+	 */
+	protected _excludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._excludeDataItem(dataItem);
+		const bullets = dataItem.bullets;
+		if (bullets) {
+			$array.each(bullets, (bullet) => {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite.setPrivate("visible", false);
+				}
+			})
+		}
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	protected _unexcludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._unexcludeDataItem(dataItem);
+		const bullets = dataItem.bullets;
+		if (bullets) {
+			$array.each(bullets, (bullet) => {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite.setPrivate("visible", true);
+				}
+			})
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _notIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._notIncludeDataItem(dataItem);
+		const bullets = dataItem.bullets;
+		if (bullets) {
+			$array.each(bullets, (bullet) => {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite.setPrivate("visible", false);
+				}
+			})
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _unNotIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._unNotIncludeDataItem(dataItem);
+		const bullets = dataItem.bullets;
+		if (bullets) {
+			$array.each(bullets, (bullet) => {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite.setPrivate("visible", true);
+				}
+			})
+		}
+	}
 }

@@ -1282,11 +1282,6 @@ export class Entity extends Settings implements IDisposer {
 
 			if (template === match) {
 				super.set(key, value);
-
-				const defaultState = this.states.lookup("default");
-				if(defaultState){
-					defaultState.set(key, value);
-				}
 			}
 		}
 	}

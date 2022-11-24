@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.35] - 2022-11-24
+
+### Fixed
+- `exclude` and `include` were not working properly is set on a `MapLineSeries` or `MapPointSeries` (since last release only).
+
+
 ## [5.2.34] - 2022-11-24
 
 ### Added

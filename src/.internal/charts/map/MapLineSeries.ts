@@ -11,7 +11,7 @@ import * as $array from "../../core/util/Array";
 /**
  * @ignore
  */
-export interface IMapLineSeriesPrivate extends IMapSeriesPrivate {	
+export interface IMapLineSeriesPrivate extends IMapSeriesPrivate {
 }
 
 export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
@@ -40,7 +40,7 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 	 * @default "curved"
 	 * @since 5.2.32
 	 */
-	lineType?: "curved" | "straight"	
+	lineType?: "curved" | "straight"
 
 }
 
@@ -87,7 +87,7 @@ export class MapLineSeries extends MapSeries {
 		this.fields.push("lineType");
 		this._setRawDefault("lineTypeField", "lineType");
 		super._afterNew();
-	}	
+	}
 
 	/**
 	 * @ignore
@@ -233,6 +233,50 @@ export class MapLineSeries extends MapSeries {
 		if (mapLine) {
 			this.mapLines.removeValue(mapLine);
 			mapLine.dispose();
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _excludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._excludeDataItem(dataItem);
+		const mapLine = dataItem.get("mapLine");
+		if (mapLine) {
+			mapLine.setPrivate("visible", false);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _unexcludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._unexcludeDataItem(dataItem);
+		const mapLine = dataItem.get("mapLine");
+		if (mapLine) {
+			mapLine.setPrivate("visible", true);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _notIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._notIncludeDataItem(dataItem);
+		const mapLine = dataItem.get("mapLine");
+		if (mapLine) {
+			mapLine.setPrivate("visible", false);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _unNotIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._unNotIncludeDataItem(dataItem);
+		const mapLine = dataItem.get("mapLine");
+		if (mapLine) {
+			mapLine.setPrivate("visible", true);
 		}
 	}
 }
