@@ -114,6 +114,18 @@ export interface IExportingSettings extends IEntitySettings {
 	backgroundColor?: Color;
 
 	/**
+	 * Opacity of the exported image background.
+	 *
+	 * * 0 - fully transparent.
+	 * * 1 - fully opaque (default).
+	 *
+	 * NOTE: some image formats like JPEG do not support transparency.
+	 * 
+	 * @since 5.2.34
+	 */
+	backgroundOpacity?: number;
+
+	/**
 	 * A string to prefix exported files with.
 	 *
 	 * @default "chart"
@@ -890,9 +902,10 @@ export class Exporting extends Entity {
 
 		// Get background
 		const background = this.get("backgroundColor", this.findBackgroundColor(this._root.dom));
+		const backgroundOpacity = this.get("backgroundOpacity", 1);
 
 		if (background) {
-			ctx.fillStyle = background.toCSS();
+			ctx.fillStyle = background.toCSS(backgroundOpacity);
 			ctx.fillRect(0, 0, newCanvas.width, newCanvas.height);
 		}
 

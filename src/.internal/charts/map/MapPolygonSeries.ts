@@ -125,6 +125,49 @@ export class MapPolygonSeries extends MapSeries {
 		this._removeGeometry(dataItem.get("geometry"));
 	}
 
+	/**
+	 * @ignore
+	 */
+	protected _excludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._excludeDataItem(dataItem);
+		const mapPolygon = dataItem.get("mapPolygon");
+		if (mapPolygon) {
+			mapPolygon.setPrivate("visible", false);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _unexcludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._unexcludeDataItem(dataItem);
+		const mapPolygon = dataItem.get("mapPolygon");
+		if (mapPolygon) {
+			mapPolygon.setPrivate("visible", true);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _notIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._notIncludeDataItem(dataItem);
+		const mapPolygon = dataItem.get("mapPolygon");
+		if (mapPolygon) {
+			mapPolygon.setPrivate("visible", false);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	protected _unNotIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._unNotIncludeDataItem(dataItem);
+		const mapPolygon = dataItem.get("mapPolygon");
+		if (mapPolygon) {
+			mapPolygon.setPrivate("visible", true);
+		}
+	}	
 
 	/**
 	 * Forces a repaint of the element which relies on data.
@@ -147,7 +190,7 @@ export class MapPolygonSeries extends MapSeries {
 	 * @param  dataItem  Target data item
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
 	 */
-	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>):Animation<any> | undefined {
+	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>): Animation<any> | undefined {
 		const polygon = dataItem.get("mapPolygon");
 		if (polygon) {
 			const geometry = polygon.get("geometry");

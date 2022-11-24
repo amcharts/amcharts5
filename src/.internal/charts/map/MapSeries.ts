@@ -1,5 +1,6 @@
 import type { MapChart } from "./MapChart";
 import type { GeoProjection, GeoPath } from "d3-geo";
+import type { DataItem } from "../../core/render/Component";
 
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
 
@@ -100,6 +101,9 @@ export abstract class MapSeries extends Series {
 	public _geometries: Array<GeoJSON.Geometry> = [];
 	protected _geoJSONparsed: boolean = false;
 
+	protected _excluded: Array<DataItem<IMapSeriesDataItem>> = [];
+	protected _notIncluded: Array<DataItem<IMapSeriesDataItem>> = [];
+
 	protected _afterNew() {
 		this.fields.push("geometry", "geometryType");
 		this._setRawDefault("geometryField", "geometry");
@@ -143,9 +147,16 @@ export abstract class MapSeries extends Series {
 				$array.each(exclude, (id) => {
 					const dataItem = this.getDataItemById(id);
 					if (dataItem) {
-						this.disposeDataItem(dataItem);
+						this._excludeDataItem(dataItem)
 					}
 				})
+			}
+
+			if (!exclude || exclude.length == 0) {
+				$array.each(this._excluded, (dataItem) => {
+					this._unexcludeDataItem(dataItem)
+				})
+				this._excluded = [];
 			}
 
 			const include = this.get("include");
@@ -156,11 +167,39 @@ export abstract class MapSeries extends Series {
 				$array.each(this.dataItems, (dataItem) => {
 					const id = dataItem.get("id");
 					if (id && include.indexOf(id) == -1) {
-						this.disposeDataItem(dataItem);
+						this._notIncludeDataItem(dataItem);
+					}
+					else {
+						this._unNotIncludeDataItem(dataItem);
 					}
 				})
 			}
+
+			if (!include) {
+				$array.each(this._notIncluded, (dataItem) => {
+					this._unNotIncludeDataItem(dataItem);
+				})
+				this._notIncluded = [];
+			}
 		}
+	}
+
+	protected _excludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		this._removeGeometry(dataItem.get("geometry"));
+		$array.move(this._excluded, dataItem);
+	}
+
+	protected _unexcludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		this._addGeometry(dataItem.get("geometry"));
+	}
+
+	protected _notIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		this._removeGeometry(dataItem.get("geometry"));
+		$array.move(this._notIncluded, dataItem);
+	}
+
+	protected _unNotIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		this._addGeometry(dataItem.get("geometry"));
 	}
 
 	protected checkInclude(id: string, includes: string[] | undefined, excludes?: string[] | undefined): boolean {
@@ -219,9 +258,9 @@ export abstract class MapSeries extends Series {
 						}
 
 						if (this._types.indexOf(type) != -1) {
-							if (!this.checkInclude(id, this.get("include"), this.get("exclude"))) {
-								continue;
-							}
+							//if (!this.checkInclude(id, this.get("include"), this.get("exclude"))) {
+							//	continue;
+							//}
 
 							let dataItem: any;
 

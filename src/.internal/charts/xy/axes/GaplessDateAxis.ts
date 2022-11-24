@@ -88,12 +88,14 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	 */
 	public valueToPosition(value: number): number {
 		const dates = this._dates;
-		const len = dates.length;
+		const startLocation = this.get("startLocation", 0);
+		const endLocation = this.get("endLocation", 1);
+		const len = dates.length - startLocation - (1 - endLocation);
 		const result = $array.getSortedIndex(dates, (x) => $order.compare(x, value));
 		let index = result.index;
 
 		if (result.found) {
-			return index / len;
+			return (index - startLocation) / len;
 		}
 		else {
 			if (index > 0) {
@@ -110,7 +112,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				d = value - itemValue;
 			}
 
-			return index / len + d / this.baseDuration() / len;
+			return (index - startLocation) / len + d / this.baseDuration() / len;
 		}
 	}
 
@@ -122,6 +124,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	 */
 	public valueToIndex(value: number): number {
 		const dates = this._dates;
+
 		const result = $array.getSortedIndex(dates, (x) => $order.compare(x, value));
 		let index = result.index;
 
@@ -145,8 +148,9 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	 * @return            Value
 	 */
 	public positionToValue(position: number): number {
-
-		let len = this._dates.length;
+		const startLocation = this.get("startLocation", 0);
+		const endLocation = this.get("endLocation", 1);
+		let len = Math.round(this._dates.length - startLocation - (1 - endLocation));
 		let index = position * len;
 		let findex = Math.floor(index);
 		if (findex < 0) {
@@ -157,11 +161,11 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			findex = len - 1
 		}
 
-		return this._dates[findex] + (index - findex) * this.baseDuration();
+		return this._dates[findex] + (index - findex + startLocation) * this.baseDuration();
 	}
 
 	protected _fixZoomFactor() {
-		this.setPrivateRaw("maxZoomFactor", this._dates.length);
+		this.setPrivateRaw("maxZoomFactor", this._dates.length - this.get("startLocation", 0) - (1 - this.get("endLocation", 1)));
 	}
 
 	protected _prepareAxisItems() {

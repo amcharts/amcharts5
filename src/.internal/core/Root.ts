@@ -514,6 +514,7 @@ export class Root implements IDisposer {
 
 		// HTML content holder
 		this._htmlElementContainer = document.createElement("div");
+		this._htmlElementContainer.className = "am5-html-container";
 		this._htmlElementContainer.style.position = "absolute";
 		this._htmlElementContainer.style.pointerEvents = "none";
 		this._htmlElementContainer.style.overflow = "hidden";
@@ -521,6 +522,7 @@ export class Root implements IDisposer {
 
 		// Create element which is used to make announcements to screen reader
 		const readerAlertElement = document.createElement("div");
+		readerAlertElement.className = "am5-reader-container";
 		readerAlertElement.setAttribute("role", "alert");
 		readerAlertElement.style.zIndex = "-100000";
 		readerAlertElement.style.opacity = "0";
@@ -530,6 +532,7 @@ export class Root implements IDisposer {
 		this._inner.appendChild(this._readerAlertElement);
 
 		const focusElementContainer = document.createElement("div");
+		focusElementContainer.className = "am5-focus-container";
 		focusElementContainer.style.position = "absolute";
 		focusElementContainer.style.pointerEvents = "none";
 		focusElementContainer.style.top = "0px";
@@ -545,6 +548,7 @@ export class Root implements IDisposer {
 		this._inner.appendChild(this._focusElementContainer);
 
 		this._tooltipElementContainer = document.createElement("div");
+		this._tooltipElementContainer.className = "am5-tooltip-container";
 		this._inner.appendChild(this._tooltipElementContainer);
 
 		// Add keyboard events for accessibility, e.g. simulating drag with arrow

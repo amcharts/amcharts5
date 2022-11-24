@@ -352,6 +352,10 @@ export abstract class Series extends Component {
 		let endIndex = this.endIndex();
 
 
+		if(this.isDirty("heatRules")){
+			this._valuesDirty = true;
+		}
+
 		if(this.isPrivateDirty("baseValueSeries")){
 			const baseValueSeries = this.getPrivate("baseValueSeries");
 			if(baseValueSeries){
@@ -554,8 +558,9 @@ export abstract class Series extends Component {
 
 
 		// Apply heat rules
-		if (this._valuesDirty && this.get("heatRules") != null) {
-			const rules = this.get("heatRules", []);
+		const rules = this.get("heatRules");
+
+		if (this._valuesDirty && rules && rules.length > 0) {			
 			$array.each(rules, (rule) => {
 				const minValue = rule.minValue || this.getPrivate(<any>(rule.dataField + "Low")) || 0;
 				const maxValue = rule.maxValue || this.getPrivate(<any>(rule.dataField + "High")) || 0;

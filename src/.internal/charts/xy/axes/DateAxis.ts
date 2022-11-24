@@ -22,6 +22,8 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	/**
 	 * Relative location of where axis cell starts: 0 - beginning, 1 - end.
 	 *
+	 * IMPORTANT: `startLocation` is not supported by [[GaplessDateAxis]].
+	 *
 	 * @default 0
 	 */
 	startLocation?: number;
@@ -29,6 +31,8 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	/**
 	 * Relative location of where axis cell ends: 0 - beginning, 1 - end.
 	 *
+	 * IMPORTANT: `endLocation` is not supported by [[GaplessDateAxis]].
+	 * 
 	 * @default 1
 	 */
 	endLocation?: number;
@@ -533,10 +537,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						startIndex -= 1;
 					}
 
+					selectionMax += this.baseDuration() * (1 - this.get("endLocation", 1));
+
 					const end = $array.getSortedIndex(series.dataItems, (dataItem) => {
 						return $order.compare(dataItem.get(fieldName), selectionMax);
 					});
-
 
 					let endIndex = end.index;
 
@@ -703,7 +708,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let startTime = $time.round(new Date(min), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05)
 		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-
 		return startTime + (endTime - startTime) * this.get("startLocation", 0);
 	}
 	/* goes up to the year
@@ -741,7 +745,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let startTime = $time.round(new Date(max), baseInterval.timeUnit, baseInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
 		let endTime = startTime + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05)
 		endTime = $time.round(new Date(endTime), baseInterval.timeUnit, 1, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
 	}
 

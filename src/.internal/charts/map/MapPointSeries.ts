@@ -70,6 +70,13 @@ export interface IMapPointSeriesDataItem extends IMapSeriesDataItem {
 	 * An ID of the [[MapPolygon]] to use for centering the point.
 	 */
 	polygonId?: string;
+
+	/**
+	 * @todo review
+	 * Specifies if a point is fixed or moves together with a map. Fixed points can not be used for MapLines pointsToConnect setting.
+	 * @default false
+	 */
+	fixed?: boolean;
 }
 
 export interface IMapPointSeriesSettings extends IMapSeriesSettings {
@@ -112,6 +119,11 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	longitudeField?: string;
 
 	/**
+	 * A field in data that holds information if this point is fixed or moves with a map.
+	 */
+	fixedField?: string;
+
+	/**
 	 * If set to `true`, bullets will resize when zooming the [[MapChart]].
 	 * 
 	 * @since 5.2.8
@@ -139,7 +151,7 @@ export class MapPointSeries extends MapSeries {
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = ["Point", "MultiPoint"];
 
 	protected _afterNew() {
-		this.fields.push("polygonId", "lineId", "longitude", "latitude");
+		this.fields.push("polygonId", "lineId", "longitude", "latitude", "fixed");
 		super._afterNew();
 	}
 
@@ -195,12 +207,12 @@ export class MapPointSeries extends MapSeries {
 
 			if (geometry) {
 				if (geometry.type == "Point") {
-					this._makeBullet(dataItem, bulletFunction);
+					this._setBulletParent(this._makeBullet(dataItem, bulletFunction));
 				}
 				else if (geometry.type = "MultiPoint") {
 					let i = 0;
 					$array.each(geometry.coordinates, () => {
-						this._makeBullet(dataItem, bulletFunction, i);
+						this._setBulletParent(this._makeBullet(dataItem, bulletFunction, i));
 						i++;
 					})
 				}
@@ -208,14 +220,40 @@ export class MapPointSeries extends MapSeries {
 		})
 	}
 
+	protected _setBulletParent(bullet?: Bullet) {
+		if (bullet) {
+			const sprite = bullet.get("sprite");
+			const chart = this.chart;
+			if (sprite && chart) {
+				const dataItem = sprite.dataItem as DataItem<IMapPointSeriesDataItem>;
+				if (dataItem) {
+					if (dataItem.get("fixed")) {
+						if (sprite.parent != chart.bulletsContainer) {
+							chart.bulletsContainer.children.moveValue(sprite);
+						}
+					}
+					else {
+						if (sprite.parent != this.bulletsContainer) {
+							this.bulletsContainer.children.moveValue(sprite);
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public _positionBullet(bullet: Bullet) {
 		const sprite = bullet.get("sprite");
 		if (sprite) {
 			const dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
+			if(dataItem && dataItem.get("fixed")){
+				return;
+			}			
 
 			const latitude = dataItem.get("latitude");
 			const longitude = dataItem.get("longitude");
 			const lineDataItem = dataItem.get("lineDataItem");
+			const fixed = dataItem.get("fixed");
 			const chart = this.chart;
 			let line: MapLine | undefined;
 			if (lineDataItem) {
@@ -304,7 +342,7 @@ export class MapPointSeries extends MapSeries {
 				}
 			}
 
-			if (coordinates) {
+			if (!fixed && coordinates) {
 				this._positionBulletReal(bullet, { type: "Point", coordinates: coordinates }, coordinates, angle);
 			}
 		}

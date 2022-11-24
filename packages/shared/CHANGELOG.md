@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.34] - 2022-11-24
+
+### Added
+- `backgroundOpacity` setting added to `Exporting`.
+- `fixed` property added to `MapPointSeriesDataItem`. Allows sticking a point to screen coordinates, rather than to lat/long on the map.
+
+### Changed
+- Various containers in amCharts 5 div (HTML content, tooltips, alerts) will now have class names applied (`"am5-html-container"`, `"am5-reader-container"`, `"am5-focus-container"`, `"am5-tooltip-container"`) so that they can be targeted via CSS, e.g. `.am5-html-container { z-index: -1 }`.
+- amCharts will no longer fail if `StyleRule` is created with unparsable selector.
+
+### Fixed
+- Labels on `Sunburst` full circle slices were not being properly truncated/sized.
+- `startLocation` and `endLocation` was being ignored by `GaplessDateAxis`.
+- Dynamically-added heat rules (after series was already created) were not working.
+
+
 ## [5.2.33] - 2022-11-18
 
 ### Added

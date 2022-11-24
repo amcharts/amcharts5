@@ -349,20 +349,23 @@ export class Sunburst extends Partition {
 			if (innerRadius == 0 && arc >= 360 && textType == "radial") {
 				radius = 1;
 				labelAngle = 0;
+				maxWidth *= 2;
+				maxHeight = maxWidth;				
 			}
+
+			if (Math.round(arc) >= 360 && textType == "radial") {
+				labelAngle = 0;
+			}			
 
 			if (textType == "circular") {
 				maxWidth = arc * $math.RADIANS * (innerRadius + (radius - innerRadius) / 2) - 10;
 			}
 
+
 			label.setAll({ labelAngle: labelAngle });
 			label.setPrivate("radius", radius);
 			label.setPrivate("innerRadius", innerRadius);
 
-			if (arc >= 360) {
-				maxWidth *= 2;
-				maxHeight = maxWidth;
-			}
 			label.setAll({
 				maxHeight: maxHeight,
 				maxWidth: maxWidth

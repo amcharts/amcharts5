@@ -6,6 +6,7 @@ import { p50, Percent } from "../util/Percent";
 import { RoundedRectangle } from "./RoundedRectangle";
 import { Rectangle } from "./Rectangle";
 import { color } from "../util/Color";
+import type { Template } from "../util/Template";
 
 import * as $math from "../util/Math";
 
@@ -15,6 +16,11 @@ export interface ISpriteResizerSettings extends IContainerSettings {
 	 * Target [[Sprite]] element.
 	 */
 	sprite?: Sprite
+
+	/**
+	 * Target [[Template]]. If a template is set, scale and rotation will be set on Template instead of a Sprite.
+	 */
+	spriteTemplate?: Template<Sprite>
 
 	/**
 	 * Rotation increment in degrees.
@@ -105,22 +111,34 @@ export class SpriteResizer extends Container {
 
 	protected _resize(grip: Sprite, c: number) {
 		const sprite = this.get("sprite");
+		const spriteTemplate = this.get("spriteTemplate");
 		if (sprite) {
-
-			sprite.set("scale", Math.max(0.01, this._is * (1 + c * (grip.x() - this._ix) / this._iw)));
+			const scale = Math.max(0.01, this._is * (1 + c * (grip.x() - this._ix) / this._iw));
+			if (spriteTemplate) {
+				spriteTemplate.set("scale", scale);
+			}
+			else {
+				sprite.set("scale", scale);
+			}
 			this._updatePositions();
 		}
 	}
 
 	protected _rotate(e: ISpritePointerEvent, delta: number) {
 		const sprite = this.get("sprite");
+		const spriteTemplate = this.get("spriteTemplate");
 		if (sprite) {
 			const parent = this.parent;
 			if (parent) {
 
 				const rotationStep = this.get("rotationStep", 10);
 				let angle = Math.round((($math.getAngle({ x: this.x(), y: this.y() }, parent.toLocal(e.point)) + delta) / rotationStep)) * rotationStep;
-				sprite.set("rotation", angle);
+				if (spriteTemplate) {
+					spriteTemplate.set("rotation", angle);
+				}
+				else {
+					sprite.set("rotation", angle);
+				}
 				this._updatePositions();
 			}
 		}

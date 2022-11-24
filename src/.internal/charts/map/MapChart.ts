@@ -661,6 +661,8 @@ export class MapChart extends SerialChart {
 		this._defaultThemes.push(MapChartDefaultTheme.new(this._root));
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["map"]);
 
+		this.children.push(this.bulletsContainer);
+
 		super._afterNew();
 
 		this._makeGeoPath();

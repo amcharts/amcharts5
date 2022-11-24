@@ -378,7 +378,6 @@ function getStylesheet(element: ShadowRoot | null, nonce: string = ""): CSSStyle
  */
 function appendStylesheet(root: CSSStyleSheet, selector: string): CSSStyleRule {
 	const index = root.cssRules.length;
-
 	root.insertRule(selector + "{}", index);
 
 	return root.cssRules[index] as CSSStyleRule;
@@ -426,11 +425,17 @@ export class StyleRule extends DisposerClass {
 
 		this._root = getStylesheet(element, nonce);
 
-		this._rule = appendStylesheet(this._root, selector);
+		try {
+			this._rule = appendStylesheet(this._root, selector);
 
-		$object.each(styles, (key, value) => {
-			this.setStyle(<string>key, value);
-		});
+			$object.each(styles, (key, value) => {
+				this.setStyle(<string>key, value);
+			});
+		}
+		catch(err) {
+			// Create an empty rule on failed selectors
+			this._rule = new CSSStyleRule();
+		}
 	}
 
 	// TODO test this

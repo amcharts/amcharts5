@@ -407,6 +407,13 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	/**
 	 * @ignore
 	 */
+	public resetUserSettings(){
+		this._userProperties = {};
+	}	
+
+	/**
+	 * @ignore
+	 */
 	public abstract markDirty(): void;
 
 	public _runAnimation(currentTime: number): boolean {
@@ -425,7 +432,6 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 					if (diff >= 1) {
 						if (animation._checkEnded()) {
 							this.set(key, animation._value(1));
-
 						} else {
 							playing = true;
 							animation._reset(currentTime);
@@ -1211,6 +1217,7 @@ export class Entity extends Settings implements IDisposer {
 		return super.set(key, value);
 	}
 
+
 	/**
 	 * @ignore
 	 */
@@ -1275,6 +1282,11 @@ export class Entity extends Settings implements IDisposer {
 
 			if (template === match) {
 				super.set(key, value);
+
+				const defaultState = this.states.lookup("default");
+				if(defaultState){
+					defaultState.set(key, value);
+				}
 			}
 		}
 	}

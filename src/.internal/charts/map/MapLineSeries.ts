@@ -27,7 +27,7 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 	geometry?: GeoJSON.LineString | GeoJSON.MultiLineString;
 
 	/**
-	 * An array of data items from [[MapPointSeries]] to use as line end-points.
+	 * An array of data items from [[MapPointSeries]] to use as line end-points. Note, fixed points can not be used here.
 	 */
 	pointsToConnect?: Array<DataItem<IMapPointSeriesDataItem>>;
 
