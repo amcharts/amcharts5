@@ -43,7 +43,7 @@ export interface IHeatRule {
 	/**
 	 * The setting value to use for items which do not have value at all.
 	 */
-	neutral: any;	
+	neutral?: any;	
 
 	/**
 	 * Which data field to use when determining item's value.
