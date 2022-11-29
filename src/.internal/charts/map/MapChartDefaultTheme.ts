@@ -56,10 +56,20 @@ export class MapChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
+		r("MapPolygonSeries").setAll({
+			affectsBounds: true
+		})
+
+
 		r("MapPointSeries").setAll({
+			affectsBounds: false,
 			clipFront: false,
 			clipBack: true,
 			autoScale: false
+		})
+
+		r("MapLineSeries").setAll({
+			affectsBounds: false
 		})
 
 		{

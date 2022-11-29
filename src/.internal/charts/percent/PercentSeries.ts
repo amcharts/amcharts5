@@ -250,9 +250,6 @@ export abstract class PercentSeries extends Series {
 
 			$array.each(this._dataItems, (dataItem) => {
 				let value = dataItem.get("valueWorking", 0);
-				if (value >= absSum) {
-					sum = dataItem.get("value", 0);
-				}
 
 				if (value > valueHigh) {
 					valueHigh = value;

@@ -229,14 +229,20 @@ export class Tooltip extends Container {
 				const bg = this.get("background")!;
 				this._keepHoverDp = new MultiDisposer([
 					bg.events.on("pointerover", (_ev) => {
-						const target = this.get("tooltipTarget");
+						let target = this.get("tooltipTarget");
 						if (target) {
+							if (target.parent && target.parent.getPrivate("tooltipTarget") == target) {
+								target = target.parent;
+							}
 							target.hover();
 						}
 					}),
 					bg.events.on("pointerout", (_ev) => {
-						const target = this.get("tooltipTarget");
+						let target = this.get("tooltipTarget");
 						if (target) {
+							if (target.parent && target.parent.getPrivate("tooltipTarget") == target) {
+								target = target.parent;
+							}
 							target.unhover();
 						}
 					})

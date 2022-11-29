@@ -3449,7 +3449,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	_getHitTarget(point: IPoint, bbox: DOMRect): CanvasDisplayObject | undefined | false {
-		if (point.x < 0 || point.x > bbox.width || point.y < 0 || point.y > bbox.height) {
+		if (bbox.width === 0 || bbox.height === 0 || point.x < 0 || point.x > bbox.width || point.y < 0 || point.y > bbox.height) {
 			return;
 		}
 		else {

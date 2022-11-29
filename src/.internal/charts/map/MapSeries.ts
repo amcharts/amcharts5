@@ -16,6 +16,13 @@ export interface IMapSeriesDataItem extends ISeriesDataItem {
 export interface IMapSeriesSettings extends ISeriesSettings {
 
 	/**
+	 * @todo review
+	 * You can tell MapPointSeries or MapLineSeries to affect map bounds. Or, if you have a Background series
+	 * you can simply create a background spanning through all the globe and set affectsBounds to false, so that background would not influence the chart when fitting it to the screen.
+	 */
+	affectsBounds?: boolean;
+
+	/**
 	 * Map data in GeoJSON format.
 	 */
 	geoJSON?: GeoJSON.GeoJSON;
@@ -190,7 +197,7 @@ export abstract class MapSeries extends Series {
 	}
 
 	protected _unexcludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
-		this._addGeometry(dataItem.get("geometry"));
+		this._addGeometry(dataItem.get("geometry"), this);
 	}
 
 	protected _notIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -199,7 +206,7 @@ export abstract class MapSeries extends Series {
 	}
 
 	protected _unNotIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
-		this._addGeometry(dataItem.get("geometry"));
+		this._addGeometry(dataItem.get("geometry"), this);
 	}
 
 	protected checkInclude(id: string, includes: string[] | undefined, excludes?: string[] | undefined): boolean {
@@ -341,8 +348,8 @@ export abstract class MapSeries extends Series {
 		}
 	}
 
-	protected _addGeometry(geometry: any) {
-		if (geometry) {
+	protected _addGeometry(geometry: any, series: MapSeries) {
+		if (geometry && series.get("affectsBounds", true)) {
 			this._geometries.push(geometry);
 
 			const chart = this.chart;

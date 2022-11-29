@@ -197,6 +197,8 @@ export class MapPointSeries extends MapSeries {
 				}
 			}
 		}
+
+		this._addGeometry(geometry, this);
 	}
 
 	protected _makeBullets(dataItem: DataItem<this["_dataItemSettings"]>) {

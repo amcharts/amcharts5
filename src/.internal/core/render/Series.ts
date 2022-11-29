@@ -41,6 +41,11 @@ export interface IHeatRule {
 	max: any;
 
 	/**
+	 * The setting value to use for items which do not have value at all.
+	 */
+	neutral: any;	
+
+	/**
 	 * Which data field to use when determining item's value.
 	 */
 	dataField: string;
@@ -564,11 +569,15 @@ export abstract class Series extends Component {
 			$array.each(rules, (rule) => {
 				const minValue = rule.minValue || this.getPrivate(<any>(rule.dataField + "Low")) || 0;
 				const maxValue = rule.maxValue || this.getPrivate(<any>(rule.dataField + "High")) || 0;
+				
 
 				$array.each(rule.target._entities, (target) => {
 					const value = target.dataItem.get(rule.dataField);
 
 					if (!$type.isNumber(value)) {
+						if(rule.neutral){
+							target.set(rule.key, rule.neutral);
+						}
 						return;
 					}
 

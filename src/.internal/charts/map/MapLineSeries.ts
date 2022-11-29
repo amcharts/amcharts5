@@ -155,6 +155,7 @@ export class MapLineSeries extends MapSeries {
 
 		dataItem.set("mapLine", mapLine);
 
+		this._addGeometry(dataItem.get("geometry"), this);
 
 		mapLine.setPrivate("series", this);
 	}

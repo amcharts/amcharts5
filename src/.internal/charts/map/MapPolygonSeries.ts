@@ -109,7 +109,7 @@ export class MapPolygonSeries extends MapSeries {
 
 		mapPolygon.series = this;
 
-		this._addGeometry(dataItem.get("geometry"));
+		this._addGeometry(dataItem.get("geometry"), this);
 	}
 
 	/**

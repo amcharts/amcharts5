@@ -52,17 +52,17 @@ export class ZoomControl extends Container {
 	protected _afterNew() {
 		super._afterNew();
 
-		this.set("position", "absolute");
+		this._setSoft("position", "absolute");
 
-		this.set("layout", this._root.verticalLayout);
-		this.set("x", p100);
-		this.set("centerX", p100);
+		this._setSoft("layout", this._root.verticalLayout);
+		this._setSoft("x", p100);
+		this._setSoft("centerX", p100);
 
-		this.set("y", p100);
-		this.set("centerY", p100);
+		this._setSoft("y", p100);
+		this._setSoft("centerY", p100);
 
-		this.set("paddingRight", 10);
-		this.set("paddingBottom", 10);
+		this._setSoft("paddingRight", 10);
+		this._setSoft("paddingBottom", 10);
 
 		this.plusButton.setAll({
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),

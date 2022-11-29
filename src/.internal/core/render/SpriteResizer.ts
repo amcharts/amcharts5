@@ -120,6 +120,7 @@ export class SpriteResizer extends Container {
 			else {
 				sprite.set("scale", scale);
 			}
+			sprite.states.lookup("default")!.set("scale", scale);
 			this._updatePositions();
 		}
 	}
@@ -139,6 +140,7 @@ export class SpriteResizer extends Container {
 				else {
 					sprite.set("rotation", angle);
 				}
+				sprite.states.lookup("default")!.set("rotation", angle);
 				this._updatePositions();
 			}
 		}

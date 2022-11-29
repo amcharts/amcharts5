@@ -41,12 +41,12 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	zoomLevel?: number;
 
 	/**
-	 * @ignore
+	 * current x position of a map
 	 */
 	translateX?: number;
 
 	/**
-	 * @ignore
+	 * current y position of a map
 	 */
 	translateY?: number;
 
@@ -301,7 +301,7 @@ export class MapChart extends SerialChart {
 	 * @since 5.2.19
 	 */
 	public geoPoint() {
-		return this.invert({ x: this.width() / 2, y: this.height() / 2 });
+		return this.invert(this.seriesContainer.toGlobal({ x: this.width() / 2, y: this.height() / 2 }));
 	}
 
 	/**
@@ -716,8 +716,16 @@ export class MapChart extends SerialChart {
 
 		this._downZoomLevel = this.get("zoomLevel", 1);
 
-
 		let count = $object.keys(this.chartContainer._downPoints).length;
+		if(count == 1){
+			// workaround to solve a problem when events are added to some children of chart container (rotation stops working)
+			const downPoint = this.chartContainer._downPoints[1];
+
+			if(downPoint && (downPoint.x == event.point.x && downPoint.y == event.point.y)){
+				count = 0;
+			}
+		}
+
 		if (count > 0) {
 			this._downTranslateX = this.get("translateX");
 			this._downTranslateY = this.get("translateY");
@@ -734,7 +742,6 @@ export class MapChart extends SerialChart {
 			}
 		}
 		else if (count == 0) {
-
 			let bg = this.chartContainer.get("background");
 			if (bg) {
 				bg.events.enableType("click");

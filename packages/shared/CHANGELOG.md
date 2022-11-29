@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.36] - 2022-11-29
+
+### Added
+- `affectsBounds` setting added to `MapSeries`. Previously only `MapPolygonSeries` affected chart bounds. Now you can tell `MapPointSeries` or `MapLineSeries` to affect map bounds. Or turn off bound checking for some `MapPolygonSeries`, e.g. for background/water.
+- `neutral` setting added to `IHeatRule`. If you set some value (color for example), it will be used for items that do not have any value.
+
+### Fixed
+- If the last slice of a percent (pie) series slice was hidden, `valueSum` was calculated incorrectly (was using last items value instead of 0).
+- `geoPoint()` method of `MapChart` was not working properly.
+- `keepTargetHover: true` was not working on all `Hierarchy` charts.
+- `ZoomControl` used to override its positional settings like `centerX`, `x`, etc.
+- Fix for occasional "Value is not of type 'long'" error.
+
+
 ## [5.2.35] - 2022-11-24
 
 ### Fixed
