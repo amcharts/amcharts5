@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.38] - 2022-11-29
+
+### Added
+- `clipExtent` added to `GraticuleSeries`. If set to `true`, graticules will be drawn only within bounds of the polygons.
+
+### Fixed
+- `ZoomControl` position was wrong sice 5.2.36.
+
+
 ## [5.2.37] - 2022-11-29
 
 ### Fixed

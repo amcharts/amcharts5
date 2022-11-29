@@ -2,7 +2,6 @@ import { MapLineSeries, IMapLineSeriesSettings, IMapLineSeriesPrivate, IMapLineS
 import type { DataItem } from "../../core/render/Component";
 import { geoGraticule } from "d3-geo";
 
-
 export interface IGraticuleSeriesDataItem extends IMapLineSeriesDataItem {
 }
 
@@ -10,6 +9,7 @@ export interface IGraticuleSeriesPrivate extends IMapLineSeriesPrivate {
 }
 
 export interface IGraticuleSeriesSettings extends IMapLineSeriesSettings {
+	clipExtent?: boolean;
 
 	/**
 	 * Place a grid line every Xth latitude/longitude.
@@ -47,14 +47,35 @@ export class GraticuleSeries extends MapLineSeries {
 		if (this.isDirty("step")) {
 			this._generate();
 		}
+
+		if (this.isDirty("clipExtent")) {
+
+			if (this.get("clipExtent")) {
+				const chart = this.chart;
+				if (chart) {
+					chart.events.on("geoboundschanged", () => {
+						this._generate();
+					})
+				}
+			}
+		}
 	}
 
 	protected _generate() {
 		let graticule = geoGraticule();
 
 		if (graticule) {
-			const step = this.get("step", 10);
+			if (this.get("clipExtent")) {
+				const chart = this.chart;
+				if (chart) {
+					const geoBounds = chart.geoBounds();
+					if (geoBounds) {
+						graticule.extent([[geoBounds.left, geoBounds.bottom], [geoBounds.right, geoBounds.top]]);
+					}
+				}
+			}
 
+			const step = this.get("step", 10);
 			graticule.stepMinor([360, 360]);
 			graticule.stepMajor([step, step]);
 			this._dataItem.set("geometry", graticule());

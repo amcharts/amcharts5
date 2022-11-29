@@ -1,5 +1,5 @@
 import { Theme } from "../../core/Theme";
-import { p50 } from "../../core/util/Percent";
+import { p50, p100 } from "../../core/util/Percent";
 import { setColor } from "../../themes/DefaultTheme";
 
 import { geoMercator } from "d3-geo";
@@ -120,6 +120,15 @@ export class MapChartDefaultTheme extends Theme {
 			step: 10
 		});
 
+
+		r("ZoomControl").setAll({
+			x: p100,
+			centerX: p100,
+			y: p100,
+			centerY: p100,
+			paddingRight: 10,
+			paddingBottom: 10
+		})
 
 	}
 }

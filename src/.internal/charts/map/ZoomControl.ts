@@ -3,7 +3,6 @@ import type { MapChart } from "./MapChart";
 import { Container, IContainerPrivate, IContainerSettings } from "../../core/render/Container";
 import { Button } from "../../core/render/Button";
 import { Graphics } from "../../core/render/Graphics";
-import { p100 } from "../../core/util/Percent";
 import { MultiDisposer } from "../../core/util/Disposer";
 
 export interface IZoomControlSettings extends IContainerSettings {
@@ -52,17 +51,9 @@ export class ZoomControl extends Container {
 	protected _afterNew() {
 		super._afterNew();
 
-		this._setSoft("position", "absolute");
+		this.set("position", "absolute");
 
-		this._setSoft("layout", this._root.verticalLayout);
-		this._setSoft("x", p100);
-		this._setSoft("centerX", p100);
-
-		this._setSoft("y", p100);
-		this._setSoft("centerY", p100);
-
-		this._setSoft("paddingRight", 10);
-		this._setSoft("paddingBottom", 10);
+		this.set("layout", this._root.verticalLayout);
 
 		this.plusButton.setAll({
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
