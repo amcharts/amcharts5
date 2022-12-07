@@ -147,6 +147,7 @@ export class Root implements IDisposer {
 	 * A [[Container]] used to display tooltips in.
 	 */
 	public tooltipContainer!: Container
+	protected _tooltipContainerSettings!: { top: number, left: number, right: number, bottom: number };
 
 	public _tooltip!: Tooltip;
 
@@ -296,8 +297,6 @@ export class Root implements IDisposer {
 	protected _htmlElementContainer: HTMLDivElement | undefined;
 	protected _htmlEnabledContainers: Container[] = [];
 
-	public tooltipRoot?: Root;
-
 	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
 		if (!isReal) {
@@ -346,21 +345,7 @@ export class Root implements IDisposer {
 
 		const tooltipContainerBounds = settings.tooltipContainerBounds;
 		if (tooltipContainerBounds) {
-			let tooltipDiv: HTMLDivElement = document.createElement("div");
-			$utils.setInteractive(tooltipDiv, false);
-
-			let tooltipDivStyle = tooltipDiv.style;
-			tooltipDivStyle.position = "absolute";
-			tooltipDivStyle.top = -tooltipContainerBounds.top + "px";
-			tooltipDivStyle.left = -tooltipContainerBounds.left + "px";
-			tooltipDivStyle.width = "calc(100% + " + (tooltipContainerBounds.left + tooltipContainerBounds.right) + "px)";
-			tooltipDivStyle.height = "calc(100% + " + (tooltipContainerBounds.top + tooltipContainerBounds.bottom) + "px)";
-			tooltipDivStyle.zIndex = "1";
-			inner.appendChild(tooltipDiv);
-
-			this.tooltipRoot = new Root(tooltipDiv, {}, true);
-			this.tooltipRoot._init();
-			this.tooltipRoot.tooltipContainer.setAll({ x: tooltipContainerBounds.left, y: tooltipContainerBounds.top });
+			this._tooltipContainerSettings = tooltipContainerBounds;
 		}
 
 		this._inner = inner;
@@ -438,12 +423,7 @@ export class Root implements IDisposer {
 				})
 			}));
 
-			let tooltipRoot = this.tooltipRoot;
-			if (!tooltipRoot) {
-				tooltipRoot = this;
-			}
-
-			const tooltip = Tooltip.new(tooltipRoot, {
+			const tooltip = Tooltip.new(this, {
 				pointerOrientation: "horizontal",
 				paddingTop: 4,
 				paddingRight: 7,
@@ -1069,11 +1049,6 @@ export class Root implements IDisposer {
 				$utils.removeElement(this._inner);
 			}
 
-			var tooltipRoot = this.tooltipRoot;
-			if (tooltipRoot) {
-				tooltipRoot.dispose();
-			}
-
 			$array.remove(registry.rootElements, this);
 		}
 	}
@@ -1106,12 +1081,6 @@ export class Root implements IDisposer {
 	public setThemes(themes: Array<Theme>): void {
 		this._rootContainer.set("themes", themes);
 
-		const tooltipRoot = this.tooltipRoot;
-		if (tooltipRoot) {
-			tooltipRoot._rootContainer.set("themes", themes);
-			tooltipRoot.tooltipContainer._applyThemes();
-		}
-
 		// otherwise new themes are not applied
 		const tooltipContainer = this.tooltipContainer;
 		if (tooltipContainer) {
@@ -1129,15 +1098,17 @@ export class Root implements IDisposer {
 
 	protected _addTooltip() {
 		if (!this.tooltipContainer) {
-			const tooltipContainer = this._rootContainer.children.push(Container.new(this, { position: "absolute", isMeasured: false, width: p100, height: p100, layer: 30 }));
+			const tooltipContainer = this._rootContainer.children.push(Container.new(this, {
+				position: "absolute",
+				isMeasured: false,
+				width: p100,
+				height: p100,
+				layer: 30,
+				layerMargin: this._tooltipContainerSettings ? this._tooltipContainerSettings : undefined
+			}));
 			this.tooltipContainer = tooltipContainer;
 
-			let tooltipRoot = this.tooltipRoot;
-			if (!tooltipRoot) {
-				tooltipRoot = this;
-			}
-
-			const tooltip = Tooltip.new(tooltipRoot, {});
+			const tooltip = Tooltip.new(this, {});
 			this.container.set("tooltip", tooltip);
 			tooltip.hide(0);
 			this._tooltip = tooltip;

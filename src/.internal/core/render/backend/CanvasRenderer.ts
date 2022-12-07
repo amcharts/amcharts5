@@ -1,7 +1,7 @@
 /** @ignore *//** */
 
 import {
-	IRenderer, IContainer, IDisplayObject, IGraphics, IRendererEvents,
+	IRenderer, IContainer, IDisplayObject, IGraphics, IRendererEvents, IMargin,
 	IText, ITextStyle, IRadialText, IPicture, IRendererEvent, ILayer, ICanvasOptions, BlendMode, IPointerEvent, Id
 } from "./Renderer";
 import type { IBounds } from "../../util/IBounds";
@@ -324,16 +324,24 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		}
 	}
 
-	public setLayer(order: number | undefined, visible: boolean = true): void {
+	public setLayer(order: number | undefined, margin: IMargin | undefined): void {
 		if (order == null) {
 			this._layer = undefined;
 
 		} else {
+			const visible = true;
 			this._layer = this._renderer.getLayer(order, visible);
 			this._layer.visible = visible;
+			this._layer.margin = margin;
+			if (margin) {
+				$utils.setInteractive(this._layer.view, false);
+			}
+
 			if (this._parent) {
 				this._parent.registerChildLayer(this._layer);
 			}
+
+			this._renderer.resizeLayer(this._layer);
 		}
 	}
 
@@ -469,6 +477,27 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		);
 	}
 
+	public _transformMargin(context: CanvasRenderingContext2D, resolution: number, margin: IMargin): void {
+		const m = this._matrix;
+		context.setTransform(
+			m.a * resolution,
+			m.b * resolution,
+			m.c * resolution,
+			m.d * resolution,
+			(m.tx + margin.left) * resolution,
+			(m.ty + margin.top) * resolution
+		);
+	}
+
+	public _transformLayer(context: CanvasRenderingContext2D, resolution: number, layer: CanvasLayer): void {
+		if (layer.margin) {
+			this._transformMargin(context, layer.scale || resolution, layer.margin);
+
+		} else {
+			this._transform(context, layer.scale || resolution);
+		}
+	}
+
 	public render(parentLayer: CanvasLayer): void {
 		if (this.visible && (this.exportable !== false || !this._renderer._omitTainted)) {
 			this._setMatrix();
@@ -491,14 +520,14 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 					// We must apply the mask before we transform the element
 					if (mask) {
-						mask._transform(context, layer.scale || resolution);
+						mask._transformLayer(context, resolution, layer);
 						mask._runPath(context);
 						context.clip();
 					}
 
 					context.globalAlpha = this.compoundAlpha * this.alpha;
 
-					this._transform(context, layer.scale || resolution);
+					this._transformLayer(context, resolution, layer);
 
 					if (this.filter) {
 						context.filter = this.filter;
@@ -1574,7 +1603,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		// Other parameters
 		if (style.fill) {
 			if (style.fill instanceof Color) {
-				context.fillStyle = style.fill.toCSS();
+				context.fillStyle = style.fill.toCSS(style.fillOpacity != undefined ? style.fillOpacity : 1);
 			} else {
 				context.fillStyle = style.fill;
 			}
@@ -2294,6 +2323,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 export class CanvasTextStyle implements ITextStyle {
 	//public wordWrapWidth: number = 100;
 	public fill?: Color | CanvasGradient | CanvasPattern;
+	public fillOpacity?: number;
 	public textAlign?: "start" | "end" | "left" | "right" | "center";
 	public fontFamily?: string;
 	public fontSize?: string | number;
@@ -3231,6 +3261,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return new CanvasImage(this, image);
 	}
 
+	resizeLayer(layer: CanvasLayer) {
+		layer.dirty = true;
+		layer.resize(this._clientWidth, this._clientHeight, this.resolution);
+	}
+
 	resize(width: number, height: number): void {
 		this._clientWidth = width;
 		this._clientHeight = height;
@@ -3239,25 +3274,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
-				layer.dirty = true;
-
-				if (layer.width != null) {
-					layer.view.width = layer.width;
-					layer.view.style.width = layer.width + "px";
-				}
-				else {
-					layer.view.width = this._width;
-					layer.view.style.width = width + "px";
-				}
-
-				if (layer.height != null) {
-					layer.view.height = layer.height;
-					layer.view.style.height = layer.height + "px";
-				}
-				else {
-					layer.view.height = this._height;
-					layer.view.style.height = height + "px";
-				}
+				this.resizeLayer(layer);
 			}
 		});
 
@@ -3274,16 +3291,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	private createDetachedLayer(willReadFrequently: boolean = false): CanvasLayer {
 		const view = document.createElement("canvas");
 		const context = view.getContext("2d", { willReadFrequently: willReadFrequently })! as CanvasRenderingContext2D;
-		const layer = {
-			view: view,
-			context: context,
-			order: 0,
-			visible: true,
-			width: undefined,
-			height: undefined,
-			dirty: true,
-			tainted: false
-		};
+
+		const layer = new CanvasLayer(view, context);
 
 		view.style.position = "absolute";
 		view.style.top = "0px";
@@ -3366,12 +3375,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		$array.each(this.layers, (layer) => {
 			if (layer) {
 				if (layer.dirty && layer.visible) {
-					const context = layer.context;
-
 					this._dirtyLayers.push(layer);
-
-					context.save();
-					context.clearRect(0, 0, this._width, this._height);
+					layer.clear();
 				}
 			}
 		});
@@ -4061,14 +4066,64 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 }
 
+
 /**
  * @ignore
  */
-export interface CanvasLayer extends ILayer {
-	view: HTMLCanvasElement;
-	context: CanvasRenderingContext2D;
-	tainted?: boolean;
-	exportableView?: HTMLCanvasElement;
-	exportableContext?: CanvasRenderingContext2D;
-	scale?: number;
+export class CanvasLayer implements ILayer {
+	public view: HTMLCanvasElement;
+	public context: CanvasRenderingContext2D;
+	public tainted: boolean = true;
+	public margin: IMargin | undefined;
+	public order: number = 0;
+	public visible: boolean = true;
+	public width: number | undefined;
+	public height: number | undefined;
+	public scale: number | undefined;
+	public dirty: boolean = true;
+	public exportableView: HTMLCanvasElement | undefined;
+	public exportableContext: CanvasRenderingContext2D | undefined;
+
+	private _width: number = 0;
+	private _height: number = 0;
+
+	constructor(view: HTMLCanvasElement, context: CanvasRenderingContext2D) {
+		this.view = view;
+		this.context = context;
+	}
+
+	resize(width: number, height: number, resolution: number) {
+		if (this.width != null) {
+			width = this.width;
+		}
+
+		if (this.height != null) {
+			height = this.height;
+		}
+
+		if (this.margin) {
+			width += (this.margin.left + this.margin.right);
+			height += (this.margin.top + this.margin.bottom);
+			this.view.style.left = -this.margin.left + "px";
+			this.view.style.top = -this.margin.top + "px";
+
+		} else {
+			this.view.style.left = "";
+			this.view.style.top = "";
+		}
+
+		this._width = Math.floor(width * resolution);
+		this._height = Math.floor(height * resolution);
+
+		this.view.width = this._width;
+		this.view.style.width = width + "px";
+
+		this.view.height = this._height;
+		this.view.style.height = height + "px";
+	}
+
+	clear() {
+		this.context.save();
+		this.context.clearRect(0, 0, this._width, this._height);
+	}
 }

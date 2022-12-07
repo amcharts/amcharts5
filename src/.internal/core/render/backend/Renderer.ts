@@ -110,7 +110,7 @@ export interface IDisplayObject extends IDisposer {
 
 	_setMatrix(): void;
 	getLayer(): ILayer;
-	setLayer(order: number | undefined): void;
+	setLayer(order: number | undefined, margin: IMargin | undefined): void;
 	markDirtyLayer(deep?: boolean): void;
 	clear(): void;
 	invalidateBounds(): void;
@@ -130,7 +130,7 @@ export interface IDisplayObject extends IDisposer {
 
 export interface IContainer extends IDisplayObject {
 	interactiveChildren: boolean;
-	_renderer:IRenderer;	
+	_renderer:IRenderer;
 	addChild(child: IDisplayObject): void;
 	addChildAt(child: IDisplayObject, index: number): void;
 	removeChild(child: IDisplayObject): void;
@@ -293,6 +293,13 @@ export interface ICanvasOptions {
 	maxHeight?: number;
 }
 
+export interface IMargin {
+	left: number;
+	right: number;
+	top: number;
+	bottom: number;
+}
+
 /**
  * @ignore
  */
@@ -302,4 +309,5 @@ export interface ILayer {
 	width: number | undefined;
 	height: number | undefined;
 	dirty: boolean;
+	margin: IMargin | undefined;
 }

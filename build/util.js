@@ -8,7 +8,12 @@ function posixPath(path) {
 	return path.replace(/\\/g, $path.posix.sep);
 }
 
+function splitPath(path) {
+	return path.split(/[\/\\]/g);
+}
+
 exports.posixPath = posixPath;
+exports.splitPath = splitPath;
 
 
 function removeTypeScriptTypes(template) {
@@ -56,6 +61,20 @@ function mapFiles(from, to, f) {
 exports.removeTypeScriptTypes = removeTypeScriptTypes;
 exports.geodataToScript = geodataToScript;
 exports.mapFiles = mapFiles;
+
+
+async function eachFileRecursive(from, f) {
+	const files = await readdir(from);
+
+	if (files === null) {
+		await f(from);
+
+	} else {
+		await Promise.all(files.map((file) => eachFileRecursive($path.join(from, file), f)));
+	}
+}
+
+exports.eachFileRecursive = eachFileRecursive;
 
 
 function webpack(config) {

@@ -23,6 +23,14 @@ export interface ILabelSettings extends IContainerSettings {
 	fill?: Color;
 
 	/**
+	 * Text opacity.
+	 *
+	 * @default 1
+	 * @ince 5.2.39
+	 */
+	fillOpacity?: number;
+
+	/**
 	 * Alignment.
 	 */
 	textAlign?: "start" | "end" | "left" | "right" | "center";
@@ -225,6 +233,7 @@ export class Label extends Container {
 	protected _textKeys: Array<string> = [
 		"text",
 		"fill",
+		"fillOpacity",
 		"textAlign",
 		"fontFamily",
 		"fontSize",

@@ -252,13 +252,15 @@ export abstract class MapSeries extends Series {
 			const geodataNames = this.get("geodataNames");
 			if (features) {
 
+				const idField = this.get("idField", "id");
+
 				for (let i = 0, len = features.length; i < len; i++) {
 					let feature: any = features[i];
 					let geometry: any = feature.geometry;
 
 					if (geometry) {
 						let type = geometry.type;
-						let id: string = feature.id;
+						let id: string = feature[idField];
 
 						if (geodataNames && geodataNames[id]) {
 							feature.properties.name = geodataNames[id];
@@ -286,7 +288,8 @@ export abstract class MapSeries extends Series {
 
 							// create one if not found
 							if (!dataItem) {
-								dataObject = { geometry: geometry, geometryType: type, id: id, madeFromGeoData: true };
+								dataObject = { geometry: geometry, geometryType: type, madeFromGeoData: true };
+								dataObject[idField] = id;
 								this.data.push(dataObject);
 							}
 							// in case found

@@ -661,12 +661,14 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		let global = this.gridContainer._display.toGlobal({ x: 0, y: 0 });
+		const gridContainer = this.gridContainer;
+		const topGridContainer = this.topGridContainer;
+		let global = gridContainer._display.toGlobal({ x: 0, y: 0 });
 		this._crispX = global.x - Math.round(global.x);
 		this._crispY = global.y - Math.round(global.y);
 
-		this.set("dx", this._crispX);
-		this.set("dy", this._crispY);
+		gridContainer.setAll({ dx: this._crispX, dy: this._crispY });
+		topGridContainer.setAll({ dx: this._crispX, dy: this._crispY });
 
 		if (this.get("fixAxisSize")) {
 			this.ghostLabel.set("visible", true);

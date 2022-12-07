@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.39] - 2022-12-07
+
+### Added
+- `fillOpacity` setting added to `Label`.
+
+### Changed
+- The whole under-the-hood implementation of the `Root`'s setting `tooltipContainerBounds`. The change should be transparent, but please inform us if the functionality broke in some way.
+
+### Fixed
+- `GraticuleSeries` was not being redrawn if its `clipExtent` was being set after series was already rendered.
+- `idField` was not being respected in some cases in a `MapSeries`.
+- `MapPointSeries` was not setting map bounds properly if it did not contain any geometries (just points with lat/long).
+- `keepTargetHover` on a `Tooltip` was not working when `tooltipContainerBounds` was used in `Root`.
+
+
 ## [5.2.38] - 2022-11-29
 
 ### Added

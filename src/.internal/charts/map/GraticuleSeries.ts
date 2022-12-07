@@ -57,6 +57,7 @@ export class GraticuleSeries extends MapLineSeries {
 						this._generate();
 					})
 				}
+				this._generate();
 			}
 		}
 	}

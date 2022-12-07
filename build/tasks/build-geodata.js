@@ -1,12 +1,12 @@
 const $path = require("path");
-const { mkdir, cp, rm, tsc, readdir, readFile, writeFile, geodataToScript, mapFiles } = require("../util");
+const { mkdir, cp, rm, tsc, readdir, readFile, writeFile, geodataToScript, mapFiles, eachFileRecursive, splitPath, posixPath } = require("../util");
 
 
 async function generateJson(from, to_es2015, to_script) {
 	const files = await readdir(from);
 
 	if (files === null) {
-		if ($path.extname(from) === ".js") {
+		if ($path.extname(from) === ".js" && $path.basename(from) !== "index.js") {
 			const file = await readFile(from);
 
 			const a = /var [a-zA-Z0-9_]+ = (\{[\s\S]+\});[ \n\r]+export default [a-zA-Z0-9_]+;[ \n\r]*$/.exec(file);
@@ -34,6 +34,49 @@ async function generateJson(from, to_es2015, to_script) {
 }
 
 
+async function getMapFiles(dir) {
+	const files = [];
+
+	await eachFileRecursive(dir, (path) => {
+		if ($path.extname(path) === ".js") {
+			const file = $path.relative(dir, path);
+
+			if (file !== "index.js") {
+				const segments = splitPath(file);
+
+				if (segments.length === 1 || segments[0] === "region") {
+					files.push(posixPath(file).replace(/\.js$/, ""));
+				}
+			}
+		}
+	});
+
+	return files;
+}
+
+async function generateIndex(dir, output, ts) {
+	const files = await getMapFiles(dir);
+
+	await Promise.all([
+		writeFile(ts, `
+export function loadMap(name: string): Promise<GeoJSON.FeatureCollection>;
+`),
+
+		writeFile(output, `
+export function loadMap(name) {
+	switch (name) {
+	${files.map((x) => {
+		return `case "${x}": return import("./${x}.js").then(function (x) { return x.default; });`
+	}).join("\n\t")}
+	default:
+		throw new Error("Could not find map " + name);
+	}
+}
+`),
+	]);
+}
+
+
 module.exports = async (state) => {
 	const output = state.path("dist", "geodata");
 
@@ -50,11 +93,19 @@ module.exports = async (state) => {
 		return geodataToScript(name, file);
 	});
 
-	await generateJson(
-		state.path("dist", "geodata", "es2015"),
-		state.path("dist", "geodata", "es2015", "json"),
-		state.path("dist", "geodata", "script", "json"),
-	);
+	await Promise.all([
+		generateJson(
+			state.path("dist", "geodata", "es2015"),
+			state.path("dist", "geodata", "es2015", "json"),
+			state.path("dist", "geodata", "script", "json"),
+		),
+
+		generateIndex(
+			state.path("dist", "geodata", "es2015"),
+			state.path("dist", "geodata", "es2015", "index.js"),
+			state.path("dist", "geodata", "es2015", "index.d.ts"),
+		),
+	]);
 
 	await cp(state.path("packages", "shared"), state.path("dist", "geodata", "es2015"));
 	await cp(state.path("packages", "geodata"), state.path("dist", "geodata", "es2015"));

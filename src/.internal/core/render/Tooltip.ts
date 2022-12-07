@@ -148,10 +148,6 @@ export class Tooltip extends Container {
 
 	constructor(root: Root, settings: Entity["_settings"], isReal: boolean, templates: Array<Template<Entity>> = []) {
 		super(root, settings, isReal, templates);
-		var tooltipRoot = root.tooltipRoot;
-		if (tooltipRoot) {
-			this._root = tooltipRoot;
-		}
 	}
 
 	protected _afterNew() {

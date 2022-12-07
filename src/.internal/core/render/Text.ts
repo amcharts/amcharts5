@@ -19,6 +19,7 @@ import * as $array from "../util/Array";
 export interface ITextSettings extends ISpriteSettings {
 	text?: string;
 	fill?: Color;
+	fillOpacity?: number;
 	textAlign?: "start" | "end" | "left" | "right" | "center";
 	fontFamily?: string;
 	fontSize?: string | number;
@@ -181,6 +182,13 @@ export class Text extends Sprite {
 			let fill = this.get("fill");
 			if (fill) {
 				textStyle.fill = fill;
+			}
+		}
+
+		if (this.isDirty("fillOpacity")) {
+			let fillOpacity = this.get("fillOpacity", 1);
+			if (fillOpacity) {
+				textStyle.fillOpacity = fillOpacity;
 			}
 		}
 

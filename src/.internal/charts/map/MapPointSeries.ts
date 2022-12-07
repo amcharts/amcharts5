@@ -177,9 +177,10 @@ export class MapPointSeries extends MapSeries {
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
-		const geometry = dataItem.get("geometry");
+		let geometry = dataItem.get("geometry");
 		if (!geometry) {
-			dataItem.set("geometry", { type: "Point", coordinates: [dataItem.get("longitude", 0), dataItem.get("latitude", 0)] });
+			geometry = { type: "Point", coordinates: [dataItem.get("longitude", 0), dataItem.get("latitude", 0)] };
+			dataItem.set("geometry", geometry);			
 		}
 		else {
 			if (geometry.type == "Point") {

@@ -1,4 +1,4 @@
-import type { IDisplayObject, IRendererEvents, IRendererEvent, IPointerEvent } from "./backend/Renderer";
+import type { IDisplayObject, IRendererEvents, IRendererEvent, IPointerEvent, IMargin } from "./backend/Renderer";
 import type { IBounds } from "../util/IBounds";
 import type { Container } from "./Container";
 import type { IAccessibilitySettings } from "../util/Accessibility";
@@ -455,6 +455,15 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * If not set, will inherit layer from its ascendants.
 	 */
 	layer?: number;
+
+	/**
+	 * Margins for the layer.
+	 *
+	 * Can be used to make the layer larger/or smaller than default chart size.
+	 *
+	 * @since @5.2.39
+	 */
+	layerMargin?: IMargin;
 
 	/**
 	 * If set to `true` the element will be hidden regardless of `visible` or
@@ -948,8 +957,8 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		if (this.isDirty("layer")) {
-			this._display.setLayer(this.get("layer"));
+		if (this.isDirty("layer") || this.isDirty("layerMargin")) {
+			this._display.setLayer(this.get("layer"), this.get("layerMargin"));
 			this.markDirtyLayer();
 		}
 
@@ -2209,7 +2218,7 @@ export abstract class Sprite extends Entity {
 	/**
 	 * Returns `false` if if either public or private setting `visible` is set
 	 * to `false`, or `forceHidden` is set to `true`.
-	 * 
+	 *
 	 * @return Visible?
 	 */
 	public isVisible(): boolean {
@@ -2231,7 +2240,7 @@ export abstract class Sprite extends Entity {
 
 	/**
 	 * Returns an actual opacity of the element, taking into account all parents.
-	 * 
+	 *
 	 * @return Opacity
 	 * @since 5.2.11
 	 */
