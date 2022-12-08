@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.41] - 2022-12-08
+
+### Fixed
+- Canvas left/top position was not set correctly (since 5.2.39).
+- `Root`'s setting `tooltipContainerBounds` was not positioning itself outside of the chart if there was space in the chart itself (since 5.2.39).
+
+
 ## [5.2.40] - 2022-12-08
 
 ### Fixed

@@ -4108,8 +4108,8 @@ export class CanvasLayer implements ILayer {
 			this.view.style.top = -this.margin.top + "px";
 
 		} else {
-			this.view.style.left = "";
-			this.view.style.top = "";
+			this.view.style.left = "0px";
+			this.view.style.top = "0px";
 		}
 
 		this._width = Math.floor(width * resolution);

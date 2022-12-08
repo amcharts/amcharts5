@@ -382,6 +382,14 @@ export class Tooltip extends Container {
 			if (tooltipContainer) {
 				xx = tooltipContainer.x();
 				yy = tooltipContainer.y();
+
+				const layerMargin = tooltipContainer.get("layerMargin");
+				if (layerMargin) {
+					xx += layerMargin.left || 0;
+					yy += layerMargin.top || 0;
+					parentW += (layerMargin.left || 0) + (layerMargin.right || 0);
+					parentH += (layerMargin.top || 0) + (layerMargin.bottom || 0);
+				}
 			}
 
 			const bounds = this.get("bounds", { left: -xx, top: -yy, right: parentW - xx, bottom: parentH - yy });
