@@ -8,6 +8,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 
+## [5.1.0] - 2022-12-07
+
+### Changed
+- Internal reorganization. No user-facing changes.
+
+
 ## [5.0.6] - 2022-10-19
 
 ### Fixed

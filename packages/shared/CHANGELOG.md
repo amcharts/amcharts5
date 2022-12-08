@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.40] - 2022-12-08
+
+### Fixed
+- `Root`'s setting `tooltipContainerBounds` was being ignored on an `XYChart` (since 5.2.39).
+- HTML content was clipped to chart's dimensions even if `tooltipContainerBounds` was used.
+
+
 ## [5.2.39] - 2022-12-07
 
 ### Added

@@ -497,7 +497,9 @@ export class Root implements IDisposer {
 		this._htmlElementContainer.className = "am5-html-container";
 		this._htmlElementContainer.style.position = "absolute";
 		this._htmlElementContainer.style.pointerEvents = "none";
-		this._htmlElementContainer.style.overflow = "hidden";
+		if (!this._tooltipContainerSettings) {
+			this._htmlElementContainer.style.overflow = "hidden";
+		}
 		this._inner.appendChild(this._htmlElementContainer);
 
 		// Create element which is used to make announcements to screen reader
@@ -1103,7 +1105,7 @@ export class Root implements IDisposer {
 				isMeasured: false,
 				width: p100,
 				height: p100,
-				layer: 30,
+				layer: this._tooltipContainerSettings ? 35 : 30,
 				layerMargin: this._tooltipContainerSettings ? this._tooltipContainerSettings : undefined
 			}));
 			this.tooltipContainer = tooltipContainer;
