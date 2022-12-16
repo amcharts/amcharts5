@@ -710,6 +710,11 @@ export abstract class Hierarchy extends Series {
 			dataItem.get("node").show(duration);
 		}
 
+		const topDepth = this.get("topDepth", 0);
+		if (depth < topDepth) {
+			dataItem.get("node").hide(0);
+		}
+
 		if (depth == 0) {
 			const upDepth = this.get("upDepth", Infinity);
 			let parent = dataItem;

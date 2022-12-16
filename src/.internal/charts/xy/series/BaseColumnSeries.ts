@@ -282,7 +282,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 		else {
 			this._skipped = true;
 		}
-		this.updateLegendMarker();
+		this.updateLegendMarker(this.get("tooltipDataItem"));
 		super._updateChildren();
 	}
 

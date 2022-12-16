@@ -1096,7 +1096,8 @@ export class XYChart extends SerialChart {
 					series.showDataItemTooltip(closestItem);
 					const point = closestItem.get("point");
 					if (point) {
-						cursor.handleMove(series.toGlobal(point), true);
+						// removing x and y to solve #72225
+						cursor.handleMove(series.toGlobal({ x: point.x - series.x(), y: point.y - series.y() }), true);
 					}
 				}
 			}

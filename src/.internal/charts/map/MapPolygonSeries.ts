@@ -23,11 +23,14 @@ export interface IMapPolygonSeriesDataItem extends IMapSeriesDataItem {
 	 * GeoJSON geometry of the polygon.
 	 */
 	geometry?: GeoJSON.Polygon | GeoJSON.MultiPolygon;
-
 }
 
 export interface IMapPolygonSeriesSettings extends IMapSeriesSettings {
-
+	/**
+	 * @todo review
+	 * @default false
+	 */
+	reverseGeodata?: boolean;
 }
 
 /**
@@ -101,9 +104,24 @@ export class MapPolygonSeries extends MapSeries {
 		}
 
 		dataItem.set("mapPolygon", mapPolygon);
-		const geometry = dataItem.get("geometry")!;
+		let geometry = dataItem.get("geometry")!;
 
 		if (geometry) {
+			if (this.get("reverseGeodata")) {
+				const coordinates = geometry.coordinates;
+				if (coordinates) {
+					for (let x = 0; x < geometry.coordinates.length; x++) {
+						if (geometry.type == "MultiPolygon") {
+							for (let y = 0; y < geometry.coordinates[x].length; y++) {
+								geometry.coordinates[x][y].reverse()
+							}
+						}
+						else {
+							geometry.coordinates[x].reverse()
+						}
+					}
+				}
+			}
 			mapPolygon.set("geometry", geometry);
 		}
 
@@ -167,7 +185,7 @@ export class MapPolygonSeries extends MapSeries {
 		if (mapPolygon) {
 			mapPolygon.setPrivate("visible", true);
 		}
-	}	
+	}
 
 	/**
 	 * Forces a repaint of the element which relies on data.

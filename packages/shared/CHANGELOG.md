@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.42] - 2022-12-16
+
+### Added
+- `reverseGeodata` setting added to `MapPolygonSeries`. If set to `true`, will reverse direction of polygon corners in GeoJSON.
+- `linechanged` event added to MapLine.
+
+### Fixed
+- If a chart had multiple vertically stacked Y axes and `snapToSeries` was set, moving mouse to series in the bottom could cause chart cursor to disappear.
+- A legend label for a `ZigZag` indicator was showning "NaN" instead of its `depth` value.
+- Hierarchy series' `topDepth` setting was not working properly if set to `>1`.
+- If a `Sprite` was hidden, it hid it's tooltip even if the tooltip at the moment was used by other element. This caused some wrong behavior with Axis tooltips, as all axis elements share the same tooltip.
+- If a `MapLine` was changed and some `MapPoint` was assigned to this line, `MapPoint` was not always updating its position.
+- Map with `geoAlbersUsa` projection was not working if `GraticuleSeries` was added to it.
+- `MapLine` was showing tooltips in a wrong position (in case lines were not straight).
+- `PeriodSelector` was not properly zooming whe data grouping was enabled.
+
+
 ## [5.2.41] - 2022-12-08
 
 ### Fixed

@@ -147,6 +147,10 @@ export interface IXYCursorPrivate extends IContainerPrivate {
 	 */
 	downPositionY?: number;
 
+	/**
+	 * Last global point to which cursor moved
+	 */
+	lastPoint?: IPoint;
 }
 
 export interface IXYCursorEvents extends IContainerEvents {
@@ -605,6 +609,7 @@ export class XYCursor extends Container {
 			}
 
 			this._lastPoint = rootPoint;
+			this.setPrivate("lastPoint", rootPoint);
 
 			this.handleMove({ x: rootPoint.x, y: rootPoint.y });
 		}

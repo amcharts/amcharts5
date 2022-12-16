@@ -11,6 +11,7 @@ import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
 import type { Animation } from "../../core/util/Entity";
+import type { IDisposer } from "../../core/util/Disposer";
 
 export interface IMapPointSeriesPrivate extends IMapSeriesPrivate {
 }
@@ -150,6 +151,8 @@ export class MapPointSeries extends MapSeries {
 
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = ["Point", "MultiPoint"];
 
+	protected _lineChangedDp?: IDisposer;
+
 	protected _afterNew() {
 		this.fields.push("polygonId", "lineId", "longitude", "latitude", "fixed");
 		super._afterNew();
@@ -180,7 +183,7 @@ export class MapPointSeries extends MapSeries {
 		let geometry = dataItem.get("geometry");
 		if (!geometry) {
 			geometry = { type: "Point", coordinates: [dataItem.get("longitude", 0), dataItem.get("latitude", 0)] };
-			dataItem.set("geometry", geometry);			
+			dataItem.set("geometry", geometry);
 		}
 		else {
 			if (geometry.type == "Point") {
@@ -278,6 +281,15 @@ export class MapPointSeries extends MapSeries {
 				}
 			}
 
+			if (this._lineChangedDp) {
+				this._lineChangedDp.dispose();
+			}
+
+			if (line) {
+				this._lineChangedDp = line.events.on("linechanged", () => {
+					this._positionBullets(dataItem);
+				})
+			}
 
 			const polygonDataItem = dataItem.get("polygonDataItem");
 			let polygon: MapPolygon | undefined;

@@ -1789,11 +1789,13 @@ export abstract class Sprite extends Entity {
 	 */
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
-		if (tooltip) {
-			let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
-			const promise = tooltip.hide(timeout);
-			this.setPrivateRaw("showingTooltip", false);
-			return promise;
+		if (tooltip) {			
+			if(tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this)){
+				let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
+				const promise = tooltip.hide(timeout);
+				this.setPrivateRaw("showingTooltip", false);
+				return promise;
+			}
 		}
 	}
 

@@ -1,9 +1,11 @@
 import type { MapLineSeries, IMapLineSeriesDataItem } from "./MapLineSeries";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { DataItem } from "../../core/render/Component";
+import type { IPoint } from "../../core/util/IPoint";
+import * as $type from "../../core/util/Type";
+import { Percent } from "../../core/util/Percent";
 
-
-import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
+import { Graphics, IGraphicsSettings, IGraphicsPrivate, IGraphicsEvents } from "../../core/render/Graphics";
 import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
 
 export interface IMapLineSettings extends IGraphicsSettings {
@@ -26,7 +28,14 @@ export interface IMapLinePrivate extends IGraphicsPrivate {
 	 * @ignore
 	 */
 	series: MapLineSeries;
+}
 
+export interface IMapLineEvents extends IGraphicsEvents {
+
+	/**
+	 * Invoked when line is redrawn
+	 */
+	linechanged: {};
 }
 
 /**
@@ -36,6 +45,7 @@ export class MapLine extends Graphics {
 
 	declare public _settings: IMapLineSettings;
 	declare public _privateSettings: IMapLinePrivate;
+	declare public _events: IMapLineEvents;
 
 	public static className: string = "MapLine";
 	public static classNames: Array<string> = Graphics.classNames.concat([MapLine.className]);
@@ -54,7 +64,7 @@ export class MapLine extends Graphics {
 						const projection = chart.get("projection");
 						let clipAngle: number | null = null;
 
-						if (projection) {
+						if (projection && projection.clipAngle) {
 							clipAngle = projection.clipAngle();
 							projection.precision(this.get("precision", 0.5));
 						}
@@ -108,7 +118,7 @@ export class MapLine extends Graphics {
 									geoPath(geometry);
 									geoPath.context(null);
 
-									if (projection) {
+									if (projection && projection.clipAngle) {
 										projection.clipAngle(clipAngle as any);
 									}
 								})
@@ -116,6 +126,10 @@ export class MapLine extends Graphics {
 						}
 					}
 				}
+			}
+			const type = "linechanged";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this });
 			}
 		}
 	}
@@ -131,6 +145,37 @@ export class MapLine extends Graphics {
 	public _clearDirty() {
 		super._clearDirty();
 		this._projectionDirty = false;
+	}
+
+	public _getTooltipPoint(): IPoint {
+		let tooltipX = this.get("tooltipX");
+		let tooltipY = this.get("tooltipY");
+
+		let x = 0;
+		let y = 0;
+
+		if ($type.isNumber(tooltipX)) {
+			x = tooltipX;
+		}
+
+		if ($type.isNumber(tooltipY)) {
+			y = tooltipY;
+		}
+
+		if (tooltipX instanceof Percent) {
+			const geoPoint = this.positionToGeoPoint(tooltipX.value)
+			const series = this.getPrivate("series");
+			if (series) {
+				const chart = series.chart;
+				if (chart) {
+					const point = chart.convert(geoPoint);
+					x = point.x;
+					y = point.y;
+				}
+			}
+		}
+		
+		return { x, y };
 	}
 
 	/**

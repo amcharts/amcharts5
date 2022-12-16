@@ -1311,7 +1311,9 @@ export abstract class XYSeries extends Series {
 			this._markStakedDirtyStack();
 
 			//this.updateLegendMarker(undefined); // causes legend marker to change color instantly when on
-			this.updateLegendValue(undefined);
+			if(!this.get("tooltipDataItem")){
+				this.updateLegendValue(undefined);
+			}
 		}
 
 		if (this.isDirty("vcx") || this.isDirty("vcy")) {

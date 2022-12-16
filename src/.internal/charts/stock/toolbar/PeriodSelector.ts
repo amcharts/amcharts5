@@ -168,6 +168,8 @@ export class PeriodSelector extends StockControl {
 						if (endTime != null) {
 							// round to the future interval
 							end = $time.round(new Date(endTime), interval.timeUnit, interval.count);
+							end.setTime(end.getTime() + $time.getDuration(interval.timeUnit, interval.count * 1.05));
+							end = $time.round(end, interval.timeUnit, interval.count);
 						}
 
 						start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
