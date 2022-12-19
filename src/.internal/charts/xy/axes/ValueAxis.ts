@@ -621,6 +621,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			// do not change to setPrivate, will cause SO
 			this.setPrivateRaw("selectionMin", selectionMin);
 			this.setPrivateRaw("selectionMax", selectionMax);
+
 			this.setPrivateRaw("step", step);
 		}
 	}
@@ -1068,8 +1069,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 
-			let start = this.valueToFinalPosition(selectionMin);
-			let end = this.valueToFinalPosition(selectionMax);
+			let len = Math.ceil(Math.log(this.getPrivate("maxZoomFactor", 100) + 1) / Math.LN10) + 2;
+
+			let start = $math.round(this.valueToFinalPosition(selectionMin), len);
+			let end = $math.round(this.valueToFinalPosition(selectionMax), len);
 
 			this.setPrivateRaw("selectionMinFinal", selectionMin);
 			this.setPrivateRaw("selectionMaxFinal", selectionMax);
@@ -1301,7 +1304,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			max = minMaxStep.max;
 		}
 
-		this.setPrivateRaw("maxZoomFactor", (max - min) / minDiff * this.get("maxZoomFactor", 100));
+		this.setPrivateRaw("maxZoomFactor", Math.max(1, Math.ceil((max - min) / minDiff * this.get("maxZoomFactor", 100))));
+		this._fixZoomFactor();
 
 		if (this.get("logarithmic")) {
 			this._minLogAdjusted = min;
@@ -1327,6 +1331,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this.animatePrivate({ key: "max", to: max, duration, easing });
 			}
 		}
+	}
+
+	protected _fixZoomFactor() {
 	}
 
 	protected _getDelta(max: number) {

@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.43] - 2022-12-19
+
+### Added
+- An event `groupintervalchanged` added to `DateAxis`. Kicks in when data grouping is on, and current group interval changes, e.g. via zooming the chart.
+
+### Fixed
+- Setting `min` and `max` on a `DateAxis` which was not base axis of a series could result in a stack overflow error in some specific cases.
+- `PeriodSelector` was not always highlighting the period button when period was selected via `selectPeriod()` method.
+- `PeriodSelector` was not selecting proper start position on some platforms when data grouping was on and `selectPeriod()` was called immediately after initialization of the chart.
+
+
 ## [5.2.42] - 2022-12-16
 
 ### Added

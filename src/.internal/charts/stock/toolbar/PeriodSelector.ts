@@ -59,6 +59,9 @@ export class PeriodSelector extends StockControl {
 	declare public _privateSettings: IPeriodSelectorPrivate;
 	declare public _events: IPeriodSelectorEvents;
 
+	protected _groupChangedDp: IDisposer | undefined;
+	protected _groupChangedTo: IDisposer | undefined;
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -137,6 +140,7 @@ export class PeriodSelector extends StockControl {
 	}
 
 	public selectPeriod(period: IPeriod): void {
+		this._highlightPeriod(period);
 		if (period.timeUnit == "max") {
 			this._getChart().zoomOut();
 		}
@@ -173,10 +177,27 @@ export class PeriodSelector extends StockControl {
 						}
 
 						start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
-						axis.zoomToDates(start, end, 0);
-						setTimeout(() => {
+
+						if (this._groupChangedDp) {
+							this._groupChangedDp.dispose();
+							this._groupChangedDp = undefined;
+						}
+
+						if (this._groupChangedTo) {
+							this._groupChangedTo.dispose();
+						}
+
+						this._groupChangedDp = axis.events.once("groupintervalchanged", () => {
 							axis.zoomToDates(start, end, 0);
-						}, 10);
+						});
+						axis.zoomToDates(start, end, 0);
+
+						this._groupChangedTo = this.setTimeout(() => {
+							if (this._groupChangedDp) {
+								this._groupChangedDp.dispose();
+							}
+							this._groupChangedTo = undefined;
+						}, 500);
 
 						return;
 					}
@@ -186,14 +207,13 @@ export class PeriodSelector extends StockControl {
 			}
 			axis.zoomToDates(start, end);
 		}
-		this._highlightPeriod(period);
 	}
 
 	protected _highlightPeriod(period: IPeriod): void {
 		const id = period.timeUnit + (period.count || "");
 		const container = this.getPrivate("label")!;
 		const buttons = container.getElementsByTagName("a");
-		for(let i = 0; i < buttons.length; i++) {
+		for (let i = 0; i < buttons.length; i++) {
 			const button = buttons[i];
 			if (button.getAttribute("data-period") == id) {
 				$utils.addClass(button, "am5stock-active");

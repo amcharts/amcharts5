@@ -149,6 +149,14 @@ export interface IDateAxisPrivate extends IValueAxisPrivate {
 }
 
 export interface IDateAxisEvents extends IValueAxisEvents {
+
+	/**
+	 * Kicks in when data grouping is on, and current group interval changes, e.g. via zooming the chart.
+	 *
+	 * @since 5.2.43
+	 */
+	groupintervalchanged: {}
+
 }
 
 /**
@@ -191,7 +199,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	protected _fixZoomFactor() {
 		var maxZoomFactor = this.get("maxZoomFactor");
-		if (maxZoomFactor != null) {
+		if (maxZoomFactor != null && maxZoomFactor != Infinity) {
 			this.setPrivateRaw("maxZoomFactor", maxZoomFactor);
 		}
 		else {
@@ -511,15 +519,23 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					this.setPrivateRaw("groupInterval", groupInterval);
 					this._setBaseInterval(groupInterval)
 
-					if (groupInterval) {
-						let newId = groupInterval.timeUnit + groupInterval.count;
-						$array.each(this.series, (series) => {
-							if (series.get("baseAxis") === this) {
-								series.setDataSet(newId);
+
+					let newId = groupInterval.timeUnit + groupInterval.count;
+					$array.each(this.series, (series) => {
+						if (series.get("baseAxis") === this) {
+							series.setDataSet(newId);
+						}
+					})
+					this.markDirtyExtremes();
+
+					this._root.events.once("frameended", () => {
+						this._root.events.once("frameended", () => {
+							const type = "groupintervalchanged";
+							if (this.events.isEnabled(type)) {
+								this.events.dispatch(type, { type: type, target: this });
 							}
 						})
-						this.markDirtyExtremes();
-					}
+					})
 				}
 			}
 
