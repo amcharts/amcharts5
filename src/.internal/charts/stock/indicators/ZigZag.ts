@@ -93,7 +93,7 @@ export class ZigZag extends Indicator {
 	 */
 	public prepareData() {
 		if (this.series) {
-			const deviation = 0.05//this.get("deviation", 5) / 100;
+			const deviation = this.get("deviation", 5) / 100;
 			const stockSeries = this.get("stockSeries");
 			const data: Array<any> = [];
 			if (stockSeries) {

@@ -68,6 +68,7 @@ export interface ILegendItem extends Entity {
 	hide?: () => void;
 	createLegendMarker?: () => {}
 	component?: Series;
+	updateLegendValue?: () => {}
 	// how to define that properties of dataItem should have legendDataItem?
 }
 
@@ -393,6 +394,10 @@ export class Legend extends Series {
 				}
 				return 0;
 			});
+
+			if (item && item.updateLegendValue) {
+				item.updateLegendValue();
+			}
 		}
 
 	}

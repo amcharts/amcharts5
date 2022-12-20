@@ -1989,6 +1989,14 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
+	public hideTooltip(): Promise<void> | undefined {
+		const tooltip = this.get("tooltip");
+		if(tooltip){
+			tooltip.set("tooltipTarget", this);
+		}
+		return super.hideTooltip();
+	}	
+
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
 		if (this.get("seriesTooltipTarget") == "bullet") {
 			const bullets = dataItem.bullets;
