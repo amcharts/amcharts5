@@ -1069,7 +1069,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 
-			let len = Math.ceil(Math.log(this.getPrivate("maxZoomFactor", 100) + 1) / Math.LN10) + 2;
+			let len = Math.min(20, Math.ceil(Math.log(this.getPrivate("maxZoomFactor", 100) + 1) / Math.LN10) + 2);
 
 			let start = $math.round(this.valueToFinalPosition(selectionMin), len);
 			let end = $math.round(this.valueToFinalPosition(selectionMax), len);

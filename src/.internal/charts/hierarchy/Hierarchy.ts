@@ -711,7 +711,7 @@ export abstract class Hierarchy extends Series {
 		}
 
 		const topDepth = this.get("topDepth", 0);
-		if (depth < topDepth) {
+		if (dataItem.get("depth") < topDepth) {
 			dataItem.get("node").hide(0);
 		}
 

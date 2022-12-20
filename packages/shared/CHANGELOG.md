@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+
+## [5.2.44] - 2022-12-20
+
+### Fixed
+- If a `ForceDirected` node with `topDepth` set to `1` was clicked to hide children and then clicked again to reveal them, the clicked node was hidden. (since 5.2.42)
+- `ValueAxis` with `min` and `max` set could result in an empty chart. (since 5.2.43)
+
+
 ## [5.2.43] - 2022-12-19
 
 ### Added

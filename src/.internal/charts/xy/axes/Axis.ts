@@ -661,6 +661,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		/*
 		const gridContainer = this.gridContainer;
 		const topGridContainer = this.topGridContainer;
 		let global = gridContainer._display.toGlobal({ x: 0, y: 0 });
@@ -669,6 +670,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 		gridContainer.setAll({ dx: this._crispX, dy: this._crispY });
 		topGridContainer.setAll({ dx: this._crispX, dy: this._crispY });
+		*/
 
 		if (this.get("fixAxisSize")) {
 			this.ghostLabel.set("visible", true);
