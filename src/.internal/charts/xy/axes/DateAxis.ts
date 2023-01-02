@@ -493,8 +493,15 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _handleRangeChange() {
 		super._handleRangeChange();
 
-		let selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
-		let selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
+		const baseInterval = this.get("baseInterval");
+		const min = this.getIntervalMin(baseInterval);
+		const max = this.getIntervalMax(baseInterval);		
+
+		let selectionMin = min + (max - min) * this.get("start", 0);
+		let selectionMax = min + (max - min) * this.get("end", 1);
+		// this caused non stop switching 4186#
+		//let selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
+		//let selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
 
 		if ($type.isNumber(selectionMin) && $type.isNumber(selectionMax)) {
 
@@ -504,6 +511,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			if (this.get("groupData") && !this._groupingCalculated) {
 				this._groupingCalculated = true;
+
+
 
 				let modifiedDifference = (selectionMax - selectionMin) + (this.get("startLocation", 0) + (1 - this.get("endLocation", 1)) * this.baseDuration());
 				let groupInterval = this.get("groupInterval");
@@ -538,6 +547,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					})
 				}
 			}
+
+			selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
+			selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
 
 			$array.each(this.series, (series) => {
 				if (series.get("baseAxis") === this) {

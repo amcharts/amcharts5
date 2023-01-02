@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Changed
+- Map of the Pakistan was updated to adhere to local requirements.
+
 
 ## [5.1.0] - 2022-12-07
 

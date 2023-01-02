@@ -488,7 +488,7 @@ export class Root implements IDisposer {
 		this._inner.appendChild(renderer.view);
 
 		// TODO: TMP TMP TMP for testing only, remove
-		//document.body.appendChild((<any>renderer)._ghostView);
+		//renderer.debugGhostView = true;
 
 		this._initResizeSensor();
 

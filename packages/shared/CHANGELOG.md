@@ -5,9 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.46] - 2023-01-02
+
+### Fixed
+- Setting `stockPositiveColor` and `stockNegativeColor` initially on a `StockChart` was not affecting colors of candlesticks.
+- When `Tooltip` had `keepTargetHover: true` set, the portions of the tooltip outside the chart area were not being registered for hovers when the `Root` element had `tooltipContainerBounds` set.
+- `DateAxis` with data grouping enabled could go into infinite loop of switching between period in some specific data setups.
+
+
 ## [5.2.45] - 2022-12-20
 
-### fixed
+### Fixed
 - `ZigZag` indicator was always using 5% deviation even if user set a different value.
 - If data of a legend was updated, labels of a legend were not updated properly in all cases.
 - A tooltip for a `ColumnSeries`/`CandlestickSeries` was not being hidden if a cursor was used and mouse was moved away from the chart.

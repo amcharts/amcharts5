@@ -337,11 +337,14 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 				$utils.setInteractive(this._layer.view, false);
 			}
 
+			this._renderer._ghostLayer.setMargin(this._renderer.layers);
+
 			if (this._parent) {
 				this._parent.registerChildLayer(this._layer);
 			}
 
 			this._renderer.resizeLayer(this._layer);
+			this._renderer.resizeGhost();
 		}
 	}
 
@@ -505,7 +508,8 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 			const resolution = this._renderer.resolution;
 
 			const layers = this._renderer.layers;
-			const ghostContext = this._renderer._ghostContext;
+			const ghostLayer = this._renderer._ghostLayer;
+			const ghostContext = ghostLayer.context;
 
 			const mask = this.mask;
 			if (mask) {
@@ -539,12 +543,12 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 			// We must apply the mask before we transform the element
 			if (mask && this._isInteractiveMask()) {
-				mask._transform(ghostContext, resolution);
+				mask._transformMargin(ghostContext, resolution, ghostLayer.margin);
 				mask._runPath(ghostContext);
 				ghostContext.clip();
 			}
 
-			this._transform(ghostContext, resolution);
+			this._transformMargin(ghostContext, resolution, ghostLayer.margin);
 
 			this._render(parentLayer);
 
@@ -1440,7 +1444,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		if (layerDirty || interactive) {
 
 			const context = layer.context;
-			const ghostContext = this._renderer._ghostContext;
+			const ghostContext = this._renderer._ghostLayer.context;
 
 			if (layerDirty) {
 				context.globalCompositeOperation = this.blendMode;
@@ -1588,7 +1592,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		super._render(layer);
 
 		const context = layer.context;
-		const ghostContext = this._renderer._ghostContext;
+		const ghostContext = this._renderer._ghostLayer.context;
 
 		// Font style
 
@@ -1698,7 +1702,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			const interactive = this._isInteractive();
 			const context = layer.context;
 			const layerDirty = layer.dirty;
-			const ghostContext = this._renderer._ghostContext;
+			const ghostContext = this._renderer._ghostLayer.context;
 
 			context.save();
 			ghostContext.save();
@@ -1834,7 +1838,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 	public _measure(layer: CanvasLayer): IBounds {
 		const context = layer.context;
-		const ghostContext = this._renderer._ghostContext;
+		const ghostContext = this._renderer._ghostLayer.context;
 		const rtl = this.style.direction == "rtl";
 
 		// Reset text info
@@ -2389,7 +2393,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 			const interactive = this._isInteractive();
 			const context = layer.context;
 			const layerDirty = layer.dirty;
-			const ghostContext = this._renderer._ghostContext;
+			const ghostContext = this._renderer._ghostLayer.context;
 
 			// Savepoint
 			context.save();
@@ -2598,7 +2602,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 	public _measureCircular(layer: CanvasLayer): IBounds {
 		const context = layer.context;
-		const ghostContext = this._renderer._ghostContext;
+		const ghostContext = this._renderer._ghostLayer.context;
 		const rtl = this.style.direction == "rtl";
 
 		const oversizedBehavior = this.style.oversizedBehavior;
@@ -2915,7 +2919,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 			if (this.interactive && this._isInteractive()) {
 				const mask = this._getMask(this.image);
 
-				this._renderer._ghostContext.drawImage(mask, 0, 0);
+				this._renderer._ghostLayer.context.drawImage(mask, 0, 0);
 			}
 		}
 	}
@@ -2965,7 +2969,7 @@ export class CanvasRendererEvent<A> implements IRendererEvent<A> {
 	public simulated: boolean = false;
 	public native: boolean = true;
 
-	constructor(public event: A, public point: IPoint, public bbox: DOMRect) {
+	constructor(public event: A, public originalPoint: IPoint, public point: IPoint, public bbox: DOMRect) {
 		if ($utils.supports("touchevents") && event instanceof Touch) {
 			this.id = event.identifier;
 
@@ -3006,8 +3010,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public _dirtyLayers: Array<CanvasLayer> = [];
 	public defaultLayer: CanvasLayer = this.getLayer(0);
 
-	protected _ghostView: HTMLCanvasElement;
-	public _ghostContext: CanvasRenderingContext2D;
+	public _ghostLayer: GhostLayer = new GhostLayer();
 
 	protected _patternCanvas: HTMLCanvasElement = document.createElement("canvas");
 	protected _patternContext: CanvasRenderingContext2D = this._patternCanvas.getContext("2d")!;
@@ -3072,22 +3075,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				}
 			});
 
-			clearCanvas(this._ghostView);
+			clearCanvas(this._ghostLayer.view);
 			clearCanvas(this._patternCanvas);
 		}));
 
-		// @todo : do the same for ghost
-		this._ghostView = document.createElement("canvas");
-		this._ghostContext = this._ghostView.getContext("2d", { alpha: false, willReadFrequently: true })! as CanvasRenderingContext2D;
-		this._ghostContext.imageSmoothingEnabled = false;
-
-		this._ghostView.style.position = "absolute";
-		this._ghostView.style.top = "0px";
-		this._ghostView.style.left = "0px";
-
-		this._disposers.push($utils.addEventListener(this._ghostView, "click", (originalEvent: MouseEvent) => {
+		this._disposers.push($utils.addEventListener(this._ghostLayer.view, "click", (originalEvent: MouseEvent) => {
 			const event = this.getEvent(originalEvent);
-			const target = this._getHitTarget(event.point, event.bbox);
+			const target = this._getHitTarget(event.originalPoint, event.bbox);
 			console.debug(target);
 		}));
 
@@ -3171,18 +3165,18 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	public get debugGhostView(): boolean {
-		return !!this._ghostView.parentNode;
+		return !!this._ghostLayer.view.parentNode;
 	}
 
 	public set debugGhostView(value: boolean) {
 		if (value) {
-			if (!this._ghostView.parentNode) {
-				this.view.appendChild(this._ghostView);
+			if (!this._ghostLayer.view.parentNode) {
+				this.view.appendChild(this._ghostLayer.view);
 			}
 
 		} else {
-			if (this._ghostView.parentNode) {
-				this._ghostView.parentNode.removeChild(this._ghostView);
+			if (this._ghostLayer.view.parentNode) {
+				this._ghostLayer.view.parentNode.removeChild(this._ghostLayer.view);
 			}
 		}
 	}
@@ -3266,6 +3260,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		layer.resize(this._clientWidth, this._clientHeight, this.resolution);
 	}
 
+	resizeGhost() {
+		this._ghostLayer.resize(this._clientWidth, this._clientHeight, this.resolution);
+	}
+
 	resize(width: number, height: number): void {
 		this._clientWidth = width;
 		this._clientHeight = height;
@@ -3278,11 +3276,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			}
 		});
 
-		// @todo: do the same for ghost canvases
-		this._ghostView.width = this._width;
-		this._ghostView.height = this._height;
-		this._ghostView.style.width = width + "px";
-		this._ghostView.style.height = height + "px";
+		this.resizeGhost();
 
 		this.view.style.width = width + "px";
 		this.view.style.height = height + "px";
@@ -3381,15 +3375,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			}
 		});
 
-		this._ghostContext.save();
-		//this._ghostContext.clearRect(0, 0, this._width, this._height);
-		//this._ghostContext.beginPath();
-		this._ghostContext.fillStyle = '#000';
-		this._ghostContext.fillRect(0, 0, this._width, this._height);
+		this._ghostLayer.clear();
 
 		root.render(this.defaultLayer);
 
-		this._ghostContext.restore();
+		this._ghostLayer.context.restore();
 
 		//setTimeout(() => {
 
@@ -3437,34 +3427,44 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	// 	return this._colorMap[colorId];
 	// }
 
+	protected _adjustBoundingBox(bbox: DOMRect): DOMRect {
+		const margin = this._ghostLayer.margin;
+
+		return new DOMRect(
+			bbox.left - margin.left,
+			bbox.top - margin.top,
+			bbox.width + margin.left + margin.right,
+			bbox.height + margin.top + margin.bottom,
+		);
+	}
+
 	public getEvent<A extends IPointerEvent>(originalEvent: A, adjustPoint: boolean = true): CanvasRendererEvent<A> {
-		const bbox: DOMRect = adjustPoint ? this.view.getBoundingClientRect() : new DOMRect(0, 0, 0, 0);
+		const bbox = this.view.getBoundingClientRect();
+
+		const originalPoint: IPoint = {
+			x: originalEvent.clientX || 0,
+			y: originalEvent.clientY || 0,
+		};
+
+		const point: IPoint = {
+			x: originalPoint.x - (adjustPoint ? bbox.left : 0),
+			y: originalPoint.y - (adjustPoint ? bbox.top : 0),
+		};
 
 		return new CanvasRendererEvent(
 			originalEvent,
-			(originalEvent.clientX || originalEvent.clientY ? {
-				x: originalEvent.clientX - (originalEvent.clientX ? bbox.left : 0),
-				y: originalEvent.clientY - (originalEvent.clientY ? bbox.top : 0),
-			} : {
-				x: 0,
-				y: 0
-			}),
-			bbox,
+			originalPoint,
+			point,
+			this._adjustBoundingBox(bbox),
 		);
 	}
 
 	_getHitTarget(point: IPoint, bbox: DOMRect): CanvasDisplayObject | undefined | false {
-		if (bbox.width === 0 || bbox.height === 0 || point.x < 0 || point.x > bbox.width || point.y < 0 || point.y > bbox.height) {
+		if (bbox.width === 0 || bbox.height === 0 || point.x < bbox.left || point.x > bbox.right || point.y < bbox.top || point.y > bbox.bottom) {
 			return;
 		}
 		else {
-			const pixel = this._ghostContext.getImageData(
-				// TODO should this round ?
-				Math.round((point.x / bbox.width) * this._width),
-				Math.round((point.y / bbox.height) * this._height),
-				1,
-				1
-			);
+			const pixel = this._ghostLayer.getImageData(point, bbox);
 
 			if (pixel.data[0] === 0 && pixel.data[1] === 0 && pixel.data[2] === 0) {
 				return false;
@@ -3546,7 +3546,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.point, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox);
 
 
 		if (target) {
@@ -3581,7 +3581,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	_dispatchGlobalMousemove(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 
-		const target = this._getHitTarget(event.point, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox);
 		event.native = native;
 
 		if (target) {
@@ -3627,7 +3627,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	_dispatchGlobalMouseup(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 		event.native = native;
-		//const target = this._getHitTarget(event.point);
+		//const target = this._getHitTarget(event.originalPoint);
 		this._dispatchEventAll("globalpointerup", event);
 	}
 
@@ -3665,7 +3665,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		const id = event.id;
 
 		if (this._mousedown.length !== 0) {
-			const target = this._getHitTarget(event.point, event.bbox);
+			const target = this._getHitTarget(event.originalPoint, event.bbox);
 
 			if (target) {
 				this._mousedown.forEach((obj) => {
@@ -3691,7 +3691,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	_dispatchDoubleClick(originalEvent: IPointerEvent): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.point, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox);
 
 		if (target) {
 			eachTargets(target, (obj) => {
@@ -3706,7 +3706,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	_dispatchWheel(originalEvent: WheelEvent): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.point, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox);
 
 		if (target) {
 			eachTargets(target, (obj) => {
@@ -4064,6 +4064,79 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return canvas;
 	}
 
+}
+
+
+class GhostLayer {
+	public view: HTMLCanvasElement;
+	public context: CanvasRenderingContext2D;
+	public margin: IMargin = {
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+	};
+
+	private _width: number = 0;
+	private _height: number = 0;
+
+	constructor() {
+		this.view = document.createElement("canvas");
+		this.context = this.view.getContext("2d", { alpha: false, willReadFrequently: true })! as CanvasRenderingContext2D;
+		this.context.imageSmoothingEnabled = false;
+
+		this.view.style.position = "absolute";
+		this.view.style.top = "0px";
+		this.view.style.left = "0px";
+	}
+
+	resize(width: number, height: number, resolution: number) {
+		width += (this.margin.left + this.margin.right);
+		height += (this.margin.top + this.margin.bottom);
+		this.view.style.left = -this.margin.left + "px";
+		this.view.style.top = -this.margin.top + "px";
+
+		this._width = Math.floor(width * resolution);
+		this._height = Math.floor(height * resolution);
+
+		this.view.width = this._width;
+		this.view.style.width = width + "px";
+
+		this.view.height = this._height;
+		this.view.style.height = height + "px";
+	}
+
+	getImageData(point: IPoint, bbox: DOMRect): ImageData {
+		return this.context.getImageData(
+			// TODO should this round ?
+			Math.round(((point.x - bbox.left) / bbox.width) * this._width),
+			Math.round(((point.y - bbox.top) / bbox.height) * this._height),
+			1,
+			1,
+		);
+	}
+
+	setMargin(layers: Array<CanvasLayer>): void {
+		this.margin.left = 0;
+		this.margin.right = 0;
+		this.margin.top = 0;
+		this.margin.bottom = 0;
+
+		$array.each(layers, (layer) => {
+			if (layer.margin) {
+				this.margin.left = Math.max(this.margin.left, layer.margin.left);
+				this.margin.right = Math.max(this.margin.right, layer.margin.right);
+				this.margin.top = Math.max(this.margin.top, layer.margin.top);
+				this.margin.bottom = Math.max(this.margin.bottom, layer.margin.bottom);
+			}
+		});
+	}
+
+	clear() {
+		this.context.save();
+		this.context.fillStyle = '#000';
+		this.context.fillRect(0, 0, this._width, this._height);
+	}
 }
 
 

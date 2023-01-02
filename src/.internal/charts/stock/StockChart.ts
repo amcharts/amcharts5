@@ -335,10 +335,27 @@ export class StockChart extends Container {
 							riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
 						}
 
+						const dropFromPrevious = column.states.lookup("dropFromPrevious");
+						if (dropFromPrevious) {
+							dropFromPrevious.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+						}
+
+						const riseFromPrevious = column.states.lookup("riseFromPrevious");
+						if (riseFromPrevious) {
+							riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+						}						
+
 						stockSeries._applyGraphicsStates(dataItem, previous);
 						previous = dataItem;
 					}
 				})
+
+				stockSeries.columns.template.states.create("riseFromOpen", {fill: stockPositiveColor, stroke:stockPositiveColor});
+				stockSeries.columns.template.states.create("riseFromPrevious", {fill: stockPositiveColor, stroke:stockPositiveColor});
+
+				stockSeries.columns.template.states.create("dropFromOpen", {fill: stockNegativeColor, stroke:stockNegativeColor});
+				stockSeries.columns.template.states.create("dropFromPrevious", {fill: stockNegativeColor, stroke:stockNegativeColor});				
+
 				stockSeries.markDirtyValues();
 			}
 		}
