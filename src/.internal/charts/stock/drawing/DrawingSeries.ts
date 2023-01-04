@@ -420,6 +420,10 @@ export class DrawingSeries extends LineSeries {
 
 						dataItem.set("valueY", vy);
 						dataItem.set("valueYWorking", vy);
+
+						const dataContext = dataItem.dataContext as any;
+						dataContext.valueX = vx;
+						dataContext.valueY = vy;
 					}
 				})
 			}
@@ -563,14 +567,18 @@ export class DrawingSeries extends LineSeries {
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 
-		const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+		const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
+		const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
 
-		dataItem.set("valueX", valueX);
-		this._setXLocation(dataItem, valueX);
+		dataItem.set("valueX", vx);
+		this._setXLocation(dataItem, vx);
 
-		dataItem.set("valueY", valueY);
-		dataItem.set("valueYWorking", valueY);
+		dataItem.set("valueY", vy);
+		dataItem.set("valueYWorking", vy);
+
+		const dataContext = dataItem.dataContext as any;
+		dataContext.valueX = vx;
+		dataContext.valueY = vy;		
 
 		this._positionBullets(dataItem);
 	}

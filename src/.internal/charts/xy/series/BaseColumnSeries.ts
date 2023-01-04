@@ -265,6 +265,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 						}
 						break;
 					}
+					else {
+						this._toggleColumn(dataItem, false);
+					}
 				}
 				for (let i = startIndex; i <= endIndex; i++) {
 					let dataItem = this.dataItems[i];

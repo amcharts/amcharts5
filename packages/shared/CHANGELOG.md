@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.47] - 2023-01-04
+
+### Fixed
+- `MapChart` with a legend could produce error (since 5.2.44).
+- `ColumnSeries` with null values could display 1px height loose column on top of the plot container.
+
+
 ## [5.2.46] - 2023-01-02
 
 ### Fixed

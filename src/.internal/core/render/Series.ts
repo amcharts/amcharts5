@@ -801,29 +801,31 @@ export abstract class Series extends Component {
 	 * @ignore
 	 */
 	public updateLegendValue(dataItem: DataItem<this["_dataItemSettings"]>) {
-		const legendDataItem = dataItem.get("legendDataItem" as any) as DataItem<ILegendDataItem>;
+		if(dataItem){
+			const legendDataItem = dataItem.get("legendDataItem" as any) as DataItem<ILegendDataItem>;
 
-		if (legendDataItem) {
-			const valueLabel = legendDataItem.get("valueLabel");
-			if (valueLabel) {
-				const text = valueLabel.text;
-				let txt = "";
-				valueLabel._setDataItem(dataItem);
-				txt = this.get("legendValueText", text.get("text", ""));
+			if (legendDataItem) {
+				const valueLabel = legendDataItem.get("valueLabel");
+				if (valueLabel) {
+					const text = valueLabel.text;
+					let txt = "";
+					valueLabel._setDataItem(dataItem);
+					txt = this.get("legendValueText", text.get("text", ""));
 
-				valueLabel.set("text", txt);
-				text.markDirtyText();
-			}
+					valueLabel.set("text", txt);
+					text.markDirtyText();
+				}
 
-			const label = legendDataItem.get("label");
-			if (label) {
-				const text = label.text;
-				let txt = "";
-				label._setDataItem(dataItem);
-				txt = this.get("legendLabelText", text.get("text", ""));
+				const label = legendDataItem.get("label");
+				if (label) {
+					const text = label.text;
+					let txt = "";
+					label._setDataItem(dataItem);
+					txt = this.get("legendLabelText", text.get("text", ""));
 
-				label.set("text", txt);
-				text.markDirtyText();
+					label.set("text", txt);
+					text.markDirtyText();
+				}
 			}
 		}
 	}
