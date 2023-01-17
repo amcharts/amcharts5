@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.48] - 2023-01-17
+
+### Added
+- Slovak (sk_SK) locale added.
+
+### Fixed
+- Grid was not being placed in correct place on a `DateAxis` with grid or grid interval in 30 minutes.
+- Cursor tooltip was not being snapped to an `XYSeries` with `snapTooltip: true` when it was left of the first available data item.
+- `PeriodSelector` was not properly zooming the X axis with a non-standard value in `firstDayOfWeek` locale.
+
+
 ## [5.2.47] - 2023-01-04
 
 ### Fixed

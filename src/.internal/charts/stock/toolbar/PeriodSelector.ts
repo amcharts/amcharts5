@@ -171,9 +171,13 @@ export class PeriodSelector extends StockControl {
 
 						if (endTime != null) {
 							// round to the future interval
-							end = $time.round(new Date(endTime), interval.timeUnit, interval.count);
+							const firstDay = this._root.locale.firstDayOfWeek;
+							const timezone = this._root.timezone;
+							const utc = this._root.utc;
+
+							end = $time.round(new Date(endTime), interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
 							end.setTime(end.getTime() + $time.getDuration(interval.timeUnit, interval.count * 1.05));
-							end = $time.round(end, interval.timeUnit, interval.count);
+							end = $time.round(end, interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
 						}
 
 						start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);

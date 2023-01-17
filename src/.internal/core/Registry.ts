@@ -6,7 +6,7 @@ export class Registry {
 	/**
 	 * Currently running version of amCharts.
 	 */
-	readonly version: string = "5.2.47";
+	readonly version: string = "5.2.48";
 
 	/**
 	 * List of applied licenses.

@@ -773,6 +773,10 @@ export class DrawingControl extends StockControl {
 
 			this._setStroke();
 			this._setFill();
+			this._setLabel();
+			this._setDrawingIcon();
+			this._setSnap();
+			this._setExtension();
 		}
 
 		$array.each(seriesList, (series) => {
