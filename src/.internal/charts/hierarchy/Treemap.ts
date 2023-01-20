@@ -307,26 +307,28 @@ export class Treemap extends Hierarchy {
 	}
 
 	public _zoom(dataItem: DataItem<this["_dataItemSettings"]>) {
-		const hierarchyNode = dataItem.get("d3HierarchyNode");
+		if (this.width() > 0 && this.height() > 0) {
+			const hierarchyNode = dataItem.get("d3HierarchyNode");
 
-		const nodePaddingOuter = this.get("nodePaddingOuter", 0);
+			const nodePaddingOuter = this.get("nodePaddingOuter", 0);
 
-		let x0 = hierarchyNode.x0 + nodePaddingOuter;
-		let x1 = hierarchyNode.x1 - nodePaddingOuter;
+			let x0 = hierarchyNode.x0 + nodePaddingOuter;
+			let x1 = hierarchyNode.x1 - nodePaddingOuter;
 
-		let y0 = hierarchyNode.y0 + nodePaddingOuter;
-		let y1 = hierarchyNode.y1 - nodePaddingOuter;
+			let y0 = hierarchyNode.y0 + nodePaddingOuter;
+			let y1 = hierarchyNode.y1 - nodePaddingOuter;
 
-		let scaleX = (this.innerWidth() - nodePaddingOuter * 2) / (x1 - x0);
-		let scaleY = (this.innerHeight() - nodePaddingOuter * 2) / (y1 - y0);
+			let scaleX = (this.innerWidth() - nodePaddingOuter * 2) / (x1 - x0);
+			let scaleY = (this.innerHeight() - nodePaddingOuter * 2) / (y1 - y0);
 
-		const easing = this.get("animationEasing");
-		const duration = this.get("animationDuration", 0);
+			const easing = this.get("animationEasing");
+			const duration = this.get("animationDuration", 0);
 
-		this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
-		this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
+			this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
+			this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
 
-		this.nodesContainer.animate({ key: "x", to: nodePaddingOuter - x0 * scaleX, duration: duration, easing: easing });
-		this.nodesContainer.animate({ key: "y", to: nodePaddingOuter - y0 * scaleY, duration: duration, easing: easing });
+			this.nodesContainer.animate({ key: "x", to: nodePaddingOuter - x0 * scaleX, duration: duration, easing: easing });
+			this.nodesContainer.animate({ key: "y", to: nodePaddingOuter - y0 * scaleY, duration: duration, easing: easing });
+		}
 	}
 }

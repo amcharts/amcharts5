@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.2.50] - 2023-01-20
+
+### Fixed
+- Maintenance release.
+
+
+## [5.2.49] - 2023-01-20
+
+### Added
+- Bulgarian (bg_BG) locale added.
+
+### Fixed
+- Treemap went into Stack owerflow error if initialized in a hidden div.
+
+
 ## [5.2.48] - 2023-01-17
 
 ### Added
