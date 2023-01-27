@@ -125,8 +125,6 @@ export interface ITooltipPrivate extends IContainerPrivate {
  */
 export class Tooltip extends Container {
 
-	protected _arrangeDisposer: MultiDisposer | undefined;
-
 	public _fx: number = 0;
 	public _fy: number = 0;
 
@@ -165,9 +163,9 @@ export class Tooltip extends Container {
 			this._updateBackground();
 		}))
 
-		this.on("bounds", () => {
+		this._disposers.push(this.on("bounds", () => {
 			this._updateBackground();
-		})
+		}))
 
 		this._updateTextColor();
 
@@ -291,6 +289,7 @@ export class Tooltip extends Container {
 						this._updateTextColor(fill);
 					}
 				})
+				this._disposers.push(this._fillDp);
 			}
 
 			if (this.get("getStrokeFromSprite")) {
@@ -308,6 +307,8 @@ export class Tooltip extends Container {
 						background.set("stroke", fill as any);
 					}
 				})
+
+				this._disposers.push(this._strokeDp);
 			}
 
 			if (this.get("getLabelFillFromSprite")) {
@@ -325,6 +326,8 @@ export class Tooltip extends Container {
 						this.label.set("fill", fill as any);
 					}
 				})
+
+				this._disposers.push(this._labelDp);
 			}
 		}
 

@@ -12,6 +12,7 @@ import type { DateFormatter } from "../util/DateFormatter";
 import type { DurationFormatter } from "../util/DurationFormatter";
 
 import * as $array from "../util/Array";
+import { Disposer } from "../util/Disposer";
 
 /**
  * @ignore Text is an internal class. Use Label instead.
@@ -145,6 +146,15 @@ export class Text extends Sprite {
 			this.markDirtyBounds();
 			if (this.get("role") == "tooltip") {
 				this._root.updateTooltip(this);
+			}
+		}
+
+		if (this.isPrivateDirty("tooltipElement")) {
+			const tooltipElement = this.getPrivate("tooltipElement");
+			if (tooltipElement) {
+				this._disposers.push(new Disposer(() => {
+					this._root._removeTooltipElement(this);
+				}));
 			}
 		}
 

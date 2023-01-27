@@ -31,6 +31,7 @@ export class RectangleSeries extends DrawingSeries {
 
 		const dataItem = event.target.dataItem as DataItem<IRectangleSeriesDataItem>;
 		const movePoint = this._movePointerPoint;
+
 		if (dataItem && movePoint) {
 			const dataContext = dataItem.dataContext as any;
 			const index = dataContext.index;
@@ -39,75 +40,67 @@ export class RectangleSeries extends DrawingSeries {
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
 
-			const valueX = xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x));
+			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
 			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 
 			const vx = "valueX"
 			const vy = "valueY"
-			const vwy = "valueYWorking";
 
-			dataItem.set(vx, valueX);
-			dataItem.set(vy, valueY);
-			dataItem.set(vwy, valueY);
+			this._setContext(dataItem, vx, valueX);
+			this._setContext(dataItem, vy, valueY, true);
 
 			this._setXLocation(dataItem, valueX);
-
 			this._positionBullets(dataItem);
 
-			const items = this._di[index];
-			const blDI = items["bl"];
-			const brDI = items["br"];
-			const tlDI = items["tl"];
-			const trDI = items["tr"];
-			const tlDI2 = items["tl2"];
+			const dataItems = this._di[index];
+			if (dataItems) {
+				const blDI = dataItems["bl"];
+				const brDI = dataItems["br"];
+				const tlDI = dataItems["tl"];
+				const trDI = dataItems["tr"];
+				const tlDI2 = dataItems["tl2"];
 
-			if (blDI && brDI && tlDI && trDI && tlDI2) {
-				if (corner == "br") {
-					blDI.set(vy, valueY);
-					blDI.set(vwy, valueY);
+				if (blDI && brDI && tlDI && trDI && tlDI2) {
+					if (corner == "br") {
+						this._setContext(blDI, vy, valueY, true);
+						this._setContext(trDI, vx, valueX);
+						this._setXLocation(trDI, valueX);
+					}
 
-					trDI.set(vx, valueX);
-					this._setXLocation(trDI, valueX);
-				}
+					if (corner == "tr") {
+						this._setContext(brDI, vx, valueX);
+						this._setXLocation(brDI, valueX);
 
-				if (corner == "tr") {
-					brDI.set(vx, valueX);
-					this._setXLocation(brDI, valueX);
+						this._setContext(tlDI, vy, valueY, true);
+						this._setContext(tlDI2, vy, valueY, true);
+					}
 
-					tlDI.set(vy, valueY);
-					tlDI.set(vwy, valueY);
+					if (corner == "bl") {
+						this._setContext(brDI, vy, valueY, true);
 
-					tlDI2.set("valueY", valueY);
-					tlDI2.set(vwy, valueY);
-				}
+						this._setContext(tlDI, vx, valueX);
+						this._setContext(tlDI2, vx, valueX);
 
-				if (corner == "bl") {
-					brDI.set(vy, valueY);
-					brDI.set(vwy, valueY);
+						this._setXLocation(tlDI, valueX);
+						this._setXLocation(tlDI2, valueX);
+					}
 
-					tlDI.set(vx, valueX);
-					tlDI2.set(vx, valueX);
+					if (corner == "tl2") {
+						this._setContext(blDI, vx, valueX);
+						this._setXLocation(blDI, valueX);
 
-					this._setXLocation(tlDI, valueX);
-					this._setXLocation(tlDI2, valueX);
-				}
+						this._setContext(trDI, vy, valueY, true);
 
-				if (corner == "tl2") {
-					blDI.set(vx, valueX);
-					this._setXLocation(blDI, valueX);
+						this._setContext(tlDI, vx, valueX);
+						this._setXLocation(tlDI, valueX);
 
-					trDI.set(vy, valueY);
-					trDI.set(vwy, valueY);
-
-					tlDI.set(vx, valueX);
-					this._setXLocation(tlDI, valueX);
-
-					tlDI.set(vy, valueY);
-					tlDI.set(vwy, valueY);
+						this._setContext(tlDI, vy, valueY, true);
+					}
 				}
 			}
 		}
 	}
+
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {
@@ -116,13 +109,13 @@ export class RectangleSeries extends DrawingSeries {
 			if (!this._isDragging) {
 
 				if (!this._isDrawing) {
+					this._index++;
 					this._isDrawing = true;
 					this.bulletsContainer.show();
 					this._addPoints(event, this._index);
 				}
 				else {
 					this._isDrawing = false;
-					this._index++;
 				}
 			}
 		}
@@ -134,7 +127,6 @@ export class RectangleSeries extends DrawingSeries {
 			const movePoint = this._movePointerPoint;
 
 			if (movePoint) {
-
 				const xAxis = this.get("xAxis");
 				const yAxis = this.get("yAxis");
 
@@ -142,22 +134,23 @@ export class RectangleSeries extends DrawingSeries {
 				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 
 				const index = this._index;
-				const diTR = this._di[index]["tr"];
-				const diBR = this._di[index]["br"];
-				const diBL = this._di[index]["bl"];
 
-				if (diTR && diBR && diBL) {
-					diTR.set("valueX", valueX);
-					diBR.set("valueX", valueX);
+				const dataItems = this._di[index];
+				if (dataItems) {
+					const diTR = dataItems["tr"];
+					const diBR = dataItems["br"];
+					const diBL = dataItems["bl"];
 
-					this._setXLocation(diTR, valueX);
-					this._setXLocation(diBR, valueX);
+					if (diTR && diBR && diBL) {
+						this._setContext(diTR, "valueX", valueX);
+						this._setContext(diBR, "valueX", valueX);
 
-					diBR.set("valueY", valueY);
-					diBR.set("valueYWorking", valueY);
+						this._setXLocation(diTR, valueX);
+						this._setXLocation(diBR, valueX);
 
-					diBL.set("valueY", valueY);
-					diBL.set("valueYWorking", valueY);
+						this._setContext(diBR, "valueY", valueY, true);
+						this._setContext(diBL, "valueY", valueY, true);
+					}
 				}
 			}
 		}
@@ -166,16 +159,17 @@ export class RectangleSeries extends DrawingSeries {
 	protected _addPoints(event: ISpritePointerEvent, index: number) {
 		const chart = this.chart;
 		if (chart) {
+
+			this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index:index, corner:"e" });
+
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
 
 			const point = chart.plotContainer.toLocal(event.point);
-			const valueX = xAxis.positionToValue(xAxis.coordinateToPosition(point.x));
+			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
 			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
 
 			this._di[index] = {};
-			this.data.push({ stroke: this._getStrokeTemplate() })
-			this._addContextInfo(index, "empty");
 
 			this._addPoint(valueX, valueY, "tl", index);
 			this._addPoint(valueX, valueY, "tr", index);
@@ -187,18 +181,13 @@ export class RectangleSeries extends DrawingSeries {
 
 	protected _addPoint(valueX: number | null, valueY: number | null, corner: string, index: number): any {
 
-		this.data.push({ valueY: valueY, valueX: valueX });
+		this.data.push({ valueY: valueY, valueX: valueX, corner:corner, index:index });
 		const len = this.dataItems.length;
 		const dataItem = this.dataItems[len - 1];
 		if (dataItem) {
 			if (valueX != null) {
 				this._setXLocation(dataItem, valueX);
 			}
-
-			this._addContextInfo(index, corner);
-
-			this._di[index][corner] = dataItem;
-
 			this.setPrivate("startIndex", 0);
 			this.setPrivate("endIndex", len);
 

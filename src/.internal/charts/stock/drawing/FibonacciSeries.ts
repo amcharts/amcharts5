@@ -1,4 +1,3 @@
-import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { Graphics } from "../../../core/render/Graphics";
 import type { DataItem } from "../../../core/render/Component";
 import type { Color } from "../../../core/util/Color";
@@ -7,7 +6,6 @@ import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, 
 import { Label } from "../../../core/render/Label";
 import { ListTemplate } from "../../../core/util/List";
 import { Template } from "../../../core/util/Template";
-import type { Line } from "../../../core/render/Line";
 
 
 import * as $array from "../../../core/util/Array";
@@ -79,20 +77,26 @@ export class FibonacciSeries extends SimpleLineSeries {
 	}
 
 	protected _updateSegmentReal(index: number) {
-		const diP1 = this._di[index]["p1"];
-		const diP2 = this._di[index]["p2"];
+		const dataItems = this._di[index];
+		if (dataItems) {
+			const diP1 = dataItems["p1"];
+			const diP2 = dataItems["p2"];
 
-		const valueX = diP1.get("valueX", 0);
-		diP2.set("valueX", valueX);
-		this._setXLocation(diP2, valueX);
+			if (diP1 && diP2) {
+				const valueX = diP1.get("valueX", 0);
+				this._setContext(diP2, "valueX", valueX);
+				this._setXLocation(diP2, valueX);
+			}
+		}
 	}
 
+	protected _addTemplates(index: number) {
+		this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index, corner: "e" });
+	}
 
 	public _updateChildren() {
-
 		super._updateChildren();
 		this._updateChildrenReal();
-
 	}
 
 	protected _updateChildrenReal() {
@@ -103,7 +107,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 			for (let i = 0; i < this._lines.length; i++) {
 				const line = this._lines[i];
-				if (line) {
+				if (line) {					
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
 
@@ -111,13 +115,12 @@ export class FibonacciSeries extends SimpleLineSeries {
 					const p2 = diP2.get("point");
 
 					const valueX = diP1.get("valueX", 0);
-					diP2.set("valueX", valueX);
+					this._setContext(diP2, "valueX", valueX);
 					this._setXLocation(diP2, valueX);
 
 					if (p1 && p2) {
 						p2.x = chart.plotContainer.width();
 						const sequence = this.get("sequence", []);
-						const colors = this.get("colors", []);
 						let prevValue = 0;
 
 						const labels = this._labels[i];
@@ -127,11 +130,16 @@ export class FibonacciSeries extends SimpleLineSeries {
 						for (let i = 0; i < sequence.length; i++) {
 							const value = sequence[i];
 
-							const color = colors[i];
 							const label = labels[i];
 
 							const fill = fills[i];
 							const stroke = strokes[i];
+
+							let fillColor = this.get("colors", [])[i];
+							let strokeColor = fillColor;
+
+							fill.set("fill", fillColor);
+							stroke.set("stroke", strokeColor);
 
 							const y1 = p1.y + (p2.y - p1.y) * prevValue;
 							const y2 = p1.y + (p2.y - p1.y) * value;
@@ -160,7 +168,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 								dataItem.set("value" as any, realValue);
 							}
 
-							label.setAll({ x: p2.x, y: y2, fill: color });
+							label.setAll({ x: p2.x, y: y2, fill:fillColor });
 							label.text.markDirtyText();
 
 							prevValue = value;
@@ -171,53 +179,61 @@ export class FibonacciSeries extends SimpleLineSeries {
 		}
 	}
 
-	protected _addPoints(event: ISpritePointerEvent, index: number): Line {
-		let line = super._addPoints(event, index);
+	protected _createElements(index: number) {
+		super._createElements(index);
 
-		const labelArr = [];
-		const fillsArr = [];
-		const strokesArr = [];
+		if (!this._fills[index]) {
 
-		const diP1 = this._di[index]["p1"];
-		const diP2 = this._di[index]["p2"];
+			const labelArr = [];
+			const fillsArr = [];
+			const strokesArr = [];
 
-		const userData = [this.dataItems.indexOf(diP1), this.dataItems.indexOf(diP2)];
+			const sequence = this.get("sequence", []);
 
-		const sequence = this.get("sequence", []);
-		const colors = this.get("colors", []);
+			for (let i = 0; i < sequence.length; i++) {
+				const label = this.makeLabel();
+				const dataItem = this.makeDataItem({});
+				dataItem.set("sequence" as any, sequence[i]);
+				label._setDataItem(dataItem);
+				labelArr.push(label);
 
-		for (let i = 0; i < sequence.length; i++) {
-			const label = this.makeLabel();
-			const dataItem = this.makeDataItem({});
-			dataItem.set("sequence" as any, sequence[i]);
-			label._setDataItem(dataItem);
-			labelArr.push(label);
+				const fill = this.makeFill(this.fills);
+				fillsArr.push(fill);
 
-			const fill = this.makeFill(this.fills);
-			fillsArr.push(fill);
+				const stroke = this.makeStroke(this.strokes);
+				strokesArr.push(stroke);
 
-			const stroke = this.makeStroke(this.strokes);
-			strokesArr.push(stroke);
-
-			let fillColor: Color | undefined = colors[i];
-			let strokeColor: Color | undefined = colors[i];
-
-			if (!fillColor) {
-				fillColor = this.get("fillColor", this.get("fill"));
+				/*
+								let fillColor: Color | undefined = colors[i];
+								let strokeColor: Color | undefined = colors[i];
+				
+								if (!fillColor) {
+									const fillTemplate = dataContext.fill;
+									if (fillTemplate) {
+										fillColor = fillTemplate.get("fill");
+									}
+									if (!fillColor) {
+										fillColor = this.get("fillColor", this.get("fill"));
+									}
+								}
+								if (!strokeColor) {
+									const strokeTemplate = dataContext.stroke;
+									if (strokeTemplate) {
+										strokeColor = strokeTemplate.get("stroke");
+									}
+									if (!strokeColor) {
+										strokeColor = this.get("strokeColor", this.get("stroke"));
+									}
+								}
+								fill.setAll({ fill: fillColor, userData: userData });
+								stroke.setAll({ stroke: strokeColor, userData: userData });
+						*/
 			}
-			if (!strokeColor) {
-				strokeColor = this.get("strokeColor", this.get("stroke"));
-			}
 
-			fill.setAll({ fill: fillColor, userData: userData });
-			stroke.setAll({ stroke: strokeColor, userData: userData });
+			this._labels[index] = labelArr;
+			this._fills[index] = fillsArr;
+			this._strokes[index] = strokesArr;
 		}
-
-		this._labels[index] = labelArr;
-		this._fills[index] = fillsArr;
-		this._strokes[index] = strokesArr;
-
-		return line;
 	}
 
 	protected _drawFill() {
@@ -246,11 +262,11 @@ export class FibonacciSeries extends SimpleLineSeries {
 		this.showAllBullets();
 	}
 
-	protected _hideAllBullets(){
-		if(this._drawingEnabled || this._erasingEnabled){
+	protected _hideAllBullets() {
+		if (this._drawingEnabled || this._erasingEnabled) {
 
 		}
-		else{
+		else {
 			super._hideAllBullets();
 		}
 	}

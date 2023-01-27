@@ -1,6 +1,7 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Line } from "../../../core/render/Line";
+import type { Template } from "../../../core/util/Template";
 
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
@@ -36,39 +37,42 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 	protected _tag = "ray";
 
 	protected _updateSegment(index: number) {
-		const diP1 = this._di[index]["p1"];
-		const diP2 = this._di[index]["p2"];
+		
+		if(this._di[index]){
 
-		const series = this.get("series");
-		if (series) {
+			const diP1 = this._di[index]["p1"];
+			const diP2 = this._di[index]["p2"];
 
-			const xAxis = this.get("xAxis");
+			const series = this.get("series");
+			if (series && diP1 && diP2) {
 
-			const min = xAxis.getPrivate("min", 0) + 1;
-			const max = xAxis.getPrivate("max", 1) - 1;
+				const xAxis = this.get("xAxis");
 
-			let x1 = $math.fitToRange(diP2.get("valueX" as any), min, max);
-			const di1 = xAxis.getSeriesItem(series, Math.max(0, xAxis.valueToPosition(x1)));
+				const min = xAxis.getPrivate("min", 0) + 1;
+				const max = xAxis.getPrivate("max", 1) - 1;
 
-			const field = this.get("field") + "Y";
+				let x1 = $math.fitToRange(diP2.get("valueX" as any), min, max);
+				const di1 = xAxis.getSeriesItem(series, Math.max(0, xAxis.valueToPosition(x1)));
 
-			if (di1) {
-				let y1 = di1.get(field as any);
+				const field = this.get("field") + "Y";
 
-				diP1.set("valueY", y1);
-				diP1.set("valueYWorking", y1);
+				if (di1) {
+					let y1 = di1.get(field as any);
 
-				diP2.set("valueY", y1);
-				diP2.set("valueYWorking", y1);
+					this._setContext(diP1, "valueY", y1, true);
+					this._setContext(diP2, "valueY", y1, true);
 
-				diP1.set("valueX", x1);
-				diP2.set("valueX", x1 + 0.01);
+					this._setContext(diP1, "valueX", x1);
+					this._setContext(diP2, "valueX", x1 + 0.01);
 
-				this._positionBullets(diP1);
-				this._positionBullets(diP2);
+					this._positionBullets(diP1);
+					this._positionBullets(diP2);
+				}
 			}
 		}
+		this._updateElements();
 	}
+
 
 	protected _updateLine(line: Line, hitLine: Line, p11: IPoint, _p22: IPoint, p1: IPoint, _p2: IPoint) {
 		line.set("points", [p1, p11]);
@@ -86,19 +90,18 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (!this._isDragging) {
-			this._addPoints(event, this._index);
-			this._updateSegment(this._index);
 			this._index++;
+			this._addPoints(event, this._index);
 			this._isDrawing = false;
 		}
 	}
 
-	protected _addPoints(event: ISpritePointerEvent, index: number): Line {
-		let line = super._addPoints(event, index);
-		this._updateExtentionLine(line);
-		const diP2 = this._di[index]["p2"];
-		diP2.set("valueX", diP2.get("valueX", 0) + 0.001);
-		this._isDrawing = false;
-		return line;
-	}
+	protected _updateExtensionLine(line: Line, template: Template<any>) {
+		line.setAll({
+			stroke: template.get("stroke"),
+			strokeWidth: template.get("strokeWidth"),
+			strokeDasharray: template.get("strokeDasharray"),
+			strokeOpacity: template.get("strokeOpacity")
+		})
+	}	
 }

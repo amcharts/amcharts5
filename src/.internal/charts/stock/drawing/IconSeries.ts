@@ -6,6 +6,7 @@ import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolyl
 import { Bullet } from "../../../core/render/Bullet";
 import { Graphics } from "../../../core/render/Graphics";
 import { SpriteResizer } from "../../../core/render/SpriteResizer";
+import { Template } from "../../../core/util/Template";
 
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 
@@ -13,12 +14,6 @@ export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 	 * An SVG path of the icon.
 	 */
 	svgPath: string;
-
-	/**
-	 * Should icon snap to closest data item?
-	 */
-	snapToData?: boolean;
-
 }
 
 export interface IIconSeriesSettings extends IPolylineSeriesSettings {
@@ -72,30 +67,13 @@ export class IconSeries extends PolylineSeries {
 		this.strokes.template.set("visible", false);
 		this.fills.template.set("visible", false);
 
-		this.bullets.push(() => {
-			const color = this.get("fillColor", this.get("fill"));
-			const strokeColor = this.get("strokeColor", this.get("stroke"));
-
-			const sprite = Graphics.new(this._root, {
+		this.bullets.push((root, _series, dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			const template = dataContext.settings;
+			const sprite = Graphics.new(root, {
 				draggable: true,
-				svgPath: this.get("iconSvgPath"),
-				scale: this.get("iconScale", 1),
-				themeTags: ["icon"],
-				fill: color,
-				stroke: strokeColor,
-				fillOpacity: this.get("fillOpacity", 1),
-				strokeOpacity: this.get("strokeOpacity", 1)
-			});
-
-			const iconCenterX = this.get("iconCenterX");
-			if (iconCenterX != null) {
-				sprite.set("centerX", iconCenterX)
-			}
-
-			const iconCenterY = this.get("iconCenterY");
-			if (iconCenterY != null) {
-				sprite.set("centerY", iconCenterY)
-			}
+				themeTags: ["icon"]
+			}, template);
 
 			this._addBulletInteraction(sprite);
 
@@ -119,6 +97,14 @@ export class IconSeries extends PolylineSeries {
 
 			this.spriteResizer.set("sprite", undefined);
 
+			sprite.on("scale", (scale) => {
+				template.set("scale", scale)
+			})
+
+			sprite.on("rotation", (rotation) => {
+				template.set("rotation", rotation)
+			})
+
 			return Bullet.new(this._root, {
 				locationX: undefined,
 				sprite: sprite
@@ -130,6 +116,10 @@ export class IconSeries extends PolylineSeries {
 		if (this._drawingEnabled) {
 			if (!this._isHover) {
 				super._handlePointerClick(event);
+
+				const dataObject = this.data.getIndex(this.data.length - 1) as any;
+				dataObject.settings = this._getIconTemplate();
+
 				this._index++;
 				this._di[this._index] = {};
 			}
@@ -150,5 +140,51 @@ export class IconSeries extends PolylineSeries {
 		if (!this.get("snapToData")) {
 			this._setXLocationReal(dataItem, value);
 		}
+	}
+
+	protected _getIconTemplate(): Template<any> {
+		const template: any = {};
+
+		const iconSvgPath = this.get("iconSvgPath");
+		if (iconSvgPath != null) {
+			template.svgPath = iconSvgPath;
+		}
+
+		const iconScale = this.get("iconScale");
+		if (iconScale != null) {
+			template.scale = iconScale;
+		}
+
+		const iconCenterX = this.get("iconCenterX");
+		if (iconCenterX != null) {
+			template.centerX = iconCenterX;
+		}
+
+		const iconCenterY = this.get("iconCenterY");
+		if (iconCenterY != null) {
+			template.centerY = iconCenterY;
+		}
+
+		const strokeColor = this.get("strokeColor");
+		if (strokeColor != null) {
+			template.stroke = strokeColor;
+		}
+
+		const strokeOpacity = this.get("strokeOpacity");
+		if (strokeOpacity != null) {
+			template.strokeOpacity = strokeOpacity;
+		}
+
+		const fillColor = this.get("fillColor");
+		if (fillColor != null) {
+			template.fill = fillColor;
+		}
+
+		const fillOpacity = this.get("fillOpacity");
+		if (fillOpacity != null) {
+			template.fillOpacity = fillOpacity;
+		}
+
+		return Template.new(template);
 	}
 }

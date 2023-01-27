@@ -101,6 +101,7 @@ export interface IDisplayObject extends IDisposer {
 	alpha: number;
 	angle: number;
 	scale: number;
+	crisp: boolean;
 	x: number;
 	y: number;
 	pivot: IPoint;

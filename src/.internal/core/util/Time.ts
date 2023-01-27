@@ -419,7 +419,6 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 			case "minute":
 
 				let minutes = date.getUTCMinutes();
-				milliseconds = date.getUTCMilliseconds();
 				if (count > 1) {
 					minutes = Math.floor(minutes / count) * count;
 				}

@@ -17,7 +17,7 @@
         "importHelpers": true,
         "noEmitOnError": true,
         "module": "esnext",
-        "target": "es5",
+        "target": "es2015",
         "rootDir": "src",
         "pretty": true,
         "declarationMap": true,

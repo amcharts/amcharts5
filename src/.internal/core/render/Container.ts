@@ -214,8 +214,10 @@ export class Container extends Sprite {
 			if (this.get("maskContent")) {
 				if (!contentMask) {
 					contentMask = Rectangle.new(this._root, {
-						width: this.width() + .5,
-						height: this.height() + .5
+						x:-.5,
+						y:-.5,
+						width: this.width() + 1,
+						height: this.height() + 1
 					});
 					this._contentMask = contentMask;
 					childrenDisplay.addChildAt(contentMask._display, 0);
@@ -285,7 +287,7 @@ export class Container extends Sprite {
 
 			const contentMask = this._contentMask;
 			if (contentMask) {
-				contentMask.setAll({ width:width + .5, height:height + .5 });
+				contentMask.setAll({ width:width + 1, height:height + 1 });
 			}
 
 			const verticalScrollbar = this.get("verticalScrollbar")!;

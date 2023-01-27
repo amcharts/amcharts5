@@ -432,7 +432,7 @@ export class StyleRule extends DisposerClass {
 				this.setStyle(<string>key, value);
 			});
 		}
-		catch(err) {
+		catch (err) {
 			// Create an empty rule on failed selectors
 			this._rule = new CSSStyleRule();
 		}
@@ -792,6 +792,24 @@ export function escapeForRgex(value: string): string {
 }
 
 /**
+ * Adds space before each uppercase letter.
+ * 
+ * @param   str Input string
+ * @return      Output string
+ */
+export function addSpacing(str: string): string {
+	let result = "";
+	for (let i = 0; i < str.length; i++) {
+		const char = str.charAt(i);
+		if (char.toUpperCase() == char && i != 0) {
+			result += " ";
+		}
+		result += char;
+	}
+	return result;
+}
+
+/**
  * ============================================================================
  * DATE-RELATED FUNCTIONS
  * ============================================================================
@@ -829,6 +847,23 @@ export function getWeek(date: Date, _utc: boolean = false): number {
 	d.setUTCDate(d.getUTCDate() + 4 - day);
 	const firstDay = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
 	return Math.ceil((((d.getTime() - firstDay.getTime()) / 86400000) + 1) / 7);
+}
+
+/**
+ * Returns a "week year" of the given date.
+ *
+ * @param date  Date
+ * @param utc   Assume UTC dates?
+ * @return Year of week
+ * @since 5.3.0
+ * @todo Account for UTC
+ */
+export function getWeekYear(date: Date, _utc: boolean = false): number {
+	const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+	const day = d.getUTCDay() || 7;
+	d.setUTCDate(d.getUTCDate() + 4 - day);
+	const firstDay = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+	return firstDay.getFullYear();
 }
 
 /**

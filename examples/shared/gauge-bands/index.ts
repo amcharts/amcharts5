@@ -35,7 +35,9 @@ const axisRenderer = am5radar.AxisRendererCircular.new(root, {
 axisRenderer.grid.template.setAll({
   stroke: root.interfaceColors.get("background"),
   visible: true,
-  strokeOpacity: 0.8
+  strokeOpacity: 0.8,
+  strokeWidth: 2,
+  crisp: false
 });
 
 const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {

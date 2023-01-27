@@ -256,19 +256,19 @@ export class XYCursor extends Container {
 			this.setPrivate("visible", true)
 		}, 500));
 
-		this.lineX.events.on("positionchanged", () => {
+		this._disposers.push(this.lineX.events.on("positionchanged", () => {
 			this._handleXLine();
-		});
+		}));
 
-		this.lineY.events.on("positionchanged", () => {
+		this._disposers.push(this.lineY.events.on("positionchanged", () => {
 			this._handleYLine();
-		});
+		}));
 
-		this.lineX.events.on("focus", (ev) => this._handleLineFocus(ev.target));
-		this.lineX.events.on("blur", (ev) => this._handleLineBlur(ev.target));
+		this._disposers.push(this.lineX.events.on("focus", (ev) => this._handleLineFocus(ev.target)));
+		this._disposers.push(this.lineX.events.on("blur", (ev) => this._handleLineBlur(ev.target)));
 
-		this.lineY.events.on("focus", (ev) => this._handleLineFocus(ev.target));
-		this.lineY.events.on("blur", (ev) => this._handleLineBlur(ev.target));
+		this._disposers.push(this.lineY.events.on("focus", (ev) => this._handleLineFocus(ev.target)));
+		this._disposers.push(this.lineY.events.on("blur", (ev) => this._handleLineBlur(ev.target)));
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
@@ -374,9 +374,11 @@ export class XYCursor extends Container {
 				const tooltip = xAxis.get("tooltip");
 				if (tooltip) {
 					this._tooltipX = true;
-					tooltip.on("pointTo", () => {
-						this._updateXLine(tooltip);
-					})
+					this._disposers.push(
+						tooltip.on("pointTo", () => {
+							this._updateXLine(tooltip);
+						})
+					)
 				}
 			}
 		}
@@ -389,9 +391,11 @@ export class XYCursor extends Container {
 				const tooltip = yAxis.get("tooltip");
 				if (tooltip) {
 					this._tooltipY = true;
-					tooltip.on("pointTo", () => {
-						this._updateYLine(tooltip);
-					})
+					this._disposers.push(
+						tooltip.on("pointTo", () => {
+							this._updateYLine(tooltip);
+						})
+					)
 				}
 			}
 		}

@@ -112,6 +112,7 @@ import type { MapPointSeries } from "./../../../map";
 import type { MapPolygon } from "./../../../map";
 import type { MapPolygonSeries } from "./../../../map";
 import type { MapSeries } from "./../../../map";
+import type { MedianPrice } from "./../../../stock";
 import type { Modal } from "./../../../index";
 import type { MovingAverage } from "./../../../stock";
 import type { MovingAverageDeviation } from "./../../../stock";
@@ -122,12 +123,14 @@ import type { OnBalanceVolume } from "./../../../stock";
 import type { Pack } from "./../../../hierarchy";
 import type { PanelControls } from "./../../../stock";
 import type { Partition } from "./../../../hierarchy";
+import type { PathPattern } from "./../../../index";
 import type { Pattern } from "./../../../index";
 import type { PercentChart } from "./../../../percent";
 import type { PercentSeries } from "./../../../percent";
 import type { PeriodSelector } from "./../../../stock";
 import type { PictorialStackedSeries } from "./../../../percent";
 import type { Picture } from "./../../../index";
+import type { PicturePattern } from "./../../../index";
 import type { PieChart } from "./../../../percent";
 import type { PieSeries } from "./../../../percent";
 import type { PointedRectangle } from "./../../../index";
@@ -168,6 +171,7 @@ import type { SmoothedXYLineSeries } from "./../../../xy";
 import type { SmoothedYLineSeries } from "./../../../xy";
 import type { Sprite } from "./../../../index";
 import type { SpriteResizer } from "./../../../index";
+import type { StandardDeviation } from "./../../../stock";
 import type { Star } from "./../../../index";
 import type { StepLineSeries } from "./../../../xy";
 import type { StochasticOscillator } from "./../../../stock";
@@ -184,6 +188,9 @@ import type { Tree } from "./../../../hierarchy";
 import type { Treemap } from "./../../../hierarchy";
 import type { TrendLineSeries } from "./../../../stock";
 import type { Triangle } from "./../../../index";
+import type { Trix } from "./../../../stock";
+import type { TypicalPrice } from "./../../../stock";
+import type { VWAP } from "./../../../stock";
 import type { ValueAxis } from "./../../../xy";
 import type { Venn } from "./../../../venn";
 import type { VerticalLayout } from "./../../../index";
@@ -195,6 +202,7 @@ import type { XYChart } from "./../../../xy";
 import type { XYChartScrollbar } from "./../../../xy";
 import type { XYCursor } from "./../../../xy";
 import type { XYSeries } from "./../../../xy";
+import type { ZigZag } from "./../../../stock";
 import type { ZoomControl } from "./../../../map";
 
 export interface IClasses {
@@ -307,6 +315,7 @@ export interface IClasses {
 	"MapPolygon": () => Promise<typeof MapPolygon>;
 	"MapPolygonSeries": () => Promise<typeof MapPolygonSeries>;
 	"MapSeries": () => Promise<typeof MapSeries>;
+	"MedianPrice": () => Promise<typeof MedianPrice>;
 	"Modal": () => Promise<typeof Modal>;
 	"MovingAverage": () => Promise<typeof MovingAverage>;
 	"MovingAverageDeviation": () => Promise<typeof MovingAverageDeviation>;
@@ -317,12 +326,14 @@ export interface IClasses {
 	"Pack": () => Promise<typeof Pack>;
 	"PanelControls": () => Promise<typeof PanelControls>;
 	"Partition": () => Promise<typeof Partition>;
+	"PathPattern": () => Promise<typeof PathPattern>;
 	"Pattern": () => Promise<typeof Pattern>;
 	"PercentChart": () => Promise<typeof PercentChart>;
 	"PercentSeries": () => Promise<typeof PercentSeries>;
 	"PeriodSelector": () => Promise<typeof PeriodSelector>;
 	"PictorialStackedSeries": () => Promise<typeof PictorialStackedSeries>;
 	"Picture": () => Promise<typeof Picture>;
+	"PicturePattern": () => Promise<typeof PicturePattern>;
 	"PieChart": () => Promise<typeof PieChart>;
 	"PieSeries": () => Promise<typeof PieSeries>;
 	"PointedRectangle": () => Promise<typeof PointedRectangle>;
@@ -363,6 +374,7 @@ export interface IClasses {
 	"SmoothedYLineSeries": () => Promise<typeof SmoothedYLineSeries>;
 	"Sprite": () => Promise<typeof Sprite>;
 	"SpriteResizer": () => Promise<typeof SpriteResizer>;
+	"StandardDeviation": () => Promise<typeof StandardDeviation>;
 	"Star": () => Promise<typeof Star>;
 	"StepLineSeries": () => Promise<typeof StepLineSeries>;
 	"StochasticOscillator": () => Promise<typeof StochasticOscillator>;
@@ -379,6 +391,9 @@ export interface IClasses {
 	"Treemap": () => Promise<typeof Treemap>;
 	"TrendLineSeries": () => Promise<typeof TrendLineSeries>;
 	"Triangle": () => Promise<typeof Triangle>;
+	"Trix": () => Promise<typeof Trix>;
+	"TypicalPrice": () => Promise<typeof TypicalPrice>;
+	"VWAP": () => Promise<typeof VWAP>;
 	"ValueAxis": () => Promise<typeof ValueAxis>;
 	"Venn": () => Promise<typeof Venn>;
 	"VerticalLayout": () => Promise<typeof VerticalLayout>;
@@ -390,6 +405,7 @@ export interface IClasses {
 	"XYChartScrollbar": () => Promise<typeof XYChartScrollbar>;
 	"XYCursor": () => Promise<typeof XYCursor>;
 	"XYSeries": () => Promise<typeof XYSeries>;
+	"ZigZag": () => Promise<typeof ZigZag>;
 	"ZoomControl": () => Promise<typeof ZoomControl>;
 }
 
@@ -503,6 +519,7 @@ const classes: IClasses = {
 	"MapPolygon": () => import(/* webpackExports: "MapPolygon", webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygon),
 	"MapPolygonSeries": () => import(/* webpackExports: "MapPolygonSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygonSeries),
 	"MapSeries": () => import(/* webpackExports: "MapSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapSeries),
+	"MedianPrice": () => import(/* webpackExports: "MedianPrice", webpackMode: "weak" */ "./../../../stock").then((m) => m.MedianPrice),
 	"Modal": () => import(/* webpackExports: "Modal", webpackMode: "weak" */ "./../../../index").then((m) => m.Modal),
 	"MovingAverage": () => import(/* webpackExports: "MovingAverage", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverage),
 	"MovingAverageDeviation": () => import(/* webpackExports: "MovingAverageDeviation", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageDeviation),
@@ -513,12 +530,14 @@ const classes: IClasses = {
 	"Pack": () => import(/* webpackExports: "Pack", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Pack),
 	"PanelControls": () => import(/* webpackExports: "PanelControls", webpackMode: "weak" */ "./../../../stock").then((m) => m.PanelControls),
 	"Partition": () => import(/* webpackExports: "Partition", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Partition),
+	"PathPattern": () => import(/* webpackExports: "PathPattern", webpackMode: "weak" */ "./../../../index").then((m) => m.PathPattern),
 	"Pattern": () => import(/* webpackExports: "Pattern", webpackMode: "weak" */ "./../../../index").then((m) => m.Pattern),
 	"PercentChart": () => import(/* webpackExports: "PercentChart", webpackMode: "weak" */ "./../../../percent").then((m) => m.PercentChart),
 	"PercentSeries": () => import(/* webpackExports: "PercentSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PercentSeries),
 	"PeriodSelector": () => import(/* webpackExports: "PeriodSelector", webpackMode: "weak" */ "./../../../stock").then((m) => m.PeriodSelector),
 	"PictorialStackedSeries": () => import(/* webpackExports: "PictorialStackedSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PictorialStackedSeries),
 	"Picture": () => import(/* webpackExports: "Picture", webpackMode: "weak" */ "./../../../index").then((m) => m.Picture),
+	"PicturePattern": () => import(/* webpackExports: "PicturePattern", webpackMode: "weak" */ "./../../../index").then((m) => m.PicturePattern),
 	"PieChart": () => import(/* webpackExports: "PieChart", webpackMode: "weak" */ "./../../../percent").then((m) => m.PieChart),
 	"PieSeries": () => import(/* webpackExports: "PieSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PieSeries),
 	"PointedRectangle": () => import(/* webpackExports: "PointedRectangle", webpackMode: "weak" */ "./../../../index").then((m) => m.PointedRectangle),
@@ -559,6 +578,7 @@ const classes: IClasses = {
 	"SmoothedYLineSeries": () => import(/* webpackExports: "SmoothedYLineSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.SmoothedYLineSeries),
 	"Sprite": () => import(/* webpackExports: "Sprite", webpackMode: "weak" */ "./../../../index").then((m) => m.Sprite),
 	"SpriteResizer": () => import(/* webpackExports: "SpriteResizer", webpackMode: "weak" */ "./../../../index").then((m) => m.SpriteResizer),
+	"StandardDeviation": () => import(/* webpackExports: "StandardDeviation", webpackMode: "weak" */ "./../../../stock").then((m) => m.StandardDeviation),
 	"Star": () => import(/* webpackExports: "Star", webpackMode: "weak" */ "./../../../index").then((m) => m.Star),
 	"StepLineSeries": () => import(/* webpackExports: "StepLineSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.StepLineSeries),
 	"StochasticOscillator": () => import(/* webpackExports: "StochasticOscillator", webpackMode: "weak" */ "./../../../stock").then((m) => m.StochasticOscillator),
@@ -575,6 +595,9 @@ const classes: IClasses = {
 	"Treemap": () => import(/* webpackExports: "Treemap", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Treemap),
 	"TrendLineSeries": () => import(/* webpackExports: "TrendLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.TrendLineSeries),
 	"Triangle": () => import(/* webpackExports: "Triangle", webpackMode: "weak" */ "./../../../index").then((m) => m.Triangle),
+	"Trix": () => import(/* webpackExports: "Trix", webpackMode: "weak" */ "./../../../stock").then((m) => m.Trix),
+	"TypicalPrice": () => import(/* webpackExports: "TypicalPrice", webpackMode: "weak" */ "./../../../stock").then((m) => m.TypicalPrice),
+	"VWAP": () => import(/* webpackExports: "VWAP", webpackMode: "weak" */ "./../../../stock").then((m) => m.VWAP),
 	"ValueAxis": () => import(/* webpackExports: "ValueAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.ValueAxis),
 	"Venn": () => import(/* webpackExports: "Venn", webpackMode: "weak" */ "./../../../venn").then((m) => m.Venn),
 	"VerticalLayout": () => import(/* webpackExports: "VerticalLayout", webpackMode: "weak" */ "./../../../index").then((m) => m.VerticalLayout),
@@ -586,6 +609,7 @@ const classes: IClasses = {
 	"XYChartScrollbar": () => import(/* webpackExports: "XYChartScrollbar", webpackMode: "weak" */ "./../../../xy").then((m) => m.XYChartScrollbar),
 	"XYCursor": () => import(/* webpackExports: "XYCursor", webpackMode: "weak" */ "./../../../xy").then((m) => m.XYCursor),
 	"XYSeries": () => import(/* webpackExports: "XYSeries", webpackMode: "weak" */ "./../../../xy").then((m) => m.XYSeries),
+	"ZigZag": () => import(/* webpackExports: "ZigZag", webpackMode: "weak" */ "./../../../stock").then((m) => m.ZigZag),
 	"ZoomControl": () => import(/* webpackExports: "ZoomControl", webpackMode: "weak" */ "./../../../map").then((m) => m.ZoomControl),
 };
 

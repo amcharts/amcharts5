@@ -214,11 +214,7 @@ export class DateFormatter extends Entity {
 				case "YYY":
 				case "YY":
 				case "Y":
-					let week = $utils.getWeek(date);
-					let year = fullYear;
-					if (week == 1 && (weekday > 4)) {
-						year--;
-					}
+					let year = $utils.getWeekYear(date, this._root.utc);
 					if (info.parts[i] == "YYYY") {
 						value = Math.abs(year).toString();
 					}

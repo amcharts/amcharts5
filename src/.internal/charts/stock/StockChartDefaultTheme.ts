@@ -124,13 +124,6 @@ export class StockChartDefaultTheme extends Theme {
 			rule.states.create("hover", { fillOpacity: 0.07 });
 		}
 
-		r("Grid", ["renderer", "x"]).setAll({
-			strokeOpacity: 0.05
-		})
-
-		r("Grid", ["renderer", "y"]).setAll({
-			strokeOpacity: 0.05
-		})
 
 		r("Grid", ["renderer", "base", "y"]).setAll({
 			strokeOpacity: 0.15
@@ -399,6 +392,11 @@ export class StockChartDefaultTheme extends Theme {
 			setColor(rule, "fill", ic, "background");
 		}
 
+		// Class: Inicator
+		r("Indicator").setAll({
+			position: "absolute"
+		});
+
 		/**
 		 * ------------------------------------------------------------------------
 		 * Drawing related
@@ -472,25 +470,42 @@ export class StockChartDefaultTheme extends Theme {
 			draggable: true
 		});
 
+		r("Line", ["drawing", "hit", "horizontal"]).setAll({
+			strokeWidth: 20
+		});
+
+		r("Line", ["drawing", "hit", "vertical"]).setAll({
+			strokeWidth: 20
+		});
+
+		r("Line", ["drawing", "hit", "ray"]).setAll({
+			strokeWidth: 20
+		});
+
 		{
 			const rule = r("Line", ["drawing", "horizontal"])
+			/*
 			rule.setAll({
-				strokeWidth: 20,
+				strokeWidth: 2,
 				strokeDasharray: 0
-			});
+			});*/
 
 			const stateRule = rule.states.create("hover", {});
 			setColor(stateRule, "stroke", ic, "negative");
 		}
 		{
 			const rule = r("Line", ["drawing", "ray"])
+			rule.setAll({
+				strokeWidth: 2,
+				strokeDasharray: 0
+			});
 			const stateRule = rule.states.create("hover", {});
 			setColor(stateRule, "stroke", ic, "negative");
 		}
 		{
 			const rule = r("Line", ["drawing", "vertical"])
 			rule.setAll({
-				strokeWidth: 20,
+				strokeWidth: 2,
 				strokeDasharray: 0
 			});
 

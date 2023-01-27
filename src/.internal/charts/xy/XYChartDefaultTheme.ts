@@ -275,10 +275,15 @@ export class XYChartDefaultTheme extends Theme {
 			layer: 30
 		});
 
+		r("Rectangle", ["axis", "header", "background"]).setAll({
+			crisp: true
+		});
+
 		{
 			const rule = r("AxisRenderer");
 
 			rule.setAll({
+				crisp: true,
 				strokeOpacity: 0
 			});
 
@@ -330,6 +335,7 @@ export class XYChartDefaultTheme extends Theme {
 			rule.setAll({
 				location: 0,
 				strokeOpacity: 0.15,
+				crisp: true
 			});
 
 			setColor(rule, "stroke", ic, "grid");
@@ -367,7 +373,8 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		r("AxisTick", ["series", "range"]).setAll({
-			visible: false
+			visible: false,
+			crisp: true
 		});
 
 		r("AxisLabel", ["series", "range"]).setAll({
@@ -757,7 +764,7 @@ export class XYChartDefaultTheme extends Theme {
 		// Hollow
 		r("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromOpen", { fillOpacity: 0 });
 		r("Rectangle", ["column", "autocolor", "pro"]).states.create("dropFromOpen", { fillOpacity: 1 });
-		
+
 		{
 			const rule = r("Rectangle", ["column", "autocolor", "pro"]).states.create("riseFromPrevious", {});
 			setColor(rule, "fill", ic, "positive");

@@ -127,11 +127,10 @@ export class DrawingSeries extends LineSeries {
 
 		super._afterNew();
 
-		this._di[0] = {};
-
 		this.set("connect", false);
 		this.set("autoGapCount", Infinity);
 		this.set("ignoreMinMax", true);
+		this.set("groupDataDisabled", true);
 
 		const strokesTemplate = this.strokes.template;
 		strokesTemplate.set("templateField", "stroke");
@@ -142,7 +141,6 @@ export class DrawingSeries extends LineSeries {
 
 		fillsTemplate.events.on("dragstart", (e) => {
 			this._handleFillDragStart(e, this._getIndex(e.target));
-
 			this._isPointerDown = true;
 		})
 
@@ -220,11 +218,23 @@ export class DrawingSeries extends LineSeries {
 			this._handleFillDragStart(e, this._getIndex(e.target));
 		})
 
-		this.set("groupDataDisabled", true);
 		this.bulletsContainer.states.create("hidden", { visible: true, opacity: 0 });
 
-		this.bullets.push(() => {
-			const color = this.get("strokeColor", this.get("stroke"));
+		this.bullets.push((_root, _series, dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			const index = dataContext.index;
+			const di = this._di[index]["e"] as DataItem<IDrawingSeriesDataItem>;
+			let color = this.get("strokeColor", this.get("stroke"));
+
+			if (di) {
+				const dc = di.dataContext as any;
+				if (dc) {
+					const strokeTemplate = dc.stroke;					
+					if (strokeTemplate) {
+						color = strokeTemplate.get("stroke");
+					}
+				}
+			}
 
 			const container = Container.new(this._root, {
 				themeTags: ["grip"],
@@ -254,8 +264,7 @@ export class DrawingSeries extends LineSeries {
 			})
 
 			this._addBulletInteraction(container);
-
-			this._tweakBullet(container);
+			this._tweakBullet(container, dataItem);
 
 			return Bullet.new(this._root, {
 				locationX: undefined,
@@ -282,18 +291,45 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	protected _afterDataChange() {
+		$array.each(this.dataItems, (dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			const index = dataContext.index;
+			const corner = dataContext.corner;
+
+			if (index != undefined) {
+				if (this._di[index] == undefined) {
+					this._di[index] = {};
+				}
+				this._createElements(index, dataItem);
+				this._di[index][corner] = dataItem;
+				this._index = index;
+			}
+		})
+	}
+
+	protected _createElements(_index: number, _dataItem?: DataItem<IDrawingSeriesDataItem>) {
+
+	}
+
+
 	public clearDrawings(): void {
 		$array.each(this._di, (_dataItems, index) => {
 			this._disposeIndex(index);
 		});
+
+		this.data.setAll([]);
+		this._index = 0;
 	}
 
 	protected _getIndex(sprite: Sprite): number {
 		const userData = sprite.get("userData");
 		if (userData && userData.length > 0) {
 			const dataItem = this.dataItems[userData[0]];
+
 			if (dataItem) {
 				const dataContext = dataItem.dataContext as any;
+
 				if (dataContext) {
 					return dataContext.index;
 				}
@@ -412,39 +448,37 @@ export class DrawingSeries extends LineSeries {
 					if ($type.isNumber(dvpx) && $type.isNumber(dvy)) {
 
 						const vpx = dvpx + dpx;
-						const vy = dvy + dy;
+						let vy = dvy + dy;
+
+						const yAxis = this.get("yAxis");
+						const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
+						vy = $math.round(vy, roundTo);
+
 						const vx = this._getXValue(xAxis.positionToValue(vpx))
 
-						dataItem.set("valueX", vx);
+						this._setContext(dataItem, "valueX", vx)
+						this._setContext(dataItem, "valueY", vy, true);
+
 						this._setXLocation(dataItem, vx);
-
-						dataItem.set("valueY", vy);
-						dataItem.set("valueYWorking", vy);
-
-						const dataContext = dataItem.dataContext as any;
-						dataContext.valueX = vx;
-						dataContext.valueY = vy;
 					}
 				})
 			}
 		}
 
 		this._updateSegment(index);
-		this._updateElements();
 	}
 
 	protected _updateSegment(_index: number) {
-
+		this._updateElements();
 	}
 
 	public _updateChildren() {
-
-		if (this.isDirty("strokeColor") || this.isDirty("fillColor") || this.isDirty("strokeOpacity") || this.isDirty("fillOpacity") || this.isDirty("strokeWidth") || this.isDirty("strokeDasharray")) {
-			this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate() });
-		}
-
 		this._updateElements();
 		super._updateChildren();
+	}
+
+	protected _updateElements() {
+
 	}
 
 	protected _getFillTemplate(): Template<any> {
@@ -489,11 +523,7 @@ export class DrawingSeries extends LineSeries {
 		return Template.new(strokeTemplate);
 	}
 
-	protected _updateElements() {
-
-	}
-
-	protected _tweakBullet(_container: Container) {
+	protected _tweakBullet(_container: Container, _dataItem: DataItem<IDrawingSeriesDataItem>) {
 
 	}
 
@@ -542,10 +572,11 @@ export class DrawingSeries extends LineSeries {
 	// need this in order bullets not to be placed to the charts bullets container
 	public _placeBulletsContainer() {
 		this.children.moveValue(this.bulletsContainer);
+		this.enableDrawing();
+		this.disableDrawing();
 	}
 
 	protected _handleBulletDragged(event: ISpritePointerEvent) {
-
 		const dataItem = event.target.dataItem as DataItem<this["_dataItemSettings"]>;
 
 		const chart = this.chart;
@@ -559,7 +590,6 @@ export class DrawingSeries extends LineSeries {
 		if (dataContext) {
 			const index = dataContext.index;
 			this._updateSegment(index);
-			this._updateElements();
 		}
 	}
 
@@ -570,15 +600,9 @@ export class DrawingSeries extends LineSeries {
 		const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
 		const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
 
-		dataItem.set("valueX", vx);
+		this._setContext(dataItem, "valueX", vx);
+		this._setContext(dataItem, "valueY", vy, true);
 		this._setXLocation(dataItem, vx);
-
-		dataItem.set("valueY", vy);
-		dataItem.set("valueYWorking", vy);
-
-		const dataContext = dataItem.dataContext as any;
-		dataContext.valueX = vx;
-		dataContext.valueY = vy;		
 
 		this._positionBullets(dataItem);
 	}
@@ -597,23 +621,6 @@ export class DrawingSeries extends LineSeries {
 
 	protected _handlePointerOut() {
 
-	}
-
-	protected _addContextInfo(index: number, corner?: any) {
-		const dataItems = this.dataItems;
-		const len = dataItems.length;
-		const dataItem = dataItems[len - 1];
-		const dataContext = dataItem.dataContext as any;
-		if (dataContext) {
-			dataContext.index = index;
-			if (corner != null) {
-				dataContext.corner = corner;
-			}
-		}
-		if (!this._di[index]) {
-			this._di[index] = {};
-		}
-		this._di[index][corner] = dataItem;
 	}
 
 	public enableDrawing() {
@@ -741,6 +748,7 @@ export class DrawingSeries extends LineSeries {
 					super.disposeDataItem(dataItem);
 				})
 			}
+			delete this._di[index];
 		}
 	}
 
@@ -753,13 +761,30 @@ export class DrawingSeries extends LineSeries {
 				value = value / 100 * baseValue + baseValue;
 			}
 		}
-		return value;
+
+		const yAxis = this.get("yAxis");
+		const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
+
+		return $math.round(value, roundTo);
 	}
 
 	protected _getXValue(value: number): number {
 		const xAxis = this.get("xAxis");
 		const min = xAxis.getPrivate("min", 0) + 1;
 		const max = xAxis.getPrivate("max", 1) - 1;
-		return $math.fitToRange(value, min, max);
+		return Math.round($math.fitToRange(value, min, max));
+	}
+
+	public _setContext(dataItem: DataItem<IDrawingSeriesDataItem>, key: any, value: any, working?: boolean) {
+		dataItem.set(key, value);
+		if (working) {
+			dataItem.set(key + "Working" as any, value);
+		}
+		const dataContext = dataItem.dataContext as any;
+
+		const field = this.get(key + "Field" as any);
+		if (field) {
+			dataContext[field] = value;
+		}
 	}
 }

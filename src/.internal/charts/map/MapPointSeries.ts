@@ -73,11 +73,17 @@ export interface IMapPointSeriesDataItem extends IMapSeriesDataItem {
 	polygonId?: string;
 
 	/**
-	 * @todo review
-	 * Specifies if a point is fixed or moves together with a map. Fixed points can not be used for MapLines pointsToConnect setting.
+	 * If set to `true`, the point will be drawn according to its `x` and `y`
+	 * coordinates, not its latitude and longitude.
+	 * 
+	 * Fixed points will not move together with map, and can not be used to
+	 * connect points on a `MapLineSeries`.
+	 * 
 	 * @default false
+	 * @since 5.2.34
 	 */
 	fixed?: boolean;
+
 }
 
 export interface IMapPointSeriesSettings extends IMapSeriesSettings {

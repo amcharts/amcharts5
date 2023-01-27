@@ -623,7 +623,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _getM(timeUnit:TimeUnit){
-		if(timeUnit == "month" || timeUnit == "year"){
+		if(timeUnit == "month" || timeUnit == "year" || timeUnit == "day"){
 			return 1.05;
 		}
 		return 1.01;

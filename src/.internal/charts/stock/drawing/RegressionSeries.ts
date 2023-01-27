@@ -36,7 +36,7 @@ export class RegressionSeries extends SimpleLineSeries {
 		const diP2 = this._di[index]["p2"];
 
 		const series = this.get("series");
-		if (series) {
+		if (series && diP1 && diP2) {
 			const xAxis = series.get("xAxis") as ValueAxis<AxisRenderer>;
 
 			let x1 = this._getXValue(diP1.get("valueX" as any));
@@ -81,15 +81,12 @@ export class RegressionSeries extends SimpleLineSeries {
 							[y1, y2] = [y2, y1];
 						}
 
-						diP1.set("valueY", y1);
-						diP1.set("valueYWorking", y1);
+						this._setContext(diP1, "valueY", y1, true);
+						this._setContext(diP2, "valueY", y2, true);
 
-						diP2.set("valueY", y2);
-						diP2.set("valueYWorking", y2);
-
-						diP1.set("valueX", x1);
-						diP2.set("valueX", x2);
-
+						this._setContext(diP1, "valueX", x1);
+						this._setContext(diP2, "valueX", x2);
+						
 						this._positionBullets(diP1);
 						this._positionBullets(diP2);
 					}

@@ -494,6 +494,23 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 */
 	showTooltipOn?: "hover" | "always" | "click";
 
+	/**
+	 * If set to `true`, an element will try to draw itself in such way, that it
+	 * looks crisp on screen, with minimal anti-aliasing.
+	 *
+	 * It will round x/y position so it is positioned fine "on pixel".
+	 *
+	 * It will also adjust `strokeWidth` based on device pixel ratio or zoom,
+	 * so the line might look thinner than expected.
+	 *
+	 * NOTE: this is might not universally work, especially when set on several
+	 * objects that are supposed to fit perfectly with each other.
+	 *
+	 * @default false
+	 * @since 5.3.0
+	 */
+	crisp?:boolean;
+
 }
 
 export interface ISpritePrivate extends IEntityPrivate {
@@ -2400,7 +2417,7 @@ export abstract class Sprite extends Entity {
 		return super._findStaticTemplate(f);
 	}
 
-	protected _walkParents(f: (parent: Sprite) => void): void {
+	public _walkParents(f: (parent: Sprite) => void): void {
 		if (this._parent) {
 			this._walkParent(f);
 		}

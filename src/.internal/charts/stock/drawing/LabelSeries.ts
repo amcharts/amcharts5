@@ -7,6 +7,7 @@ import { Label } from "../../../core/render/Label";
 import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
 import { SpriteResizer } from "../../../core/render/SpriteResizer";
 import { color, Color } from "../../../core/util/Color";
+import { Template } from "../../../core/util/Template";
 
 import * as $utils from "../../../core/util/Utils";
 
@@ -113,33 +114,16 @@ export class LabelSeries extends PolylineSeries {
 		div.appendChild(cancelButton);
 	}
 
-	protected _tweakBullet(container: Container) {
+	protected _tweakBullet(container: Container, dataItem: DataItem<ILabelSeriesDataItem>) {
+		const dataContext = dataItem.dataContext as any;
+		const text = dataContext.text;
+		const template = dataContext.settings;
 		const label = container.children.push(Label.new(this._root, {
 			themeTags: ["label"],
-			text: this.getPrivate("input").value
-		}));
+			text: text
+		}, template));
 
 		this.setPrivate("label", label);
-
-		const fontSize = this.get("labelFontSize");
-		if (fontSize != null) {
-			label.set("fontSize", fontSize)
-		}
-
-		const fontFamily = this.get("labelFontFamily");
-		if (fontFamily != null) {
-			label.set("fontFamily", fontFamily)
-		}
-
-		const fontStyle = this.get("labelFontStyle");
-		if (fontStyle != null) {
-			label.set("fontStyle", fontStyle)
-		}
-
-		const fontWeight = this.get("labelFontWeight");
-		if (fontWeight != null) {
-			label.set("fontWeight", fontWeight)
-		}
 
 		container.events.on("click", () => {
 			const spriteResizer = this.spriteResizer;
@@ -159,30 +143,38 @@ export class LabelSeries extends PolylineSeries {
 			this._isHover = false;
 		})
 
-		this._tweakBullet2(label);
+		label.on("scale", (scale) => {
+			template.set("scale", scale)
+		})
+
+		label.on("rotation", (rotation) => {
+			template.set("rotation", rotation)
+		})
+
+		this._tweakBullet2(label, dataItem);
 	}
 
-	protected _tweakBullet2(label: Label) {
+	protected _tweakBullet2(label: Label, _dataItem: DataItem<ILabelSeriesDataItem>) {
 		label.set("background", RoundedRectangle.new(this._root, { fillOpacity: 0, strokeOpacity: 0, fill: color(0xffffff) }))
-		label.set("fill", this.get("labelFill", this.get("fillColor", this.get("fill"))));
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {
 			if (!this._isHover) {
+
+				this._index++;
+				this._di[this._index] = {};
+				
 				const input = this.getPrivate("input");
 				input.value = "";
 
 				this._clickEvent = event;
-				//console.log(event);
 				const inputDiv = this.getPrivate("inputContainer");
 				inputDiv.style.display = "block";
 				inputDiv.style.left = (event.point.x) + "px";
 				inputDiv.style.top = (event.point.y) + "px";
 				input.focus();
-				this.spriteResizer.set("sprite", undefined);
-				this._index++;
-				this._di[this._index] = {};
+				this.spriteResizer.set("sprite", undefined);				
 			}
 		}
 	}
@@ -190,11 +182,48 @@ export class LabelSeries extends PolylineSeries {
 	public saveText() {
 		const clickEvent = this._clickEvent;
 		if (clickEvent) {
-			if (this.getPrivate("input").value) {
-				super._handlePointerClick(clickEvent);
+			const text = this.getPrivate("input").value;
+			if (text != undefined) {
+				this._addPoint(clickEvent);
+				const dataContext = this.data.getIndex(this.data.length - 1) as any;
+				dataContext.text = text;
+				dataContext.index = this._index;
+				dataContext.corner = 0;
+				dataContext.settings = this._getLabelTemplate();
+				this._afterTextSave(dataContext);
 			}
 			this.getPrivate("inputContainer").style.display = "none";
 		}
+	}
+
+	protected _afterTextSave(_dataContext:any){
+
+	}
+
+	protected _getLabelTemplate(): Template<any> {
+		const template: any = {};
+
+		const labelFontSize = this.get("labelFontSize");
+		if (labelFontSize != null) {
+			template.fontSize = labelFontSize;
+		}
+
+		const labelFontFamily = this.get("labelFontFamily");
+		if (labelFontFamily != null) {
+			template.fontFamily = labelFontFamily;
+		}
+
+		const labelFontWeight = this.get("labelFontWeight");
+		if (labelFontWeight != null) {
+			template.fontWeight = labelFontWeight;
+		}
+
+		const labelFill = this.get("labelFill");
+		if (labelFill != null) {
+			template.fill = labelFill;
+		}
+
+		return Template.new(template);
 	}
 
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {

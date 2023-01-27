@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.0] - 2023-01-27
+
+### Added
+- New plugin: `json`, which allows serializing and parsing serialized (JSON) configs into charts. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/).
+- New methods added to `StockChart`'s' `IndicatorControl` and `DrawingControl` used for serializing user-added indicators and annotations. [More info](https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/).
+- `crisp` (default: `false`) setting added to `Sprite`. If set to `true`, will adjust `strokeWidth` to match screen zoom (retina) as well as its positions will be rounded up, so the lines look crisper. It's primarily meant for straight lines, but can work on other objects, too. Use with care, as coordinate rounding might produce overlapping or gaps between shapes that should be adjacent.
+- New `Root` property: `accessible` (default: `true`).
+- New `Root` property: `updateTick` (default: `true`). Set it to `false` to temporarily disable all rendering on `Root`. Reset back to `true` to resume rendering. Useful when need to do a bunch of async operations that might result in errors if rendering started before all of them finish.
+
+### Changed
+- `crisp` is now set to `true` by default on elements that use straight lines, like grid, ticks, resize button icon, etc.
+- Removed grid opacity setting from default `StockChart` theme. Now it will be the same as regular `XYChart`.
+- The generated code now uses `es2015` target instead of `es5`.
+
+### Fixed
+- Labels on a `GaplessDateAxis` might get hidden at some zoom levels.
+- Eraser button on `StockChart` was not being unselected when other drawing tool was selected.
+- `"YYYY"` (year of week) in date format was not working properly in all cases.
+- Fixed two memory leak sources related to disposing of charts.
+
+
 ## [5.2.50] - 2023-01-20
 
 ### Fixed
@@ -116,6 +137,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - `idField` was not being respected in some cases in a `MapSeries`.
 - `MapPointSeries` was not setting map bounds properly if it did not contain any geometries (just points with lat/long).
 - `keepTargetHover` on a `Tooltip` was not working when `tooltipContainerBounds` was used in `Root`.
+- Some DOM elements were not being removed when element/Root was disposed.
 
 
 ## [5.2.38] - 2022-11-29

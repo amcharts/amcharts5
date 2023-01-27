@@ -1,7 +1,8 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
-import type { Line } from "../../../core/render/Line";
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
+import type { Line } from "../../../core/render/Line";
+import type { Template } from "../../../core/util/Template";
 
 export interface IHorizontalLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
@@ -22,6 +23,8 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 
 	protected _tag = "horizontal";
 
+	protected _updateExtension = true;
+
 	protected _handleBulletDragged(event: ISpritePointerEvent) {
 		super._handleBulletDragged(event);
 
@@ -32,32 +35,39 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 			const index = dataContext.index;
 			const diP1 = this._di[index]["p1"];
 			const diP2 = this._di[index]["p2"];
+			const di = this._di[index]["e"];
 
 			const movePoint = this._movePointerPoint;
 
-			if (diP1 && diP2 && movePoint) {
+			if (diP1 && diP2 && di && movePoint) {
 				const yAxis = this.get("yAxis");
 				const xAxis = this.get("xAxis");
 
 				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
 
-				diP1.set("valueY", valueY);
-				diP1.set("valueYWorking", valueY);
+				this._setContext(diP1, "valueY", valueY, true);
+				this._setContext(diP2, "valueY", valueY, true);
 
-				diP2.set("valueY", valueY);
-				diP2.set("valueYWorking", valueY);
-
-				diP1.set("valueX", valueX);
-				diP2.set("valueX", valueX + 0.01);
+				this._setContext(diP1, "valueX", valueX);
+				this._setContext(diP2, "valueX", valueX + 1);
 
 				this._setXLocation(diP1, valueX);
-				this._setXLocation(diP2, valueX + 0.01);
+				this._setXLocation(diP2, valueX + 1);
 
 				this._positionBullets(diP1);
 				this._positionBullets(diP2);
 			}
 		}
+	}
+
+	protected _updateExtensionLine(line: Line, template: Template<any>) {
+		line.setAll({
+			stroke: template.get("stroke"),
+			strokeWidth: template.get("strokeWidth"),
+			strokeDasharray: template.get("strokeDasharray"),
+			strokeOpacity: template.get("strokeOpacity")
+		})
 	}
 
 	protected _handlePointerMoveReal() {
@@ -67,19 +77,10 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {
 			if (!this._isDragging) {
-				this._addPoints(event, this._index);
 				this._index++;
+				this._addPoints(event, this._index);
 				this._isDrawing = false;
 			}
 		}
-	}
-
-	protected _addPoints(event: ISpritePointerEvent, index: number):Line {
-		const line = super._addPoints(event, index);
-		this._updateExtentionLine(line);
-		const diP2 = this._di[index]["p2"];
-		diP2.set("valueX", diP2.get("valueX", 0) + 0.001);
-		this._isDrawing = false;
-		return line;
 	}
 }

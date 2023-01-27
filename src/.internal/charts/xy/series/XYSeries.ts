@@ -1043,7 +1043,7 @@ export abstract class XYSeries extends Series {
 						this._valueXShowFields.push(field.split("Working")[0]);
 					}
 					else {
-						this._valueYShowFields.push(field);
+						this._valueXShowFields.push(field);
 					}
 				}
 			});
@@ -2103,7 +2103,7 @@ export abstract class XYSeries extends Series {
 		this.updateLegendMarker(undefined);
 	}
 
-	public _afterDataChange() {
+	protected _afterDataChange() {
 		super._afterDataChange();
 		this.get("xAxis")._markDirtyKey("start");
 		this.get("yAxis")._markDirtyKey("start");

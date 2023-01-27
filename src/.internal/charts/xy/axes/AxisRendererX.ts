@@ -182,7 +182,7 @@ export class AxisRendererX extends AxisRenderer {
 
 			if (axisHeader.children.length > 0) {
 				width = axis.axisHeader.width();
-				axis.set("marginLeft", width);
+				axis.set("marginLeft", width + 1);
 			}
 			else {
 				axisHeader.set("width", width);
@@ -242,7 +242,7 @@ export class AxisRendererX extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			tick.set("x", Math.round(this.positionToCoordinate(position) - this.axis._crispX + 0.5));
+			tick.set("x", this.positionToCoordinate(position));
 
 			let length = tick.get("length", 0);
 			const inside = tick.get("inside", this.get("inside", false));
@@ -332,7 +332,7 @@ export class AxisRendererX extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			grid.set("x", Math.round(this.positionToCoordinate(position) - this.axis._crispX + 0.5));
+			grid.set("x", this.positionToCoordinate(position));
 
 			this.toggleVisibility(grid, position, 0, 1);
 		}

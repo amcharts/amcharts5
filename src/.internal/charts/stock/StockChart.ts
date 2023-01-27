@@ -343,18 +343,18 @@ export class StockChart extends Container {
 						const riseFromPrevious = column.states.lookup("riseFromPrevious");
 						if (riseFromPrevious) {
 							riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
-						}						
+						}
 
 						stockSeries._applyGraphicsStates(dataItem, previous);
 						previous = dataItem;
 					}
 				})
 
-				stockSeries.columns.template.states.create("riseFromOpen", {fill: stockPositiveColor, stroke:stockPositiveColor});
-				stockSeries.columns.template.states.create("riseFromPrevious", {fill: stockPositiveColor, stroke:stockPositiveColor});
+				stockSeries.columns.template.states.create("riseFromOpen", { fill: stockPositiveColor, stroke: stockPositiveColor });
+				stockSeries.columns.template.states.create("riseFromPrevious", { fill: stockPositiveColor, stroke: stockPositiveColor });
 
-				stockSeries.columns.template.states.create("dropFromOpen", {fill: stockNegativeColor, stroke:stockNegativeColor});
-				stockSeries.columns.template.states.create("dropFromPrevious", {fill: stockNegativeColor, stroke:stockNegativeColor});				
+				stockSeries.columns.template.states.create("dropFromOpen", { fill: stockNegativeColor, stroke: stockNegativeColor });
+				stockSeries.columns.template.states.create("dropFromPrevious", { fill: stockNegativeColor, stroke: stockNegativeColor });
 
 				stockSeries.markDirtyValues();
 			}
@@ -778,4 +778,5 @@ export class StockChart extends Container {
 		}
 		return positiveColor;
 	}
+
 }

@@ -285,7 +285,7 @@ module.exports = {
     "inlineSources": true,
     "moduleResolution": "node",
     "module": "esnext",
-    "target": "es5",
+    "target": "es2015",
     "lib": ["es6"]
   }
 }`),
@@ -398,6 +398,10 @@ async function transpile_js(config, base, root_dir, dir) {
         }
 	});
 
+    config.extraScriptImports.forEach((x) => {
+        js_imports.push(x);
+    });
+
 	await Promise.all([
 		write_shared(config, base, dir),
 
@@ -431,6 +435,7 @@ function makeDefaultConfiguration() {
 		extraCSS: null,
 		extraHeadElements: [],
 		bodyElements: ["<div id=\"chartdiv\"></div>"],
+        extraScriptImports: [],
 		noScript: false,
 		body: {
 			"font-family": `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"`,
@@ -459,7 +464,7 @@ function validateConfiguration(config) {
 
 			defaults[key] = value;
 
-		} else if (key === "bodyElements" || key === "extraHeadElements") {
+		} else if (key === "bodyElements" || key === "extraHeadElements" || key === "extraScriptImports") {
 			if (!Array.isArray(value)) {
 				throw new Error(key + " must be an array of strings");
 			}

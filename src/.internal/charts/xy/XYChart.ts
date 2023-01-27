@@ -1416,7 +1416,7 @@ export class XYChart extends SerialChart {
 		const otherCharts = this.getPrivate("otherCharts", this._otherCharts);
 		const global = plotContainer.toGlobal(point);
 
-		if (point.x >= -0.1 && point.y >= -0.1 && point.x <= plotContainer.width() + 0.1 && point.y <= plotContainer.height() + 0.1) {
+		if (point.x >= -0.5 && point.y >= -0.5 && point.x <= plotContainer.width() + 0.5 && point.y <= plotContainer.height() + 0.5) {
 			return true;
 		}
 		if (otherCharts) {

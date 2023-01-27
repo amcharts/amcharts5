@@ -1,5 +1,4 @@
 //import type { IDisposer } from "../../../core/util/Disposer";
-import type { DrawingSeries } from "../drawing/DrawingSeries";
 import type { XYSeries } from "../../xy/series/XYSeries";
 import type { Color } from "../../../core/util/Color";
 import type { ColorSet } from "../../../core/util/ColorSet";
@@ -13,6 +12,7 @@ import { ColorControl } from "./ColorControl";
 import { DropdownListControl } from "./DropdownListControl";
 import { IconControl, IIcon } from "./IconControl";
 import { StockIcons } from "./StockIcons";
+import { DrawingSeries } from "../drawing/DrawingSeries";
 
 import { AverageSeries } from "../drawing/AverageSeries";
 import { CalloutSeries } from "../drawing/CalloutSeries";
@@ -31,7 +31,10 @@ import { RectangleSeries } from "../drawing/RectangleSeries";
 import { RegressionSeries } from "../drawing/RegressionSeries";
 import { TrendLineSeries } from "../drawing/TrendLineSeries";
 import { VerticalLineSeries } from "../drawing/VerticalLineSeries";
+import { JsonParser } from "../../../plugins/json/Json";
+import { Serializer } from "../../../plugins/json/Serializer";
 import type { StockPanel } from "../StockPanel";
+
 
 import * as $array from "../../../core/util/Array";
 import * as $object from "../../../core/util/Object";
@@ -215,6 +218,14 @@ export class DrawingControl extends StockControl {
 		super._initElements();
 	}
 
+	protected _isInited(): boolean {
+		return this.getPrivate("toolsContainer") ? true : false;
+	}
+
+	protected _resetControls(): void {
+		this.getPrivate("eraserControl")!.set("active", false);
+	}
+
 	protected _initToolbar(): void {
 		const stockChart = this.get("stockChart");
 		const l = this._root.language;
@@ -239,8 +250,11 @@ export class DrawingControl extends StockControl {
 		this.setPrivate("toolControl", toolControl);
 
 		toolControl.events.on("selected", (ev) => {
+			eraserControl.set("active", false);
 			this.set("tool", ev.tool);
 		});
+
+		toolControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Icon selection control
@@ -259,6 +273,8 @@ export class DrawingControl extends StockControl {
 			this.set("drawingIcon", ev.icon);
 		});
 
+		iconControl.events.on("click", this._resetControls, this);
+
 		/**
 		 * Snap toggle control
 		 */
@@ -276,6 +292,8 @@ export class DrawingControl extends StockControl {
 		snapControl.on("active", (_ev) => {
 			this.set("snapToData", snapControl.get("active") == true);
 		});
+
+		snapControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Stroke color control
@@ -296,6 +314,8 @@ export class DrawingControl extends StockControl {
 		strokeControl.events.on("selectedOpacity", (ev) => {
 			this.set("strokeOpacity", ev.opacity);
 		});
+
+		strokeControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Stroke width control
@@ -318,6 +338,8 @@ export class DrawingControl extends StockControl {
 		strokeWidthControl.events.on("selected", (ev) => {
 			this.set("strokeWidth", $type.toNumber($type.isString(ev.item) ? ev.item : ev.item.id));
 		});
+
+		strokeWidthControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Stroke dash cofiguration control
@@ -364,6 +386,8 @@ export class DrawingControl extends StockControl {
 			this.set("strokeDasharray", JSON.parse((<IDropdownListItem>ev.item).id));
 		});
 
+		strokeDasharrayControl.events.on("click", this._resetControls, this);
+
 		/**
 		 * Fill color control
 		 */
@@ -385,6 +409,8 @@ export class DrawingControl extends StockControl {
 			this.set("fillOpacity", ev.opacity);
 		});
 
+		fillControl.events.on("click", this._resetControls, this);
+
 		/**
 		 * Label color control
 		 */
@@ -402,6 +428,8 @@ export class DrawingControl extends StockControl {
 		labelFillControl.events.on("selected", (ev) => {
 			this.set("labelFill", ev.color);
 		});
+
+		labelFillControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Font size control
@@ -424,6 +452,8 @@ export class DrawingControl extends StockControl {
 			this.set("labelFontSize", $type.isString(ev.item) ? ev.item : ev.item.id);
 		});
 
+		fontSizeControl.events.on("click", this._resetControls, this);
+
 		/**
 		 * Bold control
 		 */
@@ -439,6 +469,8 @@ export class DrawingControl extends StockControl {
 			this.set("labelFontWeight", boldControl.get("active") ? "bold" : "normal");
 		});
 
+		boldControl.events.on("click", this._resetControls, this);
+
 		/**
 		 * Italic control
 		 */
@@ -453,6 +485,8 @@ export class DrawingControl extends StockControl {
 		italicControl.on("active", (_ev) => {
 			this.set("labelFontStyle", italicControl.get("active") ? "italic" : "normal");
 		});
+
+		italicControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Font family control
@@ -474,6 +508,8 @@ export class DrawingControl extends StockControl {
 			this.set("labelFontFamily", $type.isString(ev.item) ? ev.item : ev.item.id);
 		});
 
+		fontFamilyControl.events.on("click", this._resetControls, this);
+
 		/**
 		 * Line extension control
 		 */
@@ -491,6 +527,8 @@ export class DrawingControl extends StockControl {
 		extensionControl.on("active", (_ev) => {
 			this.set("showExtension", extensionControl.get("active") == true);
 		});
+
+		extensionControl.events.on("click", this._resetControls, this);
 
 		/**
 		 * Eraser control
@@ -529,8 +567,10 @@ export class DrawingControl extends StockControl {
 		toolsContainer.appendChild(clearControl.getPrivate("button")!);
 		this.setPrivate("clearControl", clearControl);
 		this._disposers.push($utils.addEventListener(clearControl.getPrivate("button")!, "click", (_ev) => {
+			eraserControl.set("active", false);
 			$object.each(this._drawingSeries, (_tool, seriesList) => {
 				$array.each(seriesList, (series) => {
+					//series.disableErasing();
 					series.clearDrawings();
 				});
 			})
@@ -558,7 +598,7 @@ export class DrawingControl extends StockControl {
 			}
 		}
 
-		if (this.isDirty("active")) {
+		if (this.isDirty("active") && this._isInited()) {
 			if (this.get("active")) {
 				this.getPrivate("toolsContainer")!.style.display = "block";
 				this._setTool(this.get("tool"));
@@ -613,6 +653,51 @@ export class DrawingControl extends StockControl {
 		}
 
 		// Check if we need to create series
+		this._maybeInitToolSeries(tool);
+		let seriesList = this._drawingSeries[tool];
+
+		let prevPanel: StockPanel;
+		$array.each(seriesList, (series) => {
+			if (prevPanel !== series.chart) {
+				series.enableDrawing();
+				this._currentEnabledSeries.push(series);
+				prevPanel = series.chart as StockPanel;
+			}
+		});
+
+		this.getPrivate("toolControl")!.setTool(tool);
+
+		// Show/hide needed drawing property controls
+		const controls: any = {
+			strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+			strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+			strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+			extensionControl: ["Average", "Line", "Regression", "Trend Line"],
+			fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Arrows &amp; Icons", "Fibonacci Timezone"],
+
+			labelFillControl: ["Callout", "Label"],
+			labelFontSizeControl: ["Callout", "Label"],
+			labelFontFamilyControl: ["Callout", "Label"],
+			boldControl: ["Callout", "Label"],
+			italicControl: ["Callout", "Label"],
+
+			iconControl: ["Arrows &amp; Icons"],
+			snapControl: ["Callout", "Arrows &amp; Icons"],
+		}
+
+		$object.each(controls, (control, tools) => {
+			const controlElement = (<any>this).getPrivate(control);
+			if (tools.indexOf(tool) == -1) {
+				controlElement.hide();
+			}
+			else {
+				controlElement.show();
+			}
+			//controlElement!.getPrivate("button").style.display = tools.indexOf(tool) == -1 ? "none" : "";
+		});
+	}
+
+	protected _maybeInitToolSeries(tool: DrawingTools): void {
 		let seriesList = this._drawingSeries[tool];
 		if (!seriesList) {
 
@@ -778,42 +863,6 @@ export class DrawingControl extends StockControl {
 			this._setSnap();
 			this._setExtension();
 		}
-
-		$array.each(seriesList, (series) => {
-			series.enableDrawing();
-			this._currentEnabledSeries.push(series);
-		});
-
-		this.getPrivate("toolControl")!.setTool(tool);
-
-		// Show/hide needed drawing property controls
-		const controls: any = {
-			strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-			strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-			strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-			extensionControl: ["Average", "Line", "Regression", "Trend Line"],
-			fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Arrows &amp; Icons"],
-
-			labelFillControl: ["Callout", "Label"],
-			labelFontSizeControl: ["Callout", "Label"],
-			labelFontFamilyControl: ["Callout", "Label"],
-			boldControl: ["Callout", "Label"],
-			italicControl: ["Callout", "Label"],
-
-			iconControl: ["Arrows &amp; Icons"],
-			snapControl: ["Callout", "Arrows &amp; Icons"],
-		}
-
-		$object.each(controls, (control, tools) => {
-			const controlElement = (<any>this).getPrivate(control);
-			if (tools.indexOf(tool) == -1) {
-				controlElement.hide();
-			}
-			else {
-				controlElement.show();
-			}
-			//controlElement!.getPrivate("button").style.display = tools.indexOf(tool) == -1 ? "none" : "";
-		});
 	}
 
 	protected _setStroke(): void {
@@ -870,6 +919,10 @@ export class DrawingControl extends StockControl {
 	}
 
 	protected _setDrawingIcon(): void {
+		if (!this._isInited()) {
+			return;
+		}
+
 		const icon = this.get("drawingIcon", this.get("drawingIcons")![0]);
 		const fillControl = this.getPrivate("fillControl")!;
 		if (icon.fillDisabled) {
@@ -914,5 +967,96 @@ export class DrawingControl extends StockControl {
 		super._dispose();
 	}
 
+	protected _getSeriesTool(series: DrawingSeries): DrawingTools | undefined {
+		if (series instanceof DrawingSeries) {
+			let name = series.className;
+			if (name == "SimpleLineSeries") {
+				return "Line";
+			}
+			else if (name == "IconSeries") {
+				return "Arrows &amp; Icons";
+			}
+			name = $utils.addSpacing(name.replace("Series", ""));
+			return name as DrawingTools;
+		}
+	}
 
+	/**
+	 * Serializes all drawings into an array of simple objects or JSON.
+	 *
+	 * `output` parameter can either be `"object"` or `"string"` (default).
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @since 5.3.0
+	 * @param   output Output format
+	 * @param   indent Line indent in JSON
+	 * @return         Serialized indicators
+	 */
+	public serializeDrawings(output: "object" | "string" = "string", indent?: string): Array<unknown> | string {
+		const res: Array<any> = [];
+		this.get("stockChart").panels.each((panel, panelIndex) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					const serializer = Serializer.new(this.root, {
+						includeSettings: ["strokeColor", "fillColor", "strokeOpacity", "fillOpacity", "strokeWidth", "strokeDasharray", "field", "snapToData", "svgPath", "labelFontSize", "labelFontFamily", "labelFontWeight", "labelFontStyle", "labelFill", "showExtension"],
+						//includeSettings: ["data"],
+						maxDepth: 4
+					});
+					series.data.values.map((row: any) => {
+						row.__parse = true;
+					})
+					const json: any = {
+						__tool: this._getSeriesTool(series),
+						__panelIndex: panelIndex,
+						__drawing: serializer.serialize(series.data.values, 0, true)
+					}
+					//json.__panelIndex = panelIndex;
+					res.push(json);
+				}
+			});
+		});
+		return output == "object" ? res : JSON.stringify(res, undefined, indent);
+	}
+
+	/**
+	 * Parses data serialized with `serializeDrawings()` and adds drawings to the
+	 * chart.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @since 5.3.0
+	 * @param  data Serialized data
+	 */
+	public unserializeDrawings(data: string | Array<any>): void {
+		const stockChart = this.get("stockChart");
+		if ($type.isString(data)) {
+			data = JSON.parse(data);
+		}
+		if (!$type.isArray(data)) {
+			data = [data];
+		}
+		$array.each(data, (drawing) => {
+			// Panel
+			let panel = stockChart.panels.getIndex(drawing.__panelIndex || 0)!;
+			const tool = drawing.__tool;
+
+			this._maybeInitToolSeries(tool);
+
+			// Get series
+			let drawingSeries: DrawingSeries;
+			$array.each(this._drawingSeries[tool] || [], (series) => {
+				if (series.chart === panel) {
+					drawingSeries = series;
+				}
+			});
+
+			if (!drawing.settings) {
+				drawing.settings = {};
+			}
+
+			// Parse
+			JsonParser.new(this._root).parse(drawing.__drawing).then((drawingData: any) => {
+				drawingSeries.data.pushAll(drawingData);
+			});
+		})
+	}
 }
