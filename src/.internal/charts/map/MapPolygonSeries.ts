@@ -26,11 +26,18 @@ export interface IMapPolygonSeriesDataItem extends IMapSeriesDataItem {
 }
 
 export interface IMapPolygonSeriesSettings extends IMapSeriesSettings {
+
 	/**
-	 * @todo review
+	 * If set to `true`, the order of coordinates in GeoJSON will be flipped.
+	 *
+	 * Some GeoJSON software produces those in reverse order, so if your custom
+	 * map appears garbled, try this setting.
+	 * 
 	 * @default false
+	 * @since 5.2.42
 	 */
 	reverseGeodata?: boolean;
+
 }
 
 /**

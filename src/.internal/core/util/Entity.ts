@@ -1205,6 +1205,13 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
+	 * @ignore
+	 */
+	public isUserSetting<Key extends keyof this["_settings"]>(key: Key): boolean {
+		return this._userProperties[key] || false;
+	}
+
+	/**
 	 * Sets a setting `value` for the specified `key`, and returns the same `value`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
@@ -1324,7 +1331,7 @@ export class Entity extends Settings implements IDisposer {
 		}
 	}
 
-	protected _walkParents(f: (parent: Entity) => void): void {
+	public _walkParents(f: (parent: Entity) => void): void {
 		f(this._root._rootContainer);
 		f(this);
 	}

@@ -230,7 +230,7 @@ export class RadarChart extends XYChart {
 		if (mask) {
 			mask.set("draw", (display) => {
 				this._arcGenerator.context(display as any);
-				this._arcGenerator({ innerRadius: innerRadius, outerRadius: radius, startAngle: (this.get("startAngle", 0) + 90) * $math.RADIANS, endAngle: (this.get("endAngle", 0) + 90) * $math.RADIANS });
+				this._arcGenerator({ innerRadius: innerRadius, outerRadius: radius + .5, startAngle: (this.get("startAngle", 0) + 90) * $math.RADIANS, endAngle: (this.get("endAngle", 0) + 90) * $math.RADIANS });
 			})
 		}
 	}

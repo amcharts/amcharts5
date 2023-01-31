@@ -16,9 +16,15 @@ export interface IMapSeriesDataItem extends ISeriesDataItem {
 export interface IMapSeriesSettings extends ISeriesSettings {
 
 	/**
-	 * @todo review
-	 * You can tell MapPointSeries or MapLineSeries to affect map bounds. Or, if you have a Background series
-	 * you can simply create a background spanning through all the globe and set affectsBounds to false, so that background would not influence the chart when fitting it to the screen.
+	 * All map series will determine the actual bounds shown in the [[MapChart]].
+	 *
+	 * If we need a series to be ignored while calculating the bounds, we can set
+	 * this to `false`.
+	 *
+	 * Especially useful for background series.
+	 *
+	 * @default true
+	 * @since 5.2.36
 	 */
 	affectsBounds?: boolean;
 

@@ -44,7 +44,7 @@ export class EllipseSeries extends DrawingSeries {
 
 	public readonly ellipses: ListTemplate<Ellipse> = new ListTemplate(
 		Template.new({ radiusX: 0, radiusY: 0 }),
-		() => Ellipse._new(this._root, { radiusX: 0, radiusY: 0 }, [this.ellipses.template])
+		() => Ellipse._new(this._root, { radiusX: 0, radiusY: 0, templateField: "settings"}, [this.ellipses.template])
 	);
 
 	protected _afterNew() {
@@ -65,9 +65,11 @@ export class EllipseSeries extends DrawingSeries {
 		ellipseTemplate.events.on("dragstart", (e) => {
 			this._handleFillDragStart(e, e.target.get("userData"));
 		})
+
 		ellipseTemplate.events.on("dragstop", (e) => {
 			this._handleFillDragStop(e, e.target.get("userData"));
 		})
+
 		ellipseTemplate.events.on("click", (e) => {
 			if (this._erasingEnabled) {
 				this._disposeIndex(e.target.get("userData"));
@@ -91,8 +93,9 @@ export class EllipseSeries extends DrawingSeries {
 			const positionR = xAxis.valueToPosition(rDI.get("valueX", 0));
 
 			let mx = this._getXValue(xAxis.positionToValue(positionL + (positionR - positionL) / 2));
-			tDI.set("valueX", mx);
-			bDI.set("valueX", mx);
+			this._setContext(tDI, "valueX", mx);
+			this._setContext(bDI, "valueX", mx);
+
 			this._setXLocation(tDI, mx);
 			this._setXLocation(bDI, mx);
 		}
@@ -135,35 +138,28 @@ export class EllipseSeries extends DrawingSeries {
 			if (bDI && tDI && rDI && lDI) {
 				if (corner == "b") {
 					const valueY0 = tDI.get(vwy, 0)
-
-					bDI.set(vy, valueY);
-					bDI.set(vwy, valueY);
+					this._setContext(bDI, vy, valueY, true);
 
 					let my = valueY0 + (valueY - valueY0) / 2;
-					rDI.set(vy, my);
-					rDI.set(vwy, my);
 
-					lDI.set(vy, my);
-					lDI.set(vwy, my);
+					this._setContext(rDI, vy, my, true);
+					this._setContext(lDI, vy, my, true);
+					this._setContext(bDI, vx, valueXReal);
 
-					bDI.set(vx, valueXReal)
 					bDI.set("locationX", locationXReal);
 				}
 
 				if (corner == "t") {
 					const valueY0 = bDI.get(vwy, 0)
 
-					tDI.set(vy, valueY);
-					tDI.set(vwy, valueY);
+					this._setContext(tDI, vy, valueY, true);
 
 					let my = valueY0 + (valueY - valueY0) / 2;
-					rDI.set(vy, my);
-					rDI.set(vwy, my);
 
-					lDI.set(vy, my);
-					lDI.set(vwy, my);
+					this._setContext(rDI, vy, my, true);
+					this._setContext(lDI, vy, my, true);
+					this._setContext(tDI, vx, valueXReal);
 
-					tDI.set(vx, valueXReal)
 					tDI.set("locationX", locationXReal);
 				}
 
@@ -172,37 +168,37 @@ export class EllipseSeries extends DrawingSeries {
 					const positionX0 = xAxis.valueToPosition(valueX0);
 					const positionX = xAxis.valueToPosition(valueX);
 
-					lDI.set(vx, valueX);
+					this._setContext(lDI, vx, valueX);
 					this._setXLocation(lDI, valueX);
 
 					let mpos = positionX0 + (positionX - positionX0) / 2;
 					let mx = this._getXValue(xAxis.positionToValue(mpos));
-					tDI.set(vx, mx);
-					bDI.set(vx, mx);
+					this._setContext(tDI, vx, mx);
+					this._setContext(bDI, vx, mx);
+
 					this._setXLocation(tDI, mx);
 					this._setXLocation(bDI, mx);
 
-					lDI.set(vwy, valueYReal);
-					lDI.set(vy, valueYReal);
+					this._setContext(lDI, vy, valueYReal, true);
 				}
 				if (corner == "r") {
 					const valueX0 = lDI.get(vx, 0)
 					const positionX0 = xAxis.valueToPosition(valueX0);
 					const positionX = xAxis.valueToPosition(valueX);
 
-					rDI.set(vx, valueX);
+					this._setContext(rDI, vx, valueX);
 					this._setXLocation(rDI, valueX);
 
 					let mpos = positionX0 + (positionX - positionX0) / 2;
 					let mx = this._getXValue(xAxis.positionToValue(mpos));
 
-					tDI.set(vx, mx);
-					bDI.set(vx, mx);
+					this._setContext(tDI, vx, mx);
+					this._setContext(bDI, vx, mx);
+
 					this._setXLocation(tDI, mx);
 					this._setXLocation(bDI, mx);
 
-					rDI.set(vwy, valueYReal);
-					rDI.set(vy, valueYReal);
+					this._setContext(rDI, vy, valueYReal, true);
 				}
 			}
 
@@ -211,19 +207,29 @@ export class EllipseSeries extends DrawingSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		super._handlePointerClick(event);
 		if (this._drawingEnabled) {
+			super._handlePointerClick(event);
+
 			if (!this._isDragging) {
 				if (!this._isDrawing) {
+					this._index++;
 					this._isDrawing = true;
 					this.bulletsContainer.show();
 					this._addPoints(event, this._index);
 				}
 				else {
 					this._isDrawing = false;
-					this._index++;
 				}
 			}
+		}
+	}
+
+	protected _createElements(index: number, dataItem?:DataItem<IDrawingSeriesDataItem>) {
+		if (!this._ellipses[index]) {
+			const ellipse = this.makeEllipse();
+			ellipse._setDataItem(dataItem);
+			this._ellipses[index] = ellipse;
+			ellipse.setAll({ userData: index });
 		}
 	}
 
@@ -238,40 +244,40 @@ export class EllipseSeries extends DrawingSeries {
 				const yAxis = this.get("yAxis");
 
 				const index = this._index;
-				const diT = this._di[index]["t"];
-				const diB = this._di[index]["b"];
-				const diL = this._di[index]["l"];
-				const diR = this._di[index]["r"];
+				const dataItems = this._di[index];
 
-				const valueY0 = this._clickVY;
+				if (dataItems) {
+					const diT = this._di[index]["t"];
+					const diB = this._di[index]["b"];
+					const diL = this._di[index]["l"];
+					const diR = this._di[index]["r"];
 
-				const positionX = xAxis.coordinateToPosition(movePoint.x);
-				const positionX0 = this._clickPX;
+					const valueY0 = this._clickVY;
 
-				const valueX = this._getXValue(xAxis.positionToValue(positionX));
-				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
+					const positionX = xAxis.coordinateToPosition(movePoint.x);
+					const positionX0 = this._clickPX;
 
-				if (diB && diL && diR && diT) {
-					diB.set("valueY", valueY);
-					diB.set("valueYWorking", valueY);
+					const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
+					const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 
-					const my = valueY0 + (valueY - valueY0) / 2;
-					const mx = this._getXValue(xAxis.positionToValue(positionX0 + (positionX - positionX0) / 2))
+					if (diB && diL && diR && diT) {
+						this._setContext(diB, "valueY", valueY, true);
 
-					diR.set("valueY", my);
-					diR.set("valueYWorking", my);
+						const my = valueY0 + (valueY - valueY0) / 2;
+						const mx = this._getXValue(xAxis.positionToValue(positionX0 + (positionX - positionX0) / 2))
 
-					diL.set("valueY", my);
-					diL.set("valueYWorking", my);
+						this._setContext(diR, "valueY", my, true);
+						this._setContext(diL, "valueY", my, true);
 
-					diB.set("valueX", mx);
-					diT.set("valueX", mx);
+						this._setContext(diB, "valueX", mx);
+						this._setContext(diT, "valueX", mx);
 
-					this._setXLocation(diB, mx);
-					this._setXLocation(diT, mx);
+						this._setXLocation(diB, mx);
+						this._setXLocation(diT, mx);
 
-					diR.set("valueX", valueX);
-					this._setXLocation(diR, valueX);
+						this._setContext(diR, "valueX", valueX);
+						this._setXLocation(diR, valueX);
+					}
 				}
 			}
 		}
@@ -279,14 +285,17 @@ export class EllipseSeries extends DrawingSeries {
 
 	protected _addPoints(event: ISpritePointerEvent, index: number) {
 		const chart = this.chart;
+
 		if (chart) {
+			this.data.push({ settings: this._getEllipseTemplate(), stroke:this._getStrokeTemplate(), index:index, corner:"e" });
+
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
 
 			const point = chart.plotContainer.toLocal(event.point);
 			this._clickPX = xAxis.coordinateToPosition(point.x);
 
-			const valueX = xAxis.positionToValue(this._clickPX);
+			const valueX = this._getXValue(xAxis.positionToValue(this._clickPX));
 			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
 
 			this._clickVY = valueY;
@@ -297,25 +306,15 @@ export class EllipseSeries extends DrawingSeries {
 			this._addPoint(valueX, valueY, "t", index);
 			this._addPoint(valueX, valueY, "b", index);
 			this._addPoint(valueX, valueY, "r", index);
-
-			const color = this.get("fillColor", this.get("fill"));
-			const strokeColor = this.get("strokeColor", this.get("stroke"));
-			const ellipse = this.makeEllipse();
-			this._ellipses[index] = ellipse;
-			ellipse.setAll({ userData: index, fill: color, stroke: strokeColor });
 		}
 	}
 
 	protected _addPoint(valueX: number, valueY: number, corner: string, index: number) {
-		this.data.push({ valueY: valueY, valueX: valueX });
+		this.data.push({ valueY: valueY, valueX: valueX, index: index, corner: corner });
 		const len = this.dataItems.length;
 		const dataItem = this.dataItems[len - 1];
 		if (dataItem) {
 			this._setXLocation(dataItem, valueX);
-			this._addContextInfo(index, corner);
-
-			this._di[index][corner] = dataItem;
-
 			this.setPrivate("startIndex", 0);
 			this.setPrivate("endIndex", len);
 		}
@@ -326,24 +325,26 @@ export class EllipseSeries extends DrawingSeries {
 
 		let index = 0;
 		$array.each(this._di, (dataItems) => {
-			const diT = dataItems["t"];
-			const diB = dataItems["b"];
-			const diL = dataItems["l"];
-			const diR = dataItems["r"];
-			if (diT && diB && diL && diR) {
-				const pt = diT.get("point");
-				const pb = diB.get("point");
-				const pr = diR.get("point");
-				const pl = diL.get("point");
+			if (dataItems) {
+				const diT = dataItems["t"];
+				const diB = dataItems["b"];
+				const diL = dataItems["l"];
+				const diR = dataItems["r"];
+				if (diT && diB && diL && diR) {
+					const pt = diT.get("point");
+					const pb = diB.get("point");
+					const pr = diR.get("point");
+					const pl = diL.get("point");
 
-				if (pt && pb && pr && pl) {
-					const rx = (pr.x - pl.x) / 2;
-					const ry = (pb.y - pt.y) / 2;
-					const x = pl.x + rx;
-					const y = pt.y + ry;
-					const ellipse = this._ellipses[index];
-					if (ellipse) {
-						ellipse.setAll({ x: x, y: y, radiusX: rx, radiusY: ry })
+					if (pt && pb && pr && pl) {
+						const rx = (pr.x - pl.x) / 2;
+						const ry = (pb.y - pt.y) / 2;
+						const x = pl.x + rx;
+						const y = pt.y + ry;
+						const ellipse = this._ellipses[index];
+						if (ellipse) {
+							ellipse.setAll({ x: x, y: y, radiusX: rx, radiusY: ry });
+						}
 					}
 				}
 			}
@@ -363,5 +364,21 @@ export class EllipseSeries extends DrawingSeries {
 				ellipse.dispose();
 			}
 		}
+	}
+
+	protected _getEllipseTemplate(): Template<any> {
+		const template = this._getStrokeTemplate();
+
+		const fillColor = this.get("fillColor");
+		if (fillColor != null) {
+			template.set("fill", fillColor);
+		}
+
+		const fillOpacity = this.get("fillOpacity");
+		if (fillOpacity != null) {
+			template.set("fillOpacity", fillOpacity);
+		}
+
+		return template;
 	}
 }

@@ -52,16 +52,13 @@ export class DoodleSeries extends DrawingSeries {
 			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
 			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
 
-			this.data.push({ valueY: valueY, valueX: valueX });
+			const index = this._index;
+			this.data.push({ valueY: valueY, valueX: valueX, index:index, corner:this._pIndex });
 			const len = this.dataItems.length;
 
-			const dataItem = this.dataItems[len - 1];
-			const index = this._index;
+			const dataItem = this.dataItems[len - 1];			
+			this._setXLocation(dataItem, valueX);
 
-			if (dataItem) {
-				this._setXLocation(dataItem, valueX);
-				this._addContextInfo(index);
-			}
 			let segmentItems = this._di[index];
 			if (!segmentItems) {
 				segmentItems = {};
@@ -85,6 +82,7 @@ export class DoodleSeries extends DrawingSeries {
 		super._handlePointerDown(event);
 		const chart = this.chart;
 		if (chart) {
+			this._index++;
 			this._pIndex = 0;
 
 			this._panX = chart.get("panX");
@@ -98,8 +96,7 @@ export class DoodleSeries extends DrawingSeries {
 				cursor.setPrivate("visible", false);
 			}
 
-			this.data.push({ stroke: this._getStrokeTemplate() });
-			this._addContextInfo(this._index);
+			this.data.push({ stroke: this._getStrokeTemplate(), index:this._index, corner:this._pIndex });			
 		}
 	}
 
@@ -115,8 +112,6 @@ export class DoodleSeries extends DrawingSeries {
 					cursor.setPrivate("visible", true);
 				}
 			}, 100)
-
-			this._index++;
 		}
 	}
 }

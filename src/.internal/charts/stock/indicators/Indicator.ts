@@ -61,7 +61,7 @@ export interface IIndicatorSettings extends IContainerSettings {
 	legend?: StockLegend;
 
 	/**
-	 * @todo review
+	 * Period.
 	 */
 	period?: number;
 
@@ -113,11 +113,6 @@ export abstract class Indicator extends Container {
 	public series!: XYSeries;
 
 	protected _dataDirty = false;
-
-	protected _afterNew() {
-		super._afterNew();
-		this.set("position", "absolute");
-	}
 
 	protected _sDP?: MultiDisposer;
 	protected _vDP?: MultiDisposer;

@@ -2,6 +2,7 @@ import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import type { Line } from "../../../core/render/Line";
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
+import type { Template } from "../../../core/util/Template";
 
 export interface IVerticalLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
@@ -42,14 +43,11 @@ export class VerticalLineSeries extends SimpleLineSeries {
 				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
 
-				diP1.set("valueY", valueY);
-				diP1.set("valueYWorking", valueY);
+				this._setContext(diP1, "valueY", valueY, true);
+				this._setContext(diP2, "valueY", valueY + 0.01, true);
 
-				diP2.set("valueY", valueY + 0.001);
-				diP2.set("valueYWorking", valueY + 0.001);
-
-				diP1.set("valueX", valueX);
-				diP2.set("valueX", valueX);
+				this._setContext(diP1, "valueX", valueX);
+				this._setContext(diP2, "valueX", valueX);
 
 				this._setXLocation(diP1, valueX);
 				this._setXLocation(diP2, valueX);
@@ -60,25 +58,37 @@ export class VerticalLineSeries extends SimpleLineSeries {
 		}
 	}
 
+	protected _updateSegment(index: number) {
+		if (this._di[index]) {
+			const diP1 = this._di[index]["p1"];
+			const diP2 = this._di[index]["p2"];
+			if (diP1 && diP2) {
+				this._setContext(diP2, "valueY", diP1.get("valueY", 0) + 0.01, true);
+			}
+		}
+	}
+
 	protected _handlePointerMoveReal() {
 
 	}
 
-	protected _handlePointerClickReal(event: ISpritePointerEvent) {
-		if (!this._isDragging) {
-			this._addPoints(event, this._index);
-			this._index++;
-			this._isDrawing = false;
-		}
-	}
+	protected _updateExtensionLine(line: Line, template: Template<any>) {
+		line.setAll({
+			stroke: template.get("stroke"),
+			strokeWidth: template.get("strokeWidth"),
+			strokeDasharray: template.get("strokeDasharray"),
+			strokeOpacity: template.get("strokeOpacity")
+		})
+	}	
 
-	protected _addPoints(event: ISpritePointerEvent, index: number):Line {
-		let line = super._addPoints(event, index);
-		this._updateExtentionLine(line);
-		const diP2 = this._di[index]["p2"];
-		const value = diP2.get("valueY", 0) + 0.001;
-		diP2.set("valueY", value);
-		diP2.set("valueYWorking", value);
-		return line;
+	protected _handlePointerClickReal(event: ISpritePointerEvent) {
+		if (this._drawingEnabled) {
+			if (!this._isDragging) {
+				this._index++;
+				this._addPoints(event, this._index);
+				this._isDrawing = false;
+				this._updateSegment(this._index);
+			}
+		}
 	}
 }

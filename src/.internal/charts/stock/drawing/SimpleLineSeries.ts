@@ -20,7 +20,6 @@ export interface ISimpleLineSeriesSettings extends IDrawingSeriesSettings {
 	 * @default true
 	 */
 	showExtension?: boolean;
-
 }
 
 export interface ISimpleLineSeriesPrivate extends IDrawingSeriesPrivate {
@@ -35,6 +34,7 @@ export class SimpleLineSeries extends DrawingSeries {
 	declare public _dataItemSettings: ISimpleLineSeriesDataItem;
 
 	protected _tag = "line";
+	protected _updateExtension = false;
 
 	/**
 	 * @ignore
@@ -186,17 +186,19 @@ export class SimpleLineSeries extends DrawingSeries {
 					const hitLine = this._hitLines[i];
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
+					if (diP1 && diP2) {
+						const p1 = diP1.get("point");
+						const p2 = diP2.get("point");
 
-					const p1 = diP1.get("point");
-					const p2 = diP2.get("point");
+						if (p1 && p2) {
+							const len = Math.max(Math.abs(s - p1.x), Math.abs(s - p2.x), Math.abs(s - p1.y), Math.abs(s - p2.y), Math.abs(p1.x), Math.abs(p2.x), Math.abs(p1.y), Math.abs(p2.y))
+							let angle = $math.getAngle(p2, p1);
 
-					if (p1 && p2) {
-						const len = Math.max(Math.abs(s - p1.x), Math.abs(s - p2.x), Math.abs(s - p1.y), Math.abs(s - p2.y), Math.abs(p1.x), Math.abs(p2.x), Math.abs(p1.y), Math.abs(p2.y))
-						let angle = $math.getAngle(p2, p1);
+							const p11 = { x: p1.x + len * $math.cos(angle), y: p1.y + len * $math.sin(angle) };
+							const p22 = { x: p2.x - len * $math.cos(angle), y: p2.y - len * $math.sin(angle) };
 
-						const p11 = { x: p1.x + len * $math.cos(angle), y: p1.y + len * $math.sin(angle) };
-						const p22 = { x: p2.x - len * $math.cos(angle), y: p2.y - len * $math.sin(angle) };
-						this._updateLine(line, hitLine, p11, p22, p1, p2);
+							this._updateLine(line, hitLine, p11, p22, p1, p2);
+						}
 					}
 				}
 			}
@@ -215,11 +217,11 @@ export class SimpleLineSeries extends DrawingSeries {
 		if (!this._isDragging) {
 			if (!this._isDrawing) {
 				this._isDrawing = true;
+				this._index++;
 				this._addPoints(event, this._index);
 			}
 			else {
 				this._isDrawing = false;
-				this._index++;
 			}
 		}
 	}
@@ -246,72 +248,84 @@ export class SimpleLineSeries extends DrawingSeries {
 				const xAxis = this.get("xAxis");
 				const yAxis = this.get("yAxis");
 
-				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
+				const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
+				const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 
 				const index = this._index;
 				const diP1 = this._di[index]["p1"];
 				const diP2 = this._di[index]["p2"];
 
 				if (diP1 && diP2) {
-					diP2.set("valueX", valueX);
-					diP2.set("valueY", valueY);
-					diP2.set("valueYWorking", valueY);
-
-					this._setXLocation(diP2, valueX);
+					this._setContext(diP2, "valueX", vx);
+					this._setContext(diP2, "valueY", vy, true);
+					this._setXLocation(diP2, vx);
+					this._updateSegment(index);
 				}
-
-				this._updateSegment(index);
 			}
 		}
 	}
 
-	protected _addPoints(event: ISpritePointerEvent, index: number): Line {
+	protected _createElements(index: number) {
+		if (!this._lines[index]) {
+			const line = this.makeLine();
+			this._lines[index] = line;
+
+			const hitLine = this.makeHitLine();
+			this._hitLines[index] = hitLine;
+
+			const dataContext = this.dataItems[this.dataItems.length - 1].dataContext as any;
+			let showExtension = this.get("showExtension", true);
+
+			let color = this.get("strokeColor", this.get("stroke"));
+
+			const strokeTemplate = dataContext.stroke;
+			if (strokeTemplate) {
+				color = strokeTemplate.get("stroke");
+				this._updateExtensionLine(line, strokeTemplate);
+			}
+
+			if (dataContext) {
+				showExtension = dataContext.showExtension;
+			}
+
+			line.setPrivate("visible", showExtension);
+
+
+
+			const settings = { stroke: color, userData: index };
+			line.setAll(settings);
+			hitLine.setAll(settings);
+
+			this._updateSegment(index);
+		}
+	}
+
+	protected _updateExtensionLine(_line:Line, _template:Template<any>){
+
+	}
+
+	protected _addTemplates(index: number) {
+		this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index, showExtension: this.get("showExtension", true), corner: "e" });
+	}
+
+	protected _addPoints(event: ISpritePointerEvent, index: number) {
 		const chart = this.chart!;
+		this._addTemplates(index);
 
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 
 		const point = chart.plotContainer.toLocal(event.point);
-		const valueX = xAxis.positionToValue(xAxis.coordinateToPosition(point.x));
+		const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
 		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
-
-		this._di[index] = {};
-		const line = this.makeLine();
-		this._lines[index] = line;
-
-		const hitLine = this.makeHitLine();
-		this._hitLines[index] = hitLine;
-
-		line.setPrivate("visible", this.get("showExtension", true));
-
-		const stroke = this.get("strokeColor", this.get("stroke"));
-		const settings = { stroke: stroke, userData: index };
-		line.setAll(settings);
-		hitLine.setAll(settings);
-
-		this.data.push({ stroke: this._getStrokeTemplate() });
-		this._addContextInfo(index, "e");
 
 		this._addPoint(valueX, valueY, "p1", index);
 		this._addPoint(valueX, valueY, "p2", index);
 
-		return line;
 	}
 
 	protected _addPoint(valueX: number, valueY: number, corner: string, index: number) {
-		this.data.push({ valueY: valueY, valueX: valueX });
-		const len = this.dataItems.length;
-		const dataItem = this.dataItems[len - 1];
-		if (dataItem) {
-			this._addContextInfo(index, corner);
-			this._di[index][corner] = dataItem;
-
-			this.setPrivate("startIndex", 0);
-			this.setPrivate("endIndex", len);
-
-			this._setXLocation(dataItem, valueX);
-		}
+		this.data.push({ valueY: valueY, valueX: valueX, corner: corner, index: index });
 	}
 
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -332,23 +346,6 @@ export class SimpleLineSeries extends DrawingSeries {
 				delete (this._hitLines[index]);
 				hitLine.dispose();
 			}
-		}
-	}
-
-	protected _updateExtentionLine(line: Line) {
-		let strokeOpacity = this.get("strokeOpacity");
-		if (strokeOpacity != null) {
-			line.set("strokeOpacity", strokeOpacity);
-		}
-
-		let strokeWidth = this.get("strokeWidth");
-		if (strokeWidth != null) {
-			line.set("strokeWidth", strokeWidth);
-		}
-
-		let strokeDasharray = this.get("strokeDasharray");
-		if (strokeDasharray != null) {
-			line.set("strokeDasharray", strokeDasharray);
 		}
 	}
 }

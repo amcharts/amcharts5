@@ -1043,7 +1043,7 @@ export abstract class XYSeries extends Series {
 						this._valueXShowFields.push(field.split("Working")[0]);
 					}
 					else {
-						this._valueYShowFields.push(field);
+						this._valueXShowFields.push(field);
 					}
 				}
 			});
@@ -1759,9 +1759,11 @@ export abstract class XYSeries extends Series {
 				let bullets = dataItem.bullets;
 				if (bullets) {
 					$array.each(bullets, (bullet) => {
-						let sprite = bullet.get("sprite");
-						if (sprite) {
-							sprite.setPrivate("visible", false);
+						if(bullet){
+							let sprite = bullet.get("sprite");
+							if (sprite) {
+								sprite.setPrivate("visible", false);
+							}
 						}
 					})
 				}
@@ -2103,7 +2105,7 @@ export abstract class XYSeries extends Series {
 		this.updateLegendMarker(undefined);
 	}
 
-	public _afterDataChange() {
+	protected _afterDataChange() {
 		super._afterDataChange();
 		this.get("xAxis")._markDirtyKey("start");
 		this.get("yAxis")._markDirtyKey("start");
@@ -2135,5 +2137,14 @@ export abstract class XYSeries extends Series {
 		return this.axisRanges.push({
 			axisDataItem: axisDataItem
 		})
+	}
+
+	/**
+	 * A list of series's main (ungrouped) data items.
+	 *
+	 * @return  Data items
+	 */
+	public get mainDataItems(): Array<DataItem<this["_dataItemSettings"]>> {
+		return this._mainDataItems;
 	}
 }

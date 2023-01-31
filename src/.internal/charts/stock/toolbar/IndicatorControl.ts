@@ -1,6 +1,7 @@
-import type { Indicator } from "../indicators/Indicator";
 import type { StockLegend } from "../StockLegend";
+import type { StockPanel } from "../StockPanel";
 
+import { Indicator } from "../indicators/Indicator";
 import { AccumulationDistribution } from "../indicators/AccumulationDistribution";
 import { AccumulativeSwingIndex } from "../indicators/AccumulativeSwingIndex";
 import { Aroon } from "../indicators/Aroon";
@@ -25,6 +26,9 @@ import { Trix } from "../indicators/Trix";
 import { Volume } from "../indicators/Volume";
 import { VWAP } from "../indicators/VWAP";
 import { ZigZag } from "../indicators/ZigZag";
+
+import { JsonParser } from "../../../plugins/json/Json";
+import { Serializer } from "../../../plugins/json/Serializer";
 
 //import type { IDisposer } from "../../../core/util/Disposer";
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
@@ -243,28 +247,28 @@ export class IndicatorControl extends StockControl {
 					stockSeries: stockSeries,
 					legend: legend
 				});
-				break;	
+				break;
 			case "Trix":
 				indicator = Trix.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					legend: legend
 				});
-				break;					
+				break;
 			case "Typical Price":
 				indicator = TypicalPrice.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					legend: legend
 				});
-				break;	
+				break;
 			case "Median Price":
 				indicator = MedianPrice.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					legend: legend
 				});
-				break;												
+				break;
 			case "On Balance Volume":
 				indicator = OnBalanceVolume.new(this.root, {
 					stockChart: stockChart,
@@ -311,7 +315,7 @@ export class IndicatorControl extends StockControl {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					legend: legend
-				});				
+				});
 				break;
 		}
 
@@ -348,6 +352,107 @@ export class IndicatorControl extends StockControl {
 				});
 			}
 		}
+	}
+
+	/**
+	 * Serializes all available indicators into an array of simple objects or
+	 * JSON.
+	 *
+	 * `output` parameter can either be `"object"` or `"string"` (default).
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @since 5.3.0
+	 * @param   output Output format
+	 * @param   indent Line indent in JSON
+	 * @return         Serialized indicators
+	 */
+	public serializeIndicators(output: "object" | "string" = "string", indent?: string): Array<unknown> | string {
+		const res: Array<any> = [];
+		const stockChart = this.get("stockChart");
+		stockChart.indicators.each((indicator) => {
+			//console.log(indicator);
+			const serializer = Serializer.new(this._root, {
+				excludeSettings: ["stockChart", "stockSeries", "volumeSeries", "legend"]
+			});
+
+			// Panel
+			const json: any = {};
+
+			// Series and legend
+			if (indicator.get("stockSeries")) {
+				json.__stockSeries = true;
+			}
+
+			if (indicator.get("volumeSeries")) {
+				json.__volumeSeries = true;
+			}
+
+			const legend = indicator.get("legend");
+			if (legend) {
+				legend._walkParents((parent) => {
+					if (parent.isType("StockPanel")) {
+						json.__legendIndex = stockChart.panels.indexOf(parent as StockPanel);
+					}
+				});
+			}
+
+			// Serialize
+			json.__indicator = serializer.serialize(indicator, 0);
+
+			res.push(json);
+		});
+		return output == "object" ? res : JSON.stringify(res, undefined, indent);
+	}
+
+	/**
+	 * Parses data serialized with `serializeIndicators()` and adds indicators to
+	 * the chart.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @since 5.3.0
+	 * @param  data Serialized data
+	 */
+	public unserializeIndicators(data: string | Array<any>): void {
+		const stockChart = this.get("stockChart");
+		if ($type.isString(data)) {
+			data = JSON.parse(data);
+		}
+		$array.each(data, (indicator) => {
+
+			// Populate
+			if (!indicator.__indicator.settings) {
+				indicator.__indicator.settings = {};
+			}
+			indicator.__indicator.settings.stockChart = stockChart;
+
+			if (indicator.__stockSeries && !indicator.__indicator.settings.stockSeries) {
+				indicator.__indicator.settings.stockSeries = stockChart.get("stockSeries");
+			}
+
+			if (indicator.__volumeSeries && !indicator.__indicator.settings.volumeSeries) {
+				indicator.__indicator.settings.volumeSeries = stockChart.get("volumeSeries");
+			}
+
+			if (indicator.__legendIndex !== undefined && !indicator.__indicator.settings.legend) {
+				// Find a legend
+				const panel = stockChart.panels.getIndex(indicator.__legendIndex);
+				if (panel) {
+					panel.walkChildren((child) => {
+						if (child.isType("StockLegend")) {
+							indicator.__indicator.settings.legend = child;
+						}
+					});
+				}
+			}
+
+			// Parse
+			JsonParser.new(this._root).parse(indicator.__indicator).then((indicator: any) => {
+				if (indicator instanceof Indicator) {
+					stockChart.indicators.push(indicator);
+				}
+			});
+		});
+
 	}
 
 }

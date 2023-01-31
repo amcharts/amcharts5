@@ -276,6 +276,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	public scale: number = 1;
 	public x: number = 0;
 	public y: number = 0;
+	public crisp: boolean = false;
 	public pivot: CanvasPivot = new CanvasPivot();
 
 	public filter?: string;
@@ -302,6 +303,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 	protected _dispose(): void {
 		this._renderer._removeObject(this);
+		this.getLayer().dirty = true;
 	}
 
 	public getCanvas(): HTMLCanvasElement {
@@ -470,14 +472,21 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 	public _transform(context: CanvasRenderingContext2D, resolution: number): void {
 		const m = this._matrix;
+		let tx = m.tx * resolution;
+		let ty = m.ty * resolution;
+		if (this.crisp) {
+			tx = Math.floor(tx) + .5;
+			ty = Math.floor(ty) + .5;
+		}
+
 		context.setTransform(
 			m.a * resolution,
 			m.b * resolution,
 			m.c * resolution,
 			m.d * resolution,
-			m.tx * resolution,
-			m.ty * resolution
-		);
+			tx,
+			ty)
+
 	}
 
 	public _transformMargin(context: CanvasRenderingContext2D, resolution: number, margin: IMargin): void {
@@ -577,9 +586,6 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		return this._renderer._dragging.some((x) => x.value === this);
 	}
 
-	public dispose() {
-		this.getLayer().dirty = true;
-	}
 
 	public shouldCancelTouch(): boolean {
 		const renderer = this._renderer;
@@ -669,8 +675,8 @@ export class CanvasContainer extends CanvasDisplayObject implements IContainer {
 		}
 	}
 
-	public dispose() {
-		super.dispose();
+	protected _dispose() {
+		super._dispose();
 		if (this._childLayers) {
 			$array.each(this._childLayers, (layer) => {
 				layer.dirty = true;
@@ -3079,11 +3085,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			clearCanvas(this._patternCanvas);
 		}));
 
+		/*
 		this._disposers.push($utils.addEventListener(this._ghostLayer.view, "click", (originalEvent: MouseEvent) => {
 			const event = this.getEvent(originalEvent);
 			const target = this._getHitTarget(event.originalPoint, event.bbox);
 			console.debug(target);
 		}));
+		*/
 
 		// Monitor for possible pixel ratio changes (when page is zoomed)
 		this._disposers.push($utils.onZoom(() => {

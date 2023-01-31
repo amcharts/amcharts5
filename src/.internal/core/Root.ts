@@ -92,6 +92,16 @@ export interface IRootSettings {
 	 * @since 5.2.24
 	 */
 	tooltipContainerBounds?: { top: number, left: number, right: number, bottom: number };
+
+	/**
+	 * Set to `false` to disable all accessibility features.
+	 *
+	 * NOTE: once disabled, accessibility cannot be re-enabled on a live `Root` object.
+	 * 
+	 * @default true
+	 * @since 5.3.0
+	 */
+	accessible?: boolean;
 }
 
 
@@ -118,6 +128,8 @@ export class Root implements IDisposer {
 
 	protected _ticker: ((currentTime: number) => void) | null = null;
 	protected _tickers: Array<(currentTime: number) => void> = [];
+
+	protected _updateTick: boolean = true;
 
 	/**
 	 * Root's event dispatcher.
@@ -228,6 +240,7 @@ export class Root implements IDisposer {
 	//@todo maybe make this better
 	protected _tabindexes: Sprite[] = [];
 
+	protected _a11yD: boolean = false;
 	protected _focusElementDirty: boolean = false;
 	protected _focusElementContainer: HTMLDivElement | undefined;
 	protected _focusedSprite: Sprite | undefined;
@@ -303,6 +316,10 @@ export class Root implements IDisposer {
 			throw new Error("You cannot use `new Class()`, instead use `Class.new()`");
 		}
 
+		if (settings.accessible == false) {
+			this._a11yD = true;
+		}
+
 		if (settings.useSafeResolution == null) {
 			settings.useSafeResolution = true;
 		}
@@ -354,8 +371,6 @@ export class Root implements IDisposer {
 
 		registry.rootElements.push(this);
 	}
-
-
 
 
 	public static new(id: string | HTMLElement, settings?: IRootSettings): Root {
@@ -493,207 +508,212 @@ export class Root implements IDisposer {
 		this._initResizeSensor();
 
 		// HTML content holder
-		this._htmlElementContainer = document.createElement("div");
-		this._htmlElementContainer.className = "am5-html-container";
-		this._htmlElementContainer.style.position = "absolute";
-		this._htmlElementContainer.style.pointerEvents = "none";
+		const htmlElementContainer = document.createElement("div");
+		this._htmlElementContainer = htmlElementContainer;
+		htmlElementContainer.className = "am5-html-container";
+		htmlElementContainer.style.position = "absolute";
+		htmlElementContainer.style.pointerEvents = "none";
 		if (!this._tooltipContainerSettings) {
-			this._htmlElementContainer.style.overflow = "hidden";
+			htmlElementContainer.style.overflow = "hidden";
 		}
-		this._inner.appendChild(this._htmlElementContainer);
+		this._inner.appendChild(htmlElementContainer);
 
-		// Create element which is used to make announcements to screen reader
-		const readerAlertElement = document.createElement("div");
-		readerAlertElement.className = "am5-reader-container";
-		readerAlertElement.setAttribute("role", "alert");
-		readerAlertElement.style.zIndex = "-100000";
-		readerAlertElement.style.opacity = "0";
-		readerAlertElement.style.position = "absolute";
-		readerAlertElement.style.top = "0";
-		this._readerAlertElement = readerAlertElement;
-		this._inner.appendChild(this._readerAlertElement);
+		if (this._a11yD !== true) {
 
-		const focusElementContainer = document.createElement("div");
-		focusElementContainer.className = "am5-focus-container";
-		focusElementContainer.style.position = "absolute";
-		focusElementContainer.style.pointerEvents = "none";
-		focusElementContainer.style.top = "0px";
-		focusElementContainer.style.left = "0px";
-		focusElementContainer.style.overflow = "hidden";
-		focusElementContainer.style.width = width + "px";
-		focusElementContainer.style.height = height + "px";
+			// Create element which is used to make announcements to screen reader
+			const readerAlertElement = document.createElement("div");
+			readerAlertElement.className = "am5-reader-container";
+			readerAlertElement.setAttribute("role", "alert");
+			readerAlertElement.style.zIndex = "-100000";
+			readerAlertElement.style.opacity = "0";
+			readerAlertElement.style.position = "absolute";
+			readerAlertElement.style.top = "0";
+			this._readerAlertElement = readerAlertElement;
+			this._inner.appendChild(this._readerAlertElement);
 
-		focusElementContainer.setAttribute("role", "application");
+			const focusElementContainer = document.createElement("div");
+			focusElementContainer.className = "am5-focus-container";
+			focusElementContainer.style.position = "absolute";
+			focusElementContainer.style.pointerEvents = "none";
+			focusElementContainer.style.top = "0px";
+			focusElementContainer.style.left = "0px";
+			focusElementContainer.style.overflow = "hidden";
+			focusElementContainer.style.width = width + "px";
+			focusElementContainer.style.height = height + "px";
 
-		$utils.setInteractive(focusElementContainer, false);
-		this._focusElementContainer = focusElementContainer;
-		this._inner.appendChild(this._focusElementContainer);
+			focusElementContainer.setAttribute("role", "application");
 
-		this._tooltipElementContainer = document.createElement("div");
-		this._tooltipElementContainer.className = "am5-tooltip-container";
-		this._inner.appendChild(this._tooltipElementContainer);
+			$utils.setInteractive(focusElementContainer, false);
+			this._focusElementContainer = focusElementContainer;
+			this._inner.appendChild(this._focusElementContainer);
 
-		// Add keyboard events for accessibility, e.g. simulating drag with arrow
-		// keys and click with ENTER
-		if ($utils.supports("keyboardevents")) {
+			const tooltipElementContainer = document.createElement("div");
+			this._tooltipElementContainer = tooltipElementContainer;
+			tooltipElementContainer.className = "am5-tooltip-container";
+			this._inner.appendChild(tooltipElementContainer);
 
-			this._disposers.push($utils.addEventListener(window, "keydown", (ev: KeyboardEvent) => {
-				if (ev.keyCode == 16) {
-					this._isShift = true;
-				}
-			}));
+			// Add keyboard events for accessibility, e.g. simulating drag with arrow
+			// keys and click with ENTER
+			if ($utils.supports("keyboardevents")) {
 
-			this._disposers.push($utils.addEventListener(window, "keyup", (ev: KeyboardEvent) => {
-				if (ev.keyCode == 16) {
-					this._isShift = false;
-				}
-			}));
-
-			this._disposers.push($utils.addEventListener(focusElementContainer, "keydown", (ev: KeyboardEvent) => {
-				const focusedSprite = this._focusedSprite;
-				if (focusedSprite) {
-					if (ev.keyCode == 27) {
-						// ESC pressed - lose current focus
-						$utils.blur();
-						this._focusedSprite = undefined;
+				this._disposers.push($utils.addEventListener(window, "keydown", (ev: KeyboardEvent) => {
+					if (ev.keyCode == 16) {
+						this._isShift = true;
 					}
-					let dragOffsetX = 0;
-					let dragOffsetY = 0;
-					// TODO: figure out if using bogus MouseEvent is fine, or it will
-					// fail on some platforms
-					switch (ev.keyCode) {
-						case 13:
-							ev.preventDefault();
-							const downEvent = renderer.getEvent(new MouseEvent("click"));
-							focusedSprite.events.dispatch("click", {
-								type: "click",
-								originalEvent: downEvent.event,
-								point: downEvent.point,
-								simulated: true,
-								target: focusedSprite
-							});
-							return;
-						case 37:
-							dragOffsetX = -6;
-							break;
-						case 39:
-							dragOffsetX = 6;
-							break;
-						case 38:
-							dragOffsetY = -6;
-							break;
-						case 40:
-							dragOffsetY = 6;
-							break;
-						default:
-							return;
+				}));
+
+				this._disposers.push($utils.addEventListener(window, "keyup", (ev: KeyboardEvent) => {
+					if (ev.keyCode == 16) {
+						this._isShift = false;
 					}
+				}));
 
-					if (dragOffsetX != 0 || dragOffsetY != 0) {
-						ev.preventDefault();
-
-						if (!focusedSprite.isDragging()) {
-							// Start dragging
-							this._keyboardDragPoint = {
-								x: 0,
-								y: 0
-							}
-
-							const downEvent = renderer.getEvent(new MouseEvent("mousedown", {
-								clientX: 0,
-								clientY: 0
-							}));
-
-							if (focusedSprite.events.isEnabled("pointerdown")) {
-								focusedSprite.events.dispatch("pointerdown", {
-									type: "pointerdown",
+				this._disposers.push($utils.addEventListener(focusElementContainer, "keydown", (ev: KeyboardEvent) => {
+					const focusedSprite = this._focusedSprite;
+					if (focusedSprite) {
+						if (ev.keyCode == 27) {
+							// ESC pressed - lose current focus
+							$utils.blur();
+							this._focusedSprite = undefined;
+						}
+						let dragOffsetX = 0;
+						let dragOffsetY = 0;
+						// TODO: figure out if using bogus MouseEvent is fine, or it will
+						// fail on some platforms
+						switch (ev.keyCode) {
+							case 13:
+								ev.preventDefault();
+								const downEvent = renderer.getEvent(new MouseEvent("click"));
+								focusedSprite.events.dispatch("click", {
+									type: "click",
 									originalEvent: downEvent.event,
 									point: downEvent.point,
+									simulated: true,
+									target: focusedSprite
+								});
+								return;
+							case 37:
+								dragOffsetX = -6;
+								break;
+							case 39:
+								dragOffsetX = 6;
+								break;
+							case 38:
+								dragOffsetY = -6;
+								break;
+							case 40:
+								dragOffsetY = 6;
+								break;
+							default:
+								return;
+						}
+
+						if (dragOffsetX != 0 || dragOffsetY != 0) {
+							ev.preventDefault();
+
+							if (!focusedSprite.isDragging()) {
+								// Start dragging
+								this._keyboardDragPoint = {
+									x: 0,
+									y: 0
+								}
+
+								const downEvent = renderer.getEvent(new MouseEvent("mousedown", {
+									clientX: 0,
+									clientY: 0
+								}));
+
+								if (focusedSprite.events.isEnabled("pointerdown")) {
+									focusedSprite.events.dispatch("pointerdown", {
+										type: "pointerdown",
+										originalEvent: downEvent.event,
+										point: downEvent.point,
+										simulated: true,
+										target: focusedSprite
+									});
+								}
+
+							}
+							else {
+								// Move focus marker
+								//this._positionFocusElement(focusedSprite);
+							}
+
+							// Move incrementally
+							const dragPoint = this._keyboardDragPoint!;
+							dragPoint.x += dragOffsetX;
+							dragPoint.y += dragOffsetY;
+							const moveEvent = renderer.getEvent(new MouseEvent("mousemove", {
+								clientX: dragPoint.x,
+								clientY: dragPoint.y
+							}), false);
+
+							if (focusedSprite.events.isEnabled("globalpointermove")) {
+								focusedSprite.events.dispatch("globalpointermove", {
+									type: "globalpointermove",
+									originalEvent: moveEvent.event,
+									point: moveEvent.point,
 									simulated: true,
 									target: focusedSprite
 								});
 							}
 
 						}
-						else {
-							// Move focus marker
-							//this._positionFocusElement(focusedSprite);
-						}
-
-						// Move incrementally
-						const dragPoint = this._keyboardDragPoint!;
-						dragPoint.x += dragOffsetX;
-						dragPoint.y += dragOffsetY;
-						const moveEvent = renderer.getEvent(new MouseEvent("mousemove", {
-							clientX: dragPoint.x,
-							clientY: dragPoint.y
-						}), false);
-
-						if (focusedSprite.events.isEnabled("globalpointermove")) {
-							focusedSprite.events.dispatch("globalpointermove", {
-								type: "globalpointermove",
-								originalEvent: moveEvent.event,
-								point: moveEvent.point,
-								simulated: true,
-								target: focusedSprite
-							});
-						}
-
 					}
-				}
-			}));
+				}));
 
-			this._disposers.push($utils.addEventListener(focusElementContainer, "keyup", (ev: KeyboardEvent) => {
-				if (this._focusedSprite) {
-					const focusedSprite = this._focusedSprite;
-					const keyCode = ev.keyCode;
-					switch (keyCode) {
-						case 37:
-						case 39:
-						case 38:
-						case 40:
-							if (focusedSprite.isDragging()) {
-								// Simulate drag stop
-								const dragPoint = this._keyboardDragPoint!;
-								const upEvent = renderer.getEvent(new MouseEvent("mouseup", {
-									clientX: dragPoint.x,
-									clientY: dragPoint.y
-								}));
+				this._disposers.push($utils.addEventListener(focusElementContainer, "keyup", (ev: KeyboardEvent) => {
+					if (this._focusedSprite) {
+						const focusedSprite = this._focusedSprite;
+						const keyCode = ev.keyCode;
+						switch (keyCode) {
+							case 37:
+							case 39:
+							case 38:
+							case 40:
+								if (focusedSprite.isDragging()) {
+									// Simulate drag stop
+									const dragPoint = this._keyboardDragPoint!;
+									const upEvent = renderer.getEvent(new MouseEvent("mouseup", {
+										clientX: dragPoint.x,
+										clientY: dragPoint.y
+									}));
 
-								if (focusedSprite.events.isEnabled("globalpointerup")) {
-									focusedSprite.events.dispatch("globalpointerup", {
-										type: "globalpointerup",
-										originalEvent: upEvent.event,
-										point: upEvent.point,
-										simulated: true,
-										target: focusedSprite
-									});
+									if (focusedSprite.events.isEnabled("globalpointerup")) {
+										focusedSprite.events.dispatch("globalpointerup", {
+											type: "globalpointerup",
+											originalEvent: upEvent.event,
+											point: upEvent.point,
+											simulated: true,
+											target: focusedSprite
+										});
+									}
+									//this._positionFocusElement(focusedSprite);
+									this._keyboardDragPoint = undefined;
+									// @todo dispatch mouseup event instead of calling dragStop?
+									// this._dispatchEvent("globalpointerup", target, upEvent);
+									return;
 								}
-								//this._positionFocusElement(focusedSprite);
-								this._keyboardDragPoint = undefined;
-								// @todo dispatch mouseup event instead of calling dragStop?
-								// this._dispatchEvent("globalpointerup", target, upEvent);
-								return;
-							}
-							else if (focusedSprite.get("focusableGroup")) {
-								// Find next item in focusable group
-								const group = focusedSprite.get("focusableGroup");
-								const items = this._tabindexes.filter(item => item.get("focusableGroup") == group);
-								let index = items.indexOf(focusedSprite);
-								const lastIndex = items.length - 1;
-								index += (keyCode == 39 || keyCode == 40) ? 1 : -1;
-								if (index < 0) {
-									index = lastIndex;
+								else if (focusedSprite.get("focusableGroup")) {
+									// Find next item in focusable group
+									const group = focusedSprite.get("focusableGroup");
+									const items = this._tabindexes.filter(item => item.get("focusableGroup") == group);
+									let index = items.indexOf(focusedSprite);
+									const lastIndex = items.length - 1;
+									index += (keyCode == 39 || keyCode == 40) ? 1 : -1;
+									if (index < 0) {
+										index = lastIndex;
+									}
+									else if (index > lastIndex) {
+										index = 0;
+									}
+									$utils.focus(items[index].getPrivate("focusElement")!.dom);
 								}
-								else if (index > lastIndex) {
-									index = 0;
-								}
-								$utils.focus(items[index].getPrivate("focusElement")!.dom);
-							}
-							break;
+								break;
+						}
 					}
-				}
-			}));
+				}));
+			}
 		}
 
 		this._startTicker();
@@ -732,9 +752,11 @@ export class Root implements IDisposer {
 			htmlElementContainer.style.width = w + "px";
 			htmlElementContainer.style.height = h + "px";
 
-			const focusElementContainer = this._focusElementContainer!;
-			focusElementContainer.style.width = w + "px";
-			focusElementContainer.style.height = h + "px";
+			if (this._a11yD !== true) {
+				const focusElementContainer = this._focusElementContainer!;
+				focusElementContainer.style.width = w + "px";
+				focusElementContainer.style.height = h + "px";
+			}
 
 			this._renderer.resize(w, h);
 
@@ -860,33 +882,37 @@ export class Root implements IDisposer {
 	}
 
 	private _renderFrame(currentTime: number): boolean {
-		if (this.events.isEnabled("framestarted")) {
-			this.events.dispatch("framestarted", {
-				type: "framestarted",
-				target: this,
-				timestamp: currentTime,
-			});
+		if (this._updateTick) {
+			if (this.events.isEnabled("framestarted")) {
+				this.events.dispatch("framestarted", {
+					type: "framestarted",
+					target: this,
+					timestamp: currentTime,
+				});
+			}
+
+			this._checkComputedStyles();
+			this._runTickers(currentTime);
+			this._runAnimations(currentTime);
+			this._runDirties();
+			this._render();
+			this._positionHTMLElements();
+
+			if (this.events.isEnabled("frameended")) {
+				this.events.dispatch("frameended", {
+					type: "frameended",
+					target: this,
+					timestamp: currentTime,
+				});
+			}
+
+			return this._tickers.length === 0 &&
+				this._animations.length === 0 &&
+				!this._isDirty;
+
+		} else {
+			return true;
 		}
-
-		this._checkComputedStyles();
-		this._runTickers(currentTime);
-		this._runAnimations(currentTime);
-		this._runDirties();
-		this._render();
-		this._positionHTMLElements();
-
-		if (this.events.isEnabled("frameended")) {
-			this.events.dispatch("frameended", {
-				type: "frameended",
-				target: this,
-				timestamp: currentTime,
-			});
-		}
-
-
-		return this._tickers.length === 0 &&
-			this._animations.length === 0 &&
-			!this._isDirty;
 	}
 
 	private _runTicker(currentTime: number) {
@@ -932,6 +958,24 @@ export class Root implements IDisposer {
 			};
 
 			rAF(this.fps, this._ticker!);
+		}
+	}
+
+	/**
+	 * Returns whether the root is updating or not.
+	 */
+	public get updateTick(): boolean {
+		return this._updateTick;
+	}
+
+	/**
+	 * Enables or disables the root updating.
+	 */
+	public set updateTick(value: boolean) {
+		this._updateTick = value;
+
+		if (value) {
+			this._startTicker();
 		}
 	}
 
@@ -1000,7 +1044,6 @@ export class Root implements IDisposer {
 		if (!container) {
 			container = this.container;
 		}
-		console.log(this.width());
 		container.walkChildren((child) => {
 			if (child instanceof Container) {
 				this.markDirtyGlobal(child);
@@ -1071,7 +1114,9 @@ export class Root implements IDisposer {
 	 * @param  text  Alert text
 	 */
 	public readerAlert(text: string): void {
-		this._readerAlertElement!.innerHTML = $utils.stripTags(text);
+		if (this._a11yD !== true) {
+			this._readerAlertElement!.innerHTML = $utils.stripTags(text);
+		}
 	}
 
 	/**
@@ -1100,13 +1145,14 @@ export class Root implements IDisposer {
 
 	protected _addTooltip() {
 		if (!this.tooltipContainer) {
+			const tooltipContainerSettings = this._tooltipContainerSettings;
 			const tooltipContainer = this._rootContainer.children.push(Container.new(this, {
 				position: "absolute",
 				isMeasured: false,
 				width: p100,
 				height: p100,
-				layer: this._tooltipContainerSettings ? 35 : 30,
-				layerMargin: this._tooltipContainerSettings ? this._tooltipContainerSettings : undefined
+				layer: tooltipContainerSettings ? 35 : 30,
+				layerMargin: tooltipContainerSettings ? tooltipContainerSettings : undefined
 			}));
 			this.tooltipContainer = tooltipContainer;
 
@@ -1122,6 +1168,10 @@ export class Root implements IDisposer {
 	 */
 
 	public _registerTabindexOrder(target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		if (target.get("focusable")) {
 			$array.pushOne(this._tabindexes, target);
 		}
@@ -1132,11 +1182,18 @@ export class Root implements IDisposer {
 	}
 
 	public _unregisterTabindexOrder(target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		$array.remove(this._tabindexes, target);
 		this._invalidateTabindexes();
 	}
 
 	public _invalidateTabindexes(): void {
+		if (this._a11yD == true) {
+			return;
+		}
 
 		this._tabindexes.sort((a: Sprite, b: Sprite) => {
 			const aindex = a.get("tabindexOrder", 0);
@@ -1175,6 +1232,10 @@ export class Root implements IDisposer {
 	}
 
 	public _updateCurrentFocus(): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		if (this._focusedSprite) {
 			this._decorateFocusElement(this._focusedSprite);
 			this._positionFocusElement(this._focusedSprite);
@@ -1182,6 +1243,10 @@ export class Root implements IDisposer {
 	}
 
 	public _decorateFocusElement(target: Sprite, focusElement?: HTMLDivElement): void {
+
+		if (this._a11yD == true) {
+			return;
+		}
 
 		// Decorate with proper accessibility attributes
 		if (!focusElement) {
@@ -1292,7 +1357,7 @@ export class Root implements IDisposer {
 
 	public _makeFocusElement(index: number, target: Sprite): void {
 
-		if (target.getPrivate("focusElement")) {
+		if (target.getPrivate("focusElement") || this._a11yD == true) {
 			return;
 		}
 
@@ -1326,6 +1391,10 @@ export class Root implements IDisposer {
 	}
 
 	public _removeFocusElement(target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		$array.remove(this._tabindexes, target);
 		const focusElement = target.getPrivate("focusElement");
 		if (focusElement) {
@@ -1338,11 +1407,18 @@ export class Root implements IDisposer {
 	}
 
 	public _hideFocusElement(target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		const focusElement = target.getPrivate("focusElement")!;
 		focusElement.dom.style.display = "none";
 	}
 
 	protected _moveFocusElement(index: number, target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
 
 		// Get container
 		const container = this._focusElementContainer!;
@@ -1363,6 +1439,10 @@ export class Root implements IDisposer {
 	}
 
 	protected _positionFocusElement(target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		const bounds = target.globalBounds();
 
 		const width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
@@ -1377,6 +1457,10 @@ export class Root implements IDisposer {
 	}
 
 	protected _handleFocus(ev: FocusEvent, index: number): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		// Get element
 		const focused = this._tabindexes[index];
 
@@ -1402,6 +1486,10 @@ export class Root implements IDisposer {
 	}
 
 	protected _focusNext(el: HTMLDivElement, direction: 1 | -1): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		var focusableElements = Array.from(document.querySelectorAll([
 			'a[href]',
 			'area[href]',
@@ -1431,6 +1519,10 @@ export class Root implements IDisposer {
 	}
 
 	protected _handleBlur(ev: FocusEvent, _index: number): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		const focused = this._focusedSprite;
 		if (focused && focused.events.isEnabled("blur")) {
 			focused.events.dispatch("blur", {
@@ -1446,6 +1538,10 @@ export class Root implements IDisposer {
 	 * @ignore
 	 */
 	public updateTooltip(target: Text): void {
+		if (this._a11yD == true) {
+			return;
+		}
+
 		const text = $utils.stripTags(target._getText());
 		let tooltipElement = target.getPrivate("tooltipElement");
 		if (target.get("role") == "tooltip" && text != "") {
@@ -1474,10 +1570,27 @@ export class Root implements IDisposer {
 		this._decorateFocusElement(target, tooltipElement);
 		container.append(tooltipElement);
 		target.setPrivate("tooltipElement", tooltipElement);
+
 		return tooltipElement;
 	}
 
+	public _removeTooltipElement(target: Text): void {
+		if (this._a11yD == true) {
+			return;
+		}
+		const tooltipElement = target.getPrivate("tooltipElement");
+		if (tooltipElement) {
+			const parent = tooltipElement.parentElement;
+			if (parent) {
+				parent.removeChild(tooltipElement);
+			}
+		}
+	}
+
 	public _invalidateAccessibility(target: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
 		this._focusElementDirty = true;
 		const focusElement = target.getPrivate("focusElement");
 		if (target.get("focusable")) {

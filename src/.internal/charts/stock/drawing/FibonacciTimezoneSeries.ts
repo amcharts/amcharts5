@@ -1,13 +1,14 @@
 import type { DataItem } from "../../../core/render/Component";
 
 import { FibonacciSeries, IFibonacciSeriesSettings, IFibonacciSeriesPrivate, IFibonacciSeriesDataItem } from "./FibonacciSeries";
+import { color } from "../../../core/util/Color";
 
 export interface IFibonacciTimezoneSeriesDataItem extends IFibonacciSeriesDataItem {
 
 }
 
 export interface IFibonacciTimezoneSeriesSettings extends IFibonacciSeriesSettings {
-	
+
 }
 
 export interface IFibonacciTimezoneSeriesPrivate extends IFibonacciSeriesPrivate {
@@ -26,16 +27,18 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 	protected _tag = "fibonaccitimezone";
 
 	protected _updateSegmentReal(index: number) {
-		const diP1 = this._di[index]["p1"];
-		const diP2 = this._di[index]["p2"];
+		const dataItems = this._di[index];
+		if (dataItems) {
+			const diP1 = dataItems["p1"];
+			const diP2 = dataItems["p2"];
+			if (diP1 && diP2) {
+				const valueY1 = diP1.get("valueY", 0);
+				this._setContext(diP2, "valueY", valueY1, true);
 
-		const valueY1 = diP1.get("valueY", 0);
-
-		diP2.set("valueY", valueY1)
-		diP2.set("valueYWorking", valueY1)
-
-		diP1.setRaw("locationX", 0)
-		diP2.setRaw("locationX", 0)
+				diP1.setRaw("locationX", 0);
+				diP2.setRaw("locationX", 0);
+			}
+		}
 	}
 
 	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
@@ -51,6 +54,7 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 				if (line) {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
+					const di = this._di[i]["e"];
 
 					const p1 = diP1.get("point");
 					const p2 = diP2.get("point");
@@ -60,12 +64,15 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 
 					const xAxis = this.get("xAxis");
 
-					if (open1 && open2) {
+					if (open1 && open2 && di) {
 						const valueX1 = open1["valueX"]
 						const valueX2 = open2["valueX"]
 						const diff = valueX2 - valueX1;
 
 						if (p1 && p2) {
+							const dataContext = di.dataContext as any;
+
+
 							const sequence = this.get("sequence", []);
 							const labels = this._labels[i];
 							const fills = this._fills[i];
@@ -89,6 +96,35 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 								fill.setPrivate("visible", true);
 								stroke.setPrivate("visible", true);
 
+								const fillTemplate = dataContext.fill;
+								let fillColor = this.get("colors", [])[i];
+								let strokeColor = fillColor;
+
+								if (!fillColor) {
+
+									if (fillTemplate) {
+										fillColor = fillTemplate.get("fill");
+									}
+
+									if (!fillColor) {
+										fillColor = this.get("fillColor", this.get("fill", color(0x000000)));
+									}
+								}
+
+								if (!strokeColor) {
+									const strokeTemplate = dataContext.stroke;
+									if (strokeTemplate) {
+										strokeColor = strokeTemplate.get("stroke");
+									}
+									if (!strokeColor) {
+										strokeColor = this.get("strokeColor", this.get("stroke", color(0x000000)));
+									}
+								}
+
+								fill.set("fill", fillColor);
+								stroke.set("stroke", strokeColor);
+
+
 								fill.set("draw", (display) => {
 									display.moveTo(x1, y1);
 									display.lineTo(x2, y1);
@@ -107,7 +143,7 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 									dataItem.set("value" as any, value);
 								}
 
-								label.setAll({ x: x2, y: y2 });
+								label.setAll({ x: x2, y: y2, dy:-20 });
 								label.text.markDirtyText();
 							}
 						}

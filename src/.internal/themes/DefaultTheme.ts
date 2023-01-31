@@ -430,7 +430,8 @@ export class DefaultTheme extends Theme {
 				strokeOpacity: .15,
 				isMeasured: false,
 				length: 4.5,
-				position: "absolute"
+				position: "absolute",
+				crisp: true
 			});
 
 			setColor(rule, "stroke", ic, "grid");
@@ -595,6 +596,7 @@ export class DefaultTheme extends Theme {
 			const rule = r("Graphics", ["icon", "button", "zoom"]);
 
 			rule.setAll({
+				crisp:true,
 				strokeOpacity: 0.7,
 				draw: (display: any) => {
 					display.moveTo(0, 0);
@@ -655,12 +657,13 @@ export class DefaultTheme extends Theme {
 			const rule = r("Graphics", ["resize", "button", "icon"]);
 
 			rule.setAll({
-				strokeOpacity: 0.7,
+				crisp: true,
+				strokeOpacity: 0.5,
 				draw: (display: any) => {
-					display.moveTo(0, 0);
-					display.lineTo(0, 12);
-					display.moveTo(4, 0);
-					display.lineTo(4, 12);
+					display.moveTo(0, 0.5);
+					display.lineTo(0, 12.5);
+					display.moveTo(4, 0.5);
+					display.lineTo(4, 12.5);
 				}
 			});
 

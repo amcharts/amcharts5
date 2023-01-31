@@ -166,7 +166,6 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 * @since 5.2.10
 	 */
 	lineJoin?: "miter" | "round" | "bevel";
-
 }
 
 export interface IGraphicsPrivate extends ISpritePrivate {
@@ -204,6 +203,8 @@ export class Graphics extends Sprite {
 		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("scale") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("lineJoin") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
 			this._clear = true;
 		}
+
+		this._display.crisp = this.get("crisp", false);
 
 		if (this.isDirty("fillGradient")) {
 			const gradient = this.get("fillGradient");
@@ -369,6 +370,11 @@ export class Graphics extends Sprite {
 				if (this.get("nonScalingStroke")) {
 					strokeWidth = strokeWidth / this.get("scale", 1)
 				}
+
+				if(this.get("crisp")){
+					strokeWidth /= this._root._renderer.resolution;
+				}
+
 				const lineJoin = this.get("lineJoin");
 
 				if (strokePattern) {

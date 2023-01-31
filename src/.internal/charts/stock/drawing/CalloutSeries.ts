@@ -3,7 +3,8 @@ import type { Container } from "../../../core/render/Container";
 
 import { LabelSeries, ILabelSeriesSettings, ILabelSeriesPrivate, ILabelSeriesDataItem } from "./LabelSeries";
 import { PointedRectangle } from "../../../core/render/PointedRectangle";
-import { Color, color } from "../../../core/util/Color";
+import type { DataItem } from "../../../core/render/Component";
+import { Template } from "../../../core/util/Template";
 
 import * as $ease from "../../../core/util/Ease";
 
@@ -46,16 +47,18 @@ export class CalloutSeries extends LabelSeries {
 		super._afterNew();
 	}
 
-	protected _tweakBullet2(label: Label) {
-		const bgColor = this.get("fillColor", this.get("fill", color(0x000000)));
-		label.set("background", PointedRectangle.new(this._root, { themeTags: ["callout"], strokeOpacity: 0, fill: bgColor }));
-		label.set("fill", this.get("labelFill", Color.alternative(bgColor, this._root.interfaceColors.get("alternativeText"), this._root.interfaceColors.get("text"))));
+	protected _tweakBullet2(label: Label, dataItem: DataItem<ICalloutSeriesDataItem>) {
+		const dataContext = dataItem.dataContext as any;
+		label.set("background", PointedRectangle.new(this._root, { themeTags: ["callout"] }, dataContext.bgSettings));
 	}
 
-	protected _tweakBullet(container: Container) {
-		super._tweakBullet(container);
+	protected _tweakBullet(container: Container, dataItem: DataItem<ICalloutSeriesDataItem>) {
+		super._tweakBullet(container, dataItem);
 
 		container.events.off("click");
+
+		const dataContext = dataItem.dataContext as any;
+		const template = dataContext.settings;
 
 		const label = this.getPrivate("label");
 		if (label) {
@@ -71,6 +74,9 @@ export class CalloutSeries extends LabelSeries {
 				else {
 					spriteResizer.set("sprite", label);
 				}
+				if (this._erasingEnabled) {
+					this._disposeIndex(dataContext.index);
+				}
 			})
 
 			label.on("scale", () => {
@@ -82,6 +88,14 @@ export class CalloutSeries extends LabelSeries {
 			})
 
 			label.setAll({ draggable: true });
+
+			label.on("x", (x) => {
+				template.set("x", x);
+			})
+
+			label.on("y", (y) => {
+				template.set("y", y);
+			})
 
 			const defaultState = label.states.lookup("default")!;
 			setTimeout(() => {
@@ -102,7 +116,28 @@ export class CalloutSeries extends LabelSeries {
 		}
 	}
 
+	protected _afterTextSave(dataContext: any) {
+		dataContext.bgSettings = this._getBgTemplate();
+	}
+
 	protected _hideAllBullets() {
 
+	}
+
+	protected _getBgTemplate(): Template<any> {
+		const template: any = {};
+
+		const fill = this.get("fillColor");
+		if (fill != null) {
+			template.fill = fill;
+		}
+
+		return Template.new(template);
+	}
+
+	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
+		if (!this.get("snapToData")) {
+			this._setXLocationReal(dataItem, value);
+		}
 	}
 }

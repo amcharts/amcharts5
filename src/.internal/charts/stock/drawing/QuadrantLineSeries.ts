@@ -39,7 +39,7 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 
 		const series = this.get("series");
 
-		if (series && movePoint) {
+		if (series && movePoint && diP1 && diP2) {
 			const xAxis = this.get("xAxis");
 
 			let x1 = this._getXValue(diP1.get("valueX" as any));
@@ -54,14 +54,11 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 				let y1 = di1.get(field as any);
 				let y2 = di2.get(field as any);
 
-				diP1.set("valueY", y1);
-				diP1.set("valueYWorking", y1);
+				this._setContext(diP1, "valueY", y1, true);
+				this._setContext(diP2, "valueY", y2, true);
 
-				diP2.set("valueY", y2);
-				diP2.set("valueYWorking", y2);
-
-				diP1.set("valueX", x1);
-				diP2.set("valueX", x2);
+				this._setContext(diP1, "valueX", x1);
+				this._setContext(diP2, "valueX", x2);
 
 				this._positionBullets(diP1);
 				this._positionBullets(diP2);
@@ -78,9 +75,11 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 		if (chart) {
 			for (let i = 0; i < this._lines.length; i++) {
 				const line = this._lines[i];
-				if(line){
+				if (line) {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
+					const di = this._di[i]["e"];
+					const dataContext = di.dataContext as any;
 
 					const fill1 = this.makeFill(this.fills);
 					const fill2 = this.makeFill(this.fills);
@@ -96,8 +95,16 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 					}
 
 					const userData = [this.dataItems.indexOf(diP1), this.dataItems.indexOf(diP2)];
-					const settings = { userData: userData };
 
+					let fillColor = this.get("fillColor", this.get("fill"));
+
+					const fillTemplate = dataContext.fill;
+
+					if (fillTemplate) {
+						fillColor = fillTemplate.get("fill");
+					}
+
+					const settings = { userData: userData, fill: fillColor };
 					fill1.setAll(settings);
 					fill2.setAll(settings);
 					fill2.set("forceInactive", true);
@@ -162,5 +169,5 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 
 	protected _updateLine() {
 
-	}	
+	}
 }

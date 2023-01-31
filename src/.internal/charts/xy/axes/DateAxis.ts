@@ -391,7 +391,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 										break;
 
 									case "sum":
-										newDataItem.setRaw(field as any, currentValue + value);
+										if(value != null){
+											newDataItem.setRaw(field as any, currentValue + value);
+										}
 										break;
 
 									case "open":
@@ -623,7 +625,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _getM(timeUnit:TimeUnit){
-		if(timeUnit == "month" || timeUnit == "year"){
+		if(timeUnit == "month" || timeUnit == "year" || timeUnit == "day"){
 			return 1.05;
 		}
 		return 1.01;
