@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.3.0",
+  "version": "5.3.1",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "description": "amCharts 5",
   "homepage": "https://www.amcharts.com/",
@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@types/d3": "^7.0.0",
+    "@types/d3-hierarchy": "3.1.1",
     "@types/d3-chord": "^3.0.0",
     "@types/d3-sankey": "^0.11.1",
     "@types/d3-shape": "^3.0.0",

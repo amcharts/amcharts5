@@ -430,7 +430,8 @@ export class DefaultTheme extends Theme {
 				strokeOpacity: .15,
 				isMeasured: false,
 				length: 4.5,
-				position: "absolute"
+				position: "absolute",
+				crisp: true
 			});
 
 			setColor(rule, "stroke", ic, "grid");

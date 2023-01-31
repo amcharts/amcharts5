@@ -273,7 +273,7 @@ export class StockChart extends Container {
 
 			if (stockSeries) {
 				this.indicators.each((indicator) => {
-					indicator.set("stockSeries", stockSeries);
+					indicator._setSoft("stockSeries", stockSeries);
 				})
 				const mainChart = stockSeries.chart;
 
@@ -283,7 +283,7 @@ export class StockChart extends Container {
 						if (series.isType<DrawingSeries>("DrawingSeries")) {
 							let s = series.get("series");
 							if (s == previous) {
-								series.set("series", stockSeries);
+								series._setSoft("series", stockSeries);
 							}
 						}
 					});
@@ -530,12 +530,12 @@ export class StockChart extends Container {
 		this.children.push(indicator);
 		const stockSeries = this.get("stockSeries");
 		if (stockSeries) {
-			indicator.set("stockSeries", stockSeries);
+			indicator._setSoft("stockSeries", stockSeries);
 		}
 
 		const volumeSeries = this.get("volumeSeries");
 		if (volumeSeries) {
-			indicator.set("volumeSeries", volumeSeries);
+			indicator._setSoft("volumeSeries", volumeSeries);
 		}
 
 		if (this.getPrivate("comparing")) {

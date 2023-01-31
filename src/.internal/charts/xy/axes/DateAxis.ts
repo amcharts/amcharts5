@@ -391,7 +391,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 										break;
 
 									case "sum":
-										newDataItem.setRaw(field as any, currentValue + value);
+										if(value != null){
+											newDataItem.setRaw(field as any, currentValue + value);
+										}
 										break;
 
 									case "open":

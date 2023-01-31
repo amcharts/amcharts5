@@ -373,8 +373,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		r("AxisTick", ["series", "range"]).setAll({
-			visible: false,
-			crisp: true
+			visible: false			
 		});
 
 		r("AxisLabel", ["series", "range"]).setAll({
@@ -390,7 +389,7 @@ export class XYChartDefaultTheme extends Theme {
 				strokeOpacity: 1,
 				isMeasured: false,
 				position: "absolute",
-				visible: false
+				visible: false				
 			});
 
 			setColor(rule, "stroke", ic, "grid");

@@ -1465,22 +1465,24 @@ export class XYChart extends SerialChart {
 
 		if ($type.isNumber(maxTooltipDistance)) {
 			this.series.each((series) => {
-				const tooltip = series.get("tooltip");
-				if (tooltip) {
-					let point = tooltip.get("pointTo")!;
-					if (point) {
-						let distance = Math.hypot(movePoint.x - point.x, movePoint.y - point.y);
-						if (maxTooltipDistanceBy == "x") {
-							distance = Math.abs(movePoint.x - point.x);
-						}
-						else if (maxTooltipDistanceBy == "y") {
-							distance = Math.abs(movePoint.y - point.y);
-						}
+				if(!series.isHidden()){
+					const tooltip = series.get("tooltip");
+					if (tooltip) {
+						let point = tooltip.get("pointTo")!;
+						if (point) {
+							let distance = Math.hypot(movePoint.x - point.x, movePoint.y - point.y);
+							if (maxTooltipDistanceBy == "x") {
+								distance = Math.abs(movePoint.x - point.x);
+							}
+							else if (maxTooltipDistanceBy == "y") {
+								distance = Math.abs(movePoint.y - point.y);
+							}
 
-						if (distance < minDistance) {
-							minDistance = distance;
-							closest = series;
-							closestPoint = point;
+							if (distance < minDistance) {
+								minDistance = distance;
+								closest = series;
+								closestPoint = point;
+							}
 						}
 					}
 				}
