@@ -3,6 +3,7 @@ import { Component } from "../../core/render/Component";
 import { Color } from "../../core/util/Color";
 import { Percent } from "../../core/util/Percent";
 import { Template } from "../../core/util/Template";
+import { ListData } from "../../core/util/Data";
 
 import * as $type from "../../core/util/Type";
 import * as $array from "../../core/util/Array";
@@ -24,8 +25,7 @@ export interface ISerializerSettings extends IEntitySettings {
 	/**
 	 * An array of properties to not include in the serialized data.
 	 *
-	 * @ignore
-	 * @todo implement
+	 * @since 5.3.2
 	 */
 	excludeProperties?: Array<string>;
 
@@ -95,7 +95,16 @@ export class Serializer extends Entity {
 			});
 			return res;
 		}
+		else if (source instanceof ListData) {
+			const res: any[] = [];
+			$array.each(source.values, (arrval) => {
+				res.push(this.serialize(arrval, depth, full));
+			});
+			return res;
+		}
 		const res: any = {};
+
+		const am5object = source instanceof Entity || source instanceof Template || source instanceof Color || source instanceof Percent ? true : false;
 
 		// Process settings
 		if (source instanceof Entity) {
@@ -140,8 +149,6 @@ export class Serializer extends Entity {
 		// Data
 		if (source instanceof Component) {
 			if (source.data.length) {
-				//this._refs["data" + source.uid] = this.serialize(source.data.values, depth + 1, full);
-				//console.log(source.data.values)
 				res.properties = {
 					data: this.serialize(source.data.values, 1, true)
 				};
@@ -166,9 +173,12 @@ export class Serializer extends Entity {
 		}
 		else if ($type.isObject(source)) {
 			// TODO
-			if (full) {
+			if (full && !am5object) {
+				const excludeProperties: Array<string> = this.get("excludeProperties", []);
 				$object.each(source, (key, value) => {
-					res[key] = this.serialize(value, depth + 1, full);
+					if (excludeProperties.indexOf(key) === -1) {
+						res[key] = this.serialize(value, depth + 1, full);
+					}
 				});
 			}
 		}

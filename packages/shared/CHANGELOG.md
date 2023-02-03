@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.2] - 2023-02-03
+
+### Changed
+- Panning/zooming with a right mouse button was disabled.
+
+### Fixed
+- `StockChart`'s panels date axes could go out of sync if data range was different. Now all X-axes will sync their `min` and `max`  to the axis of the main panel (one that contains `stockSeries`).
+- `StockChart` could crash if the height of div was really small.
+- Private settings `selectionMinFinal` and `selectionMaxFinal` were not being set on a `DateAxis`.
+
+
 ## [5.3.1] - 2023-01-31
 
 ### Added
@@ -17,7 +28,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - If all values in a grouped period were null, series showed 0 instead of omiting data point when group value was set to "sum".
 - Tooltip of a series with `maxTooltipDistance: -1` could be hidden when it should have been shown.
 - Setting custom `stockSeries` on an indicator was not working (Chart was force-setting its own `stockSeries` on indicators).
-- Fixing type error with `@types/d3-hierarchy`.yarn ex
+- Fixing type error with `@types/d3-hierarchy`.
 
 
 ## [5.3.0] - 2023-01-27

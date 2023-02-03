@@ -526,6 +526,10 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleCursorDown(event: IPointerEvent) {
+		if((event as any).button == 2){
+			return;
+		}
+		
 		const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
 		let local = this._display.toLocal(rootPoint);
 		const chart = this.chart;

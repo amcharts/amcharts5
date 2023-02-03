@@ -718,6 +718,9 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _handlePlotDown(event: IPointerEvent) {
+		if((event as any).button == 2){
+			return;
+		}
 		const plotContainer = this.plotContainer;
 		let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
 

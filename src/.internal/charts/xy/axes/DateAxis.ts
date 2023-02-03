@@ -734,6 +734,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._updateGhost();
 	}
 
+	protected _updateFinals(start:number, end:number){
+		this.setPrivateRaw("selectionMinFinal", this.positionToValue(start));
+		this.setPrivateRaw("selectionMaxFinal",  this.positionToValue(end));
+	}	
+
 	protected _getDelta() {
 		this._deltaMinMax = this.baseDuration() / 2;
 	}

@@ -213,7 +213,7 @@ class ParserState {
 			} else if (value.__parse === true) {
 				await this.parseAsyncObject(value);
 
-			} else {
+			} else if (value.__parse !== false) {
 				await Promise.all([
 					(value.type ? this.cacheClass(value.type) : Promise.resolve(undefined)),
 					(value.refs ? this.parseAsyncRefs(value.refs) : Promise.resolve(undefined)),
@@ -424,6 +424,12 @@ class ParserState {
 				return {
 					isValue: true,
 					value: this.parseSettings(root, value, refs),
+				};
+
+			} else if (value.__parse === false) {
+				return {
+					isValue: true,
+					value,
 				};
 
 			} else {

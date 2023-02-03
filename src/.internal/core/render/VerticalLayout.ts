@@ -53,8 +53,8 @@ export class VerticalLayout extends Layout {
 			}
 		})
 
-		if (availableHeight < 0) {
-			availableHeight = 0.01;
+		if (availableHeight <= 0 || availableHeight == Infinity) {
+			availableHeight = .1;
 		}
 
 		//if (availableHeight > 0) {

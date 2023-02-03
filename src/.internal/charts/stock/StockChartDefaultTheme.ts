@@ -48,6 +48,10 @@ export class StockChartDefaultTheme extends Theme {
 			autoSetPercentScale: true
 		});
 
+		r("StockPanel").setAll({
+			minHeight: 1
+		})
+
 		r("XYChart", ["stock"]).setAll({
 			paddingLeft: 0,
 			paddingRight: 0,

@@ -53,8 +53,8 @@ export class HorizontalLayout extends Layout {
 			}
 		});
 
-		if (availableWidth < 0) {
-			availableWidth = 0.01;
+		if (availableWidth <= 0 || availableWidth == Infinity) {
+			availableWidth = .1;
 		}
 
 		//if (availableWidth > 0) {

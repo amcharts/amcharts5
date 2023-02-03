@@ -1,6 +1,7 @@
 import type { StockPanel } from "./StockPanel";
 import type { StockLegend, IStockLegendDataItem } from "./StockLegend";
 import type { Axis } from "../xy/axes/Axis";
+import type { DateAxis } from "../xy/axes/DateAxis";
 import type { AxisRenderer } from "../xy/axes/AxisRenderer";
 import type { BaseColumnSeries } from "../xy/series/BaseColumnSeries";
 import type { IValueAxisSettings } from "../xy/axes/ValueAxis";
@@ -8,6 +9,7 @@ import type { XYSeries, IXYSeriesDataItem, IXYSeriesSettings } from "../xy/serie
 import type { DataItem } from "../../core/render/Component";
 import type { Indicator } from "./indicators/Indicator";
 import type { DrawingSeries } from "./drawing/DrawingSeries";
+import { MultiDisposer } from "../../core/util/Disposer";
 
 import { PanelControls } from "./PanelControls";
 import { StockChartDefaultTheme } from "./StockChartDefaultTheme";
@@ -127,6 +129,10 @@ export interface IStockChartPrivate extends IContainerPrivate {
 	 */
 	comparedSeries?: XYSeries[];
 
+	/**
+	 * Main Date axis of a Stock chart
+	 */
+	mainAxis?: DateAxis<AxisRenderer>
 }
 
 export interface IStockChartEvents extends IContainerEvents {
@@ -156,6 +162,7 @@ export class StockChart extends Container {
 	protected _dhp?: Percent;
 	protected _uhp?: Percent;
 	protected _downResizer?: Rectangle;
+	protected _syncExtremesDp?: MultiDisposer;
 
 	/**
 	 * A list of stock panels.
@@ -270,7 +277,6 @@ export class StockChart extends Container {
 
 
 		if (this.isDirty("stockSeries")) {
-
 			if (stockSeries) {
 				this.indicators.each((indicator) => {
 					indicator._setSoft("stockSeries", stockSeries);
@@ -287,6 +293,23 @@ export class StockChart extends Container {
 							}
 						}
 					});
+
+					const xAxis = mainChart.xAxes.getIndex(0) as DateAxis<AxisRenderer>;
+					if (xAxis) {
+						if (this._syncExtremesDp) {
+							this._syncExtremesDp.dispose();
+						}
+
+						this.setPrivateRaw("mainAxis", xAxis);
+						this._syncExtremesDp = new MultiDisposer([
+							xAxis.onPrivate("max", () => {
+								this._syncExtremes();
+							}),
+							xAxis.onPrivate("min", () => {
+								this._syncExtremes();
+							})
+						])
+					}
 				}
 
 				if (this.getPrivate("comparing")) {
@@ -713,6 +736,40 @@ export class StockChart extends Container {
 			if (axis._skipSync != true) {
 				this._syncXAxes(axis);
 			}
+		})
+	}
+
+	protected _syncExtremes() {
+		let min = Infinity;
+		let max = -min;
+		this.panels.each((panel) => {
+			panel.xAxes.each((xAxis) => {
+				let axisMin = xAxis.getPrivate("min" as any);
+				let axisMax = xAxis.getPrivate("max" as any);
+
+				if (axisMin < min) {
+					min = axisMin;
+				}
+				if (axisMax > max) {
+					max = axisMax;
+				}
+			})
+		})
+
+		this.panels.each((panel) => {
+			panel.xAxes.each((xAxis) => {
+				if (xAxis != this.getPrivate("mainAxis")) {
+					let axisMin = xAxis.getPrivate("min" as any);
+					let axisMax = xAxis.getPrivate("max" as any);
+
+					if (axisMin != min) {
+						xAxis.set("min" as any, min);
+					}
+					if (axisMax != max) {
+						xAxis.set("max" as any, max);
+					}
+				}
+			})
 		})
 	}
 

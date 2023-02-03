@@ -391,6 +391,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this.ghostLabel.set("opacity", 0);
 	}
 
+	protected _updateFinals(_start:number, _end:number){
+
+	}
+
 	/**
 	 * Zooms the axis to relative locations.
 	 *
@@ -402,9 +406,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @return            Zoom animation
 	 */
 	public zoom(start: number, end: number, duration?: number, priority?: "start" | "end"): Animation<this["_settings"]["start"]> | Animation<this["_settings"]["end"]> | undefined {
+		this._updateFinals(start, end);
 
 		if (this.get("start") !== start || this.get("end") != end) {
-
 			let sAnimation = this._sAnimation;
 			let eAnimation = this._eAnimation;
 
