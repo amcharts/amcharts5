@@ -965,6 +965,7 @@ export class DrawingControl extends StockControl {
 
 	protected _dispose(): void {
 		super._dispose();
+		$utils.removeElement(this.getPrivate("toolsContainer")!);
 	}
 
 	protected _getSeriesTool(series: DrawingSeries): DrawingTools | undefined {

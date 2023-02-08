@@ -106,9 +106,14 @@ export class StockToolbar extends Entity {
 	protected _dispose(): void {
 		super._dispose();
 
-		// $array.each(this._itemDisposers, (x) => {
-		// 	x.dispose();
-		// });
+		if (this._cssDisposer) {
+			this._cssDisposer.dispose();
+		}
+
+		const controls = this.get("controls", []);
+		$array.each(controls, (control, _index) => {
+			control.dispose();
+		});
 	}
 
 	private _initControls(): void {
@@ -119,7 +124,7 @@ export class StockToolbar extends Entity {
 				control.setPrivate("toolbar", this);
 				this.get("container")!.appendChild(control.getPrivate("button")!);
 			}
-		})
+		});
 	}
 
 	/**

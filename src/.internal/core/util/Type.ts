@@ -89,6 +89,20 @@ export function getType<A>(value: A): Type {
 
 
 /**
+ * Asserts that the condition is true.
+ *
+ * @param condition  Condition to check
+ * @param message    Message to display in the error
+ * @ignore
+ */
+export function assert(condition: boolean, message: string = "Assertion failed"): asserts condition {
+	if (!condition) {
+		throw new Error(message);
+	}
+}
+
+
+/**
  * ============================================================================
  * QUICK CONVERSION
  * ============================================================================

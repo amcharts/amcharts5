@@ -31,7 +31,9 @@ export class ResetControl extends StockControl {
 		this.events.on("click", () => {
 			const stockChart = this.get("stockChart");
 			stockChart.panels.each((panel) => {
-				panel.drawings.clear();
+				panel.drawings.each((drawing) => {
+					drawing.data.clear();
+				});
 			});
 
 			stockChart.indicators.clear();

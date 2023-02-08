@@ -873,13 +873,15 @@ export abstract class Sprite extends Entity {
 		this._dataItem = dataItem;
 		this._processTemplateField();
 		const eventType = "dataitemchanged";
-		if (this.events.isEnabled(eventType)) {
-			this.events.dispatch(eventType, {
-				type: eventType,
-				target: this,
-				oldDataItem: oldDataItem,
-				newDataItem: dataItem
-			});
+		if(dataItem != oldDataItem){
+			if (this.events.isEnabled(eventType)) {
+				this.events.dispatch(eventType, {
+					type: eventType,
+					target: this,
+					oldDataItem: oldDataItem,
+					newDataItem: dataItem
+				});
+			}
 		}
 	}
 

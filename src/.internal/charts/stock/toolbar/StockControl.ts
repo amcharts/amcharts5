@@ -196,10 +196,7 @@ export class StockControl extends Entity {
 
 	protected _dispose(): void {
 		super._dispose();
-
-		// $array.each(this._itemDisposers, (x) => {
-		// 	x.dispose();
-		// });
+		$utils.removeElement(this.getPrivate("button")!);
 	}
 
 	protected _setLabel(name: string): void {

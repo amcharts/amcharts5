@@ -301,6 +301,17 @@ class ParserState {
 				if (key === "data") {
 					this._delayed.push(run);
 
+				} else if (key === "bullets") {
+					const old = entity[key] as unknown;
+
+					$type.assert(old != null);
+					$type.assert(parsed.isValue);
+					$type.assert($type.isArray(parsed.value));
+
+					$array.each(parsed.value, (value) => {
+						(old as any).push(() => value);
+					});
+
 				} else {
 					run();
 				}

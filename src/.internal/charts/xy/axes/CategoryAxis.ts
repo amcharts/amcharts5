@@ -610,6 +610,6 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @ignore
 	 */
 	public getCellWidthPosition(): number {
-		return 1 / this.dataItems.length * (this.get("end", 1) - this.get("start", 0));
+		return 1 / this.dataItems.length / (this.get("end", 1) - this.get("start", 0));
 	}
 }

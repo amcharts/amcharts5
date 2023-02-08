@@ -1,5 +1,6 @@
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity"
 import * as $array from "./Array"
+import * as $object from "./Object"
 import en from "../../../locales/en";
 
 /**
@@ -287,6 +288,9 @@ export interface ILanguagePrivate extends IEntityPrivate {
 
 }
 
+/**
+ * Add localization functionality.
+ */
 export class Language extends Entity {
 	declare public _settings: ILanguageSettings;
 	declare public _privateSettings: ILanguagePrivate;
@@ -296,6 +300,14 @@ export class Language extends Entity {
 		super._setDefaults();
 	}
 
+	/**
+	 * Returns a prompt translation.
+	 * 
+	 * @param   prompt   Prompt to translate
+	 * @param   locale   Target locale
+	 * @param   ...rest  Parameters
+	 * @return           Translation
+	 */
 	public translate<Key extends keyof ILocaleSettings>(prompt: Key, locale?: ILocale, ...rest: Array<string>): string {
 
 		// Get langauge
@@ -333,13 +345,43 @@ export class Language extends Entity {
 		return translation;
 	}
 
+	/**
+	 * Returns a prompt translation, including custom prompts.
+	 * 
+	 * @param   prompt   Prompt to translate
+	 * @param   locale   Target locale
+	 * @param   ...rest  Parameters
+	 * @return           Translation
+	 */
 	public translateAny(prompt: string, locale?: ILocale, ...rest: Array<string>): string {
 		return this.translate(<any>prompt, locale, ...rest);
 	}
 
+	/**
+	 * Add a custom prompt to locale.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts}
+	 * @param  prompt       Source prompt
+	 * @param  translation  Tanslation
+	 * @param  locale       Target locale
+	 */
 	public setTranslationAny(prompt: string, translation: string, locale?: ILocale): void {
 		const localeTarget = locale || this._root.locale;
 		(<any>localeTarget)[prompt] = translation;
+	}
+
+	/**
+	 * Add a batch of custom prompts.
+	 *
+	 * @since 5.3.3
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts}
+	 * @param  translations  Translations
+	 * @param  locale        Target locale
+	 */
+	public setTranslationsAny(translations: { [index: string]: any }, locale?: ILocale): void {
+		$object.each(translations, (key, val) => {
+			this.setTranslationAny(key as string, val, locale);
+		});
 	}
 
 	public translateEmpty<Key extends keyof ILocaleSettings>(prompt: Key, locale?: ILocale, ...rest: Array<string>): string {
@@ -364,6 +406,13 @@ export class Language extends Entity {
 		};
 	}
 
+	/**
+	 * Translates a btach of prompts.
+	 * 
+	 * @param  list    Array of prompts to translate
+	 * @param  locale  Target locale
+	 * @return         Array of translations
+	 */
 	public translateAll<Key extends keyof ILocaleSettings>(list: Array<Key>, locale?: ILocale): Array<string> {
 		// Translate all items in the list
 		if (!this.isDefault()) {

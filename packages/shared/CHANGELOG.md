@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.3] - 2023-02-08
+
+### Added
+- New method on `Language`: `addTranslationsAny()`. Allows adding custom translations to locale. [More info](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts).
+
+### Fixed
+- In `StockChart` if "Reset" button was pressed when there were drawings present on the chart, it could freeze.
+- Calling `dispose()` on a `StockToolbar` was not properly removing all DOM elements.
+- `getCellWidthPosition()` method on a `CategoryAxis` was returning a wrong result.
+
+
 ## [5.3.2] - 2023-02-03
 
 ### Changed
