@@ -307,7 +307,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			const firstDay = this._root.locale.firstDayOfWeek;
 			const utc = this._root.utc;
-			const timezone = this._root.timezone;			
+			const timezone = this._root.timezone;
 
 			$array.each(intervals, (interval) => {
 
@@ -391,7 +391,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 										break;
 
 									case "sum":
-										if(value != null){
+										if (value != null) {
 											newDataItem.setRaw(field as any, currentValue + value);
 										}
 										break;
@@ -624,8 +624,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._intervalMax[id] = max;
 	}
 
-	protected _getM(timeUnit:TimeUnit){
-		if(timeUnit == "month" || timeUnit == "year" || timeUnit == "day"){
+	protected _getM(timeUnit: TimeUnit) {
+		if (timeUnit == "month" || timeUnit == "year" || timeUnit == "day") {
 			return 1.05;
 		}
 		return 1.01;
@@ -734,10 +734,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._updateGhost();
 	}
 
-	protected _updateFinals(start:number, end:number){
+	protected _updateFinals(start: number, end: number) {
 		this.setPrivateRaw("selectionMinFinal", this.positionToValue(start));
-		this.setPrivateRaw("selectionMaxFinal",  this.positionToValue(end));
-	}	
+		this.setPrivateRaw("selectionMaxFinal", this.positionToValue(end));
+	}
 
 	protected _getDelta() {
 		this._deltaMinMax = this.baseDuration() / 2;
@@ -982,13 +982,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 			}
 
-			if(first){
-				return first;	
+			if (first) {
+				return first;
 			}
 
-			if(second){
-				return second;	
-			}			
+			if (second) {
+				return second;
+			}
 		}
 		else {
 			// @todo check if is in range
@@ -1056,18 +1056,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns position span between start and end of a single cell in axis.
+	 * Returns relative position between two grid lines of the axis.
 	 *
 	 * @since 5.2.30
 	 * @return Position
-	 * @ignore
 	 */
 	public getCellWidthPosition(): number {
 		let max = this.getPrivate("selectionMax", this.getPrivate("max"));
 		let min = this.getPrivate("selectionMin", this.getPrivate("min"));
 
 		if ($type.isNumber(max) && $type.isNumber(min)) {
-			return this.baseDuration() / (max - min);
+			return this._intervalDuration / (max - min);
 		}
 		return 0.05;
 	}

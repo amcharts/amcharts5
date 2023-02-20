@@ -130,7 +130,10 @@ export class Serializer extends Entity {
 			if (settings.length) {
 				res.settings = {};
 				$array.each(settings, (setting) => {
-					res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1, full);
+					const settingValue = (<any>source).get(setting);
+					if (settingValue !== undefined) {
+						res.settings[setting] = this.serialize(settingValue, depth + 1, full);
+					}
 				});
 			}
 		}
@@ -176,7 +179,7 @@ export class Serializer extends Entity {
 			if (full && !am5object) {
 				const excludeProperties: Array<string> = this.get("excludeProperties", []);
 				$object.each(source, (key, value) => {
-					if (excludeProperties.indexOf(key) === -1) {
+					if (excludeProperties.indexOf(key) === -1 && value !== undefined) {
 						res[key] = this.serialize(value, depth + 1, full);
 					}
 				});

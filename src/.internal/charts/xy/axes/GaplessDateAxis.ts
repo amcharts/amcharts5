@@ -168,6 +168,19 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		this.setPrivateRaw("maxZoomFactor", this._dates.length - this.get("startLocation", 0) - (1 - this.get("endLocation", 1)));
 	}
 
+	/**
+	 * Zooms the axis to specific `start` and `end` values.
+	 *
+	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 *
+	 * @param  start     Start value
+	 * @param  end       End value
+	 * @param  duration  Duration in milliseconds
+	 */
+	public zoomToValues(start: number, end: number, duration?: number) {
+		this.zoom(this.valueToPosition(start), this.valueToPosition(end), duration);
+	}	
+
 	protected _prepareAxisItems() {
 		let startTime = this.getPrivate("selectionMin", 0);
 		let endTime = this.getPrivate("selectionMax", 0);

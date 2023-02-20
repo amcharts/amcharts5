@@ -657,6 +657,7 @@ export class DefaultTheme extends Theme {
 			const rule = r("Graphics", ["resize", "button", "icon"]);
 
 			rule.setAll({
+				interactive:false,
 				crisp: true,
 				strokeOpacity: 0.5,
 				draw: (display: any) => {

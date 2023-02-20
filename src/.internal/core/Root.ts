@@ -1861,9 +1861,11 @@ export class Root implements IDisposer {
 			}
 
 			if (!width || !height) {
+				htmlElement.style.position = "fixed";
 				htmlElement.style.width = "";
 				htmlElement.style.height = "";
 				const bbox = htmlElement.getBoundingClientRect();
+				htmlElement.style.position = "absolute";
 				w = bbox.width;
 				h = bbox.height;
 

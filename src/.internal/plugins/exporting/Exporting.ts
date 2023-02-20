@@ -746,7 +746,7 @@ export class Exporting extends Entity {
 			target: this
 		});
 
-		// Force any randering to complete before proceeding
+		// Force any rendering to complete before proceeding
 		this._root._runTickerNow();
 
 		let promise: Promise<string> | string = "";

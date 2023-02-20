@@ -165,7 +165,9 @@ export class SettingsModal extends Modal {
 			settings = [{
 				key: "stroke",
 				name: l.translateAny("Line"),
-				type: "color"
+				type: "color",
+				additionalKeys: ["fill"],
+				target: (<LineSeries>series),
 			}, {
 				key: "strokeWidth",
 				name: l.translateAny("Line"),
@@ -306,8 +308,8 @@ export class SettingsModal extends Modal {
 					if (value.setting && value.setting.target) {
 						value.setting.target.set(targetKey, value.value);
 						if (value.setting.additionalKeys) {
-							$array.each(value.setting.additionalKeys, (additonalKey) => {
-								value.setting.target.set(additonalKey, value.value);
+							$array.each(value.setting.additionalKeys, (additionalKey) => {
+								value.setting.target.set(additionalKey, value.value);
 							});
 						}
 					}

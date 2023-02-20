@@ -2407,6 +2407,11 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 				ghostContext.save();
 			}
 
+			// We need measurements in order to properly position text for alignment
+			if (!this._textInfo) {
+				this._measure(layer);
+			}
+
 			// Init
 			let radius = (this.radius || 0);
 			let startAngle = (this.startAngle || 0);
@@ -2418,11 +2423,6 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 			const kerning = this.kerning || 0;
 			let clockwise = align == "left" ? 1 : -1;
 			const shouldReverse = !this._textReversed;
-
-			// We need measurements in order to properly position text for alignment
-			if (!this._textInfo) {
-				this._measure(layer);
-			}
 
 			// Check if we need to invert the whole stuff
 			if (inward == "auto") {
@@ -3546,7 +3546,6 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	_dispatchMousedown(originalEvent: IPointerEvent): void {
-
 		const button = (<PointerEvent>originalEvent).button;
 		if (button != 0 && button != 2 && button != 1 && button !== undefined) {
 			// Ignore non-primary mouse buttons
@@ -3839,7 +3838,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				return this._makeSharedEvent("pointerdown", () => {
 					//const throttler = new Throttler();
 
-					const mousedown = onPointerEvent(this.view, "pointerdown", (events) => {
+					const mousedown = this._onPointerEvent("pointerdown", (events) => {
 						$array.each(events, (ev) => {
 							this._dispatchMousedown(ev);
 						});

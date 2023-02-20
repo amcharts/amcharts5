@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.4] - 2023-02-20
+
+### Added
+- `cellWidth` read-only private setting added to `Axis`. Holds a distance in pixels between two grid lines. It might not be accurate as grid on `DateAxis` might not be at equal intervals.
+- `getCellWidthPosition()` added to all axis types. Returns relative distance between two grid lines of the axis.
+
+### Fixed
+- HTML-based tooltip might produce a funky animation if it was displayed very close to the edge of the chart.
+- `StockChart`'s X-axes from all panels not always were syncing properly between data updates.
+- Fixing bug where click event was not dispatched on tooltips outside of the chart boundaries.
+- Changing a color for a `LineSeries` in with a `StockChart` control was not changing its tooltip color.
+- `GaplessDateAxis` was not taking into account missing dates when using `zoomToDates()` or `zoomToValues()` methods.
+- When data grouping was on and data was changed, `ValueAxis` was zooming to incorrect position.
+- Radial labels sometimes could get reversed when updating their settings.
+
+
 ## [5.3.3] - 2023-02-08
 
 ### Added

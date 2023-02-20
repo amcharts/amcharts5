@@ -189,6 +189,11 @@ export interface IAxisPrivate extends IComponentPrivate {
 	 */
 	tooltipPosition?: number;
 
+	/**
+	 * @todo review
+     * Width in pixels between grid lines (read-only). It might not be exact, as DateAxis can have grids at irregular intervals. Could be used to detect when size changes and to adjust labels for them not to overlap.
+     */
+	cellWidth?:number;
 }
 
 export interface IAxisDataItem extends IComponentDataItem {
@@ -901,6 +906,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	protected _updateGhost() {
+		this.setPrivate("cellWidth", this.getCellWidthPosition() * this.get("renderer").axisLength());
 		const ghostLabel = this.ghostLabel;
 		if (!ghostLabel.isHidden()) {
 			const bounds = ghostLabel.localBounds();
@@ -1102,11 +1108,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _groupSeriesData(_series: XYSeries) { }
 
 	/**
-	 * Returns position span between start and end of a single cell in axis.
+	 * Returns relative position between two grid lines of the axis.
 	 *
-	 * @since 5.2.30
 	 * @return Position
-	 * @ignore
 	 */
 	public getCellWidthPosition(): number {
 		return 0.05;

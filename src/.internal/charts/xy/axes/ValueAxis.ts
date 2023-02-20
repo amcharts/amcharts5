@@ -542,7 +542,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			})
 
-			this._updateGhost();
+			this._updateGhost();		
 		}
 	}
 
@@ -1175,6 +1175,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		// meaning no min/max found on series/ranges and no min/max was defined
 		if (min === Infinity || max === -Infinity) {
+			this.setPrivate("minFinal", undefined);
+			this.setPrivate("maxFinal", undefined);						
 			return;
 		}
 
@@ -1620,4 +1622,20 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 		return false;
 	}
+
+	/**
+	 * Returns relative position between two grid lines of the axis.
+	 *
+	 * @return Position
+	 */
+	public getCellWidthPosition(): number {
+		let max = this.getPrivate("selectionMax", this.getPrivate("max"));
+		let min = this.getPrivate("selectionMin", this.getPrivate("min"));
+
+		if ($type.isNumber(max) && $type.isNumber(min)) {
+			return this.getPrivate("step", 1) / (max - min);
+		}
+		return 0.05;
+	}	
+
 }

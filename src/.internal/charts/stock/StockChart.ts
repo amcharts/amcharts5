@@ -740,37 +740,28 @@ export class StockChart extends Container {
 	}
 
 	protected _syncExtremes() {
-		let min = Infinity;
-		let max = -min;
-		this.panels.each((panel) => {
-			panel.xAxes.each((xAxis) => {
-				let axisMin = xAxis.getPrivate("min" as any);
-				let axisMax = xAxis.getPrivate("max" as any);
 
-				if (axisMin < min) {
-					min = axisMin;
-				}
-				if (axisMax > max) {
-					max = axisMax;
-				}
-			})
-		})
+		const mainAxis = this.getPrivate("mainAxis");
+		if (mainAxis) {
+			const min = mainAxis.getPrivate("min");
+			const max = mainAxis.getPrivate("max");
 
-		this.panels.each((panel) => {
-			panel.xAxes.each((xAxis) => {
-				if (xAxis != this.getPrivate("mainAxis")) {
-					let axisMin = xAxis.getPrivate("min" as any);
-					let axisMax = xAxis.getPrivate("max" as any);
+			this.panels.each((panel) => {
+				panel.xAxes.each((xAxis) => {
+					if (xAxis != mainAxis) {
+						let axisMin = xAxis.getPrivate("min" as any);
+						let axisMax = xAxis.getPrivate("max" as any);
 
-					if (axisMin != min) {
-						xAxis.set("min" as any, min);
+						if (axisMin != min) {
+							xAxis.set("min" as any, min);
+						}
+						if (axisMax != max) {
+							xAxis.set("max" as any, max);
+						}
 					}
-					if (axisMax != max) {
-						xAxis.set("max" as any, max);
-					}
-				}
+				})
 			})
-		})
+		}
 	}
 
 	protected _syncXAxes(axis: Axis<AxisRenderer>) {

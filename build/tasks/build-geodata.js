@@ -9,7 +9,7 @@ async function generateJson(from, to_es2015, to_script) {
 		if ($path.extname(from) === ".js" && $path.basename(from) !== "index.js") {
 			const file = await readFile(from);
 
-			const a = /var [a-zA-Z0-9_]+ = (\{[\s\S]+\});[ \n\r]+export default [a-zA-Z0-9_]+;[ \n\r]*$/.exec(file);
+			const a = /const [a-zA-Z0-9_]+ = (\{[\s\S]+\});[ \n\r]+export default [a-zA-Z0-9_]+;[ \n\r]*$/.exec(file);
 
 			if (a == null) {
 				throw new Error("Invalid geodata: " + from);
