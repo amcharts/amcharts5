@@ -9,7 +9,6 @@ import { ListTemplate } from "../../../core/util/List";
 import { color } from "../../../core/util/Color";
 import { DataItem } from "../../../core/render/Component";
 import { Rectangle } from "../../../core/render/Rectangle";
-
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
@@ -57,6 +56,7 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	 * @since 5.2.7
 	 */
 	minDistance?: number;
+
 
 }
 
@@ -187,7 +187,7 @@ export class LineSeries extends XYSeries {
 	public _updateChildren() {
 
 		this._strokeTemplate = undefined;
-		this._fillTemplate = undefined;
+		this._fillTemplate = undefined;		
 
 		let xAxis = this.get("xAxis");
 		let yAxis = this.get("yAxis");
@@ -654,7 +654,7 @@ export class LineSeries extends XYSeries {
 	}
 
 	protected _drawStroke(graphics: Graphics, segments: number[][][]) {
-		if (graphics.get("visible")) {
+		if (graphics.get("visible") && !graphics.get("forceHidden")) {
 			graphics.set("draw", (display) => {
 				$array.each(segments, (segment) => {
 					this._strokeGenerator.context(display as any);
@@ -665,7 +665,7 @@ export class LineSeries extends XYSeries {
 	}
 
 	protected _drawFill(graphics: Graphics, segments: number[][][]) {
-		if (graphics.get("visible")) {
+		if (graphics.get("visible") && !graphics.get("forceHidden")) {
 			graphics.set("draw", (display) => {
 				$array.each(segments, (segment) => {
 					this._fillGenerator.context(display as any);

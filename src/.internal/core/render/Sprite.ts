@@ -1312,7 +1312,7 @@ export abstract class Sprite extends Entity {
 						this._handleOver();
 					}),
 
-					events.on("pointerout", () => {
+					events.on("pointerout", () => {						
 						this._handleOut();
 					}),
 
@@ -1384,6 +1384,9 @@ export abstract class Sprite extends Entity {
 			else {
 				this.states.applyAnimate("hover");
 			}
+			if(this.get("draggable") && this._isDown && this.states.lookup("down")){
+				this.states.applyAnimate("down");
+			}			
 		}
 	}
 
@@ -1399,6 +1402,9 @@ export abstract class Sprite extends Entity {
 				if (this.states.lookup("hover") || this.states.lookup("hoverActive")) {
 					this.states.applyAnimate("default");
 				}
+			}
+			if(this.get("draggable") && this._isDown && this.states.lookup("down")){
+				this.states.applyAnimate("down");
 			}
 		}
 	}

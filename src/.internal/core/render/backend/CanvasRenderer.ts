@@ -3467,21 +3467,24 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		);
 	}
 
-	_getHitTarget(point: IPoint, bbox: DOMRect): CanvasDisplayObject | undefined | false {
+	_getHitTarget(point: IPoint, bbox: DOMRect, event: IPointerEvent): CanvasDisplayObject | undefined | false {
 		if (bbox.width === 0 || bbox.height === 0 || point.x < bbox.left || point.x > bbox.right || point.y < bbox.top || point.y > bbox.bottom) {
 			return;
 		}
-		else {
-			const pixel = this._ghostLayer.getImageData(point, bbox);
 
-			if (pixel.data[0] === 0 && pixel.data[1] === 0 && pixel.data[2] === 0) {
-				return false;
-			}
-			const colorId = Color.fromRGB(pixel.data[0], pixel.data[1], pixel.data[2]).toCSS();
-			const hit = this._colorMap[colorId];
-
-			return hit;
+		if (!this._layerDom.contains(event.target as Node)) {
+			return;
 		}
+
+		const pixel = this._ghostLayer.getImageData(point, bbox);
+
+		if (pixel.data[0] === 0 && pixel.data[1] === 0 && pixel.data[2] === 0) {
+			return false;
+		}
+		const colorId = Color.fromRGB(pixel.data[0], pixel.data[1], pixel.data[2]).toCSS();
+		const hit = this._colorMap[colorId];
+
+		return hit;
 	}
 
 	_withEvents<Key extends keyof IRendererEvents>(key: Key, f: (events: Events<Key>) => void): void {
@@ -3553,7 +3556,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.originalPoint, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
 
 
 		if (target) {
@@ -3588,7 +3591,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	_dispatchGlobalMousemove(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 
-		const target = this._getHitTarget(event.originalPoint, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
 		event.native = native;
 
 		if (target) {
@@ -3672,7 +3675,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		const id = event.id;
 
 		if (this._mousedown.length !== 0) {
-			const target = this._getHitTarget(event.originalPoint, event.bbox);
+			const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
 
 			if (target) {
 				this._mousedown.forEach((obj) => {
@@ -3698,7 +3701,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	_dispatchDoubleClick(originalEvent: IPointerEvent): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.originalPoint, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
 
 		if (target) {
 			eachTargets(target, (obj) => {
@@ -3713,7 +3716,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	_dispatchWheel(originalEvent: WheelEvent): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.originalPoint, event.bbox);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
 
 		if (target) {
 			eachTargets(target, (obj) => {

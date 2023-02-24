@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.5] - 2023-02-24
+
+### Changed
+- Reverting "Fixing bug where click event was not dispatched on tooltips outside of the chart boundaries" introduced in `5.3.4` as it was causing other issues.
+
+### Fixed
+- Down state was changed to a default state if a draggable object was unhovered while dragging.
+
+
 ## [5.3.4] - 2023-02-20
 
 ### Added
