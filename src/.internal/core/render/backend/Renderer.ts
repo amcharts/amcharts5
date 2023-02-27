@@ -171,6 +171,7 @@ export interface IGraphics extends IDisplayObject {
 
 	beginFill(color?: Color | IGradient | IPattern, alpha?: number): void;
 	endFill(): void;
+	beginPath(): void;
 
 	lineStyle(width?: number, color?: Color | IGradient | IPattern, alpha?: number, lineJoin?: "miter" | "round" | "bevel"): void;
 	setLineDash(dash?: number[]): void;

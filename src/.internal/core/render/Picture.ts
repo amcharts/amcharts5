@@ -15,6 +15,14 @@ export interface IPictureSettings extends ISpriteSettings {
 	src?: string;
 
 	/**
+	 * CORS settings for loading the image. Defaults to "anonymous".
+	 *
+	 * @since 5.3.6
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin} for more info
+	 */
+	cors?: string | null;
+
+	/**
 	 * Color of the element's shadow.
 	 *
 	 * For this to work at least one of the following needs to be set as well:
@@ -116,7 +124,7 @@ export class Picture extends Sprite {
 			this._display.shadowOpacity = this.get("shadowOpacity");
 		}
 
-		if (this.isDirty("src")) {
+		if (this.isDirty("src") || this.isDirty("cors")) {
 			this._display.clear();
 			this._load();
 		}
@@ -126,7 +134,7 @@ export class Picture extends Sprite {
 		const src = this.get("src");
 		if (src) {
 			const image = new Image();
-			//image.crossOrigin = "Anonymous";
+			image.crossOrigin = this.get("cors", "anonymous");
 			image.src = src!;
 			image.decode().then(() => {
 				this._display.image = image;

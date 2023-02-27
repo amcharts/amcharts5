@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.6] - 2023-02-27
+
+### Added
+- New `cors` setting for `Picture` (defaults to `"anonymous"`).
+- `beginPath` method added to `CanvasGraphics`.
+
+### Fixed
+- Theme states no longer override user states.
+- In some specific cases with stacked axes series position could be shifted up.
+- In some specific cases a hairline of a column of a `ColumnSeries` could remain visible on the plot area even if the whole column was out of visible axis bounds.
+- A `ghostLabel` was causing some interfering issues with interactive labels of an axis.
+
+
 ## [5.3.5] - 2023-02-24
 
 ### Changed

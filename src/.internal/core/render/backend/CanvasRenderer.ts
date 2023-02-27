@@ -709,6 +709,15 @@ abstract class Op {
 /**
  * @ignore
  */
+class BeginPath extends Op {
+	public colorize(context: CanvasRenderingContext2D, _forceColor: string | undefined): void {
+		context.beginPath();
+	}
+}
+
+/**
+ * @ignore
+ */
 class BeginFill extends Op {
 	constructor(public color: string | CanvasGradient | CanvasPattern) { super(); }
 
@@ -1096,6 +1105,10 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 
 	endStroke(): void {
 		this._pushOp(new EndStroke());
+	}
+
+	beginPath(): void {
+		this._pushOp(new BeginPath());
 	}
 
 	lineStyle(width: number = 0, color?: Color | CanvasGradient | CanvasPattern, alpha: number = 1, lineJoin?: "miter" | "round" | "bevel"): void {

@@ -191,9 +191,9 @@ export interface IAxisPrivate extends IComponentPrivate {
 
 	/**
 	 * @todo review
-     * Width in pixels between grid lines (read-only). It might not be exact, as DateAxis can have grids at irregular intervals. Could be used to detect when size changes and to adjust labels for them not to overlap.
-     */
-	cellWidth?:number;
+	 * Width in pixels between grid lines (read-only). It might not be exact, as DateAxis can have grids at irregular intervals. Could be used to detect when size changes and to adjust labels for them not to overlap.
+	 */
+	cellWidth?: number;
 }
 
 export interface IAxisDataItem extends IComponentDataItem {
@@ -393,10 +393,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this.children.push(renderer);
 		this.ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}), []);
 		this.ghostLabel.adapters.disable("text");
-		this.ghostLabel.set("opacity", 0);
+		this.ghostLabel.setAll({ opacity: 0, tooltipText: undefined, tooltipHTML: undefined, interactive: false });
+		this.ghostLabel.events.disable();
 	}
 
-	protected _updateFinals(_start:number, _end:number){
+	protected _updateFinals(_start: number, _end: number) {
 
 	}
 

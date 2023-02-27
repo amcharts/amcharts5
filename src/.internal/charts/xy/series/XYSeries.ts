@@ -961,10 +961,18 @@ export abstract class XYSeries extends Series {
 			}
 		}))
 
-		if (!this.get("baseAxis")) {
-			const xAxis = this.get("xAxis");
-			const yAxis = this.get("yAxis");
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
 
+		this._disposers.push(xAxis.events.on("positionchanged", () => {
+			this._fixPosition();
+		}))
+
+		this._disposers.push(yAxis.events.on("positionchanged", () => {
+			this._fixPosition();
+		}))
+
+		if (!this.get("baseAxis")) {
 			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") || yAxis.isType<DateAxis<any>>("DateAxis")) {
 				this.set("baseAxis", yAxis);
 			}
@@ -1180,6 +1188,17 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
+	protected _fixPosition() {
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
+
+		this.set("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
+		this.set("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
+
+		this.bulletsContainer.set("y", this.y());
+		this.bulletsContainer.set("x", this.x());
+	}
+
 
 	public _prepareChildren() {
 		super._prepareChildren();
@@ -1239,10 +1258,7 @@ export abstract class XYSeries extends Series {
 		}
 
 
-		this.set("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
-		this.set("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
-		this.bulletsContainer.set("y", this.y());
-		this.bulletsContainer.set("x", this.x());
+		this._fixPosition();
 
 		const stacked = this.get("stacked");
 
@@ -1311,7 +1327,7 @@ export abstract class XYSeries extends Series {
 			this._markStakedDirtyStack();
 
 			//this.updateLegendMarker(undefined); // causes legend marker to change color instantly when on
-			if(!this.get("tooltipDataItem")){
+			if (!this.get("tooltipDataItem")) {
 				this.updateLegendValue(undefined);
 			}
 		}
@@ -1759,7 +1775,7 @@ export abstract class XYSeries extends Series {
 				let bullets = dataItem.bullets;
 				if (bullets) {
 					$array.each(bullets, (bullet) => {
-						if(bullet){
+						if (bullet) {
 							let sprite = bullet.get("sprite");
 							if (sprite) {
 								sprite.setPrivate("visible", false);
@@ -1993,11 +2009,11 @@ export abstract class XYSeries extends Series {
 
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.get("tooltip");
-		if(tooltip){
+		if (tooltip) {
 			tooltip.set("tooltipTarget", this);
 		}
 		return super.hideTooltip();
-	}	
+	}
 
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {
 		if (this.get("seriesTooltipTarget") == "bullet") {

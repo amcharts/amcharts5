@@ -16,6 +16,10 @@ export class State<E extends Entity> {
 	constructor(entity: E, settings: Partial<E["_settings"]>) {
 		this._entity = entity;
 		this._settings = settings;
+
+		$object.each(settings, (key) => {
+			this._userSettings[key] = true;
+		});
 	}
 
 	/**

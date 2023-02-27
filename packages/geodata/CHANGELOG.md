@@ -13,6 +13,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Changed
 - Map of the Pakistan was updated to adhere to local requirements.
 
+### Fixed
+- Fixed IDs of lands in the map of Denmark.
+
 
 ## [5.1.0] - 2022-12-07
 
