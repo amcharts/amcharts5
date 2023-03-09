@@ -136,7 +136,15 @@ export interface IStockChartPrivate extends IContainerPrivate {
 }
 
 export interface IStockChartEvents extends IContainerEvents {
+	/**
+	 * Kicks in when drawings change.
+	 */
+	drawingsupdated: {};
 
+	/**
+	 * Kicks in when drawings change.
+	 */
+	indicatorsupdated: {};
 }
 
 
@@ -154,7 +162,7 @@ export class StockChart extends Container {
 
 	declare public _settings: IStockChartSettings;
 	declare public _privateSettings: IStockChartPrivate;
-	declare public _events: IContainerEvents;
+	declare public _events: IStockChartEvents;
 
 	protected _xAxes: Array<Axis<AxisRenderer>> = [];
 	protected _downY?: number;
@@ -163,6 +171,8 @@ export class StockChart extends Container {
 	protected _uhp?: Percent;
 	protected _downResizer?: Rectangle;
 	protected _syncExtremesDp?: MultiDisposer;
+	protected _drawingsChanged = false;
+	protected _indicatorsChanged = false;
 
 	/**
 	 * A list of stock panels.
@@ -262,6 +272,16 @@ export class StockChart extends Container {
 		}
 	}
 
+	public markDirtyDrawings() {
+		this._drawingsChanged = true;
+		this.markDirty();
+	}
+
+	public markDirtyIndicators() {
+		this._indicatorsChanged = true;
+		this.markDirty();
+	}
+
 	public _prepareChildren() {
 
 		if (this.isDirty("volumeNegativeColor") || this.isDirty("volumePositiveColor")) {
@@ -319,6 +339,25 @@ export class StockChart extends Container {
 		}
 
 		super._prepareChildren();
+	}
+
+	public _afterChanged() {
+		super._afterChanged();
+		if (this._drawingsChanged) {
+			this._drawingsChanged = false;
+			const type = "drawingsupdated";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this });
+			}
+		}
+
+		if (this._indicatorsChanged) {
+			this._indicatorsChanged = false;
+			const type = "indicatorsupdated";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this });
+			}
+		}
 	}
 
 	public _updateChildren() {
@@ -565,11 +604,21 @@ export class StockChart extends Container {
 			this.setPercentScale(true);
 		}
 
+
+		$array.each(indicator._editableSettings, (setting) => {
+			indicator.on((setting as any).key, () => {
+				this.markDirtyIndicators();
+			})
+		})
+
+		this.markDirtyIndicators();
+
 		indicator.prepareData();
 	}
 
 	protected _removeIndicator(indicator: Indicator) {
 		this.children.removeValue(indicator);
+		this.markDirtyIndicators();
 	}
 
 	protected _removePanel(chart: StockPanel) {

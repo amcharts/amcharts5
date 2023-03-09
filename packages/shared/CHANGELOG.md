@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.7] - 2023-03-09
+
+### Added
+- New `calculateSize` setting on `Root`. This is needed if you are using a `transform: scale(...)` CSS style. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#Custom_sizing_function).
+- New settings on `DateRangeSelector`: `minDate` and `maxDate`. Allows restricting date selection to specific date ranges. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/#Restricting_date_range).
+- New events on `StockChart`: `drawingsupdated` and `indicatorsupdated`. Events kick in when drawings or indicators are added, updated, or removed. [More info](https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/#Events).
+
+### Changed
+- `DateRangeSelector` will now limit dates to actual range of data. To disable set `minDate` and `maxDate` to `null`. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/#Restricting_date_range).
+
+### Fixed
+- `XYSeries` were creating `Bullet` objects even if distance between them was less than `minBulletDistance` which was not efficient and could slow the browser down.
+- Fixed issue with mutating ES6 modules ([Issue 833](https://github.com/amcharts/amcharts5/issues/833)).
+- Fixed more issues with `ghostLabel` obstructing interactivity for other labels.
+- Bullet function was not being called when a single data item of the series was updated.
+
+
 ## [5.3.6] - 2023-02-27
 
 ### Added

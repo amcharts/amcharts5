@@ -1298,7 +1298,9 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("DateRangeSelector").setAll({
-			description: l.translateAny("Date Range")
+			description: l.translateAny("Date Range"),
+			minDate: "auto",
+			maxDate: "auto"
 		});
 
 		r("PeriodSelector").setAll({

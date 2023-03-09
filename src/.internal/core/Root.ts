@@ -65,6 +65,12 @@ interface IBounds extends Entity {
 }
 
 
+export interface ISize {
+	width: number,
+	height: number,
+}
+
+
 export interface IRootEvents {
 	framestarted: {
 		timestamp: number;
@@ -97,11 +103,18 @@ export interface IRootSettings {
 	 * Set to `false` to disable all accessibility features.
 	 *
 	 * NOTE: once disabled, accessibility cannot be re-enabled on a live `Root` object.
-	 * 
+	 *
 	 * @default true
 	 * @since 5.3.0
 	 */
 	accessible?: boolean;
+
+	/**
+	 * Allows for specifying a custom width / height for the chart.
+	 *
+	 * This function will be called automatically when the chart is resized.
+	 */
+	calculateSize?: (dimensions: DOMRect) => ISize;
 }
 
 
@@ -119,6 +132,7 @@ export class Root implements IDisposer {
 	public dom: HTMLElement;
 	public _inner: HTMLElement;
 
+	protected _settings: IRootSettings;
 	protected _isDirty: boolean = false;
 	protected _isDirtyParents: boolean = false;
 	protected _dirty: { [id: number]: Entity } = {};
@@ -316,6 +330,8 @@ export class Root implements IDisposer {
 			throw new Error("You cannot use `new Class()`, instead use `Class.new()`");
 		}
 
+		this._settings = settings;
+
 		if (settings.accessible == false) {
 			this._a11yD = true;
 		}
@@ -485,19 +501,46 @@ export class Root implements IDisposer {
 		}
 	}
 
+	protected _getRealSize(): DOMRect {
+		return this.dom.getBoundingClientRect();
+	}
+
+	protected _getCalculatedSize(rect: DOMRect): ISize {
+		if (this._settings.calculateSize) {
+			return this._settings.calculateSize(rect);
+
+		} else {
+			return {
+				width: rect.width,
+				height: rect.height,
+			};
+		}
+	}
+
 	protected _init(): void {
 		const renderer = this._renderer;
-		const rect = this.dom.getBoundingClientRect();
-		const width = Math.floor(rect.width);
-		const height = Math.floor(rect.height);
-		const rootContainer = Container.new(this, { visible: true, width, height });
+
+		const rect = this._getRealSize();
+		const size = this._getCalculatedSize(rect);
+
+		const width = Math.floor(size.width);
+		const height = Math.floor(size.height);
+
+		const realWidth = Math.floor(rect.width);
+		const realHeight = Math.floor(rect.height);
+
+		const rootContainer = Container.new(this, {
+			visible: true,
+			width: realWidth,
+			height: realHeight,
+		});
 		this._rootContainer = rootContainer;
 		this._rootContainer._defaultThemes.push(DefaultTheme.new(this));
 
 		const container = rootContainer.children.push(Container.new(this, { visible: true, width: p100, height: p100 }));
 		this.container = container;
 
-		renderer.resize(width, height);
+		renderer.resize(realWidth, realHeight, width, height);
 
 		//@todo: better appendChild - refer
 		this._inner.appendChild(renderer.view);
@@ -743,11 +786,15 @@ export class Root implements IDisposer {
 	 * can be resized manually by calling this method.
 	 */
 	public resize(): void {
-		const dom = this.dom;
-		const rect = dom.getBoundingClientRect();
-		const w = Math.floor(rect.width);
-		const h = Math.floor(rect.height);
+		const rect = this._getRealSize();
+		const size = this._getCalculatedSize(rect);
+		const w = Math.floor(size.width);
+		const h = Math.floor(size.height);
+
 		if (w > 0 && h > 0) {
+			const realWidth = Math.floor(rect.width);
+			const realHeight = Math.floor(rect.height);
+
 			const htmlElementContainer = this._htmlElementContainer!;
 			htmlElementContainer.style.width = w + "px";
 			htmlElementContainer.style.height = h + "px";
@@ -758,12 +805,12 @@ export class Root implements IDisposer {
 				focusElementContainer.style.height = h + "px";
 			}
 
-			this._renderer.resize(w, h);
+			this._renderer.resize(realWidth, realHeight, w, h);
 
 			const rootContainer = this._rootContainer;
 
-			rootContainer.setPrivate("width", w);
-			rootContainer.setPrivate("height", h);
+			rootContainer.setPrivate("width", realWidth);
+			rootContainer.setPrivate("height", realHeight);
 			this._render();
 			this._handleLogo();
 		}
@@ -1060,7 +1107,7 @@ export class Root implements IDisposer {
 	 */
 	public width(): number {
 		// TODO make this more efficient, maybe just return the renderer's width ?
-		return Math.floor(this.dom.getBoundingClientRect().width);
+		return Math.floor(this._getCalculatedSize(this._getRealSize()).width);
 	}
 
 	/**
@@ -1070,7 +1117,7 @@ export class Root implements IDisposer {
 	 */
 	public height(): number {
 		// TODO make this more efficient, maybe just return the renderer's height ?
-		return Math.floor(this.dom.getBoundingClientRect().height);
+		return Math.floor(this._getCalculatedSize(this._getRealSize()).height);
 	}
 
 	/**

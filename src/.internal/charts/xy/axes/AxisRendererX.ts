@@ -80,6 +80,7 @@ export class AxisRendererX extends AxisRenderer {
 
 		const axis = this.axis;
 		axis.ghostLabel.setPrivate("visible", !this.get("inside"));
+		axis.ghostLabel.set("x", -1000);
 
 		const opposite = "opposite"
 		const inside = "inside";

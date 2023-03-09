@@ -215,6 +215,7 @@ export abstract class Component extends Container {
 			} else if (change.type === "setIndex") {
 				const dataItem = dataItems[change.index];
 				const properties = this._makeDataItem(change.newValue);
+				dataItem.bullets = undefined;
 
 				$object.keys(properties).forEach((key) => {
 					dataItem.animate({

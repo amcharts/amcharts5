@@ -26,6 +26,28 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	 */
 	useDefaultCSS?: boolean;
 
+	/**
+	 * Minimum date to allow for selection.
+	 *
+	 * Accepts either a `Date` object or `"auto"` (smallest date available in
+	 * chart).
+	 *
+	 * @default "auto"
+	 * @since 5.3.7
+	 */
+	minDate?: Date | "auto" | null;
+
+	/**
+	 * Maximum date to allow for selection.
+	 *
+	 * Accepts either a `Date` object or `"auto"` (latest date available in
+	 * chart).
+	 *
+	 * @default "auto"
+	 * @since 5.3.7
+	 */
+	maxDate?: Date | "auto" | null;
+
 }
 
 export interface IDateRangeSelectorPrivate extends IStockControlPrivate {
@@ -208,6 +230,14 @@ export class DateRangeSelector extends StockControl {
 			}
 		});
 
+		xAxis.onPrivate("minFinal", () => {
+			this._updatePickers();
+		});
+
+		xAxis.onPrivate("maxFinal", () => {
+			this._updatePickers();
+		});
+
 		$utils.addEventListener(saveButton, "click", () => {
 			const from = this._parseDate(fromField.value);
 			const to = this._parseDate(toField.value);
@@ -236,9 +266,6 @@ export class DateRangeSelector extends StockControl {
 
 	public _afterChanged() {
 		super._afterChanged();
-		// if (this.isDirty("active")) {
-		// 	this._initDropdown();
-		// }
 	}
 
 	protected _updateInputs(): void {
@@ -259,8 +286,53 @@ export class DateRangeSelector extends StockControl {
 		this.getPrivate("fromField").value = this._formatDate(from);
 		this.getPrivate("toField").value = this._formatDate(to);
 
-		this.getPrivate("fromPicker").setDate(from);
-		this.getPrivate("toPicker").setDate(to);
+		const fromPicker = this.getPrivate("fromPicker");
+		const minDate = fromPicker.config.minDate;
+		if (!minDate || (minDate <= from)) {
+			fromPicker.setDate(from);
+		}
+		else {
+			fromPicker.setDate(minDate);
+		}
+
+		const toPicker = this.getPrivate("toPicker");
+		const maxDate = toPicker.config.maxDate;
+		if (!maxDate || (maxDate >= to)) {
+			toPicker.setDate(to);
+		}
+		else {
+			toPicker.setDate(maxDate);
+		}
+	}
+
+	protected _updatePickers(): void {
+		const xAxis = this._getAxis();
+
+		const minDate = this.get("minDate");
+		const fromPicker = this.getPrivate("fromPicker");
+		if (minDate == "auto") {
+			const min = xAxis.getPrivate("minFinal");
+			fromPicker.set("minDate", new Date(min + 1));
+		}
+		else if (minDate instanceof Date) {
+			fromPicker.set("minDate", minDate);
+		}
+		else {
+			fromPicker.set("minDate", undefined);
+		}
+
+		const maxDate = this.get("maxDate");
+		const toPicker = this.getPrivate("toPicker");
+		if (maxDate == "auto") {
+			const min = xAxis.getPrivate("minFinal");
+			toPicker.set("maxDate", new Date(min));
+		}
+		else if (maxDate instanceof Date) {
+			toPicker.set("maxDate", maxDate);
+		}
+		else {
+			toPicker.set("maxDate", undefined);
+		}
 	}
 
 	protected _updateLabel(): void {
@@ -985,7 +1057,6 @@ span.flatpickr-weekday {
 .flatpickr-day.notAllowed.nextMonthDay {
   color: rgba(64,72,72,0.3);
   background: transparent;
-  border-color: ${primary2};
   cursor: default;
 }
 .flatpickr-day.flatpickr-disabled,

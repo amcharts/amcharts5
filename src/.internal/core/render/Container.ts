@@ -214,8 +214,8 @@ export class Container extends Sprite {
 			if (this.get("maskContent")) {
 				if (!contentMask) {
 					contentMask = Rectangle.new(this._root, {
-						x:-.5,
-						y:-.5,
+						x: -.5,
+						y: -.5,
 						width: this.width() + 1,
 						height: this.height() + 1
 					});
@@ -227,7 +227,7 @@ export class Container extends Sprite {
 			else {
 				if (contentMask) {
 					childrenDisplay.removeChild(contentMask._display);
-					childrenDisplay.mask = null;					
+					childrenDisplay.mask = null;
 					contentMask.dispose();
 					this._contentMask = undefined;
 				}
@@ -273,7 +273,7 @@ export class Container extends Sprite {
 				if (w > maxWidth) {
 					w = maxWidth;
 				}
-			}			
+			}
 
 			let width = this.width();
 			let height = this.height();
@@ -287,7 +287,7 @@ export class Container extends Sprite {
 
 			const contentMask = this._contentMask;
 			if (contentMask) {
-				contentMask.setAll({ width:width + 1, height:height + 1 });
+				contentMask.setAll({ width: width + 1, height: height + 1 });
 			}
 
 			const verticalScrollbar = this.get("verticalScrollbar")!;
@@ -554,7 +554,7 @@ export class Container extends Sprite {
 
 	public _updateChildren() {
 
-		if(this.isDirty("html")){
+		if (this.isDirty("html")) {
 			const html = this.get("html");
 			if (html && html !== "") {
 				this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
@@ -563,7 +563,7 @@ export class Container extends Sprite {
 				this._root._removeHTMLContent(this);
 			}
 			this._root._positionHTMLElement(this);
-		}		
+		}
 
 		if (this.isDirty("verticalScrollbar")) {
 			const verticalScrollbar = this.get("verticalScrollbar")!;
@@ -597,13 +597,22 @@ export class Container extends Sprite {
 						return;
 					}
 
-					const shiftY = wheelEvent.deltaY / 5000;
+					let shiftY = wheelEvent.deltaY / 5000;
 					const start = verticalScrollbar.get("start", 0);
 					const end = verticalScrollbar.get("end", 1);
-					if (start + shiftY > 0 && end + shiftY < 1) {
+
+					if (start + shiftY <= 0) {
+						shiftY = -start;
+					}
+					if (end + shiftY >= 1) {
+						shiftY = 1 - end;
+					}
+
+					if (start + shiftY >= 0 && end + shiftY <= 1) {
 						verticalScrollbar.set("start", start + shiftY);
 						verticalScrollbar.set("end", end + shiftY);
 					}
+
 				})
 
 				this._disposers.push(this._vsbd0);

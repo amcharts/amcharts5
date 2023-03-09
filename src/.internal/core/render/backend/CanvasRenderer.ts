@@ -345,6 +345,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 				this._parent.registerChildLayer(this._layer);
 			}
 
+			this._layer.dirty = true;
 			this._renderer.resizeLayer(this._layer);
 			this._renderer.resizeGhost();
 		}
@@ -3034,11 +3035,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	protected _patternCanvas: HTMLCanvasElement = document.createElement("canvas");
 	protected _patternContext: CanvasRenderingContext2D = this._patternCanvas.getContext("2d")!;
 
-	protected _width: number = 0;
-	protected _height: number = 0;
+	protected _domWidth: number = 0;
+	protected _domHeight: number = 0;
 
-	protected _clientWidth: number = 0;
-	protected _clientHeight: number = 0;
+	protected _canvasWidth: number = 0;
+	protected _canvasHeight: number = 0;
 
 	public resolution: number;
 	public interactionsEnabled: boolean = true;
@@ -3277,30 +3278,31 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	resizeLayer(layer: CanvasLayer) {
-		layer.dirty = true;
-		layer.resize(this._clientWidth, this._clientHeight, this.resolution);
+		layer.resize(this._canvasWidth, this._canvasHeight, this._domWidth, this._domHeight, this.resolution);
 	}
 
 	resizeGhost() {
-		this._ghostLayer.resize(this._clientWidth, this._clientHeight, this.resolution);
+		this._ghostLayer.resize(this._canvasWidth, this._canvasHeight, this._domWidth, this._domHeight, this.resolution);
 	}
 
-	resize(width: number, height: number): void {
-		this._clientWidth = width;
-		this._clientHeight = height;
-		this._width = Math.floor(width * this.resolution);
-		this._height = Math.floor(height * this.resolution);
+	resize(canvasWidth: number, canvasHeight: number, domWidth: number, domHeight: number): void {
+		this._canvasWidth = canvasWidth;
+		this._canvasHeight = canvasHeight;
+
+		this._domWidth = domWidth;
+		this._domHeight = domHeight;
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
+				layer.dirty = true;
 				this.resizeLayer(layer);
 			}
 		});
 
 		this.resizeGhost();
 
-		this.view.style.width = width + "px";
-		this.view.style.height = height + "px";
+		this.view.style.width = domWidth + "px";
+		this.view.style.height = domHeight + "px";
 	}
 
 	private createDetachedLayer(willReadFrequently: boolean = false): CanvasLayer {
@@ -3337,11 +3339,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		layer.order = order;
 		layer.visible = visible;
 
-		if (layer.visible && this._width) {
-			layer.view.width = this._width;
-			layer.view.style.width = this._clientWidth + "px";
-			layer.view.height = this._height;
-			layer.view.style.height = this._clientHeight + "px";
+		if (layer.visible) {
+			this.resizeLayer(layer);
 		}
 
 		const layers = this.layers;
@@ -3949,30 +3948,33 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		let scale: number = this.resolution;
 
+		let canvasWidth = Math.floor(this._canvasWidth * this.resolution);
+		let canvasHeight = Math.floor(this._canvasHeight * this.resolution);
+
 		// Check if we need to scale
-		if (options.minWidth && (options.minWidth > this._width)) {
-			let minScale = options.minWidth / this._width;
+		if (options.minWidth && (options.minWidth > canvasWidth)) {
+			let minScale = options.minWidth / canvasWidth;
 			if (minScale > scale) {
 				scale = minScale * this.resolution;
 			}
 		}
 
-		if (options.minHeight && (options.minHeight > this._height)) {
-			let minScale = options.minHeight / this._height;
+		if (options.minHeight && (options.minHeight > canvasHeight)) {
+			let minScale = options.minHeight / canvasHeight;
 			if (minScale > scale) {
 				scale = minScale * this.resolution;
 			}
 		}
 
-		if (options.maxWidth && (options.maxWidth < this._width)) {
-			let maxScale = options.maxWidth / this._width;
+		if (options.maxWidth && (options.maxWidth < canvasWidth)) {
+			let maxScale = options.maxWidth / canvasWidth;
 			if (maxScale < scale) {
 				scale = maxScale * this.resolution;
 			}
 		}
 
-		if (options.maxHeight && (options.maxHeight > this._height)) {
-			let maxScale = options.maxHeight / this._height;
+		if (options.maxHeight && (options.maxHeight > canvasHeight)) {
+			let maxScale = options.maxHeight / canvasHeight;
 			if (maxScale < scale) {
 				scale = maxScale * this.resolution;
 			}
@@ -3988,13 +3990,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		// Set up new canvas for export
 		let forceRender = false;
-		let canvasWidth = this._width;
-		let canvasHeight = this._height;
 		const canvas = document.createElement("canvas");
 		if (scale != this.resolution) {
 			forceRender = true;
-			canvasWidth = this._width * scale / this.resolution;
-			canvasHeight = this._height * scale / this.resolution;
+			canvasWidth = canvasWidth * scale / this.resolution;
+			canvasHeight = canvasHeight * scale / this.resolution;
 		}
 
 		canvas.width = canvasWidth;
@@ -4113,20 +4113,25 @@ class GhostLayer {
 		this.view.style.left = "0px";
 	}
 
-	resize(width: number, height: number, resolution: number) {
-		width += (this.margin.left + this.margin.right);
-		height += (this.margin.top + this.margin.bottom);
+	resize(canvasWidth: number, canvasHeight: number, domWidth: number, domHeight: number, resolution: number) {
+		canvasWidth += (this.margin.left + this.margin.right);
+		canvasHeight += (this.margin.top + this.margin.bottom);
+
+		// TODO this should take into account calculateSize
+		domWidth += (this.margin.left + this.margin.right);
+		domHeight += (this.margin.top + this.margin.bottom);
+
 		this.view.style.left = -this.margin.left + "px";
 		this.view.style.top = -this.margin.top + "px";
 
-		this._width = Math.floor(width * resolution);
-		this._height = Math.floor(height * resolution);
+		this._width = Math.floor(canvasWidth * resolution);
+		this._height = Math.floor(canvasHeight * resolution);
 
 		this.view.width = this._width;
-		this.view.style.width = width + "px";
+		this.view.style.width = domWidth + "px";
 
 		this.view.height = this._height;
-		this.view.style.height = height + "px";
+		this.view.style.height = domHeight + "px";
 	}
 
 	getImageData(point: IPoint, bbox: DOMRect): ImageData {
@@ -4188,18 +4193,27 @@ export class CanvasLayer implements ILayer {
 		this.context = context;
 	}
 
-	resize(width: number, height: number, resolution: number) {
+	resize(canvasWidth: number, canvasHeight: number, domWidth: number, domHeight: number, resolution: number) {
+		// TODO should this take into account calculateSize ?
 		if (this.width != null) {
-			width = this.width;
+			canvasWidth = this.width;
+			domWidth = this.width;
 		}
 
+		// TODO should this take into account calculateSize ?
 		if (this.height != null) {
-			height = this.height;
+			canvasHeight = this.height;
+			domHeight = this.height;
 		}
 
 		if (this.margin) {
-			width += (this.margin.left + this.margin.right);
-			height += (this.margin.top + this.margin.bottom);
+			canvasWidth += (this.margin.left + this.margin.right);
+			canvasHeight += (this.margin.top + this.margin.bottom);
+
+			// TODO this should take into account calculateSize
+			domWidth += (this.margin.left + this.margin.right);
+			domHeight += (this.margin.top + this.margin.bottom);
+
 			this.view.style.left = -this.margin.left + "px";
 			this.view.style.top = -this.margin.top + "px";
 
@@ -4208,14 +4222,14 @@ export class CanvasLayer implements ILayer {
 			this.view.style.top = "0px";
 		}
 
-		this._width = Math.floor(width * resolution);
-		this._height = Math.floor(height * resolution);
+		this._width = Math.floor(canvasWidth * resolution);
+		this._height = Math.floor(canvasHeight * resolution);
 
 		this.view.width = this._width;
-		this.view.style.width = width + "px";
+		this.view.style.width = domWidth + "px";
 
 		this.view.height = this._height;
-		this.view.style.height = height + "px";
+		this.view.style.height = domHeight + "px";
 	}
 
 	clear() {

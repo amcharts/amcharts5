@@ -1102,9 +1102,33 @@ export abstract class XYSeries extends Series {
 	}
 
 	protected _shouldMakeBullet(dataItem: DataItem<this["_dataItemSettings"]>): boolean {
-		if (!this.get("xAxis").inited || !this.get("yAxis").inited) {
+
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
+		const baseAxis = this.get("baseAxis");
+
+		if (!xAxis.inited || !yAxis.inited) {
 			return false
 		}
+		const minBulletDistance = this.get("minBulletDistance", 0);
+		if (minBulletDistance > 0) {
+			let startIndex = this.startIndex();
+			let endIndex = this.endIndex();
+
+			let count = endIndex - startIndex;
+
+			if (xAxis == baseAxis) {
+				if (xAxis.get("renderer").axisLength() / count < minBulletDistance / 5) {
+					return false;
+				}
+			}
+			else if (yAxis == baseAxis) {
+				if (yAxis.get("renderer").axisLength() / count < minBulletDistance / 5) {
+					return false;
+				}
+			}
+		}
+
 		if (dataItem.get(this._xField as any) != null && dataItem.get(this._yField as any) != null) {
 			return true;
 		}

@@ -8,6 +8,7 @@ import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import type { XYSeries } from "../../xy/series/XYSeries";
+import type { StockPanel } from "../StockPanel";
 
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "../../xy/series/LineSeries";
 import { Bullet } from "../../../core/render/Bullet";
@@ -20,6 +21,7 @@ import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
 import * as $object from "../../../core/util/Object";
+
 
 export interface IDrawingSeriesDataItem extends ILineSeriesDataItem {
 }
@@ -70,7 +72,6 @@ export interface IDrawingSeriesSettings extends ILineSeriesSettings {
 	 * [[XYSeries]] used for drawing.
 	 */
 	series?: XYSeries;
-
 }
 
 export interface IDrawingSeriesPrivate extends ILineSeriesPrivate {
@@ -229,7 +230,7 @@ export class DrawingSeries extends LineSeries {
 			if (di) {
 				const dc = di.dataContext as any;
 				if (dc) {
-					const strokeTemplate = dc.stroke;					
+					const strokeTemplate = dc.stroke;
 					if (strokeTemplate) {
 						color = strokeTemplate.get("stroke");
 					}
@@ -474,11 +475,29 @@ export class DrawingSeries extends LineSeries {
 
 	public _updateChildren() {
 		this._updateElements();
+
+		if (this._valuesDirty) {
+			this.markDirtyDrawings();
+		}
+
 		super._updateChildren();
 	}
 
 	protected _updateElements() {
 
+	}
+
+	public markDirtyDrawings() {
+		const xAxis = this.get("xAxis");
+		if (xAxis) {
+			const panel = xAxis.chart as StockPanel;
+			if (panel) {
+				const stockChart = panel.getPrivate("stockChart");
+				if (stockChart) {
+					stockChart.markDirtyDrawings();
+				}
+			}
+		}
 	}
 
 	protected _getFillTemplate(): Template<any> {

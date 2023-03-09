@@ -278,7 +278,7 @@ export interface IRenderer extends IDisposer {
 	makeRadialText(text: string, style: ITextStyle): IText;
 	makeTextStyle(): ITextStyle;
 	makePicture(image: HTMLImageElement | undefined): IPicture;
-	resize(width: number, height: number): void;
+	resize(canvasWidth: number, canvasHeight: number, domWidth: number, domHeight: number): void;
 	render(root: IDisplayObject): void;
 	getCanvas(root: IDisplayObject, options?: ICanvasOptions): HTMLCanvasElement;
 	view: HTMLElement;
