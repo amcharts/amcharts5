@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.8] - 2023-03-24
+
+### Changed
+- Auto-hidden (as per `oversizedBehavior: "hide"` setting) `Label` elements will now trigger `boundschanged` events.
+- Defaults of `marginTop` and `marginBottom` set to `1` on all `ZoomControl` buttons.
+
+### Fixed
+- HTML-based tooltips were not being properly sized on first show unless Animated theme was enabled
+- HTML-based tooltips were sometimes ignoring `keepTargetHover: true`.
+- Tooltip positions were off when exporting a chart with `tooltipContainerBounds` set.
+- `DrawingControl` can now be used completely standalone. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Standalone_usage_API).
+- Internal tweaks that were occasionally interfering with some drag-and-drop libs.
+- Horizontal columns were not being properly highlighted when gaining focus.
+- Old bullets of data item were not being cleared if `series.data.setIndex` was used to update old data (since 5.3.7).
+- `zoomToValues()` (and `zoomToDates()` by extension) method on `GaplessDateAxis` was not working correctly with a date range outside of actual data range.
+
+
 ## [5.3.7] - 2023-03-09
 
 ### Added

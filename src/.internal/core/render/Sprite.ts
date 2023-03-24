@@ -509,7 +509,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * @default false
 	 * @since 5.3.0
 	 */
-	crisp?:boolean;
+	crisp?: boolean;
 
 }
 
@@ -873,7 +873,7 @@ export abstract class Sprite extends Entity {
 		this._dataItem = dataItem;
 		this._processTemplateField();
 		const eventType = "dataitemchanged";
-		if(dataItem != oldDataItem){
+		if (dataItem != oldDataItem) {
 			if (this.events.isEnabled(eventType)) {
 				this.events.dispatch(eventType, {
 					type: eventType,
@@ -1312,7 +1312,7 @@ export abstract class Sprite extends Entity {
 						this._handleOver();
 					}),
 
-					events.on("pointerout", () => {						
+					events.on("pointerout", () => {
 						this._handleOut();
 					}),
 
@@ -1384,9 +1384,9 @@ export abstract class Sprite extends Entity {
 			else {
 				this.states.applyAnimate("hover");
 			}
-			if(this.get("draggable") && this._isDown && this.states.lookup("down")){
+			if (this.get("draggable") && this._isDown && this.states.lookup("down")) {
 				this.states.applyAnimate("down");
-			}			
+			}
 		}
 	}
 
@@ -1403,7 +1403,7 @@ export abstract class Sprite extends Entity {
 					this.states.applyAnimate("default");
 				}
 			}
-			if(this.get("draggable") && this._isDown && this.states.lookup("down")){
+			if (this.get("draggable") && this._isDown && this.states.lookup("down")) {
 				this.states.applyAnimate("down");
 			}
 		}
@@ -1620,8 +1620,8 @@ export abstract class Sprite extends Entity {
 	 * @ignore
 	 */
 	public markDirtyBounds(): void {
-		const display = this._display;
 		if (this.get("isMeasured")) {
+			const display = this._display;
 			this._root._addDirtyBounds(this);
 			display.isMeasured = true;
 			display.invalidateBounds();
@@ -1721,11 +1721,21 @@ export abstract class Sprite extends Entity {
 		let privateHeight = this.getPrivate("height");
 
 		if ($type.isNumber(privateWidth)) {
-			bounds.right = bounds.left + privateWidth;
+			if (privateWidth > 0) {
+				bounds.right = bounds.left + privateWidth;
+			}
+			else {
+				bounds.left = bounds.right + privateWidth;
+			}
 		}
 
 		if ($type.isNumber(privateHeight)) {
-			bounds.bottom = bounds.top + privateHeight;
+			if (privateHeight > 0) {
+				bounds.bottom = bounds.top + privateHeight;
+			}
+			else {
+				bounds.top = bounds.bottom + privateHeight;
+			}
 		}
 	}
 
@@ -1814,8 +1824,8 @@ export abstract class Sprite extends Entity {
 	 */
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
-		if (tooltip) {			
-			if(tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this)){
+		if (tooltip) {
+			if (tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this)) {
 				let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
 				const promise = tooltip.hide(timeout);
 				this.setPrivateRaw("showingTooltip", false);

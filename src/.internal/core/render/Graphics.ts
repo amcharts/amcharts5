@@ -431,7 +431,11 @@ export class Graphics extends Sprite {
 
 			}
 
+			if(this.getPrivate("showingTooltip")){
+				this.showTooltip();
+			}
 		}
+
 		this._clear = false;
 	}
 

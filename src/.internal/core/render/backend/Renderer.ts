@@ -200,6 +200,7 @@ export interface IText extends IDisplayObject {
 	resolution: number;
 	text: string;
 	style: ITextStyle;
+	textVisible: boolean;
 }
 
 /**

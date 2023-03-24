@@ -1,4 +1,3 @@
-//import type { IDisposer } from "../../../core/util/Disposer";
 import type { XYSeries } from "../../xy/series/XYSeries";
 import type { Color } from "../../../core/util/Color";
 import type { ColorSet } from "../../../core/util/ColorSet";
@@ -584,6 +583,7 @@ export class DrawingControl extends StockControl {
 
 	public _beforeChanged() {
 		super._beforeChanged();
+		const isInited = this._isInited();
 
 		if (this.isDirty("tools")) {
 			const toolControl = this.getPrivate("toolControl");
@@ -598,14 +598,18 @@ export class DrawingControl extends StockControl {
 			}
 		}
 
-		if (this.isDirty("active") && this._isInited()) {
+		if (this.isDirty("active")) {
 			if (this.get("active")) {
-				this.getPrivate("toolsContainer")!.style.display = "block";
+				if (isInited) {
+					this.getPrivate("toolsContainer")!.style.display = "block";
+				}
 				this._setTool(this.get("tool"));
 
 			}
 			else {
-				this.getPrivate("toolsContainer")!.style.display = "none";
+				if (isInited) {
+					this.getPrivate("toolsContainer")!.style.display = "none";
+				}
 				this._setTool();
 			}
 		}
@@ -640,6 +644,8 @@ export class DrawingControl extends StockControl {
 	}
 
 	protected _setTool(tool?: DrawingTools): void {
+		const isInited = this._isInited();
+
 		// Disable current drawing series
 		$array.each(this._currentEnabledSeries, (series) => {
 			series.disableDrawing();
@@ -648,7 +654,9 @@ export class DrawingControl extends StockControl {
 
 		// Disable editing
 		if (!tool) {
-			this.getPrivate("eraserControl")!.set("active", false);
+			if (isInited) {
+				this.getPrivate("eraserControl")!.set("active", false);
+			}
 			return;
 		}
 
@@ -665,36 +673,38 @@ export class DrawingControl extends StockControl {
 			}
 		});
 
-		this.getPrivate("toolControl")!.setTool(tool);
+		if (isInited) {
+			this.getPrivate("toolControl")!.setTool(tool);
 
-		// Show/hide needed drawing property controls
-		const controls: any = {
-			strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-			strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-			strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-			extensionControl: ["Average", "Line", "Regression", "Trend Line"],
-			fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Arrows &amp; Icons", "Fibonacci Timezone"],
+			// Show/hide needed drawing property controls
+			const controls: any = {
+				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				extensionControl: ["Average", "Line", "Regression", "Trend Line"],
+				fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Arrows &amp; Icons", "Fibonacci Timezone"],
 
-			labelFillControl: ["Callout", "Label"],
-			labelFontSizeControl: ["Callout", "Label"],
-			labelFontFamilyControl: ["Callout", "Label"],
-			boldControl: ["Callout", "Label"],
-			italicControl: ["Callout", "Label"],
+				labelFillControl: ["Callout", "Label"],
+				labelFontSizeControl: ["Callout", "Label"],
+				labelFontFamilyControl: ["Callout", "Label"],
+				boldControl: ["Callout", "Label"],
+				italicControl: ["Callout", "Label"],
 
-			iconControl: ["Arrows &amp; Icons"],
-			snapControl: ["Callout", "Arrows &amp; Icons"],
+				iconControl: ["Arrows &amp; Icons"],
+				snapControl: ["Callout", "Arrows &amp; Icons"],
+			}
+
+			$object.each(controls, (control, tools) => {
+				const controlElement = (<any>this).getPrivate(control);
+				if (tools.indexOf(tool) == -1) {
+					controlElement.hide();
+				}
+				else {
+					controlElement.show();
+				}
+				//controlElement!.getPrivate("button").style.display = tools.indexOf(tool) == -1 ? "none" : "";
+			});
 		}
-
-		$object.each(controls, (control, tools) => {
-			const controlElement = (<any>this).getPrivate(control);
-			if (tools.indexOf(tool) == -1) {
-				controlElement.hide();
-			}
-			else {
-				controlElement.show();
-			}
-			//controlElement!.getPrivate("button").style.display = tools.indexOf(tool) == -1 ? "none" : "";
-		});
 	}
 
 	protected _maybeInitToolSeries(tool: DrawingTools): void {

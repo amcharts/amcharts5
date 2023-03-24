@@ -189,6 +189,13 @@ export class Template<E extends Entity> {
 		return new Template<E>(settings, true);
 	}
 
+	/**
+	 * Array of all entities using this template.
+	 */
+	public get entities():Array<E>{
+		return this._entities;
+	}
+
 	constructor(settings: E["_settings"], isReal: boolean) {
 		if (!isReal) {
 			throw new Error("You cannot use `new Class()`, instead use `Class.new()`");

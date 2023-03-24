@@ -1577,9 +1577,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 	public text: string;
 	public style: CanvasTextStyle;
 	public resolution: number = 1;
+	public textVisible: boolean = true;
 
 	protected _textInfo: Array<ILine> | undefined;
-	protected _textVisible: boolean = true;
 	protected _originalScale?: number = 1;
 
 	constructor(renderer: CanvasRenderer, text: string, style: CanvasTextStyle) {
@@ -1717,7 +1717,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			this._measure(layer);
 		}
 
-		if (this._textVisible) {
+		if (this.textVisible) {
 
 			const interactive = this._isInteractive();
 			const context = layer.context;
@@ -2032,7 +2032,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 								if (tmpText == "") {
 									// Unable to fit a single letter - hide the whole label
-									this._textVisible = true;
+									this.textVisible = true;
 									return false;
 								}
 								//skipFurtherText = true;
@@ -2195,18 +2195,26 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			if (ratio < 1) {
 				if (oversizedBehavior == "fit") {
 					if ($type.isNumber(this.style.minScale) && (ratio < this.style.minScale)) {
-						this._textVisible = false;
+						this.textVisible = false;
+						bounds.left = 0;
+						bounds.top = 0;
+						bounds.right = 0;
+						bounds.bottom = 0;
 					}
 					else {
 						if (!this._originalScale || this._originalScale == 1) {
 							this._originalScale = this.scale;
 						}
 						this.scale = ratio;
-						this._textVisible = true;
+						this.textVisible = true;
 					}
 				}
 				else if (oversizedBehavior == "hide") {
-					this._textVisible = false;
+					this.textVisible = false;
+					bounds.left = 0;
+					bounds.top = 0;
+					bounds.right = 0;
+					bounds.bottom = 0;
 				}
 				else {
 
@@ -2227,13 +2235,13 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 					this.scale = this._originalScale || 1;
 					this._originalScale = undefined;
-					this._textVisible = true;
+					this.textVisible = true;
 				}
 			}
 			else {
 				this.scale = this._originalScale || 1;
 				this._originalScale = undefined;
-				this._textVisible = true;
+				this.textVisible = true;
 			}
 		}
 
@@ -2405,7 +2413,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 	}
 
 	public _renderCircular(parentLayer: CanvasLayer): void {
-		if (this._textVisible) {
+		if (this.textVisible) {
 			const layer = this._layer || parentLayer;
 
 			this._prerender(layer);
@@ -2635,7 +2643,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 
 		// Reset text info
-		this._textVisible = true;
+		this.textVisible = true;
 		this._textInfo = [];
 		this._textReversed = false;
 
@@ -2765,7 +2773,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 							totalWidth += ellipsisWidth;
 							if ((totalWidth + ellipsisWidth) > maxWidth) {
 								if (lineInfo.textChunks.length == 1) {
-									this._textVisible = false;
+									this.textVisible = false;
 								}
 								else {
 									lineInfo.width += ellipsisWidth;
@@ -2820,7 +2828,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 
 		if (oversizedBehavior == "hide" && (totalWidth > maxWidth)) {
-			this._textVisible = false;
+			this.textVisible = false;
 		}
 
 		// Adjust chunk internal offsets
@@ -4029,8 +4037,15 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					this.view.appendChild(layer.view);
 					canvases.push(layer.view);
 
-					layer.view.width = canvasWidth;
-					layer.view.height = canvasHeight;
+					let extraX = 0;
+					let extraY = 0;
+					if (layer.margin) {
+						extraX += layer.margin.left || 0 + layer.margin.right || 0;
+						extraY += layer.margin.top || 0 + layer.margin.bottom || 0;
+					}
+
+					layer.view.width = canvasWidth + extraX;
+					layer.view.height = canvasHeight + extraY;
 
 					layer.context = layer.view.getContext("2d")!;
 
@@ -4051,7 +4066,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			if (layer && layer.visible) {
 
 				// Layer is fine. Just plop it into our target canvas
-				context.drawImage(layer.view, 0, 0);
+				let x = 0;
+				let y = 0;
+				if (layer.margin) {
+					x = -(layer.margin.left || 0) * this.resolution;
+					y = -(layer.margin.top || 0) * this.resolution;
+				}
+				context.drawImage(layer.view, x, y);
 
 				// Restore layer original canvas
 				if (layer.exportableView) {

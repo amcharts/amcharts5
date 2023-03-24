@@ -54,6 +54,7 @@ export class ZoomControl extends Container {
 		this.set("position", "absolute");
 
 		this.set("layout", this._root.verticalLayout);
+		this.set("themeTags", ["zoomcontrol"]);
 
 		this.plusButton.setAll({
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
@@ -64,7 +65,6 @@ export class ZoomControl extends Container {
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
 			layout: undefined
 		});
-
 	}
 
 	public _prepareChildren() {

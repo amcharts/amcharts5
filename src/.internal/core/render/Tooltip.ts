@@ -69,7 +69,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	getStrokeFromSprite?: boolean;
 
 	/**
-	 * Scree bounds to constring tooltip within.
+	 * Screen bounds to constrain the tooltip within.
 	 */
 	bounds?: IBounds;
 
@@ -143,6 +143,7 @@ export class Tooltip extends Container {
 	protected _h: number = 0;
 
 	protected _keepHoverDp: MultiDisposer | undefined;
+	protected _htmlContentHovered: boolean = false;
 
 	constructor(root: Root, settings: Entity["_settings"], isReal: boolean, templates: Array<Template<Entity>> = []) {
 		super(root, settings, isReal, templates);
@@ -171,6 +172,17 @@ export class Tooltip extends Container {
 
 		this._root.tooltipContainer.children.push(this);
 		this.hide(0);
+
+		this._disposers.push(this.label.onPrivate("htmlElement", (htmlElement) => {
+			if (htmlElement) {
+				$utils.addEventListener(htmlElement, "pointerover", (_ev) => {
+					this._htmlContentHovered = true;
+				});
+				$utils.addEventListener(htmlElement, "pointerout", (_ev) => {
+					this._htmlContentHovered = false;
+				});
+			}
+		}))
 
 		this._root._tooltips.push(this);
 	}
@@ -237,7 +249,9 @@ export class Tooltip extends Container {
 							if (target.parent && target.parent.getPrivate("tooltipTarget") == target) {
 								target = target.parent;
 							}
-							target.unhover();
+							if (!this._htmlContentHovered) {
+								target.unhover();
+							}
 						}
 					})
 				]);

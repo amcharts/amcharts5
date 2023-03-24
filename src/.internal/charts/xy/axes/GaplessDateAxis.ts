@@ -7,6 +7,7 @@ import * as $array from "../../../core/util/Array"
 import * as $order from "../../../core/util/Order";
 import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
+import * as $math from "../../../core/util/Math";
 
 export interface IGaplessDateAxisSettings<R extends AxisRenderer> extends IDateAxisSettings<R> {
 
@@ -178,6 +179,10 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	 * @param  duration  Duration in milliseconds
 	 */
 	public zoomToValues(start: number, end: number, duration?: number) {
+		const min = this.getPrivate("min", 0);
+		const max = this.getPrivate("max", 0);
+		start = $math.fitToRange(start, min, max);
+		end = $math.fitToRange(end, min, max);
 		this.zoom(this.valueToPosition(start), this.valueToPosition(end), duration);
 	}	
 

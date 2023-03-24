@@ -190,10 +190,16 @@ export interface IAxisPrivate extends IComponentPrivate {
 	tooltipPosition?: number;
 
 	/**
-	 * @todo review
-	 * Width in pixels between grid lines (read-only). It might not be exact, as DateAxis can have grids at irregular intervals. Could be used to detect when size changes and to adjust labels for them not to overlap.
+	 * Width in pixels between grid lines (read-only).
+	 * 
+	 * It might not be exact, as [[DateAxis]] can have grids at irregular
+	 * intervals.
+	 * 
+	 * Could be used to detect when size changes and to adjust labels for them
+	 * not to overlap.
 	 */
 	cellWidth?: number;
+
 }
 
 export interface IAxisDataItem extends IComponentDataItem {

@@ -228,7 +228,7 @@ export class ForceDirected extends LinkedHierarchy {
 	 */
 	public restartSimulation(alpha: number): void {
 		const d3forceSimulation = this.d3forceSimulation;
-		if (d3forceSimulation.alpha() < alpha) {
+		if (d3forceSimulation.alpha() < .25) {
 			d3forceSimulation.alpha(alpha);
 			d3forceSimulation.restart();
 		}
@@ -285,7 +285,7 @@ export class ForceDirected extends LinkedHierarchy {
 
 	protected _updateVisuals() {
 		super._updateVisuals();
-		this.restartSimulation(1);
+		this.restartSimulation(.3);
 	}
 
 	public _updateChildren() {
@@ -318,7 +318,7 @@ export class ForceDirected extends LinkedHierarchy {
 			let circle = dataItem.get("circle");
 			let manyBodyStrength = this.get("manyBodyStrength", -15);
 
-			if(circle){
+			if (circle) {
 				return circle.get("radius", 1) * node.get("scale", 1) * manyBodyStrength;
 			}
 			return 0;
@@ -329,7 +329,7 @@ export class ForceDirected extends LinkedHierarchy {
 			let node = dataItem.get("node") as LinkedHierarchyNode;
 			let circle = dataItem.get("circle");
 			let outerCircle = dataItem.get("outerCircle");
-			if(circle && outerCircle){
+			if (circle && outerCircle) {
 				let radius = circle.get("radius", 1);
 
 				if (!outerCircle.isHidden()) {
@@ -341,11 +341,10 @@ export class ForceDirected extends LinkedHierarchy {
 				return radius + this.get("nodePadding", 0);
 			}
 		})
-
-		this.restartSimulation(1);
+		this.restartSimulation(0.3);
 	}
 
-	protected _animatePositions(_dataItem: DataItem<this["_dataItemSettings"]>){
+	protected _animatePositions(_dataItem: DataItem<this["_dataItemSettings"]>) {
 		// void, do not remove
 	}
 
@@ -469,14 +468,14 @@ export class ForceDirected extends LinkedHierarchy {
 		if (x != null) {
 			(d3Node as any).fx = $utils.relativeToValue(x, this.innerWidth());
 		}
-		else{
+		else {
 			(d3Node as any).fx = undefined;
 		}
 
 		if (y != null) {
 			(d3Node as any).fy = $utils.relativeToValue(y, this.innerHeight());
 		}
-		else{
+		else {
 			(d3Node as any).fx = undefined;
 		}
 	}
@@ -528,10 +527,10 @@ export class ForceDirected extends LinkedHierarchy {
 	}
 
 	protected _onDataClear() {
-				
+
 		super._onDataClear();
 
 		this._nodes = [];
 		this._links = [];
-	}	
+	}
 }

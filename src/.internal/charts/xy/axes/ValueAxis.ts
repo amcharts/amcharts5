@@ -147,7 +147,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	tooltipNumberFormat?: string | Intl.NumberFormatOptions;
 
 	/**
-	 * If set, will use greater precision for the axis fooltip than the one for
+	 * If set, will use greater precision for the axis tooltip than the one for
 	 * axis' actual labels.
 	 *
 	 * E.g. if axis displays labels with one decimal (`1.0`, `1.1`, `1.2`) setting

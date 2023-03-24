@@ -89,6 +89,11 @@ export class MapChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "background");
 		}
 
+		r("Button", ["zoomcontrol"]).setAll({
+			marginTop: 1,
+			marginBottom: 1
+		})
+
 		r("Graphics", ["map", "button", "plus", "icon"]).setAll({
 			x: p50,
 			y: p50,

@@ -303,6 +303,8 @@ export class Root implements IDisposer {
 	 */
 	public gridLayout: VerticalLayout = GridLayout.new(this, {});
 
+	public _paused: boolean = false;
+
 	/**
 	 * Indicates whether chart should resized automatically when parent container
 	 * width and/or height changes.
@@ -567,10 +569,14 @@ export class Root implements IDisposer {
 			const readerAlertElement = document.createElement("div");
 			readerAlertElement.className = "am5-reader-container";
 			readerAlertElement.setAttribute("role", "alert");
-			readerAlertElement.style.zIndex = "-100000";
-			readerAlertElement.style.opacity = "0";
+			// readerAlertElement.style.zIndex = "-100000";
+			// readerAlertElement.style.opacity = "0";
+			// readerAlertElement.style.top = "0";
 			readerAlertElement.style.position = "absolute";
-			readerAlertElement.style.top = "0";
+			readerAlertElement.style.width = "1px";
+			readerAlertElement.style.height = "1px";
+			readerAlertElement.style.overflow = "hidden";
+			readerAlertElement.style.clip = "rect(1px, 1px, 1px, 1px)";
 			this._readerAlertElement = readerAlertElement;
 			this._inner.appendChild(this._readerAlertElement);
 
@@ -962,7 +968,7 @@ export class Root implements IDisposer {
 		}
 	}
 
-	private _runTicker(currentTime: number) {
+	public _runTicker(currentTime: number) {
 		if (!this.isDisposed()) {
 			this.animationTime = currentTime;
 
@@ -974,7 +980,9 @@ export class Root implements IDisposer {
 				this.animationTime = null;
 
 			} else {
-				rAF(this.fps, this._ticker!);
+				if (!this._paused) {
+					rAF(this.fps, this._ticker!);
+				}
 			}
 		}
 	}
@@ -1492,12 +1500,25 @@ export class Root implements IDisposer {
 
 		const bounds = target.globalBounds();
 
-		const width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
-		const height = bounds.top == bounds.bottom ? target.height() : bounds.bottom - bounds.top;
+		let width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
+		let height = bounds.top == bounds.bottom ? target.height() : bounds.bottom - bounds.top;
+
+		let x = bounds.left - 2;
+		let y = bounds.top - 2;
+
+		if (width < 0) {
+			x += width;
+			width = Math.abs(width);
+		}
+
+		if (height < 0) {
+			y += height;
+			height = Math.abs(height);
+		}
 
 		const focusElement = target.getPrivate("focusElement")!.dom;
-		focusElement.style.top = (bounds.top - 2) + "px";
-		focusElement.style.left = (bounds.left - 2) + "px";
+		focusElement.style.top = y + "px";
+		focusElement.style.left = x + "px";
 		focusElement.style.width = (width + 4) + "px";
 		focusElement.style.height = (height + 4) + "px";
 
@@ -1609,8 +1630,10 @@ export class Root implements IDisposer {
 		const container = this._tooltipElementContainer!;
 		const tooltipElement = document.createElement("div");
 		tooltipElement.style.position = "absolute";
-		tooltipElement.style.top = "-1000000px";
-		tooltipElement.style.opacity = "0.0000001";
+		tooltipElement.style.width = "1px";
+		tooltipElement.style.height = "1px";
+		tooltipElement.style.overflow = "hidden";
+		tooltipElement.style.clip = "rect(1px, 1px, 1px, 1px)";
 
 		$utils.setInteractive(tooltipElement, false);
 
@@ -1907,6 +1930,7 @@ export class Root implements IDisposer {
 				h = target.height();
 			}
 
+
 			if (!width || !height) {
 				htmlElement.style.position = "fixed";
 				htmlElement.style.width = "";
@@ -1919,6 +1943,10 @@ export class Root implements IDisposer {
 				target._adjustedLocalBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 				target.setPrivate("minWidth", w);
 				target.setPrivate("minHeight", h);
+				setTimeout(() => {
+					target.setPrivate("minWidth", w);
+					target.setPrivate("minHeight", h);
+				}, 10);
 			}
 			else {
 				target.removePrivate("minWidth");
