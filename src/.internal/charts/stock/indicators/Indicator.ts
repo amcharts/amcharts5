@@ -220,6 +220,20 @@ export abstract class Indicator extends Container {
 		}
 	}
 
+	public async hide(duration?: number): Promise<any> {
+		return Promise.all([
+			super.hide(duration),
+			this.series.hide(duration)
+		]);
+	}
+
+	public async show(duration?: number): Promise<any> {
+		return Promise.all([
+			super.show(duration),
+			this.series.show(duration)
+		]);
+	}
+
 	protected _handleLegend(series: XYSeries) {
 		const legend = this.get("legend");
 		if (legend) {

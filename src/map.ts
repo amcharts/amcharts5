@@ -7,7 +7,7 @@ export { MapPolygon, IMapPolygonSettings, IMapPolygonPrivate } from "./.internal
 export { MapPolygonSeries, IMapPolygonSeriesSettings, IMapPolygonSeriesDataItem, IMapPolygonSeriesPrivate } from "./.internal/charts/map/MapPolygonSeries";
 export { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesEvents, IMapSeriesPrivate } from "./.internal/charts/map/MapSeries";
 export { ZoomControl, IZoomControlSettings, IZoomControlPrivate } from "./.internal/charts/map/ZoomControl";
-export { getGeoRectangle, getGeoCircle, normalizeGeoPoint, getGeoCentroid, getGeoBounds } from "./.internal/charts/map/MapUtils";
+export { getGeoRectangle, getGeoCircle, normalizeGeoPoint, getGeoCentroid, getGeoBounds, getGeoArea } from "./.internal/charts/map/MapUtils";
 
 import { geoMercator, geoOrthographic, geoEquirectangular, geoAlbersUsa, geoEqualEarth, geoNaturalEarth1 } from "d3-geo";
 

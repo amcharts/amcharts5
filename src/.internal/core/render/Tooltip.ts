@@ -207,6 +207,11 @@ export class Tooltip extends Container {
 
 	public _updateChildren() {
 		super._updateChildren();
+
+		if (this.isDirty("pointerOrientation") || this.isPrivateDirty("minWidth") || this.isPrivateDirty("minHeight")) {
+			this.get("background")!._markDirtyKey("width");
+		}
+
 		const labelText = this.get("labelText");
 		if (labelText != null) {
 			this.label.set("text", this.get("labelText"));
@@ -220,7 +225,7 @@ export class Tooltip extends Container {
 	public _changed() {
 		super._changed();
 
-		if (this.isDirty("pointTo")) {
+		if (this.isDirty("pointTo") || this.isDirty("pointerOrientation")) {
 			// can't compare to previous, as sometimes pointTo is set twice (when pointer moves, so the position won't be udpated)
 			this._updateBackground();
 		}
@@ -440,6 +445,8 @@ export class Tooltip extends Container {
 				pointerLength = background.get("pointerLength", 0);
 				bgStrokeSizeY = background.get("strokeWidth", 0) / 2;
 				bgStrokeSizeX = bgStrokeSizeY;
+				background.set("width", w);
+				background.set("height", h);
 			}
 
 			let pointerX = 0;
@@ -447,7 +454,6 @@ export class Tooltip extends Container {
 
 			let boundsW = bounds.right - bounds.left;
 			let boundsH = bounds.bottom - bounds.top;
-
 
 
 			// horizontal

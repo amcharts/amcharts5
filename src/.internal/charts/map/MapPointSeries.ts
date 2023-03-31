@@ -408,11 +408,17 @@ export class MapPointSeries extends MapSeries {
 	 *
 	 * @param  dataItem   Map point
 	 * @param  zoomLevel  Zoom level
+	 * @param  rotate If it's true, the map will rotate so that this point would be in the center. Mostly usefull with geoOrthographic projection.
 	 */
-	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number): Animation<any> | undefined {
+	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number, rotate?: boolean): Animation<any> | undefined {
 		const chart = this.chart;
 		if (chart) {
-			return chart.zoomToGeoPoint({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) }, zoomLevel, true);
+			const longitude = dataItem.get("longitude", 0);
+			const latitude = dataItem.get("latitude", 0);
+			if (rotate) {
+				return chart.zoomToGeoPoint({ longitude: longitude, latitude: latitude }, zoomLevel, true, undefined, -longitude, -latitude);
+			}
+			return chart.zoomToGeoPoint({ longitude: longitude, latitude: latitude }, zoomLevel, true);
 		}
 	}
 

@@ -1943,10 +1943,6 @@ export class Root implements IDisposer {
 				target._adjustedLocalBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 				target.setPrivate("minWidth", w);
 				target.setPrivate("minHeight", h);
-				setTimeout(() => {
-					target.setPrivate("minWidth", w);
-					target.setPrivate("minHeight", h);
-				}, 10);
 			}
 			else {
 				target.removePrivate("minWidth");

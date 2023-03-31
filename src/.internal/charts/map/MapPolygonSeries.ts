@@ -214,14 +214,23 @@ export class MapPolygonSeries extends MapSeries {
 	 *
 	 * @param  dataItem  Target data item
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
+	 * @param  rotate If it's true, the map will rotate so that this polygon would be in the center. Mostly usefull with geoOrthographic projection.
 	 */
-	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>): Animation<any> | undefined {
+	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>, rotate?: boolean): Animation<any> | undefined {
 		const polygon = dataItem.get("mapPolygon");
 		if (polygon) {
 			const geometry = polygon.get("geometry");
 			const chart = this.chart;
+
 			if (geometry && chart) {
-				return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry));
+
+				if (rotate) {
+					const centroid = $mapUtils.getGeoCentroid(geometry);
+					chart.rotate(-centroid.longitude, -centroid.latitude);
+					return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry), undefined, -centroid.longitude, -centroid.latitude);
+				}
+
+				return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry),);
 			}
 		}
 	}

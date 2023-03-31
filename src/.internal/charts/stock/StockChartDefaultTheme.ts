@@ -50,7 +50,12 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("StockPanel").setAll({
 			minHeight: 1
-		})
+		});
+
+		r("StockPanel").states.create("hidden", {
+			height: p0,
+			visible: false
+		});
 
 		r("XYChart", ["stock"]).setAll({
 			paddingLeft: 0,

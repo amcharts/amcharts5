@@ -132,5 +132,19 @@ export abstract class ChartIndicator extends Indicator {
 		stockChart.panels.removeValue(this.panel);
 	}
 
+	public async hide(duration?: number): Promise<any> {
+		return Promise.all([
+			super.hide(duration),
+			this.panel.hide(duration)
+		]);
+	}
+
+	public async show(duration?: number): Promise<any> {
+		return Promise.all([
+			super.show(duration),
+			this.panel.show(duration)
+		]);
+	}
+
 	protected abstract _createSeries(): XYSeries;
 }

@@ -1,6 +1,6 @@
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import * as $math from "../../core/util/Math";
-import { geoCircle, geoCentroid, geoBounds } from "d3-geo";
+import { geoCircle, geoCentroid, geoBounds, geoArea } from "d3-geo";
 
 /**
  * Returns a GeoJSON representation of a circle, suitable for use as `geometry` value
@@ -15,7 +15,7 @@ export function getGeoCircle(geoPoint: IGeoPoint, radius: number): GeoJSON.Polyg
 }
 
 /**
- * @ignore
+ * Returns geo centroid of a geometry
  */
 export function getGeoCentroid(geometry: GeoJSON.GeometryObject): IGeoPoint {
 	const centroid = geoCentroid(geometry);
@@ -23,14 +23,21 @@ export function getGeoCentroid(geometry: GeoJSON.GeometryObject): IGeoPoint {
 }
 
 /**
- * @ignore
+ * Returns geo area of a geometry
+ */
+export function getGeoArea(geometry: GeoJSON.GeometryObject): number {
+	return geoArea(geometry);
+}
+
+/**
+ * Returns bounds of a geometry
  */
 export function getGeoBounds(geometry: GeoJSON.GeometryObject): { left: number, right: number, top: number, bottom: number } {
 	const bounds = geoBounds(geometry);
 
 	if (bounds) {
 		const geoBounds = { left: bounds[0][0], right: bounds[1][0], top: bounds[1][1], bottom: bounds[0][1] };
-		if(geoBounds.right < geoBounds.left){
+		if (geoBounds.right < geoBounds.left) {
 			geoBounds.right = 180;
 			geoBounds.left = -180;
 		}

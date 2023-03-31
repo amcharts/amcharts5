@@ -218,4 +218,20 @@ export class MovingAverageEnvelope extends MovingAverage {
 		this.lowerBandSeries.dispose();
 		super._dispose();
 	}
+
+	public async hide(duration?: number): Promise<any> {
+		return Promise.all([
+			super.hide(duration),
+			this.upperBandSeries.hide(duration),
+			this.lowerBandSeries.hide(duration)
+		]);
+	}
+
+	public async show(duration?: number): Promise<any> {
+		return Promise.all([
+			super.show(duration),
+			this.upperBandSeries.show(duration),
+			this.lowerBandSeries.show(duration)
+		]);
+	}
 }

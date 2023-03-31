@@ -482,7 +482,9 @@ export abstract class Hierarchy extends Series {
 					}
 				}
 				else {
-					childDataItem.setRaw("fill", dataItem.get("fill"));
+					if(childDataItem.get("fill") == null){
+						childDataItem.setRaw("fill", dataItem.get("fill"));
+					}
 				}
 
 				this.processDataItem(childDataItem);
@@ -694,7 +696,6 @@ export abstract class Hierarchy extends Series {
 	 * @param  duration  Animation duration in milliseconds
 	 */
 	public enableDataItem(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth?: number, depth?: number, duration?: number) {
-
 		if (depth == null) {
 			depth = 0;
 		}
@@ -733,7 +734,12 @@ export abstract class Hierarchy extends Series {
 		if (children) {
 			if (depth < maxDepth - 1) {
 				$array.each(children, (child) => {
-					this.enableDataItem(child, maxDepth, depth as number + 1, duration);
+					if(child.get("disabled") !== true){
+						this.enableDataItem(child, maxDepth, depth as number + 1, duration);
+					}
+					else{
+						this.disableDataItem(child);	
+					}
 				})
 			}
 			else {

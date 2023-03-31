@@ -12,11 +12,11 @@ export interface ITrixSettings extends IChartIndicatorSettings {
 	 * Signal color.
 	 */
 	signalColor?: Color;
-	
+
 	/**
 	 * A value for "signal" period.
 	 */
-	signalPeriod?: number;	
+	signalPeriod?: number;
 }
 
 export interface ITrixPrivate extends IChartIndicatorPrivate {
@@ -47,7 +47,7 @@ export class Trix extends ChartIndicator {
 	/**
 	 * Indicator series for the signal.
 	 */
-	public signalSeries!: LineSeries;	
+	public signalSeries!: LineSeries;
 
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
@@ -57,7 +57,7 @@ export class Trix extends ChartIndicator {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
 		type: "color"
-	},{
+	}, {
 		key: "signalPeriod",
 		name: this.root.language.translateAny("Signal period"),
 		type: "number"
@@ -108,7 +108,7 @@ export class Trix extends ChartIndicator {
 			this.setCustomData("signalPeriod", this.get("signalPeriod"));
 		}
 		super._prepareChildren();
-	}	
+	}
 
 	public _updateChildren() {
 		super._updateChildren();

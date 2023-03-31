@@ -22,6 +22,14 @@ export interface IPeriodSelectorSettings extends IStockControlSettings {
 	 */
 	periods?: IPeriod[];
 
+	/**
+	 * Hide periods that are longer than the actual data.
+	 *
+	 * @default false
+	 * @since 5.3.9
+	 */
+	hideLongPeriods?: boolean;
+
 }
 
 export interface IPeriodSelectorPrivate extends IStockControlPrivate {
@@ -76,6 +84,10 @@ export class PeriodSelector extends StockControl {
 		container.style.display = "";
 
 		const periods = this.get("periods", []);
+		const axis = this._getAxis();
+		this.setPrivate("deferTimeout", this.setTimeout(() => this.setPrivate("deferReset", false), axis.get("interpolationDuration", 1000) + 200));
+		axis.onPrivate("min", () => this._setPeriodButtonStatus());
+		axis.onPrivate("max", () => this._setPeriodButtonStatus());
 		$array.each(periods, (period) => {
 			const button = document.createElement("a");
 			button.innerHTML = period.name || (period.timeUnit.toUpperCase() + period.count || "1");
@@ -93,8 +105,6 @@ export class PeriodSelector extends StockControl {
 				if (timeout) {
 					timeout.dispose();
 				}
-				const axis = this._getAxis();
-				this.setPrivate("deferTimeout", this.setTimeout(() => this.setPrivate("deferReset", false), axis.get("interpolationDuration", 1000) + 200));
 			}));
 		});
 
@@ -116,6 +126,40 @@ export class PeriodSelector extends StockControl {
 					axis!.on("start", () => this._resetActiveButtons()),
 					axis!.on("end", () => this._resetActiveButtons())
 				]));
+			}
+		}
+	}
+
+	protected _setPeriodButtonStatus(): void {
+		if (this.get("hideLongPeriods")) {
+			let axis = this.getPrivate("axis");
+			const container = this.getPrivate("label")!;
+			const buttons = container.getElementsByTagName("a");
+			if (!axis) {
+				axis = this._getAxis();
+				const min = axis!.getPrivate("min", 0);
+				const max = axis!.getPrivate("max", 0);
+				if (min && max) {
+					const diff = max - min;
+					const periods = this.get("periods", []);
+					$array.each(periods, (period) => {
+						if (period.timeUnit !== "ytd" && period.timeUnit !== "max") {
+							const plen = $time.getDuration(period.timeUnit, period.count || 1);
+							const id = period.timeUnit + (period.count || "");
+							for (let i = 0; i < buttons.length; i++) {
+								const button = buttons[i];
+								if (button.getAttribute("data-period") == id) {
+									if (plen > diff) {
+										$utils.addClass(button, "am5stock-hidden");
+									}
+									else {
+										$utils.removeClass(button, "am5stock-hidden");
+									}
+								}
+							}
+						}
+					});
+				}
 			}
 		}
 	}

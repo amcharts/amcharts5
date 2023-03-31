@@ -124,6 +124,7 @@ export class SettingsControl extends DropdownListControl {
 
 				$array.each(yAxis.series, (series) => {
 					series.resetExtremes();
+					series.markDirtyValues();
 				})
 
 				yAxis.set("logarithmic", value);

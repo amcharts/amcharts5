@@ -329,6 +329,10 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"background": active
 			}),
 
+			new StyleRule(element, ".am5stock-link.am5stock-hidden", {
+				"display": "none"
+			}),
+
 			new StyleRule(element, ".am5stock-drawing-label-wrapper", {
 				//"font-weight": "bold"
 				"background-color": bg,

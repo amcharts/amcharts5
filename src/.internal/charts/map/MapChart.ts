@@ -328,7 +328,7 @@ export class MapChart extends SerialChart {
 			if (this._wheelDp) {
 				this._wheelDp.dispose();
 			}
-			
+
 			this._wheelDp = chartContainer.events.on("wheel", (event) => {
 				const wheelEasing = this.get("wheelEasing")!;
 				const wheelSensitivity = this.get("wheelSensitivity", 1);
@@ -432,7 +432,7 @@ export class MapChart extends SerialChart {
 			this.series.each((series) => {
 				$array.pushAll(this._geometryColection.geometries, series._geometries);
 			})
-		
+
 
 			this._fitMap();
 		}
@@ -717,11 +717,11 @@ export class MapChart extends SerialChart {
 		this._downZoomLevel = this.get("zoomLevel", 1);
 
 		let count = $object.keys(this.chartContainer._downPoints).length;
-		if(count == 1){
+		if (count == 1) {
 			// workaround to solve a problem when events are added to some children of chart container (rotation stops working)
 			const downPoint = this.chartContainer._downPoints[1];
 
-			if(downPoint && (downPoint.x == event.point.x && downPoint.y == event.point.y)){
+			if (downPoint && (downPoint.x == event.point.x && downPoint.y == event.point.y)) {
 				count = 0;
 			}
 		}
@@ -810,12 +810,30 @@ export class MapChart extends SerialChart {
 	 * Converts latitude/longitude to screen coordinates (X and Y).
 	 * 
 	 * @param  point  Geographical coordinates
-	 * @return        Screen coordinates
+	 * @param  rotationX  X rotation of a map if different from current
+	 * @param  rotationY  Y rotation of a map if different from current
+	 * 
+	 * @return Screen coordinates
 	 */
-	public convert(point: IGeoPoint): IPoint {
+	public convert(point: IGeoPoint, rotationX?: number, rotationY?: number): IPoint {
 		let projection = this.get("projection")!;
+		let xy;
 
-		const xy = projection([point.longitude, point.latitude]);
+		if (rotationX != null || rotationY != null) {
+			if (rotationX == null) {
+				rotationX = 0;
+			}
+			if (rotationY == null) {
+				rotationY = 0;
+			}
+			let rotation = projection.rotate();
+			projection.rotate([rotationX, rotationY, 0]);
+			xy = projection([point.longitude, point.latitude]);
+			projection.rotate(rotation);
+		}
+		else {
+			xy = projection([point.longitude, point.latitude]);
+		}
 
 		if (xy) {
 			return { x: xy[0], y: xy[1] };
@@ -1002,8 +1020,10 @@ export class MapChart extends SerialChart {
 	 *
 	 * @param  geoBounds  Bounds
 	 * @param  duration   Animation duration in milliseconds
+	 * @param  rotationX  X rotation of a map at the end of zoom
+	 * @param  rotationY  Y rotation of a map at the end of zoom
 	 */
-	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
+	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		if (geoBounds.right < geoBounds.left) {
 			geoBounds.right = 180;
 			geoBounds.left = -180;
@@ -1012,8 +1032,8 @@ export class MapChart extends SerialChart {
 		const geoPath = this.getPrivate("geoPath");
 		const mapBounds = geoPath.bounds(this._geometryColection);
 
-		let p0 = this.convert({ longitude: geoBounds.left, latitude: geoBounds.top });
-		let p1 = this.convert({ longitude: geoBounds.right, latitude: geoBounds.bottom });
+		let p0 = this.convert({ longitude: geoBounds.left, latitude: geoBounds.top }, rotationX, rotationY);
+		let p1 = this.convert({ longitude: geoBounds.right, latitude: geoBounds.bottom }, rotationX, rotationY);
 
 		if (p0.y < mapBounds[0][1]) {
 			p0.y = mapBounds[0][1];
@@ -1034,6 +1054,10 @@ export class MapChart extends SerialChart {
 		let y = bounds.top + (bounds.bottom - bounds.top) / 2;
 
 		let geoPoint = this.invert({ x, y });
+
+		if (rotationX != null || rotationY != null) {
+			this.rotate(rotationX, rotationY);
+		}
 
 		return this.zoomToGeoPoint(geoPoint, zoomLevel, true, duration);
 	}
@@ -1098,12 +1122,33 @@ export class MapChart extends SerialChart {
 	 * @param  level     Zoom level
 	 * @param  center    Center the map
 	 * @param  duration  Duration of the animation in milliseconds
+	 * @param  rotationX  X rotation of a map at the end of zoom
+	 * @param  rotationY  Y rotation of a map at the end of zoom
+	 * 
 	 */
-	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
-		let xy = this.convert(geoPoint);
+	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
+
+		let xy = this.convert(geoPoint, rotationX, rotationY);
+
+		if (rotationX != null || rotationY != null) {
+			this.rotate(rotationX, rotationY);
+		}
 
 		if (xy) {
 			return this.zoomToPoint(xy, level, center, duration);
+		}
+	}
+
+	public rotate(rotationX?: number, rotationY?: number, duration?: number) {
+		if (!$type.isNumber(duration)) {
+			duration = this.get("animationDuration", 0);
+		}
+		const easing = this.get("animationEasing");
+		if (rotationX != null) {
+			this.animate({ key: "rotationX", to: rotationX, duration: duration, easing: easing });
+		}
+		if (rotationY != null) {
+			this.animate({ key: "rotationY", to: rotationY, duration: duration, easing: easing });
 		}
 	}
 

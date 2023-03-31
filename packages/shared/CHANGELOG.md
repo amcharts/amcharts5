@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.9] - 2023-03-31
+
+### Added
+- New `PeriodSelector` setting: `hideLongPeriods`. Indicates whether to hide buttons for periods that are longer than the actual data on chart.
+- New `DrawingControl` methods: `clearDrawings()` and `setEraser(true | false)`.
+- Methods `hide()` and `show()` will now properly hide and show any indicator.
+- `MapChart` methods `zoomToGeoPoint()` and `zoomToGeoBounds()` now accepts `rotationX` and `rotationY` parameters. If provided, the map not only zoom to the provided point/bounds but will rotate so that this point/bounds would be in the center. Mostly usefull with `geoOrthographic` projection.
+- `MapChart`'s `convert()` method now accepts `rotationX` and `rotationY` optional parameters. If provided, the calculations will be done as if map is rotated by provided values.
+- `MapPolygonSeries` / `MapPointSeries` method `zoomToDataItem()` now accepts an optional boolean `rotate` parameter. If it's `true`, the map will rotate so that this point/polygon would be in the center. Mostly useful with `geoOrthographic` projection.
+
+### Changed
+- Hiding a `StockPanel` via its `hide()` method will now animate it to size 0 before hiding completely.
+
+### Fixed
+- The scale of the `StockChart` could become incorrect if there were compared series and the scale was switched back and forth between logarithmic and regular.
+- HTML-based tooltips were sized incorrectly in some cases.
+- Setting `pointerOrientation` on a `Tooltip` was not updating an already visible tooltip.
+
+
 ## [5.3.8] - 2023-03-24
 
 ### Changed

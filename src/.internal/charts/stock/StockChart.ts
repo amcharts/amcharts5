@@ -4,7 +4,7 @@ import type { Axis } from "../xy/axes/Axis";
 import type { DateAxis } from "../xy/axes/DateAxis";
 import type { AxisRenderer } from "../xy/axes/AxisRenderer";
 import type { BaseColumnSeries } from "../xy/series/BaseColumnSeries";
-import type { IValueAxisSettings } from "../xy/axes/ValueAxis";
+import type { IValueAxisSettings, ValueAxis } from "../xy/axes/ValueAxis";
 import type { XYSeries, IXYSeriesDataItem, IXYSeriesSettings } from "../xy/series/XYSeries";
 import type { DataItem } from "../../core/render/Component";
 import type { Indicator } from "./indicators/Indicator";
@@ -440,7 +440,10 @@ export class StockChart extends Container {
 		const axisSettings = this.get("percentScaleValueAxisSettings");
 		if (stockSeries) {
 			const mainChart = stockSeries.chart;
-			const yAxis = stockSeries.get("yAxis");
+			const yAxis = stockSeries.get("yAxis") as ValueAxis<AxisRenderer>;
+			yAxis.set("logarithmic", false);
+
+		
 			this._maybePrepAxisDefaults();
 			if (mainChart) {
 				const seriesList: XYSeries[] = [];
@@ -525,7 +528,7 @@ export class StockChart extends Container {
 				}
 			}
 
-			if (this.get("autoSetPercentScale")) {
+			if (this.get("autoSetPercentScale")) {				
 				this.setPercentScale(true);
 			}
 

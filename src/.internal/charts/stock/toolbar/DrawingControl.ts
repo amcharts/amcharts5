@@ -540,17 +540,8 @@ export class DrawingControl extends StockControl {
 		toolsContainer.appendChild(eraserControl.getPrivate("button")!);
 		this.setPrivate("eraserControl", eraserControl);
 		eraserControl.on("active", (_ev) => {
-			const active = eraserControl.get("active");
-			$object.each(this._drawingSeries, (_tool, seriesList) => {
-				$array.each(seriesList, (series) => {
-					if (active) {
-						series.enableErasing();
-					}
-					else {
-						series.disableErasing();
-					}
-				});
-			})
+			const active = eraserControl.get("active", false);
+			this.setEraser(active);
 		});
 
 		/**
@@ -567,18 +558,46 @@ export class DrawingControl extends StockControl {
 		this.setPrivate("clearControl", clearControl);
 		this._disposers.push($utils.addEventListener(clearControl.getPrivate("button")!, "click", (_ev) => {
 			eraserControl.set("active", false);
-			$object.each(this._drawingSeries, (_tool, seriesList) => {
-				$array.each(seriesList, (series) => {
-					//series.disableErasing();
-					series.clearDrawings();
-				});
-			})
+			this.clearDrawings();
 		}));
 
 		// Preset active tool
 		if (this.get("active")) {
 			this._setTool(this.get("tool"));
 		}
+	}
+
+	/**
+	 * Enables or disables eraser tool.
+	 *
+	 * @since 5.3.9
+	 * @param  active  Eraser active
+	 */
+	public setEraser(active: boolean) {
+		$object.each(this._drawingSeries, (_tool, seriesList) => {
+			$array.each(seriesList, (series) => {
+				if (active) {
+					series.enableErasing();
+				}
+				else {
+					series.disableErasing();
+				}
+			});
+		});
+	}
+
+	/**
+	 * Clears all drawings.
+	 *
+	 * @since 5.3.9
+	 */
+	public clearDrawings() {
+		$object.each(this._drawingSeries, (_tool, seriesList) => {
+			$array.each(seriesList, (series) => {
+				//series.disableErasing();
+				series.clearDrawings();
+			});
+		});
 	}
 
 	public _beforeChanged() {
