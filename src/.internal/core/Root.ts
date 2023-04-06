@@ -867,6 +867,7 @@ export class Root implements IDisposer {
 			allParents[key]._updateChildren();
 		});
 
+
 		const objects: Array<Entity> = [];
 
 		//		console.log("_beforeChanged")
@@ -904,6 +905,8 @@ export class Root implements IDisposer {
 				bounds.push(entity);
 			}
 		});
+
+		this._positionHTMLElements();
 
 		// High depth -> low depth
 		bounds.sort((x, y) => {
@@ -968,7 +971,7 @@ export class Root implements IDisposer {
 		}
 	}
 
-	public _runTicker(currentTime: number) {
+	public _runTicker(currentTime: number, now?: boolean) {
 		if (!this.isDisposed()) {
 			this.animationTime = currentTime;
 
@@ -981,7 +984,12 @@ export class Root implements IDisposer {
 
 			} else {
 				if (!this._paused) {
-					rAF(this.fps, this._ticker!);
+					if (now) {
+						this._ticker!
+					}
+					else {
+						rAF(this.fps, this._ticker!);
+					}
 				}
 			}
 		}

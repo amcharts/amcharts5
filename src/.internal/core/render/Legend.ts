@@ -338,7 +338,7 @@ export class Legend extends Series {
 				dataItem.set("label", label);
 
 				label.text.on("text", () => {
-					itemContainer.set("ariaLabel", label.text._getText() + "; " + this._t("Press ENTER to toggle"));
+					itemContainer.set("ariaLabel", label.text._getText() + (this.get("clickTarget") !== "none" ? "; " + this._t("Press ENTER to toggle") : ""));
 				});
 
 				if (item && item.get) {

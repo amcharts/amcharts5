@@ -182,6 +182,20 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	homeZoomLevel?: number;
 
 	/**
+	 * Initial/home rotationX.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 */
+	homeRotationX?: number;	
+
+	/**
+	 * Initial/home rotationY.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 */
+	homeRotationY?: number;		
+
+	/**
 	 * Initial coordinates to center map on load or `goHome()` call.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
@@ -607,7 +621,7 @@ export class MapChart extends SerialChart {
 	 * @param  duration  Animation duration in milliseconds
 	 */
 	public goHome(duration?: number) {
-		this.zoomToGeoPoint(this.homeGeoPoint(), this.get("homeZoomLevel", 1), true, duration);
+		this.zoomToGeoPoint(this.homeGeoPoint(), this.get("homeZoomLevel", 1), true, duration, this.get("homeRotationX"), this.get("homeRotationY"));
 	}
 
 	public _updateChildren() {
@@ -1131,7 +1145,7 @@ export class MapChart extends SerialChart {
 		let xy = this.convert(geoPoint, rotationX, rotationY);
 
 		if (rotationX != null || rotationY != null) {
-			this.rotate(rotationX, rotationY);
+			this.rotate(rotationX, rotationY, duration);
 		}
 
 		if (xy) {

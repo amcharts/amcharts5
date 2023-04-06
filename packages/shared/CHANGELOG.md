@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.10] - 2023-04-06
+
+### Added
+- `homeRotationX` and `homeRotationY` settings added to `MapChart`. Allows setting home x and y rotations. The chart will rotate to provided values when `goHome()` method is called.
+
+### Fixed
+- Accessibility: Legend item's ARIA labels will not contain "Press ENTER to toggle" message if the `clickTarget = "none"` is set.
+- Further improvements in rendering/sizing of the HTML-based tooltips.
+
+
 ## [5.3.9] - 2023-03-31
 
 ### Added
