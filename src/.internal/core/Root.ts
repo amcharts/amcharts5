@@ -609,6 +609,9 @@ export class Root implements IDisposer {
 					if (ev.keyCode == 16) {
 						this._isShift = true;
 					}
+					else if (ev.keyCode == 9) {
+						this._isShift = ev.shiftKey;
+					}
 				}));
 
 				this._disposers.push($utils.addEventListener(window, "keyup", (ev: KeyboardEvent) => {
@@ -1860,10 +1863,11 @@ export class Root implements IDisposer {
 		htmlElement.style.position = "absolute";
 		htmlElement.style.overflow = "auto";
 		htmlElement.style.boxSizing = "border-box";
-		$utils.setInteractive(htmlElement, true);
+		$utils.setInteractive(htmlElement, target.get("interactive", false));
 
 		// Translate events
 		if (target.events.isEnabled("click")) {
+			$utils.setInteractive(htmlElement, true);
 			this._disposers.push($utils.addEventListener<PointerEvent | MouseEvent>(htmlElement, "click", (ev: IPointerEvent) => {
 				const downEvent = this._renderer.getEvent(ev);
 				target.events.dispatch("click", {

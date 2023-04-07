@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.11] - 2023-04-07
+
+### Changed
+- Possibly a breaking change! All HTML content in tooltips now has interactivity disabled. If you have buttons/links or other interactive elements, you need to explicitly set `tooltip.label.set("interactive", true)`.
+
+### Fixed
+- HTML tooltips were flickering when moving pointer over them.
+- Hierarchy drill-downs were broken in some cases (since 5.3.10).
+- TAB-focusing of elements on the page might get stuck in a chart if tabbing started outside the document.
+
+
 ## [5.3.10] - 2023-04-06
 
 ### Added

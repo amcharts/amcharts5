@@ -482,7 +482,7 @@ export abstract class Hierarchy extends Series {
 					}
 				}
 				else {
-					if(childDataItem.get("fill") == null){
+					if (childDataItem.get("fill") == null) {
 						childDataItem.setRaw("fill", dataItem.get("fill"));
 					}
 				}
@@ -734,11 +734,18 @@ export abstract class Hierarchy extends Series {
 		if (children) {
 			if (depth < maxDepth - 1) {
 				$array.each(children, (child) => {
-					if(child.get("disabled") !== true){
-						this.enableDataItem(child, maxDepth, depth as number + 1, duration);
+					const disabledField = this.get("disabledField");
+					if (disabledField) {
+						const dataContext = child.dataContext as any;
+						if (dataContext[disabledField] != true) {
+							this.enableDataItem(child, maxDepth, depth as number + 1, duration);
+						}
+						else {
+							this.disableDataItem(child);
+						}
 					}
-					else{
-						this.disableDataItem(child);	
+					else {
+						this.enableDataItem(child, maxDepth, depth as number + 1, duration);
 					}
 				})
 			}
