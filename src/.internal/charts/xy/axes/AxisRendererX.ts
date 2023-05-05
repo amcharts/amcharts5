@@ -165,7 +165,9 @@ export class AxisRendererX extends AxisRenderer {
 
 	public _updatePositions() {
 		const axis = this.axis;
-		axis.gridContainer.set("x", axis.x() - $utils.relativeToValue(axis.get("centerX", 0), axis.width()) - axis.parent!.get("paddingLeft", 0));
+		const x = axis.x() - $utils.relativeToValue(axis.get("centerX", 0), axis.width()) - axis.parent!.get("paddingLeft", 0);
+		axis.gridContainer.set("x", x);
+		axis.topGridContainer.set("x", x);
 		axis.bulletsContainer.set("y", this.y());
 
 		const chart = axis.chart;

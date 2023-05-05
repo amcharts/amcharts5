@@ -183,18 +183,20 @@ function eachTargets(hitTarget: CanvasDisplayObject, f: (target: CanvasDisplayOb
 /**
  * @ignore
  */
-function onPointerEvent(element: EventTarget, name: string, f: (event: Array<IPointerEvent>) => void): IDisposer {
+function onPointerEvent(element: EventTarget, name: string, f: (event: Array<IPointerEvent>, target: Node | null) => void): IDisposer {
 	return $utils.addEventListener(element, $utils.getRendererEvent(name), (event: MouseEvent | TouchEvent) => {
+		const target = $utils.getEventTarget(event);
+
 		let touches = (<any>event).touches;
 		if (touches) {
 			if (touches.length == 0) {
 				touches = (<any>event).changedTouches;
 			}
 
-			f($array.copy(<TouchList>touches));
+			f($array.copy(<TouchList>touches), target);
 
 		} else {
-			f([<MouseEvent>event]);
+			f([<MouseEvent>event], target);
 		}
 	});
 }
@@ -3010,7 +3012,7 @@ export class CanvasRendererEvent<A> implements IRendererEvent<A> {
 /**
  * @ignore
  */
-interface Event<Key extends keyof IRendererEvents> {
+interface IEvent<Key extends keyof IRendererEvents> {
 	object: CanvasDisplayObject;
 	context: unknown;
 	callback: (event: IRendererEvents[Key]) => void;
@@ -3020,9 +3022,9 @@ interface Event<Key extends keyof IRendererEvents> {
 /**
  * @ignore
  */
-interface Events<Key extends keyof IRendererEvents> {
+interface IEvents<Key extends keyof IRendererEvents> {
 	disposer: IDisposer;
-	callbacks: Array<Event<Key>>;
+	callbacks: Array<IEvent<Key>>;
 	dispatching: boolean;
 	cleanup: boolean;
 }
@@ -3053,7 +3055,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public interactionsEnabled: boolean = true;
 
 	protected _listeners: { [key: string]: CounterDisposer } = {};
-	protected _events: { [Key in keyof IRendererEvents]?: Events<Key> } = {};
+	protected _events: { [Key in keyof IRendererEvents]?: IEvents<Key> } = {};
 
 	protected _colorId: number = 0;
 	protected _colorMap: { [color: string]: CanvasDisplayObject } = {};
@@ -3066,7 +3068,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public _dragging: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 	public _mousedown: Array<{ id: Id, value: CanvasDisplayObject }> = [];
 
-	protected _lastPointerMoveEvent: { events: Array<IPointerEvent>, native: boolean } | undefined;
+	protected _lastPointerMoveEvent: { events: Array<IPointerEvent>, target: Node | null, native: boolean } | undefined;
 
 	public tapToActivate: boolean = false;
 	public tapToActivateTimeout: number = 3000;
@@ -3429,11 +3431,12 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		//}, 100)
 
 		if (this._hovering.size && this._lastPointerMoveEvent) {
-			//this._mouseMoveThrottler.run();
-			const native = this._lastPointerMoveEvent.native;
+			const { events, target, native } = this._lastPointerMoveEvent;
 
-			$array.each(this._lastPointerMoveEvent.events, (event) => {
-				this._dispatchGlobalMousemove(event, native);
+			//this._mouseMoveThrottler.run();
+
+			$array.each(events, (event) => {
+				this._dispatchGlobalMousemove(event, target, native);
 			});
 		}
 	}
@@ -3487,12 +3490,12 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		);
 	}
 
-	_getHitTarget(point: IPoint, bbox: DOMRect, event: IPointerEvent): CanvasDisplayObject | undefined | false {
+	_getHitTarget(point: IPoint, bbox: DOMRect, target: Node | null): CanvasDisplayObject | undefined | false {
 		if (bbox.width === 0 || bbox.height === 0 || point.x < bbox.left || point.x > bbox.right || point.y < bbox.top || point.y > bbox.bottom) {
 			return;
 		}
 
-		if (!this._layerDom.contains(event.target as Node)) {
+		if (!target || !this._layerDom.contains(target)) {
 			return;
 		}
 
@@ -3507,8 +3510,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return hit;
 	}
 
-	_withEvents<Key extends keyof IRendererEvents>(key: Key, f: (events: Events<Key>) => void): void {
-		const events = this._events[key] as Events<Key> | undefined;
+	_withEvents<Key extends keyof IRendererEvents>(key: Key, f: (events: IEvents<Key>) => void): void {
+		const events = this._events[key] as IEvents<Key> | undefined;
 
 		if (events !== undefined) {
 			events.dispatching = true;
@@ -3568,7 +3571,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return dispatched;
 	}
 
-	_dispatchMousedown(originalEvent: IPointerEvent): void {
+	_dispatchMousedown(originalEvent: IPointerEvent, originalTarget: Node | null): void {
 		const button = (<PointerEvent>originalEvent).button;
 		if (button != 0 && button != 2 && button != 1 && button !== undefined) {
 			// Ignore non-primary mouse buttons
@@ -3576,7 +3579,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalTarget);
 
 
 		if (target) {
@@ -3608,10 +3611,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 	}
 
-	_dispatchGlobalMousemove(originalEvent: IPointerEvent, native: boolean): void {
+	_dispatchGlobalMousemove(originalEvent: IPointerEvent, originalTarget: Node | null, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 
-		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalTarget);
 		event.native = native;
 
 		if (target) {
@@ -3674,7 +3677,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 	}
 
-	_dispatchDragEnd(originalEvent: IPointerEvent): void {
+	_dispatchDragEnd(originalEvent: IPointerEvent, originalTarget: Node | null): void {
 		const button = (<PointerEvent>originalEvent).button;
 		let clickevent: "click" | "rightclick" | "middleclick";
 		if (button == 0 || button === undefined) {
@@ -3695,7 +3698,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		const id = event.id;
 
 		if (this._mousedown.length !== 0) {
-			const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
+			const target = this._getHitTarget(event.originalPoint, event.bbox, originalTarget);
 
 			if (target) {
 				this._mousedown.forEach((obj) => {
@@ -3719,9 +3722,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 	}
 
-	_dispatchDoubleClick(originalEvent: IPointerEvent): void {
+	_dispatchDoubleClick(originalEvent: IPointerEvent, originalTarget: Node | null): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalTarget);
 
 		if (target) {
 			eachTargets(target, (obj) => {
@@ -3734,9 +3737,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 	}
 
-	_dispatchWheel(originalEvent: WheelEvent): void {
+	_dispatchWheel(originalEvent: WheelEvent, originalTarget: Node | null): void {
 		const event = this.getEvent(originalEvent);
-		const target = this._getHitTarget(event.originalPoint, event.bbox, originalEvent);
+		const target = this._getHitTarget(event.originalPoint, event.bbox, originalTarget);
 
 		if (target) {
 			eachTargets(target, (obj) => {
@@ -3762,7 +3765,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return this._listeners[key].increment();
 	}
 
-	_onPointerEvent(name: string, f: (event: Array<IPointerEvent>, native: boolean) => void): IDisposer {
+	_onPointerEvent(name: string, f: (event: Array<IPointerEvent>, target: Node | null, native: boolean) => void): IDisposer {
 		let native = false;
 		let timer: number | null = null;
 
@@ -3790,13 +3793,13 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				timer = window.setTimeout(clear, 0);
 			}),
 
-			onPointerEvent(window, name, (ev) => {
+			onPointerEvent(window, name, (ev, target) => {
 				if (timer !== null) {
 					clearTimeout(timer);
 					timer = null;
 				}
 
-				f(ev, native);
+				f(ev, target, native);
 
 				native = false;
 			}),
@@ -3810,11 +3813,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			case "pointerover":
 			case "pointerout":
 				return this._makeSharedEvent("pointermove", () => {
-					const listener = (events: Array<IPointerEvent>, native: boolean) => {
-						this._lastPointerMoveEvent = { events, native };
+					const listener = (events: Array<IPointerEvent>, target: Node | null, native: boolean) => {
+						this._lastPointerMoveEvent = { events, target, native };
 
 						$array.each(events, (event) => {
-							this._dispatchGlobalMousemove(event, native);
+							this._dispatchGlobalMousemove(event, target, native);
 						});
 					};
 
@@ -3825,18 +3828,18 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				});
 			case "globalpointerup":
 				return this._makeSharedEvent("pointerup", () => {
-					var mouseup = this._onPointerEvent("pointerup", (events, native) => {
+					const mouseup = this._onPointerEvent("pointerup", (events, target, native) => {
 						$array.each(events, (event) => {
 							this._dispatchGlobalMouseup(event, native);
 						});
-						this._lastPointerMoveEvent = { events, native };
+						this._lastPointerMoveEvent = { events, target, native };
 					});
 
-					var pointercancel = this._onPointerEvent("pointercancel", (events, native) => {
+					const pointercancel = this._onPointerEvent("pointercancel", (events, target, native) => {
 						$array.each(events, (event) => {
 							this._dispatchGlobalMouseup(event, native);
 						});
-						this._lastPointerMoveEvent = { events, native };
+						this._lastPointerMoveEvent = { events, target, native };
 					});
 
 					return new Disposer(() => {
@@ -3850,8 +3853,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			case "pointerdown":
 			/*
 				return this._makeSharedEvent("pointerdown", () => {
-					return this._onPointerEvent("pointerdown", (event, native) => {
-						this._lastPointerMoveEvent = { event, native };
+					return this._onPointerEvent("pointerdown", (event, target, native) => {
+						this._lastPointerMoveEvent = { event, target, native };
 						this._dispatchMousedown(event)
 					});
 				});
@@ -3861,9 +3864,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				return this._makeSharedEvent("pointerdown", () => {
 					//const throttler = new Throttler();
 
-					const mousedown = this._onPointerEvent("pointerdown", (events) => {
+					const mousedown = this._onPointerEvent("pointerdown", (events, target) => {
 						$array.each(events, (ev) => {
-							this._dispatchMousedown(ev);
+							this._dispatchMousedown(ev, target);
 						});
 					});
 
@@ -3876,15 +3879,15 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 						//});
 					});
 
-					const mouseup = this._onPointerEvent("pointerup", (ev: Array<IPointerEvent>) => {
+					const mouseup = this._onPointerEvent("pointerup", (ev: Array<IPointerEvent>, target) => {
 						$array.each(ev, (ev) => {
-							this._dispatchDragEnd(ev);
+							this._dispatchDragEnd(ev, target);
 						});
 					});
 
-					const pointercancel = this._onPointerEvent("pointercancel", (ev: Array<IPointerEvent>) => {
+					const pointercancel = this._onPointerEvent("pointercancel", (ev: Array<IPointerEvent>, target) => {
 						$array.each(ev, (ev) => {
-							this._dispatchDragEnd(ev);
+							this._dispatchDragEnd(ev, target);
 						});
 					});
 
@@ -3897,23 +3900,23 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				});
 			case "dblclick":
 				return this._makeSharedEvent("dblclick", () => {
-					return this._onPointerEvent("dblclick", (ev) => {
+					return this._onPointerEvent("dblclick", (ev, target) => {
 						$array.each(ev, (ev) => {
-							this._dispatchDoubleClick(ev);
+							this._dispatchDoubleClick(ev, target);
 						});
 					});
 				});
 			case "wheel":
 				return this._makeSharedEvent("wheel", () => {
 					return $utils.addEventListener(window, $utils.getRendererEvent("wheel"), (event: WheelEvent) => {
-						this._dispatchWheel(event);
+						this._dispatchWheel(event, $utils.getEventTarget(event));
 					}, { passive: false });
 				});
 		}
 	}
 
 	_addEvent<C, Key extends keyof IRendererEvents>(object: CanvasDisplayObject, key: Key, callback: (this: C, event: IRendererEvents[Key]) => void, context?: C): IDisposer {
-		let events: Events<Key> | undefined = this._events[key] as any;
+		let events: IEvents<Key> | undefined = this._events[key] as any;
 
 		if (events === undefined) {
 			events = this._events[key] = {

@@ -239,16 +239,16 @@ export abstract class Indicator extends Container {
 		if (legend) {
 			legend.data.push(series);
 
-			var legendDataItem = legend.dataItems[legend.dataItems.length - 1];
+			const legendDataItem = legend.dataItems[legend.dataItems.length - 1];
 			legendDataItem.get("marker").set("forceHidden", true);
 
-			var closeButton = legendDataItem.get("closeButton");
+			const closeButton = legendDataItem.get("closeButton");
 			closeButton.set("forceHidden", false);
 			closeButton.events.on("click", () => {
 				this.dispose();
 			})
 
-			var settingsButton = legendDataItem.get("settingsButton");
+			const settingsButton = legendDataItem.get("settingsButton");
 			settingsButton.setPrivate("customData", this);
 
 			const editableSettings = this._editableSettings;

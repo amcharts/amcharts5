@@ -974,7 +974,7 @@ export class Root implements IDisposer {
 		}
 	}
 
-	public _runTicker(currentTime: number, now?: boolean) {
+	public _runTicker(currentTime: number, now?: boolean) {		
 		if (!this.isDisposed()) {
 			this.animationTime = currentTime;
 
@@ -998,10 +998,17 @@ export class Root implements IDisposer {
 		}
 	}
 
-	public _runTickerNow() {
+	public _runTickerNow(timeout: number = 10000) {
 		if (!this.isDisposed()) {
+			const endTime = performance.now() + timeout;
+
 			for (; ;) {
 				const currentTime = performance.now();
+
+				if (currentTime >= endTime) {
+					this.animationTime = null;
+					break;
+				}
 
 				this.animationTime = currentTime;
 
@@ -1569,7 +1576,7 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		var focusableElements = Array.from(document.querySelectorAll([
+		const focusableElements = Array.from(document.querySelectorAll([
 			'a[href]',
 			'area[href]',
 			'button:not([disabled])',

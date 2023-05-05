@@ -83,7 +83,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
-	stockPositiveColor?: Color;
+	stockPositiveColor?: Color | null;
 
 	/**
 	 * This color will be applied to columns/candles on the main value series (series
@@ -91,7 +91,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
-	stockNegativeColor?: Color;
+	stockNegativeColor?: Color | null;
 
 	/**
 	 * This color will be applied to columns/candles on the main volume series (series
@@ -100,7 +100,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
-	volumePositiveColor?: Color;
+	volumePositiveColor?: Color | null;
 
 	/**
 	 * This color will be applied to columns/candles on the main volume series (series
@@ -108,7 +108,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
-	volumeNegativeColor?: Color;
+	volumeNegativeColor?: Color | null;
 
 }
 
@@ -383,40 +383,42 @@ export class StockChart extends Container {
 				const stockNegativeColor = this.get("stockNegativeColor", this._root.interfaceColors.get("negative"));
 				const stockPositiveColor = this.get("stockPositiveColor", this._root.interfaceColors.get("positive"));
 				let previous = stockSeries.dataItems[0];
+				
+				if(stockPositiveColor && stockPositiveColor){
+					$array.each(stockSeries.dataItems, (dataItem) => {
+						const column = dataItem.get("graphics");
+						if (column) {
+							const dropFromOpen = column.states.lookup("dropFromOpen");
+							if (dropFromOpen) {
+								dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+							}
 
-				$array.each(stockSeries.dataItems, (dataItem) => {
-					const column = dataItem.get("graphics");
-					if (column) {
-						const dropFromOpen = column.states.lookup("dropFromOpen");
-						if (dropFromOpen) {
-							dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+							const riseFromOpen = column.states.lookup("riseFromOpen");
+							if (riseFromOpen) {
+								riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+							}
+
+							const dropFromPrevious = column.states.lookup("dropFromPrevious");
+							if (dropFromPrevious) {
+								dropFromPrevious.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+							}
+
+							const riseFromPrevious = column.states.lookup("riseFromPrevious");
+							if (riseFromPrevious) {
+								riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+							}
+
+							stockSeries._applyGraphicsStates(dataItem, previous);
+							previous = dataItem;
 						}
+					})
 
-						const riseFromOpen = column.states.lookup("riseFromOpen");
-						if (riseFromOpen) {
-							riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
-						}
+					stockSeries.columns.template.states.create("riseFromOpen", { fill: stockPositiveColor, stroke: stockPositiveColor });
+					stockSeries.columns.template.states.create("riseFromPrevious", { fill: stockPositiveColor, stroke: stockPositiveColor });
 
-						const dropFromPrevious = column.states.lookup("dropFromPrevious");
-						if (dropFromPrevious) {
-							dropFromPrevious.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
-						}
-
-						const riseFromPrevious = column.states.lookup("riseFromPrevious");
-						if (riseFromPrevious) {
-							riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
-						}
-
-						stockSeries._applyGraphicsStates(dataItem, previous);
-						previous = dataItem;
-					}
-				})
-
-				stockSeries.columns.template.states.create("riseFromOpen", { fill: stockPositiveColor, stroke: stockPositiveColor });
-				stockSeries.columns.template.states.create("riseFromPrevious", { fill: stockPositiveColor, stroke: stockPositiveColor });
-
-				stockSeries.columns.template.states.create("dropFromOpen", { fill: stockNegativeColor, stroke: stockNegativeColor });
-				stockSeries.columns.template.states.create("dropFromPrevious", { fill: stockNegativeColor, stroke: stockNegativeColor });
+					stockSeries.columns.template.states.create("dropFromOpen", { fill: stockNegativeColor, stroke: stockNegativeColor });
+					stockSeries.columns.template.states.create("dropFromPrevious", { fill: stockNegativeColor, stroke: stockNegativeColor });
+				}
 
 				stockSeries.markDirtyValues();
 			}
@@ -752,8 +754,8 @@ export class StockChart extends Container {
 	}
 
 	protected _syncYAxesSize() {
-		var maxLeft = 0;
-		var maxRight = 0;
+		let maxLeft = 0;
+		let maxRight = 0;
 		this.panels.each((chart) => {
 			let lw = chart.leftAxesContainer.width();
 			let rw = chart.rightAxesContainer.width();
@@ -851,23 +853,26 @@ export class StockChart extends Container {
 				positiveColor = this.get("volumePositiveColor", this.root.interfaceColors.get("positive", Color.fromHex(0x00FF00)));
 			}
 
-			if (stockSeries && volumeSeries) {
-				const index = volumeSeries.dataItems.indexOf(dataItem);
-				if (index > 0) {
-					let stockDataItem = stockSeries.dataItems[index];
-					if (stockDataItem) {
-						let close = stockDataItem.get("valueY");
-						if (close != null) {
-							for (let i = index - 1; i >= 0; i--) {
-								let di = stockSeries.dataItems[i];
-								let previousClose = di.get("valueY");
 
-								if (previousClose != null) {
-									if (close < previousClose) {
-										return negativeColor;
-									}
-									else {
-										return positiveColor;
+			if(negativeColor && positiveColor){
+				if (stockSeries && volumeSeries) {
+					const index = volumeSeries.dataItems.indexOf(dataItem);
+					if (index > 0) {
+						let stockDataItem = stockSeries.dataItems[index];
+						if (stockDataItem) {
+							let close = stockDataItem.get("valueY");
+							if (close != null) {
+								for (let i = index - 1; i >= 0; i--) {
+									let di = stockSeries.dataItems[i];
+									let previousClose = di.get("valueY");
+
+									if (previousClose != null) {
+										if (close < previousClose) {
+											return negativeColor;
+										}
+										else {
+											return positiveColor;
+										}
 									}
 								}
 							}

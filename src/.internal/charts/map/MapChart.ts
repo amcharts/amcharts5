@@ -118,7 +118,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	pinchZoom?: boolean;
 
 	/**
-	 * Defines what happens when mouse wheel is turned horizontally.
+	 * Defines what happens when horizontal mouse wheel (only some mouses do have such a wheel)
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
 	 * @default "none"
@@ -126,7 +126,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	wheelX?: "none" | "zoom" | "rotateX" | "rotateY";
 
 	/**
-	 * Defines what happens when mouse wheel is turned vertically.
+	 * Defines what happens when mouse wheel is turned.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
 	 * @default "zoom"
@@ -186,14 +186,14 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
 	 */
-	homeRotationX?: number;	
+	homeRotationX?: number;
 
 	/**
 	 * Initial/home rotationY.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
 	 */
-	homeRotationY?: number;		
+	homeRotationY?: number;
 
 	/**
 	 * Initial coordinates to center map on load or `goHome()` call.
@@ -359,7 +359,6 @@ export class MapChart extends SerialChart {
 					return;
 				}
 
-				const chartContainer = this.chartContainer;
 				const point = chartContainer._display.toLocal(event.point);
 
 				if ((wheelY == "zoom")) {
@@ -439,7 +438,7 @@ export class MapChart extends SerialChart {
 		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
 			this._handleSetWheel();
 		}
-		var previousGeometries = this._geometryColection.geometries;
+		const previousGeometries = this._geometryColection.geometries;
 		if (this._dirtyGeometries) {
 			this._geometryColection.geometries = [];
 
@@ -833,6 +832,11 @@ export class MapChart extends SerialChart {
 		let projection = this.get("projection")!;
 		let xy;
 
+		if (!projection.rotate) {
+			rotationX = undefined;
+			rotationY = undefined;
+		}
+
 		if (rotationX != null || rotationY != null) {
 			if (rotationX == null) {
 				rotationX = 0;
@@ -1154,15 +1158,21 @@ export class MapChart extends SerialChart {
 	}
 
 	public rotate(rotationX?: number, rotationY?: number, duration?: number) {
-		if (!$type.isNumber(duration)) {
-			duration = this.get("animationDuration", 0);
+		const projection = this.get("projection")!;
+		if (!projection.rotate) {
 		}
-		const easing = this.get("animationEasing");
-		if (rotationX != null) {
-			this.animate({ key: "rotationX", to: rotationX, duration: duration, easing: easing });
-		}
-		if (rotationY != null) {
-			this.animate({ key: "rotationY", to: rotationY, duration: duration, easing: easing });
+		else {
+			if (!$type.isNumber(duration)) {
+				duration = this.get("animationDuration", 0);
+			}
+
+			const easing = this.get("animationEasing");
+			if (rotationX != null) {
+				this.animate({ key: "rotationX", to: rotationX, duration: duration, easing: easing });
+			}
+			if (rotationY != null) {
+				this.animate({ key: "rotationY", to: rotationY, duration: duration, easing: easing });
+			}
 		}
 	}
 

@@ -45,7 +45,7 @@ function getTagValue(target: Sprite, tagName: string, format?: string): string {
 
 	// Parse parts
 	let parts: any[] = [];
-	let reg = /([^.]+)\(([^)]*)\)|([^.]+)/g;;
+	let reg = /(format[a-zA-Z]*)\((.*)\)|([^.]+)/g;
 	let matches;
 
 	while (true) {

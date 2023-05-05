@@ -39,6 +39,7 @@ async function copyDirs(state, output) {
 	await cpMaybe(state.path("packages", "es2015"), output);
 
 	await cp(state.path("src", ".internal", "charts", "venn", "vennjs"), $path.join(output, ".internal", "charts", "venn", "vennjs"));
+	await cp(state.path("src", ".internal", "bundled"), $path.join(output, ".internal", "bundled"));
 }
 
 module.exports = async (state) => {

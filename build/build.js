@@ -10,6 +10,7 @@ Tasks.run($path.join(__dirname, ".."), {
 	"examples": require("./tasks/examples"),
 	"run-example": require("./tasks/run-example"),
 	"generate-classes": require("./tasks/generate-classes"),
+	"rewrite-paths": require("./tasks/rewrite-paths"),
 	"typecheck": require("./tasks/typecheck"),
 	"version": require("./tasks/version"),
 });

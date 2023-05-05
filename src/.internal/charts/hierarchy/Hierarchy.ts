@@ -394,6 +394,16 @@ export abstract class Hierarchy extends Series {
 
 	}
 
+	/**
+	 * Looks up and returns a data item by its ID.
+	 *
+	 * @param   id  ID
+	 * @return      Data item
+	 */
+	public getDataItemById(id: string): DataItem<this["_dataItemSettings"]> | undefined {
+		return this._getDataItemById(this.dataItems, id);
+	}	
+
 	public _getDataItemById(dataItems: Array<DataItem<this["_dataItemSettings"]>>, id: string): DataItem<this["_dataItemSettings"]> | undefined {
 
 		let di: DataItem<this["_dataItemSettings"]> | undefined;
@@ -622,7 +632,6 @@ export abstract class Hierarchy extends Series {
 	 * @return            Promise
 	 */
 	public async hideDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
-
 		const promises = [super.hideDataItem(dataItem, duration)];
 
 		const hiddenState = this.states.create("hidden", {})
@@ -662,7 +671,6 @@ export abstract class Hierarchy extends Series {
 	 * @return            Promise
 	 */
 	public async showDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
-
 		const promises = [super.showDataItem(dataItem, duration)];
 
 		if (!$type.isNumber(duration)) {

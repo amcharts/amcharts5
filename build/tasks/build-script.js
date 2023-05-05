@@ -78,9 +78,9 @@ export default function () {
 	}
 };`;
 
-				const file = `import fixPolyfills from "./polyfill";
+				const file = `import fixPolyfills from "./polyfill.js";
 import "./core-js.js";
-import "regenerator-runtime/runtime";
+import "regenerator-runtime/runtime.js";
 import * as m from "./${importPath}";
 
 export const ${mangledName} = m;

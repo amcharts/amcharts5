@@ -156,6 +156,7 @@ import type { SankeyLink } from "./../../../flow";
 import type { SankeyNodes } from "./../../../flow";
 import type { Scrollbar } from "./../../../index";
 import type { SerialChart } from "./../../../index";
+import type { Serializer } from "./../../../plugins/json";
 import type { Series } from "./../../../index";
 import type { SeriesTypeControl } from "./../../../stock";
 import type { SettingsControl } from "./../../../stock";
@@ -359,6 +360,7 @@ export interface IClasses {
 	"SankeyNodes": () => Promise<typeof SankeyNodes>;
 	"Scrollbar": () => Promise<typeof Scrollbar>;
 	"SerialChart": () => Promise<typeof SerialChart>;
+	"Serializer": () => Promise<typeof Serializer>;
 	"Series": () => Promise<typeof Series>;
 	"SeriesTypeControl": () => Promise<typeof SeriesTypeControl>;
 	"SettingsControl": () => Promise<typeof SettingsControl>;
@@ -563,6 +565,7 @@ const classes: IClasses = {
 	"SankeyNodes": () => import(/* webpackExports: "SankeyNodes", webpackChunkName: "json_flow" */ "./../../../flow").then((m) => m.SankeyNodes),
 	"Scrollbar": () => import(/* webpackExports: "Scrollbar", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Scrollbar),
 	"SerialChart": () => import(/* webpackExports: "SerialChart", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.SerialChart),
+	"Serializer": () => import(/* webpackExports: "Serializer", webpackChunkName: "json_plugins_json" */ "./../../../plugins/json").then((m) => m.Serializer),
 	"Series": () => import(/* webpackExports: "Series", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Series),
 	"SeriesTypeControl": () => import(/* webpackExports: "SeriesTypeControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SeriesTypeControl),
 	"SettingsControl": () => import(/* webpackExports: "SettingsControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SettingsControl),

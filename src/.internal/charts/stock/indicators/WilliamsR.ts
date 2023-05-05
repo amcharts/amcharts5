@@ -221,7 +221,7 @@ export class WilliamsR extends ChartIndicator {
 			let data = this._getDataArray(dataItems);
 			let period = this.get("period", 14);
 
-			for (var i = 0, len = data.length; i < len; i++) {
+			for (let i = 0, len = data.length; i < len; i++) {
 				const dataItem = data[i];
 
 				let h = -Infinity;

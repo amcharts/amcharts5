@@ -370,7 +370,7 @@ export class Legend extends Series {
 				}
 
 				if (clickTarget != "none") {
-					var clickContainer = itemContainer;
+					let clickContainer = itemContainer;
 					if (clickTarget == "marker") {
 						clickContainer = marker;
 					}
@@ -380,11 +380,11 @@ export class Legend extends Series {
 
 			// Sort children
 			this.children.values.sort((a, b) => {
-				var targetA = a.dataItem!.dataContext;
-				var targetB = b.dataItem!.dataContext;
+				const targetA = a.dataItem!.dataContext;
+				const targetB = b.dataItem!.dataContext;
 				if (targetA && targetB) {
-					var indexA = this.data.indexOf(targetA);
-					var indexB = this.data.indexOf(targetB);
+					const indexA = this.data.indexOf(targetA);
+					const indexB = this.data.indexOf(targetB);
 					if (indexA > indexB) {
 						return 1;
 					}

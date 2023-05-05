@@ -33,17 +33,17 @@ export interface IHeatRule {
 	/**
 	 * The setting value to use for items if the lowest value.
 	 */
-	min: any;
+	min?: any;
 
 	/**
 	 * The setting value to use for items if the highest value.
 	 */
-	max: any;
+	max?: any;
 
 	/**
 	 * The setting value to use for items which do not have value at all.
 	 */
-	neutral?: any;	
+	neutral?: any;
 
 	/**
 	 * Which data field to use when determining item's value.
@@ -367,7 +367,7 @@ export abstract class Series extends Component {
 				this._disposers.push(baseValueSeries.onPrivate("startIndex", ()=>{
 					this.markDirtyValues();
 				}))
-			}			
+			}
 		}
 
 		const calculateAggregates = this.get("calculateAggregates");
@@ -408,12 +408,12 @@ export abstract class Series extends Component {
 
 				if (markerRectangle) {
 					if(this.isVisible()){
-						if (this.isDirty("stroke")) {												
+						if (this.isDirty("stroke")) {
 							let stroke = this.get("stroke");
 							markerRectangle.set("stroke", stroke);
 						}
 						if (this.isDirty("fill")) {
-							let fill = this.get("fill");						
+							let fill = this.get("fill");
 							markerRectangle.set("fill", fill);
 						}
 					}
@@ -565,11 +565,10 @@ export abstract class Series extends Component {
 		// Apply heat rules
 		const rules = this.get("heatRules");
 
-		if (this._valuesDirty && rules && rules.length > 0) {			
+		if (this._valuesDirty && rules && rules.length > 0) {
 			$array.each(rules, (rule) => {
 				const minValue = rule.minValue || this.getPrivate(<any>(rule.dataField + "Low")) || 0;
 				const maxValue = rule.maxValue || this.getPrivate(<any>(rule.dataField + "High")) || 0;
-				
 
 				$array.each(rule.target._entities, (target) => {
 					const value = target.dataItem.get(rule.dataField);
@@ -581,62 +580,64 @@ export abstract class Series extends Component {
 						return;
 					}
 
-					let percent: number;
-					if (rule.logarithmic) {
-						percent = (Math.log(value) * Math.LOG10E - Math.log(minValue) * Math.LOG10E) / ((Math.log(maxValue) * Math.LOG10E - Math.log(minValue) * Math.LOG10E));
-					}
-					else {
-						percent = (value - minValue) / (maxValue - minValue);
-					}
-
-					if ($type.isNumber(value) && (!$type.isNumber(percent) || Math.abs(percent) == Infinity)) {
-						percent = 0.5;
-					}
-
-					// fixes problems if all values are the same
-					let propertyValue;
-					if ($type.isNumber(rule.min)) {
-						propertyValue = rule.min + (rule.max - rule.min) * percent;
-					}
-					else if (rule.min instanceof Color) {
-						propertyValue = Color.interpolate(percent, rule.min, rule.max);
-					}
-					else if (rule.min instanceof Percent) {
-						propertyValue = percentInterpolate(percent, rule.min, rule.max);
-					}
-
 					if (rule.customFunction) {
 						rule.customFunction.call(this, target, minValue, maxValue, value);
 					}
 					else {
+						let percent: number;
+						if (rule.logarithmic) {
+							percent = (Math.log(value) * Math.LOG10E - Math.log(minValue) * Math.LOG10E) / ((Math.log(maxValue) * Math.LOG10E - Math.log(minValue) * Math.LOG10E));
+						}
+						else {
+							percent = (value - minValue) / (maxValue - minValue);
+						}
+
+						if ($type.isNumber(value) && (!$type.isNumber(percent) || Math.abs(percent) == Infinity)) {
+							percent = 0.5;
+						}
+
+						// fixes problems if all values are the same
+						let propertyValue;
+						if ($type.isNumber(rule.min)) {
+							propertyValue = rule.min + (rule.max - rule.min) * percent;
+						}
+						else if (rule.min instanceof Color) {
+							propertyValue = Color.interpolate(percent, rule.min, rule.max);
+						}
+						else if (rule.min instanceof Percent) {
+							propertyValue = percentInterpolate(percent, rule.min, rule.max);
+						}
+
 						target.set(rule.key, propertyValue);
 					}
 				});
 			});
 		}
 
-		if (this.bullets.length > 0) {
-			let count = this.dataItems.length;
-			let startIndex = this.startIndex();
-			let endIndex = this.endIndex();
+		if(this.get("visible")){
+			if (this.bullets.length > 0) {
+				let count = this.dataItems.length;
+				let startIndex = this.startIndex();
+				let endIndex = this.endIndex();
 
-			if(endIndex < count){
-				endIndex++;
-			}
-			if(startIndex > 0){
-				startIndex--;
-			}
+				if(endIndex < count){
+					endIndex++;
+				}
+				if(startIndex > 0){
+					startIndex--;
+				}
 
-			for (let i = 0; i < startIndex; i++) {
-				this._hideBullets(this.dataItems[i]);
-			}
+				for (let i = 0; i < startIndex; i++) {
+					this._hideBullets(this.dataItems[i]);
+				}
 
-			for (let i = startIndex; i < endIndex; i++) {
-				this._positionBullets(this.dataItems[i]);
-			}
+				for (let i = startIndex; i < endIndex; i++) {
+					this._positionBullets(this.dataItems[i]);
+				}
 
-			for (let i = endIndex; i < count; i++) {
-				this._hideBullets(this.dataItems[i]);
+				for (let i = endIndex; i < count; i++) {
+					this._hideBullets(this.dataItems[i]);
+				}
 			}
 		}
 	}
@@ -664,7 +665,6 @@ export abstract class Series extends Component {
 						})
 					}
 				}
-
 				if(sprite instanceof Label && sprite.get("populateText" as any)){
 					sprite.text.markDirtyText();
 				}
@@ -702,7 +702,7 @@ export abstract class Series extends Component {
 	 */
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		//super.disposeDataItem(dataItem); // does nothing
-		
+
 		const bullets = dataItem.bullets;
 
 		if(bullets){

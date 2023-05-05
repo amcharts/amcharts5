@@ -1291,15 +1291,15 @@ export abstract class Sprite extends Entity {
 								if (this.get("tooltipText") || this.get("tooltipHTML")) {
 									this.hideTooltip();
 								}
+								this.setPrivateRaw("touchHovering", false);
+								this.events.dispatch("pointerout", {
+									type: "pointerout",
+									target: ev.target,
+									originalEvent: ev.originalEvent,
+									point: ev.point,
+									simulated: ev.simulated
+								});
 							}
-							this.setPrivateRaw("touchHovering", false);
-							this.events.dispatch("pointerout", {
-								type: "pointerout",
-								target: ev.target,
-								originalEvent: ev.originalEvent,
-								point: ev.point,
-								simulated: ev.simulated
-							});
 						}
 
 						if (this._isDown) {

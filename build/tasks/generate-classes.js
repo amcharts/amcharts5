@@ -1,5 +1,5 @@
 const $path = require("path");
-const { readdir, readFile, writeFile, posixPath, mkdir, rm } = require("../util");
+const { eachFileRecursive, readdir, readFile, writeFile, posixPath, mkdir, rm } = require("../util");
 
 function mapClass(name) {
 	switch (name) {
@@ -42,29 +42,22 @@ function getChunk(path) {
 }
 
 function chunkName(path) {
-	return path.replace(/\.\.\//g, "").replace(/\//g, "_");
+	return path.replace(/\.\.\//g, "").replace(/\.js$/, "").replace(/\//g, "_");
 }
 
-async function lookup(classes, dir) {
-	const files = await readdir(dir);
-
-	if (files === null) {
-		if ($path.extname(dir) === ".ts") {
-			const file = await readFile(dir);
+async function lookup(classes, path) {
+	await eachFileRecursive(path, async (path) => {
+		if ($path.extname(path) === ".ts") {
+			const file = await readFile(path);
 
 			for (let [_, name] of file.matchAll(/public +static +className: *string *= *"([^"]+)"/g)) {
 				classes[name] = {
-					path: $path.join($path.dirname(dir), $path.basename(dir, ".ts")),
+					path: $path.join($path.dirname(path), $path.basename(path, ".ts")),
 					className: name,
 				};
 			}
 		}
-
-	} else {
-		await Promise.all(files.map((file) => {
-			return lookup(classes, $path.join(dir, file));
-		}));
-	}
+	});
 }
 
 async function writeClasses(state, classes, keys) {
@@ -77,7 +70,7 @@ async function writeClasses(state, classes, keys) {
 
 		const importPath = posixPath($path.relative(state.dir("src", ".internal", "core"), path));
 
-		imports.push(`import type { ${className} } from "./${importPath}";`);
+		imports.push(`import type { ${className} } from "./${importPath}.js";`);
 		properties.push(`\t"${key}": ${classType};`);
 	});
 

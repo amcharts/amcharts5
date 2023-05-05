@@ -77,6 +77,21 @@ async function eachFileRecursive(from, f) {
 exports.eachFileRecursive = eachFileRecursive;
 
 
+async function time(name, f) {
+	const start = performance.now();
+
+	const output = await f();
+
+	const diff = performance.now() - start;
+
+	console.debug(name + " took " + diff + " ms");
+
+	return output;
+}
+
+exports.time = time;
+
+
 function webpack(config) {
 	return new Promise(function (resolve, reject) {
 		require("webpack")(config, (err, stats) => {
@@ -391,8 +406,8 @@ class Tasks {
 		return $path.join(this.cwd, ...segments);
 	}
 
-	async task(name) {
-		return this.subtask(name, (state) => state.tasks[name](state));
+	async task(name, options) {
+		return this.subtask(name, (state) => state.tasks[name](state, options));
 	}
 
 	async subtask(name, f) {

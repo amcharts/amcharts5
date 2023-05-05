@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.12] - 2023-05-05
+
+### Added
+- New locale: Faroese (fo_FO). Thanks Martin Puge.
+
+### Changed
+- The `min` and `max` settings are now optional for `IHeatRule` ([Issue 883](https://github.com/amcharts/amcharts5/issues/883)).
+- Removed `xlsx` package (with vulnerability) from dependencies in favor of a bundled hard copy (version 0.19.3) due to their decision not to publish to NPM. ([Issue 897](https://github.com/amcharts/amcharts5/issues/897)).
+
+### Fixed
+- Events now work properly with open shadow DOM (but not closed shadow DOM).
+- Fixed export of data freezing in some cases where there are visual elements on the chart that are constantly being updated.
+- Using parentheses in the in-line number formatting function was not working as needed.
+- Tapping on a touch display outside chart was applying default state to elements that weren't being "touch-hovered".
+- `getDataItemById()` method was not working properly on `Hierarchy` series.
+
+
 ## [5.3.11] - 2023-04-07
 
 ### Changed

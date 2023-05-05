@@ -133,7 +133,7 @@ export class AxisRendererY extends AxisRenderer {
 			axis.markDirtySize();
 		}
 
-		var w = axis.labelsContainer.width();
+		const w = axis.labelsContainer.width();
 
 		if (chart) {
 			if (this.get(opposite)) {
@@ -164,7 +164,9 @@ export class AxisRendererY extends AxisRenderer {
 
 	public _updatePositions() {
 		const axis = this.axis;
-		axis.gridContainer.set("y", axis.y() - $utils.relativeToValue(axis.get("centerY", 0), axis.height()));
+		const y = axis.y() - $utils.relativeToValue(axis.get("centerY", 0), axis.height());
+		axis.gridContainer.set("y", y);
+		axis.topGridContainer.set("y", y);
 		axis.bulletsContainer.set("x", this.x());
 
 		const chart = axis.chart;

@@ -199,7 +199,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _fixZoomFactor() {
-		var maxZoomFactor = this.get("maxZoomFactor");
+		const maxZoomFactor = this.get("maxZoomFactor");
 		if (maxZoomFactor != null && maxZoomFactor != Infinity) {
 			this.setPrivateRaw("maxZoomFactor", maxZoomFactor);
 		}
@@ -959,7 +959,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		value = value - (location - 0.5) * this.baseDuration();
 
 		const result = $array.getSortedIndex(series.dataItems, (dataItem) => {
-			var diValue = 0;
+			let diValue = 0;
 			if (dataItem.open) {
 				diValue = dataItem.open[fieldName];
 			}

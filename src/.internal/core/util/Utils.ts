@@ -226,6 +226,25 @@ export function getStyle(dom: HTMLElement, property: string): string | undefined
 }
 
 /**
+ * Gets the target of the event, works for shadow DOM too.
+ */
+export function getEventTarget(event: Event | Touch): Node | null {
+	if ((event as any).composedPath) {
+		const path = (event as Event).composedPath();
+
+		if (path.length === 0) {
+			return null;
+
+		} else {
+			return path[0] as Node;
+		}
+
+	} else {
+		return event.target as Node | null;
+	}
+}
+
+/**
  * Checks of element `a` contains element `b`.
  *
  * @param a  Aleged ascendant
@@ -793,7 +812,7 @@ export function escapeForRgex(value: string): string {
 
 /**
  * Adds space before each uppercase letter.
- * 
+ *
  * @param   str Input string
  * @return      Output string
  */

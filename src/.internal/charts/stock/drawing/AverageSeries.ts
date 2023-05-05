@@ -63,7 +63,7 @@ export class AverageSeries extends SimpleLineSeries {
 					let sum = 0;
 					let count = 0;
 
-					for (var i = i1; i <= i2; i++) {
+					for (let i = i1; i <= i2; i++) {
 						const di = series.dataItems[i];
 						const value = di.get(field as any);
 						if (value != null) {

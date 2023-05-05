@@ -683,7 +683,7 @@ export class Container extends Sprite {
 			}
 
 			if (mask) {
-				var parent = mask.parent;
+				const parent = mask.parent;
 				if (parent) {
 					parent.children.removeValue(mask);
 				}

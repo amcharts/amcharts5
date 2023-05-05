@@ -747,13 +747,11 @@ export class Exporting extends Entity {
 			target: this
 		});
 
-		// Force any rendering to complete before proceeding
-		this._root._runTickerNow();
-
 		let promise: Promise<string> | string = "";
 		switch (format) {
 			case "png":
 			case "jpg":
+				this._root._runTickerNow();
 				promise = this.exportImage(format, options);
 				break;
 			case "json":
@@ -769,6 +767,7 @@ export class Exporting extends Entity {
 				promise = this.exportXLSX(options);
 				break;
 			case "pdf":
+				this._root._runTickerNow();
 				promise = this.exportPDF(options);
 				break;
 			case "pdfdata":
@@ -1449,7 +1448,7 @@ export class Exporting extends Entity {
 	 * @ignore
 	 */
 	private async _xlsx(): Promise<any> {
-		return await import(/* webpackChunkName: "xlsx" */ "xlsx/dist/xlsx.core.min.js");
+		return await import(/* webpackChunkName: "xlsx" */ "../../bundled/xlsx");
 	}
 
 	/**

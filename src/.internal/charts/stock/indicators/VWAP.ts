@@ -99,7 +99,7 @@ export class VWAP extends Indicator {
 
 					const volumeDI = volumeSeries.dataItems[i];
 					const volume = volumeDI.get("valueY", 0);
-					var vw = dataItem.value_y * volume;
+					const vw = dataItem.value_y * volume;
 
 					dataItem.vw = vw;
 					dataItem.volume = volume;

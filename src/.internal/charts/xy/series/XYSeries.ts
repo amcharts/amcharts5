@@ -231,11 +231,17 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 
 	/**
 	 * X axis series uses.
+	 *
+	 * **IMPORTANT:** `xAxis` needs to be set when creating the series. Updating
+	 * this setting on previously created series object will not work.
 	 */
 	xAxis: IXYAxis;
 
 	/**
 	 * Y axis series uses.
+	 *
+	 * **IMPORTANT:** `yAxis` needs to be set when creating the series. Updating
+	 * this setting on previously created series object will not work.
 	 */
 	yAxis: IXYAxis;
 
