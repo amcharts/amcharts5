@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.14] - 2023-05-30
+
+### Fixed
+- Interactive HTML tooltips with internal element structure were generating unohver events unnecessarily since `5.3.13`.
+
+
 ## [5.3.13] - 2023-05-30
 
 ### Added

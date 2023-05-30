@@ -158,6 +158,7 @@ export function getRendererEvent(key: string): string {
 		switch (key) {
 			case "pointerover": return "touchstart";
 			case "pointerout": return "touchend";
+			case "pointerleave": return "touchend";
 			case "pointerdown": return "touchstart";
 			case "pointermove": return "touchmove";
 			case "pointerup": return "touchend";
@@ -170,6 +171,7 @@ export function getRendererEvent(key: string): string {
 		switch (key) {
 			case "pointerover": return "mouseover";
 			case "pointerout": return "mouseout";
+			case "pointerleave": return "mouseleave";
 			case "pointerdown": return "mousedown";
 			case "pointermove": return "mousemove";
 			case "pointerup": return "mouseup";
