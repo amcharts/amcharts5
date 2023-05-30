@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.13] - 2023-05-30
+
+### Added
+- New setting `forceLTR` (default: `false`) on `NumberFormatter`. If set to `true`, will force all formatted numbers to be LTR, regardless of the direction settings on chart/page.
+- `legend: true` added to `dataContext` of a legend bullet `DataItem` (bullets are created for LineSeries), just so it is possible to distinguish between bullets created for series and legend.
+
+### Fixed
+- `Hierarchy` was not not keeping its node toggle state after resize.
+- In some cases `DateRangeSelector` was generating an error when zooming `SotckChart`.
+- Always-on / on-click `Tooltip` was not being disposed properly when `Root` element was disposed.
+- Memory leak was happening when disposing a `Container` with `verticalScrollbar` enabled.
+- `PieSeries` was erroring if its `stroke` setting was set.
+
+
 ## [5.3.12] - 2023-05-05
 
 ### Added

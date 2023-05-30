@@ -941,6 +941,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 							seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
 						}
 					}
+
 					if (!series.isHidden() && !series.isShowing()) {
 						if ($type.isNumber(seriesMin)) {
 							selectionMin = Math.min(selectionMin, seriesMin);

@@ -216,12 +216,12 @@ async function transpile_typescript(config, base, dir) {
 			"name": `amcharts5-example-${$path.basename(dir)}`,
 			"version": "0.1.0",
 			"devDependencies": Object.assign(imports_to_packages(imports), {
-				"source-map-loader": "^3.0.0",
+				"source-map-loader": "^4.0.1",
 				"ts-loader": "^9.2.2",
 				"typescript": "^4.3.4",
 				"webpack": "^5.1.3",
-				"webpack-cli": "^4.1.0",
-				"webpack-dev-server": "^3.11.0"
+				"webpack-cli": "^5.1.1",
+				"webpack-dev-server": "^4.15.0"
 			}),
 			"scripts": {
 				"build": "webpack",
@@ -309,10 +309,10 @@ async function transpile_es2015(config, base, dir) {
 			"name": `amcharts5-example-${$path.basename(dir)}`,
 			"version": "0.1.0",
 			"devDependencies": Object.assign(imports_to_packages(imports), {
-				"source-map-loader": "^3.0.0",
+				"source-map-loader": "^4.0.1",
 				"webpack": "^5.1.3",
-				"webpack-cli": "^4.1.0",
-				"webpack-dev-server": "^3.11.0"
+				"webpack-cli": "^5.1.1",
+                "webpack-dev-server": "^4.15.0"
 			}),
 			"scripts": {
 				"build": "webpack",

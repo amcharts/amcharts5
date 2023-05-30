@@ -254,9 +254,9 @@ export class DateRangeSelector extends StockControl {
 		cancelButton.className = "am5-modal-button am5-modal-scondary";
 		buttonsColumn.appendChild(cancelButton);
 
-		$utils.addEventListener(cancelButton, "click", () => {
+		this._disposers.push($utils.addEventListener(cancelButton, "click", () => {
 			this.set("active", false);
-		});
+		}));
 
 	}
 
@@ -312,7 +312,9 @@ export class DateRangeSelector extends StockControl {
 		const fromPicker = this.getPrivate("fromPicker");
 		if (minDate == "auto") {
 			const min = xAxis.getPrivate("minFinal");
-			fromPicker.set("minDate", new Date(min + 1));
+			if (min) {
+				fromPicker.set("minDate", new Date(min + 1));
+			}
 		}
 		else if (minDate instanceof Date) {
 			fromPicker.set("minDate", minDate);
@@ -324,8 +326,10 @@ export class DateRangeSelector extends StockControl {
 		const maxDate = this.get("maxDate");
 		const toPicker = this.getPrivate("toPicker");
 		if (maxDate == "auto") {
-			const min = xAxis.getPrivate("minFinal");
-			toPicker.set("maxDate", new Date(min));
+			const min = xAxis.getPrivate("maxFinal");
+			if (min) {
+				toPicker.set("maxDate", new Date(min));
+			}
 		}
 		else if (maxDate instanceof Date) {
 			toPicker.set("maxDate", maxDate);

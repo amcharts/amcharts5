@@ -83,10 +83,10 @@ export class LabelSeries extends PolylineSeries {
 		//textArea.style.textAlign = "center";
 		//textArea.rows = 2;
 		textArea.className = "am5stock-drawing-label-input";
-		$utils.addEventListener(textArea, "input", () => {
+		this._disposers.push($utils.addEventListener(textArea, "input", () => {
 			textArea.style.height = "auto";
 			textArea.style.height = textArea.scrollHeight + "px";
-		}, false);
+		}, false));
 
 
 		div.appendChild(textArea);
@@ -97,9 +97,9 @@ export class LabelSeries extends PolylineSeries {
 		saveButton.type = "button";
 		saveButton.value = this._root.language.translateAny("Save");
 		saveButton.className = "am5-modal-button am5-modal-primary";
-		$utils.addEventListener(saveButton, "click", () => {
+		this._disposers.push($utils.addEventListener(saveButton, "click", () => {
 			this.saveText();
-		});
+		}));
 
 		div.appendChild(saveButton);
 
@@ -107,10 +107,10 @@ export class LabelSeries extends PolylineSeries {
 		cancelButton.type = "button";
 		cancelButton.value = this._root.language.translateAny("Cancel");
 		cancelButton.className = "am5-modal-button am5-modal-scondary";
-		$utils.addEventListener(cancelButton, "click", () => {
+		this._disposers.push($utils.addEventListener(cancelButton, "click", () => {
 			this.getPrivate("inputContainer").style.display = "none";
 			this.getPrivate("input").value = "";
-		});
+		}));
 		div.appendChild(cancelButton);
 	}
 

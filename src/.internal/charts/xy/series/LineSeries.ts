@@ -187,7 +187,7 @@ export class LineSeries extends XYSeries {
 	public _updateChildren() {
 
 		this._strokeTemplate = undefined;
-		this._fillTemplate = undefined;		
+		this._fillTemplate = undefined;
 
 		let xAxis = this.get("xAxis");
 		let yAxis = this.get("yAxis");
@@ -729,7 +729,7 @@ export class LineSeries extends XYSeries {
 			if (this.bullets.length > 0) {
 				const bulletFunction = this.bullets.getIndex(0);
 				if (bulletFunction) {
-					const bullet = bulletFunction(marker._root, this, new DataItem(this, {}, {}));
+					const bullet = bulletFunction(marker._root, this, new DataItem(this, { legend: true }, {}));
 					if (bullet) {
 						const sprite = bullet.get("sprite");
 						if (sprite instanceof Graphics) {

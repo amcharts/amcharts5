@@ -1,7 +1,7 @@
 import type { IPicture } from "./backend/Renderer";
 import type { Color } from "../util/Color";
 
-import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
+import { Sprite, ISpriteEvents, ISpriteSettings, ISpritePrivate } from "./Sprite";
 
 import * as $type from "../util/Type";
 
@@ -69,6 +69,19 @@ export interface IPictureSettings extends ISpriteSettings {
 export interface IPicturePrivate extends ISpritePrivate {
 }
 
+export interface IPictureEvents extends ISpriteEvents {
+
+	/**
+	 * Invoked when picture is loaded.
+	 */
+	loaded: {};
+
+	/**
+	 * Invoked when picture load error happens.
+	 */
+	loaderror: {};
+}
+
 /**
  * Displays an image.
  *
@@ -84,6 +97,7 @@ export class Picture extends Sprite {
 
 	public static className: string = "Picture";
 	public static classNames: Array<string> = Sprite.classNames.concat([Picture.className]);
+	declare public _events: IPictureEvents;
 
 	public _changed() {
 		super._changed();
@@ -133,6 +147,7 @@ export class Picture extends Sprite {
 	protected _load() {
 		const src = this.get("src");
 		if (src) {
+			let eventType: "loaded" | "loaderror" = "loaded";
 			const image = new Image();
 			image.crossOrigin = this.get("cors", "anonymous");
 			image.src = src!;
@@ -140,8 +155,12 @@ export class Picture extends Sprite {
 				this._display.image = image;
 				this._updateSize();
 			}).catch((_error: any) => {
-				// TODO: maybe raise error?
+				eventType = "loaderror";
 			});
+
+			if (this.events.isEnabled(eventType)) {
+				this.events.dispatch(eventType, { type: eventType, target: this });
+			}
 		}
 	}
 

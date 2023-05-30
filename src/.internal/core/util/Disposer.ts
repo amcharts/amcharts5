@@ -138,6 +138,10 @@ export class MultiDisposer extends DisposerClass {
 			x.dispose();
 		});
 	}
+
+	public get disposers(): Array<IDisposer> {
+		return this._disposers;
+	}
 }
 
 /**

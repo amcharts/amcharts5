@@ -354,7 +354,10 @@ export abstract class Hierarchy extends Series {
 		}
 
 		if (this._sizeDirty) {
-			this._selectDataItem(this.get("selectedDataItem"), this._currentDownDepth, false);
+			const dataItem = this.get("selectedDataItem");
+			if(dataItem){
+				this._zoom(dataItem);	
+			}			
 		}
 	}
 

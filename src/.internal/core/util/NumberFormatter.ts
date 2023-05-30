@@ -74,6 +74,15 @@ export interface INumberFormatterSettings extends IEntitySettings {
 	 */
 	intlLocales?: string;
 
+	/**
+	 * If set to `true` will force the number string to be LTR, even if RTL is
+	 * enabled.
+	 * 
+	 * @default false
+	 * @since 5.3.13
+	 */
+	forceLTR?: boolean;
+
 }
 
 export interface INumberFormatterPrivate extends IEntityPrivate {
@@ -203,6 +212,10 @@ export class NumberFormatter extends Entity {
 			// Format
 			formatted = details.template.split($type.PLACEHOLDER).join(this.applyFormat(source, details));
 
+		}
+
+		if (this.get("forceLTR") === true) {
+			formatted = "‎" + formatted;
 		}
 
 		return formatted;

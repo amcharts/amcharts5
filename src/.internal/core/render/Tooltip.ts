@@ -3,6 +3,7 @@ import type { IPoint } from "../util/IPoint";
 import type { Pattern } from "../render/patterns/Pattern";
 import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
+import type { IPointerEvent } from "../render/backend/Renderer";
 
 import { MultiDisposer, IDisposer } from "../util/Disposer";
 import { Label } from "../render/Label";
@@ -260,6 +261,21 @@ export class Tooltip extends Container {
 						}
 					})
 				]);
+
+				this.label.onPrivate("htmlElement", (htmlElement: any) => {
+					if (this._keepHoverDp && htmlElement) {
+						this._keepHoverDp.disposers.push($utils.addEventListener<PointerEvent | MouseEvent>(htmlElement, "pointerout", (ev: IPointerEvent) => {
+							const downEvent = this.root._renderer.getEvent(ev);
+							bg.events.dispatch("pointerout", {
+								type: "pointerout",
+								originalEvent: downEvent.event,
+								point: downEvent.point,
+								simulated: false,
+								target: bg
+							});
+						}))
+					}
+				})
 			}
 			else {
 				if (this._keepHoverDp) {

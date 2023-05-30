@@ -26,6 +26,8 @@ import * as $order from "../../core/util/Order";
 import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
 import type { Animation } from "../../core/util/Entity";
+import type { CategoryAxis } from "./axes/CategoryAxis";
+import type { DateAxis } from "./axes/DateAxis";
 
 export interface IXYChartSettings extends ISerialChartSettings {
 
@@ -455,6 +457,18 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _removeSeries(series: this["_seriesType"]) {
+		series._unstack();
+
+		if (series._posXDp) {
+			series._posXDp.dispose();
+		}
+
+		if (series._posYDp) {
+			series._posYDp.dispose();
+		}
+
+		series.set("baseAxis", undefined);
+
 		const xAxis = series.get("xAxis");
 		if (xAxis) {
 			$array.remove(xAxis.series, series);
@@ -718,7 +732,7 @@ export class XYChart extends SerialChart {
 	}
 
 	protected _handlePlotDown(event: IPointerEvent) {
-		if((event as any).button == 2){
+		if ((event as any).button == 2) {
 			return;
 		}
 		const plotContainer = this.plotContainer;
@@ -1213,6 +1227,41 @@ export class XYChart extends SerialChart {
 
 	protected _processSeries(series: this["_seriesType"]) {
 		super._processSeries(series);
+
+		const xAxis = series.get("xAxis");
+		const yAxis = series.get("yAxis");
+
+		$array.move(xAxis.series, series);
+		$array.move(yAxis.series, series);
+
+		series._posXDp = series.addDisposer(xAxis.events.on("positionchanged", () => {
+			series._fixPosition();
+		}))
+
+		series._posXDp = series.addDisposer(yAxis.events.on("positionchanged", () => {
+			series._fixPosition();
+		}))
+
+		if (!series.get("baseAxis")) {
+			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") || yAxis.isType<DateAxis<any>>("DateAxis")) {
+				series.set("baseAxis", yAxis);
+			}
+			else {
+				series.set("baseAxis", xAxis);
+			}
+		}
+
+		if (series.get("stacked")) {
+			series._markDirtyKey("stacked");
+			$array.each(series.dataItems, (dataItem) => {
+				dataItem.set("stackToItemY", undefined);
+				dataItem.set("stackToItemX", undefined);
+			})
+		}
+		series._markDirtyAxes();
+		yAxis.markDirtyExtremes();
+		xAxis.markDirtyExtremes();
+
 		this._colorize(series);
 	}
 
@@ -1468,7 +1517,7 @@ export class XYChart extends SerialChart {
 
 		if ($type.isNumber(maxTooltipDistance)) {
 			this.series.each((series) => {
-				if(!series.isHidden()){
+				if (!series.isHidden()) {
 					const tooltip = series.get("tooltip");
 					if (tooltip) {
 						let point = tooltip.get("pointTo")!;

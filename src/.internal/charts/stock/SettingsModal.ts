@@ -290,7 +290,7 @@ export class SettingsModal extends Modal {
 		saveButton.className = "am5-modal-button am5-modal-primary";
 		content.appendChild(saveButton);
 
-		$utils.addEventListener(saveButton, "click", () => {
+		this._disposers.push($utils.addEventListener(saveButton, "click", () => {
 			$object.each(settingInputs, (key, element) => {
 				if (element.type == "checkbox") {
 					this._updatedSettings[key] = (<HTMLInputElement>element).checked;
@@ -329,7 +329,7 @@ export class SettingsModal extends Modal {
 				}
 			});
 			this.close();
-		});
+		}));
 
 		const cancelButton = document.createElement("input");
 		cancelButton.type = "button";
@@ -337,9 +337,9 @@ export class SettingsModal extends Modal {
 		cancelButton.className = "am5-modal-button am5-modal-scondary";
 		content.appendChild(cancelButton);
 
-		$utils.addEventListener(cancelButton, "click", () => {
+		this._disposers.push($utils.addEventListener(cancelButton, "click", () => {
 			this.cancel();
-		});
+		}));
 
 		// Open modal
 		this.open();

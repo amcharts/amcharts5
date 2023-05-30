@@ -569,8 +569,9 @@ export class Container extends Sprite {
 			const verticalScrollbar = this.get("verticalScrollbar")!;
 			if (verticalScrollbar) {
 				verticalScrollbar._setParent(this);
-				verticalScrollbar.children.removeValue(verticalScrollbar.startGrip);
-				verticalScrollbar.children.removeValue(verticalScrollbar.endGrip);
+
+				verticalScrollbar.startGrip.setPrivate("visible", false);
+				verticalScrollbar.endGrip.setPrivate("visible", false);
 
 				this.set("maskContent", true);
 				this.set("paddingRight", verticalScrollbar.width() + verticalScrollbar.get("marginRight", 0) + verticalScrollbar.get("marginLeft", 0));

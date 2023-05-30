@@ -227,9 +227,9 @@ export class Modal extends Entity {
 		container.appendChild(curtain);
 		this.setPrivate("curtain", curtain);
 
-		$utils.addEventListener(curtain, "click", () => {
+		this._disposers.push($utils.addEventListener(curtain, "click", () => {
 			this.cancel();
-		});
+		}));
 
 		const wrapper = document.createElement("div");
 		wrapper.className = "am5-modal-wrapper";

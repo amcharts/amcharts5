@@ -494,17 +494,19 @@ export abstract class PercentSeries extends Series {
 	 * @ignore
 	 */
 	public updateLegendMarker(dataItem: DataItem<this["_dataItemSettings"]>) {
-		const slice = dataItem.get("slice");
+		if(dataItem){
+			const slice = dataItem.get("slice");
 
-		if (slice) {
-			const legendDataItem = dataItem.get("legendDataItem");
-			if (legendDataItem) {
-				const markerRectangle = legendDataItem.get("markerRectangle");
-				$array.each(visualSettings, (setting: any) => {
-					if (slice.get(setting) != null) {
-						markerRectangle.set(setting, slice.get(setting));
-					}
-				})
+			if (slice) {
+				const legendDataItem = dataItem.get("legendDataItem");
+				if (legendDataItem) {
+					const markerRectangle = legendDataItem.get("markerRectangle");
+					$array.each(visualSettings, (setting: any) => {
+						if (slice.get(setting) != null) {
+							markerRectangle.set(setting, slice.get(setting));
+						}
+					})
+				}
 			}
 		}
 	}

@@ -1098,6 +1098,7 @@ export abstract class Sprite extends Entity {
 							this.hideTooltip();
 						})
 					]);
+					this._disposers.push(this._tooltipDp);
 				}
 				else if (showTooltipOn == "always") {
 					// nothing
@@ -1111,6 +1112,7 @@ export abstract class Sprite extends Entity {
 							this.hideTooltip();
 						})
 					]);
+					this._disposers.push(this._tooltipDp);
 				}
 			}
 		}

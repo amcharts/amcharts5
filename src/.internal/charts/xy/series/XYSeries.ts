@@ -4,7 +4,7 @@ import type { IPoint } from "../../../core/util/IPoint";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { Bullet } from "../../../core/render/Bullet";
 import type { XYChart } from "../XYChart";
-import type { CategoryAxis } from "../axes/CategoryAxis";
+//import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
 import type { ITimeInterval } from "../../../core/util/Time";
 
@@ -13,6 +13,8 @@ import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents
 import { List } from "../../../core/util/List";
 import { Container } from "../../../core/render/Container";
 import { Graphics } from "../../../core/render/Graphics";
+
+import type { IDisposer } from "../../../core/util/Disposer";
 
 import * as $type from "../../../core/util/Type";
 import * as $object from "../../../core/util/Object";
@@ -913,6 +915,9 @@ export abstract class XYSeries extends Series {
 	protected _tooltipFieldX?: string;
 	protected _tooltipFieldY?: string;
 
+	public _posXDp?:IDisposer;
+	public _posYDp?:IDisposer;
+
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
 		this.valueFields.push("valueX", "valueY", "openValueX", "openValueY", "lowValueX", "lowValueY", "highValueX", "highValueY");
@@ -942,9 +947,6 @@ export abstract class XYSeries extends Series {
 
 		super._afterNew();
 
-		this._settings.xAxis.series.push(this);
-		this._settings.yAxis.series.push(this);
-
 		this.set("maskContent", true);
 
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
@@ -966,26 +968,6 @@ export abstract class XYSeries extends Series {
 				throw new Error("Unknown IStreamEvent type");
 			}
 		}))
-
-		const xAxis = this.get("xAxis");
-		const yAxis = this.get("yAxis");
-
-		this._disposers.push(xAxis.events.on("positionchanged", () => {
-			this._fixPosition();
-		}))
-
-		this._disposers.push(yAxis.events.on("positionchanged", () => {
-			this._fixPosition();
-		}))
-
-		if (!this.get("baseAxis")) {
-			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") || yAxis.isType<DateAxis<any>>("DateAxis")) {
-				this.set("baseAxis", yAxis);
-			}
-			else {
-				this.set("baseAxis", xAxis);
-			}
-		}
 
 		this.states.create("hidden", <any>{ opacity: 1, visible: false });
 
@@ -1218,7 +1200,7 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
-	protected _fixPosition() {
+	public _fixPosition() {
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 
@@ -1233,9 +1215,13 @@ export abstract class XYSeries extends Series {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this.isDirty("valueYShow") || this.isDirty("valueXShow" || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow"))) {
+		if (this.isDirty("valueYShow") || this.isDirty("valueXShow") || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow")) {
 			this._updateFields();
 			this._makeFieldNames();
+			this._valuesDirty = true;
+		}
+
+		if(this.isDirty("xAxis") || this.isDirty("yAxis")){
 			this._valuesDirty = true;
 		}
 
@@ -1394,7 +1380,7 @@ export abstract class XYSeries extends Series {
 				const stacked = this.get("stacked", false);
 				const outOfSelection = this.getPrivate("outOfSelection");
 
-				if (baseAxis === xAxis) {
+				if (baseAxis === xAxis || !baseAxis) {
 					yAxis._calculateTotals();
 					this.setPrivateRaw("selectionMinY", undefined);
 					this.setPrivateRaw("selectionMaxY", undefined);
@@ -1407,7 +1393,7 @@ export abstract class XYSeries extends Series {
 						yAxis.markDirtySelectionExtremes();
 					}
 				}
-				else if (baseAxis === yAxis) {
+				if (baseAxis === yAxis || !baseAxis) {
 					xAxis._calculateTotals();
 					this.setPrivateRaw("selectionMinX", undefined);
 					this.setPrivateRaw("selectionMaxX", undefined);
@@ -1421,7 +1407,7 @@ export abstract class XYSeries extends Series {
 					}
 				}
 
-				if (baseAxis === xAxis) {
+				if (baseAxis === xAxis || !baseAxis) {
 					if (this.get("valueYShow") !== "valueYWorking") {
 						const selectionMinY = this.getPrivate("selectionMinY");
 						if (selectionMinY != null) {
@@ -1435,7 +1421,7 @@ export abstract class XYSeries extends Series {
 						}
 					}
 				}
-				else if (baseAxis === yAxis) {
+				if (baseAxis === yAxis || !baseAxis) {
 					if (this.get("valueXShow") !== "valueXWorking") {
 						const selectionMinX = this.getPrivate("selectionMinX");
 						if (selectionMinX != null) {
@@ -1510,6 +1496,7 @@ export abstract class XYSeries extends Series {
 
 	public _updateChildren() {
 		super._updateChildren();
+
 		// save for performance
 		this._x = this.x();
 		this._y = this.y();
@@ -1536,12 +1523,12 @@ export abstract class XYSeries extends Series {
 					}
 				}
 			}
-
 			this._stackDataItems();
 		}
 	}
 
-	protected _unstack() {
+	public _unstack() {
+
 		$object.each(this._reallyStackedTo, (_key, value) => {
 			delete (value._stackedSeries[this.uid]);
 		})

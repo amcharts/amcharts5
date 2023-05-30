@@ -438,7 +438,6 @@ export class MapChart extends SerialChart {
 		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
 			this._handleSetWheel();
 		}
-		const previousGeometries = this._geometryColection.geometries;
 		if (this._dirtyGeometries) {
 			this._geometryColection.geometries = [];
 
@@ -450,7 +449,7 @@ export class MapChart extends SerialChart {
 			this._fitMap();
 		}
 
-		if (previousGeometries.length != 0 && (w != this._pw || h != this._ph || this._dirtyGeometries)) {
+		if (w != this._pw || h != this._ph || this._dirtyGeometries) {
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;
