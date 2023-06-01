@@ -133,24 +133,34 @@ export abstract class MapSeries extends Series {
 		super._afterNew();
 	}
 
+	protected _handleDirties() {
+		const geoJSON = this.get("geoJSON");
+		let previous = this._prevSettings.geoJSON;
+
+		if (previous && previous != geoJSON) {
+			this._prevSettings.geoJSON = undefined;
+			this._geoJSONparsed = false;
+		}
+
+		if (!this._geoJSONparsed) {
+			this._parseGeoJSON();
+			this._geoJSONparsed = true;
+		}
+	}
+
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this._valuesDirty || this.isDirty("geoJSON") || this.isDirty("include") || this.isDirty("exclude")) {
-			const geoJSON = this.get("geoJSON");
-			let previous = this._prevSettings.geoJSON;
+		if (this._valuesDirty) {
+			this._handleDirties();
+		}
 
-			if (previous && previous != geoJSON) {
-				this._prevSettings.geoJSON = undefined;
-				this._geoJSONparsed = false;
-			}
+		if (this.isDirty("geoJSON") || this.isDirty("include") || this.isDirty("exclude")) {
 
-			if (!this._geoJSONparsed) {
-				this._parseGeoJSON();
-				this._geoJSONparsed = true;
-			}
+			this._handleDirties();
 
 			const chart = this.chart;
+
 			const exclude = this.get("exclude");
 
 			if (exclude) {
@@ -194,6 +204,7 @@ export abstract class MapSeries extends Series {
 				})
 				this._notIncluded = [];
 			}
+
 		}
 	}
 

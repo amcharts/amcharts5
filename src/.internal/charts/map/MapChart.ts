@@ -399,6 +399,8 @@ export class MapChart extends SerialChart {
 		const w = this.innerWidth();
 		const h = this.innerHeight();
 
+		const previousGeometries = this._geometryColection.geometries;
+
 		if (this.isDirty("projection")) {
 			this._makeGeoPath();
 			this.markDirtyProjection();
@@ -449,7 +451,7 @@ export class MapChart extends SerialChart {
 			this._fitMap();
 		}
 
-		if (w != this._pw || h != this._ph || this._dirtyGeometries) {
+		if (previousGeometries.length != 0 && (w != this._pw || h != this._ph || this._dirtyGeometries)) {
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;

@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
-## [UNRELEASED] - ????-??-??
+## [5.1.1] - 2023-06-01
 
 ### Added
 - `spain2*` maps added. Same as `spain*`, except with off-shore islands misplaced so they show up close to the mainland.
@@ -15,6 +15,8 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Fixed
 - Fixed IDs of lands in the map of Denmark.
+- County maps of Mexico did not have their `name` property set properly.
+- County maps of Canada did not have their `name` property set properly.
 
 
 ## [5.1.0] - 2022-12-07

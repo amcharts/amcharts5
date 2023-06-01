@@ -102,7 +102,10 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 *
 	 * Tooltips for data items farther then X pixels, will not be shown.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
+	 * NOTE: set it to `-1` to ensure only one tooltip is displayed, even if there
+	 * are multiple data items in the same place.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 */
 	maxTooltipDistance?: number;
 
@@ -110,7 +113,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Indicates how the distance should be measured when assessing distance
 	 * between tooltips as set in `maxTooltipDistance`.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @since 5.2.6
 	 */
 	maxTooltipDistanceBy?: "xy" | "x" | "y";
@@ -121,7 +124,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 *
 	 * Will work only if chart has an `XYCursor` enabled.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Tooltips} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#ooltips} for more info
 	 * @default true
 	 */
 	arrangeTooltips?: boolean

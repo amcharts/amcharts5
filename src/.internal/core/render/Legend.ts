@@ -143,7 +143,6 @@ export class Legend extends Series {
 	declare public _dataItemSettings: ILegendDataItem;
 	declare public _events: ILegendEvents;
 
-
 	/**
 	 * List of all [[Container]] elements for legend items.
 	 *
@@ -361,9 +360,9 @@ export class Legend extends Series {
 
 			if (item && item.show) {
 
-				this._disposers.push(item.on("visible", (visible) => {
+				item.on("visible", (visible) => {
 					itemContainer.set("disabled", !visible)
-				}));
+				})
 
 				if (!item.get("visible")) {
 					itemContainer.set("disabled", true);
@@ -450,7 +449,6 @@ export class Legend extends Series {
 				dataContext.set("legendDataItem", undefined);
 			}
 		}
-
 
 		let itemContainer = dataItem.get("itemContainer");
 		if (itemContainer) {

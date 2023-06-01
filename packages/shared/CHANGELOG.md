@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.15] - 2023-06-01
+
+### Fixed
+- Dynamic updates to `geoJSON` on a `PolygonSeries` were not working since `5.3.13`.
+- Updating data on a `PolygonSeries` was resetting map position.
+- Memory leak when modifying `Legend` data fixed.
+
+
 ## [5.3.14] - 2023-05-30
 
 ### Fixed
