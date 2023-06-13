@@ -749,7 +749,9 @@ export class Root implements IDisposer {
 								else if (focusedSprite.get("focusableGroup")) {
 									// Find next item in focusable group
 									const group = focusedSprite.get("focusableGroup");
-									const items = this._tabindexes.filter(item => item.get("focusableGroup") == group);
+									const items = this._tabindexes.filter((item) => {
+										return item.get("focusableGroup") == group && item.getPrivate("focusable") !== false ? true : false;
+									});
 									let index = items.indexOf(focusedSprite);
 									const lastIndex = items.length - 1;
 									index += (keyCode == 39 || keyCode == 40) ? 1 : -1;
@@ -1291,7 +1293,7 @@ export class Root implements IDisposer {
 				this._moveFocusElement(index, item);
 			}
 			const group = item.get("focusableGroup");
-			if (group) {
+			if (group && item.getPrivate("focusable") !== false) {
 				if (groups.indexOf(group) !== -1) {
 					// Non-first element in the group, make it not directly focusable
 					item.getPrivate("focusElement")!.dom.setAttribute("tabindex", "-1");
@@ -1300,6 +1302,7 @@ export class Root implements IDisposer {
 					groups.push(group);
 				}
 			}
+
 		});
 
 	}
@@ -1330,7 +1333,7 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		if (target.get("visible") && target.get("role") != "tooltip" && !target.isHidden()) {
+		if (target.get("visible") && target.get("role") != "tooltip" && !target.isHidden() && target.getPrivate("focusable") !== false) {
 			if (focusElement.getAttribute("tabindex") != "-1") {
 				focusElement.setAttribute("tabindex", "" + this.tabindex);
 			}

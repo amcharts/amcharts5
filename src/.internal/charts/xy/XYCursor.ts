@@ -652,7 +652,7 @@ export class XYCursor extends Container {
 		let local = this._display.toLocal(point);
 		let chart = this.chart;
 
-		if (chart && this._inPlot(local)) {
+		if (chart && (this._inPlot(local) || this._downPoint)) {
 			chart._movePoint = point;
 
 			if (this.isHidden()) {

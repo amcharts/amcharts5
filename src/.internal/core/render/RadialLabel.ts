@@ -67,6 +67,11 @@ export interface IRadialLabelSettings extends ILabelSettings {
 	 * * `"aligned"` - horizontal label aligned with other labels horizontally.
 	 * * `"adjusted"` - horizontal label adjusted in postion.
 	 *
+	 * **IMPORTANT!** If the label is used in a [[PieSeries]], its `alignLabels` setting
+	 * (default: `true`) takes precedence over `textType`. If you need to set this
+	 * to anything else than `regular`, make sure you also set `alignLabels: falese` on
+	 * `PieSeries`.
+	 *
 	 * @default "regular"
 	 */
 	textType?: "regular" | "circular" | "radial" | "aligned" | "adjusted";

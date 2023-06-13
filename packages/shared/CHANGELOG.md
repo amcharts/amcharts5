@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.16] - 2023-06-13
+
+### Fixed
+- Legend label's were losing their disabled state if labels were updated by moving cursor.
+- `Treemap`'s focus navigation using arrow keys and `focusableGroup` was not working properly.
+- `Annotator` plugin was sometimes retaining drawings after drawing was cancelled.
+
+
 ## [5.3.15] - 2023-06-01
 
 ### Fixed

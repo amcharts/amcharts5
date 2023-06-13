@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.3.15",
+  "version": "5.3.16",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "description": "amCharts 5",
   "homepage": "https://www.amcharts.com/",
@@ -48,7 +48,7 @@
     "d3-selection": "^3.0.0",
     "d3-transition": "^3.0.0",
     "flatpickr": "^4.6.9",
-    "markerjs2": "^2.17.2",
+    "markerjs2": "^2.29.4",
     "pdfmake": "^0.2.2",
     "polylabel": "^1.1.0",
     "regression": "^2.0.1",

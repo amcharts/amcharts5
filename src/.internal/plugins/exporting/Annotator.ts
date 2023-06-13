@@ -98,6 +98,7 @@ export class Annotator extends Entity {
 		//this._root._renderer.interactionsEnabled = true;
 		const markerArea = await this.getMarkerArea();
 		markerArea!.close();
+		this._markerArea = undefined;
 	}
 
 	/**
@@ -108,7 +109,9 @@ export class Annotator extends Entity {
 		this._root._renderer.interactionsEnabled = true;
 		const markerArea = await this.getMarkerArea();
 		this._picture!.show(0);
-		markerArea!.cancel();
+		markerArea!.close();
+		this._markerArea = undefined;
+		//markerArea!.cancel();
 	}
 
 	/**
@@ -168,6 +171,7 @@ export class Annotator extends Entity {
 			this._disposers.push($utils.addEventListener(markerArea, "close", () => {
 				this._root._renderer.interactionsEnabled = true;
 				this._picture!.show(0);
+				this._markerArea = undefined;
 			}));
 
 			this._disposers.push($utils.addEventListener(markerArea, "render", (event: any) => {

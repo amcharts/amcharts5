@@ -2863,10 +2863,10 @@ marked@^0.8.0:
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.8.2.tgz#4faad28d26ede351a7a1aaa5fec67915c869e355"
   integrity sha512-EGwzEeCcLniFX51DhTpmTom+dSA/MG/OBUDjnWtHbEnjAH180VzUeAw+oE4+Zv+CoYBWyRlYOTR0N8SO9R1PVw==
 
-markerjs2@^2.17.2:
-  version "2.28.1"
-  resolved "https://registry.yarnpkg.com/markerjs2/-/markerjs2-2.28.1.tgz#0e2ee897ff3bfefa49dcf22424080495cf5e4b8b"
-  integrity sha512-Hx1JixKfkP0hCKhl1qfNuP90Z9MVjHKAjMRo2xyU3fZVQuwaHO2qx1u8NqCeRqA/QuZqBlsU+FLdNkoazgsiSQ==
+markerjs2@^2.29.4:
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/markerjs2/-/markerjs2-2.29.4.tgz#0b80b0750f9522c38a6257baf822433cad0511d2"
+  integrity sha512-Fvtay7a8lGjy8T+ns3fQdeHF8LnAnjg3TO5HUsgVJ2/xUUaIOCfeKbutvivcyrYyG4tnTaiPUMg+mhsZ+Fa9bQ==
 
 md5.js@^1.3.4:
   version "1.3.5"

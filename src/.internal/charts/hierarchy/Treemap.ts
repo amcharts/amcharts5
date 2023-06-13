@@ -331,4 +331,39 @@ export class Treemap extends Hierarchy {
 			this.nodesContainer.animate({ key: "y", to: nodePaddingOuter - y0 * scaleY, duration: duration, easing: easing });
 		}
 	}
+
+	protected _selectDataItem(dataItem?: DataItem<this["_dataItemSettings"]>, downDepth?: number, skipDisptach?: boolean) {
+		super._selectDataItem(dataItem, downDepth, skipDisptach);
+		if (dataItem) {
+			let maxDepth = this.get("downDepth", 1) + dataItem.get("depth");
+			if (!this.inited) {
+				maxDepth = this.get("initialDepth", 1);
+			}
+			const visibleNodes = this._getVisibleNodes(dataItem, maxDepth);
+			this.nodes.each((node) => {
+				if (visibleNodes.indexOf(node.dataItem as DataItem<this["_dataItemSettings"]>) == -1) {
+					node.setPrivate("focusable", false);
+				}
+				else {
+					node.removePrivate("focusable");
+				}
+			});
+		}
+		this._root._invalidateTabindexes();
+	}
+
+	protected _getVisibleNodes(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth: number) {
+		const children = dataItem.get("children");
+		let includedChildren: Array<DataItem<this["_dataItemSettings"]>> = [];
+		$array.each(children, (child) => {
+			if (child.get("depth") == maxDepth || !child.get("children")) {
+				includedChildren.push(child);
+			}
+			else {
+				includedChildren = includedChildren.concat(this._getVisibleNodes(child, maxDepth));
+			}
+		});
+		return includedChildren;
+	}
+
 }

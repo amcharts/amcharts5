@@ -591,6 +591,15 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 * @ignore
 	 */
 	minHeight?: number | null;
+
+	/**
+	 * If set to `false`, its tabindex will be set to -1, so it does not get
+	 * focused with TAB, regardless whether its public setting `focusable` is
+	 * set to `true`.
+	 *
+	 * @since 5.3.16
+	 */
+	focusable?: boolean;
 }
 
 /**
@@ -1248,6 +1257,10 @@ export abstract class Sprite extends Entity {
 			else {
 				this._root._unregisterTabindexOrder(this);
 			}
+			this.markDirtyAccessibility();
+		}
+
+		if (this.isPrivateDirty("focusable")) {
 			this.markDirtyAccessibility();
 		}
 

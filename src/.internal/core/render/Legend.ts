@@ -337,7 +337,8 @@ export class Legend extends Series {
 				dataItem.set("label", label);
 
 				label.text.on("text", () => {
-					itemContainer.set("ariaLabel", label.text._getText() + (this.get("clickTarget") !== "none" ? "; " + this._t("Press ENTER to toggle") : ""));
+					itemContainer.setRaw("ariaLabel", label.text._getText() + (this.get("clickTarget") !== "none" ? "; " + this._t("Press ENTER to toggle") : ""));					
+					itemContainer.markDirtyAccessibility();
 				});
 
 				if (item && item.get) {
@@ -361,7 +362,7 @@ export class Legend extends Series {
 			if (item && item.show) {
 
 				item.on("visible", (visible) => {
-					itemContainer.set("disabled", !visible)
+					itemContainer.set("disabled", !visible);
 				})
 
 				if (!item.get("visible")) {
