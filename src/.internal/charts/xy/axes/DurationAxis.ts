@@ -132,7 +132,7 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (max > 0 && initialMax <= 0) {
 					max = 0;
 				}
-			}*/			
+			}*/
 			minMaxStep = { min: min, max: max, step: step };
 		}
 		else {
@@ -156,7 +156,7 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
-	public getTooltipText(position: number): string | undefined {
+	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
 		const formatter = this.getDurationFormatter();
 		const extraDecimals = this.get("extraTooltipPrecision", 0);
 		const decimals = this.getPrivate("stepDecimalPlaces", 0) + extraDecimals;

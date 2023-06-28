@@ -1188,7 +1188,7 @@ export class XYChart extends SerialChart {
 					// Used to populate `ariaLabel` with meaningful values
 					scrollbarX.setPrivate("positionTextFunction", (position: number) => {
 						const axis = this.xAxes.getIndex(0);
-						return axis ? axis.getTooltipText(position) || "" : "";
+						return axis ? axis.getTooltipText(position, false) || "" : "";
 					});
 
 				}
@@ -1217,7 +1217,7 @@ export class XYChart extends SerialChart {
 					// Used to populate `ariaLabel` with meaningful values
 					scrollbarY.setPrivate("positionTextFunction", (position: number) => {
 						const axis = this.yAxes.getIndex(0);
-						return axis ? axis.getTooltipText(position) || "" : "";
+						return axis ? axis.getTooltipText(position, false) || "" : "";
 					});
 
 				}

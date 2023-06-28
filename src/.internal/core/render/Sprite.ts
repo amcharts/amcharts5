@@ -1004,6 +1004,13 @@ export abstract class Sprite extends Entity {
 			}
 
 			if (this.get("tooltipPosition") == "pointer") {
+
+				if (this.isHover()) {
+					this._tooltipMoveDp = this.events.on("globalpointermove", (e) => {
+						this.showTooltip(e.point);
+					})
+				}
+
 				this._tooltipPointerDp = new MultiDisposer([
 					this.events.on("pointerover", () => {
 						this._tooltipMoveDp = this.events.on("globalpointermove", (e) => {
@@ -1840,7 +1847,7 @@ export abstract class Sprite extends Entity {
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
 		if (tooltip) {
-			if (tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this)) {
+			if (tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this) || this.get("tooltip") == tooltip) {	
 				let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
 				const promise = tooltip.hide(timeout);
 				this.setPrivateRaw("showingTooltip", false);

@@ -542,7 +542,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			})
 
-			this._updateGhost();		
+			this._updateGhost();
 		}
 	}
 
@@ -1177,7 +1177,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// meaning no min/max found on series/ranges and no min/max was defined
 		if (min === Infinity || max === -Infinity) {
 			this.setPrivate("minFinal", undefined);
-			this.setPrivate("maxFinal", undefined);						
+			this.setPrivate("maxFinal", undefined);
 			return;
 		}
 
@@ -1488,7 +1488,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
-	public getTooltipText(position: number): string | undefined {
+	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
 		const numberFormat = this.get("tooltipNumberFormat", this.get("numberFormat"));
 		const formatter = this.getNumberFormatter();
 		const extraDecimals = this.get("extraTooltipPrecision", 0);
@@ -1637,6 +1637,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			return this.getPrivate("step", 1) / (max - min);
 		}
 		return 0.05;
-	}	
+	}
 
 }

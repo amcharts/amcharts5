@@ -409,7 +409,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 */
 	public resetUserSettings(){
 		this._userProperties = {};
-	}	
+	}
 
 	/**
 	 * @ignore

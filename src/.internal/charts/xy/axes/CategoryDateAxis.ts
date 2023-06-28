@@ -129,7 +129,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 		let startTime = Number(this.dataItems[startIndex].get("category"));
 		let endTime = Number(this.dataItems[endIndex - 1].get("category"));
 		let realDuration = (endTime - startTime);
-		if(endIndex - startIndex < maxCount){
+		if (endIndex - startIndex < maxCount) {
 			realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
 		}
 
@@ -259,7 +259,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
-	public getTooltipText(position: number): string | undefined {
+	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
 		//@todo number formatter + tag
 		let dataItem = this.dataItems[this.axisPositionToIndex(position)];
 

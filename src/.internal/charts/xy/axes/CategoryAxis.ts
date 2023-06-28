@@ -536,7 +536,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @param   position  Position
 	 * @return            Tooltip text
 	 */
-	public getTooltipText(position: number): string | undefined {
+	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
 		//@todo number formatter + tag
 		const dataItem = this.dataItems[this.axisPositionToIndex(position)];
 		if (dataItem) {

@@ -110,6 +110,34 @@ export interface IRootSettings {
 	accessible?: boolean;
 
 	/**
+	 * If set to `true`, the parent inner `<div>` element will become a focusable
+	 * element.
+	 * 
+	 * @since 5.3.17
+	 * @default false
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
+	 */
+	focusable?: boolean;
+
+	/**
+	 * If set to some string, it will be used as inner `<div>` ARIA-LABEL.
+	 *
+	 * Should be used in conjuction with `focusable`.
+	 * 
+	 * @since 5.3.17
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
+	 */
+	ariaLabel?: string;
+
+	/**
+	 * Allows setting a "role" for the innert `<div>`.
+	 * 
+	 * @since 5.3.17
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
+	 */
+	role?: string;
+
+	/**
 	 * Allows for specifying a custom width / height for the chart.
 	 *
 	 * This function will be called automatically when the chart is resized.
@@ -520,6 +548,19 @@ export class Root implements IDisposer {
 	}
 
 	protected _init(): void {
+
+		const settings = this._settings;
+		if (settings.accessible !== false) {
+			if (settings.focusable) {
+				this._inner.setAttribute("focusable", "true");
+				this._inner.setAttribute("tabindex", this.tabindex + "");
+			}
+
+			if (settings.ariaLabel) {
+				this._inner.setAttribute("aria-label", settings.ariaLabel);
+			}
+		}
+
 		const renderer = this._renderer;
 
 		const rect = this._getRealSize();
@@ -590,7 +631,7 @@ export class Root implements IDisposer {
 			focusElementContainer.style.width = width + "px";
 			focusElementContainer.style.height = height + "px";
 
-			focusElementContainer.setAttribute("role", "application");
+			focusElementContainer.setAttribute("role", "graphics-document");
 
 			$utils.setInteractive(focusElementContainer, false);
 			this._focusElementContainer = focusElementContainer;

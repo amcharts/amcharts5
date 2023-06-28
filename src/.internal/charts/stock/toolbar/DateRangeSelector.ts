@@ -309,32 +309,39 @@ export class DateRangeSelector extends StockControl {
 		const xAxis = this._getAxis();
 
 		const minDate = this.get("minDate");
+		const maxDate = this.get("maxDate");
+		const toPicker = this.getPrivate("toPicker");
 		const fromPicker = this.getPrivate("fromPicker");
+
 		if (minDate == "auto") {
 			const min = xAxis.getPrivate("minFinal");
 			if (min) {
 				fromPicker.set("minDate", new Date(min + 1));
+				toPicker.set("minDate", new Date(min + 1));
 			}
 		}
 		else if (minDate instanceof Date) {
 			fromPicker.set("minDate", minDate);
+			toPicker.set("minDate", minDate);
 		}
 		else {
 			fromPicker.set("minDate", undefined);
+			toPicker.set("minDate", undefined);
 		}
 
-		const maxDate = this.get("maxDate");
-		const toPicker = this.getPrivate("toPicker");
 		if (maxDate == "auto") {
 			const min = xAxis.getPrivate("maxFinal");
 			if (min) {
+				fromPicker.set("maxDate", new Date(min));
 				toPicker.set("maxDate", new Date(min));
 			}
 		}
 		else if (maxDate instanceof Date) {
+			fromPicker.set("maxDate", maxDate);
 			toPicker.set("maxDate", maxDate);
 		}
 		else {
+			fromPicker.set("maxDate", undefined);
 			toPicker.set("maxDate", undefined);
 		}
 	}

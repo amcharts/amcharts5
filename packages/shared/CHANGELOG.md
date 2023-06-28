@@ -5,10 +5,31 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.3.17] - 2023-06-28
+
+### Added
+- `getTooltipText()` method on `Axis` has a second parameter `adjustPosition` (default: `true`). Affects only `DateAxis`. If set to `false` will not adjust position before formatting date by base interval.
+- `Root` element now has three additional settings: `focusable`, `ariaLabel`, and `role` (all are empty by default). [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element).
+
+### Changed
+- Accessibility: The `role` of the `<div>` element that holds focusable elements is changed to `graphics-document` (was `application`) to better reflect 	 interactive element. [More info](https://www.w3.org/TR/graphics-aria-1.0/#graphics-document).
+- Accessibility: `<div>` element that holds `<canas>` elements has now `aria-hidden="true"` set.
+- If using `type` with the JSON plugin, it will now always replace the existing Entity instead of merging.
+
+### Fixed
+- `ariaLabel` on horizontal scrollbar grips were being populated to a slightly wider range than actual range of the related `DateAxis`.
+- `ExportingMenu` methods `open()` and `toggle()` were not working when attached to click events on external elements.
+- Stock charts `DateRangeSelector` was allowing pickers to go outside selectable date range.
+- The JSON plugin can now change properties on a `ListTemplate` (like `grid`). [More info](https://www.amcharts.com/docs/v5/concepts/serializing/#Templates).
+- Tooltip was not always hidden when `sprite.hideTooltip()` was called.
+- If a mouse pointer was over a `Sprite` and `tooltipPosition` was changed from `"fixed"` to `"pointer"`, it was not following mouse unless you unhovered and then hovered over sprite again.
+
+
 ## [5.3.16] - 2023-06-13
 
 ### Fixed
 - Legend label's were losing their disabled state if labels were updated by moving cursor.
+- `XYCursor` will no longre freeze when selecting and pointer moves out of plot area.
 - `Treemap`'s focus navigation using arrow keys and `focusableGroup` was not working properly.
 - `Annotator` plugin was sometimes retaining drawings after drawing was cancelled.
 

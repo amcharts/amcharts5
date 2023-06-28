@@ -45,7 +45,7 @@ interface IAdapter<E extends Entity> {
 	callback: (value: E["_settings"][this["key"]], target: E, key: this["key"]) => E["_settings"][this["key"]],
 }
 
-type IParsedProperties = Array<(entity: Entity) => void>;
+type IParsedProperties = Array<(entity: object) => void>;
 
 type IRefs = { [key: string]: any } | Array<{ [key: string]: any }>;
 
@@ -105,16 +105,20 @@ function parseRef<E extends Entity>(value: string, refs: Array<IRef>): IParsed<E
 }
 
 
-function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): void {
-	if (parsed.adapters) {
-		$array.each(parsed.adapters, (adapter) => {
-			entity.adapters.add(adapter.key, adapter.callback);
-		});
-	}
-
+function mergeObject<E extends Entity>(entity: object, parsed: IParsedEntity<E>): void {
 	if (parsed.properties) {
 		$array.each(parsed.properties, (fn) => {
 			fn(entity);
+		});
+	}
+}
+
+function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): void {
+	mergeObject(entity, parsed);
+
+	if (parsed.adapters) {
+		$array.each(parsed.adapters, (adapter) => {
+			entity.adapters.add(adapter.key, adapter.callback);
 		});
 	}
 
@@ -130,6 +134,14 @@ function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): voi
 			});
 		}
 	}
+}
+
+function mergeExisting<E extends Entity>(entity: E, parsed: IParsedEntity<E>): void {
+	if (parsed.settings) {
+		entity.setAll(parsed.settings);
+	}
+
+	mergeEntity(entity, parsed);
 }
 
 
@@ -265,36 +277,41 @@ class ParserState {
 		return $array.map($object.keys(object), (key) => {
 			const parsed = this.parseValue(root, object[key], refs);
 
-			return (entity: Entity) => {
+			return (entity: object) => {
 				const run = () => {
 					const old = entity[key] as unknown;
 
-					if (old && old instanceof Entity) {
-						// TODO merge it if the value is an Entity
+					if (old) {
 						if (parsed.isValue) {
-							throw new Error("Cannot merge value into Entity");
-						}
+							// Merge Array into List
+							if ($type.isArray(parsed.value)) {
+								$array.each(parsed.value, (value) => {
+									(old as any).push(value);
+								});
 
-						if (parsed.settings) {
-							old.setAll(parsed.settings);
-						}
+							} else {
+								(entity as any)[key] = parsed.value;
+							}
 
-						mergeEntity(old, parsed);
+						} else if (parsed.construct) {
+							(entity as any)[key] = constructEntity(root, parsed);
 
-					} else if (parsed.isValue) {
-						// Merge Array into List
-						if (old && $type.isArray(parsed.value)) {
-							$array.each(parsed.value, (value) => {
-								(old as any).push(value);
-							});
+						// Merge into existing Entity or Template
+						} else if (old instanceof Entity || old instanceof Template) {
+							mergeExisting(old as Entity, parsed);
 
+						// Merge into existing object
 						} else {
-							// TODO merge it if the value is an Entity
-							(entity as any)[key] = parsed.value;
+							mergeObject(old as object, parsed);
 						}
 
 					} else {
-						(entity as any)[key] = constructEntity(root, parsed);
+						if (parsed.isValue) {
+							(entity as any)[key] = parsed.value;
+
+						} else {
+							(entity as any)[key] = constructEntity(root, parsed);
+						}
 					}
 				};
 

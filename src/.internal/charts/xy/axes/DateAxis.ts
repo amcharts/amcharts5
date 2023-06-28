@@ -118,9 +118,10 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * A value which indicates relative position within axis cell to get timestamp
 	 * for the tooltip from.
 	 *
-	 * Values are from `0` (zero) to `1` (one), meaning start and end of the cell.
+	 * Values are from `-1` to `1`.
 	 *
-	 * If not set, it will use cell's start tiemstamp.
+	 * If not set, it will use `tooltipLocation` value, if `tooltipLocation`` is
+	 * not set, it will use -0.5.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
 	 * @since 5.1.4
@@ -924,10 +925,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	/**
 	 * Returns text to be used in an axis tooltip for specific relative position.
 	 *
-	 * @param   position  Position
-	 * @return            Tooltip text
+	 * NOTE: Unless `adjustPosition` (2nd parameter) is set to `false`, the method
+	 * will adjust position by `tooltipIntervalOffset`.
+	 *
+	 * @param  position        Position
+	 * @param  adjustPosition  Adjust position
+	 * @return                 Tooltip text
 	 */
-	public getTooltipText(position: number): string | undefined {
+	public getTooltipText(position: number, adjustPosition?: boolean): string | undefined {
 		//@todo number formatter + tag
 		if (this.getPrivate("min") != null) {
 			let format = this.get("tooltipDateFormats")![this.getPrivate("baseInterval").timeUnit];
@@ -936,7 +941,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			let baseInterval = this.getPrivate("baseInterval");
 			let duration = $time.getDateIntervalDuration(baseInterval, date, this._root.locale.firstDayOfWeek, this._root.utc, this._root.timezone);
-			return this._root.dateFormatter.format(new Date(value + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration), this.get("tooltipDateFormat", format));
+
+			if (adjustPosition !== false) {
+				date = new Date(value + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration)
+			}
+
+			return this._root.dateFormatter.format(date, this.get("tooltipDateFormat", format));
 		}
 		return "";
 	}

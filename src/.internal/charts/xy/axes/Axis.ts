@@ -1006,10 +1006,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * Returns text to be used in an axis tooltip for specific relative position.
 	 *
-	 * @param   position  Position
-	 * @return            Tooltip text
+	 * @param   position        Position
+	 * @param   adjustPosition  Adjust position
+	 * @return                  Tooltip text
 	 */
-	public abstract getTooltipText(position: number): string | undefined;
+	public abstract getTooltipText(position: number, adjustPosition?: boolean): string | undefined;
 
 	/**
 	 * @ignore

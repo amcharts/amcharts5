@@ -14,6 +14,8 @@ export interface ILabelSettings extends IContainerSettings {
 
 	/**
 	 * Labels' text.
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/text-styling/} for text styling info
+	 * 
 	 */
 	text?: string;
 

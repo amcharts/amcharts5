@@ -184,7 +184,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		start = $math.fitToRange(start, min, max);
 		end = $math.fitToRange(end, min, max);
 		this.zoom(this.valueToPosition(start), this.valueToPosition(end), duration);
-	}	
+	}
 
 	protected _prepareAxisItems() {
 		let startTime = this.getPrivate("selectionMin", 0);

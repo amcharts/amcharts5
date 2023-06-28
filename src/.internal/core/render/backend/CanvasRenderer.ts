@@ -3090,6 +3090,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 
 		this.view.style.position = "absolute";
+		this.view.setAttribute("aria-hidden", "true");
 		this.view.appendChild(this._layerDom);
 
 		this._disposers.push(new Disposer(() => {

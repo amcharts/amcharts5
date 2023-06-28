@@ -288,7 +288,7 @@ export class ExportingMenu extends Entity {
 							else {
 								newItem = items[newIndex];
 							}
-						} while(!newItem);
+						} while (!newItem);
 
 						if (newItem) {
 							this._handleItemFocus(newItem);
@@ -533,12 +533,17 @@ export class ExportingMenu extends Entity {
 	 * Opens menu.
 	 */
 	public open(): void {
-		this.isOpen = true;
-		this._applyClassNames();
-		this.events.dispatch("menuopened", {
-			type: "menuopened",
-			target: this
-		});
+		this.setTimeout(() => {
+			this.isOpen = true;
+			if (this.get("deactivateRoot")) {
+				this._root._renderer.interactionsEnabled = false;
+			}
+			this._applyClassNames();
+			this.events.dispatch("menuopened", {
+				type: "menuopened",
+				target: this
+			});
+		}, 1);
 	}
 
 	/**

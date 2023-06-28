@@ -118,6 +118,17 @@ am5plugins_json.JsonParser.new(root).parse({
           type: "AxisRendererX",
           settings: {
             pan: "zoom"
+          },
+          properties: {
+            grid: {
+              properties: {
+                template: {
+                  settings: {
+                    forceHidden: true
+                  }
+                }
+              }
+            }
           }
         },
         tooltip: {

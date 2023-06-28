@@ -2,6 +2,7 @@ import { Entity, IEntitySettings, IEntityPrivate } from "../../../core/util/Enti
 import type { Sprite } from "../../../core/render/Sprite";
 import type { Axis } from "./Axis";
 import type { AxisRenderer } from "./AxisRenderer";
+import * as $object from "../../../core/util/Object";
 
 export interface IAxisBulletSettings extends IEntitySettings {
 
@@ -69,5 +70,18 @@ export class AxisBullet extends Entity {
 				this.axis._prepareDataItem(dataItem as any)
 			}
 		}
+	}
+
+	public dispose() {
+		const axis = this.axis;
+		if (axis) {
+			$object.each(axis._bullets, (key, bullet) => {
+				if (bullet.uid == this.uid) {
+					delete axis._bullets[key];
+				}
+			})
+		}
+
+		super.dispose();
 	}
 }
