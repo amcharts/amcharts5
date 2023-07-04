@@ -94,7 +94,7 @@ export class Partition extends Hierarchy {
 	public static classNames: Array<string> = Hierarchy.classNames.concat([Partition.className]);
 
 	/**
-	 * A list of node rectangle elements in a [[LinkedHierarchy]] chart.
+	 * A list of node rectangle elements in a [[Partition]] chart.
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */

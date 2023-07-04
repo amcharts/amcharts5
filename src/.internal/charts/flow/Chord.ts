@@ -1,5 +1,4 @@
 import type { DataItem } from "../../core/render/Component";
-import type { RadialLabel } from "../../core/render/RadialLabel";
 
 import { Flow, IFlowSettings, IFlowDataItem, IFlowPrivate, IFlowEvents } from "./Flow";
 import { chord, ribbon, RibbonGenerator, RibbonSubgroup, Ribbon } from "d3-chord";
@@ -21,11 +20,6 @@ export interface IChordDataItem extends IFlowDataItem {
 	 * A link element.
 	 */
 	link: ChordLink;
-
-	/**
-	 * A label element.
-	 */
-	label: RadialLabel;
 
 	/**
 	 * Source node data item.
@@ -287,17 +281,6 @@ export class Chord extends Flow {
 				ribbon.context(display as any);
 				ribbon(chordLayoutItem);
 			})
-		}
-	}
-
-	/**
-	 * @ignore
-	 */
-	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
-		super.disposeDataItem(dataItem);
-		let label = dataItem.get("label");
-		if (label) {
-			label.dispose();
 		}
 	}
 }

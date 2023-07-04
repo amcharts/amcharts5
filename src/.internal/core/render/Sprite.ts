@@ -1642,8 +1642,8 @@ export abstract class Sprite extends Entity {
 	 * @ignore
 	 */
 	public markDirtyBounds(): void {
+		const display = this._display;
 		if (this.get("isMeasured")) {
-			const display = this._display;
 			this._root._addDirtyBounds(this);
 			display.isMeasured = true;
 			display.invalidateBounds();
@@ -1847,7 +1847,7 @@ export abstract class Sprite extends Entity {
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
 		if (tooltip) {
-			if (tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this) || this.get("tooltip") == tooltip) {	
+			if (tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this) || this.get("tooltip") == tooltip) {
 				let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
 				const promise = tooltip.hide(timeout);
 				this.setPrivateRaw("showingTooltip", false);

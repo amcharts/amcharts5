@@ -313,7 +313,6 @@ export abstract class Hierarchy extends Series {
 	protected _afterNew() {
 		this._defaultThemes.push(HierarchyDefaultTheme.new(this._root));
 		this.fields.push("category", "childData", "disabled", "fill");
-
 		this.children.push(this.bulletsContainer);
 
 		super._afterNew();

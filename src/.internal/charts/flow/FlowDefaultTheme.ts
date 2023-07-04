@@ -7,6 +7,7 @@ import { ColorSet } from "../../core/util/ColorSet";
 import { setColor } from "../../themes/DefaultTheme";
 
 import * as $array from "../../core/util/Array";
+import * as $ease from "../../core/util/Ease";
 
 
 /**
@@ -252,5 +253,67 @@ export class FlowDefaultTheme extends Theme {
 
 		r("Graphics", ["chord", "link", "shape", "basic"]).states.create("hover", { strokeWidth: 2, strokeOpacity: 1 });
 
+
+		/**
+		 * ------------------------------------------------------------------------
+		 * charts/flow: ArcDiagram
+		 * ------------------------------------------------------------------------
+		 */
+
+		r("ArcDiagram").setAll({
+			orientation: "horizontal",
+			nodePadding: 5,
+			minRadius: 5,
+			radiusKey: "sum",
+			animationEasing: $ease.out($ease.cubic)
+		});
+
+		r("ArcDiagramNodes", ["horizontal"]).setAll({
+			y: p100,
+			centerY: p100
+		});
+
+		r("ArcDiagramNodes", ["vertical"]).setAll({
+			centerX: 0
+		});
+
+		r("Circle", ["arcdiagram", "node", "shape"]).setAll({
+			tooltipText: "{name}: {sum}"
+		});
+
+		{
+			const rule = r("ArcDiagramLink", ["link", "shape"]);
+
+			rule.setAll({
+				strokeOpacity: 0.15,
+				strokeStyle: "solid",
+				fillStyle: "none",
+				isMeasured: false
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
+
+		r("ArcDiagramLink", ["link", "shape"]).states.create("hover", {
+			strokeOpacity: 1			
+		});
+
+		r("Label", ["arcdiagram", "node"]).setAll({
+			text: "{name}",
+			populateText: true
+		});
+
+		r("Label", ["arcdiagram", "horizontal"]).setAll({
+			y: 0,
+			centerY: p50,
+			centerX: p100,
+			rotation: -90
+		});
+
+		r("Label", ["arcdiagram", "vertical"]).setAll({
+			centerY: p50,
+			centerX: p100,
+			paddingRight: 15
+		});
 	}
 }

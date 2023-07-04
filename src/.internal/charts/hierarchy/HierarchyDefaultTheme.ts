@@ -445,5 +445,59 @@ export class HierarchyDefaultTheme extends Theme {
 		}
 
 
+		/**
+		 * ------------------------------------------------------------------------
+		 * charts/hierarchy: Voronoi Treemap
+		 * ------------------------------------------------------------------------
+		 */
+
+		{
+			r("VoronoiTreemap").setAll({
+				type: "polygon",
+				minWeightRatio: 0.005,
+				convergenceRatio: 0.005,
+				maxIterationCount: 100,
+				singleBranchOnly: true
+			})
+		}
+
+		{
+			const rule = r("Graphics", ["voronoitreemap", "node", "shape"]);
+
+			rule.setAll({
+				strokeOpacity: 1,
+				strokeWidth: 1,
+				fillOpacity: 1
+			});
+
+			setColor(rule, "stroke", ic, "background");
+		}
+
+		{
+			r("Polygon", ["hierarchy", "node", "shape", "depth1"]).setAll({
+				strokeWidth: 3
+			});
+		}
+
+		{
+			const rule = r("Label", ["voronoitreemap"]);
+
+			rule.setAll({
+				centerY: p50,
+				centerX: p50,
+				paddingBottom: 1,
+				paddingTop: 1,
+				paddingLeft: 1,
+				paddingRight: 1,
+				populateText: true,
+				text: "{category}",
+				oversizedBehavior: "fit",
+				minScale: 0.4,
+				layer: 30
+			});
+
+			setColor(rule, "fill", ic, "alternativeText");
+		}
+
 	}
 }

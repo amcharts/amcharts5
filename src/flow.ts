@@ -14,5 +14,9 @@ export { Sankey, ISankeySettings, ISankeyDataItem, ISankeyEvents, ISankeyPrivate
 export { SankeyLink, ISankeyLinkSettings, ISankeyLinkPrivate } from "./.internal/charts/flow/SankeyLink";
 export { SankeyNodes, ISankeyNodesSettings, ISankeyNodesDataItem, ISankeyNodesEvents, ISankeyNodesPrivate } from "./.internal/charts/flow/SankeyNodes";
 
+export { ArcDiagram, IArcDiagramSettings, IArcDiagramDataItem, IArcDiagramEvents, IArcDiagramPrivate } from "./.internal/charts/flow/ArcDiagram";
+export { ArcDiagramLink, IArcDiagramLinkSettings, IArcDiagramLinkPrivate } from "./.internal/charts/flow/ArcDiagramLink";
+export { ArcDiagramNodes, IArcDiagramNodesSettings, IArcDiagramNodesDataItem, IArcDiagramNodesEvents, IArcDiagramNodesPrivate } from "./.internal/charts/flow/ArcDiagramNodes";
+
 import { FlowDefaultTheme } from "./.internal/charts/flow/FlowDefaultTheme";
 export { FlowDefaultTheme as DefaultTheme };

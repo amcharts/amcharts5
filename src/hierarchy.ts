@@ -14,5 +14,7 @@ export { Sunburst, ISunburstSettings, ISunburstDataItem, ISunburstDataObject, IS
 export { Tree, ITreeSettings, ITreeDataItem, ITreeDataObject, ITreeEvents, ITreePrivate } from "./.internal/charts/hierarchy/Tree";
 export { Treemap, ITreemapSettings, ITreemapDataItem, ITreemapDataObject, ITreemapPrivate } from "./.internal/charts/hierarchy/Treemap";
 
+export { VoronoiTreemap, IVoronoiTreemapDataItem, IVoronoiTreemapDataObject, IVoronoiTreemapPrivate, IVoronoiTreemapSettings } from "./.internal/charts/hierarchy/VoronoiTreemap";
+
 import { HierarchyDefaultTheme } from "./.internal/charts/hierarchy/HierarchyDefaultTheme";
 export { HierarchyDefaultTheme as DefaultTheme };

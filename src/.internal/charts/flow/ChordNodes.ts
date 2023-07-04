@@ -68,10 +68,16 @@ export class ChordNodes extends FlowNodes {
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
-	public readonly rectangles: ListTemplate<Slice> = new ListTemplate(
+	public readonly slices: ListTemplate<Slice> = new ListTemplate(
 		Template.new({}),
-		() => Slice._new(this._root, { themeTags: ["shape"] }, [this.rectangles.template])
+		() => Slice._new(this._root, { themeTags: ["shape"] }, [this.slices.template])
 	);
+
+	/**
+	 * @ignore
+	 * added to solve old naming bug
+	 */
+	public readonly rectangles = this.slices;
 
 	/**
 	 * @ignore
@@ -79,7 +85,7 @@ export class ChordNodes extends FlowNodes {
 	public makeNode(dataItem: DataItem<this["_dataItemSettings"]>): FlowNode {
 		const node = super.makeNode(dataItem, "chord");
 
-		const slice = node.children.insertIndex(0, this.rectangles.make());
+		const slice = node.children.insertIndex(0, this.slices.make());
 		dataItem.set("slice", slice);
 		slice._setSoft("fill", dataItem.get("fill"));
 
@@ -135,6 +141,18 @@ export class ChordNodes extends FlowNodes {
 					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.disposeDataItem(dataItem);
+		let slice = dataItem.get("slice");
+		if (slice) {
+			this.slices.removeValue(slice);
+			slice.dispose();
 		}
 	}
 }

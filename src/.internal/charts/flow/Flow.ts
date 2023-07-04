@@ -405,7 +405,7 @@ export abstract class Flow extends Series {
 
 			case "target":
 				link.set("stroke", targetFill);
-
+				break;
 			case "gradient":
 				let gradient = link._strokeGradient;
 				if (!gradient) {

@@ -30,5 +30,7 @@ export class AnimatedTheme extends Theme {
 		});
 
 		this.rule("WordCloud").set("animationDuration", 500);
+		this.rule("Polygon").set("animationDuration", 600);
+		this.rule("ArcDiagram").set("animationDuration", 600);
 	}
 }

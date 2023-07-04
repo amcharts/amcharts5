@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.0] - 2023-07-04
+
+### Added
+- New hierarchy-based series: Voronoi Treemap. [More info](https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/).
+- New flow-based series: Arc Diagram. [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/arc-diagram/).
+
+### Changed
+- Label wrapping mechanism will now treat a [zero-width space](https://en.wikipedia.org/wiki/Zero-width_space) character as a word break.
+
+
 ## [5.3.17] - 2023-06-28
 
 ### Added

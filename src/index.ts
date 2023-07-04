@@ -9,6 +9,7 @@ export { IDisposer, Disposer, ArrayDisposer, MultiDisposer, MutableValueDisposer
 export { Bullet, IBulletSettings, IBulletPrivate } from "./.internal/core/render/Bullet";
 export { Button, IButtonSettings, IButtonPrivate } from "./.internal/core/render/Button";
 export { Circle, ICircleSettings, ICirclePrivate } from "./.internal/core/render/Circle";
+export { Polygon, IPolygonSettings, IPolygonPrivate } from "./.internal/core/render/Polygon";
 export { Ellipse, IEllipseSettings, IEllipsePrivate } from "./.internal/core/render/Ellipse";
 export { Star, IStarSettings, IStarPrivate } from "./.internal/core/render/Star";
 export { Component, DataItem, IComponentSettings, IComponentPrivate, IComponentEvents } from "./.internal/core/render/Component";

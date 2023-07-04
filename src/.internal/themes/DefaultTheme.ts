@@ -467,6 +467,10 @@ export class DefaultTheme extends Theme {
 			//layer: 100
 		});
 
+		r("Polygon").setAll({
+			animationEasing: $ease.out($ease.cubic),
+		});		
+
 		{
 			const rule = r("PointedRectangle", ["tooltip", "background"]);
 
