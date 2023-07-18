@@ -60,6 +60,10 @@ export class BollingerBands extends MovingAverage {
 		name: this.root.language.translateAny("Period"),
 		type: "number"
 	}, {
+		key: "standardDeviations",
+		name: this.root.language.translateAny("Deviation"),
+		type: "number"
+	}, {
 		key: "upperColor",
 		name: this.root.language.translateAny("Upper"),
 		type: "color"
@@ -122,6 +126,15 @@ export class BollingerBands extends MovingAverage {
 		super._afterNew();
 		this.series.addTag("bollingerbands");
 		this.series._applyThemes();
+	}
+
+	public _prepareChildren() {
+
+		if (this.isDirty("standardDeviations")) {
+			this._dataDirty = true;
+		}
+
+		super._prepareChildren();
 	}
 
 	public _updateChildren() {

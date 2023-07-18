@@ -402,5 +402,6 @@ export abstract class MapSeries extends Series {
 	protected _onDataClear() {
 		super._onDataClear();
 		this._geoJSONparsed = false;
-	}
+		this._markDirtyKey("exclude");
+	}	
 }

@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.ą] - 2023-07-18
+
+### Added
+- All Flow (Sankey, Chord and Arc) nodes can be toggled (on by default). [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).
+- New `Flow` settings added: `hiddenSize` and `minHiddenValue`. [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).
+- Deviation added to editable `BolingerBand` settings (`StockChart`).
+
+### Changed
+- `Chord`'s default value of `"sort"` changed from `"descending"` to `"none"`.  This change was necessary for the new feature of [toggling nodes](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).
+
+### Fixed
+- `Label` with wrapping/truncation, containing only symbols like question mark could make the whole chart break in a dead loop.
+- `exclude`/`include` settings on `MapSeries` was being ignored when new data was set for the series.
+- `LineSeries` was not being included in the caluclation of min/max of the vertical `ValueAxis` if it did not have any data points in current zoom scope of the horizontal `DateAxis`.
+
+
 ## [5.4.0] - 2023-07-04
 
 ### Added

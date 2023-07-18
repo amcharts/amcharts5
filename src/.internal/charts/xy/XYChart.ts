@@ -1127,7 +1127,7 @@ export class XYChart extends SerialChart {
 	public _updateCursor() {
 		let cursor = this.get("cursor");
 		if (cursor) {
-			cursor.handleMove();
+			cursor.updateCursor();
 		}
 	}
 
@@ -1397,7 +1397,19 @@ export class XYChart extends SerialChart {
 	/**
 	 * @ignore
 	 */
-	public processAxis(_axis: Axis<AxisRenderer>) { };
+	public processAxis(axis: Axis<AxisRenderer>) {
+		var cursor = this.get("cursor");
+		if (cursor) {
+			this.addDisposer(axis.on("start", () => {
+				this._updateCursor();
+			}))
+
+			this.addDisposer(axis.on("end", () => {
+				this._updateCursor();
+			}))
+		}
+	}
+
 
 	public _handleAxisSelection(axis: Axis<any>, force?: boolean) {
 

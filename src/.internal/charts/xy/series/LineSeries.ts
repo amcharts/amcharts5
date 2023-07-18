@@ -281,9 +281,10 @@ export class LineSeries extends XYSeries {
 					})
 					if (hasValues && strokeTemplateFound && fillTemplateFound) {
 						startIndex = i;
-						break
+						break;
 					}
 				}
+
 
 				let len = this.dataItems.length;
 				let endIndex = this.endIndex();
@@ -305,7 +306,7 @@ export class LineSeries extends XYSeries {
 					}
 				}
 				if (startIndex > 0) {
-					startIndex--
+					startIndex--;
 				}
 
 				this._endIndex = endIndex;

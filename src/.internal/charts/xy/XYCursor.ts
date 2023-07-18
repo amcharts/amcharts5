@@ -463,6 +463,13 @@ export class XYCursor extends Container {
 		})
 	}
 
+	public updateCursor(){
+		if (this.get("alwaysShow")) {
+			this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));			
+		}		
+		this.handleMove();
+	}
+
 	public _setChart(chart: XYChart): void {
 		this.chart = chart;
 
@@ -472,10 +479,7 @@ export class XYCursor extends Container {
 
 		this.events.on("boundschanged", () => {
 			this._disposers.push(this.setTimeout(() => {
-				if (this.get("alwaysShow")) {
-					this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
-					this.handleMove();
-				}
+				this.updateCursor();
 			}, 50))
 		})
 

@@ -2272,7 +2272,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			}
 			else {
 				let tmp = text.replace(/[^,;:!?\\\/\s​]+[,;:!?\\\/\s​]*$/g, "");
-				if (tmp == "" && fallbackBreakWords) {
+				if ((tmp == "" || tmp === text) && fallbackBreakWords) {
 					breakWords = true;
 				}
 				else if (tmp == "") {

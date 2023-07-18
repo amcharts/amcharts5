@@ -31,7 +31,10 @@ export class FlowDefaultTheme extends Theme {
 			paddingLeft: 10,
 			paddingRight: 10,
 			paddingTop: 10,
-			paddingBottom: 10
+			paddingBottom: 10,
+			hiddenSize: 0.05,
+			minSize: 0,
+			minHiddenValue: 0
 		});
 
 		r("FlowNodes").setAll({
@@ -40,14 +43,24 @@ export class FlowDefaultTheme extends Theme {
 			legendValueText: "{sumOutgoing.formatNumber('#.#')}"
 		});
 
-		r("FlowNode").setAll({
 
-		});
+		r("FlowNode").setAll({
+			setStateOnChildren: true,
+			cursorOverStyle: "pointer",
+			toggleKey: "disabled"
+		})
+
+
+		r("FlowNode").states.create("disabled", {}); // do not remove
 
 		r("FlowNode", ["unknown"]).setAll({
 			draggable: false,
 			opacity: 0
 		});
+
+		r("Label", ["flow"]).states.create("disabled", {
+			fill: ic.get("disabled")
+		})
 
 		r("RadialLabel", ["flow", "node"]).setAll({
 			text: "{name}",
@@ -134,6 +147,10 @@ export class FlowDefaultTheme extends Theme {
 			cornerRadiusBR: 0
 		});
 
+		r("RoundedRectangle", ["shape"]).states.create("disabled", {
+			fill: ic.get("disabled")
+		})
+
 		r("SankeyLink").setAll({
 			controlPointDistance: 0.2
 		});
@@ -174,6 +191,7 @@ export class FlowDefaultTheme extends Theme {
 			paddingTop: 15
 		});
 
+
 		/**
 		 * ------------------------------------------------------------------------
 		 * charts/flow: Chord
@@ -185,7 +203,7 @@ export class FlowDefaultTheme extends Theme {
 			nodeWidth: 10,
 			padAngle: 1,
 			startAngle: 0,
-			sort: "descending"
+			sort:"none"
 		});
 
 		r("ChordDirected").setAll({
@@ -211,6 +229,10 @@ export class FlowDefaultTheme extends Theme {
 
 		r("Slice", ["chord", "node", "shape"]).setAll({
 			cornerRadius: 0
+		})
+
+		r("Slice", ["shape"]).states.create("disabled", {
+			fill: ic.get("disabled")
 		})
 
 		r("RadialLabel", ["chord", "node"]).setAll({
@@ -281,6 +303,10 @@ export class FlowDefaultTheme extends Theme {
 			tooltipText: "{name}: {sum}"
 		});
 
+		r("Circle", ["arcdiagram", "node", "shape"]).states.create("disabled", {
+			fill: ic.get("disabled")
+		})
+
 		{
 			const rule = r("ArcDiagramLink", ["link", "shape"]);
 
@@ -295,7 +321,7 @@ export class FlowDefaultTheme extends Theme {
 		}
 
 		r("ArcDiagramLink", ["link", "shape"]).states.create("hover", {
-			strokeOpacity: 1			
+			strokeOpacity: 1
 		});
 
 		r("Label", ["arcdiagram", "node"]).setAll({

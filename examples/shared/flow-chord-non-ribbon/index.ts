@@ -53,12 +53,18 @@ series.nodes.labels.template.setAll({
   radius: -5
 });
 
-series.nodes.bullets.push((_root, _series, dataItem) => {
+series.nodes.labels.template.states.create("disabled", { fill: am5.color(0xffffff) });
+
+series.nodes.bullets.push(function(_root, _series, dataItem) {
+  const sprite = am5.Circle.new(root, {
+    radius: 20,
+    fill: dataItem.get("fill")
+  });
+
+  sprite.states.create("hidden", { fill: root.interfaceColors.get("disabled") })
+
   return am5.Bullet.new(root, {
-    sprite: am5.Circle.new(root, {
-      radius: 20,
-      fill: dataItem.get("fill")
-    })
+    sprite: sprite
   });
 });
 

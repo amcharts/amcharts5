@@ -90,17 +90,44 @@ export interface IFlowSettings extends ISeriesSettings {
 	nodePadding?: number;
 
 	/**
-	 * Minimum size of the node/link.
+	 * Minimum size of the link.
 	 * 
 	 * It's a relative value to the sum of all values in the series. If set,
 	 * this relative value will be used for small value nodes when calculating
 	 * their size. For example, if it's set to `0.01`, small nodes will be
 	 * sized like their value is 1% of the total sum of all values in series.
-	 *
+	 * 
+	 * @default 0
 	 * @since 5.1.5
 	 */
 	minSize?: number;
 
+	/**
+	 * Relative size of hidden links.
+	 * 
+	 * Links are hidden when user clicks on nodes (if `toggleKey` on nodes is set
+	 * to `"disabled"`).
+	 * 
+	 * This allows hidden node to remain visible so that user could click on it
+	 * again to show it and its links.
+	 * 
+	 * @default 0.05
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling} for more info
+	 * @since 5.4.1
+	 */
+	hiddenSize?: number;
+
+	/**
+	 * Minimum value of hidden links.
+	 * 
+	 * Links are hidden when user clicks on nodes (if `toggleKey` on nodes is set
+	 * to `"disabled"`).
+	 * 
+	 * @default 0
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling} for more info
+	 * @since 5.4.1
+	 */
+	minHiddenValue?: number;
 }
 
 export interface IFlowPrivate extends ISeriesPrivate {
@@ -146,7 +173,7 @@ export abstract class Flow extends Series {
 	protected _nodesData: d3sankey.SankeyNodeMinimal<{}, {}>[] = [];
 	protected _linksData: { source: d3sankey.SankeyNodeMinimal<{}, {}>, target: d3sankey.SankeyNodeMinimal<{}, {}>, value: number }[] = [];
 	protected _index = 0;
-	protected _nodesDataSet:boolean = false;
+	protected _nodesDataSet: boolean = false;
 
 	protected _linksByIndex: { [index: string]: any } = {};
 	protected _afterNew() {
@@ -247,12 +274,12 @@ export abstract class Flow extends Series {
 	}
 
 	protected _onDataClear() {
-		if(!this.nodes._userDataSet){
+		if (!this.nodes._userDataSet) {
 			this.nodes.data.setAll([]);
 			this.nodes._userDataSet = false;
 		}
 
-	}		
+	}
 
 	public _prepareChildren() {
 		super._prepareChildren();
@@ -463,7 +490,12 @@ export abstract class Flow extends Series {
 
 		const easing = hiddenState.get(stateAnimationEasing, this.get(stateAnimationEasing));
 
-		promises.push(dataItem.animate({ key: "valueWorking" as any, to: 0, duration: duration, easing: easing }).waitForStop());
+		promises.push(dataItem.animate({
+			key: "valueWorking" as any,
+			to: Math.max(this.get("minHiddenValue", 0), this.get("hiddenSize", 0) * dataItem.get("value")),
+			duration: duration,
+			easing: easing
+		}).waitForStop());
 
 		const linkGraphics = dataItem.get("link");
 		linkGraphics.hide();

@@ -157,7 +157,7 @@ export abstract class FlowNodes extends Series {
 	 */
 	public readonly labels: ListTemplate<Label> = new ListTemplate(
 		Template.new({}),
-		() => Label._new(this._root, {}, [this.labels.template])
+		() => Label._new(this._root, { themeTags: ["flow"] }, [this.labels.template])
 	);
 
 	/**
@@ -233,6 +233,21 @@ export abstract class FlowNodes extends Series {
 		node._setDataItem(dataItem);
 		node.series = this;
 
+		node.events.on("click", (e) => {
+			const node = e.target;
+			if (node.get("toggleKey") == "disabled") {
+				const dataItem = node.dataItem as DataItem<IFlowNodesDataItem>;
+				if (dataItem) {
+					if (dataItem.isHidden()) {
+						this.enableDataItem(dataItem);
+					}
+					else {
+						this.disableDataItem(dataItem);
+					}
+				}
+			}
+		})
+
 		dataItem.set("node", node);
 		return node;
 	}
@@ -288,6 +303,12 @@ export abstract class FlowNodes extends Series {
 	public async showDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
 		const promises = [super.showDataItem(dataItem, duration)];
 		const flow = this.flow;
+
+		const node = dataItem.get("node");
+		if (node) {
+			node.show();
+		}
+
 		if (flow) {
 
 			let label = dataItem.get("label");
@@ -325,6 +346,12 @@ export abstract class FlowNodes extends Series {
 		const promises = [super.hideDataItem(dataItem, duration)];
 
 		const flow = this.flow;
+
+		const node = dataItem.get("node");
+		if (node) {
+			node.hide();
+		}
+
 		if (flow) {
 
 			let label = dataItem.get("label");
@@ -344,7 +371,6 @@ export abstract class FlowNodes extends Series {
 			links = dataItem.get("incomingLinks");
 
 			if (links) {
-
 				$array.each(links, (link) => {
 					flow.hideDataItem(link, duration);
 				})
@@ -352,4 +378,81 @@ export abstract class FlowNodes extends Series {
 		}
 		await promises;
 	}
+
+	/**
+	 * Shows node's data item.
+	 *
+	 * @param   dataItem  Data item
+	 * @param   duration  Animation duration in milliseconds
+	 * @return            Promise
+	 */
+	public async enableDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
+		const promises = [super.showDataItem(dataItem, duration)];
+		const flow = this.flow;
+
+		if (flow) {
+
+			let label = dataItem.get("label");
+
+			if (label) {
+				label.set("disabled", false);
+			}
+
+			let links = dataItem.get("outgoingLinks");
+			if (links) {
+				$array.each(links, (link) => {
+					flow.showDataItem(link, duration);
+				})
+			}
+
+			links = dataItem.get("incomingLinks");
+			if (links) {
+				$array.each(links, (link) => {
+					flow.showDataItem(link, duration);
+				})
+			}
+		}
+
+		await promises;
+	}
+
+	/**
+	 * Hides series's data item.
+	 *
+	 * @param   dataItem  Data item
+	 * @param   duration  Animation duration in milliseconds
+	 * @return            Promise
+	 */
+	public async disableDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
+		const promises = [super.hideDataItem(dataItem, duration)];
+
+		const flow = this.flow;
+
+		if (flow) {
+
+			let label = dataItem.get("label");
+
+			if (label) {
+				label.set("disabled", true);
+			}
+
+			let links = dataItem.get("outgoingLinks");
+
+			if (links) {
+				$array.each(links, (link) => {
+					flow.hideDataItem(link, duration);
+				})
+			}
+
+			links = dataItem.get("incomingLinks");
+
+			if (links) {
+				$array.each(links, (link) => {
+					flow.hideDataItem(link, duration);
+				})
+			}
+		}
+		await promises;
+	}
+
 }

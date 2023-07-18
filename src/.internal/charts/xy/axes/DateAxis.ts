@@ -568,9 +568,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					});
 
 					let endIndex = end.index;
-
 					let endIndex2 = endIndex;
-					if (endIndex2 > 0) {
+
+					if (endIndex2 > 1) {
 						endIndex2--;
 					}
 
