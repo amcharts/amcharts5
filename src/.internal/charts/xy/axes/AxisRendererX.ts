@@ -134,7 +134,9 @@ export class AxisRendererX extends AxisRenderer {
 		return (point2.x - point1.x) / this.width();
 	}
 
-
+	/**
+	 * @ignore
+	 */
 	public toAxisPosition(position: number): number {
 		const start = this._start || 0;
 		const end = this._end || 1;
@@ -152,7 +154,30 @@ export class AxisRendererX extends AxisRenderer {
 		return position;
 	}
 
+	/**
+	 * @ignore
+	 */
+	public toGlobalPosition(position: number): number {
+		const start = this._start || 0;
+		const end = this._end || 1;
 
+		if (!this.get("inversed")) {
+			position = position - start;
+		}
+		else {
+			position = end - position;
+		}
+
+		position = position / (end - start) * this._lc
+
+		position += this._ls;
+
+		return position;
+	}
+
+	/**
+	 * @ignore
+	 */
 	public _updateLC() {
 		const axis = this.axis;
 		const parent = axis.parent;
@@ -163,6 +188,9 @@ export class AxisRendererX extends AxisRenderer {
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
 	public _updatePositions() {
 		const axis = this.axis;
 		const x = axis.x() - $utils.relativeToValue(axis.get("centerX", 0), axis.width()) - axis.parent!.get("paddingLeft", 0);
@@ -362,7 +390,7 @@ export class AxisRendererX extends AxisRenderer {
 				let bulletPosition = this.axis.roundAxisPosition(position, location);
 				let previousBullet = this.axis._bullets[bulletPosition];
 				let d = -1;
-				if(this.get("opposite")){
+				if (this.get("opposite")) {
 					d = 1;
 				}
 

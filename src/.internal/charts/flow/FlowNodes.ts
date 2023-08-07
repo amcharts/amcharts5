@@ -109,6 +109,12 @@ export interface IFlowNodesSettings extends ISeriesSettings {
 	nameField?: string;
 
 	/**
+	 * A field in data that holds boolean value indicating if node is
+	 * disabled (collapsed).
+	 */
+	disabledField?: string;
+
+	/**
 	 * A field in data that holds color used for fills nodes.
 	 *
 	 * @default "fill"
@@ -210,7 +216,21 @@ export abstract class FlowNodes extends Series {
 			}
 		}
 
-		dataItem.setRaw("node", this.makeNode(dataItem));
+		const node = this.makeNode(dataItem);
+		dataItem.setRaw("node", node);
+
+		const disabledField = this.get("disabledField");
+
+		if (disabledField) {
+			const dataContext = dataItem.dataContext as any;
+			if (dataContext) {
+				if (dataContext[disabledField]) {
+					this.root.events.once("frameended", () => {
+						this.disableDataItem(dataItem, 0);
+					})
+				}
+			}
+		}
 	}
 
 	/**
@@ -219,6 +239,7 @@ export abstract class FlowNodes extends Series {
 	public makeNode(dataItem: DataItem<this["_dataItemSettings"]>, themeTag?: string): FlowNode {
 
 		const node = this.nodes.make();
+
 		this.nodes.push(node);
 
 		if (themeTag) {
@@ -304,12 +325,12 @@ export abstract class FlowNodes extends Series {
 		const promises = [super.showDataItem(dataItem, duration)];
 		const flow = this.flow;
 
-		const node = dataItem.get("node");
-		if (node) {
-			node.show();
-		}
-
 		if (flow) {
+
+			const node = dataItem.get("node");
+			if (node) {
+				node.show();
+			}
 
 			let label = dataItem.get("label");
 
@@ -347,12 +368,12 @@ export abstract class FlowNodes extends Series {
 
 		const flow = this.flow;
 
-		const node = dataItem.get("node");
-		if (node) {
-			node.hide();
-		}
-
 		if (flow) {
+
+			const node = dataItem.get("node");
+			if (node) {
+				node.hide();
+			}
 
 			let label = dataItem.get("label");
 
@@ -392,6 +413,14 @@ export abstract class FlowNodes extends Series {
 
 		if (flow) {
 
+			const node = dataItem.get("node");
+			if (node) {
+				this.root.events.once("frameended", () => {
+					node.set("disabled", false);
+				})
+
+			}
+
 			let label = dataItem.get("label");
 
 			if (label) {
@@ -429,6 +458,13 @@ export abstract class FlowNodes extends Series {
 		const flow = this.flow;
 
 		if (flow) {
+
+			const node = dataItem.get("node");
+			if (node) {
+				this.root.events.once("frameended", () => {
+					node.set("disabled", true);
+				})
+			}
 
 			let label = dataItem.get("label");
 

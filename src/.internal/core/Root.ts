@@ -112,7 +112,7 @@ export interface IRootSettings {
 	/**
 	 * If set to `true`, the parent inner `<div>` element will become a focusable
 	 * element.
-	 * 
+	 *
 	 * @since 5.3.17
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
@@ -123,7 +123,7 @@ export interface IRootSettings {
 	 * If set to some string, it will be used as inner `<div>` ARIA-LABEL.
 	 *
 	 * Should be used in conjuction with `focusable`.
-	 * 
+	 *
 	 * @since 5.3.17
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
 	 */
@@ -131,7 +131,7 @@ export interface IRootSettings {
 
 	/**
 	 * Allows setting a "role" for the innert `<div>`.
-	 * 
+	 *
 	 * @since 5.3.17
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
 	 */
@@ -449,8 +449,8 @@ export class Root implements IDisposer {
 
 	protected _handleLogo(): void {
 		if (this._logo) {
-			const w = this.dom.offsetWidth;
-			const h = this.dom.offsetHeight;
+			const w = this._inner.offsetWidth;
+			const h = this._inner.offsetHeight;
 			if ((w <= 150) || (h <= 60)) {
 				this._logo.hide();
 			}
@@ -532,7 +532,7 @@ export class Root implements IDisposer {
 	}
 
 	protected _getRealSize(): DOMRect {
-		return this.dom.getBoundingClientRect();
+		return this._inner.getBoundingClientRect();
 	}
 
 	protected _getCalculatedSize(rect: DOMRect): ISize {
@@ -574,8 +574,8 @@ export class Root implements IDisposer {
 
 		const rootContainer = Container.new(this, {
 			visible: true,
-			width: realWidth,
-			height: realHeight,
+			width: width,
+			height: height,
 		});
 		this._rootContainer = rootContainer;
 		this._rootContainer._defaultThemes.push(DefaultTheme.new(this));
@@ -861,8 +861,8 @@ export class Root implements IDisposer {
 
 			const rootContainer = this._rootContainer;
 
-			rootContainer.setPrivate("width", realWidth);
-			rootContainer.setPrivate("height", realHeight);
+			rootContainer.setPrivate("width", w);
+			rootContainer.setPrivate("height", h);
 			this._render();
 			this._handleLogo();
 		}
@@ -1017,7 +1017,7 @@ export class Root implements IDisposer {
 		}
 	}
 
-	public _runTicker(currentTime: number, now?: boolean) {		
+	public _runTicker(currentTime: number, now?: boolean) {
 		if (!this.isDisposed()) {
 			this.animationTime = currentTime;
 
@@ -1757,10 +1757,15 @@ export class Root implements IDisposer {
 	 * @return         Root point
 	 */
 	public documentPointToRoot(point: IPoint): IPoint {
-		const bbox = this.dom.getBoundingClientRect();
+		const rect = this._getRealSize();
+		const size = this._getCalculatedSize(rect);
+
+		const scaleWidth = size.width / rect.width;
+		const scaleHeight = size.height / rect.height;
+
 		return {
-			x: point.x - bbox.left,
-			y: point.y - bbox.top
+			x: (point.x - rect.left) * scaleWidth,
+			y: (point.y - rect.top) * scaleHeight,
 		};
 	}
 
@@ -1771,10 +1776,15 @@ export class Root implements IDisposer {
 	 * @return         Root point
 	 */
 	public rootPointToDocument(point: IPoint): IPoint {
-		const bbox = this.dom.getBoundingClientRect();
+		const rect = this._getRealSize();
+		const size = this._getCalculatedSize(rect);
+
+		const scaleWidth = size.width / rect.width;
+		const scaleHeight = size.height / rect.height;
+
 		return {
-			x: point.x + bbox.left,
-			y: point.y + bbox.top
+			x: (point.x / scaleWidth) + rect.left,
+			y: (point.y / scaleHeight) + rect.top
 		};
 	}
 

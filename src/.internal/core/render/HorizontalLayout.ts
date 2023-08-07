@@ -70,6 +70,11 @@ export class HorizontalLayout extends Layout {
 
 						child.setPrivate("width", privateWidth);
 					}
+					else {
+						if (child._prevSettings.width instanceof Percent) {
+							child.setPrivate("width", undefined);
+						}
+					}
 				}
 			}
 		});

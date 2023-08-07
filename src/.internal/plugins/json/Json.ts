@@ -199,6 +199,16 @@ class ParserState {
 		await Promise.all($array.map($object.keys(object), (key) => this.parseAsync(object[key])));
 	}
 
+	async parseAsyncSettings(object: object): Promise<void> {
+		await Promise.all($array.map($object.keys(object), (key) => this.parseAsyncSetting(key, object[key])));
+	}
+
+	async parseAsyncSetting(key: string, value: unknown): Promise<void> {
+		if (key !== "geoJSON") {
+			await this.parseAsync(value);
+		}
+	}
+
 	async parseAsyncRefs(refs: Array<object> | object): Promise<void> {
 		if ($type.isArray(refs)) {
 			await Promise.all($array.map(refs, (x) => this.parseAsyncRefs(x)));
@@ -229,7 +239,7 @@ class ParserState {
 				await Promise.all([
 					(value.type ? this.cacheClass(value.type) : Promise.resolve(undefined)),
 					(value.refs ? this.parseAsyncRefs(value.refs) : Promise.resolve(undefined)),
-					(value.settings ? this.parseAsyncObject(value.settings) : Promise.resolve(undefined)),
+					(value.settings ? this.parseAsyncSettings(value.settings) : Promise.resolve(undefined)),
 					(value.properties ? this.parseAsyncObject(value.properties) : Promise.resolve(undefined)),
 					(value.children ? this.parseAsyncArray(value.children) : Promise.resolve(undefined)),
 				]);
@@ -237,6 +247,16 @@ class ParserState {
 		}
 	}
 
+
+	parseObject(root: Root, object: object, refs: Array<IRef>): object {
+		const output: { [key: string]: any } = {};
+
+		$array.each($object.keys(object), (key) => {
+			output[key] = this.parse(root, object[key], refs);
+		});
+
+		return output;
+	}
 
 	parseArray(root: Root, value: Array<unknown>, refs: Array<IRef>): Array<unknown> {
 		return $array.map(value, (value) => this.parse(root, value, refs));
@@ -246,6 +266,9 @@ class ParserState {
 		return $array.map(value, (value) => this.parseChild(root, value, refs));
 	}
 
+	parseStops(root: Root, value: Array<object>, refs: Array<IRef>): Array<object> {
+		return $array.map(value, (value) => this.parseObject(root, value, refs));
+	}
 
 	parseSetting(root: Root, key: string, value: unknown, refs: Array<IRef>): unknown {
 		if (key === "layout") {
@@ -257,6 +280,15 @@ class ParserState {
 			case "grid":
 				return root.gridLayout;
 			}
+
+		}
+
+		if (key === "geoJSON") {
+			return value;
+		}
+
+		if (key === "stops") {
+			return this.parseStops(root, value as Array<object>, refs);
 		}
 
 		return this.parse(root, value, refs);
@@ -451,7 +483,7 @@ class ParserState {
 			} else if (value.__parse === true) {
 				return {
 					isValue: true,
-					value: this.parseSettings(root, value, refs),
+					value: this.parseObject(root, value, refs),
 				};
 
 			} else if (value.__parse === false) {

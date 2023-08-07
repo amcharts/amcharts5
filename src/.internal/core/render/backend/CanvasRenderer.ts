@@ -3045,11 +3045,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	protected _patternCanvas: HTMLCanvasElement = document.createElement("canvas");
 	protected _patternContext: CanvasRenderingContext2D = this._patternCanvas.getContext("2d")!;
 
-	protected _domWidth: number = 0;
-	protected _domHeight: number = 0;
+	protected _realWidth: number = 0;
+	protected _realHeight: number = 0;
 
-	protected _canvasWidth: number = 0;
-	protected _canvasHeight: number = 0;
+	protected _calculatedWidth: number = 0;
+	protected _calculatedHeight: number = 0;
 
 	public resolution: number;
 	public interactionsEnabled: boolean = true;
@@ -3289,19 +3289,19 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	resizeLayer(layer: CanvasLayer) {
-		layer.resize(this._canvasWidth, this._canvasHeight, this._domWidth, this._domHeight, this.resolution);
+		layer.resize(this._calculatedWidth, this._calculatedHeight, this._calculatedWidth, this._calculatedHeight, this.resolution);
 	}
 
 	resizeGhost() {
-		this._ghostLayer.resize(this._canvasWidth, this._canvasHeight, this._domWidth, this._domHeight, this.resolution);
+		this._ghostLayer.resize(this._calculatedWidth, this._calculatedHeight, this._calculatedWidth, this._calculatedHeight, this.resolution);
 	}
 
-	resize(canvasWidth: number, canvasHeight: number, domWidth: number, domHeight: number): void {
-		this._canvasWidth = canvasWidth;
-		this._canvasHeight = canvasHeight;
+	resize(realWidth: number, realHeight: number, calculatedWidth: number, calculatedHeight: number): void {
+		this._realWidth = realWidth;
+		this._realHeight = realHeight;
 
-		this._domWidth = domWidth;
-		this._domHeight = domHeight;
+		this._calculatedWidth = calculatedWidth;
+		this._calculatedHeight = calculatedHeight;
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
@@ -3312,8 +3312,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		this.resizeGhost();
 
-		this.view.style.width = domWidth + "px";
-		this.view.style.height = domHeight + "px";
+		this.view.style.width = calculatedWidth + "px";
+		this.view.style.height = calculatedHeight + "px";
 	}
 
 	private createDetachedLayer(willReadFrequently: boolean = false): CanvasLayer {
@@ -3463,8 +3463,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		const margin = this._ghostLayer.margin;
 
 		return new DOMRect(
-			bbox.left - margin.left,
-			bbox.top - margin.top,
+			-margin.left,
+			-margin.top,
 			bbox.width + margin.left + margin.right,
 			bbox.height + margin.top + margin.bottom,
 		);
@@ -3473,14 +3473,20 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public getEvent<A extends IPointerEvent>(originalEvent: A, adjustPoint: boolean = true): CanvasRendererEvent<A> {
 		const bbox = this.view.getBoundingClientRect();
 
+		const x = originalEvent.clientX || 0;
+		const y = originalEvent.clientY || 0;
+
+		const widthScale = this._calculatedWidth / this._realWidth;
+		const heightScale = this._calculatedHeight / this._realHeight;
+
 		const originalPoint: IPoint = {
-			x: originalEvent.clientX || 0,
-			y: originalEvent.clientY || 0,
+			x: x - bbox.left,
+			y: y - bbox.top,
 		};
 
 		const point: IPoint = {
-			x: originalPoint.x - (adjustPoint ? bbox.left : 0),
-			y: originalPoint.y - (adjustPoint ? bbox.top : 0),
+			x: (x - (adjustPoint ? bbox.left : 0)) * widthScale,
+			y: (y - (adjustPoint ? bbox.top : 0)) * heightScale,
 		};
 
 		return new CanvasRendererEvent(
@@ -3960,8 +3966,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		let scale: number = this.resolution;
 
-		let canvasWidth = Math.floor(this._canvasWidth * this.resolution);
-		let canvasHeight = Math.floor(this._canvasHeight * this.resolution);
+		let canvasWidth = Math.floor(this._calculatedWidth * this.resolution);
+		let canvasHeight = Math.floor(this._calculatedHeight * this.resolution);
 
 		// Check if we need to scale
 		if (options.minWidth && (options.minWidth > canvasWidth)) {

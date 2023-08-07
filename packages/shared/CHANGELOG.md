@@ -5,7 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
-## [5.4.ą] - 2023-07-18
+
+## [5.4.2] - 2023-08-07
+
+### Added
+- New method on all axis renderers: `toGlobalPosition(position)`. Converts relative axis position taking into account its current zoom count.
+- New setting on `FlowNodes`: `disabledField`. Allows pre-collapsing of nodes using data.
+
+### Fixed
+- Fixing the JSON parser to work with `geoJSON`.
+- Fixing the JSON parser to work with `stops`.
+- Fixing the behavior of `calculateSize` when using `transform: scale`.
+
+
+## [5.4.1] - 2023-07-18
 
 ### Added
 - All Flow (Sankey, Chord and Arc) nodes can be toggled (on by default). [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).

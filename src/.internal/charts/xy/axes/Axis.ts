@@ -1075,6 +1075,18 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
+	 * Converts relative position of the axis to a global position taking current
+	 * zoom into account (opposite to what `toAxisPosition` does).
+	 *
+	 * @since 5.4.2
+	 * @param position Position
+	 * @return Global position
+	 */
+	public toGlobalPosition(position: number): number {
+		return this.get("renderer").toGlobalPosition(position);
+	}
+
+	/**
 	 * Adjusts position with inversed taken into account.
 	 *
 	 * @ignore

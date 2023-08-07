@@ -481,6 +481,9 @@ export class AxisRendererY extends AxisRenderer {
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
 	public _updateLC() {
 		const axis = this.axis;
 		const parent = axis.parent;
@@ -511,6 +514,28 @@ export class AxisRendererY extends AxisRenderer {
 
 		return position;
 	}
+
+	/**
+	 * @ignore
+	 */
+	public toGlobalPosition(position: number): number {
+		const start = this._start || 0;
+		const end = this._end || 1;
+
+		if (this.get("inversed")) {
+			position = position - start;
+		}
+		else {
+			position = end - position;
+		}
+
+		position = position / (end - start) * this._lc
+
+		position += this._ls;
+
+		return position;
+	}
+
 
 	/**
 	 * @ignore

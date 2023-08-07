@@ -1,4 +1,4 @@
-import type { Sprite } from "../../../core/render/Sprite";
+import type { Sprite, ISpritePointerEvent } from "../../../core/render/Sprite";
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../../core/render/Graphics";
 import type { Axis, IAxisDataItem } from "./Axis";
 import { Template } from "../../../core/util/Template";
@@ -12,7 +12,6 @@ import type { AxisBullet } from "./AxisBullet";
 import type { XYChart } from "../XYChart";
 import type { DataItem } from "../../../core/render/Component";
 import * as $utils from "../../../core/util/Utils";
-import type { IPointerEvent } from "../../../core/render/backend/Renderer";
 
 export interface IAxisRendererSettings extends IGraphicsSettings {
 
@@ -56,9 +55,9 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * area.
 	 *
 	 * Works on [[AxisRendererX]] and [[AxisRendererY]] only.
-	 * 
+	 *
 	 * For a better result, set `maxDeviation` to `1` or so on the Axis.
-	 * 
+	 *
 	 * Will not work if `inside` is set to `true`.
 	 *
 	 * @since 5.0.7
@@ -285,15 +284,15 @@ export abstract class AxisRenderer extends Graphics {
 		const thumb = this.thumb;
 		if (thumb) {
 			this._disposers.push(thumb.events.on("pointerdown", (event) => {
-				this._handleThumbDown(event.originalEvent);
+				this._handleThumbDown(event);
 			}));
 
 			this._disposers.push(thumb.events.on("globalpointerup", (event) => {
-				this._handleThumbUp(event.originalEvent);
+				this._handleThumbUp(event);
 			}));
 
 			this._disposers.push(thumb.events.on("globalpointermove", (event) => {
-				this._handleThumbMove(event.originalEvent);
+				this._handleThumbMove(event);
 			}));
 		}
 	}
@@ -316,21 +315,21 @@ export abstract class AxisRenderer extends Graphics {
 		}
 	}
 
-	protected _handleThumbDown(event: IPointerEvent) {
-		this._thumbDownPoint = this.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+	protected _handleThumbDown(event: ISpritePointerEvent) {
+		this._thumbDownPoint = this.toLocal(event.point);
 		const axis = this.axis;
 		this._downStart = axis.get("start");
 		this._downEnd = axis.get("end");
 	}
 
-	protected _handleThumbUp(_event: IPointerEvent) {
+	protected _handleThumbUp(_event: ISpritePointerEvent) {
 		this._thumbDownPoint = undefined;
 	}
 
-	protected _handleThumbMove(event: IPointerEvent) {
+	protected _handleThumbMove(event: ISpritePointerEvent) {
 		const downPoint = this._thumbDownPoint;
 		if (downPoint) {
-			const point = this.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+			const point = this.toLocal(event.point);
 
 			const downStart = this._downStart!;
 			const downEnd = this._downEnd!;
@@ -373,6 +372,9 @@ export abstract class AxisRenderer extends Graphics {
 		this._clear = true;
 	}
 
+	/**
+	 * @ignore
+	 */
 	public toAxisPosition(position: number): number {
 		const start = this._start || 0;
 		const end = this._end || 1;
@@ -391,6 +393,25 @@ export abstract class AxisRenderer extends Graphics {
 	/**
 	 * @ignore
 	 */
+	public toGlobalPosition(position: number): number {
+		const start = this._start || 0;
+		const end = this._end || 1;
+
+		if (!this.get("inversed")) {
+			position = position - start;
+		}
+		else {
+			position = end - position;
+		}
+
+		position = position / (end - start);
+
+		return position;
+	}
+
+	/**
+	 * @ignore
+	 */
 	public fixPosition(position: number) {
 		if (this.get("inversed")) {
 			return 1 - position;
@@ -398,6 +419,9 @@ export abstract class AxisRenderer extends Graphics {
 		return position;
 	}
 
+	/**
+	 * @ignore
+	 */
 	public _updateLC() {
 
 	}

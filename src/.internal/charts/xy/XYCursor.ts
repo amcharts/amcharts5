@@ -1,7 +1,7 @@
 import type { IPoint } from "../../core/util/IPoint";
 import type { XYChart } from "./XYChart"
 import type { XYSeries } from "./series/XYSeries";
-import type { IPointerEvent } from "../../core/render/backend/Renderer";
+import type { ISpritePointerEvent } from "../../core/render/Sprite";
 import type { Axis } from "./axes/Axis";
 import type { AxisRenderer } from "./axes/AxisRenderer";
 import type { Tooltip } from "../../core/render/Tooltip";
@@ -81,7 +81,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 	/**
 	 * Defines in which direction to look when searching for the nearest data
 	 * item to snap to.
-	 * 
+	 *
 	 * Possible values: `"xy"` (default), `"x"`, and `"y"`.
 	 *
 	 * @since 5.0.6
@@ -108,7 +108,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 
 	/**
 	 * Minimum distance in pixels between down and up points.
-	 * 
+	 *
 	 * If a distance is less than the value of `moveThreshold`, the zoom or
 	 * selection won't happen.
 	 *
@@ -487,20 +487,20 @@ export class XYCursor extends Container {
 		if ($utils.supports("touchevents")) {
 			this._disposers.push(plotContainer.events.on("click", (event) => {
 				if ($utils.isTouchEvent(event.originalEvent)) {
-					this._handleMove(event.originalEvent);
+					this._handleMove(event);
 				}
 			}));
 			this._setUpTouch();
 		}
 
 		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {
-			this._handleCursorDown(event.originalEvent);
+			this._handleCursorDown(event);
 		}));
 
 		this._disposers.push(plotContainer.events.on("globalpointerup", (event) => {
-			this._handleCursorUp(event.originalEvent);
+			this._handleCursorUp(event);
 			if (!event.native && !this.isHidden()) {
-				this._handleMove(event.originalEvent);
+				this._handleMove(event);
 			}
 		}));
 
@@ -512,7 +512,7 @@ export class XYCursor extends Container {
 					return;
 				}
 			}
-			this._handleMove(event.originalEvent);
+			this._handleMove(event);
 		}));
 
 		const parent = this.parent;
@@ -529,12 +529,12 @@ export class XYCursor extends Container {
 		return false;
 	}
 
-	protected _handleCursorDown(event: IPointerEvent) {
-		if((event as any).button == 2){
+	protected _handleCursorDown(event: ISpritePointerEvent) {
+		if((event.originalEvent as any).button == 2){
 			return;
 		}
-		
-		const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
+
+		const rootPoint = event.point;
 		let local = this._display.toLocal(rootPoint);
 		const chart = this.chart;
 
@@ -560,7 +560,7 @@ export class XYCursor extends Container {
 		}
 	}
 
-	protected _handleCursorUp(event: IPointerEvent) {
+	protected _handleCursorUp(event: ISpritePointerEvent) {
 		// TODO: handle multitouch
 		if (this._downPoint) {
 			const behavior = this.get("behavior", "none");
@@ -569,7 +569,7 @@ export class XYCursor extends Container {
 					this.selection.hide();
 				}
 
-				const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
+				const rootPoint = event.point;
 				let local = this._display.toLocal(rootPoint);
 
 				const downPoint = this._downPoint;
@@ -600,7 +600,7 @@ export class XYCursor extends Container {
 		this._downPoint = undefined;
 	}
 
-	protected _handleMove(event: IPointerEvent) {
+	protected _handleMove(event: ISpritePointerEvent) {
 		if (this.getPrivate("visible")) {
 			const chart = this.chart;
 			if (chart && $object.keys(chart.plotContainer._downPoints).length > 1) {
@@ -612,8 +612,7 @@ export class XYCursor extends Container {
 			}
 
 			// TODO: handle multitouch
-			const rootPoint = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
-
+			const rootPoint = event.point;
 			const lastPoint = this._lastPoint;
 
 			if (Math.round(lastPoint.x) === Math.round(rootPoint.x) && Math.round(lastPoint.y) === Math.round(rootPoint.y)) {
@@ -636,7 +635,7 @@ export class XYCursor extends Container {
 	 *
 	 * If `skipEvent` parameter is set to `true`, the move will not invoke
 	 * the `"cursormoved"` event.
-	 * 
+	 *
 	 * @param  point      X/Y to move cursor to
 	 * @param  skipEvent  Do not fire "cursormoved" event
 	 */

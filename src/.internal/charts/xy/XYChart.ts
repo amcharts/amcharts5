@@ -4,10 +4,11 @@ import type { AxisRenderer } from "./axes/AxisRenderer";
 import type { DataItem } from "../../core/render/Component";
 import type { IDisposer } from "../../core/util/Disposer";
 import type { XYSeries, IXYSeriesDataItem } from "./series/XYSeries";
-import type { IPointerEvent } from "../../core/render/backend/Renderer";
+import type { IPointerEvent } from "../../core/render/backend/Renderer";;
 import type { Scrollbar } from "../../core/render/Scrollbar";
 import type { Tooltip } from "../../core/render/Tooltip";
 import type { IPoint } from "../../core/util/IPoint";
+import type { ISpritePointerEvent } from "../../core/render/Sprite";
 
 import { XYChartDefaultTheme } from "./XYChartDefaultTheme";
 import { Container } from "../../core/render/Container";
@@ -93,7 +94,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	/**
 	 * If not set (default), cursor will show tooltips for all data items in the
 	 * same category/date.
-	 * 
+	 *
 	 * If set, cursor will select closest data item to pointer (mouse or touch) and
 	 * show tooltip for it.
 	 *
@@ -112,7 +113,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	/**
 	 * Indicates how the distance should be measured when assessing distance
 	 * between tooltips as set in `maxTooltipDistance`.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @since 5.2.6
 	 */
@@ -134,7 +135,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * chart horizontally.
 	 *
 	 * NOTE: this setting is not supported in a [[RadarChart]].
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
 	 * @since 5.1.8
 	 * @default false
@@ -144,7 +145,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	/**
 	 * If set to `true`, using pinch gesture on the chart's plot area will zoom
 	 * chart vertically.
-	 * 
+	 *
 	 * NOTE: this setting is not supported in a [[RadarChart]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
@@ -182,7 +183,7 @@ export interface IXYChartPrivate extends ISerialChartPrivate {
 
 	/**
 	 * Array of other [[XYChart]] objects that cursors should be synced with.
-	 * 
+	 *
 	 * Note: cursors will be synced across the vertically stacked charts only.
 	 */
 	otherCharts?: Array<XYChart>
@@ -214,7 +215,7 @@ export interface IXYChartEvents extends ISerialChartEvents {
 	 * Invoked if pointer is pressed down on a chart and released without moving.
 	 *
 	 * `panended` event will still kick in after that.
-	 * 
+	 *
 	 * @since 5.2.19
 	 */
 	pancancelled: {
@@ -293,7 +294,7 @@ export class XYChart extends SerialChart {
 	public readonly leftAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout }));
 
 	/**
-	 * A [[Container]] located in the middle of the chart, used to store plotContainer and topPlotContainer	 
+	 * A [[Container]] located in the middle of the chart, used to store plotContainer and topPlotContainer
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -303,10 +304,10 @@ export class XYChart extends SerialChart {
 	/**
 	 * A [[Container]] located in the middle of the chart, used to store actual
 	 * plots (series).
-	 * 
+	 *
 	 * NOTE: `plotContainer` will automatically have its `background` preset. If
 	 * you need to modify background or outline for chart's plot area, you can
-	 * use `plotContainer.get("background")` for that.* 
+	 * use `plotContainer.get("background")` for that.*
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -424,15 +425,15 @@ export class XYChart extends SerialChart {
 		}));
 
 		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {
-			this._handlePlotDown(event.originalEvent);
+			this._handlePlotDown(event);
 		}));
 
 		this._disposers.push(plotContainer.events.on("globalpointerup", (event) => {
-			this._handlePlotUp(event.originalEvent);
+			this._handlePlotUp(event);
 		}));
 
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
-			this._handlePlotMove(event.originalEvent);
+			this._handlePlotMove(event);
 		}));
 
 		this._maskGrid();
@@ -517,7 +518,7 @@ export class XYChart extends SerialChart {
 			return;
 		}
 
-		const plotPoint = plotContainer.toLocal(this._root.documentPointToRoot({ x: wheelEvent.clientX, y: wheelEvent.clientY }))
+		const plotPoint = plotContainer.toLocal(event.point);
 		const wheelStep = this.get("wheelStep", 0.2);
 
 		const shiftY = wheelEvent.deltaY / 100;
@@ -734,17 +735,17 @@ export class XYChart extends SerialChart {
 		return [start, end];
 	}
 
-	protected _handlePlotDown(event: IPointerEvent) {
-		if ((event as any).button == 2) {
+	protected _handlePlotDown(event: ISpritePointerEvent) {
+		const originalEvent = event.originalEvent as any;
+
+		if (originalEvent.button == 2) {
 			return;
 		}
 		const plotContainer = this.plotContainer;
-		let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+		let local = plotContainer.toLocal(event.point);
 
 		if (this.get("pinchZoomX") || this.get("pinchZoomY")) {
-
-			const touchEvent = event as any;
-			const pointerId = touchEvent.pointerId;
+			const pointerId = originalEvent.pointerId;
 
 			if (pointerId) {
 
@@ -770,7 +771,7 @@ export class XYChart extends SerialChart {
 
 			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= this.height()) {
 				//this._downPoint = local;
-				this._downPoint = { x: event.clientX, y: event.clientY };
+				this._downPoint = { x: originalEvent.clientX, y: originalEvent.clientY };
 
 				const panX = this.get("panX");
 				const panY = this.get("panY");
@@ -790,7 +791,7 @@ export class XYChart extends SerialChart {
 
 				const eventType = "panstarted";
 				if (this.events.isEnabled(eventType)) {
-					this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event });
+					this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event.originalEvent });
 				}
 			}
 		}
@@ -814,21 +815,21 @@ export class XYChart extends SerialChart {
 		}
 	}
 
-	protected _handlePlotUp(event: IPointerEvent) {
+	protected _handlePlotUp(event: ISpritePointerEvent) {
 		const downPoint = this._downPoint;
 		if (downPoint) {
 			if (this.get("panX") || this.get("panY")) {
-				let local = this.plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+				let local = this.plotContainer.toLocal(event.point);
 				if (local.x == downPoint.x && local.y == downPoint.y) {
 					const eventType = "pancancelled";
 					if (this.events.isEnabled(eventType)) {
-						this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event });
+						this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event.originalEvent });
 					}
 				}
 
 				const eventType = "panended";
 				if (this.events.isEnabled(eventType)) {
-					this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event });
+					this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event.originalEvent });
 				}
 			}
 		}
@@ -843,7 +844,7 @@ export class XYChart extends SerialChart {
 		})
 	}
 
-	protected _handlePlotMove(event: IPointerEvent) {
+	protected _handlePlotMove(event: ISpritePointerEvent) {
 		const plotContainer = this.plotContainer;
 
 		if (this.get("pinchZoomX") || this.get("pinchZoomY")) {
@@ -851,7 +852,7 @@ export class XYChart extends SerialChart {
 			const pointerId = touchEvent.pointerId;
 
 			if (pointerId) {
-				this._movePoints[pointerId] = this._root.documentPointToRoot({ x: event.clientX, y: event.clientY });
+				this._movePoints[pointerId] = event.point;
 
 				if ($object.keys(plotContainer._downPoints).length > 1) {
 					this._handlePinch();
@@ -865,7 +866,7 @@ export class XYChart extends SerialChart {
 		if (downPoint) {
 
 			downPoint = plotContainer.toLocal(this._root.documentPointToRoot(downPoint));
-			let local = plotContainer.toLocal(this._root.documentPointToRoot({ x: event.clientX, y: event.clientY }));
+			let local = plotContainer.toLocal(event.point);
 
 			const panX = this.get("panX");
 			const panY = this.get("panY");

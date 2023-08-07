@@ -72,6 +72,11 @@ export class VerticalLayout extends Layout {
 
 						child.setPrivate("height", privateHeight);
 					}
+					else {
+						if(child._prevSettings.height instanceof Percent){
+							child.setPrivate("height", undefined);
+						}
+					}
 				}
 			}
 		});
