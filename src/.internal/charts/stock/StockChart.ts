@@ -272,6 +272,14 @@ export class StockChart extends Container {
 		}
 	}
 
+	public dispose() {
+		super.dispose();
+		const settingsModal = this.getPrivate("settingsModal");
+		if (settingsModal) {
+			settingsModal.dispose();
+		}
+	}
+
 	public markDirtyDrawings() {
 		this._drawingsChanged = true;
 		this.markDirty();

@@ -403,6 +403,7 @@ export class Root implements IDisposer {
 
 		let inner: HTMLDivElement = document.createElement("div");
 		inner.style.position = "relative";
+		inner.style.width = "100%";
 		inner.style.height = "100%";
 		dom.appendChild(inner);
 
@@ -1374,15 +1375,6 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		if (target.get("visible") && target.get("role") != "tooltip" && !target.isHidden() && target.getPrivate("focusable") !== false) {
-			if (focusElement.getAttribute("tabindex") != "-1") {
-				focusElement.setAttribute("tabindex", "" + this.tabindex);
-			}
-		}
-		else {
-			focusElement.removeAttribute("tabindex")
-		}
-
 		const role = target.get("role");
 		if (role) {
 			focusElement.setAttribute("role", role);
@@ -1470,6 +1462,17 @@ export class Root implements IDisposer {
 		else {
 			focusElement.removeAttribute("aria-controls");
 		}
+
+		if (target.get("visible") && target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.isHidden() && target.getPrivate("focusable") !== false) {
+			if (focusElement.getAttribute("tabindex") != "-1") {
+				focusElement.setAttribute("tabindex", "" + this.tabindex);
+			}
+			focusElement.removeAttribute("aria-hidden");
+		}
+		else {
+			focusElement.removeAttribute("tabindex");
+			focusElement.setAttribute("aria-hidden", "hidden");
+		}
 	}
 
 	public _makeFocusElement(index: number, target: Sprite): void {
@@ -1556,7 +1559,7 @@ export class Root implements IDisposer {
 	}
 
 	protected _positionFocusElement(target: Sprite): void {
-		if (this._a11yD == true) {
+		if (this._a11yD == true || target == undefined) {
 			return;
 		}
 

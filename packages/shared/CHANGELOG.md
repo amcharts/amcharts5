@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.3] - 2023-08-15
+
+### Changed
+- Accessibility: focus element of the non-visible focusable items (e.g. buttons) will now have `aria-hidden` attribute set, so they are not read out by screen readers.
+
+### Fixed
+- Fixing chart being resized incorrectly inside of nested flexbox. ([Issue 1044](https://github.com/amcharts/amcharts5/issues/1044))
+- `SettingsModal` was not being disposed together with a `Root` with a `StockChart` in it.
+
 
 ## [5.4.2] - 2023-08-07
 

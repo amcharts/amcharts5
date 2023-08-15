@@ -233,6 +233,9 @@ export class Text extends Sprite {
 		return this.get("populateText") ? populateString(this, text) : text;
 	}
 
+	/**
+	 * Forces the text to be re-evaluated and re-populated.
+	 */
 	public markDirtyText(): void {
 		this._display.text = this._getText();
 		if (this.get("role") == "tooltip") {

@@ -111,6 +111,8 @@ export interface IFlowNodesSettings extends ISeriesSettings {
 	/**
 	 * A field in data that holds boolean value indicating if node is
 	 * disabled (collapsed).
+	 *
+	 * @since 5.4.2
 	 */
 	disabledField?: string;
 

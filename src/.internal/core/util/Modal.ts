@@ -322,7 +322,10 @@ export class Modal extends Entity {
 	 */
 	public dispose() {
 		super.dispose();
-		this.root.dom.removeChild(this.getPrivate("container"));
+		const container = this.getPrivate("container");
+		if (container.parentElement) {
+			container.parentElement.removeChild(container);
+		}
 	}
 
 }
