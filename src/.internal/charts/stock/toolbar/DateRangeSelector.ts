@@ -856,7 +856,7 @@ export class DateRangeSelector extends StockControl {
   -webkit-appearance: menulist;
   -moz-appearance: menulist;
   width: auto;
-  max-width: 95px;
+  max-width: 93px;
 }
 .flatpickr-current-month .flatpickr-monthDropdown-months:focus,
 .flatpickr-current-month .flatpickr-monthDropdown-months:active {

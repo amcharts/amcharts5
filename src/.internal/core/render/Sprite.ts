@@ -1170,8 +1170,8 @@ export abstract class Sprite extends Entity {
 			this.updatePivotPoint();
 		}
 
-		if (this.isDirty("visible") || this.isPrivateDirty("visible") || this.isDirty("forceHidden") || this.isDirty("opacity")) {
-			if (!this.get("visible") || !this.getPrivate("visible") || this.get("forceHidden") || this.get("opacity") == 0) {
+		if (this.isDirty("visible") || this.isPrivateDirty("visible") || this.isDirty("forceHidden")) {
+			if (!this.get("visible") || !this.getPrivate("visible") || this.get("forceHidden")) {
 				display.visible = false;
 				this.hideTooltip();
 			}

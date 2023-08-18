@@ -334,7 +334,7 @@ export abstract class AxisRenderer extends Graphics {
 			const downStart = this._downStart!;
 			const downEnd = this._downEnd!;
 			const extra = this._getPan(point, downPoint) * Math.min(1, (downEnd - downStart)) / 2;
-			this.axis.setAll({ start: downStart - extra, end: downEnd + extra });
+			this.axis.zoom(downStart - extra, downEnd + extra, 0);
 		}
 	}
 

@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.4] - 2023-08-18
+
+### Added
+- New setting on `Sankey`: `linkSort`. Set it to a custom function for sorting links, or to `null` to use link order from data.
+
+### Changed
+- Data items with `null` values will be ignored altogether when grouping data.
+- [Reverted] Accessibility: focus element of the non-visible focusable items (e.g. buttons) will now have `aria-hidden` attribute set, so they are not read out by screen readers.
+
+### Fixed
+- In some setups month/year selectors were wrapping to two lines in a `DateRangeSelector`.
+- Fixing issue with chart not showing up sometimes.
+- `XYChartScrollbar` thumb area was not draggable since `5.4.3`.
+
+
 ## [5.4.3] - 2023-08-15
 
 ### Changed

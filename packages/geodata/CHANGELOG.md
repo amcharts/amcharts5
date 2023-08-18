@@ -10,6 +10,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - New map of Kazakhstan: `kazahkstan2023*`.
 
+### Changed
+- Updated Hormozgan province name in the maps of Iran.
+
 
 ## [5.1.1] - 2023-06-01
 

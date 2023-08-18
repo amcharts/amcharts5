@@ -70,6 +70,15 @@ export interface ISankeySettings extends IFlowSettings {
 	 */
 	nodeSort?: (a: d3sankey.SankeyNodeMinimal<{}, {}>, b: d3sankey.SankeyNodeMinimal<{}, {}>) => number | null;
 
+	/**
+	 * A custom function to use when sorting links.
+	 * 
+	 * Use `null` to sort links exactly the way they are presented in data.
+	 * 
+	 * @since 5.4.4
+	 */
+	linkSort?: null | ((a: d3sankey.SankeyLinkMinimal<{}, {}>, b: d3sankey.SankeyLinkMinimal<{}, {}>) => number | null);
+
 }
 
 export interface ISankeyPrivate extends IFlowPrivate {
@@ -238,7 +247,7 @@ export class Sankey extends Flow {
 			}
 		}
 
-		if (this._valuesDirty || this._sizeDirty || this.isDirty("nodePadding") || this.isDirty("nodeWidth") || this.isDirty("nodeAlign") || this.isDirty("nodeSort") || this.isDirty("orientation") || this.isDirty("linkTension")) {
+		if (this._valuesDirty || this._sizeDirty || this.isDirty("nodePadding") || this.isDirty("nodeWidth") || this.isDirty("nodeAlign") || this.isDirty("nodeSort") || this.isDirty("orientation") || this.isDirty("linkTension") || this.isDirty("linkSort")) {
 			if (this._nodesData.length > 0) {
 				const d3Sankey = this._d3Sankey;
 				let w = this.innerWidth();
@@ -252,6 +261,7 @@ export class Sankey extends Flow {
 				d3Sankey.nodePadding(this.get("nodePadding", 10));
 				d3Sankey.nodeWidth(this.get("nodeWidth", 10));
 				d3Sankey.nodeSort(this.get("nodeSort", null) as any);
+				(d3Sankey as any).linkSort(this.get("linkSort") as any);
 
 				switch (this.get("nodeAlign")) {
 					case "right":

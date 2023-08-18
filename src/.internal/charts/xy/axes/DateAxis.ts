@@ -382,7 +382,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 							let groupKey = groupFieldValues[field];
 							let value = dataItem.get(field as any);
 
-							if (value !== undefined) {
+							if (value != null) {
 
 								let currentValue = newDataItem.get(field as any);
 
@@ -392,9 +392,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 										break;
 
 									case "sum":
-										if (value != null) {
-											newDataItem.setRaw(field as any, currentValue + value);
-										}
+										newDataItem.setRaw(field as any, currentValue + value);
 										break;
 
 									case "open":

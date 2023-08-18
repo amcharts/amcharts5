@@ -399,7 +399,7 @@ export class XYChart extends SerialChart {
 		zoomOutButton.events.on("click", () => {
 			this.zoomOut();
 		})
-		zoomOutButton.set("opacity", 0);
+		zoomOutButton.hide(0);
 		zoomOutButton.states.lookup("default")!.set("opacity", 1);
 
 		this.chartContainer.set("layout", verticalLayout);

@@ -450,8 +450,8 @@ export class Root implements IDisposer {
 
 	protected _handleLogo(): void {
 		if (this._logo) {
-			const w = this._inner.offsetWidth;
-			const h = this._inner.offsetHeight;
+			const w = this.dom.offsetWidth;
+			const h = this.dom.offsetHeight;
 			if ((w <= 150) || (h <= 60)) {
 				this._logo.hide();
 			}
@@ -533,7 +533,7 @@ export class Root implements IDisposer {
 	}
 
 	protected _getRealSize(): DOMRect {
-		return this._inner.getBoundingClientRect();
+		return this.dom.getBoundingClientRect();
 	}
 
 	protected _getCalculatedSize(rect: DOMRect): ISize {
