@@ -354,9 +354,9 @@ export abstract class Hierarchy extends Series {
 
 		if (this._sizeDirty) {
 			const dataItem = this.get("selectedDataItem");
-			if(dataItem){
-				this._zoom(dataItem);	
-			}			
+			if (dataItem) {
+				this._zoom(dataItem);
+			}
 		}
 	}
 
@@ -404,7 +404,7 @@ export abstract class Hierarchy extends Series {
 	 */
 	public getDataItemById(id: string): DataItem<this["_dataItemSettings"]> | undefined {
 		return this._getDataItemById(this.dataItems, id);
-	}	
+	}
 
 	public _getDataItemById(dataItems: Array<DataItem<this["_dataItemSettings"]>>, id: string): DataItem<this["_dataItemSettings"]> | undefined {
 
@@ -514,6 +514,49 @@ export abstract class Hierarchy extends Series {
 				this.disableDataItem(dataItem, 0);
 			}
 		}
+	}
+
+	/**
+	 * Adds children data to the target data item.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-api/#Dynamically_adding_child_nodes} for more info
+	 * @since 5.4.5
+	 */
+	public addChildData(dataItem: DataItem<this["_dataItemSettings"]>, data: Array<any>) {
+		const dataContext = dataItem.dataContext as any;
+		const childDataField = this.get("childDataField");
+
+		let childData = dataContext[childDataField] as any;
+		if (!childData) {
+			childData = data;
+			dataContext[childDataField] = childData;
+		}
+		else {
+			childData.push(...data);
+		}
+
+		let children = dataItem.get("children");
+		if (!children) {
+			children = [];
+			dataItem.set("children", children);
+		}
+
+		let depth = dataItem.get("depth");
+
+		$array.each(childData, (child) => {
+			const childDataItem = new DataItem(this, child, this._makeDataItem(child));
+
+			children.push(childDataItem);
+
+			childDataItem.setRaw("parent", dataItem);
+			childDataItem.setRaw("depth", depth + 1);
+
+			if (childDataItem.get("fill") == null) {
+				childDataItem.setRaw("fill", dataItem.get("fill"));
+			}
+
+			this.processDataItem(childDataItem);
+		})
 	}
 
 	protected _processDataItem(_dataItem: DataItem<this["_dataItemSettings"]>) {

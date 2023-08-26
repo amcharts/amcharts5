@@ -700,7 +700,10 @@ export class XYChart extends SerialChart {
 
 		if (wheelX !== "none" || wheelY !== "none") {
 			this._wheelDp = plotContainer.events.on("wheel", (event) => {
-				this.handleWheel(event);
+				const wheelEvent = event.originalEvent;
+				if ((wheelX !== "none" && Math.abs(wheelEvent.deltaX) != 0) || (wheelY !== "none" && Math.abs(wheelEvent.deltaY) != 0)) {
+					this.handleWheel(event);
+				}
 			});
 
 			this._disposers.push(this._wheelDp);

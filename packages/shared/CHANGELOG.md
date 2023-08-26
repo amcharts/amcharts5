@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.5] - 2023-08-26
+
+### Added
+- New method `addChildData()` added to `Hierarchy`. [More info](https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-api/#Dynamically_adding_child_nodes).
+
+### Fixed
+- Vertical wheel-scrolling is no longer prevented if `wheelY: "none"` is set, regardless of the `wheelX` setting.
+
+
 ## [5.4.4] - 2023-08-18
 
 ### Added
