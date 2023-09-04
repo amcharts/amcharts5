@@ -199,7 +199,19 @@ am5plugins_json.JsonParser.new(root).parse({
           },
         },
         properties: {
-          data: "#data"
+          data: "#data",
+          bullets: [{
+            type: "Bullet",
+            settings: {
+              sprite: {
+                type: "Circle",
+                settings: {
+                  radius: 5,
+                  fill: "@series.get('fill')"
+                }
+              }
+            }
+          }]
         }
       },
     ],

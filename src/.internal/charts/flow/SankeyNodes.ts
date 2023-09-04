@@ -124,4 +124,11 @@ export class SankeyNodes extends FlowNodes {
 			rectangle.dispose();
 		}
 	}
+
+	public _updateNodeColor(dataItem: DataItem<this["_dataItemSettings"]>){
+		const rectangle = dataItem.get("rectangle");
+		if(rectangle){
+			rectangle.set("fill", dataItem.get("fill"));
+		}
+	}	
 }

@@ -102,4 +102,11 @@ export class ArcDiagramNodes extends FlowNodes {
 			circle.dispose();
 		}
 	}
+
+	public _updateNodeColor(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const circle = dataItem.get("circle");
+		if (circle) {
+			circle.set("fill", dataItem.get("fill"));
+		}
+	}
 }

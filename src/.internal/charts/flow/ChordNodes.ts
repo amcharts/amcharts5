@@ -144,6 +144,13 @@ export class ChordNodes extends FlowNodes {
 		}
 	}
 
+	public _updateNodeColor(dataItem: DataItem<this["_dataItemSettings"]>){
+		const slice = dataItem.get("slice");
+		if(slice){
+			slice.set("fill", dataItem.get("fill"));
+		}
+	}		
+
 	/**
 	 * @ignore
 	 */

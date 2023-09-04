@@ -271,8 +271,16 @@ export abstract class FlowNodes extends Series {
 			}
 		})
 
+		dataItem.on("fill", () => {
+			this._updateNodeColor(dataItem);
+		})
+
 		dataItem.set("node", node);
 		return node;
+	}
+
+	public _updateNodeColor(_dataItem: DataItem<this["_dataItemSettings"]>){
+
 	}
 
 	/**

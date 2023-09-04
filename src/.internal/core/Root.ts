@@ -224,7 +224,7 @@ export class Root implements IDisposer {
 	/**
 	 * Use UTC when formatting date/time.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#UTC_and_time_zones} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#utc-and-time-zones} for more info
 	 */
 	public utc: boolean = false;
 
@@ -234,7 +234,11 @@ export class Root implements IDisposer {
 	 * The value should be named time zone, e.g.:
 	 * `"America/Vancouver"`, `"Australia/Sydney"`, `"UTC"`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Time_zone} for more info
+	 * NOTE: Using time zone feature may noticeable affect performance of the
+	 * chart, especially with large data sets, since every single date will need
+	 * to be recalculated.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#time-zone} for more info
 	 * @since 5.1.0
 	 */
 	public timezone?: Timezone;
@@ -1409,7 +1413,7 @@ export class Root implements IDisposer {
 		}
 
 		if (target.get("ariaHidden")) {
-			focusElement.setAttribute("aria-hidden", "hidden");
+			focusElement.setAttribute("aria-hidden", "true");
 		}
 		else {
 			focusElement.removeAttribute("aria-hidden");
@@ -1471,7 +1475,7 @@ export class Root implements IDisposer {
 		}
 		else {
 			focusElement.removeAttribute("tabindex");
-			focusElement.setAttribute("aria-hidden", "hidden");
+			focusElement.setAttribute("aria-hidden", "true");
 		}
 	}
 

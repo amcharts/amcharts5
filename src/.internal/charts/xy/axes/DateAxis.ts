@@ -935,16 +935,19 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		if (this.getPrivate("min") != null) {
 			let format = this.get("tooltipDateFormats")![this.getPrivate("baseInterval").timeUnit];
 			let value = this.positionToValue(position);
-			let date = new Date(value);
+			if ($type.isNumber(value)) {
+				let date = new Date(value);
 
-			let baseInterval = this.getPrivate("baseInterval");
-			let duration = $time.getDateIntervalDuration(baseInterval, date, this._root.locale.firstDayOfWeek, this._root.utc, this._root.timezone);
+				let baseInterval = this.getPrivate("baseInterval");
+				let duration = $time.getDateIntervalDuration(baseInterval, date, this._root.locale.firstDayOfWeek, this._root.utc, this._root.timezone);
 
-			if (adjustPosition !== false) {
-				date = new Date(value + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration)
+				if (adjustPosition !== false) {
+					date = new Date(value + this.get("tooltipIntervalOffset", -this.get("tooltipLocation", 0.5)) * duration)
+				}
+
+				return this._root.dateFormatter.format(date, this.get("tooltipDateFormat", format));
 			}
 
-			return this._root.dateFormatter.format(date, this.get("tooltipDateFormat", format));
 		}
 		return "";
 	}

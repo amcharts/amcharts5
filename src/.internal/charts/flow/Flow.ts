@@ -402,18 +402,19 @@ export abstract class Flow extends Series {
 				let gradient = link._fillGradient;
 				if (!gradient) {
 					gradient = LinearGradient.new(this._root, {});
-					const sourceStop: any = { color: sourceFill }
-					if (source.get("unknown")) {
-						sourceStop.opacity = 0;
-					}
-					const targetStop: any = { color: targetFill };
-					if (target.get("unknown")) {
-						targetStop.opacity = 0;
-					}
-
-					gradient.set("stops", [sourceStop, targetStop]);
-					link._fillGradient = gradient;
 				}
+				const sourceStop: any = { color: sourceFill }
+				if (source.get("unknown")) {
+					sourceStop.opacity = 0;
+				}
+				const targetStop: any = { color: targetFill };
+				if (target.get("unknown")) {
+					targetStop.opacity = 0;
+				}
+
+				gradient.set("stops", [sourceStop, targetStop]);
+				link._fillGradient = gradient;
+
 				link.set("fillGradient", gradient);
 				break;
 			case "none":

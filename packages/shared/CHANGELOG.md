@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.6] - 2023-09-04
+
+### Added
+- When using the JSON parser, it's now possible to use a `"@series"` ref inside of a bullet to access the series of the bullet.
+- When using the JSON parser, it's now possible to use `"#foo.get('bar')"` syntax to look up settings on the referenced object.
+
+### Fixed
+- In some cases `DateAxis` could error out when using time zones.
+- Canvas container had `aria-hidden` was set to incorrect value.
+- Bullets now work correctly with the JSON parser.
+
+
 ## [5.4.5] - 2023-08-26
 
 ### Added

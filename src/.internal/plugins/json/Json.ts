@@ -36,7 +36,7 @@ function lookupRef(refs: Array<IRef>, name: string): any {
 		}
 	}
 
-	throw new Error("Could not find ref #" + name);
+	throw new Error("Could not find ref " + name);
 }
 
 
@@ -72,22 +72,31 @@ type IParsed<E extends Entity>
 
 
 function parseRef<E extends Entity>(value: string, refs: Array<IRef>): IParsed<E> {
-	if (value[0] === "#") {
-		const ref = value.slice(1);
-
-		if (value[1] === "#") {
+	if (value[0] === "#" || value[0] === "@") {
+		if (value[1] === value[0]) {
+			// "##foo" or "@@foo" gets escaped into the literal strings "#foo" or "@foo"
 			return {
 				isValue: true,
-				value: ref,
+				value: value.slice(1),
 			};
 
 		} else {
-			const path = ref.split(/\./g);
+			const path = value.split(/\./g);
 
 			let object = lookupRef(refs, path[0]);
 
 			for (let i = 1; i < path.length; ++i) {
-				object = object[path[i]];
+				const subpath = path[i];
+
+				// Supports `#foo.get("bar")` and `#foo.get('bar')` syntax
+				const parsed = /get\((["'])([^\1]*)\1\)/.exec(subpath);
+
+				if (parsed) {
+					object = object.get(parsed[2]);
+
+				} else {
+					object = object[subpath];
+				}
 			}
 
 			return {
@@ -307,10 +316,12 @@ class ParserState {
 
 	parseProperties(root: Root, object: object, refs: Array<IRef>): IParsedProperties {
 		return $array.map($object.keys(object), (key) => {
-			const parsed = this.parseValue(root, object[key], refs);
+			const rawValue = object[key];
 
 			return (entity: object) => {
 				const run = () => {
+					const parsed = this.parseValue(root, rawValue, refs);
+
 					const old = entity[key] as unknown;
 
 					if (old) {
@@ -354,11 +365,13 @@ class ParserState {
 					const old = entity[key] as unknown;
 
 					$type.assert(old != null);
-					$type.assert(parsed.isValue);
-					$type.assert($type.isArray(parsed.value));
+					$type.assert($type.isArray(rawValue));
 
-					$array.each(parsed.value, (value) => {
-						(old as any).push(() => value);
+					$array.each(rawValue, (value) => {
+						(old as any).push((_: unknown, series: unknown) => {
+							const newRefs = refs.concat([{ "@series": series }]);
+							return this.parse(root, value, newRefs);
+						});
 					});
 
 				} else {
@@ -373,7 +386,7 @@ class ParserState {
 		const newRefs: IRef = {};
 
 		$array.each($object.keys(object), (key) => {
-			newRefs[key] = this.parse(root, object[key], refs);
+			newRefs["#" + key] = this.parse(root, object[key], refs);
 		});
 
 		return newRefs;
