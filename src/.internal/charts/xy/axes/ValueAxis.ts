@@ -189,6 +189,11 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 */
 	autoZoom?: boolean;
 
+	/**
+	 * Value step between grid lines.
+	 */
+	step?: number;
+
 }
 
 export interface IValueAxisDataItem extends IAxisDataItem {
@@ -304,13 +309,6 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	selectionStepFinal?: number;
 
 	/**
-	 * Value step between grid lines.
-	 * 
-	 * @readonly
-	 */
-	step?: number;
-
-	/**
 	 * Decimal places used when formatting axis labels.
 	 * 
 	 * @readonly
@@ -407,7 +405,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		this._groupData();
 
-		if (this._sizeDirty || this._valuesDirty || this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("min") || this.isPrivateDirty("selectionMax") || this.isPrivateDirty("selectionMin") || this.isPrivateDirty("max") || this.isPrivateDirty("step") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("logarithmic")) {
+		if (this._sizeDirty || this._valuesDirty || this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("min") || this.isPrivateDirty("selectionMax") || this.isPrivateDirty("selectionMin") || this.isPrivateDirty("max") || this.isDirty("step") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("logarithmic")) {
 			this._handleRangeChange();
 			this._prepareAxisItems();
 			this._updateAxisRanges();
@@ -443,7 +441,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 
 			const logarithmic = this.get("logarithmic");
-			const step = this.getPrivate("step")!;
+			const step = this.get("step")!;
 			const selectionMin = this.getPrivate("selectionMin")!;
 			const selectionMax = this.getPrivate("selectionMax")! + step;
 
@@ -489,6 +487,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					dataItem = this.dataItems[i];
 				}
 
+				console.log("DataItem: ")
+				console.log(dataItem)
 				this._createAssets(dataItem, []);
 
 				if (dataItem.isHidden()) {
@@ -555,7 +555,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let position = this.valueToPosition(value);
 
 		let endPosition = position;
-		let fillEndPosition = this.valueToPosition(value + this.getPrivate("step")!);
+		let fillEndPosition = this.valueToPosition(value + this.get("step")!);
 
 		if ($type.isNumber(endValue)) {
 			endPosition = this.valueToPosition(endValue);
@@ -617,12 +617,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		selectionMin = minMaxStep.min;
 		selectionMax = minMaxStep.max;
 
-		if (this.getPrivate("selectionMin") !== selectionMin || this.getPrivate("selectionMax") !== selectionMax || this.getPrivate("step") !== step) {
+		if (this.getPrivate("selectionMin") !== selectionMin || this.getPrivate("selectionMax") !== selectionMax || this.get("step") !== step) {
 			// do not change to setPrivate, will cause SO
 			this.setPrivateRaw("selectionMin", selectionMin);
 			this.setPrivateRaw("selectionMax", selectionMax);
 
-			this.setPrivateRaw("step", step);
+			if (this.get("step") == null) {
+				this.setRaw("step", step);
+			}
 		}
 	}
 
@@ -1034,7 +1036,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 			const syncWithAxis = this.get("syncWithAxis");
 			if (syncWithAxis) {
-				minMaxStep = this._syncAxes(selectionMin, selectionMax, minMaxStep.step, syncWithAxis.getPrivate("selectionMinFinal", syncWithAxis.getPrivate("minFinal", 0)), syncWithAxis.getPrivate("selectionMaxFinal", syncWithAxis.getPrivate("maxFinal", 1)), syncWithAxis.getPrivate("selectionStepFinal", syncWithAxis.getPrivate("step", 1)));
+				minMaxStep = this._syncAxes(selectionMin, selectionMax, minMaxStep.step, syncWithAxis.getPrivate("selectionMinFinal", syncWithAxis.getPrivate("minFinal", 0)), syncWithAxis.getPrivate("selectionMaxFinal", syncWithAxis.getPrivate("maxFinal", 1)), syncWithAxis.getPrivate("selectionStepFinal", syncWithAxis.get("step", 1)));
 
 				selectionMin = minMaxStep.min;
 				selectionMax = minMaxStep.max;
@@ -1302,7 +1304,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		const syncWithAxis = this.get("syncWithAxis");
 		if (syncWithAxis) {
-			minMaxStep = this._syncAxes(min, max, minMaxStep.step, syncWithAxis.getPrivate("minFinal", syncWithAxis.getPrivate("min", 0)), syncWithAxis.getPrivate("maxFinal", syncWithAxis.getPrivate("max", 1)), syncWithAxis.getPrivate("step", 1));
+			minMaxStep = this._syncAxes(min, max, minMaxStep.step, syncWithAxis.getPrivate("minFinal", syncWithAxis.getPrivate("min", 0)), syncWithAxis.getPrivate("maxFinal", syncWithAxis.getPrivate("max", 1)), syncWithAxis.get("step", 1));
 			min = minMaxStep.min;
 			max = minMaxStep.max;
 		}
@@ -1634,7 +1636,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let min = this.getPrivate("selectionMin", this.getPrivate("min"));
 
 		if ($type.isNumber(max) && $type.isNumber(min)) {
-			return this.getPrivate("step", 1) / (max - min);
+			return this.get("step", 1) / (max - min);
 		}
 		return 0.05;
 	}

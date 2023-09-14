@@ -580,7 +580,7 @@ export class XYChartDefaultTheme extends Theme {
 				if (axisFill) {
 					const axis = <ValueAxis<AxisRenderer>>dataItem.component;
 					const value = dataItem.get("value");
-					const step = axis.getPrivate("step");
+					const step = axis.get("step");
 
 					if ($type.isNumber(value) && $type.isNumber(step)) {
 						if ($math.round(value / step / 2, 5) == Math.round(value / step / 2)) {
