@@ -4,6 +4,7 @@ import type { XYSeries } from "../xy/series/XYSeries";
 
 import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import { ListAutoDispose } from "../../core/util/List";
+import type { Rectangle } from "../../core/render/Rectangle";
 
 import * as $array from "../../core/util/Array";
 
@@ -37,6 +38,12 @@ export class StockPanel extends XYChart {
 	 */
 	public panelControls!: PanelControls;
 
+	/**
+	 * Panel resize grip element.
+	 *
+	 * @since 5.4.7
+	 */
+	public panelResizer?: Rectangle;
 
 	/**
 	 * A list of drawings on panel.

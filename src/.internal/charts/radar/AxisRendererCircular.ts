@@ -156,6 +156,15 @@ export class AxisRendererCircular extends AxisRenderer {
 	/**
 	 * @ignore
 	 */
+	public processAxis() {
+		super.processAxis();
+		const axis = this.axis;
+		axis.labelsContainer.set("isMeasured", false);
+	}	
+
+	/**
+	 * @ignore
+	 */
 	public updateLayout() {
 		const chart = this.chart;
 		if (chart) {

@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.7] - 2023-09-18
+
+### Added
+- `panelResizer` property added to `StockPanel`. Holds an instance of an element used as a grip for resizing a panel.
+- `originalEvent` added to all `XYCursor` events.
+- `selectcancelled` event added to `XYCursor`.
+
+### Fixed
+- HTML axis label on a circular chart were causing unnecessary CPU usage in some setups.
+
+
 ## [5.4.6] - 2023-09-04
 
 ### Added

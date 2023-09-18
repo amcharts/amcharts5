@@ -683,6 +683,9 @@ export class StockChart extends Container {
 
 		if (this.panels.length > 1) {
 			const resizer = panel.children.push(Rectangle.new(this._root, { themeTags: ["panelresizer"] }))
+
+			panel.panelResizer = resizer;
+
 			resizer.events.on("pointerdown", (e) => {
 				const chartsContainer = this.panelsContainer;
 				this._downResizer = e.target;

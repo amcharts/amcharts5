@@ -17,6 +17,7 @@ import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
+import type { IPointerEvent } from "../../core/render/backend/Renderer";
 
 export interface IXYCursorSettings extends IContainerSettings {
 
@@ -156,35 +157,50 @@ export interface IXYCursorPrivate extends IContainerPrivate {
 export interface IXYCursorEvents extends IContainerEvents {
 
 	/**
-	 * Kicks in when cursor selection starts.
-	 *
-	 * Only when `behavior` is set.
-	 */
-	selectended: {
-		target: XYCursor;
-	};
-
-	/**
 	 * Kicks in when cursor selection ends.
 	 *
 	 * Only when `behavior` is set.
 	 */
+	selectended: {
+		originalEvent: IPointerEvent,
+		target: XYCursor
+	};
+
+	/**
+	 * Kicks in when cursor selection starts.
+	 *
+	 * Only when `behavior` is set.
+	 */
 	selectstarted: {
-		target: XYCursor;
+		originalEvent: IPointerEvent,
+		target: XYCursor
 	};
 
 	/**
 	 * Kicks in when cursor's position over plot area changes.
 	 */
 	cursormoved: {
-		target: XYCursor;
+		point: IPoint,
+		target: XYCursor,
+		originalEvent?: IPointerEvent
 	};
 
 	/**
 	 * Kicks in when cursor's is hidden when user rolls-out of the plot area
 	 */
 	cursorhidden: {
-		target: XYCursor;
+		target: XYCursor
+	};
+
+	/**
+	 * Invoked if pointer is pressed down on a plot area and released without
+	 * moving (only when behavior is `"selectX"`).
+	 *
+	 * @since 5.4.7
+	 */
+	selectcancelled: {
+		originalEvent: IPointerEvent,
+		target: XYCursor
 	};
 
 }
@@ -463,10 +479,10 @@ export class XYCursor extends Container {
 		})
 	}
 
-	public updateCursor(){
+	public updateCursor() {
 		if (this.get("alwaysShow")) {
-			this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));			
-		}		
+			this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
+		}
 		this.handleMove();
 	}
 
@@ -530,7 +546,7 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleCursorDown(event: ISpritePointerEvent) {
-		if((event.originalEvent as any).button == 2){
+		if ((event.originalEvent as any).button == 2) {
 			return;
 		}
 
@@ -548,7 +564,7 @@ export class XYCursor extends Container {
 
 				const type = "selectstarted";
 				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, { type: type, target: this });
+					this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
 				}
 			}
 
@@ -591,7 +607,13 @@ export class XYCursor extends Container {
 					if (dispatch) {
 						const type = "selectended";
 						if (this.events.isEnabled(type)) {
-							this.events.dispatch(type, { type: type, target: this });
+							this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
+						}
+					}
+					else {
+						const type = "selectcancelled";
+						if (this.events.isEnabled(type)) {
+							this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
 						}
 					}
 				}
@@ -622,7 +644,7 @@ export class XYCursor extends Container {
 			this._lastPoint = rootPoint;
 			this.setPrivate("lastPoint", rootPoint);
 
-			this.handleMove({ x: rootPoint.x, y: rootPoint.y });
+			this.handleMove({ x: rootPoint.x, y: rootPoint.y }, false, event.originalEvent);
 		}
 	}
 
@@ -639,7 +661,7 @@ export class XYCursor extends Container {
 	 * @param  point      X/Y to move cursor to
 	 * @param  skipEvent  Do not fire "cursormoved" event
 	 */
-	public handleMove(point?: IPoint, skipEvent?: boolean) {
+	public handleMove(point?: IPoint, skipEvent?: boolean, originalEvent?: IPointerEvent) {
 		if (!point) {
 			point = this._movePoint;
 		}
@@ -719,7 +741,7 @@ export class XYCursor extends Container {
 
 				const type = "cursormoved";
 				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, { type: type, target: this });
+					this.events.dispatch(type, { type: type, target: this, point: point, originalEvent: originalEvent });
 				}
 			}
 
