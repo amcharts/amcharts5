@@ -19,6 +19,7 @@ import { StandardDeviation } from "../indicators/StandardDeviation";
 import { TypicalPrice } from "../indicators/TypicalPrice";
 import { MedianPrice } from "../indicators/MedianPrice";
 import { OnBalanceVolume } from "../indicators/OnBalanceVolume";
+import { Momentum } from "../indicators/Momentum";
 import { RelativeStrengthIndex } from "../indicators/RelativeStrengthIndex";
 import { StochasticOscillator } from "../indicators/StochasticOscillator";
 import { WilliamsR } from "../indicators/WilliamsR";
@@ -38,7 +39,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Trix" | "Typical Price" | "Volume" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Trix" | "Typical Price" | "Volume" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -262,6 +263,12 @@ export class IndicatorControl extends StockControl {
 					legend: legend
 				});
 				break;
+			case "Momentum":
+				indicator = Momentum.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries
+				});
+				break;				
 			case "Median Price":
 				indicator = MedianPrice.new(this.root, {
 					stockChart: stockChart,

@@ -117,6 +117,7 @@ import type { MapPolygonSeries } from "./../charts/map/MapPolygonSeries.js";
 import type { MapSeries } from "./../charts/map/MapSeries.js";
 import type { MedianPrice } from "./../charts/stock/indicators/MedianPrice.js";
 import type { Modal } from "./util/Modal.js";
+import type { Momentum } from "./../charts/stock/indicators/Momentum.js";
 import type { MovingAverage } from "./../charts/stock/indicators/MovingAverage.js";
 import type { MovingAverageDeviation } from "./../charts/stock/indicators/MovingAverageDeviation.js";
 import type { MovingAverageEnvelope } from "./../charts/stock/indicators/MovingAverageEnvelope.js";
@@ -326,6 +327,7 @@ export interface IClasses {
 	"MapSeries": MapSeries;
 	"MedianPrice": MedianPrice;
 	"Modal": Modal;
+	"Momentum": Momentum;
 	"MovingAverage": MovingAverage;
 	"MovingAverageDeviation": MovingAverageDeviation;
 	"MovingAverageEnvelope": MovingAverageEnvelope;

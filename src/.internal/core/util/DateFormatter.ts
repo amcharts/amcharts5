@@ -116,7 +116,6 @@ export class DateFormatter extends Entity {
 			date = timezone.convertLocal(date);
 		}
 
-
 		// Check if it's a valid date
 		if (!$type.isNumber(date.getTime())) {
 			// TODO translation
@@ -418,19 +417,19 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "z":
-					value = $utils.getTimeZone(date, false, false, this._root.utc);
+					value = $utils.getTimeZone(date, false, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
 					break;
 
 				case "zz":
-					value = $utils.getTimeZone(date, true, false, this._root.utc);
+					value = $utils.getTimeZone(date, true, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
 					break;
 
 				case "zzz":
-					value = $utils.getTimeZone(date, false, true, this._root.utc);
+					value = $utils.getTimeZone(date, false, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
 					break;
 
 				case "zzzz":
-					value = $utils.getTimeZone(date, true, true, this._root.utc);
+					value = $utils.getTimeZone(date, true, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
 					break;
 
 				case "Z":

@@ -247,6 +247,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 						$array.each(this.series, (series) => {
 							series.setDataSet(mainDataSetId);
+							series.resetGrouping();
 						})
 
 						this._setBaseInterval(baseInterval);

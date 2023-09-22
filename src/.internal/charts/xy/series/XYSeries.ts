@@ -915,8 +915,8 @@ export abstract class XYSeries extends Series {
 	protected _tooltipFieldX?: string;
 	protected _tooltipFieldY?: string;
 
-	public _posXDp?:IDisposer;
-	public _posYDp?:IDisposer;
+	public _posXDp?: IDisposer;
+	public _posYDp?: IDisposer;
 
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
@@ -1221,7 +1221,7 @@ export abstract class XYSeries extends Series {
 			this._valuesDirty = true;
 		}
 
-		if(this.isDirty("xAxis") || this.isDirty("yAxis")){
+		if (this.isDirty("xAxis") || this.isDirty("yAxis")) {
 			this._valuesDirty = true;
 		}
 
@@ -1359,7 +1359,6 @@ export abstract class XYSeries extends Series {
 		}
 
 		if (this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty) {
-
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 			let minBulletDistance = this.get("minBulletDistance", 0);
@@ -1784,6 +1783,21 @@ export abstract class XYSeries extends Series {
 				this.events.dispatch(type, { type: type, target: this, id: id });
 			}
 		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public resetGrouping() {
+		$object.each(this._dataSets, (_key, dataSet) => {
+			if (dataSet != this._mainDataItems) {
+				$array.each(dataSet, (dataItem) => {
+					this.disposeDataItem(dataItem);
+				})
+			}
+		})
+		this._dataSets = {};
+		this._dataItems = this.mainDataItems;
 	}
 
 	protected _handleDataSetChange() {

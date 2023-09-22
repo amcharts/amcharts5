@@ -666,6 +666,24 @@ export class Root implements IDisposer {
 					}
 				}));
 
+				this._disposers.push($utils.addEventListener(focusElementContainer, "click", () => {
+					// Some screen readers convert ENTER (and some SPACE) press whil on
+					// focused element to a "click" event, preventing actual "keydown"
+					// event from firing. We're using this "click" event to still
+					// generate internal click events.
+					const focusedSprite = this._focusedSprite;
+					if (focusedSprite) {
+						const downEvent = renderer.getEvent(new MouseEvent("click"));
+						focusedSprite.events.dispatch("click", {
+							type: "click",
+							originalEvent: downEvent.event,
+							point: downEvent.point,
+							simulated: true,
+							target: focusedSprite
+						});
+					}
+				}));
+
 				this._disposers.push($utils.addEventListener(focusElementContainer, "keydown", (ev: KeyboardEvent) => {
 					const focusedSprite = this._focusedSprite;
 					if (focusedSprite) {

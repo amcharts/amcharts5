@@ -732,6 +732,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
 
+		r("LineSeries", ["momentum"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
+		})		
+
 		r("LineSeries", ["williamsr"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
@@ -1059,6 +1064,14 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0xab82da)
 		})
 
+		r("Momentum").setAll({
+			name: "Momentum",
+			shortName: "Mom",
+			period: 14,
+			field: "close",
+			seriesColor: color(0xab82da)
+		})		
+
 		r("WilliamsR").setAll({
 			name: "Williams %R",
 			shortName: "Williams %R",
@@ -1154,7 +1167,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("IndicatorControl").setAll({
 			name: l.translateAny("Indicators"),
-			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R", "ZigZag"]
+			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

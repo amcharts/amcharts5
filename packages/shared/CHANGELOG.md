@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.8] - 2023-09-22
+
+### Added
+- Momentum indicator added to `StockChart`.
+
+### Fixed
+- `"z"` date formatting codes were not respecting the `Root.timezone` setting.
+- If a new data was loaded and `groupData` of `DateAxis` was changed from `true` to `false`, the chart was not displaying the newly-loaded data properly.
+- Accessibility: togglable elements like legend items were not being toggled by ENTER and SPACE keys with some screen reaaders (JAWS, Narrator) active.
+- RST indicator of `StockChart` was always using "close" value even if a different value was selected in the settings.
+- In some case chart could freeze when selecting with an `XYCursor` and releasing outside plot area.
+- If a new animation of the same setting was created right after previous animation finished (on `Animation`'s `"stopped"` event) the animation would not play.
+
+
 ## [5.4.7] - 2023-09-18
 
 ### Added

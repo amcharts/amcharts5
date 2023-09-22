@@ -246,40 +246,43 @@ export class RelativeStrengthIndex extends ChartIndicator {
 
 				if (i == period + 1) {
 					for (let j = 1; j <= period; j++) {
-						let value = dataItems[j].get("valueY", 0)
-						let prevValue = dataItems[j - 1].get("valueY", 0);
-						let change = value - prevValue;
+						let value = this._getValue(dataItems[j]);
+						let prevValue = this._getValue(dataItems[j - 1]);
+						if (value != undefined && prevValue != undefined) {
+							let change = value - prevValue;
 
-						if (change > 0) {
-							averageGain += change / period;
-						}
-						else {
-							averageLoss += Math.abs(change) / period;
+							if (change > 0) {
+								averageGain += change / period;
+							}
+							else {
+								averageLoss += Math.abs(change) / period;
+							}
 						}
 					}
 
 					rsi = 100 - (100 / (1 + averageGain / averageLoss));
 				}
 				else if (i > period) {
-					let value = dataItem.get("valueY", 0);
-					let prevValue = dataItems[i - 2].get("valueY", 0);
+					let value = this._getValue(dataItem);
+					let prevValue = this._getValue(dataItems[i - 2]);
+					if (value != null && prevValue != null) {
+						let change = value - prevValue;
 
-					let change = value - prevValue;
+						let gain = 0;
+						let loss = 0;
 
-					let gain = 0;
-					let loss = 0;
+						if (change > 0) {
+							gain = change;
+						}
+						else {
+							loss = -change;
+						}
 
-					if (change > 0) {
-						gain = change;
+						averageGain = (prevAverageGain * (period - 1) + gain) / period;
+						averageLoss = (prevAverageLoss * (period - 1) + loss) / period;
+
+						rsi = 100 - (100 / (1 + averageGain / averageLoss));
 					}
-					else {
-						loss = -change;
-					}
-
-					averageGain = (prevAverageGain * (period - 1) + gain) / period;
-					averageLoss = (prevAverageLoss * (period - 1) + loss) / period;
-
-					rsi = 100 - (100 / (1 + averageGain / averageLoss));
 				}
 
 				data.push({ valueX: dataItem.get("valueX"), valueY: rsi });

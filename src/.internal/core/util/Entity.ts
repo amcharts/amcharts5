@@ -388,6 +388,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	protected _animatingSettings: Animated<this["_settings"]> = {};
 	protected _animatingPrivateSettings: Animated<this["_privateSettings"]> = {};
 
+	private _playingAnimations: number = 0;
 	private _disposed: boolean = false;
 
 	// TODO move this into Entity
@@ -418,8 +419,6 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 
 	public _runAnimation(currentTime: number): boolean {
 		if (!this.isDisposed()) {
-			let playing = false;
-
 			$object.each(this._animatingSettings, (key, animation) => {
 				if (animation._stopped) {
 					this._stopAnimation(key);
@@ -433,13 +432,11 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 						if (animation._checkEnded()) {
 							this.set(key, animation._value(1));
 						} else {
-							playing = true;
 							animation._reset(currentTime);
 							this._set(key, animation._value(1));
 						}
 
 					} else {
-						playing = true;
 						this._set(key, animation._value(diff));
 					}
 				}
@@ -459,19 +456,17 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 							this.setPrivate(key, animation._value(1));
 
 						} else {
-							playing = true;
 							animation._reset(currentTime);
 							this._setPrivate(key, animation._value(1));
 						}
 
 					} else {
-						playing = true;
 						this._setPrivate(key, animation._value(diff));
 					}
 				}
 			});
 
-			return playing;
+			return this._playingAnimations !== 0;
 
 		} else {
 			return false;
@@ -644,6 +639,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		const animation = this._animatingSettings[key];
 
 		if (animation) {
+			--this._playingAnimations;
 			delete this._animatingSettings[key];
 			animation.stop();
 		}
@@ -758,6 +754,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		const animation = this._animatingPrivateSettings[key];
 
 		if (animation) {
+			--this._playingAnimations;
 			animation.stop();
 			delete this._animatingPrivateSettings[key];
 		}
@@ -829,6 +826,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 
 				const animation = this._animatingSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
 
+				++this._playingAnimations;
+
 				this._startAnimation();
 
 				return animation;
@@ -863,6 +862,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 				this.setPrivate(key, from);
 
 				const animation = this._animatingPrivateSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
+
+				++this._playingAnimations;
 
 				this._startAnimation();
 

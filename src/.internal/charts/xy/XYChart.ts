@@ -1291,9 +1291,8 @@ export class XYChart extends SerialChart {
 		const downPositionX = cursor.getPrivate("downPositionX", 0);
 		const downPositionY = cursor.getPrivate("downPositionY", 0);
 
-		const positionX = cursor.getPrivate("positionX", 0.5);
-		const positionY = cursor.getPrivate("positionY", 0.5);
-
+		const positionX = Math.min(1, Math.max(0, cursor.getPrivate("positionX", 0.5)));
+		const positionY = Math.min(1, Math.max(0, cursor.getPrivate("positionY", 0.5)));
 
 		this.xAxes.each((axis) => {
 			if (behavior === "zoomX" || behavior === "zoomXY") {

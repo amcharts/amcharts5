@@ -946,9 +946,14 @@ export function get12Hours(hours: number, base?: number): number {
  * @param utc      Assume UTC dates
  * @return Time zone name
  */
-export function getTimeZone(date: Date, long: boolean = false, savings: boolean = false, utc: boolean = false): string {
+export function getTimeZone(date: Date, long: boolean = false, savings: boolean = false, utc: boolean = false, timezone?: string): string {
 	if (utc) {
 		return long ? "Coordinated Universal Time" : "UTC";
+	}
+	else if (timezone) {
+		const d1 = date.toLocaleString("en-US", { timeZone: timezone });
+		const d2 = date.toLocaleString("en-US", { timeZone: timezone, timeZoneName: long ? "long" : "short" });
+		return trim(d2.substr(d1.length));
 	}
 	let wotz = date.toLocaleString("UTC");
 	let wtz = date.toLocaleString("UTC", { timeZoneName: long ? "long" : "short" }).substr(wotz.length);
@@ -961,8 +966,8 @@ export function getTimeZone(date: Date, long: boolean = false, savings: boolean 
 
 export function getTimezoneOffset(timezone: string): number {
 	const date = new Date(Date.UTC(2012, 0, 1, 0, 0, 0, 0));
-	const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
-	const tzDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+	const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
+	const tzDate = new Date(date.toLocaleString("en-US", { timeZone: timezone }));
 	return (tzDate.getTime() - utcDate.getTime()) / 6e4 * -1;
 }
 
