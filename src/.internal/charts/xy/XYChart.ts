@@ -851,7 +851,7 @@ export class XYChart extends SerialChart {
 		const plotContainer = this.plotContainer;
 
 		if (this.get("pinchZoomX") || this.get("pinchZoomY")) {
-			const touchEvent = event as any;
+			const touchEvent = event.originalEvent as any;
 			const pointerId = touchEvent.pointerId;
 
 			if (pointerId) {

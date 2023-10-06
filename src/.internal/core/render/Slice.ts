@@ -126,7 +126,7 @@ export class Slice extends Graphics {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("radius") || this.isDirty("arc") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("dRadius") || this.isDirty("dInnerRadius") || this.isDirty("cornerRadius")) {
+		if (this.isDirty("radius") || this.isDirty("arc") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("dRadius") || this.isDirty("dInnerRadius") || this.isDirty("cornerRadius") || this.isDirty("shiftRadius")) {
 			this._clear = true;
 		}
 	}
@@ -168,12 +168,10 @@ export class Slice extends Graphics {
 
 			this.ix = $math.cos(middleAngle);
 			this.iy = $math.sin(middleAngle);
-		}
 
-		if (this.isDirty("shiftRadius")) {
 			const shiftRadius = this.get("shiftRadius", 0);
 			this.setRaw("dx", this.ix * shiftRadius);
-			this.setRaw("dy", this.iy * shiftRadius);
+			this.setRaw("dy", this.iy * shiftRadius);			
 			this.markDirtyPosition();
 		}
 	}

@@ -128,21 +128,21 @@ function assertBinary(value: number): 0 | 1 {
 // 15 -> 0xffffff *  (3 / 16)
 // 16 -> 0xffffff *  (1 / 16)
 // @todo remove this old color distribution algo if the new one pans out
-// function distributeIdBAK(id: number): number {
-// 	if (id === 1) {
-// 		return 0x000001;
+/*function distributeId(id: number): number {
+	if (id === 1) {
+		return 0x000001;
 
-// 	} else {
-// 		// Finds the closest power of 2
-// 		const base = Math.pow(2, Math.ceil(Math.log(id) / Math.log(2)));
+	} else {
+		// Finds the closest power of 2
+		const base = Math.pow(2, Math.ceil(Math.log(id) / Math.log(2)));
 
-// 		// Translates the id into an odd fraction index
-// 		const index = ((base - id) * 2) + 1;
+		// Translates the id into an odd fraction index
+		const index = ((base - id) * 2) + 1;
 
-// 		// TODO is Math.round correct ?
-// 		return Math.round(0xffffff * (index / base));
-// 	}
-// }
+		// TODO is Math.round correct ?
+		return Math.round(0xffffff * (index / base));
+	}
+}*/
 
 /**
  * Function by smeans:
@@ -151,12 +151,14 @@ function assertBinary(value: number): 0 | 1 {
  */
 function distributeId(id: number): number {
 	const rgb = [0, 0, 0];
+
 	for (let i = 0; i < 24; i++) {
 		rgb[i % 3] <<= 1;
 		rgb[i % 3] |= id & 0x01;
 		id >>= 1;
 	}
-	return (rgb[2] | 0) + (rgb[1] << 8) + (rgb[0] << 16);
+
+	return (rgb[0] | 0) + (rgb[1] << 8) + (rgb[2] << 16);
 }
 
 /**
@@ -231,6 +233,16 @@ function clearCanvas(view: HTMLCanvasElement) {
 	view.height = 0;
 	view.style.width = "0px";
 	view.style.height = "0px";
+}
+
+
+/**
+ * Aligns the coordinate to the pixel, so it renders crisp
+ *
+ * @ignore
+ */
+function crisp(x: number): number {
+	return Math.floor(x);
 }
 
 /**
@@ -478,8 +490,8 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		let tx = m.tx * resolution;
 		let ty = m.ty * resolution;
 		if (this.crisp) {
-			tx = Math.floor(tx) + .5;
-			ty = Math.floor(ty) + .5;
+			tx = crisp(tx);
+			ty = crisp(ty);
 		}
 
 		context.setTransform(
@@ -3663,7 +3675,14 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 		this._dispatchEventAll("globalpointermove", event);
 	}
-
+/*
+	removeHovering(graphics: CanvasGraphics) {
+		this._hovering.delete(graphics);
+		if (graphics.cursorOverStyle) {
+			$utils.setStyle(document.body, "cursor", graphics._replacedCursorStyle!);
+		}
+	}
+*/
 	_dispatchGlobalMouseup(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 		event.native = native;

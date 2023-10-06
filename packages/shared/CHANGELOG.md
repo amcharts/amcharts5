@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.9] - 2023-10-06
+
+### Added
+- `drawingsInteractive(value: bool)` method added to `StockChart`. `false` will make current annotations (drawings) to be fully static (non-editable).
+
+### Fixed
+- Zoom out button on `XYChart` was not focusable.
+- Pulled out slices of a `PieSeries` could overlap with other slices if some slices were hidden.
+- Pinch-zooming was not working properly in `XYChart`.
+- Candlesticks on a `StockChart` were being colored based on previous period close value instead of current period open value.
+
+
 ## [5.4.8] - 2023-09-22
 
 ### Added

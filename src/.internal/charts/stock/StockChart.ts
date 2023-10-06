@@ -9,6 +9,7 @@ import type { XYSeries, IXYSeriesDataItem, IXYSeriesSettings } from "../xy/serie
 import type { DataItem } from "../../core/render/Component";
 import type { Indicator } from "./indicators/Indicator";
 import type { DrawingSeries } from "./drawing/DrawingSeries";
+import type { SimpleLineSeries } from "./drawing/SimpleLineSeries";
 import { MultiDisposer } from "../../core/util/Disposer";
 
 import { PanelControls } from "./PanelControls";
@@ -142,7 +143,7 @@ export interface IStockChartEvents extends IContainerEvents {
 	drawingsupdated: {};
 
 	/**
-	 * Kicks in when drawings change.
+	 * Kicks in when indicators change.
 	 */
 	indicatorsupdated: {};
 }
@@ -280,14 +281,60 @@ export class StockChart extends Container {
 		}
 	}
 
+	/**
+	 * Forces redrawing of all annotations (drfawings).
+	 */
 	public markDirtyDrawings() {
 		this._drawingsChanged = true;
 		this.markDirty();
 	}
 
+	/**
+	 * Forces redrawing of Indicators.
+	 */
 	public markDirtyIndicators() {
 		this._indicatorsChanged = true;
 		this.markDirty();
+	}
+
+	/**
+	 * Enables or disables interactivity of annotations (drawings).
+	 * 
+	 * @param value Drawings interactive?
+	 * @since 5.4.9
+	 */
+	public drawingsInteractive(value: boolean) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.strokes.each((stroke) => {
+						stroke.set("interactive", value)
+					});
+
+					series.fills.each((fill) => {
+						fill.set("interactive", value)
+					});
+
+					$array.each(series.dataItems, (dataItem) => {
+						if (dataItem.bullets) {
+							const bullet = dataItem.bullets[0];
+							if (bullet) {
+								const sprite = bullet.get("sprite");
+								if (sprite) {
+									sprite.set("interactive", value);
+								}
+							}
+						}
+					})
+
+					if (series.isType<SimpleLineSeries>("SimpleLineSeries")) {
+						series.hitLines.each((hitLine) => {
+							hitLine.set("interactive", value)
+						})
+					}
+				}
+			})
+		})
 	}
 
 	public _prepareChildren() {
@@ -302,7 +349,6 @@ export class StockChart extends Container {
 		}
 
 		const stockSeries = this.get("stockSeries");
-
 
 		if (this.isDirty("stockSeries")) {
 			if (stockSeries) {
@@ -391,8 +437,8 @@ export class StockChart extends Container {
 				const stockNegativeColor = this.get("stockNegativeColor", this._root.interfaceColors.get("negative"));
 				const stockPositiveColor = this.get("stockPositiveColor", this._root.interfaceColors.get("positive"));
 				let previous = stockSeries.dataItems[0];
-				
-				if(stockPositiveColor && stockPositiveColor){
+
+				if (stockPositiveColor && stockPositiveColor) {
 					$array.each(stockSeries.dataItems, (dataItem) => {
 						const column = dataItem.get("graphics");
 						if (column) {
@@ -421,11 +467,27 @@ export class StockChart extends Container {
 						}
 					})
 
-					stockSeries.columns.template.states.create("riseFromOpen", { fill: stockPositiveColor, stroke: stockPositiveColor });
-					stockSeries.columns.template.states.create("riseFromPrevious", { fill: stockPositiveColor, stroke: stockPositiveColor });
+					const states = stockSeries.columns.template.states;
 
-					stockSeries.columns.template.states.create("dropFromOpen", { fill: stockNegativeColor, stroke: stockNegativeColor });
-					stockSeries.columns.template.states.create("dropFromPrevious", { fill: stockNegativeColor, stroke: stockNegativeColor });
+					const riseFromOpen = states.lookup("riseFromOpen");
+					if (riseFromOpen) {
+						riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+					}
+
+					const riseFromPrevious = states.lookup("riseFromPrevious");
+					if (riseFromPrevious) {
+						riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+					}
+
+					const dropFromOpen = states.lookup("dropFromOpen");
+					if (dropFromOpen) {
+						dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+					}
+
+					const dropFromPrevious = states.lookup("dropFromPrevious");
+					if (dropFromPrevious) {
+						dropFromPrevious.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+					}
 				}
 
 				stockSeries.markDirtyValues();
@@ -453,7 +515,7 @@ export class StockChart extends Container {
 			const yAxis = stockSeries.get("yAxis") as ValueAxis<AxisRenderer>;
 			yAxis.set("logarithmic", false);
 
-		
+
 			this._maybePrepAxisDefaults();
 			if (mainChart) {
 				const seriesList: XYSeries[] = [];
@@ -538,7 +600,7 @@ export class StockChart extends Container {
 				}
 			}
 
-			if (this.get("autoSetPercentScale")) {				
+			if (this.get("autoSetPercentScale")) {
 				this.setPercentScale(true);
 			}
 
@@ -865,7 +927,7 @@ export class StockChart extends Container {
 			}
 
 
-			if(negativeColor && positiveColor){
+			if (negativeColor && positiveColor) {
 				if (stockSeries && volumeSeries) {
 					const index = volumeSeries.dataItems.indexOf(dataItem);
 					if (index > 0) {

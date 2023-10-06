@@ -728,7 +728,10 @@ export abstract class Series extends Component {
 		const bullets = dataItem.bullets;
 		if(bullets){
 			$array.each(bullets, (bullet)=>{
-				promises.push(bullet.get("sprite").show(duration));
+				const sprite = bullet.get("sprite");
+				if(sprite){
+					promises.push(sprite.show(duration));
+				}
 			})
 		}
 		await Promise.all(promises);
@@ -746,7 +749,10 @@ export abstract class Series extends Component {
 		const bullets = dataItem.bullets;
 		if(bullets){
 			$array.each(bullets, (bullet)=>{
-				promises.push(bullet.get("sprite").hide(duration));
+				const sprite = bullet.get("sprite");
+				if(sprite){					
+					promises.push(sprite.hide(duration));
+				}
 			})
 		}
 		await Promise.all(promises);

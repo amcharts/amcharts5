@@ -226,10 +226,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 
 
-			if (this.isDirty("groupInterval")) {
+			if (this.isDirty("groupInterval")) {				
 				let groupInterval = this.get("groupInterval")!;
 				if (groupInterval) {
 					this.setRaw("groupIntervals", [groupInterval]);
+					this._handleRangeChange();					
 				}
 			}
 
@@ -533,6 +534,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 							series.setDataSet(newId);
 						}
 					})
+
 					this.markDirtyExtremes();
 
 					this._root.events.once("frameended", () => {
