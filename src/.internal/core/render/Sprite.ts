@@ -56,19 +56,21 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 		},
 
 		"pointerover": function(event) {
-			/*
+
 			const sprite = this._sprite;
 			let dispatch = true;
-			
-			if (sprite.get("isMeasured")) {
+
+			if (sprite._trustBounds) {
+				sprite._getBounds()
 				const bounds = sprite.globalBounds();
+
 				if (!$math.inBounds(event.point, bounds)) {
 					dispatch = false;
 					sprite._root._renderer.removeHovering(sprite._display);
 				}
 			}
-			*/
-			if (this.isEnabled("pointerover")) {
+
+			if (dispatch && this.isEnabled("pointerover")) {
 				this.dispatch("pointerover", this._makePointerEvent("pointerover", event));
 			}
 		},
@@ -823,6 +825,8 @@ export abstract class Sprite extends Entity {
 	protected _tooltipPointerDp: MultiDisposer | undefined;
 
 	protected _statesHandled: boolean = false;
+
+	public _trustBounds: boolean = false;
 
 	protected _afterNew() {
 		this.setPrivateRaw("visible", true);
@@ -1620,7 +1624,7 @@ export abstract class Sprite extends Entity {
 
 	}
 
-	protected _getBounds() {
+	public _getBounds() {
 		this._localBounds = this._display.getLocalBounds();
 	}
 

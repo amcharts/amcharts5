@@ -470,23 +470,45 @@ export class StockChart extends Container {
 					const states = stockSeries.columns.template.states;
 
 					const riseFromOpen = states.lookup("riseFromOpen");
-					if (riseFromOpen) {
-						riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
-					}
+					const themeTags = stockSeries.columns.template.get("themeTags");
 
-					const riseFromPrevious = states.lookup("riseFromPrevious");
-					if (riseFromPrevious) {
-						riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
-					}
+					if (stockPositiveColor) {
+						if (riseFromOpen) {
+							riseFromOpen.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+						}
+						else {
+							states.create("riseFromOpen", { fill: stockPositiveColor, stroke: stockPositiveColor });
+						}
 
-					const dropFromOpen = states.lookup("dropFromOpen");
-					if (dropFromOpen) {
-						dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
-					}
 
-					const dropFromPrevious = states.lookup("dropFromPrevious");
-					if (dropFromPrevious) {
-						dropFromPrevious.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+						const riseFromPrevious = states.lookup("riseFromPrevious");
+						if (riseFromPrevious) {
+							riseFromPrevious.setAll({ fill: stockPositiveColor, stroke: stockPositiveColor });
+						}
+						else {
+							if (themeTags && themeTags.indexOf("pro") != -1) {
+								states.create("riseFromPrevious", { fill: stockPositiveColor, stroke: stockPositiveColor });
+							}
+						}
+					}
+					if (stockNegativeColor) {
+						const dropFromOpen = states.lookup("dropFromOpen");
+						if (dropFromOpen) {
+							dropFromOpen.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+						}
+						else {
+							states.create("dropFromOpen", { fill: stockNegativeColor, stroke: stockNegativeColor });
+						}
+
+						const dropFromPrevious = states.lookup("dropFromPrevious");
+						if (dropFromPrevious) {
+							dropFromPrevious.setAll({ fill: stockNegativeColor, stroke: stockNegativeColor });
+						}
+						else {
+							if (themeTags && themeTags.indexOf("pro") != -1) {
+								states.create("dropFromPrevious", { fill: stockNegativeColor, stroke: stockNegativeColor });
+							}
+						}
 					}
 				}
 

@@ -361,7 +361,7 @@ export class Container extends Sprite {
 		return this.height() - this.get("paddingTop", 0) - this.get("paddingBottom", 0);
 	}
 
-	protected _getBounds() {
+	public _getBounds() {
 
 		let width = this.get("width");
 		let height = this.get("height");

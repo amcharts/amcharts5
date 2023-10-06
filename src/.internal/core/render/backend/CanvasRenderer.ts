@@ -3675,14 +3675,14 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		}
 		this._dispatchEventAll("globalpointermove", event);
 	}
-/*
+
 	removeHovering(graphics: CanvasGraphics) {
 		this._hovering.delete(graphics);
 		if (graphics.cursorOverStyle) {
 			$utils.setStyle(document.body, "cursor", graphics._replacedCursorStyle!);
 		}
 	}
-*/
+
 	_dispatchGlobalMouseup(originalEvent: IPointerEvent, native: boolean): void {
 		const event = this.getEvent(originalEvent);
 		event.native = native;

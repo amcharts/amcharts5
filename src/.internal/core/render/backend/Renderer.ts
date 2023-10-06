@@ -269,6 +269,7 @@ export interface IRenderer extends IDisposer {
 	tapToActivate: boolean;
 	tapToActivateTimeout: number;
 	resolution: number;
+	removeHovering(graphics:IDisplayObject):void;
 	interactionsEnabled: boolean;
 	createLinearGradient(x1: number, y1: number, x2: number, y2: number): IGradient;
 	createRadialGradient(x1: number, y1: number, radius1: number, x2: number, y2: number, radius2: number): IGradient;
