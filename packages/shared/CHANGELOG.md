@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.4.11] - 2023-10-10
+
+### Fixed
+- `SliceGrouper` would use first color in series for a "group" slice if series was using a color set with custom list of colors.
+- Fixed a problem where no series was displayed after data with all 0 values was set (since `5.4.10`).
+- `forceInactive` was not working on `Container`.
+- `drawingsInteractive(value: bool)` method in `StockChart` was not working properly.
+
+
 ## [5.4.10] - 2023-10-06
 
 ### Fixed

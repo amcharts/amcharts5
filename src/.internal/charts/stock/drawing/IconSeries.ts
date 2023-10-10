@@ -7,6 +7,7 @@ import { Bullet } from "../../../core/render/Bullet";
 import { Graphics } from "../../../core/render/Graphics";
 import { SpriteResizer } from "../../../core/render/SpriteResizer";
 import { Template } from "../../../core/util/Template";
+import * as $array from "../../../core/util/Array";
 
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 
@@ -186,5 +187,21 @@ export class IconSeries extends PolylineSeries {
 		}
 
 		return Template.new(template);
+	}
+
+	public setInteractive(value: boolean) {
+		super.setInteractive(value)
+
+		$array.each(this.dataItems, (dataItem) => {
+			const bullets = dataItem.bullets;
+			if (bullets) {
+				$array.each(bullets, (bullet) => {
+					const sprite = bullet.get("sprite");
+					if (sprite) {
+						sprite.set("forceInactive", !value);
+					}
+				})
+			}
+		})
 	}
 }

@@ -44,7 +44,7 @@ export class EllipseSeries extends DrawingSeries {
 
 	public readonly ellipses: ListTemplate<Ellipse> = new ListTemplate(
 		Template.new({ radiusX: 0, radiusY: 0 }),
-		() => Ellipse._new(this._root, { radiusX: 0, radiusY: 0, templateField: "settings"}, [this.ellipses.template])
+		() => Ellipse._new(this._root, { radiusX: 0, radiusY: 0, templateField: "settings" }, [this.ellipses.template])
 	);
 
 	protected _afterNew() {
@@ -224,7 +224,7 @@ export class EllipseSeries extends DrawingSeries {
 		}
 	}
 
-	protected _createElements(index: number, dataItem?:DataItem<IDrawingSeriesDataItem>) {
+	protected _createElements(index: number, dataItem?: DataItem<IDrawingSeriesDataItem>) {
 		if (!this._ellipses[index]) {
 			const ellipse = this.makeEllipse();
 			ellipse._setDataItem(dataItem);
@@ -287,7 +287,7 @@ export class EllipseSeries extends DrawingSeries {
 		const chart = this.chart;
 
 		if (chart) {
-			this.data.push({ settings: this._getEllipseTemplate(), stroke:this._getStrokeTemplate(), index:index, corner:"e" });
+			this.data.push({ settings: this._getEllipseTemplate(), stroke: this._getStrokeTemplate(), index: index, corner: "e" });
 
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
@@ -380,5 +380,10 @@ export class EllipseSeries extends DrawingSeries {
 		}
 
 		return template;
+	}
+
+	public setInteractive(value: boolean) {
+		super.setInteractive(value);
+		this.ellipses.template.set("forceInactive", !value);
 	}
 }

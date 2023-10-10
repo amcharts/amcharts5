@@ -15,6 +15,8 @@ import { Bullet } from "../../../core/render/Bullet";
 import { Circle } from "../../../core/render/Circle";
 import { Container } from "../../../core/render/Container";
 import { Template } from "../../../core/util/Template";
+import { ListTemplate } from "../../../core/util/List";
+
 
 import * as $array from "../../../core/util/Array";
 import * as $time from "../../../core/util/Time";
@@ -115,6 +117,28 @@ export class DrawingSeries extends LineSeries {
 	protected _erasingEnabled: boolean = false;
 
 	protected _tag?: string;
+
+	public readonly grips: ListTemplate<Container> = new ListTemplate(
+		Template.new({}),
+		() => Container._new(this._root, {
+			themeTags: ["grip"],
+			setStateOnChildren: true,
+			draggable: true
+		}, [this.grips.template]),
+	);
+
+	public readonly circles: ListTemplate<Circle> = new ListTemplate(
+		Template.new({}),
+		() => Circle._new(this._root, {
+		}, [this.circles.template]),
+	);	
+
+	public readonly outerCircles: ListTemplate<Circle> = new ListTemplate(
+		Template.new({}),
+		() => Circle._new(this._root, {
+			themeTags: ["outline"]
+		}, [this.outerCircles.template]),
+	);		
 
 	protected _afterNew() {
 		this.addTag("drawing");
@@ -237,20 +261,16 @@ export class DrawingSeries extends LineSeries {
 				}
 			}
 
-			const container = Container.new(this._root, {
-				themeTags: ["grip"],
-				setStateOnChildren: true,
-				draggable: true
-			})
+			const container = this.grips.make();
+			this.grips.push(container);
 
-			container.children.push(Circle.new(this._root, {
-				themeTags: ["outline"],
-				stroke: color
-			}))
+			const circle = container.children.push(this.circles.make())
+			this.circles.push(circle);
+			circle.set("stroke", color);			
 
-			container.children.push(Circle.new(this._root, {
-				stroke: color
-			}));
+			const outerCircle = container.children.push(this.outerCircles.make())
+			this.outerCircles.push(outerCircle);
+			outerCircle.set("stroke", color);			
 
 			container.events.on("pointerover", (event) => {
 				const dataItem = event.target.dataItem;
@@ -350,6 +370,12 @@ export class DrawingSeries extends LineSeries {
 			i++;
 		})
 		return c;
+	}
+
+	public setInteractive(value: boolean) {
+		this.strokes.template.set("forceInactive", !value);
+		this.fills.template.set("forceInactive", !value);
+		this.grips.template.set("forceInactive", !value);
 	}
 
 	protected _showSegmentBullets(index: number) {
@@ -791,7 +817,10 @@ export class DrawingSeries extends LineSeries {
 		const xAxis = this.get("xAxis");
 		const min = xAxis.getPrivate("min", 0) + 1;
 		const max = xAxis.getPrivate("max", 1) - 1;
-		return Math.round($math.fitToRange(value, min, max));
+		if(xAxis.className == "GaplessDateAxis"){
+			value = $math.fitToRange(value, min, max);
+		}
+		return Math.round(value);
 	}
 
 	public _setContext(dataItem: DataItem<IDrawingSeriesDataItem>, key: any, value: any, working?: boolean) {

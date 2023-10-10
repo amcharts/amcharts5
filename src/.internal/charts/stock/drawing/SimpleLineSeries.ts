@@ -300,7 +300,7 @@ export class SimpleLineSeries extends DrawingSeries {
 		}
 	}
 
-	protected _updateExtensionLine(_line:Line, _template:Template<any>){
+	protected _updateExtensionLine(_line: Line, _template: Template<any>) {
 
 	}
 
@@ -347,5 +347,10 @@ export class SimpleLineSeries extends DrawingSeries {
 				hitLine.dispose();
 			}
 		}
+	}
+
+	public setInteractive(value: boolean) {
+		super.setInteractive(value);
+		this.hitLines.template.set("forceInactive", !value);
 	}
 }

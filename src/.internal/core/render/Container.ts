@@ -509,6 +509,18 @@ export class Container extends Sprite {
 		const innerWidth = this.innerWidth();
 		const innerHeight = this.innerHeight();
 
+		const fi = "forceInactive";
+		if (this.isDirty(fi)) {
+			const forceInactive = this.get(fi);
+			this.walkChildren((child) => {
+				child.set(fi, forceInactive);
+			})
+			const background = this.get("background");
+			if (background) {
+				background.set(fi, forceInactive);
+			}
+		}			
+
 		if (innerWidth != this._prevWidth || innerHeight != this._prevHeight) {
 			let layout = this.get("layout");
 			let horizontal = false;
@@ -553,6 +565,7 @@ export class Container extends Sprite {
 	}
 
 	public _updateChildren() {
+
 
 		if (this.isDirty("html")) {
 			const html = this.get("html");

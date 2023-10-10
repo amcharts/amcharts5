@@ -44,7 +44,7 @@ export class VerticalLineSeries extends SimpleLineSeries {
 				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
 
 				this._setContext(diP1, "valueY", valueY, true);
-				this._setContext(diP2, "valueY", valueY + 0.01, true);
+				this._setContext(diP2, "valueY", valueY + 0.0001, true);
 
 				this._setContext(diP1, "valueX", valueX);
 				this._setContext(diP2, "valueX", valueX);
@@ -63,7 +63,7 @@ export class VerticalLineSeries extends SimpleLineSeries {
 			const diP1 = this._di[index]["p1"];
 			const diP2 = this._di[index]["p2"];
 			if (diP1 && diP2) {
-				this._setContext(diP2, "valueY", diP1.get("valueY", 0) + 0.01, true);
+				this._setContext(diP2, "valueY", diP1.get("valueY", 0) + 0.0001, true);
 			}
 		}
 	}

@@ -164,7 +164,7 @@ export class LabelSeries extends PolylineSeries {
 
 				this._index++;
 				this._di[this._index] = {};
-				
+
 				const input = this.getPrivate("input");
 				input.value = "";
 
@@ -174,7 +174,7 @@ export class LabelSeries extends PolylineSeries {
 				inputDiv.style.left = (event.point.x) + "px";
 				inputDiv.style.top = (event.point.y) + "px";
 				input.focus();
-				this.spriteResizer.set("sprite", undefined);				
+				this.spriteResizer.set("sprite", undefined);
 			}
 		}
 	}
@@ -196,7 +196,7 @@ export class LabelSeries extends PolylineSeries {
 		}
 	}
 
-	protected _afterTextSave(_dataContext:any){
+	protected _afterTextSave(_dataContext: any) {
 
 	}
 

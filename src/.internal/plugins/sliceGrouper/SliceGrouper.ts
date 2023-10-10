@@ -57,6 +57,8 @@ export interface ISliceGrouperPrivate extends IEntityPrivate {
 	groupDataItem?: DataItem<IPercentSeriesDataItem>;
 	normalDataItems?: DataItem<IPercentSeriesDataItem>[];
 	smallDataItems?: DataItem<IPercentSeriesDataItem>[];
+	currentStep?: number;
+	currentPass?: number;
 }
 
 export interface ISliceGrouperEvents extends IEntityEvents {
@@ -90,6 +92,15 @@ export class SliceGrouper extends Entity {
 		this._setRawDefault("clickBehavior", "none");
 		this.initZoomButton();
 		this._root.addDisposer(this);
+
+		const series = this.get("series");
+		if (series) {
+			const colors = series.get("colors");
+			if (colors) {
+				this.setPrivate("currentStep", colors.getPrivate("currentStep"));
+				this.setPrivate("currentPass", colors.getPrivate("currentPass"));
+			}
+		}
 	}
 
 	private initZoomButton(): void {
@@ -127,6 +138,12 @@ export class SliceGrouper extends Entity {
 				const groupSliceData: any = {};
 				groupSliceData[categoryField] = this.get("groupName", "");
 				groupSliceData[valueField] = 0;
+
+				const colors = series.get("colors");
+				if (colors) {
+					colors.setPrivate("currentStep", this.getPrivate("currentStep"));
+					colors.setPrivate("currentPass", this.getPrivate("currentPass"));
+				}
 				series.data.push(groupSliceData);
 
 				groupDataItem = series.dataItems[series.dataItems.length - 1];
@@ -276,7 +293,6 @@ export class SliceGrouper extends Entity {
 				});
 			}
 		}
-
 	}
 
 }

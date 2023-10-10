@@ -9,7 +9,6 @@ import type { XYSeries, IXYSeriesDataItem, IXYSeriesSettings } from "../xy/serie
 import type { DataItem } from "../../core/render/Component";
 import type { Indicator } from "./indicators/Indicator";
 import type { DrawingSeries } from "./drawing/DrawingSeries";
-import type { SimpleLineSeries } from "./drawing/SimpleLineSeries";
 import { MultiDisposer } from "../../core/util/Disposer";
 
 import { PanelControls } from "./PanelControls";
@@ -307,31 +306,7 @@ export class StockChart extends Container {
 		this.panels.each((panel) => {
 			panel.series.each((series) => {
 				if (series.isType<DrawingSeries>("DrawingSeries")) {
-					series.strokes.each((stroke) => {
-						stroke.set("interactive", value)
-					});
-
-					series.fills.each((fill) => {
-						fill.set("interactive", value)
-					});
-
-					$array.each(series.dataItems, (dataItem) => {
-						if (dataItem.bullets) {
-							const bullet = dataItem.bullets[0];
-							if (bullet) {
-								const sprite = bullet.get("sprite");
-								if (sprite) {
-									sprite.set("interactive", value);
-								}
-							}
-						}
-					})
-
-					if (series.isType<SimpleLineSeries>("SimpleLineSeries")) {
-						series.hitLines.each((hitLine) => {
-							hitLine.set("interactive", value)
-						})
-					}
+					series.setInteractive(value);
 				}
 			})
 		})

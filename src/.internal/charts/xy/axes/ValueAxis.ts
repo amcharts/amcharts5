@@ -1002,7 +1002,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			if (selectionMin === selectionMax) {
-				this._getDelta(selectionMax);
 				selectionMin -= this._deltaMinMax;
 				selectionMax += this._deltaMinMax;
 				let minMaxStep2 = this._adjustMinMax(selectionMin, selectionMax, gridCount, strictMinMax);
