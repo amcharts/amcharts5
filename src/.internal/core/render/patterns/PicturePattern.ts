@@ -27,6 +27,10 @@ export interface IPicturePatternSettings extends IPatternSettings {
 	 */
 	centered?: boolean;
 
+
+
+	canvas?: HTMLCanvasElement;
+
 }
 
 export interface IPicturePatternPrivate extends IPatternPrivate {
@@ -66,14 +70,18 @@ export class PicturePattern extends Pattern {
 		if (this.isDirty("src")) {
 			this._load();
 		}
+
+		const canvas = this.get("canvas");
+		if (canvas) {
+			this.set("width", canvas.width);
+			this.set("height", canvas.height)
+		}		
 	}
 
 	protected _draw() {
 		super._draw();
-
 		const image = this._image;
 		if (image) {
-
 			const patternWidth = this.get("width", 100);
 			const patternHeight = this.get("height", 100);
 
@@ -105,6 +113,10 @@ export class PicturePattern extends Pattern {
 			this._display.image(image, width, height, x, y);
 		}
 
+		const canvas = this.get("canvas");
+		if (canvas) {
+			this._display.image(canvas, canvas.width, canvas.height, 0, 0);
+		}
 	}
 
 	protected _load() {

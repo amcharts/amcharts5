@@ -1563,7 +1563,7 @@ export class XYChart extends SerialChart {
 		this.series.each((series) => {
 			const tooltip = series.get("tooltip")!;
 
-			if (tooltip) {
+			if (tooltip && !tooltip.get("forceHidden")) {
 				let hidden = false;
 				let point = tooltip.get("pointTo")!;
 				if (point) {

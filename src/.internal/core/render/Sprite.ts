@@ -60,7 +60,7 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			const sprite = this._sprite;
 			let dispatch = true;
 
-			if (sprite._trustBounds) {
+			if (sprite.getPrivate("trustBounds")) {
 				sprite._getBounds()
 				const bounds = sprite.globalBounds();
 
@@ -442,7 +442,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 *
 	 * IMPORTANT: SVG filters are not supported in some browsers, e.g. Safari.
 	 *
-	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/#SVG_filters} for more info
 	 * @ignore todo: figure out if we still need this
 	 */
 	filter?: string;
@@ -524,6 +524,94 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * @since 5.3.0
 	 */
 	crisp?: boolean;
+
+	/**
+	 * Apply blur filter.
+	 *
+	 * Ranges of values in pixels: `0` to `X`.
+	 * 
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	blur?: number;
+
+	/**
+	 * Modifty visual brightness.
+	 *
+	 * Range of values: `0` to `1`.
+	 *
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	brightness?: number;
+
+	/**
+	 * Modify contrast.
+	 *
+	 * Range of values: `0` to `1`.
+	 *
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	contrast?: number;
+
+	/**
+	 * Modify saturation.
+	 *
+	 * Range of values in pixels: `0` to `X`.
+	 *
+	 * * `0` - grayscale
+	 * * `1` - no changes
+	 * * ``>1` - more saturated
+	 *
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	saturate?: number;
+
+	/**
+	 * Apply sepia filter.
+	 *
+	 * Range of values: `0` (no changes) to `1` (complete sepia).
+	 *
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	sepia?: number;
+
+	/**
+	 * Invert colors.
+	 *
+	 * Range of values: `0` (no changes) to `1` (completely inverted colors).
+	 *
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	invert?: number;
+
+	/**
+	 * Rotate HUE colors in degrees.
+	 *
+	 * Range of values: `0` to `360`.
+	 *
+	 * IMPORTANT: This setting is not supported in Safari browsers.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @since 5.5.0
+	 */
+	hue?: number;
 
 }
 
@@ -614,6 +702,20 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 * @since 5.3.16
 	 */
 	focusable?: boolean;
+
+	/**
+	 * If set to `true`, the sprite will check if a mouse pointer is within
+	 * its bounds before dispatching pointer events.
+	 * 
+	 * This helps to solve ghost tooltips problem that sometimes appear while
+	 * moving the pointer over interactive objects.
+	 * 
+	 * This is set to `true` by default on `Rectangle` and `Circle`.
+	 *
+	 * @since 5.5.0
+	 */
+	trustBounds?: boolean;
+
 }
 
 /**
@@ -825,8 +927,6 @@ export abstract class Sprite extends Entity {
 	protected _tooltipPointerDp: MultiDisposer | undefined;
 
 	protected _statesHandled: boolean = false;
-
-	public _trustBounds: boolean = false;
 
 	protected _afterNew() {
 		this.setPrivateRaw("visible", true);
@@ -1251,6 +1351,62 @@ export abstract class Sprite extends Entity {
 			display.filter = this.get("filter");
 		}
 
+		let filter = this.get("filter", "");
+
+		if (this.isDirty("blur")) {
+			const blur = this.get("blur", 0);
+			if (blur != 0) {
+				filter += " blur(" + blur + "px)";
+			}
+		}
+
+		if (this.isDirty("saturate")) {
+			const saturate = this.get("saturate", 1);
+			if (saturate != 1) {
+				filter += " saturate(" + saturate + ")";
+			}
+		}
+
+		if (this.isDirty("brightness")) {
+			const brightness = this.get("brightness", 1);
+			if (brightness != 1) {
+				filter += " brightness(" + brightness + ")";
+			}
+		}
+
+		if (this.isDirty("contrast")) {
+			const contrast = this.get("contrast", 1);
+			if (contrast != 1) {
+				filter += " contrast(" + contrast + ")";
+			}
+		}
+
+		if (this.isDirty("sepia")) {
+			const sepia = this.get("sepia", 0);
+			if (sepia != 0) {
+				filter += " sepia(" + sepia + ")";
+			}
+		}
+
+		if (this.isDirty("hue")) {
+			const hue = this.get("hue", 0);
+			if (hue != 0) {
+				filter += " hue-rotate(" + hue + "deg)";
+			}
+		}
+
+		if (this.isDirty("invert")) {
+			const invert = this.get("invert", 0);
+			if (invert != 0) {
+				filter += " invert(" + invert + ")";
+			}
+		}
+
+
+		if (filter) {
+			display.filter = filter;
+		}
+
 		if (this.isDirty("cursorOverStyle")) {
 			display.cursorOverStyle = this.get("cursorOverStyle");
 		}
@@ -1372,7 +1528,7 @@ export abstract class Sprite extends Entity {
 		}
 
 		if (this.isDirty("forceInactive")) {
-			this._display.inactive = this.get("forceInactive", false);
+			this._display.inactive = this.get("forceInactive", null);
 		}
 
 		if (this.get("showTooltipOn") == "always" && this._display.visible) {

@@ -929,16 +929,36 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					let seriesMin: number | undefined;
 					let seriesMax: number | undefined;
 					const outOfSelection = series.getPrivate("outOfSelection");
+
 					if (series.get("xAxis") === this) {
 						if (!outOfSelection) {
-							seriesMin = series.getPrivate("selectionMinX", series.getPrivate("minX"));
-							seriesMax = series.getPrivate("selectionMaxX", series.getPrivate("maxX"));
+							let minX = series.getPrivate("minX");
+							let maxX = series.getPrivate("maxX");
+
+							// solves #90085
+							if (series.startIndex() != 0 || series.endIndex() != series.dataItems.length) {
+								minX = undefined;
+								maxX = undefined;
+							}
+
+							seriesMin = series.getPrivate("selectionMinX", minX);
+							seriesMax = series.getPrivate("selectionMaxX", maxX);
 						}
 					}
 					else if (series.get("yAxis") === this) {
 						if (!outOfSelection) {
-							seriesMin = series.getPrivate("selectionMinY", series.getPrivate("minY"));
-							seriesMax = series.getPrivate("selectionMaxY", series.getPrivate("maxY"));
+
+							let minY = series.getPrivate("minY");
+							let maxY = series.getPrivate("maxY");
+
+							// solves #90085
+							if (series.startIndex() != 0 || series.endIndex() != series.dataItems.length) {
+								minY = undefined;
+								maxY = undefined;
+							}
+
+							seriesMin = series.getPrivate("selectionMinY", minY);
+							seriesMax = series.getPrivate("selectionMaxY", maxY);
 						}
 					}
 

@@ -77,6 +77,7 @@ export class RectanglePattern extends Pattern {
 		let rectW = this.get("maxWidth", 5);
 		let rectH = this.get("maxHeight", 5);
 
+		const display = this._display;
 
 		let cellW = rectW + gap;
 		let cellH = rectH + gap;
@@ -89,8 +90,8 @@ export class RectanglePattern extends Pattern {
 
 		if (rotation != 0) {
 			// @todo this is probably not right
-			this._display.x = cellW / 2 * $math.cos(rotation);
-			this._display.y = -cellH / 2 * $math.sin(rotation);
+			display.x = cellW / 2 * $math.cos(rotation);
+			display.y = -cellH / 2 * $math.sin(rotation);
 		}
 
 		for (let r = rotation == 0 ? 0 : -rows * 2; r < rows * 2; r++) {
@@ -102,7 +103,7 @@ export class RectanglePattern extends Pattern {
 						x += (cellW - rectW) / 2;
 						y += (cellH - rectH) / 2;
 					}
-					this._display.drawRect(x, y, rectW, rectH);
+					display.drawRect(x, y, rectW, rectH);
 				}
 			}
 		}
@@ -121,8 +122,8 @@ export class RectanglePattern extends Pattern {
 		if (color || colorOpacity) {
 			// this._display.lineStyle(strokeWidth, stroke, colorOpacity);
 			// this._display.endStroke();
-			this._display.beginFill(color, colorOpacity);
-			this._display.endFill();
+			display.beginFill(color, colorOpacity);
+			display.endFill();
 		}
 
 	}

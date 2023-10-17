@@ -85,7 +85,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	/**
 	 * Setting this to an instance of [[Scrollbar]] will enable vertical
 	 * scrolling of content if it does not fit into the Container.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Scrollbar} for more info
 	 */
 	verticalScrollbar?: Scrollbar;
@@ -508,18 +508,6 @@ export class Container extends Sprite {
 	public _prepareChildren() {
 		const innerWidth = this.innerWidth();
 		const innerHeight = this.innerHeight();
-
-		const fi = "forceInactive";
-		if (this.isDirty(fi)) {
-			const forceInactive = this.get(fi);
-			this.walkChildren((child) => {
-				child.set(fi, forceInactive);
-			})
-			const background = this.get("background");
-			if (background) {
-				background.set(fi, forceInactive);
-			}
-		}			
 
 		if (innerWidth != this._prevWidth || innerHeight != this._prevHeight) {
 			let layout = this.get("layout");

@@ -269,6 +269,12 @@ export class CanvasPivot implements IPoint {
 	}
 }
 
+
+interface IStatus {
+	layer: CanvasLayer;
+	inactive: boolean | null;
+}
+
 /**
  * @ignore
  */
@@ -279,7 +285,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	public visible: boolean = true;
 	public exportable?: boolean = true;
 	public interactive: boolean = false;
-	public inactive: boolean = false;
+	public inactive: boolean | null = null;
 	public wheelable: boolean = false;
 	public cancelTouch: boolean = false;
 	public isMeasured: boolean = false;
@@ -313,6 +319,13 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	constructor(renderer: CanvasRenderer) {
 		super();
 		this._renderer = renderer;
+	}
+
+	protected subStatus(status: IStatus): IStatus {
+		return {
+			inactive: (this.inactive == null ? status.inactive : this.inactive),
+			layer: this._layer || status.layer,
+		};
 	}
 
 	protected _dispose(): void {
@@ -388,7 +401,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	}
 
 	protected _isInteractive(): boolean {
-		return this.inactive == false && (this.interactive || this._renderer._forceInteractive > 0);
+		return !this.inactive && (this.interactive || this._renderer._forceInteractive > 0);
 	}
 
 	protected _isInteractiveMask(): boolean {
@@ -525,7 +538,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		}
 	}
 
-	public render(parentLayer: CanvasLayer): void {
+	public render(status: IStatus): void {
 		if (this.visible && (this.exportable !== false || !this._renderer._omitTainted)) {
 			this._setMatrix();
 
@@ -574,7 +587,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 			this._transformMargin(ghostContext, resolution, ghostLayer.margin);
 
-			this._render(parentLayer);
+			this._render(this.subStatus(status));
 
 			ghostContext.restore();
 
@@ -586,10 +599,9 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		}
 	}
 
-	protected _render(parentLayer: CanvasLayer): void {
+	protected _render(status: IStatus): void {
 		if (this.exportable === false) {
-			const layer = this._layer || parentLayer;
-			layer.tainted = true;
+			status.layer.tainted = true;
 		}
 	}
 
@@ -652,8 +664,8 @@ export class CanvasContainer extends CanvasDisplayObject implements IContainer {
 		$array.removeFirst(this._children, child);
 	}
 
-	protected _render(parentLayer: CanvasLayer): void {
-		super._render(parentLayer);
+	protected _render(status: IStatus): void {
+		super._render(status);
 
 		const renderer = this._renderer;
 
@@ -661,11 +673,9 @@ export class CanvasContainer extends CanvasDisplayObject implements IContainer {
 			++renderer._forceInteractive;
 		}
 
-		const layer = this._layer || parentLayer;
-
 		$array.each(this._children, (child) => {
 			child.compoundAlpha = this.compoundAlpha * this.alpha;
-			child.render(layer);
+			child.render(status);
 		});
 
 		if (this.interactive && this.interactiveChildren) {
@@ -1060,7 +1070,7 @@ class Shadow extends Op {
  */
 class GraphicsImage extends Op {
 	constructor(
-		public image: HTMLImageElement,
+		public image: HTMLImageElement | HTMLCanvasElement,
 		public width: number,
 		public height: number,
 		public x: number,
@@ -1192,7 +1202,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		this._pushOp(new Shadow(opacity ? color.toCSS(opacity) : color.toCSS(this._fillAlpha || this._strokeAlpha), blur, offsetX, offsetY));
 	}
 
-	image(image: HTMLImageElement, width: number, height: number, x: number, y: number): void {
+	image(image: HTMLImageElement | HTMLCanvasElement, width: number, height: number, x: number, y: number): void {
 		this._pushOp(new GraphicsImage(image, width, height, x, y));
 	}
 
@@ -1467,17 +1477,15 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		});
 	}
 
-	protected _render(parentLayer: CanvasLayer): void {
-		super._render(parentLayer);
+	protected _render(status: IStatus): void {
+		super._render(status);
 
-		const layer = this._layer || parentLayer;
-
-		const layerDirty = layer.dirty;
+		const layerDirty = status.layer.dirty;
 		const interactive = this._isInteractive();
 
 		if (layerDirty || interactive) {
 
-			const context = layer.context;
+			const context = status.layer.context;
 			const ghostContext = this._renderer._ghostLayer.context;
 
 			if (layerDirty) {
@@ -1622,10 +1630,10 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 	}
 
-	protected _prerender(layer: CanvasLayer, ignoreGhost = false, ignoreFontWeight = false): void {
-		super._render(layer);
+	protected _prerender(status: IStatus, ignoreGhost = false, ignoreFontWeight = false): void {
+		super._render(status);
 
-		const context = layer.context;
+		const context = status.layer.context;
 		const ghostContext = this._renderer._ghostLayer.context;
 
 		// Font style
@@ -1648,16 +1656,16 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		}
 
 		if (style.shadowColor) {
-			layer.context.shadowColor = style.shadowColor.toCSS(style.shadowOpacity || 1);
+			status.layer.context.shadowColor = style.shadowColor.toCSS(style.shadowOpacity || 1);
 		}
 		if (style.shadowBlur) {
-			layer.context.shadowBlur = style.shadowBlur;
+			status.layer.context.shadowBlur = style.shadowBlur;
 		}
 		if (style.shadowOffsetX) {
-			layer.context.shadowOffsetX = style.shadowOffsetX;
+			status.layer.context.shadowOffsetX = style.shadowOffsetX;
 		}
 		if (style.shadowOffsetY) {
-			layer.context.shadowOffsetY = style.shadowOffsetY;
+			status.layer.context.shadowOffsetY = style.shadowOffsetY;
 		}
 
 		this._shared(context);
@@ -1723,24 +1731,22 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		return fontStyle.join(" ");
 	}
 
-	protected _render(parentLayer: CanvasLayer): void {
-		const layer = this._layer || parentLayer;
-
+	protected _render(status: IStatus): void {
 		// We need measurements in order to properly position text for alignment
 		if (!this._textInfo) {
-			this._measure(layer);
+			this._measure(status);
 		}
 
 		if (this.textVisible) {
 
 			const interactive = this._isInteractive();
-			const context = layer.context;
-			const layerDirty = layer.dirty;
+			const context = status.layer.context;
+			const layerDirty = status.layer.dirty;
 			const ghostContext = this._renderer._ghostLayer.context;
 
 			context.save();
 			ghostContext.save();
-			this._prerender(layer);
+			this._prerender(status);
 
 			// const lines = this.text.toString().replace(/\r/g, "").split(/\n/);
 			// const x = this._localBounds && (this._localBounds.left < 0) ? Math.abs(this._localBounds.left) : 0;
@@ -1859,7 +1865,10 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 	public _addBounds(bounds: IBounds): void {
 		if (this.visible && this.isMeasured) {
 			//if (this._textVisible) {
-			const x = this._measure(this.getLayer());
+			const x = this._measure({
+				inactive: this.inactive,
+				layer: this.getLayer(),
+			});
 			setPoint(bounds, { x: x.left, y: x.top });
 			setPoint(bounds, { x: x.right, y: x.bottom });
 			//}
@@ -1870,8 +1879,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		return /apple/i.test(navigator.vendor);
 	}
 
-	public _measure(layer: CanvasLayer): IBounds {
-		const context = layer.context;
+	public _measure(status: IStatus): IBounds {
+		const context = status.layer.context;
 		const ghostContext = this._renderer._ghostLayer.context;
 		const rtl = this.style.direction == "rtl";
 
@@ -1888,7 +1897,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		// Pre-render
 		context.save();
 		ghostContext.save();
-		this._prerender(layer, true, this._ignoreFontWeight());
+		this._prerender(status, true, this._ignoreFontWeight());
 
 		// Get default font metrix
 		const refText = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
@@ -2415,26 +2424,24 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 	private _textReversed: boolean = false;
 
-	public _render(parentLayer: CanvasLayer): void {
+	public _render(status: IStatus): void {
 		switch (this.textType) {
 			case "circular":
-				this._renderCircular(parentLayer);
+				this._renderCircular(status);
 				break;
 			default:
-				super._render(parentLayer);
+				super._render(status);
 				break;
 		}
 	}
 
-	public _renderCircular(parentLayer: CanvasLayer): void {
+	public _renderCircular(status: IStatus): void {
 		if (this.textVisible) {
-			const layer = this._layer || parentLayer;
-
-			this._prerender(layer);
+			this._prerender(status);
 
 			const interactive = this._isInteractive();
-			const context = layer.context;
-			const layerDirty = layer.dirty;
+			const context = status.layer.context;
+			const layerDirty = status.layer.dirty;
 			const ghostContext = this._renderer._ghostLayer.context;
 
 			// Savepoint
@@ -2445,7 +2452,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 			// We need measurements in order to properly position text for alignment
 			if (!this._textInfo) {
-				this._measure(layer);
+				this._measure(status);
 			}
 
 			// Init
@@ -2633,17 +2640,17 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		}
 	}
 
-	public _measure(layer: CanvasLayer): IBounds {
+	public _measure(status: IStatus): IBounds {
 		switch (this.textType) {
 			case "circular":
-				return this._measureCircular(layer);
+				return this._measureCircular(status);
 			default:
-				return super._measure(layer);
+				return super._measure(status);
 		}
 	}
 
-	public _measureCircular(layer: CanvasLayer): IBounds {
-		const context = layer.context;
+	public _measureCircular(status: IStatus): IBounds {
+		const context = status.layer.context;
 		const ghostContext = this._renderer._ghostLayer.context;
 		const rtl = this.style.direction == "rtl";
 
@@ -2664,7 +2671,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		// Pre-render
 		context.save();
 		ghostContext.save();
-		this._prerender(layer, true);
+		this._prerender(status, true);
 
 		// Split up text into lines
 		const lines = this.text.toString().replace(/\r/g, "").split(/\n/);
@@ -2921,41 +2928,39 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 		return this._localBounds;
 	}
 
-	protected _render(parentLayer: CanvasLayer): void {
-		super._render(parentLayer);
+	protected _render(status: IStatus): void {
+		super._render(status);
 
 		if (this.image) {
-			const layer = this._layer || parentLayer;
-
 			if (this.tainted === undefined) {
 				this.tainted = isTainted(this.image);
-				layer.tainted = true;
+				status.layer.tainted = true;
 			}
 
 			if (this.tainted && this._renderer._omitTainted) {
 				return;
 			}
 
-			if (layer.dirty) {
+			if (status.layer.dirty) {
 
 				if (this.shadowColor) {
-					layer.context.shadowColor = this.shadowColor.toCSS(this.shadowOpacity || 1);
+					status.layer.context.shadowColor = this.shadowColor.toCSS(this.shadowOpacity || 1);
 				}
 				if (this.shadowBlur) {
-					layer.context.shadowBlur = this.shadowBlur;
+					status.layer.context.shadowBlur = this.shadowBlur;
 				}
 				if (this.shadowOffsetX) {
-					layer.context.shadowOffsetX = this.shadowOffsetX;
+					status.layer.context.shadowOffsetX = this.shadowOffsetX;
 				}
 				if (this.shadowOffsetY) {
-					layer.context.shadowOffsetY = this.shadowOffsetY;
+					status.layer.context.shadowOffsetY = this.shadowOffsetY;
 				}
 
 				// TODO should this round ?
 				const width = this.width || this.image.naturalWidth;
 				const height = this.height || this.image.naturalHeight;
 
-				layer.context.drawImage(this.image, 0, 0, width, height);
+				status.layer.context.drawImage(this.image, 0, 0, width, height);
 			}
 
 			if (this.interactive && this._isInteractive()) {
@@ -3276,6 +3281,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return this._patternContext.createPattern(this._patternCanvas, repetition)!;
 	}
 
+	
+
 	makeContainer(): CanvasContainer {
 		return new CanvasContainer(this);
 	}
@@ -3420,7 +3427,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		this._ghostLayer.clear();
 
-		root.render(this.defaultLayer);
+		root.render({
+			inactive: null,
+			layer: this.defaultLayer,
+		});
 
 		this._ghostLayer.context.restore();
 

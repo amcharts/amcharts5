@@ -203,6 +203,18 @@ export class DefaultTheme extends Theme {
 			height: 45
 		});
 
+		r("GrainPattern").setAll({
+			width:200,
+			height:200,
+			colors:[Color.fromHex(0x000000)],
+			size:1,
+			horizontalGap:0,
+			verticalGap:0,
+			density:1,
+			minOpacity:0,
+			maxOpacity:0.2
+		});		
+
 		/**
 		 * ------------------------------------------------------------------------
 		 * core: gradients

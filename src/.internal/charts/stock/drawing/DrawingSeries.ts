@@ -771,9 +771,9 @@ export class DrawingSeries extends LineSeries {
 		const baseInterval = xAxis.getPrivate("baseInterval");
 		const root = this._root;
 		const firstDayOfWeek = root.locale.firstDayOfWeek;
-		const open = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc).getTime();
+		const open = $time.round(new Date(value), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc, undefined, root.timezone).getTime();
 		let close = open + $time.getDuration(baseInterval.timeUnit, baseInterval.count * 1.05);
-		close = $time.round(new Date(close), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc).getTime();
+		close = $time.round(new Date(close), baseInterval.timeUnit, baseInterval.count, firstDayOfWeek, root.utc, undefined, root.timezone).getTime();
 		const locationX = (value - open) / (close - open);
 		dataItem.set("locationX", locationX);
 	}
@@ -814,12 +814,6 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	protected _getXValue(value: number): number {
-		const xAxis = this.get("xAxis");
-		const min = xAxis.getPrivate("min", 0) + 1;
-		const max = xAxis.getPrivate("max", 1) - 1;
-		if(xAxis.className == "GaplessDateAxis"){
-			value = $math.fitToRange(value, min, max);
-		}
 		return Math.round(value);
 	}
 

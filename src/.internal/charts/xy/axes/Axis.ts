@@ -778,7 +778,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @ignore
 	 */
 	public hideDataItem(dataItem: DataItem<IAxisDataItem>): Promise<void> {
-		this._toggleDataItem(dataItem, false);
+		this._toggleFHDataItem(dataItem, true);
 		return super.hideDataItem(dataItem);
 	}
 
@@ -786,34 +786,63 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @ignore
 	 */
 	public showDataItem(dataItem: DataItem<IAxisDataItem>): Promise<void> {
-		this._toggleDataItem(dataItem, true);
+		this._toggleFHDataItem(dataItem, false);
 		return super.showDataItem(dataItem);
 	}
 
-
-	public _toggleDataItem(dataItem: DataItem<IAxisDataItem>, visible: boolean) {
+	public _toggleFHDataItem(dataItem: DataItem<IAxisDataItem>, forceHidden: boolean) {
+		const fh = "forceHidden";
 		const label = dataItem.get("label");
 		if (label) {
-			label.setPrivate("visible", visible);
+			label.set(fh, forceHidden);
 		}
 		const grid = dataItem.get("grid");
 		if (grid) {
-			grid.setPrivate("visible", visible);
+			grid.set(fh, forceHidden);
 		}
 		const tick = dataItem.get("tick");
 		if (tick) {
-			tick.setPrivate("visible", visible);
+			tick.set(fh, forceHidden);
 		}
 		const axisFill = dataItem.get("axisFill");
 		if (axisFill) {
-			axisFill.setPrivate("visible", visible);
+			axisFill.set(fh, forceHidden);
 		}
 
 		const bullet = dataItem.get("bullet");
 		if (bullet) {
 			const sprite = bullet.get("sprite");
 			if (sprite) {
-				sprite.setPrivate("visible", visible);
+				sprite.set(fh, forceHidden);
+			}
+		}
+	}
+
+
+	public _toggleDataItem(dataItem: DataItem<IAxisDataItem>, visible: boolean) {
+		const label = dataItem.get("label");
+		const v = "visible";
+		if (label) {
+			label.setPrivate(v, visible);
+		}
+		const grid = dataItem.get("grid");
+		if (grid) {
+			grid.setPrivate(v, visible);
+		}
+		const tick = dataItem.get("tick");
+		if (tick) {
+			tick.setPrivate(v, visible);
+		}
+		const axisFill = dataItem.get("axisFill");
+		if (axisFill) {
+			axisFill.setPrivate(v, visible);
+		}
+
+		const bullet = dataItem.get("bullet");
+		if (bullet) {
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+				sprite.setPrivate(v, visible);
 			}
 		}
 	}

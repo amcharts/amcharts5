@@ -169,9 +169,11 @@ export interface IGraphicsSettings extends ISpriteSettings {
 }
 
 export interface IGraphicsPrivate extends ISpritePrivate {
+
 }
 
 export interface IGraphicsEvents extends ISpriteEvents {
+
 }
 
 /**
@@ -306,36 +308,12 @@ export class Graphics extends Sprite {
 				this._display.shadow(shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY, shadowOpacity);
 			}
 
-			if (fillPattern) {
-				let changed = false;
-				if (fill && (!fillPattern.get("fill") || fillPattern.get("fillInherited"))) {
-					fillPattern.set("fill", fill);
-					fillPattern.set("fillInherited", true)
-					changed = true;
-				}
-				if (stroke && (!fillPattern.get("color") || fillPattern.get("colorInherited"))) {
-					fillPattern.set("color", stroke);
-					fillPattern.set("colorInherited", true)
-					changed = true;
-				}
-				if (changed) {
-					// @todo: is this OK?
-					fillPattern._changed();
-				}
-				const pattern = fillPattern.pattern;
-				if (pattern) {
-					this._display.beginFill(pattern, fillOpacity);
-					this._display.endFill();
-
-					if (fillPattern instanceof PicturePattern) {
-						fillPattern.events.once("loaded", () => {
-							this._clear = true;
-							this.markDirty();
-						});
-					}
-				}
+			if (fill && !fillGradient) {
+				this._display.beginFill(fill, fillOpacity);
+				this._display.endFill();
 			}
-			else if (fillGradient) {
+
+			if (fillGradient) {
 				if (fill) {
 					const stops = fillGradient.get("stops", []);
 					if (stops.length) {
@@ -358,9 +336,37 @@ export class Graphics extends Sprite {
 					this._display.endFill();
 				}
 			}
-			else if (fill) {
-				this._display.beginFill(fill, fillOpacity);
-				this._display.endFill();
+
+			if (fillPattern) {
+				/*
+				let changed = false;
+				if (fill && (!fillPattern.get("fill") || fillPattern.get("fillInherited"))) {
+					fillPattern.set("fill", fill);
+					fillPattern.set("fillInherited", true)
+					changed = true;
+				}
+				if (stroke && (!fillPattern.get("color") || fillPattern.get("colorInherited"))) {
+					fillPattern.set("color", stroke);
+					fillPattern.set("colorInherited", true)
+					changed = true;
+				}
+				if (changed) {
+					// @todo: is this OK?
+					fillPattern._changed();
+				}
+				*/
+				const pattern = fillPattern.pattern;
+				if (pattern) {
+					this._display.beginFill(pattern, fillOpacity);
+					this._display.endFill();
+
+					if (fillPattern instanceof PicturePattern) {
+						fillPattern.events.once("loaded", () => {
+							this._clear = true;
+							this.markDirty();
+						});
+					}
+				}
 			}
 
 			if (stroke || strokeGradient || strokePattern) {
@@ -371,38 +377,19 @@ export class Graphics extends Sprite {
 					strokeWidth = strokeWidth / this.get("scale", 1)
 				}
 
-				if(this.get("crisp")){
+				if (this.get("crisp")) {
 					strokeWidth /= this._root._renderer.resolution;
 				}
 
 				const lineJoin = this.get("lineJoin");
 
-				if (strokePattern) {
-					let changed = false;
-					if (stroke && (!strokePattern.get("color") || strokePattern.get("colorInherited"))) {
-						strokePattern.set("color", stroke);
-						strokePattern.set("colorInherited", true);
-						changed = true;
-					}
-					if (changed) {
-						// @todo: is this OK?
-						strokePattern._changed();
-					}
-					const pattern = strokePattern.pattern;
-					if (pattern) {
-						this._display.lineStyle(strokeWidth, pattern, strokeOpacity, lineJoin);
-						this._display.endStroke();
-
-						if (strokePattern instanceof PicturePattern) {
-							strokePattern.events.once("loaded", () => {
-								this._clear = true;
-								this.markDirty();
-							});
-						}
-					}
+				if (stroke && !strokeGradient) {
+					this._display.lineStyle(strokeWidth, stroke, strokeOpacity, lineJoin);
+					this._display.endStroke();
 				}
-				else if (strokeGradient) {
 
+
+				if (strokeGradient) {
 					const stops = strokeGradient.get("stops", []);
 					if (stops.length) {
 						$array.each(stops, (stop: any) => {
@@ -424,14 +411,38 @@ export class Graphics extends Sprite {
 						this._display.endStroke();
 					}
 				}
-				else if (stroke) {
-					this._display.lineStyle(strokeWidth, stroke, strokeOpacity, lineJoin);
-					this._display.endStroke();
-				}
 
+				if (strokePattern) {
+					/*
+					let changed = false;
+					
+					if (stroke && (!strokePattern.get("color") || strokePattern.get("colorInherited"))) {
+						strokePattern.set("color", stroke);
+						strokePattern.set("colorInherited", true);
+						changed = true;
+					}
+					if (changed) {
+						// @todo: is this OK?
+						strokePattern._changed();
+					}
+					*/
+					let pattern = strokePattern.pattern;
+
+					if (pattern) {
+						this._display.lineStyle(strokeWidth, pattern, strokeOpacity, lineJoin);
+						this._display.endStroke();
+
+						if (strokePattern instanceof PicturePattern) {
+							strokePattern.events.once("loaded", () => {
+								this._clear = true;
+								this.markDirty();
+							});
+						}
+					}
+				}
 			}
 
-			if(this.getPrivate("showingTooltip")){
+			if (this.getPrivate("showingTooltip")) {
 				this.showTooltip();
 			}
 		}

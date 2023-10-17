@@ -2160,7 +2160,9 @@ export abstract class XYSeries extends Series {
 	}
 
 
-	// todo description
+	/**
+	 * Resets cached axis scale values.
+	 */
 	public resetExtremes() {
 		this.setPrivate("selectionMinX", undefined);
 		this.setPrivate("selectionMaxX", undefined);

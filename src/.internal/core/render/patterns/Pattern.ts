@@ -122,9 +122,9 @@ export class Pattern extends Entity {
 
 	protected _clear = false;
 
-	protected _pattern: IPattern | undefined;
+	protected _pattern: IPattern | undefined | null;
 
-	public get pattern(): IPattern | undefined {
+	public get pattern(): IPattern | undefined | null {
 		return this._pattern;
 	}
 
@@ -133,7 +133,16 @@ export class Pattern extends Entity {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("repetition") || this.isDirty("width") || this.isDirty("height") || this.isDirty("rotation") || this.isDirty("color") || this.isDirty("strokeWidth") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("colorOpacity") || this.isDirty("fill") || this.isDirty("fillOpacity")) {
+		if (this.isDirty("repetition") || this.isDirty("width") || this.isDirty("height") || this.isDirty("rotation") || this.isDirty("strokeWidth") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("colorOpacity") || this.isDirty("fillOpacity")) {
+			//console.log(this.isDirty("repetition"), this.isDirty("width"), this.isDirty("height"), this.isDirty("rotation"), this.isDirty("color"), this.isDirty("strokeWidth"), this.isDirty("strokeDasharray"), this.isDirty("strokeDashoffset"), this.isDirty("colorOpacity"), this.isDirty("fillOpacity"))	
+			this._clear = true;
+		}
+
+		this._checkDirtyFill();
+	}
+
+	protected _checkDirtyFill() {
+		if (this.isDirty("color") || this.isDirty("fill")) {
 			this._clear = true;
 		}
 	}
@@ -148,20 +157,25 @@ export class Pattern extends Entity {
 			const fill = this.get("fill");
 			const fillOpacity = this.get("fillOpacity", 1);
 
-			this._display.clear();
-			this._backgroundDisplay.clear();
+			const backgroundDisplay = this._backgroundDisplay;
+			const display = this._display;
+
+			display.clear();
+			backgroundDisplay.clear();
 
 			if (fill && (fillOpacity > 0)) {
-				this._backgroundDisplay.beginFill(fill, fillOpacity);
-				this._backgroundDisplay.drawRect(0, 0, width, height);
-				this._backgroundDisplay.endFill();
+				backgroundDisplay.beginFill(fill, fillOpacity);
+				backgroundDisplay.drawRect(0, 0, width, height);
+				backgroundDisplay.endFill();
 			}
 
-			this._display.angle = this.get("rotation", 0);
-			//this._display.pivot = { x: width / 2, y: height / 2 };
+			display.angle = this.get("rotation", 0);
+			//display.pivot = { x: width / 2, y: height / 2 };
 			this._draw();
 
-			this._pattern = this._root._renderer.createPattern(this._display, this._backgroundDisplay, repetition, width, height);
+			this._pattern = this._root._renderer.createPattern(display, backgroundDisplay, repetition, width, height);
 		}
+
+		this._clear = false;
 	}
 }

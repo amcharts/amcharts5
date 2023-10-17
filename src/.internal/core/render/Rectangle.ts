@@ -20,11 +20,10 @@ export class Rectangle extends Graphics {
 	public static className: string = "Rectangle";
 	public static classNames: Array<string> = Graphics.classNames.concat([Rectangle.className]);
 
-	public _trustBounds:boolean = true;
-
 	public _afterNew(){
 		super._afterNew();
 		this._display.isMeasured = true;
+		this.setPrivateRaw("trustBounds", true);
 	}
 
 	public _beforeChanged() {

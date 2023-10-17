@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.5.0] - 2023-10-17
+
+### Added
+- `zoomTo` (values: `"start"` and `"end"` (default)) added to `PeriodSelector`. If set to `"start"`, period buttons will selectg from the start of the data, not from the end. `"YTD"` will still select to the end. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/#Zoom_anchor_point).
+- `PeriodSelector` now supports `"custom"` periods. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/#Custom_periods).
+- New filter settings added to `Sprite`: `blur`, `brightness`, `contrast`, `saturate`, `sepia`, `invert`, `hue`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/#Built_in_filters). **These filters are not supported by Safari browsers.**
+- New `GrainPattern` added. Allows adding grainniness effect to any element. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Grain_patterns).
+- New private setting `trustBounds` added to `Sprite`. If set to `true`, the Sprite will check if a mouse pointer is within bounds of a Sprite before dispatching its pointer events. This helps to solve ghost tooltips problem which sometimes appears while moving the pointer over interactive objects. It is set to `true` by default on `Rectangle` and `Circle`.
+
+### Changed
+- Previously elements only supported one fill at a time - either `fill` or `fillGradient` or `fillPattern`. Now `fill` or `fillGradient` will be drawn even if `fillPattern` is set. This allows combining 
+patterns with gradient fills.
+- Gradients no longer inherit parent object's `fill`.
+- It is now possible to draw annotations on a `StockChart` outside X-axis' min/max using axis overzoom.
+- If a `forceHidden` for the tooltip is set to `true` the tooltip size won't be taken into account when arranging tooltips on an `XYChart`.
+
+### Fixed
+- An error was being thrown when chart with focused element was being disposed.
+- If a series had data items without value and axis was zoomed so that only these data items were in range, the series used its full min and max values resulting value axis to be fully zoomed out.
+- Using `hide()`/`show()` methods on an axis data item would no hide its visual elements.
+- Drawing annotations on a `StockChart` with timezone set was a bit wonky.
+
+
 ## [5.4.11] - 2023-10-10
 
 ### Fixed

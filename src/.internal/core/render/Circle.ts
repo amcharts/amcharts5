@@ -26,11 +26,10 @@ export class Circle extends Graphics {
 	public static className: string = "Circle";
 	public static classNames: Array<string> = Graphics.classNames.concat([Circle.className]);
 
-	public _trustBounds = true;
-
 	public _afterNew(){
 		super._afterNew();
 		this._display.isMeasured = true;
+		this.setPrivateRaw("trustBounds", true);
 	}	
 
 	public _beforeChanged() {

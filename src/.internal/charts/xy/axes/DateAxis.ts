@@ -226,11 +226,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 
 
-			if (this.isDirty("groupInterval")) {				
+			if (this.isDirty("groupInterval")) {
 				let groupInterval = this.get("groupInterval")!;
 				if (groupInterval) {
 					this.setRaw("groupIntervals", [groupInterval]);
-					this._handleRangeChange();					
+					this._handleRangeChange();
 				}
 			}
 
@@ -770,7 +770,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
 	}
 
-	protected _updateDates(_date: number) {
+	protected _updateDates(_date: number, _series: XYSeries) {
 
 	}
 
@@ -830,7 +830,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					dataItem.close![field] = endTime;
 				}
 
-				this._updateDates(startTime);
+				this._updateDates(startTime, dataItem.component as XYSeries);
 			}
 		})
 	}

@@ -10,9 +10,11 @@ import * as $time from "../../../core/util/Time";
 import * as $array from "../../../core/util/Array";
 
 export interface IPeriod {
-	timeUnit: TimeUnit | "ytd" | "max";
+	timeUnit: TimeUnit | "ytd" | "max" | "custom";
 	count?: number;
 	name?: string;
+	start?: Date;
+	end?: Date;
 }
 
 export interface IPeriodSelectorSettings extends IStockControlSettings {
@@ -29,6 +31,16 @@ export interface IPeriodSelectorSettings extends IStockControlSettings {
 	 * @since 5.3.9
 	 */
 	hideLongPeriods?: boolean;
+
+	/**
+	 * Indicates whether to select periods from the start or end of the axis
+	 * scale.
+	 *
+	 * @default "end"
+	 * @since 5.5.0
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/#Zoom_anchor_point} for more info
+	 */
+	zoomTo?: "end" | "start";
 
 }
 
@@ -144,7 +156,7 @@ export class PeriodSelector extends StockControl {
 					const periods = this.get("periods", []);
 					$array.each(periods, (period) => {
 						if (period.timeUnit !== "ytd" && period.timeUnit !== "max") {
-							const plen = $time.getDuration(period.timeUnit, period.count || 1);
+							const plen = $time.getDuration(period.timeUnit as TimeUnit, period.count || 1);
 							const id = period.timeUnit + (period.count || "");
 							for (let i = 0; i < buttons.length; i++) {
 								const button = buttons[i];
@@ -184,9 +196,16 @@ export class PeriodSelector extends StockControl {
 	}
 
 	public selectPeriod(period: IPeriod): void {
+		const fromStart = this.get("zoomTo", "end") == "start";
 		this._highlightPeriod(period);
 		if (period.timeUnit == "max") {
 			this._getChart().zoomOut();
+		}
+		else if (period.timeUnit == "custom") {
+			const axis = this._getAxis();
+			let start = period.start || new Date(axis.getPrivate("min"));
+			let end = period.end || new Date(axis.getPrivate("max"));
+			axis.zoomToDates(start, end);
 		}
 		else {
 			const axis = this._getAxis();
@@ -205,26 +224,43 @@ export class PeriodSelector extends StockControl {
 				}
 			}
 			else {
+				const timeUnit = period.timeUnit as TimeUnit;
 				// some adjustments in case data is grouped
 				if (axis.get("groupData")) {
 					// find interval which will be used after zoom
-					const interval = axis.getGroupInterval($time.getDuration(period.timeUnit, period.count))
+					const interval = axis.getGroupInterval($time.getDuration(timeUnit, period.count))
 					if (interval) {
-						// find max of the base interval
-						let endTime = axis.getIntervalMax(axis.get("baseInterval"));
 
-						if (endTime != null) {
-							// round to the future interval
-							const firstDay = this._root.locale.firstDayOfWeek;
-							const timezone = this._root.timezone;
-							const utc = this._root.utc;
+						const firstDay = this._root.locale.firstDayOfWeek;
+						const timezone = this._root.timezone;
+						const utc = this._root.utc;
 
-							end = $time.round(new Date(endTime), interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
-							end.setTime(end.getTime() + $time.getDuration(interval.timeUnit, interval.count * 1.05));
-							end = $time.round(end, interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
+						if (fromStart) {
+							let startTime = axis.getIntervalMin(axis.get("baseInterval"));
+							start = new Date(axis.getPrivate("max"));
+
+							if (startTime != null) {
+								// round to the previuous interval
+								start = $time.round(new Date(startTime), interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
+								start.setTime(start.getTime() + $time.getDuration(interval.timeUnit, interval.count * .95));
+								start = $time.round(start, interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
+							}
+
+							end = $time.add(new Date(start), timeUnit, (period.count || 1));
 						}
+						else {
+							// find max of the base interval
+							let endTime = axis.getIntervalMax(axis.get("baseInterval"));
 
-						start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
+							if (endTime != null) {
+								// round to the future interval
+								end = $time.round(new Date(endTime), interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
+								end.setTime(end.getTime() + $time.getDuration(interval.timeUnit, interval.count * 1.05));
+								end = $time.round(end, interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
+							}
+
+							start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1);
+						}
 
 						if (this._groupChangedDp) {
 							this._groupChangedDp.dispose();
@@ -251,7 +287,13 @@ export class PeriodSelector extends StockControl {
 					}
 				}
 
-				start = $time.add(new Date(end), period.timeUnit, (period.count || 1) * -1);
+				if (fromStart) {
+					start = new Date(axis.getPrivate("min"));
+					end = $time.add(new Date(start), timeUnit, (period.count || 1));
+				}
+				else {
+					start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1);
+				}
 			}
 			axis.zoomToDates(start, end);
 		}
@@ -263,7 +305,7 @@ export class PeriodSelector extends StockControl {
 		const buttons = container.getElementsByTagName("a");
 		for (let i = 0; i < buttons.length; i++) {
 			const button = buttons[i];
-			if (button.getAttribute("data-period") == id) {
+			if (button.getAttribute("data-period") == id && id != "custom") {
 				$utils.addClass(button, "am5stock-active");
 			}
 			else {

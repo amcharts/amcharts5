@@ -440,7 +440,6 @@ export class ForceDirected extends LinkedHierarchy {
 
 	/**
 	 * @ignore
-	 * @todo description
 	 */
 	protected getStrength(linkDatum: any) {
 		let strength = 0;

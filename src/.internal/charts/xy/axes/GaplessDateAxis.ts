@@ -2,6 +2,7 @@ import type { AxisRenderer } from "./AxisRenderer";
 
 import { DateAxis, IDateAxisSettings, IDateAxisPrivate, IDateAxisDataItem, IDateAxisEvents } from "./DateAxis";
 import { DataItem } from "../../../core/render/Component";
+import type { XYSeries } from "../../xy/series/XYSeries";
 
 import * as $array from "../../../core/util/Array"
 import * as $order from "../../../core/util/Order";
@@ -54,11 +55,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 	protected _dates: Array<number> = [];
 
-	protected _updateDates(date: number) {
-		const dates = this._dates;
-		const result = $array.getSortedIndex(dates, (x) => $order.compare(x, date));
-		if (!result.found) {
-			$array.insertIndex(dates, result.index, date);
+	protected _updateDates(date: number, series: XYSeries) {
+		if (!series.get("ignoreMinMax")) {
+			const dates = this._dates;
+			const result = $array.getSortedIndex(dates, (x) => $order.compare(x, date));
+			if (!result.found) {
+				$array.insertIndex(dates, result.index, date);
+			}
 		}
 	}
 
@@ -74,7 +77,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				let value = dataItem.get(field as any);
 				if ($type.isNumber(value)) {
 					if (dataItem.open) {
-						this._updateDates(dataItem.open![field]);
+						this._updateDates(dataItem.open![field], series);
 					}
 				}
 			})

@@ -82,6 +82,7 @@ import type { GaplessDateAxis } from "./../charts/xy/axes/GaplessDateAxis.js";
 import type { Gradient } from "./render/gradients/Gradient.js";
 import type { Graphics } from "./render/Graphics.js";
 import type { GraticuleSeries } from "./../charts/map/GraticuleSeries.js";
+import type { GrainPattern } from "./../core/render/patterns/GrainPattern.js";
 import type { Grid } from "./../charts/xy/axes/Grid.js";
 import type { GridLayout } from "./render/GridLayout.js";
 import type { HeatLegend } from "./render/HeatLegend.js";
@@ -291,6 +292,7 @@ export interface IClasses {
 	"GaplessDateAxis": GaplessDateAxis<AxisRenderer>;
 	"Gradient": Gradient;
 	"Graphics": Graphics;
+	"GrainPattern": GrainPattern;
 	"GraticuleSeries": GraticuleSeries;
 	"Grid": Grid;
 	"GridLayout": GridLayout;

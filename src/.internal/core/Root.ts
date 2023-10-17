@@ -1679,7 +1679,7 @@ export class Root implements IDisposer {
 		}
 
 		const focused = this._focusedSprite;
-		if (focused && focused.events.isEnabled("blur")) {
+		if (focused && !focused.isDisposed() && focused.events.isEnabled("blur")) {
 			focused.events.dispatch("blur", {
 				type: "blur",
 				originalEvent: ev,

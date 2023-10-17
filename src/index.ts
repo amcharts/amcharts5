@@ -42,6 +42,9 @@ export { Tooltip, ITooltipSettings, ITooltipPrivate } from "./.internal/core/ren
 export { VerticalLayout } from "./.internal/core/render/VerticalLayout";
 export { Timezone } from "./.internal/core/util/Timezone";
 
+export { GrainPattern } from "./.internal/core/render/patterns/GrainPattern";
+export { BlendMode } from "./.internal/core/render/backend/Renderer";
+
 export { Gradient, IGradientSettings, IGradientPrivate } from "./.internal/core/render/gradients/Gradient";
 export { LinearGradient, ILinearGradientSettings, ILinearGradientPrivate } from "./.internal/core/render/gradients/LinearGradient";
 export { RadialGradient, IRadialGradientSettings, IRadialGradientPrivate } from "./.internal/core/render/gradients/RadialGradient";

@@ -93,7 +93,7 @@ export interface IDisplayObject extends IDisposer {
 	mask: IGraphics | null;
 	visible: boolean;
 	interactive: boolean;
-	inactive: boolean;
+	inactive: boolean | null;
 	wheelable: boolean;
 	cancelTouch: boolean;
 	isMeasured: boolean;
@@ -189,7 +189,7 @@ export interface IGraphics extends IDisplayObject {
 	bezierCurveTo(cpX: number, cpY: number, cpX2: number, cpY2: number, toX: number, toY: number): void;
 	quadraticCurveTo(cpX: number, cpY: number, toX: number, toY: number): void;
 	svgPath(path: string): void;
-	image(image: HTMLImageElement, width: number, height: number, x: number, y: number): void;
+	image(image: HTMLImageElement | HTMLCanvasElement, width: number, height: number, x: number, y: number): void;
 	shadow(color: Color, blur?: number, offsetX?: number, offsetY?: number, opacity?: number): void;
 }
 
