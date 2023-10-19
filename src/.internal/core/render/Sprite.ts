@@ -568,7 +568,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 *
 	 * * `0` - grayscale
 	 * * `1` - no changes
-	 * * ``>1` - more saturated
+	 * * `>1` - more saturated
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *

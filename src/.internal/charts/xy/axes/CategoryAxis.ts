@@ -288,7 +288,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		this._frequency = frequency;
 
 		for (let j = 0; j < len; j++) {
-			this.dataItems[j].hide();
+			this._toggleDataItem(this.dataItems[j], false);
 		}
 
 		let f = this.dataItems[startIndex].get("index", 0);
@@ -297,11 +297,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			let dataItem = this.dataItems[i];
 
 			this._createAssets(dataItem, []);
-
-			if (dataItem.isHidden()) {
-				dataItem.show();
-			}
-
+			this._toggleDataItem(dataItem, true);
 			this._prepareDataItem(dataItem, f, frequency);
 			f++;
 		}

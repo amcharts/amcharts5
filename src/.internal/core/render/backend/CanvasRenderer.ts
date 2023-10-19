@@ -242,7 +242,7 @@ function clearCanvas(view: HTMLCanvasElement) {
  * @ignore
  */
 function crisp(x: number): number {
-	return Math.floor(x);
+	return Math.floor(x) +.5;
 }
 
 /**

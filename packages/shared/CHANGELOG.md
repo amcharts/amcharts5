@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+
+## [5.5.1] - 2023-10-19
+
+### Fixed
+- Not all visual settings from columns were being copied to their legend markers.
+- Data items with identical timestamps in data could sometimes be ignored when plotting series.
+- `drawingsInteractive(false)` was not having an effect on some drawing tools (Vertical/Horizontal/Ray Line).
+- `CategoryAxis`' elements (e.g. labels and grid) were ignoring `forceHidden` setting.
+- Some line elements (e.g. grid) were being drawn somewhat blurry since `5.4.9`.
+
+
 ## [5.5.0] - 2023-10-17
 
 ### Added

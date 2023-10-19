@@ -352,5 +352,6 @@ export class SimpleLineSeries extends DrawingSeries {
 	public setInteractive(value: boolean) {
 		super.setInteractive(value);
 		this.hitLines.template.set("forceInactive", !value);
+		this.lines.template.set("forceInactive", !value);
 	}
 }

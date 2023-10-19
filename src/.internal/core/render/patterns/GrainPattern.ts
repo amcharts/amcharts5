@@ -12,11 +12,12 @@ export interface IGrainPatternSettings extends IPatternSettings {
 
 	/**
 	 * Density of noise.
-	 * 
-	 * `1` means each pixel will have another pixel painted over with random
-	 * opacity from `minOpacity` to `maxOpacity`.
 	 *
-	 * `2` means every second pixel will be "painted over", etc.
+	 * Value range: `0` (no noise applied) to `1` (noise is applied to every
+	 * pixel).
+	 *
+	 * The bigger the value, the higher chance that pixel will have another pixel
+	 * painted over with random opacity from `minOpacity` to `maxOpacity`.
 	 *
 	 * @default 1
 	 */
@@ -44,14 +45,14 @@ export interface IGrainPatternSettings extends IPatternSettings {
 	colors?: Array<Color>;
 
 	/**
-	 * Horizontal gap (not in pixels but in size).
+	 * Horizontal gap between noise pixels measured in `size`.
 	 *
 	 * @default 0
 	 */
 	horizontalGap?: number;
 
 	/**
-	 * Vertical gap (not in pixels but in size).
+	 * Vertical gap between noise pixels measured in `size`.
 	 *
 	 * @default 0
 	 */

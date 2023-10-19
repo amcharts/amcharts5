@@ -292,6 +292,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 	protected _createGraphics(dataItem: DataItem<this["_dataItemSettings"]>) {
 		let graphics = dataItem.get("graphics");
 		if (!graphics) {
+
 			graphics = this._makeGraphics(this.columns, dataItem);
 			dataItem.set("graphics", graphics);
 			graphics._setDataItem(dataItem);
@@ -300,7 +301,12 @@ export abstract class BaseColumnSeries extends XYSeries {
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
 				if (markerRectangle) {
-					markerRectangle.setAll({ fill: graphics.get("fill"), stroke: graphics.get("stroke") });
+					const ds = markerRectangle.states.lookup("default")!;
+					$array.each(visualSettings, (setting: any) => {
+						const value = graphics!.get(setting, this.get(setting));
+						markerRectangle.set(setting, value);
+						ds.set(setting, value);
+					})
 				}
 			}
 
@@ -745,8 +751,11 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 			if (markerRectangle) {
 				if (!legendDataItem.get("itemContainer").get("disabled")) {
+					const ds = markerRectangle.states.lookup("default")!;
 					$array.each(visualSettings, (setting: any) => {
-						markerRectangle.set(setting, graphics.get(setting, this.get(setting)));
+						const value = graphics.get(setting, this.get(setting));
+						markerRectangle.set(setting, value);
+						ds.set(setting, value);
 					})
 				}
 			}

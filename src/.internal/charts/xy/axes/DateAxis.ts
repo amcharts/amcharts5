@@ -552,7 +552,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				if (series.get("baseAxis") === this) {
 					let fieldName = <any>(this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!);
 
-					const start = $array.getSortedIndex(series.dataItems, (dataItem) => {
+					const start = $array.getFirstSortedIndex(series.dataItems, (dataItem) => {
 						return $order.compare(dataItem.get(fieldName), selectionMin);
 					});
 

@@ -376,6 +376,8 @@ export class DrawingSeries extends LineSeries {
 		this.strokes.template.set("forceInactive", !value);
 		this.fills.template.set("forceInactive", !value);
 		this.grips.template.set("forceInactive", !value);
+		this.circles.template.set("forceInactive", !value);
+		this.outerCircles.template.set("forceInactive", !value);
 	}
 
 	protected _showSegmentBullets(index: number) {
