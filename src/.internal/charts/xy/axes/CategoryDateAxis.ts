@@ -123,7 +123,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 		this._frequency = frequency;
 
 		for (let j = 0; j < len; j++) {
-			this.dataItems[j].hide();
+			this._toggleDataItem(this.dataItems[j], false);
 		}
 
 		let startTime = Number(this.dataItems[startIndex].get("category"));
@@ -225,9 +225,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 				const format = item.format;
 				this._createAssets(dataItem, []);
 
-				if (dataItem.isHidden()) {
-					dataItem.show();
-				}
+				this._toggleDataItem(dataItem, true);
 
 				let value = Number(dataItem.get("category"));
 				let date = new Date(value);

@@ -6,6 +6,9 @@
 import type { AccumulationDistribution } from "./../../../stock";
 import type { AccumulativeSwingIndex } from "./../../../stock";
 import type { Annotator } from "./../../../plugins/exporting";
+import type { ArcDiagram } from "./../../../flow";
+import type { ArcDiagramLink } from "./../../../flow";
+import type { ArcDiagramNodes } from "./../../../flow";
 import type { Aroon } from "./../../../stock";
 import type { AverageSeries } from "./../../../stock";
 import type { AwesomeOscillator } from "./../../../stock";
@@ -77,6 +80,7 @@ import type { FunnelSeries } from "./../../../percent";
 import type { FunnelSlice } from "./../../../percent";
 import type { GaplessDateAxis } from "./../../../xy";
 import type { Gradient } from "./../../../index";
+import type { GrainPattern } from "./../../../index";
 import type { Graphics } from "./../../../index";
 import type { GraticuleSeries } from "./../../../map";
 import type { Grid } from "./../../../xy";
@@ -112,8 +116,10 @@ import type { MapPointSeries } from "./../../../map";
 import type { MapPolygon } from "./../../../map";
 import type { MapPolygonSeries } from "./../../../map";
 import type { MapSeries } from "./../../../map";
+import type { Measure } from "./../../../stock";
 import type { MedianPrice } from "./../../../stock";
 import type { Modal } from "./../../../index";
+import type { Momentum } from "./../../../stock";
 import type { MovingAverage } from "./../../../stock";
 import type { MovingAverageDeviation } from "./../../../stock";
 import type { MovingAverageEnvelope } from "./../../../stock";
@@ -134,6 +140,7 @@ import type { PicturePattern } from "./../../../index";
 import type { PieChart } from "./../../../percent";
 import type { PieSeries } from "./../../../percent";
 import type { PointedRectangle } from "./../../../index";
+import type { Polygon } from "./../../../index";
 import type { PolylineSeries } from "./../../../stock";
 import type { PyramidSeries } from "./../../../percent";
 import type { QuadrantLineSeries } from "./../../../stock";
@@ -197,6 +204,7 @@ import type { Venn } from "./../../../venn";
 import type { VerticalLayout } from "./../../../index";
 import type { VerticalLineSeries } from "./../../../stock";
 import type { Volume } from "./../../../stock";
+import type { VoronoiTreemap } from "./../../../hierarchy";
 import type { WilliamsR } from "./../../../stock";
 import type { WordCloud } from "./../../../wc";
 import type { XYChart } from "./../../../xy";
@@ -210,6 +218,9 @@ export interface IClasses {
 	"AccumulationDistribution": () => Promise<typeof AccumulationDistribution>;
 	"AccumulativeSwingIndex": () => Promise<typeof AccumulativeSwingIndex>;
 	"Annotator": () => Promise<typeof Annotator>;
+	"ArcDiagram": () => Promise<typeof ArcDiagram>;
+	"ArcDiagramLink": () => Promise<typeof ArcDiagramLink>;
+	"ArcDiagramNodes": () => Promise<typeof ArcDiagramNodes>;
 	"Aroon": () => Promise<typeof Aroon>;
 	"AverageSeries": () => Promise<typeof AverageSeries>;
 	"AwesomeOscillator": () => Promise<typeof AwesomeOscillator>;
@@ -281,6 +292,7 @@ export interface IClasses {
 	"FunnelSlice": () => Promise<typeof FunnelSlice>;
 	"GaplessDateAxis": () => Promise<typeof GaplessDateAxis>;
 	"Gradient": () => Promise<typeof Gradient>;
+	"GrainPattern": () => Promise<typeof GrainPattern>;
 	"Graphics": () => Promise<typeof Graphics>;
 	"GraticuleSeries": () => Promise<typeof GraticuleSeries>;
 	"Grid": () => Promise<typeof Grid>;
@@ -316,8 +328,10 @@ export interface IClasses {
 	"MapPolygon": () => Promise<typeof MapPolygon>;
 	"MapPolygonSeries": () => Promise<typeof MapPolygonSeries>;
 	"MapSeries": () => Promise<typeof MapSeries>;
+	"Measure": () => Promise<typeof Measure>;
 	"MedianPrice": () => Promise<typeof MedianPrice>;
 	"Modal": () => Promise<typeof Modal>;
+	"Momentum": () => Promise<typeof Momentum>;
 	"MovingAverage": () => Promise<typeof MovingAverage>;
 	"MovingAverageDeviation": () => Promise<typeof MovingAverageDeviation>;
 	"MovingAverageEnvelope": () => Promise<typeof MovingAverageEnvelope>;
@@ -338,6 +352,7 @@ export interface IClasses {
 	"PieChart": () => Promise<typeof PieChart>;
 	"PieSeries": () => Promise<typeof PieSeries>;
 	"PointedRectangle": () => Promise<typeof PointedRectangle>;
+	"Polygon": () => Promise<typeof Polygon>;
 	"PolylineSeries": () => Promise<typeof PolylineSeries>;
 	"PyramidSeries": () => Promise<typeof PyramidSeries>;
 	"QuadrantLineSeries": () => Promise<typeof QuadrantLineSeries>;
@@ -401,6 +416,7 @@ export interface IClasses {
 	"VerticalLayout": () => Promise<typeof VerticalLayout>;
 	"VerticalLineSeries": () => Promise<typeof VerticalLineSeries>;
 	"Volume": () => Promise<typeof Volume>;
+	"VoronoiTreemap": () => Promise<typeof VoronoiTreemap>;
 	"WilliamsR": () => Promise<typeof WilliamsR>;
 	"WordCloud": () => Promise<typeof WordCloud>;
 	"XYChart": () => Promise<typeof XYChart>;
@@ -415,6 +431,9 @@ const classes: IClasses = {
 	"AccumulationDistribution": () => import(/* webpackExports: "AccumulationDistribution", webpackMode: "weak" */ "./../../../stock").then((m) => m.AccumulationDistribution),
 	"AccumulativeSwingIndex": () => import(/* webpackExports: "AccumulativeSwingIndex", webpackMode: "weak" */ "./../../../stock").then((m) => m.AccumulativeSwingIndex),
 	"Annotator": () => import(/* webpackExports: "Annotator", webpackMode: "weak" */ "./../../../plugins/exporting").then((m) => m.Annotator),
+	"ArcDiagram": () => import(/* webpackExports: "ArcDiagram", webpackMode: "weak" */ "./../../../flow").then((m) => m.ArcDiagram),
+	"ArcDiagramLink": () => import(/* webpackExports: "ArcDiagramLink", webpackMode: "weak" */ "./../../../flow").then((m) => m.ArcDiagramLink),
+	"ArcDiagramNodes": () => import(/* webpackExports: "ArcDiagramNodes", webpackMode: "weak" */ "./../../../flow").then((m) => m.ArcDiagramNodes),
 	"Aroon": () => import(/* webpackExports: "Aroon", webpackMode: "weak" */ "./../../../stock").then((m) => m.Aroon),
 	"AverageSeries": () => import(/* webpackExports: "AverageSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.AverageSeries),
 	"AwesomeOscillator": () => import(/* webpackExports: "AwesomeOscillator", webpackMode: "weak" */ "./../../../stock").then((m) => m.AwesomeOscillator),
@@ -486,6 +505,7 @@ const classes: IClasses = {
 	"FunnelSlice": () => import(/* webpackExports: "FunnelSlice", webpackMode: "weak" */ "./../../../percent").then((m) => m.FunnelSlice),
 	"GaplessDateAxis": () => import(/* webpackExports: "GaplessDateAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.GaplessDateAxis),
 	"Gradient": () => import(/* webpackExports: "Gradient", webpackMode: "weak" */ "./../../../index").then((m) => m.Gradient),
+	"GrainPattern": () => import(/* webpackExports: "GrainPattern", webpackMode: "weak" */ "./../../../index").then((m) => m.GrainPattern),
 	"Graphics": () => import(/* webpackExports: "Graphics", webpackMode: "weak" */ "./../../../index").then((m) => m.Graphics),
 	"GraticuleSeries": () => import(/* webpackExports: "GraticuleSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.GraticuleSeries),
 	"Grid": () => import(/* webpackExports: "Grid", webpackMode: "weak" */ "./../../../xy").then((m) => m.Grid),
@@ -521,8 +541,10 @@ const classes: IClasses = {
 	"MapPolygon": () => import(/* webpackExports: "MapPolygon", webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygon),
 	"MapPolygonSeries": () => import(/* webpackExports: "MapPolygonSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygonSeries),
 	"MapSeries": () => import(/* webpackExports: "MapSeries", webpackMode: "weak" */ "./../../../map").then((m) => m.MapSeries),
+	"Measure": () => import(/* webpackExports: "Measure", webpackMode: "weak" */ "./../../../stock").then((m) => m.Measure),
 	"MedianPrice": () => import(/* webpackExports: "MedianPrice", webpackMode: "weak" */ "./../../../stock").then((m) => m.MedianPrice),
 	"Modal": () => import(/* webpackExports: "Modal", webpackMode: "weak" */ "./../../../index").then((m) => m.Modal),
+	"Momentum": () => import(/* webpackExports: "Momentum", webpackMode: "weak" */ "./../../../stock").then((m) => m.Momentum),
 	"MovingAverage": () => import(/* webpackExports: "MovingAverage", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverage),
 	"MovingAverageDeviation": () => import(/* webpackExports: "MovingAverageDeviation", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageDeviation),
 	"MovingAverageEnvelope": () => import(/* webpackExports: "MovingAverageEnvelope", webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageEnvelope),
@@ -543,6 +565,7 @@ const classes: IClasses = {
 	"PieChart": () => import(/* webpackExports: "PieChart", webpackMode: "weak" */ "./../../../percent").then((m) => m.PieChart),
 	"PieSeries": () => import(/* webpackExports: "PieSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PieSeries),
 	"PointedRectangle": () => import(/* webpackExports: "PointedRectangle", webpackMode: "weak" */ "./../../../index").then((m) => m.PointedRectangle),
+	"Polygon": () => import(/* webpackExports: "Polygon", webpackMode: "weak" */ "./../../../index").then((m) => m.Polygon),
 	"PolylineSeries": () => import(/* webpackExports: "PolylineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.PolylineSeries),
 	"PyramidSeries": () => import(/* webpackExports: "PyramidSeries", webpackMode: "weak" */ "./../../../percent").then((m) => m.PyramidSeries),
 	"QuadrantLineSeries": () => import(/* webpackExports: "QuadrantLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.QuadrantLineSeries),
@@ -606,6 +629,7 @@ const classes: IClasses = {
 	"VerticalLayout": () => import(/* webpackExports: "VerticalLayout", webpackMode: "weak" */ "./../../../index").then((m) => m.VerticalLayout),
 	"VerticalLineSeries": () => import(/* webpackExports: "VerticalLineSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.VerticalLineSeries),
 	"Volume": () => import(/* webpackExports: "Volume", webpackMode: "weak" */ "./../../../stock").then((m) => m.Volume),
+	"VoronoiTreemap": () => import(/* webpackExports: "VoronoiTreemap", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.VoronoiTreemap),
 	"WilliamsR": () => import(/* webpackExports: "WilliamsR", webpackMode: "weak" */ "./../../../stock").then((m) => m.WilliamsR),
 	"WordCloud": () => import(/* webpackExports: "WordCloud", webpackMode: "weak" */ "./../../../wc").then((m) => m.WordCloud),
 	"XYChart": () => import(/* webpackExports: "XYChart", webpackMode: "weak" */ "./../../../xy").then((m) => m.XYChart),

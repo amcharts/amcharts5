@@ -13,6 +13,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Changed
 - Updated Hormozgan province name in the maps of Iran.
 
+### Fixed
+- Fixed the ID of the Dādra and Nagar Haveli and Damān and Diu province in India 2020 maps.
+
 
 ## [5.1.1] - 2023-06-01
 

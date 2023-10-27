@@ -53,10 +53,12 @@ export class RelativeStrengthIndex extends ChartIndicator {
 	declare public _events: IRelativeStrengthIndexEvents;
 
 	public overBought!: DataItem<IValueAxisDataItem>;
+	public middle!: DataItem<IValueAxisDataItem>;
 	public overSold!: DataItem<IValueAxisDataItem>;
 
 	public overSoldRange!: ILineSeriesAxisRange;
 	public overBoughtRange!: ILineSeriesAxisRange;
+
 
 	/**
 	 * Indicator series.
@@ -88,15 +90,6 @@ export class RelativeStrengthIndex extends ChartIndicator {
 			type: "number"
 		},
 		{
-			key: "overBought",
-			name: this.root.language.translateAny("Overbought"),
-			type: "number"
-		}, {
-			key: "overSold",
-			name: this.root.language.translateAny("Oversold"),
-			type: "number"
-		},
-		{
 			key: "overBoughtColor",
 			name: this.root.language.translateAny("Overbought"),
 			type: "color"
@@ -113,9 +106,19 @@ export class RelativeStrengthIndex extends ChartIndicator {
 
 		this.yAxis.setAll({ min: 0, max: 100, strictMinMax: true });
 
+		this.middle = this.yAxis.createAxisRange(this.yAxis.makeDataItem({}));
+
+		const middleLabel = this.middle.get("label");
+		if (middleLabel) {
+			middleLabel.setAll({ themeTags: ["overbought"], visible: true, location: 0 });
+			middleLabel._applyThemes();
+		}
+
 		// overbought range
 		const overBought = this.yAxis.makeDataItem({});
 		this.overBought = overBought;
+
+
 
 		overBought.set("endValue", 100);
 		const overBoughtRange = this.series.createAxisRange(overBought);
@@ -159,6 +162,8 @@ export class RelativeStrengthIndex extends ChartIndicator {
 			overSoldLabel.setAll({ themeTags: ["oversold"], visible: true, location: 0 });
 			overSoldLabel._applyThemes();
 		}
+
+
 	}
 
 	public _createSeries(): LineSeries {
@@ -176,6 +181,7 @@ export class RelativeStrengthIndex extends ChartIndicator {
 	public _updateChildren() {
 
 		super._updateChildren();
+		const numberFormatter = this.getNumberFormatter();
 
 		const overSoldValue = this.get("overSold", 20);
 		const overBoughtValue = this.get("overBought", 80);
@@ -185,7 +191,7 @@ export class RelativeStrengthIndex extends ChartIndicator {
 
 			const label = this.overBought.get("label");
 			if (label) {
-				label.set("text", this.getNumberFormatter().format(overBoughtValue));
+				label.set("text", numberFormatter.format(overBoughtValue));
 			}
 		}
 
@@ -194,7 +200,7 @@ export class RelativeStrengthIndex extends ChartIndicator {
 
 			const label = this.overSold.get("label");
 			if (label) {
-				label.set("text", this.getNumberFormatter().format(overSoldValue));
+				label.set("text", numberFormatter.format(overSoldValue));
 			}
 		}
 
@@ -223,6 +229,12 @@ export class RelativeStrengthIndex extends ChartIndicator {
 			this.overBoughtRange.fills!.template.set("fill", color);
 			this.overBoughtRange.strokes!.template.set("stroke", color);
 		}
+
+		const middleValue = overSoldValue + (overBoughtValue - overSoldValue) / 2;
+		this.middle.set("value", middleValue);
+
+		this.middle.get("grid")!.setAll({ forceHidden: false, strokeOpacity: .4, strokeDasharray: [2, 2] });
+		this.middle.get("label")!.setAll({ forceHidden: false, text: numberFormatter.format(middleValue) })
 
 		this.series.get("yAxis").set("baseValue", overSoldValue + (overBoughtValue - overSoldValue) / 2);
 	}

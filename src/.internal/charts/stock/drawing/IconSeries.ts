@@ -137,12 +137,6 @@ export class IconSeries extends PolylineSeries {
 
 	}
 
-	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
-		if (!this.get("snapToData")) {
-			this._setXLocationReal(dataItem, value);
-		}
-	}
-
 	protected _getIconTemplate(): Template<any> {
 		const template: any = {};
 

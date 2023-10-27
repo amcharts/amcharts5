@@ -412,6 +412,10 @@ export class StockChartDefaultTheme extends Theme {
 		 * ------------------------------------------------------------------------
 		 */
 
+		r("DrawingSeries").setAll({
+			field: "value"
+		})
+
 
 		// bullet of all drawing series
 		{
@@ -532,6 +536,21 @@ export class StockChartDefaultTheme extends Theme {
 		}
 
 		{
+			const rule = r("Graphics", ["series", "stroke", "drawing", "measure"])
+			rule.setAll({
+				strokeOpacity: 0
+			});
+		}
+
+		r("Line", ["drawing", "measure"]).setAll({
+			strokeDasharray: [],
+			strokeWidth: 1,
+			crisp: true,
+			strokeOpacity: 0.7,
+			draggable: false
+		});
+
+		{
 			const rule = r("Graphics", ["line", "series", "stroke", "drawing"]);
 			rule.setAll({
 				strokeWidth: 2,
@@ -559,6 +578,19 @@ export class StockChartDefaultTheme extends Theme {
 			centerX: p0,
 			centerY: p50
 		});
+
+		r("Label", ["drawing", "measure"]).setAll({
+			centerX: p50,
+			centerY: p50,
+			fill: ic.get("alternativeText"),
+			textAlign: "center"
+		});
+
+		r("RoundedRectangle", ["background", "drawing", "measure"]).setAll({
+			centerX: p50,
+			centerY: p50,
+			fillOpacity:0.7
+		});		
 
 		r("PointedRectangle", ["drawing", "callout"]).setAll({
 			fillOpacity: 1,
@@ -601,10 +633,6 @@ export class StockChartDefaultTheme extends Theme {
 			]
 		})
 
-		r("IconSeries").setAll({
-			snapToData: true
-		})
-
 		r("Graphics", ["line", "series", "stroke", "drawing", "fibonacci"]).setAll({
 			forceInactive: true,
 			strokeWidth: 0.5,
@@ -627,15 +655,16 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("Label", ["fibonaccitimezone"]).setAll({
 			populateText: true,
-			text: "{value}",
-			centerX: p50,
+			text: "{value.formatNumber('#')}",
+			centerX: 0,
 			centerY: p100,
 			paddingBottom: 2,
+			paddingLeft:3,
 			fontSize: "0.8em"
 		})
 
 		r("FibonacciTimezoneSeries").setAll({
-			sequence: [1, 2, 3, 5, 8, 13, 21, 34, 55, 89],
+			sequence: [0, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89],
 			colors: []
 		})
 
@@ -655,14 +684,13 @@ export class StockChartDefaultTheme extends Theme {
 
 
 		r("Grid", ["overbought"]).setAll({
-			strokeOpacity: 0.3
+			strokeOpacity: 0.4
 		});
 
 
 		r("Grid", ["oversold"]).setAll({
-			strokeOpacity: 0.3,
+			strokeOpacity: 0.4,
 		});
-
 
 		// series fill below oversold
 		r("Graphics", ["rsi", "oversold", "fill"]).setAll({
@@ -735,7 +763,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["momentum"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
-		})		
+		})
 
 		r("LineSeries", ["williamsr"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
@@ -1070,7 +1098,7 @@ export class StockChartDefaultTheme extends Theme {
 			period: 14,
 			field: "close",
 			seriesColor: color(0xab82da)
-		})		
+		})
 
 		r("WilliamsR").setAll({
 			name: "Williams %R",
@@ -1288,7 +1316,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("DrawingControl").setAll({
 			name: l.translateAny("Draw"),
 			tool: "Line",
-			tools: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Label", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Measure", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
 			togglable: true,
 			strokeColor: color(0x882dff),
 			strokeWidth: 2,
@@ -1298,7 +1326,7 @@ export class StockChartDefaultTheme extends Theme {
 			strokeOpacity: 1,
 			showExtension: true,
 			fillColor: color(0xad6eff),
-			fillOpacity: 0.5,
+			fillOpacity: 0.2,
 			labelFill: color(0x000000),
 			labelFontSize: "12px",
 			labelFontSizes: ["8px", "10px", "11px", "12px", "14px", "16px", "20px", "24px", "36px", "48px"],
@@ -1308,7 +1336,7 @@ export class StockChartDefaultTheme extends Theme {
 			labelFontFamilies: ["Arial", "Courier New", "Garamond", "Georgia", "Times New Roman"],
 			drawingIcon: drawingIcons[0],
 			drawingIcons: drawingIcons,
-			snapToData: true
+			snapToData: false
 		});
 
 		r("ColorControl").setAll({
@@ -1447,5 +1475,12 @@ export class StockChartDefaultTheme extends Theme {
 				label: l.translateAny("Logarithmic")
 			}]
 		});
+
+		r("Measure").setAll({
+			labelText: "{value} ({percent})\n{count.formatNumber('#,###.')} " + l.translateAny("bars") + " {intervalCount.formatNumber('#,###.')} {intervalUnit}",
+			labelVolumeText: "\nVolume: {volume.formatNumber('#.##a')}",
+		});
+
 	}
+
 }

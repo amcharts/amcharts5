@@ -1569,7 +1569,7 @@ export class XYChart extends SerialChart {
 				if (point) {
 					if (maxTooltipDistance >= 0) {
 						let point = tooltip.get("pointTo")!;
-						if (point) {
+						if (point && closestPoint) {
 							if (series != closest) {
 								let distance = Math.hypot(closestPoint.x - point.x, closestPoint.y - point.y);
 								if (maxTooltipDistanceBy == "x") {

@@ -5,13 +5,6 @@ export interface ITrendLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 
 export interface ITrendLineSeriesSettings extends ISimpleLineSeriesSettings {
 
-	/**
-	 * Value field to use for calculations.
-	 *
-	 * @default "value"
-	 */
-	field: "open" | "value" | "low" | "high";
-
 }
 
 export interface ITrendLineSeriesPrivate extends ISimpleLineSeriesPrivate {
@@ -58,10 +51,5 @@ export class TrendLineSeries extends SimpleLineSeries {
 				this._positionBullets(diP2);
 			}
 		}
-	}
-
-	// need to override so that location would not be set
-	protected _setXLocation() {
-
 	}
 }

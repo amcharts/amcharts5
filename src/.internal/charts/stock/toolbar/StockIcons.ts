@@ -53,9 +53,10 @@ export class StockIcons {
 		"Bold": { viewbox: "0 0 50 50", path: "M 12 4 L 12 47 L 32 47 C 45 47 47 23 32 23 C 42 23 42 4 31 4 L 12 4 Z M 32 23 L 12 23 Z", style: "stroke-width: 1.8px" },
 		"Italic": { viewbox: "0 0 50 50", path: "M 17 5 L 38 5 M 27 5 L 18 47 M 8 47 L 28 47" },
 		"Show Extension": { viewbox: "0 0 50 50", path: "M 10 15 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 30 36 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 40 41 L 50 50 M 20 20 L 30 30 M 10 10 L 0 0" },
-		"Snap": { viewbox: "0 0 50 50", path: "M 17 29 L 29 29 M 33 39 a 5 5 0 1 0 16 3 a 5 5 0 1 0 -16 -3 M 29 17 L 29 29 L 3 3" },
+		"Snap": { viewbox: "0 0 50 50", path: "M 17 29 L 29 29 M 33 39 a 5 5 0 1 0 15 0 a 5 5 0 1 0 -15 0 M 29 17 L 29 29 L 3 3" },
 		"Reset": { viewbox: "0 0 50 50", path: "M 4 25 A 1 1 0 0 0 46 25 Q 46 4 25 4 Q 18 4 11 10 L 5 4 L 5 16 L 17 16 L 11 10" },
-		"Search": { viewbox: "0 0 50 50", path: "M 5 11 A 1 1 90 0 0 36 27 A 1 1 90 0 0 5 11 M 34 30 L 49 45 L 47 47 L 32 32"}
+		"Search": { viewbox: "0 0 50 50", path: "M 5 11 A 1 1 90 0 0 36 27 A 1 1 90 0 0 5 11 M 34 30 L 49 45 L 47 47 L 32 32"},
+		"Measure": { viewbox: "0 0 50 50", path: "M 3 38 L 35 6 L 44 15 L 12 47 L 3 38 M 10 31 L 16 37 M 16 25 L 20 29 M 22 19 L 26 23 M 28 13 L 34 19"}
 	};
 
 	public static getIcon(id: string): SVGElement {

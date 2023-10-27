@@ -109,13 +109,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			let itemValue = dates[index];
 
 			let d = 0;
-			if (itemValue > value) {
+			if (itemValue > value && value > this.getPrivate("min", 0)) {
 				d = itemValue - value;
 			}
 			else {
 				d = value - itemValue;
 			}
-
+			
 			return (index - startLocation) / len + d / this.baseDuration() / len;
 		}
 	}
@@ -222,7 +222,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			this._frequency = frequency;
 
 			for (let j = 0, length = this.dataItems.length; j < length; j++) {
-				this.dataItems[j].hide();
+				this._toggleDataItem(this.dataItems[j], false);
 			}
 
 			let realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
@@ -336,9 +336,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 							label.set("text", this._root.dateFormatter.format(date, format!));
 						}
 
-						if (dataItem.isHidden()) {
-							dataItem.show();
-						}
+						this._toggleDataItem(dataItem, true);
 						this._prepareDataItem(dataItem, gridInterval.count);
 					}
 					i++;

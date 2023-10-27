@@ -7,6 +7,7 @@ export { SettingsModal, ISettingsModalEvents, ISettingsModalPrivate, ISettingsMo
 export { Indicator, IIndicatorEditableSetting, IIndicatorEvents, IIndicatorPrivate, IIndicatorSettings } from "./.internal/charts/stock/indicators/Indicator";
 export { ChartIndicator, IChartIndicatorEvents, IChartIndicatorPrivate, IChartIndicatorSettings } from "./.internal/charts/stock/indicators/ChartIndicator";
 export { MovingAverage, IMovingAverageEvents, IMovingAveragePrivate, IMovingAverageSettings } from "./.internal/charts/stock/indicators/MovingAverage";
+export { Momentum, IMomentumEvents, IMomentumPrivate, IMomentumSettings } from "./.internal/charts/stock/indicators/Momentum";
 export { VWAP, IVWAPEvents, IVWAPPrivate, IVWAPSettings } from "./.internal/charts/stock/indicators/VWAP";
 export { MovingAverageEnvelope, IMovingAverageEnvelopeEvents, IMovingAverageEnvelopePrivate, IMovingAverageEnvelopeSettings } from "./.internal/charts/stock/indicators/MovingAverageEnvelope";
 export { MovingAverageDeviation, IMovingAverageDeviationEvents, IMovingAverageDeviationPrivate, IMovingAverageDeviationSettings } from "./.internal/charts/stock/indicators/MovingAverageDeviation";
@@ -49,6 +50,7 @@ export { QuadrantLineSeries, IQuadrantLineSeriesPrivate, IQuadrantLineSeriesData
 export { FibonacciSeries, IFibonacciSeriesPrivate, IFibonacciSeriesSettings, IFibonacciSeriesDataItem } from "./.internal/charts/stock/drawing/FibonacciSeries";
 export { FibonacciTimezoneSeries, IFibonacciTimezoneSeriesPrivate, IFibonacciTimezoneSeriesSettings, IFibonacciTimezoneSeriesDataItem } from "./.internal/charts/stock/drawing/FibonacciTimezoneSeries";
 export { HorizontalRaySeries, IHorizontalRaySeriesPrivate, IHorizontalRaySeriesSettings, IHorizontalRaySeriesDataItem } from "./.internal/charts/stock/drawing/HorizontalRaySeries";
+export { Measure, IMeasurePrivate, IMeasureSettings, IMeasureDataItem } from "./.internal/charts/stock/drawing/Measure";
 
 export { StockToolbar, IStockToolbarEvents, IStockToolbarPrivate, IStockToolbarSettings } from "./.internal/charts/stock/toolbar/StockToolbar";
 export { StockControl, IStockControlEvents, IStockControlPrivate, IStockControlSettings } from "./.internal/charts/stock/toolbar/StockControl";

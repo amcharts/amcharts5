@@ -10,23 +10,9 @@ import * as $ease from "../../../core/util/Ease";
 
 export interface ICalloutSeriesDataItem extends ILabelSeriesDataItem {
 
-	/**
-	 * Indicates whether callout will attach itself to the closest data item, as
-	 * opposed to exact location of the click.
-	 */
-	snapToData?: boolean;
-
 }
 
 export interface ICalloutSeriesSettings extends ILabelSeriesSettings {
-
-	/**
-	 * If set to `true`, callout will attach itself to the closest data item, as
-	 * opposed to exact location of the click.
-	 *
-	 * @default true
-	 */
-	snapToData?: boolean;
 
 }
 
@@ -42,10 +28,6 @@ export class CalloutSeries extends LabelSeries {
 	declare public _dataItemSettings: ICalloutSeriesDataItem;
 
 	protected _tag = "callout";
-
-	protected _afterNew() {
-		super._afterNew();
-	}
 
 	protected _tweakBullet2(label: Label, dataItem: DataItem<ICalloutSeriesDataItem>) {
 		const dataContext = dataItem.dataContext as any;
@@ -133,11 +115,5 @@ export class CalloutSeries extends LabelSeries {
 		}
 
 		return Template.new(template);
-	}
-
-	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
-		if (!this.get("snapToData")) {
-			this._setXLocationReal(dataItem, value);
-		}
 	}
 }

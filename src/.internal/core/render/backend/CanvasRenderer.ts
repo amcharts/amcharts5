@@ -400,12 +400,12 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		return this._colorId;
 	}
 
-	protected _isInteractive(): boolean {
-		return !this.inactive && (this.interactive || this._renderer._forceInteractive > 0);
+	protected _isInteractive(status: IStatus): boolean {
+		return !status.inactive && (this.interactive || this._renderer._forceInteractive > 0);
 	}
 
-	protected _isInteractiveMask(): boolean {
-		return this._isInteractive();
+	protected _isInteractiveMask(status: IStatus): boolean {
+		return this._isInteractive(status);
 	}
 
 	public contains(child: CanvasDisplayObject): boolean {
@@ -542,6 +542,8 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		if (this.visible && (this.exportable !== false || !this._renderer._omitTainted)) {
 			this._setMatrix();
 
+			const subStatus = this.subStatus(status);
+
 			const resolution = this._renderer.resolution;
 
 			const layers = this._renderer.layers;
@@ -579,7 +581,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 			ghostContext.save();
 
 			// We must apply the mask before we transform the element
-			if (mask && this._isInteractiveMask()) {
+			if (mask && this._isInteractiveMask(subStatus)) {
 				mask._transformMargin(ghostContext, resolution, ghostLayer.margin);
 				mask._runPath(ghostContext);
 				ghostContext.clip();
@@ -587,7 +589,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 			this._transformMargin(ghostContext, resolution, ghostLayer.margin);
 
-			this._render(this.subStatus(status));
+			this._render(subStatus);
 
 			ghostContext.restore();
 
@@ -639,8 +641,8 @@ export class CanvasContainer extends CanvasDisplayObject implements IContainer {
 
 	protected _children: Array<CanvasDisplayObject> = [];
 
-	protected _isInteractiveMask(): boolean {
-		return this.interactiveChildren || super._isInteractiveMask();
+	protected _isInteractiveMask(status: IStatus): boolean {
+		return this.interactiveChildren || super._isInteractiveMask(status);
 	}
 
 	addChild(child: CanvasDisplayObject): void {
@@ -1481,7 +1483,7 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		super._render(status);
 
 		const layerDirty = status.layer.dirty;
-		const interactive = this._isInteractive();
+		const interactive = this._isInteractive(status);
 
 		if (layerDirty || interactive) {
 
@@ -1642,7 +1644,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		let fontStyle = this._getFontStyle(undefined, ignoreFontWeight);
 
 		context.font = fontStyle;
-		if (this._isInteractive() && !ignoreGhost) {
+		if (this._isInteractive(status) && !ignoreGhost) {
 			ghostContext.font = fontStyle;
 		}
 
@@ -1670,7 +1672,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 		this._shared(context);
 
-		if (this._isInteractive() && !ignoreGhost) {
+		if (this._isInteractive(status) && !ignoreGhost) {
 			ghostContext.fillStyle = this._getColorId();
 			this._shared(ghostContext);
 		}
@@ -1739,7 +1741,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 		if (this.textVisible) {
 
-			const interactive = this._isInteractive();
+			const interactive = this._isInteractive(status);
 			const context = status.layer.context;
 			const layerDirty = status.layer.dirty;
 			const ghostContext = this._renderer._ghostLayer.context;
@@ -1761,7 +1763,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						ghostContext.save();
 
 						context.font = chunk.style;
-						if (this._isInteractive()) {
+						if (this._isInteractive(status)) {
 							ghostContext.font = chunk.style;
 						}
 					}
@@ -2439,7 +2441,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 		if (this.textVisible) {
 			this._prerender(status);
 
-			const interactive = this._isInteractive();
+			const interactive = this._isInteractive(status);
 			const context = status.layer.context;
 			const layerDirty = status.layer.dirty;
 			const ghostContext = this._renderer._ghostLayer.context;
@@ -2963,7 +2965,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 				status.layer.context.drawImage(this.image, 0, 0, width, height);
 			}
 
-			if (this.interactive && this._isInteractive()) {
+			if (this.interactive && this._isInteractive(status)) {
 				const mask = this._getMask(this.image);
 
 				this._renderer._ghostLayer.context.drawImage(mask, 0, 0);
@@ -3281,7 +3283,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return this._patternContext.createPattern(this._patternCanvas, repetition)!;
 	}
 
-	
+
 
 	makeContainer(): CanvasContainer {
 		return new CanvasContainer(this);

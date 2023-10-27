@@ -9,13 +9,6 @@ export interface IRegressionSeriesDataItem extends ISimpleLineSeriesDataItem {
 
 export interface IRegressionSeriesSettings extends ISimpleLineSeriesSettings {
 
-	/**
-	 * Value field to use for calculations.
-	 *
-	 * @default "value"
-	 */
-	field: "open" | "value" | "low" | "high";
-
 }
 
 export interface IRegressionSeriesPrivate extends ISimpleLineSeriesPrivate {
@@ -93,10 +86,5 @@ export class RegressionSeries extends SimpleLineSeries {
 				}
 			}
 		}
-	}
-
-	// need to override so that location would not be set
-	protected _setXLocation() {
-
 	}
 }

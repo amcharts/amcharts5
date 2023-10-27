@@ -1,6 +1,7 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import type { IPoint } from "../../../core/util/IPoint";
+import { Line } from "../../../core/render/Line";
 
 import { DrawingSeries, IDrawingSeriesSettings, IDrawingSeriesPrivate, IDrawingSeriesDataItem } from "./DrawingSeries";
 
@@ -25,6 +26,8 @@ export class PolylineSeries extends DrawingSeries {
 
 	protected _tag = "polyline";
 
+	protected _drawingLine: Line = this.mainContainer.children.push(Line.new(this._root, { forceInactive: true }));
+
 	protected _handlePointerClick(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {
 			super._handlePointerClick(event);
@@ -37,17 +40,24 @@ export class PolylineSeries extends DrawingSeries {
 				}
 
 				if (this._pIndex == 0) {
-					this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner:"e" });
+					this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: "e" });
 				}
-
+				this._drawingLine.show();
 				this._addPoint(event);
 			}
+
+			this._drawingLine.set("stroke", this.get("strokeColor"));			
 		}
 	}
 
 	protected _handleBulletDragStop(event: ISpritePointerEvent) {
 		super._handleBulletDragStop(event);
 		this._checkClosing(event);
+	}
+
+	public disableDrawing() {
+		super.disableDrawing();
+		this._drawingLine.hide();
 	}
 
 	protected _afterDataChange() {
@@ -63,6 +73,11 @@ export class PolylineSeries extends DrawingSeries {
 
 	}
 
+	public clearDrawings(): void {
+		super.clearDrawings();
+		this._drawingLine.hide();
+	}
+
 	protected _addPoint(event: ISpritePointerEvent) {
 		const chart = this.chart;
 		if (chart) {
@@ -72,7 +87,7 @@ export class PolylineSeries extends DrawingSeries {
 			const point = chart.plotContainer.toLocal(event.point);
 
 			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 			const dataItems = this.dataItems;
 			const len = dataItems.length;
@@ -113,8 +128,28 @@ export class PolylineSeries extends DrawingSeries {
 							dataContext.closing = true;
 							this._pIndex = 0;
 							this.data.push({ stroke: this._getStrokeTemplate(), index: index + 1, corner: "e" });
-
+							this._drawingLine.hide();
 						}
+					}
+				}
+			}
+		}
+	}
+
+	protected _handlePointerMove(event: ISpritePointerEvent) {
+		super._handlePointerMove(event);
+		if (this._isDrawing) {
+			const movePoint = this._movePointerPoint;
+
+			if (movePoint) {
+				const dataItems = this.dataItems;
+				const len = dataItems.length;
+				if(len > 0){
+					const lastItem = dataItems[len - 1];
+
+					const point = lastItem.get("point");
+					if (point) {
+						this._drawingLine.set("points", [point, movePoint]);
 					}
 				}
 			}

@@ -491,9 +491,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 				this._createAssets(dataItem, []);
 
-				if (dataItem.isHidden()) {
-					dataItem.show();
-				}
+				this._toggleDataItem(dataItem, true);
 
 				dataItem.setRaw("value", value);
 
@@ -533,7 +531,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			for (let j = i; j < this.dataItems.length; j++) {
-				this.dataItems[j].hide();
+				this._toggleDataItem(this.dataItems[j], false);
 			}
 
 			$array.each(this.series, (series) => {

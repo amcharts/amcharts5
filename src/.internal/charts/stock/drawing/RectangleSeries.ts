@@ -1,20 +1,22 @@
-import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
+import type { Graphics } from "../../../core/render/Graphics";
+import type { IPoint } from "../../../core/util/IPoint";
+import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
-import { DrawingSeries, IDrawingSeriesSettings, IDrawingSeriesPrivate, IDrawingSeriesDataItem } from "./DrawingSeries";
+export interface IRectangleSeriesDataItem extends ISimpleLineSeriesDataItem {
 
-export interface IRectangleSeriesDataItem extends IDrawingSeriesDataItem {
 }
 
-export interface IRectangleSeriesSettings extends IDrawingSeriesSettings {
+export interface IRectangleSeriesSettings extends ISimpleLineSeriesSettings {
+
 }
 
-export interface IRectangleSeriesPrivate extends IDrawingSeriesPrivate {
+export interface IRectangleSeriesPrivate extends ISimpleLineSeriesPrivate {
 }
 
-export class RectangleSeries extends DrawingSeries {
+export class RectangleSeries extends SimpleLineSeries {
 	public static className: string = "RectangleSeries";
-	public static classNames: Array<string> = DrawingSeries.classNames.concat([RectangleSeries.className]);
+	public static classNames: Array<string> = SimpleLineSeries.classNames.concat([RectangleSeries.className]);
 
 	declare public _settings: IRectangleSeriesSettings;
 	declare public _privateSettings: IRectangleSeriesPrivate;
@@ -26,172 +28,118 @@ export class RectangleSeries extends DrawingSeries {
 
 	protected _tag = "rectangle";
 
-	protected _handleBulletDragged(event: ISpritePointerEvent) {
-		super._handleBulletDragged(event);
+	protected _afterNew() {
+		super._afterNew();
+	}
 
-		const dataItem = event.target.dataItem as DataItem<IRectangleSeriesDataItem>;
-		const movePoint = this._movePointerPoint;
+	protected _updateSegment(index: number) {
+		const diP1 = this._di[index]["p1"];
+		const diP2 = this._di[index]["p2"];
 
-		if (dataItem && movePoint) {
-			const dataContext = dataItem.dataContext as any;
-			const index = dataContext.index;
-			const corner = dataContext.corner;
+		const series = this.get("series");
 
-			const xAxis = this.get("xAxis");
-			const yAxis = this.get("yAxis");
+		if (series && diP1 && diP2) {
+			let x1 = this._getXValue(diP1.get("valueX" as any));
+			let x2 = this._getXValue(diP2.get("valueX" as any));
 
-			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
+			const field = this.get("field") + "Y";
 
-			const vx = "valueX"
-			const vy = "valueY"
+			let y1 = this._getYValue(diP1.get(field as any), x1);
+			let y2 = this._getYValue(diP2.get(field as any), x2);
 
-			this._setContext(dataItem, vx, valueX);
-			this._setContext(dataItem, vy, valueY, true);
+			this._setContext(diP1, "valueY", y1, true);
+			this._setContext(diP2, "valueY", y2, true);
 
-			this._setXLocation(dataItem, valueX);
-			this._positionBullets(dataItem);
-
-			const dataItems = this._di[index];
-			if (dataItems) {
-				const blDI = dataItems["bl"];
-				const brDI = dataItems["br"];
-				const tlDI = dataItems["tl"];
-				const trDI = dataItems["tr"];
-				const tlDI2 = dataItems["tl2"];
-
-				if (blDI && brDI && tlDI && trDI && tlDI2) {
-					if (corner == "br") {
-						this._setContext(blDI, vy, valueY, true);
-						this._setContext(trDI, vx, valueX);
-						this._setXLocation(trDI, valueX);
-					}
-
-					if (corner == "tr") {
-						this._setContext(brDI, vx, valueX);
-						this._setXLocation(brDI, valueX);
-
-						this._setContext(tlDI, vy, valueY, true);
-						this._setContext(tlDI2, vy, valueY, true);
-					}
-
-					if (corner == "bl") {
-						this._setContext(brDI, vy, valueY, true);
-
-						this._setContext(tlDI, vx, valueX);
-						this._setContext(tlDI2, vx, valueX);
-
-						this._setXLocation(tlDI, valueX);
-						this._setXLocation(tlDI2, valueX);
-					}
-
-					if (corner == "tl2") {
-						this._setContext(blDI, vx, valueX);
-						this._setXLocation(blDI, valueX);
-
-						this._setContext(trDI, vy, valueY, true);
-
-						this._setContext(tlDI, vx, valueX);
-						this._setXLocation(tlDI, valueX);
-
-						this._setContext(tlDI, vy, valueY, true);
-					}
-				}
-			}
+			this._positionBullets(diP1);
+			this._positionBullets(diP2);
 		}
 	}
 
-
-	protected _handlePointerClick(event: ISpritePointerEvent) {
-		if (this._drawingEnabled) {
-			super._handlePointerClick(event);
-
-			if (!this._isDragging) {
-
-				if (!this._isDrawing) {
-					this._index++;
-					this._isDrawing = true;
-					this.bulletsContainer.show();
-					this._addPoints(event, this._index);
-				}
-				else {
-					this._isDrawing = false;
-				}
-			}
+	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
+		if (!this.get("snapToData")) {
+			this._setXLocationReal(dataItem, value);
+		}
+		else {
+			dataItem.set("locationX", 0);
 		}
 	}
 
-	protected _handlePointerMove(event: ISpritePointerEvent) {
-		super._handlePointerMove(event);
-		if (this._isDrawing) {
-			const movePoint = this._movePointerPoint;
-
-			if (movePoint) {
-				const xAxis = this.get("xAxis");
-				const yAxis = this.get("yAxis");
-
-				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
-
-				const index = this._index;
-
-				const dataItems = this._di[index];
-				if (dataItems) {
-					const diTR = dataItems["tr"];
-					const diBR = dataItems["br"];
-					const diBL = dataItems["bl"];
-
-					if (diTR && diBR && diBL) {
-						this._setContext(diTR, "valueX", valueX);
-						this._setContext(diBR, "valueX", valueX);
-
-						this._setXLocation(diTR, valueX);
-						this._setXLocation(diBR, valueX);
-
-						this._setContext(diBR, "valueY", valueY, true);
-						this._setContext(diBL, "valueY", valueY, true);
-					}
-				}
-			}
-		}
-	}
-
-	protected _addPoints(event: ISpritePointerEvent, index: number) {
+	public _updateChildren() {
+		super._updateChildren();
 		const chart = this.chart;
+		this.fills.clear();
 		if (chart) {
+			for (let i = 0; i < this._lines.length; i++) {
+				const line = this._lines[i];
+				if (line) {
+					const diP1 = this._di[i]["p1"];
+					const diP2 = this._di[i]["p2"];
+					const di = this._di[i]["e"];
 
-			this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index:index, corner:"e" });
+					const dataContext = di.dataContext as any;
+					const fillGraphics = this.makeFill(this.fills);
 
-			const xAxis = this.get("xAxis");
-			const yAxis = this.get("yAxis");
+					const index = this.dataItems.indexOf(diP1);
+					for (let j = index; j >= 0; j--) {
+						const dataContext = this.dataItems[j].dataContext as any;
+						const template = dataContext.fill;
+						if (template) {
+							fillGraphics.template = template;
+						}
+					}
 
-			const point = chart.plotContainer.toLocal(event.point);
-			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+					const userData = [this.dataItems.indexOf(diP1), this.dataItems.indexOf(diP2)];
 
-			this._di[index] = {};
+					let fillColor = this.get("fillColor", this.get("fill"));
 
-			this._addPoint(valueX, valueY, "tl", index);
-			this._addPoint(valueX, valueY, "tr", index);
-			this._addPoint(valueX, valueY, "br", index);
-			this._addPoint(valueX, valueY, "bl", index);
-			this._addPoint(valueX, valueY, "tl2", index);
+					const fillTemplate = dataContext.fill;
+
+					if (fillTemplate) {
+						fillColor = fillTemplate.get("fill");
+					}
+
+					const settings = { userData: userData, fill: fillColor };
+					fillGraphics.setAll(settings);
+
+					const p1 = diP1.get("point");
+					const p2 = diP2.get("point");
+
+					if (p1 && p2) {
+						fillGraphics.set("draw", (display) => {
+							display.moveTo(p1.x, p1.y);
+							display.lineTo(p2.x, p1.y);
+							display.lineTo(p2.x, p2.y);
+							display.lineTo(p1.x, p2.y);
+							display.lineTo(p1.x, p1.y);
+						})
+
+						const strokeGraphics = this.strokes.getIndex(this._getStrokeIndex(i));
+
+						if (strokeGraphics) {
+							strokeGraphics.set("draw", (display) => {
+								display.moveTo(p1.x, p1.y);
+								display.lineTo(p2.x, p1.y);
+								display.lineTo(p2.x, p2.y);
+								display.lineTo(p1.x, p2.y);
+								display.lineTo(p1.x, p1.y);
+							})
+						}
+						this._updateOthers(i, fillGraphics, p1, p2);
+					}
+				}
+			}
 		}
 	}
 
-	protected _addPoint(valueX: number | null, valueY: number | null, corner: string, index: number): any {
+	protected _updateOthers(_index: number, _fillGraphics: Graphics, _p1: IPoint, _p2: IPoint) {
 
-		this.data.push({ valueY: valueY, valueX: valueX, corner:corner, index:index });
-		const len = this.dataItems.length;
-		const dataItem = this.dataItems[len - 1];
-		if (dataItem) {
-			if (valueX != null) {
-				this._setXLocation(dataItem, valueX);
-			}
-			this.setPrivate("startIndex", 0);
-			this.setPrivate("endIndex", len);
+	}
 
-			return dataItem.dataContext;
-		}
+	protected _drawFill() {
+
+	}
+
+	protected _updateLine() {
+
 	}
 }

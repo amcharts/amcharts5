@@ -681,13 +681,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				this._createAssets(dataItem, []);
 
-				if (dataItem.isHidden()) {
-					dataItem.show();
-				}
+				this._toggleDataItem(dataItem, true);
 
 				dataItem.setRaw("value", value);
-
-
 
 				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * this._getM(gridInterval.timeUnit));
 				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
@@ -723,7 +719,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 
 			for (let j = i; j < this.dataItems.length; j++) {
-				this.dataItems[j].hide();
+				this._toggleDataItem(this.dataItems[j], false);
 			}
 
 			$array.each(this.series, (series) => {

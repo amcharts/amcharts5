@@ -62,8 +62,6 @@ export class SimpleLineSeries extends DrawingSeries {
 		return line;
 	}
 
-
-
 	public readonly hitLines: ListTemplate<Line> = new ListTemplate(
 		Template.new({}),
 		() => Line._new(this._root, {}, [this.hitLines.template])
@@ -183,7 +181,6 @@ export class SimpleLineSeries extends DrawingSeries {
 			for (let i = 0; i < this._lines.length; i++) {
 				const line = this._lines[i];
 				if (line) {
-					const hitLine = this._hitLines[i];
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
 					if (diP1 && diP2) {
@@ -197,7 +194,7 @@ export class SimpleLineSeries extends DrawingSeries {
 							const p11 = { x: p1.x + len * $math.cos(angle), y: p1.y + len * $math.sin(angle) };
 							const p22 = { x: p2.x - len * $math.cos(angle), y: p2.y - len * $math.sin(angle) };
 
-							this._updateLine(line, hitLine, p11, p22, p1, p2);
+							this._updateLine(i, p11, p22, p1, p2);
 						}
 					}
 				}
@@ -205,7 +202,10 @@ export class SimpleLineSeries extends DrawingSeries {
 		}
 	}
 
-	protected _updateLine(line: Line, hitLine: Line, p11: IPoint, p22: IPoint, p1: IPoint, p2: IPoint) {
+	protected _updateLine(index:number, p11: IPoint, p22: IPoint, p1: IPoint, p2: IPoint) {
+		const line = this._lines[index];
+		const hitLine = this._hitLines[index];
+
 		let segments = [[[p11, p1]], [[p2, p22]]];
 		let hitSegments = [[[p11, p22]]];
 
@@ -248,18 +248,19 @@ export class SimpleLineSeries extends DrawingSeries {
 				const xAxis = this.get("xAxis");
 				const yAxis = this.get("yAxis");
 
-				const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-				const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
+				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
+				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);
 
 				const index = this._index;
 				const diP1 = this._di[index]["p1"];
 				const diP2 = this._di[index]["p2"];
 
 				if (diP1 && diP2) {
-					this._setContext(diP2, "valueX", vx);
-					this._setContext(diP2, "valueY", vy, true);
-					this._setXLocation(diP2, vx);
-					this._updateSegment(index);
+					this._setContext(diP2, "valueX", valueX);
+					this._setContext(diP2, "valueY", valueY, true);
+					this._setXLocation(diP1, diP1.get("valueX", 0));
+					this._setXLocation(diP2, valueX);
+					this._updateSegment(index);	
 				}
 			}
 		}
@@ -290,8 +291,6 @@ export class SimpleLineSeries extends DrawingSeries {
 
 			line.setPrivate("visible", showExtension);
 
-
-
 			const settings = { stroke: color, userData: index };
 			line.setAll(settings);
 			hitLine.setAll(settings);
@@ -317,11 +316,10 @@ export class SimpleLineSeries extends DrawingSeries {
 
 		const point = chart.plotContainer.toLocal(event.point);
 		const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 		this._addPoint(valueX, valueY, "p1", index);
 		this._addPoint(valueX, valueY, "p2", index);
-
 	}
 
 	protected _addPoint(valueX: number, valueY: number, corner: string, index: number) {

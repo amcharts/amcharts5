@@ -20,6 +20,7 @@ export interface IDropdownListItem {
 export interface IDropdownListSettings extends IDropdownSettings {
 	items?: IDropdownListItem[];
 	maxSearchItems?: number;
+	scrollable?: boolean;
 	searchable?: boolean;
 	searchCallback?: (query: string) => Promise<IDropdownListItem[]>;
 }
@@ -74,10 +75,24 @@ export class DropdownList extends Dropdown {
 		// Create list
 		const list = document.createElement("ul");
 		list.className = "am5stock-control-list";
+
 		container.appendChild(list);
 		this.setPrivate("list", list);
 
+		if (this.get("scrollable")) {
+			this._sizeItems();
+			this.root.container.onPrivate("height", () => {
+				this._sizeItems();
+			});
+		}
+
 		this._initItems();
+	}
+
+	protected _sizeItems(): void {
+		const list = this.getPrivate("list")!;
+		list.style.maxHeight = (this.root.container.height() - 100) + "px";
+		list.style.overflow = "auto";
 	}
 
 	protected _initItems(items?: IDropdownListItem[]): void {

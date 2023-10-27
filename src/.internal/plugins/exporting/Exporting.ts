@@ -2213,13 +2213,18 @@ export class Exporting extends Entity {
 		//Save current scroll position
 		let scroll = document.documentElement.scrollTop || document.body.scrollTop;
 
-		// Hide all document nodes by applyin custom CSS
+		// Hide all document nodes by applying custom CSS
 		let rule = new StyleRule($utils.getShadowRoot(this._root.dom), "body > *", {
 			"display": "none",
 			"position": "fixed",
 			"visibility": "hidden",
 			"opacity": "0",
 			"clipPath": "polygon(0px 0px,0px 0px,0px 0px,0px 0px);"
+		}, this._root.nonce);
+
+		let rule2 = new StyleRule($utils.getShadowRoot(this._root.dom), "body", {
+			"padding": "0",
+			"margin": "0"
 		}, this._root.nonce);
 
 		// Replace title?
@@ -2261,13 +2266,8 @@ export class Exporting extends Entity {
 			document.body.removeChild(img);
 
 			// Reset back all elements
-			/*for (let len = items.length, i = 0; i < len; i++) {
-				let item = <HTMLElement>items[i];
-				if ($dom.isElement(item)) {
-					item.style.display = states[i];
-				}
-			}*/
 			rule.dispose();
+			rule2.dispose();
 
 			// Restore title
 			if (originalTitle) {

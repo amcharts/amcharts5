@@ -54,7 +54,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 	 */
 	public makeLabel(): Label {
 		const label = this.labels.make();
-		this.mainContainer.children.push(label);
+		this.bulletsContainer.children.push(label);
 		this.labels.push(label);
 		return label;
 	}
@@ -71,29 +71,6 @@ export class FibonacciSeries extends SimpleLineSeries {
 		() => Label._new(this._root, {}, [this.labels.template])
 	);
 
-	protected _updateSegment(index: number) {
-		super._updateSegment(index);
-		this._updateSegmentReal(index);
-	}
-
-	protected _updateSegmentReal(index: number) {
-		const dataItems = this._di[index];
-		if (dataItems) {
-			const diP1 = dataItems["p1"];
-			const diP2 = dataItems["p2"];
-
-			if (diP1 && diP2) {
-				const valueX = diP1.get("valueX", 0);
-				this._setContext(diP2, "valueX", valueX);
-				this._setXLocation(diP2, valueX);
-			}
-		}
-	}
-
-	protected _addTemplates(index: number) {
-		this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index, corner: "e" });
-	}
-
 	public _updateChildren() {
 		super._updateChildren();
 		this._updateChildrenReal();
@@ -107,19 +84,14 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 			for (let i = 0; i < this._lines.length; i++) {
 				const line = this._lines[i];
-				if (line) {					
+				if (line) {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
 
 					const p1 = diP1.get("point");
 					const p2 = diP2.get("point");
 
-					const valueX = diP1.get("valueX", 0);
-					this._setContext(diP2, "valueX", valueX);
-					this._setXLocation(diP2, valueX);
-
 					if (p1 && p2) {
-						p2.x = chart.plotContainer.width();
 						const sequence = this.get("sequence", []);
 						let prevValue = 0;
 
@@ -128,7 +100,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 						const fills = this._fills[i];
 
 						for (let i = 0; i < sequence.length; i++) {
-							const value = sequence[i];
+							const value = sequence[i] - 1;
 
 							const label = labels[i];
 
@@ -139,10 +111,12 @@ export class FibonacciSeries extends SimpleLineSeries {
 							let strokeColor = fillColor;
 
 							fill.set("fill", fillColor);
+							fill.set("fillOpacity", this.get("fillOpacity", 0));
 							stroke.set("stroke", strokeColor);
+							stroke.set("strokeOpacity", this.get("strokeOpacity", 0));
 
 							const y1 = p1.y + (p2.y - p1.y) * prevValue;
-							const y2 = p1.y + (p2.y - p1.y) * value;
+							const y2 = p1.y + (p2.y - p1.y) * -value;
 
 							const realValue = yAxis.positionToValue(yAxis.coordinateToPosition(y2));
 
@@ -168,10 +142,10 @@ export class FibonacciSeries extends SimpleLineSeries {
 								dataItem.set("value" as any, realValue);
 							}
 
-							label.setAll({ x: p2.x, y: y2, fill:fillColor });
+							label.setAll({ x: p2.x, y: y2, fill: fillColor });
 							label.text.markDirtyText();
 
-							prevValue = value;
+							prevValue = -value;
 						}
 					}
 				}
@@ -202,32 +176,6 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 				const stroke = this.makeStroke(this.strokes);
 				strokesArr.push(stroke);
-
-				/*
-								let fillColor: Color | undefined = colors[i];
-								let strokeColor: Color | undefined = colors[i];
-				
-								if (!fillColor) {
-									const fillTemplate = dataContext.fill;
-									if (fillTemplate) {
-										fillColor = fillTemplate.get("fill");
-									}
-									if (!fillColor) {
-										fillColor = this.get("fillColor", this.get("fill"));
-									}
-								}
-								if (!strokeColor) {
-									const strokeTemplate = dataContext.stroke;
-									if (strokeTemplate) {
-										strokeColor = strokeTemplate.get("stroke");
-									}
-									if (!strokeColor) {
-										strokeColor = this.get("strokeColor", this.get("stroke"));
-									}
-								}
-								fill.setAll({ fill: fillColor, userData: userData });
-								stroke.setAll({ stroke: strokeColor, userData: userData });
-						*/
 			}
 
 			this._labels[index] = labelArr;

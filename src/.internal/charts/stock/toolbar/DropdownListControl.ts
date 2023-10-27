@@ -8,6 +8,7 @@ export interface IDropdownListControlSettings extends IStockControlSettings {
 	currentItem?: string | IDropdownListItem;
 	fixedLabel?: boolean;
 	items?: Array<string | IDropdownListItem>;
+	scrollable?: boolean;
 	maxSearchItems?: number,
 	searchable?: boolean;
 	searchCallback?: (query: string) => IDropdownListItem[];
@@ -57,6 +58,7 @@ export class DropdownListControl extends StockControl {
 			control: this,
 			parent: this.getPrivate("button"),
 			searchable: this.get("searchable", false),
+			scrollable: this.get("scrollable", false),
 			items: []
 		}
 

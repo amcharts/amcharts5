@@ -1,5 +1,3 @@
-import type { DataItem } from "../../../core/render/Component";
-
 import { FibonacciSeries, IFibonacciSeriesSettings, IFibonacciSeriesPrivate, IFibonacciSeriesDataItem } from "./FibonacciSeries";
 import { color } from "../../../core/util/Color";
 
@@ -28,21 +26,21 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 
 	protected _updateSegmentReal(index: number) {
 		const dataItems = this._di[index];
+
 		if (dataItems) {
 			const diP1 = dataItems["p1"];
 			const diP2 = dataItems["p2"];
 			if (diP1 && diP2) {
-				const valueY1 = diP1.get("valueY", 0);
-				this._setContext(diP2, "valueY", valueY1, true);
-
+				this._setContext(diP2, "valueY", diP1.get("valueY", 0), true);
 				diP1.setRaw("locationX", 0);
 				diP2.setRaw("locationX", 0);
 			}
 		}
 	}
 
-	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
-		this._setXLocationReal(dataItem, value);
+	protected _updateSegment(index: number) {
+		super._updateSegment(index);
+		this._updateSegmentReal(index);
 	}
 
 	public _updateChildrenReal() {
@@ -72,7 +70,6 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 						if (p1 && p2) {
 							const dataContext = di.dataContext as any;
 
-
 							const sequence = this.get("sequence", []);
 							const labels = this._labels[i];
 							const fills = this._fills[i];
@@ -99,6 +96,9 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 								const fillTemplate = dataContext.fill;
 								let fillColor = this.get("colors", [])[i];
 								let strokeColor = fillColor;
+
+								fill.set("fillOpacity", this.get("fillOpacity", 0) * 0.2);
+								stroke.set("strokeOpacity", this.get("strokeOpacity", 0));
 
 								if (!fillColor) {
 
@@ -143,7 +143,7 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 									dataItem.set("value" as any, value);
 								}
 
-								label.setAll({ x: x2, y: y2, dy:-20 });
+								label.setAll({ x: x2, y: y2, dy: -20 });
 								label.text.markDirtyText();
 							}
 						}

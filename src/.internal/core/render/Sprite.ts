@@ -529,7 +529,7 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * Apply blur filter.
 	 *
 	 * Ranges of values in pixels: `0` to `X`.
-	 * 
+	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
@@ -706,10 +706,10 @@ export interface ISpritePrivate extends IEntityPrivate {
 	/**
 	 * If set to `true`, the sprite will check if a mouse pointer is within
 	 * its bounds before dispatching pointer events.
-	 * 
+	 *
 	 * This helps to solve ghost tooltips problem that sometimes appear while
 	 * moving the pointer over interactive objects.
-	 * 
+	 *
 	 * This is set to `true` by default on `Rectangle` and `Circle`.
 	 *
 	 * @since 5.5.0

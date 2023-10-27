@@ -1,19 +1,9 @@
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
-import * as $math from "../../../core/util/Math";
 
 export interface IAverageSeriesDataItem extends ISimpleLineSeriesDataItem {
-
 }
 
 export interface IAverageSeriesSettings extends ISimpleLineSeriesSettings {
-
-	/**
-	 * Value field to use for calculations.
-	 *
-	 * @default "value"
-	 */
-	field: "open" | "value" | "low" | "high";
-
 }
 
 export interface IAverageSeriesPrivate extends ISimpleLineSeriesPrivate {
@@ -30,6 +20,12 @@ export class AverageSeries extends SimpleLineSeries {
 
 	protected _tag = "average";
 
+	protected _afterNew() {
+		super._afterNew();
+		this.setPrivate("allowChangeSnap", false);
+		this.set("snapToData", true);
+	}
+
 	protected _updateSegment(index: number) {
 		const dataPoints = this._di[index];
 		if (dataPoints) {
@@ -39,13 +35,10 @@ export class AverageSeries extends SimpleLineSeries {
 			const series = this.get("series");
 			if (series && diP1 && diP2) {
 
+				let x1 = this._getXValue(diP1.get("valueX" as any));
+				let x2 = this._getXValue(diP2.get("valueX" as any));
+
 				const xAxis = this.get("xAxis");
-
-				const min = xAxis.getPrivate("min", 0) + 1;
-				const max = xAxis.getPrivate("max", 1) - 1;
-
-				let x1 = Math.round($math.fitToRange(diP1.get("valueX" as any), min, max));
-				let x2 = Math.round($math.fitToRange(diP2.get("valueX" as any), min, max));
 
 				const di1 = xAxis.getSeriesItem(series, Math.max(0, xAxis.valueToPosition(x1)));
 				const di2 = xAxis.getSeriesItem(series, Math.min(1, xAxis.valueToPosition(x2)));
@@ -88,10 +81,5 @@ export class AverageSeries extends SimpleLineSeries {
 			}
 			this._updateElements();
 		}
-	}
-
-	// need to override so that location would not be set
-	protected _setXLocation() {
-
 	}
 }

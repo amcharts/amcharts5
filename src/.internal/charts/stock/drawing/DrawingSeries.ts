@@ -74,9 +74,23 @@ export interface IDrawingSeriesSettings extends ILineSeriesSettings {
 	 * [[XYSeries]] used for drawing.
 	 */
 	series?: XYSeries;
+
+	/**
+	 * Indicates if drawings should snap to x and y values.
+	 * @ignore
+	 */
+	snapToData?: boolean;
+
+	/**
+	 * Value field to use when snapping data or calculating averages/regresions/etc.
+	 *
+	 * @default "value"
+	 */
+	field?: "open" | "value" | "low" | "high";
 }
 
 export interface IDrawingSeriesPrivate extends ILineSeriesPrivate {
+	allowChangeSnap?: boolean;
 }
 
 
@@ -118,6 +132,8 @@ export class DrawingSeries extends LineSeries {
 
 	protected _tag?: string;
 
+	protected _movePoint: IPoint = { x: 0, y: 0 };
+
 	public readonly grips: ListTemplate<Container> = new ListTemplate(
 		Template.new({}),
 		() => Container._new(this._root, {
@@ -131,17 +147,18 @@ export class DrawingSeries extends LineSeries {
 		Template.new({}),
 		() => Circle._new(this._root, {
 		}, [this.circles.template]),
-	);	
+	);
 
 	public readonly outerCircles: ListTemplate<Circle> = new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
 			themeTags: ["outline"]
 		}, [this.outerCircles.template]),
-	);		
+	);
 
 	protected _afterNew() {
 		this.addTag("drawing");
+		this.setPrivate("allowChangeSnap", true);
 
 		if (this._tag) {
 			this.addTag(this._tag);
@@ -266,11 +283,11 @@ export class DrawingSeries extends LineSeries {
 
 			const circle = container.children.push(this.circles.make())
 			this.circles.push(circle);
-			circle.set("stroke", color);			
+			circle.set("stroke", color);
 
 			const outerCircle = container.children.push(this.outerCircles.make())
 			this.outerCircles.push(outerCircle);
-			outerCircle.set("stroke", color);			
+			outerCircle.set("stroke", color);
 
 			container.events.on("pointerover", (event) => {
 				const dataItem = event.target.dataItem;
@@ -442,7 +459,8 @@ export class DrawingSeries extends LineSeries {
 			const point = chart.plotContainer.toLocal(event.point);
 
 			this._dragStartPX = xAxis.coordinateToPosition(point.x);
-			this._dragStartY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+			const valueX = this._getXValue(xAxis.positionToValue(this._dragStartPX));
+			this._dragStartY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 			const dataItems = this._di[index];
 			if (dataItems) {
@@ -463,7 +481,8 @@ export class DrawingSeries extends LineSeries {
 			const yAxis = this.get("yAxis");
 
 			const posX = xAxis.coordinateToPosition(point.x);
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
+			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 			const dpx = posX - this._dragStartPX;
 			const dy = valueY - this._dragStartY;
@@ -645,7 +664,7 @@ export class DrawingSeries extends LineSeries {
 		const yAxis = this.get("yAxis");
 
 		const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-		const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+		const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), vx);
 
 		this._setContext(dataItem, "valueX", vx);
 		this._setContext(dataItem, "valueY", vy, true);
@@ -705,7 +724,9 @@ export class DrawingSeries extends LineSeries {
 			if (!this._moveDp) {
 				this._moveDp = chart.plotContainer.events.on("globalpointermove", (e) => {
 					if (!this._erasingEnabled) {
-						this._handlePointerMove(e);
+						if (e.point.x != this._movePoint.x || e.point.y != this._movePoint.y) {
+							this._handlePointerMove(e);
+						}
 					}
 				})
 			}
@@ -765,7 +786,9 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	protected _setXLocation(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
-		this._setXLocationReal(dataItem, value);
+		if (!this.get("snapToData")) {
+			this._setXLocationReal(dataItem, value);
+		}
 	}
 
 	protected _setXLocationReal(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
@@ -800,23 +823,45 @@ export class DrawingSeries extends LineSeries {
 	}
 
 
-	protected _getYValue(value: number): number {
-		if (this.get("valueYShow") == "valueYChangeSelectionPercent") {
-			const baseValueSeries = this.getPrivate("baseValueSeries");
-			if (baseValueSeries) {
-				const baseValue = baseValueSeries._getBase("valueY");
-				value = value / 100 * baseValue + baseValue;
-			}
+	protected _getYValue(value: number, valueX: number): number {
+
+		const series = this.get("series");
+
+		if (this.get("snapToData") && series) {
+			const field = this.get("field", "value") + "Y";
+			return this._snap(valueX, value, field, series);
 		}
+		else {
+			if (this.get("valueYShow") == "valueYChangeSelectionPercent") {
+				const baseValueSeries = this.getPrivate("baseValueSeries");
+				if (baseValueSeries) {
+					const baseValue = baseValueSeries._getBase("valueY");
+					value = value / 100 * baseValue + baseValue;
+				}
+			}
 
-		const yAxis = this.get("yAxis");
-		const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
-
-		return $math.round(value, roundTo);
+			const yAxis = this.get("yAxis");
+			const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
+			return $math.round(value, roundTo);
+		}
 	}
 
 	protected _getXValue(value: number): number {
-		return Math.round(value);
+		const series = this.get("series");
+		if (this.get("snapToData") && series) {
+
+			const xAxis = this.get("xAxis");
+
+			const min = xAxis.getPrivate("min", 0) + 1;
+			const max = xAxis.getPrivate("max", 1) - 1;
+
+			value = $math.fitToRange(value, min, max);
+			value = this._snap(value, value, "valueX", series);
+			return value
+		}
+		else {
+			return Math.round(value);
+		}
 	}
 
 	public _setContext(dataItem: DataItem<IDrawingSeriesDataItem>, key: any, value: any, working?: boolean) {
@@ -830,5 +875,15 @@ export class DrawingSeries extends LineSeries {
 		if (field) {
 			dataContext[field] = value;
 		}
+	}
+
+	protected _snap(value: number, realValue: number, key: string, series: XYSeries): number {
+		const xAxis = this.get("xAxis");
+		const dataItem = xAxis.getSeriesItem(series, Math.max(0, xAxis.valueToPosition(value)));
+
+		if (dataItem) {
+			return dataItem.get(key as any)!;
+		}
+		return realValue;
 	}
 }

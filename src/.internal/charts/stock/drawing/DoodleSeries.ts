@@ -29,7 +29,7 @@ export class DoodleSeries extends DrawingSeries {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.addTag("doodle");
+		this.setPrivate("allowChangeSnap", false);
 		this.bullets.clear();
 	}
 
@@ -50,7 +50,7 @@ export class DoodleSeries extends DrawingSeries {
 			const point = chart.plotContainer.toLocal(event.point);
 
 			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 			const index = this._index;
 			this.data.push({ valueY: valueY, valueX: valueX, index:index, corner:this._pIndex });

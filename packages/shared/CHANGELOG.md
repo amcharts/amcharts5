@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.5.2] - 2023-10-27
+
+### Added
+- `customValue` added to `ISeriesDataItem` and `customValueField` to `Series`. Allows storing additional numeric information which could be used for heat rules and other purposes.
+- A middle line between oversold and overbought added to `StockChart`'s RSI indicator.
+- While drawing polygon in a `StockChart`, a line is drawn from the previous point to mouse pointer.
+- New setting `scrollable` (default: `false`) added to `StockChart`'s `DropdownList` and `DropdownListControl` (as well as other controls that extend those, e.g. `ComparisonControl`). If set to `true`, will autoamtically limit dropdown height to fit into chart, and will show scrollbar if the contents do not fit.
+- Measure tool added to `StockChart` (as a drawing item).
+- `toolSettings` setting added to `DrawingControl`. Allows passing in default settings for each drawing tool. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings).
+
+### Changed
+- Printing via `ExportingMenu` print functionality using "CSS" print method will now temporarily remove all margins and padding on `body` so that images that do not fit into single page do not produce a blank page.
+- `StockChart`'s Fibonacci drawing tool now draws from initial click point to the mouse pointer instead of to the right of the plot area.
+- `StockChart`'s Fibonacci drawing tool's click point is now at 1 value (was at 0).
+- Most of drawing tools of `StockChart` now support snapping to data items.
+- Snapping to data items in `StockChart` drawing tools is now turned off by default.
+
+### Fixed
+- If an axis range was created for a `ColumnSeries` after series was inited, columns for the range were not being created.
+- `GaplessDateAxis` valueToPosition method was returning wrong position if value was less than min value of the axis.
+- Unserializing indicators and drawings that create separate panel in a `StockChart` would not restore drawings in indicator's panel.
+
 
 ## [5.5.1] - 2023-10-19
 

@@ -40,8 +40,8 @@ export class VerticalLineSeries extends SimpleLineSeries {
 				const yAxis = this.get("yAxis");
 				const xAxis = this.get("xAxis");
 
-				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
 				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
+				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);
 
 				this._setContext(diP1, "valueY", valueY, true);
 				this._setContext(diP2, "valueY", valueY + 0.0001, true);
@@ -79,7 +79,7 @@ export class VerticalLineSeries extends SimpleLineSeries {
 			strokeDasharray: template.get("strokeDasharray"),
 			strokeOpacity: template.get("strokeOpacity")
 		})
-	}	
+	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {

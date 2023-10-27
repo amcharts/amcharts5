@@ -5,6 +5,7 @@ import type { ListTemplate } from "../../../core/util/List";
 import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
 import type { ValueAxis } from "../axes/ValueAxis";
+import type { IAxisDataItem } from "../axes/Axis";
 import type { ILegendDataItem } from "../../../core/render/Legend";
 import type { Sprite } from "../../../core/render/Sprite";
 
@@ -289,6 +290,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 		super._updateChildren();
 	}
 
+
 	protected _createGraphics(dataItem: DataItem<this["_dataItemSettings"]>) {
 		let graphics = dataItem.get("graphics");
 		if (!graphics) {
@@ -310,17 +312,38 @@ export abstract class BaseColumnSeries extends XYSeries {
 				}
 			}
 
+			let graphicsArray: Array<Graphics> | undefined = dataItem.get("rangeGraphics");
+			if (graphicsArray) {
+				$array.each(graphicsArray, (graphics) => {
+					graphics.dispose();
+				})
+			}
+
+			graphicsArray = [];
+			dataItem.setRaw("rangeGraphics", graphicsArray);
+
 			this.axisRanges.each((axisRange) => {
 				const container = axisRange.container!;
-				const graphicsArray: Array<Graphics> = dataItem.get("rangeGraphics", []);
-				dataItem.set("rangeGraphics", graphicsArray);
-
 				const rangeGraphics = this._makeGraphics(axisRange.columns, dataItem);
-				graphicsArray.push(rangeGraphics);
+				if (graphicsArray) {
+					graphicsArray.push(rangeGraphics);
+				}
 				rangeGraphics.setPrivate("list", axisRange.columns);
 				container.children.push(rangeGraphics);
 			})
 		}
+	}
+
+	public createAxisRange(axisDataItem: DataItem<IAxisDataItem>): this["_axisRangeType"] {
+		$array.each(this.dataItems, (dataItem) => {
+			const graphics = dataItem.get("graphics");
+			if (graphics) {
+				graphics.dispose();
+				dataItem.set("graphics", undefined);
+			}
+		})
+
+		return super.createAxisRange(axisDataItem);
 	}
 
 	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {

@@ -95,6 +95,15 @@ export interface ISeriesDataItem extends IComponentDataItem {
 	valueChangePreviousPercent?: number;
 	valueWorkingOpen?: number;
 	valueWorkingClose?: number;
+
+	customValue?: number;
+	customValueWorking?:number;
+	customValueChange?: number;
+	customValueChangePercent?: number;
+	customValueChangeSelection?: number;
+	customValueChangeSelectionPercent?: number;
+	customValueChangePrevious?: number;
+	customValueChangePreviousPercent?: number;
 }
 
 export interface ISeriesSettings extends IComponentSettings {
@@ -116,6 +125,13 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * rules.
 	 */
 	valueField?: string;
+
+	/**
+	 * A key to look up in data for a numeric customValue of the data item.
+	 *
+	 * Usually used for storing additional numeric information and heat rules.
+	 */
+	customValueField?: string;	
 
 	/**
 	 * A text template to be used for label in legend.
@@ -200,6 +216,15 @@ export interface ISeriesPrivate extends IComponentPrivate {
 	valueOpen?: number;
 	valueClose?: number;
 
+	customValueAverage?: number;
+	customValueCount?: number;
+	customValueSum?: number;
+	customValueAbsoluteSum?: number;
+	customValueLow?: number;
+	customValueHigh?: number;
+	customValueOpen?: number;
+	customValueClose?: number;	
+
 	baseValueSeries?: Series;
 }
 
@@ -246,7 +271,7 @@ export abstract class Series extends Component {
 	public readonly bulletsContainer: Container = Container.new(this._root, {width:p100, height:p100, position:"absolute"});
 
 	protected _afterNew() {
-		this.valueFields.push("value");
+		this.valueFields.push("value", "customValue");
 
 		super._afterNew();
 

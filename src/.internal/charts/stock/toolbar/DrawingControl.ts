@@ -4,6 +4,7 @@ import type { ColorSet } from "../../../core/util/ColorSet";
 import type { IDropdownListItem } from "./DropdownList";
 
 import { color } from "../../../core/util/Color";
+import { Template } from "../../../core/util/Template";
 
 import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
 import { DrawingToolControl, DrawingTools } from "./DrawingToolControl";
@@ -30,6 +31,7 @@ import { RectangleSeries } from "../drawing/RectangleSeries";
 import { RegressionSeries } from "../drawing/RegressionSeries";
 import { TrendLineSeries } from "../drawing/TrendLineSeries";
 import { VerticalLineSeries } from "../drawing/VerticalLineSeries";
+import { Measure } from "../drawing/Measure";
 import { JsonParser } from "../../../plugins/json/Json";
 import { Serializer } from "../../../plugins/json/Serializer";
 import type { StockPanel } from "../StockPanel";
@@ -53,6 +55,14 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	 * Default tool.
 	 */
 	tool?: DrawingTools,
+
+	/**
+	 * Default settings for drawing tools.
+	 *
+	 * @since 5.5.2
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings} for more info
+	 */
+	toolSettings?: {[index: string]: any};
 
 	/**
 	 * Target series for drawing.
@@ -182,6 +192,8 @@ export interface IDrawingControlPrivate extends IStockControlPrivate {
 
 	iconControl?: IconControl;
 	snapControl?: StockControl;
+
+	toolTemplates?: {[index: string]: Template<any>};
 }
 
 export interface IDrawingControlEvents extends IStockControlEvents {
@@ -202,6 +214,7 @@ export class DrawingControl extends StockControl {
 
 	private _drawingSeries: { [index: string]: DrawingSeries[] } = {};
 	private _currentEnabledSeries: DrawingSeries[] = [];
+	private _initedPanels: StockPanel[] = [];
 
 	protected _afterNew() {
 		super._afterNew();
@@ -710,7 +723,7 @@ export class DrawingControl extends StockControl {
 				italicControl: ["Callout", "Label"],
 
 				iconControl: ["Arrows &amp; Icons"],
-				snapControl: ["Callout", "Arrows &amp; Icons"],
+				snapControl: ["Callout", "Arrows &amp; Icons", "Line", "Polyline", "Label", "Callout", "Horizontal Line", "Horizontal Ray", "Vertical Line", "Quadrant Line", "Rectangle", "Measure", "Fibonacci"],
 			}
 
 			$object.each(controls, (control, tools) => {
@@ -729,110 +742,139 @@ export class DrawingControl extends StockControl {
 	protected _maybeInitToolSeries(tool: DrawingTools): void {
 		let seriesList = this._drawingSeries[tool];
 		if (!seriesList) {
+			seriesList = [];
+		}
 
-			// Get target series
-			const chartSeries: XYSeries[] = this.get("series", []);
-			const stockChart = this.get("stockChart");
-			if (chartSeries.length == 0) {
-				// No target series set, take first series out of each chart
-				stockChart.panels.each((panel) => {
-					if (panel.series.length > 0) {
-						chartSeries.push(panel.series.getIndex(0)!);
-					}
-				});
-			}
+		// Get target series
+		const chartSeries: XYSeries[] = this.get("series", []);
+		const stockChart = this.get("stockChart");
+		if (chartSeries.length == 0) {
+			// No target series set, take first series out of each chart
+			stockChart.panels.each((panel) => {
+				if ((seriesList.length === 0 || this._initedPanels.indexOf(panel) === -1) && (panel.series.length > 0)) {
+					chartSeries.push(panel.series.getIndex(0)!);
+					this._initedPanels.push(panel);
+				}
+			});
+		}
+
+
+		if (chartSeries.length > 0) {
+			const toolSettings: any = this.get("toolSettings", {});
 
 			// Populate the list
-			seriesList = [];
 			$array.each(chartSeries, (chartSeries) => {
 				let series: DrawingSeries | undefined;
 				const xAxis = <any>chartSeries.get("xAxis");
 				const yAxis = <any>chartSeries.get("yAxis");
 				const panel = chartSeries.chart! as StockPanel;
+				let template: any;
+				if (toolSettings[tool]) {
+					template = Template.new(toolSettings[tool]);
+					const toolTemplates: any = this.getPrivate("toolTemplates", {});
+					toolTemplates[tool] = template;
+					this.setPrivate("toolTemplates", toolTemplates);
+				}
+				
 				switch (tool) {
-					case "Average":
-						series = AverageSeries.new(this._root, {
-							series: chartSeries,
-							xAxis: xAxis,
-							yAxis: yAxis,
-							field: "value"
-						});
-						break;
-					case "Callout":
-						series = CalloutSeries.new(this._root, {
-							xAxis: xAxis,
-							yAxis: yAxis
-						});
-						break;
-					case "Doodle":
-						series = DoodleSeries.new(this._root, {
-							xAxis: xAxis,
-							yAxis: yAxis
-						});
-						series.fills.template.setAll({
-							forceHidden: true
-						});
-						break;
-					case "Ellipse":
-						series = EllipseSeries.new(this._root, {
-							xAxis: xAxis,
-							yAxis: yAxis
-						});
-						break;
-					case "Fibonacci":
-						series = FibonacciSeries.new(this._root, {
-							xAxis: xAxis,
-							yAxis: yAxis
-						});
-						break;
-					case "Fibonacci Timezone":
-						series = FibonacciTimezoneSeries.new(this._root, {
-							xAxis: xAxis,
-							yAxis: yAxis
-						});
-						break
-					case "Horizontal Line":
-						series = HorizontalLineSeries.new(this._root, {
-							xAxis: xAxis,
-							yAxis: yAxis
-						});
-						break;
-					case "Horizontal Ray":
-						series = HorizontalRaySeries.new(this._root, {
-							series: chartSeries,
-							xAxis: xAxis,
-							yAxis: yAxis,
-							field: "value"
-						});
-						break;
 					case "Arrows &amp; Icons":
 						const icon = this.get("drawingIcon", this.get("drawingIcons")![0]);
 						series = IconSeries.new(this._root, {
+							series: chartSeries,
 							xAxis: xAxis,
 							yAxis: yAxis,
 							iconSvgPath: icon.svgPath,
 							iconScale: icon.scale,
 							iconCenterX: icon.centerX,
 							iconCenterY: icon.centerY,
+						}, template);
+						break;
+					case "Average":
+						series = AverageSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break;
+					case "Callout":
+						series = CalloutSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break;
+					case "Doodle":
+						series = DoodleSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						series.fills.template.setAll({
+							forceHidden: true
 						});
+						break;
+					case "Ellipse":
+						series = EllipseSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break;
+					case "Fibonacci":
+						series = FibonacciSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break;
+					case "Fibonacci Timezone":
+						series = FibonacciTimezoneSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break
+					case "Horizontal Line":
+						series = HorizontalLineSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break;
+					case "Horizontal Ray":
+						series = HorizontalRaySeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
 						break;
 					case "Label":
 						series = LabelSeries.new(this._root, {
+							series: chartSeries,
 							xAxis: xAxis,
 							yAxis: yAxis
-						});
+						}, template);
 						break;
 					case "Line":
 						series = SimpleLineSeries.new(this._root, {
+							series: chartSeries,
 							xAxis: xAxis,
 							yAxis: yAxis
-						});
+						}, template);
+						break;
+					case "Measure":
+						series = Measure.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
 						break;
 					case "Polyline":
 						series = PolylineSeries.new(this._root, {
+							series: chartSeries,
 							xAxis: xAxis,
 							yAxis: yAxis
-						});
+						}, template);
 						series.fills.template.setAll({
 							forceHidden: true
 						});
@@ -841,38 +883,39 @@ export class DrawingControl extends StockControl {
 						series = QuadrantLineSeries.new(this._root, {
 							series: chartSeries,
 							xAxis: xAxis,
-							yAxis: yAxis,
-							field: "value"
-						});
+							yAxis: yAxis
+						}, template);
 						break;
 					case "Rectangle":
 						series = RectangleSeries.new(this._root, {
+							series: chartSeries,
 							xAxis: xAxis,
 							yAxis: yAxis
-						});
+						}, template);
 						break;
 					case "Regression":
 						series = RegressionSeries.new(this._root, {
 							series: chartSeries,
 							xAxis: xAxis,
-							yAxis: yAxis,
-							field: "value"
-						});
+							yAxis: yAxis
+						}, template);
 						break;
 					case "Trend Line":
 						series = TrendLineSeries.new(this._root, {
 							series: chartSeries,
 							xAxis: xAxis,
-							yAxis: yAxis,
-							field: "value"
-						});
+							yAxis: yAxis
+						}, template);
 						break;
 					case "Vertical Line":
 						series = VerticalLineSeries.new(this._root, {
+							series: chartSeries,
 							xAxis: xAxis,
 							yAxis: yAxis
-						});
+						}, template);
 						break;
+
+
 				}
 				if (series) {
 					seriesList.push(series);
@@ -979,10 +1022,8 @@ export class DrawingControl extends StockControl {
 		const snap = this.get("snapToData", false);
 		$object.each(this._drawingSeries, (_tool, seriesList) => {
 			$array.each(seriesList, (series) => {
-				if (series instanceof IconSeries || series instanceof CalloutSeries) {
-					series.setAll({
-						snapToData: snap
-					})
+				if (series.getPrivate("allowChangeSnap")) {
+					series.set("snapToData", snap);
 				}
 			});
 		})
@@ -1067,26 +1108,37 @@ export class DrawingControl extends StockControl {
 		$array.each(data, (drawing) => {
 			// Panel
 			let panel = stockChart.panels.getIndex(drawing.__panelIndex || 0)!;
-			const tool = drawing.__tool;
 
-			this._maybeInitToolSeries(tool);
+			if (panel) {
+				const tool = drawing.__tool;
 
-			// Get series
-			let drawingSeries: DrawingSeries;
-			$array.each(this._drawingSeries[tool] || [], (series) => {
-				if (series.chart === panel) {
-					drawingSeries = series;
+				this._maybeInitToolSeries(tool);
+
+				// Get series
+				let drawingSeries: DrawingSeries;
+				$array.each(this._drawingSeries[tool] || [], (series) => {
+					if (series.chart === panel) {
+						drawingSeries = series;
+					}
+				});
+
+				if (!drawing.settings) {
+					drawing.settings = {};
 				}
-			});
 
-			if (!drawing.settings) {
-				drawing.settings = {};
+				// Parse
+				JsonParser.new(this._root).parse(drawing.__drawing).then((drawingData: any) => {
+					drawingSeries.data.pushAll(drawingData);
+				});
 			}
-
-			// Parse
-			JsonParser.new(this._root).parse(drawing.__drawing).then((drawingData: any) => {
-				drawingSeries.data.pushAll(drawingData);
-			});
+			else {
+				// Wait until panel becomes available
+				stockChart.panels.events.once("push", (ev) => {
+					ev.newValue.series.events.once("push", (_ev) => {
+						this.unserializeDrawings(drawing);
+					})
+				})
+			}
 		})
 	}
 }

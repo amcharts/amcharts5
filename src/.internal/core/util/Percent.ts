@@ -16,7 +16,7 @@
  * You can also use shortcut functions for `0%`, `50%`, and `100%`:
  * * `am5.p0`
  * * `am5.p50`
- * * `am5.p1000`
+ * * `am5.p100`
  */
 export class Percent {
 
@@ -75,6 +75,7 @@ export class Percent {
 	/**
 	 * Value in percent.
 	 *
+	 * @readonly
 	 * @return Percent
 	 */
 	public get percent(): number {

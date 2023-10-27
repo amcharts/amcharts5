@@ -50,6 +50,8 @@ export class EllipseSeries extends DrawingSeries {
 	protected _afterNew() {
 		super._afterNew();
 
+		this.setPrivate("allowChangeSnap", false);
+
 		this.strokes.template.set("visible", false);
 		this.fills.template.set("visible", false);
 
@@ -122,7 +124,7 @@ export class EllipseSeries extends DrawingSeries {
 			const yAxis = this.get("yAxis");
 
 			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
+			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);
 
 			const vx = "valueX"
 			const vy = "valueY"
@@ -258,7 +260,7 @@ export class EllipseSeries extends DrawingSeries {
 					const positionX0 = this._clickPX;
 
 					const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-					const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)));
+					const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);
 
 					if (diB && diL && diR && diT) {
 						this._setContext(diB, "valueY", valueY, true);
@@ -296,7 +298,7 @@ export class EllipseSeries extends DrawingSeries {
 			this._clickPX = xAxis.coordinateToPosition(point.x);
 
 			const valueX = this._getXValue(xAxis.positionToValue(this._clickPX));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)));
+			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 			this._clickVY = valueY;
 
