@@ -50,7 +50,10 @@ export class ChaikinMoneyFlow extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "chaikinmoneyflow";
+	public _afterNew(){
+		this._themeTags.push("chaikinmoneyflow");
+		super._afterNew();
+	}
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

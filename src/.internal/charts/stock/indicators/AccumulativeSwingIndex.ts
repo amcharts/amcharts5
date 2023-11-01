@@ -67,10 +67,13 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 		type: "number"
 	}];
 
-	protected _themeTag: string = "accumulativeswingindex";
-
 	protected _axisRange?: ILineSeriesAxisRange;
 	protected _axisRangeDI?: DataItem<IValueAxisDataItem>;
+
+	public _afterNew(){
+		this._themeTags.push("accumulativeswingindex");
+		super._afterNew();
+	}
 
 	public _createSeries(): LineSeries {
 		const series = this.panel.series.push(LineSeries.new(this._root, {

@@ -51,7 +51,10 @@ export class Momentum extends ChartIndicator {
 		}
 	];
 
-	protected _themeTag: string = "momentum";
+	public _afterNew(){
+		this._themeTags.push("momentum");
+		super._afterNew();
+	}		
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

@@ -116,6 +116,10 @@ export class StockLegend extends Legend {
 					}
 				}
 			}
+
+			setTimeout(()=>{
+				button.unhover();
+			}, 50)
 		})
 
 		return button;

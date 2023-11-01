@@ -43,7 +43,6 @@ export class ListData<T> extends List<T> implements ICounterRef, IDataWithProces
 	protected _onPush(newValue: T) {
 		if (this.processor) {
 			this.processor.processRow(newValue);
-			//console.log(newValue)
 		}
 		super._onPush(newValue);
 	}

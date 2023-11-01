@@ -44,7 +44,11 @@ export class OnBalanceVolume extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "onbalancevolume";
+	public _afterNew(){
+		this._themeTags.push("onbalancevolume");
+		super._afterNew();
+		this.yAxis.set("numberFormat", "#.###a");
+	}		
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

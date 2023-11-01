@@ -40,6 +40,8 @@ export class Button extends Container {
 				themeTags: $utils.mergeTags(this._settings.themeTags, ["background"])
 			}));
 		}
+
+		this.setPrivate("trustBounds", true);
 	}
 
 	declare public _settings: IButtonSettings;
@@ -47,6 +49,7 @@ export class Button extends Container {
 
 	public static className: string = "Button";
 	public static classNames: Array<string> = Container.classNames.concat([Button.className]);
+
 
 	public _prepareChildren() {
 		super._prepareChildren();

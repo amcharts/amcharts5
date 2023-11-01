@@ -21,6 +21,7 @@ export { ChaikinMoneyFlow, IChaikinMoneyFlowEvents, IChaikinMoneyFlowPrivate, IC
 export { ChaikinOscillator, IChaikinOscillatorEvents, IChaikinOscillatorPrivate, IChaikinOscillatorSettings } from "./.internal/charts/stock/indicators/ChaikinOscillator";
 export { OnBalanceVolume, IOnBalanceVolumeEvents, IOnBalanceVolumePrivate, IOnBalanceVolumeSettings } from "./.internal/charts/stock/indicators/OnBalanceVolume";
 export { StochasticOscillator, IStochasticOscillatorEvents, IStochasticOscillatorPrivate, IStochasticOscillatorSettings } from "./.internal/charts/stock/indicators/StochasticOscillator";
+export { StochasticMomentumIndex, IStochasticMomentumIndexEvents, IStochasticMomentumIndexPrivate, IStochasticMomentumIndexSettings } from "./.internal/charts/stock/indicators/StochasticMomentumIndex";
 export { AwesomeOscillator, IAwesomeOscillatorEvents, IAwesomeOscillatorPrivate, IAwesomeOscillatorSettings } from "./.internal/charts/stock/indicators/AwesomeOscillator";
 export { WilliamsR, IWilliamsRPrivate, IWilliamsREvents, IWilliamsRSettings } from "./.internal/charts/stock/indicators/WilliamsR";
 export { Volume, IVolumeEvents, IVolumePrivate, IVolumeSettings } from "./.internal/charts/stock/indicators/Volume";
@@ -59,6 +60,7 @@ export { DropdownColors, IDropdownColorsEvents, IDropdownColorsPrivate, IDropdow
 export { Dropdown, IDropdownEvents, IDropdownPrivate, IDropdownSettings } from "./.internal/charts/stock/toolbar/Dropdown";
 export { DropdownList, IDropdownListEvents, IDropdownListItem, IDropdownListSettings, IDropdownListPrivate } from "./.internal/charts/stock/toolbar/DropdownList";
 export { DropdownListControl, IDropdownListControlEvents, IDropdownListControlPrivate, IDropdownListControlSettings } from "./.internal/charts/stock/toolbar/DropdownListControl";
+export { DropdownControl, IDropdownControlEvents, IDropdownControlPrivate, IDropdownControlSettings } from "./.internal/charts/stock/toolbar/DropdownControl";
 export { DrawingControl, IDrawingControlEvents, IDrawingControlPrivate, IDrawingControlSettings } from "./.internal/charts/stock/toolbar/DrawingControl";
 export { IndicatorControl, IIndicatorControlEvents, IIndicatorControlPrivate, IIndicatorControlSettings } from "./.internal/charts/stock/toolbar/IndicatorControl";
 export { StockIcons } from "./.internal/charts/stock/toolbar/StockIcons";

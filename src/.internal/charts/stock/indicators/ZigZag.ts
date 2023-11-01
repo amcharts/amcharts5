@@ -78,7 +78,8 @@ export class ZigZag extends Indicator {
 				xAxis: stockSeries.get("xAxis"),
 				yAxis: stockSeries.get("yAxis"),
 				themeTags: ["indicator", "zigzag"],
-				name: "ZigZag"
+				name: "ZigZag",
+				snapTooltip: true
 			}))
 			series.setPrivate("baseValueSeries", stockSeries);
 			this.series = series;

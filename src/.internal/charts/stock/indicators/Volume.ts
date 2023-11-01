@@ -54,7 +54,11 @@ export class Volume extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "volume";
+	public _afterNew(){
+		this._themeTags.push("volume");
+		super._afterNew();
+		this.yAxis.set("numberFormat", "#.###a");
+	}
 
 	public _createSeries(): ColumnSeries {
 		return this.panel.series.push(ColumnSeries.new(this._root, {

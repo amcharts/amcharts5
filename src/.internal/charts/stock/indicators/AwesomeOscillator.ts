@@ -55,7 +55,11 @@ export class AwesomeOscillator extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "awesomeoscillator";
+
+	public _afterNew(){
+		this._themeTags.push("awesomeoscillator");
+		super._afterNew();
+	}	
 
 	public _createSeries(): ColumnSeries {
 		return this.panel.series.push(ColumnSeries.new(this._root, {

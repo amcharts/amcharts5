@@ -104,7 +104,7 @@ export class PanelControls extends Container {
 		this.closeButton.events.on("click", () => {
 			const stockPanel = this.get("stockPanel");
 			stockPanel.close();
-		});
+		});		
 
 		this.expandButton.events.on("click", () => {
 			const stockPanel = this.get("stockPanel");

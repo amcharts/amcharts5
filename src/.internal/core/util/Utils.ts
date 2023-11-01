@@ -59,7 +59,6 @@ export function removeElement(el: HTMLElement): void {
  */
 export function addEventListener<E extends Event>(dom: EventTarget, type: string, listener: (event: E) => void, options?: any): IDisposer {
 	//@todo proper type check for options: EventListenerOptions | boolean (TS for some reason gives error on passive parameter)
-	//console.log(type, dom);
 	dom.addEventListener(type, <EventListener>listener, options || false);
 
 	return new Disposer(() => {
@@ -109,7 +108,6 @@ export function supports(cap: "touchevents" | "pointerevents" | "mouseevents" | 
  */
 export function getPointerId(event: IPointerEvent) {
 	let id = (<any>event).pointerId || 0;
-	//console.log(event);
 	return id;
 }
 
@@ -961,7 +959,7 @@ export function getTimeZone(date: Date, long: boolean = false, savings: boolean 
 	if (savings === false) {
 		wtz = wtz.replace(/ (standard|daylight|summer|winter) /i, " ");
 	}
-	return wtz;
+	return trim(wtz);
 }
 
 export function getTimezoneOffset(timezone: string): number {

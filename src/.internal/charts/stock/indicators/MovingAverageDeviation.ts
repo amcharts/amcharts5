@@ -90,7 +90,10 @@ export class MovingAverageDeviation extends ChartIndicator {
 			type: "color"
 		}];
 
-	protected _themeTag: string = "movingaveragedeviation";
+	public _afterNew(){
+		this._themeTags.push("movingaveragedeviation");
+		super._afterNew();
+	}		
 
 	public _createSeries(): ColumnSeries {
 		return this.panel.series.push(ColumnSeries.new(this._root, {

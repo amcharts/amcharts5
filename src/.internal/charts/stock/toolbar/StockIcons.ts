@@ -15,7 +15,7 @@ export class StockIcons {
 		"Color": { viewbox: "0 0 50 50", path: "" },
 		"Dash": { viewbox: "0 0 60 16", path: "M0,8 60,8" },
 
-		"Calendar": { viewbox: "0 0 50 50", path: "M 3 8 L 47 8 L 47 49 L 3 49 L 3 8 M 3 19 L 47 19 M 9 28 L 15 28 M 22 28 L 28 28 M 35 28 L 41 28 M 9 39 L 15 39 M 22 39 L 28 39 M 35 39 L 41 39 M 12 14 L 12 1 M 38 14 L 38 1" },
+		"Calendar": { viewbox: "0 0 50 50", path: "M 3 8 L 47 8 L 47 48 L 3 48 L 3 8 M 3 19 L 47 19 M 9 28 L 15 28 M 22 28 L 28 28 M 35 28 L 41 28 M 9 39 L 15 39 M 22 39 L 28 39 M 35 39 L 41 39 M 12 14 L 12 1 M 38 14 L 38 1" },
 		"Period": { viewbox: "0 0 50 50", path: "M 3 3 L 47 3 L 47 48 L 3 48 L 3 3 M 3 12 L 47 12 M 9 21 L 15 21 M 22 21 L 28 21 M 35 21 L 41 21 M 9 30 L 15 30 M 22 30 L 28 30 M 35 30 L 41 30 M 9 39 L 15 39 M 22 39 L 28 39 M 35 39 L 41 39" },
 		"Interval": { viewbox: "0 0 50 50", path: "M 3 10 L 3 48 M 3 10 L 43 10 M 13 10 L 13 36 M 23 10 L 23 36 M 43 10 L 43 48 M 33 10 L 33 36" },
 		"Comparison": { viewbox: "0 0 50 50", path: "M 25 10 L 25 40 M 10 25 L 41 25" },

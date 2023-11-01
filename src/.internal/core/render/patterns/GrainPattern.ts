@@ -40,7 +40,7 @@ export interface IGrainPatternSettings extends IPatternSettings {
 	/**
 	 * An array of colors to randomly use for pixels.
 	 *
-	 * If this is not set, will use gradient's `color` setting value or black.
+	 * @default [color(0x000000)]
 	 */
 	colors?: Array<Color>;
 
@@ -70,6 +70,8 @@ export interface IGrainPatternPrivate extends IPatternPrivate {
  * 
  * Note, grain pattern does not support `fill` and `color` setting.
  * Use `colors` setting to define colors of a grain pixels.
+ * 
+ * Note, rotation setting is not supported by this pattern.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Grain_patterns} for more info
  * @since 5.5.0
@@ -107,7 +109,7 @@ export class GrainPattern extends Pattern {
 
 			const patternData = this.context.getImageData(0, 0, width, height);
 
-			const size = this.get("size", 1);
+			const size = Math.max(1, this.get("size", 1));
 			const minOpacity = this.get("minOpacity", 0);
 			const maxOpacity = this.get("maxOpacity", 0.3);
 

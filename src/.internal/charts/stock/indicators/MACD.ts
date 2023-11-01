@@ -105,8 +105,6 @@ export class MACD extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "macd";
-
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {
 			themeTags: ["indicator"],
@@ -121,7 +119,9 @@ export class MACD extends ChartIndicator {
 	}
 
 	protected _afterNew() {
-		super._afterNew();
+		this._themeTags.push("macd");
+
+		super._afterNew();		
 
 		const chart = this.panel;
 

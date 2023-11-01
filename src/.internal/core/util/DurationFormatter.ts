@@ -485,8 +485,6 @@ export class DurationFormatter extends Entity {
 			value = Math.abs(value);
 			maxValue = Math.abs(maxValue);
 			let maxUnit = this.getValueUnit(Math.max(value, maxValue), baseUnit);
-			//let diffUnit = this.getValueUnit(Math.abs(maxValue - value), baseUnit);
-			//console.log(maxUnit, diffUnit);
 			return (<any>this.get("durationFormats"))[baseUnit!][maxUnit!];
 		}
 		else {

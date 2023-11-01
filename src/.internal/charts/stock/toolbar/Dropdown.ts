@@ -8,6 +8,7 @@ import * as $utils from "../../../core/util/Utils"
 export interface IDropdownSettings extends IEntitySettings {
 	control: StockControl;
 	parent?: HTMLElement;
+	scrollable?: boolean;
 }
 
 export interface IDropdownPrivate extends IEntityPrivate {
@@ -85,7 +86,20 @@ export class Dropdown extends Entity {
 			parent.appendChild(container);
 		}
 
+		if (this.get("scrollable")) {
+			this._sizeItems();
+			this.root.container.onPrivate("height", () => {
+				this._sizeItems();
+			});
+		}
+
 		this.hide();
+	}
+
+	protected _sizeItems(): void {
+		const container = this.getPrivate("container")!;
+		container.style.maxHeight = (this.root.container.height() - 100) + "px";
+		container.style.overflow = "auto";
 	}
 
 	public _beforeChanged() {

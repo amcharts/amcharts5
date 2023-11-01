@@ -63,8 +63,6 @@ export class Aroon extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "aroon";
-
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {
 			themeTags: ["indicator"],
@@ -77,6 +75,7 @@ export class Aroon extends ChartIndicator {
 	}
 
 	protected _afterNew() {
+		this._themeTags.push("aroon");
 		super._afterNew();
 		this.downSeries = this.panel.series.push(LineSeries.new(this._root, {
 			themeTags: ["indicator"],
@@ -87,7 +86,7 @@ export class Aroon extends ChartIndicator {
 			fill: undefined
 		}))
 
-		this.yAxis.setAll({ min: -1, max: 101, strictMinMax: true });
+		this.yAxis.setAll({ min: -1, max: 101, strictMinMax: true, numberFormat:"#'%'" });
 	}
 
 	public _updateChildren() {

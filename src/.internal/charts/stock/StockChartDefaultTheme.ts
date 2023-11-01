@@ -49,6 +49,9 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("StockPanel").setAll({
+			panY: true,
+			wheelY: "zoomX",
+			panX: true,
 			minHeight: 1
 		});
 
@@ -99,6 +102,12 @@ export class StockChartDefaultTheme extends Theme {
 			useLastColorForLegendMarker: true
 		})
 
+		r("Grid", ["middlegrid"]).setAll({
+			forceHidden: false,
+			strokeOpacity: .4,
+			strokeDasharray: [2, 2]
+		})
+
 		{
 			const rule = r("RoundedRectangle", ["legend", "itemcontainer", "background", "stocklegend"]);
 
@@ -143,7 +152,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("AxisRendererY", ["y"]).setAll({
-			opposite: true
+			opposite: true,
+			pan: "zoom"
 		})
 
 		r("Container", ["legend", "item"]).setAll({
@@ -224,16 +234,9 @@ export class StockChartDefaultTheme extends Theme {
 
 		{
 			const rule = r("Graphics", ["control", "button", "icon"]).states.create("hover", {
-				fillOpacity: 0.5
+				fillOpacity: 0.3
 			});
 			setColor(rule, "fill", ic, "secondaryButtonHover");
-		}
-
-		{
-			const rule = r("Graphics", ["control", "button", "icon"]).states.create("down", {
-				fillOpacity: 0.5
-			});
-			setColor(rule, "fill", ic, "primaryButtonDown");
 		}
 
 		/**
@@ -589,8 +592,8 @@ export class StockChartDefaultTheme extends Theme {
 		r("RoundedRectangle", ["background", "drawing", "measure"]).setAll({
 			centerX: p50,
 			centerY: p50,
-			fillOpacity:0.7
-		});		
+			fillOpacity: 0.7
+		});
 
 		r("PointedRectangle", ["drawing", "callout"]).setAll({
 			fillOpacity: 1,
@@ -659,7 +662,7 @@ export class StockChartDefaultTheme extends Theme {
 			centerX: 0,
 			centerY: p100,
 			paddingBottom: 2,
-			paddingLeft:3,
+			paddingLeft: 3,
 			fontSize: "0.8em"
 		})
 
@@ -693,36 +696,13 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		// series fill below oversold
-		r("Graphics", ["rsi", "oversold", "fill"]).setAll({
-			visible: true,
-			fillOpacity: 0.2
-		});
-
-		// series fill below oversold
-		r("Graphics", ["williamsr", "oversold", "fill"]).setAll({
-			visible: true,
-			fillOpacity: 0.2
-		});
-
-		// series fill below oversold
-		r("Graphics", ["commoditychannelindex", "oversold", "fill"]).setAll({
+		r("Graphics", ["overboughtoversold", "oversold", "fill"]).setAll({
 			visible: true,
 			fillOpacity: 0.2
 		});
 
 		// series fill above oversold
-		r("Graphics", ["rsi", "overbought", "fill"]).setAll({
-			visible: true,
-			fillOpacity: 0.2
-		});
-
-		// series fill above oversold
-		r("Graphics", ["williamsr", "overbought", "fill"]).setAll({
-			visible: true,
-			fillOpacity: 0.2
-		});
-
-		r("Graphics", ["commoditychannelindex", "overbought", "fill"]).setAll({
+		r("Graphics", ["overboughtoversold", "overbought", "fill"]).setAll({
 			visible: true,
 			fillOpacity: 0.2
 		});
@@ -755,68 +735,34 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 
-		r("LineSeries", ["rsi"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
-		})
-
-		r("LineSeries", ["momentum"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
-		})
-
-		r("LineSeries", ["williamsr"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})
-
-		r("LineSeries", ["commoditychannelindex"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})
-
-		r("LineSeries", ["stochastic"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{slowColor} bold]{slow.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
-		})
-
-		r("LineSeries", ["indicator", "bollingerbands"]).setAll({
-			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.000a')}[/] [{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{upperColor} bold]{upper.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{type})"
-		})
-
-		r("LineSeries", ["movingaverage"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
-		})
-
-		r("LineSeries", ["zigzag"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({deviation.formatNumber('#.')}, {depth.formatNumber('#.')})"
-		})
-
-		r("LineSeries", ["indicator", "movingaverageenvelope"]).setAll({
-			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.000a')}[/] [{seriesColor} bold]{valueY.formatNumber('#.000a')}[/] [{upperColor} bold]{upper.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{shiftType},{shift.formatNumber('#.')},{type})"
-		})
-
-		r("LineSeries", ["vwap"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
-		})
+		/// LEGEND LABELS
 
 		r("LineSeries", ["accumulationdistribution"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({useVolume})"
 		})
 
-		r("LineSeries", ["disparityindex"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{movingAverageType})"
+		r("LineSeries", ["accumulativeswingindex"]).setAll({
+			legendValueText: "[{swingColor} bold]{valueY.formatNumber('#.0000')}[/]",
+			legendLabelText: "{shortName} ({limitMoveValue})"
+		})
+
+		r("LineSeries", ["aroon"]).setAll({
+			legendValueText: "[{upColor} bold]{up.formatNumber('#.00')}%[/] [{downColor} bold]{down.formatNumber('#.00')}%[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})
+
+		r("ColumnSeries", ["awesomeoscillator"]).setAll({
+			legendValueText: "[{oscillatorColor}; bold]{valueY.formatNumber('#.00')}[/]",
+		})
+
+		r("LineSeries", ["indicator", "bollingerbands"]).setAll({
+			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.00')}[/] [{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{upperColor} bold]{upper.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{type})"
 		})
 
 		r("LineSeries", ["chaikinmoneyflow"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
@@ -825,57 +771,106 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{slowPeriod.formatNumber('#.')})"
 		})
 
+		r("LineSeries", ["commoditychannelindex"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})
+
+		r("LineSeries", ["disparityindex"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{movingAverageType})"
+		})
+
+		r("LineSeries", ["macd"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.00')}[/] [bold {differenceColor}]{difference.formatNumber('#.00')}[/b]",
+			legendLabelText: "{shortName} ({fastPeriod.formatNumber('#.')},{slowPeriod.formatNumber('#.')},{signalPeriod.formatNumber('#.')})"
+		})
+
+		r("LineSeries", ["medianprice"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})
+
+		r("LineSeries", ["momentum"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
+		})
+
+		r("LineSeries", ["movingaverage"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
+		})
+
+		r("ColumnSeries", ["movingaveragedeviation"]).setAll({
+			legendValueText: "[{deviationColor}; bold]{valueY.formatNumber('#.00')}[/]",
+		})
+
+		r("LineSeries", ["indicator", "movingaverageenvelope"]).setAll({
+			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.00')}[/] [{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{upperColor} bold]{upper.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{shiftType},{shift.formatNumber('#.')},{type})"
+		})
+
 		r("LineSeries", ["onbalancevolume"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName}"
 		})
 
-		r("LineSeries", ["accumulativeswingindex"]).setAll({
-			legendValueText: "[{swingColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({limitMoveValue})"
+
+		r("LineSeries", ["rsi"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
 
-		r("LineSeries", ["aroon"]).setAll({
-			legendValueText: "[{upColor} bold]{up.formatNumber('#.000a')}[/] [{downColor} bold]{down.formatNumber('#.000a')}[/]",
+		r("LineSeries", ["standarddeviation"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
+		})
+
+
+		r("LineSeries", ["stochasticmomentum"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{emaColor} bold]{ema.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{dPeriod.formatNumber('#.')},{emaPeriod.formatNumber('#.')})"
+		})
+
+		r("LineSeries", ["stochastic"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{slowColor} bold]{slow.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{kSmoothing.formatNumber('#.')},{dSmoothing.formatNumber('#.')})"
+		})
+
+		r("LineSeries", ["trix"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
-		r("ColumnSeries", ["awesomeoscillator"]).setAll({
-			legendValueText: "[{oscillatorColor}; bold]{valueY.formatNumber('#.000a')}[/]",
+		r("LineSeries", ["typicalprice"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
 		r("ColumnSeries", ["volume"]).setAll({
 			legendValueText: "[{volumeColor}; bold]{valueY.formatNumber('#.000a')}[/]",
 		})
 
-		r("ColumnSeries", ["movingaveragedeviation"]).setAll({
-			legendValueText: "[{deviationColor}; bold]{valueY.formatNumber('#.000a')}[/]",
-		})
 
-		r("LineSeries", ["standarddeviation"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+		r("LineSeries", ["vwap"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
 		})
 
-		r("LineSeries", ["typicalprice"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+
+		r("LineSeries", ["williamsr"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
-		r("LineSeries", ["trix"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.000')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+
+		r("LineSeries", ["zigzag"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({deviation.formatNumber('#.')}, {depth.formatNumber('#.')})"
 		})
 
-		r("LineSeries", ["medianprice"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})
+		// end of legend labels
 
-		r("LineSeries", ["macd"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000')}[/] [{signalColor} bold]{signal.formatNumber('#.000')}[/] [bold {differenceColor}]{difference.formatNumber('#.000')}[/b]",
-			legendLabelText: "{shortName} ({fastPeriod.formatNumber('#.')},{slowPeriod.formatNumber('#.')},{signalPeriod.formatNumber('#.')})"
-		})
 
 		r("RoundedRectangle", ["macd", "difference"]).setAll({
 			fillOpacity: 0.5,
@@ -912,40 +907,19 @@ export class StockChartDefaultTheme extends Theme {
 			strokeOpacity: 0
 		})
 
-		// Y Axis of indicators
-		r("Grid", ["renderer", "y", "rsi"]).setAll({
-			forceHidden: true
-		})
-
-		r("AxisLabel", ["renderer", "y", "rsi"]).setAll({
+		// Y Axis of overbought/oversold indicators
+		r("Grid", ["renderer", "y", "overboughtoversold"]).setAll({
 			forceHidden: true
 		})
 
 		// Y Axis of indicators
-		r("Grid", ["renderer", "y", "williamsr"]).setAll({
+		r("Grid", ["renderer", "y", "overboughtoversold"]).setAll({
 			forceHidden: true
 		})
 
-		r("AxisLabel", ["renderer", "y", "williamsr"]).setAll({
+		r("AxisLabel", ["renderer", "y", "overboughtoversold"]).setAll({
 			forceHidden: true
 		})
-
-		r("Grid", ["renderer", "y", "commoditychannelindex"]).setAll({
-			forceHidden: true
-		})
-
-		r("AxisLabel", ["renderer", "y", "commoditychannelindex"]).setAll({
-			forceHidden: true
-		})
-
-		r("Grid", ["renderer", "y", "stochastic"]).setAll({
-			forceHidden: true
-		})
-
-		r("AxisLabel", ["renderer", "y", "stochastic"]).setAll({
-			forceHidden: true
-		})
-
 
 		r("MovingAverage").setAll({
 			name: "Moving Average",
@@ -1126,15 +1100,32 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("StochasticOscillator").setAll({
 			name: "Stochastic Oscillator",
-			shortName: "Stochastic",
+			shortName: "Stochastic Osc",
 			period: 14,
 			kSmoothing: 1,
 			dSmoothing: 3,
 			field: "close",
 			overSold: 20,
 			overBought: 80,
-			seriesColor: color(0x707070),
-			slowColor: ic.get("negative")
+			overSoldColor: color(0xe40000),
+			overBoughtColor: color(0x67b7dc),
+			seriesColor: color(0xab82da),
+			slowColor: color(0xff903f)
+		})
+
+		r("StochasticMomentumIndex").setAll({
+			name: "Stochastic Momentum Index",
+			shortName: "Stochastic MI",
+			period: 10,
+			dPeriod: 3,
+			emaPeriod: 3,
+			field: "close",
+			overSold: -40,
+			overBought: 40,
+			overSoldColor: color(0xe40000),
+			overBoughtColor: color(0x67b7dc),
+			seriesColor: color(0xab82da),
+			emaColor: color(0xff903f)
 		})
 
 		r("AccumulativeSwingIndex").setAll({
@@ -1195,7 +1186,9 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("IndicatorControl").setAll({
 			name: l.translateAny("Indicators"),
-			indicators: ["Aroon", "Accumulation Distribution", "Accumulative Swing Index", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R", "ZigZag"]
+			scrollable: true,
+			fixedLabel: true,
+			indicators: ["Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

@@ -43,20 +43,18 @@ export abstract class ChartIndicator extends Indicator {
 	public legend!: StockLegend;
 
 	protected _themeTag?: string;
+	protected _themeTags:Array<string> = ["indicator"];
 
 	protected _afterNew() {
 		super._afterNew();
+
 		const stockChart = this.get("stockChart");
 		const stockSeries = this.get("stockSeries");
 		const seriesChart = stockSeries.chart;
 		const root = this._root;
 		if (stockChart && seriesChart) {
 			// make chart
-			let themeTags = ["indicator"];
-			if (this._themeTag) {
-				themeTags.push(this._themeTag);
-			}
-			const chart = stockChart.panels.push(StockPanel.new(root, { wheelY: "zoomX", panX: true, panY: false, themeTags: themeTags }));
+			const chart = stockChart.panels.push(StockPanel.new(root, { themeTags: this._themeTags }));
 			chart.addTag("indicator");
 			this.panel = chart;
 
@@ -91,7 +89,9 @@ export abstract class ChartIndicator extends Indicator {
 			this.xAxis = xAxis;
 
 			// yAxis
-			const yRenderer = AxisRendererY.new(root, {});
+			const yRenderer = AxisRendererY.new(root, {
+				minGridDistance:20
+			});
 			const yAxis = chart.yAxes.push(ValueAxis.new(root, {
 				renderer: yRenderer,
 				tooltip: Tooltip.new(root, { forceHidden: true })

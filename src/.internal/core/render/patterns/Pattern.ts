@@ -134,7 +134,6 @@ export class Pattern extends Entity {
 		super._beforeChanged();
 
 		if (this.isDirty("repetition") || this.isDirty("width") || this.isDirty("height") || this.isDirty("rotation") || this.isDirty("strokeWidth") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("colorOpacity") || this.isDirty("fillOpacity")) {
-			//console.log(this.isDirty("repetition"), this.isDirty("width"), this.isDirty("height"), this.isDirty("rotation"), this.isDirty("color"), this.isDirty("strokeWidth"), this.isDirty("strokeDasharray"), this.isDirty("strokeDashoffset"), this.isDirty("colorOpacity"), this.isDirty("fillOpacity"))	
 			this._clear = true;
 		}
 

@@ -776,5 +776,74 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "negative");
 		}
 
+
+		// AXIS RANGE GRIP
+		{
+			const rule = r("RoundedRectangle", ["rangegrip"]);
+
+			rule.setAll({
+				strokeOpacity: 0,
+				fillOpacity: 0,
+				strokeWidth:1,
+				width: 12,
+				height: 12
+			});
+		}
+
+		{
+			const rule = r("Graphics", ["rangegrip", "button", "icon"]);
+
+			rule.setAll({
+				interactive: false,
+				crisp: true,
+				strokeOpacity: 0.5,
+				draw: (display: any) => {
+					display.moveTo(0, 0.5);
+					display.lineTo(0, 12.5);
+					
+					display.moveTo(2, 0.5);
+					display.lineTo(2, 12.5);
+
+					display.moveTo(4, 0.5);
+					display.lineTo(4, 12.5);
+				}
+			});
+
+			setColor(rule, "stroke", ic, "secondaryButtonText");
+		}
+
+		r("Button", ["rangegrip"]).setAll({
+			draggable:true,
+			paddingTop:0,
+			paddingBottom:0
+		})
+
+		r("Button", ["rangegrip", "vertical"]).setAll({
+			rotation: 90,
+			cursorOverStyle: "ns-resize",
+			centerX: p50
+		});
+
+		r("Button", ["rangegrip", "horizontal"]).setAll({
+			cursorOverStyle: "ew-resize",
+			centerX: p50
+		});
+
+		r("Button", ["rangegrip", "vertical", "left"]).setAll({
+			centerY: p100
+		});
+
+		r("Button", ["rangegrip", "vertical", "right"]).setAll({
+			centerY: 0
+		});
+
+		r("Button", ["rangegrip", "horizontal", "top"]).setAll({
+			centerY: 0
+		});
+
+		r("Button", ["rangegrip", "horizontal", "bottom"]).setAll({
+			centerY: p100
+		});		
+
 	}
 }

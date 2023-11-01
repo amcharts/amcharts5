@@ -61,7 +61,10 @@ export class DisparityIndex extends ChartIndicator {
 		options: ["simple", "weighted", "exponential", "dema", "tema"]
 	}];
 
-	protected _themeTag: string = "disparityindex";
+	public _afterNew(){
+		this._themeTags.push("disparityindex");
+		super._afterNew();
+	}	
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

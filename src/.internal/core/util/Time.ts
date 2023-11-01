@@ -491,7 +491,6 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		let tzoffset = timezone.offsetUTC(date);
 		let timeZoneOffset = date.getTimezoneOffset();
 		let parsedDate = timezone.parseDate(date);
-		//console.log(parsedDate)
 		let year = parsedDate.year;
 		let month = parsedDate.month;
 		let day = parsedDate.day;

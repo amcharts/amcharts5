@@ -43,7 +43,10 @@ export class MedianPrice extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "medianprice";
+	public _afterNew(){
+		this._themeTags.push("medianprice");
+		super._afterNew();
+	}	
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

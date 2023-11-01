@@ -43,7 +43,10 @@ export class TypicalPrice extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "typicalprice";
+	public _afterNew(){
+		this._themeTags.push("typicalprice");
+		super._afterNew();
+	}	
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

@@ -204,16 +204,16 @@ export class DefaultTheme extends Theme {
 		});
 
 		r("GrainPattern").setAll({
-			width:200,
-			height:200,
-			colors:[Color.fromHex(0x000000)],
-			size:1,
-			horizontalGap:0,
-			verticalGap:0,
-			density:1,
-			minOpacity:0,
-			maxOpacity:0.2
-		});		
+			width: 200,
+			height: 200,
+			colors: [Color.fromHex(0x000000)],
+			size: 1,
+			horizontalGap: 0,
+			verticalGap: 0,
+			density: 1,
+			minOpacity: 0,
+			maxOpacity: 0.2
+		});
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -481,7 +481,7 @@ export class DefaultTheme extends Theme {
 
 		r("Polygon").setAll({
 			animationEasing: $ease.out($ease.cubic),
-		});		
+		});
 
 		{
 			const rule = r("PointedRectangle", ["tooltip", "background"]);
@@ -612,7 +612,7 @@ export class DefaultTheme extends Theme {
 			const rule = r("Graphics", ["icon", "button", "zoom"]);
 
 			rule.setAll({
-				crisp:true,
+				crisp: true,
 				strokeOpacity: 0.7,
 				draw: (display: any) => {
 					display.moveTo(0, 0);
@@ -673,7 +673,7 @@ export class DefaultTheme extends Theme {
 			const rule = r("Graphics", ["resize", "button", "icon"]);
 
 			rule.setAll({
-				interactive:false,
+				interactive: false,
 				crisp: true,
 				strokeOpacity: 0.5,
 				draw: (display: any) => {

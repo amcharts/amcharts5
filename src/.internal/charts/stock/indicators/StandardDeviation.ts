@@ -48,7 +48,10 @@ export class StandardDeviation extends ChartIndicator {
 		options: ["open", "close", "low", "high", "hl/2", "hlc/3", "hlcc/4", "ohlc/4"]
 	}];
 
-	protected _themeTag: string = "standarddeviation";
+	public _afterNew(){
+		this._themeTags.push("standarddeviation");
+		super._afterNew();
+	}			
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

@@ -57,7 +57,11 @@ export class AccumulationDistribution extends ChartIndicator {
 		type: "checkbox"
 	}];
 
-	protected _themeTag: string = "accumulationdistribution";
+	public _afterNew(){
+		this._themeTags.push("accumulationdistribution");		
+		super._afterNew();
+		this.yAxis.set("numberFormat", "#.###a");
+	}
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

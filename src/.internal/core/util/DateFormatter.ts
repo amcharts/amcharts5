@@ -417,7 +417,7 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "z":
-					value = $utils.getTimeZone(date, false, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
+					value = $utils.getTimeZone(date, false, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined).replace(/[+-]+[0-9]+$/, "");
 					break;
 
 				case "zz":
@@ -425,7 +425,7 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "zzz":
-					value = $utils.getTimeZone(date, false, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
+					value = $utils.getTimeZone(date, false, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined).replace(/[+-]+[0-9]+$/, "");
 					break;
 
 				case "zzzz":

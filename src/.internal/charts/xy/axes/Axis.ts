@@ -682,7 +682,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		}
 
 		if (this.isDirty("start") || this.isDirty("end")) {
-			this.chart!._updateCursor();
+			const chart = this.chart;
+			if(chart){
+				chart._updateCursor();
+			}
 
 			let start = this.get("start", 0);
 			let end = this.get("end", 1);
@@ -946,15 +949,15 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		const ghostLabel = this.ghostLabel;
 		if (!ghostLabel.isHidden()) {
 			const bounds = ghostLabel.localBounds();
-			const gWidth = bounds.right - bounds.left;
+			const gWidth = Math.ceil(bounds.right - bounds.left);
 			let text = ghostLabel.get("text");
 			$array.each(this.dataItems, (dataItem) => {
 				const label = dataItem.get("label");
 				if (label && !label.isHidden()) {
 					const bounds = label.localBounds();
-					const w = bounds.right - bounds.left;
+					const w = Math.ceil(bounds.right - bounds.left);
 
-					if (w > gWidth) {
+					if (w > gWidth) {						
 						text = label.text._getText();
 					}
 				}

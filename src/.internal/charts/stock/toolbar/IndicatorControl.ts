@@ -21,6 +21,7 @@ import { MedianPrice } from "../indicators/MedianPrice";
 import { OnBalanceVolume } from "../indicators/OnBalanceVolume";
 import { Momentum } from "../indicators/Momentum";
 import { RelativeStrengthIndex } from "../indicators/RelativeStrengthIndex";
+import { StochasticMomentumIndex } from "../indicators/StochasticMomentumIndex";
 import { StochasticOscillator } from "../indicators/StochasticOscillator";
 import { WilliamsR } from "../indicators/WilliamsR";
 import { Trix } from "../indicators/Trix";
@@ -32,14 +33,14 @@ import { JsonParser } from "../../../plugins/json/Json";
 import { Serializer } from "../../../plugins/json/Serializer";
 
 //import type { IDisposer } from "../../../core/util/Disposer";
-import { StockControl, IStockControlSettings, IStockControlPrivate, IStockControlEvents } from "./StockControl";
-import { DropdownList, IDropdownListItem } from "./DropdownList";
+import { DropdownListControl, IDropdownListControlSettings, IDropdownListControlPrivate, IDropdownListControlEvents } from "./DropdownListControl";
+import type { DropdownList, IDropdownListItem } from "./DropdownList";
 import { StockIcons } from "./StockIcons";
 
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Trix" | "Typical Price" | "Volume" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -47,18 +48,25 @@ export interface IIndicator {
 	callback: () => Indicator;
 }
 
-export interface IIndicatorControlSettings extends IStockControlSettings {
+export interface IIndicatorControlSettings extends IDropdownListControlSettings {
 	indicators?: Array<Indicators | IIndicator>;
 	legend?: StockLegend;
 }
 
-export interface IIndicatorControlPrivate extends IStockControlPrivate {
+export interface IIndicatorControlPrivate extends IDropdownListControlPrivate {
+	/**
+	 * Here for backwards compatiblity befor [[IndicatorControl]] was
+	 * migrated to extend [[DropdownListControl]].
+	 *
+	 * @ignore
+	 */
 	list?: DropdownList;
 }
 
-export interface IIndicatorControlEvents extends IStockControlEvents {
+export interface IIndicatorControlEvents extends IDropdownListControlEvents {
 	selected: {
-		indicator: Indicator | IIndicator
+		item: string | IDropdownListItem;
+		indicator: Indicator | IIndicator;
 	}
 }
 
@@ -67,9 +75,9 @@ export interface IIndicatorControlEvents extends IStockControlEvents {
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/indicator-control/} for more info
  */
-export class IndicatorControl extends StockControl {
+export class IndicatorControl extends DropdownListControl {
 	public static className: string = "IndicatorControl";
-	public static classNames: Array<string> = StockControl.classNames.concat([IndicatorControl.className]);
+	public static classNames: Array<string> = DropdownListControl.classNames.concat([IndicatorControl.className]);
 
 	declare public _settings: IIndicatorControlSettings;
 	declare public _privateSettings: IIndicatorControlPrivate;
@@ -81,14 +89,19 @@ export class IndicatorControl extends StockControl {
 		super._afterNew();
 
 		// Create list of tools
-		const list = DropdownList.new(this._root, {
-			control: this,
-			parent: this.getPrivate("button")
-		});
+		const list = this.getPrivate("dropdown")!;
 		this.setPrivate("list", list);
 
 		list.events.on("invoked", (ev) => {
-			this.addIndicator(<Indicators>ev.item.id);
+			const indicator = this.addIndicator(<Indicators>ev.item.id);
+			if (this.events.isEnabled("selected") && indicator) {
+				this.events.dispatch("selected", {
+					type: "selected",
+					target: this,
+					indicator: indicator,
+					item: ev.item
+				});
+			}
 		});
 
 		list.events.on("closed", (_ev) => {
@@ -142,7 +155,13 @@ export class IndicatorControl extends StockControl {
 		}
 	}
 
-	public addIndicator(indicatorId: Indicators): void {
+	/**
+	 * Creates a specific indicator, adds it to chart, and returns the instance.
+	 * 
+	 * @param   indicatorId  Indicator ID
+	 * @return               Indicator instance
+	 */
+	public addIndicator(indicatorId: Indicators): Indicator | undefined {
 		const stockChart = this.get("stockChart");
 		let indicator: Indicator | undefined;
 		const stockSeries = stockChart.get("stockSeries")!;
@@ -268,7 +287,7 @@ export class IndicatorControl extends StockControl {
 					stockChart: stockChart,
 					stockSeries: stockSeries
 				});
-				break;				
+				break;
 			case "Median Price":
 				indicator = MedianPrice.new(this.root, {
 					stockChart: stockChart,
@@ -286,6 +305,12 @@ export class IndicatorControl extends StockControl {
 				break;
 			case "Relative Strength Index":
 				indicator = RelativeStrengthIndex.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries
+				});
+				break;
+			case "Stochastic Momentum Index":
+				indicator = StochasticMomentumIndex.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries
 				});
@@ -351,14 +376,9 @@ export class IndicatorControl extends StockControl {
 				modal.openIndicator(indicator);
 			}
 
-			if (this.events.isEnabled("selected")) {
-				this.events.dispatch("selected", {
-					type: "selected",
-					target: this,
-					indicator: indicator
-				});
-			}
 		}
+
+		return indicator;
 	}
 
 	/**
@@ -377,7 +397,6 @@ export class IndicatorControl extends StockControl {
 		const res: Array<any> = [];
 		const stockChart = this.get("stockChart");
 		stockChart.indicators.each((indicator) => {
-			//console.log(indicator);
 			const serializer = Serializer.new(this._root, {
 				excludeSettings: ["stockChart", "stockSeries", "volumeSeries", "legend"]
 			});

@@ -1,25 +1,11 @@
-import type { IIndicatorEditableSetting } from "./Indicator";
-import type { IValueAxisDataItem } from "../../xy/axes/ValueAxis";
-import type { DataItem } from "../../../core/render/Component";
 import type { Color } from "../../../core/util/Color";
 
-import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
+import { OverboughtOversold, IOverboughtOversoldSettings, IOverboughtOversoldPrivate, IOverboughtOversoldEvents } from "./OverboughtOversold";
 import { LineSeries } from "../../xy/series/LineSeries";
 
 import * as $array from "../../../core/util/Array";
 
-export interface IStochasticOscillatorSettings extends IChartIndicatorSettings {
-
-	/**
-	 * A value for "overbought" threshold.
-	 */
-	overBought?: number;
-
-	/**
-	 * A value for "oversold" threshold.
-	 */
-	overSold?: number;
-
+export interface IStochasticOscillatorSettings extends IOverboughtOversoldSettings {
 	/**
 	 * A color for "slow" section.
 	 */
@@ -34,13 +20,12 @@ export interface IStochasticOscillatorSettings extends IChartIndicatorSettings {
 	 * Smoothing "d" parameter.
 	 */
 	dSmoothing?: number;
-
 }
 
-export interface IStochasticOscillatorPrivate extends IChartIndicatorPrivate {
+export interface IStochasticOscillatorPrivate extends IOverboughtOversoldPrivate {
 }
 
-export interface IStochasticOscillatorEvents extends IChartIndicatorEvents {
+export interface IStochasticOscillatorEvents extends IOverboughtOversoldEvents {
 }
 
 
@@ -49,96 +34,49 @@ export interface IStochasticOscillatorEvents extends IChartIndicatorEvents {
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
-export class StochasticOscillator extends ChartIndicator {
+export class StochasticOscillator extends OverboughtOversold {
 	public static className: string = "StochasticOscillator";
-	public static classNames: Array<string> = ChartIndicator.classNames.concat([StochasticOscillator.className]);
+	public static classNames: Array<string> = OverboughtOversold.classNames.concat([StochasticOscillator.className]);
 
 	declare public _settings: IStochasticOscillatorSettings;
 	declare public _privateSettings: IStochasticOscillatorPrivate;
 	declare public _events: IStochasticOscillatorEvents;
-
-	public overBought!: DataItem<IValueAxisDataItem>;
-	public overSold!: DataItem<IValueAxisDataItem>;
-
-	/**
-	 * Indicator series.
-	 */
-	declare public series: LineSeries;
 
 	/**
 	 * Indicator series.
 	 */
 	public slowSeries!: LineSeries;
 
-	public _editableSettings: IIndicatorEditableSetting[] = [{
-		key: "period",
-		name: this.root.language.translateAny("Period"),
-		type: "number"
-	}, {
-		key: "kSmoothing",
-		name: this.root.language.translateAny("%K Smoothing"),
-		type: "number"
-	}, {
-		key: "dSmoothing",
-		name: this.root.language.translateAny("%D Smoothing"),
-		type: "number"
-	}, {
-		key: "overBought",
-		name: this.root.language.translateAny("Overbought"),
-		type: "number"
-	}, {
-		key: "overSold",
-		name: this.root.language.translateAny("Oversold"),
-		type: "number"
-	}, {
-		key: "seriesColor",
-		name: this.root.language.translateAny("Fast"),
-		type: "color"
-	}, {
-		key: "slowColor",
-		name: this.root.language.translateAny("Slow"),
-		type: "color"
-	}];
-
-	protected _themeTag: string = "stochastic";
-
 	protected _afterNew() {
+		this._themeTags.push("stochastic");
+
 		super._afterNew();
 
+		this._editableSettings.unshift(
+			{
+				key: "period",
+				name: this.root.language.translateAny("Period"),
+				type: "number"
+			}, {
+			key: "kSmoothing",
+			name: this.root.language.translateAny("K period"),
+			type: "number"
+		}, {
+			key: "dSmoothing",
+			name: this.root.language.translateAny("SMA period"),
+			type: "number"
+		}, {
+			key: "seriesColor",
+			name: this.root.language.translateAny("Color"),
+			type: "color"
+		}, {
+			key: "slowColor",
+			name: this.root.language.translateAny("SMA Color"),
+			type: "color"
+		}
+		)
+
 		this.yAxis.setAll({ min: 0, max: 100, strictMinMax: true });
-
-		// overbought range
-		const overBought = this.yAxis.makeDataItem({});
-		this.overBought = overBought;
-		this.yAxis.createAxisRange(overBought);
-
-		const overBoughtGrid = overBought.get("grid");
-		if (overBoughtGrid) {
-			overBoughtGrid.setAll({ themeTags: ["overbought"], visible: true });
-			overBoughtGrid._applyThemes();
-		}
-
-		const overBoughtLabel = overBought.get("label");
-		if (overBoughtLabel) {
-			overBoughtLabel.setAll({ themeTags: ["overbought"], visible: true, location: 0 });
-			overBoughtLabel._applyThemes();
-		}
-
-		const overSold = this.yAxis.makeDataItem({});
-		this.overSold = overSold;
-		this.yAxis.createAxisRange(overSold);
-
-		const overSoldGrid = overSold.get("grid");
-		if (overSoldGrid) {
-			overSoldGrid.setAll({ themeTags: ["oversold"], visible: true });
-			overSoldGrid._applyThemes();
-		}
-
-		const overSoldLabel = overSold.get("label");
-		if (overSoldLabel) {
-			overSoldLabel.setAll({ themeTags: ["oversold"], visible: true, location: 0 });
-			overSoldLabel._applyThemes();
-		}
 
 		const slowSeries = this.panel.series.push(LineSeries.new(this._root, {
 			valueXField: "valueX",
@@ -152,50 +90,15 @@ export class StochasticOscillator extends ChartIndicator {
 		this.slowSeries = slowSeries;
 	}
 
-	public _createSeries(): LineSeries {
-		return this.panel.series.push(LineSeries.new(this._root, {
-			themeTags: ["indicator"],
-			xAxis: this.xAxis,
-			yAxis: this.yAxis,
-			valueXField: "valueX",
-			valueYField: "fast",
-			stroke: this.get("seriesColor"),
-			fill: undefined
-		}))
-	}
-
-	public _prepareChildren() {
-		if (this.isDirty("kSmoothing") || this.isDirty("dSmoothing")) {
-			this._dataDirty = true;
-		}
-		super._prepareChildren();
-	}
 
 	public _updateChildren() {
+		if (this.isDirty("kSmoothing") || this.isDirty("dSmoothing")) {
+			this._dataDirty = true;
+			this.setCustomData("dSmoothing", this.get("dSmoothing"));
+			this.setCustomData("kSmoothing", this.get("kSmoothing"));
+		}
 
 		super._updateChildren();
-
-		const overSoldValue = this.get("overSold", 20);
-		const overBoughtValue = this.get("overBought", 80);
-
-		if (this.isDirty("overBought")) {
-			this.overBought.set("value", overBoughtValue);
-
-			const label = this.overBought.get("label");
-			if (label) {
-				label.set("text", this.getNumberFormatter().format(overBoughtValue));
-			}
-		}
-
-		if (this.isDirty("overSold")) {
-			this.overSold.set("value", overSoldValue);
-
-			const label = this.overSold.get("label");
-			if (label) {
-				label.set("text", this.getNumberFormatter().format(overSoldValue));
-			}
-		}
-		this.series.get("yAxis").set("baseValue", overSoldValue + (overBoughtValue - overSoldValue) / 2);
 
 		if (this.isDirty("slowColor")) {
 			this._updateSeriesColor(this.slowSeries, this.get("slowColor"), "slowColor")
@@ -248,10 +151,10 @@ export class StochasticOscillator extends ChartIndicator {
 			})
 
 			period = this.get("kSmoothing", 1);
-			this._sma(data, period, "value_y", "fast");
+			this._sma(data, period, "value_y", "valueS");
 
 			period = this.get("dSmoothing", 3);
-			this._sma(data, period, "fast", "slow");
+			this._sma(data, period, "valueS", "slow");
 
 			this.series.data.setAll(data);
 			this.slowSeries.data.setAll(data);

@@ -80,8 +80,9 @@ export class Trix extends ChartIndicator {
 		}))
 	}
 
-
 	protected _afterNew() {
+		this._themeTags.push("trix");
+
 		super._afterNew();
 
 		const chart = this.panel;

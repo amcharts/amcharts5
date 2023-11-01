@@ -2076,6 +2076,7 @@ export class Root implements IDisposer {
 		let htmlElement = target.getPrivate("htmlElement");
 		if (htmlElement) {
 			this._htmlElementContainer!.removeChild(htmlElement);
+			target.removePrivate("htmlElement");
 		}
 		$array.remove(this._htmlEnabledContainers, target);
 	}

@@ -5,13 +5,34 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.5.3] - 2023-11-01
+
+### Added
+- New indicator "Stochastic Momentum Index" added.
+- All `StockChart` indicators with OverBought/Oversold ranges (Commodity Channel Index, Relative Strength Index, Stochastic Momentum Index, Stochastic Oscilator and Williams R) have now middle line between oversold/overbought. Also a draggable grip added to oversold/overbought ranges which allows user to change values by dragging these grips.
+- New `StockChart` toolbar control: `DropdownControl`. Can use to add any content to be displayed in a dropdown when clicked. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-control/).
+
+### Changed
+- Changed defaults on a `StockPanel`: `wheelY: "zoomX"`, `panX: true`, `panY: true`. Previously, those were hardcoded in `ChartIndicator`, which prevented a possibility to change them via a theme.
+- Changed defaults on an `AxisRendererY`: `pan:"zoom"`. This adds zoom possibility for all Y axes of a `StockChart` (previously indicator Y axes where not zoomable).
+- `IndicatorControl` now extends `DropdownListControl` for consistency.
+- `IndicatorControl` has now `scrollable: true` set by default.
+- Tweaked number formats for indicator legend items.
+- Default ordering of indicators in `IndicatorControl` changed.
+
+### Fixed
+- Returning empty string from `labelHTML` adapter on a `Tooltip` in some cases could result to an error.
+- Timezone formatting with "z" codes in `DateFormatter` was not always correct.
+- `XYChart` could flicker on Safari browser in some rare responsive CSS setups.
+
+
 ## [5.5.2] - 2023-10-27
 
 ### Added
 - `customValue` added to `ISeriesDataItem` and `customValueField` to `Series`. Allows storing additional numeric information which could be used for heat rules and other purposes.
 - A middle line between oversold and overbought added to `StockChart`'s RSI indicator.
 - While drawing polygon in a `StockChart`, a line is drawn from the previous point to mouse pointer.
-- New setting `scrollable` (default: `false`) added to `StockChart`'s `DropdownList` and `DropdownListControl` (as well as other controls that extend those, e.g. `ComparisonControl`). If set to `true`, will autoamtically limit dropdown height to fit into chart, and will show scrollbar if the contents do not fit.
+- New setting `scrollable` (default: `false`) added to `StockChart`'s `DropdownList` and `DropdownListControl` (as well as other controls that extend those, e.g. `ComparisonControl`). If set to `true`, will automatically limit dropdown height to fit into chart, and will show scrollbar if the contents do not fit.
 - Measure tool added to `StockChart` (as a drawing item).
 - `toolSettings` setting added to `DrawingControl`. Allows passing in default settings for each drawing tool. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings).
 

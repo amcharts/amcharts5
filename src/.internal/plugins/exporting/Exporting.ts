@@ -1354,7 +1354,6 @@ export class Exporting extends Entity {
 				}
 				wsData.push(this.getXLSXRow(dataRow, options, undefined, true));
 			}, (a, b) => {
-				//console.log(a, b)
 				let ai = dataFieldsOrder.indexOf(a);
 				let bi = dataFieldsOrder.indexOf(b);
 				if (ai > bi) {
@@ -1428,7 +1427,6 @@ export class Exporting extends Entity {
 
 			items.push(item);
 		}, (a, b) => {
-			//console.log(a, b)
 			let ai = dataFieldsOrder.indexOf(a);
 			let bi = dataFieldsOrder.indexOf(b);
 			if (ai > bi) {
@@ -1662,7 +1660,6 @@ export class Exporting extends Entity {
 				}
 				content.body.push(this.getPDFDataRow(dataRow, options, undefined, true));
 			}, (a, b) => {
-				//console.log(a, b)
 				let ai = dataFieldsOrder.indexOf(a);
 				let bi = dataFieldsOrder.indexOf(b);
 				if (ai > bi) {
@@ -1723,7 +1720,6 @@ export class Exporting extends Entity {
 			// Add to item
 			items.push(item);
 		}, (a, b) => {
-			//console.log(a, b)
 			let ai = dataFieldsOrder.indexOf(a);
 			let bi = dataFieldsOrder.indexOf(b);
 			if (ai > bi) {

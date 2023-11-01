@@ -59,7 +59,11 @@ export class ChaikinOscillator extends ChartIndicator {
 		type: "color"
 	}];
 
-	protected _themeTag: string = "chaikinoscillator";
+	public _afterNew(){
+		this._themeTags.push("chaikinoscillator");
+		super._afterNew();
+		this.yAxis.set("numberFormat", "#.###a");
+	}
 
 	public _createSeries(): LineSeries {
 		return this.panel.series.push(LineSeries.new(this._root, {

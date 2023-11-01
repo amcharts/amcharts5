@@ -182,6 +182,7 @@ import type { SpriteResizer } from "./render/SpriteResizer.js";
 import type { StandardDeviation } from "./../charts/stock/indicators/StandardDeviation.js";
 import type { Star } from "./render/Star.js";
 import type { StepLineSeries } from "./../charts/xy/series/StepLineSeries.js";
+import type { StochasticMomentumIndex } from "./../charts/stock/indicators/StochasticMomentumIndex.js";
 import type { StochasticOscillator } from "./../charts/stock/indicators/StochasticOscillator.js";
 import type { StockChart } from "./../charts/stock/StockChart.js";
 import type { StockControl } from "./../charts/stock/toolbar/StockControl.js";
@@ -395,6 +396,7 @@ export interface IClasses {
 	"Star": Star;
 	"StepLineSeries": StepLineSeries;
 	"StochasticOscillator": StochasticOscillator;
+	"StochasticMomentumIndex": StochasticMomentumIndex;
 	"StockChart": StockChart;
 	"StockControl": StockControl;
 	"StockLegend": StockLegend;
