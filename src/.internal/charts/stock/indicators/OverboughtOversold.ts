@@ -90,6 +90,22 @@ export class OverboughtOversold extends ChartIndicator {
 		super._afterNew();
 
 		const chart = this.panel;
+		const yAxis = this.yAxis;
+		yAxis.set("strictMinMax", true);
+
+		yAxis.onPrivate("max", (max) => {
+			const overBought = this.get("overBought", 0);
+			if ($type.isNumber(max) && max < overBought) {
+				yAxis.setPrivateRaw("max", overBought);
+			}
+		})
+
+		yAxis.onPrivate("min", (min) => {
+			const overSold = this.get("overSold", 0);
+			if ($type.isNumber(min) && min > overSold) {
+				yAxis.setPrivateRaw("min", overSold);
+			}
+		})
 
 		// middle grid
 		this.middle = this.yAxis.createAxisRange(this.yAxis.makeDataItem({}));
@@ -100,14 +116,14 @@ export class OverboughtOversold extends ChartIndicator {
 		const middleLabel = this.middle.get("label")!;
 		middleLabel.setAll({ visible: true, forceHidden: false });
 
-		const opposite = (this.yAxis.get("renderer") as AxisRendererY).get("opposite");
+		const opposite = (yAxis.get("renderer") as AxisRendererY).get("opposite");
 		let side = "left";
 		if (opposite) {
 			side = "right"
 		}
 
 		// overbought range
-		const overBought = this.yAxis.makeDataItem({});
+		const overBought = yAxis.makeDataItem({});
 		this.overBought = overBought;
 		overBought.set("endValue", 500);
 		overBought.set("affectsMinMax", false);
@@ -157,7 +173,7 @@ export class OverboughtOversold extends ChartIndicator {
 		overBoughtLabel.setAll({ visible: true, forceHidden: false, location: 0 });
 
 		// oversold range
-		const overSold = this.yAxis.makeDataItem({});
+		const overSold = yAxis.makeDataItem({});
 		this.overSold = overSold;
 		overSold.set("endValue", -500);
 		overSold.set("affectsMinMax", false);
