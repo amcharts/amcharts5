@@ -62,7 +62,11 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 				key: "period",
 				name: this.root.language.translateAny("K period"),
 				type: "number"
-			}, {
+			},{
+			key: "seriesColor",
+			name: this.root.language.translateAny("K period"),
+			type: "color"
+		}, {
 			key: "dPeriod",
 			name: this.root.language.translateAny("D period"),
 			type: "number"
@@ -70,13 +74,9 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 			key: "emaPeriod",
 			name: this.root.language.translateAny("EMA period"),
 			type: "number"
-		}, {
-			key: "seriesColor",
-			name: this.root.language.translateAny("Color"),
-			type: "color"
-		}, {
+		},  {
 			key: "emaColor",
-			name: this.root.language.translateAny("EMA Color"),
+			name: this.root.language.translateAny("EMA period"),
 			type: "color"
 		}
 		);

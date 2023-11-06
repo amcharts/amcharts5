@@ -202,7 +202,7 @@ export class SimpleLineSeries extends DrawingSeries {
 		}
 	}
 
-	protected _updateLine(index:number, p11: IPoint, p22: IPoint, p1: IPoint, p2: IPoint) {
+	protected _updateLine(index: number, p11: IPoint, p22: IPoint, p1: IPoint, p2: IPoint) {
 		const line = this._lines[index];
 		const hitLine = this._hitLines[index];
 
@@ -242,25 +242,27 @@ export class SimpleLineSeries extends DrawingSeries {
 	protected _handlePointerMoveReal(_event: ISpritePointerEvent) {
 		if (this._isDrawing) {
 			const movePoint = this._movePointerPoint;
+			const index = this._index;
+			const dataItems = this._di[index];
 
-			if (movePoint) {
-
+			if (movePoint && dataItems) {
 				const xAxis = this.get("xAxis");
 				const yAxis = this.get("yAxis");
 
-				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);
+				const valueXns = xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)); // not snapped
 
-				const index = this._index;
-				const diP1 = this._di[index]["p1"];
-				const diP2 = this._di[index]["p2"];
+				const valueX = this._getXValue(valueXns);
+				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueXns);
+
+				const diP1 = dataItems["p1"];
+				const diP2 = dataItems["p2"];
 
 				if (diP1 && diP2) {
-					this._setContext(diP2, "valueX", valueX);
+					this._setContext(diP2, "valueX", valueX, true);
 					this._setContext(diP2, "valueY", valueY, true);
 					this._setXLocation(diP1, diP1.get("valueX", 0));
 					this._setXLocation(diP2, valueX);
-					this._updateSegment(index);	
+					this._updateSegment(index);
 				}
 			}
 		}
@@ -315,9 +317,14 @@ export class SimpleLineSeries extends DrawingSeries {
 		const yAxis = this.get("yAxis");
 
 		const point = chart.plotContainer.toLocal(event.point);
-		const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
+		const valueYns = xAxis.positionToValue(xAxis.coordinateToPosition(point.x));
+		const valueX = this._getXValue(valueYns);
+		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueYns);
 
+		this._addPointsReal(valueX, valueY, index);
+	}
+
+	protected _addPointsReal(valueX: number, valueY: number, index: number) {
 		this._addPoint(valueX, valueY, "p1", index);
 		this._addPoint(valueX, valueY, "p2", index);
 	}

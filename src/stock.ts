@@ -36,6 +36,7 @@ export { ZigZag, IZigZagEvents, IZigZagPrivate, IZigZagSettings } from "./.inter
 export { DrawingSeries, IDrawingSeriesPrivate, IDrawingSeriesDataItem, IDrawingSeriesSettings } from "./.internal/charts/stock/drawing/DrawingSeries";
 export { PolylineSeries, IPolylineSeriesPrivate, IPolylineSeriesSettings, IPolylineSeriesDataItem } from "./.internal/charts/stock/drawing/PolylineSeries";
 export { RectangleSeries, IRectangleSeriesDataItem, IRectangleSeriesPrivate, IRectangleSeriesSettings } from "./.internal/charts/stock/drawing/RectangleSeries";
+export { ParallelChannelSeries, IParallelChannelSeriesDataItem, IParallelChannelSeriesPrivate, IParallelChannelSeriesSettings } from "./.internal/charts/stock/drawing/ParallelChannelSeries";
 export { SimpleLineSeries, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem, ISimpleLineSeriesSettings } from "./.internal/charts/stock/drawing/SimpleLineSeries";
 export { HorizontalLineSeries, IHorizontalLineSeriesPrivate, IHorizontalLineSeriesSettings, IHorizontalLineSeriesDataItem } from "./.internal/charts/stock/drawing/HorizontalLineSeries";
 export { VerticalLineSeries, IVerticalLineSeriesPrivate, IVerticalLineSeriesSettings } from "./.internal/charts/stock/drawing/VerticalLineSeries";

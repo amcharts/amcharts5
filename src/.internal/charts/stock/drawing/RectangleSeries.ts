@@ -28,10 +28,6 @@ export class RectangleSeries extends SimpleLineSeries {
 
 	protected _tag = "rectangle";
 
-	protected _afterNew() {
-		super._afterNew();
-	}
-
 	protected _updateSegment(index: number) {
 		const diP1 = this._di[index]["p1"];
 		const diP2 = this._di[index]["p2"];

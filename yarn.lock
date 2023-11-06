@@ -364,11 +364,6 @@
   resolved "https://registry.yarnpkg.com/@types/polylabel/-/polylabel-1.1.2.tgz#3c9895866e71d1ea26d21a7a520973ec1a77d318"
   integrity sha512-cM1urcUenkeQM9E3XPlxdTOeEDXTyGk+eqQ8y4HlLioJU6/9KHCHh8uxSsNXG4KjTmlmHzszer1MK7RiH5LkaA==
 
-"@types/regression@^2.0.2":
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/@types/regression/-/regression-2.0.4.tgz#a01ff62f6b15e8dcd290c267e46ecd12c4a4bf92"
-  integrity sha512-9TaqQcymIwzb4CKjF2l3lof8TGBvd734cj3hnguWlAQzhQQ3RjcJEwvzZomeiJ25AAGzFQMuJ5efGCw9FcUarA==
-
 "@types/seedrandom@^3.0.5":
   version "3.0.7"
   resolved "https://registry.yarnpkg.com/@types/seedrandom/-/seedrandom-3.0.7.tgz#679f6bc26bb59245662398a3770bcbf9d29c5af4"
@@ -3578,11 +3573,6 @@ regexp.prototype.flags@^1.2.0:
     call-bind "^1.0.2"
     define-properties "^1.2.0"
     set-function-name "^2.0.0"
-
-regression@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/regression/-/regression-2.0.1.tgz#8d29c3e8224a10850c35e337e85a8b2fac3b0c87"
-  integrity sha512-A4XYsc37dsBaNOgEjkJKzfJlE394IMmUPlI/p3TTI9u3T+2a+eox5Pr/CPUqF0eszeWZJPAc6QkroAhuUpWDJQ==
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"

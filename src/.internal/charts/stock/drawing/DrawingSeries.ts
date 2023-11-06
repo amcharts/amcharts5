@@ -459,8 +459,8 @@ export class DrawingSeries extends LineSeries {
 			const point = chart.plotContainer.toLocal(event.point);
 
 			this._dragStartPX = xAxis.coordinateToPosition(point.x);
-			const valueX = this._getXValue(xAxis.positionToValue(this._dragStartPX));
-			this._dragStartY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
+			const valueXns = xAxis.positionToValue(this._dragStartPX);
+			this._dragStartY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueXns);
 
 			const dataItems = this._di[index];
 			if (dataItems) {
@@ -481,11 +481,15 @@ export class DrawingSeries extends LineSeries {
 			const yAxis = this.get("yAxis");
 
 			const posX = xAxis.coordinateToPosition(point.x);
-			const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
+			const valueXns = xAxis.positionToValue(xAxis.coordinateToPosition(point.x));
+			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueXns);
 
 			const dpx = posX - this._dragStartPX;
 			const dy = valueY - this._dragStartY;
+
+			event.target.setAll({
+				x: 0, y: 0
+			})
 
 			const dataItems = this._di[index];
 
@@ -494,15 +498,15 @@ export class DrawingSeries extends LineSeries {
 					const dvpx = this._dvpX[key];
 					const dvy = this._dvY[key];
 					if ($type.isNumber(dvpx) && $type.isNumber(dvy)) {
-
 						const vpx = dvpx + dpx;
-						let vy = dvy + dy;
+						const vxns = xAxis.positionToValue(vpx);
+						const vx = this._getXValue(vxns);
 
+						let vy = dvy + dy;
 						const yAxis = this.get("yAxis");
 						const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
 						vy = $math.round(vy, roundTo);
-
-						const vx = this._getXValue(xAxis.positionToValue(vpx))
+						vy = this._getYValue(vy, vxns);
 
 						this._setContext(dataItem, "valueX", vx)
 						this._setContext(dataItem, "valueY", vy, true);
@@ -663,12 +667,13 @@ export class DrawingSeries extends LineSeries {
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 
-		const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
-		const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), vx);
+		const valueXns = xAxis.positionToValue(xAxis.coordinateToPosition(point.x));
+		const valueX = this._getXValue(valueXns);
+		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueXns);
 
-		this._setContext(dataItem, "valueX", vx);
-		this._setContext(dataItem, "valueY", vy, true);
-		this._setXLocation(dataItem, vx);
+		this._setContext(dataItem, "valueX", valueX);
+		this._setContext(dataItem, "valueY", valueY, true);
+		this._setXLocation(dataItem, valueX);
 
 		this._positionBullets(dataItem);
 	}
@@ -789,6 +794,9 @@ export class DrawingSeries extends LineSeries {
 		if (!this.get("snapToData")) {
 			this._setXLocationReal(dataItem, value);
 		}
+		else {
+			dataItem.set("locationX", undefined);
+		}
 	}
 
 	protected _setXLocationReal(dataItem: DataItem<this["_dataItemSettings"]>, value: number) {
@@ -856,7 +864,7 @@ export class DrawingSeries extends LineSeries {
 			const max = xAxis.getPrivate("max", 1) - 1;
 
 			value = $math.fitToRange(value, min, max);
-			value = this._snap(value, value, "valueX", series);
+			value = this._snap(value, value, "valueX", series) + 1; // important!
 			return value
 		}
 		else {
@@ -879,8 +887,7 @@ export class DrawingSeries extends LineSeries {
 
 	protected _snap(value: number, realValue: number, key: string, series: XYSeries): number {
 		const xAxis = this.get("xAxis");
-		const dataItem = xAxis.getSeriesItem(series, Math.max(0, xAxis.valueToPosition(value)));
-
+		const dataItem = xAxis.getSeriesItem(series, Math.max(0, xAxis.valueToPosition(value)), 0.5, true);
 		if (dataItem) {
 			return dataItem.get(key as any)!;
 		}

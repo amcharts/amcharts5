@@ -20,6 +20,12 @@ export class TrendLineSeries extends SimpleLineSeries {
 
 	protected _tag = "trendline";
 
+	protected _afterNew() {
+		super._afterNew();
+		this.setPrivate("allowChangeSnap", false);
+		this.set("snapToData", true);
+	}	
+
 	protected _updateSegment(index: number) {
 		const diP1 = this._di[index]["p1"];
 		const diP2 = this._di[index]["p2"];

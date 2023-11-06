@@ -58,20 +58,20 @@ export class StochasticOscillator extends OverboughtOversold {
 				name: this.root.language.translateAny("Period"),
 				type: "number"
 			}, {
+			key: "seriesColor",
+			name: this.root.language.translateAny("Period"),
+			type: "color"
+		}, {
 			key: "kSmoothing",
 			name: this.root.language.translateAny("K period"),
 			type: "number"
-		}, {
+		},{
 			key: "dSmoothing",
 			name: this.root.language.translateAny("SMA period"),
 			type: "number"
-		}, {
-			key: "seriesColor",
-			name: this.root.language.translateAny("Color"),
-			type: "color"
-		}, {
+		},  {
 			key: "slowColor",
-			name: this.root.language.translateAny("SMA Color"),
+			name: this.root.language.translateAny("SMA period"),
 			type: "color"
 		}
 		)

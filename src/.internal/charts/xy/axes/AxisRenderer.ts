@@ -297,6 +297,15 @@ export abstract class AxisRenderer extends Graphics {
 		}
 	}
 
+	public _beforeChanged() {
+		if (this.isDirty("minGridDistance")) {
+			this.root.events.once("frameended", () => {
+				this.axis.markDirtySize();
+			})
+		}
+	}
+
+
 	public _changed() {
 		super._changed();
 

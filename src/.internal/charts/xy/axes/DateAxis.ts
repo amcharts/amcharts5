@@ -958,7 +958,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @param   position  Relative position
 	 * @return            Data item
 	 */
-	public getSeriesItem(series: XYSeries, position: number, location?: number): DataItem<IXYSeriesDataItem> | undefined {
+	public getSeriesItem(series: XYSeries, position: number, location?: number, snap?: boolean): DataItem<IXYSeriesDataItem> | undefined {
 		let fieldName = <any>(this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!);
 		let value = this.positionToValue(position);
 
@@ -977,7 +977,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			return $order.compare(diValue, value);
 		});
 
-		if (series.get("snapTooltip")) {
+		if (snap || series.get("snapTooltip")) {
 			let first = series.dataItems[result.index - 1];
 			let second = series.dataItems[result.index];
 
@@ -1001,7 +1001,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 		}
 		else {
-			// @todo check if is in range
 			const dataItem = series.dataItems[result.index - 1];
 
 			if (dataItem) {

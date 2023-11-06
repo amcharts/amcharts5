@@ -91,21 +91,7 @@ export class OverboughtOversold extends ChartIndicator {
 
 		const chart = this.panel;
 		const yAxis = this.yAxis;
-		yAxis.set("strictMinMax", true);
-
-		yAxis.onPrivate("max", (max) => {
-			const overBought = this.get("overBought", 0);
-			if ($type.isNumber(max) && max < overBought) {
-				yAxis.setPrivateRaw("max", overBought);
-			}
-		})
-
-		yAxis.onPrivate("min", (min) => {
-			const overSold = this.get("overSold", 0);
-			if ($type.isNumber(min) && min > overSold) {
-				yAxis.setPrivateRaw("min", overSold);
-			}
-		})
+		yAxis.setAll({ strictMinMax: true, autoZoom: false });
 
 		// middle grid
 		this.middle = this.yAxis.createAxisRange(this.yAxis.makeDataItem({}));

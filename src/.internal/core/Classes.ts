@@ -128,6 +128,7 @@ import type { OHLCSeries } from "./../charts/xy/series/OHLCSeries.js";
 import type { OnBalanceVolume } from "./../charts/stock/indicators/OnBalanceVolume.js";
 import type { Pack } from "./../charts/hierarchy/Pack.js";
 import type { PanelControls } from "./../charts/stock/PanelControls.js";
+import type { ParallelChannelSeries } from "./../charts/stock/drawing/ParallelChannelSeries.js";
 import type { Partition } from "./../charts/hierarchy/Partition.js";
 import type { PathPattern } from "./render/patterns/PathPattern.js";
 import type { Pattern } from "./render/patterns/Pattern.js";
@@ -341,6 +342,7 @@ export interface IClasses {
 	"OnBalanceVolume": OnBalanceVolume;
 	"Pack": Pack;
 	"PanelControls": PanelControls;
+	"ParallelChannelSeries": ParallelChannelSeries;
 	"Partition": Partition;
 	"PathPattern": PathPattern;
 	"Pattern": Pattern;

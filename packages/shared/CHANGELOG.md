@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.5.5] - 2023-11-06
+
+### Added
+- SMA line added to Relative Strength Index indicator in `StockChart`.
+- A possibility to draw a Parallel Channel added to `StockChart`.
+
+### Changed
+- Removed dependency on the `regression` npm package.
+
+### Fixed
+- Change of `minGridDistance` setting on `AxisRenderer` was not being applied until next redraw.
+- Snapping of `StockChart` drawings sometimes worked incorrectly.
+- Average line was drawn incorectly on a `StockChart` (since `5.5.2`).
+
+
 ## [5.5.4] - 2023-11-01
 
 ### Fixed
@@ -75,7 +90,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - New private setting `trustBounds` added to `Sprite`. If set to `true`, the Sprite will check if a mouse pointer is within bounds of a Sprite before dispatching its pointer events. This helps to solve ghost tooltips problem which sometimes appears while moving the pointer over interactive objects. It is set to `true` by default on `Rectangle` and `Circle`.
 
 ### Changed
-- Previously elements only supported one fill at a time - either `fill` or `fillGradient` or `fillPattern`. Now `fill` or `fillGradient` will be drawn even if `fillPattern` is set. This allows combining 
+- Previously elements only supported one fill at a time - either `fill` or `fillGradient` or `fillPattern`. Now `fill` or `fillGradient` will be drawn even if `fillPattern` is set. This allows combining
 patterns with gradient fills.
 - Gradients no longer inherit parent object's `fill`.
 - It is now possible to draw annotations on a `StockChart` outside X-axis' min/max using axis overzoom.

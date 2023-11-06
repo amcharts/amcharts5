@@ -817,8 +817,8 @@ export class StockChartDefaultTheme extends Theme {
 
 
 		r("LineSeries", ["rsi"]).setAll({
-			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field})"
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{smaColor} bold]{sma.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{smaPeriod.formatNumber('#.')},{field})"
 		})
 
 		r("LineSeries", ["standarddeviation"]).setAll({
@@ -1058,12 +1058,14 @@ export class StockChartDefaultTheme extends Theme {
 			name: "Relative Strength Index",
 			shortName: "RSI",
 			period: 14,
+			smaPeriod: 3,
 			field: "close",
 			overSold: 20,
 			overBought: 80,
 			overSoldColor: color(0xe40000),
 			overBoughtColor: color(0x67b7dc),
-			seriesColor: color(0xab82da)
+			seriesColor: color(0xab82da),
+			smaColor: color(0xff903f)
 		})
 
 		r("Momentum").setAll({
@@ -1309,7 +1311,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("DrawingControl").setAll({
 			name: l.translateAny("Draw"),
 			tool: "Line",
-			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Measure", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Measure", "Parallel Channel", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
 			togglable: true,
 			strokeColor: color(0x882dff),
 			strokeWidth: 2,

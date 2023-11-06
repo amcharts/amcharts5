@@ -47,6 +47,7 @@ export class StockIcons {
 		"Regression": { viewbox: "0 0 50 50", path: "M 2 15 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 11.36 17.369 L 38.661 32.505 M 38 35 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0" },
 		"Trend Line": { viewbox: "0 0 50 50", path: "M 2 35 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 M 11.343 32.542 L 38.614 17.398 M 38 15 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0" },
 		"Vertical Line": { viewbox: "0 0 50 50", path: "M19 25a5 5 0 1 0 10 0 5 5 0 1 0-10 0M24 2v18 M24,32 v18" },
+		"Parallel Channel": { viewbox: "0 0 50 50", path: "M 3 37 L 37 3 M 13 47 L 47 13" },		
 
 		"Eraser": { viewbox: "0 0 50 50", path: "M 13 48 L 21 48 L 45 24 L 29 8 L 1 36 L 13 48 M 32 48 L 38 48 M 43 48 L 49 48 M 23 14 L 39 30 M 20 17 L 36 33 M 26 11 L 42 27" },
 		"Clear": { viewbox: "0 0 50 50", path: "M 6 10 L 12 48 L 38 48 L 44 10 L 6 10 M 14 14 L 18 43 M 25 14 L 25 43 M 36 14 L 32 43 M 6 8 L 44 8 M 21 8 L 21 3 L 30 3 L 30 8" },
@@ -56,7 +57,7 @@ export class StockIcons {
 		"Snap": { viewbox: "0 0 50 50", path: "M 17 29 L 29 29 M 33 39 a 5 5 0 1 0 15 0 a 5 5 0 1 0 -15 0 M 29 17 L 29 29 L 3 3" },
 		"Reset": { viewbox: "0 0 50 50", path: "M 4 25 A 1 1 0 0 0 46 25 Q 46 4 25 4 Q 18 4 11 10 L 5 4 L 5 16 L 17 16 L 11 10" },
 		"Search": { viewbox: "0 0 50 50", path: "M 5 11 A 1 1 90 0 0 36 27 A 1 1 90 0 0 5 11 M 34 30 L 49 45 L 47 47 L 32 32"},
-		"Measure": { viewbox: "0 0 50 50", path: "M 3 38 L 35 6 L 44 15 L 12 47 L 3 38 M 10 31 L 16 37 M 16 25 L 20 29 M 22 19 L 26 23 M 28 13 L 34 19"}
+		"Measure": { viewbox: "0 0 50 50", path: "M 3 38 L 35 6 L 46 17 L 14 49 L 3 38 M 10 31 L 16 37 M 16 25 L 20 29 M 22 19 L 26 23 M 28 13 L 34 19 M 50 50"}
 	};
 
 	public static getIcon(id: string): SVGElement {

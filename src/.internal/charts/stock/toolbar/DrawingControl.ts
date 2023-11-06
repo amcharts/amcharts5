@@ -28,6 +28,7 @@ import { SimpleLineSeries } from "../drawing/SimpleLineSeries";
 import { PolylineSeries } from "../drawing/PolylineSeries";
 import { QuadrantLineSeries } from "../drawing/QuadrantLineSeries";
 import { RectangleSeries } from "../drawing/RectangleSeries";
+import { ParallelChannelSeries } from "../drawing/ParallelChannelSeries";
 import { RegressionSeries } from "../drawing/RegressionSeries";
 import { TrendLineSeries } from "../drawing/TrendLineSeries";
 import { VerticalLineSeries } from "../drawing/VerticalLineSeries";
@@ -710,11 +711,11 @@ export class DrawingControl extends StockControl {
 
 			// Show/hide needed drawing property controls
 			const controls: any = {
-				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-				strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Parallel Channel", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line", "Parallel Channel"],
 				strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
 				extensionControl: ["Average", "Line", "Regression", "Trend Line"],
-				fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Arrows &amp; Icons", "Fibonacci Timezone"],
+				fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Parallel Channel", "Arrows &amp; Icons", "Fibonacci Timezone"],
 
 				labelFillControl: ["Callout", "Label"],
 				labelFontSizeControl: ["Callout", "Label"],
@@ -723,7 +724,7 @@ export class DrawingControl extends StockControl {
 				italicControl: ["Callout", "Label"],
 
 				iconControl: ["Arrows &amp; Icons"],
-				snapControl: ["Callout", "Arrows &amp; Icons", "Line", "Polyline", "Label", "Callout", "Horizontal Line", "Horizontal Ray", "Vertical Line", "Quadrant Line", "Rectangle", "Measure", "Fibonacci"],
+				snapControl: ["Callout", "Arrows &amp; Icons", "Line", "Polyline", "Parallel Channel", "Label", "Callout", "Horizontal Line", "Horizontal Ray", "Vertical Line", "Quadrant Line", "Rectangle", "Measure", "Fibonacci"],
 			}
 
 			$object.each(controls, (control, tools) => {
@@ -869,6 +870,13 @@ export class DrawingControl extends StockControl {
 							yAxis: yAxis
 						}, template);
 						break;
+					case "Parallel Channel":
+						series = ParallelChannelSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis
+						}, template);
+						break;						
 					case "Polyline":
 						series = PolylineSeries.new(this._root, {
 							series: chartSeries,

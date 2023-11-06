@@ -32,7 +32,7 @@ export class CommodityChannelIndex extends OverboughtOversold {
 				type: "number"
 			}, {
 			key: "seriesColor",
-			name: this.root.language.translateAny("Color"),
+			name: this.root.language.translateAny("Period"),
 			type: "color"
 		}
 		)

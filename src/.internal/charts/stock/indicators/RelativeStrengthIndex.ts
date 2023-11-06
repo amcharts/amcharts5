@@ -1,8 +1,20 @@
 import { OverboughtOversold, IOverboughtOversoldSettings, IOverboughtOversoldPrivate, IOverboughtOversoldEvents } from "./OverboughtOversold";
+import { LineSeries } from "../../xy/series/LineSeries";
+import type { Color } from "../../../core/util/Color";
 
 import * as $array from "../../../core/util/Array";
 
-export interface IRelativeStrengthIndexSettings extends IOverboughtOversoldSettings { }
+export interface IRelativeStrengthIndexSettings extends IOverboughtOversoldSettings {
+	/**
+	 * EMA period.
+	 */
+	smaPeriod?: number;
+
+	/**
+	 * A color for "ema" line.
+	 */
+	smaColor?: Color;
+}
 
 export interface IRelativeStrengthIndexPrivate extends IOverboughtOversoldPrivate { }
 
@@ -21,6 +33,11 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 	declare public _privateSettings: IRelativeStrengthIndexPrivate;
 	declare public _events: IRelativeStrengthIndexEvents;
 
+	/**
+	 * Indicator series.
+	 */
+	public smaSeries!: LineSeries;
+
 	protected _afterNew() {
 
 		this._themeTags.push("rsi");
@@ -30,17 +47,48 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 			name: this.root.language.translateAny("Period"),
 			type: "number"
 		}, {
+			key: "seriesColor",
+			name: this.root.language.translateAny("Period"),
+			type: "color"
+		}, {
 			key: "field",
 			name: this.root.language.translateAny("Field"),
 			type: "dropdown",
 			options: ["open", "close", "low", "high", "hl/2", "hlc/3", "hlcc/4", "ohlc/4"]
 		}, {
-			key: "seriesColor",
-			name: this.root.language.translateAny("Color"),
+			key: "smaPeriod",
+			name: this.root.language.translateAny("SMA period"),
+			type: "number"
+		}, {
+			key: "smaColor",
+			name: this.root.language.translateAny("SMA period"),
 			type: "color"
 		})
 
+		const smaSeries = this.panel.series.push(LineSeries.new(this._root, {
+			valueXField: "valueX",
+			valueYField: "sma",
+			xAxis: this.xAxis,
+			yAxis: this.yAxis,
+			groupDataDisabled: true,
+			themeTags: ["indicator", "sma"]
+		}))
+
+		this.smaSeries = smaSeries;
 	}
+
+	public _updateChildren(){
+		super._updateChildren();
+		if (this.isDirty("smaColor")) {
+			this._updateSeriesColor(this.smaSeries, this.get("smaColor"), "smaColor")
+		}
+		if (this.isDirty("smaPeriod")) {
+			this._dataDirty = true;
+			this.setCustomData("smaPeriod", this.get("smaPeriod"));
+		}		
+	}
+
+
 
 	/**
 	 * @ignore
@@ -48,7 +96,7 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 	public prepareData() {
 		if (this.series) {
 			const dataItems = this.get("stockSeries").dataItems;
-			const period = this.get("period", 14);
+			let period = this.get("period", 14);
 			const data: Array<any> = [];
 			let i = 0;
 			let averageGain = 0;
@@ -106,6 +154,12 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 				prevAverageLoss = averageLoss;
 			})
 			this.series.data.setAll(data);
+
+			period = this.get("smaPeriod", 3);
+			this._sma(data, period, "valueS", "sma");
+
+			this.series.data.setAll(data);
+			this.smaSeries.data.setAll(data);
 		}
 	}
 }

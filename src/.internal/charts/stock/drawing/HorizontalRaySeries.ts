@@ -36,14 +36,19 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 
 			const series = this.get("series");
 			if (series && diP1 && diP2) {
-				const valueX = this._getXValue(diP2.get("valueX" as any));
-				const valueY = this._getYValue(valueX, valueX);
+				const valueXns = diP2.get("valueX" as any);
+				let valueY = diP2.get("valueY" as any)
+				const valueX = this._getXValue(valueXns);
+				valueY = this._getYValue(valueY, valueXns);
 				
 				this._setContext(diP1, "valueY", valueY, true);
 				this._setContext(diP2, "valueY", valueY, true);
 
-				this._setContext(diP1, "valueX", valueX);
-				this._setContext(diP2, "valueX", valueX + 0.01);
+				this._setContext(diP2, "valueX", valueX);
+				this._setContext(diP1, "valueX", valueX + 1);
+				
+				this._setXLocation(diP2, valueX);
+				this._setXLocation(diP1, valueX + 1);
 
 				this._positionBullets(diP1);
 				this._positionBullets(diP2);
