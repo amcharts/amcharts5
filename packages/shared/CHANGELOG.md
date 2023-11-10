@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.5.6] - 2023-11-10
+
+### Added
+- Each `<canvas>` element in chart will now have its `class` set to reflect its layer/order, so it can be targeted with CSS. E.g. `am5-layer-0`.
+- `ClusteredPointSeries` added. Allows automatically clustering closely-located bullets into groups. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/).
+- `zoomToDataItems()` method added to `MapPointSeries`. Can be used to zoom to a number of series data items so all of them are visible.
+
+### Fixed
+- `DataProcessor` was not parsing timestamp-based string dates ('"x"') properly.
+- `strokeGradient` set on an `AxisRenderer` was not being applied (since `5.5.5`).
+
+
 ## [5.5.5] - 2023-11-06
 
 ### Added

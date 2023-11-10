@@ -10,6 +10,7 @@ import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } 
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
+import type { IPoint } from "../../core/util/IPoint";
 import type { Animation } from "../../core/util/Entity";
 import type { IDisposer } from "../../core/util/Disposer";
 
@@ -84,6 +85,15 @@ export interface IMapPointSeriesDataItem extends IMapSeriesDataItem {
 	 */
 	fixed?: boolean;
 
+	/**
+	 * Point (in pixels) of a data item
+	 */
+	point?: IPoint;
+
+	/**
+	 * @ignore
+	 */
+	clipped?: boolean;
 }
 
 export interface IMapPointSeriesSettings extends IMapSeriesSettings {
@@ -380,7 +390,9 @@ export class MapPointSeries extends MapSeries {
 			const xy = projection(coordinates as any);
 
 			if (xy) {
-				sprite.setAll({ x: xy[0], y: xy[1] });
+				const point = { x: xy[0], y: xy[1] };
+				sprite.setAll(point);
+				dataItem.setRaw("point", point);
 			}
 
 			let visible = true;
@@ -395,6 +407,7 @@ export class MapPointSeries extends MapSeries {
 				}
 			}
 			sprite.setPrivate("visible", visible);
+			dataItem.set("clipped", !visible);
 
 			if (dataItem && angle != null && dataItem.get("autoRotate", bullet.get("autoRotate"))) {
 				sprite.set("rotation", angle + dataItem.get("autoRotateAngle", bullet.get("autoRotateAngle", 0)));
@@ -419,6 +432,50 @@ export class MapPointSeries extends MapSeries {
 				return chart.zoomToGeoPoint({ longitude: longitude, latitude: latitude }, zoomLevel, true, undefined, -longitude, -latitude);
 			}
 			return chart.zoomToGeoPoint({ longitude: longitude, latitude: latitude }, zoomLevel, true);
+		}
+	}
+
+
+	/**
+	 * Zooms the map in so that all points in the array are visible.
+	 *
+	 * @param   dataItems  An array of data items of points to zoom to
+	 * @param   rotate     Rotate the map so it is centered on the selected items
+	 * @return             Animation
+	 * @since 5.5.6
+	 */
+	zoomToDataItems(dataItems: Array<DataItem<IMapPointSeriesDataItem>>, rotate?: boolean): Animation<any> | undefined {
+
+		let left: number | null = null;
+		let right: number | null = null;
+		let top: number | null = null;
+		let bottom: number | null = null;
+
+		$array.each(dataItems, (dataItem) => {
+			const longitude = dataItem.get("longitude", 0);
+			const latitude = dataItem.get("latitude", 0);
+
+			if (left == null || left > longitude) {
+				left = longitude;
+			}
+			if (right == null || right < longitude) {
+				right = longitude;
+			}
+			if (top == null || top < latitude) {
+				top = latitude;
+			}
+			if (bottom == null || bottom > latitude) {
+				bottom = latitude;
+			}
+		})
+		if (left != null && right != null && top != null && bottom != null) {
+			const chart = this.chart;
+			if (chart) {
+				if (rotate) {
+					return chart.zoomToGeoBounds({ left, right, top, bottom }, undefined, -(left + (right - left) / 2), -(top + (top - bottom) / 2));
+				}
+				return chart.zoomToGeoBounds({ left, right, top, bottom });
+			}
 		}
 	}
 

@@ -45,6 +45,7 @@ import type { ChordNonRibbon } from "./../../../flow";
 import type { Circle } from "./../../../index";
 import type { CirclePattern } from "./../../../index";
 import type { ClockHand } from "./../../../radar";
+import type { ClusteredPointSeries } from "./../../../map";
 import type { ColorControl } from "./../../../stock";
 import type { ColorSet } from "./../../../index";
 import type { ColumnSeries } from "./../../../xy";
@@ -61,6 +62,7 @@ import type { DrawingSeries } from "./../../../stock";
 import type { DrawingToolControl } from "./../../../stock";
 import type { Dropdown } from "./../../../stock";
 import type { DropdownColors } from "./../../../stock";
+import type { DropdownControl } from "./../../../stock";
 import type { DropdownList } from "./../../../stock";
 import type { DropdownListControl } from "./../../../stock";
 import type { DurationAxis } from "./../../../xy";
@@ -126,8 +128,10 @@ import type { MovingAverageEnvelope } from "./../../../stock";
 import type { OHLC } from "./../../../xy";
 import type { OHLCSeries } from "./../../../xy";
 import type { OnBalanceVolume } from "./../../../stock";
+import type { OverboughtOversold } from "./../../../stock";
 import type { Pack } from "./../../../hierarchy";
 import type { PanelControls } from "./../../../stock";
+import type { ParallelChannelSeries } from "./../../../stock";
 import type { Partition } from "./../../../hierarchy";
 import type { PathPattern } from "./../../../index";
 import type { Pattern } from "./../../../index";
@@ -182,6 +186,7 @@ import type { SpriteResizer } from "./../../../index";
 import type { StandardDeviation } from "./../../../stock";
 import type { Star } from "./../../../index";
 import type { StepLineSeries } from "./../../../xy";
+import type { StochasticMomentumIndex } from "./../../../stock";
 import type { StochasticOscillator } from "./../../../stock";
 import type { StockChart } from "./../../../stock";
 import type { StockControl } from "./../../../stock";
@@ -257,6 +262,7 @@ export interface IClasses {
 	"Circle": () => Promise<typeof Circle>;
 	"CirclePattern": () => Promise<typeof CirclePattern>;
 	"ClockHand": () => Promise<typeof ClockHand>;
+	"ClusteredPointSeries": () => Promise<typeof ClusteredPointSeries>;
 	"ColorControl": () => Promise<typeof ColorControl>;
 	"ColorSet": () => Promise<typeof ColorSet>;
 	"ColumnSeries": () => Promise<typeof ColumnSeries>;
@@ -273,6 +279,7 @@ export interface IClasses {
 	"DrawingToolControl": () => Promise<typeof DrawingToolControl>;
 	"Dropdown": () => Promise<typeof Dropdown>;
 	"DropdownColors": () => Promise<typeof DropdownColors>;
+	"DropdownControl": () => Promise<typeof DropdownControl>;
 	"DropdownList": () => Promise<typeof DropdownList>;
 	"DropdownListControl": () => Promise<typeof DropdownListControl>;
 	"DurationAxis": () => Promise<typeof DurationAxis>;
@@ -338,8 +345,10 @@ export interface IClasses {
 	"OHLC": () => Promise<typeof OHLC>;
 	"OHLCSeries": () => Promise<typeof OHLCSeries>;
 	"OnBalanceVolume": () => Promise<typeof OnBalanceVolume>;
+	"OverboughtOversold": () => Promise<typeof OverboughtOversold>;
 	"Pack": () => Promise<typeof Pack>;
 	"PanelControls": () => Promise<typeof PanelControls>;
+	"ParallelChannelSeries": () => Promise<typeof ParallelChannelSeries>;
 	"Partition": () => Promise<typeof Partition>;
 	"PathPattern": () => Promise<typeof PathPattern>;
 	"Pattern": () => Promise<typeof Pattern>;
@@ -394,6 +403,7 @@ export interface IClasses {
 	"StandardDeviation": () => Promise<typeof StandardDeviation>;
 	"Star": () => Promise<typeof Star>;
 	"StepLineSeries": () => Promise<typeof StepLineSeries>;
+	"StochasticMomentumIndex": () => Promise<typeof StochasticMomentumIndex>;
 	"StochasticOscillator": () => Promise<typeof StochasticOscillator>;
 	"StockChart": () => Promise<typeof StockChart>;
 	"StockControl": () => Promise<typeof StockControl>;
@@ -470,6 +480,7 @@ const classes: IClasses = {
 	"Circle": () => import(/* webpackExports: "Circle", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Circle),
 	"CirclePattern": () => import(/* webpackExports: "CirclePattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.CirclePattern),
 	"ClockHand": () => import(/* webpackExports: "ClockHand", webpackChunkName: "json_radar" */ "./../../../radar").then((m) => m.ClockHand),
+	"ClusteredPointSeries": () => import(/* webpackExports: "ClusteredPointSeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.ClusteredPointSeries),
 	"ColorControl": () => import(/* webpackExports: "ColorControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ColorControl),
 	"ColorSet": () => import(/* webpackExports: "ColorSet", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.ColorSet),
 	"ColumnSeries": () => import(/* webpackExports: "ColumnSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.ColumnSeries),
@@ -486,6 +497,7 @@ const classes: IClasses = {
 	"DrawingToolControl": () => import(/* webpackExports: "DrawingToolControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DrawingToolControl),
 	"Dropdown": () => import(/* webpackExports: "Dropdown", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.Dropdown),
 	"DropdownColors": () => import(/* webpackExports: "DropdownColors", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownColors),
+	"DropdownControl": () => import(/* webpackExports: "DropdownControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownControl),
 	"DropdownList": () => import(/* webpackExports: "DropdownList", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownList),
 	"DropdownListControl": () => import(/* webpackExports: "DropdownListControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownListControl),
 	"DurationAxis": () => import(/* webpackExports: "DurationAxis", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.DurationAxis),
@@ -551,8 +563,10 @@ const classes: IClasses = {
 	"OHLC": () => import(/* webpackExports: "OHLC", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.OHLC),
 	"OHLCSeries": () => import(/* webpackExports: "OHLCSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.OHLCSeries),
 	"OnBalanceVolume": () => import(/* webpackExports: "OnBalanceVolume", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.OnBalanceVolume),
+	"OverboughtOversold": () => import(/* webpackExports: "OverboughtOversold", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.OverboughtOversold),
 	"Pack": () => import(/* webpackExports: "Pack", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.Pack),
 	"PanelControls": () => import(/* webpackExports: "PanelControls", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.PanelControls),
+	"ParallelChannelSeries": () => import(/* webpackExports: "ParallelChannelSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ParallelChannelSeries),
 	"Partition": () => import(/* webpackExports: "Partition", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.Partition),
 	"PathPattern": () => import(/* webpackExports: "PathPattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.PathPattern),
 	"Pattern": () => import(/* webpackExports: "Pattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Pattern),
@@ -607,6 +621,7 @@ const classes: IClasses = {
 	"StandardDeviation": () => import(/* webpackExports: "StandardDeviation", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StandardDeviation),
 	"Star": () => import(/* webpackExports: "Star", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Star),
 	"StepLineSeries": () => import(/* webpackExports: "StepLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.StepLineSeries),
+	"StochasticMomentumIndex": () => import(/* webpackExports: "StochasticMomentumIndex", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StochasticMomentumIndex),
 	"StochasticOscillator": () => import(/* webpackExports: "StochasticOscillator", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StochasticOscillator),
 	"StockChart": () => import(/* webpackExports: "StockChart", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StockChart),
 	"StockControl": () => import(/* webpackExports: "StockControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StockControl),

@@ -45,6 +45,7 @@ import type { ChordNonRibbon } from "./../charts/flow/ChordNonRibbon.js";
 import type { Circle } from "./render/Circle.js";
 import type { CirclePattern } from "./render/patterns/CirclePattern.js";
 import type { ClockHand } from "./../charts/radar/ClockHand.js";
+import type { ClusteredPointSeries } from "./../charts/map/ClusteredPointSeries.js";
 import type { ColorControl } from "./../charts/stock/toolbar/ColorControl.js";
 import type { ColorSet } from "./util/ColorSet.js";
 import type { ColumnSeries } from "./../charts/xy/series/ColumnSeries.js";
@@ -61,6 +62,7 @@ import type { DrawingSeries } from "./../charts/stock/drawing/DrawingSeries.js";
 import type { DrawingToolControl } from "./../charts/stock/toolbar/DrawingToolControl.js";
 import type { Dropdown } from "./../charts/stock/toolbar/Dropdown.js";
 import type { DropdownColors } from "./../charts/stock/toolbar/DropdownColors.js";
+import type { DropdownControl } from "./../charts/stock/toolbar/DropdownControl.js";
 import type { DropdownList } from "./../charts/stock/toolbar/DropdownList.js";
 import type { DropdownListControl } from "./../charts/stock/toolbar/DropdownListControl.js";
 import type { DurationAxis } from "./../charts/xy/axes/DurationAxis.js";
@@ -126,6 +128,7 @@ import type { MovingAverageEnvelope } from "./../charts/stock/indicators/MovingA
 import type { OHLC } from "./../charts/xy/series/OHLC.js";
 import type { OHLCSeries } from "./../charts/xy/series/OHLCSeries.js";
 import type { OnBalanceVolume } from "./../charts/stock/indicators/OnBalanceVolume.js";
+import type { OverboughtOversold } from "./../charts/stock/indicators/OverboughtOversold.js";
 import type { Pack } from "./../charts/hierarchy/Pack.js";
 import type { PanelControls } from "./../charts/stock/PanelControls.js";
 import type { ParallelChannelSeries } from "./../charts/stock/drawing/ParallelChannelSeries.js";
@@ -259,6 +262,7 @@ export interface IClasses {
 	"Circle": Circle;
 	"CirclePattern": CirclePattern;
 	"ClockHand": ClockHand;
+	"ClusteredPointSeries": ClusteredPointSeries;
 	"ColorControl": ColorControl;
 	"ColorSet": ColorSet;
 	"ColumnSeries": ColumnSeries;
@@ -275,6 +279,7 @@ export interface IClasses {
 	"DrawingToolControl": DrawingToolControl;
 	"Dropdown": Dropdown;
 	"DropdownColors": DropdownColors;
+	"DropdownControl": DropdownControl;
 	"DropdownList": DropdownList;
 	"DropdownListControl": DropdownListControl;
 	"DurationAxis": DurationAxis<AxisRenderer>;
@@ -340,6 +345,7 @@ export interface IClasses {
 	"OHLC": OHLC;
 	"OHLCSeries": OHLCSeries;
 	"OnBalanceVolume": OnBalanceVolume;
+	"OverboughtOversold": OverboughtOversold;
 	"Pack": Pack;
 	"PanelControls": PanelControls;
 	"ParallelChannelSeries": ParallelChannelSeries;
@@ -397,8 +403,8 @@ export interface IClasses {
 	"StandardDeviation": StandardDeviation;
 	"Star": Star;
 	"StepLineSeries": StepLineSeries;
-	"StochasticOscillator": StochasticOscillator;
 	"StochasticMomentumIndex": StochasticMomentumIndex;
+	"StochasticOscillator": StochasticOscillator;
 	"StockChart": StockChart;
 	"StockControl": StockControl;
 	"StockLegend": StockLegend;

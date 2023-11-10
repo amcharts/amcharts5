@@ -298,6 +298,7 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	public _beforeChanged() {
+		super._beforeChanged();
 		if (this.isDirty("minGridDistance")) {
 			this.root.events.once("frameended", () => {
 				this.axis.markDirtySize();

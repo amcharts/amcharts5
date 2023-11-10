@@ -577,6 +577,11 @@ export class DateFormatter extends Entity {
 			return new Date(source);
 		}
 
+		// Are we parsing a timestamp?
+		if (format == "x") {
+			return new Date(parseInt(source));
+		}
+
 		// No? Let's check if it's string, and try converting to it if nec
 		if (!$type.isString(source)) {
 			source = source.toString();

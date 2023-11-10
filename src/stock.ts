@@ -5,6 +5,7 @@ export { PanelControls, IPanelControlsPrivate, IPanelControlsSettings } from "./
 export { SettingsModal, ISettingsModalEvents, ISettingsModalPrivate, ISettingsModalSettings } from "./.internal/charts/stock/SettingsModal";
 
 export { Indicator, IIndicatorEditableSetting, IIndicatorEvents, IIndicatorPrivate, IIndicatorSettings } from "./.internal/charts/stock/indicators/Indicator";
+export { OverboughtOversold, IOverboughtOversoldEvents, IOverboughtOversoldPrivate, IOverboughtOversoldSettings } from "./.internal/charts/stock/indicators/OverboughtOversold";
 export { ChartIndicator, IChartIndicatorEvents, IChartIndicatorPrivate, IChartIndicatorSettings } from "./.internal/charts/stock/indicators/ChartIndicator";
 export { MovingAverage, IMovingAverageEvents, IMovingAveragePrivate, IMovingAverageSettings } from "./.internal/charts/stock/indicators/MovingAverage";
 export { Momentum, IMomentumEvents, IMomentumPrivate, IMomentumSettings } from "./.internal/charts/stock/indicators/Momentum";

@@ -3371,6 +3371,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		layer.order = order;
 		layer.visible = visible;
 
+		layer.view.className = "am5-layer-" + order;
+
 		if (layer.visible) {
 			this.resizeLayer(layer);
 		}

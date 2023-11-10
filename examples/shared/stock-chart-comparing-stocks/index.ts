@@ -242,6 +242,9 @@ var mainSeriesControl = am5stock.DropdownListControl.new(root, {
 });
 
 mainSeriesControl.events.on("selected", function(ev) {
+  var valueSeries = stockChart.get("stockSeries");
+  var volumeSeries = stockChart.get("volumeSeries");
+  
   mainSeriesControl.set("name", ev.item.subLabel);
   valueSeries.set("name", ev.item.subLabel);
   loadData(ev.item.subLabel, [valueSeries, volumeSeries, sbSeries], currentGranularity);
