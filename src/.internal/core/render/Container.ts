@@ -310,10 +310,10 @@ export class Container extends Sprite {
 		}
 	}
 
-	public _applyThemes(): boolean {
-		if (super._applyThemes()) {
+	public _applyThemes(force: boolean = false): boolean {
+		if (super._applyThemes(force)) {
 			this.eachChildren((child) => {
-				child._applyThemes();
+				child._applyThemes(force);
 			});
 
 			return true;

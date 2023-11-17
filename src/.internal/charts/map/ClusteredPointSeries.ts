@@ -7,6 +7,8 @@ import { Label } from "../../core/render/Label";
 
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
+import * as d3hierarchy from "d3-hierarchy";
+import * as $math from "../../core/util/Math";
 
 
 export interface IClusteredDataItem extends IComponentDataItem {
@@ -32,6 +34,16 @@ export interface IClusteredPointSeriesDataItem extends IMapPointSeriesDataItem {
 	 * @readonly
 	 */
 	cluster?: DataItem<IClusteredDataItem>;
+
+	/**
+	 * How much bullet was moved from its original position
+	 */
+	dx?: number;
+
+	/**
+	 * How much bullet was moved from its original position
+	 */
+	dy?: number;
 }
 
 export interface IClusteredPointSeriesPrivate extends IMapPointSeriesPrivate {
@@ -67,6 +79,35 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_bullet} for more info
 	 */
 	clusteredBullet?: (root: Root, series: ClusteredPointSeries, dataItem: DataItem<IClusteredPointSeriesDataItem>) => Bullet | undefined;
+
+	/**
+	 * If bullets are closer to each other than `scatterDistance`, they will be
+	 * scattered so that all are visible.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
+	 * @default 5
+	 * @since 5.5.7
+	 */
+	scatterDistance?: number;
+
+	/**
+	 * Presumed radius of a each bullet when scattering them.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
+	 * @default 8
+	 * @since 5.5.7
+	 */
+	scatterRadius?: number;
+
+	/**
+	 * If a map is zoomed to a maxZoomLevel * stopClusterZoom, clusters will be
+	 * disabled.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
+	 * @default 0.95
+	 * @since 5.5.7
+	 */
+	stopClusterZoom?: number
 }
 
 /**
@@ -89,8 +130,14 @@ export class ClusteredPointSeries extends MapPointSeries {
 	protected _dataItem: DataItem<this["_dataItemSettings"]> = this.makeDataItem({});
 	protected _clusterIndex: number = 0;
 	protected _clusters: Array<Array<DataItem<this["_dataItemSettings"]>>> = [];
-
 	public clusteredDataItems: Array<DataItem<IClusteredDataItem>> = [];
+
+	protected _scatterIndex: number = 0;
+	protected _scatters: Array<Array<DataItem<this["_dataItemSettings"]>>> = [];
+
+	public _packLayout = d3hierarchy.pack();
+
+	protected _spiral: Array<{ x: number, y: number }> = [];
 
 	protected _afterNew() {
 		this.fields.push("groupId");
@@ -101,6 +148,10 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 	public _updateChildren() {
 		super._updateChildren();
+
+		if (this.isDirty("scatterRadius")) {
+			this._spiral = $math.spiralPoints(0, 0, 300, 300, 0, 3, 3, 0, 0)
+		}
 
 		const groups: { [index: string]: Array<DataItem<IClusteredPointSeriesDataItem>> } = {};
 		// distribute to groups
@@ -113,6 +164,8 @@ export class ClusteredPointSeries extends MapPointSeries {
 			groups[groupId].push(dataItem);
 		})
 
+		this._scatterIndex = -1;
+		this._scatters = [];
 		this._clusterIndex = -1;
 		this._clusters = [];
 
@@ -122,6 +175,10 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 		$array.each(this.dataItems, (dataItem) => {
 			dataItem.setRaw("cluster", undefined);
+		})
+
+		$object.each(groups, (_key, group) => {
+			this._scatterGroup(group);
 		})
 
 		$object.each(groups, (_key, group) => {
@@ -161,7 +218,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 	protected _clusterGroup(dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
 		const chart = this.chart;
-		if (chart && chart.get("zoomLevel", 1) >= chart.get("maxZoomLevel", 100) * 0.95) {
+		if (chart && chart.get("zoomLevel", 1) >= chart.get("maxZoomLevel", 100) * this.get("stopClusterZoom", 0.95)) {
 			// void
 		}
 		else {
@@ -279,11 +336,100 @@ export class ClusteredPointSeries extends MapPointSeries {
 				if (di && !di.get("clipped")) {
 					const diPoint = di.get("point");
 					if (diPoint) {
+
 						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < this.get("minDistance", 20)) {
 							const cluster = this._clusters[this._clusterIndex];
 							cluster.push(di);
 							$array.remove(dataItems, di);
 							this._clusterDataItem(di, dataItems);
+						}
+					}
+				}
+			})
+		}
+	}
+
+	protected _scatterGroup(dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
+		const chart = this.chart;
+		if (chart && chart.get("zoomLevel", 1) >= chart.get("maxZoomLevel", 100) * this.get("stopClusterZoom", 0.95)) {
+			while (dataItems.length > 0) {
+				this._scatterIndex++;
+				this._scatters[this._scatterIndex] = [];
+				const scatter = this._scatters[this._scatterIndex];
+				const dataItem = dataItems[0];
+
+				scatter.push(dataItem);
+				$array.remove(dataItems, dataItem);
+
+				this._scatterDataItem(dataItem, dataItems);
+			}
+
+			$array.each(this._scatters, (scatter) => {
+				let len = scatter.length;
+
+				if (len > 1) {
+					let previousCircles: Array<{ x: number, y: number, radius: number }> = [];
+					let s = 0;
+					let radius = this.get("scatterRadius", 8);
+					$array.each(scatter, (dataItem) => {
+						let spiralPoint = this._spiral[s];
+						let intersects = true;
+
+						if (previousCircles.length > 0) {
+							while (intersects) {
+								$array.each(previousCircles, (previousCircle) => {
+									intersects = false;
+									while ($math.circlesOverlap({ x: spiralPoint.x, y: spiralPoint.y, radius: radius }, previousCircle)) {
+										s++;
+
+										if (this._spiral[s] == undefined) {
+											intersects = false;
+										}
+										else {
+											intersects = true;
+											spiralPoint = this._spiral[s];
+										}
+									}
+								})
+							}
+						}
+
+						const dx = spiralPoint.x;
+						const dy = spiralPoint.y;
+
+						previousCircles.push({ x: dx, y: dy, radius: radius });
+
+						dataItem.set("dx", dx);
+						dataItem.set("dy", dy);
+
+						const bullets = dataItem.bullets;
+						if (bullets) {
+							$array.each(bullets, (bullet) => {
+								const sprite = bullet.get("sprite");
+								if (sprite) {
+									sprite.setAll({ dx: dx, dy: dy });
+								}
+							})
+						}
+					})
+				}
+			})
+		}
+	}
+
+	protected _scatterDataItem(dataItem: DataItem<IClusteredPointSeriesDataItem>, dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
+		const point = dataItem.get("point");
+		if (point) {
+			$array.each(dataItems, (di) => {
+				if (di && !di.get("clipped")) {
+					const diPoint = di.get("point");
+
+					if (diPoint) {
+						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < this.get("scatterDistance", 5)) {
+							const scatter = this._scatters[this._scatterIndex];
+							scatter.push(di);
+							$array.remove(dataItems, di);
+							this._scatterDataItem(di, dataItems);
 						}
 					}
 				}

@@ -743,6 +743,10 @@ export class LineSeries extends XYSeries {
 
 							marker.children.push(sprite);
 							sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });
+
+							marker.events.on("boundschanged", ()=>{
+								sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });
+							})
 						}
 					}
 				}

@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.5.7] - 2023-11-17
+
+### Added
+- Two new settings on a `ClusteredPointSeries`: `scatterDistance` and `scatterRadius`. Allow exploding clusters of very close points when further zoom-in is no longer possible. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings).
+
+### Fixed
+- `PieSeries` was not issuing proper colors for its slices with some JSON config setups.
+- In `StockChart` when percent mode was being switched off and related series toggled via legend, it would revert to percent mode.
+- When updating data on a `PieSeries` its ticks could be displayed going all the way to the center briefly.
+- Changing data on a main series in a `StockChart` was not updating related indicators properly.
+- Legend marker for a `LineSeries` with bullets could display incorrectly if the whole chart was created before adding it to the `Root` container.
+
+
 ## [5.5.6] - 2023-11-10
 
 ### Added

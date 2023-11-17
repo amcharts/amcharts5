@@ -327,17 +327,25 @@ export class StockChart extends Container {
 
 		if (this.isDirty("stockSeries")) {
 			if (stockSeries) {
+				const previous = this._prevSettings.stockSeries;
 				this.indicators.each((indicator) => {
-					indicator._setSoft("stockSeries", stockSeries);
+					if (previous == indicator.get("stockSeries")) {
+						indicator.set("stockSeries", stockSeries);
+					}
+					else {
+						indicator._setSoft("stockSeries", stockSeries);
+					}
 				})
 				const mainChart = stockSeries.chart;
 
 				if (mainChart) {
-					const previous = this._prevSettings.stockSeries;
 					mainChart.series.each((series) => {
 						if (series.isType<DrawingSeries>("DrawingSeries")) {
 							let s = series.get("series");
 							if (s == previous) {
+								series.set("series", stockSeries);
+							}
+							else {
 								series._setSoft("series", stockSeries);
 							}
 						}
@@ -533,9 +541,14 @@ export class StockChart extends Container {
 					$array.each(seriesList, (series) => {
 						if (percentScale) {
 							series.setAll(seriesSettings);
+							series.states.lookup("default")!.setAll(seriesSettings);
 						}
 						else {
 							series.states.apply("comparingDefaults");
+							const seriesDefaults = series.states.lookup("comparingDefaults");
+							if (seriesDefaults) {
+								series.states.lookup("default")!.setAll(seriesDefaults._settings);
+							}
 						}
 					});
 				}

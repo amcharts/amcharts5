@@ -68,6 +68,13 @@ export class MapChartDefaultTheme extends Theme {
 			autoScale: false
 		})
 
+		r("ClusteredPointSeries").setAll({
+			minDistance: 20,
+			scatterDistance: 3,
+			scatterRadius: 8,
+			stopClusterZoom: 0.95
+		})
+
 		r("MapLineSeries").setAll({
 			affectsBounds: false
 		})

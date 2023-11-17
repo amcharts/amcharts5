@@ -592,6 +592,9 @@ export class JsonParser {
 			} else {
 				throw new Error("When using the parent setting, the entity must be a Sprite");
 			}
+
+		} else {
+			output._applyThemes(true);
 		}
 
 		state.afterParse();

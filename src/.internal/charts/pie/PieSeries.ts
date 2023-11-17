@@ -3,6 +3,7 @@ import type { PieChart } from "./PieChart";
 
 import { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem, IPercentSeriesPrivate } from "../percent/PercentSeries";
 import { Template } from "../../core/util/Template";
+import type { IPoint } from "../../core/util/IPoint";
 import { Slice } from "../../core/render/Slice";
 import { Tick } from "../../core/render/Tick";
 import { RadialLabel } from "../../core/render/RadialLabel";
@@ -265,20 +266,24 @@ export class PieSeries extends PercentSeries {
 
 			x = label.x();
 			y = label.y();
+			let points:Array<IPoint> = [];
 
-			if (label.get("textType") == "circular") {
-				const labelRadius = label.radius() - label.get("paddingBottom", 0);
-				const labelAngle = label.get("labelAngle", 0);
-				x = labelRadius * $math.cos(labelAngle);
-				y = labelRadius * $math.sin(labelAngle);
+			if(x != 0 && y != 0){
+				if (label.get("textType") == "circular") {
+					const labelRadius = label.radius() - label.get("paddingBottom", 0);
+					const labelAngle = label.get("labelAngle", 0);
+					x = labelRadius * $math.cos(labelAngle);
+					y = labelRadius * $math.sin(labelAngle);
+				}
+
+				let dx = -pr;
+				if (label.getPrivate("left")) {
+					dx = pl;
+				}
+				points = [{ x: slice.x() + radius * cos, y: slice.y() + radius * sin }, { x: x + dx, y: y }, { x: x, y: y }];				
 			}
 
-			let dx = -pr;
-			if (label.getPrivate("left")) {
-				dx = pl;
-			}
-
-			tick.set("points", [{ x: slice.x() + radius * cos, y: slice.y() + radius * sin }, { x: x + dx, y: y }, { x: x, y: y }]);
+			tick.set("points", points);
 		}
 	}
 

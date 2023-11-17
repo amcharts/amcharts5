@@ -303,11 +303,72 @@ export function getPointOnLine(pointA: IPoint, pointB: IPoint, position: number)
  * @return Closes value from the array
  */
 export function closest(values: number[], referenceValue: number): number {
-	return values.reduce(function(prev, curr) {
+	return values.reduce(function (prev, curr) {
 		return (Math.abs(curr - referenceValue) < Math.abs(prev - referenceValue) ? curr : prev);
 	});
 }
 
-export function boundsOverlap (bounds1:IBounds, bounds2:IBounds) {  
-  return !(bounds1.bottom < bounds2.top || bounds2.bottom < bounds1.top || bounds1.right < bounds2.left || bounds2.right < bounds1.left);
+/**
+ * Returns true if bounds overlap
+ * @param bounds1 IBounds
+ * @param bounds2 IBounds
+ * @returns boolean
+ */
+export function boundsOverlap(bounds1: IBounds, bounds2: IBounds): boolean {
+	return !(bounds1.bottom < bounds2.top || bounds2.bottom < bounds1.top || bounds1.right < bounds2.left || bounds2.right < bounds1.left);
+}
+
+/**
+ * Generates points of a spiral
+ * @param cx 
+ * @param cy 
+ * @param radius 
+ * @param radiusY 
+ * @param innerRadius 
+ * @param step 
+ * @param radiusStep 
+ * @param startAngle 
+ * @param endAngle 
+ * @returns IPoint[]
+ */
+export function spiralPoints(cx: number, cy: number, radius: number, radiusY: number, innerRadius: number, step: number, radiusStep: number, startAngle: number, endAngle: number): IPoint[] {
+
+	let r = innerRadius + 0.01;
+	let angle = startAngle * RADIANS;
+	let points = [];
+
+	while (r < radius + radiusStep) {
+
+		let stepSize = step;
+		if (stepSize / 2 > r) {
+			stepSize = 2 * r;
+		}
+
+		angle += 2 * Math.asin(stepSize / 2 / r);
+
+		if (angle * DEGREES > endAngle + ((radius - innerRadius) / radiusStep) * 360) {
+			break;
+		}
+
+		let degrees = angle * DEGREES;
+
+		let point = { x: cx + r * Math.cos(angle), y: cy + r * radiusY / radius * Math.sin(angle) };
+		points.push(point);
+
+		r = innerRadius + degrees / 360 * radiusStep;
+	}
+
+	points.shift();
+
+	return points;
+}
+
+/**
+ * Returns true if circles overlap
+ * @param circle1
+ * @param circle2 
+ * @returns boolean
+ */
+export function circlesOverlap(circle1: { x: number, y: number, radius: number }, circle2: { x: number, y: number, radius: number }): boolean {
+	return Math.hypot(circle1.x - circle2.x, circle1.y - circle2.y) <= circle1.radius + circle2.radius;
 }

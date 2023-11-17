@@ -1482,7 +1482,7 @@ export class Entity extends Settings implements IDisposer {
 		this._templates.length = 0;
 	}
 
-	public _applyThemes(): boolean {
+	public _applyThemes(force: boolean = false): boolean {
 		let isConnected = false;
 
 		const defaults: Array<Array<Theme>> = [];
@@ -1527,7 +1527,7 @@ export class Entity extends Settings implements IDisposer {
 
 		this._removeTemplates();
 
-		if (isConnected) {
+		if (isConnected || force) {
 			$array.eachReverse(this.classNames, (name) => {
 				const allRules: Array<IRule<this>> = [];
 
@@ -1569,12 +1569,12 @@ export class Entity extends Settings implements IDisposer {
 
 		this._applyTemplates();
 
-		if (isConnected) {
+		if (isConnected || force) {
 			// This causes it to only run the setup function the first time that the themes are applied
 			this._runSetup = false;
 		}
 
-		return isConnected;
+		return isConnected || force;
 	}
 
 	public _changed(): void { }

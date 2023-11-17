@@ -297,7 +297,7 @@ export class WordCloud extends Series {
 			for (let i = 0; i < this._sets; i++) {
 				// bigger step at the beginning
 				const setStep = step * (this._sets - i);
-				const points = this._spiralPoints(w / 2, h / 2, w, h, 0, setStep * h / bigger, setStep * w / bigger, 0, 0)
+				const points = $math.spiralPoints(w / 2, h / 2, w, h, 0, setStep * h / bigger, setStep * w / bigger, 0, 0)
 
 				// generated more points and remove those out of bounds
 				for (let i = points.length - 1; i >= 0; i--) {
@@ -323,11 +323,15 @@ export class WordCloud extends Series {
 			});
 
 			this._dataItems.sort((a, b) => {
-				let aValue = a.get("value");
-				let bValue = b.get("value");
+				let aValue = a.get("value", 0);
+				let bValue = b.get("value", 0);
 
-				if (aValue > bValue) return -1;
-				if (aValue < bValue) return 1;
+				if (aValue > bValue) {
+					return -1;
+				}
+				if (aValue < bValue) {
+					return 1;
+				}
 				return 0;
 
 			})
@@ -629,7 +633,7 @@ export class WordCloud extends Series {
 				}
 			}
 
-			words.sort(function(a, b) {
+			words.sort(function (a, b) {
 				if (a.value == b.value) {
 					return 0;
 				}
@@ -661,39 +665,6 @@ export class WordCloud extends Series {
 		return word[0] != lword[0]
 			&& word.substr(1) == lword.substr(1)
 			&& word != lword;
-	}
-
-
-	public _spiralPoints(cx: number, cy: number, radius: number, radiusY: number, innerRadius: number, step: number, radiusStep: number, startAngle: number, endAngle: number): IPoint[] {
-
-		let r = innerRadius + 0.01;
-		let angle = startAngle * $math.RADIANS;
-		let points = [];
-
-		while (r < radius + radiusStep) {
-
-			let stepSize = step;
-			if (stepSize / 2 > r) {
-				stepSize = 2 * r;
-			}
-
-			angle += 2 * Math.asin(stepSize / 2 / r);
-
-			if (angle * $math.DEGREES > endAngle + ((radius - innerRadius) / radiusStep) * 360) {
-				break;
-			}
-
-			let degrees = angle * $math.DEGREES;
-
-			let point = { x: cx + r * Math.cos(angle), y: cy + r * radiusY / radius * Math.sin(angle) };
-			points.push(point);
-
-			r = innerRadius + degrees / 360 * radiusStep;
-		}
-
-		points.shift();
-
-		return points;
 	}
 
 	protected _hasColor(x: number, y: number, w: number, h: number, cols: number): boolean {
