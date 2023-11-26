@@ -272,6 +272,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _isPanning: boolean = false;
 
 	/**
+	 * Array of minor data items.
+	 */
+	public  minorDataItems: Array<DataItem<this["_dataItemSettings"]>> = [];
+
+	/**
 	 * A [[Container]] that holds all the axis label elements.
 	 *
 	 * @default Container.new()
@@ -683,7 +688,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 		if (this.isDirty("start") || this.isDirty("end")) {
 			const chart = this.chart;
-			if(chart){
+			if (chart) {
 				chart._updateCursor();
 			}
 
@@ -855,22 +860,89 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 */
 	public abstract basePosition(): number;
 
-	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>, tags: Array<string>) {
+	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>, tags: Array<string>, minor?: boolean) {
 		const renderer = this.get("renderer");
+		let m = "minor";
 
-		if (!dataItem.get("label")) {
+		const label = dataItem.get("label");
+		if (!label) {
 			renderer.makeLabel(dataItem, tags);
 		}
+		else {
+			let themeTags = label.get("themeTags");
+			let remove = false;
+			if (minor) {
+				if (themeTags?.indexOf(m) == -1) {
+					remove = true;
+				}
+			}
+			else {
+				if (themeTags?.indexOf(m) != -1) {
+					remove = true;
+				}
+			}
 
-		if (!dataItem.get("grid")) {
+			if (remove) {
+				label.parent?.children.removeValue(label);
+				renderer.makeLabel(dataItem, tags);
+				label.dispose();
+				renderer.labels.removeValue(label);
+			}
+		}
+
+		const grid = dataItem.get("grid");
+
+		if (!grid) {
 			renderer.makeGrid(dataItem, tags);
 		}
+		else {
+			let themeTags = grid.get("themeTags");
+			let remove = false;
+			if (minor) {
+				if (themeTags?.indexOf(m) == -1) {
+					remove = true;
+				}
+			}
+			else {
+				if (themeTags?.indexOf(m) != -1) {
+					remove = true;
+				}
+			}
 
-		if (!dataItem.get("tick")) {
-			renderer.makeTick(dataItem, tags);
+			if (remove) {
+				grid.parent?.children.removeValue(grid);
+				renderer.makeGrid(dataItem, tags);
+				grid.dispose();
+				renderer.grid.removeValue(grid);
+			}
 		}
 
-		if (!dataItem.get("axisFill")) {
+		const tick = dataItem.get("tick");
+		if (!tick) {
+			renderer.makeTick(dataItem, tags);
+		}
+		else {
+			let remove = false;
+			let themeTags = tick.get("themeTags");
+			if (minor) {
+				if (themeTags?.indexOf(m) == -1) {
+					remove = true;
+				}
+			}
+			else {
+				if (themeTags?.indexOf(m) != -1) {
+					remove = true;
+				}
+			}
+			if (remove) {
+				tick.parent?.children.removeValue(tick);
+				renderer.makeTick(dataItem, tags);
+				tick.dispose();
+				renderer.ticks.removeValue(tick);
+			}
+		}
+
+		if (!minor && !dataItem.get("axisFill")) {
 			renderer.makeAxisFill(dataItem, tags);
 		}
 
@@ -957,7 +1029,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					const bounds = label.localBounds();
 					const w = Math.ceil(bounds.right - bounds.left);
 
-					if (w > gWidth) {						
+					if (w > gWidth) {
 						text = label.text._getText();
 					}
 				}

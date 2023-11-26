@@ -22,7 +22,7 @@ export interface IDropdownEvents extends IEntityEvents {
 }
 
 /**
- * @todo revview
+ * A dropdown control for [[StockToolbar]].
  */
 export class Dropdown extends Entity {
 	public static className: string = "Dropdown";

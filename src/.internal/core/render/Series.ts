@@ -355,19 +355,46 @@ export abstract class Series extends Component {
 	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction:(root: Root, series:Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?:number):Bullet | undefined{
 		const bullet = bulletFunction(this._root, this, dataItem);
 		if(bullet){
-			let sprite = bullet.get("sprite");
-
-			if (sprite) {
-				sprite._setDataItem(dataItem);
-				sprite.setRaw("position", "absolute");
-				this.bulletsContainer.children.push(sprite);
-			}
 			bullet._index = index;
-			bullet.series = this;
-			dataItem.bullets!.push(bullet);
+			this._makeBulletReal(dataItem, bullet);
 		}
 		return bullet;
 	}
+
+	protected _makeBulletReal(dataItem: DataItem<this["_dataItemSettings"]>, bullet:Bullet){
+		let sprite = bullet.get("sprite");
+
+		if (sprite) {
+			sprite._setDataItem(dataItem);
+			sprite.setRaw("position", "absolute");
+			this.bulletsContainer.children.push(sprite);
+		}
+		bullet.series = this;
+		dataItem.bullets!.push(bullet);
+	}
+
+	/**
+	 * Adds bullet directly to a data item.
+	 *
+	 * Please note: method accepts [[Bullet]] instance as a paramter, not a
+	 * reference to a function.
+	 *
+	 * You should add Bullet instance, not a method like you do it on series.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Adding_directly_to_data_item} for more info
+	 * @since 5.6.0
+	 *
+	 * @param  dataItem  Target data item
+	 * @param  bullet    Bullet instance
+	 */
+	public addBullet(dataItem:DataItem<this["_dataItemSettings"]>, bullet:Bullet){
+		if(!dataItem.bullets){
+			dataItem.bullets = [];
+		}
+		if(bullet){
+			this._makeBulletReal(dataItem, bullet);
+		}
+	}	
 
 	public _clearDirty() {
 		super._clearDirty();
@@ -640,7 +667,7 @@ export abstract class Series extends Component {
 		}
 
 		if(this.get("visible")){
-			if (this.bullets.length > 0) {
+			//if (this.bullets.length > 0) {
 				let count = this.dataItems.length;
 				let startIndex = this.startIndex();
 				let endIndex = this.endIndex();
@@ -663,9 +690,12 @@ export abstract class Series extends Component {
 				for (let i = endIndex; i < count; i++) {
 					this._hideBullets(this.dataItems[i]);
 				}
-			}
+			//}
 		}
 	}
+
+
+
 
 	public _positionBullets(dataItem: DataItem<this["_dataItemSettings"]>){
 		if(dataItem.bullets){

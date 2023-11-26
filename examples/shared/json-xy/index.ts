@@ -115,8 +115,9 @@ am5plugins_json.JsonParser.new(root).parse({
           count: 1
         },
         renderer: {
-          type: "AxisRendererX",
+          type: "AxisRendererX",          
           settings: {
+            minorGridEnabled:true,
             pan: "zoom"
           },
           properties: {
@@ -124,7 +125,7 @@ am5plugins_json.JsonParser.new(root).parse({
               properties: {
                 template: {
                   settings: {
-                    forceHidden: true
+                    strokeOpacity: 0.2
                   }
                 }
               }

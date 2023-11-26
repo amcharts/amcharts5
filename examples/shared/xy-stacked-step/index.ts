@@ -66,12 +66,17 @@ function generateDatas(count: number) {
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   baseInterval: { timeUnit: "day", count: 1 },
-  renderer: am5xy.AxisRendererX.new(root, {}),
+  renderer: am5xy.AxisRendererX.new(root, {
+    minorGridEnabled: true
+  }),
   tooltip: am5.Tooltip.new(root, {})
 }));
 
 const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  renderer: am5xy.AxisRendererY.new(root, {})
+  renderer: am5xy.AxisRendererY.new(root, {
+    minorGridEnabled: true,
+    minGridDistance:70
+  })
 }));
 
 // Add series

@@ -76,7 +76,7 @@ export interface IStockControlEvents extends IEntityEvents {
 }
 
 /**
- * @todo revview
+ * A base class for controls on [[StockToolbar]].
  */
 export class StockControl extends Entity {
 	public static className: string = "StockControl";

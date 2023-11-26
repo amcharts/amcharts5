@@ -62,7 +62,9 @@ const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
     timeUnit: "day",
     count: 1
   },
-  renderer: am5xy.AxisRendererX.new(root, {}),
+  renderer: am5xy.AxisRendererX.new(root, {
+    minorGridEnabled: true
+  }),
   tooltip: am5.Tooltip.new(root, {})
 }));
 

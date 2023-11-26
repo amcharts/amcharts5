@@ -36,7 +36,8 @@ cursor.lineY.set("visible", false);
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 var xRenderer = am5xy.AxisRendererX.new(root, {
-  minGridDistance: 30
+  minGridDistance: 30,
+  minorGridEnabled: true
 });
 xRenderer.labels.template.setAll({
   rotation: -90,

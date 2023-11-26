@@ -204,6 +204,11 @@ export interface IValueAxisDataItem extends IAxisDataItem {
 	endValue?: number;
 
 	/**
+	 * @ignore
+	 */
+	labelEndValue?: number;
+
+	/**
 	 * If set to `true` the values fo this data item will be factored in when
 	 * calculating scale of the [[ValueAxis]]. Useful for axis ranges.
 	 * 
@@ -453,7 +458,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			const selectionMax = this.getPrivate("selectionMax")! + step;
 
 			let value = selectionMin - step;
-			let i = 0;
 			let differencePower = 1;
 			let minLog = min;
 
@@ -482,7 +486,32 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 
+			/// minor grid
+			const renderer = this.get("renderer");
+			const minorLabelsEnabled = renderer.get("minorLabelsEnabled");
+			const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
+
+			let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(step)) * Math.LOG10E));
+
+			const stepAdjusted = Math.round(step / stepPower);
+
+			let minorGridCount = 2;
+
+			if ($math.round(stepAdjusted / 5, 10) % 1 == 0) {
+				minorGridCount = 5;
+			}
+
+			if ($math.round(stepAdjusted / 10, 10) % 1 == 0) {
+				minorGridCount = 10;
+			}
+
+			let minorStep = step / minorGridCount;
+
+			// end of minor grid
+			let i = 0;
+			let m = 0;
 			let previous = -Infinity;
+
 			while (value < selectionMax) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;
 				if (this.dataItems.length < i + 1) {
@@ -495,7 +524,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 
 				this._createAssets(dataItem, []);
-
 				this._toggleDataItem(dataItem, true);
 
 				dataItem.setRaw("value", value);
@@ -507,17 +535,63 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 				this._prepareDataItem(dataItem);
 
+				let nextValue = value;
 				if (!logarithmic) {
-					value += step;
+					nextValue += step;
 				}
 				else {
 					if (differencePower > 2) {
-						value = Math.pow(10, Math.log(minLog) * Math.LOG10E + i - 5);
+						nextValue = Math.pow(10, Math.log(minLog) * Math.LOG10E + i - 5);
 					}
 					else {
-						value += step;
+						nextValue += step;
 					}
 				}
+
+				// minor grid
+				if (minorGridEnabled) {
+					let minorValue = value + minorStep;
+
+					if (logarithmic) {
+						if (differencePower > 2) {
+							let minorMinMaxStep = this._adjustMinMax(value, nextValue, 10);
+							minorStep = minorMinMaxStep.step;
+						}
+						minorValue = value + minorStep;
+					}
+
+					while (minorValue < nextValue - step * 0.00000000001) {
+						let minorDataItem: DataItem<this["_dataItemSettings"]>;
+						if (this.minorDataItems.length < m + 1) {
+							minorDataItem = new DataItem(this, undefined, {});
+							this.minorDataItems.push(minorDataItem);
+							this.processDataItem(minorDataItem);
+						}
+						else {
+							minorDataItem = this.minorDataItems[m];
+						}
+
+						this._createAssets(minorDataItem, ["minor"], true);
+						this._toggleDataItem(minorDataItem, true);
+						minorDataItem.setRaw("value", minorValue);
+
+						const minorLabel = minorDataItem.get("label");
+						if (minorLabel) {
+							if (minorLabelsEnabled) {
+								minorLabel.set("text", this._formatText(minorValue));
+							}
+							else {
+								minorLabel.setPrivate("visible", false);
+							}
+						}
+
+						this._prepareDataItem(minorDataItem);
+						minorValue += minorStep;
+						m++;
+					}
+				}
+
+				value = nextValue;
 
 				if (previous == value) {
 					break;
@@ -537,6 +611,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 			for (let j = i; j < this.dataItems.length; j++) {
 				this._toggleDataItem(this.dataItems[j], false);
+			}
+
+			for (let j = m; j < this.minorDataItems.length; j++) {
+				this._toggleDataItem(this.minorDataItems[j], false);
 			}
 
 			$array.each(this.series, (series) => {
@@ -571,7 +649,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
-		renderer.updateLabel(dataItem.get("label"), position, endPosition, count);
+		let labelEndPosition = endPosition;		
+
+		let labelEndValue = dataItem.get("labelEndValue");
+		if (labelEndValue != null) {
+			labelEndPosition = this.valueToPosition(labelEndValue);
+		}		
+
+		renderer.updateLabel(dataItem.get("label"), position, labelEndPosition, count);
 
 		const grid = dataItem.get("grid");
 		renderer.updateGrid(grid, position, endPosition);
@@ -1522,11 +1607,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 		else {
 			return formatter.format(value, undefined, decimals);
-			//label.set("text", this.getNumberFormatter().format(value, undefined, this.getPrivate("stepDecimalPlaces")));
 		}
-
-		// //@todo number formatter + tag
-		// return $math.round(this.positionToValue(position), this.getPrivate("stepDecimalPlaces")).toString();
 	}
 
 	/**

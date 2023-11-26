@@ -890,9 +890,10 @@ export abstract class Hierarchy extends Series {
 				this.enableDataItem(this.dataItems[0], downDepth, 0);
 			}
 
-			this._zoom(dataItem);
+			this._root.events.once("frameended", ()=>{
+				this._zoom(dataItem);
+			})			
 		}
-
 	}
 
 	protected _zoom(_dataItem: DataItem<this["_dataItemSettings"]>) {

@@ -322,8 +322,12 @@ export class Treemap extends Hierarchy {
 			let scaleY = (this.innerHeight() - nodePaddingOuter * 2) / (y1 - y0);
 
 			const easing = this.get("animationEasing");
-			const duration = this.get("animationDuration", 0);
+			let duration = this.get("animationDuration", 0);
 
+			if (!this.inited) {
+				duration = 0;
+			}			
+			
 			this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
 			this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
 
@@ -334,6 +338,7 @@ export class Treemap extends Hierarchy {
 
 	protected _selectDataItem(dataItem?: DataItem<this["_dataItemSettings"]>, downDepth?: number, skipDisptach?: boolean) {
 		super._selectDataItem(dataItem, downDepth, skipDisptach);
+
 		if (dataItem) {
 			let maxDepth = this.get("downDepth", 1) + dataItem.get("depth");
 			if (!this.inited) {

@@ -93,6 +93,14 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	dateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
+	 * Date formats used for minor grid labels.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Minor_grid_formats} for more info
+	 * @since 5.6.0
+	 */
+	minorDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
+
+	/**
 	 * Date formats used for "period change" labels.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
@@ -633,6 +641,37 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		return 1.01;
 	}
 
+	protected _getMinorInterval(interval:ITimeInterval):ITimeInterval | undefined{
+		let minorGridInterval:ITimeInterval | undefined;
+		let count = interval.count;
+		let timeUnit = interval.timeUnit;
+		if (count > 1) {
+			if (count == 10) {
+				count = 5;
+			}
+			else if (count == 15) {
+				count = 5;
+			}
+			else if (count == 12) {
+				count = 2;
+			}			
+			else if (count == 6) {
+				count = 1;
+			}						
+			else if (count == 30) {
+				count = 10;
+			}
+			else if (count < 10) {
+				count = 1;
+			}
+			minorGridInterval = { timeUnit: timeUnit, count: count };
+		}
+		if (timeUnit == "week") {
+			minorGridInterval = { timeUnit: "day", count: 1 };
+		}
+		return minorGridInterval;
+	}
+
 	protected _prepareAxisItems() {
 		const min = this.getPrivate("min");
 		const max = this.getPrivate("max");
@@ -668,6 +707,18 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			this.setPrivateRaw("gridInterval", gridInterval);
 
+			const minorLabelsEnabled = renderer.get("minorLabelsEnabled");
+			const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
+
+			let minorGridInterval: ITimeInterval | undefined;
+			let minorDuration = 0;
+
+			if (minorGridEnabled) {
+				minorGridInterval = this._getMinorInterval(gridInterval);
+				minorDuration = $time.getIntervalDuration(minorGridInterval);
+			}
+
+			let m = 0;
 			while (value < selectionMax + intervalDuration) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;
 				if (this.dataItems.length < i + 1) {
@@ -684,6 +735,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				this._toggleDataItem(dataItem, true);
 
 				dataItem.setRaw("value", value);
+				dataItem.setRaw("labelEndValue", undefined);
 
 				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * this._getM(gridInterval.timeUnit));
 				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
@@ -706,10 +758,83 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					label.set("text", this._root.dateFormatter.format(date, format!));
 				}
 
-				this._prepareDataItem(dataItem, gridInterval.count);
+				let count = gridInterval.count;
+				// so that labels of week would always be at the beginning of the grid
+				if (gridInterval.timeUnit == "week") {
+					dataItem.setRaw("labelEndValue", value);
+				}
+
+				if (minorGridEnabled) {
+					count = 1;
+					let timeUnit = gridInterval.timeUnit;
+					if (timeUnit == "week") {
+						timeUnit = "day";
+					}
+
+					let labelEndValue = value + $time.getDuration(timeUnit, this._getM(timeUnit));
+					labelEndValue = $time.round(new Date(labelEndValue), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+					dataItem.setRaw("labelEndValue", labelEndValue);
+				}
+
+				this._prepareDataItem(dataItem, count);
 
 				previousValue = value;
 				value = endValue;
+
+				// min grid
+				if (minorGridInterval) {
+					let minorValue = $time.round(new Date(previousValue + minorDuration * this._getM(minorGridInterval.timeUnit)), minorGridInterval.timeUnit, minorGridInterval.count, firstDay, utc, new Date(previousValue), timezone).getTime();
+					let previousMinorValue: number | undefined;
+					let minorFormats = this.get("minorDateFormats", this.get("dateFormats"))!;
+
+					while (minorValue < value - 0.01 * minorDuration) {
+						let minorDataItem: DataItem<this["_dataItemSettings"]>;
+						if (this.minorDataItems.length < m + 1) {
+							minorDataItem = new DataItem(this, undefined, {});
+							this.minorDataItems.push(minorDataItem);
+							this.processDataItem(minorDataItem);
+						}
+						else {
+							minorDataItem = this.minorDataItems[m];
+						}
+
+						this._createAssets(minorDataItem, ["minor"], true);
+
+						this._toggleDataItem(minorDataItem, true);
+
+						minorDataItem.setRaw("value", minorValue);
+
+						let minorEndValue = minorValue + $time.getDuration(minorGridInterval.timeUnit, minorGridInterval.count * this._getM(minorGridInterval.timeUnit));
+						minorEndValue = $time.round(new Date(minorEndValue), minorGridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+
+						minorDataItem.setRaw("endValue", minorEndValue);
+
+						let date = new Date(minorValue);
+
+						format = minorFormats[minorGridInterval.timeUnit];
+
+						const minorLabel = minorDataItem.get("label");
+
+						if (minorLabel) {
+							if (minorLabelsEnabled) {
+								minorLabel.set("text", this._root.dateFormatter.format(date, format!));
+							}
+							else {
+								minorLabel.setPrivate("visible", false);								
+							}
+						}
+
+						this._prepareDataItem(minorDataItem, 1);
+
+						if (minorValue == previousMinorValue) {
+							break;
+						}
+
+						previousMinorValue = minorValue;
+						minorValue = minorEndValue;
+						m++;
+					}
+				}
 
 				if (value == previousValue) {
 					break;
@@ -720,6 +845,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 			for (let j = i; j < this.dataItems.length; j++) {
 				this._toggleDataItem(this.dataItems[j], false);
+			}
+
+			for (let j = m; j < this.minorDataItems.length; j++) {
+				this._toggleDataItem(this.minorDataItems[j], false);
 			}
 
 			$array.each(this.series, (series) => {

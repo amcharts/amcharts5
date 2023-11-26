@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.6.0] - 2023-11-26
+
+### Added
+- `addBullet(dataItem, bullet)` method added to `Series`. Allows adding a `Bullet` directly to a particular data item instead of adding bullet function to the series. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Adding_directly_to_data_item).
+- `stacked` (available values: `"up"`, `"down"`,  `"auto"`) setting added to `Bullet`. Allows enabling of automatically stacking bullets on an `XYSeries`. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Stacked_bullets).
+- `field` (available values: `"open"`, `"high"`, `"low"`, `"value"`) setting added to `Bullet`. Works with `XYSeries` only. Allows setting a particular data field where the bullet should displayed at. Note: `locationX``locationY` settings will be ignored if `field` is set. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#By_data_field).
+- New `Root` element setting: `focusPadding` (default: `2`). Allows specifying distance between focused element and the focus outline.
+- Minor grid/labels added on `AxisRenderer` with new settings `minorGridEnabled` and `minorLabelsEnabled` (default: `false`). [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Minor_grid).
+- New setting `minorDateFormats` added to `DateAxis`. Allows setting different formats for minor grid labels. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Minor_grid_formats).
+
+### Changed
+- When `DateAxis` is in weekly grid mode, it will now use `multiLocation` for labels instead of `location`.
+- Placement of grid/labels is improved on `DateAxis` and `GaplessDateAxis`.
+
+### Fixed
+- Truncating was not working properly on circular labels.
+- Fixed potential conflict of responsive rules in `ResponsiveTheme`.
+- Issues fixed with data items appearing in wrong place on a chart with data grouping enabled and timezone set.
+- `DrawingControl.unserializeDrawings()` method was broken since `5.5.7`.
+
+
 ## [5.5.7] - 2023-11-17
 
 ### Added
@@ -742,7 +763,7 @@ patterns with gradient fills.
 - Additional option for `Label`'s `oversizedBehavior` setting: `"wrap-no-break"`. If set, the labels will wrap to `maxWidth`, but will not brak words even if they do not fit.
 
 ### Fixed
-- If timezone was set in a chart with a `DateAxis` with `baseInterval` set to `"day"`, axis could show wrong date and axis tooltip could snap to a wring date on a DLS switch.
+- If timezone was set in a chart with a `DateAxis` with `baseInterval` set to `"day"`, axis could show wrong date and axis tooltip could snap to a wrong date on a DLS switch.
 
 
 ## [5.2.28] - 2022-10-06

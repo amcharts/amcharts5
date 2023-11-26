@@ -71,7 +71,10 @@ volumeAxis.axisHeader.children.push(am5.Label.new(root, {
 }));
 
 
-const dateAxisRenderer = am5xy.AxisRendererX.new(root, {});
+const dateAxisRenderer = am5xy.AxisRendererX.new(root, {
+  minorGridEnabled: true
+});
+
 dateAxisRenderer.labels.template.setAll({
   minPosition: 0.01,
   maxPosition: 0.99

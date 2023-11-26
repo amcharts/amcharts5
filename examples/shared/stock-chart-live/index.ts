@@ -57,7 +57,9 @@ let dateAxis = mainPanel.xAxes.push(
       timeUnit: "minute",
       count: 1
     },
-    renderer: am5xy.AxisRendererX.new(root, {}),
+    renderer: am5xy.AxisRendererX.new(root, {
+      minorGridEnabled: true
+    }),
     tooltip: am5.Tooltip.new(root, {})
   })
 );

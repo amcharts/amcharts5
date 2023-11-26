@@ -48,10 +48,35 @@ export interface IBulletSettings extends IEntitySettings {
 	 */
 	autoRotateAngle?: number;
 
+	/**
+	 * If a field will be set, the bullet will be located at exact value of that field, not paying atention to locationY/locationX. Works with XYSeries	only.
+	 * If `field` is set, bullet will be placed at the specific data value, ignoring
+	 * any `locationX` and `locationY` settings.
+	 *
+	 * **IMPORTANT: this setting works with [[XYSeries]] only.**
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#By_data_field} for more info
+	 * @since 5.6.0
+	 */
+	field?: "open" | "high" | "low" | "value";
+
+	/**
+	 * If set, will stack bullets instead of overlapping them.
+	 *
+	 * * `"up` - stacks bullets upwards.
+	 * * `"down` - stacks bullets downwards.
+	 * * `"auto` - stacks bullets in the direction that offers more space.
+	 * 
+	 * **IMPORTANT: this setting works with [[XYSeries]] only.**
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Stacked_bullets} for more info
+	 * @since 5.6.0
+	 */
+	stacked?: "up" | "down" | "auto";
 }
 
 export interface IBulletPrivate extends IEntityPrivate {
-	hidden?:boolean;
+	hidden?: boolean;
 }
 
 /**

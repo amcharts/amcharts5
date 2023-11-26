@@ -854,6 +854,8 @@ export abstract class XYSeries extends Series {
 	protected _x: number = 0;
 	protected _y: number = 0;
 
+	public _bullets: { [index: string]: Sprite } = {};
+
 	/**
 	 * A [[Container]] that us used to put series' elements in.
 	 *
@@ -1068,6 +1070,7 @@ export abstract class XYSeries extends Series {
 	protected _dispose() {
 		super._dispose();
 
+		this._bullets = {};
 		const chart = this.chart;
 		if (chart) {
 			chart.series.removeValue(this);
@@ -1214,6 +1217,8 @@ export abstract class XYSeries extends Series {
 
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		this._bullets = {};
 
 		if (this.isDirty("valueYShow") || this.isDirty("valueXShow") || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow")) {
 			this._updateFields();
@@ -1715,7 +1720,6 @@ export abstract class XYSeries extends Series {
 	}
 
 	public _positionBullet(bullet: Bullet) {
-
 		let sprite = bullet.get("sprite");
 		if (sprite) {
 			let dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
@@ -1726,8 +1730,8 @@ export abstract class XYSeries extends Series {
 			let xAxis = this.get("xAxis");
 			let yAxis = this.get("yAxis");
 
-			const positionX = xAxis.getDataItemPositionX(dataItem, this._xField, locationX, this.get("vcx", 1));
-			const positionY = yAxis.getDataItemPositionY(dataItem, this._yField, locationY, this.get("vcy", 1))
+			let positionX = xAxis.getDataItemPositionX(dataItem, this._xField, locationX, this.get("vcx", 1));
+			let positionY = yAxis.getDataItemPositionY(dataItem, this._yField, locationY, this.get("vcy", 1))
 
 			let point = this.getPoint(positionX, positionY);
 
@@ -1736,27 +1740,123 @@ export abstract class XYSeries extends Series {
 			let top = dataItem.get("top", point.y);
 			let bottom = dataItem.get("bottom", point.y);
 
+			let x = 0;
+			let y = 0;
+
+			let w = right - left;
+			let h = bottom - top;
+
 			if (this._shouldShowBullet(positionX, positionY)) {
-				if (!bullet.getPrivate("hidden")) {
-					sprite.setPrivate("visible", true);
+				sprite.setPrivate("visible", !bullet.getPrivate("hidden"));
+
+				let field = bullet.get("field");
+
+				const baseAxis = this.get("baseAxis");
+				const xAxis = this.get("xAxis");
+				const yAxis = this.get("yAxis");
+
+				if (field != undefined) {
+					let realField: string | undefined;
+
+					if (baseAxis == xAxis) {
+						if (field == "value") {
+							realField = this._yField;
+						}
+						else if (field == "open") {
+							realField = this._yOpenField;
+						}
+						else if (field == "high") {
+							realField = this._yHighField;
+						}
+						else if (field == "low") {
+							realField = this._yLowField;
+						}
+						if (realField) {
+							positionY = yAxis.getDataItemPositionY(dataItem, realField as any, 0, this.get("vcy", 1))
+
+							point = yAxis.get("renderer").positionToPoint(positionY);
+
+							y = point.y;
+							x = left + w * locationX;
+						}
+					}
+					else {
+						if (field == "value") {
+							realField = this._xField;
+						}
+						else if (field == "open") {
+							realField = this._xOpenField;
+						}
+						else if (field == "high") {
+							realField = this._xHighField;
+						}
+						else if (field == "low") {
+							realField = this._xLowField;
+						}
+
+						if (realField) {
+							positionX = xAxis.getDataItemPositionX(dataItem, realField as any, 0, this.get("vcx", 1));
+
+							point = xAxis.get("renderer").positionToPoint(positionX);
+
+							x = point.x;
+							y = bottom - h * locationY;
+						}
+					}
 				}
 				else {
-					sprite.setPrivate("visible", false);
+					x = left + w * locationX;
+					y = bottom - h * locationY;
 				}
 
-				let w = right - left;
-				let h = bottom - top;
+				const stacked = bullet.get("stacked");
+				if (stacked) {
+					const chart = this.chart;
+					if (baseAxis == xAxis) {
+						let previousBullet = this._bullets[positionX + "_" + positionY];
+						let d = -1;
+						if (stacked == "down") {
+							d = 1;
+						}
+						else if (stacked == "auto") {
+							if (chart) {
+								if (y < chart.plotContainer.height() / 2) {
+									d = 1;
+								}
+							}
+						}
+
+						if (previousBullet) {
+							y = previousBullet.y() + previousBullet.height() * d;
+						}
+						this._bullets[positionX + "_" + positionY] = sprite;
+					}
+					else {
+						let previousBullet = this._bullets[positionX + "_" + positionY];
+						let d = -1;
+						if (stacked == "down") {
+							d = 1;
+						}
+						else if (stacked == "auto") {
+							if (chart) {
+								if (x < chart.plotContainer.width() / 2) {
+									d = 1;
+								}
+							}
+						}
+						if (previousBullet) {
+							x = previousBullet.x() + previousBullet.width() * d;
+						}
+						this._bullets[positionX + "_" + positionY] = sprite;
+					}
+				}
 
 				if (sprite.isType("Label")) {
 					sprite.setPrivate("maxWidth", Math.abs(w));
 					sprite.setPrivate("maxHeight", Math.abs(h));
 				}
 
-				let x = left + w * locationX;
-				let y = bottom - h * locationY;
-
-				sprite.set("x", x);
-				sprite.set("y", y);
+				sprite.setAll({ x, y });
 			}
 			else {
 				sprite.setPrivate("visible", false);
@@ -1801,21 +1901,19 @@ export abstract class XYSeries extends Series {
 	}
 
 	protected _handleDataSetChange() {
-		if (this.bullets.length > 0) {
-			$array.each(this._dataItems, (dataItem) => {
-				let bullets = dataItem.bullets;
-				if (bullets) {
-					$array.each(bullets, (bullet) => {
-						if (bullet) {
-							let sprite = bullet.get("sprite");
-							if (sprite) {
-								sprite.setPrivate("visible", false);
-							}
+		$array.each(this._dataItems, (dataItem) => {
+			let bullets = dataItem.bullets;
+			if (bullets) {
+				$array.each(bullets, (bullet) => {
+					if (bullet) {
+						let sprite = bullet.get("sprite");
+						if (sprite) {
+							sprite.setPrivate("visible", false);
 						}
-					})
-				}
-			})
-		}
+					}
+				})
+			}
+		})
 
 		this._selectionProcessed = false; // for totals to be calculated
 	}

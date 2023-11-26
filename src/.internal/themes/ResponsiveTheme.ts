@@ -197,6 +197,24 @@ export class ResponsiveTheme extends Theme {
 		return (width <= ResponsiveTheme.XXL) || (height <= ResponsiveTheme.XXL);
 	}
 
+	private _dp?: MultiDisposer;
+
+	constructor(root: Root, isReal: boolean) {
+		super(root, isReal);
+		this._dp = new MultiDisposer([
+			this._root._rootContainer.onPrivate("width", (_width) => {
+				if (this._isUsed()) {
+					this._maybeApplyRules();
+				}
+			}),
+			this._root._rootContainer.onPrivate("height", (_height) => {
+				if (this._isUsed()) {
+					this._maybeApplyRules();
+				}
+			})
+		]);
+	}
+
 	/**
 	 * Currently added rules.
 	 */
@@ -208,6 +226,7 @@ export class ResponsiveTheme extends Theme {
 	static newEmpty<T extends typeof ResponsiveTheme>(this: T, root: Root): InstanceType<T> {
 		return (new this(root, true)) as InstanceType<T>;
 	}
+
 
 	/**
 	 * Adds a responsive rule as well as retuns it.
@@ -221,13 +240,8 @@ export class ResponsiveTheme extends Theme {
 			rule.template = (<any>this).rule(rule.name, rule.tags);
 		}
 
-		rule._dp = new MultiDisposer([
-			this._root._rootContainer.onPrivate("width", (_width) => { if (this._isUsed()) { this._applyRule(rule); } }),
-			this._root._rootContainer.onPrivate("height", (_height) => { if (this._isUsed()) { this._applyRule(rule); } })
-		]);
-
 		this.responsiveRules.push(rule);
-		this._applyRule(rule);
+		this._maybeApplyRule(rule);
 		return rule;
 	}
 
@@ -238,8 +252,11 @@ export class ResponsiveTheme extends Theme {
 	 */
 	public removeRule(rule: IResponsiveRule): void {
 		$array.remove(this.responsiveRules, rule);
-		if (rule._dp) {
-			rule._dp.dispose();
+	}
+
+	public dispose(): void {
+		if (this._dp) {
+			this._dp.dispose();
 		}
 	}
 
@@ -247,23 +264,37 @@ export class ResponsiveTheme extends Theme {
 		return this._root._rootContainer.get("themes")!.indexOf(this) !== -1;
 	}
 
-	protected _applyRule(rule: IResponsiveRule): void {
+	protected _maybeApplyRules(): void {
+		$array.each(this.responsiveRules, (rule) => {
+			this._maybeUnapplyRule(rule);
+		});
+		$array.each(this.responsiveRules, (rule) => {
+			this._maybeApplyRule(rule);
+		});
+	}
+
+	protected _maybeApplyRule(rule: IResponsiveRule): void {
+		if (rule.applied) return;
 		const w = this._root._rootContainer.getPrivate("width");
 		const h = this._root._rootContainer.getPrivate("height");
 		const relevant = rule.relevant.call(rule, <number>w, <number>h);
-		const applied = rule.applied;
 		if (relevant) {
-			if (!applied) {
-				rule.applied = true;
-				if (rule.template && rule.settings) {
-					rule.template.setAll(rule.settings);
-				}
-				if (rule.applying) {
-					rule.applying.call(rule);
-				}
+			rule.applied = true;
+			if (rule.template && rule.settings) {
+				rule.template.setAll(rule.settings);
+			}
+			if (rule.applying) {
+				rule.applying.call(rule);
 			}
 		}
-		else if (applied) {
+	}
+
+	protected _maybeUnapplyRule(rule: IResponsiveRule): void {
+		if (!rule.applied) return;
+		const w = this._root._rootContainer.getPrivate("width");
+		const h = this._root._rootContainer.getPrivate("height");
+		const relevant = rule.relevant.call(rule, <number>w, <number>h);
+		if (!relevant) {
 			rule.applied = false;
 			if (rule.template) {
 				rule.template.removeAll();

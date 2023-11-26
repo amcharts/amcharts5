@@ -51,7 +51,9 @@ export interface IStockToolbarEvents extends IEntityEvents {
 }
 
 /**
- * @todo revview
+ * Builds a toolbar for [[StockChart]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/} for more info
  */
 export class StockToolbar extends Entity {
 	public static className: string = "StockToolbar";

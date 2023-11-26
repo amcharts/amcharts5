@@ -23,6 +23,25 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	minGridDistance?: number;
 
 	/**
+	 * Re-enable display of skipped grid lines due to lack of space and as per
+	 * the `minGridDistance` setting. Not recommended for CategoryAxis with a lot of data items. 
+	 *
+	 * @default false
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Minor_grid} for more info
+	 * @since 5.6.0
+	 */
+	minorGridEnabled?: boolean;
+
+	/**
+	 * Enable labels on minor grid. If you enable labels, grid will be enabled automatically.
+	 *
+	 * @default false
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Enabling_minor_grid_labels} for more info
+	 * @since 5.6.0
+	 */
+	minorLabelsEnabled?: boolean;
+
+	/**
 	 * Set to `true` to invert direction of the axis.
 	 *
 	 * @default false

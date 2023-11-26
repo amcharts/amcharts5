@@ -9,6 +9,7 @@ import * as $order from "../../../core/util/Order";
 import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
+import type { ITimeInterval } from "../../../core/util/Time";
 
 export interface IGaplessDateAxisSettings<R extends AxisRenderer> extends IDateAxisSettings<R> {
 
@@ -47,6 +48,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	declare public _events: IGaplessDateAxisEvents;
 
 	protected _frequency: number = 1;
+	protected _m: number = 0;
 
 	public _afterNew() {
 		this.valueFields.push("date");
@@ -115,7 +117,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			else {
 				d = value - itemValue;
 			}
-			
+
 			return (index - startLocation) / len + d / this.baseDuration() / len;
 		}
 	}
@@ -139,7 +141,6 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			if (index > 0) {
 				index -= 1;
 			}
-
 			return index;
 		}
 	}
@@ -189,6 +190,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		this.zoom(this.valueToPosition(start), this.valueToPosition(end), duration);
 	}
 
+
 	protected _prepareAxisItems() {
 		let startTime = this.getPrivate("selectionMin", 0);
 		let endTime = this.getPrivate("selectionMax", 0);
@@ -200,9 +202,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				this._updateAllDates();
 			}
 
+			const firstDay = this._root.locale.firstDayOfWeek;
+			const utc = this._root.utc;
+			const timezone = this._root.timezone;
 			const dates = this._dates;
 			const renderer = this.get("renderer");
 			const len = dates.length;
+			const baseDuration = this.baseDuration();
 
 			let startIndex = this.valueToIndex(startTime);
 			if (startIndex > 0) {
@@ -221,11 +227,15 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 			this._frequency = frequency;
 
-			for (let j = 0, length = this.dataItems.length; j < length; j++) {
-				this._toggleDataItem(this.dataItems[j], false);
-			}
+			$array.each(this.dataItems, (dataItem) => {
+				this._toggleDataItem(dataItem, false);
+			})
 
-			let realDuration = (endTime - startTime) - ((endTime - startTime) / this.baseDuration() - (endIndex - startIndex)) * this.baseDuration();
+			$array.each(this.minorDataItems, (dataItem) => {
+				this._toggleDataItem(dataItem, false);
+			})
+
+			let realDuration = (endTime - startTime) - ((endTime - startTime) / baseDuration - (endIndex - startIndex)) * baseDuration;
 
 			// if all items are on axis
 			let gridInterval = $time.chooseInterval(0, realDuration, maxCount, this.get("gridIntervals")!);
@@ -233,63 +243,50 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			const baseInterval = this.getPrivate("baseInterval");
 			let intervalDuration = $time.getIntervalDuration(gridInterval);
 
-			if (intervalDuration < this.baseDuration()) {
+			if (intervalDuration < baseDuration) {
 				gridInterval = { ...baseInterval };
 				intervalDuration = $time.getIntervalDuration(gridInterval);
 			}
 
-
 			this._intervalDuration = intervalDuration;
 
+			const timeUnit = gridInterval.timeUnit;
 			const formats = this.get("dateFormats")!;
 
-			let selectedItems: Array<number> = [];
 			let firstDate = new Date();
 			if (this._dates[0]) {
 				firstDate = new Date(this._dates[0]);
 			}
 
-			let startDate = $time.round(new Date(this.getPrivate("min", 0)), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, firstDate, this._root.timezone);
-			let value = $time.add(startDate, gridInterval.timeUnit, -1, this._root.utc, this._root.timezone).getTime();
+			let value = $time.round(new Date(this.getPrivate("selectionMin", 0)), timeUnit, gridInterval.count, firstDay, utc, firstDate, timezone).getTime();
 
-			let selectionMax = this.getPrivate("selectionMax")
+			const minorLabelsEnabled = renderer.get("minorLabelsEnabled");
+			const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
 
-			let previousPosition = -Infinity;
-			let minDifference = (this.get("end", 1) - this.get("start", 0)) / maxCount;
+			let minorGridInterval: ITimeInterval | undefined;
+			let minorDuration = 0;
+			let previousDataItem: DataItem<IGaplessDateAxisDataItem> | undefined;
 
-			while (value <= selectionMax) {
-				let index = this.valueToIndex(value);
-				let realValue = this._dates[index];
-
-				if (realValue < value) {
-					for (let i = index, len = this._dates.length; i < len; i++) {
-						let realValue = this._dates[i];
-						if (realValue >= value) {
-							index = i;
-							break;
-						}
-					}
-				}
-
-				let position = this.valueToPosition(realValue);
-				if (position - previousPosition >= minDifference * 0.95) {
-					$array.move(selectedItems, index);
-					previousPosition = position;
-				}
-
-				let previousValue = value;
-				value += $time.getDuration(gridInterval.timeUnit, gridInterval.count * this._getM(gridInterval.timeUnit));
-				value = $time.round(new Date(value), gridInterval.timeUnit, gridInterval.count, this._root.locale.firstDayOfWeek, this._root.utc, undefined, this._root.timezone).getTime();
-
-				if (value == previousValue) {
-					break;
-				}
+			if (minorGridEnabled) {
+				minorGridInterval = this._getMinorInterval(gridInterval);
+				minorDuration = $time.getIntervalDuration(minorGridInterval);
 			}
 
+
+			let selectedItems: Array<number> = this._getIndexes(value, this.getPrivate("selectionMax", value) + intervalDuration, gridInterval, this.getPrivate("min", value));
 			if (selectedItems.length > 0) {
 				let i = 0;
+				this._m = 0;
 				let previousValue = value - intervalDuration * 10;
-				const nextGridUnit = $time.getNextUnit(gridInterval.timeUnit);
+				const nextGridUnit = $time.getNextUnit(timeUnit);
+
+				// MINOR GRID
+				if (minorGridInterval) {
+					let first = dates[selectedItems[0]];
+					this._addMinorGrid(first - intervalDuration, first, minorDuration, minorGridInterval);
+				}
+
+				let minDistance = renderer.axisLength() / renderer.gridCount() * 0.5;
 
 				$array.each(selectedItems, (index) => {
 					let dataItem: DataItem<this["_dataItemSettings"]>;
@@ -315,31 +312,90 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 					dataItem.setRaw("value", value);
 					dataItem.setRaw("endValue", endValue);
 					dataItem.setRaw("index", i);
+					dataItem.setRaw("labelEndValue", undefined);
 
-					if (index > startIndex - 100 && index < endIndex + 100) {
+					let format = formats[timeUnit];
+					if (nextGridUnit && this.get("markUnitChange") && $type.isNumber(previousValue)) {
+						if (timeUnit != "year") {
+							if ($time.checkChange(value, previousValue, nextGridUnit, utc, timezone)) {
+								format = this.get("periodChangeDateFormats")![timeUnit];
+							}
+						}
+					}
 
-						let format = formats[gridInterval.timeUnit];
+					this._createAssets(dataItem, []);
 
-						format = formats[gridInterval.timeUnit];
-						if (nextGridUnit && this.get("markUnitChange") && $type.isNumber(previousValue)) {
-							if (gridInterval.timeUnit != "year") {
-								if ($time.checkChange(value, previousValue, nextGridUnit, this._root.utc, this._root.timezone)) {
-									format = this.get("periodChangeDateFormats")![gridInterval.timeUnit];
+					const label = dataItem.get("label");
+					if (label) {
+						label.set("text", this._root.dateFormatter.format(date, format!));
+					}
+
+					this._toggleDataItem(dataItem, true);
+
+					let count = gridInterval.count;
+
+					// so that labels of week would always be at the beginning of the grid
+					if (timeUnit == "week") {
+						dataItem.setRaw("labelEndValue", value);
+					}
+
+					if (minorGridEnabled) {
+						let timeUnit2 = gridInterval.timeUnit;
+						if (timeUnit2 == "week") {
+							timeUnit2 = "day";
+						}
+
+						if (count > 1 || gridInterval.timeUnit == "week") {
+							let labelEndValue = $time.round(new Date(value), timeUnit2, 1, firstDay, utc, undefined, timezone).getTime() + $time.getDuration(timeUnit2, this._getM(timeUnit2));
+							let index = this.valueToIndex(labelEndValue)
+							labelEndValue = this._dates[index];
+							if (labelEndValue == value) {
+								let next = this._dates[index + 1];
+								if (next) {
+									labelEndValue = next;
+								}
+								else {
+									labelEndValue += minorDuration;
+								}
+							}
+
+							dataItem.setRaw("labelEndValue", labelEndValue);
+						}
+						count = 1;
+					}
+
+					this._prepareDataItem(dataItem, count);
+
+					if (label && previousDataItem) {
+						if (renderer.getPrivate("letter") == "X") {
+							let previousLabel = previousDataItem.get("label");
+							if (previousLabel) {
+								let x = label.x();
+								let previousX = previousLabel.x();
+
+								if (x - previousX < minDistance) {
+									let worse = this._pickWorse(previousDataItem, dataItem, gridInterval)
+									if (worse) {
+										worse.get("label")?.setPrivate("visible", false);
+									}
 								}
 							}
 						}
 
-						this._createAssets(dataItem, []);
+						// todo y?
 
-						const label = dataItem.get("label");
-						if (label) {
-							label.set("text", this._root.dateFormatter.format(date, format!));
-						}
-
-						this._toggleDataItem(dataItem, true);
-						this._prepareDataItem(dataItem, gridInterval.count);
 					}
+
+					// MINOR GRID
+					if (minorGridInterval) {
+						this._addMinorGrid(value, endValue, minorDuration, minorGridInterval);
+					}
+
 					i++;
+
+					if (label && label.getPrivate("visible")) {
+						previousDataItem = dataItem;
+					}
 					previousValue = value;
 				})
 			}
@@ -353,4 +409,151 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 		this._updateGhost();
 	}
+
+	protected _pickWorse(dataItemA: DataItem<IGaplessDateAxisDataItem>, dataItemB: DataItem<IGaplessDateAxisDataItem>, interval: ITimeInterval): DataItem<IGaplessDateAxisDataItem> {
+		const timeUnit = interval.timeUnit;
+
+		const valueA = dataItemA.get("value", 0);
+		const valueB = dataItemB.get("value", 0);
+
+		if (timeUnit == "hour") {
+			if (new Date(valueA).getDate() != new Date(valueB).getDate()) {
+				return dataItemA;
+			}
+		}
+
+		return dataItemB;
+	}
+
+	protected _addMinorGrid(startValue: number, endValue: number, minorDuration: number, gridInterval: ITimeInterval) {
+		const minorFormats = this.get("minorDateFormats", this.get("dateFormats"))!;
+		const mTimeUnit = gridInterval.timeUnit;
+		const firstDay = this._root.locale.firstDayOfWeek;
+		const utc = this._root.utc;
+		const timezone = this._root.timezone;
+
+		let value = startValue + $time.getDuration(mTimeUnit, this._getM(mTimeUnit));
+		value = $time.round(new Date(value), mTimeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+
+		let maxValue = endValue - minorDuration * 0.5;
+
+		let minorSelectedItems: Array<number> = this._getIndexes(value, maxValue, gridInterval, value);
+
+		$array.each(minorSelectedItems, (index) => {
+			let minorDataItem: DataItem<this["_dataItemSettings"]>;
+			if (this.minorDataItems.length < this._m + 1) {
+				minorDataItem = new DataItem<this["_dataItemSettings"]>(this, undefined, {});
+				this.minorDataItems.push(minorDataItem);
+				this.processDataItem(minorDataItem);
+			}
+			else {
+				minorDataItem = this.minorDataItems[this._m];
+			}
+
+			value = this._dates[index];
+			minorDataItem.setRaw("value", value);
+			minorDataItem.setRaw("endValue", value + minorDuration);
+			minorDataItem.setRaw("index", index);
+
+			this._createAssets(minorDataItem, ["minor"], true);
+
+			const label = minorDataItem.get("label");
+			if (label) {
+				if (this.get("renderer").get("minorLabelsEnabled")) {
+					let date = new Date(value);
+					let format = minorFormats[mTimeUnit];
+					label.set("text", this._root.dateFormatter.format(date, format!));
+				}
+				else {
+					label.setPrivate("visible", false);
+				}
+			}
+
+			this._toggleDataItem(minorDataItem, true);
+			this._prepareDataItem(minorDataItem, 1);
+			this._m++;
+		})
+	}
+
+
+	protected _getIndexes(value: number, maxValue: number, interval: ITimeInterval, firstValue: number): Array<number> {
+		const items: Array<number> = [];
+		const timeUnit = interval.timeUnit;
+		const count = interval.count;
+
+		const baseInterval = this.getPrivate("baseInterval");
+
+		const firstDay = this._root.locale.firstDayOfWeek;
+		const utc = this._root.utc;
+		const timezone = this._root.timezone;
+
+		let c = count - 1;
+		let previousValue = -Infinity;
+		let duration = $time.getDuration(timeUnit, this._getM(timeUnit));
+		let fullDuration = $time.getDuration(timeUnit, count * this._getM(timeUnit));
+		let originalValue = value;
+
+		if (timeUnit == "day") {
+			value = firstValue;
+		}
+
+		while (value <= maxValue) {
+			value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+
+			let index = this.valueToIndex(value);
+			let realValue = this._dates[index];
+
+			if (timeUnit == "day" && baseInterval.timeUnit == "day") {
+				if (this._hasDate(value)) {
+					c++;
+				}
+
+				if (c == count) {
+					if (value >= originalValue - fullDuration * 2) {
+						$array.move(items, index);
+					}
+					c = 0;
+				}
+				value += duration;
+				value = $time.round(new Date(value), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+			}
+			else {
+				if (realValue < value) {
+					for (let i = index, len = this._dates.length; i < len; i++) {
+						realValue = this._dates[i];
+						if (realValue >= value) {
+							index = i;
+							break;
+						}
+					}
+				}
+
+				$array.move(items, index);
+
+				value += fullDuration;
+				value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+			}
+
+			if (value == previousValue) {
+				value += fullDuration + duration;
+				value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+			}
+			if (value == previousValue) {
+				break;
+			}
+
+			previousValue = value;
+		}
+
+		return items;
+	}
+
+	protected _hasDate(time: number) {
+		const result = $array.getSortedIndex(this._dates, (date) => {
+			return $order.compareNumber(date, time);
+		});
+
+		return result.found;
+	}
+
 }

@@ -43,7 +43,7 @@ export interface IDropdownListEvents extends IDropdownEvents {
 }
 
 /**
- * @todo revview
+ * A dropdown control for [[StockToolbar]].
  */
 export class DropdownList extends Dropdown {
 	public static className: string = "DropdownList";

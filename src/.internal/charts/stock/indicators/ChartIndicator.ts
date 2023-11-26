@@ -80,6 +80,7 @@ export abstract class ChartIndicator extends Indicator {
 				xAxis = chart.xAxes.push(DateAxis.new(root, { renderer: xRenderer, baseInterval: baseInterval }));
 			}
 
+			xRenderer.set("minorGridEnabled", seriesXAxis.get("renderer")?.get("minorGridEnabled"));
 			xAxis.set("groupData", seriesXAxis.get("groupData"));
 			xAxis.set("groupCount", seriesXAxis.get("groupCount"));
 

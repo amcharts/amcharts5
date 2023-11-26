@@ -64,15 +64,15 @@ function generateDatas(count: number) {
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-date-axis/
 const xRenderer = am5xy.AxisRendererX.new(root, {
-  pan:"zoom"
+  pan:"zoom",
+  minorGridEnabled: true
 });
 xRenderer.labels.template.set("minPosition", 0.01);
 xRenderer.labels.template.set("maxPosition", 0.99);
 
 const xAxis = chart.xAxes.push(
-  am5xy.CategoryDateAxis.new(root, {
+  am5xy.GaplessDateAxis.new(root, {
     maxDeviation:0.5,
-    categoryField: "date",
     baseInterval: {
       timeUnit: "day",
       count: 1
@@ -99,7 +99,7 @@ const series = chart.series.push(am5xy.LineSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
-  categoryXField: "date",
+  valueXField: "date",
   tooltip: am5.Tooltip.new(root, {
     labelText: "{valueY}"
   })
@@ -116,7 +116,6 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 // Set data
 let data = generateDatas(200);
 series.data.setAll(data);
-xAxis.data.setAll(data);
 
 
 // Make stuff animate on load

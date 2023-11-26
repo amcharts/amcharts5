@@ -71,6 +71,7 @@ const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
     count: 1
   },
   renderer: am5xy.AxisRendererX.new(root, {
+    minorGridEnabled: true,
     pan:"zoom"
   }),
   tooltip: am5.Tooltip.new(root, {})

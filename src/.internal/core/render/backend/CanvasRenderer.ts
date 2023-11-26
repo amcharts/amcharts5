@@ -242,7 +242,7 @@ function clearCanvas(view: HTMLCanvasElement) {
  * @ignore
  */
 function crisp(x: number): number {
-	return Math.floor(x) +.5;
+	return Math.floor(x) + .5;
 }
 
 /**
@@ -2767,23 +2767,6 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 							lineInfo.ascent = metrics.actualBoundingBoxAscent;
 						}
 
-						lineInfo.width += chunkWidth;
-						lineInfo.left += metrics.actualBoundingBoxLeft;
-						lineInfo.right += metrics.actualBoundingBoxRight;
-						lineInfo.textChunks.push({
-							style: currentStyle,
-							fill: currentFill,
-							text: char,
-							width: chunkWidth,
-							height: chunkHeight + metrics.actualBoundingBoxDescent,
-							left: metrics.actualBoundingBoxLeft,
-							right: metrics.actualBoundingBoxRight,
-							ascent: metrics.actualBoundingBoxAscent,
-							offsetX: 0,
-							offsetY: chunkHeight,
-							textDecoration: undefined
-						});
-
 						totalWidth += chunkWidth;
 
 						// Handle oversized behavior
@@ -2793,7 +2776,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 								ellipsisMetrics = this._measureText(ellipsis, context);
 							}
 							const ellipsisWidth = ellipsisMetrics.actualBoundingBoxLeft + ellipsisMetrics.actualBoundingBoxRight;
-							totalWidth += ellipsisWidth;
+							//totalWidth += ellipsisWidth;
 							if ((totalWidth + ellipsisWidth) > maxWidth) {
 								if (lineInfo.textChunks.length == 1) {
 									this.textVisible = false;
@@ -2819,6 +2802,23 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 								break;
 							}
 						}
+
+						lineInfo.width += chunkWidth;
+						lineInfo.left += metrics.actualBoundingBoxLeft;
+						lineInfo.right += metrics.actualBoundingBoxRight;
+						lineInfo.textChunks.push({
+							style: currentStyle,
+							fill: currentFill,
+							text: char,
+							width: chunkWidth,
+							height: chunkHeight + metrics.actualBoundingBoxDescent,
+							left: metrics.actualBoundingBoxLeft,
+							right: metrics.actualBoundingBoxRight,
+							ascent: metrics.actualBoundingBoxAscent,
+							offsetX: 0,
+							offsetY: chunkHeight,
+							textDecoration: undefined
+						});
 
 						if (rtl) {
 							break;

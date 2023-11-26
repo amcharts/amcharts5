@@ -281,9 +281,12 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			endIndex++;
 		}
 
-		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
+		const minorLabelsEnabled = renderer.get("minorLabelsEnabled");
+		const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
 
+		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1);
 		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
+
 		startIndex = Math.floor(startIndex / frequency) * frequency;
 		this._frequency = frequency;
 
@@ -298,8 +301,30 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 			this._createAssets(dataItem, []);
 			this._toggleDataItem(dataItem, true);
-			this._prepareDataItem(dataItem, f, frequency);
+
+			let count = frequency;
+			if (minorGridEnabled) {
+				count = 1;
+			}
+
+			this._prepareDataItem(dataItem, f, count);
+
 			f++;
+		}
+
+		if (renderer.get("minorGridEnabled")) {
+			for (let i = startIndex; i < endIndex; i++) {
+				let dataItem = this.dataItems[i];
+				if (i % frequency != 0) {
+					this._createAssets(dataItem, ["minor"], true);
+					this._toggleDataItem(dataItem, true);
+					this._prepareDataItem(dataItem, 0, 1);
+
+					if (!minorLabelsEnabled) {
+						dataItem.get("label")?.setPrivate("visible", false);
+					}
+				}
+			}
 		}
 
 		this._updateGhost();

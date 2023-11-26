@@ -120,6 +120,14 @@ export interface IRootSettings {
 	focusable?: boolean;
 
 	/**
+	 * Distance between focused element and its highlight square in pixels.
+	 *
+	 * @since 5.6.0
+	 * @default 2
+	 */
+	focusPadding?: number;
+
+	/**
 	 * If set to some string, it will be used as inner `<div>` ARIA-LABEL.
 	 *
 	 * Should be used in conjuction with `focusable`.
@@ -1590,8 +1598,10 @@ export class Root implements IDisposer {
 		let width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
 		let height = bounds.top == bounds.bottom ? target.height() : bounds.bottom - bounds.top;
 
-		let x = bounds.left - 2;
-		let y = bounds.top - 2;
+		const padding = this._settings.focusPadding !== undefined ? this._settings.focusPadding : 2;
+
+		let x = bounds.left - padding;
+		let y = bounds.top - padding;
 
 		if (width < 0) {
 			x += width;
@@ -1606,8 +1616,8 @@ export class Root implements IDisposer {
 		const focusElement = target.getPrivate("focusElement")!.dom;
 		focusElement.style.top = y + "px";
 		focusElement.style.left = x + "px";
-		focusElement.style.width = (width + 4) + "px";
-		focusElement.style.height = (height + 4) + "px";
+		focusElement.style.width = (width + padding * 2) + "px";
+		focusElement.style.height = (height + padding * 2) + "px";
 
 	}
 

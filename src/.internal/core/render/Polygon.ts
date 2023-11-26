@@ -112,6 +112,10 @@ export class Polygon extends Graphics {
 					this.setPrivateRaw("previousPoints", prevCopy);
 					this.setPrivateRaw("points", copy);
 					this.morphAnimation = this.animatePrivate({ key: "morphProgress", from: 0, to: 1, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") });
+					// solves no animated theme
+					this._root.events.once("frameended", ()=>{
+						this._markDirtyPrivateKey("morphProgress");
+					})
 				}
 			}
 			else {

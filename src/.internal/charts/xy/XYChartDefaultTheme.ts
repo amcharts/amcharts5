@@ -162,6 +162,9 @@ export class XYChartDefaultTheme extends Theme {
 			centerX: 0
 		});
 
+		r("AxisLabel", ["minor"]).setAll({
+			fontSize: "0.6em"
+		});
 
 		r("AxisLabel", ["xy", "scrollbar", "y"]).setAll({
 			visible: false
@@ -341,6 +344,19 @@ export class XYChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
+		{
+			const rule = r("Grid", ["minor"]);
+
+			rule.setAll({
+				location: 0,
+				strokeOpacity: 0.07,
+				crisp: true
+			});
+
+			setColor(rule, "stroke", ic, "grid");
+		}
+
+
 		r("Grid", ["base"]).setAll({
 			strokeOpacity: 0.3
 		});
@@ -373,7 +389,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		r("AxisTick", ["series", "range"]).setAll({
-			visible: false			
+			visible: false
 		});
 
 		r("AxisLabel", ["series", "range"]).setAll({
@@ -389,7 +405,7 @@ export class XYChartDefaultTheme extends Theme {
 				strokeOpacity: 1,
 				isMeasured: false,
 				position: "absolute",
-				visible: false				
+				visible: false
 			});
 
 			setColor(rule, "stroke", ic, "grid");
@@ -784,7 +800,7 @@ export class XYChartDefaultTheme extends Theme {
 			rule.setAll({
 				strokeOpacity: 0,
 				fillOpacity: 0,
-				strokeWidth:1,
+				strokeWidth: 1,
 				width: 12,
 				height: 12
 			});
@@ -800,7 +816,7 @@ export class XYChartDefaultTheme extends Theme {
 				draw: (display: any) => {
 					display.moveTo(0, 0.5);
 					display.lineTo(0, 12.5);
-					
+
 					display.moveTo(2, 0.5);
 					display.lineTo(2, 12.5);
 
@@ -813,9 +829,9 @@ export class XYChartDefaultTheme extends Theme {
 		}
 
 		r("Button", ["rangegrip"]).setAll({
-			draggable:true,
-			paddingTop:0,
-			paddingBottom:0
+			draggable: true,
+			paddingTop: 0,
+			paddingBottom: 0
 		})
 
 		r("Button", ["rangegrip", "vertical"]).setAll({
@@ -843,7 +859,7 @@ export class XYChartDefaultTheme extends Theme {
 
 		r("Button", ["rangegrip", "horizontal", "bottom"]).setAll({
 			centerY: p100
-		});		
+		});
 
 	}
 }

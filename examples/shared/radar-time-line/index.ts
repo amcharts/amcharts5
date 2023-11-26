@@ -177,7 +177,8 @@ cursor.lineY.set("visible", false);
 // Create axes and their renderers
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
 const xRenderer = am5radar.AxisRendererCircular.new(root, {
-  minGridDistance: 10
+  minGridDistance: 10,
+  minorGridEnabled: true
 });
 
 xRenderer.labels.template.setAll({

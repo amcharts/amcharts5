@@ -59,6 +59,7 @@ var xAxis = chart.xAxes.push(
     maxDeviation:1,
     baseInterval: { timeUnit: "day", count: 1 },
     renderer: am5xy.AxisRendererX.new(root, {
+      minorGridEnabled: true,
       pan:"zoom"
     }),
     tooltip: am5.Tooltip.new(root, {})
