@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.6.1] - 2023-11-27
+
+### Changed
+- New default rule added to `ResponsiveTheme` that will hide minor axis labels below `XXL` (1000px) breakpoint.
+- `IndicatorControl` will not list Indicators that rely on volume if chart's `volumeSeries` is not set.
+
+### Fixed
+- Fixed stacking of bullets with varying `centerY`.
+- `role` setting for `Root` element was being ignored.
+- Setting `name` for a Series would not right away update labels of its related legend item.
+
+
 ## [5.6.0] - 2023-11-26
 
 ### Added

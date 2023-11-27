@@ -121,6 +121,10 @@ export class IndicatorControl extends DropdownListControl {
 		button.className = button.className + " am5stock-control-dropdown";
 
 		this._initList();
+
+		// Re-nit list if volume series is added or removed so that we can show/hide
+		// volume-dependent indicators
+		this.get("stockChart").on("volumeSeries", () => this._initList());
 	}
 
 	protected _initList(): void {
@@ -129,19 +133,35 @@ export class IndicatorControl extends DropdownListControl {
 		const items: IDropdownListItem[] = [];
 		$array.each(indicators, (indicator: Indicators | IIndicator) => {
 			if ($type.isObject(indicator)) {
-				items.push({
-					id: indicator.id,
-					label: indicator.name
-				});
+				if (this.supportsIndicator(indicator.id as Indicators)) {
+					items.push({
+						id: indicator.id,
+						label: indicator.name
+					});
+				}
 			}
 			else {
-				items.push({
-					id: indicator,
-					label: this._root.language.translateAny(indicator)
-				});
+				if (this.supportsIndicator(indicator as Indicators)) {
+					items.push({
+						id: indicator,
+						label: this._root.language.translateAny(indicator)
+					});
+				}
 			}
 		})
 		list.set("items", items);
+	}
+
+	/**
+	 * Returns `true` if the indicator is supported in current chart setup.
+	 * 
+	 * @param   indicatorId  Indicator ID
+	 * @return               Supported?
+	 */
+	public supportsIndicator(indicatorId: Indicators): boolean {
+		const stockChart = this.get("stockChart");
+		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Volume", "VWAP"];
+		return (stockChart.get("volumeSeries") || volumeIndicators.indexOf(indicatorId) === -1) ? true : false;
 	}
 
 	protected _getDefaultIcon(): SVGElement {
@@ -162,6 +182,11 @@ export class IndicatorControl extends DropdownListControl {
 	 * @return               Indicator instance
 	 */
 	public addIndicator(indicatorId: Indicators): Indicator | undefined {
+
+		if (!this.supportsIndicator(indicatorId)) {
+			return;
+		}
+
 		const stockChart = this.get("stockChart");
 		let indicator: Indicator | undefined;
 		const stockSeries = stockChart.get("stockSeries")!;
@@ -240,6 +265,19 @@ export class IndicatorControl extends DropdownListControl {
 					legend: legend
 				});
 				break;
+			case "Median Price":
+				indicator = MedianPrice.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;
+			case "Momentum":
+				indicator = Momentum.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries
+				});
+				break;
 			case "Moving Average":
 				indicator = MovingAverage.new(this.root, {
 					stockChart: stockChart,
@@ -277,19 +315,6 @@ export class IndicatorControl extends DropdownListControl {
 				break;
 			case "Typical Price":
 				indicator = TypicalPrice.new(this.root, {
-					stockChart: stockChart,
-					stockSeries: stockSeries,
-					legend: legend
-				});
-				break;
-			case "Momentum":
-				indicator = Momentum.new(this.root, {
-					stockChart: stockChart,
-					stockSeries: stockSeries
-				});
-				break;
-			case "Median Price":
-				indicator = MedianPrice.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					legend: legend

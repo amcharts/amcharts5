@@ -1814,39 +1814,57 @@ export abstract class XYSeries extends Series {
 					const chart = this.chart;
 					if (baseAxis == xAxis) {
 						let previousBullet = this._bullets[positionX + "_" + positionY];
-						let d = -1;
-						if (stacked == "down") {
-							d = 1;
-						}
-						else if (stacked == "auto") {
-							if (chart) {
-								if (y < chart.plotContainer.height() / 2) {
-									d = 1;
+						if (previousBullet) {
+							let previousBounds = previousBullet.bounds();
+							let bounds = sprite.localBounds();
+							let yo = y;
+							y = previousBounds.top;
+
+							if (stacked == "down") {
+								y = previousBounds.bottom - bounds.top;
+							}
+							else if (stacked == "auto") {
+								if (chart) {
+									if (yo < chart.plotContainer.height() / 2) {
+										y = previousBounds.bottom - bounds.top;
+									}
+									else {
+										y += bounds.bottom;
+									}
 								}
 							}
-						}
-
-						if (previousBullet) {
-							y = previousBullet.y() + previousBullet.height() * d;
+							else {
+								y += bounds.bottom;
+							}
 						}
 						this._bullets[positionX + "_" + positionY] = sprite;
 					}
 					else {
 						let previousBullet = this._bullets[positionX + "_" + positionY];
-						let d = -1;
-						if (stacked == "down") {
-							d = 1;
-						}
-						else if (stacked == "auto") {
-							if (chart) {
-								if (x < chart.plotContainer.width() / 2) {
-									d = 1;
+						if (previousBullet) {
+							let previousBounds = previousBullet.bounds();
+							let bounds = sprite.localBounds();
+							let xo = x;
+							x = previousBounds.right;
+
+							if (stacked == "down") {
+								x = previousBounds.left - bounds.right;
+							}
+							else if (stacked == "auto") {
+								if (chart) {
+									if (xo < chart.plotContainer.width() / 2) {
+										x = previousBounds.left - bounds.right;
+									}
+									else {
+										x -= bounds.left;
+									}
 								}
 							}
+							else {
+								x -= bounds.left;
+							}
 						}
-						if (previousBullet) {
-							x = previousBullet.x() + previousBullet.width() * d;
-						}
+
 						this._bullets[positionX + "_" + positionY] = sprite;
 					}
 				}
@@ -2161,7 +2179,7 @@ export abstract class XYSeries extends Series {
 	/**
 	 * @ignore
 	 */
-	public updateLegendValue(dataItem: DataItem<this["_dataItemSettings"]> | undefined) {
+	public updateLegendValue(dataItem?: DataItem<this["_dataItemSettings"]> | undefined) {
 		const legendDataItem = this.get("legendDataItem");
 
 		if (legendDataItem) {

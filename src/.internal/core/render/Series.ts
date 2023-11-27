@@ -408,6 +408,9 @@ export abstract class Series extends Component {
 		let startIndex = this.startIndex();
 		let endIndex = this.endIndex();
 
+		if(this.isDirty("name")){
+			this.updateLegendValue();
+		}
 
 		if(this.isDirty("heatRules")){
 			this._valuesDirty = true;
@@ -861,7 +864,7 @@ export abstract class Series extends Component {
 	/**
 	 * @ignore
 	 */
-	public updateLegendValue(dataItem: DataItem<this["_dataItemSettings"]>) {
+	public updateLegendValue(dataItem?: DataItem<this["_dataItemSettings"]>) {
 		if(dataItem){
 			const legendDataItem = dataItem.get("legendDataItem" as any) as DataItem<ILegendDataItem>;
 

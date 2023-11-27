@@ -451,8 +451,26 @@ export class ResponsiveTheme extends Theme {
 
 		addRule({
 			name: "AxisLabel",
+			tags: ["x", "minor"],
+			relevant: ResponsiveTheme.widthXXL,
+			settings: {
+				forceHidden: true
+			}
+		});
+
+		addRule({
+			name: "AxisLabel",
 			tags: ["y"],
 			relevant: ResponsiveTheme.widthXXS,
+			settings: {
+				forceHidden: true
+			}
+		});
+
+		addRule({
+			name: "AxisLabel",
+			tags: ["y", "minor"],
+			relevant: ResponsiveTheme.heightXXL,
 			settings: {
 				forceHidden: true
 			}

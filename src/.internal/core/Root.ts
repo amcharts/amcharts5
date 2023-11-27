@@ -138,7 +138,7 @@ export interface IRootSettings {
 	ariaLabel?: string;
 
 	/**
-	 * Allows setting a "role" for the innert `<div>`.
+	 * Allows setting a "role" for the inner `<div>`.
 	 *
 	 * @since 5.3.17
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
@@ -571,6 +571,10 @@ export class Root implements IDisposer {
 
 			if (settings.ariaLabel) {
 				this._inner.setAttribute("aria-label", settings.ariaLabel);
+			}
+
+			if (settings.role) {
+				this._inner.setAttribute("role", settings.role);
 			}
 		}
 
