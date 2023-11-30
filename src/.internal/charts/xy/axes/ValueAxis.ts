@@ -671,7 +671,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
-		renderer.updateTick(dataItem.get("tick"), position, endPosition, count);
+		renderer.updateTick(dataItem.get("tick"), position, labelEndPosition, count);
 		renderer.updateFill(dataItem.get("axisFill"), position, fillEndPosition);
 
 		this._processBullet(dataItem);

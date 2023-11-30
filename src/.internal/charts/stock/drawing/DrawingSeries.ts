@@ -279,6 +279,7 @@ export class DrawingSeries extends LineSeries {
 			}
 
 			const container = this.grips.make();
+			container.setRaw("userData", "grip");
 			this.grips.push(container);
 
 			const circle = container.children.push(this.circles.make())

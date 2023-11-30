@@ -30,6 +30,9 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 		this._addPoint(valueX, valueY, "p2", index);
 		this._addPoint(valueX, valueY, "p3", index);
 		this._addPoint(valueX, valueY, "p4", index);
+
+		this._addPoint(valueX, valueY, "m1", index);
+		this._addPoint(valueX, valueY, "m2", index);
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
@@ -72,6 +75,9 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 				const diP3 = this._di[index]["p3"];
 				const diP4 = this._di[index]["p4"];
 
+				const diM1 = this._di[index]["m1"];
+				const diM2 = this._di[index]["m2"];
+
 				if (diP1 && diP2) {
 					if (this._firstClick) {
 						this._setContext(diP2, "valueX", valueX);
@@ -83,15 +89,80 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 						this._setContext(diP4, "valueX", valueX);
 						this._setContext(diP4, "valueY", valueY, true);
 						this._setXLocation(diP4, valueX);
+
+						this._setContext(diM1, "valueX", valueX);
+						this._setContext(diM1, "valueY", valueY, true);
+						this._setXLocation(diM1, valueX);
+
+						this._setContext(diM2, "valueX", valueX);
+						this._setContext(diM2, "valueY", valueY, true);
+						this._setXLocation(diM2, valueX);
 					}
 					else {
 						this._setContext(diP4, "valueY", valueY, true);
 						this._setContext(diP3, "valueY", diP1.get("valueY", 0) + valueY - diP2.get("valueY", 0), true);
+
+						this._updateMiddlePoints(index);
 					}
 
 					this._updateSegment(index);
 				}
 
+			}
+		}
+	}
+
+	protected _updateMiddlePoints(index: number) {
+		const diP1 = this._di[index]["p1"];
+		const diP2 = this._di[index]["p2"];
+
+		const diP3 = this._di[index]["p3"];
+		const diP4 = this._di[index]["p4"];
+
+		const diM1 = this._di[index]["m1"];
+		const diM2 = this._di[index]["m2"];
+
+		const valueX1 = diP1.get("valueX", 0);
+		const valueX2 = diP2.get("valueX", 0);
+		const valueX3 = diP3.get("valueX", 0);
+		const valueX4 = diP4.get("valueX", 0);
+
+		const valueY1 = diP1.get("valueY", 0);
+		const valueY2 = diP2.get("valueY", 0);
+		const valueY3 = diP3.get("valueY", 0);
+		const valueY4 = diP4.get("valueY", 0);
+
+		const xM1 = Math.round(valueX1 + (valueX2 - valueX1) / 2);
+
+		this._setContext(diM1, "valueY", valueY1 + (valueY2 - valueY1) / 2, true);
+		this._setContext(diM1, "valueX", xM1, true);
+		this._setXLocation(diM1, xM1);
+
+		const xM2 = valueX3 + (valueX4 - valueX3) / 2;
+		this._setContext(diM2, "valueY", valueY3 + (valueY4 - valueY3) / 2, true);
+		this._setContext(diM2, "valueX", xM2, true);
+		this._setXLocation(diM2, xM2);
+
+		if (diM1.bullets) {
+			const mBullet = diM1.bullets[0].get("sprite");
+			if (mBullet) {
+				const point1 = diP1.get("point");
+				const point2 = diP2.get("point");
+				if (point1 && point2) {
+					mBullet.set("x", point1.x + (point2.x - point1.x) / 2);
+					mBullet.set("y", point1.y + (point2.y - point1.y) / 2);
+				}
+			}
+		}
+		if (diM2.bullets) {
+			const mBullet = diM2.bullets[0].get("sprite");
+			if (mBullet) {
+				const point1 = diP3.get("point");
+				const point2 = diP4.get("point");
+				if (point1 && point2) {
+					mBullet.set("x", point1.x + (point2.x - point1.x) / 2);
+					mBullet.set("y", point1.y + (point2.y - point1.y) / 2);
+				}
 			}
 		}
 	}
@@ -167,6 +238,7 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 						})
 
 						this._updateOthers(i, fillGraphics, p1, p2);
+						this._updateMiddlePoints(i);
 					}
 				}
 			}
@@ -184,10 +256,14 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 		const diP2 = this._di[index]["p2"];
 		const diP3 = this._di[index]["p3"];
 		const diP4 = this._di[index]["p4"];
+		const diM1 = this._di[index]["m1"];
+		const diM2 = this._di[index]["m2"];
 
 		if (diP1 && diP2 && diP3 && diP4) {
 
 			const dy = diP3.get("valueY", 0) - diP1.get("valueY", 0);
+			const dy1 = diP2.get("valueY", 0) - diP1.get("valueY", 0);
+			const dy2 = diP4.get("valueY", 0) - diP3.get("valueY", 0);
 
 			const vx = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(point.x)));
 			const vy = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), vx);
@@ -218,11 +294,22 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 				this._setContext(diP2, "valueY", vy - dy, true);
 				this._setXLocation(diP2, vx);
 			}
+			else if (corner == "m1") {
+				this._setContext(diP1, "valueY", vy - dy1 / 2, true);
+				this._setContext(diP2, "valueY", vy + dy1 / 2, true);
+			}
+			else if (corner == "m2") {
+				this._setContext(diP3, "valueY", vy - dy2 / 2, true);
+				this._setContext(diP4, "valueY", vy + dy2 / 2, true);
+			}
+			this._updateMiddlePoints(index);
 		}
 		this._positionBullets(diP1);
 		this._positionBullets(diP2);
 		this._positionBullets(diP3);
 		this._positionBullets(diP4);
+		this._positionBullets(diM1);
+		this._positionBullets(diM2);
 	}
 
 	protected _updateOthers(_index: number, _fillGraphics: Graphics, _p1: IPoint, _p2: IPoint) {

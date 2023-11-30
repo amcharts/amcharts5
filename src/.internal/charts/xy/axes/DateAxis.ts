@@ -55,7 +55,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	groupCount?: number;
 
 	/**
-	 * Force data item grouping to specific interval.
+	 * Force data item grouping to specific interval. This interval must be within groupIntervals array for this to work.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
@@ -521,14 +521,19 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this.get("groupData") && !this._groupingCalculated) {
 				this._groupingCalculated = true;
 
-				let modifiedDifference = (selectionMax - selectionMin) + (this.get("startLocation", 0) + (1 - this.get("endLocation", 1)) * this.baseDuration());
 				let groupInterval = this.get("groupInterval");
+				let current = this.getPrivate("groupInterval");
+
+				let modifiedDifference = (selectionMax - selectionMin) + (this.get("startLocation", 0) + (1 - this.get("endLocation", 1)) * this.baseDuration());
+
+				if (current) {
+					let duration = $time.getIntervalDuration(current);
+					modifiedDifference = Math.ceil(modifiedDifference / duration) * duration;
+				}
 
 				if (!groupInterval) {
 					groupInterval = this.getGroupInterval(modifiedDifference);
 				}
-
-				let current = this.getPrivate("groupInterval");
 
 				if (groupInterval && (!current || (current.timeUnit !== groupInterval.timeUnit || current.count !== groupInterval.count) || this._seriesDataGrouped)) {
 					this._seriesDataGrouped = false;
@@ -641,8 +646,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		return 1.01;
 	}
 
-	protected _getMinorInterval(interval:ITimeInterval):ITimeInterval | undefined{
-		let minorGridInterval:ITimeInterval | undefined;
+	protected _getMinorInterval(interval: ITimeInterval): ITimeInterval | undefined {
+		let minorGridInterval: ITimeInterval | undefined;
 		let count = interval.count;
 		let timeUnit = interval.timeUnit;
 		if (count > 1) {
@@ -654,10 +659,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 			else if (count == 12) {
 				count = 2;
-			}			
+			}
 			else if (count == 6) {
 				count = 1;
-			}						
+			}
 			else if (count == 30) {
 				count = 10;
 			}
@@ -667,7 +672,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			minorGridInterval = { timeUnit: timeUnit, count: count };
 		}
 		if (timeUnit == "week") {
-			minorGridInterval = { timeUnit: "day", count: 1 };
+			if(this.getPrivate("baseInterval")?.timeUnit != "week"){
+				minorGridInterval = { timeUnit: "day", count: 1 };
+			}
 		}
 		return minorGridInterval;
 	}
@@ -820,7 +827,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 								minorLabel.set("text", this._root.dateFormatter.format(date, format!));
 							}
 							else {
-								minorLabel.setPrivate("visible", false);								
+								minorLabel.setPrivate("visible", false);
 							}
 						}
 

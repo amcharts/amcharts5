@@ -68,7 +68,8 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	public _updateAllDates() {
-		this._dates.length = 0;
+		const dates = this._dates;
+		dates.length = 0;
 
 		$array.each(this.series, (series) => {
 			let field = "valueX";
@@ -84,6 +85,43 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				}
 			})
 		})
+
+		const extraMax = this.get("extraMax", 0);
+		const extraMin = this.get("extraMin", 0);
+
+		const len = dates.length;
+
+		const baseInterval = this.getPrivate("baseInterval");
+		const timeUnit = baseInterval.timeUnit;
+
+		const firstDay = this._root.locale.firstDayOfWeek;
+		const utc = this._root.utc;
+		const timezone = this._root.timezone;
+
+		if (extraMax > 0) {
+			const extra = len * extraMax;
+			let time = dates[len - 1];
+			if ($type.isNumber(time)) {
+				for (let i = len - 1; i < len + extra; i++) {
+					time += $time.getDuration(timeUnit, baseInterval.count * this._getM(timeUnit));
+					time = $time.round(new Date(time), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+					dates.push(time);
+				}
+			}
+
+		}
+
+		if (extraMin > 0) {
+			const extra = len * extraMin;
+			let time = dates[0];
+			if ($type.isNumber(time)) {
+				for (let i = 0; i < extra; i++) {
+					time -= $time.getDuration(timeUnit, baseInterval.count);
+					time = $time.round(new Date(time), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+					dates.unshift(time);
+				}
+			}
+		}
 	}
 
 	/**

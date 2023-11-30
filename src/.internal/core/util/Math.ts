@@ -303,7 +303,7 @@ export function getPointOnLine(pointA: IPoint, pointB: IPoint, position: number)
  * @return Closes value from the array
  */
 export function closest(values: number[], referenceValue: number): number {
-	return values.reduce(function (prev, curr) {
+	return values.reduce(function(prev, curr) {
 		return (Math.abs(curr - referenceValue) < Math.abs(prev - referenceValue) ? curr : prev);
 	});
 }
@@ -315,7 +315,9 @@ export function closest(values: number[], referenceValue: number): number {
  * @returns boolean
  */
 export function boundsOverlap(bounds1: IBounds, bounds2: IBounds): boolean {
-	return !(bounds1.bottom < bounds2.top || bounds2.bottom < bounds1.top || bounds1.right < bounds2.left || bounds2.right < bounds1.left);
+	const horizontalOverlap = bounds1.left < bounds2.right && bounds1.right > bounds2.left;
+	const verticalOverlap = bounds1.top < bounds2.bottom && bounds1.bottom > bounds2.top;
+	return horizontalOverlap && verticalOverlap;
 }
 
 /**

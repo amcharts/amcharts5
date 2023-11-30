@@ -1,6 +1,5 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
-import type { IPoint } from "../../../core/util/IPoint";
 import { Line } from "../../../core/render/Line";
 
 import { DrawingSeries, IDrawingSeriesSettings, IDrawingSeriesPrivate, IDrawingSeriesDataItem } from "./DrawingSeries";
@@ -32,32 +31,36 @@ export class PolylineSeries extends DrawingSeries {
 		if (this._drawingEnabled) {
 			super._handlePointerClick(event);
 
-			if (!this._isDragging) {
-				this._isDrawing = true;
-				// for consistency with other series
-				if (this._index == 0) {
-					this._index = 1;
-				}
-
-				if (this._pIndex == 0) {
-					this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: "e" });
-				}
-				this._drawingLine.show();
-				this._addPoint(event);
+			if (event.target.get("userData") == "grip") {
+				this._endPolyline(event.target.dataItem);
 			}
+			else {
+				if (!this._isDragging) {
+					this._isDrawing = true;
+					// for consistency with other series
+					if (this._index == 0) {
+						this._index = 1;
+					}
 
-			this._drawingLine.set("stroke", this.get("strokeColor"));			
+					if (this._pIndex == 0) {
+						this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: "e" });
+					}
+					this._drawingLine.show();
+					this._addPoint(event);
+				}
+
+				this._drawingLine.set("stroke", this.get("strokeColor"));
+			}
 		}
 	}
 
 	protected _handleBulletDragStop(event: ISpritePointerEvent) {
 		super._handleBulletDragStop(event);
-		this._checkClosing(event);
 	}
 
 	public disableDrawing() {
 		super.disableDrawing();
-		this._drawingLine.hide();
+		this._endPolyline();
 	}
 
 	protected _afterDataChange() {
@@ -101,38 +104,35 @@ export class PolylineSeries extends DrawingSeries {
 			this._setXLocation(dataItem, valueX);
 
 			this._pIndex++;
-			this._handleClosing(dataItem, point);
 		}
 	}
 
-	protected _checkClosing(event: ISpritePointerEvent) {
-		const dataItem = event.target.dataItem;
+	protected _endPolyline(dataItem?: DataItem<this["_dataItemSettings"]>) {
+		if (!dataItem) {
+			dataItem = this.dataItems[this.dataItems.length - 1];
+		}
+
 		if (dataItem) {
-			const sprite = event.target;
-			const point = { x: sprite.x(), y: sprite.y() }
-			this._handleClosing(dataItem, point);
-		}
-	}
+			this._pIndex = 0;
+			const dataContext = dataItem.dataContext as any;
 
-	protected _handleClosing(dataItem: DataItem<this["_dataItemSettings"]>, point: IPoint) {
-		const dataContext = dataItem.dataContext as any;
-		if (!dataContext.closing) {
 			const index = dataContext.index;
-			if (this._di[index]) {
-				const firstDataItem = this._di[index][0];
 
-				if (firstDataItem && firstDataItem != dataItem) {
-					const dPoint = firstDataItem.get("point");
-					if (dPoint) {
-						if (Math.hypot(point.x - dPoint.x, point.y - dPoint.y) < 5) {
-							dataContext.closing = true;
-							this._pIndex = 0;
-							this.data.push({ stroke: this._getStrokeTemplate(), index: index + 1, corner: "e" });
-							this._drawingLine.hide();
-						}
-					}
-				}
+			if (dataContext.corner == 0) {
+				this.data.push({ valueX: dataItem.get("valueX"), valueY: dataItem.get("valueY"), index: index, corner: this._pIndex + 1, closing: true })
+
+				const dataItems = this.dataItems;
+				const len = dataItems.length - 1;
+
+				this.setPrivate("startIndex", 0);
+				this.setPrivate("endIndex", len);
+
+				dataItem = dataItems[len];
+				this._positionBullets(dataItem);
+				this._setXLocation(dataItem, dataItem.get("valueX", 0));
 			}
+			this.data.push({ stroke: this._getStrokeTemplate(), index: index + 1, corner: "e" });
+			this._drawingLine.hide();
 		}
 	}
 
@@ -144,7 +144,7 @@ export class PolylineSeries extends DrawingSeries {
 			if (movePoint) {
 				const dataItems = this.dataItems;
 				const len = dataItems.length;
-				if(len > 0){
+				if (len > 0) {
 					const lastItem = dataItems[len - 1];
 
 					const point = lastItem.get("point");

@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.6.2] - 2023-11-30
+
+### Added
+- Middle handles added to Parallel channel drawings so that the drawing could be resized vertically.
+
+### Changed
+- Clicking on a last or any other bullet when drawing a polyline on a `StockChart` will terminate current polyline. The next click will start a new polyline.
+- `extraMax` and `extraMin` settings now work on `GaplessDateAxis`. This allows adding extra space in front (or back) of your data. We recommend setting `maxDeviation` to `0` if you use `extraMax`.
+
+### Fixed
+- In some rare cases (with a specific data count and `groupData` set to `true`) the chart was continously switching from monthly to weekly group interval causing the chart to flicker.
+- Tick position was not always correct with `minorGridEnabled` set to `true`.
+- On a `DateAxis` when `gridInterval` was set to `week`, it still showed minor grid lines even when `baseInterval` was also `week`.
+
+
 ## [5.6.1] - 2023-11-27
 
 ### Changed
