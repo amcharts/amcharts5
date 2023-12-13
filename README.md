@@ -28,6 +28,54 @@ For extensive documentation, including getting started tutorials, as well
 as class reference visit [amCharts 5 documentation website](https://www.amcharts.com/docs/v5).
 
 
+#### Persian Date
+If you want to use Persian date in your chart, you can use this code in your project.
+
+```
+
+import moment from "jalali-moment";
+dateAxis
+  .get("renderer")
+  .labels.template.adapters.add("text", function (text, target) {
+    try {
+      if (target.dataItem) {
+        return moment(target.dataItem.get("value"))
+          .locale("fa")
+          .format("dddd-MMM");
+      }
+    } catch (err) {
+      return text;
+    }
+  });
+
+let xTooltip = dateAxis.get("tooltip");
+xTooltip.label.adapters.add("text", function (text, target) {
+  try {
+    if (text) {
+      return moment(text, "YYYY/MM/DD").format("jYYYY/jM/jD");
+    }
+    return text;
+  } catch (err) {
+    return text;
+  }
+});
+
+
+sbDateAxis
+  .get("renderer")
+  .labels.template.adapters.add("text", function (text, target) {
+    try {
+      if (target.dataItem) {
+        return moment(target.dataItem.get("value"))
+          .locale("fa")
+          .format("MMM YYYY");
+      }
+    } catch (err) {
+      return text;
+    }
+  });
+```
+
 ### Pre-built binaries
 
 * [NPM package](https://www.npmjs.com/package/@amcharts/amcharts5)
