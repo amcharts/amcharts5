@@ -1,7 +1,7 @@
 import { Theme } from "../../core/Theme";
 import { p100, p50, p0, percent } from "../../core/util/Percent";
 import { setColor } from "../../themes/DefaultTheme";
-import { color } from "../../core/util/Color";
+import { Color, color } from "../../core/util/Color";
 import { ColorSet } from "../../core/util/ColorSet";
 import { StockIcons } from "./toolbar/StockIcons";
 
@@ -851,6 +851,10 @@ export class StockChartDefaultTheme extends Theme {
 			legendValueText: "[{volumeColor}; bold]{valueY.formatNumber('#.000a')}[/]",
 		})
 
+		r("ColumnSeries", ["volumeprofile"]).setAll({
+			legendLabelText: "Volume Profile",
+			legendValueText: "[{downColor}; bold]{down.formatNumber('#.000a')}[/] [{upColor}; bold]{up.formatNumber('#.000a')}[/]  [bold]{total.formatNumber('#.000a')}[/]"
+		})
 
 		r("LineSeries", ["vwap"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
@@ -871,6 +875,15 @@ export class StockChartDefaultTheme extends Theme {
 
 		// end of legend labels
 
+		r("RoundedRectangle", ["series", "column", "volumeprofile"]).setAll({
+			fillOpacity: .3,
+			strokeWidth: 2,
+			strokeOpacity: 0
+		})
+
+		r("RoundedRectangle", ["series", "column", "volumeprofile"]).states.create("hover", {
+			strokeOpacity: 1
+		})
 
 		r("RoundedRectangle", ["macd", "difference"]).setAll({
 			fillOpacity: 0.5,
@@ -1160,6 +1173,18 @@ export class StockChartDefaultTheme extends Theme {
 			decreasingColor: ic.get("negative")
 		});
 
+		r("VolumeProfile").setAll({
+			name: "Volume Profile",
+			shortName: "VP",
+			upColor: Color.fromHex(0xE3B30C),
+			downColor: Color.fromHex(0x2E78E3),
+			countType: "rows",
+			count: 24,
+			axisWidth: 40,
+			valueArea: 70,
+			valueAreaOpacity: 0.7
+		});
+
 		r("MACD").setAll({
 			name: "MACD",
 			field: "close",
@@ -1190,7 +1215,8 @@ export class StockChartDefaultTheme extends Theme {
 			name: l.translateAny("Indicators"),
 			scrollable: true,
 			fixedLabel: true,
-			indicators: ["Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "VWAP", "Williams R", "ZigZag"]
+			searchable: true,
+			indicators: ["Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({
@@ -1446,6 +1472,10 @@ export class StockChartDefaultTheme extends Theme {
 			fixedLabel: true,
 			//align: "right",
 			items: [{
+				id: "fills",
+				label: l.translateAny("X-axis fills"),
+				className: "am5stock-list-info am5stock-list-heading"
+			}, {
 				form: "checkbox",
 				id: "fills",
 				label: l.translateAny("Fills")
@@ -1468,6 +1498,41 @@ export class StockChartDefaultTheme extends Theme {
 				form: "radio",
 				value: "logarithmic",
 				label: l.translateAny("Logarithmic")
+			}, {
+				id: "autosave",
+				label: l.translateAny("Drawings &amp; Indicators"),
+				className: "am5stock-list-info am5stock-list-heading"
+			}, {
+				id: "autosave",
+				form: "checkbox",
+				label: l.translateAny("Auto-save")
+			},]
+		});
+
+		r("DataSaveControl").setAll({
+			description: l.translateAny("Save drawings and indicators"),
+			togglable: true,
+			fixedLabel: true,
+			autoSave: false,
+			items: [{
+				id: "autosave",
+				form: "checkbox",
+				label: l.translateAny("Auto-save drawings and indicators")
+			}, {
+				id: "autosave",
+				label: ""
+			}, {
+				id: "save",
+				label: l.translateAny("Save drawings &amp; indicators"),
+				subLabel: l.translateAny("Saves drawings/indicators to browser local storage")
+			}, {
+				id: "restore",
+				label: l.translateAny("Restore saved data"),
+				subLabel: l.translateAny("Restores saved data from browser local storage")
+			}, {
+				id: "clear",
+				label: l.translateAny("Clear"),
+				subLabel: l.translateAny("Clears saved data from browser local storage")
 			}]
 		});
 

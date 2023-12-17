@@ -91,6 +91,8 @@ export class StockControl extends Entity {
 	protected _afterNew() {
 		super._afterNew();
 
+		this.get("stockChart").controls.push(this);
+
 		// Inherit default themes from chart
 		this._defaultThemes = this.get("stockChart")._defaultThemes;
 		super._afterNewApplyThemes();

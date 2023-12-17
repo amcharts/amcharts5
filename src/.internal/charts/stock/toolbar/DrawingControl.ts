@@ -1138,6 +1138,7 @@ export class DrawingControl extends StockControl {
 				JsonParser.new(this._root).parse(drawing.__drawing).then((drawingData: any) => {
 					drawingSeries.data.pushAll(drawingData);
 				});
+
 			}
 			else {
 				// Wait until panel becomes available

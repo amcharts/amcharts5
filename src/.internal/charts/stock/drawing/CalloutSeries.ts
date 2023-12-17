@@ -42,47 +42,49 @@ export class CalloutSeries extends LabelSeries {
 		const dataContext = dataItem.dataContext as any;
 		const template = dataContext.settings;
 
-		const label = this.getPrivate("label");
-		if (label) {
-			label.events.on("positionchanged", () => {
-				this._updatePointer(label);
-			})
+		if (template) {
+			const label = this.getPrivate("label");
+			if (label) {
+				label.events.on("positionchanged", () => {
+					this._updatePointer(label);
+				})
 
-			label.events.on("click", () => {
-				const spriteResizer = this.spriteResizer;
-				if (spriteResizer.get("sprite") == label) {
-					spriteResizer.set("sprite", undefined);
-				}
-				else {
-					spriteResizer.set("sprite", label);
-				}
-				if (this._erasingEnabled) {
-					this._disposeIndex(dataContext.index);
-				}
-			})
+				label.events.on("click", () => {
+					const spriteResizer = this.spriteResizer;
+					if (spriteResizer.get("sprite") == label) {
+						spriteResizer.set("sprite", undefined);
+					}
+					else {
+						spriteResizer.set("sprite", label);
+					}
+					if (this._erasingEnabled) {
+						this._disposeIndex(dataContext.index);
+					}
+				})
 
-			label.on("scale", () => {
-				this._updatePointer(label);
-			})
+				label.on("scale", () => {
+					this._updatePointer(label);
+				})
 
-			label.on("rotation", () => {
-				this._updatePointer(label);
-			})
+				label.on("rotation", () => {
+					this._updatePointer(label);
+				})
 
-			label.setAll({ draggable: true });
+				label.setAll({ draggable: true });
 
-			label.on("x", (x) => {
-				template.set("x", x);
-			})
+				label.on("x", (x) => {
+					template.set("x", x);
+				})
 
-			label.on("y", (y) => {
-				template.set("y", y);
-			})
+				label.on("y", (y) => {
+					template.set("y", y);
+				})
 
-			const defaultState = label.states.lookup("default")!;
-			setTimeout(() => {
-				label.animate({ key: "y", to: -label.height() / 2 - 10, from: 0, duration: defaultState.get("stateAnimationDuration", 500), easing: defaultState.get("stateAnimationEasing", $ease.out($ease.cubic)) })
-			}, 50)
+				const defaultState = label.states.lookup("default")!;
+				setTimeout(() => {
+					label.animate({ key: "y", to: -label.height() / 2 - 10, from: 0, duration: defaultState.get("stateAnimationDuration", 500), easing: defaultState.get("stateAnimationEasing", $ease.out($ease.cubic)) })
+				}, 50)
+			}
 		}
 	}
 

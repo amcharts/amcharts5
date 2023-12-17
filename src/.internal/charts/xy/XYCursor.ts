@@ -83,8 +83,9 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * Defines in which direction to look when searching for the nearest data
 	 * item to snap to.
 	 *
-	 * Possible values: `"xy"` (default), `"x"`, and `"y"`.
+	 * Possible values: `"xy"` (default), `"x"`, `"y"`, `"x!"`, `"y!"`.
 	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#snapping-to-series} for more info
 	 * @since 5.0.6
 	 * @default "xy"
 	 */

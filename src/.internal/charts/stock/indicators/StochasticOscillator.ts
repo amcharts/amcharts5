@@ -93,7 +93,7 @@ export class StochasticOscillator extends OverboughtOversold {
 
 	public _updateChildren() {
 		if (this.isDirty("kSmoothing") || this.isDirty("dSmoothing")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("dSmoothing", this.get("dSmoothing"));
 			this.setCustomData("kSmoothing", this.get("kSmoothing"));
 		}

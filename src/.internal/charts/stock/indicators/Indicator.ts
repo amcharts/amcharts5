@@ -121,7 +121,7 @@ export abstract class Indicator extends Container {
 		super._prepareChildren();
 
 		if (this.isDirty("stockSeries") || this.isDirty("volumeSeries")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 
 			const stockSeries = this.get("stockSeries");
 			const previousS = this._prevSettings.stockSeries;
@@ -131,10 +131,10 @@ export abstract class Indicator extends Container {
 			if (stockSeries) {
 				this._sDP = new MultiDisposer([
 					stockSeries.events.on("datavalidated", () => {
-						this.markDataDirty();
+						this._markDataDirty();
 					}),
 					stockSeries.events.on("datasetchanged", () => {
-						this.markDataDirty();
+						this._markDataDirty();
 					})
 				])
 			}
@@ -147,10 +147,10 @@ export abstract class Indicator extends Container {
 			if (volumeSeries) {
 				this._vDP = new MultiDisposer([
 					volumeSeries.events.on("datavalidated", () => {
-						this.markDataDirty();
+						this._markDataDirty();
 					}),
 					volumeSeries.events.on("datasetchanged", () => {
-						this.markDataDirty();
+						this._markDataDirty();
 					})
 				])
 			}
@@ -158,14 +158,15 @@ export abstract class Indicator extends Container {
 
 		if (this.isDirty("field")) {
 			if (this.get("field")) {
-				this._dataDirty = true;
+				this.markDataDirty();
 			}
 		}
 
 		if (this.isDirty("period")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("period", this.get("period"));
 		}
+
 
 		if (this._dataDirty) {
 			this.prepareData();
@@ -173,9 +174,15 @@ export abstract class Indicator extends Container {
 		}
 	}
 
-	protected markDataDirty() {
+	protected _markDataDirty() {
 		this._dataDirty = true;
 		this.markDirty();
+	}
+
+	public markDataDirty() {
+		this._root.events.once("frameended", () => {
+			this._markDataDirty();
+		})
 	}
 
 	public _updateChildren() {
@@ -189,7 +196,6 @@ export abstract class Indicator extends Container {
 		this.setCustomData("field", this.get("field"));
 		this.setCustomData("name", this.get("name"));
 		this.setCustomData("shortName", this.get("shortName"));
-
 	}
 
 	protected _dispose() {

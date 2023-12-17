@@ -3543,6 +3543,12 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		return hit;
 	}
 
+	getObjectAtPoint(point: IPoint): CanvasDisplayObject | undefined {
+		const bbox = this._adjustBoundingBox(this.view.getBoundingClientRect());
+
+		return this._getHitTarget(point, bbox, this._layerDom) || undefined;
+	}
+
 	_withEvents<Key extends keyof IRendererEvents>(key: Key, f: (events: IEvents<Key>) => void): void {
 		const events = this._events[key] as IEvents<Key> | undefined;
 

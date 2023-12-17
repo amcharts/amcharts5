@@ -57,8 +57,8 @@ export class AccumulationDistribution extends ChartIndicator {
 		type: "checkbox"
 	}];
 
-	public _afterNew(){
-		this._themeTags.push("accumulationdistribution");		
+	public _afterNew() {
+		this._themeTags.push("accumulationdistribution");
 		super._afterNew();
 		this.yAxis.set("numberFormat", "#.###a");
 	}
@@ -76,9 +76,10 @@ export class AccumulationDistribution extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("useVolume") || this.isDirty("volumeSeries")) {
-			this._dataDirty = true;
-			this.setCustomData("useVolume", this.get("useVolume") ? "Y" : "N");
+		const useVolume = "useVolume";
+		if (this.isDirty(useVolume)) {
+			this.markDataDirty();
+			this.setCustomData(useVolume, this.get(useVolume) ? "Y" : "N");
 		}
 		super._prepareChildren();
 	}
@@ -88,7 +89,6 @@ export class AccumulationDistribution extends ChartIndicator {
 	 */
 	public prepareData() {
 		if (this.series) {
-
 			const dataItems = this.get("stockSeries").dataItems;
 			const volumeSeries = this.get("volumeSeries");
 			this.setRaw("field", "close");

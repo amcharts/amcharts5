@@ -79,9 +79,10 @@ export class DisparityIndex extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("movingAverageType")) {
-			this._dataDirty = true;
-			this.setCustomData("movingAverageType", this.get("movingAverageType"));
+		const movingAverageType = "movingAverageType";
+		if (this.isDirty(movingAverageType)) {
+			this.markDataDirty();
+			this.setCustomData(movingAverageType, this.get(movingAverageType));
 		}
 
 		super._prepareChildren();

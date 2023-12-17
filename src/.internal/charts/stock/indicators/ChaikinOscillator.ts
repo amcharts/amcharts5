@@ -78,8 +78,8 @@ export class ChaikinOscillator extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("volumeSeries") || this.isDirty("slowPeriod")) {
-			this._dataDirty = true;
+		if (this.isDirty("slowPeriod")) {
+			this.markDataDirty();
 			this.setCustomData("slowPeriod", this.get("slowPeriod"));
 		}
 		super._prepareChildren();

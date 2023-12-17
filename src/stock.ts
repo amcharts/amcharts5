@@ -26,6 +26,7 @@ export { StochasticMomentumIndex, IStochasticMomentumIndexEvents, IStochasticMom
 export { AwesomeOscillator, IAwesomeOscillatorEvents, IAwesomeOscillatorPrivate, IAwesomeOscillatorSettings } from "./.internal/charts/stock/indicators/AwesomeOscillator";
 export { WilliamsR, IWilliamsRPrivate, IWilliamsREvents, IWilliamsRSettings } from "./.internal/charts/stock/indicators/WilliamsR";
 export { Volume, IVolumeEvents, IVolumePrivate, IVolumeSettings } from "./.internal/charts/stock/indicators/Volume";
+export { VolumeProfile, IVolumeProfileEvents, IVolumeProfilePrivate, IVolumeProfileSettings } from "./.internal/charts/stock/indicators/VolumeProfile";
 export { CommodityChannelIndex, ICommodityChannelIndexEvents, ICommodityChannelIndexPrivate, ICommodityChannelIndexSettings } from "./.internal/charts/stock/indicators/CommodityChannelIndex";
 export { DisparityIndex, IDisparityIndexEvents, IDisparityIndexPrivate, IDisparityIndexSettings } from "./.internal/charts/stock/indicators/DisparityIndex";
 export { StandardDeviation, IStandardDeviationEvents, IStandardDeviationPrivate, IStandardDeviationSettings } from "./.internal/charts/stock/indicators/StandardDeviation";
@@ -73,5 +74,6 @@ export { SeriesTypeControl, ISeriesTypeControlEvents, ISeriesTypeControlPrivate,
 export { IntervalControl, IIntervalControlEvents, IIntervalControlItem, IIntervalControlPrivate, IIntervalControlSettings } from "./.internal/charts/stock/toolbar/IntervalControl";
 export { ResetControl, IResetControlEvents, IResetControlPrivate, IResetControlSettings } from "./.internal/charts/stock/toolbar/ResetControl";
 export { SettingsControl, ISettingsControlEvents, ISettingsControlItem, ISettingsControlPrivate, ISettingsControlSettings } from "./.internal/charts/stock/toolbar/SettingsControl";
+export { DataSaveControl, IDataSaveControlEvents, IDataSaveControlItem, IDataSaveControlPrivate, IDataSaveControlSettings } from "./.internal/charts/stock/toolbar/DataSaveControl";
 export { ComparisonControl, IComparisonControlEvents, IComparisonControlPrivate, IComparisonControlSettings } from "./.internal/charts/stock/toolbar/ComparisonControl";
 export { ColorControl, IColorControlEvents, IColorControlPrivate, IColorControlSettings } from "./.internal/charts/stock/toolbar/ColorControl";

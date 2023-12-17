@@ -26,6 +26,7 @@ import { StochasticOscillator } from "../indicators/StochasticOscillator";
 import { WilliamsR } from "../indicators/WilliamsR";
 import { Trix } from "../indicators/Trix";
 import { Volume } from "../indicators/Volume";
+import { VolumeProfile } from "../indicators/VolumeProfile";
 import { VWAP } from "../indicators/VWAP";
 import { ZigZag } from "../indicators/ZigZag";
 
@@ -40,7 +41,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -160,7 +161,7 @@ export class IndicatorControl extends DropdownListControl {
 	 */
 	public supportsIndicator(indicatorId: Indicators): boolean {
 		const stockChart = this.get("stockChart");
-		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Volume", "VWAP"];
+		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Volume", "VolumeProfile", "VWAP"];
 		return (stockChart.get("volumeSeries") || volumeIndicators.indexOf(indicatorId) === -1) ? true : false;
 	}
 
@@ -357,6 +358,14 @@ export class IndicatorControl extends DropdownListControl {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					volumeSeries: volumeSeries
+				});
+				break;
+			case "Volume Profile":
+				indicator = VolumeProfile.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					volumeSeries: volumeSeries,
+					legend: legend
 				});
 				break;
 			case "VWAP":

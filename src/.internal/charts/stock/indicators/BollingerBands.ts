@@ -131,7 +131,7 @@ export class BollingerBands extends MovingAverage {
 	public _prepareChildren() {
 
 		if (this.isDirty("standardDeviations")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 		}
 
 		super._prepareChildren();
@@ -139,23 +139,25 @@ export class BollingerBands extends MovingAverage {
 
 	public _updateChildren() {
 		super._updateChildren();
-		if (this.isDirty("upperColor")) {
-			const color = this.get("upperColor");
+		const upperColor = "upperColor";
+		if (this.isDirty(upperColor)) {
+			const color = this.get(upperColor);
 			const upperBandSeries = this.upperBandSeries;
 			upperBandSeries.set("stroke", color);
 			upperBandSeries.set("fill", color);
 			upperBandSeries.strokes.template.set("stroke", color);
 
-			this._updateSeriesColor(upperBandSeries, color, "upperColor");
+			this._updateSeriesColor(upperBandSeries, color, upperColor);
 		}
 
-		if (this.isDirty("lowerColor")) {
-			const color = this.get("lowerColor");
+		const lowerColor = "lowerColor";
+		if (this.isDirty(lowerColor)) {
+			const color = this.get(lowerColor);
 			const lowerBandSeries = this.lowerBandSeries;
 			lowerBandSeries.set("stroke", color);
 			lowerBandSeries.strokes.template.set("stroke", color);
 
-			this._updateSeriesColor(lowerBandSeries, color, "lowerColor");
+			this._updateSeriesColor(lowerBandSeries, color, lowerColor);
 		}
 
 		this.setCustomData("standardDeviations", this.get("standardDeviations"));

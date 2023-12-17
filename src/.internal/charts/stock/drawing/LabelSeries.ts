@@ -1,11 +1,11 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { Container } from "../../../core/render/Container";
 import type { DataItem } from "../../../core/render/Component";
+import type { SpriteResizer } from "../../../core/render/SpriteResizer";
 
 import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolylineSeriesDataItem } from "./PolylineSeries";
 import { Label } from "../../../core/render/Label";
 import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
-import { SpriteResizer } from "../../../core/render/SpriteResizer";
 import { color, Color } from "../../../core/util/Color";
 import { Template } from "../../../core/util/Template";
 
@@ -57,7 +57,7 @@ export class LabelSeries extends PolylineSeries {
 	declare public _privateSettings: ILabelSeriesPrivate;
 	declare public _dataItemSettings: ILabelSeriesDataItem;
 
-	public spriteResizer = this.children.push(SpriteResizer.new(this._root, {}));
+	public spriteResizer!: SpriteResizer;
 
 	protected _clickEvent?: ISpritePointerEvent;
 
@@ -65,6 +65,8 @@ export class LabelSeries extends PolylineSeries {
 
 	protected _afterNew() {
 		super._afterNew();
+
+		this.spriteResizer = this._getStockChart().spriteResizer;
 
 		this.strokes.template.set("visible", false);
 		this.fills.template.set("visible", false);
@@ -118,40 +120,42 @@ export class LabelSeries extends PolylineSeries {
 		const dataContext = dataItem.dataContext as any;
 		const text = dataContext.text;
 		const template = dataContext.settings;
-		const label = container.children.push(Label.new(this._root, {
-			themeTags: ["label"],
-			text: text
-		}, template));
+		if (template) {
+			const label = container.children.push(Label.new(this._root, {
+				themeTags: ["label"],
+				text: text
+			}, template));
 
-		this.setPrivate("label", label);
+			this.setPrivate("label", label);
 
-		container.events.on("click", () => {
-			const spriteResizer = this.spriteResizer;
-			if (spriteResizer.get("sprite") == label) {
-				spriteResizer.set("sprite", undefined);
-			}
-			else {
-				spriteResizer.set("sprite", label);
-			}
-		})
+			container.events.on("click", () => {
+				const spriteResizer = this.spriteResizer;
+				if (spriteResizer.get("sprite") == label) {
+					spriteResizer.set("sprite", undefined);
+				}
+				else {
+					spriteResizer.set("sprite", label);
+				}
+			})
 
-		container.events.on("pointerover", () => {
-			this._isHover = true;
-		})
+			container.events.on("pointerover", () => {
+				this._isHover = true;
+			})
 
-		container.events.on("pointerout", () => {
-			this._isHover = false;
-		})
+			container.events.on("pointerout", () => {
+				this._isHover = false;
+			})
 
-		label.on("scale", (scale) => {
-			template.set("scale", scale)
-		})
+			label.on("scale", (scale) => {
+				template.set("scale", scale);
+			})
 
-		label.on("rotation", (rotation) => {
-			template.set("rotation", rotation)
-		})
+			label.on("rotation", (rotation) => {
+				template.set("rotation", rotation)
+			})
 
-		this._tweakBullet2(label, dataItem);
+			this._tweakBullet2(label, dataItem);
+		}
 	}
 
 	protected _tweakBullet2(label: Label, _dataItem: DataItem<ILabelSeriesDataItem>) {
@@ -216,6 +220,11 @@ export class LabelSeries extends PolylineSeries {
 		const labelFontWeight = this.get("labelFontWeight");
 		if (labelFontWeight != null) {
 			template.fontWeight = labelFontWeight;
+		}
+
+		const labelFontStyle = this.get("labelFontStyle");
+		if (labelFontStyle != null) {
+			template.fontStyle = labelFontStyle;
 		}
 
 		const labelFill = this.get("labelFill");

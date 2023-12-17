@@ -431,6 +431,9 @@ export abstract class Series extends Component {
 				if (!this._aggregatesCalculated) {
 					this._calculateAggregates(0, this.dataItems.length);
 					this._aggregatesCalculated = true;
+					if(startIndex != 0){
+						this._psi = undefined;
+					}
 				}
 			}
 

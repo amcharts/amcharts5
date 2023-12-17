@@ -9,6 +9,7 @@ import type { Sprite } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import type { XYSeries } from "../../xy/series/XYSeries";
 import type { StockPanel } from "../StockPanel";
+import type { StockChart } from "../StockChart";
 
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "../../xy/series/LineSeries";
 import { Bullet } from "../../../core/render/Bullet";
@@ -893,5 +894,9 @@ export class DrawingSeries extends LineSeries {
 			return dataItem.get(key as any)!;
 		}
 		return realValue;
+	}
+
+	protected _getStockChart(): StockChart {
+		return (this.get("series") as any).chart.getPrivate("stockChart");
 	}
 }

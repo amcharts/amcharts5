@@ -7,6 +7,7 @@
 import * as $type from "./Type";
 import * as $utils from "./Utils";
 import type { Timezone } from "./Timezone";
+import type { Root } from "../Root";
 
 export type TimeUnit = "millisecond" | "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
 
@@ -341,6 +342,17 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean, ti
 	return date;
 }
 
+/**
+ * @ignore
+ */
+export function roun(time: number, unit: TimeUnit, count: number, root: Root, firstTime?: number): number {
+	let firstDate;
+	if (firstTime != null) {
+		firstDate = new Date(firstTime);
+	}
+	return round(new Date(time), unit, count, root.locale.firstDayOfWeek, root.utc, firstDate, root.timezone).getTime();
+}
+
 
 /**
  * "Rounds" the date to specific time unit.
@@ -566,7 +578,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 				}
 				day = 1;
 				hour = 0;
-				minute = offsetDif;				
+				minute = offsetDif;
 				second = 0;
 				millisecond = 0;
 				break;

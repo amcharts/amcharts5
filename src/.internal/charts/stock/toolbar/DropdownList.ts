@@ -18,12 +18,36 @@ export interface IDropdownListItem {
 }
 
 export interface IDropdownListSettings extends IDropdownSettings {
-	items?: IDropdownListItem[];
-	maxSearchItems?: number;
-	searchable?: boolean;
-	searchCallback?: (query: string) => Promise<IDropdownListItem[]>;
-}
 
+	/**
+	 * A list of items in the dropdown.
+	 */
+	items?: IDropdownListItem[];
+
+	/**
+	 * Maximum search items to show.
+	 */
+	maxSearchItems?: number;
+
+	/**
+	 * Is the list searchable? If `true` shows search field and
+	 * calls `searchCallback` function for a list of items.
+	 */
+	searchable?: boolean;
+
+	/**
+	 * A callback function which returns a list of items based on a search query.
+	 */
+	searchCallback?: (query: string) => Promise<IDropdownListItem[]>;
+
+	/**
+	 * An array of item IDs to now show in the list.
+	 *
+	 * @since 5.7.0
+	 */
+	exclude?: string[];
+
+}
 
 export interface IDropdownListPrivate extends IDropdownPrivate {
 	list?: HTMLUListElement;
@@ -44,6 +68,8 @@ export interface IDropdownListEvents extends IDropdownEvents {
 
 /**
  * A dropdown control for [[StockToolbar]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-list-control/} for more info
  */
 export class DropdownList extends Dropdown {
 	public static className: string = "DropdownList";
@@ -89,6 +115,17 @@ export class DropdownList extends Dropdown {
 		}
 	}
 
+	/**
+	 * Rebuilds the list.
+	 * 
+	 * Useful when changing item data within item list.
+	 *
+	 * @since 5.7.0
+	 */
+	public rebuildList(): void {
+		this._initItems();
+	}
+
 	protected _initItems(items?: IDropdownListItem[]): void {
 		const list = this.getPrivate("list")!;
 		list.innerHTML = "";
@@ -96,8 +133,12 @@ export class DropdownList extends Dropdown {
 		if (!items) {
 			items = this.get("items", []);
 		}
+
+		const exclude: any = this.get("exclude", []);
 		$array.each(items, (item) => {
-			this.addItem(item);
+			if (exclude.indexOf(item.id) == -1) {
+				this.addItem(item);
+			}
 		});
 
 		if (this.get("scrollable")) {
@@ -201,7 +242,7 @@ export class DropdownList extends Dropdown {
 			item.appendChild(info.icon);
 		}
 
-		let inputId: string | undefined;;
+		let inputId: string | undefined;
 		if (info.form) {
 			const input: HTMLInputElement = document.createElement("input");
 			inputId = "am5stock-list-" + info.id;
@@ -248,6 +289,10 @@ export class DropdownList extends Dropdown {
 			subLabel.className = "am5stock-list-sub";
 			subLabel.innerHTML = info.subLabel;
 			item.appendChild(subLabel);
+		}
+
+		if (info.id == "separator") {
+			item.innerHTML = "<hr>";
 		}
 
 		list.appendChild(item);

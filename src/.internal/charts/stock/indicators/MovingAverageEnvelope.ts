@@ -171,7 +171,7 @@ export class MovingAverageEnvelope extends MovingAverage {
 
 	public _prepareChildren() {
 		if (this.isDirty("shiftType") || this.isDirty("shift")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("shift", this.get("shift"));
 			this.setCustomData("shiftType", this.get("shiftType"));
 		}

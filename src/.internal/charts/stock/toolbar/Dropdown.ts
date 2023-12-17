@@ -128,11 +128,16 @@ export class Dropdown extends Entity {
 	}
 
 	public hide(): void {
-		this.getPrivate("container")!.style.display = "none";
+		const arrow = this.getPrivate("arrow")!;
+		const container = this.getPrivate("container")!;
+		container.style.display = "none";
 		this.events.dispatch("closed", {
 			type: "closed",
 			target: this
 		});
+
+		container.style.marginLeft = "";
+		arrow.style.marginLeft = "";
 	}
 
 	public show(): void {

@@ -62,13 +62,6 @@ export class OnBalanceVolume extends ChartIndicator {
 		}))
 	}
 
-	public _prepareChildren() {
-		if (this.isDirty("volumeSeries")) {
-			this._dataDirty = true;
-		}
-		super._prepareChildren();
-	}
-
 	/**
 	 * @ignore
 	 */

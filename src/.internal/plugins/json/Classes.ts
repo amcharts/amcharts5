@@ -53,6 +53,7 @@ import type { CommodityChannelIndex } from "./../../../stock";
 import type { ComparisonControl } from "./../../../stock";
 import type { Component } from "./../../../index";
 import type { Container } from "./../../../index";
+import type { DataSaveControl } from "./../../../stock";
 import type { DateAxis } from "./../../../xy";
 import type { DateRangeSelector } from "./../../../stock";
 import type { DisparityIndex } from "./../../../stock";
@@ -209,6 +210,7 @@ import type { Venn } from "./../../../venn";
 import type { VerticalLayout } from "./../../../index";
 import type { VerticalLineSeries } from "./../../../stock";
 import type { Volume } from "./../../../stock";
+import type { VolumeProfile } from "./../../../stock";
 import type { VoronoiTreemap } from "./../../../hierarchy";
 import type { WilliamsR } from "./../../../stock";
 import type { WordCloud } from "./../../../wc";
@@ -270,6 +272,7 @@ export interface IClasses {
 	"ComparisonControl": () => Promise<typeof ComparisonControl>;
 	"Component": () => Promise<typeof Component>;
 	"Container": () => Promise<typeof Container>;
+	"DataSaveControl": () => Promise<typeof DataSaveControl>;
 	"DateAxis": () => Promise<typeof DateAxis>;
 	"DateRangeSelector": () => Promise<typeof DateRangeSelector>;
 	"DisparityIndex": () => Promise<typeof DisparityIndex>;
@@ -426,6 +429,7 @@ export interface IClasses {
 	"VerticalLayout": () => Promise<typeof VerticalLayout>;
 	"VerticalLineSeries": () => Promise<typeof VerticalLineSeries>;
 	"Volume": () => Promise<typeof Volume>;
+	"VolumeProfile": () => Promise<typeof VolumeProfile>;
 	"VoronoiTreemap": () => Promise<typeof VoronoiTreemap>;
 	"WilliamsR": () => Promise<typeof WilliamsR>;
 	"WordCloud": () => Promise<typeof WordCloud>;
@@ -488,6 +492,7 @@ const classes: IClasses = {
 	"ComparisonControl": () => import(/* webpackExports: "ComparisonControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ComparisonControl),
 	"Component": () => import(/* webpackExports: "Component", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Component),
 	"Container": () => import(/* webpackExports: "Container", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Container),
+	"DataSaveControl": () => import(/* webpackExports: "DataSaveControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DataSaveControl),
 	"DateAxis": () => import(/* webpackExports: "DateAxis", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.DateAxis),
 	"DateRangeSelector": () => import(/* webpackExports: "DateRangeSelector", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DateRangeSelector),
 	"DisparityIndex": () => import(/* webpackExports: "DisparityIndex", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DisparityIndex),
@@ -644,6 +649,7 @@ const classes: IClasses = {
 	"VerticalLayout": () => import(/* webpackExports: "VerticalLayout", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.VerticalLayout),
 	"VerticalLineSeries": () => import(/* webpackExports: "VerticalLineSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.VerticalLineSeries),
 	"Volume": () => import(/* webpackExports: "Volume", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.Volume),
+	"VolumeProfile": () => import(/* webpackExports: "VolumeProfile", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.VolumeProfile),
 	"VoronoiTreemap": () => import(/* webpackExports: "VoronoiTreemap", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.VoronoiTreemap),
 	"WilliamsR": () => import(/* webpackExports: "WilliamsR", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.WilliamsR),
 	"WordCloud": () => import(/* webpackExports: "WordCloud", webpackChunkName: "json_wc" */ "./../../../wc").then((m) => m.WordCloud),

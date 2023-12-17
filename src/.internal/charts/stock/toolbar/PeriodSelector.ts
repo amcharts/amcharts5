@@ -97,7 +97,6 @@ export class PeriodSelector extends StockControl {
 
 		const periods = this.get("periods", []);
 		const axis = this._getAxis();
-		this.setPrivate("deferTimeout", this.setTimeout(() => this.setPrivate("deferReset", false), axis.get("interpolationDuration", 1000) + 200));
 		axis.onPrivate("min", () => this._setPeriodButtonStatus());
 		axis.onPrivate("max", () => this._setPeriodButtonStatus());
 		$array.each(periods, (period) => {
@@ -117,6 +116,7 @@ export class PeriodSelector extends StockControl {
 				if (timeout) {
 					timeout.dispose();
 				}
+				this.setPrivate("deferTimeout", this.setTimeout(() => this.setPrivate("deferReset", false), axis.get("interpolationDuration", 1000) + 200));
 			}));
 		});
 

@@ -98,9 +98,10 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("limitMoveValue")) {
-			this.setCustomData("limitMoveValue", this.get("limitMoveValue"))
-			this._dataDirty = true;
+		const limitMoveValue = "limitMoveValue";
+		if (this.isDirty(limitMoveValue)) {
+			this.setCustomData(limitMoveValue, this.get(limitMoveValue));
+			this.markDataDirty();
 		}
 
 		const series = this.series;

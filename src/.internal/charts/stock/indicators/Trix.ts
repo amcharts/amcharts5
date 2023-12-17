@@ -105,7 +105,7 @@ export class Trix extends ChartIndicator {
 
 	public _prepareChildren() {
 		if (this.isDirty("signalPeriod")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("signalPeriod", this.get("signalPeriod"));
 		}
 		super._prepareChildren();

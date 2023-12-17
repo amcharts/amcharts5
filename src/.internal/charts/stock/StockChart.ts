@@ -9,8 +9,10 @@ import type { XYSeries, IXYSeriesDataItem, IXYSeriesSettings } from "../xy/serie
 import type { DataItem } from "../../core/render/Component";
 import type { Indicator } from "./indicators/Indicator";
 import type { DrawingSeries } from "./drawing/DrawingSeries";
+import type { StockControl } from "./toolbar/StockControl";
 import { MultiDisposer } from "../../core/util/Disposer";
 
+import { SpriteResizer } from "../../core/render/SpriteResizer";
 import { PanelControls } from "./PanelControls";
 import { StockChartDefaultTheme } from "./StockChartDefaultTheme";
 import { XYChartDefaultTheme } from "../xy/XYChartDefaultTheme";
@@ -25,6 +27,7 @@ import { registry } from "../../core/Registry";
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
 import * as $object from "../../core/util/Object";
+import type { GaplessDateAxis } from "../xy/axes/GaplessDateAxis";
 
 export interface IStockChartSettings extends IContainerSettings {
 
@@ -202,6 +205,20 @@ export class StockChart extends Container {
 	 * @default Container.new()
 	 */
 	public readonly panelsContainer: Container = this.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.verticalLayout, themeTags: ["chartscontainer"] }));
+
+	/**
+	 * An array of all Stock Controls that are created for this chart.
+	 *
+	 * @since 5.7.0
+	 */
+	public readonly controls: StockControl[] = [];
+
+	/**
+	 * An instance of [[SpriteResizer]] used for various drawing tools.
+	 * 
+	 * @since 5.7.0
+	 */
+	public spriteResizer = this.children.push(SpriteResizer.new(this._root, {}));
 
 
 	protected _afterNew() {
@@ -417,8 +434,9 @@ export class StockChart extends Container {
 
 		if (this.isDirty("stockNegativeColor") || this.isDirty("stockPositiveColor") || this.isDirty("stockSeries")) {
 			if (stockSeries && stockSeries.isType<BaseColumnSeries>("BaseColumnSeries")) {
-				const stockNegativeColor = this.get("stockNegativeColor", this._root.interfaceColors.get("negative"));
-				const stockPositiveColor = this.get("stockPositiveColor", this._root.interfaceColors.get("positive"));
+				const ic = this._root.interfaceColors;
+				const stockNegativeColor = this.get("stockNegativeColor", ic.get("negative"));
+				const stockPositiveColor = this.get("stockPositiveColor", ic.get("positive"));
 				let previous = stockSeries.dataItems[0];
 
 				if (stockPositiveColor && stockPositiveColor) {
@@ -520,7 +538,6 @@ export class StockChart extends Container {
 			const yAxis = stockSeries.get("yAxis") as ValueAxis<AxisRenderer>;
 			yAxis.set("logarithmic", false);
 
-
 			this._maybePrepAxisDefaults();
 			if (mainChart) {
 				const seriesList: XYSeries[] = [];
@@ -563,6 +580,10 @@ export class StockChart extends Container {
 				}
 			}
 		}
+
+		this.indicators.each((indicator)=>{
+			indicator.markDataDirty();
+		})
 	}
 
 	/**
@@ -698,7 +719,10 @@ export class StockChart extends Container {
 
 		this.markDirtyIndicators();
 
+		//indicator.markDataDirty(); // not good, shows zoomed out value axis
 		indicator.prepareData();
+
+		this._syncExtremes();
 	}
 
 	protected _removeIndicator(indicator: Indicator) {
@@ -716,24 +740,25 @@ export class StockChart extends Container {
 			const panelControls = panel.panelControls;
 			const index = this.panelsContainer.children.indexOf(panel);
 			const len = this.panels.length;
+			const visible = "visible"
 
-			panelControls.upButton.setPrivate("visible", false);
-			panelControls.downButton.setPrivate("visible", false);
-			panelControls.expandButton.setPrivate("visible", false);
-			panelControls.closeButton.setPrivate("visible", false);
+			panelControls.upButton.setPrivate(visible, false);
+			panelControls.downButton.setPrivate(visible, false);
+			panelControls.expandButton.setPrivate(visible, false);
+			panelControls.closeButton.setPrivate(visible, false);
 
 			if (len > 1) {
-				panelControls.expandButton.setPrivate("visible", true);
+				panelControls.expandButton.setPrivate(visible, true);
 
 				if (index != 0) {
-					panelControls.upButton.setPrivate("visible", true);
+					panelControls.upButton.setPrivate(visible, true);
 				}
 				if (index != len - 1) {
-					panelControls.downButton.setPrivate("visible", true);
+					panelControls.downButton.setPrivate(visible, true);
 				}
 
 				if (!stockSeries || stockSeries.chart != panel) {
-					panelControls.closeButton.setPrivate("visible", true);
+					panelControls.closeButton.setPrivate(visible, true);
 				}
 			}
 
@@ -743,7 +768,6 @@ export class StockChart extends Container {
 				});
 			}
 		})
-
 	}
 
 	protected _processPanel(panel: StockPanel) {
@@ -885,7 +909,7 @@ export class StockChart extends Container {
 
 			this.panels.each((panel) => {
 				panel.xAxes.each((xAxis) => {
-					if (xAxis != mainAxis) {
+					if (xAxis != mainAxis && xAxis.isType("DateAxis")) {
 						let axisMin = xAxis.getPrivate("min" as any);
 						let axisMax = xAxis.getPrivate("max" as any);
 
@@ -895,6 +919,10 @@ export class StockChart extends Container {
 						if (axisMax != max) {
 							xAxis.set("max" as any, max);
 						}
+						const type = "GaplessDateAxis";
+						if (xAxis.isType<GaplessDateAxis<AxisRenderer>>(type) && mainAxis.isType<GaplessDateAxis<AxisRenderer>>(type)) {
+							xAxis._customDates = mainAxis._dates;
+						}
 					}
 				})
 			})
@@ -903,7 +931,7 @@ export class StockChart extends Container {
 
 	protected _syncXAxes(axis: Axis<AxisRenderer>) {
 		$array.each(this._xAxes, (xAxis) => {
-			if (xAxis != axis) {
+			if (xAxis != axis && xAxis.isType("DateAxis")) {
 				xAxis._skipSync = true;
 				xAxis.set("start", axis.get("start"));
 				xAxis.set("end", axis.get("end"));
@@ -965,6 +993,25 @@ export class StockChart extends Container {
 			}
 		}
 		return positiveColor;
+	}
+
+	/**
+	 * Returns a first [[StockControl]] of specific type.
+	 *
+	 * @since 5.7.0
+	 * @param   type  Control name
+	 * @return        Control
+	 */
+	public getControl(type: string): StockControl | undefined {
+		let found: StockControl | undefined;
+		$array.eachContinue(this.controls, (control: StockControl) => {
+			if (control.className == type) {
+				found = control;
+				return false;
+			}
+			return true;
+		});
+		return found;
 	}
 
 }

@@ -3,15 +3,37 @@ import type { IDropdownListItem } from "./DropdownList";
 import { ValueAxis } from "../../xy/axes/ValueAxis";
 import { DropdownListControl, IDropdownListControlSettings, IDropdownListControlPrivate, IDropdownListControlEvents } from "./DropdownListControl";
 import { StockIcons } from "./StockIcons";
+import { DataSaveControl } from "./DataSaveControl";
 import * as $array from "../../../core/util/Array";
 
 export interface ISettingsControlItem extends IDropdownListItem {
 }
 
 export interface ISettingsControlSettings extends IDropdownListControlSettings {
+	/**
+	 * If set to `true`, all changes to chart's drawings and indicators will be
+	 * automatically saved to browser local storage and restored on next load.
+	 *
+	 * @default false
+	 *
+	 * @since 5.4.3
+	 */
+	autoSave?: boolean;
+
+	/**
+	 * A unique indentifier for local storage.
+	 *
+	 * Will try to use chart's container ID if not set.
+	 *
+	 * Consider setting it if you have multipl [[StockChart]] on the same page.
+	 *
+	 * @since 5.4.3
+	 */
+	storageId?: string;
 }
 
 export interface ISettingsControlPrivate extends IDropdownListControlPrivate {
+	dataSaveControl?: DataSaveControl;
 }
 
 export interface ISettingsControlEvents extends IDropdownListControlEvents {
@@ -51,29 +73,59 @@ export class SettingsControl extends DropdownListControl {
 				}
 			}
 
+			if (ev.item.id == "autosave") {
+				const autoSave = (<any>ev).checked;
+				let dataSaveControl = this.getPrivate("dataSaveControl")!;
+				dataSaveControl.set("autoSave", autoSave);
+			}
+
 		});
 
 		this.on("active", () => {
 			this._populateInputs();
 		});
 
-	}
+		const stockChart = this.get("stockChart");
+		const serializableTools = (stockChart.getControl("IndicatorControl") || stockChart.getControl("DrawingControl")) ? true : false;
+		let dataSaveControl = stockChart.getControl("DataSaveControl");
 
-	// public _afterChanged() {
-	// 	super._afterChanged();
-	// }
+		if(!serializableTools) {
+			const exclude: any = dropdown.get("exclude", []);
+			exclude.push("save");
+			exclude.push("autosave");
+			dropdown.set("exclude", ["save", "autosave"]);
+		}
+		else {
+			if(!dataSaveControl) {
+				dataSaveControl = DataSaveControl.new(this.root, {
+					stockChart: stockChart,
+					autoSave: this.get("autoSave", false),
+					storageId: this.get("storageId")
+				});
+			}
+			this.setPrivate("dataSaveControl", dataSaveControl as DataSaveControl);
+			this.set("autoSave", (dataSaveControl as DataSaveControl).get("autoSave"));
+			this._populateInputs();
+		}
+
+	}
 
 	protected _getDefaultIcon(): SVGElement {
 		return StockIcons.getIcon("Settings");
 	}
 
 	protected _populateInputs(): void {
+
+		// Axes-related stuff
 		const button = this.getPrivate("button")!;
 		const inputs = button.getElementsByTagName("input");
 		const currentScale = this._getYScale();
 		for (let i = 0; i < inputs.length; i++) {
 			const input = inputs[i];
 			switch (input.id) {
+				case "am5stock-list-autosave":
+					input.checked = this.get("autoSave", this.getPrivate("dataSaveControl")!.get("autoSave", false));
+					break;
 				case "am5stock-list-fills":
 					input.checked = this._getFillEnabled()
 					break;

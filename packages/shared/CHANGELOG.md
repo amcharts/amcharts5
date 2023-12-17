@@ -5,6 +5,33 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.0] - 2023-12-17
+
+### Added
+- New `Serializer` setting: `fullSettings`. Will ignore depth settings for keys listed in `fullSettings`.
+- New `StockAxis` toolbar control: `DataSaveControl`. Allows to automatically or manually save all drawings and indicators to browser's local storage, as well as restore them across sessions. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/data-save-control/).
+- Added additional item in `SettingsControl`: Auto-save drawings and indicators.
+- New setting in `SettingsControl`: `autoSave`. Enables user to toggle auto-saving of indicators/drawings via Settings dropdown.
+- New setting in `DropdownList` and `DropdownListControl`: `exclude`. Can be set to an array of item IDs that should not appear in the list. Can be used to disable default list items.
+- New property in `StockChart`: `spriteResizer`. Holdes an instance of `SpriteResizer` which is used among drawing tools.
+- `zoomable` setting added to Axis. If set to false, calling axis.zoom() won't do anything, meaning that the axis won't be zoomed with scrollbars, wheel, cursor etc.
+
+## Changed
+- `StockChart` will only sync zoom between X axes that are of the same type as the main axis.
+- All drawing tools that allow selecting and resizing them (Label, Callout, Icons) will now use shared instance of `SpriteResizer`.
+- `IndictorControl` is now searchable by default (`searchable: true`).
+
+### Fixed
+- `PeriodSelector`'s buttons were not being reset when chart was zoomed manually.
+- Dropdowns in `StockChart`'s control were not being positioned correctly in all cases on a page with RTL direction enabled.
+- Drawings loaded from serialized data were not being deleted with eraser or clear tools.
+- Elinated multiple calls to preparing data of `StockChart` indicators.
+- On `StockChart`, indicator's panel X-axis was out of sync with the main panel's X-axis if the latter's scale was longer to some other series on the main panel.
+- Italic toggle was being ignored in `StockChart` label drawing tools.
+- `GaplessDateAxis` was not always including the first date when using `axis.zoomToDates(startDate, endDate)` method.
+- When swiching to percent scale `StovkChart's main panel was showing wrong Y-axis numbers until first zoom.
+
+
 ## [5.6.2] - 2023-11-30
 
 ### Added

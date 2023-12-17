@@ -228,7 +228,9 @@ export class AxisRendererX extends AxisRenderer {
 	public processAxis() {
 		super.processAxis();
 		const axis = this.axis;
-		axis.set("width", p100);
+		if (axis.get("width") == null) {
+			axis.set("width", p100);
+		};
 		const verticalLayout = this._root.verticalLayout;
 		axis.set("layout", verticalLayout);
 		axis.labelsContainer.set("width", p100);

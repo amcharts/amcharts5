@@ -95,7 +95,7 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 
 	public _updateChildren() {
 		if (this.isDirty("dPeriod") || this.isDirty("emaPeriod")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("dPeriod", this.get("dPeriod"));
 			this.setCustomData("emaPeriod", this.get("emaPeriod"));
 		}

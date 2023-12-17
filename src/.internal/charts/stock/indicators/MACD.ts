@@ -154,7 +154,7 @@ export class MACD extends ChartIndicator {
 
 	public _prepareChildren() {
 		if (this.isDirty("fastPeriod") || this.isDirty("slowPeriod") || this.isDirty("signalPeriod")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("fastPeriod", this.get("fastPeriod"));
 			this.setCustomData("slowPeriod", this.get("slowPeriod"));
 			this.setCustomData("signalPeriod", this.get("signalPeriod"));

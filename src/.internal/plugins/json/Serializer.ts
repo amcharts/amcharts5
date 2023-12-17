@@ -23,6 +23,13 @@ export interface ISerializerSettings extends IEntitySettings {
 	includeSettings?: Array<string>;
 
 	/**
+	 * Include full values of these settings.
+	 *
+	 * @since 6.4.3
+	 */
+	fullSettings?: Array<string>;
+
+	/**
 	 * An array of properties to not include in the serialized data.
 	 *
 	 * @since 5.3.2
@@ -107,6 +114,7 @@ export class Serializer extends Entity {
 		const am5object = source instanceof Entity || source instanceof Template || source instanceof Color || source instanceof Percent ? true : false;
 
 		// Process settings
+		const fullSettings: any = this.get("fullSettings", []);
 		if (source instanceof Entity) {
 			res.type = source.className;
 
@@ -132,7 +140,7 @@ export class Serializer extends Entity {
 				$array.each(settings, (setting) => {
 					const settingValue = (<any>source).get(setting);
 					if (settingValue !== undefined) {
-						res.settings[setting] = this.serialize(settingValue, depth + 1, full);
+						res.settings[setting] = this.serialize(settingValue, depth + 1, full || fullSettings.indexOf(setting) !== -1);
 					}
 				});
 			}
@@ -143,7 +151,7 @@ export class Serializer extends Entity {
 			if (settings.length) {
 				res.settings = {};
 				$array.each(settings, (setting) => {
-					res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1);
+					res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1, fullSettings.indexOf(setting) !== -1);
 				});
 			}
 			return res;

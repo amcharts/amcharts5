@@ -112,7 +112,6 @@ export class OverboughtOversold extends ChartIndicator {
 		const overBought = yAxis.makeDataItem({});
 		this.overBought = overBought;
 		overBought.set("endValue", 500);
-		overBought.set("affectsMinMax", false);
 
 		const overBoughtRB = Button.new(this._root, {
 			themeTags: ["rangegrip", "vertical", side],
@@ -162,8 +161,6 @@ export class OverboughtOversold extends ChartIndicator {
 		const overSold = yAxis.makeDataItem({});
 		this.overSold = overSold;
 		overSold.set("endValue", -500);
-		overSold.set("affectsMinMax", false);
-
 
 		const overSoldRB = Button.new(this._root, {
 			themeTags: ["rangegrip", "vertical", side],
@@ -274,14 +271,5 @@ export class OverboughtOversold extends ChartIndicator {
 			this.overBoughtRange.fills!.template.set("fill", color);
 			this.overBoughtRange.strokes!.template.set("stroke", color);
 		}
-	}
-
-	public _updateChildren() {
-
-		if (this.isDirty("period")) {
-			this._dataDirty = true;
-		}
-
-		super._updateChildren();
 	}
 }

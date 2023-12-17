@@ -316,10 +316,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				groupOriginals = true;
 			}
 
-			const firstDay = this._root.locale.firstDayOfWeek;
-			const utc = this._root.utc;
-			const timezone = this._root.timezone;
-
 			$array.each(intervals, (interval) => {
 
 				let previousTime = -Infinity;
@@ -344,15 +340,16 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				let intervalDuration = $time.getDuration(interval.timeUnit);
 
 				let firstItem = dataItems[0];
-				let firstDate: Date;
+				let firstTime: any;
 				if (firstItem) {
-					firstDate = new Date(dataItems[0].get(key as any));
+					firstTime = dataItems[0].get(key as any);
 				}
 
 				let prevNewDataItem: DataItem<IXYSeriesDataItem> | undefined;
 				$array.each(dataItems, (dataItem) => {
 					let time = dataItem.get(key as any);
-					let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, firstDay, utc, firstDate, timezone).getTime();
+					//let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, firstDay, utc, firstDate, timezone).getTime();
+					let roundedTime = $time.roun(time, interval.timeUnit, interval.count, this._root, firstTime);
 					let dataContext: any;
 
 					if (previousTime < roundedTime - intervalDuration / 24) {
@@ -672,7 +669,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			minorGridInterval = { timeUnit: timeUnit, count: count };
 		}
 		if (timeUnit == "week") {
-			if(this.getPrivate("baseInterval")?.timeUnit != "week"){
+			if (this.getPrivate("baseInterval")?.timeUnit != "week") {
 				minorGridInterval = { timeUnit: "day", count: 1 };
 			}
 		}
@@ -684,6 +681,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const max = this.getPrivate("max");
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
+			const root = this._root;
 			const selectionMin = Math.round(this.getPrivate("selectionMin")! as number);
 			const selectionMax = Math.round(this.getPrivate("selectionMax")! as number);
 			const renderer = this.get("renderer");
@@ -703,11 +701,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			this._intervalDuration = intervalDuration;
 
 			const nextGridUnit = $time.getNextUnit(gridInterval.timeUnit);
-			const firstDay = this._root.locale.firstDayOfWeek;
-			const utc = this._root.utc;
-			const timezone = this._root.timezone;
+			const utc = root.utc;
+			const timezone = root.timezone;
 
-			value = $time.round(new Date(selectionMin - intervalDuration), gridInterval.timeUnit, gridInterval.count, firstDay, utc, new Date(min), timezone).getTime();
+			//value = $time.round(new Date(selectionMin - intervalDuration), gridInterval.timeUnit, gridInterval.count, firstDay, utc, new Date(min), timezone).getTime();
+			value = $time.roun(selectionMin - intervalDuration, gridInterval.timeUnit, gridInterval.count, root, min);
 			let previousValue = value - intervalDuration;
 			let format: string | Intl.DateTimeFormatOptions;
 			const formats = this.get("dateFormats")!;
@@ -745,7 +743,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				dataItem.setRaw("labelEndValue", undefined);
 
 				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * this._getM(gridInterval.timeUnit));
-				endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+				//endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+				endValue = $time.roun(endValue, gridInterval.timeUnit, 1, root);
 
 				dataItem.setRaw("endValue", endValue);
 
@@ -762,7 +761,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				const label = dataItem.get("label");
 				if (label) {
-					label.set("text", this._root.dateFormatter.format(date, format!));
+					label.set("text", root.dateFormatter.format(date, format!));
 				}
 
 				let count = gridInterval.count;
@@ -779,7 +778,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					}
 
 					let labelEndValue = value + $time.getDuration(timeUnit, this._getM(timeUnit));
-					labelEndValue = $time.round(new Date(labelEndValue), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+					//labelEndValue = $time.round(new Date(labelEndValue), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+					labelEndValue = $time.roun(labelEndValue, timeUnit, 1, root);
 					dataItem.setRaw("labelEndValue", labelEndValue);
 				}
 
@@ -790,7 +790,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				// min grid
 				if (minorGridInterval) {
-					let minorValue = $time.round(new Date(previousValue + minorDuration * this._getM(minorGridInterval.timeUnit)), minorGridInterval.timeUnit, minorGridInterval.count, firstDay, utc, new Date(previousValue), timezone).getTime();
+					const minorTimeUnit = minorGridInterval.timeUnit;
+					const minorCount = minorGridInterval.count;
+					const mmm = this._getM(minorTimeUnit);
+
+					//let minorValue = $time.round(new Date(previousValue + minorDuration * this._getM(minorGridInterval.timeUnit)), minorGridInterval.timeUnit, minorGridInterval.count, firstDay, utc, new Date(previousValue), timezone).getTime();
+					let minorValue = $time.roun(previousValue + minorDuration * mmm, minorTimeUnit, minorCount, root, previousValue);
+
 					let previousMinorValue: number | undefined;
 					let minorFormats = this.get("minorDateFormats", this.get("dateFormats"))!;
 
@@ -811,20 +817,21 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 						minorDataItem.setRaw("value", minorValue);
 
-						let minorEndValue = minorValue + $time.getDuration(minorGridInterval.timeUnit, minorGridInterval.count * this._getM(minorGridInterval.timeUnit));
-						minorEndValue = $time.round(new Date(minorEndValue), minorGridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+						let minorEndValue = minorValue + $time.getDuration(minorTimeUnit, minorCount * mmm);
+						//minorEndValue = $time.round(new Date(minorEndValue), minorGridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+						minorEndValue = $time.roun(minorEndValue, minorTimeUnit, 1, root);
 
 						minorDataItem.setRaw("endValue", minorEndValue);
 
 						let date = new Date(minorValue);
 
-						format = minorFormats[minorGridInterval.timeUnit];
+						format = minorFormats[minorTimeUnit];
 
 						const minorLabel = minorDataItem.get("label");
 
 						if (minorLabel) {
 							if (minorLabelsEnabled) {
-								minorLabel.set("text", this._root.dateFormatter.format(date, format!));
+								minorLabel.set("text", root.dateFormatter.format(date, format!));
 							}
 							else {
 								minorLabel.setPrivate("visible", false);
@@ -879,25 +886,24 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	protected _fixMin(min: number) {
 		const baseInterval = this.getPrivate("baseInterval");
-		const firstDay = this._root.locale.firstDayOfWeek;
-		const timezone = this._root.timezone;
-		const utc = this._root.utc;
 		const timeUnit = baseInterval.timeUnit;
-		let startTime = $time.round(new Date(min), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+		//let startTime = $time.round(new Date(min), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+		let startTime = $time.roun(min, timeUnit, baseInterval.count, this._root);
+
 		let endTime = startTime + $time.getDuration(timeUnit, baseInterval.count * this._getM(timeUnit))
-		endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+		//endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+		endTime = $time.roun(endTime, timeUnit, 1, this._root);
 		return startTime + (endTime - startTime) * this.get("startLocation", 0);
 	}
 
 	protected _fixMax(max: number) {
 		const baseInterval = this.getPrivate("baseInterval");
-		const firstDay = this._root.locale.firstDayOfWeek;
-		const timezone = this._root.timezone;
-		const utc = this._root.utc;
 		const timeUnit = baseInterval.timeUnit;
-		let startTime = $time.round(new Date(max), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+		//let startTime = $time.round(new Date(max), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+		let startTime = $time.roun(max, timeUnit, baseInterval.count, this._root);
 		let endTime = startTime + $time.getDuration(timeUnit, baseInterval.count * this._getM(timeUnit))
-		endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+		//endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+		endTime = $time.roun(endTime, timeUnit, 1, this._root);
 
 		return startTime + (endTime - startTime) * this.get("endLocation", 1);
 	}
@@ -949,14 +955,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				}
 				else {
-					const firstDay = this._root.locale.firstDayOfWeek;
-					const utc = this._root.utc;
-					const timezone = this._root.timezone
 					const timeUnit = baseInterval.timeUnit;
 					const count = baseInterval.count;
-					startTime = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+					//startTime = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+					startTime = $time.roun(value, timeUnit, count, this._root);
 					endTime = startTime + $time.getDuration(timeUnit, count * this._getM(timeUnit));
-					endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+					//endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+					endTime = $time.roun(endTime, timeUnit, 1, this._root);
 
 					dataItem.open![field] = startTime;
 					dataItem.close![field] = endTime;
@@ -1042,11 +1047,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			const timezone = this._root.timezone;
 			const count = baseInterval.count;
 
-			value = $time.round(new Date(value), timeUnit, count, firstDay, utc, new Date(this.getPrivate("min", 0)), timezone).getTime();
+			//value = $time.round(new Date(value), timeUnit, count, firstDay, utc, new Date(this.getPrivate("min", 0)), timezone).getTime();
+			value = $time.roun(value, timeUnit, count, this._root, this.getPrivate("min", 0));
 
 			let duration = $time.getDateIntervalDuration(baseInterval, new Date(value), firstDay, utc, timezone);
 			if (timezone) {
-				value = $time.round(new Date(value + this.baseDuration() * 0.05), timeUnit, count, firstDay, utc, new Date(this.getPrivate("min", 0)), timezone).getTime();
+				//value = $time.round(new Date(value + this.baseDuration() * 0.05), timeUnit, count, firstDay, utc, new Date(this.getPrivate("min", 0)), timezone).getTime();
+				value = $time.roun(value + this.baseDuration() * 0.05, timeUnit, count, this._root, this.getPrivate("min", 0));
 				duration = $time.getDateIntervalDuration(baseInterval, new Date(value + duration * location), firstDay, utc, timezone);
 			}
 

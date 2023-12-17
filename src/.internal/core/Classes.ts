@@ -53,6 +53,7 @@ import type { CommodityChannelIndex } from "./../charts/stock/indicators/Commodi
 import type { ComparisonControl } from "./../charts/stock/toolbar/ComparisonControl.js";
 import type { Component } from "./render/Component.js";
 import type { Container } from "./render/Container.js";
+import type { DataSaveControl } from "./../charts/stock/toolbar/DataSaveControl.js";
 import type { DateAxis } from "./../charts/xy/axes/DateAxis.js";
 import type { DateRangeSelector } from "./../charts/stock/toolbar/DateRangeSelector.js";
 import type { DisparityIndex } from "./../charts/stock/indicators/DisparityIndex.js";
@@ -209,6 +210,7 @@ import type { Venn } from "./../charts/venn/Venn.js";
 import type { VerticalLayout } from "./render/VerticalLayout.js";
 import type { VerticalLineSeries } from "./../charts/stock/drawing/VerticalLineSeries.js";
 import type { Volume } from "./../charts/stock/indicators/Volume.js";
+import type { VolumeProfile } from "./../charts/stock/indicators/VolumeProfile.js";
 import type { VoronoiTreemap } from "./../charts/hierarchy/VoronoiTreemap.js";
 import type { WilliamsR } from "./../charts/stock/indicators/WilliamsR.js";
 import type { WordCloud } from "./../charts/wordcloud/WordCloud.js";
@@ -270,6 +272,7 @@ export interface IClasses {
 	"ComparisonControl": ComparisonControl;
 	"Component": Component;
 	"Container": Container;
+	"DataSaveControl": DataSaveControl;
 	"DateAxis": DateAxis<AxisRenderer>;
 	"DateRangeSelector": DateRangeSelector;
 	"DisparityIndex": DisparityIndex;
@@ -426,6 +429,7 @@ export interface IClasses {
 	"VerticalLayout": VerticalLayout;
 	"VerticalLineSeries": VerticalLineSeries;
 	"Volume": Volume;
+	"VolumeProfile": VolumeProfile;
 	"VoronoiTreemap": VoronoiTreemap;
 	"WilliamsR": WilliamsR;
 	"WordCloud": WordCloud;

@@ -55,11 +55,20 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		super._afterNew();
 	}
 
-	protected _dates: Array<number> = [];
+	public _dates: Array<number> = [];
+	public _customDates?: Array<number>;
+
+
+	public _getDates(): Array<number> {
+		if (this._customDates) {
+			return this._customDates;
+		}
+		return this._dates;
+	}
 
 	protected _updateDates(date: number, series: XYSeries) {
 		if (!series.get("ignoreMinMax")) {
-			const dates = this._dates;
+			const dates = this._getDates();
 			const result = $array.getSortedIndex(dates, (x) => $order.compare(x, date));
 			if (!result.found) {
 				$array.insertIndex(dates, result.index, date);
@@ -68,57 +77,57 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	public _updateAllDates() {
-		const dates = this._dates;
-		dates.length = 0;
+		if (!this._customDates) {
+			const dates = this._dates;
+			dates.length = 0;
 
-		$array.each(this.series, (series) => {
-			let field = "valueX";
-			if (series.get("yAxis") == this) {
-				field = "valueY"
-			}
-			$array.each(series.dataItems, (dataItem) => {
-				let value = dataItem.get(field as any);
-				if ($type.isNumber(value)) {
-					if (dataItem.open) {
-						this._updateDates(dataItem.open![field], series);
+			$array.each(this.series, (series) => {
+				let field = "valueX";
+				if (series.get("yAxis") == this) {
+					field = "valueY"
+				}
+				$array.each(series.dataItems, (dataItem) => {
+					let value = dataItem.get(field as any);
+					if ($type.isNumber(value)) {
+						if (dataItem.open) {
+							this._updateDates(dataItem.open![field], series);
+						}
+					}
+				})
+			})
+
+			const extraMax = this.get("extraMax", 0);
+			const extraMin = this.get("extraMin", 0);
+
+			let len = dates.length;
+
+			const baseInterval = this.getPrivate("baseInterval");
+			const baseCount = baseInterval.count;
+			const timeUnit = baseInterval.timeUnit;
+
+			if (extraMax > 0) {
+				const extra = len * extraMax;
+				let time = dates[len - 1];
+				if ($type.isNumber(time)) {
+					for (let i = len - 1; i < len + extra; i++) {
+						time += $time.getDuration(timeUnit, baseCount * this._getM(timeUnit));
+						//time = $time.round(new Date(time), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
+						time = $time.roun(time, timeUnit, baseCount, this._root);
+						dates.push(time);
 					}
 				}
-			})
-		})
-
-		const extraMax = this.get("extraMax", 0);
-		const extraMin = this.get("extraMin", 0);
-
-		const len = dates.length;
-
-		const baseInterval = this.getPrivate("baseInterval");
-		const timeUnit = baseInterval.timeUnit;
-
-		const firstDay = this._root.locale.firstDayOfWeek;
-		const utc = this._root.utc;
-		const timezone = this._root.timezone;
-
-		if (extraMax > 0) {
-			const extra = len * extraMax;
-			let time = dates[len - 1];
-			if ($type.isNumber(time)) {
-				for (let i = len - 1; i < len + extra; i++) {
-					time += $time.getDuration(timeUnit, baseInterval.count * this._getM(timeUnit));
-					time = $time.round(new Date(time), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
-					dates.push(time);
-				}
 			}
 
-		}
-
-		if (extraMin > 0) {
-			const extra = len * extraMin;
-			let time = dates[0];
-			if ($type.isNumber(time)) {
-				for (let i = 0; i < extra; i++) {
-					time -= $time.getDuration(timeUnit, baseInterval.count);
-					time = $time.round(new Date(time), timeUnit, baseInterval.count, firstDay, utc, undefined, timezone).getTime();
-					dates.unshift(time);
+			if (extraMin > 0) {
+				const extra = len * extraMin;
+				let time = dates[0];
+				if ($type.isNumber(time)) {
+					for (let i = 0; i < extra; i++) {
+						time -= $time.getDuration(timeUnit, baseCount);
+						//time = $time.round(new Date(time), timeUnit, baseCount, firstDay, utc, undefined, timezone).getTime();
+						time = $time.roun(time, timeUnit, baseCount, this._root);
+						dates.unshift(time);
+					}
 				}
 			}
 		}
@@ -131,7 +140,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	 * @return         Relative position
 	 */
 	public valueToPosition(value: number): number {
-		const dates = this._dates;
+		const dates = this._getDates();
 		const startLocation = this.get("startLocation", 0);
 		const endLocation = this.get("endLocation", 1);
 		const len = dates.length - startLocation - (1 - endLocation);
@@ -167,7 +176,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	 * @return        Index
 	 */
 	public valueToIndex(value: number): number {
-		const dates = this._dates;
+		const dates = this._getDates();
 
 		const result = $array.getSortedIndex(dates, (x) => $order.compare(x, value));
 		let index = result.index;
@@ -193,7 +202,8 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	public positionToValue(position: number): number {
 		const startLocation = this.get("startLocation", 0);
 		const endLocation = this.get("endLocation", 1);
-		let len = Math.round(this._dates.length - startLocation - (1 - endLocation));
+		const dates = this._getDates();
+		let len = Math.round(dates.length - startLocation - (1 - endLocation));
 		let index = position * len;
 		let findex = Math.floor(index);
 		if (findex < 0) {
@@ -204,11 +214,38 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			findex = len - 1
 		}
 
-		return this._dates[findex] + (index - findex + startLocation) * this.baseDuration();
+		return dates[findex] + (index - findex + startLocation) * this.baseDuration();
 	}
 
 	protected _fixZoomFactor() {
-		this.setPrivateRaw("maxZoomFactor", this._dates.length - this.get("startLocation", 0) - (1 - this.get("endLocation", 1)));
+		this.setPrivateRaw("maxZoomFactor", this._getDates().length - this.get("startLocation", 0) - (1 - this.get("endLocation", 1)));
+	}
+
+	/**
+	 * Zooms the axis to specific `start` and `end` dates.
+	 *
+	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 *
+	 * @param  start     Start Date
+	 * @param  end       End Date
+	 * @param  duration  Duration in milliseconds
+	 */
+
+	public zoomToDates(start: Date, end: Date, duration?: number) {
+		const dates = this._getDates();
+		const len = dates.length;
+		let result = $array.getSortedIndex(dates, (x) => $order.compare(x, start.getTime()));
+		
+		let startValue = dates[Math.min(result.index, len - 1)];
+
+		result = $array.getSortedIndex(dates, (x) => $order.compare(x, end.getTime()));
+		let endValue = dates[result.index];
+
+		if(result.index >= len){
+			endValue = dates[len - 1] + this.baseDuration();
+		}
+
+		this.zoomToValues(startValue, endValue, duration);
 	}
 
 	/**
@@ -240,10 +277,10 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				this._updateAllDates();
 			}
 
-			const firstDay = this._root.locale.firstDayOfWeek;
-			const utc = this._root.utc;
-			const timezone = this._root.timezone;
-			const dates = this._dates;
+			const root = this._root;
+			const utc = root.utc;
+			const timezone = root.timezone;
+			const dates = this._getDates();
 			const renderer = this.get("renderer");
 			const len = dates.length;
 			const baseDuration = this.baseDuration();
@@ -291,12 +328,14 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			const timeUnit = gridInterval.timeUnit;
 			const formats = this.get("dateFormats")!;
 
-			let firstDate = new Date();
-			if (this._dates[0]) {
-				firstDate = new Date(this._dates[0]);
+			let firstTime = Date.now();
+
+			if (dates[0]) {
+				firstTime = dates[0];
 			}
 
-			let value = $time.round(new Date(this.getPrivate("selectionMin", 0)), timeUnit, gridInterval.count, firstDay, utc, firstDate, timezone).getTime();
+			//let value = $time.round(new Date(this.getPrivate("selectionMin", 0)), timeUnit, gridInterval.count, firstDay, utc, firstDate, timezone).getTime();
+			let value = $time.roun(this.getPrivate("selectionMin", 0), timeUnit, gridInterval.count, root, firstTime);
 
 			const minorLabelsEnabled = renderer.get("minorLabelsEnabled");
 			const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
@@ -365,7 +404,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 					const label = dataItem.get("label");
 					if (label) {
-						label.set("text", this._root.dateFormatter.format(date, format!));
+						label.set("text", root.dateFormatter.format(date, format!));
 					}
 
 					this._toggleDataItem(dataItem, true);
@@ -384,11 +423,12 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 						}
 
 						if (count > 1 || gridInterval.timeUnit == "week") {
-							let labelEndValue = $time.round(new Date(value), timeUnit2, 1, firstDay, utc, undefined, timezone).getTime() + $time.getDuration(timeUnit2, this._getM(timeUnit2));
+							//let labelEndValue = $time.round(new Date(value), timeUnit2, 1, firstDay, utc, undefined, timezone).getTime() + $time.getDuration(timeUnit2, this._getM(timeUnit2));
+							let labelEndValue = $time.roun(value, timeUnit2, 1, root) + $time.getDuration(timeUnit2, this._getM(timeUnit2));
 							let index = this.valueToIndex(labelEndValue)
-							labelEndValue = this._dates[index];
+							labelEndValue = dates[index];
 							if (labelEndValue == value) {
-								let next = this._dates[index + 1];
+								let next = dates[index + 1];
 								if (next) {
 									labelEndValue = next;
 								}
@@ -466,16 +506,14 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	protected _addMinorGrid(startValue: number, endValue: number, minorDuration: number, gridInterval: ITimeInterval) {
 		const minorFormats = this.get("minorDateFormats", this.get("dateFormats"))!;
 		const mTimeUnit = gridInterval.timeUnit;
-		const firstDay = this._root.locale.firstDayOfWeek;
-		const utc = this._root.utc;
-		const timezone = this._root.timezone;
-
 		let value = startValue + $time.getDuration(mTimeUnit, this._getM(mTimeUnit));
-		value = $time.round(new Date(value), mTimeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+		//value = $time.round(new Date(value), mTimeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+		value = $time.roun(value, mTimeUnit, 1, this._root);
 
 		let maxValue = endValue - minorDuration * 0.5;
 
 		let minorSelectedItems: Array<number> = this._getIndexes(value, maxValue, gridInterval, value);
+		const dates = this._getDates();
 
 		$array.each(minorSelectedItems, (index) => {
 			let minorDataItem: DataItem<this["_dataItemSettings"]>;
@@ -488,7 +526,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				minorDataItem = this.minorDataItems[this._m];
 			}
 
-			value = this._dates[index];
+			value = dates[index];
 			minorDataItem.setRaw("value", value);
 			minorDataItem.setRaw("endValue", value + minorDuration);
 			minorDataItem.setRaw("index", index);
@@ -518,17 +556,18 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		const items: Array<number> = [];
 		const timeUnit = interval.timeUnit;
 		const count = interval.count;
+		const mmm = this._getM(timeUnit);
 
 		const baseInterval = this.getPrivate("baseInterval");
 
-		const firstDay = this._root.locale.firstDayOfWeek;
-		const utc = this._root.utc;
-		const timezone = this._root.timezone;
+		const root = this._root;
+		const dates = this._getDates();
 
 		let c = count - 1;
 		let previousValue = -Infinity;
-		let duration = $time.getDuration(timeUnit, this._getM(timeUnit));
-		let fullDuration = $time.getDuration(timeUnit, count * this._getM(timeUnit));
+
+		let duration = $time.getDuration(timeUnit, mmm);
+		let fullDuration = $time.getDuration(timeUnit, count * mmm);
 		let originalValue = value;
 
 		if (timeUnit == "day") {
@@ -536,10 +575,11 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		}
 
 		while (value <= maxValue) {
-			value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+			//value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+			value = $time.roun(value, timeUnit, count, root);
 
 			let index = this.valueToIndex(value);
-			let realValue = this._dates[index];
+			let realValue = dates[index];
 
 			if (timeUnit == "day" && baseInterval.timeUnit == "day") {
 				if (this._hasDate(value)) {
@@ -553,12 +593,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 					c = 0;
 				}
 				value += duration;
-				value = $time.round(new Date(value), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+				//value = $time.round(new Date(value), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+				value = $time.roun(value, timeUnit, 1, root);
 			}
 			else {
 				if (realValue < value) {
-					for (let i = index, len = this._dates.length; i < len; i++) {
-						realValue = this._dates[i];
+					for (let i = index, len = dates.length; i < len; i++) {
+						realValue = dates[i];
 						if (realValue >= value) {
 							index = i;
 							break;
@@ -569,12 +610,14 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				$array.move(items, index);
 
 				value += fullDuration;
-				value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+				//value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+				value = $time.roun(value, timeUnit, count, root);
 			}
 
 			if (value == previousValue) {
 				value += fullDuration + duration;
-				value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+				//value = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
+				value = $time.roun(value, timeUnit, count, root);
 			}
 			if (value == previousValue) {
 				break;
@@ -587,7 +630,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	protected _hasDate(time: number) {
-		const result = $array.getSortedIndex(this._dates, (date) => {
+		const result = $array.getSortedIndex(this._getDates(), (date) => {
 			return $order.compareNumber(date, time);
 		});
 

@@ -812,6 +812,8 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 	highValueYCloseSelection?: number;
 
 	outOfSelection?: boolean;
+
+	doNotUpdateLegend?:boolean;
 }
 
 
@@ -2098,8 +2100,10 @@ export abstract class XYSeries extends Series {
 	 * @param  dataItem  Data item
 	 */
 	public showDataItemTooltip(dataItem: DataItem<this["_dataItemSettings"]> | undefined) {
-		this.updateLegendMarker(dataItem);
-		this.updateLegendValue(dataItem);
+		if(!this.getPrivate("doNotUpdateLegend")){
+			this.updateLegendMarker(dataItem);
+			this.updateLegendValue(dataItem);
+		}
 
 		const tooltip = this.get("tooltip");
 

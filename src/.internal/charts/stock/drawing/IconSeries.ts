@@ -1,11 +1,11 @@
 import type { Percent } from "../../../core/util/Percent";
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
+import type { SpriteResizer } from "../../../core/render/SpriteResizer";
 
 import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolylineSeriesDataItem } from "./PolylineSeries";
 import { Bullet } from "../../../core/render/Bullet";
 import { Graphics } from "../../../core/render/Graphics";
-import { SpriteResizer } from "../../../core/render/SpriteResizer";
 import { Template } from "../../../core/util/Template";
 import * as $array from "../../../core/util/Array";
 
@@ -56,12 +56,14 @@ export class IconSeries extends PolylineSeries {
 	declare public _privateSettings: IIconSeriesPrivate;
 	declare public _dataItemSettings: IIconSeriesDataItem;
 
-	public spriteResizer = this.children.push(SpriteResizer.new(this._root, {}));
+	public spriteResizer!: SpriteResizer;
 
 	protected _tag = "icon";
 
 	protected _afterNew() {
 		super._afterNew();
+
+		this.spriteResizer = this._getStockChart().spriteResizer;
 
 		this.bullets.clear();
 
@@ -71,45 +73,47 @@ export class IconSeries extends PolylineSeries {
 		this.bullets.push((root, _series, dataItem) => {
 			const dataContext = dataItem.dataContext as any;
 			const template = dataContext.settings;
-			const sprite = Graphics.new(root, {
-				draggable: true,
-				themeTags: ["icon"]
-			}, template);
+			if (template) {
+				const sprite = Graphics.new(root, {
+					draggable: true,
+					themeTags: ["icon"]
+				}, template);
 
-			this._addBulletInteraction(sprite);
+				this._addBulletInteraction(sprite);
 
-			sprite.events.on("click", () => {
-				const spriteResizer = this.spriteResizer;
-				if (spriteResizer.get("sprite") == sprite) {
-					spriteResizer.set("sprite", undefined);
-				}
-				else {
-					spriteResizer.set("sprite", sprite);
-				}
-			})
+				sprite.events.on("click", () => {
+					const spriteResizer = this.spriteResizer;
+					if (spriteResizer.get("sprite") == sprite) {
+						spriteResizer.set("sprite", undefined);
+					}
+					else {
+						spriteResizer.set("sprite", sprite);
+					}
+				})
 
-			sprite.events.on("pointerover", () => {
-				this._isHover = true;
-			})
+				sprite.events.on("pointerover", () => {
+					this._isHover = true;
+				})
 
-			sprite.events.on("pointerout", () => {
-				this._isHover = false;
-			})
+				sprite.events.on("pointerout", () => {
+					this._isHover = false;
+				})
 
-			this.spriteResizer.set("sprite", undefined);
+				this.spriteResizer.set("sprite", undefined);
 
-			sprite.on("scale", (scale) => {
-				template.set("scale", scale)
-			})
+				sprite.on("scale", (scale) => {
+					template.set("scale", scale)
+				})
 
-			sprite.on("rotation", (rotation) => {
-				template.set("rotation", rotation)
-			})
+				sprite.on("rotation", (rotation) => {
+					template.set("rotation", rotation)
+				})
 
-			return Bullet.new(this._root, {
-				locationX: undefined,
-				sprite: sprite
-			})
+				return Bullet.new(this._root, {
+					locationX: undefined,
+					sprite: sprite
+				})
+			}
 		})
 	}
 

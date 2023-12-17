@@ -86,22 +86,24 @@ export class Aroon extends ChartIndicator {
 			fill: undefined
 		}))
 
-		this.yAxis.setAll({ min: -1, max: 101, strictMinMax: true, numberFormat:"#'%'" });
+		this.yAxis.setAll({ min: -1, max: 101, strictMinMax: true, numberFormat: "#'%'" });
 	}
 
 	public _updateChildren() {
 		super._updateChildren();
 
-		if (this.isDirty("upColor")) {
-			let color = this.get("upColor", Color.fromHex(0x00ff00));
+		const upColor  = "upColor";
+		if (this.isDirty(upColor)) {
+			let color = this.get(upColor, Color.fromHex(0x00ff00));
 			this._updateSeriesColor(this.series, color);
-			this.setCustomData("upColor", color);
+			this.setCustomData(upColor, color);
 		}
 
-		if (this.isDirty("downColor")) {
-			let color = this.get("downColor", Color.fromHex(0xff0000));
+		const downColor = "downColor";
+		if (this.isDirty(downColor)) {
+			let color = this.get(downColor, Color.fromHex(0xff0000));
 			this._updateSeriesColor(this.downSeries, color);
-			this.setCustomData("downColor", color);
+			this.setCustomData(downColor, color);
 		}
 	}
 

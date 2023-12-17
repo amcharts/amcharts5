@@ -1,18 +1,16 @@
 import type { IIndicatorEditableSetting } from "./Indicator";
-import type { XYSeries } from "../../xy/series/XYSeries";
 
 import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
 import { LineSeries } from "../../xy/series/LineSeries";
+import type { XYSeries } from "../../xy/series/XYSeries";
 
 import * as $array from "../../../core/util/Array";
 
 export interface IChaikinMoneyFlowSettings extends IChartIndicatorSettings {
-
 	/**
-	 * Main volume series of the [[StockChart]].
+	 * A volume series indicator will be based on, if it reaquires one.
 	 */
-	volumeSeries: XYSeries;
-
+	volumeSeries: XYSeries;	
 }
 
 export interface IChaikinMoneyFlowPrivate extends IChartIndicatorPrivate {
@@ -65,13 +63,6 @@ export class ChaikinMoneyFlow extends ChartIndicator {
 			stroke: this.get("seriesColor"),
 			fill: undefined
 		}))
-	}
-
-	public _prepareChildren() {
-		if (this.isDirty("volumeSeries")) {
-			this._dataDirty = true;
-		}
-		super._prepareChildren();
 	}
 
 	/**

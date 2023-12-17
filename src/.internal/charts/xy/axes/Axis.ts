@@ -119,6 +119,13 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 */
 	zoomY?: boolean;
 
+
+	/**
+	 * @todo review
+	 * You can prevent axis to be zoomed if this is false.
+	 */
+	zoomable?:boolean;
+
 	/**
 	 * A relative distance the axis is allowed to be zoomed/panned beyond its
 	 * actual scope.
@@ -423,162 +430,164 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @return            Zoom animation
 	 */
 	public zoom(start: number, end: number, duration?: number, priority?: "start" | "end"): Animation<this["_settings"]["start"]> | Animation<this["_settings"]["end"]> | undefined {
-		this._updateFinals(start, end);
+		if(this.get("zoomable", true)){
+			this._updateFinals(start, end);
 
-		if (this.get("start") !== start || this.get("end") != end) {
-			let sAnimation = this._sAnimation;
-			let eAnimation = this._eAnimation;
+			if (this.get("start") !== start || this.get("end") != end) {
+				let sAnimation = this._sAnimation;
+				let eAnimation = this._eAnimation;
 
-			let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
+				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
 
-			if (start < - maxDeviation) {
-				start = -maxDeviation;
-			}
-
-			if (end > 1 + maxDeviation) {
-				end = 1 + maxDeviation;
-			}
-
-			if (start > end) {
-				[start, end] = [end, start];
-			}
-
-			if (!$type.isNumber(duration)) {
-				duration = this.get("interpolationDuration", 0);
-			}
-
-			if (!priority) {
-				priority = "end";
-			}
-
-			let maxZoomFactor = this.getPrivate("maxZoomFactor", this.get("maxZoomFactor", 100));
-			let maxZoomFactorReal = maxZoomFactor;
-
-			if (end === 1 && start !== 0) {
-				if (start < this.get("start")) {
-					priority = "start";
+				if (start < - maxDeviation) {
+					start = -maxDeviation;
 				}
-				else {
+
+				if (end > 1 + maxDeviation) {
+					end = 1 + maxDeviation;
+				}
+
+				if (start > end) {
+					[start, end] = [end, start];
+				}
+
+				if (!$type.isNumber(duration)) {
+					duration = this.get("interpolationDuration", 0);
+				}
+
+				if (!priority) {
 					priority = "end";
 				}
-			}
 
-			if (start === 0 && end !== 1) {
-				if (end > this.get("end")) {
-					priority = "end";
-				}
-				else {
-					priority = "start";
-				}
-			}
+				let maxZoomFactor = this.getPrivate("maxZoomFactor", this.get("maxZoomFactor", 100));
+				let maxZoomFactorReal = maxZoomFactor;
 
-			let minZoomCount = this.get("minZoomCount");
-			let maxZoomCount = this.get("maxZoomCount");
-
-			if ($type.isNumber(minZoomCount)) {
-				maxZoomFactor = maxZoomFactorReal / minZoomCount;
-			}
-
-			let minZoomFactor: number = 1;
-
-			if ($type.isNumber(maxZoomCount)) {
-				minZoomFactor = maxZoomFactorReal / maxZoomCount;
-			}
-
-			// most likely we are dragging left scrollbar grip here, so we tend to modify end
-			if (priority === "start") {
-				if (maxZoomCount > 0) {
-					// add to the end
-					if (1 / (end - start) < minZoomFactor) {
-						end = start + 1 / minZoomFactor;
+				if (end === 1 && start !== 0) {
+					if (start < this.get("start")) {
+						priority = "start";
+					}
+					else {
+						priority = "end";
 					}
 				}
 
-				// add to the end
-				if (1 / (end - start) > maxZoomFactor) {
-					end = start + 1 / maxZoomFactor;
-				}
-				//unless end is > 0
-				if (end > 1 && end - start < 1 / maxZoomFactor) {
-					//end = 1;
-					start = end - 1 / maxZoomFactor;
-				}
-			}
-			// most likely we are dragging right, so we modify left
-			else {
-				if (maxZoomCount > 0) {
-					// add to the end
-					if (1 / (end - start) < minZoomFactor) {
-						start = end - 1 / minZoomFactor;
+				if (start === 0 && end !== 1) {
+					if (end > this.get("end")) {
+						priority = "end";
+					}
+					else {
+						priority = "start";
 					}
 				}
 
-				// remove from start
+				let minZoomCount = this.get("minZoomCount");
+				let maxZoomCount = this.get("maxZoomCount");
+
+				if ($type.isNumber(minZoomCount)) {
+					maxZoomFactor = maxZoomFactorReal / minZoomCount;
+				}
+
+				let minZoomFactor: number = 1;
+
+				if ($type.isNumber(maxZoomCount)) {
+					minZoomFactor = maxZoomFactorReal / maxZoomCount;
+				}
+
+				// most likely we are dragging left scrollbar grip here, so we tend to modify end
+				if (priority === "start") {
+					if (maxZoomCount > 0) {
+						// add to the end
+						if (1 / (end - start) < minZoomFactor) {
+							end = start + 1 / minZoomFactor;
+						}
+					}
+
+					// add to the end
+					if (1 / (end - start) > maxZoomFactor) {
+						end = start + 1 / maxZoomFactor;
+					}
+					//unless end is > 0
+					if (end > 1 && end - start < 1 / maxZoomFactor) {
+						//end = 1;
+						start = end - 1 / maxZoomFactor;
+					}
+				}
+				// most likely we are dragging right, so we modify left
+				else {
+					if (maxZoomCount > 0) {
+						// add to the end
+						if (1 / (end - start) < minZoomFactor) {
+							start = end - 1 / minZoomFactor;
+						}
+					}
+
+					// remove from start
+					if (1 / (end - start) > maxZoomFactor) {
+						start = end - 1 / maxZoomFactor;
+					}
+					if (start < 0 && end - start < 1 / maxZoomFactor) {
+						//start = 0;
+						end = start + 1 / maxZoomFactor;
+					}
+				}
+
+				if (1 / (end - start) > maxZoomFactor) {
+					end = start + 1 / maxZoomFactor;
+				}
+
 				if (1 / (end - start) > maxZoomFactor) {
 					start = end - 1 / maxZoomFactor;
 				}
-				if (start < 0 && end - start < 1 / maxZoomFactor) {
-					//start = 0;
-					end = start + 1 / maxZoomFactor;
-				}
-			}
 
-			if (1 / (end - start) > maxZoomFactor) {
-				end = start + 1 / maxZoomFactor;
-			}
-
-			if (1 / (end - start) > maxZoomFactor) {
-				start = end - 1 / maxZoomFactor;
-			}
-
-			if (maxZoomCount != null && minZoomCount != null && (start == this.get("start") && end == this.get("end"))) {
-				const chart = this.chart;
-				if (chart) {
-					chart._handleAxisSelection(this, true);
-				}
-			}
-
-			if (((sAnimation && sAnimation.playing && sAnimation.to == start) || this.get("start") == start) && ((eAnimation && eAnimation.playing && eAnimation.to == end) || this.get("end") == end)) {
-				return;
-			}
-
-
-			if (duration > 0) {
-				let easing = this.get("interpolationEasing");
-				let sAnimation, eAnimation;
-				if (this.get("start") != start) {
-					sAnimation = this.animate({ key: "start", to: start, duration: duration, easing: easing });
-				}
-				if (this.get("end") != end) {
-					eAnimation = this.animate({ key: "end", to: end, duration: duration, easing: easing });
+				if (maxZoomCount != null && minZoomCount != null && (start == this.get("start") && end == this.get("end"))) {
+					const chart = this.chart;
+					if (chart) {
+						chart._handleAxisSelection(this, true);
+					}
 				}
 
-				this._sAnimation = sAnimation;
-				this._eAnimation = eAnimation;
-
-				if (sAnimation) {
-					return sAnimation;
+				if (((sAnimation && sAnimation.playing && sAnimation.to == start) || this.get("start") == start) && ((eAnimation && eAnimation.playing && eAnimation.to == end) || this.get("end") == end)) {
+					return;
 				}
-				else if (eAnimation) {
-					return eAnimation;
+
+
+				if (duration > 0) {
+					let easing = this.get("interpolationEasing");
+					let sAnimation, eAnimation;
+					if (this.get("start") != start) {
+						sAnimation = this.animate({ key: "start", to: start, duration: duration, easing: easing });
+					}
+					if (this.get("end") != end) {
+						eAnimation = this.animate({ key: "end", to: end, duration: duration, easing: easing });
+					}
+
+					this._sAnimation = sAnimation;
+					this._eAnimation = eAnimation;
+
+					if (sAnimation) {
+						return sAnimation;
+					}
+					else if (eAnimation) {
+						return eAnimation;
+					}
+				}
+				else {
+					this.set("start", start);
+					this.set("end", end);
+					// otherwise bullets and line out of sync, as series is not redrawn
+					this._root.events.once("frameended", () => {
+						this._markDirtyKey("start");
+						this._root._markDirty();
+					})
 				}
 			}
 			else {
-				this.set("start", start);
-				this.set("end", end);
-				// otherwise bullets and line out of sync, as series is not redrawn
-				this._root.events.once("frameended", () => {
-					this._markDirtyKey("start");
-					this._root._markDirty();
-				})
-			}
-		}
-		else {
-			if (this._sAnimation) {
-				this._sAnimation.stop();
-			}
-			if (this._eAnimation) {
-				this._eAnimation.stop();
+				if (this._sAnimation) {
+					this._sAnimation.stop();
+				}
+				if (this._eAnimation) {
+					this._eAnimation.stop();
+				}
 			}
 		}
 	}

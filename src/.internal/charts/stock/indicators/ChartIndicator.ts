@@ -122,8 +122,6 @@ export abstract class ChartIndicator extends Indicator {
 			}
 
 			chart.set("cursor", XYCursor.new(root, { yAxis: yAxis, xAxis: xAxis }));
-
-
 		}
 	}
 

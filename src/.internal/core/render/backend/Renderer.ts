@@ -286,6 +286,7 @@ export interface IRenderer extends IDisposer {
 	view: HTMLElement;
 
 	getEvent<A extends IPointerEvent>(originalEvent: A, adjustPoint?: boolean): IRendererEvent<A>;
+	getObjectAtPoint(point: IPoint): IDisplayObject | undefined;
 }
 
 export interface ICanvasOptions {

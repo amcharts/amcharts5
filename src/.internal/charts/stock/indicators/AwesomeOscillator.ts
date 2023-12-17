@@ -76,13 +76,16 @@ export class AwesomeOscillator extends ChartIndicator {
 	public _updateChildren() {
 		super._updateChildren();
 
-		if (this.isDirty("increasingColor") || this.isDirty("decreasingColor")) {
+		const increasingColor= "increasingColor";
+		const decreasingColor= "decreasingColor";
+
+		if (this.isDirty(increasingColor) || this.isDirty(decreasingColor)) {
 			const template = this.series.columns.template;
-			const increasing = this.get("increasingColor");
-			const decreasing = this.get("decreasingColor");
+			const increasing = this.get(increasingColor);
+			const decreasing = this.get(decreasingColor);
 			template.states.create("riseFromPrevious", { fill: increasing, stroke: increasing });
 			template.states.create("dropFromPrevious", { fill: decreasing, stroke: decreasing });
-			this._dataDirty = true;
+			this.markDataDirty();
 		}
 	}
 

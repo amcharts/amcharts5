@@ -121,7 +121,7 @@ export class MovingAverageDeviation extends ChartIndicator {
 
 	public _prepareChildren() {
 		if (this.isDirty("type") || this.isDirty("unit")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 		}
 		super._prepareChildren();
 	}

@@ -1228,32 +1228,6 @@ export function alternativeColor(color: iRGB, lightAlternative: iRGB = { r: 255,
 
 /**
  * @ignore
- * @deprecated
- */
-// export function unshiftThemeClass(settings: any, themeClass: string) {
-// 	let themeClasses = settings.themeClasses;
-// 	if (!themeClasses) {
-// 		themeClasses = [];
-// 	}
-// 	themeClasses.unshift(themeClass);
-// 	settings.themeClasses = themeClasses;
-// }
-
-/**
- * @ignore
- * @deprecated
- */
-// export function pushThemeClass(settings: any, themeClass: string) {
-// 	let themeClasses = settings.themeClasses;
-// 	if (!themeClasses) {
-// 		themeClasses = [];
-// 	}
-// 	themeClasses.push(themeClass);
-// 	settings.themeClasses = themeClasses;
-// }
-
-/**
- * @ignore
  */
 export function mergeTags(tags1: string[] | undefined, tags2: string[]): string[] {
 	if (!tags1) {

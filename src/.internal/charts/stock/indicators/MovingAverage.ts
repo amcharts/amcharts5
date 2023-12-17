@@ -75,7 +75,7 @@ export class MovingAverage extends Indicator {
 	public _prepareChildren() {
 
 		if (this.isDirty("type") || this.isDirty("offset")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("type", this.get("type"));
 			this.setCustomData("offset", this.get("offset", 0));
 		}

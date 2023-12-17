@@ -77,15 +77,15 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 		this.smaSeries = smaSeries;
 	}
 
-	public _updateChildren(){
+	public _updateChildren() {
 		super._updateChildren();
 		if (this.isDirty("smaColor")) {
 			this._updateSeriesColor(this.smaSeries, this.get("smaColor"), "smaColor")
 		}
 		if (this.isDirty("smaPeriod")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 			this.setCustomData("smaPeriod", this.get("smaPeriod"));
-		}		
+		}
 	}
 
 

@@ -7,8 +7,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.1.2] - 2023-12-07
+
 ### Added
 - New map of Kazakhstan: `kazahkstan2023*`.
+- New USA county maps to reflect changes in Alaska: `region/usa/ak2023*` and `region/usa/usaCounties2023*`.
 
 ### Changed
 - Updated Hormozgan province name in the maps of Iran.

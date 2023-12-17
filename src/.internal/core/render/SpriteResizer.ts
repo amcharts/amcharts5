@@ -1,12 +1,12 @@
 import type { Sprite, ISpritePointerEvent } from "./Sprite";
 import type { IDisposer } from "../util/Disposer";
+import type { Template } from "../util/Template";
 
 import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
 import { p50, Percent } from "../util/Percent";
 import { RoundedRectangle } from "./RoundedRectangle";
 import { Rectangle } from "./Rectangle";
 import { color } from "../util/Color";
-import type { Template } from "../util/Template";
 
 import * as $math from "../util/Math";
 

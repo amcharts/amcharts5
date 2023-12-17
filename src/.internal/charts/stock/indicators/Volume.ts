@@ -74,7 +74,7 @@ export class Volume extends ChartIndicator {
 
 	public _prepareChildren() {
 		if (this.isDirty("increasingColor") || this.isDirty("decreasingColor")) {
-			this._dataDirty = true;
+			this.markDataDirty();
 		}
 		super._prepareChildren();
 	}
