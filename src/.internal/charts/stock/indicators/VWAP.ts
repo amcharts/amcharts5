@@ -87,31 +87,34 @@ export class VWAP extends Indicator {
 				let i = 0;
 				let totalVolume = 0;
 				let totalVW = 0;
+
 				$array.each(data, (dataItem) => {
 					const volumeDI = volumeSeries.dataItems[i];
 					if (volumeDI) {
 						const volume = volumeDI.get("valueY", 0);
-						const vw = dataItem.value_y * volume;
+						if (volume > 0) {
+							const vw = dataItem.value_y * volume;
 
-						dataItem.vw = vw;
-						dataItem.volume = volume;
+							dataItem.vw = vw;
+							dataItem.volume = volume;
 
-						totalVW += vw;
-						totalVolume += volume;
+							totalVW += vw;
+							totalVolume += volume;
 
-						if (i >= period) {
-							let volumeToRemove = data[i - period].volume;
-							let vwToRemove = data[i - period].vw;
-							if (volumeToRemove != null) {
-								totalVolume -= volumeToRemove;
+							if (i >= period) {
+								let volumeToRemove = data[i - period].volume;
+								let vwToRemove = data[i - period].vw;
+								if (volumeToRemove != null) {
+									totalVolume -= volumeToRemove;
+								}
+								if (vwToRemove != null) {
+									totalVW -= vwToRemove;
+								}
 							}
-							if (vwToRemove != null) {
-								totalVW -= vwToRemove;
-							}
+
+							dataItem.totalVW = totalVW;
+							dataItem.vwap = totalVW / totalVolume;
 						}
-
-						dataItem.totalVW = totalVW;
-						dataItem.vwap = totalVW / totalVolume;
 					}
 
 					i++;

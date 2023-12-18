@@ -85,28 +85,12 @@ export class DataSaveControl extends DropdownListControl {
 		const stockChart = this.get("stockChart");
 		const dropdown = this.getPrivate("dropdown")!;
 
-		// Drawing control
-		let drawingControl = stockChart.getControl("DrawingControl");
-		if (!drawingControl) {
-			drawingControl = DrawingControl.new(this.root, {
-				stockChart: stockChart
-			});
-		}
-		this.setPrivate("drawingControl", drawingControl as DrawingControl);
-
-		// Indicator control
-		let indicatorControl = stockChart.getControl("IndicatorControl");
-		if (!indicatorControl) {
-			indicatorControl = IndicatorControl.new(this.root, {
-				stockChart: stockChart
-			});
-		}
-		this.setPrivate("indicatorControl", indicatorControl as IndicatorControl);
-
 		// Load local storage
 		if (localStorage && localStorage.getItem(this._getStorageId("autosave")) == "1") {
-			this.set("autoSave", true);
-			this.restoreData();
+			this.root.events.once("frameended", () => {
+				this.restoreData();
+				this.set("autoSave", true);
+			});
 		}
 
 		dropdown.events.on("changed", (ev) => {
@@ -158,7 +142,7 @@ export class DataSaveControl extends DropdownListControl {
 			}
 			else {
 				localStorage.removeItem(this._getStorageId("autosave"));
-				this.clearData();
+				//this.clearData();
 			}
 			this._populateInputs();
 		}
@@ -166,8 +150,8 @@ export class DataSaveControl extends DropdownListControl {
 
 	public saveData(): void {
 		if (localStorage) {
-			const drawingControl = this.getPrivate("drawingControl")!;
-			const indicatorControl = this.getPrivate("indicatorControl")!;
+			const drawingControl = this._getDrawingControl();
+			const indicatorControl = this._getIndicatorControl();
 			const drawings = drawingControl.serializeDrawings("string", "  ") as string;
 			const indicators = indicatorControl.serializeIndicators("string", "  ") as string;
 			if (drawings == "[]") {
@@ -202,10 +186,11 @@ export class DataSaveControl extends DropdownListControl {
 
 			stockChart.indicators.clear();
 
-			const drawingControl = this.getPrivate("drawingControl")!;
-			const indicatorControl = this.getPrivate("indicatorControl")!;
+			const drawingControl = this._getDrawingControl();
+			const indicatorControl = this._getIndicatorControl();
 			const drawings = localStorage.getItem(this._getStorageId("drawings")) || "[]";
 			const indicators = localStorage.getItem(this._getStorageId("indicators")) || "[]";
+
 			drawingControl.unserializeDrawings(drawings);
 			indicatorControl.unserializeIndicators(indicators);
 			this.events.dispatch("restored", {
@@ -259,6 +244,42 @@ export class DataSaveControl extends DropdownListControl {
 
 	protected _getStorageId(bucket: string): string {
 		return "am5-stock-" + this.get("storageId", this.getPrivate("storageId", "")) + "-" + bucket;
+	}
+
+	protected _getDrawingControl(): DrawingControl {
+
+		let drawingControl: DrawingControl | undefined = this.getPrivate("drawingControl");
+		if (drawingControl) {
+			return drawingControl;
+		}
+
+		const stockChart = this.get("stockChart");
+		drawingControl = stockChart.getControl("DrawingControl") as DrawingControl;
+		if (!drawingControl) {
+			drawingControl = DrawingControl.new(this.root, {
+				stockChart: stockChart
+			});
+			this.setPrivate("drawingControl", drawingControl);
+		}
+		return drawingControl;
+	}
+
+	protected _getIndicatorControl(): IndicatorControl {
+
+		let indicatorControl: IndicatorControl | undefined = this.getPrivate("indicatorControl");
+		if (indicatorControl) {
+			return indicatorControl;
+		}
+
+		const stockChart = this.get("stockChart");
+		indicatorControl = stockChart.getControl("IndicatorControl") as IndicatorControl;
+		if (!indicatorControl) {
+			indicatorControl = IndicatorControl.new(this.root, {
+				stockChart: stockChart
+			});
+			this.setPrivate("indicatorControl", indicatorControl);
+		}
+		return indicatorControl;
 	}
 
 }

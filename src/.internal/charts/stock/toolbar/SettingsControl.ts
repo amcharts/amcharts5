@@ -85,28 +85,30 @@ export class SettingsControl extends DropdownListControl {
 			this._populateInputs();
 		});
 
-		const stockChart = this.get("stockChart");
-		const serializableTools = (stockChart.getControl("IndicatorControl") || stockChart.getControl("DrawingControl")) ? true : false;
-		let dataSaveControl = stockChart.getControl("DataSaveControl");
+		this._disposers.push(this.root.events.on("frameended", () => {
+			const stockChart = this.get("stockChart");
+			const serializableTools = (stockChart.getControl("IndicatorControl") || stockChart.getControl("DrawingControl")) ? true : false;
+			let dataSaveControl = stockChart.getControl("DataSaveControl");
 
-		if(!serializableTools) {
-			const exclude: any = dropdown.get("exclude", []);
-			exclude.push("save");
-			exclude.push("autosave");
-			dropdown.set("exclude", ["save", "autosave"]);
-		}
-		else {
-			if(!dataSaveControl) {
-				dataSaveControl = DataSaveControl.new(this.root, {
-					stockChart: stockChart,
-					autoSave: this.get("autoSave", false),
-					storageId: this.get("storageId")
-				});
+			if (!serializableTools) {
+				const exclude: any = dropdown.get("exclude", []);
+				exclude.push("save");
+				exclude.push("autosave");
+				dropdown.set("exclude", ["save", "autosave"]);
 			}
-			this.setPrivate("dataSaveControl", dataSaveControl as DataSaveControl);
-			this.set("autoSave", (dataSaveControl as DataSaveControl).get("autoSave"));
-			this._populateInputs();
-		}
+			else {
+				if (!dataSaveControl) {
+					dataSaveControl = DataSaveControl.new(this.root, {
+						stockChart: stockChart,
+						autoSave: this.get("autoSave", false),
+						storageId: this.get("storageId")
+					});
+				}
+				this.setPrivate("dataSaveControl", dataSaveControl as DataSaveControl);
+				this.set("autoSave", (dataSaveControl as DataSaveControl).get("autoSave"));
+				this._populateInputs();
+			}
+		}));
 
 	}
 

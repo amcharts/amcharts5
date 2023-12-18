@@ -1,6 +1,7 @@
 import type { DateAxis } from "../../xy/axes/DateAxis";
 import type { Color } from "../../../core/util/Color";
 import type { Graphics } from "../../../core/render/Graphics";
+import type { XYSeries } from "../../xy/series/XYSeries";
 
 import { AxisRendererX } from "../../xy/axes/AxisRendererX";
 import { ValueAxis } from "../../xy/axes/ValueAxis";
@@ -55,6 +56,11 @@ export interface IVolumeProfileSettings extends IIndicatorSettings {
 	 * @default .7
 	 */
 	valueAreaOpacity?: number;
+
+	/**
+	 * Chart's main volume series.
+	 */
+	volumeSeries: XYSeries;
 }
 
 export interface IVolumeProfilePrivate extends IIndicatorPrivate {
@@ -145,6 +151,8 @@ export class VolumeProfile extends Indicator {
 				this.xAxis = chart.xAxes.push(ValueAxis.new(root, {
 					zoomable: false,
 					strictMinMax: true,
+					panX: false,
+					panY: false,
 					renderer: xRenderer
 				}));
 
@@ -164,9 +172,9 @@ export class VolumeProfile extends Indicator {
 					openValueYField: "yOpen",
 					valueYField: "y",
 					calculateAggregates: true,
-					themeTags: ["indicator", "volumeprofile"]					
+					themeTags: ["indicator", "volumeprofile"]
 				}))
-				
+
 
 				this.upSeries = chart.series.unshift(ColumnSeries.new(root, {
 					xAxis: this.xAxis,
@@ -183,7 +191,7 @@ export class VolumeProfile extends Indicator {
 				this.series.setPrivate("doNotUpdateLegend", true);
 
 				this.upSeries.setPrivate("baseValueSeries", stockSeries);
-				this.series.setPrivate("baseValueSeries", stockSeries);				
+				this.series.setPrivate("baseValueSeries", stockSeries);
 
 				this._handleLegend(this.series);
 
@@ -245,28 +253,30 @@ export class VolumeProfile extends Indicator {
 	}
 
 	public _updateChildren(): void {
-		super._updateChildren();
+		if (this.series) {
+			super._updateChildren();
 
-		if (this.isDirty("count") || this.isDirty("countType") || this.isDirty("valueArea")) {
-			this.markDataDirty();
-		}
+			if (this.isDirty("count") || this.isDirty("countType") || this.isDirty("valueArea")) {
+				this.markDataDirty();
+			}
 
-		if (this.isDirty("upColor")) {
-			const upColor = this.get("upColor");
-			this.upSeries.set("fill", upColor);
-			this.upSeries.set("stroke", upColor);
-			this.setCustomData("upColor", upColor);
-		}
+			if (this.isDirty("upColor")) {
+				const upColor = this.get("upColor");
+				this.upSeries.set("fill", upColor);
+				this.upSeries.set("stroke", upColor);
+				this.setCustomData("upColor", upColor);
+			}
 
-		if (this.isDirty("downColor")) {
-			const downColor = this.get("downColor");
-			this.series.set("fill", downColor);
-			this.series.set("stroke", downColor);
-			this.setCustomData("downColor", downColor);
-		}
+			if (this.isDirty("downColor")) {
+				const downColor = this.get("downColor");
+				this.series.set("fill", downColor);
+				this.series.set("stroke", downColor);
+				this.setCustomData("downColor", downColor);
+			}
 
-		if (this.isDirty("axisWidth")) {
-			this.xAxis.set("width", percent(this.get("axisWidth", 40)));
+			if (this.isDirty("axisWidth")) {
+				this.xAxis.set("width", percent(this.get("axisWidth", 40)));
+			}
 		}
 	}
 
@@ -277,7 +287,7 @@ export class VolumeProfile extends Indicator {
 		const volumeSeries = this.get("volumeSeries");
 		const stockSeries = this.get("stockSeries");
 
-		if (volumeSeries) {
+		if (volumeSeries && this.series) {
 			let startIndex = volumeSeries.startIndex();
 			let endIndex = volumeSeries.endIndex();
 
@@ -296,7 +306,7 @@ export class VolumeProfile extends Indicator {
 						if (close < min) {
 							min = close;
 						}
-					
+
 						if (close > max) {
 							max = close;
 						}
@@ -304,232 +314,235 @@ export class VolumeProfile extends Indicator {
 				}
 			}
 
-			let rows: number;
-			if (type == "ticks") {
-				step = count / 100;
-				min = Math.floor(min / step) * step;
-				max = Math.ceil(max / step) * step;
-				rows = (max - min) / step;
-			}
-			else {
-				step = (max - min) / count;
-				rows = count;
-			}
+			if (min != Infinity) {
 
-			const rowDataDown: Array<number> = [];
-			const rowDataUp: Array<number> = [];
+				let rows: number;
+				if (type == "ticks") {
+					step = count / 100;
+					min = Math.floor(min / step) * step;
+					max = Math.ceil(max / step) * step;
+					rows = (max - min) / step;
+				}
+				else {
+					step = (max - min) / count;
+					rows = count;
+				}
 
-			for (let i = 0; i < rows; i++) {
-				rowDataDown[i] = 0;
-				rowDataUp[i] = 0;
-			}
+				const rowDataDown: Array<number> = [];
+				const rowDataUp: Array<number> = [];
 
-			let previousDataItem;
-			for (let i = startIndex; i < endIndex; i++) {
-				const dataItem = stockSeries.dataItems[i];
-				const volumeDataItem = volumeSeries.dataItems[i];
-				if (dataItem && volumeDataItem) {
-					const close = dataItem.get("valueY");
-					const volume = volumeDataItem.get("valueY");
+				for (let i = 0; i < rows; i++) {
+					rowDataDown[i] = 0;
+					rowDataUp[i] = 0;
+				}
 
-					if ($type.isNumber(close) && $type.isNumber(volume)) {
-						let index = Math.floor((close - min) / step);
-						if (index == count) {
-							index = count - 1;
-						}
+				let previousDataItem;
+				for (let i = startIndex; i < endIndex; i++) {
+					const dataItem = stockSeries.dataItems[i];
+					const volumeDataItem = volumeSeries.dataItems[i];
+					if (dataItem && volumeDataItem) {
+						const close = dataItem.get("valueY");
+						const volume = volumeDataItem.get("valueY");
 
-						if ($type.isNumber(index)) {
-							if (previousDataItem && previousDataItem.get("valueY", close) < close) {
-								rowDataDown[index] += volume;
+						if ($type.isNumber(close) && $type.isNumber(volume)) {
+							let index = Math.floor((close - min) / step);
+							if (index == count) {
+								index = count - 1;
 							}
-							else {
-								rowDataUp[index] += volume;
+
+							if ($type.isNumber(index)) {
+								if (previousDataItem && previousDataItem.get("valueY", close) < close) {
+									rowDataDown[index] += volume;
+								}
+								else {
+									rowDataUp[index] += volume;
+								}
 							}
 						}
+						previousDataItem = dataItem;
 					}
-					previousDataItem = dataItem;
-				}
-			}
-
-			const dataDown = [];
-			let sum = 0;
-			for (let i = 0; i < rows; i++) {
-				let total = rowDataUp[i] + rowDataDown[i];
-				sum += total;
-
-				dataDown.push({
-					yOpen: min + i * step,
-					y: min + (i + 1) * step,
-					up: rowDataUp[i],
-					down: rowDataDown[i],
-					total: total,
-					xOpen: 0,
-					area: false
-				})
-			}
-
-			let len = this.series.data.length;
-			if (len == dataDown.length) {
-				for (let i = 0; i < len; i++) {
-					this.series.data.setIndex(i, dataDown[i]);
-				}
-			}
-			else {
-				this.series.data.setAll(dataDown);
-			}
-
-			const dataUp = [];
-
-			let highest = 0;
-			let hi = 0;
-
-			for (let i = 0; i < rows; i++) {
-				let total = rowDataUp[i] + rowDataDown[i];
-				dataUp.push({
-					yOpen: min + i * step,
-					y: min + (i + 1) * step,
-					up: rowDataUp[i],
-					down: rowDataDown[i],
-					total: total,
-					area: false
-				})
-
-				if (total > highest) {
-					highest = total;
-					hi = i;
-				}
-			}
-
-			let valueArea = sum * this.get("valueArea", 70) / 100;
-			let area = highest;
-
-			let cd = 1;
-			let cu = 1;
-			let dlen = dataUp.length;
-
-			dataUp[hi].area = true;
-			dataDown[hi].area = true;
-
-			/* 
-			// with two rows
-			while (area < valueArea) {
-				let rowAbove1 = hi + cu;
-				let rowAbove2 = hi + cu + 1;
-
-				let sumAbove = 0
-				if (rowAbove1 < dlen) {
-					sumAbove += dataUp[rowAbove1].total;
-				}
-				if (rowAbove2 < dlen) {
-					sumAbove += dataUp[rowAbove2].total;
 				}
 
-				let rowBelow1 = hi - cd;
-				let rowBelow2 = hi - cd - 1;
+				const dataDown = [];
+				let sum = 0;
+				for (let i = 0; i < rows; i++) {
+					let total = rowDataUp[i] + rowDataDown[i];
+					sum += total;
 
-				let sumBelow = 0
-				if (rowBelow1 >= 0) {
-					sumBelow += dataUp[rowBelow1].total;
-				}
-				if (rowBelow2 >= 0) {
-					sumBelow += dataUp[rowBelow2].total;
+					dataDown.push({
+						yOpen: min + i * step,
+						y: min + (i + 1) * step,
+						up: rowDataUp[i],
+						down: rowDataDown[i],
+						total: total,
+						xOpen: 0,
+						area: false
+					})
 				}
 
-				if (sumBelow <= sumAbove) {
-					area += sumAbove;
+				let len = this.series.data.length;
+				if (len && len == dataDown.length) {
+					for (let i = 0; i < len; i++) {
+						this.series.data.setIndex(i, dataDown[i]);
+					}
+				}
+				else {
+					this.series.data.setAll(dataDown);
+				}
+
+				const dataUp = [];
+
+				let highest = 0;
+				let hi = 0;
+
+				for (let i = 0; i < rows; i++) {
+					let total = rowDataUp[i] + rowDataDown[i];
+					dataUp.push({
+						yOpen: min + i * step,
+						y: min + (i + 1) * step,
+						up: rowDataUp[i],
+						down: rowDataDown[i],
+						total: total,
+						area: false
+					})
+
+					if (total > highest) {
+						highest = total;
+						hi = i;
+					}
+				}
+
+				let valueArea = sum * this.get("valueArea", 70) / 100;
+				let area = highest;
+
+				let cd = 1;
+				let cu = 1;
+				let dlen = dataUp.length;
+
+				dataUp[hi].area = true;
+				dataDown[hi].area = true;
+
+				/* 
+				// with two rows
+				while (area < valueArea) {
+					let rowAbove1 = hi + cu;
+					let rowAbove2 = hi + cu + 1;
+
+					let sumAbove = 0
 					if (rowAbove1 < dlen) {
-						dataDown[rowAbove1].area = true;
-						dataUp[rowAbove1].area = true;
-						cu++;
+						sumAbove += dataUp[rowAbove1].total;
 					}
 					if (rowAbove2 < dlen) {
-						dataDown[rowAbove2].area = true;
-						dataUp[rowAbove2].area = true;
-						cu++;
+						sumAbove += dataUp[rowAbove2].total;
 					}
-				}
-				else {
-					area += sumBelow;
+
+					let rowBelow1 = hi - cd;
+					let rowBelow2 = hi - cd - 1;
+
+					let sumBelow = 0
 					if (rowBelow1 >= 0) {
-						dataDown[rowBelow1].area = true;
-						dataUp[rowBelow1].area = true;
-						cd++;
+						sumBelow += dataUp[rowBelow1].total;
 					}
 					if (rowBelow2 >= 0) {
-						dataDown[rowBelow2].area = true;
-						dataUp[rowBelow2].area = true;
+						sumBelow += dataUp[rowBelow2].total;
+					}
+
+					if (sumBelow <= sumAbove) {
+						area += sumAbove;
+						if (rowAbove1 < dlen) {
+							dataDown[rowAbove1].area = true;
+							dataUp[rowAbove1].area = true;
+							cu++;
+						}
+						if (rowAbove2 < dlen) {
+							dataDown[rowAbove2].area = true;
+							dataUp[rowAbove2].area = true;
+							cu++;
+						}
+					}
+					else {
+						area += sumBelow;
+						if (rowBelow1 >= 0) {
+							dataDown[rowBelow1].area = true;
+							dataUp[rowBelow1].area = true;
+							cd++;
+						}
+						if (rowBelow2 >= 0) {
+							dataDown[rowBelow2].area = true;
+							dataUp[rowBelow2].area = true;
+							cd++;
+						}
+					}
+
+					if (sumBelow == 0) {
 						cd++;
+					}
+					if (sumAbove == 0) {
+						cu++;
+					}
+
+					if ((cd > dlen && cu > dlen)) {
+						break;
+					}
+
+				}
+				*/
+
+				// single row
+				while (area < valueArea) {
+					let rowAbove1 = hi + cu;
+					let sumAbove = 0
+					if (rowAbove1 < dlen) {
+						sumAbove += dataUp[rowAbove1].total;
+					}
+
+					let rowBelow1 = hi - cd;
+
+					let sumBelow = 0
+					if (rowBelow1 >= 0) {
+						sumBelow += dataUp[rowBelow1].total;
+					}
+
+					if (sumBelow <= sumAbove) {
+						area += sumAbove;
+						if (rowAbove1 < dlen) {
+							dataDown[rowAbove1].area = true;
+							dataUp[rowAbove1].area = true;
+							cu++;
+						}
+					}
+					else {
+						area += sumBelow;
+						if (rowBelow1 >= 0) {
+							dataDown[rowBelow1].area = true;
+							dataUp[rowBelow1].area = true;
+							cd++;
+						}
+					}
+
+					if (sumBelow == 0) {
+						cd++;
+					}
+					if (sumAbove == 0) {
+						cu++;
+					}
+
+					if ((cd > dlen && cu > dlen)) {
+						break;
 					}
 				}
 
-				if (sumBelow == 0) {
-					cd++;
-				}
-				if (sumAbove == 0) {
-					cu++;
-				}
+				area = Math.ceil(area);
 
-				if ((cd > dlen && cu > dlen)) {
-					break;
-				}
-
-			}
-			*/
-
-			// single row
-			while (area < valueArea) {
-				let rowAbove1 = hi + cu;
-				let sumAbove = 0
-				if (rowAbove1 < dlen) {
-					sumAbove += dataUp[rowAbove1].total;
-				}
-
-				let rowBelow1 = hi - cd;
-
-				let sumBelow = 0
-				if (rowBelow1 >= 0) {
-					sumBelow += dataUp[rowBelow1].total;
-				}
-
-				if (sumBelow <= sumAbove) {
-					area += sumAbove;
-					if (rowAbove1 < dlen) {
-						dataDown[rowAbove1].area = true;
-						dataUp[rowAbove1].area = true;
-						cu++;
+				len = this.upSeries.data.length;
+				if (len > 0 && len == dataUp.length) {
+					for (let i = 0; i < len; i++) {
+						this.upSeries.data.setIndex(i, dataUp[i]);
 					}
 				}
 				else {
-					area += sumBelow;
-					if (rowBelow1 >= 0) {
-						dataDown[rowBelow1].area = true;
-						dataUp[rowBelow1].area = true;
-						cd++;
-					}
+					this.upSeries.data.setAll(dataUp);
 				}
-
-				if (sumBelow == 0) {
-					cd++;
-				}
-				if (sumAbove == 0) {
-					cu++;
-				}
-
-				if ((cd > dlen && cu > dlen)) {
-					break;
-				}
-			}
-
-			area = Math.ceil(area);
-
-			len = this.upSeries.data.length;
-			if (len == dataUp.length) {
-				for (let i = 0; i < len; i++) {
-					this.upSeries.data.setIndex(i, dataUp[i]);
-				}
-			}
-			else {
-				this.upSeries.data.setAll(dataUp);
 			}
 		}
 	}

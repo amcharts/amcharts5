@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.1] - 2023-12-18
+
+### Fixed
+- `DataSaveControl` was always clearing manually-saved drawings/indicators unless auto-save was enabled.
+- Drawing tools eraser and clear would not always clear drawings loeaded by a `DataSaveControl`.
+- `VolumeProfileIndicator` was not working if added via API.
+- `VolumeProfileIndicator` was drawn detached from the Y-axis in some cases.
+- Fixed `VWAP` indicator with data that contained zero-volume items.
+
+
 ## [5.7.0] - 2023-12-17
 
 ### Added
