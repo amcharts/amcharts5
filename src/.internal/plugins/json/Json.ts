@@ -613,3 +613,18 @@ export class JsonParser {
 		return await this.parse(JSON.parse(string), settings);
 	}
 }
+
+/**
+ * Registers a class so that it can be parsed and instantiated bey JSON parser.
+ * 
+ * @param  name  Class name
+ * @param  func  Class reference
+ * @ignore
+ */
+export function registerCustomClass(name: string, ref: any): void {
+	if (!(classes as any)[name]) {
+		(classes as any)[name] = () => new Promise((resolve) => {
+			resolve(ref);
+		});
+	}
+}

@@ -711,6 +711,25 @@ export function trim(text: string): string {
 	return trimLeft(trimRight(text));
 }
 
+export function truncateTextWithEllipsis(text: string, maxLength: number, breakWords: boolean = false, ellipsis: string = "...") {
+	if (text.length > maxLength) {
+		// Find the last non-alphanumeric character before maxLength
+		let lastNonAlphanumericIndex = maxLength - 1;
+		while (lastNonAlphanumericIndex >= 0 && text.charAt(lastNonAlphanumericIndex).match(/\w/)) {
+			lastNonAlphanumericIndex--;
+		}
+
+		if (lastNonAlphanumericIndex >= 0 && breakWords == false) {
+			return text.substring(0, lastNonAlphanumericIndex + 1) + '...';
+		} else {
+			// If no non-alphanumeric character found, truncate without breaking words
+			return text.substring(0, maxLength) + ellipsis;
+		}
+	} else {
+		return text;
+	}
+}
+
 /**
  * Tries to determine format type.
  *

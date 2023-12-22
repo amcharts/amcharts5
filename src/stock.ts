@@ -1,4 +1,4 @@
-export { StockChart, IStockChartEvents, IStockChartPrivate, IStockChartSettings } from "./.internal/charts/stock/StockChart";
+export { StockChart, IStockChartEvents, IStockChartPrivate, IStockChartSettings, registerClass } from "./.internal/charts/stock/StockChart";
 export { StockLegend, IStockLegendDataItem, IStockLegendEvents, IStockLegendPrivate, IStockLegendSettings } from "./.internal/charts/stock/StockLegend";
 export { StockPanel, IStockPanelPrivate, IStockPanelSettings } from "./.internal/charts/stock/StockPanel";
 export { PanelControls, IPanelControlsPrivate, IPanelControlsSettings } from "./.internal/charts/stock/PanelControls";
@@ -12,6 +12,7 @@ export { Momentum, IMomentumEvents, IMomentumPrivate, IMomentumSettings } from "
 export { VWAP, IVWAPEvents, IVWAPPrivate, IVWAPSettings } from "./.internal/charts/stock/indicators/VWAP";
 export { MovingAverageEnvelope, IMovingAverageEnvelopeEvents, IMovingAverageEnvelopePrivate, IMovingAverageEnvelopeSettings } from "./.internal/charts/stock/indicators/MovingAverageEnvelope";
 export { MovingAverageDeviation, IMovingAverageDeviationEvents, IMovingAverageDeviationPrivate, IMovingAverageDeviationSettings } from "./.internal/charts/stock/indicators/MovingAverageDeviation";
+export { AccelerationBands, IAccelerationBandsEvents, IAccelerationBandsPrivate, IAccelerationBandsSettings } from "./.internal/charts/stock/indicators/AccelerationBands";
 export { BollingerBands, IBollingerBandsEvents, IBollingerBandsPrivate, IBollingerBandsSettings } from "./.internal/charts/stock/indicators/BollingerBands";
 export { RelativeStrengthIndex, IRelativeStrengthIndexEvents, IRelativeStrengthIndexPrivate, IRelativeStrengthIndexSettings } from "./.internal/charts/stock/indicators/RelativeStrengthIndex";
 export { AccumulationDistribution, IAccumulationDistributionEvents, IAccumulationDistributionPrivate, IAccumulationDistributionSettings } from "./.internal/charts/stock/indicators/AccumulationDistribution";
@@ -20,6 +21,7 @@ export { Aroon, IAroonSettings, IAroonEvents, IAroonPrivate } from "./.internal/
 export { MACD, IMACDEvents, IMACDPrivate, IMACDSettings } from "./.internal/charts/stock/indicators/MACD";
 export { ChaikinMoneyFlow, IChaikinMoneyFlowEvents, IChaikinMoneyFlowPrivate, IChaikinMoneyFlowSettings } from "./.internal/charts/stock/indicators/ChaikinMoneyFlow";
 export { ChaikinOscillator, IChaikinOscillatorEvents, IChaikinOscillatorPrivate, IChaikinOscillatorSettings } from "./.internal/charts/stock/indicators/ChaikinOscillator";
+export { BullBearPower, IBullBearPowerEvents, IBullBearPowerPrivate, IBullBearPowerSettings } from "./.internal/charts/stock/indicators/BullBearPower";
 export { OnBalanceVolume, IOnBalanceVolumeEvents, IOnBalanceVolumePrivate, IOnBalanceVolumeSettings } from "./.internal/charts/stock/indicators/OnBalanceVolume";
 export { StochasticOscillator, IStochasticOscillatorEvents, IStochasticOscillatorPrivate, IStochasticOscillatorSettings } from "./.internal/charts/stock/indicators/StochasticOscillator";
 export { StochasticMomentumIndex, IStochasticMomentumIndexEvents, IStochasticMomentumIndexPrivate, IStochasticMomentumIndexSettings } from "./.internal/charts/stock/indicators/StochasticMomentumIndex";

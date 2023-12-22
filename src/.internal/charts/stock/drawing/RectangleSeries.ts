@@ -35,13 +35,10 @@ export class RectangleSeries extends SimpleLineSeries {
 		const series = this.get("series");
 
 		if (series && diP1 && diP2) {
-			let x1 = this._getXValue(diP1.get("valueX" as any));
-			let x2 = this._getXValue(diP2.get("valueX" as any));
-
 			const field = this.get("field") + "Y";
 
-			let y1 = this._getYValue(diP1.get(field as any), x1);
-			let y2 = this._getYValue(diP2.get(field as any), x2);
+			let y1 = diP1.get(field as any);
+			let y2 = diP2.get(field as any);
 
 			this._setContext(diP1, "valueY", y1, true);
 			this._setContext(diP2, "valueY", y2, true);

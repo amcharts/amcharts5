@@ -207,6 +207,16 @@ export interface ILabelSettings extends IContainerSettings {
 	 */
 	shadowOpacity?: number;
 
+	/**
+	 * Maximum number of characters to allow in label.
+	 *
+	 * If the `text` is longer than `maxChars`, the text will be truncated
+	 * using the `breakWords` and `ellipsis` settings.
+	 * 
+	 * @since 5.7.2
+	 */
+	maxChars?: number;
+
 	// The following migh be supported some day:
 	// padding?: number;
 	// stroke?: number;
@@ -266,7 +276,8 @@ export class Label extends Container {
 		"minScale",
 		"populateText",
 		"role",
-		"ignoreFormatting"
+		"ignoreFormatting",
+		"maxChars"
 	];
 
 	public static className: string = "Label";

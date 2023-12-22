@@ -2,11 +2,13 @@ import type { StockLegend } from "../StockLegend";
 import type { StockPanel } from "../StockPanel";
 
 import { Indicator } from "../indicators/Indicator";
+import { AccelerationBands } from "../indicators/AccelerationBands";
 import { AccumulationDistribution } from "../indicators/AccumulationDistribution";
 import { AccumulativeSwingIndex } from "../indicators/AccumulativeSwingIndex";
 import { Aroon } from "../indicators/Aroon";
 import { AwesomeOscillator } from "../indicators/AwesomeOscillator";
 import { BollingerBands } from "../indicators/BollingerBands";
+import { BullBearPower } from "../indicators/BullBearPower";
 import { ChaikinMoneyFlow } from "../indicators/ChaikinMoneyFlow";
 import { ChaikinOscillator } from "../indicators/ChaikinOscillator";
 import { CommodityChannelIndex } from "../indicators/CommodityChannelIndex";
@@ -41,7 +43,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -161,7 +163,7 @@ export class IndicatorControl extends DropdownListControl {
 	 */
 	public supportsIndicator(indicatorId: Indicators): boolean {
 		const stockChart = this.get("stockChart");
-		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Volume", "VolumeProfile", "VWAP"];
+		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Volume", "Volume Profile", "VWAP"];
 		return (stockChart.get("volumeSeries") || volumeIndicators.indexOf(indicatorId) === -1) ? true : false;
 	}
 
@@ -195,6 +197,14 @@ export class IndicatorControl extends DropdownListControl {
 		const legend = this.get("legend");
 
 		switch (indicatorId) {
+			case "Acceleration Bands":
+				indicator = AccelerationBands.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;
+
 			case "Accumulation Distribution":
 				indicator = AccumulationDistribution.new(this.root, {
 					stockChart: stockChart,
@@ -231,6 +241,14 @@ export class IndicatorControl extends DropdownListControl {
 					legend: legend
 				});
 				break;
+			case "Bull Bear Power":
+					indicator = BullBearPower.new(this.root, {
+						stockChart: stockChart,
+						stockSeries: stockSeries,
+						volumeSeries: volumeSeries,
+						legend: legend
+					});
+					break;				
 			case "Chaikin Money Flow":
 				indicator = ChaikinMoneyFlow.new(this.root, {
 					stockChart: stockChart,

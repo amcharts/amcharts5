@@ -198,7 +198,10 @@ export class DropdownList extends Dropdown {
 
 	protected async _filterItems(search?: string) {
 		const searchCallback = this.get("searchCallback");
-		if (searchCallback && search) {
+		if (search == "") {
+			this._initItems(this.get("items"));
+		}
+		else if (searchCallback && search) {
 			const maxItems = this.get("maxSearchItems", 1000);
 			let items = await searchCallback.call(this, search);
 			if (maxItems && (items.length > maxItems)) {

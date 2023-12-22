@@ -508,7 +508,7 @@ export class DrawingSeries extends LineSeries {
 						const yAxis = this.get("yAxis");
 						const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
 						vy = $math.round(vy, roundTo);
-						vy = this._getYValue(vy, vxns);
+						vy = this._getYValue(vy, vxns, true);
 
 						this._setContext(dataItem, "valueX", vx)
 						this._setContext(dataItem, "valueY", vy, true);
@@ -833,7 +833,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 
-	protected _getYValue(value: number, valueX: number): number {
+	protected _getYValue(value: number, valueX: number, doNotConvert?:boolean): number {
 
 		const series = this.get("series");
 
@@ -842,14 +842,13 @@ export class DrawingSeries extends LineSeries {
 			return this._snap(valueX, value, field, series);
 		}
 		else {
-			if (this.get("valueYShow") == "valueYChangeSelectionPercent") {
+			if (!doNotConvert && this.get("valueYShow") == "valueYChangeSelectionPercent") {
 				const baseValueSeries = this.getPrivate("baseValueSeries");
 				if (baseValueSeries) {
 					const baseValue = baseValueSeries._getBase("valueY");
 					value = value / 100 * baseValue + baseValue;
 				}
 			}
-
 			const yAxis = this.get("yAxis");
 			const roundTo = yAxis.getPrivate("stepDecimalPlaces", 0) + 1;
 			return $math.round(value, roundTo);

@@ -761,6 +761,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{type})"
 		})
 
+		r("LineSeries", ["indicator", "accelerationbands"]).setAll({
+			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.00')}[/] [{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{upperColor} bold]{upper.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{factor.formatNumber('#.#####')})"
+		})
+
 		r("LineSeries", ["chaikinmoneyflow"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
@@ -769,6 +774,11 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["chaikinoscillator"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{slowPeriod.formatNumber('#.')})"
+		})
+
+		r("LineSeries", ["bullbearpower"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber()}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
 		r("LineSeries", ["commoditychannelindex"]).setAll({
@@ -1051,6 +1061,13 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0x707070)
 		})
 
+		r("BullBearPower").setAll({
+			name: "Bull Bear Power",
+			period: 13,
+			shortName: "BBP",
+			seriesColor: color(0x707070)
+		})
+
 		r("OnBalanceVolume").setAll({
 			name: "On Balance Volume",
 			shortName: "On Bal Vol",
@@ -1064,6 +1081,16 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0xff903f),
 			upperColor: color(0xffc948),
 			lowerColor: color(0xffaf74)
+		});
+
+		r("AccelerationBands").setAll({
+			name: "Acceleration Bands",
+			shortName: "Acceleration",
+			factor: 0.001,
+			period: 20,
+			seriesColor: color(0xff903f),
+			upperColor: color(0xe64c9b),
+			lowerColor: color(0xe64c9b)
 		});
 
 
@@ -1216,7 +1243,7 @@ export class StockChartDefaultTheme extends Theme {
 			scrollable: true,
 			fixedLabel: true,
 			searchable: true,
-			indicators: ["Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
+			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

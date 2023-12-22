@@ -23,6 +23,7 @@ import { p100, percent, Percent } from "../../core/util/Percent";
 import { SettingsModal } from "./SettingsModal";
 import { Color } from "../../core/util/Color";
 import { registry } from "../../core/Registry";
+import { registerCustomClass } from "../../plugins/json/Json";
 
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
@@ -681,6 +682,11 @@ export class StockChart extends Container {
 		}
 	}
 
+	public getSeriesDefault(series: XYSeries, setting: keyof IXYSeriesSettings): any {
+		const defaults = series.states.lookup("comparingDefaults");
+		return defaults ? defaults.get(setting) : series.get(setting);
+	}
+
 	protected _maybePrepAxisDefaults(): void {
 		const stockSeries = this.get("stockSeries")!;
 		const axis = stockSeries.get("yAxis");
@@ -878,8 +884,9 @@ export class StockChart extends Container {
 			chart.rightAxesContainer.set("minWidth", maxRight);
 		})
 
+		this.toolsContainer.set("paddingLeft", maxLeft);
 		this.toolsContainer.set("paddingRight", maxRight);
-		this.toolsContainer.set("paddingRight", maxRight);
+
 	}
 
 	protected _removeXAxis(_axis: Axis<AxisRenderer>) {
@@ -1014,4 +1021,17 @@ export class StockChart extends Container {
 		return found;
 	}
 
+}
+
+/**
+ * Registers a custom class so that objects (e.g. indicators) using it can be
+ * serialized and restored later.
+ * 
+ * @param  name  Class name
+ * @param  ref   Class reference
+ * @since 5.7.2
+ */
+export function registerClass(name: string, ref: any) {
+	ref.className = name;
+	registerCustomClass(name, ref);
 }

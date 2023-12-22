@@ -183,7 +183,9 @@ export class SimpleLineSeries extends DrawingSeries {
 				if (line) {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
+
 					if (diP1 && diP2) {
+
 						const p1 = diP1.get("point");
 						const p2 = diP2.get("point");
 

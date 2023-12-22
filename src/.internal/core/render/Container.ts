@@ -365,6 +365,7 @@ export class Container extends Sprite {
 
 		let width = this.get("width");
 		let height = this.get("height");
+
 		let pWidth = this.getPrivate("width");
 		let pHeight = this.getPrivate("height");
 
@@ -372,7 +373,7 @@ export class Container extends Sprite {
 			left: 0,
 			top: 0,
 			right: this.width(),
-			bottom: this.height(),
+			bottom: this.height()
 		};
 
 		let layout = this.get("layout");
@@ -457,7 +458,26 @@ export class Container extends Sprite {
 			bounds.top = t - paddingTop;
 			bounds.right = r + paddingRight;
 			bounds.bottom = b + paddingBottom;
+
+			const minWidth = this.get("minWidth");
+
+			if($type.isNumber(minWidth) && minWidth > 0){
+				if(bounds.right - bounds.left < minWidth){
+					bounds.left = bounds.right - minWidth;
+				}
+			}
+
+			const minHeight = this.get("minHeight");
+
+			if($type.isNumber(minHeight) && minHeight > 0){
+				if(bounds.bottom - bounds.top < minHeight){
+					bounds.top = bounds.bottom - minHeight;
+				}
+			}			
 		}
+
+
+
 
 		this._contentWidth = bounds.right - bounds.left;
 		this._contentHeight = bounds.bottom - bounds.top;
@@ -624,7 +644,7 @@ export class Container extends Sprite {
 					const childrenDisplay = this._childrenDisplay;
 					const contentMask = this._contentMask;
 
-					childrenDisplay.y = -verticalScrollbar.get("start") * h;
+					childrenDisplay.y = -verticalScrollbar.get("start", 0) * h;
 					childrenDisplay.markDirtyLayer();
 
 					if (contentMask) {

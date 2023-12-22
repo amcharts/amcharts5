@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.2] - 2023-12-22
+
+### Added
+- New setting on `Label`: `maxChars`. If set to a number, will truncate text to X characters with ellipsis, obeying `breakWords` and `ellipsis` settings.
+- "Bull Bear Power" indicator added to `StockChart`.
+- "Acceleration Bands" indicator added to `StockChart`.
+- Standalone `registerClass(name, classRef)` added to Stock Chart package (global: `am5stock.registerClass()`). Allows registering own indicator class so that it gets properly serialized and restored.
+
+### Changed
+- Improved min/max calculation of the `ValueAxis` when all the values of a series are the same.
+
+### Fixed
+- "Volume Profile" was showing up in the `IndicatorControl`'s dropdown, even if `volumeSeries` was not set on the `StockChart`.
+- Left-side `ValueAxis` on a `StockChart` (`opposite: false`) it was impossible to right-align axis labels to plot area. Scrollbar's width was also not adjusted to the width of the plot area.
+- Some drawing tools in `StockChart` where not working when chart was in comparison mode.
+- Drawings created when `StockChart` was in comparinson mode were not carried over correctly when switching to regular value mode.
+- Some drawing tools ceized working when main `StockChart` series was updated.
+- Searchable dropdown controls in `StockChart` were not clearing up the list of found items when the search field was cleared.
+
+
 ## [5.7.1] - 2023-12-18
 
 ### Fixed

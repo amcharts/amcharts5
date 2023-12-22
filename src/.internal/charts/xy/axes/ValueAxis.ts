@@ -1006,7 +1006,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		const gridCount = this.get("renderer").gridCount();
 		const selectionStrictMinMax = this.get("strictMinMaxSelection");
-		const strictMinMax = this.get("strictMinMax");
+		let strictMinMax = this.get("strictMinMax");
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			let selectionMin = max;
@@ -1110,8 +1110,22 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			if (selectionMin === selectionMax) {
+				let smin = selectionMin;
 				selectionMin -= this._deltaMinMax;
 				selectionMax += this._deltaMinMax;
+
+				if(selectionMin < min){
+					let d = smin - min;
+					if(d == 0){
+						d = this._deltaMinMax;
+					}
+
+					selectionMin = smin - d;
+					selectionMax = smin + d;
+
+					strictMinMax = true;
+				}
+
 				let minMaxStep2 = this._adjustMinMax(selectionMin, selectionMax, gridCount, strictMinMax);
 				selectionMin = minMaxStep2.min;
 				selectionMax = minMaxStep2.max;

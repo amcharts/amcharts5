@@ -215,7 +215,6 @@ export class DrawingControl extends StockControl {
 
 	private _drawingSeries: { [index: string]: DrawingSeries[] } = {};
 	private _currentEnabledSeries: DrawingSeries[] = [];
-	private _initedPanels: StockPanel[] = [];
 
 	protected _afterNew() {
 		super._afterNew();
@@ -224,6 +223,9 @@ export class DrawingControl extends StockControl {
 		if (this.getPrivate("toolbar")) {
 			this._initToolbar();
 		}
+
+		const stockChart = this.get("stockChart");
+		stockChart.panels.events.onAll(() => this._updatePanelBindings());
 
 	}
 
@@ -752,13 +754,12 @@ export class DrawingControl extends StockControl {
 		if (chartSeries.length == 0) {
 			// No target series set, take first series out of each chart
 			stockChart.panels.each((panel) => {
-				if ((seriesList.length === 0 || this._initedPanels.indexOf(panel) === -1) && (panel.series.length > 0)) {
-					chartSeries.push(panel.series.getIndex(0)!);
-					this._initedPanels.push(panel);
+				const targetSeries = this._getPanelMainSeries(panel);
+				if (targetSeries) {
+					chartSeries.push(targetSeries);
 				}
 			});
 		}
-
 
 		if (chartSeries.length > 0) {
 			const toolSettings: any = this.get("toolSettings", {});
@@ -929,8 +930,11 @@ export class DrawingControl extends StockControl {
 					seriesList.push(series);
 					panel.drawings.push(series);
 					series.setPrivate("baseValueSeries", chartSeries);
-					series.set("valueYShow", chartSeries.get("valueYShow"));
+					series.set("valueYShow", stockChart.getSeriesDefault(chartSeries, "valueYShow"));
 					series.set("calculateAggregates", true);
+					if (stockChart.getPrivate("comparing")) {
+						stockChart.setPercentScale();
+					}
 				}
 			})
 
@@ -944,6 +948,42 @@ export class DrawingControl extends StockControl {
 			this._setExtension();
 		}
 	}
+
+	protected _updateSeriesBindings(panel: StockPanel): void {
+		const targetSeries = this._getPanelMainSeries(panel);
+		if (targetSeries) {
+			$object.each(this._drawingSeries, (_tool, seriesList) => {
+				$array.each(seriesList, (series) => {
+					if (series.chart == panel) {
+						series.set("series", targetSeries);
+						series.setPrivate("baseValueSeries", targetSeries);
+					}
+				})
+			})
+		}
+	}
+
+	protected _getPanelMainSeries(panel: StockPanel): XYSeries | undefined {
+		const stockChart = this.get("stockChart");
+		const stockSeries = stockChart.get("stockSeries");
+		let targetSeries: XYSeries | undefined;
+		if (stockSeries && stockSeries.chart == panel) {
+			targetSeries = stockSeries;
+		}
+		else {
+			targetSeries = panel.series.getIndex(0);
+		}
+		return targetSeries;
+	}
+
+	protected _updatePanelBindings(): void {
+		const stockChart = this.get("stockChart");
+		stockChart.panels.each((panel) => {
+			panel.series.events.onAll(() => this._updateSeriesBindings(panel));
+		});
+	}
+
+
 
 	protected _setStroke(): void {
 		$object.each(this._drawingSeries, (_tool, seriesList) => {

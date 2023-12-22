@@ -36,8 +36,8 @@ export class QuadrantLineSeries extends SimpleLineSeries {
 
 			const field = this.get("field") + "Y";
 
-			let y1 = this._getYValue(diP1.get(field as any), x1);
-			let y2 = this._getYValue(diP2.get(field as any), x2);
+			let y1 = this._getYValue(diP1.get(field as any), x1, true);
+			let y2 = this._getYValue(diP2.get(field as any), x2, true);
 
 			this._setContext(diP1, "valueY", y1, true);
 			this._setContext(diP2, "valueY", y2, true);

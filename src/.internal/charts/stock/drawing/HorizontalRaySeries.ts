@@ -39,7 +39,7 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				const valueXns = diP2.get("valueX" as any);
 				let valueY = diP2.get("valueY" as any)
 				const valueX = this._getXValue(valueXns);
-				valueY = this._getYValue(valueY, valueXns);
+				valueY = this._getYValue(valueY, valueXns, true);
 				
 				this._setContext(diP1, "valueY", valueY, true);
 				this._setContext(diP2, "valueY", valueY, true);

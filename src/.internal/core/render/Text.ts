@@ -12,6 +12,7 @@ import type { DateFormatter } from "../util/DateFormatter";
 import type { DurationFormatter } from "../util/DurationFormatter";
 
 import * as $array from "../util/Array";
+import * as $utils from "../util/Utils";
 import { Disposer } from "../util/Disposer";
 
 /**
@@ -50,6 +51,7 @@ export interface ITextSettings extends ISpriteSettings {
 	minScale?: number;
 	populateText?: boolean;
 	ignoreFormatting?: boolean;
+	maxChars?: number;
 }
 
 /**
@@ -104,7 +106,8 @@ export class Text extends Sprite {
 		"oversizedBehavior",
 		"breakWords",
 		"ellipsis",
-		"minScale"
+		"minScale",
+		"maxChars"
 	];
 
 	protected _originalScale: number | undefined;
@@ -229,7 +232,10 @@ export class Text extends Sprite {
 	}
 
 	public _getText(): string {
-		const text = this.get("text", "");
+		let text = this.get("text", "");
+		if (this.get("maxChars")) {
+			text = $utils.truncateTextWithEllipsis(text, this.get("maxChars", 100000000), this.get("breakWords"), this.get("ellipsis"));
+		}
 		return this.get("populateText") ? populateString(this, text) : text;
 	}
 
