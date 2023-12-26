@@ -463,7 +463,12 @@ export class Container extends Sprite {
 
 			if($type.isNumber(minWidth) && minWidth > 0){
 				if(bounds.right - bounds.left < minWidth){
-					bounds.left = bounds.right - minWidth;
+					if(bounds.right >= minWidth){
+						bounds.left = bounds.right - minWidth;
+					}
+					else{
+						bounds.right = bounds.left + minWidth;
+					}
 				}
 			}
 
@@ -471,7 +476,12 @@ export class Container extends Sprite {
 
 			if($type.isNumber(minHeight) && minHeight > 0){
 				if(bounds.bottom - bounds.top < minHeight){
-					bounds.top = bounds.bottom - minHeight;
+					if(bounds.bottom >= minHeight){
+						bounds.top = bounds.bottom - minHeight;
+					}
+					else{
+						bounds.bottom = bounds.top + minHeight;
+					}
 				}
 			}			
 		}
