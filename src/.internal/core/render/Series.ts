@@ -635,6 +635,15 @@ export abstract class Series extends Component {
 						if(rule.neutral){
 							target.set(rule.key, rule.neutral);
 						}
+
+						const states = target.states;
+						if(states){
+							const defaultState = states.lookup("default");
+							if(defaultState){
+								defaultState.set(rule.key, rule.neutral);
+							}						
+						}					
+
 						return;
 					}
 
@@ -667,6 +676,13 @@ export abstract class Series extends Component {
 						}
 
 						target.set(rule.key, propertyValue);
+						const states = target.states;
+						if(states){
+							const defaultState = states.lookup("default");
+							if(defaultState){
+								defaultState.set(rule.key, propertyValue);
+							}						
+						}
 					}
 				});
 			});

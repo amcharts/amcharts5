@@ -3099,6 +3099,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	});
 	*/
 
+	public resetImageArray() {
+		this._ghostLayer.imageArray = undefined;
+	}
+
 	constructor(resolution?: number) {
 		super();
 
@@ -3544,9 +3548,15 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	getObjectAtPoint(point: IPoint): CanvasDisplayObject | undefined {
-		const bbox = this._adjustBoundingBox(this.view.getBoundingClientRect());
+		const data = this._ghostLayer.getImageArray(point);
 
-		return this._getHitTarget(point, bbox, this._layerDom) || undefined;
+		if (data[0] === 0 && data[1] === 0 && data[2] === 0) {
+			return undefined;
+		}
+		const colorId = Color.fromRGB(data[0], data[1], data[2]).toCSS();
+		const hit = this._colorMap[colorId];
+
+		return hit;
 	}
 
 	_withEvents<Key extends keyof IRendererEvents>(key: Key, f: (events: IEvents<Key>) => void): void {
@@ -4153,10 +4163,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			canvas.style.top = "";
 			this.view.removeChild(canvas);
 		})
-
 		return canvas;
 	}
-
 }
 
 
@@ -4170,8 +4178,11 @@ class GhostLayer {
 		bottom: 0,
 	};
 
+	private _resolution: number = 1;
 	private _width: number = 0;
 	private _height: number = 0;
+
+	public imageArray?: Uint8ClampedArray;
 
 	constructor() {
 		this.view = document.createElement("canvas");
@@ -4184,6 +4195,8 @@ class GhostLayer {
 	}
 
 	resize(canvasWidth: number, canvasHeight: number, domWidth: number, domHeight: number, resolution: number) {
+		this._resolution = resolution;
+
 		canvasWidth += (this.margin.left + this.margin.right);
 		canvasHeight += (this.margin.top + this.margin.bottom);
 
@@ -4212,6 +4225,21 @@ class GhostLayer {
 			1,
 			1,
 		);
+	}
+
+	getImageArray(point: IPoint): Array<number> {
+
+		if (!this.imageArray) {
+			this.imageArray = this.context.getImageData(0, 0, this._width, this._height).data;
+		}
+
+		const data = this.imageArray;
+
+		const x = Math.round(point.x * this._resolution);
+		const y = Math.round(point.y * this._resolution);
+
+		const i = (y * this._width + x) * 4;
+		return [data[i], data[i + 1], data[i + 2], data[i + 3]];
 	}
 
 	setMargin(layers: Array<CanvasLayer>): void {

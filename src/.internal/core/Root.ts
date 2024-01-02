@@ -1033,6 +1033,7 @@ export class Root implements IDisposer {
 			this._runAnimations(currentTime);
 			this._runDirties();
 			this._render();
+			this._renderer.resetImageArray();
 			this._positionHTMLElements();
 
 			if (this.events.isEnabled("frameended")) {

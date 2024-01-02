@@ -155,7 +155,7 @@ export abstract class MapSeries extends Series {
 			this._handleDirties();
 		}
 
-		if (this.isDirty("geoJSON") || this.isDirty("include") || this.isDirty("exclude")) {
+		if (this.get("geoJSON") && (this.isDirty("geoJSON") || this.isDirty("include") || this.isDirty("exclude"))) {
 
 			this._handleDirties();
 

@@ -2,6 +2,7 @@ import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../co
 import { Container } from "../../core/render/Container";
 import { Picture } from "../../core/render/Picture";
 import * as $utils from "../../core/util/Utils";
+import * as $object from "../../core/util/Object";
 
 import { p100 } from "../../core/util/Percent";
 
@@ -18,6 +19,32 @@ export interface IAnnotatorSettings extends IEntitySettings {
 	 * Raw annotation info saved by MarkerJS.
 	 */
 	markerState?: any;
+
+	/**
+	 * MarkerArea settings in form of an object where keys are setting names and
+	 * value is a setting value. E.g.:
+	 *
+	 * ```TypeScript
+	 * let annotator = am5plugins_exporting.Annotator.new(root, {
+	 *  markerSettings: {
+	 *    defaultColorSet: ["red", "green", "blue"],
+	 *    wrapText: true
+	 *  }
+	 *});
+	 * ```
+	 * ```JavaScript
+	 * var annotator = am5plugins_exporting.Annotator.new(root, {
+	 *  markerSettings: {
+	 *    defaultColorSet: ["red", "green", "blue"],
+	 *    wrapText: true
+	 *  }
+	 *});
+	 * ```
+	 *
+	 * @see {@link https://markerjs.com/reference/classes/settings.html} for a full list of settings
+	 * @since 5.7.4
+	 */
+	markerSettings?: {[index: string]: any};
 
 }
 
@@ -167,6 +194,12 @@ export class Annotator extends Entity {
 			markerArea.uiStyleSettings.logoPosition = "right";
 			markerArea.uiStyleSettings.zIndex = 20;
 			markerArea.targetRoot = canvas.parentElement!;
+
+			// Apply custom settings
+			const markerSettings = this.get("markerSettings", {});
+			$object.each(markerSettings, (key, value) => {
+				markerArea.settings[key] = value;
+			});
 
 			this._disposers.push($utils.addEventListener(markerArea, "close", () => {
 				this._root._renderer.interactionsEnabled = true;

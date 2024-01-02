@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.4] - 2024-01-02
+
+### Added
+- New `Annotator` setting: `markerSettings`. Allows setting default settings for `MarkerArea`. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/annotator/#Configuring_UI).
+
+### Changed
+- Heat rules are now set on the default state of a target, too.
+
+### Fixed
+- Changing data granularity on `StockChart` was not updating `baseInterval` on indicator's `DateAxis` resulting in indicator showing a wrong chart.
+- If `exclude`/`include` was set on a `MapSeries` without GeoJSON set, setting it later later would result in a map not appearing.
+
+
 ## [5.7.3] - 2023-12-26
 
 ### Fixed

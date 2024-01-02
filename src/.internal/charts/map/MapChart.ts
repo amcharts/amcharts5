@@ -729,11 +729,15 @@ export class MapChart extends SerialChart {
 	protected _handleChartDown(event: ISpritePointerEvent) {
 
 		this._downZoomLevel = this.get("zoomLevel", 1);
+		const downPoints = this.chartContainer._downPoints;
 
-		let count = $object.keys(this.chartContainer._downPoints).length;
+		let count = $object.keys(downPoints).length;
 		if (count == 1) {
 			// workaround to solve a problem when events are added to some children of chart container (rotation stops working)
-			const downPoint = this.chartContainer._downPoints[1];
+			let downPoint = downPoints[1];
+			if (!downPoint) {
+				downPoint = downPoints[0];
+			}			
 
 			if (downPoint && (downPoint.x == event.point.x && downPoint.y == event.point.y)) {
 				count = 0;

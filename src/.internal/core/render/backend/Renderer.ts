@@ -284,9 +284,9 @@ export interface IRenderer extends IDisposer {
 	render(root: IDisplayObject): void;
 	getCanvas(root: IDisplayObject, options?: ICanvasOptions): HTMLCanvasElement;
 	view: HTMLElement;
-
 	getEvent<A extends IPointerEvent>(originalEvent: A, adjustPoint?: boolean): IRendererEvent<A>;
-	getObjectAtPoint(point: IPoint): IDisplayObject | undefined;
+	getObjectAtPoint(point: IPoint): IDisplayObject | undefined;	
+	resetImageArray():void;
 }
 
 export interface ICanvasOptions {

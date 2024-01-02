@@ -10,7 +10,7 @@ import type { DataItem } from "../../core/render/Component";
 import type { Indicator } from "./indicators/Indicator";
 import type { DrawingSeries } from "./drawing/DrawingSeries";
 import type { StockControl } from "./toolbar/StockControl";
-import { MultiDisposer } from "../../core/util/Disposer";
+import { MultiDisposer, IDisposer } from "../../core/util/Disposer";
 
 import { SpriteResizer } from "../../core/render/SpriteResizer";
 import { PanelControls } from "./PanelControls";
@@ -29,6 +29,7 @@ import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
 import * as $object from "../../core/util/Object";
 import type { GaplessDateAxis } from "../xy/axes/GaplessDateAxis";
+import type { ChartIndicator } from "./indicators/ChartIndicator";
 
 export interface IStockChartSettings extends IContainerSettings {
 
@@ -177,6 +178,7 @@ export class StockChart extends Container {
 	protected _syncExtremesDp?: MultiDisposer;
 	protected _drawingsChanged = false;
 	protected _indicatorsChanged = false;
+	protected _baseDP?: IDisposer;
 
 	/**
 	 * A list of stock panels.
@@ -376,6 +378,18 @@ export class StockChart extends Container {
 						}
 
 						this.setPrivateRaw("mainAxis", xAxis);
+
+						if (this._baseDP) {
+							this._baseDP.dispose();
+						}
+						this._baseDP = xAxis.on("baseInterval", (baseInterval) => {
+							this.indicators.each((indicator) => {
+								if (indicator.isType<ChartIndicator>("ChartIndicator")) {
+									indicator.xAxis.set("baseInterval", baseInterval);
+								}
+							})
+						})
+
 						this._syncExtremesDp = new MultiDisposer([
 							xAxis.onPrivate("max", () => {
 								this._syncExtremes();
@@ -582,7 +596,7 @@ export class StockChart extends Container {
 			}
 		}
 
-		this.indicators.each((indicator)=>{
+		this.indicators.each((indicator) => {
 			indicator.markDataDirty();
 		})
 	}
