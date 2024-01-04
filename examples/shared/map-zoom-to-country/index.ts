@@ -63,7 +63,8 @@ polygonSeries.mapPolygons.template.on("active", (active, target) => {
 
 // Add zoom control
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
-chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
+var zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
+zoomControl.homeButton.set("visible", true);
 
 
 // Set clicking on "water" to zoom out

@@ -27,18 +27,24 @@ export interface IZoomControlPrivate extends IContainerPrivate {
 export class ZoomControl extends Container {
 
 	/**
-	 * A [[Button]] for zoom in.
+	 * A [[Button]] for home.
 	 *
-	 * @default Button.new()
+	 * Home button is disabled by default. To enable it set its `visible: true`.
+	 *
+	 * @see (@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Home_button) for more info
+	 * @since 5.7.5
 	 */
-	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36, themeTags: ["plus"] }));
+	public readonly homeButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["home"] }));
+
+	/**
+	 * A [[Button]] for zoom in.
+	 */
+	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["plus"] }));
 
 	/**
 	 * A [[Button]] for zoom out.
-	 *
-	 * @default Button.new()
 	 */
-	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 36, height: 36, themeTags: ["minus"] }));
+	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["minus"] }));
 
 	declare public _settings: IZoomControlSettings;
 	declare public _privateSettings: IZoomControlPrivate;
@@ -65,6 +71,11 @@ export class ZoomControl extends Container {
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
 			layout: undefined
 		});
+
+		this.homeButton.setAll({
+			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
+			layout: undefined
+		});
 	}
 
 	public _prepareChildren() {
@@ -80,6 +91,9 @@ export class ZoomControl extends Container {
 					}),
 					this.minusButton.events.on("click", () => {
 						chart.zoomOut()
+					}),
+					this.homeButton.events.on("click", () => {
+						chart.goHome()
 					})])
 			}
 

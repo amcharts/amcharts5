@@ -89,7 +89,7 @@ export class MapChartDefaultTheme extends Theme {
 				fillOpacity: 1,
 				position: "absolute",
 				strokeWidth: 0.2,
-				strokeOpacity: 1,
+				strokeOpacity: 1
 			});
 
 			setColor(rule, "fill", ic, "primaryButton");
@@ -98,7 +98,7 @@ export class MapChartDefaultTheme extends Theme {
 
 		r("Button", ["zoomcontrol"]).setAll({
 			marginTop: 1,
-			marginBottom: 1
+			marginBottom: 2
 		})
 
 		r("Graphics", ["map", "button", "plus", "icon"]).setAll({
@@ -122,6 +122,18 @@ export class MapChartDefaultTheme extends Theme {
 		});
 
 
+		r("Button", ["zoomcontrol", "home"]).setAll({
+			visible: false
+		});
+
+
+		r("Graphics", ["map", "button", "home", "icon"]).setAll({
+			x: p50,
+			y: p50,
+			svgPath: "M 8 -1 L 6 -1 L 6 7 L 2 7 L 2 1 L -2 1 L -2 7 L -6 7 L -6 -1 L -8 -1 L 0 -9 L 8 -1 Z M 8 -1"
+		});
+
+
 		/**
 		 * ------------------------------------------------------------------------
 		 * charts/map: Series
@@ -141,6 +153,5 @@ export class MapChartDefaultTheme extends Theme {
 			paddingRight: 10,
 			paddingBottom: 10
 		})
-
 	}
 }

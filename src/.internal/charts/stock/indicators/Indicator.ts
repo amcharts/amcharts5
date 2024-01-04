@@ -33,7 +33,12 @@ export interface IIndicatorEditableSetting {
 	/**
 	 * If `type: "dropdown"`, `options` should contain a list of items it.
 	 */
-	options?: Array<string | { value: number | string, text: string }>;
+	options?: Array<string | {
+		value: number | string,
+		text: string,
+		extTarget?: string,
+		extTargetValue?: number | string
+	}>;
 
 }
 

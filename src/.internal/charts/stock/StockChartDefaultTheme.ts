@@ -761,6 +761,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{type})"
 		})
 
+		r("LineSeries", ["indicator", "macross"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{fastColor} bold]{maf.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{fastPeriod.formatNumber('#.')})"
+		})
+
 		r("LineSeries", ["indicator", "accelerationbands"]).setAll({
 			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.00')}[/] [{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{upperColor} bold]{upper.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{factor.formatNumber('#.#####')})"
@@ -825,6 +830,10 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName}"
 		})
 
+		r("LineSeries", ["pvt"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.000a')}[/]",
+			legendLabelText: "{shortName}"
+		})
 
 		r("LineSeries", ["rsi"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{smaColor} bold]{sma.formatNumber('#.00')}[/]",
@@ -954,6 +963,16 @@ export class StockChartDefaultTheme extends Theme {
 			offset: 0
 		})
 
+		r("MACross").setAll({
+			name: "Moving Average Cross",
+			shortName: "MACross",
+			seriesColor: color(0xab82da),
+			fastColor: color(0x1772DE),
+			field: "close",
+			period: 9,
+			fastPeriod: 21
+		})
+
 		r("ZigZag").setAll({
 			name: "ZigZag",
 			shortName: "ZigZag",
@@ -1071,6 +1090,12 @@ export class StockChartDefaultTheme extends Theme {
 		r("OnBalanceVolume").setAll({
 			name: "On Balance Volume",
 			shortName: "On Bal Vol",
+			seriesColor: color(0x707070)
+		})
+
+		r("PVT").setAll({
+			name: "Price Volume Trend",
+			shortName: "PVT",
 			seriesColor: color(0x707070)
 		})
 
@@ -1243,7 +1268,7 @@ export class StockChartDefaultTheme extends Theme {
 			scrollable: true,
 			fixedLabel: true,
 			searchable: true,
-			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
+			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

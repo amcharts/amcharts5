@@ -23,6 +23,7 @@ export { ChaikinMoneyFlow, IChaikinMoneyFlowEvents, IChaikinMoneyFlowPrivate, IC
 export { ChaikinOscillator, IChaikinOscillatorEvents, IChaikinOscillatorPrivate, IChaikinOscillatorSettings } from "./.internal/charts/stock/indicators/ChaikinOscillator";
 export { BullBearPower, IBullBearPowerEvents, IBullBearPowerPrivate, IBullBearPowerSettings } from "./.internal/charts/stock/indicators/BullBearPower";
 export { OnBalanceVolume, IOnBalanceVolumeEvents, IOnBalanceVolumePrivate, IOnBalanceVolumeSettings } from "./.internal/charts/stock/indicators/OnBalanceVolume";
+export { PVT, IPVTEvents, IPVTPrivate, IPVTSettings } from "./.internal/charts/stock/indicators/PVT";
 export { StochasticOscillator, IStochasticOscillatorEvents, IStochasticOscillatorPrivate, IStochasticOscillatorSettings } from "./.internal/charts/stock/indicators/StochasticOscillator";
 export { StochasticMomentumIndex, IStochasticMomentumIndexEvents, IStochasticMomentumIndexPrivate, IStochasticMomentumIndexSettings } from "./.internal/charts/stock/indicators/StochasticMomentumIndex";
 export { AwesomeOscillator, IAwesomeOscillatorEvents, IAwesomeOscillatorPrivate, IAwesomeOscillatorSettings } from "./.internal/charts/stock/indicators/AwesomeOscillator";

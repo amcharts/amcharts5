@@ -46,6 +46,31 @@ export interface IAnnotatorSettings extends IEntitySettings {
 	 */
 	markerSettings?: {[index: string]: any};
 
+	/**
+	 * MarkerArea style settings for user interface elements.E.g.:
+	 *
+	 * ```TypeScript
+	 * let annotator = am5plugins_exporting.Annotator.new(root, {
+	 *  markerStyleSettings: {
+	 *    toolboxColor: "#F472B6",
+	 *    toolboxAccentColor: "#BE185D"
+	 *  }
+	 *});
+	 * ```
+	 * ```JavaScript
+	 * var annotator = am5plugins_exporting.Annotator.new(root, {
+	 *  markerStyleSettings: {
+	 *    toolboxColor: "#F472B6",
+	 *    toolboxAccentColor: "#BE185D"
+	 *  }
+	 *});
+	 * ```
+	 *
+	 * @see {@link https://markerjs.com/reference/classes/settings.html} for a full list of settings
+	 * @since 5.7.5
+	 */
+	markerStyleSettings?: {[index: string]: any};
+
 }
 
 export interface IAnnotatorPrivate extends IEntityPrivate {
@@ -199,6 +224,11 @@ export class Annotator extends Entity {
 			const markerSettings = this.get("markerSettings", {});
 			$object.each(markerSettings, (key, value) => {
 				markerArea.settings[key] = value;
+			});
+
+			const markerStyleSettings = this.get("markerStyleSettings", {});
+			$object.each(markerStyleSettings, (key, value) => {
+				markerArea.uiStyleSettings[key] = value;
 			});
 
 			this._disposers.push($utils.addEventListener(markerArea, "close", () => {

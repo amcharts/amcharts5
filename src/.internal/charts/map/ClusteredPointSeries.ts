@@ -329,6 +329,22 @@ export class ClusteredPointSeries extends MapPointSeries {
 		})
 	}
 
+	protected _onDataClear() {
+		super._onDataClear();
+
+		$array.each(this.clusteredDataItems, (dataItem) => {
+			const bullet = dataItem.get("bullet" as any);
+			if (bullet) {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite.dispose();
+				}
+			}
+		})
+		this.clusteredDataItems = [];
+
+	}
+
 	protected _clusterDataItem(dataItem: DataItem<IClusteredPointSeriesDataItem>, dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
 		const point = dataItem.get("point");
 		if (point) {

@@ -14,6 +14,7 @@ import { ChaikinOscillator } from "../indicators/ChaikinOscillator";
 import { CommodityChannelIndex } from "../indicators/CommodityChannelIndex";
 import { DisparityIndex } from "../indicators/DisparityIndex";
 import { MACD } from "../indicators/MACD";
+import { MACross } from "../indicators/MACross";
 import { MovingAverage } from "../indicators/MovingAverage";
 import { MovingAverageDeviation } from "../indicators/MovingAverageDeviation";
 import { MovingAverageEnvelope } from "../indicators/MovingAverageEnvelope";
@@ -21,6 +22,7 @@ import { StandardDeviation } from "../indicators/StandardDeviation";
 import { TypicalPrice } from "../indicators/TypicalPrice";
 import { MedianPrice } from "../indicators/MedianPrice";
 import { OnBalanceVolume } from "../indicators/OnBalanceVolume";
+import { PVT } from "../indicators/PVT";
 import { Momentum } from "../indicators/Momentum";
 import { RelativeStrengthIndex } from "../indicators/RelativeStrengthIndex";
 import { StochasticMomentumIndex } from "../indicators/StochasticMomentumIndex";
@@ -43,7 +45,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Cross" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Price Volume Trend" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -163,7 +165,7 @@ export class IndicatorControl extends DropdownListControl {
 	 */
 	public supportsIndicator(indicatorId: Indicators): boolean {
 		const stockChart = this.get("stockChart");
-		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Volume", "Volume Profile", "VWAP"];
+		const volumeIndicators = ["Chaikin Money Flow", "Chaikin Oscillator", "On Balance Volume", "Price Volume Trend", "Volume", "Volume Profile", "VWAP"];
 		return (stockChart.get("volumeSeries") || volumeIndicators.indexOf(indicatorId) === -1) ? true : false;
 	}
 
@@ -242,13 +244,13 @@ export class IndicatorControl extends DropdownListControl {
 				});
 				break;
 			case "Bull Bear Power":
-					indicator = BullBearPower.new(this.root, {
-						stockChart: stockChart,
-						stockSeries: stockSeries,
-						volumeSeries: volumeSeries,
-						legend: legend
-					});
-					break;				
+				indicator = BullBearPower.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					volumeSeries: volumeSeries,
+					legend: legend
+				});
+				break;
 			case "Chaikin Money Flow":
 				indicator = ChaikinMoneyFlow.new(this.root, {
 					stockChart: stockChart,
@@ -297,6 +299,13 @@ export class IndicatorControl extends DropdownListControl {
 					stockSeries: stockSeries
 				});
 				break;
+			case "Moving Average Cross":
+				indicator = MACross.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;
 			case "Moving Average":
 				indicator = MovingAverage.new(this.root, {
 					stockChart: stockChart,
@@ -341,6 +350,14 @@ export class IndicatorControl extends DropdownListControl {
 				break;
 			case "On Balance Volume":
 				indicator = OnBalanceVolume.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					volumeSeries: volumeSeries,
+					legend: legend
+				});
+				break;
+			case "Price Volume Trend":
+				indicator = PVT.new(this.root, {
 					stockChart: stockChart,
 					stockSeries: stockSeries,
 					volumeSeries: volumeSeries,

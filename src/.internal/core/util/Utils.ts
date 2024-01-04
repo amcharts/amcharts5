@@ -446,15 +446,15 @@ export class StyleRule extends DisposerClass {
 
 		try {
 			this._rule = appendStylesheet(this._root, selector);
-
-			$object.each(styles, (key, value) => {
-				this.setStyle(<string>key, value);
-			});
 		}
 		catch (err) {
 			// Create an empty rule on failed selectors
-			this._rule = new CSSStyleRule();
+			this._rule = appendStylesheet(this._root, ":not(*)");
 		}
+
+		$object.each(styles, (key, value) => {
+			this.setStyle(<string>key, value);
+		});
 	}
 
 	// TODO test this

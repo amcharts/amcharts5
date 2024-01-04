@@ -239,6 +239,15 @@ export class SettingsModal extends Modal {
 				case "dropdown":
 					element = this.getDropdown(setting, currentValue);
 					settingInputs[key] = <HTMLSelectElement>element;
+					$utils.addEventListener(element, "change", (ev: any) => {
+						const input: HTMLSelectElement = ev.target!;
+						const option = input.options[input!.selectedIndex];
+						const extTarget = option.getAttribute("data-target");
+						if (extTarget) {
+							console.log(settingInputs[extTarget], option.getAttribute("data-target-value"))
+							settingInputs[extTarget].value = option.getAttribute("data-target-value") + "";
+						}
+					});
 					break;
 				case "number":
 					element = this.getNumber(setting, currentValue);
@@ -356,6 +365,13 @@ export class SettingsModal extends Modal {
 					optionElement.value = <string>((<any>option).value);
 					optionElement.text = <string>((<any>option).text);
 					value = ((<any>option).value);
+
+					if ((option as any).extTarget) {
+						optionElement.setAttribute("data-target", (option as any).extTarget);
+					}
+					if ((option as any).extTargetValue) {
+						optionElement.setAttribute("data-target-value", (option as any).extTargetValue);
+					}
 				}
 				else {
 					optionElement.value = <string>option;

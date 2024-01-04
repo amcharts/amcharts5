@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.5] - 2024-01-04
+
+### Added
+- New `Annotator` setting: `markerStyleSettings`. Allows setting default settings for UI styles of `MarkerArea`. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/annotator/#Configuring_UI).
+- "Moving Average Cross" (MACross) and "Price Volume Trend" (PVT) indicators added to `StockChart`.
+- `ZoomControl` now has a new property: `homeButton`. It holds an instance of a button which zooms out the map to its initial position. It is hidden by default, so if needed, needs to unhide it by setting `zoomControl.homeButton.set("visible", true)`.
+
+### Changed
+- Settings dialog for a "Volume Profile" indicator will automatically update count field value to a more suitable one when switching count type.
+
+### Fixed
+- Clearing data on a `ClusteredPointSeries` would not remove its bullets representing clusters.
+
+
 ## [5.7.4] - 2024-01-02
 
 ### Added

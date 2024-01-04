@@ -23,8 +23,7 @@ export interface IVolumeProfileSettings extends IIndicatorSettings {
 	downColor?: Color;
 
 	/**
-	 * Type of count
-	 * @todo: what if translated in options?
+	 * Type of count.
 	 */
 	countType?: "rows" | "ticks";
 
@@ -93,8 +92,8 @@ export class VolumeProfile extends Indicator {
 		name: this.root.language.translateAny("Count"),
 		type: "dropdown",
 		options: [
-			{ value: "rows", text: this.root.language.translateAny("number of rows") },
-			{ value: "ticks", text: this.root.language.translateAny("ticks per row") }
+			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24 },
+			{ value: "ticks", text: this.root.language.translateAny("ticks per row"), extTarget: "count", extTargetValue: 1000 }
 		]
 	}, {
 		key: "count",
@@ -135,6 +134,9 @@ export class VolumeProfile extends Indicator {
 
 			if (chart) {
 				const yAxis = stockSeries.get("yAxis") as any;
+
+				(this._editableSettings as any)[0].options[1].extTargetValue = yAxis.getPrivate("step") * 50;
+
 				const panelXAxis = stockSeries.get("xAxis") as DateAxis<AxisRendererX>;
 
 				panelXAxis.on("start", () => {
