@@ -19,6 +19,7 @@ export { AccumulationDistribution, IAccumulationDistributionEvents, IAccumulatio
 export { AccumulativeSwingIndex, IAccumulativeSwingIndexEvents, IAccumulativeSwingIndexPrivate, IAccumulativeSwingIndexSettings } from "./.internal/charts/stock/indicators/AccumulativeSwingIndex";
 export { Aroon, IAroonSettings, IAroonEvents, IAroonPrivate } from "./.internal/charts/stock/indicators/Aroon";
 export { MACD, IMACDEvents, IMACDPrivate, IMACDSettings } from "./.internal/charts/stock/indicators/MACD";
+export { MACross, IMACrossEvents, IMACrossPrivate, IMACrossSettings } from "./.internal/charts/stock/indicators/MACross";
 export { ChaikinMoneyFlow, IChaikinMoneyFlowEvents, IChaikinMoneyFlowPrivate, IChaikinMoneyFlowSettings } from "./.internal/charts/stock/indicators/ChaikinMoneyFlow";
 export { ChaikinOscillator, IChaikinOscillatorEvents, IChaikinOscillatorPrivate, IChaikinOscillatorSettings } from "./.internal/charts/stock/indicators/ChaikinOscillator";
 export { BullBearPower, IBullBearPowerEvents, IBullBearPowerPrivate, IBullBearPowerSettings } from "./.internal/charts/stock/indicators/BullBearPower";

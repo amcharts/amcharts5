@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.6] - 2024-01-05
+
+### Fixed
+- One of the underlying series was not being removed when disposing MACross indicator.
+- Some of the newer indicators were not being restored.
+- `autoSave: true` set on `DataSaveControl` was not working.
+
+
 ## [5.7.5] - 2024-01-04
 
 ### Added

@@ -3,6 +3,7 @@
  * DO NOT MANUALLY EDIT IT OR YOUR CHANGES WILL BE LOST!
  */
 
+import type { AccelerationBands } from "./../../../stock";
 import type { AccumulationDistribution } from "./../../../stock";
 import type { AccumulativeSwingIndex } from "./../../../stock";
 import type { Annotator } from "./../../../plugins/exporting";
@@ -25,6 +26,7 @@ import type { AxisTick } from "./../../../xy";
 import type { BaseColumnSeries } from "./../../../xy";
 import type { BollingerBands } from "./../../../stock";
 import type { BreadcrumbBar } from "./../../../hierarchy";
+import type { BullBearPower } from "./../../../stock";
 import type { Bullet } from "./../../../index";
 import type { Button } from "./../../../index";
 import type { CalloutSeries } from "./../../../stock";
@@ -112,6 +114,7 @@ import type { LinearGradient } from "./../../../index";
 import type { LinkedHierarchy } from "./../../../hierarchy";
 import type { LinkedHierarchyNode } from "./../../../hierarchy";
 import type { MACD } from "./../../../stock";
+import type { MACross } from "./../../../stock";
 import type { MapChart } from "./../../../map";
 import type { MapLine } from "./../../../map";
 import type { MapLineSeries } from "./../../../map";
@@ -130,6 +133,7 @@ import type { OHLC } from "./../../../xy";
 import type { OHLCSeries } from "./../../../xy";
 import type { OnBalanceVolume } from "./../../../stock";
 import type { OverboughtOversold } from "./../../../stock";
+import type { PVT } from "./../../../stock";
 import type { Pack } from "./../../../hierarchy";
 import type { PanelControls } from "./../../../stock";
 import type { ParallelChannelSeries } from "./../../../stock";
@@ -222,6 +226,7 @@ import type { ZigZag } from "./../../../stock";
 import type { ZoomControl } from "./../../../map";
 
 export interface IClasses {
+	"AccelerationBands": () => Promise<typeof AccelerationBands>;
 	"AccumulationDistribution": () => Promise<typeof AccumulationDistribution>;
 	"AccumulativeSwingIndex": () => Promise<typeof AccumulativeSwingIndex>;
 	"Annotator": () => Promise<typeof Annotator>;
@@ -244,6 +249,7 @@ export interface IClasses {
 	"BaseColumnSeries": () => Promise<typeof BaseColumnSeries>;
 	"BollingerBands": () => Promise<typeof BollingerBands>;
 	"BreadcrumbBar": () => Promise<typeof BreadcrumbBar>;
+	"BullBearPower": () => Promise<typeof BullBearPower>;
 	"Bullet": () => Promise<typeof Bullet>;
 	"Button": () => Promise<typeof Button>;
 	"CalloutSeries": () => Promise<typeof CalloutSeries>;
@@ -331,6 +337,7 @@ export interface IClasses {
 	"LinkedHierarchy": () => Promise<typeof LinkedHierarchy>;
 	"LinkedHierarchyNode": () => Promise<typeof LinkedHierarchyNode>;
 	"MACD": () => Promise<typeof MACD>;
+	"MACross": () => Promise<typeof MACross>;
 	"MapChart": () => Promise<typeof MapChart>;
 	"MapLine": () => Promise<typeof MapLine>;
 	"MapLineSeries": () => Promise<typeof MapLineSeries>;
@@ -349,6 +356,7 @@ export interface IClasses {
 	"OHLCSeries": () => Promise<typeof OHLCSeries>;
 	"OnBalanceVolume": () => Promise<typeof OnBalanceVolume>;
 	"OverboughtOversold": () => Promise<typeof OverboughtOversold>;
+	"PVT": () => Promise<typeof PVT>;
 	"Pack": () => Promise<typeof Pack>;
 	"PanelControls": () => Promise<typeof PanelControls>;
 	"ParallelChannelSeries": () => Promise<typeof ParallelChannelSeries>;
@@ -442,6 +450,7 @@ export interface IClasses {
 }
 
 const classes: IClasses = {
+	"AccelerationBands": () => import(/* webpackExports: "AccelerationBands", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.AccelerationBands),
 	"AccumulationDistribution": () => import(/* webpackExports: "AccumulationDistribution", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.AccumulationDistribution),
 	"AccumulativeSwingIndex": () => import(/* webpackExports: "AccumulativeSwingIndex", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.AccumulativeSwingIndex),
 	"Annotator": () => import(/* webpackExports: "Annotator", webpackChunkName: "json_plugins_exporting" */ "./../../../plugins/exporting").then((m) => m.Annotator),
@@ -464,6 +473,7 @@ const classes: IClasses = {
 	"BaseColumnSeries": () => import(/* webpackExports: "BaseColumnSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.BaseColumnSeries),
 	"BollingerBands": () => import(/* webpackExports: "BollingerBands", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.BollingerBands),
 	"BreadcrumbBar": () => import(/* webpackExports: "BreadcrumbBar", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.BreadcrumbBar),
+	"BullBearPower": () => import(/* webpackExports: "BullBearPower", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.BullBearPower),
 	"Bullet": () => import(/* webpackExports: "Bullet", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Bullet),
 	"Button": () => import(/* webpackExports: "Button", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Button),
 	"CalloutSeries": () => import(/* webpackExports: "CalloutSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.CalloutSeries),
@@ -551,6 +561,7 @@ const classes: IClasses = {
 	"LinkedHierarchy": () => import(/* webpackExports: "LinkedHierarchy", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchy),
 	"LinkedHierarchyNode": () => import(/* webpackExports: "LinkedHierarchyNode", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchyNode),
 	"MACD": () => import(/* webpackExports: "MACD", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MACD),
+	"MACross": () => import(/* webpackExports: "MACross", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MACross),
 	"MapChart": () => import(/* webpackExports: "MapChart", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapChart),
 	"MapLine": () => import(/* webpackExports: "MapLine", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapLine),
 	"MapLineSeries": () => import(/* webpackExports: "MapLineSeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapLineSeries),
@@ -569,6 +580,7 @@ const classes: IClasses = {
 	"OHLCSeries": () => import(/* webpackExports: "OHLCSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.OHLCSeries),
 	"OnBalanceVolume": () => import(/* webpackExports: "OnBalanceVolume", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.OnBalanceVolume),
 	"OverboughtOversold": () => import(/* webpackExports: "OverboughtOversold", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.OverboughtOversold),
+	"PVT": () => import(/* webpackExports: "PVT", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.PVT),
 	"Pack": () => import(/* webpackExports: "Pack", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.Pack),
 	"PanelControls": () => import(/* webpackExports: "PanelControls", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.PanelControls),
 	"ParallelChannelSeries": () => import(/* webpackExports: "ParallelChannelSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ParallelChannelSeries),

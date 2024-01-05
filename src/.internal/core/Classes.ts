@@ -3,6 +3,7 @@
  * DO NOT MANUALLY EDIT IT OR YOUR CHANGES WILL BE LOST!
  */
 
+import type { AccelerationBands } from "./../charts/stock/indicators/AccelerationBands.js";
 import type { AccumulationDistribution } from "./../charts/stock/indicators/AccumulationDistribution.js";
 import type { AccumulativeSwingIndex } from "./../charts/stock/indicators/AccumulativeSwingIndex.js";
 import type { Annotator } from "./../plugins/exporting/Annotator.js";
@@ -24,10 +25,9 @@ import type { AxisRendererY } from "./../charts/xy/axes/AxisRendererY.js";
 import type { AxisTick } from "./../charts/xy/axes/AxisTick.js";
 import type { BaseColumnSeries } from "./../charts/xy/series/BaseColumnSeries.js";
 import type { BollingerBands } from "./../charts/stock/indicators/BollingerBands.js";
-import type { AccelerationBands } from "./../charts/stock/indicators/AccelerationBands.js";
 import type { BreadcrumbBar } from "./../charts/hierarchy/BreadcrumbBar.js";
-import type { Bullet } from "./render/Bullet.js";
 import type { BullBearPower } from "./../charts/stock/indicators/BullBearPower.js";
+import type { Bullet } from "./render/Bullet.js";
 import type { Button } from "./render/Button.js";
 import type { CalloutSeries } from "./../charts/stock/drawing/CalloutSeries.js";
 import type { Candlestick } from "./../charts/xy/series/Candlestick.js";
@@ -133,6 +133,7 @@ import type { OHLC } from "./../charts/xy/series/OHLC.js";
 import type { OHLCSeries } from "./../charts/xy/series/OHLCSeries.js";
 import type { OnBalanceVolume } from "./../charts/stock/indicators/OnBalanceVolume.js";
 import type { OverboughtOversold } from "./../charts/stock/indicators/OverboughtOversold.js";
+import type { PVT } from "./../charts/stock/indicators/PVT.js";
 import type { Pack } from "./../charts/hierarchy/Pack.js";
 import type { PanelControls } from "./../charts/stock/PanelControls.js";
 import type { ParallelChannelSeries } from "./../charts/stock/drawing/ParallelChannelSeries.js";
@@ -151,7 +152,6 @@ import type { PointedRectangle } from "./render/PointedRectangle.js";
 import type { Polygon } from "./render/Polygon.js";
 import type { PolylineSeries } from "./../charts/stock/drawing/PolylineSeries.js";
 import type { PyramidSeries } from "./../charts/funnel/PyramidSeries.js";
-import type { PVT } from "./../charts/stock/indicators/PVT.js";
 import type { QuadrantLineSeries } from "./../charts/stock/drawing/QuadrantLineSeries.js";
 import type { RadarChart } from "./../charts/radar/RadarChart.js";
 import type { RadarColumnSeries } from "./../charts/radar/RadarColumnSeries.js";
@@ -226,6 +226,7 @@ import type { ZigZag } from "./../charts/stock/indicators/ZigZag.js";
 import type { ZoomControl } from "./../charts/map/ZoomControl.js";
 
 export interface IClasses {
+	"AccelerationBands": AccelerationBands;
 	"AccumulationDistribution": AccumulationDistribution;
 	"AccumulativeSwingIndex": AccumulativeSwingIndex;
 	"Annotator": Annotator;
@@ -247,9 +248,8 @@ export interface IClasses {
 	"AxisTick": AxisTick;
 	"BaseColumnSeries": BaseColumnSeries;
 	"BollingerBands": BollingerBands;
-	"BullBearPower": BullBearPower;
-	"AccelerationBands": AccelerationBands;
 	"BreadcrumbBar": BreadcrumbBar;
+	"BullBearPower": BullBearPower;
 	"Bullet": Bullet;
 	"Button": Button;
 	"CalloutSeries": CalloutSeries;
@@ -356,6 +356,7 @@ export interface IClasses {
 	"OHLCSeries": OHLCSeries;
 	"OnBalanceVolume": OnBalanceVolume;
 	"OverboughtOversold": OverboughtOversold;
+	"PVT": PVT;
 	"Pack": Pack;
 	"PanelControls": PanelControls;
 	"ParallelChannelSeries": ParallelChannelSeries;
@@ -374,7 +375,6 @@ export interface IClasses {
 	"Polygon": Polygon;
 	"PolylineSeries": PolylineSeries;
 	"PyramidSeries": PyramidSeries;
-	"PVT": PVT;
 	"QuadrantLineSeries": QuadrantLineSeries;
 	"RadarChart": RadarChart;
 	"RadarColumnSeries": RadarColumnSeries;

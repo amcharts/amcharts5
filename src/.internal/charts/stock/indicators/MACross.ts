@@ -73,6 +73,11 @@ export class MACross extends Indicator {
 		super._prepareChildren();
 	}
 
+	protected _dispose() {
+		this.fastSeries.dispose();
+		super._dispose();
+	}	
+
 	protected _afterNew() {
 		super._afterNew();
 

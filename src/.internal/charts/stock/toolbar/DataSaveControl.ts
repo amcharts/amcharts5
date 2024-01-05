@@ -97,6 +97,9 @@ export class DataSaveControl extends DropdownListControl {
 			if (ev.item.id == "autosave") {
 				const autoSave = !ev.item.checked;
 				this.set("autoSave", autoSave);
+				if (autoSave) {
+					this.saveData();
+				}
 			}
 		});
 
@@ -138,7 +141,7 @@ export class DataSaveControl extends DropdownListControl {
 			const autoSave = this.get("autoSave", false);
 			if (autoSave) {
 				localStorage.setItem(this._getStorageId("autosave"), "1");
-				this.saveData();
+				//this.saveData();
 			}
 			else {
 				localStorage.removeItem(this._getStorageId("autosave"));
