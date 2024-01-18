@@ -99,6 +99,7 @@ export class StockControl extends Entity {
 
 		this._initElements();
 		this._applyClassNames();
+		this._maybeMakeAccessible();
 
 		this._root.addDisposer(this);
 	}
@@ -193,6 +194,10 @@ export class StockControl extends Entity {
 			}
 		}
 
+		if (this.isPrivateDirty("toolbar")) {
+			this._maybeMakeAccessible();
+		}
+
 		// todo icon
 	}
 
@@ -225,6 +230,34 @@ export class StockControl extends Entity {
 
 	protected _handleClick(): void {
 		this.set("active", !this.get("active"));
+	}
+
+	protected _maybeMakeAccessible() {
+		if (this.isAccessible()) {
+			const button = this.getPrivate("button")!;
+			button.setAttribute("tabindex", this._root.tabindex.toString());
+			button.setAttribute("role", "button");
+
+			if ($utils.supports("keyboardevents")) {
+				button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER to toggle"));
+				this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+					if (document.activeElement == button && ev.keyCode == 13) {
+						// ENTER
+						if (this.get("togglable")) {
+							this._handleClick();
+						}
+						else {
+							(document.activeElement as HTMLElement).click();
+						}
+					}
+				}));
+			}
+		}
+	}
+
+	public isAccessible(): boolean {
+		const toolbar = this.getPrivate("toolbar");
+		return toolbar && toolbar.get("focusable") ? true : false;
 	}
 
 }

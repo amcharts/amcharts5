@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Fixed
+- Updated province names in the maps for Nepal.
+
 
 ## [5.1.2] - 2023-12-07
 

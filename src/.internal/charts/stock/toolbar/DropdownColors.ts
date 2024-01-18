@@ -45,6 +45,7 @@ export class DropdownColors extends Dropdown {
 
 	protected _afterNew() {
 		super._afterNew();
+		this._setupKeyboardNav();
 		this._root.addDisposer(this);
 	}
 
@@ -76,6 +77,7 @@ export class DropdownColors extends Dropdown {
 			this.addItem(item);
 		});
 		this._initOpacity();
+		this._maybeMakeAccessible();
 	}
 
 	public _beforeChanged() {
@@ -83,6 +85,10 @@ export class DropdownColors extends Dropdown {
 
 		if (this.isDirty("colors") || this.isDirty("useOpacity") || this.isPrivateDirty("color") || this.isPrivateDirty("opacity")) {
 			this._initItems();
+		}
+
+		if (this.isDirty("control")) {
+			this._maybeMakeAccessible();
 		}
 
 	}
@@ -142,6 +148,62 @@ export class DropdownColors extends Dropdown {
 				}));
 			}
 		}
+	}
+
+	protected _setupKeyboardNav(): void {
+		if ($utils.supports("keyboardevents")) {
+			const button = this.get("control").getPrivate("button")!;
+			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+				if (this.isAccessible()) {
+					if (document.activeElement && (document.activeElement === button || $utils.contains(button, document.activeElement))) {
+						if (ev.keyCode == 13) {
+							// ENTER
+							if (document.activeElement !== button) {
+								(document.activeElement as HTMLElement).click();
+							}
+						}
+						else if ([37, 38, 39, 40].indexOf(ev.keyCode) !== -1) {
+							const dir = ev.keyCode == 37 || ev.keyCode == 38 ? -1 : 1;
+							const items = this._getActiveItems();
+							const selected = button.querySelectorAll(".am5stock-control-color:focus, .am5stock-control-opacity:focus");
+							let index: number = -1;
+							if (selected.length > 0) {
+								items.forEach((item, key) => {
+									if (item === selected.item(0)) {
+										index = key;
+									}
+								});
+							}
+							index += dir;
+							if (index < 0) {
+								index = items.length - 1;
+							}
+							else if (index >= items.length) {
+								index = 0;
+							}
+							$utils.focus(items.item(index) as HTMLElement);
+						}
+					}
+				}
+			}));
+		}
+	}
+
+	protected _maybeMakeAccessible(): void {
+		super._maybeMakeAccessible();
+		if (this.isAccessible()) {
+			//const tabindex = this._root.tabindex.toString();
+			//const list = this.getPrivate("list")!;
+			const items = this._getActiveItems();
+			items.forEach((item, key) => {
+				(item as HTMLElement).setAttribute("tabindex", "-1");
+				(item as HTMLElement).setAttribute("aria-label", this.root.language.translateAny("Selection") + " #" + (key + 1));
+			});
+		}
+	}
+
+	protected _getActiveItems(): NodeList {
+		return this.getPrivate("list")!.querySelectorAll(".am5stock-control-color, .am5stock-control-opacity");
 	}
 
 }

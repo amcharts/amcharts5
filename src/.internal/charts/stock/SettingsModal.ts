@@ -244,7 +244,6 @@ export class SettingsModal extends Modal {
 						const option = input.options[input!.selectedIndex];
 						const extTarget = option.getAttribute("data-target");
 						if (extTarget) {
-							console.log(settingInputs[extTarget], option.getAttribute("data-target-value"))
 							settingInputs[extTarget].value = option.getAttribute("data-target-value") + "";
 						}
 					});
@@ -352,6 +351,12 @@ export class SettingsModal extends Modal {
 
 		// Open modal
 		this.open();
+
+		// Auto-focus Save button
+		this.setTimeout(() => {
+			// Delayed so that pressing ENTER in the list does not trigger save, too
+			saveButton.focus();
+		}, 10);
 
 	}
 

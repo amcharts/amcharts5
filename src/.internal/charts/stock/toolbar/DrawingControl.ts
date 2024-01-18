@@ -63,7 +63,7 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	 * @since 5.5.2
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings} for more info
 	 */
-	toolSettings?: {[index: string]: any};
+	toolSettings?: { [index: string]: any };
 
 	/**
 	 * Target series for drawing.
@@ -194,7 +194,7 @@ export interface IDrawingControlPrivate extends IStockControlPrivate {
 	iconControl?: IconControl;
 	snapControl?: StockControl;
 
-	toolTemplates?: {[index: string]: Template<any>};
+	toolTemplates?: { [index: string]: Template<any> };
 }
 
 export interface IDrawingControlEvents extends IStockControlEvents {
@@ -261,6 +261,9 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Drawing tool"),
 			tools: this.get("tools")!
 		});
+
+		toolControl.setPrivate("toolbar", toolbar);
+
 		toolsContainer.appendChild(toolControl.getPrivate("button")!);
 		this.setPrivate("toolControl", toolControl);
 
@@ -280,6 +283,9 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Arrows &amp; Icons"),
 			icons: drawingIcons
 		});
+
+		iconControl.setPrivate("toolbar", toolbar);
+
 		iconControl.setIcon(this.get("drawingIcon", drawingIcons[0]));
 		toolsContainer.appendChild(iconControl.getPrivate("button")!);
 		this.setPrivate("iconControl", iconControl);
@@ -298,6 +304,9 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Snap icon to data"),
 			icon: StockIcons.getIcon("Snap")
 		});
+
+		snapControl.setPrivate("toolbar", toolbar);
+
 		snapControl.hide();
 		toolsContainer.appendChild(snapControl.getPrivate("button")!);
 		this.setPrivate("snapControl", snapControl);
@@ -318,6 +327,9 @@ export class DrawingControl extends StockControl {
 			colors: this.get("colors"),
 			description: l.translateAny("Line color")
 		});
+
+		strokeControl.setPrivate("toolbar", toolbar);
+
 		strokeControl.hide();
 		strokeControl.setPrivate("color", this.get("strokeColor", color(0x000000)));
 		strokeControl.setPrivate("opacity", this.get("strokeOpacity", 1));
@@ -345,6 +357,9 @@ export class DrawingControl extends StockControl {
 			currentItem: this.get("strokeWidth", "12") + "px",
 			items: strokeWidths
 		});
+
+		strokeWidthControl.setPrivate("toolbar", toolbar);
+
 		strokeWidthControl.hide();
 		//strokeWidthControl.setItem(this.get("strokeWidth", "12") + "px");
 		strokeWidthControl.getPrivate("icon")!.style.display = "none";
@@ -386,6 +401,9 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Line style"),
 			items: strokeDasharrays
 		});
+
+		strokeDasharrayControl.setPrivate("toolbar", toolbar);
+
 		strokeDasharrayControl.hide();
 		if (currentStrokeDasharray) {
 			strokeDasharrayControl.setItem({
@@ -413,6 +431,7 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Fill color"),
 		});
 		fillControl.hide();
+		fillControl.setPrivate("toolbar", toolbar);
 		fillControl.setPrivate("color", this.get("fillColor", color(0x000000)));
 		fillControl.setPrivate("opacity", this.get("fillOpacity", 1));
 		toolsContainer.appendChild(fillControl.getPrivate("button")!);
@@ -437,6 +456,7 @@ export class DrawingControl extends StockControl {
 			useOpacity: false
 		});
 		labelFillControl.hide();
+		labelFillControl.setPrivate("toolbar", toolbar);
 		labelFillControl.setPrivate("color", this.get("labelFill", color(0x000000)));
 		toolsContainer.appendChild(labelFillControl.getPrivate("button")!);
 		this.setPrivate("labelFillControl", labelFillControl);
@@ -460,6 +480,7 @@ export class DrawingControl extends StockControl {
 			items: fontSizes,
 		});
 		fontSizeControl.hide();
+		fontSizeControl.setPrivate("toolbar", toolbar);
 		//fontSizeControl.setItem(this.get("labelFontSize", "12px") + "");
 		toolsContainer.appendChild(fontSizeControl.getPrivate("button")!);
 		this.setPrivate("labelFontSizeControl", fontSizeControl);
@@ -478,6 +499,7 @@ export class DrawingControl extends StockControl {
 			icon: StockIcons.getIcon("Bold")
 		});
 		boldControl.hide();
+		boldControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(boldControl.getPrivate("button")!);
 		this.setPrivate("boldControl", boldControl);
 		boldControl.on("active", (_ev) => {
@@ -495,6 +517,7 @@ export class DrawingControl extends StockControl {
 			icon: StockIcons.getIcon("Italic")
 		});
 		italicControl.hide();
+		italicControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(italicControl.getPrivate("button")!);
 		this.setPrivate("italicControl", italicControl);
 		italicControl.on("active", (_ev) => {
@@ -517,6 +540,7 @@ export class DrawingControl extends StockControl {
 			items: fontFamilies,
 		});
 		fontFamilyControl.hide();
+		fontFamilyControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(fontFamilyControl.getPrivate("button")!);
 		this.setPrivate("labelFontFamilyControl", fontFamilyControl);
 		fontFamilyControl.events.on("selected", (ev) => {
@@ -534,6 +558,7 @@ export class DrawingControl extends StockControl {
 			icon: StockIcons.getIcon("Show Extension")
 		});
 		extensionControl.hide();
+		extensionControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(extensionControl.getPrivate("button")!);
 		this.setPrivate("extensionControl", extensionControl);
 		if (this.get("showExtension")) {
@@ -553,6 +578,7 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Eraser"),
 			icon: StockIcons.getIcon("Eraser")
 		});
+		eraserControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(eraserControl.getPrivate("button")!);
 		this.setPrivate("eraserControl", eraserControl);
 		eraserControl.on("active", (_ev) => {
@@ -570,6 +596,7 @@ export class DrawingControl extends StockControl {
 			icon: StockIcons.getIcon("Clear"),
 			togglable: false
 		});
+		clearControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(clearControl.getPrivate("button")!);
 		this.setPrivate("clearControl", clearControl);
 		this._disposers.push($utils.addEventListener(clearControl.getPrivate("button")!, "click", (_ev) => {
@@ -639,6 +666,7 @@ export class DrawingControl extends StockControl {
 					this.getPrivate("toolsContainer")!.style.display = "block";
 				}
 				this._setTool(this.get("tool"));
+				$utils.focus(this.getPrivate("toolControl")!.getPrivate("button") as HTMLElement);
 
 			}
 			else {
@@ -777,7 +805,7 @@ export class DrawingControl extends StockControl {
 					toolTemplates[tool] = template;
 					this.setPrivate("toolTemplates", toolTemplates);
 				}
-				
+
 				switch (tool) {
 					case "Arrows &amp; Icons":
 						const icon = this.get("drawingIcon", this.get("drawingIcons")![0]);
@@ -877,7 +905,7 @@ export class DrawingControl extends StockControl {
 							xAxis: xAxis,
 							yAxis: yAxis
 						}, template);
-						break;						
+						break;
 					case "Polyline":
 						series = PolylineSeries.new(this._root, {
 							series: chartSeries,

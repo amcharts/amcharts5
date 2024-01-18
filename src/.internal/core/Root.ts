@@ -6,6 +6,7 @@ import type { IPoint } from "./util/IPoint";
 import type { IRenderer, IPointerEvent } from "./render/backend/Renderer";
 import type { Timezone } from "./util/Timezone";
 
+import { AnimationState } from "./util/Animation";
 import { Container } from "./render/Container";
 import { Text } from "./render/Text";
 import { HorizontalLayout } from "./render/HorizontalLayout";
@@ -918,10 +919,25 @@ export class Root implements IDisposer {
 		});
 	}
 
-	private _runAnimations(currentTime: number) {
+	private _runAnimations(currentTime: number): boolean {
+		let running = 0;
+
 		$array.keepIf(this._animations, (animation) => {
-			return animation._runAnimation(currentTime);
+			const state = animation._runAnimation(currentTime);
+
+			if (state === AnimationState.Stopped) {
+				return false;
+
+			} else if (state === AnimationState.Playing) {
+				++running;
+				return true;
+
+			} else {
+				return true;
+			}
 		});
+
+		return running === 0;
 	}
 
 	private _runDirties() {
@@ -1030,7 +1046,9 @@ export class Root implements IDisposer {
 
 			this._checkComputedStyles();
 			this._runTickers(currentTime);
-			this._runAnimations(currentTime);
+
+			const animationDone = this._runAnimations(currentTime);
+
 			this._runDirties();
 			this._render();
 			this._renderer.resetImageArray();
@@ -1045,7 +1063,7 @@ export class Root implements IDisposer {
 			}
 
 			return this._tickers.length === 0 &&
-				this._animations.length === 0 &&
+				animationDone &&
 				!this._isDirty;
 
 		} else {
@@ -1168,8 +1186,9 @@ export class Root implements IDisposer {
 		// TODO use numeric id instead
 		if (this._animations.indexOf(animation) === -1) {
 			this._animations.push(animation);
-			this._startTicker();
 		}
+
+		this._startTicker();
 	}
 
 	public _markDirty() {
@@ -1436,7 +1455,7 @@ export class Root implements IDisposer {
 		}
 
 		const ariaChecked = target.get("ariaChecked");
-		if (ariaChecked != null) {
+		if (ariaChecked != null && role && ["checkbox", "option", "radio", "menuitemcheckbox", "menuitemradio", "treeitem"].indexOf(role) !== -1) {
 			focusElement.setAttribute("aria-checked", ariaChecked ? "true" : "false");
 		}
 		else {

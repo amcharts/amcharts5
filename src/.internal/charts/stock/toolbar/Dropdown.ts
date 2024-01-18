@@ -177,4 +177,14 @@ export class Dropdown extends Entity {
 		}
 	}
 
+	protected _maybeMakeAccessible() {
+		if (this.isAccessible()) {
+		}
+	}
+
+	public isAccessible(): boolean {
+		const toolbar = this.get("control").getPrivate("toolbar");
+		return toolbar && toolbar.get("focusable") ? true : false;
+	}
+
 }

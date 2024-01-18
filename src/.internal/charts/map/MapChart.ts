@@ -1105,7 +1105,7 @@ export class MapChart extends SerialChart {
 		const zoomLevel = this.get("zoomLevel", 1);
 
 		if (this.get("centerMapOnZoomOut") && level == this.get("homeZoomLevel", 1)) {
-			point = this.convert(this.homeGeoPoint());
+			point = this.convert(this.homeGeoPoint(), this.get("homeRotationX"), this.get("homeRotationY"));
 			center = true;
 		}
 

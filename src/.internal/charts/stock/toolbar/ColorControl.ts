@@ -124,4 +124,29 @@ export class ColorControl extends StockControl {
 		this._disposers.push(disposer);
 	}
 
+	public hide(): void {
+		super.hide();
+	}
+
+		protected _maybeMakeAccessible(): void {
+			super._maybeMakeAccessible();
+			if (this.isAccessible()) {
+				const button = this.getPrivate("button")!;
+				button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
+
+				if ($utils.supports("keyboardevents")) {
+					this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+						if (document.activeElement == button) {
+							if (ev.keyCode == 38 || ev.keyCode == 40) {
+								// Open on arrows
+								if (!this.get("active")) {
+									this._handleClick();
+								}
+							}
+						}
+					}));
+				}
+			}
+		}
+
 }

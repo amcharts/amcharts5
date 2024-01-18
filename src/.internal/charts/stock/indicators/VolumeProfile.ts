@@ -135,7 +135,13 @@ export class VolumeProfile extends Indicator {
 			if (chart) {
 				const yAxis = stockSeries.get("yAxis") as any;
 
-				(this._editableSettings as any)[0].options[1].extTargetValue = yAxis.getPrivate("step") * 50;
+				const step = yAxis.getPrivate("step");
+				if (step !== undefined) {
+					(this._editableSettings as any)[0].options[1].extTargetValue = yAxis.getPrivate("step") * 50;
+				}
+				yAxis.onPrivate("step", (step: number) => {
+					(this._editableSettings as any)[0].options[1].extTargetValue = step * 50;
+				});
 
 				const panelXAxis = stockSeries.get("xAxis") as DateAxis<AxisRendererX>;
 
@@ -266,6 +272,12 @@ export class VolumeProfile extends Indicator {
 				const upColor = this.get("upColor");
 				this.upSeries.set("fill", upColor);
 				this.upSeries.set("stroke", upColor);
+
+				this.upSeries.columns.template.setAll({
+					fill: upColor,
+					stroke: upColor
+				});
+
 				this.setCustomData("upColor", upColor);
 			}
 
@@ -273,12 +285,19 @@ export class VolumeProfile extends Indicator {
 				const downColor = this.get("downColor");
 				this.series.set("fill", downColor);
 				this.series.set("stroke", downColor);
+
+				this.series.columns.template.setAll({
+					fill: downColor,
+					stroke: downColor
+				});
+
 				this.setCustomData("downColor", downColor);
 			}
 
 			if (this.isDirty("axisWidth")) {
 				this.xAxis.set("width", percent(this.get("axisWidth", 40)));
 			}
+
 		}
 	}
 
@@ -547,6 +566,14 @@ export class VolumeProfile extends Indicator {
 				}
 			}
 		}
+
+		this.series.columns.each((column) => {
+			column._markDirtyKey("fillOpacity")
+		})
+
+		this.upSeries.columns.each((column) => {
+			column._markDirtyKey("fillOpacity")
+		})
 	}
 
 	protected _dispose() {

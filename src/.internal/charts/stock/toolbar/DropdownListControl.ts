@@ -3,6 +3,7 @@ import { DropdownList, IDropdownListItem } from "./DropdownList";
 
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
+import * as $utils from "../../../core/util/Utils";
 
 export interface IDropdownListControlSettings extends IStockControlSettings {
 
@@ -208,13 +209,35 @@ export class DropdownListControl extends StockControl {
 						}
 					})
 				}
-				dropdown.set("items", dropdownItems)
+				dropdown.set("items", dropdownItems);
+				//console.log(this.className, this.isAccessible())
 			}
 		}
 	}
 
 	protected _dispose(): void {
 		super._dispose();
+	}
+
+	protected _maybeMakeAccessible(): void {
+		super._maybeMakeAccessible();
+		if (this.isAccessible()) {
+			const button = this.getPrivate("button")!;
+			button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
+
+			if ($utils.supports("keyboardevents")) {
+				this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+					if (document.activeElement == button) {
+						if (ev.keyCode == 38 || ev.keyCode == 40) {
+							// Open on arrows
+							if (!this.get("active")) {
+								this._handleClick();
+							}
+						}
+					}
+				}));
+			}
+		}
 	}
 
 

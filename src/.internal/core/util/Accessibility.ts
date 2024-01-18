@@ -61,6 +61,14 @@ export interface IAccessibilitySettings {
 
 	/**
 	 * `aria-checked` setting.
+	 *
+	 * This setting is ignored unless `role` is one of the following:
+	 * * `"checkbox"`
+	 * * `"option"`
+	 * * `"radio"`
+	 * * `"menuitemcheckbox"`
+	 * * `"menuitemradio"`
+	 * * `"treeitem"`
 	 */
 	ariaChecked?: boolean;
 

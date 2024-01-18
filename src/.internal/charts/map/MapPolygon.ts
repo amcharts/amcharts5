@@ -128,10 +128,10 @@ export class MapPolygon extends Graphics {
 					}
 				}
 			}
-
-			let center = $polylabel(coordinates as number[][][]);
-			return { longitude: center[0], latitude: center[1] };
-
+			if(coordinates){
+				let center = $polylabel(coordinates as number[][][]);
+				return { longitude: center[0], latitude: center[1] };
+			}
 		}
 		return { longitude: 0, latitude: 0 };
 	}

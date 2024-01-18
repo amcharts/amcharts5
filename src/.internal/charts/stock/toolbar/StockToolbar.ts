@@ -41,6 +41,17 @@ export interface IStockToolbarSettings extends IEntitySettings {
 	 */
 	deactivateRoot?: boolean;
 
+	/**
+	 * Setting this to `true` will essentially enable accessibility for the
+	 * toolbar items.
+	 *
+	 * E.g. buttons will be focusable using TAB key. Lists navigable using arrow
+	 * keys, etc.
+	 *
+	 * @default false
+	 */
+	focusable?: boolean;
+
 }
 
 export interface IStockToolbarPrivate extends IEntityPrivate {

@@ -79,10 +79,13 @@ export class DropdownList extends Dropdown {
 	declare public _privateSettings: IDropdownListPrivate;
 	declare public _events: IDropdownListEvents;
 
+	private _currentSelectedIndex?: number;
+
 	// private _itemDisposers: Array<IDisposer> = [];
 
 	protected _afterNew() {
 		super._afterNew();
+		this._setupKeyboardNav();
 		this._root.addDisposer(this);
 	}
 
@@ -144,6 +147,8 @@ export class DropdownList extends Dropdown {
 		if (this.get("scrollable")) {
 			this._sizeItems();
 		}
+
+		this._maybeMakeAccessible();
 	}
 
 	protected _initSearch(): void {
@@ -163,6 +168,10 @@ export class DropdownList extends Dropdown {
 
 				this._disposers.push($utils.addEventListener(input, "input", (_ev) => {
 					this._filterItems(input.value);
+				}));
+
+				this._disposers.push($utils.addEventListener(input, "focus", (_ev) => {
+					this._currentSelectedIndex = undefined;
 				}));
 			}
 		}
@@ -184,6 +193,10 @@ export class DropdownList extends Dropdown {
 
 		if (this.isPrivateDirty("currentId")) {
 			// @todo
+		}
+
+		if (this.isDirty("control")) {
+			this._maybeMakeAccessible();
 		}
 
 	}
@@ -250,17 +263,18 @@ export class DropdownList extends Dropdown {
 			const input: HTMLInputElement = document.createElement("input");
 			inputId = "am5stock-list-" + info.id;
 			input.type = info.form;
+			input.setAttribute("tabindex", "-1");
 			if (info.value) {
 				input.value = info.value;
 			}
 			if (info.form == "radio") {
 				input.name = info.id;
-				inputId +=  "-" + info.value;
+				inputId += "-" + info.value;
 			}
 			if (info.checked) {
 				input.checked = true;
 			}
-			
+
 			input.id = inputId;
 
 			this._disposers.push($utils.addEventListener(item, "click", (ev) => {
@@ -334,6 +348,65 @@ export class DropdownList extends Dropdown {
 				this._initItems();
 			}
 		}
+
+		this._currentSelectedIndex = undefined;
+	}
+
+	protected _setupKeyboardNav(): void {
+		if ($utils.supports("keyboardevents")) {
+			const button = this.get("control").getPrivate("button")!;
+			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+				if (this.isAccessible()) {
+					if (document.activeElement && (document.activeElement === button || $utils.contains(button, document.activeElement))) {
+						if (ev.keyCode == 13) {
+							// ENTER
+							if (document.activeElement !== button) {
+								(document.activeElement as HTMLElement).click();
+							}
+						}
+						else if (ev.keyCode == 38 || ev.keyCode == 40) {
+							const dir = ev.keyCode == 38 ? -1 : 1;
+							let index: number | undefined = this._currentSelectedIndex;
+							if (index === undefined) {
+								index = 0;
+							}
+							else {
+								index += dir;
+							}
+							const items = this._getActiveItems();
+							if (index < 0) {
+								index = items.length - 1;
+							}
+							else if (index >= items.length) {
+								index = 0;
+							}
+
+							this.setTimeout(() => {
+								$utils.focus(items.item(index!) as HTMLElement);
+								this._currentSelectedIndex = index;
+							}, 15);
+						}
+					}
+				}
+			}));
+		}
+	}
+
+	protected _maybeMakeAccessible(): void {
+		super._maybeMakeAccessible();
+		if (this.isAccessible()) {
+			//const tabindex = this._root.tabindex.toString();
+			//const list = this.getPrivate("list")!;
+			const items = this._getActiveItems();
+			items.forEach((item) => {
+				(item as HTMLElement).setAttribute("tabindex", "-1");
+				(item as HTMLElement).setAttribute("aria-label", (item as HTMLElement).getAttribute("title") || "");
+			});
+		}
+	}
+
+	protected _getActiveItems(): NodeList {
+		return this.getPrivate("list")!.querySelectorAll(".am5stock-list-item:not(.am5stock-list-info, .am5stock-list-heading, .am5stock-disabled)");
 	}
 
 }

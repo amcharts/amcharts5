@@ -120,6 +120,44 @@ export class PeriodSelector extends StockControl {
 			}));
 		});
 
+		if ($utils.supports("keyboardevents")) {
+			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+				if (this.isAccessible()) {
+					const button = this.getPrivate("button")!;
+					if (document.activeElement && (document.activeElement === button || $utils.contains(button, document.activeElement))) {
+						if ([37, 38, 39, 40].indexOf(ev.keyCode) !== -1) {
+							const dir = ev.keyCode == 37 || ev.keyCode == 38 ? -1 : 1;
+							const items = this._getPeriodButtons();
+							const selected = container.querySelectorAll(".am5stock-link:focus");
+							let index: number = -1;
+							if (selected.length > 0) {
+								//index = items.entries().indexOf(selected.item(0));
+								items.forEach((item, key) => {
+									if (item === selected.item(0)) {
+										index = key;
+									}
+								})
+							}
+							index += dir;
+							if (index < 0) {
+								index = items.length - 1;
+							}
+							else if (index >= items.length) {
+								index = 0;
+							}
+							$utils.focus(items.item(index) as HTMLElement);
+						}
+						else if (ev.keyCode == 13) {
+							// ENTER
+							(document.activeElement as HTMLElement).click();
+						}
+					}
+				}
+			}));
+		}
+
+		this._maybeMakeAccessible();
+
 	}
 
 	protected _resetActiveButtons(): void {
@@ -182,9 +220,9 @@ export class PeriodSelector extends StockControl {
 
 	public _afterChanged() {
 		super._afterChanged();
-		// if (this.isDirty("active")) {
-		// 	this._initDropdown();
-		// }
+		if (this.isPrivateDirty("toolbar")) {
+			this._maybeMakeAccessible();
+		}
 	}
 
 	protected _getChart(): any {
@@ -312,6 +350,23 @@ export class PeriodSelector extends StockControl {
 				$utils.removeClass(button, "am5stock-active");
 			}
 		}
+	}
+
+	protected _maybeMakeAccessible(): void {
+		super._maybeMakeAccessible();
+		if (this.isAccessible()) {
+			const button = this.getPrivate("button")!;
+			button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
+			const items = this._getPeriodButtons();
+			items.forEach((item) => {
+				(item as HTMLElement).setAttribute("tabindex", "-1");
+				(item as HTMLElement).setAttribute("aria-label", (item as HTMLElement).getAttribute("title") || "");
+			});
+		}
+	}
+
+	protected _getPeriodButtons(): NodeList {
+		return this.getPrivate("label")!.querySelectorAll(".am5stock-link");
 	}
 
 }

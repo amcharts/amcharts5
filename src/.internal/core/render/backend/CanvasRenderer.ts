@@ -3964,7 +3964,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				});
 			case "wheel":
 				return this._makeSharedEvent("wheel", () => {
-					return $utils.addEventListener(window, $utils.getRendererEvent("wheel"), (event: WheelEvent) => {
+					return $utils.addEventListener(this.view, $utils.getRendererEvent("wheel"), (event: WheelEvent) => {
 						this._dispatchWheel(event, $utils.getEventTarget(event));
 					}, { passive: false });
 				});

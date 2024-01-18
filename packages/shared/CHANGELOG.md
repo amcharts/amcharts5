@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.7.7] - 2024-01-18
+
+### Added
+- New setting in `StockToolbar`: `focusable` (default: `false`). If set to `true`, will make all toolbar controls navigable/editable using keyboard. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/#Accessibility).
+
+### Changed
+- `ariaChecked` setting will be ignored if the element also has `role` set to one of these: `"checkbox"`, `"option"`, `"radio"`, `"menuitemcheckbox"`, `"menuitemradio"`, `"treeitem"`.
+
+### Fixed
+- Paused animations no longer trigger a re-render.
+- Mouse wheel events now work properly inside of shadow DOM.
+- `minBulletDistance` was not being re-measured when size of a chart was changed.
+- Volume Profile was ignoring color change in its settings dialog.
+- Volume Profile when added on chart load was not properly setting count setting in modal when switching to "Ticks per row".
+
+
 ## [5.7.6] - 2024-01-05
 
 ### Fixed

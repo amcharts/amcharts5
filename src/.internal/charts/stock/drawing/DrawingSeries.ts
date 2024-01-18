@@ -321,6 +321,16 @@ export class DrawingSeries extends LineSeries {
 		})
 	}
 
+	/**
+	 * Disposes a drawing with the specified index.
+	 *
+	 * @param  index  Index
+	 * @since 5.7.7
+	 */
+	public disposeIndex(index: number) {
+		this._disposeIndex(index);
+	}
+
 	protected _disposeIndex(index: number) {
 		const dataItems = this._di[index];
 
@@ -833,7 +843,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 
-	protected _getYValue(value: number, valueX: number, doNotConvert?:boolean): number {
+	protected _getYValue(value: number, valueX: number, doNotConvert?: boolean): number {
 
 		const series = this.get("series");
 

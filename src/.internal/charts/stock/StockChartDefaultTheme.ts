@@ -1571,9 +1571,6 @@ export class StockChartDefaultTheme extends Theme {
 				form: "checkbox",
 				label: l.translateAny("Auto-save drawings and indicators")
 			}, {
-				id: "autosave",
-				label: ""
-			}, {
 				id: "save",
 				label: l.translateAny("Save drawings &amp; indicators"),
 				subLabel: l.translateAny("Saves drawings/indicators to browser local storage")
