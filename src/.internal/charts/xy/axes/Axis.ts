@@ -350,6 +350,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	public _seriesValuesDirty = false;
 
+	public _seriesAdded = false;
+
 	/**
 	 * A container above the axis that can be used to add additional stuff into
 	 * it. For example a legend, label, or an icon.
@@ -463,7 +465,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				let maxZoomFactorReal = maxZoomFactor;
 
 				if (end === 1 && start !== 0) {
-					if (start < this.get("start")) {
+					if (start < this.get("start", 0)) {
 						priority = "start";
 					}
 					else {
@@ -472,7 +474,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				}
 
 				if (start === 0 && end !== 1) {
-					if (end > this.get("end")) {
+					if (end > this.get("end", 1)) {
 						priority = "end";
 					}
 					else {
@@ -480,8 +482,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					}
 				}
 
-				let minZoomCount = this.get("minZoomCount");
-				let maxZoomCount = this.get("maxZoomCount");
+				let minZoomCount = this.get("minZoomCount", 0);
+				let maxZoomCount = this.get("maxZoomCount", Infinity);
 
 				if ($type.isNumber(minZoomCount)) {
 					maxZoomFactor = maxZoomFactorReal / minZoomCount;
@@ -990,6 +992,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		}
 
 		this.get("renderer")._updatePositions();
+
+		this._seriesAdded = false;
 	}
 
 	/**
@@ -1098,7 +1102,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					this._updateTooltipText(tooltip, position);
 					renderer.positionTooltip(tooltip, position);
 
-					if (position < this.get("start") || position > this.get("end")) {
+					if (position < this.get("start", 0) || position > this.get("end", 1)) {
 						tooltip.hide(0);
 					}
 					else {

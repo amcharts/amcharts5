@@ -224,6 +224,8 @@ import type { XYCursor } from "./../charts/xy/XYCursor.js";
 import type { XYSeries } from "./../charts/xy/series/XYSeries.js";
 import type { ZigZag } from "./../charts/stock/indicators/ZigZag.js";
 import type { ZoomControl } from "./../charts/map/ZoomControl.js";
+import type { ZoomTools } from "./render/ZoomTools.js";
+import type { ZoomableContainer } from "./render/ZoomableContainer.js";
 
 export interface IClasses {
 	"AccelerationBands": AccelerationBands;
@@ -447,4 +449,6 @@ export interface IClasses {
 	"XYSeries": XYSeries;
 	"ZigZag": ZigZag;
 	"ZoomControl": ZoomControl;
+	"ZoomTools": ZoomTools;
+	"ZoomableContainer": ZoomableContainer;
 }

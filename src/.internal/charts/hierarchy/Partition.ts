@@ -61,6 +61,10 @@ export interface IPartitionSettings extends IHierarchySettings {
 	 */
 	orientation?: "horizontal" | "vertical";
 
+	/**
+	 * @ignore
+	 */
+	_d?:number;
 }
 
 export interface IPartitionPrivate extends IHierarchyPrivate {
@@ -73,8 +77,7 @@ export interface IPartitionPrivate extends IHierarchyPrivate {
 	/**
 	 * Current vertical scale.
 	 */
-	scaleY?: number;
-
+	scaleY?: number;	
 }
 
 /**
@@ -286,7 +289,7 @@ export class Partition extends Hierarchy {
 		const maxDepth = this.getPrivate("maxDepth", 1);
 		const levelHeight = height / (maxDepth + 1);
 		const levelWidth = width / (maxDepth + 1);
-		const initialDepth = Math.min(this.get("initialDepth", 1), maxDepth - topDepth);
+		const initialDepth = Math.min(this.get("initialDepth", 1), maxDepth)// - topDepth);
 
 		let downDepth = this._currentDownDepth;
 		if (downDepth == null) {
@@ -344,8 +347,9 @@ export class Partition extends Hierarchy {
 		}
 
 		this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
-		this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
+		this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });		
 
+		this.animate({key:"_d", from:0, to:1, duration: duration, easing: easing })
 		this.nodesContainer.animate({ key: "x", to: -x0 * scaleX, duration: duration, easing: easing });
 		this.nodesContainer.animate({ key: "y", to: -y0 * scaleY, duration: duration, easing: easing });
 	}

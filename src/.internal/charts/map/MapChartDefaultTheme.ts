@@ -1,5 +1,4 @@
 import { Theme } from "../../core/Theme";
-import { p50, p100 } from "../../core/util/Percent";
 import { setColor } from "../../themes/DefaultTheme";
 
 import { geoMercator } from "d3-geo";
@@ -96,43 +95,10 @@ export class MapChartDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "background");
 		}
 
-		r("Button", ["zoomcontrol"]).setAll({
-			marginTop: 1,
-			marginBottom: 2
-		})
 
-		r("Graphics", ["map", "button", "plus", "icon"]).setAll({
-			x: p50,
-			y: p50,
-			draw: (display) => {
-				display.moveTo(-4, 0);
-				display.lineTo(4, 0);
-				display.moveTo(0, -4);
-				display.lineTo(0, 4);
-			}
-		});
-
-		r("Graphics", ["map", "button", "minus", "icon"]).setAll({
-			x: p50,
-			y: p50,
-			draw: (display) => {
-				display.moveTo(-4, 0);
-				display.lineTo(4, 0);
-			}
-		});
-
-
-		r("Button", ["zoomcontrol", "home"]).setAll({
+		r("Button", ["zoomtools", "home"]).setAll({
 			visible: false
 		});
-
-
-		r("Graphics", ["map", "button", "home", "icon"]).setAll({
-			x: p50,
-			y: p50,
-			svgPath: "M 8 -1 L 6 -1 L 6 7 L 2 7 L 2 1 L -2 1 L -2 7 L -6 7 L -6 -1 L -8 -1 L 0 -9 L 8 -1 Z M 8 -1"
-		});
-
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -143,15 +109,5 @@ export class MapChartDefaultTheme extends Theme {
 		r("GraticuleSeries").setAll({
 			step: 10
 		});
-
-
-		r("ZoomControl").setAll({
-			x: p100,
-			centerX: p100,
-			y: p100,
-			centerY: p100,
-			paddingRight: 10,
-			paddingBottom: 10
-		})
 	}
 }

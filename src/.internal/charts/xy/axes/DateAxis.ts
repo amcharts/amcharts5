@@ -454,6 +454,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				series.setDataSet(series._dataSetId);
 			}
 			this.markDirtySize();
+			// solves problem if new series was added
+			if(this._seriesAdded){
+				this._root.events.once("frameended", ()=>{
+					this.markDirtySize();
+				})
+			}
 		}
 	}
 
@@ -607,6 +613,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 					series.setPrivate("outOfSelection", outOfSelection);
 					series.setPrivate("startIndex", startIndex);
+					series.setPrivate("adjustedStartIndex", series._adjustStartIndex(startIndex));
 					series.setPrivate("endIndex", endIndex);
 				}
 			})

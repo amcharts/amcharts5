@@ -813,7 +813,7 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 
 	outOfSelection?: boolean;
 
-	doNotUpdateLegend?:boolean;
+	doNotUpdateLegend?: boolean;
 }
 
 
@@ -974,6 +974,14 @@ export abstract class XYSeries extends Series {
 		}))
 
 		this.states.create("hidden", <any>{ opacity: 1, visible: false });
+
+		this.onPrivate("startIndex", ()=>{
+			this.updateLegendValue();
+		})
+
+		this.onPrivate("endIndex", ()=>{
+			this.updateLegendValue();
+		})		
 
 		this._makeFieldNames();
 	}
@@ -1365,7 +1373,7 @@ export abstract class XYSeries extends Series {
 			this._dataGrouped = true;
 		}
 
-		if (this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty || this._sizeDirty) {
+		if (this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("adjustedStartIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty || this._sizeDirty) {
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 			let minBulletDistance = this.get("minBulletDistance", 0);
@@ -1378,7 +1386,7 @@ export abstract class XYSeries extends Series {
 				}
 			}
 
-			if ((this._psi != startIndex || this._pei != endIndex || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty || this._valuesDirty) && !this._selectionProcessed) {
+			if ((this._psi != startIndex || this._pei != endIndex || this.isDirty("vcx") || this.isDirty("vcy") || this.isPrivateDirty("adjustedStartIndex") || this._stackDirty || this._valuesDirty) && !this._selectionProcessed) {
 				this._selectionProcessed = true;
 
 				const vcx = this.get("vcx", 1);
@@ -2100,7 +2108,7 @@ export abstract class XYSeries extends Series {
 	 * @param  dataItem  Data item
 	 */
 	public showDataItemTooltip(dataItem: DataItem<this["_dataItemSettings"]> | undefined) {
-		if(!this.getPrivate("doNotUpdateLegend")){
+		if (!this.getPrivate("doNotUpdateLegend")) {
 			this.updateLegendMarker(dataItem);
 			this.updateLegendValue(dataItem);
 		}
@@ -2315,5 +2323,47 @@ export abstract class XYSeries extends Series {
 	 */
 	public get mainDataItems(): Array<DataItem<this["_dataItemSettings"]>> {
 		return this._mainDataItems;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _adjustStartIndex(index: number): number {
+		const xAxis = this.get("xAxis");
+		const baseAxis = this.get("baseAxis");
+
+		if (baseAxis == xAxis && xAxis.isType<DateAxis<any>>("DateAxis")) {
+			const baseDuration = xAxis.baseDuration();
+			const minSelection = xAxis.getPrivate("selectionMin", xAxis.getPrivate("min", 0));
+			const dl = baseDuration * this.get("locationX", 0.5);
+
+			let value = -Infinity;
+
+			while (value < minSelection) {
+				const dataItem = this.dataItems[index];
+				if (dataItem) {
+					const open = dataItem.open;
+					if (open) {
+						value = open["valueX"];
+					}
+					else {
+						value = dataItem.get("valueX", 0);
+					}
+					value += dl;
+
+					if (value < minSelection) {
+						index++;
+					}
+					else {
+						break;
+					}
+				}
+				else {
+					break;
+				}
+			}
+		}
+
+		return index;
 	}
 }

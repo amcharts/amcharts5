@@ -224,6 +224,8 @@ import type { XYCursor } from "./../../../xy";
 import type { XYSeries } from "./../../../xy";
 import type { ZigZag } from "./../../../stock";
 import type { ZoomControl } from "./../../../map";
+import type { ZoomTools } from "./../../../index";
+import type { ZoomableContainer } from "./../../../index";
 
 export interface IClasses {
 	"AccelerationBands": () => Promise<typeof AccelerationBands>;
@@ -447,6 +449,8 @@ export interface IClasses {
 	"XYSeries": () => Promise<typeof XYSeries>;
 	"ZigZag": () => Promise<typeof ZigZag>;
 	"ZoomControl": () => Promise<typeof ZoomControl>;
+	"ZoomTools": () => Promise<typeof ZoomTools>;
+	"ZoomableContainer": () => Promise<typeof ZoomableContainer>;
 }
 
 const classes: IClasses = {
@@ -671,6 +675,8 @@ const classes: IClasses = {
 	"XYSeries": () => import(/* webpackExports: "XYSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.XYSeries),
 	"ZigZag": () => import(/* webpackExports: "ZigZag", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ZigZag),
 	"ZoomControl": () => import(/* webpackExports: "ZoomControl", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.ZoomControl),
+	"ZoomTools": () => import(/* webpackExports: "ZoomTools", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.ZoomTools),
+	"ZoomableContainer": () => import(/* webpackExports: "ZoomableContainer", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.ZoomableContainer),
 };
 
 export default classes;

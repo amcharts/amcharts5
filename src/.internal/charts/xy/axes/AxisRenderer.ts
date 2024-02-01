@@ -475,10 +475,8 @@ export abstract class AxisRenderer extends Graphics {
 	protected _positionTooltip(tooltip: Tooltip, point: IPoint) {
 		const chart = this.chart;
 		if (chart) {
-			if (chart.inPlot(point)) {
-				tooltip.set("pointTo", this._display.toGlobal(point));
-			}
-			else {
+			tooltip.set("pointTo", this._display.toGlobal(point));
+			if (!chart.inPlot(point)) {
 				tooltip.hide();
 			}
 		}

@@ -175,24 +175,26 @@ export class VolumeProfile extends Indicator {
 				this.series = chart.series.unshift(ColumnSeries.new(root, {
 					xAxis: this.xAxis,
 					yAxis: yAxis,
+					snapTooltip:false,
 					valueXField: "down",
 					openValueXField: "xOpen",
 					openValueYField: "yOpen",
 					valueYField: "y",
 					calculateAggregates: true,
-					themeTags: ["indicator", "volumeprofile"]
+					themeTags: ["indicator", "volumeprofile", "down"]
 				}))
 
 
 				this.upSeries = chart.series.unshift(ColumnSeries.new(root, {
 					xAxis: this.xAxis,
 					yAxis: yAxis,
+					snapTooltip:false,
 					valueXField: "total",
 					openValueXField: "down",
 					openValueYField: "yOpen",
 					valueYField: "y",
 					calculateAggregates: true,
-					themeTags: ["indicator", "volumeprofile"]
+					themeTags: ["indicator", "volumeprofile", "up"]
 				}))
 
 				this.upSeries.setPrivate("doNotUpdateLegend", true);

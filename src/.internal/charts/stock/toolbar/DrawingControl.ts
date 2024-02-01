@@ -776,18 +776,26 @@ export class DrawingControl extends StockControl {
 			seriesList = [];
 		}
 
+		// Get panels that are already initialized
+		const initializedPanels: StockPanel[] = [];
+		$array.each(seriesList, (series: DrawingSeries) => {
+			initializedPanels.push(series.chart as StockPanel);
+		});
+
 		// Get target series
 		const chartSeries: XYSeries[] = this.get("series", []);
 		const stockChart = this.get("stockChart");
-		if (chartSeries.length == 0) {
-			// No target series set, take first series out of each chart
+		// if (chartSeries.length == 0) {
+		// 	// No target series set, take first series out of each chart
 			stockChart.panels.each((panel) => {
-				const targetSeries = this._getPanelMainSeries(panel);
-				if (targetSeries) {
-					chartSeries.push(targetSeries);
+				if (initializedPanels.indexOf(panel) == -1) {
+					const targetSeries = this._getPanelMainSeries(panel);
+					if (targetSeries) {
+						chartSeries.push(targetSeries);
+					}
 				}
 			});
-		}
+		// }
 
 		if (chartSeries.length > 0) {
 			const toolSettings: any = this.get("toolSettings", {});
@@ -1204,6 +1212,7 @@ export class DrawingControl extends StockControl {
 
 				// Parse
 				JsonParser.new(this._root).parse(drawing.__drawing).then((drawingData: any) => {
+					this._updateDrawingIndexes(drawingData, drawingSeries._index, drawingSeries);
 					drawingSeries.data.pushAll(drawingData);
 				});
 
@@ -1217,5 +1226,27 @@ export class DrawingControl extends StockControl {
 				})
 			}
 		})
+	}
+
+	protected _updateDrawingIndexes(drawingData: any, index: number, drawingSeries: DrawingSeries): void {
+		if ($type.isArray(drawingData)) {
+			$array.each(drawingData, (item: any) => {
+				this._updateDrawingIndexes(item, index, drawingSeries);
+			})
+		}
+		else if ($type.isObject(drawingData as any) && drawingData.index !== undefined) {
+			drawingData.index += index;
+			drawingSeries._index = drawingData.index;
+		}
+	}
+
+	/**
+	 * Returns an object that holds all drawing series, arrange by tool (key).
+	 *
+	 * @since 5.8.0
+	 * @readonly
+	 */
+	public get drawingSeries(): { [index: string]: DrawingSeries[] } {
+		return this._drawingSeries;
 	}
 }

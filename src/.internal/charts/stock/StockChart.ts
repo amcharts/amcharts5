@@ -788,6 +788,8 @@ export class StockChart extends Container {
 				});
 			}
 		})
+
+		this._updateResizers();
 	}
 
 	protected _processPanel(panel: StockPanel) {
@@ -797,61 +799,61 @@ export class StockChart extends Container {
 		panel.panelControls = panel.topPlotContainer.children.push(PanelControls.new(this._root, { stockPanel: panel, stockChart: this }));
 		this._updateControls();
 
-		if (this.panels.length > 1) {
-			const resizer = panel.children.push(Rectangle.new(this._root, { themeTags: ["panelresizer"] }))
 
-			panel.panelResizer = resizer;
+		const resizer = panel.children.push(Rectangle.new(this._root, { themeTags: ["panelresizer"] }))
 
-			resizer.events.on("pointerdown", (e) => {
+		panel.panelResizer = resizer;
+
+		resizer.events.on("pointerdown", (e) => {
+			const chartsContainer = this.panelsContainer;
+			this._downResizer = e.target;
+			this.panels.each((chart) => {
+				chart.set("height", percent(chart.height() / chartsContainer.height() * 100))
+			})
+
+			this._downY = chartsContainer.toLocal(e.point).y;
+
+			const upperChart = chartsContainer.children.getIndex(chartsContainer.children.indexOf(panel) - 1) as StockPanel;
+			this._upperPanel = upperChart;
+			if (upperChart) {
+				this._uhp = upperChart.get("height") as Percent;
+			}
+
+			this._dhp = panel.get("height") as Percent;
+		})
+
+		resizer.events.on("pointerup", () => {
+			this._downResizer = undefined;
+		})
+
+		resizer.events.on("globalpointermove", (e) => {
+			if (e.target == this._downResizer) {
 				const chartsContainer = this.panelsContainer;
-				this._downResizer = e.target;
-				this.panels.each((chart) => {
-					chart.set("height", percent(chart.height() / chartsContainer.height() * 100))
-				})
+				const height = chartsContainer.height();
+				const upperChart = this._upperPanel;
 
-				this._downY = chartsContainer.toLocal(e.point).y;
-
-				const upperChart = this.panels.getIndex(this.panels.indexOf(panel) - 1);
-				this._upperPanel = upperChart;
 				if (upperChart) {
-					this._uhp = upperChart.get("height") as Percent;
-				}
+					const index = chartsContainer.children.indexOf(upperChart) + 2
+					let max = height - panel.get("minHeight", 0);
+					const lowerChart = chartsContainer.children.getIndex(index);
+					if (lowerChart) {
+						max = lowerChart.y() - panel.get("minHeight", 0);
+					}
+					//console.log(upperChart.get("minHeight", 0))
+					const y = Math.max(upperChart.y() + upperChart.get("minHeight", 0) + upperChart.get("paddingTop", 0), Math.min(chartsContainer.toLocal(e.point).y, max));
 
-				this._dhp = panel.get("height") as Percent;
-			})
-
-			resizer.events.on("pointerup", () => {
-				this._downResizer = undefined;
-			})
-
-			resizer.events.on("globalpointermove", (e) => {
-				if (e.target == this._downResizer) {
-					const chartsContainer = this.panelsContainer;
-					const height = chartsContainer.height();
-					const upperChart = this._upperPanel;
-
-					if (upperChart) {
-						const index = this.panels.indexOf(upperChart) + 2
-						let max = height - panel.get("minHeight", 0);
-						const lowerChart = this.panels.getIndex(index);
-						if (lowerChart) {
-							max = lowerChart.y() - panel.get("minHeight", 0);
-						}
-						//console.log(upperChart.get("minHeight", 0))
-						const y = Math.max(upperChart.y() + upperChart.get("minHeight", 0) + upperChart.get("paddingTop", 0), Math.min(chartsContainer.toLocal(e.point).y, max));
-
-						const downY = this._downY;
-						const dhp = this._dhp;
-						const uhp = this._uhp;
-						if (downY != null && dhp != null && uhp != null) {
-							const diff = (downY - y) / height;
-							panel.set("height", percent((dhp.value + diff) * 100));
-							upperChart.set("height", percent((uhp.value - diff) * 100))
-						}
+					const downY = this._downY;
+					const dhp = this._dhp;
+					const uhp = this._uhp;
+					if (downY != null && dhp != null && uhp != null) {
+						const diff = (downY - y) / height;
+						panel.set("height", percent((dhp.value + diff) * 100));
+						upperChart.set("height", percent((uhp.value - diff) * 100))
 					}
 				}
-			})
-		}
+			}
+		})
+
 		panel.xAxes.events.onAll((change) => {
 			if (change.type === "clear") {
 				$array.each(change.oldValues, (axis) => {
@@ -878,6 +880,17 @@ export class StockChart extends Container {
 			this._syncYAxesSize();
 		})
 
+		this._updateResizers();
+	}
+
+	public _updateResizers() {
+		this.panels.each((panel) => {
+			let hidden = false;
+			if (this.panelsContainer.children.indexOf(panel) == 0) {
+				hidden = true;
+			}
+			panel.panelResizer?.set("forceHidden", hidden);
+		})
 	}
 
 	protected _syncYAxesSize() {

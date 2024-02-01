@@ -206,6 +206,7 @@ export interface ISeriesPrivate extends IComponentPrivate {
 	chart?: Chart;
 	startIndex?: number;
 	endIndex?: number;
+	adjustedStartIndex?:number;
 
 	valueAverage?: number;
 	valueCount?: number;
@@ -437,7 +438,7 @@ export abstract class Series extends Component {
 				}
 			}
 
-			if ((this._psi != startIndex || this._pei != endIndex) && !this._selectionAggregatesCalculated) {
+			if ((this._psi != startIndex || this._pei != endIndex || this.isPrivateDirty("adjustedStartIndex")) && !this._selectionAggregatesCalculated) {
 				if (startIndex === 0 && endIndex === this.dataItems.length && this._aggregatesCalculated) {
 					// void
 				}
@@ -499,6 +500,13 @@ export abstract class Series extends Component {
 
 	}
 
+	/**
+	 * @ignore
+	 */
+	public _adjustStartIndex(index:number):number{
+		return index;
+	}
+
 	protected _calculateAggregates(startIndex: number, endIndex: number) {
 		let fields = this._valueFields;
 
@@ -537,8 +545,9 @@ export abstract class Series extends Component {
 			}
 
 			const baseValueSeries = this.getPrivate("baseValueSeries");
+			const adjustedStartIndex = this.getPrivate("adjustedStartIndex", startIndex);
 
-			for (let i = startIndex; i < endIndex; i++) {
+			for (let i = adjustedStartIndex; i < endIndex; i++) {
 				const dataItem = this.dataItems[i];
 
 				let value = dataItem.get(<any>key)
@@ -579,6 +588,40 @@ export abstract class Series extends Component {
 					dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
 					dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
 
+					previous[key] = value;
+				}
+			}
+
+			if(endIndex < this.dataItems.length - 1){
+				const dataItem = this.dataItems[endIndex];
+				let value = dataItem.get(<any>key)
+				dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
+				dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
+				dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
+				dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
+			}
+
+			if(startIndex > 0){
+				startIndex--;
+			}
+
+			delete previous[key];
+
+			for (let i = startIndex; i < adjustedStartIndex; i++) {
+				const dataItem = this.dataItems[i];
+	
+				let value = dataItem.get(<any>key);
+
+				if (previous[key] == null) {
+					previous[key] = value;
+				}				
+	
+				if (value != null) {
+					dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
+					dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
+					dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
+					dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
+	
 					previous[key] = value;
 				}
 			}
@@ -689,35 +732,30 @@ export abstract class Series extends Component {
 		}
 
 		if(this.get("visible")){
-			//if (this.bullets.length > 0) {
-				let count = this.dataItems.length;
-				let startIndex = this.startIndex();
-				let endIndex = this.endIndex();
+			let count = this.dataItems.length;
+			let startIndex = this.startIndex();
+			let endIndex = this.endIndex();
 
-				if(endIndex < count){
-					endIndex++;
-				}
-				if(startIndex > 0){
-					startIndex--;
-				}
+			if(endIndex < count){
+				endIndex++;
+			}
+			if(startIndex > 0){
+				startIndex--;
+			}
 
-				for (let i = 0; i < startIndex; i++) {
-					this._hideBullets(this.dataItems[i]);
-				}
+			for (let i = 0; i < startIndex; i++) {
+				this._hideBullets(this.dataItems[i]);
+			}
 
-				for (let i = startIndex; i < endIndex; i++) {
-					this._positionBullets(this.dataItems[i]);
-				}
+			for (let i = startIndex; i < endIndex; i++) {
+				this._positionBullets(this.dataItems[i]);
+			}
 
-				for (let i = endIndex; i < count; i++) {
-					this._hideBullets(this.dataItems[i]);
-				}
-			//}
+			for (let i = endIndex; i < count; i++) {
+				this._hideBullets(this.dataItems[i]);
+			}
 		}
 	}
-
-
-
 
 	public _positionBullets(dataItem: DataItem<this["_dataItemSettings"]>){
 		if(dataItem.bullets){

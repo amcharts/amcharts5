@@ -241,6 +241,7 @@ export class DateRangeSelector extends StockControl {
 		$utils.addEventListener(saveButton, "click", () => {
 			const from = this._parseDate(fromField.value);
 			const to = this._parseDate(toField.value);
+			to.setHours(23, 59, 59);
 			this.setPrivate("fromDate", from);
 			this.setPrivate("toDate", to);
 			xAxis.zoomToDates(from, to);
@@ -330,7 +331,7 @@ export class DateRangeSelector extends StockControl {
 		}
 
 		if (maxDate == "auto") {
-			const min = xAxis.getPrivate("maxFinal");
+			const min = xAxis.getPrivate("maxFinal") - 1;
 			if (min) {
 				fromPicker.set("maxDate", new Date(min));
 				toPicker.set("maxDate", new Date(min));

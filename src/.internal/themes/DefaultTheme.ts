@@ -136,6 +136,18 @@ export class DefaultTheme extends Theme {
 			interactiveChildren: false
 		});
 
+		r("ZoomableContainer").setAll({
+			width: p100,
+			height: p100,
+			wheelable: true,
+			pinchZoom: true,
+			maxZoomLevel: 32,
+			minZoomLevel: 1,
+			zoomStep: 2,
+			animationEasing: $ease.out($ease.cubic),
+			animationDuration: 600
+		});
+
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -1043,5 +1055,45 @@ export class DefaultTheme extends Theme {
 
 			setColor(rule, "stroke", ic, "alternativeBackground");
 		}
+
+		r("Graphics", ["button", "plus", "icon"]).setAll({
+			x: p50,
+			y: p50,
+			draw: (display) => {
+				display.moveTo(-4, 0);
+				display.lineTo(4, 0);
+				display.moveTo(0, -4);
+				display.lineTo(0, 4);
+			}
+		});
+
+		r("Graphics", ["button", "minus", "icon"]).setAll({
+			x: p50,
+			y: p50,
+			draw: (display) => {
+				display.moveTo(-4, 0);
+				display.lineTo(4, 0);
+			}
+		});
+
+		r("Graphics", ["button", "home", "icon"]).setAll({
+			x: p50,
+			y: p50,
+			svgPath: "M 8 -1 L 6 -1 L 6 7 L 2 7 L 2 1 L -2 1 L -2 7 L -6 7 L -6 -1 L -8 -1 L 0 -9 L 8 -1 Z M 8 -1"
+		});		
+
+		r("Button", ["zoomtools"]).setAll({
+			marginTop: 1,
+			marginBottom: 2
+		})
+		
+		r("ZoomTools").setAll({
+			x: p100,
+			centerX: p100,
+			y: p100,
+			centerY: p100,
+			paddingRight: 10,
+			paddingBottom: 10
+		})		
 	}
 }

@@ -544,18 +544,29 @@ export abstract class Hierarchy extends Series {
 		let depth = dataItem.get("depth");
 
 		$array.each(childData, (child) => {
-			const childDataItem = new DataItem(this, child, this._makeDataItem(child));
+			let found = false;
+			$array.eachContinue(children, (dataItem) => {
+				if (dataItem.dataContext == child) {
+					found = true;
+					return false;
+				}
+				return true;
+			})
 
-			children.push(childDataItem);
+			if (!found) {
+				const childDataItem = new DataItem(this, child, this._makeDataItem(child));
 
-			childDataItem.setRaw("parent", dataItem);
-			childDataItem.setRaw("depth", depth + 1);
+				children.push(childDataItem);
 
-			if (childDataItem.get("fill") == null) {
-				childDataItem.setRaw("fill", dataItem.get("fill"));
+				childDataItem.setRaw("parent", dataItem);
+				childDataItem.setRaw("depth", depth + 1);
+
+				if (childDataItem.get("fill") == null) {
+					childDataItem.setRaw("fill", dataItem.get("fill"));
+				}
+
+				this.processDataItem(childDataItem);
 			}
-
-			this.processDataItem(childDataItem);
 		})
 	}
 
@@ -890,9 +901,9 @@ export abstract class Hierarchy extends Series {
 				this.enableDataItem(this.dataItems[0], downDepth, 0);
 			}
 
-			this._root.events.once("frameended", ()=>{
+			this._root.events.once("frameended", () => {
 				this._zoom(dataItem);
-			})			
+			})
 		}
 	}
 

@@ -5,6 +5,34 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.0] - 2024-02-01
+
+### Added
+- New container type `ZoomableContainer` added, which allows adding zoom capabilities to virtually any chart. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Zoomable_container).
+- New class `ZoomTools` added. Can be used to quickly add zoom support for elements compatible with `IZoomable` interface, e.g. `ZoomableContainer`.
+- New read-only property of `DrawingControl`: `drawingSeries`. Contains an object where key is a drawing tool name and values are array with references to actual drawing series.
+
+### Changed
+- Default value for `strokeOpacity` for the grid line of a `StockChart` changed from `0` to `0.4` so that it would differ from regular grid lines.
+
+### Fixed
+- Resizing stock chart's panels after moving them up/down was not working properly.
+- `Hierarchy.addChildData` was duplicating node's children which were added before.
+- If `topDepth` was set to `1` on `Partition`, initially the chart was showing not all levels of nodes.
+- When clicking on particular partitions of a `Partion` chart, zoom animation was not playing.
+- `DateRangeSelector` was showing extra day in automatically-calculated end date.
+- `DateRangeSelector` was zooming to the start of the selected day, instead of end.
+- Tooltip background color passed to `HeatLegend.showValue(value, text, color)` was being ignored.
+- `ClusteredPointSeries` was not showing charts if they were added to clustered bullets.
+- Fixed issue with `DrawingControl` which was unnecessarily duplicating drawing series with each tool selection / API call.
+- Using "1M" button in `PeriodSelector` was not always selecting full month.
+- Restoring drawings with `DrawingControl.unserializeDrawings()` will now correctly update indexes of the restored drawings based on current drawing counter.
+- In some cases `StockChart` was taking a data item which was just outside of zoom range when calculating aggregate values for its series, affecting percent change values and some other aggregates.
+- Legend value was not being updated when series axis' range changed. This caused `legendRangeLabelText` to not being updated (if set) when chart was being zoomed-in/out.
+- If a type of `StockChart` series was changed with data grouping enabled, some duplicate candlesticks or ohlc sticks were displayed until first zoom.
+- In some rare cases chart would show incorrect last segment of a `LineSeries` when in percent mode.
+
+
 ## [5.7.7] - 2024-01-18
 
 ### Added

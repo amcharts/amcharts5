@@ -893,7 +893,7 @@ export abstract class Sprite extends Entity {
 	protected _sizeDirty: boolean = false;
 
 	// Will be true only when dragging
-	protected _isDragging: boolean = false;
+	public _isDragging: boolean = false;
 
 	// The event when the dragging starts
 	protected _dragEvent: ISpritePointerEvent | undefined;
@@ -1703,13 +1703,18 @@ export abstract class Sprite extends Entity {
 			let angle = 0;
 
 			let parent = this.parent;
+			let scale = 1;
+
 			while (parent != null) {
 				angle += parent.get("rotation", 0);
-				parent = parent.parent;
+				parent = parent.parent;			
+				if(parent){
+					scale *= parent.get("scale", 1);
+				}
 			}
 
-			let x = e.point.x - dragEvent.point.x;
-			let y = e.point.y - dragEvent.point.y;
+			let x = (e.point.x - dragEvent.point.x) / scale;
+			let y = (e.point.y - dragEvent.point.y) / scale;
 
 			const events = this.events;
 

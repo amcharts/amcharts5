@@ -144,7 +144,7 @@ export class StockChartDefaultTheme extends Theme {
 
 
 		r("Grid", ["renderer", "base", "y"]).setAll({
-			strokeOpacity: 0.15
+			strokeOpacity: 0.4
 		})
 
 		r("Button", ["zoom"]).setAll({

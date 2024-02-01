@@ -111,15 +111,10 @@ export interface IContainerEvents extends ISpriteEvents {
 }
 
 export interface IContainerPrivate extends ISpritePrivate {
-
 	/**
 	 * A `<div>` element used for HTML content of the `Container`.
 	 */
 	htmlElement?: HTMLDivElement;
-
-}
-
-export interface IContainerEvents extends ISpriteEvents {
 }
 
 /**

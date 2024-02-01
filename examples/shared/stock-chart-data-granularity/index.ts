@@ -225,7 +225,7 @@ seriesSwitcher.events.on("selected", function(ev) {
 
 function getNewSettings(series: am5xy.XYSeries) {
   let newSettings: any = [];
-  am5.array.each(["name", "valueYField", "highValueYField", "lowValueYField", "openValueYField", "calculateAggregates", "valueXField", "xAxis", "yAxis", "legendValueText", "stroke", "fill"], function(setting: any) {
+  am5.array.each(["name", "valueYField", "highValueYField", "lowValueYField", "openValueYField", "calculateAggregates", "valueXField", "xAxis", "yAxis", "legendValueText", "legendRangeValueText", "stroke", "fill"], function(setting: any) {
     newSettings[setting] = series.get(setting);
   });
   return newSettings;

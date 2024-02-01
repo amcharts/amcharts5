@@ -306,8 +306,15 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean, ti
 			break;
 
 		case "month":
+			const endDays = date.getUTCDate();
+			const startDays = new Date(date.getUTCFullYear(), date.getUTCMonth(), 0).getUTCDate();
 			let month: number = date.getUTCMonth();
-			date.setUTCMonth(month + count);
+			if (endDays > startDays) {
+				date.setUTCMonth(month + count, startDays);
+			}
+			else {
+				date.setUTCMonth(month + count);
+			}
 			break;
 
 		case "week":

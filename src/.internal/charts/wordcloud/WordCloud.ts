@@ -79,9 +79,10 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	autoFit?: boolean;
 
 	/**
+	 * Progress of current word layout animation. (0-1)
+	 * 
 	 * @readonly
 	 */
-
 	progress?: number;
 
 	/**

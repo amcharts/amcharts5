@@ -14,6 +14,7 @@ export { Ellipse, IEllipseSettings, IEllipsePrivate } from "./.internal/core/ren
 export { Star, IStarSettings, IStarPrivate } from "./.internal/core/render/Star";
 export { Component, DataItem, IComponentSettings, IComponentPrivate, IComponentEvents } from "./.internal/core/render/Component";
 export { Container, IContainerSettings, IContainerPrivate, IContainerEvents } from "./.internal/core/render/Container";
+export { ZoomableContainer, IZoomableContainerSettings, IZoomableContainerPrivate, IZoomableContainerEvents } from "./.internal/core/render/ZoomableContainer";
 export { Graphics, IGraphicsSettings, IGraphicsPrivate, IGraphicsEvents } from "./.internal/core/render/Graphics";
 export { GridLayout } from "./.internal/core/render/GridLayout";
 export { HeatLegend, IHeatLegendSettings, IHeatLegendPrivate } from "./.internal/core/render/HeatLegend";
@@ -41,6 +42,8 @@ export { Tick, ITickSettings, ITickPrivate } from "./.internal/core/render/Tick"
 export { Tooltip, ITooltipSettings, ITooltipPrivate } from "./.internal/core/render/Tooltip";
 export { VerticalLayout } from "./.internal/core/render/VerticalLayout";
 export { Timezone } from "./.internal/core/util/Timezone";
+
+export { ZoomTools, IZoomToolsSettings, IZoomToolsPrivate, IZoomToolsEvents } from "./.internal/core/render/ZoomTools";
 
 export { GrainPattern } from "./.internal/core/render/patterns/GrainPattern";
 export { BlendMode } from "./.internal/core/render/backend/Renderer";
@@ -72,6 +75,7 @@ export { Template } from "./.internal/core/util/Template";
 export { TextFormatter } from "./.internal/core/util/TextFormatter";
 
 export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/core/render/SpriteResizer";
+
 
 export type { IBounds } from "./.internal/core/util/IBounds";
 export type { IGeoPoint } from "./.internal/core/util/IGeoPoint";

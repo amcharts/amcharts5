@@ -1268,6 +1268,8 @@ export class XYChart extends SerialChart {
 		series._markDirtyAxes();
 		yAxis.markDirtyExtremes();
 		xAxis.markDirtyExtremes();
+		xAxis._seriesAdded = true;
+		yAxis._seriesAdded = true;
 
 		this._colorize(series);
 	}

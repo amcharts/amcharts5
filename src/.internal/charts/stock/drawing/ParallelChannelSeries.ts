@@ -18,8 +18,6 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 	declare public _privateSettings: IParallelChannelSeriesPrivate;
 	declare public _dataItemSettings: IParallelChannelSeriesDataItem;
 
-	protected _index: number = 0;
-
 	protected _di: Array<{ [index: string]: DataItem<IParallelChannelSeriesDataItem> }> = []
 	protected _tag = "parallelchannel";
 

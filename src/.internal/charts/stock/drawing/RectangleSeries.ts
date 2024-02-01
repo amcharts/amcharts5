@@ -22,8 +22,6 @@ export class RectangleSeries extends SimpleLineSeries {
 	declare public _privateSettings: IRectangleSeriesPrivate;
 	declare public _dataItemSettings: IRectangleSeriesDataItem;
 
-	protected _index: number = 0;
-
 	protected _di: Array<{ [index: string]: DataItem<IRectangleSeriesDataItem> }> = []
 
 	protected _tag = "rectangle";

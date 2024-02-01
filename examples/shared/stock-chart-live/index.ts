@@ -200,6 +200,7 @@ function getNewSettings(series) {
       "xAxis",
       "yAxis",
       "legendValueText",
+      "legendRangeValueText", 
       "stroke",
       "fill"
     ],

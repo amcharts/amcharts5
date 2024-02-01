@@ -177,7 +177,7 @@ export class HeatLegend extends Container {
 
 			let background = tooltip.get("background");
 			if (background) {
-				background.set("fill", Color.interpolate(c, startColor, endColor))
+				background.set("fill", color)
 			}
 			tooltip.set("pointTo", p);
 			tooltip.show();

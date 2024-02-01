@@ -109,7 +109,6 @@ export class DrawingSeries extends LineSeries {
 	protected _upDp?: IDisposer;
 
 	protected _drawingEnabled: boolean = false;
-	protected _isDragging: boolean = false;
 
 	protected _clickPointerPoint?: IPoint;
 	protected _movePointerPoint?: IPoint;
@@ -117,7 +116,7 @@ export class DrawingSeries extends LineSeries {
 	protected _isDrawing: boolean = false;
 	protected _isPointerDown: boolean = false;
 
-	protected _index: number = 0;
+	public _index: number = 0;
 
 	protected _di: Array<{ [index: string]: DataItem<IDrawingSeriesDataItem> }> = [];
 
