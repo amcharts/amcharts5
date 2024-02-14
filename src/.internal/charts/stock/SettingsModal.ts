@@ -245,12 +245,24 @@ export class SettingsModal extends Modal {
 						const extTarget = option.getAttribute("data-target");
 						if (extTarget) {
 							settingInputs[extTarget].value = option.getAttribute("data-target-value") + "";
+							settingInputs[extTarget].setAttribute("data-min-value", option.getAttribute("data-target-min-value") + "");
 						}
 					});
 					break;
 				case "number":
 					element = this.getNumber(setting, currentValue);
 					settingInputs[key] = <HTMLInputElement>element;
+					if (setting.minValue !== undefined) {
+						element.setAttribute("data-min-value", setting.minValue + "");
+						$utils.addEventListener(element, "change", (ev: any) => {
+							const input: HTMLInputElement = ev.target!;
+							const minValue = Number(input.getAttribute("data-min-value"));
+							const value = Number(input.value);
+							if (value < minValue) {
+								input.value = minValue + "";
+							}
+						});
+					}
 					break;
 				case "color":
 					element = this.getColor(setting, currentValue);
@@ -371,11 +383,17 @@ export class SettingsModal extends Modal {
 					optionElement.text = <string>((<any>option).text);
 					value = ((<any>option).value);
 
+					if ((option as any).minValue) {
+						optionElement.setAttribute("data-min-value", (option as any).minValue);
+					}
 					if ((option as any).extTarget) {
 						optionElement.setAttribute("data-target", (option as any).extTarget);
 					}
 					if ((option as any).extTargetValue) {
 						optionElement.setAttribute("data-target-value", (option as any).extTargetValue);
+					}
+					if ((option as any).extTargetMinValue) {
+						optionElement.setAttribute("data-target-min-value", (option as any).extTargetMinValue);
 					}
 				}
 				else {

@@ -7,8 +7,11 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Added
+- New map of Nepal: `nepal2020*`. Contains updated borders as per Nepal's guidance.
+
 ### Fixed
-- Updated province names in the maps for Nepal.
+- Updated province names in the maps for Nepal (`nepalLow` and `nepalHigh`).
 
 
 ## [5.1.2] - 2023-12-07

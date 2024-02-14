@@ -1118,8 +1118,11 @@ export class XYChart extends SerialChart {
 				if (closestItem) {
 					let series = closestItem.component as XYSeries;
 					series.showDataItemTooltip(closestItem);
+					series.setRaw("tooltipDataItem", closestItem);
+
 					const point = closestItem.get("point");
 					if (point) {
+						
 						// removing x and y to solve #72225
 						cursor.handleMove(series.toGlobal({ x: point.x - series.x(), y: point.y - series.y() }), true);
 					}

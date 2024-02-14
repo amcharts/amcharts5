@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.1] - 2024-02-14
+
+### Changed
+- `VolumeProfile` indicator will now not let select an unreasonably small value for its "ticks per row" setting.
+
+### Fixed
+- Using `DrawingControl` in standalone mode was resulting in error when trying to enable drawing tool from API.
+- Volume profile indicator was taking one extra date which was out of selection in some cases.
+- If `snapToSeries` was set on `XYCursor`, `tooltipDataItem` was set one extra time with incorrect value on `XYSeries`.
+- `XYSeries` was not updating legend if `legendRangeValueText` text was set on series and range was changed from outside without animated theme enabled.
+
+
 ## [5.8.0] - 2024-02-01
 
 ### Added

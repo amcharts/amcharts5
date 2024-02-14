@@ -31,13 +31,21 @@ export interface IIndicatorEditableSetting {
 	type: "color" | "number" | "dropdown" | "checkbox";
 
 	/**
+	 * Minimum numeric value allowable in this field.
+	 *
+	 * @since 5.8.1
+	 */
+	minValue?: number;
+
+	/**
 	 * If `type: "dropdown"`, `options` should contain a list of items it.
 	 */
 	options?: Array<string | {
 		value: number | string,
 		text: string,
 		extTarget?: string,
-		extTargetValue?: number | string
+		extTargetValue?: number | string,
+		extTargetMinValue?: number
 	}>;
 
 }

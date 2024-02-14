@@ -244,6 +244,7 @@ export class DateRangeSelector extends StockControl {
 			to.setHours(23, 59, 59);
 			this.setPrivate("fromDate", from);
 			this.setPrivate("toDate", to);
+			console.log(to);
 			xAxis.zoomToDates(from, to);
 			this._updateLabel();
 			this.set("active", false);
@@ -283,6 +284,7 @@ export class DateRangeSelector extends StockControl {
 
 		this.setPrivate("fromDate", from);
 		this.setPrivate("toDate", to);
+		console.log(to);
 
 		this.getPrivate("fromField").value = this._formatDate(from);
 		this.getPrivate("toField").value = this._formatDate(to);

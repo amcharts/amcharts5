@@ -976,11 +976,15 @@ export abstract class XYSeries extends Series {
 		this.states.create("hidden", <any>{ opacity: 1, visible: false });
 
 		this.onPrivate("startIndex", ()=>{
-			this.updateLegendValue();
+			this.root.events.once("frameended", ()=>{
+				this.updateLegendValue();			
+			})			
 		})
 
-		this.onPrivate("endIndex", ()=>{
-			this.updateLegendValue();
+		this.onPrivate("endIndex", ()=>{			
+			this.root.events.once("frameended", ()=>{
+				this.updateLegendValue();			
+			})
 		})		
 
 		this._makeFieldNames();

@@ -92,13 +92,14 @@ export class VolumeProfile extends Indicator {
 		name: this.root.language.translateAny("Count"),
 		type: "dropdown",
 		options: [
-			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24 },
-			{ value: "ticks", text: this.root.language.translateAny("ticks per row"), extTarget: "count", extTargetValue: 1000 }
+			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24 , extTargetMinValue: 1 },
+			{ value: "ticks", text: this.root.language.translateAny("ticks per row"), extTarget: "count", extTargetValue: 1000, extTargetMinValue: 200 }
 		]
 	}, {
 		key: "count",
 		name: this.root.language.translateAny("Count"),
-		type: "number"
+		type: "number",
+		minValue: 1
 	}, {
 		key: "valueArea",
 		name: this.root.language.translateAny("Value Area"),
@@ -137,10 +138,14 @@ export class VolumeProfile extends Indicator {
 
 				const step = yAxis.getPrivate("step");
 				if (step !== undefined) {
-					(this._editableSettings as any)[0].options[1].extTargetValue = yAxis.getPrivate("step") * 50;
+					const val = yAxis.getPrivate("step") * 50;
+					(this._editableSettings as any)[0].options[1].extTargetValue = val;
+					(this._editableSettings as any)[0].options[1].extTargetMinValue = val * 0.2;
 				}
 				yAxis.onPrivate("step", (step: number) => {
-					(this._editableSettings as any)[0].options[1].extTargetValue = step * 50;
+					const val = step * 50;
+					(this._editableSettings as any)[0].options[1].extTargetValue = val;
+					(this._editableSettings as any)[0].options[1].extTargetMinValue = val * 0.2;
 				});
 
 				const panelXAxis = stockSeries.get("xAxis") as DateAxis<AxisRendererX>;
@@ -270,6 +275,18 @@ export class VolumeProfile extends Indicator {
 				this.markDataDirty();
 			}
 
+			if (this.isDirty("countType")) {
+				const countType = this.get("countType");
+				if (countType == "ticks") {
+					const stockSeries = this.get("stockSeries");
+					const yAxis = stockSeries.get("yAxis") as any;
+					this._editableSettings[1].minValue = yAxis.getPrivate("step") * 50 * 0.2;
+				}
+				else {
+					this._editableSettings[1].minValue = 1;
+				}
+			}
+
 			if (this.isDirty("upColor")) {
 				const upColor = this.get("upColor");
 				this.upSeries.set("fill", upColor);
@@ -311,7 +328,7 @@ export class VolumeProfile extends Indicator {
 		const stockSeries = this.get("stockSeries");
 
 		if (volumeSeries && this.series) {
-			let startIndex = volumeSeries.startIndex();
+			let startIndex = volumeSeries.getPrivate("adjustedStartIndex", volumeSeries.startIndex());
 			let endIndex = volumeSeries.endIndex();
 
 			const count = this.get("count", 20);
