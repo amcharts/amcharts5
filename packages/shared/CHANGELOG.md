@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.2] - 2024-02-16
+
+### Fixed
+- `DateRangeSelector` was sometimes selecting an extra day on `GapplessDateAxis`.
+- DSome leftover console debug messages removed.
+
+
 ## [5.8.1] - 2024-02-14
 
 ### Changed
