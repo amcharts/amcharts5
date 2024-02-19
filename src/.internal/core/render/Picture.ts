@@ -147,20 +147,21 @@ export class Picture extends Sprite {
 	protected _load() {
 		const src = this.get("src");
 		if (src) {
-			let eventType: "loaded" | "loaderror" = "loaded";
 			const image = new Image();
 			image.crossOrigin = this.get("cors", "anonymous");
 			image.src = src!;
 			image.decode().then(() => {
 				this._display.image = image;
 				this._updateSize();
+				if (this.events.isEnabled("loaded")) {
+					this.events.dispatch("loaded", { type: "loaded", target: this });
+				}
 			}).catch((_error: any) => {
-				eventType = "loaderror";
+				if (this.events.isEnabled("loaderror")) {
+					this.events.dispatch("loaderror", { type: "loaderror", target: this });
+				}
 			});
 
-			if (this.events.isEnabled(eventType)) {
-				this.events.dispatch(eventType, { type: eventType, target: this });
-			}
 		}
 	}
 

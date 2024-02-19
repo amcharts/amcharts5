@@ -1079,14 +1079,16 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			$array.each(this.series, (series) => {
 				if (series.get("baseAxis") === this) {
 					const dataItem = this.getSeriesItem(series, position!, this.get("tooltipLocation"));					
+					
+					series._settings.tooltipDataItem = dataItem;
+
 					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
 						series.updateLegendMarker(dataItem);
 						series.updateLegendValue(dataItem);
 					}
 					else {
-						series.setRaw("tooltipDataItem", dataItem);
 						series.showDataItemTooltip(dataItem);
-					}
+					}										
 				}
 			})
 

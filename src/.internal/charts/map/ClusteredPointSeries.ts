@@ -139,8 +139,6 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 	protected _spiral: Array<{ x: number, y: number }> = [];
 
-	protected _clusterDone:boolean = false;
-
 	protected _afterNew() {
 		this.fields.push("groupId");
 		this._setRawDefault("groupIdField", "groupId");
@@ -148,61 +146,59 @@ export class ClusteredPointSeries extends MapPointSeries {
 		super._afterNew();
 	}
 
-	public _prepareChildren() {
-		super._prepareChildren();
+	public _updateChildren() {
+		super._updateChildren();
 
-		if(!this._clusterDone){
-			if (this.isDirty("scatterRadius")) {
-				this._spiral = $math.spiralPoints(0, 0, 300, 300, 0, 3, 3, 0, 0)
-			}
-
-			const groups: { [index: string]: Array<DataItem<IClusteredPointSeriesDataItem>> } = {};
-			// distribute to groups
-			$array.each(this.dataItems, (dataItem) => {
-				const groupId = dataItem.get("groupId", "_default");
-
-				if (!groups[groupId]) {
-					groups[groupId] = [];
-				}
-				groups[groupId].push(dataItem);
-			})
-
-			this._scatterIndex = -1;
-			this._scatters = [];
-			this._clusterIndex = -1;
-			this._clusters = [];
-
-			$array.each(this.clusteredDataItems, (dataItem) => {
-				dataItem.setRaw("children", undefined);
-			})
-
-			$array.each(this.dataItems, (dataItem) => {
-				dataItem.setRaw("cluster", undefined);
-			})
-
-			$object.each(groups, (_key, group) => {
-				this._scatterGroup(group);
-			})
-
-			$object.each(groups, (_key, group) => {
-				this._clusterGroup(group);
-			})
-
-			$array.each(this.dataItems, (dataItem) => {
-				if (!dataItem.get("cluster")) {
-					const bullets = dataItem.bullets;
-					if (bullets) {
-						$array.each(bullets, (bullet) => {
-							const sprite = bullet.get("sprite");
-							if (sprite) {
-								sprite.set("forceHidden", false);
-							}
-						})
-					}
-				}
-			})
-			this._clusterDone = true;
+		if (this.isDirty("scatterRadius")) {
+			this._spiral = $math.spiralPoints(0, 0, 300, 300, 0, 3, 3, 0, 0)
 		}
+
+		const groups: { [index: string]: Array<DataItem<IClusteredPointSeriesDataItem>> } = {};
+		// distribute to groups
+		$array.each(this.dataItems, (dataItem) => {
+			const groupId = dataItem.get("groupId", "_default");
+
+			if (!groups[groupId]) {
+				groups[groupId] = [];
+			}
+			groups[groupId].push(dataItem);
+		})
+
+		this._scatterIndex = -1;
+		this._scatters = [];
+		this._clusterIndex = -1;
+		this._clusters = [];
+
+		$array.each(this.clusteredDataItems, (dataItem) => {
+			dataItem.setRaw("children", undefined);
+		})
+
+		$array.each(this.dataItems, (dataItem) => {
+			dataItem.setRaw("cluster", undefined);
+		})
+
+		$object.each(groups, (_key, group) => {
+			this._scatterGroup(group);
+		})
+
+		$object.each(groups, (_key, group) => {
+			this._clusterGroup(group);
+		})
+
+		$array.each(this.dataItems, (dataItem) => {
+			if (!dataItem.get("cluster")) {
+				const bullets = dataItem.bullets;
+				if (bullets) {
+					$array.each(bullets, (bullet) => {
+						const sprite = bullet.get("sprite");
+						if (sprite) {
+							sprite.set("forceHidden", false);
+						}
+					})
+				}
+			}
+		})
+
 	}
 
 	/**
@@ -333,7 +329,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 			}
 		})
 	}
-	
+
 	protected _onDataClear() {
 		super._onDataClear();
 
@@ -368,11 +364,6 @@ export class ClusteredPointSeries extends MapPointSeries {
 				}
 			})
 		}
-	}
-
-	public _clearDirty(): void {
-		super._clearDirty();
-		this._clusterDone = false;	
 	}
 
 	protected _scatterGroup(dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {

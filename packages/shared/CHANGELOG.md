@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.3] - 2024-02-19
+
+### Fixed
+- `Picture`'s events "loaded" and "loaderror" were kicking in before actual picture was fully loaded/errored.
+- `ClusteredPointSeries` of a `MapChart` were updating clustered bullets with delay and sometimes they remained in a wrong position.
+- `StockChart`'s cursor used to freeze after chart was panned and it was not snapped to Y value (if snapping was enabled) (since `5.8.1`).
+
 ## [5.8.2] - 2024-02-16
 
 ### Fixed

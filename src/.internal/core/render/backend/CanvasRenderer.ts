@@ -728,7 +728,15 @@ function setPoint(bounds: IBounds, point: IPoint): void {
 abstract class Op {
 	public colorize(_context: CanvasRenderingContext2D, _forceColor: string | undefined): void { }
 
+	public colorizeGhost(context: CanvasRenderingContext2D, forceColor: string | undefined): void {
+		this.colorize(context, forceColor);
+	}
+
 	public path(_context: CanvasRenderingContext2D): void { }
+
+	public pathGhost(context: CanvasRenderingContext2D): void {
+		this.path(context);
+	}
 
 	public addBounds(_bounds: IBounds): void { }
 }
@@ -1065,6 +1073,8 @@ class Shadow extends Op {
 		context.shadowOffsetX = this.offsetX;
 		context.shadowOffsetY = this.offsetY;
 	}
+
+	public colorizeGhost(_context: CanvasRenderingContext2D, _forceColor: string | undefined): void {}
 }
 
 /**
@@ -1510,8 +1520,8 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 				}
 
 				if (interactive) {
-					op.path(ghostContext);
-					op.colorize(ghostContext, color);
+					op.pathGhost(ghostContext);
+					op.colorizeGhost(ghostContext, color);
 				}
 			});
 		}
