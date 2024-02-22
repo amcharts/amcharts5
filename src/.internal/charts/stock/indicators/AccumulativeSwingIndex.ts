@@ -70,7 +70,7 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 	protected _axisRange?: ILineSeriesAxisRange;
 	protected _axisRangeDI?: DataItem<IValueAxisDataItem>;
 
-	public _afterNew(){
+	public _afterNew() {
 		this._themeTags.push("accumulativeswingindex");
 		super._afterNew();
 	}
@@ -181,7 +181,12 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 
 						let r = tr - er / 2 + sh / 4;
 
-						asi += 50 * (c - cy + (c - o) / 2 + (cy - oy) / 4) / r * k / t;
+						let dasi = 50 * (c - cy + (c - o) / 2 + (cy - oy) / 4) / r * k / t;
+
+						if ($type.isNumber(dasi)) {
+							asi += dasi;
+						}
+
 
 						let color = positiveColor;
 						if (asi < 0) {

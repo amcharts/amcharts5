@@ -4,6 +4,7 @@ import { OverboughtOversold, IOverboughtOversoldSettings, IOverboughtOversoldPri
 import { LineSeries } from "../../xy/series/LineSeries";
 
 import * as $array from "../../../core/util/Array";
+import * as $type from "../../../core/util/Type";
 
 export interface IStochasticOscillatorSettings extends IOverboughtOversoldSettings {
 	/**
@@ -141,7 +142,7 @@ export class StochasticOscillator extends OverboughtOversold {
 					}
 				}
 
-				if (k == null) {
+				if (k == null || $type.isNaN(k)) {
 					data.push({ valueX: valueX });
 				}
 				else {

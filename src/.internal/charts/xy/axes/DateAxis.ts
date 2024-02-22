@@ -979,6 +979,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		})
 	}
 
+	protected _handleSizeDirty(){
+		// void 
+	}	
+
 	/**
 	 * @ignore
 	 */

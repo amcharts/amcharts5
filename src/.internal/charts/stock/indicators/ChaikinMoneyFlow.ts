@@ -10,7 +10,7 @@ export interface IChaikinMoneyFlowSettings extends IChartIndicatorSettings {
 	/**
 	 * A volume series indicator will be based on, if it reaquires one.
 	 */
-	volumeSeries: XYSeries;	
+	volumeSeries: XYSeries;
 }
 
 export interface IChaikinMoneyFlowPrivate extends IChartIndicatorPrivate {
@@ -48,7 +48,7 @@ export class ChaikinMoneyFlow extends ChartIndicator {
 		type: "color"
 	}];
 
-	public _afterNew(){
+	public _afterNew() {
 		this._themeTags.push("chaikinmoneyflow");
 		super._afterNew();
 	}
@@ -113,7 +113,9 @@ export class ChaikinMoneyFlow extends ChartIndicator {
 						mfv += data[j].mfv;
 						volume += data[j].volume;
 					}
-					dataItem.cmf = mfv / volume;
+					if (volume != 0) {
+						dataItem.cmf = mfv / volume;
+					}
 				}
 				i++;
 			})

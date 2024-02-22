@@ -233,6 +233,36 @@ export class PeriodSelector extends StockControl {
 		return this._getChart().xAxes.getIndex(0)!;
 	}
 
+	protected _getMaxOrMax(which: "min" | "max"): Date {
+		const stockChart = this.get("stockChart");
+		const series = stockChart.get("stockSeries");
+		const axis = this._getAxis();
+		let val = axis.getPrivate(which);
+		if (series && (series.dataItems.length > 0)) {
+			// Get last data item
+			let baseInterval = axis.get("baseInterval");
+			let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
+			const dataSet = series._dataSets[mainDataSetId] || series.dataItems;
+			const dataItem = dataSet[which == "min" ? 0 : dataSet.length - 1];
+			if (which == "min" && dataItem.open !== undefined && dataItem.open["valueX"] !== undefined) {
+				val = dataItem.open["valueX"];
+			}
+			else if (which == "max" && dataItem.close !== undefined && dataItem.close["valueX"] !== undefined) {
+				val = dataItem.close["valueX"] - 1;
+			}
+		}
+		return new Date(val);
+	}
+
+
+	protected _getMax(): Date {
+		return this._getMaxOrMax("max");
+	}
+
+	protected _getMin(): Date {
+		return this._getMaxOrMax("min");
+	}
+
 	public selectPeriod(period: IPeriod): void {
 		const fromStart = this.get("zoomTo", "end") == "start";
 		this._highlightPeriod(period);
@@ -241,17 +271,18 @@ export class PeriodSelector extends StockControl {
 		}
 		else if (period.timeUnit == "custom") {
 			const axis = this._getAxis();
-			let start = period.start || new Date(axis.getPrivate("min"));
-			let end = period.end || new Date(axis.getPrivate("max"));
+			let start = period.start || this._getMin();
+			let end = period.end || this._getMax();
 			axis.zoomToDates(start, end);
 		}
 		else {
 			const axis = this._getAxis();
-			let end = new Date(axis.getPrivate("max"));
+			let end = this._getMax();
 			let start: Date;
 			if (period.timeUnit == "ytd") {
 				start = new Date(end.getFullYear(), 0, 1, 0, 0, 0, 0);
-				end = new Date(axis.getIntervalMax(axis.get("baseInterval")));
+				//end = new Date(axis.getIntervalMax(axis.get("baseInterval")));
+				end = this._getMax();
 				if (axis.get("groupData")) {
 					axis.zoomToDates(start, end, 0);
 					setTimeout(() => {
@@ -274,8 +305,9 @@ export class PeriodSelector extends StockControl {
 						const utc = this._root.utc;
 
 						if (fromStart) {
-							let startTime = axis.getIntervalMin(axis.get("baseInterval"));
-							start = new Date(axis.getPrivate("max"));
+							start = this._getMin();
+							//let startTime = axis.getIntervalMin(axis.get("baseInterval"));
+							let startTime = start.getTime();
 
 							if (startTime != null) {
 								// round to the previuous interval
@@ -288,7 +320,8 @@ export class PeriodSelector extends StockControl {
 						}
 						else {
 							// find max of the base interval
-							let endTime = axis.getIntervalMax(axis.get("baseInterval"));
+							//let endTime = axis.getIntervalMax(axis.get("baseInterval"));
+							let endTime = this._getMax().getTime();
 
 							if (endTime != null) {
 								// round to the future interval
@@ -326,13 +359,14 @@ export class PeriodSelector extends StockControl {
 				}
 
 				if (fromStart) {
-					start = new Date(axis.getPrivate("min"));
+					start = this._getMin();
 					end = $time.add(new Date(start), timeUnit, (period.count || 1));
 				}
 				else {
 					start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1);
 				}
 			}
+
 			axis.zoomToDates(start, end);
 		}
 	}

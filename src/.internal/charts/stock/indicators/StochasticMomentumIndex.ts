@@ -4,6 +4,7 @@ import { OverboughtOversold, IOverboughtOversoldSettings, IOverboughtOversoldPri
 import { LineSeries } from "../../xy/series/LineSeries";
 
 import * as $array from "../../../core/util/Array";
+import * as $type from "../../../core/util/Type";
 
 export interface IStochasticMomentumIndexSettings extends IOverboughtOversoldSettings {
 	/**
@@ -62,7 +63,7 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 				key: "period",
 				name: this.root.language.translateAny("K period"),
 				type: "number"
-			},{
+			}, {
 			key: "seriesColor",
 			name: this.root.language.translateAny("K period"),
 			type: "color"
@@ -74,7 +75,7 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 			key: "emaPeriod",
 			name: this.root.language.translateAny("EMA period"),
 			type: "number"
-		},  {
+		}, {
 			key: "emaColor",
 			name: this.root.language.translateAny("EMA period"),
 			type: "color"
@@ -149,7 +150,7 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 					}
 				}
 
-				if (hhh == null) {
+				if (hhh == null || $type.isNaN(hhh) || hhh === 0) {
 					data.push({ valueX: valueX });
 				}
 				else {

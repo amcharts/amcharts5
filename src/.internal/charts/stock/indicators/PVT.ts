@@ -3,6 +3,7 @@ import type { XYSeries } from "../../xy/series/XYSeries";
 
 import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
 import { LineSeries } from "../../xy/series/LineSeries";
+import * as $type from "../../../core/util/Type";
 
 export interface IPVTSettings extends IChartIndicatorSettings {
 
@@ -87,7 +88,7 @@ export class PVT extends ChartIndicator {
 
 					let c = dataItem.value_y;
 
-					if (c != null) {
+					if (c != null && $type.isNumber(c) && c != 0) {
 						const volumeDI = volumeSeries.dataItems[i];
 						let volume = 0;
 						if (volumeDI) {

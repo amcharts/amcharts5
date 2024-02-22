@@ -125,7 +125,7 @@ export class IconSeries extends PolylineSeries {
 				const dataObject = this.data.getIndex(this.data.length - 1) as any;
 				dataObject.settings = this._getIconTemplate();
 
-				this._index++;
+				this._increaseIndex();
 				this._di[this._index] = {};
 			}
 		}

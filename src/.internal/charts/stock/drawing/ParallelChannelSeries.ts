@@ -38,7 +38,7 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 			if (!this._isDrawing) {
 				if (!this._firstClick) {
 					this._isDrawing = true;
-					this._index++;
+					this._increaseIndex();
 					this._addPoints(event, this._index);
 					this._firstClick = true;
 				}

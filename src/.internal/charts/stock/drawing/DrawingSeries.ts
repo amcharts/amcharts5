@@ -1,7 +1,6 @@
 import type { IDisposer } from "../../../core/util/Disposer";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Color } from "../../../core/util/Color";
-import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { ValueAxis } from "../../xy/axes/ValueAxis";
 import type { DateAxis } from "../../xy/axes/DateAxis";
 import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
@@ -10,6 +9,7 @@ import type { DataItem } from "../../../core/render/Component";
 import type { XYSeries } from "../../xy/series/XYSeries";
 import type { StockPanel } from "../StockPanel";
 import type { StockChart } from "../StockChart";
+import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "../../xy/series/LineSeries";
 import { Bullet } from "../../../core/render/Bullet";
@@ -27,6 +27,7 @@ import * as $object from "../../../core/util/Object";
 
 
 export interface IDrawingSeriesDataItem extends ILineSeriesDataItem {
+
 }
 
 export interface IDrawingSeriesSettings extends ILineSeriesSettings {
@@ -117,6 +118,7 @@ export class DrawingSeries extends LineSeries {
 	protected _isPointerDown: boolean = false;
 
 	public _index: number = 0;
+	public _drawingId?: string;
 
 	protected _di: Array<{ [index: string]: DataItem<IDrawingSeriesDataItem> }> = [];
 
@@ -328,6 +330,29 @@ export class DrawingSeries extends LineSeries {
 	 */
 	public disposeIndex(index: number) {
 		this._disposeIndex(index);
+	}
+
+
+	/**
+	 * Returns index of a drawing with the specific ID, or `null` if not found.
+	 * 
+	 * @param   id  ID
+	 * @return      Index
+	 * @since 5.8.4
+	 */
+	public getIndex(id: string): number | null {
+		let index = null;
+		$array.eachContinue(this.dataItems, (dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			if (dataContext.drawingId == id) {
+				index = dataContext.index;
+				return false;
+			}
+			else {
+				return true;
+			}
+		})
+		return index;
 	}
 
 	protected _disposeIndex(index: number) {
@@ -639,6 +664,15 @@ export class DrawingSeries extends LineSeries {
 				this._handlePointerClick(e);
 			}
 		})
+	}
+
+	public _increaseIndex() {
+		this._index++;
+		this._drawingId = this._generateId();
+	}
+
+	protected _generateId(): string {
+		return "" + new Date().getTime() + Math.round(Math.random() * 10000);
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {

@@ -1,4 +1,5 @@
 import { OverboughtOversold, IOverboughtOversoldSettings, IOverboughtOversoldPrivate, IOverboughtOversoldEvents } from "./OverboughtOversold";
+import * as $type from "../../../core/util/Type";
 
 export interface ICommodityChannelIndexSettings extends IOverboughtOversoldSettings { }
 
@@ -56,13 +57,16 @@ export class CommodityChannelIndex extends OverboughtOversold {
 
 				let meanDeviation = 0;
 				if (i >= period - 1) {
-
 					for (let j = i; j > i - period; j--) {
 						let di = data[j];
 						meanDeviation += Math.abs(di.value_y - ma)
 					}
 					meanDeviation = meanDeviation / period;
-					dataItem.valueS = (value - ma) / (0.015 * meanDeviation);
+
+					let valueS = (value - ma) / (0.015 * meanDeviation);
+					if ($type.isNumber(valueS)) {
+						dataItem.valueS = valueS;
+					}
 				}
 			}
 

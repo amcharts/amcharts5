@@ -32,7 +32,7 @@ export class PolylineSeries extends DrawingSeries {
 			super._handlePointerClick(event);
 
 			if (event.target.get("userData") == "grip") {
-				this._endPolyline(event.target.dataItem);
+				this._endPolyline(event.target.dataItem as DataItem<this["_dataItemSettings"]>);
 			}
 			else {
 				if (!this._isDragging) {
@@ -43,7 +43,7 @@ export class PolylineSeries extends DrawingSeries {
 					}
 
 					if (this._pIndex == 0) {
-						this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: "e" });
+						this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: "e", drawingId: this._drawingId });
 					}
 					this._drawingLine.show();
 					this._addPoint(event);
@@ -95,7 +95,7 @@ export class PolylineSeries extends DrawingSeries {
 			const dataItems = this.dataItems;
 			const len = dataItems.length;
 
-			this.data.push({ valueY: valueY, valueX: valueX, index: this._index, corner: this._pIndex });
+			this.data.push({ valueY: valueY, valueX: valueX, index: this._index, corner: this._pIndex, drawingId: this._drawingId });
 			this.setPrivate("startIndex", 0);
 			this.setPrivate("endIndex", len);
 
@@ -119,7 +119,7 @@ export class PolylineSeries extends DrawingSeries {
 			const index = dataContext.index;
 
 			if (dataContext.corner == 0) {
-				this.data.push({ valueX: dataItem.get("valueX"), valueY: dataItem.get("valueY"), index: index, corner: this._pIndex + 1, closing: true })
+				this.data.push({ valueX: dataItem.get("valueX"), valueY: dataItem.get("valueY"), index: index, corner: this._pIndex + 1, closing: true, drawingId: this._drawingId })
 
 				const dataItems = this.dataItems;
 				const len = dataItems.length - 1;
@@ -131,7 +131,7 @@ export class PolylineSeries extends DrawingSeries {
 				this._positionBullets(dataItem);
 				this._setXLocation(dataItem, dataItem.get("valueX", 0));
 			}
-			this.data.push({ stroke: this._getStrokeTemplate(), index: index + 1, corner: "e" });
+			this.data.push({ stroke: this._getStrokeTemplate(), index: index + 1, corner: "e", drawingId: this._drawingId });
 			this._drawingLine.hide();
 		}
 	}

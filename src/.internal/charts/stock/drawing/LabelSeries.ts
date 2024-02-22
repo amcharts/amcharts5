@@ -166,7 +166,7 @@ export class LabelSeries extends PolylineSeries {
 		if (this._drawingEnabled) {
 			if (!this._isHover) {
 
-				this._index++;
+				this._increaseIndex();
 				this._di[this._index] = {};
 
 				const input = this.getPrivate("input");

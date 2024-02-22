@@ -3,6 +3,7 @@ import { LineSeries } from "../../xy/series/LineSeries";
 import type { Color } from "../../../core/util/Color";
 
 import * as $array from "../../../core/util/Array";
+import * as $type from "../../../core/util/Type";
 
 export interface IRelativeStrengthIndexSettings extends IOverboughtOversoldSettings {
 	/**
@@ -106,7 +107,7 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 			$array.each(dataItems, (dataItem) => {
 				let rsi = null;
 				i++;
-
+	
 				if (i == period + 1) {
 					for (let j = 1; j <= period; j++) {
 						let value = this._getValue(dataItems[j]);
@@ -114,7 +115,7 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 						if (value != undefined && prevValue != undefined) {
 							let change = value - prevValue;
 
-							if (change > 0) {
+							if (change >= 0) {
 								averageGain += change / period;
 							}
 							else {
@@ -124,6 +125,10 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 					}
 
 					rsi = 100 - (100 / (1 + averageGain / averageLoss));
+
+					if($type.isNaN(rsi)){
+						rsi = 0;
+					}
 				}
 				else if (i > period) {
 					let value = this._getValue(dataItem);
@@ -145,6 +150,11 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 						averageLoss = (prevAverageLoss * (period - 1) + loss) / period;
 
 						rsi = 100 - (100 / (1 + averageGain / averageLoss));
+
+
+						if(isNaN(rsi)){
+							rsi = 0;
+						}						
 					}
 				}
 

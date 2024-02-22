@@ -53,10 +53,10 @@ export class DoodleSeries extends DrawingSeries {
 			const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueX);
 
 			const index = this._index;
-			this.data.push({ valueY: valueY, valueX: valueX, index:index, corner:this._pIndex });
+			this.data.push({ valueY: valueY, valueX: valueX, index: index, corner: this._pIndex, drawingId: this._drawingId });
 			const len = this.dataItems.length;
 
-			const dataItem = this.dataItems[len - 1];			
+			const dataItem = this.dataItems[len - 1];
 			this._setXLocation(dataItem, valueX);
 
 			let segmentItems = this._di[index];
@@ -82,7 +82,7 @@ export class DoodleSeries extends DrawingSeries {
 		super._handlePointerDown(event);
 		const chart = this.chart;
 		if (chart) {
-			this._index++;
+			this._increaseIndex();
 			this._pIndex = 0;
 
 			this._panX = chart.get("panX");
@@ -96,7 +96,7 @@ export class DoodleSeries extends DrawingSeries {
 				cursor.setPrivate("visible", false);
 			}
 
-			this.data.push({ stroke: this._getStrokeTemplate(), index:this._index, corner:this._pIndex });			
+			this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: this._pIndex, drawingId: this._drawingId });
 		}
 	}
 

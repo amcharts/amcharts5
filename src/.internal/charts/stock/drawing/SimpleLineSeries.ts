@@ -219,7 +219,7 @@ export class SimpleLineSeries extends DrawingSeries {
 		if (!this._isDragging) {
 			if (!this._isDrawing) {
 				this._isDrawing = true;
-				this._index++;
+				this._increaseIndex();
 				this._addPoints(event, this._index);
 			}
 			else {
@@ -308,7 +308,7 @@ export class SimpleLineSeries extends DrawingSeries {
 	}
 
 	protected _addTemplates(index: number) {
-		this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index, showExtension: this.get("showExtension", true), corner: "e" });
+		this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index, showExtension: this.get("showExtension", true), corner: "e", drawingId: this._drawingId });
 	}
 
 	protected _addPoints(event: ISpritePointerEvent, index: number) {
@@ -332,7 +332,7 @@ export class SimpleLineSeries extends DrawingSeries {
 	}
 
 	protected _addPoint(valueX: number, valueY: number, corner: string, index: number) {
-		this.data.push({ valueY: valueY, valueX: valueX, corner: corner, index: index });
+		this.data.push({ valueY: valueY, valueX: valueX, corner: corner, index: index, drawingId: this._drawingId });
 	}
 
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {

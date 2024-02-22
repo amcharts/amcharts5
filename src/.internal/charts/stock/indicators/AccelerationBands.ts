@@ -81,18 +81,18 @@ export class AccelerationBands extends Indicator {
 
         if (chart) {
 
-			const series = chart.series.push(LineSeries.new(this._root, {
-				valueXField: "valueX",
-				valueYField: "average",
-				groupDataDisabled: true,
-				calculateAggregates: true,
-				xAxis: stockSeries.get("xAxis"),
-				yAxis: stockSeries.get("yAxis"),
-				themeTags: ["indicator", "accelerationbands", "average"]
-			}))
+            const series = chart.series.push(LineSeries.new(this._root, {
+                valueXField: "valueX",
+                valueYField: "average",
+                groupDataDisabled: true,
+                calculateAggregates: true,
+                xAxis: stockSeries.get("xAxis"),
+                yAxis: stockSeries.get("yAxis"),
+                themeTags: ["indicator", "accelerationbands", "average"]
+            }))
 
-			series.setPrivate("baseValueSeries", stockSeries);
-			this.series = series;
+            series.setPrivate("baseValueSeries", stockSeries);
+            this.series = series;
 
             const upperBandSeries = chart.series.push(LineSeries.new(this._root, {
                 valueXField: "valueX",
@@ -122,7 +122,7 @@ export class AccelerationBands extends Indicator {
             lowerBandSeries.setPrivate("baseValueSeries", stockSeries);
             this.lowerBandSeries = lowerBandSeries;
         }
-        
+
         this._handleLegend(this.series);
 
         super._afterNew();
@@ -177,7 +177,7 @@ export class AccelerationBands extends Indicator {
             const stockSeries = this.get("stockSeries");
             const dataItems = stockSeries.dataItems;
 
-			let data = this._getDataArray(dataItems);            
+            let data = this._getDataArray(dataItems);
             let factor = this.get("factor", 0.001);
 
             let i = 0;
@@ -189,7 +189,7 @@ export class AccelerationBands extends Indicator {
                     let low = stockDataItem.get("lowValueY");
                     let high = stockDataItem.get("highValueY");
 
-                    if ($type.isNumber(low) && $type.isNumber(high)) {
+                    if ($type.isNumber(low) && $type.isNumber(high) && high + low != 0) {
                         dataItem._lower = (high * (1 + 2 * ((((high - low) / ((high + low) / 2)) * 1000) * factor)));
                         dataItem._upper = (low * (1 - 2 * ((((high - low) / ((high + low) / 2)) * 1000) * factor)));
                         dataItem._average = dataItem._lower + (dataItem._upper - dataItem._lower) / 2;

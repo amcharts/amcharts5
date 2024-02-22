@@ -201,6 +201,7 @@ export class XYChartDefaultTheme extends Theme {
 			const rule = r("Grid", ["cursor", "x"]);
 
 			rule.setAll({
+				forceInactive: true,
 				strokeOpacity: 0.8,
 				strokeDasharray: [2, 2],
 				ariaLabel: language.translate("Use left and right arrows to move selection")
@@ -213,6 +214,7 @@ export class XYChartDefaultTheme extends Theme {
 			const rule = r("Grid", ["cursor", "y"]);
 
 			rule.setAll({
+				forceInactive: true,
 				strokeOpacity: 0.8,
 				strokeDasharray: [2, 2],
 				ariaLabel: language.translate("Use up and down arrows to move selection")

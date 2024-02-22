@@ -72,7 +72,7 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (!this._isDragging) {
-			this._index++;
+			this._increaseIndex();
 			this._addPoints(event, this._index);
 			this._isDrawing = false;
 		}

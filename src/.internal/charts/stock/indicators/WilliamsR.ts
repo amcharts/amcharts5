@@ -66,7 +66,9 @@ export class WilliamsR extends OverboughtOversold {
 					}
 				}
 
-				dataItem.valueS = -100 * (h - dataItem.value_y) / (h - l);
+				if (h - l != 0) {
+					dataItem.valueS = -100 * (h - dataItem.value_y) / (h - l);
+				}
 			}
 
 			this.series.data.setAll(data);

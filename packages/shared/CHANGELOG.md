@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.4] - 2024-02-22
+
+### Added
+- New `DrawingSeries` method: `getIndex(drawingId)`. Will return index of a drawing corresponding to a unique id, or `null` if not found.
+
+### Changed
+- `PeriodSelector` will now zoom to last/first data items if `stockSeries` is set on `StockChart`. Previously it used to zoom to X-axis scale end/start, regardless of data.
+- All `DrawingSeries` will now add a unique `drawingId` to all drawing data.
+- Stock indicatos adjusted so that they could handle data with negative values, `0` volume values and all OHLC values being equal.
+
+### Fixed
+- Scale of a `ValueAxis` was not adjusting properly if its height/width changed during zoom.
+- Standalone `DrawingControl` (one that was not added to a toolbar) was erroring out when parent `Root` was disposed.
+- HTML content in a `Label` (with `html` set) was not inheriting labels actual color (`fill`).
+- Setting a `selectedDataItem` to a data item without children on a `Hierarchy` series was resulting in error.
+- Heat rules were setting "neutral" color on the default state of a target even if it was undefined, resulting in some issues when value was not set.
+- Heat rules were ignoring `customFunction` if value was not set.
+
+
 ## [5.8.3] - 2024-02-19
 
 ### Fixed

@@ -898,7 +898,7 @@ export abstract class Hierarchy extends Series {
 				}
 			}
 			else {
-				this.enableDataItem(this.dataItems[0], downDepth, 0);
+				this.enableDataItem(dataItem, downDepth);
 			}
 
 			this._root.events.once("frameended", () => {

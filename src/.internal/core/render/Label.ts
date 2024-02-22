@@ -344,6 +344,11 @@ export class Label extends Container {
 		}
 		else {
 			this._text.set("text", this.get("text"));
+			this._maybeUpdateHTMLColor();
+		}
+
+		if (this.isDirty("fill")) {
+			this._maybeUpdateHTMLColor();
 		}
 
 		if (this.isDirty("textAlign") || this.isDirty("width")) {
@@ -370,6 +375,13 @@ export class Label extends Container {
 			}
 
 			this.text.set("x", x);
+		}
+	}
+
+	protected _maybeUpdateHTMLColor() {
+		const htmlElement = this.getPrivate("htmlElement");
+		if (htmlElement && this.get("fill")) {
+			htmlElement.style.color = this.get("fill")!.toCSSHex();
 		}
 	}
 

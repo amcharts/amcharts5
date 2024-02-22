@@ -360,14 +360,16 @@ export class Treemap extends Hierarchy {
 	protected _getVisibleNodes(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth: number) {
 		const children = dataItem.get("children");
 		let includedChildren: Array<DataItem<this["_dataItemSettings"]>> = [];
-		$array.each(children, (child) => {
-			if (child.get("depth") == maxDepth || !child.get("children")) {
-				includedChildren.push(child);
-			}
-			else {
-				includedChildren = includedChildren.concat(this._getVisibleNodes(child, maxDepth));
-			}
-		});
+		if(children){
+			$array.each(children, (child) => {
+				if (child.get("depth") == maxDepth || !child.get("children")) {
+					includedChildren.push(child);
+				}
+				else {
+					includedChildren = includedChildren.concat(this._getVisibleNodes(child, maxDepth));
+				}
+			});
+		}
 		return includedChildren;
 	}
 

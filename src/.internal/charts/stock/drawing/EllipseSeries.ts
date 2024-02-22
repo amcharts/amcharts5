@@ -214,7 +214,7 @@ export class EllipseSeries extends DrawingSeries {
 
 			if (!this._isDragging) {
 				if (!this._isDrawing) {
-					this._index++;
+					this._increaseIndex();
 					this._isDrawing = true;
 					this.bulletsContainer.show();
 					this._addPoints(event, this._index);
@@ -289,7 +289,7 @@ export class EllipseSeries extends DrawingSeries {
 		const chart = this.chart;
 
 		if (chart) {
-			this.data.push({ settings: this._getEllipseTemplate(), stroke: this._getStrokeTemplate(), index: index, corner: "e" });
+			this.data.push({ settings: this._getEllipseTemplate(), stroke: this._getStrokeTemplate(), index: index, corner: "e", drawingId: this._drawingId });
 
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
@@ -308,11 +308,13 @@ export class EllipseSeries extends DrawingSeries {
 			this._addPoint(valueX, valueY, "t", index);
 			this._addPoint(valueX, valueY, "b", index);
 			this._addPoint(valueX, valueY, "r", index);
+
+			console.log(this.data)
 		}
 	}
 
 	protected _addPoint(valueX: number, valueY: number, corner: string, index: number) {
-		this.data.push({ valueY: valueY, valueX: valueX, index: index, corner: corner });
+		this.data.push({ valueY: valueY, valueX: valueX, index: index, corner: corner, drawingId: this._drawingId });
 		const len = this.dataItems.length;
 		const dataItem = this.dataItems[len - 1];
 		if (dataItem) {

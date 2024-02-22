@@ -410,6 +410,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._dirtyExtremes = false;
 		}
 
+		this._handleSizeDirty();		
+
 		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
 			this._getSelectionMinMax();
 			this._dirtySelectionExtremes = false;
@@ -425,6 +427,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		this._baseValue = this.baseValue();
 
+	}
+
+	protected _handleSizeDirty(){
+		if(this._sizeDirty){
+			this._dirtySelectionExtremes = true;
+		}
 	}
 
 	protected _groupData() {

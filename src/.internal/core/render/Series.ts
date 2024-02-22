@@ -672,6 +672,7 @@ export abstract class Series extends Component {
 				const maxValue = rule.maxValue || this.getPrivate(<any>(rule.dataField + "High")) || 0;
 
 				$array.each(rule.target._entities, (target) => {
+
 					const value = target.dataItem.get(rule.dataField);
 
 					if (!$type.isNumber(value)) {
@@ -682,12 +683,13 @@ export abstract class Series extends Component {
 						const states = target.states;
 						if(states){
 							const defaultState = states.lookup("default");
-							if(defaultState){
+							if(defaultState && rule.neutral){
 								defaultState.set(rule.key, rule.neutral);
 							}						
-						}					
-
-						return;
+						}
+						if(!rule.customFunction){
+							return;
+						}
 					}
 
 					if (rule.customFunction) {
