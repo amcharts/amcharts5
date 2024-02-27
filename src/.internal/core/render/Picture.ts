@@ -153,11 +153,11 @@ export class Picture extends Sprite {
 			image.decode().then(() => {
 				this._display.image = image;
 				this._updateSize();
-				if (this.events.isEnabled("loaded")) {
+				if (!this.events.isDisposed() && this.events.isEnabled("loaded")) {
 					this.events.dispatch("loaded", { type: "loaded", target: this });
 				}
 			}).catch((_error: any) => {
-				if (this.events.isEnabled("loaderror")) {
+				if (!this.events.isDisposed() && this.events.isEnabled("loaderror")) {
 					this.events.dispatch("loaderror", { type: "loaderror", target: this });
 				}
 			});
