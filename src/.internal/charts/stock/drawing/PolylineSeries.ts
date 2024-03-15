@@ -41,8 +41,9 @@ export class PolylineSeries extends DrawingSeries {
 					if (this._index == 0) {
 						this._index = 1;
 					}
-
+					
 					if (this._pIndex == 0) {
+						this._increaseIndex();
 						this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: "e", drawingId: this._drawingId });
 					}
 					this._drawingLine.show();

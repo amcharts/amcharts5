@@ -1122,7 +1122,7 @@ export class XYChart extends SerialChart {
 
 					const point = closestItem.get("point");
 					if (point) {
-						
+
 						// removing x and y to solve #72225
 						cursor.handleMove(series.toGlobal({ x: point.x - series.x(), y: point.y - series.y() }), true);
 					}
@@ -1192,6 +1192,12 @@ export class XYChart extends SerialChart {
 						this._handleScrollbar(this.xAxes, e.start, e.end, e.grip);
 					}))
 
+					this._pushPropertyDisposer("scrollbarX", scrollbarX.events.on("released", () => {
+						this.xAxes.each((axis) => {
+							this._handleAxisSelection(axis);
+						})
+					}))
+
 					// Used to populate `ariaLabel` with meaningful values
 					scrollbarX.setPrivate("positionTextFunction", (position: number) => {
 						const axis = this.xAxes.getIndex(0);
@@ -1219,6 +1225,12 @@ export class XYChart extends SerialChart {
 
 					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("rangechanged", (e) => {
 						this._handleScrollbar(this.yAxes, e.start, e.end, e.grip);
+					}))
+
+					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("released", () => {
+						this.yAxes.each((axis) => {
+							this._handleAxisSelection(axis);
+						})
 					}))
 
 					// Used to populate `ariaLabel` with meaningful values

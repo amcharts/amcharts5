@@ -33,29 +33,29 @@ import * as $math from "../util/Math";
  */
 class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> extends EventDispatcher<E> {
 	protected static RENDERER_EVENTS: { [K in keyof IRendererEvents]?: <E extends Events<Sprite, ISpriteEvents>>(this: SpriteEventDispatcher<Sprite, E>, event: IRendererEvents[K]) => void } = {
-		"click": function(event) {
+		"click": function (event) {
 			if (this.isEnabled("click") && !this._sprite.isDragging() && this._sprite._hasDown() && !this._sprite._hasMoved(this._makePointerEvent("click", event))) {
 				this.dispatch("click", this._makePointerEvent("click", event));
 			}
 		},
 
-		"rightclick": function(event) {
+		"rightclick": function (event) {
 			if (this.isEnabled("rightclick")) {
 				this.dispatch("rightclick", this._makePointerEvent("rightclick", event));
 			}
 		},
 
-		"middleclick": function(event) {
+		"middleclick": function (event) {
 			if (this.isEnabled("middleclick")) {
 				this.dispatch("middleclick", this._makePointerEvent("middleclick", event));
 			}
 		},
 
-		"dblclick": function(event) {
+		"dblclick": function (event) {
 			this.dispatchParents("dblclick", this._makePointerEvent("dblclick", event));
 		},
 
-		"pointerover": function(event) {
+		"pointerover": function (event) {
 
 			const sprite = this._sprite;
 			let dispatch = true;
@@ -63,6 +63,16 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			if (sprite.getPrivate("trustBounds")) {
 				sprite._getBounds()
 				const bounds = sprite.globalBounds();
+
+				if (sprite.isType<Graphics>("Graphics")) {
+					const strokeWidth = sprite.get("strokeWidth", 1) / 2;
+					if (strokeWidth >= 1) {
+						bounds.left -= strokeWidth;
+						bounds.right += strokeWidth;
+						bounds.top -= strokeWidth;
+						bounds.bottom += strokeWidth;
+					}
+				}
 
 				if (!$math.inBounds(event.point, bounds)) {
 					dispatch = false;
@@ -75,35 +85,35 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			}
 		},
 
-		"pointerout": function(event) {
+		"pointerout": function (event) {
 			if (this.isEnabled("pointerout")) {
 				this.dispatch("pointerout", this._makePointerEvent("pointerout", event));
 			}
 		},
 
-		"pointerdown": function(event) {
+		"pointerdown": function (event) {
 			this.dispatchParents("pointerdown", this._makePointerEvent("pointerdown", event));
 		},
 
-		"pointerup": function(event) {
+		"pointerup": function (event) {
 			if (this.isEnabled("pointerup")) {
 				this.dispatch("pointerup", this._makePointerEvent("pointerup", event));
 			}
 		},
 
-		"globalpointerup": function(event) {
+		"globalpointerup": function (event) {
 			if (this.isEnabled("globalpointerup")) {
 				this.dispatch("globalpointerup", this._makePointerEvent("globalpointerup", event));
 			}
 		},
 
-		"globalpointermove": function(event) {
+		"globalpointermove": function (event) {
 			if (this.isEnabled("globalpointermove")) {
 				this.dispatch("globalpointermove", this._makePointerEvent("globalpointermove", event));
 			}
 		},
 
-		"wheel": function(event) {
+		"wheel": function (event) {
 			this.dispatchParents("wheel", {
 				type: "wheel",
 				target: this._sprite,
@@ -1458,7 +1468,7 @@ export abstract class Sprite extends Entity {
 
 		if (this.isDirty("interactive")) {
 			const events = this.events;
-			if (this.get("interactive")) {
+			if (this.get("interactive") && !events.isDisposed()) {
 				this._hoverDp = new MultiDisposer([
 					events.on("click", (ev) => {
 						if ($utils.isTouchEvent(ev.originalEvent)) {
@@ -1707,8 +1717,8 @@ export abstract class Sprite extends Entity {
 
 			while (parent != null) {
 				angle += parent.get("rotation", 0);
-				parent = parent.parent;			
-				if(parent){
+				parent = parent.parent;
+				if (parent) {
 					scale *= parent.get("scale", 1);
 				}
 			}

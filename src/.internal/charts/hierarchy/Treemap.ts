@@ -134,6 +134,8 @@ export class Treemap extends Hierarchy {
 		super._afterNew();
 		this.setPrivate("scaleX", 1);
 		this.setPrivate("scaleY", 1);
+
+		this.nodes.template.setPrivate("trustBounds", true);
 	}
 
 	public _prepareChildren() {

@@ -23,6 +23,14 @@ export interface IStockControlSettings extends IEntitySettings {
 	visible?: boolean;
 
 	/**
+	 * Force this control to always be invisible.
+	 *
+	 * @since 5.8.5
+	 * @defaul false
+	 */
+	forceHidden?: boolean;
+
+	/**
 	 * Name of the control. Used for the label.
 	 */
 	name?: string;
@@ -171,6 +179,10 @@ export class StockControl extends Entity {
 			this.getPrivate("button")!.style.display = "none";
 		}
 
+		if (this.isDirty("forceHidden") && this.get("forceHidden")) {
+			this.getPrivate("button")!.style.display = "none";
+		}
+
 		if (this.isDirty("name")) {
 			this._setLabel(this.get("name", ""));
 		}
@@ -225,7 +237,9 @@ export class StockControl extends Entity {
 	}
 
 	public show(): void {
-		this.getPrivate("button")!.style.display = "";
+		if (this.get("forceHidden") !== true) {
+			this.getPrivate("button")!.style.display = "";
+		}
 	}
 
 	protected _handleClick(): void {

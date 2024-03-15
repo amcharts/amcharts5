@@ -136,17 +136,23 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * Sensitivity of a mouse wheel.
 	 *
+	 * NOTE: this setting is ignored when `wheelX` or `wheelY` is set to `"zoom"`.
+	 *
 	 * @default 1
 	 */
 	wheelSensitivity?: number;
 
 	/**
 	 * Duration of mouse-wheel action animation, in milliseconds.
+	 *
+	 * NOTE: this setting is ignored when `wheelX` or `wheelY` is set to `"zoom"`.
 	 */
 	wheelDuration?: number;
 
 	/**
 	 * An easing function to use for mouse wheel action animations.
+	 *
+	 * NOTE: this setting is ignored when `wheelX` or `wheelY` is set to `"zoom"`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 * @default am5.ease.out($ease.cubic)
@@ -720,6 +726,9 @@ export class MapChart extends SerialChart {
 		}
 		if (!license) {
 			this._root._showBranding();
+		}
+		else {
+			this._root._licenseApplied();
 		}
 
 		this._setUpTouch();

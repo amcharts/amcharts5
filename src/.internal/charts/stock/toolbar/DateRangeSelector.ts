@@ -63,6 +63,15 @@ export interface IDateRangeSelectorPrivate extends IStockControlPrivate {
 }
 
 export interface IDateRangeSelectorEvents extends IStockControlEvents {
+	/**
+	 * Invoked when user selects certain date range via control.
+	 *
+	 * @from 5.8.5
+	 */
+	rangeselected: {
+		fromDate: Date;
+		toDate: Date;
+	}
 }
 
 /**
@@ -247,6 +256,16 @@ export class DateRangeSelector extends StockControl {
 			xAxis.zoomToDates(from, to);
 			this._updateLabel();
 			this.set("active", false);
+
+			const type = "rangeselected";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, {
+					type: type,
+					target: this,
+					fromDate: from,
+					toDate: to
+				});
+			}
 		});
 
 		const cancelButton = document.createElement("input");
@@ -331,10 +350,10 @@ export class DateRangeSelector extends StockControl {
 		}
 
 		if (maxDate == "auto") {
-			const min = xAxis.getPrivate("maxFinal") - 1;
-			if (min) {
-				fromPicker.set("maxDate", new Date(min));
-				toPicker.set("maxDate", new Date(min));
+			const max = xAxis.getPrivate("maxFinal") - 1;
+			if (max) {
+				fromPicker.set("maxDate", new Date(max));
+				toPicker.set("maxDate", new Date(max));
 			}
 		}
 		else if (maxDate instanceof Date) {
@@ -361,7 +380,7 @@ export class DateRangeSelector extends StockControl {
 	}
 
 	protected _formatDate(date: Date): string {
-		return this._root.dateFormatter.format(date, this._getDateFormat());
+		return this._root.dateFormatter.format(date, this._getDateFormat(), true);
 	}
 
 	protected _parseDate(date: string): Date {

@@ -172,6 +172,7 @@ export class Root implements IDisposer {
 	protected _settings: IRootSettings;
 	protected _isDirty: boolean = false;
 	protected _isDirtyParents: boolean = false;
+	protected _isDirtyAnimation: boolean = false;
 	protected _dirty: { [id: number]: Entity } = {};
 	protected _dirtyParents: { [id: number]: IParent } = {};
 	protected _dirtyBounds: { [id: number]: IBounds } = {};
@@ -937,6 +938,8 @@ export class Root implements IDisposer {
 			}
 		});
 
+		this._isDirtyAnimation = false;
+
 		return running === 0;
 	}
 
@@ -1064,6 +1067,7 @@ export class Root implements IDisposer {
 
 			return this._tickers.length === 0 &&
 				animationDone &&
+				!this._isDirtyAnimation &&
 				!this._isDirty;
 
 		} else {
@@ -1183,6 +1187,8 @@ export class Root implements IDisposer {
 	}
 
 	public _addAnimation(animation: IAnimation) {
+		this._isDirtyAnimation = true;
+
 		// TODO use numeric id instead
 		if (this._animations.indexOf(animation) === -1) {
 			this._animations.push(animation);

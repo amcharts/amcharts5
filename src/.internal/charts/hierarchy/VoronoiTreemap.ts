@@ -146,6 +146,8 @@ export class VoronoiTreemap extends Hierarchy {
 			centerY: p50
 		})
 
+		this.nodes.template.setPrivate("trustBounds", true);
+
 		super._afterNew();
 	}
 

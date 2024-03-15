@@ -588,7 +588,9 @@ export abstract class Hierarchy extends Series {
 
 			this._index++;
 
-			dataItem.get("node").set("disabled", dataItem.get("disabled"));
+			this.root.events.once("frameended", ()=>{
+				dataItem.get("node").set("disabled", dataItem.get("disabled"));
+			})
 
 			let dataValue = d3HierarchyNode.data.value;
 			let value = d3HierarchyNode.value

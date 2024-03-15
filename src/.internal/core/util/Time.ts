@@ -470,6 +470,18 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 
 			case "week":
 
+				if (count > 1) {
+					if (firstDate) {
+						firstDate = round(firstDate, "week", 1);
+
+						let difference = date.getTime() - firstDate.getTime();
+						let unitCount = Math.floor(difference / getDuration("week") / count);
+						let duration = getDuration("week", unitCount * count);
+
+						date.setTime(firstDate.getTime() + duration - timeZoneOffset * getDuration("minute"));
+					}
+				}
+
 				let wday = date.getUTCDate();
 				let weekDay = date.getUTCDay();
 
@@ -633,6 +645,8 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		return date;
 	}
 }
+
+
 
 /**
  * @ignore

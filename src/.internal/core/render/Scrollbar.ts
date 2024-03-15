@@ -63,6 +63,7 @@ export interface IScrollbarEvents extends IContainerEvents {
 	 */
 	rangechanged: { start: number, end: number, grip?: "start" | "end" };
 
+	released:{};
 }
 
 /**
@@ -231,6 +232,7 @@ export class Scrollbar extends Container {
 		this._disposers.push(startGrip.events.on("globalpointerup", () => {
 			if (this._startDown) {
 				this.setPrivateRaw("isBusy", false);
+				this._released();
 			}
 			this._startDown = false;
 		}))
@@ -238,6 +240,7 @@ export class Scrollbar extends Container {
 		this._disposers.push(endGrip.events.on("globalpointerup", () => {
 			if (this._endDown) {
 				this.setPrivateRaw("isBusy", false);
+				this._released();
 			}
 			this._endDown = false;
 		}))
@@ -245,6 +248,7 @@ export class Scrollbar extends Container {
 		this._disposers.push(thumb.events.on("globalpointerup", () => {
 			if (this._thumbDown) {
 				this.setPrivateRaw("isBusy", false);
+				this._released();
 			}
 			this._thumbDown = false;
 		}))
@@ -343,6 +347,13 @@ export class Scrollbar extends Container {
 				this.events.dispatch(eventType, { type: eventType, target: this, start: this.get("start", 0), end: this.get("end", 1), grip: this._gripDown });
 			}
 		}
+	}
+
+	protected _released(){
+		const eventType = "released";
+		if (this.events.isEnabled(eventType)) {
+			this.events.dispatch(eventType, { type: eventType, target: this });
+		}		
 	}
 
 	/**

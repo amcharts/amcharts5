@@ -150,15 +150,17 @@ export class Picture extends Sprite {
 			const image = new Image();
 			image.crossOrigin = this.get("cors", "anonymous");
 			image.src = src!;
+			const events = this.events;
+			
 			image.decode().then(() => {
 				this._display.image = image;
 				this._updateSize();
-				if (this.events.isEnabled("loaded")) {
-					this.events.dispatch("loaded", { type: "loaded", target: this });
+				if (!events.isDisposed() && events.isEnabled("loaded")) {
+					events.dispatch("loaded", { type: "loaded", target: this });
 				}
 			}).catch((_error: any) => {
-				if (this.events.isEnabled("loaderror")) {
-					this.events.dispatch("loaderror", { type: "loaderror", target: this });
+				if (!events.isDisposed() && events.isEnabled("loaderror")) {
+					events.dispatch("loaderror", { type: "loaderror", target: this });
 				}
 			});
 

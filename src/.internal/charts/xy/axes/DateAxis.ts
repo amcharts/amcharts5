@@ -455,8 +455,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 			this.markDirtySize();
 			// solves problem if new series was added
-			if(this._seriesAdded){
-				this._root.events.once("frameended", ()=>{
+			if (this._seriesAdded) {
+				this._root.events.once("frameended", () => {
 					this.markDirtySize();
 				})
 			}
@@ -979,9 +979,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		})
 	}
 
-	protected _handleSizeDirty(){
+	protected _handleSizeDirty() {
 		// void 
-	}	
+	}
 
 	/**
 	 * @ignore
@@ -1195,6 +1195,42 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public zoomToDates(start: Date, end: Date, duration?: number) {
 		this.zoomToValues(start.getTime(), end.getTime(), duration);
 	}
+
+	/**
+	 * Zooms the axis to specific `start` and `end` values.
+	 *
+	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 *
+	 * @param  start     Start value
+	 * @param  end       End value
+	 * @param  duration  Duration in milliseconds
+	 */
+	public zoomToValues(start: number, end: number, duration?: number) {
+		const min = this.getPrivate("minFinal", 0);
+		const max = this.getPrivate("maxFinal", 0);
+		if (this.getPrivate("min") != null && this.getPrivate("max") != null) {
+			if (this.get("groupData")) {
+				const futureGroupInterval = this.getGroupInterval(end - start);
+				const baseInterval = this.get("baseInterval");
+				let baseMin = this.getIntervalMin(baseInterval);
+				let baseMax = this.getIntervalMax(baseInterval);
+
+				let futureMin = $time.roun(baseMin, futureGroupInterval.timeUnit, futureGroupInterval.count, this.root);
+				baseMax += $time.getDuration(futureGroupInterval.timeUnit, futureGroupInterval.count * this._getM(futureGroupInterval.timeUnit));
+
+				let futureMax = $time.roun(baseMax, futureGroupInterval.timeUnit, futureGroupInterval.count, this.root);
+
+				start = (start - futureMin) / (futureMax - futureMin);
+				end = (end - futureMin) / (futureMax - futureMin);
+
+				this.zoom(start, end, duration);
+			}
+			else {
+				this.zoom((start - min) / (max - min), (end - min) / (max - min), duration);
+			}
+		}
+	}
+
 
 	/**
 	 * Returns a `Date` object corresponding to specific position within plot

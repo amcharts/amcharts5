@@ -56,6 +56,13 @@ type ShortMonths = "Jan" | "Feb" | "Mar" | "Apr" | "May(short)" | "Jun" | "Jul" 
 type Weekdays = "Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday";
 type ShortWeekdays = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
+
+/**
+ * Date formatter class.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+ * @important
+ */
 export class DateFormatter extends Entity {
 	declare public _settings: IDateFormatterSettings;
 	declare public _privateSettings: IDateFormatterPrivate;
@@ -72,7 +79,14 @@ export class DateFormatter extends Entity {
 		super._beforeChanged();
 	}
 
-	public format(source: any, format?: string | Intl.DateTimeFormatOptions): string {
+	/**
+	 * Formats a source `Date` object into string format
+	 * @param   source          inpout date
+	 * @param   format          Output format
+	 * @param   ignoreTimezone  Ignore timezone?
+	 * @return                  Formatted date
+	 */
+	public format(source: any, format?: string | Intl.DateTimeFormatOptions, ignoreTimezone: boolean = false): string {
 
 		// Locale?
 		// TODO
@@ -112,7 +126,7 @@ export class DateFormatter extends Entity {
 
 		// Should we apply custom time zone?
 		const timezone = this._root.timezone;
-		if (timezone && !this._root.utc) {
+		if (timezone && !this._root.utc && !ignoreTimezone) {
 			date = timezone.convertLocal(date);
 		}
 
@@ -124,7 +138,7 @@ export class DateFormatter extends Entity {
 		}
 
 		// Apply format
-		formatted = this.applyFormat(date, info);
+		formatted = this.applyFormat(date, info, ignoreTimezone);
 
 		// Capitalize
 		if (this.get("capitalize")) {
@@ -144,7 +158,7 @@ export class DateFormatter extends Entity {
 	 * @param info      Parsed format information
 	 * @return Formatted date string
 	 */
-	protected applyFormat(date: Date, info: DateFormatInfo): string {
+	protected applyFormat(date: Date, info: DateFormatInfo, ignoreTimezone: boolean = false): string {
 
 		// Init return value
 		let res = info.template;
@@ -159,7 +173,7 @@ export class DateFormatter extends Entity {
 			seconds: number,
 			milliseconds: number,
 			timestamp: number = date.getTime();
-		if (this._root.utc) {
+		if (this._root.utc && !ignoreTimezone) {
 			fullYear = date.getUTCFullYear();
 			month = date.getUTCMonth();
 			weekday = date.getUTCDay();

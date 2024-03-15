@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.5] - 2024-03-15
+
+### Added
+- `forceHidden` (default: `false`) setting added to `StockControl`. Enables forcing some `StockChart` controls to be always hidden.
+- New `DateRangeSelector` event added: `"rangeselected"`.
+- New `PriodSelector` event added: `"periodselected"`.
+
+### Fixed
+- A JavaScript error was being triggered if a `Picture` was disposed before external image was finished loading (since 5.8.3).
+- Inputs in `DateRangeSelector` were ignoring `Root`'s `timezone` and `utc` settings.
+- Thicker stroke (`strokeWidth > 1`) was being ignored as a hit target for interactive elements.
+- `Scrollbar` grips would not update their position according to `maxZoomCount`/`minZoomCount` setting in some cases.
+- Hovering over the border of a `Treemap` node could result tooltip of some other node to appear.
+- In some cases pointer over tooltip of a hovered `Treemap` node would remain on the same node, even if pointer would move to some other node.
+- If a `{ timeUnit: "week", count: 2 }` (count > 1) was added to a `DateAxis`, labels were flickering while scrolling.
+- Calling `zoomToDates()`/`zoomToValues()` on a `DateAxis` was resulting not exact dates when data grouping was enabled and grouping period would changed during zoom.
+
+
 ## [5.8.4] - 2024-02-22
 
 ### Added
@@ -328,7 +346,11 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - If an axis range was created for a `ColumnSeries` after series was inited, columns for the range were not being created.
 - `GaplessDateAxis` valueToPosition method was returning wrong position if value was less than min value of the axis.
 - Unserializing indicators and drawings that create separate panel in a `StockChart` would not restore drawings in indicator's panel.
-
+- Hierarchy node was not taking "disabled" state when singleBranchOnly was true and another node was clicked.
+- drawingId was not added to StockChart's PolylineSeries.
+- Rapidly clicking on tree map nodes (when many and cpu is jammed) could result js error.
+- Circle's and Rectangles strokeWidth was ignored when detecting if the element is hovered.
+- If a Picture was disposed before loading finished, it resulted js error.
 
 ## [5.5.1] - 2023-10-19
 

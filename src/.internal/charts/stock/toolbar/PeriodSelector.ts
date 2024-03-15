@@ -64,6 +64,14 @@ export interface IPeriodSelectorPrivate extends IStockControlPrivate {
 }
 
 export interface IPeriodSelectorEvents extends IStockControlEvents {
+	/**
+	 * Invoked when user selects certain period via control.
+	 *
+	 * @from 5.8.5
+	 */
+	periodselected: {
+		period: IPeriod;
+	}
 }
 
 /**
@@ -264,6 +272,15 @@ export class PeriodSelector extends StockControl {
 	}
 
 	public selectPeriod(period: IPeriod): void {
+		const type = "periodselected";
+		if (this.events.isEnabled(type)) {
+			this.events.dispatch(type, {
+				type: type,
+				target: this,
+				period: period
+			});
+		}
+
 		const fromStart = this.get("zoomTo", "end") == "start";
 		this._highlightPeriod(period);
 		if (period.timeUnit == "max") {
