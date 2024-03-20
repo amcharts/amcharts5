@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.6] - 2024-03-20
+
+### Fixed
+- `pancancelled` event of an `XYChart` was not being fired in some cases.
+- When old series were removed from an `XYChart` and a new added, related `ValueAxis` was not zooming out to new data if Animated theme was not used.
+- `Series.on("tooltipDataItem")` was not working in some setups since `5.8.3`.
+- If a `ValueAxis` width `extraMin` and/or `extraMax` set was being synced with another axis (via `syncWith`) chart could go into an SO in some setups/cases.
+
+
 ## [5.8.5] - 2024-03-15
 
 ### Added

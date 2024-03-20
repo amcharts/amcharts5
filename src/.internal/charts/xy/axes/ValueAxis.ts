@@ -1165,6 +1165,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			if (syncWithAxis) {
 				minMaxStep = this._syncAxes(selectionMin, selectionMax, minMaxStep.step, syncWithAxis.getPrivate("selectionMinFinal", syncWithAxis.getPrivate("minFinal", 0)), syncWithAxis.getPrivate("selectionMaxFinal", syncWithAxis.getPrivate("maxFinal", 1)), syncWithAxis.getPrivate("selectionStepFinal", syncWithAxis.getPrivate("step", 1)));
 
+				if(minMaxStep.min < min){
+					minMaxStep.min = min;
+				}
+
+				if(minMaxStep.max > max){
+					minMaxStep.max = max;
+				}	
+
 				selectionMin = minMaxStep.min;
 				selectionMax = minMaxStep.max;
 			}

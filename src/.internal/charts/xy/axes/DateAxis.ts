@@ -458,6 +458,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this._seriesAdded) {
 				this._root.events.once("frameended", () => {
 					this.markDirtySize();
+					
 				})
 			}
 		}
@@ -611,10 +612,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						}
 					}
 
-					series.setPrivate("outOfSelection", outOfSelection);
-					series.setPrivate("startIndex", startIndex);
-					series.setPrivate("adjustedStartIndex", series._adjustStartIndex(startIndex));
-					series.setPrivate("endIndex", endIndex);
+					this.root.events.once("frameended", ()=>{
+						series.setPrivate("outOfSelection", outOfSelection);
+						series.setPrivate("startIndex", startIndex);
+						series.setPrivate("adjustedStartIndex", series._adjustStartIndex(startIndex));
+						series.setPrivate("endIndex", endIndex);
+					})
 				}
 			})
 		}

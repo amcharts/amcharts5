@@ -822,8 +822,7 @@ export class XYChart extends SerialChart {
 		const downPoint = this._downPoint;
 		if (downPoint) {
 			if (this.get("panX") || this.get("panY")) {
-				let local = this.plotContainer.toLocal(event.point);
-				if (local.x == downPoint.x && local.y == downPoint.y) {
+				if (event.originalEvent.clientX == downPoint.x && event.originalEvent.clientY == downPoint.y) {
 					const eventType = "pancancelled";
 					if (this.events.isEnabled(eventType)) {
 						this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event.originalEvent });

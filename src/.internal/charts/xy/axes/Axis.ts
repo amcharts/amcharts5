@@ -1080,14 +1080,14 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				if (series.get("baseAxis") === this) {
 					const dataItem = this.getSeriesItem(series, position!, this.get("tooltipLocation"));					
 					
-					series._settings.tooltipDataItem = dataItem;
-
 					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
 						series.updateLegendMarker(dataItem);
 						series.updateLegendValue(dataItem);
+						series._settings.tooltipDataItem = dataItem;
 					}
 					else {
 						series.showDataItemTooltip(dataItem);
+						series.setRaw("tooltipDataItem", dataItem);
 					}										
 				}
 			})
