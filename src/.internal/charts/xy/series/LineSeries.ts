@@ -532,6 +532,14 @@ export class LineSeries extends XYSeries {
 				container.children.push(stroke);
 			}
 
+			if (strokeTemplate && strokeTemplate != this.strokes.template) {
+				stroke.template = strokeTemplate;
+			}			
+
+			if (fillTemplate && fillTemplate != this.fills.template) {
+				fill.template = fillTemplate;
+			}						
+
 			stroke.setPrivate("visible", true);
 			this._drawStroke(stroke, segments);
 

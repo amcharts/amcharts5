@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.8.7] - 2024-03-25
+
+### Fixed
+- If a `Label` with background was hidden due to `oversizedBehavior` rule, the background was still visible.
+- Moving `XYCursor` with keyboard were not always properly updating adapter-populated tooltips.
+- HTML-based tooltips were not being updated properly in some cases.
+- Labels of a zero-value slices on a `Venn` diagram will not be displayed anymore.
+- `Sankey` links were ignoring `dx` and `dy` settings set on nodes.
+- A JS error could occur when loading on-demand data in some specific cases.
+- Series range affected by an axis range was not using settings from its `tempalteField`.
+- When data grouping was enabled on `DateAxis`, calling `zoomToDates()` (and `zoomToValues()`) could result zooming to slightly different dates.
+
+
 ## [5.8.6] - 2024-03-20
 
 ### Fixed

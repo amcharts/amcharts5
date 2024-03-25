@@ -376,6 +376,11 @@ export class Label extends Container {
 
 			this.text.set("x", x);
 		}
+
+		const background = this.get("background");
+		if (background) {
+			background.setPrivate("visible", this.text._display.textVisible);
+		}
 	}
 
 	protected _maybeUpdateHTMLColor() {
@@ -411,6 +416,10 @@ export class Label extends Container {
 		this._markDirtyKey("text")
 		if (this.text.get("populateText")) {
 			this.text.markDirtyText();
+		}
+		const html = this.get("html");
+		if (html && html !== "") {
+			this._updateHTMLContent();
 		}
 	}
 

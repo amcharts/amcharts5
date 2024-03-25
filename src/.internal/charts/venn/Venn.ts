@@ -246,6 +246,25 @@ export class Venn extends Series {
 				if (set.size > 0) {
 					sets.push(set);
 				}
+
+				const label = dataItem.get("label");
+				const slice = dataItem.get("slice");
+
+
+				let visible = true;
+				if (dataItem.get("value") == 0) {
+					visible = false;
+
+					if (slice) {
+						slice.setAll({
+							x: this.width() / 2,
+							y: this.height() / 2
+						})
+					}
+				}
+				if (label) {
+					label.setPrivate("visible", visible);
+				}
 			})
 
 			const newSets = sets.toString();

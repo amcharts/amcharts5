@@ -362,14 +362,20 @@ export class XYCursor extends Container {
 		if (dir != "") {
 			this.set(dir, position);
 		}
+
+		this.handleMove();
 	}
 
 	protected _handleLineFocus(_line: Grid) {
 		this.setAll({
-			positionX: this.getPrivate("positionX"),
-			positionY: this.getPrivate("positionY"),
+			positionX: this.getPrivate("positionX", 0),
+			positionY: this.getPrivate("positionY", 0),
 			alwaysShow: true
 		});
+		this.handleMove();
+		this.setTimeout(() => {
+			this.handleMove();
+		}, 10);
 	}
 
 	protected _handleLineBlur(_line: Grid) {

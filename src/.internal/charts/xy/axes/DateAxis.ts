@@ -458,7 +458,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this._seriesAdded) {
 				this._root.events.once("frameended", () => {
 					this.markDirtySize();
-					
+
 				})
 			}
 		}
@@ -612,12 +612,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						}
 					}
 
-					this.root.events.once("frameended", ()=>{
-						series.setPrivate("outOfSelection", outOfSelection);
-						series.setPrivate("startIndex", startIndex);
-						series.setPrivate("adjustedStartIndex", series._adjustStartIndex(startIndex));
-						series.setPrivate("endIndex", endIndex);
+					series.setPrivate("outOfSelection", outOfSelection);
+					series.setPrivate("startIndex", startIndex);
+					series.setPrivate("adjustedStartIndex", series._adjustStartIndex(startIndex));
+					series.setPrivate("endIndex", endIndex);
+					this.root.events.once("frameended", () => {
+						series._markDirtyPrivateKey("adjustedStartIndex");
 					})
+
 				}
 			})
 		}
@@ -1215,18 +1217,20 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this.get("groupData")) {
 				const futureGroupInterval = this.getGroupInterval(end - start);
 				const baseInterval = this.get("baseInterval");
+
 				let baseMin = this.getIntervalMin(baseInterval);
-				let baseMax = this.getIntervalMax(baseInterval);
+				let baseMax = this.getIntervalMax(baseInterval) - 1;
+				baseMax = $time.roun(baseMax, futureGroupInterval.timeUnit, futureGroupInterval.count, this.root);
+				baseMax += this._getM(futureGroupInterval.timeUnit) * $time.getIntervalDuration(futureGroupInterval);
+				baseMax = $time.roun(baseMax, futureGroupInterval.timeUnit, futureGroupInterval.count, this.root);
 
 				let futureMin = $time.roun(baseMin, futureGroupInterval.timeUnit, futureGroupInterval.count, this.root);
-				baseMax += $time.getDuration(futureGroupInterval.timeUnit, futureGroupInterval.count * this._getM(futureGroupInterval.timeUnit));
-
 				let futureMax = $time.roun(baseMax, futureGroupInterval.timeUnit, futureGroupInterval.count, this.root);
 
-				start = (start - futureMin) / (futureMax - futureMin);
-				end = (end - futureMin) / (futureMax - futureMin);
+				let s = (start - futureMin) / (futureMax - futureMin);
+				let e = (end - futureMin) / (futureMax - futureMin);
 
-				this.zoom(start, end, duration);
+				this.zoom(s, e, duration);
 			}
 			else {
 				this.zoom((start - min) / (max - min), (end - min) / (max - min), duration);

@@ -456,12 +456,12 @@ export class Container extends Sprite {
 
 			const minWidth = this.get("minWidth");
 
-			if($type.isNumber(minWidth) && minWidth > 0){
-				if(bounds.right - bounds.left < minWidth){
-					if(bounds.right >= minWidth){
+			if ($type.isNumber(minWidth) && minWidth > 0) {
+				if (bounds.right - bounds.left < minWidth) {
+					if (bounds.right >= minWidth) {
 						bounds.left = bounds.right - minWidth;
 					}
-					else{
+					else {
 						bounds.right = bounds.left + minWidth;
 					}
 				}
@@ -469,16 +469,16 @@ export class Container extends Sprite {
 
 			const minHeight = this.get("minHeight");
 
-			if($type.isNumber(minHeight) && minHeight > 0){
-				if(bounds.bottom - bounds.top < minHeight){
-					if(bounds.bottom >= minHeight){
+			if ($type.isNumber(minHeight) && minHeight > 0) {
+				if (bounds.bottom - bounds.top < minHeight) {
+					if (bounds.bottom >= minHeight) {
 						bounds.top = bounds.bottom - minHeight;
 					}
-					else{
+					else {
 						bounds.bottom = bounds.top + minHeight;
 					}
 				}
-			}			
+			}
 		}
 
 
@@ -577,18 +577,22 @@ export class Container extends Sprite {
 		this._handleStates();
 	}
 
+	public _updateHTMLContent() {
+		const html = this.get("html");
+		if (html && html !== "") {
+			this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
+		}
+		else {
+			this._root._removeHTMLContent(this);
+		}
+		this._root._positionHTMLElement(this);
+	}
+
 	public _updateChildren() {
 
 
 		if (this.isDirty("html")) {
-			const html = this.get("html");
-			if (html && html !== "") {
-				this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
-			}
-			else {
-				this._root._removeHTMLContent(this);
-			}
-			this._root._positionHTMLElement(this);
+			this._updateHTMLContent();
 		}
 
 		if (this.isDirty("verticalScrollbar")) {

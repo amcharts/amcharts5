@@ -142,10 +142,10 @@ export class SankeyLink extends FlowLink {
 
 					if (orientation == "vertical") {
 						if (sourceNode) {
-							y0 = sourceNode.y();
+							y0 = sourceNode.y() + sourceNode.get("dy", 0);
 						}
 						if (targetNode) {
-							y1 = targetNode.y();
+							y1 = targetNode.y() + targetNode.get("dy", 0);
 						}
 
 						angle0 = 90;
@@ -153,6 +153,9 @@ export class SankeyLink extends FlowLink {
 
 						x0 = d3SankeyLink.y0 || 0;
 						x1 = d3SankeyLink.y1 || 0;
+
+						x0 += sourceNode.get("dx", 0);
+						x1 += targetNode.get("dx", 0);
 
 						if (y1 < y0) {
 							[x0, x1] = [x1, x0];
@@ -190,14 +193,17 @@ export class SankeyLink extends FlowLink {
 					}
 					else {
 						if (sourceNode) {
-							x0 = sourceNode.x();
+							x0 = sourceNode.x() + sourceNode.get("dx", 0);
 						}
 						if (targetNode) {
-							x1 = targetNode.x();
+							x1 = targetNode.x() + targetNode.get("dx", 0);
 						}
 
 						y0 = d3SankeyLink.y0 || 0;
 						y1 = d3SankeyLink.y1 || 0;
+
+						y0 += sourceNode.get("dy", 0);
+						y1 += targetNode.get("dy", 0);
 
 						if (x1 < x0) {
 							[x0, x1] = [x1, x0];
