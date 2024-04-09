@@ -130,6 +130,7 @@ export class Measure extends RectangleSeries {
 		}
 
 		fillGraphics.set("fill", color);
+		fillGraphics.set("fillOpacity", 0.2);
 		line.set("stroke", color);
 		labelBg.set("fill", color);
 
@@ -184,7 +185,7 @@ export class Measure extends RectangleSeries {
 				let i1 = dataItems.indexOf(div1);
 				let i2 = dataItems.indexOf(div2);
 
-				if(i1 > i2){
+				if (i1 > i2) {
 					[i1, i2] = [i2, i1];
 				}
 

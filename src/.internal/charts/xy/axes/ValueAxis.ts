@@ -410,7 +410,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._dirtyExtremes = false;
 		}
 
-		this._handleSizeDirty();		
+		this._handleSizeDirty();
 
 		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
 			this._getSelectionMinMax();
@@ -429,8 +429,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	}
 
-	protected _handleSizeDirty(){
-		if(this._sizeDirty){
+	protected _handleSizeDirty() {
+		if (this._sizeDirty) {
 			this._dirtySelectionExtremes = true;
 		}
 	}
@@ -657,12 +657,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
-		let labelEndPosition = endPosition;		
+		let labelEndPosition = endPosition;
 
 		let labelEndValue = dataItem.get("labelEndValue");
 		if (labelEndValue != null) {
 			labelEndPosition = this.valueToPosition(labelEndValue);
-		}		
+		}
 
 		renderer.updateLabel(dataItem.get("label"), position, labelEndPosition, count);
 
@@ -1122,9 +1122,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				selectionMin -= this._deltaMinMax;
 				selectionMax += this._deltaMinMax;
 
-				if(selectionMin < min){
+				if (selectionMin < min) {
 					let d = smin - min;
-					if(d == 0){
+					if (d == 0) {
 						d = this._deltaMinMax;
 					}
 
@@ -1165,13 +1165,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			if (syncWithAxis) {
 				minMaxStep = this._syncAxes(selectionMin, selectionMax, minMaxStep.step, syncWithAxis.getPrivate("selectionMinFinal", syncWithAxis.getPrivate("minFinal", 0)), syncWithAxis.getPrivate("selectionMaxFinal", syncWithAxis.getPrivate("maxFinal", 1)), syncWithAxis.getPrivate("selectionStepFinal", syncWithAxis.getPrivate("step", 1)));
 
-				if(minMaxStep.min < min){
+				if (minMaxStep.min < min) {
 					minMaxStep.min = min;
 				}
 
-				if(minMaxStep.max > max){
+				if (minMaxStep.max > max) {
 					minMaxStep.max = max;
-				}	
+				}
 
 				selectionMin = minMaxStep.min;
 				selectionMax = minMaxStep.max;
@@ -1772,4 +1772,22 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		return 0.05;
 	}
 
+	/**
+	 * @ignore
+	 */	
+	public nextPosition(count?: number) {
+		if (count == null) {
+			count = 1;
+		}
+
+		if (this.get("renderer").getPrivate("letter") == "Y") {
+			count *= -1;
+		}
+
+		let value = this.positionToValue(this.getPrivate("tooltipPosition", 0));
+		value += this.getPrivate("step", 1) * count;
+		value = $math.fitToRange(value, this.getPrivate("selectionMin", 0), this.getPrivate("selectionMax", 1));
+
+		return this.toGlobalPosition(this.valueToPosition(value));
+	}
 }

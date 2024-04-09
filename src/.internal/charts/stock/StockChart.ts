@@ -30,6 +30,8 @@ import * as $utils from "../../core/util/Utils";
 import * as $object from "../../core/util/Object";
 import type { GaplessDateAxis } from "../xy/axes/GaplessDateAxis";
 import type { ChartIndicator } from "./indicators/ChartIndicator";
+import type { ISpritePointerEvent } from "../../core/render/Sprite";
+
 
 export interface IStockChartSettings extends IContainerSettings {
 
@@ -150,6 +152,34 @@ export interface IStockChartEvents extends IContainerEvents {
 	 * Kicks in when indicators change.
 	 */
 	indicatorsupdated: {};
+
+	/**
+	 * Kicks in when a drawing is added.
+	 *
+	 * @since 5.9.0
+	 */
+	drawingadded: { drawingId: string, series: DrawingSeries, index: number };
+
+	/**
+	 * Kicks in when a drawing is removed.
+	 *
+	 * @since 5.9.0
+	 */
+	drawingremoved: { drawingId: string, series: DrawingSeries, index: number };
+
+	/**
+	 * Kicks in when a drawing is selected.
+	 *
+	 * @since 5.9.0
+	 */
+	drawingselected: { drawingId: string, series: DrawingSeries, index: number };
+
+	/**
+	 * Kicks in when a drawing is unselected.
+	 *
+	 * @since 5.9.0
+	 */
+	drawingunselected: { drawingId: string, series: DrawingSeries, index: number };
 }
 
 
@@ -234,6 +264,19 @@ export class StockChart extends Container {
 
 		super._afterNew();
 
+		if ($utils.supports("keyboardevents")) {
+			this._disposers.push($utils.addEventListener(document, "keyup", (e: KeyboardEvent) => {
+				if (e.keyCode == 46) {
+					this.deleteSelectedDrawings();
+				}
+				if (e.keyCode == 27) {
+					this.unselectDrawings();
+					this.cancelDrawing();
+					this.spriteResizer.set("sprite", undefined);
+				}
+			}));
+		}
+
 		const children = this.panelsContainer.children;
 		this._disposers.push(this.panels.events.onAll((change) => {
 			if (change.type === "clear") {
@@ -316,21 +359,6 @@ export class StockChart extends Container {
 		this.markDirty();
 	}
 
-	/**
-	 * Enables or disables interactivity of annotations (drawings).
-	 * 
-	 * @param value Drawings interactive?
-	 * @since 5.4.9
-	 */
-	public drawingsInteractive(value: boolean) {
-		this.panels.each((panel) => {
-			panel.series.each((series) => {
-				if (series.isType<DrawingSeries>("DrawingSeries")) {
-					series.setInteractive(value);
-				}
-			})
-		})
-	}
 
 	public _prepareChildren() {
 
@@ -1046,6 +1074,139 @@ export class StockChart extends Container {
 			return true;
 		});
 		return found;
+	}
+
+	public _dragStartDrawing(event: ISpritePointerEvent) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series._dragStart(event);
+				}
+			})
+		})
+	}
+
+	public _dragStopDrawing(event: ISpritePointerEvent) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series._dragStop(event);
+				}
+			})
+		})
+	}
+
+	/**
+	 * Enables or disables interactivity of annotations (drawings).
+	 * 
+	 * @param value Drawings interactive?
+	 * @since 5.4.9
+	 */
+	public drawingsInteractive(value: boolean, except?: DrawingSeries) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series != except) {
+					if (series.isType<DrawingSeries>("DrawingSeries")) {
+						series.setInteractive(value);
+					}
+				}
+			})
+		})
+	}
+
+	/**
+	 * Unselect all currently selected drawings.
+	 *
+	 * @since 5.9.0
+	 */
+	public unselectDrawings() {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.unselectDrawings();
+				}
+			})
+		})
+	}
+
+	/**
+	 * Cancels drawing and deletes drawing which is now being drawn.
+	 *
+	 * @since 5.9.0
+	 */
+	public cancelDrawing() {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.cancelDrawing();
+				}
+			})
+		})
+	}	
+
+	/**
+	 * Deletes all currently selected drawings.
+	 *
+	 * @since 5.9.0
+	 *
+	 */
+	public deleteSelectedDrawings() {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.deleteSelected();
+				}
+			})
+		})
+	}
+
+	/**
+	 * Selects drawing by its ID.
+	 *
+	 * @param  id             Drawing ID
+	 * @param  keepSelection  Keep existing selections
+	 * @since 5.9.0
+	 */
+	public selectDrawing(id: string, keepSelection?: boolean) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.selectDrawing(id, keepSelection);
+				}
+			})
+		})
+	}
+
+	/**
+	 * Unselects drawing by ID.
+	 * 
+	 * @param  id  Drawing ID
+	 * @since 5.9.0
+	 */
+	public unselectDrawing(id: string) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.unselectDrawing(id);
+				}
+			})
+		})
+	}
+
+	/**
+	 * Deletes drawing by drawingId.
+	 *
+	 * @param  id  Drawing ID
+	 * @since 5.9.0
+	 */
+	public deleteDrawing(id: string) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.deleteDrawing(id);
+				}
+			})
+		})
 	}
 
 }

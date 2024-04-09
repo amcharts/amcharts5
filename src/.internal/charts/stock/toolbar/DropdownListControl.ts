@@ -188,6 +188,46 @@ export class DropdownListControl extends StockControl {
 		}
 	}
 
+	/**
+	 * Selects an item by its id.
+	 *
+	 * @since 5.9.0
+	 * @param  id  Item ID
+	 */
+	public setItemById(id: string) {
+		const item = this.getItemById(id);
+		if (item !== undefined) {
+			this.setItem(item);
+			//this.set("currentItem", item);
+			this.events.dispatch("selected", {
+				type: "selected",
+				item: item,
+				target: this
+			});
+		}
+	}
+
+	/**
+	 * Returns list item by ID.
+	 * 
+	 * @since 5.9.0
+	 * @param  id  Item ID
+	 * @return     Dropdown item
+	 */
+	public getItemById(id: string): IDropdownListItem | string | undefined {
+		let found: IDropdownListItem | string | undefined;
+		const items = this.get("items", []);
+		$array.eachContinue(items, (item) => {
+			let itemId = $type.isObject(item) ? item.id : item;
+			if (itemId == id) {
+				found = item;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+
 	public _beforeChanged() {
 		super._beforeChanged();
 		if (this.isDirty("items")) {

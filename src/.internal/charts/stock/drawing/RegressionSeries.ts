@@ -63,7 +63,7 @@ export class RegressionSeries extends SimpleLineSeries {
 		super._afterNew();
 		this.setPrivate("allowChangeSnap", false);
 		this.set("snapToData", true);
-	}	
+	}
 
 	protected _updateSegment(index: number) {
 		const diP1 = this._di[index]["p1"];

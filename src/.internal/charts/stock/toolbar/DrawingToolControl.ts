@@ -4,7 +4,7 @@ import { StockIcons } from "./StockIcons";
 
 import * as $array from "../../../core/util/Array";
 
-export type DrawingTools = "Arrows &amp; Icons" | "Average" | "Callout" | "Doodle" | "Ellipse" | "Fibonacci" | "Fibonacci Timezone" | "Horizontal Line" | "Horizontal Ray" |  "Label" | "Line" | "Measure" | "Parallel Channel" | "Polyline" | "Quadrant Line" | "Rectangle" | "Regression" | "Trend Line" | "Vertical Line";
+export type DrawingTools = "Arrows &amp; Icons" | "Average" | "Callout" | "Doodle" | "Ellipse" | "Fibonacci" | "Fibonacci Timezone" | "Horizontal Line" | "Horizontal Ray" | "Label" | "Line" | "Measure" | "Parallel Channel" | "Polyline" | "Polyfill" | "Quadrant Line" | "Rectangle" | "Regression" | "Trend Line" | "Triangle" | "Vertical Line";
 
 export interface IDrawingToolControlSettings extends IStockControlSettings {
 	tools: DrawingTools[];

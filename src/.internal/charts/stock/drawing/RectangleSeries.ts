@@ -1,14 +1,13 @@
 import type { DataItem } from "../../../core/render/Component";
 import type { Graphics } from "../../../core/render/Graphics";
 import type { IPoint } from "../../../core/util/IPoint";
+
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
 export interface IRectangleSeriesDataItem extends ISimpleLineSeriesDataItem {
-
 }
 
 export interface IRectangleSeriesSettings extends ISimpleLineSeriesSettings {
-
 }
 
 export interface IRectangleSeriesPrivate extends ISimpleLineSeriesPrivate {

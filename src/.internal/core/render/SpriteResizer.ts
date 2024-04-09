@@ -186,6 +186,10 @@ export class SpriteResizer extends Container {
 				this._positionDP = sprite.events.on("positionchanged", () => {
 					this._updatePositions();
 				})
+
+				this._positionDP = sprite.events.on("boundschanged", () => {
+					this._updatePositions();
+				})				
 			}
 			else {
 				this.hide(0);

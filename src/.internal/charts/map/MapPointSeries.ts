@@ -444,7 +444,7 @@ export class MapPointSeries extends MapSeries {
 	 * @return             Animation
 	 * @since 5.5.6
 	 */
-	zoomToDataItems(dataItems: Array<DataItem<IMapPointSeriesDataItem>>, rotate?: boolean): Animation<any> | undefined {
+	public zoomToDataItems(dataItems: Array<DataItem<IMapPointSeriesDataItem>>, rotate?: boolean): Animation<any> | undefined {
 
 		let left: number | null = null;
 		let right: number | null = null;

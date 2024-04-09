@@ -44,6 +44,10 @@ export class ColorControl extends StockControl {
 		// Do parent stuff
 		super._afterNew();
 
+		// Control
+		const button = this.getPrivate("button")!;
+		button.className = button.className + " am5stock-control-color";
+
 		// Create list of tools
 		const dropdownSettings: any = {
 			control: this,
@@ -108,6 +112,36 @@ export class ColorControl extends StockControl {
 
 	}
 
+	/**
+	 * Sets color.
+	 * 
+	 * @param  color  Color
+	 * @since 5.9.0
+	 */
+	public setColor(color: Color) {
+		this.setPrivate("color", color);
+		this.events.dispatch("selected", {
+			type: "selected",
+			color: color,
+			target: this
+		});
+	}
+
+	/**
+	 * Sets opacity.
+	 * 
+	 * @param  opacity  Opacity
+	 * @since 5.9.0
+	 */
+	public setOpacity(opacity: number) {
+		this.setPrivate("opacity", opacity);
+		this.events.dispatch("selectedOpacity", {
+			type: "selectedOpacity",
+			opacity: opacity,
+			target: this
+		});
+	}
+
 	protected _getDefaultIcon(): SVGElement {
 		const icon = StockIcons.getIcon("Color");
 		$utils.addClass(icon, "am5stock-control-icon-color");
@@ -128,25 +162,25 @@ export class ColorControl extends StockControl {
 		super.hide();
 	}
 
-		protected _maybeMakeAccessible(): void {
-			super._maybeMakeAccessible();
-			if (this.isAccessible()) {
-				const button = this.getPrivate("button")!;
-				button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
+	protected _maybeMakeAccessible(): void {
+		super._maybeMakeAccessible();
+		if (this.isAccessible()) {
+			const button = this.getPrivate("button")!;
+			button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
 
-				if ($utils.supports("keyboardevents")) {
-					this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-						if (document.activeElement == button) {
-							if (ev.keyCode == 38 || ev.keyCode == 40) {
-								// Open on arrows
-								if (!this.get("active")) {
-									this._handleClick();
-								}
+			if ($utils.supports("keyboardevents")) {
+				this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+					if (document.activeElement == button) {
+						if (ev.keyCode == 38 || ev.keyCode == 40) {
+							// Open on arrows
+							if (!this.get("active")) {
+								this._handleClick();
 							}
 						}
-					}));
-				}
+					}
+				}));
 			}
 		}
+	}
 
 }

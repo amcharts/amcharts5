@@ -991,7 +991,8 @@ export class DefaultTheme extends Theme {
 		// resizer
 
 		r("SpriteResizer").setAll({
-			rotationStep: 10
+			rotationStep: 10,
+			isMeasured:false
 		})
 
 		{

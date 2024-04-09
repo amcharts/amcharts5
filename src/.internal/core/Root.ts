@@ -666,16 +666,18 @@ export class Root implements IDisposer {
 			if ($utils.supports("keyboardevents")) {
 
 				this._disposers.push($utils.addEventListener(window, "keydown", (ev: KeyboardEvent) => {
-					if (ev.keyCode == 16) {
+					const eventKey = $utils.getEventKey(ev);
+					if (eventKey == "Shift") {
 						this._isShift = true;
 					}
-					else if (ev.keyCode == 9) {
+					else if (eventKey == "Tab") {
 						this._isShift = ev.shiftKey;
 					}
 				}));
 
 				this._disposers.push($utils.addEventListener(window, "keyup", (ev: KeyboardEvent) => {
-					if (ev.keyCode == 16) {
+					const eventKey = $utils.getEventKey(ev);
+					if (eventKey == "Shift") {
 						this._isShift = false;
 					}
 				}));
@@ -701,7 +703,7 @@ export class Root implements IDisposer {
 				this._disposers.push($utils.addEventListener(focusElementContainer, "keydown", (ev: KeyboardEvent) => {
 					const focusedSprite = this._focusedSprite;
 					if (focusedSprite) {
-						if (ev.keyCode == 27) {
+						if (ev.key == "Escape") {
 							// ESC pressed - lose current focus
 							$utils.blur();
 							this._focusedSprite = undefined;
@@ -710,8 +712,13 @@ export class Root implements IDisposer {
 						let dragOffsetY = 0;
 						// TODO: figure out if using bogus MouseEvent is fine, or it will
 						// fail on some platforms
-						switch (ev.keyCode) {
-							case 13:
+						const eventKey = $utils.getEventKey(ev);
+						switch (eventKey) {
+							case "Enter":
+							case " ":
+								if (eventKey == " " && focusedSprite.get("role") != "checkbox") {
+									return;
+								}
 								ev.preventDefault();
 								const downEvent = renderer.getEvent(new MouseEvent("click"));
 								focusedSprite.events.dispatch("click", {
@@ -722,16 +729,16 @@ export class Root implements IDisposer {
 									target: focusedSprite
 								});
 								return;
-							case 37:
+							case "ArrowLeft":
 								dragOffsetX = -6;
 								break;
-							case 39:
+							case "ArrowRight":
 								dragOffsetX = 6;
 								break;
-							case 38:
+							case "ArrowUp":
 								dragOffsetY = -6;
 								break;
-							case 40:
+							case "ArrowDown":
 								dragOffsetY = 6;
 								break;
 							default:
@@ -795,12 +802,12 @@ export class Root implements IDisposer {
 				this._disposers.push($utils.addEventListener(focusElementContainer, "keyup", (ev: KeyboardEvent) => {
 					if (this._focusedSprite) {
 						const focusedSprite = this._focusedSprite;
-						const keyCode = ev.keyCode;
-						switch (keyCode) {
-							case 37:
-							case 39:
-							case 38:
-							case 40:
+						const eventKey = $utils.getEventKey(ev);
+						switch (eventKey) {
+							case "ArrowLeft":
+							case "ArrowRight":
+							case "ArrowTop":
+							case "ArrowDown":
 								if (focusedSprite.isDragging()) {
 									// Simulate drag stop
 									const dragPoint = this._keyboardDragPoint!;
@@ -832,7 +839,7 @@ export class Root implements IDisposer {
 									});
 									let index = items.indexOf(focusedSprite);
 									const lastIndex = items.length - 1;
-									index += (keyCode == 39 || keyCode == 40) ? 1 : -1;
+									index += (eventKey == "ArrowRight" || eventKey == "ArrowDown") ? 1 : -1;
 									if (index < 0) {
 										index = lastIndex;
 									}
@@ -1034,7 +1041,6 @@ export class Root implements IDisposer {
 		objects.forEach((entity) => {
 			entity._afterChanged();
 		});
-
 	}
 
 	private _renderFrame(currentTime: number): boolean {
@@ -1154,36 +1160,44 @@ export class Root implements IDisposer {
 	}
 
 	public _addDirtyEntity(entity: Entity) {
+		this._isDirty = true;
+
 		if (this._dirty[entity.uid] === undefined) {
-			this._isDirty = true;
 			this._dirty[entity.uid] = entity;
-			this._startTicker();
 		}
+
+		this._startTicker();
 	}
 
 	public _addDirtyParent(parent: IParent) {
+		this._isDirty = true;
+		this._isDirtyParents = true;
+
 		if (this._dirtyParents[parent.uid] === undefined) {
-			this._isDirty = true;
-			this._isDirtyParents = true;
 			this._dirtyParents[parent.uid] = parent;
-			this._startTicker();
 		}
+
+		this._startTicker();
 	}
 
 	public _addDirtyBounds(entity: IBounds) {
+		this._isDirty = true;
+
 		if (this._dirtyBounds[entity.uid] === undefined) {
-			this._isDirty = true;
 			this._dirtyBounds[entity.uid] = entity;
-			this._startTicker();
 		}
+
+		this._startTicker();
 	}
 
 	public _addDirtyPosition(sprite: Sprite) {
+		this._isDirty = true;
+
 		if (this._dirtyPositions[sprite.uid] === undefined) {
-			this._isDirty = true;
 			this._dirtyPositions[sprite.uid] = sprite;
-			this._startTicker();
 		}
+
+		this._startTicker();
 	}
 
 	public _addAnimation(animation: IAnimation) {
@@ -1559,10 +1573,12 @@ export class Root implements IDisposer {
 		this._decorateFocusElement(target);
 
 		disposers.push($utils.addEventListener(focusElement, "focus", (ev: FocusEvent) => {
+			const index = Array.prototype.indexOf.call(this._focusElementContainer!.children, ev.target);
 			this._handleFocus(ev, index);
 		}));
 
 		disposers.push($utils.addEventListener(focusElement, "blur", (ev: FocusEvent) => {
+			const index = Array.prototype.indexOf.call(this._focusElementContainer!.children, ev.target);
 			this._handleBlur(ev, index);
 		}));
 

@@ -299,6 +299,26 @@ export function setInteractive(target: HTMLElement, interactive: boolean): void 
 	}
 }
 
+export function getEventKey(event: KeyboardEvent): string {
+	if (event.key !== undefined) {
+		return event.key;
+	}
+	switch(event.keyCode) {
+		case 9: return "Tab";
+		case 13: return "Enter";
+		case 16: return "Shift";
+		case 17: return "Control";
+		case 27: return "Escape";
+		case 32: return " ";
+		case 37: return "ArrowLeft";
+		case 38: return "ArrowUp";
+		case 39: return "ArrowRight";
+		case 40: return "ArrowDown";
+		case 46: return "Delete";
+	}
+	return "" + event.keyCode;
+}
+
 /**
  * Returns the shadow root of the element or null
  *

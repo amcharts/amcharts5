@@ -583,6 +583,17 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
+	 * Returns `true` if the setting exists.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
+	 * @param   key        Settings key
+	 * @return  {boolean}  Key exists
+	 */
+	public has<Key extends keyof this["_settings"]>(key: Key): boolean {
+		return key in this._settings;
+	}
+
+	/**
 	 * Returns settings value for the specified `key`.
 	 *
 	 * If there is no value, `fallback` is returned instead (if set).
@@ -1071,14 +1082,27 @@ export class Entity extends Settings implements IDisposer {
 
 	}
 
+	public _setDefaultFn<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, f: () => Value): NonNullable<this["_settings"][Key]> | Value {
+		const value = this.get(key);
+
+		if (value) {
+			return value as any;
+
+		} else {
+			const value = f();
+			this.set(key, value);
+			return value;
+		}
+	}
+
 	public _setDefault<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
-		if (!(key in this._settings)) {
+		if (!this.has(key)) {
 			super.set(key, value);
 		}
 	}
 
 	public _setRawDefault<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
-		if (!(key in this._settings)) {
+		if (!this.has(key)) {
 			super.setRaw(key, value);
 		}
 	}

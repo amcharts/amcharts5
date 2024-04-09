@@ -252,12 +252,13 @@ export class ExportingMenu extends Entity {
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+				const eventKey = $utils.getEventKey(ev);
 				if (document.activeElement == this._iconElement || this.isOpen) {
-					if (ev.keyCode == 27) {
+					if (eventKey == "Escape") {
 						// ESC
 						this.close();
 					}
-					else if (ev.keyCode == 13) {
+					else if (eventKey == "Enter") {
 						// ENTER
 						if (this._activeItem) {
 							this._handleClick(this._activeItem);
@@ -266,13 +267,13 @@ export class ExportingMenu extends Entity {
 							this.toggle();
 						}
 					}
-					else if (ev.keyCode == 38 || ev.keyCode == 40) {
+					else if (eventKey == "ArrowUp" || eventKey == "ArrowDown") {
 						const items = this.get("items", []);
 						let currentIndex = (<any>items).indexOf(this._activeItem);
 						if (this.get("valign") == "top" && currentIndex == -1) {
 							currentIndex = items.length;
 						}
-						const dir = ev.keyCode == 38 ? -1 : 1;
+						const dir = eventKey == "ArrowUp" ? -1 : 1;
 						let newIndex = currentIndex + dir;
 						let newItem;
 						do {

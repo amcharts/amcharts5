@@ -3,6 +3,7 @@ import type { IPoint } from "../util/IPoint";
 import type { Pattern } from "../render/patterns/Pattern";
 import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
+import type { Graphics } from "../render/Graphics";
 import type { IPointerEvent } from "../render/backend/Renderer";
 
 import { MultiDisposer, IDisposer } from "../util/Disposer";
@@ -155,9 +156,11 @@ export class Tooltip extends Container {
 
 		super._afterNew();
 
-		this.set("background", PointedRectangle.new(this._root, {
-			themeTags: ["tooltip", "background"]
-		}));
+		const background: Graphics = this._setDefaultFn("background", () => {
+			return PointedRectangle.new(this._root, {});
+		});
+
+		background.set("themeTags", ["tooltip", "background"]);
 
 		this._label = this.children.push(Label.new(this._root, {}));
 

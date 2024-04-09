@@ -4,7 +4,6 @@ export interface ITrendLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
 
 export interface ITrendLineSeriesSettings extends ISimpleLineSeriesSettings {
-
 }
 
 export interface ITrendLineSeriesPrivate extends ISimpleLineSeriesPrivate {
@@ -24,7 +23,7 @@ export class TrendLineSeries extends SimpleLineSeries {
 		super._afterNew();
 		this.setPrivate("allowChangeSnap", false);
 		this.set("snapToData", true);
-	}	
+	}
 
 	protected _updateSegment(index: number) {
 		const diP1 = this._di[index]["p1"];

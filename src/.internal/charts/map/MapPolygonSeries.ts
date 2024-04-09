@@ -1,4 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
+import type { Animation } from "../../core/util/Entity";
 
 import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
 import { MapPolygon } from "./MapPolygon";
@@ -7,7 +8,8 @@ import { ListTemplate } from "../../core/util/List";
 
 import * as $array from "../../core/util/Array";
 import * as $mapUtils from "./MapUtils";
-import type { Animation } from "../../core/util/Entity";
+
+
 
 export interface IMapPolygonSeriesPrivate extends IMapSeriesPrivate {
 }
@@ -231,6 +233,65 @@ export class MapPolygonSeries extends MapSeries {
 				}
 
 				return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry),);
+			}
+		}
+	}
+
+	/**
+	 * Zooms the map in so that all polygons in the array are visible.
+	 *
+	 * @param   dataItems  An array of data items to zoom to
+	 * @param   rotate     Rotate the map so it is centered on the selected items
+	 * @return             Animation
+	 * @since 5.9.0
+	 */
+	public zoomToDataItems(dataItems: Array<DataItem<IMapPolygonSeriesDataItem>>, rotate?: boolean): Animation<any> | undefined {
+		let left!: number;
+		let right!: number;
+		let top!: number;
+		let bottom!: number;
+
+		$array.each(dataItems, (dataItem) => {
+
+			const polygon = dataItem.get("mapPolygon");
+			if (polygon) {
+				const geometry = polygon.get("geometry");
+				if (geometry) {
+					let bounds = $mapUtils.getGeoBounds(geometry);
+
+					if (left == null) {
+						left = bounds.left;
+					}
+					if (right == null) {
+						right = bounds.right;
+					}
+					if (top == null) {
+						top = bounds.top;
+					}
+					if (bottom == null) {
+						bottom = bounds.bottom;
+					}
+
+					left = Math.min(bounds.left, left);
+					right = Math.max(bounds.right, right);
+					top = Math.max(bounds.top, top);
+					bottom = Math.min(bounds.bottom, bottom);
+				}
+			}
+		})
+
+		if (left != null && right != null && top != null && bottom != null) {
+			const chart = this.chart;
+			if (chart) {
+				if (rotate) {
+					const rx = left + (right - left) / 2;
+					const ry = bottom + (top - bottom) / 2;
+
+					chart.rotate(-rx, -ry);
+					return chart.zoomToGeoBounds({ left, right, top, bottom }, undefined, -rx, -ry);
+				}
+
+				return chart.zoomToGeoBounds({ left, right, top, bottom });
 			}
 		}
 	}

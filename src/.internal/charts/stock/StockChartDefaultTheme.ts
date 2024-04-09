@@ -416,7 +416,8 @@ export class StockChartDefaultTheme extends Theme {
 		 */
 
 		r("DrawingSeries").setAll({
-			field: "value"
+			field: "value",
+			selectorPadding: 10
 		})
 
 
@@ -441,6 +442,19 @@ export class StockChartDefaultTheme extends Theme {
 			const stateRule = rule.states.create("hover", { strokeWidth: 2 });
 			setColor(stateRule, "stroke", ic, "negative");
 		}
+
+		r("Circle", ["drawing", "grip", "outline"]).setAll({
+			radius: 8,
+			strokeWidth: 4,
+			strokeOpacity: 0,
+			fillOpacity: 0
+		})
+
+		r("Circle", ["drawing", "grip", "outline"]).states.create("hover", {
+			radius: 10,
+			strokeWidth: 4,
+			strokeOpacity: 0.3
+		})
 
 		r("Circle", ["drawing", "grip", "outline", "label"]).setAll({
 			forceHidden: true
@@ -480,54 +494,23 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("Line", ["drawing", "hit"]).setAll({
-			strokeWidth: 20,
+			strokeWidth: 22,
 			strokeOpacity: 0,
 			strokeDasharray: 0,
 			draggable: true
 		});
 
 		r("Line", ["drawing", "hit", "horizontal"]).setAll({
-			strokeWidth: 20
+			strokeWidth: 22
 		});
 
 		r("Line", ["drawing", "hit", "vertical"]).setAll({
-			strokeWidth: 20
+			strokeWidth: 22
 		});
 
 		r("Line", ["drawing", "hit", "ray"]).setAll({
-			strokeWidth: 20
+			strokeWidth: 22
 		});
-
-		{
-			const rule = r("Line", ["drawing", "horizontal"])
-			/*
-			rule.setAll({
-				strokeWidth: 2,
-				strokeDasharray: 0
-			});*/
-
-			const stateRule = rule.states.create("hover", {});
-			setColor(stateRule, "stroke", ic, "negative");
-		}
-		{
-			const rule = r("Line", ["drawing", "ray"])
-			rule.setAll({
-				strokeWidth: 2,
-				strokeDasharray: 0
-			});
-			const stateRule = rule.states.create("hover", {});
-			setColor(stateRule, "stroke", ic, "negative");
-		}
-		{
-			const rule = r("Line", ["drawing", "vertical"])
-			rule.setAll({
-				strokeWidth: 2,
-				strokeDasharray: 0
-			});
-
-			const stateRule = rule.states.create("hover", {});
-			setColor(stateRule, "stroke", ic, "negative");
-		}
 
 		{
 			const rule = r("Graphics", ["series", "fill", "drawing", "doodle"])
@@ -637,14 +620,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("Graphics", ["line", "series", "stroke", "drawing", "fibonacci"]).setAll({
-			forceInactive: true,
 			strokeWidth: 0.5,
 			strokeOpacity: 1
-		});
-
-		r("Graphics", ["line", "series", "fill", "drawing", "fibonacci"]).setAll({
-			forceInactive: true,
-			draggable: false
 		});
 
 		r("Label", ["fibonacci"]).setAll({
@@ -673,14 +650,13 @@ export class StockChartDefaultTheme extends Theme {
 
 
 		r("Graphics", ["line", "series", "fill", "drawing", "fibonaccitimezone"]).setAll({
-			forceInactive: true,
 			draggable: false,
 			fillOpacity: 0.1
 		});
 
 
 		r("Graphics", ["line", "series", "stroke", "drawing", "fibonaccitimezone"]).setAll({
-			forceInactive: true,
+			draggable: false,
 			strokeWidth: 0.5,
 			strokeOpacity: 1
 		});
@@ -1389,7 +1365,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("DrawingControl").setAll({
 			name: l.translateAny("Draw"),
 			tool: "Line",
-			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Measure", "Parallel Channel", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Measure", "Parallel Channel", "Polyline", "Polyfill", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Triangle", "Vertical Line"],
 			togglable: true,
 			strokeColor: color(0x882dff),
 			strokeWidth: 2,
@@ -1589,6 +1565,18 @@ export class StockChartDefaultTheme extends Theme {
 			labelText: "{value} ({percent})\n{count.formatNumber('#,###.')} " + l.translateAny("bars") + " {intervalCount.formatNumber('#,###.')} {intervalUnit}",
 			labelVolumeText: "\nVolume: {volume.formatNumber('#.##a')}",
 		});
+
+		{
+			const rule = r("Rectangle", ["selector"]);
+			rule.setAll({
+				isMeasured: false,
+				strokeDasharray: [2, 2],
+				strokeOpacity: 0.5,
+				strokeWidth: 1
+			});
+
+			setColor(rule, "stroke", ic, "alternativeBackground");
+		}
 
 	}
 

@@ -249,7 +249,7 @@ export class Modal extends Entity {
 		// Close on ESC
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-				if (this.isOpen() && ev.keyCode == 27) {
+				if (this.isOpen() && $utils.getEventKey(ev) == "Escape") {
 					this.cancel();
 				}
 			}));

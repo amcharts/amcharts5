@@ -3,6 +3,7 @@ import type { AxisRenderer } from "./AxisRenderer";
 import type { XYSeries, IXYSeriesDataItem } from "../series/XYSeries";
 import { ValueAxis, IValueAxisSettings, IValueAxisPrivate, IValueAxisDataItem, IMinMaxStep, IValueAxisEvents } from "./ValueAxis";
 import * as $type from "../../../core/util/Type";
+import * as $math from "../../../core/util/Math";
 import * as $order from "../../../core/util/Order";
 import * as $array from "../../../core/util/Array";
 import * as $object from "../../../core/util/Object";
@@ -1275,5 +1276,36 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			return this._intervalDuration / (max - min);
 		}
 		return 0.05;
+	}
+
+	public nextPosition(count?:number){
+		if(count == null){
+			count = 1;
+		}
+
+		let dtime = this.get("tooltipLocation", 0.5) * this.baseDuration();		
+		if(this.get("renderer").getPrivate("letter") == "Y"){
+			count *= -1;
+		}
+
+		let tooltipValue = this.positionToValue(this.getPrivate("tooltipPosition", 0));
+
+		const baseInterval = this.getPrivate("baseInterval");
+		let time = this._nextTime(tooltipValue, count, baseInterval);
+
+		let selectionMin = this.getPrivate("selectionMin", 0);
+		let selectionMax = this.getPrivate("selectionMax", 0);
+
+		let min = $time.roun(selectionMin, baseInterval.timeUnit, baseInterval.count, this._root);
+		let max = $time.roun(selectionMax, baseInterval.timeUnit, baseInterval.count, this._root);
+
+		time += dtime;		
+		time = $math.fitToRange(time, min + dtime, max - dtime);
+
+		return this.toGlobalPosition(this.valueToPosition(time));
+	}	
+
+	protected _nextTime(time:number, count:number, baseInterval:ITimeInterval){
+		return $time.roun(time + count * this.baseDuration(), baseInterval.timeUnit, baseInterval.count, this._root);
 	}
 }

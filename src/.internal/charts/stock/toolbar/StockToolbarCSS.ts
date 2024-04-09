@@ -20,6 +20,7 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 	const textDisabled = ic.get("disabled")!.toCSS();
 	const border = ic.get("secondaryButtonActive")!.toCSS();
 	const bg = ic.get("background")!.toCSS();
+	const link = ic.get("primaryButton")!.toCSS();
 
 	if (!rules) {
 		const disposer = new MultiDisposer([
@@ -50,9 +51,31 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			}),
 
 			new StyleRule(element, ".am5-modal-content .am5stock-control-button", {
-				"padding": "0",
-				"border": "none",
-				//"margin-top": "3px"
+				"padding": "5px 6px",
+				"line-height": "0.8em"
+			}),
+
+			new StyleRule(element, ".am5stock-control-color .am5stock-control-icon", {
+				"border-radius": "3px",
+				"min-height": "1em",
+				"max-width": "50px",
+				"line-height": "0.8em"
+			}),
+
+			new StyleRule(element, ".am5-modal-content .am5stock-control-color .am5stock-control-icon", {
+				"margin": "0",
+				"width": "48px",
+				"min-height": "1em",
+				"max-width": "50px",
+				"line-height": "0.8em",
+			}),
+
+			new StyleRule(element, ".am5-modal-content .am5stock-control-button .am5stock-control-icon > .am5stock-control-icon-color", {
+				"width": "1px"
+			}),
+
+			new StyleRule(element, ".am5-modal-content input[type=\"text\"], .am5-modal-content input[type=\"number\"], .am5-modal-content select", {
+				"border": "1px solid " + border,
 			}),
 
 			new StyleRule(element, ".am5stock-control-button.am5stock-align-right", {
@@ -64,16 +87,28 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"z-index": "2",
 			}),
 
+			new StyleRule(element, ".am5stock-control-button.am5stock-control-dropdown.am5stock-control-button-active", {
+				"z-index": "3",
+			}),
+
 			new StyleRule(element, ".am5-modal-content .am5stock-control-button.am5stock-control-button-active, .am5-modal-content .am5stock-control-button:hover", {
 				"background": "none"
+			}),
+
+			new StyleRule(element, ".am5-modal-content .am5-modal-link-reset", {
+				"display": "block",
+				"color": link,
+				"text-transform": "uppercase",
+				"font-weight": "500",
+				"margin-top": "0.5em",
+				"font-size": "0.8em",
+				"cursor": "pointer"
 			}),
 
 			new StyleRule(element, ".am5stock-control-icon", {
 				"min-width": "1.2em",
 				"min-height": "1.2em",
 				"max-width": "1.2em",
-				//"max-height": "1.2em",
-				//"margin-right": "4px",
 				"display": "inline-block",
 				"position": "relative",
 				"margin": "0 5px 0 0",
@@ -84,18 +119,12 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			}),
 
 			new StyleRule(element, ".am5stock-control-icon > *", {
-				"vertical-align": "sub",
-				// "max-width": "18px",
-				// "max-height": "18px",
-				//"margin-right": "5px"
+				"vertical-align": "sub"
 			}),
 
 			new StyleRule(element, ".am5stock-control-icon > .am5stock-control-icon-color", {
 				"max-width": "20px",
-				//"max-height": "20px",
-				"width": "20px",
-				//"height": "20px",
-				//"margin-right": "5px"
+				"width": "20px"
 			}),
 
 			new StyleRule(element, ".am5stock-control-icon > .am5stock-control-icon-color-bg", {
@@ -106,13 +135,14 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 				"left": "0",
 				"top": "0",
 				"z-index": "-1",
+				"overflow": "hidden",
+				"border-radius": "3px",
 				"background-image": "linear-gradient(45deg, #808080 25%, transparent 25%), linear-gradient(-45deg, #808080 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #808080 75%), linear-gradient(-45deg, transparent 75%, #808080 75%)",
 				"background-size": "10px 10px",
 				"background-position": "0 0, 0 5px, 5px -5px, -5px 0px",
 			}),
 
 			new StyleRule(element, ".am5stock-control-button path", {
-				//fill: ic.get("secondaryButtonText")!.toCSS(),
 				"stroke-width": "0.5",
 				"stroke": text,
 				"fill": "none",

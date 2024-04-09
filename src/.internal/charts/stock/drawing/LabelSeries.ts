@@ -2,6 +2,8 @@ import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { Container } from "../../../core/render/Container";
 import type { DataItem } from "../../../core/render/Component";
 import type { SpriteResizer } from "../../../core/render/SpriteResizer";
+import type { Graphics } from "../../../core/render/Graphics";
+import type { IDrawingSeriesDataItem } from "./DrawingSeries";
 
 import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolylineSeriesDataItem } from "./PolylineSeries";
 import { Label } from "../../../core/render/Label";
@@ -10,6 +12,8 @@ import { color, Color } from "../../../core/util/Color";
 import { Template } from "../../../core/util/Template";
 
 import * as $utils from "../../../core/util/Utils";
+import * as $array from "../../../core/util/Array";
+import * as $object from "../../../core/util/Object";
 
 export interface ILabelSeriesDataItem extends IPolylineSeriesDataItem {
 }
@@ -116,6 +120,12 @@ export class LabelSeries extends PolylineSeries {
 		div.appendChild(cancelButton);
 	}
 
+	protected _dispatchAdded(): void {
+
+	}
+
+	protected _setContextSprite(_context: any) { }
+
 	protected _tweakBullet(container: Container, dataItem: DataItem<ILabelSeriesDataItem>) {
 		const dataContext = dataItem.dataContext as any;
 		const text = dataContext.text;
@@ -128,7 +138,7 @@ export class LabelSeries extends PolylineSeries {
 
 			this.setPrivate("label", label);
 
-			container.events.on("click", () => {
+			container.events.on("click", (_e) => {
 				const spriteResizer = this.spriteResizer;
 				if (spriteResizer.get("sprite") == label) {
 					spriteResizer.set("sprite", undefined);
@@ -154,6 +164,13 @@ export class LabelSeries extends PolylineSeries {
 				template.set("rotation", rotation)
 			})
 
+			label.events.on("boundschanged", () => {
+				this.markDirty();
+			})
+
+			dataContext.sprite = container;
+			dataContext.label = label;
+
 			this._tweakBullet2(label, dataItem);
 		}
 	}
@@ -163,7 +180,11 @@ export class LabelSeries extends PolylineSeries {
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		if (this._drawingEnabled) {
+		if (this._selected.length > 0) {
+			this._hideResizer();
+			this.unselectAllDrawings();
+		}
+		else if (this._drawingEnabled) {
 			if (!this._isHover) {
 
 				this._increaseIndex();
@@ -179,8 +200,11 @@ export class LabelSeries extends PolylineSeries {
 				inputDiv.style.top = (event.point.y) + "px";
 				input.focus();
 				this.spriteResizer.set("sprite", undefined);
+
+				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}
 		}
+		this.isDrawing(false);
 	}
 
 	public saveText() {
@@ -243,5 +267,97 @@ export class LabelSeries extends PolylineSeries {
 
 	protected _hideAllBullets() {
 
+	}
+
+	protected _updateSelector(selector: Graphics, index: number) {
+		const context = this._getContext(index);
+		if (context) {
+			const sprite = context.sprite;
+
+			if (sprite) {
+				if (sprite.dataItem == this.spriteResizer.get("sprite")?.dataItem) {
+					selector.hide(0);
+				}
+				else {
+					if (this._selected.indexOf(index) != -1) {
+						selector.show(0);
+					}
+				}
+
+				const selectorPadding = this.get("selectorPadding", 5);
+
+				let bounds = sprite.bounds();
+
+				let w = (bounds.right - bounds.left) + selectorPadding * 2;
+				let h = (bounds.bottom - bounds.top) + selectorPadding * 2;
+
+				selector.setAll({
+					width: w,
+					height: h,
+					x: bounds.left - selectorPadding,
+					y: bounds.top - selectorPadding
+				})
+			}
+		}
+	}
+
+	public _prepareChildren() {
+		super._prepareChildren();
+		if (this.isDirty("labelFontSize") || this.isDirty("labelFontFamily") || this.isDirty("labelFontWeight") || this.isDirty("labelFontStyle") || this.isDirty("labelFill")) {
+			$array.each(this._selected, (i) => {
+				this._applySettings(i);
+			})
+		}
+	}
+
+	protected _applySettings(index: number, _settings?: { [index: string]: any }) {
+		let context = this._getContext(index);
+
+		if (context) {
+			let label = context.label;
+
+			if (label) {
+				let template = context.settings;
+
+				const labelSettings = {
+					fontSize: this.get("labelFontSize"),
+					fontFamily: this.get("labelFontFamily"),
+					fontWeight: this.get("labelFontWeight"),
+					fontStyle: this.get("labelFontStyle"),
+					fill: this.get("labelFill"),
+					fillColor: this.get("fillColor")
+				}
+
+				const defaultState = label.states.lookup("default")!;
+				if (labelSettings) {
+					$object.each(labelSettings, (key, value) => {
+						label.set(key as any, value);
+						defaultState.set(key as any, value);
+						if (template) {
+							template.set(key, value);
+						}
+					})
+				}
+			}
+		}
+	}
+
+	protected _handleBulletDragStart(event: ISpritePointerEvent) {
+		// don't call super		
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart._dragStartDrawing(event);
+		}
+	}
+
+	protected _handleBulletDragStop(event: ISpritePointerEvent) {
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart._dragStopDrawing(event);
+		}
+
+		this._root.events.once("frameended", () => {
+			this._positionBullets(event.target.dataItem as DataItem<IDrawingSeriesDataItem>);
+		})
 	}
 }

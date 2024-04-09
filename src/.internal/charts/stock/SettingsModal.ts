@@ -20,6 +20,14 @@ export interface ISettingsModalSettings extends IModalSettings {
 	 */
 	stockChart: StockChart;
 
+	/**
+	 * Show the "Reset to default" link?
+	 *
+	 * @default true
+	 * @since 5.9.0
+	 */
+	showResetLink?: boolean;
+
 }
 
 export interface ISettingsModalPrivate extends IModalPrivate {
@@ -221,7 +229,22 @@ export class SettingsModal extends Modal {
 		table.className = "am5-modal-table";
 		content.appendChild(table);
 
+		// Log defaults
+		let populateDefaults = false;
+		let defaults: any = {};
+		if (!target.get("userData")) {
+			target.set("userData", {});
+		}
+		if (!target.get("userData")["__defaults"]) {
+			target.get("userData")["__defaults"] = defaults;
+			populateDefaults = true;
+		}
+		else {
+			defaults = target.get("userData")["__defaults"];
+		}
+
 		const settingInputs: { [index: string]: HTMLInputElement | HTMLSelectElement } = {};
+		const controls: { [index: string]: ColorControl } = {};
 		const settingsWithTarget: { [index: string]: any } = {};
 		let prevName = "";
 		let prevLine: HTMLDivElement;
@@ -229,6 +252,10 @@ export class SettingsModal extends Modal {
 			const key = this._getSettingKey(setting);
 			const keyTarget = setting.target || target;
 			const currentValue = setting.currentValue || keyTarget.get(setting.key);
+
+			if (populateDefaults) {
+				defaults[key] = currentValue;
+			}
 
 			if (setting.target) {
 				settingsWithTarget[key] = setting;
@@ -265,7 +292,9 @@ export class SettingsModal extends Modal {
 					}
 					break;
 				case "color":
-					element = this.getColor(setting, currentValue);
+					const control = this.getColor(setting, currentValue);
+					element = control.getPrivate("button")!;
+					controls[key] = control;
 					break;
 				case "checkbox":
 					element = this.getCheckbox(setting, currentValue);
@@ -302,6 +331,29 @@ export class SettingsModal extends Modal {
 				prevLine = line;
 			}
 		});
+
+		// Reset
+		if (this.get("showResetLink", true)) {
+			const resetLink = document.createElement("a");
+			resetLink.className = "am5-modal-link am5-modal-table-cell am5-modal-link-reset";
+			resetLink.innerHTML = this._root.language.translateAny("Reset to default");
+			table.appendChild(resetLink);
+
+			this._disposers.push($utils.addEventListener(resetLink, "click", () => {
+				const defaults = target.get("userData")["__defaults"];
+				$object.each(settingInputs, (key, element) => {
+					if (element.type === "checkbox") {
+						(element as HTMLInputElement).checked = defaults[key];
+					}
+					else {
+						element.value = defaults[key];
+					}
+				});
+				$object.each(controls, (key, control) => {
+					control.setColor(defaults[key]);
+				});
+			}));
+		}
 
 		// Buttons
 		const saveButton = document.createElement("input");
@@ -427,7 +479,7 @@ export class SettingsModal extends Modal {
 		return element;
 	}
 
-	private getColor(setting: any, currentValue: any): HTMLDivElement {
+	private getColor(setting: any, currentValue: any): ColorControl {
 		const control = ColorControl.new(this.root, {
 			stockChart: this.get("stockChart"),
 			useOpacity: false
@@ -440,7 +492,7 @@ export class SettingsModal extends Modal {
 			};
 		});
 		this._disposers.push(control);
-		return control.getPrivate("button")!;
+		return control;
 	}
 
 	/**

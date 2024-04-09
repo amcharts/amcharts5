@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.0] - 2024-04-09
+
+### Added
+- `zoomToDataItems(dataItems, rotate)` method added to `MapPolygonSeries`.
+- Bigger hit circle added to Stock charts drawings bullets, which becomes visible when hovered.
+- A public method `markDirtyKey()` added. Could be used to trigger an adapter.
+- A "Reset to default" link added to `StockChart`'s settings modal.
+- New `StockChart`/`DrawingSeries` methods added related to drawing selection: `selectDrawing(id, keepSelection)`, `unselectDrawing(id)`, `unselectDrawings()`.
+- New `StockChart`/`DrawingSeries` methods added related to drawing deletion: `deleteDrawing(id)`, `deleteSelectedDrawings()`.
+- New `StockChart` events: `drawingadded`, `drawingremoved`, `drawingselected`, `drawingunselected`.
+- New `DropdownListControl` methods: `getItemById(id)` and `setItemById(id)`.
+- New `IconControl` methods: `getIconByPath(path)` and `setIconByPath(path)`.
+- New drawing tools added to `StockChart`: "Triangle" and "Polyfill".
+
+### Changed
+- Improved handling of moving lines of an `XYCursor`. It will now move by one cell automatically, or by 5 cells if pressed together with `CTRL`.
+- Improved styling of a color picker control in `StockChart`'s toolbar and settings modals.
+- Drawing functionality was completely revamped: all drawings are now selectable, editable, movable, and can be deleted by selecting them and pressing `DEL`.
+- Accessibility: Pressing SPACE when element with `role="checkbox"` set is focused, will now toggle it just like pressing ENTER.
+- `pdfmake` updated to `0.2.10`.
+
+### Fixed
+- `Sprite` was not marking its bounds dirty when margins changed. It was causing layouts with margins not to be redrawn after margins changed.
+- When drawing mode was enabled in a `StockChart` while in the percent scale, it used to reset scale to regular.
+- `Tooltip` no longer overwrites user-provided `background`.
+- `Treemap` was not redrawing when layout algorithm was changed dynamically.
+- `Tooltip` position was not being updated when bounds of a `Sprite` changed.
+- Moving line of an `XYCursor` with a keyboard press could result in an axis line to be out of sync with series tooltips.
+- `tabindexOrder` was not working properly in some cases.
+- Font family and font size controls were showing unnecessary "+" icon.
+- In some rare cases setting value on an object / data item was not working.
+
+
 ## [5.8.7] - 2024-03-25
 
 ### Fixed

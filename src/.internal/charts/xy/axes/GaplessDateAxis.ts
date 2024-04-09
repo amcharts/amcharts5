@@ -636,5 +636,8 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 		return result.found;
 	}
-
+	protected _nextTime(time:number, count:number, _baseInterval:ITimeInterval){
+		let index = $math.fitToRange(this.valueToIndex(time) + count, 0, this._dates.length - 1);
+		return this._dates[index];
+	}
 }

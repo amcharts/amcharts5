@@ -1,19 +1,18 @@
 import type { Label } from "../../../core/render/Label";
 import type { Container } from "../../../core/render/Container";
+import type { DataItem } from "../../../core/render/Component";
 
 import { LabelSeries, ILabelSeriesSettings, ILabelSeriesPrivate, ILabelSeriesDataItem } from "./LabelSeries";
 import { PointedRectangle } from "../../../core/render/PointedRectangle";
-import type { DataItem } from "../../../core/render/Component";
 import { Template } from "../../../core/util/Template";
 
 import * as $ease from "../../../core/util/Ease";
 
-export interface ICalloutSeriesDataItem extends ILabelSeriesDataItem {
 
+export interface ICalloutSeriesDataItem extends ILabelSeriesDataItem {
 }
 
 export interface ICalloutSeriesSettings extends ILabelSeriesSettings {
-
 }
 
 export interface ICalloutSeriesPrivate extends ILabelSeriesPrivate {
@@ -31,7 +30,8 @@ export class CalloutSeries extends LabelSeries {
 
 	protected _tweakBullet2(label: Label, dataItem: DataItem<ICalloutSeriesDataItem>) {
 		const dataContext = dataItem.dataContext as any;
-		label.set("background", PointedRectangle.new(this._root, { themeTags: ["callout"] }, dataContext.bgSettings));
+		const background = label.set("background", PointedRectangle.new(this._root, { themeTags: ["callout"] }, dataContext.bgSettings));
+		dataContext.background = background;
 	}
 
 	protected _tweakBullet(container: Container, dataItem: DataItem<ICalloutSeriesDataItem>) {
@@ -46,16 +46,20 @@ export class CalloutSeries extends LabelSeries {
 			const label = this.getPrivate("label");
 			if (label) {
 				label.events.on("positionchanged", () => {
-					this._updatePointer(label);
+					this._root.events.once("frameended", () => {
+						this._updatePointer(label);
+					})
 				})
 
-				label.events.on("click", () => {
+				label.events.on("click", (e) => {
 					const spriteResizer = this.spriteResizer;
 					if (spriteResizer.get("sprite") == label) {
 						spriteResizer.set("sprite", undefined);
+						this._unselectDrawing(dataContext.index);
 					}
 					else {
 						spriteResizer.set("sprite", label);
+						this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey);
 					}
 					if (this._erasingEnabled) {
 						this._disposeIndex(dataContext.index);
@@ -98,6 +102,8 @@ export class CalloutSeries extends LabelSeries {
 				background.setAll({ pointerX: point.x, pointerY: point.y });
 			}
 		}
+
+		this.markDirty();
 	}
 
 	protected _afterTextSave(dataContext: any) {
@@ -116,6 +122,52 @@ export class CalloutSeries extends LabelSeries {
 			template.fill = fill;
 		}
 
+		const fillOpacity = this.get("fillOpacity");
+		if (fillOpacity != null) {
+			template.fillOpacity = fillOpacity;
+		}
+
+		const strokeOpacity = this.get("strokeOpacity");
+		if (strokeOpacity != null) {
+			template.strokeOpacity = strokeOpacity;
+		}
+
+		const stroke = this.get("strokeColor");
+		if (stroke != null) {
+			template.stroke = stroke;
+		}
+
 		return Template.new(template);
+	}
+
+	protected _applySettings(index: number, settings?: { [index: string]: any }) {
+		super._applySettings(index, settings);
+
+		const context = this._getContext(index);
+		if (context && settings) {
+			const background = context.background;
+
+			if (background) {
+				let template = context.bgSettings;
+
+				if (settings.fill != undefined) {
+					background.set("fill", settings.fill);
+					template.set("fill", settings.fill);
+				}
+				if (settings.fillOpacity != undefined) {
+					background.set("fillOpacity", settings.fillOpacity);
+					template.set("fillOpacity", settings.fillOpacity);
+				}
+				if (settings.strokeOpacity != undefined) {
+					background.set("strokeOpacity", settings.strokeOpacity);
+					template.set("strokeOpacity", settings.strokeOpacity);
+				}
+
+				if (settings.stroke != undefined) {
+					background.set("stroke", settings.stroke);
+					template.set("stroke", settings.stroke);
+				}
+			}
+		}
 	}
 }

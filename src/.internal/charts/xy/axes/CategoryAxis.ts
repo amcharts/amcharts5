@@ -632,4 +632,22 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	public getCellWidthPosition(): number {
 		return this._frequency / this.dataItems.length / (this.get("end", 1) - this.get("start", 0));
 	}
+	
+	/**
+	 * @ignore
+	 */	
+	public nextPosition(count?:number){
+		if(count == null){
+			count = 1;
+		}
+
+		if(this.get("renderer").getPrivate("letter") == "Y"){
+			count *= -1;
+		}
+
+		const position = this.getPrivate("tooltipPosition", 0);
+
+		const index = $math.fitToRange(this.axisPositionToIndex(position) + count, 0, this.dataItems.length - 1);		
+		return this.toGlobalPosition(this.indexToPosition(index));
+	}
 }

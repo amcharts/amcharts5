@@ -7,7 +7,6 @@ export interface IAverageSeriesSettings extends ISimpleLineSeriesSettings {
 }
 
 export interface IAverageSeriesPrivate extends ISimpleLineSeriesPrivate {
-
 }
 
 export class AverageSeries extends SimpleLineSeries {

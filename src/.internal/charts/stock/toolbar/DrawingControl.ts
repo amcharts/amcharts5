@@ -227,6 +227,80 @@ export class DrawingControl extends StockControl {
 		const stockChart = this.get("stockChart");
 		stockChart.panels.events.onAll(() => this._updatePanelBindings());
 
+		stockChart.events.on("drawingselected", (ev) => {
+			// Set tool
+			const tool = this._getSeriesTool(ev.series);
+			this.set("tool", tool);
+
+			// Get context
+			const context = ev.series.getContext(ev.drawingId);
+
+			if (tool == "Label" || tool == "Callout") {
+
+				/**
+				 * --------------------------------------------------------------------
+				 * Labels and callouts
+				 * --------------------------------------------------------------------
+				 */
+
+				// Set fill
+				const settings = context.settings;
+				if (settings) {
+					this.getPrivate("labelFillControl")!.setColor(settings.get("fill"));
+					this.getPrivate("labelFontSizeControl")!.setItemById(settings.get("fontSize"));
+					this.getPrivate("boldControl")!.set("active", settings.get("fontWeight") == "bold");
+					this.getPrivate("italicControl")!.set("active", settings.get("fontStyle") == "italic");
+					this.getPrivate("labelFontFamilyControl")!.setItemById(settings.get("fontFamily"));
+				}
+
+				// Callout background/outline
+				const bg = context.bgSettings;
+				if (bg) {
+					const strokeControl = this.getPrivate("strokeControl")!;
+					strokeControl.setColor(bg.get("stroke"));
+					strokeControl.setOpacity(bg.get("strokeOpacity"));
+
+					const fillControl = this.getPrivate("fillControl")!;
+					fillControl.setColor(bg.get("fill"));
+					fillControl.setOpacity(bg.get("fillOpacity"));
+				}
+
+			}
+			else {
+
+				/**
+				 * --------------------------------------------------------------------
+				 * The rest of the stuff
+				 * --------------------------------------------------------------------
+				 */
+
+				// Set stroke
+				const stroke = context.stroke || context.settings;
+				if (stroke) {
+					const strokeControl = this.getPrivate("strokeControl")!;
+					strokeControl.setColor(stroke.get("stroke"));
+					strokeControl.setOpacity(stroke.get("strokeOpacity"));
+					this.getPrivate("strokeWidthControl")!.setItemById(stroke.get("strokeWidth") + "px");
+					this.getPrivate("strokeDasharrayControl")!.setItemById(JSON.stringify(stroke.get("strokeDasharray")));
+				}
+
+				// Set fill
+				const fill = context.fill || context.settings;
+				if (fill) {
+					const fillControl = this.getPrivate("fillControl")!;
+					fillControl.setColor(fill.get("fill"));
+					fillControl.setOpacity(fill.get("fillOpacity"));
+				}
+
+				// Handle icons
+				const sprite = context.settings || context.sprite;
+				if (sprite && sprite.get("svgPath")) {
+					this.getPrivate("iconControl")!.setIconByPath(sprite.get("svgPath"));
+				}
+			}
+
+		});
+
 	}
 
 	protected _initElements(): void {
@@ -478,6 +552,7 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Label font size"),
 			currentItem: this.get("labelFontSize", "12px") + "",
 			items: fontSizes,
+			icon: "none"
 		});
 		fontSizeControl.hide();
 		fontSizeControl.setPrivate("toolbar", toolbar);
@@ -538,6 +613,7 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Label font family"),
 			currentItem: this.get("labelFontFamily", "Arial"),
 			items: fontFamilies,
+			icon: "none"
 		});
 		fontFamilyControl.hide();
 		fontFamilyControl.setPrivate("toolbar", toolbar);
@@ -678,33 +754,48 @@ export class DrawingControl extends StockControl {
 			}
 		}
 
+
 		if (this.isDirty("tool") && this.get("active")) {
 			this._setTool(this.get("tool"));
 		}
 
+		const rootEvents = this._root.events;
 		if (this.isDirty("strokeColor") || this.isDirty("strokeWidth") || this.isDirty("strokeOpacity") || this.isDirty("strokeDasharray")) {
-			this._setStroke();
+			rootEvents.once("frameended", () => {
+				this._setStroke();
+			})
 		}
 
 		if (this.isDirty("fillColor") || this.isDirty("fillOpacity")) {
-			this._setFill();
+			rootEvents.once("frameended", () => {
+				this._setFill();
+			})
 		}
 
 		if (this.isDirty("labelFill") || this.isDirty("labelFontSize") || this.isDirty("labelFontFamily") || this.isDirty("labelFontWeight") || this.isDirty("labelFontStyle")) {
-			this._setLabel();
+			rootEvents.once("frameended", () => {
+				this._setLabel();
+			})
 		}
 
 		if (this.isDirty("showExtension")) {
-			this._setExtension();
+			rootEvents.once("frameended", () => {
+				this._setExtension();
+			})
 		}
 
 		if (this.isDirty("drawingIcon")) {
-			this._setDrawingIcon();
+			rootEvents.once("frameended", () => {
+				this._setDrawingIcon();
+			})
 		}
 
 		if (this.isDirty("snapToData")) {
-			this._setSnap();
+			rootEvents.once("frameended", () => {
+				this._setSnap();
+			})
 		}
+
 	}
 
 	protected _setTool(tool?: DrawingTools): void {
@@ -742,11 +833,11 @@ export class DrawingControl extends StockControl {
 
 			// Show/hide needed drawing property controls
 			const controls: any = {
-				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Parallel Channel", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
-				strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line", "Parallel Channel"],
-				strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Line", "Polyline", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Parallel Channel", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line", "Parallel Channel"],
+				strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
 				extensionControl: ["Average", "Line", "Regression", "Trend Line"],
-				fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Parallel Channel", "Arrows &amp; Icons", "Fibonacci Timezone"],
+				fillControl: ["Callout", "Ellipse", "Quadrant Line", "Rectangle", "Parallel Channel", "Polyfill", "Triangle", "Polyfill", "Triangle", "Arrows &amp; Icons", "Fibonacci Timezone"],
 
 				labelFillControl: ["Callout", "Label"],
 				labelFontSizeControl: ["Callout", "Label"],
@@ -755,7 +846,7 @@ export class DrawingControl extends StockControl {
 				italicControl: ["Callout", "Label"],
 
 				iconControl: ["Arrows &amp; Icons"],
-				snapControl: ["Callout", "Arrows &amp; Icons", "Line", "Polyline", "Parallel Channel", "Label", "Callout", "Horizontal Line", "Horizontal Ray", "Vertical Line", "Quadrant Line", "Rectangle", "Measure", "Fibonacci"],
+				snapControl: ["Callout", "Arrows &amp; Icons", "Line", "Polyline", "Polyfill", "Triangle", "Parallel Channel", "Label", "Callout", "Horizontal Line", "Horizontal Ray", "Vertical Line", "Quadrant Line", "Rectangle", "Measure", "Fibonacci"],
 			}
 
 			$object.each(controls, (control, tools) => {
@@ -788,14 +879,14 @@ export class DrawingControl extends StockControl {
 		const stockChart = this.get("stockChart");
 		// if (chartSeries.length == 0) {
 		// 	// No target series set, take first series out of each chart
-			stockChart.panels.each((panel) => {
-				if (initializedPanels.indexOf(panel) == -1) {
-					const targetSeries = this._getPanelMainSeries(panel);
-					if (targetSeries) {
-						chartSeries.push(targetSeries);
-					}
+		stockChart.panels.each((panel) => {
+			if (initializedPanels.indexOf(panel) == -1) {
+				const targetSeries = this._getPanelMainSeries(panel);
+				if (targetSeries) {
+					chartSeries.push(targetSeries);
 				}
-			});
+			}
+		});
 		// }
 
 		if (chartSeries.length > 0) {
@@ -925,6 +1016,29 @@ export class DrawingControl extends StockControl {
 							forceHidden: true
 						});
 						break;
+					case "Polyfill":
+						series = PolylineSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis,
+							fillShape: true
+						}, template);
+						series.fills.template.setAll({
+							forceHidden: true
+						});
+						break;
+					case "Triangle":
+						series = PolylineSeries.new(this._root, {
+							series: chartSeries,
+							xAxis: xAxis,
+							yAxis: yAxis,
+							fillShape: true,
+							pointCount: 3
+						}, template);
+						series.fills.template.setAll({
+							forceHidden: true
+						});
+						break;
 					case "Quadrant Line":
 						series = QuadrantLineSeries.new(this._root, {
 							series: chartSeries,
@@ -970,7 +1084,7 @@ export class DrawingControl extends StockControl {
 					series.set("valueYShow", stockChart.getSeriesDefault(chartSeries, "valueYShow"));
 					series.set("calculateAggregates", true);
 					if (stockChart.getPrivate("comparing")) {
-						stockChart.setPercentScale();
+						stockChart.setPercentScale(true);
 					}
 				}
 			})
@@ -1020,8 +1134,6 @@ export class DrawingControl extends StockControl {
 		});
 	}
 
-
-
 	protected _setStroke(): void {
 		$object.each(this._drawingSeries, (_tool, seriesList) => {
 			$array.each(seriesList, (series) => {
@@ -1032,6 +1144,7 @@ export class DrawingControl extends StockControl {
 					strokeDasharray: this.get("strokeDasharray"),
 				});
 			});
+
 		})
 	}
 
@@ -1042,7 +1155,8 @@ export class DrawingControl extends StockControl {
 					fillColor: this.get("fillColor"),
 					fillOpacity: this.get("fillOpacity")
 				})
-			});
+			})
+
 		})
 	}
 
@@ -1134,6 +1248,12 @@ export class DrawingControl extends StockControl {
 			}
 			else if (name == "IconSeries") {
 				return "Arrows &amp; Icons";
+			}
+			else if (name == "PolylineSeries" && (series as PolylineSeries).get("pointCount") == 3) {
+				return "Triangle";
+			}
+			else if (name == "PolylineSeries" && (series as PolylineSeries).get("fillShape")) {
+				return "Polyfill";
 			}
 			name = $utils.addSpacing(name.replace("Series", ""));
 			return name as DrawingTools;

@@ -96,6 +96,45 @@ export class IconControl extends StockControl {
 		//this.getPrivate("label")!.style.display = "none";
 	}
 
+	/**
+	 * Selects an icon by its SVG path.
+	 *
+	 * @since 5.9.0
+	 * @param  path  Item ID
+	 */
+	public setIconByPath(path: string) {
+		const icon = this.getIconByPath(path);
+		if (icon !== undefined) {
+			this.setIcon(icon);
+			//this.set("currentItem", item);
+			this.events.dispatch("selected", {
+				type: "selected",
+				icon: icon,
+				target: this
+			});
+		}
+	}
+
+	/**
+	 * Returns icon by its SVG path.
+	 * 
+	 * @since 5.9.0
+	 * @param  id  Item ID
+	 * @return     Dropdown item
+	 */
+	public getIconByPath(path: string): IIcon | undefined {
+		let found: IIcon | undefined;
+		const icons = this.get("icons", []);
+		$array.eachContinue(icons, (icon) => {
+			if (icon.svgPath == path) {
+				found = icon;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+
 	protected _initIcons(): void {
 		const list = this.getPrivate("list")!;
 		const icons = this.get("icons");
@@ -111,7 +150,7 @@ export class IconControl extends StockControl {
 	}
 
 	public _getDrawingIcon(icon: IIcon): SVGElement {
-		return StockIcons._getSVG({ viewbox: "0 0 50 50", path: icon.svgPath});
+		return StockIcons._getSVG({ viewbox: "0 0 50 50", path: icon.svgPath });
 	}
 
 	public _afterChanged() {

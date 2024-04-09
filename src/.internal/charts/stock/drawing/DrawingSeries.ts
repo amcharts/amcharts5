@@ -7,13 +7,14 @@ import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import type { XYSeries } from "../../xy/series/XYSeries";
-import type { StockPanel } from "../StockPanel";
 import type { StockChart } from "../StockChart";
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
+import type { Graphics } from "../../../core/render/Graphics";
 
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "../../xy/series/LineSeries";
 import { Bullet } from "../../../core/render/Bullet";
 import { Circle } from "../../../core/render/Circle";
+import { Rectangle } from "../../../core/render/Rectangle";
 import { Container } from "../../../core/render/Container";
 import { Template } from "../../../core/util/Template";
 import { ListTemplate } from "../../../core/util/List";
@@ -24,6 +25,7 @@ import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
 import * as $object from "../../../core/util/Object";
+
 
 
 export interface IDrawingSeriesDataItem extends ILineSeriesDataItem {
@@ -89,6 +91,12 @@ export interface IDrawingSeriesSettings extends ILineSeriesSettings {
 	 * @default "value"
 	 */
 	field?: "open" | "value" | "low" | "high";
+
+	/**
+	 * Padding of a selector rectangle (how many pixels will be added to each side around the drawing when it's selected)
+	 * @default 5
+	 */
+	selectorPadding?: number;
 }
 
 export interface IDrawingSeriesPrivate extends ILineSeriesPrivate {
@@ -125,8 +133,8 @@ export class DrawingSeries extends LineSeries {
 	protected _dragStartPX: number = 0;
 	protected _dragStartY: number = 0;
 
-	protected _dvpX: { [index: string]: number | undefined } = {};
-	protected _dvY: { [index: string]: number | undefined } = {};
+	protected _dvpX: Array<{ [index: string]: number | undefined }> = [];
+	protected _dvY: Array<{ [index: string]: number | undefined }> = [];
 
 	protected _isHover: boolean = false;
 
@@ -135,6 +143,15 @@ export class DrawingSeries extends LineSeries {
 	protected _tag?: string;
 
 	protected _movePoint: IPoint = { x: 0, y: 0 };
+
+	protected selectorContainer: Container = this.children.push(Container.new(this.root, {}));
+
+	protected _selected: Array<number> = [];
+
+	protected _isSelecting: boolean = false;
+
+	// point index in segment
+	protected _pIndex: number = 0;	
 
 	public readonly grips: ListTemplate<Container> = new ListTemplate(
 		Template.new({}),
@@ -156,6 +173,13 @@ export class DrawingSeries extends LineSeries {
 		() => Circle._new(this._root, {
 			themeTags: ["outline"]
 		}, [this.outerCircles.template]),
+	);
+
+	public readonly selectors: ListTemplate<Rectangle> = new ListTemplate(
+		Template.new({}),
+		() => Rectangle._new(this._root, {
+			themeTags: ["selector"]
+		}, [this.selectors.template]),
 	);
 
 	protected _afterNew() {
@@ -182,12 +206,6 @@ export class DrawingSeries extends LineSeries {
 		const fillsTemplate = this.fills.template;
 		fillsTemplate.setAll({ templateField: "fill" });
 
-
-		fillsTemplate.events.on("dragstart", (e) => {
-			this._handleFillDragStart(e, this._getIndex(e.target));
-			this._isPointerDown = true;
-		})
-
 		fillsTemplate.events.on("pointerdown", (e) => {
 			const index = this._getIndex(e.target);
 			if (this._erasingEnabled) {
@@ -206,27 +224,21 @@ export class DrawingSeries extends LineSeries {
 			}
 		})
 
-		strokesTemplate.events.on("pointerdown", (e) => {
-			if (this._erasingEnabled) {
-				this._disposeIndex(this._getIndex(e.target));
-			}
-			else {
-				const originalEvent = e.originalEvent as any;
-				if (!originalEvent.button && this._drawingEnabled) {
-					this._handlePointerDown(e);
-				}
+		fillsTemplate.events.on("dragstart", (e) => {
+			this.startDragItem(e, this._getIndex(e.target));
+		})
+
+		fillsTemplate.events.on("click", (e) => {
+			const index = this._getIndex(e.target);
+			const originalEvent = e.originalEvent as any;
+			if (!this._isDrawing) {
+				this._selectDrawing(index, originalEvent.ctrlKey);
 			}
 		})
 
 		fillsTemplate.events.on("dragstop", (e) => {
-			this._isPointerDown = false;
 			const index = this._getIndex(e.target);
-			this._handleFillDragStop(e, index);
-
-			const stroke = this.strokes.getIndex(this._getStrokeIndex(index));
-			if (stroke) {
-				stroke.dragStop(e);
-			}
+			this.stopDragItem(e, index);
 		})
 
 		fillsTemplate.events.on("pointerover", (e) => {
@@ -244,6 +256,20 @@ export class DrawingSeries extends LineSeries {
 			this._hideAllBullets();
 		})
 
+
+		strokesTemplate.events.on("pointerdown", (e) => {
+			const index = this._getIndex(e.target);
+			if (this._erasingEnabled) {
+				this._disposeIndex(index);
+			}
+		})
+
+		strokesTemplate.events.on("click", (e) => {
+			const index = this._getIndex(e.target);
+			const originalEvent = e.originalEvent as any;
+			this._selectDrawing(index, originalEvent.ctrlKey);
+		})
+
 		strokesTemplate.events.on("pointerover", (e) => {
 			this._isHover = true;
 			this._showSegmentBullets(this._getIndex(e.target));
@@ -255,11 +281,11 @@ export class DrawingSeries extends LineSeries {
 		})
 
 		strokesTemplate.events.on("dragstop", (e) => {
-			this._handleFillDragStop(e, this._getIndex(e.target));
+			this.stopDragItem(e, this._getIndex(e.target));
 		})
 
 		strokesTemplate.events.on("dragstart", (e) => {
-			this._handleFillDragStart(e, this._getIndex(e.target));
+			this.startDragItem(e, this._getIndex(e.target));
 		})
 
 		this.bulletsContainer.states.create("hidden", { visible: true, opacity: 0 });
@@ -352,6 +378,7 @@ export class DrawingSeries extends LineSeries {
 				return true;
 			}
 		})
+
 		return index;
 	}
 
@@ -359,10 +386,34 @@ export class DrawingSeries extends LineSeries {
 		const dataItems = this._di[index];
 
 		if (dataItems) {
+			let drawingId!: string;
+			let index!: number;
+
 			$object.each(dataItems, (_key, dataItem) => {
-				this.data.removeValue(dataItem.dataContext);
+				const dataContext = dataItem.dataContext as any;
+				this.data.removeValue(dataContext);
+
+				if (dataContext) {
+					if (dataContext.drawingId) {
+						drawingId = dataContext.drawingId;
+					}
+					if (dataContext.index) {
+						index = dataContext.index;
+					}
+				}
 			})
+
+			this._pIndex = 0;
+			delete this._di[index];
+
+			this._dispatchStockEvent("drawingremoved", drawingId, index);			
 		}
+		const selector = this._getSprite(this.selectors, index) as Rectangle;
+		if (selector) {
+			this.selectors.removeValue(selector);
+		}
+
+		$array.remove(this._selected, index);
 	}
 
 	protected _afterDataChange() {
@@ -386,6 +437,10 @@ export class DrawingSeries extends LineSeries {
 
 	}
 
+	public _clearDirty(): void {
+		super._clearDirty();
+		this._isSelecting = false;
+	}
 
 	public clearDrawings(): void {
 		$array.each(this._di, (_dataItems, index) => {
@@ -394,10 +449,12 @@ export class DrawingSeries extends LineSeries {
 
 		this.data.setAll([]);
 		this._index = 0;
+		this._selected = [];
 	}
 
 	protected _getIndex(sprite: Sprite): number {
 		const userData = sprite.get("userData");
+
 		if (userData && userData.length > 0) {
 			const dataItem = this.dataItems[userData[0]];
 
@@ -442,7 +499,7 @@ export class DrawingSeries extends LineSeries {
 					$array.each(bullets, (bullet) => {
 						const sprite = bullet.get("sprite");
 						if (sprite) {
-							sprite.show();
+							sprite.show(0);
 						}
 					})
 				}
@@ -486,7 +543,43 @@ export class DrawingSeries extends LineSeries {
 		})
 	}
 
+	protected _hideResizer(sprite?: Sprite) {
+		const spriteResizer = this._getStockChart().spriteResizer;
+		if (spriteResizer) {
+			const resizerSprite = spriteResizer.get("sprite");
+			if (resizerSprite) {
+				if (!sprite || sprite.dataItem != resizerSprite.dataItem) {
+					spriteResizer.set("sprite", undefined);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public startDragItem(event: ISpritePointerEvent, index: number) {
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart._dragStartDrawing(event);
+		}
+		this._handleFillDragStart(event, index);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public stopDragItem(event: ISpritePointerEvent, index: number) {
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart._dragStopDrawing(event);
+		}
+		this._handleFillDragStop(event, index);
+	}
+
 	protected _handleFillDragStart(event: ISpritePointerEvent, index: number) {
+		this._hideResizer(event.target);
+		this._isPointerDown = false;
 		const chart = this.chart;
 		if (chart) {
 			const xAxis = this.get("xAxis");
@@ -499,16 +592,33 @@ export class DrawingSeries extends LineSeries {
 			this._dragStartY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueXns);
 
 			const dataItems = this._di[index];
+			this._dvpX[index] = {};
+			this._dvY[index] = {};
+
 			if (dataItems) {
 				$object.each(dataItems, (key, dataItem) => {
-					this._dvpX[key] = xAxis.valueToPosition(dataItem.get("valueX", 0));
-					this._dvY[key] = dataItem.get("valueY");
+					this._dvpX[index][key] = xAxis.valueToPosition(dataItem.get("valueX", 0));
+					this._dvY[index][key] = dataItem.get("valueY");
 				})
 			}
 		}
 	}
 
+	public _dragStart(event: ISpritePointerEvent) {
+		$array.each(this._selected, (index) => {
+			this._handleFillDragStart(event, index);
+		})
+	}
+
+	public _dragStop(event: ISpritePointerEvent) {
+		$array.each(this._selected, (index) => {
+			this._handleFillDragStop(event, index);
+		})
+	}
+
 	protected _handleFillDragStop(event: ISpritePointerEvent, index: number) {
+		this._isPointerDown = false;
+
 		const chart = this.chart;
 		if (chart) {
 			const point = chart.plotContainer.toLocal(event.point);
@@ -531,8 +641,9 @@ export class DrawingSeries extends LineSeries {
 
 			if (dataItems) {
 				$object.each(dataItems, (key, dataItem) => {
-					const dvpx = this._dvpX[key];
-					const dvy = this._dvY[key];
+					const dvpx = this._dvpX[index][key];
+					const dvy = this._dvY[index][key];
+
 					if ($type.isNumber(dvpx) && $type.isNumber(dvy)) {
 						const vpx = dvpx + dpx;
 						const vxns = xAxis.positionToValue(vpx);
@@ -548,11 +659,18 @@ export class DrawingSeries extends LineSeries {
 						this._setContext(dataItem, "valueY", vy, true);
 
 						this._setXLocation(dataItem, vx);
+						this._positionBullets(dataItem);
 					}
 				})
 			}
 		}
 
+		const stroke = this.strokes.getIndex(this._getStrokeIndex(index));
+		if (stroke) {
+			stroke.dragStop(event);
+		}
+
+		this.markDirty();
 		this._updateSegment(index);
 	}
 
@@ -563,11 +681,125 @@ export class DrawingSeries extends LineSeries {
 	public _updateChildren() {
 		this._updateElements();
 
+		if (this.isDirty("strokeColor") || this.isDirty("strokeOpacity") || this.isDirty("strokeDasharray") || this.isDirty("strokeWidth")) {
+			$array.each(this._selected, (i) => {
+
+				let settings = {
+					stroke: this.get("strokeColor"),
+					strokeOpacity: this.get("strokeOpacity"),
+					strokeDasharray: this.get("strokeDasharray"),
+					strokeWidth: this.get("strokeWidth")
+				}
+
+				const stroke = this.strokes.getIndex(this._getStrokeIndex(i));
+				if (stroke) {
+					let strokeTemplate: Template<any>;
+					$array.each(this.dataItems, (dataItem) => {
+						const dataContext = dataItem.dataContext as any;
+						if (dataContext.index == i) {
+							if (dataContext.stroke) {
+								strokeTemplate = dataContext.stroke;
+							}
+						}
+					})
+
+					const defaultState = stroke.states.lookup("default")!;
+					$object.each(settings, (key, value) => {
+						stroke.set(key, value);
+						defaultState.set(key, value);
+						if (strokeTemplate) {
+							strokeTemplate.set(key, value);
+						}
+					})
+				}
+
+				this.circles.each((circle) => {
+					const dataItem = circle.dataItem;
+					if (dataItem) {
+						const dataContext = dataItem.dataContext as any;
+						if (dataContext) {
+							if (dataContext.index == i) {
+								circle.set("stroke", settings.stroke)
+								circle.states.lookup("default")!.set("stroke", settings.stroke);
+							}
+						}
+					}
+				})
+
+				this.outerCircles.each((circle) => {
+					const dataItem = circle.dataItem;
+					if (dataItem) {
+						const dataContext = dataItem.dataContext as any;
+						if (dataContext) {
+							if (dataContext.index == i) {
+								circle.set("stroke", settings.stroke)
+								circle.states.lookup("default")!.set("stroke", settings.stroke);
+							}
+						}
+					}
+				})
+
+
+				this._applySettings(i, settings);
+			})
+		}
+
+		if (this.isDirty("fillColor") || this.isDirty("fillOpacity")) {
+			$array.each(this._selected, (i) => {
+				const fill = this.fills.getIndex(this._getStrokeIndex(i));
+
+				let settings = {
+					fill: this.get("fillColor"),
+					fillOpacity: this.get("fillOpacity")
+				}
+
+				if (fill) {
+					let fillTemplate: Template<any>;
+					$array.each(this.dataItems, (dataItem) => {
+						const dataContext = dataItem.dataContext as any;
+						if (dataContext.index == i) {
+							if (dataContext.fill) {
+								fillTemplate = dataContext.fill;
+							}
+						}
+					})
+
+					const defaultState = fill.states.lookup("default")!;
+					$object.each(settings, (key, value) => {
+						fill.set(key, value);
+						defaultState.set(key, value);
+						if (fillTemplate) {
+							fillTemplate.set(key, value);
+						}
+					})
+				}
+
+				this._applySettings(i, settings);
+			})
+		}
+
 		if (this._valuesDirty) {
 			this.markDirtyDrawings();
 		}
 
 		super._updateChildren();
+		this._updateSelectors();
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	public isDrawing(value:boolean){
+		this._isDrawing = value;
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart.drawingsInteractive(!value, this);
+		}
+	}
+
+	protected _applySettings(_index: number, _settings?: { [index: string]: any }) {
+
 	}
 
 	protected _updateElements() {
@@ -575,15 +807,9 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	public markDirtyDrawings() {
-		const xAxis = this.get("xAxis");
-		if (xAxis) {
-			const panel = xAxis.chart as StockPanel;
-			if (panel) {
-				const stockChart = panel.getPrivate("stockChart");
-				if (stockChart) {
-					stockChart.markDirtyDrawings();
-				}
-			}
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart.markDirtyDrawings();
 		}
 	}
 
@@ -633,6 +859,13 @@ export class DrawingSeries extends LineSeries {
 
 	}
 
+	protected _dispatchStockEvent(type: any, drawingId?: string, index?: number) {
+		const stockChart = this._getStockChart();
+		if (stockChart && stockChart.events.isEnabled(type)) {
+			stockChart.events.dispatch(type, { drawingId: drawingId, series: this, target: stockChart, index: index });
+		}
+	}
+
 	protected _addBulletInteraction(sprite: Sprite) {
 		sprite.events.on("dragged", (e) => {
 			this._handleBulletDragged(e);
@@ -651,17 +884,22 @@ export class DrawingSeries extends LineSeries {
 		})
 
 		sprite.events.on("click", (e) => {
-			if (this._erasingEnabled) {
-				const dataItem = e.target.dataItem;
-				if (dataItem) {
-					const dataContext = dataItem.dataContext as any;
+			const dataItem = e.target.dataItem;
+			if (dataItem) {
+				const dataContext = dataItem.dataContext as any;
+				if (this._erasingEnabled) {
 					if (dataContext) {
 						this._disposeIndex(dataContext.index);
 					}
 				}
-			}
-			else {
-				this._handlePointerClick(e);
+				else {
+					if (!this._isDrawing) {
+						this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey);
+					}
+					else {
+						this._handlePointerClick(e);
+					}
+				}
 			}
 		})
 	}
@@ -672,7 +910,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	protected _generateId(): string {
-		return "" + new Date().getTime() + Math.round(Math.random() * 10000);
+		return "" + new Date().getTime() + Math.round(Math.random() * 10000 + 10000);
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
@@ -724,7 +962,8 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	protected _handleBulletDragStart(_event: ISpritePointerEvent) {
-
+		this._hideResizer();
+		this.unselectAllDrawings();
 	}
 
 	protected _handleBulletDragStop(_event: ISpritePointerEvent) {
@@ -794,7 +1033,8 @@ export class DrawingSeries extends LineSeries {
 	public disableDrawing() {
 		this._erasingEnabled = false;
 		this._drawingEnabled = false;
-		this._isDrawing = false;
+		this.isDrawing(false);
+
 		if (this._clickDp) {
 			this._clickDp.dispose();
 			this._clickDp = undefined;
@@ -940,5 +1180,238 @@ export class DrawingSeries extends LineSeries {
 
 	protected _getStockChart(): StockChart {
 		return (this.get("series") as any).chart.getPrivate("stockChart");
+	}
+
+
+	protected _getSprite(sprites: ListTemplate<any>, index: number): Graphics | undefined {
+		for (let i = 0, len = sprites.length; i < len; i++) {
+			let sprite = sprites.getIndex(i);
+			if (sprite && sprite.get("userData") == index) {
+				return sprite;
+			}
+		}
+	}
+
+
+	public _selectDrawing(index: number, keepSelection?: boolean) {
+		this._isSelecting = true;
+
+		if (this._selected.indexOf(index) != -1) {
+			if (!keepSelection) {
+				this._hideResizer();
+				this.unselectAllDrawings();
+			}
+			else {
+				this._unselectDrawing(index);
+			}
+		}
+		else {
+			if (!keepSelection) {
+				this._hideResizer();
+				this.unselectAllDrawings();
+			}
+			let selector = this._getSprite(this.selectors, index);
+			if (!selector) {
+				selector = this.selectorContainer.children.push(this.selectors.make() as Rectangle);
+				this.selectors.push(selector as Rectangle);
+			}
+
+			selector.show(0);
+
+			selector.set("userData", index);
+			$array.move(this._selected, index);
+
+			this._dispatchStockEvent("drawingselected", this.indexToDrawingId(index), index);
+			this.markDirty();
+		}
+	}
+
+	protected _unselectDrawing(index: number) {
+		const selector = this._getSprite(this.selectors, index);
+		if (selector) {
+			selector.hide(0);
+			$array.remove(this._selected, index);
+			this._dispatchStockEvent("drawingunselected", this.indexToDrawingId(index), index);
+		}
+	}
+
+	protected _updateSelectors() {
+		this.selectors.each((selector) => {
+			const index = selector.get("userData")
+			this._updateSelector(selector, index);
+		})
+	}
+
+	protected _updateSelector(selector: Graphics, index: number) {
+		let l!: number;
+		let r!: number;
+		let t!: number;
+		let b!: number;
+
+		const selectorPadding = this.get("selectorPadding", 5);
+
+		$array.each(this.dataItems, (dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			if (dataContext) {
+				if (dataContext.index == index) {
+					let point = dataItem.get("point");
+					if (point) {
+						if (l == null) {
+							l = point.x;
+						}
+						l = Math.min(l, point.x);
+
+						if (r == null) {
+							r = point.x;
+						}
+						r = Math.max(r, point.x);
+
+						if (t == null) {
+							t = point.y;
+						}
+						t = Math.min(t, point.y);
+
+						if (b == null) {
+							b = point.y;
+						}
+						b = Math.max(b, point.y);
+					}
+				}
+			}
+		})
+
+		if (r != null && l != null && t != null && b != null) {
+			selector.setAll({
+				width: r - l + selectorPadding * 2,
+				height: b - t + selectorPadding * 2,
+				x: l - selectorPadding,
+				y: t - selectorPadding
+			})
+		}
+	}
+
+	/**
+	 * 
+	 * @param index returns drawingId
+	 * @returns 
+	 */
+	public indexToDrawingId(index: number): string | undefined {
+		let id: string | undefined;
+		$array.eachContinue(this.dataItems, (dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			if (dataContext.index == index) {
+				id = dataContext.drawingId;
+				return false;
+			}
+			return true;
+		})
+		return id;
+	}
+
+	protected _getContext(index: number): any {
+		let context: any;
+		$array.eachContinue(this.dataItems, (dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			if (dataContext.index == index && dataContext.sprite) {
+				context = dataContext;
+				return false;
+			}
+			return true;
+		})
+		return context;
+	}
+
+	public getContext(id: string) {
+		const index = this.getIndex(id);
+		if (index != null) {
+			return this._getContext(index);
+		}
+	}
+
+	/**
+	 * Unselects all currently selected drawings on this series.
+	 *
+	 * @since 5.9.0
+	 */
+	public unselectAllDrawings() {
+		const chart = this._getStockChart();
+		if (chart) {
+			chart.unselectDrawings();
+		}
+	}
+
+	/**
+	 * Unselects all currently selected drawings of this series.
+	 *
+	 * @since 5.9.0
+	 */
+	public unselectDrawings() {
+		for (let i = this._selected.length - 1; i >= 0; i--) {
+			this._unselectDrawing(this._selected[i]);
+		}
+	}
+
+	/**
+	 * Selects series' drawing by its ID.
+	 *
+	 * @param  id             Drawing ID
+	 * @param  keepSelection  Keep existing selections
+	 * @since 5.9.0
+	 */
+	public selectDrawing(id: string, keepSelection?: boolean) {
+		const index = this.getIndex(id);
+		if (index != null) {
+			this._selectDrawing(index, keepSelection);
+		}
+	}
+
+	/**
+	 * Unselects series' drawing by its ID.
+	 *
+	 * @param  id  Drawing ID
+	 * @since 5.9.0
+	 */
+	public unselectDrawing(id: string) {
+		const index = this.getIndex(id);
+		if (index != null) {
+			this._unselectDrawing(index);
+		}
+	}
+
+	/**
+	 * Deletes all currently selected drawings on this series.
+	 *
+	 * @since 5.9.0
+	 */
+	public deleteSelected() {
+		for (let i = this._selected.length - 1; i >= 0; i--) {
+			this.disposeIndex(this._selected[i]);
+		}
+	}
+
+	/**
+	 * Deletes a series' drawing by ids ID.
+	 *
+	 * @param  id  Drawing ID
+	 * @since 5.9.0
+	 */
+	public deleteDrawing(id: string) {
+		const index = this.getIndex(id);
+		if (index != null) {
+			this.disposeIndex(index);
+		}
+	}
+
+	/**
+	 * Cancels current drawing
+	 *
+	 * @since 5.9.0
+	 */
+	public cancelDrawing() {
+		if(this._isDrawing){
+			this._disposeIndex(this._index);
+		}
+
+		this.isDrawing(false);
 	}
 }

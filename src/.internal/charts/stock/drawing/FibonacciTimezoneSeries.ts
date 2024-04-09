@@ -2,17 +2,13 @@ import { FibonacciSeries, IFibonacciSeriesSettings, IFibonacciSeriesPrivate, IFi
 import { color } from "../../../core/util/Color";
 
 export interface IFibonacciTimezoneSeriesDataItem extends IFibonacciSeriesDataItem {
-
 }
 
 export interface IFibonacciTimezoneSeriesSettings extends IFibonacciSeriesSettings {
-
 }
 
 export interface IFibonacciTimezoneSeriesPrivate extends IFibonacciSeriesPrivate {
-
 }
-
 
 export class FibonacciTimezoneSeries extends FibonacciSeries {
 	public static className: string = "FibonacciTimezoneSeries";

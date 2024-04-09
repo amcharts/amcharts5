@@ -119,10 +119,8 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 */
 	zoomY?: boolean;
 
-
 	/**
-	 * @todo review
-	 * You can prevent axis to be zoomed if this is false.
+	 * Set this to `false` to prevent axis from being zoomed.
 	 */
 	zoomable?:boolean;
 
@@ -1092,15 +1090,16 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				}
 			})
 
+			if (this.get("snapTooltip")) {
+				position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
+			}
+			
+			this.setPrivateRaw("tooltipPosition", position);
 
 			if (tooltip) {
 				renderer.updateTooltipBounds(tooltip);
 
-				if (this.get("snapTooltip")) {
-					position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
-				}
-				if (!$type.isNaN(position)) {
-					this.setPrivateRaw("tooltipPosition", position);
+				if (!$type.isNaN(position)) {					
 					this._updateTooltipText(tooltip, position);
 					renderer.positionTooltip(tooltip, position);
 
@@ -1254,4 +1253,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public getCellWidthPosition(): number {
 		return 0.05;
 	}
+
+	/**
+	 * @ignore
+	 */
+	public abstract nextPosition(_count?:number):number
 }

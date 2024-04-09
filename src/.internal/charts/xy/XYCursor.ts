@@ -281,15 +281,15 @@ export class XYCursor extends Container {
 			this._handleYLine();
 		}));
 
-		this._disposers.push(this.lineX.events.on("focus", (ev) => this._handleLineFocus(ev.target)));
-		this._disposers.push(this.lineX.events.on("blur", (ev) => this._handleLineBlur(ev.target)));
+		this._disposers.push(this.lineX.events.on("focus", () => this._handleLineFocus()));
+		this._disposers.push(this.lineX.events.on("blur", () => this._handleLineBlur()));
 
-		this._disposers.push(this.lineY.events.on("focus", (ev) => this._handleLineFocus(ev.target)));
-		this._disposers.push(this.lineY.events.on("blur", (ev) => this._handleLineBlur(ev.target)));
+		this._disposers.push(this.lineY.events.on("focus", () => this._handleLineFocus()));
+		this._disposers.push(this.lineY.events.on("blur", () => this._handleLineBlur()));
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-				this._handleLineMove(ev.keyCode);
+				this._handleLineMove($utils.getEventKey(ev), ev.ctrlKey);
 			}));
 		}
 	}
@@ -319,66 +319,62 @@ export class XYCursor extends Container {
 		this.lineY.setPrivate("visible", visible);
 	}
 
-	protected _handleLineMove(keyCode: number) {
+	protected _handleLineMove(key: string, ctrlKey?: boolean) {
 		let dir: any = "";
-		let position = 0;
-		let increment = 0.1;
+
 		const chart = this.chart;
 
-		if (this._root.focused(this.lineX)) {
-			if (chart && chart.xAxes.length) {
-				increment = chart.xAxes.getIndex(0)!.getCellWidthPosition();
+		let axis: Axis<AxisRenderer> | undefined;
+		if (chart && chart.xAxes.length) {
+			if (this._root.focused(this.lineX)) {
+				dir = "positionX";
+				axis = chart.xAxes.getIndex(0);
 			}
-			position = this.getPrivate("positionX", 0);
-			dir = "positionX";
-			if (keyCode == 37) {
-				position -= increment;
+			else if (this._root.focused(this.lineY)) {
+				axis = chart.yAxes.getIndex(0);
+				dir = "positionY";
 			}
-			else if (keyCode == 39) {
-				position += increment;
-			}
-		}
-		else if (this._root.focused(this.lineY)) {
-			if (chart && chart.yAxes.length) {
-				increment = chart.yAxes.getIndex(0)!.getCellWidthPosition();
-			}
-			position = this.getPrivate("positionY", 0);
-			dir = "positionY";
-			if (keyCode == 38) {
-				position -= increment;
-			}
-			else if (keyCode == 40) {
-				position += increment;
-			}
-		}
 
-		if (position < 0) {
-			position = 0;
-		}
-		else if (position > 1) {
-			position = 1;
-		}
+			let m = 1;
+			if (ctrlKey) {
+				m = 5;
+			}
 
-		if (dir != "") {
-			this.set(dir, position);
-		}
+			if (axis) {
+				let inversed = axis.get("renderer").get("inversed", false);
+				let step;
+				if (key == "ArrowRight" || key == "ArrowDown") {
+					step = 1;
+				}
+				else if (key == "ArrowLeft" || key == "ArrowUp") {
+					step = -1;
+				}
+				else if (key == "Tab") {
+					step = 0;
+				}
 
-		this.handleMove();
+				if (step != null) {
+					if (inversed) {
+						step *= -1;
+					}
+
+					this.set(dir, axis.nextPosition(step * m));
+				}
+			}
+		}
 	}
 
-	protected _handleLineFocus(_line: Grid) {
+	protected _handleLineFocus() {
 		this.setAll({
 			positionX: this.getPrivate("positionX", 0),
 			positionY: this.getPrivate("positionY", 0),
 			alwaysShow: true
 		});
-		this.handleMove();
-		this.setTimeout(() => {
-			this.handleMove();
-		}, 10);
+
+		this._handleLineMove("Tab");
 	}
 
-	protected _handleLineBlur(_line: Grid) {
+	protected _handleLineBlur() {
 		this.setAll({
 			positionX: undefined,
 			positionY: undefined,
@@ -460,7 +456,7 @@ export class XYCursor extends Container {
 	}
 
 	protected _updateXLine(tooltip: Tooltip) {
-		let x = $math.round(this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).x, 2);
+		let x = $math.round(this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).x, 3);
 		if (this._toX != x) {
 			this.lineX.animate({ key: "x", to: x, duration: tooltip.get("animationDuration", 0), easing: tooltip.get("animationEasing") });
 			this._toX = x;
@@ -468,7 +464,7 @@ export class XYCursor extends Container {
 	}
 
 	protected _updateYLine(tooltip: Tooltip) {
-		let y = $math.round(this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).y, 2);
+		let y = $math.round(this._display.toLocal(tooltip.get("pointTo", { x: 0, y: 0 })).y, 3);
 		if (this._toY != y) {
 			this.lineY.animate({ key: "y", to: y, duration: tooltip.get("animationDuration", 0), easing: tooltip.get("animationEasing") });
 			this._toY = y;
@@ -536,6 +532,8 @@ export class XYCursor extends Container {
 				}
 			}
 			this._handleMove(event);
+
+			this._handleLineBlur();
 		}));
 
 		const parent = this.parent;

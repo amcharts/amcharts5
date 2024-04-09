@@ -1,10 +1,10 @@
 import type { PanelControls } from "./PanelControls";
 import type { StockChart } from "./StockChart"
 import type { XYSeries } from "../xy/series/XYSeries";
+import type { Rectangle } from "../../core/render/Rectangle";
 
 import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
 import { ListAutoDispose } from "../../core/util/List";
-import type { Rectangle } from "../../core/render/Rectangle";
 
 import * as $array from "../../core/util/Array";
 

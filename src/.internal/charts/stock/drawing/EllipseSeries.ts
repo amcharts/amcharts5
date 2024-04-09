@@ -7,12 +7,12 @@ import { ListTemplate } from "../../../core/util/List";
 import { Template } from "../../../core/util/Template";
 
 import * as $array from "../../../core/util/Array";
+import * as $object from "../../../core/util/Object";
 
 export interface IEllipseSeriesDataItem extends IDrawingSeriesDataItem {
 }
 
 export interface IEllipseSeriesSettings extends IDrawingSeriesSettings {
-
 }
 
 export interface IEllipseSeriesPrivate extends IDrawingSeriesPrivate {
@@ -65,18 +65,47 @@ export class EllipseSeries extends DrawingSeries {
 		})
 
 		ellipseTemplate.events.on("dragstart", (e) => {
-			this._handleFillDragStart(e, e.target.get("userData"));
+			this.startDragItem(e, e.target.get("userData"));
 		})
 
 		ellipseTemplate.events.on("dragstop", (e) => {
-			this._handleFillDragStop(e, e.target.get("userData"));
+			this.stopDragItem(e, e.target.get("userData"));
 		})
 
 		ellipseTemplate.events.on("click", (e) => {
+			const index = e.target.get("userData");
 			if (this._erasingEnabled) {
-				this._disposeIndex(e.target.get("userData"));
+				this._disposeIndex(index);
+			}
+			else {
+				this._selectDrawing(index, (e.originalEvent as any).ctrlKey);
 			}
 		})
+	}
+
+	protected _applySettings(index: number, settings: { [index: string]: any }) {
+
+		let template: Template<any>;
+		$array.each(this.dataItems, (dataItem) => {
+			const dataContext = dataItem.dataContext as any;
+			if (dataContext.index == index) {
+				if (dataContext.settings) {
+					template = dataContext.settings;
+				}
+			}
+		})
+
+		const ellipse = this._getSprite(this.ellipses, index);
+		if (ellipse) {
+			const defaultState = ellipse.states.lookup("default")!;
+			$object.each(settings, (key, value) => {
+				ellipse.set(key as any, value);
+				defaultState.set(key as any, value);
+				if (template) {
+					template.set(key, value);
+				}
+			})
+		}
 	}
 
 	protected _handleFillDragStop(event: ISpritePointerEvent, index: number) {
@@ -101,7 +130,6 @@ export class EllipseSeries extends DrawingSeries {
 			this._setXLocation(tDI, mx);
 			this._setXLocation(bDI, mx);
 		}
-
 	}
 
 
@@ -215,12 +243,15 @@ export class EllipseSeries extends DrawingSeries {
 			if (!this._isDragging) {
 				if (!this._isDrawing) {
 					this._increaseIndex();
-					this._isDrawing = true;
+					this.isDrawing(true);
+					this._hideResizer(event.target);
 					this.bulletsContainer.show();
 					this._addPoints(event, this._index);
+					this.unselectDrawings();
 				}
 				else {
-					this._isDrawing = false;
+					this.isDrawing(false);
+					this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 				}
 			}
 		}
@@ -232,6 +263,7 @@ export class EllipseSeries extends DrawingSeries {
 			ellipse._setDataItem(dataItem);
 			this._ellipses[index] = ellipse;
 			ellipse.setAll({ userData: index });
+			(dataItem?.dataContext as any).sprite = ellipse;
 		}
 	}
 
@@ -308,8 +340,6 @@ export class EllipseSeries extends DrawingSeries {
 			this._addPoint(valueX, valueY, "t", index);
 			this._addPoint(valueX, valueY, "b", index);
 			this._addPoint(valueX, valueY, "r", index);
-
-			console.log(this.data)
 		}
 	}
 

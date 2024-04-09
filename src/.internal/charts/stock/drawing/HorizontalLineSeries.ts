@@ -1,8 +1,6 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
-import type { Line } from "../../../core/render/Line";
-import type { Template } from "../../../core/util/Template";
 
 export interface IHorizontalLineSeriesDataItem extends ISimpleLineSeriesDataItem {
 }
@@ -23,7 +21,10 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 
 	protected _tag = "horizontal";
 
-	protected _updateExtension = true;
+	protected _afterNew() {
+		super._afterNew();
+		this.lines.template.set("forceHidden", true);
+	}
 
 	protected _handleBulletDragged(event: ISpritePointerEvent) {
 		super._handleBulletDragged(event);
@@ -35,43 +36,53 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 			const index = dataContext.index;
 			const diP1 = this._di[index]["p1"];
 			const diP2 = this._di[index]["p2"];
-			const di = this._di[index]["e"];
+			const diP3 = this._di[index]["p3"];
 
 			const movePoint = this._movePointerPoint;
 
-			if (diP1 && diP2 && di && movePoint) {
+			if (diP1 && diP2 && diP3 && movePoint) {
 				const yAxis = this.get("yAxis");
 				const xAxis = this.get("xAxis");
 
 				const valueX = this._getXValue(xAxis.positionToValue(xAxis.coordinateToPosition(movePoint.x)));
-				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);				
+				const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(movePoint.y)), valueX);
+
+				const min = xAxis.getPrivate("min", 0);
+				const max = xAxis.getPrivate("max", 1);
 
 				this._setContext(diP1, "valueY", valueY, true);
 				this._setContext(diP2, "valueY", valueY, true);
+				this._setContext(diP3, "valueY", valueY, true);
 
-				this._setContext(diP1, "valueX", valueX);
-				this._setContext(diP2, "valueX", valueX + 1);
+				this._setContext(diP1, "valueX", min - (max - min));
+				this._setContext(diP2, "valueX", valueX);
+				this._setContext(diP3, "valueX", max + (max - min));
 
-				this._setXLocation(diP1, valueX);
-				this._setXLocation(diP2, valueX + 1);
+				this._setXLocation(diP2, diP2.get("valueX", 0));
 
-				this._positionBullets(diP1);
 				this._positionBullets(diP2);
 			}
 		}
 	}
 
-	protected _updateExtensionLine(line: Line, template: Template<any>) {
-		line.setAll({
-			stroke: template.get("stroke"),
-			strokeWidth: template.get("strokeWidth"),
-			strokeDasharray: template.get("strokeDasharray"),
-			strokeOpacity: template.get("strokeOpacity")
-		})
-	}
-
 	protected _handlePointerMoveReal() {
 
+	}
+
+	protected _updateSegment(index: number) {
+		if (this._di[index]) {
+			const diP1 = this._di[index]["p1"];
+			const diP3 = this._di[index]["p3"];
+
+			if (diP1 && diP3) {
+				const xAxis = this.get("xAxis");
+				const min = xAxis.getPrivate("min", 0);
+				const max = xAxis.getPrivate("max", 1);
+
+				this._setContext(diP1, "valueX", min - (max - min), true);
+				this._setContext(diP3, "valueX", max + (max - min), true);
+			}
+		}
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
@@ -79,8 +90,16 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 			if (!this._isDragging) {
 				this._increaseIndex();
 				this._addPoints(event, this._index);
-				this._isDrawing = false;
+				this.isDrawing(false);
+				this.unselectAllDrawings();
+				this._updateSegment(this._index);
+				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}
 		}
+	}
+
+	protected _addPointsReal(valueX: number, valueY: number, index: number) {
+		super._addPointsReal(valueX, valueY, index);
+		this._addPoint(valueX, valueY, "p3", index);
 	}
 }

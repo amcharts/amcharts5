@@ -117,7 +117,7 @@ export class StockLegend extends Legend {
 				}
 			}
 
-			setTimeout(()=>{
+			setTimeout(() => {
 				button.unhover();
 			}, 50)
 		})

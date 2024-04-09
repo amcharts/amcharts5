@@ -7,7 +7,9 @@ import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolyl
 import { Bullet } from "../../../core/render/Bullet";
 import { Graphics } from "../../../core/render/Graphics";
 import { Template } from "../../../core/util/Template";
+
 import * as $array from "../../../core/util/Array";
+import * as $object from "../../../core/util/Object";
 
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 
@@ -20,22 +22,22 @@ export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 export interface IIconSeriesSettings extends IPolylineSeriesSettings {
 
 	/**
-	 * @todo review
+	 * An SVG path of the icon.
 	 */
 	iconSvgPath: string;
 
 	/**
-	 * @todo review
+	 * Scale (0-X).
 	 */
 	iconScale?: number;
 
 	/**
-	 * @todo review
+	 * Relative horizontal center.
 	 */
 	iconCenterX?: Percent;
 
 	/**
-	 * @todo review
+	 * Relative vertical center.
 	 */
 	iconCenterY?: Percent;
 
@@ -79,9 +81,11 @@ export class IconSeries extends PolylineSeries {
 					themeTags: ["icon"]
 				}, template);
 
+				dataContext.sprite = sprite;
+
 				this._addBulletInteraction(sprite);
 
-				sprite.events.on("click", () => {
+				sprite.events.on("click", (_e) => {
 					const spriteResizer = this.spriteResizer;
 					if (spriteResizer.get("sprite") == sprite) {
 						spriteResizer.set("sprite", undefined);
@@ -117,8 +121,14 @@ export class IconSeries extends PolylineSeries {
 		})
 	}
 
+	protected _setContextSprite(_context: any) { }
+
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		if (this._drawingEnabled) {
+		if (this._selected.length > 0) {
+			this._hideResizer();
+			this.unselectAllDrawings();
+		}
+		else if (this._drawingEnabled) {
 			if (!this._isHover) {
 				super._handlePointerClick(event);
 
@@ -127,8 +137,11 @@ export class IconSeries extends PolylineSeries {
 
 				this._increaseIndex();
 				this._di[this._index] = {};
+
+				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}
 		}
+		this.isDrawing(false);
 	}
 
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -137,7 +150,54 @@ export class IconSeries extends PolylineSeries {
 		this._isHover = false;
 	}
 
+	protected _applySettings(index: number, settings?: { [index: string]: any }) {
+		let template: Template<any>;
+		let sprite!: Graphics;
+
+		let context = this._getContext(index);
+		if (context) {
+			sprite = context.sprite;
+			template = context.settings;
+
+			if (sprite) {
+
+				const svgPath = this.get("iconSvgPath");
+				const centerX = this.get("iconCenterX");
+				const centerY = this.get("iconCenterY");
+
+				sprite.set("svgPath", svgPath);
+				sprite.set("centerX", centerX);
+				sprite.set("centerY", centerY);
+
+				const defaultState = sprite.states.lookup("default")!;
+				defaultState.set("svgPath", svgPath);
+				defaultState.set("centerX", centerX);
+				defaultState.set("centerY", centerY);
+
+				if (template) {
+					template.set("svgPath", svgPath);
+					template.set("centerX", centerX);
+					template.set("centerY", centerY);
+				}
+
+				if (settings) {
+					$object.each(settings, (key, value) => {
+						sprite.set(key as any, value);
+						defaultState.set(key as any, value);
+						if (template) {
+							template.set(key, value);
+						}
+					})
+				}
+			}
+		}
+	}
+
 	protected _hideAllBullets() {
+
+	}
+
+	protected _dispatchAdded(): void {
 
 	}
 
@@ -200,6 +260,67 @@ export class IconSeries extends PolylineSeries {
 					}
 				})
 			}
+		})
+	}
+
+	public _prepareChildren() {
+		super._prepareChildren();
+		if (this.isDirty("iconSvgPath")) {
+
+			$array.each(this._selected, (i) => {
+				this._applySettings(i);
+			})
+		}
+	}
+
+	protected _updateSelector(selector: Graphics, index: number) {
+		const context = this._getContext(index);
+		if (context) {
+			const sprite = context.sprite;
+
+			if (sprite) {
+				if (sprite.dataItem == this.spriteResizer.get("sprite")?.dataItem) {
+					selector.hide(0);
+				}
+				else {
+					if (this._selected.indexOf(index) != -1) {
+						selector.show(0);
+					}
+				}
+
+				const selectorPadding = this.get("selectorPadding", 5);
+
+				let bounds = sprite.bounds();
+
+				let w = (bounds.right - bounds.left) + selectorPadding * 2;
+				let h = (bounds.bottom - bounds.top) + selectorPadding * 2;
+
+				selector.setAll({
+					width: w,
+					height: h,
+					x: bounds.left - selectorPadding,
+					y: bounds.top - selectorPadding
+				})
+			}
+		}
+	}
+
+	protected _handleBulletDragStart(event: ISpritePointerEvent) {
+		// don't call super
+		this._hideResizer(event.target);
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart._dragStartDrawing(event);
+		}
+	}
+
+	protected _handleBulletDragStop(event: ISpritePointerEvent) {
+		const stockChart = this._getStockChart();
+		if (stockChart) {
+			stockChart._dragStopDrawing(event);
+		}
+		this._root.events.once("frameended", () => {
+			this._positionBullets(event.target.dataItem as DataItem<IIconSeriesDataItem>);
 		})
 	}
 }

@@ -1,17 +1,16 @@
 import type { Graphics } from "../../../core/render/Graphics";
 import type { DataItem } from "../../../core/render/Component";
 import type { Color } from "../../../core/util/Color";
+import type { Sprite } from "../../../core/render/Sprite";
 
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 import { Label } from "../../../core/render/Label";
 import { ListTemplate } from "../../../core/util/List";
 import { Template } from "../../../core/util/Template";
 
-
 import * as $array from "../../../core/util/Array";
 
 export interface IFibonacciSeriesDataItem extends ISimpleLineSeriesDataItem {
-
 }
 
 export interface IFibonacciSeriesSettings extends ISimpleLineSeriesSettings {
@@ -29,12 +28,7 @@ export interface IFibonacciSeriesSettings extends ISimpleLineSeriesSettings {
 }
 
 export interface IFibonacciSeriesPrivate extends ISimpleLineSeriesPrivate {
-
 }
-
-
-
-
 
 export class FibonacciSeries extends SimpleLineSeries {
 	public static className: string = "FibonacciSeries";
@@ -76,6 +70,10 @@ export class FibonacciSeries extends SimpleLineSeries {
 		this._updateChildrenReal();
 	}
 
+	protected _getIndex(sprite: Sprite): number {
+		return sprite.get("userData");
+	}
+
 	protected _updateChildrenReal() {
 		const chart = this.chart;
 
@@ -88,64 +86,67 @@ export class FibonacciSeries extends SimpleLineSeries {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
 
-					const p1 = diP1.get("point");
-					const p2 = diP2.get("point");
+					if (diP1 && diP2) {
 
-					if (p1 && p2) {
-						const sequence = this.get("sequence", []);
-						let prevValue = 0;
+						const p1 = diP1.get("point");
+						const p2 = diP2.get("point");
 
-						const labels = this._labels[i];
-						const strokes = this._strokes[i];
-						const fills = this._fills[i];
+						if (p1 && p2) {
+							const sequence = this.get("sequence", []);
+							let prevValue = 0;
 
-						for (let i = 0; i < sequence.length; i++) {
-							const value = sequence[i] - 1;
+							const labels = this._labels[i];
+							const strokes = this._strokes[i];
+							const fills = this._fills[i];
 
-							const label = labels[i];
+							for (let i = 0; i < sequence.length; i++) {
+								const value = sequence[i] - 1;
 
-							const fill = fills[i];
-							const stroke = strokes[i];
+								const label = labels[i];
 
-							let fillColor = this.get("colors", [])[i];
-							let strokeColor = fillColor;
+								const fill = fills[i];
+								const stroke = strokes[i];
 
-							fill.set("fill", fillColor);
-							fill.set("fillOpacity", this.get("fillOpacity", 0));
-							stroke.set("stroke", strokeColor);
-							stroke.set("strokeOpacity", this.get("strokeOpacity", 0));
+								let fillColor = this.get("colors", [])[i];
+								let strokeColor = fillColor;
 
-							const y1 = p1.y + (p2.y - p1.y) * prevValue;
-							const y2 = p1.y + (p2.y - p1.y) * -value;
+								fill.set("fill", fillColor);
+								fill.set("fillOpacity", this.get("fillOpacity", 0));
+								stroke.set("stroke", strokeColor);
+								stroke.set("strokeOpacity", this.get("strokeOpacity", 0));
 
-							const realValue = yAxis.positionToValue(yAxis.coordinateToPosition(y2));
+								const y1 = p1.y + (p2.y - p1.y) * prevValue;
+								const y2 = p1.y + (p2.y - p1.y) * -value;
 
-							fill.setPrivate("visible", true);
-							stroke.setPrivate("visible", true);
+								const realValue = yAxis.positionToValue(yAxis.coordinateToPosition(y2));
 
-							fill.set("draw", (display) => {
-								display.moveTo(p1.x, y1);
-								display.lineTo(p2.x, y1);
+								fill.setPrivate("visible", true);
+								stroke.setPrivate("visible", true);
 
-								display.lineTo(p2.x, y2);
-								display.lineTo(p1.x, y2);
-								display.lineTo(p1.x, y1);
-							})
+								fill.set("draw", (display) => {
+									display.moveTo(p1.x, y1);
+									display.lineTo(p2.x, y1);
 
-							stroke.set("draw", (display) => {
-								display.moveTo(p1.x, y2);
-								display.lineTo(p2.x, y2);
-							})
+									display.lineTo(p2.x, y2);
+									display.lineTo(p1.x, y2);
+									display.lineTo(p1.x, y1);
+								})
 
-							const dataItem = label.dataItem;
-							if (dataItem) {
-								dataItem.set("value" as any, realValue);
+								stroke.set("draw", (display) => {
+									display.moveTo(p1.x, y2);
+									display.lineTo(p2.x, y2);
+								})
+
+								const dataItem = label.dataItem;
+								if (dataItem) {
+									dataItem.set("value" as any, realValue);
+								}
+
+								label.setAll({ x: p2.x, y: y2, fill: fillColor });
+								label.text.markDirtyText();
+
+								prevValue = -value;
 							}
-
-							label.setAll({ x: p2.x, y: y2, fill: fillColor });
-							label.text.markDirtyText();
-
-							prevValue = -value;
 						}
 					}
 				}
@@ -173,8 +174,11 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 				const fill = this.makeFill(this.fills);
 				fillsArr.push(fill);
+				fill.set("userData", index);
+				fill.states.remove("hover");
 
 				const stroke = this.makeStroke(this.strokes);
+				stroke.set("userData", index);
 				strokesArr.push(stroke);
 			}
 

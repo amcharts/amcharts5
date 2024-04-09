@@ -9,6 +9,7 @@ import { Template } from "../../../core/util/Template";
 
 import * as $math from "../../../core/util/Math";
 
+
 export interface ISimpleLineSeriesDataItem extends IDrawingSeriesDataItem {
 }
 
@@ -78,6 +79,8 @@ export class SimpleLineSeries extends DrawingSeries {
 			this._showSegmentBullets(e.target.get("userData"));
 		})
 
+		this.strokes.template.set("forceInactive", true);
+
 		lineTemplate.events.on("pointerout", (e) => {
 			this._hideAllBullets();
 
@@ -114,8 +117,12 @@ export class SimpleLineSeries extends DrawingSeries {
 		})
 
 		hitTemplate.events.on("click", (e) => {
+			const index = e.target.get("userData");
 			if (this._erasingEnabled) {
-				this._disposeIndex(e.target.get("userData"));
+				this._disposeIndex(index);
+			}
+			else {
+				this._selectDrawing(index, (e.originalEvent as any).ctrlKey);
 			}
 		})
 
@@ -216,14 +223,17 @@ export class SimpleLineSeries extends DrawingSeries {
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
-		if (!this._isDragging) {
+		if (!this._isDragging && !this._isSelecting) {
 			if (!this._isDrawing) {
-				this._isDrawing = true;
+				this.isDrawing(true);
+				this._hideResizer(event.target);
+				this.unselectAllDrawings();
 				this._increaseIndex();
 				this._addPoints(event, this._index);
 			}
 			else {
-				this._isDrawing = false;
+				this.isDrawing(false);
+				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}
 		}
 	}
@@ -279,6 +289,8 @@ export class SimpleLineSeries extends DrawingSeries {
 			this._hitLines[index] = hitLine;
 
 			const dataContext = this.dataItems[this.dataItems.length - 1].dataContext as any;
+			dataContext.sprite = line;
+
 			let showExtension = this.get("showExtension", true);
 
 			let color = this.get("strokeColor", this.get("stroke"));
@@ -286,7 +298,6 @@ export class SimpleLineSeries extends DrawingSeries {
 			const strokeTemplate = dataContext.stroke;
 			if (strokeTemplate) {
 				color = strokeTemplate.get("stroke");
-				this._updateExtensionLine(line, strokeTemplate);
 			}
 
 			if (dataContext) {
@@ -301,10 +312,6 @@ export class SimpleLineSeries extends DrawingSeries {
 
 			this._updateSegment(index);
 		}
-	}
-
-	protected _updateExtensionLine(_line: Line, _template: Template<any>) {
-
 	}
 
 	protected _addTemplates(index: number) {
@@ -360,5 +367,18 @@ export class SimpleLineSeries extends DrawingSeries {
 		super.setInteractive(value);
 		this.hitLines.template.set("forceInactive", !value);
 		this.lines.template.set("forceInactive", !value);
+	}
+
+	protected _applySettings(index: number, settings?: { [index: string]: any }) {
+		super._applySettings(index, settings);
+		let context = this._getContext(index);
+
+		if (context) {
+			let line = context.sprite;
+
+			if (line && settings && settings.stroke) {
+				line.set("stroke", settings.stroke)
+			}
+		}
 	}
 }

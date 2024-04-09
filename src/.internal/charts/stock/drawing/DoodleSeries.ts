@@ -1,11 +1,11 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import { DrawingSeries, IDrawingSeriesSettings, IDrawingSeriesPrivate, IDrawingSeriesDataItem } from "./DrawingSeries";
+import { color } from "../../../core/util/Color";
 
 export interface IDoodleSeriesDataItem extends IDrawingSeriesDataItem {
 }
 
 export interface IDoodleSeriesSettings extends IDrawingSeriesSettings {
-
 }
 
 export interface IDoodleSeriesPrivate extends IDrawingSeriesPrivate {
@@ -27,10 +27,17 @@ export class DoodleSeries extends DrawingSeries {
 
 	protected _tag = "doodle";
 
+	protected _down: boolean = false;
+
 	protected _afterNew() {
 		super._afterNew();
 		this.setPrivate("allowChangeSnap", false);
 		this.bullets.clear();
+
+		this.strokes.template.setAll({
+			fill: color(0xffffff),
+			fillOpacity: 0
+		})
 	}
 
 	protected _handlePointerMove(event: ISpritePointerEvent) {
@@ -72,16 +79,11 @@ export class DoodleSeries extends DrawingSeries {
 		}
 	}
 
-	protected _handleFillDragStart(e: ISpritePointerEvent, index: number) {
-		if (!this._drawingEnabled) {
-			super._handleFillDragStart(e, index);
-		}
-	}
-
 	protected _handlePointerDown(event: ISpritePointerEvent) {
 		super._handlePointerDown(event);
 		const chart = this.chart;
 		if (chart) {
+
 			this._increaseIndex();
 			this._pIndex = 0;
 
@@ -96,14 +98,16 @@ export class DoodleSeries extends DrawingSeries {
 				cursor.setPrivate("visible", false);
 			}
 
-			this.data.push({ stroke: this._getStrokeTemplate(), index: this._index, corner: this._pIndex, drawingId: this._drawingId });
+			this._down = true;
+			this.data.push({ stroke: this._getStrokeTemplate(), sprite: this.mainContainer, index: this._index, corner: this._pIndex, drawingId: this._drawingId });
 		}
 	}
 
 	protected _handlePointerUp(event: ISpritePointerEvent) {
 		super._handlePointerUp(event);
 		const chart = this.chart;
-		if (chart) {
+		if (chart && this._down) {
+			this._down = false;
 			this.setTimeout(() => {
 				chart.set("panX", this._panX);
 				chart.set("panY", this._panY);
@@ -112,6 +116,8 @@ export class DoodleSeries extends DrawingSeries {
 					cursor.setPrivate("visible", true);
 				}
 			}, 100)
+
+			this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 		}
 	}
 }

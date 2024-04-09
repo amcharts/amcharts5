@@ -21,6 +21,11 @@ export interface IClusteredDataItem extends IComponentDataItem {
 	 * Bullet of clustered data item
 	 */
 	bullet?: Bullet;
+
+	/**
+	 * An ID of a group.
+	 */
+	groupId?: string	
 }
 
 export interface IClusteredPointSeriesDataItem extends IMapPointSeriesDataItem {
@@ -78,7 +83,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_bullet} for more info
 	 */
-	clusteredBullet?: (root: Root, series: ClusteredPointSeries, dataItem: DataItem<IClusteredPointSeriesDataItem>) => Bullet | undefined;
+	clusteredBullet?: (root: Root, series: ClusteredPointSeries, dataItem: DataItem<IClusteredDataItem>) => Bullet | undefined;
 
 	/**
 	 * If bullets are closer to each other than `scatterDistance`, they will be
@@ -266,6 +271,8 @@ export class ClusteredPointSeries extends MapPointSeries {
 					this.clusteredDataItems.push(clusteredDataItem)
 				}
 
+				let groupId;
+
 				$array.each(cluster, (dataItem) => {
 					dataItem.setRaw("cluster", clusteredDataItem);
 
@@ -284,12 +291,14 @@ export class ClusteredPointSeries extends MapPointSeries {
 							}
 						})
 					}
+					groupId = dataItem.get("groupId");
 				})
 
 				let averageX = sumX / len;
 				let averageY = sumY / len;
 
 				clusteredDataItem.setRaw("children" as any, cluster);
+				clusteredDataItem.setRaw("groupId", groupId);
 
 				const prevLen = clusteredDataItem.get("value" as any);
 				clusteredDataItem.setRaw("value" as any, len);

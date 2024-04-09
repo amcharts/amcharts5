@@ -943,6 +943,14 @@ export abstract class Sprite extends Entity {
 		super._afterNew();
 	}
 
+	/**
+	 * Marks some setting as dirty. Could be used to trigger adapter.
+	 * @param key 
+	 */
+	public markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
+		this._markDirtyKey(key);
+	}
+
 	public _markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
 		super._markDirtyKey(key);
 		if (key == "x" || key == "y" || key == "dx" || key == "dy") {
@@ -1329,7 +1337,7 @@ export abstract class Sprite extends Entity {
 			this._sizeDirty = true;
 		}
 
-		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight") || this.isPrivateDirty("maxWidth") || this.isPrivateDirty("maxHeight") || this.isPrivateDirty("minWidth") || this.isPrivateDirty("minHeight")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("minWidth") || this.isDirty("minHeight") || this.isPrivateDirty("maxWidth") || this.isPrivateDirty("maxHeight") || this.isPrivateDirty("minWidth") || this.isPrivateDirty("minHeight") || this.isDirty("marginLeft") || this.isDirty("marginTop") || this.isDirty("marginRight") || this.isDirty("marginBottom")) {
 			this.markDirtyBounds();
 			this._sizeDirty = true;
 		}
@@ -1910,6 +1918,11 @@ export abstract class Sprite extends Entity {
 				this.parent.markDirty();
 				this.parent.markDirtyBounds();
 			}
+
+			// Update tooltip position together with the Sprite
+			if (this.getPrivate("showingTooltip")) {
+				this.showTooltip();
+			}			
 		}
 	}
 

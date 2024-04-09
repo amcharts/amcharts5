@@ -1,8 +1,9 @@
 import type { DataItem } from "../../../core/render/Component";
 import type { Graphics } from "../../../core/render/Graphics";
 import type { IPoint } from "../../../core/util/IPoint";
-import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
+
+import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
 export interface IParallelChannelSeriesDataItem extends ISimpleLineSeriesDataItem { }
 
@@ -37,15 +38,18 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 		if (!this._isDragging) {
 			if (!this._isDrawing) {
 				if (!this._firstClick) {
-					this._isDrawing = true;
+					this.isDrawing(true);
+					this._hideResizer(event.target);
 					this._increaseIndex();
 					this._addPoints(event, this._index);
 					this._firstClick = true;
+					this.unselectDrawings();
 				}
 			}
 			else {
 				if (!this._firstClick) {
-					this._isDrawing = false;
+					this.isDrawing(false);
+					this._dispatchStockEvent("drawingadded", this._drawingId);
 				}
 				this._firstClick = false;
 			}

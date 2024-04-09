@@ -163,9 +163,12 @@ export class Treemap extends Hierarchy {
 			}
 			if (algorithm) {
 				this._treemapLayout = d3hierarchy.treemap().tile(algorithm);
-			}
-			if (this._rootNode) {
-				this._updateNodes(this._rootNode);
+				this._updateVisuals();
+
+				const selectedDataItem = this.get("selectedDataItem") as DataItem<this["_dataItemSettings"]>;				
+				if(selectedDataItem){
+					this._zoom(selectedDataItem);
+				}				
 			}
 		}
 
@@ -179,7 +182,7 @@ export class Treemap extends Hierarchy {
 			if (this._rootNode) {
 				this._updateNodesScale(this._rootNode);
 			}
-		}
+		}		
 	}
 
 	protected _updateVisuals() {
