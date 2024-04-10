@@ -43,7 +43,8 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 			}),
 
 			new StyleRule(element, ".am5stock-control-button:hover", {
-				"background": active
+				//"background": hover
+				"border-color": hover
 			}),
 
 			new StyleRule(element, ".am5stock-control-button.am5stock-no-hover:hover", {

@@ -45,7 +45,8 @@ export class StockChartDefaultTheme extends Theme {
 				extraMax: 0.05,
 				strictMinMaxSelection: true
 			},
-			autoSetPercentScale: true
+			autoSetPercentScale: true,
+			drawingSelectionEnabled: false
 		});
 
 		r("StockPanel").setAll({

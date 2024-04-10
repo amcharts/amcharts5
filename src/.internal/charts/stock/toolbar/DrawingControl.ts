@@ -177,6 +177,13 @@ export interface IDrawingControlPrivate extends IStockControlPrivate {
 	// label?: HTMLDivElement;
 	toolControl?: DrawingToolControl;
 	eraserControl?: StockControl;
+
+	/**
+	 * Selector mode toggler.
+	 *
+	 * @since 5.9.1
+	 */
+	selectControl?: StockControl;
 	clearControl?: StockControl;
 
 	strokeControl?: ColorControl;
@@ -647,6 +654,26 @@ export class DrawingControl extends StockControl {
 		extensionControl.events.on("click", this._resetControls, this);
 
 		/**
+		 * Select control
+		 */
+		const selectControl = StockControl.new(this._root, {
+			stockChart: stockChart,
+			description: l.translateAny("Select"),
+			icon: StockIcons.getIcon("Select"),
+			active: stockChart.get("drawingSelectionEnabled", false)
+		});
+		this._disposers.push(stockChart.on("drawingSelectionEnabled", (active) => {
+			selectControl.set("active", active);
+		}));
+		selectControl.setPrivate("toolbar", toolbar);
+		toolsContainer.appendChild(selectControl.getPrivate("button")!);
+		this.setPrivate("selectControl", selectControl);
+		selectControl.on("active", (_ev) => {
+			const active = selectControl.get("active", false);
+			stockChart.set("drawingSelectionEnabled", active);
+		});
+
+		/**
 		 * Eraser control
 		 */
 		const eraserControl = StockControl.new(this._root, {
@@ -687,7 +714,7 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Enables or disables eraser tool.
+	 * Enables or disables eraser mode.
 	 *
 	 * @since 5.3.9
 	 * @param  active  Eraser active

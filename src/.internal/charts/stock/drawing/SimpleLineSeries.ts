@@ -369,6 +369,13 @@ export class SimpleLineSeries extends DrawingSeries {
 		this.lines.template.set("forceInactive", !value);
 	}
 
+	public enableDrawingSelection(value:boolean){
+		super.enableDrawingSelection(value);		
+		this.hitLines.template.set("forceInactive", !value);
+		this.lines.template.set("forceInactive", !value);			
+		this.strokes.template.set("forceInactive", true);
+	}
+
 	protected _applySettings(index: number, settings?: { [index: string]: any }) {
 		super._applySettings(index, settings);
 		let context = this._getContext(index);

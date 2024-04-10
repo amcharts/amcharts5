@@ -151,7 +151,7 @@ export class DrawingSeries extends LineSeries {
 	protected _isSelecting: boolean = false;
 
 	// point index in segment
-	protected _pIndex: number = 0;	
+	protected _pIndex: number = 0;
 
 	public readonly grips: ListTemplate<Container> = new ListTemplate(
 		Template.new({}),
@@ -346,6 +346,9 @@ export class DrawingSeries extends LineSeries {
 		this.events.on("pointerout", () => {
 			this._handlePointerOut();
 		})
+
+		this._getStockChart().markDirtyKey("drawingSelectionEnabled");
+
 	}
 
 	/**
@@ -406,7 +409,7 @@ export class DrawingSeries extends LineSeries {
 			this._pIndex = 0;
 			delete this._di[index];
 
-			this._dispatchStockEvent("drawingremoved", drawingId, index);			
+			this._dispatchStockEvent("drawingremoved", drawingId, index);
 		}
 		const selector = this._getSprite(this.selectors, index) as Rectangle;
 		if (selector) {
@@ -488,6 +491,15 @@ export class DrawingSeries extends LineSeries {
 		this.grips.template.set("forceInactive", !value);
 		this.circles.template.set("forceInactive", !value);
 		this.outerCircles.template.set("forceInactive", !value);
+
+		if(value){
+			this.showAllBullets();
+		}
+	}
+
+	public enableDrawingSelection(value: boolean) {
+		this.strokes.template.set("forceInactive", !value);
+		this.fills.template.set("forceInactive", !value);
 	}
 
 	protected _showSegmentBullets(index: number) {
@@ -790,11 +802,13 @@ export class DrawingSeries extends LineSeries {
 	/**
 	 * @ignore
 	 */
-	public isDrawing(value:boolean){
+	public isDrawing(value: boolean) {
 		this._isDrawing = value;
 		const stockChart = this._getStockChart();
 		if (stockChart) {
-			stockChart.drawingsInteractive(!value, this);
+			if (value) {
+				stockChart.set("drawingSelectionEnabled", false);
+			}
 		}
 	}
 
@@ -1194,35 +1208,37 @@ export class DrawingSeries extends LineSeries {
 
 
 	public _selectDrawing(index: number, keepSelection?: boolean) {
-		this._isSelecting = true;
+		if (this._getStockChart().get("drawingSelectionEnabled")) {
+			this._isSelecting = true;
 
-		if (this._selected.indexOf(index) != -1) {
-			if (!keepSelection) {
-				this._hideResizer();
-				this.unselectAllDrawings();
+			if (this._selected.indexOf(index) != -1) {
+				if (!keepSelection) {
+					this._hideResizer();
+					this.unselectAllDrawings();
+				}
+				else {
+					this._unselectDrawing(index);
+				}
 			}
 			else {
-				this._unselectDrawing(index);
-			}
-		}
-		else {
-			if (!keepSelection) {
-				this._hideResizer();
-				this.unselectAllDrawings();
-			}
-			let selector = this._getSprite(this.selectors, index);
-			if (!selector) {
-				selector = this.selectorContainer.children.push(this.selectors.make() as Rectangle);
-				this.selectors.push(selector as Rectangle);
-			}
+				if (!keepSelection) {
+					this._hideResizer();
+					this.unselectAllDrawings();
+				}
+				let selector = this._getSprite(this.selectors, index);
+				if (!selector) {
+					selector = this.selectorContainer.children.push(this.selectors.make() as Rectangle);
+					this.selectors.push(selector as Rectangle);
+				}
 
-			selector.show(0);
+				selector.show(0);
 
-			selector.set("userData", index);
-			$array.move(this._selected, index);
+				selector.set("userData", index);
+				$array.move(this._selected, index);
 
-			this._dispatchStockEvent("drawingselected", this.indexToDrawingId(index), index);
-			this.markDirty();
+				this._dispatchStockEvent("drawingselected", this.indexToDrawingId(index), index);
+				this.markDirty();
+			}
 		}
 	}
 
@@ -1408,7 +1424,7 @@ export class DrawingSeries extends LineSeries {
 	 * @since 5.9.0
 	 */
 	public cancelDrawing() {
-		if(this._isDrawing){
+		if (this._isDrawing) {
 			this._disposeIndex(this._index);
 		}
 

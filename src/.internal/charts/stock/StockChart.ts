@@ -117,6 +117,16 @@ export interface IStockChartSettings extends IContainerSettings {
 	 */
 	volumeNegativeColor?: Color | null;
 
+	/**
+	 * If set to `true`, all drawings will be selectable.
+	 *
+	 * Selectable drawings can be moved, rotated, or deleted.
+	 * 
+	 * @default false
+	 * @since 5.9.1
+	 */
+	drawingSelectionEnabled?: boolean;
+
 }
 
 export interface IStockChartPrivate extends IContainerPrivate {
@@ -361,6 +371,20 @@ export class StockChart extends Container {
 
 
 	public _prepareChildren() {
+
+		if (this.isDirty("drawingSelectionEnabled")) {
+			const enabled = this.get("drawingSelectionEnabled", false);
+			if (!enabled) {
+				this.unselectDrawings();
+			}
+			this.panels.each((panel) => {
+				panel.series.each((series) => {
+					if (series.isType<DrawingSeries>("DrawingSeries")) {
+						series.enableDrawingSelection(enabled);
+					}
+				})
+			})
+		}
 
 		if (this.isDirty("volumeNegativeColor") || this.isDirty("volumePositiveColor")) {
 			const volumeSeries = this.get("volumeSeries");
@@ -1142,7 +1166,7 @@ export class StockChart extends Container {
 				}
 			})
 		})
-	}	
+	}
 
 	/**
 	 * Deletes all currently selected drawings.

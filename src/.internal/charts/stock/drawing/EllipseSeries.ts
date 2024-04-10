@@ -420,4 +420,9 @@ export class EllipseSeries extends DrawingSeries {
 		super.setInteractive(value);
 		this.ellipses.template.set("forceInactive", !value);
 	}
+
+	public enableDrawingSelection(value:boolean){
+		super.enableDrawingSelection(value);
+		this.ellipses.template.set("forceInactive", !value);
+	}	
 }

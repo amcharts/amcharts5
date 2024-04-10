@@ -835,7 +835,7 @@ export class Root implements IDisposer {
 									// Find next item in focusable group
 									const group = focusedSprite.get("focusableGroup");
 									const items = this._tabindexes.filter((item) => {
-										return item.get("focusableGroup") == group && item.getPrivate("focusable") !== false ? true : false;
+										return item.get("focusableGroup") == group && item.getPrivate("focusable") !== false && item.isVisibleDeep() ? true : false;
 									});
 									let index = items.indexOf(focusedSprite);
 									const lastIndex = items.length - 1;
@@ -1573,13 +1573,11 @@ export class Root implements IDisposer {
 		this._decorateFocusElement(target);
 
 		disposers.push($utils.addEventListener(focusElement, "focus", (ev: FocusEvent) => {
-			const index = Array.prototype.indexOf.call(this._focusElementContainer!.children, ev.target);
-			this._handleFocus(ev, index);
+			this._handleFocus(ev);
 		}));
 
 		disposers.push($utils.addEventListener(focusElement, "blur", (ev: FocusEvent) => {
-			const index = Array.prototype.indexOf.call(this._focusElementContainer!.children, ev.target);
-			this._handleBlur(ev, index);
+			this._handleBlur(ev);
 		}));
 
 		this._moveFocusElement(index, target);
@@ -1667,13 +1665,30 @@ export class Root implements IDisposer {
 
 	}
 
-	protected _handleFocus(ev: FocusEvent, index: number): void {
+	protected _getSpriteByFocusElement(target: any): Sprite | undefined {
+		let found: Sprite | undefined;
+		$array.eachContinue(this._tabindexes, (item, _index) => {
+			if (item.getPrivate("focusElement")!.dom === target) {
+				found = item;
+				return false;
+			}
+			return true;
+		});
+		return found;
+	}
+
+	protected _handleFocus(ev: FocusEvent): void {
 		if (this._a11yD == true) {
 			return;
 		}
 
 		// Get element
-		const focused = this._tabindexes[index];
+		//const focused = this._tabindexes[index];
+		const focused = this._getSpriteByFocusElement(ev.target);
+
+		if (!focused) {
+			return;
+		}
 
 		// Jump over hidden elements
 		if (!focused.isVisibleDeep()) {
@@ -1729,7 +1744,7 @@ export class Root implements IDisposer {
 		(<HTMLElement>focusableElements[index]).focus();
 	}
 
-	protected _handleBlur(ev: FocusEvent, _index: number): void {
+	protected _handleBlur(ev: FocusEvent): void {
 		if (this._a11yD == true) {
 			return;
 		}

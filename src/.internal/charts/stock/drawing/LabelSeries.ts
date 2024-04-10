@@ -186,7 +186,7 @@ export class LabelSeries extends PolylineSeries {
 		}
 		else if (this._drawingEnabled) {
 			if (!this._isHover) {
-
+				this.isDrawing(true);
 				this._increaseIndex();
 				this._di[this._index] = {};
 
@@ -199,7 +199,8 @@ export class LabelSeries extends PolylineSeries {
 				inputDiv.style.left = (event.point.x) + "px";
 				inputDiv.style.top = (event.point.y) + "px";
 				input.focus();
-				this.spriteResizer.set("sprite", undefined);
+
+				this.spriteResizer.set("sprite", undefined);				
 
 				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}

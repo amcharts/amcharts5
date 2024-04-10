@@ -433,6 +433,9 @@ export class LineSeries extends XYSeries {
 		}
 
 
+		let rangeStrokeTemplate = this._strokeTemplate;
+		let rangeFillTemplate = this._fillTemplate;
+
 		for (i = dataItemIndex; i < currentEndIndex; i++) {
 			this._dindex = i;
 			const dataItem = this._dataItems[i];
@@ -464,6 +467,7 @@ export class LineSeries extends XYSeries {
 						break;
 					}
 					else {
+						rangeStrokeTemplate = strokeTemplate;
 						stroke.template = strokeTemplate;
 					}
 				}
@@ -482,6 +486,7 @@ export class LineSeries extends XYSeries {
 						break;
 					}
 					else {
+						rangeFillTemplate = fillTemplate;
 						fill.template = fillTemplate;
 					}
 				}
@@ -532,12 +537,12 @@ export class LineSeries extends XYSeries {
 				container.children.push(stroke);
 			}
 
-			if (this._strokeTemplate && this._strokeTemplate != this.strokes.template) {
-				stroke.template = this._strokeTemplate;
+			if (rangeStrokeTemplate && rangeStrokeTemplate != this.strokes.template) {
+				stroke.template = rangeStrokeTemplate;
 			}			
 
-			if (this._fillTemplate && this._fillTemplate != this.fills.template) {
-				fill.template = this._fillTemplate;
+			if (rangeFillTemplate && rangeFillTemplate != this.fills.template) {
+				fill.template = rangeFillTemplate;
 			}						
 
 			stroke.setPrivate("visible", true);

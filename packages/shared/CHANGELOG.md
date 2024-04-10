@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.1] - 2024-04-10
+
+## Added
+- New control in `StockChart`'s drawing toolbar: "Select". Allows toggling "selection" mode on and off. When it's on, clicking on any existing drawing will select it. Otherwise drawing will be initiated using currently selected tool. This allows drawing over existing drawings. Default: off.
+- New `StockChart` setting: `drawingSelectionEnabled` (default: `false`). If set to `true`, all drawings will be selectable by clicking on them.
+
+### Changed
+- Bundled `xlsx` library code updated to `0.20.2`.
+- All drawings are not selectable by default (they were selectable since 5.9.0). To enable selection, use the newly introduced "Select" control, or via `StockChart`'s `drawingSelectionEnabled` setting.
+
+###
+- Revisited fix to `tabindexOrder` with a safer approach.
+- Arrow-navigating between grouped focusable items were not "jumping over" hidden items.
+- `LineSeries`' axis ranges were not properly using `stroke`/`fill` templates from data.
+
+
 ## [5.9.0] - 2024-04-09
 
 ### Added
