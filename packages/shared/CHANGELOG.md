@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.2] - 2024-04-17
+
+### Added
+- Accessibility: Two new `Tooltip` settings added: `readerAnnounce` (boolean, default: `false`) and `labelAriaLabel`. If `readerAnnounce` is set to `true`, tooltip's contents (`labelAriaLabel` if set, or regular label text) will be read out by screen readers when tooltip is shown or its data item changes.
+- Accessibility: New `Label` method: `getAccessibleText()`. Returns populated `arialLabel` text if set, or regular `text` content.
+- New `Sprite` method: `compositeScale()`. Returns actual scale of an element, compounded based on scale of its own and all of its ancestors.
+- Net global function `am5.getRootById(id)`. Returns `Root` instance stored in a `<div>` with specific id.
+- 4 new `StockPanel` events added: `moved`, `closed`, `collapsed`, and `expanded`. [More details](https://www.amcharts.com/docs/v5/charts/stock/panels/#Events).
+- 2 new `Entity` methods added: `off(key, callback?)` and `offPrivate(key, callback?)`. Allows removing setting/private setting value change events set via `on()`/`onPrivate()`. [More details](https://www.amcharts.com/docs/v5/concepts/events/#Removing).
+- New `StockChart` setting: `erasingEnabled`. If set to `true`, the chart will go into "eraser" mode - same as clicking on an Eraser tool in stock toolbar.
+
+### Changed
+- HTML content will now scale according to its "composite" `scale`. (Scale calculated all the way its ancestor tree).
+- `StockChart` will now restore "selection mode" after briefly turning it off while drawing is being drawn.
+- Improved dangling of circular labels with Arabic text.
+
+### Fixed
+- HTML content was sometimes being incorrectly positioned if either `width` or `height` was set, but not both.
+- Selecting a drawing on a `StockChart` was resulting in an error if there was no `DrawingControl` present in a chart's toolbar.
+- `StockChart`'s eraser tool was not working properly since `5.9.1`.
+- If a `StockPanel` was added to a zoomed `StockChart` it would not sync its zoom and would appear fully zoomed out.
+
+
 ## [5.9.1] - 2024-04-10
 
 ## Added

@@ -1,6 +1,6 @@
 export { Root } from "./.internal/core/Root";
 export { Theme } from "./.internal/core/Theme";
-export { addLicense, registry, disposeAllRootElements } from "./.internal/core/Registry";
+export { addLicense, registry, disposeAllRootElements, getRootById } from "./.internal/core/Registry";
 export { ready } from "./.internal/core/util/Utils";
 export { Modal, IModalSettings } from "./.internal/core/util/Modal";
 export { Entity, IEntitySettings, IEntityEvents, IEntityPrivate } from "./.internal/core/util/Entity";

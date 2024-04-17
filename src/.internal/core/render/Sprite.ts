@@ -2512,6 +2512,17 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
+	 * Returns an actual scale of the element, taking into account all parents.
+	 *
+	 * @return Opacity
+	 * @since 5.9.2
+	 */
+	public compositeScale(): number {
+		const scale = this.get("scale", 1);
+		return this._parent ? (this._parent.compositeScale() * scale) : scale;
+	}
+
+	/**
 	 * Returns width of this element in pixels.
 	 *
 	 * @return Width (px)

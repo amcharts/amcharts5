@@ -498,6 +498,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	public enableDrawingSelection(value: boolean) {
+		this._erasingEnabled = false;
 		this.strokes.template.set("forceInactive", !value);
 		this.fills.template.set("forceInactive", !value);
 	}
@@ -807,6 +808,7 @@ export class DrawingSeries extends LineSeries {
 		const stockChart = this._getStockChart();
 		if (stockChart) {
 			if (value) {
+				stockChart._selectionWasOn = stockChart.get("drawingSelectionEnabled", false);
 				stockChart.set("drawingSelectionEnabled", false);
 			}
 		}
@@ -875,6 +877,13 @@ export class DrawingSeries extends LineSeries {
 
 	protected _dispatchStockEvent(type: any, drawingId?: string, index?: number) {
 		const stockChart = this._getStockChart();
+
+		if(type == "drawingadded"){
+			if(stockChart._selectionWasOn){
+				stockChart.set("drawingSelectionEnabled", true);
+			}
+		}
+
 		if (stockChart && stockChart.events.isEnabled(type)) {
 			stockChart.events.dispatch(type, { drawingId: drawingId, series: this, target: stockChart, index: index });
 		}
@@ -1038,10 +1047,14 @@ export class DrawingSeries extends LineSeries {
 
 	public enableErasing() {
 		this._erasingEnabled = true;
+		this.setInteractive(true);
 	}
 
 	public disableErasing() {
 		this._erasingEnabled = false;
+		if(!this._getStockChart().get("drawingSelectionEnabled")){
+			this.setInteractive(false);
+		}		
 	}
 
 	public disableDrawing() {

@@ -239,6 +239,10 @@ export class DrawingControl extends StockControl {
 			const tool = this._getSeriesTool(ev.series);
 			this.set("tool", tool);
 
+			if (!this._isInited()) {
+				return;
+			}
+
 			// Get context
 			const context = ev.series.getContext(ev.drawingId);
 
@@ -665,6 +669,7 @@ export class DrawingControl extends StockControl {
 		this._disposers.push(stockChart.on("drawingSelectionEnabled", (active) => {
 			selectControl.set("active", active);
 		}));
+
 		selectControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(selectControl.getPrivate("button")!);
 		this.setPrivate("selectControl", selectControl);
@@ -681,6 +686,11 @@ export class DrawingControl extends StockControl {
 			description: l.translateAny("Eraser"),
 			icon: StockIcons.getIcon("Eraser")
 		});
+
+		this._disposers.push(stockChart.on("erasingEnabled", (active) => {
+			eraserControl.set("active", active);
+		}));
+
 		eraserControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(eraserControl.getPrivate("button")!);
 		this.setPrivate("eraserControl", eraserControl);
@@ -720,16 +730,7 @@ export class DrawingControl extends StockControl {
 	 * @param  active  Eraser active
 	 */
 	public setEraser(active: boolean) {
-		$object.each(this._drawingSeries, (_tool, seriesList) => {
-			$array.each(seriesList, (series) => {
-				if (active) {
-					series.enableErasing();
-				}
-				else {
-					series.disableErasing();
-				}
-			});
-		});
+		this.get("stockChart").set("erasingEnabled", active);
 	}
 
 	/**

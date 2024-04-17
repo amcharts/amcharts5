@@ -531,11 +531,28 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
+	 * Removes a callback for when value of a setting changes.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key       Private settings key
+	 * @param   callback  Callback
+	 * @since 5.9.2
+	 */
+	public off<Key extends keyof this["_settings"]>(key: Key, callback?: (value: this["_settings"][Key], target?: this, key?: Key) => void): void {
+		let events = this._settingEvents[key];
+		if (events !== undefined && callback !== undefined) {
+			$array.removeFirst(events, callback);
+		}
+		else {
+			delete this._settingEvents[key];
+		}
+	}
+
+	/**
 	 * Sets a callback function to invoke when specific key of private settings
 	 * changes or is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
-	 * @ignore
 	 * @param   key       Private settings key
 	 * @param   callback  Callback
 	 * @return            Disposer for event
@@ -559,6 +576,24 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
+	 * Removes a callback for when value of a private setting changes.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key       Private settings key
+	 * @param   callback  Callback
+	 * @since 5.9.2
+	 */
+	public offPrivate<Key extends keyof this["_privateSettings"]>(key: Key, callback?: (value: this["_privateSettings"][Key], target?: this, key?: Key) => void): void {
+		let events = this._privateSettingEvents[key];
+		if (events !== undefined && callback !== undefined) {
+			$array.removeFirst(events, callback);
+		}
+		else {
+			delete this._privateSettingEvents[key];
+		}
+	}
+
+/**
 	 * @ignore
 	 */
 	public getRaw<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;

@@ -303,7 +303,7 @@ export function getEventKey(event: KeyboardEvent): string {
 	if (event.key !== undefined) {
 		return event.key;
 	}
-	switch(event.keyCode) {
+	switch (event.keyCode) {
 		case 9: return "Tab";
 		case 13: return "Enter";
 		case 16: return "Shift";
@@ -864,6 +864,44 @@ export function addSpacing(str: string): string {
 		}
 		result += char;
 	}
+	return result;
+}
+
+/**
+ * Splits the string into separate characters. Keeps RTL words non-split.
+ * 
+ * @param   source  Input
+ * @return          Split text
+ */
+export function splitString(source: string): string[] {
+	// Regular expression to identify RTL characters
+	const rtlChar = /[\u0590-\u05FF\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+	// Regular expression to capture segments ending with specific Arabic characters
+	const splitPattern = /([^اأدذرزو]*[اأدذرزو])/gi;
+
+	// Split input string into array of words or characters, including whitespace
+	let segments = source.split(/(\s+)/); // Split by whitespace, capturing it
+
+	let result: string[] = [];
+	segments.forEach(segment => {
+		if (segment.match(/^\s+$/)) {
+			// If the segment is purely whitespace
+			if (segment = " ") {
+				segment = "  ";
+			}
+			result.push(segment);
+		} else if (rtlChar.test(segment)) {
+			// If the segment contains RTL characters, handle special splits
+			let parts = segment.split(splitPattern).filter(part => part !== '');
+			// Concatenate parts processed by the split pattern directly to result
+			result = result.concat(parts);
+		} else {
+			// Treat this segment as LTR: split into characters
+			result = result.concat([...segment]);
+		}
+	});
+
 	return result;
 }
 

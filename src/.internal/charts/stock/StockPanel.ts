@@ -3,7 +3,7 @@ import type { StockChart } from "./StockChart"
 import type { XYSeries } from "../xy/series/XYSeries";
 import type { Rectangle } from "../../core/render/Rectangle";
 
-import { XYChart, IXYChartPrivate, IXYChartSettings } from "../xy/XYChart";
+import { XYChart, IXYChartPrivate, IXYChartSettings, IXYChartEvents } from "../xy/XYChart";
 import { ListAutoDispose } from "../../core/util/List";
 
 import * as $array from "../../core/util/Array";
@@ -20,6 +20,39 @@ export interface IStockPanelPrivate extends IXYChartPrivate {
 
 }
 
+export interface IStockPanelEvents extends IXYChartEvents {
+	/**
+	 * Kicks in when panels is moved up or down.
+	 * 
+	 * @since 5.9.2
+	 */
+	moved: {
+		oldIndex: number;
+		newIndex: number;
+	};
+
+	/**
+	 * Kicks in when panel is closed (removed).
+	 *
+	 * @since 5.9.2
+	 */
+	closed: {};
+
+	/**
+	 * Kicks in when panel is expanded.
+	 *
+	 * @since 5.9.2
+	 */
+	expanded: {};
+
+	/**
+	 * Kicks in when panel is collapsed (returns to normal size).
+	 *
+	 * @since 5.9.2
+	 */
+	collapsed: {};
+}
+
 /**
  * A panel instance for the [[StockChart]].
  *
@@ -32,6 +65,7 @@ export class StockPanel extends XYChart {
 
 	declare public _settings: IStockPanelSettings;
 	declare public _privateSettings: IStockPanelPrivate;
+	declare public _events: IStockPanelEvents;
 
 	/**
 	 * An instance of [[PanelControls]].
@@ -83,6 +117,15 @@ export class StockPanel extends XYChart {
 		const index = children.indexOf(this);
 		if (index > 0) {
 			children.moveValue(this, index - 1);
+			const type = "moved";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, {
+					type: type,
+					oldIndex: index,
+					newIndex: index - 1,
+					target: this
+				});
+			}
 		}
 
 		stockChart._updateControls();
@@ -98,6 +141,15 @@ export class StockPanel extends XYChart {
 		const index = children.indexOf(this);
 		if (index < children.length - 1) {
 			children.moveValue(this, index + 1);
+			const type = "moved";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, {
+					type: type,
+					oldIndex: index,
+					newIndex: index + 1,
+					target: this
+				});
+			}
 		}
 		stockChart._updateControls();
 	}
@@ -107,6 +159,13 @@ export class StockPanel extends XYChart {
 	 */
 	public close(): void {
 		const stockChart = this.getPrivate("stockChart");
+		const type = "closed";
+		if (this.events.isEnabled(type)) {
+			this.events.dispatch(type, {
+				type: type,
+				target: this
+			});
+		}
 		stockChart.panels.removeValue(this);
 		stockChart._updateControls();
 	}
@@ -126,14 +185,30 @@ export class StockPanel extends XYChart {
 
 		$array.each(panels, (panel) => {
 			panel.setPrivate("visible", true);
-		})
+		});
 
 		if (panels.length == 0) {
 			stockChart.panels.each((panel) => {
 				if (panel != this) {
 					panel.setPrivate("visible", false);
 				}
-			})
+			});
+			const type = "expanded";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, {
+					type: type,
+					target: this
+				});
+			}
+		}
+		else {
+			const type = "collapsed";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, {
+					type: type,
+					target: this
+				});
+			}
 		}
 
 		stockChart._updateControls();

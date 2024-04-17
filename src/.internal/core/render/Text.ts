@@ -239,6 +239,14 @@ export class Text extends Sprite {
 		return this.get("populateText") ? populateString(this, text) : text;
 	}
 
+	public _getAccessibleText(): string {
+		const ariaLabel = this.get("ariaLabel");
+		if (ariaLabel !== undefined) {
+			return this.get("populateText") ? populateString(this, ariaLabel) : ariaLabel;
+		}
+		return this._getText();
+	}
+
 	/**
 	 * Forces the text to be re-evaluated and re-populated.
 	 */

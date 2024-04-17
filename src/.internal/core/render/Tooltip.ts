@@ -5,6 +5,10 @@ import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
 import type { Graphics } from "../render/Graphics";
 import type { IPointerEvent } from "../render/backend/Renderer";
+import type { DataItem, IComponentDataItem } from "./Component";
+import type { Root } from "../Root";
+import type { Template } from "../util/Template";
+import type { Entity } from "../util/Entity";
 
 import { MultiDisposer, IDisposer } from "../util/Disposer";
 import { Label } from "../render/Label";
@@ -16,12 +20,6 @@ import { Color } from "../util/Color";
 import * as $math from "../util/Math";
 import * as $array from "../util/Array";
 import * as $utils from "../util/Utils";
-//import * as $utils from "../util/Utils";
-import type { DataItem, IComponentDataItem } from "./Component";
-
-import type { Root } from "../Root";
-import type { Template } from "../util/Template";
-import type { Entity } from "../util/Entity";
 
 
 export interface ITooltipSettings extends IContainerSettings {
@@ -29,14 +27,28 @@ export interface ITooltipSettings extends IContainerSettings {
 	/**
 	 * Text to use for tooltip's label.
 	 */
-	labelText?: string
+	labelText?: string;
 
 	/**
 	 * HTML content to use for tooltip's label.
 	 *
 	 * @since 5.2.11
 	 */
-	labelHTML?: string
+	labelHTML?: string;
+
+	/**
+	 * A screen reader content for the label.
+	 *
+	 * Used in conjuction with `readerAnnounce`. If it is set to `true`, and
+	 * `labelAriaLabel` is set, its contents will be read out by a screen reader
+	 * when tooltip is shown or its data item changes.
+	 *
+	 * Otherwise, regular `labelText` (or `text` set directly on tooltip label) will
+	 * be used for scree reader announcement.
+	 *
+	 * @since 5.9.2
+	 */
+	labelAriaLabel?: string;
 
 	/**
 	 * A direction of the tooltip pointer.
@@ -114,6 +126,15 @@ export interface ITooltipSettings extends IContainerSettings {
 	 */
 	keepTargetHover?: boolean;
 
+	/**
+	 * If set to `true` the tooltip contents will be read out by a screen reader
+	 * when displayed or changed.
+	 * 
+	 * @default false
+	 * @since 5.9.2
+	 */
+	readerAnnounce?: boolean;
+
 }
 
 export interface ITooltipPrivate extends IContainerPrivate {
@@ -188,7 +209,21 @@ export class Tooltip extends Container {
 			}
 		}))
 
+		this.on("visible", (_ev) => {
+			this._handleReaderAnnouncement();
+		});
+
+		this.label.events.on("dataitemchanged", (_ev) => {
+			this._handleReaderAnnouncement();
+		});
+
 		this._root._tooltips.push(this);
+	}
+
+	protected _handleReaderAnnouncement() {
+		if (this.get("readerAnnounce") && this.isVisibleDeep()) {
+			this._root.readerAlert(this.label.getAccessibleText());
+		}
 	}
 
 	/**
@@ -223,6 +258,10 @@ export class Tooltip extends Container {
 		const labelHTML = this.get("labelHTML");
 		if (labelHTML != null) {
 			this.label.set("html", this.get("labelHTML"));
+		}
+		const labelAriaLabel = this.get("labelAriaLabel");
+		if (labelAriaLabel != null) {
+			this.label.set("ariaLabel", this.get("labelAriaLabel"));
 		}
 	}
 

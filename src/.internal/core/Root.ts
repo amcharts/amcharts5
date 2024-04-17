@@ -1777,6 +1777,7 @@ export class Root implements IDisposer {
 			if (tooltipElement.innerHTML != text) {
 				tooltipElement.innerHTML = text!;
 			}
+			tooltipElement.setAttribute("aria-hidden", target.isVisibleDeep() ? "false" : "true");
 		}
 		else if (tooltipElement) {
 			tooltipElement.remove();
@@ -2068,6 +2069,11 @@ export class Root implements IDisposer {
 				}
 			});
 
+			// Init and reset scale
+			const scale = target.compositeScale() || 1;
+			htmlElement.style.transform = "";
+			htmlElement.style.transformOrigin = "";
+
 			// Deal with opacity
 			const opacity = target.compositeOpacity();
 			setTimeout(() => {
@@ -2106,12 +2112,12 @@ export class Root implements IDisposer {
 				htmlElement.style.height = "";
 				const bbox = htmlElement.getBoundingClientRect();
 				htmlElement.style.position = "absolute";
-				w = bbox.width;
-				h = bbox.height;
+				if (!width) w = bbox.width;
+				if (!height) h = bbox.height;
 
 				target._adjustedLocalBounds = { left: 0, right: 0, top: 0, bottom: 0 };
-				target.setPrivate("minWidth", w);
-				target.setPrivate("minHeight", h);
+				target.setPrivate("minWidth", w / scale);
+				target.setPrivate("minHeight", h / scale);
 			}
 			else {
 				target.removePrivate("minWidth");
@@ -2128,6 +2134,12 @@ export class Root implements IDisposer {
 			// Hide or show
 			if (!visible || opacity == 0) {
 				htmlElement.style.display = "none";
+			}
+
+			// Deal with scale
+			if (scale != 1) {
+				htmlElement.style.transform = "scale(" + scale + ")";
+				htmlElement.style.transformOrigin = "top left";
 			}
 
 		}

@@ -127,6 +127,14 @@ export interface IStockChartSettings extends IContainerSettings {
 	 */
 	drawingSelectionEnabled?: boolean;
 
+	/**
+	 * If set to `true`, clicking on drawings will delete them.
+	 *
+	 * @default false
+	 * @since 5.9.2
+	 */
+	erasingEnabled?: boolean;
+
 }
 
 export interface IStockChartPrivate extends IContainerPrivate {
@@ -219,6 +227,8 @@ export class StockChart extends Container {
 	protected _drawingsChanged = false;
 	protected _indicatorsChanged = false;
 	protected _baseDP?: IDisposer;
+
+	public _selectionWasOn: boolean = false;
 
 	/**
 	 * A list of stock panels.
@@ -377,10 +387,33 @@ export class StockChart extends Container {
 			if (!enabled) {
 				this.unselectDrawings();
 			}
+			else {
+				this.set("erasingEnabled", false);
+			}
+
 			this.panels.each((panel) => {
 				panel.series.each((series) => {
 					if (series.isType<DrawingSeries>("DrawingSeries")) {
 						series.enableDrawingSelection(enabled);
+					}
+				})
+			})
+		}
+
+		if (this.isDirty("erasingEnabled")) {
+			const enabled = this.get("erasingEnabled", false);
+			if (enabled) {
+				this.set("drawingSelectionEnabled", false);
+			}
+			this.panels.each((panel) => {
+				panel.series.each((series) => {
+					if (series.isType<DrawingSeries>("DrawingSeries")) {
+						if (enabled) {
+							series.enableErasing();
+						}
+						else {
+							series.disableErasing();
+						}
 					}
 				})
 			})
@@ -984,6 +1017,12 @@ export class StockChart extends Container {
 				this._syncXAxes(axis);
 			}
 		})
+
+		if(this._xAxes[0]){
+			this._root.events.once("frameended", ()=>{
+				this._syncXAxes(this._xAxes[0])
+			})
+		}
 	}
 
 	protected _syncExtremes() {

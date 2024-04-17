@@ -6,7 +6,7 @@ export class Registry {
 	/**
 	 * Currently running version of amCharts.
 	 */
-	readonly version: string = "5.9.1";
+	readonly version: string = "5.9.2";
 
 	/**
 	 * List of applied licenses.
@@ -58,4 +58,21 @@ export function disposeAllRootElements(): void {
 	while(root = registry.rootElements.pop()) {
 		root.dispose();
 	}
+}
+
+/**
+ * Finds and returns a `Root` element assigned to a container with `id`.
+ * 
+ * @param   id  Container ID
+ * @return      Root
+ * @since 5.9.2
+ */
+export function getRootById(id: string): any {
+	let found;
+	registry.rootElements.forEach((item) => {
+		if (item.dom.id == id) {
+			found = item;
+		}
+	});
+	return found;
 }

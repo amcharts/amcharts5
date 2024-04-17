@@ -277,7 +277,8 @@ export class Label extends Container {
 		"populateText",
 		"role",
 		"ignoreFormatting",
-		"maxChars"
+		"maxChars",
+		"ariaLabel"
 	];
 
 	public static className: string = "Label";
@@ -431,5 +432,15 @@ export class Label extends Container {
 	 */
 	public getText(): string {
 		return this._text._getText();
+	}
+
+	/**
+	 * Returns "aria-label" text with populated placeholders and formatting
+	 * if `populateText` is set to `true`.
+	 *
+	 * @return Populated text
+	 */
+	public getAccessibleText(): string {
+		return this._text._getAccessibleText();
 	}
 }
