@@ -1,7 +1,12 @@
 import type { IHierarchyDataItem } from "./Hierarchy";
 import type { DataItem } from "../../core/render/Component";
+import type { Bullet } from "../../core/render/Bullet";
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
+import * as $array from "../../core/util/Array";
+import type { Root } from "../../core/Root";
+import type { List } from "../../core/util/List";
+import type { LinkedHierarchy } from "./LinkedHierarchy";
 
 export interface IHierarchyLinkSettings extends IGraphicsSettings {
 
@@ -28,7 +33,7 @@ export interface IHierarchyLinkSettings extends IGraphicsSettings {
 }
 
 export interface IHierarchyLinkPrivate extends IGraphicsPrivate {
-	d3Link:any;
+	d3Link: any;
 }
 
 /**
@@ -41,6 +46,37 @@ export class HierarchyLink extends Graphics {
 	public static className: string = "HierarchyLink";
 	public static classNames: Array<string> = Graphics.classNames.concat([HierarchyLink.className]);
 
+	public bullets: Array<Bullet> = [];
+
+	public series?: LinkedHierarchy;
+
+	public _handleBullets(bullets:List<<D extends DataItem<IHierarchyDataItem>>(root: Root, source: D, target:D) => Bullet | undefined>) {
+		$array.each(this.bullets, (bullet) => {
+			bullet.dispose();
+		})
+		
+		bullets.each((bullet)=>{
+			const newBullet = bullet(this._root, this.get("source")!, this.get("target")!);
+			if (newBullet) {
+				this.bullets.push(newBullet);
+
+				const sprite = newBullet.get("sprite");
+
+				this.addDisposer(newBullet.on("locationX", () => {
+					this._clear = true;
+					this.markDirty();
+				}))
+
+				if(sprite){
+					const series = this.series;
+					if(series){
+						series.linksContainer.children.push(sprite);
+					}
+				}
+			}			
+		})	
+	}
+
 	public _changed() {
 		super._changed();
 		if (this._clear) {
@@ -49,8 +85,38 @@ export class HierarchyLink extends Graphics {
 			if (source && target) {
 				const sourceNode = source.get("node");
 				const targetNode = target.get("node");
-				this._display.moveTo(sourceNode.x(), sourceNode.y());
-				this._display.lineTo(targetNode.x(), targetNode.y());
+
+				const x0 = sourceNode.x();
+				const y0 = sourceNode.y();
+
+				const x1 = targetNode.x();
+				const y1 = targetNode.y();
+
+				this._display.moveTo(x0, y0);
+				this._display.lineTo(x1, y1);
+
+				const sourceRadius = sourceNode.dataItem?.get("outerCircle" as any).get("radius", 0);
+				const targetRadius = targetNode.dataItem?.get("outerCircle" as any).get("radius", 0);
+
+				const distance = Math.hypot(x1 - x0, y1 - y0);
+				const trueDistance = distance - sourceRadius - targetRadius;
+
+				$array.each(this.bullets, (bullet) => {
+					const sprite = bullet.get("sprite");
+					if(sprite){
+						const location = bullet.get("locationX", 0.5);
+
+						// const tx = trueDistance / distance * (x1 - x0);
+						// const ty = trueDistance / distance * (y1 - y0);
+
+						sprite.set("x", x0 + sourceRadius / distance * (x1 - x0) + trueDistance / distance * (x1 - x0) * location);
+						sprite.set("y", y0 + sourceRadius / distance * (y1 - y0) + trueDistance / distance * (y1 - y0) * location);
+
+						if(bullet.get("autoRotate")){
+							sprite.set("rotation", Math.atan2(y1 - y0, x1 - x0) * 180 / Math.PI + bullet.get("autoRotateAngle", 0));
+						}
+					}
+				})
 			}
 		}
 	}
@@ -76,5 +142,13 @@ export class HierarchyLink extends Graphics {
 				})
 			}
 		}
+	}
+
+	public dispose(){
+		super.dispose();
+		$array.each(this.bullets, (bullet) => {
+			bullet.dispose();
+		})
+		this.bullets = [];
 	}
 }

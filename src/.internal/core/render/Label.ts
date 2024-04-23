@@ -368,10 +368,10 @@ export class Label extends Container {
 			}
 			else {
 				if (textAlign == "left" || textAlign == "start") {
-					x = this.get("paddingLeft");
+					x = this.get("paddingLeft", 0);
 				}
 				else if (textAlign == "right" || textAlign == "end") {
-					x = -this.get("paddingRight");
+					x = -this.get("paddingRight", 0);
 				}
 			}
 

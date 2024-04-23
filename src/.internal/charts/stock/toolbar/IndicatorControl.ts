@@ -181,6 +181,18 @@ export class IndicatorControl extends DropdownListControl {
 	}
 
 	/**
+	 * Removes all indicators from the stock chart.
+	 *
+	 * @since 5.9.3
+	 */
+	public clearIndicators(): void {
+		const stockChart = this.get("stockChart");
+		stockChart.indicators.eachReverse((indicator) => {
+			indicator.dispose();
+		});
+	}
+
+	/**
 	 * Creates a specific indicator, adds it to chart, and returns the instance.
 	 * 
 	 * @param   indicatorId  Indicator ID

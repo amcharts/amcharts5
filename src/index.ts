@@ -72,6 +72,7 @@ export { InterfaceColors, IInterfaceColorsSettings } from "./.internal/core/util
 export { NumberFormatter, INumberFormatterSettings, INumberFormatterPrivate, INumberSuffix } from "./.internal/core/util/NumberFormatter";
 export { Percent, percent, p100, p50, p0 } from "./.internal/core/util/Percent";
 export { Template } from "./.internal/core/util/Template";
+export { ListTemplate } from "./.internal/core/util/List";
 export { TextFormatter } from "./.internal/core/util/TextFormatter";
 
 export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/core/render/SpriteResizer";

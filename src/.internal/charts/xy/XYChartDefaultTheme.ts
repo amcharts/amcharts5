@@ -8,6 +8,7 @@ import type { IGaplessDateAxisDataItem } from "./axes/GaplessDateAxis";
 
 import { Theme } from "../../core/Theme";
 import { percent, p50, p100 } from "../../core/util/Percent";
+import { Color } from "../../core/util/Color";
 import { ColorSet } from "../../core/util/ColorSet";
 import { setColor } from "../../themes/DefaultTheme";
 
@@ -52,6 +53,11 @@ export class XYChartDefaultTheme extends Theme {
 		r("XYSeries").setAll({
 			legendLabelText: "{name}"
 		})
+
+		r("Rectangle", ["plotbackground", "xy", "background"]).setAll({
+			fill: Color.fromHex(0x000000),
+			fillOpacity: 0
+		});
 
 		/**
 		 * ------------------------------------------------------------------------

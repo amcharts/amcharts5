@@ -2139,7 +2139,7 @@ export class Root implements IDisposer {
 			// Deal with scale
 			if (scale != 1) {
 				htmlElement.style.transform = "scale(" + scale + ")";
-				htmlElement.style.transformOrigin = "top left";
+				htmlElement.style.transformOrigin = target.get("centerX", 0) + "%  " + target.get("centerY", 0) + "%";
 			}
 
 		}

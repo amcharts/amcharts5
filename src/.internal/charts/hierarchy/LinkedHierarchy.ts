@@ -1,4 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
+import type { Bullet } from "../../core/render/Bullet";
 import type * as d3hierarchy from "d3-hierarchy";
 
 import { Hierarchy, IHierarchySettings, IHierarchyDataItem, IHierarchyPrivate, IHierarchyEvents } from "./Hierarchy";
@@ -12,6 +13,8 @@ import type { IPoint } from "../../core/util/IPoint";
 
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
+import { List } from "../../core/util/List";
+import type { Root } from "../../core/Root";
 
 /**
  * @ignore
@@ -74,7 +77,6 @@ export interface ILinkedHierarchyDataItem extends IHierarchyDataItem {
 	 * @ignore
 	 */
 	d3HierarchyNode: d3hierarchy.HierarchyPointNode<ILinkedHierarchyDataObject>;
-
 }
 
 export interface ILinkedHierarchySettings extends IHierarchySettings {
@@ -105,8 +107,16 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	declare public _dataItemSettings: ILinkedHierarchyDataItem;
 	declare public _events: ILinkedHierarchyEvents;
 
+	public linkBullets: List<<D extends DataItem<IHierarchyDataItem>>(root: Root, source: D, target:D) => Bullet | undefined> = new List();
+
 	protected _afterNew() {
 		this.fields.push("linkWith", "x", "y");
+
+		this._disposers.push(this.linkBullets.events.onAll(() => {
+			this.links.each((link) => {
+				link._handleBullets(this.linkBullets);
+			})
+		}))
 
 		super._afterNew();
 	}
@@ -334,11 +344,14 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 		if (!link) {
 			link = this.links.make();
+			link.series = this;
 			this.links.push(link);
 			this.linksContainer.children.push(link);
 			link.set("source", source);
 			link.set("target", target);
 			link._setDataItem(source);
+
+			link._handleBullets(this.linkBullets);
 			link.set("stroke", source.get("fill"));
 			if (strength != null) {
 				link.set("strength", strength)

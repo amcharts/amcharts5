@@ -224,6 +224,11 @@ export abstract class Indicator extends Container {
 		const series = this.series;
 		if (series) {
 			series.dispose();
+
+			const yAxis = series.get("yAxis");
+			if (yAxis) {
+				yAxis.markDirtySelectionExtremes();
+			}
 		}
 
 		const stockChart = this.get("stockChart");

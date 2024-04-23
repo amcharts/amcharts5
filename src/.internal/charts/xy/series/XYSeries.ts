@@ -2120,7 +2120,7 @@ export abstract class XYSeries extends Series {
 		const tooltip = this.get("tooltip");
 
 		if (tooltip) {
-			if (!this.isHidden()) {
+			if (!this.isHidden() && this.get("visible")) {
 				tooltip._setDataItem(dataItem);
 
 				if (dataItem) {

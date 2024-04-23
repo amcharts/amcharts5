@@ -840,6 +840,7 @@ export class DrawingControl extends StockControl {
 			if (isInited) {
 				this.getPrivate("eraserControl")!.set("active", false);
 			}
+			this.get("stockChart").set("drawingSelectionEnabled", false)
 			return;
 		}
 

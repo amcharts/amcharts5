@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.3] - 2024-04-23
+
+### Added
+- Added possibility to add bullets to links in a linked hierarchy charts, like Force-directed and Tree. [More info](https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-link-bullets/).
+- New `IndicatorControl` method: `clearIndicators()`. Allows clearing all indicators from the chart at once.
+
+### Changed
+- `StockChart` will now automatically disable select mode when exitting drawing mode.
+- `XYChart` background fill color and opacity have been moved to a default theme, so that it can be overridden by custom themes.
+
+### Fixed
+- Resize bubbles on `StockChart`'s drawings were sometimes disabled when switching and drawing with another drawing tool.
+- Resize bubbles on `StockChart`'s were not shown after Eraser was turned on and off.
+- Resize bubbles on `StockChart`'s were not shown when drawing mode was toggled off and then back on.
+- `PieChart` was not updating radius if resized very quickly.
+- If an `XYSeries` was initially hidden, its tooltip was still visible on an `XYChart` with cursor.
+- Clicking on a selected icon drawing in a `SockChart` would not unselect it.
+- A perfectly vertical or horizontal line with `strokeGradient` set was invisible.
+- Removing an indicator from `StockChart` could cause Y-axis to be auto-zoomed incorrectly.
+- The centering of a scaled HTML content was not taking `centerX`/`centerY` into account.
+
+
 ## [5.9.2] - 2024-04-17
 
 ### Added

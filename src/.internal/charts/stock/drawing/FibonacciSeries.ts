@@ -204,6 +204,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 
 	}
 
+	/*
 	public enableDrawing() {
 		super.enableDrawing();
 		this.showAllBullets();
@@ -213,7 +214,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 		super.enableErasing();
 		this.showAllBullets();
 	}
-
+	
 	protected _hideAllBullets() {
 		if (this._drawingEnabled || this._erasingEnabled) {
 
@@ -221,7 +222,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 		else {
 			super._hideAllBullets();
 		}
-	}
+	}*/
 
 	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.disposeDataItem(dataItem);

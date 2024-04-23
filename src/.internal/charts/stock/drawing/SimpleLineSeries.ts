@@ -82,7 +82,7 @@ export class SimpleLineSeries extends DrawingSeries {
 		this.strokes.template.set("forceInactive", true);
 
 		lineTemplate.events.on("pointerout", (e) => {
-			this._hideAllBullets();
+			//this._hideAllBullets();
 
 			const index = e.target.get("userData");
 
@@ -164,7 +164,7 @@ export class SimpleLineSeries extends DrawingSeries {
 
 		hitTemplate.events.on("pointerout", (e) => {
 			const index = e.target.get("userData");
-			this._hideAllBullets();
+			//this._hideAllBullets();
 
 			const line = this._lines[index];
 

@@ -253,7 +253,7 @@ export class DrawingSeries extends LineSeries {
 
 		fillsTemplate.events.on("pointerout", () => {
 			this._isHover = false;
-			this._hideAllBullets();
+			//this._hideAllBullets();
 		})
 
 
@@ -277,7 +277,7 @@ export class DrawingSeries extends LineSeries {
 
 		strokesTemplate.events.on("pointerout", () => {
 			this._isHover = false;
-			this._hideAllBullets();
+			//this._hideAllBullets();
 		})
 
 		strokesTemplate.events.on("dragstop", (e) => {
@@ -326,9 +326,9 @@ export class DrawingSeries extends LineSeries {
 				}
 			})
 
-			container.events.on("pointerout", () => {
-				this._hideAllBullets();
-			})
+			//container.events.on("pointerout", () => {
+			//	this._hideAllBullets();
+			//})
 
 			this._addBulletInteraction(container);
 			this._tweakBullet(container, dataItem);
@@ -488,13 +488,10 @@ export class DrawingSeries extends LineSeries {
 	public setInteractive(value: boolean) {
 		this.strokes.template.set("forceInactive", !value);
 		this.fills.template.set("forceInactive", !value);
-		this.grips.template.set("forceInactive", !value);
-		this.circles.template.set("forceInactive", !value);
-		this.outerCircles.template.set("forceInactive", !value);
 
-		if(value){
-			this.showAllBullets();
-		}
+		//if(value){
+		//	this.showAllBullets();
+		//}
 	}
 
 	public enableDrawingSelection(value: boolean) {
@@ -520,6 +517,7 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	/*
 	protected _hideAllBullets() {
 		this.strokes.each((stroke) => {
 			stroke.unhover();
@@ -541,7 +539,6 @@ export class DrawingSeries extends LineSeries {
 			})
 		}
 	}
-
 	protected showAllBullets() {
 		$array.each(this.dataItems, (dataItem) => {
 			const bullets = dataItem.bullets;
@@ -555,6 +552,7 @@ export class DrawingSeries extends LineSeries {
 			}
 		})
 	}
+	*/
 
 	protected _hideResizer(sprite?: Sprite) {
 		const spriteResizer = this._getStockChart().spriteResizer;
@@ -1042,6 +1040,8 @@ export class DrawingSeries extends LineSeries {
 					}
 				})
 			}
+
+			//this.showAllBullets();			
 		}
 	}
 
@@ -1076,7 +1076,7 @@ export class DrawingSeries extends LineSeries {
 			this._upDp.dispose();
 			this._upDp = undefined;
 		}
-		this._hideAllBullets();
+		//this._hideAllBullets();
 	}
 
 	protected _handlePointerMove(event: ISpritePointerEvent) {
@@ -1225,8 +1225,7 @@ export class DrawingSeries extends LineSeries {
 			this._isSelecting = true;
 
 			if (this._selected.indexOf(index) != -1) {
-				if (!keepSelection) {
-					this._hideResizer();
+				if (!keepSelection) {					
 					this.unselectAllDrawings();
 				}
 				else {

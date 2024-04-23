@@ -16,7 +16,6 @@ import { Rectangle } from "../../core/render/Rectangle";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
 import { ListAutoDispose } from "../../core/util/List";
 import { p100 } from "../../core/util/Percent";
-import { Color } from "../../core/util/Color";
 import { Button } from "../../core/render/Button";
 import { Graphics } from "../../core/render/Graphics";
 import { Percent } from "../../core/util/Percent";
@@ -419,9 +418,7 @@ export class XYChart extends SerialChart {
 		plotContainer.set("interactive", true);
 		plotContainer.set("interactiveChildren", false);
 		plotContainer.set("background", Rectangle.new(root, {
-			themeTags: ["xy", "background"],
-			fill: Color.fromHex(0x000000),
-			fillOpacity: 0
+			themeTags: ["plotbackground", "xy", "background"]
 		}));
 
 		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {

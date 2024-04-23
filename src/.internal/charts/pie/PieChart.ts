@@ -94,7 +94,6 @@ export class PieChart extends PercentChart {
 		const endAngle = this.get("endAngle", 0);
 		const innerRadius = this.get("innerRadius");
 
-
 		let bounds = $math.getArcBounds(0, 0, startAngle, endAngle, 1);
 
 		const wr = w / (bounds.right - bounds.left);
@@ -193,4 +192,9 @@ export class PieChart extends PercentChart {
 		}
 		return innerRadius;
 	}
+
+	public _updateSize() {
+		super._updateSize();
+		this.markDirtyKey("radius");
+	}		
 }

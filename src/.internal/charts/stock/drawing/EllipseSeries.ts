@@ -60,9 +60,11 @@ export class EllipseSeries extends DrawingSeries {
 			this._showSegmentBullets(e.target.get("userData"));
 		})
 
+		/*
 		ellipseTemplate.events.on("pointerout", () => {
 			this._hideAllBullets();
 		})
+		*/
 
 		ellipseTemplate.events.on("dragstart", (e) => {
 			this.startDragItem(e, e.target.get("userData"));
