@@ -490,7 +490,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				differencePower = Math.log(selectionMax - step) * Math.LOG10E - Math.log(minLog) * Math.LOG10E;
 
 				if (differencePower > 2) {
-					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 5);
+					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 50);
 				}
 			}
 
@@ -549,7 +549,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 				else {
 					if (differencePower > 2) {
-						nextValue = Math.pow(10, Math.log(minLog) * Math.LOG10E + i - 5);
+						nextValue = Math.pow(10, Math.log(minLog) * Math.LOG10E + i - 50);
 					}
 					else {
 						nextValue += step;
@@ -1353,7 +1353,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// add extras
 		min -= (max - min) * extraMin;
 		max += (max - min) * extraMax;
-
+		
 		if (this.get("logarithmic")) {
 			// don't let min go below 0 if real min is >= 0
 			if (min < 0 && initialMin >= 0) {
@@ -1364,9 +1364,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				max = 0;
 			}
 		}
-
+		
 		this._minReal = min;
 		this._maxReal = max;
+
 		let strictMinMax = this.get("strictMinMax");
 		let strictMinMaxSelection = this.get("strictMinMaxSelection", false);
 		if (strictMinMaxSelection) {

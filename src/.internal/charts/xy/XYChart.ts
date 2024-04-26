@@ -1190,7 +1190,9 @@ export class XYChart extends SerialChart {
 
 					this._pushPropertyDisposer("scrollbarX", scrollbarX.events.on("released", () => {
 						this.xAxes.each((axis) => {
-							this._handleAxisSelection(axis);
+							if(axis.get("zoomable")){
+								this._handleAxisSelection(axis);
+							}
 						})
 					}))
 
@@ -1225,7 +1227,9 @@ export class XYChart extends SerialChart {
 
 					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("released", () => {
 						this.yAxes.each((axis) => {
-							this._handleAxisSelection(axis);
+							if(axis.get("zoomable")){
+								this._handleAxisSelection(axis);
+							}
 						})
 					}))
 

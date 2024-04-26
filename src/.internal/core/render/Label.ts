@@ -323,28 +323,22 @@ export class Label extends Container {
 	public _updateChildren() {
 		super._updateChildren();
 
+		const text = this._text;
+
 		$array.each(this._textKeys, (property) => {
 			this._text.set(property as any, this.get(property as any));
 		})
 
-		if (this.isDirty("maxWidth")) {
-			this._setMaxDimentions();
-		}
-
-		if (this.isDirty("maxHeight")) {
-			this._setMaxDimentions();
-		}
-
-		if (this.isDirty("rotation")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isDirty("rotation")) {
 			this._setMaxDimentions();
 		}
 
 		// Do not show regular text if HTML is used
 		if (this.get("html", "") !== "") {
-			this._text.set("text", "");
+			text.set("text", "");
 		}
 		else {
-			this._text.set("text", this.get("text"));
+			text.set("text", this.get("text"));
 			this._maybeUpdateHTMLColor();
 		}
 
@@ -375,12 +369,12 @@ export class Label extends Container {
 				}
 			}
 
-			this.text.set("x", x);
+			text.set("x", x);
 		}
 
 		const background = this.get("background");
 		if (background) {
-			background.setPrivate("visible", this.text._display.textVisible);
+			background.setPrivate("visible", text._display.textVisible);
 		}
 	}
 
@@ -394,29 +388,35 @@ export class Label extends Container {
 	protected _setMaxDimentions() {
 		const rotation = this.get("rotation");
 		const vertical = rotation == 90 || rotation == 270 || rotation == -90;
+		const text = this._text;
 
 		const maxWidth = this.get("maxWidth", this.getPrivate("maxWidth", Infinity));
 		if ($type.isNumber(maxWidth)) {
-			this.text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
+			text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
 		}
 		else {
-			this.text.set(vertical ? "maxHeight" : "maxWidth", undefined);
+			text.set(vertical ? "maxHeight" : "maxWidth", undefined);
 		}
 
 		const maxHeight = this.get("maxHeight", this.getPrivate("maxHeight", Infinity));
 		if ($type.isNumber(maxHeight)) {
-			this.text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
+			text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
 		}
 		else {
-			this.text.set(vertical ? "maxWidth" : "maxHeight", undefined);
+			text.set(vertical ? "maxWidth" : "maxHeight", undefined);
 		}
+
+		this.root.events.once("frameended", () => {
+			text.markDirtyBounds();
+		})
 	}
 
 	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
 		super._setDataItem(dataItem);
 		this._markDirtyKey("text")
-		if (this.text.get("populateText")) {
-			this.text.markDirtyText();
+		const text = this._text;
+		if (text.get("populateText")) {
+			text.markDirtyText();
 		}
 		const html = this.get("html");
 		if (html && html !== "") {

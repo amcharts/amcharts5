@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.4] - 2024-04-26
+
+### Fixed
+- `StockChart` with `VolumeProfile` indicator was snapping scrollbar's left grip to the start.
+- Logarithmic axis was not showing labels less than 10e-5.
+- `Treemap`'s labels would sometimes not adjust its size (usually with a lot of data).
+
+
 ## [5.9.3] - 2024-04-23
 
 ### Added
