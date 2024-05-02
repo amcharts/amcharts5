@@ -563,7 +563,9 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("Label", ["drawing", "label"]).setAll({
 			centerX: p0,
-			centerY: p50
+			centerY: p50,
+			minHeight: 28,
+			minWidth: 28
 		});
 
 		r("Label", ["drawing", "measure"]).setAll({
@@ -1386,7 +1388,8 @@ export class StockChartDefaultTheme extends Theme {
 			labelFontFamilies: ["Arial", "Courier New", "Garamond", "Georgia", "Times New Roman"],
 			drawingIcon: drawingIcons[0],
 			drawingIcons: drawingIcons,
-			snapToData: false
+			snapToData: false,
+			scrollable: true
 		});
 
 		r("ColorControl").setAll({

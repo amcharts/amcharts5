@@ -69,6 +69,7 @@ import type { DropdownControl } from "./../charts/stock/toolbar/DropdownControl.
 import type { DropdownList } from "./../charts/stock/toolbar/DropdownList.js";
 import type { DropdownListControl } from "./../charts/stock/toolbar/DropdownListControl.js";
 import type { DurationAxis } from "./../charts/xy/axes/DurationAxis.js";
+import type { EditableLabel } from "./render/EditableLabel.js";
 import type { Ellipse } from "./render/Ellipse.js";
 import type { EllipseSeries } from "./../charts/stock/drawing/EllipseSeries.js";
 import type { Entity } from "./util/Entity.js";
@@ -294,6 +295,7 @@ export interface IClasses {
 	"DropdownList": DropdownList;
 	"DropdownListControl": DropdownListControl;
 	"DurationAxis": DurationAxis<AxisRenderer>;
+	"EditableLabel": EditableLabel;
 	"Ellipse": Ellipse;
 	"EllipseSeries": EllipseSeries;
 	"Entity": Entity;

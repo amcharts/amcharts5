@@ -4,7 +4,7 @@ import type { DataItem, IComponentDataItem } from "./Component";
 
 import { Text } from "../render/Text";
 import { p50, p100 } from "../util/Percent";
-import { Container, IContainerPrivate, IContainerSettings } from "./Container";
+import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
 
 import * as  $array from "../../core/util/Array";
 import * as  $type from "../../core/util/Type";
@@ -230,6 +230,9 @@ export interface ILabelSettings extends IContainerSettings {
 export interface ILabelPrivate extends IContainerPrivate {
 }
 
+export interface ILabelEvents extends IContainerEvents {
+}
+
 /**
  * Creates a label with support for in-line styling and data bindings.
  *
@@ -239,6 +242,7 @@ export class Label extends Container {
 
 	declare public _settings: ILabelSettings;
 	declare public _privateSettings: ILabelPrivate;
+	declare public _events: ILabelEvents;
 
 	protected _text!: Text;
 

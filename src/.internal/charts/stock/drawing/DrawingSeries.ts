@@ -1220,8 +1220,8 @@ export class DrawingSeries extends LineSeries {
 	}
 
 
-	public _selectDrawing(index: number, keepSelection?: boolean) {
-		if (this._getStockChart().get("drawingSelectionEnabled")) {
+	public _selectDrawing(index: number, keepSelection?: boolean, force?:boolean) {
+		if (this._getStockChart().get("drawingSelectionEnabled") || force) {
 			this._isSelecting = true;
 
 			if (this._selected.indexOf(index) != -1) {

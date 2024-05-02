@@ -69,6 +69,7 @@ import type { DropdownControl } from "./../../../stock";
 import type { DropdownList } from "./../../../stock";
 import type { DropdownListControl } from "./../../../stock";
 import type { DurationAxis } from "./../../../xy";
+import type { EditableLabel } from "./../../../index";
 import type { Ellipse } from "./../../../index";
 import type { EllipseSeries } from "./../../../stock";
 import type { Entity } from "./../../../index";
@@ -294,6 +295,7 @@ export interface IClasses {
 	"DropdownList": () => Promise<typeof DropdownList>;
 	"DropdownListControl": () => Promise<typeof DropdownListControl>;
 	"DurationAxis": () => Promise<typeof DurationAxis>;
+	"EditableLabel": () => Promise<typeof EditableLabel>;
 	"Ellipse": () => Promise<typeof Ellipse>;
 	"EllipseSeries": () => Promise<typeof EllipseSeries>;
 	"Entity": () => Promise<typeof Entity>;
@@ -520,6 +522,7 @@ const classes: IClasses = {
 	"DropdownList": () => import(/* webpackExports: "DropdownList", webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownList),
 	"DropdownListControl": () => import(/* webpackExports: "DropdownListControl", webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownListControl),
 	"DurationAxis": () => import(/* webpackExports: "DurationAxis", webpackMode: "weak" */ "./../../../xy").then((m) => m.DurationAxis),
+	"EditableLabel": () => import(/* webpackExports: "EditableLabel", webpackMode: "weak" */ "./../../../index").then((m) => m.EditableLabel),
 	"Ellipse": () => import(/* webpackExports: "Ellipse", webpackMode: "weak" */ "./../../../index").then((m) => m.Ellipse),
 	"EllipseSeries": () => import(/* webpackExports: "EllipseSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.EllipseSeries),
 	"Entity": () => import(/* webpackExports: "Entity", webpackMode: "weak" */ "./../../../index").then((m) => m.Entity),

@@ -6,12 +6,10 @@ import type { Graphics } from "../../../core/render/Graphics";
 import type { IDrawingSeriesDataItem } from "./DrawingSeries";
 
 import { PolylineSeries, IPolylineSeriesSettings, IPolylineSeriesPrivate, IPolylineSeriesDataItem } from "./PolylineSeries";
-import { Label } from "../../../core/render/Label";
-import { RoundedRectangle } from "../../../core/render/RoundedRectangle";
-import { color, Color } from "../../../core/util/Color";
+import { EditableLabel } from "../../../core/render/EditableLabel";
+import type { Color } from "../../../core/util/Color";
 import { Template } from "../../../core/util/Template";
 
-import * as $utils from "../../../core/util/Utils";
 import * as $array from "../../../core/util/Array";
 import * as $object from "../../../core/util/Object";
 
@@ -50,7 +48,7 @@ export interface ILabelSeriesSettings extends IPolylineSeriesSettings {
 export interface ILabelSeriesPrivate extends IPolylineSeriesPrivate {
 	inputContainer: HTMLDivElement;
 	input: HTMLTextAreaElement;
-	label: Label;
+	label: EditableLabel;
 }
 
 export class LabelSeries extends PolylineSeries {
@@ -67,6 +65,10 @@ export class LabelSeries extends PolylineSeries {
 
 	protected _tag = "label";
 
+	protected _isEditing: boolean = false;
+
+	protected _isSelected: boolean = false;
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -76,48 +78,6 @@ export class LabelSeries extends PolylineSeries {
 		this.fills.template.set("visible", false);
 
 		this.addTag(this._tag);
-
-		const div = document.createElement("div");
-		//div.style.width = "300px";
-		div.style.position = "absolute";
-		div.style.display = "none";
-		div.className = "am5stock-drawing-label-wrapper";
-		this._root._inner.appendChild(div);
-		this.setPrivate("inputContainer", div);
-
-		const textArea = document.createElement("textarea");;
-		//textArea.style.textAlign = "center";
-		//textArea.rows = 2;
-		textArea.className = "am5stock-drawing-label-input";
-		this._disposers.push($utils.addEventListener(textArea, "input", () => {
-			textArea.style.height = "auto";
-			textArea.style.height = textArea.scrollHeight + "px";
-		}, false));
-
-
-		div.appendChild(textArea);
-		div.appendChild(document.createElement("br"));
-		this.setPrivate("input", textArea);
-
-		const saveButton = document.createElement("input");
-		saveButton.type = "button";
-		saveButton.value = this._root.language.translateAny("Save");
-		saveButton.className = "am5-modal-button am5-modal-primary";
-		this._disposers.push($utils.addEventListener(saveButton, "click", () => {
-			this.saveText();
-		}));
-
-		div.appendChild(saveButton);
-
-		const cancelButton = document.createElement("input");
-		cancelButton.type = "button";
-		cancelButton.value = this._root.language.translateAny("Cancel");
-		cancelButton.className = "am5-modal-button am5-modal-scondary";
-		this._disposers.push($utils.addEventListener(cancelButton, "click", () => {
-			this.getPrivate("inputContainer").style.display = "none";
-			this.getPrivate("input").value = "";
-		}));
-		div.appendChild(cancelButton);
 	}
 
 	protected _dispatchAdded(): void {
@@ -130,20 +90,47 @@ export class LabelSeries extends PolylineSeries {
 		const dataContext = dataItem.dataContext as any;
 		const text = dataContext.text;
 		const template = dataContext.settings;
+
 		if (template) {
-			const label = container.children.push(Label.new(this._root, {
+			const label = container.children.push(EditableLabel.new(this._root, {
 				themeTags: ["label"],
-				text: text
+				text: text,
+				editOn: "none",
+				active: true
 			}, template));
 
 			this.setPrivate("label", label);
 
-			container.events.on("click", (_e) => {
+			label.on("active", () => {
+				this.setTimeout(() => {
+					this._isEditing = label.get("active", false);
+				}, 200)
+
+				if (!label.get("active")) {
+					this.setTimeout(() => {
+						if (label) {
+							if (label.get("text") == "") {
+								this._disposeIndex(dataContext.index);
+							}
+						}
+					}, 100)
+				}
+			});
+
+			this._isEditing = true;
+
+			container.events.on("click", (e) => {
 				const spriteResizer = this.spriteResizer;
 				if (spriteResizer.get("sprite") == label) {
+					this._isEditing = true;
+					label.set("active", true);
+					this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey, true);
 					spriteResizer.set("sprite", undefined);
 				}
 				else {
+					this._isEditing = false;
+					this._isSelected = true;
+					this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey, true);
 					spriteResizer.set("sprite", label);
 				}
 			})
@@ -175,12 +162,16 @@ export class LabelSeries extends PolylineSeries {
 		}
 	}
 
-	protected _tweakBullet2(label: Label, _dataItem: DataItem<ILabelSeriesDataItem>) {
-		label.set("background", RoundedRectangle.new(this._root, { fillOpacity: 0, strokeOpacity: 0, fill: color(0xffffff) }))
+	protected _tweakBullet2(_label: EditableLabel, _dataItem: DataItem<ILabelSeriesDataItem>) {
+
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {
-		if (this._selected.length > 0) {
+		if (this._isEditing) {
+			return;
+		}
+		if (this._selected.length > 0 || this._isSelected) {
+			this._isSelected = false;
 			this._hideResizer();
 			this.unselectAllDrawings();
 		}
@@ -190,39 +181,21 @@ export class LabelSeries extends PolylineSeries {
 				this._increaseIndex();
 				this._di[this._index] = {};
 
-				const input = this.getPrivate("input");
-				input.value = "";
-
-				this._clickEvent = event;
-				const inputDiv = this.getPrivate("inputContainer");
-				inputDiv.style.display = "block";
-				inputDiv.style.left = (event.point.x) + "px";
-				inputDiv.style.top = (event.point.y) + "px";
-				input.focus();
-
-				this.spriteResizer.set("sprite", undefined);				
-
-				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
-			}
-		}
-		this.isDrawing(false);
-	}
-
-	public saveText() {
-		const clickEvent = this._clickEvent;
-		if (clickEvent) {
-			const text = this.getPrivate("input").value;
-			if (text != undefined) {
-				this._addPoint(clickEvent);
+				this._addPoint(event);
 				const dataContext = this.data.getIndex(this.data.length - 1) as any;
-				dataContext.text = text;
+				dataContext.text = "";
 				dataContext.index = this._index;
 				dataContext.corner = 0;
 				dataContext.settings = this._getLabelTemplate();
 				this._afterTextSave(dataContext);
+
+				this.spriteResizer.set("sprite", undefined);
+
+				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}
-			this.getPrivate("inputContainer").style.display = "none";
 		}
+
+		this.isDrawing(false);
 	}
 
 	protected _afterTextSave(_dataContext: any) {

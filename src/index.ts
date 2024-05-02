@@ -20,6 +20,7 @@ export { GridLayout } from "./.internal/core/render/GridLayout";
 export { HeatLegend, IHeatLegendSettings, IHeatLegendPrivate } from "./.internal/core/render/HeatLegend";
 export { HorizontalLayout } from "./.internal/core/render/HorizontalLayout";
 export { Label, ILabelSettings, ILabelPrivate } from "./.internal/core/render/Label";
+export { EditableLabel, IEditableLabelSettings, IEditableLabelPrivate } from "./.internal/core/render/EditableLabel";
 export { Layout, ILayoutSettings, ILayoutPrivate } from "./.internal/core/render/Layout";
 export { Legend, ILegendSettings, ILegendPrivate, ILegendEvents } from "./.internal/core/render/Legend";
 export { Line, ILineSettings, ILinePrivate } from "./.internal/core/render/Line";

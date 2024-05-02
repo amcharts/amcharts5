@@ -421,6 +421,31 @@ export class DefaultTheme extends Theme {
 			textAlign: "center"
 		});
 
+		r("EditableLabel").setAll({
+			editOn: "click",
+			//setStateOnChildren: true,
+			themeTags: ["editablelabel"]
+		});
+
+		r("RoundedRectangle", ["editablelabel", "background"]).setAll({
+			fillOpacity: 0,
+			fill: Color.fromHex(0x000000),
+			cornerRadiusBL: 3,
+			cornerRadiusBR: 3,
+			cornerRadiusTL: 3,
+			cornerRadiusTR: 3,
+			strokeOpacity: 0,
+			stroke: Color.fromHex(0x000000)			
+		});
+
+		{
+			r("RoundedRectangle", ["editablelabel", "background"]).states.create("active", {
+				strokeOpacity: 0.2,
+			});
+		}
+
+
+
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -992,7 +1017,7 @@ export class DefaultTheme extends Theme {
 
 		r("SpriteResizer").setAll({
 			rotationStep: 10,
-			isMeasured:false
+			isMeasured: false
 		})
 
 		{
@@ -1081,13 +1106,13 @@ export class DefaultTheme extends Theme {
 			x: p50,
 			y: p50,
 			svgPath: "M 8 -1 L 6 -1 L 6 7 L 2 7 L 2 1 L -2 1 L -2 7 L -6 7 L -6 -1 L -8 -1 L 0 -9 L 8 -1 Z M 8 -1"
-		});		
+		});
 
 		r("Button", ["zoomtools"]).setAll({
 			marginTop: 1,
 			marginBottom: 2
 		})
-		
+
 		r("ZoomTools").setAll({
 			x: p100,
 			centerX: p100,
@@ -1095,6 +1120,6 @@ export class DefaultTheme extends Theme {
 			centerY: p100,
 			paddingRight: 10,
 			paddingBottom: 10
-		})		
+		})
 	}
 }

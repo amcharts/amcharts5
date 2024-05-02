@@ -249,6 +249,7 @@ export class XYCursor extends Container {
 
 	protected _movePoint: IPoint | undefined;
 	protected _lastPoint: IPoint = { x: 0, y: 0 };
+	protected _lastPoint2: IPoint = { x: 0, y: 0 };
 
 	protected _tooltipX: boolean = false;
 	protected _tooltipY: boolean = false;
@@ -532,8 +533,11 @@ export class XYCursor extends Container {
 				}
 			}
 			this._handleMove(event);
-
-			this._handleLineBlur();
+			
+			if(Math.hypot(this._lastPoint2.x - event.point.x, this._lastPoint2.y - event.point.y) > 1) {
+				this._handleLineBlur();
+				this._lastPoint2 = event.point;
+			}
 		}));
 
 		const parent = this.parent;

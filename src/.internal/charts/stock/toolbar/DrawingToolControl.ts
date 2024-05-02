@@ -8,6 +8,14 @@ export type DrawingTools = "Arrows &amp; Icons" | "Average" | "Callout" | "Doodl
 
 export interface IDrawingToolControlSettings extends IStockControlSettings {
 	tools: DrawingTools[];
+
+	/**
+	 * If set to `true`, the dropdown will fix the height to fit within chart's
+	 * area, with scroll if the contents do not fit.
+	 *
+	 * @since 5.9.5
+	 */
+	scrollable?: boolean;
 }
 
 export interface IDrawingToolControlPrivate extends IStockControlPrivate {
@@ -41,7 +49,8 @@ export class DrawingToolControl extends StockControl {
 		// Create list of tools
 		const list = DropdownList.new(this._root, {
 			control: this,
-			parent: this.getPrivate("button")
+			parent: this.getPrivate("button"),
+			scrollable: this.get("scrollable", false)
 		});
 		this.setPrivate("list", list);
 

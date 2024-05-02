@@ -180,6 +180,9 @@ export class RadialLabel extends Label {
 					paddingRight: 0
 				});
 
+				this.setRaw("x", undefined);
+				this.setRaw("y", undefined);				
+
 				// Circular labels are handled and positioned differently
 
 				this._text.set("orientation", orientation);

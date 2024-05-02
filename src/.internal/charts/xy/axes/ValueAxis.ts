@@ -349,6 +349,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _minReal: number | undefined;
 	protected _maxReal: number | undefined;
 
+	protected _minRealLog: number | undefined;
+
 	protected _baseValue: number = 0;
 	protected _syncDp?: MultiDisposer;
 	protected _minLogAdjusted: number = 1;
@@ -467,7 +469,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 			let value = selectionMin - step;
 			let differencePower = 1;
-			let minLog = min;
+			let minLog: number = min;
 
 			if (logarithmic) {
 				value = this._minLogAdjusted;
@@ -483,7 +485,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				if (minLog <= 0) {
 					minLog = 1;
 					if (step < 1) {
-						minLog = step;
+						if ($type.isNumber(this._minRealLog)) {
+							minLog = this._minRealLog;
+						}
+						else {
+							minLog = Math.pow(10, -50);
+						}
 					}
 				}
 
@@ -535,7 +542,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this._toggleDataItem(dataItem, true);
 
 				dataItem.setRaw("value", value);
-
 				const label = dataItem.get("label");
 				if (label) {
 					label.set("text", this._formatText(value));
@@ -606,7 +612,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 
 				let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(step)) * Math.LOG10E));
-				if (stepPower < 1) {
+				if (stepPower < 1 && !logarithmic) {
 					// exponent is less then 1 too. Count decimals of exponent
 					let decCount = Math.round(Math.abs(Math.log(Math.abs(stepPower)) * Math.LOG10E)) + 2;
 					// round value to avoid floating point issues
@@ -1325,6 +1331,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let minAdapted = this.adapters.fold("min", min);
 		let maxAdapted = this.adapters.fold("max", max);
 
+		this._minRealLog = min;
+
 		if ($type.isNumber(minAdapted)) {
 			min = minAdapted;
 		}
@@ -1353,7 +1361,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// add extras
 		min -= (max - min) * extraMin;
 		max += (max - min) * extraMax;
-		
+
 		if (this.get("logarithmic")) {
 			// don't let min go below 0 if real min is >= 0
 			if (min < 0 && initialMin >= 0) {
@@ -1364,7 +1372,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				max = 0;
 			}
 		}
-		
+
 		this._minReal = min;
 		this._maxReal = max;
 
@@ -1775,7 +1783,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	/**
 	 * @ignore
-	 */	
+	 */
 	public nextPosition(count?: number) {
 		if (count == null) {
 			count = 1;

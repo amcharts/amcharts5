@@ -69,6 +69,7 @@ import type { DropdownControl } from "./../../../stock";
 import type { DropdownList } from "./../../../stock";
 import type { DropdownListControl } from "./../../../stock";
 import type { DurationAxis } from "./../../../xy";
+import type { EditableLabel } from "./../../../index";
 import type { Ellipse } from "./../../../index";
 import type { EllipseSeries } from "./../../../stock";
 import type { Entity } from "./../../../index";
@@ -294,6 +295,7 @@ export interface IClasses {
 	"DropdownList": () => Promise<typeof DropdownList>;
 	"DropdownListControl": () => Promise<typeof DropdownListControl>;
 	"DurationAxis": () => Promise<typeof DurationAxis>;
+	"EditableLabel": () => Promise<typeof EditableLabel>;
 	"Ellipse": () => Promise<typeof Ellipse>;
 	"EllipseSeries": () => Promise<typeof EllipseSeries>;
 	"Entity": () => Promise<typeof Entity>;
@@ -520,6 +522,7 @@ const classes: IClasses = {
 	"DropdownList": () => import(/* webpackExports: "DropdownList", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownList),
 	"DropdownListControl": () => import(/* webpackExports: "DropdownListControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownListControl),
 	"DurationAxis": () => import(/* webpackExports: "DurationAxis", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.DurationAxis),
+	"EditableLabel": () => import(/* webpackExports: "EditableLabel", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.EditableLabel),
 	"Ellipse": () => import(/* webpackExports: "Ellipse", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Ellipse),
 	"EllipseSeries": () => import(/* webpackExports: "EllipseSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.EllipseSeries),
 	"Entity": () => import(/* webpackExports: "Entity", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Entity),

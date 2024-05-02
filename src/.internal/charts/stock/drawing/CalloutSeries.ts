@@ -54,12 +54,16 @@ export class CalloutSeries extends LabelSeries {
 				label.events.on("click", (e) => {
 					const spriteResizer = this.spriteResizer;
 					if (spriteResizer.get("sprite") == label) {
+						this._isEditing = true;
+						label.set("active", true);
+						this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey, true);
 						spriteResizer.set("sprite", undefined);
-						this._unselectDrawing(dataContext.index);
 					}
 					else {
+						this._isEditing = false;
+						this._isSelected = true;
+						this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey, true);
 						spriteResizer.set("sprite", label);
-						this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey);
 					}
 					if (this._erasingEnabled) {
 						this._disposeIndex(dataContext.index);

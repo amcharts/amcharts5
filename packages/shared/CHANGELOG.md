@@ -5,6 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.5] - 2024-05-02
+
+### Added
+- New `DrawingControl` setting: `scrollable` (default: `false`). If set to `true` will restrict tool list to the height of the target chart.
+- New `Sprite` method: `compositeRotation()`. Returns element's rotation in degrees, taking into account all of its ancestors.
+- New element `EditableLabel`.
+
+### Changed
+- The drawing tool dropdown will now be fixed to the height of the target chart by default. You can disable it using `scrollable: false` on the `DrawingControl`.
+- HTML content will now take `rotation` setting into account.
+- Label and Callout drawing tools in `StockChart` will now use new `EditableLabel` element for smoother editing experience. The text is now editable.
+
+### Fixed
+- A `ValueAxis` with logarightmic scale and very small numbers was sometimes displaying cluttered grid lines and overlapping labels.
+- Volume Profile indicator could show previous data if user quickly scrolled to the range where no volume data was available.
+- Switching type of `RadialLabels` from radial to circular was resulting in those labels positioned incorrectly.
+- If a mouse pointer was over the chart when TAB key was used to focus an `XYCursor` line, series/axis' tooltip would disappear.
+
+
 ## [5.9.4] - 2024-04-26
 
 ### Fixed

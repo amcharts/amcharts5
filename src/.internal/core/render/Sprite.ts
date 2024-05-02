@@ -2523,6 +2523,17 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
+	 * Returns an actual roation of the element, taking into account all parents.
+	 *
+	 * @return Opacity
+	 * @since 5.9.2
+	 */
+	public compositeRotation(): number {
+		const rotation = this.get("rotation", 0);
+		return this._parent ? (this._parent.compositeRotation() + rotation) : rotation;
+	}
+
+	/**
 	 * Returns width of this element in pixels.
 	 *
 	 * @return Width (px)

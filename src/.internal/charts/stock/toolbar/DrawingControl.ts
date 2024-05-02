@@ -58,6 +58,14 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	tool?: DrawingTools,
 
 	/**
+	 * If set to `true`, the dropdown will fix the height to fit within chart's
+	 * area, with scroll if the contents do not fit.
+	 *
+	 * @since 5.9.5
+	 */
+	scrollable?: boolean;
+
+	/**
 	 * Default settings for drawing tools.
 	 *
 	 * @since 5.5.2
@@ -344,7 +352,8 @@ export class DrawingControl extends StockControl {
 		const toolControl = DrawingToolControl.new(this._root, {
 			stockChart: stockChart,
 			description: l.translateAny("Drawing tool"),
-			tools: this.get("tools")!
+			tools: this.get("tools")!,
+			scrollable: this.get("scrollable", false)
 		});
 
 		toolControl.setPrivate("toolbar", toolbar);

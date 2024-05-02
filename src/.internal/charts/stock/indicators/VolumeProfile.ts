@@ -462,72 +462,6 @@ export class VolumeProfile extends Indicator {
 				dataUp[hi].area = true;
 				dataDown[hi].area = true;
 
-				/* 
-				// with two rows
-				while (area < valueArea) {
-					let rowAbove1 = hi + cu;
-					let rowAbove2 = hi + cu + 1;
-
-					let sumAbove = 0
-					if (rowAbove1 < dlen) {
-						sumAbove += dataUp[rowAbove1].total;
-					}
-					if (rowAbove2 < dlen) {
-						sumAbove += dataUp[rowAbove2].total;
-					}
-
-					let rowBelow1 = hi - cd;
-					let rowBelow2 = hi - cd - 1;
-
-					let sumBelow = 0
-					if (rowBelow1 >= 0) {
-						sumBelow += dataUp[rowBelow1].total;
-					}
-					if (rowBelow2 >= 0) {
-						sumBelow += dataUp[rowBelow2].total;
-					}
-
-					if (sumBelow <= sumAbove) {
-						area += sumAbove;
-						if (rowAbove1 < dlen) {
-							dataDown[rowAbove1].area = true;
-							dataUp[rowAbove1].area = true;
-							cu++;
-						}
-						if (rowAbove2 < dlen) {
-							dataDown[rowAbove2].area = true;
-							dataUp[rowAbove2].area = true;
-							cu++;
-						}
-					}
-					else {
-						area += sumBelow;
-						if (rowBelow1 >= 0) {
-							dataDown[rowBelow1].area = true;
-							dataUp[rowBelow1].area = true;
-							cd++;
-						}
-						if (rowBelow2 >= 0) {
-							dataDown[rowBelow2].area = true;
-							dataUp[rowBelow2].area = true;
-							cd++;
-						}
-					}
-
-					if (sumBelow == 0) {
-						cd++;
-					}
-					if (sumAbove == 0) {
-						cu++;
-					}
-
-					if ((cd > dlen && cu > dlen)) {
-						break;
-					}
-
-				}
-				*/
-
 				// single row
 				while (area < valueArea) {
 					let rowAbove1 = hi + cu;
@@ -583,6 +517,10 @@ export class VolumeProfile extends Indicator {
 				else {
 					this.upSeries.data.setAll(dataUp);
 				}
+			}
+			else{
+				this.upSeries.data.clear();
+				this.series.data.clear();
 			}
 		}
 

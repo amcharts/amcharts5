@@ -2069,8 +2069,9 @@ export class Root implements IDisposer {
 				}
 			});
 
-			// Init and reset scale
+			// Init and reset scale / rotation
 			const scale = target.compositeScale() || 1;
+			const rotation = target.compositeRotation() || 0;
 			htmlElement.style.transform = "";
 			htmlElement.style.transformOrigin = "";
 
@@ -2138,7 +2139,14 @@ export class Root implements IDisposer {
 
 			// Deal with scale
 			if (scale != 1) {
-				htmlElement.style.transform = "scale(" + scale + ")";
+				htmlElement.style.transform += "scale(" + scale + ")";
+			}
+
+			if (rotation != 0) {
+				htmlElement.style.transform += " rotate(" + rotation + "deg)";
+			}
+
+			if (htmlElement.style.transform != "") {
 				htmlElement.style.transformOrigin = target.get("centerX", 0) + "%  " + target.get("centerY", 0) + "%";
 			}
 
