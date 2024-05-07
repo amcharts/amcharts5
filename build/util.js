@@ -346,7 +346,7 @@ async function tsc(cwd, config, force) {
 		args.push("--force");
 	}
 
-	await spawn("tsc", args, { cwd });
+	await spawn("tsc", args, { cwd, shell: true });
 }
 
 exports.tsc = tsc;

@@ -1324,6 +1324,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			return;
 		}
 
+		if(min > max){
+			[min, max] = [max, min];
+		}
+
 		const initialMin = min;
 		const initialMax = max;
 
@@ -1563,10 +1567,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// approximate difference between two grid lines
 		let step = Math.ceil((difference / gridCount) / power) * power;
 		let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(step)) * Math.LOG10E));
-
-		if(min > max){
-			[min, max] = [max, min];
-		}
 
 		// the step should divide by  2, 5, and 10.
 		let stepDivisor: number = Math.ceil(step / stepPower); // number 0 - 10
