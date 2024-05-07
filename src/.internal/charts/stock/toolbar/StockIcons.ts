@@ -53,7 +53,7 @@ export class StockIcons {
 		"Parallel Channel": { viewbox: "0 0 50 50", path: "M 3 37 L 37 3 M 13 47 L 47 13" },
 
 		"Eraser": { viewbox: "0 0 50 50", path: "M 13 48 L 21 48 L 45 24 L 29 8 L 1 36 L 13 48 M 32 48 L 38 48 M 43 48 L 49 48 M 23 14 L 39 30 M 20 17 L 36 33 M 26 11 L 42 27" },
-		"Select": { viewbox: "0 0 50 50", path: "M 6 6 L 33 18 L 22 25 L 36 43 L 31 47 L 18 28 L 9 36 L 6 6" },
+		"Select": { viewbox: "0 0 50 50", path: "M 8 6 L 35 18 L 24 25 L 38 43 L 33 47 L 20 28 L 11 36 L 8 6" },
 		"Clear": { viewbox: "0 0 50 50", path: "M 6 10 L 12 48 L 38 48 L 44 10 L 6 10 M 14 14 L 18 43 M 25 14 L 25 43 M 36 14 L 32 43 M 6 8 L 44 8 M 21 8 L 21 3 L 30 3 L 30 8" },
 		"Bold": { viewbox: "0 0 50 50", path: "M 12 4 L 12 47 L 32 47 C 45 47 47 23 32 23 C 42 23 42 4 31 4 L 12 4 Z M 32 23 L 12 23 Z", style: "stroke-width: 1.8px" },
 		"Italic": { viewbox: "0 0 50 50", path: "M 17 5 L 38 5 M 27 5 L 18 47 M 8 47 L 28 47" },

@@ -1564,8 +1564,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let step = Math.ceil((difference / gridCount) / power) * power;
 		let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(step)) * Math.LOG10E));
 
+		if(min > max){
+			[min, max] = [max, min];
+		}
+
 		// the step should divide by  2, 5, and 10.
 		let stepDivisor: number = Math.ceil(step / stepPower); // number 0 - 10
+
 
 		if (stepDivisor > 5) {
 			stepDivisor = 10;
@@ -1577,11 +1582,16 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		// now get real step
 		step = Math.ceil(step / (stepPower * stepDivisor)) * stepPower * stepDivisor;
 
+
 		let maxPrecision = this.get("maxPrecision");
 		if ($type.isNumber(maxPrecision)) {
+			
 			let ceiledStep = $math.ceil(step, maxPrecision);
 			if (maxPrecision < Number.MAX_VALUE && step !== ceiledStep) {
 				step = ceiledStep;
+				if(step == 0){
+					step = 1;
+				}
 			}
 		}
 

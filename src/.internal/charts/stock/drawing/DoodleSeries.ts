@@ -66,12 +66,6 @@ export class DoodleSeries extends DrawingSeries {
 			const dataItem = this.dataItems[len - 1];
 			this._setXLocation(dataItem, valueX);
 
-			let segmentItems = this._di[index];
-			if (!segmentItems) {
-				segmentItems = {};
-			}
-			segmentItems[this._pIndex] = dataItem;
-			this._di[index] = segmentItems;
 			this._pIndex++;
 
 			this.setPrivate("startIndex", 0);
@@ -99,6 +93,7 @@ export class DoodleSeries extends DrawingSeries {
 			}
 
 			this._down = true;
+
 			this.data.push({ stroke: this._getStrokeTemplate(), sprite: this.mainContainer, index: this._index, corner: this._pIndex, drawingId: this._drawingId });
 		}
 	}

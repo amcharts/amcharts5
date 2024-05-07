@@ -184,7 +184,7 @@ export class PolylineSeries extends DrawingSeries {
 				this._positionBullets(dataItem);
 				this._setXLocation(dataItem, dataItem.get("valueX", 0));
 			}
-			this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index + 1, corner: "e", drawingId: this._drawingId });
+
 			this._drawingLine.hide();
 			
 			this.isDrawing(false);

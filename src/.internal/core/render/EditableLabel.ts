@@ -7,6 +7,7 @@ import { color } from "../util/Color";
 
 import * as $utils from "../util/Utils"
 import * as $type from "../util/Type"
+import * as $array from "../util/Array"
 
 export interface IEditableLabelSettings extends ILabelSettings {
 
@@ -24,6 +25,14 @@ export interface IEditableLabelSettings extends ILabelSettings {
 	 * @default "click"
 	 */
 	editOn?: "click" | "dblclick" | "rightclick" | "middleclick" | "none";
+
+	/**
+	 * Allow multiple lines (`true` - dfault) or no (`false`).
+	 *
+	 * @default true
+	 * @since 5.9.6
+	 */
+	multiLine?: boolean;
 
 }
 
@@ -127,6 +136,10 @@ export class EditableLabel extends Label {
 
 					// Resize textarea on keypress
 					textarea.addEventListener("input", _ev => {
+						if (this.get("multiLine") === false) {
+							// replace line breaks with spaces for single-line labels
+							textarea.value = textarea.value.replace(/\n/g, " ");
+						}
 						this.set("text", textarea.value);
 						this._syncStyle();
 					});
@@ -142,6 +155,15 @@ export class EditableLabel extends Label {
 							}
 						}));
 					}
+
+					// Intercept ENTER if necessary
+					this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+						if ($utils.getEventKey(ev) == "Enter" && this.get("multiLine") === false) {
+							// Single-line label, save instead of breaking into new line
+							ev.preventDefault();
+							this.set("active", false);
+						}
+					}));
 
 					this.events.dispatch("inited", {
 						type: "inited",
@@ -199,6 +221,15 @@ export class EditableLabel extends Label {
 		const input = this.getPrivate("input");
 		const textarea = this.getPrivate("textarea");
 		if (textarea) {
+			// Set up HTML
+			const el = input.getPrivate("htmlElement")!;
+
+			// Reset all styles
+			const computedStyles = window.getComputedStyle(textarea);
+			$array.each(computedStyles, (style: any) => {
+				textarea.style[style] = "initial";
+			});
+
 			// Remove textarea attributes
 			textarea.style.color = this.get("fill", color(0x000000)).toCSS(this.get("fillOpacity", 1));
 			textarea.style.backgroundColor = "rgba(0, 0, 0, 0)";
@@ -214,8 +245,15 @@ export class EditableLabel extends Label {
 			// @todo
 
 			// Size
+			// Handle maxWidth
 			textarea.style.overflow = "hidden";
-			textarea.style.minWidth = textarea.scrollWidth + "px";
+			const maxWidth = this.get("maxWidth", 0) - this.get("paddingLeft", 0) - this.get("paddingRight", 0);
+			if (maxWidth > 0) {
+				textarea.style.maxWidth = maxWidth + "px";
+			}
+			else {
+				textarea.style.minWidth = textarea.scrollWidth + "px";
+			}
 
 			textarea.style.height = "auto";
 			textarea.style.minHeight = textarea.scrollHeight + "px";
@@ -268,6 +306,35 @@ export class EditableLabel extends Label {
 				fontStyle = fontStyle;
 			}
 			textarea.style.fontStyle = fontStyle;
+
+			const oversizeBehavior = this.get("oversizedBehavior");
+			if (oversizeBehavior == "wrap") {
+				textarea.style.whiteSpace = "pre-wrap";
+			}
+			else {
+				textarea.style.whiteSpace = "nowrap";
+			}
+
+			// Adjust textarea postion based on textAlign setting
+			this._root.events.on("frameended", () => {
+				const textAlign = this.get("textAlign", "start");
+				if (textAlign == "center") {
+					textarea.style.textAlign = "center";
+					if (!el.style.transform.match(/translateX/)) {
+						el.style.transform += " translateX(-50%)";
+					}
+				}
+				else if (textAlign == "end") {
+					textarea.style.textAlign = "right";
+					if (!el.style.transform.match(/translateX/)) {
+						el.style.transform += "translateX(-100%)";
+					}
+				}
+				else {
+					textarea.style.textAlign = textAlign;
+				}
+			});
+
 		}
 	}
 

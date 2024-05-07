@@ -77,7 +77,8 @@ export { ListTemplate } from "./.internal/core/util/List";
 export { TextFormatter } from "./.internal/core/util/TextFormatter";
 
 export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/core/render/SpriteResizer";
-
+export { CanvasRenderer } from "./.internal/core/render/backend/CanvasRenderer";
+export { CanvasLayer } from "./.internal/core/render/backend/CanvasRenderer";
 
 export type { IBounds } from "./.internal/core/util/IBounds";
 export type { IGeoPoint } from "./.internal/core/util/IGeoPoint";

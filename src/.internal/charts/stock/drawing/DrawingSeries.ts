@@ -259,6 +259,7 @@ export class DrawingSeries extends LineSeries {
 
 		strokesTemplate.events.on("pointerdown", (e) => {
 			const index = this._getIndex(e.target);
+
 			if (this._erasingEnabled) {
 				this._disposeIndex(index);
 			}
@@ -405,6 +406,15 @@ export class DrawingSeries extends LineSeries {
 					}
 				}
 			})
+			
+			for(let i = this.dataItems.length - 1; i >= 0; i--){
+				const dataItem = this.dataItems[i];
+				const dataContext = dataItem.dataContext as any;
+				if(dataContext.index == index){
+					this.data.removeValue(dataContext);
+					this.disposeDataItem(dataItem);
+				}
+			}
 
 			this._pIndex = 0;
 			delete this._di[index];
@@ -432,7 +442,7 @@ export class DrawingSeries extends LineSeries {
 				this._createElements(index, dataItem);
 				this._di[index][corner] = dataItem;
 				this._index = index;
-			}
+			}			
 		})
 	}
 
@@ -516,43 +526,6 @@ export class DrawingSeries extends LineSeries {
 			})
 		}
 	}
-
-	/*
-	protected _hideAllBullets() {
-		this.strokes.each((stroke) => {
-			stroke.unhover();
-		})
-
-		if (!this._drawingEnabled && !this._isDragging) {
-			const dataItems = this.dataItems;
-
-			$array.each(dataItems, (dataItem) => {
-				const bullets = dataItem.bullets;
-				if (bullets) {
-					$array.each(bullets, (bullet) => {
-						const sprite = bullet.get("sprite");
-						if (sprite) {
-							sprite.hide();
-						}
-					})
-				}
-			})
-		}
-	}
-	protected showAllBullets() {
-		$array.each(this.dataItems, (dataItem) => {
-			const bullets = dataItem.bullets;
-			if (bullets) {
-				$array.each(bullets, (bullet) => {
-					const sprite = bullet.get("sprite");
-					if (sprite) {
-						sprite.show();
-					}
-				})
-			}
-		})
-	}
-	*/
 
 	protected _hideResizer(sprite?: Sprite) {
 		const spriteResizer = this._getStockChart().spriteResizer;
@@ -930,7 +903,7 @@ export class DrawingSeries extends LineSeries {
 		this._drawingId = this._generateId();
 	}
 
-	protected _generateId(): string {
+	public _generateId(): string {
 		return "" + new Date().getTime() + Math.round(Math.random() * 10000 + 10000);
 	}
 
@@ -1222,6 +1195,7 @@ export class DrawingSeries extends LineSeries {
 
 	public _selectDrawing(index: number, keepSelection?: boolean, force?:boolean) {
 		if (this._getStockChart().get("drawingSelectionEnabled") || force) {
+
 			this._isSelecting = true;
 
 			if (this._selected.indexOf(index) != -1) {

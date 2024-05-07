@@ -424,7 +424,8 @@ export class DefaultTheme extends Theme {
 		r("EditableLabel").setAll({
 			editOn: "click",
 			//setStateOnChildren: true,
-			themeTags: ["editablelabel"]
+			themeTags: ["editablelabel"],
+			multiLine: true
 		});
 
 		r("RoundedRectangle", ["editablelabel", "background"]).setAll({

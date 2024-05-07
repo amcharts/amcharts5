@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.6] - 2024-05-07
+
+### Added
+- New `EditableLable` setting: `multiline` (default: `true`). If set to `false` will only allow label to be edited on a single line.
+- `hsvToHsl()` and `hslToHsv()` color convertion functions added to `am5.utils` namespace.
+
+### Changed
+- Accessibility: Both vertical and horizontal line elements of `XYCursor` now have their `role` set to `"slider"` by default.
+- `EditableLabel` now supports `maxWidth` and `oversizedBehavior` settings.
+- `EditableLabel` will now reset all available styles that might come from page-wide CSS to `"initial"` so its appearance is not affected by any outside CSS.
+
+### Fixed
+- `EditableLabel` was not being properly positioned with `textAlign` set to anything else than `"left"`.
+- `ValueAxis` in some rare cases (when `max` and `maxPrecision` was set) could get to infinite loop.
+- Some drawing series on `StockChart` were not properly removing items of deleted drawings from their data/dataitems.
+
+
 ## [5.9.5] - 2024-05-02
 
 ### Added

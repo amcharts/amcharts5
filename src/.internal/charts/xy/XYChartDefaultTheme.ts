@@ -210,6 +210,7 @@ export class XYChartDefaultTheme extends Theme {
 				forceInactive: true,
 				strokeOpacity: 0.8,
 				strokeDasharray: [2, 2],
+				role: "slider",
 				ariaLabel: language.translate("Use left and right arrows to move selection")
 			});
 
@@ -223,6 +224,7 @@ export class XYChartDefaultTheme extends Theme {
 				forceInactive: true,
 				strokeOpacity: 0.8,
 				strokeDasharray: [2, 2],
+				role: "slider",
 				ariaLabel: language.translate("Use up and down arrows to move selection")
 			});
 

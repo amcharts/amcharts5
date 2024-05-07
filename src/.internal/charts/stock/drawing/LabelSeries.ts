@@ -99,6 +99,10 @@ export class LabelSeries extends PolylineSeries {
 				active: true
 			}, template));
 
+			label.on("text", (text)=>{
+				dataContext.text = text;
+			})
+
 			this.setPrivate("label", label);
 
 			label.on("active", () => {
@@ -130,7 +134,6 @@ export class LabelSeries extends PolylineSeries {
 				else {
 					this._isEditing = false;
 					this._isSelected = true;
-					this._selectDrawing(dataContext.index, (e.originalEvent as any).ctrlKey, true);
 					spriteResizer.set("sprite", label);
 				}
 			})

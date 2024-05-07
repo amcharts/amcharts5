@@ -869,7 +869,7 @@ export function addSpacing(str: string): string {
 
 /**
  * Splits the string into separate characters. Keeps RTL words non-split.
- * 
+ *
  * @param   source  Input
  * @return          Split text
  */
@@ -1080,6 +1080,16 @@ export interface iHSL {
 }
 
 /**
+ * Represents an interface for an object that represents an HSV color.
+ */
+export interface iHSV {
+	h: number;
+	s: number;
+	v: number;
+	a?: number;
+}
+
+/**
  * The functions below are taken and adapted from Garry Tan's blog post:
  * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
  *
@@ -1096,7 +1106,6 @@ export interface iHSL {
  * Function adapted from:
  * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
  *
- * @ignore Exclude from docs
  * @param h       The hue
  * @param s       The saturation
  * @param l       The lightness
@@ -1143,7 +1152,6 @@ export function hslToRgb(color: iHSL): iRGB {
  * Function adapted from:
  * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
  *
- * @ignore Exclude from docs
  * @param r       The red color value
  * @param g       The green color value
  * @param b       The blue color value
@@ -1179,14 +1187,58 @@ export function rgbToHsl(color: iRGB): iHSL {
 	return {
 		h: h,
 		s: s,
-		l: l
+		l: l,
 	};
 }
+
+
+/**
+ * Converts HSV to HSL.
+ *
+ * https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_HSL
+ */
+export function hsvToHsl(hsv: iHSV): iHSL {
+	const l = hsv.v * (1 - (hsv.s / 2));
+
+	const s =
+		(l === 0 || l === 1
+			? 0
+			: (hsv.v - l) / Math.min(l, 1 - l));
+
+	return {
+		h: hsv.h,
+		s,
+		l,
+		a: hsv.a,
+	};
+}
+
+
+/**
+ * Converts HSL to HSV.
+ *
+ * https://en.wikipedia.org/wiki/HSL_and_HSV#HSL_to_HSV
+ */
+export function hslToHsv(hsl: iHSL): iHSV {
+	const v = hsl.l + (hsl.s * Math.min(hsl.l, 1 - hsl.l));
+
+	const s =
+		(v === 0
+			? 0
+			: 2 * (1 - (hsl.l / v)));
+
+	return {
+		h: hsl.h,
+		s,
+		v,
+		a: hsl.a,
+	};
+}
+
 
 /**
  * Returns a color that is `percent` brighter than the reference color.
  *
- * @ignore Exclude from docs
  * @param color    Reference color
  * @param percent  Brightness percent
  * @return Hex code of the new color
@@ -1209,7 +1261,6 @@ export function lighten(rgb: $type.Optional<iRGB>, percent: number): $type.Optio
 /**
  * Gets lightness step.
  *
- * @ignore Exclude from docs
  * @param value    Value
  * @param percent  Percent
  * @return Step
@@ -1222,7 +1273,6 @@ export function getLightnessStep(value: number, percent: number): number {
 /**
  * Returns a color that is `percent` brighter than the source `color`.
  *
- * @ignore Exclude from docs
  * @param color    Source color
  * @param percent  Brightness percent
  * @return New color
@@ -1263,7 +1313,6 @@ export function getBrightnessStep(_value: number, percent: number): number {
  * color to use for elements over this color. E.g.: you would want to use
  * black text over light background, and vice versa.
  *
- * @ignore Exclude from docs
  * @param color  Source color
  * @return Light?
  */
@@ -1278,7 +1327,6 @@ export function isLight(color: iRGB): boolean {
  * `saturation` can be in the range of 0 (fully desaturated) to 1 (fully
  * saturated).
  *
- * @ignore Exclude from docs
  * @param color       Base color
  * @param saturation  Saturation (0-1)
  * @return New color
@@ -1293,6 +1341,14 @@ export function saturate(rgb: $type.Optional<iRGB>, saturation: number): $type.O
 	return hslToRgb(hsl);
 }
 
+/**
+ * Returns a color which contrasts more with the source `color`.
+ *
+ * @param  color             Base color
+ * @param  lightAlternative  Light option
+ * @param  darkAlternative   Dark option
+ * @return New color
+ */
 export function alternativeColor(color: iRGB, lightAlternative: iRGB = { r: 255, g: 255, b: 255 }, darkAlternative: iRGB = { r: 255, g: 255, b: 255 }): iRGB {
 	let light = lightAlternative;
 	let dark = darkAlternative;

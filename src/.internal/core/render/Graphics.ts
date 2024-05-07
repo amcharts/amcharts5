@@ -272,7 +272,8 @@ export class Graphics extends Sprite {
 			this._display.blendMode = blendMode;
 
 			const draw = this.get("draw");
-			if (draw) {
+
+			if (draw && typeof draw === "function") {
 				draw(this._display, this);
 			}
 
@@ -301,8 +302,6 @@ export class Graphics extends Sprite {
 			const shadowOffsetX = this.get("shadowOffsetX");
 			const shadowOffsetY = this.get("shadowOffsetY");
 			const shadowOpacity = this.get("shadowOpacity");
-
-			//const bounds = this._display.getLocalBounds();
 
 			if (shadowColor && (shadowBlur || shadowOffsetX || shadowOffsetY)) {
 				this._display.shadow(shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY, shadowOpacity);
@@ -338,23 +337,6 @@ export class Graphics extends Sprite {
 			}
 
 			if (fillPattern) {
-				/*
-				let changed = false;
-				if (fill && (!fillPattern.get("fill") || fillPattern.get("fillInherited"))) {
-					fillPattern.set("fill", fill);
-					fillPattern.set("fillInherited", true)
-					changed = true;
-				}
-				if (stroke && (!fillPattern.get("color") || fillPattern.get("colorInherited"))) {
-					fillPattern.set("color", stroke);
-					fillPattern.set("colorInherited", true)
-					changed = true;
-				}
-				if (changed) {
-					// @todo: is this OK?
-					fillPattern._changed();
-				}
-				*/
 				const pattern = fillPattern.pattern;
 				if (pattern) {
 					this._display.beginFill(pattern, fillOpacity);
