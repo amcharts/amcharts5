@@ -220,6 +220,8 @@ export class XYCursor extends Container {
 	declare public _privateSettings: IXYCursorPrivate;
 	declare public _events: IXYCursorEvents;
 
+	protected _alwaysShow: boolean = false;
+
 	/**
 	 * A [[Grid]] elment that used for horizontal line of the cursor crosshair.
 	 *
@@ -366,6 +368,7 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleLineFocus() {
+		this._alwaysShow = this.get("alwaysShow", false);
 		this.setAll({
 			positionX: this.getPrivate("positionX", 0),
 			positionY: this.getPrivate("positionY", 0),
@@ -376,11 +379,13 @@ export class XYCursor extends Container {
 	}
 
 	protected _handleLineBlur() {
-		this.setAll({
-			positionX: undefined,
-			positionY: undefined,
-			alwaysShow: false
-		});
+		if (this.lineX.isFocus() || this.lineY.isFocus()) {
+			this.setAll({
+				positionX: undefined,
+				positionY: undefined,
+				alwaysShow: this._alwaysShow
+			});
+		}
 	}
 
 	public _prepareChildren() {
@@ -533,8 +538,8 @@ export class XYCursor extends Container {
 				}
 			}
 			this._handleMove(event);
-			
-			if(Math.hypot(this._lastPoint2.x - event.point.x, this._lastPoint2.y - event.point.y) > 1) {
+
+			if (Math.hypot(this._lastPoint2.x - event.point.x, this._lastPoint2.y - event.point.y) > 1) {
 				this._handleLineBlur();
 				this._lastPoint2 = event.point;
 			}

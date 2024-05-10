@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.8] - 2024-05-10
+
+### Added
+- Two new settings for `Sprite` added: `ariaCurrent` (sets [`aria-current`](https://w3c.github.io/aria/#aria-current)) and `ariaSelected` (sets [`aria-selected`](https://w3c.github.io/aria/#aria-selected)).
+- Two new methods for `MapPolygonSeries` added: `getPolygonByPoint()` and `getPolygonByGeoPoint()`.
+
+### Fixed
+- Better positioning of `EditableLabel` when its `width` is set.
+- `alwaysShow` setting of `XYCursor` was not working properly.
+
+
 ## [5.9.7] - 2024-05-07
 
 ### Fixed

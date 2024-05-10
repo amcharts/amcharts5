@@ -73,6 +73,22 @@ export interface IAccessibilitySettings {
 	ariaChecked?: boolean;
 
 	/**
+	 * `aria-current` setting.
+	 * 
+	 * @see {@link https://w3c.github.io/aria/#aria-current} for more info
+	 * @since 5.9.8
+	 */
+	ariaCurrent?: string;
+
+	/**
+	 * `aria-selected` setting.
+	 * 
+	 * @see {@link https://w3c.github.io/aria/#aria-selected} for more info
+	 * @since 5.9.8
+	 */
+	ariaSelected?: boolean;
+
+	/**
 	 * `aria-hidden` setting.
 	 */
 	ariaHidden?: boolean;

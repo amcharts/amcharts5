@@ -1482,6 +1482,22 @@ export class Root implements IDisposer {
 			focusElement.removeAttribute("aria-checked");
 		}
 
+		const ariaCurrent = target.get("ariaCurrent");
+		if (ariaCurrent != null) {
+			focusElement.setAttribute("aria-current", ariaCurrent);
+		}
+		else {
+			focusElement.removeAttribute("aria-current");
+		}
+
+		const ariaSelected = target.get("ariaSelected");
+		if (ariaSelected != null && role && ["gridcell", "option", "row", "tab", "columnheader", "rowheader", "treeitem"].indexOf(role) !== -1) {
+			focusElement.setAttribute("aria-selected", ariaSelected ? "true" : "false");
+		}
+		else {
+			focusElement.removeAttribute("aria-selected");
+		}
+
 		if (target.get("ariaHidden")) {
 			focusElement.setAttribute("aria-hidden", "true");
 		}

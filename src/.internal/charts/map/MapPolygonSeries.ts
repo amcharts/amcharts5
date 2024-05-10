@@ -1,5 +1,7 @@
 import type { DataItem } from "../../core/render/Component";
 import type { Animation } from "../../core/util/Entity";
+import type { IPoint } from "../../core/util/IPoint";
+import type { IGeoPoint } from "../../core/util/IGeoPoint";
 
 import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
 import { MapPolygon } from "./MapPolygon";
@@ -294,5 +296,30 @@ export class MapPolygonSeries extends MapSeries {
 				return chart.zoomToGeoBounds({ left, right, top, bottom });
 			}
 		}
+	}
+
+	/**
+	 * Returns a [[MapPolygon]] that is under specific X/Y point.
+	 *
+	 * @since 5.9.8
+	 * @param   point  X/Y
+	 * @return         Polygon
+	 */
+	public getPolygonByPoint(point: IPoint): MapPolygon | undefined {
+		let found: MapPolygon | undefined;
+		const renderer = this._display._renderer;
+		const displayObject = (renderer as any).getObjectAtPoint(point);
+		if (displayObject) {
+			this.mapPolygons.each(function(polygon) {
+				if (polygon._display == displayObject) {
+					found = polygon;
+				}
+			});
+			return found;
+		}
+	}
+	
+	public getPolygonByGeoPoint(point: IGeoPoint): MapPolygon | undefined {
+		return this.getPolygonByPoint(this.chart!.convert(point));
 	}
 }

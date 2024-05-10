@@ -245,7 +245,6 @@ export class EditableLabel extends Label {
 			// @todo
 
 			// Size
-			// Handle maxWidth
 			textarea.style.overflow = "hidden";
 			const maxWidth = this.get("maxWidth", 0) - this.get("paddingLeft", 0) - this.get("paddingRight", 0);
 			if (maxWidth > 0) {
@@ -257,6 +256,12 @@ export class EditableLabel extends Label {
 
 			textarea.style.height = "auto";
 			textarea.style.minHeight = textarea.scrollHeight + "px";
+
+			// If width is explicitly set on a label, use it for textarea
+			if (this.get("width")) {
+				textarea.style.width = (this.width()  - this.get("paddingLeft", 0) - this.get("paddingRight", 0)) + "px";
+				textarea.style.minWidth = "";
+			}
 
 			// Line height
 			const lineHeight = this.get("lineHeight");
@@ -320,14 +325,14 @@ export class EditableLabel extends Label {
 				const textAlign = this.get("textAlign", "start");
 				if (textAlign == "center") {
 					textarea.style.textAlign = "center";
-					if (!el.style.transform.match(/translateX/)) {
+					if (!el.style.transform.match(/translateX/) && !this.get("width")) {
 						el.style.transform += " translateX(-50%)";
 					}
 				}
 				else if (textAlign == "end") {
 					textarea.style.textAlign = "right";
-					if (!el.style.transform.match(/translateX/)) {
-						el.style.transform += "translateX(-100%)";
+					if (!el.style.transform.match(/translateX/) && !this.get("width")) {
+						el.style.transform += " translateX(-100%)";
 					}
 				}
 				else {
