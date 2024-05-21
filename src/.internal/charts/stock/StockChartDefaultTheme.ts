@@ -845,6 +845,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
 		})
 
+		r("LineSeries", ["averagetruerange"]).setAll({
+			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
+		})		
+
 		r("ColumnSeries", ["volume"]).setAll({
 			legendValueText: "[{volumeColor}; bold]{valueY.formatNumber('#.000a')}[/]",
 		})
@@ -999,6 +1004,13 @@ export class StockChartDefaultTheme extends Theme {
 			field: "hlc/3",
 			period: 20
 		})
+
+		r("AverageTrueRange").setAll({
+			name: "Average True Range",
+			seriesColor: color(0xff903f),
+			shortName: "ATR",
+			period: 14
+		})		
 
 		r("Trix").setAll({
 			name: "Trix",
@@ -1247,7 +1259,7 @@ export class StockChartDefaultTheme extends Theme {
 			scrollable: true,
 			fixedLabel: true,
 			searchable: true,
-			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
+			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Average True Range", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

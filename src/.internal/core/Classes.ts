@@ -12,6 +12,7 @@ import type { ArcDiagramLink } from "./../charts/flow/ArcDiagramLink.js";
 import type { ArcDiagramNodes } from "./../charts/flow/ArcDiagramNodes.js";
 import type { Aroon } from "./../charts/stock/indicators/Aroon.js";
 import type { AverageSeries } from "./../charts/stock/drawing/AverageSeries.js";
+import type { AverageTrueRange } from "./../charts/stock/indicators/AverageTrueRange.js";
 import type { AwesomeOscillator } from "./../charts/stock/indicators/AwesomeOscillator.js";
 import type { Axis } from "./../charts/xy/axes/Axis.js";
 import type { AxisBullet } from "./../charts/xy/axes/AxisBullet.js";
@@ -237,6 +238,7 @@ export interface IClasses {
 	"ArcDiagramLink": ArcDiagramLink;
 	"ArcDiagramNodes": ArcDiagramNodes;
 	"Aroon": Aroon;
+	"AverageTrueRange": AverageTrueRange;
 	"AverageSeries": AverageSeries;
 	"AwesomeOscillator": AwesomeOscillator;
 	"Axis": Axis<AxisRenderer>;

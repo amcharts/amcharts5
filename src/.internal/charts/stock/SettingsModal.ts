@@ -266,7 +266,7 @@ export class SettingsModal extends Modal {
 				case "dropdown":
 					element = this.getDropdown(setting, currentValue);
 					settingInputs[key] = <HTMLSelectElement>element;
-					$utils.addEventListener(element, "change", (ev: any) => {
+					this._disposers.push($utils.addEventListener(element, "change", (ev: any) => {
 						const input: HTMLSelectElement = ev.target!;
 						const option = input.options[input!.selectedIndex];
 						const extTarget = option.getAttribute("data-target");
@@ -274,21 +274,21 @@ export class SettingsModal extends Modal {
 							settingInputs[extTarget].value = option.getAttribute("data-target-value") + "";
 							settingInputs[extTarget].setAttribute("data-min-value", option.getAttribute("data-target-min-value") + "");
 						}
-					});
+					}));
 					break;
 				case "number":
 					element = this.getNumber(setting, currentValue);
 					settingInputs[key] = <HTMLInputElement>element;
 					if (setting.minValue !== undefined) {
 						element.setAttribute("data-min-value", setting.minValue + "");
-						$utils.addEventListener(element, "change", (ev: any) => {
+						this._disposers.push($utils.addEventListener(element, "change", (ev: any) => {
 							const input: HTMLInputElement = ev.target!;
 							const minValue = Number(input.getAttribute("data-min-value"));
 							const value = Number(input.value);
 							if (value < minValue) {
 								input.value = minValue + "";
 							}
-						});
+						}));
 					}
 					break;
 				case "color":

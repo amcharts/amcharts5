@@ -200,12 +200,12 @@ export class Tooltip extends Container {
 
 		this._disposers.push(this.label.onPrivate("htmlElement", (htmlElement) => {
 			if (htmlElement) {
-				$utils.addEventListener(htmlElement, "pointerover", (_ev) => {
+				this._disposers.push($utils.addEventListener(htmlElement, "pointerover", (_ev) => {
 					this._htmlContentHovered = true;
-				});
-				$utils.addEventListener(htmlElement, "pointerout", (_ev) => {
+				}));
+				this._disposers.push($utils.addEventListener(htmlElement, "pointerout", (_ev) => {
 					this._htmlContentHovered = false;
-				});
+				}));
 			}
 		}))
 

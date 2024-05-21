@@ -289,6 +289,7 @@ export class SliceGrouper extends Entity {
 			const series = this.get("series");
 			if (series) {
 				series.events.on("datavalidated", (_ev) => {
+					this.removePrivate("groupDataItem");
 					this.handleData();
 				});
 			}

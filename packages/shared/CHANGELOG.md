@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.9] - 2024-05-21
+
+### Added
+- "Average True Range" indicator added to `StockChart`.
+
+### Fixed
+- Some recent versions of Chrome would sometimes clear canvas of a chart in an inactive tab after some time.
+- Some events were not being disposed together with related object.
+- Disposing an `XYChart` immediately after it was created would not dispose its `XYCursor` and related event handlers.
+- `StockChart` method `unselectDrawings()` was not hiding resizer brackets.
+- `SliceGrouper` would not update properly when series data was updated.
+
+
 ## [5.9.8] - 2024-05-10
 
 ### Added

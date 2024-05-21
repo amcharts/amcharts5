@@ -1190,7 +1190,7 @@ export class XYChart extends SerialChart {
 
 					this._pushPropertyDisposer("scrollbarX", scrollbarX.events.on("released", () => {
 						this.xAxes.each((axis) => {
-							if(axis.get("zoomable")){
+							if (axis.get("zoomable")) {
 								this._handleAxisSelection(axis);
 							}
 						})
@@ -1227,7 +1227,7 @@ export class XYChart extends SerialChart {
 
 					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("released", () => {
 						this.yAxes.each((axis) => {
-							if(axis.get("zoomable")){
+							if (axis.get("zoomable")) {
 								this._handleAxisSelection(axis);
 							}
 						})
@@ -1738,6 +1738,17 @@ export class XYChart extends SerialChart {
 			axis.setPrivate("updateScrollbar", true);
 			axis.zoom(0, 1);
 		})
+	}
+
+	protected _dispose() {
+		super._dispose();
+
+		// Explicitly disposing cursor to avoid memory leak of cursor adding
+		// keyboard events after parent chart has been disposed
+		const cursor = this.get("cursor");
+		if (cursor) {
+			cursor.dispose();
+		}
 	}
 
 }

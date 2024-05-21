@@ -392,6 +392,13 @@ export class Root implements IDisposer {
 
 		this._renderer = new CanvasRenderer(resolution);
 
+		// solving issue with blank canvas
+		this._disposers.push($utils.addEventListener(document, "visibilitychange", () => {
+			if (document.visibilityState === "visible") {
+				this._runTickerNow();
+			}
+		}));
+
 		let dom: HTMLElement | null;
 
 		if (id instanceof HTMLElement) {

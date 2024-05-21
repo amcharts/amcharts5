@@ -1190,6 +1190,8 @@ export class StockChart extends Container {
 				}
 			})
 		})
+
+		this.spriteResizer.set("sprite", undefined);
 	}
 
 	/**

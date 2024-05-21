@@ -247,7 +247,7 @@ export class DateRangeSelector extends StockControl {
 			this._updatePickers();
 		});
 
-		$utils.addEventListener(saveButton, "click", () => {
+		this._disposers.push($utils.addEventListener(saveButton, "click", () => {
 			const from = this._parseDate(fromField.value);
 			const to = this._parseDate(toField.value);
 			to.setHours(23, 59, 59);
@@ -266,7 +266,7 @@ export class DateRangeSelector extends StockControl {
 					toDate: to
 				});
 			}
-		});
+		}));
 
 		const cancelButton = document.createElement("input");
 		cancelButton.type = "button";
