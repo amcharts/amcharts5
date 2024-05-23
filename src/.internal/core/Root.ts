@@ -392,13 +392,6 @@ export class Root implements IDisposer {
 
 		this._renderer = new CanvasRenderer(resolution);
 
-		// solving issue with blank canvas
-		this._disposers.push($utils.addEventListener(document, "visibilitychange", () => {
-			if (document.visibilityState === "visible") {
-				this._runTickerNow();
-			}
-		}));
-
 		let dom: HTMLElement | null;
 
 		if (id instanceof HTMLElement) {
@@ -727,7 +720,7 @@ export class Root implements IDisposer {
 									return;
 								}
 								ev.preventDefault();
-								const downEvent = renderer.getEvent(new MouseEvent("click"));
+								const downEvent = renderer.getEvent(new MouseEvent("mouse"));
 								focusedSprite.events.dispatch("click", {
 									type: "click",
 									originalEvent: downEvent.event,

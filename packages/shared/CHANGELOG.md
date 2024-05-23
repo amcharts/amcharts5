@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.10] - 2024-05-23
+
+### Fixed
+- Serializing/saving ATR indicator was generating an error.
+- Toggling a focused element with ENTER/SPACE will no longer trigger its hover.
+- Reverting the empty canvas fix from `5.9.9` as Chrome seems to have fixed the issue.
+
+
 ## [5.9.9] - 2024-05-21
 
 ### Added

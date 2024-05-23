@@ -38,6 +38,7 @@ export { TypicalPrice, ITypicalPriceEvents, ITypicalPricePrivate, ITypicalPriceS
 export { Trix, ITrixEvents, ITrixPrivate, ITrixSettings } from "./.internal/charts/stock/indicators/Trix";
 export { MedianPrice, IMedianPriceEvents, IMedianPricePrivate, IMedianPriceSettings } from "./.internal/charts/stock/indicators/MedianPrice";
 export { ZigZag, IZigZagEvents, IZigZagPrivate, IZigZagSettings } from "./.internal/charts/stock/indicators/ZigZag";
+export { AverageTrueRange, IAverageTrueRangeEvents, IAverageTrueRangePrivate, IAverageTrueRangeSettings } from "./.internal/charts/stock/indicators/AverageTrueRange";
 
 export { DrawingSeries, IDrawingSeriesPrivate, IDrawingSeriesDataItem, IDrawingSeriesSettings } from "./.internal/charts/stock/drawing/DrawingSeries";
 export { PolylineSeries, IPolylineSeriesPrivate, IPolylineSeriesSettings, IPolylineSeriesDataItem } from "./.internal/charts/stock/drawing/PolylineSeries";

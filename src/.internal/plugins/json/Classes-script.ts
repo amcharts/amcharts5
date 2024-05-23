@@ -12,6 +12,7 @@ import type { ArcDiagramLink } from "./../../../flow";
 import type { ArcDiagramNodes } from "./../../../flow";
 import type { Aroon } from "./../../../stock";
 import type { AverageSeries } from "./../../../stock";
+import type { AverageTrueRange } from "./../../../stock";
 import type { AwesomeOscillator } from "./../../../stock";
 import type { Axis } from "./../../../xy";
 import type { AxisBullet } from "./../../../xy";
@@ -238,6 +239,7 @@ export interface IClasses {
 	"ArcDiagramNodes": () => Promise<typeof ArcDiagramNodes>;
 	"Aroon": () => Promise<typeof Aroon>;
 	"AverageSeries": () => Promise<typeof AverageSeries>;
+	"AverageTrueRange": () => Promise<typeof AverageTrueRange>;
 	"AwesomeOscillator": () => Promise<typeof AwesomeOscillator>;
 	"Axis": () => Promise<typeof Axis>;
 	"AxisBullet": () => Promise<typeof AxisBullet>;
@@ -465,6 +467,7 @@ const classes: IClasses = {
 	"ArcDiagramNodes": () => import(/* webpackExports: "ArcDiagramNodes", webpackMode: "weak" */ "./../../../flow").then((m) => m.ArcDiagramNodes),
 	"Aroon": () => import(/* webpackExports: "Aroon", webpackMode: "weak" */ "./../../../stock").then((m) => m.Aroon),
 	"AverageSeries": () => import(/* webpackExports: "AverageSeries", webpackMode: "weak" */ "./../../../stock").then((m) => m.AverageSeries),
+	"AverageTrueRange": () => import(/* webpackExports: "AverageTrueRange", webpackMode: "weak" */ "./../../../stock").then((m) => m.AverageTrueRange),
 	"AwesomeOscillator": () => import(/* webpackExports: "AwesomeOscillator", webpackMode: "weak" */ "./../../../stock").then((m) => m.AwesomeOscillator),
 	"Axis": () => import(/* webpackExports: "Axis", webpackMode: "weak" */ "./../../../xy").then((m) => m.Axis),
 	"AxisBullet": () => import(/* webpackExports: "AxisBullet", webpackMode: "weak" */ "./../../../xy").then((m) => m.AxisBullet),

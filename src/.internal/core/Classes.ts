@@ -238,8 +238,8 @@ export interface IClasses {
 	"ArcDiagramLink": ArcDiagramLink;
 	"ArcDiagramNodes": ArcDiagramNodes;
 	"Aroon": Aroon;
-	"AverageTrueRange": AverageTrueRange;
 	"AverageSeries": AverageSeries;
+	"AverageTrueRange": AverageTrueRange;
 	"AwesomeOscillator": AwesomeOscillator;
 	"Axis": Axis<AxisRenderer>;
 	"AxisBullet": AxisBullet;
