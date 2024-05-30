@@ -36,9 +36,19 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	primaryButtonActive?: Color,
 
 	/**
+	 * Primary button fill color when it is set as disabled.
+	 */
+	primaryButtonDisabled?: Color,	
+
+	/**
+	 * Primary button text color when it is set as disabled.
+	 */
+	primaryButtonTextDisabled?: Color,
+
+	/**
 	 * Primary button text color.
 	 */
-	primaryButtonText?: Color,
+	primaryButtonText?: Color,	
 
 	/**
 	 * Primary button stroke (outline) color.

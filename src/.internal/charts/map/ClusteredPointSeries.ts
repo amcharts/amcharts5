@@ -1,9 +1,10 @@
 import { MapPointSeries, IMapPointSeriesSettings, IMapPointSeriesPrivate, IMapPointSeriesDataItem } from "./MapPointSeries";
-import { DataItem, IComponentDataItem } from "../../core/render/Component";
+import { Component, DataItem, IComponentDataItem } from "../../core/render/Component";
 import type { Root } from "../../core/Root";
 import type { Bullet } from "../../core/render/Bullet";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
@@ -25,7 +26,17 @@ export interface IClusteredDataItem extends IComponentDataItem {
 	/**
 	 * An ID of a group.
 	 */
-	groupId?: string	
+	groupId?: string
+
+	/**
+	 * Longitude.
+	 */
+	longitude?: number;
+
+	/**
+	 * Latitude.
+	 */
+	latitude?: number;
 }
 
 export interface IClusteredPointSeriesDataItem extends IMapPointSeriesDataItem {
@@ -113,6 +124,13 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * @since 5.5.7
 	 */
 	stopClusterZoom?: number
+
+
+	/**
+	 * Delay in milliseconds before clustering is made. This is useful if you have many data items and want to avoid clustering on every zoom/position change.
+	 * @default 0
+	 */
+	clusterDelay?: number;
 }
 
 /**
@@ -144,6 +162,8 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 	protected _spiral: Array<{ x: number, y: number }> = [];
 
+	protected _clusterDP?: IDisposer;
+
 	protected _afterNew() {
 		this.fields.push("groupId");
 		this._setRawDefault("groupIdField", "groupId");
@@ -158,6 +178,39 @@ export class ClusteredPointSeries extends MapPointSeries {
 			this._spiral = $math.spiralPoints(0, 0, 300, 300, 0, 3, 3, 0, 0)
 		}
 
+		const clusterDelay = this.get("clusterDelay", 0);
+		if (clusterDelay) {
+			if (this._clusterDP) {
+				this._clusterDP.dispose();
+
+				this._clusterDP = this.setTimeout(() => {
+					this._doTheCluster();
+				}, clusterDelay)
+			}
+			else {
+				// first time without delay
+				this._doTheCluster();
+				this._clusterDP = this.setTimeout(() => { }, 0);
+			}
+		}
+		else {
+			this._doTheCluster();
+		}
+
+		$array.each(this.clusteredDataItems, (dataItem) => {
+			const bullet = dataItem.get("bullet" as any);
+			if (bullet) {
+				const sprite = bullet.get("sprite");
+				const point = this.chart!.convert({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) });
+
+				sprite.setAll({ x: point.x, y: point.y });
+			}
+		})
+
+	}
+
+
+	protected _doTheCluster() {
 		const groups: { [index: string]: Array<DataItem<IClusteredPointSeriesDataItem>> } = {};
 		// distribute to groups
 		$array.each(this.dataItems, (dataItem) => {
@@ -186,6 +239,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 			this._scatterGroup(group);
 		})
 
+
 		$object.each(groups, (_key, group) => {
 			this._clusterGroup(group);
 		})
@@ -203,7 +257,6 @@ export class ClusteredPointSeries extends MapPointSeries {
 				}
 			}
 		})
-
 	}
 
 	/**
@@ -228,6 +281,17 @@ export class ClusteredPointSeries extends MapPointSeries {
 			// void
 		}
 		else {
+
+			dataItems.sort((a, b) => {
+				const pointA = a.get("point");
+				const pointB = b.get("point");
+				if (pointA && pointB) {
+					return Math.hypot(pointA.x - pointB.x, pointA.y - pointB.y);
+				}
+
+				return 0;
+			})
+
 			while (dataItems.length > 0) {
 				this._clusterIndex++;
 				this._clusters[this._clusterIndex] = [];
@@ -235,7 +299,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 				const dataItem = dataItems[0];
 
 				cluster.push(dataItem);
-				$array.remove(dataItems, dataItem);
+				$array.removeFirst(dataItems, dataItem);
 
 				this._clusterDataItem(dataItem, dataItems);
 			}
@@ -243,20 +307,20 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 		let i = 0;
 
-		$array.each(this._clusters, (cluster) => {
-			let sumX = 0;
-			let sumY = 0;
+		const bulletMethod = this.get("clusteredBullet");
+		if (bulletMethod) {
+			$array.each(this._clusters, (cluster) => {
+				let sumX = 0;
+				let sumY = 0;
 
-			let len = cluster.length;
+				let len = cluster.length;
 
-			if (len > 1) {
+				if (len > 1) {
 
-				let clusteredDataItem = this.clusteredDataItems[i];
-				if (!clusteredDataItem) {
-					clusteredDataItem = new DataItem(this, undefined, {});
+					let clusteredDataItem = this.clusteredDataItems[i];
+					if (!clusteredDataItem) {
+						clusteredDataItem = new DataItem(this, undefined, {});
 
-					const bulletMethod = this.get("clusteredBullet");
-					if (bulletMethod) {
 						const bullet = clusteredDataItem.set("bullet" as any, bulletMethod(this._root, this, clusteredDataItem));
 
 						if (bullet) {
@@ -264,66 +328,87 @@ export class ClusteredPointSeries extends MapPointSeries {
 							if (sprite) {
 								this.bulletsContainer.children.push(sprite);
 								sprite._setDataItem(clusteredDataItem);
-							}
-						}
-					}
 
-					this.clusteredDataItems.push(clusteredDataItem)
-				}
-
-				let groupId;
-
-				$array.each(cluster, (dataItem) => {
-					dataItem.setRaw("cluster", clusteredDataItem);
-
-					const point = dataItem.get("point");
-					if (point) {
-						sumX += point.x;
-						sumY += point.y;
-					}
-
-					const bullets = dataItem.bullets;
-					if (bullets) {
-						$array.each(bullets, (bullet) => {
-							const sprite = bullet.get("sprite");
-							if (sprite) {
-								sprite.set("forceHidden", true);
-							}
-						})
-					}
-					groupId = dataItem.get("groupId");
-				})
-
-				let averageX = sumX / len;
-				let averageY = sumY / len;
-
-				clusteredDataItem.setRaw("children" as any, cluster);
-				clusteredDataItem.setRaw("groupId", groupId);
-
-				const prevLen = clusteredDataItem.get("value" as any);
-				clusteredDataItem.setRaw("value" as any, len);
-
-				const bullet = clusteredDataItem.get("bullet" as any);
-				if (bullet) {
-					const sprite = bullet.get("sprite");
-					if (sprite) {
-						sprite.set("forceHidden", false);
-						sprite.setAll({ x: averageX, y: averageY });
-
-						if (prevLen != len) {
-							if (sprite instanceof Container) {
-								sprite.walkChildren((child) => {
-									if (child instanceof Label) {
-										child.text.markDirtyText();
+								this.root.events.once("frameended", () => {
+									if (sprite instanceof Container) {
+										sprite.walkChildren((child) => {
+											if (child instanceof Component) {
+												child.markDirtyValues();
+											}
+										});
 									}
 								})
 							}
 						}
+
+						this.clusteredDataItems.push(clusteredDataItem)
 					}
+
+					let groupId;
+
+					$array.each(cluster, (dataItem) => {
+						dataItem.setRaw("cluster", clusteredDataItem);
+
+						const point = dataItem.get("point");
+						if (point) {
+							sumX += point.x;
+							sumY += point.y;
+						}
+
+						const bullets = dataItem.bullets;
+						if (bullets) {
+							$array.each(bullets, (bullet) => {
+								const sprite = bullet.get("sprite");
+								if (sprite) {
+									sprite.set("forceHidden", true);
+								}
+							})
+						}
+						groupId = dataItem.get("groupId");
+					})
+
+					let averageX = sumX / len;
+					let averageY = sumY / len;
+
+					clusteredDataItem.setRaw("children" as any, cluster);
+					clusteredDataItem.setRaw("groupId", groupId);
+
+					const prevLen = clusteredDataItem.get("value" as any);
+					clusteredDataItem.setRaw("value" as any, len);
+
+					const bullet = clusteredDataItem.get("bullet" as any);
+					if (bullet) {
+
+						let geoPoint = this.chart!.invert({ x: averageX, y: averageY });
+						if (geoPoint) {
+							clusteredDataItem.setAll({
+								longitude: geoPoint.longitude,
+								latitude: geoPoint.latitude,
+							});
+						}
+
+						this._positionBullets(clusteredDataItem)
+
+						const sprite = bullet.get("sprite");
+						if (sprite) {
+							sprite.set("forceHidden", false);
+							//sprite.setAll({ x: averageX, y: averageY });
+
+							if (prevLen != len) {
+								if (sprite instanceof Container) {
+									sprite.walkChildren((child) => {
+										if (child instanceof Label) {
+											child.text.markDirtyText();
+										}
+									})
+								}
+							}
+						}
+					}
+					i++;
 				}
-				i++;
-			}
-		})
+			})
+		}
 
 		$array.each(this.clusteredDataItems, (dataItem) => {
 			let children = dataItem.get("children");
@@ -358,20 +443,22 @@ export class ClusteredPointSeries extends MapPointSeries {
 	protected _clusterDataItem(dataItem: DataItem<IClusteredPointSeriesDataItem>, dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
 		const point = dataItem.get("point");
 		if (point) {
-			$array.each(dataItems, (di) => {
+			let minDistance = this.get("minDistance", 20);
+			const cluster = this._clusters[this._clusterIndex];
+
+			for (let i = dataItems.length - 1; i >= 0; i--) {
+				const di = dataItems[i];
 				if (di && !di.get("clipped")) {
 					const diPoint = di.get("point");
 					if (diPoint) {
-
-						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < this.get("minDistance", 20)) {
-							const cluster = this._clusters[this._clusterIndex];
+						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < minDistance) {
 							cluster.push(di);
-							$array.remove(dataItems, di);
+							$array.removeFirst(dataItems, di);
 							this._clusterDataItem(di, dataItems);
 						}
 					}
 				}
-			})
+			}
 		}
 	}
 
@@ -446,15 +533,16 @@ export class ClusteredPointSeries extends MapPointSeries {
 	protected _scatterDataItem(dataItem: DataItem<IClusteredPointSeriesDataItem>, dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
 		const point = dataItem.get("point");
 		if (point) {
+			const scatterDistance = this.get("scatterDistance", 5)
+			const scatter = this._scatters[this._scatterIndex];
 			$array.each(dataItems, (di) => {
 				if (di && !di.get("clipped")) {
 					const diPoint = di.get("point");
 
 					if (diPoint) {
-						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < this.get("scatterDistance", 5)) {
-							const scatter = this._scatters[this._scatterIndex];
+						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < scatterDistance) {
 							scatter.push(di);
-							$array.remove(dataItems, di);
+							$array.removeFirst(dataItems, di);
 							this._scatterDataItem(di, dataItems);
 						}
 					}

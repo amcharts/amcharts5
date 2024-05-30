@@ -294,6 +294,9 @@ export abstract class AxisRenderer extends Graphics {
 	public abstract positionToPoint(_position: number): IPoint;
 
 
+	/**
+	 * A thumb Graphics to be used for panning the axis (the one which shows under the labels when hovered)
+	 */
 	public readonly thumb?: Graphics;
 
 	protected _afterNew() {

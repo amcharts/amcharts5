@@ -55,6 +55,8 @@ export class DefaultTheme extends Theme {
 			primaryButtonHover: Color.fromHex(0x6771dc),
 			primaryButtonDown: Color.fromHex(0x68dc76),
 			primaryButtonActive: Color.fromHex(0x68dc76),
+			primaryButtonDisabled: Color.fromHex(0xdadada),
+			primaryButtonTextDisabled: Color.fromHex(0xffffff),
 			primaryButtonText: Color.fromHex(0xffffff),
 			primaryButtonStroke: Color.fromHex(0xffffff),
 			secondaryButton: Color.fromHex(0xd9d9d9),
@@ -436,7 +438,7 @@ export class DefaultTheme extends Theme {
 			cornerRadiusTL: 3,
 			cornerRadiusTR: 3,
 			strokeOpacity: 0,
-			stroke: Color.fromHex(0x000000)			
+			stroke: Color.fromHex(0x000000)
 		});
 
 		{
@@ -571,6 +573,9 @@ export class DefaultTheme extends Theme {
 		r("Button").states.create("hover", {});
 		r("Button").states.create("down", { stateAnimationDuration: 0 });
 		r("Button").states.create("active", {});
+		r("Button").states.create("disabled", {
+			forceInactive: true
+		});
 
 		{
 			const rule = r("RoundedRectangle", ["button", "background"]);
@@ -594,7 +599,25 @@ export class DefaultTheme extends Theme {
 		}
 
 		{
+			const rule = r("RoundedRectangle", ["button", "background"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "primaryButtonDisabled");
+		}
+
+		{
+			const rule = r("Graphics", ["button", "icon"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "primaryButtonTextDisabled");
+		}
+
+		{
+			const rule = r("Label", ["button"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "primaryButtonTextDisabled");
+		}
+
+		{
 			const rule = r("Graphics", ["button", "icon"]);
+			rule.setAll({
+				forceInactive: true
+			})
 			setColor(rule, "stroke", ic, "primaryButtonText");
 		}
 

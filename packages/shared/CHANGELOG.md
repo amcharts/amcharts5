@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.11] - 2024-05-30
+
+### Added
+- `clusterDelay` setting added to `ClusteredPointSeries`. Setting it to non-zero number will automatically debounce re-clustering of points, helping with performance when there are a lot of data items.
+
+### Changed
+- `ZoomControl` buttons will now be automatically disabled whem max or min zoom level is reached.
+
+### Fixed
+- "Zoom out" button was visible even the chart was not zoomed when `selectionStrictMinMax` was set to `true` (you still need to set `strictMinMax: true` for it to go away).
+- `Venn` chart could produce JS error when slices were being hidden in rapid succession.
+- Charts added to clustered point series bullets were not being rendered.
+
+
 ## [5.9.10] - 2024-05-23
 
 ### Fixed

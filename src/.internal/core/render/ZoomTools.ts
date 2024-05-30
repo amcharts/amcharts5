@@ -1,7 +1,8 @@
 import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "../../core/render/Container";
 import { Button } from "../../core/render/Button";
 import { Graphics } from "../../core/render/Graphics";
-import { MultiDisposer } from "../../core/util/Disposer";
+import { MultiDisposer, IDisposer } from "../../core/util/Disposer";
+import { ZoomableContainer } from "./ZoomableContainer";
 
 export interface IZoomable {
 	zoomIn(): void;
@@ -55,6 +56,7 @@ export class ZoomTools extends Container {
 	declare public _privateSettings: IZoomToolsPrivate;
 
 	protected _disposer: MultiDisposer | undefined;
+	protected _targetDisposer: IDisposer | undefined;
 
 	protected _afterNew() {
 		super._afterNew();
@@ -85,8 +87,32 @@ export class ZoomTools extends Container {
 
 		if (this.isDirty("target")) {
 			const target = this.get("target");
+
 			const previous = this._prevSettings.target;
 			if (target) {
+				if (target instanceof ZoomableContainer) {
+					this._targetDisposer = this.addDisposer(target.contents.on("scale", (scale) => {
+						if (scale == target.get("minZoomLevel")) {
+							this.minusButton.set("disabled", true)
+						}
+						else {
+							this.minusButton.set("disabled", false)
+						}
+
+						if (scale == target.get("maxZoomLevel")) {
+							this.plusButton.set("disabled", true)
+						}
+						else {
+							this.plusButton.set("disabled", false)
+						}
+					}))
+					this.root.events.once("frameended", () => {
+						if (target.get("scale") == target.get("minZoomLevel")) {
+							this.minusButton.set("disabled", true)
+						}
+					})
+				}
+
 				this._disposer = new MultiDisposer([
 					this.plusButton.events.on("click", () => {
 						target.zoomIn()
@@ -99,8 +125,13 @@ export class ZoomTools extends Container {
 					})])
 			}
 
-			if (previous && this._disposer) {
-				this._disposer.dispose();
+			if (previous) {
+				if (this._disposer) {
+					this._disposer.dispose();
+				}
+				if (this._targetDisposer) {
+					this._targetDisposer.dispose();
+				}
 			}
 		}
 	}

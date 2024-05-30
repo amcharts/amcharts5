@@ -36,6 +36,11 @@ export class MapPolygon extends Graphics {
 	public static classNames: Array<string> = Graphics.classNames.concat([MapPolygon.className]);
 	protected _projectionDirty: boolean = false;
 
+	protected _afterNew(): void {
+		super._afterNew();
+		this.setPrivate("trustBounds", true);
+	}
+
 	/**
 	 * A [[MapPolygonSeries]] polygon belongs to.
 	 */
@@ -128,7 +133,7 @@ export class MapPolygon extends Graphics {
 					}
 				}
 			}
-			if(coordinates){
+			if (coordinates) {
 				let center = $polylabel(coordinates as number[][][]);
 				return { longitude: center[0], latitude: center[1] };
 			}

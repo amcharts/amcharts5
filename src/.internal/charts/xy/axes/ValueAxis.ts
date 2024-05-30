@@ -53,7 +53,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 
 	/**
 	 * Force axis to auto-zoom to exact lowest and highest values from attached
-	 * series' data items within ucurrently visible range.
+	 * series' data items within currently visible range.
 	 * 
 	 * This is a good feature when your series is plotted from derivative values,
 	 * like `valueYChangeSelection` as it helps to avoid frequent jumping of
@@ -1195,8 +1195,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 
 			if (selectionStrictMinMax) {
-				selectionMin = selectionMinReal - (selectionMax - selectionMin) * extraMin;
-				selectionMax = selectionMaxReal + (selectionMax - selectionMin) * extraMax;
+				selectionMin = selectionMinReal - (selectionMaxReal - selectionMinReal) * extraMin;
+				selectionMax = selectionMaxReal + (selectionMaxReal - selectionMinReal) * extraMax;
 			}
 
 			if (this.get("logarithmic")) {

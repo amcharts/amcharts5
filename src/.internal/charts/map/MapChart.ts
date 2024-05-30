@@ -26,6 +26,7 @@ import * as $utils from "../../core/util/Utils";
 import type { IDisposer } from "../../core/util/Disposer";
 import type { ISpritePointerEvent } from "../../core/render/Sprite";
 
+
 export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
@@ -534,6 +535,27 @@ export class MapChart extends SerialChart {
 					}
 				}
 			})
+
+			const zoomControl = this.get("zoomControl");
+			if (zoomControl) {
+				const zoomLevel = this.get("zoomLevel", 1);
+
+				if (zoomLevel == this.get("minZoomLevel", 1)) {
+					this.root.events.once("frameended", () =>{
+						zoomControl.minusButton.set("disabled", true);
+					})										
+				}
+				else {
+					zoomControl.minusButton.set("disabled", false);
+				}
+
+				if (zoomLevel == this.get("maxZoomLevel", 32)) {
+					zoomControl.plusButton.set("disabled", true);
+				}
+				else {
+					zoomControl.plusButton.set("disabled", false);
+				}
+			}
 		}
 
 		if (this.isDirty("translateX") || this.isDirty("translateY")) {
@@ -746,7 +768,7 @@ export class MapChart extends SerialChart {
 			let downPoint = downPoints[1];
 			if (!downPoint) {
 				downPoint = downPoints[0];
-			}			
+			}
 
 			if (downPoint && (downPoint.x == event.point.x && downPoint.y == event.point.y)) {
 				count = 0;

@@ -243,9 +243,9 @@ export class Venn extends Series {
 				}
 				set.size = dataItem.get("valueWorking");
 
-				if (set.size > 0) {
+				//if (set.size > 0) { // not good
 					sets.push(set);
-				}
+				//}
 
 				const label = dataItem.get("label");
 				const slice = dataItem.get("slice");
@@ -266,6 +266,7 @@ export class Venn extends Series {
 					label.setPrivate("visible", visible);
 				}
 			})
+
 
 			const newSets = sets.toString();
 
@@ -494,10 +495,11 @@ export class Venn extends Series {
 			const legendDataItem = dataItem.get("legendDataItem");
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
-
-				$array.each(visualSettings, (setting: any) => {
-					markerRectangle.set(setting, slice.get(setting));
-				})
+				if(!dataItem.isHidden()){
+					$array.each(visualSettings, (setting: any) => {
+						markerRectangle.set(setting, slice.get(setting));
+					})
+				}
 			}
 		}
 	}

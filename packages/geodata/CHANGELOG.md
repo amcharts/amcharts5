@@ -10,6 +10,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - New map of Nepal: `nepal2020*`. Contains updated borders as per Nepal's guidance.
 
+### Changed
+- Map of Algeria updated for the most recent changes.
+
 ### Fixed
 - Updated province names in the maps for Nepal (`nepalLow` and `nepalHigh`).
 
