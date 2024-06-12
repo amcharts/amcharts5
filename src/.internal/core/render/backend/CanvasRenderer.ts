@@ -1796,6 +1796,13 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						let offset = 1;
 						let fontSize = chunk.height;
 
+						const oversizedBehavior = this.style.oversizedBehavior || "";
+						if (["truncate", "wrap", "wrap-no-break"].indexOf(oversizedBehavior) > -1) {
+							// Measure actual width of the text so the line fits
+							const metrics = this._measureText(chunk.text, context);
+							chunk.width = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+						}
+
 						let offsetX = chunk.offsetX;
 						switch (this.style.textAlign) {
 							case "right":

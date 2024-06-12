@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.12] - 2024-06-12
+
+### Changed
+- `ClusteredPointSeries` now re-clusters points only when zoom level changes. This improves performance when paning/rotating the map.
+
+### Fixed
+- `NumberFormatter` would incorrectly round numbers smaller than 0 due to floating point issue in some cases.
+- An error could occur when enabling drawing mode if there were previously disposed chart indicators.
+- Truncated or wrapped labels were not properly sizing underline and line-trhough decorations.
+- While wheel-zooming bothg X and Y axes simultaneously, the chart could fully zoom out in some cases.
+
+
 ## [5.9.11] - 2024-05-30
 
 ### Added

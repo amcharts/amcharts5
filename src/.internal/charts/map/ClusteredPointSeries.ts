@@ -127,8 +127,13 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 
 
 	/**
-	 * Delay in milliseconds before clustering is made. This is useful if you have many data items and want to avoid clustering on every zoom/position change.
+	 * Delay in milliseconds before clustering is made.
+	 * 
+	 * This is useful if you have many data items and want to avoid re-clustering
+	 * on every zoom/position change.
+	 * 
 	 * @default 0
+	 * @since 5.9.11
 	 */
 	clusterDelay?: number;
 }
@@ -164,6 +169,8 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 	protected _clusterDP?: IDisposer;
 
+	protected _previousZL: number = 0;
+
 	protected _afterNew() {
 		this.fields.push("groupId");
 		this._setRawDefault("groupIdField", "groupId");
@@ -178,35 +185,42 @@ export class ClusteredPointSeries extends MapPointSeries {
 			this._spiral = $math.spiralPoints(0, 0, 300, 300, 0, 3, 3, 0, 0)
 		}
 
-		const clusterDelay = this.get("clusterDelay", 0);
-		if (clusterDelay) {
-			if (this._clusterDP) {
-				this._clusterDP.dispose();
+		const chart = this.chart;
 
-				this._clusterDP = this.setTimeout(() => {
+		if (chart) {
+
+			const zoomLevel = chart.get("zoomLevel", 1);
+
+			if (zoomLevel != this._previousZL) {
+				const clusterDelay = this.get("clusterDelay", 0);
+				if (clusterDelay) {
+					if (this._clusterDP) {
+						this._clusterDP.dispose();
+
+						this._clusterDP = this.setTimeout(() => {
+							this._doTheCluster();
+						}, clusterDelay)
+					}
+					else {
+						// first time without delay
+						this._doTheCluster();
+						this._clusterDP = this.setTimeout(() => { }, 0);
+					}
+				}
+				else {
 					this._doTheCluster();
-				}, clusterDelay)
+				}
+
+				this._previousZL = zoomLevel;
 			}
-			else {
-				// first time without delay
-				this._doTheCluster();
-				this._clusterDP = this.setTimeout(() => { }, 0);
-			}
+
+			$array.each(this.clusteredDataItems, (dataItem) => {
+				const bullet = dataItem.get("bullet" as any);
+				const longitude = dataItem.get("longitude", 0);
+				const latitude = dataItem.get("latitude", 0);
+				this._positionBulletReal(bullet, { type: "Point", coordinates: [longitude, latitude] }, [longitude, latitude]);
+			})			
 		}
-		else {
-			this._doTheCluster();
-		}
-
-		$array.each(this.clusteredDataItems, (dataItem) => {
-			const bullet = dataItem.get("bullet" as any);
-			if (bullet) {
-				const sprite = bullet.get("sprite");
-				const point = this.chart!.convert({ longitude: dataItem.get("longitude", 0), latitude: dataItem.get("latitude", 0) });
-
-				sprite.setAll({ x: point.x, y: point.y });
-			}
-		})
-
 	}
 
 

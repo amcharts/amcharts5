@@ -515,8 +515,11 @@ export class NumberFormatter extends Entity {
 			value = Math.round(value);
 		}
 		else if (details.decimals.passive > 0) {
-			let d: number = Math.pow(10, details.decimals.passive);
-			value = Math.round(value * d) / d;
+			const decimals = $utils.decimalPlaces(value);
+			if (decimals > 0) {
+				const d = Math.pow(10, details.decimals.passive);
+				value = Math.round(parseFloat((value * d).toFixed(decimals))) / d;
+			}
 		}
 
 		// Init return value

@@ -415,7 +415,31 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		this._handleSizeDirty();
 
 		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
-			this._getSelectionMinMax();
+
+			const chart = this.chart;
+			let getMM = false;
+			// #1563
+			if (chart) {
+				const letter = this.get("renderer").getPrivate("letter");
+				if (letter == "Y") {
+					chart.xAxes.each((axis) => {
+						if (axis.className != "ValueAxis") {
+							getMM = true;
+						}
+					})
+				}
+				else if (letter == "X") {
+					chart.yAxes.each((axis) => {
+						if (axis.className != "ValueAxis") {
+							getMM = true;
+						}
+					})
+				}
+			}
+
+			if (getMM) {
+				this._getSelectionMinMax();
+			}
 			this._dirtySelectionExtremes = false;
 		}
 
@@ -1324,7 +1348,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			return;
 		}
 
-		if(min > max){
+		if (min > max) {
 			[min, max] = [max, min];
 		}
 
@@ -1585,11 +1609,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let maxPrecision = this.get("maxPrecision");
 		if ($type.isNumber(maxPrecision)) {
-			
+
 			let ceiledStep = $math.ceil(step, maxPrecision);
 			if (maxPrecision < Number.MAX_VALUE && step !== ceiledStep) {
 				step = ceiledStep;
-				if(step == 0){
+				if (step == 0) {
 					step = 1;
 				}
 			}

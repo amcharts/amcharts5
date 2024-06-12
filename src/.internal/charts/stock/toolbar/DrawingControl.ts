@@ -1142,10 +1142,15 @@ export class DrawingControl extends StockControl {
 		const targetSeries = this._getPanelMainSeries(panel);
 		if (targetSeries) {
 			$object.each(this._drawingSeries, (_tool, seriesList) => {
-				$array.each(seriesList, (series) => {
+				$array.eachReverse(seriesList, (series) => {
 					if (series.chart == panel) {
-						series.set("series", targetSeries);
-						series.setPrivate("baseValueSeries", targetSeries);
+						if (panel.isDisposed()) {
+							$array.remove(seriesList, series);
+						}
+						else {
+							series.set("series", targetSeries);
+							series.setPrivate("baseValueSeries", targetSeries);
+						}
 					}
 				})
 			})
@@ -1182,7 +1187,6 @@ export class DrawingControl extends StockControl {
 					strokeDasharray: this.get("strokeDasharray"),
 				});
 			});
-
 		})
 	}
 

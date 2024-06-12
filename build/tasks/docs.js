@@ -21,7 +21,9 @@ module.exports = async (state) => {
 		"--exclude", "src/geodata/**/*",
 		"--tsconfig", state.dir("tsconfig.json"),
 		state.dir("src"),
-	]);
+	], {
+		shell: true
+	});
 
 	const [json] = await Promise.all([
 		readJson($path.join(dir, "docs.json")),
