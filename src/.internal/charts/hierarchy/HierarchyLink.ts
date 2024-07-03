@@ -121,6 +121,30 @@ export class HierarchyLink extends Graphics {
 		}
 	}
 
+	public hide(duration?: number){
+		$array.each(this.bullets, (bullet) => {
+			if(bullet){
+				const sprite = bullet.get("sprite");
+				if(sprite){
+					sprite.hide(duration);
+				}
+			}
+		})
+		return super.hide();	
+	}
+
+	public show(duration?: number){
+		$array.each(this.bullets, (bullet) => {
+			if(bullet){
+				const sprite = bullet.get("sprite");
+				if(sprite){
+					sprite.show(duration);
+				}
+			}
+		})
+		return super.show();	
+	}
+
 	public _beforeChanged() {
 		super._beforeChanged();
 

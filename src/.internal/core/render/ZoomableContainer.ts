@@ -128,6 +128,22 @@ export class ZoomableContainer extends Container {
 		this._disposers.push(events.on("globalpointermove", (event) => {
 			this._handleThisMove(event);
 		}));
+
+		const bg = this.contents.get("background");
+		if(bg){
+			bg.adapters.add("width", (width) => {
+				return Number(width) * 5;
+			})
+			bg.adapters.add("height", (height) => {
+				return Number(height) * 5;
+			})
+			bg.adapters.add("x", (x) => {
+				return Number(x) - bg.width() / 5 * 2;
+			})
+			bg.adapters.add("y", (y) => {
+				return Number(y) - bg.height() / 5 * 2;
+			})								
+		}
 	}
 
 	public _prepareChildren() {

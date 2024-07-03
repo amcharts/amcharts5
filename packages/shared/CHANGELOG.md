@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.9.13] - 2024-07-03
+
+### Fixed
+- If start and end values of a `HeatLegend` were the same, the tooltip was shown in the top/left corner of the chart.
+- If a linked hierarchy had bullets on links, they remained visible when nodes and links were hidden.
+- Zoom-out button could be visibile initially with some specific setups.
+- `ZoomableContainer` would not react to pans in some of its sections if its contents was panned outside the its bounds.
+
+
 ## [5.9.12] - 2024-06-12
 
 ### Changed

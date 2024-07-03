@@ -153,7 +153,12 @@ export class HeatLegend extends Container {
 			const startValue = this.get("startValue", 0);
 			const endValue = this.get("endValue", 1);
 
-			const c = (value - startValue) / (endValue - startValue);
+			let c = (value - startValue) / (endValue - startValue);
+
+			if(c == Infinity || c == -Infinity || isNaN(c)) {
+				c = 0.5;
+			}
+
 			const startColor = this.get("startColor")!;
 			const endColor = this.get("endColor")!;
 

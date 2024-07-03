@@ -59,6 +59,8 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * like `valueYChangeSelection` as it helps to avoid frequent jumping of
 	 * series to adjusted min and max of the axis.
 	 * 
+	 * This will not work if strictMinMax is set to true (the axis will not zoom at all in this case).
+	 * 
 	 * Use `extraMin` and `extraMax` to add extra "padding".
 	 *
 	 * @since 5.1.11
@@ -1172,8 +1174,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let selectionMinReal = selectionMin;
 			let selectionMaxReal = selectionMax;
 
-			selectionMin -= (selectionMax - selectionMin) * extraMin;
-			selectionMax += (selectionMax - selectionMin) * extraMax;
+			let delta = selectionMax - selectionMin;
+
+			selectionMin -= delta * extraMin;
+			selectionMax += delta * extraMax;			
 
 			let minMaxStep: IMinMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount);
 
@@ -1206,7 +1210,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				selectionMin = minMaxStep.min;
 				selectionMax = minMaxStep.max;
 			}
-
+	
 			if (strictMinMax) {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = Math.max(selectionMin, minDefined);
@@ -1214,14 +1218,39 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 				if ($type.isNumber(maxDefined)) {
 					selectionMax = Math.min(selectionMax, maxDefined);
-				}
-
+				}			
 			}
 
 			if (selectionStrictMinMax) {
 				selectionMin = selectionMinReal - (selectionMaxReal - selectionMinReal) * extraMin;
 				selectionMax = selectionMaxReal + (selectionMaxReal - selectionMinReal) * extraMax;
 			}
+
+			if (strictMinMax) {
+				if ($type.isNumber(minDefined)) {
+					selectionMin = minDefined;
+				}
+				else {
+					selectionMin = selectionMinReal;
+				}
+	
+				if ($type.isNumber(maxDefined)) {
+					selectionMax = maxDefined;
+				}
+				else {
+					selectionMax = selectionMaxReal;
+				}
+	
+				if (selectionMax - selectionMin <= 0.00000001) {
+					selectionMin -= this._deltaMinMax;
+					selectionMax += this._deltaMinMax;
+				}
+	
+				let delta = selectionMax - selectionMin;
+
+				selectionMin -= delta * extraMin;
+				selectionMax += delta * extraMax;
+			}		
 
 			if (this.get("logarithmic")) {
 
@@ -1449,8 +1478,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				max += this._deltaMinMax;
 			}
 
-			min -= (max - min) * extraMin;
-			max += (max - min) * extraMax;
+			let delta = max - min;
+			min -= delta * extraMin;
+			max += delta * extraMax;
 		}
 
 		minAdapted = this.adapters.fold("min", min);
@@ -1474,12 +1504,15 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		min = $math.round(min, decCount);
 		max = $math.round(max, decCount);
 
+		
+
 		const syncWithAxis = this.get("syncWithAxis");
 		if (syncWithAxis) {
 			minMaxStep = this._syncAxes(min, max, minMaxStep.step, syncWithAxis.getPrivate("minFinal", syncWithAxis.getPrivate("min", 0)), syncWithAxis.getPrivate("maxFinal", syncWithAxis.getPrivate("max", 1)), syncWithAxis.getPrivate("step", 1));
 			min = minMaxStep.min;
 			max = minMaxStep.max;
 		}
+
 
 		this.setPrivateRaw("maxZoomFactor", Math.max(1, Math.ceil((max - min) / minDiff * this.get("maxZoomFactor", 100))));
 		this._fixZoomFactor();
@@ -1494,9 +1527,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
+		
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			if (this.getPrivate("minFinal") !== min || this.getPrivate("maxFinal") !== max) {
+
 				this.setPrivate("minFinal", min);
 				this.setPrivate("maxFinal", max);
 				this._saveMinMax(min, max);

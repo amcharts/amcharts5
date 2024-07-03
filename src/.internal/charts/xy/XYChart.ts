@@ -25,6 +25,7 @@ import * as $type from "../../core/util/Type";
 import * as $order from "../../core/util/Order";
 import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
+import * as $math from "../../core/util/Math";
 import type { Animation } from "../../core/util/Entity";
 import type { CategoryAxis } from "./axes/CategoryAxis";
 import type { DateAxis } from "./axes/DateAxis";
@@ -1471,12 +1472,12 @@ export class XYChart extends SerialChart {
 		if (zoomOutButton && zoomOutButton.parent) {
 			let visible = false;
 			this.xAxes.each((axis) => {
-				if (axis.get("start") != 0 || axis.get("end") != 1) {
+				if ($math.round(axis.get("start", 0), 6) != 0 || $math.round(axis.get("end", 1), 6) != 1) {
 					visible = true;
 				}
 			})
 			this.yAxes.each((axis) => {
-				if (axis.get("start") != 0 || axis.get("end") != 1) {
+				if ($math.round(axis.get("start", 0), 6) != 0 || $math.round(axis.get("end", 1), 6) != 1) {
 					visible = true;
 				}
 			})
