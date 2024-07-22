@@ -7,6 +7,8 @@ import type { ColorSet } from "../../core/util/ColorSet";
 import type { ILegendDataItem } from "../../core/render/Legend";
 import type { Color } from "../../core/util/Color";
 import type { PercentChart } from "./PercentChart";
+import type { PatternSet } from "../../core/util/PatternSet";
+import type { Pattern } from "../../core/render/patterns/Pattern";
 
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../core/render/Series";
 import { Container } from "../../core/render/Container";
@@ -52,6 +54,14 @@ export interface IPercentSeriesDataItem extends ISeriesDataItem {
 	 */
 	fill: Color;
 
+	/**
+	 * Pattern used for the slice and related elements, e.g. legend marker.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @since 5.10.0
+	 */
+	fillPattern: Pattern;
+
 }
 
 //type IPercentSeriesDataItemSettings = { [K in keyof IPercentSeriesDataItem]?: string; };
@@ -62,6 +72,14 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 	 * A [[ColorSet]] to use when asigning colors for slices.
 	 */
 	colors?: ColorSet;
+
+	/**
+	 * A [[PatternSet]] to use when asigning patterns for slices.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @since 5.10.0
+	 */
+	patterns?: PatternSet;
 
 	/**
 	 * A field in data that holds category names.
@@ -158,6 +176,10 @@ export abstract class PercentSeries extends Series {
 			this.updateLegendMarker(dataItem);
 		})
 
+		slice.on("fillPattern", () => {
+			this.updateLegendMarker(dataItem);
+		})		
+
 		slice.on("stroke", () => {
 			this.updateLegendMarker(dataItem);
 		})
@@ -226,6 +248,10 @@ export abstract class PercentSeries extends Series {
 		const colors = this.get("colors");
 		if (colors) {
 			colors.reset();
+		}
+		const patterns = this.get("patterns");
+		if (patterns) {
+			patterns.reset();
 		}
 	}
 
@@ -356,6 +382,13 @@ export abstract class PercentSeries extends Series {
 				dataItem.setRaw("fill", colors.next());
 			}
 		}
+
+		if (dataItem.get("fillPattern") == null) {
+			let patterns = this.get("patterns");
+			if (patterns) {
+				dataItem.setRaw("fillPattern", patterns.next());
+			}
+		}
 	}
 
 	/**
@@ -394,7 +427,7 @@ export abstract class PercentSeries extends Series {
 			promises.push(slice.show(duration));
 		}
 
-		if(slice.get("active")){
+		if (slice.get("active")) {
 			slice.states.applyAnimate("active");
 		}
 
@@ -494,7 +527,7 @@ export abstract class PercentSeries extends Series {
 	 * @ignore
 	 */
 	public updateLegendMarker(dataItem: DataItem<this["_dataItemSettings"]>) {
-		if(dataItem){
+		if (dataItem) {
 			const slice = dataItem.get("slice");
 
 			if (slice) {

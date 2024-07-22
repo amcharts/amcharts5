@@ -9,6 +9,9 @@ import type { Scrollbar } from "../../core/render/Scrollbar";
 import type { Tooltip } from "../../core/render/Tooltip";
 import type { IPoint } from "../../core/util/IPoint";
 import type { ISpritePointerEvent } from "../../core/render/Sprite";
+import type { Animation } from "../../core/util/Entity";
+import type { CategoryAxis } from "./axes/CategoryAxis";
+import type { DateAxis } from "./axes/DateAxis";
 
 import { XYChartDefaultTheme } from "./XYChartDefaultTheme";
 import { Container } from "../../core/render/Container";
@@ -26,9 +29,6 @@ import * as $order from "../../core/util/Order";
 import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
-import type { Animation } from "../../core/util/Entity";
-import type { CategoryAxis } from "./axes/CategoryAxis";
-import type { DateAxis } from "./axes/DateAxis";
 
 export interface IXYChartSettings extends ISerialChartSettings {
 
@@ -1298,6 +1298,14 @@ export class XYChart extends SerialChart {
 
 				series._setSoft("stroke", color);
 				series._setSoft("fill", color);
+			}
+		}
+		const patternSet = this.get("patterns")!;
+		if (patternSet) {
+			if (series.get("fillPattern") == null) {
+				const pattern = patternSet.next();
+
+				series._setSoft("fillPattern", pattern);
 			}
 		}
 	}

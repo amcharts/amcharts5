@@ -75,6 +75,7 @@ export class ArcDiagramNodes extends FlowNodes {
 		const circle = node.children.insertIndex(0, this.circles.make());
 		dataItem.set("circle", circle);
 		circle._setSoft("fill", dataItem.get("fill"));
+		circle._setSoft("fillPattern", dataItem.get("fillPattern"));
 
 		const label = this.labels.make();
 		this.labels.push(label);
@@ -107,6 +108,7 @@ export class ArcDiagramNodes extends FlowNodes {
 		const circle = dataItem.get("circle");
 		if (circle) {
 			circle.set("fill", dataItem.get("fill"));
+			circle.set("fillPattern", dataItem.get("fillPattern"));
 		}
 	}
 }

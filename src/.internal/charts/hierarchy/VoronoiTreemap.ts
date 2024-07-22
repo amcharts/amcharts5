@@ -220,7 +220,10 @@ export class VoronoiTreemap extends Hierarchy {
 			polygon.set("coordinates", coordinates);
 
 			const fill = dataItem.get("fill");
+			const fillPattern = dataItem.get("fillPattern");
+			
 			polygon._setDefault("fill", fill);
+			polygon._setDefault("fillPattern", fillPattern);
 
 			const label = dataItem.get("label");
 			if (label) {

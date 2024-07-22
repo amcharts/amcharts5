@@ -142,6 +142,7 @@ import type { ParallelChannelSeries } from "./../../../stock";
 import type { Partition } from "./../../../hierarchy";
 import type { PathPattern } from "./../../../index";
 import type { Pattern } from "./../../../index";
+import type { PatternSet } from "./../../../index";
 import type { PercentChart } from "./../../../percent";
 import type { PercentSeries } from "./../../../percent";
 import type { PeriodSelector } from "./../../../stock";
@@ -369,6 +370,7 @@ export interface IClasses {
 	"Partition": () => Promise<typeof Partition>;
 	"PathPattern": () => Promise<typeof PathPattern>;
 	"Pattern": () => Promise<typeof Pattern>;
+	"PatternSet": () => Promise<typeof PatternSet>;
 	"PercentChart": () => Promise<typeof PercentChart>;
 	"PercentSeries": () => Promise<typeof PercentSeries>;
 	"PeriodSelector": () => Promise<typeof PeriodSelector>;
@@ -597,6 +599,7 @@ const classes: IClasses = {
 	"Partition": () => import(/* webpackExports: "Partition", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.Partition),
 	"PathPattern": () => import(/* webpackExports: "PathPattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.PathPattern),
 	"Pattern": () => import(/* webpackExports: "Pattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Pattern),
+	"PatternSet": () => import(/* webpackExports: "PatternSet", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.PatternSet),
 	"PercentChart": () => import(/* webpackExports: "PercentChart", webpackChunkName: "json_percent" */ "./../../../percent").then((m) => m.PercentChart),
 	"PercentSeries": () => import(/* webpackExports: "PercentSeries", webpackChunkName: "json_percent" */ "./../../../percent").then((m) => m.PercentSeries),
 	"PeriodSelector": () => import(/* webpackExports: "PeriodSelector", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.PeriodSelector),

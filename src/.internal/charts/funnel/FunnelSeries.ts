@@ -304,9 +304,11 @@ export class FunnelSeries extends PercentSeries {
 				const label = dataItem.get("label");
 				const link = dataItem.get("link");
 				const color = dataItem.get("fill");
+				const fillPattern = dataItem.get("fillPattern");
 
 				slice._setDefault("fill", color);
 				slice._setDefault("stroke", color);
+				slice._setDefault("fillPattern", fillPattern);
 				link._setDefault("fill", color);
 				link._setDefault("stroke", color);
 

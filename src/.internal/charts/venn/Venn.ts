@@ -1,4 +1,9 @@
 import type { DataItem } from "../../core/render/Component";
+import type { ILegendDataItem } from "../../core/render/Legend";
+import type { Color } from "../../core/util/Color";
+import type { ColorSet } from "../../core/util/ColorSet";
+import type { Pattern } from "../../core/render/patterns/Pattern";
+import type { PatternSet } from "../../core/util/PatternSet";
 
 import { VennDefaultTheme } from "./VennDefaultTheme";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../core/render/Series";
@@ -7,9 +12,6 @@ import { Graphics, visualSettings } from "../../core/render/Graphics";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
 import { ListTemplate } from "../../core/util/List";
-import type { ILegendDataItem } from "../../core/render/Legend";
-import type { Color } from "../../core/util/Color";
-import type { ColorSet } from "../../core/util/ColorSet";
 
 import * as $utils from "../../core/util/Utils";
 import * as $array from "../../core/util/Array";
@@ -48,6 +50,14 @@ export interface IVennDataItem extends ISeriesDataItem {
 	 */
 	fill: Color;
 
+	/**
+	 * Fill pattern used for the slice and related elements, e.g. legend marker.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @since 5.10.0
+	 */
+	fillPattern: Pattern;
+
 }
 
 export interface IVennSettings extends ISeriesSettings {
@@ -61,6 +71,14 @@ export interface IVennSettings extends ISeriesSettings {
 	 * A [[ColorSet]] to use when asigning colors for slices.
 	 */
 	colors?: ColorSet;
+
+	/**
+	 * A [[PatternSet]] to use when asigning patterns for slices.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @since 5.10.0
+	 */
+	patterns?: PatternSet;
 
 	/**
 	 * A field in data that holds category names.
@@ -152,6 +170,10 @@ export class Venn extends Series {
 			this.updateLegendMarker(dataItem);
 		})
 
+		slice.on("fillPattern", () => {
+			this.updateLegendMarker(dataItem);
+		})
+
 		slice.on("stroke", () => {
 			this.updateLegendMarker(dataItem);
 		})
@@ -221,6 +243,13 @@ export class Venn extends Series {
 			}
 		}
 
+		if (dataItem.get("fillPattern") == null) {
+			let patterns = this.get("patterns");
+			if (patterns) {
+				dataItem.setRaw("fillPattern", patterns.next());
+			}
+		}
+
 		this.makeSlice(dataItem);
 		this.makeLabel(dataItem);
 	}
@@ -244,7 +273,7 @@ export class Venn extends Series {
 				set.size = dataItem.get("valueWorking");
 
 				//if (set.size > 0) { // not good
-					sets.push(set);
+				sets.push(set);
 				//}
 
 				const label = dataItem.get("label");
@@ -287,6 +316,10 @@ export class Venn extends Series {
 						const slice = dataItem.get("slice");
 						const color = dataItem.get("fill");
 						slice._setDefault("fill", color);
+
+						const fillPattern = dataItem.get("fillPattern");
+						slice._setDefault("fillPattern", fillPattern);
+
 						slice._setDefault("stroke", color);
 
 						this.updateLegendMarker(dataItem);
@@ -320,6 +353,9 @@ export class Venn extends Series {
 							const color = dataItem.get("fill");
 							slice._setDefault("fill", color);
 							slice._setDefault("stroke", color);
+
+							const fillPattern = dataItem.get("fillPattern");
+							slice._setDefault("fillPattern", fillPattern);
 
 							slice.setAll({ svgPath: intersectionPath });
 						}
@@ -495,7 +531,7 @@ export class Venn extends Series {
 			const legendDataItem = dataItem.get("legendDataItem");
 			if (legendDataItem) {
 				const markerRectangle = legendDataItem.get("markerRectangle");
-				if(!dataItem.isHidden()){
+				if (!dataItem.isHidden()) {
 					$array.each(visualSettings, (setting: any) => {
 						markerRectangle.set(setting, slice.get(setting));
 					})

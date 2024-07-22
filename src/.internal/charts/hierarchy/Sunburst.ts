@@ -261,8 +261,10 @@ export class Sunburst extends Partition {
 			slice.animate({ key: "arc", to: arc, duration: duration, easing: easing })
 
 			const fill = dataItem.get("fill");
+			const fillPattern = dataItem.get("fillPattern");
 
 			slice._setDefault("fill", fill);
+			slice._setDefault("fillPattern", fillPattern);
 			slice._setDefault("stroke", fill);
 		}
 	}

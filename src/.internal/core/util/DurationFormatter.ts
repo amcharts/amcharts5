@@ -206,7 +206,6 @@ export class DurationFormatter extends Entity {
 			details = info.zero;
 		}
 
-
 		// Format
 		let formatted = this.applyFormat(source, details);
 
@@ -403,11 +402,18 @@ export class DurationFormatter extends Entity {
 			let digits = part.length;
 
 			// Calculate current unit value
-			let ints = Math.floor(tstamp / this._getUnitValue(unit!));
+			let ints: number;
+			const unitValue = this._getUnitValue(unit!);
+			if (i < (len -1)) {
+				ints = Math.floor(tstamp / unitValue);
+			}
+			else {
+				ints = Math.round(tstamp / unitValue);
+			}
 			res = res.replace($type.PLACEHOLDER, $utils.padString(ints, digits, "0"));
 
 			// Reduce timestamp
-			tstamp -= ints * this._getUnitValue(unit!);
+			tstamp -= ints * unitValue;
 		}
 
 		// Reapply negative sign

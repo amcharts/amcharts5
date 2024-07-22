@@ -182,6 +182,12 @@ export abstract class BaseColumnSeries extends XYSeries {
 			}
 		}
 
+		if (this.isDirty("fillPattern")) {
+			if (columnsTemplate.get("fillPattern") == null) {
+				columnsTemplate.set("fillPattern", this.get("fillPattern"));
+			}
+		}		
+
 		if (this.isDirty("stroke")) {
 			if (columnsTemplate.get("stroke") == null) {
 				columnsTemplate.set("stroke", this.get("stroke"));

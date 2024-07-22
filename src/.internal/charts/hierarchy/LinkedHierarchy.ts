@@ -291,11 +291,13 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		}
 
 		const fill = dataItem.get("fill");
+		const fillPattern = dataItem.get("fillPattern");
 		const circle = dataItem.get("circle");
 		const children = dataItem.get("children");
 		
 		if (circle) {
 			circle._setDefault("fill", fill);
+			circle._setDefault("fillPattern", fillPattern);
 			circle._setDefault("stroke", fill);
 		}
 
@@ -306,6 +308,9 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 			if (!children || children.length == 0) {
 				outerCircle.setPrivate("visible", false);
+			}
+			else{
+				outerCircle.setPrivate("visible", true);
 			}
 		}
 	}

@@ -146,9 +146,11 @@ export class Pack extends Hierarchy {
 
 		if (circle) {
 			const fill = dataItem.get("fill");
+			const fillPattern = dataItem.get("fillPattern");
 
 			circle.animate({ key: "radius", to: radius, duration: duration, easing: easing })
 			circle._setDefault("fill", fill);
+			circle._setDefault("fillPattern", fillPattern);
 			circle._setDefault("stroke", fill);
 		}
 	}

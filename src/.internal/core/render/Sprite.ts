@@ -1922,7 +1922,7 @@ export abstract class Sprite extends Entity {
 			// Update tooltip position together with the Sprite
 			if (this.getPrivate("showingTooltip")) {
 				this.showTooltip();
-			}			
+			}
 		}
 	}
 
@@ -1982,65 +1982,71 @@ export abstract class Sprite extends Entity {
 	 * Simulate hover over element.
 	 */
 	public hover() {
-		this.showTooltip();
-		this._handleOver();
+		if (!this.isDisposed()) {
+			this.showTooltip();
+			this._handleOver();
+		}
 	}
 
 	/**
 	 * Simulate unhover over element.
 	 */
 	public unhover(): void {
-		this.hideTooltip();
-		this._handleOut();
+		if (!this.isDisposed()) {
+			this.hideTooltip();
+			this._handleOut();
+		}
 	}
 
 	/**
 	 * Shows element's [[Tooltip]].
 	 */
 	public showTooltip(point?: IPoint): Promise<void> | undefined {
-		const tooltip = this.getTooltip();
-		const tooltipText = this.get("tooltipText");
-		const tooltipHTML = this.get("tooltipHTML");
+		if (!this.isDisposed()) {
+			const tooltip = this.getTooltip();
+			const tooltipText = this.get("tooltipText");
+			const tooltipHTML = this.get("tooltipHTML");
 
-		if ((tooltipText || tooltipHTML) && tooltip) {
-			const tooltipPosition = this.get("tooltipPosition");
-			const tooltipTarget = this.getPrivate("tooltipTarget", this);
+			if ((tooltipText || tooltipHTML) && tooltip) {
+				const tooltipPosition = this.get("tooltipPosition");
+				const tooltipTarget = this.getPrivate("tooltipTarget", this);
 
-			if (tooltipPosition == "fixed" || !point) {
-				this._display._setMatrix();
-				point = this.toGlobal(tooltipTarget._getTooltipPoint());
-			}
+				if (tooltipPosition == "fixed" || !point) {
+					this._display._setMatrix();
+					point = this.toGlobal(tooltipTarget._getTooltipPoint());
+				}
 
-			tooltip.set("pointTo", point);
-			tooltip.set("tooltipTarget", tooltipTarget);
+				tooltip.set("pointTo", point);
+				tooltip.set("tooltipTarget", tooltipTarget);
 
-			if (!tooltip.get("x")) {
-				tooltip.set("x", point.x);
-			}
-			if (!tooltip.get("y")) {
-				tooltip.set("y", point.y);
-			}
+				if (!tooltip.get("x")) {
+					tooltip.set("x", point.x);
+				}
+				if (!tooltip.get("y")) {
+					tooltip.set("y", point.y);
+				}
 
-			if (tooltipText) {
-				tooltip.label.set("text", tooltipText);
-			}
-			if (tooltipHTML) {
-				tooltip.label.set("html", tooltipHTML);
-			}
-			const dataItem = this.dataItem;
-			if (dataItem) {
-				tooltip.label._setDataItem(dataItem);
-			}
+				if (tooltipText) {
+					tooltip.label.set("text", tooltipText);
+				}
+				if (tooltipHTML) {
+					tooltip.label.set("html", tooltipHTML);
+				}
+				const dataItem = this.dataItem;
+				if (dataItem) {
+					tooltip.label._setDataItem(dataItem);
+				}
 
-			if (this.get("showTooltipOn") == "always" && (point.x < 0 || point.x > this._root.width() || point.y < 0 || point.y > this._root.height())) {
-				this.hideTooltip();
-				return;
-			}
+				if (this.get("showTooltipOn") == "always" && (point.x < 0 || point.x > this._root.width() || point.y < 0 || point.y > this._root.height())) {
+					this.hideTooltip();
+					return;
+				}
 
-			tooltip.label.text.markDirtyText();
-			const promise = tooltip.show();
-			this.setPrivateRaw("showingTooltip", true);
-			return promise;
+				tooltip.label.text.markDirtyText();
+				const promise = tooltip.show();
+				this.setPrivateRaw("showingTooltip", true);
+				return promise;
+			}
 		}
 	}
 

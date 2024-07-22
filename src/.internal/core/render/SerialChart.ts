@@ -1,19 +1,31 @@
-import type { Series } from "./Series";
-
 import { Chart, IChartSettings, IChartPrivate, IChartEvents } from "./Chart";
 import { Container } from "../../core/render/Container";
 import { ListAutoDispose } from "../../core/util/List";
 import { p100 } from "../../core/util/Percent";
-import * as $array from "../../core/util/Array";
+
 import type { ColorSet } from "../../core/util/ColorSet";
+import type { PatternSet } from "../../core/util/PatternSet";
+import type { Series } from "./Series";
+
+import * as $array from "../../core/util/Array";
 
 export interface ISerialChartSettings extends IChartSettings {
+
 	/**
 	 * A [[ColorSet]] to use when asigning colors for series.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
 	 */
 	colors?: ColorSet;
+
+	/**
+	 * A [[PatternSet]] to use when asigning patterns for series.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @since 5.10.0
+	 */
+	patterns?: PatternSet;
+
 }
 
 export interface ISerialChartPrivate extends IChartPrivate {
@@ -61,6 +73,11 @@ export abstract class SerialChart extends Chart {
 				const colors = this.get("colors");
 				if (colors) {
 					colors.reset();
+				}
+
+				const patterns = this.get("patterns");
+				if (patterns) {
+					patterns.reset();
 				}
 
 			} else if (change.type === "push") {

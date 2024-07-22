@@ -3,6 +3,8 @@ import type { ColorSet } from "../../core/util/ColorSet";
 import type { Bullet } from "../../core/render/Bullet";
 import type { Root } from "../../core/Root";
 import type { Easing } from "../../core/util/Ease";
+import type { PatternSet } from "../../core/util/PatternSet";
+import type { Pattern } from "../../core/render/patterns/Pattern";
 
 import { HierarchyDefaultTheme } from "./HierarchyDefaultTheme";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
@@ -99,6 +101,14 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	fill: Color;
 
 	/**
+	 * Node's auto-assigned pattern.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @since 5.10.0
+	 */
+	fillPattern: Pattern;
+
+	/**
 	 * Indicates if node is currently disabled.
 	 */
 	disabled: boolean;
@@ -152,6 +162,14 @@ export interface IHierarchySettings extends ISeriesSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Node_colors} for more info
 	 */
 	colors?: ColorSet;
+
+	/**
+	 * A [[PatternSet]] to use when asigning patterns for nodes.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @since 5.10.0
+	 */
+	patterns?: PatternSet;
 
 	/**
 	 * Number of child levels to open when clicking on a node.
@@ -454,6 +472,11 @@ export abstract class Hierarchy extends Series {
 		if (colors) {
 			colors.reset();
 		}
+
+		const patterns = this.get("patterns");
+		if (patterns) {
+			patterns.reset();
+		}
 	}
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -461,12 +484,17 @@ export abstract class Hierarchy extends Series {
 
 		const childData = dataItem.get("childData");
 		const colors = this.get("colors");
+		const patterns = this.get("patterns");
 		const topDepth = this.get("topDepth", 0);
 
 		if (!dataItem.get("parent")) {
 			dataItem.setRaw("depth", 0);
 			if (colors && topDepth == 0 && dataItem.get("fill") == null) {
 				dataItem.setRaw("fill", colors.next());
+
+				if (patterns) {
+					dataItem.setRaw("fillPattern", patterns.next());
+				}
 			}
 		}
 
@@ -492,10 +520,16 @@ export abstract class Hierarchy extends Series {
 					if (colors && childDataItem.get("fill") == null) {
 						childDataItem.setRaw("fill", colors.next());
 					}
+					if (patterns && childDataItem.get("fillPattern") == null) {
+						childDataItem.setRaw("fillPattern", patterns.next());
+					}
 				}
 				else {
 					if (childDataItem.get("fill") == null) {
 						childDataItem.setRaw("fill", dataItem.get("fill"));
+					}
+					if (childDataItem.get("fillPattern") == null) {
+						childDataItem.setRaw("fillPattern", dataItem.get("fillPattern"));
 					}
 				}
 
@@ -539,6 +573,12 @@ export abstract class Hierarchy extends Series {
 		if (!children) {
 			children = [];
 			dataItem.set("children", children);
+		}
+
+		const node = dataItem.get("node");
+
+		if (node) {
+			node.set("toggleKey", "disabled");
 		}
 
 		let depth = dataItem.get("depth");
@@ -588,7 +628,7 @@ export abstract class Hierarchy extends Series {
 
 			this._index++;
 
-			this.root.events.once("frameended", ()=>{
+			this.root.events.once("frameended", () => {
 				dataItem.get("node").set("disabled", dataItem.get("disabled"));
 			})
 
@@ -612,11 +652,13 @@ export abstract class Hierarchy extends Series {
 				dataItem.get("label").text.markDirtyText();
 				dataItem.setRaw("valuePercent", valuePercent);
 
-				if (this.getPrivate("valueLow") > value) {
+				const valueLow = this.getPrivate("valueLow");
+				if (valueLow != undefined && valueLow > value) {
 					this.setPrivateRaw("valueLow", value);
 				}
 
-				if (this.getPrivate("valueHigh") < value) {
+				const valueHigh = this.getPrivate("valueHigh");
+				if (valueHigh != undefined && valueHigh < value) {
 					this.setPrivateRaw("valueHigh", value);
 				}
 			}
@@ -777,6 +819,8 @@ export abstract class Hierarchy extends Series {
 			dataItem.get("node").show(duration);
 		}
 
+		
+
 		const topDepth = this.get("topDepth", 0);
 		if (dataItem.get("depth") < topDepth) {
 			dataItem.get("node").hide(0);
@@ -798,7 +842,7 @@ export abstract class Hierarchy extends Series {
 
 		let children = dataItem.get("children");
 		if (children) {
-			if (depth < maxDepth - 1) {
+			if (depth < maxDepth - 1) {				
 				$array.each(children, (child) => {
 					const disabledField = this.get("disabledField");
 					if (disabledField) {
@@ -860,14 +904,14 @@ export abstract class Hierarchy extends Series {
 				downDepth = Math.min(this.get("downDepth", 1), maxDepth - dataItem.get("depth"));
 			}
 
+			const hierarchyNode = dataItem.get("d3HierarchyNode");			
+			let currentDepth = hierarchyNode.depth;
 			if (!this.inited) {
 				downDepth = Math.min(this.get("initialDepth", 1), maxDepth - topDepth);
+				downDepth = Math.max(0, downDepth);
 			}
 
 			this._currentDownDepth = downDepth;
-
-			const hierarchyNode = dataItem.get("d3HierarchyNode");
-			let currentDepth = hierarchyNode.depth;
 
 			if (currentDepth + downDepth > maxDepth) {
 				downDepth = maxDepth - currentDepth;

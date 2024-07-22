@@ -315,19 +315,27 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * @ignore
+	 * Creates a new data item and processes it.
+	 * 
+	 * @param   data         Data item settings
+	 * @param   dataContext  Data context
+	 * @return               New data item
 	 */
-	public makeDataItem(data: this["_dataItemSettings"]): DataItem<this["_dataItemSettings"]> {
-		let dataItem = new DataItem(this, undefined, data);
+	public makeDataItem(data: this["_dataItemSettings"], dataContext?: any): DataItem<this["_dataItemSettings"]> {
+		let dataItem = new DataItem(this, dataContext, data);
 		this.processDataItem(dataItem);
 		return dataItem;
 	}
 
 	/**
-	 * @ignore
+	 * Adds new explicit data item to series.
+	 * 
+	 * @param   data         Data item settings
+	 * @param   dataContext  Data context
+	 * @return               New data item
 	 */
-	public pushDataItem(data: this["_dataItemSettings"]): DataItem<this["_dataItemSettings"]> {
-		const dataItem = this.makeDataItem(data);
+	public pushDataItem(data: this["_dataItemSettings"], dataContext?: any): DataItem<this["_dataItemSettings"]> {
+		const dataItem = this.makeDataItem(data, dataContext);
 		this._mainDataItems.push(dataItem);
 		return dataItem;
 	}

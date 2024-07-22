@@ -3,7 +3,7 @@ import type { InterfaceColors, IInterfaceColorsSettings } from "../core/util/Int
 import { Theme } from "../core/Theme";
 import { p100, p50 } from "../core/util/Percent";
 import { Color } from "../core/util/Color";
-import { GridLayout } from "../core/render/GridLayout"
+import { GridLayout } from "../core/render/GridLayout";
 
 import * as $ease from "../core/util/Ease";
 
@@ -228,6 +228,17 @@ export class DefaultTheme extends Theme {
 			minOpacity: 0,
 			maxOpacity: 0.2
 		});
+
+		{
+			const rule = r("PatternSet");
+
+			rule.setAll({
+				step: 1
+			});
+
+			setColor(rule, "color", ic, "stroke");
+		}
+
 
 		/**
 		 * ------------------------------------------------------------------------

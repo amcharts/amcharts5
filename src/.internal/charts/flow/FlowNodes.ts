@@ -2,6 +2,10 @@ import type { DataItem } from "../../core/render/Component";
 import type { Color } from "../../core/util/Color";
 import type { Time } from "../../core/util/Animation";
 import type { Flow, IFlowDataItem } from "./Flow";
+import type { ColorSet } from "../../core/util/ColorSet";
+import type { PatternSet } from "../../core/util/PatternSet";
+import type { Pattern } from "../../core/render/patterns/Pattern";
+
 import type * as d3sankey from "d3-sankey";
 
 import { Label } from "../../core/render/Label";
@@ -9,7 +13,6 @@ import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
 import { FlowNode } from "./FlowNode";
-import type { ColorSet } from "../../core/util/ColorSet";
 
 import * as $array from "../../core/util/Array";
 
@@ -34,6 +37,14 @@ export interface IFlowNodesDataItem extends ISeriesDataItem {
 	 * Node color.
 	 */
 	fill: Color;
+
+	/**
+	 * Node pattern.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @since 5.10.0
+	 */
+	fillPattern: Pattern;
 
 	/**
 	 * Indicates "unknown" node.
@@ -129,6 +140,14 @@ export interface IFlowNodesSettings extends ISeriesSettings {
 	colors?: ColorSet;
 
 	/**
+	 * A [[PatternSet]] that series will use to apply to its nodes.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @since 5.10.0
+	 */
+	patterns?: PatternSet;
+
+	/**
 	 * Animation duration in ms.
 	 */
 	animationDuration?: number;
@@ -204,6 +223,11 @@ export abstract class FlowNodes extends Series {
 			colors.reset();
 		}
 
+		const patterns = this.get("patterns");
+		if (patterns) {
+			patterns.reset();
+		}
+
 		this._userDataSet = true;
 	}
 
@@ -215,6 +239,13 @@ export abstract class FlowNodes extends Series {
 			let colors = this.get("colors");
 			if (colors) {
 				dataItem.setRaw("fill", colors.next());
+			}
+		}
+
+		if (dataItem.get("fillPattern") == null) {
+			let patterns = this.get("patterns");
+			if (patterns) {
+				dataItem.setRaw("fillPattern", patterns.next());
 			}
 		}
 
@@ -275,11 +306,16 @@ export abstract class FlowNodes extends Series {
 			this._updateNodeColor(dataItem);
 		})
 
+		dataItem.on("fillPattern", () => {
+			this._updateNodeColor(dataItem);
+		})
+
+
 		dataItem.set("node", node);
 		return node;
 	}
 
-	public _updateNodeColor(_dataItem: DataItem<this["_dataItemSettings"]>){
+	public _updateNodeColor(_dataItem: DataItem<this["_dataItemSettings"]>) {
 
 	}
 

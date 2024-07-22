@@ -203,6 +203,9 @@ export class PieSeries extends PercentSeries {
 						const color = dataItem.get("fill");
 						slice._setDefault("fill", color);
 						slice._setDefault("stroke", color);
+
+						const fillPattern = dataItem.get("fillPattern");
+						slice._setDefault("fillPattern", fillPattern);						
 					}
 
 					let middleAngle = $math.normalizeAngle(currentAngle + currentArc / 2);

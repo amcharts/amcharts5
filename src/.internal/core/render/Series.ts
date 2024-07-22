@@ -1,22 +1,25 @@
+import type { Root } from "../../core/Root";
+import type { Chart } from "./Chart";
+import type { Bullet } from "./Bullet";
+import type { Graphics } from "../../core/render/Graphics";
+import type { ILegendDataItem } from "./Legend";
+import type { Template } from "../../core/util/Template";
+import type { Sprite } from "../../core/render/Sprite";
+import type { Pattern } from "./patterns/Pattern";
+
 import { Component, IComponentSettings, IComponentPrivate, DataItem, IComponentEvents, IComponentDataItem } from "../../core/render/Component";
 import { List } from "../../core/util/List";
 import { Color } from "../../core/util/Color";
 import { percentInterpolate } from "../../core/util/Animation";
 import { Percent } from "../../core/util/Percent";
+import { p100 } from "../../core/util/Percent";
+import { Container } from "../../core/render/Container";
+import { Label } from "../../core/render/Label";
+//import { Animations } from "../../core/util/Animation";
+
 import * as $array from "../../core/util/Array";
 import * as $type from "../../core/util/Type";
 import * as $time from "../../core/util/Time";
-import type { Root } from "../../core/Root";
-import { p100 } from "../../core/util/Percent";
-import type { Chart } from "./Chart";
-import type { Bullet } from "./Bullet";
-import { Container } from "../../core/render/Container";
-import type { Graphics } from "../../core/render/Graphics";
-import type { ILegendDataItem } from "./Legend";
-import type { Template } from "../../core/util/Template";
-import type { Sprite } from "../../core/render/Sprite";
-import { Label } from "../../core/render/Label";
-//import { Animations } from "../../core/util/Animation";
 
 /**
  * Defines interface for a heat rule.
@@ -188,6 +191,14 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
 	 */
 	fill?: Color;
+
+	/**
+	 * Series fill pattern.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @since 5.10.0
+	 */
+	fillPattern?: Pattern;
 
 	/**
 	 * A data item representing series in a [[Legend]].

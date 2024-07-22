@@ -88,6 +88,7 @@ export class ChordNodes extends FlowNodes {
 		const slice = node.children.insertIndex(0, this.slices.make());
 		dataItem.set("slice", slice);
 		slice._setSoft("fill", dataItem.get("fill"));
+		slice._setSoft("fillPattern", dataItem.get("fillPattern"));
 
 		const label = this.labels.make();
 		this.labels.push(label);
@@ -148,6 +149,7 @@ export class ChordNodes extends FlowNodes {
 		const slice = dataItem.get("slice");
 		if(slice){
 			slice.set("fill", dataItem.get("fill"));
+			slice.set("fillPattern", dataItem.get("fillPattern"));
 		}
 	}		
 

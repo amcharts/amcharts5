@@ -209,6 +209,15 @@ export class LineSeries extends XYSeries {
 			}
 		}
 
+		if (this.isDirty("fillPattern")) {
+			const fillPattern = this.get("fillPattern");
+			this.fills.template.set("fillPattern", fillPattern);
+			const legendFill = this._legendFill;
+			if (legendFill) {
+				legendFill.states.lookup("default")!.set("fillPattern", fillPattern);
+			}
+		}		
+
 		if (this.isDirty("curveFactory")) {
 			const curveFactory = this.get("curveFactory")!;
 			if (curveFactory) {

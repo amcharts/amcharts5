@@ -59,6 +59,8 @@ export class SankeyNodes extends FlowNodes {
 		const rectangle = node.children.insertIndex(0, this.rectangles.make());
 		this.rectangles.push(rectangle);
 		rectangle._setSoft("fill", dataItem.get("fill"));
+		rectangle._setSoft("fillPattern", dataItem.get("fillPattern"));
+		
 		dataItem.set("rectangle", rectangle);
 
 		node.events.on("dragged", () => {
@@ -129,6 +131,7 @@ export class SankeyNodes extends FlowNodes {
 		const rectangle = dataItem.get("rectangle");
 		if(rectangle){
 			rectangle.set("fill", dataItem.get("fill"));
+			rectangle.set("fillPattern", dataItem.get("fillPattern"));
 		}
 	}	
 }

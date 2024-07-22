@@ -58,11 +58,11 @@ export abstract class ChartIndicator extends Indicator {
 			chart.addTag("indicator");
 			this.panel = chart;
 
-			stockChart.panels.events.on("removeIndex", (e) => {
+			this.addDisposer(stockChart.panels.events.on("removeIndex", (e) => {
 				if (e.oldValue == chart) {
 					stockChart.indicators.removeValue(this);
 				}
-			})
+			}))
 
 			const seriesXAxis = stockSeries.get("xAxis") as any;
 

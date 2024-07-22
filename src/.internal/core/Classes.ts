@@ -142,6 +142,7 @@ import type { ParallelChannelSeries } from "./../charts/stock/drawing/ParallelCh
 import type { Partition } from "./../charts/hierarchy/Partition.js";
 import type { PathPattern } from "./render/patterns/PathPattern.js";
 import type { Pattern } from "./render/patterns/Pattern.js";
+import type { PatternSet } from "./util/PatternSet.js";
 import type { PercentChart } from "./../charts/percent/PercentChart.js";
 import type { PercentSeries } from "./../charts/percent/PercentSeries.js";
 import type { PeriodSelector } from "./../charts/stock/toolbar/PeriodSelector.js";
@@ -369,6 +370,7 @@ export interface IClasses {
 	"Partition": Partition;
 	"PathPattern": PathPattern;
 	"Pattern": Pattern;
+	"PatternSet": PatternSet;
 	"PercentChart": PercentChart;
 	"PercentSeries": PercentSeries;
 	"PeriodSelector": PeriodSelector;

@@ -59,6 +59,7 @@ export { Pattern, IPatternSettings, IPatternPrivate } from "./.internal/core/ren
 export { PicturePattern, IPicturePatternSettings, IPicturePatternPrivate } from "./.internal/core/render/patterns/PicturePattern";
 export { RectanglePattern, IRectanglePatternSettings, IRectanglePatternPrivate } from "./.internal/core/render/patterns/RectanglePattern";
 export { PathPattern, IPathPatternSettings, IPathPatternPrivate } from "./.internal/core/render/patterns/PathPattern";
+export { PatternSet, IPatternSetSettings, IPatternSetPrivate } from "./.internal/core/util/PatternSet";
 
 export { Color, color } from "./.internal/core/util/Color";
 export { ColorSet, IColorSetSettings, IColorSetPrivate, IColorSetStepOptions } from "./.internal/core/util/ColorSet";

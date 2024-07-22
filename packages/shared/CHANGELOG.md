@@ -5,12 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.0] - 2024-07-22
+
+### Added
+- A second parameter (`dataContext`) added to `Component`'s methods `pushDataItem` and `makeDataItem`, allowing to pass in a data context object related to the data item.
+- New class `PatternSet` added. Allows serving patterns similarly to `ColorSet`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets).
+- New setting `patterns` added to `Hierarchy`, `PercentSeries`, `Venn`, `SerialChart`, `FlowNodes`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets).
+- New setting `fillPattern` added to `IFlowNodesDataItem`, `IHierarchyDataItem`, `IPercentSeriesDataItem`, `IVennDataItem`, `ISeriesSettings`.
+
+### Fixed
+- `LinkedHierarchy` nodes were not clickable when children were added using `addChildData()` method.
+- If there were no nodes at `topLevel` in `Hierarchy` chart, it would show nodes from upper levels.
+- Not all event listeners were disposed when disposing a `ChartIndicator`. This could cause a memory leak.
+- `Sprite`'s `hover()`/`unhover()` methods now check if the `Sprite` is not disposed. This fixes some potential errors when disposed items are being referenced.
+- Adding in explicit d3 dependencies ([Issue 1567](https://github.com/amcharts/amcharts5/issues/1567))
+- `DurationFormatter` was not rounding fractional numbers properly in some cases.
+
+
 ## [5.9.13] - 2024-07-03
 
 ### Fixed
 - If start and end values of a `HeatLegend` were the same, the tooltip was shown in the top/left corner of the chart.
 - If a linked hierarchy had bullets on links, they remained visible when nodes and links were hidden.
-- Zoom-out button could be visibile initially with some specific setups.
+- Zoom-out button could be visible initially with some specific setups.
 - `ZoomableContainer` would not react to pans in some of its sections if its contents was panned outside the its bounds.
 
 
