@@ -8,6 +8,7 @@ import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } fr
 
 import * as  $array from "../../core/util/Array";
 import * as  $type from "../../core/util/Type";
+import { LinearGradient } from "./gradients/LinearGradient";
 
 
 export interface ILabelSettings extends IContainerSettings {
@@ -22,7 +23,7 @@ export interface ILabelSettings extends IContainerSettings {
 	/**
 	 * Text color.
 	 */
-	fill?: Color;
+	fill?: Color | LinearGradient;
 
 	/**
 	 * Text opacity.

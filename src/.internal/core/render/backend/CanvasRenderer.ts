@@ -4,6 +4,7 @@ import {
 	IRenderer, IContainer, IDisplayObject, IGraphics, IRendererEvents, IMargin,
 	IText, ITextStyle, IRadialText, IPicture, IRendererEvent, ILayer, ICanvasOptions, BlendMode, IPointerEvent, Id
 } from "./Renderer";
+import { LinearGradient } from "../gradients/LinearGradient";
 import type { IBounds } from "../../util/IBounds";
 import type { IPoint } from "../../util/IPoint";
 import { Color } from "../../util/Color";
@@ -1758,6 +1759,11 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 			context.save();
 			ghostContext.save();
+			const style = this.style
+			if (style.fill && this._localBounds && style.fill instanceof LinearGradient) {
+				this.style.fill = style.fill.getFillFromBounds(0, this._localBounds.right, 0, this._localBounds.bottom)
+			}
+
 			this._prerender(status);
 
 			// const lines = this.text.toString().replace(/\r/g, "").split(/\n/);

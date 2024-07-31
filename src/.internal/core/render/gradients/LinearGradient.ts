@@ -40,13 +40,20 @@ export class LinearGradient extends Gradient {
 	 * @ignore
 	 */
 	public getFill(target: Sprite): IGradient {
-		const rotation = this.get("rotation", 0);
 		let bounds = this.getBounds(target);
 
 		let l = bounds.left || 0;
 		let r = bounds.right || 0;
 		let t = bounds.top || 0;
 		let b = bounds.bottom || 0;
+		return this.getFillFromBounds(l, r, t, b)
+	}
+
+	/**
+	 * @ignore
+	 */
+	public getFillFromBounds(l: number, r: number, t: number, b: number): IGradient {
+		const rotation = this.get("rotation", 0);
 
 		let cos = $math.cos(rotation);
 		let sin = $math.sin(rotation);
