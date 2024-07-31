@@ -1,4 +1,4 @@
-import type { Color } from "../util/Color";
+import { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
 import type { DataItem, IComponentDataItem } from "./Component";
 
@@ -8,7 +8,7 @@ import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } fr
 
 import * as  $array from "../../core/util/Array";
 import * as  $type from "../../core/util/Type";
-import { LinearGradient } from "./gradients/LinearGradient";
+import type { LinearGradient } from "./gradients/LinearGradient";
 
 
 export interface ILabelSettings extends IContainerSettings {
@@ -386,7 +386,10 @@ export class Label extends Container {
 	protected _maybeUpdateHTMLColor() {
 		const htmlElement = this.getPrivate("htmlElement");
 		if (htmlElement && this.get("fill")) {
-			htmlElement.style.color = this.get("fill")!.toCSSHex();
+			const fill = this.get("fill")
+			if (fill instanceof Color) {
+				htmlElement.style.color = fill.toCSSHex();
+			}
 		}
 	}
 

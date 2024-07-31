@@ -2,7 +2,7 @@ import { Label, ILabelPrivate, ILabelSettings, ILabelEvents } from "./Label";
 import { Container } from "./Container";
 import { RoundedRectangle } from "./RoundedRectangle";
 import { Percent } from "../util/Percent"
-import { color } from "../util/Color";
+import { Color, color } from "../util/Color";
 
 
 import * as $utils from "../util/Utils"
@@ -231,7 +231,11 @@ export class EditableLabel extends Label {
 			});
 
 			// Remove textarea attributes
-			textarea.style.color = this.get("fill", color(0x000000)).toCSS(this.get("fillOpacity", 1));
+			const fill = this.get("fill", color(0x000000))
+			if (fill instanceof Color) {
+				textarea.style.color = fill.toCSS(this.get("fillOpacity", 1));
+			}
+
 			textarea.style.backgroundColor = "rgba(0, 0, 0, 0)";
 			textarea.style.border = "none";
 			textarea.style.outline = "none";
