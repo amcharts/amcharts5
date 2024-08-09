@@ -54,13 +54,13 @@ export class LinearGradient extends Gradient {
 		let w = cos * (r - l);
 		let h = sin * (b - t);
 
-		if(w == 0){
+		if (w == 0) {
 			w = 1;
 		}
 
-		if(h == 0){
+		if (h == 0) {
 			h = 1;
-		}		
+		}
 
 		let longer = Math.max(w, h);
 
@@ -70,8 +70,6 @@ export class LinearGradient extends Gradient {
 			l + longer * cos,
 			t + longer * sin
 		);
-
-		
 
 		const stops = this.get("stops")!;
 		if (stops) {

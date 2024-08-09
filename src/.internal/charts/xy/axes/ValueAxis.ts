@@ -347,6 +347,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	protected _dirtyExtremes: boolean = false;
 	protected _dirtySelectionExtremes: boolean = false;
+	protected _dseHandled = false;
 	protected _deltaMinMax: number = 1;
 	protected _minReal: number | undefined;
 	protected _maxReal: number | undefined;
@@ -413,7 +414,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._getMinMax();
 			this._dirtyExtremes = false;
 		}
-
+		
 		this._handleSizeDirty();
 
 		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
@@ -458,9 +459,15 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	protected _handleSizeDirty() {
-		if (this._sizeDirty) {
+		if (this._sizeDirty && !this._dseHandled) {
 			this._dirtySelectionExtremes = true;
+			this._dseHandled = true;
 		}
+	}
+
+	public _clearDirty(): void {
+		super._clearDirty();
+		this._dseHandled = false;
 	}
 
 	protected _groupData() {

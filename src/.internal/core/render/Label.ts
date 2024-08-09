@@ -1,6 +1,7 @@
 import type { Color } from "../util/Color";
 import type { Percent } from "../util/Percent";
 import type { DataItem, IComponentDataItem } from "./Component";
+import type { Gradient } from "../render/gradients/Gradient";
 
 import { Text } from "../render/Text";
 import { p50, p100 } from "../util/Percent";
@@ -31,6 +32,14 @@ export interface ILabelSettings extends IContainerSettings {
 	 * @ince 5.2.39
 	 */
 	fillOpacity?: number;
+
+	/**
+	 * Fill gradient.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
+	 * @since 5.10.1
+	 */
+	fillGradient?: Gradient;
 
 	/**
 	 * Alignment.
@@ -249,6 +258,7 @@ export class Label extends Container {
 	protected _textKeys: Array<string> = [
 		"text",
 		"fill",
+		"fillGradient",
 		"fillOpacity",
 		"textAlign",
 		"fontFamily",
@@ -346,7 +356,7 @@ export class Label extends Container {
 			this._maybeUpdateHTMLColor();
 		}
 
-		if (this.isDirty("fill")) {
+		if (this.isDirty("fill") || this.isDirty("fillGradient")) {
 			this._maybeUpdateHTMLColor();
 		}
 
@@ -386,6 +396,7 @@ export class Label extends Container {
 		const htmlElement = this.getPrivate("htmlElement");
 		if (htmlElement && this.get("fill")) {
 			htmlElement.style.color = this.get("fill")!.toCSSHex();
+			//@todo support gradient
 		}
 	}
 

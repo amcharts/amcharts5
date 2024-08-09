@@ -3,13 +3,13 @@ import type { Percent } from "../util/Percent";
 import type { IText } from "./backend/Renderer";
 import type { IBounds } from "../util/IBounds";
 import type { DataItem, IComponentDataItem } from "./Component";
-
-import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
-import { populateString } from "../util/PopulateString";
-
 import type { NumberFormatter } from "../util/NumberFormatter";
 import type { DateFormatter } from "../util/DateFormatter";
 import type { DurationFormatter } from "../util/DurationFormatter";
+import type { Gradient } from "../render/gradients/Gradient";
+
+import { Sprite, ISpriteSettings, ISpritePrivate } from "./Sprite";
+import { populateString } from "../util/PopulateString";
 
 import * as $array from "../util/Array";
 import * as $utils from "../util/Utils";
@@ -21,6 +21,15 @@ import { Disposer } from "../util/Disposer";
 export interface ITextSettings extends ISpriteSettings {
 	text?: string;
 	fill?: Color;
+
+	/**
+	 * Fill gradient.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
+	 * @since 5.10.1
+	 */
+	fillGradient?: Gradient;
+
 	fillOpacity?: number;
 	textAlign?: "start" | "end" | "left" | "right" | "center";
 	fontFamily?: string;
@@ -128,6 +137,10 @@ export class Text extends Sprite {
 		}
 		else {
 			super._updateBounds();
+			let fillGradient = this.get("fillGradient");
+			if (fillGradient) {
+				this._display.style.fill = fillGradient.getFill(this);
+			}
 		}
 	}
 
@@ -191,9 +204,30 @@ export class Text extends Sprite {
 			this.markDirtyBounds();
 		}
 
-		if (this.isDirty("fill")) {
-			let fill = this.get("fill");
-			if (fill) {
+		if (this.isDirty("fill") || this.isDirty("fillGradient")) {
+			const fill = this.get("fill");
+			const fillGradient = this.get("fillGradient");
+			const fillOpacity = this.get("fillOpacity");
+			if (fillGradient) {
+				if (fill) {
+					const stops = fillGradient.get("stops", []);
+					if (stops.length) {
+						$array.each(stops, (stop: any) => {
+							if ((!stop.color || stop.colorInherited) && fill) {
+								stop.color = fill;
+								stop.colorInherited = true;
+							}
+
+							if (stop.opacity == null || stop.opacityInherited) {
+								stop.opacity = fillOpacity;
+								stop.opacityInherited = true;
+							}
+						})
+					}
+				}
+				textStyle.fill = fillGradient.getFill(this);
+			}
+			else if (fill) {
 				textStyle.fill = fill;
 			}
 		}

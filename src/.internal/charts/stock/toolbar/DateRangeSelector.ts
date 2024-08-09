@@ -1361,7 +1361,7 @@ span.flatpickr-day.nextMonthDay.selected {
 			        flex: 1 0 auto;
 		}
 	}
-		`));
+		`, this._root.nonce));
 	}
 
 }

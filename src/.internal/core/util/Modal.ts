@@ -32,7 +32,7 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"z-index": "100000",
 				"top": "0",
 				"left": "0"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-curtain", {
 				"top": "0",
@@ -42,7 +42,7 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"position": "absolute",
 				"background": ic.get("background")!.toCSS(0.5),
 				"z-index": "100"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-wrapper", {
 				"top": "0",
@@ -54,7 +54,7 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"white-space": "nowrap",
 				"background": ic.get("background")!.toCSS(0.5),
 				"z-index": "101"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-wrapper:before", {
 				"content": "''",
@@ -62,7 +62,7 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"height": "100%",
 				"vertical-align": "middle",
 				"margin-right": "-0.25em"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-content", {
 				"display": "inline-block",
@@ -76,46 +76,46 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"-webkit-box-shadow": "0px 0px 36px 0px " + shadow,
 				"box-shadow": "0px 0px 36px 0px " + shadow,
 				"color": text
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-content h1", {
 				"font-size": "1em",
 				"margin": "0 0 0.5em 0"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-table", {
 				"display": "table",
 				"margin": "1em 0"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-table-row", {
 				"display": "table-row"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-table-heading", {
 				"display": "table-heading",
 				"padding": "3px 10px 3px 0",
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-table-cell", {
 				"display": "table-cell",
 				"padding": "3px 0 3px 0",
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-table-cell > *", {
 				"vertical-align": "middle"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-content input[type=text], .am5-modal-content input[type=number], .am5-modal-content select", {
 				"border": "1px solid " + active,
 				"border-radius": "4px",
 				"padding": "3px 5px",
 				"margin": "2px"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-input-narrow", {
 				"width": "50px"
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-button", {
 				"font-weight": "400",
@@ -131,21 +131,21 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"margin": "0 0.25em 0 0",
 				"border": "1px solid " + ic.get("secondaryButtonStroke")!.toCSS(),
 				"background": ic.get("secondaryButton")!.toCSS()
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-button:hover", {
 				"background": ic.get("secondaryButtonHover")!.toCSS()
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-button.am5-modal-primary", {
 				"color": ic.get("primaryButtonText")!.toCSS(),
 				"border": "1px solid " + ic.get("primaryButtonStroke")!.toCSS(),
 				"background": ic.get("primaryButton")!.toCSS()
-			}),
+			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-button.am5-modal-primary:hover", {
 				"background": ic.get("primaryButtonHover")!.toCSS()
-			}),
+			}, root.nonce),
 
 		]);
 

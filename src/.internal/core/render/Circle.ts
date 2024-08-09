@@ -44,7 +44,7 @@ export class Circle extends Graphics {
 		super._changed();
 
 		if (this._clear) {
-			this._display.drawCircle(0, 0, this.get("radius", 10));
+			this._display.drawCircle(0, 0, Math.abs(this.get("radius", 10)));
 		}
 	}
 }

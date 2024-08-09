@@ -345,6 +345,11 @@ export class LineSeries extends XYSeries {
 	protected _clearGraphics() {
 		this.strokes.clear();
 		this.fills.clear();
+
+		this.axisRanges.each((axisRange) => {
+			axisRange.fills!.clear();
+			axisRange.strokes!.clear();			
+		})		
 	}
 
 	protected _startSegment(dataItemIndex: number) {
@@ -532,7 +537,6 @@ export class LineSeries extends XYSeries {
 			const container = axisRange.container;
 			const fills = axisRange.fills!;
 			const fill = this.makeFill(fills);
-
 			if (container) {
 				container.children.push(fill);
 			}

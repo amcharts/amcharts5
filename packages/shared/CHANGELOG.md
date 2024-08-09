@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.1] - 2024-08-09
+
+### Added
+- `fillGradient` setting added to `Label`.
+
+### Changed
+- Exporting a PDF will now check image size and will not scale it up to fit page size if it's smaller. It will still scale dowwn the image to fit in the page.
+
+### Fixed
+- Memory leak with axis ranges on `LineSeries` fixed.
+- `PieSeries` tick was not visible if pie had two equal slices.
+- `root.nonce` was not being added to all dynamically-loaded stylesheets.
+- A stack overflow could occur when auto-zooming a `ValueAxis` in some very rare cases.
+
+
 ## [5.10.0] - 2024-07-22
 
 ### Added

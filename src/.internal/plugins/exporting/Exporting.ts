@@ -1497,8 +1497,20 @@ export class Exporting extends Entity {
 
 		// Get image
 		let image: string;
+
+		const imageSize = {
+			width: 0,
+			height: 0
+		};
+
 		if (includeImage) {
-			image = await this.exportImage(options.imageFormat || "png", options);
+			const imageFormat = options.imageFormat || "png";
+			const imageOptions: any = this._getFormatOptions(imageFormat, options);
+			const canvas = await this.getCanvas(imageOptions);
+			imageSize.width = canvas.clientWidth;
+			imageSize.height = canvas.clientHeight;
+			image = canvas.toDataURL(this.getContentType(imageFormat), options.quality || 1);
+			this.disposeCanvas(canvas);
 		}
 		// Load pdfmake
 
@@ -1550,11 +1562,20 @@ export class Exporting extends Entity {
 
 		// Add image
 		if (includeImage && image!) {
-			doc.content.push({
-				image: image!,
-				alignment: options.align || "left",
-				fit: this.getPageSizeFit(doc.pageSize, doc.pageMargins, extraMargin, orientation)
-			});
+			const fitSize = this.getPageSizeFit(doc.pageSize, doc.pageMargins, extraMargin, orientation);
+			if ((imageSize.width > fitSize[0]) || (imageSize.height > fitSize[1])) {
+				doc.content.push({
+					image: image!,
+					alignment: options.align || "left",
+					fit: fitSize
+				});
+			}
+			else {
+				doc.content.push({
+					image: image!,
+					alignment: options.align || "left"
+				});
+			}
 		}
 
 		// Add data

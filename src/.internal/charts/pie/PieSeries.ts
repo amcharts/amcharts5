@@ -271,7 +271,7 @@ export class PieSeries extends PercentSeries {
 			y = label.y();
 			let points:Array<IPoint> = [];
 
-			if(x != 0 && y != 0){
+			if(x != 0 || y != 0){
 				if (label.get("textType") == "circular") {
 					const labelRadius = label.radius() - label.get("paddingBottom", 0);
 					const labelAngle = label.get("labelAngle", 0);
