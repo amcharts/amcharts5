@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.3] - 2024-08-23
+
+### Fixed
+- The chart would not allow overzooming using mouse wheel since `5.10.2`. It will now allow overzoom based on axis' `maxDeviation` setting.
+
+
 ## [5.10.2] - 2024-08-23
 
 ### Added

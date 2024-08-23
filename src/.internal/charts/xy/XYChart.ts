@@ -525,6 +525,7 @@ export class XYChart extends SerialChart {
 		const wheelZoomPositionX = this.get("wheelZoomPositionX");
 		const wheelZoomPositionY = this.get("wheelZoomPositionY");
 
+
 		if ((wheelX === "zoomX" || wheelX === "zoomXY") && shiftX != 0) {
 			this.xAxes.each((axis) => {
 				if (axis.get("zoomX")) {
@@ -537,8 +538,10 @@ export class XYChart extends SerialChart {
 						position = wheelZoomPositionX;
 					}
 
-					let newStart =  Math.min(1, Math.max(0, start - wheelStep * (end - start) * shiftX * position));
-					let newEnd = Math.max(0, Math.min(1, end + wheelStep * (end - start) * shiftX * (1 - position)));
+					let maxDeviation = axis.get("maxDeviation", 0);
+
+					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftX * position));
+					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftX * (1 - position)));
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 					}
@@ -558,8 +561,10 @@ export class XYChart extends SerialChart {
 						position = wheelZoomPositionX;
 					}
 
-					let newStart = Math.min(1, Math.max(0, start - wheelStep * (end - start) * shiftY * position));
-					let newEnd = Math.max(0, Math.min(1, end + wheelStep * (end - start) * shiftY * (1 - position)));
+					let maxDeviation = axis.get("maxDeviation", 0);
+
+					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftY * position));
+					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftY * (1 - position)));
 
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
@@ -581,8 +586,10 @@ export class XYChart extends SerialChart {
 						position = wheelZoomPositionY;
 					}
 
-					let newStart = Math.min(1, Math.max(0, start - wheelStep * (end - start) * shiftX * position));
-					let newEnd = Math.max(0, Math.min(1, end + wheelStep * (end - start) * shiftX * (1 - position)));
+					let maxDeviation = axis.get("maxDeviation", 0);
+
+					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftX * position));
+					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftX * (1 - position)));
 
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
@@ -603,8 +610,10 @@ export class XYChart extends SerialChart {
 						position = wheelZoomPositionY;
 					}
 
-					let newStart = Math.min(1, Math.max(0, start - wheelStep * (end - start) * shiftY * position));
-					let newEnd = Math.max(0, Math.min(1, end + wheelStep * (end - start) * shiftY * (1 - position)));
+					let maxDeviation = axis.get("maxDeviation", 0);
+
+					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftY * position));
+					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftY * (1 - position)));
 
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));

@@ -59,10 +59,9 @@ export interface IZoomableContainerSettings extends IContainerSettings {
 	animationEasing?: (t: Time) => Time;
 
 	/**
-	 * How much of a contents can go outside the viewport.
+	 * How much of a content can go outside the viewport.
 	 *
 	 * @default 0.4
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
 	 */
 	maxPanOut?: number;
 
