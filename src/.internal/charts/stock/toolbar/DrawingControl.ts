@@ -2,6 +2,8 @@ import type { XYSeries } from "../../xy/series/XYSeries";
 import type { Color } from "../../../core/util/Color";
 import type { ColorSet } from "../../../core/util/ColorSet";
 import type { IDropdownListItem } from "./DropdownList";
+import type { StockPanel } from "../StockPanel";
+import type { IPoint } from "../../../core/util/IPoint";
 
 import { color } from "../../../core/util/Color";
 import { Template } from "../../../core/util/Template";
@@ -35,7 +37,6 @@ import { VerticalLineSeries } from "../drawing/VerticalLineSeries";
 import { Measure } from "../drawing/Measure";
 import { JsonParser } from "../../../plugins/json/Json";
 import { Serializer } from "../../../plugins/json/Serializer";
-import type { StockPanel } from "../StockPanel";
 
 
 import * as $array from "../../../core/util/Array";
@@ -1414,5 +1415,29 @@ export class DrawingControl extends StockControl {
 	 */
 	public get drawingSeries(): { [index: string]: DrawingSeries[] } {
 		return this._drawingSeries;
+	}
+
+	/**
+	 * Adds a line drawing.
+	 *
+	 * Supported tools: `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"`.
+	 * 
+	 * @param  tool   Drawing tool
+	 * @param  panel  Panel
+	 * @param  point  Point
+	 * @since 5.10.2
+	 */
+	public addLine(tool: "Horizontal Line" | "Horizontal Ray" | "Vertical Line", panel: StockPanel, point: IPoint): void {
+		this._maybeInitToolSeries(tool);
+		const seriesList = this._drawingSeries[tool];
+		let targetSeries: SimpleLineSeries | undefined;
+		$array.each(seriesList, (series) => {
+			if (panel === series.chart) {
+				targetSeries = series as SimpleLineSeries;
+			}
+		});
+		if (targetSeries) {
+			targetSeries.addLine(point);
+		}
 	}
 }

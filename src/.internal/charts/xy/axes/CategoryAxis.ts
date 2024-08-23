@@ -8,6 +8,7 @@ import * as $math from "../../../core/util/Math";
 import * as $utils from "../../../core/util/Utils";
 import { populateString } from "../../../core/util/PopulateString";
 import type { Tooltip } from "../../../core/render/Tooltip";
+import { ValueAxis } from "./ValueAxis";
 
 export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
 
@@ -184,7 +185,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 					otherAxis = xAxis;
 				}
 
-				if (otherAxis.className == "ValueAxis") {
+				if (otherAxis instanceof ValueAxis) {
 
 					if (key || openKey) {
 						let startDataItem: DataItem<IXYSeriesDataItem> | undefined;

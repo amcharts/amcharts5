@@ -51,9 +51,9 @@ export class VerticalLineSeries extends SimpleLineSeries {
 				const min = yAxis.getPrivate("min", 0);
 				const max = yAxis.getPrivate("max", 1);
 
-				this._setContext(diP1, "valueY", min - (max - min), true);
+				this._setContext(diP1, "valueY", min - (max - min) * 10, true);
 				this._setContext(diP2, "valueY", valueY, true);
-				this._setContext(diP3, "valueY", max + (max - min), true);
+				this._setContext(diP3, "valueY", max + (max - min) * 10, true);
 
 				this._setContext(diP1, "valueX", valueX);
 				this._setContext(diP2, "valueX", valueX);
@@ -79,8 +79,8 @@ export class VerticalLineSeries extends SimpleLineSeries {
 				const min = yAxis.getPrivate("min", 0);
 				const max = yAxis.getPrivate("max", 1);
 
-				this._setContext(diP1, "valueY", min - (max - min), true);
-				this._setContext(diP3, "valueY", max + (max - min), true);
+				this._setContext(diP1, "valueY", min - (max - min) * 10, true);
+				this._setContext(diP3, "valueY", max + (max - min) * 10, true);
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
+
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
 export interface IHorizontalLineSeriesDataItem extends ISimpleLineSeriesDataItem {
@@ -54,9 +55,9 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 				this._setContext(diP2, "valueY", valueY, true);
 				this._setContext(diP3, "valueY", valueY, true);
 
-				this._setContext(diP1, "valueX", min - (max - min));
+				this._setContext(diP1, "valueX", min - (max - min) * 10);
 				this._setContext(diP2, "valueX", valueX);
-				this._setContext(diP3, "valueX", max + (max - min));
+				this._setContext(diP3, "valueX", max + (max - min) * 10);
 
 				this._setXLocation(diP2, diP2.get("valueX", 0));
 
@@ -79,8 +80,8 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 				const min = xAxis.getPrivate("min", 0);
 				const max = xAxis.getPrivate("max", 1);
 
-				this._setContext(diP1, "valueX", min - (max - min), true);
-				this._setContext(diP3, "valueX", max + (max - min), true);
+				this._setContext(diP1, "valueX", min - (max - min) * 10, true);
+				this._setContext(diP3, "valueX", max + (max - min) * 10, true);
 			}
 		}
 	}
@@ -102,4 +103,5 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 		super._addPointsReal(valueX, valueY, index);
 		this._addPoint(valueX, valueY, "p3", index);
 	}
+
 }

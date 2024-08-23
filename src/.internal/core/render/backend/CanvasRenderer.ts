@@ -2263,7 +2263,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 					switch (this.style.textAlign) {
 						case "right":
 						case "end":
-							bounds.left = -maxWidth;
+							bounds.left = rtl ? maxWidth : -maxWidth;
 							bounds.right = 0;
 							break;
 						case "center":
@@ -2272,7 +2272,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							break;
 						default:
 							bounds.left = 0;
-							bounds.right = maxWidth;
+							bounds.right = rtl ? -maxWidth : maxWidth;
 					}
 
 					this.scale = this._originalScale || 1;

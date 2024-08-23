@@ -55,7 +55,7 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				this._setContext(diP2, "valueY", valueY, true);
 
 				this._setContext(diP1, "valueX", valueX);
-				this._setContext(diP2, "valueX", max + (max - min));
+				this._setContext(diP2, "valueX", max + (max - min) *10);
 
 				this._setXLocation(diP1, diP1.get("valueX", 0));
 
@@ -78,7 +78,7 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				const max = xAxis.getPrivate("max", 1);
 
 
-				this._setContext(diP2, "valueX", max + (max - min), true);
+				this._setContext(diP2, "valueX", max + (max - min) * 10, true);
 			}
 		}
 	}

@@ -12,6 +12,7 @@ import { color } from "../../core/util/Color";
 import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
 import * as $object from "../../core/util/Object";
+import * as $type from "../../core/util/Type";
 
 export interface IZoomableContainerSettings extends IContainerSettings {
 
@@ -56,6 +57,14 @@ export interface IZoomableContainerSettings extends IContainerSettings {
 	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	animationEasing?: (t: Time) => Time;
+
+	/**
+	 * How much of a contents can go outside the viewport.
+	 *
+	 * @default 0.4
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
+	 */
+	maxPanOut?: number;
 
 }
 
@@ -130,7 +139,7 @@ export class ZoomableContainer extends Container {
 		}));
 
 		const bg = this.contents.get("background");
-		if(bg){
+		if (bg) {
 			bg.adapters.add("width", (width) => {
 				return Number(width) * 5;
 			})
@@ -142,8 +151,32 @@ export class ZoomableContainer extends Container {
 			})
 			bg.adapters.add("y", (y) => {
 				return Number(y) - bg.height() / 5 * 2;
-			})								
+			})
 		}
+
+		const contents = this.contents;
+
+		contents.adapters.add("x", (x) => {
+			if($type.isNumber(x)){
+				let maxPanOut = this.get("maxPanOut", 0.4);
+				let w = contents.width();
+
+				x = Math.min(w * maxPanOut, x);
+				x = Math.max(this.width() - w * contents.get("scale", 1) * (1 + maxPanOut), x);
+			}
+			return x;
+		})
+
+		contents.adapters.add("y", (y) => {
+			if($type.isNumber(y)){
+				let maxPanOut = this.get("maxPanOut", 0.4);
+				let h = contents.height();
+
+				y = Math.min(h * maxPanOut, y);
+				y = Math.max(this.height() - h * contents.get("scale", 1) * (1 + maxPanOut), y);
+			}
+			return y;
+		})
 	}
 
 	public _prepareChildren() {
@@ -157,8 +190,6 @@ export class ZoomableContainer extends Container {
 
 
 	protected _handleSetWheel() {
-		// const contents = this.contents;
-
 		if (this.get("wheelable")) {
 			if (this._wheelDp) {
 				this._wheelDp.dispose();

@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.2] - 2024-08-23
+
+### Added
+- `panSensitivity` added to `AxisRenderer` (default: `1`).
+- `maxPanOut` added to `ZoomableContainer` (default: `0.4`).
+- Method `addLine(tool, panel, point)` added `DrawingControl`. Allows adding line drawings via API. Supports (`"Line"`, `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"` tools). [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Adding_line_drawings).
+
+### Fixed
+- Fast mouse wheel zooming of stock chart could cause browser to hang in some cases.
+- `minBulletDistance` of a `XYSeries` was ignored when base axis was `CategoryAxis` and other axis was `DateAxis`.
+- RTL labels with text-wrapping enabled were not being positioned properly.
+
+
 ## [5.10.1] - 2024-08-09
 
 ### Added

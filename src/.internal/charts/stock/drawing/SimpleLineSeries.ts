@@ -318,19 +318,23 @@ export class SimpleLineSeries extends DrawingSeries {
 		this.data.push({ stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: index, showExtension: this.get("showExtension", true), corner: "e", drawingId: this._drawingId });
 	}
 
-	protected _addPoints(event: ISpritePointerEvent, index: number) {
+	public addPoints(point: IPoint, index: number) {
 		const chart = this.chart!;
 		this._addTemplates(index);
+		point = chart.plotContainer.toLocal(point);
 
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 
-		const point = chart.plotContainer.toLocal(event.point);
 		const valueYns = xAxis.positionToValue(xAxis.coordinateToPosition(point.x));
 		const valueX = this._getXValue(valueYns);
 		const valueY = this._getYValue(yAxis.positionToValue(yAxis.coordinateToPosition(point.y)), valueYns);
 
 		this._addPointsReal(valueX, valueY, index);
+	}
+
+	protected _addPoints(event: ISpritePointerEvent, index: number) {
+		this.addPoints(event.point, index);
 	}
 
 	protected _addPointsReal(valueX: number, valueY: number, index: number) {
@@ -369,10 +373,10 @@ export class SimpleLineSeries extends DrawingSeries {
 		this.lines.template.set("forceInactive", !value);
 	}
 
-	public enableDrawingSelection(value:boolean){
-		super.enableDrawingSelection(value);		
+	public enableDrawingSelection(value: boolean) {
+		super.enableDrawingSelection(value);
 		this.hitLines.template.set("forceInactive", !value);
-		this.lines.template.set("forceInactive", !value);			
+		this.lines.template.set("forceInactive", !value);
 		this.strokes.template.set("forceInactive", true);
 	}
 
@@ -387,5 +391,20 @@ export class SimpleLineSeries extends DrawingSeries {
 				line.set("stroke", settings.stroke)
 			}
 		}
+	}
+
+	/**
+	 * Adds a line drawing.
+	 *
+	 * Supported tools: `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"`.
+	 * 
+	 * @param  point Point
+	 * @since 5.10.2
+	 */
+	public addLine(point: IPoint): void {
+		this._increaseIndex();
+		this.addPoints(point, this._index);
+		this._updateSegment(this._index);
+		this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 	}
 }

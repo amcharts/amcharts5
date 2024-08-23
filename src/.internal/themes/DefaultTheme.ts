@@ -147,7 +147,8 @@ export class DefaultTheme extends Theme {
 			minZoomLevel: 1,
 			zoomStep: 2,
 			animationEasing: $ease.out($ease.cubic),
-			animationDuration: 600
+			animationDuration: 600,
+			maxPanOut: 0.4
 		});
 
 
