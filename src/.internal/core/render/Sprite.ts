@@ -1242,7 +1242,15 @@ export abstract class Sprite extends Entity {
 				if (showTooltipOn == "click") {
 					this._tooltipDp = new MultiDisposer([
 						events.on("click", () => {
-							this.setTimeout(() => this.showTooltip(), 10);
+							this.setTimeout(() => {
+								const tooltip = this.getTooltip();
+								if (tooltip && !tooltip.isHidden() && tooltip.get("tooltipTarget") === this) {
+									this.hideTooltip();
+								}
+								else {
+									this.showTooltip();
+								}
+							}, 10);
 						}),
 						$utils.addEventListener(document, "click", (_ev: MouseEvent) => {
 							this.hideTooltip();
@@ -1440,7 +1448,7 @@ export abstract class Sprite extends Entity {
 					events.on("blur", () => {
 						// TODO: proper hover, not just tooltip
 						this.hideTooltip();
-					})])
+					})]);
 			}
 			else {
 				if (this._focusDp) {
@@ -1458,6 +1466,9 @@ export abstract class Sprite extends Entity {
 				this._root._unregisterTabindexOrder(this);
 			}
 			this.markDirtyAccessibility();
+			this._disposers.push(events.on("blur", () => {
+				this.setPrivateRaw("touchHovering", false);
+			}));
 		}
 
 		if (this.isPrivateDirty("focusable")) {

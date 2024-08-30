@@ -156,7 +156,17 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			}
 
 			let itemValue = dates[index];
-
+			const nextDate = dates[index + 1];
+			if(nextDate){
+				let nextItemValue = nextDate;
+				// use next item value if it's closer
+				if (Math.abs(nextItemValue - value) < Math.abs(itemValue - value)) {
+					itemValue = nextItemValue;
+					index++;
+				}
+			}
+			
+			/*
 			let d = 0;
 			if (itemValue > value && value > this.getPrivate("min", 0)) {
 				d = itemValue - value;
@@ -164,6 +174,9 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			else {
 				d = value - itemValue;
 			}
+			*/
+
+			let d = value - itemValue;
 
 			return (index - startLocation) / len + d / this.baseDuration() / len;
 		}
@@ -235,13 +248,13 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		const dates = this._getDates();
 		const len = dates.length;
 		let result = $array.getSortedIndex(dates, (x) => $order.compare(x, start.getTime()));
-		
+
 		let startValue = dates[Math.min(result.index, len - 1)];
 
 		result = $array.getSortedIndex(dates, (x) => $order.compare(x, end.getTime()));
 		let endValue = dates[result.index];
 
-		if(result.index >= len){
+		if (result.index >= len) {
 			endValue = dates[len - 1] + this.baseDuration();
 		}
 
@@ -636,7 +649,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 		return result.found;
 	}
-	protected _nextTime(time:number, count:number, _baseInterval:ITimeInterval){
+	protected _nextTime(time: number, count: number, _baseInterval: ITimeInterval) {
 		let index = $math.fitToRange(this.valueToIndex(time) + count, 0, this._dates.length - 1);
 		return this._dates[index];
 	}

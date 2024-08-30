@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.4] - 2024-08-30
+
+### Changed
+- Multiple clicks (or ENTER presses when focused) on an `showTooltipOn: "click"` elements will toggle tooltip, rather than keep it open.
+
+### Fixed
+- Accessibility: A focusable element would display tooltip only once on ENTER press with NVDA reader.
+- `"Horizontal Line"` and `"Horizontal Ray"` lines are now allow for longer overzoom / X-axis scope.
+- Candles on a `GaplessDateAxis` could some time become too wide.
+
+
 ## [5.10.3] - 2024-08-23
 
 ### Fixed
@@ -16,7 +27,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - `panSensitivity` added to `AxisRenderer` (default: `1`).
 - `maxPanOut` added to `ZoomableContainer` (default: `0.4`).
-- Method `addLine(tool, panel, point)` added `DrawingControl`. Allows adding line drawings via API. Supports (`"Line"`, `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"` tools). [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Adding_line_drawings).
+- Method `addLine(tool, panel, point)` added `DrawingControl`. Allows adding line drawings via API. Supports (`"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"` tools). [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Adding_line_drawings).
 
 ### Fixed
 - Fast mouse wheel zooming of stock chart could cause browser to hang in some cases.
