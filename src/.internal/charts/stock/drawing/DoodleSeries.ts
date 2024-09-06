@@ -74,27 +74,29 @@ export class DoodleSeries extends DrawingSeries {
 	}
 
 	protected _handlePointerDown(event: ISpritePointerEvent) {
-		super._handlePointerDown(event);
+		
 		const chart = this.chart;
-		if (chart) {
+		if (chart) {			
+			if (this.unselectAllDrawings() == 0) {
+				super._handlePointerDown(event);
+				this._increaseIndex();
+				this._pIndex = 0;
 
-			this._increaseIndex();
-			this._pIndex = 0;
+				this._panX = chart.get("panX");
+				this._panY = chart.get("panY");
 
-			this._panX = chart.get("panX");
-			this._panY = chart.get("panY");
+				chart.set("panX", false);
+				chart.set("panY", false);
 
-			chart.set("panX", false);
-			chart.set("panY", false);
+				const cursor = chart.get("cursor");
+				if (cursor) {
+					cursor.setPrivate("visible", false);
+				}
 
-			const cursor = chart.get("cursor");
-			if (cursor) {
-				cursor.setPrivate("visible", false);
+				this._down = true;
+
+				this.data.push({ stroke: this._getStrokeTemplate(), sprite: this.mainContainer, index: this._index, corner: this._pIndex, drawingId: this._drawingId });
 			}
-
-			this._down = true;
-
-			this.data.push({ stroke: this._getStrokeTemplate(), sprite: this.mainContainer, index: this._index, corner: this._pIndex, drawingId: this._drawingId });
 		}
 	}
 

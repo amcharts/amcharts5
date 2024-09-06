@@ -406,11 +406,11 @@ export class DrawingSeries extends LineSeries {
 					}
 				}
 			})
-			
-			for(let i = this.dataItems.length - 1; i >= 0; i--){
+
+			for (let i = this.dataItems.length - 1; i >= 0; i--) {
 				const dataItem = this.dataItems[i];
 				const dataContext = dataItem.dataContext as any;
-				if(dataContext.index == index){
+				if (dataContext.index == index) {
 					this.data.removeValue(dataContext);
 					this.disposeDataItem(dataItem);
 				}
@@ -442,7 +442,7 @@ export class DrawingSeries extends LineSeries {
 				this._createElements(index, dataItem);
 				this._di[index][corner] = dataItem;
 				this._index = index;
-			}			
+			}
 		})
 	}
 
@@ -547,6 +547,11 @@ export class DrawingSeries extends LineSeries {
 		if (stockChart) {
 			stockChart._dragStartDrawing(event);
 		}
+
+		if (this._selected.indexOf(index) == -1) {
+			this.unselectAllDrawings();
+		}
+
 		this._handleFillDragStart(event, index);
 	}
 
@@ -849,8 +854,8 @@ export class DrawingSeries extends LineSeries {
 	protected _dispatchStockEvent(type: any, drawingId?: string, index?: number) {
 		const stockChart = this._getStockChart();
 
-		if(type == "drawingadded"){
-			if(stockChart._selectionWasOn){
+		if (type == "drawingadded") {
+			if (stockChart._selectionWasOn) {
 				stockChart.set("drawingSelectionEnabled", true);
 			}
 		}
@@ -1025,9 +1030,9 @@ export class DrawingSeries extends LineSeries {
 
 	public disableErasing() {
 		this._erasingEnabled = false;
-		if(!this._getStockChart().get("drawingSelectionEnabled")){
+		if (!this._getStockChart().get("drawingSelectionEnabled")) {
 			this.setInteractive(false);
-		}		
+		}
 	}
 
 	public disableDrawing() {
@@ -1193,13 +1198,13 @@ export class DrawingSeries extends LineSeries {
 	}
 
 
-	public _selectDrawing(index: number, keepSelection?: boolean, force?:boolean) {
+	public _selectDrawing(index: number, keepSelection?: boolean, force?: boolean) {
 		if (this._getStockChart().get("drawingSelectionEnabled") || force) {
 
 			this._isSelecting = true;
 
 			if (this._selected.indexOf(index) != -1) {
-				if (!keepSelection) {					
+				if (!keepSelection) {
 					this.unselectAllDrawings();
 				}
 				else {
@@ -1335,11 +1340,12 @@ export class DrawingSeries extends LineSeries {
 	 *
 	 * @since 5.9.0
 	 */
-	public unselectAllDrawings() {
+	public unselectAllDrawings(): number {
 		const chart = this._getStockChart();
 		if (chart) {
-			chart.unselectDrawings();
+			return chart.unselectDrawings();
 		}
+		return 0;
 	}
 
 	/**
@@ -1347,10 +1353,13 @@ export class DrawingSeries extends LineSeries {
 	 *
 	 * @since 5.9.0
 	 */
-	public unselectDrawings() {
+	public unselectDrawings(): number {
+		let count = 0;
 		for (let i = this._selected.length - 1; i >= 0; i--) {
 			this._unselectDrawing(this._selected[i]);
+			count++;
 		}
+		return count;
 	}
 
 	/**

@@ -110,6 +110,7 @@ import type { LabelSeries } from "./../charts/stock/drawing/LabelSeries.js";
 import type { Layout } from "./render/Layout.js";
 import type { Legend } from "./render/Legend.js";
 import type { Line } from "./render/Line.js";
+import type { LineArrowSeries } from "./../charts/stock/drawing/LineArrowSeries.js";
 import type { LinePattern } from "./render/patterns/LinePattern.js";
 import type { LineSeries } from "./../charts/xy/series/LineSeries.js";
 import type { LinearGradient } from "./render/gradients/LinearGradient.js";
@@ -338,6 +339,7 @@ export interface IClasses {
 	"Layout": Layout;
 	"Legend": Legend;
 	"Line": Line;
+	"LineArrowSeries": LineArrowSeries;
 	"LinePattern": LinePattern;
 	"LineSeries": LineSeries;
 	"LinearGradient": LinearGradient;

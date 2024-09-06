@@ -42,6 +42,7 @@ export class StockIcons {
 		"Arrows &amp; Icons": { viewbox: "0 0 50 50", path: "M 5 35 L 5 15 L 26 15 M 26 15 L 26 5 L 45 26 L 26 45 L 26 35 L 5 35" },
 		"Label": { viewbox: "0 0 50 50", path: "M 10 45 l 15 -32 l 15 32 m -24 -13 l 18 0", style: "stroke-width: 1.2px" },
 		"Line": { viewbox: "0 0 50 50", path: "M 4 46 L 46 4" },
+		"Line Arrow": { viewbox: "0 0 50 50", path: "M 4 46 L 46 4 M 30 4 L 46 4 L 46 20" },
 		"Polyline": { viewbox: "0 0 50 50", path: "M 2 15 L 16 42 L 36 22 L 48 29" },
 		"Polyfill": { viewbox: "0 0 50 50", path: "M 2 15 L 8 44 L 20 26 L 41 32 L 47 13 L 24 4 L 2 15" },
 		"Quadrant Line": { viewbox: "0 0 50 50", path: "M2 3 h46 M2 15 h46 M2 29 h46 M2 43 h46" },

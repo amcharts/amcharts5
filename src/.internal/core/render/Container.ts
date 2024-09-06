@@ -588,6 +588,30 @@ export class Container extends Sprite {
 		this._root._positionHTMLElement(this);
 	}
 
+	/**
+	 * If scrolling is enabled on the Container (by adding `verticalScrollbar`)
+	 * the Container will scroll in such way so that target element becomes
+	 * visible if its currently outside of view.
+	 * 
+	 * @param  child  Target child
+	 * @since 5.10.5
+	 */
+	public scrollToChild(child: Sprite) {
+		const verticalScrollbar = this.get("verticalScrollbar")!;
+		if (verticalScrollbar) {
+			let y = child.y();
+			let h = this.innerHeight();
+			let ch = child.height();
+			let contentH = this._contentHeight;
+			let max = (h - ch / 2) / contentH;
+
+			if (y + ch * .7 + this._childrenDisplay.y > h || y - ch * .3 + this._childrenDisplay.y < 0) {
+				let pos = Math.max(0, Math.min(max, (y - ch / 2) / contentH));
+				verticalScrollbar.animate({ key: "start", to: pos, duration: verticalScrollbar.get("animationDuration", 0), easing: verticalScrollbar.get("animationEasing") });
+			}
+		}
+	}
+
 	public _updateChildren() {
 
 

@@ -224,12 +224,14 @@ export class SimpleLineSeries extends DrawingSeries {
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (!this._isDragging && !this._isSelecting) {
+
 			if (!this._isDrawing) {
-				this.isDrawing(true);
+				if (this.unselectAllDrawings() == 0) {
+					this.isDrawing(true);
+					this._increaseIndex();
+					this._addPoints(event, this._index);
+				}
 				this._hideResizer(event.target);
-				this.unselectAllDrawings();
-				this._increaseIndex();
-				this._addPoints(event, this._index);
 			}
 			else {
 				this.isDrawing(false);

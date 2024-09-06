@@ -474,6 +474,11 @@ export class StockChartDefaultTheme extends Theme {
 			forceHidden: false
 		})
 
+		r("Triangle", ["drawing", "arrow"]).setAll({
+			width: 20,
+			height: 15
+		})
+
 		{
 			const rule = r("Graphics", ["series", "fill", "drawing"])
 
@@ -848,7 +853,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["averagetruerange"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')})"
-		})		
+		})
 
 		r("ColumnSeries", ["volume"]).setAll({
 			legendValueText: "[{volumeColor}; bold]{valueY.formatNumber('#.000a')}[/]",
@@ -1010,7 +1015,7 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0xff903f),
 			shortName: "ATR",
 			period: 14
-		})		
+		})
 
 		r("Trix").setAll({
 			name: "Trix",
@@ -1380,7 +1385,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("DrawingControl").setAll({
 			name: l.translateAny("Draw"),
 			tool: "Line",
-			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Measure", "Parallel Channel", "Polyline", "Polyfill", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Triangle", "Vertical Line"],
+			tools: ["Arrows &amp; Icons", "Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Label", "Line", "Line Arrow", "Measure", "Parallel Channel", "Polyline", "Polyfill", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Triangle", "Vertical Line"],
 			togglable: true,
 			strokeColor: color(0x882dff),
 			strokeWidth: 2,

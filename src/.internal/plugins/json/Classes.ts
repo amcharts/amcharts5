@@ -110,6 +110,7 @@ import type { LabelSeries } from "./../../../stock";
 import type { Layout } from "./../../../index";
 import type { Legend } from "./../../../index";
 import type { Line } from "./../../../index";
+import type { LineArrowSeries } from "./../../../stock";
 import type { LinePattern } from "./../../../index";
 import type { LineSeries } from "./../../../xy";
 import type { LinearGradient } from "./../../../index";
@@ -338,6 +339,7 @@ export interface IClasses {
 	"Layout": () => Promise<typeof Layout>;
 	"Legend": () => Promise<typeof Legend>;
 	"Line": () => Promise<typeof Line>;
+	"LineArrowSeries": () => Promise<typeof LineArrowSeries>;
 	"LinePattern": () => Promise<typeof LinePattern>;
 	"LineSeries": () => Promise<typeof LineSeries>;
 	"LinearGradient": () => Promise<typeof LinearGradient>;
@@ -567,6 +569,7 @@ const classes: IClasses = {
 	"Layout": () => import(/* webpackExports: "Layout", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Layout),
 	"Legend": () => import(/* webpackExports: "Legend", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Legend),
 	"Line": () => import(/* webpackExports: "Line", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Line),
+	"LineArrowSeries": () => import(/* webpackExports: "LineArrowSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.LineArrowSeries),
 	"LinePattern": () => import(/* webpackExports: "LinePattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.LinePattern),
 	"LineSeries": () => import(/* webpackExports: "LineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.LineSeries),
 	"LinearGradient": () => import(/* webpackExports: "LinearGradient", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.LinearGradient),

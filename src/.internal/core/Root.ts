@@ -760,6 +760,11 @@ export class Root implements IDisposer {
 									clientY: 0
 								}));
 
+								downEvent.point = {
+									x: 0,
+									y: 0
+								};
+
 								if (focusedSprite.events.isEnabled("pointerdown")) {
 									focusedSprite.events.dispatch("pointerdown", {
 										type: "pointerdown",

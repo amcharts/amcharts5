@@ -45,6 +45,7 @@ export { PolylineSeries, IPolylineSeriesPrivate, IPolylineSeriesSettings, IPolyl
 export { RectangleSeries, IRectangleSeriesDataItem, IRectangleSeriesPrivate, IRectangleSeriesSettings } from "./.internal/charts/stock/drawing/RectangleSeries";
 export { ParallelChannelSeries, IParallelChannelSeriesDataItem, IParallelChannelSeriesPrivate, IParallelChannelSeriesSettings } from "./.internal/charts/stock/drawing/ParallelChannelSeries";
 export { SimpleLineSeries, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem, ISimpleLineSeriesSettings } from "./.internal/charts/stock/drawing/SimpleLineSeries";
+export { LineArrowSeries, ILineArrowSeriesPrivate, ILineArrowSeriesDataItem, ILineArrowSeriesSettings } from "./.internal/charts/stock/drawing/LineArrowSeries";
 export { HorizontalLineSeries, IHorizontalLineSeriesPrivate, IHorizontalLineSeriesSettings, IHorizontalLineSeriesDataItem } from "./.internal/charts/stock/drawing/HorizontalLineSeries";
 export { VerticalLineSeries, IVerticalLineSeriesPrivate, IVerticalLineSeriesSettings } from "./.internal/charts/stock/drawing/VerticalLineSeries";
 export { AverageSeries, IAverageSeriesPrivate, IAverageSeriesSettings, IAverageSeriesDataItem } from "./.internal/charts/stock/drawing/AverageSeries";

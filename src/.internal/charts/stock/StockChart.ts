@@ -1018,8 +1018,8 @@ export class StockChart extends Container {
 			}
 		})
 
-		if(this._xAxes[0]){
-			this._root.events.once("frameended", ()=>{
+		if (this._xAxes[0]) {
+			this._root.events.once("frameended", () => {
 				this._syncXAxes(this._xAxes[0])
 			})
 		}
@@ -1182,16 +1182,19 @@ export class StockChart extends Container {
 	 *
 	 * @since 5.9.0
 	 */
-	public unselectDrawings() {
+	public unselectDrawings(): number {
+		let count = 0;
 		this.panels.each((panel) => {
 			panel.series.each((series) => {
 				if (series.isType<DrawingSeries>("DrawingSeries")) {
-					series.unselectDrawings();
+					count += series.unselectDrawings();
 				}
 			})
 		})
 
 		this.spriteResizer.set("sprite", undefined);
+
+		return count;
 	}
 
 	/**

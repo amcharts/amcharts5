@@ -38,12 +38,13 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 		if (!this._isDragging) {
 			if (!this._isDrawing) {
 				if (!this._firstClick) {
-					this.isDrawing(true);
-					this._hideResizer(event.target);
-					this._increaseIndex();
-					this._addPoints(event, this._index);
-					this._firstClick = true;
-					this.unselectDrawings();
+					if(this.unselectDrawings() == 0){
+						this.isDrawing(true);
+						this._hideResizer(event.target);
+						this._increaseIndex();
+						this._addPoints(event, this._index);
+						this._firstClick = true;
+					}					
 				}
 			}
 			else {

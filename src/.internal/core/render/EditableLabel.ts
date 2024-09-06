@@ -251,7 +251,8 @@ export class EditableLabel extends Label {
 				textarea.style.maxWidth = maxWidth + "px";
 			}
 			else {
-				textarea.style.minWidth = textarea.scrollWidth + "px";
+				// The actual minWidth will be set on frameend
+				textarea.style.minWidth = "";
 			}
 
 			textarea.style.height = "auto";
@@ -322,6 +323,11 @@ export class EditableLabel extends Label {
 
 			// Adjust textarea postion based on textAlign setting
 			this._root.events.on("frameended", () => {
+
+				if (textarea.style.minWidth == "") {
+					textarea.style.minWidth = (textarea.scrollWidth + 20) + "px";
+				}
+
 				const textAlign = this.get("textAlign", "start");
 				if (textAlign == "center") {
 					textarea.style.textAlign = "center";

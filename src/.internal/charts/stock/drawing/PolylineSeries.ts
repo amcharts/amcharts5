@@ -84,34 +84,35 @@ export class PolylineSeries extends DrawingSeries {
 				if (!this._isDragging) {
 					this.isDrawing(true);
 					this._hideResizer(event.target);
-					this.unselectAllDrawings();
-					// for consistency with other series
-					if (this._index == 0) {
-						this._index = 1;
-					}
-
-					if (this._pIndex == 0) {
-						this._increaseIndex();
-						const context = { stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: this._index, corner: "e", drawingId: this._drawingId };
-						this._setContextSprite(context);
-						this.data.push(context);
-					}
-					this._drawingLine.show();
-					this._addPoint(event);
-
-					// add one more if fill
-					if (this.get("fillShape")) {
-						if (this._pIndex == 1) {
-							this._addPoint(event, true);
+					if (this.unselectAllDrawings() == 0) {
+						// for consistency with other series
+						if (this._index == 0) {
+							this._index = 1;
 						}
-						else if (this._pIndex > 1) {
-							this.data.moveValue(this.data.getIndex(this.data.length - 1), this.data.length - 2);
-						}
-					}
 
-					if (this._pIndex - 1 == this.get("pointCount", 1000)) {
-						this._endPolyline();
-						return;
+						if (this._pIndex == 0) {
+							this._increaseIndex();
+							const context = { stroke: this._getStrokeTemplate(), fill: this._getFillTemplate(), index: this._index, corner: "e", drawingId: this._drawingId };
+							this._setContextSprite(context);
+							this.data.push(context);
+						}
+						this._drawingLine.show();
+						this._addPoint(event);
+
+						// add one more if fill
+						if (this.get("fillShape")) {
+							if (this._pIndex == 1) {
+								this._addPoint(event, true);
+							}
+							else if (this._pIndex > 1) {
+								this.data.moveValue(this.data.getIndex(this.data.length - 1), this.data.length - 2);
+							}
+						}
+
+						if (this._pIndex - 1 == this.get("pointCount", 1000)) {
+							this._endPolyline();
+							return;
+						}
 					}
 				}
 
@@ -186,7 +187,7 @@ export class PolylineSeries extends DrawingSeries {
 			}
 
 			this._drawingLine.hide();
-			
+
 			this.isDrawing(false);
 			this._dispatchAdded();
 		}
@@ -273,5 +274,5 @@ export class PolylineSeries extends DrawingSeries {
 	public cancelDrawing() {
 		super.cancelDrawing();
 		this._drawingLine.hide(0);
-	}	
+	}
 }

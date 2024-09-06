@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.5] - 2024-09-06
+
+### Added
+- `scrollToChild()` method added to `Container`. Scrolls the container to the target child element if the container is scrollable and the element is currently outside of view.
+- New `StockChart` drawing tool added: "Line Arrow".
+
+### Changed
+- When a selected drawing in a `StockChart` is inselected by clicking on a chart's plot area the new drawing will not be added anymore.
+
+### Fixed
+- Keyboard-dragging of focusable elements was not working correctly in some cases.
+- Sometimes label/callout drawing text was cut temporarily while editing them on `StockChart`.
+- Editable labels/callouts would go into edit mode when unserialized.
+- If auto-saving of drawings was enabled, editing text would not always save the latest version of the label/callout text.
+- Dragging a `StockChart` drawing while other drawing was selected, would drag the selected drawing as well.
+
+
 ## [5.10.4] - 2024-08-30
 
 ### Changed

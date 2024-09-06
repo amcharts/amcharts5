@@ -89,12 +89,14 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {
 			if (!this._isDragging) {
-				this._increaseIndex();
-				this._addPoints(event, this._index);
-				this.isDrawing(false);
-				this.unselectAllDrawings();
-				this._updateSegment(this._index);
-				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
+				if(this.unselectAllDrawings() == 0){
+					this._increaseIndex();
+					this._addPoints(event, this._index);
+					this.isDrawing(false);
+					
+					this._updateSegment(this._index);
+					this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
+				}
 			}
 		}
 	}

@@ -244,12 +244,13 @@ export class EllipseSeries extends DrawingSeries {
 
 			if (!this._isDragging) {
 				if (!this._isDrawing) {
-					this._increaseIndex();
-					this.isDrawing(true);
-					this._hideResizer(event.target);
-					this.bulletsContainer.show();
-					this._addPoints(event, this._index);
-					this.unselectDrawings();
+					if (this.unselectAllDrawings() == 0) {
+						this._increaseIndex();
+						this.isDrawing(true);
+						this._hideResizer(event.target);
+						this.bulletsContainer.show();
+						this._addPoints(event, this._index);
+					}
 				}
 				else {
 					this.isDrawing(false);
@@ -423,8 +424,8 @@ export class EllipseSeries extends DrawingSeries {
 		this.ellipses.template.set("forceInactive", !value);
 	}
 
-	public enableDrawingSelection(value:boolean){
+	public enableDrawingSelection(value: boolean) {
 		super.enableDrawingSelection(value);
 		this.ellipses.template.set("forceInactive", !value);
-	}	
+	}
 }

@@ -61,8 +61,6 @@ export class LabelSeries extends PolylineSeries {
 
 	public spriteResizer!: SpriteResizer;
 
-	protected _clickEvent?: ISpritePointerEvent;
-
 	protected _tag = "label";
 
 	protected _isEditing: boolean = false;
@@ -95,13 +93,12 @@ export class LabelSeries extends PolylineSeries {
 			const label = container.children.push(EditableLabel.new(this._root, {
 				themeTags: ["label"],
 				text: text,
-				editOn: "none",
-				active: true
+				editOn: "none"
 			}, template));
 
-			label.on("text", (text)=>{
+			label.on("text", (text) => {
 				dataContext.text = text;
-			})
+			});
 
 			this.setPrivate("label", label);
 
@@ -117,11 +114,17 @@ export class LabelSeries extends PolylineSeries {
 								this._disposeIndex(dataContext.index);
 							}
 						}
-					}, 100)
+					}, 100);
+
+					// Trigger a drawing updated event so that updated text is saved if
+					// necessary
+					const stockChart = this._getStockChart();
+					const type = "drawingsupdated";
+					if (stockChart.events.isEnabled(type)) {
+						stockChart.events.dispatch(type, { type: type, target: stockChart });
+					}
 				}
 			});
-
-			this._isEditing = true;
 
 			container.events.on("click", (e) => {
 				const spriteResizer = this.spriteResizer;
@@ -185,12 +188,18 @@ export class LabelSeries extends PolylineSeries {
 				this._di[this._index] = {};
 
 				this._addPoint(event);
+
 				const dataContext = this.data.getIndex(this.data.length - 1) as any;
 				dataContext.text = "";
 				dataContext.index = this._index;
 				dataContext.corner = 0;
 				dataContext.settings = this._getLabelTemplate();
 				this._afterTextSave(dataContext);
+
+				this._root.events.once("frameended", () => {
+					dataContext.label.set("active", true);
+					this._isEditing = true;
+				});
 
 				this.spriteResizer.set("sprite", undefined);
 
