@@ -151,6 +151,7 @@ export class IconSeries extends PolylineSeries {
 	}
 
 	protected _applySettings(index: number, settings?: { [index: string]: any }) {
+		super._applySettings(index, settings);
 		let template: Template<any>;
 		let sprite!: Graphics;
 
@@ -191,10 +192,6 @@ export class IconSeries extends PolylineSeries {
 				}
 			}
 		}
-	}
-
-	protected _hideAllBullets() {
-
 	}
 
 	protected _dispatchAdded(): void {
@@ -304,6 +301,21 @@ export class IconSeries extends PolylineSeries {
 			}
 		}
 	}
+
+	public toggleDrawing(enabled: boolean) {
+		$array.each(this.dataItems, (dataItem) => {
+			const bullets = dataItem.bullets;
+			if (bullets) {
+				$array.each(bullets, (bullet) => {
+					const sprite = bullet.get("sprite");
+					if (sprite) {
+						sprite.set("forceInactive", !enabled);
+					}
+				})
+			}
+		})
+	}
+
 
 	protected _handleBulletDragStart(event: ISpritePointerEvent) {
 		// don't call super

@@ -107,12 +107,12 @@ export class AxisRendererCircular extends AxisRenderer {
 	 *
 	 * @default new ListTemplate<AxisLabelRadial>
 	 */
-	public readonly labels: ListTemplate<AxisLabelRadial> = new ListTemplate(
+	public readonly labels: ListTemplate<AxisLabelRadial> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => AxisLabelRadial._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
 		}, [this.labels.template])
-	);
+	));
 
 
 	/**
@@ -122,12 +122,12 @@ export class AxisRendererCircular extends AxisRenderer {
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
-	public readonly axisFills: ListTemplate<Slice> = new ListTemplate(
+	public readonly axisFills: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Slice._new(this._root, {
 			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["fill"]), this.get("themeTags", []))
 		}, [this.axisFills.template])
-	);
+	));
 
 
 	public static className: string = "AxisRendererCircular";
@@ -160,7 +160,7 @@ export class AxisRendererCircular extends AxisRenderer {
 		super.processAxis();
 		const axis = this.axis;
 		axis.labelsContainer.set("isMeasured", false);
-	}	
+	}
 
 	/**
 	 * @ignore

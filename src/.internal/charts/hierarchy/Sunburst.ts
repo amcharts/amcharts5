@@ -135,24 +135,24 @@ export class Sunburst extends Partition {
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
-	public readonly slices: ListTemplate<Slice> = new ListTemplate(
+	public readonly slices: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Slice._new(this._root, {
 			themeTags: $utils.mergeTags(this.slices.template.get("themeTags", []), [this._tag, "hierarchy", "node", "shape"])
 		}, [this.slices.template])
-	);
+	));
 
 	/**
 	 * A list of label elements in a [[Hierarchy]] chart.
 	 *
 	 * @default new ListTemplate<RadialLabel>
 	 */
-	public readonly labels: ListTemplate<RadialLabel> = new ListTemplate(
+	public readonly labels: ListTemplate<RadialLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RadialLabel._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag])
 		}, [this.labels.template])
-	);
+	));
 
 	protected _afterNew() {
 		super._afterNew();
@@ -352,12 +352,12 @@ export class Sunburst extends Partition {
 				radius = 1;
 				labelAngle = 0;
 				maxWidth *= 2;
-				maxHeight = maxWidth;				
+				maxHeight = maxWidth;
 			}
 
 			if (Math.round(arc) >= 360 && textType == "radial") {
 				labelAngle = 0;
-			}			
+			}
 
 			if (textType == "circular") {
 				maxWidth = arc * $math.RADIANS * (innerRadius + (radius - innerRadius) / 2) - 10;

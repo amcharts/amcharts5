@@ -39,10 +39,10 @@ export class ArcDiagramNodes extends FlowNodes {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, {}, [this.labels.template])
-	);
+	));
 
 	declare public _settings: IArcDiagramNodesSettings;
 	declare public _privateSettings: IArcDiagramNodesPrivate;
@@ -61,10 +61,10 @@ export class ArcDiagramNodes extends FlowNodes {
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
-	public readonly circles: ListTemplate<Circle> = new ListTemplate(
+	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, { themeTags: ["shape"] }, [this.circles.template])
-	);
+	));
 
 	/**
 	 * @ignore

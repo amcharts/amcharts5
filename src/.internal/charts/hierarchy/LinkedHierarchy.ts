@@ -126,50 +126,50 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	 *
 	 * @default new ListTemplate<LinkedHierarchyNode>
 	 */
-	public readonly nodes: ListTemplate<LinkedHierarchyNode> = new ListTemplate(
+	public readonly nodes: ListTemplate<LinkedHierarchyNode> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => LinkedHierarchyNode._new(this._root, {
 			themeTags: $utils.mergeTags(this.nodes.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "node"]),
 			x: this.width() / 2,
 			y: this.height() / 2
 		}, [this.nodes.template])
-	);
+	));
 
 	/**
 	 * A list of node circle elements in a [[LinkedHierarchy]] chart.
 	 *
 	 * @default new ListTemplate<Circle>
 	 */
-	public readonly circles: ListTemplate<Circle> = new ListTemplate(
+	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
 			themeTags: $utils.mergeTags(this.circles.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.circles.template])
-	);
+	));
 
 	/**
 	 * A list of node outer circle elements in a [[LinkedHierarchy]] chart.
 	 *
 	 * @default new ListTemplate<Circle>
 	 */
-	public readonly outerCircles: ListTemplate<Circle> = new ListTemplate(
+	public readonly outerCircles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
 			themeTags: $utils.mergeTags(this.outerCircles.template.get("themeTags", []), [this._tag, "outer", "shape"])
 		}, [this.outerCircles.template])
-	);
+	));
 
 	/**
 	 * A list of link elements in a [[LinkedHierarchy]] chart.
 	 *
 	 * @default new ListTemplate<HierarchyLink>
 	 */
-	public readonly links: ListTemplate<HierarchyLink> = new ListTemplate(
+	public readonly links: ListTemplate<HierarchyLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => HierarchyLink._new(this._root, {
 			themeTags: $utils.mergeTags(this.links.template.get("themeTags", []), [this._tag, "linkedhierarchy", "hierarchy", "link"])
 		}, [this.links.template])
-	);
+	));
 
 	/**
 	 * A [[Container]] that link elements are placed in.
@@ -205,7 +205,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 		const d = circle.get("radius", this.width()) * 2;
 		label.setAll({ maxWidth: d, maxHeight: d });
-		
+
 		circle._setDataItem(dataItem);
 		outerCircle._setDataItem(dataItem);
 
@@ -273,7 +273,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const easing = this.get("animationEasing");
 
 		node.animate({ key: "x", to: point.x, duration: duration, easing: easing });
-		node.animate({ key: "y", to: point.y, duration: duration, easing: easing });		
+		node.animate({ key: "y", to: point.y, duration: duration, easing: easing });
 	}
 
 	protected _updateNode(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -294,7 +294,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		const fillPattern = dataItem.get("fillPattern");
 		const circle = dataItem.get("circle");
 		const children = dataItem.get("children");
-		
+
 		if (circle) {
 			circle._setDefault("fill", fill);
 			circle._setDefault("fillPattern", fillPattern);

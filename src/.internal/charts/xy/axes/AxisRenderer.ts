@@ -24,7 +24,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 
 	/**
 	 * Re-enable display of skipped grid lines due to lack of space and as per
-	 * the `minGridDistance` setting. Not recommended for CategoryAxis with a lot of data items. 
+	 * the `minGridDistance` setting. Not recommended for CategoryAxis with a lot of data items.
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Minor_grid} for more info
@@ -154,12 +154,12 @@ export abstract class AxisRenderer extends Graphics {
 	 *
 	 * @default new ListTemplate<AxisTick>
 	 */
-	public readonly ticks: ListTemplate<AxisTick> = new ListTemplate(
+	public readonly ticks: ListTemplate<AxisTick> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => AxisTick._new(this._root, {
 			themeTags: $utils.mergeTags(this.ticks.template.get("themeTags", []), this.get("themeTags", []))
 		}, [this.ticks.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -182,12 +182,12 @@ export abstract class AxisRenderer extends Graphics {
 	 *
 	 * @default new ListTemplate<Grid>
 	 */
-	public readonly grid: ListTemplate<Grid> = new ListTemplate(
+	public readonly grid: ListTemplate<Grid> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Grid._new(this._root, {
 			themeTags: $utils.mergeTags(this.grid.template.get("themeTags", []), this.get("themeTags", []))
 		}, [this.grid.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -210,12 +210,12 @@ export abstract class AxisRenderer extends Graphics {
 	 *
 	 * @default new ListTemplate<Graphics>
 	 */
-	public readonly axisFills: ListTemplate<Graphics> = new ListTemplate(
+	public readonly axisFills: ListTemplate<Graphics> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Graphics._new(this._root, {
 			themeTags: $utils.mergeTags(this.axisFills.template.get("themeTags", ["axis", "fill"]), this.get("themeTags", []))
 		}, [this.axisFills.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -240,12 +240,12 @@ export abstract class AxisRenderer extends Graphics {
 	 *
 	 * @default new ListTemplate<AxisLabel>
 	 */
-	public readonly labels: ListTemplate<AxisLabel> = new ListTemplate(
+	public readonly labels: ListTemplate<AxisLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => AxisLabel._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
 		}, [this.labels.template])
-	);
+	));
 
 
 	declare public _settings: IAxisRendererSettings;

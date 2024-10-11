@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.6] - 2024-10-11
+
+### Added
+- `hideDrawingGrips` setting (default: `false`) added to `StockChart`. If set to true, grips of drawings will be hidden when not in drawing mode.
+- `toggleDrawing(enabled: boolean)` method added to `StockChart`. Toggles drawing mode on or off.
+- `autoOpenSettings` setting (default: `true`) added to `Indicator`. If set to `false`, a settings modal will not pop up automatically when the indicator is added to chart via indicator control.
+
+### Changed
+- On `StockChart` labels and icons are no longer draggable to avoid interfering with chart drag/zoom.
+- Arrow position slightly changed in "Line Arrow" drawing tool on `StockChart`. Grip at the end of the arrow removed.
+- Arrow tip size will not increased to reflect the line thickness of a "Line Arrow".
+- "Volume Profile" indicator had its full name hardcoded for legend. It will now use its `shortName` (which is "Volume Profile", too, by default but can be changed to anything else).
+- `Modal` content will now have its contents aligned to `start`, rather than `left`, to properly handle RTL direction.
+
+### Fixed
+- "Line Arrow" drawing tool would not save its color when serialized.
+- "Line Arrow" tip was not taking a color change.
+- ES2025 examples involving `MapChart` were not correctly importing geodata.
+- Using `clearDrawings()` was erroring if there was "Line Arrow" drawings added to `StockChart`.
+- Rotated elements with HTML content were not being properly positioned in all cases.
+- `scrollToChild` method of `Container` was not working properly.
+
+
 ## [5.10.5] - 2024-09-06
 
 ### Added

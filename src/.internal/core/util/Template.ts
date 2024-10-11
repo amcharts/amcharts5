@@ -4,6 +4,18 @@ import { EventDispatcher, Events } from "./EventDispatcher";
 import { IDisposer, Disposer, MultiDisposer } from "./Disposer";
 import * as $array from "./Array";
 import * as $object from "./Object";
+import * as $type from "./Type";
+
+
+function disposeSettings(settings: object) {
+	$object.each(settings, (_key, value) => {
+		if ($type.isObject(value) && typeof (value as any).dispose === "function") {
+			(value as any).enableDispose = true;
+			(value as any).dispose();
+		}
+	});
+}
+
 
 export class TemplateState<E extends Entity> {
 	public _settings: Partial<E["_settings"]>;
@@ -15,6 +27,10 @@ export class TemplateState<E extends Entity> {
 		this._name = name;
 		this._template = template;
 		this._settings = settings;
+	}
+
+	public _dispose() {
+		disposeSettings(this._settings);
 	}
 
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
@@ -67,6 +83,12 @@ export class TemplateStates<E extends Entity> {
 
 	constructor(template: Template<E>) {
 		this._template = template;
+	}
+
+	public _dispose() {
+		$object.each(this._states, (_key, state) => {
+			state._dispose();
+		});
 	}
 
 	public lookup(name: string): TemplateState<E> | undefined {
@@ -159,7 +181,9 @@ export interface ApplyState<E extends Entity> {
 
 
 // TODO maybe extend from Properties ?
-export class Template<E extends Entity> {
+export class Template<E extends Entity> implements IDisposer {
+	private _disposed: boolean = false;
+
 	public _settings: Partial<E["_settings"]>;
 	public _privateSettings: E["_privateSettings"] = {};
 
@@ -189,6 +213,36 @@ export class Template<E extends Entity> {
 		return new Template<E>(settings, true);
 	}
 
+	protected _dispose() {
+		disposeSettings(this._settings);
+		disposeSettings(this._privateSettings);
+	}
+
+	/**
+	 * Returns `true` if this element is disposed.
+	 *
+	 * @return Disposed
+	 */
+	public isDisposed(): boolean {
+		return this._disposed;
+	}
+
+	/**
+	 * Disposes this object.
+	 */
+	public dispose() {
+		if (!this._disposed) {
+			this._disposed = true;
+			this._dispose();
+		}
+	}
+
+	private _checkDisposed() {
+		if (this._disposed) {
+			throw new Error("Template is disposed");
+		}
+	}
+
 	/**
 	 * Array of all entities using this template.
 	 */
@@ -207,6 +261,8 @@ export class Template<E extends Entity> {
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
+		this._checkDisposed();
+
 		const value = this._settings[key];
 
 		if (value !== undefined) {
@@ -218,10 +274,13 @@ export class Template<E extends Entity> {
 	}
 
 	public setRaw<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
+		this._checkDisposed();
 		this._settings[key] = value;
 	}
 
 	public set<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
+		this._checkDisposed();
+
 		if (this._settings[key] !== value) {
 			this.setRaw(key, value);
 
@@ -232,6 +291,8 @@ export class Template<E extends Entity> {
 	}
 
 	public remove<Key extends keyof this["_settings"]>(key: Key): void {
+		this._checkDisposed();
+
 		if (key in this._settings) {
 			delete this._settings[key];
 
@@ -242,6 +303,8 @@ export class Template<E extends Entity> {
 	}
 
 	public removeAll(): void {
+		this._checkDisposed();
+
 		$object.each(this._settings, (key, _value) => {
 			this.remove(key);
 		});
@@ -250,6 +313,8 @@ export class Template<E extends Entity> {
 	public getPrivate<Key extends keyof this["_privateSettings"], F>(key: Key, fallback: F): NonNullable<this["_privateSettings"][Key]> | F;
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key): this["_privateSettings"][Key];
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key, fallback?: any): any {
+		this._checkDisposed();
+
 		const value = this._privateSettings[key];
 
 		if (value !== undefined) {
@@ -261,11 +326,14 @@ export class Template<E extends Entity> {
 	}
 
 	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
+		this._checkDisposed();
 		this._privateSettings[key] = value;
 		return value;
 	}
 
 	public setPrivate<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
+		this._checkDisposed();
+
 		if (this._privateSettings[key] !== value) {
 			this.setPrivateRaw(key, value);
 
@@ -278,6 +346,8 @@ export class Template<E extends Entity> {
 	}
 
 	public removePrivate<Key extends keyof this["_privateSettings"]>(key: Key): void {
+		this._checkDisposed();
+
 		if (key in this._privateSettings) {
 			delete this._privateSettings[key];
 
@@ -288,6 +358,8 @@ export class Template<E extends Entity> {
 	}
 
 	public setAll(value: this["_settings"]) {
+		this._checkDisposed();
+
 		$object.each(value, (key, value) => {
 			this.set(key, value);
 		});
@@ -295,6 +367,8 @@ export class Template<E extends Entity> {
 
 	// TODO code duplication with Properties
 	public on<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: E, key?: Key) => void): IDisposer {
+		this._checkDisposed();
+
 		let events = this._settingEvents[key];
 
 		if (events === undefined) {
@@ -314,6 +388,8 @@ export class Template<E extends Entity> {
 
 	// TODO code duplication with Properties
 	public onPrivate<Key extends keyof this["_privateSettings"]>(key: Key, callback: (value: this["_privateSettings"][Key], target?: E, key?: Key) => void): IDisposer {
+		this._checkDisposed();
+
 		let events = this._privateSettingEvents[key];
 
 		if (events === undefined) {
@@ -332,6 +408,8 @@ export class Template<E extends Entity> {
 	}
 
 	public _apply(entity: E, state: ApplyState<E>): IDisposer {
+		this._checkDisposed();
+
 		const disposers: Array<IDisposer> = [];
 
 		$object.each(this._settingEvents, (key, events) => {
@@ -355,14 +433,18 @@ export class Template<E extends Entity> {
 	}
 
 	public _setObjectTemplate(entity: E) {
+		this._checkDisposed();
 		this._entities.push(entity);
 	}
 
 	public _removeObjectTemplate(entity: E) {
+		this._checkDisposed();
 		$array.remove(this._entities, entity);
 	}
 
 	public _stateChanged(name: string): void {
+		this._checkDisposed();
+
 		this._entities.forEach((entity) => {
 			entity._applyStateByKey(name);
 		});

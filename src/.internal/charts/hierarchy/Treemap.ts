@@ -123,12 +123,12 @@ export class Treemap extends Hierarchy {
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */
-	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
+	public readonly rectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.rectangles.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.rectangles.template])
-	);
+	));
 
 	protected _afterNew() {
 		super._afterNew();
@@ -165,10 +165,10 @@ export class Treemap extends Hierarchy {
 				this._treemapLayout = d3hierarchy.treemap().tile(algorithm);
 				this._updateVisuals();
 
-				const selectedDataItem = this.get("selectedDataItem") as DataItem<this["_dataItemSettings"]>;				
+				const selectedDataItem = this.get("selectedDataItem") as DataItem<this["_dataItemSettings"]>;
 				if(selectedDataItem){
 					this._zoom(selectedDataItem);
-				}				
+				}
 			}
 		}
 
@@ -182,7 +182,7 @@ export class Treemap extends Hierarchy {
 			if (this._rootNode) {
 				this._updateNodesScale(this._rootNode);
 			}
-		}		
+		}
 	}
 
 	protected _updateVisuals() {
@@ -333,8 +333,8 @@ export class Treemap extends Hierarchy {
 
 			if (!this.inited) {
 				duration = 0;
-			}			
-			
+			}
+
 			this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
 			this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
 

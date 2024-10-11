@@ -776,7 +776,9 @@ export class DrawingControl extends StockControl {
 		}
 
 		if (this.isDirty("active")) {
-			if (this.get("active")) {
+			this.get("stockChart").toggleDrawing(this.get("active"))
+			
+			if (this.get("active")) {				
 				if (isInited) {
 					this.getPrivate("toolsContainer")!.style.display = "block";
 				}
@@ -790,7 +792,7 @@ export class DrawingControl extends StockControl {
 					this.getPrivate("toolsContainer")!.style.display = "none";
 				}
 				this._setTool();
-			}
+			}			
 		}
 
 
@@ -851,7 +853,7 @@ export class DrawingControl extends StockControl {
 			if (isInited) {
 				this.getPrivate("eraserControl")!.set("active", false);
 			}
-			this.get("stockChart").set("drawingSelectionEnabled", false)
+			this.get("stockChart").set("drawingSelectionEnabled", false)			
 			return;
 		}
 

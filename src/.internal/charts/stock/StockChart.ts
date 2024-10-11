@@ -60,7 +60,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	/**
 	 * Settings to be applied to the the main value series, when chart is
 	 * switched to "percent scale".
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/#Configuring} for more info
 	 */
 	percentScaleSeriesSettings?: Partial<IXYSeriesSettings>;
@@ -68,7 +68,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	/**
 	 * Settings to be applied to the [[ValueAxis]] of the main value series,
 	 * when chart is switched to "percent scale".
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/#Configuring} for more info
 	 */
 	percentScaleValueAxisSettings?: Partial<IValueAxisSettings<AxisRenderer>>;
@@ -121,7 +121,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * If set to `true`, all drawings will be selectable.
 	 *
 	 * Selectable drawings can be moved, rotated, or deleted.
-	 * 
+	 *
 	 * @default false
 	 * @since 5.9.1
 	 */
@@ -134,6 +134,15 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * @since 5.9.2
 	 */
 	erasingEnabled?: boolean;
+
+	/**
+	 * If set to `true` drawing grips will be hidden when [[StockChart]] is not
+	 * in drawing mode.
+	 *
+	 * @default false
+	 * @since 5.10.6
+	 */
+	hideDrawingGrips?: boolean;
 
 }
 
@@ -247,14 +256,14 @@ export class StockChart extends Container {
 	/**
 	 * A [[Container]], resiting on top of the charts, suitable for additional
 	 * tools, like [[Scrollbar]].
-	 * 
+	 *
 	 * @default Container.new()
 	 */
 	public readonly toolsContainer: Container = this.children.push(Container.new(this._root, { width: p100, themeTags: [] }));
 
 	/**
 	 * A [[Container]] where all the stock panels are placed into.
-	 * 
+	 *
 	 * @default Container.new()
 	 */
 	public readonly panelsContainer: Container = this.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.verticalLayout, themeTags: ["chartscontainer"] }));
@@ -268,7 +277,7 @@ export class StockChart extends Container {
 
 	/**
 	 * An instance of [[SpriteResizer]] used for various drawing tools.
-	 * 
+	 *
 	 * @since 5.7.0
 	 */
 	public spriteResizer = this.children.push(SpriteResizer.new(this._root, {}));
@@ -355,8 +364,8 @@ export class StockChart extends Container {
 		}
 	}
 
-	public dispose() {
-		super.dispose();
+	protected _dispose() {
+		super._dispose();
 		const settingsModal = this.getPrivate("settingsModal");
 		if (settingsModal) {
 			settingsModal.dispose();
@@ -379,6 +388,22 @@ export class StockChart extends Container {
 		this.markDirty();
 	}
 
+
+	/**
+	 * Toggles drawing mode on or off.
+	 *
+	 * @param  enabled  Drawing enabled
+	 * @since 5.10.6
+	 */
+	public toggleDrawing(enabled?: boolean) {
+		this.panels.each((panel) => {
+			panel.series.each((series) => {
+				if (series.isType<DrawingSeries>("DrawingSeries")) {
+					series.toggleDrawing(enabled);
+				}
+			})
+		})
+	}
 
 	public _prepareChildren() {
 
@@ -626,7 +651,7 @@ export class StockChart extends Container {
 	 *
 	 * In percent scale mode `percentScaleSeriesSettings` and `percentScaleValueAxisSettings` will
 	 * be applied to the regular series on the main panel and its Y axis.
-	 * 
+	 *
 	 * @param  percentScale  Comparison mode active
 	 */
 	public setPercentScale(percentScale?: boolean): void {
@@ -741,7 +766,7 @@ export class StockChart extends Container {
 
 	/**
 	 * Removes compared series.
-	 * 
+	 *
 	 * @param  series  Compared series
 	 */
 	public removeComparingSeries(series: XYSeries) {
@@ -1070,7 +1095,7 @@ export class StockChart extends Container {
 	 *
 	 * * `positiveColor` - close is greater or euqal than close of the previous period.
 	 * * `negativeColor` - close is lower than close of the previous period.
-	 * 
+	 *
 	 * @param   dataItem       Target data item
 	 * @param   negativeColor  "Negative color" (red)
 	 * @param   positiveColor  "Positive color" (green)
@@ -1161,7 +1186,7 @@ export class StockChart extends Container {
 
 	/**
 	 * Enables or disables interactivity of annotations (drawings).
-	 * 
+	 *
 	 * @param value Drawings interactive?
 	 * @since 5.4.9
 	 */
@@ -1247,7 +1272,7 @@ export class StockChart extends Container {
 
 	/**
 	 * Unselects drawing by ID.
-	 * 
+	 *
 	 * @param  id  Drawing ID
 	 * @since 5.9.0
 	 */
@@ -1282,7 +1307,7 @@ export class StockChart extends Container {
 /**
  * Registers a custom class so that objects (e.g. indicators) using it can be
  * serialized and restored later.
- * 
+ *
  * @param  name  Class name
  * @param  ref   Class reference
  * @since 5.7.2

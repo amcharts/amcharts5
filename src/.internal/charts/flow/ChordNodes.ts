@@ -46,10 +46,10 @@ export class ChordNodes extends FlowNodes {
 	 *
 	 * @default new ListTemplate<RadialLabel>
 	 */
-	public readonly labels: ListTemplate<RadialLabel> = new ListTemplate(
+	public readonly labels: ListTemplate<RadialLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RadialLabel._new(this._root, {}, [this.labels.template])
-	);
+	));
 
 	declare public _settings: IChordNodesSettings;
 	declare public _privateSettings: IChordNodesPrivate;
@@ -68,10 +68,10 @@ export class ChordNodes extends FlowNodes {
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
-	public readonly slices: ListTemplate<Slice> = new ListTemplate(
+	public readonly slices: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Slice._new(this._root, { themeTags: ["shape"] }, [this.slices.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -151,7 +151,7 @@ export class ChordNodes extends FlowNodes {
 			slice.set("fill", dataItem.get("fill"));
 			slice.set("fillPattern", dataItem.get("fillPattern"));
 		}
-	}		
+	}
 
 	/**
 	 * @ignore

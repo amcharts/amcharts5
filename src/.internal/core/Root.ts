@@ -25,7 +25,7 @@ import { ILocale, Language } from "./util/Language";
 import { Events, EventDispatcher } from "./util/EventDispatcher";
 import { DefaultTheme } from "../themes/DefaultTheme";
 import { CanvasRenderer } from "./render/backend/CanvasRenderer";
-import { p100, percent } from "./util/Percent";
+import { p100, percent, isPercent, Percent } from "./util/Percent";
 import { color } from "./util/Color";
 import { populateString } from "./util/PopulateString";
 import { registry } from "./Registry";
@@ -2108,9 +2108,18 @@ export class Root implements IDisposer {
 			}
 
 			// Deal with position
-			const bounds = target.globalBounds();
-			htmlElement.style.top = (bounds.top) + "px";
-			htmlElement.style.left = (bounds.left) + "px";
+			// const bounds = target.globalBounds();
+			// htmlElement.style.top = (bounds.top) + "px";
+			// htmlElement.style.left = (bounds.left) + "px";
+			let pos = {
+				x: target.x(),
+				y: target.y()
+			}
+			if (target.parent) {
+				pos = target.parent.toGlobal(pos)
+			}
+			htmlElement.style.top = pos.y + "px";
+			htmlElement.style.left = pos.x + "px";
 
 			// Use width/height if those are set
 			const width = target.get("width");
@@ -2137,13 +2146,45 @@ export class Root implements IDisposer {
 				if (!width) w = bbox.width;
 				if (!height) h = bbox.height;
 
-				target._adjustedLocalBounds = { left: 0, right: 0, top: 0, bottom: 0 };
-				target.setPrivate("minWidth", w / scale);
-				target.setPrivate("minHeight", h / scale);
-			}
-			else {
-				target.removePrivate("minWidth");
-				target.removePrivate("minHeight");
+				let lw = w / scale;
+				let lh = h / scale;
+
+				let cx = target.get("centerX", 0);
+				let cy = target.get("centerY", 0);
+
+				let ll = 0;
+				let lr = 0;
+				let lt = 0;
+				let lb = 0;
+
+				if (cx instanceof Percent) {
+					ll = -cx.value * lw;
+					lr = (1 - cx.value) * lw;
+				}
+				else {
+					ll = -cx;
+					lr = lw - cx;
+				}
+
+				if (cy instanceof Percent) {
+					lt = -cy.value * lh;
+					lb = (1 - cy.value) * lh;
+				}
+				else {
+					lt = -cy;
+					lb = lh - cy;
+				}
+
+				target._localBounds = { left: ll, right: lr, top: lt, bottom: lb };
+				
+				let previousBounds = target._adjustedLocalBounds;
+				let newBounds = target._display.getAdjustedBounds(target._localBounds);
+				target._adjustedLocalBounds = newBounds;
+
+				// compare each value of the bounds
+				if(previousBounds.left !== newBounds.left || previousBounds.right !== newBounds.right || previousBounds.top !== newBounds.top || previousBounds.bottom !== newBounds.bottom){
+					target.markDirtyBounds();
+				}				
 			}
 
 			if (w > 0) {
@@ -2158,6 +2199,16 @@ export class Root implements IDisposer {
 				htmlElement.style.display = "none";
 			}
 
+			// Center position
+			const x = target.get("centerX", 0);
+			const originX = isPercent(x) ? (x as Percent).percent + "%" : x + "px";
+			const y = target.get("centerY", 0);
+			const originY = isPercent(y) ? (y as Percent).percent + "%" : y + "px";
+
+			if (x || y) {
+				htmlElement.style.transform = "translate(-" + originX + ", -" + originY + ")" + htmlElement.style.transform;
+			}
+
 			// Deal with scale
 			if (scale != 1) {
 				htmlElement.style.transform += "scale(" + scale + ")";
@@ -2168,8 +2219,10 @@ export class Root implements IDisposer {
 			}
 
 			if (htmlElement.style.transform != "") {
-				htmlElement.style.transformOrigin = target.get("centerX", 0) + "%  " + target.get("centerY", 0) + "%";
+				htmlElement.style.transformOrigin = originX + " " + originY;
+				//htmlElement.style.transformOrigin = "0% 0%";
 			}
+
 
 		}
 	}

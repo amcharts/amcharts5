@@ -47,10 +47,10 @@ export class SimpleLineSeries extends DrawingSeries {
 		return line;
 	}
 
-	public readonly lines: ListTemplate<Line> = new ListTemplate(
+	public readonly lines: ListTemplate<Line> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Line._new(this._root, {}, [this.lines.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -63,10 +63,10 @@ export class SimpleLineSeries extends DrawingSeries {
 		return line;
 	}
 
-	public readonly hitLines: ListTemplate<Line> = new ListTemplate(
+	public readonly hitLines: ListTemplate<Line> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Line._new(this._root, {}, [this.hitLines.template])
-	);
+	));
 
 	protected _di: Array<{ [index: string]: DataItem<ISimpleLineSeriesDataItem> }> = [];
 	protected _lines: Array<Line> = [];
@@ -399,7 +399,7 @@ export class SimpleLineSeries extends DrawingSeries {
 	 * Adds a line drawing.
 	 *
 	 * Supported tools: `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"`.
-	 * 
+	 *
 	 * @param  point Point
 	 * @since 5.10.2
 	 */

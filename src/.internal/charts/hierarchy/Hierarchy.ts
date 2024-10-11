@@ -276,12 +276,12 @@ export abstract class Hierarchy extends Series {
 	 *
 	 * @default new ListTemplate<HierarchyNode>
 	 */
-	public readonly nodes: ListTemplate<HierarchyNode> = new ListTemplate(
+	public readonly nodes: ListTemplate<HierarchyNode> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => HierarchyNode.new(this._root, {
 			themeTags: $utils.mergeTags(this.nodes.template.get("themeTags", []), [this._tag, "hierarchy", "node"])
 		}, this.nodes.template)
-	);
+	));
 
 	/**
 	 * @ignore
@@ -319,12 +319,12 @@ export abstract class Hierarchy extends Series {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label.new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), [this._tag])
 		}, this.labels.template)
-	);
+	));
 
 	public _currentDownDepth: number | undefined;
 
@@ -819,7 +819,7 @@ export abstract class Hierarchy extends Series {
 			dataItem.get("node").show(duration);
 		}
 
-		
+
 
 		const topDepth = this.get("topDepth", 0);
 		if (dataItem.get("depth") < topDepth) {
@@ -842,7 +842,7 @@ export abstract class Hierarchy extends Series {
 
 		let children = dataItem.get("children");
 		if (children) {
-			if (depth < maxDepth - 1) {				
+			if (depth < maxDepth - 1) {
 				$array.each(children, (child) => {
 					const disabledField = this.get("disabledField");
 					if (disabledField) {
@@ -904,7 +904,7 @@ export abstract class Hierarchy extends Series {
 				downDepth = Math.min(this.get("downDepth", 1), maxDepth - dataItem.get("depth"));
 			}
 
-			const hierarchyNode = dataItem.get("d3HierarchyNode");			
+			const hierarchyNode = dataItem.get("d3HierarchyNode");
 			let currentDepth = hierarchyNode.depth;
 			if (!this.inited) {
 				downDepth = Math.min(this.get("initialDepth", 1), maxDepth - topDepth);

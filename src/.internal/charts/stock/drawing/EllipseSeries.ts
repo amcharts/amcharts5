@@ -42,10 +42,10 @@ export class EllipseSeries extends DrawingSeries {
 		return ellipse;
 	}
 
-	public readonly ellipses: ListTemplate<Ellipse> = new ListTemplate(
+	public readonly ellipses: ListTemplate<Ellipse> = this.addDisposer(new ListTemplate(
 		Template.new({ radiusX: 0, radiusY: 0 }),
 		() => Ellipse._new(this._root, { radiusX: 0, radiusY: 0, templateField: "settings" }, [this.ellipses.template])
-	);
+	));
 
 	protected _afterNew() {
 		super._afterNew();
@@ -86,7 +86,7 @@ export class EllipseSeries extends DrawingSeries {
 	}
 
 	protected _applySettings(index: number, settings: { [index: string]: any }) {
-
+		super._applySettings(index, settings);
 		let template: Template<any>;
 		$array.each(this.dataItems, (dataItem) => {
 			const dataContext = dataItem.dataContext as any;

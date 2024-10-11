@@ -84,13 +84,13 @@ export class RadarColumnSeries extends BaseColumnSeries {
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
-	public readonly columns: ListTemplate<Slice> = new ListTemplate(
+	public readonly columns: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Slice._new(this._root, {
 			position: "absolute",
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["radar", "series", "column"])
 		}, [this.columns.template])
-	);
+	));
 
 	public static className: string = "RadarColumnSeries";
 	public static classNames: Array<string> = BaseColumnSeries.classNames.concat([RadarColumnSeries.className]);

@@ -77,7 +77,7 @@ export interface IPartitionPrivate extends IHierarchyPrivate {
 	/**
 	 * Current vertical scale.
 	 */
-	scaleY?: number;	
+	scaleY?: number;
 }
 
 /**
@@ -101,12 +101,12 @@ export class Partition extends Hierarchy {
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */
-	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
+	public readonly rectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.rectangles.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.rectangles.template])
-	);
+	));
 
 	public _partitionLayout = d3hierarchy.partition();
 
@@ -201,12 +201,12 @@ export class Partition extends Hierarchy {
 		if (rectangle) {
 			const fill = dataItem.get("fill");
 			const fillPattern = dataItem.get("fillPattern");
-			
+
 			rectangle.animate({ key: "width", to: w, duration: duration, easing: easing })
 			rectangle.animate({ key: "height", to: h, duration: duration, easing: easing })
 			rectangle._setDefault("fill", fill);
 			rectangle._setDefault("fillPattern", fillPattern);
-			rectangle._setDefault("stroke", fill);			
+			rectangle._setDefault("stroke", fill);
 		}
 	}
 
@@ -349,7 +349,7 @@ export class Partition extends Hierarchy {
 		}
 
 		this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
-		this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });		
+		this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
 
 		this.animate({key:"_d", from:0, to:1, duration: duration, easing: easing })
 		this.nodesContainer.animate({ key: "x", to: -x0 * scaleX, duration: duration, easing: easing });

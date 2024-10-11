@@ -407,7 +407,8 @@ export class StockChartDefaultTheme extends Theme {
 
 		// Class: Inicator
 		r("Indicator").setAll({
-			position: "absolute"
+			position: "absolute",
+			autoOpenSettings: true
 		});
 
 		/**
@@ -475,8 +476,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("Triangle", ["drawing", "arrow"]).setAll({
-			width: 20,
-			height: 15
+			width: 22,
+			height: 17			
 		})
 
 		{
@@ -860,7 +861,7 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("ColumnSeries", ["volumeprofile"]).setAll({
-			legendLabelText: "Volume Profile",
+			legendLabelText: "{shortName}",
 			legendValueText: "[{downColor}; bold]{down.formatNumber('#.000a')}[/] [{upColor}; bold]{up.formatNumber('#.000a')}[/]  [bold]{total.formatNumber('#.000a')}[/]"
 		})
 
@@ -1223,7 +1224,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("VolumeProfile").setAll({
 			name: "Volume Profile",
-			shortName: "VP",
+			shortName: "Volume Profile",
 			upColor: Color.fromHex(0xE3B30C),
 			downColor: Color.fromHex(0x2E78E3),
 			countType: "rows",

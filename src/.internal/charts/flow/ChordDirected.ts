@@ -55,10 +55,10 @@ export class ChordDirected extends Chord {
 	 *
 	 * @default new ListTemplate<ChordLinkDirected>
 	 */
-	public readonly links: ListTemplate<ChordLinkDirected> = new ListTemplate(
+	public readonly links: ListTemplate<ChordLinkDirected> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => ChordLinkDirected._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
-	);
+	));
 	/**
 	 * @ignore
 	 */

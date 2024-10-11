@@ -21,7 +21,7 @@ export interface IAxisBulletSettings extends IEntitySettings {
 	/**
 	 * Indicates if the bullet should be stacked on top of another bullet if it's
 	 * on the same position.
-	 * 
+	 *
 	 * Will work on horizontal or vertical axes only.
 	 *
 	 * @since 5.2.28
@@ -72,7 +72,7 @@ export class AxisBullet extends Entity {
 		}
 	}
 
-	public dispose() {
+	protected _dispose() {
 		const axis = this.axis;
 		if (axis) {
 			$object.each(axis._bullets, (key, bullet) => {
@@ -82,6 +82,6 @@ export class AxisBullet extends Entity {
 			})
 		}
 
-		super.dispose();
+		super._dispose();
 	}
 }

@@ -68,7 +68,7 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"display": "inline-block",
 				"padding": "1.2em",
 				"vertical-align": "middle",
-				"text-align": "left",
+				"text-align": "start",
 				"white-space": "normal",
 				"background": ic.get("background")!.toCSS(),
 				//"border": "1px solid " + ic.get("alternativeBackground")!.toCSS(),
@@ -266,7 +266,7 @@ export class Modal extends Entity {
 
 	/**
 	 * Returns `true` if modal is currently open.
-	 * 
+	 *
 	 * @return  Modal open?
 	 */
 	public isOpen(): boolean {
@@ -320,12 +320,12 @@ export class Modal extends Entity {
 	/**
 	 * Disposes modal.
 	 */
-	public dispose() {
-		super.dispose();
+	protected _dispose() {
+		super._dispose();
+
 		const container = this.getPrivate("container");
 		if (container.parentElement) {
 			container.parentElement.removeChild(container);
 		}
 	}
-
 }

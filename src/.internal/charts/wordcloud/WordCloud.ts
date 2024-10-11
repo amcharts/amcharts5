@@ -80,7 +80,7 @@ export interface IWordCloudSettings extends ISeriesSettings {
 
 	/**
 	 * Progress of current word layout animation. (0-1)
-	 * 
+	 *
 	 * @readonly
 	 */
 	progress?: number;
@@ -210,7 +210,7 @@ export class WordCloud extends Series {
 	 *
 	 * `labels.template` can also be used to configure labels.
 	 */
-	public readonly labels: ListTemplate<Label> = this._makeLabels();
+	public readonly labels: ListTemplate<Label> = this.addDisposer(this._makeLabels());
 
 	/**
 	 * @ignore

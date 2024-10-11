@@ -36,7 +36,7 @@ export interface IMapPolygonSeriesSettings extends IMapSeriesSettings {
 	 *
 	 * Some GeoJSON software produces those in reverse order, so if your custom
 	 * map appears garbled, try this setting.
-	 * 
+	 *
 	 * @default false
 	 * @since 5.2.42
 	 */
@@ -69,10 +69,10 @@ export class MapPolygonSeries extends MapSeries {
 	 *
 	 * @default new ListTemplate<MapPolygon>
 	 */
-	public readonly mapPolygons: ListTemplate<MapPolygon> = new ListTemplate(
+	public readonly mapPolygons: ListTemplate<MapPolygon> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => MapPolygon._new(this._root, {}, [this.mapPolygons.template])
-	);
+	));
 
 	public static className: string = "MapPolygonSeries";
 	public static classNames: Array<string> = MapSeries.classNames.concat([MapPolygonSeries.className]);
@@ -318,7 +318,7 @@ export class MapPolygonSeries extends MapSeries {
 			return found;
 		}
 	}
-	
+
 	public getPolygonByGeoPoint(point: IGeoPoint): MapPolygon | undefined {
 		return this.getPolygonByPoint(this.chart!.convert(point));
 	}

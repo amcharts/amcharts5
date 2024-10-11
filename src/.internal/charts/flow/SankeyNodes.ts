@@ -38,10 +38,10 @@ export class SankeyNodes extends FlowNodes {
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */
-	public readonly rectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
+	public readonly rectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, { themeTags: ["shape"] }, [this.rectangles.template])
-	);
+	));
 
 	/**
 	 * Related [[Sankey]] series.
@@ -60,7 +60,7 @@ export class SankeyNodes extends FlowNodes {
 		this.rectangles.push(rectangle);
 		rectangle._setSoft("fill", dataItem.get("fill"));
 		rectangle._setSoft("fillPattern", dataItem.get("fillPattern"));
-		
+
 		dataItem.set("rectangle", rectangle);
 
 		node.events.on("dragged", () => {
@@ -133,5 +133,5 @@ export class SankeyNodes extends FlowNodes {
 			rectangle.set("fill", dataItem.get("fill"));
 			rectangle.set("fillPattern", dataItem.get("fillPattern"));
 		}
-	}	
+	}
 }

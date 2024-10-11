@@ -50,11 +50,11 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 
 	/**
 	 * Number of corners when type is `"polygon"`.
-	 * 
+	 *
 	 * `120` means the polygoon will look like a circle.
 	 *
 	 * NOTE: this setting is ignored if `type="rectangle"`.
-	 * 
+	 *
 	 * @default 120
 	 */
 	cornerCount?: number;
@@ -62,12 +62,12 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	/**
 	 * Minimum weight ratio which allows computing the minimum allowed
 	 * weight (`= [maximum weight] * minWeightRatio`).
-	 * 
+	 *
 	 * Setting very small `minWeigtRatio` might result flickering.
 	 *
 	 * NOTE: the nodes that have smaller weight will be scaled up and will not
 	 * represent their true value correctly.
-	 * 
+	 *
 	 * @default 0.005
 	 */
 	minWeightRatio?: number;
@@ -75,25 +75,25 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	/**
 	 * The convergence ratio in Voronoi treemaps measures how well the treemap
 	 * layout represents the hierarchical structure of the underlying data.
-	 * 
+	 *
 	 * It is calculated as the ratio of the summed area of the smallest enclosing
 	 * rectangle for each cell to the total area of the treemap. A lower
 	 * convergence ratio indicates a better representation of the hierarchy,
 	 * meaning that the cells are closely packed and the treemap effectively
 	 * captures the nested relationships between the data elements.
-	 * 
+	 *
 	 * @default 0.005
 	 */
 	convergenceRatio?: number;
 
 	/**
 	 * Maximum allowed number of iterations when computing the layout.
-	 * 
+	 *
 	 * Computation is stopped when it number of iterations is reached, even if
 	 * the `convergenceRatio` is not yet reached.
 	 *
 	 * Bigger number means finer results, but slower performance.
-	 * 
+	 *
 	 * @default 100
 	 */
 	maxIterationCount?: number;
@@ -105,7 +105,7 @@ export interface IVoronoiTreemapPrivate extends IHierarchyPrivate {
 
 /**
  * A Weighted Voronoi Treemap series.
- * 
+ *
  * NOTE: Try to avoid a big number of data items with very big value
  * differences. Better group small items into "Other" item.
  *
@@ -128,12 +128,12 @@ export class VoronoiTreemap extends Hierarchy {
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */
-	public readonly polygons: ListTemplate<Polygon> = new ListTemplate(
+	public readonly polygons: ListTemplate<Polygon> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Polygon._new(this._root, {
 			themeTags: $utils.mergeTags(this.polygons.template.get("themeTags", []), [this._tag, "shape"])
 		}, [this.polygons.template])
-	);
+	));
 
 	public voronoi = voronoiTreemap();
 
@@ -221,7 +221,7 @@ export class VoronoiTreemap extends Hierarchy {
 
 			const fill = dataItem.get("fill");
 			const fillPattern = dataItem.get("fillPattern");
-			
+
 			polygon._setDefault("fill", fill);
 			polygon._setDefault("fillPattern", fillPattern);
 

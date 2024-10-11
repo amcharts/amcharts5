@@ -60,10 +60,10 @@ export class FibonacciSeries extends SimpleLineSeries {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, {}, [this.labels.template])
-	);
+	));
 
 	public _updateChildren() {
 		super._updateChildren();
@@ -214,7 +214,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 		super.enableErasing();
 		this.showAllBullets();
 	}
-	
+
 	protected _hideAllBullets() {
 		if (this._drawingEnabled || this._erasingEnabled) {
 

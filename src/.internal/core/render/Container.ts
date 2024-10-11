@@ -357,157 +357,162 @@ export class Container extends Sprite {
 	}
 
 	public _getBounds() {
+		if (!this.get("html")) {
+			let width = this.get("width");
+			let height = this.get("height");
 
-		let width = this.get("width");
-		let height = this.get("height");
+			let pWidth = this.getPrivate("width");
+			let pHeight = this.getPrivate("height");
 
-		let pWidth = this.getPrivate("width");
-		let pHeight = this.getPrivate("height");
+			let bounds: IBounds = {
+				left: 0,
+				top: 0,
+				right: this.width(),
+				bottom: this.height()
+			};
 
-		let bounds: IBounds = {
-			left: 0,
-			top: 0,
-			right: this.width(),
-			bottom: this.height()
-		};
+			let layout = this.get("layout");
+			let horizontal = false;
+			let vertical = false;
+			if (layout instanceof HorizontalLayout || layout instanceof GridLayout) {
+				horizontal = true;
+			}
 
-		let layout = this.get("layout");
-		let horizontal = false;
-		let vertical = false;
-		if (layout instanceof HorizontalLayout || layout instanceof GridLayout) {
-			horizontal = true;
-		}
+			if (layout instanceof VerticalLayout) {
+				vertical = true;
+			}
 
-		if (layout instanceof VerticalLayout) {
-			vertical = true;
-		}
+			if ((width != null || pWidth != null) && (height != null || pHeight != null) && !this.get("verticalScrollbar")) {
+				// void
+			}
+			else {
+				let m = Number.MAX_VALUE;
 
-		if ((width != null || pWidth != null) && (height != null || pHeight != null) && !this.get("verticalScrollbar")) {
-			// void
+				let l = m;
+				let r = -m;
+				let t = m;
+				let b = -m;
+
+				const paddingLeft = this.get("paddingLeft", 0);
+				const paddingTop = this.get("paddingTop", 0);
+				const paddingRight = this.get("paddingRight", 0);
+				const paddingBottom = this.get("paddingBottom", 0);
+
+				this.children.each((child) => {
+					if (child.get("position") != "absolute" && child.get("isMeasured")) {
+						let childBounds = child.adjustedLocalBounds();
+						let childX = child.x();
+						let childY = child.y();
+						let cl = childX + childBounds.left;
+						let cr = childX + childBounds.right;
+						let ct = childY + childBounds.top;
+						let cb = childY + childBounds.bottom;
+
+						if (horizontal) {
+							cl -= child.get("marginLeft", 0);
+							cr += child.get("marginRight", 0);
+						}
+
+						if (vertical) {
+							ct -= child.get("marginTop", 0);
+							cb += child.get("marginBottom", 0);
+						}
+
+						if (cl < l) {
+							l = cl;
+						}
+						if (cr > r) {
+							r = cr;
+						}
+						if (ct < t) {
+							t = ct;
+						}
+						if (cb > b) {
+							b = cb;
+						}
+					}
+				})
+
+				if (l == m) {
+					l = 0;
+				}
+
+				if (r == -m) {
+					r = 0;
+				}
+
+				if (t == m) {
+					t = 0;
+				}
+
+				if (b == -m) {
+					b = 0;
+				}
+
+				bounds.left = l - paddingLeft;
+				bounds.top = t - paddingTop;
+				bounds.right = r + paddingRight;
+				bounds.bottom = b + paddingBottom;
+
+				const minWidth = this.get("minWidth");
+
+				if ($type.isNumber(minWidth) && minWidth > 0) {
+					if (bounds.right - bounds.left < minWidth) {
+						if (bounds.right >= minWidth) {
+							bounds.left = bounds.right - minWidth;
+						}
+						else {
+							bounds.right = bounds.left + minWidth;
+						}
+					}
+				}
+
+				const minHeight = this.get("minHeight");
+
+				if ($type.isNumber(minHeight) && minHeight > 0) {
+					if (bounds.bottom - bounds.top < minHeight) {
+						if (bounds.bottom >= minHeight) {
+							bounds.top = bounds.bottom - minHeight;
+						}
+						else {
+							bounds.bottom = bounds.top + minHeight;
+						}
+					}
+				}
+			}
+
+			this._contentWidth = bounds.right - bounds.left;
+			this._contentHeight = bounds.bottom - bounds.top;
+
+			if ($type.isNumber(width)) {
+				bounds.left = 0;
+				bounds.right = width;
+			}
+
+			if ($type.isNumber(pWidth)) {
+				bounds.left = 0;
+				bounds.right = pWidth;
+			}
+
+			if ($type.isNumber(height)) {
+				bounds.top = 0;
+				bounds.bottom = height;
+			}
+
+			if ($type.isNumber(pHeight)) {
+				bounds.top = 0;
+				bounds.bottom = pHeight;
+			}
+
+			this._localBounds = bounds;
 		}
 		else {
-			let m = Number.MAX_VALUE;
-
-			let l = m;
-			let r = -m;
-			let t = m;
-			let b = -m;
-
-			const paddingLeft = this.get("paddingLeft", 0);
-			const paddingTop = this.get("paddingTop", 0);
-			const paddingRight = this.get("paddingRight", 0);
-			const paddingBottom = this.get("paddingBottom", 0);
-
-			this.children.each((child) => {
-				if (child.get("position") != "absolute" && child.get("isMeasured")) {
-					let childBounds = child.adjustedLocalBounds();
-					let childX = child.x();
-					let childY = child.y();
-					let cl = childX + childBounds.left;
-					let cr = childX + childBounds.right;
-					let ct = childY + childBounds.top;
-					let cb = childY + childBounds.bottom;
-
-					if (horizontal) {
-						cl -= child.get("marginLeft", 0);
-						cr += child.get("marginRight", 0);
-					}
-
-					if (vertical) {
-						ct -= child.get("marginTop", 0);
-						cb += child.get("marginBottom", 0);
-					}
-
-					if (cl < l) {
-						l = cl;
-					}
-					if (cr > r) {
-						r = cr;
-					}
-					if (ct < t) {
-						t = ct;
-					}
-					if (cb > b) {
-						b = cb;
-					}
-				}
-			})
-
-			if (l == m) {
-				l = 0;
-			}
-
-			if (r == -m) {
-				r = 0;
-			}
-
-			if (t == m) {
-				t = 0;
-			}
-
-			if (b == -m) {
-				b = 0;
-			}
-
-			bounds.left = l - paddingLeft;
-			bounds.top = t - paddingTop;
-			bounds.right = r + paddingRight;
-			bounds.bottom = b + paddingBottom;
-
-			const minWidth = this.get("minWidth");
-
-			if ($type.isNumber(minWidth) && minWidth > 0) {
-				if (bounds.right - bounds.left < minWidth) {
-					if (bounds.right >= minWidth) {
-						bounds.left = bounds.right - minWidth;
-					}
-					else {
-						bounds.right = bounds.left + minWidth;
-					}
-				}
-			}
-
-			const minHeight = this.get("minHeight");
-
-			if ($type.isNumber(minHeight) && minHeight > 0) {
-				if (bounds.bottom - bounds.top < minHeight) {
-					if (bounds.bottom >= minHeight) {
-						bounds.top = bounds.bottom - minHeight;
-					}
-					else {
-						bounds.bottom = bounds.top + minHeight;
-					}
-				}
+			let bounds = this._localBounds;
+			if (bounds) {
+				this._contentWidth = bounds.right - bounds.left;
+				this._contentHeight = bounds.bottom - bounds.top;
 			}
 		}
-
-
-
-
-		this._contentWidth = bounds.right - bounds.left;
-		this._contentHeight = bounds.bottom - bounds.top;
-
-		if ($type.isNumber(width)) {
-			bounds.left = 0;
-			bounds.right = width;
-		}
-
-		if ($type.isNumber(pWidth)) {
-			bounds.left = 0;
-			bounds.right = pWidth;
-		}
-
-		if ($type.isNumber(height)) {
-			bounds.top = 0;
-			bounds.bottom = height;
-		}
-
-		if ($type.isNumber(pHeight)) {
-			bounds.top = 0;
-			bounds.bottom = pHeight;
-		}
-
-		this._localBounds = bounds;
 	}
 
 	public _updateBounds() {
@@ -603,7 +608,7 @@ export class Container extends Sprite {
 			let h = this.innerHeight();
 			let ch = child.height();
 			let contentH = this._contentHeight;
-			let max = (h - ch / 2) / contentH;
+			let max = 1 - (h - ch / 2) / contentH;
 
 			if (y + ch * .7 + this._childrenDisplay.y > h || y - ch * .3 + this._childrenDisplay.y < 0) {
 				let pos = Math.max(0, Math.min(max, (y - ch / 2) / contentH));

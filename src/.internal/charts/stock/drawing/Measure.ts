@@ -51,10 +51,10 @@ export class Measure extends RectangleSeries {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, {}, [this.labels.template])
-	);
+	));
 
 	/**
 	 * @ignore

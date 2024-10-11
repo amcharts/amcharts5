@@ -186,8 +186,9 @@ export class Annotator extends Entity {
 		}
 	}
 
-	public dispose(): void {
-		super.dispose();
+	protected _dispose(): void {
+		super._dispose();
+
 		if (this._markerArea && this._markerArea.isOpen) {
 			this._markerArea.close();
 		}

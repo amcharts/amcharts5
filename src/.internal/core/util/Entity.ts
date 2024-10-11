@@ -393,6 +393,11 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	// TODO move this into Entity
 	protected _userProperties: Dirty<this["_settings"]> = {};
 
+	/**
+	 * If this is set to `false` then disposing does nothing, it's a no-op.
+	 */
+	public enableDispose: boolean = true;
+
 	constructor(settings: Settings["_settings"]) {
 		this._settings = settings;
 	}
@@ -532,7 +537,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 
 	/**
 	 * Removes a callback for when value of a setting changes.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Private settings key
 	 * @param   callback  Callback
@@ -577,7 +582,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 
 	/**
 	 * Removes a callback for when value of a private setting changes.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Private settings key
 	 * @param   callback  Callback
@@ -950,7 +955,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * Disposes this object.
 	 */
 	public dispose() {
-		if (!this._disposed) {
+		if (this.enableDispose && !this._disposed) {
 			this._disposed = true;
 			this._dispose();
 		}

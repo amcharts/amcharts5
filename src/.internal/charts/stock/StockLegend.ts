@@ -82,7 +82,7 @@ export class StockLegend extends Legend {
 	 *
 	 * @default new ListTemplate<Button>()
 	 */
-	public readonly closeButtons: ListTemplate<Button> = new ListTemplate(
+	public readonly closeButtons: ListTemplate<Button> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Button._new(this._root, {
 			themeTags: $utils.mergeTags(this.closeButtons.template.get("themeTags", []), ["control", "close"]),
@@ -90,7 +90,7 @@ export class StockLegend extends Legend {
 				themeTags: ["icon", "button"]
 			})
 		}, [this.closeButtons.template])
-	);
+	));
 
 
 	/**
@@ -130,7 +130,7 @@ export class StockLegend extends Legend {
 	 *
 	 * @default new ListTemplate<Button>()
 	 */
-	public readonly settingsButtons: ListTemplate<Button> = new ListTemplate(
+	public readonly settingsButtons: ListTemplate<Button> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Button._new(this._root, {
 			themeTags: $utils.mergeTags(this.settingsButtons.template.get("themeTags", []), ["control", "settings"]),
@@ -138,7 +138,7 @@ export class StockLegend extends Legend {
 				themeTags: ["icon", "button"]
 			})
 		}, [this.settingsButtons.template])
-	);
+	));
 
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {

@@ -890,7 +890,7 @@ export abstract class Sprite extends Entity {
 
 	public _adjustedLocalBounds: IBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 
-	protected _localBounds: IBounds = { left: 0, right: 0, top: 0, bottom: 0 };
+	public _localBounds: IBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 
 	public static className: string = "Sprite";
 	public static classNames: Array<string> = Entity.classNames.concat([Sprite.className]);

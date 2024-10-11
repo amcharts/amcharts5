@@ -61,7 +61,7 @@ export class BreadcrumbBar extends Container {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), ["label"]),
@@ -69,7 +69,7 @@ export class BreadcrumbBar extends Container {
 				themeTags: ["background"]
 			})
 		}, [this.labels.template])
-	);
+	));
 
 	public static className: string = "BreadcrumbBar";
 	public static classNames: Array<string> = Container.classNames.concat([BreadcrumbBar.className]);

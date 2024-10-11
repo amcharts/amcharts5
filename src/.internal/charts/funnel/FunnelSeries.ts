@@ -147,7 +147,7 @@ export class FunnelSeries extends PercentSeries {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Slice_links} for more info
 	 */
-	public readonly links: ListTemplate<this["_sliceType"]> = this._makeLinks();
+	public readonly links: ListTemplate<this["_sliceType"]> = this.addDisposer(this._makeLinks());
 
 	protected _makeLinks(): ListTemplate<this["_sliceType"]> {
 		return new ListTemplate(

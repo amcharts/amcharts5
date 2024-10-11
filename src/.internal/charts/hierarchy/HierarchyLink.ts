@@ -54,7 +54,7 @@ export class HierarchyLink extends Graphics {
 		$array.each(this.bullets, (bullet) => {
 			bullet.dispose();
 		})
-		
+
 		bullets.each((bullet)=>{
 			const newBullet = bullet(this._root, this.get("source")!, this.get("target")!);
 			if (newBullet) {
@@ -73,8 +73,8 @@ export class HierarchyLink extends Graphics {
 						series.linksContainer.children.push(sprite);
 					}
 				}
-			}			
-		})	
+			}
+		})
 	}
 
 	public _changed() {
@@ -130,7 +130,7 @@ export class HierarchyLink extends Graphics {
 				}
 			}
 		})
-		return super.hide();	
+		return super.hide();
 	}
 
 	public show(duration?: number){
@@ -142,7 +142,7 @@ export class HierarchyLink extends Graphics {
 				}
 			}
 		})
-		return super.show();	
+		return super.show();
 	}
 
 	public _beforeChanged() {
@@ -168,8 +168,8 @@ export class HierarchyLink extends Graphics {
 		}
 	}
 
-	public dispose(){
-		super.dispose();
+	protected _dispose(){
+		super._dispose();
 		$array.each(this.bullets, (bullet) => {
 			bullet.dispose();
 		})

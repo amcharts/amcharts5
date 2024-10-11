@@ -36,7 +36,7 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 	 *
 	 * * `"curved"` (default) - connects points using shortest distance, which will result in curved lines based on map projection.
 	 * * `"straight"` - connects points using visually straight lines, and will not cross the -180/180 longitude.
-	 * 
+	 *
 	 * @default "curved"
 	 * @since 5.2.32
 	 */
@@ -62,7 +62,7 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 	 *
 	 * * `"curved"` (default) - connects points using shortest distance, which will result in curved lines based on map projection.
 	 * * `"straight"` - connects points using visually straight lines, and will not cross the -180/180 longitude.
-	 * 
+	 *
 	 * @default "curved"
 	 * @since 5.2.24
 	 */
@@ -106,10 +106,10 @@ export class MapLineSeries extends MapSeries {
 	 *
 	 * @default new ListTemplate<MapLine>
 	 */
-	public readonly mapLines: ListTemplate<MapLine> = new ListTemplate(
+	public readonly mapLines: ListTemplate<MapLine> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => MapLine._new(this._root, {}, [this.mapLines.template])
-	);
+	));
 
 	public static className: string = "MapLineSeries";
 	public static classNames: Array<string> = MapSeries.classNames.concat([MapLineSeries.className]);

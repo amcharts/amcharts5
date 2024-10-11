@@ -97,10 +97,10 @@ export class Chord extends Flow {
 	 *
 	 * @default new ListTemplate<ChordLink>
 	 */
-	public readonly links: ListTemplate<ChordLink> = new ListTemplate(
+	public readonly links: ListTemplate<ChordLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => ChordLink._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
-	);
+	));
 
 	/**
 	 * A series for all chord nodes.
@@ -169,7 +169,7 @@ export class Chord extends Flow {
 							if(value < valueSum * minSize){
 								value = valueSum * minSize;
 							}
-						}							
+						}
 					})
 				}
 

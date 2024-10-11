@@ -52,7 +52,7 @@ export interface IVennDataItem extends ISeriesDataItem {
 
 	/**
 	 * Fill pattern used for the slice and related elements, e.g. legend marker.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
 	 * @since 5.10.0
 	 */
@@ -148,7 +148,7 @@ export class Venn extends Series {
 	 *
 	 * `slices.template` can also be used to configure slices.
 	 */
-	public readonly slices: ListTemplate<Graphics> = this._makeSlices();
+	public readonly slices: ListTemplate<Graphics> = this.addDisposer(this._makeSlices());
 
 
 	/**
@@ -199,7 +199,7 @@ export class Venn extends Series {
 	 *
 	 * `labels.template` can also be used to configure slice labels.
 	 */
-	public readonly labels: ListTemplate<Label> = this._makeLabels();
+	public readonly labels: ListTemplate<Label> = this.addDisposer(this._makeLabels());
 
 	/**
 	 * @ignore

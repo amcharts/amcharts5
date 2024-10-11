@@ -100,6 +100,15 @@ export interface IIndicatorSettings extends IContainerSettings {
 	 */
 	seriesColor?: Color;
 
+	/**
+	 * Should indicator settings modal be openend automatically when indicator
+	 * is added to a chart via [[IndicatorControl]].
+	 * 
+	 * @default true
+	 * @since 5.10.6
+	 */
+	autoOpenSettings?: boolean;
+
 }
 
 export interface IIndicatorPrivate extends IContainerPrivate {

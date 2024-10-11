@@ -129,12 +129,12 @@ export class HeatLegend extends Container {
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */
-	public readonly markers: ListTemplate<RoundedRectangle> = new ListTemplate(
+	public readonly markers: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.markers.template.get("themeTags", []), [this.get("orientation"), "heatlegend", "marker"])
 		}, [this.markers.template])
-	);
+	));
 
 
 	/**

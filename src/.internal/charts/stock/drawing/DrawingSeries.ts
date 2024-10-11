@@ -153,34 +153,34 @@ export class DrawingSeries extends LineSeries {
 	// point index in segment
 	protected _pIndex: number = 0;
 
-	public readonly grips: ListTemplate<Container> = new ListTemplate(
+	public readonly grips: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Container._new(this._root, {
 			themeTags: ["grip"],
 			setStateOnChildren: true,
 			draggable: true
 		}, [this.grips.template]),
-	);
+	));
 
-	public readonly circles: ListTemplate<Circle> = new ListTemplate(
+	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
 		}, [this.circles.template]),
-	);
+	));
 
-	public readonly outerCircles: ListTemplate<Circle> = new ListTemplate(
+	public readonly outerCircles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
 			themeTags: ["outline"]
 		}, [this.outerCircles.template]),
-	);
+	));
 
-	public readonly selectors: ListTemplate<Rectangle> = new ListTemplate(
+	public readonly selectors: ListTemplate<Rectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Rectangle._new(this._root, {
 			themeTags: ["selector"]
 		}, [this.selectors.template]),
-	);
+	));
 
 	protected _afterNew() {
 		this.addTag("drawing");
@@ -365,7 +365,7 @@ export class DrawingSeries extends LineSeries {
 
 	/**
 	 * Returns index of a drawing with the specific ID, or `null` if not found.
-	 * 
+	 *
 	 * @param   id  ID
 	 * @return      Index
 	 * @since 5.8.4
@@ -791,7 +791,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	protected _applySettings(_index: number, _settings?: { [index: string]: any }) {
-
+		this.markDirtyDrawings();
 	}
 
 	protected _updateElements() {
@@ -1018,8 +1018,6 @@ export class DrawingSeries extends LineSeries {
 					}
 				})
 			}
-
-			//this.showAllBullets();			
 		}
 	}
 
@@ -1054,7 +1052,19 @@ export class DrawingSeries extends LineSeries {
 			this._upDp.dispose();
 			this._upDp = undefined;
 		}
-		//this._hideAllBullets();
+	}
+
+	public toggleDrawing(enabled?: boolean) {
+		if(this._getStockChart().get("hideDrawingGrips")){
+			this.root.events.once("frameended", () => {
+				this.circles.each((circle) => {
+					circle.set("forceHidden", !enabled);
+				})
+				this.grips.each((grip) => {
+					grip.set("forceInactive", !enabled);
+				})
+			})
+		}
 	}
 
 	protected _handlePointerMove(event: ISpritePointerEvent) {
@@ -1298,9 +1308,9 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param index returns drawingId
-	 * @returns 
+	 * @returns
 	 */
 	public indexToDrawingId(index: number): string | undefined {
 		let id: string | undefined;

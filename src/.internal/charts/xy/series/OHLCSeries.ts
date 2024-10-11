@@ -58,14 +58,14 @@ export class OHLCSeries extends CandlestickSeries {
 	 *
 	 * @default new ListTemplate<OHLC>
 	 */
-	public readonly columns: ListTemplate<OHLC> = new ListTemplate(
+	public readonly columns: ListTemplate<OHLC> = this.addDisposer(new ListTemplate(
 		Template.new({
 			themeTags: ["autocolor"]
 		}),
 		() => OHLC._new(this._root, {
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["ohlc", "series", "column"])
 		}, [this.columns.template])
-	);
+	));
 
 	protected _processAxisRange(axisRange: this["_axisRangeType"]) {
 		super._processAxisRange(axisRange);

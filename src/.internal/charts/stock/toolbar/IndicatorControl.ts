@@ -453,7 +453,7 @@ export class IndicatorControl extends DropdownListControl {
 
 		if (indicator) {
 			stockChart.indicators.push(indicator);
-			if (indicator._editableSettings.length) {
+			if (indicator._editableSettings.length && indicator.get("autoOpenSettings", true)) {
 				const modal = stockChart.getPrivate("settingsModal");
 				modal.events.once("done", (ev) => {
 					if (indicator) {

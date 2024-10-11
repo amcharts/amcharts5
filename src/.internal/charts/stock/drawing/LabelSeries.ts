@@ -296,7 +296,8 @@ export class LabelSeries extends PolylineSeries {
 		}
 	}
 
-	protected _applySettings(index: number, _settings?: { [index: string]: any }) {
+	protected _applySettings(index: number, settings?: { [index: string]: any }) {
+		super._applySettings(index, settings);
 		let context = this._getContext(index);
 
 		if (context) {
@@ -344,6 +345,12 @@ export class LabelSeries extends PolylineSeries {
 
 		this._root.events.once("frameended", () => {
 			this._positionBullets(event.target.dataItem as DataItem<IDrawingSeriesDataItem>);
+		})
+	}
+
+	public toggleDrawing(enabled?: boolean) {
+		this.grips.each((grip) => {
+			grip.set("forceInactive", !enabled);
 		})
 	}
 }

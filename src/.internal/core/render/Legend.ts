@@ -148,7 +148,7 @@ export class Legend extends Series {
 	 *
 	 * @default new ListTemplate<Container>
 	 */
-	public readonly itemContainers: ListTemplate<Container> = new ListTemplate(
+	public readonly itemContainers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Container._new(this._root, {
 			themeTags: $utils.mergeTags(this.itemContainers.template.get("themeTags", []), ["legend", "item"]),
@@ -158,7 +158,7 @@ export class Legend extends Series {
 				themeTagsSelf: $utils.mergeTags(this.itemContainers.template.get("themeTagsSelf", []), ["itemcontainer"])
 			})
 		}, [this.itemContainers.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -186,12 +186,12 @@ export class Legend extends Series {
 	 *
 	 * @default new ListTemplate<Container>
 	 */
-	public readonly markers: ListTemplate<Container> = new ListTemplate(
+	public readonly markers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Container._new(this._root, {
 			themeTags: $utils.mergeTags(this.markers.template.get("themeTags", []), ["legend", "marker"])
 		}, [this.markers.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -207,12 +207,12 @@ export class Legend extends Series {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), ["legend", "label"])
 		}, [this.labels.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -228,12 +228,12 @@ export class Legend extends Series {
 	 *
 	 * @default new ListTemplate<label>
 	 */
-	public readonly valueLabels: ListTemplate<Label> = new ListTemplate(
+	public readonly valueLabels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, {
 			themeTags: $utils.mergeTags(this.valueLabels.template.get("themeTags", []), ["legend", "label", "value"])
 		}, [this.valueLabels.template])
-	);
+	));
 
 	/**
 	 * @ignore
@@ -249,12 +249,12 @@ export class Legend extends Series {
 	 *
 	 * @default new ListTemplate<RoundedRectangle>
 	 */
-	public readonly markerRectangles: ListTemplate<RoundedRectangle> = new ListTemplate(
+	public readonly markerRectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, {
 			themeTags: $utils.mergeTags(this.markerRectangles.template.get("themeTags", []), ["legend", "marker", "rectangle"])
 		}, [this.markerRectangles.template])
-	);
+	));
 
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -337,7 +337,7 @@ export class Legend extends Series {
 				dataItem.set("label", label);
 
 				label.text.on("text", () => {
-					itemContainer.setRaw("ariaLabel", label.text._getText() + (this.get("clickTarget") !== "none" ? "; " + this._t("Press ENTER to toggle") : ""));					
+					itemContainer.setRaw("ariaLabel", label.text._getText() + (this.get("clickTarget") !== "none" ? "; " + this._t("Press ENTER to toggle") : ""));
 					itemContainer.markDirtyAccessibility();
 				});
 

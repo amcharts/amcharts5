@@ -61,14 +61,14 @@ export class CandlestickSeries extends ColumnSeries {
 	 *
 	 * @default new ListTemplate<Candlestick>
 	 */
-	public readonly columns: ListTemplate<Candlestick> = new ListTemplate(
+	public readonly columns: ListTemplate<Candlestick> = this.addDisposer(new ListTemplate(
 		Template.new({
 			themeTags: ["autocolor"]
 		}),
 		() => Candlestick._new(this._root, {
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["candlestick", "series", "column"])
 		}, [this.columns.template])
-	);
+	));
 
 	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
 		super._updateGraphics(dataItem, previousDataItem);

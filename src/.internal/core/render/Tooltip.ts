@@ -129,7 +129,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	/**
 	 * If set to `true` the tooltip contents will be read out by a screen reader
 	 * when displayed or changed.
-	 * 
+	 *
 	 * @default false
 	 * @since 5.9.2
 	 */
@@ -239,8 +239,8 @@ export class Tooltip extends Container {
 	/**
 	 * Permanently disposes the tooltip.
 	 */
-	public dispose() {
-		super.dispose();
+	protected _dispose() {
+		super._dispose();
 		$array.remove(this._root._tooltips, this);
 	}
 

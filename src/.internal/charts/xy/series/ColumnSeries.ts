@@ -43,13 +43,13 @@ export class ColumnSeries extends BaseColumnSeries {
 	 * `columns.template` can be used to set default settings for all columns,
 	 * or to change on existing ones.
 	 */
-	public readonly columns: ListTemplate<RoundedRectangle> = new ListTemplate(
+	public readonly columns: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => RoundedRectangle._new(this._root, {
 			position: "absolute",
 			themeTags: $utils.mergeTags(this.columns.template.get("themeTags", []), ["series", "column"])
 		}, [this.columns.template])
-	);
+	));
 
 	public static className: string = "ColumnSeries";
 	public static classNames: Array<string> = BaseColumnSeries.classNames.concat([ColumnSeries.className]);

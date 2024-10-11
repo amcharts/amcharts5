@@ -182,20 +182,20 @@ export abstract class FlowNodes extends Series {
 	 *
 	 * @default new ListTemplate<Label>
 	 */
-	public readonly labels: ListTemplate<Label> = new ListTemplate(
+	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Label._new(this._root, { themeTags: ["flow"] }, [this.labels.template])
-	);
+	));
 
 	/**
 	 * List of node elements.
 	 *
 	 * @default new ListTemplate<FlowNode>
 	 */
-	public readonly nodes: ListTemplate<FlowNode> = new ListTemplate(
+	public readonly nodes: ListTemplate<FlowNode> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => FlowNode._new(this._root, { themeTags: ["node"] }, [this.nodes.template])
-	);
+	));
 
 	/**
 	 * Related [[Flow]] series.

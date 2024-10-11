@@ -86,10 +86,10 @@ export class ArcDiagram extends Flow {
 	 *
 	 * @default new ListTemplate<ArcDiagramLink>
 	 */
-	public readonly links: ListTemplate<ArcDiagramLink> = new ListTemplate(
+	public readonly links: ListTemplate<ArcDiagramLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => ArcDiagramLink._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
-	);
+	));
 
 	/**
 	 * A series for all ArcDiagram nodes.

@@ -115,12 +115,12 @@ export class AxisRendererRadial extends AxisRenderer {
 	 *
 	 * @default new ListTemplate<AxisLabelRadial>
 	 */
-	public readonly labels: ListTemplate<AxisLabelRadial> = new ListTemplate(
+	public readonly labels: ListTemplate<AxisLabelRadial> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => AxisLabelRadial._new(this._root, {
 			themeTags: $utils.mergeTags(this.labels.template.get("themeTags", []), this.get("themeTags", []))
 		}, [this.labels.template])
-	);
+	));
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "radial"]);

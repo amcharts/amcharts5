@@ -144,12 +144,12 @@ export class LineSeries extends XYSeries {
 	 *
 	 * @default new ListTemplate<Graphics>
 	 */
-	public readonly strokes: ListTemplate<Graphics> = new ListTemplate(
+	public readonly strokes: ListTemplate<Graphics> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Graphics._new(this._root, {
 			themeTags: $utils.mergeTags(this.strokes.template.get("themeTags", []), ["line", "series", "stroke"])
 		}, [this.strokes.template]),
-	);
+	));
 
 	/**
 	 * @ignore
@@ -168,12 +168,12 @@ export class LineSeries extends XYSeries {
 	 *
 	 * @default new ListTemplate<Graphics>
 	 */
-	public readonly fills: ListTemplate<Graphics> = new ListTemplate(
+	public readonly fills: ListTemplate<Graphics> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Graphics._new(this._root, {
 			themeTags: $utils.mergeTags(this.strokes.template.get("themeTags", []), ["line", "series", "fill"])
 		}, [this.fills.template]),
-	);
+	));
 
 	// custom set from data
 	protected _fillTemplate: Template<Graphics> | undefined;
@@ -216,7 +216,7 @@ export class LineSeries extends XYSeries {
 			if (legendFill) {
 				legendFill.states.lookup("default")!.set("fillPattern", fillPattern);
 			}
-		}		
+		}
 
 		if (this.isDirty("curveFactory")) {
 			const curveFactory = this.get("curveFactory")!;
@@ -327,7 +327,7 @@ export class LineSeries extends XYSeries {
 					this._startSegment(0);
 				}
 				else {
-					// this is done to avoid recursion with a lot of segments 
+					// this is done to avoid recursion with a lot of segments
 					while (this._dindex < endIndex - 1) {
 						this._startSegment(this._dindex);
 						this._sindex++;
@@ -348,8 +348,8 @@ export class LineSeries extends XYSeries {
 
 		this.axisRanges.each((axisRange) => {
 			axisRange.fills!.clear();
-			axisRange.strokes!.clear();			
-		})		
+			axisRange.strokes!.clear();
+		})
 	}
 
 	protected _startSegment(dataItemIndex: number) {
@@ -552,11 +552,11 @@ export class LineSeries extends XYSeries {
 
 			if (rangeStrokeTemplate && rangeStrokeTemplate != this.strokes.template) {
 				stroke.template = rangeStrokeTemplate;
-			}			
+			}
 
 			if (rangeFillTemplate && rangeFillTemplate != this.fills.template) {
 				fill.template = rangeFillTemplate;
-			}						
+			}
 
 			stroke.setPrivate("visible", true);
 			this._drawStroke(stroke, segments);

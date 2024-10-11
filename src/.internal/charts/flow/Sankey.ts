@@ -72,9 +72,9 @@ export interface ISankeySettings extends IFlowSettings {
 
 	/**
 	 * A custom function to use when sorting links.
-	 * 
+	 *
 	 * Use `null` to sort links exactly the way they are presented in data.
-	 * 
+	 *
 	 * @since 5.4.4
 	 */
 	linkSort?: null | ((a: d3sankey.SankeyLinkMinimal<{}, {}>, b: d3sankey.SankeyLinkMinimal<{}, {}>) => number | null);
@@ -103,10 +103,10 @@ export class Sankey extends Flow {
 	 *
 	 * @default new ListTemplate<SankeyLink>
 	 */
-	public readonly links: ListTemplate<SankeyLink> = new ListTemplate(
+	public readonly links: ListTemplate<SankeyLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => SankeyLink._new(this._root, { themeTags: ["link", "shape"] }, [this.links.template])
-	);
+	));
 
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["sankey", this._settings.orientation || "horizontal"]);

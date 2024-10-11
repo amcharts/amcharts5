@@ -501,6 +501,14 @@ export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDi
 		super._onClear(oldValues);
 	}
 
+	protected _dispose() {
+		if (this.autoDispose) {
+			$array.each(this._values, (x) => {
+				x.dispose();
+			});
+		}
+	}
+
 	public isDisposed(): boolean {
 		return this._disposed;
 	}
@@ -508,12 +516,7 @@ export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDi
 	public dispose(): void {
 		if (!this._disposed) {
 			this._disposed = true;
-
-			if (this.autoDispose) {
-				$array.each(this._values, (x) => {
-					x.dispose();
-				});
-			}
+			this._dispose();
 		}
 	}
 }
@@ -533,5 +536,13 @@ export class ListTemplate<A extends Entity> extends ListAutoDispose<A> {
 		super();
 		this.template = template;
 		this.make = make;
+	}
+
+	protected _dispose() {
+		super._dispose();
+
+		if (this.autoDispose) {
+			this.template.dispose();
+		}
 	}
 }

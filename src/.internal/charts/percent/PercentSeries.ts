@@ -160,7 +160,7 @@ export abstract class PercentSeries extends Series {
 	 *
 	 * `slices.template` can also be used to configure slices.
 	 */
-	public readonly slices: ListTemplate<this["_sliceType"]> = this._makeSlices();
+	public readonly slices: ListTemplate<this["_sliceType"]> = this.addDisposer(this._makeSlices());
 
 	protected abstract _makeSlices(): ListTemplate<this["_sliceType"]>;
 
@@ -178,7 +178,7 @@ export abstract class PercentSeries extends Series {
 
 		slice.on("fillPattern", () => {
 			this.updateLegendMarker(dataItem);
-		})		
+		})
 
 		slice.on("stroke", () => {
 			this.updateLegendMarker(dataItem);
@@ -196,7 +196,7 @@ export abstract class PercentSeries extends Series {
 	 *
 	 * `labels.template` can also be used to configure slice labels.
 	 */
-	public readonly labels: ListTemplate<this["_labelType"]> = this._makeLabels();
+	public readonly labels: ListTemplate<this["_labelType"]> = this.addDisposer(this._makeLabels());
 
 	protected abstract _makeLabels(): ListTemplate<this["_labelType"]>;
 
@@ -216,7 +216,7 @@ export abstract class PercentSeries extends Series {
 	 *
 	 * `ticks.template` can also be used to configure slice ticks.
 	 */
-	public readonly ticks: ListTemplate<this["_tickType"]> = this._makeTicks();
+	public readonly ticks: ListTemplate<this["_tickType"]> = this.addDisposer(this._makeTicks());
 
 	protected abstract _makeTicks(): ListTemplate<this["_tickType"]>;
 
