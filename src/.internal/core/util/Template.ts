@@ -438,7 +438,7 @@ export class Template<E extends Entity> implements IDisposer {
 	}
 
 	public _removeObjectTemplate(entity: E) {
-		this._checkDisposed();
+		//this._checkDisposed();
 		$array.remove(this._entities, entity);
 	}
 

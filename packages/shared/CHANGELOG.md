@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.7] - 2024-10-12
+
+### Fixed
+- In some cases disposing `Root` element could result in a "Template is disposed" error.
+
+
 ## [5.10.6] - 2024-10-11
 
 ### Added
