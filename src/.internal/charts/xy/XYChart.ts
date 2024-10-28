@@ -507,25 +507,15 @@ export class XYChart extends SerialChart {
 
 		const wheelEvent = event.originalEvent;
 
-		// Check if the inner scroll is over
-		let innerScrollOver = true;
-		const scrollbarX = this.get("scrollbarX");
-		const scrollbarY = this.get("scrollbarY");
-
-		if (scrollbarX) {
-			const startX = scrollbarX.get("start", 0);
-			const endX = scrollbarX.get("end", 1);
-			if (startX > 0 || endX < 1) {
-				innerScrollOver = false;
-			}
+		// Ignore wheel event if it is happening on a non-chart element, e.g. if
+		// some page element is over the chart.
+		if ($utils.isLocalEvent(wheelEvent, this)) {
+			// I believe the following piece of code remove the possibility of 
+			// custom behavior, like letting the event bubble up if desired
+			// wheelEvent.preventDefault();
 		}
-
-		if (scrollbarY) {
-			const startY = scrollbarY.get("start", 0);
-			const endY = scrollbarY.get("end", 1);
-			if (startY > 0 || endY < 1) {
-				innerScrollOver = false;
-			}
+		else {
+			return;
 		}
 
 		const plotPoint = plotContainer.toLocal(event.point);
@@ -536,6 +526,7 @@ export class XYChart extends SerialChart {
 
 		const wheelZoomPositionX = this.get("wheelZoomPositionX");
 		const wheelZoomPositionY = this.get("wheelZoomPositionY");
+
 
 		if ((wheelX === "zoomX" || wheelX === "zoomXY") && shiftX != 0) {
 			this.xAxes.each((axis) => {
@@ -705,12 +696,19 @@ export class XYChart extends SerialChart {
 					newStart = se[0];
 					newEnd = se[1];
 
-					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					const canLeft = newStart != 0 && delta < 0;
+					const canRight = newEnd != 1 && delta > 0;
+
+					// Still not perfect, due to the animation
+					// But that is what I found so far
+					if ($utils.isLocalEvent(wheelEvent, this) && (canLeft || canRight)) {
+						event.originalEvent.preventDefault();
+						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					} else {
+						this.events.dispatch("wheelended", { type: "wheelended", target: this });
+					}
 				}
 			})
-			if ($utils.isLocalEvent(wheelEvent, this) && !innerScrollOver) {
-				wheelEvent.preventDefault();
-			}
 		}
 	}
 
