@@ -186,7 +186,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 			if (columnsTemplate.get("fillPattern") == null) {
 				columnsTemplate.set("fillPattern", this.get("fillPattern"));
 			}
-		}		
+		}
 
 		if (this.isDirty("stroke")) {
 			if (columnsTemplate.get("stroke") == null) {
@@ -520,6 +520,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 			}
 
 			this._applyGraphicsStates(dataItem, previousDataItem);
+		}
+		else {
+			this._toggleColumn(dataItem, false);
 		}
 	}
 

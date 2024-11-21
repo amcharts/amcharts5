@@ -689,6 +689,10 @@ export class Root implements IDisposer {
 					// generate internal click events.
 					const focusedSprite = this._focusedSprite;
 					if (focusedSprite) {
+						const announceText = focusedSprite.get("clickAnnounceText", "");
+						if (announceText !== "") {
+							this.readerAlert(announceText);
+						}
 						const downEvent = renderer.getEvent(new MouseEvent("click"));
 						focusedSprite.events.dispatch("click", {
 							type: "click",
@@ -716,6 +720,10 @@ export class Root implements IDisposer {
 						switch (eventKey) {
 							case "Enter":
 							case " ":
+								const announceText = focusedSprite.get("clickAnnounceText", "");
+								if (announceText !== "") {
+									this.readerAlert(announceText);
+								}
 								if (eventKey == " " && focusedSprite.get("role") != "checkbox") {
 									return;
 								}
@@ -811,7 +819,7 @@ export class Root implements IDisposer {
 						switch (eventKey) {
 							case "ArrowLeft":
 							case "ArrowRight":
-							case "ArrowTop":
+							case "ArrowUp":
 							case "ArrowDown":
 								if (focusedSprite.isDragging()) {
 									// Simulate drag stop
@@ -852,6 +860,13 @@ export class Root implements IDisposer {
 										index = 0;
 									}
 									$utils.focus(items[index].getPrivate("focusElement")!.dom);
+								}
+								break;
+							case "Tab":
+								const group = focusedSprite.get("focusableGroup");
+								if (group && this._isShift) {
+									this._focusNext(focusedSprite.getPrivate("focusElement")!.dom, -1, group);
+									return;
 								}
 								break;
 						}
@@ -1732,7 +1747,7 @@ export class Root implements IDisposer {
 		}
 	}
 
-	protected _focusNext(el: HTMLDivElement, direction: 1 | -1): void {
+	protected _focusNext(el: HTMLDivElement, direction: 1 | -1, group?: string | number): void {
 		if (this._a11yD == true) {
 			return;
 		}
@@ -1762,7 +1777,17 @@ export class Root implements IDisposer {
 			index = 0;
 		}
 
-		(<HTMLElement>focusableElements[index]).focus();
+		const targetElement = (<HTMLDivElement>focusableElements[index]);
+
+		if (group && direction == -1) {
+			const target = this._getSpriteByFocusElement(targetElement);
+			if (target && target.get("focusableGroup") == group) {
+				this._focusNext(targetElement, direction);
+				return;
+			}
+		}
+
+		targetElement.focus();
 	}
 
 	protected _handleBlur(ev: FocusEvent): void {
@@ -2112,8 +2137,8 @@ export class Root implements IDisposer {
 			// htmlElement.style.top = (bounds.top) + "px";
 			// htmlElement.style.left = (bounds.left) + "px";
 			let pos = {
-				x: target.x(),
-				y: target.y()
+				x: target.x() + target.get("dx", 0),
+				y: target.y() + target.get("dy", 0)
 			}
 			if (target.parent) {
 				pos = target.parent.toGlobal(pos)
@@ -2176,15 +2201,15 @@ export class Root implements IDisposer {
 				}
 
 				target._localBounds = { left: ll, right: lr, top: lt, bottom: lb };
-				
+
 				let previousBounds = target._adjustedLocalBounds;
 				let newBounds = target._display.getAdjustedBounds(target._localBounds);
 				target._adjustedLocalBounds = newBounds;
 
 				// compare each value of the bounds
-				if(previousBounds.left !== newBounds.left || previousBounds.right !== newBounds.right || previousBounds.top !== newBounds.top || previousBounds.bottom !== newBounds.bottom){
+				if (previousBounds.left !== newBounds.left || previousBounds.right !== newBounds.right || previousBounds.top !== newBounds.top || previousBounds.bottom !== newBounds.bottom) {
 					target.markDirtyBounds();
-				}				
+				}
 			}
 
 			if (w > 0) {

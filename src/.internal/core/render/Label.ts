@@ -407,7 +407,7 @@ export class Label extends Container {
 
 		const maxWidth = this.get("maxWidth", this.getPrivate("maxWidth", Infinity));
 		if ($type.isNumber(maxWidth)) {
-			text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
+			text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
 		}
 		else {
 			text.set(vertical ? "maxHeight" : "maxWidth", undefined);
@@ -415,7 +415,7 @@ export class Label extends Container {
 
 		const maxHeight = this.get("maxHeight", this.getPrivate("maxHeight", Infinity));
 		if ($type.isNumber(maxHeight)) {
-			text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
+			text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
 		}
 		else {
 			text.set(vertical ? "maxWidth" : "maxHeight", undefined);
@@ -423,7 +423,7 @@ export class Label extends Container {
 
 		this.root.events.once("frameended", () => {
 			text.markDirtyBounds();
-		})
+		});
 	}
 
 	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {

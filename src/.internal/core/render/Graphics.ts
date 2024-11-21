@@ -166,6 +166,15 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 * @since 5.2.10
 	 */
 	lineJoin?: "miter" | "round" | "bevel";
+
+	/**
+	 * This setting determines the shape used to draw the end points of lines.
+	 *
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineCap} for more info
+	 * @default "butt"
+	 * @since 5.10.8
+	 */
+	lineCap?: "butt" | "round" | "square";
 }
 
 export interface IGraphicsPrivate extends ISpritePrivate {
@@ -202,7 +211,7 @@ export class Graphics extends Sprite {
 			this.markDirtyBounds();
 		}
 
-		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("scale") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("lineJoin") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
+		if (this.isDirty("fill") || this.isDirty("stroke") || this.isDirty("visible") || this.isDirty("forceHidden") || this.isDirty("scale") || this.isDirty("fillGradient") || this.isDirty("strokeGradient") || this.isDirty("fillPattern") || this.isDirty("strokePattern") || this.isDirty("fillOpacity") || this.isDirty("strokeOpacity") || this.isDirty("strokeWidth") || this.isDirty("draw") || this.isDirty("blendMode") || this.isDirty("strokeDasharray") || this.isDirty("strokeDashoffset") || this.isDirty("svgPath") || this.isDirty("lineJoin") || this.isDirty("lineCap") || this.isDirty("shadowColor") || this.isDirty("shadowBlur") || this.isDirty("shadowOffsetX") || this.isDirty("shadowOffsetY")) {
 			this._clear = true;
 		}
 
@@ -364,9 +373,10 @@ export class Graphics extends Sprite {
 				}
 
 				const lineJoin = this.get("lineJoin");
+				const lineCap = this.get("lineCap");
 
 				if (stroke && !strokeGradient) {
-					this._display.lineStyle(strokeWidth, stroke, strokeOpacity, lineJoin);
+					this._display.lineStyle(strokeWidth, stroke, strokeOpacity, lineJoin, lineCap);
 					this._display.endStroke();
 				}
 
@@ -389,7 +399,7 @@ export class Graphics extends Sprite {
 
 					const gradient = strokeGradient.getFill(this);
 					if (gradient) {
-						this._display.lineStyle(strokeWidth, gradient, strokeOpacity, lineJoin);
+						this._display.lineStyle(strokeWidth, gradient, strokeOpacity, lineJoin, lineCap);
 						this._display.endStroke();
 					}
 				}
@@ -411,7 +421,7 @@ export class Graphics extends Sprite {
 					let pattern = strokePattern.pattern;
 
 					if (pattern) {
-						this._display.lineStyle(strokeWidth, pattern, strokeOpacity, lineJoin);
+						this._display.lineStyle(strokeWidth, pattern, strokeOpacity, lineJoin, lineCap);
 						this._display.endStroke();
 
 						if (strokePattern instanceof PicturePattern) {

@@ -509,8 +509,9 @@ export class XYChart extends SerialChart {
 
 		// Ignore wheel event if it is happening on a non-chart element, e.g. if
 		// some page element is over the chart.
+		let prevent = false;
 		if ($utils.isLocalEvent(wheelEvent, this)) {
-			wheelEvent.preventDefault();
+			prevent = true;
 		}
 		else {
 			return;
@@ -542,8 +543,16 @@ export class XYChart extends SerialChart {
 
 					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftX * position));
 					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftX * (1 - position)));
+
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+					else {
+						prevent = false;
 					}
 				}
 			})
@@ -566,8 +575,15 @@ export class XYChart extends SerialChart {
 					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftY * position));
 					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftY * (1 - position)));
 
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+					else {
+						prevent = false;
 					}
 				}
 			})
@@ -591,8 +607,15 @@ export class XYChart extends SerialChart {
 					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftX * position));
 					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftX * (1 - position)));
 
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+					else {
+						prevent = false;
 					}
 				}
 			})
@@ -615,8 +638,15 @@ export class XYChart extends SerialChart {
 					let newStart = Math.min(1 + maxDeviation, Math.max(-maxDeviation, start - wheelStep * (end - start) * shiftY * position));
 					let newEnd = Math.max(-maxDeviation, Math.min(1 + maxDeviation, end + wheelStep * (end - start) * shiftY * (1 - position)));
 
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					if (1 / (newEnd - newStart) < axis.getPrivate("maxZoomFactor", Infinity) / axis.get("minZoomCount", 1)) {
 						this._handleWheelAnimation(axis.zoom(newStart, newEnd));
+					}
+					else {
+						prevent = false;
 					}
 				}
 			})
@@ -637,6 +667,10 @@ export class XYChart extends SerialChart {
 					newStart = se[0];
 					newEnd = se[1];
 
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 				}
 			})
@@ -655,6 +689,10 @@ export class XYChart extends SerialChart {
 					let se = this._fixWheel(newStart, newEnd);
 					newStart = se[0];
 					newEnd = se[1];
+
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
 
 					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 				}
@@ -675,6 +713,10 @@ export class XYChart extends SerialChart {
 					newStart = se[0];
 					newEnd = se[1];
 
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 				}
 			})
@@ -694,9 +736,17 @@ export class XYChart extends SerialChart {
 					newStart = se[0];
 					newEnd = se[1];
 
+					if (newStart == start && newEnd == end) {
+						prevent = false;
+					}
+
 					this._handleWheelAnimation(axis.zoom(newStart, newEnd));
 				}
 			})
+		}
+
+		if (prevent) {
+			wheelEvent.preventDefault();
 		}
 	}
 

@@ -48,6 +48,14 @@ export interface IAccessibilitySettings {
 	focusableGroup?: string | number;
 
 	/**
+	 * If set, the text will be read out (announced) by a screen reader when
+	 * focused element is "clicked" (by pressing ENTER or SPACE).
+	 * 
+	 * @since 5.10.8
+	 */
+	clickAnnounceText?: string;
+
+	/**
 	 * Element's role.
 	 * 
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Roles} for more info

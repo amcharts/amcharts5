@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.8] - 2024-11-21
+
+### Added
+- New setting `lineCap` (default `"butt"`) added to `Graphics`. Allows specifying how line ends should be drawn. Possible values: `"butt"` (default), `"round"`, `"square"`.
+- New setting `clickAnnounceText` added to `Sprite`. If set will announce the text when focused element is triggered with a press of ENTER or SPACE.
+
+### Changed
+- Pressing Shift-TAB while focus on non-first member of the focusabel group will now jump to a previous group or focusable element, rather than current group's first element.
+- When an `XYChart` is zoomed using mouse wheel it will no longer stop page scroll when its fully zoomed out or zoomed in.
+
+### Fixed
+- HTML content was ignoring `dx`/`dy` position adjustment settings.
+- Pressing the UP key was being ignored when navigating within a group of focusable objects.
+- Last label of `GaplessDateAxis` was in wrong position when baseInterval was week and minorGrid was enabled.
+- Setting data item's value to null (if previous was a valid number) did not remove the column of a ColumnSeries.
+- The `maxWidth`/`maxHeight` recaculation of vertical labels was not correctly factoring in its padding.
+
+
 ## [5.10.7] - 2024-10-12
 
 ### Fixed

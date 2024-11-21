@@ -685,6 +685,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this.getPrivate("baseInterval")?.timeUnit != "week") {
 				minorGridInterval = { timeUnit: "day", count: 1 };
 			}
+			else {
+				minorGridInterval = { timeUnit: "week", count: 1 };
+			}
 		}
 		return minorGridInterval;
 	}
@@ -1278,13 +1281,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		return 0.05;
 	}
 
-	public nextPosition(count?:number){
-		if(count == null){
+	public nextPosition(count?: number) {
+		if (count == null) {
 			count = 1;
 		}
 
-		let dtime = this.get("tooltipLocation", 0.5) * this.baseDuration();		
-		if(this.get("renderer").getPrivate("letter") == "Y"){
+		let dtime = this.get("tooltipLocation", 0.5) * this.baseDuration();
+		if (this.get("renderer").getPrivate("letter") == "Y") {
 			count *= -1;
 		}
 
@@ -1299,13 +1302,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let min = $time.roun(selectionMin, baseInterval.timeUnit, baseInterval.count, this._root);
 		let max = $time.roun(selectionMax, baseInterval.timeUnit, baseInterval.count, this._root);
 
-		time += dtime;		
+		time += dtime;
 		time = $math.fitToRange(time, min + dtime, max - dtime);
 
 		return this.toGlobalPosition(this.valueToPosition(time));
-	}	
+	}
 
-	protected _nextTime(time:number, count:number, baseInterval:ITimeInterval){
+	protected _nextTime(time: number, count: number, baseInterval: ITimeInterval) {
 		return $time.roun(time + count * this.baseDuration(), baseInterval.timeUnit, baseInterval.count, this._root);
 	}
 }

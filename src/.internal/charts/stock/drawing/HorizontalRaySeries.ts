@@ -1,5 +1,6 @@
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
+import * as $array from "../../../core/util/Array";
 
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 
@@ -55,13 +56,28 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				this._setContext(diP2, "valueY", valueY, true);
 
 				this._setContext(diP1, "valueX", valueX);
-				this._setContext(diP2, "valueX", max + (max - min) * 100);
+				this._setContext(diP2, "valueX", max + (max - min));
 
 				this._setXLocation(diP1, diP1.get("valueX", 0));
 
 				this._positionBullets(diP1);
 			}
 		}
+	}
+
+	public _prepareChildren(): void {
+		super._prepareChildren();
+
+		const xAxis = this.get("xAxis");
+
+		const min = xAxis.getPrivate("min", 0);
+		const max = xAxis.getPrivate("max", 1);
+
+		$array.each(this._di, (di) => {
+			if(di){
+				this._setContext(di["p2"], "valueX", max + (max - min), true);			
+			}
+		});
 	}
 
 	protected _handlePointerMoveReal() {
@@ -78,10 +94,11 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				const max = xAxis.getPrivate("max", 1);
 
 
-				this._setContext(diP2, "valueX", max + (max - min) * 100, true);
+				this._setContext(diP2, "valueX", max + (max - min), true);
 			}
 		}
 	}
+	
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
 		if (this._drawingEnabled) {
