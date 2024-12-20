@@ -189,7 +189,7 @@ export class Measure extends RectangleSeries {
 					[i1, i2] = [i2, i1];
 				}
 
-				for (let i = i1; i < i2; i++) {
+				for (let i = i1; i <= i2; i++) {
 					const dataItem = dataItems[i];
 					if (dataItem) {
 						const value = dataItem.get("valueY");
@@ -200,7 +200,6 @@ export class Measure extends RectangleSeries {
 				}
 			}
 		}
-
 
 		let text = this.get("labelText", "");
 		if (volume > 0) {

@@ -13,6 +13,7 @@ import { ChaikinMoneyFlow } from "../indicators/ChaikinMoneyFlow";
 import { ChaikinOscillator } from "../indicators/ChaikinOscillator";
 import { CommodityChannelIndex } from "../indicators/CommodityChannelIndex";
 import { DisparityIndex } from "../indicators/DisparityIndex";
+import { HeikinAshi } from "../indicators/HeikinAshi";
 import { MACD } from "../indicators/MACD";
 import { MACross } from "../indicators/MACross";
 import { MovingAverage } from "../indicators/MovingAverage";
@@ -46,7 +47,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Average True Range" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Cross" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Price Volume Trend" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Average True Range" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "Heikin Ashi" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Cross" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Price Volume Trend" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -292,6 +293,13 @@ export class IndicatorControl extends DropdownListControl {
 					stockSeries: stockSeries
 				});
 				break;
+			case "Heikin Ashi":
+				indicator = HeikinAshi.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;	
 			case "MACD":
 				indicator = MACD.new(this.root, {
 					stockChart: stockChart,

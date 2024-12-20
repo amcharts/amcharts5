@@ -359,8 +359,9 @@ export class MapChart extends SerialChart {
 
 				// Ignore wheel event if it is happening on a non-chart element, e.g. if
 				// some page element is over the chart.
+				let prevent = false;
 				if ($utils.isLocalEvent(wheelEvent, this)) {
-					wheelEvent.preventDefault();
+					prevent = true;
 				}
 				else {
 					return;
@@ -369,6 +370,10 @@ export class MapChart extends SerialChart {
 				const point = chartContainer._display.toLocal(event.point);
 
 				if ((wheelY == "zoom")) {
+					if(this.get("zoomLevel") == this.get("minZoomLevel", 1) && wheelEvent.deltaY > 0) {
+						return;
+					}
+
 					this._handleWheelZoom(wheelEvent.deltaY, point);
 				}
 				else if (wheelY == "rotateY") {
@@ -386,6 +391,9 @@ export class MapChart extends SerialChart {
 				}
 				else if (wheelX == "rotateX") {
 					this._handleWheelRotateX(wheelEvent.deltaX / 5 * wheelSensitivity, wheelDuration, wheelEasing);
+				}
+				if(prevent) {
+					wheelEvent.preventDefault();
 				}
 
 			});

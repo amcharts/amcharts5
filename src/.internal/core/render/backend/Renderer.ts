@@ -201,6 +201,7 @@ export interface IText extends IDisplayObject {
 	text: string;
 	style: ITextStyle;
 	textVisible: boolean;
+	truncated?: boolean;
 }
 
 /**

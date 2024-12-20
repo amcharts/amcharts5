@@ -140,39 +140,41 @@ export class ZoomableContainer extends Container {
 		const bg = this.contents.get("background");
 		if (bg) {
 			bg.adapters.add("width", (width) => {
-				return Number(width) * 5;
+				return Number(width) * 20;
 			})
 			bg.adapters.add("height", (height) => {
-				return Number(height) * 5;
+				return Number(height) * 20;
 			})
 			bg.adapters.add("x", (x) => {
-				return Number(x) - bg.width() / 5 * 2;
+				return Number(x) - bg.width() / 2;
 			})
 			bg.adapters.add("y", (y) => {
-				return Number(y) - bg.height() / 5 * 2;
+				return Number(y) - bg.height() / 2;
 			})
 		}
 
 		const contents = this.contents;
 
 		contents.adapters.add("x", (x) => {
-			if($type.isNumber(x)){
+			const scale = contents.get("scale", 1);
+			if($type.isNumber(x) && scale >= 1){
 				let maxPanOut = this.get("maxPanOut", 0.4);
 				let w = contents.width();
 
 				x = Math.min(w * maxPanOut, x);
-				x = Math.max(this.width() - w * contents.get("scale", 1) * (1 + maxPanOut), x);
+				x = Math.max(this.width() - w * scale * (1 + maxPanOut), x);
 			}
 			return x;
 		})
 
 		contents.adapters.add("y", (y) => {
-			if($type.isNumber(y)){
+			const scale = contents.get("scale", 1);
+			if($type.isNumber(y) && scale >= 1){
 				let maxPanOut = this.get("maxPanOut", 0.4);
 				let h = contents.height();
 
 				y = Math.min(h * maxPanOut, y);
-				y = Math.max(this.height() - h * contents.get("scale", 1) * (1 + maxPanOut), y);
+				y = Math.max(this.height() - h * scale * (1 + maxPanOut), y);
 			}
 			return y;
 		})

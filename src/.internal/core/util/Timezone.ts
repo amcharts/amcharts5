@@ -19,7 +19,10 @@ function parseDate(timezone: Intl.DateTimeFormat, date: Date): ParsedDate {
 	let millisecond = 0;
 	let weekday = 0;
 
+
+
 	timezone.formatToParts(date).forEach((x) => {
+
 		switch (x.type) {
 			case "year":
 				year = +x.value;
@@ -107,7 +110,7 @@ export class Timezone {
 
 		this.name = timezone;
 
-		this._utc = new Intl.DateTimeFormat("UTC", {
+		this._utc = new Intl.DateTimeFormat("en-US", {
 			hour12: false,
 			timeZone: "UTC",
 			year: "numeric",
@@ -120,7 +123,7 @@ export class Timezone {
 			fractionalSecondDigits: 3,
 		} as any);
 
-		this._dtf = new Intl.DateTimeFormat("UTC", {
+		this._dtf = new Intl.DateTimeFormat("en-US", {
 			hour12: false,
 			timeZone: timezone,
 			year: "numeric",

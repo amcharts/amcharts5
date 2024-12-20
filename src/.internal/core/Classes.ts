@@ -93,6 +93,7 @@ import type { GraticuleSeries } from "./../charts/map/GraticuleSeries.js";
 import type { Grid } from "./../charts/xy/axes/Grid.js";
 import type { GridLayout } from "./render/GridLayout.js";
 import type { HeatLegend } from "./render/HeatLegend.js";
+import type { HeikinAshi } from "./../charts/stock/indicators/HeikinAshi.js";
 import type { Hierarchy } from "./../charts/hierarchy/Hierarchy.js";
 import type { HierarchyLink } from "./../charts/hierarchy/HierarchyLink.js";
 import type { HierarchyNode } from "./../charts/hierarchy/HierarchyNode.js";
@@ -322,6 +323,7 @@ export interface IClasses {
 	"Grid": Grid;
 	"GridLayout": GridLayout;
 	"HeatLegend": HeatLegend;
+	"HeikinAshi": HeikinAshi;
 	"Hierarchy": Hierarchy;
 	"HierarchyLink": HierarchyLink;
 	"HierarchyNode": HierarchyNode;

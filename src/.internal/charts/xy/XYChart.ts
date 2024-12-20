@@ -1603,7 +1603,15 @@ export class XYChart extends SerialChart {
 		const w = plotContainer.width();
 		const h = plotContainer.height();
 
-		const hh = this.height();
+		let hh = this.height();
+
+		const bounds = this._root.tooltipContainer.get("layerMargin");
+
+		if (bounds) {
+			if (bounds.bottom > hh) {
+				hh = bounds.bottom;
+			}
+		}
 
 		let plotT = plotContainer._display.toGlobal({ x: 0, y: 0 });
 		let plotB = plotContainer._display.toGlobal({ x: w, y: h });
@@ -1728,7 +1736,6 @@ export class XYChart extends SerialChart {
 					}
 				})
 				if (prevY < 0) {
-
 					tooltips.reverse();
 					let prevBottom = prevY;
 

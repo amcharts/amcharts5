@@ -5,6 +5,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.9] - 2024-12-20
+
+### Added
+- Added way to determine if text label was autotruncated (`label.text._display.trunacted`).
+- Heikin Ashi indicator added to `StockChart`.
+
+### Changed
+- The following settings will carry over to `Label`'s HTML content if set: `fontFamily`, `fontSize`, `fontStyle`, `fontWeight`, `fontStyle`, `fontVariant`, `textDecoration`.
+- When an `MapChart` is zoomed using mouse wheel it will no longer stop page scroll when its fully zoomed out.
+- When arranging tooltips on an `XYChart`, will now pay attention to `tooltipContainerBounds.bottom` setting.
+
+### Fixed
+- `ZoomableContainer` was not zooming out properly if `minZoomLevel` was `< 1`.
+- `PicturePattern` was ignoring `colorOpacity` setting.
+- `PicturePattern` with `fit: "pattern"` set would sometimes not show actual image.
+- "Measure" drawing tool of `StockChart` was not including one volume bar value.
+- If a timezone was set on a chart and browser's locale was set to some non-English language, weekly grid was shown incorrecly on a `DateAxis`.
+- Changing `text` on a `Label` with `oversizedBehavior="fit"` would sometimes not revert to original scale even if the new text would fit into max width.
+
+
 ## [5.10.8] - 2024-11-21
 
 ### Added
@@ -18,8 +38,8 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Fixed
 - HTML content was ignoring `dx`/`dy` position adjustment settings.
 - Pressing the UP key was being ignored when navigating within a group of focusable objects.
-- Last label of `GaplessDateAxis` was in wrong position when baseInterval was week and minorGrid was enabled.
-- Setting data item's value to null (if previous was a valid number) did not remove the column of a ColumnSeries.
+- Last label of `GaplessDateAxis` was in wrong position when `baseInterval` was set to week and `minorGrid` was enabled.
+- Setting data item's value to `null` (if previous was a valid number) did not remove the column of a `ColumnSeries`.
 - The `maxWidth`/`maxHeight` recaculation of vertical labels was not correctly factoring in its padding.
 
 

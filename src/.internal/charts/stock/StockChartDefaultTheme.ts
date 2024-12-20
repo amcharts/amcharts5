@@ -477,7 +477,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("Triangle", ["drawing", "arrow"]).setAll({
 			width: 22,
-			height: 17			
+			height: 17
 		})
 
 		{
@@ -739,6 +739,11 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("ColumnSeries", ["awesomeoscillator"]).setAll({
 			legendValueText: "[{oscillatorColor}; bold]{valueY.formatNumber('#.00')}[/]",
+		})
+
+		r("CandlestickSeries", ["heikinashi"]).setAll({
+			legendValueText: "open: [bold]{openValueY.formatNumber('#.00')}[/] low: [bold]{lowValueY.formatNumber('#.00')}[/] high: [bold]{highValueY.formatNumber('#.00')}[/] close: [bold]{valueY.formatNumber('#.00')}[/]",
+			legendRangeValueText: ""
 		})
 
 		r("LineSeries", ["indicator", "bollingerbands"]).setAll({
@@ -1215,6 +1220,14 @@ export class StockChartDefaultTheme extends Theme {
 			decreasingColor: ic.get("negative")
 		});
 
+		r("HeikinAshi").setAll({
+			name: "Heikin Ashi",
+			shortName: "Heikin Ashi",
+			increasingColor: ic.get("positive"),
+			decreasingColor: ic.get("negative")
+		});
+
+
 		r("Volume").setAll({
 			name: "Volume",
 			shortName: "Volume",
@@ -1265,7 +1278,7 @@ export class StockChartDefaultTheme extends Theme {
 			scrollable: true,
 			fixedLabel: true,
 			searchable: true,
-			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Average True Range", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
+			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Average True Range", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "Heikin Ashi", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

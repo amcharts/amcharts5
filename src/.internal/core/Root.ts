@@ -2104,11 +2104,39 @@ export class Root implements IDisposer {
 		if (htmlElement) {
 
 			// Translate settings
-			const visualSettings = ["paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "minWidth", "minHeight", "maxWidth", "maxHeight"];
+			const visualSettings = [
+				"paddingTop",
+				"paddingRight",
+				"paddingBottom",
+				"paddingLeft",
+				"minWidth",
+				"minHeight",
+				"maxWidth",
+				"maxHeight"
+			];
 			$array.each(visualSettings, (setting: any) => {
 				const value = target.get(setting);
 				if (value) {
 					htmlElement.style[setting] = value + "px";
+				}
+				else {
+					htmlElement.style[setting] = "";
+				}
+			});
+
+			const strtingSettings = [
+				"fontFamily",
+				"fontSize",
+				"fontStyle",
+				"fontWeight",
+				"fontStyle",
+				"fontVariant",
+				"textDecoration"
+			];
+			$array.each(strtingSettings, (setting: any) => {
+				const value = target.get(setting);
+				if (value) {
+					htmlElement.style[setting] = value + "";
 				}
 				else {
 					htmlElement.style[setting] = "";

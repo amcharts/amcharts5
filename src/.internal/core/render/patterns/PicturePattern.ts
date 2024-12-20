@@ -75,11 +75,17 @@ export class PicturePattern extends Pattern {
 		if (canvas) {
 			this.set("width", canvas.width);
 			this.set("height", canvas.height)
-		}		
+		}
 	}
 
 	protected _draw() {
 		super._draw();
+
+		const colorOpacity = this.get("colorOpacity");
+		if (colorOpacity !== undefined) {
+			this._display.alpha = Math.max(0, colorOpacity);
+		}
+
 		const image = this._image;
 		if (image) {
 			const patternWidth = this.get("width", 100);
@@ -92,6 +98,7 @@ export class PicturePattern extends Pattern {
 			if (fit == "pattern") {
 				width = patternWidth;
 				height = patternHeight;
+				this.markDirty();
 			}
 			else {
 				width = image.width;
@@ -117,6 +124,7 @@ export class PicturePattern extends Pattern {
 		if (canvas) {
 			this._display.image(canvas, canvas.width, canvas.height, 0, 0);
 		}
+
 	}
 
 	protected _load() {

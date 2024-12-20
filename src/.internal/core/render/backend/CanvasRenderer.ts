@@ -1616,6 +1616,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 	public style: CanvasTextStyle;
 	public resolution: number = 1;
 	public textVisible: boolean = true;
+	public truncated?: boolean;
 
 	protected _textInfo: Array<ILine> | undefined;
 	protected _originalScale?: number = 1;
@@ -2047,6 +2048,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						// Check for fit
 						if (truncate) {
 
+							this.truncated = undefined;
+
 							// Break words?
 							let breakWords = firstTextChunk || this.style.breakWords || false;
 
@@ -2061,6 +2064,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 								chunk.text = this._truncateText(context, chunk.text, excessWidth, breakWords);
 								chunk.text += ellipsis;
 								skipFurtherText = true;
+								this.truncated = true;
 							}
 
 						}
@@ -2248,7 +2252,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						bounds.bottom = 0;
 					}
 					else {
-						if (!this._originalScale || this._originalScale == 1) {
+						if (!this._originalScale) {
 							this._originalScale = this.scale;
 						}
 						this.scale = ratio;
