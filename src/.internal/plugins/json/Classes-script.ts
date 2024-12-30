@@ -93,6 +93,7 @@ import type { GraticuleSeries } from "./../../../map";
 import type { Grid } from "./../../../xy";
 import type { GridLayout } from "./../../../index";
 import type { HeatLegend } from "./../../../index";
+import type { HeikinAshi } from "./../../../stock";
 import type { Hierarchy } from "./../../../hierarchy";
 import type { HierarchyLink } from "./../../../hierarchy";
 import type { HierarchyNode } from "./../../../hierarchy";
@@ -322,6 +323,7 @@ export interface IClasses {
 	"Grid": () => Promise<typeof Grid>;
 	"GridLayout": () => Promise<typeof GridLayout>;
 	"HeatLegend": () => Promise<typeof HeatLegend>;
+	"HeikinAshi": () => Promise<typeof HeikinAshi>;
 	"Hierarchy": () => Promise<typeof Hierarchy>;
 	"HierarchyLink": () => Promise<typeof HierarchyLink>;
 	"HierarchyNode": () => Promise<typeof HierarchyNode>;
@@ -552,6 +554,7 @@ const classes: IClasses = {
 	"Grid": () => import(/* webpackExports: "Grid", webpackMode: "weak" */ "./../../../xy").then((m) => m.Grid),
 	"GridLayout": () => import(/* webpackExports: "GridLayout", webpackMode: "weak" */ "./../../../index").then((m) => m.GridLayout),
 	"HeatLegend": () => import(/* webpackExports: "HeatLegend", webpackMode: "weak" */ "./../../../index").then((m) => m.HeatLegend),
+	"HeikinAshi": () => import(/* webpackExports: "HeikinAshi", webpackMode: "weak" */ "./../../../stock").then((m) => m.HeikinAshi),
 	"Hierarchy": () => import(/* webpackExports: "Hierarchy", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Hierarchy),
 	"HierarchyLink": () => import(/* webpackExports: "HierarchyLink", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.HierarchyLink),
 	"HierarchyNode": () => import(/* webpackExports: "HierarchyNode", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.HierarchyNode),

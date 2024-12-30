@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.10] - 2024-12-30
+
+### Fixed
+- Fixed restoring serialized Heikin Ashi indicator.
+- Heikin Ashi indicator formula fix.
+
+
 ## [5.10.9] - 2024-12-20
 
 ### Added

@@ -121,8 +121,8 @@ export class HeikinAshi extends ChartIndicator {
 						const newClose = (open + close + high + low) / 4;
 						const newOpen = (prevOpen + prevClose) / 2;
 
-						const newHigh = Math.max(high, open, close);
-						const newLow = Math.min(low, open, close);
+						const newHigh = Math.max(high, newOpen, newClose);
+						const newLow = Math.min(low, newOpen, newClose);
 
 						data.push({
 							valueX: dataItem.get("valueX"),
