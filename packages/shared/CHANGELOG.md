@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.11] - 2025-01-13
+
+### Added
+- `useSelectionExtremes` added to `XYSeries` (default: `false`). If set to `true` series will use selection extremes when calculating min and max values of the axis scale. Useful for stacked series.
+
+### Changed
+- Setting `fontSize` on an HTML `Label`, will now assume a "px" value instead of ignoring it altogether.
+- Indicator names (both full and short) are now translatable via custom locales.
+
+### Fixed
+- `DateRangeSelector` control on `StockChart` was not working correctly when `Root` had UTC enabled.
+- In some cases, `Tooltip` HTML content would not get updated for series.
+
+
 ## [5.10.10] - 2024-12-30
 
 ### Fixed

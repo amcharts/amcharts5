@@ -222,6 +222,11 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 export interface IXYSeriesSettings extends ISeriesSettings {
 
 	/**
+	 * If set to `true` series will use selection extremes when calculating min and max values of the axis. Useful for stacked series.
+	 */
+	useSelectionExtremes?: boolean;
+
+	/**
 	 * Minimal distance between data items in pixels.
 	 *
 	 * If data items are closer than this, bullets are turned off to avoid
@@ -1440,7 +1445,7 @@ export abstract class XYSeries extends Series {
 					}
 				}
 				if (baseAxis === yAxis || !baseAxis) {
-					if (this.get("valueXShow") !== "valueXWorking") {
+					if (this.get("valueXShow") !== "valueXWorking" || this.get("useSelectionExtremes")) {
 						const selectionMinX = this.getPrivate("selectionMinX");
 						if (selectionMinX != null) {
 							this.setPrivateRaw("minX", selectionMinX);

@@ -428,7 +428,8 @@ export class Label extends Container {
 
 	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
 		super._setDataItem(dataItem);
-		this._markDirtyKey("text")
+		this._markDirtyKey("text");
+		this._markDirtyKey("html");
 		const text = this._text;
 		if (text.get("populateText")) {
 			text.markDirtyText();

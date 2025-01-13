@@ -579,7 +579,12 @@ export class DateFormatter extends Entity {
 		return this._shortWeekdays()[index];
 	}
 
-	public parse(source: any, format: string): Date {
+	public parse(source: any, format: string, utc?: boolean): Date {
+
+		// If UTC is not supplied, use Root setting
+		if (typeof utc === "undefined") {
+			utc = this._root.utc;
+		}
 
 		// Is it already a Date
 		if (source instanceof Date) {
@@ -655,7 +660,7 @@ export class DateFormatter extends Entity {
 			"millisecond": 0,
 			"timestamp": <any>null,
 			"offset": 0,
-			"utc": this._root.utc
+			"utc": utc
 		}
 
 		// Index adjuster
@@ -916,7 +921,7 @@ export class DateFormatter extends Entity {
 					parseInt(matches[parsedIndexes.week]),
 					resValues.year,
 					1,
-					this._root.utc
+					utc
 				);
 			}
 

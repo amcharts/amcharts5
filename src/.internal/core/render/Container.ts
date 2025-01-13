@@ -583,9 +583,9 @@ export class Container extends Sprite {
 	}
 
 	public _updateHTMLContent() {
-		const html = this.get("html");
+		const html = this.get("html", "");
 		if (html && html !== "") {
-			this._root._setHTMLContent(this, populateString(this, this.get("html", "")));
+			this._root._setHTMLContent(this, populateString(this, html));
 		}
 		else {
 			this._root._removeHTMLContent(this);

@@ -2136,7 +2136,12 @@ export class Root implements IDisposer {
 			$array.each(strtingSettings, (setting: any) => {
 				const value = target.get(setting);
 				if (value) {
-					htmlElement.style[setting] = value + "";
+					if (setting == "fontSize" && !$type.isString(value)) {
+						htmlElement.style[setting] = value + "px";
+					}
+					else {
+						htmlElement.style[setting] = value + "";
+					}
 				}
 				else {
 					htmlElement.style[setting] = "";

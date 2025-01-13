@@ -384,7 +384,7 @@ export class DateRangeSelector extends StockControl {
 	}
 
 	protected _parseDate(date: string): Date {
-		return this._root.dateFormatter.parse(date, this._getDateFormat());
+		return this._root.dateFormatter.parse(date, this._getDateFormat(), false);
 	}
 
 	protected _getDateFormat(): string {

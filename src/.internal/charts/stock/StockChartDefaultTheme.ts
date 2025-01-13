@@ -949,8 +949,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("MovingAverage").setAll({
-			name: "Moving Average",
-			shortName: "MA",
+			name: l.translateAny("Moving Average"),
+			shortName: l.translateAny("MA"),
 			seriesColor: color(0xab82da),
 			type: "simple",
 			field: "close",
@@ -959,8 +959,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("MACross").setAll({
-			name: "Moving Average Cross",
-			shortName: "MACross",
+			name: l.translateAny("Moving Average Cross"),
+			shortName: l.translateAny("MACross"),
 			seriesColor: color(0xab82da),
 			fastColor: color(0x1772DE),
 			field: "close",
@@ -969,16 +969,16 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("ZigZag").setAll({
-			name: "ZigZag",
-			shortName: "ZigZag",
+			name: l.translateAny("ZigZag"),
+			shortName: l.translateAny("ZigZag"),
 			seriesColor: ic.get("alternativeBackground"),
 			deviation: 5,
 			depth: 3
 		})
 
 		r("MovingAverageEnvelope").setAll({
-			name: "Moving Average Envelope",
-			shortName: "MA ENV",
+			name: l.translateAny("Moving Average Envelope"),
+			shortName: l.translateAny("MA ENV"),
 			seriesColor: color(0xff903f),
 			upperColor: color(0xffc948),
 			lowerColor: color(0xffaf74),
@@ -991,8 +991,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("MovingAverageDeviation").setAll({
-			name: "Moving Average Deviation",
-			shortName: "MA Dev",
+			name: l.translateAny("Moving Average Deviation"),
+			shortName: l.translateAny("MA Dev"),
 			increasingColor: ic.get("positive"),
 			decreasingColor: ic.get("negative"),
 			type: "simple",
@@ -1001,65 +1001,65 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("StandardDeviation").setAll({
-			name: "Standard Deviation",
+			name: l.translateAny("Standard Deviation"),
 			seriesColor: ic.get("alternativeBackground"),
-			shortName: "STDEV",
+			shortName: l.translateAny("STDEV"),
 			field: "close",
 			period: 20
 		})
 
 		r("TypicalPrice").setAll({
-			name: "Typical Price",
+			name: l.translateAny("Typical Price"),
 			seriesColor: ic.get("alternativeBackground"),
-			shortName: "Typical Price",
+			shortName: l.translateAny("Typical Price"),
 			field: "hlc/3",
 			period: 20
 		})
 
 		r("AverageTrueRange").setAll({
-			name: "Average True Range",
+			name: l.translateAny("Average True Range"),
 			seriesColor: color(0xff903f),
-			shortName: "ATR",
+			shortName: l.translateAny("ATR"),
 			period: 14
 		})
 
 		r("Trix").setAll({
-			name: "Trix",
+			name: l.translateAny("Trix"),
 			seriesColor: ic.get("alternativeBackground"),
 			signalColor: color(0xff903f),
-			shortName: "Trix",
+			shortName: l.translateAny("Trix"),
 			field: "close",
 			period: 20,
 			signalPeriod: 9
 		})
 
 		r("MedianPrice").setAll({
-			name: "Median Price",
+			name: l.translateAny("Median Price"),
 			seriesColor: ic.get("alternativeBackground"),
-			shortName: "Median Price",
+			shortName: l.translateAny("Median Price"),
 			field: "hl/2",
 			period: 20
 		})
 
 
 		r("VWAP").setAll({
-			name: "Volume-Weighted Average Price",
-			shortName: "VWAP",
+			name: l.translateAny("Volume-Weighted Average Price"),
+			shortName: l.translateAny("VWAP"),
 			seriesColor: color(0xab82da),
 			field: "hlc/3",
 			period: 30
 		})
 
 		r("AccumulationDistribution").setAll({
-			name: "Accumulation/Distribution",
-			shortName: "Accum/Dist",
+			name: l.translateAny("Accumulation/Distribution"),
+			shortName: l.translateAny("Accum/Dist"),
 			seriesColor: color(0x707070),
 			useVolume: true
 		})
 
 		r("DisparityIndex").setAll({
-			name: "Disparity Index",
-			shortName: "Disparity",
+			name: l.translateAny("Disparity Index"),
+			shortName: l.translateAny("Disparity"),
 			seriesColor: color(0x707070),
 			period: 14,
 			field: "close",
@@ -1068,42 +1068,42 @@ export class StockChartDefaultTheme extends Theme {
 
 
 		r("ChaikinMoneyFlow").setAll({
-			name: "Chaikin Money Flow",
-			shortName: "Chaikin MF",
+			name: l.translateAny("Chaikin Money Flow"),
+			shortName: l.translateAny("Chaikin MF"),
 			seriesColor: color(0x707070),
 			period: 20
 		})
 
 		r("ChaikinOscillator").setAll({
-			name: "Chaikin Oscillator",
+			name: l.translateAny("Chaikin Oscillator"),
 			period: 3,
 			slowPeriod: 10,
-			shortName: "Chaikin Osc",
+			shortName: l.translateAny("Chaikin Osc"),
 			seriesColor: color(0x707070)
 		})
 
 		r("BullBearPower").setAll({
-			name: "Bull Bear Power",
+			name: l.translateAny("Bull Bear Power"),
 			period: 13,
-			shortName: "BBP",
+			shortName: l.translateAny("BBP"),
 			seriesColor: color(0x707070)
 		})
 
 		r("OnBalanceVolume").setAll({
-			name: "On Balance Volume",
-			shortName: "On Bal Vol",
+			name: l.translateAny("On Balance Volume"),
+			shortName: l.translateAny("On Bal Vol"),
 			seriesColor: color(0x707070)
 		})
 
 		r("PVT").setAll({
-			name: "Price Volume Trend",
-			shortName: "PVT",
+			name: l.translateAny("Price Volume Trend"),
+			shortName: l.translateAny("PVT"),
 			seriesColor: color(0x707070)
 		})
 
 		r("BollingerBands").setAll({
-			name: "Bollinger Bands",
-			shortName: "Bollinger",
+			name: l.translateAny("Bollinger Bands"),
+			shortName: l.translateAny("Bollinger"),
 			standardDeviations: 2,
 			seriesColor: color(0xff903f),
 			upperColor: color(0xffc948),
@@ -1111,8 +1111,8 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("AccelerationBands").setAll({
-			name: "Acceleration Bands",
-			shortName: "Acceleration",
+			name: l.translateAny("Acceleration Bands"),
+			shortName: l.translateAny("Acceleration"),
 			factor: 0.001,
 			period: 20,
 			seriesColor: color(0xff903f),
@@ -1122,8 +1122,8 @@ export class StockChartDefaultTheme extends Theme {
 
 
 		r("RelativeStrengthIndex").setAll({
-			name: "Relative Strength Index",
-			shortName: "RSI",
+			name: l.translateAny("Relative Strength Index"),
+			shortName: l.translateAny("RSI"),
 			period: 14,
 			smaPeriod: 3,
 			field: "close",
@@ -1136,16 +1136,16 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("Momentum").setAll({
-			name: "Momentum",
-			shortName: "Mom",
+			name: l.translateAny("Momentum"),
+			shortName: l.translateAny("Mom"),
 			period: 14,
 			field: "close",
 			seriesColor: color(0xab82da)
 		})
 
 		r("WilliamsR").setAll({
-			name: "Williams %R",
-			shortName: "Williams %R",
+			name: l.translateAny("Williams %R"),
+			shortName: l.translateAny("Williams %R"),
 			period: 14,
 			field: "close",
 			overSold: -80,
@@ -1156,8 +1156,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("CommodityChannelIndex").setAll({
-			name: "Commodity Channel Index",
-			shortName: "CCI",
+			name: l.translateAny("Commodity Channel Index"),
+			shortName: l.translateAny("CCI"),
 			period: 20,
 			field: "close",
 			overSold: -100,
@@ -1168,8 +1168,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("StochasticOscillator").setAll({
-			name: "Stochastic Oscillator",
-			shortName: "Stochastic Osc",
+			name: l.translateAny("Stochastic Oscillator"),
+			shortName: l.translateAny("Stochastic Osc"),
 			period: 14,
 			kSmoothing: 1,
 			dSmoothing: 3,
@@ -1183,8 +1183,8 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("StochasticMomentumIndex").setAll({
-			name: "Stochastic Momentum Index",
-			shortName: "Stochastic MI",
+			name: l.translateAny("Stochastic Momentum Index"),
+			shortName: l.translateAny("Stochastic MI"),
 			period: 10,
 			dPeriod: 3,
 			emaPeriod: 3,
@@ -1198,46 +1198,46 @@ export class StockChartDefaultTheme extends Theme {
 		})
 
 		r("AccumulativeSwingIndex").setAll({
-			name: "Accumulative Swing Index",
-			shortName: "ACC Swing",
+			name: l.translateAny("Accumulative Swing Index"),
+			shortName: l.translateAny("ACC Swing"),
 			limitMoveValue: 1000,
 			positiveColor: ic.get("positive"),
 			negativeColor: ic.get("negative")
 		})
 
 		r("Aroon").setAll({
-			name: "Aroon",
-			shortName: "Aroon",
+			name: l.translateAny("Aroon"),
+			shortName: l.translateAny("Aroon"),
 			period: 14,
 			upColor: ic.get("positive"),
 			downColor: ic.get("negative")
 		})
 
 		r("AwesomeOscillator").setAll({
-			name: "Awesome Oscillator",
-			shortName: "Awesome",
+			name: l.translateAny("Awesome Oscillator"),
+			shortName: l.translateAny("Awesome"),
 			increasingColor: ic.get("positive"),
 			decreasingColor: ic.get("negative")
 		});
 
 		r("HeikinAshi").setAll({
-			name: "Heikin Ashi",
-			shortName: "Heikin Ashi",
+			name: l.translateAny("Heikin Ashi"),
+			shortName: l.translateAny("Heikin Ashi"),
 			increasingColor: ic.get("positive"),
 			decreasingColor: ic.get("negative")
 		});
 
 
 		r("Volume").setAll({
-			name: "Volume",
-			shortName: "Volume",
+			name: l.translateAny("Volume"),
+			shortName: l.translateAny("Volume"),
 			increasingColor: ic.get("positive"),
 			decreasingColor: ic.get("negative")
 		});
 
 		r("VolumeProfile").setAll({
-			name: "Volume Profile",
-			shortName: "Volume Profile",
+			name: l.translateAny("Volume Profile"),
+			shortName: l.translateAny("Volume Profile"),
 			upColor: Color.fromHex(0xE3B30C),
 			downColor: Color.fromHex(0x2E78E3),
 			countType: "rows",
@@ -1248,9 +1248,9 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("MACD").setAll({
-			name: "MACD",
+			name: l.translateAny("MACD"),
 			field: "close",
-			shortName: "MACD",
+			shortName: l.translateAny("MACD"),
 			fastPeriod: 12,
 			slowPeriod: 26,
 			signalPeriod: 9,
