@@ -519,6 +519,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		if (isNaN(date.getTime())) {
 			return date;
 		}
+		let initialTime = date.getTime();
 		let tzoffset = timezone.offsetUTC(date);
 		let timeZoneOffset = date.getTimezoneOffset();
 		let parsedDate = timezone.parseDate(date);
@@ -577,6 +578,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 				if (count > 1) {
 					hour = Math.floor(hour / count) * count;
 				}
+
 				minute = offsetDif;
 				second = 0;
 				millisecond = 0;
@@ -632,7 +634,23 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 				break;
 		}
 
+
+
 		date = new Date(year, month, day, hour, minute, second, millisecond);
+
+		// fix to solve #101989
+		const newTime = date.getTime();
+		let hDuration = 3600000;
+		if (unit == "hour") {
+			hDuration = 3600000 * count;
+		}
+
+		if (newTime + hDuration <= initialTime) {
+			if (unit == "hour" || unit == "minute" || unit == "second" || unit == "millisecond") {
+				date = new Date(newTime + hDuration);
+			}
+		}
+		// end of fix
 
 		let newTimeZoneOffset = date.getTimezoneOffset();
 		let newTzoffset = timezone.offsetUTC(date);

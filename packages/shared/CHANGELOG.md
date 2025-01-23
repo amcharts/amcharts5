@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.10.12] - 2025-01-23
+
+### Fixed
+- `useSelectionExtremes` (added in 5.10.11) was not working with vertical `ValueAxis`.
+- In case `addChildData()` of a `Hierarchy` was used with `topLevel = 0`, newly added nodes were invisible.
+- `DateFormatter` was not considering daylight savings of the timezone when formatting timezone offset related codes.
+- If `Root` timezone was set and series were using hourly (or more granular) data, items could be placed incorrectly at the daylight-savings switch.
+
+
 ## [5.10.11] - 2025-01-13
 
 ### Added

@@ -103,6 +103,7 @@ export class DateFormatter extends Entity {
 		// TODO: decide if we need to cast
 		let date: Date = source;
 
+
 		// Is it a built-in format or Intl.DateTimeFormat
 		if ($type.isObject(format)) {
 
@@ -126,6 +127,7 @@ export class DateFormatter extends Entity {
 
 		// Should we apply custom time zone?
 		const timezone = this._root.timezone;
+		let originalDate = date;
 		if (timezone && !this._root.utc && !ignoreTimezone) {
 			date = timezone.convertLocal(date);
 		}
@@ -138,7 +140,7 @@ export class DateFormatter extends Entity {
 		}
 
 		// Apply format
-		formatted = this.applyFormat(date, info, ignoreTimezone);
+		formatted = this.applyFormat(date, info, ignoreTimezone, originalDate);
 
 		// Capitalize
 		if (this.get("capitalize")) {
@@ -158,7 +160,7 @@ export class DateFormatter extends Entity {
 	 * @param info      Parsed format information
 	 * @return Formatted date string
 	 */
-	protected applyFormat(date: Date, info: DateFormatInfo, ignoreTimezone: boolean = false): string {
+	protected applyFormat(date: Date, info: DateFormatInfo, ignoreTimezone: boolean = false, originalDate?: Date): string {
 
 		// Init return value
 		let res = info.template;
@@ -431,19 +433,19 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "z":
-					value = $utils.getTimeZone(date, false, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined).replace(/[+-]+[0-9]+$/, "");
+					value = $utils.getTimeZone(originalDate || date, false, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined).replace(/[+-]+[0-9]+$/, "");
 					break;
 
 				case "zz":
-					value = $utils.getTimeZone(date, true, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
+					value = $utils.getTimeZone(originalDate || date, true, false, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
 					break;
 
 				case "zzz":
-					value = $utils.getTimeZone(date, false, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined).replace(/[+-]+[0-9]+$/, "");
+					value = $utils.getTimeZone(originalDate || date, false, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined).replace(/[+-]+[0-9]+$/, "");
 					break;
 
 				case "zzzz":
-					value = $utils.getTimeZone(date, true, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
+					value = $utils.getTimeZone(originalDate || date, true, true, this._root.utc, this._root.timezone ? this._root.timezone.name : undefined);
 					break;
 
 				case "Z":
@@ -452,7 +454,7 @@ export class DateFormatter extends Entity {
 					if (timezone instanceof Timezone) {
 						timezone = timezone.name;
 					}
-					const offset = timezone ? $utils.getTimezoneOffset(timezone) : date.getTimezoneOffset();
+					const offset = timezone ? $utils.getTimezoneOffset(timezone, originalDate || date) : date.getTimezoneOffset();
 
 					let tz = Math.abs(offset) / 60;
 					let tzh = Math.floor(tz);

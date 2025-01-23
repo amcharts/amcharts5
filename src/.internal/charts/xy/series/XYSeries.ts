@@ -1431,7 +1431,7 @@ export abstract class XYSeries extends Series {
 				}
 
 				if (baseAxis === xAxis || !baseAxis) {
-					if (this.get("valueYShow") !== "valueYWorking") {
+					if (this.get("valueYShow") !== "valueYWorking" || this.get("useSelectionExtremes")) {
 						const selectionMinY = this.getPrivate("selectionMinY");
 						if (selectionMinY != null) {
 							this.setPrivateRaw("minY", selectionMinY);

@@ -602,7 +602,14 @@ export abstract class Hierarchy extends Series {
 				childDataItem.setRaw("depth", depth + 1);
 
 				if (childDataItem.get("fill") == null) {
-					childDataItem.setRaw("fill", dataItem.get("fill"));
+					let fill = dataItem.get("fill");
+					if(fill == null) {
+						const colors = this.get("colors");
+						if(colors){
+							fill = colors.next();	
+						}						
+					}
+					childDataItem.setRaw("fill", fill);
 				}
 
 				this.processDataItem(childDataItem);

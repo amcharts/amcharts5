@@ -1039,8 +1039,8 @@ export function getTimeZone(date: Date, long: boolean = false, savings: boolean 
 	return trim(wtz);
 }
 
-export function getTimezoneOffset(timezone: string): number {
-	const date = new Date(Date.UTC(2012, 0, 1, 0, 0, 0, 0));
+export function getTimezoneOffset(timezone: string, targetDate?: Date): number {
+	const date = targetDate || new Date(Date.UTC(2012, 0, 1, 0, 0, 0, 0));
 	const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
 	const tzDate = new Date(date.toLocaleString("en-US", { timeZone: timezone }));
 	return (tzDate.getTime() - utcDate.getTime()) / 6e4 * -1;
