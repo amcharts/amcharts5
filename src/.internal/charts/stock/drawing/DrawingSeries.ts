@@ -1056,13 +1056,14 @@ export class DrawingSeries extends LineSeries {
 
 	public toggleDrawing(enabled?: boolean) {
 		if(this._getStockChart().get("hideDrawingGrips")){
+			this.circles.getIndex(0)?.markDirty();
 			this.root.events.once("frameended", () => {
 				this.circles.each((circle) => {
 					circle.set("forceHidden", !enabled);
 				})
 				this.grips.each((grip) => {
 					grip.set("forceInactive", !enabled);
-				})
+				})				
 			})
 		}
 	}

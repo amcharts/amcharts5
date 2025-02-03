@@ -1865,7 +1865,7 @@ export abstract class Sprite extends Entity {
 				}
 			}
 
-			if (this.get("focusable") && this.isFocus()) {
+			if (this.get("focusable")) {
 				this.markDirtyAccessibility();
 			}
 		}

@@ -368,6 +368,13 @@ export class Root implements IDisposer {
 	protected _htmlElementContainer: HTMLDivElement | undefined;
 	protected _htmlEnabledContainers: Container[] = [];
 
+	/**
+	 * Entities that have their `id` setting set.
+	 *
+	 * @since 5.11.0
+	 */
+	public entitiesById: { [index: string]: any } = {};
+
 	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
 		if (!isReal) {
@@ -1573,7 +1580,7 @@ export class Root implements IDisposer {
 			focusElement.removeAttribute("aria-controls");
 		}
 
-		if (target.get("visible") && target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.isHidden() && target.getPrivate("focusable") !== false) {
+		if (target.get("visible") && target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.isHidden() && target.getPrivate("focusable") !== false && (target.height() || target.width())) {
 			if (focusElement.getAttribute("tabindex") != "-1") {
 				focusElement.setAttribute("tabindex", "" + this.tabindex);
 			}

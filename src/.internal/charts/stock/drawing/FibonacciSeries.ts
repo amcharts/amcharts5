@@ -85,6 +85,9 @@ export class FibonacciSeries extends SimpleLineSeries {
 				if (line) {
 					const diP1 = this._di[i]["p1"];
 					const diP2 = this._di[i]["p2"];
+					const di = this._di[i]["e"];
+					const dataContext = di.dataContext as any;
+					const strokeTemplate = dataContext.stroke;					
 
 					if (diP1 && diP2) {
 
@@ -111,9 +114,18 @@ export class FibonacciSeries extends SimpleLineSeries {
 								let strokeColor = fillColor;
 
 								fill.set("fill", fillColor);
-								fill.set("fillOpacity", this.get("fillOpacity", 0));
 								stroke.set("stroke", strokeColor);
-								stroke.set("strokeOpacity", this.get("strokeOpacity", 0));
+
+								let strokeOpacity;								
+								if(strokeTemplate){
+									strokeOpacity = strokeTemplate.get("strokeOpacity");
+								}
+
+								if(strokeOpacity == undefined){
+									strokeOpacity = this.get("strokeOpacity", 0);
+								}
+
+								stroke.set("strokeOpacity", strokeOpacity);
 
 								const y1 = p1.y + (p2.y - p1.y) * prevValue;
 								const y2 = p1.y + (p2.y - p1.y) * -value;

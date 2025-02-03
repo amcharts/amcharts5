@@ -90,11 +90,34 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 								stroke.setPrivate("visible", true);
 
 								const fillTemplate = dataContext.fill;
+								const strokeTemplate = dataContext.stroke;
+
 								let fillColor = this.get("colors", [])[i];
 								let strokeColor = fillColor;
 
-								fill.set("fillOpacity", this.get("fillOpacity", 0) * 0.2);
-								stroke.set("strokeOpacity", this.get("strokeOpacity", 0));
+								let fillOpacity;								
+								if(fillTemplate){
+									fillOpacity = fillTemplate.get("fillOpacity");
+								}
+
+								if(fillOpacity == undefined){
+									fillOpacity = this.get("fillOpacity", 0);
+								}
+
+								fillOpacity = fillOpacity * 0.2;
+								fill.set("fillOpacity", fillOpacity);
+								
+
+								let strokeOpacity;								
+								if(strokeTemplate){
+									strokeOpacity = strokeTemplate.get("strokeOpacity");
+								}
+
+								if(strokeOpacity == undefined){
+									strokeOpacity = this.get("strokeOpacity", 0);
+								}
+
+								stroke.set("strokeOpacity", strokeOpacity);
 
 								if (!fillColor) {
 
@@ -108,7 +131,7 @@ export class FibonacciTimezoneSeries extends FibonacciSeries {
 								}
 
 								if (!strokeColor) {
-									const strokeTemplate = dataContext.stroke;
+									
 									if (strokeTemplate) {
 										strokeColor = strokeTemplate.get("stroke");
 									}

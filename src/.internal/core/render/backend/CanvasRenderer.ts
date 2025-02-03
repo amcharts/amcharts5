@@ -538,7 +538,7 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		}
 	}
 
-	public render(status: IStatus): void {
+	public render(status: IStatus, targetGhostLayer: number = 0): void {
 		if (this.visible && (this.exportable !== false || !this._renderer._omitTainted)) {
 			this._setMatrix();
 
@@ -588,8 +588,10 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 			}
 
 			this._transformMargin(ghostContext, resolution, ghostLayer.margin);
-
-			this._render(subStatus);
+			if ((subStatus.layer.order > 0) && !targetGhostLayer) {
+				$array.move(this._renderer._deferredGhostLayers, subStatus.layer.order);
+			}
+			this._render(subStatus, targetGhostLayer);
 
 			ghostContext.restore();
 
@@ -601,10 +603,20 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 		}
 	}
 
-	protected _render(status: IStatus): void {
+	protected _render(status: IStatus, _targetGhostLayer: number = 0): void {
 		if (this.exportable === false) {
 			status.layer.tainted = true;
 		}
+	}
+
+	protected _ghostOnly(targetGhostLayer: number = 0): boolean {
+		return targetGhostLayer > 0 ? true : false;
+	}
+
+	protected _drawGhost(status: IStatus, targetGhostLayer: number = 0): boolean {
+		const interactive = this._isInteractive(status);
+		const order = status.layer.order || 0;
+		return interactive && ((order == 0 && !this._ghostOnly(targetGhostLayer)) || order == targetGhostLayer) ? true : false;
 	}
 
 	hovering(): boolean {
@@ -666,7 +678,7 @@ export class CanvasContainer extends CanvasDisplayObject implements IContainer {
 		$array.removeFirst(this._children, child);
 	}
 
-	protected _render(status: IStatus): void {
+	protected _render(status: IStatus, targetGhostLayer: number): void {
 		super._render(status);
 
 		const renderer = this._renderer;
@@ -677,7 +689,7 @@ export class CanvasContainer extends CanvasDisplayObject implements IContainer {
 
 		$array.each(this._children, (child) => {
 			child.compoundAlpha = this.compoundAlpha * this.alpha;
-			child.render(status);
+			child.render(status, targetGhostLayer);
 		});
 
 		if (this.interactive && this.interactiveChildren) {
@@ -1493,37 +1505,38 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		});
 	}
 
-	protected _render(status: IStatus): void {
+	protected _render(status: IStatus, targetGhostLayer: number = 0): void {
 		super._render(status);
 
 		const layerDirty = status.layer.dirty;
 		const interactive = this._isInteractive(status);
+		const ghostOnly = this._ghostOnly(targetGhostLayer);
+		const drawGhost = this._drawGhost(status, targetGhostLayer);
 
-		if (layerDirty || interactive) {
+		if (layerDirty || interactive || ghostOnly) {
 
 			const context = status.layer.context;
 			const ghostContext = this._renderer._ghostLayer.context;
 
-			if (layerDirty) {
+			if (layerDirty && !ghostOnly) {
 				context.globalCompositeOperation = this.blendMode;
-
 				context.beginPath();
 			}
 
 			let color: string | undefined;
 
-			if (interactive) {
+			if (drawGhost) {
 				ghostContext.beginPath();
 				color = this._getColorId();
 			}
 
 			$array.each(this._operations, (op) => {
-				if (layerDirty) {
+				if (layerDirty && !ghostOnly) {
 					op.path(context);
 					op.colorize(context, undefined);
 				}
 
-				if (interactive) {
+				if (drawGhost) {
 					op.pathGhost(ghostContext);
 					op.colorizeGhost(ghostContext, color);
 				}
@@ -1748,7 +1761,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		return fontStyle.join(" ");
 	}
 
-	protected _render(status: IStatus): void {
+	protected _render(status: IStatus, targetGhostLayer: number = 0): void {
 		// We need measurements in order to properly position text for alignment
 		if (!this._textInfo) {
 			this._measure(status);
@@ -1760,6 +1773,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			const context = status.layer.context;
 			const layerDirty = status.layer.dirty;
 			const ghostContext = this._renderer._ghostLayer.context;
+
+			const ghostOnly = this._ghostOnly(targetGhostLayer);
+			const drawGhost = this._drawGhost(status, targetGhostLayer);
 
 			context.save();
 			ghostContext.save();
@@ -1777,7 +1793,10 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						context.save();
 						ghostContext.save();
 
-						context.font = chunk.style;
+						if (!ghostOnly) {
+							context.font = chunk.style;
+						}
+
 						if (this._isInteractive(status)) {
 							ghostContext.font = chunk.style;
 						}
@@ -1785,12 +1804,14 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 					if (chunk.fill) {
 						context.save();
-						context.fillStyle = chunk.fill.toCSS();
+						if (!ghostOnly) {
+							context.fillStyle = chunk.fill.toCSS();
+						}
 						// Color does not affect ghostContext so we not set it
 					}
 
 					// Draw text
-					if (layerDirty) {
+					if (layerDirty && !ghostOnly) {
 						context.fillText(chunk.text, chunk.offsetX, line.offsetY + chunk.offsetY);
 					}
 
@@ -1845,22 +1866,24 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							y = thickness + offset * 1.5 + line.offsetY + chunk.offsetY;
 						}
 
-						context.save();
-						context.beginPath();
-						if (chunk.fill) {
-							context.strokeStyle = chunk.fill.toCSS();
+						if (!ghostOnly) {
+							context.save();
+							context.beginPath();
+							if (chunk.fill) {
+								context.strokeStyle = chunk.fill.toCSS();
+							}
+							else if (this.style.fill && this.style.fill instanceof Color) {
+								context.strokeStyle = this.style.fill.toCSS();
+							}
+							context.lineWidth = thickness * offset;
+							context.moveTo(offsetX, y);
+							context.lineTo(offsetX + chunk.width, y);
+							context.stroke();
+							context.restore();
 						}
-						else if (this.style.fill && this.style.fill instanceof Color) {
-							context.strokeStyle = this.style.fill.toCSS();
-						}
-						context.lineWidth = thickness * offset;
-						context.moveTo(offsetX, y);
-						context.lineTo(offsetX + chunk.width, y);
-						context.stroke();
-						context.restore();
 					}
 
-					if (interactive && this.interactive) {
+					if (interactive && this.interactive && drawGhost) {
 						// Draw text in ghost canvas ONLY if it is set as interactive
 						// explicitly. This way we avoid hit test anomalies caused by anti
 						// aliasing of text.
@@ -2451,18 +2474,18 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 	private _textReversed: boolean = false;
 
-	public _render(status: IStatus): void {
+	public _render(status: IStatus, targetGhostLayer: number = 0): void {
 		switch (this.textType) {
 			case "circular":
-				this._renderCircular(status);
+				this._renderCircular(status, targetGhostLayer);
 				break;
 			default:
-				super._render(status);
+				super._render(status, targetGhostLayer);
 				break;
 		}
 	}
 
-	public _renderCircular(status: IStatus): void {
+	public _renderCircular(status: IStatus, targetGhostLayer: number = 0): void {
 		if (this.textVisible) {
 			this._prerender(status);
 
@@ -2493,6 +2516,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 			const kerning = this.kerning || 0;
 			let clockwise = align == "left" ? 1 : -1;
 			const shouldReverse = !this._textReversed;
+
+			const ghostOnly = this._ghostOnly(targetGhostLayer);
+			const drawGhost = this._drawGhost(status, targetGhostLayer);
 
 			// Check if we need to invert the whole stuff
 			if (inward == "auto") {
@@ -2574,7 +2600,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 				}
 
 				// Assume starting angle
-				context.rotate(lineStartAngle);
+				if (!ghostOnly) {
+					context.rotate(lineStartAngle);
+				}
 				if (interactive) {
 					ghostContext.rotate(lineStartAngle);
 				}
@@ -2588,7 +2616,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 					// Rotate half a letter
 					angleShift = (charWidth / 2) / (radius - textHeight) * clockwise;
-					context.rotate(angleShift);
+					if (!ghostOnly) {
+						context.rotate(angleShift);
+					}
 					if (interactive) {
 						ghostContext.rotate(angleShift);
 					}
@@ -2598,7 +2628,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 						context.save();
 						ghostContext.save();
 
-						context.font = chunk.style;
+						if (!ghostOnly) {
+							context.font = chunk.style;
+						}
 						if (interactive) {
 							ghostContext.font = chunk.style;
 						}
@@ -2606,23 +2638,27 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 					if (chunk.fill) {
 						context.save();
-						context.fillStyle = chunk.fill.toCSS();
+						if (!ghostOnly) {
+							context.fillStyle = chunk.fill.toCSS();
+						}
 						// Color does not affect ghostContext so we not set it
 					}
 
 					// Center letters
-					context.textBaseline = "middle";
-					context.textAlign = "center";
+					if (!ghostOnly) {
+						context.textBaseline = "middle";
+						context.textAlign = "center";
+					}
 					if (interactive) {
 						ghostContext.textBaseline = "middle";
 						ghostContext.textAlign = "center";
 					}
 
 					// Plop the letter
-					if (layerDirty) {
+					if (layerDirty && !ghostOnly) {
 						context.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
 					}
-					if (interactive) {
+					if (interactive && drawGhost) {
 						ghostContext.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
 					}
 
@@ -2639,7 +2675,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 					// Rotate half a letter and add spacing
 					angleShift = (charWidth / 2 + kerning) / (radius - textHeight) * clockwise;
-					context.rotate(angleShift);
+					if (!ghostOnly) {
+						context.rotate(angleShift);
+					}
 					if (interactive) {
 						ghostContext.rotate(angleShift);
 					}
@@ -2958,7 +2996,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 		return this._localBounds;
 	}
 
-	protected _render(status: IStatus): void {
+	protected _render(status: IStatus, targetGhostLayer: number = 0): void {
 		super._render(status);
 
 		if (this.image) {
@@ -2971,7 +3009,10 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 				return;
 			}
 
-			if (status.layer.dirty) {
+			const ghostOnly = this._ghostOnly(targetGhostLayer);
+			const drawGhost = this._drawGhost(status, targetGhostLayer);
+
+			if (status.layer.dirty && !ghostOnly) {
 
 				if (this.shadowColor) {
 					status.layer.context.shadowColor = this.shadowColor.toCSS(this.shadowOpacity || 1);
@@ -2993,7 +3034,7 @@ export class CanvasImage extends CanvasDisplayObject implements IPicture {
 				status.layer.context.drawImage(this.image, 0, 0, width, height);
 			}
 
-			if (this.interactive && this._isInteractive(status)) {
+			if (this.interactive && this._isInteractive(status) && drawGhost) {
 				const mask = this._getMask(this.image);
 
 				this._renderer._ghostLayer.context.drawImage(mask, 0, 0);
@@ -3088,6 +3129,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public defaultLayer: CanvasLayer = this.getLayer(0);
 
 	public _ghostLayer: GhostLayer = new GhostLayer();
+
+	public _deferredGhostLayers: Array<number> = [];
 
 	protected _patternCanvas: HTMLCanvasElement = document.createElement("canvas");
 	protected _patternContext: CanvasRenderingContext2D = this._patternCanvas.getContext("2d")!;
@@ -3451,6 +3494,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	render(root: CanvasDisplayObject): void {
 
 		this._dirtyLayers.length = 0;
+		this._deferredGhostLayers = [];
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
@@ -3467,6 +3511,17 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			inactive: null,
 			layer: this.defaultLayer,
 		});
+
+		const deferredGhostLayers = this._deferredGhostLayers;
+		if (deferredGhostLayers.length) {
+			deferredGhostLayers.sort((a, b) => a - b);
+			$array.each(deferredGhostLayers, (layerx) => {
+				root.render({
+					inactive: null,
+					layer: this.defaultLayer
+				}, layerx);
+			});
+		}
 
 		this._ghostLayer.context.restore();
 

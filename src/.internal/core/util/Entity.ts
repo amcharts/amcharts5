@@ -154,7 +154,7 @@ export interface IEntitySettings {
 	/**
 	 * A custom string ID for the element.
 	 *
-	 * If set, element can be looked up via `am5.registry.entitiesById`.
+	 * If set, element can be looked up via `root.entitiesById`.
 	 *
 	 * Will raise error if an element with the same ID already exists.
 	 */
@@ -1666,15 +1666,18 @@ export class Entity extends Settings implements IDisposer {
 
 			const prevId = this._prevSettings.id;
 			if(prevId) {
+				delete this._root.entitiesById[prevId];
 				delete registry.entitiesById[prevId];
 			}
 		}
 	}
 
 	private _registerId(id: string): void {
-		if (registry.entitiesById[id] && registry.entitiesById[id] !== this) {
+		if (this._root.entitiesById[id] && this._root.entitiesById[id] !== this) {
 			throw new Error("An entity with id \"" + id + "\" already exists.");
 		}
+
+		this._root.entitiesById[id] = this;
 		registry.entitiesById[id] = this;
 	}
 
@@ -1718,6 +1721,7 @@ export class Entity extends Settings implements IDisposer {
 
 		const id = this.get("id")!;
 		if (id) {
+			delete this._root.entitiesById[id];
 			delete registry.entitiesById[id];
 		}
 	}

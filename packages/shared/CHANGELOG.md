@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.11.0] - 2025-02-03
+
+### Added
+- New `Root` property: `entitiesById`. Contains all Entities belonging to this `Root` instance that have an `id` set.
+
+### Changed
+- From now on, unique `id` for Entities will be enforced within Root scope, not global scope.
+- `StockChart`'s indicators had axes tooltips and cursor horizontal line hardcoded with `forceHidden: true`. It was moved to a default theme, so now you can enable them using custom theme.
+
+### Fixed
+- Overlapping interactive elements were ignoring `layer` setting.
+- Improved handling of focusing of Series' elements.
+- `toggleDrawing` of `StockChart` was not hiding/showing grips if called from outside until hovered over the chart.
+- Changing stroke/fill drawing setting in `StockChart` drawing toolbar would update colors for existing Fibonacci drawings.
+
+
 ## [5.10.12] - 2025-01-23
 
 ### Fixed

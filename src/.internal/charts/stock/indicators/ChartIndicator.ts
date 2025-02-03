@@ -43,7 +43,7 @@ export abstract class ChartIndicator extends Indicator {
 	public legend!: StockLegend;
 
 	protected _themeTag?: string;
-	protected _themeTags:Array<string> = ["indicator"];
+	protected _themeTags: Array<string> = ["indicator"];
 
 	protected _afterNew() {
 		super._afterNew();
@@ -84,18 +84,20 @@ export abstract class ChartIndicator extends Indicator {
 			xAxis.set("groupData", seriesXAxis.get("groupData"));
 			xAxis.set("groupCount", seriesXAxis.get("groupCount"));
 
-			xAxis.set("tooltip", Tooltip.new(root, { forceHidden: true }));
+			xAxis.set("tooltip", Tooltip.new(root, { themeTags: ["indicator"] }));
 
 			xAxis.setAll({ start: start, end: end })
 			this.xAxis = xAxis;
 
 			// yAxis
 			const yRenderer = AxisRendererY.new(root, {
-				minGridDistance:20
+				minGridDistance: 20
 			});
+			const yTooltip = Tooltip.new(root, { themeTags: ["indicator"] });
+
 			const yAxis = chart.yAxes.push(ValueAxis.new(root, {
 				renderer: yRenderer,
-				tooltip: Tooltip.new(root, { forceHidden: true })
+				tooltip: yTooltip
 			}))
 			this.yAxis = yAxis;
 

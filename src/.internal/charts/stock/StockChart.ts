@@ -406,7 +406,6 @@ export class StockChart extends Container {
 	}
 
 	public _prepareChildren() {
-
 		if (this.isDirty("drawingSelectionEnabled")) {
 			const enabled = this.get("drawingSelectionEnabled", false);
 			if (!enabled) {

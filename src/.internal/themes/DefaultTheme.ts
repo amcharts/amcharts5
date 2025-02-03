@@ -1039,6 +1039,10 @@ export class DefaultTheme extends Theme {
 			paddingRight: 7
 		});
 
+		r("Tooltip", ['indicator']).setAll({
+			forceHidden: true
+		});
+
 		r("PointedRectangle", ["tooltip", "stock", "axis"]).setAll({
 			pointerLength: 0,
 			pointerBaseWidth: 0,
