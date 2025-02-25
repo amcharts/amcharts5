@@ -1597,6 +1597,11 @@ export abstract class XYSeries extends Series {
 					if (stackToNegative) {
 						if ($type.isNumber(value)) {
 							if ($type.isNumber(stackValue)) {
+
+								if(s == len - 1){
+									dataItem.setRaw(stackToItemKey, undefined);
+								}
+
 								if (value >= 0 && stackValue >= 0) {
 									dataItem.setRaw(stackToItemKey, stackToItem);
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
@@ -1608,7 +1613,7 @@ export abstract class XYSeries extends Series {
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 									stackToSeries._stackedSeries[this.uid] = this;
 									break;
-								}
+								}								
 							}
 						}
 						else {

@@ -578,7 +578,7 @@ export abstract class Hierarchy extends Series {
 		const node = dataItem.get("node");
 
 		if (node) {
-			node.set("toggleKey", "disabled");
+			node.set("toggleKey", this.nodes.template.get("toggleKey", "disabled"));
 		}
 
 		let depth = dataItem.get("depth");

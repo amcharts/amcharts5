@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.11.1] - 2025-02-25
+
+### Added
+- New setting `disableWeekDays` (array of numbers) in `DateRangeSelector`. E.g. set to `diasbleWeekDays: [0, 6]` to disable Sundays and Saturdays.
+
+### Fixed
+- The value of a `Hierarchy` node with `toggleKey: "none"` would be reset to `"disabled"`, after data was appended to the node.
+- `DurationFormatter` was not correctly rounding fractional numbers in some cases.
+- `DateRangeSelector` was not correctly handling `firstDayOfWeek` value from locale.
+- `XYCursor` lines were not focusable until cursor was shown for the first time.
+- Setting `exclude` on a `MapSeries` would not re-enable previously excluded objects.
+- Fixed issue with stacking of negative values.
+
+
 ## [5.11.0] - 2025-02-03
 
 ### Added

@@ -48,6 +48,15 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	 */
 	maxDate?: Date | "auto" | null;
 
+	/**
+	 * Set to array of days to disable in date picker dropdowns, with Sunday
+	 * starting at 0, Monday - 1, etc.
+	 * 
+	 * @default []
+	 * @since 5.11.1
+	 */
+	disableWeekDays?: number[];
+
 }
 
 export interface IDateRangeSelectorPrivate extends IStockControlPrivate {
@@ -177,11 +186,20 @@ export class DateRangeSelector extends StockControl {
 		// Date pickers
 		const pickerLocale = this._getPickerLocale();
 
+		// Disable weekends?
+		const disableWeekDays: number[] = this.get("disableWeekDays", []);
+		const disable = disableWeekDays.length ? [
+			function(date: Date) {
+				return (disableWeekDays.indexOf(date.getDay()) !== -1);
+			}
+		] : [];
+
 		const fromPicker = flatpickr(fromField, {
 			inline: true,
 			appendTo: fromColumn,
 			allowInput: true,
 			locale: pickerLocale,
+			disable: disable,
 			formatDate: (date) => {
 				return this._formatDate(date);
 			},
@@ -197,6 +215,7 @@ export class DateRangeSelector extends StockControl {
 			appendTo: toColumn,
 			allowInput: true,
 			locale: pickerLocale,
+			disable: disable,
 			formatDate: (date) => {
 				return this._formatDate(date);
 			},
@@ -401,7 +420,7 @@ export class DateRangeSelector extends StockControl {
 
 	protected _getPickerLocale(): any {
 		const l = this._root.language;
-		return {
+		const locale: any = {
 			weekdays: {
 				shorthand: [
 					l.translate("Sun"),
@@ -452,7 +471,7 @@ export class DateRangeSelector extends StockControl {
 					l.translate("December"),
 				],
 			},
-			firstDayOfWeek: l.translate("firstDayOfWeek"),
+			firstDayOfWeek: this._root.locale.firstDayOfWeek,
 			ordinal: l.translateFunc("_dateOrd"),
 			rangeSeparator: " " + l.translateAny("to") + " ",
 			weekAbbreviation: l.translateAny("Wk"),
@@ -463,8 +482,10 @@ export class DateRangeSelector extends StockControl {
 			monthAriaLabel: l.translateAny("Month"),
 			hourAriaLabel: l.translateAny("Hour"),
 			minuteAriaLabel: l.translateAny("Minute"),
-			time_24hr: true,
+			time_24hr: true
 		}
+
+		return locale;
 	}
 
 	/**

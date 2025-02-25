@@ -33,29 +33,29 @@ import * as $math from "../util/Math";
  */
 class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> extends EventDispatcher<E> {
 	protected static RENDERER_EVENTS: { [K in keyof IRendererEvents]?: <E extends Events<Sprite, ISpriteEvents>>(this: SpriteEventDispatcher<Sprite, E>, event: IRendererEvents[K]) => void } = {
-		"click": function (event) {
+		"click": function(event) {
 			if (this.isEnabled("click") && !this._sprite.isDragging() && this._sprite._hasDown() && !this._sprite._hasMoved(this._makePointerEvent("click", event))) {
 				this.dispatch("click", this._makePointerEvent("click", event));
 			}
 		},
 
-		"rightclick": function (event) {
+		"rightclick": function(event) {
 			if (this.isEnabled("rightclick")) {
 				this.dispatch("rightclick", this._makePointerEvent("rightclick", event));
 			}
 		},
 
-		"middleclick": function (event) {
+		"middleclick": function(event) {
 			if (this.isEnabled("middleclick")) {
 				this.dispatch("middleclick", this._makePointerEvent("middleclick", event));
 			}
 		},
 
-		"dblclick": function (event) {
+		"dblclick": function(event) {
 			this.dispatchParents("dblclick", this._makePointerEvent("dblclick", event));
 		},
 
-		"pointerover": function (event) {
+		"pointerover": function(event) {
 
 			const sprite = this._sprite;
 			let dispatch = true;
@@ -85,35 +85,35 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			}
 		},
 
-		"pointerout": function (event) {
+		"pointerout": function(event) {
 			if (this.isEnabled("pointerout")) {
 				this.dispatch("pointerout", this._makePointerEvent("pointerout", event));
 			}
 		},
 
-		"pointerdown": function (event) {
+		"pointerdown": function(event) {
 			this.dispatchParents("pointerdown", this._makePointerEvent("pointerdown", event));
 		},
 
-		"pointerup": function (event) {
+		"pointerup": function(event) {
 			if (this.isEnabled("pointerup")) {
 				this.dispatch("pointerup", this._makePointerEvent("pointerup", event));
 			}
 		},
 
-		"globalpointerup": function (event) {
+		"globalpointerup": function(event) {
 			if (this.isEnabled("globalpointerup")) {
 				this.dispatch("globalpointerup", this._makePointerEvent("globalpointerup", event));
 			}
 		},
 
-		"globalpointermove": function (event) {
+		"globalpointermove": function(event) {
 			if (this.isEnabled("globalpointermove")) {
 				this.dispatch("globalpointermove", this._makePointerEvent("globalpointermove", event));
 			}
 		},
 
-		"wheel": function (event) {
+		"wheel": function(event) {
 			this.dispatchParents("wheel", {
 				type: "wheel",
 				target: this._sprite,
@@ -1468,6 +1468,11 @@ export abstract class Sprite extends Entity {
 			this.markDirtyAccessibility();
 			this._disposers.push(events.on("blur", () => {
 				this.setPrivateRaw("touchHovering", false);
+			}));
+			this._disposers.push(events.once("boundschanged", () => {
+				// We might need to do this to re-evaluate accessibility attributes
+				// once the element gains size (bounds)
+				this.markDirtyAccessibility();
 			}));
 		}
 

@@ -206,6 +206,7 @@ export class DurationFormatter extends Entity {
 			details = info.zero;
 		}
 
+
 		// Format
 		let formatted = this.applyFormat(source, details);
 
@@ -387,19 +388,29 @@ export class DurationFormatter extends Entity {
 		let negative = !details.absolute && (value < this.get("negativeBase"));
 		value = Math.abs(value);
 
+
 		// Recalculate to milliseconds
 		let tstamp = this.toTimeStamp(value, details.baseUnit);
 
 		// Init return value
 		let res = details.template;
+		const values: any  = {
+			millisecond: 0,
+			second: 0,
+			minute: 0,
+			hour: 0,
+			day: 0,
+			week: 0,
+			month: 0,
+			year: 0
+		};
 
 		// Iterate through duration parts
 		for (let i = 0, len = details.parts.length; i < len; i++) {
 
 			// Gather the part
 			let part = details.parts[i];
-			let unit = this._toTimeUnit(part.substr(0, 1));
-			let digits = part.length;
+			let unit: any = this._toTimeUnit(part.substr(0, 1));
 
 			// Calculate current unit value
 			let ints: number;
@@ -410,11 +421,62 @@ export class DurationFormatter extends Entity {
 			else {
 				ints = Math.round(tstamp / unitValue);
 			}
-			res = res.replace($type.PLACEHOLDER, $utils.padString(ints, digits, "0"));
+
+			values[unit] += ints;
 
 			// Reduce timestamp
 			tstamp -= ints * unitValue;
 		}
+
+		// Check if we have full unit that we need to bump up to higher unit
+		$object.each(values, (unit, value) => {
+			if (unit == "millisecond" && value == 1000) {
+				values["second"]++;
+				values["millisecond"] = 0;
+			}
+			else if (unit == "second" && value == 60) {
+				values["minute"]++;
+				values["second"] = 0;
+			}
+			else if (unit == "minute" && value == 60) {
+				values["hour"]++;
+				values["minute"] = 0;
+			}
+			else if (unit == "hour" && value == 24) {
+				values["day"]++;
+				values["hour"] = 0;
+			}
+			else if (unit == "day" && value == 7) {
+				values["week"]++;
+				values["day"] = 0;
+			}
+			else if (unit == "day" && value == 30) {
+				values["month"]++;
+				values["day"] = 0;
+			}
+			else if (unit == "month" && value == 12) {
+				values["year"]++;
+				values["month"] = 0;
+			}
+			// if (val > 0) {
+			// 	res = res.replace($type.PLACEHOLDER, $utils.padString(val, 2, "0"));
+			// }
+			// else {
+			// 	res = res.replace($type.PLACEHOLDER, "");
+			// }
+		});
+
+		// Iterate again
+		for (let i = 0, len = details.parts.length; i < len; i++) {
+			// Gather the part
+			let part = details.parts[i];
+			let unit: any = this._toTimeUnit(part.substr(0, 1));
+			let digits = part.length;
+
+			// Calculate current unit value
+			res = res.replace($type.PLACEHOLDER, $utils.padString(values[unit], digits, "0"));
+		}
+
 
 		// Reapply negative sign
 		if (negative) {

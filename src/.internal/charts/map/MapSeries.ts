@@ -173,7 +173,17 @@ export abstract class MapSeries extends Series {
 						this._excludeDataItem(dataItem)
 					}
 				})
+
+				$array.each(this._excluded, (dataItem) => {
+					const id = dataItem.get("id");
+					if (id) {
+						if (exclude.indexOf(id) == -1) {
+							this._unexcludeDataItem(dataItem)
+						}
+					}
+				})
 			}
+
 
 			if (!exclude || exclude.length == 0) {
 				$array.each(this._excluded, (dataItem) => {
@@ -403,5 +413,5 @@ export abstract class MapSeries extends Series {
 		super._onDataClear();
 		this._geoJSONparsed = false;
 		this._markDirtyKey("exclude");
-	}	
+	}
 }
