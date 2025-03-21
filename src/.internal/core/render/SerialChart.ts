@@ -106,6 +106,7 @@ export abstract class SerialChart extends Chart {
 	}
 
 	protected _removeSeries(series: this["_seriesType"]) {
+		series._handleRemoved();
 		if (!series.isDisposed()) {
 			this.seriesContainer.children.removeValue(series);
 			series._removeBulletsContainer();

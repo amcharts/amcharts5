@@ -28,6 +28,14 @@ export interface ISettingsModalSettings extends IModalSettings {
 	 */
 	showResetLink?: boolean;
 
+	/**
+	 * Available line widths for user to choose from.
+	 *
+	 * @default [1, 2, 4, 10]
+	 * @since 5.11.2
+	 */
+	strokeWidths?: number[];
+
 }
 
 export interface ISettingsModalPrivate extends IModalPrivate {
@@ -61,7 +69,7 @@ interface ISeriesEditableSetting extends IIndicatorEditableSetting {
  */
 export class SettingsModal extends Modal {
 	public static className: string = "SettingsModal";
-	public static classNames: Array<string> = Modal.classNames.concat([Modal.className]);
+	public static classNames: Array<string> = Modal.classNames.concat([SettingsModal.className]);
 
 	declare public _settings: ISettingsModalSettings;
 	declare public _privateSettings: ISettingsModalPrivate;
@@ -73,6 +81,8 @@ export class SettingsModal extends Modal {
 
 	protected _afterNew() {
 		super._afterNew();
+		this._defaultThemes = this.get("stockChart")._defaultThemes;
+		super._afterNewApplyThemes();
 	}
 
 	public _beforeChanged() {
@@ -170,6 +180,10 @@ export class SettingsModal extends Modal {
 			});
 		}
 		else if (isline) {
+			const widths = this.get("strokeWidths", [1, 2, 4, 10]);
+			const widthOptions = widths.map((width) => {
+				return { value: width, text: width + "px" };
+			});
 			settings = [{
 				key: "stroke",
 				name: l.translateAny("Line"),
@@ -180,12 +194,7 @@ export class SettingsModal extends Modal {
 				key: "strokeWidth",
 				name: l.translateAny("Line"),
 				type: "dropdown",
-				options: [
-					{ value: 1, text: "1px" },
-					{ value: 2, text: "2px" },
-					{ value: 4, text: "4px" },
-					{ value: 10, text: "10px" }
-				],
+				options: widthOptions,
 				currentValue: (<LineSeries>series).strokes.template.get("strokeWidth", 1),
 				target: (<LineSeries>series).strokes.template,
 				invalidateTarget: series

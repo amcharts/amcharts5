@@ -1132,6 +1132,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		return position;
 	}
 
+	public _handleSeriesRemoved() {
+	}
+
 	/**
 	 * @ignore
 	 */

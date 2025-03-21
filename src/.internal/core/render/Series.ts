@@ -511,6 +511,10 @@ export abstract class Series extends Component {
 
 	}
 
+	public _handleRemoved(){
+		
+	}
+
 	/**
 	 * @ignore
 	 */

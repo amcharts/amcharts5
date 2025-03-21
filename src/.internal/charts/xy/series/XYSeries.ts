@@ -1563,6 +1563,17 @@ export abstract class XYSeries extends Series {
 		})
 	}
 
+	public _handleRemoved(): void {
+		const xAxis = this.get("xAxis");
+		if(xAxis){
+			xAxis._handleSeriesRemoved();
+		}
+		const yAxis = this.get("yAxis");		
+		if(yAxis){
+			yAxis._handleSeriesRemoved();
+		}
+	}
+
 	protected _stackDataItems() {
 		// this works only with the same number of data @todo: search by date/category?
 		const baseAxis = this.get("baseAxis");

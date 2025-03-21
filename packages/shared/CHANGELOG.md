@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.11.2] - 2025-03-21
+
+### Added
+- `strokeWidths` setting added to `SettingsModal`.
+- `cornerRadiusTL`, `cornerRadiusTR`, `cornerRadiusBR`, `cornerRadiusBL` added to `FunnelSlice`. Use it to add rounded corner to funnel slices.
+
+### Changed
+- Screen reader alerts were not being read out if the message was exact same text as the last one.
+- All settings from `IAccessibilitySettings` have been moved to `ISpriteSettings`.
+
+### Fixed
+- Fixed a prompt in Dutch (nl_NL) translation.
+- A Horizontal Line drawing restored from serialized data was not visible until chart zoom.
+- HTML content outside of a scrollable `Container` were still visible.
+- `am5.type.toNumber()` could go into infinite loop with some non-numeric input values.
+- Removing of an `XYSeries` from an `XYChart` with a `DateAxis` and data grouping enabled could cause newly added series to be wrongly grouped.
+
+
 ## [5.11.1] - 2025-02-25
 
 ### Added

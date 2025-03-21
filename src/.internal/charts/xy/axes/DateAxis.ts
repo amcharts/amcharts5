@@ -273,7 +273,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	public _groupSeriesData(series: XYSeries) {
 		if (this.get("groupData") && !series.get("groupDataDisabled")) {
-
 			this._dataGrouped = true; // helps to avoid double grouping
 
 			this._seriesDataGrouped = true;
@@ -318,7 +317,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 
 			$array.each(intervals, (interval) => {
-
 				let previousTime = -Infinity;
 				let dataSetId = interval.timeUnit + interval.count;
 				series._dataSets[dataSetId] = [];
@@ -544,7 +542,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					this._seriesDataGrouped = false;
 					this.setPrivateRaw("groupInterval", groupInterval);
 					this._setBaseInterval(groupInterval)
-
 
 					let newId = groupInterval.timeUnit + groupInterval.count;
 					$array.each(this.series, (series) => {
@@ -927,6 +924,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _updateDates(_date: number, _series: XYSeries) {
 
 	}
+
+	public _handleSeriesRemoved() {
+		this.setPrivate("baseInterval", this.get("baseInterval"));
+		this.setPrivate("min", undefined);
+	}	
 
 	/**
 	 * Returns a duration of currently active `baseInterval` in milliseconds.

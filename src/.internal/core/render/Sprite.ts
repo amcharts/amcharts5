@@ -1,7 +1,7 @@
 import type { IDisplayObject, IRendererEvents, IRendererEvent, IPointerEvent, IMargin } from "./backend/Renderer";
 import type { IBounds } from "../util/IBounds";
 import type { Container } from "./Container";
-import type { IAccessibilitySettings } from "../util/Accessibility";
+import type { Role, AriaLive } from "../util/Accessibility";
 import type { NumberFormatter } from "../util/NumberFormatter";
 import type { DateFormatter } from "../util/DateFormatter";
 import type { DurationFormatter } from "../util/DurationFormatter";
@@ -226,7 +226,7 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 }
 
 
-export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings {
+export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * X position relative to parent.
@@ -622,6 +622,142 @@ export interface ISpriteSettings extends IEntitySettings, IAccessibilitySettings
 	 * @since 5.5.0
 	 */
 	hue?: number;
+
+		/**
+	 * An internal order by which focusable elements will be selected within the
+	 * chart.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+	 */
+	tabindexOrder?: number;
+
+	/**
+	 * Simulate hover on an element when it gains focus, including changing hover
+	 * appearance and displaying a tooltip if application.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+	 */
+	hoverOnFocus?: boolean;
+
+	/**
+	 * Can element be focused, i.e. selected using TAB key.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+	 */
+	focusable?: boolean;
+
+	/**
+	 * An identifier by which to group common elements into focusable groups.
+	 *
+	 * If set, only the first element in he group will be focusable via TAB key.
+	 * When it is selected, the rest of the elements in the same group can be
+	 * selected using arrow keys.
+	 *
+	 * It allows users to TAB-through chart elements quickly without the need
+	 * to TAB into each and every element.
+	 *
+	 * It's up to implementer of the charts to provide meaningful `ariaLabel` to
+	 * the element, which advertises this capability and provides adequate
+	 * instructions.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Grouping_focusable_elements} for more info
+	 * @since 5.0.6
+	 */
+	focusableGroup?: string | number;
+
+	/**
+	 * If set, the text will be read out (announced) by a screen reader when
+	 * focused element is "clicked" (by pressing ENTER or SPACE).
+	 * 
+	 * @since 5.10.8
+	 */
+	clickAnnounceText?: string;
+
+	/**
+	 * Element's role.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Roles} for more info
+	 */
+	role?: Role;
+
+	/**
+	 * `aria-live` setting.
+	 */
+	ariaLive?: AriaLive;
+
+	/**
+	 * `aria-checked` setting.
+	 *
+	 * This setting is ignored unless `role` is one of the following:
+	 * * `"checkbox"`
+	 * * `"option"`
+	 * * `"radio"`
+	 * * `"menuitemcheckbox"`
+	 * * `"menuitemradio"`
+	 * * `"treeitem"`
+	 */
+	ariaChecked?: boolean;
+
+	/**
+	 * `aria-current` setting.
+	 * 
+	 * @see {@link https://w3c.github.io/aria/#aria-current} for more info
+	 * @since 5.9.8
+	 */
+	ariaCurrent?: string;
+
+	/**
+	 * `aria-selected` setting.
+	 * 
+	 * @see {@link https://w3c.github.io/aria/#aria-selected} for more info
+	 * @since 5.9.8
+	 */
+	ariaSelected?: boolean;
+
+	/**
+	 * `aria-hidden` setting.
+	 */
+	ariaHidden?: boolean;
+
+	/**
+	 * Label for the element to use for screen readers.
+	 * 
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Screen_reader} for more info
+	 */
+	ariaLabel?: string;
+
+	/**
+	 * `aria-orientation` setting.
+	 */
+	ariaOrientation?: string;
+
+	/**
+	 * `aria-valuenow` setting.
+	 */
+	ariaValueNow?: string;
+
+	/**
+	 * `aria-valuemin` setting.
+	 */
+	ariaValueMin?: string;
+
+	/**
+	 * `aria-valuemax` setting.
+	 */
+	ariaValueMax?: string;
+
+	/**
+	 * `aria-valuetext` setting.
+	 */
+	ariaValueText?: string;
+
+	/**
+	 * `aria-controls` setting.
+	 */
+	ariaControls?: string;
+
+	//ariaDescription?: string;
+	//readerControls?: string;
 
 }
 

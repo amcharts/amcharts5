@@ -65,8 +65,7 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 		}
 	}
 
-	public _prepareChildren(): void {
-		super._prepareChildren();
+	public _prepareChildren(): void {	
 
 		const xAxis = this.get("xAxis");
 
@@ -78,6 +77,8 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				this._setContext(di["p2"], "valueX", max + (max - min), true);			
 			}
 		});
+
+		super._prepareChildren();
 	}
 
 	protected _handlePointerMoveReal() {

@@ -10,6 +10,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Changed
 - Updated the name of North Macedonia in transaltion files.
 - Updated Shannon county (South Dakota) name/FIPS to Oglala Lakota (FIPS 46102).
+- Updated faulty code for Azores in `portugalRegions` map data.
 
 
 ## [5.1.4] - 2024-07-03

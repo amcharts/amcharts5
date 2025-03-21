@@ -71,8 +71,7 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 
 	}
 
-	public _prepareChildren(): void {
-		super._prepareChildren();
+	public _prepareChildren(): void {	
 
 		const xAxis = this.get("xAxis");
 
@@ -85,6 +84,8 @@ export class HorizontalLineSeries extends SimpleLineSeries {
 				this._setContext(di["p3"], "valueX", max + (max - min), true);			
 			}
 		});
+
+		super._prepareChildren();
 	}
 
 	protected _updateSegment(index: number) {

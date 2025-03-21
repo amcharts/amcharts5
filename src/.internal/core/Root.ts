@@ -1333,7 +1333,12 @@ export class Root implements IDisposer {
 	 */
 	public readerAlert(text: string): void {
 		if (this._a11yD !== true) {
-			this._readerAlertElement!.innerHTML = $utils.stripTags(text);
+			const element = this._readerAlertElement!;
+			text = $utils.stripTags(text);
+			if (element.innerHTML == text) {
+				element.innerHTML = "";
+			}
+			element.innerHTML = text;
 		}
 	}
 
@@ -2070,6 +2075,36 @@ export class Root implements IDisposer {
 		const htmlElement = document.createElement("div");
 		target.setPrivate("htmlElement", htmlElement);
 
+		// Should we put this into a wrapper?
+		let needWrapper: Boolean = false;
+		let wrapperTarget: Container;
+		target._walkParents((parent) => {
+			if ((parent as Container).get("verticalScrollbar")) {
+				needWrapper = true;
+				wrapperTarget = parent as Container;
+				return false;
+			}
+		});
+		let htmlElementWrapper: HTMLDivElement;
+
+		if (needWrapper) {
+			htmlElementWrapper = document.createElement("div");
+			target.setPrivate("htmlElementWrapper", htmlElementWrapper);
+			target.setPrivate("wrapperContainer", wrapperTarget!);
+
+			htmlElementWrapper.style.position = "absolute";
+			htmlElementWrapper.style.overflow = "hidden";
+			htmlElementWrapper.style.boxSizing = "border-box";
+			htmlElementWrapper.style.top = "0px";
+			htmlElementWrapper.style.left = "0px";
+			htmlElementWrapper.style.width = "100%";
+			htmlElementWrapper.style.height = "100%";
+
+			wrapperTarget!.events.on("boundschanged", () => {
+				this._positionHTMLElement(target);
+			});
+		}
+
 		//htmlElement.tabIndex = this.tabindex;
 		htmlElement.style.position = "absolute";
 		htmlElement.style.overflow = "auto";
@@ -2093,7 +2128,13 @@ export class Root implements IDisposer {
 
 		this._positionHTMLElement(target);
 
-		container.append(htmlElement);
+		if (needWrapper) {
+			htmlElementWrapper!.append(htmlElement);
+			container.append(htmlElementWrapper!);
+		}
+		else {
+			container.append(htmlElement);
+		}
 
 		$array.pushOne(this._htmlEnabledContainers, target);
 
@@ -2107,6 +2148,15 @@ export class Root implements IDisposer {
 	}
 
 	public _positionHTMLElement(target: Container): void {
+		const htmlElementWrapper = target.getPrivate("htmlElementWrapper");
+		if (htmlElementWrapper) {
+			const wrapperTarget = target.getPrivate("wrapperContainer");
+			if (wrapperTarget) {
+				const bounds = wrapperTarget.globalBounds();
+				htmlElementWrapper.style.clipPath = "rect(" + bounds.top + "px " + bounds.right + "px " + bounds.bottom + "px " + bounds.left + "px)";
+			}
+		}
+
 		const htmlElement = target.getPrivate("htmlElement");
 		if (htmlElement) {
 
@@ -2303,10 +2353,18 @@ export class Root implements IDisposer {
 	}
 
 	public _removeHTMLContent(target: Container): void {
-		let htmlElement = target.getPrivate("htmlElement");
-		if (htmlElement) {
+		const htmlElementWrapper = target.getPrivate("htmlElementWrapper");
+		const htmlElement = target.getPrivate("htmlElement");
+		if (htmlElementWrapper) {
+			this._htmlElementContainer!.removeChild(htmlElementWrapper);
+			target.removePrivate("htmlElement");
+			target.removePrivate("htmlElementWrapper");
+			target.removePrivate("wrapperContainer");
+		}
+		else if (htmlElement) {
 			this._htmlElementContainer!.removeChild(htmlElement);
 			target.removePrivate("htmlElement");
+			target.removePrivate("wrapperContainer");
 		}
 		$array.remove(this._htmlEnabledContainers, target);
 	}

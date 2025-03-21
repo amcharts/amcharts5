@@ -115,6 +115,18 @@ export interface IContainerPrivate extends ISpritePrivate {
 	 * A `<div>` element used for HTML content of the `Container`.
 	 */
 	htmlElement?: HTMLDivElement;
+	
+	/**
+	 * A wrapper `<div>` for `htmlElement`.
+	 *
+	 * @since 5.11.2
+	 */
+	htmlElementWrapper?: HTMLDivElement;
+
+	/**
+	 * @ignore
+	 */
+	wrapperContainer?: Container;
 }
 
 /**
