@@ -28,7 +28,7 @@ export interface IIndicatorEditableSetting {
 	/**
 	 * Type of the control to show for editing the setting in modal.
 	 */
-	type: "color" | "number" | "dropdown" | "checkbox";
+	type: "color" | "number" | "dropdown" | "checkbox" | "text";
 
 	/**
 	 * Minimum numeric value allowable in this field.

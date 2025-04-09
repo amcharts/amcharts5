@@ -309,9 +309,10 @@ export class SettingsModal extends Modal {
 					element = this.getCheckbox(setting, currentValue);
 					settingInputs[key] = <HTMLInputElement>element;
 					break;
-				// case "text":
-				// 	element = this.getText(setting, currentValue);
-				// 	break;
+				case "text":
+					element = this.getText(setting, currentValue);
+					settingInputs[key] = <HTMLInputElement>element;
+					break;
 			}
 
 			if (element) {
@@ -383,6 +384,7 @@ export class SettingsModal extends Modal {
 					this._updatedSettings[key] = element.value;
 				}
 			});
+
 			$object.each(this._updatedSettings, (key, value) => {
 				const targetKey = (<string>key).split(".").pop();
 				if ($type.isObject(value) && value.value) {
@@ -478,6 +480,14 @@ export class SettingsModal extends Modal {
 		element.type = "number";
 		element.value = currentValue;
 		element.className = "am5-modal-input-narrow"
+		return element;
+	}
+
+	private getText(_setting: any, currentValue: any): HTMLInputElement {
+		const element = document.createElement("input");
+		element.type = "text";
+		element.value = currentValue;
+		element.className = "am5-modal-input"
 		return element;
 	}
 

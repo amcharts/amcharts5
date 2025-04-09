@@ -207,7 +207,7 @@ export class RadarChart extends XYChart {
 		this._updateMask(this.seriesContainer, innerRadius, radius);
 		this._updateMask(this.gridContainer, innerRadius, radius);
 
-		this.series.each((series) => {
+		this.series.each((series) => {			
 			if ((series as XYSeries).get("maskBullets")) {
 				this._updateMask(series.bulletsContainer, innerRadius, radius);
 			}
@@ -241,6 +241,11 @@ export class RadarChart extends XYChart {
 	public processAxis(axis: Axis<AxisRendererRadial | AxisRendererCircular>) {
 		this.radarContainer.children.push(axis);
 	}
+
+	protected _processSeries(series: this["_seriesType"]) {
+		super._processSeries(series);
+		this._updateRadius();
+	}	
 
 	/**
 	 * @ignore

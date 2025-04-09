@@ -927,7 +927,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	public _handleSeriesRemoved() {
 		this.setPrivate("baseInterval", this.get("baseInterval"));
-		this.setPrivate("min", undefined);
+		this.setPrivate("min", undefined);		
+		this.setPrivate("minFinal", undefined);		
 	}	
 
 	/**

@@ -472,7 +472,7 @@ export class DrawingControl extends StockControl {
 		 */
 		const strokeDasharrays: IDropdownListItem[] = [];
 		let currentStrokeDasharray: SVGElement | undefined;
-		const strokeDasharray = this.get("strokeDasharray", []);
+		const strokeDasharray = this.get("strokeDasharray", undefined);
 		$array.each(this.get("strokeDasharrays", []), (dasharray) => {
 			const icon = StockIcons.getIcon("Dash");
 			const id = JSON.stringify(dasharray);

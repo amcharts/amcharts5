@@ -623,12 +623,12 @@ export interface ISpriteSettings extends IEntitySettings {
 	 */
 	hue?: number;
 
-		/**
-	 * An internal order by which focusable elements will be selected within the
-	 * chart.
-	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
-	 */
+	/**
+ * An internal order by which focusable elements will be selected within the
+ * chart.
+ * 
+ * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+ */
 	tabindexOrder?: number;
 
 	/**
@@ -861,6 +861,14 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 * @since 5.5.0
 	 */
 	trustBounds?: boolean;
+
+	/**
+	 * Logs last point for the shown tooltip (used to prevent subequent shows
+	 * of tooltip in the same place)
+	 *
+	 * @since 5.11.3
+	 */
+	lastTooltipCoords?: IPoint;
 
 }
 
@@ -2154,6 +2162,7 @@ export abstract class Sprite extends Entity {
 	 * Shows element's [[Tooltip]].
 	 */
 	public showTooltip(point?: IPoint): Promise<void> | undefined {
+
 		if (!this.isDisposed()) {
 			const tooltip = this.getTooltip();
 			const tooltipText = this.get("tooltipText");
@@ -2166,6 +2175,16 @@ export abstract class Sprite extends Entity {
 				if (tooltipPosition == "fixed" || !point) {
 					this._display._setMatrix();
 					point = this.toGlobal(tooltipTarget._getTooltipPoint());
+				}
+
+				if (tooltipPosition == "pointer") {
+					const lastTooltipCoords = this.getPrivate("lastTooltipCoords");
+					if (lastTooltipCoords && lastTooltipCoords.x == point.x && lastTooltipCoords.y == point.y) {
+						return;
+					}
+					else {
+						this.setPrivate("lastTooltipCoords", point);
+					}
 				}
 
 				tooltip.set("pointTo", point);
@@ -2208,6 +2227,7 @@ export abstract class Sprite extends Entity {
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
 		if (tooltip) {
+			this.removePrivate("lastTooltipCoords");
 			if (tooltip.get("tooltipTarget") == this.getPrivate("tooltipTarget", this) || this.get("tooltip") == tooltip) {
 				let timeout = tooltip.get("keepTargetHover") && tooltip.get("stateAnimationDuration", 0) == 0 ? 400 : undefined;
 				const promise = tooltip.hide(timeout);

@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.11.3] - 2025-04-09
+
+### Added
+- A "text" field type support added to custom Indicator's `_editableSettings`. [More info](https://www.amcharts.com/docs/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#Editable_settings).
+
+### Fixed
+- `"frameended"` event would trigger indefinitely when a `Sprite` with `tooltipPosition: "pointer"` was being hovered, even if cursor was not moving.
+- Changing series type on a `StockChart` would result in X-axis tooltip not to show date (since `5.11.2`).
+- `"drawingsupdated"` event of `StockChart` was being dispatched when drawing was selected.
+
+
 ## [5.11.2] - 2025-03-21
 
 ### Added
