@@ -336,7 +336,14 @@ export function boundsOverlap(bounds1: IBounds, bounds2: IBounds): boolean {
 export function spiralPoints(cx: number, cy: number, radius: number, radiusY: number, innerRadius: number, step: number, radiusStep: number, startAngle: number, endAngle: number): IPoint[] {
 
 	let r = innerRadius + 0.01;
+	startAngle = normalizeAngle(startAngle);
+	endAngle = normalizeAngle(endAngle);
+	
 	let angle = startAngle * RADIANS;
+	
+	if(endAngle < startAngle) {
+		endAngle += 360;
+	}
 	let points = [];
 
 	while (r < radius + radiusStep) {
@@ -346,18 +353,23 @@ export function spiralPoints(cx: number, cy: number, radius: number, radiusY: nu
 			stepSize = 2 * r;
 		}
 
-		angle += 2 * Math.asin(stepSize / 2 / r);
+		let c = Math.max(0.01, Math.min(1, r / 200));
 
-		if (angle * DEGREES > endAngle + ((radius - innerRadius) / radiusStep) * 360) {
-			break;
-		}
-
+		stepSize = stepSize * c;
+	
 		let degrees = angle * DEGREES;
+
 
 		let point = { x: cx + r * Math.cos(angle), y: cy + r * radiusY / radius * Math.sin(angle) };
 		points.push(point);
 
-		r = innerRadius + degrees / 360 * radiusStep;
+		r = innerRadius + 0.01 + (degrees - startAngle) / 360 * radiusStep;
+
+		angle += 2 * Math.asin(stepSize / 2 / r);
+
+		if (angle * DEGREES > endAngle + 360 * Math.ceil((radius - innerRadius) / radiusStep)) {
+			break;
+		}		
 	}
 
 	points.shift();

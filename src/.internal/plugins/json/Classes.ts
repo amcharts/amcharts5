@@ -20,6 +20,8 @@ import type { AxisLabel } from "./../../../xy";
 import type { AxisLabelRadial } from "./../../../xy";
 import type { AxisRenderer } from "./../../../xy";
 import type { AxisRendererCircular } from "./../../../radar";
+import type { AxisRendererCurveX } from "./../../../timeline";
+import type { AxisRendererCurveY } from "./../../../timeline";
 import type { AxisRendererRadial } from "./../../../radar";
 import type { AxisRendererX } from "./../../../xy";
 import type { AxisRendererY } from "./../../../xy";
@@ -56,6 +58,10 @@ import type { CommodityChannelIndex } from "./../../../stock";
 import type { ComparisonControl } from "./../../../stock";
 import type { Component } from "./../../../index";
 import type { Container } from "./../../../index";
+import type { CurveChart } from "./../../../timeline";
+import type { CurveColumnSeries } from "./../../../timeline";
+import type { CurveCursor } from "./../../../timeline";
+import type { CurveLineSeries } from "./../../../timeline";
 import type { DataSaveControl } from "./../../../stock";
 import type { DateAxis } from "./../../../xy";
 import type { DateRangeSelector } from "./../../../stock";
@@ -180,6 +186,7 @@ import type { SerialChart } from "./../../../index";
 import type { Serializer } from "./../../../plugins/json";
 import type { Series } from "./../../../index";
 import type { SeriesTypeControl } from "./../../../stock";
+import type { SerpentineChart } from "./../../../timeline";
 import type { SettingsControl } from "./../../../stock";
 import type { SettingsModal } from "./../../../stock";
 import type { SimpleLineSeries } from "./../../../stock";
@@ -191,6 +198,7 @@ import type { SmoothedRadarLineSeries } from "./../../../radar";
 import type { SmoothedXLineSeries } from "./../../../xy";
 import type { SmoothedXYLineSeries } from "./../../../xy";
 import type { SmoothedYLineSeries } from "./../../../xy";
+import type { SpiralChart } from "./../../../timeline";
 import type { Sprite } from "./../../../index";
 import type { SpriteResizer } from "./../../../index";
 import type { StandardDeviation } from "./../../../stock";
@@ -250,6 +258,8 @@ export interface IClasses {
 	"AxisLabelRadial": () => Promise<typeof AxisLabelRadial>;
 	"AxisRenderer": () => Promise<typeof AxisRenderer>;
 	"AxisRendererCircular": () => Promise<typeof AxisRendererCircular>;
+	"AxisRendererCurveX": () => Promise<typeof AxisRendererCurveX>;
+	"AxisRendererCurveY": () => Promise<typeof AxisRendererCurveY>;
 	"AxisRendererRadial": () => Promise<typeof AxisRendererRadial>;
 	"AxisRendererX": () => Promise<typeof AxisRendererX>;
 	"AxisRendererY": () => Promise<typeof AxisRendererY>;
@@ -286,6 +296,10 @@ export interface IClasses {
 	"ComparisonControl": () => Promise<typeof ComparisonControl>;
 	"Component": () => Promise<typeof Component>;
 	"Container": () => Promise<typeof Container>;
+	"CurveChart": () => Promise<typeof CurveChart>;
+	"CurveColumnSeries": () => Promise<typeof CurveColumnSeries>;
+	"CurveCursor": () => Promise<typeof CurveCursor>;
+	"CurveLineSeries": () => Promise<typeof CurveLineSeries>;
 	"DataSaveControl": () => Promise<typeof DataSaveControl>;
 	"DateAxis": () => Promise<typeof DateAxis>;
 	"DateRangeSelector": () => Promise<typeof DateRangeSelector>;
@@ -410,6 +424,7 @@ export interface IClasses {
 	"Serializer": () => Promise<typeof Serializer>;
 	"Series": () => Promise<typeof Series>;
 	"SeriesTypeControl": () => Promise<typeof SeriesTypeControl>;
+	"SerpentineChart": () => Promise<typeof SerpentineChart>;
 	"SettingsControl": () => Promise<typeof SettingsControl>;
 	"SettingsModal": () => Promise<typeof SettingsModal>;
 	"SimpleLineSeries": () => Promise<typeof SimpleLineSeries>;
@@ -421,6 +436,7 @@ export interface IClasses {
 	"SmoothedXLineSeries": () => Promise<typeof SmoothedXLineSeries>;
 	"SmoothedXYLineSeries": () => Promise<typeof SmoothedXYLineSeries>;
 	"SmoothedYLineSeries": () => Promise<typeof SmoothedYLineSeries>;
+	"SpiralChart": () => Promise<typeof SpiralChart>;
 	"Sprite": () => Promise<typeof Sprite>;
 	"SpriteResizer": () => Promise<typeof SpriteResizer>;
 	"StandardDeviation": () => Promise<typeof StandardDeviation>;
@@ -481,6 +497,8 @@ const classes: IClasses = {
 	"AxisLabelRadial": () => import(/* webpackExports: "AxisLabelRadial", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.AxisLabelRadial),
 	"AxisRenderer": () => import(/* webpackExports: "AxisRenderer", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.AxisRenderer),
 	"AxisRendererCircular": () => import(/* webpackExports: "AxisRendererCircular", webpackChunkName: "json_radar" */ "./../../../radar").then((m) => m.AxisRendererCircular),
+	"AxisRendererCurveX": () => import(/* webpackExports: "AxisRendererCurveX", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.AxisRendererCurveX),
+	"AxisRendererCurveY": () => import(/* webpackExports: "AxisRendererCurveY", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.AxisRendererCurveY),
 	"AxisRendererRadial": () => import(/* webpackExports: "AxisRendererRadial", webpackChunkName: "json_radar" */ "./../../../radar").then((m) => m.AxisRendererRadial),
 	"AxisRendererX": () => import(/* webpackExports: "AxisRendererX", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.AxisRendererX),
 	"AxisRendererY": () => import(/* webpackExports: "AxisRendererY", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.AxisRendererY),
@@ -517,6 +535,10 @@ const classes: IClasses = {
 	"ComparisonControl": () => import(/* webpackExports: "ComparisonControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ComparisonControl),
 	"Component": () => import(/* webpackExports: "Component", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Component),
 	"Container": () => import(/* webpackExports: "Container", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Container),
+	"CurveChart": () => import(/* webpackExports: "CurveChart", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.CurveChart),
+	"CurveColumnSeries": () => import(/* webpackExports: "CurveColumnSeries", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.CurveColumnSeries),
+	"CurveCursor": () => import(/* webpackExports: "CurveCursor", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.CurveCursor),
+	"CurveLineSeries": () => import(/* webpackExports: "CurveLineSeries", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.CurveLineSeries),
 	"DataSaveControl": () => import(/* webpackExports: "DataSaveControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DataSaveControl),
 	"DateAxis": () => import(/* webpackExports: "DateAxis", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.DateAxis),
 	"DateRangeSelector": () => import(/* webpackExports: "DateRangeSelector", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DateRangeSelector),
@@ -641,6 +663,7 @@ const classes: IClasses = {
 	"Serializer": () => import(/* webpackExports: "Serializer", webpackChunkName: "json_plugins_json" */ "./../../../plugins/json").then((m) => m.Serializer),
 	"Series": () => import(/* webpackExports: "Series", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Series),
 	"SeriesTypeControl": () => import(/* webpackExports: "SeriesTypeControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SeriesTypeControl),
+	"SerpentineChart": () => import(/* webpackExports: "SerpentineChart", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.SerpentineChart),
 	"SettingsControl": () => import(/* webpackExports: "SettingsControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SettingsControl),
 	"SettingsModal": () => import(/* webpackExports: "SettingsModal", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SettingsModal),
 	"SimpleLineSeries": () => import(/* webpackExports: "SimpleLineSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SimpleLineSeries),
@@ -652,6 +675,7 @@ const classes: IClasses = {
 	"SmoothedXLineSeries": () => import(/* webpackExports: "SmoothedXLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.SmoothedXLineSeries),
 	"SmoothedXYLineSeries": () => import(/* webpackExports: "SmoothedXYLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.SmoothedXYLineSeries),
 	"SmoothedYLineSeries": () => import(/* webpackExports: "SmoothedYLineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.SmoothedYLineSeries),
+	"SpiralChart": () => import(/* webpackExports: "SpiralChart", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.SpiralChart),
 	"Sprite": () => import(/* webpackExports: "Sprite", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Sprite),
 	"SpriteResizer": () => import(/* webpackExports: "SpriteResizer", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.SpriteResizer),
 	"StandardDeviation": () => import(/* webpackExports: "StandardDeviation", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StandardDeviation),

@@ -1189,14 +1189,18 @@ export class DrawingControl extends StockControl {
 	}
 
 	protected _setStroke(): void {
+		const strokeDasharray = JSON.stringify(this.get("strokeDasharray"));
 		$object.each(this._drawingSeries, (_tool, seriesList) => {
 			$array.each(seriesList, (series) => {
 				series.setAll({
 					strokeColor: this.get("strokeColor"),
 					strokeWidth: this.get("strokeWidth"),
-					strokeOpacity: this.get("strokeOpacity"),
-					strokeDasharray: this.get("strokeDasharray"),
+					strokeOpacity: this.get("strokeOpacity")
 				});
+
+				if (JSON.stringify(series.get("strokeDasharray")) !== strokeDasharray) {
+					series.set("strokeDasharray", this.get("strokeDasharray"));
+				}
 			});
 		})
 	}

@@ -51,6 +51,10 @@ export interface IListEvents<A> {
 		newIndex: number,
 		value: A,
 	};
+	swap: {
+		a: A,
+		b: A,
+	};
 }
 
 
@@ -192,6 +196,17 @@ export class List<T> {
 		}
 	}
 
+	protected _onSwap(a: T, b: T) {
+		if (this.events.isEnabled("swap")) {
+			this.events.dispatch("swap", {
+				type: "swap",
+				target: this,
+				a,
+				b
+			});
+		}
+	}	
+
 	protected _onRemoveIndex(index: number, oldValue: T) {
 		if (this.events.isEnabled("removeIndex")) {
 			this.events.dispatch("removeIndex", {
@@ -280,10 +295,8 @@ export class List<T> {
 			const value_b = this._values[b];
 
 			this._values[a] = value_b;
-			this._onSetIndex(a, value_a, value_b);
-
 			this._values[b] = value_a;
-			this._onSetIndex(b, value_b, value_a);
+			this._onSwap(value_a, value_b);
 		}
 	}
 
@@ -474,6 +487,19 @@ export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDi
 	public autoDispose: boolean = true;
 
 	private _disposed: boolean = false;
+
+	/**
+	 * Swaps indexes of two items in the list.
+	 *
+	 * @param a  Item 1
+	 * @param b  Item 2
+	 */
+	public swap(a: number, b: number): void {
+		const currentAutoDispose = this.autoDispose;
+		this.autoDispose = false;
+		super.swap(a, b);
+		this.autoDispose = currentAutoDispose;
+	}
 
 	protected _onSetIndex(index: number, oldValue: A, newValue: A) {
 		if (this.autoDispose) {

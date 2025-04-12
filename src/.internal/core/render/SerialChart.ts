@@ -94,6 +94,18 @@ export abstract class SerialChart extends Chart {
 			} else if (change.type === "moveIndex") {
 				children.moveValue(change.value, change.newIndex);
 				this._processSeries(change.value);
+			} else if (change.type === "swap") {
+				const a = change.a;
+				const b = change.b;
+				const aIndex = this.series.indexOf(a);
+				const bIndex = this.series.indexOf(b);
+				children.moveValue(a, bIndex);
+				children.moveValue(b, aIndex);
+
+				this.series.each((series) => {
+					this._processSeries(series);
+					series.markDirtyValues();
+				})
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}

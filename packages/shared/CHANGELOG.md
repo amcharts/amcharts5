@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.12.0] - 2025-04-12
+
+### Added
+- Timeline chart type family added: `CurveChart`, `SerpentineChart`, `SpiralChart`. [More info](https://www.amcharts.com/docs/v5/charts/timeline/).
+
+### Changed
+- Using `swap()` method on a `ListDispose` will not longer auto-dispose items being swapped, even if `autoDispose = true`.
+
+### Fixed
+- `"drawingsupdated"` event of `StockChart` was being dispatched when drawing was selected. (wasn't exactly fixed in `5.11.3`)
+
+
+
 ## [5.11.3] - 2025-04-09
 
 ### Added
