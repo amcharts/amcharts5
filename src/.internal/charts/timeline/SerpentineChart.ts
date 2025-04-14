@@ -93,10 +93,10 @@ export class SerpentineChart extends CurveChart {
 		let points: IPoint[] = [];
 		let radius: number;
 
-		if (this.get("orientation") == "vertical") {
 
-			radius = Math.min(h / (levelCount + 1) / 2, w / 2);
-			h = Math.min(radius * (levelCount + 1) * 2, h);
+		if (this.get("orientation") == "vertical") {
+			radius = Math.min(h / (levelCount + 1) / 2, w / 3);		
+			h = Math.min(radius * (levelCount + 1) * 2, h);				
 
 			const startLocation = this.get("startLocation", 0);
 			const endLocation = this.get("endLocation", 1);
@@ -147,8 +147,8 @@ export class SerpentineChart extends CurveChart {
 			}
 		}
 		else {
-			radius = Math.min(w / (levelCount + 1) / 2, h / 2);
-			w = Math.min(radius * (levelCount + 1) * 2, w);
+			radius = Math.min(w / (levelCount + 1) / 2, h / 3);		
+			w = Math.min(radius * (levelCount + 1) * 2, w);	
 
 			const startLocation = this.get("startLocation", 0);
 			const endLocation = this.get("endLocation", 1);

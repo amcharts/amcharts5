@@ -109,6 +109,10 @@ export class CurveChart extends XYChart {
 				series.bulletsContainer.set("mask", undefined);
 			}
 		})
+
+		this.yAxes.each((axis) => {
+			axis.markDirtySize();
+		})		
 	}
 
 	/**

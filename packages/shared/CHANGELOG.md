@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.12.1] - 2025-04-14
+
+### Fixed
+- `SerpentineChart` could be displayed incorrectly if chart was very wide/tall and level count was small.
+- `CurveChart` would not adjust all of its elements after resize.
+
+
 ## [5.12.0] - 2025-04-12
 
 ### Added
