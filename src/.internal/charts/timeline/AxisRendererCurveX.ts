@@ -651,7 +651,10 @@ export class AxisRendererCurveX extends AxisRenderer {
 	 * @ignore
 	 */
 	public positionTooltip(tooltip: Tooltip, position: number) {
-		const point = this.positionToPoint(position, this.get("yRenderer").axis.get("start", 0));
+		const yRenderer = this.get("yRenderer");
+		const start = yRenderer.axis.get("start", 0);
+		const end = yRenderer.axis.get("end", 1);
+		const point = this.positionToPoint(position, yRenderer.get("axisLocation", 0.5) * (end - start) + start);
 		this._positionTooltip(tooltip, point);
 	}
 

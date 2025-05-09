@@ -980,17 +980,17 @@ export abstract class XYSeries extends Series {
 
 		this.states.create("hidden", <any>{ opacity: 1, visible: false });
 
-		this.onPrivate("startIndex", ()=>{
-			this.root.events.once("frameended", ()=>{
-				this.updateLegendValue();			
-			})			
+		this.onPrivate("startIndex", () => {
+			this.root.events.once("frameended", () => {
+				this.updateLegendValue();
+			})
 		})
 
-		this.onPrivate("endIndex", ()=>{			
-			this.root.events.once("frameended", ()=>{
-				this.updateLegendValue();			
+		this.onPrivate("endIndex", () => {
+			this.root.events.once("frameended", () => {
+				this.updateLegendValue();
 			})
-		})		
+		})
 
 		this._makeFieldNames();
 	}
@@ -1024,10 +1024,20 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
+	protected _onDataClear(): void {
+		super._onDataClear();
+		$object.each(this._dataSets, (_key, dataItems) => {
+			$array.each(dataItems, (dataItem) => {
+				dataItem.dispose();
+			});
+			dataItems.length = 0;
+		});
+	}
+
 	protected _removeAxisRange(axisRange: this["_axisRangeType"]) {
 		const axisDataItem = axisRange.axisDataItem;
 		const axis = <Axis<AxisRenderer>>axisDataItem.component;
-		axis.disposeDataItem(axisDataItem);
+		axisDataItem.dispose();
 
 		$array.remove(axis._seriesAxisRanges, axisDataItem);
 
@@ -1120,6 +1130,7 @@ export abstract class XYSeries extends Series {
 		if (!xAxis.inited || !yAxis.inited) {
 			return false
 		}
+
 		const minBulletDistance = this.get("minBulletDistance", 0);
 		if (minBulletDistance > 0) {
 			let startIndex = this.startIndex();
@@ -1565,11 +1576,11 @@ export abstract class XYSeries extends Series {
 
 	public _handleRemoved(): void {
 		const xAxis = this.get("xAxis");
-		if(xAxis){
+		if (xAxis) {
 			xAxis._handleSeriesRemoved();
 		}
-		const yAxis = this.get("yAxis");		
-		if(yAxis){
+		const yAxis = this.get("yAxis");
+		if (yAxis) {
 			yAxis._handleSeriesRemoved();
 		}
 	}
@@ -1609,7 +1620,7 @@ export abstract class XYSeries extends Series {
 						if ($type.isNumber(value)) {
 							if ($type.isNumber(stackValue)) {
 
-								if(s == len - 1){
+								if (s == len - 1) {
 									dataItem.setRaw(stackToItemKey, undefined);
 								}
 
@@ -1624,7 +1635,7 @@ export abstract class XYSeries extends Series {
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 									stackToSeries._stackedSeries[this.uid] = this;
 									break;
-								}								
+								}
 							}
 						}
 						else {
@@ -1945,7 +1956,7 @@ export abstract class XYSeries extends Series {
 		$object.each(this._dataSets, (_key, dataSet) => {
 			if (dataSet != this._mainDataItems) {
 				$array.each(dataSet, (dataItem) => {
-					this.disposeDataItem(dataItem);
+					dataItem.dispose();
 				})
 			}
 		})

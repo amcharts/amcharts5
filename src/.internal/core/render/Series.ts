@@ -846,6 +846,7 @@ export abstract class Series extends Component {
 			$array.each(bullets, (bullet)=>{
 				bullet.dispose();
 			})
+			dataItem.bullets = undefined;
 		}
 	}
 

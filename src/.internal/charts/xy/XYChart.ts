@@ -1710,6 +1710,9 @@ export class XYChart extends SerialChart {
 
 		if (this.get("arrangeTooltips")) {
 
+			let totalTooltipH = 0;
+			let tooltipCount = 0;
+
 			const tooltipContainer = this._root.tooltipContainer;
 
 			const count = tooltips.length;
@@ -1722,6 +1725,8 @@ export class XYChart extends SerialChart {
 
 				$array.each(tooltips, (tooltip) => {
 					let height = tooltip.height();
+					tooltipCount++;
+					totalTooltipH += height;
 					let centerY = tooltip.get("centerY");
 					if (centerY instanceof Percent) {
 						height *= centerY.value;
@@ -1740,6 +1745,7 @@ export class XYChart extends SerialChart {
 					let prevBottom = prevY;
 
 					$array.each(tooltips, (tooltip) => {
+						tooltipCount++;
 						let bounds = tooltip.get("bounds");
 						if (bounds) {
 							let top = bounds.top - prevY;
@@ -1760,7 +1766,9 @@ export class XYChart extends SerialChart {
 
 				let prevY = 0;
 				$array.each(tooltips, (tooltip) => {
+					tooltipCount++;
 					let height = tooltip.height();
+					totalTooltipH += height;
 					let centerY = tooltip.get("centerY");
 					if (centerY instanceof Percent) {
 						height *= centerY.value;
@@ -1779,6 +1787,7 @@ export class XYChart extends SerialChart {
 					let prevBottom = hh;
 
 					$array.each(tooltips, (tooltip) => {
+						tooltipCount++;
 						let bounds = tooltip.get("bounds");
 						if (bounds) {
 							let top = bounds.top - (hh - prevY);
@@ -1792,6 +1801,12 @@ export class XYChart extends SerialChart {
 						}
 					})
 				}
+			}
+
+			if (totalTooltipH == 0 && tooltipCount > 0) {
+				this._disposers.push(this.root.events.once("frameended", () => {
+					this.arrangeTooltips();
+				}))
 			}
 		}
 	}

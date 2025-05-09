@@ -418,7 +418,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		this._handleSizeDirty();
 
 		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
-
 			const chart = this.chart;
 			let getMM = false;
 			// #1563
@@ -459,9 +458,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	protected _handleSizeDirty() {
-		if (this._sizeDirty && !this._dseHandled) {
+		if (this._sizeDirty && !this._dseHandled) {			
 			this._dirtySelectionExtremes = true;
 			this._dseHandled = true;
+
+			if(this.getPrivate("selectionMinFinal") != this.getPrivate("selectionMin") || this.getPrivate("selectionMaxFinal") != this.getPrivate("selectionMax")) {
+				this._dirtySelectionExtremes = false;
+			}
 		}
 	}
 
@@ -1281,7 +1284,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivateRaw("selectionMinFinal", selectionMin);
 			this.setPrivateRaw("selectionMaxFinal", selectionMax);
 			this.setPrivateRaw("selectionStepFinal", minMaxStep.step);
-
+			
 			this.zoom(start, end);
 		}
 	}

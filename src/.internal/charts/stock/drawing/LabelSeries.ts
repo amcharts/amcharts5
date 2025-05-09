@@ -89,6 +89,8 @@ export class LabelSeries extends PolylineSeries {
 		const text = dataContext.text;
 		const template = dataContext.settings;
 
+		container.set("forceInactive", true);
+
 		if (template) {
 			const label = container.children.push(EditableLabel.new(this._root, {
 				themeTags: ["label"],

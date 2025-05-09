@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.12.2] - 2025-05-09
+
+### Fixed
+- The tooltips on an `XYChart` would not get re-arranged if pointer was being moved moved slowly into chart area and stopped.
+- Restored labels and callouts of a `StockChart` were initially dragable even when not in drawing mode.
+- Resize tool was not hidden when exiting drawing mode on a `StockChart`.
+- If data grouping on was enabled on a `DateAxis`  and new data was set while the chart was being scrolled, it might show some ghost bullets in the plot area.
+
+
 ## [5.12.1] - 2025-04-14
 
 ### Fixed

@@ -1036,6 +1036,7 @@ export class DrawingSeries extends LineSeries {
 	public disableDrawing() {
 		this._erasingEnabled = false;
 		this._drawingEnabled = false;
+		this._hideResizer();
 		this.isDrawing(false);
 
 		if (this._clickDp) {

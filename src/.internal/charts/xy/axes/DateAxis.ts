@@ -457,7 +457,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this._seriesAdded) {
 				this._root.events.once("frameended", () => {
 					this.markDirtySize();
-
 				})
 			}
 		}

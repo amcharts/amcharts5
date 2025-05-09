@@ -386,7 +386,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
 			if (change.type === "clear") {
 				$array.each(change.oldValues, (dataItem) => {
-					this.disposeDataItem(dataItem);
+					dataItem.dispose();
 				});
 			} else if (change.type === "push") {
 				this._processAxisRange(change.newValue, ["range"]);
