@@ -1301,11 +1301,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let extraMax = this.get("extraMax", 0);
 
 		if (this.get("logarithmic")) {
-			if (this.get("extraMin") == null) {
-				extraMin = 0.1;
-			}
-			if (this.get("extraMax") == null) {
-				extraMax = 0.2;
+			if(!this.get("strictMinMax")) {
+				if (this.get("extraMin") == null) {
+					extraMin = 0.1;
+				}
+				if (this.get("extraMax") == null) {
+					extraMax = 0.2;
+				}
 			}
 		}
 

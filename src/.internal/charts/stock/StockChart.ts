@@ -982,11 +982,15 @@ export class StockChart extends Container {
 		})
 
 		panel.leftAxesContainer.events.on("boundschanged", () => {
-			this._syncYAxesSize();
+			this.root.events.once("frameended", () => {
+				this._syncYAxesSize();
+			})
 		})
 
 		panel.rightAxesContainer.events.on("boundschanged", () => {
-			this._syncYAxesSize();
+			this.root.events.once("frameended", () => {
+				this._syncYAxesSize();
+			})
 		})
 
 		this._updateResizers();
@@ -1002,9 +1006,11 @@ export class StockChart extends Container {
 		})
 	}
 
+
 	protected _syncYAxesSize() {
 		let maxLeft = 0;
 		let maxRight = 0;
+
 		this.panels.each((chart) => {
 			let lw = chart.leftAxesContainer.width();
 			let rw = chart.rightAxesContainer.width();
@@ -1015,6 +1021,7 @@ export class StockChart extends Container {
 				maxRight = rw;
 			}
 		})
+
 		this.panels.each((chart) => {
 			chart.leftAxesContainer.set("minWidth", maxLeft);
 			chart.rightAxesContainer.set("minWidth", maxRight);
@@ -1022,7 +1029,6 @@ export class StockChart extends Container {
 
 		this.toolsContainer.set("paddingLeft", maxLeft);
 		this.toolsContainer.set("paddingRight", maxRight);
-
 	}
 
 	protected _removeXAxis(_axis: Axis<AxisRenderer>) {

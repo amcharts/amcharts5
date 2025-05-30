@@ -1430,7 +1430,8 @@ export class StockChartDefaultTheme extends Theme {
 		r("DateRangeSelector").setAll({
 			description: l.translateAny("Date Range"),
 			minDate: "auto",
-			maxDate: "auto"
+			maxDate: "auto",
+			allowInput: true
 		});
 
 		r("PeriodSelector").setAll({

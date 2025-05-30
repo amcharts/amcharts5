@@ -512,6 +512,21 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
+	 * Returns a position of a category.
+	 *
+	 * @param   category  Category to look up
+	 * @return            Position
+	 */
+	public categoryToPosition(category: string): number {
+		let dataItem = this._itemMap[category];
+		if (dataItem) {
+			return this.indexToPosition(dataItem.get("index")!);
+		}
+		return NaN;
+	}
+
+
+	/**
 	 * Returns an index of a category.
 	 *
 	 * @param   category  Category to look up
@@ -523,7 +538,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			return dataItem.get("index")!;
 		}
 		return NaN;
-	}
+	}	
 
 	/**
 	 * @ignore

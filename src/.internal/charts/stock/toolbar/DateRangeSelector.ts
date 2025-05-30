@@ -57,6 +57,15 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	 */
 	disableWeekDays?: number[];
 
+	/**
+	 * If set to `false`, typing into date fields will be disabled. Instead,
+	 * user will be able to select a day using arrow keys.
+	 * 
+	 * @default true
+	 * @since 5.12.3
+	 */
+	allowInput?: boolean;
+
 }
 
 export interface IDateRangeSelectorPrivate extends IStockControlPrivate {
@@ -140,6 +149,7 @@ export class DateRangeSelector extends StockControl {
 	protected _initDropdown(): void {
 		const dropdown = this.getPrivate("dropdown");
 		const container = dropdown.getPrivate("container")!;
+		const allowInput = this.get("allowInput", true);
 
 		const content = document.createElement("div")
 		content.className = "am5stock-row";
@@ -161,6 +171,12 @@ export class DateRangeSelector extends StockControl {
 
 		const fromField = document.createElement("input");
 		fromField.type = "text";
+		if (allowInput) {
+			fromField.setAttribute("aria-label", this._root.language.translateAny("From date"));
+		}
+		else {
+			fromField.setAttribute("aria-label", this._root.language.translateAny("From date") + "; " + this._root.language.translateAny("Use arrow keys and ENTER to selected a date"));
+		}
 		fromGroup.appendChild(fromField);
 		this.setPrivate("fromField", fromField);
 
@@ -180,6 +196,12 @@ export class DateRangeSelector extends StockControl {
 
 		const toField = document.createElement("input");
 		toField.type = "text";
+		if (allowInput) {
+			toField.setAttribute("aria-label", this._root.language.translateAny("To date"));
+		}
+		else {
+			toField.setAttribute("aria-label", this._root.language.translateAny("To date") + "; " + this._root.language.translateAny("Use arrow keys and ENTER to selected a date"));
+		}
 		toGroup.appendChild(toField);
 		this.setPrivate("toField", toField);
 
@@ -197,7 +219,7 @@ export class DateRangeSelector extends StockControl {
 		const fromPicker = flatpickr(fromField, {
 			inline: true,
 			appendTo: fromColumn,
-			allowInput: true,
+			allowInput: allowInput,
 			locale: pickerLocale,
 			disable: disable,
 			formatDate: (date) => {
@@ -213,7 +235,7 @@ export class DateRangeSelector extends StockControl {
 		const toPicker = flatpickr(toField, {
 			inline: true,
 			appendTo: toColumn,
-			allowInput: true,
+			allowInput: allowInput,
 			locale: pickerLocale,
 			disable: disable,
 			formatDate: (date) => {

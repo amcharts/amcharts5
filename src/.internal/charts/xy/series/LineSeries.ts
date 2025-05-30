@@ -764,8 +764,14 @@ export class LineSeries extends XYSeries {
 						}
 
 						if (sprite) {
-							sprite.set("tooltipText", undefined);
-							sprite.set("tooltipHTML", undefined);
+
+							sprite.setAll({
+								tooltipText: undefined,
+								tooltipHTML: undefined,
+								focusable: undefined,
+								focusableGroup: undefined,
+								ariaLabel: undefined
+							});
 
 							marker.children.push(sprite);
 							sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });

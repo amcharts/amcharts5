@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.12.3] - 2025-05-30
+
+### Added
+- New setting on `DateRangeSelector`: `allowInput` (default: `true`). If set to `false`, date inputs will be disabled, but the dates will be selectable using arrow keys.
+- `categoryToPosition()` method added to `CategoryAxis`.
+
+### Fixed
+- With `strictMinMax` set to `true` the zoom out button was sometimes visible on initial chart load.
+- Focusable bullets will no longer be focusable in legend's markers.
+- After removing comaprison series with a separate `ValueAxis` from `StockChart` white space was not being removed.
+- Changing stroke/fill on a `ColumnSeries` via `StockChart`'s settings modal was being ignored.
+
+
 ## [5.12.2] - 2025-05-09
 
 ### Fixed

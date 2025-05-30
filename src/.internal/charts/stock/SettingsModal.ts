@@ -387,6 +387,9 @@ export class SettingsModal extends Modal {
 
 			$object.each(this._updatedSettings, (key, value) => {
 				const targetKey = (<string>key).split(".").pop();
+				if (targetKey && ["fill", "stroke"].indexOf(targetKey) != -1 && target.className == "ColumnSeries") {
+					target.columns.template.remove(targetKey);
+				}
 				if ($type.isObject(value) && value.value) {
 					if (value.setting && value.setting.target) {
 						value.setting.target.set(targetKey, value.value);
