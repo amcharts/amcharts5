@@ -657,7 +657,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				i++;
 
 				// #103520
-				if (logarithmic) {
+				if (logarithmic && differencePower <= 2) {
 					if (value - step < step) {
 						value = step;
 					}

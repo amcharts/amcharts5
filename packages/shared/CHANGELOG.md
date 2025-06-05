@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.1] - 2025-06-05
+
+### Fixed
+- Logarithmic `ValueAxis` was not showing grid at proper intervals in some cases (since `5.13.0`).
+
+
 ## [5.13.0] - 2025-06-05
 
 ### Added 
