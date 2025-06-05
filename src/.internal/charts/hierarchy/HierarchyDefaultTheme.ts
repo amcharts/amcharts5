@@ -425,8 +425,13 @@ export class HierarchyDefaultTheme extends Theme {
 		r("HierarchyNode", ["treemap", "node"]).setAll({
 			tooltipY: percent(40),
 			isMeasured: false,
-			position: "absolute"
+			position: "absolute",
+			cursorOverStyle: "pointer"
 		});
+
+		r("HierarchyNode", ["treemap", "node", "last"]).setAll({			
+			cursorOverStyle: "default"
+		});		
 
 		{
 			const rule = r("RoundedRectangle", ["treemap", "node", "shape"]);

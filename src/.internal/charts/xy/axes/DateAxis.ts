@@ -926,9 +926,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	public _handleSeriesRemoved() {
 		this.setPrivate("baseInterval", this.get("baseInterval"));
-		this.setPrivate("min", undefined);		
-		this.setPrivate("minFinal", undefined);		
-	}	
+		this.setPrivate("min", undefined);
+		this.setPrivate("minFinal", undefined);
+	}
 
 	/**
 	 * Returns a duration of currently active `baseInterval` in milliseconds.
@@ -997,23 +997,28 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	/**
 	 * @ignore
 	 */
-	public getDataItemPositionX(dataItem: DataItem<IXYSeriesDataItem>, field: string, cellLocation: number, axisLocation: number): number {
+	public getDataItemPositionX(dataItem: DataItem<IXYSeriesDataItem>, field: string, cellLocation: number, axisLocation: number, exactLocation?: boolean): number {
 
 		let openValue;
 		let closeValue;
+		let value;
 
-		if (dataItem.open && dataItem.close) {
-			openValue = dataItem.open[field];
-			closeValue = dataItem.close[field];
+		if (exactLocation) {
+			value = dataItem.get(field as any);
 		}
 		else {
-			openValue = dataItem.get(field as any)
-			closeValue = openValue;
+			if (dataItem.open && dataItem.close) {
+				openValue = dataItem.open[field];
+				closeValue = dataItem.close[field];
+			}
+			else {
+				openValue = dataItem.get(field as any)
+				closeValue = openValue;
+			}
+
+			value = openValue + (closeValue - openValue) * cellLocation;
+			value = this._baseValue + (value - this._baseValue) * axisLocation;
 		}
-
-		let value = openValue + (closeValue - openValue) * cellLocation;
-
-		value = this._baseValue + (value - this._baseValue) * axisLocation;
 
 		return this.valueToPosition(value);
 	}
@@ -1028,22 +1033,26 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	/**
 	 * @ignore
 	 */
-	public getDataItemPositionY(dataItem: DataItem<IXYSeriesDataItem>, field: string, cellLocation: number, axisLocation: number): number {
+	public getDataItemPositionY(dataItem: DataItem<IXYSeriesDataItem>, field: string, cellLocation: number, axisLocation: number, exactLocation?: boolean): number {
 		let openValue;
 		let closeValue;
-
-		if (dataItem.open && dataItem.close) {
-			openValue = dataItem.open[field];
-			closeValue = dataItem.close[field];
+		let value;
+		if (exactLocation) {
+			value = dataItem.get(field as any);
 		}
 		else {
-			openValue = dataItem.get(field as any)
-			closeValue = openValue;
+			if (dataItem.open && dataItem.close) {
+				openValue = dataItem.open[field];
+				closeValue = dataItem.close[field];
+			}
+			else {
+				openValue = dataItem.get(field as any)
+				closeValue = openValue;
+			}
+
+			value = openValue + (closeValue - openValue) * cellLocation;
+			value = this._baseValue + (value - this._baseValue) * axisLocation;
 		}
-
-		let value = openValue + (closeValue - openValue) * cellLocation;
-
-		value = this._baseValue + (value - this._baseValue) * axisLocation;
 		return this.valueToPosition(value);
 	}
 

@@ -57,11 +57,23 @@ export class RoundedRectangle extends Rectangle {
 		let width = this.width();
 		let height = this.height();
 
+		let wSign = width / Math.abs(width);
+		let hSign = height / Math.abs(height);
+
+		let x = 0;
+		let y = 0;
+
+		const strokeWidth = this.get("strokeWidth", 0);
+
+		if (this.get("containStroke", false)) {
+			width -= wSign * strokeWidth;
+			height -= hSign * strokeWidth;
+			x += wSign * strokeWidth / 2;
+			y += hSign * strokeWidth / 2;
+		}
+
 		let w = width;
 		let h = height;
-
-		let wSign = w / Math.abs(width);
-		let hSign = h / Math.abs(height);
 
 		if ($type.isNumber(w) && $type.isNumber(h)) {
 
@@ -80,22 +92,22 @@ export class RoundedRectangle extends Rectangle {
 			crbl = $math.fitToRange(crbl, 0, maxcr);
 
 			const display = this._display;
-			display.moveTo(crtl * wSign, 0);
-			display.lineTo(w - crtr * wSign, 0);
+			display.moveTo(x + crtl * wSign, y);
+			display.lineTo(x + w - crtr * wSign, y);
 			if (crtr > 0) {
-				display.arcTo(w, 0, w, crtr * hSign, crtr);
+				display.arcTo(x + w, y, x + w, y + crtr * hSign, crtr);
 			}
-			display.lineTo(w, h - crbr * hSign);
+			display.lineTo(x + w, y + h - crbr * hSign);
 			if (crbr > 0) {
-				display.arcTo(w, h, w - crbr * wSign, h, crbr);
+				display.arcTo(x + w, y + h, x + w - crbr * wSign, y + h, crbr);
 			}
-			display.lineTo(crbl * wSign, h);
+			display.lineTo(x + crbl * wSign, y + h);
 			if (crbl > 0) {
-				display.arcTo(0, h, 0, h - crbl * hSign, crbl);
+				display.arcTo(x, y + h, x, y + h - crbl * hSign, crbl);
 			}
-			display.lineTo(0, crtl * hSign);
+			display.lineTo(x, y + crtl * hSign);
 			if (crtl > 0) {
-				display.arcTo(0, 0, crtl * wSign, 0, crtl);
+				display.arcTo(x, y, x + crtl * wSign, y, crtl);
 			}
 			display.closePath();
 		}

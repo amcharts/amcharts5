@@ -185,6 +185,7 @@ export class DrawingSeries extends LineSeries {
 	protected _afterNew() {
 		this.addTag("drawing");
 		this.setPrivate("allowChangeSnap", true);
+		this.set("exactLocationX", true);
 
 		if (this._tag) {
 			this.addTag(this._tag);

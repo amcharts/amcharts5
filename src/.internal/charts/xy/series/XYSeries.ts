@@ -222,7 +222,38 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 export interface IXYSeriesSettings extends ISeriesSettings {
 
 	/**
-	 * If set to `true` series will use selection extremes when calculating min and max values of the axis. Useful for stacked series.
+	 * If this is set to `true`, data items will ignore `locationX` setting
+	 * but will place the data point at exact X value.
+	 * 
+	 * This works with [[DateAxis]] only.
+	 * 
+	 * On a `ColumnSeries`/`CandlestickSeries` this setting will affect bullets
+	 * only.
+	 *
+	 * @default false
+	 * @since 5.13.0
+	 */
+	exactLocationX?: boolean;
+
+	/**
+	 * If this is set to `true`, data items will ignore `locationX` setting
+	 * but will place the data point at exact Y value.
+	 * 
+	 * This works with [[DateAxis]] only.
+	 * 
+	 * On a `ColumnSeries`/`CandlestickSeries` this setting will affect bullets
+	 * only.
+	 *
+	 * @default false
+	 * @since 5.13.0
+	 */
+	exactLocationY?: boolean;
+
+	/**
+	 * If set to `true` series will use selection extremes when calculating
+	 * their min and max values of the axis. Useful for stacked series.
+	 *
+	 * @since 5.10.11
 	 */
 	useSelectionExtremes?: boolean;
 
@@ -1776,8 +1807,11 @@ export abstract class XYSeries extends Series {
 			let xAxis = this.get("xAxis");
 			let yAxis = this.get("yAxis");
 
-			let positionX = xAxis.getDataItemPositionX(dataItem, this._xField, locationX, this.get("vcx", 1));
-			let positionY = yAxis.getDataItemPositionY(dataItem, this._yField, locationY, this.get("vcy", 1))
+			let exactLocationX = this.get("exactLocationX", false);
+			let exactLocationY = this.get("exactLocationY", false);
+
+			let positionX = xAxis.getDataItemPositionX(dataItem, this._xField, locationX, this.get("vcx", 1), exactLocationX);
+			let positionY = yAxis.getDataItemPositionY(dataItem, this._yField, locationY, this.get("vcy", 1), exactLocationY);
 
 			let point = this.getPoint(positionX, positionY);
 
@@ -1818,7 +1852,7 @@ export abstract class XYSeries extends Series {
 							realField = this._yLowField;
 						}
 						if (realField) {
-							positionY = yAxis.getDataItemPositionY(dataItem, realField as any, 0, this.get("vcy", 1))
+							positionY = yAxis.getDataItemPositionY(dataItem, realField as any, 0, this.get("vcy", 1), exactLocationY)
 
 							point = yAxis.get("renderer").positionToPoint(positionY);
 
@@ -1841,7 +1875,7 @@ export abstract class XYSeries extends Series {
 						}
 
 						if (realField) {
-							positionX = xAxis.getDataItemPositionX(dataItem, realField as any, 0, this.get("vcx", 1));
+							positionX = xAxis.getDataItemPositionX(dataItem, realField as any, 0, this.get("vcx", 1), exactLocationX);
 
 							point = xAxis.get("renderer").positionToPoint(positionX);
 
@@ -2151,6 +2185,9 @@ export abstract class XYSeries extends Series {
 
 		const tooltip = this.get("tooltip");
 
+		const exactLocationX = this.get("exactLocationX", false);
+		const exactLocationY = this.get("exactLocationY", false);
+
 		if (tooltip) {
 			if (!this.isHidden() && this.get("visible")) {
 				tooltip._setDataItem(dataItem);
@@ -2168,8 +2205,8 @@ export abstract class XYSeries extends Series {
 					const vcx = this.get("vcx", 1);
 					const vcy = this.get("vcy", 1);
 
-					const xPos = xAxis.getDataItemPositionX(dataItem, this._tooltipFieldX!, this._aLocationX0 + (this._aLocationX1 - this._aLocationX0) * itemLocationX, vcx);
-					const yPos = yAxis.getDataItemPositionY(dataItem, this._tooltipFieldY!, this._aLocationY0 + (this._aLocationY1 - this._aLocationY0) * itemLocationY, vcy);
+					const xPos = xAxis.getDataItemPositionX(dataItem, this._tooltipFieldX!, this._aLocationX0 + (this._aLocationX1 - this._aLocationX0) * itemLocationX, vcx, exactLocationX);
+					const yPos = yAxis.getDataItemPositionY(dataItem, this._tooltipFieldY!, this._aLocationY0 + (this._aLocationY1 - this._aLocationY0) * itemLocationY, vcy, exactLocationY);
 
 					const point = this.getPoint(xPos, yPos);
 

@@ -212,6 +212,7 @@ import type { StockLegend } from "./../charts/stock/StockLegend.js";
 import type { StockPanel } from "./../charts/stock/StockPanel.js";
 import type { StockToolbar } from "./../charts/stock/toolbar/StockToolbar.js";
 import type { Sunburst } from "./../charts/hierarchy/Sunburst.js";
+import type { SuperTrend } from "./../charts/stock/indicators/SuperTrend.js";
 import type { Text } from "./render/Text.js";
 import type { Tick } from "./render/Tick.js";
 import type { Tooltip } from "./render/Tooltip.js";
@@ -450,6 +451,7 @@ export interface IClasses {
 	"StockPanel": StockPanel;
 	"StockToolbar": StockToolbar;
 	"Sunburst": Sunburst;
+	"SuperTrend": SuperTrend;
 	"Text": Text;
 	"Tick": Tick;
 	"Tooltip": Tooltip;

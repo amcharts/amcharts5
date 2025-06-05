@@ -46,14 +46,15 @@ export class StockChartDefaultTheme extends Theme {
 				strictMinMaxSelection: true
 			},
 			autoSetPercentScale: true,
-			drawingSelectionEnabled: false
+			drawingSelectionEnabled: false,
+			autoHidePanelControls: false
 		});
 
 		r("StockPanel").setAll({
 			panY: true,
 			wheelY: "zoomX",
 			panX: true,
-			minHeight: 1
+			minHeight: 1			
 		});
 
 		r("StockPanel").states.create("hidden", {
@@ -679,6 +680,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("Grid", ["oversold"]).setAll({
 			strokeOpacity: 0.4,
 		});
+		
 
 		// series fill below oversold
 		r("Graphics", ["overboughtoversold", "oversold", "fill"]).setAll({
@@ -687,10 +689,19 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		// series fill above oversold
+		
 		r("Graphics", ["overboughtoversold", "overbought", "fill"]).setAll({
 			visible: true,
 			fillOpacity: 0.2
 		});
+
+		r("Graphics", ["fill", "supertrend", "upper"]).setAll({
+			fillOpacity: 0.2
+		})
+
+		r("Graphics", ["fill", "supertrend", "lower"]).setAll({
+			fillOpacity: 0.2
+		})		
 
 		r("Graphics", ["fill", "bollingerbands", "upper"]).setAll({
 			fillOpacity: 0.2
@@ -804,7 +815,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["movingaverage"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
-		})
+		})		
 
 		r("ColumnSeries", ["movingaveragedeviation"]).setAll({
 			legendValueText: "[{deviationColor}; bold]{valueY.formatNumber('#.00')}[/]",
@@ -845,6 +856,11 @@ export class StockChartDefaultTheme extends Theme {
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{slowColor} bold]{slow.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{kSmoothing.formatNumber('#.')},{dSmoothing.formatNumber('#.')})"
 		})
+
+		r("LineSeries", ["supertrend"]).setAll({
+			legendValueText: "",
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{multiplier.formatNumber('#.')})"
+		})		
 
 		r("LineSeries", ["trix"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.00')}[/]",
@@ -1143,6 +1159,15 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0xab82da)
 		})
 
+		r("SuperTrend").setAll({
+			name: l.translateAny("Super Trend"),
+			shortName: l.translateAny("Super Trend"),
+			period: 10,
+			upperColor: ic.get("negative"),
+			lowerColor: ic.get("positive"),
+			multiplier: 3
+		})
+
 		r("WilliamsR").setAll({
 			name: l.translateAny("Williams %R"),
 			shortName: l.translateAny("Williams %R"),
@@ -1278,7 +1303,7 @@ export class StockChartDefaultTheme extends Theme {
 			scrollable: true,
 			fixedLabel: true,
 			searchable: true,
-			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Average True Range", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "Heikin Ashi", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
+			indicators: ["Acceleration Bands", "Accumulation Distribution", "Accumulative Swing Index", "Aroon", "Average True Range", "Awesome Oscillator", "Bollinger Bands", "Bull Bear Power", "Chaikin Money Flow", "Chaikin Oscillator", "Commodity Channel Index", "Disparity Index", "Heikin Ashi", "MACD", "Median Price", "Momentum", "Moving Average", "Moving Average Cross", "Moving Average Deviation", "Moving Average Envelope", "On Balance Volume", "Price Volume Trend", "Relative Strength Index", "Standard Deviation", "Stochastic Momentum Index", "Stochastic Oscillator", "Super Trend", "Trix", "Typical Price", "Volume", "Volume Profile", "VWAP", "Williams R", "ZigZag"]
 		});
 
 		r("ComparisonControl").setAll({

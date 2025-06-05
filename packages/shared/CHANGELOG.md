@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.0] - 2025-06-05
+
+### Added 
+- `exactLocationX` and `exactLocationY` added to `XYSeries`. If this is set to `true`, data items will ignore `locationX`/`locationY` setting but will place the data point at exact X/Y value. This will work only with `DateAxis`. If used on a `ColumnSeries`/`CandlestickSeries` it will affect its bullets only.
+- `autoHidePanelControls` added to `StockChart`.
+- `containStroke` added to `Rectangle`. If this is set to `true`, rectangle will be drawn in such a way that its stroke is contained within the rectangle's width and height. Useful if you have thicker `strokeWidth` for `ColumnSeries`.
+- Super Trend indicator added to `StockChart`.
+- `getFillGradientFromSprite` setting added to `Tooltip` (default: `false`).
+
+### Fixed
+- Fixed unserialized drawings like doodles looking jagged (setitng `exactLocationX` to `true` by default on all drawings).
+- Improved step calculation on a logarithmic `ValueAxis`.
+- `Treemap` was not showing pointer cursor on active nodes.
+- `IndicatorControl` no longer will insert a custom indicator created in its callback into `StockChart`'s indicator list if it was already inserted in the callback.
+
+
 ## [5.12.3] - 2025-05-30
 
 ### Added
@@ -44,7 +60,6 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Fixed
 - `"drawingsupdated"` event of `StockChart` was being dispatched when drawing was selected. (wasn't exactly fixed in `5.11.3`)
-
 
 
 ## [5.11.3] - 2025-04-09

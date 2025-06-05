@@ -29,6 +29,7 @@ import { Momentum } from "../indicators/Momentum";
 import { RelativeStrengthIndex } from "../indicators/RelativeStrengthIndex";
 import { StochasticMomentumIndex } from "../indicators/StochasticMomentumIndex";
 import { StochasticOscillator } from "../indicators/StochasticOscillator";
+import { SuperTrend } from "../indicators/SuperTrend";
 import { WilliamsR } from "../indicators/WilliamsR";
 import { Trix } from "../indicators/Trix";
 import { Volume } from "../indicators/Volume";
@@ -47,7 +48,7 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
-export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Average True Range" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "Heikin Ashi" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Cross" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Price Volume Trend" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
+export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Average True Range" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "Heikin Ashi" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Cross" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Price Volume Trend" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Super Trend" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
 	id: string;
@@ -410,6 +411,13 @@ export class IndicatorControl extends DropdownListControl {
 					stockSeries: stockSeries
 				});
 				break;
+			case "Super Trend":
+				indicator = SuperTrend.new(this.root, {
+					stockChart: stockChart,
+					stockSeries: stockSeries,
+					legend: legend
+				});
+				break;				
 			case "Williams R":
 				indicator = WilliamsR.new(this.root, {
 					stockChart: stockChart,
@@ -460,7 +468,9 @@ export class IndicatorControl extends DropdownListControl {
 		}
 
 		if (indicator) {
-			stockChart.indicators.push(indicator);
+			if (!stockChart.indicators.contains(indicator)) {
+				stockChart.indicators.push(indicator);
+			}
 			if (indicator._editableSettings.length && indicator.get("autoOpenSettings", true)) {
 				const modal = stockChart.getPrivate("settingsModal");
 				modal.events.once("done", (ev) => {

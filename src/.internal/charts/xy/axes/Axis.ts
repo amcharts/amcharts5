@@ -642,12 +642,12 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * @ignore
 	 */
-	public abstract getDataItemPositionX(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number): number;
+	public abstract getDataItemPositionX(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number, exactLocation?:boolean): number;
 
 	/**
 	 * @ignore
 	 */
-	public abstract getDataItemPositionY(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number): number;
+	public abstract getDataItemPositionY(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number, exactLocation?:boolean): number;
 
 	/**
 	 * @ignore

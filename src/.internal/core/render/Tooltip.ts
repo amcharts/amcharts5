@@ -62,9 +62,18 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * its `tooltipTarget`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
-	 * @default false
+	 * @default true
 	 */
 	getFillFromSprite?: boolean;
+
+	/**
+	 * If set to `true` will use the same `filGradientl` for its background as
+	 * its `tooltipTarget`.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
+	 * @default false
+	 */
+	getFillGradientFromSprite?: boolean;
 
 	/**
 	 * If set to `true` will use the same `fill` color as its `tooltipTarget`.
@@ -159,6 +168,7 @@ export class Tooltip extends Container {
 	public static classNames: Array<string> = Container.classNames.concat([Tooltip.className]);
 
 	protected _fillDp: IDisposer | undefined;
+	protected _fillGrDp: IDisposer | undefined;
 	protected _strokeDp: IDisposer | undefined;
 	protected _labelDp: IDisposer | undefined;
 
@@ -357,16 +367,36 @@ export class Tooltip extends Container {
 				}
 
 				if (fill != null) {
-					background.set("fill", fill as any);
+					background.set("fill", fill);
 				}
 
 				this._fillDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
-						background.set("fill", fill as any);
+						background.set("fill", fill);
 						this._updateTextColor(fill);
 					}
 				})
 				this._disposers.push(this._fillDp);
+			}
+
+			if (this.get("getFillGradientFromSprite")) {
+
+				if (this._fillGrDp) {
+					this._fillGrDp.dispose();
+				}
+
+				let fillGradient = tooltipTarget.get("fillGradient" as any);
+
+				if (fillGradient != null) {
+					background.set("fillGradient", fillGradient);
+				}
+
+				this._fillGrDp = tooltipTarget.on("fillGradient" as any, (fillGradient) => {
+					if (fillGradient != null) {
+						background.set("fillGradient", fillGradient);
+					}
+				})
+				this._disposers.push(this._fillGrDp);
 			}
 
 			if (this.get("getStrokeFromSprite")) {
@@ -376,12 +406,12 @@ export class Tooltip extends Container {
 				}
 
 				if (fill != null) {
-					background.set("stroke", fill as any);
+					background.set("stroke", fill);
 				}
 
 				this._strokeDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
-						background.set("stroke", fill as any);
+						background.set("stroke", fill);
 					}
 				})
 
@@ -395,12 +425,12 @@ export class Tooltip extends Container {
 				}
 
 				if (fill != null) {
-					this.label.set("fill", fill as any);
+					this.label.set("fill", fill);
 				}
 
 				this._labelDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
-						this.label.set("fill", fill as any);
+						this.label.set("fill", fill);
 					}
 				})
 

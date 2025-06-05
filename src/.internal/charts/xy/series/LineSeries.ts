@@ -572,8 +572,11 @@ export class LineSeries extends XYSeries {
 		let itemLocationX = dataItem.get("locationX", o.locationX);
 		let itemLocationY = dataItem.get("locationY", o.locationY);
 
-		let xPos = o.xAxis.getDataItemPositionX(dataItem, o.xField, itemLocationX, o.vcx);
-		let yPos = o.yAxis.getDataItemPositionY(dataItem, o.yField, itemLocationY, o.vcy);
+		const exactLocationX = this.get("exactLocationX", false);
+		const exactLocationY = this.get("exactLocationY", false);
+
+		let xPos = o.xAxis.getDataItemPositionX(dataItem, o.xField, itemLocationX, o.vcx, exactLocationX);
+		let yPos = o.yAxis.getDataItemPositionY(dataItem, o.yField, itemLocationY, o.vcy, exactLocationY);
 
 		if (this._shouldInclude(xPos)) {
 
@@ -609,7 +612,7 @@ export class LineSeries extends XYSeries {
 							let stackToItemY = dataItem.get("stackToItemY")!;
 
 							if (stackToItemX) {
-								xPos0 = o.xAxis.getDataItemPositionX(stackToItemX, o.xField, itemLocationX, (stackToItemX.component as XYSeries).get("vcx"));
+								xPos0 = o.xAxis.getDataItemPositionX(stackToItemX, o.xField, itemLocationX, (stackToItemX.component as XYSeries).get("vcx"), exactLocationX);
 								if ($type.isNaN(xPos0)) {
 									xPos0 = o.basePosX;
 								}
@@ -619,12 +622,12 @@ export class LineSeries extends XYSeries {
 									xPos0 = o.basePosX;
 								}
 								else {
-									xPos0 = o.xAxis.getDataItemPositionX(dataItem, o.xOpenField, itemLocationX, o.vcx);
+									xPos0 = o.xAxis.getDataItemPositionX(dataItem, o.xOpenField, itemLocationX, o.vcx, exactLocationX);
 								}
 							}
 
 							if (stackToItemY) {
-								yPos0 = o.yAxis.getDataItemPositionY(stackToItemY, o.yField, itemLocationY, (stackToItemY.component as XYSeries).get("vcy"));
+								yPos0 = o.yAxis.getDataItemPositionY(stackToItemY, o.yField, itemLocationY, (stackToItemY.component as XYSeries).get("vcy"), exactLocationY);
 								if ($type.isNaN(yPos0)) {
 									yPos0 = o.basePosY;
 								}
@@ -634,13 +637,13 @@ export class LineSeries extends XYSeries {
 									yPos0 = o.basePosY;
 								}
 								else {
-									yPos0 = o.yAxis.getDataItemPositionY(dataItem, o.yOpenField, itemLocationY, o.vcy);
+									yPos0 = o.yAxis.getDataItemPositionY(dataItem, o.yOpenField, itemLocationY, o.vcy, exactLocationY);
 								}
 							}
 						}
 						else {
-							xPos0 = o.xAxis.getDataItemPositionX(dataItem, o.xOpenField, itemLocationX, o.vcx);
-							yPos0 = o.yAxis.getDataItemPositionY(dataItem, o.yOpenField, itemLocationY, o.vcy);
+							xPos0 = o.xAxis.getDataItemPositionX(dataItem, o.xOpenField, itemLocationX, o.vcx, exactLocationX);
+							yPos0 = o.yAxis.getDataItemPositionY(dataItem, o.yOpenField, itemLocationY, o.vcy, exactLocationY);
 						}
 					}
 				}

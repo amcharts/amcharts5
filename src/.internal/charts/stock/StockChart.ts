@@ -144,6 +144,15 @@ export interface IStockChartSettings extends IContainerSettings {
 	 */
 	hideDrawingGrips?: boolean;
 
+	/**
+	 * If set to `true`, panel controls will automatically hide when mouse is
+	 * not over the chart.
+	 *
+	 * @default false
+	 * @since 5.13.0
+	 */
+	autoHidePanelControls?: boolean;
+
 }
 
 export interface IStockChartPrivate extends IContainerPrivate {
@@ -870,11 +879,31 @@ export class StockChart extends Container {
 			const index = this.panelsContainer.children.indexOf(panel);
 			const len = this.panels.length;
 			const visible = "visible"
+			const autoHidePanelControls = this.get("autoHidePanelControls", false);
+
+			panelControls.set(visible, !autoHidePanelControls);
 
 			panelControls.upButton.setPrivate(visible, false);
 			panelControls.downButton.setPrivate(visible, false);
 			panelControls.expandButton.setPrivate(visible, false);
 			panelControls.closeButton.setPrivate(visible, false);
+
+
+			if(autoHidePanelControls) {
+				panel.plotContainer.events.on("pointerover", () => {
+					panelControls.show();
+				})
+
+				panelControls.events.on("pointerover", () => {
+					panelControls.show();
+				})
+
+				panel.plotContainer.events.on("pointerout", () => {
+					if(!panelControls.isHover()){
+						panelControls.hide();
+					}
+				})
+			}
 
 			if (len > 1) {
 				panelControls.expandButton.setPrivate(visible, true);

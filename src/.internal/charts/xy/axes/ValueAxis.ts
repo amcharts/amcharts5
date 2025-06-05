@@ -414,7 +414,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._getMinMax();
 			this._dirtyExtremes = false;
 		}
-		
+
 		this._handleSizeDirty();
 
 		if (this._dirtySelectionExtremes && !this._isPanning && this.get("autoZoom", true)) {
@@ -458,11 +458,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	protected _handleSizeDirty() {
-		if (this._sizeDirty && !this._dseHandled) {			
+		if (this._sizeDirty && !this._dseHandled) {
 			this._dirtySelectionExtremes = true;
 			this._dseHandled = true;
 
-			if(this.getPrivate("selectionMinFinal") != this.getPrivate("selectionMin") || this.getPrivate("selectionMaxFinal") != this.getPrivate("selectionMax")) {
+			if (this.getPrivate("selectionMinFinal") != this.getPrivate("selectionMin") || this.getPrivate("selectionMaxFinal") != this.getPrivate("selectionMax")) {
 				this._dirtySelectionExtremes = false;
 			}
 		}
@@ -655,6 +655,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					value = $math.round(value, decCount);
 				}
 				i++;
+
+				// #103520
+				if (logarithmic) {
+					if (value - step < step) {
+						value = step;
+					}
+				}
 
 				previous = value;
 			}
@@ -1187,7 +1194,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let delta = selectionMax - selectionMin;
 
 			selectionMin -= delta * extraMin;
-			selectionMax += delta * extraMax;			
+			selectionMax += delta * extraMax;
 
 			let minMaxStep: IMinMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount);
 
@@ -1220,7 +1227,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				selectionMin = minMaxStep.min;
 				selectionMax = minMaxStep.max;
 			}
-	
+
 			if (strictMinMax) {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = Math.max(selectionMin, minDefined);
@@ -1228,7 +1235,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 				if ($type.isNumber(maxDefined)) {
 					selectionMax = Math.min(selectionMax, maxDefined);
-				}			
+				}
 			}
 
 			if (selectionStrictMinMax) {
@@ -1243,24 +1250,24 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				else {
 					selectionMin = selectionMinReal;
 				}
-	
+
 				if ($type.isNumber(maxDefined)) {
 					selectionMax = maxDefined;
 				}
 				else {
 					selectionMax = selectionMaxReal;
 				}
-	
+
 				if (selectionMax - selectionMin <= 0.00000001) {
 					selectionMin -= this._deltaMinMax;
 					selectionMax += this._deltaMinMax;
 				}
-	
+
 				let delta = selectionMax - selectionMin;
 
 				selectionMin -= delta * extraMin;
 				selectionMax += delta * extraMax;
-			}		
+			}
 
 			if (this.get("logarithmic")) {
 
@@ -1284,7 +1291,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivateRaw("selectionMinFinal", selectionMin);
 			this.setPrivateRaw("selectionMaxFinal", selectionMax);
 			this.setPrivateRaw("selectionStepFinal", minMaxStep.step);
-			
+
 			this.zoom(start, end);
 		}
 	}
@@ -1301,7 +1308,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let extraMax = this.get("extraMax", 0);
 
 		if (this.get("logarithmic")) {
-			if(!this.get("strictMinMax")) {
+			if (!this.get("strictMinMax")) {
 				if (this.get("extraMin") == null) {
 					extraMin = 0.1;
 				}
@@ -1516,7 +1523,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		min = $math.round(min, decCount);
 		max = $math.round(max, decCount);
 
-		
+
 
 		const syncWithAxis = this.get("syncWithAxis");
 		if (syncWithAxis) {
@@ -1539,7 +1546,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
-		
+
 
 		if ($type.isNumber(min) && $type.isNumber(max)) {
 			if (this.getPrivate("minFinal") !== min || this.getPrivate("maxFinal") !== max) {
