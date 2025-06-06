@@ -212,6 +212,7 @@ import type { StockLegend } from "./../../../stock";
 import type { StockPanel } from "./../../../stock";
 import type { StockToolbar } from "./../../../stock";
 import type { Sunburst } from "./../../../hierarchy";
+import type { SuperTrend } from "./../../../stock";
 import type { Text } from "./../../../index";
 import type { Tick } from "./../../../index";
 import type { Tooltip } from "./../../../index";
@@ -450,6 +451,7 @@ export interface IClasses {
 	"StockPanel": () => Promise<typeof StockPanel>;
 	"StockToolbar": () => Promise<typeof StockToolbar>;
 	"Sunburst": () => Promise<typeof Sunburst>;
+	"SuperTrend": () => Promise<typeof SuperTrend>;
 	"Text": () => Promise<typeof Text>;
 	"Tick": () => Promise<typeof Tick>;
 	"Tooltip": () => Promise<typeof Tooltip>;
@@ -689,6 +691,7 @@ const classes: IClasses = {
 	"StockPanel": () => import(/* webpackExports: "StockPanel", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StockPanel),
 	"StockToolbar": () => import(/* webpackExports: "StockToolbar", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.StockToolbar),
 	"Sunburst": () => import(/* webpackExports: "Sunburst", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.Sunburst),
+	"SuperTrend": () => import(/* webpackExports: "SuperTrend", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.SuperTrend),
 	"Text": () => import(/* webpackExports: "Text", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Text),
 	"Tick": () => import(/* webpackExports: "Tick", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Tick),
 	"Tooltip": () => import(/* webpackExports: "Tooltip", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Tooltip),

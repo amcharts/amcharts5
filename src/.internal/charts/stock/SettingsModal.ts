@@ -51,6 +51,16 @@ export interface ISettingsModalEvents extends IModalEvents {
 		settingsTarget?: Indicator | XYSeries
 	}
 
+	/**
+	 * Invoked when modal starts generating actual content.
+	 *
+	 * It's a good place to modify settings.
+	 */
+	initstarted: {
+		settings?: any,
+		settingsTarget?: Indicator | XYSeries
+	}
+
 }
 
 /**
@@ -227,6 +237,14 @@ export class SettingsModal extends Modal {
 
 		// Clear
 		this.clear();
+
+		// Init started event
+		this.events.dispatch("initstarted", {
+			type: "initstarted",
+			settings: settings,
+			settingsTarget: target,
+			target: this
+		});
 
 		// Title
 		const title = document.createElement("h1");

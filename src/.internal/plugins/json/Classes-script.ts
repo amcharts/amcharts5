@@ -212,6 +212,7 @@ import type { StockLegend } from "./../../../stock";
 import type { StockPanel } from "./../../../stock";
 import type { StockToolbar } from "./../../../stock";
 import type { Sunburst } from "./../../../hierarchy";
+import type { SuperTrend } from "./../../../stock";
 import type { Text } from "./../../../index";
 import type { Tick } from "./../../../index";
 import type { Tooltip } from "./../../../index";
@@ -450,6 +451,7 @@ export interface IClasses {
 	"StockPanel": () => Promise<typeof StockPanel>;
 	"StockToolbar": () => Promise<typeof StockToolbar>;
 	"Sunburst": () => Promise<typeof Sunburst>;
+	"SuperTrend": () => Promise<typeof SuperTrend>;
 	"Text": () => Promise<typeof Text>;
 	"Tick": () => Promise<typeof Tick>;
 	"Tooltip": () => Promise<typeof Tooltip>;
@@ -689,6 +691,7 @@ const classes: IClasses = {
 	"StockPanel": () => import(/* webpackExports: "StockPanel", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockPanel),
 	"StockToolbar": () => import(/* webpackExports: "StockToolbar", webpackMode: "weak" */ "./../../../stock").then((m) => m.StockToolbar),
 	"Sunburst": () => import(/* webpackExports: "Sunburst", webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Sunburst),
+	"SuperTrend": () => import(/* webpackExports: "SuperTrend", webpackMode: "weak" */ "./../../../stock").then((m) => m.SuperTrend),
 	"Text": () => import(/* webpackExports: "Text", webpackMode: "weak" */ "./../../../index").then((m) => m.Text),
 	"Tick": () => import(/* webpackExports: "Tick", webpackMode: "weak" */ "./../../../index").then((m) => m.Tick),
 	"Tooltip": () => import(/* webpackExports: "Tooltip", webpackMode: "weak" */ "./../../../index").then((m) => m.Tooltip),

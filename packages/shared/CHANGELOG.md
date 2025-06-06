@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.2] - 2025-06-06
+
+### Added
+- Event added to `SettingsModal`: `initstarted`. Use it to modify settings contents. [More info](https://www.amcharts.com/docs/v5/tutorials/modifying-series-indicator-settings-modal/).
+
+### Changed
+- `StockChart`'s "Label" and "Callout" drawings now are draggable/selectable right after creation without the select tool.
+
+### Fixed
+- Added `SuperTrend` to serializable class list.
+- `StockChart`'s drawing selection rectangle sometimes remained visible when drawing mode was turned off.
+
+
 ## [5.13.1] - 2025-06-05
 
 ### Fixed
