@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.3] - 2025-06-07
+
+### Fixed
+- `drawingsUpdated` event was fired each time the chart was scrolled.
+
+
 ## [5.13.2] - 2025-06-06
 
 ### Added

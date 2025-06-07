@@ -769,7 +769,9 @@ export class DrawingSeries extends LineSeries {
 		}
 
 		if (this._valuesDirty) {
-			this.markDirtyDrawings();
+			if(!this._baseSeriesDirty){
+				this.markDirtyDrawings();
+			}
 		}
 
 		super._updateChildren();

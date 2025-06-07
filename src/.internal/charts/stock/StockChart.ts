@@ -531,6 +531,7 @@ export class StockChart extends Container {
 	public _afterChanged() {
 		super._afterChanged();
 		if (this._drawingsChanged) {
+
 			this._drawingsChanged = false;
 			const type = "drawingsupdated";
 			if (this.events.isEnabled(type)) {

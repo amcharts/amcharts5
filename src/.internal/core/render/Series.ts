@@ -263,6 +263,8 @@ export abstract class Series extends Component {
 	protected _psi: number | undefined;
 	protected _pei: number | undefined;
 
+	protected _baseSeriesDirty: boolean = false;
+
 	/**
 	 * A chart series belongs to.
 	 */
@@ -411,6 +413,7 @@ export abstract class Series extends Component {
 	public _clearDirty() {
 		super._clearDirty();
 		this._aggregatesCalculated = false;
+		this._baseSeriesDirty = false;
 		this._selectionAggregatesCalculated = false;
 	}
 
@@ -432,6 +435,7 @@ export abstract class Series extends Component {
 			const baseValueSeries = this.getPrivate("baseValueSeries");
 			if(baseValueSeries){
 				this._disposers.push(baseValueSeries.onPrivate("startIndex", ()=>{
+					this._baseSeriesDirty = true;
 					this.markDirtyValues();
 				}))
 			}
