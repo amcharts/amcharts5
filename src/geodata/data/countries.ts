@@ -95,7 +95,7 @@ const countries: Countries = {
 	"HT": [ "haitiLow", "haitiHigh" ],
 	"HU": [ "hungaryLow", "hungaryHigh" ],
 	"IS": [ "icelandLow", "icelandHigh" ],
-	"IN": [ "india2020Low", "india2020High", "india2019Low", "india2019High", "indiaLow", "indiaHigh" ],
+	"IN": [ "india2023Low", "india2023High", "india2020Low", "india2020High", "india2019Low", "india2019High", "indiaLow", "indiaHigh" ],
 	"ID": [ "indonesiaLow", "indonesiaHigh" ],
 	"IE": [ "irelandLow", "irelandHigh" ],
 	"IL": [ "israelLow", "israelHigh", "israelPalestineLow", "israelPalestineHigh" ],

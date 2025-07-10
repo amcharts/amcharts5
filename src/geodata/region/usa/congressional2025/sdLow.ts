@@ -1,0 +1,3 @@
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-104.053,43.001],[-104.058,44.997],[-104.045,45.945],[-101.041,45.943],[-99.297,45.94],[-96.564,45.935],[-96.857,45.605],[-96.453,45.301],[-96.437,43.12],[-96.688,42.653],[-97.218,42.845],[-97.831,42.869],[-97.947,42.771],[-98.499,42.999],[-101.633,42.996],[-104.053,43.001]]]},"properties":{"name":"Congressional District (at Large)","id":"4600","STATEID":"46","CD118":"00","CDSESSION":"118","STATENAME":"South Dakota"},"id":"4600"}]};
+
+export default map;

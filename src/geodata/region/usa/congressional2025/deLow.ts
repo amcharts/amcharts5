@@ -1,0 +1,3 @@
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-75.075,38.625],[-75.049,38.451],[-75.694,38.46],[-75.789,39.722],[-75.564,39.839],[-75.612,39.622],[-75.591,39.461],[-75.439,39.313],[-75.402,39.067],[-75.075,38.625]]]},"properties":{"name":"Congressional District (at Large)","id":"1000","STATEID":"10","CD118":"00","CDSESSION":"118","STATENAME":"Delaware"},"id":"1000"}]};
+
+export default map;

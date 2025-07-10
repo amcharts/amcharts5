@@ -1,0 +1,3 @@
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-77.12,38.934],[-77.042,38.995],[-76.909,38.893],[-77.032,38.851],[-77.12,38.934]]]},"properties":{"name":"Delegate District (at Large)","id":"1198","STATEID":"11","CD118":"98","CDSESSION":"118","STATENAME":"Washington, DC"},"id":"1198"}]};
+
+export default map;

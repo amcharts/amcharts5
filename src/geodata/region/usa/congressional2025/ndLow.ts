@@ -1,0 +1,3 @@
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-96.564,45.935],[-97.483,45.935],[-99.297,45.94],[-101.041,45.943],[-102.446,45.945],[-104.045,45.945],[-104.045,47.27],[-104.049,49],[-102.217,48.999],[-99.94,48.999],[-97.229,49],[-97.105,48.69],[-97.166,48.551],[-97.147,48.144],[-96.85,47.591],[-96.777,46.895],[-96.799,46.654],[-96.6,46.33],[-96.564,45.935]]]},"properties":{"name":"Congressional District (at Large)","id":"3800","STATEID":"38","CD118":"00","CDSESSION":"118","STATENAME":"North Dakota"},"id":"3800"}]};
+
+export default map;

@@ -1,0 +1,3 @@
+const map: GeoJSON.FeatureCollection = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[-104.058,44.997],[-104.055,43.853],[-104.053,43.001],[-104.053,41.917],[-104.053,41.001],[-106.061,40.997],[-108.526,41],[-109.543,40.998],[-111.047,40.998],[-111.047,42.358],[-111.045,43.372],[-111.055,45.001],[-110.704,44.992],[-108.262,45],[-105.928,44.993],[-104.058,44.997]]]},"properties":{"name":"Congressional District (at Large)","id":"5600","STATEID":"56","CD118":"00","CDSESSION":"118","STATENAME":"Wyoming"},"id":"5600"}]};
+
+export default map;
