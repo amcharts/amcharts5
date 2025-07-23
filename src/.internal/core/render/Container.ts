@@ -825,4 +825,12 @@ export class Container extends Sprite {
 			this._root._setHTMLContent(this, populateString(this, html));
 		}
 	}
+
+	public contentWidth(): number {
+		return this._contentWidth;
+	}
+
+	public contentHeight(): number {
+		return this._contentHeight;
+	}
 }

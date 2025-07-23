@@ -1645,6 +1645,11 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		this._textInfo = undefined;
 	}
 
+	public invalidateVisibility(): void {
+		this.textVisible = true;
+		this.scale = this._originalScale || 1;
+	}
+
 	private _shared(context: CanvasRenderingContext2D) {
 		if (this.style.textAlign) {
 			context.textAlign = this.style.textAlign;

@@ -675,18 +675,21 @@ export class DrawingControl extends StockControl {
 			stockChart: stockChart,
 			description: l.translateAny("Select"),
 			icon: StockIcons.getIcon("Select"),
-			active: stockChart.get("drawingSelectionEnabled", false)
+			active: stockChart.get("drawingSelectionEnabled", stockChart.getPrivate("drawingSelectionEnabled", false)),
 		});
 		this._disposers.push(stockChart.on("drawingSelectionEnabled", (active) => {
 			selectControl.set("active", active);
 		}));
+		this._disposers.push(stockChart.onPrivate("drawingSelectionEnabled", (active) => {
+			selectControl.set("active", active);
+		}));		
 
 		selectControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(selectControl.getPrivate("button")!);
 		this.setPrivate("selectControl", selectControl);
 		selectControl.on("active", (_ev) => {
 			const active = selectControl.get("active", false);
-			stockChart.set("drawingSelectionEnabled", active);
+			stockChart.setPrivateRaw("drawingSelectionEnabled", active);
 		});
 
 		/**
@@ -791,7 +794,9 @@ export class DrawingControl extends StockControl {
 				if (isInited) {
 					this.getPrivate("toolsContainer")!.style.display = "none";
 				}
-				this._setTool();
+				if(this.get("tool")) {
+					this._setTool();
+				}
 			}			
 		}
 
@@ -854,7 +859,7 @@ export class DrawingControl extends StockControl {
 				this.getPrivate("eraserControl")!.set("active", false);
 			}
 			const stockChart = this.get("stockChart");
-			stockChart.set("drawingSelectionEnabled", false)			
+			stockChart.setPrivate("drawingSelectionEnabled", false)			
 			stockChart.unselectDrawings();
 			return;
 		}
@@ -877,7 +882,7 @@ export class DrawingControl extends StockControl {
 
 			// Show/hide needed drawing property controls
 			const controls: any = {
-				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Line Arrow", "Parallel Channel", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
+				strokeControl: ["Average", "Callout", "Doodle", "Ellipse", "Fibonacci Timezone", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Line Arrow", "Parallel Channel", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
 				strokeWidthControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Line Arrow", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line", "Parallel Channel"],
 				strokeDasharrayControl: ["Average", "Doodle", "Ellipse", "Horizontal Line", "Horizontal Ray", "Arrows &amp; Icons", "Line", "Line Arrow", "Polyline", "Polyfill", "Triangle", "Quadrant Line", "Rectangle", "Regression", "Trend Line", "Vertical Line"],
 				extensionControl: ["Average", "Line", "Regression", "Trend Line"],

@@ -5,6 +5,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.4] - 2025-07-23
+
+### Added
+- `contentWidth()` and `contentHeight()` methods added to Container.
+
+### Changed
+- Removed stroke color selector from Fibonacci drawing tool.
+
+### Fixed
+- Logarithmic `ValueAxis` was showing grid at wrong intervals in some cases.
+- HTML labels were not being displayed if `autoResize` was set to `false` on a `Root`.
+- Resetting `Label`'s `oevrsizedBehavior` to `"none"` would not reset the label visibility/scale if it was already affected via previous setting like `"hide"` or `"fit"`.
+- Fixed 100% stacked area chart with all values of the same date/category equal to 0.
+- `drawingSelectionEnabled` was being ignored if initially set on a `StockChart`.
+- `GridLayout` used height of the highest cell for all other cells which went after it.
+- Vertically stacked multiple `ValueAxis` could crash the chart if `ChartCursor` behavior was set `zoomXY`.
+
+
 ## [5.13.3] - 2025-06-07
 
 ### Fixed

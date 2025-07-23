@@ -176,6 +176,9 @@ export interface IStockChartPrivate extends IContainerPrivate {
 	 * Main Date axis of a Stock chart
 	 */
 	mainAxis?: DateAxis<AxisRenderer>
+
+
+	drawingSelectionEnabled?: boolean;	
 }
 
 export interface IStockChartEvents extends IContainerEvents {
@@ -415,8 +418,8 @@ export class StockChart extends Container {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("drawingSelectionEnabled")) {
-			const enabled = this.get("drawingSelectionEnabled", false);
+		if (this.isDirty("drawingSelectionEnabled") || this.isPrivateDirty("drawingSelectionEnabled")) {
+			const enabled = this.get("drawingSelectionEnabled", this.getPrivate("drawingSelectionEnabled", false));
 			if (!enabled) {
 				this.unselectDrawings();
 			}
@@ -436,7 +439,7 @@ export class StockChart extends Container {
 		if (this.isDirty("erasingEnabled")) {
 			const enabled = this.get("erasingEnabled", false);
 			if (enabled) {
-				this.set("drawingSelectionEnabled", false);
+				this.setPrivate("drawingSelectionEnabled", false);
 			}
 			this.panels.each((panel) => {
 				panel.series.each((series) => {

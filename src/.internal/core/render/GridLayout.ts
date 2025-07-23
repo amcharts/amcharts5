@@ -89,7 +89,7 @@ export class GridLayout extends Layout {
 		let prevY = paddingTop;
 
 		let column = 0;
-		let maxColumnHeight = 0;
+		let maxRowHeight = 0;
 
 		columnCount = columnWidths.length;
 
@@ -112,14 +112,15 @@ export class GridLayout extends Layout {
 
 				prevX += columnWidths[column] + marginRight;
 
-				maxColumnHeight = Math.max(maxColumnHeight, child.height() + marginTop + marginBottom);
+				maxRowHeight = Math.max(maxRowHeight, child.height() + marginTop + marginBottom);
 
 				column++;
 
 				if (column >= columnCount) {
 					column = 0;
 					prevX = paddingLeft;
-					prevY += maxColumnHeight;
+					prevY += maxRowHeight;
+					maxRowHeight = 0;
 				}
 			}
 		});

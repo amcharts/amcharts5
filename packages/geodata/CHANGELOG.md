@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
-## [UNRELEASED] - ????-??-?
+## [5.1.5] - 2025-07-10
+
+### Added
+- New map of India: `india2023*`. Contains most recent updates.
+- Congressional map set for US 119th Congress: `region/usa/congressional2025/*`.
 
 ### Changed
 - Updated the name of North Macedonia in transaltion files.

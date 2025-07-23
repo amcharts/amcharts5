@@ -519,7 +519,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				minLog = value;
 
 				if (minLog <= 0) {
-					minLog = 1;
+					let minRealLog = this._minRealLog;
+					if (!$type.isNumber(minRealLog)) {
+						minRealLog = 1;
+					}
+					minLog = Math.pow(10, Math.log(minRealLog) * Math.LOG10E);
+
 					if (step < 1) {
 						if ($type.isNumber(this._minRealLog)) {
 							minLog = this._minRealLog;
@@ -1030,7 +1035,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 										if (!$type.isNaN(value)) {
 											dataItem.set((field + "Total") as any, total);
 											dataItem.set((field + "Sum") as any, sum);
-											dataItem.set((field + "TotalPercent") as any, value / total * 100);
+											let totalPercent = value / total * 100;
+											if (total == 0) {
+												totalPercent = 0;
+											}
+
+											dataItem.set((field + "TotalPercent") as any, totalPercent);
 										}
 									}
 								}

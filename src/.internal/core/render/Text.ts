@@ -181,6 +181,7 @@ export class Text extends Sprite {
 
 		if (this.isDirty("oversizedBehavior")) {
 			textStyle.oversizedBehavior = this.get("oversizedBehavior", "none");
+			this._display.invalidateVisibility();
 			this.markDirtyBounds();
 		}
 

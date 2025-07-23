@@ -1383,6 +1383,7 @@ export class XYChart extends SerialChart {
 			if (behavior === "zoomX" || behavior === "zoomXY") {
 				let position0 = axis.toAxisPosition(downPositionX);
 				let position1 = axis.toAxisPosition(positionX);
+
 				axis.zoom(position0, position1);
 			}
 			axis.setPrivate("updateScrollbar", true);
@@ -1392,7 +1393,15 @@ export class XYChart extends SerialChart {
 			if (behavior === "zoomY" || behavior === "zoomXY") {
 				let position0 = axis.toAxisPosition(downPositionY);
 				let position1 = axis.toAxisPosition(positionY);
-				axis.zoom(position0, position1);
+
+				const maxDeviation = axis.get("maxDeviation", 0);
+
+				if ((position0 < -maxDeviation && position1 < -maxDeviation) || (position0 > 1 + maxDeviation && position1 > 1 + maxDeviation)) {
+					// void
+				}
+				else {
+					axis.zoom(position0, position1);
+				}
 			}
 			axis.setPrivate("updateScrollbar", true);
 		})

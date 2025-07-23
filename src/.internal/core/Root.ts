@@ -2346,6 +2346,9 @@ export class Root implements IDisposer {
 		let htmlElement = target.getPrivate("htmlElement");
 		if (!htmlElement) {
 			htmlElement = this._makeHTMLElement(target);
+			if (!this.autoResize) {
+				this.resize();
+			}
 		}
 		if (htmlElement.innerHTML != html) {
 			htmlElement.innerHTML = html;
