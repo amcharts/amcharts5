@@ -54,10 +54,28 @@ export class Volume extends ChartIndicator {
 		type: "color"
 	}];
 
-	public _afterNew(){
+	public _afterNew() {
 		this._themeTags.push("volume");
 		super._afterNew();
 		this.yAxis.set("numberFormat", "#.###a");
+
+		const stockChart = this.get("stockChart");
+		if (stockChart) {
+			const _this = this;
+			this.series.columns.template.adapters.add("fill", function(fill, target) {
+				const dataItem = target.dataItem;
+				if (dataItem) {
+					const dataContext = dataItem.dataContext as any;
+					const color = stockChart.getVolumeColor(dataItem, _this.get("decreasingColor", Color.fromHex(0xff0000)), _this.get("increasingColor", Color.fromHex(0x00ff00)));
+					if (dataContext) {
+						dataContext.volumeColor = color;
+					}
+
+					return color;
+				}
+				return fill;
+			})
+		}
 	}
 
 	public _createSeries(): ColumnSeries {
@@ -91,20 +109,12 @@ export class Volume extends ChartIndicator {
 
 				this.setRaw("field", "close");
 
-				let decreasingColor = this.get("decreasingColor", Color.fromHex(0xff0000));
-				let increasingColor = this.get("increasingColor", Color.fromHex(0x00ff00));
-
 				let data = this._getDataArray(dataItems);
 
 				$array.each(data, (dataItem) => {
 					dataItem.volume = dataItem.value_y;
 				})
 				this.series.data.setAll(data);
-
-				$array.each(this.series.dataItems, (dataItem) => {
-					const dataContext = dataItem.dataContext as any;
-					dataContext.volumeColor = stockChart.getVolumeColor(dataItem, decreasingColor, increasingColor);
-				})
 			}
 		}
 	}

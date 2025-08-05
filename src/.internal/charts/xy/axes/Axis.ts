@@ -437,7 +437,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				let sAnimation = this._sAnimation;
 				let eAnimation = this._eAnimation;
 
-				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
+				if (start > end) {
+					[start, end] = [end, start];
+				}					
+
+				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));				
 
 				if (start < - maxDeviation) {
 					start = -maxDeviation;
@@ -445,11 +449,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 				if (end > 1 + maxDeviation) {
 					end = 1 + maxDeviation;
-				}
-
-				if (start > end) {
-					[start, end] = [end, start];
-				}
+				}			
 
 				if (!$type.isNumber(duration)) {
 					duration = this.get("interpolationDuration", 0);

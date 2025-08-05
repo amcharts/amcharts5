@@ -3,6 +3,7 @@ import { Container } from "./Container";
 import { RoundedRectangle } from "./RoundedRectangle";
 import { Percent } from "../util/Percent"
 import { color } from "../util/Color";
+import { MultiDisposer } from "../util/Disposer";
 
 
 import * as $utils from "../util/Utils"
@@ -59,6 +60,8 @@ export class EditableLabel extends Label {
 	public static className: string = "EditableLabel";
 	public static classNames: Array<string> = Label.classNames.concat([EditableLabel.className]);
 
+	protected _editOnEvents?: MultiDisposer;
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -68,19 +71,6 @@ export class EditableLabel extends Label {
 		}));
 
 		input.hide();
-
-		const editOn: any = this.get("editOn", "click");
-
-		if (editOn != "none") {
-			input.events.on(editOn, (_ev) => {
-				// this is here just to make it interactive
-			});
-
-			this.events.on(editOn, (_ev) => {
-				this.set("active", true);
-			});
-		}
-
 		this.setPrivate("input", input);
 
 		// Set background
@@ -96,6 +86,30 @@ export class EditableLabel extends Label {
 		}
 
 	}
+
+	public _beforeChanged() {
+		super._beforeChanged();
+
+		// If editOn setting is changed, remove old listeners
+		if (this.isDirty("editOn")) {
+			if (this._editOnEvents) {
+				this._editOnEvents.dispose();
+			}
+			const editOn: any = this.get("editOn", "click");
+			if (editOn != "none") {
+				this._editOnEvents = new MultiDisposer([
+					this.getPrivate("input").events.on(editOn, (_ev) => {
+						// this is here just to make it interactive
+					}),
+					this.events.on(editOn, (_ev) => {
+						this.set("active", true);
+					})
+			]);
+			}
+		}
+
+	}
+
 
 	public _prepareChildren() {
 		super._prepareChildren();
@@ -260,7 +274,7 @@ export class EditableLabel extends Label {
 
 			// If width is explicitly set on a label, use it for textarea
 			if (this.get("width")) {
-				textarea.style.width = (this.width()  - this.get("paddingLeft", 0) - this.get("paddingRight", 0)) + "px";
+				textarea.style.width = (this.width() - this.get("paddingLeft", 0) - this.get("paddingRight", 0)) + "px";
 				textarea.style.minWidth = "";
 			}
 

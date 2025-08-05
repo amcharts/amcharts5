@@ -178,6 +178,12 @@ export class ClusteredPointSeries extends MapPointSeries {
 		super._afterNew();
 	}
 
+	protected _afterDataChange(): void {
+		super._afterDataChange();
+
+		this._previousZL = 0;
+	}
+
 	public _updateChildren() {
 		super._updateChildren();
 

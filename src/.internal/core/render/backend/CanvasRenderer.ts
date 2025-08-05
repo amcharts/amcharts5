@@ -2164,7 +2164,6 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 						const chunkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
 
-
 						if (chunkHeight > lineInfo.height) {
 							lineInfo.height = chunkHeight;
 						}
@@ -2244,7 +2243,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			$array.each(lineInfo.textChunks, (chunk) => {
 				chunk.offsetX = currentChunkOffset + chunk.left - lineInfo.left;
 				chunk.offsetY += lineInfo.height - lineInfo.height * (this.style.baselineRatio || 0.19);
-				currentChunkOffset += chunk.width;
+				currentChunkOffset += chunk.width * (rtl ? -1 : 1);
 
 				if (chunk.verticalAlign) {
 					switch (chunk.verticalAlign) {

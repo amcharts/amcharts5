@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.5] - 2025-08-05
+
+### Fixed
+- Labels with RTL direction and in-line formatting tags could be distorted.
+- Dynamically changing `editOn` setting on an `EditableLabel` was not working.
+- Volume indicator was not working properly with data grouping turned on.
+- Vertically stacked multiple `ValueAxis` could crash the chart if `ChartCursor` behavior was set `zoomXY` and selection of a zoom included both axes.
+- Points were not grouped until zoom level changed of a `ClusteredPointSeries` of a `MapChart` if data was set dynamically.
+
+
 ## [5.13.4] - 2025-07-23
 
 ### Added
