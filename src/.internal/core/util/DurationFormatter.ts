@@ -446,7 +446,7 @@ export class DurationFormatter extends Entity {
 				values["day"]++;
 				values["hour"] = 0;
 			}
-			else if (unit == "day" && value == 7) {
+			else if (unit == "day" && value == 7 && details.parts.indexOf("w") !== -1) {
 				values["week"]++;
 				values["day"] = 0;
 			}

@@ -178,7 +178,7 @@ export interface IStockChartPrivate extends IContainerPrivate {
 	mainAxis?: DateAxis<AxisRenderer>
 
 
-	drawingSelectionEnabled?: boolean;	
+	drawingSelectionEnabled?: boolean;
 }
 
 export interface IStockChartEvents extends IContainerEvents {
@@ -249,7 +249,7 @@ export class StockChart extends Container {
 	protected _indicatorsChanged = false;
 	protected _baseDP?: IDisposer;
 
-	public _selectionWasOn: boolean = false;
+	//public _selectionWasOn: boolean = false;
 
 	/**
 	 * A list of stock panels.
@@ -418,8 +418,18 @@ export class StockChart extends Container {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("drawingSelectionEnabled") || this.isPrivateDirty("drawingSelectionEnabled")) {
-			const enabled = this.get("drawingSelectionEnabled", this.getPrivate("drawingSelectionEnabled", false));
+		if (this.isDirty("drawingSelectionEnabled")) {
+			const enabled = this.get("drawingSelectionEnabled");
+			if (enabled !== undefined) {
+				this._root.events.once("frameended", () => {
+					this.setPrivate("drawingSelectionEnabled", enabled);
+				})
+			}
+		}
+
+		if (this.isPrivateDirty("drawingSelectionEnabled")) {
+			const enabled = this.getPrivate("drawingSelectionEnabled", false);
+
 			if (!enabled) {
 				this.unselectDrawings();
 			}
@@ -893,7 +903,7 @@ export class StockChart extends Container {
 			panelControls.closeButton.setPrivate(visible, false);
 
 
-			if(autoHidePanelControls) {
+			if (autoHidePanelControls) {
 				panel.plotContainer.events.on("pointerover", () => {
 					panelControls.show();
 				})
@@ -903,7 +913,7 @@ export class StockChart extends Container {
 				})
 
 				panel.plotContainer.events.on("pointerout", () => {
-					if(!panelControls.isHover()){
+					if (!panelControls.isHover()) {
 						panelControls.hide();
 					}
 				})

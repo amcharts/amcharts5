@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.13.6] - 2025-08-27
+
+### Fixed
+- In some cases, `DurationFormatter` could display incorrect number of days.
+- The selector tool in `StockChart`'s drawing mode was not working properly since `5.13.4`.
+
+
 ## [5.13.5] - 2025-08-05
 
 ### Fixed

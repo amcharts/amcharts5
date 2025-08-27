@@ -349,7 +349,7 @@ export class DrawingSeries extends LineSeries {
 			this._handlePointerOut();
 		})
 
-		this._getStockChart().markDirtyKey("drawingSelectionEnabled");
+		this._getStockChart()._markDirtyPrivateKey("drawingSelectionEnabled");
 
 	}
 
@@ -507,8 +507,9 @@ export class DrawingSeries extends LineSeries {
 
 	public enableDrawingSelection(value: boolean) {
 		this._erasingEnabled = false;
-		this.strokes.template.set("forceInactive", !value);
-		this.fills.template.set("forceInactive", !value);
+		this._root.events.once("frameended", () => {
+			this.setInteractive(value);
+		});
 	}
 
 	protected _showSegmentBullets(index: number) {
@@ -769,7 +770,7 @@ export class DrawingSeries extends LineSeries {
 		}
 
 		if (this._valuesDirty) {
-			if(!this._baseSeriesDirty){
+			if (!this._baseSeriesDirty) {
 				this.markDirtyDrawings();
 			}
 		}
@@ -787,7 +788,7 @@ export class DrawingSeries extends LineSeries {
 		const stockChart = this._getStockChart();
 		if (stockChart) {
 			if (value) {
-				stockChart._selectionWasOn = stockChart.get("drawingSelectionEnabled", false);
+				//stockChart._selectionWasOn = stockChart.get("drawingSelectionEnabled", false);
 				stockChart.set("drawingSelectionEnabled", false);
 			}
 		}
@@ -857,11 +858,11 @@ export class DrawingSeries extends LineSeries {
 	protected _dispatchStockEvent(type: any, drawingId?: string, index?: number) {
 		const stockChart = this._getStockChart();
 
-		if (type == "drawingadded") {
-			if (stockChart._selectionWasOn) {
-				stockChart.set("drawingSelectionEnabled", true);
-			}
-		}
+		//if (type == "drawingadded") {
+			//if (stockChart._selectionWasOn) {
+			//	stockChart.set("drawingSelectionEnabled", true);
+			//}
+		//}
 
 		if (stockChart && stockChart.events.isEnabled(type)) {
 			stockChart.events.dispatch(type, { drawingId: drawingId, series: this, target: stockChart, index: index });
@@ -1059,7 +1060,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	public toggleDrawing(enabled?: boolean) {
-		if(this._getStockChart().get("hideDrawingGrips")){
+		if (this._getStockChart().get("hideDrawingGrips")) {
 			this.circles.getIndex(0)?.markDirty();
 			this.root.events.once("frameended", () => {
 				this.circles.each((circle) => {
@@ -1067,7 +1068,7 @@ export class DrawingSeries extends LineSeries {
 				})
 				this.grips.each((grip) => {
 					grip.set("forceInactive", !enabled);
-				})				
+				})
 			})
 		}
 	}
@@ -1214,7 +1215,7 @@ export class DrawingSeries extends LineSeries {
 
 
 	public _selectDrawing(index: number, keepSelection?: boolean, force?: boolean) {
-		if (this._getStockChart().get("drawingSelectionEnabled") || force) {
+		if (this._getStockChart().getPrivate("drawingSelectionEnabled") || force) {
 
 			this._isSelecting = true;
 

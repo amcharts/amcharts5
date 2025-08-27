@@ -675,7 +675,7 @@ export class DrawingControl extends StockControl {
 			stockChart: stockChart,
 			description: l.translateAny("Select"),
 			icon: StockIcons.getIcon("Select"),
-			active: stockChart.get("drawingSelectionEnabled", stockChart.getPrivate("drawingSelectionEnabled", false)),
+			active: stockChart.get("drawingSelectionEnabled"),
 		});
 		this._disposers.push(stockChart.on("drawingSelectionEnabled", (active) => {
 			selectControl.set("active", active);
@@ -689,7 +689,7 @@ export class DrawingControl extends StockControl {
 		this.setPrivate("selectControl", selectControl);
 		selectControl.on("active", (_ev) => {
 			const active = selectControl.get("active", false);
-			stockChart.setPrivateRaw("drawingSelectionEnabled", active);
+			stockChart.setPrivate("drawingSelectionEnabled", active);
 		});
 
 		/**
@@ -859,7 +859,7 @@ export class DrawingControl extends StockControl {
 				this.getPrivate("eraserControl")!.set("active", false);
 			}
 			const stockChart = this.get("stockChart");
-			stockChart.setPrivate("drawingSelectionEnabled", false)			
+			stockChart.setPrivate("drawingSelectionEnabled", false);			
 			stockChart.unselectDrawings();
 			return;
 		}
