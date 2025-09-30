@@ -1,5 +1,7 @@
 import type { DataItem } from "../../core/render/Component";
 import type { Bullet } from "../../core/render/Bullet";
+import type { Root } from "../../core/Root";
+import type { IPoint } from "../../core/util/IPoint";
 import type * as d3hierarchy from "d3-hierarchy";
 
 import { Hierarchy, IHierarchySettings, IHierarchyDataItem, IHierarchyPrivate, IHierarchyEvents } from "./Hierarchy";
@@ -9,12 +11,10 @@ import { HierarchyLink } from "./HierarchyLink";
 import { Template } from "../../core/util/Template";
 import { Circle } from "../../core/render/Circle";
 import { ListTemplate } from "../../core/util/List";
-import type { IPoint } from "../../core/util/IPoint";
+import { List } from "../../core/util/List";
 
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
-import { List } from "../../core/util/List";
-import type { Root } from "../../core/Root";
 
 /**
  * @ignore

@@ -64,7 +64,7 @@ export interface IPartitionSettings extends IHierarchySettings {
 	/**
 	 * @ignore
 	 */
-	_d?:number;
+	_d?: number;
 }
 
 export interface IPartitionPrivate extends IHierarchyPrivate {
@@ -351,7 +351,7 @@ export class Partition extends Hierarchy {
 		this.animatePrivate({ key: "scaleX", to: scaleX, duration: duration, easing: easing });
 		this.animatePrivate({ key: "scaleY", to: scaleY, duration: duration, easing: easing });
 
-		this.animate({key:"_d", from:0, to:1, duration: duration, easing: easing })
+		this.animate({ key: "_d", from: 0, to: 1, duration: duration, easing: easing })
 		this.nodesContainer.animate({ key: "x", to: -x0 * scaleX, duration: duration, easing: easing });
 		this.nodesContainer.animate({ key: "y", to: -y0 * scaleY, duration: duration, easing: easing });
 	}

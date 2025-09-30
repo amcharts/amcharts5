@@ -2,7 +2,7 @@ import type { IPoint } from "../../core/util/IPoint";
 
 import { Container, IContainerSettings, IContainerPrivate } from "./Container";
 import { Label } from "../../core/render/Label";
-import { p100 } from "../../core/util/Percent";
+import { percent, p100 } from "../../core/util/Percent";
 import { RoundedRectangle } from "../../core/render/RoundedRectangle";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
@@ -24,6 +24,22 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	 * Ending (highest value) color.
 	 */
 	endColor: Color;
+
+	/**
+	 * Starting (lowest value) opacity.
+	 * 
+	 * @default 1
+	 * @since 5.14.0
+	 */
+	startOpacity: number;
+
+	/**
+	 * Ending (lowest value) opacity.
+	 * 
+	 * @default 1
+	 * @since 5.14.0
+	 */
+	endOpacity: number;
 
 	/**
 	 * Start (lowest) value.
@@ -225,6 +241,10 @@ export class HeatLegend extends Container {
 			const stepCount = this.get("stepCount", 1);
 			const startColor = this.get("startColor")!;
 			const endColor = this.get("endColor")!;
+
+			const startOpacity = this.get("startOpacity", 1);
+			const endOpacity = this.get("endOpacity", 1);
+
 			this.markerContainer.children.clear();
 			if (stepCount > 1) {
 				for (let i = 0; i < stepCount; i++) {
@@ -238,14 +258,25 @@ export class HeatLegend extends Container {
 					}
 
 					if (startColor && endColor) {
-						marker.set("fill", Color.interpolate(i / stepCount, startColor, endColor));
+						marker.setAll({
+							fill: Color.interpolate(i / stepCount, startColor, endColor),
+							fillOpacity: percent(i / stepCount * 100).interpolate(startOpacity, endOpacity)
+						});
 					}
 				}
 			}
 			else if (stepCount == 1) {
 				const marker = this.makeMarker();
 				this.markerContainer.children.push(marker);
-				const gradient = LinearGradient.new(this._root, { stops: [{ color: startColor }, { color: endColor }] });
+				const gradient = LinearGradient.new(this._root, {
+					stops: [{
+						color: startColor,
+						opacity: startOpacity
+					}, {
+						color: endColor,
+						opacity: endOpacity
+					}]
+				});
 
 				if (orientation == "vertical") {
 					gradient.set("rotation", 90);

@@ -71,6 +71,7 @@ export default {
 	"_date_minute": "HH:mm",
 	"_date_minute_full": "HH:mm - MMM dd, yyyy",
 	"_date_hour": "HH:mm",
+	"_date_hour_short": "HH",
 	"_date_hour_full": "HH:mm - MMM dd, yyyy",
 	"_date_day": "MMM dd",
 	"_date_day_full": "MMM dd, yyyy",
@@ -363,4 +364,9 @@ export default {
 	"Error parsing file: %1": "파일 파싱 오류: %1",
 	"Unable to load file: %1": "파일 로드 불가능: %1",
 	"Invalid date": "날짜 올바르지 않음",
+
+	// Common actions
+	"Close": "",
+	"Minimize": "",
+	"Confirm": ""
 };

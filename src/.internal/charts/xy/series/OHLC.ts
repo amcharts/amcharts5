@@ -1,12 +1,17 @@
 import { Candlestick, ICandlestickSettings, ICandlestickPrivate } from "./Candlestick";
 
-
 export interface IOHLCSettings extends ICandlestickSettings {
 }
 
 export interface IOHLCPrivate extends ICandlestickPrivate {
 }
 
+/**
+ * Used to plot an OHLC graphic on an [[OHLCSeries]].
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+ * @important
+ */
 export class OHLC extends Candlestick {
 
 	declare public _settings: IOHLCSettings;

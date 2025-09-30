@@ -1,8 +1,4 @@
-import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./AxisRenderer";
-import { p100 } from "../../../core/util/Percent";
 import type { IPoint } from "../../../core/util/IPoint";
-import * as $type from "../../../core/util/Type";
-import * as $utils from "../../../core/util/Utils";
 import type { AxisLabel } from "./AxisLabel";
 import type { Grid } from "./Grid";
 import type { AxisTick } from "./AxisTick";
@@ -10,8 +6,13 @@ import type { Graphics } from "../../../core/render/Graphics";
 import type { Tooltip } from "../../../core/render/Tooltip";
 import type { Template } from "../../../core/util/Template";
 import type { AxisBullet } from "./AxisBullet";
+
+import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./AxisRenderer";
+import { p100 } from "../../../core/util/Percent";
 import { Rectangle } from "../../../core/render/Rectangle";
 
+import * as $type from "../../../core/util/Type";
+import * as $utils from "../../../core/util/Utils";
 
 export interface IAxisRendererXSettings extends IAxisRendererSettings {
 
@@ -53,7 +54,7 @@ export class AxisRendererX extends AxisRenderer {
 
 	declare public readonly labelTemplate: Template<AxisLabel>;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured: false, themeTags: ["axis", "x", "thumb"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured: false, themeTags: ["axis", "x", "thumb", "zoomgrip"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
@@ -79,8 +80,11 @@ export class AxisRendererX extends AxisRenderer {
 		super._changed();
 
 		const axis = this.axis;
-		axis.ghostLabel.setPrivate("visible", !this.get("inside"));
-		axis.ghostLabel.set("x", -1000);
+		const ghostLabel = axis.ghostLabel;
+		if (ghostLabel) {
+			ghostLabel.setPrivate("visible", !this.get("inside"));
+			ghostLabel.set("x", -1000);
+		}
 
 		const opposite = "opposite"
 		const inside = "inside";
@@ -117,7 +121,7 @@ export class AxisRendererX extends AxisRenderer {
 
 				}
 
-				axis.ghostLabel._applyThemes();
+				axis.ghostLabel?._applyThemes();
 				this.labels.each((label) => {
 					label._applyThemes();
 				})

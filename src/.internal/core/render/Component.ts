@@ -122,6 +122,7 @@ export interface IComponentPrivate extends IContainerPrivate {
 
 export interface IComponentEvents extends IContainerEvents {
 	datavalidated: {}
+	valueschanged: {}
 }
 
 /**
@@ -388,6 +389,13 @@ export abstract class Component extends Container {
 			this._dataChanged = false;
 		}
 
+		if (this._valuesDirty){
+			const type = "valueschanged";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this });
+			}
+		}
+
 		this.inited = true;
 	}
 
@@ -413,4 +421,15 @@ export abstract class Component extends Container {
 		this.markDirty();
 	}
 
+	/**
+	 * Looks up and returns a data item by its ID.
+	 *
+	 * @param   id  ID
+	 * @return      Data item
+	 */
+	public getDataItemById(id: string): DataItem<this["_dataItemSettings"]> | undefined {
+		return $array.find(this.dataItems, (dataItem: any) => {
+			return dataItem.get("id") == id;
+		})
+	}	
 }

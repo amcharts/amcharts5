@@ -23,6 +23,7 @@ export default {
 	"_date_minute": "hh:mm a",
 	"_date_minute_full": "hh:mm a - MMM dd, yyyy",
 	"_date_hour": "hh:mm a",
+	"_date_hour_short": "hhaaa",
 	"_date_hour_full": "hh:mm a - MMM dd, yyyy",
 	"_date_day": "MMM dd",
 	"_date_day_full": "MMM dd, yyyy",
@@ -189,4 +190,9 @@ export default {
 	"Error parsing file: %1": "",
 	"Unable to load file: %1": "",
 	"Invalid date": "",
+
+	// Common actions
+	"Close": "",
+	"Minimize": "",
+	"Confirm": ""
 };

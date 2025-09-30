@@ -52,11 +52,14 @@ import type { CirclePattern } from "./../../../index";
 import type { ClockHand } from "./../../../radar";
 import type { ClusteredPointSeries } from "./../../../map";
 import type { ColorControl } from "./../../../stock";
+import type { ColorPicker } from "./../../../plugins/colorPicker";
+import type { ColorPickerButton } from "./../../../plugins/colorPicker";
 import type { ColorSet } from "./../../../index";
 import type { ColumnSeries } from "./../../../xy";
 import type { CommodityChannelIndex } from "./../../../stock";
 import type { ComparisonControl } from "./../../../stock";
 import type { Component } from "./../../../index";
+import type { ConfirmButton } from "./../../../index";
 import type { Container } from "./../../../index";
 import type { CurveChart } from "./../../../timeline";
 import type { CurveColumnSeries } from "./../../../timeline";
@@ -76,6 +79,7 @@ import type { DropdownControl } from "./../../../stock";
 import type { DropdownList } from "./../../../stock";
 import type { DropdownListControl } from "./../../../stock";
 import type { DurationAxis } from "./../../../xy";
+import type { EditableAxisLabel } from "./../../../xy";
 import type { EditableLabel } from "./../../../index";
 import type { Ellipse } from "./../../../index";
 import type { EllipseSeries } from "./../../../stock";
@@ -91,6 +95,12 @@ import type { FlowNodes } from "./../../../flow";
 import type { ForceDirected } from "./../../../hierarchy";
 import type { FunnelSeries } from "./../../../percent";
 import type { FunnelSlice } from "./../../../percent";
+import type { Gantt } from "./../../../gantt";
+import type { GanttCategoryAxis } from "./../../../gantt";
+import type { GanttCategoryAxisRenderer } from "./../../../gantt";
+import type { GanttDateAxis } from "./../../../gantt";
+import type { GanttDateAxisRenderer } from "./../../../gantt";
+import type { GanttSeries } from "./../../../gantt";
 import type { GaplessDateAxis } from "./../../../xy";
 import type { Gradient } from "./../../../index";
 import type { GrainPattern } from "./../../../index";
@@ -121,6 +131,7 @@ import type { LineArrowSeries } from "./../../../stock";
 import type { LinePattern } from "./../../../index";
 import type { LineSeries } from "./../../../xy";
 import type { LinearGradient } from "./../../../index";
+import type { Link } from "./../../../index";
 import type { LinkedHierarchy } from "./../../../hierarchy";
 import type { LinkedHierarchyNode } from "./../../../hierarchy";
 import type { MACD } from "./../../../stock";
@@ -139,9 +150,11 @@ import type { Momentum } from "./../../../stock";
 import type { MovingAverage } from "./../../../stock";
 import type { MovingAverageDeviation } from "./../../../stock";
 import type { MovingAverageEnvelope } from "./../../../stock";
+import type { NumericStepper } from "./../../../index";
 import type { OHLC } from "./../../../xy";
 import type { OHLCSeries } from "./../../../xy";
 import type { OnBalanceVolume } from "./../../../stock";
+import type { OrthogonalLine } from "./../../../index";
 import type { OverboughtOversold } from "./../../../stock";
 import type { PVT } from "./../../../stock";
 import type { Pack } from "./../../../hierarchy";
@@ -162,6 +175,7 @@ import type { PieSeries } from "./../../../percent";
 import type { PointedRectangle } from "./../../../index";
 import type { Polygon } from "./../../../index";
 import type { PolylineSeries } from "./../../../stock";
+import type { ProgressPie } from "./../../../index";
 import type { PyramidSeries } from "./../../../percent";
 import type { QuadrantLineSeries } from "./../../../stock";
 import type { RadarChart } from "./../../../radar";
@@ -291,11 +305,14 @@ export interface IClasses {
 	"ClockHand": () => Promise<typeof ClockHand>;
 	"ClusteredPointSeries": () => Promise<typeof ClusteredPointSeries>;
 	"ColorControl": () => Promise<typeof ColorControl>;
+	"ColorPicker": () => Promise<typeof ColorPicker>;
+	"ColorPickerButton": () => Promise<typeof ColorPickerButton>;
 	"ColorSet": () => Promise<typeof ColorSet>;
 	"ColumnSeries": () => Promise<typeof ColumnSeries>;
 	"CommodityChannelIndex": () => Promise<typeof CommodityChannelIndex>;
 	"ComparisonControl": () => Promise<typeof ComparisonControl>;
 	"Component": () => Promise<typeof Component>;
+	"ConfirmButton": () => Promise<typeof ConfirmButton>;
 	"Container": () => Promise<typeof Container>;
 	"CurveChart": () => Promise<typeof CurveChart>;
 	"CurveColumnSeries": () => Promise<typeof CurveColumnSeries>;
@@ -315,6 +332,7 @@ export interface IClasses {
 	"DropdownList": () => Promise<typeof DropdownList>;
 	"DropdownListControl": () => Promise<typeof DropdownListControl>;
 	"DurationAxis": () => Promise<typeof DurationAxis>;
+	"EditableAxisLabel": () => Promise<typeof EditableAxisLabel>;
 	"EditableLabel": () => Promise<typeof EditableLabel>;
 	"Ellipse": () => Promise<typeof Ellipse>;
 	"EllipseSeries": () => Promise<typeof EllipseSeries>;
@@ -330,6 +348,12 @@ export interface IClasses {
 	"ForceDirected": () => Promise<typeof ForceDirected>;
 	"FunnelSeries": () => Promise<typeof FunnelSeries>;
 	"FunnelSlice": () => Promise<typeof FunnelSlice>;
+	"Gantt": () => Promise<typeof Gantt>;
+	"GanttCategoryAxis": () => Promise<typeof GanttCategoryAxis>;
+	"GanttCategoryAxisRenderer": () => Promise<typeof GanttCategoryAxisRenderer>;
+	"GanttDateAxis": () => Promise<typeof GanttDateAxis>;
+	"GanttDateAxisRenderer": () => Promise<typeof GanttDateAxisRenderer>;
+	"GanttSeries": () => Promise<typeof GanttSeries>;
 	"GaplessDateAxis": () => Promise<typeof GaplessDateAxis>;
 	"Gradient": () => Promise<typeof Gradient>;
 	"GrainPattern": () => Promise<typeof GrainPattern>;
@@ -360,6 +384,7 @@ export interface IClasses {
 	"LinePattern": () => Promise<typeof LinePattern>;
 	"LineSeries": () => Promise<typeof LineSeries>;
 	"LinearGradient": () => Promise<typeof LinearGradient>;
+	"Link": () => Promise<typeof Link>;
 	"LinkedHierarchy": () => Promise<typeof LinkedHierarchy>;
 	"LinkedHierarchyNode": () => Promise<typeof LinkedHierarchyNode>;
 	"MACD": () => Promise<typeof MACD>;
@@ -378,9 +403,11 @@ export interface IClasses {
 	"MovingAverage": () => Promise<typeof MovingAverage>;
 	"MovingAverageDeviation": () => Promise<typeof MovingAverageDeviation>;
 	"MovingAverageEnvelope": () => Promise<typeof MovingAverageEnvelope>;
+	"NumericStepper": () => Promise<typeof NumericStepper>;
 	"OHLC": () => Promise<typeof OHLC>;
 	"OHLCSeries": () => Promise<typeof OHLCSeries>;
 	"OnBalanceVolume": () => Promise<typeof OnBalanceVolume>;
+	"OrthogonalLine": () => Promise<typeof OrthogonalLine>;
 	"OverboughtOversold": () => Promise<typeof OverboughtOversold>;
 	"PVT": () => Promise<typeof PVT>;
 	"Pack": () => Promise<typeof Pack>;
@@ -401,6 +428,7 @@ export interface IClasses {
 	"PointedRectangle": () => Promise<typeof PointedRectangle>;
 	"Polygon": () => Promise<typeof Polygon>;
 	"PolylineSeries": () => Promise<typeof PolylineSeries>;
+	"ProgressPie": () => Promise<typeof ProgressPie>;
 	"PyramidSeries": () => Promise<typeof PyramidSeries>;
 	"QuadrantLineSeries": () => Promise<typeof QuadrantLineSeries>;
 	"RadarChart": () => Promise<typeof RadarChart>;
@@ -531,11 +559,14 @@ const classes: IClasses = {
 	"ClockHand": () => import(/* webpackExports: "ClockHand", webpackChunkName: "json_radar" */ "./../../../radar").then((m) => m.ClockHand),
 	"ClusteredPointSeries": () => import(/* webpackExports: "ClusteredPointSeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.ClusteredPointSeries),
 	"ColorControl": () => import(/* webpackExports: "ColorControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ColorControl),
+	"ColorPicker": () => import(/* webpackExports: "ColorPicker", webpackChunkName: "json_plugins_colorPicker" */ "./../../../plugins/colorPicker").then((m) => m.ColorPicker),
+	"ColorPickerButton": () => import(/* webpackExports: "ColorPickerButton", webpackChunkName: "json_plugins_colorPicker" */ "./../../../plugins/colorPicker").then((m) => m.ColorPickerButton),
 	"ColorSet": () => import(/* webpackExports: "ColorSet", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.ColorSet),
 	"ColumnSeries": () => import(/* webpackExports: "ColumnSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.ColumnSeries),
 	"CommodityChannelIndex": () => import(/* webpackExports: "CommodityChannelIndex", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.CommodityChannelIndex),
 	"ComparisonControl": () => import(/* webpackExports: "ComparisonControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ComparisonControl),
 	"Component": () => import(/* webpackExports: "Component", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Component),
+	"ConfirmButton": () => import(/* webpackExports: "ConfirmButton", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.ConfirmButton),
 	"Container": () => import(/* webpackExports: "Container", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Container),
 	"CurveChart": () => import(/* webpackExports: "CurveChart", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.CurveChart),
 	"CurveColumnSeries": () => import(/* webpackExports: "CurveColumnSeries", webpackChunkName: "json_timeline" */ "./../../../timeline").then((m) => m.CurveColumnSeries),
@@ -555,6 +586,7 @@ const classes: IClasses = {
 	"DropdownList": () => import(/* webpackExports: "DropdownList", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownList),
 	"DropdownListControl": () => import(/* webpackExports: "DropdownListControl", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.DropdownListControl),
 	"DurationAxis": () => import(/* webpackExports: "DurationAxis", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.DurationAxis),
+	"EditableAxisLabel": () => import(/* webpackExports: "EditableAxisLabel", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.EditableAxisLabel),
 	"EditableLabel": () => import(/* webpackExports: "EditableLabel", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.EditableLabel),
 	"Ellipse": () => import(/* webpackExports: "Ellipse", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Ellipse),
 	"EllipseSeries": () => import(/* webpackExports: "EllipseSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.EllipseSeries),
@@ -570,6 +602,12 @@ const classes: IClasses = {
 	"ForceDirected": () => import(/* webpackExports: "ForceDirected", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.ForceDirected),
 	"FunnelSeries": () => import(/* webpackExports: "FunnelSeries", webpackChunkName: "json_percent" */ "./../../../percent").then((m) => m.FunnelSeries),
 	"FunnelSlice": () => import(/* webpackExports: "FunnelSlice", webpackChunkName: "json_percent" */ "./../../../percent").then((m) => m.FunnelSlice),
+	"Gantt": () => import(/* webpackExports: "Gantt", webpackChunkName: "json_gantt" */ "./../../../gantt").then((m) => m.Gantt),
+	"GanttCategoryAxis": () => import(/* webpackExports: "GanttCategoryAxis", webpackChunkName: "json_gantt" */ "./../../../gantt").then((m) => m.GanttCategoryAxis),
+	"GanttCategoryAxisRenderer": () => import(/* webpackExports: "GanttCategoryAxisRenderer", webpackChunkName: "json_gantt" */ "./../../../gantt").then((m) => m.GanttCategoryAxisRenderer),
+	"GanttDateAxis": () => import(/* webpackExports: "GanttDateAxis", webpackChunkName: "json_gantt" */ "./../../../gantt").then((m) => m.GanttDateAxis),
+	"GanttDateAxisRenderer": () => import(/* webpackExports: "GanttDateAxisRenderer", webpackChunkName: "json_gantt" */ "./../../../gantt").then((m) => m.GanttDateAxisRenderer),
+	"GanttSeries": () => import(/* webpackExports: "GanttSeries", webpackChunkName: "json_gantt" */ "./../../../gantt").then((m) => m.GanttSeries),
 	"GaplessDateAxis": () => import(/* webpackExports: "GaplessDateAxis", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.GaplessDateAxis),
 	"Gradient": () => import(/* webpackExports: "Gradient", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Gradient),
 	"GrainPattern": () => import(/* webpackExports: "GrainPattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.GrainPattern),
@@ -600,6 +638,7 @@ const classes: IClasses = {
 	"LinePattern": () => import(/* webpackExports: "LinePattern", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.LinePattern),
 	"LineSeries": () => import(/* webpackExports: "LineSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.LineSeries),
 	"LinearGradient": () => import(/* webpackExports: "LinearGradient", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.LinearGradient),
+	"Link": () => import(/* webpackExports: "Link", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Link),
 	"LinkedHierarchy": () => import(/* webpackExports: "LinkedHierarchy", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchy),
 	"LinkedHierarchyNode": () => import(/* webpackExports: "LinkedHierarchyNode", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchyNode),
 	"MACD": () => import(/* webpackExports: "MACD", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MACD),
@@ -618,9 +657,11 @@ const classes: IClasses = {
 	"MovingAverage": () => import(/* webpackExports: "MovingAverage", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MovingAverage),
 	"MovingAverageDeviation": () => import(/* webpackExports: "MovingAverageDeviation", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MovingAverageDeviation),
 	"MovingAverageEnvelope": () => import(/* webpackExports: "MovingAverageEnvelope", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MovingAverageEnvelope),
+	"NumericStepper": () => import(/* webpackExports: "NumericStepper", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.NumericStepper),
 	"OHLC": () => import(/* webpackExports: "OHLC", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.OHLC),
 	"OHLCSeries": () => import(/* webpackExports: "OHLCSeries", webpackChunkName: "json_xy" */ "./../../../xy").then((m) => m.OHLCSeries),
 	"OnBalanceVolume": () => import(/* webpackExports: "OnBalanceVolume", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.OnBalanceVolume),
+	"OrthogonalLine": () => import(/* webpackExports: "OrthogonalLine", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.OrthogonalLine),
 	"OverboughtOversold": () => import(/* webpackExports: "OverboughtOversold", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.OverboughtOversold),
 	"PVT": () => import(/* webpackExports: "PVT", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.PVT),
 	"Pack": () => import(/* webpackExports: "Pack", webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.Pack),
@@ -641,6 +682,7 @@ const classes: IClasses = {
 	"PointedRectangle": () => import(/* webpackExports: "PointedRectangle", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.PointedRectangle),
 	"Polygon": () => import(/* webpackExports: "Polygon", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Polygon),
 	"PolylineSeries": () => import(/* webpackExports: "PolylineSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.PolylineSeries),
+	"ProgressPie": () => import(/* webpackExports: "ProgressPie", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.ProgressPie),
 	"PyramidSeries": () => import(/* webpackExports: "PyramidSeries", webpackChunkName: "json_percent" */ "./../../../percent").then((m) => m.PyramidSeries),
 	"QuadrantLineSeries": () => import(/* webpackExports: "QuadrantLineSeries", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.QuadrantLineSeries),
 	"RadarChart": () => import(/* webpackExports: "RadarChart", webpackChunkName: "json_radar" */ "./../../../radar").then((m) => m.RadarChart),

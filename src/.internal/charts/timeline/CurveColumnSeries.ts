@@ -200,9 +200,9 @@ export class CurveColumnSeries extends BaseColumnSeries {
 
 	public _updateChildren(): void {
 		super._updateChildren();
-		if(!this.get("maskBullets")) {
+		if (!this.get("maskBullets")) {
 			this.bulletsContainer.remove("mask");
-		}	
+		}
 	}
 
 	protected _processAxisRange(axisRange: this["_axisRangeType"]) {

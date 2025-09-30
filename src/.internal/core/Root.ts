@@ -58,6 +58,8 @@ function rAF(fps: number | undefined, callback: (currentTime: number) => void): 
 interface IParent extends Entity {
 	_prepareChildren(): void;
 	_updateChildren(): void;
+	_childrenUpdt: boolean;
+	_childrenPrep: boolean;
 }
 
 interface IBounds extends Entity {
@@ -375,6 +377,8 @@ export class Root implements IDisposer {
 	 */
 	public entitiesById: { [index: string]: any } = {};
 
+	protected _systemTooltip!: Tooltip;
+
 	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
 		if (!isReal) {
@@ -496,6 +500,7 @@ export class Root implements IDisposer {
 				scale: .6,
 				y: percent(100),
 				centerY: p100,
+				tooltipY: 10,
 				tooltipText: "Created using amCharts 5",
 				tooltipX: p100,
 				cursorOverStyle: "pointer",
@@ -506,22 +511,8 @@ export class Root implements IDisposer {
 				})
 			}));
 
-			const tooltip = Tooltip.new(this, {
-				pointerOrientation: "horizontal",
-				paddingTop: 4,
-				paddingRight: 7,
-				paddingBottom: 4,
-				paddingLeft: 7
-			});
-			tooltip.label.setAll({
-				fontSize: 12
-			});
-			tooltip.get("background")!.setAll({
-				fill: this.interfaceColors.get("background"),
-				stroke: this.interfaceColors.get("grid"),
-				strokeOpacity: 0.3
-			})
-			logo.set("tooltip", tooltip);
+
+			logo.set("tooltip", this.systemTooltip);
 
 			logo.events.on("click", () => {
 				window.open("https://www.amcharts.com/", "_blank");
@@ -545,11 +536,10 @@ export class Root implements IDisposer {
 
 			a.states.create("hover", { stroke: color(0x474758) });
 
-			//logo.set("tooltip", this._tooltip);
-			//logo.setPrivate("tooltipTarget", logo.get("background"));
 			this._logo = logo;
 
 			this._handleLogo();
+
 		}
 	}
 
@@ -814,7 +804,6 @@ export class Root implements IDisposer {
 									target: focusedSprite
 								});
 							}
-
 						}
 					}
 				}));
@@ -890,6 +879,21 @@ export class Root implements IDisposer {
 		if (!this._hasLicense()) {
 			this._showBranding();
 		}
+	}
+
+	/**
+	 * Returns an instance of a universal [[Tooltip]] instance.
+	 * @since 5.14.0
+	 */
+	public get systemTooltip() {
+		if (!this._systemTooltip) {
+			const tooltip = Tooltip.new(this, {
+				themeTags: ["system"]
+			});
+
+			this._systemTooltip = tooltip;
+		}
+		return this._systemTooltip;
 	}
 
 	private _initResizeSensor(): void {
@@ -978,7 +982,7 @@ export class Root implements IDisposer {
 	}
 
 	private _runDirties() {
-		//console.log("tick **************************************************************");
+		//console.log("tick **************************************************************");		
 		let allParents: { [id: number]: IParent } = {};
 
 		while (this._isDirtyParents) {
@@ -1067,6 +1071,11 @@ export class Root implements IDisposer {
 		//		console.log("_afterChanged")
 		objects.forEach((entity) => {
 			entity._afterChanged();
+		});
+
+		$object.keys(allParents).forEach((key) => {			
+			allParents[key]._childrenPrep = false;
+			allParents[key]._childrenUpdt = false;
 		});
 	}
 

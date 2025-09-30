@@ -1,15 +1,15 @@
 import type { AxisRenderer } from "./AxisRenderer";
+import type { XYSeries } from "../../xy/series/XYSeries";
+import type { ITimeInterval } from "../../../core/util/Time";
 
 import { DateAxis, IDateAxisSettings, IDateAxisPrivate, IDateAxisDataItem, IDateAxisEvents } from "./DateAxis";
 import { DataItem } from "../../../core/render/Component";
-import type { XYSeries } from "../../xy/series/XYSeries";
 
 import * as $array from "../../../core/util/Array"
 import * as $order from "../../../core/util/Order";
 import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
-import type { ITimeInterval } from "../../../core/util/Time";
 
 export interface IGaplessDateAxisSettings<R extends AxisRenderer> extends IDateAxisSettings<R> {
 
@@ -157,7 +157,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 			let itemValue = dates[index];
 			const nextDate = dates[index + 1];
-			if(nextDate){
+			if (nextDate) {
 				let nextItemValue = nextDate;
 				// use next item value if it's closer
 				if (Math.abs(nextItemValue - value) < Math.abs(itemValue - value)) {
@@ -165,7 +165,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 					index++;
 				}
 			}
-			
+
 			/*
 			let d = 0;
 			if (itemValue > value && value > this.getPrivate("min", 0)) {

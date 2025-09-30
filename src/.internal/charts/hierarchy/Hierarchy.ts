@@ -603,11 +603,11 @@ export abstract class Hierarchy extends Series {
 
 				if (childDataItem.get("fill") == null) {
 					let fill = dataItem.get("fill");
-					if(fill == null) {
+					if (fill == null) {
 						const colors = this.get("colors");
-						if(colors){
-							fill = colors.next();	
-						}						
+						if (colors) {
+							fill = colors.next();
+						}
 					}
 					childDataItem.setRaw("fill", fill);
 				}

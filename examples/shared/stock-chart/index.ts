@@ -74,6 +74,7 @@ let dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {
 let valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
   name: "MSFT",
   clustered: false,
+  turboMode: true,
   valueXField: "Date",
   valueYField: "Close",
   highValueYField: "High",
@@ -123,6 +124,7 @@ let volumeValueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
 let volumeSeries = mainPanel.series.push(am5xy.ColumnSeries.new(root, {
   name: "Volume",
+  turboMode: true,
   clustered: false,
   valueXField: "Date",
   valueYField: "Volume",

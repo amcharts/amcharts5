@@ -1,9 +1,7 @@
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "./LineSeries";
 import { curveMonotoneXTension } from "../../../core/render/MonotoneXTension";
 
-
 export interface ISmoothedXLineSeriesDataItem extends ILineSeriesDataItem {
-
 }
 
 export interface ISmoothedXLineSeriesSettings extends ILineSeriesSettings {

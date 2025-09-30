@@ -112,7 +112,7 @@ export class CurveChart extends XYChart {
 
 		this.yAxes.each((axis) => {
 			axis.markDirtySize();
-		})		
+		})
 	}
 
 	/**
@@ -151,7 +151,7 @@ export class CurveChart extends XYChart {
 	/**
 	 * @ignore
 	 */
-	public inPlot(_point: IPoint): boolean {		
+	public inPlot(_point: IPoint): boolean {
 		return true;
 	}
 

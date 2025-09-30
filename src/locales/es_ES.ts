@@ -23,6 +23,7 @@ export default {
 	"_date_minute": "HH:mm",
 	"_date_minute_full": "HH:mm - dd MMM",
 	"_date_hour": "HH:mm",
+	"_date_hour_short": "HH",
 	"_date_hour_full": "HH:mm - dd MMM",
 	"_date_day": "dd MMM",
 	"_date_day_full": "dd MMM",
@@ -174,5 +175,10 @@ export default {
 	"No parser available for file: %1": "No hay analizador disponible para el archivo: %1",
 	"Error parsing file: %1": "Error al analizar el archivo: %1",
 	"Unable to load file: %1": "No se puede cargar el archivo: %1",
-	"Invalid date": "Fecha inválida"
+	"Invalid date": "Fecha inválida",
+
+	// Common actions
+	"Close": "",
+	"Minimize": "",
+	"Confirm": ""
 };

@@ -1,9 +1,10 @@
 import type { InterfaceColors, IInterfaceColorsSettings } from "../core/util/InterfaceColors";
 
 import { Theme } from "../core/Theme";
-import { p100, p50 } from "../core/util/Percent";
-import { Color } from "../core/util/Color";
+import { p100, p50, percent } from "../core/util/Percent";
+import { color, Color } from "../core/util/Color";
 import { GridLayout } from "../core/render/GridLayout";
+import { Label } from "../core/render/Label";
 
 import * as $ease from "../core/util/Ease";
 
@@ -531,9 +532,106 @@ export class DefaultTheme extends Theme {
 			//layer: 100
 		});
 
+		// system tooltip
+		r("Tooltip", ["system"]).setAll({
+			pointerOrientation: "horizontal",
+			paddingTop: 4,
+			paddingRight: 7,
+			paddingBottom: 4,
+			paddingLeft: 7
+		});
+
+		{
+			const rule = r("PointedRectangle", ["tooltip", "system", "background"]);
+
+			rule.setAll({
+				strokeOpacity: 0.3
+			});
+
+			setColor(rule, "fill", ic, "background");
+			setColor(rule, "stroke", ic, "grid");
+		}
+
+		r("Label", ["tooltip", "system"]).setAll({
+			fontSize: 12,
+			fill: ic.get("background")
+		});
+
+
 		r("Polygon").setAll({
 			animationEasing: $ease.out($ease.cubic),
 		});
+
+		r("Link").setAll({
+			cornerRadius: 8,
+			setStateOnChildren: true
+		});
+
+		{
+			const rule = r("OrthogonalLine", ["link", "line"]);
+
+			rule.setAll({
+				isMeasured: false,
+				crisp: true
+			});
+
+			const stateActive = rule.states.create("active", {
+				strokeWidth: 2
+			})
+			setColor(stateActive, "stroke", ic, "negative");
+		}
+
+		r("OrthogonalLine", ["link", "hit"]).setAll({
+			strokeWidth: 10,
+			opacity: 0,
+			strokeOpacity: 0
+		});
+
+		{
+			const rule = r("OrthogonalLine")
+			rule.setAll({
+				strokeWidth: 1,
+				strokeOpacity: 1,
+				cornerRadius: 10
+			})
+
+			setColor(rule, "stroke", ic, "grid");
+		}
+
+		{
+			const rule = r("Triangle", ["link"]);
+			rule.setAll({
+				width: 14,
+				height: 10,
+				centerY: 0
+			})
+
+			setColor(rule, "fill", ic, "grid");
+			setColor(rule, "stroke", ic, "grid");
+
+			rule.states.create("default", {
+				stateAnimationDuration: 0
+			})
+
+			const state = rule.states.create("active", {
+				stateAnimationDuration: 0,
+				stroke: color(0xffffff),
+				strokeWidth: 2
+			});
+
+			// draw circle and x inside
+			state.set("draw", (display) => {
+				display.arc(0, 0, 11, 0, Math.PI * 2);
+
+				display.moveTo(-4, -4);
+				display.lineTo(4, 4);
+				display.moveTo(4, -4);
+				display.lineTo(-4, 4);
+			})
+
+			setColor(state, "fill", ic, "negative");
+		}
+
 
 		{
 			const rule = r("PointedRectangle", ["tooltip", "background"]);
@@ -637,6 +735,87 @@ export class DefaultTheme extends Theme {
 			const rule = r("Label", ["button"]);
 			setColor(rule, "fill", ic, "primaryButtonText");
 		}
+
+		/**
+		 * ------------------------------------------------------------------------
+		 * ConfirmButton
+		 * ------------------------------------------------------------------------
+		 */
+
+		r("ConfirmButton").setAll({
+			toggleKey: "active",
+			setStateOnChildren: true,
+			label: Label.new(this._root, {
+				text: language.translate("Confirm"),
+				forceHidden: true
+			})
+		});
+
+		{
+			const rule = r("RoundedRectangle", ["button", "background", "confirm"]).states.create("active", {});
+			setColor(rule, "fill", ic, "negative");
+		}
+
+		r("Label", ["button", "confirm"]).setAll({
+			paddingTop: 0,
+			paddingBottom: 0,
+			paddingRight: 3,
+			paddingLeft: 5
+		});
+
+		r("Label", ["button", "confirm"]).states.create("default", {
+			stateAnimationDuration: 0
+		});
+
+		r("Label", ["button", "confirm"]).states.create("active", {
+			forceHidden: false,
+			stateAnimationDuration: 0
+		});
+
+		{
+			const rule = r("Graphics", ["icon", "confirm", "button"]);
+			rule.setAll({
+				stateAnimationDuration: 0
+			});
+
+			rule.states.create("default", {
+				stateAnimationDuration: 0
+			});
+
+			setColor(rule, "stroke", ic, "primaryButtonText");
+		}
+
+		{
+			const rule = r("Graphics", ["icon", "confirm", "button"]).states.create("active", {
+				svgPath: "M -5 1 L 0 6 L 8 -5",
+				strokeWidth: 2
+			});
+			setColor(rule, "stroke", ic, "primaryButtonText");
+		}
+
+		{
+			const rule = r("Graphics", ["icon", "confirm", "button", "secondary"]).states.create("active", {});
+			setColor(rule, "stroke", ic, "primaryButtonText");
+		}
+
+
+		{
+			const rule = r("RoundedRectangle", ["button", "background", "confirm", "secondary"]).states.create("active", {
+				fillOpacity: 1
+			});
+			setColor(rule, "fill", ic, "negative");
+		}
+
+		{
+			const rule = r("RoundedRectangle", ["button", "background", "confirm", "secondary"]).states.create("hoverActive", {
+				fillOpacity: 1
+			});
+			setColor(rule, "fill", ic, "negative");
+		}
+
+		// required
+		r("Button", ["button", "confirm"]).states.create("hoverActive", {});
+
 
 		/**
 		 * ------------------------------------------------------------------------
@@ -1161,5 +1340,108 @@ export class DefaultTheme extends Theme {
 			paddingRight: 10,
 			paddingBottom: 10
 		})
+
+
+		// Progress pie
+		r("ProgressPie").setAll({
+			radius: p100,
+			width: 50,
+			height: 50,
+			centerX: percent(-50),
+			centerY: percent(-50),
+			innerRadius: percent(85),
+			numberFormat: "#."
+		});
+
+		{
+			const rule = r("Label", ["progresspie"]);
+			rule.setAll({
+				centerX: p50,
+				centerY: p50,
+				fontSize: "0.75em"
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = r("Circle", ["progresspie"]);
+			rule.setAll({
+				fillOpacity: 0.5
+			});
+
+			setColor(rule, "fill", ic, "background");
+		}
+
+		{
+			const rule = r("Slice", ["progresspie"]);
+			rule.setAll({
+				startAngle: -90
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+		{
+			const rule = r("Slice", ["progresspie", "background"]);
+			rule.setAll({
+				fillOpacity: 0.2,
+				arc: 360
+			});
+
+			setColor(rule, "fill", ic, "primaryButton");
+		}
+
+
+		// Numeric stepper
+		r("EditableLabel", ["numericstepper"]).setAll({
+			y: p50,
+			centerY: p50,
+			multiLine: false,
+			marginRight: 2
+		})
+
+		{
+			const rule = r("Container", ["numericstepper", "buttons"]);
+
+			rule.setAll({
+				layout: this._root.verticalLayout,
+				centerY: p50,
+				y: p50,
+				marginRight: 10,
+				opacity: 0
+			});
+
+			rule.states.create("active", {
+				opacity: 1
+			})
+			rule.states.create("default", {
+				opacity: 0
+			})
+		}
+
+		{
+			const rule = r("Triangle", ["numericstepper"]);
+			rule.setAll({
+				width: 17,
+				height: 11,
+				marginTop: 3,
+				marginBottom: 3,
+				strokeWidth: 5,
+				strokeOpacity: 0,
+				cursorOverStyle: "pointer"
+			})
+
+			setColor(rule, "fill", ic, "secondaryButton");
+		}
+
+		{
+			const rule = r("Triangle", ["downbutton"]);
+			rule.setAll({
+				rotation: 180
+			})
+		}
+
+
 	}
 }

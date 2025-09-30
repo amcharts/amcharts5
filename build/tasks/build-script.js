@@ -1,5 +1,6 @@
 const $path = require("path");
 const { cp, cpMaybe, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, geodataToScript, removeTypeScriptTypes } = require("../util");
+const dependencies = require("../script-dependencies");
 
 
 async function removeFiles(path) {
@@ -129,20 +130,13 @@ export const ${mangledName} = m;`);
 
 			let dependOn;
 
-			// TODO handle this automatically
-			switch (moduleName) {
-			case "index":
-				break;
-			case "pie":
-			case "funnel":
-				dependOn = "percent";
-				break;
-			case "radar":
-			case "stock":
-				dependOn = "xy";
-				break;
-			default:
-				dependOn = "index";
+			if (moduleName !== "index") {
+				if (dependencies[moduleName] != null) {
+					dependOn = dependencies[moduleName];
+
+				} else {
+					dependOn = "index";
+				}
 			}
 
 			entries[moduleName] = {
@@ -190,6 +184,18 @@ async function buildWorldLow(state) {
 async function copyFiles(state, output) {
 	await cp(state.path("packages", "shared"), output);
 	await cpMaybe(state.path("packages", "script"), output);
+}
+
+
+async function removeError(output) {
+	const dir = $path.join(output, "index.js");
+
+	const file = await readFile(dir);
+
+	await writeFile(dir, file.replace(
+		/function\(\) *\{\s*if\(![_a-zA-Z]+\.m\[\d+\]\) *\{ *var [a-zA-Z]+ *= *new Error\("Module '[^\(\n\r]+\(weak dependency\)"\);[^\}\n\r]+\} *return ([^;\}\n\r]+);?\s*\}/g,
+		"()=>$1"
+	));
 }
 
 
@@ -257,6 +263,18 @@ module.exports = async (state) => {
 						minChunks: 2,
 						enforce: true,
 						priority: 1,
+						test: (module) => {
+							return module.resource && (
+								/[\/\\]node_modules[\/\\]/.test(module.resource) ||
+								/[\/\\]\.internal[\/\\]core[\/\\]/.test(module.resource) ||
+
+								// This causes the JSON plugin to be moved into index.js
+								//
+								// This is necessary to avoid breaking existing user code,
+								// because charts/stock relies upon the JSON plugin
+								/[\/\\]plugins[\/\\]json[\/\\]/.test(module.resource)
+							);
+						},
 					},
 
 					// This disables Webpack's default behavior, which causes problems
@@ -326,6 +344,7 @@ module.exports = async (state) => {
 	await Promise.all([
 		buildWorldLow(state),
 		removeFiles(output),
+		removeError(output),
 		copyFiles(state, output),
 	]);
 };

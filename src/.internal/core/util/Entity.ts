@@ -1566,6 +1566,7 @@ export class Entity extends Settings implements IDisposer {
 
 		let themes: Array<Array<Theme>> = [];
 
+
 		const themeTags: Set<string> = new Set();
 
 		const tags = this.get("themeTagsSelf");

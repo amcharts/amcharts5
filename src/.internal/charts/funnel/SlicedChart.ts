@@ -1,5 +1,6 @@
-import { PercentChart, IPercentChartPrivate, IPercentChartSettings } from "../percent/PercentChart";
 import type { PercentSeries } from "../percent/PercentSeries";
+
+import { PercentChart, IPercentChartPrivate, IPercentChartSettings } from "../percent/PercentChart";
 
 
 export interface ISlicedChartSettings extends IPercentChartSettings {
@@ -18,7 +19,7 @@ export class SlicedChart extends PercentChart {
 	protected _afterNew() {
 		super._afterNew();
 
-		this.seriesContainer.setAll({ isMeasured:true, layout: this._root.horizontalLayout });
+		this.seriesContainer.setAll({ isMeasured: true, layout: this._root.horizontalLayout });
 	}
 
 	public static className: string = "SlicedChart";

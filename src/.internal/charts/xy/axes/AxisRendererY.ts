@@ -1,8 +1,4 @@
-import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./AxisRenderer";
-import { p100 } from "../../../core/util/Percent";
 import type { IPoint } from "../../../core/util/IPoint";
-import * as $type from "../../../core/util/Type";
-import * as $utils from "../../../core/util/Utils";
 import type { Graphics } from "../../../core/render/Graphics";
 import type { AxisLabel } from "./AxisLabel";
 import type { AxisBullet } from "./AxisBullet";
@@ -10,7 +6,13 @@ import type { Grid } from "./Grid";
 import type { AxisTick } from "./AxisTick";
 import type { Tooltip } from "../../../core/render/Tooltip";
 import type { Template } from "../../../core/util/Template";
+
+import { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./AxisRenderer";
+import { p100 } from "../../../core/util/Percent";
 import { Rectangle } from "../../../core/render/Rectangle";
+
+import * as $type from "../../../core/util/Type";
+import * as $utils from "../../../core/util/Utils";
 
 export interface IAxisRendererYSettings extends IAxisRendererSettings {
 
@@ -53,7 +55,7 @@ export class AxisRendererY extends AxisRenderer {
 
 	protected _downY?: number;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, isMeasured: false, themeTags: ["axis", "y", "thumb"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, isMeasured: false, themeTags: ["axis", "y", "thumb", "zoomgrip"] });
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "y"]);
@@ -86,8 +88,11 @@ export class AxisRendererY extends AxisRenderer {
 		super._changed();
 
 		const axis = this.axis;
-		axis.ghostLabel.setPrivate("visible", !this.get("inside"));
-		axis.ghostLabel.set("y", -1000);
+		const ghostLabel = axis.ghostLabel;
+		if (ghostLabel) {
+			ghostLabel.setPrivate("visible", !this.get("inside"));
+			ghostLabel.set("y", -1000);
+		}
 
 		const thumb = this.thumb;
 		const opposite = "opposite";
@@ -124,7 +129,7 @@ export class AxisRendererY extends AxisRenderer {
 					axisChildren.moveValue(this);
 				}
 
-				axis.ghostLabel._applyThemes();
+				axis.ghostLabel?._applyThemes();
 				this.labels.each((label) => {
 					label._applyThemes();
 				})

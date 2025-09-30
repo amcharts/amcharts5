@@ -115,7 +115,7 @@ export class CurveCursor extends XYCursor {
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 		const renderer = yAxis.get("renderer");
-		const position = renderer.toAxisPosition(this.getPrivate("positionY", 0));
+		const position = 1 - renderer.toAxisPosition(this.getPrivate("positionY", 0));
 
 
 		const points = renderer.getPoints(xAxis.get("start", 0), position, xAxis.get("end", 1), position);

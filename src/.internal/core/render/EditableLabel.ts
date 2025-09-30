@@ -34,7 +34,6 @@ export interface IEditableLabelSettings extends ILabelSettings {
 	 * @since 5.9.6
 	 */
 	multiLine?: boolean;
-
 }
 
 export interface IEditableLabelPrivate extends ILabelPrivate {
@@ -234,9 +233,9 @@ export class EditableLabel extends Label {
 	protected _syncStyle() {
 		const input = this.getPrivate("input");
 		const textarea = this.getPrivate("textarea");
-		if (textarea) {
+		const el = input.getPrivate("htmlElement");
+		if (textarea && el) {
 			// Set up HTML
-			const el = input.getPrivate("htmlElement")!;
 
 			// Reset all styles
 			const computedStyles = window.getComputedStyle(textarea);
@@ -293,13 +292,13 @@ export class EditableLabel extends Label {
 			// Font stuff
 			let fontFamily: any = this.get("fontFamily");
 			if (!fontFamily) {
-				fontFamily = getComputedStyle(input.getPrivate("htmlElement")!, "font-family").getPropertyValue("font-family");
+				fontFamily = getComputedStyle(el, "font-family").getPropertyValue("font-family");
 			}
 			textarea.style.fontFamily = fontFamily;
 
 			let fontSize: any = this.get("fontSize");
 			if (!fontSize) {
-				fontSize = getComputedStyle(input.getPrivate("htmlElement")!, "font-size").getPropertyValue("font-size");
+				fontSize = getComputedStyle(el, "font-size").getPropertyValue("font-size");
 			}
 			else if ($type.isNumber(fontSize)) {
 				fontSize = fontSize + "px";
@@ -311,7 +310,7 @@ export class EditableLabel extends Label {
 
 			let fontWeight: any = this.get("fontWeight");
 			if (!fontWeight) {
-				fontWeight = getComputedStyle(input.getPrivate("htmlElement")!, "font-weight").getPropertyValue("font-weight");
+				fontWeight = getComputedStyle(el, "font-weight").getPropertyValue("font-weight");
 			}
 			else {
 				fontWeight = fontWeight;
@@ -320,7 +319,7 @@ export class EditableLabel extends Label {
 
 			let fontStyle: any = this.get("fontStyle");
 			if (!fontStyle) {
-				fontStyle = getComputedStyle(input.getPrivate("htmlElement")!, "font-style").getPropertyValue("font-style");
+				fontStyle = getComputedStyle(el, "font-style").getPropertyValue("font-style");
 			}
 			else {
 				fontStyle = fontStyle;

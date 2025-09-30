@@ -81,6 +81,7 @@ var color = root.interfaceColors.get("background");
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
 var series = chart.series.push(
   am5xy.CandlestickSeries.new(root, {
+    turboMode: true,
     fill: color,
     calculateAggregates: true,
     stroke: color,

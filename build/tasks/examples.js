@@ -1,5 +1,6 @@
 const $path = require("path");
 const { cp, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, exists, removeTypeScriptTypes } = require("../util");
+const dependencies = require("../script-dependencies");
 
 
 const geodata_message = `Map geodata could not be loaded. Please download the latest <a href=\\"https://www.amcharts.com/download/download-v5/\\">amcharts geodata</a> and extract its contents into the same directory as your amCharts files.`;
@@ -368,7 +369,7 @@ async function transpile_js(config, base, root_dir, dir) {
 
 	await processFiles(base, dir, (from, to) => write_js(imports, from, to));
 
-	const js_imports = [];
+	let js_imports = [];
 
 	const path_to_v5 = posixPath($path.relative(dir, root_dir));
 
@@ -383,7 +384,15 @@ async function transpile_js(config, base, root_dir, dir) {
                 if (split.length === 2) {
                     js_imports.push(path_to_v5 + "/index.js");
                 } else {
-                    js_imports.push(path_to_v5 + "/" + split.slice(2).join("/") + ".js");
+                    const name = split.slice(2).join("/");
+
+                    if (dependencies[name] != null) {
+                        dependencies[name].forEach((dependency) => {
+                            js_imports.push(path_to_v5 + "/" + dependency + ".js");
+                        });
+                    }
+
+                    js_imports.push(path_to_v5 + "/" + name + ".js");
                 }
 
             } else if (split[0] === "@amcharts" && split[1] === "amcharts5-geodata") {
@@ -400,6 +409,17 @@ async function transpile_js(config, base, root_dir, dir) {
 
     config.extraScriptImports.forEach((x) => {
         js_imports.push(x);
+    });
+
+    const seen = new Set();
+
+    js_imports = js_imports.filter((x) => {
+        if (seen.has(x)) {
+            return false;
+        } else {
+            seen.add(x);
+            return true;
+        }
     });
 
 	await Promise.all([

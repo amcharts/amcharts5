@@ -1,5 +1,6 @@
-import { Label, ILabelSettings, ILabelPrivate } from "../../../core/render/Label";
 import type { IPoint } from "../../../core/util/IPoint";
+
+import { Label, ILabelSettings, ILabelPrivate } from "../../../core/render/Label";
 
 export interface IAxisLabel extends Label {
 

@@ -46,7 +46,7 @@ export interface IAxisRendererCurveYSettings extends IAxisRendererSettings {
 	* @default 0.5
 	*/
 	axisLocation?: number;
-	
+
 	/**
 	 * Should axis labels rotation should be adjusted to the axis rotation?
 	 *
@@ -241,9 +241,9 @@ export class AxisRendererCurveY extends AxisRenderer {
 					y: point.y
 				});
 
-				if(this.get("rotateLabels", true)){
+				if (this.get("rotateLabels", true)) {
 					label.set("rotation", angle);
-				}				
+				}
 			}
 
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));
@@ -393,8 +393,8 @@ export class AxisRendererCurveY extends AxisRenderer {
 	 * @ignore
 	 */
 	public positionTooltip(tooltip: Tooltip, position: number) {
-		const xRenderer = this.get("xRenderer");		
-		if(xRenderer){
+		const xRenderer = this.get("xRenderer");
+		if (xRenderer) {
 			const point = this.positionToPoint(position, xRenderer.axis.get("start", 0));
 			this._positionTooltip(tooltip, point);
 		}

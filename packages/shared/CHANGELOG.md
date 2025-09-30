@@ -5,6 +5,33 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.14.0] - 2025-09-30
+
+### Added
+- New chart type: `Gantt`. [More info](https://www.amcharts.com/docs/v5/charts/gantt/).
+- Two new settings added to `HeatLegend`: `startOpacity` (default: `1`) and `endOpacity` (default: `1`).
+- New plugin: `colorPicker`.
+- New method to add debounced events: `events.onDebounced()`. [More info](https://www.amcharts.com/docs/v5/concepts/events/#Debounced_events).
+- New setting added to `ColumnSeries`: `turboMode` (default: `false`). If set to `true`, the series will render columns directly on canvas, speeding up column-heavy charts. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Turbo_mode).
+- New setting added to `DateAxis`: `skipFirstMinor` (default: `true`). If set to `true`, the axis will skip the first minor grid line and label.
+- New setting added to `DateAxis`: `weekLabelLocation` (default: `true`). A relative location of weekly labels.
+- New setting added to `Axis`: `minorAxisFillsEnabled` (default: `true`).
+- New setting added to `Axis`: `zoomOut` (default: `true`). If set to `false`, the axis will not be zoomed out when the chart's zoom out button is pressed, and vice versa when axis is zoomed, it will not trigger the button to appear.
+- New setting added to `LinePattern`: `angle` (default: `0`). Use `angle` instead of `rotation` for better perfomance and smaller pattern size.
+- New accessor `systemTooltip` added to `Root`. Use this instance of `Tooltip` for generic tooltip needs.
+
+### Fixed
+- If an axis range was added to `CategoryAxis` with catgegories not present in data, it was displayed over whole plot area.
+- Line and column series were flickering a bit while scrolling without Animated theme.
+- If `minBulletDistance` was set on a series with data gaps, bullets could be hidden if zoomed to a position where start or end item was on a missing item.
+- When using valueYShow: `valueYChangeSelectionPercent`, line series could show a drawing bug under certain zoom conditions.
+- Columns were drawn overlapped if `baseInterval` of `DateAxis` was set to 8 months.
+- `CurveCursor` vertical position was inverted before.
+- `index.js` in the compiled script version included `xy.js` stuff. It's fixed now.
+- `zoomToValues()` method of `ValueAxis` was not working properly with auto-zoom enabled.
+- `oversizedBehavior` was being ignored on composite bullet of the `ClusteredPointSeries`.
+
+
 ## [5.13.6] - 2025-08-27
 
 ### Fixed

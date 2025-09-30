@@ -1540,13 +1540,17 @@ export class XYChart extends SerialChart {
 		if (zoomOutButton && zoomOutButton.parent) {
 			let visible = false;
 			this.xAxes.each((axis) => {
-				if ($math.round(axis.get("start", 0), 5) != 0 || $math.round(axis.get("end", 1), 5) != 1) {
-					visible = true;
+				if (axis.get("zoomOut", true)) {
+					if ($math.round(axis.get("start", 0), 5) != 0 || $math.round(axis.get("end", 1), 5) != 1) {
+						visible = true;
+					}
 				}
 			})
 			this.yAxes.each((axis) => {
-				if ($math.round(axis.get("start", 0), 5) != 0 || $math.round(axis.get("end", 1), 5) != 1) {
-					visible = true;
+				if (axis.get("zoomOut", true)) {
+					if ($math.round(axis.get("start", 0), 5) != 0 || $math.round(axis.get("end", 1), 5) != 1) {
+						visible = true;
+					}
 				}
 			})
 
@@ -1821,13 +1825,17 @@ export class XYChart extends SerialChart {
 	 */
 	public zoomOut() {
 		this.xAxes.each((axis) => {
-			axis.setPrivate("updateScrollbar", true);
-			axis.zoom(0, 1);
+			if (axis.get("zoomOut", true)) {
+				axis.setPrivate("updateScrollbar", true);
+				axis.zoom(0, 1);
+			}
 		})
 
 		this.yAxes.each((axis) => {
-			axis.setPrivate("updateScrollbar", true);
-			axis.zoom(0, 1);
+			if (axis.get("zoomOut", true)) {
+				axis.setPrivate("updateScrollbar", true);
+				axis.zoom(0, 1);
+			}
 		})
 	}
 

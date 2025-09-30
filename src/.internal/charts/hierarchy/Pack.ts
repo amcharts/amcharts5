@@ -51,7 +51,7 @@ export interface IPackSettings extends IHierarchySettings {
 	 *
 	 * @since 5.2.6
 	 */
-	nodePadding?:number
+	nodePadding?: number
 
 }
 

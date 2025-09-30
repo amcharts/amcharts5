@@ -1,12 +1,13 @@
 import type { IHierarchyDataItem } from "./Hierarchy";
 import type { DataItem } from "../../core/render/Component";
 import type { Bullet } from "../../core/render/Bullet";
-
-import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
-import * as $array from "../../core/util/Array";
 import type { Root } from "../../core/Root";
 import type { List } from "../../core/util/List";
 import type { LinkedHierarchy } from "./LinkedHierarchy";
+
+import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
+
+import * as $array from "../../core/util/Array";
 
 export interface IHierarchyLinkSettings extends IGraphicsSettings {
 

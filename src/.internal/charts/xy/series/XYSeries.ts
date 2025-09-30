@@ -7,6 +7,7 @@ import type { XYChart } from "../XYChart";
 //import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
 import type { ITimeInterval } from "../../../core/util/Time";
+import type { IDisposer } from "../../../core/util/Disposer";
 
 import { DataItem } from "../../../core/render/Component";
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../../core/render/Series";
@@ -14,7 +15,6 @@ import { List } from "../../../core/util/List";
 import { Container } from "../../../core/render/Container";
 import { Graphics } from "../../../core/render/Graphics";
 
-import type { IDisposer } from "../../../core/util/Disposer";
 
 import * as $type from "../../../core/util/Type";
 import * as $object from "../../../core/util/Object";
@@ -2092,7 +2092,10 @@ export abstract class XYSeries extends Series {
 	public async hideDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
 		const promises = [super.hideDataItem(dataItem, duration)];
 
-		const hiddenState = this.states.create("hidden", {})
+		let hiddenState = this.states.lookup("hidden");
+		if (!hiddenState) {
+			hiddenState = this.states.create("hidden", {});
+		}
 
 		if (!$type.isNumber(duration)) {
 			duration = hiddenState.get("stateAnimationDuration", this.get("stateAnimationDuration", 0));

@@ -90,7 +90,7 @@ export class VerticalLineSeries extends SimpleLineSeries {
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
-		if (this._drawingEnabled) {
+		if (this._drawingEnabled && !this._canceled) {
 			if (!this._isDragging) {
 				if (this.unselectAllDrawings() == 0) {
 					this._increaseIndex();
@@ -103,6 +103,7 @@ export class VerticalLineSeries extends SimpleLineSeries {
 				}
 			}
 		}
+		this._canceled = false;
 	}
 
 	protected _addPointsReal(valueX: number, valueY: number, index: number) {

@@ -1,12 +1,14 @@
 import type { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
-import { CategoryAxis, ICategoryAxisSettings, ICategoryAxisPrivate, ICategoryAxisDataItem, ICategoryAxisEvents } from "./CategoryAxis";
 import type { ITimeInterval } from "../../../core/util/Time";
+import type { Tooltip } from "../../../core/render/Tooltip";
+
+import { CategoryAxis, ICategoryAxisSettings, ICategoryAxisPrivate, ICategoryAxisDataItem, ICategoryAxisEvents } from "./CategoryAxis";
+
 import * as $time from "../../../core/util/Time";
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
-import type { Tooltip } from "../../../core/render/Tooltip";
 
 export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICategoryAxisSettings<R> {
 

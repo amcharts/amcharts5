@@ -115,6 +115,7 @@ export default {
 	"_date_minute": "HH:mm",
 	"_date_minute_full": "HH:mm - MMM dd, yyyy",
 	"_date_hour": "HH:mm",
+	"_date_hour_short": "HH",
 	"_date_hour_full": "HH:mm - MMM dd, yyyy",
 	"_date_day": "MMM dd",
 	"_date_day_full": "MMM dd, yyyy",
@@ -394,4 +395,9 @@ export default {
 	"Error parsing file: %1": "Napaka pri parsanju datoteke: %1",
 	"Unable to load file: %1": "Ni mogoče naložiti datoteke: %1",
 	"Invalid date": "Neveljaven datum",
+
+	// Common actions
+	"Close": "",
+	"Minimize": "",
+	"Confirm": ""
 };

@@ -1,8 +1,9 @@
-import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "./LineSeries";
 import type { AxisRenderer } from "../axes/AxisRenderer";
 import type { Axis } from "../axes/Axis";
-import { Percent, p100 } from "../../../core/util/Percent";
 import type { DataItem } from "../../../core/render/Component";
+
+import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "./LineSeries";
+import { Percent, p100 } from "../../../core/util/Percent";
 import { curveStepAfter } from "d3-shape";
 
 export interface IStepLineSeriesDataItem extends ILineSeriesDataItem {
@@ -34,6 +35,12 @@ export interface IStepLineSeriesSettings extends ILineSeriesSettings {
 export interface IStepLineSeriesPrivate extends ILineSeriesPrivate {
 }
 
+/**
+ * Used to plot stepped line and/or area series.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/} for more info
+ * @important
+ */
 export class StepLineSeries extends LineSeries {
 	public static className: string = "StepLineSeries";
 	public static classNames: Array<string> = LineSeries.classNames.concat([StepLineSeries.className]);
@@ -172,7 +179,7 @@ export class StepLineSeries extends LineSeries {
 			points.push(point0);
 			points.push(point1);
 
-			dataItem.set("point", {x:point0[0] + (point1[0] - point0[0]) / 2, y:point0[1] + (point1[1] - point0[1]) / 2 });
+			dataItem.set("point", { x: point0[0] + (point1[0] - point0[0]) / 2, y: point0[1] + (point1[1] - point0[1]) / 2 });
 		}
 
 		if (this.get("noRisers")) {

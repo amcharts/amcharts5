@@ -1,7 +1,9 @@
-import { Entity, IEntitySettings, IEntityPrivate } from "../../../core/util/Entity";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { Axis } from "./Axis";
 import type { AxisRenderer } from "./AxisRenderer";
+
+import { Entity, IEntitySettings, IEntityPrivate } from "../../../core/util/Entity";
+
 import * as $object from "../../../core/util/Object";
 
 export interface IAxisBulletSettings extends IEntitySettings {

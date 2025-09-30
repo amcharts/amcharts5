@@ -1,5 +1,7 @@
-import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import type { IPoint } from "../../core/util/IPoint";
+
+import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
+
 import * as $math from "../../core/util/Math";
 import * as $utils from "../../core/util/Utils";
 

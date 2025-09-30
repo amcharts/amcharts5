@@ -111,6 +111,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 	protected _ph: number = 0;
 	protected _pw: number = 0;
 
+	protected _columnsUpdated: boolean = false;
+
 	public _makeFieldNames() {
 		super._makeFieldNames();
 
@@ -276,17 +278,35 @@ export abstract class BaseColumnSeries extends XYSeries {
 						this._toggleColumn(dataItem, false);
 					}
 				}
+
+				this._beforeColumnsDraw();
+
+				let axisCase: 0 | 1 | 2 = 0;
+
+				if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") && xAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
+					axisCase = 2;
+				}
+				else if (xAxis === baseAxis) {
+					axisCase = 0;
+				}
+				else if (yAxis === baseAxis) {
+					axisCase = 1;
+				}
+
 				for (let i = startIndex; i <= endIndex; i++) {
 					let dataItem = this.dataItems[i];
-					this._updateGraphics(dataItem, previous);
+					this._updateGraphics(dataItem, previous, axisCase);
 					if (dataItem.get("valueX") != null && dataItem.get("valueY") != null) {
 						previous = dataItem;
 					}
 				}
 
+				this._afterColumnsDraw();
+
 				for (let i = endIndex + 1; i < len; i++) {
 					this._toggleColumn(this.dataItems[i], false);
 				}
+				this._columnsUpdated = true;
 			}
 		}
 		else {
@@ -296,6 +316,18 @@ export abstract class BaseColumnSeries extends XYSeries {
 			this.updateLegendMarker(this.get("tooltipDataItem"));
 		}
 		super._updateChildren();
+	}
+
+	public _afterChanged(): void {
+		super._afterChanged();
+		this._columnsUpdated = false;
+	}
+	protected _beforeColumnsDraw() {
+
+	}
+
+	protected _afterColumnsDraw() {
+
 	}
 
 
@@ -354,7 +386,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 		return super.createAxisRange(axisDataItem);
 	}
 
-	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
+	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>, axisCase: 0 | 1 | 2) {
 		let graphics = dataItem.get("graphics")!;
 
 		//if (!graphics) {
@@ -367,6 +399,9 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 		const valueX = dataItem.get(xField as any);
 		const valueY = dataItem.get(yField as any);
+
+		const exactLocationX = this.get("exactLocationX", false);
+		//const exactLocationY = this.get("exactLocationY", false);		
 
 		if (valueX != null && valueY != null) {
 			const xOpenField = this._xOpenField;
@@ -385,7 +420,6 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 			const xAxis = this.get("xAxis");
 			const yAxis = this.get("yAxis");
-			const baseAxis = this.get("baseAxis");
 
 			const xStart = xAxis.get("start");
 			const xEnd = xAxis.get("end");
@@ -404,8 +438,79 @@ export abstract class BaseColumnSeries extends XYSeries {
 			let fitW = false;
 			let fitH = false;
 
-			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") && xAxis.isType<CategoryAxis<any>>("CategoryAxis")) {
 
+			if (axisCase == 0) {
+				let startLocation = this._aLocationX0 + openLocationX - 0.5;
+				let endLocation = this._aLocationX1 + locationX - 0.5;
+
+				if (width instanceof Percent) {
+					let offset: number = (endLocation - startLocation) * (1 - width.value) / 2;
+					startLocation += offset;
+					endLocation -= offset;
+				}
+
+				l = xAxis.getDataItemPositionX(dataItem, xOpenField, startLocation, vcx, exactLocationX);
+				r = xAxis.getDataItemPositionX(dataItem, xField, endLocation, vcx, exactLocationX);
+				t = yAxis.getDataItemPositionY(dataItem, yField, locationY, vcy);
+
+				if (this._yOpenField !== this._yField) {
+					b = yAxis.getDataItemPositionY(dataItem, yOpenField, openLocationY, vcy);
+				}
+				else {
+					if (stacked) {
+						let stackToItemY = dataItem.get("stackToItemY")!;
+						if (stackToItemY) {
+							b = yAxis.getDataItemPositionY(stackToItemY, yField, openLocationY, (stackToItemY.component as XYSeries).get("vcy"));
+						}
+						else {
+							b = yAxis.basePosition();
+						}
+					}
+					else {
+						b = yAxis.basePosition();
+					}
+				}
+				dataItem.setRaw("point", { x: l + (r - l) / 2, y: t });
+
+				fitH = true;
+			}
+			else if (axisCase == 1) {
+				let startLocation = this._aLocationY0 + openLocationY - 0.5;
+				let endLocation = this._aLocationY1 + locationY - 0.5;
+
+				if (height instanceof Percent) {
+					let offset: number = (endLocation - startLocation) * (1 - height.value) / 2;
+					startLocation += offset;
+					endLocation -= offset;
+				}
+
+				t = yAxis.getDataItemPositionY(dataItem, yOpenField, startLocation, vcy);
+				b = yAxis.getDataItemPositionY(dataItem, yField, endLocation, vcy);
+				r = xAxis.getDataItemPositionX(dataItem, xField, locationX, vcx, exactLocationX);
+
+				if (this._xOpenField !== this._xField) {
+					l = xAxis.getDataItemPositionX(dataItem, xOpenField, openLocationX, vcx, exactLocationX);
+				}
+				else {
+					if (stacked) {
+						let stackToItemX = dataItem.get("stackToItemX")!;
+						if (stackToItemX) {
+							l = xAxis.getDataItemPositionX(stackToItemX, xField, openLocationX, (stackToItemX.component as XYSeries).get("vcx"), exactLocationX);
+						}
+						else {
+							l = xAxis.basePosition();
+						}
+					}
+					else {
+						l = xAxis.basePosition();
+					}
+				}
+
+				fitW = true;
+
+				dataItem.setRaw("point", { x: r, y: t + (b - t) / 2 });
+			}
+			else if (axisCase == 2) {
 				let startLocation = this._aLocationX0 + openLocationX - 0.5;
 				let endLocation = this._aLocationX1 + locationX - 0.5;
 
@@ -432,79 +537,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 				dataItem.setRaw("point", { x: l + (r - l) / 2, y: t + (b - t) / 2 });
 			}
-			else if (xAxis === baseAxis) {
 
-				let startLocation = this._aLocationX0 + openLocationX - 0.5;
-				let endLocation = this._aLocationX1 + locationX - 0.5;
-
-				if (width instanceof Percent) {
-					let offset: number = (endLocation - startLocation) * (1 - width.value) / 2;
-					startLocation += offset;
-					endLocation -= offset;
-				}
-
-				l = xAxis.getDataItemPositionX(dataItem, xOpenField, startLocation, vcx);
-				r = xAxis.getDataItemPositionX(dataItem, xField, endLocation, vcx);
-				t = yAxis.getDataItemPositionY(dataItem, yField, locationY, vcy);
-
-				if (this._yOpenField !== this._yField) {
-					b = yAxis.getDataItemPositionY(dataItem, yOpenField, openLocationY, vcy);
-				}
-				else {
-					if (stacked) {
-						let stackToItemY = dataItem.get("stackToItemY")!;
-						if (stackToItemY) {
-							b = yAxis.getDataItemPositionY(stackToItemY, yField, openLocationY, (stackToItemY.component as XYSeries).get("vcy"));
-						}
-						else {
-							b = yAxis.basePosition();
-						}
-					}
-					else {
-						b = yAxis.basePosition();
-					}
-				}
-				dataItem.setRaw("point", { x: l + (r - l) / 2, y: t });
-
-				fitH = true;
-			}
-			else if (yAxis === baseAxis) {
-				let startLocation = this._aLocationY0 + openLocationY - 0.5;
-				let endLocation = this._aLocationY1 + locationY - 0.5;
-
-				if (height instanceof Percent) {
-					let offset: number = (endLocation - startLocation) * (1 - height.value) / 2;
-					startLocation += offset;
-					endLocation -= offset;
-				}
-
-				t = yAxis.getDataItemPositionY(dataItem, yOpenField, startLocation, vcy);
-				b = yAxis.getDataItemPositionY(dataItem, yField, endLocation, vcy);
-				r = xAxis.getDataItemPositionX(dataItem, xField, locationX, vcx);
-
-				if (this._xOpenField !== this._xField) {
-					l = xAxis.getDataItemPositionX(dataItem, xOpenField, openLocationX, vcx);
-				}
-				else {
-					if (stacked) {
-						let stackToItemX = dataItem.get("stackToItemX")!;
-						if (stackToItemX) {
-							l = xAxis.getDataItemPositionX(stackToItemX, xField, openLocationX, (stackToItemX.component as XYSeries).get("vcx"));
-						}
-						else {
-							l = xAxis.basePosition();
-						}
-					}
-					else {
-						l = xAxis.basePosition();
-					}
-				}
-
-				fitW = true;
-
-				dataItem.setRaw("point", { x: r, y: t + (b - t) / 2 });
-			}
-
+			this._applyGraphicsStates(dataItem, previousDataItem);
 			this._updateSeriesGraphics(dataItem, graphics!, l, r, t, b, fitW, fitH);
 
 			if ((l < xStart && r < xStart) || (l > xEnd && r > xEnd) || (t < yStart && b <= yStart) || (t >= yEnd && b > yEnd) || $type.isNaN(l) || $type.isNaN(t)) {
@@ -520,8 +554,6 @@ export abstract class BaseColumnSeries extends XYSeries {
 					this._updateSeriesGraphics(dataItem, graphics, l, r, t, b, fitW, fitH);
 				})
 			}
-
-			this._applyGraphicsStates(dataItem, previousDataItem);
 		}
 		else {
 			this._toggleColumn(dataItem, false);
@@ -794,7 +826,6 @@ export abstract class BaseColumnSeries extends XYSeries {
 				}
 			}
 		}
-
 	}
 
 	protected _getTooltipTarget(dataItem: DataItem<this["_dataItemSettings"]>): Sprite {

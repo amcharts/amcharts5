@@ -34,6 +34,9 @@ export interface EventListener {
 	shouldClone: boolean;
 	dispatch: (type: any, event: any) => void;
 	disposer: IDisposer;
+
+	_debounceDelay?: number
+	_debounceTimeout?: number;
 }
 
 /**
@@ -318,7 +321,20 @@ export class EventDispatcher<T> implements IDisposer {
 			// TODO if the function throws, maybe it should keep going ?
 			this._eachListener((listener) => {
 				if (!listener.killed && (listener.type === null || listener.type === type)) {
-					listener.dispatch(type, event);
+					if (listener._debounceDelay) {
+						if (listener._debounceTimeout) {
+							window.clearTimeout(listener._debounceTimeout);
+						}
+						listener._debounceTimeout = window.setTimeout(() => {
+							listener._debounceTimeout = undefined;
+							if (!listener.killed) {
+								listener.dispatch(type, event);
+							}
+						}, listener._debounceDelay);
+					}
+					else {
+						listener.dispatch(type, event);
+					}
 				}
 			});
 		}
@@ -361,7 +377,7 @@ export class EventDispatcher<T> implements IDisposer {
 	 * @param dispatch
 	 * @returns An event listener
 	 */
-	protected _on<C, Key extends keyof T>(once: boolean, type: Key | null, callback: any, context: C, shouldClone: boolean, dispatch: (type: Key, event: T[Key]) => void): EventListener {
+	protected _on<C, Key extends keyof T>(once: boolean, type: Key | null, callback: any, context: C, shouldClone: boolean, dispatch: (type: Key, event: T[Key]) => void, debounceDelay?: number): EventListener {
 		if (this._disposed) {
 			throw new Error("EventDispatcher is disposed");
 		}
@@ -378,8 +394,12 @@ export class EventDispatcher<T> implements IDisposer {
 			once: once,
 			disposer: new Disposer(() => {
 				info.killed = true;
+				if (info._debounceTimeout) {
+					window.clearTimeout(info._debounceTimeout);
+				}
 				this._removeListener(info);
-			})
+			}),
+			_debounceDelay: debounceDelay
 		};
 
 		this._listeners.push(info);
@@ -408,7 +428,7 @@ export class EventDispatcher<T> implements IDisposer {
 	 * }, this);
 	 * ```
 	 * ```JavaScript
-	 * button.events.once("click", (ev) => {
+	 * button.events.once("click", function(ev) {
 	 *   console.log("Button clicked");
 	 * }, this);
 	 * ```
@@ -427,6 +447,36 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
+	 * Creates a debounced event listener to be invoked on a specific event type.
+	 *
+	 * ```TypeScript
+	 * button.events.onDebounced("click", (ev) => {
+	 *   console.log("Button clicked");
+	 * }, 500, this);
+	 * ```
+	 * ```JavaScript
+	 * button.events.onDebounced("click", function(ev) {
+	 *   console.log("Button clicked");
+	 * }, 500, this);
+	 * ```
+	 *
+	 * The above will invoke our custom event handler whenever series we put
+	 * event on is hidden.
+	 *
+	 * @param type           Listener's type
+	 * @param callback       Callback function
+	 * @param debounceDelay  Debounce delay in milliseconds
+	 * @param context        Callback context
+	 * @param shouldClone    Whether the listener should be copied when the EventDispatcher is copied
+	 * @returns A disposable event listener
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Debounced_events} for more info
+	 * @since 5.14.0
+	 */
+	public onDebounced<C, Key extends keyof T>(type: Key, callback: (this: C | undefined, event: T[Key]) => void, debounceDelay: number, context?: C, shouldClone: boolean = true): IDisposer {
+		return this._on(false, type, callback, context, shouldClone, (_type, event) => callback.call(context, event), debounceDelay).disposer;
+	}
+
+	/**
 	 * Creates an event listener to be invoked on a specific event type once.
 	 *
 	 * Once the event listener is invoked, it is automatically disposed.
@@ -437,7 +487,7 @@ export class EventDispatcher<T> implements IDisposer {
 	 * }, this);
 	 * ```
 	 * ```JavaScript
-	 * button.events.once("click", (ev) => {
+	 * button.events.once("click", function(ev) {
 	 *   console.log("Button clicked");
 	 * }, this);
 	 * ```

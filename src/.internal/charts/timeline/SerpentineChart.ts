@@ -1,10 +1,10 @@
-import { CurveChart, ICurveChartPrivate, ICurveChartSettings } from "./CurveChart";
-import { p50, Percent } from "../../core/util/Percent";
-
 import type { CurveColumnSeries } from "./CurveColumnSeries";
 import type { AxisRendererCurveY } from "./AxisRendererCurveY";
 import type { IPoint } from "../../core/util/IPoint";
 import type { AxisRendererCurveX } from "./AxisRendererCurveX";
+
+import { CurveChart, ICurveChartPrivate, ICurveChartSettings } from "./CurveChart";
+import { p50, Percent } from "../../core/util/Percent";
 
 import * as $math from "../../core/util/Math";
 import * as $utils from "../../core/util/Utils";
@@ -95,8 +95,8 @@ export class SerpentineChart extends CurveChart {
 
 
 		if (this.get("orientation") == "vertical") {
-			radius = Math.min(h / (levelCount + 1) / 2, w / 3);		
-			h = Math.min(radius * (levelCount + 1) * 2, h);				
+			radius = Math.min(h / (levelCount + 1) / 2, w / 3);
+			h = Math.min(radius * (levelCount + 1) * 2, h);
 
 			const startLocation = this.get("startLocation", 0);
 			const endLocation = this.get("endLocation", 1);
@@ -147,8 +147,8 @@ export class SerpentineChart extends CurveChart {
 			}
 		}
 		else {
-			radius = Math.min(w / (levelCount + 1) / 2, h / 3);		
-			w = Math.min(radius * (levelCount + 1) * 2, w);	
+			radius = Math.min(w / (levelCount + 1) / 2, h / 3);
+			w = Math.min(radius * (levelCount + 1) * 2, w);
 
 			const startLocation = this.get("startLocation", 0);
 			const endLocation = this.get("endLocation", 1);

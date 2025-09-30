@@ -127,7 +127,9 @@ export class PolylineSeries extends DrawingSeries {
 
 	public disableDrawing() {
 		super.disableDrawing();
-		this._endPolyline();
+		if (this._pIndex > 0) {
+			this._endPolyline();
+		}
 	}
 
 	public clearDrawings(): void {

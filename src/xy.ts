@@ -16,6 +16,7 @@ export { AxisLabel, IAxisLabelSettings, IAxisLabel, IAxisLabelPrivate } from "./
 export { AxisLabelRadial, IAxisLabelRadialSettings, IAxisLabelRadialPrivate } from "./.internal/charts/xy/axes/AxisLabelRadial";
 export { AxisTick, IAxisTickSettings, IAxisTickPrivate } from "./.internal/charts/xy/axes/AxisTick";
 export { Grid, IGridSettings, IGridPrivate } from "./.internal/charts/xy/axes/Grid";
+export { EditableAxisLabel } from "./.internal/charts/xy/axes/EditableAxisLabel";
 
 export { AxisRenderer, IAxisRendererSettings, IAxisRendererPrivate } from "./.internal/charts/xy/axes/AxisRenderer";
 export { AxisRendererX, IAxisRendererXSettings, IAxisRendererXPrivate } from "./.internal/charts/xy/axes/AxisRendererX";

@@ -2,7 +2,6 @@ import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataIte
 import { curveMonotoneYTension } from "../../../core/render/MonotoneYTension";
 
 export interface ISmoothedYLineSeriesDataItem extends ILineSeriesDataItem {
-
 }
 
 export interface ISmoothedYLineSeriesSettings extends ILineSeriesSettings {

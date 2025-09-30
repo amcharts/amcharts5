@@ -322,7 +322,7 @@ export abstract class Series extends Component {
 
 	public endIndex():number {
 		let len = this.dataItems.length;
-		return Math.min(this.getPrivate("endIndex", len), len)
+		return Math.max(0, Math.min(this.getPrivate("endIndex", len), len));
 	}
 
 	protected _handleBullets(dataItems:Array<DataItem<this["_dataItemSettings"]>>){
@@ -340,17 +340,6 @@ export abstract class Series extends Component {
 		this.markDirtyValues();
 	}
 
-	/**
-	 * Looks up and returns a data item by its ID.
-	 *
-	 * @param   id  ID
-	 * @return      Data item
-	 */
-	public getDataItemById(id: string): DataItem<this["_dataItemSettings"]> | undefined {
-		return $array.find(this.dataItems, (dataItem: any) => {
-			return dataItem.get("id") == id;
-		})
-	}
 
 	protected _makeBullets(dataItem: DataItem<this["_dataItemSettings"]>) {
 		if(this._shouldMakeBullet(dataItem)){
@@ -549,6 +538,8 @@ export abstract class Series extends Component {
 			count[key] = 0;
 		})
 
+		const len = this.dataItems.length;
+
 		$array.each(fields, (key) => {
 			let change = key + "Change";
 			let changePercent = key + "ChangePercent";
@@ -565,6 +556,20 @@ export abstract class Series extends Component {
 
 			const baseValueSeries = this.getPrivate("baseValueSeries");
 			const adjustedStartIndex = this.getPrivate("adjustedStartIndex", startIndex);
+			
+			// Function to calculate changes for a single data item
+			const calculateChangesForItem = (dataItem: any, key: string) => {
+				if (dataItem) {
+					let value = dataItem.get(<any>key);
+					if (value != null) {
+						dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
+						dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
+						dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
+						dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
+						previous[key] = value;
+					}
+				}
+			};			
 
 			for (let i = adjustedStartIndex; i < endIndex; i++) {
 				const dataItem = this.dataItems[i];
@@ -602,28 +607,22 @@ export abstract class Series extends Component {
 							dataItem.setRaw(<any>(changePercent), (value - open[openKey]) / open[openKey] * 100);
 						}
 
-						dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
-						dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
-						dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
-						dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
-
-						previous[key] = value;
+						calculateChangesForItem(dataItem, key);
 					}
 				}
 			}
 
-			if(endIndex < this.dataItems.length - 1){
-				const dataItem = this.dataItems[endIndex];
-				if(dataItem){
-					let value = dataItem.get(<any>key)
-					dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
-					dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
-					dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
-					dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
-				}
+			// Calculate for endIndex item
+			if (endIndex < len) {
+				calculateChangesForItem(this.dataItems[endIndex], key);
+			}
+			
+			// Calculate for endIndex+1 item if available
+			if (endIndex + 1 < len) {
+				calculateChangesForItem(this.dataItems[endIndex + 1], key);
 			}
 
-			if(startIndex > 0){
+			if (startIndex > 0) {
 				startIndex--;
 			}
 
@@ -631,8 +630,7 @@ export abstract class Series extends Component {
 
 			for (let i = startIndex; i < adjustedStartIndex; i++) {
 				const dataItem = this.dataItems[i];
-				if(dataItem){
-	
+				if(dataItem) {
 					let value = dataItem.get(<any>key);
 
 					if (previous[key] == null) {
@@ -662,7 +660,7 @@ export abstract class Series extends Component {
 			this.setPrivate(<any>(key + "CloseSelection"), close[key]);
 		})
 
-		if (startIndex === 0 && endIndex === this.dataItems.length) {
+		if (startIndex === 0 && endIndex === len) {
 			$array.each(fields, (key) => {
 				this.setPrivate(<any>(key + "Average"), average[key]);
 				this.setPrivate(<any>(key + "Count"), count[key]);

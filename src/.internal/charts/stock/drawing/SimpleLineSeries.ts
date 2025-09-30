@@ -223,7 +223,7 @@ export class SimpleLineSeries extends DrawingSeries {
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
-		if (!this._isDragging && !this._isSelecting) {
+		if (!this._isDragging && !this._isSelecting && !this._canceled) {
 
 			if (!this._isDrawing) {
 				if (this.unselectAllDrawings() == 0) {
@@ -238,6 +238,7 @@ export class SimpleLineSeries extends DrawingSeries {
 				this._dispatchStockEvent("drawingadded", this._drawingId, this._index);
 			}
 		}
+		this._canceled = false;
 	}
 
 	protected _handlePointerClick(event: ISpritePointerEvent) {

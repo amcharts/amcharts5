@@ -21,8 +21,6 @@ import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 import * as $utils from "../../../core/util/Utils";
 
-
-
 export interface IAxisSettings<R extends AxisRenderer> extends IComponentSettings {
 	/**
 	 * A renderer object which is responsible of rendering visible axis elements.
@@ -122,7 +120,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	/**
 	 * Set this to `false` to prevent axis from being zoomed.
 	 */
-	zoomable?:boolean;
+	zoomable?: boolean;
 
 	/**
 	 * A relative distance the axis is allowed to be zoomed/panned beyond its
@@ -167,6 +165,23 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_bullets} for more info
 	 */
 	bullet?: (root: Root, axis: Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
+
+	/**
+	 * Specifies how axis fill should be drawn (if fill rule allows it).
+	 *
+	 * @since 5.14.0
+	 */
+	minorAxisFillsEnabled?: boolean;
+
+	/**
+	 * If set to `false`, the axis will not be zoomed out when the chart's zoom
+	 * out button is pressed, and vice versa when axis is zoomed, it will not
+	 * trigger the button to appear.
+	 *
+	 * @default true
+	 * @since 5.14.0
+	 */
+	zoomOut?: boolean;
 }
 
 export interface IAxisEvents extends IComponentEvents {
@@ -279,7 +294,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * Array of minor data items.
 	 */
-	public  minorDataItems: Array<DataItem<this["_dataItemSettings"]>> = [];
+	public minorDataItems: Array<DataItem<this["_dataItemSettings"]>> = [];
 
 	/**
 	 * A [[Container]] that holds all the axis label elements.
@@ -340,7 +355,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Ghost_label} for more info
 	 */
-	public ghostLabel!: AxisLabel;
+	public ghostLabel?: AxisLabel;
 
 	protected _cursorPosition: number = -1;
 
@@ -409,10 +424,16 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			renderer.processAxis();
 		}
 		this.children.push(renderer);
-		this.ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}), []);
-		this.ghostLabel.adapters.disable("text");
-		this.ghostLabel.setAll({ opacity: 0, tooltipText: undefined, tooltipHTML: undefined, interactive: false });
-		this.ghostLabel.events.disable();
+		this._createGhostLabel();
+	}
+
+	protected _createGhostLabel() {
+		const renderer = this.get("renderer");
+		const ghostLabel = renderer.makeLabel(new DataItem(this, undefined, {}), []);
+		ghostLabel.adapters.disable("text");
+		ghostLabel.setAll({ opacity: 0, tooltipText: undefined, tooltipHTML: undefined, interactive: false });
+		ghostLabel.events.disable();
+		this.ghostLabel = ghostLabel;
 	}
 
 	protected _updateFinals(_start: number, _end: number) {
@@ -430,7 +451,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	 * @return            Zoom animation
 	 */
 	public zoom(start: number, end: number, duration?: number, priority?: "start" | "end"): Animation<this["_settings"]["start"]> | Animation<this["_settings"]["end"]> | undefined {
-		if(this.get("zoomable", true)){
+		if (this.get("zoomable", true)) {
+
 			this._updateFinals(start, end);
 
 			if (this.get("start") !== start || this.get("end") != end) {
@@ -439,9 +461,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 				if (start > end) {
 					[start, end] = [end, start];
-				}					
+				}
 
-				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));				
+				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
 
 				if (start < - maxDeviation) {
 					start = -maxDeviation;
@@ -449,7 +471,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 				if (end > 1 + maxDeviation) {
 					end = 1 + maxDeviation;
-				}			
+				}
 
 				if (!$type.isNumber(duration)) {
 					duration = this.get("interpolationDuration", 0);
@@ -481,6 +503,12 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				}
 
 				let minZoomCount = this.get("minZoomCount", 0);
+				const dataItems = this.dataItems;
+
+				if (dataItems && dataItems.length < minZoomCount) {
+					minZoomCount = dataItems.length;
+				}
+
 				let maxZoomCount = this.get("maxZoomCount", Infinity);
 
 				if ($type.isNumber(minZoomCount)) {
@@ -550,7 +578,6 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					return;
 				}
 
-
 				if (duration > 0) {
 					let easing = this.get("interpolationEasing");
 					let sAnimation, eAnimation;
@@ -574,6 +601,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				else {
 					this.set("start", start);
 					this.set("end", end);
+					this.root.events.once("frameended", () => {
+						this.markDirtyKey("start");
+					});
 				}
 			}
 			else {
@@ -642,12 +672,12 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * @ignore
 	 */
-	public abstract getDataItemPositionX(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number, exactLocation?:boolean): number;
+	public abstract getDataItemPositionX(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number, exactLocation?: boolean): number;
 
 	/**
 	 * @ignore
 	 */
-	public abstract getDataItemPositionY(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number, exactLocation?:boolean): number;
+	public abstract getDataItemPositionY(_dataItem: DataItem<IXYSeriesDataItem>, _field: string, _cellLocation?: number, _axisLocation?: number, exactLocation?: boolean): number;
 
 	/**
 	 * @ignore
@@ -683,11 +713,14 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this.get("fixAxisSize")) {
-			this.ghostLabel.set("visible", true);
-		}
-		else {
-			this.ghostLabel.set("visible", false);
+		const ghostLabel = this.ghostLabel;
+		if (ghostLabel) {
+			if (this.get("fixAxisSize")) {
+				ghostLabel.set("visible", true);
+			}
+			else {
+				ghostLabel.set("visible", false);
+			}
 		}
 
 		if (this.isDirty("start") || this.isDirty("end")) {
@@ -949,6 +982,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		if (!minor && !dataItem.get("axisFill")) {
 			renderer.makeAxisFill(dataItem, tags);
 		}
+		else if (minor && !dataItem.get("axisFill") && this.get("minorAxisFillsEnabled")) {
+			renderer.makeAxisFill(dataItem, tags);
+		}
 
 		this._processBullet(dataItem);
 	}
@@ -1025,26 +1061,28 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	protected _updateGhost() {
 		this.setPrivate("cellWidth", this.getCellWidthPosition() * this.get("renderer").axisLength());
 		const ghostLabel = this.ghostLabel;
-		if (!ghostLabel.isHidden()) {
-			const bounds = ghostLabel.localBounds();
-			const gWidth = Math.ceil(bounds.right - bounds.left);
-			let text = ghostLabel.get("text");
-			$array.each(this.dataItems, (dataItem) => {
-				const label = dataItem.get("label");
-				if (label && !label.isHidden()) {
-					const bounds = label.localBounds();
-					const w = Math.ceil(bounds.right - bounds.left);
+		if (ghostLabel) {
+			if (!ghostLabel.isHidden()) {
+				const bounds = ghostLabel.localBounds();
+				const gWidth = Math.ceil(bounds.right - bounds.left);
+				let text = ghostLabel.get("text");
+				$array.each(this.dataItems, (dataItem) => {
+					const label = dataItem.get("label");
+					if (label && !label.isHidden()) {
+						const bounds = label.localBounds();
+						const w = Math.ceil(bounds.right - bounds.left);
 
-					if (w > gWidth) {
-						text = label.text._getText();
+						if (w > gWidth) {
+							text = label.text._getText();
+						}
 					}
-				}
-			})
-			ghostLabel.set("text", text);
+				})
+				ghostLabel.set("text", text);
+			}
+			let start = this.get("start", 0);
+			let end = this.get("end", 1);
+			this.get("renderer").updateLabel(ghostLabel, start + (end - start) * 0.5);
 		}
-		let start = this.get("start", 0);
-		let end = this.get("end", 1);
-		this.get("renderer").updateLabel(ghostLabel, start + (end - start) * 0.5);
 	}
 
 	public _handleCursorPosition(position: number, snapToSeries?: Array<XYSeries>) {
@@ -1071,8 +1109,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 			$array.each(this.series, (series) => {
 				if (series.get("baseAxis") === this) {
-					const dataItem = this.getSeriesItem(series, position!, this.get("tooltipLocation"));					
-					
+					const dataItem = this.getSeriesItem(series, position!, this.get("tooltipLocation"));
+
 					if (snapToSeries && snapToSeries.indexOf(series) != -1) {
 						series.updateLegendMarker(dataItem);
 						series.updateLegendValue(dataItem);
@@ -1081,20 +1119,20 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					else {
 						series.showDataItemTooltip(dataItem);
 						series.setRaw("tooltipDataItem", dataItem);
-					}										
+					}
 				}
 			})
 
 			if (this.get("snapTooltip")) {
 				position = this.roundAxisPosition(position, this.get("tooltipLocation", 0.5));
 			}
-			
+
 			this.setPrivateRaw("tooltipPosition", position);
 
 			if (tooltip) {
 				renderer.updateTooltipBounds(tooltip);
 
-				if (!$type.isNaN(position)) {					
+				if (!$type.isNaN(position)) {
 					this._updateTooltipText(tooltip, position);
 					renderer.positionTooltip(tooltip, position);
 
@@ -1255,5 +1293,5 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * @ignore
 	 */
-	public abstract nextPosition(_count?:number):number
+	public abstract nextPosition(_count?: number): number
 }

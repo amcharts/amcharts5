@@ -8,6 +8,7 @@ export { IDisposer, Disposer, ArrayDisposer, MultiDisposer, MutableValueDisposer
 
 export { Bullet, IBulletSettings, IBulletPrivate } from "./.internal/core/render/Bullet";
 export { Button, IButtonSettings, IButtonPrivate } from "./.internal/core/render/Button";
+export { ConfirmButton, IConfirmButtonSettings, IConfirmButtonPrivate } from "./.internal/core/render/ConfirmButton";
 export { Circle, ICircleSettings, ICirclePrivate } from "./.internal/core/render/Circle";
 export { Polygon, IPolygonSettings, IPolygonPrivate } from "./.internal/core/render/Polygon";
 export { Ellipse, IEllipseSettings, IEllipsePrivate } from "./.internal/core/render/Ellipse";
@@ -24,6 +25,8 @@ export { EditableLabel, IEditableLabelSettings, IEditableLabelPrivate } from "./
 export { Layout, ILayoutSettings, ILayoutPrivate } from "./.internal/core/render/Layout";
 export { Legend, ILegendSettings, ILegendPrivate, ILegendEvents } from "./.internal/core/render/Legend";
 export { Line, ILineSettings, ILinePrivate } from "./.internal/core/render/Line";
+export { Link, ILinkSettings, ILinkPrivate } from "./.internal/core/render/Link";
+export { OrthogonalLine, IOrthogonalLineSettings, IOrthogonalLinePrivate } from "./.internal/core/render/OrthogonalLine";
 export { Picture, IPictureSettings, IPicturePrivate } from "./.internal/core/render/Picture";
 export { PointedRectangle, IPointedRectangleSettings, IPointedRectanglePrivate } from "./.internal/core/render/PointedRectangle";
 export { RadialLabel, IRadialLabelSettings, IRadialLabelPrivate } from "./.internal/core/render/RadialLabel";
@@ -80,6 +83,9 @@ export { TextFormatter } from "./.internal/core/util/TextFormatter";
 export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/core/render/SpriteResizer";
 export { CanvasRenderer } from "./.internal/core/render/backend/CanvasRenderer";
 export { CanvasLayer } from "./.internal/core/render/backend/CanvasRenderer";
+
+export { NumericStepper, INumericStepperSettings, INumericStepperPrivate } from "./.internal/core/render/NumericStepper";
+export { ProgressPie } from "./.internal/core/render/ProgressPie";
 
 export type { IBounds } from "./.internal/core/util/IBounds";
 export type { IGeoPoint } from "./.internal/core/util/IGeoPoint";

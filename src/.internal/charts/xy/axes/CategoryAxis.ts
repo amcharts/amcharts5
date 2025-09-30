@@ -1,14 +1,16 @@
 import type { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
-import { Axis, IAxisSettings, IAxisPrivate, IAxisDataItem, IAxisEvents } from "./Axis";
+import type { Tooltip } from "../../../core/render/Tooltip";
 import type { IXYSeriesDataItem, XYSeries } from "../series/XYSeries";
+
+import { Axis, IAxisSettings, IAxisPrivate, IAxisDataItem, IAxisEvents } from "./Axis";
+import { populateString } from "../../../core/util/PopulateString";
+import { ValueAxis } from "./ValueAxis";
+
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
 import * as $utils from "../../../core/util/Utils";
-import { populateString } from "../../../core/util/PopulateString";
-import type { Tooltip } from "../../../core/render/Tooltip";
-import { ValueAxis } from "./ValueAxis";
 
 export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
 
@@ -23,6 +25,16 @@ export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSett
 	 * A field in data which holds categories.
 	 */
 	categoryField: string;
+
+	/**
+	 * A key to look up in data for an id of the data item.
+	 */
+	idField?: string;
+
+	/**
+	 * A key to look up in data for a relative size value of the data item. 
+	 */
+	cellSizeField?: string;
 
 	/**
 	 * Relative location of where axis cell starts: 0 - beginning, 1 - end.
@@ -76,6 +88,22 @@ export interface ICategoryAxisDataItem extends IAxisDataItem {
 	 */
 	deltaPosition?: number;
 
+	/**
+	 * A size of the category cell.
+	 *
+	 * NOTE: This value is used only if `cellSizeField` is set on the series.
+	 */
+	cellSize?: number;
+
+	/**
+	 * @ignore
+	 */
+	finalCellSize?: number;
+
+	/**
+	 * A unique id of the data item.
+	 */
+	id?: string;
 }
 
 export interface ICategoryAxisPrivate extends IAxisPrivate {
@@ -89,7 +117,6 @@ export interface ICategoryAxisPrivate extends IAxisPrivate {
 	 * End index of the current zoom scope.
 	 */
 	endIndex?: number;
-
 }
 
 export interface ICategoryAxisEvents extends IAxisEvents {
@@ -117,10 +144,22 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
-		this.fields.push("category");
+		this.fields.push("category", "id", "cellSize");
 		this.setPrivateRaw("name", "category");
 		this.addTag("category");
 		super._afterNew();
+	}
+
+	public _afterDataChange(): void {
+		super._afterDataChange();
+		const len = this.dataItems.length;
+		if (len > 0) {
+			this.setPrivateRaw("maxZoomFactor", len);
+		}
+
+		// fix final indexes		
+		this.setPrivateRaw("startIndex", Math.min(this.getPrivate("startIndex", 0), len));
+		this.setPrivateRaw("endIndex", Math.min(this.getPrivate("endIndex", len), 1));
 	}
 
 	public _prepareChildren() {
@@ -139,8 +178,13 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivateRaw("maxZoomFactor", len);
 		}
 
-		this.setPrivateRaw("startIndex", Math.max(Math.round(this.get("start", 0) * len), 0));
-		this.setPrivateRaw("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));
+		let start = this.get("start", 0);
+		let end = this.get("end", 1);
+
+		let indices = this._getIndices(start, end);
+
+		this.setPrivateRaw("startIndex", indices.startIndex);
+		this.setPrivateRaw("endIndex", indices.endIndex);
 
 		if (this._sizeDirty || this._valuesDirty || (this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("endIndex") || this.isPrivateDirty("startIndex") || this.isPrivateDirty("width") || this.isPrivateDirty("height"))) {
 			if (this.dataItems.length > 0) {
@@ -151,10 +195,91 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 	}
 
+	/**
+	 * @ignore
+	 */
+	public adjustZoom(): void {
+		const len = this.dataItems.length;
+		if (len > 1) {
+			let maxZoomCount = this.get("maxZoomCount", this.dataItems.length);
+			let minZoomCount = this.get("minZoomCount", 1);
+
+			let count = 0;
+			let startIndex = this.getPrivate("startIndex", 0);
+			let endIndex = this.getPrivate("endIndex", 0);
+
+			const sAnimation = this._sAnimation;
+			const eAnimation = this._eAnimation;
+
+			let start = this.get("start", 0);
+			let getIndices = false;
+			if (sAnimation && !sAnimation.stopped) {
+				start = Number(sAnimation.to);
+				getIndices = true;
+			}
+			let end = this.get("end", 1);
+			if (eAnimation && !eAnimation.stopped) {
+				end = Number(eAnimation.to);
+				getIndices = true;
+			}
+
+			if (getIndices) {
+				const indices = this._getIndices(start, end);
+				startIndex = indices.startIndex;
+				endIndex = indices.endIndex;
+			}
+
+			for (let i = startIndex; i < endIndex; i++) {
+				const dataItem = this.dataItems[i];
+				count += dataItem.get("finalCellSize", 1);
+			};
+
+			if (count <= minZoomCount) {
+				// need to zoom out
+				let c = 0;
+
+				for (let i = startIndex; i < len; i++) {
+					const dataItem = this.dataItems[i];
+					c += dataItem.get("finalCellSize", 1);
+
+					endIndex = i + 1;
+					if (c >= minZoomCount) {
+						break;
+					}
+				}
+
+				if (c < minZoomCount) {
+					// still not enough, try to extend at the start
+					for (let i = startIndex - 1; i >= 0; i--) {
+						const dataItem = this.dataItems[i];
+						c += dataItem.get("finalCellSize", 1);
+						startIndex = i;
+						if (c >= minZoomCount) {
+							break;
+						}
+					}
+				}
+				this.zoomToIndexes(startIndex, endIndex);
+			}
+			else if (count >= maxZoomCount) {
+				let c = count;
+				for (let i = endIndex - 1; i >= startIndex; i--) {
+					const dataItem = this.dataItems[i];
+					c -= dataItem.get("finalCellSize", 1);
+					if (c <= maxZoomCount) {
+						endIndex = i + 1;
+						break;
+					}
+				}
+				this.zoomToIndexes(startIndex, endIndex);
+			}
+		}
+	}
+
 	protected _handleRangeChange() {
 		$array.each(this.series, (series) => {
-			let startCategory = this.dataItems[this.startIndex()].get("category");
-			let endCategory = this.dataItems[this.endIndex() - 1].get("category");
+			let startCategory = this.dataItems[this.startIndex()].get("category")!;
+			let endCategory = this.dataItems[this.endIndex() - 1].get("category")!;
 
 			let baseAxis = series.get("baseAxis");
 			let xAxis = series.get("xAxis");
@@ -191,37 +316,53 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 						let startDataItem: DataItem<IXYSeriesDataItem> | undefined;
 						let endDataItem: DataItem<IXYSeriesDataItem> | undefined;
 
-						for (let i = 0, len = series.dataItems.length; i < len; i++) {
-							let dataItem = series.dataItems[i];
-							if (key) {
-								if (dataItem.get(key as any) === startCategory) {
-									startDataItem = dataItem;
-									break;
+						function findDataItem(
+							series: XYSeries,
+							categoryAxis: CategoryAxis<any>,
+							key: string | undefined,
+							openKey: string | undefined,
+							category: string,
+							direction: "previous" | "next"
+						): DataItem<IXYSeriesDataItem> | undefined {
+							let dataItem: DataItem<IXYSeriesDataItem> | undefined;
+							let idx = categoryAxis.categoryToIndex(category!);
+
+							while (!dataItem && idx >= 0 && idx < categoryAxis.dataItems.length) {
+								let searchCategory = categoryAxis.dataItems[idx].get("category");
+								if (direction == "previous") {
+									for (let i = series.dataItems.length - 1; i >= 0; i--) {
+										let item = series.dataItems[i];
+										if (key && item.get(key as any) === searchCategory) {
+											dataItem = item;
+											break;
+										}
+										if (openKey && item.get(openKey as any) === searchCategory) {
+											dataItem = item;
+											break;
+										}
+									}
+								} else {
+									for (let i = 0, len = series.dataItems.length; i < len; i++) {
+										let item = series.dataItems[i];
+										if (key && item.get(key as any) === searchCategory) {
+											dataItem = item;
+											break;
+										}
+										if (openKey && item.get(openKey as any) === searchCategory) {
+											dataItem = item;
+											break;
+										}
+									}
+								}
+								if (!dataItem) {
+									idx += direction === "previous" ? -1 : 1;
 								}
 							}
-							if (openKey) {
-								if (dataItem.get(openKey as any) === startCategory) {
-									startDataItem = dataItem;
-									break;
-								}
-							}
+							return dataItem;
 						}
 
-						for (let i = series.dataItems.length - 1; i >= 0; i--) {
-							let dataItem = series.dataItems[i];
-							if (key) {
-								if (dataItem.get(key as any) === endCategory) {
-									endDataItem = dataItem;
-									break;
-								}
-							}
-							if (openKey) {
-								if (dataItem.get(openKey as any) === endCategory) {
-									endDataItem = dataItem;
-									break;
-								}
-							}
-						}
+						startDataItem = findDataItem(series, this, key, openKey, startCategory, "next");
+						endDataItem = findDataItem(series, this, key, openKey, endCategory, "previous");
 
 						let startIndex = 0;
 						let endIndex = series.dataItems.length;
@@ -286,6 +427,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
 
 		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1);
+
 		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
 
 		startIndex = Math.floor(startIndex / frequency) * frequency;
@@ -365,6 +507,10 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		if (dataItem.get("isRange")) {
 			fillEndIndex = endIndex;
+
+			if (!$type.isNumber(index)) {
+				return;
+			}
 		}
 		else {
 			fillEndIndex = index + this._frequency - 1;
@@ -488,24 +634,65 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @param   location  Location
 	 * @return            Index
 	 */
-	public indexToPosition(index: number, location?: number): number {
+	public indexToPosition(index: number, location?: number, final?: boolean): number {
+		let len = this.dataItems.length;
+		let position = 0;
+
+		if (len == 0) {
+			return 0;
+		}
+
+		if (index >= len) {
+			index = len - 1;
+			location = 1;
+		}
+
 		if (!$type.isNumber(location)) {
 			location = 0.5;
 		}
 
-		let len = this.dataItems.length;
+		if (!$type.isNumber(index)) {
+			return 0;
+		}
 
 		let startLocation = this.get("startLocation", 0);
 		let endLocation = this.get("endLocation", 1);
 
-		len -= startLocation;
-		len -= (1 - endLocation);
+		if (!this.get("cellSizeField")) {
+			len -= startLocation;
+			len -= (1 - endLocation);
 
-		let position = (index + location - startLocation) / len;
+			position = (index + location - startLocation) / len;
+		}
+		else {
+			let name: "finalCellSize" | "cellSize" = final ? "finalCellSize" : "cellSize";
 
-		let dataItem = this.dataItems[index];
-		if (dataItem) {
-			position += dataItem.get("deltaPosition", 0);
+			const dataItems = this.dataItems;
+
+			// Calculate total modified count (sum of cell sizes)
+			let modCount = 0;
+			$array.each(this.dataItems, (dataItem) => {
+				modCount += dataItem.get(name, 1);
+			});
+
+			modCount -= startLocation * dataItems[0].get(name, 1);
+			modCount -= (1 - endLocation) * dataItems[dataItems.length - 1].get(name, 1);
+
+			// Calculate the position based on cell sizes
+			let acc = 0;
+			for (let i = 0; i < index; i++) {
+				acc += dataItems[i].get(name, 1);
+			}
+			let cellSizeAtIndex = dataItems[index].get(name, 1);
+
+			position = (acc + location * cellSizeAtIndex - startLocation * dataItems[0].get(name, 1)) / modCount;
+		}
+
+		if (!final) {
+			let dataItem = this.dataItems[index];
+			if (dataItem) {
+				position += dataItem.get("deltaPosition", 0);
+			}
 		}
 
 		return position;
@@ -538,7 +725,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			return dataItem.get("index")!;
 		}
 		return NaN;
-	}	
+	}
 
 	/**
 	 * @ignore
@@ -564,7 +751,40 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 */
 	public axisPositionToIndex(position: number): number {
 		let len = this.dataItems.length;
-		return $math.fitToRange(Math.floor(position * len), 0, len - 1);//$math.fitToRange(Math.floor((end - start) * len * position + len * start), 0, len - 1);
+		if (len === 0) {
+			return 0;
+		}
+
+		// Calculate total modified length (sum of cell sizes)
+		if (this.get("cellSizeField")) {
+			let modifiedLen = 0;
+			let cellSizes: number[] = [];
+			$array.each(this.dataItems, (dataItem) => {
+				const cellSize = dataItem.get("cellSize", 1);
+				cellSizes.push(cellSize);
+				modifiedLen += cellSize;
+			});
+			// Adjust for startLocation and endLocation
+			let startLocation = this.get("startLocation", 0);
+			let endLocation = this.get("endLocation", 1);
+			modifiedLen -= startLocation;
+			modifiedLen -= (1 - endLocation);
+
+			// Find which cell the position falls into
+			let rel = position * modifiedLen + startLocation;
+			let acc = 0;
+			for (let i = 0; i < len; i++) {
+				const cellSize = cellSizes[i];
+				if (rel < acc + cellSize) {
+					return i;
+				}
+				acc += cellSize;
+			}
+			return len - 1;
+		}
+		else {
+			return $math.fitToRange(Math.floor(position * len), 0, len - 1);
+		}
 	}
 
 	/**
@@ -621,6 +841,45 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 	}
 
+	public _getIndices(start: number, end: number): { startIndex: number, endIndex: number } {
+		let len = this.dataItems.length;
+		let startIndex = 0;
+		let endIndex = len;
+
+		if (this.get("cellSizeField")) {
+			let count = 0;
+			$array.each(this.dataItems, (dataItem) => {
+				count += dataItem.get("cellSize", 1);
+			});
+
+			let c = 0;
+			for (let i = 0; i < len; i++) {
+				c += this.dataItems[i].get("cellSize", 1);
+				if (c / count > start) {
+					startIndex = i;
+					break;
+				}
+			}
+
+			for (let i = startIndex + 1; i < len; i++) {
+				c += this.dataItems[i].get("cellSize", 1);
+				if (c / count > end) {
+					endIndex = i + 1;
+					break;
+				}
+			}
+
+			startIndex = Math.max(startIndex, 0);
+			endIndex = Math.min(endIndex, len);
+		}
+		else {
+			startIndex = Math.max(Math.round(this.get("start", 0) * len), 0);
+			endIndex = Math.min(Math.round(this.get("end", 1) * len), len);
+		}
+
+		return { startIndex, endIndex };
+	}
+
 	/**
 	 * Zooms the axis to specific `start` and `end` indexes.
 	 *
@@ -632,7 +891,16 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	 */
 	public zoomToIndexes(start: number, end: number, duration?: number) {
 		let len = this.dataItems.length;
-		this.zoom(start / len, end / len, duration);
+		if (this.get("cellSizeField")) {
+			start = Math.min(Math.max(start, 0), len);
+			end = Math.max(Math.min(end, len), 1);
+			this.setPrivateRaw("startIndex", start);
+			this.setPrivateRaw("endIndex", end);
+			this.zoom(this.indexToPosition(start, 0, true), this.indexToPosition(end, 0, true), duration);
+		}
+		else {
+			this.zoom(start / len, end / len, duration);
+		}
 	}
 
 	public zoomToCategories(startCategory: string, endCategory: string, duration?: number) {
@@ -648,22 +916,22 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	public getCellWidthPosition(): number {
 		return this._frequency / this.dataItems.length / (this.get("end", 1) - this.get("start", 0));
 	}
-	
+
 	/**
 	 * @ignore
-	 */	
-	public nextPosition(count?:number){
-		if(count == null){
+	 */
+	public nextPosition(count?: number) {
+		if (count == null) {
 			count = 1;
 		}
 
-		if(this.get("renderer").getPrivate("letter") == "Y"){
+		if (this.get("renderer").getPrivate("letter") == "Y") {
 			count *= -1;
 		}
 
 		const position = this.getPrivate("tooltipPosition", 0);
 
-		const index = $math.fitToRange(this.axisPositionToIndex(position) + count, 0, this.dataItems.length - 1);		
+		const index = $math.fitToRange(this.axisPositionToIndex(position) + count, 0, this.dataItems.length - 1);
 		return this.toGlobalPosition(this.indexToPosition(index));
 	}
 }

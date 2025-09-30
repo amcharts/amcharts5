@@ -249,6 +249,7 @@ export class XYChartDefaultTheme extends Theme {
 		 */
 
 		r("Axis").setAll({
+			zoomOut: true,
 			start: 0,
 			end: 1,
 			minZoomCount: 1,
@@ -322,7 +323,7 @@ export class XYChartDefaultTheme extends Theme {
 		});
 
 		{
-			const rule = r("Rectangle", ["axis", "thumb"]);
+			const rule = r("Rectangle", ["axis", "thumb", "zoomgrip"]);
 
 			rule.setAll({
 				fillOpacity: 0
@@ -333,11 +334,11 @@ export class XYChartDefaultTheme extends Theme {
 			rule.states.create("hover", { fillOpacity: 0.1 })
 		}
 
-		r("Rectangle", ["axis", "thumb", "x"]).setAll({
+		r("Rectangle", ["axis", "thumb", "x", "zoomgrip"]).setAll({
 			cursorOverStyle: "ew-resize"
 		});
 
-		r("Rectangle", ["axis", "thumb", "y"]).setAll({
+		r("Rectangle", ["axis", "thumb", "y", "zoomgrip"]).setAll({
 			cursorOverStyle: "ns-resize"
 		});
 
@@ -530,6 +531,8 @@ export class XYChartDefaultTheme extends Theme {
 			markUnitChange: true,
 			groupData: false,
 			groupCount: 500,
+			skipFirstMinor: true,
+			weekLabelLocation: 0,
 			gridIntervals: $array.copy(gridIntervals),
 			dateFormats: $object.copy(dateFormats),
 			periodChangeDateFormats: $object.copy(periodChangeDateFormats),

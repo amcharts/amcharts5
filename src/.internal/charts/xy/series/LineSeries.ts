@@ -9,6 +9,7 @@ import { ListTemplate } from "../../../core/util/List";
 import { color } from "../../../core/util/Color";
 import { DataItem } from "../../../core/render/Component";
 import { Rectangle } from "../../../core/render/Rectangle";
+
 import * as $type from "../../../core/util/Type";
 import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
@@ -779,7 +780,7 @@ export class LineSeries extends XYSeries {
 							marker.children.push(sprite);
 							sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });
 
-							marker.events.on("boundschanged", ()=>{
+							marker.events.on("boundschanged", () => {
 								sprite.setAll({ x: marker.width() / 2, y: marker.height() / 2 });
 							})
 						}

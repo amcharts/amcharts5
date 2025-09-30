@@ -450,7 +450,10 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 
 				let month = date.getUTCMonth();
 				if (count > 1) {
-					month = Math.floor(month / count) * count;
+					// only do this if count is 2, 3, 4, and 6
+					if (count == 2 || count == 3 || count == 4 || count == 6) {
+						month = Math.floor(month / count) * count;
+					}
 				}
 
 				date.setUTCMonth(month, 1);

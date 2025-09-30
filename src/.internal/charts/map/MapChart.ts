@@ -549,9 +549,7 @@ export class MapChart extends SerialChart {
 				const zoomLevel = this.get("zoomLevel", 1);
 
 				if (zoomLevel == this.get("minZoomLevel", 1)) {
-					this.root.events.once("frameended", () =>{
-						zoomControl.minusButton.set("disabled", true);
-					})										
+					zoomControl.minusButton.set("disabled", true);
 				}
 				else {
 					zoomControl.minusButton.set("disabled", false);

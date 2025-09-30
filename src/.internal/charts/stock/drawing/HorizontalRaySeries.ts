@@ -102,7 +102,7 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 	
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
-		if (this._drawingEnabled) {
+		if (this._drawingEnabled && !this._canceled) {
 			if (!this._isDragging) {
 				if (this.unselectAllDrawings() == 0) {
 					this._increaseIndex();
@@ -115,5 +115,6 @@ export class HorizontalRaySeries extends SimpleLineSeries {
 				}
 			}
 		}
+		this._canceled = false;
 	}
 }

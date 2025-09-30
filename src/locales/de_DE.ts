@@ -115,6 +115,7 @@ export default {
 	"_date_minute": "HH:mm",
 	"_date_minute_full": "HH:mm - dd. MMM, yyyy",
 	"_date_hour": "HH:mm",
+	"_date_hour_short": "HH",
 	"_date_hour_full": "HH:mm - dd. MMM, yyyy",
 	"_date_day": "dd. MMM",
 	"_date_day_full": "dd. MMM, yyyy",
@@ -335,4 +336,9 @@ export default {
 	"Error parsing file: %1": "Fehler beim Parsen von Datei %1",
 	"Unable to load file: %1": "Datei %1 konnte nicht geladen werden",
 	"Invalid date": "Kein Datum",
+
+	// Common actions
+	"Close": "",
+	"Minimize": "",
+	"Confirm": ""
 };

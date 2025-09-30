@@ -1,9 +1,9 @@
-import { CurveChart, ICurveChartPrivate, ICurveChartSettings } from "./CurveChart";
-import { p50, Percent } from "../../core/util/Percent";
-
 import type { CurveColumnSeries } from "./CurveColumnSeries";
 import type { AxisRendererCurveY } from "./AxisRendererCurveY";
 import type { AxisRendererCurveX } from "./AxisRendererCurveX";
+
+import { CurveChart, ICurveChartPrivate, ICurveChartSettings } from "./CurveChart";
+import { p50, Percent } from "../../core/util/Percent";
 
 import * as $math from "../../core/util/Math";
 import * as $utils from "../../core/util/Utils";

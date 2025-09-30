@@ -634,7 +634,7 @@ export class WordCloud extends Series {
 				}
 			}
 
-			words.sort(function (a, b) {
+			words.sort(function(a, b) {
 				if (a.value == b.value) {
 					return 0;
 				}

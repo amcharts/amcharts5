@@ -2,7 +2,7 @@ import type { Label } from "../render/Label";
 import type { Graphics } from "../render/Graphics";
 
 import { RoundedRectangle } from "../render/RoundedRectangle";
-import { Container, IContainerPrivate, IContainerSettings } from "./Container";
+import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
 
 import * as $utils from "../../core/util/Utils";
 
@@ -21,6 +21,9 @@ export interface IButtonSettings extends IContainerSettings {
 }
 
 export interface IButtonPrivate extends IContainerPrivate {
+}
+
+export interface IButtonEvents extends IContainerEvents {
 }
 
 /**
@@ -46,6 +49,7 @@ export class Button extends Container {
 
 	declare public _settings: IButtonSettings;
 	declare public _privateSettings: IButtonPrivate;
+	declare public _events: IButtonEvents;
 
 	public static className: string = "Button";
 	public static classNames: Array<string> = Container.classNames.concat([Button.className]);

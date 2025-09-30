@@ -35,7 +35,7 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 	}
 
 	protected _handlePointerClickReal(event: ISpritePointerEvent) {
-		if (!this._isDragging) {
+		if (!this._isDragging && !this._canceled) {
 			if (!this._isDrawing) {
 				if (!this._firstClick) {
 					if(this.unselectDrawings() == 0){
@@ -55,6 +55,7 @@ export class ParallelChannelSeries extends SimpleLineSeries {
 				this._firstClick = false;
 			}
 		}
+		this._canceled = false;
 	}
 
 

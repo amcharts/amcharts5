@@ -48,7 +48,13 @@ export class CandlestickSeries extends ColumnSeries {
 	 * @ignore
 	 */
 	public makeColumn(dataItem: DataItem<this["_dataItemSettings"]>, listTemplate: ListTemplate<Candlestick>): Candlestick {
-		const column = this.mainContainer.children.push(listTemplate.make());
+		const column = listTemplate.make();
+		if (!this.get("turboMode")) {
+			this.mainContainer.children.push(column);
+		}
+		else {
+			column.virtualParent = this.chart;
+		}
 		column._setDataItem(dataItem);
 		listTemplate.push(column);
 		return column;
@@ -70,12 +76,11 @@ export class CandlestickSeries extends ColumnSeries {
 		}, [this.columns.template])
 	));
 
-	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>) {
-		super._updateGraphics(dataItem, previousDataItem);
+	protected _updateGraphics(dataItem: DataItem<this["_dataItemSettings"]>, previousDataItem: DataItem<this["_dataItemSettings"]>, axisCase: 0 | 1 | 2) {
+		super._updateGraphics(dataItem, previousDataItem, axisCase);
 
 		const xAxis = this.getRaw("xAxis");
 		const yAxis = this.getRaw("yAxis");
-		const baseAxis = this.getRaw("baseAxis");
 
 		let vcy = this.get("vcy", 1);
 		let vcx = this.get("vcx", 1);
@@ -98,27 +103,7 @@ export class CandlestickSeries extends ColumnSeries {
 
 		let orientation: "horizontal" | "vertical";
 
-		if (yAxis === baseAxis) {
-			let open = xAxis.getDataItemPositionX(dataItem, this._xOpenField, 1, vcx);
-			let close = xAxis.getDataItemPositionX(dataItem, this._xField, 1, vcx);
-
-			lx1 = xAxis.getDataItemPositionX(dataItem, this._xLowField, 1, vcx);
-			hx1 = xAxis.getDataItemPositionX(dataItem, this._xHighField, 1, vcx);
-
-			hx0 = Math.max(open, close);
-			lx0 = Math.min(open, close);
-
-			let startLocation = this._aLocationY0 + openLocationY - 0.5;
-			let endLocation = this._aLocationY1 + locationY - 0.5;
-
-			ly0 = yAxis.getDataItemPositionY(dataItem, this._yField, startLocation + (endLocation - startLocation) / 2, vcy);
-			ly1 = ly0;
-			hy0 = ly0;
-			hy1 = ly0;
-
-			orientation = "horizontal";
-		}
-		else {
+		if (axisCase == 0) {
 			let open = yAxis.getDataItemPositionY(dataItem, this._yOpenField, 1, vcy);
 			let close = yAxis.getDataItemPositionY(dataItem, this._yField, 1, vcy);
 
@@ -138,6 +123,26 @@ export class CandlestickSeries extends ColumnSeries {
 
 			orientation = "vertical";
 		}
+		else {
+			let open = xAxis.getDataItemPositionX(dataItem, this._xOpenField, 1, vcx);
+			let close = xAxis.getDataItemPositionX(dataItem, this._xField, 1, vcx);
+
+			lx1 = xAxis.getDataItemPositionX(dataItem, this._xLowField, 1, vcx);
+			hx1 = xAxis.getDataItemPositionX(dataItem, this._xHighField, 1, vcx);
+
+			hx0 = Math.max(open, close);
+			lx0 = Math.min(open, close);
+
+			let startLocation = this._aLocationY0 + openLocationY - 0.5;
+			let endLocation = this._aLocationY1 + locationY - 0.5;
+
+			ly0 = yAxis.getDataItemPositionY(dataItem, this._yField, startLocation + (endLocation - startLocation) / 2, vcy);
+			ly1 = ly0;
+			hy0 = ly0;
+			hy1 = ly0;
+
+			orientation = "horizontal";
+		}
 
 		this._updateCandleGraphics(dataItem, lx0, lx1, ly0, ly1, hx0, hx1, hy0, hy1, orientation)
 	}
@@ -152,43 +157,104 @@ export class CandlestickSeries extends ColumnSeries {
 			let ph0 = this.getPoint(hx0, hy0);
 			let ph1 = this.getPoint(hx1, hy1);
 
-			let x = column.x();
-			let y = column.y();
+			if (this.get("turboMode")) {
+				const currentDI = this.allColumnsData[this.allColumnsData.length - 1];
+				currentDI.lowX0 = pl0.x;
+				currentDI.lowY0 = pl0.y;
 
-			column.set("lowX0", pl0.x - x);
-			column.set("lowY0", pl0.y - y);
+				currentDI.lowX1 = pl1.x;
+				currentDI.lowY1 = pl1.y;
 
-			column.set("lowX1", pl1.x - x);
-			column.set("lowY1", pl1.y - y);
+				currentDI.highX0 = ph0.x;
+				currentDI.highY0 = ph0.y;
 
-			column.set("highX0", ph0.x - x);
-			column.set("highY0", ph0.y - y);
+				currentDI.highX1 = ph1.x;
+				currentDI.highY1 = ph1.y;
+			}
+			else {
+				let x = column.x();
+				let y = column.y();
 
-			column.set("highX1", ph1.x - x);
-			column.set("highY1", ph1.y - y);
+				column.set("lowX0", pl0.x - x);
+				column.set("lowY0", pl0.y - y);
 
-			column.set("orientation", orientation);
+				column.set("lowX1", pl1.x - x);
+				column.set("lowY1", pl1.y - y);
 
-			let rangeGraphics = dataItem.get("rangeGraphics")!;
-			if (rangeGraphics) {
-				$array.each(rangeGraphics, (column: any) => {
-					column.set("lowX0", pl0.x - x);
-					column.set("lowY0", pl0.y - y);
+				column.set("highX0", ph0.x - x);
+				column.set("highY0", ph0.y - y);
 
-					column.set("lowX1", pl1.x - x);
-					column.set("lowY1", pl1.y - y);
+				column.set("highX1", ph1.x - x);
+				column.set("highY1", ph1.y - y);
 
-					column.set("highX0", ph0.x - x);
-					column.set("highY0", ph0.y - y);
+				column.set("orientation", orientation);
 
-					column.set("highX1", ph1.x - x);
-					column.set("highY1", ph1.y - y);
+				let rangeGraphics = dataItem.get("rangeGraphics")!;
+				if (rangeGraphics) {
+					$array.each(rangeGraphics, (column: any) => {
+						column.set("lowX0", pl0.x - x);
+						column.set("lowY0", pl0.y - y);
 
-					column.set("orientation", orientation);
-				})
+						column.set("lowX1", pl1.x - x);
+						column.set("lowY1", pl1.y - y);
+
+						column.set("highX0", ph0.x - x);
+						column.set("highY0", ph0.y - y);
+
+						column.set("highX1", ph1.x - x);
+						column.set("highY1", ph1.y - y);
+
+						column.set("orientation", orientation);
+					})
+				}
 			}
 		}
 	}
+
+	protected _afterColumnsDraw() {
+		if (this.get("turboMode")) {
+
+			this.allColumns.set("draw", (display) => {
+				display.clear();
+				$array.each(this.allColumnsData, (column) => {
+					display.beginPath();
+					const w = column.width;
+					const h = column.height;
+					const x = column.x;
+					const y = column.y;
+					const stroke = column.stroke;
+					const fill = column.fill;
+					const strokeWidth = column.strokeWidth;
+					const strokeOpacity = column.strokeOpacity;
+					const fillOpacity = column.fillOpacity;
+
+					const lowX0 = column.lowX0!;
+					const lowY0 = column.lowY0!;
+					const lowX1 = column.lowX1!;
+					const lowY1 = column.lowY1!;
+
+					const highX0 = column.highX0!;
+					const highY0 = column.highY0!;
+					const highX1 = column.highX1!;
+					const highY1 = column.highY1!;
+
+					display.beginFill(fill, fillOpacity);
+					display.beginPath();
+					display.lineStyle(strokeWidth, stroke, strokeOpacity);
+					display.drawRect(x, y, w, h);
+
+					display.moveTo(lowX0, lowY0);
+					display.lineTo(lowX1, lowY1);
+					display.moveTo(highX0, highY0);
+					display.lineTo(highX1, highY1);
+
+					display.endStroke();
+					display.endFill();
+				});
+			})
+		}
+	}
+
 
 	protected _processAxisRange(axisRange: this["_axisRangeType"]) {
 		super._processAxisRange(axisRange);

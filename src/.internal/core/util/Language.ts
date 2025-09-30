@@ -52,6 +52,7 @@ export interface ILocaleSettings {
 	"_date_minute"?: string;
 	"_date_minute_full"?: string;
 	"_date_hour"?: string;
+	"_date_hour_short"?: string;
 	"_date_hour_full"?: string;
 	"_date_day"?: string;
 	"_date_day_full"?: string;
@@ -248,9 +249,11 @@ export interface ILocaleSettings {
 	// Common actions
 	"Close"?: string;
 	"Minimize"?: string;
+	"Confirm"?: string;
 
 	"Venn Series"?: string;
 	"Venn Diagram"?: string;
+
 }
 
 /**

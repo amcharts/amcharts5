@@ -33,29 +33,29 @@ import * as $math from "../util/Math";
  */
 class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> extends EventDispatcher<E> {
 	protected static RENDERER_EVENTS: { [K in keyof IRendererEvents]?: <E extends Events<Sprite, ISpriteEvents>>(this: SpriteEventDispatcher<Sprite, E>, event: IRendererEvents[K]) => void } = {
-		"click": function(event) {
+		"click": function (event) {
 			if (this.isEnabled("click") && !this._sprite.isDragging() && this._sprite._hasDown() && !this._sprite._hasMoved(this._makePointerEvent("click", event))) {
 				this.dispatch("click", this._makePointerEvent("click", event));
 			}
 		},
 
-		"rightclick": function(event) {
+		"rightclick": function (event) {
 			if (this.isEnabled("rightclick")) {
 				this.dispatch("rightclick", this._makePointerEvent("rightclick", event));
 			}
 		},
 
-		"middleclick": function(event) {
+		"middleclick": function (event) {
 			if (this.isEnabled("middleclick")) {
 				this.dispatch("middleclick", this._makePointerEvent("middleclick", event));
 			}
 		},
 
-		"dblclick": function(event) {
+		"dblclick": function (event) {
 			this.dispatchParents("dblclick", this._makePointerEvent("dblclick", event));
 		},
 
-		"pointerover": function(event) {
+		"pointerover": function (event) {
 
 			const sprite = this._sprite;
 			let dispatch = true;
@@ -85,35 +85,35 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			}
 		},
 
-		"pointerout": function(event) {
+		"pointerout": function (event) {
 			if (this.isEnabled("pointerout")) {
 				this.dispatch("pointerout", this._makePointerEvent("pointerout", event));
 			}
 		},
 
-		"pointerdown": function(event) {
+		"pointerdown": function (event) {
 			this.dispatchParents("pointerdown", this._makePointerEvent("pointerdown", event));
 		},
 
-		"pointerup": function(event) {
+		"pointerup": function (event) {
 			if (this.isEnabled("pointerup")) {
 				this.dispatch("pointerup", this._makePointerEvent("pointerup", event));
 			}
 		},
 
-		"globalpointerup": function(event) {
+		"globalpointerup": function (event) {
 			if (this.isEnabled("globalpointerup")) {
 				this.dispatch("globalpointerup", this._makePointerEvent("globalpointerup", event));
 			}
 		},
 
-		"globalpointermove": function(event) {
+		"globalpointermove": function (event) {
 			if (this.isEnabled("globalpointermove")) {
 				this.dispatch("globalpointermove", this._makePointerEvent("globalpointermove", event));
 			}
 		},
 
-		"wheel": function(event) {
+		"wheel": function (event) {
 			this.dispatchParents("wheel", {
 				type: "wheel",
 				target: this._sprite,
@@ -166,8 +166,8 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 		return events.increment();
 	}
 
-	protected _on<C, Key extends keyof E>(once: boolean, type: Key | null, callback: any, context: C, shouldClone: boolean, dispatch: (type: Key, event: E[Key]) => void): EventListener {
-		const info = super._on(once, type, callback, context, shouldClone, dispatch);
+	protected _on<C, Key extends keyof E>(once: boolean, type: Key | null, callback: any, context: C, shouldClone: boolean, dispatch: (type: Key, event: E[Key]) => void, debounceDelay?: number): EventListener {
+		const info = super._on(once, type, callback, context, shouldClone, dispatch, debounceDelay);
 
 		const rendererEvent = (SpriteEventDispatcher.RENDERER_EVENTS as any)[type];
 		if (rendererEvent !== undefined) {
@@ -1080,7 +1080,9 @@ export abstract class Sprite extends Entity {
 
 	protected _tooltipPointerDp: MultiDisposer | undefined;
 
-	protected _statesHandled: boolean = false;
+	//protected _statesHandled: boolean = false;
+
+	protected _virtualParent: Container | undefined;
 
 	protected _afterNew() {
 		this.setPrivateRaw("visible", true);
@@ -1308,36 +1310,37 @@ export abstract class Sprite extends Entity {
 	}
 
 	protected _handleStates() {
-		if (!this._statesHandled) {
-			if (this.isDirty("active")) {
-				if (this.get("active")) {
-					this.states.applyAnimate("active");
-					this.set("ariaChecked", true);
-				}
-				else {
-					if (!this.isHidden()) {
-						this.states.applyAnimate("default");
-					}
-					this.set("ariaChecked", false);
-				}
-				this.markDirtyAccessibility();
-			}
+		//if (!this._statesHandled) {
+		if (this.isDirty("active")) {
 
-			if (this.isDirty("disabled")) {
-				if (this.get("disabled")) {
-					this.states.applyAnimate("disabled");
-					this.set("ariaChecked", false);
-				}
-				else {
-					if (!this.isHidden()) {
-						this.states.applyAnimate("default");
-					}
-					this.set("ariaChecked", true);
-				}
-				this.markDirtyAccessibility();
+			if (this.get("active")) {
+				this.states.applyAnimate("active");
+				this.set("ariaChecked", true);
 			}
-			this._statesHandled = true;
+			else {
+				if (!this.isHidden()) {
+					this.states.applyAnimate("default");
+				}
+				this.set("ariaChecked", false);
+			}
+			this.markDirtyAccessibility();
 		}
+
+		if (this.isDirty("disabled")) {
+			if (this.get("disabled")) {
+				this.states.applyAnimate("disabled");
+				this.set("ariaChecked", false);
+			}
+			else {
+				if (!this.isHidden()) {
+					this.states.applyAnimate("default");
+				}
+				this.set("ariaChecked", true);
+			}
+			this.markDirtyAccessibility();
+		}
+		//	this._statesHandled = true;
+		//}
 	}
 
 	public _changed() {
@@ -2135,7 +2138,7 @@ export abstract class Sprite extends Entity {
 	public _clearDirty() {
 		super._clearDirty();
 		this._sizeDirty = false;
-		this._statesHandled = false;
+		//this._statesHandled = false;
 	}
 
 	/**
@@ -2861,7 +2864,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	public _walkParents(f: (parent: Sprite) => void): void {
-		if (this._parent) {
+		if (this._parent || this._virtualParent) {
 			this._walkParent(f);
 		}
 	}
@@ -2870,8 +2873,18 @@ export abstract class Sprite extends Entity {
 		if (this._parent) {
 			this._parent._walkParent(f);
 		}
+		else {
+			if (this._virtualParent) {
+				this._virtualParent._walkParent(f);
+			}
+		}
 
 		f(this);
+	}
+
+	public set virtualParent(parent: Container | undefined) {
+		this._virtualParent = parent;
+		this._applyThemes();
 	}
 
 	/**

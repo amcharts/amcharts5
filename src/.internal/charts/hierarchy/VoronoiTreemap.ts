@@ -1,16 +1,16 @@
-import { voronoiTreemap } from 'd3-voronoi-treemap';
-import seedrandom from "seedrandom";
-
 import type { HierarchyNode } from "../hierarchy/HierarchyNode";
-
 import type { DataItem } from "../../core/render/Component";
+
 import { Hierarchy, IHierarchyPrivate, IHierarchySettings, IHierarchyDataItem } from "../hierarchy/Hierarchy";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
 import { Polygon } from "../../core/render/Polygon";
+import { p50 } from "../../core/util/Percent";
+import { voronoiTreemap } from 'd3-voronoi-treemap';
+import seedrandom from "seedrandom";
+
 import * as $utils from "../../core/util/Utils";
 import * as $array from "../../core/util/Array";
-import { p50 } from "../../core/util/Percent";
 
 
 export interface IVoronoiTreemapDataObject {

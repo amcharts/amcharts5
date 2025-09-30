@@ -166,7 +166,7 @@ export class Treemap extends Hierarchy {
 				this._updateVisuals();
 
 				const selectedDataItem = this.get("selectedDataItem") as DataItem<this["_dataItemSettings"]>;
-				if(selectedDataItem){
+				if (selectedDataItem) {
 					this._zoom(selectedDataItem);
 				}
 			}
@@ -367,7 +367,7 @@ export class Treemap extends Hierarchy {
 	protected _getVisibleNodes(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth: number) {
 		const children = dataItem.get("children");
 		let includedChildren: Array<DataItem<this["_dataItemSettings"]>> = [];
-		if(children){
+		if (children) {
 			$array.each(children, (child) => {
 				if (child.get("depth") == maxDepth || !child.get("children")) {
 					includedChildren.push(child);

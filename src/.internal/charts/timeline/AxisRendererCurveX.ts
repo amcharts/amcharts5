@@ -161,7 +161,7 @@ export class AxisRendererCurveX extends AxisRenderer {
 
 				let yAxisLenght = this.get("yRenderer").get("axisLength", 0);
 				let aw = maxX - minX + 2 * yAxisLenght;
-				let ah = maxY - minY + 2 * yAxisLenght;	
+				let ah = maxY - minY + 2 * yAxisLenght;
 
 				// calculate center
 				let centerX = (minX + maxX) / 2;

@@ -1,16 +1,18 @@
 import type { Sprite, ISpritePointerEvent } from "../../../core/render/Sprite";
-import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../../core/render/Graphics";
 import type { Axis, IAxisDataItem } from "./Axis";
-import { Template } from "../../../core/util/Template";
-import { ListTemplate } from "../../../core/util/List";
-import { AxisTick } from "./AxisTick";
-import { Grid } from "./Grid";
-import { AxisLabel } from "./AxisLabel";
 import type { IPoint } from "../../../core/util/IPoint";
 import type { Tooltip } from "../../../core/render/Tooltip";
 import type { AxisBullet } from "./AxisBullet";
 import type { XYChart } from "../XYChart";
 import type { DataItem } from "../../../core/render/Component";
+
+import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../../core/render/Graphics";
+import { Template } from "../../../core/util/Template";
+import { ListTemplate } from "../../../core/util/List";
+import { AxisTick } from "./AxisTick";
+import { Grid } from "./Grid";
+import { AxisLabel } from "./AxisLabel";
+
 import * as $utils from "../../../core/util/Utils";
 
 export interface IAxisRendererSettings extends IGraphicsSettings {

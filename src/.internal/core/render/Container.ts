@@ -115,7 +115,7 @@ export interface IContainerPrivate extends ISpritePrivate {
 	 * A `<div>` element used for HTML content of the `Container`.
 	 */
 	htmlElement?: HTMLDivElement;
-	
+
 	/**
 	 * A wrapper `<div>` for `htmlElement`.
 	 *
@@ -171,9 +171,22 @@ export class Container extends Sprite {
 	protected _vsbd0: IDisposer | undefined;
 	protected _vsbd1: IDisposer | undefined;
 
+	protected _hsbd0: IDisposer | undefined;
+	protected _hsbd1: IDisposer | undefined;
+
+	public _childrenPrep: boolean = false;
+	public _childrenUpdt: boolean = false;
+
 	protected _afterNew() {
 		super._afterNew();
 		this._display.addChild(this._childrenDisplay);
+	}
+
+	public _afterChanged(): void {
+		super._afterChanged();
+
+		this._childrenPrep = false;
+		this._childrenUpdt = false;
 	}
 
 	protected _dispose() {
@@ -186,6 +199,18 @@ export class Container extends Sprite {
 		}
 
 		super._dispose();
+	}
+
+	public _beforeChanged(): void {
+
+		if (!this._childrenPrep) {
+			this._prepareChildren();
+		}
+
+		if (!this._childrenUpdt) {
+			this._updateChildren();
+		}
+		super._beforeChanged();
 	}
 
 	public _changed() {
@@ -301,7 +326,16 @@ export class Container extends Sprite {
 			if (verticalScrollbar) {
 				verticalScrollbar.set("height", height);
 				verticalScrollbar.set("x", width - verticalScrollbar.width() - verticalScrollbar.get("marginRight", 0));
-				verticalScrollbar.set("end", verticalScrollbar.get("start", 0) + height / this._contentHeight);
+
+				let start = verticalScrollbar.get("start", 0);
+				let end = verticalScrollbar.get("end", 1);
+
+				if (start > 1 - end) {
+					verticalScrollbar.set("start", Math.max(0, end - height / this._contentHeight));
+				}
+				else {
+					verticalScrollbar.set("end", Math.min(1, start + height / this._contentHeight));
+				}
 
 				const bg = verticalScrollbar.get("background");
 				if (bg) {
@@ -548,6 +582,9 @@ export class Container extends Sprite {
 	}
 
 	public _prepareChildren() {
+
+		this._childrenPrep = true;
+
 		const innerWidth = this.innerWidth();
 		const innerHeight = this.innerHeight();
 
@@ -591,7 +628,7 @@ export class Container extends Sprite {
 			this.updateBackground();
 		}
 
-		this._handleStates();
+		//this._handleStates();
 	}
 
 	public _updateHTMLContent() {
@@ -631,6 +668,7 @@ export class Container extends Sprite {
 
 	public _updateChildren() {
 
+		this._childrenUpdt = true;
 
 		if (this.isDirty("html")) {
 			this._updateHTMLContent();
@@ -725,6 +763,8 @@ export class Container extends Sprite {
 					this.set("paddingRight", undefined);
 				}
 			}
+
+
 		}
 
 		if (this.isDirty("background")) {

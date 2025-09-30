@@ -86,6 +86,7 @@ if (currentGrid) {
 let valueSeries = mainPanel.series.push(
   am5xy.CandlestickSeries.new(root, {
     name: "AMCH",
+    turboMode: true,
     clustered: false,
     valueXField: "Date",
     valueYField: "Close",

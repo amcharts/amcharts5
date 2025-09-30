@@ -349,8 +349,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _dirtySelectionExtremes: boolean = false;
 	protected _dseHandled = false;
 	protected _deltaMinMax: number = 1;
-	protected _minReal: number | undefined;
-	protected _maxReal: number | undefined;
+	public _minReal: number | undefined;
+	public _maxReal: number | undefined;
 
 	protected _minRealLog: number | undefined;
 
@@ -406,7 +406,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let someDirty = false;
 		if (this.isDirty("min") || this.isDirty("max") || this.isDirty("maxPrecision") || this.isDirty("numberFormat")) {
 			someDirty = true;
-			this.ghostLabel.set("text", "");
+			this.ghostLabel?.set("text", "");
 		}
 
 		//if (this._dirtyExtremes || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision")) {
@@ -1783,8 +1783,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @param  duration  Duration in milliseconds
 	 */
 	public zoomToValues(start: number, end: number, duration?: number) {
-		const min = this.getPrivate("minFinal", 0);
-		const max = this.getPrivate("maxFinal", 0);
+		const min = this.getPrivate("minFinal", this.getPrivate("min", 0));
+		const max = this.getPrivate("maxFinal", this.getPrivate("max", 1));
+
 		if (this.getPrivate("min") != null && this.getPrivate("max") != null) {
 			this.zoom((start - min) / (max - min), (end - min) / (max - min), duration);
 		}

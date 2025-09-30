@@ -429,9 +429,9 @@ export class HierarchyDefaultTheme extends Theme {
 			cursorOverStyle: "pointer"
 		});
 
-		r("HierarchyNode", ["treemap", "node", "last"]).setAll({			
+		r("HierarchyNode", ["treemap", "node", "last"]).setAll({
 			cursorOverStyle: "default"
-		});		
+		});
 
 		{
 			const rule = r("RoundedRectangle", ["treemap", "node", "shape"]);

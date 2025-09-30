@@ -1,7 +1,11 @@
-import { DataItem } from "../../../core/render/Component";
 import type { AxisRenderer } from "./AxisRenderer";
 import type { XYSeries, IXYSeriesDataItem } from "../series/XYSeries";
+import type { ITimeInterval } from "../../../core/util/Time";
+import type { TimeUnit } from "../../../core/util/Time";
+
+import { DataItem } from "../../../core/render/Component";
 import { ValueAxis, IValueAxisSettings, IValueAxisPrivate, IValueAxisDataItem, IMinMaxStep, IValueAxisEvents } from "./ValueAxis";
+
 import * as $type from "../../../core/util/Type";
 import * as $math from "../../../core/util/Math";
 import * as $order from "../../../core/util/Order";
@@ -9,8 +13,6 @@ import * as $array from "../../../core/util/Array";
 import * as $object from "../../../core/util/Object";
 import * as $utils from "../../../core/util/Utils";
 import * as $time from "../../../core/util/Time";
-import type { ITimeInterval } from "../../../core/util/Time";
-import type { TimeUnit } from "../../../core/util/Time";
 
 export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSettings<R> {
 
@@ -136,6 +138,23 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * @since 5.1.4
 	 */
 	tooltipIntervalOffset?: number;
+
+	/**
+	 * If set to `true`, the axis will skip the first minor grid line and label.
+	 * 
+	 * @default true
+	 * @since 5.14.0
+	 */
+	skipFirstMinor?: boolean;
+
+	/**
+	 * A relative location of weekly labels.
+	 *
+	 * @default 0
+	 * @since 5.14.0
+	 */
+	weekLabelLocation?: number;
+
 }
 
 export interface IDateAxisDataItem extends IValueAxisDataItem {
@@ -646,7 +665,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _getM(timeUnit: TimeUnit) {
-		if (timeUnit == "month" || timeUnit == "year" || timeUnit == "day") {
+		if (timeUnit == "day" || timeUnit == "month" || timeUnit == "year") {
 			return 1.05;
 		}
 		return 1.01;
@@ -684,6 +703,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			else {
 				minorGridInterval = { timeUnit: "week", count: 1 };
 			}
+		}
+
+		if (timeUnit == "year" && count == 1) {
+			minorGridInterval = { timeUnit: "month", count: 1 };
 		}
 		return minorGridInterval;
 	}
@@ -736,6 +759,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 
 			let m = 0;
+
 			while (value < selectionMax + intervalDuration) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;
 				if (this.dataItems.length < i + 1) {
@@ -779,13 +803,16 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				let count = gridInterval.count;
 				// so that labels of week would always be at the beginning of the grid
 				if (gridInterval.timeUnit == "week") {
-					dataItem.setRaw("labelEndValue", value);
+					label?.set("location", this.get("weekLabelLocation", 0));
+				}
+				else {
+					label?.set("location", renderer.labels.template.get("location"));
 				}
 
 				if (minorGridEnabled) {
 					count = 1;
 					let timeUnit = gridInterval.timeUnit;
-					if (timeUnit == "week") {
+					if (timeUnit == "week" && this.get("skipFirstMinor")) {
 						timeUnit = "day";
 					}
 
@@ -805,6 +832,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					const minorTimeUnit = minorGridInterval.timeUnit;
 					const minorCount = minorGridInterval.count;
 					const mmm = this._getM(minorTimeUnit);
+
+					if (!this.get("skipFirstMinor")) {
+						previousValue -= minorDuration * mmm;
+					}
+
 
 					//let minorValue = $time.round(new Date(previousValue + minorDuration * this._getM(minorGridInterval.timeUnit)), minorGridInterval.timeUnit, minorGridInterval.count, firstDay, utc, new Date(previousValue), timezone).getTime();
 					let minorValue = $time.roun(previousValue + minorDuration * mmm, minorTimeUnit, minorCount, root, previousValue);
@@ -854,6 +886,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 						if (minorValue == previousMinorValue) {
 							break;
+						}
+
+						if (!minorDataItem.get("isRange")) {
+							const fillRule = this.get("fillRule");
+							if (fillRule) {
+								fillRule(minorDataItem)
+							}
 						}
 
 						previousMinorValue = minorValue;
@@ -1226,8 +1265,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @param  duration  Duration in milliseconds
 	 */
 	public zoomToValues(start: number, end: number, duration?: number) {
-		const min = this.getPrivate("minFinal", 0);
-		const max = this.getPrivate("maxFinal", 0);
+		const min = this.getPrivate("minFinal", this.getPrivate("min", 0));
+		const max = this.getPrivate("maxFinal", this.getPrivate("max", 0));
+
 		if (this.getPrivate("min") != null && this.getPrivate("max") != null) {
 			if (this.get("groupData")) {
 				const futureGroupInterval = this.getGroupInterval(end - start);

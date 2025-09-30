@@ -128,6 +128,8 @@ export class DrawingSeries extends LineSeries {
 	public _index: number = 0;
 	public _drawingId?: string;
 
+	protected _canceled = false;
+
 	protected _di: Array<{ [index: string]: DataItem<IDrawingSeriesDataItem> }> = [];
 
 	protected _dragStartPX: number = 0;
@@ -1438,7 +1440,7 @@ export class DrawingSeries extends LineSeries {
 		if (this._isDrawing) {
 			this._disposeIndex(this._index);
 		}
-
+		this._canceled = true;
 		this.isDrawing(false);
 	}
 }

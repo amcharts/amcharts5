@@ -2,11 +2,9 @@ import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataIte
 import { curveCardinal, CurveCardinalFactory } from "d3-shape";
 
 export interface SmoothedXYLineSeriesDataItem extends ILineSeriesDataItem {
-
 }
 
 export interface ISmoothedXYLineSeriesDataItem extends ILineSeriesDataItem {
-
 }
 
 export interface SmoothedXYLineSeriesProperties extends ILineSeriesSettings {

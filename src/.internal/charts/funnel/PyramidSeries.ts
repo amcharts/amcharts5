@@ -1,6 +1,8 @@
 import type { DataItem } from "../../core/render/Component";
+
 import { FunnelSeries, IFunnelSeriesSettings, IFunnelSeriesDataItem, IFunnelSeriesPrivate } from "./FunnelSeries";
 import { Percent, p100 } from "../../core/util/Percent";
+
 import * as $utils from "../../core/util/Utils";
 import * as $type from "../../core/util/Type";
 
