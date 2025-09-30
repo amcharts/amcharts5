@@ -17,10 +17,6 @@ root.setThemes([
 // https://www.amcharts.com/docs/v5/charts/gantt/
 const gantt = root.container.children.push(am5gantt.Gantt.new(root, {}));
 
-gantt.yAxis.setAll({
-  maxCellHeight: 70
-});
-
 // Set category data
 // https://www.amcharts.com/docs/v5/charts/gantt/#Category_data
 gantt.yAxis.data.setAll([{

@@ -748,6 +748,21 @@ export class GanttDefaultTheme extends Theme {
 		});
 
 
+		// edit button
+		r("Button", ["edit"]).setAll({
+			visible: false,
+			tooltipText: l.translateAny("Edit mode"),
+			toggleKey: "active"
+		})
+
+		{
+			const rule = r("Graphics", ["icon", "edit", "button"]);
+			rule.setAll({
+				svgPath: "M 10.1 -1.3 L 16.1 5.3 L 7.9 14.4 L 1.9 14.4 L 1.9 7.8 L 10.1 -1.3 M 8.2 0.8 L 14.2 7.4 M 1.9 12.7 L 3.5 14.4 M 6.7 11.6 L 12.3 5.3 M 4.5 9.2 L 10.1 2.9 M 1.9 7.8 L 4.5 9.2 L 5.1 11.3 L 6.7 11.6 L 7.9 14.4 M 8.9 0.1 L 14.9 6.8 M 9.5 -0.6 L 15.5 6 M 1.9 13.4 L 2.9 14.4 M 1.9 12 L 4.1 14.4"
+			});			
+			setColor(rule, "stroke", ic, "secondaryButton");
+		}
+
 		// expand button
 		r("Button", ["expand"]).setAll({
 			tooltipText: l.translateAny("Expand all")

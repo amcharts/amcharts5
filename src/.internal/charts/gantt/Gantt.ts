@@ -242,6 +242,17 @@ export class Gantt extends Container {
 	}));
 
 	/**
+	 * The [[Button]] element to toggle edit mode.
+	 *
+	 * @since 5.14.1
+	 */
+	public readonly editButton: Button = this.controls.children.push(Button.new(this._root, {
+		themeTags: ["edit", "secondary", "fixedwidth"],
+		icon: Graphics.new(this._root, { themeTags: ["icon"] }),
+		tooltip: this.root.systemTooltip
+	}));
+
+	/**
 	 * The [[Button]] element to clear all tasks.
 	 */
 	public readonly clearButton: ConfirmButton = this.controls.children.push(ConfirmButton.new(this._root, {
@@ -534,6 +545,10 @@ export class Gantt extends Container {
 			this.yAxis.setDataItemColor(this.yAxis.get("selectedDataItem"), c);
 		});
 
+		this.editButton.on("active", (active) => {
+			this.set("editable", active);
+		});
+
 		this.fitButton.events.on("click", () => {
 
 			let min = series.getPrivate("selectionMinX", 0);
@@ -615,6 +630,10 @@ export class Gantt extends Container {
 
 		if (this.isDirty("linkNewTasks")) {
 			this.linkButton.set("active", this.get("linkNewTasks", false));
+		}
+
+		if (this.isDirty("editable")) {
+			this.editButton.set("active", this.get("editable", true));
 		}
 
 		if (this._sizeDirty || this.isDirty("sidebarWidth")) {
@@ -860,6 +879,8 @@ export class Gantt extends Container {
 		const forceInactive = "forceInactive";
 		const draggable = "draggable";
 
+		this.series.markDirtyValues();
+
 		this.addButton.set(forceHidden, !value);
 		this.colorPickerButton.set(forceHidden, !value);
 		this.clearButton.set(forceHidden, !value);
@@ -880,6 +901,8 @@ export class Gantt extends Container {
 
 		this.series.startBullets.template.set(forceHidden, !value);
 		this.series.endBullets.template.set(forceHidden, !value);
+
+		this.series.links.template.set(forceInactive, !value);
 
 		this.xAxisMinor.set(forceInactive, !value);
 	}

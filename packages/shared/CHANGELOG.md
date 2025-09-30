@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.14.1] - 2025-09-30
+
+### Added
+- `editButton` added to `Gantt` chart. The button is hidden by default. Unhide to enable users toggle between edit and read-only modes. [More info](https://www.amcharts.com/docs/v5/charts/gantt/#Control_buttons).
+
+### Fixed
+- Links were active in read-only mode (`editable: false`) of `Gantt` chart.
+- Too many minor grid intervals could be drawn on a `DateAxis` if grid interval was `"year"`.
+
+
 ## [5.14.0] - 2025-09-30
 
 ### Added

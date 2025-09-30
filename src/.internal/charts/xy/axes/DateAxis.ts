@@ -705,7 +705,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 		}
 
-		if (timeUnit == "year" && count == 1) {
+		if (timeUnit == "year" && count == 1 && this.getPrivate("selectionMax", 0) - this.getPrivate("selectionMin", 0) < 4 * 366 * 24 * 60 * 60 * 1000) {
 			minorGridInterval = { timeUnit: "month", count: 1 };
 		}
 		return minorGridInterval;

@@ -17,11 +17,6 @@ root.setThemes([
 // https://www.amcharts.com/docs/v5/charts/gantt/
 const gantt = root.container.children.push(am5gantt.Gantt.new(root, {}));
 
-// Configure Y-axis
-gantt.yAxis.setAll({
-  maxCellHeight: 70
-});
-
 // Default data
 let categoryData = [{
   name: "Start",
