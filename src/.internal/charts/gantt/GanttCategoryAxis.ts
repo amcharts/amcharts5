@@ -1415,17 +1415,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 			}
 
 			const progressPie = dataItem.get("progressPie");
-			let point = { x: 0, y: 0 };
-			if (progressPie) {
-				point = progressPie.toGlobal(point);
-				point = this.toLocal(point);
-			}
-
-			this.xButton.setAll({
-				y: point.y,
-				x: point.x
-			});
-
+			progressPie?.children.push(this.xButton);
 
 			this.setRaw("selectedDataItem", dataItem);
 
@@ -1446,6 +1436,10 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 			}
 
 			this._delDp = this.xButton.events.once("click", () => {
+				const parent = this.xButton.parent;
+				if (parent) {
+					parent.children.removeValue(this.xButton);
+				}
 				this.deleteDataItem(dataItem);
 				this.unselectDataItems();
 			})

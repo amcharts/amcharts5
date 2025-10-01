@@ -846,6 +846,12 @@ export class GanttSeries extends ColumnSeries {
 
 					height = (y1 - y0) * r;
 
+
+
+					const maxHeight = column.get("maxHeight", Infinity) * $math.cos(45);
+					const minHeight = column.get("minHeight", 0) * $math.cos(45);
+					height = $math.fitToRange(height, minHeight, maxHeight);
+
 					zeroRectangle.setPrivate("height", height);
 					zeroRectangle.setPrivate("width", height);
 				}
@@ -1325,9 +1331,18 @@ export class GanttSeries extends ColumnSeries {
 		}
 
 		let columnHeight: number | Percent = percent(60);
+		let minHeight = 0;
+		let maxHeight = Infinity;
 		let column = this.columns.getIndex(0);
+		let r = 1;
 		if (column) {
 			columnHeight = column.get("height", 0);
+			const cos = $math.cos(45);
+			if (columnHeight instanceof Percent) {
+				r = columnHeight.value * cos * cos;
+			}
+			minHeight = column.get("minHeight", 0) * cos * cos;
+			maxHeight = column.get("maxHeight", Infinity) * cos * cos;
 		}
 
 		$array.each(this.dataItems, (dataItem) => {
@@ -1390,10 +1405,8 @@ export class GanttSeries extends ColumnSeries {
 						y0 = yRenderer.positionToCoordinate(y0);
 						y1 = yRenderer.positionToCoordinate(y1);
 
-						let h = (y1 - y0) / 2;
-						if (columnHeight instanceof Percent) {
-							h *= columnHeight.value;
-						}
+						let h = (y1 - y0) * r;
+						h = $math.fitToRange(h, minHeight, maxHeight);
 
 						firstPoint.x += h - endRadius;
 					}
@@ -1423,11 +1436,11 @@ export class GanttSeries extends ColumnSeries {
 								y0 = yRenderer.positionToCoordinate(y0);
 								y1 = yRenderer.positionToCoordinate(y1);
 
-								let h = (y1 - y0) / 2;
-								if (columnHeight instanceof Percent) {
-									h *= columnHeight.value;
-								}
+								let h = (y1 - y0) * r;
 
+
+
+								h = $math.fitToRange(h, minHeight, maxHeight);
 								lastPoint.x -= h;
 							}
 						}

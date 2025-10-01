@@ -306,6 +306,7 @@ export class Root implements IDisposer {
 	protected _keyboardDragPoint: IPoint | undefined;
 	protected _tooltipElementContainer: HTMLDivElement | undefined;
 	protected _readerAlertElement: HTMLDivElement | undefined;
+	protected _skipNextGroupJump: boolean = true;
 
 	public _logo?: Container;
 
@@ -861,7 +862,10 @@ export class Root implements IDisposer {
 							case "Tab":
 								const group = focusedSprite.get("focusableGroup");
 								if (group && this._isShift) {
-									this._focusNext(focusedSprite.getPrivate("focusElement")!.dom, -1, group);
+									if (!this._skipNextGroupJump) {
+										this._focusNext(focusedSprite.getPrivate("focusElement")!.dom, -1, group);
+										this._skipNextGroupJump = true;
+									}
 									return;
 								}
 								break;
@@ -1073,7 +1077,7 @@ export class Root implements IDisposer {
 			entity._afterChanged();
 		});
 
-		$object.keys(allParents).forEach((key) => {			
+		$object.keys(allParents).forEach((key) => {
 			allParents[key]._childrenPrep = false;
 			allParents[key]._childrenUpdt = false;
 		});
@@ -1766,6 +1770,10 @@ export class Root implements IDisposer {
 				target: focused
 			});
 		}
+
+		if (focused.getPrivate("focusElement")!.dom.tabIndex == -1) {
+			this._skipNextGroupJump = false;
+		}
 	}
 
 	protected _focusNext(el: HTMLDivElement, direction: 1 | -1, group?: string | number): void {
@@ -1824,6 +1832,7 @@ export class Root implements IDisposer {
 				target: focused
 			});
 		}
+
 		this._focusedSprite = undefined;
 	}
 

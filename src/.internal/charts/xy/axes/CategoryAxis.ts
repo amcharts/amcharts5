@@ -180,7 +180,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let start = this.get("start", 0);
 		let end = this.get("end", 1);
-
+		
 		let indices = this._getIndices(start, end);
 
 		this.setPrivateRaw("startIndex", indices.startIndex);
@@ -845,25 +845,34 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		let len = this.dataItems.length;
 		let startIndex = 0;
 		let endIndex = len;
+		let name: "cellSize" | "finalCellSize" = "cellSize";
 
 		if (this.get("cellSizeField")) {
 			let count = 0;
-			$array.each(this.dataItems, (dataItem) => {
-				count += dataItem.get("cellSize", 1);
+			const dataItems = this.dataItems;
+			if(dataItems.length == 0){
+				return { startIndex: 0, endIndex: 0 };
+			}
+
+			$array.each(dataItems, (dataItem) => {
+				count += dataItem.get(name, 1);
 			});
+
+			count -= this.get("startLocation", 0) * dataItems[0].get(name, 1);
+			count -= (1 - this.get("endLocation", 1)) * dataItems[dataItems.length - 1].get(name, 1);
 
 			let c = 0;
 			for (let i = 0; i < len; i++) {
-				c += this.dataItems[i].get("cellSize", 1);
-				if (c / count > start) {
+				c += this.dataItems[i].get(name, 1);
+				if (Math.round(c) > Math.round(start * count)) {
 					startIndex = i;
 					break;
 				}
 			}
 
 			for (let i = startIndex + 1; i < len; i++) {
-				c += this.dataItems[i].get("cellSize", 1);
-				if (c / count > end) {
+				c += this.dataItems[i].get(name, 1);
+				if (Math.round(c) >= Math.round(end * count)) {
 					endIndex = i + 1;
 					break;
 				}

@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.14.2] - 2025-10-01
+
+### Changed
+- Minor tweaks to Gantt icons.
+- The column for zero-length tasks on Gantt is now limited in size by default.
+
+### Fixed
+- Pressing Shift-TAB when the first element of a series was focused and `focusableGroup` is set, would jump back two series back instead of one.
+
+
 ## [5.14.1] - 2025-09-30
 
 ### Added
@@ -275,7 +285,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - New setting `clickAnnounceText` added to `Sprite`. If set will announce the text when focused element is triggered with a press of ENTER or SPACE.
 
 ### Changed
-- Pressing Shift-TAB while focus on non-first member of the focusabel group will now jump to a previous group or focusable element, rather than current group's first element.
+- Pressing Shift-TAB while focus on non-first member of the focusable group will now jump to a previous group or focusable element, rather than current group's first element.
 - When an `XYChart` is zoomed using mouse wheel it will no longer stop page scroll when its fully zoomed out or zoomed in.
 
 ### Fixed

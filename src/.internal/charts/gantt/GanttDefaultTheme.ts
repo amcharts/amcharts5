@@ -758,8 +758,8 @@ export class GanttDefaultTheme extends Theme {
 		{
 			const rule = r("Graphics", ["icon", "edit", "button"]);
 			rule.setAll({
-				svgPath: "M 10.1 -1.3 L 16.1 5.3 L 7.9 14.4 L 1.9 14.4 L 1.9 7.8 L 10.1 -1.3 M 8.2 0.8 L 14.2 7.4 M 1.9 12.7 L 3.5 14.4 M 6.7 11.6 L 12.3 5.3 M 4.5 9.2 L 10.1 2.9 M 1.9 7.8 L 4.5 9.2 L 5.1 11.3 L 6.7 11.6 L 7.9 14.4 M 8.9 0.1 L 14.9 6.8 M 9.5 -0.6 L 15.5 6 M 1.9 13.4 L 2.9 14.4 M 1.9 12 L 4.1 14.4"
-			});			
+				svgPath: "M 11 -1 L 17 5 L 8 14 L 2 14 L 2 8 L 11 -1 M 7 11 L 15 3 M 5 9 L 13 1 M 2 8 L 5 9 L 5 11 L 7 11 L 8 14 M 2 12 L 4 14"
+			});
 			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
@@ -798,7 +798,8 @@ export class GanttDefaultTheme extends Theme {
 		{
 			const rule = r("Graphics", ["icon", "link", "button"]);
 			rule.setAll({
-				svgPath: "M 5 5 L 13 5 C 17 5 17 11 13 11 L 8 11 C 4 11 4 17 8 17 L 16 17 L 14 15 L 14 19 L 16 17"
+				dy: 1,
+				svgPath: "M 5 4 L 13 4 C 17 4 17 11 13 11 L 8 11 C 4 11 4 18 8 18 L 16 18 L 14 16 L 14 20 L 16 18"
 			});
 			setColor(rule, "stroke", ic, "secondaryButton");
 		}
@@ -847,7 +848,7 @@ export class GanttDefaultTheme extends Theme {
 
 		// x button (shown when clicked on a task)		
 		r("Button", ["xbutton"]).setAll({
-			position: "absolute",
+
 			width: 35,
 			height: 35,
 			centerX: p50,
