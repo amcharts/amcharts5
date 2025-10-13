@@ -358,6 +358,10 @@ export class EllipseSeries extends DrawingSeries {
 	}
 
 	public _updateChildren() {
+		if(this._isMoving){
+			return;
+		}
+
 		super._updateChildren();
 
 		let index = 0;

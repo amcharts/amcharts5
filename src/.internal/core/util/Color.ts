@@ -62,7 +62,7 @@ export function rgba2hex(color: string): number {
  * * `"rgb(255, 0, 0)"`
  * * `"rgba(255, 0, 0, 1)"`
  * * `0xff0000`
- * 
+ *
  * @param   input  Input color
  * @return         Color
  */
@@ -117,7 +117,7 @@ export class Color {
 
 	/**
 	 * Returns color CSS representation in form of `rgba(r, g, b, a)` string.
-	 * 
+	 *
 	 * @param   alpha  Opacity
 	 * @return         CSS string
 	 */
@@ -127,7 +127,7 @@ export class Color {
 
 	/**
 	 * Returns color CSS representation in form of `#rgb` string.
-	 * 
+	 *
 	 * @return         CSS string
 	 */
 	public toCSSHex(): string {

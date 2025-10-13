@@ -124,7 +124,7 @@ export class Measure extends RectangleSeries {
 		const diP2 = this._di[index]["p2"];
 		let color = positiveColor;
 		let iy = 1;
-		if (p1.y > p2.y) {
+		if (p1.y < p2.y) {
 			iy = -1;
 			color = negativeColor;
 		}

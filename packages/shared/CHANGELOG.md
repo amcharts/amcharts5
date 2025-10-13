@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.14.3] - 2025-10-13
+
+### Fixed
+- If an axis range was created on `CategoryAxis` and then data was changed which wouldn't have these categories anymore, elements of the axis range remained visible on the chart.
+- Hovering over `Gantt` category labels caused background of the category item to unhover.
+- `am5.type.toNumber()` function would go into dead loop if the parameter contained multiple dots or minus symbols.
+- Stock chart's drawings were snapped to initial position if data update happened while dragging the drawing.
+- Measure drawing tool in `StockChart` had colors inverted (red for positive, green for negative).
+- Zooming an `XYChart` with mouse wheel really fast could result chart to be zoomed to a state where user could not zoom-out anymore.
+
+
 ## [5.14.2] - 2025-10-01
 
 ### Changed
@@ -114,7 +125,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [5.13.0] - 2025-06-05
 
-### Added 
+### Added
 - `exactLocationX` and `exactLocationY` added to `XYSeries`. If this is set to `true`, data items will ignore `locationX`/`locationY` setting but will place the data point at exact X/Y value. This will work only with `DateAxis`. If used on a `ColumnSeries`/`CandlestickSeries` it will affect its bullets only.
 - `autoHidePanelControls` added to `StockChart`.
 - `containStroke` added to `Rectangle`. If this is set to `true`, rectangle will be drawn in such a way that its stroke is contained within the rectangle's width and height. Useful if you have thicker `strokeWidth` for `ColumnSeries`.

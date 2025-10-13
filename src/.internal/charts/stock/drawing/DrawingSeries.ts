@@ -152,6 +152,8 @@ export class DrawingSeries extends LineSeries {
 
 	protected _isSelecting: boolean = false;
 
+	protected _isMoving: boolean = false;
+
 	// point index in segment
 	protected _pIndex: number = 0;
 
@@ -556,6 +558,8 @@ export class DrawingSeries extends LineSeries {
 			this.unselectAllDrawings();
 		}
 
+		this._isMoving = true;
+
 		this._handleFillDragStart(event, index);
 	}
 
@@ -567,6 +571,7 @@ export class DrawingSeries extends LineSeries {
 		if (stockChart) {
 			stockChart._dragStopDrawing(event);
 		}
+		this._isMoving = false;
 		this._handleFillDragStop(event, index);
 	}
 
@@ -672,6 +677,10 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	public _updateChildren() {
+		if (this._isMoving) {
+			return;
+		}
+
 		this._updateElements();
 
 		if (this.isDirty("strokeColor") || this.isDirty("strokeOpacity") || this.isDirty("strokeDasharray") || this.isDirty("strokeWidth")) {

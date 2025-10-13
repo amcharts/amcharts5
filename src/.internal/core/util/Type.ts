@@ -120,7 +120,8 @@ export function toNumber(value: any): number {
 	if (value != null && !isNumber(value)) {
 		let converted = Number(value);
 		if (isNaN(converted) && isString(value) && value != "" && value.match(/[0-9]+/)) {
-			return toNumber(value.replace(/[^0-9.\-]+/g, ''));
+			const newValue = value.replace(/[^0-9.\-]+/g, '');
+			return value === newValue ? converted : toNumber(newValue);
 		}
 		return converted;
 	}

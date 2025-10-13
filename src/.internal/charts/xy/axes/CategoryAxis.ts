@@ -509,7 +509,8 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			fillEndIndex = endIndex;
 
 			if (!$type.isNumber(index)) {
-				return;
+				this._toggleDataItem(dataItem, false);
+				return;				
 			}
 		}
 		else {

@@ -190,6 +190,14 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 		const label = super.makeLabel(dataItem, themeTags);
 		labelContainer.children.push(label);
 
+		label.events.on("pointerover", () => {
+			background.hover();
+		});
+
+		label.events.on("pointerout", () => {
+			background.unhover();
+		});
+
 		label.events.on("click", () => {
 			label.set("maxWidth", undefined);
 		});

@@ -54,8 +54,13 @@ export class RectangleSeries extends SimpleLineSeries {
 		}
 	}
 
+
 	public _updateChildren() {
+		if(this._isMoving){
+			return;
+		}		
 		super._updateChildren();
+
 		const chart = this.chart;
 		this.fills.clear();
 		if (chart) {

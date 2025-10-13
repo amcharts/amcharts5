@@ -473,6 +473,9 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					end = 1 + maxDeviation;
 				}
 
+				let maxZoomFactor = this.getPrivate("maxZoomFactor", this.get("maxZoomFactor", 100));
+				let maxZoomFactorReal = maxZoomFactor;
+
 				if (!$type.isNumber(duration)) {
 					duration = this.get("interpolationDuration", 0);
 				}
@@ -480,9 +483,6 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 				if (!priority) {
 					priority = "end";
 				}
-
-				let maxZoomFactor = this.getPrivate("maxZoomFactor", this.get("maxZoomFactor", 100));
-				let maxZoomFactorReal = maxZoomFactor;
 
 				if (end === 1 && start !== 0) {
 					if (start < this.get("start", 0)) {
@@ -519,6 +519,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 				if ($type.isNumber(maxZoomCount)) {
 					minZoomFactor = maxZoomFactorReal / maxZoomCount;
+				}
+
+				// need one more
+				if (start > end) {
+					[start, end] = [end, start];
 				}
 
 				// most likely we are dragging left scrollbar grip here, so we tend to modify end
@@ -558,6 +563,7 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 						end = start + 1 / maxZoomFactor;
 					}
 				}
+
 
 				if (1 / (end - start) > maxZoomFactor) {
 					end = start + 1 / maxZoomFactor;
