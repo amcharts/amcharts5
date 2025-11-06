@@ -10,6 +10,7 @@ import type { XYSeries } from "../../xy/series/XYSeries";
 import type { StockChart } from "../StockChart";
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { Graphics } from "../../../core/render/Graphics";
+import type { AxisRendererX } from "../../xy/axes/AxisRendererX";
 
 import { LineSeries, ILineSeriesSettings, ILineSeriesPrivate, ILineSeriesDataItem } from "../../xy/series/LineSeries";
 import { Bullet } from "../../../core/render/Bullet";
@@ -1174,14 +1175,14 @@ export class DrawingSeries extends LineSeries {
 		const series = this.get("series");
 		if (this.get("snapToData") && series) {
 
-			const xAxis = this.get("xAxis");
+			const xAxis = this.get("xAxis")  as DateAxis<AxisRendererX>;
 
 			const min = xAxis.getPrivate("min", 0) + 1;
 			const max = xAxis.getPrivate("max", 1) - 1;
 
 			value = $math.fitToRange(value, min, max);
-			value = this._snap(value, value, "valueX", series) + 1; // important!
-			return value
+			let position = xAxis.roundAxisPosition(xAxis.valueToPosition(value), 0.5);
+			return xAxis.positionToValue(position);
 		}
 		else {
 			return Math.round(value);

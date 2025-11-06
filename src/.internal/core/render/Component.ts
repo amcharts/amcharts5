@@ -114,7 +114,6 @@ export interface IComponentSettings extends IContainerSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 */
 	interpolationEasing?: $ease.Easing;
-
 }
 
 export interface IComponentPrivate extends IContainerPrivate {
@@ -221,6 +220,10 @@ export abstract class Component extends Container {
 				}
 
 				$object.keys(properties).forEach((key) => {
+					if (dataItem.get(key) == properties[key]) {
+						return;
+					}
+
 					dataItem.animate({
 						key: key,
 						to: properties[key],
@@ -389,7 +392,7 @@ export abstract class Component extends Container {
 			this._dataChanged = false;
 		}
 
-		if (this._valuesDirty){
+		if (this._valuesDirty) {
 			const type = "valueschanged";
 			if (this.events.isEnabled(type)) {
 				this.events.dispatch(type, { type: type, target: this });
@@ -431,5 +434,5 @@ export abstract class Component extends Container {
 		return $array.find(this.dataItems, (dataItem: any) => {
 			return dataItem.get("id") == id;
 		})
-	}	
+	}
 }

@@ -3,9 +3,6 @@ import type { Color } from "../../../core/util/Color";
 
 import { Indicator, IIndicatorSettings, IIndicatorPrivate, IIndicatorEvents } from "./Indicator";
 import { LineSeries } from "../../xy/series/LineSeries";
-import * as $type from "../../../core/util/Type";
-
-import * as $array from "../../../core/util/Array";
 
 export interface IAccelerationBandsSettings extends IIndicatorSettings {
     /**
@@ -164,9 +161,6 @@ export class AccelerationBands extends Indicator {
         }
     }
 
-    /**
-     * @ignore
-     */
     public prepareData() {
         super.prepareData();
 
@@ -180,23 +174,29 @@ export class AccelerationBands extends Indicator {
             let data = this._getDataArray(dataItems);
             let factor = this.get("factor", 0.001);
 
-            let i = 0;
 
-            $array.each(data, (dataItem: any) => {
-                let stockDataItem = dataItems[i];
+            for (let i = 0; i < data.length; i++) {
+                const dataItem = data[i];
+                const stockDataItem = dataItems[i];
 
                 if (stockDataItem) {
-                    let low = stockDataItem.get("lowValueY");
-                    let high = stockDataItem.get("highValueY");
+                    const low = stockDataItem.get("lowValueY") as number;
+                    const high = stockDataItem.get("highValueY") as number;
 
-                    if ($type.isNumber(low) && $type.isNumber(high) && high + low != 0) {
-                        dataItem._lower = (high * (1 + 2 * ((((high - low) / ((high + low) / 2)) * 1000) * factor)));
-                        dataItem._upper = (low * (1 - 2 * ((((high - low) / ((high + low) / 2)) * 1000) * factor)));
-                        dataItem._average = dataItem._lower + (dataItem._upper - dataItem._lower) / 2;
+                    if (low == null || high == null) {
+                        continue;
                     }
+
+                    const sum = high + low;
+                    if (sum === 0) {
+                        continue;
+                    }
+                    const ff = (((high - low) / (sum / 2)) * 1000) * factor;
+                    dataItem._lower = (high * (1 + 2 * ff));
+                    dataItem._upper = (low * (1 - 2 * ff));
+                    dataItem._average = dataItem._lower + (dataItem._upper - dataItem._lower) / 2;
                 }
-                i++;
-            })
+            }
 
             this._sma(data, period, "_lower", "lower");
             this._sma(data, period, "_upper", "upper");

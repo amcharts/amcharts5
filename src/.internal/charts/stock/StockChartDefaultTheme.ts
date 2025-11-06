@@ -46,7 +46,7 @@ export class StockChartDefaultTheme extends Theme {
 				strictMinMaxSelection: true
 			},
 			autoSetPercentScale: true,
-		
+
 			autoHidePanelControls: false
 		});
 
@@ -54,7 +54,7 @@ export class StockChartDefaultTheme extends Theme {
 			panY: true,
 			wheelY: "zoomX",
 			panX: true,
-			minHeight: 1			
+			minHeight: 1
 		});
 
 		r("StockPanel").states.create("hidden", {
@@ -680,7 +680,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("Grid", ["oversold"]).setAll({
 			strokeOpacity: 0.4,
 		});
-		
+
 
 		// series fill below oversold
 		r("Graphics", ["overboughtoversold", "oversold", "fill"]).setAll({
@@ -689,7 +689,7 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		// series fill above oversold
-		
+
 		r("Graphics", ["overboughtoversold", "overbought", "fill"]).setAll({
 			visible: true,
 			fillOpacity: 0.2
@@ -701,7 +701,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("Graphics", ["fill", "supertrend", "lower"]).setAll({
 			fillOpacity: 0.2
-		})		
+		})
 
 		r("Graphics", ["fill", "bollingerbands", "upper"]).setAll({
 			fillOpacity: 0.2
@@ -725,11 +725,17 @@ export class StockChartDefaultTheme extends Theme {
 			forceHidden: true
 		})
 
+		r("XYSeries").setAll({
+			excludeFromAggregate: ["valueX"]
+		})
 
 		r("XYSeries", ["indicator"]).setAll({
 			legendLabelText: "{name}"
 		})
 
+		r("ColumnSeries", ["indicator"]).setAll({
+			turboMode: true
+		})
 
 		/// LEGEND LABELS
 
@@ -815,7 +821,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["movingaverage"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
-		})		
+		})
 
 		r("ColumnSeries", ["movingaveragedeviation"]).setAll({
 			legendValueText: "[{deviationColor}; bold]{valueY.formatNumber('#.00')}[/]",
@@ -860,7 +866,7 @@ export class StockChartDefaultTheme extends Theme {
 		r("LineSeries", ["supertrend"]).setAll({
 			legendValueText: "",
 			legendLabelText: "{shortName} ({period.formatNumber('#.')},{multiplier.formatNumber('#.')})"
-		})		
+		})
 
 		r("LineSeries", ["trix"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{signalColor} bold]{signal.formatNumber('#.00')}[/]",

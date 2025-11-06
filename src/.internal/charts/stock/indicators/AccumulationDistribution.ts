@@ -4,8 +4,6 @@ import type { XYSeries } from "../../xy/series/XYSeries";
 import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
 import { LineSeries } from "../../xy/series/LineSeries";
 
-import * as $array from "../../../core/util/Array";
-
 export interface IAccumulationDistributionSettings extends IChartIndicatorSettings {
 
 	/**
@@ -88,43 +86,47 @@ export class AccumulationDistribution extends ChartIndicator {
 	 * @ignore
 	 */
 	public prepareData() {
-		if (this.series) {
-			const dataItems = this.get("stockSeries").dataItems;
-			const volumeSeries = this.get("volumeSeries");
-			this.setRaw("field", "close");
-
-			let i = 0;
-			let data: Array<any> = this._getDataArray(dataItems);
-			let prevAD = 0;
-			let useVolume = this.get("useVolume");
-
-			$array.each(dataItems, (dataItem) => {
-				let close = dataItem.get("valueY") as number;
-				if (close != null) {
-					let low = dataItem.get("lowValueY", close) as number;
-					let high = dataItem.get("highValueY", close) as number;
-
-					let volume = 1;
-					if (volumeSeries && useVolume) {
-						const volumeDI = volumeSeries.dataItems[i];
-						if (volumeDI) {
-							volume = volumeDI.get("valueY", 1);
-						}
-					}
-
-					let mf = ((close - low) - (high - close)) / (high - low)
-					if (high == low) {
-						mf = 0;
-					}
-
-					let ad = prevAD + mf * volume;
-					data[i].ad = ad;
-
-					prevAD = ad
-				}
-				i++;
-			})
-			this.series.data.setAll(data);
+		if (!this.series) {
+			return;
 		}
+
+		const stockSeries = this.get("stockSeries") as any;
+		const dataItems = stockSeries?.dataItems ?? [];
+		const volumeSeries = this.get("volumeSeries") as XYSeries | undefined;
+		this.setRaw("field", "close");
+
+		const data: Array<any> = this._getDataArray(dataItems);
+		const useVolume = !!this.get("useVolume");
+		const volItems = useVolume && volumeSeries ? volumeSeries.dataItems : undefined;
+
+		let prevAD = 0;
+		for (let i = 0, len = dataItems.length; i < len; i++) {
+			const dataItem = dataItems[i];
+			const close = dataItem.get("valueY") as number | undefined;
+			if (close == null) {
+				continue;
+			}
+
+			const low = dataItem.get("lowValueY", close) as number;
+			const high = dataItem.get("highValueY", close) as number;
+			const range = high - low;
+
+			const mf = range === 0 ? 0 : ((close - low) - (high - close)) / range;
+
+			let volume = 1;
+			if (volItems) {
+				const vdi = volItems[i];
+				if (vdi) {
+					const v = vdi.get("valueY");
+					volume = v != null ? (v as number) : 1;
+				}
+			}
+
+			const ad = prevAD + mf * volume;
+			data[i].ad = ad;
+			prevAD = ad;
+		}
+
+		this.series.data.setAll(data);
 	}
 }

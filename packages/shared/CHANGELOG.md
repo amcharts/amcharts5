@@ -5,6 +5,27 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.14.4] - 2025-11-06
+
+### Added
+- Added `ariaLabel` setting to `ExportingMenu`.
+- Added `autoDispose` (default: `false`) property to `Registry`. Set it to `true` to automatically dispose a `Root` element if it exists in the target container when a new `Root` element is being created.
+- Added `exculdeFromAggregate` setting to `XYSeries`, mainly for performance. Use it to remove some data fields from calculation of their aggregate values. On a `StockChart` the setting is set to `["valueX"]`, since X values are not usually used in aggregates, but will save some processing time on large data sets.
+
+### Changed
+- `date` tag added to `DateAxis`.
+- `gapless` tag added to `GaplessDateAxis`.
+- `turboMode` is now set to `true` on all `ColumnSeries`/`CandlestickSeries` by default on all `StockChart` indicator series.
+
+### Fixed
+- Performance improvements.
+- `zoomable` set on axis to false was ignored by stock chart.
+- Adding an arrow or icon to `StockChart` would dispatch a `"drawingadded"` event with wrong `drawingId`.
+- Focus elements in a scrollable container were sometimes being highlighted incorrectly.
+- `Container` method `scrollToChild()` was not working properly.
+- `DateRangeSelector` was displaying selectable days incorrectly whith some of the locales.
+
+
 ## [5.14.3] - 2025-10-13
 
 ### Fixed

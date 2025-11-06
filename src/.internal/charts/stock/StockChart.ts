@@ -1129,7 +1129,7 @@ export class StockChart extends Container {
 
 	protected _syncXAxes(axis: Axis<AxisRenderer>) {
 		$array.each(this._xAxes, (xAxis) => {
-			if (xAxis != axis && xAxis.isType("DateAxis")) {
+			if (xAxis != axis && xAxis.isType("DateAxis") && xAxis.get("zoomable", true)) {
 				xAxis._skipSync = true;
 				xAxis.set("start", axis.get("start"));
 				xAxis.set("end", axis.get("end"));

@@ -134,7 +134,7 @@ export interface ISeriesSettings extends IComponentSettings {
 	 *
 	 * Usually used for storing additional numeric information and heat rules.
 	 */
-	customValueField?: string;	
+	customValueField?: string;
 
 	/**
 	 * A text template to be used for label in legend.
@@ -207,6 +207,15 @@ export interface ISeriesSettings extends IComponentSettings {
 	 */
 	legendDataItem?: DataItem<ILegendDataItem>;
 
+	/**
+	 * A list of field names to exclude from automatic aggregation
+	 * when `calculateAggregates` is enabled. Use it to optimize
+	 * performance by disabling automatic aggregation for data
+	 * fields where aggregate values are not needed.
+	 *
+	 * @since 5.14.4
+	 */
+	excludeFromAggregate?: Array<string>;
 }
 
 export interface ISeriesPrivate extends IComponentPrivate {
@@ -235,7 +244,7 @@ export interface ISeriesPrivate extends IComponentPrivate {
 	customValueLow?: number;
 	customValueHigh?: number;
 	customValueOpen?: number;
-	customValueClose?: number;	
+	customValueClose?: number;
 
 	baseValueSeries?: Series;
 }
@@ -291,22 +300,8 @@ export abstract class Series extends Component {
 
 		this.setPrivate("customData", {});
 
-		this._disposers.push(this.bullets.events.onAll((change) => {
-			if (change.type === "clear") {
-				this._handleBullets(this.dataItems);
-			} else if (change.type === "push") {
-				this._handleBullets(this.dataItems);
-			} else if (change.type === "setIndex") {
-				this._handleBullets(this.dataItems);
-			} else if (change.type === "insertIndex") {
-				this._handleBullets(this.dataItems);
-			} else if (change.type === "removeIndex") {
-				this._handleBullets(this.dataItems);
-			} else if (change.type === "moveIndex") {
-				this._handleBullets(this.dataItems);
-			} else {
-				throw new Error("Unknown IListEvent type");
-			}
+		this._disposers.push(this.bullets.events.onAll(() => {
+			this._handleBullets(this.dataItems);
 		}));
 	}
 
@@ -397,7 +392,7 @@ export abstract class Series extends Component {
 		if(bullet){
 			this._makeBulletReal(dataItem, bullet);
 		}
-	}	
+	}
 
 	public _clearDirty() {
 		super._clearDirty();
@@ -449,7 +444,6 @@ export abstract class Series extends Component {
 				else {
 					this._calculateAggregates(startIndex, endIndex);
 				}
-
 				this._selectionAggregatesCalculated = true;
 			}
 		}
@@ -505,7 +499,7 @@ export abstract class Series extends Component {
 	}
 
 	public _handleRemoved(){
-		
+
 	}
 
 	/**
@@ -516,10 +510,17 @@ export abstract class Series extends Component {
 	}
 
 	protected _calculateAggregates(startIndex: number, endIndex: number) {
-		let fields = this._valueFields;
 
+		let fields = this._valueFields;
 		if (!fields) {
 			throw new Error("No value fields are set for the series.");
+		}
+
+		const excludeFromAggregate = this.get("excludeFromAggregate");
+		if(excludeFromAggregate){
+			fields = fields.filter((field)=>{
+				return excludeFromAggregate.indexOf(field) == -1;
+			});
 		}
 
 		const sum: { [index: string]: number } = {};
@@ -532,15 +533,18 @@ export abstract class Series extends Component {
 		const average: { [index: string]: number } = {};
 		const previous: { [index: string]: number } = {};
 
-		$array.each(fields, (key) => {
+		for(let f = 0, flen = fields.length; f < flen; f++){
+			let key = fields[f];
 			sum[key] = 0;
 			absSum[key] = 0;
 			count[key] = 0;
-		})
+		}
 
-		const len = this.dataItems.length;
+		const dataItems = this.dataItems;
+		const len = dataItems.length;
 
-		$array.each(fields, (key) => {
+		for(let f = 0, flen = fields.length; f < flen; f++){
+			let key = fields[f];
 			let change = key + "Change";
 			let changePercent = key + "ChangePercent";
 			let changePrevious = key + "ChangePrevious";
@@ -550,48 +554,42 @@ export abstract class Series extends Component {
 
 			let openKey = "valueY";
 
-			if(key == "valueX" || key == "openValueX" || key == "lowValueX" || key == "highValueX"){
+			if (key === "valueX" || key.endsWith("ValueX")) {
 				openKey = "valueX";
 			}
 
 			const baseValueSeries = this.getPrivate("baseValueSeries");
 			const adjustedStartIndex = this.getPrivate("adjustedStartIndex", startIndex);
-			
-			// Function to calculate changes for a single data item
-			const calculateChangesForItem = (dataItem: any, key: string) => {
-				if (dataItem) {
-					let value = dataItem.get(<any>key);
-					if (value != null) {
-						dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
-						dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
-						dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
-						dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
-						previous[key] = value;
-					}
-				}
-			};			
 
+			const calculateChangesForItem = (dataItem: any, value:number, key: string) => {
+				if (startIndex === 0) {
+					const openValue = open[openKey];
+					const changeValue = value - openValue;
+					dataItem.setRaw(<any>(change), changeValue);
+					dataItem.setRaw(<any>(changePercent), changeValue / openValue * 100);
+				}
+
+				const changePreviousValue = value - previous[openKey];
+				const changeSelectionValue = value - open[openKey];
+				dataItem.setRaw(<any>(changePrevious), changePreviousValue);
+				dataItem.setRaw(<any>(changePreviousPercent), changePreviousValue / previous[openKey] * 100);
+				dataItem.setRaw(<any>(changeSelection), changeSelectionValue);
+				dataItem.setRaw(<any>(changeSelectionPercent), changeSelectionValue / open[openKey] * 100);
+				previous[key] = value;
+			};
+
+			// find first non-null value to initialize open, low, high instead of checking in loop
 			for (let i = adjustedStartIndex; i < endIndex; i++) {
-				const dataItem = this.dataItems[i];
+				const dataItem = dataItems[i];
 				if(dataItem){
 					let value = dataItem.get(<any>key)
-
-					if (value != null) {
-						count[key]++;
-						sum[key] += value;
-
-						absSum[key] += Math.abs(value);
-
-						average[key] = sum[key] / count[key];
-
-						if (low[key] > value || low[key] == null) {
+					if(value != null){
+						if(low[key] == null){
 							low[key] = value;
 						}
-						if (high[key] < value || high[key] == null) {
+						if(high[key] == null){
 							high[key] = value;
 						}
-
-						close[key] = value;
 
 						if (open[key] == null) {
 							open[key] = value;
@@ -602,24 +600,57 @@ export abstract class Series extends Component {
 							}
 						}
 
-						if (startIndex === 0) {
-							dataItem.setRaw(<any>(change), value - open[openKey]);
-							dataItem.setRaw(<any>(changePercent), (value - open[openKey]) / open[openKey] * 100);
-						}
-
-						calculateChangesForItem(dataItem, key);
+						// stop cycle
+						break;
 					}
 				}
 			}
 
-			// Calculate for endIndex item
-			if (endIndex < len) {
-				calculateChangesForItem(this.dataItems[endIndex], key);
+
+			for (let i = adjustedStartIndex; i < endIndex; i++) {
+				const dataItem = dataItems[i];
+				if(dataItem){
+					let value = (dataItem._settings as any)[key];
+
+					if (value != null) {
+						count[key]++;
+						sum[key] += value;
+
+						absSum[key] += Math.abs(value);
+
+						if (low[key] > value) {
+							low[key] = value;
+						}
+						if (high[key] < value) {
+							high[key] = value;
+						}
+
+						close[key] = value;
+						calculateChangesForItem(dataItem, value, key);
+					}
+				}
 			}
-			
-			// Calculate for endIndex+1 item if available
+
+			average[key] = sum[key] / count[key];
+
+			if (endIndex < len) {
+				const dataItem = dataItems[endIndex];
+				if(dataItem){
+					let value = dataItem.get(<any>key);
+					if(value != null){
+						calculateChangesForItem(dataItem, value, key);
+					}
+				}
+			}
+
 			if (endIndex + 1 < len) {
-				calculateChangesForItem(this.dataItems[endIndex + 1], key);
+				const dataItem = dataItems[endIndex + 1];
+				if(dataItem){
+					let value = dataItem.get(<any>key);
+					if(value != null){
+						calculateChangesForItem(dataItem, value, key);
+					}
+				}
 			}
 
 			if (startIndex > 0) {
@@ -629,27 +660,23 @@ export abstract class Series extends Component {
 			delete previous[key];
 
 			for (let i = startIndex; i < adjustedStartIndex; i++) {
-				const dataItem = this.dataItems[i];
+				const dataItem = dataItems[i];
 				if(dataItem) {
 					let value = dataItem.get(<any>key);
 
 					if (previous[key] == null) {
 						previous[key] = value;
-					}				
-		
+					}
+
 					if (value != null) {
-						dataItem.setRaw(<any>(changePrevious), value - previous[openKey]);
-						dataItem.setRaw(<any>(changePreviousPercent), (value - previous[openKey]) / previous[openKey] * 100);
-						dataItem.setRaw(<any>(changeSelection), value - open[openKey]);
-						dataItem.setRaw(<any>(changeSelectionPercent), (value - open[openKey]) / open[openKey] * 100);
-		
-						previous[key] = value;
+						calculateChangesForItem(dataItem, value, key);
 					}
 				}
 			}
-		})
+		}
 
-		$array.each(fields, (key) => {
+		for(let f = 0, flen = fields.length; f < flen; f++){
+			let key = fields[f];
 			this.setPrivate(<any>(key + "AverageSelection"), average[key]);
 			this.setPrivate(<any>(key + "CountSelection"), count[key]);
 			this.setPrivate(<any>(key + "SumSelection"), sum[key]);
@@ -658,10 +685,11 @@ export abstract class Series extends Component {
 			this.setPrivate(<any>(key + "HighSelection"), high[key]);
 			this.setPrivate(<any>(key + "OpenSelection"), open[key]);
 			this.setPrivate(<any>(key + "CloseSelection"), close[key]);
-		})
+		}
 
 		if (startIndex === 0 && endIndex === len) {
-			$array.each(fields, (key) => {
+			for(let f = 0, flen = fields.length; f < flen; f++){
+				let key = fields[f];
 				this.setPrivate(<any>(key + "Average"), average[key]);
 				this.setPrivate(<any>(key + "Count"), count[key]);
 				this.setPrivate(<any>(key + "Sum"), sum[key]);
@@ -670,7 +698,7 @@ export abstract class Series extends Component {
 				this.setPrivate(<any>(key + "High"), high[key]);
 				this.setPrivate(<any>(key + "Open"), open[key]);
 				this.setPrivate(<any>(key + "Close"), close[key]);
-			})
+			}
 		}
 	}
 
@@ -707,7 +735,7 @@ export abstract class Series extends Component {
 							const defaultState = states.lookup("default");
 							if(defaultState && rule.neutral){
 								defaultState.set(rule.key, rule.neutral);
-							}						
+							}
 						}
 						if(!rule.customFunction){
 							return;
@@ -748,7 +776,7 @@ export abstract class Series extends Component {
 							const defaultState = states.lookup("default");
 							if(defaultState){
 								defaultState.set(rule.key, propertyValue);
-							}						
+							}
 						}
 					}
 				});
@@ -890,7 +918,7 @@ export abstract class Series extends Component {
 		if(bullets){
 			$array.each(bullets, (bullet)=>{
 				const sprite = bullet.get("sprite");
-				if(sprite){					
+				if(sprite){
 					promises.push(sprite.hide(duration));
 				}
 			})

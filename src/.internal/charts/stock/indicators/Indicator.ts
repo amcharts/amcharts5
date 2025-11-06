@@ -103,7 +103,7 @@ export interface IIndicatorSettings extends IContainerSettings {
 	/**
 	 * Should indicator settings modal be openend automatically when indicator
 	 * is added to a chart via [[IndicatorControl]].
-	 * 
+	 *
 	 * @default true
 	 * @since 5.10.6
 	 */
@@ -384,140 +384,209 @@ export abstract class Indicator extends Container {
 		return data;
 	}
 
-	protected _sma(data: Array<any>, period: number, field: string, toField: string) {
-		let i = 0;
-		let index = 0;
-		let ma = 0;
-		$array.each(data, (dataItem) => {
-			let value = dataItem[field];
-			if (value != null) {
-				i++;
-				ma += value / period;
 
-				if (i >= period) {
-					if (i > period) {
-						let valueToRemove = data[index - period][field];
-						if (valueToRemove != null) {
-							ma -= valueToRemove / period;
-						}
+	protected _sma(data: Array<any>, period: number, field: string, toField: string) {
+		if (!data || data.length === 0 || period <= 0) {
+			return;
+		}
+
+		const invPeriod = 1 / period;
+		const len = data.length;
+
+		let count = 0; // number of non-null values encountered
+		let sum = 0;   // sum of values in the current window
+
+		for (let i = 0; i < len; i++) {
+			const dataItem = data[i];
+			const value = dataItem[field];
+
+			if (value != null) {
+				count++;
+				sum += value;
+
+				// remove value that goes out of window (by index, to preserve original behavior)
+				if (count > period) {
+					const valueToRemove = data[i - period][field];
+					if (valueToRemove != null) {
+						sum -= valueToRemove;
 					}
-					dataItem[toField] = ma;
+				}
+
+				if (count >= period) {
+					dataItem[toField] = sum * invPeriod;
 				}
 			}
-			index++;
-		})
+		}
 	}
 
 	protected _wma(data: Array<any>, period: number, field: string, toField: string) {
-		let i = 0;
-		let index = 0;
-		let ma = 0;
-		$array.each(data, (dataItem) => {
-			let value = dataItem[field];
-			if (value != null) {
-				i++;
-				if (i >= period) {
-					let sum = 0;
-					let m = 0;
-					let count = 0;
-					let k = 0
-					for (let n = index; n >= 0; n--) {
-						let pValue = data[n][field];
+		const denom = period * (period + 1) / 2;
+		const buffer: number[] = new Array(period);
+		let start = 0;
+		let len = 0;
+		let sum = 0;      // sum of values in the window
+		let weighted = 0; // weighted sum (1*v1 + 2*v2 + ... + p*vp)
 
-						if (pValue != null) {
-							sum += pValue * (period - m);
-							count += (period - m);
-							k++;
-						}
-						m++;
+		for (let i = 0; i < data.length; i++) {
+			const dataItem = data[i];
+			const value = dataItem[field];
 
-						if (k == period) {
-							break;
-						}
-					}
+			if (value == null) {
+				continue;
+			}
 
-					ma = sum / count;
-					dataItem[toField] = ma;
+			if (len < period) {
+
+				const pos = (start + len) % period;
+				buffer[pos] = value;
+				len++;
+				sum += value;
+				weighted += len * value;
+
+				if (len === period) {
+					dataItem[toField] = weighted / denom;
 				}
 			}
-			index++;
-		})
+			else {
+				const oldest = buffer[start];
+				weighted = weighted - sum + period * value;
+				sum = sum - oldest + value;
+				buffer[start] = value;
+				start = (start + 1) % period;
+				dataItem[toField] = weighted / denom;
+			}
+		}
 	}
 
-	protected _ema(data: Array<any>, period: number, field: string, toField: string) {
-		let i = 0;
-		let ma = 0;
-		let multiplier = 2 / (1 + period);
-		$array.each(data, (dataItem) => {
-			let value = dataItem[field];
-			if (value != null) {
-				i++;
 
-				if (i > period) {
-					ma = value * multiplier + ma * (1 - multiplier);
+	protected _ema(data: Array<any>, period: number, field: string, toField: string) {
+		const len = data.length;
+		if (len === 0 || period <= 0) {
+			return;
+		}
+
+		const invPeriod = 1 / period;
+		const multiplier = 2 / (1 + period);
+		const oneMinus = 1 - multiplier;
+
+		let ma = 0;
+		let count = 0;
+
+		for (let i = 0; i < len; i++) {
+			const dataItem = data[i];
+			const value = dataItem[field];
+
+			if (value == null) {
+				continue;
+			}
+
+			count++;
+
+			if (count > period) {
+				ma = value * multiplier + ma * oneMinus;
+				dataItem[toField] = ma;
+			}
+			else {
+				ma += value * invPeriod;
+				if (count === period) {
 					dataItem[toField] = ma;
 				}
-				else {
-					ma += value / period;
-					if (i == period) {
-						dataItem[toField] = ma;
-					}
-				}
 			}
-		})
+		}
 	}
 
 	protected _dema(data: Array<any>, period: number, field: string, toField: string) {
-		let i = 0;
+		if (period <= 0 || data.length === 0) {
+			return;
+		}
+
+		const multiplier = 2 / (1 + period);
+		const oneMinus = 1 - multiplier;
+		const invPeriod = 1 / period;
+
+		let ema = 0;
+		let emaCount = 0;
+
 		let ema2 = 0;
-		let multiplier = 2 / (1 + period);
+		let ema2Count = 0;
 
-		this._ema(data, period, field, "ema");
+		for (let i = 0, len = data.length; i < len; i++) {
+			const dataItem = data[i];
+			const value = dataItem[field];
 
-		$array.each(data, (dataItem) => {
-			let ema = dataItem.ema;
-			if (ema != null) {
-				i++;
-				if (i > period) {
-					ema2 = ema * multiplier + ema2 * (1 - multiplier);
-					dataItem[toField] = 2 * ema - ema2;
+			if (value == null) {
+				continue;
+			}
+
+			// compute EMA (same logic as _ema)
+			emaCount++;
+			if (emaCount > period) {
+				ema = value * multiplier + ema * oneMinus;
+				dataItem.ema = ema;
+			}
+			else {
+				ema += value * invPeriod;
+				if (emaCount === period) {
+					dataItem.ema = ema;
+				}
+			}
+
+			// if EMA was produced for this item, update EMA of EMA (ema2) and DEMA
+			const emaVal = dataItem.ema;
+			if (emaVal != null) {
+				ema2Count++;
+				if (ema2Count > period) {
+					ema2 = emaVal * multiplier + ema2 * oneMinus;
+					dataItem[toField] = 2 * emaVal - ema2;
 					dataItem.ema2 = ema2;
 				}
 				else {
-					ema2 += ema / period;
-					if (i == period) {
-						dataItem[toField] = 2 * ema - ema2;
+					ema2 += emaVal / period;
+					if (ema2Count === period) {
+						dataItem[toField] = 2 * emaVal - ema2;
 						dataItem.ema2 = ema2;
 					}
 				}
 			}
-		})
+		}
 	}
 
 	protected _tema(data: Array<any>, period: number, field: string, toField: string) {
-		let i = 0;
-		let ema3 = 0;
-		let multiplier = 2 / (1 + period);
+		if (period <= 0 || data.length === 0) {
+			return;
+		}
 
+		const multiplier = 2 / (1 + period);
+		const oneMinus = 1 - multiplier;
+
+		// Ensure ema and ema2 are present
 		this._dema(data, period, field, "dema");
 
-		$array.each(data, (dataItem) => {
-			let ema = dataItem.ema;
-			let ema2 = dataItem.ema2;
+		let ema3 = 0;
+		let count = 0;
+		for (let i = 0, len = data.length; i < len; i++) {
+			const dataItem = data[i];
+			const ema = dataItem.ema;
+			const ema2 = dataItem.ema2;
 
-			if (ema2 != null) {
-				i++;
-				if (i > period) {
-					ema3 = ema2 * multiplier + ema3 * (1 - multiplier);
-					dataItem[toField] = 3 * ema - 3 * ema2 + ema3;
-				}
-				else {
-					ema3 += ema2 / period;
-					if (i == period) {
-						dataItem[toField] = 3 * ema - 3 * ema2 + ema3;
-					}
+			if (ema2 == null) {
+				continue;
+			}
+
+			count++;
+			if (count > period) {
+				ema3 = ema2 * multiplier + ema3 * oneMinus;
+				// guard ema just in case (should be present when ema2 is)
+				const emaVal = (ema == null) ? 0 : ema;
+				dataItem[toField] = 3 * emaVal - 3 * ema2 + ema3;
+			}
+			else {
+				ema3 += ema2 / period;
+				if (count === period) {
+					const emaVal = (ema == null) ? 0 : ema;
+					dataItem[toField] = 3 * emaVal - 3 * ema2 + ema3;
 				}
 			}
-		})
+		}
 	}
 }

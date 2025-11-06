@@ -113,6 +113,13 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	 */
 	deactivateRoot?: boolean;
 
+	/**
+	 * ARIA label for the menu.
+	 *
+	 * @since 5.14.4
+	 */
+	ariaLabel?: string;
+
 }
 
 export interface IExportingMenuPrivate extends IEntityPrivate {
@@ -247,7 +254,7 @@ export class ExportingMenu extends Entity {
 
 		iconElement.innerHTML = '<svg fill="none" height="20" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"/></svg>';
 		iconElement.setAttribute("tabindex", this._root.tabindex.toString());
-		iconElement.setAttribute("aria-label", this._t("Export") + "; " + this._t("Press ENTER to open"));
+		iconElement.setAttribute("aria-label", this.get("ariaLabel", this._t("Export") + "; " + this._t("Press ENTER to open")));
 		iconElement.setAttribute("role", "button");
 
 		if ($utils.supports("keyboardevents")) {
@@ -440,7 +447,7 @@ export class ExportingMenu extends Entity {
 
 			const a = document.createElement("a");
 
-			let ariaLabel = this._t("Export");
+			let ariaLabel = this._t("Export ");
 			if (item.label) {
 				a.innerHTML = item.label;
 				ariaLabel += " " + item.label;

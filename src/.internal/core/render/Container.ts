@@ -326,7 +326,10 @@ export class Container extends Sprite {
 			if (verticalScrollbar) {
 				verticalScrollbar.set("height", height);
 				verticalScrollbar.set("x", width - verticalScrollbar.width() - verticalScrollbar.get("marginRight", 0));
+				verticalScrollbar.set("end", verticalScrollbar.get("start", 0) + height / this._contentHeight);
 
+				/**
+				 * ruins scrollToChild
 				let start = verticalScrollbar.get("start", 0);
 				let end = verticalScrollbar.get("end", 1);
 
@@ -336,7 +339,7 @@ export class Container extends Sprite {
 				else {
 					verticalScrollbar.set("end", Math.min(1, start + height / this._contentHeight));
 				}
-
+ 				*/
 				const bg = verticalScrollbar.get("background");
 				if (bg) {
 					bg.setAll({ width: verticalScrollbar.width(), height: height })

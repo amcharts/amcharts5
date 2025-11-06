@@ -52,6 +52,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 	public _afterNew() {
 		this.valueFields.push("date");
+		this.addTag("gapless");
 		super._afterNew();
 	}
 

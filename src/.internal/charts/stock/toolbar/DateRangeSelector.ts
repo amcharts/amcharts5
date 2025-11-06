@@ -51,7 +51,7 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	/**
 	 * Set to array of days to disable in date picker dropdowns, with Sunday
 	 * starting at 0, Monday - 1, etc.
-	 * 
+	 *
 	 * @default []
 	 * @since 5.11.1
 	 */
@@ -60,7 +60,7 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	/**
 	 * If set to `false`, typing into date fields will be disabled. Instead,
 	 * user will be able to select a day using arrow keys.
-	 * 
+	 *
 	 * @default true
 	 * @since 5.12.3
 	 */
@@ -493,7 +493,7 @@ export class DateRangeSelector extends StockControl {
 					l.translate("December"),
 				],
 			},
-			firstDayOfWeek: this._root.locale.firstDayOfWeek,
+			firstDayOfWeek: this._root.locale.firstDayOfWeek !== undefined ? this._root.locale.firstDayOfWeek : 1,
 			ordinal: l.translateFunc("_dateOrd"),
 			rangeSeparator: " " + l.translateAny("to") + " ",
 			weekAbbreviation: l.translateAny("Wk"),
@@ -506,7 +506,6 @@ export class DateRangeSelector extends StockControl {
 			minuteAriaLabel: l.translateAny("Minute"),
 			time_24hr: true
 		}
-
 		return locale;
 	}
 

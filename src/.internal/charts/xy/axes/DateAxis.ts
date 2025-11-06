@@ -216,6 +216,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
+		this.addTag("date");
 		this._setBaseInterval(this.get("baseInterval"));
 		this.on("baseInterval", () => {
 			this._setBaseInterval(this.get("baseInterval"));
@@ -630,11 +631,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 					series.setPrivate("outOfSelection", outOfSelection);
 					series.setPrivate("startIndex", startIndex);
-					series.setPrivate("adjustedStartIndex", series._adjustStartIndex(startIndex));
+					let adjustedStartIndex = series._adjustStartIndex(startIndex);
+					if (series.getPrivate("adjustedStartIndex") !== adjustedStartIndex) {
+						series.setPrivate("adjustedStartIndex", adjustedStartIndex);
+						this.root.events.once("frameended", () => {
+							series._markDirtyPrivateKey("adjustedStartIndex");
+						})
+					}
 					series.setPrivate("endIndex", endIndex);
-					this.root.events.once("frameended", () => {
-						series._markDirtyPrivateKey("adjustedStartIndex");
-					})
 
 				}
 			})

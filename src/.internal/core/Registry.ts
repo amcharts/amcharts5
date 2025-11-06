@@ -1,4 +1,3 @@
-
 /**
  * @ignore
  */
@@ -6,7 +5,7 @@ export class Registry {
 	/**
 	 * Currently running version of amCharts.
 	 */
-	readonly version: string = "5.14.3";
+	readonly version: string = "5.14.4";
 
 	/**
 	 * List of applied licenses.
@@ -24,10 +23,16 @@ export class Registry {
 	 */
 	rootElements: any[] = [];
 
+	/**
+	 * Automatically dispose a [[Root]] element if it exists in the target container.
+	 *
+	 * @since 5.14.4
+	 */
+	autoDispose: boolean = false;
 }
 
 /**
-	* @ignore
+ * @ignore
  */
 export const registry = new Registry();
 
@@ -49,20 +54,19 @@ export function addLicense(license: string): void {
 	registry.licenses.push(license);
 }
 
-
 /**
  * Disposes all [[Root]] elements.
  */
 export function disposeAllRootElements(): void {
 	let root;
-	while(root = registry.rootElements.pop()) {
+	while ((root = registry.rootElements.pop())) {
 		root.dispose();
 	}
 }
 
 /**
  * Finds and returns a `Root` element assigned to a container with `id`.
- * 
+ *
  * @param   id  Container ID
  * @return      Root
  * @since 5.9.2

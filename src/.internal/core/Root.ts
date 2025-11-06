@@ -415,7 +415,12 @@ export class Root implements IDisposer {
 
 		$array.each(registry.rootElements, (root) => {
 			if (root.dom === dom) {
-				throw new Error("You cannot have multiple Roots on the same DOM node");
+				if (registry.autoDispose) {
+					root.dispose();
+				}
+				else {
+					throw new Error("You cannot have multiple Roots on the same DOM node");
+				}
 			}
 		});
 
@@ -986,7 +991,7 @@ export class Root implements IDisposer {
 	}
 
 	private _runDirties() {
-		//console.log("tick **************************************************************");		
+		//console.log("tick **************************************************************");
 		let allParents: { [id: number]: IParent } = {};
 
 		while (this._isDirtyParents) {
@@ -1697,6 +1702,8 @@ export class Root implements IDisposer {
 		if (this._a11yD == true || target == undefined) {
 			return;
 		}
+
+		this._focusElementContainer!.scrollTop = 0;
 
 		const bounds = target.globalBounds();
 

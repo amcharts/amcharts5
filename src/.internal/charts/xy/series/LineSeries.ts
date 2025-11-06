@@ -234,8 +234,8 @@ export class LineSeries extends XYSeries {
 					fill.setPrivate("visible", false);
 				})
 
-				this.strokes.each((fill) => {
-					fill.setPrivate("visible", false);
+				this.strokes.each((stroke) => {
+					stroke.setPrivate("visible", false);
 				})
 
 				this.axisRanges.each((axisRange) => {

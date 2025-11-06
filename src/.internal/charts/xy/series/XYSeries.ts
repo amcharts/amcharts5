@@ -25,37 +25,20 @@ import * as $utils from "../../../core/util/Utils";
  * @ignore
  */
 function min(left: number | undefined, right: number | undefined): number | undefined {
-	if (left == null) {
-		return right;
-
-	} else if (right == null) {
-		return left;
-
-	} else if (right < left) {
-		return right;
-
-	} else {
-		return left;
-	}
+	if (left == null) return right;
+	if (right == null) return left;
+	return (right < left) ? right : left;
 }
 
 /**
  * @ignore
  */
 function max(left: number | undefined, right: number | undefined): number | undefined {
-	if (left == null) {
-		return right;
-
-	} else if (right == null) {
-		return left;
-
-	} else if (right > left) {
-		return right;
-
-	} else {
-		return left;
-	}
+	if (left == null) return right;
+	if (right == null) return left;
+	return (left > right) ? left : right;
 }
+
 
 /**
  * Interface representing a series axis range.
@@ -1142,7 +1125,7 @@ export abstract class XYSeries extends Series {
 
 	// TODO use  SelectKeys<this["_privateSettings"], number | undefined>
 	protected _min<Key extends keyof this["_privateSettings"]>(key: Key, value: number | undefined) {
-		let newValue = min(this.getPrivate(key) as any, value);
+		let newValue = min(this.getPrivate(key) as any, value);		
 		this.setPrivate(key, newValue as any);
 	}
 
