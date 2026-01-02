@@ -165,13 +165,13 @@ export class Trix extends ChartIndicator {
 			})
 
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 
 
 			period = this.get("signalPeriod", 9);
 			this._sma(data, period, "trix", "signal");
 
-			this.signalSeries.data.setAll(data);
+			this.signalSeries.updateData(data);
 		}
 	}
 }

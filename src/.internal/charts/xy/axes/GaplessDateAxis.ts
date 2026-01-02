@@ -179,7 +179,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 			let d = value - itemValue;
 
-			return (index - startLocation) / len + d / this.baseDuration() / len;
+			return (index - startLocation) / len + d / this._baseDuration / len;
 		}
 	}
 
@@ -228,7 +228,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			findex = len - 1
 		}
 
-		return dates[findex] + (index - findex + startLocation) * this.baseDuration();
+		return dates[findex] + (index - findex + startLocation) * this._baseDuration;
 	}
 
 	protected _fixZoomFactor() {
@@ -256,7 +256,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		let endValue = dates[result.index];
 
 		if (result.index >= len) {
-			endValue = dates[len - 1] + this.baseDuration();
+			endValue = dates[len - 1] + this._baseDuration;
 		}
 
 		this.zoomToValues(startValue, endValue, duration);
@@ -297,7 +297,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			const dates = this._getDates();
 			const renderer = this.get("renderer");
 			const len = dates.length;
-			const baseDuration = this.baseDuration();
+			const baseDuration = this._baseDuration;
 
 			let startIndex = this.valueToIndex(startTime);
 			if (startIndex > 0) {
@@ -336,6 +336,8 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				gridInterval = { ...baseInterval };
 				intervalDuration = $time.getIntervalDuration(gridInterval);
 			}
+
+			this.setPrivateRaw("gridInterval", gridInterval);			
 
 			this._intervalDuration = intervalDuration;
 

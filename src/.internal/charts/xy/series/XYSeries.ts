@@ -875,6 +875,9 @@ export abstract class XYSeries extends Series {
 	protected _x: number = 0;
 	protected _y: number = 0;
 
+	protected _xRenderer!: AxisRenderer;
+	protected _yRenderer!: AxisRenderer;
+
 	public _bullets: { [index: string]: Sprite } = {};
 
 	/**
@@ -1125,7 +1128,7 @@ export abstract class XYSeries extends Series {
 
 	// TODO use  SelectKeys<this["_privateSettings"], number | undefined>
 	protected _min<Key extends keyof this["_privateSettings"]>(key: Key, value: number | undefined) {
-		let newValue = min(this.getPrivate(key) as any, value);		
+		let newValue = min(this.getPrivate(key) as any, value);
 		this.setPrivate(key, newValue as any);
 	}
 
@@ -1153,12 +1156,12 @@ export abstract class XYSeries extends Series {
 			let count = endIndex - startIndex;
 
 			if (xAxis == baseAxis) {
-				if (xAxis.get("renderer").axisLength() / count < minBulletDistance / 5) {
+				if (this._xRenderer.axisLength() / count < minBulletDistance / 5) {
 					return false;
 				}
 			}
 			else if (yAxis == baseAxis) {
-				if (yAxis.get("renderer").axisLength() / count < minBulletDistance / 5) {
+				if (this._yRenderer.axisLength() / count < minBulletDistance / 5) {
 					return false;
 				}
 			}
@@ -1261,6 +1264,9 @@ export abstract class XYSeries extends Series {
 
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		this._xRenderer = this.get("xAxis").get("renderer");
+		this._yRenderer = this.get("yAxis").get("renderer");
 
 		this._bullets = {};
 
@@ -1837,7 +1843,7 @@ export abstract class XYSeries extends Series {
 						if (realField) {
 							positionY = yAxis.getDataItemPositionY(dataItem, realField as any, 0, this.get("vcy", 1), exactLocationY)
 
-							point = yAxis.get("renderer").positionToPoint(positionY);
+							point = this._yRenderer.positionToPoint(positionY);
 
 							y = point.y;
 							x = left + w * locationX;
@@ -1860,7 +1866,7 @@ export abstract class XYSeries extends Series {
 						if (realField) {
 							positionX = xAxis.getDataItemPositionX(dataItem, realField as any, 0, this.get("vcx", 1), exactLocationX);
 
-							point = xAxis.get("renderer").positionToPoint(positionX);
+							point = this._xRenderer.positionToPoint(positionX);
 
 							x = point.x;
 							y = bottom - h * locationY;
@@ -2304,22 +2310,22 @@ export abstract class XYSeries extends Series {
 	 * @ignore
 	 */
 	public getPoint(positionX: number, positionY: number): IPoint {
-		let x = this.get("xAxis").get("renderer").positionToCoordinate(positionX);
-		let y = this.get("yAxis").get("renderer").positionToCoordinate(positionY);
+		let x = this._xRenderer.positionToCoordinate(positionX);
+		let y = this._yRenderer.positionToCoordinate(positionY);
 
 		// if coordinate is super big, canvas fails to draw line, capping to some big number (won't make any visual difference)
 		let max = 999999999;
 		if (y < -max) {
 			y = -max;
 		}
-		if (y > max) {
+		else if (y > max) {
 			y = max;
 		}
 
 		if (x < -max) {
 			x = -max;
 		}
-		if (x > max) {
+		else if (x > max) {
 			x = max;
 		}
 

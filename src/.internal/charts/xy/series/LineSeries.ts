@@ -230,6 +230,8 @@ export class LineSeries extends XYSeries {
 		if (xAxis.inited && yAxis.inited) {
 			if (this._axesDirty || this._valuesDirty || this._stackDirty || this.isDirty("vcx") || this.isDirty("vcy") || this._sizeDirty || this.isDirty("connect") || this.isDirty("curveFactory")) {
 
+				const dataItems = this.dataItems;
+
 				this.fills.each((fill) => {
 					fill.setPrivate("visible", false);
 				})
@@ -270,7 +272,7 @@ export class LineSeries extends XYSeries {
 				}
 
 				for (let i = startIndex - 1; i >= 0; i--) {
-					let dataItem = this.dataItems[i];
+					let dataItem = dataItems[i];
 					let hasValues = true;
 					let dataContext = dataItem.dataContext as any;
 					if (strokeTemplateField) {
@@ -296,13 +298,13 @@ export class LineSeries extends XYSeries {
 				}
 
 
-				let len = this.dataItems.length;
+				let len = dataItems.length;
 				let endIndex = this.endIndex();
 
 				if (endIndex < len) {
 					endIndex++;
 					for (let i = endIndex; i < len; i++) {
-						let dataItem = this.dataItems[i];
+						let dataItem = dataItems[i];
 						let hasValues = true;
 						$array.each(this._valueFields, (field) => {
 							if (!$type.isNumber(dataItem.get(field as any))) {
@@ -324,7 +326,7 @@ export class LineSeries extends XYSeries {
 				this._clearGraphics();
 				this._sindex = 0;
 				this._dindex = startIndex;
-				if (this.dataItems.length == 1) {
+				if (len == 1) {
 					this._startSegment(0);
 				}
 				else {
@@ -354,6 +356,9 @@ export class LineSeries extends XYSeries {
 	}
 
 	protected _startSegment(dataItemIndex: number) {
+
+		const dataItems = this.dataItems;
+
 		let endIndex = this._endIndex;
 		let currentEndIndex = endIndex;
 
@@ -453,7 +458,7 @@ export class LineSeries extends XYSeries {
 
 		for (i = dataItemIndex; i < currentEndIndex; i++) {
 			this._dindex = i;
-			const dataItem = this._dataItems[i];
+			const dataItem = dataItems[i];
 
 			let valueX = dataItem.get(xField as any);
 			let valueY = dataItem.get(yField as any);
@@ -508,7 +513,7 @@ export class LineSeries extends XYSeries {
 			}
 
 			if (!connect) {
-				let nextItem = this.dataItems[i + 1];
+				let nextItem = dataItems[i + 1];
 				if (nextItem) {
 					if (baseAxis.shouldGap(dataItem, nextItem, autoGapCount, baseField)) {
 						points = [];

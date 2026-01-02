@@ -1,6 +1,7 @@
 import { Entity, IEntityEvents, IEntitySettings, IEntityPrivate } from "../../core/util/Entity";
 import { Component } from "../../core/render/Component";
 import { Color } from "../../core/util/Color";
+import { Gradient } from "../../core/render/gradients/Gradient";
 import { Percent } from "../../core/util/Percent";
 import { Template } from "../../core/util/Template";
 import { ListData } from "../../core/util/Data";
@@ -40,7 +41,7 @@ export interface ISerializerSettings extends IEntitySettings {
 	 * An array of properties to include in the serialized data.
 	 *
 	 * @ignore
-	 * @todo implement
+	 * @since 5.15.0
 	 */
 	includeProperties?: Array<string>;
 
@@ -50,6 +51,39 @@ export interface ISerializerSettings extends IEntitySettings {
 	 * @default 2
 	 */
 	maxDepth?: number;
+
+	/**
+	 * Include states in the output.
+	 *
+	 * @default false
+	 * @since 5.15.0
+	 */
+	includeStates?: boolean;
+
+	/**
+	 * Include adapters in the output.
+	 *
+	 * @default false
+	 * @since 5.15.0
+	 */
+	includeAdapters?: boolean;
+
+	/**
+	 * Include events in the output.
+	 *
+	 * @since 5.15.0
+	 * @default false
+	 * @todo implement
+	 * @ignore
+	 */
+	includeEvents?: boolean;
+
+	/**
+	 * Serialize functions as strings or functions.
+	 *
+	 * @default "function"
+	 */
+	functionsAs?: "string" | "function";
 
 }
 
@@ -81,12 +115,13 @@ export class Serializer extends Entity {
 	/**
 	 * Serializes target object into a simple object or JSON string.
 	 *
-	 * @param   source  Target object
-	 * @param   depth   Current depth
-	 * @param   full    Serialize object in full (ignoring maxDepth)
-	 * @return          Serialized data
+	 * @param   source      Target object
+	 * @param   depth       Current depth
+	 * @param   full        Serialize object in full (ignoring maxDepth)
+	 * @param   forceParse  If true, will add __parse to serialized objects
+	 * @return              Serialized data
 	 */
-	public serialize(source: unknown, depth: number = 0, full: boolean = false): unknown {
+	public serialize(source: unknown, depth: number = 0, full: boolean = false, forceParse: boolean = false): unknown {
 		if (depth > this.get("maxDepth", 2)) {
 			return undefined;
 		}
@@ -98,14 +133,14 @@ export class Serializer extends Entity {
 		if ($type.isArray(source)) {
 			const res: any[] = [];
 			$array.each(source, (arrval) => {
-				res.push(this.serialize(arrval, depth, full));
+				res.push(this.serialize(arrval, depth, full, forceParse));
 			});
 			return res;
 		}
 		else if (source instanceof ListData) {
 			const res: any[] = [];
 			$array.each(source.values, (arrval) => {
-				res.push(this.serialize(arrval, depth, full));
+				res.push(this.serialize(arrval, depth, full, forceParse));
 			});
 			return res;
 		}
@@ -117,18 +152,7 @@ export class Serializer extends Entity {
 		const fullSettings: any = this.get("fullSettings", []);
 		if (source instanceof Entity) {
 			res.type = source.className;
-
-			let settings: Array<string> = $object.keys(source._settings);
-			const includeSettings: Array<string> = this.get("includeSettings", []);
-			const excludeSettings: Array<string> = this.get("excludeSettings", []);
-			if (includeSettings.length) {
-				settings = includeSettings;
-			}
-			else if (excludeSettings.length) {
-				settings = settings.filter((value) => {
-					return excludeSettings.indexOf(value) === -1;
-				});
-			}
+			let settings: Array<string> = this._filterSettings($object.keys(source._settings));
 
 			// Include only user settings
 			settings = settings.filter((value) => {
@@ -141,27 +165,37 @@ export class Serializer extends Entity {
 					const settingValue = (<any>source).get(setting);
 					if (settingValue !== undefined) {
 						res.settings[setting] = this.serialize(settingValue, depth + 1, full || fullSettings.indexOf(setting) !== -1);
+						if (source instanceof Gradient && setting === "stops") {
+							res.settings[setting] = this.serialize(settingValue, 0, true);
+						}
 					}
 				});
 			}
+			this._processAdapters(source, res);
+			this._processStates(source, res);
 		}
 		else if (source instanceof Template) {
 			res.type = "Template";
-			let settings: Array<string> = $object.keys(source._settings);
+			let settings: Array<string> = this._filterSettings($object.keys(source._settings));
 			if (settings.length) {
 				res.settings = {};
 				$array.each(settings, (setting) => {
-					res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1, fullSettings.indexOf(setting) !== -1);
+					if ((<any>source)._settings[setting] !== undefined) {
+						res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1, fullSettings.indexOf(setting) !== -1);
+					}
 				});
 			}
+			this._processAdapters(source, res);
+			this._processStates(source, res);
+
 			return res;
 		}
 
 		// Data
 		if (source instanceof Component) {
-			if (source.data.length) {
+			if (source.data.length && (this.get("excludeProperties")! || []).indexOf("data") === -1) {
 				res.properties = {
-					data: this.serialize(source.data.values, 1, true)
+					data: this.serialize(source.data.values, depth, true)
 				};
 			}
 		}
@@ -179,7 +213,10 @@ export class Serializer extends Entity {
 				value: source.percent
 			};
 		}
-		else if ($type.isString(source) || $type.isNumber(source)) {
+		else if ($type.isString(source)) {
+			return this._escapeRefs(source);
+		}
+		else if ($type.isNumber(source)) {
 			return source;
 		}
 		else if ($type.isObject(source)) {
@@ -188,7 +225,28 @@ export class Serializer extends Entity {
 				const excludeProperties: Array<string> = this.get("excludeProperties", []);
 				$object.each(source, (key, value) => {
 					if (excludeProperties.indexOf(key) === -1 && value !== undefined) {
-						res[key] = this.serialize(value, depth + 1, full);
+						res[key] = this.serialize(value, depth + 1, full, forceParse);
+					}
+				});
+				if (forceParse) {
+					// Add only if there are objects
+					$object.each(res, (_key, value) => {
+						if ($type.isObject(value)) {
+							res.__parse = true;
+						}
+					});
+				}
+			}
+			else if (am5object) {
+				const includeProperties: Array<string> = this.get("includeProperties", []);
+				$array.each(includeProperties, (key) => {
+
+					const value: any = (source as any)[key];
+					if (value !== undefined) {
+						if (res.properties === undefined) {
+							res.properties = {};
+						}
+						res.properties[key] = this.serialize(value, depth + 1, full, forceParse);
 					}
 				});
 			}
@@ -200,4 +258,58 @@ export class Serializer extends Entity {
 
 		return res;
 	}
+
+	private _processAdapters(source: any, res: any) {
+		if (this.get("includeAdapters", false)) {
+			const asString = this.get("functionsAs", "string") == "string";
+			const callbacks = source.adapters._callbacks;
+			if (Object.keys(callbacks).length > 0) {
+				res.adapters = [];
+				$object.each(callbacks, (key, callbackList) => {
+					callbackList.forEach((callback: any) => {
+						res.adapters.push({
+							key: key,
+							callback: asString ? callback.toString() : callback
+						});
+					});
+				});
+			}
+		}
+	}
+
+	private _processStates(source: any, res: any) {
+		if (this.get("includeStates", false)) {
+			const states = source.states._states;
+			if (Object.keys(states).length > 0) {
+				res.states = [];
+				$object.each(states, (key: any, state: any) => {
+					if (Object.keys(state._settings).length > 0) {
+						res.states.push({
+							key: key,
+							settings: this.serialize(state._settings, 0, true)
+						});
+					}
+				});
+			}
+		}
+	}
+
+	private _filterSettings(settings: any) {
+		const includeSettings: Array<string> = this.get("includeSettings", []);
+		const excludeSettings: Array<string> = this.get("excludeSettings", []);
+		if (includeSettings.length) {
+			settings = includeSettings;
+		}
+		else if (excludeSettings.length) {
+			settings = settings.filter((value: any) => {
+				return excludeSettings.indexOf(value) === -1;
+			});
+		}
+		return settings;
+	}
+
+	private _escapeRefs(text: string): string {
+		return text.replace(/^#/, '##').replace(/^@/, '@@');
+	}
+
 }

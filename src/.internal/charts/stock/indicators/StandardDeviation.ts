@@ -101,7 +101,7 @@ export class StandardDeviation extends ChartIndicator {
 				}
 				i++;
 			})
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

@@ -1,10 +1,11 @@
-import { MapPointSeries, IMapPointSeriesSettings, IMapPointSeriesPrivate, IMapPointSeriesDataItem } from "./MapPointSeries";
-import { Component, DataItem, IComponentDataItem } from "../../core/render/Component";
 import type { Root } from "../../core/Root";
 import type { Bullet } from "../../core/render/Bullet";
+import type { IDisposer } from "../../core/util/Disposer";
+
+import { MapPointSeries, IMapPointSeriesSettings, IMapPointSeriesPrivate, IMapPointSeriesDataItem } from "./MapPointSeries";
+import { Component, DataItem, IComponentDataItem } from "../../core/render/Component";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
-import type { IDisposer } from "../../core/util/Disposer";
 
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
@@ -108,7 +109,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 
 	/**
 	 * Presumed radius of a each bullet when scattering them.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
 	 * @default 8
 	 * @since 5.5.7
@@ -118,7 +119,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	/**
 	 * If a map is zoomed to a maxZoomLevel * stopClusterZoom, clusters will be
 	 * disabled.
-	 * 
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
 	 * @default 0.95
 	 * @since 5.5.7
@@ -128,10 +129,10 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 
 	/**
 	 * Delay in milliseconds before clustering is made.
-	 * 
+	 *
 	 * This is useful if you have many data items and want to avoid re-clustering
 	 * on every zoom/position change.
-	 * 
+	 *
 	 * @default 0
 	 * @since 5.9.11
 	 */
@@ -141,7 +142,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 /**
  * A version of [[MapPointSeries]] which can automatically group closely located
  * bullets into groups.
- * 
+ *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/} for more info
  * @since 5.5.6
  * @important
@@ -225,7 +226,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 				const longitude = dataItem.get("longitude", 0);
 				const latitude = dataItem.get("latitude", 0);
 				this._positionBulletReal(bullet, { type: "Point", coordinates: [longitude, latitude] }, [longitude, latitude]);
-			})			
+			})
 		}
 	}
 

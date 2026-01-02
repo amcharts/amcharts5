@@ -227,7 +227,11 @@ export abstract class AxisRenderer extends Graphics {
 		const label = this.labels.make();
 
 		label.set("themeTags", $utils.mergeTags(label.get("themeTags"), themeTags));
-		this.axis.labelsContainer.children.moveValue(label, 0);
+		if (dataItem.get("isRange")) {
+			this.axis.labelsContainer.children.push(label);
+		} else {
+			this.axis.labelsContainer.children.moveValue(label, 0);
+		}
 
 		label._setDataItem(dataItem);
 		dataItem.setRaw("label", label);

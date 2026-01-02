@@ -208,8 +208,8 @@ export class MovingAverageEnvelope extends MovingAverage {
 				}
 			})
 
-			this.upperBandSeries.data.setAll(smaData);
-			this.lowerBandSeries.data.setAll(smaData);
+			this.upperBandSeries.updateData(smaData);
+			this.lowerBandSeries.updateData(smaData);
 		}
 	}
 

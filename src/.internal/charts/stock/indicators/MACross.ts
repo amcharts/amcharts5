@@ -133,8 +133,8 @@ export class MACross extends Indicator {
 			this._sma(data, period, "value_y", "ma");
 			this._sma(data, fastPeriod, "value_y", "maf");
 
-			this.series.data.setAll(data);
-			this.fastSeries.data.setAll(data);
+			this.series.updateData(data);
+			this.fastSeries.updateData(data);
 		}
 	}
 }

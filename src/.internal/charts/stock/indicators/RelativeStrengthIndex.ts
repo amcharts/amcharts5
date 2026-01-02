@@ -163,13 +163,13 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 				prevAverageGain = averageGain;
 				prevAverageLoss = averageLoss;
 			})
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 
 			period = this.get("smaPeriod", 3);
 			this._sma(data, period, "valueS", "sma");
 
-			this.series.data.setAll(data);
-			this.smaSeries.data.setAll(data);
+			this.series.updateData(data);
+			this.smaSeries.updateData(data);
 		}
 	}
 }

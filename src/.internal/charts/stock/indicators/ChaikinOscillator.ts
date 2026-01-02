@@ -136,7 +136,7 @@ export class ChaikinOscillator extends ChartIndicator {
 				}
 			})
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

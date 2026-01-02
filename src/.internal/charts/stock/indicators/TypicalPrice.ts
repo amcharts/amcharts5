@@ -95,7 +95,7 @@ export class TypicalPrice extends ChartIndicator {
 				index++;
 			})
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

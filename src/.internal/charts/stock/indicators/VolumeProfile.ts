@@ -92,7 +92,7 @@ export class VolumeProfile extends Indicator {
 		name: this.root.language.translateAny("Count"),
 		type: "dropdown",
 		options: [
-			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24 , extTargetMinValue: 1 },
+			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24, extTargetMinValue: 1 },
 			{ value: "ticks", text: this.root.language.translateAny("ticks per row"), extTarget: "count", extTargetValue: 1000, extTargetMinValue: 200 }
 		]
 	}, {
@@ -180,12 +180,13 @@ export class VolumeProfile extends Indicator {
 				this.series = chart.series.unshift(ColumnSeries.new(root, {
 					xAxis: this.xAxis,
 					yAxis: yAxis,
-					snapTooltip:false,
+					snapTooltip: false,
 					valueXField: "down",
 					openValueXField: "xOpen",
 					openValueYField: "yOpen",
 					valueYField: "y",
 					calculateAggregates: true,
+					turboMode: false,
 					themeTags: ["indicator", "volumeprofile", "down"]
 				}))
 
@@ -193,7 +194,7 @@ export class VolumeProfile extends Indicator {
 				this.upSeries = chart.series.unshift(ColumnSeries.new(root, {
 					xAxis: this.xAxis,
 					yAxis: yAxis,
-					snapTooltip:false,
+					snapTooltip: false,
 					valueXField: "total",
 					openValueXField: "down",
 					openValueYField: "yOpen",
@@ -518,7 +519,7 @@ export class VolumeProfile extends Indicator {
 					this.upSeries.data.setAll(dataUp);
 				}
 			}
-			else{
+			else {
 				this.upSeries.data.clear();
 				this.series.data.clear();
 			}

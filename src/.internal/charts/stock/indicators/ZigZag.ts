@@ -205,7 +205,7 @@ export class ZigZag extends Indicator {
 						}
 					}
 				}
-				this.series.data.setAll(data);
+				this.series.updateData(data);
 			}
 		}
 	}

@@ -212,12 +212,10 @@ export class CandlestickSeries extends ColumnSeries {
 	}
 
 	protected _afterColumnsDraw() {
-		if (this.get("turboMode")) {
-
+		if (this.get("turboMode")) {			
 			this.allColumns.set("draw", (display) => {
 				display.clear();
 				$array.each(this.allColumnsData, (column) => {
-					display.beginPath();
 					const w = column.width;
 					const h = column.height;
 					const x = column.x;

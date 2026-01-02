@@ -257,6 +257,56 @@ export abstract class Component extends Container {
 		}));
 	}
 
+
+	/**
+	 * Updates existing data in the component without disposing old data items. If there are more data items than before, new ones will be created. If there are less, old ones will be removed.
+	 * @param data 
+	 */
+	public updateData(data: Array<any>) {
+
+		let ii = 0;
+
+		$array.each(data, (dataObject, index) => {
+			const dataItem = this.dataItems[index];
+			if (!dataItem) {
+				this.data.push(dataObject);
+			}
+			else {
+				const dataContext = dataItem.dataContext as any
+				if (dataContext) {
+					$object.keys(dataObject).forEach((key) => {
+						dataContext[key] = dataObject[key];
+					});
+				}
+
+				const properties = this._makeDataItem(dataContext);
+				const interpolationDuration = this.get("interpolationDuration", 0);
+				const interpolationEasing = this.get("interpolationEasing");
+
+				$object.keys(properties).forEach((key) => {
+					if (dataItem.get(key) == properties[key]) {
+						return;
+					}
+
+					dataItem.animate({
+						key: key,
+						to: properties[key],
+						duration: interpolationDuration,
+						easing: interpolationEasing,
+					});
+				});
+
+			}
+			ii = index;
+		})
+
+		for (let i = ii + 1; i < this.dataItems.length; i++) {
+			const dataItem = this.dataItems[i];
+			$array.remove(this.dataItems, dataItem);
+			dataItem.dispose();
+		}
+	}
+
 	protected _updateFields() {
 		if (this.valueFields) {
 			this._valueFields = [];

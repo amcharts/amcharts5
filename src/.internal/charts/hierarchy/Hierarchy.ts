@@ -271,6 +271,14 @@ export abstract class Hierarchy extends Series {
 
 	protected _tag: string = "hierarchy";
 
+	public _applyThemes(force: boolean = false): boolean {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		return super._applyThemes(force);		
+	}	
+
 	/**
 	 * A list of nodes in a [[Hierarchy]] chart.
 	 *

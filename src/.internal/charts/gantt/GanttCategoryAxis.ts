@@ -201,6 +201,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	protected _dataChangeDp: IDisposer | undefined;
 	protected _treeDirty: boolean = false;
 
+	public axisResizer?: Rectangle;
+
 	/**
 	 * A reference to the parent [[Gantt]] chart.
 	 */
@@ -240,6 +242,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 		const resizer = this.children.push(Rectangle.new(this._root, {
 			themeTags: ["axisresizer"]
 		}))
+
+		this.axisResizer = resizer;
 
 		resizer.events.on("pointerdown", (e) => {
 			this._downX = this.toLocal(e.point).x;

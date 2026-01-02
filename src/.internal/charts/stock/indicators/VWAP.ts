@@ -119,7 +119,7 @@ export class VWAP extends Indicator {
 
 					i++;
 				})
-				this.series.data.setAll(data);
+				this.series.updateData(data);
 			}
 		}
 	}

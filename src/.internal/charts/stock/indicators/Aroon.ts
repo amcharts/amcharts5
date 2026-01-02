@@ -148,8 +148,8 @@ export class Aroon extends ChartIndicator {
 				i++;
 			})
 
-			this.series.data.setAll(data);
-			this.downSeries.data.setAll(data);
+			this.series.updateData(data);
+			this.downSeries.updateData(data);
 		}
 	}
 }

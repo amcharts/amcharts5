@@ -247,9 +247,9 @@ export class MACD extends ChartIndicator {
 				}
 			})
 
-			this.differenceSeries.data.setAll(data);
-			this.signalSeries.data.setAll(data);
-			this.series.data.setAll(data);
+			this.differenceSeries.updateData(data);
+			this.signalSeries.updateData(data);
+			this.series.updateData(data);
 		}
 	}
 }

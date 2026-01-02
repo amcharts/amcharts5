@@ -114,7 +114,8 @@ export class Volume extends ChartIndicator {
 				$array.each(data, (dataItem) => {
 					dataItem.volume = dataItem.value_y;
 				})
-				this.series.data.setAll(data);
+
+				this.series.updateData(data);
 			}
 		}
 	}

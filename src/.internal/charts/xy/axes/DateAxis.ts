@@ -546,7 +546,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				let groupInterval = this.get("groupInterval");
 				let current = this.getPrivate("groupInterval");
 
-				let modifiedDifference = (selectionMax - selectionMin) + (this.get("startLocation", 0) + (1 - this.get("endLocation", 1)) * this.baseDuration());
+				let modifiedDifference = (selectionMax - selectionMin) + (this.get("startLocation", 0) + (1 - this.get("endLocation", 1)) * this._baseDuration);
 
 				if (current) {
 					let duration = $time.getIntervalDuration(current);
@@ -596,7 +596,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						startIndex -= 1;
 					}
 
-					selectionMax += this.baseDuration() * (1 - this.get("endLocation", 1));
+					selectionMax += this._baseDuration * (1 - this.get("endLocation", 1));
 
 					const end = $array.getSortedIndex(series.dataItems, (dataItem) => {
 						return $order.compare(dataItem.get(fieldName), selectionMax);
@@ -732,7 +732,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			const intervals = this.get("gridIntervals")!;
 			let gridInterval = $time.chooseInterval(0, selectionMax - selectionMin, renderer.gridCount(), intervals);
 
-			if ($time.getIntervalDuration(gridInterval) < this.baseDuration()) {
+			if ($time.getIntervalDuration(gridInterval) < this._baseDuration) {
 				gridInterval = { ...baseInterval };
 			}
 
@@ -936,7 +936,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _getDelta() {
-		this._deltaMinMax = this.baseDuration() / 2;
+		this._deltaMinMax = this._baseDuration / 2;
 	}
 
 	protected _fixMin(min: number) {
@@ -1111,7 +1111,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 */
 	public roundAxisPosition(position: number, location: number): number {
 		let value = this.positionToValue(position);
-		value = value - (location - 0.5) * this.baseDuration();
+		value = value - (location - 0.5) * this._baseDuration;
 
 		let baseInterval = this.getPrivate("baseInterval");
 		if (!$type.isNaN(value)) {
@@ -1127,7 +1127,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			let duration = $time.getDateIntervalDuration(baseInterval, new Date(value), firstDay, utc, timezone);
 			if (timezone) {
 				//value = $time.round(new Date(value + this.baseDuration() * 0.05), timeUnit, count, firstDay, utc, new Date(this.getPrivate("min", 0)), timezone).getTime();
-				value = $time.roun(value + this.baseDuration() * 0.05, timeUnit, count, this._root, this.getPrivate("min", 0));
+				value = $time.roun(value + this._baseDuration * 0.05, timeUnit, count, this._root, this.getPrivate("min", 0));
 				duration = $time.getDateIntervalDuration(baseInterval, new Date(value + duration * location), firstDay, utc, timezone);
 			}
 
@@ -1183,7 +1183,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			location = 0.5;
 		}
 
-		value = value - (location - 0.5) * this.baseDuration();
+		value = value - (location - 0.5) * this._baseDuration;
 
 		const result = $array.getSortedIndex(series.dataItems, (dataItem) => {
 			let diValue = 0;
@@ -1240,7 +1240,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const value1 = dataItem.get(fieldName as any);
 		const value2 = nextItem.get(fieldName as any);
 
-		if (value2 - value1 > this.baseDuration() * autoGapCount) {
+		if (value2 - value1 > this._baseDuration * autoGapCount) {
 			return true;
 		}
 		return false;
@@ -1341,7 +1341,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			count = 1;
 		}
 
-		let dtime = this.get("tooltipLocation", 0.5) * this.baseDuration();
+		let dtime = this.get("tooltipLocation", 0.5) * this._baseDuration;
 		if (this.get("renderer").getPrivate("letter") == "Y") {
 			count *= -1;
 		}
@@ -1364,6 +1364,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	protected _nextTime(time: number, count: number, baseInterval: ITimeInterval) {
-		return $time.roun(time + count * this.baseDuration(), baseInterval.timeUnit, baseInterval.count, this._root);
+		return $time.roun(time + count * this._baseDuration, baseInterval.timeUnit, baseInterval.count, this._root);
 	}
 }

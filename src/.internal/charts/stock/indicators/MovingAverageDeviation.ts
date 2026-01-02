@@ -185,7 +185,7 @@ export class MovingAverageDeviation extends ChartIndicator {
 				}
 			})
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

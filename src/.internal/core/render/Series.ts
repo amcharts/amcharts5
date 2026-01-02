@@ -404,6 +404,9 @@ export abstract class Series extends Component {
 	public _prepareChildren(){
 		super._prepareChildren();
 
+		const dataItems = this.dataItems;
+		const count = dataItems.length;
+
 		let startIndex = this.startIndex();
 		let endIndex = this.endIndex();
 
@@ -429,7 +432,7 @@ export abstract class Series extends Component {
 		if(calculateAggregates){
 			if (this._valuesDirty && !this._dataProcessed) {
 				if (!this._aggregatesCalculated) {
-					this._calculateAggregates(0, this.dataItems.length);
+					this._calculateAggregates(0, count);					
 					this._aggregatesCalculated = true;
 					if(startIndex != 0){
 						this._psi = undefined;
@@ -438,7 +441,7 @@ export abstract class Series extends Component {
 			}
 
 			if ((this._psi != startIndex || this._pei != endIndex || this.isPrivateDirty("adjustedStartIndex")) && !this._selectionAggregatesCalculated) {
-				if (startIndex === 0 && endIndex === this.dataItems.length && this._aggregatesCalculated) {
+				if (startIndex === 0 && endIndex === count && this._aggregatesCalculated) {
 					// void
 				}
 				else {
@@ -484,12 +487,12 @@ export abstract class Series extends Component {
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 
-			if(endIndex < this.dataItems.length){
+			if(endIndex < count){
 				endIndex++;
 			}
 
 			for (let i = startIndex; i < endIndex; i++) {
-				let dataItem = this.dataItems[i];
+				let dataItem = dataItems[i];
 				if (!dataItem.bullets) {
 					this._makeBullets(dataItem);
 				}
@@ -783,8 +786,9 @@ export abstract class Series extends Component {
 			});
 		}
 
-		if(this.get("visible")){
-			let count = this.dataItems.length;
+		if(this.get("visible") && this.bullets.length > 0){
+			const dataItems = this.dataItems;
+			let count = dataItems.length;
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 
@@ -796,15 +800,15 @@ export abstract class Series extends Component {
 			}
 
 			for (let i = 0; i < startIndex; i++) {
-				this._hideBullets(this.dataItems[i]);
+				this._hideBullets(dataItems[i]);
 			}
 
 			for (let i = startIndex; i < endIndex; i++) {
-				this._positionBullets(this.dataItems[i]);
+				this._positionBullets(dataItems[i]);
 			}
 
 			for (let i = endIndex; i < count; i++) {
-				this._hideBullets(this.dataItems[i]);
+				this._hideBullets(dataItems[i]);
 			}
 		}
 	}

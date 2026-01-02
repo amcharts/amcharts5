@@ -177,6 +177,14 @@ export abstract class FlowNodes extends Series {
 	declare public _dataItemSettings: IFlowNodesDataItem;
 	declare public _events: IFlowNodesEvents;
 
+	public _applyThemes(force: boolean = false): boolean {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		return super._applyThemes(force);		
+	}	
+
 	/**
 	 * List of label elements.
 	 *

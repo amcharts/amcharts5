@@ -202,9 +202,9 @@ export class AccelerationBands extends Indicator {
             this._sma(data, period, "_upper", "upper");
             this._sma(data, period, "_average", "average");
 
-            this.upperBandSeries.data.setAll(data);
-            this.lowerBandSeries.data.setAll(data);
-            this.series.data.setAll(data);
+            this.upperBandSeries.updateData(data);
+            this.lowerBandSeries.updateData(data);
+            this.series.updateData(data);
         }
     }
 

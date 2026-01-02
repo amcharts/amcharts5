@@ -35,6 +35,7 @@ import * as $array from "./util/Array";
 import * as $object from "./util/Object";
 import * as $utils from "./util/Utils";
 import * as $type from "./util/Type";
+import * as $ease from "./util/Ease";
 
 
 import en from "../../locales/en";
@@ -529,7 +530,9 @@ export class Root implements IDisposer {
 			const m = logo.children.push(Graphics.new(this, {
 				stroke: color(0xcccccc),
 				strokeWidth: 3,
-				svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6"
+				svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6",
+				dx: -50,
+				strokeOpacity: 0
 			}));
 
 			m.states.create("hover", { stroke: color(0x3CABFF) });
@@ -537,8 +540,43 @@ export class Root implements IDisposer {
 			const a = logo.children.push(Graphics.new(this, {
 				stroke: color(0x888888),
 				strokeWidth: 3,
-				svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0"
+				svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0",
+				dx: 50,
+				strokeOpacity: 0
 			}));
+
+			const easing = $ease.out($ease.cubic);
+			const duration = 1500;
+
+			logo.setTimeout(() => {
+				a.animate({
+					key: "strokeOpacity",
+					to: 1,
+					duration: duration,
+					easing: easing
+				});
+
+				a.animate({
+					key: "dx",
+					to: 0,
+					duration: duration,
+					easing: easing
+				});
+
+				m.animate({
+					key: "dx",
+					to: 0,
+					duration: duration,
+					easing: easing
+				});
+
+				m.animate({
+					key: "strokeOpacity",
+					to: 1,
+					duration: duration,
+					easing: easing
+				});
+			}, 3000);
 
 			a.states.create("hover", { stroke: color(0x474758) });
 

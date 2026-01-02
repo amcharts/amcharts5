@@ -198,7 +198,7 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 					}
 				}
 			}
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

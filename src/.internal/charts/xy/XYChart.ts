@@ -493,6 +493,15 @@ export class XYChart extends SerialChart {
 		super._removeSeries(series);
 	}
 
+	public _applyThemes(force: boolean = false): boolean {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		const changed = super._applyThemes(force);		
+		return changed;
+	}
+
 	/**
 	 * This method is invoked when mouse wheel is used over chart's plot
 	 * container, and handles zooming/pan.

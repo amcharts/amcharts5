@@ -199,25 +199,26 @@ export abstract class BaseColumnSeries extends XYSeries {
 		let index = 0;
 		let clusterCount = 0;
 		let i = 0;
+		if (baseAxis) {
+			$array.each(baseAxis.series, (series) => {
+				if (series instanceof BaseColumnSeries) {
+					const stacked = series.get("stacked");
 
-		$array.each(baseAxis.series, (series) => {
-			if (series instanceof BaseColumnSeries) {
-				const stacked = series.get("stacked");
+					if (stacked && i == 0) {
+						clusterCount++;
+					}
 
-				if (stacked && i == 0) {
-					clusterCount++;
+					if (!stacked && series.get("clustered")) {
+						clusterCount++;
+					}
 				}
 
-				if (!stacked && series.get("clustered")) {
-					clusterCount++;
+				if (series === this) {
+					index = clusterCount - 1;
 				}
-			}
-
-			if (series === this) {
-				index = clusterCount - 1;
-			}
-			i++;
-		})
+				i++;
+			})
+		}
 
 		if (!this.get("clustered")) {
 			index = 0;
@@ -229,17 +230,14 @@ export abstract class BaseColumnSeries extends XYSeries {
 			index = 0;
 		}
 
-		const xRenderer = xAxis.get("renderer");
-		const yRenderer = yAxis.get("renderer");
-
 		const cellStartLocation = "cellStartLocation";
 		const cellEndLocation = "cellEndLocation";
 
-		const cellLocationX0 = xRenderer.get(cellStartLocation, 0);
-		const cellLocationX1 = xRenderer.get(cellEndLocation, 1);
+		const cellLocationX0 = this._xRenderer.get(cellStartLocation, 0);
+		const cellLocationX1 = this._xRenderer.get(cellEndLocation, 1);
 
-		const cellLocationY0 = yRenderer.get(cellStartLocation, 0);
-		const cellLocationY1 = yRenderer.get(cellEndLocation, 1);
+		const cellLocationY0 = this._yRenderer.get(cellStartLocation, 0);
+		const cellLocationY1 = this._yRenderer.get(cellEndLocation, 1);
 
 		this._aLocationX0 = cellLocationX0 + (index / clusterCount) * (cellLocationX1 - cellLocationX0);
 		this._aLocationX1 = cellLocationX0 + (index + 1) / clusterCount * (cellLocationX1 - cellLocationX0);;
@@ -437,7 +435,6 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 			let fitW = false;
 			let fitH = false;
-
 
 			if (axisCase == 0) {
 				let startLocation = this._aLocationX0 + openLocationX - 0.5;

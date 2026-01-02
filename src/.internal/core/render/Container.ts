@@ -339,7 +339,7 @@ export class Container extends Sprite {
 				else {
 					verticalScrollbar.set("end", Math.min(1, start + height / this._contentHeight));
 				}
- 				*/
+					*/
 				const bg = verticalScrollbar.get("background");
 				if (bg) {
 					bg.setAll({ width: verticalScrollbar.width(), height: height })
@@ -649,7 +649,7 @@ export class Container extends Sprite {
 	 * If scrolling is enabled on the Container (by adding `verticalScrollbar`)
 	 * the Container will scroll in such way so that target element becomes
 	 * visible if its currently outside of view.
-	 * 
+	 *
 	 * @param  child  Target child
 	 * @since 5.10.5
 	 */
@@ -820,12 +820,12 @@ export class Container extends Sprite {
 	/**
 	 * @ignore
 	 */
-	public walkChildren(f: (child: Sprite) => void): void {
-		this.children.each((child) => {
+	public walkChildren(f: (child: Sprite, index?: number) => void): void {
+		this.children.each((child, index) => {
 			if (child instanceof Container) {
 				child.walkChildren(f);
 			}
-			f(child);
+			f(child, index);
 		});
 	}
 

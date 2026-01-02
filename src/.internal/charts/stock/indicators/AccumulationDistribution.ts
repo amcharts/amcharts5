@@ -127,6 +127,6 @@ export class AccumulationDistribution extends ChartIndicator {
 			prevAD = ad;
 		}
 
-		this.series.data.setAll(data);
+		this.series.updateData(data);
 	}
 }

@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.15.0] - 2026-01-02
+
+### Added
+- `updateData(data)` method added to `Component`. Updates existing data in the component without disposing old data items. If there are more data items than before, new ones will be created. If there are less, old ones will be removed.
+- New class in JSON plugin: `ChartSerializer`. Allows serializing whole chart objects into a JSON. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/chart-serializer/).
+- New functionality in JSON parser: states, adapters, `templateField`, axis bullets, axis ranges. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/).
+
+### Changed
+- Stock indicators now use `updateData()` method which makes them work much faster when data is added or updated.
+
+### Fixed
+- `VolumeProfile` indicator was not showing value in legend when hovering columns (since last version).
+- Axis range labels were being drawn in reverse order.
+- Private setting `gridInterval` was not being set on `GaplessDateAxis`.
+
+
 ## [5.14.4] - 2025-11-06
 
 ### Added

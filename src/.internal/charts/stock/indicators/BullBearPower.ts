@@ -90,7 +90,7 @@ export class BullBearPower extends ChartIndicator {
                 i++;
             })
 
-            this.series.data.setAll(data);
+            this.series.updateData(data);
         }
     }
 }

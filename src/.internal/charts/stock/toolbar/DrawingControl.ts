@@ -233,6 +233,14 @@ export class DrawingControl extends StockControl {
 	private _drawingSeries: { [index: string]: DrawingSeries[] } = {};
 	private _currentEnabledSeries: DrawingSeries[] = [];
 
+	public _applyThemes(force: boolean = false): boolean {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		return super._applyThemes(force);
+	}
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -682,7 +690,7 @@ export class DrawingControl extends StockControl {
 		}));
 		this._disposers.push(stockChart.onPrivate("drawingSelectionEnabled", (active) => {
 			selectControl.set("active", active);
-		}));		
+		}));
 
 		selectControl.setPrivate("toolbar", toolbar);
 		toolsContainer.appendChild(selectControl.getPrivate("button")!);
@@ -780,8 +788,8 @@ export class DrawingControl extends StockControl {
 
 		if (this.isDirty("active")) {
 			this.get("stockChart").toggleDrawing(this.get("active"))
-			
-			if (this.get("active")) {				
+
+			if (this.get("active")) {
 				if (isInited) {
 					this.getPrivate("toolsContainer")!.style.display = "block";
 				}
@@ -794,10 +802,10 @@ export class DrawingControl extends StockControl {
 				if (isInited) {
 					this.getPrivate("toolsContainer")!.style.display = "none";
 				}
-				if(this.get("tool")) {
+				if (this.get("tool")) {
 					this._setTool();
 				}
-			}			
+			}
 		}
 
 
@@ -859,7 +867,7 @@ export class DrawingControl extends StockControl {
 				this.getPrivate("eraserControl")!.set("active", false);
 			}
 			const stockChart = this.get("stockChart");
-			stockChart.setPrivate("drawingSelectionEnabled", false);			
+			stockChart.setPrivate("drawingSelectionEnabled", false);
 			stockChart.unselectDrawings();
 			return;
 		}
@@ -1341,7 +1349,7 @@ export class DrawingControl extends StockControl {
 			panel.series.each((series) => {
 				if (series.isType<DrawingSeries>("DrawingSeries")) {
 					const serializer = Serializer.new(this.root, {
-						includeSettings: ["strokeColor", "fillColor", "strokeOpacity", "fillOpacity", "strokeWidth", "strokeDasharray", "field", "snapToData", "svgPath", "labelFontSize", "labelFontFamily", "labelFontWeight", "labelFontStyle", "labelFill", "showExtension"],
+						includeSettings: ["stroke", "fill", "strokeColor", "fillColor", "strokeOpacity", "fillOpacity", "strokeWidth", "strokeDasharray", "field", "snapToData", "svgPath", "labelFontSize", "labelFontFamily", "labelFontWeight", "labelFontStyle", "labelFill", "showExtension"],
 						//includeSettings: ["data"],
 						maxDepth: 4
 					});
@@ -1442,7 +1450,7 @@ export class DrawingControl extends StockControl {
 	 * Adds a line drawing.
 	 *
 	 * Supported tools: `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"`.
-	 * 
+	 *
 	 * @param  tool   Drawing tool
 	 * @param  panel  Panel
 	 * @param  point  Point

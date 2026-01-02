@@ -95,7 +95,7 @@ export class MedianPrice extends ChartIndicator {
 				index++;
 			})
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

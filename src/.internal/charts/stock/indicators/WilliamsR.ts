@@ -71,7 +71,7 @@ export class WilliamsR extends OverboughtOversold {
 				}
 			}
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

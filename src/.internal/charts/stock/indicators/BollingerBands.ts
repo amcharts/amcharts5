@@ -206,8 +206,8 @@ export class BollingerBands extends MovingAverage {
 				i++;
 			})
 
-			this.upperBandSeries.data.setAll(smaData);
-			this.lowerBandSeries.data.setAll(smaData);
+			this.upperBandSeries.updateData(smaData);
+			this.lowerBandSeries.updateData(smaData);
 		}
 	}
 

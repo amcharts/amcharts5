@@ -136,6 +136,14 @@ export class Venn extends Series {
 
 	protected _hovered?: Graphics;
 
+	public _applyThemes(force: boolean = false): boolean {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		return super._applyThemes(force);		
+	}	
+
 	protected _afterNew() {
 		this._defaultThemes.push(VennDefaultTheme.new(this._root));
 		this.fields.push("intersections", "category", "fill");

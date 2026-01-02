@@ -70,7 +70,7 @@ export class CommodityChannelIndex extends OverboughtOversold {
 				}
 			}
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

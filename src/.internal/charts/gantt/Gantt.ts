@@ -269,7 +269,13 @@ export class Gantt extends Container {
 
 	protected _customColor: Color | undefined;
 
-
+	public _applyThemes(force: boolean = false): boolean {
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		return super._applyThemes(force);		
+	}
 
 	protected _afterNew() {
 		this.addTag("gantt");

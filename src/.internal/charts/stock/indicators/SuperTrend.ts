@@ -278,8 +278,8 @@ export class SuperTrend extends Indicator {
 				prevClose = valueClose;
 			})
 
-			this.upperBandSeries.data.setAll(data);
-			this.lowerBandSeries.data.setAll(data);
+			this.upperBandSeries.updateData(data);
+			this.lowerBandSeries.updateData(data);
 		}
 	}
 	protected _dispose() {

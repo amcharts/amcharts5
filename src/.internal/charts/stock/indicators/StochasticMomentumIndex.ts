@@ -178,8 +178,8 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 			let emaPeriod = this.get("emaPeriod", 3);
 			this._sma(data, emaPeriod, "valueS", "ema");
 
-			this.series.data.setAll(data);
-			this.emaSeries.data.setAll(data);
+			this.series.updateData(data);
+			this.emaSeries.updateData(data);
 		}
 	}
 }

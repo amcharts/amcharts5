@@ -171,7 +171,7 @@ export class MovingAverage extends Indicator {
 				})
 			}
 
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

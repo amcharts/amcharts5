@@ -128,7 +128,7 @@ export class DisparityIndex extends ChartIndicator {
 					dataItem.disparity = 100 * (dataItem.value_y - ma) / ma
 				}
 			})
-			this.series.data.setAll(data);
+			this.series.updateData(data);
 		}
 	}
 }

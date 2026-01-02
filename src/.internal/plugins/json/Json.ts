@@ -6,6 +6,7 @@ import { Container } from "../../core/render/Container";
 import { Color } from "../../core/util/Color";
 import { Percent } from "../../core/util/Percent";
 import { Template } from "../../core/util/Template";
+import { ListData } from "../../core/util/Data";
 
 import * as $type from "../../core/util/Type";
 import * as $array from "../../core/util/Array";
@@ -24,6 +25,10 @@ function isObject(value: any): value is { [key: string]: any } {
 	return $type.isObject(value);
 }
 
+function isObjectParsed(value: object): boolean {
+	return value instanceof Entity || value instanceof Color || value instanceof Percent || value instanceof Template;
+}
+
 
 function lookupRef(refs: Array<IRef>, name: string): any {
 	let i = refs.length;
@@ -40,9 +45,21 @@ function lookupRef(refs: Array<IRef>, name: string): any {
 }
 
 
+interface IAxisRange<E extends Entity> {
+	__parseLogic: "axisRange" | "seriesAxisRange",
+	axis: string,
+	series?: string,
+	settings: E["_settings"],
+}
+
 interface IAdapter<E extends Entity> {
 	key: keyof E["_settings"],
 	callback: (value: E["_settings"][this["key"]], target: E, key: this["key"]) => E["_settings"][this["key"]],
+}
+
+interface IState<E extends Entity> {
+	key: string,
+	settings: E["_settings"],
 }
 
 type IParsedProperties = Array<(entity: object) => void>;
@@ -60,6 +77,7 @@ interface IParsedEntity<E extends Entity> {
 	construct: typeof Entity | undefined,
 	settings: object | undefined,
 	adapters: Array<IAdapter<E>> | undefined,
+	states: Array<IState<E>> | undefined,
 	children: Array<IChild> | undefined,
 	properties: IParsedProperties | undefined,
 	index: number | undefined,
@@ -131,10 +149,16 @@ function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): voi
 		});
 	}
 
+	if (parsed.states) {
+		$array.each(parsed.states, (state) => {
+			entity.states.create(state.key, state.settings);
+		});
+	}
+
 	if (entity instanceof Container) {
 		if (parsed.children) {
 			parsed.children.forEach((child) => {
-				if (child.index == null) {
+				if (child.index == null || child.index >= entity.children.length) {
 					entity.children.push(child.value);
 
 				} else {
@@ -185,7 +209,17 @@ class ParserState {
 	}
 
 	async storeClass(name: string): Promise<void> {
+		if (name === "Template") {
+			// Do nothing
+			return;
+		}
+
 		const promise = classes[name as keyof IClasses];
+
+		if (promise == null) {
+			throw new Error("Unknown object type `" + name + "`");
+		}
+
 		this._cache[name] = await promise() as typeof Entity;
 	}
 
@@ -204,26 +238,31 @@ class ParserState {
 		await Promise.all($array.map(array, (x) => this.parseAsync(x)));
 	}
 
-	async parseAsyncObject(object: object): Promise<void> {
-		await Promise.all($array.map($object.keys(object), (key) => this.parseAsync(object[key])));
-	}
+	async parseAsyncObjectKey(key: string, value: unknown): Promise<void> {
+		if (key === "type") {
+			if ($type.isString(value)) {
+				await this.cacheClass(value);
 
-	async parseAsyncSettings(object: object): Promise<void> {
-		await Promise.all($array.map($object.keys(object), (key) => this.parseAsyncSetting(key, object[key])));
-	}
+			} else {
+				await this.parseAsync(value);
+			}
 
-	async parseAsyncSetting(key: string, value: unknown): Promise<void> {
-		if (key !== "geoJSON") {
+		} else if (key === "geoJSON" || key === "geometry") {
+			// Do nothing
+
+		} else {
 			await this.parseAsync(value);
 		}
 	}
 
-	async parseAsyncRefs(refs: Array<object> | object): Promise<void> {
-		if ($type.isArray(refs)) {
-			await Promise.all($array.map(refs, (x) => this.parseAsyncRefs(x)));
-
-		} else {
-			await this.parseAsyncObject(refs);
+	async parseAsyncObject(object: object): Promise<void> {
+		switch ((object as any).type) {
+			case "Color":
+			case "Percent":
+				// Do nothing
+				break;
+			default:
+				await Promise.all($array.map($object.keys(object), (key) => this.parseAsyncObjectKey(key, object[key])));
 		}
 	}
 
@@ -232,26 +271,10 @@ class ParserState {
 			await this.parseAsyncArray(value);
 
 		} else if (isObject(value)) {
-			if (value.type === "Color" || value.type === "Percent") {
-				// Do nothing
-
-			} else if (value.type === "Template") {
-				await Promise.all([
-					(value.refs ? this.parseAsyncRefs(value.refs) : Promise.resolve(undefined)),
-					(value.settings ? this.parseAsyncObject(value.settings) : Promise.resolve(undefined)),
-				]);
-
-			} else if (value.__parse === true) {
-				await this.parseAsyncObject(value);
-
-			} else if (value.__parse !== false) {
-				await Promise.all([
-					(value.type ? this.cacheClass(value.type) : Promise.resolve(undefined)),
-					(value.refs ? this.parseAsyncRefs(value.refs) : Promise.resolve(undefined)),
-					(value.settings ? this.parseAsyncSettings(value.settings) : Promise.resolve(undefined)),
-					(value.properties ? this.parseAsyncObject(value.properties) : Promise.resolve(undefined)),
-					(value.children ? this.parseAsyncArray(value.children) : Promise.resolve(undefined)),
-				]);
+			if (!isObjectParsed(value)) {
+				if (value.__parse === true || value.__parse !== false) {
+					await this.parseAsyncObject(value);
+				}
 			}
 		}
 	}
@@ -282,14 +305,25 @@ class ParserState {
 	parseSetting(root: Root, key: string, value: unknown, refs: Array<IRef>): unknown {
 		if (key === "layout") {
 			switch (value) {
-			case "horizontal":
-				return root.horizontalLayout;
-			case "vertical":
-				return root.verticalLayout;
-			case "grid":
-				return root.gridLayout;
+				case "horizontal":
+					return root.horizontalLayout;
+				case "vertical":
+					return root.verticalLayout;
+				case "grid":
+					return root.gridLayout;
 			}
+		}
 
+		if (key === "clusteredBullet") {
+			return (_: unknown, series: unknown) => {
+				const newRefs = refs.concat([{ "@series": series }]);
+				return this.parse(root, value, newRefs);
+			};
+		}
+
+		if (key === "projection") {
+			// @todo: implement
+			return value;
 		}
 
 		if (key === "geoJSON") {
@@ -313,6 +347,19 @@ class ParserState {
 		return settings;
 	}
 
+	parseState<E extends Entity>(root: Root, object: { key: string, settings: Object }, refs: Array<IRef>): { key: string, settings: E["_settings"] } {
+		return {
+			key: object.key,
+			settings: this.parseSettings(root, object.settings, refs),
+		};
+	}
+
+	parseAdapter<E extends Entity>(root: Root, object: { key: keyof E["_settings"], callback: unknown }, refs: Array<IRef>): IAdapter<E> {
+		return {
+			key: object.key,
+			callback: this.parse(root, object.callback, refs),
+		};
+	}
 
 	parseProperties(root: Root, object: object, refs: Array<IRef>): IParsedProperties {
 		return $array.map($object.keys(object), (key) => {
@@ -321,16 +368,20 @@ class ParserState {
 			return (entity: object) => {
 				const run = () => {
 					const parsed = this.parseValue(root, rawValue, refs);
-
 					const old = entity[key] as unknown;
 
 					if (old) {
 						if (parsed.isValue) {
 							// Merge Array into List
 							if ($type.isArray(parsed.value)) {
-								$array.each(parsed.value, (value) => {
-									(old as any).push(value);
-								});
+								if (old instanceof ListData) {
+									(old as any).setAll(parsed.value);
+								}
+								else {
+									$array.each(parsed.value, (value) => {
+										(old as any).push(value);
+									});
+								}
 
 							} else {
 								(entity as any)[key] = parsed.value;
@@ -339,11 +390,11 @@ class ParserState {
 						} else if (parsed.construct) {
 							(entity as any)[key] = constructEntity(root, parsed);
 
-						// Merge into existing Entity or Template
+							// Merge into existing Entity or Template
 						} else if (old instanceof Entity || old instanceof Template) {
 							mergeExisting(old as Entity, parsed);
 
-						// Merge into existing object
+							// Merge into existing object
 						} else {
 							mergeObject(old as object, parsed);
 						}
@@ -374,6 +425,12 @@ class ParserState {
 						});
 					});
 
+				} else if (key === "bullet") {
+					(entity as any).set("bullet", (_: unknown, axis: unknown) => {
+						const newRefs = refs.concat([{ "@axis": axis }]);
+						return this.parse(root, rawValue, newRefs);
+					});
+
 				} else {
 					run();
 				}
@@ -381,12 +438,62 @@ class ParserState {
 		});
 	}
 
+	parseAxisRange<E extends Entity>(root: Root, value: IAxisRange<E>, refs: Array<IRef>): IParsedEntity<E> {
+		const settings = this.parseSettings(root, value.settings, refs);
+
+		return {
+			isValue: false,
+			type: undefined,
+			construct: undefined,
+			settings,
+			adapters: undefined,
+			states: undefined,
+			children: undefined,
+			properties: undefined,
+			index: undefined,
+			value,
+		};
+	}
 
 	parseRefsObject(root: Root, object: { [key: string]: any }, refs: Array<IRef>): IRef {
 		const newRefs: IRef = {};
 
-		$array.each($object.keys(object), (key) => {
-			newRefs["#" + key] = this.parse(root, object[key], refs);
+		$object.each(object, (key, value) => {
+			if (value.__parseLogic == "axisRange" || value.__parseLogic == "seriesAxisRange") {
+				// Parse axis range
+				const parsed = this.parseAxisRange(root, value, refs);
+
+				const axis = lookupRef(refs, value.axis);
+				const axisDataItem = axis.makeDataItem({});
+
+				// Apply settings to data item
+				mergeExisting(axisDataItem, parsed);
+
+				let seriesRange: any | undefined;
+
+				const series = value.series ? lookupRef(refs, value.series) : undefined;
+
+				if (series) {
+					seriesRange = series.createAxisRange(axisDataItem);
+
+				} else {
+					axis.createAxisRange(axisDataItem);
+				}
+
+				// Set series range settings
+				if (seriesRange) {
+					["fills", "strokes", "graphics"].forEach((targetKey: string) => {
+						if (seriesRange[targetKey] !== undefined && value[targetKey] !== undefined) {
+							value[targetKey].__parse = true;
+							const parsedSetting = this.parse(root, value[targetKey], refs);
+							seriesRange[targetKey].template.setAll(parsedSetting);
+						}
+					});
+				}
+
+			} else {
+				newRefs["#" + key] = this.parse(root, value, refs);
+			}
 		});
 
 		return newRefs;
@@ -442,6 +549,8 @@ class ParserState {
 		const settings = (value.settings ? this.parseSettings(root, value.settings, refs) : undefined);
 		const properties = (value.properties ? this.parseProperties(root, value.properties, refs) : undefined);
 		const children = (value.children ? this.parseChildren(root, value.children, refs) : undefined);
+		const states = (value.states ? $array.map(value.states, (value: any) => this.parseState(root, value, refs)) : undefined);
+		const adapters = (value.adapters ? $array.map(value.adapters, (value: any) => this.parseAdapter(root, value, refs)) : undefined) as any;
 
 		const index = (value.index == null ? undefined : value.index);
 
@@ -450,11 +559,42 @@ class ParserState {
 			type: value.type,
 			construct,
 			settings,
-			adapters: value.adapters,
+			adapters,
+			states,
 			children,
 			properties,
 			index,
 			value,
+		};
+	}
+
+	parseTemplate<E extends Entity>(root: Root, value: { [key: string]: any }, refs: Array<IRef>): IParsed<E> {
+		if (value.refs) {
+			refs = this.parseRefs(root, value.refs, refs);
+		}
+
+		const settings = (value.settings ? this.parseSettings(root, value.settings, refs) : {});
+
+		const template = Template.new(settings);
+
+		const states = (value.states ? $array.map(value.states, (value: any) => this.parseState(root, value, refs)) : undefined);
+		const adapters = (value.adapters ? $array.map(value.adapters, (value: any) => this.parseAdapter(root, value, refs)) : undefined) as any;
+
+		if (adapters) {
+			$array.each(adapters, (adapter: any) => {
+				template.adapters.add(adapter.key, adapter.callback);
+			});
+		}
+
+		if (states) {
+			$array.each(states, (state: any) => {
+				template.states.create(state.key, state.settings);
+			});
+		}
+
+		return {
+			isValue: true,
+			value: template,
 		};
 	}
 
@@ -469,7 +609,13 @@ class ParserState {
 			};
 
 		} else if (isObject(value)) {
-			if (value.type === "Color") {
+			if (isObjectParsed(value)) {
+				return {
+					isValue: true,
+					value,
+				};
+
+			} else if (value.type === "Color") {
 				return {
 					isValue: true,
 					value: Color.fromAny(value.value),
@@ -482,16 +628,7 @@ class ParserState {
 				};
 
 			} else if (value.type === "Template") {
-				if (value.refs) {
-					refs = this.parseRefs(root, value.refs, refs);
-				}
-
-				const settings = (value.settings ? this.parseSettings(root, value.settings, refs) : {});
-
-				return {
-					isValue: true,
-					value: Template.new(settings),
-				};
+				return this.parseTemplate(root, value, refs);
 
 			} else if (value.__parse === true) {
 				return {
@@ -520,7 +657,7 @@ class ParserState {
 		}
 	}
 
-	parse<E extends Entity>(root: Root, value: unknown, refs: Array<IRef>): E | object {
+	parse<E extends Entity>(root: Root, value: unknown, refs: Array<IRef>): any {
 		const parsed = this.parseValue<E>(root, value, refs);
 
 		if (parsed.isValue) {
@@ -616,7 +753,7 @@ export class JsonParser {
 
 /**
  * Registers a class so that it can be parsed and instantiated bey JSON parser.
- * 
+ *
  * @param  name  Class name
  * @param  func  Class reference
  * @ignore

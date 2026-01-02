@@ -157,8 +157,8 @@ export class StochasticOscillator extends OverboughtOversold {
 			period = this.get("dSmoothing", 3);
 			this._sma(data, period, "valueS", "slow");
 
-			this.series.data.setAll(data);
-			this.slowSeries.data.setAll(data);
+			this.series.updateData(data);
+			this.slowSeries.updateData(data);
 		}
 	}
 }
