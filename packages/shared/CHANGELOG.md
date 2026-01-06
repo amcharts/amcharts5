@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.15.1] - 2026-01-06
+
+### Fixed
+- Axis ranges were not being fully parsed from JSON config.
+
+
 ## [5.15.0] - 2026-01-02
 
 ### Added

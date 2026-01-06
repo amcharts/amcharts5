@@ -178,6 +178,30 @@ function mergeExisting<E extends Entity>(entity: E, parsed: IParsedEntity<E>): v
 }
 
 
+// TODO replace this with `__parseLogic: "merge"`
+function mergeExistingAxisRange<E extends Entity>(entity: E, parsed: IParsedEntity<E>): void {
+	if (parsed.settings) {
+		$object.each(parsed.settings, (key, value: any) => {
+			if (value instanceof Entity) {
+				const old = entity.get(key) as any;
+
+				if (old instanceof Entity) {
+					old.setAll(value._settings);
+
+				} else {
+					entity.set(key, value as any);
+				}
+
+			} else {
+				entity.set(key, value);
+			}
+		});
+	}
+
+	mergeEntity(entity, parsed);
+}
+
+
 function constructEntity<E extends Entity>(root: Root, parsed: IParsedEntity<E>): E | object {
 	if (!parsed.construct) {
 		return parsed.value;
@@ -466,9 +490,6 @@ class ParserState {
 				const axis = lookupRef(refs, value.axis);
 				const axisDataItem = axis.makeDataItem({});
 
-				// Apply settings to data item
-				mergeExisting(axisDataItem, parsed);
-
 				let seriesRange: any | undefined;
 
 				const series = value.series ? lookupRef(refs, value.series) : undefined;
@@ -479,6 +500,9 @@ class ParserState {
 				} else {
 					axis.createAxisRange(axisDataItem);
 				}
+
+				// Apply settings to data item
+				mergeExistingAxisRange(axisDataItem, parsed);
 
 				// Set series range settings
 				if (seriesRange) {
