@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.15.2] - 2026-01-12
+
+### Changed
+- If an invalid SVG path is passed to Graphics svgPath setting, warning is displayed instead of JS error.
+
+### Fixed
+- Toggling turboMode after the ColumnSeries was initialized was not working properly.
+
+
 ## [5.15.1] - 2026-01-06
 
 ### Fixed

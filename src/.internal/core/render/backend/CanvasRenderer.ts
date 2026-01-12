@@ -1247,252 +1247,263 @@ export class CanvasGraphics extends CanvasDisplayObject implements IGraphics {
 		const SEGMENTS_REGEXP = /([MmZzLlHhVvCcSsQqTtAa])([^MmZzLlHhVvCcSsQqTtAa]*)/g;
 		const ARGS_REGEXP = /[\u0009\u0020\u000A\u000C\u000D]*([\+\-]?[0-9]*\.?[0-9]+(?:[eE][\+\-]?[0-9]+)?)[\u0009\u0020\u000A\u000C\u000D]*,?/g;
 
-		let match;
+		// Hack needed to undo any operations if the SVG parsing fails
+		const length = this._operations.length;
 
-		while ((match = SEGMENTS_REGEXP.exec(path)) !== null) {
-			const name = match[1];
-			const rest = match[2];
+		try {
+			let match;
 
-			const args: Array<string> = [];
+			while ((match = SEGMENTS_REGEXP.exec(path)) !== null) {
+				const name = match[1];
+				const rest = match[2];
 
-			while ((match = ARGS_REGEXP.exec(rest)) !== null) {
-				args.push(match[1]);
-			}
+				const args: Array<string> = [];
 
-			// Reset control point
-			if (name !== "S" && name !== "s" && name !== "C" && name !== "c") {
-				cpx = null;
-				cpy = null;
-			}
+				while ((match = ARGS_REGEXP.exec(rest)) !== null) {
+					args.push(match[1]);
+				}
 
-			// Reset control point
-			if (name !== "Q" && name !== "q" && name !== "T" && name !== "t") {
-				qcpx = null;
-				qcpy = null;
-			}
+				// Reset control point
+				if (name !== "S" && name !== "s" && name !== "C" && name !== "c") {
+					cpx = null;
+					cpy = null;
+				}
 
-			switch (name) {
-				case "M":
-					checkEvenArgs(name, args.length, 2);
-					x = +args[0];
-					y = +args[1];
-					this.moveTo(x, y);
+				// Reset control point
+				if (name !== "Q" && name !== "q" && name !== "T" && name !== "t") {
+					qcpx = null;
+					qcpy = null;
+				}
 
-					for (let i = 2; i < args.length; i += 2) {
-						x = +args[i];
-						y = +args[i + 1];
-						this.lineTo(x, y);
-					}
-					break;
-				case "m":
-					checkEvenArgs(name, args.length, 2);
-					x += +args[0];
-					y += +args[1];
-					this.moveTo(x, y);
+				switch (name) {
+					case "M":
+						checkEvenArgs(name, args.length, 2);
+						x = +args[0];
+						y = +args[1];
+						this.moveTo(x, y);
 
-					for (let i = 2; i < args.length; i += 2) {
-						x += +args[i];
-						y += +args[i + 1];
-						this.lineTo(x, y);
-					}
-					break;
-
-				case "L":
-					checkEvenArgs(name, args.length, 2);
-					for (let i = 0; i < args.length; i += 2) {
-						x = +args[i];
-						y = +args[i + 1];
-						this.lineTo(x, y);
-					}
-					break;
-				case "l":
-					checkEvenArgs(name, args.length, 2);
-					for (let i = 0; i < args.length; i += 2) {
-						x += +args[i];
-						y += +args[i + 1];
-						this.lineTo(x, y);
-					}
-					break;
-
-				case "H":
-					checkMinArgs(name, args.length, 1);
-					for (let i = 0; i < args.length; ++i) {
-						x = +args[i];
-						this.lineTo(x, y);
-					}
-					break;
-				case "h":
-					checkMinArgs(name, args.length, 1);
-					for (let i = 0; i < args.length; ++i) {
-						x += +args[i];
-						this.lineTo(x, y);
-					}
-					break;
-
-				case "V":
-					checkMinArgs(name, args.length, 1);
-					for (let i = 0; i < args.length; ++i) {
-						y = +args[i];
-						this.lineTo(x, y);
-					}
-					break;
-				case "v":
-					checkMinArgs(name, args.length, 1);
-					for (let i = 0; i < args.length; ++i) {
-						y += +args[i];
-						this.lineTo(x, y);
-					}
-					break;
-
-				case "C":
-					checkEvenArgs(name, args.length, 6);
-					for (let i = 0; i < args.length; i += 6) {
-						const x1 = +args[i];
-						const y1 = +args[i + 1];
-						cpx = +args[i + 2];
-						cpy = +args[i + 3];
-						x = +args[i + 4];
-						y = +args[i + 5];
-						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
-					}
-					break;
-				case "c":
-					checkEvenArgs(name, args.length, 6);
-					for (let i = 0; i < args.length; i += 6) {
-						const x1 = +args[i] + x;
-						const y1 = +args[i + 1] + y;
-						cpx = +args[i + 2] + x;
-						cpy = +args[i + 3] + y;
-						x += +args[i + 4];
-						y += +args[i + 5];
-						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
-					}
-					break;
-
-				case "S":
-					checkEvenArgs(name, args.length, 4);
-					if (cpx === null || cpy === null) {
-						cpx = x;
-						cpy = y;
-					}
-					for (let i = 0; i < args.length; i += 4) {
-						const x1 = 2 * x - cpx;
-						const y1 = 2 * y - cpy;
-						cpx = +args[i];
-						cpy = +args[i + 1];
-						x = +args[i + 2];
-						y = +args[i + 3];
-						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
-					}
-					break;
-				case "s":
-					checkEvenArgs(name, args.length, 4);
-					if (cpx === null || cpy === null) {
-						cpx = x;
-						cpy = y;
-					}
-					for (let i = 0; i < args.length; i += 4) {
-						const x1 = 2 * x - cpx;
-						const y1 = 2 * y - cpy;
-						cpx = +args[i] + x;
-						cpy = +args[i + 1] + y;
-						x += +args[i + 2];
-						y += +args[i + 3];
-						this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
-					}
-					break;
-
-				case "Q":
-					checkEvenArgs(name, args.length, 4);
-					for (let i = 0; i < args.length; i += 4) {
-						qcpx = +args[i];
-						qcpy = +args[i + 1];
-						x = +args[i + 2];
-						y = +args[i + 3];
-						this.quadraticCurveTo(qcpx, qcpy, x, y);
-					}
-					break;
-				case "q":
-					checkEvenArgs(name, args.length, 4);
-					for (let i = 0; i < args.length; i += 4) {
-						qcpx = +args[i] + x;
-						qcpy = +args[i + 1] + y;
-						x += +args[i + 2];
-						y += +args[i + 3];
-						this.quadraticCurveTo(qcpx, qcpy, x, y);
-					}
-					break;
-
-				case "T":
-					checkEvenArgs(name, args.length, 2);
-					if (qcpx === null || qcpy === null) {
-						qcpx = x;
-						qcpy = y;
-					}
-					for (let i = 0; i < args.length; i += 2) {
-						qcpx = 2 * x - qcpx;
-						qcpy = 2 * y - qcpy;
-						x = +args[i];
-						y = +args[i + 1];
-						this.quadraticCurveTo(qcpx, qcpy, x, y);
-					}
-					break;
-				case "t":
-					checkEvenArgs(name, args.length, 2);
-					if (qcpx === null || qcpy === null) {
-						qcpx = x;
-						qcpy = y;
-					}
-					for (let i = 0; i < args.length; i += 2) {
-						qcpx = 2 * x - qcpx;
-						qcpy = 2 * y - qcpy;
-						x += +args[i];
-						y += +args[i + 1];
-						this.quadraticCurveTo(qcpx, qcpy, x, y);
-					}
-					break;
-
-				case "A":
-				case "a":
-					const relative = (name === "a");
-
-					splitArcFlags(args);
-					checkEvenArgs(name, args.length, 7);
-
-					for (let i = 0; i < args.length; i += 7) {
-						let cx = +args[i + 5];
-						let cy = +args[i + 6];
-
-						if (relative) {
-							cx += x;
-							cy += y;
+						for (let i = 2; i < args.length; i += 2) {
+							x = +args[i];
+							y = +args[i + 1];
+							this.lineTo(x, y);
 						}
+						break;
+					case "m":
+						checkEvenArgs(name, args.length, 2);
+						x += +args[0];
+						y += +args[1];
+						this.moveTo(x, y);
 
-						const bs = arcToBezier({
-							px: x,
-							py: y,
-							rx: +args[i],
-							ry: +args[i + 1],
-							xAxisRotation: +args[i + 2],
-							largeArcFlag: assertBinary(+args[i + 3]),
-							sweepFlag: assertBinary(+args[i + 4]),
-							cx,
-							cy,
-						});
+						for (let i = 2; i < args.length; i += 2) {
+							x += +args[i];
+							y += +args[i + 1];
+							this.lineTo(x, y);
+						}
+						break;
 
-						$array.each(bs, (b) => {
-							this.bezierCurveTo(b.x1, b.y1, b.x2, b.y2, b.x, b.y);
-							x = b.x;
-							y = b.y;
-						});
-					}
-					break;
-				case "Z":
-				case "z":
-					checkArgs(name, args.length, 0);
-					this.closePath();
-					break;
+					case "L":
+						checkEvenArgs(name, args.length, 2);
+						for (let i = 0; i < args.length; i += 2) {
+							x = +args[i];
+							y = +args[i + 1];
+							this.lineTo(x, y);
+						}
+						break;
+					case "l":
+						checkEvenArgs(name, args.length, 2);
+						for (let i = 0; i < args.length; i += 2) {
+							x += +args[i];
+							y += +args[i + 1];
+							this.lineTo(x, y);
+						}
+						break;
+
+					case "H":
+						checkMinArgs(name, args.length, 1);
+						for (let i = 0; i < args.length; ++i) {
+							x = +args[i];
+							this.lineTo(x, y);
+						}
+						break;
+					case "h":
+						checkMinArgs(name, args.length, 1);
+						for (let i = 0; i < args.length; ++i) {
+							x += +args[i];
+							this.lineTo(x, y);
+						}
+						break;
+
+					case "V":
+						checkMinArgs(name, args.length, 1);
+						for (let i = 0; i < args.length; ++i) {
+							y = +args[i];
+							this.lineTo(x, y);
+						}
+						break;
+					case "v":
+						checkMinArgs(name, args.length, 1);
+						for (let i = 0; i < args.length; ++i) {
+							y += +args[i];
+							this.lineTo(x, y);
+						}
+						break;
+
+					case "C":
+						checkEvenArgs(name, args.length, 6);
+						for (let i = 0; i < args.length; i += 6) {
+							const x1 = +args[i];
+							const y1 = +args[i + 1];
+							cpx = +args[i + 2];
+							cpy = +args[i + 3];
+							x = +args[i + 4];
+							y = +args[i + 5];
+							this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
+						}
+						break;
+					case "c":
+						checkEvenArgs(name, args.length, 6);
+						for (let i = 0; i < args.length; i += 6) {
+							const x1 = +args[i] + x;
+							const y1 = +args[i + 1] + y;
+							cpx = +args[i + 2] + x;
+							cpy = +args[i + 3] + y;
+							x += +args[i + 4];
+							y += +args[i + 5];
+							this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
+						}
+						break;
+
+					case "S":
+						checkEvenArgs(name, args.length, 4);
+						if (cpx === null || cpy === null) {
+							cpx = x;
+							cpy = y;
+						}
+						for (let i = 0; i < args.length; i += 4) {
+							const x1 = 2 * x - cpx;
+							const y1 = 2 * y - cpy;
+							cpx = +args[i];
+							cpy = +args[i + 1];
+							x = +args[i + 2];
+							y = +args[i + 3];
+							this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
+						}
+						break;
+					case "s":
+						checkEvenArgs(name, args.length, 4);
+						if (cpx === null || cpy === null) {
+							cpx = x;
+							cpy = y;
+						}
+						for (let i = 0; i < args.length; i += 4) {
+							const x1 = 2 * x - cpx;
+							const y1 = 2 * y - cpy;
+							cpx = +args[i] + x;
+							cpy = +args[i + 1] + y;
+							x += +args[i + 2];
+							y += +args[i + 3];
+							this.bezierCurveTo(x1, y1, cpx, cpy, x, y);
+						}
+						break;
+
+					case "Q":
+						checkEvenArgs(name, args.length, 4);
+						for (let i = 0; i < args.length; i += 4) {
+							qcpx = +args[i];
+							qcpy = +args[i + 1];
+							x = +args[i + 2];
+							y = +args[i + 3];
+							this.quadraticCurveTo(qcpx, qcpy, x, y);
+						}
+						break;
+					case "q":
+						checkEvenArgs(name, args.length, 4);
+						for (let i = 0; i < args.length; i += 4) {
+							qcpx = +args[i] + x;
+							qcpy = +args[i + 1] + y;
+							x += +args[i + 2];
+							y += +args[i + 3];
+							this.quadraticCurveTo(qcpx, qcpy, x, y);
+						}
+						break;
+
+					case "T":
+						checkEvenArgs(name, args.length, 2);
+						if (qcpx === null || qcpy === null) {
+							qcpx = x;
+							qcpy = y;
+						}
+						for (let i = 0; i < args.length; i += 2) {
+							qcpx = 2 * x - qcpx;
+							qcpy = 2 * y - qcpy;
+							x = +args[i];
+							y = +args[i + 1];
+							this.quadraticCurveTo(qcpx, qcpy, x, y);
+						}
+						break;
+					case "t":
+						checkEvenArgs(name, args.length, 2);
+						if (qcpx === null || qcpy === null) {
+							qcpx = x;
+							qcpy = y;
+						}
+						for (let i = 0; i < args.length; i += 2) {
+							qcpx = 2 * x - qcpx;
+							qcpy = 2 * y - qcpy;
+							x += +args[i];
+							y += +args[i + 1];
+							this.quadraticCurveTo(qcpx, qcpy, x, y);
+						}
+						break;
+
+					case "A":
+					case "a":
+						const relative = (name === "a");
+
+						splitArcFlags(args);
+						checkEvenArgs(name, args.length, 7);
+
+						for (let i = 0; i < args.length; i += 7) {
+							let cx = +args[i + 5];
+							let cy = +args[i + 6];
+
+							if (relative) {
+								cx += x;
+								cy += y;
+							}
+
+							const bs = arcToBezier({
+								px: x,
+								py: y,
+								rx: +args[i],
+								ry: +args[i + 1],
+								xAxisRotation: +args[i + 2],
+								largeArcFlag: assertBinary(+args[i + 3]),
+								sweepFlag: assertBinary(+args[i + 4]),
+								cx,
+								cy,
+							});
+
+							$array.each(bs, (b) => {
+								this.bezierCurveTo(b.x1, b.y1, b.x2, b.y2, b.x, b.y);
+								x = b.x;
+								y = b.y;
+							});
+						}
+						break;
+					case "Z":
+					case "z":
+						checkArgs(name, args.length, 0);
+						this.closePath();
+						break;
+				}
 			}
+
+		} catch (e) {
+			// Undo any operations back to before `svgPath` was called
+			this._operations.length = length;
+
+			console.warn("Error when parsing svgPath:\n  " + (e as Error).message + "\n" + path);
 		}
 	}
 

@@ -128,9 +128,28 @@ export class ColumnSeries extends BaseColumnSeries {
 		}
 	}
 
+	public _updateChildren(): void {
+		if (this.isDirty("turboMode")) {
+			this.markDirtyValues();
+
+			if(!this.get("turboMode")) {
+				this.allColumns.set("draw", undefined);
+			}
+		}
+
+		super._updateChildren();
+	}
+
 
 	protected _updateSeriesGraphics(dataItem: DataItem<this["_dataItemSettings"]>, graphics: Graphics, l: number, r: number, t: number, b: number, fitW: boolean, fitH: boolean) {
 		if (this.get("turboMode")) {
+			graphics.virtualParent = this.chart;
+
+			if(graphics.parent){
+				this.mainContainer.children.removeValue(graphics);
+				graphics._parent = undefined;
+			}			
+
 			const stroke = graphics.get("stroke");
 			const fillOpacity = graphics.get("fillOpacity", 1);
 			const strokeOpacity = graphics.get("strokeOpacity", 1);
@@ -162,6 +181,11 @@ export class ColumnSeries extends BaseColumnSeries {
 			this.allColumnsData.push({ width: r - l, height: b - t, x: l, y: t, stroke: stroke, fill: fill, strokeWidth: strokWidth, strokeOpacity: strokeOpacity, fillOpacity: fillOpacity });
 		}
 		else {
+
+			if(!graphics.parent){
+				this.mainContainer.children.push(graphics);
+			}
+
 			super._updateSeriesGraphics(dataItem, graphics, l, r, t, b, fitW, fitH);
 		}
 	}
