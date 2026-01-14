@@ -786,7 +786,7 @@ export abstract class Series extends Component {
 			});
 		}
 
-		if(this.get("visible") && this.bullets.length > 0){
+		if(this.get("visible")){
 			const dataItems = this.dataItems;
 			let count = dataItems.length;
 			let startIndex = this.startIndex();
