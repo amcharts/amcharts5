@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+
+## [5.15.4] - 2026-01-23
+
+## Fixed
+- Adding bullets to series in some setups with React could result JS error since `5.15.0`.
+
+
 ## [5.15.3] - 2026-01-14
 
 ### Fixed

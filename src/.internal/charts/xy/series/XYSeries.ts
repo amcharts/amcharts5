@@ -969,7 +969,15 @@ export abstract class XYSeries extends Series {
 		this._setRawDefault("highValueXGrouped", "high");
 		this._setRawDefault("highValueYGrouped", "high");
 
+		const xAxis = this.get("xAxis");
+		if (xAxis) {
+			this._xRenderer = xAxis.get("renderer");
+		}
 
+		const yAxis = this.get("yAxis");
+		if (yAxis) {
+			this._yRenderer = yAxis.get("renderer");
+		}
 
 		super._afterNew();
 
