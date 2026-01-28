@@ -1510,6 +1510,23 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
+	protected _postUpdateData(): void {
+
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
+
+		xAxis._seriesValuesDirty = true;
+		yAxis._seriesValuesDirty = true;		
+
+		$array.each(this.dataItems, (dataItem) => {
+			dataItem.open = undefined;
+			dataItem.close = undefined;
+
+			xAxis.processSeriesDataItem(dataItem, this._valueXFields);
+			yAxis.processSeriesDataItem(dataItem, this._valueYFields);
+		})
+	}
+
 
 	protected _makeRangeMask() {
 		if (this.axisRanges.length > 0) {

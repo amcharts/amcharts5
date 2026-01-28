@@ -185,6 +185,7 @@ export class Root implements IDisposer {
 	protected _tickers: Array<(currentTime: number) => void> = [];
 
 	protected _updateTick: boolean = true;
+	public skipRenderFrame: boolean = false;
 
 	/**
 	 * Root's event dispatcher.
@@ -991,6 +992,10 @@ export class Root implements IDisposer {
 	}
 
 	private _render() {
+		if (this.skipRenderFrame) {
+			this.skipRenderFrame = false;
+			return;
+		}
 		this._renderer.render(this._rootContainer._display);
 
 		if (this._focusElementDirty) {

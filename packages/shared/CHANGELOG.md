@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.15.5] - 2026-01-28
+
+### Added
+- `skipRenderFrame` property added to `Root`. If set to `true`, the next frame will not be rendered. Helps to avoid flickering in some cases, like zooming right after data update.
+
+### Fixed
+- Since `5.15.0`, with the `updateData` introduced, `StockChart` with indicators was not properly switching data granularity.
+
 
 ## [5.15.4] - 2026-01-23
 

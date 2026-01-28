@@ -257,6 +257,9 @@ export abstract class Component extends Container {
 		}));
 	}
 
+	protected _postUpdateData() {
+
+	}
 
 	/**
 	 * Updates existing data in the component without disposing old data items. If there are more data items than before, new ones will be created. If there are less, old ones will be removed.
@@ -265,7 +268,7 @@ export abstract class Component extends Container {
 	public updateData(data: Array<any>) {
 
 		let ii = 0;
-
+		
 		$array.each(data, (dataObject, index) => {
 			const dataItem = this.dataItems[index];
 			if (!dataItem) {
@@ -280,31 +283,27 @@ export abstract class Component extends Container {
 				}
 
 				const properties = this._makeDataItem(dataContext);
-				const interpolationDuration = this.get("interpolationDuration", 0);
-				const interpolationEasing = this.get("interpolationEasing");
 
 				$object.keys(properties).forEach((key) => {
 					if (dataItem.get(key) == properties[key]) {
 						return;
 					}
 
-					dataItem.animate({
-						key: key,
-						to: properties[key],
-						duration: interpolationDuration,
-						easing: interpolationEasing,
-					});
+					dataItem.set(key, properties[key]); // no animations!!!
+					dataItem.set(key + "Working" as any, properties[key]);
 				});
 
 			}
 			ii = index;
 		})
 
-		for (let i = ii + 1; i < this.dataItems.length; i++) {
+		for (let i = this.dataItems.length - 1; i > ii; i--) {
 			const dataItem = this.dataItems[i];
 			$array.remove(this.dataItems, dataItem);
 			dataItem.dispose();
 		}
+
+		this._postUpdateData();
 	}
 
 	protected _updateFields() {

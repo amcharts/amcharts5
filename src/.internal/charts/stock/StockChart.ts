@@ -991,7 +991,7 @@ export class StockChart extends Container {
 					if (lowerChart) {
 						max = lowerChart.y() - panel.get("minHeight", 0);
 					}
-					//console.log(upperChart.get("minHeight", 0))
+
 					const y = Math.max(upperChart.y() + upperChart.get("minHeight", 0) + upperChart.get("paddingTop", 0), Math.min(chartsContainer.toLocal(e.point).y, max));
 
 					const downY = this._downY;
