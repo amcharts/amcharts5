@@ -5,6 +5,10 @@ export function keys<O>(object: O): Array<Keyof<O>> {
 	return Object.keys(object) as Array<Keyof<O>>;
 }
 
+export function entries<O>(object: O): Array<[Keyof<O>, O[Keyof<O>]]> {
+	return Object.entries(object) as Array<[Keyof<O>, O[Keyof<O>] ]>;
+}
+
 /**
  * Returns an array of object's property names ordered using specific ordering
  * function.

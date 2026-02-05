@@ -5,6 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.15.6] - 2026-02-05
+
+## Added 
+- `ignoreThemes` added to `Entity`. If set to `true`, no themes will be applied to the element. Set it to `true` on an elements (e.g. candles) of which there are many for improved performance. Required setting will need to be set directly on the element or its template.
+
+## Fixed
+- Perdormance of `turboMode` increased significantly.
+
+
 ## [5.15.5] - 2026-01-28
 
 ### Added

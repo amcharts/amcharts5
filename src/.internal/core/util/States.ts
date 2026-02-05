@@ -85,8 +85,8 @@ export class State<E extends Entity> {
 	 * @param settings Settings
 	 */
 	public setAll(settings: this["_settings"]) {
-		$object.keys(settings).forEach((key) => {
-			this.set(key, settings[key]);
+		$object.entries(settings).forEach(([key, value]) => {
+			this.set(key, value);
 		});
 	}
 

@@ -219,14 +219,14 @@ export abstract class Component extends Container {
 					dataItem.bullets = undefined;
 				}
 
-				$object.keys(properties).forEach((key) => {
-					if (dataItem.get(key) == properties[key]) {
+				$object.entries(properties).forEach(([key, value]) => {
+					if (dataItem.get(key) == value) {
 						return;
 					}
 
 					dataItem.animate({
 						key: key,
-						to: properties[key],
+						to: value,
 						duration: this.get("interpolationDuration", 0),
 						easing: this.get("interpolationEasing"),
 					});
@@ -268,7 +268,7 @@ export abstract class Component extends Container {
 	public updateData(data: Array<any>) {
 
 		let ii = 0;
-		
+
 		$array.each(data, (dataObject, index) => {
 			const dataItem = this.dataItems[index];
 			if (!dataItem) {
@@ -277,20 +277,21 @@ export abstract class Component extends Container {
 			else {
 				const dataContext = dataItem.dataContext as any
 				if (dataContext) {
-					$object.keys(dataObject).forEach((key) => {
-						dataContext[key] = dataObject[key];
+					$object.entries(dataObject).forEach(([key, value]) => {
+						dataContext[key] = value;
 					});
 				}
 
 				const properties = this._makeDataItem(dataContext);
 
-				$object.keys(properties).forEach((key) => {
-					if (dataItem.get(key) == properties[key]) {
-						return;
+				$object.entries(properties).forEach(([key, value]) => {
+					if (dataItem.get(key) != value) {
+						dataItem.set(key, value);
+						const workingKey = this._valueFieldsF[key]?.workingKey;
+						if (workingKey) {
+							dataItem.set(workingKey as any, value);
+						}
 					}
-
-					dataItem.set(key, properties[key]); // no animations!!!
-					dataItem.set(key + "Working" as any, properties[key]);
 				});
 
 			}

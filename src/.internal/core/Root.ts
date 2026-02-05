@@ -1041,38 +1041,33 @@ export class Root implements IDisposer {
 			// This must be before calling _prepareChildren
 			this._isDirtyParents = false;
 
-			$object.keys(this._dirtyParents).forEach((key) => {
-				const parent = this._dirtyParents[key];
-
+			$object.entries(this._dirtyParents).forEach(([key, parent]) => {
 				delete this._dirtyParents[key];
 
 				if (!parent.isDisposed()) {
 					allParents[parent.uid] = parent;
 					parent._prepareChildren();
 				}
-			});
+			});			
 		}
 
-		$object.keys(allParents).forEach((key) => {
-			allParents[key]._updateChildren();
+		$object.entries(allParents).forEach(([_key, parent]) => {
+			parent._updateChildren();
 		});
-
 
 		const objects: Array<Entity> = [];
 
 		//		console.log("_beforeChanged")
-		$object.keys(this._dirty).forEach((key) => {
-			const entity = this._dirty[key];
-
+		$object.entries(this._dirty).forEach(([key, entity]) => {
 			if (entity.isDisposed()) {
-				delete this._dirty[entity.uid];
+				delete this._dirty[key];
 
 			} else {
 				objects.push(entity);
 				entity._beforeChanged();
 			}
 		});
-
+		
 		//		console.log("_changed")
 		objects.forEach((entity) => {
 			entity._changed();
@@ -1085,9 +1080,7 @@ export class Root implements IDisposer {
 		const depths: { [id: number]: number } = {};
 		const bounds: Array<IBounds> = [];
 
-		$object.keys(this._dirtyBounds).forEach((key) => {
-			const entity = this._dirtyBounds[key];
-
+		$object.entries(this._dirtyBounds).forEach(([key, entity]) => {
 			delete this._dirtyBounds[key];
 
 			if (!entity.isDisposed()) {
@@ -1095,6 +1088,7 @@ export class Root implements IDisposer {
 				bounds.push(entity);
 			}
 		});
+
 
 		this._positionHTMLElements();
 
@@ -1110,9 +1104,8 @@ export class Root implements IDisposer {
 
 		//		console.log("_updatePosition")
 		const dirtyPositions = this._dirtyPositions;
-		$object.keys(dirtyPositions).forEach((key) => {
-			const sprite = dirtyPositions[key];
 
+		$object.entries(dirtyPositions).forEach(([key, sprite]) => {
 			delete dirtyPositions[key];
 
 			if (!sprite.isDisposed()) {
@@ -1125,9 +1118,9 @@ export class Root implements IDisposer {
 			entity._afterChanged();
 		});
 
-		$object.keys(allParents).forEach((key) => {
-			allParents[key]._childrenPrep = false;
-			allParents[key]._childrenUpdt = false;
+		$object.entries(allParents).forEach(([_key, parent]) => {
+			parent._childrenPrep = false;
+			parent._childrenUpdt = false;
 		});
 	}
 

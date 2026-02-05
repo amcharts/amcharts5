@@ -120,6 +120,14 @@ export class Adapters<E extends Settings> {
 export interface IEntitySettings {
 
 	/**
+	 * If set to `true` the themes will be ignored when applying settings.
+	 *
+	 * @default false
+	 * @since 5.15.6
+	 */
+	ignoreThemes?: boolean;
+
+	/**
 	 * Tags which can be used by the theme rules.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
@@ -1560,6 +1568,10 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	public _applyThemes(force: boolean = false): boolean {
+		if(this.get("ignoreThemes")){
+			return false;
+		}
+
 		let isConnected = false;
 
 		const defaults: Array<Array<Theme>> = [];

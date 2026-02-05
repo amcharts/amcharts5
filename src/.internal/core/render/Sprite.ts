@@ -2883,8 +2883,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	public set virtualParent(parent: Container | undefined) {
-		this._virtualParent = parent;
-		this._applyThemes();
+		if(this._virtualParent !== parent){
+			this._virtualParent = parent;
+			this._applyThemes();
+		}		
 	}
 
 	/**
