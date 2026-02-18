@@ -1034,7 +1034,7 @@ export class Root implements IDisposer {
 	}
 
 	private _runDirties() {
-		//console.log("tick **************************************************************");
+		//console.time("tick");
 		let allParents: { [id: number]: IParent } = {};
 
 		while (this._isDirtyParents) {
@@ -1122,6 +1122,7 @@ export class Root implements IDisposer {
 			parent._childrenPrep = false;
 			parent._childrenUpdt = false;
 		});
+		//console.timeEnd("tick");
 	}
 
 	private _renderFrame(currentTime: number): boolean {

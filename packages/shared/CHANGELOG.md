@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.16.0] - 2026-02-18
+
+## Added
+- `animateProjection` method added to `MapChart`. Allows changing map projection using animation.
+
+### Changed
+- Performance: No longer using `Object.defineProperty` in compiled library.
+
+## Fixed
+- In some cases, logarithmic scale of `ValueAxis` was ignoring `minGridDistance`, resulting in label overlap.
+
+
 ## [5.15.6] - 2026-02-05
 
 ## Added 

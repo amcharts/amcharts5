@@ -2,7 +2,7 @@
     "compileOnSave": false,
     "compilerOptions": {
         "importsNotUsedAsValues": "error",
-        "useDefineForClassFields": true,
+        "useDefineForClassFields": false,
         "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,

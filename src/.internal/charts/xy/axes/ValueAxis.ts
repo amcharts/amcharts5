@@ -568,6 +568,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let m = 0;
 			let previous = -Infinity;
 
+			const gridCount = this.get("renderer").gridCount();
+
 			while (value < selectionMax) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;
 				if (this.dataItems.length < i + 1) {
@@ -596,7 +598,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 				else {
 					if (differencePower > 2) {
-						nextValue = Math.pow(10, Math.log(minLog) * Math.LOG10E + i - 50);
+						const targetGridCount = Math.max(1, gridCount);
+						// how many log "powers" (decades) one major grid line should jump
+						const x = Math.max(1, Math.ceil(differencePower / targetGridCount));
+
+						// use stepped exponent so total major items stays around gridCount
+						const exponent = Math.log(minLog) * Math.LOG10E + (i + 1) * x - 50;
+						nextValue = Math.pow(10, exponent);
 					}
 					else {
 						nextValue += step;

@@ -1,6 +1,6 @@
 import type { MapSeries } from "./MapSeries";
 import type { MapPointSeries } from "./MapPointSeries";
-import type { GeoProjection, GeoPath } from "d3-geo";
+import type { GeoProjection, GeoPath, GeoRawProjection } from "d3-geo";
 import type { IPoint } from "../../core/util/IPoint";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { Time } from "../../core/util/Animation";
@@ -12,7 +12,7 @@ import type { IMapPolygonSeriesDataItem } from "./MapPolygonSeries";
 import { MapChartDefaultTheme } from "./MapChartDefaultTheme";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
 import { Rectangle } from "../../core/render/Rectangle";
-import { geoPath } from "d3-geo";
+import { geoPath, geoProjection, geoProjectionMutator } from "d3-geo";
 import { Color } from "../../core/util/Color";
 import { registry } from "../../core/Registry";
 
@@ -243,6 +243,11 @@ export interface IMapChartPrivate extends ISerialChartPrivate {
 	 */
 	mapScale: number;
 
+	/**
+	 * @ignore
+	 */
+	projectionBlend?: number;
+
 }
 
 
@@ -306,6 +311,21 @@ export class MapChart extends SerialChart {
 
 	protected _centerX: number = 0;
 	protected _centerY: number = 0;
+
+	protected _projectionRaw?: GeoRawProjection;
+	protected _projectionBlendAnim?: Animation<this["_privateSettings"]["projectionBlend"]>;
+	protected _projectionBlendData?: {
+		blended: GeoProjection;
+		mutate: Function;
+		sourceScale: number;
+		targetScale: number;
+		sourceTranslateX: number;
+		sourceTranslateY: number;
+		targetTranslateX: number;
+		targetTranslateY: number;
+		target: GeoProjection;
+		targetRaw: GeoRawProjection;
+	};
 
 	protected _makeGeoPath() {
 		const projection = this.get("projection")!;
@@ -449,6 +469,45 @@ export class MapChart extends SerialChart {
 						}
 					}
 				}
+			}
+		}
+
+		// Handle projection blend animation (driven by animatePrivate on projectionBlend)
+		if (this.isPrivateDirty("projectionBlend") && this._projectionBlendData) {
+			const d = this._projectionBlendData;
+			const t = this.getPrivate("projectionBlend", 0)!;
+
+			// Update the blended raw function
+			(d.mutate as any)(t);
+
+			// Interpolate scale and translate
+			const scale = d.sourceScale + (d.targetScale - d.sourceScale) * t;
+			const tx = d.sourceTranslateX + (d.targetTranslateX - d.sourceTranslateX) * t;
+			const ty = d.sourceTranslateY + (d.targetTranslateY - d.sourceTranslateY) * t;
+
+			d.blended.scale(scale * this.get("zoomLevel", 1));
+			d.blended.translate([tx, ty]);
+
+			if (d.blended.rotate) {
+				d.blended.rotate([
+					this.get("rotationX", 0),
+					this.get("rotationY", 0),
+					this.get("rotationZ", 0)
+				]);
+			}
+
+			this.setPrivateRaw("mapScale", scale);
+			this.setRaw("translateX", tx);
+			this.setRaw("translateY", ty);
+
+			this.markDirtyProjection();
+
+			// Animation complete — install the real target projection
+			if (t >= 1) {
+				this._projectionRaw = d.targetRaw;
+				this._projectionBlendData = undefined;
+				this._projectionBlendAnim = undefined;
+				this.set("projection", d.target);
 			}
 		}
 
@@ -1216,6 +1275,144 @@ export class MapChart extends SerialChart {
 				this.animate({ key: "rotationY", to: rotationY, duration: duration, easing: easing });
 			}
 		}
+	}
+
+	/**
+	 * Animates the map projection transition from the current projection to
+	 * the target projection over the specified duration.
+	 *
+	 * Since d3-geo does not expose raw projection functions on projection
+	 * instances, you must pass both the target `GeoProjection` and its
+	 * corresponding `GeoRawProjection`. On the first call you must also
+	 * pass `sourceRaw` so the method knows the current projection's raw
+	 * function. Subsequent calls reuse the previous target's raw
+	 * automatically.
+	 *
+	 * @param target     Target projection (e.g. `geoOrthographic()`)
+	 * @param targetRaw  Raw projection function (e.g. `geoOrthographicRaw`)
+	 * @param duration   Duration in milliseconds (default: `animationDuration`)
+	 * @param easing     Easing function (default: `animationEasing`)
+	 * @param sourceRaw  Raw function of the current projection (needed on first call)
+	 *
+	 * @since 5.16.0
+	 */
+	public animateProjection(
+		target: GeoProjection,
+		targetRaw: GeoRawProjection,
+		duration?: number,
+		easing?: (t: Time) => Time,
+		sourceRaw?: GeoRawProjection
+	): void {
+
+		// Cancel any ongoing projection blend animation
+		if (this._projectionBlendAnim) {
+			this._projectionBlendAnim.stop();
+			this._projectionBlendAnim = undefined;
+			this._projectionBlendData = undefined;
+		}
+
+		// Use provided sourceRaw, or fall back to stored one from previous call
+		if (sourceRaw) {
+			this._projectionRaw = sourceRaw;
+		}
+
+		const currentRaw = this._projectionRaw;
+
+		// If we don't have a source raw, snap immediately
+		if (!currentRaw) {
+			this.set("projection", target);
+			this._projectionRaw = targetRaw;
+			return;
+		}
+
+		if (duration == null) {
+			duration = this.get("animationDuration", 0);
+		}
+
+		if (!duration) {
+			this.set("projection", target);
+			this._projectionRaw = targetRaw;
+			return;
+		}
+
+		if (!easing) {
+			easing = this.get("animationEasing");
+		}
+
+		// Stop ongoing zoom/pan/rotation animations
+		if (this._za) this._za.stop();
+		if (this._txa) this._txa.stop();
+		if (this._tya) this._tya.stop();
+		if (this._rxa) this._rxa.stop();
+		if (this._rya) this._rya.stop();
+
+		const w = this.innerWidth();
+		const h = this.innerHeight();
+
+		// Capture current source state
+		const sScale = this.getPrivate("mapScale")!;
+		const sTx = this.get("translateX", w / 2);
+		const sTy = this.get("translateY", h / 2);
+
+		// Compute fitted target state using a temporary projection
+		const tempTarget = geoProjection(targetRaw);
+		tempTarget.fitSize([w, h], this._geometryColection);
+		const tScale = tempTarget.scale();
+		const tTranslate = tempTarget.translate();
+
+		// Create blended projection via geoProjectionMutator
+		const mutate = geoProjectionMutator((t: number) => {
+			return (lambda: number, phi: number): [number, number] => {
+				const p0 = currentRaw(lambda, phi);
+				const p1 = targetRaw(lambda, phi);
+				return [
+					(1 - t) * p0[0] + t * p1[0],
+					(1 - t) * p0[1] + t * p1[1]
+				];
+			};
+		});
+
+		// Initialize at t=0
+		const blended = (mutate as any)(0) as GeoProjection;
+
+		blended.scale(sScale * this.get("zoomLevel", 1));
+		blended.translate([sTx, sTy]);
+		blended.precision(0.5);
+
+		if (blended.rotate) {
+			blended.rotate([
+				this.get("rotationX", 0),
+				this.get("rotationY", 0),
+				this.get("rotationZ", 0)
+			]);
+		}
+
+		// Install blended projection without triggering isDirty("projection") cascade
+		this.setRaw("projection", blended);
+		this._makeGeoPath();
+
+		// Store blend data for _prepareChildren to use
+		this._projectionBlendData = {
+			blended,
+			mutate,
+			sourceScale: sScale,
+			targetScale: tScale,
+			sourceTranslateX: sTx,
+			sourceTranslateY: sTy,
+			targetTranslateX: tTranslate[0],
+			targetTranslateY: tTranslate[1],
+			target,
+			targetRaw
+		};
+
+		// Animate the blend value 0→1 using the standard animation system
+		this._projectionBlendAnim = this.animatePrivate({
+			key: "projectionBlend",
+			from: 0,
+			to: 1,
+			duration,
+			easing
+		});
 	}
 
 	/**
