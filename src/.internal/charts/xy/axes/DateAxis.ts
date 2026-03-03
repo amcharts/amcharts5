@@ -404,11 +404,13 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						prevNewDataItem = newDataItem;
 					}
 					else {
+						let hasValue = false;
 						$array.each(fields, (field) => {
 							let groupKey = groupFieldValues[field];
 							let value = dataItem.get(field as any);
 
 							if (value != null) {
+								hasValue = true;
 
 								let currentValue = newDataItem.get(field as any);
 
@@ -451,11 +453,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 								}
 
 								newDataItem.setRaw(workingFields[field] as any, newDataItem.get(field as any));
-								let dataContext: any = $object.copy(dataItem.dataContext);
-								dataContext[key as any] = roundedTime;
-								newDataItem.dataContext = dataContext;
 							}
 						})
+
+						if (hasValue) {
+							let dataContext: any = $object.copy(dataItem.dataContext);
+							dataContext[key as any] = roundedTime;
+							newDataItem.dataContext = dataContext;
+						}
 
 						if (groupOriginals) {
 							newDataItem.get("originals")!.push(dataItem);

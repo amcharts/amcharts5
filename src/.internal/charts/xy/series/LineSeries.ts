@@ -286,11 +286,12 @@ export class LineSeries extends XYSeries {
 						}
 					}
 
-					$array.each(this._valueFields, (field) => {
-						if (!$type.isNumber(dataItem.get(field as any))) {
+					for (let f = 0, flen = this._valueFields.length; f < flen; f++) {
+						if (!$type.isNumber(dataItem.get(this._valueFields[f] as any))) {
 							hasValues = false;
+							break;
 						}
-					})
+					}
 					if (hasValues && strokeTemplateFound && fillTemplateFound) {
 						startIndex = i;
 						break;
@@ -306,11 +307,12 @@ export class LineSeries extends XYSeries {
 					for (let i = endIndex; i < len; i++) {
 						let dataItem = dataItems[i];
 						let hasValues = true;
-						$array.each(this._valueFields, (field) => {
-							if (!$type.isNumber(dataItem.get(field as any))) {
+						for (let f = 0, flen = this._valueFields.length; f < flen; f++) {
+							if (!$type.isNumber(dataItem.get(this._valueFields[f] as any))) {
 								hasValues = false;
+								break;
 							}
-						})
+						}
 						if (hasValues) {
 							endIndex = i + 1;
 							break;

@@ -79,10 +79,12 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 	public _updateAllDates() {
 		if (!this._customDates) {
-			const dates = this._dates;
-			dates.length = 0;
 
+			const newDates = new Set<number>();
 			$array.each(this.series, (series) => {
+				if (series.get("ignoreMinMax")) {
+					return;
+				}
 				let field = "valueX";
 				if (series.get("yAxis") == this) {
 					field = "valueY"
@@ -91,11 +93,14 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 					let value = dataItem.get(field as any);
 					if ($type.isNumber(value)) {
 						if (dataItem.open) {
-							this._updateDates(dataItem.open![field], series);
+							newDates.add(dataItem.open![field]);
 						}
 					}
 				})
 			})
+
+			this._dates = Array.from(newDates).sort((a, b) => a - b);
+			const dates = this._dates;
 
 			const extraMax = this.get("extraMax", 0);
 			const extraMin = this.get("extraMin", 0);
@@ -123,12 +128,15 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 				const extra = len * extraMin;
 				let time = dates[0];
 				if ($type.isNumber(time)) {
+					const extraDates: number[] = [];
 					for (let i = 0; i < extra; i++) {
 						time -= $time.getDuration(timeUnit, baseCount);
 						//time = $time.round(new Date(time), timeUnit, baseCount, firstDay, utc, undefined, timezone).getTime();
 						time = $time.roun(time, timeUnit, baseCount, this._root);
-						dates.unshift(time);
+						extraDates.push(time);
 					}
+					extraDates.reverse();
+					dates.unshift(...extraDates);
 				}
 			}
 		}

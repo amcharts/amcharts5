@@ -351,9 +351,9 @@ export class Treemap extends Hierarchy {
 			if (!this.inited) {
 				maxDepth = this.get("initialDepth", 1);
 			}
-			const visibleNodes = this._getVisibleNodes(dataItem, maxDepth);
+			const visibleSet = new Set(this._getVisibleNodes(dataItem, maxDepth));
 			this.nodes.each((node) => {
-				if (visibleNodes.indexOf(node.dataItem as DataItem<this["_dataItemSettings"]>) == -1) {
+				if (!visibleSet.has(node.dataItem as DataItem<this["_dataItemSettings"]>)) {
 					node.setPrivate("focusable", false);
 				}
 				else {
@@ -364,20 +364,20 @@ export class Treemap extends Hierarchy {
 		this._root._invalidateTabindexes();
 	}
 
-	protected _getVisibleNodes(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth: number) {
+	protected _getVisibleNodes(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth: number, out?: Array<DataItem<this["_dataItemSettings"]>>): Array<DataItem<this["_dataItemSettings"]>> {
+		if (!out) { out = []; }
 		const children = dataItem.get("children");
-		let includedChildren: Array<DataItem<this["_dataItemSettings"]>> = [];
 		if (children) {
 			$array.each(children, (child) => {
 				if (child.get("depth") == maxDepth || !child.get("children")) {
-					includedChildren.push(child);
+					out!.push(child);
 				}
 				else {
-					includedChildren = includedChildren.concat(this._getVisibleNodes(child, maxDepth));
+					this._getVisibleNodes(child, maxDepth, out);
 				}
 			});
 		}
-		return includedChildren;
+		return out;
 	}
 
 }

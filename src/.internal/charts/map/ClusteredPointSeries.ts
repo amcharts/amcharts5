@@ -302,27 +302,76 @@ export class ClusteredPointSeries extends MapPointSeries {
 			// void
 		}
 		else {
+			const minDistance = this.get("minDistance", 20);
+			const minDistSq = minDistance * minDistance;
 
-			dataItems.sort((a, b) => {
-				const pointA = a.get("point");
-				const pointB = b.get("point");
-				if (pointA && pointB) {
-					return Math.hypot(pointA.x - pointB.x, pointA.y - pointB.y);
+			// Pre-filter to candidates with valid points
+			const candidates: Array<{ di: DataItem<IClusteredPointSeriesDataItem>, x: number, y: number }> = [];
+			for (let i = 0; i < dataItems.length; i++) {
+				const di = dataItems[i];
+				if (!di.get("clipped")) {
+					const pt = di.get("point");
+					if (pt) {
+						candidates.push({ di: di, x: pt.x, y: pt.y });
+					}
 				}
+			}
 
-				return 0;
-			})
+			// Spatial grid: cell size = minDistance so neighbors are always in adjacent cells
+			const grid = new Map<string, number[]>();
+			for (let i = 0; i < candidates.length; i++) {
+				const c = candidates[i];
+				const key = Math.floor(c.x / minDistance) + "," + Math.floor(c.y / minDistance);
+				let cell = grid.get(key);
+				if (!cell) {
+					cell = [];
+					grid.set(key, cell);
+				}
+				cell.push(i);
+			}
 
-			while (dataItems.length > 0) {
+			const visited = new Uint8Array(candidates.length);
+
+			for (let i = 0; i < candidates.length; i++) {
+				if (visited[i]) continue;
+				visited[i] = 1;
+
 				this._clusterIndex++;
 				this._clusters[this._clusterIndex] = [];
 				const cluster = this._clusters[this._clusterIndex];
-				const dataItem = dataItems[0];
 
-				cluster.push(dataItem);
-				$array.removeFirst(dataItems, dataItem);
+				const seed = candidates[i];
+				cluster.push(seed.di);
 
-				this._clusterDataItem(dataItem, dataItems);
+				// BFS: only check 9 neighboring cells per expansion
+				const queue = [seed];
+				let head = 0;
+
+				while (head < queue.length) {
+					const pt = queue[head++];
+					const cx = Math.floor(pt.x / minDistance);
+					const cy = Math.floor(pt.y / minDistance);
+
+					for (let dcx = -1; dcx <= 1; dcx++) {
+						for (let dcy = -1; dcy <= 1; dcy++) {
+							const cell = grid.get((cx + dcx) + "," + (cy + dcy));
+							if (cell) {
+								for (let k = 0; k < cell.length; k++) {
+									const idx = cell[k];
+									if (visited[idx]) continue;
+									const c = candidates[idx];
+									const dx = c.x - pt.x;
+									const dy = c.y - pt.y;
+									if (dx * dx + dy * dy < minDistSq) {
+										visited[idx] = 1;
+										cluster.push(c.di);
+										queue.push(c);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -461,41 +510,79 @@ export class ClusteredPointSeries extends MapPointSeries {
 
 	}
 
-	protected _clusterDataItem(dataItem: DataItem<IClusteredPointSeriesDataItem>, dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
-		const point = dataItem.get("point");
-		if (point) {
-			let minDistance = this.get("minDistance", 20);
-			const cluster = this._clusters[this._clusterIndex];
-
-			for (let i = dataItems.length - 1; i >= 0; i--) {
-				const di = dataItems[i];
-				if (di && !di.get("clipped")) {
-					const diPoint = di.get("point");
-					if (diPoint) {
-						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < minDistance) {
-							cluster.push(di);
-							$array.removeFirst(dataItems, di);
-							this._clusterDataItem(di, dataItems);
-						}
-					}
-				}
-			}
-		}
-	}
 
 	protected _scatterGroup(dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
 		const chart = this.chart;
 		if (chart && chart.get("zoomLevel", 1) >= chart.get("maxZoomLevel", 100) * this.get("stopClusterZoom", 0.95)) {
-			while (dataItems.length > 0) {
+			const scatterDistance = this.get("scatterDistance", 5);
+			const scatterDistSq = scatterDistance * scatterDistance;
+
+			// Pre-filter to candidates with valid points
+			const candidates: Array<{ di: DataItem<IClusteredPointSeriesDataItem>, x: number, y: number }> = [];
+			for (let i = 0; i < dataItems.length; i++) {
+				const di = dataItems[i];
+				if (!di.get("clipped")) {
+					const pt = di.get("point");
+					if (pt) {
+						candidates.push({ di: di, x: pt.x, y: pt.y });
+					}
+				}
+			}
+
+			// Spatial grid: cell size = scatterDistance
+			const grid = new Map<string, number[]>();
+			for (let i = 0; i < candidates.length; i++) {
+				const c = candidates[i];
+				const key = Math.floor(c.x / scatterDistance) + "," + Math.floor(c.y / scatterDistance);
+				let cell = grid.get(key);
+				if (!cell) {
+					cell = [];
+					grid.set(key, cell);
+				}
+				cell.push(i);
+			}
+
+			const visited = new Uint8Array(candidates.length);
+
+			for (let i = 0; i < candidates.length; i++) {
+				if (visited[i]) continue;
+				visited[i] = 1;
+
 				this._scatterIndex++;
 				this._scatters[this._scatterIndex] = [];
 				const scatter = this._scatters[this._scatterIndex];
-				const dataItem = dataItems[0];
 
-				scatter.push(dataItem);
-				$array.remove(dataItems, dataItem);
+				const seed = candidates[i];
+				scatter.push(seed.di);
 
-				this._scatterDataItem(dataItem, dataItems);
+				const queue = [seed];
+				let head = 0;
+
+				while (head < queue.length) {
+					const pt = queue[head++];
+					const cx = Math.floor(pt.x / scatterDistance);
+					const cy = Math.floor(pt.y / scatterDistance);
+
+					for (let dcx = -1; dcx <= 1; dcx++) {
+						for (let dcy = -1; dcy <= 1; dcy++) {
+							const cell = grid.get((cx + dcx) + "," + (cy + dcy));
+							if (cell) {
+								for (let k = 0; k < cell.length; k++) {
+									const idx = cell[k];
+									if (visited[idx]) continue;
+									const c = candidates[idx];
+									const dx = c.x - pt.x;
+									const dy = c.y - pt.y;
+									if (dx * dx + dy * dy < scatterDistSq) {
+										visited[idx] = 1;
+										scatter.push(c.di);
+										queue.push(c);
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 			$array.each(this._scatters, (scatter) => {
@@ -551,24 +638,4 @@ export class ClusteredPointSeries extends MapPointSeries {
 		}
 	}
 
-	protected _scatterDataItem(dataItem: DataItem<IClusteredPointSeriesDataItem>, dataItems: Array<DataItem<IClusteredPointSeriesDataItem>>) {
-		const point = dataItem.get("point");
-		if (point) {
-			const scatterDistance = this.get("scatterDistance", 5)
-			const scatter = this._scatters[this._scatterIndex];
-			$array.each(dataItems, (di) => {
-				if (di && !di.get("clipped")) {
-					const diPoint = di.get("point");
-
-					if (diPoint) {
-						if (Math.hypot(diPoint.x - point.x, diPoint.y - point.y) < scatterDistance) {
-							scatter.push(di);
-							$array.removeFirst(dataItems, di);
-							this._scatterDataItem(di, dataItems);
-						}
-					}
-				}
-			})
-		}
-	}
 }

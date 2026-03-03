@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.16.1] - 2026-03-03
+
+## Changed
+- Performance optimization: `ClusteredPointSeries`, `WordCloud`, `GaplessDateAxis`, `Treemap`, `Chord`, `DateAxis`, and others.
+- New defaults for `MapPointSeries`: `longitudeField: "longitude"` and `latitudeField: "latitude"`.
+
+
 ## [5.16.0] - 2026-02-18
 
 ## Added

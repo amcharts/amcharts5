@@ -185,7 +185,7 @@ export class WordCloud extends Series {
 
 	protected _process = false;
 
-	protected _buffer: Array<number> = [];
+	protected _buffer: Uint8Array = new Uint8Array(0);
 
 	protected _boundsToAdd?: IBounds;
 
@@ -286,7 +286,7 @@ export class WordCloud extends Series {
 			const smaller = Math.min(w, h);
 			const bigger = Math.max(w, h);
 
-			this._buffer = Array(Math.ceil(this._root.width() * this._root.height() * resolution * resolution)).fill(0);
+			this._buffer = new Uint8Array(Math.ceil(this._root.width() * this._root.height() * resolution * resolution));
 
 			if (smaller < 800) {
 				step = step / 2;
@@ -395,9 +395,9 @@ export class WordCloud extends Series {
 				this.setTimeout(() => {
 					this._process = true;
 					this._markDirtyKey("progress");
-				}, 50)
+				}, 20)
 			})
-		}
+		}		
 
 		const boundsToAdd = this._boundsToAdd;
 		if (boundsToAdd) {
@@ -487,6 +487,9 @@ export class WordCloud extends Series {
 
 				let intersects = true;
 
+				const animationDuration = this.get("animationDuration", 0);
+				const animationEasing = this.get("animationEasing");
+
 				while (intersects) {
 
 					let p = points[pIndex];
@@ -508,10 +511,10 @@ export class WordCloud extends Series {
 								const angle = dataItem.get("angle", 0);
 								const fontSize = dataItem.get("fontSize", 0);
 								if (label.get("x") != -999999) {
-									label.animate({ key: "x", to: p.x, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") })
-									label.animate({ key: "y", to: p.y, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") })
-									label.animate({ key: "rotation", to: angle, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") })
-									label.animate({ key: "fontSize", to: fontSize, duration: this.get("animationDuration", 0), easing: this.get("animationEasing") })
+									label.animate({ key: "x", to: p.x, duration: animationDuration, easing: animationEasing });
+									label.animate({ key: "y", to: p.y, duration: animationDuration, easing: animationEasing });
+									label.animate({ key: "rotation", to: angle, duration: animationDuration, easing: animationEasing });
+									label.animate({ key: "fontSize", to: fontSize, duration: animationDuration, easing: animationEasing });
 								}
 								else {
 									label.setAll({ x: p.x, y: p.y, rotation: angle, fontSize: fontSize });
@@ -583,21 +586,13 @@ export class WordCloud extends Series {
 				return [];
 			}
 
-			let word;
-			while (true) {
-				word = res.pop();
+			// Map keyed by lowercase word for O(1) lookup
+			const wordMap = new Map<string, { category: string, value: number }>();
 
-				if (!word) {
-					break;
-				}
-
-				let item;
-				for (let i = 0; i < words.length; i++) {
-					if (words[i].category.toLowerCase() == word.toLowerCase()) {
-						item = words[i];
-						break;
-					}
-				}
+			for (let i = 0; i < res.length; i++) {
+				const word = res[i];
+				const lower = word.toLowerCase();
+				const item = wordMap.get(lower);
 				if (item) {
 					item.value++;
 					if (!this.isCapitalized(word)) {
@@ -605,10 +600,9 @@ export class WordCloud extends Series {
 					}
 				}
 				else {
-					words.push({
-						category: word,
-						value: 1
-					})
+					const entry = { category: word, value: 1 };
+					wordMap.set(lower, entry);
+					words.push(entry);
 				}
 			}
 

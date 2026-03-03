@@ -171,6 +171,8 @@ export class MapPointSeries extends MapSeries {
 
 	protected _afterNew() {
 		this.fields.push("polygonId", "lineId", "longitude", "latitude", "fixed");
+		this._setRawDefault("longitudeField", "longitude");
+		this._setRawDefault("latitudeField", "latitude");
 		super._afterNew();
 	}
 

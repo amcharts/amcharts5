@@ -361,7 +361,7 @@ export class Root implements IDisposer {
 	 */
 	public autoResize: boolean = true;
 
-	protected _fontHash: string = "";
+	protected _fontHash: string[] = [];
 
 	protected _isDisposed: boolean = false;
 	protected _disposers: Array<IDisposer> = [];
@@ -2015,17 +2015,21 @@ export class Root implements IDisposer {
 
 	protected _updateComputedStyles(): boolean {
 		const styles = window.getComputedStyle(this.dom);
-		let fontHash = "";
-		$object.each(styles, (key, val) => {
-			if ($type.isString(key) && key.match(/^font/)) {
-				fontHash += val;
-			}
-		})
-		const changed = fontHash != this._fontHash;
-		if (changed) {
-			this._fontHash = fontHash;
+		const oldFonts = this._fontHash;
+		const newFonts: string[] = $object.keys(styles).flatMap((k: any) => typeof k === "string" && k.startsWith("font") ? [styles[k as any]?.toString()] : []);
+
+		if (oldFonts.length !== newFonts.length) {
+			this._fontHash = newFonts;
+			return true;
 		}
-		return changed;
+
+		for (let i = 0; i < oldFonts.length; i++) {
+			if (oldFonts[i] !== newFonts[i]) {
+				this._fontHash = newFonts;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected _checkComputedStyles(): void {

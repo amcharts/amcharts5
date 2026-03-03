@@ -150,30 +150,28 @@ export class Chord extends Flow {
 
 	protected _makeMatrix(): number[][] {
 		const matrix: number[][] = [];
+		const valueSum = this.getPrivate("valueSum", 0);
+		const minSize = this.get("minSize", 0);
+		const minValue = minSize > 0 ? valueSum * minSize : 0;
+
 		$array.each(this.nodes.dataItems, (sourceDataItem) => {
 			const group: number[] = [];
 			matrix.push(group);
-			let outgoing = sourceDataItem.get("outgoingLinks");
+			const outgoing = sourceDataItem.get("outgoingLinks");
+
+			const outMap = new Map<any, number>();
+			if (outgoing) {
+				$array.each(outgoing, (outgoingLink) => {
+					let value = outgoingLink.get("valueWorking");
+					if (value > 0 && minValue > 0 && value < minValue) {
+						value = minValue;
+					}
+					outMap.set(outgoingLink.get("target"), value);
+				})
+			}
 
 			$array.each(this.nodes.dataItems, (targetDataItem) => {
-				let value = 0;
-				if (outgoing) {
-					$array.each(outgoing, (outgoingLink) => {
-						if (outgoingLink.get("target") === targetDataItem) {
-							value = outgoingLink.get("valueWorking");
-						}
-
-						let valueSum = this.getPrivate("valueSum", 0);
-						let minSize = this.get("minSize", 0);
-						if(value > 0 && minSize > 0){
-							if(value < valueSum * minSize){
-								value = valueSum * minSize;
-							}
-						}
-					})
-				}
-
-				group.push(value);
+				group.push(outMap.get(targetDataItem) || 0);
 			})
 		})
 		return matrix;

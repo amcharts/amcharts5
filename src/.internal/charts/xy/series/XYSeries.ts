@@ -1362,6 +1362,10 @@ export abstract class XYSeries extends Series {
 				this._stack();
 			}
 
+			let minX: any = undefined;
+			let maxX: any = undefined;
+			let minY: any = undefined;
+			let maxY: any = undefined;
 			$array.each(this.dataItems, (dataItem) => {
 				$array.each(this._valueXShowFields, (key) => {
 					let value = dataItem.get(<any>key);
@@ -1369,9 +1373,8 @@ export abstract class XYSeries extends Series {
 						if (stacked) {
 							value += this.getStackedXValue(dataItem, key);
 						}
-
-						this._min("minX", value);
-						this._max("maxX", value);
+						minX = min(minX, value);
+						maxX = max(maxX, value);
 					}
 				})
 
@@ -1381,15 +1384,18 @@ export abstract class XYSeries extends Series {
 						if (stacked) {
 							value += this.getStackedYValue(dataItem, key);
 						}
-
-						this._min("minY", value);
-						this._max("maxY", value);
+						minY = min(minY, value);
+						maxY = max(maxY, value);
 					}
 				})
 
 				xAxis.processSeriesDataItem(dataItem, this._valueXFields);
 				yAxis.processSeriesDataItem(dataItem, this._valueYFields);
 			})
+			this._min("minX", minX);
+			this._max("maxX", maxX);
+			this._min("minY", minY);
+			this._max("maxY", maxY);
 
 			xAxis._seriesValuesDirty = true;
 			yAxis._seriesValuesDirty = true;

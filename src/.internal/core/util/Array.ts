@@ -614,7 +614,9 @@ export function getSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) => Or
 		// equal
 		} else if (order === 0) {
 			found = true;
-			start = pivot + 1;
+			for (start = pivot + 1; start < end && ordering(array[start]) === 0; start++);
+			start--;
+			break;
 
 		// more
 		} else {
@@ -624,7 +626,7 @@ export function getSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) => Or
 
 	return {
 		found: found,
-		index: (found ? start - 1 : start)
+		index: start
 	};
 }
 
