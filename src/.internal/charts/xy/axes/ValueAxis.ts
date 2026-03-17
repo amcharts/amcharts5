@@ -54,13 +54,13 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	/**
 	 * Force axis to auto-zoom to exact lowest and highest values from attached
 	 * series' data items within currently visible range.
-	 * 
+	 *
 	 * This is a good feature when your series is plotted from derivative values,
 	 * like `valueYChangeSelection` as it helps to avoid frequent jumping of
 	 * series to adjusted min and max of the axis.
-	 * 
+	 *
 	 * This will not work if strictMinMax is set to true (the axis will not zoom at all in this case).
-	 * 
+	 *
 	 * Use `extraMin` and `extraMax` to add extra "padding".
 	 *
 	 * @since 5.1.11
@@ -180,9 +180,22 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	syncWithAxis?: ValueAxis<AxisRenderer>;
 
 	/**
+	 * If set to `true` and `syncWithAxis` is set, the zero line of this axis
+	 * will be aligned with the zero line of the target axis, and the remaining
+	 * grid intervals will be distributed proportionally above and below zero.
+	 *
+	 * Only takes effect when both axes' ranges include zero.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid} for more info
+	 * @default false
+	 * @since 5.16.2
+	 */
+	syncZeros?: boolean;
+
+	/**
 	 * If set to `false`, the axis won't be auto-zoomed to a selection (this
 	 * works only if the other axis is a `DateAxis` or a `CategoryAxis`).
-	 * 
+	 *
 	 * IMPORTANT: This setting will be ignored if both X and Y axes are
 	 * a `ValueAxis`.
 	 *
@@ -213,7 +226,7 @@ export interface IValueAxisDataItem extends IAxisDataItem {
 	/**
 	 * If set to `true` the values fo this data item will be factored in when
 	 * calculating scale of the [[ValueAxis]]. Useful for axis ranges.
-	 * 
+	 *
 	 * @since 5.1.4
 	 */
 	affectsMinMax?: boolean;
@@ -230,14 +243,14 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 
 	/**
 	 * Calculated current minimum value of the axis scale.
-	 * 
+	 *
 	 * @readonly
 	 */
 	min?: number;
 
 	/**
 	 * Calculated current maximum value of the axis scale.
-	 * 
+	 *
 	 * @readonly
 	 */
 	max?: number;
@@ -248,7 +261,7 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	 * Can be useful in cases where axis zoom is currently being animated, and
 	 * `min` is reflecting current intermediate value, whereas `minFinal` will
 	 * show target value.
-	 * 
+	 *
 	 * @readonly
 	 */
 	minFinal?: number;
@@ -259,21 +272,21 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	 * Can be useful in cases where axis zoom is currently being animated, and
 	 * `max` is reflecting current intermediate value, whereas `maxFinal` will
 	 * show target value.
-	 * 
+	 *
 	 * @readonly
 	 */
 	maxFinal?: number;
 
 	/**
 	 * Calculated minimum value of the currently viewable (zoomed) scope.
-	 * 
+	 *
 	 * @readonly
 	 */
 	selectionMin?: number;
 
 	/**
 	 * Calculated maximum value of the currently viewable (zoomed) scope.
-	 * 
+	 *
 	 * @readonly
 	 */
 	selectionMax?: number;
@@ -284,7 +297,7 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	 * Can be useful in cases where axis zoom is currently being animated, and
 	 * `selectionMin` is reflecting current intermediate value,
 	 * whereas `selectionMinFinal` will show target value.
-	 * 
+	 *
 	 * @readonly
 	 */
 	selectionMinFinal?: number;
@@ -295,7 +308,7 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	 * Can be useful in cases where axis zoom is currently being animated, and
 	 * `selectionMax` is reflecting current intermediate value,
 	 * whereas `selectionMaxFinal` will show target value.
-	 * 
+	 *
 	 * @readonly
 	 */
 	selectionMaxFinal?: number;
@@ -305,21 +318,21 @@ export interface IValueAxisPrivate extends IAxisPrivate {
 	 *
 	 * `selectionStepFinal` will show what step will be when animation is
 	 * finished.
-	 * 
+	 *
 	 * @readonly
 	 */
 	selectionStepFinal?: number;
 
 	/**
 	 * Value step between grid lines.
-	 * 
+	 *
 	 * @readonly
 	 */
 	step?: number;
 
 	/**
 	 * Decimal places used when formatting axis labels.
-	 * 
+	 *
 	 * @readonly
 	 */
 	stepDecimalPlaces?: number;
@@ -1016,43 +1029,48 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					let fieldWorking = field + "Working";
 
 					if (field) {
+						let seriesCount = this.series.length;
+						let includedSeries: XYSeries[] = [];
+						let vcValues: number[] = [];
+						for (let s = 0; s < seriesCount; s++) {
+							let ser = this.series[s];
+							if (!ser.get("excludeFromTotal")) {
+								includedSeries.push(ser);
+								vcValues.push(ser.get(vc as any));
+							}
+						}
+						let len = includedSeries.length;
+
+						let fieldTotal = (field + "Total") as any;
+						let fieldSum = (field + "Sum") as any;
+						let fieldTotalPercent = (field + "TotalPercent") as any;
+
 						for (let i = startIndex; i < endIndex; i++) {
 							let sum = 0;
 							let total = 0;
 
-							$array.each(this.series, (series) => {
-								if (!series.get("excludeFromTotal")) {
-									let dataItem = series.dataItems[i];
-									if (dataItem) {
-										let value = dataItem.get(fieldWorking as any) * series.get(vc as any);
-
-										if (!$type.isNaN(value)) {
-											sum += value;
-											total += Math.abs(value);
-										}
+							for (let s = 0; s < len; s++) {
+								let dataItem = includedSeries[s].dataItems[i];
+								if (dataItem) {
+									let value = dataItem.get(fieldWorking as any) * vcValues[s];
+									if (!$type.isNaN(value)) {
+										sum += value;
+										total += Math.abs(value);
 									}
 								}
-							})
+							}
 
-							$array.each(this.series, (series) => {
-								if (!series.get("excludeFromTotal")) {
-									let dataItem = series.dataItems[i];
-									if (dataItem) {
-										let value = dataItem.get(fieldWorking as any) * series.get(vc as any);
-
-										if (!$type.isNaN(value)) {
-											dataItem.set((field + "Total") as any, total);
-											dataItem.set((field + "Sum") as any, sum);
-											let totalPercent = value / total * 100;
-											if (total == 0) {
-												totalPercent = 0;
-											}
-
-											dataItem.set((field + "TotalPercent") as any, totalPercent);
-										}
+							for (let s = 0; s < len; s++) {
+								let dataItem = includedSeries[s].dataItems[i];
+								if (dataItem) {
+									let value = dataItem.get(fieldWorking as any) * vcValues[s];
+									if (!$type.isNaN(value)) {
+										dataItem.set(fieldTotal, total);
+										dataItem.set(fieldSum, sum);
+										dataItem.set(fieldTotalPercent, total == 0 ? 0 : value / total * 100);
 									}
 								}
-							})
+							}
 						}
 					}
 				}
@@ -1222,7 +1240,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			selectionMin = $math.fitToRange(selectionMin, min, max);
 			selectionMax = $math.fitToRange(selectionMax, min, max);
 
-			// do it for the second time !important			
+			// do it for the second time !important
 			minMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount, true);
 
 			if (!strictMinMax) {
@@ -1234,19 +1252,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			if (syncWithAxis) {
 				minMaxStep = this._syncAxes(selectionMin, selectionMax, minMaxStep.step, syncWithAxis.getPrivate("selectionMinFinal", syncWithAxis.getPrivate("minFinal", 0)), syncWithAxis.getPrivate("selectionMaxFinal", syncWithAxis.getPrivate("maxFinal", 1)), syncWithAxis.getPrivate("selectionStepFinal", syncWithAxis.getPrivate("step", 1)));
 
-				if (minMaxStep.min < min) {
-					minMaxStep.min = min;
-				}
-
-				if (minMaxStep.max > max) {
-					minMaxStep.max = max;
-				}
-
 				selectionMin = minMaxStep.min;
 				selectionMax = minMaxStep.max;
 			}
 
-			if (strictMinMax) {
+			if (strictMinMax && !syncWithAxis) {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = Math.max(selectionMin, minDefined);
 				}
@@ -1256,12 +1266,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 
-			if (selectionStrictMinMax) {
+			if (selectionStrictMinMax && !syncWithAxis) {
 				selectionMin = selectionMinReal - (selectionMaxReal - selectionMinReal) * extraMin;
 				selectionMax = selectionMaxReal + (selectionMaxReal - selectionMinReal) * extraMax;
 			}
 
-			if (strictMinMax) {
+			if (strictMinMax && !syncWithAxis) {
 				if ($type.isNumber(minDefined)) {
 					selectionMin = minDefined;
 				}
@@ -1439,7 +1449,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		min = this._fixMin(min);
 		max = this._fixMax(max);
 
-		// this happens if starLocation and endLocation are 0.5 and DateAxis has only one date		
+		// this happens if starLocation and endLocation are 0.5 and DateAxis has only one date
 		if (max - min <= 1 / Math.pow(10, 15)) {
 			if (max - min !== 0) {
 				this._deltaMinMax = (max - min) / 2;
@@ -1810,49 +1820,60 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _syncAxes(min: number, max: number, step: number, syncMin: number, syncMax: number, syncStep: number) {
 		let axis = this.get("syncWithAxis");
 		if (axis) {
-			let count: number = Math.round(syncMax - syncMin) / syncStep;
-			let currentCount = Math.round((max - min) / step);
+			let targetCount = Math.round((syncMax - syncMin) / syncStep);
+			if (targetCount > 0) {
 
-			let gridCount = this.get("renderer").gridCount();
+				if (this.get("syncZeros") && syncMin <= 0 && syncMax >= 0) {
+					// Count intervals below/above zero on source axis
+					let belowCount = Math.round((0 - syncMin) / syncStep);
+					let aboveCount = targetCount - belowCount;
 
-			if ($type.isNumber(count) && $type.isNumber(currentCount)) {
-				let synced = false;
-				let c = 0
-				let diff = (max - min) * 0.01;
-				let omin = min;
-				let omax = max;
-				let ostep = step;
-
-				while (synced != true) {
-					synced = this._checkSync(omin, omax, ostep, count);
-					c++;
-					if (c > 500) {
-						synced = true;
+					// Find the smallest nice step that covers this axis's
+					// data on both sides with the same below/above split
+					let rawStep = 0;
+					if (belowCount > 0 && min < 0) {
+						rawStep = Math.abs(min) / belowCount;
 					}
-					if (!synced) {
-						if (c / 3 == Math.round(c / 3)) {
-							omin = min - diff * c;
-							if (min >= 0 && omin < 0) {
-								omin = 0;
-							}
-						}
-						else {
-							omax = max + diff * c;
-							if (omax <= 0 && omax > 0) {
-								omax = 0;
-							}
-						}
+					if (aboveCount > 0 && max > 0) {
+						rawStep = Math.max(rawStep, max / aboveCount);
+					}
 
-						let minMaxStep = this._adjustMinMax(omin, omax, gridCount, true);
-						omin = minMaxStep.min;
-						omax = minMaxStep.max;
-						ostep = minMaxStep.step;
+					// Fallback: if one side has no data but has intervals
+					if (rawStep == 0) {
+						rawStep = (max - min) / targetCount;
 					}
-					else {
-						min = omin;
-						max = omax;
-						step = ostep;
+
+					step = this._niceStep(rawStep);
+					min = -step * belowCount;
+					max = step * aboveCount;
+				}
+				else {
+					// Regular grid count sync (no zero alignment)
+					let rawStep = (max - min) / targetCount;
+					step = this._niceStep(rawStep);
+
+					// Snap min/max to step boundaries ensuring data coverage
+					let newMin = Math.floor(min / step) * step;
+					let newMax = newMin + step * targetCount;
+
+					// Ensure max covers the data
+					if (newMax < max) {
+						newMin = Math.ceil(max / step) * step - step * targetCount;
+						newMax = newMin + step * targetCount;
 					}
+
+					// Preserve zero boundaries
+					if (min >= 0 && newMin < 0) {
+						newMin = 0;
+						newMax = step * targetCount;
+					}
+					if (max <= 0 && newMax > 0) {
+						newMax = 0;
+						newMin = -(step * targetCount);
+					}
+
+					min = newMin;
+					max = newMax;
 				}
 			}
 		}
@@ -1861,16 +1882,32 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns `true` if axis needs to be resunced with some other axis.
+	 * Rounds a raw step value up to the nearest "nice" number
+	 * (1, 2, 5, 10, 20, 50, etc.), respecting maxPrecision.
 	 */
-	protected _checkSync(min: number, max: number, step: number, count: number): boolean {
-		let currentCount = (max - min) / step;
-		for (let i = 1; i < count; i++) {
-			if ($math.round(currentCount / i, 1) == count || currentCount * i == count) {
-				return true;
+	protected _niceStep(rawStep: number): number {
+		let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(rawStep)) * Math.LOG10E));
+		let normalized = rawStep / stepPower;
+
+		if (normalized <= 1) normalized = 1;
+		else if (normalized <= 2) normalized = 2;
+		else if (normalized <= 5) normalized = 5;
+		else normalized = 10;
+
+		let step = normalized * stepPower;
+
+		let maxPrecision = this.get("maxPrecision");
+		if ($type.isNumber(maxPrecision)) {
+			let ceiledStep = $math.ceil(step, maxPrecision);
+			if (maxPrecision < Number.MAX_VALUE && step !== ceiledStep) {
+				step = ceiledStep;
+				if (step == 0) {
+					step = 1;
+				}
 			}
 		}
-		return false;
+
+		return step;
 	}
 
 	/**

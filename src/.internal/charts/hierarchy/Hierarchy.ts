@@ -145,6 +145,15 @@ export interface IHierarchySettings extends ISeriesSettings {
 	childDataField?: string;
 
 	/**
+	 * A field in data that holds the parent node's ID, used with flat
+	 * (tabular) data via [[setFlatData]].
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Flat_data} for more info
+	 * @since 5.16.2
+	 */
+	parentIdField?: string;
+
+	/**
 	 * A field in data that holds boolean value indicating if node is
 	 * disabled (collapsed).
 	 */
@@ -276,8 +285,8 @@ export abstract class Hierarchy extends Series {
 		if (colors) {
 			colors.reset();
 		}
-		return super._applyThemes(force);		
-	}	
+		return super._applyThemes(force);
+	}
 
 	/**
 	 * A list of nodes in a [[Hierarchy]] chart.
@@ -436,19 +445,23 @@ export abstract class Hierarchy extends Series {
 
 		let di: DataItem<this["_dataItemSettings"]> | undefined;
 
-		$array.each(dataItems, (dataItem: any) => {
+		$array.eachContinue(dataItems, (dataItem: any) => {
 
 			if (dataItem.get("id") == id) {
 				di = dataItem;
+				return false;
 			}
 
 			const children = dataItem.get("children");
 			if (children) {
 				let childDataItem = this._getDataItemById(children, id);
 				if (childDataItem) {
-					di = childDataItem
+					di = childDataItem;
+					return false;
 				}
 			}
+
+			return true;
 		})
 
 		return di;
@@ -490,7 +503,18 @@ export abstract class Hierarchy extends Series {
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 
-		const childData = dataItem.get("childData");
+		let childData = dataItem.get("childData");
+
+		// Fallback: if _makeDataItem didn't map childData (e.g. childDataField
+		// was not yet set during _updateFields), read directly from dataContext
+		if (!childData) {
+			const childDataField = this.get("childDataField", "children");
+			childData = (dataItem.dataContext as any)[childDataField];
+			if (childData) {
+				dataItem.setRaw("childData", childData);
+			}
+		}
+
 		const colors = this.get("colors");
 		const patterns = this.get("patterns");
 		const topDepth = this.get("topDepth", 0);
@@ -559,6 +583,57 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
+	 * Sets flat (tabular) data for the hierarchy chart.
+	 *
+	 * Converts flat data with parent references into nested hierarchical
+	 * data. Requires [[idField]] and [[parentIdField]] to be set.
+	 *
+	 * The root node should have a `null`/`undefined` parent ID.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Flat_data} for more info
+	 * @since 5.16.2
+	 * @param  flatData  Array of flat data objects
+	 */
+	public setFlatData(flatData: Array<any>) {
+		const idField = this.get("idField", "id");
+		const parentIdField = this.get("parentIdField", "parentId");
+		const childDataField = this.get("childDataField", "children");
+
+		// Build lookup map
+		const map = new Map<string, any>();
+		const items: any[] = [];
+
+		$array.each(flatData, (item) => {
+			const clone = Object.assign({}, item);
+			map.set(clone[idField], clone);
+			items.push(clone);
+		});
+
+		// Link children to parents
+		let root: any;
+
+		$array.each(items, (item) => {
+			const parentId = item[parentIdField];
+			if (parentId == null || parentId === "") {
+				root = item;
+			}
+			else {
+				const parent = map.get(parentId);
+				if (parent) {
+					if (!parent[childDataField]) {
+						parent[childDataField] = [];
+					}
+					parent[childDataField].push(item);
+				}
+			}
+		});
+
+		if (root) {
+			this.data.setAll([root]);
+		}
+	}
+
+	/**
 	 * Adds children data to the target data item.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-api/#Dynamically_adding_child_nodes} for more info
@@ -566,7 +641,7 @@ export abstract class Hierarchy extends Series {
 	 */
 	public addChildData(dataItem: DataItem<this["_dataItemSettings"]>, data: Array<any>) {
 		const dataContext = dataItem.dataContext as any;
-		const childDataField = this.get("childDataField");
+		const childDataField = this.get("childDataField", "children");
 
 		let childData = dataContext[childDataField] as any;
 		if (!childData) {

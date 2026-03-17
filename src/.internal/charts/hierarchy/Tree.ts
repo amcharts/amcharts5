@@ -44,6 +44,28 @@ export interface ITreeSettings extends ILinkedHierarchySettings {
 	 */
 	inversed?: boolean;
 
+	/**
+	 * If set to `true`, will use cluster layout (dendrogram) where all leaf
+	 * nodes are placed at the same depth.
+	 *
+	 * @default false
+	 * @since 5.16.2
+	 */
+	clustered?: boolean;
+
+	/**
+	 * A function that returns the desired separation between neighboring
+	 * nodes. Receives two data items and should return a numeric value.
+	 *
+	 * Default is `1` for siblings, `2` for non-siblings.
+	 *
+	 * Can be used to create variable node spacing based on value, label
+	 * size, or other data properties.
+	 *
+	 * @since 5.16.2
+	 */
+	nodeSeparation?: (a: DataItem<ITreeDataItem>, b: DataItem<ITreeDataItem>) => number;
+
 }
 
 export interface ITreePrivate extends ILinkedHierarchyPrivate {
@@ -86,7 +108,12 @@ export class Tree extends LinkedHierarchy {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this.isDirty("orientation") || this.isDirty("inversed")) {
+		if (this.isDirty("clustered")) {
+			this._hierarchyLayout = this.get("clustered") ? d3hierarchy.cluster() : d3hierarchy.tree();
+			this._updateVisuals();
+		}
+
+		if (this.isDirty("orientation") || this.isDirty("inversed") || this.isDirty("nodeSeparation")) {
 			this._updateVisuals();
 		}
 	}
@@ -100,6 +127,13 @@ export class Tree extends LinkedHierarchy {
 			}
 			else {
 				layout.size([this.innerHeight(), this.innerWidth()]);
+			}
+
+			const nodeSeparation = this.get("nodeSeparation");
+			if (nodeSeparation) {
+				layout.separation((a: any, b: any) => {
+					return nodeSeparation(a.data.dataItem, b.data.dataItem);
+				});
 			}
 
 			layout(this._rootNode);

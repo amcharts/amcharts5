@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.16.2] - 2026-03-17
+
+## Added
+- `syncZeros` added to `ValueAxis`. It will work only if `syncWithAxis` is set and zero is within min/max of axis.
+- Exposing standalone functions via `index`/`am5`: `populateString()`, `getTagValue()`, `getCustomDataValue()`.
+- `nodeSeparation` setting added to `Tree`. Allows custom separation function between nodes, receiving two data items and returning a numeric value.
+- `setFlatData()` method added to `Hierarchy`. Accepts flat array data with parent ID references and converts it to nested hierarchy format. Works with new `parentIdField` setting.
+- `clustered` setting added to `Tree`. When set to `true`, uses cluster layout (dendrogram) where all leaf nodes are placed at the same depth.
+
+## Fixed
+- `minBulletDistance` was not showing/hiding bullets if set dynamically after series was already initialized.
+- Axis syncing algorithm fixed, performance of syncing  improved.
+- `Tree` and `ForceDirected` charts with very deep structures were having performance issues.
+
+
 ## [5.16.1] - 2026-03-03
 
 ## Changed

@@ -29,6 +29,7 @@ export class HierarchyDefaultTheme extends Theme {
 			width: p100,
 			height: p100,
 			colors: ColorSet.new(this._root, { step: 2 }),
+			childDataField: "children",
 			downDepth: 1,
 			initialDepth: 5,
 			singleBranchOnly: true,

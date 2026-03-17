@@ -6,7 +6,11 @@ import { Sprite } from "../render/Sprite";
 import { TextFormatter } from "./TextFormatter";
 
 /**
- * @ignore
+ * Populates the curly-bracket placeholders with actual values from a [[Sprite]].
+ *
+ * @param target Target Sprite
+ * @param string Target text
+ * @returns Populated text
  */
 export function populateString(target: Sprite, string: string): string {
 	if (string != null) {
@@ -37,9 +41,15 @@ export function populateString(target: Sprite, string: string): string {
 }
 
 /**
- * @ignore
+ * Returns an abstract value from the target [[Sprite]]'s data item, settings,
+ * properties or parents.
+ *
+ * @param target Target Sprite
+ * @param tagName Tage to extract value for
+ * @param format Format for the value
+ * @returns Value
  */
-function getTagValue(target: Sprite, tagName: string, format?: string): string {
+export function getTagValue(target: Sprite, tagName: string, format?: string): string {
 	let value: any;
 	const dataItem = target.dataItem;
 
@@ -160,9 +170,13 @@ function getTagValue(target: Sprite, tagName: string, format?: string): string {
 }
 
 /**
- * @ignore
+ * Returns a value from target [[Sprite]]'s `customData`.
+ *
+ * @param target Target Sprite
+ * @param prop Key
+ * @returns Value
  */
-function getCustomDataValue(target: Sprite, prop: string): any {
+export function getCustomDataValue(target: Sprite, prop: string): any {
 	const customData = target.getPrivate("customData");
 	if ($type.isObject(customData)) {
 		return (<any>customData)[prop];

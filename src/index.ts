@@ -92,6 +92,8 @@ export type { IGeoPoint } from "./.internal/core/util/IGeoPoint";
 export type { IPoint } from "./.internal/core/util/IPoint";
 export type { IRectangle } from "./.internal/core/util/IRectangle";
 
+export { populateString, getTagValue, getCustomDataValue, getTagValueFromObject } from "./.internal/core/util/PopulateString";
+
 import * as array from "./.internal/core/util/Array";
 export { array }
 

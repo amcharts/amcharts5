@@ -41,6 +41,18 @@ Those are available via separate package:
 * [ZIP download](https://www.amcharts.com/download/download/)
 
 
+### amCharts + AI
+
+amCharts works nicely with all major AI models (Claude, ChatGPT, Gemini,
+etc.). For even better results, we provide the following resources:
+
+* [amCharts 5 + AI documentation](https://www.amcharts.com/docs/v5/ai/)
+* [amCharts 5 Skill on GitHub](https://github.com/amcharts/amcharts5-skill)
+* [amCharts 5 MCP Server on GitHub](https://github.com/amcharts/amcharts5-mcp)
+* [amCharts 5 MCP Server on npm](https://www.npmjs.com/package/@amcharts/amcharts5-mcp)
+* [amCharts 5 .cursorrules file](https://github.com/amcharts/amcharts5-skill/blob/main/cursorrules)
+
+
 ### License
 
 If you have a commercial amCharts 5 license, this software is covered by your

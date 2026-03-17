@@ -1427,7 +1427,7 @@ export abstract class XYSeries extends Series {
 			this._dataGrouped = true;
 		}
 
-		if (this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("adjustedStartIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty || this._sizeDirty) {
+		if (this._valuesDirty || this.isPrivateDirty("startIndex") || this.isPrivateDirty("adjustedStartIndex") || this.isPrivateDirty("endIndex") || this.isDirty("vcx") || this.isDirty("vcy") || this._stackDirty || this._sizeDirty || this.isDirty("minBulletDistance")) {
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 			let minBulletDistance = this.get("minBulletDistance", 0);

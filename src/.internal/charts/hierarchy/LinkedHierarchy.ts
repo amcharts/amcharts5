@@ -97,6 +97,7 @@ export interface ILinkedHierarchyEvents extends IHierarchyEvents {
 /**
  * A base class for linked hierarchy series.
  */
+
 export abstract class LinkedHierarchy extends Hierarchy {
 
 	public static className: string = "LinkedHierarchy";
@@ -220,19 +221,28 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		dataItem.setRaw("childLinks", []);
 		dataItem.setRaw("links", []);
 		super.processDataItem(dataItem);
+
+		// Run updateLinkWith once after the entire tree is processed, not per-node
+		if (!dataItem.get("parent")) {
+			this.updateLinkWith(this.dataItems);
+		}
+	}
+
+	public addChildData(dataItem: DataItem<this["_dataItemSettings"]>, data: Array<any>) {
+		super.addChildData(dataItem, data);
+		this.updateLinkWith(this.dataItems);
 	}
 
 	protected _processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super._processDataItem(dataItem);
 
 		const parentDataItem = dataItem.get("parent");
-		if (parentDataItem && parentDataItem.get("depth") >= this.get("topDepth")) {
+		if (parentDataItem && parentDataItem.get("depth") >= this.get("topDepth", 0)) {
 			const link = this.linkDataItems(parentDataItem, dataItem);
 			dataItem.setRaw("parentLink", link);
 		}
 
 		const node = dataItem.get("node");
-		this.updateLinkWith(this.dataItems);
 		node._updateLinks(0);
 	}
 
@@ -280,15 +290,6 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		super._updateNode(dataItem);
 
 		this._animatePositions(dataItem);
-
-		const hierarchyNode = dataItem.get("d3HierarchyNode");
-
-		const hierarchyChildren = hierarchyNode.children;
-		if (hierarchyChildren) {
-			$array.each(hierarchyChildren, (hierarchyChild) => {
-				this._updateNodes(hierarchyChild)
-			})
-		}
 
 		const fill = dataItem.get("fill");
 		const fillPattern = dataItem.get("fillPattern");
