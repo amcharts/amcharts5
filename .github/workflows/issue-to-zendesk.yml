@@ -23,7 +23,7 @@ jobs:
               --arg extid "${{ github.event.issue.number }}" \
               '{ticket: {subject: $subj, comment: {body: $body}, external_id: $extid, tags: ["github"]}}')
 
-            curl -sf -X POST \
+            curl -v -X POST \
               "https://${ZD_SUBDOMAIN}.zendesk.com/api/v2/tickets.json" \
               -H "Content-Type: application/json" \
               -u "${ZD_EMAIL}/token:${ZD_TOKEN}" \
