@@ -23,13 +23,14 @@ jobs:
           COMMENT_URL: ${{ github.event.comment.html_url }}
         run: |
           if [ "${{ github.event_name }}" = "issues" ]; then
+            BODY=$(printf '%s\n\n---\nGitHub Issue: %s' "$ISSUE_BODY" "$ISSUE_URL")
             PAYLOAD=$(jq -n \
               --arg subj "GitHub Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}" \
-              --arg body "${ISSUE_BODY}\n\n---\nGitHub Issue: ${ISSUE_URL}" \
+              --arg body "$BODY" \
               --arg extid "$ISSUE_NUMBER" \
               '{ticket: {subject: $subj, comment: {body: $body}, external_id: $extid, tags: ["github"]}}')
 
-            curl -sf -X POST \
+            curl -v -X POST \
               "https://${ZD_SUBDOMAIN}.zendesk.com/api/v2/tickets.json" \
               -H "Content-Type: application/json" \
               -u "${ZD_EMAIL}/token:${ZD_TOKEN}" \
@@ -41,8 +42,9 @@ jobs:
               -u "${ZD_EMAIL}/token:${ZD_TOKEN}" | jq -r '.results[0].id')
 
             if [ "$TICKET_ID" != "null" ] && [ -n "$TICKET_ID" ]; then
+              BODY=$(printf 'Comment by @%s:\n\n%s\n\n---\nGitHub Comment: %s' "$COMMENT_USER" "$COMMENT_BODY" "$COMMENT_URL")
               PAYLOAD=$(jq -n \
-                --arg body "Comment by @${COMMENT_USER}:\n\n${COMMENT_BODY}\n\n---\nGitHub Comment: ${COMMENT_URL}" \
+                --arg body "$BODY" \
                 '{ticket: {comment: {body: $body, public: true}}}')
 
               curl -v -X PUT \
