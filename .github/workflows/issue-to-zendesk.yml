@@ -22,8 +22,14 @@ jobs:
           COMMENT_USER: ${{ github.event.comment.user.login }}
           COMMENT_URL: ${{ github.event.comment.html_url }}
         run: |
+          # Convert markdown newlines to <br> for HTML rendering
+          html_escape_newlines() {
+            echo "$1" | sed 's/$/<br>/'
+          }
+
           if [ "${{ github.event_name }}" = "issues" ]; then
-            BODY=$(printf '%s<br><br><hr><br>GitHub Issue: <a href="%s">%s</a>' "$ISSUE_BODY" "$ISSUE_URL" "$ISSUE_URL")
+            ISSUE_HTML=$(html_escape_newlines "$ISSUE_BODY")
+            BODY=$(printf '%s<br><hr><br>GitHub Issue: <a href="%s">%s</a>' "$ISSUE_HTML" "$ISSUE_URL" "$ISSUE_URL")
             PAYLOAD=$(jq -n \
               --arg subj "GitHub Issue #${ISSUE_NUMBER}: ${ISSUE_TITLE}" \
               --arg body "$BODY" \
@@ -42,7 +48,8 @@ jobs:
               -u "${ZD_EMAIL}/token:${ZD_TOKEN}" | jq -r '.results[0].id')
 
             if [ "$TICKET_ID" != "null" ] && [ -n "$TICKET_ID" ]; then
-              BODY=$(printf 'Comment by @%s:<br><br>%s<br><br><hr><br>GitHub Comment: <a href="%s">%s</a>' "$COMMENT_USER" "$COMMENT_BODY" "$COMMENT_URL" "$COMMENT_URL")
+              COMMENT_HTML=$(html_escape_newlines "$COMMENT_BODY")
+              BODY=$(printf 'Comment by @%s:<br><br>%s<br><hr><br>GitHub Comment: <a href="%s">%s</a>' "$COMMENT_USER" "$COMMENT_HTML" "$COMMENT_URL" "$COMMENT_URL")
               PAYLOAD=$(jq -n \
                 --arg body "$BODY" \
                 '{ticket: {comment: {html_body: $body, public: true}}}')
