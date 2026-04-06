@@ -41,6 +41,7 @@ import type { ChaikinMoneyFlow } from "./../charts/stock/indicators/ChaikinMoney
 import type { ChaikinOscillator } from "./../charts/stock/indicators/ChaikinOscillator.js";
 import type { Chart } from "./render/Chart.js";
 import type { ChartIndicator } from "./../charts/stock/indicators/ChartIndicator.js";
+import type { ChartSerializer } from "./../plugins/json/ChartSerializer.js";
 import type { Chord } from "./../charts/flow/Chord.js";
 import type { ChordDirected } from "./../charts/flow/ChordDirected.js";
 import type { ChordLink } from "./../charts/flow/ChordLink.js";
@@ -142,6 +143,8 @@ import type { MapLineSeries } from "./../charts/map/MapLineSeries.js";
 import type { MapPointSeries } from "./../charts/map/MapPointSeries.js";
 import type { MapPolygon } from "./../charts/map/MapPolygon.js";
 import type { MapPolygonSeries } from "./../charts/map/MapPolygonSeries.js";
+import type { MapSankeyNodes } from "./../charts/map/MapSankeyNodes.js";
+import type { MapSankeySeries } from "./../charts/map/MapSankeySeries.js";
 import type { MapSeries } from "./../charts/map/MapSeries.js";
 import type { Measure } from "./../charts/stock/drawing/Measure.js";
 import type { MedianPrice } from "./../charts/stock/indicators/MedianPrice.js";
@@ -294,6 +297,7 @@ export interface IClasses {
 	"ChaikinOscillator": ChaikinOscillator;
 	"Chart": Chart;
 	"ChartIndicator": ChartIndicator;
+	"ChartSerializer": ChartSerializer;
 	"Chord": Chord;
 	"ChordDirected": ChordDirected;
 	"ChordLink": ChordLink;
@@ -395,6 +399,8 @@ export interface IClasses {
 	"MapPointSeries": MapPointSeries;
 	"MapPolygon": MapPolygon;
 	"MapPolygonSeries": MapPolygonSeries;
+	"MapSankeyNodes": MapSankeyNodes;
+	"MapSankeySeries": MapSankeySeries;
 	"MapSeries": MapSeries;
 	"Measure": Measure;
 	"MedianPrice": MedianPrice;

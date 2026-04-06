@@ -58,40 +58,45 @@ export function ceil(value: number, precision: number): number {
 
 
 /**
- * [getCubicControlPointA description]
+ * Returns the first control point for a cubic bezier spline segment
+ * interpolating through three consecutive points with the given tension.
  *
- * @ignore Exclude from docs
- * @todo Description
- * @param p0        [description]
- * @param p1        [description]
- * @param p2        [description]
- * @param p3        [description]
- * @param tensionX  [description]
- * @param tensionY  [description]
- * @return [description]
+ * @ignore
+ * @param p0        Previous point
+ * @param p1        Current point
+ * @param p2        Next point
+ * @param tensionX  Horizontal tension (0–1)
+ * @param tensionY  Vertical tension (0–1)
+ * @return          First control point
  */
 export function getCubicControlPointA(p0: IPoint, p1: IPoint, p2: IPoint, tensionX: number, tensionY: number): IPoint {
 	return { x: ((-p0.x + p1.x / tensionX + p2.x) * tensionX), y: ((-p0.y + p1.y / tensionY + p2.y) * tensionY) };
 }
 
 /**
- * [getCubicControlPointB description]
+ * Returns the second control point for a cubic bezier spline segment
+ * interpolating through three consecutive points with the given tension.
  *
- * @ignore Exclude from docs
- * @todo Description
- * @param p0        [description]
- * @param p1        [description]
- * @param p2        [description]
- * @param p3        [description]
- * @param tensionX  [description]
- * @param tensionY  [description]
- * @return [description]
+ * @ignore
+ * @param p1        Current point
+ * @param p2        Next point
+ * @param p3        Point after next
+ * @param tensionX  Horizontal tension (0–1)
+ * @param tensionY  Vertical tension (0–1)
+ * @return          Second control point
  */
 export function getCubicControlPointB(p1: IPoint, p2: IPoint, p3: IPoint, tensionX: number, tensionY: number): IPoint {
 	return { x: ((p1.x + p2.x / tensionX - p3.x) * tensionX), y: ((p1.y + p2.y / tensionY - p3.y) * tensionY) };
 }
 
-
+/**
+ * Clamps a value to the given [min, max] range.
+ *
+ * @param value  Value to clamp
+ * @param min    Minimum
+ * @param max    Maximum
+ * @return       Clamped value
+ */
 export function fitToRange(value: number, min: number, max: number): number {
 	return Math.min(Math.max(value, min), max);
 }
@@ -126,7 +131,12 @@ export function cos(angle: number): number {
 	return Math.cos(RADIANS * angle);
 }
 
-// 0 to 360
+/**
+ * Normalizes an angle to the 0–360 range.
+ *
+ * @param value  Angle in degrees
+ * @return       Normalized angle (0–360)
+ */
 export function normalizeAngle(value: number): number {
 	value = value % 360;
 	if (value < 0) {
@@ -135,7 +145,16 @@ export function normalizeAngle(value: number): number {
 	return value;
 }
 
-// TODO this doesn't work properly for skewing, and it's probably broken for rotation too
+/**
+ * Returns the bounding box of a circular arc.
+ *
+ * @param cx          Center X
+ * @param cy          Center Y
+ * @param startAngle  Start angle in degrees
+ * @param endAngle    End angle in degrees
+ * @param radius      Arc radius
+ * @return            Bounding box
+ */
 export function getArcBounds(cx: number, cy: number, startAngle: number, endAngle: number, radius: number): IBounds {
 
 	let minX = Number.MAX_VALUE;
@@ -169,18 +188,23 @@ export function getArcBounds(cx: number, cy: number, startAngle: number, endAngl
 }
 
 /**
- * Returns point on arc
+ * Returns a point on a circle at the given angle.
  *
- * @param center point
- * @param radius
- * @param arc
- * @return {boolean}
+ * @param radius  Circle radius
+ * @param arc     Angle in degrees
+ * @return        Point on the arc
  */
 export function getArcPoint(radius: number, arc: number) {
 	return ({ x: radius * cos(arc), y: radius * sin(arc) });
 }
 
 
+/**
+ * Merges an array of bounds into a single bounding box that encompasses all of them.
+ *
+ * @param bounds  Array of bounds to merge
+ * @return        Combined bounding box
+ */
 export function mergeBounds(bounds: IBounds[]): IBounds {
 	const len = bounds.length;
 
@@ -207,6 +231,15 @@ export function mergeBounds(bounds: IBounds[]): IBounds {
 }
 
 
+/**
+ * Fits an angle into the given start/end range, snapping to the
+ * nearest boundary when the angle falls outside.
+ *
+ * @param value       Angle in degrees
+ * @param startAngle  Range start in degrees
+ * @param endAngle    Range end in degrees
+ * @return            Angle clamped to the range
+ */
 export function fitAngleToRange(value: number, startAngle: number, endAngle: number): number {
 
 	if (startAngle > endAngle) {
@@ -253,6 +286,13 @@ export function fitAngleToRange(value: number, startAngle: number, endAngle: num
 	return value;
 }
 
+/**
+ * Returns `true` if a point is inside the given bounds (inclusive).
+ *
+ * @param point   Point to test
+ * @param bounds  Bounding box
+ * @return        Whether the point is inside
+ */
 export function inBounds(point: IPoint, bounds: IBounds) {
 	if (point.x >= bounds.left && point.y >= bounds.top && point.x <= bounds.right && point.y <= bounds.bottom) {
 		return true;
@@ -260,6 +300,14 @@ export function inBounds(point: IPoint, bounds: IBounds) {
 	return false;
 }
 
+/**
+ * Returns the angle in degrees from `point1` to `point2`.
+ * If `point2` is omitted, uses double of `point1` coordinates.
+ *
+ * @param point1  Origin point
+ * @param point2  Target point (optional)
+ * @return        Angle in degrees (0–360)
+ */
 export function getAngle(point1: IPoint, point2?: IPoint): number {
 	if (!point2) {
 		point2 = { x: point1.x * 2, y: point1.y * 2 };
@@ -274,15 +322,13 @@ export function getAngle(point1: IPoint, point2?: IPoint): number {
 }
 
 /**
- * [getPointOnQuadraticCurve description]
+ * Returns a point on a quadratic bezier curve at the given position (0–1).
  *
- * @ignore Exclude from docs
- * @todo Description
- * @param pointA        [description]
- * @param pointB        [description]
- * @param controlPoint  [description]
- * @param position      [description]
- * @return [description]
+ * @param pointA        Start point
+ * @param pointB        End point
+ * @param controlPoint  Control point
+ * @param position      Relative position (0 = start, 1 = end)
+ * @return              Point on the curve
  */
 export function getPointOnQuadraticCurve(pointA: IPoint, pointB: IPoint, controlPoint: IPoint, position: number): IPoint {
 	let x: number = (1 - position) * (1 - position) * pointA.x + 2 * (1 - position) * position * controlPoint.x + position * position * pointB.x;
@@ -290,8 +336,64 @@ export function getPointOnQuadraticCurve(pointA: IPoint, pointB: IPoint, control
 	return { x: x, y: y };
 }
 
+/**
+ * Returns a point on a cubic bezier curve at the given position (0–1).
+ *
+ * @param pointA         Start point
+ * @param pointB         End point
+ * @param controlPointA  First control point (near start)
+ * @param controlPointB  Second control point (near end)
+ * @param position       Relative position (0 = start, 1 = end)
+ * @return               Point on the curve
+ */
+export function getPointOnCubicCurve(pointA: IPoint, pointB: IPoint, controlPointA: IPoint, controlPointB: IPoint, position: number): IPoint {
+	let s = 1 - position;
+	let x = s * s * s * pointA.x + 3 * s * s * position * controlPointA.x + 3 * s * position * position * controlPointB.x + position * position * position * pointB.x;
+	let y = s * s * s * pointA.y + 3 * s * s * position * controlPointA.y + 3 * s * position * position * controlPointB.y + position * position * position * pointB.y;
+	return { x: x, y: y };
+}
+
+/**
+ * Returns a point at a relative position along a straight line between two points.
+ *
+ * @param pointA    Start point
+ * @param pointB    End point
+ * @param position  Relative position (0 = start, 1 = end)
+ * @return          Point on the line
+ */
 export function getPointOnLine(pointA: IPoint, pointB: IPoint, position: number): IPoint {
 	return { x: pointA.x + (pointB.x - pointA.x) * position, y: pointA.y + (pointB.y - pointA.y) * position };
+}
+
+/**
+ * Given a normalized location (0–1) along a multi-segment path and an array
+ * of cumulative segment lengths, returns which segment the location falls in
+ * and the local parameter t within that segment.
+ *
+ * @param location           Relative position along the full path (0–1)
+ * @param cumulativeLengths  Cumulative length at the end of each segment
+ * @return                   Segment index and local t (0–1)
+ */
+export function resolveLocationOnPath(location: number, cumulativeLengths: number[]): { index: number; t: number } {
+	const n = cumulativeLengths.length;
+	if (n > 0) {
+		const totalLength = cumulativeLengths[n - 1];
+		const targetLength = location * totalLength;
+
+		let index = 0;
+		for (let i = 0; i < n; i++) {
+			if (cumulativeLengths[i] >= targetLength) {
+				index = i;
+				break;
+			}
+		}
+
+		const segStart = index > 0 ? cumulativeLengths[index - 1] : 0;
+		const segLength = cumulativeLengths[index] - segStart;
+		const t = segLength > 0 ? (targetLength - segStart) / segLength : 0;
+		return { index, t };
+	}
+	return { index: 0, t: 0 };
 }
 
 
@@ -321,17 +423,18 @@ export function boundsOverlap(bounds1: IBounds, bounds2: IBounds): boolean {
 }
 
 /**
- * Generates points of a spiral
- * @param cx 
- * @param cy 
- * @param radius 
- * @param radiusY 
- * @param innerRadius 
- * @param step 
- * @param radiusStep 
- * @param startAngle 
- * @param endAngle 
- * @returns IPoint[]
+ * Generates points along a spiral path.
+ *
+ * @param cx           Center X
+ * @param cy           Center Y
+ * @param radius       Outer radius
+ * @param radiusY      Vertical radius (for elliptical spirals)
+ * @param innerRadius  Inner radius where the spiral starts
+ * @param step         Base step size between points
+ * @param radiusStep   Radius increase per full revolution
+ * @param startAngle   Start angle in degrees
+ * @param endAngle     End angle in degrees
+ * @return             Array of points along the spiral
  */
 export function spiralPoints(cx: number, cy: number, radius: number, radiusY: number, innerRadius: number, step: number, radiusStep: number, startAngle: number, endAngle: number): IPoint[] {
 
@@ -378,10 +481,11 @@ export function spiralPoints(cx: number, cy: number, radius: number, radiusY: nu
 }
 
 /**
- * Returns true if circles overlap
- * @param circle1
- * @param circle2 
- * @returns boolean
+ * Returns `true` if two circles overlap or touch.
+ *
+ * @param circle1  First circle (x, y, radius)
+ * @param circle2  Second circle (x, y, radius)
+ * @return         Whether the circles overlap
  */
 export function circlesOverlap(circle1: { x: number, y: number, radius: number }, circle2: { x: number, y: number, radius: number }): boolean {
 	return Math.hypot(circle1.x - circle2.x, circle1.y - circle2.y) <= circle1.radius + circle2.radius;

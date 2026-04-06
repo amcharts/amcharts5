@@ -78,6 +78,10 @@ export class MapChartDefaultTheme extends Theme {
 			affectsBounds: false
 		})
 
+		r("MapSankeySeries").setAll({
+			affectsBounds: false
+		})
+
 		{
 			const rule = r("MapPolygon");
 

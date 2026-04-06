@@ -1,10 +1,22 @@
 import * as $array from "./Array";
 import type { Keyof } from "./Type";
 
+/**
+ * Returns an array of object's own enumerable property names.
+ *
+ * @param object  Source object
+ * @return Array of property names
+ */
 export function keys<O>(object: O): Array<Keyof<O>> {
 	return Object.keys(object) as Array<Keyof<O>>;
 }
 
+/**
+ * Returns an array of object's own enumerable [key, value] pairs.
+ *
+ * @param object  Source object
+ * @return Array of [key, value] tuples
+ */
 export function entries<O>(object: O): Array<[Keyof<O>, O[Keyof<O>]]> {
 	return Object.entries(object) as Array<[Keyof<O>, O[Keyof<O>] ]>;
 }
@@ -21,10 +33,22 @@ export function keysOrdered<Object>(object: Object, order: (a: Keyof<Object>, b:
 	return keys(object).sort(order);
 }
 
+/**
+ * Returns a shallow copy of the object.
+ *
+ * @param object  Source object
+ * @return Shallow copy
+ */
 export function copy<O>(object: O): O {
 	return Object.assign({}, object);
 }
 
+/**
+ * Iterates through all properties of the object calling `fn` for each of them.
+ *
+ * @param object  Source object
+ * @param f       Callback function
+ */
 export function each<O>(object: O, f: <K extends keyof O>(key: K, value: Exclude<O[K], undefined>) => void): void {
 	keys(object).forEach((key) => {
 		f(key, object[key] as any);
@@ -81,7 +105,6 @@ export function hasKey<Object, Key extends keyof Object>(object: Object, key: Ke
  * @param fromObject  Source object
  * @param toObject    Target object
  * @return Updated target object
- * @todo Maybe consolidate with utils.copy?
  */
 export function softCopyProperties(source: Object, target: Object): Object {
 	each(source, (key, value) => {

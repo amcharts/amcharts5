@@ -221,6 +221,11 @@ export function setStyle(dom: HTMLElement, property: string, value: string | und
 	(<any>dom.style)[property] = value;
 }
 
+/**
+ * Gets style property value on a DOM element.
+ *
+ * @ignore Exclude from docs
+ */
 export function getStyle(dom: HTMLElement, property: string): string | undefined {
 	return (<any>dom.style)[property];
 }
@@ -299,6 +304,11 @@ export function setInteractive(target: HTMLElement, interactive: boolean): void 
 	}
 }
 
+/**
+ * Returns a normalized key name from a keyboard event.
+ *
+ * @ignore
+ */
 export function getEventKey(event: KeyboardEvent): string {
 	if (event.key !== undefined) {
 		return event.key;
@@ -345,10 +355,7 @@ export function getShadowRoot(a: Node): ShadowRoot | null {
 }
 
 /**
- * [rootStylesheet description]
- *
- * @ignore Exclude from docs
- * @todo Description
+ * @ignore
  */
 let rootStylesheet: $type.Optional<CSSStyleSheet>;
 
@@ -374,11 +381,7 @@ function createStylesheet(element: ShadowRoot | null, text: string, nonce: strin
 }
 
 /**
- * [getStylesheet description]
- *
- * @ignore Exclude from docs
- * @todo Description
- * @return [description]
+ * @ignore
  */
 function getStylesheet(element: ShadowRoot | null, nonce: string = ""): CSSStyleSheet {
 	if (element === null) {
@@ -408,12 +411,7 @@ function getStylesheet(element: ShadowRoot | null, nonce: string = ""): CSSStyle
 }
 
 /**
- * [makeStylesheet description]
- *
- * @ignore Exclude from docs
- * @todo Description
- * @param selector  [description]
- * @return [description]
+ * @ignore
  */
 function appendStylesheet(root: CSSStyleSheet, selector: string): CSSStyleRule {
 	const index = root.cssRules.length;
@@ -661,14 +659,33 @@ export function removeClass(element: HTMLElement, className: string): void {
 
 // }
 
+/**
+ * Returns `true` if the current device is running iOS.
+ *
+ * @return Is iOS?
+ */
 export function iOS(): boolean {
 	return /apple/i.test(navigator.vendor) && "ontouchend" in document;
 }
 
+/**
+ * Returns a safe canvas resolution for the current device.
+ * Returns `1` on iOS to avoid memory issues, `undefined` otherwise.
+ *
+ * @return Resolution or undefined
+ */
 export function getSafeResolution(): number | undefined {
 	return iOS() ? 1 : undefined;
 }
 
+/**
+ * Converts a value that can be a number or [[Percent]] to an absolute number
+ * relative to the given full value.
+ *
+ * @param percent  Input value (number or Percent)
+ * @param full     Full reference value
+ * @return Absolute value
+ */
 export function relativeToValue(percent: number | Percent | undefined | null, full: number): number {
 	if ($type.isNumber(percent)) {
 		return percent;
@@ -719,18 +736,45 @@ export function padString(value: any, len: number = 0, char: string = "0"): stri
 	return len > value.length ? Array(len - value.length + 1).join(char) + value : value;
 }
 
+/**
+ * Removes whitespace from the beginning of a string.
+ *
+ * @param text  Source string
+ * @return Trimmed string
+ */
 export function trimLeft(text: string): string {
 	return text.replace(/^[\s]*/, "");
 }
 
+/**
+ * Removes whitespace from the end of a string.
+ *
+ * @param text  Source string
+ * @return Trimmed string
+ */
 export function trimRight(text: string): string {
 	return text.replace(/[\s]*$/, "");
 }
 
+/**
+ * Removes whitespace from both ends of a string.
+ *
+ * @param text  Source string
+ * @return Trimmed string
+ */
 export function trim(text: string): string {
 	return trimLeft(trimRight(text));
 }
 
+/**
+ * Truncates a string to a maximum length, appending an ellipsis.
+ *
+ * @param text        Source string
+ * @param maxLength   Maximum character length
+ * @param breakWords  Allow breaking mid-word?
+ * @param ellipsis    Ellipsis string to append
+ * @return Truncated string
+ */
 export function truncateTextWithEllipsis(text: string, maxLength: number, breakWords: boolean = false, ellipsis: string = "...") {
 	if (text.length > maxLength) {
 		// Find the last non-alphanumeric character before maxLength
@@ -918,7 +962,6 @@ export function splitString(source: string): string[] {
  * @param date  Date
  * @param utc   Assume UTC dates?
  * @return Year day
- * @todo Account for UTC
  */
 export function getYearDay(date: Date, utc: boolean = false): number {
 	// TODO: utc needed?
@@ -935,7 +978,6 @@ export function getYearDay(date: Date, utc: boolean = false): number {
  * @param date  Date
  * @param utc   Assume UTC dates?
  * @return Week number
- * @todo Account for UTC
  */
 export function getWeek(date: Date, _utc: boolean = false): number {
 	const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -952,7 +994,6 @@ export function getWeek(date: Date, _utc: boolean = false): number {
  * @param utc   Assume UTC dates?
  * @return Year of week
  * @since 5.3.0
- * @todo Account for UTC
  */
 export function getWeekYear(date: Date, _utc: boolean = false): number {
 	const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -1039,6 +1080,13 @@ export function getTimeZone(date: Date, long: boolean = false, savings: boolean 
 	return trim(wtz);
 }
 
+/**
+ * Returns the UTC offset in minutes for a given timezone.
+ *
+ * @param timezone    IANA timezone identifier
+ * @param targetDate  Date to check offset for
+ * @return Offset in minutes
+ */
 export function getTimezoneOffset(timezone: string, targetDate?: Date): number {
 	const date = targetDate || new Date(Date.UTC(2012, 0, 1, 0, 0, 0, 0));
 	const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
@@ -1047,6 +1095,12 @@ export function getTimezoneOffset(timezone: string, targetDate?: Date): number {
 }
 
 
+/**
+ * Capitalizes the first letter of a string.
+ *
+ * @param text  Source string
+ * @return Capitalized string
+ */
 export function capitalizeFirst(text: string): string {
 	return text.charAt(0).toUpperCase() + text.slice(1);
 }

@@ -5,16 +5,25 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.17.0] - 2026-04-06
+
+### Added
+- `MapSankeySeries` added. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/)
+
+### Fixed
+- Added safeguards to avoid floating point errors when animating values.
+
+
 ## [5.16.2] - 2026-03-17
 
-## Added
+### Added
 - `syncZeros` added to `ValueAxis`. It will work only if `syncWithAxis` is set and zero is within min/max of axis.
 - Exposing standalone functions via `index`/`am5`: `populateString()`, `getTagValue()`, `getCustomDataValue()`.
 - `nodeSeparation` setting added to `Tree`. Allows custom separation function between nodes, receiving two data items and returning a numeric value.
 - `setFlatData()` method added to `Hierarchy`. Accepts flat array data with parent ID references and converts it to nested hierarchy format. Works with new `parentIdField` setting.
 - `clustered` setting added to `Tree`. When set to `true`, uses cluster layout (dendrogram) where all leaf nodes are placed at the same depth.
 
-## Fixed
+### Fixed
 - `minBulletDistance` was not showing/hiding bullets if set dynamically after series was already initialized.
 - Axis syncing algorithm fixed, performance of syncing  improved.
 - `Tree` and `ForceDirected` charts with very deep structures were having performance issues.
@@ -22,29 +31,29 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [5.16.1] - 2026-03-03
 
-## Changed
+### Changed
 - Performance optimization: `ClusteredPointSeries`, `WordCloud`, `GaplessDateAxis`, `Treemap`, `Chord`, `DateAxis`, and others.
 - New defaults for `MapPointSeries`: `longitudeField: "longitude"` and `latitudeField: "latitude"`.
 
 
 ## [5.16.0] - 2026-02-18
 
-## Added
+### Added
 - `animateProjection` method added to `MapChart`. Allows changing map projection using animation.
 
 ### Changed
 - Performance: No longer using `Object.defineProperty` in compiled library.
 
-## Fixed
+### Fixed
 - In some cases, logarithmic scale of `ValueAxis` was ignoring `minGridDistance`, resulting in label overlap.
 
 
 ## [5.15.6] - 2026-02-05
 
-## Added 
+### Added 
 - `ignoreThemes` added to `Entity`. If set to `true`, no themes will be applied to the element. Set it to `true` on an elements (e.g. candles) of which there are many for improved performance. Required setting will need to be set directly on the element or its template.
 
-## Fixed
+### Fixed
 - Perdormance of `turboMode` increased significantly.
 
 
@@ -59,7 +68,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [5.15.4] - 2026-01-23
 
-## Fixed
+### Fixed
 - Adding bullets to series in some setups with React could result JS error since `5.15.0`.
 
 

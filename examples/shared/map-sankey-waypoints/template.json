@@ -1,0 +1,3 @@
+{
+  "bodyElements": ["<style>body { margin: 0; padding: 0; background: #0a0e12; overflow: hidden; }</style>", "<div id=\"chartdiv\" style=\"width: 100%; height: 100vh; background: #0a0e12;\"></div>"]
+}

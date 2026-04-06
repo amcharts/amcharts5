@@ -41,6 +41,7 @@ import type { ChaikinMoneyFlow } from "./../../../stock";
 import type { ChaikinOscillator } from "./../../../stock";
 import type { Chart } from "./../../../index";
 import type { ChartIndicator } from "./../../../stock";
+import type { ChartSerializer } from "./../../../plugins/json";
 import type { Chord } from "./../../../flow";
 import type { ChordDirected } from "./../../../flow";
 import type { ChordLink } from "./../../../flow";
@@ -142,6 +143,8 @@ import type { MapLineSeries } from "./../../../map";
 import type { MapPointSeries } from "./../../../map";
 import type { MapPolygon } from "./../../../map";
 import type { MapPolygonSeries } from "./../../../map";
+import type { MapSankeyNodes } from "./../../../map";
+import type { MapSankeySeries } from "./../../../map";
 import type { MapSeries } from "./../../../map";
 import type { Measure } from "./../../../stock";
 import type { MedianPrice } from "./../../../stock";
@@ -294,6 +297,7 @@ export interface IClasses {
 	"ChaikinOscillator": () => Promise<typeof ChaikinOscillator>;
 	"Chart": () => Promise<typeof Chart>;
 	"ChartIndicator": () => Promise<typeof ChartIndicator>;
+	"ChartSerializer": () => Promise<typeof ChartSerializer>;
 	"Chord": () => Promise<typeof Chord>;
 	"ChordDirected": () => Promise<typeof ChordDirected>;
 	"ChordLink": () => Promise<typeof ChordLink>;
@@ -395,6 +399,8 @@ export interface IClasses {
 	"MapPointSeries": () => Promise<typeof MapPointSeries>;
 	"MapPolygon": () => Promise<typeof MapPolygon>;
 	"MapPolygonSeries": () => Promise<typeof MapPolygonSeries>;
+	"MapSankeyNodes": () => Promise<typeof MapSankeyNodes>;
+	"MapSankeySeries": () => Promise<typeof MapSankeySeries>;
 	"MapSeries": () => Promise<typeof MapSeries>;
 	"Measure": () => Promise<typeof Measure>;
 	"MedianPrice": () => Promise<typeof MedianPrice>;
@@ -548,6 +554,7 @@ const classes: IClasses = {
 	"ChaikinOscillator": () => import(/* webpackExports: "ChaikinOscillator", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ChaikinOscillator),
 	"Chart": () => import(/* webpackExports: "Chart", webpackChunkName: "json_index" */ "./../../../index").then((m) => m.Chart),
 	"ChartIndicator": () => import(/* webpackExports: "ChartIndicator", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.ChartIndicator),
+	"ChartSerializer": () => import(/* webpackExports: "ChartSerializer", webpackChunkName: "json_plugins_json" */ "./../../../plugins/json").then((m) => m.ChartSerializer),
 	"Chord": () => import(/* webpackExports: "Chord", webpackChunkName: "json_flow" */ "./../../../flow").then((m) => m.Chord),
 	"ChordDirected": () => import(/* webpackExports: "ChordDirected", webpackChunkName: "json_flow" */ "./../../../flow").then((m) => m.ChordDirected),
 	"ChordLink": () => import(/* webpackExports: "ChordLink", webpackChunkName: "json_flow" */ "./../../../flow").then((m) => m.ChordLink),
@@ -649,6 +656,8 @@ const classes: IClasses = {
 	"MapPointSeries": () => import(/* webpackExports: "MapPointSeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapPointSeries),
 	"MapPolygon": () => import(/* webpackExports: "MapPolygon", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapPolygon),
 	"MapPolygonSeries": () => import(/* webpackExports: "MapPolygonSeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapPolygonSeries),
+	"MapSankeyNodes": () => import(/* webpackExports: "MapSankeyNodes", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapSankeyNodes),
+	"MapSankeySeries": () => import(/* webpackExports: "MapSankeySeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapSankeySeries),
 	"MapSeries": () => import(/* webpackExports: "MapSeries", webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapSeries),
 	"Measure": () => import(/* webpackExports: "Measure", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.Measure),
 	"MedianPrice": () => import(/* webpackExports: "MedianPrice", webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MedianPrice),
