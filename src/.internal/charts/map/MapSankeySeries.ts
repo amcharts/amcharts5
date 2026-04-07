@@ -2,6 +2,7 @@ import type { DataItem } from "../../core/render/Component";
 import type { Bullet } from "../../core/render/Bullet";
 import type { IOrientationPoint } from "../../core/util/IPoint";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import { MapPolygonSeries, IMapPolygonSeriesSettings, IMapPolygonSeriesDataItem, IMapPolygonSeriesPrivate } from "./MapPolygonSeries";
 import { MapSankeyNodes, IMapSankeyNodesDataItem } from "./MapSankeyNodes";
@@ -318,6 +319,12 @@ export class MapSankeySeries extends MapPolygonSeries {
 	private _geoTargetOffsets: Map<DataItem<IMapSankeySeriesDataItem>, number> = new Map();
 
 	/**
+	 * Disposer for the polygonSeries `datavalidated` listener. Re-attached
+	 * whenever the `polygonSeries` setting changes.
+	 */
+	private _polygonSeriesDP?: IDisposer;
+
+	/**
 	 * @ignore
 	 */
 	protected _afterNew() {
@@ -335,7 +342,64 @@ export class MapSankeySeries extends MapPolygonSeries {
 
 		this.nodes.flow = this;
 
+		// Watch for polygonSeries changes — re-attach the datavalidated
+		// listener so users don't have to wait for the polygon series to
+		// be ready before calling sankey.data.setAll().
+		this.on("polygonSeries", () => {
+			this._setupPolygonSeriesListener();
+		});
+
 		super._afterNew();
+
+		// Initial setup in case polygonSeries was passed in constructor settings.
+		this._setupPolygonSeriesListener();
+	}
+
+	/**
+	 * (Re)subscribes to the current `polygonSeries` `datavalidated` event so
+	 * that any data items added before the polygon series finished loading
+	 * its geoJSON get their endpoints resolved automatically.
+	 */
+	private _setupPolygonSeriesListener() {
+		if (this._polygonSeriesDP) {
+			this._polygonSeriesDP.dispose();
+			this._polygonSeriesDP = undefined;
+		}
+
+		const polygonSeries = this.get("polygonSeries");
+		if (polygonSeries) {
+			this._polygonSeriesDP = polygonSeries.events.on("datavalidated", () => {
+				this._resolvePendingDataItems();
+			});
+
+			// If the polygon series already has data items (e.g. it was
+			// validated before our data was set), resolve immediately.
+			if (polygonSeries.dataItems.length > 0) {
+				this._resolvePendingDataItems();
+			}
+		}
+	}
+
+	/**
+	 * Walks all data items and resolves any whose source/target endpoints
+	 * weren't resolved during the initial `processDataItem` call (because
+	 * the polygon series wasn't ready yet). Marks values dirty so the
+	 * geometries get regenerated.
+	 */
+	private _resolvePendingDataItems() {
+		let anyResolved = false;
+		$array.each(this.dataItems, (dataItem) => {
+			if (this._resolveEndpoints(dataItem)) {
+				anyResolved = true;
+			}
+		});
+		if (anyResolved) {
+			// Trigger geometry regeneration on next validation cycle.
+			// Mirrors Component.markDirtyValues without the parent's
+			// MapPolygon geometry sync (handled later in _generateGeometries).
+			this._valuesDirty = true;
+			this.markDirty();
+		}
 	}
 
 	public static className: string = "MapSankeySeries";
@@ -576,6 +640,10 @@ export class MapSankeySeries extends MapPolygonSeries {
 	 */
 	protected _dispose() {
 		super._dispose();
+		if (this._polygonSeriesDP) {
+			this._polygonSeriesDP.dispose();
+			this._polygonSeriesDP = undefined;
+		}
 		this._bezierSegments.clear();
 		this._segmentCumulativeLengths.clear();
 		this._geoSourceCoords.clear();
@@ -604,73 +672,94 @@ export class MapSankeySeries extends MapPolygonSeries {
 		}
 		super.processDataItem(dataItem);
 
+		this._resolveEndpoints(dataItem);
+	}
+
+	/**
+	 * Resolves the source/target endpoints for a single data item:
+	 * looks up centroids on the polygon series (if `sourceId`/`targetId` is set),
+	 * then creates or attaches the appropriate sankey nodes.
+	 *
+	 * Returns `true` if anything was newly resolved, so callers can decide
+	 * whether to mark geometries dirty.
+	 *
+	 * Safe to call repeatedly: skips endpoints that are already resolved.
+	 */
+	private _resolveEndpoints(dataItem: DataItem<this["_dataItemSettings"]>): boolean {
 		const polygonSeries = this.get("polygonSeries");
+		let resolved = false;
 
-		// Resolve source coordinates
-		let sourceLon = dataItem.get("sourceLongitude");
-		let sourceLat = dataItem.get("sourceLatitude");
-		const sourceId = dataItem.get("sourceId");
+		// -- Source --
+		if (!dataItem.get("sourceNode")) {
+			let sourceLon = dataItem.get("sourceLongitude");
+			let sourceLat = dataItem.get("sourceLatitude");
+			const sourceId = dataItem.get("sourceId");
 
-		if (sourceId && polygonSeries) {
-			const polygonDI = polygonSeries.getDataItemById(sourceId);
-			if (polygonDI) {
-				const geometry = polygonDI.get("geometry");
-				if (geometry) {
-					const centroid = getGeoCentroid(geometry);
-					sourceLon = centroid.longitude;
-					sourceLat = centroid.latitude;
+			if (sourceId && polygonSeries) {
+				const polygonDI = polygonSeries.getDataItemById(sourceId);
+				if (polygonDI) {
+					const geometry = polygonDI.get("geometry");
+					if (geometry) {
+						const centroid = getGeoCentroid(geometry);
+						sourceLon = centroid.longitude;
+						sourceLat = centroid.latitude;
+					}
+				}
+			}
+
+			if (sourceLon != null && sourceLat != null) {
+				const sourceKey = sourceId ?? (Number(sourceLon) + "," + Number(sourceLat));
+				let sourceNode = this.nodes.getDataItemById(sourceKey);
+				if (!sourceNode) {
+					const ctx: any = dataItem.dataContext;
+					const name = (ctx && ctx.source) || sourceKey;
+					this.nodes.data.push({ id: sourceKey, name, longitude: Number(sourceLon), latitude: Number(sourceLat) });
+					sourceNode = this.nodes.dataItems[this.nodes.dataItems.length - 1];
+				}
+				if (sourceNode) {
+					dataItem.setRaw("sourceNode", sourceNode);
+					this.nodes.addOutgoingLink(sourceNode, dataItem);
+					resolved = true;
 				}
 			}
 		}
 
-		// Resolve target coordinates
-		let targetLon = dataItem.get("targetLongitude");
-		let targetLat = dataItem.get("targetLatitude");
-		const targetId = dataItem.get("targetId");
+		// -- Target --
+		if (!dataItem.get("targetNode")) {
+			let targetLon = dataItem.get("targetLongitude");
+			let targetLat = dataItem.get("targetLatitude");
+			const targetId = dataItem.get("targetId");
 
-		if (targetId && polygonSeries) {
-			const polygonDI = polygonSeries.getDataItemById(targetId);
-			if (polygonDI) {
-				const geometry = polygonDI.get("geometry");
-				if (geometry) {
-					const centroid = getGeoCentroid(geometry);
-					targetLon = centroid.longitude;
-					targetLat = centroid.latitude;
+			if (targetId && polygonSeries) {
+				const polygonDI = polygonSeries.getDataItemById(targetId);
+				if (polygonDI) {
+					const geometry = polygonDI.get("geometry");
+					if (geometry) {
+						const centroid = getGeoCentroid(geometry);
+						targetLon = centroid.longitude;
+						targetLat = centroid.latitude;
+					}
+				}
+			}
+
+			if (targetLon != null && targetLat != null) {
+				const targetKey = targetId ?? (Number(targetLon) + "," + Number(targetLat));
+				let targetNode = this.nodes.getDataItemById(targetKey);
+				if (!targetNode) {
+					const ctx: any = dataItem.dataContext;
+					const name = (ctx && ctx.target) || targetKey;
+					this.nodes.data.push({ id: targetKey, name, longitude: Number(targetLon), latitude: Number(targetLat) });
+					targetNode = this.nodes.dataItems[this.nodes.dataItems.length - 1];
+				}
+				if (targetNode) {
+					dataItem.setRaw("targetNode", targetNode);
+					this.nodes.addIncomingLink(targetNode, dataItem);
+					resolved = true;
 				}
 			}
 		}
 
-		// Create/find source node
-		if (sourceLon != null && sourceLat != null) {
-			const sourceKey = sourceId ?? (Number(sourceLon) + "," + Number(sourceLat));
-			let sourceNode = this.nodes.getDataItemById(sourceKey);
-			if (!sourceNode) {
-				const ctx: any = dataItem.dataContext;
-				const name = (ctx && ctx.source) || sourceKey;
-				this.nodes.data.push({ id: sourceKey, name, longitude: Number(sourceLon), latitude: Number(sourceLat) });
-				sourceNode = this.nodes.dataItems[this.nodes.dataItems.length - 1];
-			}
-			if (sourceNode) {
-				dataItem.setRaw("sourceNode", sourceNode);
-				this.nodes.addOutgoingLink(sourceNode, dataItem);
-			}
-		}
-
-		// Create/find target node
-		if (targetLon != null && targetLat != null) {
-			const targetKey = targetId ?? (Number(targetLon) + "," + Number(targetLat));
-			let targetNode = this.nodes.getDataItemById(targetKey);
-			if (!targetNode) {
-				const ctx: any = dataItem.dataContext;
-				const name = (ctx && ctx.target) || targetKey;
-				this.nodes.data.push({ id: targetKey, name, longitude: Number(targetLon), latitude: Number(targetLat) });
-				targetNode = this.nodes.dataItems[this.nodes.dataItems.length - 1];
-			}
-			if (targetNode) {
-				dataItem.setRaw("targetNode", targetNode);
-				this.nodes.addIncomingLink(targetNode, dataItem);
-			}
-		}
+		return resolved;
 	}
 
 	/**

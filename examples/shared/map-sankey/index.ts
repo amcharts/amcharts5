@@ -159,37 +159,34 @@ sankeySeries.bullets.push(() => {
 	});
 });
 
-// Set data after polygonSeries loads (sourceId/targetId need centroid lookup)
 // Producers > Processing Hubs > Consumer Markets
-polygonSeries.events.once("datavalidated", () => {
-	sankeySeries.data.setAll([
-		// Producers > Hubs
-		{ sourceId: "BR", targetId: "DE", value: 350 },
-		{ sourceId: "BR", targetId: "US", value: 450 },
-		{ sourceId: "BR", targetId: "IT", value: 200 },
-		{ sourceId: "VN", targetId: "DE", value: 200 },
-		{ sourceId: "VN", targetId: "BE", value: 150 },
-		{ sourceId: "CO", targetId: "US", value: 250 },
-		{ sourceId: "CO", targetId: "DE", value: 80 },
-		{ sourceId: "ET", targetId: "DE", value: 60 },
-		{ sourceId: "ET", targetId: "BE", value: 40 },
-		{ sourceId: "ID", targetId: "US", value: 80 },
-		{ sourceId: "HN", targetId: "DE", value: 60 },
-		{ sourceId: "HN", targetId: "BE", value: 40 },
+sankeySeries.data.setAll([
+	// Producers > Hubs
+	{ sourceId: "BR", targetId: "DE", value: 350 },
+	{ sourceId: "BR", targetId: "US", value: 450 },
+	{ sourceId: "BR", targetId: "IT", value: 200 },
+	{ sourceId: "VN", targetId: "DE", value: 200 },
+	{ sourceId: "VN", targetId: "BE", value: 150 },
+	{ sourceId: "CO", targetId: "US", value: 250 },
+	{ sourceId: "CO", targetId: "DE", value: 80 },
+	{ sourceId: "ET", targetId: "DE", value: 60 },
+	{ sourceId: "ET", targetId: "BE", value: 40 },
+	{ sourceId: "ID", targetId: "US", value: 80 },
+	{ sourceId: "HN", targetId: "DE", value: 60 },
+	{ sourceId: "HN", targetId: "BE", value: 40 },
 
-		// Hubs > Consumer Markets
-		{ sourceId: "DE", targetId: "FR", value: 150 },
-		{ sourceId: "DE", targetId: "PL", value: 100 },
-		{ sourceId: "DE", targetId: "SE", value: 80 },
-		{ sourceId: "DE", targetId: "RU", value: 120 },
-		{ sourceId: "BE", targetId: "GB", value: 100 },
-		{ sourceId: "BE", targetId: "NL", value: 80 },
-		{ sourceId: "IT", targetId: "GR", value: 50 },
-		{ sourceId: "IT", targetId: "AT", value: 40 },
-		{ sourceId: "US", targetId: "CA", value: 120 },
-		{ sourceId: "US", targetId: "JP", value: 80 }
-	]);
-});
+	// Hubs > Consumer Markets
+	{ sourceId: "DE", targetId: "FR", value: 150 },
+	{ sourceId: "DE", targetId: "PL", value: 100 },
+	{ sourceId: "DE", targetId: "SE", value: 80 },
+	{ sourceId: "DE", targetId: "RU", value: 120 },
+	{ sourceId: "BE", targetId: "GB", value: 100 },
+	{ sourceId: "BE", targetId: "NL", value: 80 },
+	{ sourceId: "IT", targetId: "GR", value: 50 },
+	{ sourceId: "IT", targetId: "AT", value: 40 },
+	{ sourceId: "US", targetId: "CA", value: 120 },
+	{ sourceId: "US", targetId: "JP", value: 80 }
+]);
 
 
 // Set country names on auto-created nodes and animate bullets
@@ -209,31 +206,27 @@ sankeySeries.events.on("datavalidated", () => {
 		}
 	});
 
-	// Defer bullet animation to next frame — bullets are not yet
-	// instantiated when datavalidated fires inside polygonSeries handler
-	setTimeout(() => {
-		am5.array.each(sankeySeries.dataItems, (dataItem) => {
-			const bullets = dataItem.bullets;
-			if (bullets) {
-				am5.array.each(bullets, (bullet: am5.Bullet) => {
-					var randomDur = 3000 + Math.random() * 3000;
-					var delay = Math.random() * randomDur;
-					setTimeout(() => {
-						const sprite = bullet.get("sprite");
-						if (sprite) sprite.set("visible", true);
-						bullet.animate({
-							key: "locationX",
-							from: 0,
-							to: 1,
-							duration: randomDur,
-							easing: am5.ease.linear,
-							loops: Infinity
-						});
-					}, delay);
-				});
-			}
-		});
-	}, 100);
+	am5.array.each(sankeySeries.dataItems, (dataItem) => {
+		const bullets = dataItem.bullets;
+		if (bullets) {
+			am5.array.each(bullets, (bullet: am5.Bullet) => {
+				var randomDur = 3000 + Math.random() * 3000;
+				var delay = Math.random() * randomDur;
+				setTimeout(() => {
+					const sprite = bullet.get("sprite");
+					if (sprite) sprite.set("visible", true);
+					bullet.animate({
+						key: "locationX",
+						from: 0,
+						to: 1,
+						duration: randomDur,
+						easing: am5.ease.linear,
+						loops: Infinity
+					});
+				}, delay);
+			});
+		}
+	});
 });
 
 
