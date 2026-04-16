@@ -32,7 +32,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	/**
 	 * The initial relative zoom start position of the axis.
 	 *
-	 * E.g. stting it to `0.1` will pre-zoom axis to 10% from the start.
+	 * E.g. setting it to `0.1` will pre-zoom axis to 10% from the start.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
 	 */
@@ -41,7 +41,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	/**
 	 * The initial relative zoom end position of the axis.
 	 *
-	 * E.g. stting it to `0.9` will pre-zoom axis to 10% from the end.
+	 * E.g. setting it to `0.9` will pre-zoom axis to 10% from the end.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
 	 */
@@ -87,7 +87,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 
 	/**
 	 * If set to `false` the axis will be exempt when chart is panned
-	 * horizontally, and will keep its current position.`
+	 * horizontally, and will keep its current position.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
@@ -95,7 +95,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 
 	/**
 	 * If set to `false` the axis will be exempt when chart is panned
-	 * vertically, and will keep its current position.`
+	 * vertically, and will keep its current position.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
@@ -103,7 +103,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 
 	/**
 	 * If set to `false` the axis will be exempt when chart is zoomed
-	 * horizontally, and will keep its current zoom/position.`
+	 * horizontally, and will keep its current zoom/position.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
@@ -111,7 +111,7 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 
 	/**
 	 * If set to `false` the axis will be exempt when chart is zoomed
-	 * vertically, and will keep its current zoom/position.`
+	 * vertically, and will keep its current zoom/position.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
@@ -258,10 +258,10 @@ export interface IAxisDataItem extends IComponentDataItem {
 	 * If set to `true`, the grid and axis fill of this data item will be drawn
 	 * above series.
 	 *
-	 * NOTE: this needs to be set **before** crating an axis range. Updating this
+	 * NOTE: this needs to be set **before** creating an axis range. Updating this
 	 * dynamically won't have any effect.
 	 *
-	 * NOTE: if you need all grid to be drawn above series, you can brig it to
+	 * NOTE: if you need all grid to be drawn above series, you can bring it to
 	 * front with `chart.gridContainer.toFront();`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Grid_fill_above_series} for more info

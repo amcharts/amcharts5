@@ -67,10 +67,9 @@ export interface INumberFormatterSettings extends IEntitySettings {
 	numericFields?: string[];
 
 	/**
-	 * Locales if you are using date formats in `Intl.NumberFormatOptions` syntax.
+	 * Locales to use when formatting using `Intl.NumberFormat`.
 	 *
-	 * @see (@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/NumberFormat) about using Intl for number formatting
-	 * @param value Locales
+	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat} for more info
 	 */
 	intlLocales?: string;
 

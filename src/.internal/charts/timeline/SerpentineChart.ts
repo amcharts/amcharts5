@@ -13,7 +13,7 @@ import * as $utils from "../../core/util/Utils";
 export interface ISerpentineChartSettings extends ICurveChartSettings {
 
 	/**
-	 * Orientation of the serpatine.
+	 * Orientation of the serpentine.
 	 *
 	 * @default "vertical"
 	 */
@@ -36,14 +36,14 @@ export interface ISerpentineChartSettings extends ICurveChartSettings {
 	/**
 	 * Relative location (0-1) of the start postion.
 	 *
-	 * @defult 0
+	 * @default 0
 	 */
 	startLocation?: number;
 
 	/**
 	 * Relative location (0-1) of the end position.
 	 *
-	 * @defult 1
+	 * @default 1
 	 */
 	endLocation?: number;
 

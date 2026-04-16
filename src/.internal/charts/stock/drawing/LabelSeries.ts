@@ -24,7 +24,7 @@ export interface ILabelSeriesSettings extends IPolylineSeriesSettings {
 	labelFontSize?: number | string | undefined;
 
 	/**
-	 * Label font damily.
+	 * Label font family.
 	 */
 	labelFontFamily?: string;
 

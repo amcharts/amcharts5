@@ -27,7 +27,7 @@ export interface IVoronoiTreemapDataItem extends IHierarchyDataItem {
 	children: Array<DataItem<IVoronoiTreemapDataItem>>;
 
 	/**
-	 * Data it of a parent node.
+	 * Data item of a parent node.
 	 */
 	parent: DataItem<IVoronoiTreemapDataItem>;
 
@@ -51,7 +51,7 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	/**
 	 * Number of corners when type is `"polygon"`.
 	 *
-	 * `120` means the polygoon will look like a circle.
+	 * `120` means the polygon will look like a circle.
 	 *
 	 * NOTE: this setting is ignored if `type="rectangle"`.
 	 *
@@ -63,7 +63,7 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	 * Minimum weight ratio which allows computing the minimum allowed
 	 * weight (`= [maximum weight] * minWeightRatio`).
 	 *
-	 * Setting very small `minWeigtRatio` might result flickering.
+	 * Setting very small `minWeightRatio` might result in flickering.
 	 *
 	 * NOTE: the nodes that have smaller weight will be scaled up and will not
 	 * represent their true value correctly.

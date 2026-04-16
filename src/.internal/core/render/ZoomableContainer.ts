@@ -33,7 +33,7 @@ export interface IZoomableContainerSettings extends IContainerSettings {
 	/**
 	 * Zoom level increase/decrease factor with each zoom action.
 	 * 
-	 * @defult 2
+	 * @default 2
 	 */
 	zoomStep?: number;
 

@@ -82,6 +82,8 @@ export interface IGraphicsSettings extends ISpriteSettings {
 
 	/**
 	 * Width of the stroke (border or line) in pixels.
+	 *
+	 * @default 1
 	 */
 	strokeWidth?: number;
 
@@ -127,7 +129,7 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	shadowColor?: Color | null;
 
 	/**
-	 * Blurriness of the the shadow.
+	 * Blurriness of the shadow.
 	 *
 	 * The bigger the number, the more blurry shadow will be.
 	 *

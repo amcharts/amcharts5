@@ -12,10 +12,10 @@ export interface ILinePatternSettings extends IPatternSettings {
 
 	/**
 	 * Line drawing angle in degrees. For line patterns it's better than using
-	 * rotation of the whole pattern, allowing smaller pattern sized.
-	 * 
+	 * rotation of the whole pattern, allowing smaller pattern sizes.
+	 *
 	 * @default 0
-	 * @since 5.14.
+	 * @since 5.14
 	 */
 	angle?: number;
 

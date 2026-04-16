@@ -91,7 +91,7 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	exporting?: Exporting;
 
 	/**
-	 * If set to `false` the legend will not load default CSS.
+	 * If set to `false` the menu will not load default CSS.
 	 *
 	 * @default true
 	 */

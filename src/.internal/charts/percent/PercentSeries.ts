@@ -69,12 +69,12 @@ export interface IPercentSeriesDataItem extends ISeriesDataItem {
 export interface IPercentSeriesSettings extends ISeriesSettings {
 
 	/**
-	 * A [[ColorSet]] to use when asigning colors for slices.
+	 * A [[ColorSet]] to use when assigning colors for slices.
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * A [[PatternSet]] to use when asigning patterns for slices.
+	 * A [[PatternSet]] to use when assigning patterns for slices.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
 	 * @since 5.10.0

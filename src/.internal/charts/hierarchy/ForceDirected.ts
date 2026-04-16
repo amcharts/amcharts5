@@ -83,7 +83,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	linkWithStrength?: number | undefined;
 
 	/**
-	 * Resistance acting agains node speed.
+	 * Resistance acting against node speed.
 	 *
 	 * The greater the value, the more "sluggish" the nodes will be.
 	 *
@@ -140,7 +140,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	xField?: string;
 
 	/**
-	 * Field in data that holds X coordinate of the node.
+	 * Field in data that holds Y coordinate of the node.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Fixed_nodes} for more info
 	 */

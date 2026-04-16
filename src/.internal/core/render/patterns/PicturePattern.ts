@@ -13,7 +13,7 @@ export interface IPicturePatternSettings extends IPatternSettings {
 	 * How pattern should be sized:
 	 *
 	 * * `"image"` (default) - pattern will be sized to actual image dimensions.
-	 * * `"pattern"` - image will sized to image dimensions.
+	 * * `"pattern"` - image will be sized to pattern dimensions.
 	 * * `"none"` - image will be placed in the pattern, regardless of either dimensions.
 	 * 
 	 * @default "image"

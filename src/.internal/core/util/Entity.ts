@@ -151,11 +151,15 @@ export interface IEntitySettings {
 
 	/**
 	 * Duration of transition from one state to another.
+	 *
+	 * @default 0
 	 */
 	stateAnimationDuration?:number;
 
 	/**
 	 * Easing of transition from one state to another.
+	 *
+	 * @default out(cubic)
 	 */
 	stateAnimationEasing?:$ease.Easing;
 

@@ -29,7 +29,7 @@ export interface IPartitionDataItem extends IHierarchyDataItem {
 	children: Array<DataItem<IPartitionDataItem>>;
 
 	/**
-	 * Data it of a parent node.
+	 * Data item of a parent node.
 	 */
 	parent: DataItem<IPartitionDataItem>;
 

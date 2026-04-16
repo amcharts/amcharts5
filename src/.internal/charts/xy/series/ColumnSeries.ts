@@ -17,7 +17,7 @@ export interface IColumnSeriesSettings extends IBaseColumnSeriesSettings {
 	/**
 	 * Enables "turbo mode" of rendering.
 	 * 
-	 * If enabled, the columsn will be drawn directly on canvas, rather than
+	 * If enabled, the columns will be drawn directly on canvas, rather than
 	 * each individually, significantly speeding up the rendering. Especially
 	 * on column-heavy charts.
 	 *

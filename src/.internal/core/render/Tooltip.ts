@@ -44,7 +44,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * when tooltip is shown or its data item changes.
 	 *
 	 * Otherwise, regular `labelText` (or `text` set directly on tooltip label) will
-	 * be used for scree reader announcement.
+	 * be used for screen reader announcement.
 	 *
 	 * @since 5.9.2
 	 */
@@ -53,7 +53,8 @@ export interface ITooltipSettings extends IContainerSettings {
 	/**
 	 * A direction of the tooltip pointer.
 	 *
-	 * https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Orientation
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Orientation} for more info
+	 * @default "vertical"
 	 */
 	pointerOrientation?: "left" | "right" | "up" | "down" | "vertical" | "horizontal";
 
@@ -67,7 +68,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	getFillFromSprite?: boolean;
 
 	/**
-	 * If set to `true` will use the same `filGradientl` for its background as
+	 * If set to `true` will use the same `fillGradient` for its background as
 	 * its `tooltipTarget`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
@@ -123,7 +124,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	animationEasing?: (t: Time) => Time;
 
 	/**
-	 * A target element tooltip is shown fow.
+	 * A target element tooltip is shown for.
 	 */
 	tooltipTarget?: Sprite;
 

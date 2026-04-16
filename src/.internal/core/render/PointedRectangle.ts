@@ -4,12 +4,12 @@ import * as $math from "../util/Math";
 export interface IPointedRectangleSettings extends IGraphicsSettings {
 
 	/**
-	 * A width of the pinter's (stem's) thick end (base) in pixels.
+	 * A width of the pointer's (stem's) thick end (base) in pixels.
 	 */
 	pointerBaseWidth?: number;
 
 	/**
-	 * A length of the pinter (stem) in pixels.
+	 * A length of the pointer (stem) in pixels.
 	 */
 	pointerLength?: number;
 

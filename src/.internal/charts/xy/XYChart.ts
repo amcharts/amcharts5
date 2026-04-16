@@ -125,7 +125,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 *
 	 * Will work only if chart has an `XYCursor` enabled.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#ooltips} for more info
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @default true
 	 */
 	arrangeTooltips?: boolean

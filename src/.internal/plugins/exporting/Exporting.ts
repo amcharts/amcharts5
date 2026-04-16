@@ -86,7 +86,7 @@ export interface IExportingImageSource {
 	marginLeft?: number;
 
 	/**
-	 * Position to place extra image in releation to the main chart.
+	 * Position to place extra image in relation to the main chart.
 	 *
 	 * @default "bottom"
 	 */
@@ -538,7 +538,7 @@ export interface IExportingDataOptions extends IExportingFormatOptions {
 	useLocale?: boolean;
 
 	/**
-	 * If set to `true` will pivot the able so that columns are horizontal.
+	 * If set to `true` will pivot the table so that columns are horizontal.
 	 */
 	pivot?: boolean;
 

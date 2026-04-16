@@ -44,7 +44,7 @@ export interface IFunnelSliceSettings extends IGraphicsSettings {
 	cornerRadiusTR?: number;
 
 	/**
-	 * Radius of the botttom-right corner in pixels.
+	 * Radius of the bottom-right corner in pixels.
 	 * 
 	 * @since 5.11.2
 	 */

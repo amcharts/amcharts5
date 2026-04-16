@@ -31,7 +31,7 @@ export interface IRadialLabelSettings extends ILabelSettings {
 	baseRadius?: number | Percent;
 
 	/**
-	 * Label anngle in degrees.
+	 * Label angle in degrees.
 	 *
 	 * In most cases it will be set by the chart/series and does not need to
 	 * be set manually.
@@ -43,7 +43,7 @@ export interface IRadialLabelSettings extends ILabelSettings {
 	 * following.
 	 *
 	 * `"auto"` means that facing will be chosen automatically based on the angle
-	 * to enhance readbility.
+	 * to enhance readability.
 	 *
 	 * Only applies if `type = "circluar"`.
 	 * 
@@ -69,7 +69,7 @@ export interface IRadialLabelSettings extends ILabelSettings {
 	 *
 	 * **IMPORTANT!** If the label is used in a [[PieSeries]], its `alignLabels` setting
 	 * (default: `true`) takes precedence over `textType`. If you need to set this
-	 * to anything else than `regular`, make sure you also set `alignLabels: falese` on
+	 * to anything else than `regular`, make sure you also set `alignLabels: false` on
 	 * `PieSeries`.
 	 *
 	 * @default "regular"

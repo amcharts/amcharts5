@@ -31,7 +31,7 @@ export interface IVennDataItem extends ISeriesDataItem {
 	category: string;
 
 	/**
-	 * Slice visaul element.
+	 * Slice visual element.
 	 */
 	slice: Graphics;
 

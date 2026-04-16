@@ -12,7 +12,7 @@ import * as $utils from "../../core/util/Utils";
 export interface ISpiralChartSettings extends ICurveChartSettings {
 
 	/**
-	 * Numer of spiral circles.
+	 * Number of spiral circles.
 	 *
 	 * @default 3
 	 */
@@ -21,7 +21,7 @@ export interface ISpiralChartSettings extends ICurveChartSettings {
 	/**
 	 * y Axis radius in percent.
 	 *
-	 * @defgault 50%
+	 * @default 50%
 	 */
 	yAxisRadius?: Percent;
 
@@ -35,7 +35,7 @@ export interface ISpiralChartSettings extends ICurveChartSettings {
 	/**
 	 * End angle of the spiral in degrees.
 	 *
-	 * default 0
+	 * @default 0
 	 */
 	endAngle?: number;
 

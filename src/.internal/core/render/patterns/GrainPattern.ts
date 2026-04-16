@@ -33,7 +33,7 @@ export interface IGrainPatternSettings extends IPatternSettings {
 	/**
 	 * Maximum opacity of a noise pixel.
 	 *
-	 * @default 0.3
+	 * @default 0.2
 	 */
 	maxOpacity?: number;
 

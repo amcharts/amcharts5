@@ -26,7 +26,7 @@ export interface IStockControlSettings extends IEntitySettings {
 	 * Force this control to always be invisible.
 	 *
 	 * @since 5.8.5
-	 * @defaul false
+	 * @default false
 	 */
 	forceHidden?: boolean;
 
@@ -41,7 +41,7 @@ export interface IStockControlSettings extends IEntitySettings {
 	description?: string;
 
 	/**
-	 * An element with control icon. If not set, each control will aytomatically
+	 * An element with control icon. If not set, each control will automatically
 	 * create an icon.
 	 */
 	icon?: HTMLElement | SVGElement | "none";

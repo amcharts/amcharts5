@@ -48,7 +48,7 @@ export interface IAxisLabel extends Label {
 	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
 	 * end of the axis than 10%.
 	 *
-	 * @default 0
+	 * @default 1
 	 */
 	maxPosition?: number;
 

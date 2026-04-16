@@ -272,11 +272,15 @@ export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * Opacity. 0 - fully transparent; 1 - fully opaque.
+	 *
+	 * @default 1
 	 */
 	opacity?: number;
 
 	/**
 	 * Rotation in degrees.
+	 *
+	 * @default 0
 	 */
 	rotation?: number;
 
@@ -284,6 +288,8 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * Scale.
 	 *
 	 * Setting to a value less than 1 will shrink object.
+	 *
+	 * @default 1
 	 */
 	scale?: number;
 
@@ -323,6 +329,8 @@ export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * Is element visible?
+	 *
+	 * @default true
 	 */
 	visible?: boolean;
 
@@ -330,7 +338,9 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * Positioning of the element.
 	 *
 	 * `"absolute"` means element will not participate in parent layout scheme,
-	 * and will be positioned solely accoridng its `x` and `y` settings.
+	 * and will be positioned solely according to its `x` and `y` settings.
+	 *
+	 * @default "relative"
 	 */
 	position?: "absolute" | "relative";
 
@@ -363,11 +373,15 @@ export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * Tooltip pointer X coordinate relative to the element itself.
+	 *
+	 * @default am5.percent(50)
 	 */
 	tooltipX?: number | Percent;
 
 	/**
 	 * Tooltip pointer Y coordinate relative to the element itself.
+	 *
+	 * @default am5.percent(50)
 	 */
 	tooltipY?: number | Percent;
 
@@ -378,12 +392,16 @@ export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * Tooltip position.
+	 *
+	 * @default "fixed"
 	 */
 	tooltipPosition?: "fixed" | "pointer";
 
 	/**
 	 * If set to `false` element will not be measured and cannot participate in
 	 * layout schemes.
+	 *
+	 * @default true
 	 */
 	isMeasured?: boolean;
 
@@ -474,7 +492,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * Numeric layer to put element in.
 	 *
 	 * Elements with higher number will appear in front of the ones with lower
-	 * numer.
+	 * number.
 	 *
 	 * If not set, will inherit layer from its ascendants.
 	 */
@@ -548,9 +566,11 @@ export interface ISpriteSettings extends IEntitySettings {
 	blur?: number;
 
 	/**
-	 * Modifty visual brightness.
+	 * Modify visual brightness.
 	 *
-	 * Range of values: `0` to `1`.
+	 * * `0` - completely black
+	 * * `1` - no changes (default)
+	 * * `>1` - brighter
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
@@ -562,7 +582,9 @@ export interface ISpriteSettings extends IEntitySettings {
 	/**
 	 * Modify contrast.
 	 *
-	 * Range of values: `0` to `1`.
+	 * * `0` - completely gray
+	 * * `1` - no changes (default)
+	 * * `>1` - more contrast
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
@@ -573,8 +595,6 @@ export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * Modify saturation.
-	 *
-	 * Range of values in pixels: `0` to `X`.
 	 *
 	 * * `0` - grayscale
 	 * * `1` - no changes
@@ -633,7 +653,7 @@ export interface ISpriteSettings extends IEntitySettings {
 
 	/**
 	 * Simulate hover on an element when it gains focus, including changing hover
-	 * appearance and displaying a tooltip if application.
+	 * appearance and displaying a tooltip if applicable.
 	 * 
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
 	 */

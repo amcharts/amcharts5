@@ -8,7 +8,7 @@ import * as $array from "../../../core/util/Array";
 
 export interface IChaikinMoneyFlowSettings extends IChartIndicatorSettings {
 	/**
-	 * A volume series indicator will be based on, if it reaquires one.
+	 * A volume series indicator will be based on, if it requires one.
 	 */
 	volumeSeries: XYSeries;
 }

@@ -39,7 +39,7 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	innerRadius?: number | Percent;
 
 	/**
-	 * Chart start angle in degress.
+	 * Chart start angle in degrees.
 	 *
 	 * @default -90
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
@@ -47,7 +47,7 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	startAngle?: number;
 
 	/**
-	 * Chart end angle in degress.
+	 * Chart end angle in degrees.
 	 *
 	 * @default 270
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info

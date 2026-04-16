@@ -18,7 +18,7 @@ export interface IRadarLineSeriesSettings extends ILineSeriesSettings {
 	 * first one with a line, thus completing full circle.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-series/#Connecting_ends} for more info
-	 * @default @true
+	 * @default true
 	 */
 	connectEnds?: boolean;
 

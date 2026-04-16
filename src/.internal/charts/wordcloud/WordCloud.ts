@@ -161,7 +161,7 @@ export interface IWordCloudPrivate extends ISeriesPrivate {
 }
 
 /**
- * Creates a [[WordlCloud]] series.
+ * Creates a [[WordCloud]] series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/word-cloud/} for more info
  * @important

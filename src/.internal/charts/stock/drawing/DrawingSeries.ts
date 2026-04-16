@@ -87,7 +87,7 @@ export interface IDrawingSeriesSettings extends ILineSeriesSettings {
 	snapToData?: boolean;
 
 	/**
-	 * Value field to use when snapping data or calculating averages/regresions/etc.
+	 * Value field to use when snapping data or calculating averages/regressions/etc.
 	 *
 	 * @default "value"
 	 */

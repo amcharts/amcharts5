@@ -20,12 +20,14 @@ export interface IColorSetSettings extends IEntitySettings {
 
 	/**
 	 * Start iterating colors from specific index.
+	 *
+	 * @default 0
 	 */
 	startIndex?: number;
 
 	/**
 	 * If set to `true`, color set will reuse existing colors from the list
-	 * inestead of generating new ones.
+	 * instead of generating new ones.
 	 *
 	 * @default false
 	 */
@@ -33,12 +35,11 @@ export interface IColorSetSettings extends IEntitySettings {
 
 	/**
 	 * A base color to generate new colors from if `colors` is not specified.
-	 * @type {[type]}
 	 */
 	baseColor?: Color;
 
 	/**
-	 * A set of tranformation to apply to base list of colors when the set runs
+	 * A set of transformations to apply to base list of colors when the set runs
 	 * out of colors and generates additional ones.
 	 */
 	passOptions?: IColorSetStepOptions;

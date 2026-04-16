@@ -445,7 +445,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	highValueXShow?: "highValueXWorking" | "highValueXChange" | "highValueXChangePercent" | "highValueXChangeSelection" | "highValueXChangeSelectionPercent" | "highValueXChangePrevious" | "highValueXChangePreviousPercent";
 
 	/**
-	 * Display data field for Y low value.
+	 * Display data field for Y high value.
 	 */
 	highValueYShow?: "highValueYWorking" | "highValueYChange" | "highValueYChangePercent" | "highValueYChangeSelection" | "highValueYChangeSelectionPercent" | "highValueYChangePrevious" | "highValueYChangePreviousPercent";
 
@@ -453,13 +453,13 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Indicates what aggregate value to use for collective data item, when
 	 * aggregating X high values from several data items.
 	 */
-	highValueXGrouped?: "open" | "close" | "high" | "high" | "average" | "sum" | "extreme";
+	highValueXGrouped?: "open" | "close" | "high" | "average" | "sum" | "extreme";
 
 	/**
 	 * Indicates what aggregate value to use for collective data item, when
 	 * aggregating X high values from several data items.
 	 */
-	highValueYGrouped?: "open" | "close" | "high" | "high" | "average" | "sum" | "extreme";
+	highValueYGrouped?: "open" | "close" | "high" | "average" | "sum" | "extreme";
 
 	/**
 	 * Horizontal location of the low data point relative to its cell.

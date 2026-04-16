@@ -47,8 +47,8 @@ export interface IArcDiagramSettings extends IFlowSettings {
 	minRadius?: number;
 
 	/**
-	 * Defines Which value should be used when calculating circle radius. Use "none" if you want all circles to be the same.
-	 * @martynas: gal cia reik naudot radiusField, biski no idea.
+	 * Defines which value should be used when calculating circle radius. Use "none" if you want all circles to be the same.
+	 *
 	 * @default "sum"
 	 */
 	radiusKey?: "sum" | "sumIncoming" | "sumOutgoing" | "none";

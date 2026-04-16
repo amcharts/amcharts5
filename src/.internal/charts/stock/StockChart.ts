@@ -266,7 +266,7 @@ export class StockChart extends Container {
 	public readonly indicators: ListAutoDispose<Indicator> = new ListAutoDispose();
 
 	/**
-	 * A [[Container]], resiting on top of the charts, suitable for additional
+	 * A [[Container]], resting on top of the charts, suitable for additional
 	 * tools, like [[Scrollbar]].
 	 *
 	 * @default Container.new()
@@ -385,7 +385,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Forces redrawing of all annotations (drfawings).
+	 * Forces redrawing of all annotations (drawings).
 	 */
 	public markDirtyDrawings() {
 		this._drawingsChanged = true;
@@ -1141,7 +1141,7 @@ export class StockChart extends Container {
 	/**
 	 * Returns a color for volume, based on current and previous close.
 	 *
-	 * * `positiveColor` - close is greater or euqal than close of the previous period.
+	 * * `positiveColor` - close is greater or equal than close of the previous period.
 	 * * `negativeColor` - close is lower than close of the previous period.
 	 *
 	 * @param   dataItem       Target data item

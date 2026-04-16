@@ -84,7 +84,7 @@ export interface IDateRangeSelectorEvents extends IStockControlEvents {
 	/**
 	 * Invoked when user selects certain date range via control.
 	 *
-	 * @from 5.8.5
+	 * @since 5.8.5
 	 */
 	rangeselected: {
 		fromDate: Date;

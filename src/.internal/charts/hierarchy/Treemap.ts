@@ -46,7 +46,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	nodePaddingTop?: number;
 
 	/**
-	 * Gap between nodes and bottomedge.
+	 * Gap between nodes and bottom edge.
 	 *
 	 * Will be ignored if `nodePaddingOuter` is set.
 	 *
@@ -75,7 +75,6 @@ export interface ITreemapSettings extends IHierarchySettings {
 	/**
 	 * An algorithm to use when laying out node rectangles.
 	 *
-	 * @see {@link }
 	 * @default "squarify"
 	 */
 	layoutAlgorithm?: "binary" | "squarify" | "slice" | "dice" | "sliceDice";

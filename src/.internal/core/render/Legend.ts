@@ -87,18 +87,21 @@ export interface ILegendSettings extends ISeriesSettings {
 	/**
 	 * A key to look up in data for a name of the data item.
 	 *
+	 * @default "name"
 	 */
 	nameField?: string;
 
 	/**
 	 * A key to look up in data for a fill of the data item.
 	 *
+	 * @default "fill"
 	 */
 	fillField?: string;
 
 	/**
 	 * A key to look up in data for a stroke of the data item.
 	 *
+	 * @default "stroke"
 	 */
 	strokeField?: string;
 

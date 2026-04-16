@@ -188,7 +188,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	downDepth?: number;
 
 	/**
-	 * Number of levels parent levels to show from currently selected node.
+	 * Number of parent levels to show from currently selected node.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
 	 */

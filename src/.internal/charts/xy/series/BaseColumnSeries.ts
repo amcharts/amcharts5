@@ -75,7 +75,7 @@ export interface IBaseColumnSeriesAxisRange extends IXYSeriesAxisRange {
 	/**
 	 * A list of actual [[Graphics]] elements for an axis range.
 	 *
-	 * Can be used to ajust the look of the axis range columns.
+	 * Can be used to adjust the look of the axis range columns.
 	 */
 	columns: ListTemplate<Graphics>;
 

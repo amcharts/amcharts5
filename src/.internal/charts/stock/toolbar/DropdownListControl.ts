@@ -45,7 +45,7 @@ export interface IDropdownListControlSettings extends IStockControlSettings {
 	searchCallback?: (query: string) => IDropdownListItem[];
 
 	/**
-	 * An array of item IDs to now show in the list.
+	 * An array of item IDs to not show in the list.
 	 *
 	 * @since 5.7.0
 	 */

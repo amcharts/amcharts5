@@ -72,13 +72,13 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * Series data can contain a field with an ID of a virtual group the bullet
 	 * belongs to.
 	 *
-	 * For example, we migth want bullets to group with other bullets from the
+	 * For example, we might want bullets to group with other bullets from the
 	 * same continent.
 	 *
 	 * `groupIdField` specifies which field in source data holds group IDs.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_segregation} for more info
-	 * @default groupID
+	 * @default "groupId"
 	 */
 	groupIdField?: string;
 

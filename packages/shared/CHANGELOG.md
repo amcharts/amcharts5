@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.17.2] - 2026-04-16
+
+### Changed
+- Tweaked geodata for better display of antimeridian-crossing countries.
+
+
 ## [5.17.1] - 2026-04-07
 
 ### Changed

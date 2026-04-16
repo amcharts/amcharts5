@@ -34,7 +34,7 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	startOpacity: number;
 
 	/**
-	 * Ending (lowest value) opacity.
+	 * Ending (highest value) opacity.
 	 * 
 	 * @default 1
 	 * @since 5.14.0

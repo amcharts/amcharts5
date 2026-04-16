@@ -47,7 +47,7 @@ export interface ISliceGrouperSettings extends IEntitySettings {
 	 *
 	 * * `"none"` (default) - nothing.
 	 * * `"break"` - underlying small slices are shown.
-	 * * `"zoom"` - series shows only small slies (big ones are hidden).
+	 * * `"zoom"` - series shows only small slices (big ones are hidden).
 	 */
 	clickBehavior?: "none" | "break" | "zoom";
 

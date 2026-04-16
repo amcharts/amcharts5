@@ -42,7 +42,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	endLocation?: number;
 
 	/**
-	 * Should axis group data items togeter dynamically?
+	 * Should axis group data items together dynamically?
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info

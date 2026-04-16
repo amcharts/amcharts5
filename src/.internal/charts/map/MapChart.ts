@@ -75,14 +75,14 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * Highest zoom level map is allowed to zoom in to.
 	 *
-	 * @deault 32
+	 * @default 32
 	 */
 	maxZoomLevel?: number;
 
 	/**
 	 * Lowest zoom level map is allowed to zoom in to.
 	 *
-	 * @deault 1
+	 * @default 1
 	 */
 	minZoomLevel?: number;
 

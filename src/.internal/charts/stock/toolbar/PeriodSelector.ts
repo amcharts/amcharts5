@@ -67,7 +67,7 @@ export interface IPeriodSelectorEvents extends IStockControlEvents {
 	/**
 	 * Invoked when user selects certain period via control.
 	 *
-	 * @from 5.8.5
+	 * @since 5.8.5
 	 */
 	periodselected: {
 		period: IPeriod;

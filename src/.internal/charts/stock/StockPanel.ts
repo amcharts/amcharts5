@@ -22,7 +22,7 @@ export interface IStockPanelPrivate extends IXYChartPrivate {
 
 export interface IStockPanelEvents extends IXYChartEvents {
 	/**
-	 * Kicks in when panels is moved up or down.
+	 * Kicks in when panel is moved up or down.
 	 * 
 	 * @since 5.9.2
 	 */

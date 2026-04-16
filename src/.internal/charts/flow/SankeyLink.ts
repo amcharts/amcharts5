@@ -17,7 +17,7 @@ export interface ISankeyLinkSettings extends IFlowLinkSettings {
 	source?: DataItem<ISankeyNodesDataItem>;
 
 	/**
-	 * Source node data item.
+	 * Target node data item.
 	 */
 	target?: DataItem<ISankeyNodesDataItem>;
 

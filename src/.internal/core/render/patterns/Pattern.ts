@@ -6,7 +6,7 @@ import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../ut
 export interface IPatternSettings extends IEntitySettings {
 
 	/**
-	 * Rotation of patterm in degrees. Supported values: -90 to 90.
+	 * Rotation of pattern in degrees. Supported values: -90 to 90.
 	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Rotation} for more info
@@ -16,6 +16,7 @@ export interface IPatternSettings extends IEntitySettings {
 	/**
 	 * How pattern tiles are repeated when filling the area.
 	 *
+	 * @default "repeat"
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Repetition} for more info
 	 */
 	repetition?: "repeat" | "repeat-x" | "repeat-y" | "no-repeat";
@@ -23,13 +24,15 @@ export interface IPatternSettings extends IEntitySettings {
 	/**
 	 * Width of the pattern tile, in pixels.
 	 *
+	 * @default 50
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Sizing_patterns} for more info
 	 */
 	width?: number;
 
 	/**
-	 * Width of the pattern tile, in pixels.
+	 * Height of the pattern tile, in pixels.
 	 *
+	 * @default 50
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Sizing_patterns} for more info
 	 */
 	height?: number;
@@ -79,6 +82,7 @@ export interface IPatternSettings extends IEntitySettings {
 	/**
 	 * Opacity of the fill for gaps between pattern shapes.
 	 *
+	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
 	 */
 	fillOpacity?: number;

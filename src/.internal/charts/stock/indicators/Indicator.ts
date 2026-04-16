@@ -63,7 +63,7 @@ export interface IIndicatorSettings extends IContainerSettings {
 	stockSeries: XYSeries;
 
 	/**
-	 * A volume series indicator will be based on, if it reaquires one.
+	 * A volume series indicator will be based on, if it requires one.
 	 */
 	volumeSeries?: XYSeries;
 
@@ -101,7 +101,7 @@ export interface IIndicatorSettings extends IContainerSettings {
 	seriesColor?: Color;
 
 	/**
-	 * Should indicator settings modal be openend automatically when indicator
+	 * Should indicator settings modal be opened automatically when indicator
 	 * is added to a chart via [[IndicatorControl]].
 	 *
 	 * @default true

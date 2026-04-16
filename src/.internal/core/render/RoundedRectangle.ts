@@ -17,7 +17,7 @@ export interface IRoundedRectangleSettings extends IRectangleSettings {
 	cornerRadiusTR?: number;
 
 	/**
-	 * Radius of the botttom-right corner in pixels.
+	 * Radius of the bottom-right corner in pixels.
 	 */
 	cornerRadiusBR?: number;
 

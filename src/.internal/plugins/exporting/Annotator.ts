@@ -47,7 +47,7 @@ export interface IAnnotatorSettings extends IEntitySettings {
 	markerSettings?: {[index: string]: any};
 
 	/**
-	 * MarkerArea style settings for user interface elements.E.g.:
+	 * MarkerArea style settings for user interface elements. E.g.:
 	 *
 	 * ```TypeScript
 	 * let annotator = am5plugins_exporting.Annotator.new(root, {

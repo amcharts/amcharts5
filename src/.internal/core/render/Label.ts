@@ -29,7 +29,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 * Text opacity.
 	 *
 	 * @default 1
-	 * @ince 5.2.39
+	 * @since 5.2.39
 	 */
 	fillOpacity?: number;
 
@@ -88,7 +88,7 @@ export interface ILabelSettings extends IContainerSettings {
 	lineHeight?: Percent | number;
 
 	/**
-	 * How mouch of the height should be considered to go below baseline.
+	 * How much of the height should be considered to go below baseline.
 	 *
 	 * @default 0.19
 	 */
@@ -163,6 +163,8 @@ export interface ILabelSettings extends IContainerSettings {
 	 * will try to populate them with actual data.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Data_placeholders} for more info
+	 *
+	 * @default false
 	 */
 	populateText?: boolean;
 
@@ -185,7 +187,7 @@ export interface ILabelSettings extends IContainerSettings {
 	shadowColor?: Color | null;
 
 	/**
-	 * Blurriness of the the shadow.
+	 * Blurriness of the shadow.
 	 *
 	 * The bigger the number, the more blurry shadow will be.
 	 *

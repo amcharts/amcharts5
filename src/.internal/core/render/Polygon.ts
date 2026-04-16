@@ -13,7 +13,7 @@ export interface IPolygonSettings extends IGraphicsSettings {
 	points?: Array<IPoint>;
 
 	/**
-	 * Corodinates.
+	 * Coordinates.
 	 */
 	coordinates?: Array<Array<number>>;
 

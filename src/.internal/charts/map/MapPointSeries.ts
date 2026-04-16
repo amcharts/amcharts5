@@ -109,6 +109,8 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	/**
 	 * If set to `true` will hide all points that are in the visible range of
 	 * the map.
+	 *
+	 * @default false
 	 */
 	clipFront?: boolean;
 
@@ -126,7 +128,7 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	clipBack?: boolean;
 
 	/**
-	 * A field in data that holds point's longitude.
+	 * A field in data that holds point's latitude.
 	 */
 	latitudeField?: string;
 

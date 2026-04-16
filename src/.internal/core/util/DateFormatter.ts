@@ -29,6 +29,7 @@ export interface IDateFormatterSettings extends IEntitySettings {
 	/**
 	 * A date format to be used when formatting dates.
 	 *
+	 * @default "yyyy-MM-dd"
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	dateFormat?: string | Intl.DateTimeFormatOptions;

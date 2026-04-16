@@ -7,7 +7,7 @@ export interface ICirclePatternSettings extends IPatternSettings {
 	/**
 	 * Gap between circles, in pixels.
 	 *
-	 * @default 3
+	 * @default 5
 	 */
 	gap?: number;
 
@@ -29,7 +29,7 @@ export interface ICirclePatternSettings extends IPatternSettings {
 	/**
 	 * Center circles.
 	 *
-	 * @default true
+	 * @default false
 	 */
 	centered?: boolean;
 

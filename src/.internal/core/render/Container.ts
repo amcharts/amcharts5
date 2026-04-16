@@ -49,7 +49,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	background?: Graphics;
 
 	/**
-	 * A method to layout
+	 * A layout to use for arranging children.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Layout} for more info
 	 */
@@ -71,6 +71,8 @@ export interface IContainerSettings extends ISpriteSettings {
 	/**
 	 * If set to `true` all descendants - not just direct children, but every
 	 * element in it - will become "interactive".
+	 *
+	 * @default true
 	 */
 	interactiveChildren?: boolean;
 
@@ -79,6 +81,8 @@ export interface IContainerSettings extends ISpriteSettings {
 	 * state on its children.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#States} for more info
+	 *
+	 * @default false
 	 */
 	setStateOnChildren?: boolean;
 

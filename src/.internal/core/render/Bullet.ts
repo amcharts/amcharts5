@@ -7,14 +7,14 @@ export interface IBulletSettings extends IEntitySettings {
 	/**
 	 * Horizontal location within target element.
 	 *
-	 * 0 - left, 1 - right, or anything inbetweeen.
+	 * 0 - left, 1 - right, or anything in between.
 	 */
 	locationX?: number;
 
 	/**
 	 * Vertical location within target element.
 	 *
-	 * 0 - top, 1 - bottom, or anything inbetweeen.
+	 * 0 - top, 1 - bottom, or anything in between.
 	 */
 	locationY?: number;
 
@@ -49,7 +49,6 @@ export interface IBulletSettings extends IEntitySettings {
 	autoRotateAngle?: number;
 
 	/**
-	 * If a field will be set, the bullet will be located at exact value of that field, not paying atention to locationY/locationX. Works with XYSeries	only.
 	 * If `field` is set, bullet will be placed at the specific data value, ignoring
 	 * any `locationX` and `locationY` settings.
 	 *
