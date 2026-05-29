@@ -150,6 +150,9 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 
 	/**
 	 * Default label font.
+	 *
+	 * Use reserved value `"inherit"` to use computed style on chart
+	 * container. (since `5.17.3`)
 	 */
 	labelFontFamily?: string;
 

@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.17.3] - 2026-05-29
+
+### Added
+- `Label` setting `fontFamily` now accepts special value of `"inherit"`. If set it will automatically use computer `fontFamily` value on chart's DOM container.
+- `onDebounced(key, callback, delay)` and `offDebounced(key, callback?)` methods added to all entities. Like `on()`/`off()` for settings, but the callback fires only once after rapid changes settle, waiting `delay` milliseconds since the last change.
+- `onPrivateDebounced(key, callback, delay)` and `offDebouncedPrivate(key, callback?)` — same as above for private settings.
+
+### Fixed
+- The underline text for a `Label` could render thicker in some cases.
+- `GanttSeries` was not syncing the `end` field back to data context when tasks were moved or resized, causing stale values when serializing data or calculating linked group positions.
+- `Gantt.addNewTask()` was setting a hardcoded stale `end` value in new task data.
+- If `Root` was placed in a ShadowDOM, TAB would select non-visible focusable elements.
+- Accessibility: The text for readable tooltip element had in-line formatting text in them.
+
+
 ## [5.17.2] - 2026-04-16
 
 ### Changed

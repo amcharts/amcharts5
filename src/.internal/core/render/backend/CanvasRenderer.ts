@@ -1090,7 +1090,7 @@ class Shadow extends Op {
 		context.shadowOffsetY = this.offsetY;
 	}
 
-	public colorizeGhost(_context: CanvasRenderingContext2D, _forceColor: string | undefined): void {}
+	public colorizeGhost(_context: CanvasRenderingContext2D, _forceColor: string | undefined): void { }
 }
 
 /**
@@ -1764,7 +1764,10 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			fontStyle.push(style.fontSize);
 		}
 
-		if (style2 && style2.fontFamily) {
+		if (style.fontFamily == "inherit") {
+			fontStyle.push(getComputedStyle(this._renderer.view).getPropertyValue("font-family"));
+		}
+		else if (style2 && style2.fontFamily) {
 			fontStyle.push(style2.fontFamily);
 		}
 		else if (style.fontFamily) {
@@ -1881,6 +1884,8 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						else {
 							y = thickness + offset * 1.5 + line.offsetY + chunk.offsetY;
 						}
+
+						y = Math.round(y);
 
 						if (!ghostOnly) {
 							context.save();
@@ -2124,6 +2129,26 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 									this.textVisible = true;
 									return false;
 								}
+
+								// _truncateText() may return text that still overflows (a single
+								// word wider than the remaining space when word-breaking is not
+								// allowed). If the line already has content, move the WHOLE chunk
+								// to the next line instead of letting it overflow.
+								if (!firstTextChunk) {
+									const tmpMetrics = this._measureText($utils.trim(tmpText), context);
+									const tmpWidth = tmpMetrics.actualBoundingBoxLeft + tmpMetrics.actualBoundingBoxRight;
+									if (tmpWidth > excessWidth) {
+										leftoverChunks = chunks.slice(index);
+										if (currentFormat) {
+											leftoverChunks.unshift({
+												type: "format",
+												text: currentFormat
+											});
+										}
+										chunks = [];
+										return false;
+									}
+								}
 								//skipFurtherText = true;
 
 								//Add remaining chunks for the next line
@@ -2357,7 +2382,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 				text = text.slice(0, -1);
 			}
 			else {
-				let tmp = text.replace(/[^,;:!?\\\/\s​]+[,;:!?\\\/\s​]*$/g, "");
+				// A comma directly followed by a digit is a numeric separator (e.g.
+				// "1,200,300"), not a word boundary - keep such numbers unbroken.
+				let tmp = text.replace(/(?:[^,;:!?\\\/\s​]|,(?=\d))+[,;:!?\\\/\s​]*$/g, "");
 				if ((tmp == "" || tmp === text) && fallbackBreakWords) {
 					breakWords = true;
 				}
@@ -3137,7 +3164,7 @@ interface IEvents<Key extends keyof IRendererEvents> {
  */
 export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDisposer {
 	public view: HTMLElement = document.createElement("div");
-	protected _layerDom: HTMLElement = document.createElement("div");
+	public _layerDom: HTMLElement = document.createElement("div");
 
 	public layers: Array<CanvasLayer> = [];
 	public _dirtyLayers: Array<CanvasLayer> = [];

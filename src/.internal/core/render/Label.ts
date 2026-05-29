@@ -16,7 +16,7 @@ export interface ILabelSettings extends IContainerSettings {
 	/**
 	 * Labels' text.
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/text-styling/} for text styling info
-	 * 
+	 *
 	 */
 	text?: string;
 
@@ -50,6 +50,9 @@ export interface ILabelSettings extends IContainerSettings {
 	 * Font family to use for the label.
 	 *
 	 * Multiple fonts can be separated by commas.
+	 *
+	 * Use reserved value `"inherit"` to use computed style on chart
+	 * container. (since `5.17.3`)
 	 */
 	fontFamily?: string;
 
@@ -223,7 +226,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 *
 	 * If the `text` is longer than `maxChars`, the text will be truncated
 	 * using the `breakWords` and `ellipsis` settings.
-	 * 
+	 *
 	 * @since 5.7.2
 	 */
 	maxChars?: number;

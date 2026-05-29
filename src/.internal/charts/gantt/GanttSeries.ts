@@ -761,10 +761,12 @@ export class GanttSeries extends ColumnSeries {
 
 
 						delete (dataContext[this.get("openValueXField")]);
+						delete (dataContext[this.get("valueXField")]);
 						delete (dataContext[this.get("durationField")]);
 					}
 					else {
 						dataContext[this.get("openValueXField")] = dataItem.get("openValueX");
+						dataContext[this.get("valueXField")] = dataItem.get("valueX");
 						dataContext[this.get("durationField")] = dataItem.get("duration");
 						dataContext[this.get("progressField")] = dataItem.get("progress");
 					}

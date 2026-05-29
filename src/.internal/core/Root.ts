@@ -1048,7 +1048,7 @@ export class Root implements IDisposer {
 					allParents[parent.uid] = parent;
 					parent._prepareChildren();
 				}
-			});			
+			});
 		}
 
 		$object.entries(allParents).forEach(([_key, parent]) => {
@@ -1067,7 +1067,7 @@ export class Root implements IDisposer {
 				entity._beforeChanged();
 			}
 		});
-		
+
 		//		console.log("_changed")
 		objects.forEach((entity) => {
 			entity._changed();
@@ -1825,7 +1825,19 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		const focusableElements = Array.from(document.querySelectorAll([
+		const rootNode = this.dom.getRootNode ? this.dom.getRootNode() : null;
+		let queryRoot: Document | ShadowRoot = this.dom.ownerDocument || document;
+
+		if (rootNode) {
+			if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
+				queryRoot = rootNode;
+			}
+			else if (rootNode instanceof Document) {
+				queryRoot = rootNode;
+			}
+		}
+
+		const focusableElements = Array.from(queryRoot.querySelectorAll([
 			'a[href]',
 			'area[href]',
 			'button:not([disabled])',
@@ -1860,7 +1872,9 @@ export class Root implements IDisposer {
 			}
 		}
 
-		targetElement.focus();
+		if (targetElement) {
+			targetElement.focus();
+		}
 	}
 
 	protected _handleBlur(ev: FocusEvent): void {
@@ -1888,7 +1902,7 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		const text = $utils.stripTags(target._getText());
+		const text = $utils.stripFormatTags($utils.stripTags(target._getText()));
 		let tooltipElement = target.getPrivate("tooltipElement");
 		if (target.get("role") == "tooltip" && text != "") {
 			if (!tooltipElement) {

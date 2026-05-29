@@ -400,6 +400,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	public _settingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K], O extends this>(value: V, target?: O, key?: K) => void> } = {};
 	public _privateSettingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K], O extends this>(value: V, target?: O, key?: K) => void> } = {};
 
+	public _debouncedSettingEvents: { [K in keyof this["_settings"]]?: Array<{ cb: (value: any, target?: any, key?: any) => void; delay: number; timeout?: number }> } = {};
+	public _debouncedPrivateSettingEvents: { [K in keyof this["_settings"]]?: Array<{ cb: (value: any, target?: any, key?: any) => void; delay: number; timeout?: number }> } = {};
+
 	public _prevSettings: this["_settings"] = {};
 	public _prevPrivateSettings: this["_privateSettings"] = {};
 
@@ -571,6 +574,86 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		}
 	}
 
+	private _onDebouncedHelper(map: { [key: string]: any }, key: any, callback: any, delay: number): IDisposer {
+		let events = map[key];
+
+		if (events === undefined) {
+			events = map[key] = [];
+		}
+
+		const entry: { cb: any; delay: number; timeout?: number } = { cb: callback, delay };
+		events.push(entry);
+
+		return new Disposer(() => {
+			if (entry.timeout) {
+				window.clearTimeout(entry.timeout);
+			}
+			$array.removeFirst(events!, entry);
+
+			if (events!.length === 0) {
+				delete map[key];
+			}
+		});
+	}
+
+	private _offDebouncedHelper(map: { [key: string]: any }, key: any, callback?: any): void {
+		const events = map[key];
+
+		if (events !== undefined) {
+			if (callback !== undefined) {
+				const index = $array.findIndex(events, (e: any) => e.cb === callback);
+
+				if (index !== -1) {
+					const entry = events[index];
+
+					if (entry.timeout) {
+						window.clearTimeout(entry.timeout);
+					}
+
+					events.splice(index, 1);
+
+					if (events.length === 0) {
+						delete map[key];
+					}
+				}
+			} else {
+				$array.each(events, (entry: any) => {
+					if (entry.timeout) {
+						window.clearTimeout(entry.timeout);
+					}
+				});
+
+				delete map[key];
+			}
+		}
+	}
+
+	/**
+	 * Sets a debounced callback function to invoke when specific key of settings
+	 * changes or is set. The callback fires only once even if the setting is changed
+	 * multiple times within the debounce delay.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key            Settings key
+	 * @param   callback       Callback
+	 * @param   debounceDelay  Debounce delay in milliseconds
+	 * @return                 Disposer for event
+	 */
+	public onDebounced<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: this, key?: Key) => void, debounceDelay: number): IDisposer {
+		return this._onDebouncedHelper(this._debouncedSettingEvents, key, callback, debounceDelay);
+	}
+
+	/**
+	 * Removes a debounced callback for when value of a setting changes.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key       Settings key
+	 * @param   callback  Callback
+	 */
+	public offDebounced<Key extends keyof this["_settings"]>(key: Key, callback?: (value: this["_settings"][Key], target?: this, key?: Key) => void): void {
+		this._offDebouncedHelper(this._debouncedSettingEvents, key, callback);
+	}
+
 	/**
 	 * Sets a callback function to invoke when specific key of private settings
 	 * changes or is set.
@@ -616,7 +699,33 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		}
 	}
 
-/**
+	/**
+	 * Sets a debounced callback function to invoke when specific key of private
+	 * settings changes or is set. The callback fires only once even if the setting
+	 * is changed multiple times within the debounce delay.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key            Private settings key
+	 * @param   callback       Callback
+	 * @param   debounceDelay  Debounce delay in milliseconds
+	 * @return                 Disposer for event
+	 */
+	public onPrivateDebounced<Key extends keyof this["_privateSettings"]>(key: Key, callback: (value: this["_privateSettings"][Key], target?: this, key?: Key) => void, debounceDelay: number): IDisposer {
+		return this._onDebouncedHelper(this._debouncedPrivateSettingEvents, key, callback, debounceDelay);
+	}
+
+	/**
+	 * Removes a debounced callback for when value of a private setting changes.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key       Private settings key
+	 * @param   callback  Callback
+	 */
+	public offDebouncedPrivate<Key extends keyof this["_privateSettings"]>(key: Key, callback?: (value: this["_privateSettings"][Key], target?: this, key?: Key) => void): void {
+		this._offDebouncedHelper(this._debouncedPrivateSettingEvents, key, callback);
+	}
+
+	/**
 	 * @ignore
 	 */
 	public getRaw<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
@@ -675,6 +784,20 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 				callback(value, this, key);
 			});
 		}
+
+		const debouncedEvents = this._debouncedSettingEvents[key];
+
+		if (debouncedEvents !== undefined) {
+			$array.each(debouncedEvents, (entry) => {
+				if (entry.timeout) {
+					window.clearTimeout(entry.timeout);
+				}
+				entry.timeout = window.setTimeout(() => {
+					entry.timeout = undefined;
+					entry.cb(value, this, key);
+				}, entry.delay);
+			});
+		}
 	}
 
 	protected _sendPrivateKeyEvent<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): void {
@@ -683,6 +806,20 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		if (events !== undefined) {
 			$array.each(events!, (callback) => {
 				callback(value, this, key);
+			});
+		}
+
+		const debouncedEvents = this._debouncedPrivateSettingEvents[key];
+
+		if (debouncedEvents !== undefined) {
+			$array.each(debouncedEvents, (entry) => {
+				if (entry.timeout) {
+					window.clearTimeout(entry.timeout);
+				}
+				entry.timeout = window.setTimeout(() => {
+					entry.timeout = undefined;
+					entry.cb(value, this, key);
+				}, entry.delay);
 			});
 		}
 	}

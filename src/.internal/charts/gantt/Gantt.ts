@@ -786,7 +786,6 @@ export class Gantt extends Container {
 
 		const seriesDataObject: any = {
 			start: start,
-			end: start + 1,
 			duration: duration,
 			progress: progress,
 			id: uid,

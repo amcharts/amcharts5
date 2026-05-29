@@ -874,6 +874,16 @@ export function stripTags(text: string): string {
 }
 
 /**
+ * Strips inline formatting tags (square brackets) from the string.
+ *
+ * @param text  Source string
+ * @return String without tags
+ */
+export function stripFormatTags(text: string): string {
+	return text ? text.replace(/\[[^\]]*\]/g, "") : text;
+}
+
+/**
  * Removes new lines and tags from a string.
  *
  * @param text  String to conver

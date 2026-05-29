@@ -25,6 +25,9 @@ export interface ILabelSeriesSettings extends IPolylineSeriesSettings {
 
 	/**
 	 * Label font family.
+	 *
+	 * Use reserved value `"inherit"` to use computed style on chart
+	 * container. (since `5.17.3`)
 	 */
 	labelFontFamily?: string;
 
@@ -332,7 +335,7 @@ export class LabelSeries extends PolylineSeries {
 	}
 
 	protected _handleBulletDragStart(event: ISpritePointerEvent) {
-		// don't call super		
+		// don't call super
 		const stockChart = this._getStockChart();
 		if (stockChart) {
 			stockChart._dragStartDrawing(event);
