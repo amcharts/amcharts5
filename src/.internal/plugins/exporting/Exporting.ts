@@ -47,10 +47,11 @@ async function _pdfmake(): Promise<any> {
 
 	let pdfmake = a[0].default;
 	let vfs_fonts = a[1].default;
-	const global = <any>window;
-	global.pdfMake = global.pdfMake || {};
-	global.pdfMake.vfs = vfs_fonts;
-	pdfmake.vfs = vfs_fonts;
+
+	// pdfmake 0.3+ no longer reads a plain `vfs` assignment; the virtual file
+	// system must be registered through `addVirtualFileSystem()`. The default
+	// Roboto font definition is already set up by pdfmake itself.
+	pdfmake.addVirtualFileSystem(vfs_fonts);
 	return pdfmake;
 }
 
@@ -1630,6 +1631,12 @@ export class Exporting extends Entity {
 			if (options.extraFonts) {
 				$array.each(options.extraFonts, addFont);
 			}
+
+			// In pdfmake 0.3+ custom fonts and their files are registered on the
+			// instance rather than passed to `createPdf()`. Merge them onto the
+			// existing defaults so subsequent exports keep working.
+			pdfmake.addFonts(fonts);
+			pdfmake.addVirtualFileSystem(vfs);
 		}
 
 		this.events.dispatch("pdfdocready", {
@@ -1641,11 +1648,7 @@ export class Exporting extends Entity {
 		});
 
 		// Create PDF
-		return new Promise<string>((success, _error) => {
-			pdfmake.createPdf(doc, null, fonts, vfs).getBase64((uri: string) => {
-				success(uri);
-			});
-		});
+		return await pdfmake.createPdf(doc, {}).getBase64();
 	}
 
 	/**

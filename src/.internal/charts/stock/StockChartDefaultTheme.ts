@@ -765,7 +765,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["indicator", "bollingerbands"]).setAll({
 			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.00')}[/] [{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{upperColor} bold]{upper.formatNumber('#.00')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{type})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{standardDeviations.formatNumber('#.')},{maType})"
 		})
 
 		r("LineSeries", ["indicator", "macross"]).setAll({
@@ -820,7 +820,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["movingaverage"]).setAll({
 			legendValueText: "[{seriesColor} bold]{valueY.formatNumber('#.00')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{type},{offset.formatNumber('#.')})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{maType},{offset.formatNumber('#.')})"
 		})
 
 		r("ColumnSeries", ["movingaveragedeviation"]).setAll({
@@ -829,7 +829,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		r("LineSeries", ["indicator", "movingaverageenvelope"]).setAll({
 			legendValueText: "[{lowerColor} bold]{lower.formatNumber('#.00')}[/] [{seriesColor} bold]{valueY.formatNumber('#.00')}[/] [{upperColor} bold]{upper.formatNumber('#.00')}[/]",
-			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{shiftType},{shift.formatNumber('#.')},{type})"
+			legendLabelText: "{shortName} ({period.formatNumber('#.')},{field},{shiftType},{shift.formatNumber('#.')},{maType})"
 		})
 
 		r("LineSeries", ["onbalancevolume"]).setAll({
@@ -974,7 +974,7 @@ export class StockChartDefaultTheme extends Theme {
 			name: l.translateAny("Moving Average"),
 			shortName: l.translateAny("MA"),
 			seriesColor: color(0xab82da),
-			type: "simple",
+			maType: "simple",
 			field: "close",
 			period: 20,
 			offset: 0
@@ -1004,7 +1004,7 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0xff903f),
 			upperColor: color(0xffc948),
 			lowerColor: color(0xffaf74),
-			type: "simple",
+			maType: "simple",
 			field: "close",
 			period: 20,
 			offset: 0,
@@ -1017,7 +1017,7 @@ export class StockChartDefaultTheme extends Theme {
 			shortName: l.translateAny("MA Dev"),
 			increasingColor: ic.get("positive"),
 			decreasingColor: ic.get("negative"),
-			type: "simple",
+			maType: "simple",
 			field: "close",
 			period: 20
 		})

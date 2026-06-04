@@ -1352,7 +1352,7 @@ export class DrawingControl extends StockControl {
 			panel.series.each((series) => {
 				if (series.isType<DrawingSeries>("DrawingSeries")) {
 					const serializer = Serializer.new(this.root, {
-						includeSettings: ["stroke", "fill", "strokeColor", "fillColor", "strokeOpacity", "fillOpacity", "strokeWidth", "strokeDasharray", "field", "snapToData", "svgPath", "labelFontSize", "labelFontFamily", "labelFontWeight", "labelFontStyle", "labelFill", "showExtension"],
+						includeSettings: ["stroke", "fill", "strokeColor", "fillColor", "strokeOpacity", "fillOpacity", "strokeWidth", "strokeDasharray", "field", "snapToData", "svgPath", "labelFontSize", "labelFontFamily", "labelFontWeight", "labelFontStyle", "labelFill", "showExtension", "fontSize", "fontFamily", "fontWeight", "fontStyle"],
 						//includeSettings: ["data"],
 						maxDepth: 4
 					});

@@ -21,7 +21,8 @@
         "rootDir": "src",
         "pretty": true,
         "declarationMap": true,
-        "lib": ["es6", "es2015", "dom"],
+        "types": [],
+        "lib": ["es2020", "dom"],
         "outDir": "./dist/es2015",
         "declarationDir": "./dist/es2015"
     },

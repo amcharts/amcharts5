@@ -81,7 +81,7 @@ export class BollingerBands extends MovingAverage {
 		type: "dropdown",
 		options: ["open", "close", "low", "high", "hl/2", "hlc/3", "hlcc/4", "ohlc/4"]
 	}, {
-		key: "type",
+		key: "maType",
 		name: this.root.language.translateAny("Type"),
 		type: "dropdown",
 		options: ["simple", "weighted", "exponential", "dema", "tema"]

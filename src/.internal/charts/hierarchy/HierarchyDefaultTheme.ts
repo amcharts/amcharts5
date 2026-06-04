@@ -459,7 +459,7 @@ export class HierarchyDefaultTheme extends Theme {
 
 		{
 			r("VoronoiTreemap").setAll({
-				type: "polygon",
+				shapeType: "polygon",
 				minWeightRatio: 0.005,
 				convergenceRatio: 0.005,
 				maxIterationCount: 100,

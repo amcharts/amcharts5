@@ -46,14 +46,21 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/#Diagram_type} for more info
 	 * @default "polygon"
 	 */
+	shapeType?: "rectangle" | "polygon"
+
+	/**
+	 * Type of the diagram's shape.
+	 * Left for backward compatibility. Please use `shapeType` instead.
+	 * @ignore
+	 */
 	type?: "rectangle" | "polygon"
 
 	/**
-	 * Number of corners when type is `"polygon"`.
+	 * Number of corners when `shapeType` is `"polygon"`.
 	 *
 	 * `120` means the polygon will look like a circle.
 	 *
-	 * NOTE: this setting is ignored if `type="rectangle"`.
+	 * NOTE: this setting is ignored if `shapeType="rectangle"`.
 	 *
 	 * @default 120
 	 */
@@ -154,6 +161,11 @@ export class VoronoiTreemap extends Hierarchy {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		if (this.isDirty("type") && this.get("type") !== undefined) {
+			this.set("shapeType", this.get("type"));
+			this.setRaw("type", undefined);
+		}
+
 		const width = this.innerWidth() / 2;
 		const height = this.innerHeight() / 2;
 
@@ -168,15 +180,15 @@ export class VoronoiTreemap extends Hierarchy {
 		this.voronoi.maxIterationCount((this.get("maxIterationCount", 100)));
 		this.voronoi.minWeightRatio((this.get("minWeightRatio", 0.005)));
 
-		if (this.isDirty("type")) {
-			if (this.get("type") == "polygon") {
+		if (this.isDirty("shapeType")) {
+			if (this.get("shapeType") == "polygon") {
 				this.voronoi.clip(this.getCirclePolygon(1));
 				this._updateVisuals();
 			}
 		}
 
 		if (this._sizeDirty) {
-			if (this.get("type") == "rectangle") {
+			if (this.get("shapeType") == "rectangle") {
 				this.voronoi.prng(seedrandom("X"));
 				this.voronoi.clip([[-width, -height], [-width, height], [width, height], [width, -height]])(node);
 				this._updateVisuals();
@@ -199,7 +211,7 @@ export class VoronoiTreemap extends Hierarchy {
 			let coordinates: any = [];
 
 			let d = 1;
-			if (this.get("type") == "polygon") {
+			if (this.get("shapeType") == "polygon") {
 				d = Math.min(this.innerWidth(), this.innerHeight()) / 2;
 			}
 

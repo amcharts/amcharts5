@@ -74,7 +74,7 @@ export class PictorialStackedSeries extends PyramidSeries {
 		else {
 			scale = h / mh;
 		}
-		if (scale != Infinity && scale != NaN) {
+		if (scale != Infinity && !Number.isNaN(scale)) {
 			seriesMask.set("scale", scale);
 			seriesMask.set("x", w / 2);
 			seriesMask.set("y", h / 2);

@@ -23,7 +23,15 @@ export interface IMovingAverageDeviationSettings extends IChartIndicatorSettings
 	 *
 	 * @default "simple"
 	 */
+	maType?: "simple" | "weighted" | "exponential" | "dema" | "tema";
+
+	/**
+	 * Type of the moving average.
+	 * Left for backward compatibility. Please use `maType` instead.
+	 * @ignore
+	 */
 	type?: "simple" | "weighted" | "exponential" | "dema" | "tema";
+
 
 	/**
 	 * How units are calculated.
@@ -70,7 +78,7 @@ export class MovingAverageDeviation extends ChartIndicator {
 			type: "dropdown",
 			options: ["open", "close", "low", "high", "hl/2", "hlc/3", "hlcc/4", "ohlc/4"]
 		}, {
-			key: "type",
+			key: "maType",
 			name: this.root.language.translateAny("Type"),
 			type: "dropdown",
 			options: ["simple", "weighted", "exponential", "dema", "tema"]
@@ -90,10 +98,10 @@ export class MovingAverageDeviation extends ChartIndicator {
 			type: "color"
 		}];
 
-	public _afterNew(){
+	public _afterNew() {
 		this._themeTags.push("movingaveragedeviation");
 		super._afterNew();
-	}		
+	}
 
 	public _createSeries(): ColumnSeries {
 		return this.panel.series.push(ColumnSeries.new(this._root, {
@@ -120,7 +128,13 @@ export class MovingAverageDeviation extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
-		if (this.isDirty("type") || this.isDirty("unit")) {
+		if (this.isDirty("type") && this.get("type") !== undefined) {
+			this.set("maType", this.get("type"));
+			this.setRaw("type", undefined);
+		}
+
+
+		if (this.isDirty("maType") || this.isDirty("unit")) {
 			this.markDataDirty();
 		}
 		super._prepareChildren();
@@ -138,7 +152,7 @@ export class MovingAverageDeviation extends ChartIndicator {
 
 			let data = this._getDataArray(dataItems);
 			let period = this.get("period", 50);
-			const type = this.get("type");
+			const type = this.get("maType");
 			const unit = this.get("unit");
 
 			switch (type) {
@@ -168,7 +182,7 @@ export class MovingAverageDeviation extends ChartIndicator {
 			let i = 0;
 			$array.each(data, (dataItem) => {
 				i++;
-				if (i >= period) {
+				if (i >= period && dataItem.value_y != null && dataItem.ma != null) {
 					let deviation = dataItem.value_y - dataItem.ma;
 					if (unit == "percent") {
 						deviation = (dataItem.value_y / dataItem.ma - 1) * 100;

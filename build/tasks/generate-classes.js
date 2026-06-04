@@ -11,6 +11,10 @@ function mapClass(name) {
 	case "DurationAxis":
 	case "GaplessDateAxis":
 		return `${name}<AxisRenderer>`;
+	case "GanttCategoryAxis":
+		return `${name}<GanttCategoryAxisRenderer>`;
+	case "GanttDateAxis":
+		return `${name}<GanttDateAxisRenderer>`;
 	default:
 		return name;
 	}
@@ -102,8 +106,8 @@ async function writeJson(state, classes, keys) {
 
 		imports.push(`import type { ${className} } from "./${chunk}";`);
 		types.push(`\t"${key}": () => Promise<typeof ${className}>;`);
-		properties.push(`\t"${key}": () => import(/* webpackExports: "${className}", webpackChunkName: "json_${chunkName(chunk)}" */ "./${chunk}").then((m) => m.${className}),`);
-		propertiesScript.push(`\t"${key}": () => import(/* webpackExports: "${className}", webpackMode: "weak" */ "./${chunk}").then((m) => m.${className}),`);
+		properties.push(`\t"${key}": () => import(/* webpackChunkName: "json_${chunkName(chunk)}" */ "./${chunk}").then((m) => m.${className}),`);
+		propertiesScript.push(`\t"${key}": () => import(/* webpackMode: "weak" */ "./${chunk}").then((m) => m.${className}),`);
 	});
 
 	await writeFile(state.dir("src", ".internal", "plugins", "json", "Classes.ts"), `/**

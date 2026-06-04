@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.18.0] - 2026-06-04
+
+### Added
+- `fitNodes` (default: `false`) setting added to `Tree` chart. If set to `true`, hidden nodes will excluded from the layout, giving more space for visible ones.
+
+### Changed
+- `pdfmake` dependency updated to `^0.3.9`. For those using only amCharts Exporting API, nothing changes. Only if you are accessing pdfmake object directly, there are some breaking API changes. [More info](https://www.amcharts.com/docs/v5/tutorials/pdfmake-upgrade-notice-02-03/).
+- Renamed `type` setting to `maType` on moving average indicators (`MovingAverage`, `MovingAverageDeviation`, `MovingAverageEnvelope`, `BollingerBands`). (setting `type` will work as well, but it's deprecated)
+- Renamed `type` setting to `shapeType` on `VoronoiTreemap`. (setting `type` will work as well, but it's deprecated)
+
+### Fixed
+- `PictorialStackedSeries` was not correctly guarding against `NaN` scale values, which could result in invalid scale being applied to the series mask and graphics.
+- Saving/serializing `StockChart` now includes `fontFamily`, `fontWeight`, and `fontStyle` settings for labels.
+
+
 ## [5.17.3] - 2026-05-29
 
 ### Added

@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.17.3",
+  "version": "5.18.0",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "description": "amCharts 5",
   "homepage": "https://www.amcharts.com/",
@@ -53,11 +53,15 @@
     "d3-voronoi-treemap": "^1.1.2",
     "flatpickr": "^4.6.13",
     "markerjs2": "^2.29.4",
-    "pdfmake": "^0.2.2",
+    "pdfmake": "~0.3.9",
     "polylabel": "^1.1.0",
     "seedrandom": "^3.0.5",
     "svg-arc-to-cubic-bezier": "^3.2.0",
     "tslib": "^2.2.0"
+  },
+  "resolutions": {
+    "@types/node": "^18.0.0",
+    "@types/d3-dispatch": "3.0.6"
   },
   "devDependencies": {
     "@types/seedrandom": "^3.0.5",

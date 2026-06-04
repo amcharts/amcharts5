@@ -327,7 +327,8 @@ module.exports = async (state) => {
 				{
 					test: /\.js$/,
 					enforce: "pre",
-					use: ["source-map-loader"]
+					use: ["source-map-loader"],
+					exclude: /node_modules/,
 				},
 			]
 		},

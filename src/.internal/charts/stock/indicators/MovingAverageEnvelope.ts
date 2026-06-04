@@ -69,7 +69,7 @@ export class MovingAverageEnvelope extends MovingAverage {
 		name: this.root.language.translateAny("Period"),
 		type: "number"
 	}, {
-		key: "type",
+		key: "maType",
 		name: this.root.language.translateAny("Type"),
 		type: "dropdown",
 		options: ["simple", "weighted", "exponential", "dema", "tema"]

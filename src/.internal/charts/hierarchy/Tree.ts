@@ -1,8 +1,11 @@
 import type { DataItem } from "../../core/render/Component";
 import type { IPoint } from "../../core/util/IPoint";
+import type { IHierarchyDataObject, IHierarchyDataItem } from "./Hierarchy";
 
 import { LinkedHierarchy, ILinkedHierarchyPrivate, ILinkedHierarchySettings, ILinkedHierarchyDataItem, ILinkedHierarchyEvents } from "./LinkedHierarchy";
 
+import * as $array from "../../core/util/Array";
+import * as $type from "../../core/util/Type";
 import * as d3hierarchy from "d3-hierarchy";
 
 export interface ITreeDataObject {
@@ -66,6 +69,15 @@ export interface ITreeSettings extends ILinkedHierarchySettings {
 	 */
 	nodeSeparation?: (a: DataItem<ITreeDataItem>, b: DataItem<ITreeDataItem>) => number;
 
+	/**
+	 * If set to `true`, hidden or disabled nodes are excluded from the layout
+	 * so that visible nodes spread out to fill the available chart area.
+	 *
+	 * @default false
+	 * @since 5.18.0
+	 */
+	fitNodes?: boolean;
+
 }
 
 export interface ITreePrivate extends ILinkedHierarchyPrivate {
@@ -106,6 +118,10 @@ export class Tree extends LinkedHierarchy {
 	public _packData: ITreeDataObject | undefined;
 
 	public _prepareChildren() {
+		if (this.isDirty("fitNodes")) {
+			this._valuesDirty = true;
+		}
+
 		super._prepareChildren();
 
 		if (this.isDirty("clustered")) {
@@ -115,6 +131,67 @@ export class Tree extends LinkedHierarchy {
 
 		if (this.isDirty("orientation") || this.isDirty("inversed") || this.isDirty("nodeSeparation")) {
 			this._updateVisuals();
+		}
+	}
+
+	protected _makeHierarchyData(data: IHierarchyDataObject, dataItem: DataItem<IHierarchyDataItem>) {
+		if (!this.get("fitNodes")) {
+			super._makeHierarchyData(data, dataItem);
+			return;
+		}
+
+		data.dataItem = dataItem;
+		const children = (dataItem as DataItem<ITreeDataItem>).get("children");
+		if (children) {
+			const childrenDataArray: Array<IHierarchyDataObject> = [];
+			data.children = childrenDataArray;
+			$array.each(children, (childDataItem) => {
+				if (childDataItem.isHidden()) {
+					return;
+				}
+				const node = childDataItem.get("node");
+				if (node && node.isHidden()) {
+					return;
+				}
+				const childData = {};
+				childrenDataArray.push(childData);
+				this._makeHierarchyData(childData, childDataItem);
+			});
+		}
+
+		const value = dataItem.get("valueWorking");
+		if ($type.isNumber(value)) {
+			data.value = value;
+		}
+	}
+
+	public async hideDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
+		const result = super.hideDataItem(dataItem, duration);
+		if (this.get("fitNodes")) {
+			this.markDirtyValues();
+		}
+		return result;
+	}
+
+	public async showDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number): Promise<void> {
+		const result = super.showDataItem(dataItem, duration);
+		if (this.get("fitNodes")) {
+			this.markDirtyValues();
+		}
+		return result;
+	}
+
+	public disableDataItem(dataItem: DataItem<this["_dataItemSettings"]>, duration?: number) {
+		super.disableDataItem(dataItem, duration);
+		if (this.get("fitNodes")) {
+			this.markDirtyValues();
+		}
+	}
+
+	public enableDataItem(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth?: number, depth?: number, duration?: number) {
+		super.enableDataItem(dataItem, maxDepth, depth, duration);
+		if (this.get("fitNodes")) {
+			this.markDirtyValues();
 		}
 	}
 

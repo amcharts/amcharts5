@@ -359,13 +359,17 @@ export class Animation<Value> {
 	}
 
 	public _value(diff: Time): Value {
-		if ((diff as number) >= 1) {
-			return this._to;
-		}
 		if ((diff as number) <= 0) {
 			return this._from;
 		}
-		return this._interpolate(this._easing(diff), this._from, this._to);
+		const eased = this._easing(diff) as number;
+		if (eased >= 0.999999) {
+			return this._to;
+		}
+		if (eased <= 0.000001) {
+			return this._from;
+		}
+		return this._interpolate(eased, this._from, this._to);
 	}
 }
 

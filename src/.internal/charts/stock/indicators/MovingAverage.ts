@@ -13,6 +13,13 @@ export interface IMovingAverageSettings extends IIndicatorSettings {
 	 *
 	 * @default "simple"
 	 */
+	maType?: "simple" | "weighted" | "exponential" | "dema" | "tema";
+
+	/**
+	 * Type of the moving average.
+	 * Left for backward compatibility. Please use `maType` instead.
+	 * @ignore
+	 */
 	type?: "simple" | "weighted" | "exponential" | "dema" | "tema";
 
 	/**
@@ -66,7 +73,7 @@ export class MovingAverage extends Indicator {
 		type: "dropdown",
 		options: ["open", "close", "low", "high", "hl/2", "hlc/3", "hlcc/4", "ohlc/4"]
 	}, {
-		key: "type",
+		key: "maType",
 		name: this.root.language.translateAny("Type"),
 		type: "dropdown",
 		options: ["simple", "weighted", "exponential", "dema", "tema"]
@@ -74,9 +81,14 @@ export class MovingAverage extends Indicator {
 
 	public _prepareChildren() {
 
-		if (this.isDirty("type") || this.isDirty("offset")) {
+		if (this.isDirty("type") && this.get("type") !== undefined) {
+			this.set("maType", this.get("type"));
+			this.setRaw("type", undefined);
+		}
+
+		if (this.isDirty("maType") || this.isDirty("offset")) {
 			this.markDataDirty();
-			this.setCustomData("type", this.get("type"));
+			this.setCustomData("maType", this.get("maType"));
 			this.setCustomData("offset", this.get("offset", 0));
 		}
 
@@ -115,13 +127,13 @@ export class MovingAverage extends Indicator {
 	public prepareData() {
 		if (this.series) {
 			let period = this.get("period", 50);
-			const type = this.get("type");
+			const maType = this.get("maType");
 			const stockSeries = this.get("stockSeries");
 			const dataItems = stockSeries.dataItems;
 
 			let data = this._getDataArray(dataItems);
 
-			switch (type) {
+			switch (maType) {
 				case "simple":
 					this._sma(data, period, "value_y", "ma");
 					break;
