@@ -309,6 +309,14 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	// TODO can this be replaced with _localMatrix ?
 	protected _uMatrix: Matrix = new Matrix();
 
+	// Cached transform inputs for _setMatrix memoization (NaN forces first compute)
+	protected _mx: number = NaN;
+	protected _my: number = NaN;
+	protected _mpx: number = NaN;
+	protected _mpy: number = NaN;
+	protected _mAngle: number = NaN;
+	protected _mScale: number = NaN;
+
 	public _renderer: CanvasRenderer;
 	public _parent: CanvasContainer | undefined;
 
@@ -479,21 +487,37 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 	}
 
 	public _setMatrix(): void {
-		// TODO only calculate this if it has actually changed
-		this._localMatrix.setTransform(
-			this.x,
-			this.y,
-			this.pivot.x,
-			this.pivot.y,
-			// Converts degrees to radians
-			this.angle * Math.PI / 180,
-			this.scale
-		);
+		const px = this.pivot.x;
+		const py = this.pivot.y;
 
+		// Only rebuild the local matrix (the sin/cos cost) when an input changed.
+		if (this.x !== this._mx || this.y !== this._my ||
+			px !== this._mpx || py !== this._mpy ||
+			this.angle !== this._mAngle || this.scale !== this._mScale) {
+
+			this._localMatrix.setTransform(
+				this.x,
+				this.y,
+				px,
+				py,
+				// Converts degrees to radians
+				this.angle * Math.PI / 180,
+				this.scale
+			);
+
+			this._mx = this.x;
+			this._my = this.y;
+			this._mpx = px;
+			this._mpy = py;
+			this._mAngle = this.angle;
+			this._mScale = this.scale;
+		}
+
+		// Prepend stays unconditional: cheap, and always reflects the parent's
+		// current world matrix (render() guarantees the parent was updated first).
 		this._matrix.copyFrom(this._localMatrix);
 
 		if (this._parent) {
-			// TODO only calculate this if it has actually changed
 			this._matrix.prepend(this._parent._matrix);
 		}
 	}

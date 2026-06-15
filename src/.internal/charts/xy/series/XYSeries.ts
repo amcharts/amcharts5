@@ -1130,8 +1130,14 @@ export abstract class XYSeries extends Series {
 			chart.series.removeValue(this);
 		}
 
-		$array.removeFirst(this.get("xAxis").series, this);
-		$array.removeFirst(this.get("yAxis").series, this);
+		const xAxis = this.get("xAxis");
+		if (xAxis) {
+			$array.removeFirst(xAxis.series, this);
+		}
+		const yAxis = this.get("yAxis");
+		if (yAxis) {
+			$array.removeFirst(yAxis.series, this);
+		}
 	}
 
 	// TODO use  SelectKeys<this["_privateSettings"], number | undefined>
@@ -1471,7 +1477,7 @@ export abstract class XYSeries extends Series {
 						}
 					}
 					else {
-						yAxis.markDirtySelectionExtremes();
+						xAxis.markDirtySelectionExtremes();
 					}
 				}
 
@@ -1494,7 +1500,7 @@ export abstract class XYSeries extends Series {
 						const selectionMinX = this.getPrivate("selectionMinX");
 						if (selectionMinX != null) {
 							this.setPrivateRaw("minX", selectionMinX);
-							yAxis.markDirtyExtremes();
+							xAxis.markDirtyExtremes();
 						}
 						const selectionMaxX = this.getPrivate("selectionMaxX")
 						if (selectionMaxX != null) {

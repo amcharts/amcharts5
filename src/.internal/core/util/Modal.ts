@@ -243,7 +243,7 @@ export class Modal extends Entity {
 
 		const html = this.get("content");
 		if (html) {
-			content.innerHTML = html;
+			content.innerHTML = this._root._sanitizeHTML(html);
 		}
 
 		// Close on ESC
@@ -260,7 +260,7 @@ export class Modal extends Entity {
 		super._beforeChanged();
 
 		if (this.isDirty("content")) {
-			this.getPrivate("content").innerHTML = this.get("content", "");
+			this.getPrivate("content").innerHTML = this._root._sanitizeHTML(this.get("content", ""));
 		}
 	}
 

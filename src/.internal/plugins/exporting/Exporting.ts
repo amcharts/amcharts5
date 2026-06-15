@@ -604,6 +604,20 @@ export interface IExportingCSVOptions extends IExportingDataOptions {
 	 */
 	addBOM?: boolean;
 
+	/**
+	 * If set to `false`, disables protection against spreadsheet formula
+	 * injection (a.k.a. "CSV injection").
+	 *
+	 * When enabled (default), string cell values that begin with a character
+	 * that spreadsheet applications could interpret as the start of a formula
+	 * (`=`, `+`, `-`, `@`, tab, or carriage return) are prefixed with a single
+	 * quote so they are imported as plain text.
+	 *
+	 * @default true
+	 * @since 5.19.0
+	 */
+	escapeFormulas?: boolean;
+
 }
 
 export interface IExportingHTMLOptions extends IExportingDataOptions {
@@ -633,7 +647,30 @@ export interface IExportingHTMLOptions extends IExportingDataOptions {
 export interface IExportingXLSXOptions extends IExportingDataOptions {
 	// @todo
 	//sheets?: string[];
+
+	/**
+	 * If set to `false`, disables protection against spreadsheet formula
+	 * injection (a.k.a. "CSV injection").
+	 *
+	 * When enabled (default), string cell values that begin with a character
+	 * that spreadsheet applications could interpret as the start of a formula
+	 * (`=`, `+`, `-`, `@`, tab, or carriage return) are prefixed with a single
+	 * quote so they are imported as plain text.
+	 *
+	 * @default true
+	 * @since 5.19.0
+	 */
+	escapeFormulas?: boolean;
 }
+
+/**
+ * A list of characters that, when a spreadsheet cell value begins with one of
+ * them, can cause the cell to be interpreted as a formula by Excel, Google
+ * Sheets, LibreOffice, etc. (a.k.a. "formula injection" / "CSV injection").
+ *
+ * @ignore
+ */
+const formulaInjectionChars: string[] = ["=", "+", "-", "@", "\t", "\r"];
 
 /**
  * A plugin that can be used to export chart snapshots and data.
@@ -1099,6 +1136,11 @@ export class Exporting extends Entity {
 			// Convert dates
 			let item = asIs ? value : this.convertToSpecialFormat(key, value, options);
 
+			// Neutralize spreadsheet formula injection
+			if (options.escapeFormulas !== false) {
+				item = this.escapeFormulas(item);
+			}
+
 			// Cast and escape doublequotes
 			item = "" + item;
 			item = item.replace(/"/g, '""');
@@ -1249,7 +1291,7 @@ export class Exporting extends Entity {
 
 			// Escape HTML entities
 			item = "" + item;
-			item = item.replace(/[\u00A0-\u9999<>\&]/gim, function(i: string) {
+			item = item.replace(/[\u00A0-\u9999<>\&]/gim, function (i: string) {
 				return "&#" + i.charCodeAt(0) + ";";
 			});
 
@@ -1425,6 +1467,11 @@ export class Exporting extends Entity {
 
 			// Convert dates
 			let item = asIs ? value : this.convertToSpecialFormat(key, value, options, true);
+
+			// Neutralize spreadsheet formula injection
+			if (options.escapeFormulas !== false) {
+				item = this.escapeFormulas(item);
+			}
 
 			items.push(item);
 		}, (a, b) => {
@@ -1976,6 +2023,24 @@ export class Exporting extends Entity {
 	}
 
 	/**
+	 * If `value` is a string that begins with a character a spreadsheet
+	 * application could treat as the start of a formula, prefixes it with a
+	 * single quote so it is imported as plain text. This mitigates spreadsheet
+	 * formula injection ("CSV injection") attacks via untrusted cell data.
+	 *
+	 * Non-string values (numbers, dates) are returned unchanged, so legitimate
+	 * signed numbers are not affected.
+	 *
+	 * @ignore
+	 */
+	public escapeFormulas(value: any): any {
+		if (typeof value == "string" && value.length > 0 && formulaInjectionChars.indexOf(value.charAt(0)) !== -1) {
+			return "'" + value;
+		}
+		return value;
+	}
+
+	/**
 	 * @ignore
 	 */
 	public isDateField(field: string): boolean {
@@ -2324,7 +2389,7 @@ export class Exporting extends Entity {
 		}
 		iframe.contentWindow!.document.body.appendChild(img);
 
-		(<any>iframe).load = function() {
+		(<any>iframe).load = function () {
 			iframe.contentWindow!.document.body.appendChild(img);
 		};
 

@@ -894,6 +894,58 @@ export function plainText(text: string): string {
 }
 
 /**
+ * HTML tags that [[sanitizeHTML]] strips out entirely (together with their
+ * contents where applicable). They can execute scripts or pull in
+ * external/malicious resources and have no legitimate use inside chart labels,
+ * tooltips, modal content, or export menu items.
+ *
+ * @ignore
+ */
+const dangerousHTMLTags: string = "script|iframe|frame|frameset|object|embed|applet|noscript|template|link|meta|base|form";
+
+/**
+ * Sanitizes an HTML string by stripping out constructs that are practically
+ * only used for cross-site scripting (XSS) attacks, while leaving legitimate
+ * markup intact. Specifically it removes:
+ *
+ * * `<script>`, `<iframe>`, `<object>`, `<embed>` and similar dangerous tags;
+ * * inline event handler attributes (`onerror`, `onload`, `onclick`, ...);
+ * * `javascript:` / `vbscript:` (and similar) protocol URLs in attributes;
+ * * inline styles that smuggle in scripts via `expression()`,
+ *   `url(javascript:...)`, `behavior`, or `-moz-binding`.
+ *
+ * This is applied to any HTML that gets injected via `innerHTML` (e.g. `html`
+ * and `labelHTML` settings, HTML tooltips, modal content, and export menu
+ * labels), because chart data and labels frequently originate from untrusted
+ * back-ends.
+ *
+ * @since 5.19.0
+ * @param   html  Source HTML
+ * @return        Sanitized HTML
+ */
+export function sanitizeHTML(html: string): string {
+	if (html == null || html === "") {
+		return html;
+	}
+
+	return ("" + html)
+		// Remove dangerous tag blocks together with their content
+		.replace(new RegExp("<\\s*(" + dangerousHTMLTags + ")\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>", "gi"), "")
+		// Remove any leftover or self-closing dangerous tags
+		.replace(new RegExp("<\\s*\\/?\\s*(?:" + dangerousHTMLTags + ")\\b[^>]*>", "gi"), "")
+		// Remove inline event handler attributes (on*=...), quoted or unquoted
+		.replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+		// Neutralize script protocols in URL-bearing attributes. Whitespace and
+		// control characters are tolerated between the chars since browsers
+		// ignore them when resolving a protocol (e.g. `java\tscript:`).
+		.replace(/((?:href|src|xlink:href|action|formaction|data|background|poster|srcdoc|ping)\s*=\s*)(?:"[\s]*j[\s]*a[\s]*v[\s]*a[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t[\s]*:[^"]*"|'[\s]*j[\s]*a[\s]*v[\s]*a[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t[\s]*:[^']*'|(?:javascript|vbscript|livescript|mocha):[^\s>]*)/gi, "$1\"#\"")
+		// Drop srcdoc entirely, as it always carries embedded markup
+		.replace(/\ssrcdoc\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+		// Remove inline styles that can execute scripts
+		.replace(/\sstyle\s*=\s*(?:"[^"]*(?:expression|javascript:|vbscript:|behavior|-moz-binding)[^"]*"|'[^']*(?:expression|javascript:|vbscript:|behavior|-moz-binding)[^']*')/gi, "");
+}
+
+/**
  * Escapes string so it can safely be used in a Regex.
  *
  * @param value  Unsescaped string

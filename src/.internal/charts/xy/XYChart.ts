@@ -1329,7 +1329,7 @@ export class XYChart extends SerialChart {
 			series._fixPosition();
 		}))
 
-		series._posXDp = series.addDisposer(yAxis.events.on("positionchanged", () => {
+		series._posYDp = series.addDisposer(yAxis.events.on("positionchanged", () => {
 			series._fixPosition();
 		}))
 
@@ -1549,14 +1549,14 @@ export class XYChart extends SerialChart {
 		if (zoomOutButton && zoomOutButton.parent) {
 			let visible = false;
 			this.xAxes.each((axis) => {
-				if (axis.get("zoomOut", true)) {
+				if (axis.get("zoomOut", true) && !axis._isSynced()) {
 					if ($math.round(axis.get("start", 0), 5) != 0 || $math.round(axis.get("end", 1), 5) != 1) {
 						visible = true;
 					}
 				}
 			})
 			this.yAxes.each((axis) => {
-				if (axis.get("zoomOut", true)) {
+				if (axis.get("zoomOut", true) && !axis._isSynced()) {
 					if ($math.round(axis.get("start", 0), 5) != 0 || $math.round(axis.get("end", 1), 5) != 1) {
 						visible = true;
 					}
@@ -1834,14 +1834,14 @@ export class XYChart extends SerialChart {
 	 */
 	public zoomOut() {
 		this.xAxes.each((axis) => {
-			if (axis.get("zoomOut", true)) {
+			if (axis.get("zoomOut", true) && !axis._isSynced()) {
 				axis.setPrivate("updateScrollbar", true);
 				axis.zoom(0, 1);
 			}
 		})
 
 		this.yAxes.each((axis) => {
-			if (axis.get("zoomOut", true)) {
+			if (axis.get("zoomOut", true) && !axis._isSynced()) {
 				axis.setPrivate("updateScrollbar", true);
 				axis.zoom(0, 1);
 			}

@@ -4,6 +4,7 @@ import type { Bullet } from "../../core/render/Bullet";
 import type { Root } from "../../core/Root";
 import type { List } from "../../core/util/List";
 import type { LinkedHierarchy } from "./LinkedHierarchy";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 
@@ -50,6 +51,9 @@ export class HierarchyLink extends Graphics {
 	public bullets: Array<Bullet> = [];
 
 	public series?: LinkedHierarchy;
+
+	protected _sourceDp?: IDisposer;
+	protected _targetDp?: IDisposer;
 
 	public _handleBullets(bullets:List<<D extends DataItem<IHierarchyDataItem>>(root: Root, source: D, target:D) => Bullet | undefined>) {
 		$array.each(this.bullets, (bullet) => {
@@ -150,21 +154,29 @@ export class HierarchyLink extends Graphics {
 		super._beforeChanged();
 
 		if (this.isDirty("source")) {
+			if (this._sourceDp) {
+				this._sourceDp.dispose();
+			}
 			const source = this.get("source");
 			if (source) {
 				const sourceNode = source.get("node");
-				sourceNode.events.on("positionchanged", () => {
+				this._sourceDp = sourceNode.events.on("positionchanged", () => {
 					this._markDirtyKey("stroke");
-				})
+				});
+				this._disposers.push(this._sourceDp);
 			}
 		}
 		if (this.isDirty("target")) {
+			if (this._targetDp) {
+				this._targetDp.dispose();
+			}
 			const target = this.get("target");
 			if (target) {
 				const targetNode = target.get("node");
-				targetNode.events.on("positionchanged", () => {
+				this._targetDp = targetNode.events.on("positionchanged", () => {
 					this._markDirtyKey("stroke");
-				})
+				});
+				this._disposers.push(this._targetDp);
 			}
 		}
 	}

@@ -155,6 +155,19 @@ export interface IRootSettings {
 	 * This function will be called automatically when the chart is resized.
 	 */
 	calculateSize?: (dimensions: DOMRect) => ISize;
+
+	/**
+	 * If set to `false`, HTML content (e.g. `html`/`labelHTML` settings, HTML
+	 * tooltips, modal content, and export menu labels) will be injected as-is,
+	 * without being sanitized for potentially malicious code.
+	 *
+	 * Only disable this if you fully trust the source of all HTML content, as
+	 * unsanitized HTML coming from untrusted data can lead to XSS attacks.
+	 *
+	 * @default true
+	 * @since 5.19.0
+	 */
+	sanitizeHTML?: boolean;
 }
 
 
@@ -396,6 +409,10 @@ export class Root implements IDisposer {
 
 		if (settings.useSafeResolution == null) {
 			settings.useSafeResolution = true;
+		}
+
+		if (settings.sanitizeHTML == null) {
+			settings.sanitizeHTML = true;
 		}
 
 		let resolution;
@@ -2422,6 +2439,16 @@ export class Root implements IDisposer {
 		}
 	}
 
+	/**
+	 * Sanitizes HTML content before it gets injected via `innerHTML`, unless
+	 * sanitization is disabled via the `sanitizeHTML` setting.
+	 *
+	 * @ignore
+	 */
+	public _sanitizeHTML(html: string): string {
+		return this._settings.sanitizeHTML ? $utils.sanitizeHTML(html) : html;
+	}
+
 	public _setHTMLContent(target: Container, html: string): void {
 		let htmlElement = target.getPrivate("htmlElement");
 		if (!htmlElement) {
@@ -2430,8 +2457,9 @@ export class Root implements IDisposer {
 				this.resize();
 			}
 		}
-		if (htmlElement.innerHTML != html) {
-			htmlElement.innerHTML = html;
+		const sanitized = this._sanitizeHTML(html);
+		if (htmlElement.innerHTML != sanitized) {
+			htmlElement.innerHTML = sanitized;
 		}
 	}
 

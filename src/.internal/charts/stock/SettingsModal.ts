@@ -105,7 +105,7 @@ export class SettingsModal extends Modal {
 
 	/**
 	 * Opens settings modal for an [[Indicator]].
-	 * 
+	 *
 	 * @param  target  Target indicator
 	 */
 	public openIndicator(target: Indicator): void {
@@ -115,7 +115,7 @@ export class SettingsModal extends Modal {
 
 	/**
 	 * Opens settings editing for the any [[XYSeries]].
-	 * 
+	 *
 	 * @param  series  target series
 	 */
 	public openSeries(series: XYSeries): void {
@@ -248,7 +248,7 @@ export class SettingsModal extends Modal {
 
 		// Title
 		const title = document.createElement("h1");
-		title.innerHTML = target.get("name");
+		title.innerText = target.get("name");
 		content.appendChild(title);
 
 		// Add fields

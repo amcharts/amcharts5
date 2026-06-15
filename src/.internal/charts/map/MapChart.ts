@@ -27,6 +27,42 @@ import type { IDisposer } from "../../core/util/Disposer";
 import type { ISpritePointerEvent } from "../../core/render/Sprite";
 
 
+/**
+ * Registry of projections that can be looked up by name via the `projectionName`
+ * setting on `MapChart`. The `am5map` entry point populates this with all
+ * bundled d3-geo projections. Custom projections can be added via
+ * `registerProjection()`.
+ */
+export const projectionRegistry: { [name: string]: () => GeoProjection } = {};
+
+/**
+ * Wraps a projection factory so the projections it produces carry their
+ * registered `name`. The tag lets `ChartSerializer` emit a matching
+ * `projectionName` even for charts that set `projection` directly in code.
+ */
+export function tagProjection(name: string, factory: () => GeoProjection): () => GeoProjection {
+	return () => {
+		const projection = factory();
+		(projection as any).__projectionName = name;
+		return projection;
+	};
+}
+
+/**
+ * Registers a projection factory under the given name so it can be referenced
+ * by `MapChart`'s `projectionName` setting.
+ *
+ * Returns a name-tagged factory: use its return value (e.g. `const cc =
+ * registerProjection("geoConicConformal", geoConicConformal)`) as
+ * `projection: cc()` and the chart will round-trip through serialization the
+ * same way the bundled projections do.
+ */
+export function registerProjection(name: string, factory: () => GeoProjection): () => GeoProjection {
+	const tagged = tagProjection(name, factory);
+	projectionRegistry[name] = tagged;
+	return tagged;
+}
+
 export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
@@ -35,6 +71,40 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Projections} for more info
 	 */
 	projection?: GeoProjection;
+
+	/**
+	 * Name of a projection to use, e.g. `"geoMercator"`, `"geoOrthographic"`.
+	 *
+	 * This is a string-friendly alternative to `projection`, mainly intended for
+	 * JSON config. If set, the chart looks the name up in `projectionRegistry`
+	 * and assigns the resulting projection to the `projection` setting.
+	 *
+	 * The bundled projections — `"geoMercator"`, `"geoOrthographic"`,
+	 * `"geoEquirectangular"`, `"geoAlbersUsa"`, `"geoEqualEarth"`,
+	 * `"geoNaturalEarth1"` — are registered automatically when building charts
+	 * from JSON config.
+	 *
+	 * In code you do not need this setting: set `projection` directly with the
+	 * am5map factory, e.g. `projection: am5map.geoOrthographic()`. Those factories
+	 * tag their projection with its name, so `ChartSerializer` can still emit the
+	 * matching `projectionName` on output — the chart round-trips either way.
+	 * (The registry itself stays empty in code-only setups so unused projections
+	 * can be tree-shaken.)
+	 *
+	 * To use a projection that isn't bundled, register it once before creating
+	 * the chart:
+	 *
+	 * ```TypeScript
+	 * import { geoConicConformal } from "d3-geo";
+	 * am5map.registerProjection("geoConicConformal", geoConicConformal);
+	 * ```
+	 * ```JavaScript
+	 * am5map.registerProjection("geoConicConformal", d3.geoConicConformal);
+	 * ```
+	 *
+	 * @since 5.19.0
+	 */
+	projectionName?: string;
 
 	/**
 	 * Current zoom level.
@@ -223,7 +293,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 *
 	 * `false` would mean that zoom out will be centered around the mouse
 	 * cursor (when zooming using wheel), or current map position.
-	 * 
+	 *
 	 * @default true
 	 * @since 5.2.1
 	 */
@@ -313,6 +383,7 @@ export class MapChart extends SerialChart {
 	protected _centerY: number = 0;
 
 	protected _projectionRaw?: GeoRawProjection;
+	protected _appliedProjectionName?: string;
 	protected _projectionBlendAnim?: Animation<this["_privateSettings"]["projectionBlend"]>;
 	protected _projectionBlendData?: {
 		blended: GeoProjection;
@@ -336,7 +407,7 @@ export class MapChart extends SerialChart {
 
 	/**
 	 * Returns a geoPoint of the current zoom position.
-	 * 
+	 *
 	 * You can later use it to restore zoom position, e.g.: `chart.zoomToGeoPoint(geoPoint, zoomLevel, true)`.
 	 *
 	 * @since 5.2.19
@@ -390,7 +461,7 @@ export class MapChart extends SerialChart {
 				const point = chartContainer._display.toLocal(event.point);
 
 				if ((wheelY == "zoom")) {
-					if(this.get("zoomLevel") == this.get("minZoomLevel", 1) && wheelEvent.deltaY > 0) {
+					if (this.get("zoomLevel") == this.get("minZoomLevel", 1) && wheelEvent.deltaY > 0) {
 						return;
 					}
 
@@ -412,7 +483,7 @@ export class MapChart extends SerialChart {
 				else if (wheelX == "rotateX") {
 					this._handleWheelRotateX(wheelEvent.deltaX / 5 * wheelSensitivity, wheelDuration, wheelEasing);
 				}
-				if(prevent) {
+				if (prevent) {
 					wheelEvent.preventDefault();
 				}
 
@@ -429,6 +500,17 @@ export class MapChart extends SerialChart {
 
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		if (this.isDirty("projectionName")) {
+			const name = this.get("projectionName") as string | undefined;
+			if (name && name !== this._appliedProjectionName) {
+				const factory = projectionRegistry[name];
+				if (factory) {
+					this._appliedProjectionName = name;
+					this.set("projection", factory());
+				}
+			}
+		}
 
 		const projection = this.get("projection")!;
 		const w = this.innerWidth();
@@ -903,7 +985,7 @@ export class MapChart extends SerialChart {
 	/**
 	 * Converts screen coordinates (X and Y) within chart to latitude and
 	 * longitude.
-	 * 
+	 *
 	 * @param  point  Screen coordinates
 	 * @return        Geographical coordinates
 	 */
@@ -922,11 +1004,11 @@ export class MapChart extends SerialChart {
 
 	/**
 	 * Converts latitude/longitude to screen coordinates (X and Y).
-	 * 
+	 *
 	 * @param  point  Geographical coordinates
 	 * @param  rotationX  X rotation of a map if different from current
 	 * @param  rotationY  Y rotation of a map if different from current
-	 * 
+	 *
 	 * @return Screen coordinates
 	 */
 	public convert(point: IGeoPoint, rotationX?: number, rotationY?: number): IPoint {
@@ -1243,7 +1325,7 @@ export class MapChart extends SerialChart {
 	 * @param  duration  Duration of the animation in milliseconds
 	 * @param  rotationX  X rotation of a map at the end of zoom
 	 * @param  rotationY  Y rotation of a map at the end of zoom
-	 * 
+	 *
 	 */
 	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 

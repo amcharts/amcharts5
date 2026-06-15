@@ -376,10 +376,11 @@ export abstract class Indicator extends Container {
 	/**
 	 * @ignore
 	 */
+
 	protected _getTypicalPrice(dataItems: Array<DataItem<any>>): Array<any> {
 		const data: Array<any> = [];
 		$array.each(dataItems, (dataItem) => {
-			data.push({ valueX: dataItem.get("valueX"), value_y: (dataItem.get("valueY", 0) + dataItem.get("highValueY", 0) + dataItem.get("lowValueY", 0)) / 2 });
+			data.push({ valueX: dataItem.get("valueX"), value_y: (dataItem.get("valueY", 0) + dataItem.get("highValueY", 0) + dataItem.get("lowValueY", 0)) / 3 });
 		})
 		return data;
 	}

@@ -292,6 +292,16 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _isPanning: boolean = false;
 
 	/**
+	 * @ignore
+	 * Returns `true` if this axis is currently sync-driven (and therefore its
+	 * `start`/`end` and rendered grid should reflect the synced bounds even
+	 * when they exceed the axis data range).
+	 */
+	public _isSynced(): boolean {
+		return false;
+	}
+
+	/**
 	 * Array of minor data items.
 	 */
 	public minorDataItems: Array<DataItem<this["_dataItemSettings"]>> = [];
@@ -463,14 +473,16 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					[start, end] = [end, start];
 				}
 
-				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
+				if (!this._isSynced()) {
+					let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
 
-				if (start < - maxDeviation) {
-					start = -maxDeviation;
-				}
+					if (start < - maxDeviation) {
+						start = -maxDeviation;
+					}
 
-				if (end > 1 + maxDeviation) {
-					end = 1 + maxDeviation;
+					if (end > 1 + maxDeviation) {
+						end = 1 + maxDeviation;
+					}
 				}
 
 				let maxZoomFactor = this.getPrivate("maxZoomFactor", this.get("maxZoomFactor", 100));
@@ -738,23 +750,25 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 			let start = this.get("start", 0);
 			let end = this.get("end", 1);
 
-			let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
+			if (!this._isSynced()) {
+				let maxDeviation = this.get("maxDeviation", 0.5) * Math.min(1, (end - start));
 
-			if (start < -maxDeviation) {
-				let delta = start + maxDeviation;
-				start = -maxDeviation;
-				this.setRaw("start", start);
-				if (this.isDirty("end")) {
-					this.setRaw("end", end - delta);
+				if (start < -maxDeviation) {
+					let delta = start + maxDeviation;
+					start = -maxDeviation;
+					this.setRaw("start", start);
+					if (this.isDirty("end")) {
+						this.setRaw("end", end - delta);
+					}
 				}
-			}
-			if (end > 1 + maxDeviation) {
-				let delta = end - 1 - maxDeviation;
-				end = 1 + maxDeviation;
-				this.setRaw("end", end);
+				if (end > 1 + maxDeviation) {
+					let delta = end - 1 - maxDeviation;
+					end = 1 + maxDeviation;
+					this.setRaw("end", end);
 
-				if (this.isDirty("start")) {
-					this.setRaw("start", start - delta);
+					if (this.isDirty("start")) {
+						this.setRaw("start", start - delta);
+					}
 				}
 			}
 		}

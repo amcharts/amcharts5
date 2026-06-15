@@ -108,6 +108,10 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 		const renderer = this.get("renderer");
 		const len = this.dataItems.length;
 
+		if (len === 0) {
+			return;
+		}
+
 		let startIndex = this.startIndex();
 		if (startIndex > 0) {
 			startIndex--;

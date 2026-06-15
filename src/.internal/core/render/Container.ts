@@ -240,6 +240,7 @@ export class Container extends Sprite {
 			this.children.each((child) => {
 				child.markDirtyPosition();
 			})
+			this.markDirtyBounds();
 		}
 
 		if (this.isDirty("maskContent")) {

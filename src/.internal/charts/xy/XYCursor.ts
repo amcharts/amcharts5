@@ -5,6 +5,7 @@ import type { ISpritePointerEvent } from "../../core/render/Sprite";
 import type { Axis } from "./axes/Axis";
 import type { AxisRenderer } from "./axes/AxisRenderer";
 import type { Tooltip } from "../../core/render/Tooltip";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import { Container, IContainerSettings, IContainerPrivate, IContainerEvents } from "../../core/render/Container";
 import { p100 } from "../../core/util/Percent";
@@ -264,6 +265,8 @@ export class XYCursor extends Container {
 	protected _toX?: number;
 	protected _toY?: number;
 
+	protected _boundsTimeout?: IDisposer;
+
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["xy", "cursor"]);
 		super._afterNew();
@@ -503,9 +506,13 @@ export class XYCursor extends Container {
 		const plotContainer = chart.plotContainer;
 
 		this.events.on("boundschanged", () => {
-			this._disposers.push(this.setTimeout(() => {
+			if (this._boundsTimeout) {
+				this._boundsTimeout.dispose();
+			}
+			this._boundsTimeout = this.setTimeout(() => {
 				this.updateCursor();
-			}, 50))
+			}, 50);
+			this._disposers.push(this._boundsTimeout);
 		})
 
 		//this._display.interactive = true;

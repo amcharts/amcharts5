@@ -449,12 +449,12 @@ export class ExportingMenu extends Entity {
 
 			let ariaLabel = this._t("Export ");
 			if (item.label) {
-				a.innerHTML = item.label;
+				a.innerHTML = this._root._sanitizeHTML(item.label);
 				ariaLabel += " " + item.label;
 			}
 
 			if (item.sublabel) {
-				a.innerHTML += " <span class=\"am5exporting-label-alt\">" + item.sublabel + "</span>";
+				a.innerHTML += " <span class=\"am5exporting-label-alt\">" + this._root._sanitizeHTML(item.sublabel) + "</span>";
 				ariaLabel += " (" + item.sublabel + ")";
 			}
 

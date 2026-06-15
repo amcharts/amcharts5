@@ -136,7 +136,7 @@ export class StepLineSeries extends LineSeries {
 									xOpenPos0 = o.basePosX;
 									xOpenPos1 = o.basePosX;
 								}
-								else if (o.baseAxis === o.yAxis) {
+								else if (o.baseAxis === o.xAxis) {
 									xOpenPos0 = o.xAxis.getDataItemPositionX(dataItem, o.xOpenField, itemLocationX0, o.vcx);
 									xOpenPos1 = o.xAxis.getDataItemPositionX(dataItem, o.xOpenField, itemLocationX1, o.vcx);
 								}

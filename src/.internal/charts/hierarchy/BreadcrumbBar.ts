@@ -90,20 +90,19 @@ export class BreadcrumbBar extends Container {
 	public _changed() {
 		super._changed();
 		if (this.isDirty("series")) {
+			if (this._disposer) {
+				this._disposer.dispose();
+				this._disposer = undefined;
+			}
+
 			const series = this.get("series");
-			const previous = this._prevSettings.series;
-			if (series != previous) {
+			if (series) {
 				this._disposer = series.events.on("dataitemselected", (event) => {
 					this._handleDataItem(event.dataItem)
 				})
-			}
-			else if (previous) {
-				if (this._disposer) {
-					this._disposer.dispose();
-				}
-			}
 
-			this._handleDataItem(series.get("selectedDataItem"));
+				this._handleDataItem(series.get("selectedDataItem"));
+			}
 		}
 	}
 

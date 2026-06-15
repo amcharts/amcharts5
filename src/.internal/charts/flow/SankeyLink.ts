@@ -3,6 +3,7 @@ import type { FlowNode } from "./FlowNode";
 import type { Sankey, ISankeyDataItem } from "./Sankey";
 import type { ISankeyNodesDataItem } from "./SankeyNodes";
 import type { IOrientationPoint } from "../../core/util/IPoint";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import { FlowLink, IFlowLinkPrivate, IFlowLinkSettings } from "./FlowLink";
 import type { IPoint } from "../../core/util/IPoint";
@@ -62,26 +63,37 @@ export class SankeyLink extends FlowLink {
 	protected _svgPath: SVGPathElement = document.createElementNS("http://www.w3.org/2000/svg", "path");
 	protected _totalLength: number = 0;
 
+	protected _sourceDp?: IDisposer;
+	protected _targetDp?: IDisposer;
+
 
 	public _beforeChanged() {
 		super._beforeChanged();
 
 		if (this.isDirty("source")) {
+			if (this._sourceDp) {
+				this._sourceDp.dispose();
+			}
 			const source = this.get("source");
 			if (source) {
 				const sourceNode = source.get("node");
-				this._disposers.push(sourceNode.events.on("positionchanged", () => {
+				this._sourceDp = sourceNode.events.on("positionchanged", () => {
 					this.markDirty();
-				}))
+				});
+				this._disposers.push(this._sourceDp);
 			}
 		}
 		if (this.isDirty("target")) {
+			if (this._targetDp) {
+				this._targetDp.dispose();
+			}
 			const target = this.get("target");
 			if (target) {
 				const targetNode = target.get("node");
-				this._disposers.push(targetNode.events.on("positionchanged", () => {
+				this._targetDp = targetNode.events.on("positionchanged", () => {
 					this.markDirty();
-				}))
+				});
+				this._disposers.push(this._targetDp);
 			}
 		}
 

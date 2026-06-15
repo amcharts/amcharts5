@@ -475,7 +475,7 @@ export class ForceDirected extends LinkedHierarchy {
 			(d3Node as any).fy = $utils.relativeToValue(y, this.innerHeight());
 		}
 		else {
-			(d3Node as any).fx = undefined;
+			(d3Node as any).fy = undefined;
 		}
 	}
 

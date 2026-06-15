@@ -30,6 +30,28 @@ function isObjectParsed(value: object): boolean {
 }
 
 
+// Detects whether a raw setting value references `@self` (the entity itself),
+// which means it must be applied after the entity is constructed.
+//
+// Only recurses into plain JSON objects/arrays (the shapes a parsed config is made of) so that
+// live instances passed programmatically (Entity, DataItem, Sprite, ...) are never walked - those
+// can hold circular references and are never `@self` strings anyway.
+function usesSelfRef(value: any): boolean {
+	if ($type.isString(value)) {
+		return value === "@self" || value.indexOf("@self.") === 0;
+
+	} else if ($type.isArray(value)) {
+		return $array.any(value, usesSelfRef);
+
+	} else if (isObject(value) && value.constructor === Object) {
+		return $array.any($object.keys(value), (key) => usesSelfRef(value[key]));
+
+	} else {
+		return false;
+	}
+}
+
+
 function lookupRef(refs: Array<IRef>, name: string): any {
 	let i = refs.length;
 
@@ -570,13 +592,52 @@ class ParserState {
 		}
 
 		const construct = (value.type ? this.getClass(value.type) : undefined);
-		const settings = (value.settings ? this.parseSettings(root, value.settings, refs) : undefined);
+
+		// Settings that reference `@self` (the entity itself) can't be resolved at construction time,
+		// so they're split off and applied after the entity is built and its deferred data is set.
+		let settingsRaw = value.settings;
+		const selfSettings: { [key: string]: any } = {};
+		let hasSelfSettings = false;
+
+		if (settingsRaw) {
+			$array.each($object.keys(settingsRaw), (key) => {
+				// `geoJSON`/`geometry` are large opaque settings (same ones `parseAsync` skips) - never
+				// scan into them.
+				if (key !== "geoJSON" && key !== "geometry" && usesSelfRef(settingsRaw[key])) {
+					selfSettings[key] = settingsRaw[key];
+					hasSelfSettings = true;
+				}
+			});
+
+			if (hasSelfSettings) {
+				settingsRaw = Object.assign({}, settingsRaw);
+				$array.each($object.keys(selfSettings), (key) => {
+					delete settingsRaw[key];
+				});
+			}
+		}
+
+		const settings = (settingsRaw ? this.parseSettings(root, settingsRaw, refs) : undefined);
 		const properties = (value.properties ? this.parseProperties(root, value.properties, refs) : undefined);
 		const children = (value.children ? this.parseChildren(root, value.children, refs) : undefined);
 		const states = (value.states ? $array.map(value.states, (value: any) => this.parseState(root, value, refs)) : undefined);
 		const adapters = (value.adapters ? $array.map(value.adapters, (value: any) => this.parseAdapter(root, value, refs)) : undefined) as any;
 
 		const index = (value.index == null ? undefined : value.index);
+
+		let allProperties = properties;
+		if (hasSelfSettings) {
+			const deferredProp = (entity: object) => {
+				this._delayed.push(() => {
+					const newRefs = refs.concat([{ "@self": entity }]);
+					$array.each($object.keys(selfSettings), (key) => {
+						const parsed = this.parseValue(root, selfSettings[key], newRefs);
+						(entity as any).set(key, parsed.isValue ? parsed.value : constructEntity(root, parsed));
+					});
+				});
+			};
+			allProperties = allProperties ? allProperties.concat([deferredProp]) : [deferredProp];
+		}
 
 		return {
 			isValue: false,
@@ -586,7 +647,7 @@ class ParserState {
 			adapters,
 			states,
 			children,
-			properties,
+			properties: allProperties,
 			index,
 			value,
 		};

@@ -3,6 +3,7 @@ import type { DataItem } from "../../core/render/Component";
 import type { IArcDiagramNodesDataItem } from "./ArcDiagramNodes";
 import type { ArcDiagram, IArcDiagramDataItem } from "./ArcDiagram";
 import type { IOrientationPoint, IPoint } from "../../core/util/IPoint";
+import type { IDisposer } from "../../core/util/Disposer";
 import * as $math from "../../core/util/Math";
 
 
@@ -45,25 +46,36 @@ export class ArcDiagramLink extends FlowLink {
 
 	declare public series: ArcDiagram | undefined;
 
+	protected _sourceDp?: IDisposer;
+	protected _targetDp?: IDisposer;
+
 	public _beforeChanged() {
 		super._beforeChanged();
 
 		if (this.isDirty("source")) {
+			if (this._sourceDp) {
+				this._sourceDp.dispose();
+			}
 			const source = this.get("source");
 			if (source) {
 				const sourceNode = source.get("node");
-				this._disposers.push(sourceNode.events.on("positionchanged", () => {
+				this._sourceDp = sourceNode.events.on("positionchanged", () => {
 					this._markDirtyKey("stroke");
-				}))
+				});
+				this._disposers.push(this._sourceDp);
 			}
 		}
 		if (this.isDirty("target")) {
+			if (this._targetDp) {
+				this._targetDp.dispose();
+			}
 			const target = this.get("target");
 			if (target) {
 				const targetNode = target.get("node");
-				this._disposers.push(targetNode.events.on("positionchanged", () => {
+				this._targetDp = targetNode.events.on("positionchanged", () => {
 					this._markDirtyKey("stroke");
-				}))
+				});
+				this._disposers.push(this._targetDp);
 			}
 		}
 

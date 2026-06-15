@@ -386,6 +386,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		this.markDirty();
 	}
 
+	public _isSynced(): boolean {
+		return this.get("syncWithAxis") != null;
+	}
+
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		this.setPrivateRaw("name", "value");
@@ -773,20 +777,35 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let selectionMin: number = this.positionToValue(this.get("start", 0));
 		let selectionMax: number = this.positionToValue(this.get("end", 1));
 
-		const gridCount = this.get("renderer").gridCount();
-		let minMaxStep: IMinMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount, true);
+		let step: number;
 
-		let stepDecimalPlaces = $utils.decimalPlaces(minMaxStep.step);
-		this.setPrivateRaw("stepDecimalPlaces", stepDecimalPlaces);
+		if (this._isSynced()) {
+			// Honor the bounds/step that _syncAxes already computed; _adjustMinMax
+			// would otherwise pick its own gridCount-driven step and silently
+			// break the sync.
+			selectionMin = this.getPrivate("selectionMinFinal", selectionMin);
+			selectionMax = this.getPrivate("selectionMaxFinal", selectionMax);
+			step = this.getPrivate("selectionStepFinal", 1);
 
-		selectionMin = $math.round(selectionMin, stepDecimalPlaces);
-		selectionMax = $math.round(selectionMax, stepDecimalPlaces);
+			const stepDecimalPlaces = $utils.decimalPlaces(step);
+			this.setPrivateRaw("stepDecimalPlaces", stepDecimalPlaces);
+		}
+		else {
+			const gridCount = this.get("renderer").gridCount();
+			let minMaxStep: IMinMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount, true);
 
-		minMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount, true);
+			let stepDecimalPlaces = $utils.decimalPlaces(minMaxStep.step);
+			this.setPrivateRaw("stepDecimalPlaces", stepDecimalPlaces);
 
-		let step = minMaxStep.step;
-		selectionMin = minMaxStep.min;
-		selectionMax = minMaxStep.max;
+			selectionMin = $math.round(selectionMin, stepDecimalPlaces);
+			selectionMax = $math.round(selectionMax, stepDecimalPlaces);
+
+			minMaxStep = this._adjustMinMax(selectionMin, selectionMax, gridCount, true);
+
+			step = minMaxStep.step;
+			selectionMin = minMaxStep.min;
+			selectionMax = minMaxStep.max;
+		}
 
 		if (this.getPrivate("selectionMin") !== selectionMin || this.getPrivate("selectionMax") !== selectionMax || this.getPrivate("step") !== step) {
 			// do not change to setPrivate, will cause SO

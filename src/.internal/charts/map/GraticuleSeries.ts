@@ -1,5 +1,6 @@
 import { MapLineSeries, IMapLineSeriesSettings, IMapLineSeriesPrivate, IMapLineSeriesDataItem } from "./MapLineSeries";
 import type { DataItem } from "../../core/render/Component";
+import type { IDisposer } from "../../core/util/Disposer";
 import { geoGraticule } from "d3-geo";
 
 export interface IGraticuleSeriesDataItem extends IMapLineSeriesDataItem {
@@ -35,6 +36,8 @@ export class GraticuleSeries extends MapLineSeries {
 
 	protected _dataItem: DataItem<this["_dataItemSettings"]> = this.makeDataItem({});
 
+	protected _geoboundsDp?: IDisposer;
+
 	protected _afterNew() {
 		super._afterNew();
 		this.dataItems.push(this._dataItem);
@@ -50,12 +53,18 @@ export class GraticuleSeries extends MapLineSeries {
 
 		if (this.isDirty("clipExtent")) {
 
+			if (this._geoboundsDp) {
+				this._geoboundsDp.dispose();
+				this._geoboundsDp = undefined;
+			}
+
 			if (this.get("clipExtent")) {
 				const chart = this.chart;
 				if (chart) {
-					chart.events.on("geoboundschanged", () => {
+					this._geoboundsDp = chart.events.on("geoboundschanged", () => {
 						this._generate();
-					})
+					});
+					this._disposers.push(this._geoboundsDp);
 				}
 				this._generate();
 			}

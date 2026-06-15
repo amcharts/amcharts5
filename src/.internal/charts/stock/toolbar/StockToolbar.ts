@@ -146,6 +146,9 @@ export class StockToolbar extends Entity {
 	 * @ignore Exclude from docs
 	 */
 	public loadDefaultCSS(): void {
+		if (this._cssDisposer) {
+			this._cssDisposer.dispose();
+		}
 		const disposer = StockToolbarCSS($utils.getShadowRoot(this._root.dom), this._root);
 		this._disposers.push(disposer);
 		this._cssDisposer = disposer;

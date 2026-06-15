@@ -235,7 +235,7 @@ export class MapPointSeries extends MapSeries {
 				if (geometry.type == "Point") {
 					this._setBulletParent(this._makeBullet(dataItem, bulletFunction));
 				}
-				else if (geometry.type = "MultiPoint") {
+				else if (geometry.type == "MultiPoint") {
 					let i = 0;
 					$array.each(geometry.coordinates, () => {
 						this._setBulletParent(this._makeBullet(dataItem, bulletFunction, i));

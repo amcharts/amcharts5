@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.19.0] - 2026-06-15
+
+### Added
+- JSON config parser now supports a `@self` reference in settings, pointing to the entity being configured. This makes it possible to reference an entity from within its own settings, e.g. `"selectedDataItem": "@self.dataItems.0"` on a `Hierarchy` series. Such settings are applied after the entity (and its data) are ready.
+- `MapChart` now supports a `projectionName` setting — a string-friendly alternative to `projection` (e.g. `"geoOrthographic"`), primarily for JSON config. The bundled projections are registered automatically when parsing JSON. In code, the `am5map` projection factories (e.g. `am5map.geoOrthographic()`) tag their output with the projection name, so charts that set `projection` directly still serialize back to a matching `projectionName`. Additional projections can be registered with `am5map.registerProjection()`. The bundled projections are no longer eagerly pulled in, so they can be tree-shaken when unused.
+
+### Changed
+- Dynamically-set HTML content (e.g. `html`/`labelHTML` settings, HTML tooltips, modal content, export menu labels) is now sanitized to strip potentially malicious code. Can be disabled via the `sanitizeHTML: false` setting on `Root`.
+- CSV and XLSX data exports now guard against spreadsheet formula injection ("CSV injection"): string cells starting with `=`, `+`, `-`, `@`, tab, or carriage return are prefixed with a single quote so they are imported as plain text. Can be disabled via the `escapeFormulas: false` export option.
+
+### Fixed
+- `ValueAxis` with `syncWithAxis` set could end up with grid lines not aligned with the source axis (depending on data range and `maxPrecision`), and the zoom-out button could remain visible after the chart was fully zoomed out.
+- `ChartSerializer` would error out on a legend with non-Entity items in its data.
+- Changing padding of Container was not causing it to be redrawn.
+- Adding a new series to a `PieChart` at runtime was not resizing already-rendered series until the next chart resize.
+- `MapPointSeries` was not rendering bullets for `MultiPoint` geometries due to an assignment used in place of a comparison.
+- `CommodityChannelIndex` indicator was computing typical price as `(high + low + close) / 2` instead of `/ 3`, producing inflated values.
+- `ForceDirected` was clearing a node's fixed `x` position instead of its fixed `y` when the `y` coordinate was unset, leaving the node pinned vertically.
+- `Legend` was erroring out when sorting its items if its `children` contained extra elements without a data item (e.g. a manually added `Button`).
+- `DateAxis` with `groupData: true` leaked grouped data items (and their bullets) on every regroup — most noticeable with frequent real-time data updates — because the previous grouped data sets were dropped without being disposed.
+- Misc changes to alleviate potential for XSS via user-supplied content.
+
+
 ## [5.18.0] - 2026-06-04
 
 ### Added

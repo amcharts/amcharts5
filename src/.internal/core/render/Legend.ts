@@ -383,8 +383,8 @@ export class Legend extends Series {
 
 			// Sort children
 			this.children.values.sort((a, b) => {
-				const targetA = a.dataItem!.dataContext;
-				const targetB = b.dataItem!.dataContext;
+				const targetA = a.dataItem ? a.dataItem.dataContext : undefined;
+				const targetB = b.dataItem ? b.dataItem.dataContext : undefined;
 				if (targetA && targetB) {
 					const indexA = this.data.indexOf(targetA);
 					const indexB = this.data.indexOf(targetB);

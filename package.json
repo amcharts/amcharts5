@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.18.0",
+  "version": "5.19.0",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "description": "amCharts 5",
   "homepage": "https://www.amcharts.com/",
@@ -20,7 +20,7 @@
     "charts",
     "typescript"
   ],
-  "sideEffects": false,
+  "sideEffects": ["**/MapChartProjections.{ts,js}"],
   "scripts": {
     "build": "node build/build.js -- build",
     "build:fonts": "node build/build.js -- build:fonts",

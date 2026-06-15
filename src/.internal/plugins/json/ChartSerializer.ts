@@ -33,16 +33,6 @@ export interface IChartSerializerSettings extends ISerializerSettings {
 	 */
 	removeEmptyObjects?: boolean;
 
-	/**
-	 * Include projection settings in the output.
-	 *
-	 * If enabled, the projection function will be included in the output,
-	 * according to the `functionsAs` setting.
-	 *
-	 * @default false
-	 */
-	includeProjection?: boolean;
-
 }
 
 export interface IChartSerializerPrivate extends ISerializerPrivate {
@@ -283,7 +273,7 @@ export class ChartSerializer extends Serializer {
 							const series = item.component;
 							childItem.properties.data[index] = "#" + this._getInternalRef(series.uid) + ".dataItems." + index;
 						}
-						else if ((item as Entity).isType<Series>("Series")) {
+						else if (item instanceof Entity && item.isType<Series>("Series")) {
 							childItem.properties.data[index] = "#" + this._getInternalRef(item.uid);
 						}
 						else {
@@ -677,17 +667,15 @@ export class ChartSerializer extends Serializer {
 
 		// Handle projection setting
 		const projection = source.get("projection")
-		if (projection && this.get("includeProjection", false)) {
-			// @TODO: use references for functions instead
-			//result.settings.projection = "#" + this._saveFunction(projection);
-			const asString = this.get("functionsAs", "string") == "string";
-			if (asString) {
-				result.settings.projection = projection.toString();
-			}
-			else {
-				result.settings.projection = projection;
-			}
+
+		// If the projection carries a registered name (e.g. set via
+		// `am5map.geoMercator()`) and no explicit `projectionName` was set,
+		// emit `projectionName` so the chart round-trips even when built in code.
+		if (projection && !source.get("projectionName") && (projection as any).__projectionName) {
+			this._maybeInit(result, "settings", {});
+			result.settings.projectionName = (projection as any).__projectionName;
 		}
+
 	}
 
 	private _processGantt(source: Gantt, result: any) {
@@ -720,7 +708,7 @@ export class ChartSerializer extends Serializer {
 		const selectedDataItem = source.get("selectedDataItem");
 		if (selectedDataItem) {
 			const index = source.dataItems.indexOf(selectedDataItem);
-			result.settings.selectedDataItem = "@series.dataItems." + index;
+			result.settings.selectedDataItem = "@self.dataItems." + index;
 		}
 	}
 

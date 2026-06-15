@@ -310,6 +310,18 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 			})
 
+			// Dispose previously grouped data items (and their bullets) before
+			// rebuilding the data sets, otherwise they (and their bullets) are
+			// orphaned on every regroup and leak. The main data set is owned by
+			// the series and must not be disposed here.
+			$object.each(series._dataSets, (_id, dataSet) => {
+				if (dataSet != series._mainDataItems) {
+					$array.each(dataSet, (dataItem) => {
+						dataItem.dispose();
+					})
+				}
+			})
+
 			series._dataSets = {};
 
 			const key = this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!;
@@ -474,8 +486,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 			})
 
-			if (series._dataSetId) {
+			if (series._dataSetId && series._dataSets[series._dataSetId]) {
 				series.setDataSet(series._dataSetId);
+			}
+			else {
+				// The previously active grouped interval may no longer exist in the
+				// rebuilt data sets (e.g. groupIntervals changed, or data shrank);
+				// fall back to the main set so _dataItems never points at disposed items.
+				series.setDataSet(mainDataSetId);
 			}
 			this.markDirtySize();
 			// solves problem if new series was added

@@ -118,7 +118,7 @@ export class MapPolygonSeries extends MapSeries {
 		let geometry = dataItem.get("geometry")!;
 
 		if (geometry) {
-			if (this.get("reverseGeodata")) {
+			if (this.get("reverseGeodata") && !(geometry as any)._reversed) {
 				const coordinates = geometry.coordinates;
 				if (coordinates) {
 					for (let x = 0; x < geometry.coordinates.length; x++) {
@@ -131,6 +131,7 @@ export class MapPolygonSeries extends MapSeries {
 							geometry.coordinates[x].reverse()
 						}
 					}
+					(geometry as any)._reversed = true;
 				}
 			}
 			mapPolygon.set("geometry", geometry);

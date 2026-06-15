@@ -83,6 +83,13 @@ export class PieChart extends PercentChart {
 		this.seriesContainer.setAll({ x: p50, y: p50 });
 	}
 
+	protected _processSeries(series: this["_seriesType"]) {
+		super._processSeries(series);
+		this.series.each((s) => {
+			s._markDirtyKey("innerRadius");
+		});
+	}
+
 	public _prepareChildren() {
 		super._prepareChildren();
 
