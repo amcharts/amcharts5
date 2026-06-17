@@ -650,10 +650,7 @@ const classes: IClasses = {
 	"LinkedHierarchyNode": () => import(/* webpackChunkName: "json_hierarchy" */ "./../../../hierarchy").then((m) => m.LinkedHierarchyNode),
 	"MACD": () => import(/* webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MACD),
 	"MACross": () => import(/* webpackChunkName: "json_stock" */ "./../../../stock").then((m) => m.MACross),
-	"MapChart": () => Promise.all([
-		import(/* webpackChunkName: "json_map" */ "./../../../map"),
-		import(/* webpackChunkName: "json_map" */ "./../../../.internal/charts/map/MapChartProjections")
-	]).then(([m]) => m.MapChart),
+	"MapChart": () => import(/* webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapChart),
 	"MapLine": () => import(/* webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapLine),
 	"MapLineSeries": () => import(/* webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapLineSeries),
 	"MapPointSeries": () => import(/* webpackChunkName: "json_map" */ "./../../../map").then((m) => m.MapPointSeries),

@@ -627,11 +627,37 @@ export class ChartSerializer extends Serializer {
 		source.series.each((series: any, _index: number) => {
 			const seriesId = this._getInternalRef(series.uid);
 			const serializedSeries = this._lists.series[seriesId];
-			let serializedData = this._getRef("data", serializedSeries.properties.data.substr(1))
+			let serializedData = this._getRef("data", serializedSeries.properties.data.substr(1));
 			$array.keepIf(serializedData, (item: any) => !item.madeFromGeoData);
-			$array.map(serializedData, (item: any) => {
-				if (item.geometry) {
-					//delete item.geometry;
+
+			// Collect ids present in the series' `geoJSON`, so we can strip the
+			// geometry off the user data that duplicates a GeoJSON feature.
+			const idField = series.get("idField", "id");
+			const geoJSON = series.get("geoJSON");
+			const geoJSONIds: { [index: string]: boolean } = {};
+			if (geoJSON) {
+				let features: any[] = [];
+				if (geoJSON.type == "FeatureCollection") {
+					features = geoJSON.features;
+				}
+				else if (geoJSON.type == "Feature") {
+					features = [geoJSON];
+				}
+				$array.each(features, (feature: any) => {
+					const id = feature[idField];
+					if (id != null) {
+						geoJSONIds[id] = true;
+					}
+				});
+			}
+
+			$array.each(serializedData, (item: any) => {
+				const id = item[idField];
+				// If the same id exists in `geoJSON`, the geometry will be
+				// re-populated from there, so we don't need to serialize it.
+				if (id != null && geoJSONIds[id]) {
+					delete item.geometry;
+					delete item.geometryType;
 				}
 			});
 			if (serializedData.length === 0) {

@@ -75,21 +75,19 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * Name of a projection to use, e.g. `"geoMercator"`, `"geoOrthographic"`.
 	 *
-	 * This is a string-friendly alternative to `projection`, mainly intended for
-	 * JSON config. If set, the chart looks the name up in `projectionRegistry`
-	 * and assigns the resulting projection to the `projection` setting.
+	 * A string-friendly alternative to `projection`: when set, the chart looks the
+	 * name up in `projectionRegistry` and assigns the resulting projection to the
+	 * `projection` setting. Handy for JSON config, where a function can't be used.
 	 *
 	 * The bundled projections — `"geoMercator"`, `"geoOrthographic"`,
 	 * `"geoEquirectangular"`, `"geoAlbersUsa"`, `"geoEqualEarth"`,
-	 * `"geoNaturalEarth1"` — are registered automatically when building charts
-	 * from JSON config.
+	 * `"geoNaturalEarth1"` — are registered automatically when `am5map` is loaded,
+	 * so these names resolve out of the box.
 	 *
-	 * In code you do not need this setting: set `projection` directly with the
-	 * am5map factory, e.g. `projection: am5map.geoOrthographic()`. Those factories
-	 * tag their projection with its name, so `ChartSerializer` can still emit the
-	 * matching `projectionName` on output — the chart round-trips either way.
-	 * (The registry itself stays empty in code-only setups so unused projections
-	 * can be tree-shaken.)
+	 * In code you can also just set `projection` directly, e.g.
+	 * `projection: am5map.geoOrthographic()`. The `am5map` projection factories tag
+	 * their output with the projection name, so `ChartSerializer` emits the matching
+	 * `projectionName` either way — the chart round-trips through serialization.
 	 *
 	 * To use a projection that isn't bundled, register it once before creating
 	 * the chart:
