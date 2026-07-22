@@ -228,6 +228,28 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._baseDuration = $time.getIntervalDuration(interval);
 	}
 
+	public _prepareChildren() {
+		// `startLocation`/`endLocation` shift the axis min/max via `_fixMin`/`_fixMax`
+		// (computed in `_getMinMax`), so re-run the extremes when they change. Set the
+		// flag directly rather than calling `markDirtyExtremes()` — that also calls
+		// `markDirty()`, which would re-enter `_prepareChildren` while these settings
+		// are still dirty and recurse. `super._prepareChildren()` reads the flag this
+		// same cycle via its `_dirtyExtremes` gate.
+		if (this.isDirty("startLocation") || this.isDirty("endLocation")) {
+			this._dirtyExtremes = true;
+		}
+
+		// These affect label text / minor grid, which are rebuilt in
+		// `_prepareAxisItems` (gated by `_sizeDirty` among others). Set the flag
+		// directly rather than calling `markDirtySize()` to avoid re-entering
+		// `_prepareChildren` while the settings are still dirty.
+		if (this.isDirty("markUnitChange") || this.isDirty("skipFirstMinor") || this.isDirty("weekLabelLocation")) {
+			this._sizeDirty = true;
+		}
+
+		super._prepareChildren();
+	}
+
 	protected _fixZoomFactor() {
 		const maxZoomFactor = this.get("maxZoomFactor");
 		if (maxZoomFactor != null && maxZoomFactor != Infinity) {
@@ -900,16 +922,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 						const minorLabel = minorDataItem.get("label");
 
-						if (minorLabel) {
-							if (minorLabelsEnabled) {
-								minorLabel.set("text", root.dateFormatter.format(date, format!));
-							}
-							else {
-								minorLabel.setPrivate("visible", false);
-							}
+						if (minorLabel && minorLabelsEnabled) {
+							minorLabel.set("text", root.dateFormatter.format(date, format!));
 						}
 
 						this._prepareDataItem(minorDataItem, 1);
+
+						// Hide the minor label after `_prepareDataItem`: it calls
+						// `toggleVisibility`, which would otherwise re-show the label.
+						if (minorLabel && !minorLabelsEnabled) {
+							minorLabel.setPrivate("visible", false);
+						}
 
 						if (minorValue == previousMinorValue) {
 							break;

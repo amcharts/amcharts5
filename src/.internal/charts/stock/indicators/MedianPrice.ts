@@ -36,7 +36,10 @@ export class MedianPrice extends ChartIndicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),

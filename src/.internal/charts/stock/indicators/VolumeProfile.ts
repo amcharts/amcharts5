@@ -10,6 +10,7 @@ import { ColumnSeries } from "../../xy/series/ColumnSeries";
 import { percent } from "../../../core/util/Percent";
 
 import * as $type from "../../../core/util/Type";
+import * as $array from "../../../core/util/Array";
 
 export interface IVolumeProfileSettings extends IIndicatorSettings {
 	/**
@@ -92,18 +93,23 @@ export class VolumeProfile extends Indicator {
 		name: this.root.language.translateAny("Count"),
 		type: "dropdown",
 		options: [
-			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24, extTargetMinValue: 1 },
+			{ value: "rows", text: this.root.language.translateAny("number of rows"), extTarget: "count", extTargetValue: 24, extTargetMinValue: 10, extTargetMaxValue: 500, extTargetStep: 1 },
 			{ value: "ticks", text: this.root.language.translateAny("ticks per row"), extTarget: "count", extTargetValue: 1000, extTargetMinValue: 200 }
 		]
 	}, {
 		key: "count",
 		name: this.root.language.translateAny("Count"),
 		type: "number",
-		minValue: 1
+		minValue: 10,
+		maxValue: 500,
+		step: 1
 	}, {
 		key: "valueArea",
 		name: this.root.language.translateAny("Value Area"),
-		type: "number"
+		type: "number",
+		minValue: 50,
+		maxValue: 95,
+		step: 1
 	}, {
 		key: "upColor",
 		name: this.root.language.translateAny("Up volume"),
@@ -115,7 +121,10 @@ export class VolumeProfile extends Indicator {
 	}, {
 		key: "axisWidth",
 		name: this.root.language.translateAny("Width %"),
-		type: "number"
+		type: "number",
+		minValue: 10,
+		maxValue: 100,
+		step: 1
 	}];
 
 	public xAxis!: ValueAxis<AxisRendererX>;
@@ -123,6 +132,73 @@ export class VolumeProfile extends Indicator {
 	public upSeries!: ColumnSeries;
 
 	protected _previousColumn?: Graphics;
+
+	/**
+	 * Keeps the `count` setting's limits in sync with the current `countType`:
+	 * rows mode is a fixed 10..500 (step 1); ticks mode uses an axis-dependent
+	 * range derived from the y-axis step (so it scales with the instrument), with
+	 * an upper cap that keeps the row count sane. Also mirrors those bounds onto
+	 * the `countType` dropdown's "ticks" option. Looks entries up by key rather
+	 * than by array index.
+	 */
+	protected _updateCountBounds(): void {
+		let ticksOption: any;
+		let countSetting: IIndicatorEditableSetting | undefined;
+		$array.each(this._editableSettings, (setting) => {
+			if (setting.key == "countType" && setting.options) {
+				$array.each(setting.options as Array<any>, (option) => {
+					if (option && option.value == "ticks") {
+						ticksOption = option;
+					}
+				});
+			}
+			else if (setting.key == "count" && setting.type == "number") {
+				countSetting = setting;
+			}
+		});
+
+		// Dynamic ticks range from the y-axis step. Left undefined until the axis
+		// step is known, so we never clamp a ticks value against a fixed fallback
+		// (which would corrupt a legitimately small tick size on a low-priced
+		// instrument). `_updateCountBounds` is re-run with a re-clamp once the step
+		// arrives (see the onPrivate("step") handler).
+		let ticksDefault = 1000;
+		let ticksMin: number | undefined = undefined;
+		let ticksMax: number | undefined = undefined;
+		const stockSeries = this.get("stockSeries");
+		const yAxis = stockSeries ? stockSeries.get("yAxis") as any : undefined;
+		const step = yAxis ? yAxis.getPrivate("step") : undefined;
+		if (step !== undefined) {
+			const val = step * 50;
+			ticksDefault = val;
+			ticksMin = val * 0.2;
+			ticksMax = val * 100;
+		}
+
+		if (ticksOption) {
+			ticksOption.extTargetValue = ticksDefault;
+			ticksOption.extTargetMinValue = ticksMin;
+			ticksOption.extTargetMaxValue = ticksMax;
+		}
+
+		if (countSetting) {
+			if (this.get("countType") == "ticks") {
+				countSetting.minValue = ticksMin;
+				countSetting.maxValue = ticksMax;
+				countSetting.step = undefined;
+			}
+			else {
+				countSetting.minValue = 10;
+				countSetting.maxValue = 500;
+				countSetting.step = 1;
+			}
+		}
+	}
+
+	public _clampSettings(force: boolean = false): void {
+		this._updateCountBounds();
+		super._clampSettings(force);
+	}
 
 	protected _afterNew() {
 		super._afterNew();
@@ -136,16 +212,15 @@ export class VolumeProfile extends Indicator {
 			if (chart) {
 				const yAxis = stockSeries.get("yAxis") as any;
 
-				const step = yAxis.getPrivate("step");
-				if (step !== undefined) {
-					const val = yAxis.getPrivate("step") * 50;
-					(this._editableSettings as any)[0].options[1].extTargetValue = val;
-					(this._editableSettings as any)[0].options[1].extTargetMinValue = val * 0.2;
-				}
-				yAxis.onPrivate("step", (step: number) => {
-					const val = step * 50;
-					(this._editableSettings as any)[0].options[1].extTargetValue = val;
-					(this._editableSettings as any)[0].options[1].extTargetMinValue = val * 0.2;
+				this._updateCountBounds();
+				yAxis.onPrivate("step", () => {
+					// Bounds are now known: re-clamp count into range and, if that
+					// actually changed it, recompute so heavy build never runs stale.
+					const before = this.get("count");
+					this._clampSettings(true);
+					if (this.get("count") !== before) {
+						this.markDataDirty();
+					}
 				});
 
 				const panelXAxis = stockSeries.get("xAxis") as DateAxis<AxisRendererX>;
@@ -277,15 +352,7 @@ export class VolumeProfile extends Indicator {
 			}
 
 			if (this.isDirty("countType")) {
-				const countType = this.get("countType");
-				if (countType == "ticks") {
-					const stockSeries = this.get("stockSeries");
-					const yAxis = stockSeries.get("yAxis") as any;
-					this._editableSettings[1].minValue = yAxis.getPrivate("step") * 50 * 0.2;
-				}
-				else {
-					this._editableSettings[1].minValue = 1;
-				}
+				this._updateCountBounds();
 			}
 
 			if (this.isDirty("upColor")) {
@@ -344,12 +411,14 @@ export class VolumeProfile extends Indicator {
 				if (dataItem) {
 					const close = dataItem.get("valueY");
 					if ($type.isNumber(close)) {
-						if (close < min) {
-							min = close;
+						const low = dataItem.get("lowValueY", close);
+						const high = dataItem.get("highValueY", close);
+						if (low < min) {
+							min = low;
 						}
 
-						if (close > max) {
-							max = close;
+						if (high > max) {
+							max = high;
 						}
 					}
 				}
@@ -369,6 +438,17 @@ export class VolumeProfile extends Indicator {
 					rows = count;
 				}
 
+				// Hard safety cap: a pathological count (e.g. a deserialized ticks
+				// config restored before the axis step is known) could otherwise
+				// build a runaway number of rows and freeze the thread. Rebase the
+				// step so binning still spans the range. Normal rows-mode (<=500)
+				// and sane ticks values stay well under this.
+				rows = Math.max(1, Math.ceil(rows));
+				if (rows > 2000) {
+					rows = 2000;
+					step = (max - min) / rows;
+				}
+
 				const rowDataDown: Array<number> = [];
 				const rowDataUp: Array<number> = [];
 
@@ -377,7 +457,6 @@ export class VolumeProfile extends Indicator {
 					rowDataUp[i] = 0;
 				}
 
-				let previousDataItem;
 				for (let i = startIndex; i < endIndex; i++) {
 					const dataItem = stockSeries.dataItems[i];
 					const volumeDataItem = volumeSeries.dataItems[i];
@@ -386,21 +465,46 @@ export class VolumeProfile extends Indicator {
 						const volume = volumeDataItem.get("valueY");
 
 						if ($type.isNumber(close) && $type.isNumber(volume)) {
-							let index = Math.floor((close - min) / step);
-							if (index == count) {
-								index = count - 1;
+							const barOpen = dataItem.get("openValueY", close);
+							const low = dataItem.get("lowValueY", close);
+							const high = dataItem.get("highValueY", close);
+							const bodyTop = Math.max(close, barOpen);
+							const bodyBot = Math.min(close, barOpen);
+							const green = close >= barOpen;
+							const topWick = high - bodyTop;
+							const bottomWick = bodyBot - low;
+							const body = bodyTop - bodyBot;
+							// Spread the bar volume over where it traded, split into body + two
+							// wicks with the wicks at double the body per-price density. The
+							// body is up volume on a green candle (close >= open), down
+							// otherwise; each wick is split evenly between up and down.
+							const denom = 2 * topWick + 2 * bottomWick + body;
+							if (denom <= 0) {
+								// Flat bar (high == low): drop it all in one row.
+								let index = Math.floor((close - min) / step);
+								if (!(index >= 0)) { index = 0; } // also catches NaN from a zero-width range
+								if (index >= rows) { index = rows - 1; }
+								if (green) { rowDataUp[index] += volume; } else { rowDataDown[index] += volume; }
 							}
-
-							if ($type.isNumber(index)) {
-								if (previousDataItem && previousDataItem.get("valueY", close) < close) {
-									rowDataDown[index] += volume;
-								}
-								else {
-									rowDataUp[index] += volume;
+							else {
+								const bodyVol = body * volume / denom;
+								const topVol = 2 * topWick * volume / denom;
+								const botVol = 2 * bottomWick * volume / denom;
+								let jLow = Math.floor((low - min) / step);
+								let jHigh = Math.floor((high - min) / step);
+								if (jLow < 0) { jLow = 0; }
+								if (jHigh >= rows) { jHigh = rows - 1; }
+								for (let j = jLow; j <= jHigh; j++) {
+									const rowBot = min + j * step;
+									const rowTop = rowBot + step;
+									const bodyOv = body > 0 ? bodyVol * (Math.max(0, Math.min(rowTop, bodyTop) - Math.max(rowBot, bodyBot)) / body) : 0;
+									const topOv = topWick > 0 ? topVol * (Math.max(0, Math.min(rowTop, high) - Math.max(rowBot, bodyTop)) / topWick) : 0;
+									const botOv = bottomWick > 0 ? botVol * (Math.max(0, Math.min(rowTop, bodyBot) - Math.max(rowBot, low)) / bottomWick) : 0;
+									rowDataUp[j] += (green ? bodyOv : 0) + topOv / 2 + botOv / 2;
+									rowDataDown[j] += (green ? 0 : bodyOv) + topOv / 2 + botOv / 2;
 								}
 							}
 						}
-						previousDataItem = dataItem;
 					}
 				}
 

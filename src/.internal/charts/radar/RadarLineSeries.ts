@@ -76,6 +76,17 @@ export class RadarLineSeries extends LineSeries {
 		return { x: radius * $math.cos(angle), y: radius * $math.sin(angle) };
 	}
 
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		// `connectEnds` is read in `_endLine` during the line rebuild in
+		// `_updateChildren` (gated by `_valuesDirty` among others), so force that
+		// rebuild when it changes.
+		if (this.isDirty("connectEnds")) {
+			this._valuesDirty = true;
+		}
+	}
+
 	protected _endLine(points: Array<Array<number>>, firstPoint: Array<number>) {
 		if (this.get("connectEnds") && firstPoint) {
 			points.push(firstPoint);

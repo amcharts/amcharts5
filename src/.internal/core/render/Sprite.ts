@@ -113,6 +113,12 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			}
 		},
 
+		"globalpointerdown": function (event) {
+			if (this.isEnabled("globalpointerdown")) {
+				this.dispatch("globalpointerdown", this._makePointerEvent("globalpointerdown", event));
+			}
+		},
+
 		"wheel": function (event) {
 			this.dispatchParents("wheel", {
 				type: "wheel",
@@ -1011,6 +1017,12 @@ export interface ISpriteEvents extends IEntityEvents {
 	 * element or even chart area.
 	 */
 	globalpointermove: ISpritePointerEvent;
+
+	/**
+	 * Invoked when pointer button is pressed or touch starts anywhere on the
+	 * chart surface, even outside of the element.
+	 */
+	globalpointerdown: ISpritePointerEvent;
 
 	/**
 	 * Invoked when mouse wheel is spinned while pointer is over the element.

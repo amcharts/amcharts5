@@ -30,13 +30,19 @@ export class CommodityChannelIndex extends OverboughtOversold {
 			{
 				key: "period",
 				name: this.root.language.translateAny("Period"),
-				type: "number"
+				type: "number",
+				minValue: 5,
+				maxValue: 100,
+				step: 1
 			}, {
 			key: "seriesColor",
 			name: this.root.language.translateAny("Period"),
 			type: "color"
 		}
 		)
+
+		this._setEditableSettingBounds("overBought", 50, 300, 1);
+		this._setEditableSettingBounds("overSold", -300, -50, 1);
 	}
 
 	/**

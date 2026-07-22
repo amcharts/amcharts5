@@ -58,11 +58,17 @@ export class MovingAverage extends Indicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 500,
+		step: 1
 	}, {
 		key: "offset",
 		name: this.root.language.translateAny("Offset"),
-		type: "number"
+		type: "number",
+		minValue: -50,
+		maxValue: 50,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
@@ -81,6 +87,8 @@ export class MovingAverage extends Indicator {
 
 	public _prepareChildren() {
 
+		super._prepareChildren();
+
 		if (this.isDirty("type") && this.get("type") !== undefined) {
 			this.set("maType", this.get("type"));
 			this.setRaw("type", undefined);
@@ -91,8 +99,6 @@ export class MovingAverage extends Indicator {
 			this.setCustomData("maType", this.get("maType"));
 			this.setCustomData("offset", this.get("offset", 0));
 		}
-
-		super._prepareChildren();
 	}
 
 	protected _afterNew() {

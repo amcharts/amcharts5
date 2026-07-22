@@ -63,6 +63,19 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		super._afterNew();
 	}
 
+	public _prepareChildren() {
+		// `baseUnit` drives the scale and `durationFormat` computed in
+		// `_adjustMinMax`, and the labels re-render in `_prepareAxisItems`. Set
+		// `_sizeDirty` (in both gates) so the extremes recompute AND the labels
+		// re-format — `_dirtyExtremes` alone won't re-render labels when the min/max
+		// are unchanged (e.g. second <-> minute). Set directly to avoid re-entering
+		// `_prepareChildren`.
+		if (this.isDirty("baseUnit")) {
+			this._sizeDirty = true;
+		}
+		super._prepareChildren();
+	}
+
 
 	protected _adjustMinMax(min: number, max: number, gridCount: number, strictMode?: boolean): IMinMaxStep {
 		let minMaxStep: IMinMaxStep;

@@ -986,8 +986,8 @@ export class StockChartDefaultTheme extends Theme {
 			seriesColor: color(0xab82da),
 			fastColor: color(0x1772DE),
 			field: "close",
-			period: 9,
-			fastPeriod: 21
+			period: 21,
+			fastPeriod: 9
 		})
 
 		r("ZigZag").setAll({

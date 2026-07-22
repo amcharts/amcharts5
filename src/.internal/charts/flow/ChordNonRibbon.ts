@@ -52,6 +52,15 @@ export class ChordNonRibbon extends Chord {
 		super._afterNew();
 	}
 
+	public _prepareChildren() {
+		// `linkType` is read in `_updateLink`, which the base runs in a pass gated
+		// by chord-changed/radius/nodeWidth; force it when the setting changes.
+		if (this.isDirty("linkType")) {
+			this._sizeDirty = true;
+		}
+		super._prepareChildren();
+	}
+
 	protected _makeMatrix(): number[][] {
 		const matrix: number[][] = [];
 		$array.each(this.nodes.dataItems, (sourceDataItem) => {

@@ -10,6 +10,8 @@ import { BaseColumnSeries } from "../../xy/series/BaseColumnSeries";
 import { MultiDisposer } from "../../../core/util/Disposer";
 
 import * as $array from "../../../core/util/Array";
+import * as $math from "../../../core/util/Math";
+import * as $type from "../../../core/util/Type";
 
 export interface IIndicatorEditableSetting {
 
@@ -38,6 +40,35 @@ export interface IIndicatorEditableSetting {
 	minValue?: number;
 
 	/**
+	 * Maximum numeric value allowable in this field.
+	 *
+	 * @since 5.20.0
+	 */
+	maxValue?: number;
+
+	/**
+	 * Step for the numeric input. A step of `1` also marks the setting as an
+	 * integer, so typed decimals are rounded to whole numbers.
+	 *
+	 * @since 5.20.0
+	 */
+	step?: number;
+
+	/**
+	 * Display multiplier for the settings modal only. The value shown/edited in
+	 * the UI is `stored value × scale`, and it is divided back on save. Use it
+	 * when a setting's stored unit is awkward to show — e.g. Acceleration Bands
+	 * `factor` is stored in thousandths, so `scale: 1000` displays the
+	 * conventional `1` (= single band width) instead of `0.001`.
+	 *
+	 * Does NOT affect the stored/serialized value, the API, or `minValue`/
+	 * `maxValue`/`step` — those all stay in stored units.
+	 *
+	 * @since 5.20.0
+	 */
+	scale?: number;
+
+	/**
 	 * If `type: "dropdown"`, `options` should contain a list of items it.
 	 */
 	options?: Array<string | {
@@ -45,7 +76,11 @@ export interface IIndicatorEditableSetting {
 		text: string,
 		extTarget?: string,
 		extTargetValue?: number | string,
-		extTargetMinValue?: number
+		extTargetMinValue?: number,
+		/** @since 5.20.0 */
+		extTargetMaxValue?: number,
+		/** @since 5.20.0 */
+		extTargetStep?: number
 	}>;
 
 }
@@ -139,8 +174,61 @@ export abstract class Indicator extends Container {
 	protected _sDP?: MultiDisposer;
 	protected _vDP?: MultiDisposer;
 
+	/**
+	 * Clamps numeric settings that carry `minValue`/`maxValue`/`step` limits in
+	 * `_editableSettings` back into their allowed range, so out-of-range values
+	 * (from the settings modal, deserialized configs, or the API) can never reach
+	 * the heavy `prepareData()` — which, for e.g. Volume Profile, would otherwise
+	 * freeze the page. A `step` of `1` marks an integer setting, so typed decimals
+	 * are rounded. Called with `force` on add/deserialize (nothing is "dirty"
+	 * yet); otherwise only dirty keys are checked.
+	 */
+	public _clampSettings(force: boolean = false): void {
+		$array.each(this._editableSettings, (setting) => {
+			if (setting.type != "number") {
+				return;
+			}
+			const key = setting.key as any;
+			if (!force && !this.isDirty(key)) {
+				return;
+			}
+			let value = this.get(key);
+			if (!$type.isNumber(value)) {
+				return;
+			}
+			let clamped = value;
+			if (setting.step != null && setting.step >= 1) {
+				clamped = Math.round(clamped);
+			}
+			clamped = $math.fitToRange(clamped, setting.minValue != null ? setting.minValue : -Infinity, setting.maxValue != null ? setting.maxValue : Infinity);
+			if (clamped !== value) {
+				// setRaw (not set): writes the value without marking the key dirty, so
+				// clamping here can't re-enter the dirty cycle. (The per-setting
+				// `on(key)` event still fires; that's harmless and the clamp converges.)
+				this.setRaw(key, clamped as any);
+			}
+		});
+	}
+
+	/**
+	 * Assigns numeric limits to an editable setting by key. Used for entries that
+	 * are inherited from a base indicator (e.g. overbought/oversold) whose range
+	 * differs per subclass.
+	 */
+	protected _setEditableSettingBounds(key: string, minValue?: number, maxValue?: number, step?: number): void {
+		$array.each(this._editableSettings, (setting) => {
+			if (setting.type == "number" && setting.key == key) {
+				setting.minValue = minValue;
+				setting.maxValue = maxValue;
+				setting.step = step;
+			}
+		});
+	}
+
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		this._clampSettings();
 
 		if (this.isDirty("stockSeries") || this.isDirty("volumeSeries")) {
 			this.markDataDirty();

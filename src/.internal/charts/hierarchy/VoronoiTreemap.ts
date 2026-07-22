@@ -180,18 +180,30 @@ export class VoronoiTreemap extends Hierarchy {
 		this.voronoi.maxIterationCount((this.get("maxIterationCount", 100)));
 		this.voronoi.minWeightRatio((this.get("minWeightRatio", 0.005)));
 
-		if (this.isDirty("shapeType")) {
-			if (this.get("shapeType") == "polygon") {
-				this.voronoi.clip(this.getCirclePolygon(1));
-				this._updateVisuals();
-			}
-		}
-
-		if (this._sizeDirty) {
+		// Re-clip and re-tessellate on the relevant setting changes. Full
+		// re-tessellation is expensive, so avoid it where it isn't needed:
+		//  - "rectangle": the clip depends on the actual size, so recompute on a
+		//    shape change AND on resize.
+		//  - "polygon": uses a size-independent unit clip (scaled per node in
+		//    `_updateNode`), so it only needs a re-tessellation when the shape or
+		//    `cornerCount` changes — NOT on resize. Resizing just rescales the
+		//    existing cells (handled by the base `_updateVisuals` on `_sizeDirty`),
+		//    which is cheap; re-tessellating there would spike CPU with lots of
+		//    data (e.g. when a legend reflows the plot area).
+		if (node) {
 			if (this.get("shapeType") == "rectangle") {
-				this.voronoi.prng(seedrandom("X"));
-				this.voronoi.clip([[-width, -height], [-width, height], [width, height], [width, -height]])(node);
-				this._updateVisuals();
+				if (this.isDirty("shapeType") || this._sizeDirty) {
+					this.voronoi.prng(seedrandom("X"));
+					this.voronoi.clip([[-width, -height], [-width, height], [width, height], [width, -height]])(node);
+					this._updateVisuals();
+				}
+			}
+			else {
+				if (this.isDirty("shapeType") || this.isDirty("cornerCount")) {
+					this.voronoi.prng(seedrandom("X"));
+					this.voronoi.clip(this.getCirclePolygon(1))(node);
+					this._updateVisuals();
+				}
 			}
 		}
 

@@ -67,7 +67,10 @@ export class MovingAverageEnvelope extends MovingAverage {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 500,
+		step: 1
 	}, {
 		key: "maType",
 		name: this.root.language.translateAny("Type"),
@@ -82,15 +85,26 @@ export class MovingAverageEnvelope extends MovingAverage {
 		key: "shiftType",
 		name: this.root.language.translateAny("Shift type"),
 		type: "dropdown",
-		options: ["percent", "points"]
+		// No extTargetValue: switching mode keeps the user's shift value and just
+		// re-clamps it into the new mode's range (see _updateShiftBounds).
+		options: [
+			{ value: "percent", text: this.root.language.translateAny("percent"), extTarget: "shift", extTargetMinValue: 0.1, extTargetMaxValue: 20, extTargetStep: 0.1 },
+			{ value: "points", text: this.root.language.translateAny("points"), extTarget: "shift", extTargetMinValue: 1, extTargetMaxValue: 5000, extTargetStep: 1 }
+		]
 	}, {
 		key: "shift",
 		name: this.root.language.translateAny("Shift"),
-		type: "number"
+		type: "number",
+		minValue: 0.1,
+		maxValue: 20,
+		step: 0.1
 	}, {
 		key: "offset",
 		name: this.root.language.translateAny("Offset"),
-		type: "number"
+		type: "number",
+		minValue: -50,
+		maxValue: 50,
+		step: 1
 	}, {
 		key: "upperColor",
 		name: this.root.language.translateAny("Top"),
@@ -104,6 +118,36 @@ export class MovingAverageEnvelope extends MovingAverage {
 		name: this.root.language.translateAny("Bottom"),
 		type: "color"
 	}];
+
+	/**
+	 * Keeps the `shift` setting's limits in sync with `shiftType`: percent mode is
+	 * 0.1..20 (%) with a 0.1 step; points mode is 1..5000 with a step of 1.
+	 */
+	protected _updateShiftBounds(): void {
+		let shiftSetting: IIndicatorEditableSetting | undefined;
+		$array.each(this._editableSettings, (setting) => {
+			if (setting.key == "shift" && setting.type == "number") {
+				shiftSetting = setting;
+			}
+		});
+		if (shiftSetting) {
+			if (this.get("shiftType") == "points") {
+				shiftSetting.minValue = 1;
+				shiftSetting.maxValue = 5000;
+				shiftSetting.step = 1;
+			}
+			else {
+				shiftSetting.minValue = 0.1;
+				shiftSetting.maxValue = 20;
+				shiftSetting.step = 0.1;
+			}
+		}
+	}
+
+	public _clampSettings(force: boolean = false): void {
+		this._updateShiftBounds();
+		super._clampSettings(force);
+	}
 
 	protected _afterNew() {
 
@@ -170,12 +214,12 @@ export class MovingAverageEnvelope extends MovingAverage {
 	}
 
 	public _prepareChildren() {
+		super._prepareChildren();
 		if (this.isDirty("shiftType") || this.isDirty("shift")) {
 			this.markDataDirty();
 			this.setCustomData("shift", this.get("shift"));
 			this.setCustomData("shiftType", this.get("shiftType"));
 		}
-		super._prepareChildren();
 	}
 
 	/**

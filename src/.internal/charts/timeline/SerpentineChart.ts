@@ -79,7 +79,7 @@ export class SerpentineChart extends CurveChart {
 	public _prepareChildren(): void {
 		super._prepareChildren();
 
-		if (this.isDirty("levelCount") || this.isDirty("orientation")) {
+		if (this.isDirty("levelCount") || this.isDirty("orientation") || this.isDirty("yAxisRadius") || this.isDirty("startLocation") || this.isDirty("endLocation")) {
 			this._updateMasks();
 		}
 	}

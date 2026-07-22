@@ -90,8 +90,16 @@ export class GrainPattern extends Pattern {
 
 	public _beforeChanged() {
 		//document.body.appendChild(this.canvas); // temp
-		this.canvas.width = this.get("width", 200);
-		this.canvas.height = this.get("height", 200);
+		// Assigning canvas.width/height clears and reallocates the backing store,
+		// so only do it when the dimensions actually change.
+		const width = this.get("width", 200);
+		const height = this.get("height", 200);
+		if (this.canvas.width !== width) {
+			this.canvas.width = width;
+		}
+		if (this.canvas.height !== height) {
+			this.canvas.height = height;
+		}
 
 		if (this.isDirty("size") || this.isDirty("density") || this.isDirty("minOpacity") || this.isDirty("maxOpacity") || this.isDirty("colors") || this.isDirty("horizontalGap") || this.isDirty("verticalGap")) {
 			this._clearGrain = true;
@@ -107,7 +115,9 @@ export class GrainPattern extends Pattern {
 			const width = this.get("width", 200);
 			const height = this.get("height", 200);
 
-			const patternData = this.context.getImageData(0, 0, width, height);
+			// The canvas was just cleared, so allocate a fresh zeroed buffer
+			// instead of reading the (blank) canvas back with getImageData.
+			const patternData = this.context.createImageData(width, height);
 
 			const size = Math.max(1, this.get("size", 1));
 			const minOpacity = this.get("minOpacity", 0);
@@ -121,27 +131,52 @@ export class GrainPattern extends Pattern {
 			const horizontalGap = this.get("horizontalGap", 0) + 1;
 			const verticalGap = this.get("verticalGap", 0) + 1;
 
-			for (let r = 0; r < rows; r++) {
+			const colorCount = colors.length;
+			const opacityRange = maxOpacity - minOpacity;
 
-				if (verticalGap > 0) {
-					if (r / verticalGap != Math.round(r / verticalGap)) {
-						continue;
-					}
+			// Precompute each palette color's channels once, so the hot loop reads
+			// plain numbers instead of the Color r/g/b getters (one getter call per
+			// channel per painted pixel otherwise).
+			const rCh = new Array(colorCount);
+			const gCh = new Array(colorCount);
+			const bCh = new Array(colorCount);
+			for (let i = 0; i < colorCount; i++) {
+				rCh[i] = colors[i].r;
+				gCh[i] = colors[i].g;
+				bCh[i] = colors[i].b;
+			}
+
+			// Write packed 32-bit RGBA pixels through a Uint32Array view instead of
+			// four clamped Uint8ClampedArray byte writes per pixel.
+			const buf32 = new Uint32Array(patternData.data.buffer);
+			const alwaysDraw = density >= 1;
+			const hGap = horizontalGap > 1 ? horizontalGap : 0;
+			const vGap = verticalGap > 1 ? verticalGap : 0;
+
+			for (let r = 0; r < rows; r++) {
+				if (vGap && r % vGap !== 0) {
+					continue;
 				}
 
 				for (let c = 0; c < cols; c++) {
-					const color = colors[Math.floor(Math.random() * colors.length)];
-					const alpha = (minOpacity + Math.random() * (maxOpacity - minOpacity)) * 255;
-					const rnd = Math.random();
-
-					if (horizontalGap > 0) {
-						if (c / horizontalGap != Math.round(c / horizontalGap)) {
-							continue;
-						}
+					if (hGap && c % hGap !== 0) {
+						continue;
 					}
 
-					if (rnd < density) {
-						this._setRectData(c, r, size, width, patternData.data, color.r, color.g, color.b, alpha);
+					// Draw only `density` fraction of cells; compute the random
+					// color/alpha only for the cells we actually paint.
+					if (alwaysDraw || Math.random() < density) {
+						const ci = colorCount > 1 ? (Math.random() * colorCount) | 0 : 0;
+						const alpha = ((minOpacity + Math.random() * opacityRange) * 255) | 0;
+						// Little-endian RGBA.
+						const packed = (rCh[ci] | (gCh[ci] << 8) | (bCh[ci] << 16) | (alpha << 24)) >>> 0;
+
+						if (size === 1) {
+							buf32[r * width + c] = packed;
+						}
+						else {
+							this._setRectData(c, r, size, width, buf32, packed);
+						}
 					}
 				}
 			}
@@ -157,15 +192,18 @@ export class GrainPattern extends Pattern {
 		return false;
 	}
 
-	protected _setRectData(col: number, row: number, size: number, width: number, data: Uint8ClampedArray, rc: number, gc: number, bc: number, ac: number) {
-		for (var c = col * size; c < col * size + size; c++) {
-			for (var r = row * size; r < row * size + size; r++) {
-				var i = (r * width + c) * 4;
+	protected _setRectData(col: number, row: number, size: number, width: number, buf32: Uint32Array, packed: number) {
+		const x0 = col * size;
+		const y0 = row * size;
+		const x1 = x0 + size;
+		const y1 = y0 + size;
 
-				data[i] = rc;
-				data[i + 1] = gc;
-				data[i + 2] = bc;
-				data[i + 3] = ac;
+		for (var y = y0; y < y1; y++) {
+			// Write each row as a contiguous run for cache-friendly access.
+			let i = y * width + x0;
+			for (var x = x0; x < x1; x++) {
+				buf32[i] = packed;
+				i++;
 			}
 		}
 	}

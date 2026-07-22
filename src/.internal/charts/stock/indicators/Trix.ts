@@ -52,7 +52,10 @@ export class Trix extends ChartIndicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
@@ -60,7 +63,10 @@ export class Trix extends ChartIndicator {
 	}, {
 		key: "signalPeriod",
 		name: this.root.language.translateAny("Signal period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 40,
+		step: 1
 	}, {
 		key: "signalColor",
 		name: this.root.language.translateAny("Signal color"),
@@ -104,11 +110,11 @@ export class Trix extends ChartIndicator {
 
 
 	public _prepareChildren() {
+		super._prepareChildren();
 		if (this.isDirty("signalPeriod")) {
 			this.markDataDirty();
 			this.setCustomData("signalPeriod", this.get("signalPeriod"));
 		}
-		super._prepareChildren();
 	}
 
 	public _updateChildren() {

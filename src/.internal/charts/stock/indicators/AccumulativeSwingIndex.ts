@@ -64,7 +64,10 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 	}, {
 		key: "limitMoveValue",
 		name: this.root.language.translateAny("Limit move value"),
-		type: "number"
+		type: "number",
+		minValue: 1,
+		maxValue: 1000000,
+		step: 1
 	}];
 
 	protected _axisRange?: ILineSeriesAxisRange;
@@ -98,6 +101,8 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
+		super._prepareChildren();
+
 		const limitMoveValue = "limitMoveValue";
 		if (this.isDirty(limitMoveValue)) {
 			this.setCustomData(limitMoveValue, this.get(limitMoveValue));
@@ -124,7 +129,6 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 				}
 			}
 		}
-		super._prepareChildren();
 	}
 
 	/**

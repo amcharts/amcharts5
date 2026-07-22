@@ -41,11 +41,17 @@ export class ZigZag extends Indicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "deviation",
 		name: this.root.language.translateAny("Deviation"),
-		type: "number"
+		type: "number",
+		minValue: 0.01,
+		maxValue: 5,
+		step: 0.01
 	}, {
 		key: "depth",
 		name: this.root.language.translateAny("Depth"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 50,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
@@ -114,7 +120,7 @@ export class ZigZag extends Indicator {
 					let j = 1;
 					for (let i = 1, len = dataItems.length; i < len; i++) {
 						let dataItem = dataItems[i];
-						let value = dataItem.get("value", 0);
+						let value = dataItem.get("valueY", 0);
 						let low = dataItem.get("lowValueY", value);
 						let high = dataItem.get("highValueY", value);
 						let time = dataItem.get("valueX", 0);
@@ -140,7 +146,7 @@ export class ZigZag extends Indicator {
 						let depth = this.get("depth", 3);
 						for (let i = j - 1, len = dataItems.length; i < len; i++) {
 							let dataItem = dataItems[i];
-							let value = dataItem.get("value", 0);
+							let value = dataItem.get("valueY", 0);
 							let low = dataItem.get("lowValueY", value);
 							let high = dataItem.get("highValueY", value);
 							let time = dataItem.get("valueX", 0);

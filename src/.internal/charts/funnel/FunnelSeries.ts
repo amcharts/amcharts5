@@ -276,7 +276,9 @@ export class FunnelSeries extends PercentSeries {
 			this._fixLayout();
 		}
 
-		if (this._total > 0 && (this._valuesDirty || this._sizeDirty)) {
+		// `bottomRatio`/`startLocation`/`endLocation` are read while laying out the
+		// slices below (and in `decorateSlice`), so re-run this pass when they change.
+		if (this._total > 0 && (this._valuesDirty || this._sizeDirty || this.isDirty("bottomRatio") || this.isDirty("startLocation") || this.isDirty("endLocation"))) {
 
 			const slicesContainer = this.slicesContainer;
 

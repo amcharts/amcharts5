@@ -37,7 +37,10 @@ export class AverageTrueRange extends ChartIndicator {
     public _editableSettings: IIndicatorEditableSetting[] = [{
         key: "period",
         name: this.root.language.translateAny("Period"),
-        type: "number"
+        type: "number",
+        minValue: 3,
+        maxValue: 50,
+        step: 1
     }, {
         key: "seriesColor",
         name: this.root.language.translateAny("Color"),

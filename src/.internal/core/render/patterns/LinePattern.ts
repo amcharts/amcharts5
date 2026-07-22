@@ -40,8 +40,60 @@ export class LinePattern extends Pattern {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("gap")) {
+		if (this.isDirty("gap") || this.isDirty("angle")) {
 			this._clear = true;
+		}
+
+		this._optimizeTileSize();
+	}
+
+	/**
+	 * A line pattern's tile is only a repeat unit, so an oversized `width`/
+	 * `height` just wastes memory and draw time for an identical result. Shrink
+	 * it to a few line periods — the minimal seamless tile. Only applies to a
+	 * fully-repeating pattern; a `gap` of 0 (single line) or a non-`repeat`
+	 * `repetition` keep the requested size, and the tile is never grown.
+	 *
+	 * The shrink is only seamless in the tile's own coordinate space, where the
+	 * lines are drawn at `angle`. A whole-tile `rotation` transforms the tile
+	 * externally, so an asymmetric optimal size (e.g. a 4px-wide sliver for the
+	 * default horizontal lines) no longer tiles once rotated — leaving the
+	 * requested size intact is what keeps `rotation` seamless. Prefer `angle`.
+	 * @ignore
+	 */
+	protected _optimizeTileSize() {
+		const repetition = this.get("repetition");
+		if (repetition && repetition !== "repeat") {
+			return;
+		}
+
+		if (this.get("rotation")) {
+			return;
+		}
+
+		const gap = this.get("gap", 0);
+		if (!gap) {
+			return;
+		}
+
+		const step = gap + this.get("strokeWidth", 1);
+		const rad = this.get("angle", 0) * Math.PI / 180;
+		const sinA = Math.abs(Math.sin(rad));
+		const cosA = Math.abs(Math.cos(rad));
+
+		// The line period projected onto each axis. A line running (nearly)
+		// parallel to an axis needs no period along it, so that dimension can be
+		// minimal. A few periods gives a small tile with margin against sub-pixel
+		// edge artifacts; the `_draw` spacing-snap then makes it tile exactly.
+		const periods = 4;
+		const optimalW = Math.max(1, Math.ceil((sinA > 0.000001 ? step / sinA : 1) * periods));
+		const optimalH = Math.max(1, Math.ceil((cosA > 0.000001 ? step / cosA : 1) * periods));
+
+		if (this.get("width", 100) > optimalW) {
+			this.setRaw("width", optimalW);
+		}
+		if (this.get("height", 100) > optimalH) {
+			this.setRaw("height", optimalH);
 		}
 	}
 
@@ -73,8 +125,24 @@ export class LinePattern extends Pattern {
 				// Angled lines
 				const cosA = Math.cos(angle);
 				const sinA = Math.sin(angle);
+
+				// Snap the perpendicular spacing so the tile holds a whole number
+				// of line periods and therefore tiles seamlessly. The line normal
+				// is (sinA, cosA), so a tile shift of (w, 0) moves the line offset
+				// by `w * sinA` and (0, h) by `h * cosA` — both must be multiples
+				// of the spacing. Nudge the spacing to satisfy the axis with the
+				// larger projection (exact for a square tile at 45deg, and the
+				// nearest-seamless value otherwise), which keeps the visual gap
+				// almost unchanged. Without this the pattern seams, and because a
+				// fill pattern is anchored at the shape's origin the seam lands
+				// dead-centre (e.g. an X across a circle).
+				const proj = Math.max(Math.abs(w * sinA), Math.abs(h * cosA));
+				if (proj > 0.000001) {
+					step = proj / Math.max(1, Math.round(proj / step));
+				}
+
 				const diagonal = Math.sqrt(w * w + h * h) * 2; // Ensure lines cover the entire area even when rotated
-				
+
 				// Calculate how many lines we need based on the gap
 				const effectiveStep = step / Math.max(Math.abs(cosA), Math.abs(sinA));
 				const lineCount = Math.ceil(diagonal / effectiveStep) * 2;

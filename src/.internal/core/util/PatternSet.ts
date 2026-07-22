@@ -71,7 +71,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: 45,
+					angle: 45,
 					strokeWidth: 1,
 					//gap: 6,
 					color: color
@@ -87,7 +87,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: -45,
+					angle: -45,
 					strokeWidth: 1,
 					gap: 6,
 					color: color
@@ -101,7 +101,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 6,
 					height: 6,
-					rotation: 90,
+					angle: 90,
 					strokeWidth: 1,
 					color: color
 				}),
@@ -109,6 +109,7 @@ export class PatternSet extends Entity {
 					width: 14,
 					height: 14,
 					rotation: 45,
+					rotateShapes: true,
 					gap: 4,
 					maxWidth: 6,
 					maxHeight: 6,
@@ -118,7 +119,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 6,
 					height: 6,
-					rotation: 0,
+					angle: 0,
 					strokeWidth: 1,
 					color: color
 				}),
@@ -135,7 +136,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: 45,
+					angle: 45,
 					strokeWidth: 2,
 					gap: 3,
 					strokeDasharray: [4, 2],
@@ -152,7 +153,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: -45,
+					angle: -45,
 					strokeWidth: 2,
 					gap: 3,
 					strokeDasharray: [4, 2],
@@ -170,7 +171,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: -45,
+					angle: -45,
 					strokeWidth: 2,
 					gap: 1,
 					color: color
@@ -178,7 +179,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: 45,
+					angle: 45,
 					strokeWidth: 2,
 					gap: 1,
 					color: color
@@ -186,7 +187,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: 0,
+					angle: 0,
 					strokeWidth: 3,
 					gap: 1,
 					color: color
@@ -194,7 +195,7 @@ export class PatternSet extends Entity {
 				this.getLinePattern({
 					width: 1000,
 					height: 1000,
-					rotation: 90,
+					angle: 90,
 					strokeWidth: 3,
 					gap: 1,
 					color: color

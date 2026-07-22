@@ -164,6 +164,13 @@ export class Sunburst extends Partition {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		// These settings are only consumed in `_updateVisuals` (arc bounds, radius
+		// and per-slice angle math), which the base only runs on value/size
+		// changes — so redraw when they change dynamically.
+		if (this.isDirty("startAngle") || this.isDirty("endAngle") || this.isDirty("radius") || this.isDirty("innerRadius")) {
+			this._updateVisuals();
+		}
+
 		if (this.isPrivateDirty("dr") || this.isPrivateDirty("dx")) {
 			if (this._rootNode) {
 				this._updateNodesScale(this._rootNode);

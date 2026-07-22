@@ -3,7 +3,6 @@ import type { IIndicatorEditableSetting } from "./Indicator";
 import { ChartIndicator, IChartIndicatorSettings, IChartIndicatorPrivate, IChartIndicatorEvents } from "./ChartIndicator";
 import { LineSeries } from "../../xy/series/LineSeries";
 
-import * as $array from "../../../core/util/Array";
 
 export interface IStandardDeviationSettings extends IChartIndicatorSettings {
 }
@@ -36,7 +35,10 @@ export class StandardDeviation extends ChartIndicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
@@ -80,27 +82,35 @@ export class StandardDeviation extends ChartIndicator {
 
 			this._sma(data, period, "value_y", "ma");
 
-			let i = 0;
+			// Rolling sum / sum of squares over the window, so the standard deviation
+			// is O(n) instead of O(n * period) and values are read once per bar.
+			let sum = 0;
+			let sumSq = 0;
+			let count = 0;
 
-			$array.each(data, (dataItem: any) => {
-				if (i >= period - 1) {
-					let mean = dataItem.ma;
-
-					let stdSum = 0;
-					for (let j = i - period + 1; j <= i; j++) {
-						let di = dataItems[j];
-						let diValue = this._getValue(di);
-						if (diValue != null) {
-							stdSum += Math.pow(diValue - mean, 2);
-						}
-					}
-
-					let std = Math.sqrt(stdSum / period);
-
-					dataItem.deviation = std;
+			for (let i = 0, len = data.length; i < len; i++) {
+				const v = this._getValue(dataItems[i]);
+				if (v != null) {
+					sum += v;
+					sumSq += v * v;
+					count++;
 				}
-				i++;
-			})
+				if (i >= period) {
+					const ov = this._getValue(dataItems[i - period]);
+					if (ov != null) {
+						sum -= ov;
+						sumSq -= ov * ov;
+						count--;
+					}
+				}
+
+				if (i >= period - 1) {
+					// sum((x - m)^2) = sumSq - 2*m*sum + count*m^2, divided by period.
+					const mean = data[i].ma;
+					const variance = (sumSq - 2 * mean * sum + count * mean * mean) / period;
+					data[i].deviation = Math.sqrt(variance < 0 ? 0 : variance);
+				}
+			}
 			this.series.updateData(data);
 		}
 	}

@@ -190,6 +190,8 @@ import type { RadialLabel } from "./../../../index";
 import type { RadialText } from "./../../../index";
 import type { Rectangle } from "./../../../index";
 import type { RectanglePattern } from "./../../../index";
+import type { StarPattern } from "./../../../index";
+import type { TrianglePattern } from "./../../../index";
 import type { RectangleSeries } from "./../../../stock";
 import type { RegressionSeries } from "./../../../stock";
 import type { RelativeStrengthIndex } from "./../../../stock";
@@ -446,6 +448,8 @@ export interface IClasses {
 	"RadialText": () => Promise<typeof RadialText>;
 	"Rectangle": () => Promise<typeof Rectangle>;
 	"RectanglePattern": () => Promise<typeof RectanglePattern>;
+	"StarPattern": () => Promise<typeof StarPattern>;
+	"TrianglePattern": () => Promise<typeof TrianglePattern>;
 	"RectangleSeries": () => Promise<typeof RectangleSeries>;
 	"RegressionSeries": () => Promise<typeof RegressionSeries>;
 	"RelativeStrengthIndex": () => Promise<typeof RelativeStrengthIndex>;
@@ -703,6 +707,8 @@ const classes: IClasses = {
 	"RadialText": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.RadialText),
 	"Rectangle": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Rectangle),
 	"RectanglePattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.RectanglePattern),
+	"StarPattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.StarPattern),
+	"TrianglePattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.TrianglePattern),
 	"RectangleSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.RectangleSeries),
 	"RegressionSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.RegressionSeries),
 	"RelativeStrengthIndex": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.RelativeStrengthIndex),

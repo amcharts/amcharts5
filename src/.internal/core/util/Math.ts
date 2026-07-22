@@ -157,6 +157,15 @@ export function normalizeAngle(value: number): number {
  */
 export function getArcBounds(cx: number, cy: number, startAngle: number, endAngle: number, radius: number): IBounds {
 
+	// Guard against non-finite angles (e.g. a radar chart whose start/end angle
+	// was set to NaN or Infinity) and against a full-circle-or-more span. Without
+	// this, the 90°-step loop below runs forever (Infinity) or returns NaN bounds.
+	// In both cases fall back to the full-radius box so callers stay finite.
+	if (!Number.isFinite(startAngle) || !Number.isFinite(endAngle) || Math.abs(endAngle - startAngle) >= 360) {
+		const r = Number.isFinite(radius) ? Math.abs(radius) : 0;
+		return ({ left: cx - r, top: cy - r, right: cx + r, bottom: cy + r });
+	}
+
 	let minX = Number.MAX_VALUE;
 	let minY = Number.MAX_VALUE;
 	let maxX = -Number.MAX_VALUE;

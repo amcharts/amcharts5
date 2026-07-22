@@ -237,7 +237,10 @@ export class HeatLegend extends Container {
 			}
 		}
 
-		if (this.isDirty("stepCount")) {
+		// The markers (colors, opacities, gradient rotation, step order) are all
+		// (re)built here, so rebuild on any of the settings they depend on — not
+		// just `stepCount`.
+		if (this.isDirty("stepCount") || this.isDirty("startColor") || this.isDirty("endColor") || this.isDirty("startOpacity") || this.isDirty("endOpacity") || this.isDirty("orientation")) {
 			const stepCount = this.get("stepCount", 1);
 			const startColor = this.get("startColor")!;
 			const endColor = this.get("endColor")!;

@@ -263,9 +263,21 @@ export class WordCloud extends Series {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this.isDirty("text")) {
-			this.data.setAll(this._getWords(this.get("text")));
+		// `maxCount`/`minValue`/`minWordLength`/`excludeWords` are word-extraction
+		// filters applied in `_getWords`, which only ran on a `text` change — so
+		// re-extract when any of them change too (only relevant when using `text`).
+		if (this.isDirty("text") || this.isDirty("maxCount") || this.isDirty("minValue") || this.isDirty("minWordLength") || this.isDirty("excludeWords")) {
+			const text = this.get("text");
+			if (text != null) {
+				this.data.setAll(this._getWords(text));
+			}
+			// Clear these so the `data.setAll` above doesn't re-enter this block and
+			// recurse (mirrors the original `text` handling).
 			this._dirty["text"] = false;
+			this._dirty["maxCount"] = false;
+			this._dirty["minValue"] = false;
+			this._dirty["minWordLength"] = false;
+			this._dirty["excludeWords"] = false;
 		}
 	}
 
@@ -277,7 +289,7 @@ export class WordCloud extends Series {
 		//const rows = Math.round(this._root.height() * resolution);
 		let step = this.get("step", 1) * 2;
 
-		if (this._valuesDirty || this._sizeDirty || this.isPrivateDirty("adjustedFontSize")) {
+		if (this._valuesDirty || this._sizeDirty || this.isPrivateDirty("adjustedFontSize") || this.isDirty("minFontSize") || this.isDirty("maxFontSize") || this.isDirty("step") || this.isDirty("angles")) {
 			const adjustedFontSize = this.getPrivate("adjustedFontSize", 1);
 
 			const w = this.innerWidth();

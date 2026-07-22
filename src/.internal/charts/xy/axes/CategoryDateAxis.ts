@@ -100,6 +100,16 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 		super._afterNew();
 	}
 
+	public _prepareChildren() {
+		// `baseInterval` is read in `_prepareAxisItems` (gated by `_sizeDirty` among
+		// others), so re-run it when the interval changes. Set the flag directly to
+		// avoid re-entering `_prepareChildren`.
+		if (this.isDirty("baseInterval")) {
+			this._sizeDirty = true;
+		}
+		super._prepareChildren();
+	}
+
 
 	protected _prepareAxisItems() {
 		// temp

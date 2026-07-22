@@ -409,15 +409,38 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 			let syncWithAxis = this.get("syncWithAxis");
 			if (syncWithAxis) {
+				// Re-sync whenever any of the source axis's sync inputs change.
+				// With autoZoom the sync target is the visible selection; without
+				// it the axis holds its full range and only the full extremes
+				// need recomputing. Mark dirty (not just a flag) so this axis is
+				// queued even when the source publishes after its update pass.
+				const resync = () => {
+					if (this.get("autoZoom", true)) {
+						this.markDirtySelectionExtremes();
+					}
+					else {
+						this.markDirtyExtremes();
+					}
+				};
 				this._syncDp = new MultiDisposer([
-					syncWithAxis.onPrivate("selectionMinFinal", () => {
-						this._dirtySelectionExtremes = true;
-					}),
-					syncWithAxis.onPrivate("selectionMaxFinal", () => {
-						this._dirtySelectionExtremes = true;
-					})
+					syncWithAxis.onPrivate("selectionMinFinal", resync),
+					syncWithAxis.onPrivate("selectionMaxFinal", resync),
+					syncWithAxis.onPrivate("selectionStepFinal", resync),
+					syncWithAxis.onPrivate("minFinal", resync),
+					syncWithAxis.onPrivate("maxFinal", resync),
+					// Step can change on its own (e.g. a resize changes
+					// gridCount while min/max stay the same)
+					syncWithAxis.onPrivate("step", resync)
 				])
 			}
+		}
+
+		// `syncZeros` changes how the synced axis' min/max align (via `_syncAxes`),
+		// so re-run both the full and selection extremes when it changes. Set flags
+		// directly to avoid re-entering `_prepareChildren` while it is still dirty.
+		if (this.isDirty("syncZeros")) {
+			this._dirtyExtremes = true;
+			this._dirtySelectionExtremes = true;
 		}
 
 		let someDirty = false;
@@ -425,6 +448,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			someDirty = true;
 			this.ghostLabel?.set("text", "");
 		}
+
+		// If a sync recompute only changes the step (e.g. a resize changed
+		// gridCount while min/max stayed the same), nothing else marks the
+		// range dirty, so track the step explicitly for the render gate below.
+		const prevSelectionStepFinal = this.getPrivate("selectionStepFinal");
 
 		//if (this._dirtyExtremes || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("min") || this.isDirty("max") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("maxPrecision")) {
 		if (this._sizeDirty || this._dirtyExtremes || this._valuesDirty || someDirty || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("extraMin") || this.isDirty("extraMax") || this.isDirty("logarithmic") || this.isDirty("treatZeroAs") || this.isDirty("baseValue") || this.isDirty("strictMinMax") || this.isDirty("strictMinMaxSelection")) {
@@ -464,7 +492,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 		this._groupData();
 
-		if (this._sizeDirty || this._valuesDirty || this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("min") || this.isPrivateDirty("selectionMax") || this.isPrivateDirty("selectionMin") || this.isPrivateDirty("max") || this.isPrivateDirty("step") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("logarithmic")) {
+		if (this._sizeDirty || this._valuesDirty || this.isDirty("start") || this.isDirty("end") || this.isPrivateDirty("min") || this.isPrivateDirty("selectionMax") || this.isPrivateDirty("selectionMin") || this.isPrivateDirty("max") || this.isPrivateDirty("step") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("logarithmic") || prevSelectionStepFinal !== this.getPrivate("selectionStepFinal")) {
 			this._handleRangeChange();
 			this._prepareAxisItems();
 			this._updateAxisRanges();
@@ -494,6 +522,28 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 	}
 
+	/**
+	 * Logarithmic grid values are computed via `Math.pow(10, ...)`, which
+	 * carries floating-point noise (e.g. `4999.999999999999` instead of
+	 * `5000`). Round to ~10 significant digits so the grid values (and their
+	 * labels) come out clean; a format without a decimal directive (e.g.
+	 * `"#,###"`) would otherwise pass the noisy fraction straight through.
+	 */
+	protected _cleanLogValue(value: number): number {
+		if (!(value > 0)) {
+			return value;
+		}
+		const decCount = 10 - Math.floor(Math.log(value) * Math.LOG10E);
+		// $math.round computes Math.pow(10, decCount), which overflows to
+		// Infinity for extremely small values (reachable via the 1e-50 seed
+		// in _prepareAxisItems) and would turn the value into NaN. Such
+		// values are off scale anyway, so leave them as is.
+		if (decCount > 280) {
+			return value;
+		}
+		return $math.round(value, decCount);
+	}
+
 	protected _formatText(value: number) {
 		const numberFormat = this.get("numberFormat");
 		const formatter = this.getNumberFormatter();
@@ -504,7 +554,23 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			text = formatter.format(value, numberFormat);
 		}
 		else {
-			text = formatter.format(value, undefined, this.getPrivate("stepDecimalPlaces"));
+			// On a logarithmic axis every grid label is a different magnitude,
+			// and the default number format keeps at most 5 decimals, so a
+			// smaller value (e.g. 1e-8) would be rounded away to "0". Give such
+			// values a format with just enough decimals to show them in full.
+			// Values the default format can show keep the regular path, so
+			// their labels stay exactly as before.
+			let logDecimals = 0;
+			if (this.get("logarithmic") && $type.isNumber(value) && value != 0) {
+				logDecimals = Math.min($utils.decimalPlaces(value), 20);
+			}
+
+			if (logDecimals > 5) {
+				text = formatter.format(value, "#,###." + new Array(logDecimals + 1).join("#"));
+			}
+			else {
+				text = formatter.format(value, undefined, this.getPrivate("stepDecimalPlaces"));
+			}
 		}
 		return text;
 	}
@@ -601,10 +667,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				this._createAssets(dataItem, []);
 				this._toggleDataItem(dataItem, true);
 
-				dataItem.setRaw("value", value);
+				const itemValue = logarithmic ? this._cleanLogValue(value) : value;
+				dataItem.setRaw("value", itemValue);
 				const label = dataItem.get("label");
 				if (label) {
-					label.set("text", this._formatText(value));
+					label.set("text", this._formatText(itemValue));
 				}
 
 				this._prepareDataItem(dataItem);
@@ -653,19 +720,21 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 
 						this._createAssets(minorDataItem, ["minor"], true);
 						this._toggleDataItem(minorDataItem, true);
-						minorDataItem.setRaw("value", minorValue);
+						const minorItemValue = logarithmic ? this._cleanLogValue(minorValue) : minorValue;
+						minorDataItem.setRaw("value", minorItemValue);
 
 						const minorLabel = minorDataItem.get("label");
-						if (minorLabel) {
-							if (minorLabelsEnabled) {
-								minorLabel.set("text", this._formatText(minorValue));
-							}
-							else {
-								minorLabel.setPrivate("visible", false);
-							}
+						if (minorLabel && minorLabelsEnabled) {
+							minorLabel.set("text", this._formatText(minorItemValue));
 						}
 
 						this._prepareDataItem(minorDataItem);
+
+						// Hide the minor label after `_prepareDataItem`: it calls
+						// `toggleVisibility`, which would otherwise re-show the label.
+						if (minorLabel && !minorLabelsEnabled) {
+							minorLabel.setPrivate("visible", false);
+						}
 						minorValue += minorStep;
 						m++;
 					}
@@ -785,7 +854,17 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			// break the sync.
 			selectionMin = this.getPrivate("selectionMinFinal", selectionMin);
 			selectionMax = this.getPrivate("selectionMaxFinal", selectionMax);
-			step = this.getPrivate("selectionStepFinal", 1);
+
+			const stepFinal = this.getPrivate("selectionStepFinal");
+			if ($type.isNumber(stepFinal) && stepFinal > 0 && stepFinal < Infinity) {
+				step = stepFinal;
+			}
+			else {
+				// Sync hasn't produced a usable step yet (e.g. first render
+				// pass); a fixed or degenerate step here could make
+				// _prepareAxisItems generate a near-infinite number of items.
+				step = this._adjustMinMax(selectionMin, selectionMax, this.get("renderer").gridCount(), true).step;
+			}
 
 			const stepDecimalPlaces = $utils.decimalPlaces(step);
 			this.setPrivateRaw("stepDecimalPlaces", stepDecimalPlaces);
@@ -1577,6 +1656,17 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			minMaxStep = this._syncAxes(min, max, minMaxStep.step, syncWithAxis.getPrivate("minFinal", syncWithAxis.getPrivate("min", 0)), syncWithAxis.getPrivate("maxFinal", syncWithAxis.getPrivate("max", 1)), syncWithAxis.getPrivate("step", 1));
 			min = minMaxStep.min;
 			max = minMaxStep.max;
+
+			// Without autoZoom the axis holds its full range, so the synced
+			// full range is also its selection. Publish it so that
+			// _handleRangeChange renders the synced step and so that axes
+			// synced to this one get notified. With autoZoom the selection is
+			// computed in _getSelectionMinMax instead.
+			if (!this.get("autoZoom", true)) {
+				this.setPrivateRaw("selectionMinFinal", min);
+				this.setPrivateRaw("selectionMaxFinal", max);
+				this.setPrivateRaw("selectionStepFinal", minMaxStep.step);
+			}
 		}
 
 
@@ -1840,7 +1930,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		let axis = this.get("syncWithAxis");
 		if (axis) {
 			let targetCount = Math.round((syncMax - syncMin) / syncStep);
-			if (targetCount > 0) {
+			if ($type.isNumber(targetCount) && targetCount > 0 && targetCount < Infinity) {
 
 				if (this.get("syncZeros") && syncMin <= 0 && syncMax >= 0) {
 					// Count intervals below/above zero on source axis
@@ -1862,37 +1952,46 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 						rawStep = (max - min) / targetCount;
 					}
 
-					step = this._niceStep(rawStep);
-					min = -step * belowCount;
-					max = step * aboveCount;
+					// A degenerate range would produce a zero/NaN step; keep
+					// the axis's own min/max/step in that case
+					if (rawStep > 0 && rawStep < Infinity) {
+						step = this._niceStep(rawStep);
+						min = -step * belowCount;
+						max = step * aboveCount;
+					}
 				}
 				else {
 					// Regular grid count sync (no zero alignment)
 					let rawStep = (max - min) / targetCount;
-					step = this._niceStep(rawStep);
 
-					// Snap min/max to step boundaries ensuring data coverage
-					let newMin = Math.floor(min / step) * step;
-					let newMax = newMin + step * targetCount;
+					// A degenerate range would produce a zero/NaN step; keep
+					// the axis's own min/max/step in that case
+					if (rawStep > 0 && rawStep < Infinity) {
+						step = this._niceStep(rawStep);
 
-					// Ensure max covers the data
-					if (newMax < max) {
-						newMin = Math.ceil(max / step) * step - step * targetCount;
-						newMax = newMin + step * targetCount;
+						// Snap min/max to step boundaries ensuring data coverage
+						let newMin = Math.floor(min / step) * step;
+						let newMax = newMin + step * targetCount;
+
+						// Ensure max covers the data
+						if (newMax < max) {
+							newMin = Math.ceil(max / step) * step - step * targetCount;
+							newMax = newMin + step * targetCount;
+						}
+
+						// Preserve zero boundaries
+						if (min >= 0 && newMin < 0) {
+							newMin = 0;
+							newMax = step * targetCount;
+						}
+						if (max <= 0 && newMax > 0) {
+							newMax = 0;
+							newMin = -(step * targetCount);
+						}
+
+						min = newMin;
+						max = newMax;
 					}
-
-					// Preserve zero boundaries
-					if (min >= 0 && newMin < 0) {
-						newMin = 0;
-						newMax = step * targetCount;
-					}
-					if (max <= 0 && newMax > 0) {
-						newMax = 0;
-						newMin = -(step * targetCount);
-					}
-
-					min = newMin;
-					max = newMax;
 				}
 			}
 		}
@@ -1905,6 +2004,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	 * (1, 2, 5, 10, 20, 50, etc.), respecting maxPrecision.
 	 */
 	protected _niceStep(rawStep: number): number {
+		// A zero/NaN/negative step would stall axis item generation downstream,
+		// so never let one through
+		if (!$type.isNumber(rawStep) || rawStep <= 0 || rawStep == Infinity) {
+			return 1;
+		}
+
 		let stepPower = Math.pow(10, Math.floor(Math.log(Math.abs(rawStep)) * Math.LOG10E));
 		let normalized = rawStep / stepPower;
 
@@ -1914,6 +2019,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		else normalized = 10;
 
 		let step = normalized * stepPower;
+
+		// stepPower can underflow to 0 for extremely small raw steps
+		if (!(step > 0 && step < Infinity)) {
+			step = rawStep;
+		}
 
 		let maxPrecision = this.get("maxPrecision");
 		if ($type.isNumber(maxPrecision)) {

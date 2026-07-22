@@ -240,6 +240,21 @@ export class Venn extends Series {
 	}
 
 
+	protected _onDataClear() {
+		super._onDataClear();
+		// Reset the color/pattern sets so re-setting data rebuilds from the start
+		// of the palette (matching the Hierarchy charts), instead of continuing to
+		// step from where the previous data left off.
+		const colors = this.get("colors");
+		if (colors) {
+			colors.reset();
+		}
+		const patterns = this.get("patterns");
+		if (patterns) {
+			patterns.reset();
+		}
+	}
+
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		super.processDataItem(dataItem);
 

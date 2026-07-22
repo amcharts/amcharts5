@@ -34,7 +34,7 @@ export class Rectangle extends Graphics {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("width") || this.isDirty("height") || this.isPrivateDirty("width") || this.isPrivateDirty("height")) {
+		if (this.isDirty("width") || this.isDirty("height") || this.isPrivateDirty("width") || this.isPrivateDirty("height") || this.isDirty("containStroke")) {
 			this._clear = true;
 		}
 	}

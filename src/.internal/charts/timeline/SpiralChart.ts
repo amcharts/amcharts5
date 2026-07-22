@@ -78,7 +78,7 @@ export class SpiralChart extends CurveChart {
 	public _prepareChildren(): void {
 		super._prepareChildren();
 
-		if (this.isDirty("levelCount")) {
+		if (this.isDirty("levelCount") || this.isDirty("yAxisRadius") || this.isDirty("startAngle") || this.isDirty("endAngle") || this.isDirty("innerRadius")) {
 			this._updateMasks();
 		}
 	}

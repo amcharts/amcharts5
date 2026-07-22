@@ -114,7 +114,7 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-input-narrow", {
-				"width": "50px"
+				"width": "70px"
 			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-button", {

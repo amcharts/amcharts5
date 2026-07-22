@@ -49,11 +49,17 @@ export class SuperTrend extends Indicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "multiplier",
 		name: this.root.language.translateAny("Multiplier"),
-		type: "number"
+		type: "number",
+		minValue: 0.5,
+		maxValue: 10,
+		step: 0.1
 	}, {
 		key: "upperColor",
 		name: this.root.language.translateAny("Upper"),

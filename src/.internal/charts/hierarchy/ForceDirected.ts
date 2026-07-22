@@ -221,6 +221,21 @@ export class ForceDirected extends LinkedHierarchy {
 		if (this.isDirty("initialFrames")) {
 			d3forceSimulation.alphaDecay(1 - Math.pow(0.001, 1 / this.get("initialFrames", 500)));
 		}
+
+		// `minRadius`/`maxRadius` drive each node's radius (`_updateRadius`), which
+		// the base only re-runs on value/size changes; recompute the radii here.
+		if (this.isDirty("minRadius") || this.isDirty("maxRadius")) {
+			if (this._rootNode) {
+				this._updateNodes(this._rootNode);
+			}
+		}
+
+		// `nodePadding` (and the changed radii) feed the collision force in
+		// `_updateForces`, which also re-reads the accessors and restarts the
+		// simulation so the layout settles with the new sizes/padding.
+		if (this.isDirty("minRadius") || this.isDirty("maxRadius") || this.isDirty("nodePadding")) {
+			this._updateForces();
+		}
 	}
 
 	/**

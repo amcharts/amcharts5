@@ -44,7 +44,10 @@ export class MACross extends Indicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Slow period"),
-		type: "number"
+		type: "number",
+		minValue: 5,
+		maxValue: 500,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Slow period"),
@@ -52,7 +55,10 @@ export class MACross extends Indicator {
 	}, {
 		key: "fastPeriod",
 		name: this.root.language.translateAny("Fast period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "fastColor",
 		name: this.root.language.translateAny("Fast period"),
@@ -123,8 +129,8 @@ export class MACross extends Indicator {
 	 */
 	public prepareData() {
 		if (this.series) {
-			let period = this.get("period", 9);
-			let fastPeriod = this.get("fastPeriod", 21);
+			let period = this.get("period", 21);
+			let fastPeriod = this.get("fastPeriod", 9);
 			const stockSeries = this.get("stockSeries");
 			const dataItems = stockSeries.dataItems;
 

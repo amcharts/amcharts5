@@ -54,6 +54,17 @@ export class StepLineSeries extends LineSeries {
 		super._afterNew();
 	}
 
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		// `stepWidth` / `noRisers` are only read in `_getPoints` during the line
+		// rebuild in `_updateChildren`, which is gated by `_valuesDirty` (among
+		// others). Force that rebuild when they change dynamically.
+		if (this.isDirty("stepWidth") || this.isDirty("noRisers")) {
+			this._valuesDirty = true;
+		}
+	}
+
 
 	protected _getPoints(dataItem: DataItem<this["_dataItemSettings"]>, o: { points: Array<Array<number>>, segments: number[][][], stacked: boolean | undefined, getOpen: boolean, basePosX: number, basePosY: number, fillVisible: boolean | undefined, xField: string, yField: string, xOpenField: string, yOpenField: string, vcx: number, vcy: number, baseAxis: Axis<AxisRenderer>, xAxis: Axis<AxisRenderer>, yAxis: Axis<AxisRenderer>, locationX: number, locationY: number, openLocationX: number, openLocationY: number }) {
 		let points = o.points;

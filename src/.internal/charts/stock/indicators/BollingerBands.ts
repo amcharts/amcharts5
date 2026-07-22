@@ -4,7 +4,6 @@ import type { Color } from "../../../core/util/Color";
 import { MovingAverage, IMovingAverageSettings, IMovingAveragePrivate, IMovingAverageEvents } from "./MovingAverage";
 import { LineSeries } from "../../xy/series/LineSeries";
 
-import * as $array from "../../../core/util/Array";
 
 export interface IBollingerBandsSettings extends IMovingAverageSettings {
 
@@ -58,11 +57,17 @@ export class BollingerBands extends MovingAverage {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Period"),
-		type: "number"
+		type: "number",
+		minValue: 5,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "standardDeviations",
 		name: this.root.language.translateAny("Deviation"),
-		type: "number"
+		type: "number",
+		minValue: 1,
+		maxValue: 4,
+		step: 0.1
 	}, {
 		key: "upperColor",
 		name: this.root.language.translateAny("Upper"),
@@ -180,31 +185,37 @@ export class BollingerBands extends MovingAverage {
 
 			let smaData = this.series.data.values as any;
 
-			let i = 0;
+			// Rolling sum / sum of squares over the window, so the bands are O(n)
+			// instead of O(n * period) and values are read once per bar.
+			let sum = 0;
+			let sumSq = 0;
+			let count = 0;
 
-			$array.each(smaData, (dataItem: any) => {
-				if (i >= period - 1) {
-					let mean = dataItem.ma;
-
-					let stdSum = 0;
-					for (let j = i - period + 1; j <= i; j++) {
-						let di = dataItems[j];
-						let diValue = this._getValue(di);
-						if (diValue != null) {
-							stdSum += Math.pow(diValue - mean, 2);
-						}
-					}
-
-					let std = Math.sqrt(stdSum / period);
-
-					const lower = mean - standardDeviations * std;
-					const upper = mean + standardDeviations * std;
-
-					dataItem.upper = upper;
-					dataItem.lower = lower;
+			for (let i = 0, len = smaData.length; i < len; i++) {
+				const v = this._getValue(dataItems[i]);
+				if (v != null) {
+					sum += v;
+					sumSq += v * v;
+					count++;
 				}
-				i++;
-			})
+				if (i >= period) {
+					const ov = this._getValue(dataItems[i - period]);
+					if (ov != null) {
+						sum -= ov;
+						sumSq -= ov * ov;
+						count--;
+					}
+				}
+
+				if (i >= period - 1) {
+					// sum((x - m)^2) = sumSq - 2*m*sum + count*m^2, divided by period.
+					const mean = smaData[i].ma;
+					const variance = (sumSq - 2 * mean * sum + count * mean * mean) / period;
+					const std = Math.sqrt(variance < 0 ? 0 : variance);
+					smaData[i].lower = mean - standardDeviations * std;
+					smaData[i].upper = mean + standardDeviations * std;
+				}
+			}
 
 			this.upperBandSeries.updateData(smaData);
 			this.lowerBandSeries.updateData(smaData);

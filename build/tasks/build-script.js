@@ -307,7 +307,12 @@ module.exports = async (state) => {
 		},
 
 		plugins: [
-			new CheckDuplicates(),
+			new CheckDuplicates({
+				// Themes are standalone bundles; each chunk intentionally inlines
+				// its base theme and shared helpers (e.g. DarkVariant), so the
+				// same theme module legitimately lands in multiple chunks.
+				ignore: [/\/\.internal\/themes\//],
+			}),
 			new $webpack.NormalModuleReplacementPlugin(/^\.\/Classes$/, "./Classes-script"),
 		],
 

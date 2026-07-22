@@ -54,8 +54,44 @@ export class CirclePattern extends Pattern {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("gap")) {
+		if (this.isDirty("gap") || this.isDirty("radius") || this.isDirty("checkered")) {
 			this._clear = true;
+		}
+
+		this._optimizeTileSize();
+	}
+
+	/**
+	 * A circle pattern's tile is only a repeat unit — the grid repeats every
+	 * cell — so an oversized `width`/`height` just wastes memory and draw time
+	 * for an identical result. Normalise it to a single cell (2x2 cells when
+	 * `checkered`). Skipped for a `rotation` (not periodic on an axis-aligned
+	 * tile) and for non-`repeat` repetitions.
+	 * @ignore
+	 */
+	protected _optimizeTileSize() {
+		const repetition = this.get("repetition");
+		if (repetition && repetition !== "repeat") {
+			return;
+		}
+		if (this.get("rotation", 0) !== 0) {
+			return;
+		}
+
+		const gap = this.get("gap", 0);
+		const cell = this.get("radius", 3) * 2 + gap;
+		if (cell <= 0) {
+			return;
+		}
+
+		const n = this.get("checkered", false) ? 2 : 1;
+		const optimal = Math.max(1, Math.round(cell * n));
+
+		if (this.get("width", 100) !== optimal) {
+			this.setRaw("width", optimal);
+		}
+		if (this.get("height", 100) !== optimal) {
+			this.setRaw("height", optimal);
 		}
 	}
 
@@ -85,14 +121,58 @@ export class CirclePattern extends Pattern {
 			this._display.y = cellH * $math.sin(rotation);
 		}
 
+		// Only emit the cells that actually cover the tile (see RectanglePattern for
+		// the rationale). The grid is drawn in local space and then rotated about
+		// the origin (plus the display.x/display.y offset), so invert that transform
+		// for the four tile corners to get the local cell range — instead of a fixed
+		// `-2*cols..2*cols` x `-2*rows..2*rows` 16x over-draw that could exceed the
+		// canvas fill limit on a large tile and render nothing.
+		// A couple of cells of margin so circles straddling the tile edge (the
+		// centring offset can push them across) are drawn from both sides, keeping
+		// the tile seamless — needed once the tile is shrunk to a single cell.
+		let cMin = -2;
+		let cMax = cols + 2;
+		let rMin = -2;
+		let rMax = rows + 2;
+
+		if (rotation != 0) {
+			const cos = $math.cos(rotation);
+			const sin = $math.sin(rotation);
+			const dx = this._display.x;
+			const dy = this._display.y;
+
+			let minX = Infinity;
+			let maxX = -Infinity;
+			let minY = Infinity;
+			let maxY = -Infinity;
+
+			const corners = [[0, 0], [w, 0], [0, h], [w, h]];
+			for (let i = 0; i < corners.length; i++) {
+				const ox = corners[i][0] - dx;
+				const oy = corners[i][1] - dy;
+				const lx = cos * ox + sin * oy;
+				const ly = -sin * ox + cos * oy;
+				if (lx < minX) { minX = lx; }
+				if (lx > maxX) { maxX = lx; }
+				if (ly < minY) { minY = ly; }
+				if (ly > maxY) { maxY = ly; }
+			}
+
+			// Two cells of margin cover the centering shift and partial edges.
+			cMin = Math.floor(minX / cellW) - 2;
+			cMax = Math.ceil(maxX / cellW) + 2;
+			rMin = Math.floor(minY / cellH) - 2;
+			rMax = Math.ceil(maxY / cellH) + 2;
+		}
+
 		const color = this.get("color");
 		const colorOpacity = this.get("colorOpacity");
 		if (color || colorOpacity) {
 			this._display.beginFill(color, colorOpacity);
 		}
 
-		for (let r = rotation == 0 ? 0 : -rows * 2; r < rows * 2; r++) {
-			for (let c = rotation == 0 ? 0 : -cols * 2; c < cols * 2; c++) {
+		for (let r = rMin; r < rMax; r++) {
+			for (let c = cMin; c < cMax; c++) {
 				if (!checkered || ((r & 1) != 1 && (c & 1) != 1) || ((r & 1) == 1 && (c & 1) == 1)) {
 					let x = c * cellW;
 					let y = r * cellH;
@@ -103,15 +183,6 @@ export class CirclePattern extends Pattern {
 					this._display.drawCircle(x - radius, y - radius, radius);
 				}
 			}
-		}
-
-		if (checkered) {
-			w = w / 2 - gap * 2;
-			h = h / 2 - gap * 2;
-		}
-		else {
-			w -= gap;
-			h -= gap;
 		}
 
 		if (color || colorOpacity) {

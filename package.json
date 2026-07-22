@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.19.1",
+  "version": "5.20.0",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "description": "amCharts 5",
   "homepage": "https://www.amcharts.com/",
@@ -20,7 +20,9 @@
     "charts",
     "typescript"
   ],
-  "sideEffects": ["**/map.{ts,js}"],
+  "sideEffects": [
+    "**/map.{ts,js}"
+  ],
   "scripts": {
     "build": "node build/build.js -- build",
     "build:fonts": "node build/build.js -- build:fonts",
@@ -30,6 +32,7 @@
     "run-example": "node build/build.js -- run-example",
     "typecheck": "node build/build.js -- typecheck",
     "generate-classes": "node build/build.js -- generate-classes",
+    "generate:geojson": "node build/generate-geojson.js",
     "docs": "node build/build.js -- docs"
   },
   "dependencies": {
@@ -70,6 +73,7 @@
     "cpr": "^3.0.1",
     "cross-env": "^7.0.3",
     "http-server": "^14.1.0",
+    "mapshaper": "^0.7.14",
     "regenerator-runtime": "^0.13.9",
     "rimraf": "^3.0.2",
     "source-map-loader": "^3.0.0",

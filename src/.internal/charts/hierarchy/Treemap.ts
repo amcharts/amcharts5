@@ -172,9 +172,10 @@ export class Treemap extends Hierarchy {
 		}
 
 		if (this.isDirty("nodePaddingRight") || this.isDirty("nodePaddingLeft") || this.isDirty("nodePaddingTop") || this.isDirty("nodePaddingBottom") || this.isDirty("nodePaddingOuter") || this.isDirty("nodePaddingInner")) {
-			if (this._rootNode) {
-				this._updateNodes(this._rootNode);
-			}
+			// The paddings are applied to the d3 layout inside `_updateVisuals`,
+			// which then recomputes node coordinates. Calling `_updateNodes`
+			// alone would reuse stale coordinates and ignore the new padding.
+			this._updateVisuals();
 		}
 
 		if (this.isPrivateDirty("scaleX") || this.isPrivateDirty("scaleY")) {

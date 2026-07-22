@@ -1909,7 +1909,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 							y = thickness + offset * 1.5 + line.offsetY + chunk.offsetY;
 						}
 
-						y = Math.round(y);
+						y = crisp(y);
 
 						if (!ghostOnly) {
 							context.save();
@@ -2328,7 +2328,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 		// We need to fit?
 		if (oversizedBehavior !== "none") {
-			const ratio = this._fitRatio(bounds);
+			const ratio = this._fitRatio(bounds, oversizedBehavior == "truncate");
 			if (ratio < 1) {
 				if (oversizedBehavior == "fit") {
 					if ($type.isNumber(this.style.minScale) && (ratio < this.style.minScale)) {
@@ -2354,7 +2354,6 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 					bounds.bottom = 0;
 				}
 				else {
-
 					switch (this.style.textAlign) {
 						case "right":
 						case "end":
@@ -2388,9 +2387,9 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		return bounds;
 	}
 
-	protected _fitRatio(bounds: IBounds): number {
+	protected _fitRatio(bounds: IBounds, horizontalOnly: boolean = false): number {
 		const maxW = this.style.maxWidth;
-		const maxH = this.style.maxHeight;
+		const maxH = horizontalOnly ? undefined : this.style.maxHeight;
 		if (!$type.isNumber(maxW) && !$type.isNumber(maxH)) {
 			return 1;
 		}
@@ -3807,6 +3806,11 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 				return true;
 			});
 		}
+
+		// Dispatch a global (target-independent) pointerdown, mirroring
+		// globalpointermove/globalpointerup, so listeners can react to a press
+		// anywhere on the chart surface, not just on themselves.
+		this._dispatchEventAll("globalpointerdown", event);
 	}
 
 	_dispatchGlobalMousemove(originalEvent: IPointerEvent, originalTarget: Node | null, native: boolean): void {
@@ -4064,6 +4068,12 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					});
 				});
 			*/
+			// Shares the same "pointerdown" bundle as the cases above:
+			// _dispatchMousedown ends with a globalpointerdown dispatch. A
+			// separate narrower bundle would win the shared "pointerdown" slot
+			// when initialized first and leave later click/pointerup
+			// subscribers without dragmove/dragend listeners.
+			case "globalpointerdown":
 			case "pointermove":
 			case "pointerup":
 				return this._makeSharedEvent("pointerdown", () => {

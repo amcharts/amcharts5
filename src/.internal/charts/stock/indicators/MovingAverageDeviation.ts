@@ -71,7 +71,10 @@ export class MovingAverageDeviation extends ChartIndicator {
 		{
 			key: "period",
 			name: this.root.language.translateAny("Period"),
-			type: "number"
+			type: "number",
+			minValue: 2,
+			maxValue: 200,
+			step: 1
 		}, {
 			key: "field",
 			name: this.root.language.translateAny("Field"),

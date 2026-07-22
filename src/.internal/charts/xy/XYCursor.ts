@@ -120,6 +120,20 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 */
 	moveThreshold?: number
 
+	/**
+	 * How far (in pixels) outside the plot area a press can start and still
+	 * begin a zoom/selection, when `behavior` is set to a zoom or select mode.
+	 *
+	 * Makes it easier to start selecting near the edges of the plot area. The
+	 * selection still starts on the edge of the plot area (the press point is
+	 * clamped into it). A value of `0` (default) disables this and keeps the
+	 * original behavior: a selection can only start within the plot area.
+	 *
+	 * @since 5.20.0
+	 * @default 0
+	 */
+	clickTolerance?: number
+
 }
 
 
@@ -529,6 +543,10 @@ export class XYCursor extends Container {
 			this._handleCursorDown(event);
 		}));
 
+		this._disposers.push(plotContainer.events.on("globalpointerdown", (event) => {
+			this._handleCursorDownGlobal(event);
+		}));
+
 		this._disposers.push(plotContainer.events.on("globalpointerup", (event) => {
 			this._handleCursorUp(event);
 			if (!event.native && !this.isHidden()) {
@@ -538,7 +556,10 @@ export class XYCursor extends Container {
 
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
 			if (!this.get("syncWith")) {
-				if ($object.keys(plotContainer._downPoints).length == 0 && !event.native && this.isHidden()) {
+				// `_downPoint` also counts as dragging: a selection started via
+				// `clickTolerance` outside the plot area does not populate
+				// `plotContainer._downPoints` (the press never hit it).
+				if ($object.keys(plotContainer._downPoints).length == 0 && !this._downPoint && !event.native && this.isHidden()) {
 					// Ignore mouse movement if it originates on outside element and
 					// we're not dragging.
 					return;
@@ -578,23 +599,76 @@ export class XYCursor extends Container {
 		this.selection.set("draw", () => { });
 
 		if (chart && this._inPlot(local)) {
-			this._downPoint = local;
-
-			if (this.get("behavior") != "none") {
-				this.selection.show();
-
-				const type = "selectstarted";
-				if (this.events.isEnabled(type)) {
-					this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
-				}
-			}
-
-			let positionX = this._getPosition(local).x;
-			let positionY = this._getPosition(local).y;
-
-			this.setPrivate("downPositionX", positionX);
-			this.setPrivate("downPositionY", positionY);
+			this._startSelection(local, event);
 		}
+	}
+
+	/**
+	 * Handles a press anywhere on the chart surface. When `clickTolerance` is
+	 * set and the press lands just outside the plot area (within the tolerance),
+	 * the selection is started as if the press had happened on the plot edge.
+	 * In-plot presses are ignored here — they are handled by `_handleCursorDown`
+	 * (bound to the plot container) so behavior with `clickTolerance: 0` is
+	 * unchanged.
+	 */
+	protected _handleCursorDownGlobal(event: ISpritePointerEvent) {
+		const tolerance = this.get("clickTolerance", 0);
+		if (tolerance <= 0 || this.get("behavior", "none") == "none") {
+			return;
+		}
+
+		if ((event.originalEvent as any).button == 2) {
+			return;
+		}
+
+		const chart = this.chart;
+		if (!chart) {
+			return;
+		}
+
+		const local = this._display.toLocal(event.point);
+
+		// In-plot presses are handled by the plot container's own pointerdown.
+		if (this._inPlot(local)) {
+			return;
+		}
+
+		const w = this.width();
+		const h = this.height();
+
+		// How far outside the plot rectangle the press is, per axis.
+		const dx = Math.max(0, -local.x, local.x - w);
+		const dy = Math.max(0, -local.y, local.y - h);
+
+		if (dx > tolerance || dy > tolerance) {
+			return;
+		}
+
+		// Clamp the press onto the plot edge so the selection starts there.
+		local.x = $math.fitToRange(local.x, 0, w);
+		local.y = $math.fitToRange(local.y, 0, h);
+
+		this.selection.set("draw", () => { });
+		this._startSelection(local, event);
+	}
+
+	protected _startSelection(local: IPoint, event: ISpritePointerEvent) {
+		this._downPoint = local;
+
+		if (this.get("behavior") != "none") {
+			this.selection.show();
+
+			const type = "selectstarted";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
+			}
+		}
+
+		let positionX = this._getPosition(local).x;
+		let positionY = this._getPosition(local).y;
+
+		this.setPrivate("downPositionX", positionX);
+		this.setPrivate("downPositionY", positionY);
 	}
 
 	protected _handleCursorUp(event: ISpritePointerEvent) {

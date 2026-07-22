@@ -78,15 +78,24 @@ export class MACD extends ChartIndicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "fastPeriod",
 		name: this.root.language.translateAny("Fast MA period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 50,
+		step: 1
 	}, {
 		key: "slowPeriod",
 		name: this.root.language.translateAny("Slow MA period"),
-		type: "number"
+		type: "number",
+		minValue: 10,
+		maxValue: 100,
+		step: 1
 	}, {
 		key: "signalPeriod",
 		name: this.root.language.translateAny("Signal period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 40,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("MACD"),
@@ -153,13 +162,13 @@ export class MACD extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
+		super._prepareChildren();
 		if (this.isDirty("fastPeriod") || this.isDirty("slowPeriod") || this.isDirty("signalPeriod")) {
 			this.markDataDirty();
 			this.setCustomData("fastPeriod", this.get("fastPeriod"));
 			this.setCustomData("slowPeriod", this.get("slowPeriod"));
 			this.setCustomData("signalPeriod", this.get("signalPeriod"));
 		}
-		super._prepareChildren();
 	}
 
 	public _updateChildren() {

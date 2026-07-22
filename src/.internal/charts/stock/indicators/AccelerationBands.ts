@@ -16,6 +16,12 @@ export interface IAccelerationBandsSettings extends IIndicatorSettings {
     lowerColor?: Color;
 
 
+    /**
+     * Band width factor. Stored in thousandths: the default `0.001` yields the
+     * standard Acceleration Bands (the classic `4 * (high - low) / (high + low)`
+     * form). The settings UI shows this as the conventional `1` (= single band
+     * width) via a display scale, but the stored/API value remains in thousandths.
+     */
     factor?: number;
 }
 
@@ -52,11 +58,20 @@ export class AccelerationBands extends Indicator {
     public _editableSettings: IIndicatorEditableSetting[] = [{
         key: "period",
         name: this.root.language.translateAny("Period"),
-        type: "number"
+        type: "number",
+        minValue: 10,
+        maxValue: 100,
+        step: 1
     }, {
         key: "factor",
         name: this.root.language.translateAny("Factor"),
-        type: "number"
+        type: "number",
+        minValue: 0.0005,
+        maxValue: 0.003,
+        step: 0.0001,
+        // Stored in thousandths (0.001 = standard bands); shown in the UI as the
+        // conventional 1 = single band width (so the field reads 0.5..3.0).
+        scale: 1000
     }, {
         key: "upperColor",
         name: this.root.language.translateAny("Upper"),
@@ -129,12 +144,12 @@ export class AccelerationBands extends Indicator {
 
     public _prepareChildren() {
 
+        super._prepareChildren();
+
         if (this.isDirty("factor")) {
             this.markDataDirty();
             this.setCustomData("factor", this.get("factor"));
         }
-
-        super._prepareChildren();
     }
 
     public _updateChildren() {
@@ -192,8 +207,8 @@ export class AccelerationBands extends Indicator {
                         continue;
                     }
                     const ff = (((high - low) / (sum / 2)) * 1000) * factor;
-                    dataItem._lower = (high * (1 + 2 * ff));
-                    dataItem._upper = (low * (1 - 2 * ff));
+                    dataItem._upper = (high * (1 + 2 * ff));
+                    dataItem._lower = (low * (1 - 2 * ff));
                     dataItem._average = dataItem._lower + (dataItem._upper - dataItem._lower) / 2;
                 }
             }

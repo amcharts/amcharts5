@@ -190,6 +190,8 @@ import type { RadialLabel } from "./render/RadialLabel.js";
 import type { RadialText } from "./render/RadialText.js";
 import type { Rectangle } from "./render/Rectangle.js";
 import type { RectanglePattern } from "./render/patterns/RectanglePattern.js";
+import type { StarPattern } from "./render/patterns/StarPattern.js";
+import type { TrianglePattern } from "./render/patterns/TrianglePattern.js";
 import type { RectangleSeries } from "./../charts/stock/drawing/RectangleSeries.js";
 import type { RegressionSeries } from "./../charts/stock/drawing/RegressionSeries.js";
 import type { RelativeStrengthIndex } from "./../charts/stock/indicators/RelativeStrengthIndex.js";
@@ -446,6 +448,8 @@ export interface IClasses {
 	"RadialText": RadialText;
 	"Rectangle": Rectangle;
 	"RectanglePattern": RectanglePattern;
+	"StarPattern": StarPattern;
+	"TrianglePattern": TrianglePattern;
 	"RectangleSeries": RectangleSeries;
 	"RegressionSeries": RegressionSeries;
 	"RelativeStrengthIndex": RelativeStrengthIndex;

@@ -5,6 +5,53 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.0] - 2026-07-22
+
+### Added
+- New `StarPattern` and `TrianglePattern` fill patterns added. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/)
+- `RectanglePattern` now supports a `rotateShapes` setting. When `true`, `rotation` rotates each rectangle around its own center instead of the whole grid which makes it faster.
+- New themes: `Midnight`, `Ember`, `Nord`, `NordDark`, `Pastel`, `PastelDark`, `Colorblind`, `ColorblindDark` (Okabe-Ito, color-blindness safe), `Patterns`, `PatternsDark`, `Petroleum`, `Savanna`.
+- New dark variants of the existing themes: `DatavizDark`, `KellyDark`, `MaterialDark`, `MoonriseDark`, `SpiritedDark`, `FrozenDark`.
+- Two new parameterized themes : `Monochrome` (a single-hue lightness ramp with an optional `accent`) and `Adaptive` (generates a full palette from one or two base colors). [More info](https://www.amcharts.com/docs/v5/concepts/themes/)
+- `XYChart` has new `strokeWidths` and `strokeDasharrays` settings — arrays cycled across line series as they are added, the same way `colors` cycles series colors.
+- `XYCursor` has a new `clickTolerance` setting: how far outside the plot area (in pixels) a press can start and still begin a zoom/selection (the selection still starts on the plot edge). Default: `0` (current behavior).
+- New `globalpointerdown` event on all elements, fired on a press anywhere on the chart surface (mirrors `globalpointermove`/`globalpointerup`).
+
+### Changed
+- The Volume Profile indicator now distributes each bar's volume across the full high/low price range it traded, instead of placing the whole bar at its closing price.
+- `Label`'s `oversizedBehavior: "truncate"` now ignores `maxHeight` setting (because there's no way to truncate text vertically).
+- Stock chart indicators now enforce sensible min/max limits on their numeric settings, so extreme values can no longer freeze the page (e.g. a Volume Profile row count of 24000) or break an indicator. `IIndicatorEditableSetting` gains `maxValue` and `step`.
+- New properties on Indicator editable settings: `scale`, `maxValue`, `step`. [More info](https://www.amcharts.com/docs/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#Setting_up_the_modal)
+- Acceleration Bands' `factor` now displays as the conventional `1` instead of `0.001`.
+- If a bullet's `Graphics` has no paint settings set (`fill`, `fillGradient`, `fillPattern`, `stroke`, `strokeGradient`) it will inherit all those from parent series.
+- New `Series` settings: `fillGradient`/`strokeGradient`.
+- `PathPattern` now repeats the `svgPath` on as a grid instead of drawing once and letting rendering engine repeat it.
+- An `XYSeries` value field (e.g. `valueYField`, `openValueYField`) can now be changed dynamically after the series is created; re-set the series' data afterwards for the change to take effect.
+- A `Container`'s `Rectangle`/`RoundedRectangle` background now defaults `crisp` to `true` (for sharper edges/strokes) unless `crisp` is set explicitly.
+- An `XYSeries` can now be reassigned to a different `xAxis`/`yAxis` after creation.
+- Accessibility: Focusable elements are not being sized on initial load until they are actually focused.
+- Accessibility: The `<div>` that holds chart's focusable elements will now have its `aria-label` set if `ariaLabel` is provided in `Root` settings.
+
+### Fixed
+- Logarithmic `ValueAxis` could show floating-point noise in its grid labels (e.g. `4,999.999999999999` instead of `5,000`). Grid values are now rounded.
+- Logarithmic `ValueAxis` was showing `0` for grid values smaller than `0.00001` when no `numberFormat` was set
+- `ValueAxis` with `syncWithAxis` and `autoZoom: false` regressed in 5.19.0: wrong scale and a possible browser hang.
+- Acceleration Bands: the upper and lower bands were swapped to display appropriate `upperColor`/`lowerColor`.
+- Williams %R: used a `period + 1` lookback and treated a missing high/low as `0`; it now uses exactly `period` bars.
+- Momentum: skipped its first computable value; it now plots from `period` bars onward.
+- Relative Strength Index: returned `0` (maximum "oversold") for a perfectly flat market (`0/0`); it now returns a neutral `50`.
+- Moving Average Cross: default fast/slow periods were inverted; the defaults are now `fastPeriod: 9` / `period: 21`.
+- Volume Profile: no longer errors in `ticks` count mode when the visible price range is flat.
+- `LinePattern` with a non-zero `angle` could show a seam instead of tiling seamlessly.
+- `LinePattern` with a non-zero `rotation` could render broken/dashed lines after the tile-size optimization; the auto-shrink is now skipped when `rotation` is set.
+- `RectanglePattern`/`CirclePattern` with a non-zero `rotation` could render nothing on larger pattern tiles.
+- `ChartSerializer` now accounts for settings on start/end labels of a `HeatLegend`.
+- Width of the `Label`'s underline could fluctuate in some cases.
+- A non-finite `startAngle`/`endAngle` on a `RadarChart` (e.g. `NaN` or `Infinity`) could freeze the browser.
+- `Venn` was not resetting its `colors`/`patterns` sets when data was cleared/re-set.
+- Classes that would not react/redraw to dynamic changes to some of their settings: `CategoryAxis`, `DateAxis`, `ValueAxis`, `CategoryDateAxis`, `DurationAxis`, `XYSeries`, `ColumnSeries`, `StepLineSeries`, `RadarLineSeries`, `SmoothedRadarLineSeries`, `Treemap`, `VoronoiTreemap`, `Sunburst`, `Pack`, `ForceDirected`, `FunnelSlice`, `FunnelSeries`, `PyramidSeries`, `SerpentineChart`, `SpiralChart`, `Graphics`, `Rectangle`, `RoundedRectangle`, `HeatLegend`, `WordCloud`, `Flow`, `FlowLink`, `Chord`, `ChordDirected`, `ChordNonRibbon`, `ArcDiagram`.
+
+
 ## [5.19.1] - 2026-06-17
 
 ### Fixed
@@ -1368,8 +1415,8 @@ patterns with gradient fills.
 - `Root` element now has three additional settings: `focusable`, `ariaLabel`, and `role` (all are empty by default). [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element).
 
 ### Changed
-- Accessibility: The `role` of the `<div>` element that holds focusable elements is changed to `graphics-document` (was `application`) to better reflect 	 interactive element. [More info](https://www.w3.org/TR/graphics-aria-1.0/#graphics-document).
-- Accessibility: `<div>` element that holds `<canas>` elements has now `aria-hidden="true"` set.
+- Accessibility: The `role` of the `<div>` element that holds focusable elements is changed to `graphics-document` (was `application`) to better reflect interactive element. [More info](https://www.w3.org/TR/graphics-aria-1.0/#graphics-document).
+- Accessibility: `<div>` element that holds `<canvas>` elements has now `aria-hidden="true"` set.
 - If using `type` with the JSON plugin, it will now always replace the existing Entity instead of merging.
 
 ### Fixed

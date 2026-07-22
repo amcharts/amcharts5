@@ -196,6 +196,21 @@ export abstract class BaseColumnSeries extends XYSeries {
 			}
 		}
 
+		// Clustering is computed from all column series sharing the base axis, so
+		// toggling `clustered` OR `stacked` on one series changes the slot count
+		// for the others too (a stacked series collapses into a single slot).
+		// Reposition this series and mark its siblings dirty so they reflow.
+		if (this.isDirty("clustered") || this.isDirty("stacked")) {
+			this._valuesDirty = true;
+			if (baseAxis) {
+				$array.each(baseAxis.series, (series) => {
+					if (series instanceof BaseColumnSeries && series !== this) {
+						series.markDirtyValues();
+					}
+				});
+			}
+		}
+
 		let index = 0;
 		let clusterCount = 0;
 		let i = 0;

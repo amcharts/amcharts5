@@ -53,6 +53,8 @@ export class SmoothedRadarLineSeries extends RadarLineSeries {
 			else {
 				this.setRaw("curveFactory", curveCardinal.tension(this.get("tension", 0)));
 			}
+			// `setRaw` doesn't mark `curveFactory` dirty, so force the line rebuild.
+			this._valuesDirty = true;
 		}
 
 		if (this.isDirty("tension")) {
@@ -60,6 +62,8 @@ export class SmoothedRadarLineSeries extends RadarLineSeries {
 			if (cf) {
 				cf.tension(this.get("tension", 0));
 			}
+			// The factory is mutated in place, so force the line rebuild.
+			this._valuesDirty = true;
 		}
 	}
 

@@ -61,6 +61,8 @@ export { LinePattern, ILinePatternSettings, ILinePatternPrivate } from "./.inter
 export { Pattern, IPatternSettings, IPatternPrivate } from "./.internal/core/render/patterns/Pattern";
 export { PicturePattern, IPicturePatternSettings, IPicturePatternPrivate } from "./.internal/core/render/patterns/PicturePattern";
 export { RectanglePattern, IRectanglePatternSettings, IRectanglePatternPrivate } from "./.internal/core/render/patterns/RectanglePattern";
+export { StarPattern, IStarPatternSettings, IStarPatternPrivate } from "./.internal/core/render/patterns/StarPattern";
+export { TrianglePattern, ITrianglePatternSettings, ITrianglePatternPrivate } from "./.internal/core/render/patterns/TrianglePattern";
 export { PathPattern, IPathPatternSettings, IPathPatternPrivate } from "./.internal/core/render/patterns/PathPattern";
 export { PatternSet, IPatternSetSettings, IPatternSetPrivate } from "./.internal/core/util/PatternSet";
 

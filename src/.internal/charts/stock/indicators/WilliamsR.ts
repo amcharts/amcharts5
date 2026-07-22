@@ -27,12 +27,18 @@ export class WilliamsR extends OverboughtOversold {
 		this._editableSettings.unshift({
 			key: "period",
 			name: this.root.language.translateAny("Period"),
-			type: "number"
+			type: "number",
+			minValue: 3,
+			maxValue: 100,
+			step: 1
 		}, {
 			key: "seriesColor",
 			name: this.root.language.translateAny("Period"),
 			type: "color"
 		});
+
+		this._setEditableSettingBounds("overBought", -30, -5, 1);
+		this._setEditableSettingBounds("overSold", -95, -70, 1);
 	}
 
 
@@ -52,21 +58,25 @@ export class WilliamsR extends OverboughtOversold {
 
 				let h = -Infinity;
 				let l = Infinity;
-				let b = Math.max(0, i - period);
+				let b = Math.max(0, i - period + 1);
 				for (let j = b; j <= i; j++) {
 
-					let vh = dataItems[j].get("highValueY", 0);
+					let vh = dataItems[j].get("highValueY");
+					let vl = dataItems[j].get("lowValueY");
+					if (vh == null || vl == null) {
+						continue;
+					}
+
 					if (vh >= h) {
 						h = vh;
 					}
 
-					let vl = dataItems[j].get("lowValueY", 0);
 					if (vl <= l) {
 						l = vl;
 					}
 				}
 
-				if (h - l != 0) {
+				if (h !== -Infinity && h - l != 0) {
 					dataItem.valueS = -100 * (h - dataItem.value_y) / (h - l);
 				}
 			}

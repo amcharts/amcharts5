@@ -81,6 +81,7 @@ export interface IRendererEvents {
 	dblclick: IRendererEvent<IPointerEvent>;
 	globalpointermove: IRendererEvent<IPointerEvent>,
 	globalpointerup: IRendererEvent<IPointerEvent>,
+	globalpointerdown: IRendererEvent<IPointerEvent>,
 	pointerover: IRendererEvent<IPointerEvent>;
 	pointerout: IRendererEvent<IPointerEvent>;
 	pointerdown: IRendererEvent<IPointerEvent>;

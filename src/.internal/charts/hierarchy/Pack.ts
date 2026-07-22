@@ -113,14 +113,22 @@ export class Pack extends Hierarchy {
 				this._updateNodesScale(this._rootNode);
 			}
 		}
+
+		// `nodePadding` is applied in `_updateVisuals`, which the base only runs on
+		// value/size changes — so re-run it when the padding changes dynamically.
+		if (this.isDirty("nodePadding")) {
+			this._updateVisuals();
+		}
 	}
 
 	protected _updateVisuals() {
 		if (this._rootNode) {
 			const packLayout = this._packLayout;
 			packLayout.size([this.innerWidth(), this.innerHeight()]);
-			packLayout(this._rootNode);
+			// Set padding before computing the layout, otherwise it only takes
+			// effect on the next pass.
 			packLayout.padding(this.get("nodePadding", 0));
+			packLayout(this._rootNode);
 			this._updateNodes(this._rootNode);
 		}
 	}

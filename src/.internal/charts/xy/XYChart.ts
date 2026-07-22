@@ -46,6 +46,26 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	scrollbarY?: Scrollbar;
 
 	/**
+	 * A list of stroke widths (in pixels) to cycle through for line series as they
+	 * are added, the same way `colors` cycles series colors. Each added line
+	 * series is given the next width based on its position. Useful for telling
+	 * line series apart without relying on color (e.g. the "Patterns" theme).
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for related info
+	 */
+	strokeWidths?: Array<number>;
+
+	/**
+	 * A list of stroke dash arrays to cycle through for line series as they are
+	 * added, the same way `colors` cycles series colors. Each entry is a
+	 * `strokeDasharray` value (an array of dash/gap lengths, or a single number);
+	 * `0` or an empty array is a solid line.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for related info
+	 */
+	strokeDasharrays?: Array<number | Array<number>>;
+
+	/**
 	 * If this is set to `true`, users will be able to pan the chart horizontally
 	 * by dragging plot area.
 	 *
@@ -1374,6 +1394,24 @@ export class XYChart extends SerialChart {
 				const pattern = patternSet.next();
 
 				series._setSoft("fillPattern", pattern);
+			}
+		}
+
+		// Cycle stroke widths / dash arrays for line series (those that have a
+		// `strokes` list), keyed by the series' position — so line series can be
+		// told apart by weight and dashiness without relying on color.
+		const strokeWidths = this.get("strokeWidths");
+		const strokeDasharrays = this.get("strokeDasharrays");
+		if (strokeWidths || strokeDasharrays) {
+			const strokes = (series as any).strokes;
+			if (strokes && strokes.template) {
+				const index = this.series.indexOf(series);
+				if (strokeWidths && strokeWidths.length > 0) {
+					strokes.template.set("strokeWidth", strokeWidths[index % strokeWidths.length]);
+				}
+				if (strokeDasharrays && strokeDasharrays.length > 0) {
+					strokes.template.set("strokeDasharray", strokeDasharrays[index % strokeDasharrays.length]);
+				}
 			}
 		}
 	}

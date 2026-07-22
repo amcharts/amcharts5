@@ -871,6 +871,11 @@ export class StockChart extends Container {
 
 		this.markDirtyIndicators();
 
+		// Clamp out-of-range numeric settings before the first (synchronous)
+		// prepareData below — covers freshly added and deserialized indicators, so
+		// heavy compute (e.g. Volume Profile rows) never runs with a bad value.
+		indicator._clampSettings(true);
+
 		//indicator.markDataDirty(); // not good, shows zoomed out value axis
 		indicator.prepareData();
 

@@ -983,6 +983,16 @@ export abstract class XYSeries extends Series {
 
 		this.set("maskContent", true);
 
+		// Re-wire the series when it is reassigned to a different axis after
+		// creation. Handled via `on()` (fires once on `.set()`, outside the
+		// validation cycle) so the swap's `set`/markDirty calls can't re-enter.
+		this._disposers.push(this.on("xAxis", () => {
+			this._switchAxis("xAxis");
+		}));
+		this._disposers.push(this.on("yAxis", () => {
+			this._switchAxis("yAxis");
+		}));
+
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
 			if (change.type === "clear") {
 				$array.each(change.oldValues, (axisRange) => {
@@ -1018,6 +1028,19 @@ export abstract class XYSeries extends Series {
 		})
 
 		this._makeFieldNames();
+
+		// Value fields were historically meant to be set once at creation. Allow
+		// them to be changed dynamically: rebuild the field map and names
+		// synchronously when a `*Field` setting changes, so a subsequent
+		// `data.setAll()` (which parses synchronously) picks up the new field.
+		const onFieldChange = () => {
+			this._updateFields();
+			this._makeFieldNames();
+			this.markDirtyValues();
+		};
+		$array.each([...this.valueXFields, ...this.valueYFields], (key) => {
+			this.on(<any>(key + "Field"), onFieldChange);
+		});
 	}
 
 	protected _processAxisRange(axisRange: this["_axisRangeType"]) {
@@ -1072,7 +1095,7 @@ export abstract class XYSeries extends Series {
 		}
 	}
 
-	protected _updateFields() {
+	public _updateFields() {
 		super._updateFields();
 
 		this._valueXFields = [];
@@ -1276,6 +1299,48 @@ export abstract class XYSeries extends Series {
 	}
 
 
+	/**
+	 * Re-wires the series when its `xAxis`/`yAxis` setting is changed to a
+	 * different axis after creation, mirroring `XYChart._processSeries`. Invoked
+	 * from an `on()` handler (fires once on `.set()`) rather than from
+	 * `_prepareChildren`, so setting `baseAxis`/markDirty here can't re-enter.
+	 */
+	protected _switchAxis(key: "xAxis" | "yAxis") {
+		const prevAxis = (this._prevSettings as any)[key] as Axis<any> | undefined;
+		const axis = this.get(key as any) as Axis<any> | undefined;
+
+		if (prevAxis && axis && prevAxis !== axis) {
+			// Detach from the previous axis
+			$array.remove(prevAxis.series, this);
+			const prevDp = key == "xAxis" ? this._posXDp : this._posYDp;
+			if (prevDp) {
+				prevDp.dispose();
+			}
+			prevAxis.markDirtyExtremes();
+
+			// Re-point baseAxis if it referenced the previous axis
+			if (this.get("baseAxis") === prevAxis) {
+				this.set("baseAxis", axis);
+			}
+
+			// Attach to the new axis
+			$array.move(axis.series, this);
+			const dp = this.addDisposer(axis.events.on("positionchanged", () => {
+				this._fixPosition();
+			}));
+			if (key == "xAxis") {
+				this._posXDp = dp;
+			}
+			else {
+				this._posYDp = dp;
+			}
+			axis.markDirtyExtremes();
+			axis._seriesAdded = true;
+
+			this._markDirtyAxes();
+		}
+	}
+
 	public _prepareChildren() {
 		super._prepareChildren();
 
@@ -1284,13 +1349,20 @@ export abstract class XYSeries extends Series {
 
 		this._bullets = {};
 
-		if (this.isDirty("valueYShow") || this.isDirty("valueXShow") || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow")) {
+		if (this.isDirty("valueYShow") || this.isDirty("valueXShow") || this.isDirty("openValueYShow") || this.isDirty("openValueXShow") || this.isDirty("lowValueYShow") || this.isDirty("lowValueXShow") || this.isDirty("highValueYShow") || this.isDirty("highValueXShow")) {			
 			this._updateFields();
 			this._makeFieldNames();
 			this._valuesDirty = true;
 		}
 
 		if (this.isDirty("xAxis") || this.isDirty("yAxis")) {
+			this._valuesDirty = true;
+		}
+
+		// Location settings are read while (re)building points/columns in
+		// `_updateChildren` (gated by `_valuesDirty`), so force that rebuild when
+		// they change dynamically.
+		if (this.isDirty("locationX") || this.isDirty("locationY") || this.isDirty("openLocationX") || this.isDirty("openLocationY") || this.isDirty("exactLocationX") || this.isDirty("exactLocationY")) {
 			this._valuesDirty = true;
 		}
 
@@ -1347,16 +1419,18 @@ export abstract class XYSeries extends Series {
 
 		const stacked = this.get("stacked");
 
-		if (this.isDirty("stacked")) {
+		if (this.isDirty("stacked") || (this.isDirty("stackToNegative") && stacked)) {
 			if (stacked) {
 				if (this._valuesDirty && !this._dataProcessed) {
 
 				}
 				else {
+					this._valuesDirty = true;
 					this._stack();
 				}
 			}
 			else {
+				this._valuesDirty = true;
 				this._unstack();
 			}
 		}

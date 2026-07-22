@@ -184,7 +184,7 @@ export class Chord extends Flow {
 
 		let chordChanged = false;
 
-		if (this._valuesDirty || this._sizeDirty || this.isDirty("padAngle") || this.isDirty("startAngle")) {
+		if (this._valuesDirty || this._sizeDirty || this.isDirty("padAngle") || this.isDirty("startAngle") || this.isDirty("sort")) {
 
 			const matrix = this._makeMatrix();
 

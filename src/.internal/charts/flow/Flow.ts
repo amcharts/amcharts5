@@ -284,6 +284,12 @@ export abstract class Flow extends Series {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		// `minSize` clamps node values in the `_valuesDirty` block below, so re-run
+		// it when the setting changes.
+		if (this.isDirty("minSize")) {
+			this._valuesDirty = true;
+		}
+
 		let valueLow = Infinity;
 		let valueHigh = -Infinity;
 		let valueSum = 0;

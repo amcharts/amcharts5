@@ -165,6 +165,10 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		if(this.isDirty("startLocation") || this.isDirty("endLocation")){
+			this._sizeDirty = true;
+		}
+
 		const len = this.dataItems.length;
 		let i = 0;
 		if (this._valuesDirty) {
@@ -429,6 +433,14 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1);
 
 		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
+
+		// A degenerate axis length (e.g. a NaN/Infinity angle span on a radar
+		// chart) makes `maxCount` non-finite, which cascades into a NaN
+		// `frequency` and a NaN `startIndex` — and `this.dataItems[NaN]` is
+		// undefined, throwing on `.get()` below. Fall back to a valid frequency.
+		if (!$type.isNumber(frequency)) {
+			frequency = 1;
+		}
 
 		startIndex = Math.floor(startIndex / frequency) * frequency;
 		this._frequency = frequency;

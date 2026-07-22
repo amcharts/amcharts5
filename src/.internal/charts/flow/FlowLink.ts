@@ -53,7 +53,7 @@ export abstract class FlowLink extends Graphics {
 
 	public _changed() {
 		super._changed();
-		if (this.isDirty("fillStyle")) {
+		if (this.isDirty("fillStyle") || this.isDirty("strokeStyle")) {
 			const series = this.series;
 			const dataItem = this.dataItem as DataItem<IFlowDataItem>;
 			if (series && dataItem) {

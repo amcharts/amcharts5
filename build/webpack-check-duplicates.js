@@ -1,6 +1,15 @@
 const $path = require("path");
 
 class CheckDuplicates {
+	// `ignore` is an optional array of RegExps tested against each module's
+	// resource path (with forward slashes, so patterns are cross-platform).
+	// Matching modules are allowed to appear in multiple chunks without warning
+	// — used for standalone bundles like themes that intentionally inline a
+	// shared base into each chunk.
+	constructor(options) {
+		this.ignore = (options && options.ignore) || [];
+	}
+
 	apply(compiler) {
 		compiler.hooks.emit.tap("CheckDuplicates", (compilation) => {
 			const logger = compiler.getInfrastructureLogger("CheckDuplicates");
@@ -18,7 +27,9 @@ class CheckDuplicates {
 
 					const chunks = compilation.chunkGraph.getModuleChunks(module);
 
-					if (chunks.length > 1) {
+					const normalized = module.resource.replace(/\\/g, "/");
+
+					if (chunks.length > 1 && !this.ignore.some((regexp) => regexp.test(normalized))) {
 						const files = [];
 
 						chunks.forEach((chunk) => {

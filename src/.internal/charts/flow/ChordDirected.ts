@@ -92,6 +92,9 @@ export class ChordDirected extends Chord {
 				ribbon.headRadius(headRadius);
 				this._ribbon = ribbon;
 			}
+			// Rebuilding the ribbon generator alone doesn't re-apply it to existing
+			// links; force the link-update pass so the new generator is used.
+			this._sizeDirty = true;
 		}
 
 		super._prepareChildren();

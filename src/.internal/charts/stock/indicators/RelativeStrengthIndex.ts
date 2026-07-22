@@ -46,7 +46,10 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 		this._editableSettings.unshift({
 			key: "period",
 			name: this.root.language.translateAny("Period"),
-			type: "number"
+			type: "number",
+			minValue: 2,
+			maxValue: 100,
+			step: 1
 		}, {
 			key: "seriesColor",
 			name: this.root.language.translateAny("Period"),
@@ -59,12 +62,18 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 		}, {
 			key: "smaPeriod",
 			name: this.root.language.translateAny("SMA period"),
-			type: "number"
+			type: "number",
+			minValue: 1,
+			maxValue: 50,
+			step: 1
 		}, {
 			key: "smaColor",
 			name: this.root.language.translateAny("SMA period"),
 			type: "color"
 		})
+
+		this._setEditableSettingBounds("overBought", 60, 90, 1);
+		this._setEditableSettingBounds("overSold", 10, 40, 1);
 
 		const smaSeries = this.panel.series.push(LineSeries.new(this._root, {
 			valueXField: "valueX",
@@ -127,7 +136,7 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 					rsi = 100 - (100 / (1 + averageGain / averageLoss));
 
 					if($type.isNaN(rsi)){
-						rsi = 0;
+						rsi = 50;
 					}
 				}
 				else if (i > period) {
@@ -153,7 +162,7 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 
 
 						if(isNaN(rsi)){
-							rsi = 0;
+							rsi = 50;
 						}						
 					}
 				}

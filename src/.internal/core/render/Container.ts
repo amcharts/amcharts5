@@ -787,6 +787,11 @@ export class Container extends Sprite {
 				background.set("isMeasured", false);
 				background._setParent(this);
 				this._display.addChildAt(background._display, 0);
+				// Rectangle / RoundedRectangle backgrounds render sharper edges and
+				// strokes when crisp; default it on unless the user set it explicitly.
+				if (background instanceof Rectangle && !background.isUserSetting("crisp")) {
+					background.set("crisp", true);
+				}
 			}
 		}
 

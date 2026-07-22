@@ -710,6 +710,9 @@ export class Root implements IDisposer {
 			focusElementContainer.style.height = height + "px";
 
 			focusElementContainer.setAttribute("role", "graphics-document");
+			if (settings.ariaLabel) {
+				focusElementContainer.setAttribute("aria-label", settings.ariaLabel);
+			}
 
 			$utils.setInteractive(focusElementContainer, false);
 			this._focusElementContainer = focusElementContainer;
@@ -1756,7 +1759,6 @@ export class Root implements IDisposer {
 		if (this._a11yD == true || target == undefined) {
 			return;
 		}
-
 		this._focusElementContainer!.scrollTop = 0;
 
 		const bounds = target.globalBounds();
@@ -1976,7 +1978,9 @@ export class Root implements IDisposer {
 		if (target.get("focusable")) {
 			if (focusElement) {
 				this._decorateFocusElement(target);
-				this._positionFocusElement(target);
+				if (this._focusedSprite === target) {
+					this._positionFocusElement(target);
+				}
 			}
 			// else {
 			// 	this._renderer._makeFocusElement(0, this);

@@ -48,11 +48,17 @@ export class ChaikinOscillator extends ChartIndicator {
 	public _editableSettings: IIndicatorEditableSetting[] = [{
 		key: "period",
 		name: this.root.language.translateAny("Fast period"),
-		type: "number"
+		type: "number",
+		minValue: 2,
+		maxValue: 15,
+		step: 1
 	}, {
 		key: "slowPeriod",
 		name: this.root.language.translateAny("Slow period"),
-		type: "number"
+		type: "number",
+		minValue: 5,
+		maxValue: 40,
+		step: 1
 	}, {
 		key: "seriesColor",
 		name: this.root.language.translateAny("Color"),
@@ -78,11 +84,11 @@ export class ChaikinOscillator extends ChartIndicator {
 	}
 
 	public _prepareChildren() {
+		super._prepareChildren();
 		if (this.isDirty("slowPeriod")) {
 			this.markDataDirty();
 			this.setCustomData("slowPeriod", this.get("slowPeriod"));
 		}
-		super._prepareChildren();
 	}
 
 	/**

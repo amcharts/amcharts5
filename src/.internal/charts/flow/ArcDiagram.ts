@@ -127,7 +127,7 @@ export class ArcDiagram extends Flow {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this._valuesDirty || this._sizeDirty || this.isDirty("orientation")) {
+		if (this._valuesDirty || this._sizeDirty || this.isDirty("orientation") || this.isDirty("radiusKey") || this.isDirty("minRadius") || this.isDirty("nodePadding")) {
 			let width = 1;
 			const orientation = this.get("orientation");
 

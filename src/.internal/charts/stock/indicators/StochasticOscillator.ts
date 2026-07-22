@@ -57,7 +57,10 @@ export class StochasticOscillator extends OverboughtOversold {
 			{
 				key: "period",
 				name: this.root.language.translateAny("Period"),
-				type: "number"
+				type: "number",
+				minValue: 2,
+				maxValue: 50,
+				step: 1
 			}, {
 			key: "seriesColor",
 			name: this.root.language.translateAny("Period"),
@@ -65,17 +68,26 @@ export class StochasticOscillator extends OverboughtOversold {
 		}, {
 			key: "kSmoothing",
 			name: this.root.language.translateAny("K period"),
-			type: "number"
+			type: "number",
+			minValue: 1,
+			maxValue: 20,
+			step: 1
 		},{
 			key: "dSmoothing",
 			name: this.root.language.translateAny("SMA period"),
-			type: "number"
+			type: "number",
+			minValue: 1,
+			maxValue: 20,
+			step: 1
 		},  {
 			key: "slowColor",
 			name: this.root.language.translateAny("SMA period"),
 			type: "color"
 		}
 		)
+
+		this._setEditableSettingBounds("overBought", 70, 95, 1);
+		this._setEditableSettingBounds("overSold", 5, 30, 1);
 
 		this.yAxis.setAll({ min: 0, max: 100, strictMinMax: true });
 

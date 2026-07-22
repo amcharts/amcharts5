@@ -11,7 +11,7 @@ let rules: CounterDisposer | undefined;
 /**
  * @ignore
  */
-export default function(element: ShadowRoot | null, root: Root, _prefix?: string): IDisposer {
+export default function (element: ShadowRoot | null, root: Root, _prefix?: string): IDisposer {
 	const ic = root.interfaceColors;
 	const active = ic.get("secondaryButton")!.toCSS();
 	const hover = ic.get("secondaryButtonHover")!.toCSS();
@@ -65,10 +65,18 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 
 			new StyleRule(element, ".am5-modal-content .am5stock-control-color .am5stock-control-icon", {
 				"margin": "0",
-				"width": "48px",
+				"width": "100%",
 				"min-height": "1em",
-				"max-width": "50px",
+				"max-width": "none",
 				"line-height": "0.8em",
+			}, root.nonce),
+
+			// Match the color field's outline width to the number/text inputs so the
+			// fields line up. The button keeps its border (outline) and padding, so
+			// the swatch above sits inside it as a smaller colored rectangle.
+			new StyleRule(element, ".am5-modal-content .am5stock-control-button.am5stock-control-color", {
+				"box-sizing": "border-box",
+				"width": "70px"
 			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-content .am5stock-control-button .am5stock-control-icon > .am5stock-control-icon-color", {
@@ -77,6 +85,9 @@ export default function(element: ShadowRoot | null, root: Root, _prefix?: string
 
 			new StyleRule(element, ".am5-modal-content input[type=\"text\"], .am5-modal-content input[type=\"number\"], .am5-modal-content select", {
 				"border": "1px solid " + border,
+				// border-box so the fixed input width includes the border, matching the
+				// color field's border-box outline width exactly.
+				"box-sizing": "border-box",
 			}, root.nonce),
 
 			new StyleRule(element, ".am5stock-control-button.am5stock-align-right", {

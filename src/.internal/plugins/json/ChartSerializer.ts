@@ -287,6 +287,18 @@ export class ChartSerializer extends Serializer {
 						"labels", "valueLabels", "markers", "markerRectangles", "itemContainers"
 					]);
 				}
+				else if (child.isType<HeatLegend>("HeatLegend")) {
+					childItem = this.serialize(child, 0, false);
+					this._maybeInit(childItem, "properties", {});
+					this._populateTemplates(child, childItem.properties, ["markers"]);
+					["startLabel", "endLabel"].forEach((key: string) => {
+						const serializedPropValue = this.serialize((child as any)[key], 0, true);
+						if (serializedPropValue) {
+							this._stripType(serializedPropValue);
+							childItem.properties[key] = serializedPropValue;
+						}
+					});
+				}
 				else {
 					childItem = this.serialize(child, 0, true);
 				}

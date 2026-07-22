@@ -297,24 +297,45 @@ export class SettingsModal extends Modal {
 						const input: HTMLSelectElement = ev.target!;
 						const option = input.options[input!.selectedIndex];
 						const extTarget = option.getAttribute("data-target");
-						if (extTarget) {
-							settingInputs[extTarget].value = option.getAttribute("data-target-value") + "";
-							settingInputs[extTarget].setAttribute("data-min-value", option.getAttribute("data-target-min-value") + "");
+						if (extTarget && settingInputs[extTarget]) {
+							const targetInput = settingInputs[extTarget] as HTMLInputElement;
+							// Apply each retargeted attribute only when the option carries it,
+							// so a value-less retarget doesn't stringify "null" onto the input.
+							const applyAttr = (attr: string, prop: "min" | "max" | "step" | null, source: string) => {
+								const v = option.getAttribute(source);
+								if (v != null) {
+									targetInput.setAttribute(attr, v);
+									if (prop) { (targetInput as any)[prop] = v; }
+								}
+								else {
+									targetInput.removeAttribute(attr);
+									// "any" (not removed) so a step-less mode keeps decimals valid.
+									if (prop == "step") { targetInput.step = "any"; }
+									else if (prop) { targetInput.removeAttribute(prop); }
+								}
+							};
+							const tv = option.getAttribute("data-target-value");
+							if (tv != null) { targetInput.value = tv; }
+							applyAttr("data-min-value", "min", "data-target-min-value");
+							applyAttr("data-max-value", "max", "data-target-max-value");
+							applyAttr("data-step", "step", "data-target-step");
+							this._clampNumberInput(targetInput);
 						}
 					}));
 					break;
 				case "number":
 					element = this.getNumber(setting, currentValue);
 					settingInputs[key] = <HTMLInputElement>element;
-					if (setting.minValue !== undefined) {
-						element.setAttribute("data-min-value", setting.minValue + "");
+					// Data attributes (and the clamp) work in DISPLAY units, so scale
+					// the bounds to match the scaled value shown by getNumber.
+					const numScale = setting.scale != null ? setting.scale : 1;
+					if (numScale !== 1) { element.setAttribute("data-scale", numScale + ""); }
+					if (setting.minValue != null) { element.setAttribute("data-min-value", (setting.minValue * numScale) + ""); }
+					if (setting.maxValue != null) { element.setAttribute("data-max-value", (setting.maxValue * numScale) + ""); }
+					if (setting.step != null) { element.setAttribute("data-step", (setting.step * numScale) + ""); }
+					if (setting.minValue != null || setting.maxValue != null || setting.step != null) {
 						this._disposers.push($utils.addEventListener(element, "change", (ev: any) => {
-							const input: HTMLInputElement = ev.target!;
-							const minValue = Number(input.getAttribute("data-min-value"));
-							const value = Number(input.value);
-							if (value < minValue) {
-								input.value = minValue + "";
-							}
+							this._clampNumberInput(ev.target as HTMLInputElement);
 						}));
 					}
 					break;
@@ -374,11 +395,19 @@ export class SettingsModal extends Modal {
 						(element as HTMLInputElement).checked = defaults[key];
 					}
 					else {
-						element.value = defaults[key];
+						element.value = $type.isNumber(defaults[key]) ? (defaults[key] * (Number(element.getAttribute("data-scale")) || 1)) + "" : defaults[key];
 					}
 				});
 				$object.each(controls, (key, control) => {
 					control.setColor(defaults[key]);
+				});
+				// Re-apply any mode dropdown's retargeted bounds to its number input,
+				// so a restored default isn't later mis-clamped on save by stale
+				// min/max/step left over from a previous mode selection.
+				$object.each(settingInputs, (_key, element) => {
+					if (element.tagName == "SELECT") {
+						element.dispatchEvent(new Event("change"));
+					}
 				});
 			}));
 		}
@@ -396,7 +425,9 @@ export class SettingsModal extends Modal {
 					this._updatedSettings[key] = (<HTMLInputElement>element).checked;
 				}
 				else if (element.type == "number") {
-					this._updatedSettings[key] = $type.toNumber(element.value);
+					// Clamp on save too — covers commit without a blur/change event.
+					this._clampNumberInput(element as HTMLInputElement);
+					this._updatedSettings[key] = $type.toNumber(element.value) / (Number((<HTMLInputElement>element).getAttribute("data-scale")) || 1);
 				}
 				else {
 					this._updatedSettings[key] = element.value;
@@ -467,17 +498,23 @@ export class SettingsModal extends Modal {
 					optionElement.text = <string>((<any>option).text);
 					value = ((<any>option).value);
 
-					if ((option as any).minValue) {
+					if ((option as any).minValue != null) {
 						optionElement.setAttribute("data-min-value", (option as any).minValue);
 					}
-					if ((option as any).extTarget) {
+					if ((option as any).extTarget != null) {
 						optionElement.setAttribute("data-target", (option as any).extTarget);
 					}
-					if ((option as any).extTargetValue) {
+					if ((option as any).extTargetValue != null) {
 						optionElement.setAttribute("data-target-value", (option as any).extTargetValue);
 					}
-					if ((option as any).extTargetMinValue) {
+					if ((option as any).extTargetMinValue != null) {
 						optionElement.setAttribute("data-target-min-value", (option as any).extTargetMinValue);
+					}
+					if ((option as any).extTargetMaxValue != null) {
+						optionElement.setAttribute("data-target-max-value", (option as any).extTargetMaxValue);
+					}
+					if ((option as any).extTargetStep != null) {
+						optionElement.setAttribute("data-target-step", (option as any).extTargetStep);
 					}
 				}
 				else {
@@ -496,12 +533,48 @@ export class SettingsModal extends Modal {
 		return element;
 	}
 
-	private getNumber(_setting: any, currentValue: any): HTMLInputElement {
+	private getNumber(setting: any, currentValue: any): HTMLInputElement {
 		const element = document.createElement("input");
 		element.type = "number";
-		element.value = currentValue;
+		// `scale` shows an awkward stored unit as a friendlier number in the UI
+		// (e.g. Acceleration Bands factor 0.001 shown as 1): the value and bounds
+		// are multiplied for display and divided back on save.
+		const scale = (setting && setting.scale != null) ? setting.scale : 1;
+		element.value = $type.isNumber(currentValue) ? (currentValue * scale) + "" : currentValue;
 		element.className = "am5-modal-input-narrow"
+		// Native bounds for the spinner arrows (min can be 0/negative, so guard
+		// with != null, not truthiness).
+		if (setting && setting.minValue != null) { element.min = (setting.minValue * scale) + ""; }
+		if (setting && setting.maxValue != null) { element.max = (setting.maxValue * scale) + ""; }
+		// "any" when unspecified, so a step-less (e.g. fractional ticks) value isn't
+		// forced to whole numbers by the native implicit step of 1.
+		element.step = (setting && setting.step != null) ? (setting.step * scale) + "" : "any";
 		return element;
+	}
+
+	/**
+	 * Clamps a number input to its `data-min-value`/`data-max-value` and rounds to
+	 * an integer when `data-step` is `1`. Attribute-driven so it also works after
+	 * a mode dropdown retargets the input's bounds. Tolerant of missing / empty /
+	 * literal "null" attribute values.
+	 */
+	private _clampNumberInput(input: HTMLInputElement): void {
+		const attrNum = (name: string): number | undefined => {
+			const s = input.getAttribute(name);
+			if (s == null || s === "" || s === "null") { return undefined; }
+			const n = Number(s);
+			return isNaN(n) ? undefined : n;
+		};
+		const value = Number(input.value);
+		if (isNaN(value)) { return; }
+		const step = attrNum("data-step");
+		const min = attrNum("data-min-value");
+		const max = attrNum("data-max-value");
+		let clamped = value;
+		if (step != null && step >= 1) { clamped = Math.round(clamped); }
+		if (min != null && clamped < min) { clamped = min; }
+		if (max != null && clamped > max) { clamped = max; }
+		if (clamped !== value) { input.value = clamped + ""; }
 	}
 
 	private getText(_setting: any, currentValue: any): HTMLInputElement {

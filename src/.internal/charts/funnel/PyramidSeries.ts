@@ -68,6 +68,13 @@ export class PyramidSeries extends FunnelSeries {
 	public _prepareChildren() {
 		super._prepareChildren();
 		this._nextSize = undefined;
+
+		// `topWidth`/`bottomWidth`/`valueIs` are read in `decorateSlice` during the
+		// (inherited) slice-layout pass, gated by `_valuesDirty`; force it when
+		// they change.
+		if (this.isDirty("topWidth") || this.isDirty("bottomWidth") || this.isDirty("valueIs")) {
+			this._valuesDirty = true;
+		}
 	}
 
 	protected decorateSlice(dataItem: DataItem<this["_dataItemSettings"]>) {

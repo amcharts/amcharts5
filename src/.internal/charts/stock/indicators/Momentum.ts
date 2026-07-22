@@ -38,7 +38,10 @@ export class Momentum extends ChartIndicator {
 		{
 			key: "period",
 			name: this.root.language.translateAny("Period"),
-			type: "number"
+			type: "number",
+			minValue: 3,
+			maxValue: 100,
+			step: 1
 		}, {
 			key: "field",
 			name: this.root.language.translateAny("Field"),
@@ -80,7 +83,7 @@ export class Momentum extends ChartIndicator {
 			let i = 0;
 
 			$array.each(dataItems, (dataItem) => {
-				if (i > period) {
+				if (i >= period) {
 					let value = this._getValue(dataItem);
 					let prevValue = this._getValue(dataItems[i - period]);
 
