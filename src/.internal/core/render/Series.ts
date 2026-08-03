@@ -381,32 +381,43 @@ export abstract class Series extends Component {
 			sprite._setDataItem(dataItem);
 			sprite.setRaw("position", "absolute");
 
-			// A bullet whose shape defines none of its own paint inherits the full
-			// set from the series, so bullets match their series without restating
-			// the color (like columns do). It's all-or-nothing: if the bullet sets
-			// even one of fill/fillGradient/fillPattern/stroke/strokeGradient, it is
-			// left entirely alone. Only Graphics-based shapes are touched;
-			// container/label/picture bullets are left to style their own children.
-			if (sprite.isType<Graphics>("Graphics")) {
-				const unstyled = sprite.get("fill") == null
-					&& sprite.get("fillGradient") == null
-					&& sprite.get("fillPattern") == null
-					&& sprite.get("stroke") == null
-					&& sprite.get("strokeGradient") == null;
-
-				if (unstyled) {
-					sprite.set("fill", this.get("fill"));
-					sprite.set("fillGradient", this.get("fillGradient"));
-					sprite.set("fillPattern", this.get("fillPattern"));
-					sprite.set("stroke", this.get("stroke"));
-					sprite.set("strokeGradient", this.get("strokeGradient"));
-				}
-			}
+			this._applyBulletDefaultPaint(sprite, dataItem);
 
 			this.bulletsContainer.children.push(sprite);
 		}
 		bullet.series = this;
 		dataItem.bullets!.push(bullet);
+	}
+
+	/**
+	 * A bullet whose shape defines none of its own paint inherits the full set
+	 * from the series, so bullets match their series without restating the color
+	 * (like columns do). It's all-or-nothing: if the bullet sets even one of
+	 * `fill`/`fillGradient`/`fillPattern`/`stroke`/`strokeGradient`, it is left
+	 * entirely alone. Only `Graphics`-based shapes are touched; container/label/
+	 * picture bullets are left to style their own children.
+	 *
+	 * @ignore
+	 */
+	public _applyBulletDefaultPaint(sprite: Sprite, dataItem?: DataItem<this["_dataItemSettings"]>) {
+		if (sprite.isType<Graphics>("Graphics")) {
+			const unstyled = sprite.get("fill") == null
+				&& sprite.get("fillGradient") == null
+				&& sprite.get("fillPattern") == null
+				&& sprite.get("stroke") == null
+				&& sprite.get("strokeGradient") == null;
+
+			if (unstyled) {
+				// pie slices, flow nodes and hierarchy nodes hold their color on the data item
+				const itemFill = dataItem ? (dataItem as any).get("fill") : undefined;
+
+				sprite.set("fill", itemFill != null ? itemFill : this.get("fill"));
+				sprite.set("fillGradient", this.get("fillGradient"));
+				sprite.set("fillPattern", this.get("fillPattern"));
+				sprite.set("stroke", this.get("stroke"));
+				sprite.set("strokeGradient", this.get("strokeGradient"));
+			}
+		}
 	}
 
 	/**

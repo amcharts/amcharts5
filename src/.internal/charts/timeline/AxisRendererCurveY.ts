@@ -108,6 +108,11 @@ export class AxisRendererCurveY extends AxisRenderer {
 		if (this.isDirty("axisLength")) {
 			this.updateLayout();
 		}
+
+		if (this.isDirty("rotateLabels")) {
+			// re-run the label loop so `updateLabel` applies (or clears) rotation
+			this.axis.markDirtySize();
+		}
 	}
 
 	/**
@@ -243,6 +248,10 @@ export class AxisRendererCurveY extends AxisRenderer {
 
 				if (this.get("rotateLabels", true)) {
 					label.set("rotation", angle);
+				}
+				else {
+					// reset, so turning `rotateLabels` off again unrotates the labels
+					label.set("rotation", 0);
 				}
 			}
 

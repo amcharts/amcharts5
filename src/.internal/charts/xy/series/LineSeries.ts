@@ -776,6 +776,12 @@ export class LineSeries extends XYSeries {
 
 						if (sprite) {
 
+							// legend bullets are created straight from the bullet
+							// function, bypassing `_makeBulletReal`, so apply the same
+							// series-paint inheritance here — otherwise a bullet with
+							// no fill of its own is invisible in the legend
+							this._applyBulletDefaultPaint(sprite);
+
 							sprite.setAll({
 								tooltipText: undefined,
 								tooltipHTML: undefined,

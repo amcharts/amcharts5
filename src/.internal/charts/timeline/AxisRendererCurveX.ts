@@ -115,6 +115,11 @@ export class AxisRendererCurveX extends AxisRenderer {
 			const yRenderer = this.get("yRenderer");
 			yRenderer.set("xRenderer", this);
 		}
+
+		if (this.isDirty("rotateLabels")) {
+			// re-run the label loop so `updateLabel` applies (or clears) rotation
+			this.axis.markDirtySize();
+		}
 	}
 
 	/**
@@ -531,6 +536,10 @@ export class AxisRendererCurveX extends AxisRenderer {
 
 			if (this.get("rotateLabels", true)) {
 				label.set("rotation", angle - 90);
+			}
+			else {
+				// reset, so turning `rotateLabels` off again unrotates the labels
+				label.set("rotation", 0);
 			}
 
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));

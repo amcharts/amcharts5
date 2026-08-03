@@ -1,6 +1,7 @@
 {
     "extends": "./tsconfig.build.json",
     "compilerOptions": {
+        "types": ["geojson"],
         "declarationDir": "./dist/geodata/es2015",
         "rootDir": "src/geodata",
         "outDir": "./dist/geodata/es2015",

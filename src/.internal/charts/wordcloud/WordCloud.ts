@@ -1,9 +1,7 @@
 import type { DataItem } from "../../core/render/Component";
-import type { CanvasLayer } from "../../core/render/backend/CanvasRenderer";
 import type { ColorSet } from "../../core/util/ColorSet";
 import type { Percent } from "../../core/util/Percent";
 import type { IPoint } from "../../core/util/IPoint";
-import type { IDisposer } from "../../core/util/Disposer";
 import type { Time } from "../../core/util/Animation";
 
 import { WordCloudDefaultTheme } from "./WordCloudDefaultTheme";
@@ -11,9 +9,9 @@ import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate } from "../../
 import { Template } from "../../core/util/Template";
 import { Label } from "../../core/render/Label";
 import { Container } from "../../core/render/Container";
+import { Graphics } from "../../core/render/Graphics";
 import { ListTemplate } from "../../core/util/List";
-import { Color } from "../../core/util/Color";
-import type { IBounds } from "../../core/util/IBounds";
+import type { Color } from "../../core/util/Color";
 
 import * as $utils from "../../core/util/Utils";
 import * as $array from "../../core/util/Array";
@@ -31,11 +29,6 @@ export interface IWordCloudDataItem extends ISeriesDataItem {
 	 * Label.
 	 */
 	label: Label;
-
-	/**
-	 * Label.
-	 */
-	ghostLabel: Label;
 
 	/**
 	 * Fill color used for the slice and related elements, e.g. legend marker.
@@ -146,9 +139,78 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	angles?: number[];
 
 	/**
+	 * How a word's rotation is chosen from `angles`.
+	 *
+	 * When `true` (default) each word picks a random angle from `angles`, so the
+	 * cloud looks different on every layout. When `false` words cycle through
+	 * `angles` in order (word 0 gets `angles[0]`, word 1 `angles[1]`, and so on),
+	 * which — together with `randomness: 0` — makes the layout reproducible.
+	 *
+	 * @since 5.20.1
+	 * @default true
+	 */
+	randomizeAngles?: boolean;
+
+	/**
+	 * Whether words may nest into each other's empty space.
+	 *
+	 * When `true` (default) a word is packed against its neighbors' letters, so
+	 * small words tuck into the concavities of bigger ones and the cloud packs
+	 * tightly — but bounding boxes may overlap. Set to `false` to pack whole
+	 * bounding boxes instead, so they never overlap (useful when labels have an
+	 * opaque `background`, whose rectangles would otherwise slide into a
+	 * neighbor's gaps).
+	 *
+	 * @since 5.20.1
+	 * @default true
+	 */
+	allowNesting?: boolean;
+
+	/**
 	 * Step for next word placement.
 	 */
 	step?: number;
+
+	/**
+	 * Experimental: if set, words are arranged to fill this shape. The path is
+	 * scaled proportionally to fit the plot area.
+	 *
+	 * NOTE: this is an experimental feature and the fit is approximate. Favor
+	 * simple, bold shapes over complex, thin, or highly concave ones, and tune
+	 * `shapeTolerance`, `maskByShape`, `angles` (and `minFontSize`/`maxFontSize`)
+	 * to get a better fill for a particular shape.
+	 *
+	 * @since 5.20.1
+	 */
+	svgPath?: string;
+
+	/**
+	 * Extra distance (in pixels) a word may extend past the `svgPath` outline,
+	 * on top of the automatic per-word overhang (a fraction of each word's own
+	 * size). Words already spill over the edge proportionally to their size so
+	 * the outline fills well at `0` (default); increase this to let them spill
+	 * further.
+	 *
+	 * Can also be negative to pull words further inside the outline, creating
+	 * visual padding between the words and the shape edge.
+	 *
+	 * Only affects placement — the drawn `shape` outline is unchanged. Requires
+	 * `svgPath`.
+	 *
+	 * @since 5.20.1
+	 * @default 0
+	 */
+	shapeTolerance?: number;
+
+	/**
+	 * If set to `true`, words are clipped to the `svgPath` shape, so the parts
+	 * of letters that overhang the outline (see `shapeTolerance`) are cut off at
+	 * the edge for a crisp silhouette. Requires `svgPath`.
+	 *
+	 * @since 5.20.1
+	 * @default false
+	 */
+	maskByShape?: boolean;
 }
 
 export interface IWordCloudPrivate extends ISeriesPrivate {
@@ -158,6 +220,32 @@ export interface IWordCloudPrivate extends ISeriesPrivate {
 	 */
 	adjustedFontSize: number;
 
+}
+
+/**
+ * A bit-packed glyph mask of a single word (32 pixels per int), used by the
+ * layout for in-memory collision detection.
+ *
+ * @ignore
+ */
+interface IWordSprite {
+	bits: Int32Array;
+	stride: number;
+	bw: number;
+	bh: number;
+}
+
+/**
+ * A computed placement of a single word. No `point` means the word could not
+ * be placed (label gets hidden).
+ *
+ * @ignore
+ */
+interface IWordPlacement {
+	dataItem: DataItem<IWordCloudDataItem>;
+	point?: IPoint;
+	angle: number;
+	fontSize: number;
 }
 
 /**
@@ -175,19 +263,60 @@ export class WordCloud extends Series {
 	declare public _privateSettings: IWordCloudPrivate;
 	declare public _dataItemSettings: IWordCloudDataItem;
 
-	protected _currentIndex: number = 0;
-	protected _timeoutDP?: IDisposer;
-
-	protected _ghostContainer = this.children.push(Container.new(this._root, { layer: 99, opacity: 0.01 }))
+	/**
+	 * A [[Graphics]] element that draws the `svgPath` shape the words are
+	 * arranged into, aligned exactly with the word-constraint region.
+	 *
+	 * By default it renders as a faint silhouette (the theme's alternative
+	 * background color at 10% opacity) behind the words, and only when
+	 * `svgPath` is set. Style it via
+	 * `series.shape.setAll({ fill: color, fillOpacity: 0.1, ... })`.
+	 *
+	 * Its geometry (`svgPath`, `scale`, `x`, `y`) and visibility are managed
+	 * by the series; `fill`/`stroke` and other styling are yours to set.
+	 *
+	 * It is added as the first child, so it always renders behind the words.
+	 *
+	 * @since 5.20.1
+	 */
+	public readonly shape: Graphics = this.children.push(Graphics.new(this._root, {
+		themeTags: ["wordcloud", "shape"]
+	}));
 
 	protected _pointSets: Array<Array<IPoint>> = [];
 	protected _sets: number = 3;
 
-	protected _process = false;
+	// bit-packed occupancy board sized to the plot area (32 pixels per int) and
+	// a private scratch canvas used to rasterize word glyph masks
+	protected _board: Int32Array = new Int32Array(0);
+	protected _boardW: number = 0;
+	protected _boardH: number = 0;
+	protected _boardStride: number = 0;
+	protected _scratchCanvas?: HTMLCanvasElement;
+	protected _scratchContext?: CanvasRenderingContext2D;
 
-	protected _buffer: Uint8Array = new Uint8Array(0);
-
-	protected _boundsToAdd?: IBounds;
+	// `svgPath` shape support: a bit mask of the fitted shape's EXTERIOR, tested
+	// against an eroded word box so words stay (mostly) inside; cached per plot
+	// size + path
+	protected _shapeMask?: Int32Array;
+	protected _shapeMaskKey?: string;
+	// candidate points for a shape, ordered thickest-first (by distance to the
+	// shape edge) so words fill the shape from its core outward to the edges —
+	// replaces the spiral, which only fills an ellipse
+	protected _shapeCandidates?: Array<IPoint>;
+	// Container holding the word labels. The `maskByShape` clip is applied to
+	// THIS container (not the whole series), so the labels actually get clipped —
+	// masking the series itself has no effect on the labels.
+	protected _labelsContainer = this.children.push(Container.new(this._root, {}));
+	// whether the `maskByShape` clip is currently applied to `_labelsContainer`.
+	// The mask itself is built fresh on each apply and owned by the container
+	// (which disposes it on removal), so we only track the applied state here.
+	protected _maskApplied: boolean = false;
+	// fitted-shape geometry for the clip mask (kept in sync in `_prepareShapeMask`)
+	protected _shapeScale: number = 1;
+	protected _shapeTx: number = 0;
+	protected _shapeTy: number = 0;
+	protected _svgPathWarned: boolean = false;
 
 	protected _afterNew() {
 		this._defaultThemes.push(WordCloudDefaultTheme.new(this._root));
@@ -198,10 +327,6 @@ export class WordCloud extends Series {
 		this._setDefault("fillField", "fill");
 
 		super._afterNew();
-
-		this._root.events.on("frameended", () => {
-			this.set("progress", this._currentIndex / this.dataItems.length);
-		})
 	}
 
 
@@ -216,7 +341,7 @@ export class WordCloud extends Series {
 	 * @ignore
 	 */
 	public makeLabel(dataItem: DataItem<this["_dataItemSettings"]>): Label {
-		const label = this.children.push(this.labels.make());
+		const label = this._labelsContainer.children.push(this.labels.make());
 		label._setDataItem(dataItem);
 		const fill = dataItem.get("fill");
 		if (fill != null) {
@@ -226,12 +351,6 @@ export class WordCloud extends Series {
 
 		dataItem.set("label", label);
 		this.labels.push(label);
-
-		const ghostLabel = this._ghostContainer.children.push(this.labels.make());
-		ghostLabel._setDataItem(dataItem);
-		ghostLabel.setAll({ fill: Color.fromHex(0x000000), fontWeight: "900" });
-		dataItem.set("ghostLabel", ghostLabel);
-		this.labels.push(ghostLabel);
 
 		return label;
 	}
@@ -284,12 +403,19 @@ export class WordCloud extends Series {
 	public _updateChildren() {
 		super._updateChildren();
 
-		const resolution = this._root._renderer.resolution;
-		const cols = Math.round(this._root.width() * resolution);
-		//const rows = Math.round(this._root.height() * resolution);
 		let step = this.get("step", 1) * 2;
 
-		if (this._valuesDirty || this._sizeDirty || this.isPrivateDirty("adjustedFontSize") || this.isDirty("minFontSize") || this.isDirty("maxFontSize") || this.isDirty("step") || this.isDirty("angles")) {
+		// `shapeTolerance` only affects placement when a shape is active, so it
+		// shouldn't trigger a relayout with no `svgPath` set. `maskByShape` never
+		// relayouts (it only toggles the clip — handled after this block).
+		const shapeSet = this.get("svgPath") != null;
+
+		if (this._valuesDirty || this._sizeDirty || this.isPrivateDirty("adjustedFontSize") || this.isDirty("minFontSize") || this.isDirty("maxFontSize") || this.isDirty("step") || this.isDirty("angles") || this.isDirty("randomness") || this.isDirty("randomizeAngles") || this.isDirty("allowNesting") || this.isDirty("svgPath") || (shapeSet && this.isDirty("shapeTolerance"))) {
+			// The layout re-fits from full size every pass (`_layoutAll` searches
+			// its own `shrink` from 1), so keep `adjustedFontSize` at 1. Otherwise
+			// a stale (ratcheted-down) value pre-scales the fonts and the cloud
+			// can't grow back when the container is enlarged.
+			this.setPrivateRaw("adjustedFontSize", 1);
 			const adjustedFontSize = this.getPrivate("adjustedFontSize", 1);
 
 			const w = this.innerWidth();
@@ -298,13 +424,10 @@ export class WordCloud extends Series {
 			const smaller = Math.min(w, h);
 			const bigger = Math.max(w, h);
 
-			this._buffer = new Uint8Array(Math.ceil(this._root.width() * this._root.height() * resolution * resolution));
-
 			if (smaller < 800) {
 				step = step / 2;
 			}
 
-			this._ghostContainer._display.clear();
 			this._pointSets = [];
 
 			for (let i = 0; i < this._sets; i++) {
@@ -313,14 +436,16 @@ export class WordCloud extends Series {
 				const points = $math.spiralPoints(w / 2, h / 2, w, h, 0, setStep * h / bigger, setStep * w / bigger, 0, 0)
 
 				// generated more points and remove those out of bounds
-				for (let i = points.length - 1; i >= 0; i--) {
-					let point = points[i];
-
-					if (point.x < 0 || point.x > w || point.y < 0 || point.y > h) {
-						points.splice(i, 1);
-						continue;
+				// (single compacting pass; per-point splicing was O(n^2))
+				let n = 0;
+				for (let j = 0; j < points.length; j++) {
+					const point = points[j];
+					if (point.x >= 0 && point.x <= w && point.y >= 0 && point.y <= h) {
+						points[n++] = point;
 					}
 				}
+				points.length = n;
+
 				this._pointSets.push(points);
 			}
 
@@ -379,10 +504,10 @@ export class WordCloud extends Series {
 			const maxFontSize = $utils.relativeToValue(this.get("maxFontSize", 100), smallerSize) * adjustedFontSize;
 
 			const angles = this.get("angles", [0]);
+			const randomizeAngles = this.get("randomizeAngles", true);
 
-			$array.each(this._dataItems, (dataItem) => {
+			$array.each(this._dataItems, (dataItem, index) => {
 				const value = dataItem.get("valueWorking", 0);
-				const ghostLabel = dataItem.get("ghostLabel");
 				let fontSize = minFontSize + (maxFontSize - minFontSize) * (value - valueLow) / (valueHigh - valueLow);
 				if ($type.isNaN(fontSize)) {
 					fontSize = maxFontSize;
@@ -393,177 +518,1022 @@ export class WordCloud extends Series {
 				dataItem.setRaw("set", set);
 				dataItem.setRaw("fontSize", fontSize);
 
-				let angle = angles[Math.floor(Math.random() * (angles.length))];
+				// Random angle by default; cycle through `angles` in order when
+				// `randomizeAngles` is off (reproducible with `randomness: 0`).
+				let angle = randomizeAngles
+					? angles[Math.floor(Math.random() * (angles.length))]
+					: angles[index % angles.length];
 
 				dataItem.setRaw("angle", angle);
-
-				ghostLabel.setAll({ fontSize: fontSize, rotation: angle, x: -10000 });
 			})
 
-			this._process = false;
-			this._currentIndex = 0;
+			// the whole layout happens right here, in one synchronous pass
+			this._layoutAll();
+		}
 
-			this._root.events.once("frameended", () => {
-				this.setTimeout(() => {
-					this._process = true;
-					this._markDirtyKey("progress");
-				}, 20)
-			})
-		}		
+		// `maskByShape` only applies/removes the shape clip — no relayout needed
+		// (which would re-shuffle the words). A no-op when there is no active
+		// shape, so it never forces a redraw with `svgPath` unset.
+		if (this.isDirty("maskByShape")) {
+			this._updateShapeVisibility();
+		}
+	}
 
-		const boundsToAdd = this._boundsToAdd;
-		if (boundsToAdd) {
-			const context = (this._ghostContainer._display.getLayer() as CanvasLayer).context;
-			const y = Math.round(boundsToAdd.top);
-			const x = Math.round(boundsToAdd.left);
-			const w = Math.round(boundsToAdd.right - boundsToAdd.left);
-			const h = Math.round(boundsToAdd.bottom - boundsToAdd.top);
+	/**
+	 * Measures, rasterizes and places all words in one synchronous pass.
+	 * Occupancy is a bit-packed in-memory board tested with bitwise AND — no
+	 * canvas readback and no per-frame word processing.
+	 */
+	protected _layoutAll(): void {
+		// reset `progress` (raw, no event) so the `set(…, 1)` at the end fires on
+		// every layout, not just the first — listeners can detect each relayout
+		this.setRaw("progress", 0);
 
-			const imageData = context.getImageData(x, y, w, h).data;
-			const buffer = this._buffer;
+		// build (or reuse) the `svgPath` shape mask
+		this._prepareShapeMask();
+
+		const autoFit = this.get("autoFit", false);
+		// autoFit shrinks by 0.9 until everything fits; 32 steps take the font
+		// size below 4% of the original, which always fits in practice
+		const maxAttempts = autoFit ? 32 : 1;
+
+		let shrink = 1;
+		let placements: Array<IWordPlacement> | undefined;
+
+		for (let attempt = 0; attempt < maxAttempts; attempt++) {
+			placements = this._layoutAttempt(shrink);
+			if (placements) {
+				break;
+			}
+			shrink *= 0.9;
+		}
+
+		if (placements) {
+			// expose the applied autoFit scale on the documented private
+			// (raw: the gate resets it to 1 before the next pass, so this only
+			// reports the result and never feeds back into the font sizing)
+			this.setPrivateRaw("adjustedFontSize", shrink);
+
+			const animationDuration = this.get("animationDuration", 0);
+			const animationEasing = this.get("animationEasing");
+
+			// The layout is computed in one pass, but the reveal can still be
+			// sequenced word by word for a staggered appearance. Only placed
+			// words get a reveal slot, in placement (biggest-first) order;
+			// skipped words neither reveal nor leave a gap in the cascade.
+			const sequenced = this.get("sequencedInterpolation", false);
+			const sequencedDelay = this.get("sequencedDelay", 15);
+			let revealIndex = 0;
+
+			$array.each(placements, (placement) => {
+				const dataItem = placement.dataItem;
+				const label = dataItem.get("label");
+				const point = placement.point;
+
+				if (point) {
+					dataItem.setRaw("angle", placement.angle);
+
+					if (label.get("x") != -999999) {
+						label.animate({ key: "x", to: point.x, duration: animationDuration, easing: animationEasing });
+						label.animate({ key: "y", to: point.y, duration: animationDuration, easing: animationEasing });
+						label.animate({ key: "rotation", to: placement.angle, duration: animationDuration, easing: animationEasing });
+						label.animate({ key: "fontSize", to: placement.fontSize, duration: animationDuration, easing: animationEasing });
+					}
+					else {
+						label.setAll({ x: point.x, y: point.y, rotation: placement.angle, fontSize: placement.fontSize });
+						if (sequenced) {
+							label.appear(undefined, revealIndex * sequencedDelay);
+						}
+						else {
+							label.appear();
+						}
+					}
+
+					revealIndex++;
+				}
+				else {
+					label.set("x", -999999);
+				}
+			});
+		}
+
+		this.set("progress", 1);
+	}
+
+	/**
+	 * Runs one full placement pass with all font sizes scaled by `shrink`.
+	 * Returns the computed placements, or `undefined` if a word did not fit
+	 * and `autoFit` wants a retry at a smaller scale.
+	 */
+	protected _layoutAttempt(shrink: number): Array<IWordPlacement> | undefined {
+		const w = this.innerWidth();
+		const h = this.innerHeight();
+		const resolution = this._root._renderer.resolution;
+
+		const placements: Array<IWordPlacement> = [];
+
+		if (w <= 0 || h <= 0) {
+			return placements;
+		}
+
+		// occupancy board, sized to the plot area
+		const boardW = Math.ceil(w * resolution);
+		const boardH = Math.ceil(h * resolution);
+		const boardStride = Math.ceil(boardW / 32);
+		const boardLength = boardH * boardStride;
+
+		if (this._board.length == boardLength) {
+			this._board.fill(0);
+		}
+		else {
+			this._board = new Int32Array(boardLength);
+		}
+
+		this._boardW = boardW;
+		this._boardH = boardH;
+		this._boardStride = boardStride;
+
+		// The board holds only placed WORDS (used for word-vs-word collision).
+		// The shape's exterior is kept separate (`_shapeMask`) and tested against
+		// an eroded word box, so words may spill over the shape edge by a bit of
+		// their own size but never overlap each other.
+		const shapeMask = (this._shapeMask && this._shapeMask.length == boardLength) ? this._shapeMask : undefined;
+		// A word may overhang the shape edge by this fraction of its own size,
+		// plus any flat `shapeTolerance`. Proportional, so small edge words poke
+		// out a little and big words a bit more — filling edges without a crude
+		// uniform tolerance.
+		const overhangFraction = 0.4;
+		const shapeTolerance = this.get("shapeTolerance", 0);
+
+		const autoFit = this.get("autoFit", false);
+		const randomness = this.get("randomness", 0);
+		const angles = this.get("angles", [0]);
+		// when nesting is off, each word occupies its whole bounding box (the
+		// box is stamped, not the glyphs), so bounding boxes never overlap
+		const stampBox = !this.get("allowNesting", true);
+
+		// candidate points get consumed as words are placed, so work on copies
+		// (a shrink retry needs the originals intact)
+		const pointSets: Array<Array<IPoint>> = [];
+		$array.each(this._pointSets, (points) => {
+			pointSets.push(points.slice());
+		});
+
+		// With a shape, all words draw from a single distance-ranked list
+		// (thickest-first) shared across sizes, so the shape fills core-first
+		// out to the edges. Without a shape, the per-size spiral sets are used.
+		const shapeCandidates = this._shapeCandidates ? this._shapeCandidates.slice() : undefined;
+
+		for (let i = 0; i < this.dataItems.length; i++) {
+			const dataItem = this.dataItems[i];
+			const text = dataItem.get("category", "");
+			const label = dataItem.get("label");
+			const fontSize = dataItem.get("fontSize", 0) * shrink;
+			let angle = dataItem.get("angle", 0);
+
+			// `_wordFontStyle` forces a heavy weight so the measured/rasterized
+			// mask is fatter than the drawn glyph, keeping natural spacing
+			// between words.
+			const font = this._wordFontStyle(label, fontSize);
+			// vertical advance per line, so multi-line categories (with `\n`)
+			// are measured and stamped as the stacked block they render as
+			const lineStep = this._lineStep(label, fontSize);
+			const size = this._measureWord(text, font, fontSize, lineStep);
+
+			const lw = size.width;
+			const lh = size.height;
+
+			if (!(lw > 0 && lh > 0 && fontSize > 0)) {
+				placements.push({ dataItem: dataItem, angle: angle, fontSize: fontSize });
+				continue;
+			}
+
+			// The label's padding inflates the collision box, the bounds checks
+			// and the covered-point pruning (in the word's local axes,
+			// pre-rotation), so every word keeps a padding-sized moat — while the
+			// stamped mask stays glyph-precise so small words still nest into
+			// big-letter concavities.
+			const padLeft = label.get("paddingLeft", 0);
+			const padRight = label.get("paddingRight", 0);
+			const padTop = label.get("paddingTop", 0);
+			const padBottom = label.get("paddingBottom", 0);
+
+			const plw = lw + padLeft + padRight;
+			const plh = lh + padTop + padBottom;
+
+			// turn an overly wide word so it fits better (using its padded width)
+			if (w > h && plw >= w / 2) {
+				$array.each(angles, (a) => {
+					if (a == 0 && angle != 0) {
+						angle = 0;
+					}
+				})
+			}
+			if (h > w && plw >= w / 2) {
+				$array.each(angles, (a) => {
+					if (Math.abs(a) == 90 && angle == 0) {
+						angle = a;
+					}
+				})
+			}
+
+			// Nesting on (default): stamp only the glyphs, so small words nest
+			// into big-letter concavities. Nesting off: stamp the full box below,
+			// so bounding boxes never overlap (useful with opaque backgrounds,
+			// whose rectangles would otherwise slide into a neighbor's gaps).
+			const sprite = stampBox ? undefined : this._rasterizeWord(text, font, lw, lh, angle);
+
+			// Collision mask: a SOLID padded rectangle at the word's actual
+			// angle. For 0/90 this degenerates to the axis-aligned box (same
+			// result as before), but for diagonal words it hugs the real
+			// footprint, so neighbors can pack into the otherwise-empty
+			// corners of the axis-aligned bounding box.
+			const collisionMask = this._rasterizeBox(plw, plh, angle);
+
+			// For a shape: a smaller box, eroded by the allowed overhang, that
+			// must stay INSIDE the shape (tested against `shapeMask`). The word's
+			// full box may spill past the shape edge by `maxOverhang`, but the
+			// eroded core cannot — so words hug the outline proportionally to
+			// their size instead of leaving a fixed margin.
+			let shapeCore: IWordSprite | undefined;
+			if (shapeMask) {
+				const maxOverhang = shapeTolerance + overhangFraction * Math.min(lw, lh);
+				const ew = Math.max(1, plw - 2 * maxOverhang);
+				const eh = Math.max(1, plh - 2 * maxOverhang);
+				shapeCore = this._rasterizeBox(ew, eh, angle);
+			}
+
+			// padded footprint extents (rotated AABB) in logical plot pixels,
+			// used for the plot-edge checks and the coarse point pruning
+			const rad = angle * Math.PI / 180;
+			const cosA = Math.abs(Math.cos(rad));
+			const sinA = Math.abs(Math.sin(rad));
+			const fw = plw * cosA + plh * sinA;
+			const fh = plw * sinA + plh * cosA;
+
+			const points = shapeCandidates || pointSets[dataItem.get("set", 0)];
+
+			let pIndex = Math.round(Math.random() * points.length * randomness);
+			let placed = false;
+
+			while (true) {
+				const p = points[pIndex];
+				if (!p) {
+					break;
+				}
+
+				if (p.x - fw / 2 < 0 || p.x + fw / 2 > w || p.y - fh / 2 < 0 || p.y + fh / 2 > h) {
+					pIndex++;
+					continue;
+				}
+
+				// collision-test the padding-inflated solid oriented box; the
+				// stamp is that same box for a backed word, or just its glyphs
+				const bx = Math.round(p.x * resolution - collisionMask.bw / 2);
+				const by = Math.round(p.y * resolution - collisionMask.bh / 2);
+
+				if (this._collidesAt(collisionMask, bx, by)) {
+					pIndex += 2;
+					continue;
+				}
+
+				// the eroded core must stay inside the shape (allows overhang)
+				if (shapeCore && shapeMask) {
+					const sbx = Math.round(p.x * resolution - shapeCore.bw / 2);
+					const sby = Math.round(p.y * resolution - shapeCore.bh / 2);
+					if (this._collidesAt(shapeCore, sbx, sby, shapeMask)) {
+						pIndex += 2;
+						continue;
+					}
+				}
+
+				if (stampBox) {
+					// mark the whole bounding box occupied (no nesting)
+					this._stampSprite(collisionMask, bx, by);
+				}
+				else {
+					const px = Math.round(p.x * resolution - sprite!.bw / 2);
+					const py = Math.round(p.y * resolution - sprite!.bh / 2);
+					this._stampSprite(sprite!, px, py);
+				}
+
+				// remove candidate points covered by the placed word, testing the
+				// word's ORIENTED box (not its axis-aligned bounding box). For a
+				// diagonal (e.g. 45°) word the AABB is a much larger square, so
+				// pruning by it would delete candidates in the empty corners that
+				// later words could still use — leaving gaps around slanted words.
+				const cosR = Math.cos(rad);
+				const sinR = Math.sin(rad);
+				const hw = plw / 2;
+				const hh = plh / 2;
+
+				let n = 0;
+				for (let j = 0; j < points.length; j++) {
+					const point = points[j];
+					const dx = point.x - p.x;
+					const dy = point.y - p.y;
+					// rotate the offset into the word's local axes
+					const rx = dx * cosR + dy * sinR;
+					const ry = -dx * sinR + dy * cosR;
+					if (Math.abs(rx) > hw || Math.abs(ry) > hh) {
+						points[n++] = point;
+					}
+				}
+				points.length = n;
+
+				placements.push({ dataItem: dataItem, point: { x: p.x, y: p.y }, angle: angle, fontSize: fontSize });
+				placed = true;
+				break;
+			}
+
+			if (!placed) {
+				if (autoFit) {
+					// signal the caller to retry with smaller font sizes
+					return undefined;
+				}
+				placements.push({ dataItem: dataItem, angle: angle, fontSize: fontSize });
+			}
+		}
+
+		return placements;
+	}
+
+	/**
+	 * Builds (or reuses) the `svgPath` shape mask for the current plot size.
+	 * The mask marks the fitted shape's EXTERIOR, tested against an eroded word
+	 * box so words stay (mostly) inside the shape. Placement is driven by the
+	 * distance-ranked `_shapeCandidates` (thickest interior first).
+	 */
+	protected _prepareShapeMask(): void {
+		const svgPath = this.get("svgPath");
+
+		const w = this.innerWidth();
+		const h = this.innerHeight();
+
+		if (!svgPath || w <= 0 || h <= 0) {
+			this._shapeMask = undefined;
+			this._shapeMaskKey = undefined;
+			this._shapeCandidates = undefined;
+			// hide the silhouette and drop any clip; user styling stays intact
+			this._updateShapeVisibility();
+			return;
+		}
+
+		const resolution = this._root._renderer.resolution;
+		const boardW = Math.ceil(w * resolution);
+		const boardH = Math.ceil(h * resolution);
+		const boardStride = Math.ceil(boardW / 32);
+
+		// the mask is the TRUE shape; `shapeTolerance` no longer dilates it (it
+		// feeds the per-word overhang in `_layoutAttempt` instead), so it is not
+		// part of the cache key
+		const key = boardW + "x" + boardH + "|" + svgPath;
+
+		// the mask only depends on the plot size and the path — reuse it
+		// across relayouts and autoFit shrink passes
+		if (this._shapeMaskKey != key) {
+			this._shapeMaskKey = key;
+			this._shapeCandidates = undefined;
+			this._shapeMask = undefined;
+
+			try {
+				const path = new Path2D(svgPath);
+				const bbox = this._svgPathBBox(path);
+
+				if (!bbox || !(bbox.width > 0) || !(bbox.height > 0)) {
+					this._warnSvgPath("svgPath produced no drawable shape, ignoring it");
+					this._updateShapeVisibility();
+					return;
+				}
+
+				// proportional fit (no stretching), centered in the plot
+				const scale = Math.min(w / bbox.width, h / bbox.height);
+				const tx = (w - bbox.width * scale) / 2 - bbox.left * scale;
+				const ty = (h - bbox.height * scale) / 2 - bbox.top * scale;
+
+				const context = this._scratchContext || this._makeScratch();
+				const canvas = this._scratchCanvas!;
+
+				if (canvas.width < boardW) {
+					canvas.width = boardW;
+				}
+				if (canvas.height < boardH) {
+					canvas.height = boardH;
+				}
+
+				context.setTransform(1, 0, 0, 1, 0, 0);
+				context.clearRect(0, 0, boardW, boardH);
+				context.setTransform(scale * resolution, 0, 0, scale * resolution, tx * resolution, ty * resolution);
+				context.fillStyle = "#000000";
+				context.fill(path);
+				context.setTransform(1, 0, 0, 1, 0, 0);
+
+				// pack the EXTERIOR (empty pixels) into the mask; `inkCount`
+				// guards against a path that produced no interior at all
+				const data = context.getImageData(0, 0, boardW, boardH).data;
+				const mask = new Int32Array(boardH * boardStride);
+
+				let inkCount = 0;
+
+				let n = 3;
+				for (let r = 0; r < boardH; r++) {
+					const rowBase = r * boardStride;
+					for (let c = 0; c < boardW; c++) {
+						if (data[n] == 0) {
+							mask[rowBase + (c >> 5)] |= 1 << (31 - (c & 31));
+						}
+						else {
+							inkCount++;
+						}
+						n += 4;
+					}
+				}
+
+				if (inkCount == 0) {
+					this._warnSvgPath("svgPath produced no drawable shape, ignoring it");
+					this._updateShapeVisibility();
+					return;
+				}
+
+				this._shapeMask = mask;
+				// distance-transform candidate points (thickest-first) so words
+				// fill the whole shape, edges included, instead of just an ellipse
+				this._shapeCandidates = this._buildShapeCandidates(boardW, boardH, data, resolution);
+
+				// Align the public `shape` Graphics with the fitted region:
+				// Graphics renders native path point p at (x + scale * p),
+				// which is exactly the mask's logical = scale * native + (tx, ty)
+				// mapping, so the silhouette overlays the word-constraint area.
+				// Only geometry is managed here — user styling is untouched.
+				this.shape.setAll({ svgPath: svgPath, scale: scale, x: tx, y: ty });
+				// remember the fitted geometry; the clip mask (used when
+				// `maskByShape`) is built lazily from it in `_applyMaskGraphics`
+				this._shapeScale = scale;
+				this._shapeTx = tx;
+				this._shapeTy = ty;
+				// if a clip is already applied, rebuild it against the new
+				// geometry/path (e.g. after a resize or a path change); skip when
+				// `maskByShape` is being turned off this pass (removed just below)
+				if (this._maskApplied && this.get("maskByShape", false)) {
+					this._applyMaskGraphics();
+				}
+			}
+			catch (e) {
+				this._warnSvgPath("svgPath could not be parsed, ignoring it");
+				this._updateShapeVisibility();
+				return;
+			}
+		}
+
+		// with a shape active, `_shapeCandidates` (distance-ranked) drives
+		// placement in `_layoutAttempt` instead of the spiral; here we only
+		// manage the silhouette's visibility and the optional clip mask (runs on
+		// every exit, so removing/invalidating `svgPath` un-clips the labels)
+		this._updateShapeVisibility();
+	}
+
+	/**
+	 * Shows or hides the `shape` silhouette and applies (or removes) the
+	 * `maskByShape` clip on the labels container, based on whether a shape is
+	 * currently active. Must run on EVERY `_prepareShapeMask` exit — otherwise a
+	 * stale clip from a previous shape would keep the labels cut off after the
+	 * shape is removed or its path becomes invalid.
+	 */
+	protected _updateShapeVisibility(): void {
+		// covers a cached invalid path as well
+		const shapeActive = !!(this._shapeMask && this._shapeCandidates);
+		this.shape.set("forceHidden", !shapeActive);
+
+		// clip the words to the shape when `maskByShape` is on (cuts off the
+		// letter parts that overhang the outline). Applied to the labels
+		// container so the labels themselves are clipped.
+		const wantMask = shapeActive && this.get("maskByShape", false);
+		if (wantMask && !this._maskApplied) {
+			this._applyMaskGraphics();
+		}
+		else if (!wantMask && this._maskApplied) {
+			// removing a mask disposes it (Container); the next apply builds a
+			// fresh one
+			this._labelsContainer.set("mask", undefined);
+			this._maskApplied = false;
+		}
+	}
+
+	/**
+	 * Builds a FRESH clip-mask [[Graphics]] from the fitted-shape geometry and
+	 * applies it to the labels container. Rebuilt on every apply because removing
+	 * a mask disposes it (see [[Container]]), so a single reused instance would
+	 * be dead after the first toggle-off.
+	 */
+	protected _applyMaskGraphics(): void {
+		const svgPath = this.get("svgPath");
+		if (svgPath == null) {
+			return;
+		}
+		const mask = Graphics.new(this._root, {});
+		mask.setAll({ scale: this._shapeScale, x: this._shapeTx, y: this._shapeTy });
+		// not a child, so not in the normal update cycle — use a `draw` callback
+		// (replayed at clip time) rather than the `svgPath` setting
+		mask.set("draw", (display) => {
+			display.svgPath(svgPath);
+		});
+		this._labelsContainer.set("mask", mask);
+		this._maskApplied = true;
+	}
+
+	/**
+	 * Builds candidate placement points for a shape, ordered by distance to the
+	 * shape's edge (thickest interior first). A two-pass chamfer distance
+	 * transform measures how much room each interior pixel has; placing words
+	 * biggest-first into the roomiest free spots fills the core first and lets
+	 * progressively smaller words flow out to the edges — filling the whole
+	 * silhouette instead of just an inscribed ellipse.
+	 */
+	protected _buildShapeCandidates(boardW: number, boardH: number, data: Uint8ClampedArray, resolution: number): Array<IPoint> {
+		const size = boardW * boardH;
+		const dist = new Float32Array(size);
+		const INF = 1e9;
+
+		// exterior (alpha 0) starts at distance 0, interior at infinity
+		let a = 3;
+		for (let i = 0; i < size; i++) {
+			dist[i] = data[a] == 0 ? 0 : INF;
+			a += 4;
+		}
+
+		const SQ2 = Math.SQRT2;
+
+		// forward pass (top-left -> bottom-right)
+		for (let r = 0; r < boardH; r++) {
+			const rowBase = r * boardW;
+			for (let c = 0; c < boardW; c++) {
+				const idx = rowBase + c;
+				if (dist[idx] == 0) {
+					continue;
+				}
+				let d = dist[idx];
+				if (c > 0) { d = Math.min(d, dist[idx - 1] + 1); }
+				if (r > 0) {
+					d = Math.min(d, dist[idx - boardW] + 1);
+					if (c > 0) { d = Math.min(d, dist[idx - boardW - 1] + SQ2); }
+					if (c < boardW - 1) { d = Math.min(d, dist[idx - boardW + 1] + SQ2); }
+				}
+				dist[idx] = d;
+			}
+		}
+
+		// backward pass (bottom-right -> top-left)
+		for (let r = boardH - 1; r >= 0; r--) {
+			const rowBase = r * boardW;
+			for (let c = boardW - 1; c >= 0; c--) {
+				const idx = rowBase + c;
+				if (dist[idx] == 0) {
+					continue;
+				}
+				let d = dist[idx];
+				if (c < boardW - 1) { d = Math.min(d, dist[idx + 1] + 1); }
+				if (r < boardH - 1) {
+					d = Math.min(d, dist[idx + boardW] + 1);
+					if (c < boardW - 1) { d = Math.min(d, dist[idx + boardW + 1] + SQ2); }
+					if (c > 0) { d = Math.min(d, dist[idx + boardW - 1] + SQ2); }
+				}
+				dist[idx] = d;
+			}
+		}
+
+		// sub-sample the interior on a grid and rank by clearance (thickest first)
+		const grid = Math.max(2, Math.round(4 * resolution));
+		const ranked: Array<{ x: number, y: number, d: number }> = [];
+		for (let r = 0; r < boardH; r += grid) {
+			const rowBase = r * boardW;
+			for (let c = 0; c < boardW; c += grid) {
+				const d = dist[rowBase + c];
+				if (d > 0 && d < INF) {
+					ranked.push({ x: c / resolution, y: r / resolution, d: d });
+				}
+			}
+		}
+
+		ranked.sort((p1, p2) => p2.d - p1.d);
+
+		const points: Array<IPoint> = [];
+		if (ranked.length > 0) {
+			for (let i = 0; i < ranked.length; i++) {
+				points.push({ x: ranked[i].x, y: ranked[i].y });
+			}
+		}
+		else {
+			// degenerate: the fitted shape inks the whole board (no exterior), so
+			// every pixel stayed at INF and nothing ranked — fall back to a plain
+			// grid so the shape still fills instead of rendering blank
+			for (let r = 0; r < boardH; r += grid) {
+				for (let c = 0; c < boardW; c += grid) {
+					points.push({ x: c / resolution, y: r / resolution });
+				}
+			}
+		}
+		return points;
+	}
+
+	/**
+	 * Finds the bounding box of an SVG path (in path units) by rasterizing it
+	 * onto the scratch canvas at decreasing probe scales until it fits, then
+	 * scanning the ink bounds. Canvas-based, so it works without attaching
+	 * any SVG element to the document.
+	 */
+	protected _svgPathBBox(path: Path2D): { left: number, top: number, width: number, height: number } | undefined {
+		const probeSize = 1024;
+
+		const context = this._scratchContext || this._makeScratch();
+		const canvas = this._scratchCanvas!;
+
+		if (canvas.width < probeSize) {
+			canvas.width = probeSize;
+		}
+		if (canvas.height < probeSize) {
+			canvas.height = probeSize;
+		}
+
+		const scales = [1, 0.25, 0.0625, 0.015625, 0.00390625];
+
+		for (let k = 0; k < scales.length; k++) {
+			const scale = scales[k];
+
+			context.setTransform(1, 0, 0, 1, 0, 0);
+			context.clearRect(0, 0, probeSize, probeSize);
+			context.setTransform(scale, 0, 0, scale, probeSize / 2, probeSize / 2);
+			context.fillStyle = "#000000";
+			context.fill(path);
+			context.setTransform(1, 0, 0, 1, 0, 0);
+
+			const data = context.getImageData(0, 0, probeSize, probeSize).data;
+
+			let minX = probeSize;
+			let minY = probeSize;
+			let maxX = -1;
+			let maxY = -1;
 
 			let n = 3;
-			for (let r = y; r < y + h; r++) {
-				for (let c = x; c < x + w; c++) {
-					let i = ((r + 1) * cols - (cols - c));
-					if (imageData[n] != 0) {
-						buffer[i] = 1;
+			for (let r = 0; r < probeSize; r++) {
+				for (let c = 0; c < probeSize; c++) {
+					if (data[n] != 0) {
+						if (c < minX) {
+							minX = c;
+						}
+						if (c > maxX) {
+							maxX = c;
+						}
+						if (r < minY) {
+							minY = r;
+						}
+						if (r > maxY) {
+							maxY = r;
+						}
 					}
 					n += 4;
 				}
 			}
-			this._boundsToAdd = undefined;
+
+			if (maxX < 0) {
+				// no ink at this scale: a path whose coords sit outside the probe
+				// window (large or translated) shows nothing at scale 1 but ISN'T
+				// degenerate — retry smaller before giving up
+				if (k < scales.length - 1) {
+					continue;
+				}
+				return undefined;
+			}
+
+			// ink touching the probe border means the path was likely clipped,
+			// so retry at a smaller scale (unless this was the last one)
+			if ((minX == 0 || minY == 0 || maxX == probeSize - 1 || maxY == probeSize - 1) && k < scales.length - 1) {
+				continue;
+			}
+
+			return {
+				left: (minX - probeSize / 2) / scale,
+				top: (minY - probeSize / 2) / scale,
+				width: (maxX - minX + 1) / scale,
+				height: (maxY - minY + 1) / scale
+			};
 		}
 
-		if (this._process && this.isDirty("progress")) {
-			this._processItem();
+		return undefined;
+	}
+
+	/**
+	 * Logs a one-time console warning about an unusable `svgPath` (invalid or
+	 * degenerate). Warns once per series to avoid flooding the console.
+	 */
+	protected _warnSvgPath(message: string): void {
+		if (!this._svgPathWarned) {
+			this._svgPathWarned = true;
+			console.warn("WordCloud: " + message);
 		}
 	}
 
-	protected _processItem() {
-		this._boundsToAdd = undefined;
+	/**
+	 * Builds the CSS font shorthand used to measure and rasterize a word's
+	 * collision mask, mirroring the renderer's `CanvasText._getFontStyle` (same
+	 * part order, same fallbacks) so the scratch-canvas raster lines up with the
+	 * drawn glyph. The weight is forced to `900` so the mask is fatter than the
+	 * displayed label — that extra thickness is what keeps natural spacing
+	 * between words (the label itself is drawn with its own weight).
+	 */
+	protected _wordFontStyle(label: Label, fontSize: number): string {
+		const parts: string[] = [];
 
-		if (this._currentIndex < this.dataItems.length) {
-			const dataItem = this.dataItems[this._currentIndex];
-			const label = dataItem.get("label");
-			const ghostLabel = dataItem.get("ghostLabel");
+		const fontVariant = label.get("fontVariant");
+		if (fontVariant) {
+			parts.push(fontVariant);
+		}
 
-			const resolution = this._root._renderer.resolution;
+		// forced heavy weight (see doc): fattens the mask for word spacing
+		parts.push("900");
 
-			let lw = ghostLabel.width();
-			let lh = ghostLabel.height();
+		const fontStyle = label.get("fontStyle");
+		if (fontStyle) {
+			parts.push(fontStyle);
+		}
 
-			const context = (ghostLabel._display.getLayer() as CanvasLayer).context;
-			const set = dataItem.get("set");
+		parts.push(fontSize + "px");
 
-			const points = this._pointSets[set];
+		let fontFamily: string | undefined = label.get("fontFamily");
+		if (fontFamily == "inherit") {
+			fontFamily = getComputedStyle(this._root.dom).getPropertyValue("font-family");
+		}
 
-			const w = this.innerWidth();
-			const h = this.innerHeight();
+		if (fontFamily) {
+			parts.push(fontFamily);
+		}
+		else {
+			parts.push("Arial");
+		}
 
-			const cols = Math.round(this._root.width() * resolution);
+		return parts.join(" ");
+	}
 
-			const x = this.x();
-			const y = this.y();
+	protected _makeScratch(): CanvasRenderingContext2D {
+		const canvas = document.createElement("canvas");
+		const context = canvas.getContext("2d", { willReadFrequently: true })! as CanvasRenderingContext2D;
+		this._scratchCanvas = canvas;
+		this._scratchContext = context;
+		return context;
+	}
 
-			const angles = this.get("angles", [0]);
-			if (w > h) {
-				if (lw >= w / 2) {
-					$array.each(angles, (angle) => {
-						if (angle == 0 && dataItem.get("angle") != 0) {
-							dataItem.setRaw("angle", 0);
-							ghostLabel.set("rotation", 0);
-							[lw, lh] = [lh, lw];
-						}
-					})
-				}
+	/**
+	 * Vertical advance between lines for a label, honoring its `lineHeight`
+	 * setting (the theme default is 100%, i.e. one font size per line). Used to
+	 * stack multi-line categories (`\n`) the way the label renders them.
+	 */
+	protected _lineStep(label: Label, fontSize: number): number {
+		const lineHeight = label.get("lineHeight");
+		if (lineHeight != null) {
+			// like the renderer, a plain number is a multiplier and a `Percent`
+			// is relative (theme default 100%). Approximated against the font
+			// size rather than the measured glyph height, so the stacked mask
+			// runs a touch tall — safe (extra gap, never overlap).
+			const step = $type.isNumber(lineHeight)
+				? lineHeight * fontSize
+				: $utils.relativeToValue(lineHeight, fontSize);
+			if (step > 0) {
+				return step;
 			}
+		}
+		return fontSize;
+	}
 
-			if (h > w) {
-				if (lw >= w / 2) {
-					$array.each(angles, (angle) => {
-						if (Math.abs(angle) == 90 && dataItem.get("angle") == 0) {
-							dataItem.setRaw("angle", angle);
-							ghostLabel.set("rotation", angle);
-							[lw, lh] = [lh, lw];
-						}
-					})
-				}
+	/**
+	 * Measures a word synchronously on the scratch canvas. Categories may span
+	 * several lines (`\n`); the width is the widest line and the height stacks
+	 * the lines by `lineStep`, matching the label's rendered footprint.
+	 */
+	protected _measureWord(text: string, font: string, fontSize: number, lineStep: number): { width: number, height: number } {
+		const context = this._scratchContext || this._makeScratch();
+
+		context.setTransform(1, 0, 0, 1, 0, 0);
+		context.font = font;
+
+		const lines = text.split("\n");
+
+		// width is the widest line's advance width
+		let width = 0;
+		for (let i = 0; i < lines.length; i++) {
+			const w = context.measureText(lines[i]).width;
+			if (w > width) {
+				width = w;
 			}
+		}
 
-			const rw = Math.ceil(lw * resolution);
-			const rh = Math.ceil(lh * resolution);
-
-			if (context && lw > 0 && lh > 0) {
-				let pIndex = Math.round(Math.random() * points.length * this.get("randomness", 0));
-
-				let intersects = true;
-
-				const animationDuration = this.get("animationDuration", 0);
-				const animationEasing = this.get("animationEasing");
-
-				while (intersects) {
-
-					let p = points[pIndex];
-					if (p) {
-						intersects = false;
-
-						if (this._currentIndex > 0) {
-							let cx = Math.round((p.x + x) * resolution - rw / 2);
-							let cy = Math.round((p.y + y) * resolution - rh / 2);
-							intersects = this._hasColor(cx, cy, rw, rh, cols);
-						}
-
-						if (p.x - lw / 2 < 0 || p.x + lw / 2 > w || p.y - lh / 2 < 0 || p.y + lh / 2 > h) {
-							pIndex++;
-							intersects = true;
-						}
-						else {
-							if (!intersects) {
-								const angle = dataItem.get("angle", 0);
-								const fontSize = dataItem.get("fontSize", 0);
-								if (label.get("x") != -999999) {
-									label.animate({ key: "x", to: p.x, duration: animationDuration, easing: animationEasing });
-									label.animate({ key: "y", to: p.y, duration: animationDuration, easing: animationEasing });
-									label.animate({ key: "rotation", to: angle, duration: animationDuration, easing: animationEasing });
-									label.animate({ key: "fontSize", to: fontSize, duration: animationDuration, easing: animationEasing });
-								}
-								else {
-									label.setAll({ x: p.x, y: p.y, rotation: angle, fontSize: fontSize });
-									label.appear();
-								}
-
-								ghostLabel.setAll({ x: p.x, y: p.y });
-
-								for (let i = points.length - 1; i >= 0; i--) {
-									let point = points[i]
-									if (point.x >= p.x - lw / 2 && point.x <= p.x + lw / 2 && point.y >= p.y - lh / 2 && point.y <= p.y + lh / 2) {
-										points.splice(i, 1);
-									}
-								}
-								this._boundsToAdd = { left: (p.x + x - lw / 2) * resolution, right: (p.x + x + lw / 2) * resolution, top: (p.y + y - lh / 2) * resolution, bottom: (p.y + y + lh / 2) * resolution };
-							}
-							else {
-								pIndex += 2;
-							}
-						}
-					}
-					else {
-						if (this.get("autoFit")) {
-							this.setTimeout(() => {
-								this.setPrivate("adjustedFontSize", this.getPrivate("adjustedFontSize", 1) * 0.9);
-							}, 50);
-							return;
-						}
-						label.set("x", -999999);
-						intersects = false;
-					}
-				}
+		let height: number;
+		if (lines.length > 1) {
+			// stacked block: one `lineStep` per line
+			height = lines.length * lineStep;
+		}
+		else {
+			// single line: tight glyph height (falls back to the font size)
+			const metrics = context.measureText(text);
+			height = 0;
+			if (metrics.actualBoundingBoxAscent != null && metrics.actualBoundingBoxDescent != null) {
+				height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
 			}
+			if (!(height > 0)) {
+				height = fontSize;
+			}
+		}
 
-			this._currentIndex++;
+		return { width: width, height: height };
+	}
+
+	/**
+	 * Rasterizes a word (at its final font and rotation) on the scratch canvas
+	 * and packs the alpha channel into a bit mask.
+	 */
+	protected _rasterizeWord(text: string, font: string, lw: number, lh: number, angle: number): IWordSprite {
+		const resolution = this._root._renderer.resolution;
+
+		const rad = angle * Math.PI / 180;
+		const cos = Math.abs(Math.cos(rad));
+		const sin = Math.abs(Math.sin(rad));
+
+		// bounding box of the rotated word, in device pixels
+		const bw = Math.max(1, Math.ceil((lw * cos + lh * sin) * resolution));
+		const bh = Math.max(1, Math.ceil((lw * sin + lh * cos) * resolution));
+
+		const context = this._scratchContext || this._makeScratch();
+		const canvas = this._scratchCanvas!;
+
+		// grow-only, to avoid constant reallocation
+		if (canvas.width < bw) {
+			canvas.width = bw;
+		}
+		if (canvas.height < bh) {
+			canvas.height = bh;
+		}
+
+		context.setTransform(1, 0, 0, 1, 0, 0);
+		context.clearRect(0, 0, bw, bh);
+
+		// same scale model as the renderer: draw in logical pixels, transform
+		// carries the resolution (translation is in device pixels)
+		context.setTransform(resolution, 0, 0, resolution, bw / 2, bh / 2);
+		if (rad != 0) {
+			context.rotate(rad);
+		}
+
+		context.font = font;
+		context.textAlign = "center";
+		context.textBaseline = "middle";
+		context.fillStyle = "#000000";
+
+		// draw each line centered in its own equal horizontal band, so a
+		// multi-line category rasterizes to the same stacked footprint it
+		// renders as (single line: one band centered on the origin, unchanged)
+		const lines = text.split("\n");
+		const slice = lh / lines.length;
+		for (let i = 0; i < lines.length; i++) {
+			context.fillText(lines[i], 0, (i + 0.5 - lines.length / 2) * slice);
+		}
+
+		return this._packScratch(bw, bh);
+	}
+
+	/**
+	 * Rasterizes a SOLID rectangle of the given (padded) dimensions at the
+	 * word's angle, and packs it into a bit mask. Used as the collision
+	 * footprint: at 0/90 degrees it equals the axis-aligned box, while for
+	 * diagonal words it hugs the real footprint so neighbors can pack into
+	 * the empty corners of the axis-aligned bounding box.
+	 */
+	protected _rasterizeBox(lw: number, lh: number, angle: number): IWordSprite {
+		const resolution = this._root._renderer.resolution;
+
+		const rad = angle * Math.PI / 180;
+		const cos = Math.abs(Math.cos(rad));
+		const sin = Math.abs(Math.sin(rad));
+
+		// bounding box of the rotated rectangle, in device pixels
+		const bw = Math.max(1, Math.ceil((lw * cos + lh * sin) * resolution));
+		const bh = Math.max(1, Math.ceil((lw * sin + lh * cos) * resolution));
+
+		const context = this._scratchContext || this._makeScratch();
+		const canvas = this._scratchCanvas!;
+
+		if (canvas.width < bw) {
+			canvas.width = bw;
+		}
+		if (canvas.height < bh) {
+			canvas.height = bh;
+		}
+
+		context.setTransform(1, 0, 0, 1, 0, 0);
+		context.clearRect(0, 0, bw, bh);
+
+		context.setTransform(resolution, 0, 0, resolution, bw / 2, bh / 2);
+		if (rad != 0) {
+			context.rotate(rad);
+		}
+
+		context.fillStyle = "#000000";
+		context.fillRect(-lw / 2, -lh / 2, lw, lh);
+
+		return this._packScratch(bw, bh);
+	}
+
+	/**
+	 * Packs the alpha channel of the scratch canvas' top-left `bw x bh`
+	 * region into a bit mask (32 pixels per int, MSB first).
+	 */
+	protected _packScratch(bw: number, bh: number): IWordSprite {
+		const context = this._scratchContext!;
+
+		const stride = Math.ceil(bw / 32);
+		const bits = new Int32Array(bh * stride);
+		const data = context.getImageData(0, 0, bw, bh).data;
+
+		let n = 3;
+		for (let r = 0; r < bh; r++) {
+			const rowBase = r * stride;
+			for (let c = 0; c < bw; c++) {
+				if (data[n] != 0) {
+					bits[rowBase + (c >> 5)] |= 1 << (31 - (c & 31));
+				}
+				n += 4;
+			}
+		}
+
+		return { bits: bits, stride: stride, bw: bw, bh: bh };
+	}
+
+	/**
+	 * Tests a collision mask against the occupancy board at device
+	 * coordinates `(px, py)` (top-left corner). Bitwise AND, exact to the
+	 * pixel. The glyph-shaped nesting comes from the board containing only
+	 * glyph ink; the mask itself is the word's solid oriented (padded) box.
+	 */
+	protected _collidesAt(sprite: IWordSprite, px: number, py: number, board: Int32Array = this._board): boolean {
+		// A box poking past the board (possible by a rounding pixel) is
+		// treated as a collision; the word simply tries the next point.
+		if (px < 0 || py < 0 || px + sprite.bw > this._boardW || py + sprite.bh > this._boardH) {
+			return true;
+		}
+
+		const boardStride = this._boardStride;
+		const bits = sprite.bits;
+		const spriteStride = sprite.stride;
+
+		const shift = px & 31;
+		const x0 = px >> 5;
+		const spanInts = (sprite.bw + shift + 31) >> 5;
+
+		for (let r = 0; r < sprite.bh; r++) {
+			let last = 0;
+			const boardOff = (py + r) * boardStride + x0;
+			const spriteOff = r * spriteStride;
+
+			for (let i = 0; i < spanInts; i++) {
+				const s = i < spriteStride ? bits[spriteOff + i] : 0;
+				const chunk = shift == 0 ? s : ((last << (32 - shift)) | (s >>> shift));
+				if (chunk != 0 && (chunk & board[boardOff + i]) != 0) {
+					return true;
+				}
+				last = s;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Stamps a sprite into the occupancy board (bitwise OR) at device
+	 * coordinates `(px, py)` (top-left corner).
+	 */
+	protected _stampSprite(sprite: IWordSprite, px: number, py: number): void {
+		const board = this._board;
+		const boardStride = this._boardStride;
+		const bits = sprite.bits;
+		const spriteStride = sprite.stride;
+
+		const shift = px & 31;
+		const x0 = px >> 5;
+		const spanInts = (sprite.bw + shift + 31) >> 5;
+
+		for (let r = 0; r < sprite.bh; r++) {
+			let last = 0;
+			const boardOff = (py + r) * boardStride + x0;
+			const spriteOff = r * spriteStride;
+
+			for (let i = 0; i < spanInts; i++) {
+				const s = i < spriteStride ? bits[spriteOff + i] : 0;
+				const chunk = shift == 0 ? s : ((last << (32 - shift)) | (s >>> shift));
+				if (chunk != 0) {
+					board[boardOff + i] |= chunk;
+				}
+				last = s;
+			}
 		}
 	}
+
 	/**
 * @ignore
 */
@@ -573,12 +1543,6 @@ export class WordCloud extends Series {
 		if (label) {
 			this.labels.removeValue(label);
 			label.dispose();
-		}
-
-		const ghostLabel = dataItem.get("ghostLabel");
-		if (ghostLabel) {
-			this.labels.removeValue(ghostLabel);
-			ghostLabel.dispose();
 		}
 	}
 	/**
@@ -672,20 +1636,5 @@ export class WordCloud extends Series {
 		return word[0] != lword[0]
 			&& word.substr(1) == lword.substr(1)
 			&& word != lword;
-	}
-
-	protected _hasColor(x: number, y: number, w: number, h: number, cols: number): boolean {
-		const buffer = this._buffer;
-		if (buffer) {
-			for (let r = y; r < y + h; r += 4) {
-				for (let c = x; c < x + w; c += 4) {
-					let i = ((r + 1) * cols - (cols - c));
-					if (buffer[i] != 0) {
-						return true;
-					}
-				}
-			}
-		}
-		return false
 	}
 }

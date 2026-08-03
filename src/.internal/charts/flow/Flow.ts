@@ -394,6 +394,8 @@ export abstract class Flow extends Series {
 		switch (fillStyle) {
 
 			case "solid":
+				// other styles set fill on the link itself, which would win over the template
+				link.remove("fill");
 				link._applyTemplates();
 				break;
 			case "source":
@@ -430,6 +432,7 @@ export abstract class Flow extends Series {
 
 		switch (strokeStyle) {
 			case "solid":
+				link.remove("stroke");
 				link._applyTemplates();
 				break;
 

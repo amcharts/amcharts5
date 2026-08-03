@@ -817,6 +817,12 @@ export class Container extends Sprite {
 				this._display.addChildAt(mask._display, 0);
 				this._childrenDisplay.mask = mask._display;
 			}
+			else {
+				// mask removed: clear the clip, otherwise the children keep being
+				// clipped by the (now disposed) previous mask display. Fall back to
+				// the content mask if `maskContent` is in effect.
+				this._childrenDisplay.mask = this._contentMask ? this._contentMask._display : null;
+			}
 		}
 	}
 

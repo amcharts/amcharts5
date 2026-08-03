@@ -152,13 +152,16 @@ export class ArcDiagramLink extends FlowLink {
 		if (this._p0 && this._p1) {
 			const radius = this._radius;
 
+			// radius is signed, but the arc is always drawn bulging one way
+			const bulge = Math.abs(radius);
+
 			if (this.getPrivate("orientation") == "vertical") {
 				let angle = -90 + 180 * location;
-				return { y: this._p0.y + radius + radius * $math.sin(angle), x: radius * $math.cos(angle), angle: angle + 90 };
+				return { y: this._p0.y + radius + radius * $math.sin(angle), x: bulge * $math.cos(angle), angle: angle + 90 };
 			}
 			else {
 				let angle = 180 + 180 * location;
-				return { x: this._p0.x + radius + radius * $math.cos(angle), y: radius * $math.sin(angle), angle: angle + 90 };
+				return { x: this._p0.x + radius + radius * $math.cos(angle), y: bulge * $math.sin(angle), angle: angle + 90 };
 			}
 		}
 		return { x: 0, y: 0, angle: 0 };

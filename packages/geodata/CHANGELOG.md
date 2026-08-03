@@ -5,7 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
-## [UNRELEASED] - 2026-07-17
+## [UNRELEASED] - ????-??-??
+
+
+## [5.1.6] - 2026-07-27
 
 ### Added
 - Congressional map set for US 120th Congress: `region/usa/congressional120/*`. Includes proposed changes for AL, CA, FL, NC, OH, TX, TN, UT. Pending: MO, LA.

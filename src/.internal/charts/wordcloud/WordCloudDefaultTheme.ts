@@ -26,7 +26,18 @@ export class WordCloudDefaultTheme extends Theme {
 			step: 15,
 			randomness: 0,
 			autoFit: true,
+			// the whole layout is computed in one pass; sequencing the reveal
+			// gives a staggered word-by-word appearance (15ms per word)
+			sequencedInterpolation: true,
+			sequencedDelay: 15,
 			animationEasing: $ease.out($ease.cubic)
+		});
+
+		// the `svgPath` shape silhouette rendered behind the words: a faint
+		// fill by default, user-styleable via `series.shape`
+		r("Graphics", ["wordcloud", "shape"]).setAll({
+			fill: ic.get("alternativeBackground"),
+			fillOpacity: 0.1
 		});
 
 		{

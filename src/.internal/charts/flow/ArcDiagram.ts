@@ -143,15 +143,24 @@ export class ArcDiagram extends Flow {
 				width = this.innerWidth();
 			}
 
-			let sum = 0;
+			let sumNoLow = 0;
 			let low = Infinity;
 			let radiusKey = this.get("radiusKey");
 
 			if (radiusKey != "none") {
+				// from the full values, not the animating ones, so hiding or showing
+				// a node doesn't rescale all the others mid-animation
 				$array.each(this.nodes.dataItems, (dataItem) => {
-					let value = dataItem.get(radiusKey + "Working" as any);
-					sum += value;
-					low = Math.min(low, value);
+					low = Math.min(low, dataItem.get(radiusKey as any));
+				})
+
+				if (low == Infinity) {
+					low = 0;
+				}
+
+				// must match the radius formula below, or the row won't fit the width
+				$array.each(this.nodes.dataItems, (dataItem) => {
+					sumNoLow += Math.max(0, dataItem.get(radiusKey + "Working" as any) - low);
 				})
 			}
 
@@ -165,8 +174,7 @@ export class ArcDiagram extends Flow {
 				width = 0;
 			}
 
-			let sumNoLow = sum - count * low;
-			let c = width / sumNoLow;
+			let c = sumNoLow > 0 ? width / sumNoLow : 0;
 
 			let prevCoord = 0;
 			const animationDuration = this.get("animationDuration", 0);
@@ -176,7 +184,7 @@ export class ArcDiagram extends Flow {
 				let value = dataItem.get(radiusKey + "Working" as any);
 
 				const node = dataItem.get("node");
-				let radius = minRadius + c * (value - low) / 2;
+				let radius = minRadius + c * Math.max(0, value - low) / 2;
 
 				if (radiusKey == "none") {
 					radius = minRadius + width / count / 2;

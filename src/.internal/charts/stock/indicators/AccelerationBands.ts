@@ -4,6 +4,9 @@ import type { Color } from "../../../core/util/Color";
 import { Indicator, IIndicatorSettings, IIndicatorPrivate, IIndicatorEvents } from "./Indicator";
 import { LineSeries } from "../../xy/series/LineSeries";
 
+// factor is stored in thousandths, but shown as 1 = single band width
+const FACTOR_SCALE = 1000;
+
 export interface IAccelerationBandsSettings extends IIndicatorSettings {
     /**
      * A color for upper section.
@@ -71,7 +74,7 @@ export class AccelerationBands extends Indicator {
         step: 0.0001,
         // Stored in thousandths (0.001 = standard bands); shown in the UI as the
         // conventional 1 = single band width (so the field reads 0.5..3.0).
-        scale: 1000
+        scale: FACTOR_SCALE
     }, {
         key: "upperColor",
         name: this.root.language.translateAny("Upper"),
@@ -148,7 +151,8 @@ export class AccelerationBands extends Indicator {
 
         if (this.isDirty("factor")) {
             this.markDataDirty();
-            this.setCustomData("factor", this.get("factor"));
+            // legend shows the same scaled value as the settings modal
+            this.setCustomData("factor", this.get("factor", 0.001) * FACTOR_SCALE);
         }
     }
 

@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.1] - 2026-08-03
+
+### Added
+- `WordCloud`: new `svgPath` setting arranges words into a shape; `maskByShape` clips words to the outline, and `shapeTolerance` sets how far they may spill past it (negative pulls them inside for padding).
+- `WordCloud`: new `randomizeAngles` setting — set to `false` to cycle `angles` in order for a reproducible layout.
+- `WordCloud`: new `allowNesting` setting — set to `false` to pack words as non-overlapping bounding boxes instead of nesting into each other's gaps (useful with opaque label backgrounds).
+
+### Changed
+- `WordCloud` now computes its layout synchronously in a single pass instead of one word per animation frame — much faster for large clouds. The per-data-item `ghostLabel` is removed and labels are held in an internal container, so code reading `dataItem.get("ghostLabel")` or walking `series.children` for labels needs updating.
+- `WordCloud` word reveal can be staggered via `sequencedInterpolation`/`sequencedDelay`.
+
+### Fixed
+- Removing a `Container`'s `mask` (setting it to `undefined`) no longer leaves its children clipped by the removed mask. Also fixes bullet clipping getting stuck after toggling `maskBullets` off on radar/curve charts.
+- Timeline curve charts (`SerpentineChart`/`SpiralChart`/`CurveChart`): setting an axis renderer's `rotateLabels` back to `false` did not un-rotate the labels.
+- A line series bullet with no paint of its own (relying on inheriting the series color) was invisible in the legend marker.
+- `ArcDiagram`: bullets on links whose target comes before their source were placed on the wrong side of the nodes, mirroring the arc instead of following it.
+- `ArcDiagram`: hiding a node made all the remaining node circles shrink disproportionately.
+- Flow charts: setting a link's `fillStyle`/`strokeStyle` back to `"solid"` after using `"source"`, `"target"` or `"none"` kept the old color instead of restoring the solid one.
+- A bullet with no fill of its own now takes the color of its own slice or node on pie, funnel, flow and hierarchy charts, instead of the series color.
+- Acceleration Bands legend now shows the same scaled `factor` as the settings modal (`1` instead of `0.001`).
+
+
 ## [5.20.0] - 2026-07-22
 
 ### Added
@@ -33,6 +55,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - Accessibility: The `<div>` that holds chart's focusable elements will now have its `aria-label` set if `ariaLabel` is provided in `Root` settings.
 
 ### Fixed
+- `WordCloud` was not re-laying-out when its `randomness` setting was changed dynamically.
 - Logarithmic `ValueAxis` could show floating-point noise in its grid labels (e.g. `4,999.999999999999` instead of `5,000`). Grid values are now rounded.
 - Logarithmic `ValueAxis` was showing `0` for grid values smaller than `0.00001` when no `numberFormat` was set
 - `ValueAxis` with `syncWithAxis` and `autoZoom: false` regressed in 5.19.0: wrong scale and a possible browser hang.
