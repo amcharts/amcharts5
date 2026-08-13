@@ -129,6 +129,10 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * clamped into it). A value of `0` (default) disables this and keeps the
 	 * original behavior: a selection can only start within the plot area.
 	 *
+	 * The tolerance area is not limited to the chart container. A plain click
+	 * within it does not start a selection - it dispatches `"selectcancelled"`,
+	 * same as a click within the plot area.
+	 *
 	 * @since 5.20.0
 	 * @default 0
 	 */
@@ -556,9 +560,8 @@ export class XYCursor extends Container {
 
 		this._disposers.push(plotContainer.events.on("globalpointermove", (event) => {
 			if (!this.get("syncWith")) {
-				// `_downPoint` also counts as dragging: a selection started via
-				// `clickTolerance` outside the plot area does not populate
-				// `plotContainer._downPoints` (the press never hit it).
+				// `_downPoint` counts as dragging too: a press outside the plot
+				// area never populated `plotContainer._downPoints`.
 				if ($object.keys(plotContainer._downPoints).length == 0 && !this._downPoint && !event.native && this.isHidden()) {
 					// Ignore mouse movement if it originates on outside element and
 					// we're not dragging.
@@ -604,12 +607,9 @@ export class XYCursor extends Container {
 	}
 
 	/**
-	 * Handles a press anywhere on the chart surface. When `clickTolerance` is
-	 * set and the press lands just outside the plot area (within the tolerance),
-	 * the selection is started as if the press had happened on the plot edge.
-	 * In-plot presses are ignored here — they are handled by `_handleCursorDown`
-	 * (bound to the plot container) so behavior with `clickTolerance: 0` is
-	 * unchanged.
+	 * Handles a press outside the plot area but within `clickTolerance`: the
+	 * press is clamped onto the plot edge and the selection starts there.
+	 * In-plot presses are handled by `_handleCursorDown` instead.
 	 */
 	protected _handleCursorDownGlobal(event: ISpritePointerEvent) {
 		const tolerance = this.get("clickTolerance", 0);
@@ -644,7 +644,6 @@ export class XYCursor extends Container {
 			return;
 		}
 
-		// Clamp the press onto the plot edge so the selection starts there.
 		local.x = $math.fitToRange(local.x, 0, w);
 		local.y = $math.fitToRange(local.y, 0, h);
 
@@ -682,6 +681,12 @@ export class XYCursor extends Container {
 
 				const rootPoint = event.point;
 				let local = this._display.toLocal(rootPoint);
+
+				// The press was clamped into the plot area, so clamp the release
+				// point too - otherwise a click within `clickTolerance` measures
+				// as a drag and dispatches "selectended".
+				local.x = $math.fitToRange(local.x, 0, this.width());
+				local.y = $math.fitToRange(local.y, 0, this.height());
 
 				const downPoint = this._downPoint;
 				const moveThreshold = this.get("moveThreshold", 1);

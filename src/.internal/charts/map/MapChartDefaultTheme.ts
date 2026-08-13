@@ -41,8 +41,23 @@ export class MapChartDefaultTheme extends Theme {
 			wheelDuration: 0,
 			wheelSensitivity: 1,
 			maxPanOut: 0.4,
-			centerMapOnZoomOut: true
+			centerMapOnZoomOut: true,
+			doubleClickZoom: true,
+			boxZoom: "none"
 		});
+
+		{
+			const rule = r("Rectangle", ["map", "selection"]);
+
+			rule.setAll({
+				fillOpacity: 0.15,
+				strokeOpacity: 0.8,
+				strokeDasharray: [4, 4]
+			});
+
+			setColor(rule, "fill", ic, "alternativeBackground");
+			setColor(rule, "stroke", ic, "alternativeBackground");
+		}
 
 		{
 			const rule = r("MapLine");

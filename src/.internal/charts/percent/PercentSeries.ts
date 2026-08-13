@@ -252,6 +252,12 @@ export abstract class PercentSeries extends Series {
 		super._afterNew();
 	}
 
+	public _placeBulletsContainer() {
+		// bullets are positioned in series coordinates, so the container has to
+		// stay in the series - the chart lays several of them out side by side
+		this.children.moveValue(this.bulletsContainer);
+	}
+
 	protected _onDataClear() {
 		const colors = this.get("colors");
 		if (colors) {

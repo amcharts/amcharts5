@@ -297,6 +297,33 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 */
 	centerMapOnZoomOut?: boolean;
 
+	/**
+	 * Setting to `true` will make map zoom in on a double click (or double tap),
+	 * and zoom out on a shift + double click.
+	 *
+	 * On maps that are panned by rotating (`panX: "rotateX"` and/or
+	 * `panY: "rotateY"`) the clicked location is rotated to the center of the
+	 * map. Otherwise it stays under the pointer.
+	 *
+	 * @default true
+	 * @since 5.20.2
+	 */
+	doubleClickZoom?: boolean;
+
+	/**
+	 * Allows zooming the map to an area drawn with a pointer.
+	 *
+	 * The value defines a key that needs to be held down while dragging, with
+	 * `"drag"` meaning that no key is needed. Since a plain drag pans the map,
+	 * `"drag"` should be used with `panX`/`panY` set to `"none"`.
+	 *
+	 * The drawn area is represented by the `boxZoomSelection` element.
+	 *
+	 * @default "none"
+	 * @since 5.20.2
+	 */
+	boxZoom?: "none" | "drag" | "shift" | "ctrl" | "alt";
+
 }
 
 export interface IMapChartPrivate extends ISerialChartPrivate {
@@ -350,6 +377,23 @@ export class MapChart extends SerialChart {
 	protected _movePoints: { [index: number]: IPoint } = {};
 	protected _downZoomLevel: number = 1;
 	protected _doubleDownDistance: number = 0;
+
+	/**
+	 * A [[Rectangle]] element that shows the area being drawn when `boxZoom` is
+	 * enabled.
+	 *
+	 * @since 5.20.2
+	 */
+	public readonly boxZoomSelection: Rectangle = Rectangle.new(this._root, {
+		themeTags: ["map", "selection"],
+		isMeasured: false,
+		visible: false
+	});
+
+	protected _boxDownPoint: IPoint | undefined;
+	protected _panSuspended: boolean = false;
+	protected _suspendedPanX: "none" | "rotateX" | "translateX" | undefined;
+	protected _suspendedPanY: "none" | "rotateY" | "translateY" | undefined;
 
 	protected _dirtyGeometries: boolean = false;
 	protected _geometryColection: GeoJSON.GeometryCollection = { type: "GeometryCollection", geometries: [] };
@@ -494,6 +538,143 @@ export class MapChart extends SerialChart {
 				this._wheelDp.dispose();
 			}
 		}
+	}
+
+	protected _handleDoubleClick(event: ISpritePointerEvent) {
+		if (!this.get("doubleClickZoom")) {
+			return;
+		}
+
+		if ((event.originalEvent as MouseEvent).shiftKey) {
+			this.zoomOut();
+		}
+		else {
+			const level = this.get("zoomLevel", 1) * this.get("zoomStep", 2);
+			this._zoomToScreenPoint(this.chartContainer._display.toLocal(event.point), level);
+		}
+	}
+
+	/**
+	 * Zooms to a point on the screen, rotating the map so that the point ends up
+	 * in the center of it, if the map is panned by rotating.
+	 */
+	protected _zoomToScreenPoint(point: IPoint, level: number) {
+		const projection = this.get("projection")!;
+		const rotateX = this.get("panX") == "rotateX";
+		const rotateY = this.get("panY") == "rotateY";
+
+		if ((rotateX || rotateY) && projection.rotate && projection.invert) {
+			const geoPoint = this.invert(point);
+			// A point outside the globe does not translate to a location
+			if ($type.isNumber(geoPoint.longitude) && $type.isNumber(geoPoint.latitude)) {
+				this.zoomToGeoPoint(geoPoint, level, true, undefined,
+					rotateX ? -geoPoint.longitude : this.get("rotationX", 0),
+					rotateY ? -geoPoint.latitude : this.get("rotationY", 0));
+				return;
+			}
+		}
+
+		this.zoomToPoint(point, level);
+	}
+
+	protected _isBoxZoomEvent(event: ISpritePointerEvent): boolean {
+		const originalEvent = event.originalEvent as MouseEvent;
+
+		// Right and middle button presses come through as "pointerdown" too
+		if (originalEvent.button) {
+			return false;
+		}
+
+		switch (this.get("boxZoom", "none")) {
+			case "drag":
+				return true;
+			case "shift":
+				return originalEvent.shiftKey;
+			case "ctrl":
+				return originalEvent.ctrlKey;
+			case "alt":
+				return originalEvent.altKey;
+		}
+
+		return false;
+	}
+
+	protected _handleBoxDown(event: ISpritePointerEvent) {
+		// Root simulates pointer events to drag a focused element with a keyboard
+		if (event.simulated || !this._isBoxZoomEvent(event)) {
+			return;
+		}
+
+		this._boxDownPoint = this.chartContainer._display.toLocal(event.point);
+
+		// Panning has to be off while the box is being drawn, otherwise the map
+		// would move along with the pointer
+		if (!this._panSuspended) {
+			this._panSuspended = true;
+			this._suspendedPanX = this.get("panX");
+			this._suspendedPanY = this.get("panY");
+			this.setRaw("panX", "none");
+			this.setRaw("panY", "none");
+		}
+
+		this._drawBoxSelection(this._boxDownPoint);
+		this.boxZoomSelection.set("visible", true);
+	}
+
+	protected _handleBoxMove(event: ISpritePointerEvent) {
+		if (this._boxDownPoint) {
+			this._drawBoxSelection(this.chartContainer._display.toLocal(event.point));
+		}
+	}
+
+	protected _handleBoxUp(event: ISpritePointerEvent) {
+		const downPoint = this._boxDownPoint;
+		const upPoint = this.chartContainer._display.toLocal(event.point);
+
+		this._endBoxZoom();
+
+		if (!downPoint) {
+			return;
+		}
+
+		const width = Math.abs(upPoint.x - downPoint.x);
+		const height = Math.abs(upPoint.y - downPoint.y);
+
+		// Ignore accidental micro-drags, e.g. a double click with a key held down
+		if (width < 10 || height < 10) {
+			return;
+		}
+
+		const level = this.get("zoomLevel", 1) * Math.min(this.width() / width, this.height() / height);
+
+		this._zoomToScreenPoint({ x: (downPoint.x + upPoint.x) / 2, y: (downPoint.y + upPoint.y) / 2 }, level);
+	}
+
+	protected _endBoxZoom() {
+		this._boxDownPoint = undefined;
+		this.boxZoomSelection.set("visible", false);
+
+		if (this._panSuspended) {
+			this._panSuspended = false;
+			// Do not undo a panning change made while the box was being drawn
+			if (this.get("panX") == "none") {
+				this.setRaw("panX", this._suspendedPanX);
+			}
+			if (this.get("panY") == "none") {
+				this.setRaw("panY", this._suspendedPanY);
+			}
+		}
+	}
+
+	protected _drawBoxSelection(point: IPoint) {
+		const downPoint = this._boxDownPoint!;
+
+		this.boxZoomSelection.setAll({
+			x: Math.min(downPoint.x, point.x),
+			y: Math.min(downPoint.y, point.y),
+			width: Math.abs(point.x - downPoint.x),
+			height: Math.abs(point.y - downPoint.y)
+		});
 	}
 
 	public _prepareChildren() {
@@ -855,6 +1036,7 @@ export class MapChart extends SerialChart {
 		this._makeGeoPath();
 
 		this.chartContainer.children.push(this.seriesContainer);
+		this.chartContainer.children.push(this.boxZoomSelection);
 
 		if (this.get("translateX") == null) {
 			this.set("translateX", this.width() / 2);
@@ -883,6 +1065,23 @@ export class MapChart extends SerialChart {
 
 		this._disposers.push(this.chartContainer.events.on("globalpointermove", (event) => {
 			this._handleChartMove(event);
+		}));
+
+		this._disposers.push(this.chartContainer.events.on("dblclick", (event) => {
+			this._handleDoubleClick(event);
+		}));
+
+		// Box zoom
+		this._disposers.push(this.chartContainer.events.on("pointerdown", (event) => {
+			this._handleBoxDown(event);
+		}));
+
+		this._disposers.push(this.chartContainer.events.on("globalpointermove", (event) => {
+			this._handleBoxMove(event);
+		}));
+
+		this._disposers.push(this.chartContainer.events.on("globalpointerup", (event) => {
+			this._handleBoxUp(event);
 		}));
 
 		let license = false;

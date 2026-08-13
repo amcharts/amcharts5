@@ -40,6 +40,22 @@ export interface IScrollbarSettings extends IContainerSettings {
 	 */
 	animationEasing?: (t: Time) => Time;
 
+	/**
+	 * Puts the scrollbar on the opposite side of the chart: a horizontal
+	 * scrollbar below the plot instead of above it, and a vertical one to the
+	 * left instead of the right.
+	 *
+	 * Can be changed at any time - the chart moves the scrollbar over.
+	 *
+	 * Only has effect on scrollbars set via a chart's `scrollbarX`/`scrollbarY`
+	 * settings. A scrollbar the user added to a container themselves is left
+	 * where it is.
+	 *
+	 * @default false
+	 * @since 5.20.2
+	 */
+	opposite?: boolean;
+
 }
 
 export interface IScrollbarPrivate extends IContainerPrivate {

@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Changed
+- Renamed Nauru to Naoero in world maps and related data.
+
 
 ## [5.1.6] - 2026-07-27
 

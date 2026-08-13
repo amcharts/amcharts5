@@ -78,6 +78,17 @@ export class CurveChart extends XYChart {
 		this._disposers.push(this.plotContainer.events.on("boundschanged", () => {
 			this._updateMasks();
 		}));
+
+		// an axis added later has no curve to lay itself along until the masks are
+		// rebuilt, which otherwise only happens on a resize
+		const axisAdded = () => {
+			if (!this.isDisposed()) {
+				this._updateMasks();
+			}
+		};
+
+		this._disposers.push(this.xAxes.events.onAll(axisAdded));
+		this._disposers.push(this.yAxes.events.onAll(axisAdded));
 	}
 
 	protected _maskGrid() {

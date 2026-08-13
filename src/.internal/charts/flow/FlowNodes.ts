@@ -5,6 +5,8 @@ import type { Flow, IFlowDataItem } from "./Flow";
 import type { ColorSet } from "../../core/util/ColorSet";
 import type { PatternSet } from "../../core/util/PatternSet";
 import type { Pattern } from "../../core/render/patterns/Pattern";
+import type { Container } from "../../core/render/Container";
+import type { Bullet } from "../../core/render/Bullet";
 
 import type * as d3sankey from "d3-sankey";
 
@@ -271,6 +273,25 @@ export abstract class FlowNodes extends Series {
 					})
 				}
 			}
+		}
+	}
+
+	/**
+	 * Node bullets go into the node itself, so that they move with it and sit
+	 * above its shape but below its label.
+	 */
+	protected _getBulletContainer(dataItem: DataItem<this["_dataItemSettings"]>): Container {
+		return dataItem.get("node") || super._getBulletContainer(dataItem);
+	}
+
+	protected _makeBulletReal(dataItem: DataItem<this["_dataItemSettings"]>, bullet: Bullet) {
+		super._makeBulletReal(dataItem, bullet);
+
+		// bullets are added after the label, so put it back on top
+		const label = dataItem.get("label");
+		const node = dataItem.get("node");
+		if (label && node && label.parent === node) {
+			node.children.moveValue(label);
 		}
 	}
 

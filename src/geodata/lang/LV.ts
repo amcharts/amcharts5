@@ -170,7 +170,7 @@ const lang: Lang = {
 	"NL": "Nīderlande",
 	"NO": "Norvēģija",
 	"NP": "Nepāla",
-	"NR": "Nauru",
+	"NR": "Naoero",
 	"NU": "Niue",
 	"NZ": "Jaunzēlande",
 	"OM": "Omāna",

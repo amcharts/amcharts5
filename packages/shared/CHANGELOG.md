@@ -5,6 +5,28 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.2] - 2026-08-13
+
+### Added
+- New `SerialChartContainer` chart type — a directly-usable `SerialChart` whose `seriesContainer` is a `ZoomableContainer`, for zoomable/pannable series like `ForceDirected`.
+- `ArcDiagram`: bullets added to nodes are now positioned on the node circle, using `locationX`/`locationY` as fractions of it. Previously they were created but never placed.
+- `Scrollbar`: new `opposite` setting puts a chart's `scrollbarX` below the plot and its `scrollbarY` to the left, instead of above and to the right.
+- JSON config now supports a top-level `root` section to apply settings and properties to the `Root` object.
+- `Root` now supports `fontFamily`, `fontSize`, and `fontWeight` settings, used as defaults for all text elements unless overridden on an element.
+- `ChartSerializer`: new `includeRoot` setting (default `false`) adds a `root` section with the `Root` object's settings and properties to the serialized output.
+- `MapChart`: new `boxZoom` setting zooms the map to an area drawn with a pointer. The drawn area is represented by the new `boxZoomSelection` element.
+- `MapChart` now zooms in on a double click, and out on a shift + double click. Set the new `doubleClickZoom` setting to `false` to disable it.
+
+### Fixed
+- Serializing then parsing a chart no longer breaks on an element's `background`/`icon`: type-less sub-object settings are now merged into the existing element instead of replacing it.
+- `XYCursor`: with `clickTolerance` set, a plain click outside the plot area dispatched `"selectended"` with a selection rectangle that was never drawn — the press was clamped onto the plot edge but the release point was not, so the click measured as a drag. It now dispatches `"selectcancelled"`, same as a click within the plot area.
+- `WordCloud` ignored its own padding when positioning words: the cloud shrank to fit but stayed in the top left corner, with all the padding pooled at the bottom right.
+- Flow charts: bullets added to nodes were drawn underneath the node rectangles. They are now children of the node, drawn above its shape but below its label, with their position relative to the node.
+- `FunnelSeries`/`PyramidSeries`: bullet `locationX`/`locationY` positioned against the slice's bounding box, so a bullet could land outside a tapered slice. They now follow the slice's actual sloping edges.
+- Percent charts (pie, funnel, pyramid): with more than one series on a chart, bullets of the second and later series were drawn over the first one, ignoring how the chart lays the series out.
+- Timeline charts (`SerpentineChart`/`SpiralChart`/`CurveChart`): an axis added after the chart was built was not laid out along the curve until the chart was resized.
+
+
 ## [5.20.1] - 2026-08-03
 
 ### Added

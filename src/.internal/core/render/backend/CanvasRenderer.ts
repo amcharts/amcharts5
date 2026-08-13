@@ -3807,9 +3807,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			});
 		}
 
-		// Dispatch a global (target-independent) pointerdown, mirroring
-		// globalpointermove/globalpointerup, so listeners can react to a press
-		// anywhere on the chart surface, not just on themselves.
+		// Target-independent, mirroring globalpointermove/globalpointerup.
 		this._dispatchEventAll("globalpointerdown", event);
 	}
 
@@ -4068,11 +4066,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 					});
 				});
 			*/
-			// Shares the same "pointerdown" bundle as the cases above:
-			// _dispatchMousedown ends with a globalpointerdown dispatch. A
-			// separate narrower bundle would win the shared "pointerdown" slot
-			// when initialized first and leave later click/pointerup
-			// subscribers without dragmove/dragend listeners.
+			// Must share the "pointerdown" bundle: a separate one would win the
+			// slot and leave later subscribers without dragmove/dragend.
 			case "globalpointerdown":
 			case "pointermove":
 			case "pointerup":

@@ -374,6 +374,15 @@ export abstract class Series extends Component {
 		return bullet;
 	}
 
+	/**
+	 * Container a data item's bullets are added to. Series that lay their data
+	 * items out as separate containers can put bullets into the item itself, so
+	 * that they move with it and can be stacked among its other children.
+	 */
+	protected _getBulletContainer(_dataItem: DataItem<this["_dataItemSettings"]>): Container {
+		return this.bulletsContainer;
+	}
+
 	protected _makeBulletReal(dataItem: DataItem<this["_dataItemSettings"]>, bullet:Bullet){
 		let sprite = bullet.get("sprite");
 
@@ -383,7 +392,7 @@ export abstract class Series extends Component {
 
 			this._applyBulletDefaultPaint(sprite, dataItem);
 
-			this.bulletsContainer.children.push(sprite);
+			this._getBulletContainer(dataItem).children.push(sprite);
 		}
 		bullet.series = this;
 		dataItem.bullets!.push(bullet);

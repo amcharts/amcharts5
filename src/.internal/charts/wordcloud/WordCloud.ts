@@ -403,6 +403,14 @@ export class WordCloud extends Series {
 	public _updateChildren() {
 		super._updateChildren();
 
+		// Layout works in an innerWidth/innerHeight box, so the words (and the
+		// shape) have to be moved into the padded area, or they sit in the top
+		// left corner with all the padding pooled at the bottom right.
+		this._labelsContainer.setAll({
+			x: this.get("paddingLeft", 0),
+			y: this.get("paddingTop", 0)
+		});
+
 		let step = this.get("step", 1) * 2;
 
 		// `shapeTolerance` only affects placement when a shape is active, so it
@@ -965,7 +973,10 @@ export class WordCloud extends Series {
 				// which is exactly the mask's logical = scale * native + (tx, ty)
 				// mapping, so the silhouette overlays the word-constraint area.
 				// Only geometry is managed here — user styling is untouched.
-				this.shape.setAll({ svgPath: svgPath, scale: scale, x: tx, y: ty });
+				// shifted by the padding to match the labels container, which is
+				// offset the same way (the clip mask lives inside that container,
+				// so it follows on its own)
+				this.shape.setAll({ svgPath: svgPath, scale: scale, x: tx + this.get("paddingLeft", 0), y: ty + this.get("paddingTop", 0) });
 				// remember the fitted geometry; the clip mask (used when
 				// `maskByShape`) is built lazily from it in `_applyMaskGraphics`
 				this._shapeScale = scale;

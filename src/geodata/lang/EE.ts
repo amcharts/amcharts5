@@ -170,7 +170,7 @@ const lang: Lang = {
 	"NL": "Nedalandsdu",
 	"NO": "Norwaydu",
 	"NP": "Nepaldu",
-	"NR": "Naurudu",
+	"NR": "Naoerodu",
 	"NU": "Niuedu",
 	"NZ": "New Zealand-du",
 	"OM": "Omandu",

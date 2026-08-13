@@ -168,6 +168,27 @@ export interface IRootSettings {
 	 * @since 5.19.0
 	 */
 	sanitizeHTML?: boolean;
+
+	/**
+	 * Default font family for all text elements, unless overridden on an element.
+	 *
+	 * @since 5.20.2
+	 */
+	fontFamily?: string;
+
+	/**
+	 * Default font size for all text elements, unless overridden on an element.
+	 *
+	 * @since 5.20.2
+	 */
+	fontSize?: number | string;
+
+	/**
+	 * Default font weight for all text elements, unless overridden on an element.
+	 *
+	 * @since 5.20.2
+	 */
+	fontWeight?: "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
 }
 
 
@@ -1009,6 +1030,93 @@ export class Root implements IDisposer {
 			this._render();
 			this._handleLogo();
 		}
+	}
+
+	/**
+	 * Re-applies the current `_settings` to the live `Root` and its sub-objects
+	 * without tearing anything down.
+	 *
+	 * Unlike `_init()`, this creates no new containers, DOM elements, or event
+	 * listeners. Use it after changing settings on an already-initialized `Root`
+	 * (e.g. from a parsed `root` config section).
+	 *
+	 * NOTE: `accessible` can only be turned off (matching constructor behavior);
+	 * it cannot be re-enabled on a live `Root`.
+	 *
+	 * @ignore
+	 */
+	public _reapplySettings(): void {
+		const settings = this._settings;
+
+		// Renderer resolution (`useSafeResolution`). `getSafeResolution()` returns
+		// `undefined` off iOS, which means "use the device pixel ratio".
+		const safeResolution = $utils.getSafeResolution();
+		this._renderer.resolution = (settings.useSafeResolution && safeResolution != null) ? safeResolution : window.devicePixelRatio;
+
+		// Tooltip container bounds.
+		if (settings.tooltipContainerBounds) {
+			this._tooltipContainerSettings = settings.tooltipContainerBounds;
+		}
+		if (this._htmlElementContainer) {
+			this._htmlElementContainer.style.overflow = settings.tooltipContainerBounds ? "" : "hidden";
+		}
+
+		// Accessibility can only be disabled, never re-enabled on a live `Root`.
+		if (settings.accessible === false) {
+			this._a11yD = true;
+		}
+
+		// Inner element ARIA / focus attributes.
+		if (!this._a11yD) {
+			const inner = this._inner;
+
+			if (settings.focusable) {
+				inner.setAttribute("focusable", "true");
+				inner.setAttribute("tabindex", this.tabindex + "");
+			}
+			else {
+				inner.removeAttribute("focusable");
+				inner.removeAttribute("tabindex");
+			}
+
+			if (settings.ariaLabel != null) {
+				inner.setAttribute("aria-label", settings.ariaLabel);
+			}
+			else {
+				inner.removeAttribute("aria-label");
+			}
+
+			if (settings.role != null) {
+				inner.setAttribute("role", settings.role);
+			}
+			else {
+				inner.removeAttribute("role");
+			}
+		}
+
+		// `focusPadding`, `sanitizeHTML` and `calculateSize` are read from
+		// `_settings` on demand, so they need no explicit re-application.
+
+		// Force every element to re-run its update cycle so values derived from
+		// Root settings downstream (e.g. label fonts pulled from `fontFamily`/
+		// `fontSize`/`fontWeight`) are re-applied. `markDirty()` on a `Container`
+		// re-runs its `_updateChildren()`, which is where those values are pushed.
+		if (this._rootContainer) {
+			this._rootContainer.markDirty();
+			this._rootContainer.walkChildren((child) => {
+				child.markDirty();
+			});
+		}
+
+		// Push the new resolution / calculated size to the renderer and re-render.
+		this._render();
+	}
+
+	/**
+	 * Root's settings.
+	 */
+	public get settings(): IRootSettings {
+		return this._settings;
 	}
 
 	private _render() {

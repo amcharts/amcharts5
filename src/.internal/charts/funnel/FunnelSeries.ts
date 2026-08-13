@@ -602,21 +602,11 @@ export class FunnelSeries extends PercentSeries {
 			const slice = dataItem.get("slice");
 
 			if (slice) {
-				const width = slice.width();
-				const height = slice.height();
-				const locationX = bullet.get("locationX", 0.5);
-				const locationY = bullet.get("locationY", 0.5);
+				// the slice knows where its own sloping edges are at any location,
+				// the bounding box would put the bullet outside a tapered slice
+				const point = slice.getPoint(bullet.get("locationX", 0.5), bullet.get("locationY", 0.5));
 
-				let dx = 0;
-				let dy = 0;
-				if (this.get("orientation") == "horizontal") {
-					dy = height / 2
-				}
-				else {
-					dx = width / 2
-				}
-
-				sprite.setAll({ x: slice.x() + width * locationX - dx, y: slice.y() - dy + height * locationY });
+				sprite.setAll({ x: slice.x() + point.x, y: slice.y() + point.y });
 			}
 		}
 	}

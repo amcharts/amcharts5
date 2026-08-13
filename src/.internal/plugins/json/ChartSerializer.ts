@@ -1,6 +1,7 @@
 import { Entity } from "../../core/util/Entity";
 import type { Sprite } from "../../core/render/Sprite";
 import type { SerialChart } from "../../core/render/SerialChart";
+import type { SerialChartContainer } from "../../core/render/SerialChartContainer";
 import type { Series } from "../../core/render/Series";
 import type { XYChart } from "../../charts/xy/XYChart";
 import type { XYSeries } from "../../charts/xy/series/XYSeries";
@@ -32,6 +33,15 @@ export interface IChartSerializerSettings extends ISerializerSettings {
 	 * @default true
 	 */
 	removeEmptyObjects?: boolean;
+
+	/**
+	 * Include a `root` section (settings and properties of the [[Root]] object)
+	 * in the serialized output.
+	 *
+	 * @default false
+	 * @since 5.20.2
+	 */
+	includeRoot?: boolean;
 
 }
 
@@ -68,6 +78,7 @@ export class ChartSerializer extends Serializer {
 		super._afterNew();
 		this._setSoft("maxDepth", 10);
 		this._setSoft("removeEmptyObjects", true);
+		this._setSoft("includeRoot", false);
 		this._setSoft("includeEvents", true);
 		this._setSoft("includeAdapters", true);
 		this._setSoft("includeStates", true);
@@ -151,10 +162,43 @@ export class ChartSerializer extends Serializer {
 			}
 		});
 
+		// Root settings/properties
+		if (this.get("includeRoot")) {
+			result.root = this._serializeRoot();
+		}
+
 		// Cleanup
 		if (this.get("removeEmptyObjects")) {
 			this._pruneEmptyObjects(result);
 		}
+
+		return result;
+	}
+
+	private _serializeRoot(): any {
+		const root: any = this.root;
+		const result: any = { properties: {}, settings: {} };
+
+		// Properties. Entity-based properties (formatters) are serialized into a
+		// `settings` block (no `type`) so they merge into the existing instance on
+		// parse; primitives are included as-is.
+		$array.each(["utc", "fps", "numberFormatter", "dateFormatter", "durationFormatter", "tabindex"], (key: string) => {
+			const value = root[key];
+			if (value === undefined) {
+				return;
+			}
+			if (value instanceof Entity) {
+				const serialized: any = this.serialize(value, 0, false);
+				this._stripType(serialized);
+				result.properties[key] = serialized;
+			}
+			else {
+				result.properties[key] = value;
+			}
+		});
+
+		// Settings from `Root._settings`.
+		result.settings = this.serialize(root.settings, 0, true);
 
 		return result;
 	}
@@ -195,6 +239,10 @@ export class ChartSerializer extends Serializer {
 		// Specialized serializers
 		if (source.isType<SerialChart>("SerialChart")) {
 			this._processSerialChart(source, result);
+		}
+
+		if (source.isType<SerialChartContainer>("SerialChartContainer")) {
+			this._processSerialChartContainer(source, result);
 		}
 
 		if (source.isType<XYChart>("XYChart")) {
@@ -390,6 +438,11 @@ export class ChartSerializer extends Serializer {
 			});
 		}
 
+		// Handle Hierarchy
+		if (series.isType<Hierarchy>("Hierarchy")) {
+			this._processHierarchy(series, result);
+		}
+
 		this._saveRefId("series", seriesId, this._lists.series[seriesId]);
 		this._processCustomChildren(series, this._lists.series[seriesId]);
 
@@ -436,6 +489,39 @@ export class ChartSerializer extends Serializer {
 
 		// Custom children
 		this._processCustomChildren(source, result);
+	}
+
+	private _processSerialChartContainer(source: SerialChartContainer, result: any): void {
+
+		// Init properites
+		this._maybeInit(result, "properties", {});
+
+		// Serialize zoomableContainer
+		result.properties.zoomableContainer = this.serialize(source.zoomableContainer, 0, false);
+		this._stripType(result.properties.zoomableContainer);
+
+		// Process ZoomTools
+		if (result.settings && result.settings.zoomTools && result.settings.zoomTools.settings) {
+			// `target` is re-pointed at the chart's `seriesContainer` on parse.
+			delete result.settings.zoomTools.settings.target;
+
+			// A parsed `ZoomTools` creates its own buttons, so we only export
+			// their settings (no `type`) to configure them in place. `background`
+			// and `icon` are theme-created sub-elements and are stripped, same as
+			// XYChart's `zoomOutButton`.
+			const zoomTools: any = source.get("zoomTools");
+			this._maybeInit(result.settings.zoomTools, "properties", {});
+			["homeButton", "minusButton", "plusButton"].forEach((button) => {
+				const serializedButton: any = this.serialize(zoomTools[button], 0, false);
+				this._stripType(serializedButton);
+				if (serializedButton.settings) {
+					this._stripType(serializedButton.settings.background);
+					this._stripType(serializedButton.settings.icon);
+					//delete serializedButton.settings.icon;
+				}
+				result.settings.zoomTools.properties[button] = serializedButton;
+			});
+		}
 	}
 
 	private _processXYChart(source: XYChart, result: any) {

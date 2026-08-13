@@ -1,6 +1,7 @@
 import type { DataItem } from "../../core/render/Component";
 import type { FlowNode } from "./FlowNode";
 import type { ArcDiagram } from "./ArcDiagram";
+import type { Bullet } from "../../core/render/Bullet";
 
 import { FlowNodes, IFlowNodesSettings, IFlowNodesDataItem, IFlowNodesPrivate, IFlowNodesEvents } from "./FlowNodes";
 import { Circle } from "../../core/render/Circle";
@@ -90,6 +91,31 @@ export class ArcDiagramNodes extends FlowNodes {
 		circle._setDataItem(dataItem);
 
 		return node;
+	}
+
+	public _positionBullet(bullet: Bullet) {
+		const sprite = bullet.get("sprite");
+
+		if (sprite) {
+			const dataItem = sprite.dataItem as DataItem<this["_dataItemSettings"]>;
+
+			if (dataItem) {
+				const circle = dataItem.get("circle");
+
+				if (circle) {
+					// locations are fractions of the circle's bounding box, so the
+					// default 0.5/0.5 sits in the middle of the node
+					const radius = circle.get("radius", 0);
+					const locationX = bullet.get("locationX", 0.5);
+					const locationY = bullet.get("locationY", 0.5);
+
+					sprite.setAll({
+						x: radius * (2 * locationX - 1),
+						y: radius * (2 * locationY - 1)
+					});
+				}
+			}
+		}
 	}
 
 	/**

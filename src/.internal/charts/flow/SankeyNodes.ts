@@ -104,11 +104,10 @@ export class SankeyNodes extends FlowNodes {
 				const sprite = bullet.get("sprite");
 				if (sprite) {
 					const rectangle = dataItem.get("rectangle");
-					const node = dataItem.get("node");
 					const locationX = bullet.get("locationX", 0.5);
 					const locationY = bullet.get("locationY", 0.5);
 					if (rectangle) {
-						sprite.setAll({ x: node.x() + rectangle.width() * locationX, y: node.y() + rectangle.height() * locationY });
+						sprite.setAll({ x: rectangle.width() * locationX, y: rectangle.height() * locationY });
 					}
 				}
 			}

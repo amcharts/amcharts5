@@ -41,6 +41,7 @@ export { Sprite, ISpriteSettings, ISpritePrivate, ISpriteEvents, ISpritePointerE
 export { Series, ISeriesSettings, ISeriesEvents, ISeriesPrivate } from "./.internal/core/render/Series";
 export { Chart, IChartSettings, IChartEvents, IChartPrivate } from "./.internal/core/render/Chart";
 export { SerialChart, ISerialChartSettings, ISerialChartEvents, ISerialChartPrivate } from "./.internal/core/render/SerialChart";
+export { SerialChartContainer, ISerialChartContainerSettings, ISerialChartContainerEvents, ISerialChartContainerPrivate } from "./.internal/core/render/SerialChartContainer";
 export { Text, ITextSettings, ITextPrivate } from "./.internal/core/render/Text";
 export { Tick, ITickSettings, ITickPrivate } from "./.internal/core/render/Tick";
 export { Tooltip, ITooltipSettings, ITooltipPrivate } from "./.internal/core/render/Tooltip";

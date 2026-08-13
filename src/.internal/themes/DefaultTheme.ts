@@ -152,6 +152,12 @@ export class DefaultTheme extends Theme {
 			maxPanOut: 0.4
 		});
 
+		r("ZoomableContainer", ["serialchartcontainer"]).setAll({
+			wheelable: false,
+			pinchZoom: false,
+			maskContent: true
+		});
+
 
 		/**
 		 * ------------------------------------------------------------------------

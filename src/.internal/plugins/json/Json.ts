@@ -29,6 +29,16 @@ function isObjectParsed(value: object): boolean {
 	return value instanceof Entity || value instanceof Color || value instanceof Percent || value instanceof Template;
 }
 
+// Detects a type-less, entity-shaped config object, e.g. a serialized `background`
+// whose `type` was stripped so that it configures the existing sub-object in place
+// instead of constructing a new one.
+function isMergeDescriptor(value: any): boolean {
+	return isObject(value)
+		&& value.constructor === Object
+		&& value.type === undefined
+		&& (value.settings !== undefined || value.states !== undefined || value.properties !== undefined || value.adapters !== undefined);
+}
+
 
 // Detects whether a raw setting value references `@self` (the entity itself),
 // which means it must be applied after the entity is constructed.
@@ -436,9 +446,13 @@ class ParserState {
 						} else if (parsed.construct) {
 							(entity as any)[key] = constructEntity(root, parsed);
 
-							// Merge into existing Entity or Template
-						} else if (old instanceof Entity || old instanceof Template) {
-							mergeExisting(old as Entity, parsed);
+							// Merge into existing Entity
+						} else if (old instanceof Entity) {
+							this.mergeExistingEntity(root, old as Entity, parsed, refs);
+
+							// Merge into existing Template
+						} else if (old instanceof Template) {
+							mergeExisting(old as unknown as Entity, parsed);
 
 							// Merge into existing object
 						} else {
@@ -482,6 +496,62 @@ class ParserState {
 				}
 			};
 		});
+	}
+
+	// Applies a parsed config to an already-existing entity. Unlike `setAll`, a
+	// setting whose existing value is an [[Entity]] and whose incoming value is a
+	// type-less, entity-shaped object (see `isMergeDescriptor`) is merged into that
+	// existing sub-entity instead of replacing it with the raw config object.
+	mergeExistingEntity<E extends Entity>(root: Root, entity: E, parsed: IParsedEntity<E>, refs: Array<IRef>): void {
+		if (parsed.settings) {
+			const rawSettings: any = (parsed.value as any).settings;
+
+			$object.each(parsed.settings, (key, value: any) => {
+				const existing = (entity as any).get(key);
+				const raw = rawSettings ? rawSettings[key] : undefined;
+
+				if (existing instanceof Entity && isMergeDescriptor(raw)) {
+					this.mergeExistingEntity(root, existing, this.parseEntity(root, raw, refs), refs);
+
+				} else {
+					(entity as any).set(key, value);
+				}
+			});
+		}
+
+		mergeEntity(entity, parsed);
+	}
+
+	// Applies a `root` config section to the [[Root]] object. `properties` are set
+	// directly on the `Root`; [[Entity]]-based properties (e.g. `numberFormatter`,
+	// `dateFormatter`) are parsed and merged into the existing instance the same
+	// way entities are parsed elsewhere (i.e. their settings live in a `settings`
+	// block). `settings` are applied to the root's settings, then re-applied
+	// non-destructively so they take effect.
+	applyRoot(root: Root, config: { [key: string]: any }): void {
+		const rootAny: any = root;
+
+		const properties = config.properties;
+		if (isObject(properties)) {
+			$object.each(properties, (key, value) => {
+				const existing = rootAny[key];
+				if (existing instanceof Entity && isObject(value)) {
+					this.mergeExistingEntity(root, existing, this.parseEntity(root, value, []), []);
+				} else {
+					rootAny[key] = this.parse(root, value, []);
+				}
+			});
+		}
+
+		const settings = config.settings;
+		if (isObject(settings) && $object.keys(settings).length > 0) {
+			$object.each(settings, (key, value) => {
+				rootAny._settings[key] = this.parse(root, value, []);
+			});
+			// Non-destructive re-apply (does NOT re-run `_init()`, which would
+			// duplicate containers, DOM nodes and event listeners).
+			rootAny._reapplySettings();
+		}
 	}
 
 	parseAxisRange<E extends Entity>(root: Root, value: IAxisRange<E>, refs: Array<IRef>): IParsedEntity<E> {
@@ -804,6 +874,14 @@ export class JsonParser {
 		const state = new ParserState();
 
 		await state.parseAsync(object);
+
+		// Apply the top-level `root` config section to the `Root` object before
+		// the chart is parsed. Only the top-level entry is treated this way
+		// (nested parsing never inspects `root`), and the key is ignored by the
+		// rest of the parser, so it does not affect chart/entity parsing.
+		if (isObject(object) && isObject((object as any).root)) {
+			state.applyRoot(this._root, (object as any).root);
+		}
 
 		const output = state.parse(this._root, object, []) as E;
 

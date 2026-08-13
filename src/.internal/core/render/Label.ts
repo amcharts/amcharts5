@@ -316,7 +316,7 @@ export class Label extends Container {
 		this._makeText();
 
 		$array.each(this._textKeys, (property) => {
-			const propValue = this.get(property as any);
+			const propValue = this._getTextKeyValue(property);
 			if (propValue != undefined) {
 				this._text.set(property as any, propValue);
 			}
@@ -339,13 +339,34 @@ export class Label extends Container {
 		this._text = this.children.push(Text.new(this._root, {}));
 	}
 
+	/**
+	 * Returns the value to push downstream to the [[Text]] for a given key.
+	 *
+	 * For the font settings (`fontFamily`/`fontSize`/`fontWeight`) the label's
+	 * own value is used only when it was explicitly set on the label
+	 * (`isUserSetting`) or when there is no matching `Root` setting. Otherwise a
+	 * `Root`-level default takes precedence, so it overrides theme values but
+	 * never an explicit per-label value.
+	 */
+	protected _getTextKeyValue(property: string): any {
+		if (property === "fontFamily" || property === "fontSize" || property === "fontWeight") {
+			if (!this.isUserSetting(property as any)) {
+				const rootValue = (this._root.settings as any)[property];
+				if (rootValue != undefined) {
+					return rootValue;
+				}
+			}
+		}
+		return this.get(property as any);
+	}
+
 	public _updateChildren() {
 		super._updateChildren();
 
 		const text = this._text;
 
 		$array.each(this._textKeys, (property) => {
-			this._text.set(property as any, this.get(property as any));
+			this._text.set(property as any, this._getTextKeyValue(property));
 		})
 
 		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isDirty("rotation")) {

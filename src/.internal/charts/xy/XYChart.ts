@@ -1269,9 +1269,7 @@ export class XYChart extends SerialChart {
 					previous.dispose();
 				}
 				if (scrollbarX) {
-					if (!scrollbarX.parent) {
-						this.topAxesContainer.children.push(scrollbarX);
-					}
+					this._placeScrollbar("scrollbarX", scrollbarX, this.topAxesContainer, this.bottomAxesContainer);
 
 					this._pushPropertyDisposer("scrollbarX", scrollbarX.events.on("rangechanged", (e) => {
 						this._handleScrollbar(this.xAxes, e.start, e.end, e.grip);
@@ -1306,9 +1304,7 @@ export class XYChart extends SerialChart {
 					previous.dispose();
 				}
 				if (scrollbarY) {
-					if (!scrollbarY.parent) {
-						this.rightAxesContainer.children.push(scrollbarY);
-					}
+					this._placeScrollbar("scrollbarY", scrollbarY, this.rightAxesContainer, this.leftAxesContainer, true);
 
 					this._pushPropertyDisposer("scrollbarY", scrollbarY.events.on("rangechanged", (e) => {
 						this._handleScrollbar(this.yAxes, e.start, e.end, e.grip);
@@ -1334,6 +1330,65 @@ export class XYChart extends SerialChart {
 		}
 
 		this._handleZoomOut();
+	}
+
+	/**
+	 * Puts a scrollbar into one of two containers, depending on its `opposite`
+	 * setting, and moves it over if the setting changes later. `unshift` is for
+	 * the left container, which fills left to right, so the scrollbar has to go
+	 * in at the front to end up outside the axes.
+	 *
+	 * @ignore
+	 */
+	protected _placeScrollbar(key: "scrollbarX" | "scrollbarY", scrollbar: Scrollbar, container: Container, oppositeContainer: Container, unshift?: boolean) {
+		const place = () => {
+			const opposite = scrollbar.get("opposite");
+			const target = opposite ? oppositeContainer : container;
+			const children = target.children;
+			const index = (opposite && unshift) ? 0 : children.length - 1;
+
+			if (scrollbar.parent != target || children.indexOf(scrollbar) != index) {
+				// A vertical layout only ever sets a child's private `y` and a
+				// horizontal one only `x`, so whatever the new container does not
+				// own would keep the value the previous one gave it. Drop both, the
+				// same way a container resets its children when its own layout
+				// changes.
+				scrollbar.removePrivate("x");
+				scrollbar.removePrivate("y");
+
+				if (opposite && unshift) {
+					children.moveValue(scrollbar, 0);
+				}
+				else {
+					children.moveValue(scrollbar);
+				}
+
+				// Inserting a child only marks the container it came from, so make
+				// the receiving side re-measure and lay out again.
+				target.markDirtyBounds();
+
+				// A vertical scrollbar changes the width of the left/right
+				// containers, which the top/bottom padding is derived from. Those
+				// widths only settle once the layout has run, hence the wait.
+				this._root.events.once("frameended", () => {
+					if (!this.isDisposed()) {
+						this._updateChartLayout();
+					}
+				});
+			}
+		}
+
+		if (!scrollbar.parent) {
+			place();
+		}
+
+		this._pushPropertyDisposer(key, scrollbar.on("opposite", () => {
+			// only move scrollbars the chart placed itself
+			const parent = scrollbar.parent;
+			if (parent == container || parent == oppositeContainer) {
+				place();
+			}
+		}))
 	}
 
 	protected _processSeries(series: this["_seriesType"]) {

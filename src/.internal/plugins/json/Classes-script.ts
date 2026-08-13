@@ -190,8 +190,6 @@ import type { RadialLabel } from "./../../../index";
 import type { RadialText } from "./../../../index";
 import type { Rectangle } from "./../../../index";
 import type { RectanglePattern } from "./../../../index";
-import type { StarPattern } from "./../../../index";
-import type { TrianglePattern } from "./../../../index";
 import type { RectangleSeries } from "./../../../stock";
 import type { RegressionSeries } from "./../../../stock";
 import type { RelativeStrengthIndex } from "./../../../stock";
@@ -202,6 +200,7 @@ import type { SankeyLink } from "./../../../flow";
 import type { SankeyNodes } from "./../../../flow";
 import type { Scrollbar } from "./../../../index";
 import type { SerialChart } from "./../../../index";
+import type { SerialChartContainer } from "./../../../index";
 import type { Serializer } from "./../../../plugins/json";
 import type { Series } from "./../../../index";
 import type { SeriesTypeControl } from "./../../../stock";
@@ -222,6 +221,7 @@ import type { Sprite } from "./../../../index";
 import type { SpriteResizer } from "./../../../index";
 import type { StandardDeviation } from "./../../../stock";
 import type { Star } from "./../../../index";
+import type { StarPattern } from "./../../../index";
 import type { StepLineSeries } from "./../../../xy";
 import type { StochasticMomentumIndex } from "./../../../stock";
 import type { StochasticOscillator } from "./../../../stock";
@@ -239,6 +239,7 @@ import type { Tree } from "./../../../hierarchy";
 import type { Treemap } from "./../../../hierarchy";
 import type { TrendLineSeries } from "./../../../stock";
 import type { Triangle } from "./../../../index";
+import type { TrianglePattern } from "./../../../index";
 import type { Trix } from "./../../../stock";
 import type { TypicalPrice } from "./../../../stock";
 import type { VWAP } from "./../../../stock";
@@ -448,8 +449,6 @@ export interface IClasses {
 	"RadialText": () => Promise<typeof RadialText>;
 	"Rectangle": () => Promise<typeof Rectangle>;
 	"RectanglePattern": () => Promise<typeof RectanglePattern>;
-	"StarPattern": () => Promise<typeof StarPattern>;
-	"TrianglePattern": () => Promise<typeof TrianglePattern>;
 	"RectangleSeries": () => Promise<typeof RectangleSeries>;
 	"RegressionSeries": () => Promise<typeof RegressionSeries>;
 	"RelativeStrengthIndex": () => Promise<typeof RelativeStrengthIndex>;
@@ -460,6 +459,7 @@ export interface IClasses {
 	"SankeyNodes": () => Promise<typeof SankeyNodes>;
 	"Scrollbar": () => Promise<typeof Scrollbar>;
 	"SerialChart": () => Promise<typeof SerialChart>;
+	"SerialChartContainer": () => Promise<typeof SerialChartContainer>;
 	"Serializer": () => Promise<typeof Serializer>;
 	"Series": () => Promise<typeof Series>;
 	"SeriesTypeControl": () => Promise<typeof SeriesTypeControl>;
@@ -480,6 +480,7 @@ export interface IClasses {
 	"SpriteResizer": () => Promise<typeof SpriteResizer>;
 	"StandardDeviation": () => Promise<typeof StandardDeviation>;
 	"Star": () => Promise<typeof Star>;
+	"StarPattern": () => Promise<typeof StarPattern>;
 	"StepLineSeries": () => Promise<typeof StepLineSeries>;
 	"StochasticMomentumIndex": () => Promise<typeof StochasticMomentumIndex>;
 	"StochasticOscillator": () => Promise<typeof StochasticOscillator>;
@@ -497,6 +498,7 @@ export interface IClasses {
 	"Treemap": () => Promise<typeof Treemap>;
 	"TrendLineSeries": () => Promise<typeof TrendLineSeries>;
 	"Triangle": () => Promise<typeof Triangle>;
+	"TrianglePattern": () => Promise<typeof TrianglePattern>;
 	"Trix": () => Promise<typeof Trix>;
 	"TypicalPrice": () => Promise<typeof TypicalPrice>;
 	"VWAP": () => Promise<typeof VWAP>;
@@ -707,8 +709,6 @@ const classes: IClasses = {
 	"RadialText": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.RadialText),
 	"Rectangle": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Rectangle),
 	"RectanglePattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.RectanglePattern),
-	"StarPattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.StarPattern),
-	"TrianglePattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.TrianglePattern),
 	"RectangleSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.RectangleSeries),
 	"RegressionSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.RegressionSeries),
 	"RelativeStrengthIndex": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.RelativeStrengthIndex),
@@ -719,6 +719,7 @@ const classes: IClasses = {
 	"SankeyNodes": () => import(/* webpackMode: "weak" */ "./../../../flow").then((m) => m.SankeyNodes),
 	"Scrollbar": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Scrollbar),
 	"SerialChart": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.SerialChart),
+	"SerialChartContainer": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.SerialChartContainer),
 	"Serializer": () => import(/* webpackMode: "weak" */ "./../../../plugins/json").then((m) => m.Serializer),
 	"Series": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Series),
 	"SeriesTypeControl": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.SeriesTypeControl),
@@ -739,6 +740,7 @@ const classes: IClasses = {
 	"SpriteResizer": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.SpriteResizer),
 	"StandardDeviation": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.StandardDeviation),
 	"Star": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Star),
+	"StarPattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.StarPattern),
 	"StepLineSeries": () => import(/* webpackMode: "weak" */ "./../../../xy").then((m) => m.StepLineSeries),
 	"StochasticMomentumIndex": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.StochasticMomentumIndex),
 	"StochasticOscillator": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.StochasticOscillator),
@@ -756,6 +758,7 @@ const classes: IClasses = {
 	"Treemap": () => import(/* webpackMode: "weak" */ "./../../../hierarchy").then((m) => m.Treemap),
 	"TrendLineSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.TrendLineSeries),
 	"Triangle": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Triangle),
+	"TrianglePattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.TrianglePattern),
 	"Trix": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.Trix),
 	"TypicalPrice": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.TypicalPrice),
 	"VWAP": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.VWAP),
