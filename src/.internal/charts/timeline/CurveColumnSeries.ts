@@ -83,8 +83,8 @@ export class CurveColumnSeries extends BaseColumnSeries {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.set("maskContent", false);
-		this.bulletsContainer.set("maskContent", false);
+		this._setC("maskContent", false);
+		this.bulletsContainer._setC("maskContent", false);
 		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
 	}
 
@@ -120,7 +120,7 @@ export class CurveColumnSeries extends BaseColumnSeries {
 
 		const polygon = graphics as Polygon;
 
-		polygon.set("points", points);
+		polygon._setC("points", points);
 	}
 
 	protected _shouldInclude(position: number): boolean {

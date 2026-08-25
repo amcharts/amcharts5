@@ -46,7 +46,7 @@ export class SerialChartContainer extends SerialChart {
 	 * A [[ZoomableContainer]] which holds chart's `seriesContainer` so it can
 	 * be zoomed and panned.
 	 */
-	public readonly zoomableContainer: ZoomableContainer = ZoomableContainer.new(this._root, { width: p100, height: p100, isMeasured: false });
+	public readonly zoomableContainer: ZoomableContainer = ZoomableContainer.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured");
 
 	protected _afterNew() {
 		super._afterNew();

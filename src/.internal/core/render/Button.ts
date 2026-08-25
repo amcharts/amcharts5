@@ -38,11 +38,9 @@ export class Button extends Container {
 
 		super._afterNew();
 
-		if (!this._settings.background) {
-			this.set("background", RoundedRectangle.new(this._root, {
-				themeTags: $utils.mergeTags(this._settings.themeTags, ["background"])
-			}));
-		}
+		this._setDefaultTagged("background", $utils.mergeTags(this._settings.themeTags, ["background"]), () => {
+			return RoundedRectangle.new(this._root, {});
+		});
 
 		this.setPrivate("trustBounds", true);
 	}

@@ -1,6 +1,25 @@
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
+import { registry } from "../../core/Registry";
 import * as $math from "../../core/util/Math";
 import { geoCircle, geoCentroid, geoBounds, geoArea } from "d3-geo";
+
+
+/**
+ * Notes down which call produced a geometry, and with what, so that serializing
+ * can write out those few numbers instead of every coordinate they expand to.
+ *
+ * The note is not enumerable, so it stays out of the geometry itself.
+ *
+ * @ignore
+ */
+export function describeGeometry<T extends object>(geometry: T, name: string, args: { [index: string]: any }): T {
+	Object.defineProperty(geometry, "__geometry", {
+		value: { name: name, args: args },
+		enumerable: false,
+		configurable: true
+	});
+	return geometry;
+}
 
 /**
  * Returns a GeoJSON representation of a circle, suitable for use as `geometry` value
@@ -11,7 +30,11 @@ import { geoCircle, geoCentroid, geoBounds, geoArea } from "d3-geo";
  * @return            Polygon geometry
  */
 export function getGeoCircle(geoPoint: IGeoPoint, radius: number): GeoJSON.Polygon {
-	return geoCircle().center([geoPoint.longitude, geoPoint.latitude]).radius(radius)();
+	return describeGeometry(
+		geoCircle().center([geoPoint.longitude, geoPoint.latitude]).radius(radius)(),
+		"GeoCircle",
+		{ geoPoint: geoPoint, radius: radius }
+	);
 }
 
 /**
@@ -58,6 +81,11 @@ export function getGeoBounds(geometry: GeoJSON.GeometryObject): { left: number, 
  */
 export function getGeoRectangle(north: number, east: number, south: number, west: number): GeoJSON.MultiPolygon {
 
+	// What was asked for, before the clamping below pulls the edges inside the
+	// range a projection can draw - so a serialized rectangle reads as the one
+	// that was requested
+	const asked = { north: north, east: east, south: south, west: west };
+
 	let multiPolygon: Array<Array<Array<[number, number]>>> = [];
 
 	if (west <= -180) {
@@ -102,7 +130,7 @@ export function getGeoRectangle(north: number, east: number, south: number, west
 		}
 	}
 
-	return { type: "MultiPolygon", coordinates: multiPolygon };
+	return describeGeometry({ type: "MultiPolygon", coordinates: multiPolygon }, "GeoRectangle", asked);
 }
 
 /**
@@ -142,3 +170,8 @@ export function wrapAngleTo180(angle: number): number {
 
 	return angle;
 }
+
+// Lets a config store a shape as the call that made it - the JSON plugin looks
+// these up by name rather than importing the map module
+registry.geometryFunctions["GeoRectangle"] = (args: any) => getGeoRectangle(args.north, args.east, args.south, args.west);
+registry.geometryFunctions["GeoCircle"] = (args: any) => getGeoCircle(args.geoPoint, args.radius);

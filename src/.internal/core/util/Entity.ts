@@ -418,6 +418,14 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	// TODO move this into Entity
 	protected _userProperties: Dirty<this["_settings"]> = {};
 
+	// Settings the library worked out for itself. Anything written through
+	// `_setC` is flagged in `_userProperties` as well, so that everything which
+	// keys off it - themes, templates - behaves exactly as before, and only code
+	// that cares about provenance (serializing) tells them apart. Defaults
+	// (`_setDefault` and friends) are flagged here alone, since they never
+	// counted as user properties in the first place.
+	protected _computedProperties: Dirty<this["_settings"]> = {};
+
 	/**
 	 * If this is set to `false` then disposing does nothing, it's a no-op.
 	 */
@@ -439,6 +447,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 */
 	public resetUserSettings(){
 		this._userProperties = {};
+		this._computedProperties = {};
 	}
 
 	/**
@@ -464,7 +473,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 
 					if (diff >= 1) {
 						if (animation._checkEnded()) {
-							this.set(key, animation._value(1));
+							this._setAnimated(key, animation._value(1));
 
 						} else {
 							playing = true;
@@ -1032,6 +1041,23 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @param   options  Animation options
 	 * @return           Animation object
 	 */
+	/**
+	 * Writes a value an animation arrived at.
+	 *
+	 * An animation carries provenance along rather than creating it: a setting
+	 * that was asked for stays that way, and one that was computed - or never set
+	 * at all - does not become a choice just because something animated to it.
+	 */
+	protected _setAnimated<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
+		const authored = this._userProperties[key] && !this._computedProperties[key];
+
+		this.set(key, value as any);
+
+		if (!authored) {
+			this._computedProperties[key] = true;
+		}
+	}
+
 	public animate<Key extends keyof this["_settings"]>(options: AnimationOptions<Key, this["_settings"][Key]>): Animation<this["_settings"][Key]> {
 		const key = options.key;
 		const to = options.to;
@@ -1042,14 +1068,14 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		const easing = (options.easing === undefined ? $ease.linear : options.easing);
 
 		if (duration === 0) {
-			this.set(key, to);
+			this._setAnimated(key, to);
 
 		} else {
 			if (from === undefined || from === to) {
-				this.set(key, to);
+				this._setAnimated(key, to);
 
 			} else {
-				this.set(key, from);
+				this._setAnimated(key, from);
 
 				const animation = this._animatingSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
 
@@ -1289,7 +1315,7 @@ export class Entity extends Settings implements IDisposer {
 
 		} else {
 			const value = f();
-			this.set(key, value);
+			this._setC(key, value);
 			return value;
 		}
 	}
@@ -1297,12 +1323,16 @@ export class Entity extends Settings implements IDisposer {
 	public _setDefault<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		if (!this.has(key)) {
 			super.set(key, value);
+			// a default only lands when nothing was asked for, so it is the
+			// library's own value - see `_setC`
+			this._computedProperties[key] = true;
 		}
 	}
 
 	public _setRawDefault<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		if (!this.has(key)) {
 			super.setRaw(key, value);
+			this._computedProperties[key] = true;
 		}
 	}
 
@@ -1458,7 +1488,90 @@ export class Entity extends Settings implements IDisposer {
 	 */
 	public set<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
 		this._userProperties[key] = true;
+		delete this._computedProperties[key];
 		return super.set(key, value);
+	}
+
+	/**
+	 * Same as `set()`, but for a value the library works out itself rather than
+	 * one that was asked for - a size measured during layout, a color derived
+	 * from data, and so on.
+	 *
+	 * Behaves identically in every way that affects the chart; the value is only
+	 * additionally flagged as computed, so that it can be left out when the chart
+	 * is serialized.
+	 *
+	 * @ignore
+	 * @param   key       Setting key
+	 * @param   value     Setting value
+	 * @return            Setting value
+	 */
+	public _setC<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
+		const authored = this._userProperties[key] && !this._computedProperties[key] && (this._settings as any)[key] === value;
+		const result = this.set(key, value);
+		if (!authored) {
+			this._computedProperties[key] = true;
+		}
+		return result;
+	}
+
+	/**
+	 * Same as `setRaw()`, but for a value the library works out itself.
+	 *
+	 * Kept separate from `_setC()` because `setRaw()` deliberately writes without
+	 * the side effects of `set()` - no animation is stopped and no change is
+	 * announced - and callers that reach for it are relying on that.
+	 *
+	 * @ignore
+	 * @param   key       Setting key
+	 * @param   value     Setting value
+	 */
+	public _setCRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value) {
+		const authored = this._userProperties[key] && !this._computedProperties[key] && (this._settings as any)[key] === value;
+		this.setRaw(key, value);
+		if (!authored) {
+			this._computedProperties[key] = true;
+		}
+	}
+
+	/**
+	 * Flags already-set settings as computed, without writing anything.
+	 *
+	 * For settings passed to `new()` by the library itself, where re-setting them
+	 * just to flag them would announce a change that never happened.
+	 *
+	 * @ignore
+	 * @param   keys  Setting keys
+	 * @return        Itself
+	 */
+	public _markC<T extends Entity>(this: T, ...keys: Array<keyof T["_settings"]>): T {
+		$array.each(keys, (key) => {
+			this._computedProperties[key] = true;
+		});
+		return this;
+	}
+
+	/**
+	 * Sets multiple computed settings at once.
+	 *
+	 * @ignore
+	 * @param   settings  Settings
+	 */
+	public _setCAll(settings: Partial<this["_settings"]>) {
+		$object.each(settings, (key, value) => {
+			this._setC(key, value as any);
+		});
+	}
+
+	/**
+	 * Returns `true` if the setting holds a value the library worked out itself.
+	 *
+	 * @ignore
+	 * @param   key  Setting key
+	 * @return       Computed?
+	 */
+	public isComputedSetting<Key extends keyof this["_settings"]>(key: Key): boolean {
+		return this._computedProperties[key] || false;
 	}
 
 
@@ -1467,6 +1580,7 @@ export class Entity extends Settings implements IDisposer {
 	 */
 	public setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value) {
 		this._userProperties[key] = true;
+		delete this._computedProperties[key];
 		super.setRaw(key, value);
 	}
 
@@ -1493,6 +1607,7 @@ export class Entity extends Settings implements IDisposer {
 	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
 		delete this._userProperties[key];
+		delete this._computedProperties[key];
 		this._removeTemplateProperty(key);
 	}
 

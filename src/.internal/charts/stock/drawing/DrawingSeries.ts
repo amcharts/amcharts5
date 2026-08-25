@@ -295,7 +295,7 @@ export class DrawingSeries extends LineSeries {
 			this.startDragItem(e, this._getIndex(e.target));
 		})
 
-		this.bulletsContainer.states.create("hidden", { visible: true, opacity: 0 });
+		this.bulletsContainer.states._createC("hidden", { visible: true, opacity: 0 });
 
 		this.bullets.push((_root, _series, dataItem) => {
 			const dataContext = dataItem.dataContext as any;

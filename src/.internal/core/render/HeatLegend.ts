@@ -31,7 +31,7 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	 * @default 1
 	 * @since 5.14.0
 	 */
-	startOpacity: number;
+	startOpacity?: number;
 
 	/**
 	 * Ending (highest value) opacity.
@@ -39,7 +39,7 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	 * @default 1
 	 * @since 5.14.0
 	 */
-	endOpacity: number;
+	endOpacity?: number;
 
 	/**
 	 * Start (lowest) value.
@@ -126,7 +126,7 @@ export class HeatLegend extends Container {
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["heatlegend", this._settings.orientation]);
 		super._afterNew();
-		this.set("tooltip", Tooltip.new(this._root, {
+		this._setC("tooltip", Tooltip.new(this._root, {
 			themeTags: ["heatlegend"]
 		}));
 	}
@@ -216,23 +216,23 @@ export class HeatLegend extends Container {
 
 		if (this.isDirty("orientation")) {
 			if (orientation == "vertical") {
-				this.markerContainer.setAll({ layout: this._root.verticalLayout, height: p100 });
-				this.set("layout", this._root.horizontalLayout);
-				startLabel.setAll({ y: p100, x: undefined, centerY: p100, centerX: p100 });
-				endLabel.setAll({ y: 0, x: undefined, centerY: 0, centerX: p100 });
-				labelContainer.setAll({ height: p100, width: undefined });
+				this.markerContainer._setCAll({ layout: this._root.verticalLayout, height: p100 });
+				this._setC("layout", this._root.horizontalLayout);
+				startLabel._setCAll({ y: p100, x: undefined, centerY: p100, centerX: p100 });
+				endLabel._setCAll({ y: 0, x: undefined, centerY: 0, centerX: p100 });
+				labelContainer._setCAll({ height: p100, width: undefined });
 				if (tooltip) {
-					tooltip.set("pointerOrientation", "horizontal");
+					tooltip._setC("pointerOrientation", "horizontal");
 				}
 			}
 			else {
-				this.markerContainer.setAll({ layout: this._root.horizontalLayout, width: p100 });
-				this.set("layout", this._root.verticalLayout);
-				startLabel.setAll({ x: 0, y: undefined, centerX: 0, centerY: 0 });
-				endLabel.setAll({ x: p100, y: undefined, centerX: p100, centerY: 0 });
-				labelContainer.setAll({ width: p100, height: undefined });
+				this.markerContainer._setCAll({ layout: this._root.horizontalLayout, width: p100 });
+				this._setC("layout", this._root.verticalLayout);
+				startLabel._setCAll({ x: 0, y: undefined, centerX: 0, centerY: 0 });
+				endLabel._setCAll({ x: p100, y: undefined, centerX: p100, centerY: 0 });
+				labelContainer._setCAll({ width: p100, height: undefined });
 				if (tooltip) {
-					tooltip.set("pointerOrientation", "vertical");
+					tooltip._setC("pointerOrientation", "vertical");
 				}
 			}
 		}
@@ -261,7 +261,7 @@ export class HeatLegend extends Container {
 					}
 
 					if (startColor && endColor) {
-						marker.setAll({
+						marker._setCAll({
 							fill: Color.interpolate(i / stepCount, startColor, endColor),
 							fillOpacity: percent(i / stepCount * 100).interpolate(startOpacity, endOpacity)
 						});
@@ -292,17 +292,17 @@ export class HeatLegend extends Container {
 					gradient.set("rotation", 0);
 				}
 				if (startColor && endColor) {
-					marker.set("fillGradient", gradient);
+					marker._setC("fillGradient", gradient);
 				}
 			}
 		}
 
 		if (this.isDirty("startText") || this.isDirty("startValue")) {
-			startLabel.set("text", this.get("startText", this.getNumberFormatter().format(this.get("startValue", 0))));
+			startLabel._setC("text", this.get("startText", this.getNumberFormatter().format(this.get("startValue", 0))));
 		}
 
 		if (this.isDirty("endText") || this.isDirty("endValue")) {
-			endLabel.set("text", this.get("endText", this.getNumberFormatter().format(this.get("endValue", 1))))
+			endLabel._setC("text", this.get("endText", this.getNumberFormatter().format(this.get("endValue", 1))))
 		}
 	}
 }

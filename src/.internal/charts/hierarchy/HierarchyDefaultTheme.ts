@@ -28,7 +28,7 @@ export class HierarchyDefaultTheme extends Theme {
 			legendValueText: "{sum.formatNumber('#.#')}",
 			width: p100,
 			height: p100,
-			colors: ColorSet.new(this._root, { step: 2 }),
+			colors: ColorSet.new(this._root, { step: 2 })._markC("step"),
 			childDataField: "children",
 			downDepth: 1,
 			initialDepth: 5,

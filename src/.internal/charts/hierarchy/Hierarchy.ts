@@ -1071,7 +1071,7 @@ export abstract class Hierarchy extends Series {
 
 		if (this.get("selectedDataItem") == dataItem) {
 			if (parent) {
-				this.set("selectedDataItem", parent);
+				this._setC("selectedDataItem", parent);
 			}
 			else {
 				let depth = Math.min(this.get("downDepth", 1), maxDepth - dataItem.get("depth"));
@@ -1084,7 +1084,7 @@ export abstract class Hierarchy extends Series {
 			}
 		}
 		else {
-			this.set("selectedDataItem", dataItem);
+			this._setC("selectedDataItem", dataItem);
 		}
 	}
 

@@ -315,7 +315,7 @@ export abstract class AxisRenderer extends Graphics {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.set("isMeasured", false);
+		this._setC("isMeasured", false);
 
 		const thumb = this.thumb;
 		if (thumb) {

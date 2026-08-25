@@ -160,12 +160,12 @@ export class PieSeries extends PercentSeries {
 				let labelsTemplate = this.labels.template;
 
 				if (this.get("alignLabels")) {
-					labelsTemplate.set("textType", "aligned");
+					labelsTemplate._setC("textType", "aligned");
 				}
 				else {
 					let textType = labelsTemplate.get("textType");
 					if (textType == null || textType == "aligned") {
-						labelsTemplate.set("textType", "adjusted");
+						labelsTemplate._setC("textType", "adjusted");
 					}
 				}
 			}

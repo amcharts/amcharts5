@@ -1,5 +1,6 @@
-import type { IMapPointSeriesDataItem } from "./MapPointSeries";
+import type { IMapPointSeriesDataItem, MapPointSeries } from "./MapPointSeries";
 import type { DataItem } from "../../core/render/Component";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
 import { MapLine } from "./MapLine";
@@ -30,6 +31,21 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 	 * An array of data items from [[MapPointSeries]] to use as line end-points. Note, fixed points can not be used here.
 	 */
 	pointsToConnect?: Array<DataItem<IMapPointSeriesDataItem>>;
+
+	/**
+	 * Ids of the points the line connects, looked up in the series set as
+	 * `pointSeries`. The points themselves stay where they are; the line follows
+	 * them, and a config carries the ids rather than a copy of the coordinates.
+	 *
+	 * The line waits for every id to match a point of its own before it is drawn,
+	 * so it is never drawn short. Fixed points cannot be used, same as with
+	 * `pointsToConnect`.
+	 *
+	 * Ignored if `pointsToConnect` is set on the same data item.
+	 *
+	 * @since 5.20.3
+	 */
+	pointIds?: Array<string>;
 
 	/**
 	 * A line type.
@@ -73,6 +89,21 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 	 * @ignore
 	 */
 	lineTypeField?: string;
+
+	/**
+	 * A [[MapPointSeries]] the `pointIds` of a data item are looked up in.
+	 *
+	 * @since 5.20.3
+	 */
+	pointSeries?: MapPointSeries;
+
+	/**
+	 * A field in data that holds ids of the points a line connects.
+	 *
+	 * @default "pointIds"
+	 * @since 5.20.3
+	 */
+	pointIdsField?: string;
 }
 
 /**
@@ -83,10 +114,132 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
  */
 export class MapLineSeries extends MapSeries {
 
+	protected _pointSeriesDP?: IDisposer;
+
+	/**
+	 * The data items whose `pointsToConnect` this series worked out from
+	 * `pointIds`, so that they can be worked out again - and one set by hand can
+	 * be left alone.
+	 */
+	protected _derivedPoints: WeakSet<DataItem<IMapLineSeriesDataItem>> = new WeakSet();
+
 	protected _afterNew() {
-		this.fields.push("lineType");
+		this.fields.push("lineType", "pointIds");
 		this._setRawDefault("lineTypeField", "lineType");
+		this._setRawDefault("pointIdsField", "pointIds");
+
+		// Data can be set before the point series has loaded, so the lookup is
+		// retried whenever that series validates - and again if it is swapped
+		this.on("pointSeries", () => {
+			this._setupPointSeriesListener();
+		});
+
 		super._afterNew();
+
+		this._setupPointSeriesListener();
+	}
+
+	protected _dispose() {
+		super._dispose();
+
+		if (this._pointSeriesDP) {
+			this._pointSeriesDP.dispose();
+			this._pointSeriesDP = undefined;
+		}
+	}
+
+	/**
+	 * (Re)subscribes to the current `pointSeries` so that lines whose points were
+	 * not there yet get connected once they are.
+	 */
+	protected _setupPointSeriesListener() {
+		if (this._pointSeriesDP) {
+			this._pointSeriesDP.dispose();
+			this._pointSeriesDP = undefined;
+		}
+
+		const pointSeries = this.get("pointSeries");
+		if (pointSeries) {
+			this._pointSeriesDP = pointSeries.events.on("datavalidated", () => {
+				this._resolvePendingPointIds();
+			});
+
+			if (pointSeries.dataItems.length > 0) {
+				this._resolvePendingPointIds();
+			}
+		}
+	}
+
+	/**
+	 * Retries every line that is still waiting for its points.
+	 */
+	protected _resolvePendingPointIds() {
+		$array.each(this.dataItems, (dataItem) => {
+			this._resolvePointIds(dataItem);
+		});
+	}
+
+	/**
+	 * Turns a data item's `pointIds` into the points themselves. Silent when an
+	 * id matches nothing: the line waits rather than being drawn short.
+	 */
+	protected _resolvePointIds(dataItem: DataItem<this["_dataItemSettings"]>): boolean {
+		const current = dataItem.get("pointsToConnect");
+
+		// Whoever set the points outright meant it. Only a link this series made
+		// itself is its to remake - after the points are reloaded, say, or the
+		// series they come from is swapped for another
+		if (current && !this._derivedPoints.has(dataItem)) {
+			return false;
+		}
+
+		const pointIds = dataItem.get("pointIds");
+		const pointSeries = this.get("pointSeries");
+
+		if (!pointIds || pointIds.length === 0 || !pointSeries) {
+			return false;
+		}
+
+		const points: Array<DataItem<IMapPointSeriesDataItem>> = [];
+
+		for (let i = 0; i < pointIds.length; i++) {
+			const point = pointSeries.getDataItemById(pointIds[i]);
+
+			// A point that is not there, or has nowhere on the map to be - one
+			// pinned to the screen, say - leaves the line waiting. Better nothing
+			// than a line drawn short of where it was asked to go. Same test the
+			// line itself uses to place a point (see `markDirtyValues`)
+			if (!point) {
+				return false;
+			}
+
+			// A fixed point sits at screen coordinates and is given a placeholder
+			// geometry, so connecting to it draws a line to the middle of the ocean.
+			// `fixed` only reaches the data item when `fixedField` is set, so the row
+			// itself is the other place to look
+			const context: any = point.dataContext;
+
+			if (point.get("fixed") || (context && context.fixed)) {
+				return false;
+			}
+
+			const hasPosition = (point.get("longitude") != null && point.get("latitude") != null) || point.get("geometry") != null;
+
+			if (!hasPosition) {
+				return false;
+			}
+
+			points.push(point);
+		}
+
+		// Already connected to exactly these
+		if (current && current.length === points.length && !$array.any(points, (point) => current.indexOf(point) === -1)) {
+			return false;
+		}
+
+		this._derivedPoints.add(dataItem);
+		dataItem.set("pointsToConnect", points);
+		return true;
 	}
 
 	/**
@@ -136,7 +289,7 @@ export class MapLineSeries extends MapSeries {
 		super._prepareChildren();
 
 		if (this.isDirty("stroke")) {
-			this.mapLines.template.set("stroke", this.get("stroke"));
+			this.mapLines.template._setC("stroke", this.get("stroke"));
 		}
 	}
 
@@ -152,6 +305,9 @@ export class MapLineSeries extends MapSeries {
 		dataItem.on("pointsToConnect", () => {
 			this._handlePointsToConnect(dataItem);
 		})
+
+		// After the listener above, so that resolving connects the line right away
+		this._resolvePointIds(dataItem);
 
 		dataItem.set("mapLine", mapLine);
 
@@ -216,10 +372,10 @@ export class MapLineSeries extends MapSeries {
 					let geometry: any = { type: "LineString", coordinates: coordinates };
 
 					dataItem.setRaw("geometry", geometry);
-					mapLine.set("geometry", geometry);
+					mapLine._setC("geometry", geometry);
 				}
 				else {
-					mapLine.set("geometry", dataItem.get("geometry"));
+					mapLine._setC("geometry", dataItem.get("geometry"));
 				}
 			}
 		}

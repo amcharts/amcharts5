@@ -315,6 +315,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	public _groupSeriesData(series: XYSeries) {
 		if (this.get("groupData") && !series.get("groupDataDisabled")) {
+
+			let groupIntervals = this.get("groupIntervals")!;
+
+			// Nothing to group by yet - the intervals come from a theme, which is
+			// not applied until the axis is attached to a chart that is itself
+			// connected to the root. Leaving before the flags below means grouping
+			// is retried once the setting arrives, rather than counted as done.
+			if (!groupIntervals) {
+				return;
+			}
+
 			this._dataGrouped = true; // helps to avoid double grouping
 
 			this._seriesDataGrouped = true;
@@ -323,8 +334,6 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			let intervals: ITimeInterval[] = [];
 			let baseDuration = this.baseMainDuration();
 
-			let groupIntervals = this.get("groupIntervals")!;
-			if (groupIntervals) { }
 			$array.each(groupIntervals, (interval) => {
 				let intervalDuration = $time.getIntervalDuration(interval);
 				if (intervalDuration > baseDuration) {

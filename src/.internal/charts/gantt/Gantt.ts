@@ -133,14 +133,14 @@ export class Gantt extends Container {
 	 */
 	public scrollbarX: Scrollbar = Scrollbar.new(this._root, {
 		orientation: "horizontal"
-	});
+	})._markC("orientation");
 
 	/**
 	 * A scrollbar for vertical scrolling.
 	 */
 	public scrollbarY: Scrollbar = Scrollbar.new(this._root, {
 		orientation: "vertical"
-	});
+	})._markC("orientation");
 
 	/**
 	 * A reference to the [[XYChart]] that holds the Gantt chart.
@@ -287,7 +287,7 @@ export class Gantt extends Container {
 
 		this.colorPickerButton.events.on("click", () => {
 			this.yAxis.xButton.hide(0);
-			this.colorPicker.setAll({
+			this.colorPicker._setCAll({
 				colorButton: this.colorPickerButton
 			})
 			this.children.moveValue(this.colorPicker, this.children.length - 1);
@@ -310,10 +310,10 @@ export class Gantt extends Container {
 
 		chart.children.push(this.controls);
 
-		chart.set("cursor", XYCursor.new(root, {
+		chart._setC("cursor", XYCursor.new(root, {
 			xAxis: this.xAxis,
 			yAxis: this.yAxis
-		}));
+		})._markC("xAxis", "yAxis"));
 
 		const yRenderer = GanttCategoryAxisRenderer.new(root, {});
 
@@ -333,7 +333,8 @@ export class Gantt extends Container {
 				idField: "id",
 				nameField: "name",
 				renderer: yRenderer
-			})
+			})._markC("categoryField", "cellSizeField", "collapsedField", "parentIdField",
+				"colorField", "idField", "nameField", "renderer")
 		);
 
 		yAxis.gantt = this;
@@ -374,7 +375,7 @@ export class Gantt extends Container {
 					fill: color(0xfff),
 					fillOpacity: 0
 				})
-			})
+			})._markC("baseInterval", "renderer", "background")
 		);
 
 		xAxisMinor.gantt = this;
@@ -450,7 +451,7 @@ export class Gantt extends Container {
 				baseInterval: { timeUnit: "day", count: 1 },
 				renderer: ganttAxisRenderrer,
 				tooltip: Tooltip.new(root, {})
-			})
+			})._markC("baseInterval", "renderer", "tooltip")
 		);
 
 		xAxis.gantt = this;
@@ -466,11 +467,11 @@ export class Gantt extends Container {
 
 		// sync minor x axis with main x axis
 		xAxis.on("start", (value) => {
-			xAxisMinor.set("start", value);
+			xAxisMinor._setC("start", value);
 		});
 
 		xAxis.on("end", (value) => {
-			xAxisMinor.set("end", value);
+			xAxisMinor._setC("end", value);
 		});
 
 		// set min max if not set
@@ -486,7 +487,7 @@ export class Gantt extends Container {
 		xAxis.onPrivate("gridInterval", (value) => {
 			const gridIntervals = this.get("gridIntervals");
 			if (gridIntervals && gridIntervals[value.timeUnit]) {
-				xAxisMinor.set("gridIntervals", gridIntervals[value.timeUnit]);
+				xAxisMinor._setC("gridIntervals", gridIntervals[value.timeUnit]);
 			}
 		});
 
@@ -503,13 +504,14 @@ export class Gantt extends Container {
 			linkToField: "linkTo",
 			categoryYField: "id",
 			idField: "id"
-		}));
+		})._markC("xAxis", "yAxis", "baseAxis", "openValueXField", "valueXField", "progressField",
+			"durationField", "linkToField", "categoryYField", "idField"));
 
 		series.gantt = this;
 
 		// Add scrollbars
-		this.scrollbarX = chart.set("scrollbarX", this.scrollbarX);
-		this.scrollbarY = chart.set("scrollbarY", this.scrollbarY);
+		this.scrollbarX = chart._setC("scrollbarX", this.scrollbarX);
+		this.scrollbarY = chart._setC("scrollbarY", this.scrollbarY);
 		this.scrollbarY.startGrip.set("forceHidden", true);
 		this.scrollbarY.endGrip.set("forceHidden", true);
 
@@ -544,7 +546,10 @@ export class Gantt extends Container {
 		})
 
 		this.linkButton.on("active", (active) => {
-			this.set("linkNewTasks", active);
+			// The button is synced from the setting, so only a click disagrees with it
+			if (this.get("linkNewTasks", false) !== active) {
+				this.set("linkNewTasks", active);
+			}
 		})
 
 		this.colorPicker.on("color", (c) => {
@@ -552,7 +557,10 @@ export class Gantt extends Container {
 		});
 
 		this.editButton.on("active", (active) => {
-			this.set("editable", active);
+			// As above: syncing the button back into the setting is not configuration
+			if (this.get("editable", true) !== active) {
+				this.set("editable", active);
+			}
 		});
 
 		this.fitButton.events.on("click", () => {
@@ -645,15 +653,15 @@ export class Gantt extends Container {
 		if (this._sizeDirty || this.isDirty("sidebarWidth")) {
 			let width = $utils.relativeToValue(this.get("sidebarWidth", percent(20)), this.innerWidth());
 			width = Math.max(width, this.yAxis.get("minWidth", 100));
-			this.yAxis.labelsContainer.set("width", width);
+			this.yAxis.labelsContainer._setC("width", width);
 			this._updateScrollbar();
 		}
 
 		if (this.isDirty("durationUnit")) {
 			const durationUnit = this.get("durationUnit");
 			if (durationUnit) {
-				this.xAxis.set("baseInterval", { timeUnit: durationUnit, count: 1 });
-				this.xAxisMinor.set("baseInterval", { timeUnit: durationUnit, count: 1 });
+				this.xAxis._setC("baseInterval", { timeUnit: durationUnit, count: 1 });
+				this.xAxisMinor._setC("baseInterval", { timeUnit: durationUnit, count: 1 });
 			}
 		}
 
@@ -664,7 +672,7 @@ export class Gantt extends Container {
 
 	protected _updateScrollbar() {
 		const point = this.xyChart.plotContainer.toGlobal({ x: 0, y: 0 });
-		this.scrollbarX.setAll({
+		this.scrollbarX._setCAll({
 			x: point.x,
 			width: this.xyChart.plotContainer.width()
 		});
@@ -886,29 +894,30 @@ export class Gantt extends Container {
 
 		this.series.markDirtyValues();
 
-		this.addButton.set(forceHidden, !value);
-		this.colorPickerButton.set(forceHidden, !value);
-		this.clearButton.set(forceHidden, !value);
-		this.linkButton.set(forceHidden, !value);
+		// All of this follows from `editable`, so it is the Gantt's own doing
+		this.addButton._setC(forceHidden, !value);
+		this.colorPickerButton._setC(forceHidden, !value);
+		this.clearButton._setC(forceHidden, !value);
+		this.linkButton._setC(forceHidden, !value);
 
 		const renderer = this.yAxis.get("renderer");
-		renderer.labels.template.set(forceInactive, !value);
+		renderer.labels.template._setC(forceInactive, !value);
 
-		renderer.grips.template.set(forceHidden, !value);
-		renderer.containers.template.set(draggable, value);
+		renderer.grips.template._setC(forceHidden, !value);
+		renderer.containers.template._setC(draggable, value);
 
-		renderer.controlsContainers.template.set(forceInactive, !value);
+		renderer.controlsContainers.template._setC(forceInactive, !value);
 
-		this.series.columns.template.set(draggable, value);
-		this.series.startGrips.template.set(forceHidden, !value);
-		this.series.endGrips.template.set(forceHidden, !value);
-		this.series.progressGrips.template.set(forceHidden, !value);
+		this.series.columns.template._setC(draggable, value);
+		this.series.startGrips.template._setC(forceHidden, !value);
+		this.series.endGrips.template._setC(forceHidden, !value);
+		this.series.progressGrips.template._setC(forceHidden, !value);
 
-		this.series.startBullets.template.set(forceHidden, !value);
-		this.series.endBullets.template.set(forceHidden, !value);
+		this.series.startBullets.template._setC(forceHidden, !value);
+		this.series.endBullets.template._setC(forceHidden, !value);
 
-		this.series.links.template.set(forceInactive, !value);
+		this.series.links.template._setC(forceInactive, !value);
 
-		this.xAxisMinor.set(forceInactive, !value);
+		this.xAxisMinor._setC(forceInactive, !value);
 	}
 }

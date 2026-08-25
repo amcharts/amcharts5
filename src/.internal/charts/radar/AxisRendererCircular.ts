@@ -142,7 +142,7 @@ export class AxisRendererCircular extends AxisRenderer {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "circular"]);
 		super._afterNew();
 		this.setPrivateRaw("letter", "X");
-		this.setRaw("position", "absolute");
+		this._setCRaw("position", "absolute");
 	}
 
 	public _changed() {
@@ -307,7 +307,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 			label.setPrivate("radius", radius);
 			label.setPrivate("innerRadius", innerRadius);
-			label.set("labelAngle", angle);
+			label._setC("labelAngle", angle);
 
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));
 		}
@@ -396,7 +396,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 				this.toggleVisibility(sprite, position, 0, 1);
 
-				sprite.setAll({ rotation: angle, x: radius * $math.cos(angle), y: radius * $math.sin(angle) });
+				sprite._setCAll({ rotation: angle, x: radius * $math.cos(angle), y: radius * $math.sin(angle) });
 			}
 		}
 	}
@@ -415,7 +415,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 			let startAngle = this.fitAngle(this.positionToAngle(position));
 			let endAngle = this.fitAngle(this.positionToAngle(endPosition));
-			fill.setAll({ startAngle: startAngle, arc: endAngle - startAngle });
+			fill._setCAll({ startAngle: startAngle, arc: endAngle - startAngle });
 
 			fill._setSoft("innerRadius", this.getPrivate("innerRadius"));
 			fill._setSoft("radius", this.getPrivate("radius"));

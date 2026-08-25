@@ -10,6 +10,7 @@ import { ListData } from "../../core/util/Data";
 
 import * as $type from "../../core/util/Type";
 import * as $array from "../../core/util/Array";
+import { registry } from "../../core/Registry";
 import * as $object from "../../core/util/Object";
 
 import type { IClasses } from "./Classes";
@@ -119,6 +120,10 @@ interface IParsedEntity<E extends Entity> {
 type IParsed<E extends Entity>
 	= IParsedEntity<E>
 	| { isValue: true, value: any };
+
+
+const GEODATA_PREFIX = "am5geodata_";
+const LOCALE_PREFIX = "am5locales_";
 
 
 function parseRef<E extends Entity>(value: string, refs: Array<IRef>): IParsed<E> {
@@ -251,6 +256,22 @@ class ParserState {
 	protected _caching: { [key: string]: Promise<void> } = {};
 	protected _cache: { [key: string]: typeof Entity } = {};
 	protected _delayed: Array<() => void> = [];
+	protected _updateTargets: "strict" | "soft";
+
+	constructor(updateTargets: "strict" | "soft" = "strict") {
+		this._updateTargets = updateTargets;
+	}
+
+	// When `updateTargets` is "soft" and there is an existing entity target whose
+	// type matches the incoming config's `type`, the config is merged into that
+	// target in place (as if `type` had not been specified) instead of replacing
+	// it with a freshly constructed object.
+	protected _softMerges(old: unknown, type: string | undefined): old is Entity {
+		return this._updateTargets === "soft"
+			&& type !== undefined
+			&& old instanceof Entity
+			&& old.className === type;
+	}
 
 
 	afterParse(): void {
@@ -318,7 +339,12 @@ class ParserState {
 				// Do nothing
 				break;
 			default:
-				await Promise.all($array.map($object.keys(object), (key) => this.parseAsyncObjectKey(key, object[key])));
+				// `__parse` says the object is data, so a `type` in it is a column
+				// name and not a class to go and load
+				const isData = (object as any).__parse === true;
+				await Promise.all($array.map($object.keys(object), (key) => {
+					return isData && key === "type" ? Promise.resolve() : this.parseAsyncObjectKey(key, object[key]);
+				}));
 		}
 	}
 
@@ -340,6 +366,10 @@ class ParserState {
 		const output: { [key: string]: any } = {};
 
 		$array.each($object.keys(object), (key) => {
+			// Our own marker, not part of the object
+			if (key === "__parse") {
+				return;
+			}
 			output[key] = this.parse(root, object[key], refs);
 		});
 
@@ -383,6 +413,14 @@ class ParserState {
 		}
 
 		if (key === "geoJSON") {
+			// A geodata pack is a global (`am5geodata_worldLow`), so a config
+			// refers to it by name rather than carrying a megabyte of coordinates
+			if ($type.isString(value) && value.indexOf(GEODATA_PREFIX) === 0 && typeof window !== "undefined") {
+				const geodata = (window as any)[value];
+				if (geodata) {
+					return geodata;
+				}
+			}
 			return value;
 		}
 
@@ -406,7 +444,7 @@ class ParserState {
 	parseState<E extends Entity>(root: Root, object: { key: string, settings: Object }, refs: Array<IRef>): { key: string, settings: E["_settings"] } {
 		return {
 			key: object.key,
-			settings: this.parseSettings(root, object.settings, refs),
+			settings: object.settings ? this.parseSettings(root, object.settings, refs) : {},
 		};
 	}
 
@@ -424,7 +462,12 @@ class ParserState {
 			return (entity: object) => {
 				const run = () => {
 					const parsed = this.parseValue(root, rawValue, refs);
-					const old = entity[key] as unknown;
+					// Usually a property, but a block may also name a setting that
+					// already holds an entity - an axis' `renderer`, say - and then it
+					// configures the one that is there rather than replacing it
+					const old = (entity[key] === undefined && typeof (entity as any).get === "function"
+						? (entity as any).get(key)
+						: entity[key]) as unknown;
 
 					if (old) {
 						if (parsed.isValue) {
@@ -443,7 +486,10 @@ class ParserState {
 								(entity as any)[key] = parsed.value;
 							}
 
-						} else if (parsed.construct) {
+							// A typed config normally replaces the existing object, but in
+							// "soft" mode a same-type target is merged into instead (falls
+							// through to the merge branch below).
+						} else if (parsed.construct && !this._softMerges(old, parsed.type)) {
 							(entity as any)[key] = constructEntity(root, parsed);
 
 							// Merge into existing Entity
@@ -510,7 +556,10 @@ class ParserState {
 				const existing = (entity as any).get(key);
 				const raw = rawSettings ? rawSettings[key] : undefined;
 
-				if (existing instanceof Entity && isMergeDescriptor(raw)) {
+				// Merge into the existing sub-entity when the incoming setting is a
+				// type-less merge descriptor, or - in "soft" mode - a same-type typed
+				// object. Otherwise replace it with the parsed value.
+				if (existing instanceof Entity && (isMergeDescriptor(raw) || this._softMerges(existing, isObject(raw) ? raw.type : undefined))) {
 					this.mergeExistingEntity(root, existing, this.parseEntity(root, raw, refs), refs);
 
 				} else {
@@ -534,6 +583,16 @@ class ParserState {
 		const properties = config.properties;
 		if (isObject(properties)) {
 			$object.each(properties, (key, value) => {
+				// A locale is named rather than copied out, so the pack it names is
+				// looked up the same way a geodata pack is
+				if (key === "locale" && $type.isString(value) && value.indexOf(LOCALE_PREFIX) === 0 && typeof window !== "undefined") {
+					const pack: any = (window as any)[value];
+					if (pack) {
+						rootAny.locale = pack;
+					}
+					return;
+				}
+
 				const existing = rootAny[key];
 				if (existing instanceof Entity && isObject(value)) {
 					this.mergeExistingEntity(root, existing, this.parseEntity(root, value, []), []);
@@ -547,6 +606,8 @@ class ParserState {
 		if (isObject(settings) && $object.keys(settings).length > 0) {
 			$object.each(settings, (key, value) => {
 				rootAny._settings[key] = this.parse(root, value, []);
+				// Asked for now, whatever the Root filled in for itself earlier
+				delete rootAny._computedSettings[key];
 			});
 			// Non-destructive re-apply (does NOT re-run `_init()`, which would
 			// duplicate containers, DOM nodes and event listeners).
@@ -602,6 +663,8 @@ class ParserState {
 						if (seriesRange[targetKey] !== undefined && value[targetKey] !== undefined) {
 							value[targetKey].__parse = true;
 							const parsedSetting = this.parse(root, value[targetKey], refs);
+							// The flag is ours, not a setting
+							delete parsedSetting.__parse;
 							seriesRange[targetKey].template.setAll(parsedSetting);
 						}
 					});
@@ -770,10 +833,44 @@ class ParserState {
 					value,
 				};
 
+				// Read before any `type`: the marker is what says whether this is an
+				// object to build or data to leave alone
+			} else if (value.__parse === true) {
+				return {
+					isValue: true,
+					value: this.parseObject(root, value, refs),
+				};
+
+			} else if (value.__parse === false) {
+				// The marker is ours, not part of the data
+				const copy: { [key: string]: any } = {};
+				$object.each(value, (key, item) => {
+					if (key !== "__parse") {
+						copy[key] = item;
+					}
+				});
+				return {
+					isValue: true,
+					value: copy,
+				};
+
 			} else if (value.type === "Color") {
 				return {
 					isValue: true,
 					value: Color.fromAny(value.value),
+				};
+
+			} else if (registry.geometryFunctions[value.type as string]) {
+				// A shape stored as the call that made it (GeoRectangle, GeoCircle)
+				const args: any = {};
+				$object.each(value as any, (key, arg) => {
+					if (key !== "type") {
+						args[key] = arg;
+					}
+				});
+				return {
+					isValue: true,
+					value: registry.geometryFunctions[value.type as string](args),
 				};
 
 			} else if (value.type === "Percent") {
@@ -784,18 +881,6 @@ class ParserState {
 
 			} else if (value.type === "Template") {
 				return this.parseTemplate(root, value, refs);
-
-			} else if (value.__parse === true) {
-				return {
-					isValue: true,
-					value: this.parseObject(root, value, refs),
-				};
-
-			} else if (value.__parse === false) {
-				return {
-					isValue: true,
-					value,
-				};
 
 			} else {
 				return this.parseEntity(root, value, refs);
@@ -825,7 +910,24 @@ class ParserState {
 }
 
 export interface IParseSettings {
+
+	/**
+	 * Parent container to place the parsed chart into.
+	 */
 	parent?: Container;
+
+	/**
+	 * If set to `"strict"` and source object has `type` set, a new object of
+	 * that type will be created and used in place of existing one.
+	 *
+	 * In case of `"soft"`, parser will check if source and target objects are
+	 * of the same type and overwrite only if types differ. Otherwise only
+	 * settings will be applied, just like if the `type` was not specified at all.
+	 *
+	 * @default "strict"
+	 * @since 5.20.3
+	 */
+	updateTargets?: "strict" | "soft";
 }
 
 /**
@@ -871,7 +973,7 @@ export class JsonParser {
 	 * @return          A promise of a target object
 	 */
 	async parse<E extends Entity>(object: unknown, settings: IParseSettings = {}): Promise<E> {
-		const state = new ParserState();
+		const state = new ParserState(settings.updateTargets);
 
 		await state.parseAsync(object);
 

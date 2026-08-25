@@ -44,8 +44,8 @@ export class CurveLineSeries extends LineSeries {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.set("maskContent", false);
-		this.bulletsContainer.set("maskContent", false);
+		this._setC("maskContent", false);
+		this.bulletsContainer._setC("maskContent", false);
 		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
 	}
 

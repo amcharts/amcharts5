@@ -4,7 +4,7 @@ import type { IPoint } from "../../../core/util/IPoint";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { Bullet } from "../../../core/render/Bullet";
 import type { XYChart } from "../XYChart";
-//import type { CategoryAxis } from "../axes/CategoryAxis";
+import type { CategoryAxis } from "../axes/CategoryAxis";
 import type { DateAxis } from "../axes/DateAxis";
 import type { ITimeInterval } from "../../../core/util/Time";
 import type { IDisposer } from "../../../core/util/Disposer";
@@ -981,7 +981,7 @@ export abstract class XYSeries extends Series {
 
 		super._afterNew();
 
-		this.set("maskContent", true);
+		this._setC("maskContent", true);
 
 		// Re-wire the series when it is reassigned to a different axis after
 		// creation. Handled via `on()` (fires once on `.set()`, outside the
@@ -1013,7 +1013,7 @@ export abstract class XYSeries extends Series {
 			}
 		}))
 
-		this.states.create("hidden", <any>{ opacity: 1, visible: false });
+		this.states._createC("hidden", <any>{ opacity: 1, visible: false });
 
 		this.onPrivate("startIndex", () => {
 			this.root.events.once("frameended", () => {
@@ -1066,7 +1066,7 @@ export abstract class XYSeries extends Series {
 			}
 			const axisFill = axisDataItem.get("axisFill");
 			if (axisFill) {
-				container.set("mask", axisFill);
+				container._setC("mask", axisFill);
 			}
 			axis._seriesAxisRanges.push(axisDataItem);
 		}
@@ -1268,14 +1268,14 @@ export abstract class XYSeries extends Series {
 			}
 
 			if (xAxis === baseAxis) {
-				hiddenState.set("vcy", value);
+				hiddenState._setC("vcy", value);
 			}
 			else if (yAxis === baseAxis) {
-				hiddenState.set("vcx", value);
+				hiddenState._setC("vcx", value);
 			}
 			else {
-				hiddenState.set("vcy", value);
-				hiddenState.set("vcx", value);
+				hiddenState._setC("vcy", value);
+				hiddenState._setC("vcx", value);
 			}
 		}
 	}
@@ -1291,8 +1291,8 @@ export abstract class XYSeries extends Series {
 		const xAxis = this.get("xAxis");
 		const yAxis = this.get("yAxis");
 
-		this.set("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
-		this.set("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
+		this._setC("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
+		this._setC("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
 
 		this.bulletsContainer.set("y", this.y());
 		this.bulletsContainer.set("x", this.x());
@@ -1320,7 +1320,23 @@ export abstract class XYSeries extends Series {
 
 			// Re-point baseAxis if it referenced the previous axis
 			if (this.get("baseAxis") === prevAxis) {
-				this.set("baseAxis", axis);
+				if (this._computedProperties["baseAxis"]) {
+					// the chart's own pick, so make it again the way the chart
+					// would - carrying the old one over lands somewhere a rebuilt
+					// chart never would
+					const xAxis = this.get("xAxis");
+					const yAxis = this.get("yAxis");
+					if (xAxis && yAxis) {
+						const categoryish = yAxis.isType<CategoryAxis<any>>("CategoryAxis") || yAxis.isType<DateAxis<any>>("DateAxis");
+						this._setC("baseAxis", categoryish ? yAxis : xAxis);
+					}
+					else {
+						this._setC("baseAxis", axis);
+					}
+				}
+				else {
+					this.set("baseAxis", axis);
+				}
 			}
 
 			// Attach to the new axis
@@ -1366,8 +1382,8 @@ export abstract class XYSeries extends Series {
 			this._valuesDirty = true;
 		}
 
-		this.set("width", this.get("xAxis").width());
-		this.set("height", this.get("yAxis").height());
+		this._setC("width", this.get("xAxis").width());
+		this._setC("height", this.get("yAxis").height());
 
 		this._handleMaskBullets();
 

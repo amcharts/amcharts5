@@ -121,8 +121,8 @@ export class RadarChart extends XYChart {
 
 		radarContainer.children.pushAll([gridContainer, seriesContainer, topGridContainer, bulletsContainer]);
 
-		seriesContainer.set("mask", Graphics.new(this._root, {}));
-		gridContainer.set("mask", Graphics.new(this._root, {}));
+		seriesContainer._setC("mask", Graphics.new(this._root, {}));
+		gridContainer._setC("mask", Graphics.new(this._root, {}));
 
 		this._disposers.push(this.plotContainer.events.on("boundschanged", () => {
 			this._updateRadius();

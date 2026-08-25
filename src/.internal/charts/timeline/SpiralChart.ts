@@ -97,14 +97,14 @@ export class SpiralChart extends CurveChart {
 
 		this.yAxes.each((axis) => {
 			const renderer = axis.get("renderer") as AxisRendererCurveY;
-			renderer.set("axisLength", yAxisRadius);
+			renderer._setC("axisLength", yAxisRadius);
 			axis.markDirtySize();
 		})
 
 		this.xAxes.each((axis) => {
 			const renderer = axis.get("renderer") as AxisRendererCurveX;
 			renderer.setPrivate("autoScale", false);
-			renderer.set("points", points);
+			renderer._setC("points", points);
 		})
 		super._updateMasks();
 	}

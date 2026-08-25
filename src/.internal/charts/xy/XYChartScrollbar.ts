@@ -36,7 +36,7 @@ export class XYChartScrollbar extends Scrollbar {
 		panY: false,
 		wheelX: "none",
 		wheelY: "none"
-	}));
+	}))._markC("interactive", "interactiveChildren", "panX", "panY", "wheelX", "wheelY");
 
 	/**
 	 * A graphics element that is displayed over inactive portion of the
@@ -45,7 +45,7 @@ export class XYChartScrollbar extends Scrollbar {
 	public readonly overlay: Graphics = this.children.push(Graphics.new(this._root, {
 		themeTags: ["overlay"],
 		interactive: false
-	}));
+	})._markC("interactive"));
 
 	protected _afterNew() {
 		this._addOrientationClass();
@@ -56,11 +56,11 @@ export class XYChartScrollbar extends Scrollbar {
 		children.moveValue(this.startGrip);
 		children.moveValue(this.endGrip);
 
-		this.thumb.set("opacity", 0);
-		this.thumb.states.create("hover", { opacity: 0.2 });
+		this.thumb._setC("opacity", 0);
+		this.thumb.states._createC("hover", { opacity: 0.2 });
 
 		const plotContainer = this.chart.plotContainer;
-		plotContainer.set("interactive", false);
+		plotContainer._setC("interactive", false);
 		plotContainer.remove("background");
 		plotContainer.children.removeValue(this.chart.zoomOutButton);
 

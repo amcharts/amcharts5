@@ -447,7 +447,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 			// disable interactivity of all containers
 			const renderer = this.get("renderer");
 			renderer.containers.each((container) => {
-				container.set("forceInactive", false);
+				container._setC("forceInactive", false);
 			});
 		})
 
@@ -456,7 +456,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 			// disable interactivity of all containers
 			const renderer = this.get("renderer");
 			renderer.containers.each((container) => {
-				container.set("forceInactive", true);
+				container._setC("forceInactive", true);
 			});
 			startY = e.target.y();
 		})
@@ -672,8 +672,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 					}
 				}
 				else {
-					this.set("start", start);
-					this.set("end", end);
+					this._setC("start", start);
+					this._setC("end", end);
 					this.root.events.once("frameended", () => {
 						this.markDirtyKey("start");
 					});
@@ -699,8 +699,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 
 			const minCellHeight = this.get("minCellHeight", 70);
 			const maxZoomCount = Math.floor(availableHeight / minCellHeight);
-			this.set("maxZoomCount", maxZoomCount);
-			this.set("minZoomCount", maxZoomCount);
+			this._setC("maxZoomCount", maxZoomCount);
+			this._setC("minZoomCount", maxZoomCount);
 
 			// to avoid many items to be drawn
 			if (this.get("start") == 0 && this.get("end") == 1) {

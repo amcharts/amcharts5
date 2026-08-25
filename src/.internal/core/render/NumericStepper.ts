@@ -52,7 +52,7 @@ export class NumericStepper extends Container {
 			fill: color(0xffffff)
 		}));
 
-		this.buttonsContainer.states.create("hidden", {
+		this.buttonsContainer.states._createC("hidden", {
 			opacity: 0,
 			visible: true
 		});

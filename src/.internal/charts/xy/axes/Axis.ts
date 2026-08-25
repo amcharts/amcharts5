@@ -617,8 +617,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 					}
 				}
 				else {
-					this.set("start", start);
-					this.set("end", end);
+					this._setC("start", start);
+					this._setC("end", end);
 					this.root.events.once("frameended", () => {
 						this.markDirtyKey("start");
 					});
@@ -859,26 +859,26 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		const fh = "forceHidden";
 		const label = dataItem.get("label");
 		if (label) {
-			label.set(fh, forceHidden);
+			label._setC(fh, forceHidden);
 		}
 		const grid = dataItem.get("grid");
 		if (grid) {
-			grid.set(fh, forceHidden);
+			grid._setC(fh, forceHidden);
 		}
 		const tick = dataItem.get("tick");
 		if (tick) {
-			tick.set(fh, forceHidden);
+			tick._setC(fh, forceHidden);
 		}
 		const axisFill = dataItem.get("axisFill");
 		if (axisFill) {
-			axisFill.set(fh, forceHidden);
+			axisFill._setC(fh, forceHidden);
 		}
 
 		const bullet = dataItem.get("bullet");
 		if (bullet) {
 			const sprite = bullet.get("sprite");
 			if (sprite) {
-				sprite.set(fh, forceHidden);
+				sprite._setC(fh, forceHidden);
 			}
 		}
 	}

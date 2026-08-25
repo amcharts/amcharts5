@@ -195,10 +195,10 @@ export class FunnelSeries extends PercentSeries {
 		})
 
 		if (this.get("orientation") == "vertical") {
-			this.set("layout", this._root.horizontalLayout);
+			this._setC("layout", this._root.horizontalLayout);
 		}
 		else {
-			this.set("layout", this._root.verticalLayout);
+			this._setC("layout", this._root.verticalLayout);
 		}
 	}
 
@@ -348,26 +348,26 @@ export class FunnelSeries extends PercentSeries {
 		const labelsTemplate = this.labels.template;
 
 		if (this.get("alignLabels")) {
-			labelsContainer.set("position", "relative");
-			labelsContainer.setAll({ isMeasured: true });
+			labelsContainer._setC("position", "relative");
+			labelsContainer._setCAll({ isMeasured: true });
 			if (orientation == "vertical") {
-				this.set("layout", this._root.horizontalLayout);
-				labelsTemplate.setAll({ centerX: p100, x: p100 });
+				this._setC("layout", this._root.horizontalLayout);
+				labelsTemplate._setCAll({ centerX: p100, x: p100 });
 			}
 			else {
-				this.set("layout", this._root.verticalLayout);
-				labelsTemplate.setAll({ centerX: 0, x: 0 });
+				this._setC("layout", this._root.verticalLayout);
+				labelsTemplate._setCAll({ centerX: 0, x: 0 });
 			}
 		}
 		else {
-			labelsContainer.setAll({ isMeasured: false, position: "absolute" });
+			labelsContainer._setCAll({ isMeasured: false, position: "absolute" });
 			if (orientation == "vertical") {
-				labelsContainer.setAll({ x: p50 });
-				labelsTemplate.setAll({ centerX: p50, x: 0 });
+				labelsContainer._setCAll({ x: p50 });
+				labelsTemplate._setCAll({ centerX: p50, x: 0 });
 			}
 			else {
-				labelsContainer.setAll({ y: p50 });
-				labelsTemplate.setAll({ centerX: p50, y: 0 });
+				labelsContainer._setCAll({ y: p50 });
+				labelsTemplate._setCAll({ centerX: p50, y: 0 });
 			}
 		}
 		this.markDirtySize();
@@ -443,8 +443,8 @@ export class FunnelSeries extends PercentSeries {
 		let topWidth = workingValue / valueHigh * maxSize;
 		let bottomWidth = (workingValue - (workingValue - nextValue) * bottomRatio) / valueHigh * maxSize;
 
-		slice.setAll({ topWidth, bottomWidth, orientation });
-		link.setAll({ topWidth: bottomWidth, bottomWidth: (workingValue - (workingValue - nextValue)) / valueHigh * maxSize, orientation });
+		slice._setCAll({ topWidth, bottomWidth, orientation });
+		link._setCAll({ topWidth: bottomWidth, bottomWidth: (workingValue - (workingValue - nextValue)) / valueHigh * maxSize, orientation });
 
 		const startLocation = this.get("startLocation", 0);
 		const endLocation = this.get("endLocation", 1);
@@ -455,32 +455,32 @@ export class FunnelSeries extends PercentSeries {
 
 			maxHeight = maxHeight * (endLocation - startLocation) + linkHeight;
 
-			slice.set("y", this._nextCoord);
+			slice._setC("y", this._nextCoord);
 
 			let height = Math.min(100000, Math.max(0, maxHeight / this._count * d / this._total - linkHeight));
 
-			slice.setAll({ height, x: maxWidth / 2 });
+			slice._setCAll({ height, x: maxWidth / 2 });
 			let labelY = this._nextCoord + height / 2;
-			label.set("y", labelY);
+			label._setC("y", labelY);
 
 			this._nextCoord += height + linkHeight;
-			link.setAll({ y: this._nextCoord - linkHeight, x: maxWidth / 2 });
+			link._setCAll({ y: this._nextCoord - linkHeight, x: maxWidth / 2 });
 		}
 		else {
 			let linkHeight = link.width() * d;
 
 			maxWidth = maxWidth * (endLocation - startLocation) + linkHeight;
 
-			slice.set("x", this._nextCoord);
+			slice._setC("x", this._nextCoord);
 
 			let width = Math.min(100000, Math.max(0, maxWidth / this._count * d / this._total - linkHeight));
 
-			slice.setAll({ width, y: maxHeight / 2 });
+			slice._setCAll({ width, y: maxHeight / 2 });
 			const labelX = this._nextCoord + width / 2;
-			label.set("x", labelX);
+			label._setC("x", labelX);
 
 			this._nextCoord += width + linkHeight;
-			link.setAll({ x: this._nextCoord - linkHeight, y: maxHeight / 2 });
+			link._setCAll({ x: this._nextCoord - linkHeight, y: maxHeight / 2 });
 		}
 	}
 

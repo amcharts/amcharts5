@@ -113,6 +113,61 @@ export class Serializer extends Entity {
 	protected _refs: { [index: string]: any } = {};
 
 	/**
+	 * Set while serializing data. A `#` or `@` at the start of a string means a
+	 * reference in a config, so strings are escaped - but most of a data row is
+	 * handed back untouched when parsed, and escaping it there would corrupt it
+	 * a little more on every round trip. `_escapeParsed` puts the escaping back
+	 * in the few places the parser does read values.
+	 *
+	 * @ignore
+	 */
+	protected _serializingData: boolean = false;
+
+	/**
+	 * Serializes data, which is values rather than configuration.
+	 *
+	 * @ignore
+	 */
+	public serializeData(values: Array<any>): unknown {
+		const previous = this._serializingData;
+		this._serializingData = true;
+		const result = this.serialize(values, 0, true, true);
+		this._serializingData = previous;
+		this._escapeParsed(result);
+		return result;
+	}
+
+	/**
+	 * Escapes the strings the parser is going to read as references, and only
+	 * those. It walks data the way the parser does: through every array, and
+	 * into an object only when that object is marked `__parse`. Anywhere else a
+	 * string comes back as it was written, so escaping it would leave a stray
+	 * `##` in the data.
+	 */
+	private _escapeParsed(value: any): void {
+		if ($type.isArray(value)) {
+			$array.each(value, (item, index) => {
+				if ($type.isString(item)) {
+					value[index] = this._escapeText(item);
+				}
+				else {
+					this._escapeParsed(item);
+				}
+			});
+		}
+		else if ($type.isObject(value) && (value as any).__parse === true) {
+			$object.each(value as any, (key, item) => {
+				if ($type.isString(item)) {
+					(value as any)[key] = this._escapeText(item);
+				}
+				else {
+					this._escapeParsed(item);
+				}
+			});
+		}
+	}
+
+	/**
 	 * Serializes target object into a simple object or JSON string.
 	 *
 	 * @param   source      Target object
@@ -126,8 +181,19 @@ export class Serializer extends Entity {
 			return undefined;
 		}
 
-		if (source === false || source === true) {
+		if (source === false || source === true || source === null) {
 			return source;
+		}
+
+		// A geometry built by one of the map's shape functions goes out as that
+		// call - a handful of numbers rather than every coordinate it expands to
+		const described: any = source && (source as any).__geometry;
+		if (described) {
+			const call: any = { type: described.name };
+			$object.each(described.args, (key, value) => {
+				call[key] = value;
+			});
+			return call;
 		}
 
 		if ($type.isArray(source)) {
@@ -154,9 +220,10 @@ export class Serializer extends Entity {
 			res.type = source.className;
 			let settings: Array<string> = this._filterSettings($object.keys(source._settings));
 
-			// Include only user settings
+			// Include only what was asked for - not what the chart worked out for
+			// itself
 			settings = settings.filter((value) => {
-				return source.isUserSetting(value as any);
+				return source.isUserSetting(value as any) && !source.isComputedSetting(value as any);
 			});
 
 			if (settings.length) {
@@ -171,12 +238,18 @@ export class Serializer extends Entity {
 					}
 				});
 			}
+			this._processComputedEntities(source, res, settings, depth);
 			this._processAdapters(source, res);
 			this._processStates(source, res);
 		}
 		else if (source instanceof Template) {
 			res.type = "Template";
 			let settings: Array<string> = this._filterSettings($object.keys(source._settings));
+
+			settings = settings.filter((value) => {
+				return !source._computedSettings[value as never];
+			});
+
 			if (settings.length) {
 				res.settings = {};
 				$array.each(settings, (setting) => {
@@ -187,6 +260,7 @@ export class Serializer extends Entity {
 			}
 			this._processAdapters(source, res);
 			this._processStates(source, res);
+			this._afterEntity(source, res);
 
 			return res;
 		}
@@ -195,7 +269,7 @@ export class Serializer extends Entity {
 		if (source instanceof Component) {
 			if (source.data.length && (this.get("excludeProperties")! || []).indexOf("data") === -1) {
 				res.properties = {
-					data: this.serialize(source.data.values, depth, true)
+					data: this.serializeData(source.data.values)
 				};
 			}
 		}
@@ -235,6 +309,13 @@ export class Serializer extends Entity {
 							res.__parse = true;
 						}
 					});
+
+					// A data row with its own `type` field reads as an entity to the
+					// parser, which then goes looking for a class by that name. Saying
+					// so outright keeps a column called `type` a column.
+					if (res.type !== undefined && res.__parse !== true) {
+						res.__parse = false;
+					}
 				}
 			}
 			else if (am5object) {
@@ -256,7 +337,72 @@ export class Serializer extends Entity {
 			res.refs = this._refs;
 		}
 
+		this._afterEntity(source, res);
+
 		return res;
+	}
+
+	/**
+	 * A place for a subclass to add to what an entity serialized to, wherever it
+	 * was reached from.
+	 *
+	 * @ignore
+	 */
+	protected _afterEntity(_source: any, _res: any): void { }
+
+	/**
+	 * Writes out what was styled on an object the library built for itself.
+	 *
+	 * A background an element seeds, a part it configures - the object itself is
+	 * not configuration, so it is not written out on its own account. What
+	 * someone then styled on it is, and would otherwise be lost. It goes out
+	 * without a `type`, so parsing configures the object already there instead of
+	 * replacing it with a new one.
+	 *
+	 * @param   source    Source object
+	 * @param   res       Result
+	 * @param   written   Setting keys already written out in full
+	 * @param   depth     Current depth
+	 */
+	private _processComputedEntities(source: Entity, res: any, written: Array<string>, depth: number): void {
+		$array.each(this._filterSettings($object.keys(source._settings)), (key: any) => {
+			if (written.indexOf(key) !== -1) {
+				return;
+			}
+
+			const value: any = (<any>source._settings)[key];
+
+			if (!(value instanceof Entity)) {
+				return;
+			}
+
+			// An element the chart holds in its own right - an axis, a series,
+			// another chart - is written out where it belongs and referenced from
+			// here. Only the parts an element owns are configured in place.
+			const part: any = value;
+
+			if (part.isType && (part.isType("Axis") || part.isType("Series") || part.isType("Chart"))) {
+				return;
+			}
+
+			// past `maxDepth` there is nothing to write
+			const serialized: any = this.serialize(part, depth + 1, false);
+
+			if (!serialized || typeof serialized !== "object") {
+				return;
+			}
+
+			delete serialized.type;
+
+			if (serialized.settings || serialized.properties || serialized.states || serialized.adapters) {
+				if (!res.properties) {
+					res.properties = {};
+				}
+				if (res.properties[key] === undefined) {
+					res.properties[key] = serialized;
+				}
+			}
+		});
 	}
 
 	private _processAdapters(source: any, res: any) {
@@ -281,15 +427,35 @@ export class Serializer extends Entity {
 		if (this.get("includeStates", false)) {
 			const states = source.states._states;
 			if (Object.keys(states).length > 0) {
-				res.states = [];
+				const serialized: Array<any> = [];
+
 				$object.each(states, (key: any, state: any) => {
-					if (Object.keys(state._settings).length > 0) {
-						res.states.push({
-							key: key,
-							settings: this.serialize(state._settings, 0, true)
-						});
+					// Same rule as for settings - leave out what the chart worked out
+					// for itself. A template's states have no computed settings of
+					// their own: a template is configuration, so its states are too.
+					const settings: any = {};
+					const computed: any = state._computedSettings || {};
+
+					$object.each(state._settings, (settingKey: any, value: any) => {
+						if (!computed[settingKey]) {
+							settings[settingKey] = value;
+						}
+					});
+
+					if (Object.keys(settings).length > 0) {
+						const serializedSettings: any = this.serialize(settings, 0, true);
+						if (serializedSettings && Object.keys(serializedSettings).length > 0) {
+							serialized.push({
+								key: key,
+								settings: serializedSettings
+							});
+						}
 					}
 				});
+
+				if (serialized.length > 0) {
+					res.states = serialized;
+				}
 			}
 		}
 	}
@@ -309,6 +475,13 @@ export class Serializer extends Entity {
 	}
 
 	private _escapeRefs(text: string): string {
+		if (this._serializingData) {
+			return text;
+		}
+		return this._escapeText(text);
+	}
+
+	private _escapeText(text: string): string {
 		return text.replace(/^#/, '##').replace(/^@/, '@@');
 	}
 

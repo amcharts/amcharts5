@@ -126,7 +126,7 @@ export class AxisRendererRadial extends AxisRenderer {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "radial"]);
 		super._afterNew();
 		this.setPrivate("letter", "Y");
-		this.setRaw("position", "absolute");
+		this._setCRaw("position", "absolute");
 	}
 
 	public _changed() {
@@ -250,7 +250,7 @@ export class AxisRendererRadial extends AxisRenderer {
 
 			label.setPrivate("radius", radius);
 			label.setPrivate("innerRadius", radius);
-			label.set("labelAngle", this.get("axisAngle"));
+			label._setC("labelAngle", this.get("axisAngle"));
 
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));
 		}

@@ -202,14 +202,14 @@ export class SerpentineChart extends CurveChart {
 
 		this.yAxes.each((axis) => {
 			const renderer = axis.get("renderer") as AxisRendererCurveY;
-			renderer.set("axisLength", $utils.relativeToValue(this.get("yAxisRadius", p50), 2 * radius));
+			renderer._setC("axisLength", $utils.relativeToValue(this.get("yAxisRadius", p50), 2 * radius));
 			axis.markDirtySize();
 		})
 
 		this.xAxes.each((axis) => {
 			const renderer = axis.get("renderer") as AxisRendererCurveX;
 			renderer.setPrivate("autoScale", false);
-			renderer.set("points", points);
+			renderer._setC("points", points);
 		})
 		super._updateMasks();
 	}

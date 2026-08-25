@@ -44,14 +44,14 @@ export class PictorialStackedSeries extends PyramidSeries {
 	 */
 	public readonly seriesMask: Graphics = Graphics.new(this._root, { position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 });
 
-	public readonly seriesGraphics: Graphics = this.slicesContainer.children.push(Graphics.new(this._root, { themeTags: ["pictorial", "background"], position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 }));
+	public readonly seriesGraphics: Graphics = this.slicesContainer.children.push(Graphics.new(this._root, { themeTags: ["pictorial", "background"], position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 })._markC("themeTags", "position", "x", "y", "centerX", "centerY"));
 
 	protected _afterNew() {
 		super._afterNew();
-		this.set("topWidth", p100);
-		this.set("bottomWidth", p100);
-		this.set("valueIs", "height");
-		this.slicesContainer.set("mask", this.seriesMask);
+		this._setC("topWidth", p100);
+		this._setC("bottomWidth", p100);
+		this._setC("valueIs", "height");
+		this.slicesContainer._setC("mask", this.seriesMask);
 	}
 
 	protected _updateScale() {
@@ -79,9 +79,9 @@ export class PictorialStackedSeries extends PyramidSeries {
 			seriesMask.set("x", w / 2);
 			seriesMask.set("y", h / 2);
 
-			seriesGraphics.set("scale", scale);
-			seriesGraphics.set("x", w / 2);
-			seriesGraphics.set("y", h / 2);
+			seriesGraphics._setC("scale", scale);
+			seriesGraphics._setC("x", w / 2);
+			seriesGraphics._setC("y", h / 2);
 		}
 	}
 
@@ -90,7 +90,7 @@ export class PictorialStackedSeries extends PyramidSeries {
 		if (this.isDirty("svgPath")) {
 			const svgPath = this.get("svgPath");
 			this.seriesMask.set("svgPath", svgPath);
-			this.seriesGraphics.set("svgPath", svgPath);
+			this.seriesGraphics._setC("svgPath", svgPath);
 		}
 
 		this._updateScale();

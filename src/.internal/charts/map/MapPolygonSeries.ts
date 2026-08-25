@@ -99,10 +99,10 @@ export class MapPolygonSeries extends MapSeries {
 		super._prepareChildren();
 
 		if (this.isDirty("fill")) {
-			this.mapPolygons.template.set("fill", this.get("fill"));
+			this.mapPolygons.template._setC("fill", this.get("fill"));
 		}
 		if (this.isDirty("stroke")) {
-			this.mapPolygons.template.set("stroke", this.get("stroke"));
+			this.mapPolygons.template._setC("stroke", this.get("stroke"));
 		}
 	}
 
@@ -134,7 +134,7 @@ export class MapPolygonSeries extends MapSeries {
 					(geometry as any)._reversed = true;
 				}
 			}
-			mapPolygon.set("geometry", geometry);
+			mapPolygon._setC("geometry", geometry);
 		}
 
 		mapPolygon.series = this;
@@ -209,7 +209,7 @@ export class MapPolygonSeries extends MapSeries {
 		if (dataItem) {
 			const mapPolygon = dataItem.get("mapPolygon");
 			if (mapPolygon) {
-				mapPolygon.set("geometry", dataItem.get("geometry"));
+				mapPolygon._setC("geometry", dataItem.get("geometry"));
 			}
 		}
 	}

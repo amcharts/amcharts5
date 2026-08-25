@@ -71,6 +71,8 @@ export class TemplateState<E extends Entity> {
 			if (!seen[key] && !other._userSettings[key]) {
 				seen[key] = true;
 				other.setRaw(key, value);
+				// came from a theme, so it is not part of the configuration
+				other._computedSettings[key] = true;
 			}
 		});
 	}
@@ -187,6 +189,8 @@ export class Template<E extends Entity> implements IDisposer {
 	public _settings: Partial<E["_settings"]>;
 	public _privateSettings: E["_privateSettings"] = {};
 
+	public _computedSettings: Dirty<E["_settings"]> = {};
+
 	// TODO code duplication with Properties
 	public _settingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K]>(value: V) => void> } = {};
 	public _privateSettingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K]>(value: V) => void> } = {};
@@ -275,11 +279,13 @@ export class Template<E extends Entity> implements IDisposer {
 
 	public setRaw<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		this._checkDisposed();
+		delete this._computedSettings[key];
 		this._settings[key] = value;
 	}
 
 	public set<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		this._checkDisposed();
+		delete this._computedSettings[key];
 
 		if (this._settings[key] !== value) {
 			this.setRaw(key, value);
@@ -290,11 +296,49 @@ export class Template<E extends Entity> implements IDisposer {
 		}
 	}
 
+	/**
+	 * Same as `set()`, but for a value the library works out itself rather than
+	 * one that was asked for, so that it can be left out when serializing.
+	 *
+	 * @ignore
+	 */
+	public _setC<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
+		const authored = !this._computedSettings[key] && this._settings[key] === value;
+		this.set(key, value);
+		if (!authored) {
+			this._computedSettings[key] = true;
+		}
+	}
+
+	/**
+	 * Sets multiple computed settings at once.
+	 *
+	 * @ignore
+	 */
+	public _setCAll(settings: this["_settings"]) {
+		$object.each(settings, (key, value) => {
+			this._setC(key, value as any);
+		});
+	}
+
+	/**
+	 * Flags already-set settings as computed, without writing anything.
+	 *
+	 * @ignore
+	 */
+	public _markC<T extends Template<any>>(this: T, ...keys: Array<keyof T["_settings"]>): T {
+		$array.each(keys, (key) => {
+			this._computedSettings[key] = true;
+		});
+		return this;
+	}
+
 	public remove<Key extends keyof this["_settings"]>(key: Key): void {
 		this._checkDisposed();
 
 		if (key in this._settings) {
 			delete this._settings[key];
+			delete this._computedSettings[key];
 
 			this._entities.forEach((entity) => {
 				entity._removeTemplateProperty(key);

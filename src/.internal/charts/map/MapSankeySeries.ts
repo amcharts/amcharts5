@@ -271,6 +271,16 @@ export interface IMapSankeySeriesSettings extends IMapPolygonSeriesSettings {
  * @since 5.17.0
  * @important
  */
+/**
+ * Settings the band and node geometry is generated from: a change to any of them
+ * means the shapes have to be worked out again.
+ */
+const GEOMETRY_SETTINGS = [
+	"controlPointDistance", "controlPointDistanceSource", "controlPointDistanceTarget",
+	"orientation", "maxWidth", "resolution", "nodePadding", "autoSort", "antimeridian",
+	"nodeType", "nodeWidth"
+];
+
 export class MapSankeySeries extends MapPolygonSeries {
 
 	/**
@@ -784,6 +794,13 @@ export class MapSankeySeries extends MapPolygonSeries {
 	 * @ignore
 	 */
 	public _prepareChildren() {
+		// The shape of the bands and the nodes is worked out from these, and the
+		// only thing that used to re-run that was the data changing - so setting
+		// any of them on a chart that was already up did nothing until it did
+		if ($array.any(GEOMETRY_SETTINGS, (setting) => this.isDirty(setting as any))) {
+			this._valuesDirty = true;
+		}
+
 		if (this._valuesDirty || this._sizeDirty) {
 			this._generateGeometries();
 		}
@@ -1095,7 +1112,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 			dataItem.setRaw("geometry", geometry);
 			const mapPolygon = dataItem.get("mapPolygon");
 			if (mapPolygon) {
-				mapPolygon.set("geometry", geometry);
+				mapPolygon._setC("geometry", geometry);
 
 				if (linkColorMode !== "solid") {
 					const nodeDataItem = linkColorMode === "source"
@@ -1194,7 +1211,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 
 			const mapPolygon = nodeDataItem.get("mapPolygon");
 			if (mapPolygon) {
-				mapPolygon.set("geometry", nodeGeo);
+				mapPolygon._setC("geometry", nodeGeo);
 				// Reorder at display level so nodes render above bands.
 				// Avoids Children.moveValue which triggers markDirty() loop.
 				this._childrenDisplay.removeChild(mapPolygon._display);

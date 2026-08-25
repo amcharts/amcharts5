@@ -40,17 +40,17 @@ export class ZoomTools extends Container {
 	/**
 	 * A [[Button]] for home.
 	 */
-	public readonly homeButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["home"] }));
+	public readonly homeButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["home"] })._markC("width", "height", "themeTags"));
 
 	/**
 	 * A [[Button]] for zoom in.
 	 */
-	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["plus"] }));
+	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["plus"] })._markC("width", "height", "themeTags"));
 
 	/**
 	 * A [[Button]] for zoom out.
 	 */
-	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["minus"] }));
+	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["minus"] })._markC("width", "height", "themeTags"));
 
 	declare public _settings: IZoomToolsSettings;
 	declare public _privateSettings: IZoomToolsPrivate;
@@ -61,22 +61,22 @@ export class ZoomTools extends Container {
 	protected _afterNew() {
 		super._afterNew();
 
-		this.set("position", "absolute");
+		this._setC("position", "absolute");
 
-		this.set("layout", this._root.verticalLayout);
+		this._setC("layout", this._root.verticalLayout);
 		this.addTag("zoomtools");
 
-		this.plusButton.setAll({
+		this.plusButton._setCAll({
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
 			layout: undefined
 		});
 
-		this.minusButton.setAll({
+		this.minusButton._setCAll({
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
 			layout: undefined
 		});
 
-		this.homeButton.setAll({
+		this.homeButton._setCAll({
 			icon: Graphics.new(this._root, { themeTags: ["icon"] }),
 			layout: undefined
 		});
@@ -93,22 +93,22 @@ export class ZoomTools extends Container {
 				if (target instanceof ZoomableContainer) {
 					this._targetDisposer = this.addDisposer(target.contents.on("scale", (scale) => {
 						if (scale == target.get("minZoomLevel")) {
-							this.minusButton.set("disabled", true)
+							this.minusButton._setC("disabled", true)
 						}
 						else {
-							this.minusButton.set("disabled", false)
+							this.minusButton._setC("disabled", false)
 						}
 
 						if (scale == target.get("maxZoomLevel")) {
-							this.plusButton.set("disabled", true)
+							this.plusButton._setC("disabled", true)
 						}
 						else {
-							this.plusButton.set("disabled", false)
+							this.plusButton._setC("disabled", false)
 						}
 					}))
 					this.root.events.once("frameended", () => {
 						if (target.get("scale") == target.get("minZoomLevel")) {
-							this.minusButton.set("disabled", true)
+							this.minusButton._setC("disabled", true)
 						}
 					})
 				}

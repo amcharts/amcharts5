@@ -227,7 +227,7 @@ export class GanttSeries extends ColumnSeries {
 		themeTags: ["connectorline"],
 		visible: false,
 		forceInactive: true
-	}));
+	})._markC("themeTags", "visible", "forceInactive"));
 
 	/**
 	 * A triangle that is shown at the end of the connector line, while creating
@@ -237,7 +237,7 @@ export class GanttSeries extends ColumnSeries {
 		themeTags: ["connectorarrow"],
 		visible: false,
 		forceInactive: true
-	}));
+	})._markC("themeTags", "visible", "forceInactive"));
 
 	/**
 	 * [[ListTemplate]] of [[Link]] that connect tasks.
@@ -352,7 +352,7 @@ export class GanttSeries extends ColumnSeries {
 	protected _afterNew(): void {
 		this.fields.push("linkTo", "categoryId");
 		this.valueFields.push("progress", "duration");
-		this.set("exactLocationX", true);
+		this._setC("exactLocationX", true);
 
 		super._afterNew();
 
@@ -491,7 +491,7 @@ export class GanttSeries extends ColumnSeries {
 			fillOpacity: 0
 		}));
 		dataItem.setRaw("mask", mask);
-		maskedContainer.set("mask", mask);
+		maskedContainer._setC("mask", mask);
 
 		// --- Progress elements ---
 		const progressRectangle = maskedContainer.children.push(this.progressRectangles.make());
@@ -785,6 +785,13 @@ export class GanttSeries extends ColumnSeries {
 					categoryDataContext[categoryField] = category;
 					if (parent) {
 						categoryDataContext[yAxis.get("parentIdField", "parentId")] = parent.get("id");
+					}
+
+					// Collapsing is something a group does, at any level - a leaf has
+					// nothing to collapse, and a top-level group is the one most often
+					// collapsed
+					const rowChildren = categoryAxisDataItem.get("children");
+					if (rowChildren && rowChildren.length > 0) {
 						categoryDataContext[yAxis.get("collapsedField", "collapsed")] = categoryAxisDataItem.get("collapsed", false);
 					}
 				}

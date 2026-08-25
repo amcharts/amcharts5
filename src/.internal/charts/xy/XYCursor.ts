@@ -266,7 +266,7 @@ export class XYCursor extends Container {
 	 */
 	public readonly selection: Graphics = this.children.push(Graphics.new(this._root, {
 		themeTags: ["selection", "cursor"], layer: 30
-	}));
+	})._markC("themeTags", "layer"));
 
 	protected _movePoint: IPoint | undefined;
 	protected _lastPoint: IPoint = { x: 0, y: 0 };
@@ -288,8 +288,8 @@ export class XYCursor extends Container {
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["xy", "cursor"]);
 		super._afterNew();
-		this.setAll({ "width": p100, height: p100, isMeasured: true, position: "absolute" });
-		this.states.create("hidden", { visible: true, opacity: 0 });
+		this._setCAll({ "width": p100, height: p100, isMeasured: true, position: "absolute" });
+		this.states._createC("hidden", { visible: true, opacity: 0 });
 		this._drawLines();
 		this.setPrivateRaw("visible", false);
 
@@ -726,11 +726,11 @@ export class XYCursor extends Container {
 		if (this.getPrivate("visible")) {
 			const chart = this.chart;
 			if (chart && $object.keys(chart.plotContainer._downPoints).length > 1) {
-				this.set("forceHidden", true)
+				this._setC("forceHidden", true)
 				return;
 			}
 			else {
-				this.set("forceHidden", false)
+				this._setC("forceHidden", false)
 			}
 
 			// TODO: handle multitouch
@@ -872,10 +872,10 @@ export class XYCursor extends Container {
 
 	protected _updateLines(x: number, y: number) {
 		if (!this._tooltipX) {
-			this.lineX.set("x", x);
+			this.lineX._setC("x", x);
 		}
 		if (!this._tooltipY) {
-			this.lineY.set("y", y);
+			this.lineY._setC("y", y);
 		}
 
 		this._drawLines();

@@ -170,8 +170,9 @@ export class Slice extends Graphics {
 			this.iy = $math.sin(middleAngle);
 
 			const shiftRadius = this.get("shiftRadius", 0);
-			this.setRaw("dx", this.ix * shiftRadius);
-			this.setRaw("dy", this.iy * shiftRadius);			
+			// the slice shifting itself out along its own angle
+			this._setCRaw("dx", this.ix * shiftRadius);
+			this._setCRaw("dy", this.iy * shiftRadius);			
 			this.markDirtyPosition();
 		}
 	}

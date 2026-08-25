@@ -93,7 +93,7 @@ export class ClockHand extends Container {
 		super._afterNew();
 
 		// to be redrawn when size changes
-		this.set("width", percent(1));
+		this._setC("width", percent(1));
 
 		this.adapters.add("x", () => {
 			return 0
@@ -133,7 +133,7 @@ export class ClockHand extends Container {
 				let bullet = parent.parent;
 				// to be redrawn when size changes
 				if (bullet) {
-					bullet.set("width", percent(1));
+					bullet._setC("width", percent(1));
 				}
 
 				const dataItem = parent.dataItem;

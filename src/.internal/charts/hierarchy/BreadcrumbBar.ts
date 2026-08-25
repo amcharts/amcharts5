@@ -107,7 +107,7 @@ export class BreadcrumbBar extends Container {
 	}
 
 	protected _handleDataItem(dataItem: DataItem<IHierarchyDataItem> | undefined) {
-		this.set("minHeight", this.height());
+		this._setC("minHeight", this.height());
 		this.children.clear();
 		this.labels.clear();
 

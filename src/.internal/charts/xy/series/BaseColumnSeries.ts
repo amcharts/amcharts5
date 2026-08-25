@@ -180,19 +180,19 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const columnsTemplate = this.columns.template;
 		if (this.isDirty("fill")) {
 			if (columnsTemplate.get("fill") == null) {
-				columnsTemplate.set("fill", this.get("fill"));
+				columnsTemplate._setC("fill", this.get("fill"));
 			}
 		}
 
 		if (this.isDirty("fillPattern")) {
 			if (columnsTemplate.get("fillPattern") == null) {
-				columnsTemplate.set("fillPattern", this.get("fillPattern"));
+				columnsTemplate._setC("fillPattern", this.get("fillPattern"));
 			}
 		}
 
 		if (this.isDirty("stroke")) {
 			if (columnsTemplate.get("stroke") == null) {
-				columnsTemplate.set("stroke", this.get("stroke"));
+				columnsTemplate._setC("stroke", this.get("stroke"));
 			}
 		}
 

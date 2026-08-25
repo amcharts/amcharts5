@@ -311,21 +311,21 @@ export class Legend extends Series {
 					}
 				}
 				else {
-					if (item.on) {
+					if (item && item.on) {
 						item.on(fillField as any, () => {
-							markerRectangle.set("fill", item.get(fillField as any));
+							markerRectangle._setC("fill", item.get(fillField as any));
 						})
 
 						item.on(strokeField as any, () => {
-							markerRectangle.set("stroke", item.get(strokeField as any));
+							markerRectangle._setC("stroke", item.get(strokeField as any));
 						})
 					}
 				}
 
-				markerRectangle.setAll({ fill, stroke });
+				markerRectangle._setCAll({ fill, stroke });
 
 				// this solves if template field is set on slice
-				const component = item.component;
+				const component = item && item.component;
 				if (component && component.updateLegendMarker) {
 					component.updateLegendMarker(item as any);
 				}

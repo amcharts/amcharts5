@@ -788,14 +788,14 @@ export abstract class Series extends Component {
 
 					if (!$type.isNumber(value)) {
 						if(rule.neutral){
-							target.set(rule.key, rule.neutral);
+							target._setC(rule.key, rule.neutral);
 						}
 
 						const states = target.states;
 						if(states){
 							const defaultState = states.lookup("default");
 							if(defaultState && rule.neutral){
-								defaultState.set(rule.key, rule.neutral);
+								defaultState._setC(rule.key, rule.neutral);
 							}
 						}
 						if(!rule.customFunction){
@@ -831,12 +831,12 @@ export abstract class Series extends Component {
 							propertyValue = percentInterpolate(percent, rule.min, rule.max);
 						}
 
-						target.set(rule.key, propertyValue);
+						target._setC(rule.key, propertyValue);
 						const states = target.states;
 						if(states){
 							const defaultState = states.lookup("default");
 							if(defaultState){
-								defaultState.set(rule.key, propertyValue);
+								defaultState._setC(rule.key, propertyValue);
 							}
 						}
 					}

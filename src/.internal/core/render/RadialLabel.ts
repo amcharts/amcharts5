@@ -173,7 +173,8 @@ export class RadialLabel extends Label {
 
 			if (textType == "circular") {
 
-				this.setAll({
+				// a circular label positions itself, so this is the label's own doing
+				this._setCAll({
 					paddingTop: 0,
 					paddingBottom: 0,
 					paddingLeft: 0,
@@ -261,8 +262,9 @@ export class RadialLabel extends Label {
 		}
 
 
-		this.setRaw("dx", dx);
-		this.setRaw("dy", dy);
+		// the label placing itself along its radius
+		this._setCRaw("dx", dx);
+		this._setCRaw("dy", dy);
 
 		super._updatePosition();
 	}

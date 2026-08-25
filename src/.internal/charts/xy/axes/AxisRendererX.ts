@@ -54,7 +54,7 @@ export class AxisRendererX extends AxisRenderer {
 
 	declare public readonly labelTemplate: Template<AxisLabel>;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured: false, themeTags: ["axis", "x", "thumb", "zoomgrip"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { width: p100, isMeasured: false, themeTags: ["axis", "x", "thumb", "zoomgrip"] })._markC("width", "isMeasured", "themeTags");
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "x"]);
@@ -63,9 +63,9 @@ export class AxisRendererX extends AxisRenderer {
 		this.setPrivateRaw("letter", "X");
 
 		const gridTemplate = this.grid.template;
-		gridTemplate.set("height", p100);
-		gridTemplate.set("width", 0);
-		gridTemplate.set("draw", (display, graphics) => {
+		gridTemplate._setC("height", p100);
+		gridTemplate._setC("width", 0);
+		gridTemplate._setC("draw", (display, graphics) => {
 			display.moveTo(0, 0);
 			display.lineTo(0, graphics.height());
 		});
@@ -83,7 +83,7 @@ export class AxisRendererX extends AxisRenderer {
 		const ghostLabel = axis.ghostLabel;
 		if (ghostLabel) {
 			ghostLabel.setPrivate("visible", !this.get("inside"));
-			ghostLabel.set("x", -1000);
+			ghostLabel._setC("x", -1000);
 		}
 
 		const opposite = "opposite"
@@ -198,9 +198,9 @@ export class AxisRendererX extends AxisRenderer {
 	public _updatePositions() {
 		const axis = this.axis;
 		const x = axis.x() - $utils.relativeToValue(axis.get("centerX", 0), axis.width()) - axis.parent!.get("paddingLeft", 0);
-		axis.gridContainer.set("x", x);
-		axis.topGridContainer.set("x", x);
-		axis.bulletsContainer.set("y", this.y());
+		axis.gridContainer._setC("x", x);
+		axis.topGridContainer._setC("x", x);
+		axis.bulletsContainer._setC("y", this.y());
 
 		const chart = axis.chart;
 		if (chart) {
@@ -233,10 +233,10 @@ export class AxisRendererX extends AxisRenderer {
 		super.processAxis();
 		const axis = this.axis;
 		if (axis.get("width") == null) {
-			axis.set("width", p100);
+			axis._setC("width", p100);
 		};
 		const verticalLayout = this._root.verticalLayout;
-		axis.set("layout", verticalLayout);
+		axis._setC("layout", verticalLayout);
 		axis.labelsContainer.set("width", p100);
 		axis.axisHeader.setAll({ layout: verticalLayout });
 	}
@@ -279,19 +279,19 @@ export class AxisRendererX extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			tick.set("x", this.positionToCoordinate(position));
+			tick._setC("x", this.positionToCoordinate(position));
 
 			let length = tick.get("length", 0);
 			const inside = tick.get("inside", this.get("inside", false));
 
 			if (this.get("opposite")) {
-				tick.set("y", p100);
+				tick._setC("y", p100);
 				if (!inside) {
 					length *= -1
 				}
 			}
 			else {
-				tick.set("y", 0);
+				tick._setC("y", 0);
 				if (inside) {
 					length *= -1
 				}
@@ -327,22 +327,22 @@ export class AxisRendererX extends AxisRenderer {
 			const opposite = this.get("opposite");
 			if (opposite) {
 				if (!inside) {
-					label.set("position", "relative");
-					label.set("y", p100);
+					label._setC("position", "relative");
+					label._setC("y", p100);
 				}
 				else {
-					label.set("position", "absolute");
-					label.set("y", 0)
+					label._setC("position", "absolute");
+					label._setC("y", 0)
 				}
 			}
 			else {
 				if (!inside) {
-					label.set("y", undefined);
-					label.set("position", "relative");
+					label._setC("y", undefined);
+					label._setC("position", "relative");
 				}
 				else {
-					label.set("y", 0)
-					label.set("position", "absolute");
+					label._setC("y", 0)
+					label._setC("position", "absolute");
 				}
 			}
 
@@ -350,7 +350,7 @@ export class AxisRendererX extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			label.set("x", this.positionToCoordinate(position));
+			label._setC("x", this.positionToCoordinate(position));
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));
 		}
 	}
@@ -369,7 +369,7 @@ export class AxisRendererX extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			grid.set("x", this.positionToCoordinate(position));
+			grid._setC("x", this.positionToCoordinate(position));
 
 			this.toggleVisibility(grid, position, 0, 1);
 		}
@@ -404,16 +404,16 @@ export class AxisRendererX extends AxisRenderer {
 					if (previousBullet) {
 						let previousSprite = previousBullet.get("sprite");
 						if (previousSprite) {
-							sprite.set("y", previousSprite.y() + previousSprite.height() * d);
+							sprite._setC("y", previousSprite.y() + previousSprite.height() * d);
 						}
 					}
 					else {
-						sprite.set("y", 0);
+						sprite._setC("y", 0);
 					}
 				}
 
 				this.axis._bullets[bulletPosition] = bullet;
-				sprite.set("x", this.positionToCoordinate(position));
+				sprite._setC("x", this.positionToCoordinate(position));
 				this.toggleVisibility(sprite, position, 0, 1);
 			}
 		}
@@ -519,7 +519,7 @@ export class AxisRendererX extends AxisRenderer {
 
 		if (!$utils.sameBounds(bounds, oldBounds)) {
 			tooltip.set("bounds", bounds);
-			tooltip.set("pointerOrientation", pointerOrientation);
+			tooltip._setC("pointerOrientation", pointerOrientation);
 		}
 	}
 }

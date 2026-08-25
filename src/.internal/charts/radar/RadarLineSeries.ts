@@ -52,9 +52,9 @@ export class RadarLineSeries extends LineSeries {
 
 	protected _afterNew() {
 		super._afterNew();
-		this.set("maskContent", false);
-		this.bulletsContainer.set("maskContent", false);
-		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
+		this._setC("maskContent", false);
+		this.bulletsContainer._setC("maskContent", false);
+		this.bulletsContainer._setC("mask", Graphics.new(this._root, {}));
 	}
 
 	protected _handleMaskBullets() {

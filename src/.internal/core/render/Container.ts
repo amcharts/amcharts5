@@ -186,6 +186,26 @@ export class Container extends Sprite {
 		this._display.addChild(this._childrenDisplay);
 	}
 
+	/**
+	 * Returns the sub-element held in `key`, creating it with `f` if there is
+	 * none, and merging `themeTags` into whichever element ends up there.
+	 *
+	 * The tags describe the role the element plays within this class, so an
+	 * element passed in by a user (or by a parsed config) needs them just as
+	 * much as a default one - without them the theme rules keyed on those tags
+	 * never match and the element renders unstyled.
+	 *
+	 * @ignore
+	 */
+	public _setDefaultTagged<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, themeTags: Array<string>, f: () => Value): NonNullable<this["_settings"][Key]> | Value {
+		const value = this._setDefaultFn(key, f);
+		const sprite = value as unknown as Sprite;
+
+		sprite.set("themeTags", $utils.mergeTags(sprite.get("themeTags", []), themeTags));
+
+		return value;
+	}
+
 	public _afterChanged(): void {
 		super._afterChanged();
 
@@ -316,7 +336,7 @@ export class Container extends Sprite {
 			let height = this.height();
 
 			if (background) {
-				background.setAll({ width: w, height: h, x: x, y: y });
+				background._setCAll({ width: w, height: h, x: x, y: y });
 				if (this._display.interactive) {
 					background._display.interactive = true;
 				}
@@ -331,20 +351,22 @@ export class Container extends Sprite {
 			if (verticalScrollbar) {
 				verticalScrollbar.set("height", height);
 				verticalScrollbar.set("x", width - verticalScrollbar.width() - verticalScrollbar.get("marginRight", 0));
-				verticalScrollbar.set("end", verticalScrollbar.get("start", 0) + height / this._contentHeight);
 
-				/**
-				 * ruins scrollToChild
+				const visibleRatio = Math.min(1, height / this._contentHeight);
+				const maxStart = Math.max(0, 1 - visibleRatio);
 				let start = verticalScrollbar.get("start", 0);
-				let end = verticalScrollbar.get("end", 1);
 
-				if (start > 1 - end) {
-					verticalScrollbar.set("start", Math.max(0, end - height / this._contentHeight));
+				// The viewport can grow past the current scroll position, e.g. when the
+				// container is resized while scrolled to the bottom. Without pulling the
+				// position back the content stays pushed up, leaving a gap below it.
+				// Only an out of range position is written, so a scroll animation that
+				// stays in range runs on - one that does not is stopped by `set`.
+				if (start > maxStart) {
+					start = maxStart;
+					verticalScrollbar._setC("start", start);
 				}
-				else {
-					verticalScrollbar.set("end", Math.min(1, start + height / this._contentHeight));
-				}
-					*/
+
+				verticalScrollbar._setC("end", start + visibleRatio);
 				const bg = verticalScrollbar.get("background");
 				if (bg) {
 					bg.setAll({ width: verticalScrollbar.width(), height: height })
@@ -665,7 +687,10 @@ export class Container extends Sprite {
 			let h = this.innerHeight();
 			let ch = child.height();
 			let contentH = this._contentHeight;
-			let max = 1 - (h - ch / 2) / contentH;
+			// scrolled all the way down is the last child sitting on the bottom edge -
+			// going past that only opens a gap below the content. Measured against
+			// the full height, same as the scroll position is clamped to.
+			let max = Math.max(0, 1 - this.height() / contentH);
 
 			if (y + ch * .7 + this._childrenDisplay.y > h || y - ch * .3 + this._childrenDisplay.y < 0) {
 				let pos = Math.max(0, Math.min(max, (y - ch / 2) / contentH));
@@ -693,15 +718,12 @@ export class Container extends Sprite {
 				this.set("maskContent", true);
 				this.set("paddingRight", verticalScrollbar.width() + verticalScrollbar.get("marginRight", 0) + verticalScrollbar.get("marginLeft", 0));
 
-				let background = this.get("background");
-
-				if (!background) {
-					background = this.set("background", Rectangle.new(this._root, {
-						themeTags: ["background"],
+				this._setDefaultTagged("background", ["background"], () => {
+					return Rectangle.new(this._root, {
 						fillOpacity: 0,
 						fill: this._root.interfaceColors.get("alternativeBackground")
-					}));
-				}
+					});
+				});
 
 				this._vsbd0 = this.events.on("wheel", (event) => {
 					const wheelEvent = event.originalEvent;
@@ -727,8 +749,8 @@ export class Container extends Sprite {
 					}
 
 					if (start + shiftY >= 0 && end + shiftY <= 1) {
-						verticalScrollbar.set("start", start + shiftY);
-						verticalScrollbar.set("end", end + shiftY);
+						verticalScrollbar._setC("start", start + shiftY);
+						verticalScrollbar._setC("end", end + shiftY);
 					}
 
 				})
@@ -784,13 +806,13 @@ export class Container extends Sprite {
 
 			const background = this.get("background");
 			if (background instanceof Sprite) {
-				background.set("isMeasured", false);
+				background._setC("isMeasured", false);
 				background._setParent(this);
 				this._display.addChildAt(background._display, 0);
 				// Rectangle / RoundedRectangle backgrounds render sharper edges and
 				// strokes when crisp; default it on unless the user set it explicitly.
 				if (background instanceof Rectangle && !background.isUserSetting("crisp")) {
-					background.set("crisp", true);
+					background._setC("crisp", true);
 				}
 			}
 		}

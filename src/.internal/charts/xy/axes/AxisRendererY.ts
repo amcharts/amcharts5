@@ -55,7 +55,7 @@ export class AxisRendererY extends AxisRenderer {
 
 	protected _downY?: number;
 
-	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, isMeasured: false, themeTags: ["axis", "y", "thumb", "zoomgrip"] });
+	public thumb: Rectangle = Rectangle.new(this._root, { height: p100, isMeasured: false, themeTags: ["axis", "y", "thumb", "zoomgrip"] })._markC("height", "isMeasured", "themeTags");
 
 	public _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "y"]);
@@ -67,9 +67,9 @@ export class AxisRendererY extends AxisRenderer {
 		this.setPrivateRaw("letter", "Y");
 
 		const gridTemplate = this.grid.template;
-		gridTemplate.set("width", p100);
-		gridTemplate.set("height", 0);
-		gridTemplate.set("draw", (display, graphics) => {
+		gridTemplate._setC("width", p100);
+		gridTemplate._setC("height", 0);
+		gridTemplate._setC("draw", (display, graphics) => {
 			display.moveTo(0, 0);
 			display.lineTo(graphics.width(), 0);
 		});
@@ -91,7 +91,7 @@ export class AxisRendererY extends AxisRenderer {
 		const ghostLabel = axis.ghostLabel;
 		if (ghostLabel) {
 			ghostLabel.setPrivate("visible", !this.get("inside"));
-			ghostLabel.set("y", -1000);
+			ghostLabel._setC("y", -1000);
 		}
 
 		const thumb = this.thumb;
@@ -142,10 +142,10 @@ export class AxisRendererY extends AxisRenderer {
 
 		if (chart) {
 			if (this.get(opposite)) {
-				thumb.set("centerX", 0);
+				thumb._setC("centerX", 0);
 			}
 			else {
-				thumb.set("centerX", w);
+				thumb._setC("centerX", w);
 			}
 		}
 
@@ -159,10 +159,10 @@ export class AxisRendererY extends AxisRenderer {
 		super.processAxis();
 		const axis = this.axis;
 		if (axis.get("height") == null) {
-			axis.set("height", p100);
+			axis._setC("height", p100);
 		}
 		const horizontalLayout = this._root.horizontalLayout;
-		axis.set("layout", horizontalLayout);
+		axis._setC("layout", horizontalLayout);
 		axis.labelsContainer.set("height", p100);
 		axis.axisHeader.set("layout", horizontalLayout);
 	}
@@ -170,9 +170,9 @@ export class AxisRendererY extends AxisRenderer {
 	public _updatePositions() {
 		const axis = this.axis;
 		const y = axis.y() - $utils.relativeToValue(axis.get("centerY", 0), axis.height());
-		axis.gridContainer.set("y", y);
-		axis.topGridContainer.set("y", y);
-		axis.bulletsContainer.set("x", this.x());
+		axis.gridContainer._setC("y", y);
+		axis.topGridContainer._setC("y", y);
+		axis.bulletsContainer._setC("x", this.x());
 
 		const chart = axis.chart;
 		if (chart) {
@@ -229,23 +229,23 @@ export class AxisRendererY extends AxisRenderer {
 			const inside = label.get("inside", this.get("inside", false));
 
 			if (opposite) {
-				label.set("x", 0);
+				label._setC("x", 0);
 
 				if (inside) {
-					label.set("position", "absolute");
+					label._setC("position", "absolute");
 				}
 				else {
-					label.set("position", "relative");
+					label._setC("position", "relative");
 				}
 			}
 			else {
 				if (inside) {
-					label.set("x", 0);
-					label.set("position", "absolute");
+					label._setC("x", 0);
+					label._setC("position", "absolute");
 				}
 				else {
-					label.set("x", undefined);
-					label.set("position", "relative");
+					label._setC("x", undefined);
+					label._setC("position", "relative");
 				}
 			}
 
@@ -253,7 +253,7 @@ export class AxisRendererY extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			label.set("y", this.positionToCoordinate(position));
+			label._setC("y", this.positionToCoordinate(position));
 			this.toggleVisibility(label, position, label.get("minPosition", 0), label.get("maxPosition", 1));
 		}
 	}
@@ -272,7 +272,7 @@ export class AxisRendererY extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			grid.set("y", this.positionToCoordinate(position));
+			grid._setC("y", this.positionToCoordinate(position));
 			this.toggleVisibility(grid, position, 0, 1);
 		}
 	}
@@ -298,13 +298,13 @@ export class AxisRendererY extends AxisRenderer {
 				position = position + (endPosition - position) * location;
 			}
 
-			tick.set("y", this.positionToCoordinate(position));
+			tick._setC("y", this.positionToCoordinate(position));
 
 			let length = tick.get("length", 0);
 			const inside = tick.get("inside", this.get("inside", false));
 
 			if (this.get("opposite")) {
-				tick.set("x", 0);
+				tick._setC("x", 0);
 				if (inside) {
 					length *= -1
 				}
@@ -353,18 +353,18 @@ export class AxisRendererY extends AxisRenderer {
 					if (previousBullet) {
 						let previousSprite = previousBullet.get("sprite");
 						if (previousSprite) {
-							sprite.set("x", previousSprite.x() + previousSprite.width() * d);
+							sprite._setC("x", previousSprite.x() + previousSprite.width() * d);
 						}
 					}
 					else {
-						sprite.set("x", 0);
+						sprite._setC("x", 0);
 					}
 				}
 
 				this.axis._bullets[bulletPosition] = bullet;
 
 
-				sprite.set("y", this.positionToCoordinate(position));
+				sprite._setC("y", this.positionToCoordinate(position));
 
 				this.toggleVisibility(sprite, position, 0, 1);
 			}
@@ -482,7 +482,7 @@ export class AxisRendererY extends AxisRenderer {
 
 		if (!$utils.sameBounds(bounds, oldBounds)) {
 			tooltip.set("bounds", bounds);
-			tooltip.set("pointerOrientation", pointerOrientation);
+			tooltip._setC("pointerOrientation", pointerOrientation);
 		}
 	}
 

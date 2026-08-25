@@ -195,27 +195,27 @@ export class LineSeries extends XYSeries {
 
 		if (this.isDirty("stroke")) {
 			const stroke = this.get("stroke");
-			this.strokes.template.set("stroke", stroke);
+			this.strokes.template._setC("stroke", stroke);
 			const legendStroke = this._legendStroke;
 			if (legendStroke) {
-				legendStroke.states.lookup("default")!.set("stroke", stroke);
+				legendStroke.states.lookup("default")!._setC("stroke", stroke);
 			}
 		}
 		if (this.isDirty("fill")) {
 			const fill = this.get("fill");
-			this.fills.template.set("fill", fill);
+			this.fills.template._setC("fill", fill);
 			const legendFill = this._legendFill;
 			if (legendFill) {
-				legendFill.states.lookup("default")!.set("fill", fill);
+				legendFill.states.lookup("default")!._setC("fill", fill);
 			}
 		}
 
 		if (this.isDirty("fillPattern")) {
 			const fillPattern = this.get("fillPattern");
-			this.fills.template.set("fillPattern", fillPattern);
+			this.fills.template._setC("fillPattern", fillPattern);
 			const legendFill = this._legendFill;
 			if (legendFill) {
-				legendFill.states.lookup("default")!.set("fillPattern", fillPattern);
+				legendFill.states.lookup("default")!._setC("fillPattern", fillPattern);
 			}
 		}
 
@@ -761,8 +761,8 @@ export class LineSeries extends XYSeries {
 
 			const disabledColor = this._root.interfaceColors.get("disabled");
 
-			legendStroke.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
-			legendFill.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
+			legendStroke.states._createC("disabled", { fill: disabledColor, stroke: disabledColor });
+			legendFill.states._createC("disabled", { fill: disabledColor, stroke: disabledColor });
 
 			if (this.bullets.length > 0) {
 				const bulletFunction = this.bullets.getIndex(0);
@@ -771,7 +771,7 @@ export class LineSeries extends XYSeries {
 					if (bullet) {
 						const sprite = bullet.get("sprite");
 						if (sprite instanceof Graphics) {
-							sprite.states.create("disabled", { fill: disabledColor, stroke: disabledColor });
+							sprite.states._createC("disabled", { fill: disabledColor, stroke: disabledColor });
 						}
 
 						if (sprite) {

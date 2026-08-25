@@ -5,6 +5,39 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.3] - 2026-08-25
+
+### Added
+- `ChartSerializer`/`JsonParser`: a `Root`'s `interfaceColors` are now serialized and applied on parse.
+- `ChartSerializer`/`JsonParser`: a Gantt chart support added.
+- `MapLineSeries`: new `pointIds` data field and `pointSeries` setting. A line can now name the points it connects (`{ pointIds: ["JFK", "LAX"] }`) instead of holding their data items. `pointsToConnect` wins if both are set.
+- `JsonParser`: new `updateTargets` setting. `"soft"` updates an existing object of the same type instead of replacing it with a new one. Default is `"strict"`, the old behavior.
+
+### Changed
+- `ChartSerializer`: only user-set settings are being serialized, leaving defaults out of the resulting JSON.
+- `ChartSerializer`: more chart-level elements are serialized: an `XYChart`'s `plotContainer`, anything added to a chart's `children`, a flow's or a map sankey's `nodes`, a word cloud's `shape`, a `ClockHand`'s `hand` and `pin`, and a Gantt's labels, grid, ticks and task parts.
+- `ChartSerializer`: objects pointing at one another will now use references instead of copies, e.g. `"@series.get('fill')"`.
+- `ChartSerializer`/`JsonParser`: big values are written short and rebuilt on parse: a map's `geoJSON` and a `Root`'s locale by the name of the pack they came from.
+
+### Fixed
+- `ChartSerializer`: fixed palette serialization.
+- `ChartSerializer`: `type` is stripped from objects an element builds by itself so config does not overwrite it.
+- `ChartSerializer`: chart-set values are no longer serialized.
+- `ChartSerializer`: a legend or breadcrumb bar added to a container's `children` was written out twice.
+- `ChartSerializer`: data a chart builds for itself (e.g. flow's nodes, a word cloud's words) is no longer serialized.
+- `ChartSerializer`: templates with states no longer error on serialization.
+- `ChartSerializer`/`JsonParser`: data no longer breaks a config (a field called `type`, a string starting with `#` or `@`, and a `null`).
+- `ChartSerializer`: a legend fed with data items that are not rows of the series' data (e.g. hierarchy's second level) pointed at the wrong ones and came back empty.
+- `Gantt`: collapsing a top-level group was not being written to the data.
+- `MapSankeySeries`: some settings did nothing when changed on a chart that was already drawn.
+- `XYChart`: series colors are assigned when themes are applied, not only on the first frame.
+- `HeatLegend`: `startOpacity` and `endOpacity` are no longer declared required.
+- A scrollable `Container` - a `Legend` with a `verticalScrollbar`, say - scrolled to the bottom and then made taller kept its contents pushed up. `scrollToChild()` could leave a similar gap on the last child.
+- Background `themeTags` were not being applied properly in some cases.
+- Resetting `focusable` to `false` on a `Sprite` was not removing the `focusableElement` private setting.
+- The tooltips with `tooltipPosition: "pointer"` would not hide when tap would occur outside target element the toopltip was displayed on.
+
+
 ## [5.20.2] - 2026-08-13
 
 ### Added

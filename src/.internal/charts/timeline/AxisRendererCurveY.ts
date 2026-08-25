@@ -99,7 +99,7 @@ export class AxisRendererCurveY extends AxisRenderer {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "radial"]);
 		super._afterNew();
 		this.setPrivate("letter", "Y");
-		this.setRaw("position", "absolute");
+		this._setCRaw("position", "absolute");
 	}
 
 	public _changed() {

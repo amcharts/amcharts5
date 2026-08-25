@@ -72,7 +72,7 @@ export class XYChartDefaultTheme extends Theme {
 			paddingRight: 0,
 			colors: ColorSet.new(this._root, {
 				saturation: 0
-			})
+			})._markC("saturation")
 		});
 
 		{

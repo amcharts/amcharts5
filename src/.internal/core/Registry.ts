@@ -5,7 +5,7 @@ export class Registry {
 	/**
 	 * Currently running version of amCharts.
 	 */
-	readonly version: string = "5.20.2";
+	readonly version: string = "5.20.3";
 
 	/**
 	 * List of applied licenses.
@@ -29,6 +29,16 @@ export class Registry {
 	 * @since 5.14.4
 	 */
 	autoDispose: boolean = false;
+
+	/**
+	 * Functions that build a geometry from a few numbers, by the name they are
+	 * serialized under. Registered by the map module; read when a config is
+	 * parsed, so that a shape can be stored as the call that made it rather than
+	 * as the coordinates it produced.
+	 *
+	 * @ignore
+	 */
+	geometryFunctions: { [index: string]: (...args: Array<any>) => any } = {};
 }
 
 /**

@@ -13,6 +13,11 @@ export class State<E extends Entity> {
 	public _settings: Partial<E["_settings"]>;
 	public _userSettings: Dirty<E["_settings"]> = {};
 
+	// Settings the library worked out for itself. A subset of `_userSettings`, so
+	// that state application and pruning behave exactly as before and only
+	// serializing tells them apart.
+	public _computedSettings: Dirty<E["_settings"]> = {};
+
 	constructor(entity: E, settings: Partial<E["_settings"]>) {
 		this._entity = entity;
 		this._settings = settings;
@@ -62,7 +67,38 @@ export class State<E extends Entity> {
 	 */
 	public set<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
 		this._userSettings[key] = true;
+		delete this._computedSettings[key];
 		this.setRaw(key, value);
+	}
+
+	/**
+	 * Same as `set()`, but for a value the library works out itself rather than
+	 * one that was asked for.
+	 *
+	 * The state behaves identically - the value is only additionally flagged as
+	 * computed, so that it can be left out when the chart is serialized.
+	 *
+	 * @ignore
+	 * @param   key       Setting key
+	 * @param   value     Setting value
+	 */
+	/**
+	 * Writes a value the library worked out itself, without announcing it - used
+	 * where a state notes what to return to.
+	 *
+	 * @ignore
+	 */
+	public _setCRaw<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
+		this.setRaw(key, value);
+		this._computedSettings[key] = true;
+	}
+
+	public _setC<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
+		const authored = !this._computedSettings[key] && this._settings[key] === value;
+		this.set(key, value);
+		if (!authored) {
+			this._computedSettings[key] = true;
+		}
 	}
 
 	/**
@@ -73,6 +109,7 @@ export class State<E extends Entity> {
 	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
 		delete this._userSettings[key];
+		delete this._computedSettings[key];
 		delete this._settings[key];
 	}
 
@@ -111,14 +148,15 @@ export class State<E extends Entity> {
 			if (!seen[key]) {
 				seen[key] = true;
 
-				// save values to default state
+				// save values to default state - the library's own note of what to
+				// come back to, not something anyone asked for
 				if (this !== defaultState) {
 					if (!(key in defaultState._settings)) {
-						defaultState._settings[key] = this._entity.get(key);
+						defaultState._setCRaw(key, this._entity.get(key));
 					}
 				}
 
-				this._entity.set(key, value);
+				this._entity._setC(key, value);
 			}
 		});
 	}
@@ -160,10 +198,10 @@ export class State<E extends Entity> {
 			if (!seen[key]) {
 				seen[key] = true;
 
-				// save values to default state
+				// save values to default state - see `apply()`
 				if (this != defaultState) {
 					if (!(key in defaultState._settings)) {
-						defaultState._settings[key] = this._entity.get(key);
+						defaultState._setCRaw(key, this._entity.get(key));
 					}
 				}
 
@@ -228,6 +266,28 @@ export class States<E extends Entity> {
 			this._states[name] = state;
 			return state;
 		}
+	}
+
+	/**
+	 * Same as `create()`, but for a state the library sets up itself rather than
+	 * one that was asked for.
+	 *
+	 * The state behaves identically - its settings are only additionally flagged
+	 * as computed, so that they can be left out when the chart is serialized.
+	 *
+	 * @ignore
+	 * @param   name      State name
+	 * @param   settings  Settings
+	 * @return            New State
+	 */
+	public _createC(name: string, settings: Partial<E["_settings"]>): State<E> {
+		const state = this.create(name, settings);
+
+		$object.each(settings, (key) => {
+			state._computedSettings[key] = true;
+		});
+
+		return state;
 	}
 
 	/**

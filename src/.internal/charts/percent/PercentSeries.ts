@@ -647,7 +647,7 @@ export abstract class PercentSeries extends Series {
 				if (l.y + labelLeft < next) {
 					l.y = next - labelLeft;
 				}
-				l.label.set("x", l.y);
+				l.label._setC("x", l.y);
 
 				next = l.y + bounds.right;
 			})
@@ -676,7 +676,7 @@ export abstract class PercentSeries extends Series {
 				if (l.y + labelRight > next) {
 					l.y = next - labelRight;
 				}
-				l.label.set("x", l.y);
+				l.label._setC("x", l.y);
 				next = l.y + bounds.left;
 			})
 		}

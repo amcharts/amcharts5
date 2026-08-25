@@ -73,16 +73,9 @@ export class EditableLabel extends Label {
 		this.setPrivate("input", input);
 
 		// Set background
-		let background = this.get("background");
-
-		if (!background) {
-			background = this.set("background", RoundedRectangle.new(this._root, {
-				themeTags: ["editablelabel", "background"]
-			}));
-		}
-		else {
-			background.set("themeTags", ["editablelabel", "background"]);
-		}
+		this._setDefaultTagged("background", ["editablelabel", "background"], () => {
+			return RoundedRectangle.new(this._root, {});
+		});
 
 	}
 

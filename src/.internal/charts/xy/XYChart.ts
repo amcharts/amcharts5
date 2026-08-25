@@ -284,7 +284,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly topAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout }));
+	public readonly topAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout })._markC("width", "layout"));
 
 	/**
 	 * A [[Container]] located in the middle the chart, used to store vertical axes
@@ -293,7 +293,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly yAxesAndPlotContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.horizontalLayout }));
+	public readonly yAxesAndPlotContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.horizontalLayout })._markC("width", "height", "layout"));
 
 	/**
 	 * A [[Container]] located on bottom of the chart, used to store bottom
@@ -302,7 +302,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly bottomAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout }));
+	public readonly bottomAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout })._markC("width", "layout"));
 
 	/**
 	 * A [[Container]] located on left of the chart, used to store left-hand
@@ -311,7 +311,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly leftAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout }));
+	public readonly leftAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout })._markC("height", "layout"));
 
 	/**
 	 * A [[Container]] located in the middle of the chart, used to store plotContainer and topPlotContainer
@@ -319,7 +319,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly plotsContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false }));
+	public readonly plotsContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false })._markC("width", "height", "maskContent"));
 
 	/**
 	 * A [[Container]] located in the middle of the chart, used to store actual
@@ -332,7 +332,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly plotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 }));
+	public readonly plotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 })._markC("width", "height"));
 
 	/**
 	 * A [[Container]] used for any elements that need to be displayed over
@@ -341,7 +341,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly topPlotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 }));
+	public readonly topPlotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 })._markC("width", "height"));
 
 	/**
 	 * A [[Container]] axis grid elements are stored in.
@@ -349,7 +349,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly gridContainer: Container = this.plotContainer.children.push(Container.new(this._root, { width: p100, height: p100, isMeasured: false }));
+	public readonly gridContainer: Container = this.plotContainer.children.push(Container.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured"));
 
 	/**
 	 * A [[Container]] axis background grid elements are stored in.
@@ -357,7 +357,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured: false });
+	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured");
 
 	/**
 	 * A [[Container]] located on right of the chart, used to store right-hand
@@ -366,7 +366,7 @@ export class XYChart extends SerialChart {
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
-	public readonly rightAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout }));
+	public readonly rightAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout })._markC("height", "layout"));
 
 	/**
 	 * A [[Container]] axis headers are stored in.
@@ -420,7 +420,7 @@ export class XYChart extends SerialChart {
 			this.zoomOut();
 		})
 		zoomOutButton.hide(0);
-		zoomOutButton.states.lookup("default")!.set("opacity", 1);
+		zoomOutButton.states.lookup("default")!._setC("opacity", 1);
 
 		this.chartContainer.set("layout", verticalLayout);
 
@@ -436,11 +436,11 @@ export class XYChart extends SerialChart {
 
 		// Setting trasnparent background so that full body of the plot container
 		// is interactive
-		plotContainer.set("interactive", true);
-		plotContainer.set("interactiveChildren", false);
-		plotContainer.set("background", Rectangle.new(root, {
+		plotContainer._setC("interactive", true);
+		plotContainer._setC("interactiveChildren", false);
+		plotContainer._setC("background", Rectangle.new(root, {
 			themeTags: ["plotbackground", "xy", "background"]
-		}));
+		})._markC("themeTags"));
 
 		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {
 			this._handlePlotDown(event);
@@ -518,7 +518,14 @@ export class XYChart extends SerialChart {
 		if (colors) {
 			colors.reset();
 		}
-		const changed = super._applyThemes(force);		
+		const changed = super._applyThemes(force);
+
+		// Recolorize all series that might've not been added before theme was
+		// applied to the chart
+		this.series.each((series) => {
+			this._colorize(series);
+		});
+
 		return changed;
 	}
 
@@ -1409,11 +1416,12 @@ export class XYChart extends SerialChart {
 		}))
 
 		if (!series.get("baseAxis")) {
+			// the chart working it out, not something anyone asked for
 			if (yAxis.isType<CategoryAxis<any>>("CategoryAxis") || yAxis.isType<DateAxis<any>>("DateAxis")) {
-				series.set("baseAxis", yAxis);
+				series._setC("baseAxis", yAxis);
 			}
 			else {
-				series.set("baseAxis", xAxis);
+				series._setC("baseAxis", xAxis);
 			}
 		}
 
@@ -1462,10 +1470,10 @@ export class XYChart extends SerialChart {
 			if (strokes && strokes.template) {
 				const index = this.series.indexOf(series);
 				if (strokeWidths && strokeWidths.length > 0) {
-					strokes.template.set("strokeWidth", strokeWidths[index % strokeWidths.length]);
+					strokes.template._setC("strokeWidth", strokeWidths[index % strokeWidths.length]);
 				}
 				if (strokeDasharrays && strokeDasharrays.length > 0) {
-					strokes.template.set("strokeDasharray", strokeDasharrays[index % strokeDasharrays.length]);
+					strokes.template._setC("strokeDasharray", strokeDasharrays[index % strokeDasharrays.length]);
 				}
 			}
 		}
@@ -1616,8 +1624,8 @@ export class XYChart extends SerialChart {
 				let scrollbarX = this.get("scrollbarX");
 
 				if (scrollbarX && (!scrollbarX.getPrivate("isBusy") || force)) {
-					scrollbarX.setRaw("start", start);
-					scrollbarX.setRaw("end", end);
+					scrollbarX._setCRaw("start", start);
+					scrollbarX._setCRaw("end", end);
 					scrollbarX.updateGrips();
 				}
 			}
@@ -1627,8 +1635,8 @@ export class XYChart extends SerialChart {
 				let scrollbarY = this.get("scrollbarY");
 
 				if (scrollbarY && (!scrollbarY.getPrivate("isBusy") || force)) {
-					scrollbarY.setRaw("start", start);
-					scrollbarY.setRaw("end", end);
+					scrollbarY._setCRaw("start", start);
+					scrollbarY._setCRaw("end", end);
 					scrollbarY.updateGrips();
 				}
 			}

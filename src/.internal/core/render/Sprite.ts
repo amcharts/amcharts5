@@ -153,7 +153,7 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 
 	protected _onRenderer<Key extends keyof IRendererEvents>(key: Key, dispatch: (this: this, event: IRendererEvents[Key]) => void): IDisposer {
 		// TODO: is this OK? it'd be good not to require to set this on each individual element
-		this._sprite.set("interactive", true);
+		this._sprite._setC("interactive", true);
 		this._sprite._display.interactive = true;
 
 		let events = this._rendererDisposers[key];
@@ -1325,6 +1325,11 @@ export abstract class Sprite extends Entity {
 
 				this._tooltipPointerDp = new MultiDisposer([
 					this.events.on("pointerover", () => {
+						const tooltipMoveDp = this._tooltipMoveDp;
+						if (tooltipMoveDp) {
+							tooltipMoveDp.dispose();
+							this._tooltipMoveDp = undefined;
+						}
 						this._tooltipMoveDp = this.events.on("globalpointermove", (e) => {
 							this.showTooltip(e.point);
 						})
@@ -1347,13 +1352,13 @@ export abstract class Sprite extends Entity {
 
 			if (this.get("active")) {
 				this.states.applyAnimate("active");
-				this.set("ariaChecked", true);
+				this._setC("ariaChecked", true);
 			}
 			else {
 				if (!this.isHidden()) {
 					this.states.applyAnimate("default");
 				}
-				this.set("ariaChecked", false);
+				this._setC("ariaChecked", false);
 			}
 			this.markDirtyAccessibility();
 		}
@@ -1361,13 +1366,13 @@ export abstract class Sprite extends Entity {
 		if (this.isDirty("disabled")) {
 			if (this.get("disabled")) {
 				this.states.applyAnimate("disabled");
-				this.set("ariaChecked", false);
+				this._setC("ariaChecked", false);
 			}
 			else {
 				if (!this.isHidden()) {
 					this.states.applyAnimate("default");
 				}
-				this.set("ariaChecked", true);
+				this._setC("ariaChecked", true);
 			}
 			this.markDirtyAccessibility();
 		}
@@ -1384,7 +1389,7 @@ export abstract class Sprite extends Entity {
 		if (this.isDirty("draggable")) {
 			const draggable = this.get("draggable");
 			if (draggable) {
-				this.set("interactive", true);
+				this._setC("interactive", true);
 
 				this._dragDp = new MultiDisposer([
 					events.on("pointerdown", (ev) => {
@@ -1536,7 +1541,7 @@ export abstract class Sprite extends Entity {
 		if (this.isDirty("wheelable")) {
 			const wheelable = this.get("wheelable");
 			if (wheelable) {
-				this.set("interactive", true);
+				this._setC("interactive", true);
 			}
 			display.wheelable = wheelable ? true : false;
 		}
@@ -1696,7 +1701,10 @@ export abstract class Sprite extends Entity {
 
 					events.on("globalpointerup", (ev) => {
 						if ($utils.isTouchEvent(ev.originalEvent)) {
-							if (this.getPrivate("touchHovering")) {
+							// Only "out" if the tap landed away from this element. A tap
+							// on the same element keeps it hovered (isHover), so the tooltip
+							// stays put and simply repositions, instead of hiding.
+							if (this.getPrivate("touchHovering") && !this.isHover()) {
 								this._handleOut();
 								if (this.get("tooltipText") || this.get("tooltipHTML")) {
 									this.hideTooltip();
@@ -2197,7 +2205,6 @@ export abstract class Sprite extends Entity {
 	 * Shows element's [[Tooltip]].
 	 */
 	public showTooltip(point?: IPoint): Promise<void> | undefined {
-
 		if (!this.isDisposed()) {
 			const tooltip = this.getTooltip();
 			const tooltipText = this.get("tooltipText");
@@ -2206,6 +2213,14 @@ export abstract class Sprite extends Entity {
 			if ((tooltipText || tooltipHTML) && tooltip) {
 				const tooltipPosition = this.get("tooltipPosition");
 				const tooltipTarget = this.getPrivate("tooltipTarget", this);
+
+				// A point-less call on a "pointer"-positioned tooltip (e.g. from the
+				// boundschanged/positionchanged handlers keeping it glued to a moving
+				// target) must keep it at the last pointer location, not snap it to the
+				// element's anchor.
+				if (tooltipPosition == "pointer" && !point) {
+					point = this.getPrivate("lastTooltipCoords");
+				}
 
 				if (tooltipPosition == "fixed" || !point) {
 					this._display._setMatrix();
@@ -2586,7 +2601,7 @@ export abstract class Sprite extends Entity {
 			this._isHiding = false;
 
 			if (this.states.lookup("default")!.get("visible")) {
-				this.set("visible", true);
+				this._setC("visible", true);
 			}
 			this._onShow(duration);
 
@@ -2620,7 +2635,7 @@ export abstract class Sprite extends Entity {
 			this._isShowing = false;
 			let state = this.states.lookup("hidden");
 			if (!state) {
-				state = this.states.create("hidden", {
+				state = this.states._createC("hidden", {
 					"opacity": 0,
 					"visible": false
 				});

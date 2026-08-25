@@ -207,6 +207,14 @@ export class Root implements IDisposer {
 	public _inner: HTMLElement;
 
 	protected _settings: IRootSettings;
+
+	/**
+	 * Settings the Root filled in for itself, so that serializing can leave them
+	 * out - a `Root` is not an `Entity`, so it has no `_computedProperties`.
+	 *
+	 * @ignore
+	 */
+	public _computedSettings: { [K in keyof IRootSettings]?: boolean } = {};
 	protected _isDirty: boolean = false;
 	protected _isDirtyParents: boolean = false;
 	protected _isDirtyAnimation: boolean = false;
@@ -430,10 +438,12 @@ export class Root implements IDisposer {
 
 		if (settings.useSafeResolution == null) {
 			settings.useSafeResolution = true;
+			this._computedSettings.useSafeResolution = true;
 		}
 
 		if (settings.sanitizeHTML == null) {
 			settings.sanitizeHTML = true;
+			this._computedSettings.sanitizeHTML = true;
 		}
 
 		let resolution;
@@ -574,7 +584,7 @@ export class Root implements IDisposer {
 				strokeOpacity: 0
 			}));
 
-			m.states.create("hover", { stroke: color(0x3CABFF) });
+			m.states._createC("hover", { stroke: color(0x3CABFF) });
 
 			const a = logo.children.push(Graphics.new(this, {
 				stroke: color(0x888888),
@@ -679,7 +689,9 @@ export class Root implements IDisposer {
 		this._rootContainer = rootContainer;
 		this._rootContainer._defaultThemes.push(DefaultTheme.new(this));
 
-		const container = rootContainer.children.push(Container.new(this, { visible: true, width: p100, height: p100 }));
+		// the size is needed to rebuild this from a config, `visible` is the default
+		const container = rootContainer.children.push(Container.new(this, { width: p100, height: p100 }));
+		container._setC("visible", true);
 		this.container = container;
 
 		renderer.resize(realWidth, realHeight, width, height);
@@ -1563,7 +1575,7 @@ export class Root implements IDisposer {
 			this.tooltipContainer = tooltipContainer;
 
 			const tooltip = Tooltip.new(this, {});
-			this.container.set("tooltip", tooltip);
+			this.container._setC("tooltip", tooltip);
 			tooltip.hide(0);
 			this._tooltip = tooltip;
 		}
@@ -1828,6 +1840,7 @@ export class Root implements IDisposer {
 			$array.each(focusElement.disposers, (x) => {
 				x.dispose();
 			});
+			target.removePrivate("focusElement");
 		}
 	}
 

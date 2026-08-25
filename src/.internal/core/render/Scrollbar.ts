@@ -92,11 +92,10 @@ export class Scrollbar extends Container {
 
 	public _addOrientationClass() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["scrollbar", this._settings.orientation]);
-		if (!this._settings.background) {
-			this._settings.background = RoundedRectangle.new(this._root, {
-				themeTags: $utils.mergeTags(this._settings.themeTags, ["main", "background"])
-			});
-		}
+
+		this._setDefaultTagged("background", $utils.mergeTags(this._settings.themeTags, ["main", "background"]), () => {
+			return RoundedRectangle.new(this._root, {});
+		});
 	}
 
 	declare public _settings: IScrollbarSettings;
@@ -136,14 +135,14 @@ export class Scrollbar extends Container {
 		return this.children.push(Button.new(this._root, {
 			themeTags: ["resize", "button", this.get("orientation")], icon: Graphics.new(this._root, {
 				themeTags: ["icon"]
-			})
-		}));
+			})._markC("themeTags")
+		})._markC("themeTags", "icon"));
 	}
 
 	protected _makeThumb(): RoundedRectangle {
 		return this.children.push(RoundedRectangle.new(this._root, {
 			themeTags: ["thumb", this.get("orientation")]
-		}));
+		})._markC("themeTags"));
 	}
 
 	protected _handleAnimation(animation: Animation<any>) {
@@ -205,7 +204,7 @@ export class Scrollbar extends Container {
 						this._handleAnimation(this.thumb.animate({ key: key, to: newCoordinate, duration: duration, easing: this.get("animationEasing") }));
 					}
 					else {
-						this.thumb.set(key, newCoordinate);
+						this.thumb._setC(key, newCoordinate);
 						this._root.events.once("frameended", () => {
 							this.setPrivateRaw("isBusy", false);
 						})
@@ -290,8 +289,8 @@ export class Scrollbar extends Container {
 		}));
 
 		if (this.get("orientation") == "vertical") {
-			startGrip.set("x", 0);
-			endGrip.set("x", 0);
+			startGrip._setC("x", 0);
+			endGrip._setC("x", 0);
 
 			this._disposers.push(thumb.adapters.add("y", (value) => {
 				return Math.max(Math.min(Number(value), this.height() - thumb.height()), 0);
@@ -318,8 +317,8 @@ export class Scrollbar extends Container {
 			}))
 		}
 		else {
-			startGrip.set("y", 0);
-			endGrip.set("y", 0);
+			startGrip._setC("y", 0);
+			endGrip._setC("y", 0);
 
 			this._disposers.push(thumb.adapters.add("x", (value) => {
 				return Math.max(Math.min(Number(value), this.width() - thumb.width()), 0);
@@ -384,12 +383,12 @@ export class Scrollbar extends Container {
 		const width = this.width();
 
 		if (orientation == "vertical") {
-			startGrip.set("y", height * this.get("start", 0));
-			endGrip.set("y", height * this.get("end", 1));
+			startGrip._setC("y", height * this.get("start", 0));
+			endGrip._setC("y", height * this.get("end", 1));
 		}
 		else {
-			startGrip.set("x", width * this.get("start", 0));
-			endGrip.set("x", width * this.get("end", 1));
+			startGrip._setC("x", width * this.get("start", 0));
+			endGrip._setC("x", width * this.get("end", 1));
 		}
 
 		const valueFunction = this.getPrivate("positionTextFunction");
@@ -406,19 +405,19 @@ export class Scrollbar extends Container {
 			toValue = to + "%";
 		}
 
-		startGrip.set("ariaLabel", this._t("From %1", undefined, fromValue));
-		startGrip.set("ariaValueNow", "" + from);
-		startGrip.set("ariaValueText", from + "%");
+		startGrip._setC("ariaLabel", this._t("From %1", undefined, fromValue));
+		startGrip._setC("ariaValueNow", "" + from);
+		startGrip._setC("ariaValueText", from + "%");
 
-		startGrip.set("ariaValueMin", "0");
-		startGrip.set("ariaValueMax", "100");
+		startGrip._setC("ariaValueMin", "0");
+		startGrip._setC("ariaValueMax", "100");
 
-		endGrip.set("ariaLabel", this._t("To %1", undefined, toValue));
-		endGrip.set("ariaValueNow", "" + to);
-		endGrip.set("ariaValueText", to + "%");
+		endGrip._setC("ariaLabel", this._t("To %1", undefined, toValue));
+		endGrip._setC("ariaValueNow", "" + to);
+		endGrip._setC("ariaValueText", to + "%");
 
-		endGrip.set("ariaValueMin", "0");
-		endGrip.set("ariaValueMax", "100");
+		endGrip._setC("ariaValueMin", "0");
+		endGrip._setC("ariaValueMax", "100");
 	}
 
 	protected _updateThumb() {
@@ -441,8 +440,8 @@ export class Scrollbar extends Container {
 		if (this.get("orientation") == "vertical") {
 			if ($type.isNumber(y0) && $type.isNumber(y1)) {
 				if (!this._thumbBusy && !thumb.isDragging()) {
-					thumb.set("height", y1 - y0);
-					thumb.set("y", y0);
+					thumb._setC("height", y1 - y0);
+					thumb._setC("y", y0);
 				}
 				start = y0 / height;
 				end = y1 / height;
@@ -451,8 +450,8 @@ export class Scrollbar extends Container {
 		else {
 			if ($type.isNumber(x0) && $type.isNumber(x1)) {
 				if (!this._thumbBusy && !thumb.isDragging()) {
-					thumb.set("width", x1 - x0);
-					thumb.set("x", x0);
+					thumb._setC("width", x1 - x0);
+					thumb._setC("x", x0);
 				}
 				start = x0 / width;
 				end = x1 / width;
@@ -460,8 +459,8 @@ export class Scrollbar extends Container {
 		}
 
 		if (this.getPrivate("isBusy") && (this.get("start") != start || this.get("end") != end)) {
-			this.set("start", start);
-			this.set("end", end);
+			this._setC("start", start);
+			this._setC("end", end);
 		}
 
 		const valueFunction = this.getPrivate("positionTextFunction");
@@ -478,9 +477,9 @@ export class Scrollbar extends Container {
 			toValue = to + "%";
 		}
 
-		thumb.set("ariaLabel", this._t("From %1 to %2", undefined, fromValue, toValue));
-		thumb.set("ariaValueNow", "" + from);
-		thumb.set("ariaValueText", from + "%");
+		thumb._setC("ariaLabel", this._t("From %1 to %2", undefined, fromValue, toValue));
+		thumb._setC("ariaValueNow", "" + from);
+		thumb._setC("ariaValueText", from + "%");
 	}
 
 
@@ -492,13 +491,13 @@ export class Scrollbar extends Container {
 
 		if (this.get("orientation") == "vertical") {
 			const thumbSize = thumb.height();
-			startGrip.set("y", thumb.y());
-			endGrip.set("y", thumb.y() + thumbSize);
+			startGrip._setC("y", thumb.y());
+			endGrip._setC("y", thumb.y() + thumbSize);
 		}
 		else {
 			const thumbSize = thumb.width();
-			startGrip.set("x", thumb.x());
-			endGrip.set("x", thumb.x() + thumbSize);
+			startGrip._setC("x", thumb.x());
+			endGrip._setC("x", thumb.x() + thumbSize);
 		}
 	}
 }

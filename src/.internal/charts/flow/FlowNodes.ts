@@ -217,10 +217,10 @@ export abstract class FlowNodes extends Series {
 	protected _afterNew() {
 		this.fields.push("unknown", "name", "fill");
 
-		this.set("idField", "id");
-		this.set("nameField", "id");
-		this.set("fillField", "fill");
-		this.set("unknownField", "unknown");
+		this._setC("idField", "id");
+		this._setC("nameField", "id");
+		this._setC("fillField", "fill");
+		this._setC("unknownField", "unknown");
 
 		this.children.push(this.bulletsContainer);
 

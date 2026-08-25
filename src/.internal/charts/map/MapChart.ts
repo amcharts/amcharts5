@@ -869,17 +869,17 @@ export class MapChart extends SerialChart {
 				const zoomLevel = this.get("zoomLevel", 1);
 
 				if (zoomLevel == this.get("minZoomLevel", 1)) {
-					zoomControl.minusButton.set("disabled", true);
+					zoomControl.minusButton._setC("disabled", true);
 				}
 				else {
-					zoomControl.minusButton.set("disabled", false);
+					zoomControl.minusButton._setC("disabled", false);
 				}
 
 				if (zoomLevel == this.get("maxZoomLevel", 32)) {
-					zoomControl.plusButton.set("disabled", true);
+					zoomControl.plusButton._setC("disabled", true);
 				}
 				else {
-					zoomControl.plusButton.set("disabled", false);
+					zoomControl.plusButton._setC("disabled", false);
 				}
 			}
 		}

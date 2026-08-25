@@ -3,7 +3,6 @@ import type { IPoint } from "../util/IPoint";
 import type { Pattern } from "../render/patterns/Pattern";
 import type { Time } from "../util/Animation";
 import type { Sprite } from "../render/Sprite";
-import type { Graphics } from "../render/Graphics";
 import type { IPointerEvent } from "../render/backend/Renderer";
 import type { DataItem, IComponentDataItem } from "./Component";
 import type { Root } from "../Root";
@@ -188,11 +187,9 @@ export class Tooltip extends Container {
 
 		super._afterNew();
 
-		const background: Graphics = this._setDefaultFn("background", () => {
+		this._setDefaultTagged("background", ["tooltip", "background"], () => {
 			return PointedRectangle.new(this._root, {});
 		});
-
-		background.set("themeTags", ["tooltip", "background"]);
 
 		this._label = this.children.push(Label.new(this._root, {}));
 
@@ -368,12 +365,12 @@ export class Tooltip extends Container {
 				}
 
 				if (fill != null) {
-					background.set("fill", fill);
+					background._setC("fill", fill);
 				}
 
 				this._fillDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
-						background.set("fill", fill);
+						background._setC("fill", fill);
 						this._updateTextColor(fill);
 					}
 				})
@@ -389,12 +386,12 @@ export class Tooltip extends Container {
 				let fillGradient = tooltipTarget.get("fillGradient" as any);
 
 				if (fillGradient != null) {
-					background.set("fillGradient", fillGradient);
+					background._setC("fillGradient", fillGradient);
 				}
 
 				this._fillGrDp = tooltipTarget.on("fillGradient" as any, (fillGradient) => {
 					if (fillGradient != null) {
-						background.set("fillGradient", fillGradient);
+						background._setC("fillGradient", fillGradient);
 					}
 				})
 				this._disposers.push(this._fillGrDp);
@@ -407,12 +404,12 @@ export class Tooltip extends Container {
 				}
 
 				if (fill != null) {
-					background.set("stroke", fill);
+					background._setC("stroke", fill);
 				}
 
 				this._strokeDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
-						background.set("stroke", fill);
+						background._setC("stroke", fill);
 					}
 				})
 
@@ -426,12 +423,12 @@ export class Tooltip extends Container {
 				}
 
 				if (fill != null) {
-					this.label.set("fill", fill);
+					this.label._setC("fill", fill);
 				}
 
 				this._labelDp = tooltipTarget.on("fill" as any, (fill) => {
 					if (fill != null) {
-						this.label.set("fill", fill);
+						this.label._setC("fill", fill);
 					}
 				})
 
@@ -454,7 +451,7 @@ export class Tooltip extends Container {
 			}
 
 			if (fill instanceof Color) {
-				this.label.set("fill", Color.alternative(fill, this._root.interfaceColors.get("alternativeText"), this._root.interfaceColors.get("text")));
+				this.label._setC("fill", Color.alternative(fill, this._root.interfaceColors.get("alternativeText"), this._root.interfaceColors.get("text")));
 			}
 		}
 	}
@@ -534,8 +531,8 @@ export class Tooltip extends Container {
 				pointerLength = background.get("pointerLength", 0);
 				bgStrokeSizeY = background.get("strokeWidth", 0) / 2;
 				bgStrokeSizeX = bgStrokeSizeY;
-				background.set("width", w);
-				background.set("height", h);
+				background._setC("width", w);
+				background._setC("height", h);
 			}
 
 			let pointerX = 0;
@@ -603,13 +600,13 @@ export class Tooltip extends Container {
 				this.animate({ key: "y", to: y, duration: animationDuration, easing: animationEasing });
 			}
 			else {
-				this.set("x", x);
-				this.set("y", y);
+				this._setC("x", x);
+				this._setC("y", y);
 			}
 
 			if (background instanceof PointedRectangle) {
-				background.set("pointerX", pointerX);
-				background.set("pointerY", pointerY);
+				background._setC("pointerX", pointerX);
+				background._setC("pointerY", pointerY);
 			}
 
 			if (w > 0) {

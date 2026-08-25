@@ -101,7 +101,7 @@ export class AxisRendererCurveX extends AxisRenderer {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["renderer", "circular"]);
 		super._afterNew();
 		this.setPrivateRaw("letter", "X");
-		this.setRaw("position", "absolute");
+		this._setCRaw("position", "absolute");
 	}
 
 	public _beforeChanged() {

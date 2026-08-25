@@ -625,7 +625,7 @@ export class WordCloud extends Series {
 			});
 		}
 
-		this.set("progress", 1);
+		this._setC("progress", 1);
 	}
 
 	/**
@@ -976,7 +976,7 @@ export class WordCloud extends Series {
 				// shifted by the padding to match the labels container, which is
 				// offset the same way (the clip mask lives inside that container,
 				// so it follows on its own)
-				this.shape.setAll({ svgPath: svgPath, scale: scale, x: tx + this.get("paddingLeft", 0), y: ty + this.get("paddingTop", 0) });
+				this.shape._setCAll({ svgPath: svgPath, scale: scale, x: tx + this.get("paddingLeft", 0), y: ty + this.get("paddingTop", 0) });
 				// remember the fitted geometry; the clip mask (used when
 				// `maskByShape`) is built lazily from it in `_applyMaskGraphics`
 				this._shapeScale = scale;
@@ -1013,7 +1013,7 @@ export class WordCloud extends Series {
 	protected _updateShapeVisibility(): void {
 		// covers a cached invalid path as well
 		const shapeActive = !!(this._shapeMask && this._shapeCandidates);
-		this.shape.set("forceHidden", !shapeActive);
+		this.shape._setC("forceHidden", !shapeActive);
 
 		// clip the words to the shape when `maskByShape` is on (cuts off the
 		// letter parts that overhang the outline). Applied to the labels
@@ -1042,7 +1042,7 @@ export class WordCloud extends Series {
 			return;
 		}
 		const mask = Graphics.new(this._root, {});
-		mask.setAll({ scale: this._shapeScale, x: this._shapeTx, y: this._shapeTy });
+		mask._setCAll({ scale: this._shapeScale, x: this._shapeTx, y: this._shapeTy });
 		// not a child, so not in the normal update cycle — use a `draw` callback
 		// (replayed at clip time) rather than the `svgPath` setting
 		mask.set("draw", (display) => {

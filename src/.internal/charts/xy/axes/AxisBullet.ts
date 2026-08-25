@@ -61,7 +61,7 @@ export class AxisBullet extends Entity {
 
 		if (this.isDirty("sprite")) {
 			if (sprite) {
-				sprite.setAll({ position: "absolute", role: "figure" });
+				sprite._setCAll({ position: "absolute", role: "figure" });
 				this._disposers.push(sprite);
 			}
 		}
