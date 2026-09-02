@@ -1443,7 +1443,9 @@ export class XYChart extends SerialChart {
 
 	protected _colorize(series: this["_seriesType"]) {
 		const colorSet = this.get("colors")!;
-		if (colorSet) {
+		// A series colouring each of its own data items does not use a series
+		// colour, and taking one would shift every later series along
+		if (colorSet && !(series as any).get("colorByDataItem")) {
 			if (series.get("fill") == null) {
 				const color = colorSet.next();
 

@@ -52,6 +52,9 @@ export class SerialChartContainer extends SerialChart {
 		super._afterNew();
 		this.addTag("serialchartcontainer");
 		this.zoomableContainer.contents.children.push(this.seriesContainer);
+		// Bullets sit alongside the series, so they zoom and pan with it and stay
+		// drawn on top of it
+		this.zoomableContainer.contents.children.push(this.bulletsContainer);
 		this.chartContainer.children.push(this.zoomableContainer);
 	}
 

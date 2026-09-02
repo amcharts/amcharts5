@@ -587,6 +587,25 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		}
 	}
 
+	/**
+	 * Sets a callback function to invoke the first time specific key of settings
+	 * changes or is set. The callback is automatically removed after it fires once.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key       Settings key
+	 * @param   callback  Callback
+	 * @return            Disposer for event
+	 * @since 5.20.4
+	 */
+	public once<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: this, key?: Key) => void): IDisposer {
+		const disposer = this.on(key, (value, target, key) => {
+			disposer.dispose();
+			callback(value, target, key);
+		});
+
+		return disposer;
+	}
+
 	private _onDebouncedHelper(map: { [key: string]: any }, key: any, callback: any, delay: number): IDisposer {
 		let events = map[key];
 
@@ -665,6 +684,27 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 */
 	public offDebounced<Key extends keyof this["_settings"]>(key: Key, callback?: (value: this["_settings"][Key], target?: this, key?: Key) => void): void {
 		this._offDebouncedHelper(this._debouncedSettingEvents, key, callback);
+	}
+
+	/**
+	 * Sets a debounced callback function to invoke the first time specific key of
+	 * settings changes or is set. The callback fires only once, after which it is
+	 * automatically removed.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
+	 * @param   key            Settings key
+	 * @param   callback       Callback
+	 * @param   debounceDelay  Debounce delay in milliseconds
+	 * @return                 Disposer for event
+	 * @since 5.20.4
+	 */
+	public onceDebounced<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: this, key?: Key) => void, debounceDelay: number): IDisposer {
+		const disposer = this.onDebounced(key, (value, target, key) => {
+			disposer.dispose();
+			callback(value, target, key);
+		}, debounceDelay);
+
+		return disposer;
 	}
 
 	/**
@@ -793,7 +833,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		const events = this._settingEvents[key];
 
 		if (events !== undefined) {
-			$array.each(events!, (callback) => {
+			// Iterate over a copy so a callback that removes itself (e.g. `once`)
+			// does not corrupt the loop.
+			$array.each(events!.slice(), (callback) => {
 				callback(value, this, key);
 			});
 		}
@@ -817,7 +859,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		const events = this._privateSettingEvents[key];
 
 		if (events !== undefined) {
-			$array.each(events!, (callback) => {
+			// Iterate over a copy so a callback that removes itself (e.g. `once`)
+			// does not corrupt the loop.
+			$array.each(events!.slice(), (callback) => {
 				callback(value, this, key);
 			});
 		}

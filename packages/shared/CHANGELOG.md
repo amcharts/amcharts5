@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.4] - 2026-09-02
+
+### Added
+- `Entity`: new `once()` and `onceDebounced()` methods - like `on()`/`onDebounced()`, but the callback fires only the first time a setting changes, then removes itself.
+- Column series: new `colorByDataItem` setting gives each column its own color from the series' new `colors` (`ColorSet`), instead of the whole series sharing one.
+
+### Fixed
+- `SerialChartContainer`: a series' bullets were created but never drawn.
+- `ChartSerializer`: serializing a series whose bullet function returns nothing for some data items threw an error.
+- `JsonParser`: an adapter whose callback did not survive the trip through JSON broke the chart it was parsed into. Such an adapter is now skipped.
+- `JsonParser`: a flow chart's `nodes` are now parsed before its `data`, so links no longer point at nodes that do not exist yet.
+
+
 ## [5.20.3] - 2026-08-25
 
 ### Added

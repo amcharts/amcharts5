@@ -8,15 +8,25 @@ import type { ValueAxis } from "../axes/ValueAxis";
 import type { IAxisDataItem } from "../axes/Axis";
 import type { ILegendDataItem } from "../../../core/render/Legend";
 import type { Sprite } from "../../../core/render/Sprite";
+import type { Color } from "../../../core/util/Color";
 
 import { XYSeries, IXYSeriesPrivate, IXYSeriesSettings, IXYSeriesDataItem, IXYSeriesAxisRange } from "./XYSeries";
 import { Percent } from "../../../core/util/Percent";
+import { ColorSet } from "../../../core/util/ColorSet";
 import { visualSettings } from "../../../core/render/Graphics";
 
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
 
 export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
+
+	/**
+	 * Color of the column, when the series colors each data item separately.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/} for more info
+	 * @since 5.20.4
+	 */
+	fill?: Color;
 
 	/**
 	 * An actual [[Graphics]] element (Column/Slice/Candlestick/OHLC).
@@ -57,6 +67,26 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 * @default true
 	 */
 	adjustBulletPosition?: boolean;
+
+	/**
+	 * If set to `true`, each column gets its own color from `colors`, instead of
+	 * the whole series sharing one color.
+	 *
+	 * @default false
+	 * @since 5.20.4
+	 */
+	colorByDataItem?: boolean;
+
+	/**
+	 * A [[ColorSet]] to take colors from when `colorByDataItem` is set.
+	 *
+	 * The series makes its own if none is given, rather than taking the chart's:
+	 * the chart's palette is stepped once per series, and one palette per series
+	 * also means editing one does not change the others.
+	 *
+	 * @since 5.20.4
+	 */
+	colors?: ColorSet;
 
 	/**
 	 * If set to `true` will use color of the last visible column for legend
@@ -177,8 +207,13 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const yAxis = this.get("yAxis");
 		const baseAxis = this.get("baseAxis")!;
 
+		this._colorColumns();
+
 		const columnsTemplate = this.columns.template;
-		if (this.isDirty("fill")) {
+		// A series colour on the template would shadow the per-column one
+		const perColumn = this.get("colorByDataItem", false);
+
+		if (this.isDirty("fill") && !perColumn) {
 			if (columnsTemplate.get("fill") == null) {
 				columnsTemplate._setC("fill", this.get("fill"));
 			}
@@ -190,7 +225,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 			}
 		}
 
-		if (this.isDirty("stroke")) {
+		if (this.isDirty("stroke") && !perColumn) {
 			if (columnsTemplate.get("stroke") == null) {
 				columnsTemplate._setC("stroke", this.get("stroke"));
 			}
@@ -344,6 +379,73 @@ export abstract class BaseColumnSeries extends XYSeries {
 	}
 
 
+	/**
+	 * The palette each column is colored from. Made on demand so every series
+	 * gets its own - a themed one would be a single instance shared by all of
+	 * them.
+	 *
+	 * @ignore
+	 */
+	protected _afterNew() {
+		super._afterNew();
+
+		// Made up front rather than when the first column asks for a color: a
+		// palette that only appears on the next frame is not there to be read by
+		// anything looking at the series right after the setting is switched on.
+		// One per series, so editing one series' palette leaves the others alone.
+		if (!this.get("colors")) {
+			// the series made it, nobody asked for it
+			this._setC("colors", ColorSet.new(this._root, {}));
+		}
+	}
+
+	protected _colorSet(): ColorSet {
+		return this.get("colors")!;
+	}
+
+	/**
+	 * Gives every column its own color, by data item index.
+	 *
+	 * By index rather than by stepping the palette, so the colors do not depend
+	 * on how many times the data has been set, survive a theme being applied
+	 * again, and are there for data items the axis groups together.
+	 *
+	 * @ignore
+	 */
+	protected _colorColumns(): void {
+		if (!this.get("colorByDataItem")) {
+			return;
+		}
+
+		// Switched on after the chart was built, the series colour is already sitting
+		// on the column template, where it shadows everything below. Take back what
+		// the library put there - a fill somebody asked for is left alone
+		const template = this.columns.template;
+		if (template._computedSettings["fill"]) {
+			template.remove("fill");
+		}
+		if (template._computedSettings["stroke"]) {
+			template.remove("stroke");
+		}
+
+		const colors = this._colorSet();
+		const step = colors.get("step", 1);
+		const startIndex = colors.get("startIndex", 0);
+
+		$array.each(this.dataItems, (dataItem, index) => {
+			const color = colors.getIndex(startIndex + index * step);
+			dataItem.setRaw("fill", color);
+
+			const graphics = dataItem.get("graphics");
+			if (graphics) {
+				// a default, so a column template or a heat rule still wins, and it
+				// is re-applied here because applying themes again drops it
+				graphics._setDefault("fill", color);
+				graphics._setDefault("stroke", color);
+			}
+		});
+	}
+
 	protected _createGraphics(dataItem: DataItem<this["_dataItemSettings"]>) {
 		let graphics = dataItem.get("graphics");
 		if (!graphics) {
@@ -351,6 +453,14 @@ export abstract class BaseColumnSeries extends XYSeries {
 			graphics = this._makeGraphics(this.columns, dataItem);
 			dataItem.set("graphics", graphics);
 			graphics._setDataItem(dataItem);
+
+			// `_colorColumns` runs earlier in the same pass, so the color is already
+			// on the data item - the column just did not exist yet to take it
+			const fill = dataItem.get("fill");
+			if (fill != null) {
+				graphics._setDefault("fill", fill);
+				graphics._setDefault("stroke", fill);
+			}
 
 			const legendDataItem = dataItem.get("legendDataItem");
 			if (legendDataItem) {
@@ -813,6 +923,12 @@ export abstract class BaseColumnSeries extends XYSeries {
 					dataItem = lastDataItem;
 				}
 			}
+		}
+
+		// Colored per data item, so the series has no color of its own for the
+		// marker to fall back on - use the first column's
+		if (!dataItem && this.get("colorByDataItem")) {
+			dataItem = this.dataItems[0];
 		}
 
 		if (legendDataItem) {

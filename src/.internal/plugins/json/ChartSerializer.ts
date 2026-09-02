@@ -1274,9 +1274,17 @@ export class ChartSerializer extends Serializer {
 
 	private _processBullets(series: any, properties: any): void {
 		series.bullets.each((bulletFunction: any) => {
-			this._maybeInit(properties, "bullets", []);
 			const sampleDataItem = series.dataItems.length ? series.dataItems[0] : new DataItem(series, {}, {});
 			const bullet = bulletFunction(series.root, series, sampleDataItem);
+
+			// A bullet function may decide there is no bullet for this data item
+			if (!bullet) {
+				return;
+			}
+
+			// only now, or a series whose bullets all opt out writes out an empty list
+			this._maybeInit(properties, "bullets", []);
+
 			const serializedBullet: any = this.serialize(bullet, 0, true);
 			const bulletSprite = bullet.get("sprite");
 			if (bulletSprite) {

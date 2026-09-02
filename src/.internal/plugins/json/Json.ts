@@ -182,7 +182,11 @@ function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): voi
 
 	if (parsed.adapters) {
 		$array.each(parsed.adapters, (adapter) => {
-			entity.adapters.add(adapter.key, adapter.callback);
+			// A callback cannot survive a trip through JSON, so a config may carry
+			// an adapter with nothing to call. Skip it rather than break the chart
+			if (typeof adapter.callback === "function") {
+				entity.adapters.add(adapter.key, adapter.callback);
+			}
 		});
 	}
 
@@ -456,7 +460,16 @@ class ParserState {
 	}
 
 	parseProperties(root: Root, object: object, refs: Array<IRef>): IParsedProperties {
-		return $array.map($object.keys(object), (key) => {
+		// A flow's `nodes` have to exist before the `data` whose links point at
+		// them, so they go first no matter where the config lists them
+		const keys = $object.keys(object).slice();
+		const nodesAt = (keys as Array<string>).indexOf("nodes");
+		if (nodesAt > 0) {
+			const nodesKey = keys.splice(nodesAt, 1)[0];
+			keys.unshift(nodesKey);
+		}
+
+		return $array.map(keys, (key) => {
 			const rawValue = object[key];
 
 			return (entity: object) => {
@@ -800,7 +813,9 @@ class ParserState {
 
 		if (adapters) {
 			$array.each(adapters, (adapter: any) => {
-				template.adapters.add(adapter.key, adapter.callback);
+				if (typeof adapter.callback === "function") {
+					template.adapters.add(adapter.key, adapter.callback);
+				}
 			});
 		}
 
