@@ -641,7 +641,9 @@ export class ChartSerializer extends Serializer {
 			if (settings[key] === undefined) {
 				return;
 			}
-			const spriteColor = sprite.get(key as any);
+			// Raw: the comparison is against what was configured on the sprite, and
+			// a colour adapter reads a data item the sample sprite does not have
+			const spriteColor = sprite.getRaw(key as any);
 			const seriesColor = series.get(key as any);
 			if (spriteColor instanceof Color && seriesColor instanceof Color && spriteColor.hex === seriesColor.hex) {
 				settings[key] = "@series.get('" + key + "')";
@@ -1301,6 +1303,14 @@ export class ChartSerializer extends Serializer {
 				// Look for templates
 				this._processTemplate(bulletSprite, serializedBullet.settings.sprite);
 			}
+
+			// The sample was built only to be read. Left alive it still draws on
+			// the next frame, and a bullet's own adapter - which expects the data
+			// item this sample never had - throws there instead.
+			if (bulletSprite) {
+				bulletSprite.dispose();
+			}
+			bullet.dispose();
 		});
 	}
 

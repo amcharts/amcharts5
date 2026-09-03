@@ -191,6 +191,17 @@ export abstract class Flow extends Series {
 	}
 
 	/**
+	 * Bullets sit in the series' own coordinates - a link bullet is placed from
+	 * the link's geometry - so the container stays where `_afterNew` put it.
+	 * A chart moving it into its own would leave every bullet adrift from the
+	 * link or node it marks by however far the series sits from the chart origin.
+	 *
+	 * @ignore
+	 */
+	public _placeBulletsContainer() {
+	}
+
+	/**
 	 * @ignore
 	 */
 	public abstract makeLink(dataItem: DataItem<this["_dataItemSettings"]>): FlowLink;

@@ -413,14 +413,42 @@ export abstract class BaseColumnSeries extends XYSeries {
 	 * @ignore
 	 */
 	protected _colorColumns(): void {
+		const template = this.columns.template;
+
 		if (!this.get("colorByDataItem")) {
+			// Switched off again: hand back what the per-column coloring took over,
+			// or the columns keep the colors it gave them
+			if (this.isDirty("colorByDataItem")) {
+				$array.each(this.dataItems, (dataItem) => {
+					dataItem.setRaw("fill", undefined);
+
+					const graphics = dataItem.get("graphics");
+					if (graphics) {
+						graphics.remove("fill");
+						graphics.remove("stroke");
+					}
+				});
+
+				// and put the series color back on the template, which is where the
+				// columns take it from - the usual pass below only runs when the
+				// series color itself changes, and it has not
+				const fill = this.get("fill");
+				if (fill != null && template.get("fill") == null) {
+					template._setC("fill", fill);
+				}
+
+				const stroke = this.get("stroke");
+				if (stroke != null && template.get("stroke") == null) {
+					template._setC("stroke", stroke);
+				}
+			}
+
 			return;
 		}
 
 		// Switched on after the chart was built, the series colour is already sitting
 		// on the column template, where it shadows everything below. Take back what
 		// the library put there - a fill somebody asked for is left alone
-		const template = this.columns.template;
 		if (template._computedSettings["fill"]) {
 			template.remove("fill");
 		}

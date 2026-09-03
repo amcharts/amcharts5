@@ -1937,27 +1937,39 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					let belowCount = Math.round((0 - syncMin) / syncStep);
 					let aboveCount = targetCount - belowCount;
 
-					// Find the smallest nice step that covers this axis's
-					// data on both sides with the same below/above split
-					let rawStep = 0;
-					if (belowCount > 0 && min < 0) {
-						rawStep = Math.abs(min) / belowCount;
-					}
-					if (aboveCount > 0 && max > 0) {
-						rawStep = Math.max(rawStep, max / aboveCount);
-					}
+					// The source has no room on a side this axis has data on - it
+					// stops at zero where this one does not. Aligning anyway sets that
+					// side of the range to zero, putting the data outside the axis,
+					// where it is silently not drawn. Only the source can make the
+					// room (give it `extraMin`/`extraMax`), so keep this axis's own
+					// bounds instead: the zero lines will not line up, but nothing
+					// disappears.
+					const needsBelow = min < 0 && belowCount == 0;
+					const needsAbove = max > 0 && aboveCount == 0;
 
-					// Fallback: if one side has no data but has intervals
-					if (rawStep == 0) {
-						rawStep = (max - min) / targetCount;
-					}
+					if (!needsBelow && !needsAbove) {
+						// Find the smallest nice step that covers this axis's
+						// data on both sides with the same below/above split
+						let rawStep = 0;
+						if (belowCount > 0 && min < 0) {
+							rawStep = Math.abs(min) / belowCount;
+						}
+						if (aboveCount > 0 && max > 0) {
+							rawStep = Math.max(rawStep, max / aboveCount);
+						}
 
-					// A degenerate range would produce a zero/NaN step; keep
-					// the axis's own min/max/step in that case
-					if (rawStep > 0 && rawStep < Infinity) {
-						step = this._niceStep(rawStep);
-						min = -step * belowCount;
-						max = step * aboveCount;
+						// Fallback: if one side has no data but has intervals
+						if (rawStep == 0) {
+							rawStep = (max - min) / targetCount;
+						}
+
+						// A degenerate range would produce a zero/NaN step; keep
+						// the axis's own min/max/step in that case
+						if (rawStep > 0 && rawStep < Infinity) {
+							step = this._niceStep(rawStep);
+							min = -step * belowCount;
+							max = step * aboveCount;
+						}
 					}
 				}
 				else {

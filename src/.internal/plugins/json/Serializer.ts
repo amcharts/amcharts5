@@ -229,7 +229,11 @@ export class Serializer extends Entity {
 			if (settings.length) {
 				res.settings = {};
 				$array.each(settings, (setting) => {
-					const settingValue = (<any>source).get(setting);
+					// Raw, not `get()`: an adapter's job is to work out a value at
+					// draw time from a data item, and the sample sprite serialized
+					// here has none - running one throws. What was configured is
+					// the raw value anyway; the adapted one is not configuration.
+					const settingValue = (<any>source).getRaw(setting);
 					if (settingValue !== undefined) {
 						res.settings[setting] = this.serialize(settingValue, depth + 1, full || fullSettings.indexOf(setting) !== -1);
 						if (source instanceof Gradient && setting === "stops") {

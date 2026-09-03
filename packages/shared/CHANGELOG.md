@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.5] - 2026-09-03
+
+### Fixed
+- Column series: switching `colorByDataItem` back off left the columns with the colors it gave them, instead of returning them to the series color.
+- Flow charts (`Sankey`/`Chord`/`ArcDiagram`): bullets were misplaced when the series was added to a chart rather than used on its own, e.g. in a `SerialChartContainer`.
+- `ValueAxis`: with `syncZeros`, an axis whose data crossed zero was forced to start (or end) at zero when the axis it synced with did not go past zero itself, putting that data outside the axis where it was not drawn at all. Such an axis now keeps its own range - the zero lines cannot line up in that case, but nothing disappears. Give the synced-with axis room past zero (`extraMin`/`extraMax`) to line them up.
+
+
 ## [5.20.4] - 2026-09-02
 
 ### Added
