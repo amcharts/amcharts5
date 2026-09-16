@@ -535,9 +535,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 		const decCount = 10 - Math.floor(Math.log(value) * Math.LOG10E);
 		// $math.round computes Math.pow(10, decCount), which overflows to
-		// Infinity for extremely small values (reachable via the 1e-50 seed
-		// in _prepareAxisItems) and would turn the value into NaN. Such
-		// values are off scale anyway, so leave them as is.
+		// Infinity for extremely small values and would turn the value into
+		// NaN. Such values are off scale anyway, so leave them as is.
 		if (decCount > 280) {
 			return value;
 		}
@@ -586,9 +585,15 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			const selectionMin = this.getPrivate("selectionMin")!;
 			const selectionMax = this.getPrivate("selectionMax")! + step;
 
+			const gridCount = this.get("renderer").gridCount();
+
 			let value = selectionMin - step;
 			let differencePower = 1;
 			let minLog: number = min;
+
+			// decades one major grid line jumps, and the power the grid starts at
+			let logPowerStep = 1;
+			let logStartPower = 0;
 
 			if (logarithmic) {
 				value = this._minLogAdjusted;
@@ -621,7 +626,13 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				differencePower = Math.log(selectionMax - step) * Math.LOG10E - Math.log(minLog) * Math.LOG10E;
 
 				if (differencePower > 2) {
-					value = Math.pow(10, Math.log(minLog) * Math.LOG10E - 50);
+					// Capped at the range itself, or a stride wider than the range
+					// would step right over it and leave no grid at all.
+					logPowerStep = Math.max(1, Math.min(Math.ceil(differencePower / Math.max(1, gridCount)), Math.floor(differencePower)));
+					// Anchor the grid on round powers of ten - 1, 10, 100 - rather
+					// than on the axis minimum, which gave labels like 3.01, 30.1, 301.
+					logStartPower = Math.floor(Math.log(minLog) * Math.LOG10E / logPowerStep) * logPowerStep;
+					value = Math.pow(10, logStartPower);
 				}
 			}
 
@@ -650,8 +661,6 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			let i = 0;
 			let m = 0;
 			let previous = -Infinity;
-
-			const gridCount = this.get("renderer").gridCount();
 
 			while (value < selectionMax) {
 				let dataItem: DataItem<this["_dataItemSettings"]>;
@@ -682,13 +691,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 				else {
 					if (differencePower > 2) {
-						const targetGridCount = Math.max(1, gridCount);
-						// how many log "powers" (decades) one major grid line should jump
-						const x = Math.max(1, Math.ceil(differencePower / targetGridCount));
-
-						// use stepped exponent so total major items stays around gridCount
-						const exponent = Math.log(minLog) * Math.LOG10E + (i + 1) * x - 50;
-						nextValue = Math.pow(10, exponent);
+						nextValue = Math.pow(10, logStartPower + (i + 1) * logPowerStep);
 					}
 					else {
 						nextValue += step;

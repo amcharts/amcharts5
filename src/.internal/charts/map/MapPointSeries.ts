@@ -143,6 +143,41 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	fixedField?: string;
 
 	/**
+	 * A field in data that holds an ID of a [[MapLine]] the point is attached to.
+	 *
+	 * @default "lineId"
+	 * @since 5.20.6
+	 */
+	lineIdField?: string;
+
+	/**
+	 * A field in data that holds a relative position (0-1) of the point on the
+	 * line it is attached to.
+	 *
+	 * @default "positionOnLine"
+	 * @since 5.20.6
+	 */
+	positionOnLineField?: string;
+
+	/**
+	 * A field in data that holds whether the point rotates to face the direction
+	 * of the line it is attached to.
+	 *
+	 * @default "autoRotate"
+	 * @since 5.20.6
+	 */
+	autoRotateField?: string;
+
+	/**
+	 * A field in data that holds an angle added to the automatically calculated
+	 * rotation.
+	 *
+	 * @default "autoRotateAngle"
+	 * @since 5.20.6
+	 */
+	autoRotateAngleField?: string;
+
+	/**
 	 * If set to `true`, bullets will resize when zooming the [[MapChart]].
 	 * 
 	 * @since 5.2.8
@@ -172,9 +207,13 @@ export class MapPointSeries extends MapSeries {
 	protected _lineChangedDp?: IDisposer;
 
 	protected _afterNew() {
-		this.fields.push("polygonId", "lineId", "longitude", "latitude", "fixed");
+		this.fields.push("polygonId", "lineId", "longitude", "latitude", "fixed", "positionOnLine", "autoRotate", "autoRotateAngle");
 		this._setRawDefault("longitudeField", "longitude");
 		this._setRawDefault("latitudeField", "latitude");
+		this._setRawDefault("lineIdField", "lineId");
+		this._setRawDefault("positionOnLineField", "positionOnLine");
+		this._setRawDefault("autoRotateField", "autoRotate");
+		this._setRawDefault("autoRotateAngleField", "autoRotateAngle");
 		super._afterNew();
 	}
 

@@ -282,9 +282,6 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 	protected _handleRangeChange() {
 		$array.each(this.series, (series) => {
-			let startCategory = this.dataItems[this.startIndex()].get("category")!;
-			let endCategory = this.dataItems[this.endIndex() - 1].get("category")!;
-
 			let baseAxis = series.get("baseAxis");
 			let xAxis = series.get("xAxis");
 			let yAxis = series.get("yAxis");
@@ -317,66 +314,44 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 				if (otherAxis instanceof ValueAxis) {
 
 					if (key || openKey) {
-						let startDataItem: DataItem<IXYSeriesDataItem> | undefined;
-						let endDataItem: DataItem<IXYSeriesDataItem> | undefined;
+						let firstIndex = this.startIndex();
+						let lastIndex = this.endIndex() - 1;
 
-						function findDataItem(
-							series: XYSeries,
-							categoryAxis: CategoryAxis<any>,
-							key: string | undefined,
-							openKey: string | undefined,
-							category: string,
-							direction: "previous" | "next"
-						): DataItem<IXYSeriesDataItem> | undefined {
-							let dataItem: DataItem<IXYSeriesDataItem> | undefined;
-							let idx = categoryAxis.categoryToIndex(category!);
+						let startIndex = -1;
+						let endIndex = 0;
 
-							while (!dataItem && idx >= 0 && idx < categoryAxis.dataItems.length) {
-								let searchCategory = categoryAxis.dataItems[idx].get("category");
-								if (direction == "previous") {
-									for (let i = series.dataItems.length - 1; i >= 0; i--) {
-										let item = series.dataItems[i];
-										if (key && item.get(key as any) === searchCategory) {
-											dataItem = item;
-											break;
-										}
-										if (openKey && item.get(openKey as any) === searchCategory) {
-											dataItem = item;
-											break;
-										}
-									}
-								} else {
-									for (let i = 0, len = series.dataItems.length; i < len; i++) {
-										let item = series.dataItems[i];
-										if (key && item.get(key as any) === searchCategory) {
-											dataItem = item;
-											break;
-										}
-										if (openKey && item.get(openKey as any) === searchCategory) {
-											dataItem = item;
-											break;
-										}
-									}
-								}
-								if (!dataItem) {
-									idx += direction === "previous" ? -1 : 1;
+						// Series data is not necessarily in the same order as axis
+						// categories, and a category can hold more than one item, so
+						// find the outermost items that touch the selected categories
+						// instead of relying on the order.
+						for (let i = 0, len = series.dataItems.length; i < len; i++) {
+							let dataItem = series.dataItems[i];
+
+							let low = NaN;
+							let high = NaN;
+
+							if (key) {
+								low = high = this.categoryToIndex(dataItem.get(key as any));
+							}
+
+							if (openKey) {
+								let openIndex = this.categoryToIndex(dataItem.get(openKey as any));
+								if ($type.isNumber(openIndex)) {
+									low = $type.isNumber(low) ? Math.min(low, openIndex) : openIndex;
+									high = $type.isNumber(high) ? Math.max(high, openIndex) : openIndex;
 								}
 							}
-							return dataItem;
+
+							if ($type.isNumber(low) && low <= lastIndex && high >= firstIndex) {
+								if (startIndex == -1) {
+									startIndex = i;
+								}
+								endIndex = i + 1;
+							}
 						}
 
-						startDataItem = findDataItem(series, this, key, openKey, startCategory, "next");
-						endDataItem = findDataItem(series, this, key, openKey, endCategory, "previous");
-
-						let startIndex = 0;
-						let endIndex = series.dataItems.length;
-
-						if (startDataItem) {
-							startIndex = series.dataItems.indexOf(startDataItem);
-						}
-
-						if (endDataItem) {
-							endIndex = series.dataItems.indexOf(endDataItem) + 1;
+						if (startIndex == -1) {
+							startIndex = 0;
 						}
 
 						series.setPrivate("startIndex", startIndex);

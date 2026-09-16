@@ -233,7 +233,14 @@ export class Serializer extends Entity {
 					// draw time from a data item, and the sample sprite serialized
 					// here has none - running one throws. What was configured is
 					// the raw value anyway; the adapted one is not configuration.
-					const settingValue = (<any>source).getRaw(setting);
+					let settingValue = (<any>source).getRaw(setting);
+					// Only the tags that were given, not the ones the library added
+					if (setting === "themeTags") {
+						settingValue = source._getUserThemeTags();
+						if (!settingValue.length) {
+							return;
+						}
+					}
 					if (settingValue !== undefined) {
 						res.settings[setting] = this.serialize(settingValue, depth + 1, full || fullSettings.indexOf(setting) !== -1);
 						if (source instanceof Gradient && setting === "stops") {
@@ -251,7 +258,7 @@ export class Serializer extends Entity {
 			let settings: Array<string> = this._filterSettings($object.keys(source._settings));
 
 			settings = settings.filter((value) => {
-				return !source._computedSettings[value as never];
+				return value !== "themeTags" && !source._computedSettings[value as never];
 			});
 
 			if (settings.length) {
@@ -397,6 +404,14 @@ export class Serializer extends Entity {
 			}
 
 			delete serialized.type;
+
+			// The part already has its tags, and writing them would replace them
+			if (serialized.settings) {
+				delete serialized.settings.themeTags;
+				if (!Object.keys(serialized.settings).length) {
+					delete serialized.settings;
+				}
+			}
 
 			if (serialized.settings || serialized.properties || serialized.states || serialized.adapters) {
 				if (!res.properties) {

@@ -570,7 +570,8 @@ export class CanvasDisplayObject extends DisposerClass implements IDisplayObject
 
 			const resolution = this._renderer.resolution;
 
-			const layers = this._renderer.layers;
+			// Only layers being redrawn: state calls on idle canvases leak in Chrome 153
+			const layers = this._renderer._dirtyLayers;
 			const ghostLayer = this._renderer._ghostLayer;
 			const ghostContext = ghostLayer.context;
 
@@ -1700,7 +1701,7 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 	}
 
-	protected _prerender(status: IStatus, ignoreGhost = false, ignoreFontWeight = false): void {
+	protected _prerender(status: IStatus, ignoreGhost = false, ignoreFontWeight = false, ignoreLayer = false): void {
 		super._render(status);
 
 		const context = status.layer.context;
@@ -1711,34 +1712,37 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 		const style = this.style;
 		let fontStyle = this._getFontStyle(undefined, ignoreFontWeight);
 
-		context.font = fontStyle;
+		if (!ignoreLayer) {
+			context.font = fontStyle;
+
+			// Other parameters
+			if (style.fill) {
+				if (style.fill instanceof Color) {
+					context.fillStyle = style.fill.toCSS(style.fillOpacity != undefined ? style.fillOpacity : 1);
+				} else {
+					context.fillStyle = style.fill;
+				}
+			}
+
+			if (style.shadowColor) {
+				context.shadowColor = style.shadowColor.toCSS(style.shadowOpacity || 1);
+			}
+			if (style.shadowBlur) {
+				context.shadowBlur = style.shadowBlur;
+			}
+			if (style.shadowOffsetX) {
+				context.shadowOffsetX = style.shadowOffsetX;
+			}
+			if (style.shadowOffsetY) {
+				context.shadowOffsetY = style.shadowOffsetY;
+			}
+
+			this._shared(context);
+		}
+
 		if (this._isInteractive(status) && !ignoreGhost) {
 			ghostContext.font = fontStyle;
 		}
-
-		// Other parameters
-		if (style.fill) {
-			if (style.fill instanceof Color) {
-				context.fillStyle = style.fill.toCSS(style.fillOpacity != undefined ? style.fillOpacity : 1);
-			} else {
-				context.fillStyle = style.fill;
-			}
-		}
-
-		if (style.shadowColor) {
-			status.layer.context.shadowColor = style.shadowColor.toCSS(style.shadowOpacity || 1);
-		}
-		if (style.shadowBlur) {
-			status.layer.context.shadowBlur = style.shadowBlur;
-		}
-		if (style.shadowOffsetX) {
-			status.layer.context.shadowOffsetX = style.shadowOffsetX;
-		}
-		if (style.shadowOffsetY) {
-			status.layer.context.shadowOffsetY = style.shadowOffsetY;
-		}
-
-		this._shared(context);
 
 		if (this._isInteractive(status) && !ignoreGhost) {
 			ghostContext.fillStyle = this._getColorId();
@@ -1820,9 +1824,19 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 			const ghostOnly = this._ghostOnly(targetGhostLayer);
 			const drawGhost = this._drawGhost(status, targetGhostLayer);
 
-			context.save();
+			// Layer context is touched only when it is redrawn: state calls on idle canvases leak in Chrome 153
+			const drawLayer = layerDirty && !ghostOnly;
+
+			// Nothing to draw
+			if (!drawLayer && !(this.interactive && drawGhost)) {
+				return;
+			}
+
+			if (drawLayer) {
+				context.save();
+			}
 			ghostContext.save();
-			this._prerender(status);
+			this._prerender(status, false, false, !drawLayer);
 
 			// const lines = this.text.toString().replace(/\r/g, "").split(/\n/);
 			// const x = this._localBounds && (this._localBounds.left < 0) ? Math.abs(this._localBounds.left) : 0;
@@ -1833,33 +1847,30 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 					// Set style
 					if (chunk.style) {
-						context.save();
-						ghostContext.save();
-
-						if (!ghostOnly) {
+						if (drawLayer) {
+							context.save();
 							context.font = chunk.style;
 						}
 
+						ghostContext.save();
 						if (this._isInteractive(status)) {
 							ghostContext.font = chunk.style;
 						}
 					}
 
-					if (chunk.fill) {
+					if (chunk.fill && drawLayer) {
 						context.save();
-						if (!ghostOnly) {
-							context.fillStyle = chunk.fill.toCSS();
-						}
+						context.fillStyle = chunk.fill.toCSS();
 						// Color does not affect ghostContext so we not set it
 					}
 
 					// Draw text
-					if (layerDirty && !ghostOnly) {
+					if (drawLayer) {
 						context.fillText(chunk.text, chunk.offsetX, line.offsetY + chunk.offsetY);
 					}
 
 					// Draw underline
-					if (chunk.textDecoration == "underline" || chunk.textDecoration == "line-through") {
+					if (drawLayer && (chunk.textDecoration == "underline" || chunk.textDecoration == "line-through")) {
 
 						let thickness = 1;
 						let offset = 1;
@@ -1911,21 +1922,19 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 
 						y = crisp(y);
 
-						if (!ghostOnly) {
-							context.save();
-							context.beginPath();
-							if (chunk.fill) {
-								context.strokeStyle = chunk.fill.toCSS();
-							}
-							else if (this.style.fill && this.style.fill instanceof Color) {
-								context.strokeStyle = this.style.fill.toCSS();
-							}
-							context.lineWidth = thickness * offset;
-							context.moveTo(offsetX, y);
-							context.lineTo(offsetX + chunk.width, y);
-							context.stroke();
-							context.restore();
+						context.save();
+						context.beginPath();
+						if (chunk.fill) {
+							context.strokeStyle = chunk.fill.toCSS();
 						}
+						else if (this.style.fill && this.style.fill instanceof Color) {
+							context.strokeStyle = this.style.fill.toCSS();
+						}
+						context.lineWidth = thickness * offset;
+						context.moveTo(offsetX, y);
+						context.lineTo(offsetX + chunk.width, y);
+						context.stroke();
+						context.restore();
 					}
 
 					if (interactive && this.interactive && drawGhost) {
@@ -1935,21 +1944,25 @@ export class CanvasText extends CanvasDisplayObject implements IText {
 						ghostContext.fillText(chunk.text, chunk.offsetX, line.offsetY + chunk.offsetY);
 					}
 
-					if (chunk.fill) {
+					if (chunk.fill && drawLayer) {
 						context.restore();
 						// Color does not affect ghostContext so we not set it
 					}
 
 					// Reset style
 					if (chunk.style) {
-						context.restore();
+						if (drawLayer) {
+							context.restore();
+						}
 						ghostContext.restore();
 					}
 
 				});
 			});
 
-			context.restore();
+			if (drawLayer) {
+				context.restore();
+			}
 			ghostContext.restore();
 		}
 	}
@@ -2552,18 +2565,31 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 	public _renderCircular(status: IStatus, targetGhostLayer: number = 0): void {
 		if (this.textVisible) {
-			this._prerender(status);
-
 			const interactive = this._isInteractive(status);
 			const context = status.layer.context;
 			const layerDirty = status.layer.dirty;
 			const ghostContext = this._renderer._ghostLayer.context;
 
+			const ghostOnly = this._ghostOnly(targetGhostLayer);
+			const drawGhost = this._drawGhost(status, targetGhostLayer);
+
+			// Layer context is touched only when it is redrawn: state calls on idle canvases leak in Chrome 153
+			const drawLayer = layerDirty && !ghostOnly;
+
+			// Nothing to draw
+			if (!drawLayer && !drawGhost) {
+				return;
+			}
+
 			// Savepoint
-			context.save();
+			if (drawLayer) {
+				context.save();
+			}
 			if (interactive) {
 				ghostContext.save();
 			}
+
+			this._prerender(status, false, false, !drawLayer);
 
 			// We need measurements in order to properly position text for alignment
 			if (!this._textInfo) {
@@ -2581,9 +2607,6 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 			const kerning = this.kerning || 0;
 			let clockwise = align == "left" ? 1 : -1;
 			const shouldReverse = !this._textReversed;
-
-			const ghostOnly = this._ghostOnly(targetGhostLayer);
-			const drawGhost = this._drawGhost(status, targetGhostLayer);
 
 			// Check if we need to invert the whole stuff
 			if (inward == "auto") {
@@ -2659,16 +2682,12 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 				lineStartAngle += (Math.PI * (inward ? 0 : 1)); // Rotate 180 if outward
 
 				// Savepoint
-				context.save();
-				if (interactive) {
-					ghostContext.save();
-				}
-
-				// Assume starting angle
-				if (!ghostOnly) {
+				if (drawLayer) {
+					context.save();
 					context.rotate(lineStartAngle);
 				}
 				if (interactive) {
+					ghostContext.save();
 					ghostContext.rotate(lineStartAngle);
 				}
 
@@ -2681,7 +2700,7 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 					// Rotate half a letter
 					angleShift = (charWidth / 2) / (radius - textHeight) * clockwise;
-					if (!ghostOnly) {
+					if (drawLayer) {
 						context.rotate(angleShift);
 					}
 					if (interactive) {
@@ -2690,27 +2709,24 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 
 					// Set style
 					if (chunk.style) {
-						context.save();
-						ghostContext.save();
-
-						if (!ghostOnly) {
+						if (drawLayer) {
+							context.save();
 							context.font = chunk.style;
 						}
+						ghostContext.save();
 						if (interactive) {
 							ghostContext.font = chunk.style;
 						}
 					}
 
-					if (chunk.fill) {
+					if (chunk.fill && drawLayer) {
 						context.save();
-						if (!ghostOnly) {
-							context.fillStyle = chunk.fill.toCSS();
-						}
+						context.fillStyle = chunk.fill.toCSS();
 						// Color does not affect ghostContext so we not set it
 					}
 
 					// Center letters
-					if (!ghostOnly) {
+					if (drawLayer) {
 						context.textBaseline = "middle";
 						context.textAlign = "center";
 					}
@@ -2720,27 +2736,29 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 					}
 
 					// Plop the letter
-					if (layerDirty && !ghostOnly) {
+					if (drawLayer) {
 						context.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
 					}
 					if (interactive && drawGhost) {
 						ghostContext.fillText(char, 0, (inward ? 1 : -1) * (0 - radius + textHeight / 2));
 					}
 
-					if (chunk.fill) {
+					if (chunk.fill && drawLayer) {
 						context.restore();
 						// Color does not affect ghostContext so we not set it
 					}
 
 					// Reset style
 					if (chunk.style) {
-						context.restore();
+						if (drawLayer) {
+							context.restore();
+						}
 						ghostContext.restore();
 					}
 
 					// Rotate half a letter and add spacing
 					angleShift = (charWidth / 2 + kerning) / (radius - textHeight) * clockwise;
-					if (!ghostOnly) {
+					if (drawLayer) {
 						context.rotate(angleShift);
 					}
 					if (interactive) {
@@ -2750,7 +2768,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 				});
 
 				// Restore angle
-				context.restore();
+				if (drawLayer) {
+					context.restore();
+				}
 				if (interactive) {
 					ghostContext.restore();
 				}
@@ -2763,7 +2783,9 @@ export class CanvasRadialText extends CanvasText implements IRadialText {
 			});
 
 			// Restore
-			context.restore();
+			if (drawLayer) {
+				context.restore();
+			}
 			if (interactive) {
 				ghostContext.restore();
 			}
@@ -3590,24 +3612,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 		this._ghostLayer.context.restore();
 
-		//setTimeout(() => {
-
-		// Remove this after the Chrome bug is fixed:
-		// https://bugs.chromium.org/p/chromium/issues/detail?id=1279394
-		$array.each(this.layers, (layer) => {
-			if (layer) {
-				const context = layer.context;
-				context.beginPath();
-				context.moveTo(0, 0);
-				context.stroke();
-			}
-		});
-
 		$array.each(this._dirtyLayers, (layer) => {
 			layer.context.restore();
 			layer.dirty = false;
 		});
-		//}, 100)
 
 		if (this._hovering.size && this._lastPointerMoveEvent) {
 			const { events, target, native } = this._lastPointerMoveEvent;

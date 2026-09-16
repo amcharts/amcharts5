@@ -210,8 +210,23 @@ function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): voi
 	}
 }
 
+// Adds parsed tags to the ones an existing element already has, instead of replacing them
+function mergeThemeTags(entity: Entity, settings: any): void {
+	if (settings && $type.isArray(settings.themeTags)) {
+		entity._addUserThemeTags(settings.themeTags);
+		const tags = entity.get("themeTags", []).slice();
+		$array.each(settings.themeTags as Array<string>, (tag) => {
+			if (tags.indexOf(tag) === -1) {
+				tags.push(tag);
+			}
+		});
+		settings.themeTags = tags;
+	}
+}
+
 function mergeExisting<E extends Entity>(entity: E, parsed: IParsedEntity<E>): void {
 	if (parsed.settings) {
+		mergeThemeTags(entity, parsed.settings);
 		entity.setAll(parsed.settings);
 	}
 
@@ -222,6 +237,7 @@ function mergeExisting<E extends Entity>(entity: E, parsed: IParsedEntity<E>): v
 // TODO replace this with `__parseLogic: "merge"`
 function mergeExistingAxisRange<E extends Entity>(entity: E, parsed: IParsedEntity<E>): void {
 	if (parsed.settings) {
+		mergeThemeTags(entity, parsed.settings);
 		$object.each(parsed.settings, (key, value: any) => {
 			if (value instanceof Entity) {
 				const old = entity.get(key) as any;
@@ -564,6 +580,7 @@ class ParserState {
 	mergeExistingEntity<E extends Entity>(root: Root, entity: E, parsed: IParsedEntity<E>, refs: Array<IRef>): void {
 		if (parsed.settings) {
 			const rawSettings: any = (parsed.value as any).settings;
+			mergeThemeTags(entity, parsed.settings);
 
 			$object.each(parsed.settings, (key, value: any) => {
 				const existing = (entity as any).get(key);

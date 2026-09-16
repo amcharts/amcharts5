@@ -100,7 +100,6 @@ export class ChartSerializer extends Serializer {
 		//this._setSoft("includeProperties", ["label"]);
 		this._setSoft("excludeSettings", [
 			"chart",
-			"themeTags",
 			"draw",
 			"curveFactory",
 			"tooltipDataItem",

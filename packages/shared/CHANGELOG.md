@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.6] - 2026-09-16
+
+### Added
+- `MapPointSeries`: `positionOnLine`, `autoRotate` and `autoRotateAngle` can now be set in data, so points placed on lines no longer need to be added as data items. `lineId` in data now works without setting `lineIdField`.
+
+### Fixed
+- `CategoryAxis`: when a series' data was not in the same order as the axis categories, some of its items were not drawn at all. Most visible on Gantt-like column charts, where several items share a category and the data is ordered by date.
+- `ValueAxis`: a logarithmic axis with a wide range labelled its grid with the axis minimum multiplied by ten each step, e.g. 3.01, 30.1, 301. It now uses round powers of ten.
+- `ChartSerializer`: `themeTags` given to an element were not serialized, so anything styled through them, like a switch button, lost that styling when the config was parsed again. Tags the library adds itself are still left out.
+- Charts with a looping animation, like a pulsing bullet, used ever more memory in Chrome 153 until the tab crashed.
+- Underlined text on a layer that was not being redrawn got darker over time.
+
+
 ## [5.20.5] - 2026-09-03
 
 ### Fixed

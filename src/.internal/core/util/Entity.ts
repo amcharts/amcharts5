@@ -386,6 +386,9 @@ interface IStartAnimation {
  */
 let counter = 0;
 
+// How many elements are being built right now
+let constructing = 0;
+
 /**
  * Base class for [[Entity]] objects that support Settings.
  *
@@ -1239,6 +1242,13 @@ export class Entity extends Settings implements IDisposer {
 	protected _disposerProperties: { [Key in keyof this["_settings"]]?: Array<IDisposer> } = {};
 
 	/**
+	 * Tags given to the element, as opposed to ones the library added.
+	 *
+	 * @ignore
+	 */
+	public _userThemeTags: Array<string> | undefined;
+
+	/**
 	 * IMPORTANT! Do not instantiate this class via `new Class()` syntax.
 	 *
 	 * Use static method `Class.new()` instead.
@@ -1269,16 +1279,29 @@ export class Entity extends Settings implements IDisposer {
 	 * @return            Instantiated object
 	 */
 	static new<C extends typeof Entity, T extends InstanceType<C>>(this: C, root: Root, settings: T["_settings"], template?: Template<T>): T {
-		const x = (new this(root, settings, true)) as T;
-		x._template = template;
-		x._afterNew();
-		return x;
+		// Tags on an element made while another one is being built are the library's
+		const userTags = constructing === 0 && settings.themeTags ? settings.themeTags.slice() : undefined;
+		constructing++;
+		try {
+			const x = (new this(root, settings, true)) as T;
+			x._userThemeTags = userTags;
+			x._template = template;
+			x._afterNew();
+			return x;
+		} finally {
+			constructing--;
+		}
 	}
 
 	static _new<C extends typeof Entity, T extends InstanceType<C>>(this: C, root: Root, settings: T["_settings"], templates: Array<Template<T>> = []): T {
-		const x = (new this(root, settings, true, templates)) as T;
-		x._afterNew();
-		return x;
+		constructing++;
+		try {
+			const x = (new this(root, settings, true, templates)) as T;
+			x._afterNew();
+			return x;
+		} finally {
+			constructing--;
+		}
 	}
 
 	protected _afterNew() {
@@ -2100,6 +2123,33 @@ export class Entity extends Settings implements IDisposer {
 			tags.push(tag);
 			this.set("themeTags", tags);
 		}
+	}
+
+	/**
+	 * Tags given to the element that are still set.
+	 *
+	 * @ignore
+	 */
+	public _getUserThemeTags(): Array<string> {
+		const userTags = this._userThemeTags;
+		if (!userTags) {
+			return [];
+		}
+		const tags = (<any>this).get("themeTags", []);
+		return userTags.filter((tag) => tags.indexOf(tag) !== -1);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _addUserThemeTags(tags: Array<string>): void {
+		const userTags = this._userThemeTags || [];
+		$array.each(tags, (tag) => {
+			if (userTags.indexOf(tag) === -1) {
+				userTags.push(tag);
+			}
+		});
+		this._userThemeTags = userTags;
 	}
 
 	/**
