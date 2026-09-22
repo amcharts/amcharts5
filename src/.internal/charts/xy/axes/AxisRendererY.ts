@@ -181,11 +181,16 @@ export class AxisRendererY extends AxisRenderer {
 			let height = axis.get("marginTop", 0);
 
 			if (axisHeader.children.length > 0) {
+				// The height set while the header was empty would keep it at zero, so
+				// the axis never makes room for what was put there later
+				if (axisHeader.isComputedSetting("height")) {
+					axisHeader.remove("height");
+				}
 				height = axis.axisHeader.height();
-				axis.set("marginTop", height + 1);
+				axis._setC("marginTop", height + 1);
 			}
 			else {
-				axisHeader.set("height", height);
+				axisHeader._setC("height", height);
 			}
 			axisHeader.setAll({ y: axis.y() - height, x: -1, width: plotContainer.width() + 2 });
 		}

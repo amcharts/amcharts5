@@ -408,6 +408,13 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 		this.setPrivate("updateScrollbar", true);
 
+		// What the header holds decides how much room the axis leaves for it, and
+		// that is worked out while the axis updates - so something put there later
+		// has to bring the axis round again
+		this._disposers.push(this.axisHeader.children.events.onAll(() => {
+			this.markDirty();
+		}));
+
 		this._disposers.push(this.axisRanges.events.onAll((change) => {
 			if (change.type === "clear") {
 				$array.each(change.oldValues, (dataItem) => {

@@ -9,6 +9,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Changed
 - Renamed Nauru to Naoero in world maps and related data.
+- Fixed map of North Korea.
 
 
 ## [5.1.6] - 2026-07-27

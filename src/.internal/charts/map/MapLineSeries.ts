@@ -248,6 +248,7 @@ export class MapLineSeries extends MapSeries {
 	public makeMapLine(dataItem: DataItem<this["_dataItemSettings"]>): MapLine {
 		const mapLine = this.children.push(this.mapLines.make());
 		mapLine._setDataItem(dataItem);
+		this._linkSprite(mapLine, dataItem);
 		this.mapLines.push(mapLine);
 		return mapLine;
 	}

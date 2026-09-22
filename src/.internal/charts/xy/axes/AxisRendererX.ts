@@ -216,11 +216,16 @@ export class AxisRendererX extends AxisRenderer {
 			}
 
 			if (axisHeader.children.length > 0) {
+				// The width set while the header was empty would keep it at zero, so
+				// the axis never makes room for what was put there later
+				if (axisHeader.isComputedSetting("width")) {
+					axisHeader.remove("width");
+				}
 				width = axis.axisHeader.width();
-				axis.set("marginLeft", width + 1);
+				axis._setC("marginLeft", width + 1);
 			}
 			else {
-				axisHeader.set("width", width);
+				axisHeader._setC("width", width);
 			}
 			axisHeader.setAll({ x: x, y: -1, height: plotContainer.height() + 2 });
 		}

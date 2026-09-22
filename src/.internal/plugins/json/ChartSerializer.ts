@@ -1099,7 +1099,7 @@ export class ChartSerializer extends Serializer {
 			// geometry off the user data that duplicates a GeoJSON feature.
 			const idField = series.get("idField", "id");
 			const geoJSON = series.get("geoJSON");
-			const geoJSONIds: { [index: string]: boolean } = {};
+			const geoJSONIds: { [index: string]: any } = {};
 			if (geoJSON) {
 				let features: any[] = [];
 				if (geoJSON.type == "FeatureCollection") {
@@ -1111,7 +1111,7 @@ export class ChartSerializer extends Serializer {
 				$array.each(features, (feature: any) => {
 					const id = feature[idField];
 					if (id != null) {
-						geoJSONIds[id] = true;
+						geoJSONIds[id] = feature.properties || {};
 					}
 				});
 			}
@@ -1123,8 +1123,21 @@ export class ChartSerializer extends Serializer {
 				if (id != null && geoJSONIds[id]) {
 					delete item.geometry;
 					delete item.geometryType;
+					// Feature properties (`name`, ...) are copied onto the row on
+					// load, so one still equal to the feature's is not the user's
+					$object.each(geoJSONIds[id], (key, value) => {
+						if (key !== idField && item[key] === value) {
+							delete item[key];
+						}
+					});
 				}
 			});
+			// what is left of a row that only restated its feature is its id
+			if (geoJSON) {
+				$array.keepIf(serializedData, (item: any) => {
+					return item[idField] == null || !geoJSONIds[item[idField]] || $object.keys(item).some((key) => key !== idField && key !== "__parse");
+				});
+			}
 			if (serializedData.length === 0) {
 				delete serializedSeries.properties.data;
 			}

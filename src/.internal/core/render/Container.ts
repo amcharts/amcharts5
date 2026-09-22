@@ -808,6 +808,10 @@ export class Container extends Sprite {
 			if (background instanceof Sprite) {
 				background._setC("isMeasured", false);
 				background._setParent(this);
+				// reads the container's data item, so a per-item background works
+				if (background.get("templateField")) {
+					background._processTemplateField();
+				}
 				this._display.addChildAt(background._display, 0);
 				// Rectangle / RoundedRectangle backgrounds render sharper edges and
 				// strokes when crisp; default it on unless the user set it explicitly.
@@ -901,6 +905,10 @@ export class Container extends Sprite {
 	public _setDataItem(dataItem?: DataItem<IComponentDataItem>): void {
 		const updated = (dataItem !== this._dataItem);
 		super._setDataItem(dataItem);
+		const background = this.get("background");
+		if (background && background.get("templateField")) {
+			background._processTemplateField();
+		}
 		const html = this.get("html", "");
 		if (html && html !== "" && updated) {
 			this._root._setHTMLContent(this, populateString(this, html));

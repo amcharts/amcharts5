@@ -217,6 +217,12 @@ export class CSVParser {
 				break;
 			}
 
+			// A match of no length leaves the expression where it was, so the loop
+			// would never end - empty input is what hits this
+			if (arrMatches[0].length === 0) {
+				break;
+			}
+
 			// Get the delimiter that was found.
 			let strMatchedDelimiter = arrMatches[1];
 

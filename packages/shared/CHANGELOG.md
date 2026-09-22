@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.7] - 2026-09-22
+
+### Added
+- `Series`: data items can link somewhere. Set `urlField` to a data field holding a URL, and clicking the item's bullet, column, slice, map polygon or map line opens it; `linkTarget` sets where (`"_self"` by default, like a plain link). Script urls (`javascript:`, `data:`, `vbscript:`) are not opened. A url added to an item later (e.g. `data.setIndex()`) links too.
+
+### Fixed
+- `ChartSerializer`: map data rows no longer carry the geodata's own feature properties (`name`, and on some maps `CNTRY`, `TYPE`) - the map copies them onto each row when it loads, so they were written out as if configured. A row left with nothing but its id is dropped.
+- `Container`: a `background` with its own `templateField` never read the data item, so a label's background could not be set per data item (e.g. per bullet). It now reads its container's data item.
+- `CSVParser`: parsing an empty string looped until it ran out of memory and threw "Invalid array length", instead of returning no rows. An empty response from a server was enough to hit it.
+- `JsonParser`: a config where one reference pointed at another further down the list - a legend in an axis header naming a series, as on the candlestick chart demo - failed to parse with "Could not find ref". Such a value is now resolved after the rest of the config.
+- `Axis`: something put into an `axisHeader` after the chart was built - a legend, say - did not make the axis leave room for it, so it covered the axis instead of pushing it down. The header's size is no longer held at what it measured while empty, and the axis is brought round when its header's contents change.
+
+
+
 ## [5.20.6] - 2026-09-16
 
 ### Added

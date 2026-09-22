@@ -58,6 +58,7 @@ export class MapPolygonSeries extends MapSeries {
 	public makeMapPolygon(dataItem: DataItem<this["_dataItemSettings"]>): MapPolygon {
 		const mapPolygon = this.children.push(this.mapPolygons.make());
 		mapPolygon._setDataItem(dataItem);
+		this._linkSprite(mapPolygon, dataItem);
 		this.mapPolygons.push(mapPolygon);
 		return mapPolygon;
 	}

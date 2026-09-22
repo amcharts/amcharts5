@@ -481,6 +481,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 			graphics = this._makeGraphics(this.columns, dataItem);
 			dataItem.set("graphics", graphics);
 			graphics._setDataItem(dataItem);
+			this._linkSprite(graphics, dataItem);
 
 			// `_colorColumns` runs earlier in the same pass, so the color is already
 			// on the data item - the column just did not exist yet to take it

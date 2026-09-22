@@ -63,7 +63,16 @@ function usesSelfRef(value: any): boolean {
 }
 
 
-function lookupRef(refs: Array<IRef>, name: string): any {
+// A ref that is not there yet. Refs are parsed in order, and one of them can
+// point at another further down the list - an axis whose header holds a legend
+// listing a series, say - so the value is resolved again once everything exists.
+export class MissingRefError extends Error {
+	constructor(public refName: string) {
+		super("Could not find ref " + refName);
+	}
+}
+
+function lookupRef(refs: Array<IRef>, name: string, fallback?: Array<IRef>): any {
 	let i = refs.length;
 
 	while (i--) {
@@ -74,7 +83,19 @@ function lookupRef(refs: Array<IRef>, name: string): any {
 		}
 	}
 
-	throw new Error("Could not find ref " + name);
+	if (fallback) {
+		let j = fallback.length;
+
+		while (j--) {
+			const sub = fallback[j];
+
+			if (name in sub) {
+				return sub[name];
+			}
+		}
+	}
+
+	throw new MissingRefError(name);
 }
 
 
@@ -126,7 +147,7 @@ const GEODATA_PREFIX = "am5geodata_";
 const LOCALE_PREFIX = "am5locales_";
 
 
-function parseRef<E extends Entity>(value: string, refs: Array<IRef>): IParsed<E> {
+function parseRef<E extends Entity>(value: string, refs: Array<IRef>, fallback?: Array<IRef>): IParsed<E> {
 	if (value[0] === "#" || value[0] === "@") {
 		if (value[1] === value[0]) {
 			// "##foo" or "@@foo" gets escaped into the literal strings "#foo" or "@foo"
@@ -138,7 +159,7 @@ function parseRef<E extends Entity>(value: string, refs: Array<IRef>): IParsed<E
 		} else {
 			const path = value.split(/\./g);
 
-			let object = lookupRef(refs, path[0]);
+			let object = lookupRef(refs, path[0], fallback);
 
 			for (let i = 1; i < path.length; ++i) {
 				const subpath = path[i];
@@ -276,6 +297,8 @@ class ParserState {
 	protected _caching: { [key: string]: Promise<void> } = {};
 	protected _cache: { [key: string]: typeof Entity } = {};
 	protected _delayed: Array<() => void> = [];
+	// Every ref parsed so far, so a value resolved later sees the whole config
+	protected _globalRefs: Array<IRef> = [];
 	protected _updateTargets: "strict" | "soft";
 
 	constructor(updateTargets: "strict" | "soft" = "strict") {
@@ -451,11 +474,21 @@ class ParserState {
 		return this.parse(root, value, refs);
 	}
 
-	parseSettings<E extends Entity>(root: Root, object: object, refs: Array<IRef>): E["_settings"] {
+	parseSettings<E extends Entity>(root: Root, object: object, refs: Array<IRef>, pending?: { [key: string]: any }): E["_settings"] {
 		const settings: { [key: string]: any } = {};
 
 		$array.each($object.keys(object), (key) => {
-			settings[key] = this.parseSetting(root, key, object[key], refs);
+			try {
+				settings[key] = this.parseSetting(root, key, object[key], refs);
+			} catch (e) {
+				// A ref further down the config: hold the raw value and set it once
+				// everything is parsed
+				if (pending && e instanceof MissingRefError) {
+					pending[key] = object[key];
+				} else {
+					throw e;
+				}
+			}
 		});
 
 		return settings;
@@ -544,6 +577,18 @@ class ParserState {
 					}
 				};
 
+				const runOrDefer = () => {
+					try {
+						run();
+					} catch (e) {
+						if (e instanceof MissingRefError) {
+							this._delayed.push(run);
+						} else {
+							throw e;
+						}
+					}
+				};
+
 				if (key === "data") {
 					this._delayed.push(run);
 
@@ -567,7 +612,7 @@ class ParserState {
 					});
 
 				} else {
-					run();
+					runOrDefer();
 				}
 			};
 		});
@@ -713,11 +758,15 @@ class ParserState {
 			const length = object.length;
 
 			for (let i = 0; i < length; ++i) {
-				refs = refs.concat([this.parseRefsObject(root, object[i] as any, refs)]);
+				const parsed = this.parseRefsObject(root, object[i] as any, refs);
+				this._globalRefs.push(parsed);
+				refs = refs.concat([parsed]);
 			}
 
 		} else {
-			refs = refs.concat([this.parseRefsObject(root, object, refs)]);
+			const parsed = this.parseRefsObject(root, object, refs);
+			this._globalRefs.push(parsed);
+			refs = refs.concat([parsed]);
 		}
 
 		return refs;
@@ -780,7 +829,9 @@ class ParserState {
 			}
 		}
 
-		const settings = (settingsRaw ? this.parseSettings(root, settingsRaw, refs) : undefined);
+		const pendingSettings: { [key: string]: any } = {};
+		const settings = (settingsRaw ? this.parseSettings(root, settingsRaw, refs, pendingSettings) : undefined);
+		const hasPendingSettings = $object.keys(pendingSettings).length > 0;
 		const properties = (value.properties ? this.parseProperties(root, value.properties, refs) : undefined);
 		const children = (value.children ? this.parseChildren(root, value.children, refs) : undefined);
 		const states = (value.states ? $array.map(value.states, (value: any) => this.parseState(root, value, refs)) : undefined);
@@ -789,6 +840,19 @@ class ParserState {
 		const index = (value.index == null ? undefined : value.index);
 
 		let allProperties = properties;
+
+		if (hasPendingSettings) {
+			const deferredRefs = (entity: object) => {
+				this._delayed.push(() => {
+					$array.each($object.keys(pendingSettings), (key) => {
+						const parsed = this.parseValue(root, pendingSettings[key], refs);
+						(entity as any).set(key, parsed.isValue ? parsed.value : constructEntity(root, parsed));
+					});
+				});
+			};
+			allProperties = allProperties ? allProperties.concat([deferredRefs]) : [deferredRefs];
+		}
+
 		if (hasSelfSettings) {
 			const deferredProp = (entity: object) => {
 				this._delayed.push(() => {
@@ -919,7 +983,7 @@ class ParserState {
 			}
 
 		} else if ($type.isString(value)) {
-			return parseRef(value, refs);
+			return parseRef(value, refs, this._globalRefs);
 
 		} else {
 			return {

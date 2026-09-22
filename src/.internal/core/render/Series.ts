@@ -89,6 +89,13 @@ export interface IHeatRule {
 
 export interface ISeriesDataItem extends IComponentDataItem {
 	id?: string;
+
+	/**
+	 * A URL to open when the data item's element is clicked.
+	 *
+	 * @since 5.20.7
+	 */
+	url?: string;
 	value?: number;
 	valueWorking?:number;
 	valueChange?: number;
@@ -121,6 +128,26 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * A key to look up in data for an id of the data item.
 	 */
 	idField?: string;
+
+	/**
+	 * A key to look up in data for a URL to open when the data item's element
+	 * (a bullet, column, slice, map polygon or map line) is clicked.
+	 *
+	 * Links are off until this is set.
+	 *
+	 * @since 5.20.7
+	 */
+	urlField?: string;
+
+	/**
+	 * Where a data item's URL opens: `"_self"` for the same window, `"_blank"`
+	 * for a new tab, or a named window / frame. A chart embedded in an iframe
+	 * usually wants `"_blank"` or `"_top"`.
+	 *
+	 * @default "_self"
+	 * @since 5.20.7
+	 */
+	linkTarget?: string;
 
 	/**
 	 * A key to look up in data for a numeric value of the data item.
@@ -310,6 +337,7 @@ export abstract class Series extends Component {
 
 	protected _afterNew() {
 		this.valueFields.push("value", "customValue");
+		this.fields.push("url");
 
 		super._afterNew();
 
@@ -391,11 +419,59 @@ export abstract class Series extends Component {
 			sprite.setRaw("position", "absolute");
 
 			this._applyBulletDefaultPaint(sprite, dataItem);
+			this._linkSprite(sprite, dataItem);
 
 			this._getBulletContainer(dataItem).children.push(sprite);
 		}
 		bullet.series = this;
 		dataItem.bullets!.push(bullet);
+	}
+
+	/**
+	 * Makes an element open its data item's URL when clicked.
+	 *
+	 * @ignore
+	 */
+	public _linkSprite(sprite: Sprite, dataItem: DataItem<this["_dataItemSettings"]>) {
+		// the url can come or go later (setIndex, urlField set), so the click and pointer follow it
+		let clicking = false;
+		const sync = (url: string | undefined) => {
+			if (url && !clicking) {
+				clicking = true;
+				sprite.events.on("click", () => {
+					this.openUrl(dataItem);
+				});
+			}
+			// a cursor someone chose stays; only the library's own pointer follows the url
+			if (sprite.isUserSetting("cursorOverStyle") && !sprite.isComputedSetting("cursorOverStyle")) {
+				return;
+			}
+			if (url) {
+				sprite._setC("cursorOverStyle", "pointer");
+			}
+			else if (sprite.get("cursorOverStyle") == "pointer") {
+				sprite.remove("cursorOverStyle");
+			}
+		};
+		sync(dataItem.get("url"));
+		sprite.addDisposer(dataItem.on("url", (url) => sync(url)));
+	}
+
+	/**
+	 * Opens a data item's URL in the window set by `linkTarget`.
+	 *
+	 * Override to intercept links, e.g. in an editor.
+	 *
+	 * @param  dataItem  Data item
+	 * @since 5.20.7
+	 */
+	public openUrl(dataItem: DataItem<this["_dataItemSettings"]>) {
+		const url = dataItem.get("url");
+		// a script url would run code in the chart's page, not go anywhere
+		if (url && !/^(javascript|data|vbscript):/i.test(String(url).replace(/[\s\x00-\x1f]/g, ""))) {
+			const target = this.get("linkTarget", "_self");
+			window.open(url, target, target == "_blank" ? "noopener" : undefined);
+		}
 	}
 
 	/**
@@ -467,6 +543,16 @@ export abstract class Series extends Component {
 
 		let startIndex = this.startIndex();
 		let endIndex = this.endIndex();
+
+		// links switched on, off or moved to another field after the items exist
+		if (this.isDirty("urlField")) {
+			this._updateFields();
+			const urlField = this.get("urlField");
+			$array.each(dataItems, (dataItem) => {
+				const context: any = dataItem.dataContext;
+				dataItem.set("url", urlField && context ? context[urlField] : undefined);
+			});
+		}
 
 		if(this.isDirty("name")){
 			this.updateLegendValue();

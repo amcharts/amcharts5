@@ -187,6 +187,7 @@ export class Venn extends Series {
 		})
 
 		slice._setDataItem(dataItem);
+		this._linkSprite(slice, dataItem);
 		dataItem.set("slice", slice);
 		this.slices.push(slice);
 
