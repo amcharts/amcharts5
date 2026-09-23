@@ -5,6 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.20.8] - 2026-09-23
+
+### Added
+- New `animations` setting on every element: animations described as data, so they can be set in a JSON config and are saved with it. Each entry animates a setting (`key`, `from`, `to`, `duration`, `delay`, `loops` - `0` for ever - `yoyo`, and `easing` by name), or with `target: "dataItem"` a value of the element's data item, e.g. a map point's `positionOnLine` to fly it along its line. A saved chart keeps the configured values, not ones caught mid-animation.
+- `ChartSerializer`: an animation started in code that loops forever (`loops: Infinity`) is saved as an `animations` entry. Set `runningAnimations: false` to turn serializing looped animations off.
+- `ease`: easing functions carry their name (`easingInfo()`), including ones made with `out()`, `inOut()` and `yoyo()`; `byName()` returns one by name.
+
+### Changed
+- `MapPointSeries`: an auto-rotating point faces the way it is travelling while its `positionOnLine` animates, so it turns round on the way back.
+
+
 ## [5.20.7] - 2026-09-22
 
 ### Added

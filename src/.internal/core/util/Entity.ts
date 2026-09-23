@@ -178,6 +178,99 @@ export interface IEntitySettings {
 	 */
 	userData?: any;
 
+	/**
+	 * Animations the element plays on its own, described as data - so they can
+	 * be set from a JSON config and saved with it.
+	 *
+	 * Each one animates a setting of the element (or, with `target: "dataItem"`,
+	 * a value of its data item - a map point's `positionOnLine`, say). They start
+	 * when the setting is applied, restart when it changes, and stop when the
+	 * element is disposed. A saved config keeps what was configured, never a
+	 * value caught half way through an animation.
+	 *
+	 * ```TypeScript
+	 * sprite.set("animations", [
+	 *   { key: "rotation", to: 360, duration: 4000, loops: 0 },
+	 *   { key: "scale", from: 1, to: 1.3, duration: 800, loops: 0, yoyo: true, easing: "sine" }
+	 * ]);
+	 * ```
+	 *
+	 * @since 5.21.0
+	 */
+	animations?: Array<IDeclaredAnimation>;
+
+}
+
+/**
+ * An animation described as data, for the `animations` setting.
+ *
+ * @since 5.21.0
+ */
+export interface IDeclaredAnimation {
+
+	/**
+	 * Setting (or data item value, with `target: "dataItem"`) to animate.
+	 */
+	key: string;
+
+	/**
+	 * Value to start from. Defaults to the current value.
+	 */
+	from?: any;
+
+	/**
+	 * Value to animate to.
+	 */
+	to: any;
+
+	/**
+	 * Duration in milliseconds. With `yoyo`, one way.
+	 */
+	duration: number;
+
+	/**
+	 * Milliseconds to wait before starting.
+	 *
+	 * @default 0
+	 */
+	delay?: number;
+
+	/**
+	 * How many times to play it; `0` plays it forever.
+	 *
+	 * @default 1
+	 */
+	loops?: number;
+
+	/**
+	 * Go back to `from` after reaching `to`, rather than jumping back.
+	 *
+	 * @default false
+	 */
+	yoyo?: boolean;
+
+	/**
+	 * Easing by name: `"linear"`, `"quad"`, `"cubic"`, `"exp"`, `"sine"`,
+	 * `"circle"`, `"bounce"` or `"elastic"`.
+	 *
+	 * @default "linear"
+	 */
+	easing?: string;
+
+	/**
+	 * Which way the easing applies.
+	 *
+	 * @default "in"
+	 */
+	ease?: "in" | "out" | "inOut";
+
+	/**
+	 * `"self"` animates a setting of the element; `"dataItem"` a value of the
+	 * element's data item.
+	 *
+	 * @default "self"
+	 */
+	target?: "self" | "dataItem";
 }
 
 export interface IEntityPrivate {
@@ -271,6 +364,29 @@ export class Animation<Value> {
 
 	public get to() {
 		return this._to;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public get duration(): number {
+		return this._duration;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public get easing(): $ease.Easing {
+		return this._easing;
+	}
+
+	/**
+	 * Plays left, `Infinity` for one that loops for ever.
+	 *
+	 * @ignore
+	 */
+	public get loops(): number {
+		return this._loops;
 	}
 
 	public get from() {
@@ -428,6 +544,19 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	// (`_setDefault` and friends) are flagged here alone, since they never
 	// counted as user properties in the first place.
 	protected _computedProperties: Dirty<this["_settings"]> = {};
+
+	/**
+	 * What a setting held before an `animations` entry took it over, and where
+	 * that came from - what a saved config writes, rather than a value caught
+	 * mid-animation. Put back when the animation is removed.
+	 *
+	 * @ignore
+	 */
+	public _animationBases: { [key: string]: { value: any, user: boolean, computed: boolean } } = {};
+
+	// Above zero while an animation is writing a value, so that write is not
+	// mistaken for someone setting it.
+	protected _animationWriting: number = 0;
 
 	/**
 	 * If this is set to `false` then disposing does nothing, it's a no-op.
@@ -1098,7 +1227,12 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	protected _setAnimated<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		const authored = this._userProperties[key] && !this._computedProperties[key];
 
-		this.set(key, value as any);
+		this._animationWriting++;
+		try {
+			this.set(key, value as any);
+		} finally {
+			this._animationWriting--;
+		}
 
 		if (!authored) {
 			this._computedProperties[key] = true;
@@ -1556,6 +1690,10 @@ export class Entity extends Settings implements IDisposer {
 	public set<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value): Value {
 		this._userProperties[key] = true;
 		delete this._computedProperties[key];
+		// Set outright: that is what was configured now, not what the animation replaced
+		if (!this._animationWriting) {
+			delete this._animationBases[key as string];
+		}
 		return super.set(key, value);
 	}
 
@@ -1648,6 +1786,9 @@ export class Entity extends Settings implements IDisposer {
 	public setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, value: Value) {
 		this._userProperties[key] = true;
 		delete this._computedProperties[key];
+		if (!this._animationWriting) {
+			delete this._animationBases[key as string];
+		}
 		super.setRaw(key, value);
 	}
 
@@ -2002,7 +2143,95 @@ export class Entity extends Settings implements IDisposer {
 
 	public _changed(): void { }
 
+	// What the `animations` setting started, so it can be stopped again.
+	protected _declaredAnimations: Array<{ target: Settings, key: string, animation: Animation<any> }> = [];
+	protected _declaredTimers: Array<IDisposer> = [];
+
+	/**
+	 * Stops what the `animations` setting started and puts back what the
+	 * animated settings held before.
+	 */
+	protected _stopDeclaredAnimations(restore: boolean = true): void {
+		// Off the disposer list as well, or every restart leaves one behind
+		$array.each(this._declaredTimers, (timer) => this.removeDispose(timer));
+		this._declaredTimers = [];
+
+		$array.each(this._declaredAnimations, (declared) => declared.animation.stop());
+		this._declaredAnimations = [];
+
+		if (!restore) {
+			return;
+		}
+
+		$object.each(this._animationBases, (key, base) => {
+			(this as any)._set(key, base.value);
+			if (base.user) { (this._userProperties as any)[key] = true; } else { delete (this._userProperties as any)[key]; }
+			if (base.computed) { (this._computedProperties as any)[key] = true; } else { delete (this._computedProperties as any)[key]; }
+		});
+		this._animationBases = {};
+	}
+
+	/**
+	 * Plays the `animations` setting.
+	 */
+	protected _playDeclaredAnimations(): void {
+		this._stopDeclaredAnimations();
+
+		const declared = this.get("animations");
+		if (!declared || !declared.length) {
+			return;
+		}
+
+		$array.each(declared, (options) => {
+			const target: Settings | undefined = options.target === "dataItem" ? (this as any).dataItem : this;
+			const key = options.key;
+			if (!target || !key) {
+				return;
+			}
+
+			// A data item's values are data, never written as settings; an element's
+			// setting keeps what was configured, for the saved config.
+			if (target === this && !this._animationBases[key]) {
+				this._animationBases[key] = {
+					value: (this._settings as any)[key],
+					user: !!(this._userProperties as any)[key],
+					computed: !!(this._computedProperties as any)[key]
+				};
+			}
+
+			const easing = $ease.byName(options.easing, options.ease);
+			const duration = options.duration || 0;
+			const loops = options.loops === 0 ? Infinity : (options.loops || 1);
+
+			const start = () => {
+				if (target.isDisposed()) {
+					return;
+				}
+				// There and back within one run, so a loop always starts where it began
+				const animation = (target as any).animate({
+					key,
+					from: options.from,
+					to: options.to,
+					duration: options.yoyo ? duration * 2 : duration,
+					easing: options.yoyo ? $ease.yoyo(easing) : easing,
+					loops
+				});
+				this._declaredAnimations.push({ target, key, animation });
+			};
+
+			if (options.delay) {
+				this._declaredTimers.push(this.setTimeout(start, options.delay));
+			} else {
+				start();
+			}
+		});
+	}
+
 	public _beforeChanged(): void {
+
+		if (this.isDirty("animations")) {
+			this._playDeclaredAnimations();
+		}
 
 		if (this.isDirty("id")) {
 			const id = this.get("id")!;
@@ -2039,6 +2268,9 @@ export class Entity extends Settings implements IDisposer {
 
 	protected _dispose() {
 		super._dispose();
+
+		// A data item outlives the element that animated it
+		this._stopDeclaredAnimations(false);
 
 		const template = this._template;
 

@@ -471,6 +471,11 @@ class ParserState {
 			return this.parseStops(root, value as Array<object>, refs);
 		}
 
+		// Plain descriptions whose `from` / `to` can be colors or percents
+		if (key === "animations" && $type.isArray(value)) {
+			return this.parseStops(root, value as Array<object>, refs);
+		}
+
 		return this.parse(root, value, refs);
 	}
 

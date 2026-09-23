@@ -1195,6 +1195,12 @@ export abstract class Sprite extends Entity {
 		this._processTemplateField();
 		const eventType = "dataitemchanged";
 		if (dataItem != oldDataItem) {
+			// Animations of the data item's values move to the new one
+			const animations = this.get("animations");
+			if (animations && animations.some((a) => a.target === "dataItem")) {
+				this._markDirtyKey("animations");
+			}
+
 			if (this.events.isEnabled(eventType)) {
 				this.events.dispatch(eventType, {
 					type: eventType,

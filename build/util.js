@@ -133,7 +133,8 @@ function spawnStatus(name, args, options = {}) {
 			cwd: options.cwd || process.cwd(),
 			env: Object.assign({}, process.env, options.env),
 			stdio: options.stdio || "inherit",
-			shell: options.shell || false,
+			// Node refuses to start a .cmd file without a shell (since 18.20 / 20.12)
+			shell: options.shell || (process.platform === "win32" && command.endsWith(".cmd")),
 		});
 
 		spawn.on("exit", (code) => {

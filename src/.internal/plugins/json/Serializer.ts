@@ -9,6 +9,7 @@ import { ListData } from "../../core/util/Data";
 import * as $type from "../../core/util/Type";
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
+import * as $ease from "../../core/util/Ease";
 
 
 export interface ISerializerSettings extends IEntitySettings {
@@ -51,6 +52,18 @@ export interface ISerializerSettings extends IEntitySettings {
 	 * @default 2
 	 */
 	maxDepth?: number;
+
+	/**
+	 * Write an animation started in code that loops for ever - a globe that
+	 * keeps turning, a marker that keeps pulsing - into the `animations`
+	 * setting, so the saved chart plays it too. Animations that end (`appear()`,
+	 * state changes, zooming) are never written, and neither is one whose easing
+	 * is a function of its own rather than one of amCharts' easings.
+	 *
+	 * @default true
+	 * @since 5.21.0
+	 */
+	runningAnimations?: boolean;
 
 	/**
 	 * Include states in the output.
@@ -220,9 +233,17 @@ export class Serializer extends Entity {
 			res.type = source.className;
 			let settings: Array<string> = this._filterSettings($object.keys(source._settings));
 
+			// A setting an `animations` entry is playing is written as it was
+			// configured, not as it happens to be mid-animation
+			const bases = source._animationBases;
+
 			// Include only what was asked for - not what the chart worked out for
 			// itself
 			settings = settings.filter((value) => {
+				const base = bases[value];
+				if (base) {
+					return base.user && !base.computed;
+				}
 				return source.isUserSetting(value as any) && !source.isComputedSetting(value as any);
 			});
 
@@ -233,7 +254,7 @@ export class Serializer extends Entity {
 					// draw time from a data item, and the sample sprite serialized
 					// here has none - running one throws. What was configured is
 					// the raw value anyway; the adapted one is not configuration.
-					let settingValue = (<any>source).getRaw(setting);
+					let settingValue = bases[setting] ? bases[setting].value : (<any>source).getRaw(setting);
 					// Only the tags that were given, not the ones the library added
 					if (setting === "themeTags") {
 						settingValue = source._getUserThemeTags();
@@ -248,6 +269,9 @@ export class Serializer extends Entity {
 						}
 					}
 				});
+			}
+			if (this.get("runningAnimations", true)) {
+				this._processRunningAnimations(source, res, depth);
 			}
 			this._processComputedEntities(source, res, settings, depth);
 			this._processAdapters(source, res);
@@ -265,7 +289,8 @@ export class Serializer extends Entity {
 				res.settings = {};
 				$array.each(settings, (setting) => {
 					if ((<any>source)._settings[setting] !== undefined) {
-						res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1, fullSettings.indexOf(setting) !== -1);
+						// In full like an element's settings, or plain objects in them (`animations`) come out empty
+						res.settings[setting] = this.serialize((<any>source).get(setting), depth + 1, full || fullSettings.indexOf(setting) !== -1);
 					}
 				});
 			}
@@ -375,6 +400,63 @@ export class Serializer extends Entity {
 	 * @param   written   Setting keys already written out in full
 	 * @param   depth     Current depth
 	 */
+	/**
+	 * Adds the element's endless animations started in code to its `animations`
+	 * setting. The setting they animate is left out: the animation sets it.
+	 *
+	 * @param   source  Source object
+	 * @param   res     Result
+	 * @param   depth   Current depth
+	 */
+	private _processRunningAnimations(source: Entity, res: any, depth: number): void {
+		const declared: Array<{ target: any, key: string }> = (source as any)._declaredAnimations || [];
+		const entries: Array<any> = [];
+
+		$object.each((source as any)._animatingSettings || {}, (key: any, animation: any) => {
+			if (!animation || animation.stopped || animation.loops !== Infinity) {
+				return;
+			}
+
+			// Playing because the `animations` setting says so: already written
+			if ($array.any(declared, (item) => item.target === source && item.key === key)) {
+				return;
+			}
+
+			const info = $ease.easingInfo(animation.easing);
+			if (!info) {
+				return;
+			}
+
+			const entry: any = {
+				key,
+				from: this.serialize(animation.from, depth + 2),
+				to: this.serialize(animation.to, depth + 2),
+				// With yoyo, one run goes there and back; the entry gives one way
+				duration: info.yoyo ? animation.duration / 2 : animation.duration,
+				loops: 0
+			};
+			if (info.easing !== "linear") {
+				entry.easing = info.easing;
+			}
+			if (info.ease) {
+				entry.ease = info.ease;
+			}
+			if (info.yoyo) {
+				entry.yoyo = true;
+			}
+			entries.push(entry);
+
+			if (res.settings) {
+				delete res.settings[key];
+			}
+		});
+
+		if (entries.length) {
+			res.settings = res.settings || {};
+			res.settings.animations = (res.settings.animations || []).concat(entries);
+		}
+	}
+
 	private _processComputedEntities(source: Entity, res: any, written: Array<string>, depth: number): void {
 		$array.each(this._filterSettings($object.keys(source._settings)), (key: any) => {
 			if (written.indexOf(key) !== -1) {

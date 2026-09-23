@@ -11,9 +11,40 @@
  * @hidden
  */
 import * as $math from "./Math";
+import * as $object from "./Object";
 import type { Time } from "./Animation";
 
 export type Easing = (time: Time) => Time;
+
+/**
+ * What an easing function is, by name: the base easing, which way it applies,
+ * and whether it goes there and back. Only functions made from the ones here
+ * have one - a hand-written easing cannot be named.
+ *
+ * @since 5.21.0
+ */
+export interface IEasingInfo {
+	easing: string;
+	ease?: "out" | "inOut";
+	yoyo?: boolean;
+}
+
+function named(easing: Easing, info: IEasingInfo): Easing {
+	(easing as any)._easingInfo = info;
+	return easing;
+}
+
+/**
+ * Returns what an easing function is, by name, or `undefined` for one that was
+ * not made from the functions here.
+ *
+ * @param   easing  Easing function
+ * @return          Its name and options
+ * @since 5.21.0
+ */
+export function easingInfo(easing: Easing | undefined): IEasingInfo | undefined {
+	return easing ? (easing as any)._easingInfo : undefined;
+}
 
 /**
  * The functions below are from D3.js library (https://d3js.org/)
@@ -90,7 +121,7 @@ export function circle(t: Time): Time {
 /**
  */
 export function yoyo(ease: Easing): Easing {
-	return function (t: Time) {
+	const easing = function (t: Time) {
 		if ((t as number) < 0.5) {
 			return ease((t as number) * 2.0);
 
@@ -98,16 +129,20 @@ export function yoyo(ease: Easing): Easing {
 			return ease((1.0 - (t as number)) * 2.0);
 		}
 	};
+	const info = easingInfo(ease);
+	return info && !info.yoyo ? named(easing, { ...info, yoyo: true }) : easing;
 }
 
 export function out(ease: Easing): Easing {
-	return function (t: Time) {
+	const easing = function (t: Time) {
 		return 1.0 - (ease(1.0 - (t as number)) as number);
 	};
+	const info = easingInfo(ease);
+	return info && !info.ease && !info.yoyo ? named(easing, { ...info, ease: "out" }) : easing;
 }
 
 export function inOut(ease: Easing): Easing {
-	return function (t: Time) {
+	const easing = function (t: Time) {
 		if (t as number <= 0.5) {
 			return ease(t as number * 2.0) as number / 2.0;
 
@@ -115,6 +150,8 @@ export function inOut(ease: Easing): Easing {
 			return 1.0 - (ease((1.0 - (t as number)) * 2.0) as number / 2.0);
 		}
 	};
+	const info = easingInfo(ease);
+	return info && !info.ease && !info.yoyo ? named(easing, { ...info, ease: "inOut" }) : easing;
 }
 
 /**
@@ -184,4 +221,39 @@ let s = Math.asin(1 / amplitude) * period;
 export function elastic(t: Time): Time {
 	let v = t as number;
 	return amplitude * Math.pow(2, 10 * --v) * Math.sin((s - v) / period);
+}
+
+/**
+ * Easing functions by name, for places a function cannot go - a JSON config.
+ *
+ * @ignore
+ */
+const namedEasings: { [name: string]: Easing } = { linear, quad, cubic, exp, sine, circle, bounce, elastic };
+
+$object.each(namedEasings, (name, easing) => {
+	named(easing, { easing: String(name) });
+});
+
+/**
+ * Returns the easing function called `name` (`"linear"`, `"quad"`, `"cubic"`,
+ * `"exp"`, `"sine"`, `"circle"`, `"bounce"` or `"elastic"`), eased in, out or
+ * both ways. An unknown name gives `linear`.
+ *
+ * @param   name  Easing name
+ * @param   mode  `"in"` (default), `"out"` or `"inOut"`
+ * @return        Easing function
+ * @since 5.21.0
+ */
+export function byName(name?: string, mode?: "in" | "out" | "inOut"): Easing {
+	const ease = (name && namedEasings[name]) || linear;
+
+	if (mode === "out") {
+		return out(ease);
+	}
+
+	if (mode === "inOut") {
+		return inOut(ease);
+	}
+
+	return ease;
 }

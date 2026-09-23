@@ -204,6 +204,33 @@ export class MapPointSeries extends MapSeries {
 
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = ["Point", "MultiPoint"];
 
+	// Where each point last was on its line, and which way it was going
+	protected _travel: WeakMap<DataItem<this["_dataItemSettings"]>, { position: number, back: boolean }> = new WeakMap();
+
+	/**
+	 * Is the point travelling towards the start of its line? Only while an
+	 * `animations` entry of its bullet moves it: a point set in place faces the
+	 * way the line runs, and one moved from code is turned by that code, as the
+	 * flight demos do.
+	 */
+	protected _movingBack(dataItem: DataItem<this["_dataItemSettings"]>, position: number, bullet: Bullet): boolean {
+		const sprite: any = bullet.get("sprite");
+		const declared = sprite && $array.any(sprite._declaredAnimations || [], (item: any) => item.target === dataItem && item.key === "positionOnLine");
+		const animating = declared && !!(dataItem as any)._animatingSettings?.positionOnLine;
+		const last = this._travel.get(dataItem);
+		let back = false;
+
+		if (animating && last) {
+			const step = position - last.position;
+			// Standing still between two frames, or a loop jumping back to its
+			// start, keeps the way it was going
+			back = step === 0 || Math.abs(step) > 0.5 ? last.back : step < 0;
+		}
+
+		this._travel.set(dataItem, { position, back });
+		return back;
+	}
+
 	protected _lineChangedDp?: IDisposer;
 
 	protected _afterNew() {
@@ -395,6 +422,11 @@ export class MapPointSeries extends MapSeries {
 
 					//dataItem.set("autoRotateAngle", $math.getAngle(point0, point1));
 					angle = $math.getAngle(point0, point1);
+
+					// Moving back along the line (an `animations` entry on its way back): face that way
+					if (this._movingBack(dataItem, positionOnLine, bullet)) {
+						angle += 180;
+					}
 				}
 
 				dataItem.setRaw("longitude", geoPoint.longitude);
