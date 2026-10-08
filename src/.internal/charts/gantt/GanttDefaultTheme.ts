@@ -676,7 +676,9 @@ export class GanttDefaultTheme extends Theme {
 			y: p50,
 			width: 30,
 			height: 30,
-			cursorOverStyle: "pointer"
+			cursorOverStyle: "pointer",
+			role: "button",
+			ariaLabel: "{name}; " + l.translate("Press ENTER to toggle")
 		})
 
 		r("Graphics", ["taskbullet", "icon"]).states.create("default", {
@@ -739,6 +741,8 @@ export class GanttDefaultTheme extends Theme {
 			width: 35,
 			height: 35,
 			tooltipText: l.translateAny("Add task"),
+			ariaLabel: l.translateAny("Add task"),
+			role: "button",
 			tooltipX: percent(90)
 		})
 
@@ -752,6 +756,8 @@ export class GanttDefaultTheme extends Theme {
 		r("Button", ["edit"]).setAll({
 			visible: false,
 			tooltipText: l.translateAny("Edit mode"),
+			ariaLabel: l.translateAny("Edit mode"),
+			role: "button",
 			toggleKey: "active"
 		})
 
@@ -765,7 +771,9 @@ export class GanttDefaultTheme extends Theme {
 
 		// expand button
 		r("Button", ["expand"]).setAll({
-			tooltipText: l.translateAny("Expand all")
+			tooltipText: l.translateAny("Expand all"),
+			ariaLabel: l.translateAny("Expand all"),
+			role: "button"
 		})
 
 		{
@@ -778,7 +786,9 @@ export class GanttDefaultTheme extends Theme {
 
 		// collapse button
 		r("Button", ["collapse"]).setAll({
-			tooltipText: l.translateAny("Collapse all")
+			tooltipText: l.translateAny("Collapse all"),
+			ariaLabel: l.translateAny("Collapse all"),
+			role: "button"
 		})
 
 		{
@@ -792,6 +802,8 @@ export class GanttDefaultTheme extends Theme {
 		// auto-link button
 		r("Button", ["link"]).setAll({
 			tooltipText: l.translateAny("Link new tasks"),
+			ariaLabel: l.translateAny("Link new tasks"),
+			role: "button",
 			toggleKey: "active"
 		})
 
@@ -806,7 +818,9 @@ export class GanttDefaultTheme extends Theme {
 
 		// clear button
 		r("Button", ["clear"]).setAll({
-			tooltipText: l.translateAny("Clear all")
+			tooltipText: l.translateAny("Clear all"),
+			ariaLabel: l.translateAny("Clear all"),
+			role: "button"
 		});
 
 		// garbage bin icon
@@ -822,7 +836,9 @@ export class GanttDefaultTheme extends Theme {
 
 		// fit button
 		r("Button", ["fit"]).setAll({
-			tooltipText: l.translateAny("Fit to view")
+			tooltipText: l.translateAny("Fit to view"),
+			ariaLabel: l.translateAny("Fit to view"),
+			role: "button"
 		})
 
 		{
@@ -834,7 +850,9 @@ export class GanttDefaultTheme extends Theme {
 		}
 
 		r("Button", ["zoomout"]).setAll({
-			tooltipText: l.translateAny("Zoom out")
+			tooltipText: l.translateAny("Zoom out"),
+			ariaLabel: l.translateAny("Zoom out"),
+			role: "button"
 		})
 
 		{
@@ -848,7 +866,8 @@ export class GanttDefaultTheme extends Theme {
 
 		// x button (shown when clicked on a task)		
 		r("Button", ["xbutton"]).setAll({
-
+			role: "button",
+			ariaLabel: l.translate("Delete"),
 			width: 35,
 			height: 35,
 			centerX: p50,
@@ -887,7 +906,9 @@ export class GanttDefaultTheme extends Theme {
 			height: 35,
 			marginLeft: 6,
 			tooltipX: percent(90),
-			tooltipText: l.translateAny("Set color")
+			tooltipText: l.translateAny("Set color"),
+			ariaLabel: l.translateAny("Set color"),
+			role: "button"
 		});
 	}
 }

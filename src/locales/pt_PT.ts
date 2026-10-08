@@ -256,5 +256,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Cancelar",
+	"Delete": "Eliminar",
+	"Settings": "Definições",
+	"Expand": "Expandir",
+	"Move Up": "Mover para cima",
+	"Move Down": "Mover para baixo"
 };

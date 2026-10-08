@@ -14,7 +14,7 @@ import * as $math from "../../core/util/Math";
 export interface IChordNodesDataItem extends IFlowNodesDataItem {
 
 	/**
-	 * Node [[Slice]] element.
+	 * The node's arc, a [[Slice]] element.
 	 */
 	slice: Slice;
 
@@ -35,16 +35,15 @@ export interface IChordNodesEvents extends IFlowNodesEvents {
 }
 
 /**
- * Holds instances of nodes for a [[Chord]] series.
+ * Holds the nodes of a [[Chord]] series. Dragging a node rotates the whole
+ * chord.
  */
 export class ChordNodes extends FlowNodes {
 	public static className: string = "ChordNodes";
 	public static classNames: Array<string> = FlowNodes.classNames.concat([ChordNodes.className]);
 
 	/**
-	 * List of label elements.
-	 *
-	 * @default new ListTemplate<RadialLabel>
+	 * List of node labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<RadialLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -64,9 +63,7 @@ export class ChordNodes extends FlowNodes {
 	protected _dAngle: number = 0;
 
 	/**
-	 * List of slice elements.
-	 *
-	 * @default new ListTemplate<Slice>
+	 * List of the nodes' arcs; configure them all through `slices.template`.
 	 */
 	public readonly slices: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),

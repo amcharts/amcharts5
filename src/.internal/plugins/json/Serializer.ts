@@ -1,4 +1,4 @@
-import { Entity, IEntityEvents, IEntitySettings, IEntityPrivate } from "../../core/util/Entity";
+import { Entity, Settings, IEntityEvents, IEntitySettings, IEntityPrivate } from "../../core/util/Entity";
 import { Component } from "../../core/render/Component";
 import { Color } from "../../core/util/Color";
 import { Gradient } from "../../core/render/gradients/Gradient";
@@ -15,24 +15,26 @@ import * as $ease from "../../core/util/Ease";
 export interface ISerializerSettings extends IEntitySettings {
 
 	/**
-	 * An array of settings to not include in the serialized data.
+	 * Settings to leave out of the output. Ignored when `includeSettings` is
+	 * set.
 	 */
 	excludeSettings?: Array<string>;
 
 	/**
-	 * An array of settings to include in the serialized data.
+	 * The only settings to write; all others are left out.
 	 */
 	includeSettings?: Array<string>;
 
 	/**
-	 * Include full values of these settings.
+	 * Settings whose plain-object values are written with all their keys.
+	 * In other settings, a plain object comes out empty.
 	 *
-	 * @since 6.4.3
+	 * @since 5.7.0
 	 */
 	fullSettings?: Array<string>;
 
 	/**
-	 * An array of properties to not include in the serialized data.
+	 * Properties to leave out of the output, e.g. `"data"`.
 	 *
 	 * @since 5.3.2
 	 */
@@ -47,14 +49,14 @@ export interface ISerializerSettings extends IEntitySettings {
 	includeProperties?: Array<string>;
 
 	/**
-	 * Maximum depth of recursion when traversing target object.
+	 * How many levels of nested objects to write; deeper ones are left out.
 	 *
 	 * @default 2
 	 */
 	maxDepth?: number;
 
 	/**
-	 * Write an animation started in code that loops for ever - a globe that
+	 * Write an animation started in code that loops forever - a globe that
 	 * keeps turning, a marker that keeps pulsing - into the `animations`
 	 * setting, so the saved chart plays it too. Animations that end (`appear()`,
 	 * state changes, zooming) are never written, and neither is one whose easing
@@ -66,7 +68,7 @@ export interface ISerializerSettings extends IEntitySettings {
 	runningAnimations?: boolean;
 
 	/**
-	 * Include states in the output.
+	 * Writes the elements' states.
 	 *
 	 * @default false
 	 * @since 5.15.0
@@ -74,7 +76,7 @@ export interface ISerializerSettings extends IEntitySettings {
 	includeStates?: boolean;
 
 	/**
-	 * Include adapters in the output.
+	 * Writes the elements' adapters.
 	 *
 	 * @default false
 	 * @since 5.15.0
@@ -92,9 +94,11 @@ export interface ISerializerSettings extends IEntitySettings {
 	includeEvents?: boolean;
 
 	/**
-	 * Serialize functions as strings or functions.
+	 * How adapter callbacks are written (see `includeAdapters`): `"string"` as
+	 * their source code, `"function"` as the functions themselves, which JSON
+	 * can't hold. [[ChartSerializer]] uses `"function"` unless set.
 	 *
-	 * @default "function"
+	 * @default "string"
 	 */
 	functionsAs?: "string" | "function";
 
@@ -108,8 +112,8 @@ export interface ISerializerEvents extends IEntityEvents {
 
 
 /**
- * Provides functionality to serialize charts or individual elements into simple
- * objects or JSON.
+ * Serializes charts or individual elements into plain objects, which can be
+ * saved as JSON.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/} for more info
  * @since 5.3.0
@@ -135,6 +139,18 @@ export class Serializer extends Entity {
 	 * @ignore
 	 */
 	protected _serializingData: boolean = false;
+	protected _inInterfaceColors: boolean = false;
+
+	// Which of the root's interface colours this very Color object is, if any.
+	// Not in data, where a string starting with "@" is escaped as text
+	protected _interfaceColorKey(color: Color): string | undefined {
+		const interfaceColors: any = this._root.interfaceColors;
+		if (this._serializingData || this._inInterfaceColors || !interfaceColors) {
+			return undefined;
+		}
+		const settings = interfaceColors._settings;
+		return $array.find($object.keys(settings), (key) => settings[key] === color) as string | undefined;
+	}
 
 	/**
 	 * Serializes data, which is values rather than configuration.
@@ -181,17 +197,28 @@ export class Serializer extends Entity {
 	}
 
 	/**
-	 * Serializes target object into a simple object or JSON string.
+	 * Serializes an object into a plain object.
 	 *
-	 * @param   source      Target object
+	 * @param   source      Object to serialize
 	 * @param   depth       Current depth
-	 * @param   full        Serialize object in full (ignoring maxDepth)
-	 * @param   forceParse  If true, will add __parse to serialized objects
+	 * @param   full        Write plain objects in full, with all their keys
+	 * @param   forceParse  Mark plain objects with `__parse`, so the parser reads them
 	 * @return              Serialized data
 	 */
 	public serialize(source: unknown, depth: number = 0, full: boolean = false, forceParse: boolean = false): unknown {
 		if (depth > this.get("maxDepth", 2)) {
 			return undefined;
+		}
+
+		// The root's own interface colours go out as values, not as references to themselves
+		if (source === this._root.interfaceColors && !this._inInterfaceColors) {
+			this._inInterfaceColors = true;
+			try {
+				return this.serialize(source, depth, full, forceParse);
+			}
+			finally {
+				this._inInterfaceColors = false;
+			}
 		}
 
 		if (source === false || source === true || source === null) {
@@ -312,6 +339,12 @@ export class Serializer extends Entity {
 
 		// Process the rest
 		if (source instanceof Color) {
+			// A colour taken from the root's interface colours goes out as a
+			// reference, so it follows the theme the config is parsed with
+			const key = this._interfaceColorKey(source);
+			if (key) {
+				return "@root.interfaceColors.get('" + key + "')";
+			}
 			return {
 				type: "Color",
 				value: source.toCSSHex()
@@ -328,6 +361,10 @@ export class Serializer extends Entity {
 		}
 		else if ($type.isNumber(source)) {
 			return source;
+		}
+		else if (source instanceof Date) {
+			// A date has no keys of its own to write: saved as its timestamp
+			return source.getTime();
 		}
 		else if ($type.isObject(source)) {
 			// TODO
@@ -387,20 +424,6 @@ export class Serializer extends Entity {
 	protected _afterEntity(_source: any, _res: any): void { }
 
 	/**
-	 * Writes out what was styled on an object the library built for itself.
-	 *
-	 * A background an element seeds, a part it configures - the object itself is
-	 * not configuration, so it is not written out on its own account. What
-	 * someone then styled on it is, and would otherwise be lost. It goes out
-	 * without a `type`, so parsing configures the object already there instead of
-	 * replacing it with a new one.
-	 *
-	 * @param   source    Source object
-	 * @param   res       Result
-	 * @param   written   Setting keys already written out in full
-	 * @param   depth     Current depth
-	 */
-	/**
 	 * Adds the element's endless animations started in code to its `animations`
 	 * setting. The setting they animate is left out: the animation sets it.
 	 *
@@ -409,7 +432,30 @@ export class Serializer extends Entity {
 	 * @param   depth   Current depth
 	 */
 	private _processRunningAnimations(source: Entity, res: any, depth: number): void {
-		const declared: Array<{ target: any, key: string }> = (source as any)._declaredAnimations || [];
+		const entries = this._runningAnimationEntries(source, depth);
+
+		$array.each(entries, (entry) => {
+			if (res.settings) {
+				delete res.settings[entry.key];
+			}
+		});
+
+		if (entries.length) {
+			res.settings = res.settings || {};
+			res.settings.animations = (res.settings.animations || []).concat(entries);
+		}
+	}
+
+	/**
+	 * Describes the endless animations running on `source` as `animations`
+	 * entries.
+	 *
+	 * @param   source  Source object
+	 * @param   depth   Current depth
+	 * @param   target  Whose setting the entries animate
+	 * @return          Animation entries
+	 */
+	protected _runningAnimationEntries(source: Settings, depth: number, target?: "dataItem"): Array<any> {
 		const entries: Array<any> = [];
 
 		$object.each((source as any)._animatingSettings || {}, (key: any, animation: any) => {
@@ -417,8 +463,9 @@ export class Serializer extends Entity {
 				return;
 			}
 
-			// Playing because the `animations` setting says so: already written
-			if ($array.any(declared, (item) => item.target === source && item.key === key)) {
+			// Playing because an `animations` setting says so - this element's, or
+			// one aimed at this data item: already written
+			if (animation._declared) {
 				return;
 			}
 
@@ -444,19 +491,29 @@ export class Serializer extends Entity {
 			if (info.yoyo) {
 				entry.yoyo = true;
 			}
-			entries.push(entry);
-
-			if (res.settings) {
-				delete res.settings[key];
+			if (target) {
+				entry.target = target;
 			}
+			entries.push(entry);
 		});
 
-		if (entries.length) {
-			res.settings = res.settings || {};
-			res.settings.animations = (res.settings.animations || []).concat(entries);
-		}
+		return entries;
 	}
 
+	/**
+	 * Writes out what was styled on an object the library built for itself.
+	 *
+	 * A background an element seeds, a part it configures - the object itself is
+	 * not configuration, so it is not written out on its own account. What
+	 * someone then styled on it is, and would otherwise be lost. It goes out
+	 * without a `type`, so parsing configures the object already there instead of
+	 * replacing it with a new one.
+	 *
+	 * @param   source    Source object
+	 * @param   res       Result
+	 * @param   written   Setting keys already written out in full
+	 * @param   depth     Current depth
+	 */
 	private _processComputedEntities(source: Entity, res: any, written: Array<string>, depth: number): void {
 		$array.each(this._filterSettings($object.keys(source._settings)), (key: any) => {
 			if (written.indexOf(key) !== -1) {

@@ -1,0 +1,21 @@
+{
+  "title": "Micro Charts in a Table",
+  "description": "A table with a tiny line chart and a tiny column chart in every row, each in its own root with the Micro theme.",
+  "category": "other",
+  "tier": "technique",
+  "tags": ["micro theme", "sparkline", "table", "multiple roots"],
+  "bodyElements": [
+    "<div id=\"chartdiv\">",
+    "  <table>",
+    "    <thead>",
+    "      <tr><th>Branch</th><th>Change</th><th>Revenue</th><th>Orders</th></tr>",
+    "    </thead>",
+    "    <tbody id=\"rows\"></tbody>",
+    "  </table>",
+    "</div>"
+  ],
+  "chartdiv": {
+    "height": null
+  },
+  "extraCSS": "#chartdiv table {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 1.25em;\n}\n\n#chartdiv th,\n#chartdiv td {\n  padding: 0.3em 0.8em;\n  border-bottom: 1px solid #e5e5e5;\n  text-align: left;\n}\n\n#chartdiv th {\n  font-size: 0.7em;\n  font-weight: normal;\n  color: #777777;\n}\n\n#chartdiv td:nth-child(n+3) {\n  width: 35%;\n}\n\n#chartdiv td div {\n  height: 35px;\n}"
+}

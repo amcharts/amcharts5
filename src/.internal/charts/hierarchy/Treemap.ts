@@ -17,63 +17,68 @@ export interface ITreemapDataItem extends IHierarchyDataItem {
 	children: Array<DataItem<ITreemapDataItem>>;
 	parent: DataItem<ITreemapDataItem>;
 	d3HierarchyNode: d3hierarchy.HierarchyRectangularNode<IHierarchyDataObject>;
+	/**
+	 * The node's rectangle.
+	 */
 	rectangle: RoundedRectangle;
 }
 
 export interface ITreemapSettings extends IHierarchySettings {
 
 	/**
-	 * Gap between nodes. In pixels.
+	 * Gap between neighboring nodes, in pixels.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingInner?: number;
 
 	/**
-	 * Gap between nodes and outer edge of the chart. In pixels.
+	 * Gap between a node's edges and the nodes inside it, in pixels; for the
+	 * top node, that is the gap to the chart's edges. Overrides
+	 * `nodePaddingTop`, `nodePaddingRight`, `nodePaddingBottom` and
+	 * `nodePaddingLeft`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingOuter?: number;
 
 	/**
-	 * Gap between nodes and top edge.
-	 *
-	 * Will be ignored if `nodePaddingOuter` is set.
+	 * Gap between a node's top edge and the nodes inside it, in pixels.
+	 * Ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingTop?: number;
 
 	/**
-	 * Gap between nodes and bottom edge.
-	 *
-	 * Will be ignored if `nodePaddingOuter` is set.
+	 * Gap between a node's bottom edge and the nodes inside it, in pixels.
+	 * Ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingBottom?: number;
 
 	/**
-	 * Gap between nodes and left edge.
-	 *
-	 * Will be ignored if `nodePaddingOuter` is set.
+	 * Gap between a node's left edge and the nodes inside it, in pixels.
+	 * Ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingLeft?: number;
 
 	/**
-	 * Gap between nodes and bottom edge.
-	 *
-	 * Will be ignored if `nodePaddingOuter` is set.
+	 * Gap between a node's right edge and the nodes inside it, in pixels.
+	 * Ignored if `nodePaddingOuter` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
 	 */
 	nodePaddingRight?: number;
 
 	/**
-	 * An algorithm to use when laying out node rectangles.
+	 * How the rectangles are laid out: `"squarify"` keeps them close to
+	 * squares, `"binary"` splits the space in balanced halves, `"slice"`
+	 * stacks them top to bottom, `"dice"` places them left to right, and
+	 * `"sliceDice"` alternates between the two from level to level.
 	 *
 	 * @default "squarify"
 	 */
@@ -96,7 +101,8 @@ export interface ITreemapPrivate extends IHierarchyPrivate {
 }
 
 /**
- * Treemap series.
+ * A treemap: nodes as rectangles sized by value, each inside its parent's
+ * rectangle. A click on a node zooms into it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/} for more info
  */
@@ -118,9 +124,8 @@ export class Treemap extends Hierarchy {
 	declare public _rootNode: d3hierarchy.HierarchyRectangularNode<ITreemapDataObject> | undefined;
 
 	/**
-	 * A list of node rectangle elements in a [[Treemap]] chart.
-	 *
-	 * @default new ListTemplate<RoundedRectangle>
+	 * List of node rectangles; configure them all through
+	 * `rectangles.template`.
 	 */
 	public readonly rectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),

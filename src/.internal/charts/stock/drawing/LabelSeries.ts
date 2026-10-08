@@ -19,30 +19,30 @@ export interface ILabelSeriesDataItem extends IPolylineSeriesDataItem {
 export interface ILabelSeriesSettings extends IPolylineSeriesSettings {
 
 	/**
-	 * Label font size.
+	 * Font size of new labels and, when changed, of the selected ones.
 	 */
 	labelFontSize?: number | string | undefined;
 
 	/**
-	 * Label font family.
+	 * Font family of new labels and, when changed, of the selected ones.
 	 *
-	 * Use reserved value `"inherit"` to use computed style on chart
-	 * container. (since `5.17.3`)
+	 * `"inherit"` uses the computed font of the chart's container (since
+	 * `5.17.3`).
 	 */
 	labelFontFamily?: string;
 
 	/**
-	 * Font weight.
+	 * Font weight of new labels and, when changed, of the selected ones.
 	 */
 	labelFontWeight?: "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
 
 	/**
-	 * Font style.
+	 * Font style of new labels and, when changed, of the selected ones.
 	 */
 	labelFontStyle?: "normal" | "italic" | "oblique";
 
 	/**
-	 * Label color.
+	 * Text color of new labels and, when changed, of the selected ones.
 	 */
 	labelFill?: Color;
 
@@ -54,6 +54,10 @@ export interface ILabelSeriesPrivate extends IPolylineSeriesPrivate {
 	label: EditableLabel;
 }
 
+/**
+ * Draws text labels typed in on the chart, for the Label tool of a
+ * [[StockChart]].
+ */
 export class LabelSeries extends PolylineSeries {
 	public static className: string = "LabelSeries";
 	public static classNames: Array<string> = PolylineSeries.classNames.concat([LabelSeries.className]);
@@ -62,6 +66,9 @@ export class LabelSeries extends PolylineSeries {
 	declare public _privateSettings: ILabelSeriesPrivate;
 	declare public _dataItemSettings: ILabelSeriesDataItem;
 
+	/**
+	 * The chart's [[SpriteResizer]], which resizes and rotates labels.
+	 */
 	public spriteResizer!: SpriteResizer;
 
 	protected _tag = "label";

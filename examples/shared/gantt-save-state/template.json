@@ -1,0 +1,7 @@
+{
+  "title": "Gantt Chart That Saves Edits",
+  "description": "A Gantt chart that keeps the user's edits and marked dates in localStorage and restores them on the next visit.",
+  "category": "gantt",
+  "tier": "technique",
+  "tags": ["gantt", "local storage", "events", "marked dates"]
+}

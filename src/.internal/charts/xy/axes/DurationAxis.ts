@@ -9,11 +9,8 @@ import * as $math from "../../../core/util/Math";
 export interface IDurationAxisSettings<R extends AxisRenderer> extends IValueAxisSettings<R> {
 
 	/**
-	 * A base unit (granularity) of data.
-	 *
-	 * Used to indicate what are the base units of your data.
-	 *
-	 * Available options: `"millisecond"`, `"second"` (default), `"minute"`, `"hour"`, `"day"`, `"week"`, `"month"`, and `"year"`.
+	 * The time unit the data's values are in: with `"second"`, a value of `90`
+	 * is 1 minute 30 seconds.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/#Base_unit} for more info
 	 * @default "second"
@@ -28,7 +25,8 @@ export interface IDurationAxisDataItem extends IValueAxisDataItem {
 export interface IDurationAxisPrivate extends IValueAxisPrivate {
 
 	/**
-	 * A format to used by axis to format its labels.
+	 * The duration format the axis picked for its labels and tooltip, based
+	 * on the grid step.
 	 *
 	 * @readonly
 	 */
@@ -40,7 +38,8 @@ export interface IDurationAxisEvents extends IValueAxisEvents {
 }
 
 /**
- * Creates a duration axis.
+ * A value axis whose values are amounts of `baseUnit`, with labels formatted
+ * as durations.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/duration-axis/} for more info
  * @important
@@ -83,7 +82,7 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		const durationFormatter = this.getDurationFormatter();
 		const baseUnit = this.get("baseUnit");
 		// we don't allow to go to smaller units, setting so to avoid invalidation
-		this.setRaw("maxPrecision", 0);
+		this._setCRaw("maxPrecision", 0);
 
 		if (baseUnit == "millisecond" || baseUnit == "second" || baseUnit == "minute" || baseUnit == "hour") {
 			// will fail if 0
@@ -164,9 +163,10 @@ export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns text to be used in an axis tooltip for specific relative position.
+	 * Returns the text the axis tooltip shows at a position, formatted as a
+	 * duration.
 	 *
-	 * @param   position  Position
+	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Tooltip text
 	 */
 	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {

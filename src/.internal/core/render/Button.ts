@@ -9,12 +9,13 @@ import * as $utils from "../../core/util/Utils";
 export interface IButtonSettings extends IContainerSettings {
 
 	/**
-	 * A [[Label]] element for the button to show as a label.
+	 * A [[Label]] shown on the button. A label it replaces is disposed.
 	 */
 	label?: Label;
 
 	/**
-	 * A [[Graphics]] element for the button to show as icon.
+	 * A [[Graphics]] shown on the button as its icon. An icon it replaces is
+	 * disposed.
 	 */
 	icon?: Graphics;
 

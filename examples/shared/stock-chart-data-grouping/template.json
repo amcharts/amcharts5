@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"]
+  "title": "Stock Chart Data Grouping",
+  "description": "Three years of daily prices on a date axis with groupData, which shows them as weekly candlesticks when zoomed out and as daily ones when zoomed in.",
+  "category": "stock",
+  "tier": "technique",
+  "tags": ["data grouping", "date axis", "candlestick", "zoom", "toolbar"],
+  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "chartdiv": { "height": "calc(100vh - 36px)" }
 }

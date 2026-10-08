@@ -11,7 +11,8 @@ export interface IEditableAxisLabelPrivate extends IEditableLabelPrivate {
 
 
 /**
- * Draws an axis label.
+ * An axis label whose text the user can edit in place, as on a Gantt chart's
+ * task axis.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels} for more info
  * @important

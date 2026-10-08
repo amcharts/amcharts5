@@ -15,72 +15,72 @@ root.setThemes([
 ]);
 
 
-// Create wrapper container
-const container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
-  height: am5.percent(100),
-  layout: root.verticalLayout
-}));
-
-
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
-const series = container.children.push(am5hierarchy.Partition.new(root, {
-  singleBranchOnly: false,
-  orientation: "vertical",
-  downDepth: 1,
-  initialDepth: 10,
+// https://www.amcharts.com/docs/v5/charts/hierarchy/partition/
+const series = root.container.children.push(am5hierarchy.Partition.new(root, {
+  orientation: "horizontal", // one column per level, left to right; "vertical" makes rows
   valueField: "value",
   categoryField: "name",
   childDataField: "children"
 }));
 
 
-// Generate and set data
+// Set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
-const maxLevels = 2;
-const maxNodes = 3;
-const maxValue = 100;
+// only the leaves have a value; a parent's rectangle spans its children's, so each
+// rectangle's height shows its share of the total
+series.data.setAll([{
+  name: "Budget",
+  children: [
+    {
+      name: "Housing",
+      children: [
+        { name: "Rent", value: 900 },
+        {
+          name: "Utilities",
+          children: [
+            { name: "Electricity", value: 150 },
+            { name: "Heating", value: 200 },
+            { name: "Internet", value: 120 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Food",
+      children: [
+        { name: "Groceries", value: 450 },
+        {
+          name: "Eating Out",
+          children: [
+            { name: "Restaurants", value: 220 },
+            { name: "Coffee", value: 130 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Transport",
+      children: [
+        {
+          name: "Car",
+          children: [
+            { name: "Fuel", value: 200 },
+            { name: "Insurance", value: 150 }
+          ]
+        },
+        { name: "Public Transit", value: 130 }
+      ]
+    }
+  ]
+}]);
 
-const data = {
-  name: "Root",
-  children: []
-}
-generateLevel(data, "", 0);
 
-series.data.setAll([data]);
+// Select the root node
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
 series.set("selectedDataItem", series.dataItems[0]);
-
-function generateLevel(data: any, name: string, level: number) {
-  for (let i = 0; i < Math.ceil(maxNodes * Math.random()) + 1; i++) {
-    let nodeName = name + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i];
-    let child;
-    if (level < maxLevels) {
-      child = {
-        name: nodeName + level
-      }
-
-      if (level > 0 && Math.random() < 0.5) {
-        child.value = Math.round(Math.random() * maxValue);
-      }
-      else {
-        child.children = [];
-        generateLevel(child, nodeName + i, level + 1)
-      }
-    }
-    else {
-      child = {
-        name: name + i,
-        value: Math.round(Math.random() * maxValue)
-      }
-    }
-    data.children.push(child);
-  }
-
-  level++;
-  return data;
-}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Hủy",
+	"Delete": "Xóa",
+	"Settings": "Cài đặt",
+	"Expand": "Mở rộng",
+	"Move Up": "Di chuyển lên",
+	"Move Down": "Di chuyển xuống"
 };

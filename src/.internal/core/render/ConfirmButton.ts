@@ -10,12 +10,20 @@ export interface IConfirmButtonPrivate extends IButtonPrivate {
 }
 
 export interface IConfirmButtonEvents extends IButtonEvents {
+	/**
+	 * The button was clicked again while asking for confirmation.
+	 */
 	confirmed: {};
+	/**
+	 * The confirmation was cancelled with a click elsewhere or the ESC key.
+	 */
 	cancelled: {};
 }
 
 /**
- * Draws an interactive button, which displays a confirmation when clicked.
+ * A button that asks for confirmation: the first click shows "Confirm", and
+ * a second click dispatches `"confirmed"`. A click elsewhere or the ESC key
+ * cancels.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/buttons/} for more info
  * @important

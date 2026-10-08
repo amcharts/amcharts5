@@ -19,7 +19,7 @@ import type { Bullet } from "../../core/render/Bullet";
 export interface ISankeyDataItem extends IFlowDataItem {
 
 	/**
-	 * Link element.
+	 * The link element.
 	 */
 	link: SankeyLink;
 
@@ -38,25 +38,27 @@ export interface ISankeyDataItem extends IFlowDataItem {
 export interface ISankeySettings extends IFlowSettings {
 
 	/**
-	 * Orientation of the series.
+	 * Direction of the flow: `"horizontal"` from left to right, `"vertical"`
+	 * from top to bottom.
 	 *
 	 * @default "horizontal"
 	 */
 	orientation?: "horizontal" | "vertical";
 
 	/**
-	 * Alignment of nodes.
+	 * How nodes are spread across the columns. `"left"` puts each node in the
+	 * earliest column its links allow, `"right"` in the latest. `"justify"` is
+	 * like `"left"`, but moves nodes with no outgoing links to the last column;
+	 * `"center"` is like `"left"`, but moves nodes with no incoming links to
+	 * the column just before their nearest target.
 	 *
-	 * @default "left"
+	 * @default "justify"
 	 */
 	nodeAlign?: "left" | "right" | "justify" | "center"
 
 	/**
-	 * Tension setting of the link curve.
-	 *
-	 * Accepts values from `0` to `1`.
-	 *
-	 * `1` will result in perfectly straight lines.
+	 * Tension of the link curves, from `0` to `1`. `1` makes the links
+	 * straight between their bend points.
 	 *
 	 * @default 0.5
 	 */
@@ -71,9 +73,9 @@ export interface ISankeySettings extends IFlowSettings {
 	nodeSort?: (a: d3sankey.SankeyNodeMinimal<{}, {}>, b: d3sankey.SankeyNodeMinimal<{}, {}>) => number | null;
 
 	/**
-	 * A custom function to use when sorting links.
-	 *
-	 * Use `null` to sort links exactly the way they are presented in data.
+	 * Function that orders the links where they meet a node. `null` keeps the
+	 * order of the data; when not set, links are ordered by the position of
+	 * the node at their other end.
 	 *
 	 * @since 5.4.4
 	 */
@@ -88,7 +90,8 @@ export interface ISankeyEvents extends IFlowEvents {
 }
 
 /**
- * Sankey series.
+ * Sankey diagram: nodes in columns, linked by bands as wide as the values
+ * they carry.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important
@@ -99,9 +102,7 @@ export class Sankey extends Flow {
 	public static classNames: Array<string> = Flow.classNames.concat([Sankey.className]);
 
 	/**
-	 * List of link elements.
-	 *
-	 * @default new ListTemplate<SankeyLink>
+	 * List of link elements; configure them all through `links.template`.
 	 */
 	public readonly links: ListTemplate<SankeyLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -131,9 +132,7 @@ export class Sankey extends Flow {
 	}
 
 	/**
-	 * A series representing sankey nodes.
-	 *
-	 * @default SankeyNodes.new()
+	 * The series that holds the diagram's nodes.
 	 */
 	public readonly nodes: SankeyNodes = this.children.push(SankeyNodes.new(this._root, {}));
 

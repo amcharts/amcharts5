@@ -8,24 +8,27 @@ import * as $utils from "../../core/util/Utils";
 export interface IFunnelSliceSettings extends IGraphicsSettings {
 
 	/**
-	 * Top width in pixels.
+	 * Width of the slice's top edge (its left edge when horizontal), in
+	 * pixels.
 	 */
 	topWidth?: number;
 
 	/**
-	 * Bottom width in pixels.
+	 * Width of the slice's bottom edge (its right edge when horizontal), in
+	 * pixels.
 	 */
 	bottomWidth?: number;
 
 	/**
-	 * Orientation.
+	 * `"vertical"` for a slice of a top-to-bottom series, `"horizontal"` for
+	 * one of a left-to-right series.
 	 */
 	orientation?: "vertical" | "horizontal";
 
 	/**
-	 * A distance in pixels the slice should "puff up".
-	 *
-	 * Any non-zero value will make sides of the slide curved.
+	 * Curves the slice's sides outward, by a fraction of its height (its width
+	 * when horizontal); a negative value curves them inward. `0` keeps them
+	 * straight.
 	 */
 	expandDistance?: number;
 
@@ -63,7 +66,8 @@ export interface IFunnelSlicePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a slice for [[FunnelSeries]].
+ * A slice of a [[FunnelSeries]] or [[PyramidSeries]]: a trapezoid whose sides
+ * can curve. The links between slices are also drawn with it.
  */
 export class FunnelSlice extends Graphics {
 	declare public _settings: IFunnelSliceSettings;

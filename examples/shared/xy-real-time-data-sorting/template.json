@@ -1,0 +1,7 @@
+{
+  "title": "Real-Time Data Sorting",
+  "description": "Columns whose values change on a timer and that slide to their new places as the category axis is sorted again.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["column", "live data", "sorting", "category axis", "animation"]
+}

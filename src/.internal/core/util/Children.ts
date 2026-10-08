@@ -66,14 +66,14 @@ export class Children<A extends Sprite> extends List<A> implements IDisposer {
 	}
 
 	/**
-	 * Returns `true` if obejct is disposed.
+	 * Returns `true` if the list is disposed.
 	 */
 	public isDisposed(): boolean {
 		return this._disposed;
 	}
 
 	/**
-	 * Permanently dispose this object.
+	 * Disposes the list and all children in it.
 	 */
 	public dispose() {
 		if (!this._disposed) {

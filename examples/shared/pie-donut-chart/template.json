@@ -1,0 +1,7 @@
+{
+  "title": "Donut Chart",
+  "description": "A pie chart made into a donut with an inner radius, with a legend below it.",
+  "category": "percent",
+  "tier": "basic",
+  "tags": ["pie", "donut", "inner radius", "legend"]
+}

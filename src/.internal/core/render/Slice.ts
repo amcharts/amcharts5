@@ -8,44 +8,51 @@ import * as $math from "../util/Math";
 export interface ISliceSettings extends IGraphicsSettings {
 
 	/**
-	 * Radius in pixels.
+	 * Outer radius in pixels.
 	 */
 	radius?: number;
 
 	/**
-	 * Slice "width" in degrees.
+	 * Size of the slice in degrees, clockwise from `startAngle`. A negative
+	 * value runs counterclockwise.
 	 */
 	arc?: number;
 
 	/**
-	 * Inner radius of the slice in pixels.
+	 * Inner radius in pixels. A negative value is measured inwards from
+	 * `radius`.
 	 */
 	innerRadius?: number;
 
 	/**
-	 * Start angle in degrees.
+	 * Start angle in degrees: `0` points right, and angles run clockwise.
 	 */
 	startAngle?: number;
 
 	/**
-	 * Slice corner radius in pixels.
+	 * Corner radius in pixels.
 	 */
 	cornerRadius?: number;
 
 	/**
-	 * Slice "pull out" radius in pixels.
+	 * How far in pixels the slice is pulled out from the center, along its
+	 * middle angle.
+	 *
+	 * @default 0
 	 */
 	shiftRadius?: number;
 
 	/**
-	 * Number of pixels to add to whatever slice's `radius` value is. Negative
-	 * numbers can also be used.
+	 * Pixels added to `radius`; can be negative.
+	 *
+	 * @default 0
 	 */
 	dRadius?: number;
 
 	/**
-	 * Number of pixels to add to whatever slice's `innerRadius` value is.
-	 * Negative numbers can also be used.
+	 * Pixels added to `innerRadius`; can be negative.
+	 *
+	 * @default 0
 	 */
 	dInnerRadius?: number;
 
@@ -55,7 +62,7 @@ export interface ISlicePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a slice shape.
+ * A slice of a circle or ring, as in a pie chart.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  */

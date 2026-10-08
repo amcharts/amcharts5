@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+### Added
+- `images/`: whole-world day and night images from NASA (2048 and 4096 pixels wide) for `am5map.MapRasterSeries`. See `images/README.md` for credit.
+
 ### Changed
 - Renamed Nauru to Naoero in world maps and related data.
 - Fixed map of North Korea.

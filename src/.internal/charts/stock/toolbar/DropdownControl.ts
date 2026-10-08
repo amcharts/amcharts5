@@ -2,8 +2,18 @@ import { StockControl, IStockControlSettings, IStockControlPrivate, IStockContro
 import { Dropdown } from "./Dropdown";
 
 export interface IDropdownControlSettings extends IStockControlSettings {
+	/**
+	 * Not used by this control.
+	 */
 	fixedLabel?: boolean;
+	/**
+	 * Limits the dropdown's height to the chart's height minus 100 pixels,
+	 * scrolling the rest.
+	 */
 	scrollable?: boolean;
+	/**
+	 * HTML content of the dropdown.
+	 */
 	html?: string;
 }
 
@@ -16,7 +26,7 @@ export interface IDropdownControlEvents extends IStockControlEvents {
 }
 
 /**
- * A generic control which creates a searchable list of items in a dropdown.
+ * A control with a dropdown that shows custom HTML (`html`).
  *
  * Can be used in a [[StockToolbar]].
  *

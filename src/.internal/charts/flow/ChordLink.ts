@@ -9,22 +9,28 @@ import * as $math from "../../core/util/Math";
 export interface IChordLinkSettings extends IFlowLinkSettings {
 
 	/**
-	 * Source data item.
+	 * Source node data item.
 	 */
 	source?: DataItem<IChordNodesDataItem>;
 
 	/**
-	 * target data item.
+	 * Target node data item.
 	 */
 	target?: DataItem<IChordNodesDataItem>;
 
 	/**
-	 * Radius of the link at the source.
+	 * Radius at which the ribbon meets its source node, in pixels or percent
+	 * of the node ring's inner radius. Not used by [[ChordNonRibbon]].
+	 *
+	 * @default 100%
 	 */
 	sourceRadius?: number | Percent;
 
 	/**
-	 * Radius of the link at the end (target).
+	 * Radius at which the ribbon meets its target node, in pixels or percent
+	 * of the node ring's inner radius. Not used by [[ChordNonRibbon]].
+	 *
+	 * @default 100%
 	 */
 	targetRadius?: number | Percent;
 
@@ -34,7 +40,7 @@ export interface IChordLinkPrivate extends IFlowLinkPrivate {
 }
 
 /**
- * A link element used in [[Chord]] chart.
+ * A link element of a [[Chord]] series.
  */
 export class ChordLink extends FlowLink {
 

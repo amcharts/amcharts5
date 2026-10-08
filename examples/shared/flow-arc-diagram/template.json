@@ -1,0 +1,7 @@
+{
+  "title": "Arc Diagram",
+  "description": "An arc diagram: nodes in a row, sized by their total, with arcs for the links between them and a label under each node.",
+  "category": "flow",
+  "tier": "basic",
+  "tags": ["arc diagram", "flow", "links", "labels"]
+}

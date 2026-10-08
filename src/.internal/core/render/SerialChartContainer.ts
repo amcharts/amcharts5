@@ -8,10 +8,8 @@ import type { ZoomTools } from "./ZoomTools";
 export interface ISerialChartContainerSettings extends ISerialChartSettings {
 
 	/**
-	 * A [[ZoomTools]] instance to add to the chart.
-	 *
-	 * When set, its `target` is automatically pointed at the chart's
-	 * `seriesContainer`.
+	 * A [[ZoomTools]] to add to the chart. Its `target` is set to the chart's
+	 * `zoomableContainer`.
 	 */
 	zoomTools?: ZoomTools;
 
@@ -24,14 +22,10 @@ export interface ISerialChartContainerEvents extends ISerialChartEvents {
 }
 
 /**
- * A [[SerialChart]] whose `seriesContainer` is a [[ZoomableContainer]], so that
- * the chart contents can be zoomed and panned.
+ * A chart for series of any kind, such as a force-directed tree, that can be
+ * zoomed and panned: its series sit in a [[ZoomableContainer]].
  *
- * Unlike the abstract [[SerialChart]], this chart attaches its
- * `seriesContainer` to the display tree on its own, so it can be instantiated
- * and used directly.
- *
- * #since 5.20.2
+ * @since 5.20.2
  */
 export class SerialChartContainer extends SerialChart {
 	public static className: string = "SerialChartContainer";
@@ -43,8 +37,8 @@ export class SerialChartContainer extends SerialChart {
 	declare public _events: ISerialChartContainerEvents;
 
 	/**
-	 * A [[ZoomableContainer]] which holds chart's `seriesContainer` so it can
-	 * be zoomed and panned.
+	 * The [[ZoomableContainer]] that holds the series and their bullets, so they
+	 * can be zoomed and panned.
 	 */
 	public readonly zoomableContainer: ZoomableContainer = ZoomableContainer.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured");
 

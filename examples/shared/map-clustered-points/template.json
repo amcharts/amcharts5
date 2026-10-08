@@ -1,0 +1,8 @@
+{
+  "title": "Clustered Map Points",
+  "description": "City markers that merge into clusters with a count when they are close together; clicking a cluster zooms in on its cities.",
+  "category": "map",
+  "tier": "technique",
+  "tags": ["clustered point series", "cluster", "bullets", "zoom"],
+  "jsonNote": "Zooming in on a clicked cluster takes code."
+}

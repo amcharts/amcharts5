@@ -20,14 +20,15 @@ export interface DateFormatInfo {
 export interface IDateFormatterSettings extends IEntitySettings {
 
 	/**
-	 * Should the first letter of the formatted date be capitalized?
+	 * Capitalizes the first letter of the formatted date.
 	 *
 	 * @default true
 	 */
 	capitalize?: boolean;
 
 	/**
-	 * A date format to be used when formatting dates.
+	 * Format used when no other format is given: a format string, or options
+	 * for `Intl.DateTimeFormat`.
 	 *
 	 * @default "yyyy-MM-dd"
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
@@ -35,15 +36,16 @@ export interface IDateFormatterSettings extends IEntitySettings {
 	dateFormat?: string | Intl.DateTimeFormatOptions;
 
 	/**
-	 * An array of data fields that hold date values and should be formatted
-	 * with a [[DateFormatter]].
+	 * Data fields that hold dates. Text placeholders with these fields, such as
+	 * `{date}`, are formatted as dates even without `formatDate()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders} for more info
 	 */
 	dateFields?: string[];
 
 	/**
-	 * Locales to use when formatting using `Intl.DateFormatter`.
+	 * Locale for formats given as `Intl.DateTimeFormat` options, such as
+	 * `"de-DE"`. The browser's locale if not set.
 	 */
 	intlLocales?: string;
 
@@ -59,7 +61,7 @@ type ShortWeekdays = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 
 
 /**
- * Date formatter class.
+ * Formats dates in labels, tooltips and other text, and parses date strings.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
  * @important
@@ -67,6 +69,9 @@ type ShortWeekdays = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 export class DateFormatter extends Entity {
 	declare public _settings: IDateFormatterSettings;
 	declare public _privateSettings: IDateFormatterPrivate;
+
+	public static className: string = "DateFormatter";
+	public static classNames: Array<string> = Entity.classNames.concat([DateFormatter.className]);
 
 	protected _setDefaults() {
 		// Defaults
@@ -81,10 +86,10 @@ export class DateFormatter extends Entity {
 	}
 
 	/**
-	 * Formats a source `Date` object into string format
-	 * @param   source          inpout date
-	 * @param   format          Output format
-	 * @param   ignoreTimezone  Ignore timezone?
+	 * Formats a `Date` as a string.
+	 * @param   source          Date
+	 * @param   format          Format string or `Intl.DateTimeFormat` options; `dateFormat` if not given
+	 * @param   ignoreTimezone  Ignore the root's `utc` and `timezone` settings
 	 * @return                  Formatted date
 	 */
 	public format(source: any, format?: string | Intl.DateTimeFormatOptions, ignoreTimezone: boolean = false): string {
@@ -493,7 +498,7 @@ export class DateFormatter extends Entity {
 	}
 
 	/**
-	 * Parses format into structured infromation.
+	 * Parses a format into structured information.
 	 *
 	 * @param format Format template
 	 */
@@ -582,6 +587,16 @@ export class DateFormatter extends Entity {
 		return this._shortWeekdays()[index];
 	}
 
+	/**
+	 * Parses a date string in `format` into a `Date`. A `Date` is returned as
+	 * it is and a number is read as a timestamp. A string that doesn't match
+	 * the format is passed to the `Date` constructor.
+	 *
+	 * @param   source  Date string
+	 * @param   format  Format of the string, such as `"yyyy-MM-dd"`
+	 * @param   utc     Parse as UTC; the root's `utc` setting if not given
+	 * @return          Date
+	 */
 	public parse(source: any, format: string, utc?: boolean): Date {
 
 		// If UTC is not supplied, use Root setting
@@ -1092,7 +1107,7 @@ export class DateFormatter extends Entity {
 	}
 
 	/**
-	 * Resolves month name (i.e. "December") into a month number (11).
+	 * Resolves a month name (e.g. "December") into a month number (11).
 	 *
 	 * @param value  Month name
 	 * @return Month number
@@ -1117,7 +1132,7 @@ export class DateFormatter extends Entity {
 	}
 
 	/**
-	 * Resolves short month name (i.e. "Dec") into a month number.
+	 * Resolves a short month name (e.g. "Dec") into a month number.
 	 *
 	 * @param value  Short month name
 	 * @return Month number
@@ -1148,11 +1163,11 @@ export class DateFormatter extends Entity {
 	}
 
 	/**
-	 * Checks if passed in string represents AM/PM notation in many of its
-	 * versions.
+	 * Checks if a string is an AM marker ("AM", "A.M." or "A", or their
+	 * translations).
 	 *
 	 * @param value  Source string
-	 * @return Is it AM/PM?
+	 * @return Is it AM?
 	 */
 	protected isAm(value: string): boolean {
 		let list = this.getStringList(["AM", "A.M.", "A"]);

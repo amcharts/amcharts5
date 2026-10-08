@@ -1,4 +1,4 @@
-import { Entity } from "../../core/util/Entity";
+import { Entity, _lastUid } from "../../core/util/Entity";
 import type { Sprite } from "../../core/render/Sprite";
 import type { SerialChart } from "../../core/render/SerialChart";
 import type { SerialChartContainer } from "../../core/render/SerialChartContainer";
@@ -29,15 +29,15 @@ import * as $array from "../../core/util/Array";
 export interface IChartSerializerSettings extends ISerializerSettings {
 
 	/**
-	 * Remove empty objects from the output.
+	 * Leaves empty objects out of the output.
 	 *
 	 * @default true
 	 */
 	removeEmptyObjects?: boolean;
 
 	/**
-	 * Include a `root` section (settings and properties of the [[Root]] object)
-	 * in the serialized output.
+	 * Adds a `root` section with what was configured on the [[Root]], such as
+	 * its settings, formatters and locale.
 	 *
 	 * @default false
 	 * @since 5.20.2
@@ -54,7 +54,10 @@ export interface IChartSerializerEvents extends ISerializerEvents {
 
 
 /**
- * Serializes whole charts into simple objects or JSON.
+ * Serializes a whole chart, with its axes, series, data and legends, into a
+ * config that [[JsonParser]] builds the chart from again. Unlike
+ * [[Serializer]], by default it writes states and adapters, keeps adapter
+ * callbacks as functions, and goes 10 levels deep.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/chart-serializer/} for more info
  * @since 5.15.0
@@ -102,6 +105,7 @@ export class ChartSerializer extends Serializer {
 			"chart",
 			"draw",
 			"curveFactory",
+			"pixelHeightFunction",
 			"tooltipDataItem",
 			"legendDataItem",
 			"vcx",
@@ -125,6 +129,10 @@ export class ChartSerializer extends Serializer {
 		this.reset();
 	}
 
+	/**
+	 * Clears what the serializer remembers from an earlier `serializeAll()`.
+	 * Call it before serializing again with the same serializer.
+	 */
 	public reset(): void {
 		this._disableDataSerialization = false;
 		this._pendingSeriesRefs = [];
@@ -151,10 +159,10 @@ export class ChartSerializer extends Serializer {
 	}
 
 	/**
-	 * Serializes target object into a simple object.
+	 * Serializes a chart, or a container with charts, into a config object.
 	 *
-	 * @param   source  Target object
-	 * @return          Serialized data
+	 * @param   source  Chart or container
+	 * @return          Config
 	 */
 	public serializeAll(source: Container): any {
 
@@ -203,7 +211,10 @@ export class ChartSerializer extends Serializer {
 		$object.each(this._mainRefs, (_key, value) => {
 			if (value.length) {
 				value.forEach((item) => {
-					result.refs.push(item);
+					// A series saved on its own is the config itself, not something it refers to
+					if (!$object.keys(item).some((id) => item[id] === result)) {
+						result.refs.push(item);
+					}
 				});
 			}
 		});
@@ -264,7 +275,8 @@ export class ChartSerializer extends Serializer {
 		// itself
 		const settings: any = {};
 		$object.each(root.settings, (key: any, value: any) => {
-			if (!root._computedSettings[key]) {
+			// The renderer is a runtime choice (and a class), not chart configuration
+			if (!root._computedSettings[key] && key !== "renderer") {
 				settings[key] = value;
 			}
 		});
@@ -363,17 +375,20 @@ export class ChartSerializer extends Serializer {
 	}
 
 	private _examineStructure(source: Container) {
-		// A plain container's children are serialized as children already
-		const plain = source.className === "Container";
+		// A plain container someone made is serialized with its children. One the
+		// library built - a chart's plot container, say - is not, so what was put
+		// in it is looked for here.
+		const plain = source.className === "Container" && !source._builtIn;
 
 		// Collect serializable custom children
 		source.children.each((child: Sprite) => {
 			this._lists.elements[child.uid] = child;
 			// A sprite made for a data item is the data showing, not configuration
 			const dataDriven = (child as any).dataItem !== undefined;
+			const builtIn = child._builtIn;
 
 			if (child.hasTag("serialize") || this._isLegend(child) || child.isType<Entity>("BreadcrumbBar")
-				|| (!plain && !dataDriven && !this._isOwnElement(source, child))) {
+				|| (!plain && !dataDriven && !builtIn && !this._isOwnElement(source, child))) {
 				this._lists.sprites[child.uid] = child;
 			}
 
@@ -424,7 +439,8 @@ export class ChartSerializer extends Serializer {
 								legendItem.properties.data[index] = "#" + this._getInternalRef(item.uid);
 							}
 							else {
-								legendItem.properties.data[index] = item;
+								// A row of its own, written like series data (e.g. a Color as a type)
+								legendItem.properties.data[index] = (this.serializeData([item]) as Array<any>)[0];
 							}
 						});
 
@@ -532,7 +548,7 @@ export class ChartSerializer extends Serializer {
 			// Percent
 			"slices", "labels", "ticks", "links",
 			// Hierarchy
-			"nodes", "circles", "outerCircles",
+			"nodes", "circles", "outerCircles", "rectangles", "polygons",
 			// Map
 			"mapPolygons", "mapLines"
 		]);
@@ -890,7 +906,7 @@ export class ChartSerializer extends Serializer {
 		this._maybeInit(serializedAxis.settings, "renderer", {});
 		this._maybeInit(serializedAxis.settings.renderer, "properties", {});
 		this._populateTemplates(axis.get("renderer"), serializedAxis.settings.renderer.properties, [
-			"labels", "grid", "minorGrid", "ticks"
+			"labels", "grid", "minorGrid", "ticks", "axisFills"
 		]);
 
 		// Axis syncing
@@ -990,6 +1006,26 @@ export class ChartSerializer extends Serializer {
 
 		if (source.isType("PictorialStackedSeries")) {
 			this._processParts(source, res, ["seriesGraphics"]);
+		}
+
+		// The sun the series makes itself, unless one was set
+		if (source.isType("NightSeries")) {
+			this._processParts(source, res, ["sun"]);
+		}
+
+		if (source.isType("PercentSeries")) {
+			this._processParts(source, res, ["labelsContainer", "ticksContainer"]);
+		}
+
+		if (source.isType("Series")) {
+			this._processParts(source, res, ["bulletsContainer"]);
+
+			// Hidden with hide() or a legend click: a state, not a setting, but it
+			// is how the chart was left. Not while autoAppear has yet to show it
+			if (source.isHidden() && !source._appearPending && !(res.settings && res.settings.visible !== undefined)) {
+				this._maybeInit(res, "settings", {});
+				res.settings.visible = false;
+			}
 		}
 
 		// A palette usually arrives from a theme and is then edited in place rather
@@ -1286,9 +1322,40 @@ export class ChartSerializer extends Serializer {
 		}
 	}
 
+	/**
+	 * A data item's endless animation - a plane flying its route, say - is
+	 * started in code, so nothing on the bullet says it is playing. It is
+	 * written on the bullet's sprite as an `animations` entry aimed at the data
+	 * item, which is what plays it back.
+	 *
+	 * @param   series            Series
+	 * @param   serializedSprite  Serialized bullet sprite
+	 */
+	private _processDataItemAnimations(series: any, serializedSprite: any): void {
+		if (!this.get("runningAnimations", true) || !serializedSprite) {
+			return;
+		}
+
+		// The first one playing: staggered starts may not have reached item 0 yet
+		let entries: Array<any> = [];
+		$array.eachContinue(series.dataItems, (dataItem: any) => {
+			entries = this._runningAnimationEntries(dataItem, 0, "dataItem");
+			return !entries.length;
+		});
+
+		if (entries.length) {
+			const settings = serializedSprite.settings = serializedSprite.settings || {};
+			settings.animations = (settings.animations || []).concat(entries);
+		}
+	}
+
 	private _processBullets(series: any, properties: any): void {
+		let first = true;
+
 		series.bullets.each((bulletFunction: any) => {
 			const sampleDataItem = series.dataItems.length ? series.dataItems[0] : new DataItem(series, {}, {});
+			// What the function makes now gets a higher uid; anything older is shared
+			const lastUid = _lastUid();
 			const bullet = bulletFunction(series.root, series, sampleDataItem);
 
 			// A bullet function may decide there is no bullet for this data item
@@ -1310,6 +1377,12 @@ export class ChartSerializer extends Serializer {
 				// the series, so the two stay in sync when parsed back.
 				this._referenceSeriesColors(bulletSprite, series, serializedBullet.settings.sprite);
 
+				// Only the first one, or every bullet animates the same data item
+				if (first) {
+					this._processDataItemAnimations(series, serializedBullet.settings.sprite);
+					first = false;
+				}
+
 				properties.bullets.push(serializedBullet);
 
 				// Look for templates
@@ -1319,11 +1392,36 @@ export class ChartSerializer extends Serializer {
 			// The sample was built only to be read. Left alive it still draws on
 			// the next frame, and a bullet's own adapter - which expects the data
 			// item this sample never had - throws there instead.
-			if (bulletSprite) {
-				bulletSprite.dispose();
-			}
-			bullet.dispose();
+			this._disposeSampleBullet(bulletFunction, series, sampleDataItem, bullet, lastUid);
 		});
+	}
+
+	// Disposes what a bullet function made for the sample, but not what it hands
+	// out again: anything made before the call, or cached on this first call
+	private _disposeSampleBullet(bulletFunction: any, series: any, dataItem: any, bullet: any, lastUid: number): void {
+		const isNew = (entity: any) => entity && entity.uid > lastUid;
+		const sprite = bullet.get("sprite");
+
+		if (!isNew(bullet) && !isNew(sprite)) {
+			return;
+		}
+
+		// A function that caches returns the same objects again
+		const again = bulletFunction(series.root, series, dataItem);
+		const againSprite = again ? again.get("sprite") : undefined;
+
+		if (isNew(sprite) && sprite !== againSprite) {
+			sprite.dispose();
+		}
+		if (isNew(bullet) && bullet !== again) {
+			bullet.dispose();
+		}
+		if (isNew(againSprite) && againSprite !== sprite) {
+			againSprite.dispose();
+		}
+		if (isNew(again) && again !== bullet) {
+			again.dispose();
+		}
 	}
 
 	private _populateTemplates(source: any, result: any, templateKeys: Array<any>): void {

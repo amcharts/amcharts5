@@ -18,15 +18,17 @@ root.setThemes([
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/
 const chart = root.container.children.push(am5percent.SlicedChart.new(root, {
-  layout: root.verticalLayout
+  layout: root.verticalLayout // stacks the funnel and the legend, so the legend goes below
 }));
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Series
+// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/
+// one slice per data row, top to bottom, each as wide as its value is to the largest one,
+// with a faint band narrowing to the next slice
 const series = chart.series.push(am5percent.FunnelSeries.new(root, {
-  alignLabels: false,
-  orientation: "vertical",
+  alignLabels: false,      // labels sit in the middle of their slices, not in a column beside
+  orientation: "vertical", // slices top to bottom; "horizontal" lays them left to right
   valueField: "value",
   categoryField: "category"
 }));
@@ -45,18 +47,13 @@ series.data.setAll([
 ]);
 
 
-// Play initial series animation
-// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
-series.appear();
-
-
 // Create legend
 // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
-  centerX: am5.p50,
-  x: am5.p50,
-  marginTop: 15,
-  marginBottom: 15
+  centerX: am5.percent(50), // centered under the funnel
+  x: am5.percent(50),
+  marginTop: 15,            // some room between the funnel and the legend...
+  marginBottom: 15          // ...and below it
 }));
 
 legend.data.setAll(series.dataItems);
@@ -64,4 +61,5 @@ legend.data.setAll(series.dataItems);
 
 // Make stuff animate on load
 // https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+series.appear();
 chart.appear(1000, 100);

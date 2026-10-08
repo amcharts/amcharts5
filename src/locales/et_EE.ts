@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Tühista",
+	"Delete": "Kustuta",
+	"Settings": "Seaded",
+	"Expand": "Laienda",
+	"Move Up": "Liiguta üles",
+	"Move Down": "Liiguta alla"
 };

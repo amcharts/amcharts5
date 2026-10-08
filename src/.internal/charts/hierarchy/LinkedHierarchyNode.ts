@@ -17,7 +17,7 @@ export interface ILinkedHierarchyNodePrivate extends IHierarchyNodePrivate {
 export class LinkedHierarchyNode extends HierarchyNode {
 
 	/**
-	 * A series node belongs to.
+	 * The series the node belongs to.
 	 */
 	declare public series: LinkedHierarchy | undefined;
 

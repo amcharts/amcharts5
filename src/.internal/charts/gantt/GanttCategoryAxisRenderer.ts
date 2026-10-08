@@ -21,7 +21,8 @@ export interface IGanttCategoryAxisRendererPrivate extends IAxisRendererYPrivate
 }
 
 /**
- * Renderer for [[GanttCategoryAxis]] axes.
+ * Renderer for a [[GanttCategoryAxis]]: draws each task's row with its grip,
+ * task bullet, editable label, duration stepper and progress pie.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_vertical_axis} for more info
  * @since 5.14.0
@@ -38,11 +39,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 
 
 	/**
-	 * A [[TemplateList]] with all the labels attached to the axis.
-	 *
-	 * `labels.template` can be used to configure appearance of the labels.
-	 *
-	 * @default new ListTemplate<AxisLabelRadial>
+	 * The task name labels, which the user can edit. Configure them through
+	 * `labels.template`.
 	 */
 	public readonly labels: ListTemplate<EditableAxisLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -52,11 +50,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 	));
 
 	/**
-	 * A [[TemplateList]] with all the containers attached to the axis.
-	 *
-	 * This container holds all the elements of axis item - label, grip, task bullet, controls, etc.
-	 *
-	 * @default new ListTemplate<Container>
+	 * Row containers, each holding a task's grip, task bullet, label and
+	 * controls. Dragging one moves the task in the list.
 	 */
 	public readonly containers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -66,11 +61,7 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 	));
 
 	/**
-	 * A [[TemplateList]] with all the controls containers attached to the axis.
-	 *
-	 * This container holds all the controls of axis item - duration stepper, progress pie, etc.
-	 *
-	 * @default new ListTemplate<Container>
+	 * Containers for each task's duration stepper and progress pie.
 	 */
 	public readonly controlsContainers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -80,11 +71,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 	));
 
 	/**
-	 * A [[TemplateList]] with all the grips attached to the axis.
-	 *
-	 * Dragging by the grips allows to rearrange the axis items.
-	 *
-	 * @default new ListTemplate<Rectangle>
+	 * Grips at the left of the rows, for dragging tasks to reorder them or to
+	 * move them under another task.
 	 */
 	public readonly grips: ListTemplate<Rectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -94,11 +82,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 	));
 
 	/**
-	 * A [[TemplateList]] with all the progress pies attached to the axis.
-	 *
-	 * Progress pies are used to show progress of tasks.
-	 *
-	 * @default new ListTemplate<ProgressPie>
+	 * Pies that show each task's progress. Clicking one toggles the task
+	 * between done and its previous progress.
 	 */
 	public readonly progressPies: ListTemplate<ProgressPie> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -108,13 +93,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 	));
 
 	/**
-	 * A [[TemplateList]] with all the task bullets attached to the axis.
-	 *
-	 * Task bullets are shown to the left of the label. If a task doesn't have
-	 * children it will show circle. Otherwise it will show rectangle which is
-	 * clickable and can be used to toggle collapse/expand of the task.
-	 *
-	 * @default new ListTemplate<Button>
+	 * Bullets left of the labels: a triangle that collapses and expands a
+	 * task's subtasks, or a circle for a task without any.
 	 */
 	public readonly taskBullets: ListTemplate<Button> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -128,11 +108,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 	));
 
 	/**
-	 * A [[TemplateList]] with all the duration steppers attached to the axis.
-	 *
-	 * Duration steppers are used to set and show duration of tasks.
-	 *
-	 * @default new ListTemplate<NumericStepper>
+	 * Steppers that show and set each task's duration, in `durationUnit`
+	 * units.
 	 */
 	public readonly durationSteppers: ListTemplate<NumericStepper> = this.addDisposer(new ListTemplate(
 		Template.new({}),

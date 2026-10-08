@@ -11,7 +11,8 @@ export interface IXYChartScrollbarPrivate extends IScrollbarPrivate {
 }
 
 /**
- * Creates a scrollbar with chart preview in it.
+ * A scrollbar with a small preview chart in it. Add axes and series to its
+ * `chart` to draw the preview.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/#Scrollbar_with_chart_preview} for more info
  * @important
@@ -25,8 +26,8 @@ export class XYChartScrollbar extends Scrollbar {
 	public static classNames: Array<string> = Scrollbar.classNames.concat([XYChartScrollbar.className]);
 
 	/**
-	 * An instance of an [[XYChart]] that is used to plot chart preview in
-	 * scrollbar.
+	 * The preview chart inside the scrollbar. It does not react to the
+	 * pointer.
 	 */
 	public readonly chart: XYChart = this.children.push(XYChart.new(this._root, {
 		themeTags: ["chart"],
@@ -39,8 +40,7 @@ export class XYChartScrollbar extends Scrollbar {
 	}))._markC("interactive", "interactiveChildren", "panX", "panY", "wheelX", "wheelY");
 
 	/**
-	 * A graphics element that is displayed over inactive portion of the
-	 * scrollbarpreview, to dim it down.
+	 * Shading drawn over the parts of the preview outside the selected range.
 	 */
 	public readonly overlay: Graphics = this.children.push(Graphics.new(this._root, {
 		themeTags: ["overlay"],

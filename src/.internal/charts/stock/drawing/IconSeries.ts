@@ -14,7 +14,7 @@ import * as $object from "../../../core/util/Object";
 export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 
 	/**
-	 * An SVG path of the icon.
+	 * SVG path of the icon.
 	 */
 	svgPath: string;
 }
@@ -22,27 +22,30 @@ export interface IIconSeriesDataItem extends IPolylineSeriesDataItem {
 export interface IIconSeriesSettings extends IPolylineSeriesSettings {
 
 	/**
-	 * An SVG path of the icon.
+	 * SVG path of new icons and, when changed, of the selected ones.
 	 */
 	iconSvgPath: string;
 
 	/**
-	 * Scale (0-X).
+	 * Scale of new icons: `1` is the path's own size.
 	 */
 	iconScale?: number;
 
 	/**
-	 * Relative horizontal center.
+	 * Horizontal point of the icon placed on the clicked spot: `0%` is its
+	 * left edge, `100%` its right.
 	 */
 	iconCenterX?: Percent;
 
 	/**
-	 * Relative vertical center.
+	 * Vertical point of the icon placed on the clicked spot: `0%` is its top
+	 * edge, `100%` its bottom.
 	 */
 	iconCenterY?: Percent;
 
 	/**
-	 * Should icon snap to closest data item?
+	 * Places new icons at the value (`field`) of the nearest data item of
+	 * `series`, instead of where clicked.
 	 */
 	snapToData?: boolean;
 }
@@ -50,6 +53,9 @@ export interface IIconSeriesSettings extends IPolylineSeriesSettings {
 export interface IIconSeriesPrivate extends IPolylineSeriesPrivate {
 }
 
+/**
+ * Draws icons, for the Arrows & Icons tool of a [[StockChart]].
+ */
 export class IconSeries extends PolylineSeries {
 	public static className: string = "IconSeries";
 	public static classNames: Array<string> = PolylineSeries.classNames.concat([IconSeries.className]);
@@ -58,6 +64,9 @@ export class IconSeries extends PolylineSeries {
 	declare public _privateSettings: IIconSeriesPrivate;
 	declare public _dataItemSettings: IIconSeriesDataItem;
 
+	/**
+	 * The chart's [[SpriteResizer]], which resizes and rotates icons.
+	 */
 	public spriteResizer!: SpriteResizer;
 
 	protected _tag = "icon";

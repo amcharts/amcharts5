@@ -9,22 +9,20 @@ import * as $object from "../../../core/util/Object";
 export interface IAxisBulletSettings extends IEntitySettings {
 
 	/**
-	 * Relative location of the bullet within the cell.
+	 * Where the bullet sits within its cell, from `0` (start) to `1` (end).
 	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * @default 0.5
 	 */
 	location?: number;
 
 	/**
-	 * A visual element of the bullet.
+	 * The element to show as the bullet.
 	 */
 	sprite: Sprite;
 
 	/**
-	 * Indicates if the bullet should be stacked on top of another bullet if it's
-	 * on the same position.
-	 *
-	 * Will work on horizontal or vertical axes only.
+	 * Stacks the bullet next to another bullet at the same position, instead
+	 * of over it. Works on [[AxisRendererX]] and [[AxisRendererY]] only.
 	 *
 	 * @since 5.2.28
 	 * @default false
@@ -44,7 +42,7 @@ export interface IAxisBulletPrivate extends IEntityPrivate {
 export class AxisBullet extends Entity {
 
 	/**
-	 * Target axis object.
+	 * The axis the bullet is on.
 	 */
 	public axis: Axis<AxisRenderer> | undefined;
 
@@ -61,7 +59,11 @@ export class AxisBullet extends Entity {
 
 		if (this.isDirty("sprite")) {
 			if (sprite) {
-				sprite._setCAll({ position: "absolute", role: "figure" });
+				sprite._setC("position", "absolute");
+				// "figure" unless the sprite has a role of its own (e.g. a button)
+				if (sprite.get("role") == null) {
+					sprite._setC("role", "figure");
+				}
 				this._disposers.push(sprite);
 			}
 		}

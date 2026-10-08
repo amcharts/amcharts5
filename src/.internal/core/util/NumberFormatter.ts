@@ -18,65 +18,66 @@ export interface INumberSuffix {
 export interface INumberFormatterSettings extends IEntitySettings {
 
 	/**
-	 * Number format to be used when formatting numbers.
+	 * Format used when no other format is given: a format string, or options
+	 * for `Intl.NumberFormat`.
 	 *
 	 * @default "#,###.#####"
 	 */
 	numberFormat?: string | Intl.NumberFormatOptions;
 
 	/**
-	 * A threshold value for negative numbers.
+	 * Values below this use the negative part of the format (after the first
+	 * `|`), and a value equal to it the zero part (after the second `|`). The
+	 * minus sign still shows only for values below `0`.
 	 *
 	 * @default 0
 	 */
 	negativeBase?: number;
 
 	/**
-	 * Prefixes and thresholds to group big numbers into, e.g. 1M.
-	 *
-	 * Used in conjunction with `a` modifier of the number format.
+	 * Suffixes for big numbers and the values they stand for, such as `"M"`
+	 * for a million. Used by the `a` modifier of the number format.
 	 */
 	bigNumberPrefixes?: INumberSuffix[];
 
 	/**
-	 * Prefixes and thresholds to group small numbers into, e.g. 1m.
-	 *
-	 * Used in conjunction with `a` modifier of the number format.
+	 * Suffixes for small numbers and the values they stand for, such as `"m"`
+	 * for a thousandth. Used by the `a` modifier of the number format.
 	 */
 	smallNumberPrefixes?: INumberSuffix[];
 
 	/**
-	 * All numbers below this value are considered small.
+	 * Numbers below this use `smallNumberPrefixes` with the `a` modifier;
+	 * others use `bigNumberPrefixes`.
 	 *
 	 * @default 1
 	 */
 	smallNumberThreshold?: number;
 
 	/**
-	 * Prefixes to and thresholds to use when grouping data size numbers, e.g. 1MB.
-	 *
-	 * Used in conjunction with `b` modifier of the number format.
+	 * Suffixes for data sizes and the byte counts they stand for, such as
+	 * `"KB"` for 1024. Used by the `b` modifier of the number format.
 	 */
 	bytePrefixes?: INumberSuffix[];
 
 	/**
-	 * Indicates which fields in data should be considered numeric.
-	 *
-	 * It is used when formatting data placeholder values.
+	 * Data fields that hold numbers. Text placeholders with these fields are
+	 * formatted as numbers even without `formatNumber()`.
 	 */
 	numericFields?: string[];
 
 	/**
-	 * Locales to use when formatting using `Intl.NumberFormat`.
+	 * Locale for formats given as `Intl.NumberFormat` options, such as
+	 * `"de-DE"`. The browser's locale if not set.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat} for more info
 	 */
 	intlLocales?: string;
 
 	/**
-	 * If set to `true` will force the number string to be LTR, even if RTL is
-	 * enabled.
-	 * 
+	 * Forces formatted numbers to read left to right, even in a right-to-left
+	 * layout.
+	 *
 	 * @default false
 	 * @since 5.3.13
 	 */
@@ -88,7 +89,7 @@ export interface INumberFormatterPrivate extends IEntityPrivate {
 }
 
 /**
- * Number formatter
+ * Formats numbers in labels, tooltips and other text.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/} for more info
  * @important
@@ -96,6 +97,9 @@ export interface INumberFormatterPrivate extends IEntityPrivate {
 export class NumberFormatter extends Entity {
 	declare public _settings: INumberFormatterSettings;
 	declare public _privateSettings: INumberFormatterPrivate;
+
+	public static className: string = "NumberFormatter";
+	public static classNames: Array<string> = Entity.classNames.concat([NumberFormatter.className]);
 
 	protected _setDefaults() {
 		// Defaults
@@ -146,10 +150,11 @@ export class NumberFormatter extends Entity {
 	}
 
 	/**
-	 * Formats the number according to specific format.
+	 * Formats a number as a string.
 	 *
-	 * @param value   Value to format
-	 * @param format  Format to apply
+	 * @param value      Value to format
+	 * @param format     Format string or `Intl.NumberFormat` options; `numberFormat` if not given
+	 * @param precision  Minimum number of decimals, padded with zeros; ignored for a format with a modifier
 	 * @return Formatted number
 	 */
 	public format(value: number | string, format?: string | Intl.NumberFormatOptions, precision?: number): string {
@@ -224,7 +229,7 @@ export class NumberFormatter extends Entity {
 	 * Parses supplied format into structured object which can be used to format
 	 * the number.
 	 *
-	 * @param format Format string, i.e. "#,###.00"
+	 * @param format Format string, e.g. "#,###.00"
 	 * @param language Language
 	 * @ignore
 	 */
@@ -631,7 +636,7 @@ export class NumberFormatter extends Entity {
 	}
 
 	/**
-	 * Replaces brackets with temporary placeholders.
+	 * Replaces a double vertical bar (`||`) with a temporary placeholder.
 	 *
 	 * @ignore Exclude from docs
 	 * @param text  Input text
@@ -642,7 +647,7 @@ export class NumberFormatter extends Entity {
 	}
 
 	/**
-	 * Replaces placeholders back to brackets.
+	 * Replaces the placeholder with a single vertical bar (`|`).
 	 *
 	 * @ignore Exclude from docs
 	 * @param text  Escaped text

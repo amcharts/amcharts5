@@ -7,7 +7,9 @@ export interface IWilliamsRPrivate extends IOverboughtOversoldPrivate { }
 export interface IWilliamsREvents extends IOverboughtOversoldEvents { }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Williams %R indicator: where the close is within the high-low range of the
+ * last `period` data items, from `0` (at the high) to `-100` (at the low).
+ * Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */

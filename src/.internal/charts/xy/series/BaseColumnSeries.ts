@@ -21,7 +21,7 @@ import * as $type from "../../../core/util/Type";
 export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 
 	/**
-	 * Color of the column, when the series colors each data item separately.
+	 * The column's color, given by the series when `colorByDataItem` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/} for more info
 	 * @since 5.20.4
@@ -29,20 +29,20 @@ export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 	fill?: Color;
 
 	/**
-	 * An actual [[Graphics]] element (Column/Slice/Candlestick/OHLC).
+	 * The column drawn for the data item: a [[RoundedRectangle]], [[Slice]],
+	 * [[Candlestick]] or [[OHLC]], depending on the series.
 	 */
 	graphics?: Graphics;
 
 	/**
-	 * In case axis ranges are added to the series, it creates a separate
-	 * element ([[Graphics]]) for each axis range. This array holds them all.
+	 * The data item's columns in the series' axis ranges, one per range.
 	 */
 	rangeGraphics?: Array<Graphics>;
 
 	/**
-	 * If data items from this series are used to feed a [[Legend]], this
-	 * will hold a reference to the equivalent Legend data item.
-	 * 
+	 * The [[Legend]] data item for this data item, when the series' data
+	 * items feed a legend.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/#Data_item_list} for more info
 	 */
 	legendDataItem?: DataItem<ILegendDataItem>;
@@ -51,8 +51,9 @@ export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 
 	/**
-	 * Indicates if series must divvy up available space with other column
-	 * series (`true`; default) or take up the whole available space (`false`).
+	 * Places the columns side by side with those of the other clustered column
+	 * series on the same base axis, sharing each cell. With `false`, the
+	 * columns take the whole cell and can overlap the others.
 	 *
 	 * @default true
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Clustering} for more info
@@ -60,17 +61,16 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	clustered?: boolean;
 
 	/**
-	 * Whether positions of bullets should be calculated based on portion of
-	 * column currently visual (`true`) or the whole length/height of the
-	 * column (`false`).
+	 * Places bullets on the visible part of a column that runs past the plot
+	 * area, instead of on the whole column.
 	 *
 	 * @default true
 	 */
 	adjustBulletPosition?: boolean;
 
 	/**
-	 * If set to `true`, each column gets its own color from `colors`, instead of
-	 * the whole series sharing one color.
+	 * Gives each column its own color from `colors`, instead of one color for
+	 * the whole series.
 	 *
 	 * @default false
 	 * @since 5.20.4
@@ -78,19 +78,16 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	colorByDataItem?: boolean;
 
 	/**
-	 * A [[ColorSet]] to take colors from when `colorByDataItem` is set.
-	 *
-	 * The series makes its own if none is given, rather than taking the chart's:
-	 * the chart's palette is stepped once per series, and one palette per series
-	 * also means editing one does not change the others.
+	 * Colors for the columns when `colorByDataItem` is set. If not set, the
+	 * series makes its own [[ColorSet]], separate from the chart's.
 	 *
 	 * @since 5.20.4
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * If set to `true` will use color of the last visible column for legend
-	 * marker. Otherwise, series `fill`/`stroke` will be used.
+	 * Colors the legend marker like the last visible column, instead of with
+	 * the series' `fill` and `stroke`.
 	 *
 	 * @since 5.1.13
 	 */
@@ -103,16 +100,16 @@ export interface IBaseColumnSeriesPrivate extends IXYSeriesPrivate { }
 export interface IBaseColumnSeriesAxisRange extends IXYSeriesAxisRange {
 
 	/**
-	 * A list of actual [[Graphics]] elements for an axis range.
-	 *
-	 * Can be used to adjust the look of the axis range columns.
+	 * Columns of the series within the range. Configure their look through
+	 * `columns.template`.
 	 */
 	columns: ListTemplate<Graphics>;
 
 }
 
 /**
- * Base class for all "column-based" series
+ * Base class for column-based series: [[ColumnSeries]],
+ * [[CandlestickSeries]], [[OHLCSeries]] and [[RadarColumnSeries]].
  */
 export abstract class BaseColumnSeries extends XYSeries {
 
@@ -130,7 +127,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 	public abstract makeColumn(dataItem: DataItem<this["_dataItemSettings"]>, listTemplate: ListTemplate<Graphics>): Graphics
 
 	/**
-	 * ListTemplate of columns in series.
+	 * Columns of the series. Configure them all through `columns.template`.
 	 */
 	public abstract columns: ListTemplate<Graphics>;
 
@@ -380,9 +377,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 
 
 	/**
-	 * The palette each column is colored from. Made on demand so every series
-	 * gets its own - a themed one would be a single instance shared by all of
-	 * them.
+	 * Gives the series its own palette for `colorByDataItem` if `colors` is not
+	 * set - a themed one would be a single instance shared by all of them.
 	 *
 	 * @ignore
 	 */
@@ -871,8 +867,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 	}
 
 	/**
-	 * Hides series's data item.
-	 * 
+	 * Hides a data item, along with its column.
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
@@ -916,8 +912,8 @@ export abstract class BaseColumnSeries extends XYSeries {
 	}
 
 	/**
-	 * Shows series's data item.
-	 * 
+	 * Shows a data item, along with its column.
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise

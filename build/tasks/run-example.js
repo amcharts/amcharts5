@@ -1,20 +1,15 @@
-const { withLinkSource, withLinkTargets, spawn, spawnSilent } = require("../util");
+const { spawnSilent } = require("../util");
 
+// Builds everything and opens one example, in its script version
 module.exports = async (state) => {
-    await state.task("build");
+    await state.task("build:script");
     await state.task("examples");
 
     const name = state.args[0];
 
-    const cwd = state.path("dist", "es2015", "examples", "javascript", name);
+    if (!name) {
+        throw new Error("Usage: run-example <name of a folder in examples/shared>");
+    }
 
-    await withLinkSource(state.path("dist", "es2015"), async () => {
-        await spawnSilent("yarn", [], { cwd });
-
-        await withLinkTargets(cwd, ["@amcharts/amcharts5"], async () => {
-            await spawnSilent("yarn", ["build"], { cwd });
-        });
-    });
-
-    await spawnSilent("http-server", ["./", "-o"], { cwd });
+    await spawnSilent("http-server", ["./", "-o", "examples/" + name + "/"], { cwd: state.path("dist", "script") });
 };

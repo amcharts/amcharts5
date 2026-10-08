@@ -5,6 +5,123 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.21.0] - 2026-10-08
+
+### Added
+- Charts can be drawn as SVG instead of canvas: set `renderer: am5.SVGRenderer` in `Root.new()` settings, or `am5.Root.defaultRenderer = am5.SVGRenderer` for every chart on the page. Canvas stays the default. Blend modes `DST_OVER`, `SRC_ATOP` and `XOR` are canvas-only. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#renderer)
+- `am5.renderToSVG(root)`: a chart as an SVG document, whichever renderer draws it. Pass an element instead (e.g. `series.pixels`) to export just that element. Fully transparent elements are left out. Screen readers read it as one image, titled by the chart's `ariaLabel` or the `title` option. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/exporting-svg/)
+- `am5map.MapRasterSeries`: a whole-world image, such as a satellite photo, reprojected as the map rotates and zooms (WebGL where available). With `nightSrc` and `sunDate` or `sunPosition` it shows day and night; `am5map.getSunPosition(date)` finds where the sun is overhead. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-raster-series/)
+- `am5map.NightSeries`: shades the part of a map where it is night, with twilight in steps, and shows the sun. Set `sunDate` (e.g. `"now"`) or `sunPosition`; `sunAltitude` keeps the sun in view past a globe's edge. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/night-series/)
+- `am5map.PixelMapSeries`: map polygons drawn as a grid of pixels (squares, circles, diamonds or hexagons) that rotate and zoom with the map, with heat rules, states and tooltips as in `MapPolygonSeries`. `uniform: true` gives an even grid, `columnHeight` raises pixels into 3D columns. Pixels take their polygon's `stroke` when `strokeWidth` is set, and in SVG export each polygon's pixels are a group with its `id` and name. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/pixel-map-series/)
+- Map lines and points can float above the ground: `altitude` on a `MapLine` raises each leg, from one point to the next, into an arc, and `altitudeField` on a `MapPointSeries` raises points by a data value, in metres. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/#Altitude)
+- `MapPointSeries`: new `surfaceBullets` setting lays bullets onto the map's surface, so they turn and stretch with the projection. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/#Surface_bullets)
+- `MapChart`: new `autoHome` setting sends the map to its home position once it loads, so a map loaded from JSON can start at home without calling `goHome()`. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom)
+- `MapPolygonSeries`: new `clickZoom` setting zooms the map to a clicked polygon (a globe also turns to it); clicking it again or the background goes back home. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object)
+- `<am5-chart>`: a chart as an HTML element, built from a JSON config (`config` or `src`), with `themes` and `renderer="svg"`. Load `element.js` after `plugins/json.js`, or `import "@amcharts/amcharts5/element"`. [More info](https://www.amcharts.com/docs/v5/getting-started/integrations/am5-chart-element/)
+- Charts follow Windows High Contrast (forced colors): labels, grid, axes and buttons take the system colors, so they stay visible; series colors are kept. `Root` setting `forcedColors: false` turns it off. [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#High_contrast_mode)
+- New `autoAppear` setting (with `appearDuration` and `appearDelay`): an element plays its `appear()` animation when first drawn, so a JSON config can have the opening animation too. A series waits for its first data. [More info](https://www.amcharts.com/docs/v5/concepts/animations/#Automatic_appearance)
+- The examples were rewritten: each is one `index.html`, 61 also come as a JSON config, and `examples/index.html` is a gallery showing each chart above its source, on canvas or as SVG. In the npm package they are plain sources (`examples/<name>/index.ts`). Comments in the code explain most settings.
+- The npm package and the download now include `AGENTS.md` and a `docs/` folder with a reference for every chart type, for AI coding agents. [More info](https://www.amcharts.com/docs/v5/ai/)
+- New locale prompts, translated in all locales: "OK", "Cancel", "Delete", "Settings", "Expand", "Move Up", "Move Down".
+- `Scrollbar`: new `outsideAxes` setting puts a chart's scrollbar beyond its axes (`true`) or between them and the plot (`false`), on any side. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/#Inside_or_outside_the_axes)
+- `ChartSerializer`/`JsonParser`: a colour taken from `root.interfaceColors` is saved as a reference (`"@root.interfaceColors.get('background')"`), so a chart parsed with another theme uses that theme's colour. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/chart-serializer/#Theme_colors)
+
+### Changed
+- Responsive theme: minor axis labels are hidden only on charts 600 px or smaller (was 1000 px), so a chart that turns them on shows them.
+- `Sunburst`: `singleBranchOnly` is now ignored (always `true`).
+- Accessibility: ESC on a focused chart element hides its tooltip and ends a keyboard drag, instead of moving focus to the page.
+- `StockToolbar`: `focusable` is now `true` by default, so the toolbar can be used with the keyboard.
+- Accessibility: in a `focusableGroup`, arrow keys move between members even when they are draggable (e.g. `Flow` and hierarchy nodes); SHIFT + arrow keys drag them.
+- `Modal` (also used by `StockChart` settings): it is a dialog to screen readers, named by `ariaLabel` (new setting) or its first heading, focus moves into it when it opens, TAB stays inside it, and closing it gives focus back.
+- `ExportingMenu` now includes "SVG" image option by default.
+
+### Fixed
+- A hidden element (`visible: false`, `forceHidden` or `hide()`) still took up its space in a container sized to its content. E.g. a hidden `XYChart` scrollbar left an empty band above the plot.
+- `Partition`, `Sunburst`: changing `nodePadding` after the chart was drawn had no effect until a resize or data change.
+- `root.horizontalLayout` and `root.gridLayout` were typed as `VerticalLayout`.
+- `GrainPattern`: changing `width` or `height` removed the grain.
+- `ZoomTools`: after `target` was changed, the buttons stopped working.
+- `calculateAggregates`: `valueChange`, `valueChangePercent` and the like were `NaN` on non-XY series (pie, map heat maps) and wrong on bubble series.
+- Bullets with `stacked: "up"` (or `"auto"` in the lower half) on a vertical series overlapped instead of stacking.
+- Dragging an element whose parent is scaled moved it by the wrong amount.
+- `updateData([])` kept the first data item.
+- `WordCloud`: a word failing more than one of `minValue`, `minWordLength` and `excludeWords` also removed a neighbouring word.
+- `MapChart.zoomToGeoBounds()` rotated with `animationDuration` instead of the `duration` given, and changed the bounds object passed in.
+- `MapPointSeries.zoomToDataItems(items, true)` (and `ClusteredPointSeries.zoomToCluster`) turned a globe to a point above the items.
+- `MapPolygonSeries.getPolygonByGeoPoint()` could miss on charts with padding.
+- `MapChart.geoPoint()` was off on charts with padding or not at the top left of the root.
+- Stock drawings: erasing the first drawing reported `index: undefined` in `drawingremoved` and left it in an internal list.
+- Stock indicators drawn in their own panel: the `legend` and `cursor` properties were always `undefined`.
+- `SliceGrouper`: setting `clickBehavior` after creating the plugin made a click on the group slice throw.
+- Exporting: printing with `printMethod: "css"` and a `title` left the page with the print title.
+- Exporting: the HTML `headerClass` option was ignored; header cells got `cellClass`.
+- Exporting: CSV and HTML with `pivot: true` listed the fields in reverse `dataFieldsOrder`.
+- Exporting: a cropped `extraImages` entry above or below the chart made the image as wide as the chart was tall.
+- `Gantt`: the category axis' `colorField` and `nameField` had no effect; `color` and `name` were always used.
+- `PieChart`: with a negative `innerRadius` and several series, the rings were sized wrong.
+- `Sunburst`: with only one of `startAngle` and `endAngle` set, the chart was sized for different angles than it was drawn with.
+- `Chord`: setting `sort` back to `"none"` kept the previous order.
+- `AxisRendererRadial`: a negative `radius` broke the axis. It is measured in from the chart's radius, as on `AxisRendererCircular`.
+- `SmoothedRadarLineSeries`: changing `tension` after the series was created had no effect.
+- `RadarColumnSeries`: with an `innerRadius` on an axis renderer, the column tooltip pointed at the wrong place.
+- `ChartSerializer`: a `DurationAxis` was saved with `maxPrecision: 0`, and a `DateAxis` with `groupInterval` with its `groupIntervals`, though the axes set those themselves.
+- `am5.net.load()` with `responseType: "blob"`: if reading the blob failed, the promise never settled. It is rejected now.
+- `PatternSet`: past the end of its list it returned nothing, so elements after the 17th got no pattern. It starts over from the first pattern.
+- `DurationFormatter`: the codes `H`, `D`, `Y`, `K`, `k` and `n` gave `NaN` (e.g. `"HH:mm:ss"`). They work as `h`, `d`, `y` and `S`. This also fixes the Italian locale's millisecond durations.
+- `CSVParser`: `skipEmpty: false` was ignored, so empty lines were always skipped.
+- Exporting: the `maxHeight` image option never made the image smaller, and on high-DPI screens `minWidth` and `minHeight` were often ignored.
+- `PeriodSelector`: a period without a `name` got a label like `MONTHundefined` (no `count`) or `YTDundefined`. It shows `MONTH1` and `YTD` now.
+- `ValueAxis`: a logarithmic axis with values <= 0 drew nothing without saying why. It now logs a console warning pointing to `treatZeroAs`.
+- `Color.alternative(color)` without the light and dark colors always returned white. The dark default is black now.
+- Date format `YYYY` (the ISO year a week belongs to) was a year behind for every date in time zones west of UTC.
+- `Label`: with `maxChars`, a text cut at a word boundary always ended in `...`, ignoring the `ellipsis` setting.
+- `DataProcessor`: `emptyAs` also replaced `0` and `false` values. It now replaces only `null`, `undefined` and `""`.
+- Heat rules: `minValue: 0` and `maxValue: 0` were ignored, and the data's lowest or highest value was used instead.
+- `Label`: `fillOpacity: 0` was ignored, so the text stayed visible (or kept its previous opacity). It now hides the text.
+- `DurationFormatter`: durations between a month and a year were shown in days only (e.g. `45d 00:00:00`). They use the month formats again (`1m 15d 00:00:00`).
+- `MapPointSeries`: of the bullets placed on lines (`lineId`), only one moved when the lines changed, e.g. got a new `altitude`. All of them follow their lines now.
+- `strokeWidth: 0` drew a 1px line and `shadowOpacity: 0` a full shadow. Both now draw nothing.
+- Filters (`brightness`, `saturate`, `blur` and the rest): changing one dropped the others, and setting one back to neutral left it on.
+- `Label` with `maxWidth` or `maxHeight`: padding was being calculated incorrectly.
+- Labels kept old measurements when a web font loaded after the chart was drawn.
+- A `fontSize` given as a number in a string (e.g. `"8"`) was ignored. It now counts as pixels, like `8`.
+- `RadialLabel` with `textType: "circular"`, `orientation: "outward"` and `textAlign: "left"` was drawn mirrored on every other redraw.
+- Patterns were blurry on high-resolution screens.
+- `PathPattern` (since 5.20.0): without `maxWidth`/`maxHeight` the path was squeezed into 10x10 pixels, and a `width`/`height` set on the pattern was replaced.
+- `Root.new()` on an element that is missing or already has a root left a broken root behind that logged errors.
+- Removing or changing a chart's `animations` setting could leave it drawn with the animated value.
+- `PieChart` and `RadarChart` (and gauges): `innerRadius: am5.percent(0)` broke the chart, and a radar's radius ignored the room left by a legend inside the chart.
+- `Sunburst`: changing `startAngle` and `endAngle` on a drawn chart left the labels and bullets behind.
+- `ForceDirected`: changing `manyBodyStrength`, `centerStrength`, or a link's `distance` or `strength` did nothing once the layout had settled.
+- `MapChart`: `goHome()` went to the wrong place when called before the map was ready or on a rotated map (e.g. a globe)..
+- `MapChart`: a zoomed-in map could not be dragged to its edges (with `maxPanOut: 0` not at all), after a resize it could be dragged past them, and the first drag could make it jump back towards the centre.
+- `MapSankeySeries`: bullets not moving along their flow stayed behind when the map moved, and bullets were drawn under the flows.
+- `MapLineSeries`: changing `lineType` on the series or a data item did not redraw lines already drawn.
+- Axis bullets: `dy` on an X axis bullet's sprite, or `dx` on a Y axis one, had no effect.
+- Stock indicators `VolumeProfile`, `Volume`, `MACD`, `AwesomeOscillator`, `MovingAverageDeviation` and `HeikinAshi`: changing their column colours did not recolour the columns already drawn.
+- `ChartSerializer`: these were not saved: a series hidden with `hide()` or a legend click, a looping animation started on a data item, elements added to a plot container, `Date` values, settings on a series' `bulletsContainer` and on a pie or funnel series' `labelsContainer`/`ticksContainer`, and the `axisFills`, `rectangles` (`Treemap`, `Partition`) and `polygons` (`VoronoiTreemap`) templates.
+- `ChartSerializer`: a formatter set on an element (e.g. a heat legend's `numberFormatter`) and a colour in a legend's own data were saved without their type, and an axis header's own layout was saved as if configured.
+- `ChartSerializer`: fixed serializing saving a Sankey, treemap or word cloud series placed straight in the root container.
+- `Legend` with `clickTarget: "marker"` (e.g. `StockLegend`): ENTER on a focused item did not toggle it.
+- `Gantt`: the expand/collapse button of a task without subtasks is no longer a keyboard stop.
+- `ExportingMenu`: menu items are exposed as menu items to screen readers, the icon tells whether the menu is open, closing the menu returns focus to the icon, and item labels no longer have a double space.
+- `focusableGroup`: a group is always one TAB stop (the member focused last).
+- Accessibility: `Pack`, `ForceDirected` and `Tree` nodes could not be focused, a `Sunburst` node's focus outline was misplaced, and an element shown again without animation could stay hidden from screen readers.
+- Accessibility: focusable pie slices and map polygons could not be focused.
+- Accessibility: map objects left out with `include` or `exclude` got focus elements.
+- `EditableLabel` (used by `Gantt` and `NumericStepper`): ENTER did not work anywhere else on the page.
+- `MapChart`: the zoom level is announced to screen readers once zooming settles.
+- Accessibility: toggles tell screen readers their state. A toggle button (`role: "button"` with `toggleKey`) has `aria-pressed`, a focusable figure that toggles (e.g. a pie slice) is exposed as a toggle button, and new `ariaExpanded` setting gives `aria-expanded`, set on `Gantt` tasks with subtasks and hierarchy nodes with children.
+- Accessibility: changing `ariaCurrent` or `ariaSelected` did not update the element, and `ariaHidden: true` was ignored on a visible focusable element.
+- Accessibility: SPACE clicks a focused element with a button-like `role` (`button`, `checkbox`, `switch`, `radio`, `tab`, `option`, menu items), and `clickAnnounceText` is no longer announced when SPACE does nothing.
+- Accessibility: a tooltip shown for a focused element (`hoverOnFocus`) is announced to screen readers, unless it repeats the element's name.
+- Accessibility: icon buttons had no name for screen readers: zoom controls, `Gantt` toolbar and task buttons, `StockChart` panel and legend buttons, `ColorPicker` buttons, overbought/oversold grips.
+- Accessibility: scrollbar grips on a `CategoryAxis` (also in `Gantt`) were named "From " / "To " without the category.
+- Accessibility: focusable map objects panned or zoomed out of view were still TAB stops, with the focus outline outside the chart. They are TAB stops again once at least partly in view, and screen readers can read them all the time.
+- Accessibility: a bullet's sprite kept no `role` of its own: `Bullet` and `AxisBullet` set it to `"figure"` even when it had one (e.g. a button or a slider).
+- `GaplessDateAxis`: with grouped data and `root.timezone` set, the chart stayed blank with an "Invalid time value" error.
+
+
 ## [5.20.8] - 2026-09-23
 
 ### Added

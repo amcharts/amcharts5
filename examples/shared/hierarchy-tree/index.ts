@@ -15,71 +15,71 @@ root.setThemes([
 ]);
 
 
-// Create wrapper container
-const container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
-  height: am5.percent(100),
-  layout: root.verticalLayout
-}));
-
-
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
-const series = container.children.push(am5hierarchy.Tree.new(root, {
-  singleBranchOnly: false,
-  downDepth: 1,
-  initialDepth: 10,
+// https://www.amcharts.com/docs/v5/charts/hierarchy/tree/
+// the top node is at the top, and each level of nesting one row lower, linked to its parent
+const series = root.container.children.push(am5hierarchy.Tree.new(root, {
+  paddingTop: 40,    // the top node sits on the layout's top edge: room for its circle
+  paddingBottom: 40, // the deepest nodes sit on the bottom edge: room for theirs
   valueField: "value",
   categoryField: "name",
   childDataField: "children"
 }));
 
 
-// Generate and set data
+// Make the nodes big enough for their labels
+series.circles.template.set("radius", 30);
+
+
+// Set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
-const maxLevels = 3;
-const maxNodes = 3;
-const maxValue = 100;
+series.data.setAll([{
+  name: "Acme",
+  children: [
+    {
+      name: "Product",
+      children: [
+        { name: "Web", value: 12 },
+        { name: "Mobile", value: 8 },
+        {
+          name: "Platform",
+          children: [
+            { name: "Cloud", value: 5 },
+            { name: "Data", value: 6 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Sales",
+      children: [
+        { name: "Europe", value: 7 },
+        { name: "Americas", value: 9 },
+        { name: "Asia", value: 4 }
+      ]
+    },
+    {
+      name: "Support",
+      children: [
+        { name: "Helpdesk", value: 10 },
+        {
+          name: "Training",
+          children: [
+            { name: "Docs", value: 3 },
+            { name: "Courses", value: 4 }
+          ]
+        }
+      ]
+    }
+  ]
+}]);
 
-const data = {
-  name: "Root",
-  children: []
-}
-generateLevel(data, "", 0);
 
-series.data.setAll([data]);
+// Select the root node
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
 series.set("selectedDataItem", series.dataItems[0]);
-
-function generateLevel(data: any, name: string, level: number) {
-  for (let i = 0; i < Math.ceil(maxNodes * Math.random()) + 1; i++) {
-    let nodeName = name + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i];
-    let child;
-    if (level < maxLevels) {
-      child = {
-        name: nodeName + level
-      }
-
-      if (level > 0 && Math.random() < 0.5) {
-        child.value = Math.round(Math.random() * maxValue);
-      }
-      else {
-        child.children = [];
-        generateLevel(child, nodeName + i, level + 1)
-      }
-    }
-    else {
-      child = {
-        name: name + i,
-        value: Math.round(Math.random() * maxValue)
-      }
-    }
-    data.children.push(child);
-  }
-
-  level++;
-  return data;
-}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

@@ -1,0 +1,7 @@
+{
+  "title": "Circle Pack",
+  "description": "A pack chart: nested data as circles inside circles, sized by value, where a click opens the next level.",
+  "category": "hierarchy",
+  "tier": "basic",
+  "tags": ["pack", "hierarchy", "nested data", "drill-down"]
+}

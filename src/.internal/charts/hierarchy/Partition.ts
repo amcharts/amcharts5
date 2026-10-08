@@ -29,7 +29,7 @@ export interface IPartitionDataItem extends IHierarchyDataItem {
 	children: Array<DataItem<IPartitionDataItem>>;
 
 	/**
-	 * Data item of a parent node.
+	 * Data item of the parent node.
 	 */
 	parent: DataItem<IPartitionDataItem>;
 
@@ -39,7 +39,7 @@ export interface IPartitionDataItem extends IHierarchyDataItem {
 	d3HierarchyNode: d3hierarchy.HierarchyRectangularNode<IHierarchyDataObject>;
 
 	/**
-	 * A [[RoundedRectangle]] element of a node.
+	 * The node's rectangle.
 	 */
 	rectangle: RoundedRectangle;
 
@@ -48,14 +48,15 @@ export interface IPartitionDataItem extends IHierarchyDataItem {
 export interface IPartitionSettings extends IHierarchySettings {
 
 	/**
-	 * Gap between nodes in pixels.
+	 * Gap between nodes, in pixels.
 	 *
 	 * @default 0
 	 */
 	nodePadding?: number;
 
 	/**
-	 * Orientation of the diagram.
+	 * Direction the levels follow each other: `"vertical"` from top to
+	 * bottom, `"horizontal"` from left to right.
 	 *
 	 * @default "vertical"
 	 */
@@ -81,7 +82,9 @@ export interface IPartitionPrivate extends IHierarchyPrivate {
 }
 
 /**
- * Partition series.
+ * A partition (icicle) diagram: each level is a row of rectangles (a column,
+ * when horizontal), and each node spans as much of it as its value. A click
+ * on a node zooms into it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/partition/} for more info
  */
@@ -97,9 +100,8 @@ export class Partition extends Hierarchy {
 	public static classNames: Array<string> = Hierarchy.classNames.concat([Partition.className]);
 
 	/**
-	 * A list of node rectangle elements in a [[Partition]] chart.
-	 *
-	 * @default new ListTemplate<RoundedRectangle>
+	 * List of node rectangles; configure them all through
+	 * `rectangles.template`.
 	 */
 	public readonly rectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -123,9 +125,7 @@ export class Partition extends Hierarchy {
 		super._prepareChildren();
 
 		if (this.isDirty("nodePadding")) {
-			if (this._rootNode) {
-				this._updateNodes(this._rootNode);
-			}
+			this._updateVisuals();
 		}
 
 		if (this.isPrivateDirty("scaleX") || this.isPrivateDirty("scaleY")) {
@@ -153,9 +153,7 @@ export class Partition extends Hierarchy {
 
 			const nodePadding = this.get("nodePadding");
 
-			if ($type.isNumber(nodePadding)) {
-				partitionLayout.padding(nodePadding);
-			}
+			partitionLayout.padding($type.isNumber(nodePadding) ? nodePadding : 0);
 
 
 			partitionLayout(this._rootNode);

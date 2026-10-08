@@ -1,0 +1,24 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "sourceMap": false,
+        "inlineSources": false,
+        "rootDir": "..",
+        "resolveJsonModule": true,
+        "baseUrl": "..",
+        "paths": {
+            "@amcharts/amcharts5": ["src/index"],
+            "@amcharts/amcharts5/*": ["src/*"],
+            "@amcharts/amcharts5-geodata/*": ["src/geodata/*"],
+            "@amcharts/amcharts5-fonts/*": ["src/fonts/*"]
+        }
+    },
+    "include": [
+        "shared/**/*.ts",
+        "../src/.internal/@types/**/*.d.ts"
+    ],
+    "exclude": [
+        "shared/jest/**/*"
+    ]
+}

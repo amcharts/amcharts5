@@ -22,14 +22,14 @@ export abstract class Chart extends Container {
 	declare public _events: IChartEvents;
 
 	/**
-	 * A [[Container]] chart places its elements in.
+	 * The [[Container]] the chart places its elements in.
 	 * 
 	 * @default Container.new()
 	 */
 	public readonly chartContainer: Container = this.children.push(Container.new(this._root, { width: p100, height: p100, interactiveChildren: false }));
 
 	/**
-	 * A [[Container]] chart places its bullets in.
+	 * The [[Container]] the chart places its bullets in.
 	 * 
 	 * @default Container.new()
 	 */

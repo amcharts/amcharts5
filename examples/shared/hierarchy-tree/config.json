@@ -1,0 +1,76 @@
+{
+  "type": "Tree",
+  "settings": {
+    "paddingTop": 40,
+    "paddingBottom": 40,
+    "valueField": "value",
+    "categoryField": "name",
+    "childDataField": "children",
+    "selectedDataItem": "@self.dataItems.0",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "data": "#data-0",
+    "circles": {
+      "properties": {
+        "template": {
+          "settings": { "radius": 30 }
+        }
+      }
+    }
+  },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "name": "Acme",
+          "children": [
+            {
+              "name": "Product",
+              "children": [
+                { "name": "Web", "value": 12 },
+                { "name": "Mobile", "value": 8 },
+                {
+                  "name": "Platform",
+                  "children": [
+                    { "name": "Cloud", "value": 5 },
+                    { "name": "Data", "value": 6 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Sales",
+              "children": [
+                { "name": "Europe", "value": 7 },
+                { "name": "Americas", "value": 9 },
+                { "name": "Asia", "value": 4 }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Support",
+              "children": [
+                { "name": "Helpdesk", "value": 10 },
+                {
+                  "name": "Training",
+                  "children": [
+                    { "name": "Docs", "value": 3 },
+                    { "name": "Courses", "value": 4 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            }
+          ],
+          "__parse": true
+        }
+      ]
+    }
+  ]
+}

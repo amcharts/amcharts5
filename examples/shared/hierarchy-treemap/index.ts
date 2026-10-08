@@ -15,78 +15,84 @@ root.setThemes([
 ]);
 
 
-// Create wrapper container
+// Create a container that stacks the breadcrumbs above the chart
 const container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
-  height: am5.percent(100),
+  width: am5.percent(100),  // fills the chart div; the treemap gets
+  height: am5.percent(100), // the height the breadcrumbs leave
   layout: root.verticalLayout
 }));
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
+// https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/
+// a click on a tile zooms into it; the breadcrumbs lead back up
 const series = container.children.push(am5hierarchy.Treemap.new(root, {
-  singleBranchOnly: false,
-  downDepth: 1,
-  upDepth: 1,
-  initialDepth: 1,
+  downDepth: 1,    // a click shows one level inside the clicked tile
+  upDepth: 1,      // levels more than one above the opened tile are hidden
+  initialDepth: 2, // two levels under the top node at first: Audio and Kitchen stay closed
   valueField: "value",
   categoryField: "name",
   childDataField: "children"
 }));
 
 
-// Generate and set data
+// Add breadcrumbs above the chart
+// https://www.amcharts.com/docs/v5/charts/hierarchy/breadcrumbs/
+container.children.unshift(am5hierarchy.BreadcrumbBar.new(root, {
+  series: series
+}));
+
+
+// Set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
-const maxLevels = 2;
-const maxNodes = 6;
-const maxValue = 100;
+series.data.setAll([{
+  name: "Sales",
+  children: [
+    {
+      name: "Electronics",
+      children: [
+        { name: "Phones", value: 86 },
+        { name: "Laptops", value: 64 },
+        {
+          name: "Audio",
+          children: [
+            { name: "Headphones", value: 31 },
+            { name: "Speakers", value: 18 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Home",
+      children: [
+        { name: "Furniture", value: 52 },
+        { name: "Lighting", value: 15 },
+        {
+          name: "Kitchen",
+          children: [
+            { name: "Cookware", value: 22 },
+            { name: "Appliances", value: 37 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Sports",
+      children: [
+        { name: "Cycling", value: 41 },
+        { name: "Fitness", value: 28 },
+        { name: "Outdoor", value: 23 }
+      ]
+    }
+  ]
+}]);
 
-const data = {
-  name: "Root",
-  children: []
-}
-generateLevel(data, "", 0);
 
-series.data.setAll([data]);
+// Select the root node
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
 series.set("selectedDataItem", series.dataItems[0]);
-
-container.children.moveValue(
-  am5hierarchy.BreadcrumbBar.new(root, {
-    series: series
-  }), 0
-);
-
-function generateLevel(data: any, name: string, level: number) {
-  for (let i = 0; i < Math.ceil(maxNodes * Math.random()) + 1; i++) {
-    let nodeName = name + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i];
-    let child;
-    if (level < maxLevels) {
-      child = {
-        name: nodeName + level
-      }
-
-      if (level > 0 && Math.random() < 0.5) {
-        child.value = Math.round(Math.random() * maxValue);
-      }
-      else {
-        child.children = [];
-        generateLevel(child, nodeName + i, level + 1)
-      }
-    }
-    else {
-      child = {
-        name: name + i,
-        value: Math.round(Math.random() * maxValue)
-      }
-    }
-    data.children.push(child);
-  }
-
-  level++;
-  return data;
-}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "ตกลง",
+	"Cancel": "ยกเลิก",
+	"Delete": "ลบ",
+	"Settings": "การตั้งค่า",
+	"Expand": "ขยาย",
+	"Move Up": "ย้ายขึ้น",
+	"Move Down": "ย้ายลง"
 };

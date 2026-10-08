@@ -53,9 +53,8 @@ export function rgba2hex(color: string): number {
 }
 
 /**
- * Returns a new [[Color]] object base on input.
- *
- * Accepts parameters in CSS hex or rgb/rtba strings, or hex numbers.
+ * Returns a new [[Color]] from a hex number, or a CSS hex, `rgb()` or
+ * `rgba()` string (color names such as `"red"` are not accepted):
  *
  * * `"#f00"`
  * * `"#ff0000"`
@@ -71,8 +70,8 @@ export function color(input: number | string): Color {
 }
 
 /**
- * Wherever color needs to be specified in amCharts 5, `Color` object needs to
- * be used.
+ * A color. Every color setting takes a `Color` object, usually created with
+ * `am5.color()`, e.g. `am5.color(0xff0000)`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/} for more info
  * @important
@@ -85,14 +84,14 @@ export class Color {
 	}
 
 	/**
-	 * Color numeric value.
+	 * The color as a number, such as `0xff0000`.
 	 */
 	public get hex(): number {
 		return this._hex;
 	}
 
 	/**
-	 * Value of color's R channel.
+	 * The red channel, from `0` to `255`.
 	 * @return R value
 	 */
 	public get r(): number {
@@ -100,7 +99,7 @@ export class Color {
 	}
 
 	/**
-	 * Value of color's G channel.
+	 * The green channel, from `0` to `255`.
 	 * @return G value
 	 */
 	public get g(): number {
@@ -108,7 +107,7 @@ export class Color {
 	}
 
 	/**
-	 * Value of color's B channel.
+	 * The blue channel, from `0` to `255`.
 	 * @return B value
 	 */
 	public get b(): number {
@@ -116,9 +115,9 @@ export class Color {
 	}
 
 	/**
-	 * Returns color CSS representation in form of `rgba(r, g, b, a)` string.
+	 * Returns the color as a CSS `rgba(r, g, b, a)` string.
 	 *
-	 * @param   alpha  Opacity
+	 * @param   alpha  Opacity, from `0` to `1`
 	 * @return         CSS string
 	 */
 	public toCSS(alpha: number = 1): string {
@@ -126,7 +125,7 @@ export class Color {
 	}
 
 	/**
-	 * Returns color CSS representation in form of `#rgb` string.
+	 * Returns the color as a CSS hex string, such as `"#ff0000"`.
 	 *
 	 * @return         CSS string
 	 */
@@ -135,8 +134,8 @@ export class Color {
 	}
 
 	/**
-	 * Returns color's HSL info.
-	 * @param   alpha Opacity
+	 * Returns the color's hue, saturation and lightness, each from `0` to `1`.
+	 * @param   alpha Opacity (not used)
 	 * @return        HSL info
 	 */
 	public toHSL(alpha: number = 1): $utils.iHSL {
@@ -149,11 +148,11 @@ export class Color {
 	}
 
 	/**
-	 * Converts HSL values into a new [[Color]] object.
+	 * Returns a new [[Color]] from hue, saturation and lightness.
 	 *
-	 * @param   h H value
-	 * @param   s S value
-	 * @param   l L value
+	 * @param   h Hue, from `0` to `1`
+	 * @param   s Saturation, from `0` to `1`
+	 * @param   l Lightness, from `0` to `1`
 	 * @return    Color object
 	 */
 	public static fromHSL(h: number, s: number, l: number): Color {
@@ -170,7 +169,7 @@ export class Color {
 	}
 
 	/**
-	 * Converts hex number into a new [[Color]] object.
+	 * Returns a new [[Color]] from a hex number.
 	 *
 	 * ```TypeScript
 	 * Color.fromHex(0xff0000) // red
@@ -187,11 +186,11 @@ export class Color {
 	}
 
 	/**
-	 * Converts RGB values to a new [[Color]] object.
+	 * Returns a new [[Color]] from red, green and blue channels.
 	 *
-	 * @param   r  R value
-	 * @param   g  G value
-	 * @param   b  B value
+	 * @param   r  Red, from `0` to `255`
+	 * @param   g  Green, from `0` to `255`
+	 * @param   b  Blue, from `0` to `255`
 	 * @return     Color
 	 */
 	public static fromRGB(r: number, g: number, b: number): Color {
@@ -199,7 +198,8 @@ export class Color {
 	}
 
 	/**
-	 * Converts RGB string to a new [[Color]] object.
+	 * Returns a new [[Color]] from a hex string, such as `"#ff0000"` or
+	 * `"#f00"`.
 	 *
 	 * ```TypeScript
 	 * Color.fromString("#ff0000") // red
@@ -208,7 +208,7 @@ export class Color {
 	 * Color.fromString("#ff0000") // red
 	 * ```
 	 *
-	 * @param   s  RGB string
+	 * @param   s  Hex string
 	 * @return     Color
 	 */
 	public static fromString(s: string): Color {
@@ -216,7 +216,8 @@ export class Color {
 	}
 
 	/**
-	 * Converts CSS rgba() syntax to a new [[Color]] object.
+	 * Returns a new [[Color]] from a CSS `rgb()` or `rgba()` string. The alpha
+	 * part is ignored, and a string it can't read gives black.
 	 *
 	 * ```TypeScript
 	 * Color.fromCSS("rgba(255, 0, 0, 1)") // red
@@ -225,17 +226,16 @@ export class Color {
 	 * Color.fromCSS("rgba(255, 0, 0, 1)") // red
 	 * ```
 	 *
-	 * @param  {string} s [description]
-	 * @return {Color}    [description]
+	 * @param   s  CSS string
+	 * @return     Color
 	 */
 	public static fromCSS(s: string): Color {
 		return new Color(rgba2hex(s));
 	}
 
 	/**
-	 * Convert to color from virtually anything.
-	 *
-	 * Will throw an exception if unable to resolve the color.
+	 * Returns a new [[Color]] from a hex number, a hex, `rgb()` or `rgba()`
+	 * string, or another [[Color]]. Throws an error for anything else.
 	 *
 	 * @param   s  Source
 	 * @return     Color
@@ -260,9 +260,8 @@ export class Color {
 	}
 
 	/**
-	 * Returns a new [[Color]] object based on either `lightAlternative` or
-	 * `darkAlternative` depending on which one is more contrasting with
-	 * the `color`.
+	 * Returns `lightAlternative` or `darkAlternative`, whichever contrasts more
+	 * with `color`: the dark one for a light color, the light one for a dark.
 	 *
 	 * @param   color             Reference color
 	 * @param   lightAlternative  Light color
@@ -279,13 +278,12 @@ export class Color {
 	}
 
 	/**
-	 * Returns an intermediate Color between two reference colors depending on
-	 * the progress (`diff`) between the two.
+	 * Returns a color between `from` and `to`.
 	 *
-	 * @param   diff  Progress
+	 * @param   diff  Position between the two, from `0` (`from`) to `1` (`to`)
 	 * @param   from  Source color
 	 * @param   to    Target color
-	 * @param   mode  Interpolation mode
+	 * @param   mode  Mix the `"rgb"` channels or the `"hsl"` values
 	 * @return        Color
 	 */
 	public static interpolate(diff: Time, from: Color, to: Color, mode: "rgb" | "hsl" = "rgb"): Color {
@@ -308,12 +306,12 @@ export class Color {
 	}
 
 	/**
-	 * Returns a new [[Color]] lightened by `percent` value.
-	 *
-	 * Use negative value to darken the color.
+	 * Returns a new [[Color]] lightened by `percent`, from `-1` to `1`: `0.2`
+	 * moves each channel 20% of the way to white. A negative value darkens it
+	 * toward black.
 	 *
 	 * @param   color    Source color
-	 * @param   percent  Percent
+	 * @param   percent  Amount, from `-1` to `1`
 	 * @return           New color
 	 */
 	public static lighten(color: Color, percent: number): Color {
@@ -322,12 +320,12 @@ export class Color {
 	}
 
 	/**
-	 * Returns a new [[Color]] brightened by `percent` value.
-	 *
-	 * Use negative value to dim the color.
+	 * Returns a new [[Color]] brightened by `percent`, from `-1` to `1`. Unlike
+	 * `lighten()`, it adds the same amount to every channel. A negative value
+	 * dims the color.
 	 *
 	 * @param   color    Source color
-	 * @param   percent  Percent
+	 * @param   percent  Amount, from `-1` to `1`
 	 * @return           New color
 	 */
 	public static brighten(color: Color, percent: number): Color {
@@ -336,12 +334,12 @@ export class Color {
 	}
 
 	/**
-	 * Returns a new [[Color]] saturated by `percent` value.
-	 *
-	 * Value range is between `0` (fully desaturated), to `1` (full color).
+	 * Returns a new [[Color]] with its saturation set to `percent`, from `0`
+	 * (grey) to `1`. The value replaces the color's saturation rather than
+	 * adjusting it; `1` returns the color unchanged.
 	 *
 	 * @param   color    Source color
-	 * @param   percent  Percent
+	 * @param   percent  Saturation, from `0` to `1`
 	 * @return           New color
 	 */
 	public static saturate(color: Color, percent: number): Color {

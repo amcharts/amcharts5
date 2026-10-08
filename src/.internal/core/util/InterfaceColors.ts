@@ -6,12 +6,12 @@ import { Entity, IEntitySettings } from "./Entity"
 export interface IInterfaceColorsSettings extends IEntitySettings {
 
 	/**
-	 * Used for generic outlines.
+	 * Color for general outlines.
 	 */
 	stroke?: Color,
 
 	/**
-	 * Used for generic fills.
+	 * Color for general fills, such as a scrollbar's background.
 	 */
 	fill?: Color,
 
@@ -26,22 +26,22 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	primaryButtonHover?: Color,
 
 	/**
-	 * Primary button fill color when pressing down on it.
+	 * Primary button fill color while pressed.
 	 */
 	primaryButtonDown?: Color,
 
 	/**
-	 * Primary button fill color when it is set as active.
+	 * Primary button fill color when active.
 	 */
 	primaryButtonActive?: Color,
 
 	/**
-	 * Primary button fill color when it is set as disabled.
+	 * Primary button fill color when disabled.
 	 */
 	primaryButtonDisabled?: Color,	
 
 	/**
-	 * Primary button text color when it is set as disabled.
+	 * Primary button text color when disabled.
 	 */
 	primaryButtonTextDisabled?: Color,
 
@@ -66,12 +66,12 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	secondaryButtonHover?: Color,
 
 	/**
-	 * Secondary button fill color when pressing down on it.
+	 * Secondary button fill color while pressed.
 	 */
 	secondaryButtonDown?: Color,
 
 	/**
-	 * Secondary button fill color when it is set as active.
+	 * Secondary button fill color when active.
 	 */
 	secondaryButtonActive?: Color,
 
@@ -86,18 +86,19 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	secondaryButtonStroke?: Color,
 
 	/**
-	 * Grid color.
+	 * Color of grid lines.
 	 */
 	grid?: Color,
 
 	/**
-	 * Chart background color.
+	 * Background color, for elements that should blend with what is behind
+	 * the chart, such as legend item backgrounds.
 	 */
 	background?: Color,
 
 	/**
-	 * Alternative background, for elements that need to contrast with primary
-	 * background.
+	 * A color that contrasts with `background`, for elements that should stand
+	 * out from it, such as tooltips.
 	 */
 	alternativeBackground?: Color,
 
@@ -107,8 +108,7 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	text?: Color,
 
 	/**
-	 * Alternative text color, used for inverted (dark) backgrounds.
-	 * @type {[type]}
+	 * Text color over `alternativeBackground`, such as in tooltips.
 	 */
 	alternativeText?: Color,
 
@@ -118,12 +118,12 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	disabled?: Color,
 
 	/**
-	 * Color to indicate positive value.
+	 * Color for positive values, such as a rise.
 	 */
 	positive?: Color,
 
 	/**
-	 * Color to indicate negative value.
+	 * Color for negative values, such as a fall.
 	 */
 	negative?: Color
 
@@ -131,7 +131,8 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 
 
 /**
- * Presets for common UI elements.
+ * Colors of common interface elements: buttons, grid, text and backgrounds.
+ * The root's is `root.interfaceColors`.
  */
 export class InterfaceColors extends Entity {
 	public static className: string = "InterfaceColors";

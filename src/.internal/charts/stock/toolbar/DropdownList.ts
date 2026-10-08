@@ -5,43 +5,74 @@ import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
 
 export interface IDropdownListItem {
+	/**
+	 * ID of the item. `"separator"` draws a separator line instead.
+	 */
 	id: string;
+	/**
+	 * Text of the item.
+	 */
 	label: string;
+	/**
+	 * Second line of text, also used as the item's tooltip.
+	 */
 	subLabel?: string;
+	/**
+	 * Extra CSS class of the item.
+	 */
 	className?: string;
+	/**
+	 * Icon shown before the label.
+	 */
 	icon?: SVGElement;
+	/**
+	 * Adds a radio button or a checkbox to the item. Toggling it dispatches
+	 * `changed`.
+	 */
 	form?: "radio" | "checkbox";
+	/**
+	 * Value of the radio button or checkbox.
+	 */
 	value?: string;
+	/**
+	 * Checks the radio button or checkbox at the start.
+	 */
 	checked?: boolean;
 	options?: IDropdownListItem[];
+	/**
+	 * Shows the item as disabled, so it can't be picked.
+	 */
 	disabled?: boolean;
 }
 
 export interface IDropdownListSettings extends IDropdownSettings {
 
 	/**
-	 * A list of items in the dropdown.
+	 * Items of the list.
 	 */
 	items?: IDropdownListItem[];
 
 	/**
-	 * Maximum search items to show.
+	 * Most results of `searchCallback` to show; the rest are cut off with a
+	 * note.
+	 *
+	 * @default 10
 	 */
 	maxSearchItems?: number;
 
 	/**
-	 * Is the list searchable? If `true` shows search field and
-	 * calls `searchCallback` function for a list of items.
+	 * Shows a search field above the list. Typing filters the items or, with
+	 * `searchCallback`, replaces them with its results.
 	 */
 	searchable?: boolean;
 
 	/**
-	 * A callback function which returns a list of items based on a search query.
+	 * Returns the items to show for a search query.
 	 */
 	searchCallback?: (query: string) => Promise<IDropdownListItem[]>;
 
 	/**
-	 * An array of item IDs to not show in the list.
+	 * IDs of items to leave out of the list.
 	 *
 	 * @since 5.7.0
 	 */
@@ -56,10 +87,16 @@ export interface IDropdownListPrivate extends IDropdownPrivate {
 }
 
 export interface IDropdownListEvents extends IDropdownEvents {
+	/**
+	 * An item was clicked.
+	 */
 	invoked: {
 		item: IDropdownListItem;
 	};
 
+	/**
+	 * The radio button or checkbox of an item was toggled.
+	 */
 	changed: {
 		item: IDropdownListItem;
 		value: string | boolean;
@@ -67,7 +104,7 @@ export interface IDropdownListEvents extends IDropdownEvents {
 }
 
 /**
- * A dropdown control for [[StockToolbar]].
+ * A dropdown list for the controls of a [[StockToolbar]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-list-control/} for more info
  */
@@ -119,9 +156,8 @@ export class DropdownList extends Dropdown {
 	}
 
 	/**
-	 * Rebuilds the list.
-	 * 
-	 * Useful when changing item data within item list.
+	 * Rebuilds the list from `items`, for example after the items' data was
+	 * changed in place.
 	 *
 	 * @since 5.7.0
 	 */
@@ -244,11 +280,17 @@ export class DropdownList extends Dropdown {
 		}
 	}
 
+	/**
+	 * Adds an item to the end of the list as shown, without adding it to
+	 * `items`.
+	 *
+	 * @param  info  Item
+	 */
 	public addItem(info: IDropdownListItem): void {
 		const list = this.getPrivate("list")!;
 		const item = document.createElement("li");
 		item.className = "am5stock-list-item";
-		item.setAttribute("title", info.subLabel || info.label);
+		item.setAttribute("title", $utils.htmlToText(info.subLabel || info.label));
 
 		if (info.className) {
 			item.className += " " + info.className;

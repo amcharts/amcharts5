@@ -1,0 +1,33 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "panX": "rotateX",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100,
+    "projectionName": "geoNaturalEarth1"
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1"]
+  },
+  "refs": [
+    {
+      "data-0": []
+    },
+    {
+      "data-1": []
+    },
+    {
+      "series-0": {
+        "type": "MapPolygonSeries",
+        "settings": { "geoJSON": "am5geodata_worldLow" }
+      }
+    },
+    {
+      "series-1": {
+        "type": "NightSeries",
+        "settings": { "sunDate": "now" }
+      }
+    }
+  ]
+}

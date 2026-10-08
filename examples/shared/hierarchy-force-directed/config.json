@@ -1,0 +1,69 @@
+{
+  "type": "ForceDirected",
+  "settings": {
+    "minRadius": 25,
+    "maxRadius": 55,
+    "nodePadding": 10,
+    "valueField": "value",
+    "categoryField": "name",
+    "childDataField": "children",
+    "selectedDataItem": "@self.dataItems.0",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": { "data": "#data-0" },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "name": "Music",
+          "children": [
+            {
+              "name": "Rock",
+              "children": [
+                { "name": "Classic Rock", "value": 64 },
+                { "name": "Punk", "value": 28 },
+                {
+                  "name": "Metal",
+                  "children": [
+                    { "name": "Heavy Metal", "value": 35 },
+                    { "name": "Thrash", "value": 17 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Electronic",
+              "children": [
+                { "name": "House", "value": 42 },
+                { "name": "Techno", "value": 31 },
+                { "name": "Ambient", "value": 19 }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Jazz",
+              "children": [
+                { "name": "Swing", "value": 24 },
+                { "name": "Bebop", "value": 33 },
+                {
+                  "name": "Fusion",
+                  "children": [
+                    { "name": "Jazz Rock", "value": 14 },
+                    { "name": "Latin Jazz", "value": 21 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            }
+          ],
+          "__parse": true
+        }
+      ]
+    }
+  ]
+}

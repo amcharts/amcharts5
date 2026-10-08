@@ -12,7 +12,7 @@ import { Label } from "../../core/render/Label";
 export interface IArcDiagramNodesDataItem extends IFlowNodesDataItem {
 
 	/**
-	 * Node [[Circle]] element.
+	 * The node's [[Circle]] element.
 	 */
 	circle: Circle;
 
@@ -29,16 +29,14 @@ export interface IArcDiagramNodesPrivate extends IFlowNodesPrivate { };
 export interface IArcDiagramNodesEvents extends IFlowNodesEvents { };
 
 /**
- * Holds instances of nodes for a [[ArcDiagram]] series.
+ * Holds the nodes of an [[ArcDiagram]] series.
  */
 export class ArcDiagramNodes extends FlowNodes {
 	public static className: string = "ArcDiagramNodes";
 	public static classNames: Array<string> = FlowNodes.classNames.concat([ArcDiagramNodes.className]);
 
 	/**
-	 * List of label elements.
-	 *
-	 * @default new ListTemplate<Label>
+	 * List of node labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -58,9 +56,7 @@ export class ArcDiagramNodes extends FlowNodes {
 	protected _dAngle: number = 0;
 
 	/**
-	 * List of slice elements.
-	 *
-	 * @default new ListTemplate<Slice>
+	 * List of node circles; configure them all through `circles.template`.
 	 */
 	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),

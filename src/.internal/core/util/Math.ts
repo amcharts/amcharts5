@@ -14,11 +14,11 @@ export const RADIANS = PI / 180;
 export const DEGREES = 180 / PI;
 
 /**
- * Rounds the numeric value to whole number or specific precision of set.
+ * Rounds a number to a whole number, or to `precision` decimal places if set.
  *
  * @param value      Value
  * @param precision  Precision (number of decimal points)
- * @param floor  In case value ends with 0.5 and precision is 0, we might need to floor the value instead of ceiling it.
+ * @param floor      Round halves down instead of up, when rounding to a whole number
  * @return Rounded value
  */
 export function round(value: number, precision?: number, floor?: boolean): number {
@@ -40,7 +40,8 @@ export function round(value: number, precision?: number, floor?: boolean): numbe
 
 
 /**
- * Ceils the numeric value to whole number or specific precision of set.
+ * Rounds a number up to a whole number, or to `precision` decimal places if
+ * set.
  *
  * @param value      Value
  * @param precision  Precision (number of decimal points)
@@ -104,7 +105,7 @@ export function fitToRange(value: number, min: number, max: number): number {
 /**
  * Returns sine of an angle specified in degrees.
  *
- * @param value  Value
+ * @param angle  Angle in degrees
  * @return Sine
  */
 export function sin(angle: number): number {
@@ -112,10 +113,10 @@ export function sin(angle: number): number {
 }
 
 /**
- * Returns tan of an angle specified in degrees.
+ * Returns tangent of an angle specified in degrees.
  *
- * @param value  Value
- * @return Sine
+ * @param angle  Angle in degrees
+ * @return Tangent
  */
 export function tan(angle: number): number {
 	return Math.tan(RADIANS * angle);
@@ -124,7 +125,7 @@ export function tan(angle: number): number {
 /**
  * Returns cosine of an angle specified in degrees.
  *
- * @param value  Value
+ * @param angle  Angle in degrees
  * @return Cosine
  */
 export function cos(angle: number): number {
@@ -197,7 +198,8 @@ export function getArcBounds(cx: number, cy: number, startAngle: number, endAngl
 }
 
 /**
- * Returns a point on a circle at the given angle.
+ * Returns a point on a circle at the given angle, relative to the circle's
+ * center.
  *
  * @param radius  Circle radius
  * @param arc     Angle in degrees
@@ -310,8 +312,9 @@ export function inBounds(point: IPoint, bounds: IBounds) {
 }
 
 /**
- * Returns the angle in degrees from `point1` to `point2`.
- * If `point2` is omitted, uses double of `point1` coordinates.
+ * Returns the angle in degrees from `point1` to `point2`: `0` points right and
+ * angles grow clockwise. If `point2` is omitted, returns the angle of `point1`
+ * as seen from `0, 0`.
  *
  * @param point1  Origin point
  * @param point2  Target point (optional)
@@ -409,9 +412,9 @@ export function resolveLocationOnPath(location: number, cumulativeLengths: numbe
 /**
  * Returns the closest value from the array of values to the reference value.
  *
- * @param values  Array of values
- * @param value   Reference value
- * @return Closes value from the array
+ * @param values          Array of values
+ * @param referenceValue  Reference value
+ * @return Closest value from the array
  */
 export function closest(values: number[], referenceValue: number): number {
 	return values.reduce(function(prev, curr) {
@@ -420,10 +423,11 @@ export function closest(values: number[], referenceValue: number): number {
 }
 
 /**
- * Returns true if bounds overlap
- * @param bounds1 IBounds
- * @param bounds2 IBounds
- * @returns boolean
+ * Returns `true` if two bounds overlap. Bounds that only touch do not.
+ *
+ * @param bounds1  First bounds
+ * @param bounds2  Second bounds
+ * @returns Whether the bounds overlap
  */
 export function boundsOverlap(bounds1: IBounds, bounds2: IBounds): boolean {
 	const horizontalOverlap = bounds1.left < bounds2.right && bounds1.right > bounds2.left;

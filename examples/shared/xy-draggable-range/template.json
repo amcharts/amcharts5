@@ -1,0 +1,7 @@
+{
+  "title": "Draggable Range",
+  "description": "A handle on the date axis that the user drags to move an axis range; the part of the series after it is drawn in another color with a pattern fill.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "axis range", "series range", "dragging", "pattern"]
+}

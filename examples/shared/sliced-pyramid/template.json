@@ -1,0 +1,7 @@
+{
+  "title": "Pyramid Chart",
+  "description": "A pyramid series in a sliced chart, with aligned labels and a legend.",
+  "category": "percent",
+  "tier": "basic",
+  "tags": ["pyramid", "sliced", "legend"]
+}

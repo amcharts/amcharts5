@@ -7,11 +7,14 @@ import * as $array from "../../../core/util/Array";
 export type DrawingTools = "Arrows &amp; Icons" | "Average" | "Callout" | "Doodle" | "Ellipse" | "Fibonacci" | "Fibonacci Timezone" | "Horizontal Line" | "Horizontal Ray" | "Label" | "Line" | "Line Arrow"  | "Measure" | "Parallel Channel" | "Polyline" | "Polyfill" | "Quadrant Line" | "Rectangle" | "Regression" | "Trend Line" | "Triangle" | "Vertical Line";
 
 export interface IDrawingToolControlSettings extends IStockControlSettings {
+	/**
+	 * Drawing tools to list.
+	 */
 	tools: DrawingTools[];
 
 	/**
-	 * If set to `true`, the dropdown will fix the height to fit within chart's
-	 * area, with scroll if the contents do not fit.
+	 * Limits the list's height to the chart's height minus 100 pixels,
+	 * scrolling the rest.
 	 *
 	 * @since 5.9.5
 	 */
@@ -23,15 +26,17 @@ export interface IDrawingToolControlPrivate extends IStockControlPrivate {
 }
 
 export interface IDrawingToolControlEvents extends IStockControlEvents {
+	/**
+	 * A tool was picked from the list.
+	 */
 	selected: {
 		tool: DrawingTools
 	}
 }
 
 /**
- * Control which allows selecting drawing tool.
- *
- * Should not be instantiated directly. Use [[DrawingControl]] instead.
+ * A dropdown for picking a drawing tool. Created by [[DrawingControl]]; not
+ * meant to be used on its own.
  */
 export class DrawingToolControl extends StockControl {
 	public static className: string = "DrawingToolControl";
@@ -59,7 +64,7 @@ export class DrawingToolControl extends StockControl {
 		});
 
 		list.events.on("invoked", (ev) => {
-			this.setTool(<DrawingTools>ev.item.label);
+			this.setTool(<DrawingTools>ev.item.id);
 			this.events.dispatch("selected", {
 				type: "selected",
 				tool: <DrawingTools>ev.item.id,
@@ -82,6 +87,11 @@ export class DrawingToolControl extends StockControl {
 		this._initTools();
 	}
 
+	/**
+	 * Shows a tool on the button. Does not dispatch `selected`.
+	 *
+	 * @param  tool  Tool
+	 */
 	public setTool(tool: DrawingTools): void {
 		this.getPrivate("icon")!.innerHTML = "";
 		this.getPrivate("icon")!.appendChild(this._getToolIcon(tool));

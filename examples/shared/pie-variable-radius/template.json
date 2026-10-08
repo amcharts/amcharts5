@@ -1,0 +1,7 @@
+{
+  "title": "Pie Chart with Variable Radius",
+  "description": "A pie chart where each slice's radius follows its value, set by an adapter on the slice template.",
+  "category": "percent",
+  "tier": "technique",
+  "tags": ["pie", "adapter", "radius", "legend"]
+}

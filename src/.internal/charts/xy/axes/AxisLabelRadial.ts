@@ -5,39 +5,30 @@ import { RadialLabel, IRadialLabelSettings, IRadialLabelPrivate } from "../../..
 export interface IAxisLabelRadialSettings extends IRadialLabelSettings {
 
 	/**
-	 * Relative location of the label within the cell.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Where the label sits within its cell, from `0` (start) to `1` (end). A
+	 * cell is a category, a date period, or the span of an axis range.
 	 */
 	location?: number;
 
 	/**
-	 * Relative location of the label within the cell when it spans multiple
-	 * intervals.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Used instead of `location` when a grid step spans several units, such
+	 * as 5 days, or when only every few categories get a label.
 	 */
 	multiLocation?: number;
 
 	/**
-	 * The minimum relative position within visible axis scope the label can
-	 * appear on.
-	 *
-	 * E.g. `0.1` will mean that label will not be shown if it's closer to the
-	 * beginning of the axis than 10%.
+	 * Hides the label when it is closer to the start of the visible part of
+	 * the axis than this, from `0` to `1`: `0.1` hides labels in the first 10%.
 	 *
 	 * @default 0
 	 */
 	minPosition?: number;
 
 	/**
-	 * The maximum relative position within visible axis scope the label can
-	 * appear on.
+	 * Hides the label when it is closer to the end of the visible part of the
+	 * axis than this, from `0` to `1`: `0.9` hides labels in the last 10%.
 	 *
-	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
-	 * end of the axis than 10%.
-	 *
-	 * @default 0
+	 * @default 1
 	 */
 	maxPosition?: number;
 

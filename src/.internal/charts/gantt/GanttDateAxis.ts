@@ -9,7 +9,8 @@ export interface IGanttDateAxisSettings<R extends AxisRenderer> extends IDateAxi
 
 export interface IGanttDateAxisDataItem extends IDateAxisDataItem {
 	/**
-	 * Flag is set to active if an axis range is added to this data item.
+	 * `true` once the user has marked this date by clicking the lower date
+	 * axis. Its grid line is then hidden, so only the mark shows.
 	 */
 	active?: boolean;
 }
@@ -22,7 +23,8 @@ export interface IGanttDateAxisEvents extends IDateAxisEvents {
 
 
 /**
- * A date axis that is used as an X (horizontal) axis for [[Gantt]] charts.
+ * A date axis of a [[Gantt]] chart. The Gantt has two, both above the plot
+ * area: `xAxis` with the larger time units and `xAxisMinor` below it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Timeline_horizontal_axis} for more info
  * @since 5.14.0

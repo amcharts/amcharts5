@@ -1,0 +1,7 @@
+{
+  "title": "Clustered Column Chart",
+  "description": "Several column series side by side in each category, with value labels and a legend.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["column", "clustered", "category axis", "bullet", "legend"]
+}

@@ -11,19 +11,19 @@ import * as $utils from "../../../core/util/Utils";
 export interface IStockControlSettings extends IEntitySettings {
 
 	/**
-	 * A [[StockChart]] the toolbar is for.
+	 * The [[StockChart]] the control acts on.
 	 */
 	stockChart: StockChart;
 
 	/**
-	 * Is control visible?
-	 * 
+	 * Shows the control's button; `false` hides it.
+	 *
 	 * @default true
 	 */
 	visible?: boolean;
 
 	/**
-	 * Force this control to always be invisible.
+	 * Keeps the control hidden, even when `show()` is called.
 	 *
 	 * @since 5.8.5
 	 * @default false
@@ -31,37 +31,38 @@ export interface IStockControlSettings extends IEntitySettings {
 	forceHidden?: boolean;
 
 	/**
-	 * Name of the control. Used for the label.
+	 * Label text of the control's button.
 	 */
 	name?: string;
 
 	/**
-	 * Description of what the button does.
+	 * What the control does, shown as the button's tooltip. Falls back to
+	 * `name`.
 	 */
 	description?: string;
 
 	/**
-	 * An element with control icon. If not set, each control will automatically
-	 * create an icon.
+	 * Icon element of the button, or `"none"` for no icon. Each control has
+	 * its own default icon.
 	 */
 	icon?: HTMLElement | SVGElement | "none";
 
 	/**
-	 * Indicates if control is active.
-	 * 
+	 * Turns the control on; its button shows as active.
+	 *
 	 * @default false
 	 */
 	active?: boolean;
 
 	/**
-	 * If set to `true`, control can be toggle on and off by clicking on it.
-	 * 
+	 * A click on the button toggles `active`.
+	 *
 	 * @default true
 	 */
 	togglable?: boolean;
 
 	/**
-	 * Alignment of the control in a toolbar.
+	 * Side of the toolbar the control is placed on.
 	 *
 	 * @default "left"
 	 */
@@ -78,13 +79,16 @@ export interface IStockControlPrivate extends IEntityPrivate {
 }
 
 export interface IStockControlEvents extends IEntityEvents {
+	/**
+	 * The control's button was clicked.
+	 */
 	click: {
 		originalEvent: IPointerEvent
 	}
 }
 
 /**
- * A base class for controls on [[StockToolbar]].
+ * Base class for the controls of a [[StockToolbar]].
  */
 export class StockControl extends Entity {
 	public static className: string = "StockControl";
@@ -115,7 +119,7 @@ export class StockControl extends Entity {
 	protected _initElements(): void {
 		// Create button
 		const button = document.createElement("div");
-		button.setAttribute("title", this.get("description", this.get("name", "")));
+		button.setAttribute("title", $utils.htmlToText(this.get("description", this.get("name", ""))));
 		this.setPrivate("button", button);
 
 		// Create icon
@@ -229,13 +233,19 @@ export class StockControl extends Entity {
 		}
 
 		const button = this.getPrivate("button")!;
-		button.setAttribute("title", this.get("description", this.get("name", "")));
+		button.setAttribute("title", $utils.htmlToText(this.get("description", this.get("name", ""))));
 	}
 
+	/**
+	 * Hides the control's button.
+	 */
 	public hide(): void {
 		this.getPrivate("button")!.style.display = "none";
 	}
 
+	/**
+	 * Shows the control's button, unless `forceHidden` is set.
+	 */
 	public show(): void {
 		if (this.get("forceHidden") !== true) {
 			this.getPrivate("button")!.style.display = "";
@@ -255,8 +265,9 @@ export class StockControl extends Entity {
 			if ($utils.supports("keyboardevents")) {
 				button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER to toggle"));
 				this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-					if (document.activeElement == button && ev.keyCode == 13) {
-						// ENTER
+					if (document.activeElement == button && (ev.keyCode == 13 || ev.keyCode == 32)) {
+						// ENTER or SPACE, as on a native button
+						ev.preventDefault();
 						if (this.get("togglable")) {
 							this._handleClick();
 						}
@@ -271,7 +282,7 @@ export class StockControl extends Entity {
 
 	public isAccessible(): boolean {
 		const toolbar = this.getPrivate("toolbar");
-		return toolbar && toolbar.get("focusable") ? true : false;
+		return toolbar && toolbar.get("focusable", true) ? true : false;
 	}
 
 }

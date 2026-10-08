@@ -16,7 +16,9 @@ export interface ITypicalPriceEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Typical Price indicator: `field`, by default the typical price (`"hlc/3"`,
+ * the average of high, low and close), averaged over `period`. Drawn in a
+ * panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -29,7 +31,7 @@ export class TypicalPrice extends ChartIndicator {
 	declare public _events: ITypicalPriceEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>amCharts 5 Examples</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f6f7f9;
+        --card: #ffffff;
+        --text: #1c2330;
+        --muted: #5d6878;
+        --line: #dfe3ea;
+        --accent: #2f6fde;
+        --on-accent: #ffffff;
+        --code-bg: #fbfcfd;
+        --tok-comment: #6b7a8c;
+        --tok-string: #0b7a4b;
+        --tok-number: #a24a00;
+        --tok-keyword: #8a2fb8;
+        --tok-name: #1d5fc4;
+        --added: #e2f3e6;
+        --warn: #c98a00;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #12161d;
+          --card: #1b212b;
+          --text: #e8ecf2;
+          --muted: #9aa5b5;
+          --line: #2c3442;
+          --accent: #7aa7ff;
+          --on-accent: #0d1320;
+          --code-bg: #161b24;
+          --tok-comment: #8794a6;
+          --tok-string: #7fd4a4;
+          --tok-number: #f0a868;
+          --tok-keyword: #d19cf0;
+          --tok-name: #8ab8ff;
+          --added: #1d3a2a;
+          --warn: #e0a83a;
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
+        font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover, a:focus-visible { text-decoration: underline; }
+      button, select {
+        font: inherit;
+        color: var(--text);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 5px 10px;
+      }
+      button { cursor: pointer; }
+      button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+      /* What the example is, and moving between examples */
+      header {
+        flex: 0 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--card);
+      }
+      header .about { flex: 1 1 320px; min-width: 0; }
+      header h1 { margin: 0; font-size: 18px; line-height: 1.3; }
+      header h1 small { margin-left: 8px; color: var(--muted); font-weight: normal; font-size: 13px; }
+      header p { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
+      header nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+      header select { max-width: 280px; }
+
+      /* The running chart; the strip under it is dragged to resize it */
+      .chart {
+        flex: 0 0 auto;
+        position: relative;
+        height: 44vh;
+        height: min(44vh, 520px);
+        min-height: 180px;
+        max-height: 80vh;
+        overflow: hidden;
+        background: #ffffff;
+      }
+      .chart iframe { display: block; width: 100%; height: 100%; border: 0; }
+      .grip {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 11px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        background: var(--card);
+        cursor: ns-resize;
+        touch-action: none;
+      }
+      .grip::before { content: ""; width: 40px; height: 3px; border-radius: 2px; background: var(--muted); opacity: 0.6; }
+      .grip:hover::before, .grip:focus-visible::before, .resizing .grip::before { background: var(--accent); opacity: 1; }
+      .grip:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+      /* While dragging, the frame must not take the pointer */
+      .resizing { cursor: ns-resize; user-select: none; -webkit-user-select: none; }
+      .resizing iframe { pointer-events: none; }
+
+      .bar {
+        flex: 0 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 14px;
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--line);
+        background: var(--card);
+      }
+      .bar .label { color: var(--muted); font-size: 13px; }
+      .segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+      [hidden] { display: none !important; }
+      .segmented button { border: 0; border-radius: 0; background: transparent; }
+      .segmented button + button { border-left: 1px solid var(--line); }
+      /* The group clips an outline around its buttons: drawn inside instead */
+      .segmented button:focus-visible { outline-offset: -3px; }
+      .segmented button[aria-pressed="true"], .tabs button[aria-pressed="true"] {
+        background: var(--accent);
+        color: var(--on-accent);
+      }
+      .tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+      .tabs button[aria-pressed="true"] { border-color: var(--accent); }
+      .spacer { flex: 1 1 auto; }
+      .note { color: var(--muted); font-size: 13px; }
+      #modeNote { flex: 1 1 240px; min-width: 0; }
+      /* A JSON version that is not the same chart says so where it is seen */
+      #modeNote.differs { color: var(--text); border-left: 3px solid var(--warn); padding-left: 8px; }
+      #copy { min-width: 5.5em; }
+      .check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
+
+      /* The source */
+      /* Takes what is left and scrolls on its own, so the chart stays in view */
+      .source { flex: 1 1 0; min-height: 0; overflow: auto; background: var(--code-bg); }
+      pre {
+        margin: 0;
+        padding: 14px 16px 32px;
+        font: 13px/1.55 ui-monospace, "Cascadia Mono", Consolas, "SF Mono", Menlo, monospace;
+        tab-size: 2;
+        white-space: pre;
+      }
+      .c { color: var(--tok-comment); }
+      .s { color: var(--tok-string); }
+      .n { color: var(--tok-number); }
+      .k { color: var(--tok-keyword); }
+      .t { color: var(--tok-name); }
+      /* Lines the viewer added to the source */
+      .added { display: block; margin: 0 -16px; padding: 0 16px; background: var(--added); }
+      /* Rows of long data that are left out until asked for */
+      .fold { display: block; margin: 0 -16px; padding: 0 16px; color: var(--accent); cursor: pointer; }
+      .fold:hover, .fold:focus-visible { text-decoration: underline; }
+      .fold:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+      @media (max-width: 600px), (max-height: 800px) {
+        .chart { height: 36vh; }
+      }
+      @media (max-width: 600px), (max-height: 640px) {
+        header p { display: none; }
+      }
+      @media (max-width: 600px) {
+        #fileNote { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="about">
+        <h1><span id="title">amCharts 5 Examples</span><small id="kind"></small></h1>
+        <p id="description"></p>
+      </div>
+      <nav aria-label="Examples">
+        <a href="index.html">All examples</a>
+        <button type="button" id="previous" aria-label="Previous example">&lsaquo; Previous</button>
+        <select id="picker" aria-label="Example"></select>
+        <button type="button" id="next" aria-label="Next example">Next &rsaquo;</button>
+      </nav>
+    </header>
+
+    <div class="chart" id="chart"></div>
+    <div class="grip" id="grip" role="separator" aria-orientation="horizontal" aria-label="Resize the chart" tabindex="0" title="Drag to resize the chart; double-click for the usual size"></div>
+
+    <div class="bar">
+      <span class="label" id="modeLabel">Chart built from</span>
+      <div class="segmented" id="mode" role="group" aria-labelledby="modeLabel">
+        <button type="button" data-mode="code" aria-pressed="true">JavaScript</button>
+        <button type="button" data-mode="json" aria-pressed="false">JSON config</button>
+      </div>
+      <span class="note" id="modeNote"></span>
+      <label class="check" id="svgLabel"><input type="checkbox" id="svg" /> SVG renderer</label>
+    </div>
+
+    <div class="bar">
+      <div class="tabs" id="tabs" role="group" aria-label="Source files"></div>
+      <span class="spacer"></span>
+      <span class="note" id="fileNote"></span>
+      <button type="button" id="copy" aria-live="polite">Copy</button>
+    </div>
+
+    <div class="source" id="source" role="region" aria-label="Source" tabindex="0"><pre id="code"></pre></div>
+
+    <script>
+    (function () {
+      // Filled in by the build: every example, in gallery order
+      var EXAMPLES = "%EXAMPLES%";
+
+      var chart = document.getElementById("chart");
+      var tabs = document.getElementById("tabs");
+      var code = document.getElementById("code");
+      var picker = document.getElementById("picker");
+      var svgBox = document.getElementById("svg");
+      var grip = document.getElementById("grip");
+      var pane = document.getElementById("source");
+      var modeButtons = document.querySelectorAll("#mode button");
+      var current = null;
+      var running = "";
+      var reveal = false;
+      // What Copy copies: what is shown, in full where only a part is shown
+      var copyText = "";
+      // JSON was asked for; kept while passing examples that have none
+      var wantJson = false;
+      var sources = {};
+      var files = [];
+      // The tab last looked at, for each way of building the chart; the first one otherwise
+      var selected = { code: null, json: null };
+      try {
+        selected.code = localStorage.getItem("am5examples-tab-code");
+        selected.json = localStorage.getItem("am5examples-tab-json");
+      } catch (e) {}
+      // Long data inside a config is folded until it is asked for
+      var unfolded = false;
+      var FOLD_OVER = 20;
+      var FOLD_KEEP = 3;
+
+      function escapeHTML(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      // A few colours, not a parser: comments, strings, numbers, keywords
+      var RULES = {
+        js: [
+          ["c", /\/\/[^\n]*|\/\*[\s\S]*?\*\//y],
+          ["t", /"(?:[^"\\\n]|\\.)*"(?=:)/y],
+          ["s", /"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/y],
+          ["n", /\b\d+(?:\.\d+)?\b/y],
+          ["k", /\b(?:import|from|as|export|const|let|var|function|return|if|else|for|while|new|true|false|null|undefined|typeof|in|of|this)\b/y],
+          ["t", /\bam5[A-Za-z0-9_]*\b/y]
+        ],
+        json: [
+          ["t", /"(?:[^"\\\n]|\\.)*"(?=\s*:)/y],
+          ["s", /"(?:[^"\\\n]|\\.)*"/y],
+          ["n", /-?\b\d+(?:\.\d+)?(?:[eE][-+]?\d+)?\b/y],
+          ["k", /\b(?:true|false|null)\b/y]
+        ],
+        html: [
+          ["c", /<!--[\s\S]*?-->/y],
+          ["s", /"[^"\n]*"/y],
+          ["k", /<\/?[A-Za-z][A-Za-z0-9-]*|\/?>/y],
+          ["t", /\b[a-z-]+(?==)/y]
+        ]
+      };
+
+      // No span runs over a line end, so the result can be cut into lines
+      function span(name, text) {
+        return escapeHTML(text).split("\n").map(function (part) {
+          return part === "" ? "" : '<span class="' + name + '">' + part + "</span>";
+        }).join("\n");
+      }
+
+      function highlight(text, language) {
+        var rules = RULES[language] || [];
+        var out = "";
+        var plain = "";
+        var i = 0;
+        while (i < text.length) {
+          var hit = null;
+          for (var r = 0; r < rules.length; r++) {
+            rules[r][1].lastIndex = i;
+            var match = rules[r][1].exec(text);
+            if (match && match[0].length) {
+              hit = [rules[r][0], match[0]];
+              break;
+            }
+          }
+          if (hit) {
+            out += escapeHTML(plain) + span(hit[0], hit[1]);
+            plain = "";
+            i += hit[1].length;
+          }
+          else {
+            // Whole words at a time, so a number inside a name is not coloured
+            var word = /[A-Za-z_$][A-Za-z0-9_$]*|[\s\S]/y;
+            word.lastIndex = i;
+            var piece = word.exec(text)[0];
+            plain += piece;
+            i += piece.length;
+          }
+        }
+        return out + escapeHTML(plain);
+      }
+
+      // A page is markup around code: what is inside its script elements is JavaScript
+      function highlightPage(text) {
+        var out = "";
+        var at = 0;
+        var inline = /^([ \t]*<script>\n)([\s\S]*?)(?=\n[ \t]*<\/script>)/gm;
+        var match;
+        while ((match = inline.exec(text)) != null) {
+          out += highlight(text.slice(at, match.index) + match[1], "html") + highlight(match[2], "js");
+          at = match.index + match[0].length;
+        }
+        return out + highlight(text.slice(at), "html");
+      }
+
+      // The same source, changed to draw as SVG. Returns the text and which of
+      // its lines are new, or null when the file has nothing to change
+      function asSVG(file) {
+        var lines = file.content.split("\n");
+        var added = {};
+
+        // Where the chart code starts: inside a page's script element, after a
+        // module's imports, or at the top of code shown alone
+        var start = 0;
+        var i;
+        if (file.language === "html") {
+          start = -1;
+          for (i = 0; i < lines.length; i++) {
+            if (/^\s*<script>\s*$/.test(lines[i])) {
+              start = i + 1;
+              break;
+            }
+          }
+          if (start === -1) {
+            return null;
+          }
+        }
+        else {
+          for (i = 0; i < lines.length; i++) {
+            if (/^import /.test(lines[i])) {
+              start = i + 1;
+            }
+          }
+        }
+        while (start < lines.length && lines[start] === "") {
+          start++;
+        }
+
+        // Before the root is made, when that is not inside a function
+        var indent = /^\s*/.exec(lines[start] || "")[0];
+        var at = start;
+        for (i = start; i < lines.length; i++) {
+          if (lines[i].indexOf(indent + "// Create root element") === 0) {
+            at = i;
+            break;
+          }
+        }
+
+        var extra = [
+          indent + "// Draw the chart as SVG instead of canvas",
+          indent + "am5.Root.defaultRenderer = am5.SVGRenderer;",
+          "",
+          ""
+        ];
+        Array.prototype.splice.apply(lines, [at, 0].concat(extra));
+        added[at] = true;
+        added[at + 1] = true;
+
+        return { content: lines.join("\n"), added: added };
+      }
+
+      function find(name) {
+        for (var i = 0; i < EXAMPLES.length; i++) {
+          if (EXAMPLES[i].name === name) {
+            return i;
+          }
+        }
+        return -1;
+      }
+
+      // "#xy-line", "#xy-line/json", "#xy-line/svg" or "#xy-line/json/svg"
+      function fromHash() {
+        var parts = decodeURIComponent(location.hash.replace(/^#/, "")).split("/");
+        var index = find(parts[0]);
+        return { index: index === -1 ? 0 : index, unknown: index === -1 && parts[0] !== "", json: parts.indexOf("json") > 0, svg: parts.indexOf("svg") > 0 };
+      }
+
+      function go(index, json, svg) {
+        var example = EXAMPLES[(index + EXAMPLES.length) % EXAMPLES.length];
+        location.hash = "#" + example.name + (json && example.json ? "/json" : "") + (svg ? "/svg" : "");
+      }
+
+      // An example that is drawn as SVG by its own code has nothing to switch
+      function switched() {
+        return current.svg && !current.example.svg;
+      }
+
+      // The chart code or the config of a page, on its own and without the indent
+      // it has inside the page
+      function alone(file) {
+        if (!file.alone) {
+          var indent = new Array((file.partIndent || 0) + 1).join(" ");
+          var text = file.content.slice(file.part[0], file.part[1]).split("\n").map(function (line) {
+            return line.indexOf(indent) === 0 ? line.slice(indent.length) : line;
+          }).join("\n");
+          file.alone = {
+            key: "code",
+            label: file.partLanguage === "json" ? "JSON config" : "JavaScript",
+            language: file.partLanguage,
+            file: file.file,
+            content: text + "\n",
+            isAlone: true
+          };
+        }
+        return file.alone;
+      }
+
+      // The file as it is shown: as built, or changed to draw as SVG. A config
+      // says nothing about the renderer, and neither does data
+      function shown(file) {
+        var changes = file.language === "html" || file.file === "index.ts" || (file.isAlone && file.language === "js");
+        return (switched() && changes && asSVG(file)) || { content: file.content, added: {} };
+      }
+
+      // Rows of long data inside a config that are left out: for each first
+      // hidden line, how many rows it stands for
+      function folds(lines) {
+        var hidden = {};
+        var markers = {};
+        for (var i = 0; i < lines.length; i++) {
+          var open = /^(\s*)"data-\d+": \[\s*$/.exec(lines[i]);
+          if (!open) {
+            continue;
+          }
+          var end = -1;
+          for (var j = i + 1; j < lines.length; j++) {
+            if (lines[j] === open[1] + "]" || lines[j] === open[1] + "],") {
+              end = j;
+              break;
+            }
+          }
+          var rows = end - i - 1;
+          if (end !== -1 && rows > FOLD_OVER) {
+            markers[i + 1 + FOLD_KEEP] = { rows: rows - FOLD_KEEP, indent: /^\s*/.exec(lines[i + 1])[0] };
+            for (var k = i + 1 + FOLD_KEEP; k < end; k++) {
+              hidden[k] = true;
+            }
+            i = end;
+          }
+        }
+        return { hidden: hidden, markers: markers };
+      }
+
+      function showFile(key, keepScroll) {
+        var file = null;
+        for (var i = 0; i < files.length; i++) {
+          if (files[i].key === key) {
+            file = files[i];
+          }
+        }
+        if (!file) {
+          file = files[0];
+        }
+        if (!file) {
+          return;
+        }
+        var mode = current.json ? "json" : "code";
+        selected[mode] = file.key;
+        try { localStorage.setItem("am5examples-tab-" + mode, file.key); } catch (e) {}
+        var buttons = tabs.querySelectorAll("button");
+        for (var b = 0; b < buttons.length; b++) {
+          buttons[b].setAttribute("aria-pressed", files[b] === file ? "true" : "false");
+        }
+
+        var result = shown(file);
+        copyText = result.content;
+        // Long data is cut for showing; Copy still takes all of it
+        var lines = result.content.split("\n");
+        if (file.shown) {
+          lines = lines.slice(0, file.shown).concat([""]);
+        }
+        var text = lines.join("\n");
+        var html = (file.language === "html" ? highlightPage(text) : highlight(text, file.language)).split("\n");
+        var fold = unfolded ? { hidden: {}, markers: {} } : folds(lines);
+        var isNew = false;
+        var isFolded = false;
+        var out = "";
+        for (var l = 0; l < html.length; l++) {
+          var end = l < html.length - 1 ? "\n" : "";
+          if (fold.markers[l]) {
+            isFolded = true;
+            out += '<span class="fold" role="button" tabindex="0">' + fold.markers[l].indent + "... " + fold.markers[l].rows + " more rows, click to show" + "\n</span>";
+          }
+          if (fold.hidden[l]) {
+            continue;
+          }
+          if (result.added[l]) {
+            isNew = true;
+            out += '<span class="added">' + html[l] + "\n</span>";
+          }
+          // Where a page's chart code starts
+          else if (file.language === "html" && lines[l].indexOf("<!-- Chart code -->") !== -1) {
+            out += '<span id="codeStart">' + html[l] + "</span>" + end;
+          }
+          else {
+            out += html[l] + end;
+          }
+        }
+        code.innerHTML = out;
+
+        if (!keepScroll) {
+          pane.scrollTop = 0;
+          // What SVG changed when it was switched on just now, or else the chart
+          // code of a page: the HTML before it is a scroll away
+          var first = code.querySelector(".added");
+          var start = document.getElementById("codeStart");
+          var top = pane.getBoundingClientRect().top;
+          if (reveal && first) {
+            pane.scrollTop = Math.max(0, first.getBoundingClientRect().top - top - pane.clientHeight / 3);
+          }
+          else if (start) {
+            pane.scrollTop = Math.max(0, start.getBoundingClientRect().top - top - 8);
+          }
+        }
+        reveal = false;
+
+        var note = file.file;
+        if (file.shown) {
+          note += ": first " + file.shown + " of " + file.lines + " lines shown, Copy takes all";
+        }
+        else if (file.file === "index.ts") {
+          note += ", from the TypeScript version";
+        }
+        else if (file.isAlone) {
+          note += current.json ? ": the config alone" : ": the chart code alone";
+        }
+        else if (file.language === "html") {
+          var data = files.filter(function (other) { return other.data; })[0];
+          note += data ? ": the whole example; its data is in " + data.file : ": the whole example, one page";
+        }
+        if (isNew) {
+          note += ". Highlighted: what draws it as SVG";
+        }
+        else if (file.isAlone && current.json && switched()) {
+          note += ". SVG is set in the page, see HTML + JSON config";
+        }
+        if (isFolded) {
+          note += ". Long data is folded; Copy takes all";
+        }
+        document.getElementById("fileNote").textContent = note;
+      }
+
+      // The files of the way the chart is built now: the chart code or the
+      // config on its own first, then the page it is in
+      function showSource(source) {
+        var mode = current.json ? "json" : "code";
+        files = [];
+        source.files.forEach(function (file) {
+          if (file.mode !== mode) {
+            return;
+          }
+          if (file.part) {
+            file.key = "page";
+            files.push(alone(file));
+          }
+          else {
+            file.key = file.file;
+          }
+          files.push(file);
+        });
+        tabs.innerHTML = "";
+        files.forEach(function (file) {
+          var button = document.createElement("button");
+          button.type = "button";
+          button.textContent = file.label;
+          button.addEventListener("click", function () { showFile(file.key); });
+          tabs.appendChild(button);
+        });
+        showFile(selected[mode]);
+      }
+
+      // Runs the page, or the page as it is shown when that is not the file on disk
+      function run(source) {
+        var page = current.example.name + "/" + (current.json ? "json.html" : "index.html");
+        var key = page + (switched() ? "?svg" : "");
+        var content = null;
+
+        if (switched()) {
+          // Needs the source, which may still be on its way
+          if (!source) {
+            return;
+          }
+          source.files.forEach(function (file) {
+            if (file.file === (current.json ? "json.html" : "index.html")) {
+              var result = asSVG(file);
+              content = result && result.content;
+            }
+          });
+        }
+
+        if (key === running) {
+          return;
+        }
+        running = key;
+
+        // A new frame each time: one that is reused keeps what it ran before
+        var frame = document.createElement("iframe");
+        frame.title = "The running example";
+        if (content != null) {
+          // Its files are beside the page it was made from
+          frame.srcdoc = content.replace("<head>", '<head>\n    <base href="' + new URL(current.example.name + "/", location.href).href + '" />');
+        }
+        else {
+          frame.src = page;
+        }
+        chart.innerHTML = "";
+        chart.appendChild(frame);
+      }
+
+      // Loaded as a script, which works from disk where fetch() does not
+      window.am5example_source = function (source) {
+        sources[source.name] = source;
+        if (current && current.example.name === source.name) {
+          showSource(source);
+          run(source);
+        }
+      };
+
+      function show() {
+        var where = fromHash();
+        // A name that is not an example: the address says what is shown instead
+        if (where.unknown) {
+          location.replace("#" + EXAMPLES[0].name);
+          return;
+        }
+        var example = EXAMPLES[where.index];
+        var json = where.json && example.json;
+        // The address says which version, for an example that has both
+        if (example.json) {
+          wantJson = json;
+        }
+        // Arriving with SVG on: bring up what it changed, as ticking the box does
+        if (where.svg && !example.svg && (!current || current.example !== example)) {
+          reveal = true;
+        }
+        if (!current || current.example !== example || current.json !== json) {
+          unfolded = false;
+        }
+        current = { example: example, json: json, svg: where.svg, index: where.index };
+
+        document.title = example.title + " - amCharts 5 Examples";
+        document.getElementById("title").textContent = example.title;
+        document.getElementById("kind").textContent = example.categoryTitle + (example.tierTitle ? ", " + example.tierTitle.toLowerCase() : "");
+        document.getElementById("description").textContent = example.description || "";
+        picker.value = example.name;
+
+        for (var i = 0; i < modeButtons.length; i++) {
+          var button = modeButtons[i];
+          var isJson = button.getAttribute("data-mode") === "json";
+          button.setAttribute("aria-pressed", isJson === json ? "true" : "false");
+        }
+        // The switch is only there when there is a config to switch to
+        document.getElementById("mode").hidden = !example.json;
+        var modeNote = document.getElementById("modeNote");
+        var differs = json && !!example.jsonNote;
+        modeNote.className = differs ? "note differs" : "note";
+        modeNote.textContent = !example.json ? "JavaScript only: this example has no JSON config"
+          : !json ? ""
+          : differs ? "Not identical to the JavaScript version. " + example.jsonNote
+          : "The same chart, built from a JSON config";
+
+        svgBox.checked = where.svg || !!example.svg;
+        svgBox.disabled = !!example.svg;
+        document.getElementById("svgLabel").title = example.svg ? "This example is drawn as SVG by its own code" : "Draw the chart as SVG instead of canvas, and show the code that does it";
+
+        var source = sources[example.name];
+        if (source) {
+          showSource(source);
+        }
+        else {
+          files = [];
+          tabs.innerHTML = "";
+          code.textContent = "";
+          var script = document.createElement("script");
+          script.src = "viewer-data/" + example.name + ".js";
+          script.onerror = function () { code.textContent = "The source of this example could not be loaded."; };
+          document.head.appendChild(script);
+        }
+        run(source);
+      }
+
+      // The picker, grouped by category
+      var group = null;
+      EXAMPLES.forEach(function (example) {
+        if (!group || group.label !== example.categoryTitle) {
+          group = document.createElement("optgroup");
+          group.label = example.categoryTitle;
+          picker.appendChild(group);
+        }
+        var option = document.createElement("option");
+        option.value = example.name;
+        option.textContent = example.title;
+        group.appendChild(option);
+      });
+
+      picker.addEventListener("change", function () { go(find(picker.value), wantJson, current.svg); });
+      document.getElementById("previous").addEventListener("click", function () { go(current.index - 1, wantJson, current.svg); });
+      document.getElementById("next").addEventListener("click", function () { go(current.index + 1, wantJson, current.svg); });
+      for (var m = 0; m < modeButtons.length; m++) {
+        modeButtons[m].addEventListener("click", function () {
+          wantJson = this.getAttribute("data-mode") === "json";
+          go(current.index, wantJson, current.svg);
+        });
+      }
+      // Folded data opens where it is, without moving what is in view
+      function unfold(event) {
+        var target = event.target;
+        while (target && target !== code) {
+          if (target.className === "fold") {
+            if (event.type === "keydown") {
+              if (event.key !== "Enter" && event.key !== " ") {
+                return;
+              }
+              event.preventDefault();
+            }
+            unfolded = true;
+            showFile(selected[current.json ? "json" : "code"], true);
+            return;
+          }
+          target = target.parentNode;
+        }
+      }
+      code.addEventListener("click", unfold);
+      code.addEventListener("keydown", unfold);
+
+      // The chart's height: dragged by the strip under it, kept for next time
+      function setHeight(height, save) {
+        height = Math.max(180, Math.min(Math.round(window.innerHeight * 0.8), Math.round(height)));
+        chart.style.height = height + "px";
+        if (save) {
+          try { localStorage.setItem("am5examples-height", String(height)); } catch (e) {}
+        }
+      }
+      try {
+        var kept = parseInt(localStorage.getItem("am5examples-height"), 10);
+        if (kept) {
+          setHeight(kept, false);
+        }
+      } catch (e) {}
+
+      var pointer = window.PointerEvent ? { down: "pointerdown", move: "pointermove", up: "pointerup" } : { down: "mousedown", move: "mousemove", up: "mouseup" };
+      grip.addEventListener(pointer.down, function (event) {
+        var from = chart.getBoundingClientRect().height;
+        var startY = event.clientY;
+        function move(e) {
+          setHeight(from + e.clientY - startY, false);
+        }
+        function end() {
+          document.removeEventListener(pointer.move, move);
+          document.removeEventListener(pointer.up, end);
+          document.removeEventListener("pointercancel", end);
+          document.body.className = "";
+          setHeight(chart.getBoundingClientRect().height, true);
+        }
+        document.body.className = "resizing";
+        document.addEventListener(pointer.move, move);
+        document.addEventListener(pointer.up, end);
+        document.addEventListener("pointercancel", end);
+        event.preventDefault();
+      });
+      grip.addEventListener("keydown", function (event) {
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+          setHeight(chart.getBoundingClientRect().height + (event.key === "ArrowDown" ? 24 : -24), true);
+          event.preventDefault();
+        }
+      });
+      grip.addEventListener("dblclick", function () {
+        chart.style.height = "";
+        try { localStorage.removeItem("am5examples-height"); } catch (e) {}
+      });
+      svgBox.addEventListener("change", function () {
+        reveal = svgBox.checked;
+        go(current.index, current.json, svgBox.checked);
+      });
+
+      document.getElementById("copy").addEventListener("click", function () {
+        var button = this;
+        var text = copyText;
+        var done = function () {
+          button.textContent = "Copied";
+          setTimeout(function () { button.textContent = "Copy"; }, 1500);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () {});
+        }
+        else {
+          var area = document.createElement("textarea");
+          area.value = text;
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand("copy"); done(); } catch (e) {}
+          document.body.removeChild(area);
+        }
+      });
+
+      window.addEventListener("hashchange", show);
+
+      if (EXAMPLES.length) {
+        show();
+      }
+      else {
+        document.getElementById("description").textContent = "No examples found.";
+      }
+    })();
+    </script>
+  </body>
+</html>

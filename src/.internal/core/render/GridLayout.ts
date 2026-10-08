@@ -7,14 +7,14 @@ import type { Container } from "./Container";
 export interface IGridLayoutSettings extends ILayoutSettings {
 
 	/**
-	 * If set to `true` all columns in the grid will be equal width.
+	 * Makes all columns as wide as the widest child.
 	 *
 	 * @default false
 	 */
 	fixedWidthGrid?: boolean;
 
 	/**
-	 * Maximum number of columns in the grid.
+	 * Maximum number of columns. No limit if not set.
 	 */
 	maxColumns?: number;
 
@@ -24,7 +24,8 @@ export interface IGridLayoutPrivate extends ILayoutPrivate {
 }
 
 /**
- * A grid children layout for [[Container]].
+ * Lays out a [[Container]]'s children in rows from left to right, with as
+ * many columns as fit its width.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
  */

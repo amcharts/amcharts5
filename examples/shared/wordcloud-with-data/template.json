@@ -1,0 +1,7 @@
+{
+  "title": "Word Cloud from Data",
+  "description": "A word cloud made from a list of words with weights, colored by weight with a heat rule.",
+  "category": "other",
+  "tier": "basic",
+  "tags": ["word cloud", "data", "heat rules"]
+}

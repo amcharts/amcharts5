@@ -2,347 +2,155 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5stock from "@amcharts/amcharts5/stock";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import data from "./data.json";
 
-import "./data/MSFT_minute.js";
-import "./data/MSFT_day.js";
-import "./data/MSFT_week.js";
-import "./data/MSFT_month.js";
 
 // Create root element
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-let root = am5.Root.new("chartdiv");
+const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
-
-// Create a stock chart
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
-let stockChart = root.container.children.push(am5stock.StockChart.new(root, {
-}));
-
-
 // Set global number format
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/
 root.numberFormatter.set("numberFormat", "#,###.00");
 
 
+// Create a stock chart
+// https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
+const stockChart = root.container.children.push(am5stock.StockChart.new(root, {}));
+
+
 // Create a main stock panel (chart)
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock-chart/#Adding_panels
-let mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
-  wheelY: "zoomX",
-  panX: true,
-  panY: true
+const mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
+  wheelY: "zoomX", // the mouse wheel zooms in on the dates
+  panX: true,      // dragging the plot moves along the dates...
+  panY: true       // ...and up or down the price scale
 }));
 
 
-// Create value axis
-// -------------------------------------------------------------------------------
+// Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-let valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
+const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {
-    pan: "zoom"
+    pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
   }),
-  extraMin: 0.1, // adds some space for for main series
-  tooltip: am5.Tooltip.new(root, {}),
-  numberFormat: "#,###.00",
-  extraTooltipPrecision: 2
+  tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis...
+  extraTooltipPrecision: 2            // ...with two more decimals than the labels
 }));
 
-let dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {
-  baseInterval: {
+// a GaplessDateAxis leaves out the dates without data, such as weekends
+const dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {
+  baseInterval: { // matches the daily data the chart starts with; the switcher changes it
     timeUnit: "day",
     count: 1
   },
   renderer: am5xy.AxisRendererX.new(root, {
-    minorGridEnabled: true
+    minorGridEnabled: true // fainter grid lines between the labelled ones
   }),
-  tooltip: am5.Tooltip.new(root, {})
+  tooltip: am5.Tooltip.new(root, {}) // shows the cursor's date on the axis
 }));
+
+// The first label would be cut off by the edge of the chart
+dateAxis.get("renderer").labels.template.set("minPosition", 0.01);
 
 
 // Add series
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-let valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
+const valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
   name: "MSFT",
-  turboMode: true,
-  clustered: false,
   valueXField: "Date",
   valueYField: "Close",
   highValueYField: "High",
   lowValueYField: "Low",
   openValueYField: "Open",
-  calculateAggregates: true,
   xAxis: dateAxis,
   yAxis: valueAxis,
+  // the hovered candle's prices in the legend
   legendValueText: "open: [bold]{openValueY}[/] high: [bold]{highValueY}[/] low: [bold]{lowValueY}[/] close: [bold]{valueY}[/]",
-  legendRangeValueText:""
+  legendRangeValueText: "" // no values while the pointer is off the plot
 }));
 
 
 // Set main value series
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
 stockChart.set("stockSeries", valueSeries);
 
 
 // Add a stock legend
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock-chart/stock-legend/
-let valueLegend = mainPanel.plotContainer.children.push(am5stock.StockLegend.new(root, {
+// in the plot container, so it sits over the top left of the plot
+const valueLegend = mainPanel.plotContainer.children.push(am5stock.StockLegend.new(root, {
   stockChart: stockChart
 }));
 
-
-// Create volume axis
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-let volumeAxisRenderer = am5xy.AxisRendererY.new(root, {
-  inside: true
-});
-
-volumeAxisRenderer.labels.template.set("forceHidden", true);
-volumeAxisRenderer.grid.template.set("forceHidden", true);
-
-let volumeValueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
-  numberFormat: "#.#a",
-  height: am5.percent(20),
-  y: am5.percent(100),
-  centerY: am5.percent(100),
-  renderer: volumeAxisRenderer
-}));
-
-// Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-let volumeSeries = mainPanel.series.push(am5xy.ColumnSeries.new(root, {
-  name: "Volume",
-  turboMode: true,
-  clustered: false,
-  valueXField: "Date",
-  valueYField: "Volume",
-  xAxis: dateAxis,
-  yAxis: volumeValueAxis,
-  legendValueText: "[bold]{valueY.formatNumber('#,###.0a')}[/]"
-}));
-
-volumeSeries.columns.template.setAll({
-  strokeOpacity: 0,
-  fillOpacity: 0.5
-});
-
-// color columns by stock rules
-volumeSeries.columns.template.adapters.add("fill", function(fill, target) {
-  let dataItem = target.dataItem;
-  if (dataItem) {
-    return stockChart.getVolumeColor(dataItem);
-  }
-  return fill;
-})
+valueLegend.data.setAll([valueSeries]);
 
 
-// Set main series
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
-stockChart.set("volumeSeries", volumeSeries);
-valueLegend.data.setAll([valueSeries, volumeSeries]);
-
-
-// Add cursor(s)
-// -------------------------------------------------------------------------------
+// Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
 mainPanel.set("cursor", am5xy.XYCursor.new(root, {
   yAxis: valueAxis,
   xAxis: dateAxis,
-  snapToSeries: [valueSeries],
-  snapToSeriesBy: "y!"
+  snapToSeries: [valueSeries], // the horizontal line jumps to the close of the candle...
+  snapToSeriesBy: "y!"         // ...at the date under the pointer
 }));
 
 
-// Add scrollbar
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-let scrollbar = mainPanel.set("scrollbarX", am5xy.XYChartScrollbar.new(root, {
-  orientation: "horizontal",
-  height: 50
-}));
-stockChart.toolsContainer.children.push(scrollbar);
-
-let sbDateAxis = scrollbar.chart.xAxes.push(am5xy.GaplessDateAxis.new(root, {
-  baseInterval: {
-    timeUnit: "day",
-    count: 1
-  },
-  renderer: am5xy.AxisRendererX.new(root, {})
-}));
-
-let sbValueAxis = scrollbar.chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  renderer: am5xy.AxisRendererY.new(root, {})
-}));
-
-let sbSeries = scrollbar.chart.series.push(am5xy.LineSeries.new(root, {
-  valueYField: "Close",
-  valueXField: "Date",
-  xAxis: sbDateAxis,
-  yAxis: sbValueAxis
-}));
-
-sbSeries.fills.template.setAll({
-  visible: true,
-  fillOpacity: 0.3
-});
+// Set data: data.json has one dataset per interval, the chart starts with the daily one
+// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_data
+valueSeries.data.setAll(data.day);
 
 
-// Function that dynamically loads data
-function loadData(ticker: string, series: am5xy.XYSeries[], granularity: string) {
-  let data = (<any>window)[ticker + "_" + granularity];
-  am5.array.each(series, function(item) {
-    item.data.setAll(data);
-  });
-}
-
-// Load initial data for the first series
-let currentGranularity = "day";
-loadData("MSFT", [valueSeries, volumeSeries, sbSeries], currentGranularity);
-
-// Set up series type switcher
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/stock/toolbar/series-type-control/
-let seriesSwitcher = am5stock.SeriesTypeControl.new(root, {
-  stockChart: stockChart
-});
-
-seriesSwitcher.events.on("selected", function(ev) {
-  setSeriesType(ev.item.id);
-});
-
-function getNewSettings(series: am5xy.XYSeries) {
-  let newSettings: any = [];
-  am5.array.each(["name", "valueYField", "highValueYField", "lowValueYField", "openValueYField", "calculateAggregates", "valueXField", "xAxis", "yAxis", "legendValueText", "legendRangeValueText", "stroke", "fill"], function(setting: any) {
-    newSettings[setting] = series.get(setting);
-  });
-  return newSettings;
-}
-
-function setSeriesType(seriesType: string) {
-  // Get current series and its settings
-  let currentSeries = stockChart.get("stockSeries")!;
-  let newSettings = getNewSettings(currentSeries);
-
-  // Remove previous series
-  let data = currentSeries.data.values;
-  mainPanel.series.removeValue(currentSeries);
-
-  // Create new series
-  let series;
-  switch (seriesType) {
-    case "line":
-      series = mainPanel.series.push(am5xy.LineSeries.new(root, newSettings));
-      break;
-    case "candlestick":
-    case "procandlestick":
-      newSettings.clustered = false;
-      series = mainPanel.series.push(am5xy.CandlestickSeries.new(root, newSettings));
-      if (seriesType == "procandlestick") {
-        series.columns.template.get("themeTags")!.push("pro");
-      }
-      break;
-    case "ohlc":
-      newSettings.clustered = false;
-      series = mainPanel.series.push(am5xy.OHLCSeries.new(root, newSettings));
-      break;
-  }
-
-  // Set new series as stockSeries
-  if (series) {
-    valueLegend.data.removeValue(currentSeries);
-    series.data.setAll(data);
-    stockChart.set("stockSeries", series);
-    let cursor = mainPanel.get("cursor");
-    if (cursor) {
-      cursor.set("snapToSeries", [series]);
-    }
-    valueLegend.data.insertIndex(0, series);
-  }
-}
-
-// Interval switcher
-// -------------------------------------------------------------------------------
+// Set up interval switcher: the id of an item is the name of its dataset
 // https://www.amcharts.com/docs/v5/charts/stock/toolbar/interval-control/
-let intervalSwitcher = am5stock.IntervalControl.new(root, {
+const intervalSwitcher = am5stock.IntervalControl.new(root, {
   stockChart: stockChart,
+  currentItem: "day", // the control starts on "1 day", to match the data loaded above
   items: [
-    { id: "1 minute", label: "1 minute", interval: { timeUnit: "minute", count: 1 } },
-    { id: "1 day", label: "1 day", interval: { timeUnit: "day", count: 1 } },
-    { id: "1 week", label: "1 week", interval: { timeUnit: "week", count: 1 } },
-    { id: "1 month", label: "1 month", interval: { timeUnit: "month", count: 1 } }
+    { id: "minute", label: "1 minute", interval: { timeUnit: "minute", count: 1 } },
+    { id: "day", label: "1 day", interval: { timeUnit: "day", count: 1 } },
+    { id: "week", label: "1 week", interval: { timeUnit: "week", count: 1 } },
+    { id: "month", label: "1 month", interval: { timeUnit: "month", count: 1 } }
   ]
 });
 
-intervalSwitcher.events.on("selected", function(ev: any) {
-  // Determine selected granularity
-  currentGranularity = ev.item.interval.timeUnit;
+// a picked interval loads its own dataset and sets the axis's base interval to match
+intervalSwitcher.events.on("selected", (ev) => {
+  const item = ev.item as am5stock.IIntervalControlItem;
 
-  // Get series
-  const valueSeries = stockChart.get("stockSeries")!;
-  const volumeSeries = stockChart.get("volumeSeries")!;
-
-  // Set up zoomout
-  valueSeries.events.once("datavalidated", function() {
+  // The new data covers another period: show all of it
+  valueSeries.events.once("datavalidated", () => {
     mainPanel.zoomOut();
   });
 
-  // Load data for all series (main series + comparisons)
-  const promises = [];
-  promises.push(loadData("MSFT", [valueSeries, volumeSeries, sbSeries], currentGranularity));
-  am5.array.each(stockChart.getPrivate("comparedSeries", []), function(series) {
-    promises.push(loadData(series.get("name")!, [series], currentGranularity));
+  // Tell the axis how far apart the data items are, then swap the data
+  dateAxis.set("baseInterval", {
+    timeUnit: item.interval.timeUnit,
+    count: item.interval.count || 1
   });
-
-  // Once data loading is done, set `baseInterval` on the DateAxis
-  Promise.all(promises).then(function() {
-    dateAxis.set("baseInterval", ev.item.interval);
-    sbDateAxis.set("baseInterval", ev.item.interval);
-  });
+  valueSeries.data.setAll(data[item.id as keyof typeof data]);
 });
 
 
-// Stock toolbar
-// -------------------------------------------------------------------------------
+// Add stock toolbar
 // https://www.amcharts.com/docs/v5/charts/stock/toolbar/
-let toolbar = am5stock.StockToolbar.new(root, {
-  container: document.getElementById("chartcontrols")!,
+am5stock.StockToolbar.new(root, {
+  container: document.getElementById("chartcontrols")!, // the div above the chart that holds the toolbar
   stockChart: stockChart,
   controls: [
-    am5stock.IndicatorControl.new(root, {
-      stockChart: stockChart,
-      legend: valueLegend
-    }),
-    am5stock.DateRangeSelector.new(root, {
-      stockChart: stockChart
-    }),
-    am5stock.PeriodSelector.new(root, {
-      stockChart: stockChart
-    }),
-    intervalSwitcher,
-    seriesSwitcher,
-    am5stock.DrawingControl.new(root, {
-      stockChart: stockChart
-    }),
-    am5stock.ResetControl.new(root, {
-      stockChart: stockChart
-    }),
-    am5stock.SettingsControl.new(root, {
-      stockChart: stockChart
-    })
+    intervalSwitcher
   ]
-})
+});
+
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+valueSeries.appear(1000);
+stockChart.appear(1000, 100);

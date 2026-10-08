@@ -1,0 +1,8 @@
+{
+  "title": "Satellite Image Globe",
+  "description": "A slowly turning globe that shows a satellite image with MapRasterSeries, with country borders drawn over it. The image loads from the amCharts CDN, so it needs an internet connection.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["globe", "satellite", "raster", "image", "animations"],
+  "since": "5.21.0"
+}

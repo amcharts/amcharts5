@@ -42,43 +42,44 @@ export interface IContainerSettings extends ISpriteSettings {
 	paddingBottom?: number;
 
 	/**
-	 * Background element.
+	 * Element drawn behind the container's content, sized to fill the
+	 * container.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Background} for more info
 	 */
 	background?: Graphics;
 
 	/**
-	 * A layout to use for arranging children.
+	 * How children are arranged, e.g. `root.horizontalLayout`,
+	 * `root.verticalLayout` or `root.gridLayout`. Without a layout, children
+	 * are placed by their own `x` and `y`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Layout} for more info
 	 */
 	layout?: Layout | null;
 
 	/**
-	 * An element to use as a container's mask (clipping region).
+	 * An element whose shape clips the container's children.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Masks} for more info
 	 */
 	mask?: Graphics | null;
 
 	/**
-	 * If set to `true` all content going outside the bounds of the container
-	 * will be clipped.
+	 * Clips all content that goes outside the container's bounds.
 	 */
 	maskContent?: boolean;
 
 	/**
-	 * If set to `true` all descendants - not just direct children, but every
-	 * element in it - will become "interactive".
+	 * Makes every descendant, not just direct children, interactive when the
+	 * container itself is interactive.
 	 *
 	 * @default true
 	 */
 	interactiveChildren?: boolean;
 
 	/**
-	 * If set to `true`, applying a state on a container will also apply the same
-	 * state on its children.
+	 * Applies every state set on the container to its children too.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#States} for more info
 	 *
@@ -87,22 +88,23 @@ export interface IContainerSettings extends ISpriteSettings {
 	setStateOnChildren?: boolean;
 
 	/**
-	 * Setting this to an instance of [[Scrollbar]] will enable vertical
-	 * scrolling of content if it does not fit into the Container.
+	 * A [[Scrollbar]] that scrolls the content vertically when it does not fit
+	 * in the container.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Scrollbar} for more info
 	 */
 	verticalScrollbar?: Scrollbar;
 
 	/**
-	 * If set to `true` its children will be laid out in opposite order.
+	 * Lays out the children in reverse order.
 	 *
 	 * @since 5.1.1
 	 */
 	reverseChildren?: boolean;
 
 	/**
-	 * HTML content of the container.
+	 * HTML content of the container. It can hold data placeholders, such as
+	 * `{category}`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/} for more info
 	 * @since 5.2.11
@@ -116,7 +118,7 @@ export interface IContainerEvents extends ISpriteEvents {
 
 export interface IContainerPrivate extends ISpritePrivate {
 	/**
-	 * A `<div>` element used for HTML content of the `Container`.
+	 * The `<div>` element that holds the container's `html` content.
 	 */
 	htmlElement?: HTMLDivElement;
 
@@ -134,11 +136,10 @@ export interface IContainerPrivate extends ISpritePrivate {
 }
 
 /**
- * A basic element that can have child elements, maintain their layout, and
+ * An element that holds child elements, arranges them with a layout, and can
  * have a background.
  *
- * It can have any [[Sprite]] element as a child, from very basic shapes, to
- * full-fledged charts.
+ * Its children can be any [[Sprite]], from basic shapes to whole charts.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/} for more info
  * @important
@@ -154,7 +155,7 @@ export class Container extends Sprite {
 	public _childrenDisplay: IContainer = this._root._renderer.makeContainer();
 
 	/**
-	 * List of Container's child elements.
+	 * The container's child elements.
 	 */
 	public children: Children<Sprite> = new Children(this);
 
@@ -415,7 +416,7 @@ export class Container extends Sprite {
 	}
 
 	/**
-	 * Returns container's inner width (width without padding) in pixels.
+	 * Returns the container's width without padding, in pixels.
 	 *
 	 * @return Inner width (px)
 	 */
@@ -424,7 +425,7 @@ export class Container extends Sprite {
 	}
 
 	/**
-	 * Returns container's inner height (height without padding) in pixels.
+	 * Returns the container's height without padding, in pixels.
 	 *
 	 * @return Inner height (px)
 	 */
@@ -475,7 +476,8 @@ export class Container extends Sprite {
 				const paddingBottom = this.get("paddingBottom", 0);
 
 				this.children.each((child) => {
-					if (child.get("position") != "absolute" && child.get("isMeasured")) {
+					// A hidden child takes no room, as the layouts already skip it
+					if (child.get("position") != "absolute" && child.get("isMeasured") && child.isVisible()) {
 						let childBounds = child.adjustedLocalBounds();
 						let childX = child.x();
 						let childY = child.y();
@@ -613,6 +615,9 @@ export class Container extends Sprite {
 
 	public _prepareChildren() {
 
+		this._applyDeclaredAnimations();
+		this._applyAutoAppear();
+
 		this._childrenPrep = true;
 
 		const innerWidth = this.innerWidth();
@@ -673,11 +678,10 @@ export class Container extends Sprite {
 	}
 
 	/**
-	 * If scrolling is enabled on the Container (by adding `verticalScrollbar`)
-	 * the Container will scroll in such way so that target element becomes
-	 * visible if its currently outside of view.
+	 * Scrolls the container so that the child comes into view, if it is out of
+	 * view. Works only on a container with a `verticalScrollbar`.
 	 *
-	 * @param  child  Target child
+	 * @param  child  Child to scroll to
 	 * @since 5.10.5
 	 */
 	public scrollToChild(child: Sprite) {
@@ -871,6 +875,10 @@ export class Container extends Sprite {
 		});
 	}
 
+	/**
+	 * Calls `f` for each child, including the background, vertical scrollbar
+	 * and mask.
+	 */
 	public eachChildren(f: (child: Sprite) => void): void {
 		const background = this.get("background");
 		if (background) {
@@ -892,6 +900,10 @@ export class Container extends Sprite {
 		});
 	}
 
+	/**
+	 * Returns all children, including the background, vertical scrollbar and
+	 * mask.
+	 */
 	public allChildren(): Array<Sprite> {
 		const output: Array<Sprite> = [];
 

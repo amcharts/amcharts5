@@ -1,0 +1,7 @@
+{
+  "title": "Partition Chart",
+  "description": "A partition chart: every level of nested data as a column of rectangles sized by value.",
+  "category": "hierarchy",
+  "tier": "basic",
+  "tags": ["partition", "hierarchy", "nested data", "orientation"]
+}

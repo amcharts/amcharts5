@@ -7,12 +7,14 @@ import * as $type from "../../../core/util/Type";
 
 export interface IRelativeStrengthIndexSettings extends IOverboughtOversoldSettings {
 	/**
-	 * EMA period.
+	 * Period of the simple moving average of the RSI, drawn as a second line.
+	 *
+	 * @default 3
 	 */
 	smaPeriod?: number;
 
 	/**
-	 * A color for "ema" line.
+	 * Color of the moving average line.
 	 */
 	smaColor?: Color;
 }
@@ -22,7 +24,9 @@ export interface IRelativeStrengthIndexPrivate extends IOverboughtOversoldPrivat
 export interface IRelativeStrengthIndexEvents extends IOverboughtOversoldEvents { }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Relative Strength Index indicator: momentum from `0` to `100`, comparing
+ * average gains with average losses over `period`. Drawn in a panel of its
+ * own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -35,7 +39,7 @@ export class RelativeStrengthIndex extends OverboughtOversold {
 	declare public _events: IRelativeStrengthIndexEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the RSI's moving average (`smaPeriod`).
 	 */
 	public smaSeries!: LineSeries;
 

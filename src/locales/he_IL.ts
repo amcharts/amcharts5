@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "אישור",
+	"Cancel": "ביטול",
+	"Delete": "מחיקה",
+	"Settings": "הגדרות",
+	"Expand": "הרחבה",
+	"Move Up": "הזזה למעלה",
+	"Move Down": "הזזה למטה"
 };

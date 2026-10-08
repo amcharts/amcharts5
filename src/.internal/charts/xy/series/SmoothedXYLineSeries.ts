@@ -10,8 +10,8 @@ export interface ISmoothedXYLineSeriesDataItem extends ILineSeriesDataItem {
 export interface SmoothedXYLineSeriesProperties extends ILineSeriesSettings {
 
 	/**
-	 * A tension force for the smoothing (0-1). The smaller the value the more
-	 * curvy the line will be.
+	 * How tight the curve is, from `0` to `1`: `1` draws straight lines, a
+	 * smaller value a rounder curve.
 	 *
 	 * @default 0.5
 	 */
@@ -28,7 +28,8 @@ export interface SmoothedXYLineSeriesPrivate extends ILineSeriesPrivate {
 }
 
 /**
- * Smoothed line series suitable for XY (scatter) charts
+ * A line series drawn as a smooth curve that can run in any direction, for
+ * XY (scatter) charts.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/} for more info
  */

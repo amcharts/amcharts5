@@ -313,6 +313,13 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "ОК",
+	"Cancel": "Отказ",
+	"Delete": "Изтриване",
+	"Settings": "Настройки",
+	"Expand": "Разгъване",
+	"Move Up": "Преместване нагоре",
+	"Move Down": "Преместване надолу"
 
 };

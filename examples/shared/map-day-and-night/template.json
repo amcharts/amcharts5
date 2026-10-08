@@ -1,0 +1,8 @@
+{
+  "title": "Day and Night Map",
+  "description": "A world map with a NightSeries that shades where it is night right now and shows the sun.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["night series", "sun", "twilight", "polygon series"],
+  "since": "5.21.0"
+}

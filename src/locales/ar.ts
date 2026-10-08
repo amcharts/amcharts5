@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "موافق",
+	"Cancel": "إلغاء",
+	"Delete": "حذف",
+	"Settings": "الإعدادات",
+	"Expand": "توسيع",
+	"Move Up": "نقل لأعلى",
+	"Move Down": "نقل لأسفل"
 };

@@ -2,11 +2,9 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Ember" — a warm dark theme on a warm near-black ground, with a series
- * palette biased toward ambers, oranges and reds (plus a few cool hues for
- * categorical separation).
- *
- * This is a standalone theme; it does not modify the built-in `DarkTheme`.
+ * "Ember": a warm dark theme on a near-black brown background, with series
+ * colors leaning to golds, oranges and reds, plus a few cool hues to tell
+ * series apart. It sets all interface colors, so use it instead of `Dark`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

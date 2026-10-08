@@ -1,3 +1,7 @@
 {
-  "bodyElements": ["<style>body { margin: 0; padding: 0; background: #f0e6d6; overflow: hidden; }</style>", "<div id=\"chartdiv\" style=\"width: 100%; height: 100vh; background: #f0e6d6;\"></div>"]
+  "title": "Map Sankey",
+  "description": "Flows between countries drawn as bands on a map with MapSankeySeries, each band as wide as its value.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["map sankey series", "flows", "links", "nodes"]
 }

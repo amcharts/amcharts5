@@ -26,7 +26,8 @@ export interface INetLoadResult<A> {
 	response?: string;
 
 	/**
-	 * Request response as Blob. (if set `responseType = "blob"`)
+	 * Response as a `Blob`, when `responseType` is `"blob"`. `response` then
+	 * holds its text.
 	 */
 	blob?: Blob;
 
@@ -41,12 +42,15 @@ export interface INetLoadResult<A> {
 	error: boolean;
 
 	/**
-	 * A target object that made the net load request.
+	 * The `target` passed to `load()`.
 	 */
 	target?: A;
 
 }
 
+/**
+ * Options for `load()`.
+ */
 export interface INetRequestOptions {
 
 	/**
@@ -62,35 +66,32 @@ export interface INetRequestOptions {
 	responseType?: XMLHttpRequestResponseType;
 
 	/**
-	 * Specify whether to send CORS credentials (defaults to `false`).
+	 * Sends credentials, such as cookies, with cross-origin requests.
 	 *
+	 * @default false
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials} for more info
 	 */
 	withCredentials?: boolean;
 }
 
 /**
- * Loads an external file via its URL.
- *
- * Please note that this is an asynchronous function.
- *
- * It will not return the result, but rather a `Promise`.
- *
- * You can use the `await` notion, or `then()`.
+ * Loads a file from `url` and returns a `Promise` of the result. The promise
+ * is rejected, with `error: true` in the result, if the request fails or its
+ * status is not 200.
  *
  * ```TypeScript
  * // Using await
- * let response = await Net.load( "http://www.my.com/data.json" );
+ * let response = await am5.net.load( "http://www.my.com/data.json" );
  * console.log( response.response );
  *
  * // Using then()
- * Net.load( "http://www.my.com/data.json" ).then( ( response ) => {
+ * am5.net.load( "http://www.my.com/data.json" ).then( ( response ) => {
  *   console.log( response.response );
  * } );
  * ```
  * ```JavaScript
  * // Using then()
- * Net.load( "http://www.my.com/data.json" ).then( function( response ) {
+ * am5.net.load( "http://www.my.com/data.json" ).then( function( response ) {
  *   console.log( response.response );
  * } );
  * ```
@@ -98,7 +99,7 @@ export interface INetRequestOptions {
  * @async
  * @see {@link https://www.amcharts.com/docs/v5/concepts/data/net-load-utility/} for more info
  * @param url      URL for the file to load
- * @param target   A target element that is requesting the net load
+ * @param target   Any object, passed back as `target` in the result
  * @param options  Request options
  * @return Result (Promise)
  */
@@ -128,6 +129,14 @@ export function load<A>(url: string, target?: A, options?: INetRequestOptions): 
 							target: target
 						};
 						success(output);
+					}, () => {
+						error({
+							xhr: xhr,
+							error: true,
+							blob: blob,
+							type: xhr.getResponseHeader("Content-Type"),
+							target: target
+						});
 					});
 					return;
 				}

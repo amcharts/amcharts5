@@ -22,45 +22,40 @@ import * as $math from "../../core/util/Math";
 export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 
 	/**
-	 * Outer radius of the axis.
-	 *
-	 * If set in percent, it will be relative to chart's own `radius`.
+	 * Outer radius of the axis, in pixels or as a percent of the chart's
+	 * radius. A negative value is measured in from the chart's radius.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	radius?: number | Percent;
 
 	/**
-	 * Inner radius of the axis.
-	 *
-	 * If set in percent, it will be relative to chart's own `innerRadius`.
-	 *
-	 * If value is negative, inner radius will be calculated from the outer edge.
+	 * Inner radius of the axis, in pixels or as a percent of the chart's
+	 * radius. A negative value is measured in from the axis's outer radius.
+	 * If not set, the chart's `innerRadius` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Series start angle.
-	 *
-	 * If not set, will use chart's `startAngle.`
+	 * Angle in degrees where the axis starts. If not set, the chart's
+	 * `startAngle` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	startAngle?: number;
 
 	/**
-	 * Series end angle.
-	 *
-	 * If not set, will use chart's `endAngle.`
+	 * Angle in degrees where the axis ends. If not set, the chart's
+	 * `endAngle` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	endAngle?: number;
 
 	/**
-	 * @todo am: needs description
+	 * Not used by a circular axis. See `axisAngle` of [[AxisRendererRadial]].
 	 */
 	axisAngle?: number;
 
@@ -69,41 +64,40 @@ export interface IAxisRendererCircularSettings extends IAxisRendererSettings {
 export interface IAxisRendererCircularPrivate extends IAxisRendererPrivate {
 
 	/**
-	 * Actual radius of the label in pixels.
+	 * Actual outer radius of the axis in pixels.
 	 */
 	radius?: number;
 
 	/**
-	 * Actual inner radius of the label in pixels.
+	 * Actual inner radius of the axis in pixels.
 	 */
 	innerRadius?: number;
 
 	/**
-	 * Actual start angle of the label in degrees.
+	 * Actual start angle of the axis in degrees.
 	 */
 	startAngle?: number;
 
 	/**
-	 * Actual end angle of the label in degrees.
+	 * Actual end angle of the axis in degrees.
 	 */
 	endAngle?: number;
 
 }
 
 /**
- * Renderer for circular axes.
+ * Renderer for an axis that runs around a [[RadarChart]], from its
+ * `startAngle` to its `endAngle`.
  */
 export class AxisRendererCircular extends AxisRenderer {
 
 	/**
-	 * Chart this renderer is for.
+	 * The chart this renderer is for.
 	 */
 	declare public chart: RadarChart | undefined;
 
 	/**
-	 * A list of labels in the axis.
-	 *
-	 * `labels.template` can be used to configure labels.
+	 * Labels of the axis. Configure them through `labels.template`.
 	 *
 	 * @default new ListTemplate<AxisLabelRadial>
 	 */
@@ -116,9 +110,7 @@ export class AxisRendererCircular extends AxisRenderer {
 
 
 	/**
-	 * A list of fills in the axis.
-	 *
-	 * `axisFills.template` can be used to configure axis fills.
+	 * Fills of the axis cells. Configure them through `axisFills.template`.
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
@@ -238,10 +230,10 @@ export class AxisRendererCircular extends AxisRenderer {
 	}
 
 	/**
-	 * Converts relative position to angle.
+	 * Converts a relative position on the axis to an angle.
 	 *
-	 * @param   position  Position
-	 * @return            Angle
+	 * @param   position  Position (0-1)
+	 * @return            Angle in degrees
 	 */
 	public positionToAngle(position: number): number {
 		const axis: Axis<AxisRenderer> = this.axis;
@@ -269,10 +261,10 @@ export class AxisRendererCircular extends AxisRenderer {
 	protected _handleOpposite() { }
 
 	/**
-	 * Converts relative position to an X/Y coordinate.
+	 * Converts a relative position on the axis to a point on its outer radius.
 	 *
-	 * @param   position  Position
-	 * @return            Point
+	 * @param   position  Position (0-1)
+	 * @return            Point relative to the chart's center
 	 */
 	public positionToPoint(position: number): IPoint {
 		const radius = this.getPrivate("radius", 0);
@@ -444,7 +436,7 @@ export class AxisRendererCircular extends AxisRenderer {
 	}
 
 	/**
-	 * Returns axis length in pixels.
+	 * Returns the length of the axis's arc in pixels.
 	 *
 	 * @return Length
 	 */

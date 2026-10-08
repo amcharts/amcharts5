@@ -21,34 +21,33 @@ import * as $array from "../../core/util/Array";
 export interface IAxisRendererCurveYSettings extends IAxisRendererSettings {
 
 	/**
-	 * Axis length in pixels.
-	 * 
-	 * [[SerpentineChart]] and [[SpiralChart]] will ignore this setting as they
-	 * calculate axis length by the `yAxisRadius` setting of a chart itself.
+	 * Length of the axis in pixels. On a [[CurveChart]], it is scaled along
+	 * with the X renderer's `points`.
+	 *
+	 * [[SerpentineChart]] and [[SpiralChart]] ignore it and work the length
+	 * out from their own `yAxisRadius`.
 	 *
 	 * @default 60
 	 */
 	axisLength?: number;
 
 	/**
-	 * X-axis renderer.
-	 *
-	 * This setting is required.
+	 * Renderer of the X axis. It is set automatically when this renderer is
+	 * the X renderer's `yRenderer`.
 	 */
 	xRenderer?: AxisRendererCurveX;
 
 	/**
-	* Relative location of the axis on the chart: 0-1.
-	*
-	* * `0` - start
-	* * `1` - end
+	* Where on this axis the X axis line runs: `0` at its start, `1` at its
+	* end. At `0.5`, the axis reaches out equally to both sides of the line.
 	*
 	* @default 0.5
 	*/
 	axisLocation?: number;
 
 	/**
-	 * Should axis labels rotation should be adjusted to the axis rotation?
+	 * Rotates the labels to the direction of the X axis line at its start,
+	 * where this axis's labels are.
 	 *
 	 * @default false
 	 */
@@ -60,7 +59,8 @@ export interface IAxisRendererCurveYPrivate extends IAxisRendererPrivate {
 }
 
 /**
- * Renderer for [[CurveChart]] "vertical" axes.
+ * Renderer for the Y axis of a [[CurveChart]], which runs across the X axis
+ * line all along it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0
@@ -82,11 +82,8 @@ export class AxisRendererCurveY extends AxisRenderer {
 	protected _fillGenerator = arc();
 
 	/**
-	 * A [[TemplateList]] with all the labels attached to the axis.
-	 *
-	 * `labels.template` can be used to configure appearance of the labels.
-	 *
-	 * @default new ListTemplate<AxisLabelRadial>
+	 * The axis labels, placed at the start of the X axis line. Configure them
+	 * through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<AxisLabelRadial> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -196,10 +193,12 @@ export class AxisRendererCurveY extends AxisRenderer {
 	protected _handleOpposite() { }
 
 	/**
-	 * Converts relative position to X/Y point.
+	 * Converts a position on this axis and one on the X axis to an X/Y point.
 	 *
-	 * @param   position  Position
-	 * @return            Point
+	 * @param   position   Position on this axis, `0` to `1`
+	 * @param   positionX  Position on the X axis, `0` to `1`
+	 * @param   doNotFix   `positionX` is already relative to the X axis's visible (zoomed) range
+	 * @return             Point
 	 */
 	public positionToPoint(position: number, positionX?: number, doNotFix?: boolean): IPoint {
 		if (positionX == undefined) {
@@ -366,7 +365,7 @@ export class AxisRendererCurveY extends AxisRenderer {
 	}
 
 	/**
-	 * Returns axis length in pixels.
+	 * Returns the `axisLength` setting.
 	 *
 	 * @return Length
 	 */
@@ -382,7 +381,8 @@ export class AxisRendererCurveY extends AxisRenderer {
 	}
 
 	/**
-	 * Converts relative position to pixels.
+	 * Converts a position on the axis to a distance in pixels from the start
+	 * of its visible range.
 	 *
 	 * @param   position  Position
 	 * @return            Pixels

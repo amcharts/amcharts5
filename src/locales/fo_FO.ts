@@ -420,6 +420,13 @@ export default {
 	// Common actions
 	"Close": "Lukka",
 	"Minimize": "Minimera",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Ógilda",
+	"Delete": "Strika",
+	"Settings": "Stillingar",
+	"Expand": "Víðka",
+	"Move Up": "Flyt upp",
+	"Move Down": "Flyt niður"
 
 };

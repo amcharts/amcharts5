@@ -16,7 +16,9 @@ export interface IBullBearPowerEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Bull Bear Power indicator: bull power (high minus the `period` exponential
+ * moving average of the close) plus bear power (low minus that average).
+ * Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -29,7 +31,7 @@ export class BullBearPower extends ChartIndicator {
     declare public _events: IBullBearPowerEvents;
 
     /**
-     * Indicator series.
+     * The indicator's series.
      */
     declare public series: LineSeries;
 

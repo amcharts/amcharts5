@@ -3,13 +3,13 @@ import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 export interface IEllipseSettings extends IGraphicsSettings {
 
 	/**
-	 * The ellipse's major-axis radius. Must be non-negative.
+	 * Horizontal radius in pixels.
 	 */
 
 	radiusX: number
 
 	/**
-	 * The ellipse's minor-axis radius. Must be non-negative.
+	 * Vertical radius in pixels.
 	 */
 	radiusY: number
 }
@@ -18,7 +18,7 @@ export interface IEllipsePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a Ellipse.
+ * Draws an ellipse centered on its `x` and `y`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  * @important

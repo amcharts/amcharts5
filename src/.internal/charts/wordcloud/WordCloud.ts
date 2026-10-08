@@ -21,17 +21,17 @@ import * as $type from "../../core/util/Type";
 export interface IWordCloudDataItem extends ISeriesDataItem {
 
 	/**
-	 * Category.
+	 * The word.
 	 */
 	category: string;
 
 	/**
-	 * Label.
+	 * The label that shows the word.
 	 */
 	label: Label;
 
 	/**
-	 * Fill color used for the slice and related elements, e.g. legend marker.
+	 * The word's color.
 	 */
 	fill: Color;
 
@@ -54,97 +54,118 @@ export interface IWordCloudDataItem extends ISeriesDataItem {
 export interface IWordCloudSettings extends ISeriesSettings {
 
 	/**
-	 * Duration of word animation when chart resizes.
+	 * Duration, in milliseconds, of words moving to their new places when the
+	 * cloud is laid out again, as when the chart resizes.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * An easing function to use for word animations.
+	 * Easing of words moving to their new places.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
-	 * @default am5.ease.out($ease.cubic)
+	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	animationEasing?: (t: Time) => Time;
 
 	/**
-	 * @default false
+	 * Shrinks all words until every one of them fits. When off, words that
+	 * don't fit are left out.
+	 *
+	 * @default true
 	 */
 	autoFit?: boolean;
 
 	/**
-	 * Progress of current word layout animation. (0-1)
+	 * Layout progress, from `0` to `1`. The layout runs in one pass, so this
+	 * turns `1` each time it finishes: watch it to know when words are placed.
 	 *
 	 * @readonly
 	 */
 	progress?: number;
 
 	/**
-	 * A [[ColorSet]] to use when asigning colors for slices.
+	 * Colors for words with no `fill` in data, one after another.
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * A field in data that holds category names.
+	 * Field in `data` that holds the words.
+	 *
+	 * @default "category"
 	 */
 	categoryField?: string;
 
 	/**
-	 * A field that holds color for label fill.
+	 * Field in `data` that holds a word's color.
+	 *
+	 * @default "fill"
 	 */
 	fillField?: string;
 
 	/**
-	 * Source text from which words are extracted.
+	 * Text to make the cloud from: each word's value is the number of times it
+	 * appears. Replaces `data`.
 	 */
 	text?: string;
 
 	/**
-	 * Absolute or relative font size for the smallest words.
+	 * Font size of the words with the lowest value: in pixels, or a share of
+	 * the smaller of the cloud's width and height.
+	 *
+	 * @default am5.percent(2)
 	 */
 	minFontSize?: number | Percent;
 
 	/**
-	 * Absolute or relative font size for the biggest words.
+	 * Font size of the words with the highest value: in pixels, or a share of
+	 * the smaller of the cloud's width and height.
+	 *
+	 * @default am5.percent(15)
 	 */
 	maxFontSize?: number | Percent;
 
 	/**
-	 * Minimum occurances for a word to be included into cloud.
+	 * Fewest times a word must appear in `text` to be shown.
 	 */
 	minValue?: number;
 
 	/**
-	 * Maximum number of words to show.
+	 * Most words to take from `text`, most frequent first. Doesn't limit
+	 * `data`.
 	 */
 	maxCount?: number;
 
 	/**
-	 * Array of words  exclude from cloud.
+	 * Words of `text` to leave out. Case-sensitive.
 	 */
 	excludeWords?: Array<string>;
 
 	/**
-	 * Randomness of word placement (0-1).
+	 * How randomly words are placed, from `0` (from the middle outwards, in
+	 * order of value) to `1`.
+	 *
+	 * @default 0
 	 */
 	randomness?: number;
 
 	/**
-	 * Minimum number of characters for a word to be included in the cloud.
+	 * Fewest characters a word of `text` must have to be shown.
+	 *
+	 * @default 1
 	 */
 	minWordLength?: number;
 
 	/**
-	 * An array of possible rotation angles for words.
+	 * Angles, in degrees, that words can be rotated to.
+	 *
+	 * @default [0, -90]
 	 */
 	angles?: number[];
 
 	/**
-	 * How a word's rotation is chosen from `angles`.
-	 *
-	 * When `true` (default) each word picks a random angle from `angles`, so the
-	 * cloud looks different on every layout. When `false` words cycle through
-	 * `angles` in order (word 0 gets `angles[0]`, word 1 `angles[1]`, and so on),
-	 * which — together with `randomness: 0` — makes the layout reproducible.
+	 * Gives each word a random angle from `angles`, so the cloud differs on
+	 * every layout. When `false`, words take `angles` in turn, which with
+	 * `randomness: 0` makes the layout the same every time.
 	 *
 	 * @since 5.20.1
 	 * @default true
@@ -152,14 +173,9 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	randomizeAngles?: boolean;
 
 	/**
-	 * Whether words may nest into each other's empty space.
-	 *
-	 * When `true` (default) a word is packed against its neighbors' letters, so
-	 * small words tuck into the concavities of bigger ones and the cloud packs
-	 * tightly — but bounding boxes may overlap. Set to `false` to pack whole
-	 * bounding boxes instead, so they never overlap (useful when labels have an
-	 * opaque `background`, whose rectangles would otherwise slide into a
-	 * neighbor's gaps).
+	 * Lets small words tuck into the gaps between a bigger word's letters, so
+	 * the cloud packs tightly, though the words' boxes overlap. Set to `false`
+	 * to keep boxes apart, as for labels with an opaque `background`.
 	 *
 	 * @since 5.20.1
 	 * @default true
@@ -167,35 +183,31 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	allowNesting?: boolean;
 
 	/**
-	 * Step for next word placement.
+	 * Spacing of the spiral of points that words are tried at. Smaller packs
+	 * words more tightly, but takes longer.
+	 *
+	 * @default 15
 	 */
 	step?: number;
 
 	/**
-	 * Experimental: if set, words are arranged to fill this shape. The path is
-	 * scaled proportionally to fit the plot area.
+	 * Experimental: an SVG path for the words to fill, scaled to fit the
+	 * cloud.
 	 *
-	 * NOTE: this is an experimental feature and the fit is approximate. Favor
-	 * simple, bold shapes over complex, thin, or highly concave ones, and tune
-	 * `shapeTolerance`, `maskByShape`, `angles` (and `minFontSize`/`maxFontSize`)
-	 * to get a better fill for a particular shape.
+	 * The fit is approximate. Simple, bold shapes work best; tune
+	 * `shapeTolerance`, `maskByShape`, `angles`, `minFontSize` and
+	 * `maxFontSize` for a better fill.
 	 *
 	 * @since 5.20.1
 	 */
 	svgPath?: string;
 
 	/**
-	 * Extra distance (in pixels) a word may extend past the `svgPath` outline,
-	 * on top of the automatic per-word overhang (a fraction of each word's own
-	 * size). Words already spill over the edge proportionally to their size so
-	 * the outline fills well at `0` (default); increase this to let them spill
-	 * further.
+	 * How many more pixels a word may reach past the `svgPath` outline, on top
+	 * of the bit each word overhangs by itself in proportion to its size. A
+	 * negative value keeps words further inside.
 	 *
-	 * Can also be negative to pull words further inside the outline, creating
-	 * visual padding between the words and the shape edge.
-	 *
-	 * Only affects placement — the drawn `shape` outline is unchanged. Requires
-	 * `svgPath`.
+	 * Affects placement only, not the drawn `shape`.
 	 *
 	 * @since 5.20.1
 	 * @default 0
@@ -203,9 +215,8 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	shapeTolerance?: number;
 
 	/**
-	 * If set to `true`, words are clipped to the `svgPath` shape, so the parts
-	 * of letters that overhang the outline (see `shapeTolerance`) are cut off at
-	 * the edge for a crisp silhouette. Requires `svgPath`.
+	 * Clips the words to the `svgPath` shape, cutting off letters that reach
+	 * past its edge.
 	 *
 	 * @since 5.20.1
 	 * @default false
@@ -216,7 +227,8 @@ export interface IWordCloudSettings extends ISeriesSettings {
 export interface IWordCloudPrivate extends ISeriesPrivate {
 
 	/**
-	 * Indicates whether size of the font was adjusted for better fit.
+	 * The factor `autoFit` scaled font sizes by to fit all words: `1` if it
+	 * didn't need to.
 	 */
 	adjustedFontSize: number;
 
@@ -249,7 +261,8 @@ interface IWordPlacement {
 }
 
 /**
- * Creates a [[WordCloud]] series.
+ * A word cloud: words sized by their values, from `data` or counted in
+ * `text`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/word-cloud/} for more info
  * @important
@@ -264,18 +277,9 @@ export class WordCloud extends Series {
 	declare public _dataItemSettings: IWordCloudDataItem;
 
 	/**
-	 * A [[Graphics]] element that draws the `svgPath` shape the words are
-	 * arranged into, aligned exactly with the word-constraint region.
-	 *
-	 * By default it renders as a faint silhouette (the theme's alternative
-	 * background color at 10% opacity) behind the words, and only when
-	 * `svgPath` is set. Style it via
-	 * `series.shape.setAll({ fill: color, fillOpacity: 0.1, ... })`.
-	 *
-	 * Its geometry (`svgPath`, `scale`, `x`, `y`) and visibility are managed
-	 * by the series; `fill`/`stroke` and other styling are yours to set.
-	 *
-	 * It is added as the first child, so it always renders behind the words.
+	 * Draws the `svgPath` shape behind the words, while it is set: a faint
+	 * silhouette by default. Style it with `series.shape.setAll({ ... })`; its
+	 * geometry and visibility are the series'.
 	 *
 	 * @since 5.20.1
 	 */
@@ -331,9 +335,7 @@ export class WordCloud extends Series {
 
 
 	/**
-	 * A [[ListTemplate]] of all labels in series.
-	 *
-	 * `labels.template` can also be used to configure labels.
+	 * Labels of all words. Configure them through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(this._makeLabels());
 
@@ -1603,13 +1605,7 @@ export class WordCloud extends Series {
 					let w = words[i];
 					let word = w.category;
 
-					if (w.value < minValue) {
-						words.splice(i, 1);
-					}
-					if (word.length < minWordLength) {
-						words.splice(i, 1);
-					}
-					if (excludeWords && excludeWords.indexOf(word) !== -1) {
+					if (w.value < minValue || word.length < minWordLength || (excludeWords && excludeWords.indexOf(word) !== -1)) {
 						words.splice(i, 1);
 					}
 				}

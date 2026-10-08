@@ -8,16 +8,13 @@ import { buildPatterns, PATTERN_STROKE_WIDTHS, PATTERN_STROKE_DASHARRAYS, PATTER
 import { setColor } from "./DefaultTheme";
 
 /**
- * "Patterns Dark" - the dark counterpart to `Patterns`: every filled series
- * shares the same gray ramp overlaid with a distinct black pattern (hatch / dot /
- * star / triangle / grid) - the opposite pattern color to the light `Patterns`,
- * so the texture reads as dark cuts into the gray on the dark ground. Line series
- * are gray, told apart by stroke width and dash.
+ * "Patterns Dark": the dark counterpart to `Patterns`, with gray interface
+ * colors on a dark background. Filled series take the same shades of gray,
+ * but with black patterns on top, which read as dark cuts into the gray. Line
+ * series are told apart by stroke width and dash.
  *
- * Like `Patterns`, categories are encoded by shape rather than hue, so it stays
- * legible for all forms of color blindness.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * Like `Patterns`, it tells series apart by texture rather than hue, so it
+ * stays legible for all forms of color blindness.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info

@@ -21,38 +21,33 @@ import * as $math from "../../core/util/Math";
 export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 
 	/**
-	 * Outer radius of the axis.
-	 *
-	 * If set in percent, it will be relative to chart's own `radius`.
+	 * Outer radius of the axis, in pixels or as a percent of the chart's
+	 * radius. A negative value is measured in from the chart's radius.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	radius?: number | Percent;
 
 	/**
-	 * Inner radius of the axis.
-	 *
-	 * If set in percent, it will be relative to chart's own `innerRadius`.
-	 *
-	 * If value is negative, inner radius will be calculated from the outer edge.
+	 * Inner radius of the axis, in pixels or as a percent of the chart's
+	 * radius. A negative value is measured in from the axis's outer radius.
+	 * If not set, the chart's `innerRadius` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Series start angle.
-	 *
-	 * If not set, will use chart's `startAngle.`
+	 * Angle in degrees where the axis's grid circles and fills start. If not
+	 * set, the chart's `startAngle` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
 	startAngle?: number;
 
 	/**
-	 * Series end angle.
-	 *
-	 * If not set, will use chart's `endAngle.`
+	 * Angle in degrees where the axis's grid circles and fills end. If not
+	 * set, the chart's `endAngle` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
 	 */
@@ -60,7 +55,10 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 
 
 	/**
-	 * @todo am: needs description
+	 * Angle in degrees of the axis line, along which its labels and ticks
+	 * sit: `0` points right, `-90` up.
+	 *
+	 * @default -90
 	 */
 	axisAngle?: number;
 
@@ -69,34 +67,34 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 export interface IAxisRendererRadialPrivate extends IAxisRendererPrivate {
 
 	/**
-	 * Actual radius of the label in pixels.
+	 * Actual outer radius of the axis in pixels.
 	 */
 	radius?: number;
 
 	/**
-	 * Actual inner radius of the label in pixels.
+	 * Actual inner radius of the axis in pixels.
 	 */
 	innerRadius?: number;
 
 	/**
-	 * Actual start angle of the label in degrees.
+	 * Actual start angle of the axis's grid in degrees.
 	 */
 	startAngle?: number;
 
 	/**
-	 * Actual end angle of the label in degrees.
+	 * Actual end angle of the axis's grid in degrees.
 	 */
 	endAngle?: number;
 
 }
 
 /**
- * Renderer for radial axes.
+ * Renderer for an axis that runs out from the center of a [[RadarChart]].
  */
 export class AxisRendererRadial extends AxisRenderer {
 
 	/**
-	 * Chart this renderer is for.
+	 * The chart this renderer is for.
 	 */
 	declare public chart: RadarChart | undefined;
 
@@ -109,9 +107,7 @@ export class AxisRendererRadial extends AxisRenderer {
 	protected _fillGenerator = arc();
 
 	/**
-	 * A [[TemplateList]] with all the labels attached to the axis.
-	 *
-	 * `labels.template` can be used to configure appearance of the labels.
+	 * Labels of the axis. Configure them through `labels.template`.
 	 *
 	 * @default new ListTemplate<AxisLabelRadial>
 	 */
@@ -153,6 +149,10 @@ export class AxisRendererRadial extends AxisRenderer {
 			const radius = chart.getPrivate("radius", 0);
 
 			let r = $utils.relativeToValue(this.get("radius", p100), radius);
+
+			if (r < 0) {
+				r = radius + r;
+			}
 			let ir = $utils.relativeToValue(this.get("innerRadius", chart.getPrivate("innerRadius", 0)), radius) * chart.getPrivate("irModifyer", 1);
 
 			if (ir < 0) {
@@ -211,10 +211,10 @@ export class AxisRendererRadial extends AxisRenderer {
 	protected _handleOpposite() { }
 
 	/**
-	 * Converts relative position to X/Y point.
+	 * Converts a relative position on the axis to a point on the axis line.
 	 *
-	 * @param   position  Position
-	 * @return            Point
+	 * @param   position  Position (0-1)
+	 * @return            Point relative to the chart's center
 	 */
 	public positionToPoint(position: number): IPoint {
 		const innerRadius = this.getPrivate("innerRadius", 0);
@@ -367,7 +367,7 @@ export class AxisRendererRadial extends AxisRenderer {
 	}
 
 	/**
-	 * Returns axis length in pixels.
+	 * Returns the axis length in pixels, from its inner to its outer radius.
 	 *
 	 * @return Length
 	 */
@@ -383,10 +383,11 @@ export class AxisRendererRadial extends AxisRenderer {
 	}
 
 	/**
-	 * Converts relative position to pixels.
+	 * Converts a relative position on the axis to a distance from its inner
+	 * radius.
 	 *
-	 * @param   position  Position
-	 * @return            Pixels
+	 * @param   position  Position (0-1)
+	 * @return            Distance in pixels
 	 */
 	public positionToCoordinate(position: number): number {
 		if (this._inversed) {

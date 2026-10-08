@@ -10,74 +10,64 @@ import * as $utils from "../util/Utils";
 export interface IRadialLabelSettings extends ILabelSettings {
 
 	/**
-	 * Pixel value to adjust radius with.
-	 *
-	 * Will add to (or subtract from if negative) whatever value `baseRadius` evaluates
-	 * to.
+	 * Distance in pixels from `baseRadius`: outward, or inward when `inside`
+	 * is `true`. A negative value goes the other way.
 	 */
 	radius?: number;
 
 	/**
-	 * Radius of the label's position.
-	 *
-	 * Can be either set in absolute pixel value, or percent.
-	 *
-	 * Relative value, depending on the situation, will most often mean its
-	 * position within certain circular object, like a slice: 0% meaning inner
-	 * edge, and 100% - the outer edge.
+	 * Where the label sits across the arc it belongs to, such as a slice: a
+	 * percent, `0%` being the inner edge and `100%` the outer one, or pixels
+	 * from the inner edge.
 	 *
 	 * @default 100%
 	 */
 	baseRadius?: number | Percent;
 
 	/**
-	 * Label angle in degrees.
-	 *
-	 * In most cases it will be set by the chart/series and does not need to
-	 * be set manually.
+	 * Angle in degrees of the label's position around the center: `0` points
+	 * right, and angles grow clockwise. Usually set by the series.
 	 */
 	labelAngle?: number;
 
 	/**
-	 * Should the text "face" inward or outward from the arc the text is
-	 * following.
+	 * Which way the text faces with `textType` `"circular"`: `"inward"`,
+	 * `"outward"`, or `"auto"` to pick whichever reads better at its angle.
+	 * With `"radial"`, `"auto"` turns text on the left half so that it does
+	 * not read upside down.
 	 *
-	 * `"auto"` means that facing will be chosen automatically based on the angle
-	 * to enhance readability.
-	 *
-	 * Only applies if `type = "circluar"`.
-	 * 
 	 * @default "auto"
 	 */
 	orientation?: "inward" | "outward" | "auto";
 
 	/**
-	 * Should label be drawn inside (`true`) or outside (`false`) the arc.
+	 * Places the label inside the arc instead of outside: `radius` then counts
+	 * inward.
 	 *
 	 * @default false
 	 */
 	inside?: boolean;
 
 	/**
-	 * Label type.
+	 * How the label is placed:
 	 *
-	 * * `"regular"` (default) - normal horizontal label.
-	 * * `"circular"` - arched label.
-	 * * `"radial"` - label radiating from the center of the arc.
-	 * * `"aligned"` - horizontal label aligned with other labels horizontally.
-	 * * `"adjusted"` - horizontal label adjusted in postion.
+	 * * `"regular"` - horizontal, at its position on the arc.
+	 * * `"circular"` - curved along the arc.
+	 * * `"radial"` - rotated to run along the radius.
+	 * * `"aligned"` - horizontal, lined up in columns with the other labels.
+	 * * `"adjusted"` - horizontal, moved outward so that its edge, not its
+	 *   center, is at its position.
 	 *
-	 * **IMPORTANT!** If the label is used in a [[PieSeries]], its `alignLabels` setting
-	 * (default: `true`) takes precedence over `textType`. If you need to set this
-	 * to anything else than `regular`, make sure you also set `alignLabels: false` on
-	 * `PieSeries`.
+	 * **IMPORTANT!** In a [[PieSeries]], `alignLabels` (`true` by default)
+	 * overrides `textType`. To use a type other than `"aligned"`, also set
+	 * `alignLabels: false` on the series.
 	 *
 	 * @default "regular"
 	 */
 	textType?: "regular" | "circular" | "radial" | "aligned" | "adjusted";
 
 	/**
-	 * Extra spacing between characters, in pixels.
+	 * Extra spacing between characters in pixels, for `"circular"` text.
 	 *
 	 * @default 0
 	 */
@@ -104,6 +94,10 @@ export interface IRadialLabelPrivate extends ILabelPrivate {
 
 }
 
+/**
+ * A label placed around a center at an angle and radius, such as a pie
+ * slice's label. It can also curve along the arc (`textType`).
+ */
 export class RadialLabel extends Label {
 
 	declare public _settings: IRadialLabelSettings;
@@ -127,8 +121,8 @@ export class RadialLabel extends Label {
 	}
 
 	/**
-	 * Returns base radius in pixels.
-	 * 
+	 * Returns the radius in pixels that `baseRadius` points to.
+	 *
 	 * @return Base radius
 	 */
 	public baseRadius(): number {
@@ -139,8 +133,9 @@ export class RadialLabel extends Label {
 	}
 
 	/**
-	 * Returns radius adjustment in pixels.
-	 * 
+	 * Returns the label's radius in pixels: the base radius plus the `radius`
+	 * adjustment.
+	 *
 	 * @return Radius
 	 */
 	public radius(): number {

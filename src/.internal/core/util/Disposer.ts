@@ -145,13 +145,10 @@ export class MultiDisposer extends DisposerClass {
 }
 
 /**
- * A special kind of Disposer that has attached value set.
- *
- * If a new value is set using `set()` method, the old disposer value is
- * disposed.
+ * Holds a value together with its disposer. Setting a new value with `set()`
+ * disposes the previous disposer.
  *
  * @ignore Exclude from docs
- * @todo Description
  */
 export class MutableValueDisposer<T extends IDisposer> extends DisposerClass {
 
@@ -206,22 +203,20 @@ export class MutableValueDisposer<T extends IDisposer> extends DisposerClass {
 }
 
 /**
+ * A disposer that disposes itself once every disposer returned by
+ * `increment()` has been disposed.
+ *
  * @ignore Exclude from docs
- * @todo Description
  */
 export class CounterDisposer extends Disposer {
 
 	/**
-	 * [_counter description]
-	 *
-	 * @todo Description
+	 * Number of disposers from `increment()` not yet disposed.
 	 */
 	private _counter: number = 0;
 
 	/**
-	 * [increment description]
-	 *
-	 * @todo Description
+	 * Increments the counter and returns a disposer that decrements it.
 	 */
 	public increment() {
 		// TODO throw an error if it is disposed

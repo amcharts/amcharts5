@@ -7,9 +7,9 @@ export interface IGanttDateAxisRendererPrivate extends IAxisRendererXPrivate {
 }
 
 /**
- * Renderer for [[GanttDateAxis]] axes.
+ * Renderer for a [[GanttDateAxis]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_vertical_axis} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Timeline_horizontal_axis} for more info
  * @since 5.14.0
  * @important
  */

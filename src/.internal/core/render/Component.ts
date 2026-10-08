@@ -7,33 +7,35 @@ import type * as $ease from "../util/Ease";
 import type { Bullet } from "./Bullet";
 
 /**
- * A base element that holds data bit (data item) for any [[Component]].
+ * One item of a [[Component]]'s data, holding its values and settings.
  */
 export class DataItem<P extends IComponentDataItem> extends Settings {
 	declare public _settings: P;
 
 	/**
-	 * A data item's owener [[Component]].
+	 * The [[Component]] the data item belongs to.
 	 */
 	public component: Component;
 
 	/**
-	 * A reference to actual item in source data this item is based on.
+	 * The object in the source data this data item was made from.
 	 */
 	public dataContext: unknown;
 
 	/**
-	 * @todo requires description
+	 * Bullets shown for this data item.
 	 */
 	public bullets: Array<Bullet> | undefined;
 
 	/**
-	 * A set of "open" values.
+	 * Start of the base interval each date field's value falls in, by field.
+	 * Set by a [[DateAxis]].
 	 */
 	public open: { [index: string]: any } | undefined;
 
 	/**
-	 * A set of "close" values.
+	 * End of the base interval each date field's value falls in, by field.
+	 * Set by a [[DateAxis]].
 	 */
 	public close: { [index: string]: any } | undefined;
 
@@ -69,7 +71,9 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 	}
 
 	/**
-	 * Shows a data item that's currently hidden.
+	 * Shows the data item.
+	 *
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public show(duration?: number) {
 		this.setRaw("visible", true);
@@ -79,7 +83,9 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 	}
 
 	/**
-	 * Hides a data item that's currently visible.
+	 * Hides the data item.
+	 *
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public hide(duration?: number) {
 		this.setRaw("visible", false);
@@ -88,6 +94,9 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 		}
 	}
 
+	/**
+	 * Returns `true` if the data item is hidden.
+	 */
 	public isHidden() {
 		return !this.get("visible");
 	}
@@ -101,15 +110,16 @@ export interface IComponentDataItem {
 export interface IComponentSettings extends IContainerSettings {
 
 	/**
-	 * A duration of the animation from one setting value to another, in
-	 * milliseconds.
+	 * Duration in milliseconds of the animation from old values to new ones,
+	 * e.g. when data changes.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animating_data_values} for more info
+	 * @default 0
 	 */
 	interpolationDuration?: number;
 
 	/**
-	 * Easing function to use for cross setting value animations.
+	 * Easing function of the animation from old values to new ones.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 */
@@ -120,12 +130,18 @@ export interface IComponentPrivate extends IContainerPrivate {
 }
 
 export interface IComponentEvents extends IContainerEvents {
+	/**
+	 * The component's data changed and was processed.
+	 */
 	datavalidated: {}
+	/**
+	 * Values of the component's data items changed.
+	 */
 	valueschanged: {}
 }
 
 /**
- * A base class for elements that make use of data.
+ * Base class for elements that use data.
  */
 export abstract class Component extends Container {
 	public static className: string = "Component";
@@ -158,12 +174,13 @@ export abstract class Component extends Container {
 	protected _dataGrouped = false;
 
 	/**
-	 * Indicates if the component has already been initialized.
+	 * Becomes `true` after the component's first update.
 	 */
 	public inited: boolean = false;
 
 	/**
-	 * Component's data.
+	 * The component's data: a list of data objects, each made into a data
+	 * item.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/} for more info
 	 */
@@ -262,12 +279,15 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Updates existing data in the component without disposing old data items. If there are more data items than before, new ones will be created. If there are less, old ones will be removed.
-	 * @param data 
+	 * Updates the data in place, keeping the existing data items: each object's
+	 * values go into the data item at the same index. Extra objects are added
+	 * as new data items, and data items beyond the new data are removed.
+	 *
+	 * @param  data  New data
 	 */
 	public updateData(data: Array<any>) {
 
-		let ii = 0;
+		let ii = -1;
 
 		$array.each(data, (dataObject, index) => {
 			const dataItem = this.dataItems[index];
@@ -336,7 +356,7 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * A list of component's data items.
+	 * The component's data items.
 	 *
 	 * @return  Data items
 	 */
@@ -369,10 +389,10 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Creates a new data item and processes it.
-	 * 
+	 * Creates and processes a data item, without adding it to `dataItems`.
+	 *
 	 * @param   data         Data item settings
-	 * @param   dataContext  Data context
+	 * @param   dataContext  Object to use as the data item's `dataContext`
 	 * @return               New data item
 	 */
 	public makeDataItem(data: this["_dataItemSettings"], dataContext?: any): DataItem<this["_dataItemSettings"]> {
@@ -382,10 +402,11 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Adds new explicit data item to series.
-	 * 
+	 * Creates a data item straight from settings, not from data, and adds it
+	 * to the component's data items.
+	 *
 	 * @param   data         Data item settings
-	 * @param   dataContext  Data context
+	 * @param   dataContext  Object to use as the data item's `dataContext`
 	 * @return               New data item
 	 */
 	public pushDataItem(data: this["_dataItemSettings"], dataContext?: any): DataItem<this["_dataItemSettings"]> {
@@ -402,7 +423,7 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Shows component's data item.
+	 * Shows a data item.
 	 *
 	 * @param   dataItem   Data item
 	 * @param   _duration  Animation duration in milliseconds
@@ -413,7 +434,7 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Hides component's data item.
+	 * Hides a data item.
 	 *
 	 * @param   dataItem   Data item
 	 * @param   _duration  Animation duration in milliseconds
@@ -453,7 +474,7 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Forces a repaint of the element which relies on data.
+	 * Makes the component redraw from its data on the next frame.
 	 *
 	 * @since 5.0.21
 	 */
@@ -475,7 +496,7 @@ export abstract class Component extends Container {
 	}
 
 	/**
-	 * Looks up and returns a data item by its ID.
+	 * Returns the data item whose `id` matches, if any.
 	 *
 	 * @param   id  ID
 	 * @return      Data item

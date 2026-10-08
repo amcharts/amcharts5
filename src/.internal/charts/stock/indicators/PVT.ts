@@ -8,7 +8,7 @@ import * as $type from "../../../core/util/Type";
 export interface IPVTSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Chart's main volume series.
+	 * The volume series that weights each price change. Required.
 	 */
 	volumeSeries: XYSeries;
 
@@ -22,7 +22,8 @@ export interface IPVTEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Price Volume Trend indicator: a running total of each close's percentage
+ * change from the previous one, times volume. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -35,7 +36,7 @@ export class PVT extends ChartIndicator {
 	declare public _events: IPVTEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

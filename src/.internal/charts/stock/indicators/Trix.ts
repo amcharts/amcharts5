@@ -9,12 +9,14 @@ import type { Color } from "../../../core/util/Color";
 
 export interface ITrixSettings extends IChartIndicatorSettings {
 	/**
-	 * Signal color.
+	 * Color of the signal line.
 	 */
 	signalColor?: Color;
 
 	/**
-	 * A value for "signal" period.
+	 * Period of the signal line, a simple moving average of the Trix line.
+	 *
+	 * @default 9
 	 */
 	signalPeriod?: number;
 }
@@ -27,7 +29,8 @@ export interface ITrixEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Trix indicator: the percentage change of a triple exponential moving average
+ * of `field` over `period`, with a signal line. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -40,12 +43,12 @@ export class Trix extends ChartIndicator {
 	declare public _events: ITrixEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the Trix line.
 	 */
 	declare public series: LineSeries;
 
 	/**
-	 * Indicator series for the signal.
+	 * Series of the signal line.
 	 */
 	public signalSeries!: LineSeries;
 

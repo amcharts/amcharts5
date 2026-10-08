@@ -12,23 +12,19 @@ export interface IPathPatternSettings extends IPatternSettings {
 	/**
 	 * Gap between motifs, in pixels.
 	 *
-	 * @default 6
+	 * @default 0
 	 */
 	gap?: number;
 
 	/**
 	 * The path is scaled (keeping its aspect ratio) to fit within
-	 * `maxWidth` x `maxHeight` pixels.
-	 *
-	 * @default 10
+	 * `maxWidth` x `maxHeight` pixels. Without either, it keeps its own size.
 	 */
 	maxWidth?: number;
 
 	/**
 	 * The path is scaled (keeping its aspect ratio) to fit within
-	 * `maxWidth` x `maxHeight` pixels.
-	 *
-	 * @default 10
+	 * `maxWidth` x `maxHeight` pixels. Without either, it keeps its own size.
 	 */
 	maxHeight?: number;
 
@@ -57,6 +53,9 @@ export interface IPathPatternPrivate extends IPatternPrivate {
  *
  * Note: `rotation` rotates each motif around its own centre (the grid stays
  * axis-aligned), so the pattern tiles seamlessly at any angle.
+ *
+ * The tile is one grid cell, unless `width` and `height` are set: then that
+ * is the tile, as before 5.20.0.
  *
  * @since 5.2.33
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
@@ -99,7 +98,7 @@ export class PathPattern extends Pattern {
 	/**
 	 * The tile is only a repeat unit (the grid repeats every cell), so shrink an
 	 * oversized `width`/`height` to a single cell (2x2 when `checkered`). Skipped
-	 * for non-`repeat` repetitions.
+	 * for non-`repeat` repetitions, and when the chart set the tile's size.
 	 * @ignore
 	 */
 	protected _optimizeTileSize() {
@@ -108,9 +107,14 @@ export class PathPattern extends Pattern {
 			return;
 		}
 
+		if (this._authored("width") || this._authored("height")) {
+			return;
+		}
+
+		const motif = this._motif();
 		const gap = this.get("gap", 0);
-		const cellW = this.get("maxWidth", 10) + gap;
-		const cellH = this.get("maxHeight", 10) + gap;
+		const cellW = motif.w + gap;
+		const cellH = motif.h + gap;
 		if (cellW <= 0 || cellH <= 0) {
 			return;
 		}
@@ -120,11 +124,38 @@ export class PathPattern extends Pattern {
 		const optimalH = Math.max(1, Math.round(cellH * n));
 
 		if (this.get("width", 100) !== optimalW) {
-			this.setRaw("width", optimalW);
+			this._setCRaw("width", optimalW);
 		}
 		if (this.get("height", 100) !== optimalH) {
-			this.setRaw("height", optimalH);
+			this._setCRaw("height", optimalH);
 		}
+	}
+
+	protected _authored(key: "width" | "height"): boolean {
+		return this.isUserSetting(key) && !this.isComputedSetting(key);
+	}
+
+	/**
+	 * The motif's scale and the box it takes: `maxWidth` x `maxHeight`, or the
+	 * path's own size when neither is set.
+	 * @ignore
+	 */
+	protected _motif(): { scale: number; w: number; h: number } {
+		const svgPath = this.get("svgPath");
+		if (svgPath != null && svgPath !== this._bboxPath) {
+			this._bbox = this._getPathBounds(svgPath);
+			this._bboxPath = svgPath;
+		}
+		const bbox = this._bbox;
+		const maxWidth: number | undefined = this.get("maxWidth");
+		const maxHeight: number | undefined = this.get("maxHeight");
+
+		if (maxWidth == null && maxHeight == null) {
+			return { scale: 1, w: bbox.w, h: bbox.h };
+		}
+
+		const scale = Math.min(maxWidth != null ? maxWidth / bbox.w : Infinity, maxHeight != null ? maxHeight / bbox.h : Infinity);
+		return { scale: scale, w: maxWidth != null ? maxWidth : bbox.w * scale, h: maxHeight != null ? maxHeight : bbox.h * scale };
 	}
 
 	public _changed() {
@@ -141,16 +172,13 @@ export class PathPattern extends Pattern {
 	}
 
 	protected _renderPattern(svgPath: string) {
-		if (svgPath !== this._bboxPath) {
-			this._bbox = this._getPathBounds(svgPath);
-			this._bboxPath = svgPath;
-		}
+		const motif = this._motif();
 
 		const width = this.get("width", 100);
 		const height = this.get("height", 100);
 		const gap = this.get("gap", 0);
-		const maxWidth = this.get("maxWidth", 10);
-		const maxHeight = this.get("maxHeight", 10);
+		const maxWidth = motif.w;
+		const maxHeight = motif.h;
 		const checkered = this.get("checkered", false);
 		const centered = this.get("centered", true);
 		const rotation = this.get("rotation", 0) * Math.PI / 180;
@@ -173,15 +201,21 @@ export class PathPattern extends Pattern {
 
 		const path = new Path2D(svgPath);
 		const bbox = this._bbox;
-		// Uniform scale so the motif fits into maxWidth x maxHeight.
-		const scale = Math.min(maxWidth / bbox.w, maxHeight / bbox.h);
+		// Uniform scale so the motif fits into its box
+		const scale = motif.scale;
 		const bcx = bbox.x + bbox.w / 2;
 		const bcy = bbox.y + bbox.h / 2;
 
 		let cellW = maxWidth + gap;
 		let cellH = maxHeight + gap;
-		const cols = Math.max(1, Math.round(width / cellW));
-		const rows = Math.max(1, Math.round(height / cellH));
+		let cols = Math.max(1, Math.round(width / cellW));
+		let rows = Math.max(1, Math.round(height / cellH));
+
+		// A tile the chart sized, with no motif size: one motif per tile, as before 5.20.0
+		if (this.get("maxWidth") == null && this.get("maxHeight") == null && (this._authored("width") || this._authored("height"))) {
+			cols = 1;
+			rows = 1;
+		}
 		cellW = width / cols;
 		cellH = height / rows;
 
@@ -208,7 +242,7 @@ export class PathPattern extends Pattern {
 			}
 		}
 
-		this._pattern = ctx.createPattern(this.canvas, this.get("repetition", "repeat"));
+		this._pattern = this._root._renderer.createRasterPattern(this.canvas, this.get("repetition", "repeat"));
 	}
 
 	/**

@@ -8,7 +8,8 @@ import * as $array from "../../../core/util/Array";
 export interface IDisparityIndexSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Type of the moving average.
+	 * Kind of moving average: `"simple"`, `"weighted"`, `"exponential"`,
+	 * `"dema"` (double exponential) or `"tema"` (triple exponential).
 	 *
 	 * @default "simple"
 	 */
@@ -24,7 +25,8 @@ export interface IDisparityIndexEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Disparity Index indicator: how far `field` is from its moving average over
+ * `period`, in percent of the average. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -37,7 +39,7 @@ export class DisparityIndex extends ChartIndicator {
 	declare public _events: IDisparityIndexEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

@@ -51,13 +51,31 @@ import * as $type from "../../../core/util/Type";
 export type Indicators = "Acceleration Bands" | "Accumulation Distribution" | "Accumulative Swing Index" | "Aroon" | "Average True Range" | "Awesome Oscillator" | "Bollinger Bands" | "Bull Bear Power" | "Chaikin Money Flow" | "Chaikin Oscillator" | "Commodity Channel Index" | "Disparity Index" | "Heikin Ashi" | "MACD" | "Momentum" | "Moving Average" | "Moving Average Cross" | "Moving Average Deviation" | "Moving Average Envelope" | "On Balance Volume" | "Price Volume Trend" | "Relative Strength Index" | "Standard Deviation" | "Stochastic Oscillator" | "Stochastic Momentum Index" | "Super Trend" | "Trix" | "Typical Price" | "Volume" | "Volume Profile" | "VWAP" | "Williams R" | "Median Price" | "ZigZag";
 
 export interface IIndicator {
+	/**
+	 * ID of the indicator in the list.
+	 */
 	id: string;
+	/**
+	 * Name shown in the list.
+	 */
 	name: string;
+	/**
+	 * Creates and returns the indicator when it is picked.
+	 */
 	callback: () => Indicator;
 }
 
 export interface IIndicatorControlSettings extends IDropdownListControlSettings {
+	/**
+	 * Indicators to list: names of built-in ones, or [[IIndicator]] objects
+	 * for custom ones. Those that need volume are listed only while the chart
+	 * has a `volumeSeries`.
+	 */
 	indicators?: Array<Indicators | IIndicator>;
+	/**
+	 * The [[StockLegend]] that indicators drawn over the main series are
+	 * added to.
+	 */
 	legend?: StockLegend;
 }
 
@@ -72,6 +90,9 @@ export interface IIndicatorControlPrivate extends IDropdownListControlPrivate {
 }
 
 export interface IIndicatorControlEvents extends IDropdownListControlEvents {
+	/**
+	 * An indicator was picked from the list and added to the chart.
+	 */
 	selected: {
 		item: string | IDropdownListItem;
 		indicator: Indicator | IIndicator;
@@ -161,8 +182,9 @@ export class IndicatorControl extends DropdownListControl {
 	}
 
 	/**
-	 * Returns `true` if the indicator is supported in current chart setup.
-	 * 
+	 * Returns `true` if the indicator can be added: those that need volume
+	 * need the chart's `volumeSeries`.
+	 *
 	 * @param   indicatorId  Indicator ID
 	 * @return               Supported?
 	 */
@@ -196,10 +218,12 @@ export class IndicatorControl extends DropdownListControl {
 	}
 
 	/**
-	 * Creates a specific indicator, adds it to chart, and returns the instance.
-	 * 
+	 * Creates an indicator, adds it to the chart and returns it. If it has
+	 * editable settings and `autoOpenSettings`, opens its settings modal;
+	 * canceling the modal removes the indicator again.
+	 *
 	 * @param   indicatorId  Indicator ID
-	 * @return               Indicator instance
+	 * @return               Indicator, or `undefined` if it can't be added
 	 */
 	public addIndicator(indicatorId: Indicators): Indicator | undefined {
 
@@ -489,10 +513,8 @@ export class IndicatorControl extends DropdownListControl {
 	}
 
 	/**
-	 * Serializes all available indicators into an array of simple objects or
-	 * JSON.
-	 *
-	 * `output` parameter can either be `"object"` or `"string"` (default).
+	 * Serializes the chart's indicators into an array of objects
+	 * (`output: "object"`) or into JSON (`"string"`, the default).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
@@ -538,8 +560,7 @@ export class IndicatorControl extends DropdownListControl {
 	}
 
 	/**
-	 * Parses data serialized with `serializeIndicators()` and adds indicators to
-	 * the chart.
+	 * Adds indicators to the chart from data made by `serializeIndicators()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0

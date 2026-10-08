@@ -10,8 +10,8 @@ export interface IGradient {
 }
 
 /**
- * Represents an object describing color switching point in a gradiend.
- *F
+ * A color stop in a gradient.
+ *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export interface IGradientStop {
@@ -22,26 +22,29 @@ export interface IGradientStop {
 	color?: Color;
 
 	/**
-	 * Offset defines where in the gradient the color should kick in. Values
-	 * from 0 to 1 are possible with 0 meaning start, 0.5 half-way through the
-	 * gradient, etc.
+	 * Where the color sits along the gradient, from `0` (start) to `1` (end).
+	 * Stops without an offset are spaced evenly.
 	 */
 	offset?: number;
 
 	/**
-	 * Transparency of the color. 0 - completely transparent, 1 - fully opaque.
+	 * Opacity of the color, from `0` (transparent) to `1` (opaque).
+	 *
+	 * @default 1
 	 */
 	opacity?: number;
 
 	/**
-	 * Sets lightness of the color.
+	 * Lightens the color by this amount, from `-1` to `1`: `0.2` moves it 20%
+	 * of the way to white. A negative value darkens it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/#Brightness} for more info
 	 */
 	lighten?: number;
 
 	/**
-	 * Sets brightness of the color.
+	 * Brightens the color by this amount, from `-1` to `1`, adding the same
+	 * amount to each channel. A negative value dims it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/#Brightness} for more info
 	 */
@@ -90,6 +93,19 @@ export interface IRendererEvents {
 	wheel: IRendererEvent<WheelEvent>;
 }
 
+/**
+ * A 2x2 linear transform: `a`, `b` are where the x axis goes, `c`, `d` where
+ * the y axis goes.
+ *
+ * @ignore
+ */
+export interface IDeform {
+	a: number;
+	b: number;
+	c: number;
+	d: number;
+}
+
 export interface IDisplayObject extends IDisposer {
 	mask: IGraphics | null;
 	visible: boolean;
@@ -106,6 +122,11 @@ export interface IDisplayObject extends IDisposer {
 	x: number;
 	y: number;
 	pivot: IPoint;
+
+	/**
+	 * @ignore
+	 */
+	deform: IDeform | null;
 	filter?: string;
 	cursorOverStyle?: string;
 	exportable?: boolean;
@@ -119,6 +140,13 @@ export interface IDisplayObject extends IDisposer {
 	toLocal(point: IPoint): IPoint;
 	toGlobal(point: IPoint): IPoint;
 	getLocalBounds(): IBounds;
+
+	/**
+	 * Bounds of the object's own content, also when it is not measured.
+	 *
+	 * @ignore
+	 */
+	getContentBounds(): IBounds;
 	getAdjustedBounds(bounds?: IBounds): IBounds;
 	on<C, Key extends keyof IRendererEvents>(key: Key, callback: (this: C, event: IRendererEvents[Key]) => void, context?: C): IDisposer;
 	hovering(): boolean;
@@ -140,6 +168,9 @@ export interface IContainer extends IDisplayObject {
 
 
 /**
+ * Blend modes for the `blendMode` setting of a [[Graphics]]. Each value is a
+ * canvas composite operation.
+ *
  * From https://github.com/pixijs/pixi.js/blob/3dd0ff9a935f0bc13a09aefff9eb2872f02c51b9/packages/canvas/canvas-renderer/src/utils/mapCanvasBlendModesToPixi.ts#L13
  */
 export enum BlendMode {
@@ -192,6 +223,15 @@ export interface IGraphics extends IDisplayObject {
 	svgPath(path: string): void;
 	image(image: HTMLImageElement | HTMLCanvasElement, width: number, height: number, x: number, y: number): void;
 	shadow(color: Color, blur?: number, offsetX?: number, offsetY?: number, opacity?: number): void;
+
+	/**
+	 * Groups the shapes drawn until [[endGroup]] under an id and a name. Canvas
+	 * ignores it; SVG writes a `<g>`.
+	 *
+	 * @since 5.21.0
+	 */
+	beginGroup(id?: string, name?: string): void;
+	endGroup(): void;
 }
 
 /**
@@ -277,6 +317,7 @@ export interface IRenderer extends IDisposer {
 	createLinearGradient(x1: number, y1: number, x2: number, y2: number): IGradient;
 	createRadialGradient(x1: number, y1: number, radius1: number, x2: number, y2: number, radius2: number): IGradient;
 	createPattern(graphics: IGraphics, background: IGraphics, repetition: string, width: number, height: number): IPattern;
+	createRasterPattern(source: HTMLCanvasElement, repetition: string): IPattern | null;
 	makeContainer(): IContainer;
 	makeGraphics(): IGraphics;
 	makeText(text: string, style: ITextStyle): IText;
@@ -290,6 +331,13 @@ export interface IRenderer extends IDisposer {
 	getEvent<A extends IPointerEvent>(originalEvent: A, adjustPoint?: boolean): IRendererEvent<A>;
 	getObjectAtPoint(point: IPoint): IDisplayObject | undefined;	
 	resetImageArray():void;
+}
+
+/**
+ * A renderer class, e.g. `CanvasRenderer`.
+ */
+export interface IRendererClass {
+	new(resolution?: number): IRenderer;
 }
 
 export interface ICanvasOptions {

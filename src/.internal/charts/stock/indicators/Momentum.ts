@@ -16,7 +16,8 @@ export interface IMomentumEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Momentum indicator: `field` minus its value `period` data items earlier.
+ * Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  * @since 5.4.8
@@ -30,7 +31,7 @@ export class Momentum extends ChartIndicator {
 	declare public _events: IMomentumEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

@@ -17,24 +17,29 @@ export interface IScrollbarSettings extends IContainerSettings {
 	orientation: "horizontal" | "vertical";
 
 	/**
-	 * Relative start of the selected range, with 0 meaning beginning, and 1 the
-	 * end.
+	 * Start of the selected range, from `0` to `1`: `0` is the left end, or
+	 * the top on a vertical scrollbar.
+	 *
+	 * @default 0
 	 */
 	start?: number;
 
 	/**
-	 * Relative end of the selected range, with 0 meaning beginning, and 1 the
-	 * end.
+	 * End of the selected range, from `0` to `1`: `1` is the right end, or
+	 * the bottom on a vertical scrollbar.
+	 *
+	 * @default 1
 	 */
 	end?: number;
 
 	/**
-	 * Number of milliseconds to play scroll animations for.
+	 * Duration in milliseconds of scroll animations, such as after a click on
+	 * the scrollbar's background.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * Easing function to use for animations.
+	 * Easing function of scroll animations.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 */
@@ -42,19 +47,27 @@ export interface IScrollbarSettings extends IContainerSettings {
 
 	/**
 	 * Puts the scrollbar on the opposite side of the chart: a horizontal
-	 * scrollbar below the plot instead of above it, and a vertical one to the
-	 * left instead of the right.
+	 * scrollbar below the plot area instead of above it, a vertical one on the
+	 * left instead of the right. It can be changed at any time.
 	 *
-	 * Can be changed at any time - the chart moves the scrollbar over.
-	 *
-	 * Only has effect on scrollbars set via a chart's `scrollbarX`/`scrollbarY`
-	 * settings. A scrollbar the user added to a container themselves is left
-	 * where it is.
+	 * Works only for scrollbars set as a chart's `scrollbarX` or `scrollbarY`.
 	 *
 	 * @default false
 	 * @since 5.20.2
 	 */
 	opposite?: boolean;
+
+	/**
+	 * Where the scrollbar sits relative to the axes on its side: `true` beyond
+	 * them (outermost), `false` between them and the plot area. If not set,
+	 * the chart decides. It can be changed at any time.
+	 *
+	 * Like `opposite`, works only for scrollbars set as a chart's `scrollbarX`
+	 * or `scrollbarY`.
+	 *
+	 * @since 5.21.0
+	 */
+	outsideAxes?: boolean;
 
 }
 
@@ -68,23 +81,26 @@ export interface IScrollbarPrivate extends IContainerPrivate {
 	/**
 	 * @ignore
 	 */
-	positionTextFunction?: (position: number) => string;
+	positionTextFunction?: (position: number, isEnd?: boolean) => string;
 
 }
 
 export interface IScrollbarEvents extends IContainerEvents {
 
 	/**
-	 * Invoked when range of the selection changes.
+	 * The selected range (`start` or `end`) changed.
 	 */
 	rangechanged: { start: number, end: number, grip?: "start" | "end" };
 
+	/**
+	 * The pointer was released after pressing a grip or the thumb.
+	 */
 	released:{};
 }
 
 /**
- * A control that allows zooming chart's axes, or other uses requiring range
- * selection.
+ * A control for selecting a range, such as the zoom of a chart's axes: the
+ * grips resize the range, the thumb between them moves it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/} for more info
  */
@@ -106,18 +122,18 @@ export class Scrollbar extends Container {
 	public static classNames: Array<string> = Container.classNames.concat([Scrollbar.className]);
 
 	/**
-	 * A thumb elment - a draggable square between the grips, used for panning
-	 * the selection.
+	 * The draggable bar between the grips, which moves the selected range.
+	 * Double-clicking it selects the full range.
 	 */
 	public thumb: RoundedRectangle = this._makeThumb();
 
 	/**
-	 * Start grip button.
+	 * The grip that drags the start of the range.
 	 */
 	public startGrip: Button = this._makeButton();
 
 	/**
-	 * End grip button.
+	 * The grip that drags the end of the range.
 	 */
 	public endGrip: Button = this._makeButton();
 
@@ -398,7 +414,7 @@ export class Scrollbar extends Container {
 		let toValue: string;
 		if (valueFunction) {
 			fromValue = valueFunction.call(this, this.get("start", 0));
-			toValue = valueFunction.call(this, this.get("end", 0));
+			toValue = valueFunction.call(this, this.get("end", 0), true);
 		}
 		else {
 			fromValue = from + "%";
@@ -470,7 +486,7 @@ export class Scrollbar extends Container {
 		let toValue: string;
 		if (valueFunction) {
 			fromValue = valueFunction.call(this, this.get("start", 0));
-			toValue = valueFunction.call(this, this.get("end", 0));
+			toValue = valueFunction.call(this, this.get("end", 0), true);
 		}
 		else {
 			fromValue = from + "%";

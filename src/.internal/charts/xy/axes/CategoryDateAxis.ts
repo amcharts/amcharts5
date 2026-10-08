@@ -13,45 +13,48 @@ import * as $utils from "../../../core/util/Utils";
 export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICategoryAxisSettings<R> {
 
 	/**
-	 * Indicates granularity of data.
+	 * The time interval of the data, such as `{ timeUnit: "day", count: 1 }`
+	 * for daily data.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
 	/**
-	 * A list of intervals the axis is allowed to show grid/labels on.
+	 * Intervals the grid and labels can be placed at, from shortest to
+	 * longest. The axis uses the shortest that keeps grid lines at least
+	 * `minGridDistance` apart.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
 
 	/**
-	 * Display "period change" labels using different format.
-	 *
-	 * If set to `true`, will use `periodChangeDateFormats` instead
-	 * of `dateFormats` for such labels, e.g. for month start.
+	 * Formats labels where a new period begins, such as the first day of a
+	 * month, with `periodChangeDateFormats` instead of `dateFormats`.
 	 *
 	 * @default true
 	 */
 	markUnitChange?: boolean;
 
 	/**
-	 * Date formats used for intermediate labels.
+	 * Date formats for labels, by the time unit of the grid, such as `"day"`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	dateFormats?: { [index: string]: string };
 
 	/**
-	 * Date formats used for "period change" labels.
+	 * Date formats, by time unit, for labels where a new period begins (see
+	 * `markUnitChange`).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	periodChangeDateFormats?: { [index: string]: string };
 
 	/**
-	 * A date format to use for axis tooltip.
+	 * Date format for the axis tooltip. If not set, the one in `dateFormats`
+	 * for the time unit of `baseInterval` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
 	 */
@@ -65,7 +68,7 @@ export interface ICategoryDateAxisDataItem extends ICategoryAxisDataItem {
 export interface ICategoryDateAxisPrivate extends ICategoryAxisPrivate {
 
 	/**
-	 * Current base interval.
+	 * The `baseInterval` in use.
 	 */
 	baseInterval: ITimeInterval;
 
@@ -76,7 +79,8 @@ export interface ICategoryDateAxisEvents extends ICategoryAxisEvents {
 
 
 /**
- * Category-based date axis.
+ * A category axis whose categories are timestamps. Each data item takes an
+ * equal share of the axis, so periods without data leave no gaps.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-date-axis/} for more info
  * @important
@@ -134,7 +138,10 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 
 		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
 
-		let frequency = Math.min(len, Math.ceil((endIndex - startIndex) / maxCount));
+		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
+		if (!$type.isNumber(frequency)) {
+			frequency = 1;
+		}
 		startIndex = Math.floor(startIndex / frequency) * frequency;
 		this._frequency = frequency;
 
@@ -258,7 +265,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 	}
 
 	/**
-	 * Returns a duration of currently active `baseInterval` in milliseconds.
+	 * Returns the duration of `baseInterval` in milliseconds.
 	 *
 	 * @return Duration
 	 */
@@ -268,9 +275,10 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 
 
 	/**
-	 * Returns text to be used in an axis tooltip for specific relative position.
+	 * Returns the text the axis tooltip shows at a position: the date of the
+	 * category there.
 	 *
-	 * @param   position  Position
+	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Tooltip text
 	 */
 	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {

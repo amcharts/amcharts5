@@ -19,59 +19,43 @@ root.setThemes([
 // Create the map chart
 // https://www.amcharts.com/docs/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
-  panX: "translateX",
-  panY: "translateY",
-  projection: am5map.geoMercator()
+  panX: "translateX",  // dragging moves the map sideways...
+  panY: "translateY",  // ...and up and down
+  projection: am5map.geoMercator() // the common flat world map
 }));
-
-
-// Create main polygon series for countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
-const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
-  geoJSON: am5geodata_worldLow as any
-}));
-
-polygonSeries.mapPolygons.template.setAll({
-  tooltipText: "{name}",
-  toggleKey: "active",
-  interactive: true
-});
-
-polygonSeries.mapPolygons.template.states.create("hover", {
-  fill: root.interfaceColors.get("primaryButtonHover")
-});
-
-polygonSeries.mapPolygons.template.states.create("active", {
-  fill: root.interfaceColors.get("primaryButtonHover")
-});
-
-let previousPolygon;
-
-polygonSeries.mapPolygons.template.on("active", (active, target) => {
-  if (previousPolygon && previousPolygon != target) {
-    previousPolygon.set("active", false);
-  }
-  if (target.get("active")) {
-    polygonSeries.zoomToDataItem(target.dataItem as any);
-  }
-  else {
-    chart.goHome();
-  }
-  previousPolygon = target;
-});
 
 
 // Add zoom control
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
-var zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
-zoomControl.homeButton.set("visible", true);
+const zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
+zoomControl.homeButton.set("visible", true); // hidden by default; a click zooms back out to the world
 
 
-// Set clicking on "water" to zoom out
-chart.chartContainer.get("background").events.on("click", () => {
-  chart.goHome();
-})
+// Create main polygon series for countries. clickZoom zooms to the clicked
+// country, and back out when it is clicked again or the water is clicked
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+  geoJSON: am5geodata_worldLow,
+  exclude: ["AQ"], // no Antarctica, which Mercator stretches across the bottom
+  clickZoom: true
+}));
+
+polygonSeries.mapPolygons.template.setAll({
+  tooltipText: "{name}", // the country's name, which comes with the map data
+  interactive: true      // the countries react to the pointer: hover and click
+});
+
+// the country under the pointer takes the theme's hover color
+polygonSeries.mapPolygons.template.states.create("hover", {
+  fill: root.interfaceColors.get("primaryButtonHover")
+});
+
+// The country zoomed to is active
+polygonSeries.mapPolygons.template.states.create("active", {
+  fill: root.interfaceColors.get("primaryButtonActive") // green in the default theme
+});
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 chart.appear(1000, 100);

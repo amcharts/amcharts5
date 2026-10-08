@@ -44,7 +44,7 @@ export function copy<O>(object: O): O {
 }
 
 /**
- * Iterates through all properties of the object calling `fn` for each of them.
+ * Iterates through all properties of the object calling `f` for each of them.
  *
  * @param object  Source object
  * @param f       Callback function
@@ -80,7 +80,7 @@ export function eachContinue<Object>(object: Object, fn: <Key extends Keyof<Obje
  *
  * @param object  Source object
  * @param fn      Callback function
- * @param order   Ordering function
+ * @param ord     Ordering function
  */
 export function eachOrdered<Object>(object: Object, fn: <Key extends Keyof<Object>>(key: Key, value: Object[Key]) => void, ord: (a: Keyof<Object>, b: Keyof<Object>) => number): void {
 	$array.each(keysOrdered(object, ord), (key) => {
@@ -100,10 +100,11 @@ export function hasKey<Object, Key extends keyof Object>(object: Object, key: Ke
 }
 
 /**
- * Copies all properties of one object to the other, omitting undefined, but only if property in target object doesn't have a value set.
+ * Copies each property of `source` that is not `null` or `undefined` to
+ * `target`, where `target` has no value for it yet.
  *
- * @param fromObject  Source object
- * @param toObject    Target object
+ * @param source  Source object
+ * @param target  Target object
  * @return Updated target object
  */
 export function softCopyProperties(source: Object, target: Object): Object {

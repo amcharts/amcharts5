@@ -16,53 +16,53 @@ import * as $type from "../../core/util/Type";
 export interface IHeatLegendSettings extends IContainerSettings {
 
 	/**
-	 * Starting (lowest value) color.
+	 * Color at the start of the scale (the lowest value).
 	 */
 	startColor: Color;
 
 	/**
-	 * Ending (highest value) color.
+	 * Color at the end of the scale (the highest value).
 	 */
 	endColor: Color;
 
 	/**
-	 * Starting (lowest value) opacity.
-	 * 
+	 * Opacity at the start of the scale (the lowest value).
+	 *
 	 * @default 1
 	 * @since 5.14.0
 	 */
 	startOpacity?: number;
 
 	/**
-	 * Ending (highest value) opacity.
-	 * 
+	 * Opacity at the end of the scale (the highest value).
+	 *
 	 * @default 1
 	 * @since 5.14.0
 	 */
 	endOpacity?: number;
 
 	/**
-	 * Start (lowest) value.
+	 * The lowest value, at the start of the scale.
 	 */
 	startValue?: number;
 
 	/**
-	 * End (highest) value.
+	 * The highest value, at the end of the scale.
 	 */
 	endValue?: number;
 
 	/**
-	 * Text for start label.
+	 * Text of the start label. If not set, it shows `startValue`.
 	 */
 	startText?: string;
 
 	/**
-	 * Text for end label.
+	 * Text of the end label. If not set, it shows `endValue`.
 	 */
 	endText?: string;
 
 	/**
-	 * Number of steps
+	 * Number of color steps. At `1` the scale is a smooth gradient.
 	 *
 	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Gradient_or_steps} for more info
@@ -70,7 +70,8 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	stepCount?: number;
 
 	/**
-	 * Orientation of the heat legend.
+	 * Orientation of the scale: `"horizontal"` runs from start on the left to
+	 * end on the right, `"vertical"` from start at the bottom to end at the top.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Orientation} for more info
 	 */
@@ -82,37 +83,30 @@ export interface IHeatLegendPrivate extends IContainerPrivate {
 }
 
 /**
- * Heat legend.
+ * A legend that shows a color scale from `startColor` to `endColor`, with the
+ * values at its ends.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/} for more info
  */
 export class HeatLegend extends Container {
 
 	/**
-	 * A [[Container]] that all labels are placed in.
-	 *
-	 * @default Container.new()
+	 * The [[Container]] that holds the start and end labels.
 	 */
 	public readonly labelContainer: Container = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A [[Container]] that all markers are placed in.
-	 *
-	 * @default Container.new()
+	 * The [[Container]] that holds the markers.
 	 */
 	public readonly markerContainer: Container = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A start [[Label]].
-	 *
-	 * @default Label.new()
+	 * The [[Label]] at the start of the scale.
 	 */
 	public readonly startLabel: Label = this.labelContainer.children.push(Label.new(this._root, { themeTags: ["start"] }));
 
 	/**
-	 * An end [[Label]].
-	 *
-	 * @default Label.new()
+	 * The [[Label]] at the end of the scale.
 	 */
 	public readonly endLabel: Label = this.labelContainer.children.push(Label.new(this._root, { themeTags: ["end"] }));
 
@@ -141,9 +135,8 @@ export class HeatLegend extends Container {
 	}
 
 	/**
-	 * List of rectangle elements used for default legend markers.
-	 *
-	 * @default new ListTemplate<RoundedRectangle>
+	 * The rectangles that make up the scale: one per step, or one with a
+	 * gradient when `stepCount` is `1`.
 	 */
 	public readonly markers: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -154,13 +147,11 @@ export class HeatLegend extends Container {
 
 
 	/**
-	 * Moves and shows tooltip at specific value.
+	 * Shows the tooltip, pointing at a value on the scale.
 	 *
-	 * Can also specify optional text to show in tooltip, as well as the color.
-	 *
-	 * @param  value  Value
-	 * @param  text   Text
-	 * @param  color  Color
+	 * @param  value  Value to point at
+	 * @param  text   Tooltip text; the formatted value if not given
+	 * @param  color  Tooltip background color; the value's color on the scale if not given
 	 */
 	public showValue(value: number, text?: string, color?: Color) {
 		const tooltip = this.getTooltip();

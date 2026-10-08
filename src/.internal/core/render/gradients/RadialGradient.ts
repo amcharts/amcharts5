@@ -18,12 +18,14 @@ export interface IRadialGradientSettings extends IGradientSettings {
 	radius?: number | Percent;
 
 	/**
-	 * X position.
+	 * Horizontal position of the gradient's center, in pixels or as a percent
+	 * of the element's width.
 	 */
 	x?: number | Percent;
 
 	/**
-	 * Y position.
+	 * Vertical position of the gradient's center, in pixels or as a percent of
+	 * the element's height.
 	 */
 	y?: number | Percent;
 
@@ -33,7 +35,7 @@ export interface IRadialGradientPrivate extends IGradientPrivate {
 }
 
 /**
- * Radial gradient.
+ * A gradient that changes color outward from a center point.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */

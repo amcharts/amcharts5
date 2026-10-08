@@ -20,8 +20,7 @@ export interface ICurveLineSeriesAxisRange extends ILineSeriesAxisRange {
 }
 
 /**
- * A line series for use in a [[CurveChart]], [[SerpetineChart]], or
- * a [[SpiralChart]].
+ * A line series for a [[CurveChart]], [[SerpentineChart]] or [[SpiralChart]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0
@@ -35,7 +34,7 @@ export class CurveLineSeries extends LineSeries {
 	declare public _axisRangeType: ICurveLineSeriesAxisRange;
 
 	/**
-	 * A chart series belongs to.
+	 * The chart the series belongs to.
 	 */
 	declare public chart: CurveChart | undefined;
 
@@ -46,7 +45,7 @@ export class CurveLineSeries extends LineSeries {
 		super._afterNew();
 		this._setC("maskContent", false);
 		this.bulletsContainer._setC("maskContent", false);
-		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
+		this.bulletsContainer._setC("mask", Graphics.new(this._root, {}));
 	}
 
 	protected _handleMaskBullets() {

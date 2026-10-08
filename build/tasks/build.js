@@ -18,6 +18,7 @@ async function writePackage(state) {
 			keywords: root.keywords,
 			main: "index.js",
 			module: "index.js",
+			types: "index.d.ts",
 			sideEffects: root.sideEffects,
 			dependencies: root.dependencies,
 		}, null, 2),
@@ -36,6 +37,8 @@ async function removeMapFiles(dir) {
 
 async function copyDirs(state, output) {
 	await cp(state.path("packages", "shared"), output);
+	// What belongs to the library alone: shared also goes to geodata and fonts
+	await cpMaybe(state.path("packages", "library"), output);
 	await cpMaybe(state.path("packages", "es2015"), output);
 
 	await cp(state.path("src", ".internal", "charts", "venn", "vennjs"), $path.join(output, ".internal", "charts", "venn", "vennjs"));

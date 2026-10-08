@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "D'acord",
+	"Cancel": "Cancel·la",
+	"Delete": "Suprimeix",
+	"Settings": "Configuració",
+	"Expand": "Expandeix",
+	"Move Up": "Mou amunt",
+	"Move Down": "Mou avall"
 };

@@ -1,0 +1,79 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "panX": "rotateX",
+    "panY": "rotateY",
+    "paddingBottom": 20,
+    "paddingTop": 20,
+    "paddingLeft": 20,
+    "paddingRight": 20,
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100,
+    "projectionName": "geoOrthographic"
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "geometry": { "type": "GeoRectangle", "north": 90, "east": 180, "south": -90, "west": -180 },
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "data-1": []
+    },
+    {
+      "series-0": {
+        "type": "MapPolygonSeries",
+        "properties": {
+          "data": "#data-0",
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#000000" },
+                  "fillOpacity": 0.1,
+                  "strokeOpacity": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-1": {
+        "type": "MapPolygonSeries",
+        "settings": { "geoJSON": "am5geodata_worldLow", "clickZoom": true },
+        "properties": {
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": { "tooltipText": "{name}", "interactive": true },
+                "states": [
+                  {
+                    "key": "hover",
+                    "settings": {
+                      "fill": { "type": "Color", "value": "#6771dc" }
+                    }
+                  },
+                  {
+                    "key": "active",
+                    "settings": {
+                      "fill": { "type": "Color", "value": "#68dc76" }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

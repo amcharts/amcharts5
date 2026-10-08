@@ -6,8 +6,18 @@ import * as $utils from "../../../core/util/Utils"
 
 
 export interface IDropdownSettings extends IEntitySettings {
+	/**
+	 * The control the dropdown belongs to.
+	 */
 	control: StockControl;
+	/**
+	 * Element the dropdown is placed in.
+	 */
 	parent?: HTMLElement;
+	/**
+	 * Limits the dropdown's height to the chart's height minus 100 pixels,
+	 * scrolling the rest.
+	 */
 	scrollable?: boolean;
 }
 
@@ -17,12 +27,18 @@ export interface IDropdownPrivate extends IEntityPrivate {
 }
 
 export interface IDropdownEvents extends IEntityEvents {
+	/**
+	 * The dropdown was opened.
+	 */
 	opened: {};
+	/**
+	 * The dropdown was closed.
+	 */
 	closed: {};
 }
 
 /**
- * A dropdown control for [[StockToolbar]].
+ * Base class for the dropdowns of [[StockToolbar]] controls.
  */
 export class Dropdown extends Entity {
 	public static className: string = "Dropdown";
@@ -119,14 +135,17 @@ export class Dropdown extends Entity {
 	}
 
 	/**
-	 * Returns `true` if dropdown is currently open.
-	 * 
+	 * Returns `true` while the dropdown is open.
+	 *
 	 * @return  Dropdown open?
 	 */
 	public isOpen(): boolean {
 		return this.getPrivate("container")!.style.display != "none";
 	}
 
+	/**
+	 * Closes the dropdown.
+	 */
 	public hide(): void {
 		const arrow = this.getPrivate("arrow")!;
 		const container = this.getPrivate("container")!;
@@ -140,6 +159,9 @@ export class Dropdown extends Entity {
 		arrow.style.marginLeft = "";
 	}
 
+	/**
+	 * Opens the dropdown.
+	 */
 	public show(): void {
 		const arrow = this.getPrivate("arrow")!;
 		const container = this.getPrivate("container")!;
@@ -167,6 +189,9 @@ export class Dropdown extends Entity {
 		});
 	}
 
+	/**
+	 * Opens the dropdown, or closes it if it is open.
+	 */
 	public toggle(): void {
 		const container = this.getPrivate("container")!;
 		if (container.style.display == "none") {
@@ -184,7 +209,7 @@ export class Dropdown extends Entity {
 
 	public isAccessible(): boolean {
 		const toolbar = this.get("control").getPrivate("toolbar");
-		return toolbar && toolbar.get("focusable") ? true : false;
+		return toolbar && toolbar.get("focusable", true) ? true : false;
 	}
 
 }

@@ -8,44 +8,47 @@ import * as $utils from "../../../core/util/Utils";
 export interface IDropdownListControlSettings extends IStockControlSettings {
 
 	/**
-	 * Currently selected item.
+	 * Item (or its ID) shown as selected when the control is created. It is
+	 * not updated when another item is picked.
 	 */
 	currentItem?: string | IDropdownListItem;
 
 	/**
-	 * Label does not change when item is selected in the list.
+	 * Keeps the button's label and icon when an item is picked, instead of
+	 * showing that item.
 	 */
 	fixedLabel?: boolean;
 
 	/**
-	 * A list of items in the dropdown.
+	 * Items of the dropdown: strings, or objects with an `id` and a `label`.
 	 */
 	items?: Array<string | IDropdownListItem>;
 
 	/**
-	 * If set to `true`, the dropdown will fix the height to fit within chart's
-	 * area, with scroll if the contents do not fit.
+	 * Limits the list's height to the chart's height minus 100 pixels,
+	 * scrolling the rest.
 	 */
 	scrollable?: boolean;
 
 	/**
-	 * Maximum search items to show.
+	 * Most results of `searchCallback` to show; the rest are cut off with a
+	 * note.
 	 */
 	maxSearchItems?: number,
 
 	/**
-	 * Is the list searchable? If `true` shows search field and
-	 * calls `searchCallback` function for a list of items.
+	 * Shows a search field above the list. Typing filters the items or, with
+	 * `searchCallback`, replaces them with its results.
 	 */
 	searchable?: boolean;
 
 	/**
-	 * A callback function which returns a list of items based on a search query.
+	 * Returns the items to show for a search query.
 	 */
 	searchCallback?: (query: string) => IDropdownListItem[];
 
 	/**
-	 * An array of item IDs to not show in the list.
+	 * IDs of items to leave out of the list.
 	 *
 	 * @since 5.7.0
 	 */
@@ -58,13 +61,16 @@ export interface IDropdownListControlPrivate extends IStockControlPrivate {
 }
 
 export interface IDropdownListControlEvents extends IStockControlEvents {
+	/**
+	 * An item was picked from the list, or selected with `setItemById()`.
+	 */
 	selected: {
 		item: string | IDropdownListItem;
 	};
 }
 
 /**
- * A generic control which creates a searchable list of items in a dropdown.
+ * A control with a dropdown list of items, which can be searchable.
  *
  * Can be used in a [[StockToolbar]].
  *
@@ -159,6 +165,12 @@ export class DropdownListControl extends StockControl {
 		});
 	}
 
+	/**
+	 * Shows an item on the button as the selected one, unless `fixedLabel` is
+	 * set. Does not dispatch `selected`.
+	 *
+	 * @param  item  Item
+	 */
 	public setItem(item: string | IDropdownListItem): void {
 		if (this.get("fixedLabel") !== true) {
 			const label = this.getPrivate("label")!;
@@ -189,7 +201,8 @@ export class DropdownListControl extends StockControl {
 	}
 
 	/**
-	 * Selects an item by its id.
+	 * Selects an item by its ID: shows it on the button and dispatches
+	 * `selected`.
 	 *
 	 * @since 5.9.0
 	 * @param  id  Item ID
@@ -208,8 +221,8 @@ export class DropdownListControl extends StockControl {
 	}
 
 	/**
-	 * Returns list item by ID.
-	 * 
+	 * Returns the item with an ID from `items`.
+	 *
 	 * @since 5.9.0
 	 * @param  id  Item ID
 	 * @return     Dropdown item

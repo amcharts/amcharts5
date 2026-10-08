@@ -23,101 +23,103 @@ import * as $type from "../../core/util/Type";
 export interface IGanttSeriesDataItem extends IColumnSeriesDataItem {
 
 	/**
-	 * [[Container]] that holds all the elements of the series item, except the column graphics itslef.
+	 * Container with the task's grips, bullets and progress elements, which
+	 * moves with the bar. The bar itself is not in it.
 	 */
 	container?: Container
 
 	/**
-	 * A [[Container]] that is masked and holds progress rectangle and progress grip.	
+	 * Container, masked to the bar's shape, with the progress rectangle and
+	 * progress grip.
 	 */
 	maskedContainer?: Container;
 
 	/**
-	 * A [[RoundedRectangle]] that is used to mask the progress rectangle.
+	 * The mask of `maskedContainer`, with the bar's corner radii.
 	 */
 	mask?: RoundedRectangle;
 
 	/**
-	 * A [[Circle]] used as a bullet shown at the start of the task bar.
+	 * Circle at the start of the bar, where a link being drawn can end.
 	 */
 	startBullet?: Circle;
 
 	/**
-	 * A [[Circle]] used as a bullet shown at the end of the task bar.
+	 * Circle at the end of the bar; dragging from it draws a link to another
+	 * task.
 	 */
 	endBullet?: Circle;
 
 	/**
-	 * A [[Rectangle]] filled with line pattern which is used to resize task bar.
+	 * Grip for dragging the start of the bar.
 	 */
 	startGrip?: Rectangle;
 
 	/**
-	 * A [[Rectangle]] filled with line pattern which is used to resize task bar.
+	 * Grip for dragging the end of the bar.
 	 */
 	endGrip?: Rectangle;
 
 	/**
-	 * A [[Rectangle]] that is used to show progress of the task. It actually
-	 * shows the remaining part of the task and is filled with diagonal line
-	 * pattern.
+	 * Shows the task's progress by covering the part not yet done with a
+	 * diagonal line pattern.
 	 */
 	progressRectangle?: Rectangle;
 
 	/**
-	 * A [[RoundedRectangle]] rotated by 45 degrees and is shown instead of a
-	 * column when the task has zero duration.
+	 * Diamond shown instead of the bar when the task has zero duration.
 	 */
 	zeroRectangle?: RoundedRectangle;
 
 	/**
-	 * A [[Triangle]] that is used to resize progress rectangle.
+	 * Triangle dragged along the bar to set the task's progress.
 	 */
 	progressGrip?: Triangle;
 
 	/**
-	 * A value that holds the progress value of the task.
+	 * Progress of the task, from `0` to `1`.
 	 */
 	progress?: number;
 
 	/**
-	 * A value that holds previous progress value of the task, used when
-	 * toggling progress using progress pie next to the y axis label.
+	 * Progress before the last click on the task's progress pie, which a
+	 * second click restores.
 	 */
 	prevProgress?: number;
 
 	/**
-	 * Duration of the task, in units of the x axis.
+	 * Duration of the task in the Gantt's `durationUnit` units.
 	 */
 	duration?: number;
 
 	/**
-	 * Array of IDs of tasks this task is linked to.
+	 * IDs of the tasks this task links to.
 	 */
 	linkTo?: Array<string>;
 
 	/**
-	 * Refferences to `Link` objects that are used to visually connect tasks.
+	 * The [[Link]] lines from this task, keyed by the ID of the task each one
+	 * goes to.
 	 */
 	links?: { [index: string]: Link };
 
 	/**
-	 * A reference to a corresponding category axis data item.
+	 * The task's data item in the [[GanttCategoryAxis]].
 	 */
 	categoryAxisDataItem?: DataItem<IGanttCategoryAxisDataItem>;
 
 	/**
-	 * Array of children data items.
+	 * Data items of the subtasks.
 	 */
 	children?: Array<DataItem<IGanttSeriesDataItem>>;
 
 	/**
-	 * A reference to a parent data item, if any.
+	 * Data item of the parent task, if any.
 	 */
 	parent?: DataItem<IGanttSeriesDataItem>;
 
 	/**
-	 * Category name.
+	 * Name of the task, from the category axis data.
 	 */
 	name?: string;
 
@@ -126,7 +128,7 @@ export interface IGanttSeriesDataItem extends IColumnSeriesDataItem {
 export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 
 	/**
-	 * A field in data that holds progress of the task.
+	 * Field in data that holds the task's progress, `0` to `1`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Series_data} for more info
 	 * @default "progress"
@@ -134,7 +136,8 @@ export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 	progressField?: string;
 
 	/**
-	 * A field in data that holds duration of the task.
+	 * Field in data that holds the task's duration, in the Gantt's
+	 * `durationUnit` units.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Series_data} for more info
 	 * @default "duration"
@@ -142,7 +145,8 @@ export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 	durationField?: string;
 
 	/**
-	 * A field in data that holds and ID of the task it is linked to.
+	 * Field in data that holds an array of IDs of the tasks this task links
+	 * to.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Series_data} for more info
 	 * @default "linkTo"
@@ -150,26 +154,28 @@ export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 	linkToField?: string;
 
 	/**
-	 * A distance in pixels that link should be protracted from the edge of the
-	 * task bars.
+	 * How far in pixels a link runs straight out of a bar's end, and into the
+	 * next bar's start, before it turns.
 	 *
 	 * @default 25
 	 */
 	linkHorizontalOffset?: number;
 
 	/**
-	 * When dragging/resizing a column, how many units should it snap to.
+	 * How many `durationUnit` units a dragged or resized bar snaps to, e.g.
+	 * `2` snaps to every second unit.
+	 *
 	 * @default 1
 	 */
 	snapCount?: number;
 
 	/**
-	 * A reference to the y-axis of the Gantt chart.
+	 * The Gantt's task list axis.
 	 */
 	yAxis: GanttCategoryAxis<GanttCategoryAxisRenderer>;
 
 	/**
-	 * A reference to the x-axis of the Gantt chart.
+	 * The Gantt's upper date axis.
 	 */
 	xAxis: GanttDateAxis<GanttDateAxisRenderer>;
 
@@ -182,7 +188,8 @@ export interface IGanttSeriesAxisRange extends IColumnSeriesAxisRange {
 }
 
 /**
- * A series used in [[Gantt]] chart to display tasks and their progress.
+ * Series of a [[Gantt]] chart: draws the task bars, their progress and the
+ * links between tasks, and lets the user drag and resize them.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Gantt_series} for more info
  * @important
@@ -221,7 +228,7 @@ export class GanttSeries extends ColumnSeries {
 	public linksContainer: Container = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A line which is shown while creating a connector between two tasks.
+	 * Dashed line shown while the user draws a link between two tasks.
 	 */
 	public connectorLine: Line = this.children.push(Line.new(this._root, {
 		themeTags: ["connectorline"],
@@ -230,8 +237,8 @@ export class GanttSeries extends ColumnSeries {
 	})._markC("themeTags", "visible", "forceInactive"));
 
 	/**
-	 * A triangle that is shown at the end of the connector line, while creating
-	 * a connector.
+	 * Arrowhead at the pointer end of `connectorLine`, while the user draws a
+	 * link.
 	 */
 	public connectorArrow: Triangle = this.children.push(Triangle.new(this._root, {
 		themeTags: ["connectorarrow"],
@@ -240,7 +247,8 @@ export class GanttSeries extends ColumnSeries {
 	})._markC("themeTags", "visible", "forceInactive"));
 
 	/**
-	 * [[ListTemplate]] of [[Link]] that connect tasks.
+	 * The [[Link]] lines between tasks. Clicking a link selects it, and a
+	 * second click deletes it.
 	 */
 	public readonly links: ListTemplate<Link> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -250,8 +258,8 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Container]]s that hold all the elements of series
-	 * items, such as grips, bullets, etc.
+	 * Containers, one per task, with the grips, bullets and progress elements
+	 * of its bar.
 	 */
 	public readonly containers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -262,8 +270,8 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Container]]s that are used to mask elements, such
-	 * as progress rectangles.
+	 * Containers, masked to the bar's shape, with each task's progress
+	 * rectangle and progress grip.
 	 */
 	public readonly maskedContainers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -274,7 +282,8 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Circle]]s that are used as start bullets.
+	 * Circles at the start of the bars. Hidden until a link being drawn hovers
+	 * a task it can end on.
 	 */
 	public readonly startBullets: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -285,7 +294,8 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Circle]]s that are used as end bullets.
+	 * Circles at the end of the bars; dragging from one draws a link to
+	 * another task.
 	 */
 	public readonly endBullets: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -296,7 +306,7 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Rectangle]]s that are used to resize task bars.
+	 * Grips for dragging the start of the bars.
 	 */
 	public readonly startGrips: ListTemplate<Rectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -306,7 +316,7 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Rectangle]]s that are used to resize task bars.
+	 * Grips for dragging the end of the bars.
 	 */
 	public readonly endGrips: ListTemplate<Rectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -316,8 +326,7 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[RoundedRectangle]]s that are used to show
-	 * zero-duration tasks.
+	 * Diamonds shown instead of bars for tasks with zero duration.
 	 */
 	public readonly zeroRectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -327,9 +336,8 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Rectangle]]s that are used to show progress of the
-	 * task. It is actually a remaining part of the task and is filled with
-	 * diagonal line pattern.
+	 * Rectangles that show progress by covering the part of each bar not yet
+	 * done with a diagonal line pattern.
 	 */
 	public readonly progressRectangles: ListTemplate<Rectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -339,8 +347,8 @@ export class GanttSeries extends ColumnSeries {
 	));
 
 	/**
-	 * [[ListTemplate]] of [[Triangle]]s that are used to resize progress
-	 * rectangles.
+	 * Triangles at the bottom of the bars, dragged to set each task's
+	 * progress.
 	 */
 	public readonly progressGrips: ListTemplate<Triangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -405,7 +413,7 @@ export class GanttSeries extends ColumnSeries {
 	 * @ignore
 	 */
 	protected roundValue(value: number, invertThreshold?: boolean): number {
-		let threshold = this.gantt.get("snapThreshold", 0.8);
+		let threshold = this.gantt.get("snapThreshold", 0.5);
 		if (invertThreshold) {
 			threshold = 1 - threshold;
 		}
@@ -711,10 +719,11 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Checks if the task is collapsed.
+	 * Checks whether the task is hidden inside a collapsed parent task, at any
+	 * level above it.
 	 *
 	 * @param  dataItem  Data item
-	 * @return           Collapsed?
+	 * @return           Inside a collapsed parent?
 	 */
 	public isCollapsed(dataItem: DataItem<IGanttSeriesDataItem>): boolean {
 		const categoryAxisDataItem = dataItem.get("categoryAxisDataItem") as DataItem<IGanttCategoryAxisDataItem>;
@@ -1504,7 +1513,7 @@ export class GanttSeries extends ColumnSeries {
 		const categoryAxisDataItem = dataItem.get("categoryAxisDataItem") as DataItem<IGanttCategoryAxisDataItem>;
 		const fill = categoryAxisDataItem ? categoryAxisDataItem.get("customColor", categoryAxisDataItem.get("color")) : undefined;
 
-		dataItem.setRaw("name", (categoryAxisDataItem.dataContext as any).name);
+		dataItem.setRaw("name", categoryAxisDataItem.get("name"));
 
 		const startBullet = dataItem.get("startBullet");
 		startBullet?.setAll({
@@ -1589,8 +1598,8 @@ export class GanttSeries extends ColumnSeries {
 
 
 	/**
-	 * Hides series's data item.
-	 * 
+	 * Hides a task's bar, with its grips, bullets and links.
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
@@ -1629,8 +1638,8 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Shows series's data item.
-	 * 
+	 * Shows a task's bar, with its grips, bullets and links.
+	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
@@ -1669,7 +1678,7 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Disposes a data item and removes it from the series.
+	 * Disposes a data item with all its elements and links.
 	 *
 	 * @param dataItem  Data item
 	 */
@@ -1723,7 +1732,7 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Disposes all links of a data item and removes them from the series.
+	 * Removes all links from and to a task.
 	 *
 	 * @param dataItem  Data item
 	 */
@@ -1758,7 +1767,8 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Returns the duration of a data item in units.
+	 * Returns a task's duration in `durationUnit` units, without the weekends
+	 * and holidays it spans (see `excludeWeekends`).
 	 *
 	 * @param dataItem  Data item
 	 * @return Duration in units
@@ -1772,7 +1782,7 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Returns the depth of a data item in the hierarchy.
+	 * Returns how deep a task is in the hierarchy: `0` for a top-level task.
 	 *
 	 * @param dataItem  Data item
 	 * @return Depth level
@@ -1788,11 +1798,12 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Returns the end value of a data item, adjusting for holidays and weekends.
+	 * Returns the end of a task with the given start and duration. With
+	 * `excludeWeekends`, weekends and holidays don't count toward the duration.
 	 *
-	 * @param openValue  Open value in milliseconds
-	 * @param duration   Duration in units
-	 * @return           Adjusted end value in milliseconds
+	 * @param openValue  Start timestamp in milliseconds
+	 * @param duration   Duration in `durationUnit` units
+	 * @return           End timestamp in milliseconds
 	 */
 	public getEndValue(openValue: number, duration: number): number {
 		let adjustedDuration = duration;
@@ -1810,10 +1821,11 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Returns the open value of a data item, adjusting for holidays and weekends.
+	 * Returns a task start moved off weekends and holidays to the next working
+	 * unit. With `excludeWeekends` off, returns it unchanged.
 	 *
-	 * @param openValue  Open value in milliseconds
-	 * @return           Adjusted open value
+	 * @param openValue  Start timestamp in milliseconds
+	 * @return           Adjusted start timestamp
 	 */
 	public getOpenValue(openValue: number): number {
 		if (this.gantt.get("excludeWeekends", true)) {
@@ -1825,7 +1837,7 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Returns the duration of a unit in milliseconds.
+	 * Returns the length of one `durationUnit` in milliseconds.
 	 *
 	 * @return Duration in milliseconds
 	 */
@@ -1834,11 +1846,12 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-	 * Returns the count of holidays between two dates.
+	 * Counts the `durationUnit` steps between two timestamps that fall on
+	 * weekends or holidays, leaving out those at the very end of the range.
 	 *
-	 * @param start  Start date in milliseconds
-	 * @param end    End date in milliseconds
-	 * @return       Count of holidays
+	 * @param start  Start timestamp in milliseconds
+	 * @param end    End timestamp in milliseconds
+	 * @return       Count of holiday units
 	 */
 	public getHolidayCount(start: number, end: number): number {
 		let count = 0;
@@ -1857,10 +1870,11 @@ export class GanttSeries extends ColumnSeries {
 	}
 
 	/**
-		 * Checks if a given date is a holiday or weekend.
+		 * Checks whether a timestamp falls on one of the `weekends` days or a
+		 * `holidays` date. Always `false` while `excludeWeekends` is off.
 		 *
-		 * @param value  Date value in milliseconds
-		 * @return       `true` if the date is a holiday or weekend, otherwise `false`
+		 * @param value  Timestamp in milliseconds
+		 * @return       `true` on a weekend or holiday
 		 */
 	public isHoliday(value: number): boolean {
 		if (this.gantt.get("excludeWeekends", true)) {

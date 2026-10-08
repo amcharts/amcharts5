@@ -1,0 +1,7 @@
+{
+  "title": "Tree Chart",
+  "description": "A tree chart: nested data as linked nodes laid out level by level.",
+  "category": "hierarchy",
+  "tier": "basic",
+  "tags": ["tree", "hierarchy", "nested data"]
+}

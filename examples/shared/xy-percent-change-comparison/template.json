@@ -1,0 +1,7 @@
+{
+  "title": "Percent Change Comparison",
+  "description": "Two price series shown as percent change from the start of the zoomed range, so they can be compared, with a volume panel on a second, stacked Y axis.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "percent change", "stacked axes", "gapless date axis", "legend", "volume"]
+}

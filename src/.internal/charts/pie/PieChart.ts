@@ -11,10 +11,8 @@ import * as $math from "../../core/util/Math";
 export interface IPieChartSettings extends IPercentChartSettings {
 
 	/**
-	 * Outer radius of the pie chart.
-	 *
-	 * Can be set in fixed pixel value, or relative to chart container size in
-	 * percent.
+	 * Outer radius of the pie, in pixels or percent. A percent is of the
+	 * largest radius that fits the chart for its `startAngle` and `endAngle`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
 	 * @default 80%
@@ -22,20 +20,19 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	radius?: number | Percent;
 
 	/**
-	 * Inner radius of the pie chart. Setting to any non-zero value will result
-	 * in a donut chart.
-	 *
-	 * Can be set in fixed pixel value, or relative to chart container size in
-	 * percent.
-	 *
-	 * Setting to negative number will mean pixels from outer radius.
+	 * Inner radius of the pie, in pixels or percent of `radius`; any non-zero
+	 * value makes a donut. A negative number is pixels in from the outer
+	 * radius.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * A start angle of the chart in degrees.
+	 * Angle where the pie starts, in degrees: `0` is at the right, `-90` at the
+	 * top, and angles grow clockwise. The chart uses it to fit and center the
+	 * pie; the series' own `startAngle` sets where its slices start, so set
+	 * both.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Start_end_angles} for more info
 	 * @default -90
@@ -43,7 +40,8 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	startAngle?: number;
 
 	/**
-	 * An end angle of the chart in degrees.
+	 * Angle where the pie ends, in degrees. Like `startAngle`, it fits and
+	 * centers the pie; set the series' `endAngle` to match.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Start_end_angles} for more info
 	 * @default 270
@@ -62,7 +60,9 @@ export interface IPieChartPrivate extends IPercentChartPrivate {
 }
 
 /**
- * Creates a pie chart.
+ * A pie or donut chart. Several [[PieSeries]] in one chart split the space
+ * between `innerRadius` and `radius` into concentric rings, unless they set
+ * their own radii.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
  * @important
@@ -108,12 +108,16 @@ export class PieChart extends PercentChart {
 
 		let innerBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 
-		if (innerRadius instanceof Percent) {
+		// 0% has nothing to divide by: like a number, it is used as it is
+		if (innerRadius instanceof Percent && innerRadius.value !== 0) {
 			let value = innerRadius.value;
 			let mr = Math.min(wr, hr);
 			value = Math.max(mr * value, mr - Math.min(h, w)) / mr;
 			innerBounds = $math.getArcBounds(0, 0, startAngle, endAngle, value);
 			this.setPrivateRaw("irModifyer", value / innerRadius.value);
+		}
+		else {
+			this.setPrivateRaw("irModifyer", 1);
 		}
 
 		bounds = $math.mergeBounds([bounds, innerBounds]);
@@ -140,18 +144,19 @@ export class PieChart extends PercentChart {
 	}
 
 	/**
-	 * Returns outer radius in pixels.
+	 * Returns the outer radius in pixels, of the whole pie or of one series.
 	 *
-	 * If optional series parameter is passed in, it will return outer radius
-	 * of that particular series.
-	 *
-	 * @param   series  Series
+	 * @param   series  Series to get the radius of
 	 * @return          Radius in pixels
 	 */
 	public radius(series?: PieSeries): number {
 
 		let radius = $utils.relativeToValue(this.get("radius", 0), this._maxRadius);
 		let innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), radius);
+
+		if (innerRadius < 0) {
+			innerRadius = radius + innerRadius;
+		}
 
 		if (series) {
 			let index = this.series.indexOf(series);
@@ -169,12 +174,9 @@ export class PieChart extends PercentChart {
 	}
 
 	/**
-	 * Returns inner radius in pixels.
+	 * Returns the inner radius in pixels, of the whole pie or of one series.
 	 *
-	 * If optional series parameter is passed in, it will return inner radius
-	 * of that particular series.
-	 *
-	 * @param   series  Series
+	 * @param   series  Series to get the inner radius of
 	 * @return          Radius in pixels
 	 */
 	public innerRadius(series?: PieSeries): number {

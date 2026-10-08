@@ -1,0 +1,8 @@
+{
+  "title": "Satellite Day and Night Map",
+  "description": "A flat map that shows a daytime satellite image where the sun is up right now and city lights where it is night, with MapRasterSeries. The images load from the amCharts CDN, so it needs an internet connection.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["satellite", "raster", "image", "day and night", "sun"],
+  "since": "5.21.0"
+}

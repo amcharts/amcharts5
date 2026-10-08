@@ -1,4 +1,9 @@
 {
+    "title": "Testing with Jest",
+    "description": "A project set up to run Jest tests against a chart, in the jsdom environment.",
+    "category": "other",
+    "tier": "technique",
+    "tags": ["jest", "testing", "jsdom"],
     "noScript": true,
     "packageJson": {
         "devDependencies": {

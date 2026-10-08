@@ -1,0 +1,545 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "panX": "rotateX",
+    "panY": "rotateY",
+    "homeRotationX": -74,
+    "homeRotationY": -22,
+    "homeZoomLevel": 1.25,
+    "autoHome": true,
+    "zoomControl": {
+      "type": "ZoomControl",
+      "properties": {
+        "homeButton": {
+          "settings": { "visible": true }
+        }
+      }
+    },
+    "projectionName": "geoOrthographic",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1", "#series-2", "#series-3"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "geometry": { "type": "GeoRectangle", "north": 90, "east": 180, "south": -90, "west": -180 },
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "data-1": []
+    },
+    {
+      "data-2": []
+    },
+    {
+      "data-3": [
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Ningbo",
+          "targetLongitude": 121.97,
+          "targetLatitude": 29.87,
+          "value": 1100,
+          "waypoints": [
+            { "longitude": 59.5, "latitude": 23.4 },
+            { "longitude": 76, "latitude": 3 },
+            { "longitude": 99, "latitude": 1 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Qingdao",
+          "targetLongitude": 120.38,
+          "targetLatitude": 36.07,
+          "value": 600,
+          "waypoints": [
+            { "longitude": 59.5, "latitude": 23.4 },
+            { "longitude": 76, "latitude": 3 },
+            { "longitude": 99, "latitude": 1 },
+            { "longitude": 124, "latitude": 32 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Yokohama",
+          "targetLongitude": 139.64,
+          "targetLatitude": 35.44,
+          "value": 700,
+          "waypoints": [
+            { "longitude": 58.5, "latitude": 25 },
+            { "longitude": 80, "latitude": 9 },
+            { "longitude": 104, "latitude": 7 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Ulsan",
+          "targetLongitude": 129.38,
+          "targetLatitude": 35.5,
+          "value": 800,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 78, "latitude": 6 },
+            { "longitude": 101, "latitude": 3 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Jamnagar",
+          "targetLongitude": 69.66,
+          "targetLatitude": 22.42,
+          "value": 500,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Mumbai",
+          "targetLongitude": 72.88,
+          "targetLatitude": 19.08,
+          "value": 300,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 64, "latitude": 18 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Tanura",
+          "sourceLongitude": 50.17,
+          "sourceLatitude": 26.64,
+          "target": "Rotterdam",
+          "targetLongitude": 4.12,
+          "targetLatitude": 51.95,
+          "value": 350,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 60.5, "latitude": 19.5 },
+            { "longitude": 46, "latitude": 12.3 },
+            { "longitude": 33.5, "latitude": 28.5 },
+            { "longitude": 13, "latitude": 37 },
+            { "longitude": -10, "latitude": 39 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Basra",
+          "sourceLongitude": 48.8,
+          "sourceLatitude": 29.69,
+          "target": "Ningbo",
+          "targetLongitude": 121.97,
+          "targetLatitude": 29.87,
+          "value": 700,
+          "waypoints": [
+            { "longitude": 59.5, "latitude": 23.4 },
+            { "longitude": 76, "latitude": 3 },
+            { "longitude": 99, "latitude": 1 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Basra",
+          "sourceLongitude": 48.8,
+          "sourceLatitude": 29.69,
+          "target": "Ulsan",
+          "targetLongitude": 129.38,
+          "targetLatitude": 35.5,
+          "value": 400,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 78, "latitude": 6 },
+            { "longitude": 101, "latitude": 3 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Basra",
+          "sourceLongitude": 48.8,
+          "sourceLatitude": 29.69,
+          "target": "Jamnagar",
+          "targetLongitude": 69.66,
+          "targetLatitude": 22.42,
+          "value": 600,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Basra",
+          "sourceLongitude": 48.8,
+          "sourceLatitude": 29.69,
+          "target": "Mumbai",
+          "targetLongitude": 72.88,
+          "targetLatitude": 19.08,
+          "value": 400,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 64, "latitude": 18 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Basra",
+          "sourceLongitude": 48.8,
+          "sourceLatitude": 29.69,
+          "target": "Trieste",
+          "targetLongitude": 13.78,
+          "targetLatitude": 45.65,
+          "value": 350,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 60.5, "latitude": 19.5 },
+            { "longitude": 46, "latitude": 12.3 },
+            { "longitude": 33.5, "latitude": 28.5 },
+            { "longitude": 22, "latitude": 35 },
+            { "longitude": 18.5, "latitude": 40 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Basra",
+          "sourceLongitude": 48.8,
+          "sourceLatitude": 29.69,
+          "target": "Piraeus",
+          "targetLongitude": 23.63,
+          "targetLatitude": 37.94,
+          "value": 250,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 60.5, "latitude": 19.5 },
+            { "longitude": 46, "latitude": 12.3 },
+            { "longitude": 33.5, "latitude": 28.5 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Fujairah",
+          "sourceLongitude": 56.33,
+          "sourceLatitude": 25.12,
+          "target": "Yokohama",
+          "targetLongitude": 139.64,
+          "targetLatitude": 35.44,
+          "value": 400,
+          "waypoints": [
+            { "longitude": 80, "latitude": 9 },
+            { "longitude": 104, "latitude": 7 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Fujairah",
+          "sourceLongitude": 56.33,
+          "sourceLatitude": 25.12,
+          "target": "Ulsan",
+          "targetLongitude": 129.38,
+          "targetLatitude": 35.5,
+          "value": 350,
+          "waypoints": [
+            { "longitude": 78, "latitude": 6 },
+            { "longitude": 101, "latitude": 3 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Fujairah",
+          "sourceLongitude": 56.33,
+          "sourceLatitude": 25.12,
+          "target": "Singapore",
+          "targetLongitude": 103.84,
+          "targetLatitude": 1.26,
+          "value": 250,
+          "waypoints": [
+            { "longitude": 78, "latitude": 6 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Fujairah",
+          "sourceLongitude": 56.33,
+          "sourceLatitude": 25.12,
+          "target": "Jamnagar",
+          "targetLongitude": 69.66,
+          "targetLatitude": 22.42,
+          "value": 300,
+          "waypoints": [],
+          "__parse": true
+        },
+        {
+          "source": "Mina Al Ahmadi",
+          "sourceLongitude": 48.17,
+          "sourceLatitude": 29.08,
+          "target": "Ulsan",
+          "targetLongitude": 129.38,
+          "targetLatitude": 35.5,
+          "value": 400,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 78, "latitude": 6 },
+            { "longitude": 101, "latitude": 3 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Mina Al Ahmadi",
+          "sourceLongitude": 48.17,
+          "sourceLatitude": 29.08,
+          "target": "Yokohama",
+          "targetLongitude": 139.64,
+          "targetLatitude": 35.44,
+          "value": 300,
+          "waypoints": [
+            { "longitude": 58.5, "latitude": 25 },
+            { "longitude": 80, "latitude": 9 },
+            { "longitude": 104, "latitude": 7 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Mina Al Ahmadi",
+          "sourceLongitude": 48.17,
+          "sourceLatitude": 29.08,
+          "target": "Ningbo",
+          "targetLongitude": 121.97,
+          "targetLatitude": 29.87,
+          "value": 300,
+          "waypoints": [
+            { "longitude": 59.5, "latitude": 23.4 },
+            { "longitude": 76, "latitude": 3 },
+            { "longitude": 99, "latitude": 1 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Kharg Island",
+          "sourceLongitude": 50.32,
+          "sourceLatitude": 29.23,
+          "target": "Ningbo",
+          "targetLongitude": 121.97,
+          "targetLatitude": 29.87,
+          "value": 400,
+          "waypoints": [
+            { "longitude": 59.5, "latitude": 23.4 },
+            { "longitude": 76, "latitude": 3 },
+            { "longitude": 99, "latitude": 1 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Kharg Island",
+          "sourceLongitude": 50.32,
+          "sourceLatitude": 29.23,
+          "target": "Qingdao",
+          "targetLongitude": 120.38,
+          "targetLatitude": 36.07,
+          "value": 200,
+          "waypoints": [
+            { "longitude": 59.5, "latitude": 23.4 },
+            { "longitude": 76, "latitude": 3 },
+            { "longitude": 99, "latitude": 1 },
+            { "longitude": 124, "latitude": 32 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Kharg Island",
+          "sourceLongitude": 50.32,
+          "sourceLatitude": 29.23,
+          "target": "Piraeus",
+          "targetLongitude": 23.63,
+          "targetLatitude": 37.94,
+          "value": 100,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 60.5, "latitude": 19.5 },
+            { "longitude": 46, "latitude": 12.3 },
+            { "longitude": 33.5, "latitude": 28.5 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Laffan",
+          "sourceLongitude": 51.56,
+          "sourceLatitude": 25.93,
+          "target": "Yokohama",
+          "targetLongitude": 139.64,
+          "targetLatitude": 35.44,
+          "value": 300,
+          "waypoints": [
+            { "longitude": 58.5, "latitude": 25 },
+            { "longitude": 80, "latitude": 9 },
+            { "longitude": 104, "latitude": 7 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Laffan",
+          "sourceLongitude": 51.56,
+          "sourceLatitude": 25.93,
+          "target": "Ulsan",
+          "targetLongitude": 129.38,
+          "targetLatitude": 35.5,
+          "value": 200,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 78, "latitude": 6 },
+            { "longitude": 101, "latitude": 3 }
+          ],
+          "__parse": true
+        },
+        {
+          "source": "Ras Laffan",
+          "sourceLongitude": 51.56,
+          "sourceLatitude": 25.93,
+          "target": "Singapore",
+          "targetLongitude": 103.84,
+          "targetLatitude": 1.26,
+          "value": 120,
+          "waypoints": [
+            { "longitude": 59, "latitude": 24.2 },
+            { "longitude": 78, "latitude": 6 }
+          ],
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "MapPolygonSeries",
+        "properties": {
+          "data": "#data-0",
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#000000" },
+                  "fillOpacity": 0.1,
+                  "strokeOpacity": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-1": {
+        "type": "GraticuleSeries",
+        "properties": {
+          "mapLines": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "stroke": { "type": "Color", "value": "#000000" },
+                  "strokeOpacity": 0.08
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-2": {
+        "type": "MapPolygonSeries",
+        "settings": { "geoJSON": "am5geodata_worldLow" },
+        "properties": {
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#000000" },
+                  "fillOpacity": 0.15,
+                  "strokeWidth": 0.5,
+                  "stroke": { "type": "Color", "value": "#ffffff" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-3": {
+        "type": "MapSankeySeries",
+        "settings": { "maxWidth": 0.8, "nodePadding": 0.1, "controlPointDistance": 0.4 },
+        "properties": {
+          "data": "#data-3",
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#c8890a" },
+                  "fillOpacity": 0.5,
+                  "strokeOpacity": 0,
+                  "tooltipText": "{source} > {target}: {value}k barrels a day"
+                }
+              }
+            }
+          },
+          "nodes": {
+            "properties": {
+              "mapPolygons": {
+                "properties": {
+                  "template": {
+                    "settings": {
+                      "fill": { "type": "Color", "value": "#c8890a" },
+                      "stroke": { "type": "Color", "value": "#ffffff" },
+                      "strokeWidth": 1.5,
+                      "tooltipText": "{name}: {sum}k barrels a day"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "locationX": 0,
+                "autoRotate": true,
+                "autoRotateAngle": -90,
+                "animations": [
+                  { "key": "locationX", "from": 0, "to": 1, "duration": 8386.454260071221, "delay": 0, "loops": 0 }
+                ],
+                "sprite": {
+                  "type": "Graphics",
+                  "settings": {
+                    "svgPath": "M0,-7 C2,-4 5,0 5,3 C5,6 3,8 0,8 C-3,8 -5,6 -5,3 C-5,0 -2,-4 0,-7 Z",
+                    "scale": 0.5,
+                    "fill": { "type": "Color", "value": "#000000" }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "title": "Funnel Chart",
+  "description": "A funnel series in a sliced chart, with labels on the slices and a legend.",
+  "category": "percent",
+  "tier": "basic",
+  "tags": ["funnel", "sliced", "legend"]
+}

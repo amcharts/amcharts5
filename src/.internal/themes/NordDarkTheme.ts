@@ -2,11 +2,9 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Nord Dark" — the dark variant of the Nord palette (Arctic Ice Studio): muted
- * Frost/Aurora accents on the deep "Polar Night" `#2e3440` ground. Cool and
- * deliberately low-contrast. Pairs with `Nord`.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * "Nord Dark": the dark side of the Nord palette by Arctic Ice Studio, with
+ * muted Frost and Aurora colors on the deep "Polar Night" `#2e3440`
+ * background. Cool and deliberately low in contrast. Pairs with `Nord`.
  *
  * @see {@link https://www.nordtheme.com/} for the original palette
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info

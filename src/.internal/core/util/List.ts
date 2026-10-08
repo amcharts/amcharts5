@@ -27,30 +27,51 @@ function checkBounds(index: number, len: number): void {
 
 
 export interface IListEvents<A> {
+	/**
+	 * All items were removed, by `clear()` or `setAll()`.
+	 */
 	clear: {
 		oldValues: Array<A>,
 	};
+	/**
+	 * An item was added to the end of the list.
+	 */
 	push: {
 		newValue: A,
 	};
+	/**
+	 * An item was inserted at `index`.
+	 */
 	insertIndex: {
 		index: number,
 		newValue: A,
 	};
+	/**
+	 * The item at `index` was replaced.
+	 */
 	setIndex: {
 		index: number,
 		oldValue: A,
 		newValue: A,
 	};
+	/**
+	 * The item at `index` was removed.
+	 */
 	removeIndex: {
 		index: number,
 		oldValue: A,
 	};
+	/**
+	 * An item was moved from `oldIndex` to `newIndex`.
+	 */
 	moveIndex: {
 		oldIndex: number,
 		newIndex: number,
 		value: A,
 	};
+	/**
+	 * Two items swapped places.
+	 */
 	swap: {
 		a: A,
 		b: A,
@@ -59,7 +80,8 @@ export interface IListEvents<A> {
 
 
 /**
- * A List class is used to hold a number of indexed items of the same type.
+ * An ordered list of items that dispatches events as items are added, removed
+ * or moved.
  */
 export class List<T> {
 
@@ -73,7 +95,7 @@ export class List<T> {
 	/**
 	 * Constructor
 	 *
-	 * @param initial  Inital list of values to add to list
+	 * @param initial  Initial list of values to add to list
 	 */
 	constructor(initial: Array<T> = []) {
 		this._values = initial;
@@ -82,8 +104,8 @@ export class List<T> {
 	/**
 	 * An array of values in the list.
 	 *
-	 * Do not use this property to add values. Rather use dedicated methods, like
-	 * `push()`, `removeIndex()`, etc.
+	 * Don't change this array directly: use methods like `push()` and
+	 * `removeIndex()`, which dispatch the list's events.
 	 *
 	 * @readonly
 	 * @return List values
@@ -95,7 +117,7 @@ export class List<T> {
 	/**
 	 * Checks if list contains specific item reference.
 	 *
-	 * @param item  Item to search for
+	 * @param value  Item to search for
 	 * @return `true` if found, `false` if not found
 	 */
 	public contains(value: T): boolean {
@@ -103,9 +125,9 @@ export class List<T> {
 	}
 
 	/**
-	 * Removes specific item from the list.
+	 * Removes all copies of an item from the list.
 	 *
-	 * @param item An item to remove
+	 * @param value  An item to remove
 	 */
 	public removeValue(value: T): void {
 		let i = 0;
@@ -126,7 +148,7 @@ export class List<T> {
 	/**
 	 * Searches the list for specific item and returns its index.
 	 *
-	 * @param item  An item to search for
+	 * @param value  An item to search for
 	 * @return Index or -1 if not found
 	 */
 	public indexOf(value: T): number {
@@ -241,13 +263,11 @@ export class List<T> {
 	}
 
 	/**
-	 * Sets value at specific index.
-	 *
-	 * If there's already a value at the index, it is overwritten.
+	 * Replaces the value at `index`, which must already exist.
 	 *
 	 * @param index  Index
 	 * @param value  New value
-	 * @return New value
+	 * @return Old value
 	 */
 	public setIndex(index: number, value: T): T {
 		checkBounds(index, this._values.length);
@@ -264,11 +284,12 @@ export class List<T> {
 	}
 
 	/**
-	 * Adds an item to the list at a specific index, which pushes all the other
-	 * items further down the list.
+	 * Inserts an item at `index`, moving the items from there on one place
+	 * further.
 	 *
-	 * @param index Index
-	 * @param item  An item to add
+	 * @param index  Index
+	 * @param value  An item to add
+	 * @return Added item
 	 */
 	public insertIndex<K extends T>(index: number, value: K): K {
 		checkBounds(index, this._values.length + 1);
@@ -279,10 +300,10 @@ export class List<T> {
 	}
 
 	/**
-	 * Swaps indexes of two items in the list.
+	 * Swaps two items in the list.
 	 *
-	 * @param a  Item 1
-	 * @param b  Item 2
+	 * @param a  Index of the first item
+	 * @param b  Index of the second item
 	 */
 	public swap(a: number, b: number): void {
 		const len = this._values.length;
@@ -318,13 +339,12 @@ export class List<T> {
 	}
 
 	/**
-	 * Moves an item to a specific index within the list.
+	 * Moves an item to `toIndex`, or to the end of the list if `toIndex` is not
+	 * set. An item that is not in the list yet is added.
 	 *
-	 * If the index is not specified it will move the item to the end of the
-	 * list.
-	 *
-	 * @param value  Item to move
-	 * @param index  Index to place item at
+	 * @param value    Item to move
+	 * @param toIndex  Index to place item at
+	 * @return Moved item
 	 */
 	public moveValue<K extends T>(value: K, toIndex?: number): K {
 		// TODO don't do anything if the desired index is the same as the current index
@@ -359,7 +379,8 @@ export class List<T> {
 	/**
 	 * Adds an item to the end of the list.
 	 *
-	 * @param item  An item to add
+	 * @param value  An item to add
+	 * @return Added item
 	 */
 	public push<K extends T>(value: K): K {
 		this._values.push(value);
@@ -370,7 +391,8 @@ export class List<T> {
 	/**
 	 * Adds an item as a first item in the list.
 	 *
-	 * @param item  An item to add
+	 * @param value  An item to add
+	 * @return Added item
 	 */
 	public unshift<K extends T>(value: K): K {
 		this.insertIndex(0, value);
@@ -378,9 +400,9 @@ export class List<T> {
 	}
 
 	/**
-	 * Adds multiple items to the list.
+	 * Adds multiple items to the end of the list.
 	 *
-	 * @param items  An Array of items to add
+	 * @param values  An Array of items to add
 	 */
 	public pushAll(values: Array<T>): void {
 		$array.each(values, (value) => {
@@ -389,9 +411,9 @@ export class List<T> {
 	}
 
 	/**
-	 * Copies and adds items from abother list.
+	 * Adds all items of another list to the end of this one.
 	 *
-	 * @param source  A list top copy items from
+	 * @param source  A list to copy items from
 	 */
 	public copyFrom(source: this): void {
 		this.pushAll(source._values);
@@ -417,9 +439,7 @@ export class List<T> {
 	}
 
 	/**
-	 * Sets multiple items to the list.
-	 *
-	 * All current items are removed.
+	 * Replaces all items in the list with `newArray`.
 	 *
 	 * @param newArray  New items
 	 */
@@ -453,20 +473,15 @@ export class List<T> {
 	}
 
 	/**
-	 * Calls `f` for each element in the list.
-	 *
-	 * `f` should have at least one parameter defined which will get a current
-	 * item, with optional second argument - index.
+	 * Calls `f` for each item in the list, with the item and its index.
 	 */
 	public each(f: (value: T, index: number) => void): void {
 		$array.each(this._values, f);
 	}
 
 	/**
-	 * Calls `f` for each element in the list, from right to left.
-	 *
-	 * `f` should have at least one parameter defined which will get a current
-	 * item, with optional second argument - index.
+	 * Calls `f` for each item in the list, from last to first, with the item
+	 * and its index.
 	 */
 	public eachReverse(f: (value: T, index: number) => void): void {
 		$array.eachReverse(this._values, f);
@@ -489,10 +504,10 @@ export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDi
 	private _disposed: boolean = false;
 
 	/**
-	 * Swaps indexes of two items in the list.
+	 * Swaps two items in the list, without disposing them.
 	 *
-	 * @param a  Item 1
-	 * @param b  Item 2
+	 * @param a  Index of the first item
+	 * @param b  Index of the second item
 	 */
 	public swap(a: number, b: number): void {
 		const currentAutoDispose = this.autoDispose;

@@ -109,9 +109,11 @@ export class GrainPattern extends Pattern {
 
 
 	public _changed() {
+		// Pattern._changed() replaces the grain whenever it redraws
+		const clear = this._clear;
 		super._changed();
 
-		if (this._clearGrain) {
+		if (this._clearGrain || clear) {
 			const width = this.get("width", 200);
 			const height = this.get("height", 200);
 
@@ -182,7 +184,7 @@ export class GrainPattern extends Pattern {
 			}
 
 			this.context.putImageData(patternData, 0, 0);
-			this._pattern = this.context.createPattern(this.canvas, "repeat");
+			this._pattern = this._root._renderer.createRasterPattern(this.canvas, "repeat");
 		}
 
 		this._clearGrain = false;

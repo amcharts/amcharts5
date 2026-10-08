@@ -1,0 +1,7 @@
+{
+  "title": "Pie Chart",
+  "description": "A pie chart with a legend below it.",
+  "category": "percent",
+  "tier": "basic",
+  "tags": ["pie", "legend"]
+}

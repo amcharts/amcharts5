@@ -9,12 +9,16 @@ import * as $array from "../../../core/util/Array";
 export interface IChaikinOscillatorSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Main volume series of the [[StockChart]].
+	 * The volume series that weights the accumulation/distribution line.
+	 * Required.
 	 */
 	volumeSeries: XYSeries;
 
 	/**
-	 * Slow period setting.
+	 * Period of the slow exponential moving average. `period` sets the fast
+	 * one.
+	 *
+	 * @default 10
 	 */
 	slowPeriod?: number;
 
@@ -28,7 +32,9 @@ export interface IChaikinOscillatorEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Chaikin Oscillator indicator: the fast (`period`) minus the slow
+ * (`slowPeriod`) exponential moving average of the accumulation/distribution
+ * line. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -41,7 +47,7 @@ export class ChaikinOscillator extends ChartIndicator {
 	declare public _events: IChaikinOscillatorEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

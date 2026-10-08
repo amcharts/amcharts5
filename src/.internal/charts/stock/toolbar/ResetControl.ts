@@ -11,9 +11,7 @@ export interface IResetControlEvents extends IStockControlEvents {
 }
 
 /**
- * Reset control.
- *
- * Removes all drawings and indicators when clicked.
+ * A control that removes all drawings and indicators when clicked.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/reset-control/} for more info
  */

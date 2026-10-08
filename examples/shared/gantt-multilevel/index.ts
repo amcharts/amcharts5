@@ -1,11 +1,12 @@
 import * as am5 from "@amcharts/amcharts5";
 import * as am5gantt from "@amcharts/amcharts5/gantt";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import am5plugins_colorPicker from "@amcharts/amcharts5/plugins/colorPicker";
+
 
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-var root = am5.Root.new("chartdiv");
+const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -13,78 +14,45 @@ root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
+
 // Create Gantt chart
 // https://www.amcharts.com/docs/v5/charts/gantt/
-var gantt = root.container.children.push(am5gantt.Gantt.new(root, {}));
+// with no settings, tasks can be edited with the mouse and durations count days, skipping weekends
+const gantt = root.container.children.push(am5gantt.Gantt.new(root, {}));
 
-// Set category data
+
+// Set category data: parentId puts a task under another one
 // https://www.amcharts.com/docs/v5/charts/gantt/#Category_data
-gantt.yAxis.data.setAll([{
-  name: "Idea",
-  id: "gantt_0"
-}, {
-  name: "Kick-off",
-  id: "gantt_1"
-}, {
-  name: "Planning",
-  id: "gantt_2"
-}, {
-  name: "Development",
-  id: "gantt_3"
-}, {
-  name: "Testing",
-  id: "gantt_4"
-}, {
-  name: "Finalization",
-  id: "gantt_5"
-}, {
-  name: "Release",
-  id: "gantt_6"
-}]);
+gantt.yAxis.data.setAll([
+  { id: "kickoff", name: "Kick-off" },
+  { id: "design", name: "Design" },
+  { id: "wireframes", name: "Wireframes", parentId: "design" },
+  { id: "visuals", name: "Visual design", parentId: "design" },
+  { id: "development", name: "Development" },
+  { id: "frontend", name: "Front end", parentId: "development" },
+  { id: "backend", name: "Back end", parentId: "development" },
+  { id: "testing", name: "Testing", parentId: "development" },
+  { id: "launch", name: "Launch" }
+]);
 
-// Set series data
+
+// Set series data: a parent task takes its dates from its subtasks
 // https://www.amcharts.com/docs/v5/charts/gantt/#Series_data
-gantt.series.data.setAll([{
-  start: 1758142800000,
-  duration: 0,
-  progress: 1,
-  id: "gantt_0",
-  linkTo: ["gantt_1"]
-}, {
-  start: 1758142800000,
-  duration: 2,
-  progress: 1,
-  id: "gantt_1",
-  linkTo: ["gantt_2"]
-}, {
-  start: 1758488400000,
-  duration: 2,
-  progress: 0.2,
-  id: "gantt_2",
-  linkTo: ["gantt_3"]
-}, {
-  start: 1758661200000,
-  duration: 1,
-  progress: 0.8,
-  id: "gantt_3",
-  linkTo: ["gantt_4"]
-}, {
-  start: 1758747600000,
-  duration: 3,
-  progress: 0,
-  id: "gantt_4",
-  linkTo: ["gantt_5"]
-}, {
-  start: 1759179600000,
-  duration: 0,
-  progress: 0,
-  id: "gantt_5",
-  linkTo: ["gantt_6"]
-}, {
-  start: 1759179600000,
-  duration: 4,
-  progress: 0,
-  id: "gantt_6"
-}]);
+// start is a timestamp in ms and duration a number of working days (0 draws a diamond);
+// progress is the share done, 0 to 1; linkTo draws an arrow to the task that follows
+gantt.series.data.setAll([
+  { id: "kickoff", start: 1758142800000, duration: 0, progress: 1, linkTo: ["design"] },
+  { id: "design", linkTo: ["development"] },
+  { id: "wireframes", start: 1758142800000, duration: 2, progress: 1, linkTo: ["visuals"] },
+  { id: "visuals", start: 1758488400000, duration: 4, progress: 0.75 },
+  { id: "development", linkTo: ["launch"] },
+  { id: "frontend", start: 1758834000000, duration: 4, progress: 0.2, linkTo: ["testing"] },
+  { id: "backend", start: 1758834000000, duration: 3, progress: 0, linkTo: ["testing"] },
+  { id: "testing", start: 1759352400000, duration: 2, progress: 0 },
+  { id: "launch", start: 1759698000000, duration: 0, progress: 0 }
+]);
 
-gantt.appear();
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+gantt.appear(1000, 100);

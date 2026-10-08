@@ -1,4 +1,4 @@
-import type { IDisplayObject, IRendererEvents, IRendererEvent, IPointerEvent, IMargin } from "./backend/Renderer";
+import type { IDisplayObject, IRendererEvents, IRendererEvent, IPointerEvent, IMargin, IDeform } from "./backend/Renderer";
 import type { IBounds } from "../util/IBounds";
 import type { Container } from "./Container";
 import type { Role, AriaLive } from "../util/Accessibility";
@@ -187,9 +187,8 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 	}
 
 	/**
-	 * Will stop any bubbling up of the event to element's parents.
-	 *
-	 * Should be called in an event handler, e.g.:
+	 * Stops the event being handled from being dispatched on the element's
+	 * parents. Call it in an event handler, e.g.:
 	 *
 	 * ```TypeScript
 	 * element.events.on("pointerdown", function(ev) {
@@ -235,24 +234,28 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 export interface ISpriteSettings extends IEntitySettings {
 
 	/**
-	 * X position relative to parent.
+	 * X position in the parent: pixels from its left edge, or a [[Percent]] of
+	 * its inner width, measured from inside its left padding.
 	 */
 	x?: number | Percent | null;
 
 	/**
-	 * Y position relative to parent.
+	 * Y position in the parent: pixels from its top edge, or a [[Percent]] of
+	 * its inner height, measured from inside its top padding.
 	 */
 	y?: number | Percent | null;
 
 	/**
-	 * Element's absolute width in pixels (numeric value) or relative width to
-	 * parent ([[Percent]]);
+	 * Width in pixels, or a [[Percent]] of the parent's inner width. In a
+	 * horizontal layout, a percent width is a share of the width the other
+	 * children leave.
 	 */
 	width?: number | Percent | null;
 
 	/**
-	 * Element's absolute height in pixels (numeric value) or relative height to
-	 * parent ([[Percent]]);
+	 * Height in pixels, or a [[Percent]] of the parent's inner height. In a
+	 * vertical layout, a percent height is a share of the height the other
+	 * children leave.
 	 */
 	height?: number | Percent | null;
 
@@ -277,39 +280,39 @@ export interface ISpriteSettings extends IEntitySettings {
 	minHeight?: number | null;
 
 	/**
-	 * Opacity. 0 - fully transparent; 1 - fully opaque.
+	 * Opacity, from `0` (transparent) to `1` (opaque).
 	 *
 	 * @default 1
 	 */
 	opacity?: number;
 
 	/**
-	 * Rotation in degrees.
+	 * Rotation in degrees, clockwise, around the point set by `centerX` and
+	 * `centerY`.
 	 *
 	 * @default 0
 	 */
 	rotation?: number;
 
 	/**
-	 * Scale.
-	 *
-	 * Setting to a value less than 1 will shrink object.
+	 * Scale, around the point set by `centerX` and `centerY`: below `1`
+	 * shrinks the element, above `1` enlarges it.
 	 *
 	 * @default 1
 	 */
 	scale?: number;
 
 	/**
-	 * X coordinate of the center of the element relative to itself.
-	 *
-	 * Center coordinates will affect placement as well as rotation pivot point.
+	 * The point of the element that is placed at its `x` position, and that
+	 * it rotates and scales around: pixels from its left edge, or a percent of
+	 * its width.
 	 */
 	centerX?: number | Percent;
 
 	/**
-	 * Y coordinate of the center of the element relative to itself.
-	 *
-	 * Center coordinates will affect placement as well as rotation pivot point.
+	 * The point of the element that is placed at its `y` position, and that
+	 * it rotates and scales around: pixels from its top edge, or a percent of
+	 * its height.
 	 */
 	centerY?: number | Percent;
 
@@ -334,7 +337,8 @@ export interface ISpriteSettings extends IEntitySettings {
 	marginBottom?: number;
 
 	/**
-	 * Is element visible?
+	 * Whether the element is shown. Unlike `show()` and `hide()`, it does not
+	 * animate.
 	 *
 	 * @default true
 	 */
@@ -343,8 +347,8 @@ export interface ISpriteSettings extends IEntitySettings {
 	/**
 	 * Positioning of the element.
 	 *
-	 * `"absolute"` means element will not participate in parent layout scheme,
-	 * and will be positioned solely according to its `x` and `y` settings.
+	 * `"absolute"` leaves the element out of its parent's layout and size: it
+	 * is placed by its `x` and `y` only.
 	 *
 	 * @default "relative"
 	 */
@@ -361,113 +365,117 @@ export interface ISpriteSettings extends IEntitySettings {
 	dy?: number;
 
 	/**
-	 * Should this element accept user interaction events?
+	 * Makes the element respond to the pointer. Adding a pointer event
+	 * listener to it turns this on.
 	 */
 	interactive?: boolean;
 
 	/**
-	 * Text to show in a tooltip when hovered.
+	 * Text of the element's tooltip. It can hold data placeholders, such as
+	 * `{value}`.
 	 */
 	tooltipText?: string;
 
 	/**
-	 * HTML content to show in a tooltip when hovered.
+	 * HTML content of the element's tooltip, shown in place of `tooltipText`.
 	 *
 	 * @since 5.2.11
 	 */
 	tooltipHTML?: string;
 
 	/**
-	 * Tooltip pointer X coordinate relative to the element itself.
+	 * Where on the element the tooltip points, horizontally: pixels from its
+	 * left edge, or a percent of its width.
 	 *
 	 * @default am5.percent(50)
 	 */
 	tooltipX?: number | Percent;
 
 	/**
-	 * Tooltip pointer Y coordinate relative to the element itself.
+	 * Where on the element the tooltip points, vertically: pixels from its top
+	 * edge, or a percent of its height.
 	 *
 	 * @default am5.percent(50)
 	 */
 	tooltipY?: number | Percent;
 
 	/**
-	 * [[Tooltip]] instance.
+	 * The [[Tooltip]] to show for the element. If not set, the nearest
+	 * parent's is used.
 	 */
 	tooltip?: Tooltip;
 
 	/**
-	 * Tooltip position.
+	 * Where the tooltip points: `"fixed"` at `tooltipX` and `tooltipY`, or
+	 * `"pointer"` at the pointer, following it.
 	 *
 	 * @default "fixed"
 	 */
 	tooltipPosition?: "fixed" | "pointer";
 
 	/**
-	 * If set to `false` element will not be measured and cannot participate in
-	 * layout schemes.
+	 * If `false`, the element's bounds are not measured, so it takes no part
+	 * in its parent's layout or size.
 	 *
 	 * @default true
 	 */
 	isMeasured?: boolean;
 
 	/**
-	 * Allows binding element's settings to data.
+	 * Field in the data item's data object that holds settings for this
+	 * element, applied over its template's.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/template-fields/} for more info
 	 */
 	templateField?: string;
 
 	/**
-	 * If set to `true`, user will be able to drag this element. It will also
-	 * disable default drag events over the area of this element.
+	 * Lets the user drag the element. Touches that start on it no longer
+	 * scroll the page.
 	 */
 	draggable?: boolean;
 
 	/**
-	 * If set to `true`, mouse wheel events will be triggered over the element. It
-	 * will also disable page scrolling using mouse wheel when pointer is over
-	 * the element.
+	 * Makes the element receive mouse wheel events. While the pointer is over
+	 * it, the wheel no longer scrolls the page.
 	 */
 	wheelable?: boolean;
 
 	/**
-	 * An instance of [[NumberFormatter]] that should be used instead of global
-	 * formatter object.
+	 * A [[NumberFormatter]] to use for this element instead of the root's.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
 	 */
 	numberFormatter?: NumberFormatter | undefined;
 
 	/**
-	 * An instance of [[DateFormatter]] that should be used instead of global
-	 * formatter object.
+	 * A [[DateFormatter]] to use for this element instead of the root's.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
 	 */
 	dateFormatter?: DateFormatter | undefined;
 
 	/**
-	 * An instance of [[DurationFormatter]] that should be used instead of global
-	 * formatter object.
+	 * A [[DurationFormatter]] to use for this element instead of the root's.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
 	 */
 	durationFormatter?: DurationFormatter | undefined;
 
 	/**
-	 * If set, element will toggle specified boolean setting between `true` and
-	 * `false` when clicked/touched.
+	 * Setting that a click or tap toggles between `true` and `false`:
+	 * `"active"` or `"disabled"`. `"none"` turns toggling off.
 	 */
 	toggleKey?: "disabled" | "active" | "none" | undefined;
 
 	/**
-	 * Indicates if element is currently active.
+	 * Applies the element's `"active"` state while `true`.
 	 */
 	active?: boolean;
 
 	/**
-	 * Indicates if element is disabled.
+	 * Applies the element's `"disabled"` state while `true`. It changes only
+	 * the look: the element still responds to the pointer.
 	 */
 	disabled?: boolean;
 
@@ -482,59 +490,100 @@ export interface ISpriteSettings extends IEntitySettings {
 	filter?: string;
 
 	/**
-	 * A named mouse cursor style to show when hovering this element.
+	 * CSS cursor to show while the pointer is over the element, e.g.
+	 * `"pointer"`.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/CSS/cursor} for more info
 	 */
 	cursorOverStyle?: string;
 
 	/**
-	 * If set to `false` this element will not appear in exported snapshots of
-	 * the chart.
+	 * If `false`, the element is left out of exported images of the chart.
 	 */
 	exportable?: boolean;
 
 	/**
-	 * Numeric layer to put element in.
-	 *
-	 * Elements with higher number will appear in front of the ones with lower
-	 * number.
-	 *
-	 * If not set, will inherit layer from its ascendants.
+	 * Layer to draw the element on: elements on higher layers show in front of
+	 * those on lower ones. If not set, the element is on its parent's layer.
 	 */
 	layer?: number;
 
 	/**
-	 * Margins for the layer.
-	 *
-	 * Can be used to make the layer larger/or smaller than default chart size.
+	 * Margins in pixels that make the element's layer larger than the chart,
+	 * or, when negative, smaller.
 	 *
 	 * @since @5.2.39
 	 */
 	layerMargin?: IMargin;
 
 	/**
-	 * If set to `true` the element will be hidden regardless of `visible` or
-	 * even if `show()` is called.
+	 * Hides the element whatever its `visible` setting, even when `show()` is
+	 * called.
 	 */
 	forceHidden?: boolean;
 
 	/**
-	 * If set to `true` the element will be inactive - absolutely oblivious
-	 * to all interactions, even if there are related events set, or
-	 * the `interactive: true` is set.
+	 * Plays the element's reveal animation, as `appear()` does, when it is
+	 * first drawn: a chart fades in, a series grows its columns or lines from
+	 * the base. A series waits for its first data. It plays once: data updates
+	 * do not replay it, but turning the setting off and on again does.
+	 * Elements made from a template play as each one is made.
+	 *
+	 * An element that starts hidden (`visible: false`, or hidden in code before
+	 * it is drawn) stays hidden. An `animations` entry on the same setting,
+	 * such as a pulsing `opacity`, keeps playing.
+	 *
+	 * This is how a JSON config gets the opening animation, as a config cannot
+	 * call `appear()`.
+	 *
+	 * ```TypeScript
+	 * chart.setAll({ autoAppear: true, appearDuration: 1000, appearDelay: 100 });
+	 * series.setAll({ autoAppear: true, appearDuration: 1000 });
+	 * ```
+	 * ```JavaScript
+	 * chart.setAll({ autoAppear: true, appearDuration: 1000, appearDelay: 100 });
+	 * series.setAll({ autoAppear: true, appearDuration: 1000 });
+	 * ```
+	 *
+	 * @default false
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/} for more info
+	 * @since 5.21.0
+	 */
+	autoAppear?: boolean;
+
+	/**
+	 * Duration of the `autoAppear` animation, in milliseconds. Without it, the
+	 * element's `stateAnimationDuration` is used.
+	 *
+	 * @since 5.21.0
+	 */
+	appearDuration?: number;
+
+	/**
+	 * Milliseconds to wait before the `autoAppear` animation starts. The
+	 * element stays hidden until then.
+	 *
+	 * @default 0
+	 * @since 5.21.0
+	 */
+	appearDelay?: number;
+
+	/**
+	 * Makes the element and its children ignore the pointer, even with
+	 * `interactive: true` or event listeners set.
 	 *
 	 * @since 5.0.21
 	 */
 	forceInactive?: boolean;
 
 	/**
-	 * Defines when tooltip is shown over the element.
-	 *
-	 * Available options:
-	 * * `"hover"` (default) - tooltip is shown when element is hovered by a pointer or touched. It is hidden as soon as element is not hovered anymore, or touch occurs outside it.
-	 * * `"always"` - a tooltip will always be shown over the element, without any interactions. Please note that if you need to show tooltips for multiple elements at the same time, you need to explicitly create a `Tooltip` instance and set element's `tooltip` setting with it.
-	 * * '"click"' - a tooltip will only appear when target element is clicked/tapped. Tooltip will hide when clicking anywhere else on the page.
+	 * When the element's tooltip shows:
+	 * * `"hover"` (default) - while the pointer is over the element, or after
+	 *   a tap on it until a tap elsewhere.
+	 * * `"always"` - all the time. To show tooltips of several elements at
+	 *   once, give each its own [[Tooltip]] (`tooltip`).
+	 * * `"click"` - after a click or tap on the element, until a click
+	 *   anywhere else on the page.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Sticky_tooltips} for more info
 	 * @default "hover"
@@ -543,16 +592,12 @@ export interface ISpriteSettings extends IEntitySettings {
 	showTooltipOn?: "hover" | "always" | "click";
 
 	/**
-	 * If set to `true`, an element will try to draw itself in such way, that it
-	 * looks crisp on screen, with minimal anti-aliasing.
+	 * Draws the element sharply, with minimal anti-aliasing: its position is
+	 * rounded to whole pixels, and `strokeWidth` is adjusted to the device
+	 * pixel ratio, so lines may look thinner than expected.
 	 *
-	 * It will round x/y position so it is positioned fine "on pixel".
-	 *
-	 * It will also adjust `strokeWidth` based on device pixel ratio or zoom,
-	 * so the line might look thinner than expected.
-	 *
-	 * NOTE: this is might not universally work, especially when set on several
-	 * objects that are supposed to fit perfectly with each other.
+	 * NOTE: it may not work well on several elements that are meant to fit
+	 * together exactly.
 	 *
 	 * @default false
 	 * @since 5.3.0
@@ -560,9 +605,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	crisp?: boolean;
 
 	/**
-	 * Apply blur filter.
-	 *
-	 * Ranges of values in pixels: `0` to `X`.
+	 * Blur radius in pixels, from `0` (no blur) up.
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
@@ -572,7 +615,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	blur?: number;
 
 	/**
-	 * Modify visual brightness.
+	 * Brightness.
 	 *
 	 * * `0` - completely black
 	 * * `1` - no changes (default)
@@ -586,7 +629,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	brightness?: number;
 
 	/**
-	 * Modify contrast.
+	 * Contrast.
 	 *
 	 * * `0` - completely gray
 	 * * `1` - no changes (default)
@@ -600,10 +643,10 @@ export interface ISpriteSettings extends IEntitySettings {
 	contrast?: number;
 
 	/**
-	 * Modify saturation.
+	 * Saturation.
 	 *
 	 * * `0` - grayscale
-	 * * `1` - no changes
+	 * * `1` - no changes (default)
 	 * * `>1` - more saturated
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
@@ -614,9 +657,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	saturate?: number;
 
 	/**
-	 * Apply sepia filter.
-	 *
-	 * Range of values: `0` (no changes) to `1` (complete sepia).
+	 * Sepia tone, from `0` (no changes) to `1` (full sepia).
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
@@ -626,9 +667,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	sepia?: number;
 
 	/**
-	 * Invert colors.
-	 *
-	 * Range of values: `0` (no changes) to `1` (completely inverted colors).
+	 * Color inversion, from `0` (no changes) to `1` (fully inverted colors).
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
@@ -638,9 +677,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	invert?: number;
 
 	/**
-	 * Rotate HUE colors in degrees.
-	 *
-	 * Range of values: `0` to `360`.
+	 * Rotates the hue of all colors by this many degrees, from `0` to `360`.
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
@@ -721,8 +758,20 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * * `"menuitemcheckbox"`
 	 * * `"menuitemradio"`
 	 * * `"treeitem"`
+	 *
+	 * On a toggle `"button"` (one with `toggleKey`) it is exposed as
+	 * `aria-pressed`.
 	 */
 	ariaChecked?: boolean;
+
+	/**
+	 * `aria-expanded` setting: whether the content the element shows or hides
+	 * (e.g. a task's subtasks, a node's children) is shown.
+	 *
+	 * @see {@link https://w3c.github.io/aria/#aria-expanded} for more info
+	 * @since 5.21.0
+	 */
+	ariaExpanded?: boolean;
 
 	/**
 	 * `aria-current` setting.
@@ -794,6 +843,14 @@ export interface ISpritePrivate extends IEntityPrivate {
 	customData?: any;
 
 	/**
+	 * A 2x2 transform applied around the element's position after its
+	 * rotation and scale.
+	 *
+	 * @ignore
+	 */
+	deform?: IDeform | null;
+
+	/**
 	 * @ignore
 	 */
 	x?: number;
@@ -819,7 +876,7 @@ export interface ISpritePrivate extends IEntityPrivate {
 	visible?: boolean;
 
 	/**
-	 * Is element currently showing a tooltip?
+	 * `true` while the element shows its tooltip.
 	 */
 	showingTooltip?: boolean;
 
@@ -837,7 +894,8 @@ export interface ISpritePrivate extends IEntityPrivate {
 	};
 
 	/**
-	 * An element tooltip should inherit its colors from.
+	 * An element whose tooltip point and colors the tooltip uses, in place of
+	 * this element's.
 	 */
 	tooltipTarget?: Graphics;
 
@@ -876,21 +934,39 @@ export interface ISpritePrivate extends IEntityPrivate {
 	focusable?: boolean;
 
 	/**
-	 * If set to `true`, the sprite will check if a mouse pointer is within
-	 * its bounds before dispatching pointer events.
+	 * If set to `true`, the sprite gets no focus element, so it is left out of
+	 * keyboard navigation and screen readers even if `focusable` is `true`.
 	 *
-	 * This helps to solve ghost tooltips problem that sometimes appear while
-	 * moving the pointer over interactive objects.
+	 * Used for map objects that their series leaves out with `include` or
+	 * `exclude`.
 	 *
-	 * This is set to `true` by default on `Rectangle` and `Circle`.
+	 * @ignore
+	 */
+	focusExcluded?: boolean;
+
+	/**
+	 * If set to `true`, the sprite is outside the visible area (e.g. a map
+	 * object panned or zoomed away): it is not a TAB stop, but screen readers
+	 * can still read it.
+	 *
+	 * @ignore
+	 */
+	focusOutOfView?: boolean;
+
+	/**
+	 * Checks that the pointer is within the element's bounds before
+	 * dispatching `"pointerover"`. This prevents ghost tooltips that sometimes
+	 * appear while the pointer moves over interactive elements.
+	 *
+	 * It is `true` by default on `Rectangle` and `Circle`.
 	 *
 	 * @since 5.5.0
 	 */
 	trustBounds?: boolean;
 
 	/**
-	 * Logs last point for the shown tooltip (used to prevent subequent shows
-	 * of tooltip in the same place)
+	 * The last point the tooltip was shown at, so it is not shown again at the
+	 * same place.
 	 *
 	 * @since 5.11.3
 	 */
@@ -899,7 +975,7 @@ export interface ISpritePrivate extends IEntityPrivate {
 }
 
 /**
- * An interface defining event objects that originate from pinter interactions.
+ * Event object of a pointer interaction.
  */
 export interface ISpritePointerEvent {
 
@@ -909,13 +985,13 @@ export interface ISpritePointerEvent {
 	originalEvent: IPointerEvent;
 
 	/**
-	 * A point where event originated.
+	 * The point of the event, relative to the root.
 	 */
 	point: IPoint;
 
 	/**
-	 * Is it a simulated event, e.g. if the event was generated by code rather
-	 * then actual user interaction.
+	 * `true` if the event was generated by code rather than by user
+	 * interaction.
 	 */
 	simulated: boolean;
 
@@ -934,7 +1010,7 @@ export interface ISpritePointerEvent {
 export interface ISpriteEvents extends IEntityEvents {
 
 	/**
-	 * Invoked when element's data item changes.
+	 * The element's data item changed.
 	 */
 	dataitemchanged: {
 		oldDataItem: DataItem<IComponentDataItem> | undefined,
@@ -942,90 +1018,94 @@ export interface ISpriteEvents extends IEntityEvents {
 	};
 
 	/**
-	 * Invoked when element's position (X/Y) changes.
+	 * The element's position changed.
 	 */
 	positionchanged: {};
 
 	/**
-	 * Invoked when element's bounds change due to any manipulation to it.
+	 * The element's bounds changed.
 	 */
 	boundschanged: {};
 
 	/**
-	 * Invoked when element dragging starts.
+	 * Dragging of the element started: the pointer moved more than 5 pixels
+	 * after pressing on it.
 	 */
 	dragstart: ISpritePointerEvent;
 
 	/**
-	 * Invoked when element dragging stops.
+	 * Dragging of the element stopped.
 	 */
 	dragstop: ISpritePointerEvent;
 
 	/**
-	 * Invoked when element ois being dragged.
+	 * The element moved while being dragged.
 	 */
 	dragged: ISpritePointerEvent;
 
 	/**
-	 * Invoked when element is clicked or tapped.
+	 * The element was clicked or tapped. A press and release more than 5
+	 * pixels apart is not a click.
 	 */
 	click: ISpritePointerEvent;
 
 	/**
-	 * Invoked when element is clicked width the right mouse button.
+	 * The element was clicked with the right mouse button.
 	 */
 	rightclick: ISpritePointerEvent;
 
 	/**
-	 * Invoked when element is clicked with the middle mouse button.
+	 * The element was clicked with the middle mouse button.
 	 */
 	middleclick: ISpritePointerEvent;
 
 	/**
-	 * Invoked when element is doubleclicked or tapped twice quickly.
+	 * The element was double-clicked or double-tapped. Also dispatched on its
+	 * parents.
 	 */
 	dblclick: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer moves over the element.
+	 * The pointer moved over the element.
 	 */
 	pointerover: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer moves outside the element.
+	 * The pointer left the element.
 	 */
 	pointerout: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer button is pressed or touch starts over the element.
+	 * A pointer button was pressed, or a touch started, over the element. Also
+	 * dispatched on its parents.
 	 */
 	pointerdown: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer button is released or touch stops over the element.
+	 * A pointer button was released, or a touch ended, over the element.
 	 */
 	pointerup: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer button is released or touch stops in the window, even
-	 * outside of the element or even chart area.
+	 * A pointer button was released, or a touch ended, anywhere in the window,
+	 * even outside the chart.
 	 */
 	globalpointerup: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer is moving anywhere in the window, even outside of the
-	 * element or even chart area.
+	 * The pointer moved anywhere in the window, even outside the chart.
 	 */
 	globalpointermove: ISpritePointerEvent;
 
 	/**
-	 * Invoked when pointer button is pressed or touch starts anywhere on the
-	 * chart surface, even outside of the element.
+	 * A pointer button was pressed, or a touch started, anywhere in the
+	 * window, even outside the chart.
 	 */
 	globalpointerdown: ISpritePointerEvent;
 
 	/**
-	 * Invoked when mouse wheel is spinned while pointer is over the element.
+	 * The mouse wheel turned while the pointer was over the element. Also
+	 * dispatched on its parents.
 	 */
 	wheel: {
 		originalEvent: WheelEvent;
@@ -1051,7 +1131,7 @@ export interface ISpriteEvents extends IEntityEvents {
 }
 
 /**
- * A base class for all visual elements.
+ * Base class of all visual elements.
  *
  * @important
  */
@@ -1122,8 +1202,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Marks some setting as dirty. Could be used to trigger adapter.
-	 * @param key 
+	 * Marks a setting as changed, so the element reads it again, running its
+	 * adapters, on the next frame.
+	 *
+	 * @param  key  Setting key
 	 */
 	public markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
 		this._markDirtyKey(key);
@@ -1213,11 +1295,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * A [[DataItem]] used for this element.
+	 * The element's [[DataItem]], or, if it has none, its nearest parent's.
 	 *
-	 * NOTE: data item is being assigned automatically in most cases where it
-	 * matters. Use this accessor to set data item only if you know what you're
-	 * doing.
+	 * NOTE: data items are assigned automatically in most cases where it
+	 * matters. Set one only if you know what you are doing.
 	 *
 	 * @param  value  Data item
 	 */
@@ -1292,6 +1373,8 @@ export abstract class Sprite extends Entity {
 
 	public _beforeChanged() {
 		super._beforeChanged();
+
+		this._applyAutoAppear();
 
 		// handling states in beforeChanged, otherwise states is not applied without animated theme
 		this._handleStates();
@@ -1500,6 +1583,11 @@ export abstract class Sprite extends Entity {
 			display.scale = this.get("scale", 0);
 		}
 
+		if (this.isPrivateDirty("deform")) {
+			this.markDirtyBounds();
+			display.deform = (this.getPrivate("deform") as IDeform | null | undefined) || null;
+		}
+
 		if (this.isDirty("centerX") || this.isDirty("centerY")) {
 			this.markDirtyBounds();
 			this.updatePivotPoint();
@@ -1553,6 +1641,11 @@ export abstract class Sprite extends Entity {
 		}
 
 		// Accessibility
+		if (this.isPrivateDirty("focusExcluded") && this.get("focusable")) {
+			this._root._registerTabindexOrder(this);
+			this.markDirtyAccessibility();
+		}
+
 		if (this.isDirty("tabindexOrder") || this.isDirty("focusableGroup")) {
 			if (this.get("focusable")) {
 				this._root._registerTabindexOrder(this);
@@ -1562,65 +1655,46 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		if (this.isDirty("filter")) {
-			//this.markDirtyBounds();
-			display.filter = this.get("filter");
-		}
+		if (this.isDirty("filter") || this.isDirty("blur") || this.isDirty("saturate") || this.isDirty("brightness") || this.isDirty("contrast") || this.isDirty("sepia") || this.isDirty("hue") || this.isDirty("invert")) {
+			// Built from all of them, so changing one keeps the rest and a neutral value clears
+			let filter = this.get("filter", "");
 
-		let filter = this.get("filter", "");
-
-		if (this.isDirty("blur")) {
 			const blur = this.get("blur", 0);
 			if (blur != 0) {
 				filter += " blur(" + blur + "px)";
 			}
-		}
 
-		if (this.isDirty("saturate")) {
 			const saturate = this.get("saturate", 1);
 			if (saturate != 1) {
 				filter += " saturate(" + saturate + ")";
 			}
-		}
 
-		if (this.isDirty("brightness")) {
 			const brightness = this.get("brightness", 1);
 			if (brightness != 1) {
 				filter += " brightness(" + brightness + ")";
 			}
-		}
 
-		if (this.isDirty("contrast")) {
 			const contrast = this.get("contrast", 1);
 			if (contrast != 1) {
 				filter += " contrast(" + contrast + ")";
 			}
-		}
 
-		if (this.isDirty("sepia")) {
 			const sepia = this.get("sepia", 0);
 			if (sepia != 0) {
 				filter += " sepia(" + sepia + ")";
 			}
-		}
 
-		if (this.isDirty("hue")) {
 			const hue = this.get("hue", 0);
 			if (hue != 0) {
 				filter += " hue-rotate(" + hue + "deg)";
 			}
-		}
 
-		if (this.isDirty("invert")) {
 			const invert = this.get("invert", 0);
 			if (invert != 0) {
 				filter += " invert(" + invert + ")";
 			}
-		}
 
-
-		if (filter) {
-			display.filter = filter;
+			display.filter = filter.trim();
 		}
 
 		if (this.isDirty("cursorOverStyle")) {
@@ -1632,11 +1706,20 @@ export abstract class Sprite extends Entity {
 				this._focusDp = new MultiDisposer([
 					events.on("focus", () => {
 						// TODO: proper hover, not just tooltip
+						// A tooltip brought up by keyboard focus is read out
+						const tooltip = this.getTooltip();
+						if (tooltip) {
+							tooltip._focusAnnounce = true;
+						}
 						this.showTooltip();
 					}),
 
 					events.on("blur", () => {
 						// TODO: proper hover, not just tooltip
+						const tooltip = this.getTooltip();
+						if (tooltip) {
+							tooltip._focusAnnounce = false;
+						}
 						this.hideTooltip();
 					})]);
 			}
@@ -1666,11 +1749,11 @@ export abstract class Sprite extends Entity {
 			}));
 		}
 
-		if (this.isPrivateDirty("focusable")) {
+		if (this.isPrivateDirty("focusable") || this.isPrivateDirty("focusOutOfView")) {
 			this.markDirtyAccessibility();
 		}
 
-		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueMin") || this.isDirty("ariaValueMax") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel") || this.isDirty("ariaControls")) {
+		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaCurrent") || this.isDirty("ariaSelected") || this.isDirty("ariaExpanded") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueMin") || this.isDirty("ariaValueMax") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel") || this.isDirty("ariaControls")) {
 			// display.accessibility.ariaLabel = populateString(this, this.get("ariaLabel", ""));
 			// @todo make sure ariaLabel gets populated in Root
 			this.markDirtyAccessibility();
@@ -1934,10 +2017,8 @@ export abstract class Sprite extends Entity {
 
 			while (parent != null) {
 				angle += parent.get("rotation", 0);
+				scale *= parent.get("scale", 1);
 				parent = parent.parent;
-				if (parent) {
-					scale *= parent.get("scale", 1);
-				}
 			}
 
 			let x = (e.point.x - dragEvent.point.x) / scale;
@@ -2017,8 +2098,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns depth (how deep in the hierachy of the content tree) of this
-	 * element.
+	 * Returns how deep the element is in the tree: the number of parents it
+	 * has.
 	 *
 	 * @return Depth
 	 */
@@ -2132,6 +2213,12 @@ export abstract class Sprite extends Entity {
 			if (this.getPrivate("showingTooltip")) {
 				this.showTooltip();
 			}
+
+			// Accessibility depends on size (zero-sized elements are hidden from
+			// screen readers), so re-evaluate it now that bounds are known
+			if (this.get("focusable")) {
+				this.markDirtyAccessibility();
+			}
 		}
 	}
 
@@ -2181,14 +2268,89 @@ export abstract class Sprite extends Entity {
 		}
 	}
 
+	// autoAppear: played once already, and played in this frame
+	protected _appeared: boolean = false;
+	protected _appearApplied: boolean = false;
+
+	/**
+	 * Hidden by `appear()` or `autoAppear` until it shows: not hidden on purpose.
+	 *
+	 * @ignore
+	 */
+	public _appearPending: boolean = false;
+
+	/**
+	 * Whether `autoAppear` can play yet. A series waits for its data.
+	 */
+	protected _autoAppearReady(): boolean {
+		return true;
+	}
+
+	/**
+	 * Plays `autoAppear` the first time the element is drawn, and again when
+	 * the setting is turned off and on. A container does this before it
+	 * prepares its children, so that hiding it and its data items is part of
+	 * the same frame.
+	 */
+	protected _applyAutoAppear(): void {
+		if (this.isDirty("autoAppear") && !this.get("autoAppear")) {
+			this._appeared = false;
+		}
+		if (this._appearApplied || this._appeared || !this.get("autoAppear") || !this._autoAppearReady()) {
+			return;
+		}
+		this._appearApplied = true;
+		this._appeared = true;
+
+		// Hidden on purpose: it shows the usual way when it is shown. Already
+		// showing: appear() was called in code
+		if (this.get("visible") === false || this.isHidden() || this.isShowing()) {
+			return;
+		}
+
+		const duration = this.get("appearDuration");
+		const delay = this.get("appearDelay", 0);
+		this._appearPending = true;
+		this.hide(0).then(() => {
+			const show = () => {
+				this._appearPending = false;
+				if (!this.isDisposed()) {
+					this.show(duration);
+					this._replayDeclaredAnimations();
+				}
+			};
+			if (delay) {
+				this.setTimeout(show, delay);
+			}
+			else {
+				show();
+			}
+		});
+	}
+
+	// An `animations` entry on what showing animates (opacity, say) keeps
+	// playing, as it does next to appear() called in code
+	protected _replayDeclaredAnimations(): void {
+		const declared = this.get("animations");
+		const hidden = this.states.lookup("hidden");
+		if (declared && hidden) {
+			const keys = Object.keys(hidden._settings);
+			if (declared.some((animation) => animation.target !== "dataItem" && keys.indexOf(animation.key) !== -1)) {
+				this._playDeclaredAnimations();
+			}
+		}
+	}
+
 	public _clearDirty() {
 		super._clearDirty();
+		this._appearApplied = false;
 		this._sizeDirty = false;
 		//this._statesHandled = false;
 	}
 
 	/**
-	 * Simulate hover over element.
+	 * Hovers the element as if the pointer were over it: applies its hover
+	 * state and shows its tooltip.
 	 */
 	public hover() {
 		if (!this.isDisposed()) {
@@ -2198,7 +2360,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Simulate unhover over element.
+	 * Ends a hover, as if the pointer left the element: hides its tooltip and
+	 * takes it out of its hover state.
 	 */
 	public unhover(): void {
 		if (!this.isDisposed()) {
@@ -2208,7 +2371,11 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Shows element's [[Tooltip]].
+	 * Shows the element's [[Tooltip]]. Does nothing if the element has no
+	 * `tooltipText` or `tooltipHTML`.
+	 *
+	 * @param   point  Point to point at, relative to the root; used only with `tooltipPosition: "pointer"`
+	 * @return         Promise
 	 */
 	public showTooltip(point?: IPoint): Promise<void> | undefined {
 		if (!this.isDisposed()) {
@@ -2278,7 +2445,9 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Hides element's [[Tooltip]].
+	 * Hides the element's [[Tooltip]].
+	 *
+	 * @return  Promise
 	 */
 	public hideTooltip(): Promise<void> | undefined {
 		const tooltip = this.getTooltip();
@@ -2315,7 +2484,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns [[Tooltip]] used for this element.
+	 * Returns the element's [[Tooltip]]: its own `tooltip`, or else the nearest
+	 * parent's.
 	 *
 	 * @return Tooltip
 	 */
@@ -2415,7 +2585,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns element's actual X position in pixels.
+	 * Returns the element's X position in pixels, relative to its parent,
+	 * without `dx`.
 	 *
 	 * @return X (px)
 	 */
@@ -2447,7 +2618,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns element's actual Y position in pixels.
+	 * Returns the element's Y position in pixels, relative to its parent,
+	 * without `dy`.
 	 *
 	 * @return Y (px)
 	 */
@@ -2511,17 +2683,17 @@ export abstract class Sprite extends Entity {
 	 * Returns local coordinates of the element's bounds.
 	 *
 	 * @ignore
-	 * @return Global bounds
+	 * @return Local bounds
 	 */
 	public localBounds(): IBounds {
 		return this._localBounds;
 	}
 
 	/**
-	 * Returns adjusted local coordinates of the element's bounds.
+	 * Returns the element's bounds in its parent's coordinates.
 	 *
 	 * @ignore
-	 * @return Global bounds
+	 * @return Bounds
 	 */
 	public bounds(): IBounds {
 		const bounds = this._adjustedLocalBounds;
@@ -2537,8 +2709,26 @@ export abstract class Sprite extends Entity {
 	 * @return Global bounds
 	 */
 	public globalBounds(): IBounds {
-		const bounds = this.localBounds();
+		return this._toGlobalBounds(this.localBounds());
+	}
 
+	/**
+	 * Returns global bounds of the element's shape, for its focus element.
+	 *
+	 * Same as `globalBounds()`, except that an element that is not measured
+	 * (a pie slice, a map polygon) is measured here, so that it can be focused.
+	 *
+	 * @ignore
+	 * @return Global bounds
+	 */
+	public _focusBounds(): IBounds {
+		if (this.get("isMeasured")) {
+			return this.globalBounds();
+		}
+		return this._toGlobalBounds(this._display.getContentBounds());
+	}
+
+	protected _toGlobalBounds(bounds: IBounds): IBounds {
 		const p0 = this.toGlobal({ x: bounds.left, y: bounds.top });
 		const p1 = this.toGlobal({ x: bounds.right, y: bounds.top });
 		const p2 = this.toGlobal({ x: bounds.right, y: bounds.bottom });
@@ -2561,31 +2751,35 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Plays initial reveal animation regardless if element is currently hidden
-	 * or visible.
+	 * Plays the reveal animation: hides the element at once, then shows it,
+	 * whether it was hidden or not.
 	 *
 	 * @param   duration  Duration of the animation in milliseconds
-	 * @param   delay     Delay showing of the element by X milliseconds
+	 * @param   delay     Milliseconds to wait before showing the element
 	 * @return            Promise
 	 */
 	public async appear(duration?: number, delay?: number): Promise<void> {
+		// Hidden only until it shows: not hidden on purpose, for a saved config
+		this._appearPending = true;
 		await this.hide(0);
 		if (delay) {
 			return new Promise<void>((success, _error) => {
 				this.setTimeout(() => {
+					this._appearPending = false;
 					success(this.show(duration));
 				}, delay);
 			});
 
 		}
 		else {
+			this._appearPending = false;
 			return this.show(duration);
 		}
 	}
 
 	/**
-	 * Shows currently hidden element and returns a `Promise` which completes
-	 * when all showing animations are finished.
+	 * Shows the element and returns a `Promise` that resolves when its
+	 * showing animations finish.
 	 *
 	 * ```TypeScript
 	 * series.show().then(function(ev) {
@@ -2598,7 +2792,8 @@ export abstract class Sprite extends Entity {
 	 * })
 	 * ```
 	 *
-	 * @return Promise
+	 * @param   duration  Animation duration in milliseconds
+	 * @return            Promise
 	 */
 	public async show(duration?: number): Promise<void> {
 		if (!this._isShowing) {
@@ -2619,8 +2814,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Hides the element and returns a `Promise` which completes when all hiding
-	 * animations are finished.
+	 * Hides the element and returns a `Promise` that resolves when its hiding
+	 * animations finish.
 	 *
 	 * ```TypeScript
 	 * series.hide().then(function(ev) {
@@ -2633,7 +2828,8 @@ export abstract class Sprite extends Entity {
 	 * })
 	 * ```
 	 *
-	 * @return Promise
+	 * @param   duration  Animation duration in milliseconds
+	 * @return            Promise
 	 */
 	public async hide(duration?: number): Promise<void> {
 		if (!this._isHiding && !this._isHidden) {
@@ -2658,7 +2854,9 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns `true` if this element is currently hidden.
+	 * Returns `true` if the element was hidden with `hide()`, even while its
+	 * hiding animation still plays. For the `visible` setting, use
+	 * `isVisible()`.
 	 *
 	 * @return Is hidden?
 	 */
@@ -2667,7 +2865,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns `true` if this element is currently animating to a default state.
+	 * Returns `true` while the element's showing animation plays.
 	 *
 	 * @return Is showing?
 	 */
@@ -2676,7 +2874,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns `true` if this element is currently animating to a hidden state.
+	 * Returns `true` while the element's hiding animation plays.
 	 *
 	 * @return Is hiding?
 	 */
@@ -2685,7 +2883,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns `true` if this element is currently hovered by a pointer.
+	 * Returns `true` if the pointer is over the element.
 	 *
 	 * @return Is hovered?
 	 */
@@ -2703,7 +2901,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns `true` if this element is currently being dragged.
+	 * Returns `true` while the element is being dragged.
 	 *
 	 * @return Is dragged?
 	 */
@@ -2712,8 +2910,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns `false` if if either public or private setting `visible` is set
-	 * to `false`, or `forceHidden` is set to `true`.
+	 * Returns `false` if either the public or the private setting `visible` is
+	 * `false`, or `forceHidden` is `true`.
 	 *
 	 * @return Visible?
 	 */
@@ -2735,7 +2933,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns an actual opacity of the element, taking into account all parents.
+	 * Returns the element's opacity multiplied by those of all its parents.
 	 *
 	 * @return Opacity
 	 * @since 5.2.11
@@ -2746,9 +2944,9 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns an actual scale of the element, taking into account all parents.
+	 * Returns the element's scale multiplied by those of all its parents.
 	 *
-	 * @return Opacity
+	 * @return Scale
 	 * @since 5.9.2
 	 */
 	public compositeScale(): number {
@@ -2757,9 +2955,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns an actual roation of the element, taking into account all parents.
+	 * Returns the element's rotation plus those of all its parents, in
+	 * degrees.
 	 *
-	 * @return Opacity
+	 * @return Rotation
 	 * @since 5.9.2
 	 */
 	public compositeRotation(): number {
@@ -2768,7 +2967,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns width of this element in pixels.
+	 * Returns the element's width in pixels.
 	 *
 	 * @return Width (px)
 	 */
@@ -2815,7 +3014,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns maximum allowed width of this element in pixels.
+	 * Returns the most width the element may take, in pixels: its `maxWidth`,
+	 * a fixed `width`, or else its parent's inner width.
 	 *
 	 * @return Maximum width (px)
 	 */
@@ -2838,7 +3038,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns maximum allowed height of this element in pixels.
+	 * Returns the most height the element may take, in pixels: its
+	 * `maxHeight`, a fixed `height`, or else its parent's inner height.
 	 *
 	 * @return Maximum height (px)
 	 */
@@ -2861,7 +3062,7 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns height of this element in pixels.
+	 * Returns the element's height in pixels.
 	 *
 	 * @return Height (px)
 	 */
@@ -2975,56 +3176,53 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Returns an instance of [[NumberFormatter]] used in this element.
-	 *
-	 * If this element does not have it set, global one form [[Root]] is used.
+	 * Returns the [[NumberFormatter]] of the element: its own
+	 * `numberFormatter`, or else the one of the [[Root]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
-	 * @return NumberFormatter instace
+	 * @return NumberFormatter instance
 	 */
 	public getNumberFormatter(): NumberFormatter {
 		return this.get("numberFormatter", this._root.numberFormatter);
 	}
 
 	/**
-	 * Returns an instance of [[DateFormatter]] used in this element.
-	 *
-	 * If this element does not have it set, global one form [[Root]] is used.
+	 * Returns the [[DateFormatter]] of the element: its own `dateFormatter`,
+	 * or else the one of the [[Root]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
-	 * @return DateFormatter instace
+	 * @return DateFormatter instance
 	 */
 	public getDateFormatter(): DateFormatter {
 		return this.get("dateFormatter", this._root.dateFormatter);
 	}
 
 	/**
-	 * Returns an instance of [[DurationFormatter]] used in this element.
-	 *
-	 * If this element does not have it set, global one form [[Root]] is used.
+	 * Returns the [[DurationFormatter]] of the element: its own
+	 * `durationFormatter`, or else the one of the [[Root]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
-	 * @return DurationFormatter instace
+	 * @return DurationFormatter instance
 	 */
 	public getDurationFormatter(): DurationFormatter {
 		return this.get("durationFormatter", this._root.durationFormatter);
 	}
 
 	/**
-	 * Converts X/Y coordinate within this element to a global coordinate.
+	 * Converts a point within the element to a point relative to the root.
 	 *
-	 * @param  point  Local coordinate
-	 * @return        Global coordinate
+	 * @param  point  Point within the element
+	 * @return        Point relative to the root
 	 */
 	public toGlobal(point: IPoint): IPoint {
 		return this._display.toGlobal(point);
 	}
 
 	/**
-	 * Converts global X/Y coordinate to a coordinate within this element.
+	 * Converts a point relative to the root to a point within the element.
 	 *
-	 * @param  point  Global coordinate
-	 * @return        Local coordinate
+	 * @param  point  Point relative to the root
+	 * @return        Point within the element
 	 */
 	public toLocal(point: IPoint): IPoint {
 		return this._display.toLocal(point);
@@ -3053,10 +3251,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Moves sprite to the end of the parent's children array.
-	 *
-	 * Depending on `layout` setting of the parten container, it may effect the
-	 * positioning or overlapping order of the elements.
+	 * Moves the element to the end of its parent's children, so it is drawn
+	 * over its siblings, or, in a layout, placed last.
 	 */
 	public toFront() {
 		const parent = this.parent;
@@ -3066,10 +3262,8 @@ export abstract class Sprite extends Entity {
 	}
 
 	/**
-	 * Moves sprite to the beginning of the parent's children array.
-	 *
-	 * Depending on `layout` setting of the parten container, it may effect the
-	 * positioning or overlapping order of the elements.
+	 * Moves the element to the start of its parent's children, so it is drawn
+	 * under its siblings, or, in a layout, placed first.
 	 */
 	public toBack() {
 		const parent = this.parent;

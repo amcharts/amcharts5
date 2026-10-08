@@ -3,11 +3,11 @@ import { Graphics, IGraphicsPrivate, IGraphicsSettings } from "../../../core/ren
 export interface IGridSettings extends IGraphicsSettings {
 
 	/**
-	 * Relative location of the grid line within the cell.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Where the grid line sits within its cell, from `0` (start) to `1` (end).
+	 * A cell is a category, a date period, or the span of an axis range.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @default 0
 	 */
 	location?: number;
 
@@ -17,7 +17,7 @@ export interface IGridPrivate extends IGraphicsPrivate {
 }
 
 /**
- * Creates an axis grid line.
+ * A grid line of an axis, drawn across the plot area.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Grid} for more info
  * @important

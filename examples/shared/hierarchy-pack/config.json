@@ -1,0 +1,69 @@
+{
+  "type": "Pack",
+  "settings": {
+    "initialDepth": 2,
+    "valueField": "value",
+    "categoryField": "name",
+    "childDataField": "children",
+    "selectedDataItem": "@self.dataItems.0",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": { "data": "#data-0" },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "name": "Food",
+          "children": [
+            {
+              "name": "Fruit",
+              "children": [
+                { "name": "Apples", "value": 40 },
+                { "name": "Bananas", "value": 36 },
+                {
+                  "name": "Berries",
+                  "children": [
+                    { "name": "Strawberries", "value": 18 },
+                    { "name": "Blueberries", "value": 14 },
+                    { "name": "Raspberries", "value": 12 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Drinks",
+              "children": [
+                { "name": "Coffee", "value": 42 },
+                { "name": "Tea", "value": 36 },
+                { "name": "Juice", "value": 39 }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Dairy",
+              "children": [
+                { "name": "Milk", "value": 46 },
+                { "name": "Yogurt", "value": 38 },
+                {
+                  "name": "Cheese",
+                  "children": [
+                    { "name": "Cheddar", "value": 16 },
+                    { "name": "Gouda", "value": 14 },
+                    { "name": "Brie", "value": 12 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            }
+          ],
+          "__parse": true
+        }
+      ]
+    }
+  ]
+}

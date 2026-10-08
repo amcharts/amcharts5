@@ -1,0 +1,7 @@
+{
+  "title": "Sunburst Chart",
+  "description": "A sunburst: nested data as rings of slices, one ring per level.",
+  "category": "hierarchy",
+  "tier": "basic",
+  "tags": ["sunburst", "hierarchy", "nested data"]
+}

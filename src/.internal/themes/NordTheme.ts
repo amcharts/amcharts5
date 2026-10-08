@@ -2,11 +2,9 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Nord" — the light variant of the Nord palette (Arctic Ice Studio): a cool,
- * desaturated, deliberately low-contrast scheme on a "Snow Storm" off-white
- * ground, with muted Frost/Aurora accents. Pairs with `NordDark`.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * "Nord": the light side of the Nord palette by Arctic Ice Studio, with muted
+ * Frost and Aurora colors on the off-white "Snow Storm" `#eceff4` background.
+ * Cool and deliberately low in contrast. Pairs with `NordDark`.
  *
  * @see {@link https://www.nordtheme.com/} for the original palette
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info

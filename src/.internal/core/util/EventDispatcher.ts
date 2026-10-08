@@ -66,7 +66,7 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Returns if this object has been already disposed.
+	 * Returns `true` if the dispatcher has been disposed.
 	 *
 	 * @return Disposed?
 	 */
@@ -75,7 +75,7 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Dispose (destroy) this object.
+	 * Disposes the dispatcher and all its listeners.
 	 */
 	public dispose(): void {
 		if (!this._disposed) {
@@ -100,7 +100,7 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Checks if this particular event dispatcher has any listeners set.
+	 * Checks if the dispatcher has any listeners.
 	 *
 	 * @return Has listeners?
 	 */
@@ -109,8 +109,10 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Checks if this particular event dispatcher has any particular listeners set.
+	 * Checks if the dispatcher has listeners for `type`, counting the ones added
+	 * with `onAll()`.
 	 *
+	 * @param type  Event type
 	 * @return Has particular event listeners?
 	 */
 	public hasListenersByType<Key extends keyof T>(type: Key): boolean {
@@ -143,10 +145,8 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Disable dispatching of events for a certain event type.
-	 *
-	 * Optionally, can set how many dispatches to skip before automatically
-	 * re-enabling the dispatching.
+	 * Stops dispatching events of `type`, until `enableType()` is called or, if
+	 * `amount` is set, for that many dispatches.
 	 *
 	 * @param type    Event type
 	 * @param amount  Number of event dispatches to skip
@@ -158,7 +158,7 @@ export class EventDispatcher<T> implements IDisposer {
 	/**
 	 * Removes listener from dispatcher.
 	 *
-	 * Will throw an exception if such listener does not exists.
+	 * Will throw an exception if such listener does not exist.
 	 *
 	 * @param listener Listener to remove
 	 */
@@ -201,7 +201,8 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Checks if dispatching for particular event type is enabled.
+	 * Checks if an event of `type` would reach a listener: events are enabled,
+	 * the type is not disabled, and it has listeners.
 	 *
 	 * @param type  Event type
 	 * @return Enabled?
@@ -216,7 +217,7 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Removes all listeners of a particular event type
+	 * Removes all listeners of a particular event type.
 	 *
 	 * @param type  Listener's type
 	 */
@@ -233,7 +234,8 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Checks if there's already a listener with specific parameters.
+	 * Checks if there's already a listener with specific parameters. Listeners
+	 * added with `once()` are not counted.
 	 *
 	 * @param type      Listener's type
 	 * @param callback  Callback function
@@ -280,12 +282,10 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * [_eachListener description]
+	 * Calls `fn` for each listener. Listeners removed meanwhile are taken out
+	 * of the list after the loop.
 	 *
-	 * All of this extra code is needed when a listener is removed while iterating
-	 *
-	 * @todo Description
-	 * @param fn [description]
+	 * @param fn  Function to call
 	 */
 	protected _eachListener(fn: (listener: EventListener) => void): void {
 		++this._iterating;
@@ -309,11 +309,11 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Dispatches an event immediately without waiting for next cycle.
+	 * Calls the listeners of `type` right away; debounced listeners are called
+	 * after their delay. `event` must include `type` and `target`.
 	 *
 	 * @param type   Event type
 	 * @param event  Event object
-	 * @todo automatically add in type and target properties if they are missing
 	 */
 	public dispatch<Key extends keyof T>(type: Key, event: T[Key]): void {
 		if (this._shouldDispatch(type)) {
@@ -365,16 +365,16 @@ export class EventDispatcher<T> implements IDisposer {
 	}*/
 
 	/**
-	 * Creates, catalogs and returns an [[EventListener]].
+	 * Creates, catalogs and returns an [[EventListener]], replacing an existing
+	 * one with the same parameters.
 	 *
-	 * Event listener can be disposed.
-	 *
-	 * @param once         Listener's once setting
-	 * @param type         Listener's type
-	 * @param callback     Callback function
-	 * @param context      Callback context
-	 * @param shouldClone  Whether the listener should be copied when the EventDispatcher is copied
-	 * @param dispatch
+	 * @param once           Listener's once setting
+	 * @param type           Listener's type
+	 * @param callback       Callback function
+	 * @param context        Callback context
+	 * @param shouldClone    Whether the listener should be copied when the EventDispatcher is copied
+	 * @param dispatch       Function that calls `callback` for an event
+	 * @param debounceDelay  Debounce delay in milliseconds
 	 * @returns An event listener
 	 */
 	protected _on<C, Key extends keyof T>(once: boolean, type: Key | null, callback: any, context: C, shouldClone: boolean, dispatch: (type: Key, event: T[Key]) => void, debounceDelay?: number): EventListener {
@@ -411,7 +411,7 @@ export class EventDispatcher<T> implements IDisposer {
 	 * Creates an event listener to be invoked on **any** event.
 	 *
 	 * @param callback     Callback function
-	 * @param context      Callback context
+	 * @param context      Value of `this` inside `callback`
 	 * @param shouldClone  Whether the listener should be copied when the EventDispatcher is copied
 	 * @returns A disposable event listener
 	 */
@@ -423,22 +423,22 @@ export class EventDispatcher<T> implements IDisposer {
 	 * Creates an event listener to be invoked on a specific event type.
 	 *
 	 * ```TypeScript
-	 * button.events.once("click", (ev) => {
+	 * button.events.on("click", (ev) => {
 	 *   console.log("Button clicked");
 	 * }, this);
 	 * ```
 	 * ```JavaScript
-	 * button.events.once("click", function(ev) {
+	 * button.events.on("click", function(ev) {
 	 *   console.log("Button clicked");
 	 * }, this);
 	 * ```
 	 *
-	 * The above will invoke our custom event handler whenever series we put
-	 * event on is hidden.
+	 * The above logs every click on the button. To remove the listener, call
+	 * `dispose()` on the returned object, or use `off()`.
 	 *
 	 * @param type         Listener's type
 	 * @param callback     Callback function
-	 * @param context      Callback context
+	 * @param context      Value of `this` inside `callback`
 	 * @param shouldClone  Whether the listener should be copied when the EventDispatcher is copied
 	 * @returns A disposable event listener
 	 */
@@ -460,13 +460,13 @@ export class EventDispatcher<T> implements IDisposer {
 	 * }, 500, this);
 	 * ```
 	 *
-	 * The above will invoke our custom event handler whenever series we put
-	 * event on is hidden.
+	 * The above logs once, 500 ms after the last of a series of clicks. Each new
+	 * event restarts the delay, and `callback` gets the last one.
 	 *
 	 * @param type           Listener's type
 	 * @param callback       Callback function
 	 * @param debounceDelay  Debounce delay in milliseconds
-	 * @param context        Callback context
+	 * @param context        Value of `this` inside `callback`
 	 * @param shouldClone    Whether the listener should be copied when the EventDispatcher is copied
 	 * @returns A disposable event listener
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Debounced_events} for more info
@@ -477,9 +477,8 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Creates an event listener to be invoked on a specific event type once.
-	 *
-	 * Once the event listener is invoked, it is automatically disposed.
+	 * Creates an event listener that is invoked only the first time the event
+	 * happens, and is then disposed.
 	 *
 	 * ```TypeScript
 	 * button.events.once("click", (ev) => {
@@ -492,12 +491,12 @@ export class EventDispatcher<T> implements IDisposer {
 	 * }, this);
 	 * ```
 	 *
-	 * The above will invoke our custom event handler the first time series we
-	 * put event on is hidden.
+	 * The above logs the first click on the button only. `off()` does not
+	 * remove such a listener: call `dispose()` on the returned object instead.
 	 *
 	 * @param type         Listener's type
 	 * @param callback     Callback function
-	 * @param context      Callback context
+	 * @param context      Value of `this` inside `callback`
 	 * @param shouldClone  Whether the listener should be copied when the EventDispatcher is copied
 	 * @returns A disposable event listener
 	 */
@@ -512,11 +511,13 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
-	 * Removes the event listener with specific parameters.
+	 * Removes listeners added with `on()` or `onDebounced()` that match `type`,
+	 * `callback` and `context`. Without `callback`, removes all of them for
+	 * `type` and `context`. Listeners added with `once()` are not removed.
 	 *
 	 * @param type         Listener's type
 	 * @param callback     Callback function
-	 * @param context      Callback context
+	 * @param context      Callback context, the same as passed to `on()`
 	 */
 	public off<C, Key extends keyof T>(type: Key, callback?: (this: C, event: T[Key]) => void, context?: C): void {
 		this._removeExistingListener(false, type, callback, context);

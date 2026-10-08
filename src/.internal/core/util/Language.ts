@@ -250,6 +250,13 @@ export interface ILocaleSettings {
 	"Close"?: string;
 	"Minimize"?: string;
 	"Confirm"?: string;
+	"OK"?: string;
+	"Cancel"?: string;
+	"Delete"?: string;
+	"Settings"?: string;
+	"Expand"?: string;
+	"Move Up"?: string;
+	"Move Down"?: string;
 
 	"Venn Series"?: string;
 	"Venn Diagram"?: string;
@@ -285,14 +292,15 @@ export interface ILanguageSettings extends IEntitySettings {
 export interface ILanguagePrivate extends IEntityPrivate {
 
 	/**
-	 * A locale for International English (default).
+	 * The English locale, used for prompts the root's locale doesn't translate.
 	 */
 	defaultLocale: ILocale;
 
 }
 
 /**
- * Add localization functionality.
+ * Translates the text prompts of charts into the root's locale. Available as
+ * `root.language`.
  */
 export class Language extends Entity {
 	declare public _settings: ILanguageSettings;
@@ -304,10 +312,11 @@ export class Language extends Entity {
 	}
 
 	/**
-	 * Returns a prompt translation.
-	 * 
+	 * Returns the translation of `prompt`, from English if the locale has
+	 * none. `%1`, `%2` and so on in it are replaced with the `rest` parameters.
+	 *
 	 * @param   prompt   Prompt to translate
-	 * @param   locale   Target locale
+	 * @param   locale   Target locale; the root's locale if not given
 	 * @param   ...rest  Parameters
 	 * @return           Translation
 	 */
@@ -349,10 +358,11 @@ export class Language extends Entity {
 	}
 
 	/**
-	 * Returns a prompt translation, including custom prompts.
-	 * 
+	 * Same as `translate()`, but takes any prompt, including custom ones added
+	 * with `setTranslationAny()`.
+	 *
 	 * @param   prompt   Prompt to translate
-	 * @param   locale   Target locale
+	 * @param   locale   Target locale; the root's locale if not given
 	 * @param   ...rest  Parameters
 	 * @return           Translation
 	 */
@@ -361,12 +371,12 @@ export class Language extends Entity {
 	}
 
 	/**
-	 * Add a custom prompt to locale.
+	 * Adds a custom prompt and its translation to a locale.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts}
 	 * @param  prompt       Source prompt
-	 * @param  translation  Tanslation
-	 * @param  locale       Target locale
+	 * @param  translation  Translation
+	 * @param  locale       Target locale; the root's locale if not given
 	 */
 	public setTranslationAny(prompt: string, translation: string, locale?: ILocale): void {
 		const localeTarget = locale || this._root.locale;
@@ -374,12 +384,13 @@ export class Language extends Entity {
 	}
 
 	/**
-	 * Add a batch of custom prompts.
+	 * Adds several custom prompts at once, from an object of prompts and their
+	 * translations.
 	 *
 	 * @since 5.3.3
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts}
 	 * @param  translations  Translations
-	 * @param  locale        Target locale
+	 * @param  locale        Target locale; the root's locale if not given
 	 */
 	public setTranslationsAny(translations: { [index: string]: any }, locale?: ILocale): void {
 		$object.each(translations, (key, val) => {
@@ -387,11 +398,29 @@ export class Language extends Entity {
 		});
 	}
 
+	/**
+	 * Same as `translate()`, but returns an empty string when the prompt has
+	 * no translation.
+	 *
+	 * @param   prompt   Prompt to translate
+	 * @param   locale   Target locale; the root's locale if not given
+	 * @param   ...rest  Parameters
+	 * @return           Translation
+	 */
 	public translateEmpty<Key extends keyof ILocaleSettings>(prompt: Key, locale?: ILocale, ...rest: Array<string>): string {
 		let translation = this.translate(prompt, locale, ...rest);
 		return translation == prompt ? "" : translation;
 	}
 
+	/**
+	 * Returns a function of the root's locale, such as `"_dateOrd"`, which
+	 * gives the ordinal suffix of a day. A function that returns an empty
+	 * string if the locale has none.
+	 *
+	 * @param   prompt  Function name
+	 * @param   locale  Locale
+	 * @return          Function
+	 */
 	public translateFunc<Key extends keyof ILocaleFunctions>(prompt: Key, locale?: ILocale): ILocaleFunctions[Key] {
 
 		if ((<any>this._root.locale)[prompt]) {
@@ -410,8 +439,9 @@ export class Language extends Entity {
 	}
 
 	/**
-	 * Translates a btach of prompts.
-	 * 
+	 * Translates a list of prompts. With the default locale, returns the list
+	 * as it is.
+	 *
 	 * @param  list    Array of prompts to translate
 	 * @param  locale  Target locale
 	 * @return         Array of translations
@@ -427,7 +457,7 @@ export class Language extends Entity {
 	}
 
 	/**
-	 * Returns `true` if the currently selected locale is a default locale.
+	 * Returns `true` if the root's locale is the default (English) one.
 	 *
 	 * @return `true` if locale is default; `false` if it is not.
 	 */

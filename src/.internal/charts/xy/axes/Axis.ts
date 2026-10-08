@@ -23,58 +23,55 @@ import * as $utils from "../../../core/util/Utils";
 
 export interface IAxisSettings<R extends AxisRenderer> extends IComponentSettings {
 	/**
-	 * A renderer object which is responsible of rendering visible axis elements.
+	 * The renderer that draws the axis line, labels, ticks, grid and fills:
+	 * [[AxisRendererX]] for a horizontal axis, [[AxisRendererY]] for a vertical
+	 * one.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
 	 */
 	renderer: R;
 
 	/**
-	 * The initial relative zoom start position of the axis.
-	 *
-	 * E.g. setting it to `0.1` will pre-zoom axis to 10% from the start.
+	 * Start of the visible (zoomed) part of the axis: `0` is the start of the
+	 * axis, `1` the end. Set it to pre-zoom: `0.1` hides the first 10%.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
+	 * @default 0
 	 */
 	start?: number;
 
 	/**
-	 * The initial relative zoom end position of the axis.
-	 *
-	 * E.g. setting it to `0.9` will pre-zoom axis to 10% from the end.
+	 * End of the visible (zoomed) part of the axis: `0` is the start of the
+	 * axis, `1` the end. Set it to pre-zoom: `0.9` hides the last 10%.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pre_zooming_axes} for more info
+	 * @default 1
 	 */
 	end?: number;
 
 	/**
-	 * Maximum number of times the scope of the axis could auto-zoom-in.
-	 *
-	 * This is to prevent axis jumping too drastically when scrolling/zooming.
+	 * Roughly how many times the axis can be zoomed in. A [[CategoryAxis]]
+	 * ignores it and zooms in as far as `minZoomCount` categories; a
+	 * [[DateAxis]] set to `null` (its default) zooms in as far as
+	 * `minZoomCount` base intervals.
 	 *
 	 * @default 1000
 	 */
 	maxZoomFactor?: number | null;
 
 	/**
-	 * Maximum number of axis elements to show at a time.
-	 *
-	 * E.g. for a [[CategoryAxis]] that would be number of categories.
-	 * For a [[DateAxis]] it would be number of `baseInterval`.
-	 *
-	 * The axis will not allow to be zoomed out beyond this number.
+	 * Most cells to show at a time, such as categories on a [[CategoryAxis]]
+	 * or `baseInterval` periods on a [[DateAxis]]. The axis can't be zoomed out
+	 * any further.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Limiting_zoom_scope} for more info
 	 */
 	maxZoomCount?: number;
 
 	/**
-	 * Minimum number of axis elements to show at a time.
-	 *
-	 * E.g. for a [[CategoryAxis]] that would be number of categories.
-	 * For a [[DateAxis]] it would be number of `baseInterval`.
-	 *
-	 * The axis will not allow to be zoomed in beyond this number.
+	 * Fewest cells to show at a time, such as categories on a [[CategoryAxis]]
+	 * or `baseInterval` periods on a [[DateAxis]]. The axis can't be zoomed in
+	 * any further.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Limiting_zoom_scope} for more info
 	 */
@@ -86,45 +83,49 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	baseValue?: number;
 
 	/**
-	 * If set to `false` the axis will be exempt when chart is panned
-	 * horizontally, and will keep its current position.
+	 * `false` keeps this axis in place when the chart is panned horizontally,
+	 * by dragging or with the mouse wheel.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	panX?: boolean;
 
 	/**
-	 * If set to `false` the axis will be exempt when chart is panned
-	 * vertically, and will keep its current position.
+	 * `false` keeps this axis in place when the chart is panned vertically,
+	 * by dragging or with the mouse wheel.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	panY?: boolean;
 
 	/**
-	 * If set to `false` the axis will be exempt when chart is zoomed
-	 * horizontally, and will keep its current zoom/position.
+	 * `false` keeps this axis as it is when the mouse wheel zooms the chart
+	 * horizontally. The cursor, scrollbars and pinch still zoom it; use
+	 * `zoomable` to stop those too.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	zoomX?: boolean;
 
 	/**
-	 * If set to `false` the axis will be exempt when chart is zoomed
-	 * vertically, and will keep its current zoom/position.
+	 * `false` keeps this axis as it is when the mouse wheel zooms the chart
+	 * vertically. The cursor, scrollbars and pinch still zoom it; use
+	 * `zoomable` to stop those too.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Excluding_axes_from_pan_or_zoom} for more info
 	 */
 	zoomY?: boolean;
 
 	/**
-	 * Set this to `false` to prevent axis from being zoomed.
+	 * `false` makes `zoom()` do nothing, so the cursor, scrollbars, pinch and
+	 * mouse wheel can't zoom or scroll the axis. Dragging the plot area still
+	 * pans it.
 	 */
 	zoomable?: boolean;
 
 	/**
-	 * A relative distance the axis is allowed to be zoomed/panned beyond its
-	 * actual scope.
+	 * How far past its ends the axis can be zoomed or panned, as a share of
+	 * the visible range: `0.1` is 10%.
 	 *
 	 * @default 0.1
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Over_zooming} for more info
@@ -132,51 +133,53 @@ export interface IAxisSettings<R extends AxisRenderer> extends IComponentSetting
 	maxDeviation?: number;
 
 	/**
-	 * [[Tooltip]] element to use for axis.
+	 * Tooltip that shows the axis value at the cursor's position.
 	 */
 	tooltip?: Tooltip;
 
 	/**
-	 * `tooltipLocation` indicates
-	 * which relative place to snap to: `0` beginning, `0.5` - middle, `1` - end.
+	 * Where within a cell the tooltip snaps to when `snapTooltip` is on: `0`
+	 * the cell's start, `0.5` its middle, `1` its end.
 	 *
 	 * @default 0.5
 	 */
 	tooltipLocation?: number;
 
 	/**
-	 * Should tooltip snap to the `tooltipLocation` (`true`) or follow cursor.
+	 * Snaps the tooltip to `tooltipLocation` in the cell under the cursor,
+	 * instead of following the cursor exactly.
 	 *
 	 * @default true
 	 */
 	snapTooltip?: boolean;
 
 	/**
-	 * If set to `true` (default) the axis width will stay constant across all
-	 * zooms, even if actual length of all visible labels changes.
+	 * Keeps the axis from shrinking as zooming changes the visible labels: it
+	 * keeps room for the widest label shown so far.
 	 *
 	 * @default true
 	 */
 	fixAxisSize?: boolean;
 
 	/**
-	 * A function that will be used to create bullets on each cell.
+	 * Function that creates an [[AxisBullet]] for each of the axis's cells,
+	 * such as each category. Axis ranges get none.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_bullets} for more info
 	 */
 	bullet?: (root: Root, axis: Axis<AxisRenderer>, dataItem: DataItem<IAxisDataItem>) => AxisBullet;
 
 	/**
-	 * Specifies how axis fill should be drawn (if fill rule allows it).
+	 * Creates axis fills for the cells of the minor grid too, not only the
+	 * main one. The `fillRule` still decides which of them show.
 	 *
 	 * @since 5.14.0
 	 */
 	minorAxisFillsEnabled?: boolean;
 
 	/**
-	 * If set to `false`, the axis will not be zoomed out when the chart's zoom
-	 * out button is pressed, and vice versa when axis is zoomed, it will not
-	 * trigger the button to appear.
+	 * `false` leaves the axis out of the chart's zoom-out: the zoom-out button
+	 * doesn't reset it, and zooming it doesn't show the button.
 	 *
 	 * @default true
 	 * @since 5.14.0
@@ -205,18 +208,15 @@ export interface IAxisPrivate extends IComponentPrivate {
 	maxZoomFactor?: number | null;
 
 	/**
-	 * Saves position to which tooltip points.
+	 * Position on the axis (`0` to `1`) the tooltip points to.
 	 */
 	tooltipPosition?: number;
 
 	/**
-	 * Width in pixels between grid lines (read-only).
-	 * 
-	 * It might not be exact, as [[DateAxis]] can have grids at irregular
-	 * intervals.
-	 * 
-	 * Could be used to detect when size changes and to adjust labels for them
-	 * not to overlap.
+	 * Distance in pixels between grid lines (read-only). Approximate on a
+	 * [[DateAxis]], whose grid can be uneven.
+	 *
+	 * Watch it to resize or hide labels so they don't overlap.
 	 */
 	cellWidth?: number;
 
@@ -250,19 +250,15 @@ export interface IAxisDataItem extends IComponentDataItem {
 	bullet?: AxisBullet;
 
 	/**
-	 * Indicates if this data item represents an axis range.
+	 * `true` if this data item is an axis range.
 	 */
 	isRange?: boolean;
 
 	/**
-	 * If set to `true`, the grid and axis fill of this data item will be drawn
-	 * above series.
+	 * Draws the grid and fill of this axis range above the series. Set it
+	 * before the range is created; changing it later has no effect.
 	 *
-	 * NOTE: this needs to be set **before** creating an axis range. Updating this
-	 * dynamically won't have any effect.
-	 *
-	 * NOTE: if you need all grid to be drawn above series, you can bring it to
-	 * front with `chart.gridContainer.toFront();`.
+	 * To draw all grid above the series, use `chart.gridContainer.toFront()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Grid_fill_above_series} for more info
 	 * @default false
@@ -302,40 +298,33 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Array of minor data items.
+	 * Data items of the minor grid.
 	 */
 	public minorDataItems: Array<DataItem<this["_dataItemSettings"]>> = [];
 
 	/**
-	 * A [[Container]] that holds all the axis label elements.
-	 *
-	 * @default Container.new()
+	 * Holds the axis's labels and ticks.
 	 */
 	public readonly labelsContainer: Container = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A [[Container]] that holds all the axis grid and fill elements.
-	 *
-	 * @default Container.new()
+	 * Holds the axis's grid and fills, drawn below the series.
 	 */
 	public readonly gridContainer: Container = Container.new(this._root, { width: p100, height: p100 });
 
 	/**
-	 * A [[Container]] that holds axis grid elements which goes above the series.
-	 *
-	 * @default Container.new()
+	 * Holds the grid and fills of axis ranges set to be drawn `above` the
+	 * series.
 	 */
 	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100 });
 
 	/**
-	 * A [[Container]] that holds all the axis bullet elements.
-	 *
-	 * @default new Container
+	 * Holds the axis's bullets.
 	 */
 	public readonly bulletsContainer: Container = this.children.push(Container.new(this._root, { isMeasured: false, width: p100, height: p100, position: "absolute" }));
 
 	/**
-	 * A referenece to the the chart the axis belongs to.
+	 * The chart the axis belongs to.
 	 */
 	public chart: XYChart | undefined;
 
@@ -350,18 +339,18 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _skipSync: boolean = false;
 
 	/**
-	 * A list of axis ranges.
+	 * The axis's ranges: highlighted values or spans, each with its own grid,
+	 * label and fill.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
-	 * @default new List()
 	 */
 	public readonly axisRanges: List<DataItem<this["_dataItemSettings"]>> = new List();
 
 	public _seriesAxisRanges: Array<DataItem<this["_dataItemSettings"]>> = [];
 
 	/**
-	 * A control label that is invisible but is used to keep width the width of
-	 * the axis constant.
+	 * An invisible label that keeps room for the axis's widest label, so the
+	 * axis doesn't shrink while zooming (see `fixAxisSize`).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Ghost_label} for more info
 	 */
@@ -376,11 +365,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _seriesAdded = false;
 
 	/**
-	 * A container above the axis that can be used to add additional stuff into
-	 * it. For example a legend, label, or an icon.
+	 * A container for extra content, such as a legend, a label or an icon. It
+	 * sits above a Y axis, and to the left of an X axis.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/} for more info
-	 * @default new Container
 	 */
 	public axisHeader: Container = this.children.push(Container.new(this._root, {
 		themeTags: ["axis", "header"],
@@ -388,8 +376,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 		background: Rectangle.new(this._root, {
 			themeTags: ["header", "background"],
 			fill: this._root.interfaceColors.get("background")
-		})
-	}));
+		})._markC("themeTags", "fill")
+	})._markC("themeTags", "position", "background"));
 
 	public _bullets: { [index: string]: AxisBullet } = {};
 
@@ -458,14 +446,15 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Zooms the axis to relative locations.
+	 * Zooms the axis to the range between `start` and `end`, where `0` is the
+	 * start of the axis and `1` the end. The range is kept within
+	 * `maxDeviation`, `maxZoomFactor`, `minZoomCount` and `maxZoomCount`.
 	 *
-	 * Both `start` and `end` are relative: 0 means start of the axis, 1 - end.
-	 *
-	 * @param   start     Relative start
-	 * @param   end       Relative end
-	 * @param   duration  Duration of the zoom animation in milliseconds
-	 * @return            Zoom animation
+	 * @param   start     Start position (`0` to `1`)
+	 * @param   end       End position (`0` to `1`)
+	 * @param   duration  Animation duration in milliseconds; `interpolationDuration` if not set
+	 * @param   priority  Which end to keep when the limits change the range; `"end"` if not set
+	 * @return            Zoom animation, if any
 	 */
 	public zoom(start: number, end: number, duration?: number, priority?: "start" | "end"): Animation<this["_settings"]["start"]> | Animation<this["_settings"]["end"]> | undefined {
 		if (this.get("zoomable", true)) {
@@ -1123,8 +1112,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Can be called when axis zoom changes and you need to update tooltip
-	 * position.
+	 * Moves the axis tooltip, and the series tooltips it drives, to the
+	 * cursor's current position. Call it after changing the zoom from code.
 	 */
 	public updateTooltip() {
 		const snapToSeries = this._snapToSeries;
@@ -1182,13 +1171,23 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Returns text to be used in an axis tooltip for specific relative position.
+	 * Returns the text the axis tooltip shows at a position.
 	 *
-	 * @param   position        Position
-	 * @param   adjustPosition  Adjust position
+	 * @param   position        Position on the axis (`0` to `1`)
+	 * @param   adjustPosition  `false` skips a [[DateAxis]]'s shift by `tooltipIntervalOffset`
 	 * @return                  Tooltip text
 	 */
 	public abstract getTooltipText(position: number, adjustPosition?: boolean): string | undefined;
+
+	/**
+	 * Text for a scrollbar grip at `position`, read out by screen readers.
+	 * `isEnd` is set for the end of the range.
+	 *
+	 * @ignore
+	 */
+	public _scrollbarText(position: number, _isEnd?: boolean): string {
+		return this.getTooltipText(position, false) || "";
+	}
 
 	/**
 	 * @ignore
@@ -1234,10 +1233,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Converts pixel coordinate to a relative position on axis.
+	 * Converts a pixel coordinate along the axis, from its left or top edge, to
+	 * a position on the axis (`0` to `1`), taking zoom into account.
 	 *
-	 * @param   coordinate  Coordinate
-	 * @return              Relative position
+	 * @param   coordinate  Coordinate in pixels
+	 * @return              Position on the axis
 	 */
 	public coordinateToPosition(coordinate: number): number {
 		const renderer = this.get("renderer");
@@ -1245,23 +1245,23 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Converts relative position of the plot area to relative position of the
-	 * axis with zoom taken into account.
+	 * Converts a position in the plot area (`0` to `1`, from its left or top
+	 * edge) to a position on the axis, taking zoom and `inversed` into account.
 	 *
-	 * @param position Position
-	 * @return Relative position
+	 * @param position Position in the plot area
+	 * @return Position on the axis
 	 */
 	public toAxisPosition(position: number): number {
 		return this.get("renderer").toAxisPosition(position);
 	}
 
 	/**
-	 * Converts relative position of the axis to a global position taking current
-	 * zoom into account (opposite to what `toAxisPosition` does).
+	 * Converts a position on the axis to a position in the plot area (`0` to
+	 * `1`, from its left or top edge): the opposite of `toAxisPosition`.
 	 *
 	 * @since 5.4.2
-	 * @param position Position
-	 * @return Global position
+	 * @param position Position on the axis
+	 * @return Position in the plot area
 	 */
 	public toGlobalPosition(position: number): number {
 		return this.get("renderer").toGlobalPosition(position);
@@ -1277,10 +1277,11 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Returns a data item from series that is closest to the `position`.
+	 * Returns the series data item closest to a position on the axis.
 	 *
 	 * @param   series    Series
-	 * @param   position  Relative position
+	 * @param   position  Position on the axis (`0` to `1`)
+	 * @param   location  Location within the cell (`0` to `1`), used by a [[DateAxis]]
 	 * @return            Data item
 	 */
 	public abstract getSeriesItem(series: XYSeries, position: number, location?: number): DataItem<IXYSeriesDataItem> | undefined
@@ -1293,7 +1294,8 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
-	 * Creates and returns an axis range object.
+	 * Adds a data item, made with `axis.makeDataItem()`, as an axis range and
+	 * returns it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 * @param   axisDataItem  Axis data item
@@ -1309,9 +1311,10 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	public _groupSeriesData(_series: XYSeries) { }
 
 	/**
-	 * Returns relative position between two grid lines of the axis.
+	 * Returns the distance between two grid lines as a share of the visible
+	 * part of the axis.
 	 *
-	 * @return Position
+	 * @return Distance (`0` to `1`)
 	 */
 	public getCellWidthPosition(): number {
 		return 0.05;

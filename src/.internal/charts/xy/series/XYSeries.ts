@@ -41,24 +41,25 @@ function max(left: number | undefined, right: number | undefined): number | unde
 
 
 /**
- * Interface representing a series axis range.
+ * An axis range of a series: a stretch of an axis within which the series
+ * can look different.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
  */
 export interface IXYSeriesAxisRange {
 
 	/**
-	 * Related axis data item.
+	 * The axis data item that sets where the range starts and ends.
 	 */
 	axisDataItem: DataItem<IAxisDataItem>;
 
 	/**
-	 * A [[Container]] element that range's elements are placed in.
+	 * Container that holds the range's elements.
 	 */
 	container?: Container;
 
 	/**
-	 * Target series.
+	 * The series the range belongs to.
 	 */
 	series?: XYSeries;
 
@@ -76,8 +77,8 @@ export interface IXYAxis extends Axis<AxisRenderer> {
 export interface IXYSeriesEvents extends ISeriesEvents {
 
 	/**
-	 * Kicks in when axis starts using different data set, e.g. data
-	 * of different granularit on [[DateAxis]].
+	 * The series switched to another data set, such as data grouped by
+	 * another interval on a [[DateAxis]]. `id` names the new set.
 	 *
 	 * @since 5.1.1
 	 */
@@ -205,13 +206,10 @@ export interface IXYSeriesDataItem extends ISeriesDataItem {
 export interface IXYSeriesSettings extends ISeriesSettings {
 
 	/**
-	 * If this is set to `true`, data items will ignore `locationX` setting
-	 * but will place the data point at exact X value.
-	 * 
-	 * This works with [[DateAxis]] only.
-	 * 
-	 * On a `ColumnSeries`/`CandlestickSeries` this setting will affect bullets
-	 * only.
+	 * Places data points at their exact date on a [[DateAxis]] X axis,
+	 * ignoring `locationX`. When that axis is the base axis, a column then
+	 * spans exactly from its open date to its date, so it needs an
+	 * `openValueXField` to have any width.
 	 *
 	 * @default false
 	 * @since 5.13.0
@@ -219,13 +217,8 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	exactLocationX?: boolean;
 
 	/**
-	 * If this is set to `true`, data items will ignore `locationX` setting
-	 * but will place the data point at exact Y value.
-	 * 
-	 * This works with [[DateAxis]] only.
-	 * 
-	 * On a `ColumnSeries`/`CandlestickSeries` this setting will affect bullets
-	 * only.
+	 * Places data points at their exact date on a [[DateAxis]] Y axis,
+	 * ignoring `locationY`. Columns are not affected.
 	 *
 	 * @default false
 	 * @since 5.13.0
@@ -233,231 +226,247 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	exactLocationY?: boolean;
 
 	/**
-	 * If set to `true` series will use selection extremes when calculating
-	 * their min and max values of the axis. Useful for stacked series.
+	 * Makes the value axis scale to the series' values within the visible
+	 * range only, instead of all its values. Useful for stacked series.
 	 *
 	 * @since 5.10.11
 	 */
 	useSelectionExtremes?: boolean;
 
 	/**
-	 * Minimal distance between data items in pixels.
-	 *
-	 * If data items are closer than this, bullets are turned off to avoid
-	 * overcrowding.
+	 * Hides the bullets while data items are, on average, closer than this
+	 * many pixels to each other along the base axis.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets} for more info
 	 */
 	minBulletDistance?: number;
 
 	/**
-	 * X axis series uses.
-	 *
-	 * **IMPORTANT:** `xAxis` needs to be set when creating the series. Updating
-	 * this setting on previously created series object will not work.
+	 * The X axis the series is plotted against. Must be set when creating the
+	 * series; it can be switched to another axis of the same type later.
 	 */
 	xAxis: IXYAxis;
 
 	/**
-	 * Y axis series uses.
-	 *
-	 * **IMPORTANT:** `yAxis` needs to be set when creating the series. Updating
-	 * this setting on previously created series object will not work.
+	 * The Y axis the series is plotted against. Must be set when creating the
+	 * series; it can be switched to another axis of the same type later.
 	 */
 	yAxis: IXYAxis;
 
 	/**
-	 * If set to `true` series will be stacked to other series that also have
-	 * this setting set to `true`.
+	 * Stacks the series on the one before it in the chart's `series` that has
+	 * the same axes and is of the same type. The first series of a stack
+	 * doesn't need it set.
 	 *
-	 * NOTE: for series stack properly, all stacked series must have same number
-	 * of data items with the same timestamp/category.
+	 * Stacking goes by data item index, so all stacked series need the same
+	 * data items (dates or categories), in the same order.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Stacked_series} for more info
 	 */
 	stacked?: boolean;
 
 	/**
-	 * Whether to stack negative values from zero (`true`) or from whatever
-	 * previous series value is (`false`).
+	 * When stacking, puts negative values on the negative values below and
+	 * positive on positive, so the stack grows away from zero both ways. With
+	 * `false`, each value goes on the one right below it, whatever its sign.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Negative_value_stacking} for more info
 	 */
 	stackToNegative?: boolean;
 
 	/**
-	 * Base axis for the series.
-	 *
-	 * A base axis will dictate direction series plot.
+	 * The axis the series runs along, such as the category axis of a column
+	 * series; the other axis holds its values. If not set, the chart picks the
+	 * Y axis when it is a category or date axis, and the X axis otherwise.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Base_axis} for more info
 	 */
 	baseAxis?: IXYAxis;
 
 	/**
-	 * Input data field for X value.
+	 * Data field with the X value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	valueXField?: string;
 
 	/**
-	 * Input data field for Y value.
+	 * Data field with the Y value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	valueYField?: string;
 
 	/**
-	 * Exclude series values when calculating totals for category/interval.
+	 * Leaves the series out of the totals (`valueYTotal`, `valueYTotalPercent`
+	 * and the like) that a value axis with `calculateTotals` works out.
 	 *
 	 * @default false
 	 */
 	excludeFromTotal?: boolean;
 
 	/**
-	 * Display data field for X value.
+	 * Which form of the X value the series plots on a [[ValueAxis]]: the value
+	 * itself (`"valueXWorking"`), or one worked out from it, such as its change
+	 * since the first visible data item (`"valueXChangeSelection"`) or its
+	 * percent of the total (`"valueXTotalPercent"`).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @default "valueXWorking"
 	 */
 	valueXShow?: "valueXWorking" | "valueXChange" | "valueXChangePercent" | "valueXChangeSelection" | "valueXChangeSelectionPercent" | "valueXChangePrevious" | "valueXChangePreviousPercent" | "valueXTotal" | "valueXTotalPercent" | "valueXSum";
 
 	/**
-	 * Display data field for Y value.
+	 * Which form of the Y value the series plots on a [[ValueAxis]]: the value
+	 * itself (`"valueYWorking"`), or one worked out from it, such as its change
+	 * since the first visible data item (`"valueYChangeSelection"`) or its
+	 * percent of the total (`"valueYTotalPercent"`).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @default "valueYWorking"
 	 */
 	valueYShow?: "valueYWorking" | "valueYChange" | "valueYChangePercent" | "valueYChangeSelection" | "valueYChangeSelectionPercent" | "valueYChangePrevious" | "valueYChangePreviousPercent" | "valueYTotal" | "valueYTotalPercent" | "valueYSum";
 
 	/**
-	 * Indicates what aggregate value to use for collective data item, when
-	 * aggregating X values from several data items.
+	 * How a [[DateAxis]] with `groupData` combines the X values of the data
+	 * items it groups into one: `"open"` takes the first, `"close"` the last,
+	 * `"extreme"` the one farthest from zero, and the rest as named.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @default "close"
 	 */
 	valueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
-	 * Indicates what aggregate value to use for collective data item, when
-	 * aggregating X values from several data items.
+	 * How a [[DateAxis]] with `groupData` combines the Y values of the data
+	 * items it groups into one: `"open"` takes the first, `"close"` the last,
+	 * `"extreme"` the one farthest from zero, and the rest as named.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @default "close"
 	 */
 	valueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
-	 * Input data field for X open value.
+	 * Data field with the open X value, such as where a horizontal column
+	 * starts.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueXField?: string;
 
 	/**
-	 * Input data field for X open value.
+	 * Data field with the open Y value, such as where a column starts.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueYField?: string;
 
 	/**
-	 * Display data field for X open value.
+	 * Which form of the open X value the series plots; see `valueXShow`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueXShow?: "openValueXWorking" | "openValueXChange" | "openValueXChangePercent" | "openValueXChangeSelection" | "openValueXChangeSelectionPercent" | "openValueXChangePrevious" | "openValueXChangePreviousPercent";
 
 	/**
-	 * Display data field for Y open value.
+	 * Which form of the open Y value the series plots; see `valueYShow`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openValueYShow?: "openValueYWorking" | "openValueYChange" | "openValueYChangePercent" | "openValueYChangeSelection" | "openValueYChangeSelectionPercent" | "openValueYChangePrevious" | "openValueYChangePreviousPercent";
 
 	/**
-	 * Display data field for Y open value.
+	 * How grouping combines the open X values; see `valueXGrouped`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @default "open"
 	 */
 	openValueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
-	 * Display data field for Y open value.
+	 * How grouping combines the open Y values; see `valueYGrouped`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @default "open"
 	 */
 	openValueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 
 
 	/**
-	 * Input data field for X low value.
+	 * Data field with the low X value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	lowValueXField?: string;
 
 	/**
-	 * Input data field for Y low value.
+	 * Data field with the low Y value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	lowValueYField?: string;
 
 	/**
-	 * Input data field for X high value.
+	 * Data field with the high X value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	highValueXField?: string;
 
 	/**
-	 * Input data field for Y high value.
+	 * Data field with the high Y value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	highValueYField?: string;
 
 	/**
-	 * Display data field for X low value.
+	 * Which form of the low X value the series plots; see `valueXShow`.
 	 */
 	lowValueXShow?: "lowValueXWorking" | "lowValueXChange" | "lowValueXChangePercent" | "lowValueXChangeSelection" | "lowValueXChangeSelectionPercent" | "lowValueXChangePrevious" | "lowValueXChangePreviousPercent";
 
 	/**
-	 * Display data field for Y low value.
+	 * Which form of the low Y value the series plots; see `valueYShow`.
 	 */
 	lowValueYShow?: "lowValueYWorking" | "lowValueYChange" | "lowValueYChangePercent" | "lowValueYChangeSelection" | "lowValueYChangeSelectionPercent" | "lowValueYChangePrevious" | "lowValueYChangePreviousPercent";
 
 	/**
-	 * Indicates what aggregate value to use for collective data item, when
-	 * aggregating X low values from several data items.
+	 * How grouping combines the low X values; see `valueXGrouped`.
+	 *
+	 * @default "low"
 	 */
 	lowValueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
-	 * Indicates what aggregate value to use for collective data item, when
-	 * aggregating Y low values from several data items.
+	 * How grouping combines the low Y values; see `valueYGrouped`.
+	 *
+	 * @default "low"
 	 */
 	lowValueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
 
 	/**
-	 * Display data field for X high value.
+	 * Which form of the high X value the series plots; see `valueXShow`.
 	 */
 	highValueXShow?: "highValueXWorking" | "highValueXChange" | "highValueXChangePercent" | "highValueXChangeSelection" | "highValueXChangeSelectionPercent" | "highValueXChangePrevious" | "highValueXChangePreviousPercent";
 
 	/**
-	 * Display data field for Y high value.
+	 * Which form of the high Y value the series plots; see `valueYShow`.
 	 */
 	highValueYShow?: "highValueYWorking" | "highValueYChange" | "highValueYChangePercent" | "highValueYChangeSelection" | "highValueYChangeSelectionPercent" | "highValueYChangePrevious" | "highValueYChangePreviousPercent";
 
 	/**
-	 * Indicates what aggregate value to use for collective data item, when
-	 * aggregating X high values from several data items.
+	 * How grouping combines the high X values; see `valueXGrouped`.
+	 *
+	 * @default "high"
 	 */
 	highValueXGrouped?: "open" | "close" | "high" | "average" | "sum" | "extreme";
 
 	/**
-	 * Indicates what aggregate value to use for collective data item, when
-	 * aggregating X high values from several data items.
+	 * How grouping combines the high Y values; see `valueYGrouped`.
+	 *
+	 * @default "high"
 	 */
 	highValueYGrouped?: "open" | "close" | "high" | "average" | "sum" | "extreme";
 
@@ -499,36 +508,37 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 
 
 	/**
-	 * Input data field for X category.
+	 * Data field with the X category.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	categoryXField?: string;
 
 	/**
-	 * Input data field for Y category.
+	 * Data field with the Y category.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	categoryYField?: string;
 
 	/**
-	 * Display data field for X category.
+	 * Data field with the X category a column starts at, so that it can span
+	 * several categories.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openCategoryXField?: string;
 
 	/**
-	 * Display data field for Y category.
+	 * Data field with the Y category a column starts at, so that it can span
+	 * several categories.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
 	 */
 	openCategoryYField?: string;
 
 	/**
-	 * If set to `true` this series will be ignored when calculating scale of the
-	 * related axes.
+	 * Leaves the series out when its axes work out their scale.
 	 *
 	 * @default false
 	 */
@@ -565,59 +575,53 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	locationY?: number;
 
 	/**
-	 * Horizontal location of the open data point relative to its cell.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
-	 *
-	 * @default 0.5
+	 * Where in its X axis cell the open data point sits: `0` at the start,
+	 * `0.5` in the middle, `1` at the end. If not set, `locationX` is used.
 	 */
 	openLocationX?: number;
 
 	/**
-	 * Vertical location of the open data point relative to its cell.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
-	 *
-	 * @default 0.5
+	 * Where in its Y axis cell the open data point sits: `0` at the start,
+	 * `0.5` in the middle, `1` at the end. If not set, `locationY` is used.
 	 */
 	openLocationY?: number;
 
 	/**
-	 * If set to `true` [[XYCursor]] will show closest data item from series
-	 * even if it is outside currently hovered date axis interval.
-	 *
-	 * This setting is relevant only if `baseAxis` is a date axis.
+	 * Lets the cursor show the nearest data item even when there is none in
+	 * the date interval under the pointer. Works only with a [[DateAxis]].
 	 */
 	snapTooltip?: boolean;
 
 	/**
-	 * Text to use for series legend label when no particular category/interval
-	 * is selected.
+	 * Text of the series' legend label while the cursor is not over any of
+	 * its data items. If not set, `legendLabelText` is used.
 	 */
 	legendRangeLabelText?: string;
 
 	/**
-	 * Text to use for series legend value label when no particular
-	 * category/interval is selected.
+	 * Text of the series' legend value label while the cursor is not over any
+	 * of its data items.
 	 */
 	legendRangeValueText?: string;
 
 
 	/**
-	 * If set to `true`, series bullets will be masked by plot area.
+	 * Clips the series' bullets to the plot area.
+	 *
+	 * @default true
 	 */
 	maskBullets?: boolean;
 
 	/**
-	 * Whether series' tooltip should inherit its color from series or its first
-	 * bullet.
+	 * Where the series' tooltip takes its color from: the series (on a
+	 * column series, the hovered column), or the data item's first bullet.
 	 *
 	 * @default "series"
 	 */
 	seriesTooltipTarget?: "series" | "bullet";
 
 	/**
-	 * Indicates horizontal position at which to show series' tooltip at.
+	 * Which of the data item's X values the series' tooltip points at.
 	 *
 	 * @default "value"
 	 * @since 5.0.16
@@ -625,7 +629,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	tooltipPositionX?: "open" | "value" | "low" | "high";
 
 	/**
-	 * Indicates vertical position at which to show series' tooltip at.
+	 * Which of the data item's Y values the series' tooltip points at.
 	 *
 	 * @default "value"
 	 * @since 5.0.16
@@ -634,28 +638,24 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 
 
 	/**
-	 * If set to `true` data items for this series won't be grouped even if
-	 * the `groupData: true` is set on a related [[DateAxis]].
-	 * 
+	 * Keeps the series' data ungrouped even when its [[DateAxis]] has
+	 * `groupData` set.
+	 *
 	 * @since 5.0.19
 	 */
 	groupDataDisabled?: boolean;
 
 	/**
-	 * A [[DataItem]] that is being used for current tooltip, e.g. by a chart
-	 * cursor.
+	 * The data item the series' tooltip currently shows, such as the one
+	 * under the cursor.
 	 *
 	 * @since 5.1.2
 	 */
 	tooltipDataItem?: DataItem<IXYSeriesDataItem>
 
 	/**
-	 * If set to `true`, when data is grouped, the `originals` setting of the
-	 * group data items will be populated by the original (source) data items
-	 * that fall into the group.
-	 *
-	 * Please note that if `groupDataCallback` is set, this setting is ignored
-	 * as originals will always be included, regardless of the value.
+	 * Fills the `originals` of each grouped data item with the source data
+	 * items it was made from. Always on when `groupDataCallback` is set.
 	 *
 	 * @since 5.1.11
 	 * @default false
@@ -663,7 +663,8 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	groupDataWithOriginals?: boolean;
 
 	/**
-	 * A custom function to call when grouping data items.
+	 * Function called for each grouped data item once it is complete, to set
+	 * values of your own. Its `originals` hold the source data items.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Custom_aggregation_functions} for more info
 	 * @since 5.1.11
@@ -837,7 +838,7 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 
 
 /**
- * A base class for all XY chart series.
+ * Base class for all XY chart series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/} for more info
  */
@@ -881,14 +882,15 @@ export abstract class XYSeries extends Series {
 	public _bullets: { [index: string]: Sprite } = {};
 
 	/**
-	 * A [[Container]] that us used to put series' elements in.
+	 * Container that holds the series' elements, such as its lines or
+	 * columns.
 	 *
 	 * @default Container.new()
 	 */
 	public readonly mainContainer: Container = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A list of axis ranges that affect the series.
+	 * Axis ranges of the series, added with `createAxisRange()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 */
@@ -1283,7 +1285,7 @@ export abstract class XYSeries extends Series {
 
 	protected _handleMaskBullets() {
 		if (this.isDirty("maskBullets")) {
-			this.bulletsContainer.set("maskContent", this.get("maskBullets"));
+			this.bulletsContainer._setC("maskContent", this.get("maskBullets"));
 		}
 	}
 
@@ -1294,8 +1296,8 @@ export abstract class XYSeries extends Series {
 		this._setC("x", xAxis.x() - $utils.relativeToValue(xAxis.get("centerX", 0), xAxis.width()) - xAxis.parent!.get("paddingLeft", 0));
 		this._setC("y", yAxis.y() - $utils.relativeToValue(yAxis.get("centerY", 0), yAxis.height()) - yAxis.parent!.get("paddingTop", 0));
 
-		this.bulletsContainer.set("y", this.y());
-		this.bulletsContainer.set("x", this.x());
+		this.bulletsContainer._setC("y", this.y());
+		this.bulletsContainer._setC("x", this.x());
 	}
 
 
@@ -2025,12 +2027,12 @@ export abstract class XYSeries extends Series {
 										y = previousBounds.bottom - bounds.top;
 									}
 									else {
-										y += bounds.bottom;
+										y -= bounds.bottom;
 									}
 								}
 							}
 							else {
-								y += bounds.bottom;
+								y -= bounds.bottom;
 							}
 						}
 						this._bullets[positionX + "_" + positionY] = sprite;
@@ -2133,7 +2135,7 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * Shows hidden series.
+	 * Shows the series.
 	 *
 	 * @param   duration  Duration of animation in milliseconds
 	 * @return            Animation promise
@@ -2159,7 +2161,7 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * Hides series.
+	 * Hides the series.
 	 *
 	 * @param   duration  Duration of animation in milliseconds
 	 * @return            Animation promise
@@ -2176,7 +2178,7 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * Shows series's data item.
+	 * Shows a data item, animating its values back from the base value.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -2199,7 +2201,7 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Hides a data item, animating its values to the value axis's base value.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -2292,9 +2294,10 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * Shows a tooltip for specific data item.
+	 * Shows the series' tooltip for a data item, and shows that data item in
+	 * the legend.
 	 *
-	 * @param  dataItem  Data item
+	 * @param  dataItem  Data item, or `undefined` to clear the tooltip
 	 */
 	public showDataItemTooltip(dataItem: DataItem<this["_dataItemSettings"]> | undefined) {
 		if (!this.getPrivate("doNotUpdateLegend")) {
@@ -2481,7 +2484,8 @@ export abstract class XYSeries extends Series {
 
 
 	/**
-	 * Resets cached axis scale values.
+	 * Clears the series' cached minimum and maximum values, which the axes
+	 * use for their scale.
 	 */
 	public resetExtremes() {
 		this.setPrivate("selectionMinX", undefined);
@@ -2496,7 +2500,8 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * Creates and returns an axis range object.
+	 * Adds an axis range to the series and returns it. Make its data item
+	 * with the axis's `makeDataItem()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 * @param   axisDataItem  Axis data item
@@ -2509,7 +2514,7 @@ export abstract class XYSeries extends Series {
 	}
 
 	/**
-	 * A list of series's main (ungrouped) data items.
+	 * The series' original data items, before any grouping by a [[DateAxis]].
 	 *
 	 * @return  Data items
 	 */

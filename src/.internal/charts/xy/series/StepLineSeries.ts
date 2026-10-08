@@ -12,10 +12,8 @@ export interface IStepLineSeriesDataItem extends ILineSeriesDataItem {
 export interface IStepLineSeriesSettings extends ILineSeriesSettings {
 
 	/**
-	 * Width of the step in percent relative to the cell width.
-	 *
-	 * NOTE: setting this to less than 100% makes sense only when risers are
-	 * disabled: `noRisers: true`
+	 * Width of each step as a percent of its cell. Less than 100% shows only
+	 * with `noRisers` set.
 	 *
 	 * @default 100%
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/#Step_width} for more info
@@ -23,7 +21,8 @@ export interface IStepLineSeriesSettings extends ILineSeriesSettings {
 	stepWidth?: Percent;
 
 	/**
-	 * Disables vertical connecting lines for the steps.
+	 * Draws only the steps, without the risers that join one step to the
+	 * next.
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/#Disabling_risers} for more info
@@ -36,7 +35,8 @@ export interface IStepLineSeriesPrivate extends ILineSeriesPrivate {
 }
 
 /**
- * Used to plot stepped line and/or area series.
+ * A line series drawn as steps: flat across each cell, with risers joining
+ * one step to the next. Its fill below makes a stepped area.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/} for more info
  * @important

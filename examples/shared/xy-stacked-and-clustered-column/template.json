@@ -1,0 +1,7 @@
+{
+  "title": "Stacked and Clustered Columns",
+  "description": "Column series where some are stacked and some start a new cluster, set per series with the stacked setting.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["column", "stacked", "clustered", "category axis", "legend"]
+}

@@ -4,47 +4,56 @@ import { RoundedRectangle, IRoundedRectangleSettings, IRoundedRectanglePrivate }
 export interface ICandlestickSettings extends IRoundedRectangleSettings {
 
 	/**
-	 * X0 position of the low value in pixels.
+	 * X where the low wick starts, at the body, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	lowX0?: number;
 
 	/**
-	 * Y0 position of the low value in pixels.
+	 * Y where the low wick starts, at the body, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	lowY0?: number;
 
 	/**
-	 * X2 position of the low value in pixels.
+	 * X where the low wick ends, at the low value, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	lowX1?: number;
 
 	/**
-	 * Y1 position of the low value in pixels.
+	 * Y where the low wick ends, at the low value, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	lowY1?: number;
 
 	/**
-	 * X0 position of the high value in pixels.
+	 * X where the high wick starts, at the body, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	highX0?: number;
 
 	/**
-	 * Y0 position of the high value in pixels.
+	 * Y where the high wick starts, at the body, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	highY0?: number;
 
 	/**
-	 * Xz position of the high value in pixels.
+	 * X where the high wick ends, at the high value, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	highX1?: number;
 
 	/**
-	 * Y1 position of the high value in pixels.
+	 * Y where the high wick ends, at the high value, in pixels relative to the
+	 * candle. Set by the series.
 	 */
 	highY1?: number;
 
 	/**
-	 * Orientation of the cnadlestick.
+	 * Which way the candle runs: `"vertical"` when the values are on the Y
+	 * axis, `"horizontal"` when they are on the X axis. Set by the series.
 	 */
 	orientation?: "horizontal" | "vertical"
 
@@ -54,7 +63,8 @@ export interface ICandlestickPrivate extends IRoundedRectanglePrivate {
 }
 
 /**
- * A candle element used in a [[CandlestickSeries]].
+ * A candle of a [[CandlestickSeries]]: a body from the open to the close
+ * value, with wicks out to the low and high values.
  */
 export class Candlestick extends RoundedRectangle {
 

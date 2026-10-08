@@ -17,32 +17,33 @@ import * as $time from "../../../core/util/Time";
 export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSettings<R> {
 
 	/**
-	 * Indicates granularity of data.
+	 * The time interval of the data, such as `{ timeUnit: "day", count: 1 }`
+	 * for daily data. Each data item takes up one such period on the axis.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
 	/**
-	 * Relative location of where axis cell starts: 0 - beginning, 1 - end.
-	 *
-	 * IMPORTANT: `startLocation` is not supported by [[GaplessDateAxis]].
+	 * Where within the first period the axis starts, from `0` (its start) to
+	 * `1` (its end): `0.5` cuts off the first half of the first period.
 	 *
 	 * @default 0
 	 */
 	startLocation?: number;
 
 	/**
-	 * Relative location of where axis cell ends: 0 - beginning, 1 - end.
+	 * Where within the last period the axis ends, from `0` (its start) to `1`
+	 * (its end): `0.5` cuts off the second half of the last period.
 	 *
-	 * IMPORTANT: `endLocation` is not supported by [[GaplessDateAxis]].
-	 * 
 	 * @default 1
 	 */
 	endLocation?: number;
 
 	/**
-	 * Should axis group data items together dynamically?
+	 * Groups data items into longer intervals from `groupIntervals` whenever
+	 * more than `groupCount` of them would be in view, and back as the chart
+	 * zooms in.
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
@@ -50,7 +51,8 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	groupData?: boolean;
 
 	/**
-	 * Maximum number of data items in the view before data grouping kicks in.
+	 * Most data items to show at once before `groupData` groups them into a
+	 * longer interval.
 	 *
 	 * @default 500
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
@@ -58,45 +60,47 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	groupCount?: number;
 
 	/**
-	 * Force data item grouping to specific interval. This interval must be within groupIntervals array for this to work.
+	 * Groups data into this interval at any zoom, when `groupData` is on. It
+	 * must be one of `groupIntervals`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupInterval?: ITimeInterval;
 
 	/**
-	 * A list of intervals the axis is allowed to group data items into.
+	 * Intervals `groupData` can group data into, from shortest to longest.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
 	 */
 	groupIntervals?: Array<ITimeInterval>;
 
 	/**
-	 * A list of intervals the axis is allowed to show grid/labels on.
+	 * Intervals the grid and labels can be placed at, from shortest to
+	 * longest. The axis uses the shortest that keeps grid lines at least
+	 * `minGridDistance` apart.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
 
 	/**
-	 * Display "period change" labels using different format.
-	 *
-	 * If set to `true`, will use `periodChangeDateFormats` instead
-	 * of `dateFormats` for such labels, e.g. for month start.
+	 * Formats labels where a new period begins, such as the first day of a
+	 * month, with `periodChangeDateFormats` instead of `dateFormats`.
 	 *
 	 * @default true
 	 */
 	markUnitChange?: boolean;
 
 	/**
-	 * Date formats used for intermediate labels.
+	 * Date formats for labels, by the time unit of the grid, such as `"day"`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	dateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
-	 * Date formats used for minor grid labels.
+	 * Date formats for minor grid labels, by time unit. If not set,
+	 * `dateFormats` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Minor_grid_formats} for more info
 	 * @since 5.6.0
@@ -104,35 +108,33 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	minorDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
-	 * Date formats used for "period change" labels.
+	 * Date formats, by time unit, for labels where a new period begins (see
+	 * `markUnitChange`).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
 	 */
 	periodChangeDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
-	 * A date format to use for axis tooltip.
+	 * Date format for the axis tooltip. Overrides `tooltipDateFormats`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
 	 */
 	tooltipDateFormat?: string | Intl.DateTimeFormatOptions;
 
 	/**
-	 * Time unit-specific formats to use for axis tooltip.
-	 * 
+	 * Date formats for the axis tooltip, by the time unit of the current base
+	 * interval (the group interval while data is grouped).
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
 	 * @since 5.1.4
 	 */
 	tooltipDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
-	 * A value which indicates relative position within axis cell to get timestamp
-	 * for the tooltip from.
-	 *
-	 * Values are from `-1` to `1`.
-	 *
-	 * If not set, it will use `tooltipLocation` value, if `tooltipLocation`` is
-	 * not set, it will use -0.5.
+	 * Shifts the date the axis tooltip shows, in base intervals, from `-1` to
+	 * `1`. If not set, it is minus `tooltipLocation` (`-0.5` by default), so a
+	 * tooltip pointing at the middle of a period shows the period's start.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
 	 * @since 5.1.4
@@ -140,15 +142,17 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	tooltipIntervalOffset?: number;
 
 	/**
-	 * If set to `true`, the axis will skip the first minor grid line and label.
-	 * 
+	 * Skips the minor grid line and label that would fall on each main grid
+	 * line.
+	 *
 	 * @default true
 	 * @since 5.14.0
 	 */
 	skipFirstMinor?: boolean;
 
 	/**
-	 * A relative location of weekly labels.
+	 * Where labels sit within their cell, from `0` (start) to `1` (end), when
+	 * the grid is in weeks. Replaces the labels' `location` then.
 	 *
 	 * @default 0
 	 * @since 5.14.0
@@ -163,17 +167,18 @@ export interface IDateAxisDataItem extends IValueAxisDataItem {
 export interface IDateAxisPrivate extends IValueAxisPrivate {
 
 	/**
-	 * Current group interval.
+	 * The interval data is currently grouped into, when `groupData` is on.
 	 */
 	groupInterval?: ITimeInterval;
 
 	/**
-	 * Current base interval.
+	 * The current base interval: `baseInterval`, or the group interval while
+	 * data is grouped.
 	 */
 	baseInterval: ITimeInterval;
 
 	/**
-	 * Current grid interval.
+	 * The interval between grid lines at the current zoom.
 	 */
 	gridInterval: ITimeInterval;
 }
@@ -181,7 +186,8 @@ export interface IDateAxisPrivate extends IValueAxisPrivate {
 export interface IDateAxisEvents extends IValueAxisEvents {
 
 	/**
-	 * Kicks in when data grouping is on, and current group interval changes, e.g. via zooming the chart.
+	 * The data was regrouped into a different interval, such as after zooming
+	 * (`groupData` is on).
 	 *
 	 * @since 5.2.43
 	 */
@@ -190,7 +196,7 @@ export interface IDateAxisEvents extends IValueAxisEvents {
 }
 
 /**
- * Creates a date axis.
+ * An axis of dates and times, placing each data item at its time.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/} for more info
  * @important
@@ -280,7 +286,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			if (this.isDirty("groupInterval")) {
 				let groupInterval = this.get("groupInterval")!;
 				if (groupInterval) {
-					this.setRaw("groupIntervals", [groupInterval]);
+					this._setCRaw("groupIntervals", [groupInterval]);
 					this._handleRangeChange();
 				}
 			}
@@ -543,9 +549,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns a time interval axis would group data to for a specified duration.
+	 * Returns the interval the axis would group data into to show a time span
+	 * of `duration`.
 	 *
 	 * @since 5.2.1
+	 * @param   duration  Time span in milliseconds
+	 * @return            Group interval
 	 */
 	public getGroupInterval(duration: number): ITimeInterval {
 		let baseInterval = this.get("baseInterval");
@@ -557,10 +566,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Return `max` of a specified time interval.
-	 * 
-	 * Will work only if the axis was grouped to this interval at least once.
-	 * 
+	 * Returns the axis's maximum with data at `interval`, the `baseInterval`
+	 * or a group interval. Known only once the axis has shown data at it.
+	 *
 	 * @since 5.2.1
 	 * @param   interval  Interval
 	 * @return            Max
@@ -570,10 +578,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Return `min` of a specified time interval.
-	 * 
-	 * Will work only if the axis was grouped to this interval at least once.
-	 * 
+	 * Returns the axis's minimum with data at `interval`, the `baseInterval`
+	 * or a group interval. Known only once the axis has shown data at it.
+	 *
 	 * @since 5.2.1
 	 * @param   interval  Interval
 	 * @return            Min
@@ -1029,8 +1036,9 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns a duration of currently active `baseInterval` in milliseconds.
-	 * 
+	 * Returns the duration of the current base interval in milliseconds: the
+	 * group interval while data is grouped, `baseInterval` otherwise.
+	 *
 	 * @return Duration
 	 */
 	public baseDuration(): number {
@@ -1039,7 +1047,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns a duration of user-defined `baseInterval` in milliseconds.
+	 * Returns the duration of the `baseInterval` setting in milliseconds,
+	 * whatever the grouping.
 	 *
 	 * @return Duration
 	 */
@@ -1192,13 +1201,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns text to be used in an axis tooltip for specific relative position.
+	 * Returns the text the axis tooltip shows at a position. Unless
+	 * `adjustPosition` is `false`, the date is shifted by
+	 * `tooltipIntervalOffset`.
 	 *
-	 * NOTE: Unless `adjustPosition` (2nd parameter) is set to `false`, the method
-	 * will adjust position by `tooltipIntervalOffset`.
-	 *
-	 * @param  position        Position
-	 * @param  adjustPosition  Adjust position
+	 * @param  position        Position on the axis (`0` to `1`)
+	 * @param  adjustPosition  `false` to skip the shift
 	 * @return                 Tooltip text
 	 */
 	public getTooltipText(position: number, adjustPosition?: boolean): string | undefined {
@@ -1224,10 +1232,14 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns a data item from series that is closest to the `position`.
+	 * Returns the series data item at a position on the axis: the one whose
+	 * period contains it, or, with `snap` or the series' `snapTooltip`, the
+	 * nearest one.
 	 *
 	 * @param   series    Series
-	 * @param   position  Relative position
+	 * @param   position  Position on the axis (`0` to `1`)
+	 * @param   location  Location within the period (`0` to `1`); `0.5` if not set
+	 * @param   snap      Return the nearest data item even if no period contains the position
 	 * @return            Data item
 	 */
 	public getSeriesItem(series: XYSeries, position: number, location?: number, snap?: boolean): DataItem<IXYSeriesDataItem> | undefined {
@@ -1302,26 +1314,22 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Zooms the axis to specific `start` and `end` dates.
-	 *
-	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 * Zooms the axis to the range between two dates.
 	 *
 	 * @param  start     Start Date
 	 * @param  end       End Date
-	 * @param  duration  Duration in milliseconds
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public zoomToDates(start: Date, end: Date, duration?: number) {
 		this.zoomToValues(start.getTime(), end.getTime(), duration);
 	}
 
 	/**
-	 * Zooms the axis to specific `start` and `end` values.
-	 *
-	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 * Zooms the axis to the range between two timestamps, in milliseconds.
 	 *
 	 * @param  start     Start value
 	 * @param  end       End value
-	 * @param  duration  Duration in milliseconds
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public zoomToValues(start: number, end: number, duration?: number) {
 		const min = this.getPrivate("minFinal", this.getPrivate("min", 0));
@@ -1354,10 +1362,10 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 
 	/**
-	 * Returns a `Date` object corresponding to specific position within plot
-	 * area.
+	 * Returns the date at a position on the axis (`0` to `1`, regardless of
+	 * zoom).
 	 *
-	 * @param   position  Pposition
+	 * @param   position  Position
 	 * @return            Date
 	 */
 	public positionToDate(position: number): Date {
@@ -1365,8 +1373,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns a relative position within plot area that corresponds to specific
-	 * date.
+	 * Returns the position of a date on the axis (`0` to `1`, regardless of
+	 * zoom).
 	 *
 	 * @param   date  Date
 	 * @return        Position
@@ -1376,10 +1384,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
-	 * Returns relative position between two grid lines of the axis.
+	 * Returns the distance between two grid lines as a share of the visible
+	 * part of the axis.
 	 *
 	 * @since 5.2.30
-	 * @return Position
+	 * @return Distance (`0` to `1`)
 	 */
 	public getCellWidthPosition(): number {
 		let max = this.getPrivate("selectionMax", this.getPrivate("max"));

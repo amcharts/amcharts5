@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "確定",
+	"Cancel": "取消",
+	"Delete": "刪除",
+	"Settings": "設定",
+	"Expand": "展開",
+	"Move Up": "上移",
+	"Move Down": "下移"
 };

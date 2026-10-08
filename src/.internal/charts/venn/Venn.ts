@@ -21,27 +21,29 @@ import * as venn from "./vennjs/index.js";
 export interface IVennDataItem extends ISeriesDataItem {
 
 	/**
-	 * Array of categories that this data item is an intersection for.
+	 * Categories of the circles this data item is the overlap of. Set only for
+	 * overlaps.
 	 */
 	intersections: Array<string>;
 
 	/**
-	 * Category.
+	 * The circle's category, which overlaps refer to in `intersections`.
 	 */
 	category: string;
 
 	/**
-	 * Slice visual element.
+	 * The shape that shows the data item: a circle, or the area where circles
+	 * overlap.
 	 */
 	slice: Graphics;
 
 	/**
-	 * Slice label.
+	 * The slice's label.
 	 */
 	label: Label;
 
 	/**
-	 * A related legend data item.
+	 * The data item's entry in a legend.
 	 */
 	legendDataItem: DataItem<ILegendDataItem>;
 
@@ -63,17 +65,18 @@ export interface IVennDataItem extends ISeriesDataItem {
 export interface IVennSettings extends ISeriesSettings {
 
 	/**
-	 * A field in data that holds array of categories that overlap.
+	 * Field in `data` that holds the categories of the circles an overlap is
+	 * made of.
 	 */
 	intersectionsField?: string;
 
 	/**
-	 * A [[ColorSet]] to use when asigning colors for slices.
+	 * Colors for slices with no `fill` in data, one after another.
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * A [[PatternSet]] to use when asigning patterns for slices.
+	 * Patterns for slices with no `fillPattern`, one after another.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
 	 * @since 5.10.0
@@ -81,12 +84,12 @@ export interface IVennSettings extends ISeriesSettings {
 	patterns?: PatternSet;
 
 	/**
-	 * A field in data that holds category names.
+	 * Field in `data` that holds the circles' categories.
 	 */
 	categoryField?: string;
 
 	/**
-	 * A field that holds color for slice fill.
+	 * Field in `data` that holds a slice's fill color.
 	 */
 	fillField?: string;
 
@@ -96,7 +99,8 @@ export interface IVennPrivate extends ISeriesPrivate {
 }
 
 /**
- * Creates a Venn diagram.
+ * A Venn diagram: circles sized by their values, overlapping as much as the
+ * values of their overlaps say.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/venn/} for more info
  * @important
@@ -113,22 +117,21 @@ export class Venn extends Series {
 	protected _sets: string = "";
 
 	/**
-	 * A [[Container]] that holds all slices (circles and intersections).
+	 * Holds all slices: circles and overlaps.
 	 *
 	 * @default Container.new()
 	 */
 	public readonly slicesContainer = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A [[Container]] that holds all labels.
+	 * Holds all labels.
 	 *
 	 * @default Container.new()
 	 */
 	public readonly labelsContainer = this.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A [[Graphics]] element that is used to show the shape of the hovered slice
-	 * or intersection.
+	 * Drawn over the hovered slice, in its shape.
 	 *
 	 * @default Graphics.new()
 	 */
@@ -152,9 +155,7 @@ export class Venn extends Series {
 
 
 	/**
-	 * A [[ListTemplate]] of all slices in series.
-	 *
-	 * `slices.template` can also be used to configure slices.
+	 * All slices of the series. Configure them through `slices.template`.
 	 */
 	public readonly slices: ListTemplate<Graphics> = this.addDisposer(this._makeSlices());
 
@@ -204,9 +205,8 @@ export class Venn extends Series {
 	}
 
 	/**
-	 * A [[ListTemplate]] of all slice labels in series.
-	 *
-	 * `labels.template` can also be used to configure slice labels.
+	 * All slice labels of the series. Configure them through
+	 * `labels.template`.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(this._makeLabels());
 
@@ -399,9 +399,9 @@ export class Venn extends Series {
 	}
 
 	/**
-	 * Looks up and returns a data item by its category.
+	 * Returns the data item of a circle by its category.
 	 *
-	 * @param   category  Category
+	 * @param   id  Category
 	 * @return      Data item
 	 */
 	public getDataItemByCategory(id: string): DataItem<this["_dataItemSettings"]> | undefined {
@@ -412,7 +412,8 @@ export class Venn extends Series {
 
 
 	/**
-	 * Shows series's data item.
+	 * Shows a data item. Showing an overlap shows its circles too; showing a
+	 * circle shows again the overlaps whose circles are all shown.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -481,7 +482,7 @@ export class Venn extends Series {
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Hides a data item. Hiding a circle hides the overlaps it is part of too.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -565,7 +566,7 @@ export class Venn extends Series {
 	}
 
 	/**
-	 * Triggers hover on a series data item.
+	 * Hovers the slice of a data item.
 	 *
 	 * @since 5.0.7
 	 * @param  dataItem  Target data item
@@ -578,7 +579,7 @@ export class Venn extends Series {
 	}
 
 	/**
-	 * Triggers un-hover on a series data item.
+	 * Unhovers the slice of a data item.
 	 *
 	 * @since 5.0.7
 	 * @param  dataItem  Target data item

@@ -14,17 +14,19 @@ import * as $utils from "../../core/util/Utils";
 export interface IStockLegendDataItem extends ILegendDataItem {
 
 	/**
-	 * Legend item "close" [[Button]].
+	 * The item's close [[Button]]. Compared series and indicators drawn over
+	 * the main series show it, so the user can remove them.
 	 */
 	closeButton: Button;
 
 	/**
-	 * Legend item "settings" [[Button]].
+	 * The item's settings [[Button]], which opens the settings modal for the
+	 * indicator or series.
 	 */
 	settingsButton: Button;
 
 	/**
-	 * Target [[StockPanel]] legend item is attached to.
+	 * The [[StockPanel]] the item belongs to.
 	 */
 	panel: StockPanel;
 
@@ -34,7 +36,7 @@ export interface IStockLegendDataItem extends ILegendDataItem {
 export interface IStockLegendSettings extends ILegendSettings {
 
 	/**
-	 * A target [[StockChart]].
+	 * The [[StockChart]] the legend belongs to.
 	 */
 	stockChart: StockChart;
 
@@ -47,7 +49,8 @@ export interface IStockLegendEvents extends ILegendEvents {
 }
 
 /**
- * A legend, specifically designed for use in a [[StockChart]].
+ * A legend for a [[StockChart]] panel, with settings and close buttons on its
+ * items.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Legend} for more info
  * @important
@@ -78,9 +81,8 @@ export class StockLegend extends Legend {
 	}
 
 	/**
-	 * A list of "close" buttons in legend items.
-	 *
-	 * @default new ListTemplate<Button>()
+	 * The items' close buttons. Settings on `closeButtons.template` apply to
+	 * all of them.
 	 */
 	public readonly closeButtons: ListTemplate<Button> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -126,9 +128,8 @@ export class StockLegend extends Legend {
 	}
 
 	/**
-	 * A list of "settings" buttons in legend items.
-	 *
-	 * @default new ListTemplate<Button>()
+	 * The items' settings buttons. Settings on `settingsButtons.template`
+	 * apply to all of them.
 	 */
 	public readonly settingsButtons: ListTemplate<Button> = this.addDisposer(new ListTemplate(
 		Template.new({}),

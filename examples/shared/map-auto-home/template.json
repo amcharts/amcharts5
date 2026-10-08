@@ -1,0 +1,8 @@
+{
+  "title": "Map with Home Position",
+  "description": "A map that opens zoomed in on Europe, using the home settings and autoHome, with a home button to return there.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["home", "zoom", "zoom control", "autoHome"],
+  "since": "5.21.0"
+}

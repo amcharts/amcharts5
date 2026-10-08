@@ -1,0 +1,7 @@
+{
+  "title": "Treemap with Breadcrumbs",
+  "description": "A treemap that drills into a branch on click, with a breadcrumb bar to go back up.",
+  "category": "hierarchy",
+  "tier": "basic",
+  "tags": ["treemap", "hierarchy", "breadcrumbs", "drill-down"]
+}

@@ -1,0 +1,7 @@
+{
+  "title": "Smoothed Line Chart",
+  "description": "A smoothed line series with a fill and bullets on a date axis.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["smoothed line", "area", "bullets", "date axis"]
+}

@@ -9,7 +9,8 @@ import * as $array from "../../../core/util/Array";
 export interface IMovingAverageSettings extends IIndicatorSettings {
 
 	/**
-	 * Type of the moving average.
+	 * Kind of moving average: `"simple"`, `"weighted"`, `"exponential"`,
+	 * `"dema"` (double exponential) or `"tema"` (triple exponential).
 	 *
 	 * @default "simple"
 	 */
@@ -23,8 +24,9 @@ export interface IMovingAverageSettings extends IIndicatorSettings {
 	type?: "simple" | "weighted" | "exponential" | "dema" | "tema";
 
 	/**
-	 * Offset.
-	 * 
+	 * Shifts the line by this many data items: positive values move it right
+	 * (later in time), negative ones left.
+	 *
 	 * @default 0
 	 */
 	offset?: number;
@@ -38,7 +40,8 @@ export interface IMovingAverageEvents extends IIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Moving Average indicator: a line over the main series, averaging `field`
+ * over the last `period` data items.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -51,7 +54,7 @@ export class MovingAverage extends Indicator {
 	declare public _events: IMovingAverageEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

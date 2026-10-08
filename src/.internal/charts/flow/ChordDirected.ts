@@ -15,9 +15,8 @@ export interface IChordDirectedDataItem extends IChordDataItem {
 export interface IChordDirectedSettings extends IChordSettings {
 
 	/**
-	 * Length of the link arrow in pixels.
-	 *
-	 * Set to `null` to disable arrowheads.
+	 * Length of the arrowhead at the target end of each link, in pixels.
+	 * `null` draws links without arrowheads.
 	 *
 	 * @default 10
 	 */
@@ -32,7 +31,9 @@ export interface IChordDirectedEvents extends IChordEvents {
 }
 
 /**
- * Directed chord series.
+ * Chord diagram for one-way flows: a node's arc shows its incoming and
+ * outgoing totals together, and each link keeps its width all the way to the
+ * target, where it ends in an arrowhead.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important
@@ -51,9 +52,7 @@ export class ChordDirected extends Chord {
 	public _ribbonArrow: RibbonArrowGenerator<any, Ribbon, RibbonSubgroup> = ribbonArrow();
 
 	/**
-	 * List of link elements.
-	 *
-	 * @default new ListTemplate<ChordLinkDirected>
+	 * List of link elements; configure them all through `links.template`.
 	 */
 	public readonly links: ListTemplate<ChordLinkDirected> = this.addDisposer(new ListTemplate(
 		Template.new({}),

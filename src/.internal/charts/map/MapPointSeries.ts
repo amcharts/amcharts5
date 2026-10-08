@@ -13,6 +13,9 @@ import * as $math from "../../core/util/Math";
 import type { IPoint } from "../../core/util/IPoint";
 import type { Animation } from "../../core/util/Entity";
 import type { IDisposer } from "../../core/util/Disposer";
+import type { IGeoPoint } from "../../core/util/IGeoPoint";
+import type { IDeform } from "../../core/render/backend/Renderer";
+import { projectAltitude } from "./MapUtils";
 
 export interface IMapPointSeriesPrivate extends IMapSeriesPrivate {
 }
@@ -25,68 +28,80 @@ export interface IMapPointSeriesDataItem extends IMapSeriesDataItem {
 	geometry?: GeoJSON.Point | GeoJSON.MultiPoint;
 
 	/**
-	 * Longitude.
+	 * Longitude of the point, in degrees.
 	 */
 	longitude?: number;
 
 	/**
-	 * Latitude.
+	 * Latitude of the point, in degrees.
 	 */
 	latitude?: number;
 
 	/**
-	 * Relative position (0-1) on the [[MapLine]] to place point on.
+	 * Height above the ground, in metres: `400000` is about the height of the
+	 * International Space Station. On flat maps the point rises up the screen.
+	 *
+	 * Read from data only when the series sets `altitudeField`. A point on a
+	 * line takes the line's altitude instead.
+	 *
+	 * @since 5.21.0
+	 */
+	altitude?: number;
+
+	/**
+	 * Where on its line the point sits, from `0` (start) to `1` (end).
 	 */
 	positionOnLine?: number;
 
 	/**
-	 * Automatically rotate the point bullet to face the direction of the line
-	 * it is attached to.
+	 * Turns the bullet to face the way its line runs.
 	 */
 	autoRotate?: boolean;
 
 	/**
-	 * The angle will be added to the automatically-calculated angle.
-	 *
-	 * Can be used to reverse the direction.
+	 * Degrees added to the angle `autoRotate` works out, such as `180` to face
+	 * the other way.
 	 */
 	autoRotateAngle?: number;
 
 	/**
-	 * A data item from a [[MapLineSeries]] the point is attached to.
+	 * Data item of a line in a [[MapLineSeries]] to place the point on, at
+	 * `positionOnLine`.
 	 */
 	lineDataItem?: DataItem<IMapLineSeriesDataItem>;
 
 	/**
-	 * An ID of a [[MapLine]] the point is attached to.
+	 * Id of a line, in any [[MapLineSeries]] of the chart, to place the point
+	 * on, at `positionOnLine`.
 	 */
 	lineId?: string;
 
 	/**
-	 * A data item from a [[MapPolygonSeries]] to use for positioning of the
-	 * point.
+	 * Data item of a polygon in a [[MapPolygonSeries]] to place the point at,
+	 * in its visual center.
 	 */
 	polygonDataItem?: DataItem<IMapPolygonSeriesDataItem>;
 
 	/**
-	 * An ID of the [[MapPolygon]] to use for centering the point.
+	 * Id of a polygon, in any [[MapPolygonSeries]] of the chart, to place the
+	 * point at, in its visual center.
 	 */
 	polygonId?: string;
 
 	/**
-	 * If set to `true`, the point will be drawn according to its `x` and `y`
-	 * coordinates, not its latitude and longitude.
-	 * 
-	 * Fixed points will not move together with map, and can not be used to
-	 * connect points on a `MapLineSeries`.
-	 * 
+	 * Places the point by its bullet's own `x` and `y` instead of its longitude
+	 * and latitude, so it stays put as the map moves.
+	 *
+	 * A [[MapLineSeries]] can't connect fixed points.
+	 *
 	 * @default false
 	 * @since 5.2.34
 	 */
 	fixed?: boolean;
 
 	/**
-	 * Point (in pixels) of a data item
+	 * Where the point is drawn, in pixels, relative to the map's area. Set by
+	 * the series.
 	 */
 	point?: IPoint;
 
@@ -99,51 +114,60 @@ export interface IMapPointSeriesDataItem extends IMapSeriesDataItem {
 export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 
 	/**
-	 * A field in data that holds an ID of the related polygon.
-	 *
-	 * If set, the point will be positioned in the visual center of the target
-	 * polygon.
+	 * Field in `data` that holds the id of a polygon to place the point at, in
+	 * its visual center. Not set by default.
 	 */
 	polygonIdField?: string;
 
 	/**
-	 * If set to `true` will hide all points that are in the visible range of
-	 * the map.
+	 * Hides the points on the side of the map facing the viewer. With
+	 * `clipBack: false`, only the points behind a globe show.
 	 *
 	 * @default false
 	 */
 	clipFront?: boolean;
 
 	/**
-	 * If set to `true` will hide all points that are in the invisible range of
-	 * the map.
-	 *
-	 * For example on the side of the globe facing away from the viewer when
-	 * used with Orthographic projection.
-	 *
-	 * NOTE: not all projections have invisible side.
+	 * Hides the points on the far side of a globe. Only projections with a
+	 * hidden side, such as `geoOrthographic`, are affected.
 	 *
 	 * @default true
 	 */
 	clipBack?: boolean;
 
 	/**
-	 * A field in data that holds point's latitude.
+	 * Lays bullets onto the map's surface: each bullet turns, squashes and
+	 * stretches with the projection where it is, as if painted on the map.
+	 * On a globe they flatten towards the edge; on Mercator they grow towards
+	 * the poles.
+	 *
+	 * @default false
+	 * @since 5.21.0
+	 */
+	surfaceBullets?: boolean;
+
+	/**
+	 * Field in `data` that holds the point's latitude.
+	 *
+	 * @default "latitude"
 	 */
 	latitudeField?: string;
 
 	/**
-	 * A field in data that holds point's longitude.
+	 * Field in `data` that holds the point's longitude.
+	 *
+	 * @default "longitude"
 	 */
 	longitudeField?: string;
 
 	/**
-	 * A field in data that holds information if this point is fixed or moves with a map.
+	 * Field in `data` that holds whether the point is `fixed`. Not set by
+	 * default.
 	 */
 	fixedField?: string;
 
 	/**
-	 * A field in data that holds an ID of a [[MapLine]] the point is attached to.
+	 * Field in `data` that holds the id of the line the point sits on.
 	 *
 	 * @default "lineId"
 	 * @since 5.20.6
@@ -151,8 +175,19 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	lineIdField?: string;
 
 	/**
-	 * A field in data that holds a relative position (0-1) of the point on the
-	 * line it is attached to.
+	 * Field in `data` that holds the point's height above the ground, in
+	 * metres.
+	 *
+	 * Not set by default, so a data column that happens to be called
+	 * "altitude" (perhaps in feet, or above sea level) isn't read as heights.
+	 *
+	 * @since 5.21.0
+	 */
+	altitudeField?: string;
+
+	/**
+	 * Field in `data` that holds where on its line the point sits, from `0`
+	 * (start) to `1` (end).
 	 *
 	 * @default "positionOnLine"
 	 * @since 5.20.6
@@ -160,8 +195,8 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	positionOnLineField?: string;
 
 	/**
-	 * A field in data that holds whether the point rotates to face the direction
-	 * of the line it is attached to.
+	 * Field in `data` that holds whether the point turns to face the way its
+	 * line runs.
 	 *
 	 * @default "autoRotate"
 	 * @since 5.20.6
@@ -169,8 +204,8 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	autoRotateField?: string;
 
 	/**
-	 * A field in data that holds an angle added to the automatically calculated
-	 * rotation.
+	 * Field in `data` that holds degrees added to the angle `autoRotate` works
+	 * out.
 	 *
 	 * @default "autoRotateAngle"
 	 * @since 5.20.6
@@ -178,8 +213,9 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 	autoRotateAngleField?: string;
 
 	/**
-	 * If set to `true`, bullets will resize when zooming the [[MapChart]].
-	 * 
+	 * Scales bullets with the map's zoom level, so they grow as the map zooms
+	 * in.
+	 *
 	 * @since 5.2.8
 	 * @default false
 	 */
@@ -188,7 +224,8 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
 };
 
 /**
- * Creates a map series for displaying markers on the map.
+ * A map series of points, shown as bullets. A point sits at a longitude and
+ * latitude, in a polygon, or on a line.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/} for more info
  * @important
@@ -231,10 +268,11 @@ export class MapPointSeries extends MapSeries {
 		return back;
 	}
 
-	protected _lineChangedDp?: IDisposer;
+	// Each data item on a line follows changes to that line
+	protected _lineChangedDps: Map<DataItem<IMapPointSeriesDataItem>, { line: MapLine, dp: IDisposer }> = new Map();
 
 	protected _afterNew() {
-		this.fields.push("polygonId", "lineId", "longitude", "latitude", "fixed", "positionOnLine", "autoRotate", "autoRotateAngle");
+		this.fields.push("polygonId", "lineId", "longitude", "latitude", "altitude", "fixed", "positionOnLine", "autoRotate", "autoRotateAngle");
 		this._setRawDefault("longitudeField", "longitude");
 		this._setRawDefault("latitudeField", "latitude");
 		this._setRawDefault("lineIdField", "lineId");
@@ -252,8 +290,9 @@ export class MapPointSeries extends MapSeries {
 	}
 
 	/**
-	 * Forces a repaint of the element which relies on data.
+	 * Redraws the series, and places the bullets of `dataItem` again.
 	 *
+	 * @param  dataItem  Data item whose bullets to place
 	 * @since 5.0.21
 	 */
 	public markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -367,14 +406,18 @@ export class MapPointSeries extends MapSeries {
 				}
 			}
 
-			if (this._lineChangedDp) {
-				this._lineChangedDp.dispose();
+			const watched = this._lineChangedDps.get(dataItem);
+			if (watched && watched.line !== line) {
+				watched.dp.dispose();
+				this._lineChangedDps.delete(dataItem);
 			}
-
-			if (line) {
-				this._lineChangedDp = line.events.on("linechanged", () => {
-					this._positionBullets(dataItem);
-				})
+			if (line && (!watched || watched.line !== line)) {
+				this._lineChangedDps.set(dataItem, {
+					line,
+					dp: line.events.on("linechanged", () => {
+						this._positionBullets(dataItem);
+					})
+				});
 			}
 
 			const polygonDataItem = dataItem.get("polygonDataItem");
@@ -400,6 +443,7 @@ export class MapPointSeries extends MapSeries {
 
 			const positionOnLine = dataItem.get("positionOnLine");
 			let coordinates: [number, number] | undefined;
+			let altitude = dataItem.get("altitude", 0);
 
 			let angle: number | undefined;
 
@@ -412,13 +456,15 @@ export class MapPointSeries extends MapSeries {
 			else if (line && $type.isNumber(positionOnLine)) {
 				let geoPoint = line.positionToGeoPoint(positionOnLine);
 				coordinates = [geoPoint.longitude, geoPoint.latitude];
+				altitude = line.positionToAltitude(positionOnLine);
 
 				if (dataItem.get("autoRotate", bullet.get("autoRotate")) && chart) {
 					const geoPoint0 = line.positionToGeoPoint(positionOnLine - 0.002);
 					const geoPoint1 = line.positionToGeoPoint(positionOnLine + 0.002);
 
-					const point0 = chart.convert(geoPoint0);
-					const point1 = chart.convert(geoPoint1);
+					// Along the raised line when it is raised
+					const point0 = this._raisedPoint(geoPoint0, line.positionToAltitude(positionOnLine - 0.002)) || chart.convert(geoPoint0);
+					const point1 = this._raisedPoint(geoPoint1, line.positionToAltitude(positionOnLine + 0.002)) || chart.convert(geoPoint1);
 
 					//dataItem.set("autoRotateAngle", $math.getAngle(point0, point1));
 					angle = $math.getAngle(point0, point1);
@@ -439,7 +485,7 @@ export class MapPointSeries extends MapSeries {
 				const geometry = dataItem.get("geometry")!;
 				if (geometry) {
 					if (geometry.type == "Point") {
-						this._positionBulletReal(bullet, geometry, geometry.coordinates as [number, number], angle);
+						this._positionBulletReal(bullet, geometry, geometry.coordinates as [number, number], angle, altitude);
 					}
 					else if (geometry.type == "MultiPoint") {
 						let index = bullet._index || 0;
@@ -449,12 +495,20 @@ export class MapPointSeries extends MapSeries {
 			}
 
 			if (!fixed && coordinates) {
-				this._positionBulletReal(bullet, { type: "Point", coordinates: coordinates }, coordinates, angle);
+				this._positionBulletReal(bullet, { type: "Point", coordinates: coordinates }, coordinates, angle, altitude);
 			}
 		}
 	}
 
-	protected _positionBulletReal(bullet: Bullet, geometry: GeoJSON.Geometry, coordinates: [number, number], angle?: number) {
+	// Where a point raised above the surface appears; nothing when it is not raised
+	protected _raisedPoint(geoPoint: IGeoPoint, altitude: number): IPoint | undefined {
+		const chart = this.chart;
+		if (chart && altitude) {
+			return projectAltitude(chart.get("projection")!, geoPoint.longitude, geoPoint.latitude, altitude);
+		}
+	}
+
+	protected _positionBulletReal(bullet: Bullet, geometry: GeoJSON.Geometry, coordinates: [number, number], angle?: number, altitude?: number) {
 		const sprite = bullet.get("sprite");
 		const chart = this.chart;
 		if (chart) {
@@ -462,23 +516,38 @@ export class MapPointSeries extends MapSeries {
 			const geoPath = chart.getPrivate("geoPath");
 			const dataItem: DataItem<IMapPointSeriesDataItem> = sprite.dataItem as DataItem<IMapPointSeriesDataItem>;
 
-			const xy = projection(coordinates as any);
-
-			if (xy) {
-				const point = { x: xy[0], y: xy[1] };
-				sprite.setAll(point);
-				dataItem.setRaw("point", point);
-			}
-
 			let visible = true;
-			if (geoPath(geometry)) {
-				if (this.get("clipFront")) {
+			if (altitude) {
+				// Raised: a far point shows where it rises past the globe's edge
+				const raised = projectAltitude(projection, coordinates[0], coordinates[1], altitude);
+				if (raised) {
+					const point = { x: raised.x, y: raised.y };
+					sprite.setAll(point);
+					dataItem.setRaw("point", point);
+					visible = raised.far ? !(raised.hidden && this.get("clipBack")) : !this.get("clipFront");
+				}
+				else {
 					visible = false;
 				}
 			}
 			else {
-				if (this.get("clipBack")) {
-					visible = false;
+				const xy = projection(coordinates as any);
+
+				if (xy) {
+					const point = { x: xy[0], y: xy[1] };
+					sprite.setAll(point);
+					dataItem.setRaw("point", point);
+				}
+
+				if (geoPath(geometry)) {
+					if (this.get("clipFront")) {
+						visible = false;
+					}
+				}
+				else {
+					if (this.get("clipBack")) {
+						visible = false;
+					}
 				}
 			}
 			sprite.setPrivate("visible", visible);
@@ -487,16 +556,72 @@ export class MapPointSeries extends MapSeries {
 			if (dataItem && angle != null && dataItem.get("autoRotate", bullet.get("autoRotate"))) {
 				sprite.set("rotation", angle + dataItem.get("autoRotateAngle", bullet.get("autoRotateAngle", 0)));
 			}
+
+			// Only a changed deform redraws the bullet (zooming a flat map keeps it)
+			const deform = this.get("surfaceBullets") ? this._surfaceDeform(coordinates[0], coordinates[1]) : undefined;
+			const current = sprite.getPrivate("deform") as IDeform | null | undefined;
+			if (!deform || !current || deform.a !== current.a || deform.b !== current.b || deform.c !== current.c || deform.d !== current.d) {
+				sprite.setPrivate("deform", deform);
+			}
+		}
+	}
+
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		if (this.isDirty("surfaceBullets")) {
+			$array.each(this.dataItems, (dataItem) => {
+				this._positionBullets(dataItem);
+			});
 		}
 	}
 
 	/**
-	 * Centers the map to specific series' data item and zooms to the level
-	 * specified in the parameters.
+	 * How the surface looks at a point, against the map's center: the
+	 * projected east and north directions, as a 2x2 transform for a bullet.
+	 */
+	protected _surfaceDeform(longitude: number, latitude: number): IDeform | undefined {
+		const chart = this.chart;
+		if (!chart) {
+			return;
+		}
+		const projection = chart.get("projection")!;
+		const scale = projection.scale();
+		const step = 0.5;
+		const point = projection([longitude, latitude]);
+		const north = projection([longitude, Math.min(89.99, latitude + step)]);
+		if (!point || !north) {
+			return;
+		}
+
+		// East by the same distance as north; across a flat map's edge, west instead
+		const eastStep = step / Math.max(Math.cos(latitude * $math.RADIANS), 0.01);
+		let east = projection([longitude + eastStep, latitude]);
+		let sign = 1;
+		if (!east || Math.abs(east[0] - point[0]) > Math.PI * scale / 2) {
+			east = projection([longitude - eastStep, latitude]);
+			sign = -1;
+		}
+		if (!east) {
+			return;
+		}
+
+		const k = 1 / (step * $math.RADIANS * scale);
+		return {
+			a: (east[0] - point[0]) * k * sign,
+			b: (east[1] - point[1]) * k * sign,
+			c: -(north[0] - point[0]) * k,
+			d: -(north[1] - point[1]) * k
+		};
+	}
+
+	/**
+	 * Zooms the map to a point, centered.
 	 *
-	 * @param  dataItem   Map point
+	 * @param  dataItem   Data item of the point
 	 * @param  zoomLevel  Zoom level
-	 * @param  rotate If it's true, the map will rotate so that this point would be in the center. Mostly usefull with geoOrthographic projection.
+	 * @param  rotate     Also rotate the map to bring the point to the middle, as on a globe
+	 * @return            Zoom level animation
 	 */
 	public zoomToDataItem(dataItem: DataItem<IMapPointSeriesDataItem>, zoomLevel: number, rotate?: boolean): Animation<any> | undefined {
 		const chart = this.chart;
@@ -512,11 +637,11 @@ export class MapPointSeries extends MapSeries {
 
 
 	/**
-	 * Zooms the map in so that all points in the array are visible.
+	 * Zooms the map to fit several points.
 	 *
-	 * @param   dataItems  An array of data items of points to zoom to
-	 * @param   rotate     Rotate the map so it is centered on the selected items
-	 * @return             Animation
+	 * @param   dataItems  Data items of the points
+	 * @param   rotate     Also rotate the map to bring the middle of their bounds to the middle of the view
+	 * @return             Zoom level animation
 	 * @since 5.5.6
 	 */
 	public zoomToDataItems(dataItems: Array<DataItem<IMapPointSeriesDataItem>>, rotate?: boolean): Animation<any> | undefined {
@@ -547,7 +672,7 @@ export class MapPointSeries extends MapSeries {
 			const chart = this.chart;
 			if (chart) {
 				if (rotate) {
-					return chart.zoomToGeoBounds({ left, right, top, bottom }, undefined, -(left + (right - left) / 2), -(top + (top - bottom) / 2));
+					return chart.zoomToGeoBounds({ left, right, top, bottom }, undefined, -(left + (right - left) / 2), -(bottom + (top - bottom) / 2));
 				}
 				return chart.zoomToGeoBounds({ left, right, top, bottom });
 			}
@@ -578,7 +703,21 @@ export class MapPointSeries extends MapSeries {
 			})
 		}
 
+		const watched = this._lineChangedDps.get(dataItem);
+		if (watched) {
+			watched.dp.dispose();
+			this._lineChangedDps.delete(dataItem);
+		}
+
 		super.disposeDataItem(dataItem);
+	}
+
+	protected _dispose() {
+		this._lineChangedDps.forEach((watched) => {
+			watched.dp.dispose();
+		});
+		this._lineChangedDps.clear();
+		super._dispose();
 	}
 
 	/**
@@ -591,7 +730,7 @@ export class MapPointSeries extends MapSeries {
 			$array.each(bullets, (bullet) => {
 				const sprite = bullet.get("sprite");
 				if (sprite) {
-					sprite.setPrivate("visible", false);
+					this._setExcluded(sprite, true);
 				}
 			})
 		}
@@ -608,7 +747,7 @@ export class MapPointSeries extends MapSeries {
 			$array.each(bullets, (bullet) => {
 				const sprite = bullet.get("sprite");
 				if (sprite) {
-					sprite.setPrivate("visible", true);
+					this._setExcluded(sprite, false);
 				}
 			})
 		}
@@ -624,7 +763,7 @@ export class MapPointSeries extends MapSeries {
 			$array.each(bullets, (bullet) => {
 				const sprite = bullet.get("sprite");
 				if (sprite) {
-					sprite.setPrivate("visible", false);
+					this._setExcluded(sprite, true);
 				}
 			})
 		}
@@ -640,7 +779,7 @@ export class MapPointSeries extends MapSeries {
 			$array.each(bullets, (bullet) => {
 				const sprite = bullet.get("sprite");
 				if (sprite) {
-					sprite.setPrivate("visible", true);
+					this._setExcluded(sprite, false);
 				}
 			})
 		}

@@ -19,7 +19,7 @@ export interface ILineArrowSeriesDataItem extends ISimpleLineSeriesDataItem {
 export interface ILineArrowSeriesSettings extends ISimpleLineSeriesSettings {
 
 	/**
-	 * Show a dotted line extending from both ends of the drawn line.
+	 * Has no effect here: line arrows never show the dotted extension.
 	 *
 	 * @default true
 	 */
@@ -30,7 +30,8 @@ export interface ILineArrowSeriesPrivate extends ISimpleLineSeriesPrivate {
 }
 
 /**
- * Used for Line Arrow drawing tool in [[StockChart]].
+ * Draws a straight line with an arrowhead at its end, for the Line Arrow tool
+ * of a [[StockChart]].
  *
  * @since 5.10.5
  */
@@ -185,6 +186,9 @@ export class LineArrowSeries extends SimpleLineSeries {
 		return arrow;
 	}
 
+	/**
+	 * Arrowheads at the ends of the lines.
+	 */
 	public readonly arrows: ListTemplate<Triangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Triangle._new(this._root, { themeTags: ["arrow"] }, [this.arrows.template])

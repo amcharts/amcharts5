@@ -1,0 +1,7 @@
+{
+  "title": "Gapless Date Axis",
+  "description": "A line of weekday values on a GaplessDateAxis, which leaves out the weekends so the points stay evenly spaced.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["line", "date axis", "gapless", "weekends", "cursor"]
+}

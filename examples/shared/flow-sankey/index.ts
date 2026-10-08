@@ -16,33 +16,36 @@ root.setThemes([
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/flow-charts/
+// https://www.amcharts.com/docs/v5/charts/flow-charts/sankey-diagram/
 const series = root.container.children.push(am5flow.Sankey.new(root, {
-  sourceIdField: "from",
-  targetIdField: "to",
+  sourceIdField: "source",
+  targetIdField: "target",
   valueField: "value",
-  paddingRight: 50
+  paddingRight: 50 // room for the labels of the last nodes, which sit right of them
 }));
-
-series.nodes.get("colors").set("step", 2);
+// every second color of the color set, so neighboring nodes differ more
+series.nodes.get("colors")!.set("step", 2);
 
 
 // Set data
 // https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
+// each row is one link from a source node to a target node, as thick as its value;
+// the nodes are created from the ids the links use
 series.data.setAll([
-  { from: "A", to: "D", value: 10 },
-  { from: "B", to: "D", value: 8 },
-  { from: "B", to: "E", value: 4 },
-  { from: "C", to: "E", value: 3 },
-  { from: "D", to: "G", value: 5 },
-  { from: "D", to: "I", value: 2 },
-  { from: "D", to: "H", value: 3 },
-  { from: "E", to: "H", value: 6 },
-  { from: "G", to: "J", value: 5 },
-  { from: "I", to: "J", value: 1 },
-  { from: "H", to: "J", value: 9 }
+  { source: "A", target: "D", value: 10 },
+  { source: "B", target: "D", value: 8 },
+  { source: "B", target: "E", value: 4 },
+  { source: "C", target: "E", value: 3 },
+  { source: "D", target: "G", value: 5 },
+  { source: "D", target: "I", value: 2 },
+  { source: "D", target: "H", value: 3 },
+  { source: "E", target: "H", value: 6 },
+  { source: "G", target: "J", value: 5 },
+  { source: "I", target: "J", value: 1 },
+  { source: "H", target: "J", value: 9 }
 ]);
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

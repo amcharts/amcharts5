@@ -8,12 +8,12 @@ import * as $array from "../../../core/util/Array";
 export interface IAroonSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Color for ups.
+	 * Color of the Aroon Up line.
 	 */
 	upColor?: Color;
 
 	/**
-	 * Color for downs.
+	 * Color of the Aroon Down line.
 	 */
 	downColor?: Color;
 
@@ -27,7 +27,9 @@ export interface IAroonEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Aroon indicator: two lines from `0` to `100` showing how recent the highest
+ * high (Aroon Up) and the lowest low (Aroon Down) of the last `period` data
+ * items are. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -40,12 +42,12 @@ export class Aroon extends ChartIndicator {
 	declare public _events: IAroonEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the Aroon Up line.
 	 */
 	declare public series: LineSeries;
 
 	/**
-	 * Indicator series for downs.
+	 * Series of the Aroon Down line.
 	 */
 	declare public downSeries: LineSeries;
 

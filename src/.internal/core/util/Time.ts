@@ -9,17 +9,28 @@ import * as $utils from "./Utils";
 import type { Timezone } from "./Timezone";
 import type { Root } from "../Root";
 
+/**
+ * A unit of time.
+ */
 export type TimeUnit = "millisecond" | "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
 
+/**
+ * A span of time, such as 5 minutes: `{ timeUnit: "minute", count: 5 }`.
+ */
 export interface ITimeInterval {
+	/**
+	 * Unit of the interval.
+	 */
 	timeUnit: TimeUnit;
+	/**
+	 * How many units the interval spans.
+	 */
 	count: number;
 }
 
 
 /**
- * Returns a `Promise` which can be used to execute code after number of
- * milliseconds.
+ * Returns a promise that resolves after `ms` milliseconds.
  *
  * @param   ms  Sleep duration in ms
  * @return      Promise
@@ -84,13 +95,11 @@ export function getNextUnit(unit: TimeUnit): TimeUnit | undefined {
 }
 
 /**
- * Returns number of milliseconds in the `count` of time `unit`.
- *
- * Available units: "millisecond", "second", "minute", "hour", "day", "week",
- * "month", and "year".
+ * Returns the length of `count` units of time, in milliseconds. A month counts
+ * as an average month (about 30.44 days), a year as 365 days.
  *
  * @param unit   Time unit
- * @param count  Number of units
+ * @param count  Number of units; `1` if not given
  * @return Milliseconds
  */
 export function getDuration(unit: TimeUnit, count?: number): number {
@@ -111,6 +120,18 @@ export function getIntervalDuration(interval: ITimeInterval | undefined) {
 }
 
 
+/**
+ * Returns the length of `interval` in milliseconds, for the period that
+ * `date` falls in. Days, weeks, months and years get their real length there,
+ * such as 29 days for February 2024.
+ *
+ * @param interval         Interval
+ * @param date             Date in the period
+ * @param firstDateOfWeek  First day of week, `0` for Sunday
+ * @param utc              Use UTC
+ * @param timezone         Use a named timezone
+ * @return Milliseconds
+ */
 export function getDateIntervalDuration(interval: ITimeInterval, date: Date, firstDateOfWeek?: number, utc?: boolean, timezone?: Timezone) {
 	const unit = interval.timeUnit;
 	const count = interval.count;
@@ -154,12 +175,14 @@ export function copy(date: Date): Date {
 }
 
 /**
- * Checks if the `unit` part of two `Date` objects do not match. Two dates
- * represent a "range" of time, rather the same time date.
+ * Returns `true` if two timestamps fall in different periods of `unit`, such
+ * as on different days for `"day"`.
  *
- * @param timeOne  timestamp
- * @param timeTwo  timestamp
- * @param unit     Time unit to check
+ * @param timeOne   First timestamp
+ * @param timeTwo   Second timestamp
+ * @param unit      Time unit to check
+ * @param utc       Use UTC
+ * @param timezone  Use a named timezone
  * @return Range?
  */
 export function checkChange(timeOne: number, timeTwo: number, unit: TimeUnit, utc?: boolean, timezone?: Timezone): boolean {
@@ -253,11 +276,13 @@ export function checkChange(timeOne: number, timeTwo: number, unit: TimeUnit, ut
 }
 
 /**
- * Adds `count` of time `unit` to the source date. Returns a modified `Date` object.
+ * Adds `count` units of time to `date`. Changes `date` itself and returns it.
  *
- * @param date   Source date
- * @param unit   Time unit
- * @param count  Number of units to add
+ * @param date      Source date
+ * @param unit      Time unit
+ * @param count     Number of units to add
+ * @param utc       Use UTC
+ * @param timezone  Use a named timezone
  * @return Modified date
  */
 export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean, timezone?: Timezone): Date {
@@ -362,15 +387,15 @@ export function roun(time: number, unit: TimeUnit, count: number, root: Root, fi
 
 
 /**
- * "Rounds" the date to specific time unit.
+ * Rounds a date down to the start of its period of `count` units, such as to
+ * midnight for `"day"`. May change `date` itself.
  *
  * @param date             Source date
  * @param unit             Time unit
  * @param count            Number of units to round to
- * @param firstDateOfWeek  First day of week
+ * @param firstDateOfWeek  First day of week, `0` for Sunday; `1` (Monday) if not given
  * @param utc              Use UTC timezone
- * @param firstDate        First date to round to
- * @param roundMinutes     Minutes to round to (some timezones use non-whole hour)
+ * @param firstDate        Date to count periods from, for `"day"` and `"week"` with `count` above `1`
  * @param timezone         Use specific named timezone when rounding
  * @return New date
  */

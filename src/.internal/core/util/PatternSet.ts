@@ -10,28 +10,31 @@ import { Entity, IEntitySettings, IEntityPrivate } from "./Entity";
 export interface IPatternSetSettings extends IEntitySettings {
 
 	/**
-	 * List of colors in the set.
+	 * The patterns in the set. A built-in list of 16 patterns if not set.
 	 */
 	patterns?: Pattern[];
 
 	/**
-	 * A step size when using `next()`.
-	 *
-	 * E.g. setting to `2` will make it return every second pattern in the list.
+	 * How many positions `next()` moves each time: `2` returns every second
+	 * pattern.
 	 *
 	 * @default 1
 	 */
 	step?: number;
 
 	/**
-	 * A base color to use for all patterns.
+	 * Color of the built-in patterns, used when `patterns` is not set. Changing
+	 * it after the set is created has no effect.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
 	 */
 	color?: Color;
 
 	/**
-	 * Start iterating patterns from specific index.
+	 * Index of the pattern the first `next()` returns, and `reset()` goes back
+	 * to.
+	 *
+	 * @default 0
 	 */
 	startIndex?: number;
 
@@ -40,7 +43,7 @@ export interface IPatternSetSettings extends IEntitySettings {
 export interface IPatternSetPrivate extends IEntityPrivate {
 
 	/**
-	 * Current step.
+	 * Index of the pattern the next `next()` returns.
 	 */
 	currentStep?: number;
 
@@ -48,8 +51,7 @@ export interface IPatternSetPrivate extends IEntityPrivate {
 
 
 /**
- * An object which holds list of [[Pattern]] objects and can serve them up in
- * an interative way.
+ * A list of [[Pattern]] objects that series and other elements take in turn.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
  * @since 5.10.0
@@ -214,10 +216,10 @@ export class PatternSet extends Entity {
 	}
 
 	/**
-	 * Returns a [[Pattern]] at specific index.
+	 * Returns the [[Pattern]] at `index`.
 	 *
 	 * @param   index  Index
-	 * @return         Color
+	 * @return         Pattern
 	 */
 	public getIndex(index: number): Pattern {
 		const patterns = this.get("patterns", []);
@@ -229,16 +231,17 @@ export class PatternSet extends Entity {
 
 
 		if (index > (patterns.length - 1)) {
-			const adjustedIndex = index - Math.floor(index * (index / patterns.length));
+			const adjustedIndex = index % patterns.length;
 			return patterns[adjustedIndex];
 		}
 		return patterns[index];
 	}
 
 	/**
-	 * Returns next [[Color]] in the list.
+	 * Returns the next [[Pattern]] in the list, `step` positions after the last
+	 * one.
 	 *
-	 * If the list is out of colors, new ones are generated dynamically.
+	 * @return  Pattern
 	 */
 	public next(): Pattern {
 		let currentStep = this.getPrivate("currentStep", this.get("startIndex", 0));
@@ -247,15 +250,14 @@ export class PatternSet extends Entity {
 	}
 
 	/**
-	 * Resets counter to the start of the list, so the next call for `next()` will
-	 * return the first pattern.
+	 * Starts over, so the next `next()` returns the pattern at `startIndex`.
 	 */
 	public reset(): void {
 		this.setPrivate("currentStep", this.get("startIndex", 0));
 	}
 
 	/**
-	 * Returns a [[LinePattern].
+	 * Creates a [[LinePattern]] with these settings.
 	 *
 	 * @param   settings  Pattern settings
 	 * @return            Pattern object
@@ -266,7 +268,7 @@ export class PatternSet extends Entity {
 	}
 
 	/**
-	 * Returns a [[RectanglePattern].
+	 * Creates a [[RectanglePattern]] with these settings.
 	 *
 	 * @param   settings  Pattern settings
 	 * @return            Pattern object
@@ -277,7 +279,7 @@ export class PatternSet extends Entity {
 	}
 
 	/**
-	 * Returns a [[CirclePattern].
+	 * Creates a [[CirclePattern]] with these settings.
 	 *
 	 * @param   settings  Pattern settings
 	 * @return            Pattern object

@@ -12,37 +12,39 @@ import * as $utils from "../../core/util/Utils";
 export interface ISpiralChartSettings extends ICurveChartSettings {
 
 	/**
-	 * Number of spiral circles.
+	 * Number of turns the spiral makes from `innerRadius` to the outer edge.
 	 *
 	 * @default 3
 	 */
 	levelCount?: number;
 
 	/**
-	 * y Axis radius in percent.
+	 * Length of the Y axis, as a percent of the distance between neighboring
+	 * turns.
 	 *
-	 * @default 50%
+	 * @default 60%
 	 */
 	yAxisRadius?: Percent;
 
 	/**
-	 * Start angle of the spiral in degrees.
+	 * Angle in degrees where the spiral starts, at its inner end: `0` points
+	 * right, `-90` up.
 	 *
 	 * @default -90
 	 */
 	startAngle?: number;
 
 	/**
-	 * End angle of the spiral in degrees.
+	 * Angle in degrees where the spiral ends, at its outer edge.
 	 *
 	 * @default 0
 	 */
 	endAngle?: number;
 
 	/**
-	 * Inner radius of the spiral in percent.
+	 * Radius where the spiral starts, as a percent of the chart's radius.
 	 *
-	 * @default 60%
+	 * @default 20%
 	 */
 	innerRadius?: Percent;
 
@@ -52,13 +54,10 @@ export interface ISpiralChartPrivate extends ICurveChartPrivate {
 }
 
 /**
- * A spiral chart.
- * 
- * For this chart to work, it needs curve points provided via renderer of
- * its X-axis.
- * 
- * Note: it is an experimental chart type and does not support all the
- * functionality of the [[XYChart]].
+ * A timeline that winds outward in a spiral, clockwise. It builds the X axis
+ * line itself, so the X renderer needs no `points`.
+ *
+ * It is experimental and does not support everything an [[XYChart]] does.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0

@@ -4,7 +4,9 @@ import { Percent } from "../util/Percent";
 import type { Container } from "./Container";
 
 /**
- * A horizontal children layout for [[Container]].
+ * Lays out a [[Container]]'s children side by side, from left to right.
+ * Children with a percent width share the width the others leave, in
+ * proportion to their percents.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
  */

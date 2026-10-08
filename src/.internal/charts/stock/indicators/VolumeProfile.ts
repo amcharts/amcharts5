@@ -14,51 +14,55 @@ import * as $array from "../../../core/util/Array";
 
 export interface IVolumeProfileSettings extends IIndicatorSettings {
 	/**
-	 * Volume up color.
+	 * Color of the up volume part of each row.
 	 */
 	upColor?: Color;
 
 	/**
-	 * Volume down color.
+	 * Color of the down volume part of each row.
 	 */
 	downColor?: Color;
 
 	/**
-	 * Type of count.
+	 * How the price range is split into rows: `"rows"` into `count` rows of
+	 * equal height, `"ticks"` into rows `count` ticks tall.
+	 *
+	 * @default "rows"
 	 */
 	countType?: "rows" | "ticks";
 
 	/**
-	 * Number of rows or number of ticks, depending on the countType.
+	 * Number of rows, or with `countType: "ticks"`, the height of a row in
+	 * ticks of `0.01`.
 	 *
 	 * @default 24
 	 */
 	count?: number;
 
 	/**
-	 * Max width of columns in percent (%).
-	 * 
+	 * Width of the profile's longest row, in percent of the plot area width.
+	 *
 	 * @default 40
 	 */
 	axisWidth?: number;
 
 	/**
-	 * Specifies what percentage of all volume for the trading session should
-	 * be highlighted by Value Area.
-	 * 
+	 * Percent of the visible range's volume to highlight as the value area:
+	 * the rows around the row with the most volume.
+	 *
 	 * @default 70
 	 */
 	valueArea?: number;
 
 	/**
-	 * Opacity of columns which fall withing value area.
-	 * 
+	 * Fill opacity of the rows in the value area.
+	 *
 	 * @default .7
 	 */
 	valueAreaOpacity?: number;
 
 	/**
-	 * Chart's main volume series.
+	 * The volume series to build the profile from. Required.
 	 */
 	volumeSeries: XYSeries;
 }
@@ -70,7 +74,9 @@ export interface IVolumeProfileEvents extends IIndicatorEvents {
 }
 
 /**
- * An implementation of a Volume Profile indicator for a [[StockChart]].
+ * Volume Profile indicator: horizontal rows over the main series showing how
+ * much volume traded at each price in the visible range, split into up and
+ * down volume.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  * @since 5.7.0
@@ -84,7 +90,7 @@ export class VolumeProfile extends Indicator {
 	declare public _events: IVolumeProfileEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the down volume columns.
 	 */
 	declare public series: ColumnSeries;
 
@@ -127,19 +133,23 @@ export class VolumeProfile extends Indicator {
 		step: 1
 	}];
 
+	/**
+	 * Horizontal axis the rows' volume is measured on.
+	 */
 	public xAxis!: ValueAxis<AxisRendererX>;
 
+	/**
+	 * Series of the up volume columns, drawn after the down volume.
+	 */
 	public upSeries!: ColumnSeries;
 
 	protected _previousColumn?: Graphics;
 
 	/**
-	 * Keeps the `count` setting's limits in sync with the current `countType`:
-	 * rows mode is a fixed 10..500 (step 1); ticks mode uses an axis-dependent
-	 * range derived from the y-axis step (so it scales with the instrument), with
-	 * an upper cap that keeps the row count sane. Also mirrors those bounds onto
-	 * the `countType` dropdown's "ticks" option. Looks entries up by key rather
-	 * than by array index.
+	 * Sets the limits of `count` for the current `countType`: `10` to `500`
+	 * (step `1`) for rows; for ticks, a range derived from the Y axis step, so
+	 * it scales with the instrument. Also applies them to the dropdown's
+	 * "ticks" option.
 	 */
 	protected _updateCountBounds(): void {
 		let ticksOption: any;
@@ -364,6 +374,8 @@ export class VolumeProfile extends Indicator {
 					fill: upColor,
 					stroke: upColor
 				});
+				// Turbo mode draws the columns with the colours they had when laid out
+				this.upSeries.markDirtyValues();
 
 				this.setCustomData("upColor", upColor);
 			}

@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"]
+  "title": "Stock Chart with Volume Panel",
+  "description": "A stock chart that shows volume in a second panel, which has its own axes, legend and cursor and stays in sync with the main one.",
+  "category": "stock",
+  "tier": "technique",
+  "tags": ["stock panel", "volume", "candlestick", "legend", "cursor", "toolbar"],
+  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "chartdiv": { "height": "calc(100vh - 36px)" }
 }

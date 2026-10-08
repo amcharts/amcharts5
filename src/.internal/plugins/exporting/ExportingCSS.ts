@@ -102,11 +102,11 @@ function makeStyles(element: ShadowRoot | null, root: Root): IDisposer {
 			"right": "0"
 		}, root.nonce),
 
-		new StyleRule(element, ".am5exporting-menu.am5exporting-valign-top, .am5exporting-icon.am5exporting-valign-top, .am5exporting-list.am5exporting-align-top", {
+		new StyleRule(element, ".am5exporting-menu.am5exporting-valign-top, .am5exporting-icon.am5exporting-valign-top, .am5exporting-list.am5exporting-valign-top", {
 			"top": "0"
 		}, root.nonce),
 
-		new StyleRule(element, ".am5exporting-menu.am5exporting-valign-bottom, .am5exporting-icon.am5exporting-valign-bottom, .am5exporting-list.am5exporting-align-bottom", {
+		new StyleRule(element, ".am5exporting-menu.am5exporting-valign-bottom, .am5exporting-icon.am5exporting-valign-bottom, .am5exporting-list.am5exporting-valign-bottom", {
 			"bottom": "0"
 		}, root.nonce),
 

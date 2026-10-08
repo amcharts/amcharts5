@@ -1,0 +1,7 @@
+{
+  "title": "Radar Line Chart",
+  "description": "A line series with bullets on a radar chart, with a category axis around the circle and a cursor.",
+  "category": "radar",
+  "tier": "basic",
+  "tags": ["radar", "line", "category axis", "bullets", "cursor"]
+}

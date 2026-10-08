@@ -20,7 +20,7 @@ export interface ICandlestickSeriesPrivate extends IColumnSeriesPrivate {
 export interface ICandlestickSeriesAxisRange extends IColumnSeriesAxisRange {
 
 	/**
-	 * A list of [[Candlestick]] element in series.
+	 * Candles of the series within the range.
 	 *
 	 * @readonly
 	 */
@@ -29,7 +29,9 @@ export interface ICandlestickSeriesAxisRange extends IColumnSeriesAxisRange {
 }
 
 /**
- * Candlestick series.
+ * A series that shows open, high, low and close values as candles
+ * ([[Candlestick]]). A candle that closes below its open takes the
+ * `negative` interface color, the others the `positive` one.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
@@ -61,9 +63,7 @@ export class CandlestickSeries extends ColumnSeries {
 	}
 
 	/**
-	 * A list of candles in the series.
-	 *
-	 * `columns.template` can be used to configure candles.
+	 * Candles of the series. Configure them all through `columns.template`.
 	 *
 	 * @default new ListTemplate<Candlestick>
 	 */

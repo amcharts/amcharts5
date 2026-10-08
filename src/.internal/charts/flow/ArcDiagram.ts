@@ -15,7 +15,7 @@ import * as $array from "../../core/util/Array";
 export interface IArcDiagramDataItem extends IFlowDataItem {
 
 	/**
-	 * A link element.
+	 * The link element.
 	 */
 	link: ArcDiagramLink;
 
@@ -33,33 +33,40 @@ export interface IArcDiagramDataItem extends IFlowDataItem {
 
 export interface IArcDiagramSettings extends IFlowSettings {
 	/**
-	 * Orientation of the series. This setting can not be changed after the chart is initialized.
+	 * Puts the nodes in a row along the bottom with arcs above them
+	 * (`"horizontal"`), or in a column on the left with arcs to the right
+	 * (`"vertical"`). Set it when creating the series; it can't be changed
+	 * later.
 	 *
 	 * @default "horizontal"
 	 */
 	orientation: "horizontal" | "vertical";
 
 	/**
-	 * Minimum radius of a nodes circle.
-	 * Maximum radius is computed based on available space
+	 * Smallest radius of a node circle, in pixels. The largest follows from
+	 * the space available.
+	 *
 	 * @default 5
 	 */
 	minRadius?: number;
 
 	/**
-	 * Defines which value should be used when calculating circle radius. Use "none" if you want all circles to be the same.
+	 * Node value that sizes the circles: `"sum"` (all links),
+	 * `"sumIncoming"`, `"sumOutgoing"`, or `"none"` for circles all the same
+	 * size.
 	 *
 	 * @default "sum"
 	 */
 	radiusKey?: "sum" | "sumIncoming" | "sumOutgoing" | "none";
 
 	/**
-	 * Duration for all drill animations in milliseconds.
+	 * Duration of the animation that moves nodes to new positions when values
+	 * change, for example after a node is toggled, in milliseconds.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * An easing function to use for drill animations.
+	 * Easing of the node animation set by `animationDuration`.
 	 */
 	animationEasing?: Easing;
 }
@@ -71,7 +78,8 @@ export interface IArcDiagramEvents extends IFlowEvents {
 }
 
 /**
- * Regular ArcDiagram series.
+ * Arc diagram: nodes as circles in a row or column, sized by their values and
+ * linked by arcs.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important
@@ -82,9 +90,7 @@ export class ArcDiagram extends Flow {
 	public static classNames: Array<string> = Flow.classNames.concat([ArcDiagram.className]);
 
 	/**
-	 * List of link elements.
-	 *
-	 * @default new ListTemplate<ArcDiagramLink>
+	 * List of link elements; configure them all through `links.template`.
 	 */
 	public readonly links: ListTemplate<ArcDiagramLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -92,9 +98,7 @@ export class ArcDiagram extends Flow {
 	));
 
 	/**
-	 * A series for all ArcDiagram nodes.
-	 *
-	 * @default ArcDiagramNodes.new()
+	 * The series that holds the diagram's nodes.
 	 */
 	public readonly nodes: ArcDiagramNodes = this.children.push(ArcDiagramNodes.new(this._root, {}));
 

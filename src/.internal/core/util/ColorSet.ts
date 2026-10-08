@@ -5,47 +5,47 @@ import { Color } from "./Color";
 export interface IColorSetSettings extends IEntitySettings {
 
 	/**
-	 * List of colors in the set.
+	 * The colors in the set. Generated colors are added to this list.
 	 */
 	colors?: Color[];
 
 	/**
-	 * A step size when using `next()`.
-	 *
-	 * E.g. setting to `2` will make it return every second color in the list.
+	 * How many positions `next()` moves each time: `2` returns every second
+	 * color.
 	 *
 	 * @default 1
 	 */
 	step?: number;
 
 	/**
-	 * Start iterating colors from specific index.
+	 * Index of the color the first `next()` returns, and `reset()` goes back to.
 	 *
 	 * @default 0
 	 */
 	startIndex?: number;
 
 	/**
-	 * If set to `true`, color set will reuse existing colors from the list
-	 * instead of generating new ones.
+	 * Repeats the list from the start when it runs out, instead of generating
+	 * new colors.
 	 *
 	 * @default false
 	 */
 	reuse?: boolean;
 
 	/**
-	 * A base color to generate new colors from if `colors` is not specified.
+	 * A base color to generate new colors from if `colors` is not set.
 	 */
 	baseColor?: Color;
 
 	/**
-	 * A set of transformations to apply to base list of colors when the set runs
-	 * out of colors and generates additional ones.
+	 * How the colors generated when the list runs out differ from the original
+	 * list. Each time the list runs out, a new pass of colors is added, shifted
+	 * by these amounts once more.
 	 */
 	passOptions?: IColorSetStepOptions;
 
 	/**
-	 * If set, each returned color will be applied saturation.
+	 * Saturation for every color the set returns, from `0` (grey) to `1`.
 	 */
 	saturation?: number;
 
@@ -67,17 +67,17 @@ export interface IColorSetPrivate extends IEntityPrivate {
 export interface IColorSetStepOptions {
 
 	/**
-	 * Value to add to "hue".
+	 * Added to the hue on each pass. `1` is a full turn of the color wheel.
 	 */
 	hue?: number;
 
 	/**
-	 * Value to add to "saturation".
+	 * Added to the saturation (`0` to `1`) on each pass.
 	 */
 	saturation?: number;
 
 	/**
-	 * Value to add to "lightness".
+	 * Added to the lightness (`0` to `1`) on each pass.
 	 */
 	lightness?: number;
 
@@ -85,7 +85,8 @@ export interface IColorSetStepOptions {
 
 
 /**
- * An object which holds list of colors and can generate new ones.
+ * A list of colors that series and other elements take in turn. When the
+ * list runs out, it generates more.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Color_sets} for more info
  */
@@ -149,9 +150,8 @@ export class ColorSet extends Entity {
 	}
 
 	/**
-	 * Returns a [[Color]] at specific index.
-	 *
-	 * If there's no color at this index, a new color is generated.
+	 * Returns the [[Color]] at `index`, generating more colors if the list is
+	 * shorter.
 	 *
 	 * @param   index  Index
 	 * @return         Color
@@ -168,9 +168,10 @@ export class ColorSet extends Entity {
 	}
 
 	/**
-	 * Returns next [[Color]] in the list.
+	 * Returns the next [[Color]] in the list, `step` positions after the last
+	 * one. Generates more colors when the list runs out.
 	 *
-	 * If the list is out of colors, new ones are generated dynamically.
+	 * @return  Color
 	 */
 	public next() {
 		let currentStep = this.getPrivate("currentStep", this.get("startIndex", 0));
@@ -179,8 +180,7 @@ export class ColorSet extends Entity {
 	}
 
 	/**
-	 * Resets counter to the start of the list, so the next call for `next()` will
-	 * return the first color.
+	 * Starts over, so the next `next()` returns the color at `startIndex`.
 	 */
 	public reset() {
 		this.setPrivate("currentStep", this.get("startIndex", 0));

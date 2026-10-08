@@ -2,10 +2,9 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Midnight" — a dark theme on a deep-navy ground, with a series palette tuned
- * to read well on it.
- *
- * This is a standalone theme; it does not modify the built-in `DarkTheme`.
+ * "Midnight": a dark theme on a deep navy background, with series colors of
+ * even depth tuned to show on it. It sets all interface colors, so use it
+ * instead of `Dark`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

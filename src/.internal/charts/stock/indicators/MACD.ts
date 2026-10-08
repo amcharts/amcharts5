@@ -10,32 +10,39 @@ import * as $array from "../../../core/util/Array";
 export interface IMACDSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Increasing color.
+	 * Color of difference columns higher than the previous one.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * Decreasing color.
+	 * Color of difference columns lower than the previous one.
 	 */
 	decreasingColor?: Color;
 
 	/**
-	 * Signal color.
+	 * Color of the signal line.
 	 */
 	signalColor?: Color;
 
 	/**
-	 * A value for "fast" period.
+	 * Period of the fast exponential moving average.
+	 *
+	 * @default 12
 	 */
 	fastPeriod?: number;
 
 	/**
-	 * A value for "slow" period.
+	 * Period of the slow exponential moving average.
+	 *
+	 * @default 26
 	 */
 	slowPeriod?: number;
 
 	/**
-	 * A value for "signal" period.
+	 * Period of the signal line, an exponential moving average of the MACD
+	 * line.
+	 *
+	 * @default 9
 	 */
 	signalPeriod?: number;
 
@@ -48,7 +55,9 @@ export interface IMACDEvents extends IChartIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * MACD (Moving Average Convergence Divergence) indicator: the fast minus the
+ * slow exponential moving average of `field`, with a signal line and columns
+ * of the difference between the two. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -61,17 +70,17 @@ export class MACD extends ChartIndicator {
 	declare public _events: IMACDEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the MACD line.
 	 */
 	declare public series: LineSeries;
 
 	/**
-	 * Indicator series for the signal.
+	 * Series of the signal line.
 	 */
 	public signalSeries!: LineSeries;
 
 	/**
-	 * Indicator series for the difference.
+	 * Columns of the difference between the MACD and signal lines.
 	 */
 	public differenceSeries!: ColumnSeries;
 
@@ -181,6 +190,8 @@ export class MACD extends ChartIndicator {
 			template.states.create("riseFromPrevious", { fill: increasing, stroke: increasing });
 			template.states.create("dropFromPrevious", { fill: decreasing, stroke: decreasing });
 			this._dataDirty = true;
+			// The columns take the states only when they are laid out again
+			this.differenceSeries.markDirtyValues();
 		}
 
 		if (this.isDirty("signalColor")) {

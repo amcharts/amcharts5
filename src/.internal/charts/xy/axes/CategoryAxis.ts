@@ -15,36 +15,41 @@ import * as $utils from "../../../core/util/Utils";
 export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
 
 	/**
-	 * A function that can be used to specify how to configure axis fills.
+	 * Function that decides which axis fills show; it is called for each
+	 * category with its index. The default fills every other category.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_fills} for more info
 	 */
 	fillRule?: (dataItem: DataItem<ICategoryAxisDataItem>, index?: number) => void;
 
 	/**
-	 * A field in data which holds categories.
+	 * Field in the data that holds the category names.
 	 */
 	categoryField: string;
 
 	/**
-	 * A key to look up in data for an id of the data item.
+	 * Field in the data that holds a unique id for each category.
 	 */
 	idField?: string;
 
 	/**
-	 * A key to look up in data for a relative size value of the data item. 
+	 * Field in the data that holds each category's relative size: a category
+	 * of `2` takes twice the room of one of `1`. Categories without it get
+	 * `1`.
 	 */
 	cellSizeField?: string;
 
 	/**
-	 * Relative location of where axis cell starts: 0 - beginning, 1 - end.
+	 * Where within the first category the axis starts, from `0` (its start)
+	 * to `1` (its end): `0.5` cuts off the first half of the first category.
 	 *
 	 * @default 0
 	 */
 	startLocation?: number;
 
 	/**
-	 * Relative location of where axis cell ends: 0 - beginning, 1 - end.
+	 * Where within the last category the axis ends, from `0` (its start) to
+	 * `1` (its end): `0.5` cuts off the second half of the last category.
 	 *
 	 * @default 1
 	 */
@@ -54,13 +59,12 @@ export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSett
 export interface ICategoryAxisDataItem extends IAxisDataItem {
 
 	/**
-	 * Named category.
+	 * The category name.
 	 */
 	category?: string;
 
 	/**
-	 * Named end category (for axis items that span multiple categories, like
-	 * axis ranges).
+	 * End category, for axis ranges that span several categories.
 	 */
 	endCategory?: string;
 
@@ -70,28 +74,30 @@ export interface ICategoryAxisDataItem extends IAxisDataItem {
 	index?: number;
 
 	/**
-	 * Relative location of the category within cell: 0 - start, 1 - end.
+	 * Where within `category` the item starts, from `0` (start) to `1` (end).
+	 *
+	 * @default 0
 	 */
 	categoryLocation?: number;
 
 	/**
-	 * Relative location of the end category within cell: 0 - start, 1 - end.
+	 * Where within `endCategory` (or `category`) the item ends, from `0`
+	 * (start) to `1` (end).
+	 *
+	 * @default 1
 	 */
 	endCategoryLocation?: number;
 
 	/**
-	 * A distance to shift data item relative to its original position.
-	 *
-	 * The value is 0 to 1, where 1 is full witdth of the axis.
-	 *
-	 * Can be used to sort data items without modifying order of the actual data.
+	 * Shifts the category from its place, as a share of the whole axis
+	 * length (`1` is the full axis). Used to animate sorting without
+	 * reordering the data.
 	 */
 	deltaPosition?: number;
 
 	/**
-	 * A size of the category cell.
-	 *
-	 * NOTE: This value is used only if `cellSizeField` is set on the series.
+	 * Relative size of the category's cell. Used only when the axis has
+	 * `cellSizeField` set.
 	 */
 	cellSize?: number;
 
@@ -109,12 +115,12 @@ export interface ICategoryAxisDataItem extends IAxisDataItem {
 export interface ICategoryAxisPrivate extends IAxisPrivate {
 
 	/**
-	 * Start index of the current zoom scope.
+	 * Index of the first category in view.
 	 */
 	startIndex?: number;
 
 	/**
-	 * End index of the current zoom scope.
+	 * Index after the last category in view.
 	 */
 	endIndex?: number;
 }
@@ -124,7 +130,8 @@ export interface ICategoryAxisEvents extends IAxisEvents {
 }
 
 /**
- * Creates a category axis.
+ * An axis of named categories, each taking an equal share of the axis unless
+ * `cellSizeField` sets their sizes.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-axis/} for more info
  * @important
@@ -157,15 +164,15 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 			this.setPrivateRaw("maxZoomFactor", len);
 		}
 
-		// fix final indexes		
-		this.setPrivateRaw("startIndex", Math.min(this.getPrivate("startIndex", 0), len));
-		this.setPrivateRaw("endIndex", Math.min(this.getPrivate("endIndex", len), 1));
+		// Keep the indexes within the data until the next frame works them out from the zoom
+		this.setPrivateRaw("startIndex", Math.max(Math.round(this.get("start", 0) * len), 0));
+		this.setPrivateRaw("endIndex", Math.min(Math.round(this.get("end", 1) * len), len));
 	}
 
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if(this.isDirty("startLocation") || this.isDirty("endLocation")){
+		if (this.isDirty("startLocation") || this.isDirty("endLocation")) {
 			this._sizeDirty = true;
 		}
 
@@ -184,7 +191,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let start = this.get("start", 0);
 		let end = this.get("end", 1);
-		
+
 		let indices = this._getIndices(start, end);
 
 		this.setPrivateRaw("startIndex", indices.startIndex);
@@ -497,7 +504,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 			if (!$type.isNumber(index)) {
 				this._toggleDataItem(dataItem, false);
-				return;				
+				return;
 			}
 		}
 		else {
@@ -520,11 +527,17 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 	}
 
+	/**
+	 * Returns the index of the first category in view.
+	 */
 	public startIndex() {
 		let len = this.dataItems.length;
 		return Math.min(Math.max(this.getPrivate("startIndex", 0), 0), len - 1);
 	}
 
+	/**
+	 * Returns the index after the last category in view.
+	 */
 	public endIndex() {
 		let len = this.dataItems.length;
 		return Math.max(1, Math.min(this.getPrivate("endIndex", len), len));
@@ -545,9 +558,9 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns X coordinate in pixels corresponding to specific category index.
+	 * Returns the X coordinate in pixels of the middle of a category.
 	 *
-	 * @param   value  Index
+	 * @param   value  Category
 	 * @return         X coordinate
 	 */
 	public getX(value: string): number {
@@ -559,9 +572,9 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns Y coordinate in pixels corresponding to specific category index.
+	 * Returns the Y coordinate in pixels of the middle of a category.
 	 *
-	 * @param   value  Index
+	 * @param   value  Category
 	 * @return         Y coordinate
 	 */
 	public getY(value: string): number {
@@ -612,15 +625,12 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Converts category index to a relative position.
-	 *
-	 * `location` indicates relative position within category: 0 - start, 1 - end.
-	 *
-	 * If not set, will use middle (0.5) of the category.
+	 * Converts a category index to a position on the axis (`0` to `1`).
 	 *
 	 * @param   index     Index
-	 * @param   location  Location
-	 * @return            Index
+	 * @param   location  Location within the category, from `0` (start) to `1` (end); `0.5` if not set
+	 * @param   final     Use the cell sizes running animations head for, and ignore `deltaPosition`
+	 * @return            Position
 	 */
 	public indexToPosition(index: number, location?: number, final?: boolean): number {
 		let len = this.dataItems.length;
@@ -687,7 +697,8 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns a position of a category.
+	 * Returns the position (`0` to `1`) of the middle of a category on the
+	 * axis.
 	 *
 	 * @param   category  Category to look up
 	 * @return            Position
@@ -731,10 +742,9 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns an index of the category that corresponds to specific pixel
-	 * position within axis.
+	 * Returns the index of the category at a position on the axis.
 	 *
-	 * @param position  Position (px)
+	 * @param position  Position (`0` to `1`)
 	 * @return Category index
 	 */
 	public axisPositionToIndex(position: number): number {
@@ -776,9 +786,10 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns text to be used in an axis tooltip for specific relative position.
+	 * Returns the text the axis tooltip shows at a position: the axis's
+	 * `tooltipText`, or else the text of the tooltip's or the category's label.
 	 *
-	 * @param   position  Position
+	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Tooltip text
 	 */
 	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
@@ -787,9 +798,23 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		if (dataItem) {
 			const label = dataItem.get("label")
 			if (label) {
-				return populateString(label, this.get("tooltipText", ""));
+				// `tooltipText`, else what the axis tooltip shows, else what the axis
+				// label shows (e.g. a Gantt task's name rather than its id)
+				const tooltip = this.get("tooltip");
+				const labelText = label.get("text", "{category}");
+				const text = this.get("tooltipText", tooltip ? tooltip.label.get("text", labelText) : labelText);
+				return populateString(label, text);
 			}
 		}
+	}
+
+	public _scrollbarText(position: number, isEnd?: boolean): string {
+		// A range ends where its last category ends, which is also where the next
+		// one starts: name the last one inside
+		if (isEnd && position > 0) {
+			position -= 0.000001;
+		}
+		return super._scrollbarText(position, isEnd);
 	}
 
 	protected _updateTooltipText(tooltip: Tooltip, position: number) {
@@ -798,10 +823,10 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns a data item from series that is closest to the `position`.
+	 * Returns the series data item of the category at a position on the axis.
 	 *
 	 * @param   series    Series
-	 * @param   position  Relative position
+	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Data item
 	 */
 	public getSeriesItem(series: XYSeries, position: number): DataItem<IXYSeriesDataItem> | undefined {
@@ -838,7 +863,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		if (this.get("cellSizeField")) {
 			let count = 0;
 			const dataItems = this.dataItems;
-			if(dataItems.length == 0){
+			if (dataItems.length == 0) {
 				return { startIndex: 0, endIndex: 0 };
 			}
 
@@ -878,13 +903,12 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Zooms the axis to specific `start` and `end` indexes.
-	 *
-	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 * Zooms the axis to show the categories from index `start` up to, but not
+	 * including, `end`.
 	 *
 	 * @param  start     Start index
-	 * @param  end       End index
-	 * @param  duration  Duration in milliseconds
+	 * @param  end       End index (not included)
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public zoomToIndexes(start: number, end: number, duration?: number) {
 		let len = this.dataItems.length;
@@ -900,15 +924,24 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 	}
 
+	/**
+	 * Zooms the axis to show the categories from `startCategory` to
+	 * `endCategory`, both included.
+	 *
+	 * @param  startCategory  First category
+	 * @param  endCategory    Last category
+	 * @param  duration       Animation duration in milliseconds
+	 */
 	public zoomToCategories(startCategory: string, endCategory: string, duration?: number) {
 		this.zoomToIndexes(this.categoryToIndex(startCategory), this.categoryToIndex(endCategory) + 1, duration);
 	}
 
 	/**
-	 * Returns position span between start and end of a single cell in axis.
+	 * Returns the distance between two grid lines as a share of the visible
+	 * part of the axis.
 	 *
 	 * @since 5.2.30
-	 * @return Position
+	 * @return Distance (`0` to `1`)
 	 */
 	public getCellWidthPosition(): number {
 		return this._frequency / this.dataItems.length / (this.get("end", 1) - this.get("start", 0));

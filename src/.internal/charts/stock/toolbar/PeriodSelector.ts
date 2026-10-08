@@ -10,22 +10,38 @@ import * as $time from "../../../core/util/Time";
 import * as $array from "../../../core/util/Array";
 
 export interface IPeriod {
+	/**
+	 * Time unit of the period, or `"ytd"` (year to date), `"max"` (all data)
+	 * or `"custom"` (from `start` to `end`).
+	 */
 	timeUnit: TimeUnit | "ytd" | "max" | "custom";
+	/**
+	 * Number of `timeUnit`s in the period.
+	 */
 	count?: number;
+	/**
+	 * Label of the period's button.
+	 */
 	name?: string;
+	/**
+	 * Start of a `"custom"` period; the start of the data if not set.
+	 */
 	start?: Date;
+	/**
+	 * End of a `"custom"` period; the end of the data if not set.
+	 */
 	end?: Date;
 }
 
 export interface IPeriodSelectorSettings extends IStockControlSettings {
 
 	/**
-	 * A list periods to choose from.
+	 * Periods to show buttons for.
 	 */
 	periods?: IPeriod[];
 
 	/**
-	 * Hide periods that are longer than the actual data.
+	 * Hides the buttons of periods longer than the data.
 	 *
 	 * @default false
 	 * @since 5.3.9
@@ -33,8 +49,8 @@ export interface IPeriodSelectorSettings extends IStockControlSettings {
 	hideLongPeriods?: boolean;
 
 	/**
-	 * Indicates whether to select periods from the start or end of the axis
-	 * scale.
+	 * Which end of the data a period is measured from: `"end"` shows the
+	 * latest data, `"start"` the earliest.
 	 *
 	 * @default "end"
 	 * @since 5.5.0
@@ -65,7 +81,8 @@ export interface IPeriodSelectorPrivate extends IStockControlPrivate {
 
 export interface IPeriodSelectorEvents extends IStockControlEvents {
 	/**
-	 * Invoked when user selects certain period via control.
+	 * A period was selected, by a click on its button or with
+	 * `selectPeriod()`.
 	 *
 	 * @since 5.8.5
 	 */
@@ -75,7 +92,8 @@ export interface IPeriodSelectorEvents extends IStockControlEvents {
 }
 
 /**
- * A pre-defined period selector control for [[StockToolback]].
+ * A [[StockToolbar]] control with buttons that zoom the chart to preset
+ * periods, such as one month or year to date.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/} for more info
  */
@@ -109,7 +127,8 @@ export class PeriodSelector extends StockControl {
 		axis.onPrivate("max", () => this._setPeriodButtonStatus());
 		$array.each(periods, (period) => {
 			const button = document.createElement("a");
-			button.innerHTML = period.name || (period.timeUnit.toUpperCase() + period.count || "1");
+			const unit = period.timeUnit;
+			button.innerHTML = period.name || (unit.toUpperCase() + (unit == "ytd" || unit == "max" || unit == "custom" ? "" : (period.count || 1)));
 			button.className = "am5stock-link";
 			button.setAttribute("data-period", period.timeUnit + (period.count || ""));
 			container.appendChild(button);
@@ -271,6 +290,12 @@ export class PeriodSelector extends StockControl {
 		return this._getMaxOrMax("min");
 	}
 
+	/**
+	 * Zooms the chart to a period and highlights its button. Dispatches
+	 * `periodselected`.
+	 *
+	 * @param  period  Period
+	 */
 	public selectPeriod(period: IPeriod): void {
 		const type = "periodselected";
 		if (this.events.isEnabled(type)) {

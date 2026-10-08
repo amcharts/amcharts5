@@ -45,7 +45,7 @@ export function populateString(target: Sprite, string: string): string {
  * properties or parents.
  *
  * @param target Target Sprite
- * @param tagName Tage to extract value for
+ * @param tagName Tag to extract value for
  * @param format Format for the value
  * @returns Value
  */

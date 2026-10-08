@@ -1,0 +1,80 @@
+{
+  "type": "Gantt",
+  "settings": { "autoAppear": true, "appearDuration": 1000, "appearDelay": 100 },
+  "properties": {
+    "yAxis": {
+      "properties": { "data": "#data-0" }
+    },
+    "series": {
+      "properties": { "data": "#data-1" }
+    }
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "id": "kickoff", "name": "Kick-off", "color": "#6794dc" },
+        { "id": "design", "name": "Design", "color": "#6771dc", "collapsed": false },
+        { "id": "wireframes", "name": "Wireframes", "parentId": "design", "color": "#6771dc" },
+        { "id": "visuals", "name": "Visual design", "parentId": "design", "color": "#6771dc" },
+        { "id": "development", "name": "Development", "color": "#8067dc", "collapsed": false },
+        { "id": "frontend", "name": "Front end", "parentId": "development", "color": "#8067dc" },
+        { "id": "backend", "name": "Back end", "parentId": "development", "color": "#8067dc" },
+        { "id": "testing", "name": "Testing", "parentId": "development", "color": "#8067dc" },
+        { "id": "launch", "name": "Launch", "color": "#a367dc" }
+      ]
+    },
+    {
+      "data-1": [
+        {
+          "id": "kickoff",
+          "start": 1758142800000,
+          "duration": 0,
+          "progress": 1,
+          "linkTo": ["design"],
+          "end": 1758142800000,
+          "__parse": true
+        },
+        {
+          "id": "design",
+          "linkTo": ["development"],
+          "__parse": true
+        },
+        {
+          "id": "wireframes",
+          "start": 1758142800000,
+          "duration": 2,
+          "progress": 1,
+          "linkTo": ["visuals"],
+          "end": 1758315600000,
+          "__parse": true
+        },
+        { "id": "visuals", "start": 1758488400000, "duration": 4, "progress": 0.75, "end": 1758834000000 },
+        {
+          "id": "development",
+          "linkTo": ["launch"],
+          "__parse": true
+        },
+        {
+          "id": "frontend",
+          "start": 1758834000000,
+          "duration": 4,
+          "progress": 0.2,
+          "linkTo": ["testing"],
+          "end": 1759352400000,
+          "__parse": true
+        },
+        {
+          "id": "backend",
+          "start": 1758834000000,
+          "duration": 3,
+          "progress": 0,
+          "linkTo": ["testing"],
+          "end": 1759266000000,
+          "__parse": true
+        },
+        { "id": "testing", "start": 1759352400000, "duration": 2, "progress": 0, "end": 1759525200000 },
+        { "id": "launch", "start": 1759698000000, "duration": 0, "progress": 0, "end": 1759698000000 }
+      ]
+    }
+  ]
+}

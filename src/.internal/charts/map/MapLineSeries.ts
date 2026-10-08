@@ -18,7 +18,7 @@ export interface IMapLineSeriesPrivate extends IMapSeriesPrivate {
 export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 
 	/**
-	 * Related [[MapLine]] object.
+	 * The line that shows the data item.
 	 */
 	mapLine?: MapLine;
 
@@ -28,30 +28,27 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 	geometry?: GeoJSON.LineString | GeoJSON.MultiLineString;
 
 	/**
-	 * An array of data items from [[MapPointSeries]] to use as line end-points. Note, fixed points can not be used here.
+	 * Data items of a [[MapPointSeries]] for the line to connect, in order. The
+	 * line follows them when they move. Fixed points can't be used.
 	 */
 	pointsToConnect?: Array<DataItem<IMapPointSeriesDataItem>>;
 
 	/**
-	 * Ids of the points the line connects, looked up in the series set as
-	 * `pointSeries`. The points themselves stay where they are; the line follows
-	 * them, and a config carries the ids rather than a copy of the coordinates.
+	 * Ids of the points for the line to connect, looked up in `pointSeries`.
+	 * The line follows the points, and a config holds just the ids.
 	 *
-	 * The line waits for every id to match a point of its own before it is drawn,
-	 * so it is never drawn short. Fixed points cannot be used, same as with
-	 * `pointsToConnect`.
-	 *
-	 * Ignored if `pointsToConnect` is set on the same data item.
+	 * The line isn't drawn until every id matches a point, so it is never drawn
+	 * short. Fixed points can't be used. Ignored if `pointsToConnect` is set.
 	 *
 	 * @since 5.20.3
 	 */
 	pointIds?: Array<string>;
 
 	/**
-	 * A line type.
+	 * How the line runs between its points, instead of the series' `lineType`:
 	 *
-	 * * `"curved"` (default) - connects points using shortest distance, which will result in curved lines based on map projection.
-	 * * `"straight"` - connects points using visually straight lines, and will not cross the -180/180 longitude.
+	 * * `"curved"` - along the shortest path on the globe, which the projection may bend.
+	 * * `"straight"` - in straight lines on screen, never across the 180th meridian.
 	 *
 	 * @default "curved"
 	 * @since 5.2.32
@@ -63,21 +60,17 @@ export interface IMapLineSeriesDataItem extends IMapSeriesDataItem {
 export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 
 	/**
-	 * If set to `true` will hide line segments that are in the invisible range
-	 * of the map.
-	 *
-	 * For example on the side of the globe facing away from the viewer when
-	 * used with Orthographic projection.
-	 *
-	 * NOTE: not all projections have invisible side.
+	 * Hides the parts of lines on the far side of a globe, unless set to
+	 * `false`. Only projections with a hidden side, such as `geoOrthographic`,
+	 * are affected.
 	 */
 	clipBack?: boolean;
 
 	/**
-	 * A line type.
+	 * How lines run between their points:
 	 *
-	 * * `"curved"` (default) - connects points using shortest distance, which will result in curved lines based on map projection.
-	 * * `"straight"` - connects points using visually straight lines, and will not cross the -180/180 longitude.
+	 * * `"curved"` - along the shortest path on the globe, which the projection may bend.
+	 * * `"straight"` - in straight lines on screen, never across the 180th meridian.
 	 *
 	 * @default "curved"
 	 * @since 5.2.24
@@ -91,14 +84,14 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 	lineTypeField?: string;
 
 	/**
-	 * A [[MapPointSeries]] the `pointIds` of a data item are looked up in.
+	 * The point series that data items' `pointIds` refer to.
 	 *
 	 * @since 5.20.3
 	 */
 	pointSeries?: MapPointSeries;
 
 	/**
-	 * A field in data that holds ids of the points a line connects.
+	 * Field in `data` that holds each line's `pointIds`.
 	 *
 	 * @default "pointIds"
 	 * @since 5.20.3
@@ -107,7 +100,8 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
 }
 
 /**
- * Creates a map series for displaying lines on the map.
+ * A map series of lines, such as routes: from GeoJSON geometries, or
+ * connecting the points of a [[MapPointSeries]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/} for more info
  * @important
@@ -254,9 +248,7 @@ export class MapLineSeries extends MapSeries {
 	}
 
 	/**
-	 * A [[ListTemplate]] of all lines in series.
-	 *
-	 * `mapLines.template` can also be used to configure lines.
+	 * All lines of the series. Configure them through `mapLines.template`.
 	 *
 	 * @default new ListTemplate<MapLine>
 	 */
@@ -292,6 +284,11 @@ export class MapLineSeries extends MapSeries {
 		if (this.isDirty("stroke")) {
 			this.mapLines.template._setC("stroke", this.get("stroke"));
 		}
+
+		// Lines take their type when they are drawn, so draw them again
+		if (this.isDirty("lineType")) {
+			this.markDirtyProjection();
+		}
 	}
 
 	protected processDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -305,6 +302,12 @@ export class MapLineSeries extends MapSeries {
 		this._handlePointsToConnect(dataItem);
 		dataItem.on("pointsToConnect", () => {
 			this._handlePointsToConnect(dataItem);
+		})
+		dataItem.on("lineType", () => {
+			const line = dataItem.get("mapLine");
+			if (line) {
+				line.markDirtyProjection();
+			}
 		})
 
 		// After the listener above, so that resolving connects the line right away
@@ -334,6 +337,10 @@ export class MapLineSeries extends MapSeries {
 				point.on("latitude", () => {
 					this.markDirtyValues(dataItem);
 				})
+
+				point.on("altitude", () => {
+					this.markDirtyValues(dataItem);
+				})
 			})
 
 			this.markDirtyValues(dataItem);
@@ -341,8 +348,10 @@ export class MapLineSeries extends MapSeries {
 	}
 
 	/**
-	 * Forces a repaint of the element which relies on data.
+	 * Redraws the series, and the line of `dataItem`, rebuilding its geometry
+	 * from `pointsToConnect` if set.
 	 *
+	 * @param  dataItem  Data item whose line to redraw
 	 * @since 5.0.21
 	 */
 	public markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -356,8 +365,10 @@ export class MapLineSeries extends MapSeries {
 					$array.each(pointsToConnect, (point) => {
 						const longitude = point.get("longitude");
 						const latitude = point.get("latitude");
+						// A raised point raises the line's end too (metres, as in GeoJSON)
+						const altitude = point.get("altitude");
 						if (longitude != null && latitude != null) {
-							coordinates.push([longitude, latitude]);
+							coordinates.push(altitude ? [longitude, latitude, altitude] : [longitude, latitude]);
 						}
 						else {
 							const geometry = point.get("geometry");
@@ -401,7 +412,7 @@ export class MapLineSeries extends MapSeries {
 		super._excludeDataItem(dataItem);
 		const mapLine = dataItem.get("mapLine");
 		if (mapLine) {
-			mapLine.setPrivate("visible", false);
+			this._setExcluded(mapLine, true);
 		}
 	}
 
@@ -412,7 +423,7 @@ export class MapLineSeries extends MapSeries {
 		super._unexcludeDataItem(dataItem);
 		const mapLine = dataItem.get("mapLine");
 		if (mapLine) {
-			mapLine.setPrivate("visible", true);
+			this._setExcluded(mapLine, false);
 		}
 	}
 
@@ -423,7 +434,7 @@ export class MapLineSeries extends MapSeries {
 		super._notIncludeDataItem(dataItem);
 		const mapLine = dataItem.get("mapLine");
 		if (mapLine) {
-			mapLine.setPrivate("visible", false);
+			this._setExcluded(mapLine, true);
 		}
 	}
 
@@ -434,7 +445,7 @@ export class MapLineSeries extends MapSeries {
 		super._unNotIncludeDataItem(dataItem);
 		const mapLine = dataItem.get("mapLine");
 		if (mapLine) {
-			mapLine.setPrivate("visible", true);
+			this._setExcluded(mapLine, false);
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import { Theme } from "../../core/Theme";
 import { setColor } from "../../themes/DefaultTheme";
+import { Color } from "../../core/util/Color";
 
 import { geoMercator } from "d3-geo";
 
@@ -127,6 +128,28 @@ export class MapChartDefaultTheme extends Theme {
 
 		r("GraticuleSeries").setAll({
 			step: 10
+		});
+
+		r("NightSeries").setAll({
+			affectsBounds: false
+		});
+
+		r("MapPolygon", ["pixel"]).setAll({
+			strokeWidth: 0
+		});
+
+		r("MapPolygon", ["night"]).setAll({
+			fill: Color.fromHex(0x000000),
+			fillOpacity: 0.5,
+			strokeOpacity: 0
+		});
+
+		r("Circle", ["night", "sun"]).setAll({
+			radius: 8,
+			fill: Color.fromHex(0xffba00),
+			shadowColor: Color.fromHex(0xffba00),
+			shadowBlur: 16,
+			shadowOpacity: 1
 		});
 	}
 }

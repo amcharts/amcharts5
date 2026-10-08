@@ -68,17 +68,13 @@ export const PATTERN_GRAYS: Array<Color> = [
 ];
 
 /**
- * "Patterns" — a monochrome, texture-driven theme in the spirit of engraved or
- * newspaper charts: every filled series shares one gray fill overlaid with a
- * distinct white pattern (hatch / dot / star / triangle / grid), so series are
- * told apart purely by texture rather than hue.
+ * "Patterns": a black-and-white light theme in the spirit of engraved or
+ * newspaper charts. Filled series take shades of gray, each with its own white
+ * pattern (hatches, dots, stars, triangles, grids) on top. Line series take
+ * the grays too, told apart by stroke width and dash.
  *
- * Line series (which have no fill for a pattern to attach to) are all gray too
- * and are told apart by stroke width and dash. Because categories are encoded by
- * shape rather than hue, it prints cleanly and stays legible for all forms of
- * color blindness. It layers on the default (light) look.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * As series differ by texture and tone rather than hue, it prints cleanly and
+ * stays legible for all forms of color blindness.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info

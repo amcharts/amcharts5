@@ -1,0 +1,7 @@
+{
+  "title": "Gauge with Clock Hand",
+  "description": "A gauge made from a radar chart: a half-circle value axis and a clock hand that points at a value.",
+  "category": "radar",
+  "tier": "basic",
+  "tags": ["gauge", "radar", "clock hand", "axis range"]
+}

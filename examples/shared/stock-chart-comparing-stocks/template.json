@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"]
+  "title": "Comparing Stocks",
+  "description": "A stock chart with a comparison control and a searchable dropdown: picked stocks are added with addComparingSeries() and the chart switches to percent change.",
+  "category": "stock",
+  "tier": "technique",
+  "tags": ["comparison", "percent scale", "toolbar", "search", "candlestick"],
+  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "chartdiv": { "height": "calc(100vh - 36px)" }
 }

@@ -24,21 +24,19 @@ import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
 
 import type { IDisposer } from "../../core/util/Disposer";
-import type { ISpritePointerEvent } from "../../core/render/Sprite";
+import type { Sprite, ISpritePointerEvent } from "../../core/render/Sprite";
 
 
 /**
- * Registry of projections that can be looked up by name via the `projectionName`
- * setting on `MapChart`. The `am5map` entry point populates this with all
- * bundled d3-geo projections. Custom projections can be added via
- * `registerProjection()`.
+ * Projections that [[MapChart]]'s `projectionName` can name. `am5map` registers
+ * its bundled projections here; add others with `registerProjection()`.
  */
 export const projectionRegistry: { [name: string]: () => GeoProjection } = {};
 
 /**
- * Wraps a projection factory so the projections it produces carry their
- * registered `name`. The tag lets `ChartSerializer` emit a matching
- * `projectionName` even for charts that set `projection` directly in code.
+ * Wraps a projection factory so the projections it makes carry `name`, which
+ * lets `ChartSerializer` write `projectionName` for a chart that sets
+ * `projection` in code.
  */
 export function tagProjection(name: string, factory: () => GeoProjection): () => GeoProjection {
 	return () => {
@@ -49,13 +47,12 @@ export function tagProjection(name: string, factory: () => GeoProjection): () =>
 }
 
 /**
- * Registers a projection factory under the given name so it can be referenced
- * by `MapChart`'s `projectionName` setting.
+ * Registers a projection factory under `name`, for [[MapChart]]'s
+ * `projectionName`.
  *
- * Returns a name-tagged factory: use its return value (e.g. `const cc =
- * registerProjection("geoConicConformal", geoConicConformal)`) as
- * `projection: cc()` and the chart will round-trip through serialization the
- * same way the bundled projections do.
+ * Returns the factory tagged with the name: a chart given `projection: cc()`,
+ * where `const cc = registerProjection("geoConicConformal", geoConicConformal)`,
+ * serializes with its `projectionName`, as the bundled projections do.
  */
 export function registerProjection(name: string, factory: () => GeoProjection): () => GeoProjection {
 	const tagged = tagProjection(name, factory);
@@ -63,34 +60,25 @@ export function registerProjection(name: string, factory: () => GeoProjection): 
 	return tagged;
 }
 
+// The settings that place the map
+const homeKeys: Array<"zoomLevel" | "translateX" | "translateY" | "rotationX" | "rotationY"> = ["zoomLevel", "translateX", "translateY", "rotationX", "rotationY"];
+
 export interface IMapChartSettings extends ISerialChartSettings {
 
 	/**
-	 * A projection to use when plotting the map.
+	 * The projection the map is drawn with, such as `am5map.geoMercator()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Projections} for more info
 	 */
 	projection?: GeoProjection;
 
 	/**
-	 * Name of a projection to use, e.g. `"geoMercator"`, `"geoOrthographic"`.
+	 * The projection by name, such as `"geoOrthographic"`: the chart sets
+	 * `projection` to it. Useful in JSON configs, which can't hold a function.
 	 *
-	 * A string-friendly alternative to `projection`: when set, the chart looks the
-	 * name up in `projectionRegistry` and assigns the resulting projection to the
-	 * `projection` setting. Handy for JSON config, where a function can't be used.
-	 *
-	 * The bundled projections — `"geoMercator"`, `"geoOrthographic"`,
-	 * `"geoEquirectangular"`, `"geoAlbersUsa"`, `"geoEqualEarth"`,
-	 * `"geoNaturalEarth1"` — are registered automatically when `am5map` is loaded,
-	 * so these names resolve out of the box.
-	 *
-	 * In code you can also just set `projection` directly, e.g.
-	 * `projection: am5map.geoOrthographic()`. The `am5map` projection factories tag
-	 * their output with the projection name, so `ChartSerializer` emits the matching
-	 * `projectionName` either way — the chart round-trips through serialization.
-	 *
-	 * To use a projection that isn't bundled, register it once before creating
-	 * the chart:
+	 * The names `"geoMercator"`, `"geoOrthographic"`, `"geoEquirectangular"`,
+	 * `"geoAlbersUsa"`, `"geoEqualEarth"` and `"geoNaturalEarth1"` work out of
+	 * the box. Register any other projection once, before creating the chart:
 	 *
 	 * ```TypeScript
 	 * import { geoConicConformal } from "d3-geo";
@@ -105,65 +93,80 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	projectionName?: string;
 
 	/**
-	 * Current zoom level.
+	 * The map's zoom level: `1` shows the whole map fitted to the chart, `2`
+	 * shows it twice as large.
+	 *
+	 * @default 1
 	 */
 	zoomLevel?: number;
 
 	/**
-	 * current x position of a map
+	 * Horizontal position of the projection's center, in pixels from the left
+	 * of the map's area. Changes as the map is panned.
 	 */
 	translateX?: number;
 
 	/**
-	 * current y position of a map
+	 * Vertical position of the projection's center, in pixels from the top of
+	 * the map's area. Changes as the map is panned.
 	 */
 	translateY?: number;
 
 	/**
-	 * Vertical centering of the map.
+	 * Tilts the map north or south, in degrees: the latitude `-rotationY`
+	 * comes to the middle, so `-30` centers latitude 30. Needs a projection
+	 * that can rotate.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 * @default 0
 	 */
 	rotationY?: number;
 
 	/**
-	 * Horizontal centering of the map.
+	 * Turns the map around the poles, in degrees: the longitude `-rotationX`
+	 * comes to the middle, so `-74` centers longitude 74. Needs a projection
+	 * that can rotate.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 * @default 0
 	 */
 	rotationX?: number;
 
 	/**
-	 * Depth centering of the map.
+	 * Spins the map around its middle, in degrees. Needs a projection that can
+	 * rotate.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 * @default 0
 	 */
 	rotationZ?: number;
 
 	/**
-	 * Highest zoom level map is allowed to zoom in to.
+	 * The highest zoom level the map can zoom in to.
 	 *
 	 * @default 32
 	 */
 	maxZoomLevel?: number;
 
 	/**
-	 * Lowest zoom level map is allowed to zoom in to.
+	 * The lowest zoom level the map can zoom out to.
 	 *
 	 * @default 1
 	 */
 	minZoomLevel?: number;
 
 	/**
-	 * Increment zoom level by `zoomStep` when user zooms in via [[ZoomControl]] or
-	 * API.
+	 * How many times one zoom step zooms in or out: the zoom level is multiplied
+	 * or divided by it. Used by [[ZoomControl]], the wheel, double clicks,
+	 * `zoomIn()` and `zoomOut()`.
 	 *
 	 * @default 2
 	 */
 	zoomStep?: number;
 
 	/**
-	 * Defines what happens when map is being dragged horizontally.
+	 * What dragging the map horizontally does: `"translateX"` moves it,
+	 * `"rotateX"` turns it around the poles (as on a globe), `"none"` nothing.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning} for more info
 	 * @default "translateX"
@@ -171,7 +174,8 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	panX?: "none" | "rotateX" | "translateX";
 
 	/**
-	 * Defines what happens when map is being dragged vertically.
+	 * What dragging the map vertically does: `"translateY"` moves it,
+	 * `"rotateY"` tilts it north or south (as on a globe), `"none"` nothing.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning} for more info
 	 * @default "translateY"
@@ -179,7 +183,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	panY?: "none" | "rotateY" | "translateY";
 
 	/**
-	 * Enables pinch-zooming of the map on multi-touch devices.
+	 * Lets users zoom the map with a two-finger pinch on touch devices.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Pinch_zoom} for more info
 	 * @default true
@@ -187,7 +191,8 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	pinchZoom?: boolean;
 
 	/**
-	 * Defines what happens when horizontal mouse wheel (only some mouses do have such a wheel)
+	 * What scrolling horizontally (with a tilting wheel or a touchpad) does to
+	 * the map.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
 	 * @default "none"
@@ -195,7 +200,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	wheelX?: "none" | "zoom" | "rotateX" | "rotateY";
 
 	/**
-	 * Defines what happens when mouse wheel is turned.
+	 * What turning the mouse wheel does to the map.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
 	 * @default "zoom"
@@ -203,82 +208,96 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	wheelY?: "none" | "zoom" | "rotateX" | "rotateY";
 
 	/**
-	 * Sensitivity of a mouse wheel.
-	 *
-	 * NOTE: this setting is ignored when `wheelX` or `wheelY` is set to `"zoom"`.
+	 * Multiplies how far the wheel rotates the map. Applies only to the
+	 * `"rotateX"` and `"rotateY"` wheel actions.
 	 *
 	 * @default 1
 	 */
 	wheelSensitivity?: number;
 
 	/**
-	 * Duration of mouse-wheel action animation, in milliseconds.
+	 * Duration of the rotation a wheel turn makes, in milliseconds. Applies
+	 * only to the `"rotateX"` and `"rotateY"` wheel actions.
 	 *
-	 * NOTE: this setting is ignored when `wheelX` or `wheelY` is set to `"zoom"`.
+	 * @default 0
 	 */
 	wheelDuration?: number;
 
 	/**
-	 * An easing function to use for mouse wheel action animations.
-	 *
-	 * NOTE: this setting is ignored when `wheelX` or `wheelY` is set to `"zoom"`.
+	 * Easing of the rotation a wheel turn makes. Applies only to the
+	 * `"rotateX"` and `"rotateY"` wheel actions.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
-	 * @default am5.ease.out($ease.cubic)
+	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	wheelEasing?: (t: Time) => Time;
 
 	/**
-	 * Duration of zoom/pan animations, in milliseconds.
+	 * Duration of zoom and rotation animations, in milliseconds: zooming with
+	 * the wheel, buttons or a double click, and the zoom and rotate methods.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * An easing function to use for zoom/pan animations.
+	 * Easing of zoom and rotation animations.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
-	 * @default am5.ease.out($ease.cubic)
+	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	animationEasing?: (t: Time) => Time;
 
 
 	/**
-	 * A [[ZoomControl]] instance.
+	 * Zoom buttons to show on the map.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Zoom_control} for more info
 	 */
 	zoomControl?: ZoomControl;
 
 	/**
-	 * Initial/home zoom level.
+	 * Zoom level of the home position, which `goHome()` and `autoHome` go to.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 * @default 1
 	 */
 	homeZoomLevel?: number;
 
 	/**
-	 * Initial/home rotationX.
+	 * `rotationX` of the home position, which `goHome()` and `autoHome` go to.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
 	 */
 	homeRotationX?: number;
 
 	/**
-	 * Initial/home rotationY.
+	 * `rotationY` of the home position, which `goHome()` and `autoHome` go to.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
 	 */
 	homeRotationY?: number;
 
 	/**
-	 * Initial coordinates to center map on load or `goHome()` call.
+	 * The point `goHome()` and `autoHome` center the map on. If not set, the
+	 * middle of the map is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
 	 */
 	homeGeoPoint?: IGeoPoint;
 
 	/**
-	 * How much of a map can go outside the viewport.
+	 * Goes to the home position once the map is loaded, as `goHome()` does:
+	 * animated when `animationDuration` is set (as by the Animated theme), at
+	 * once otherwise.
+	 *
+	 * @default false
+	 * @since 5.21.0
+	 */
+	autoHome?: boolean;
+
+	/**
+	 * How far the map can be dragged away from the middle, as a share of its
+	 * size: `0.4` lets its center move 40% of the map's width or height. A map
+	 * zoomed larger than the chart can always be dragged to its edges.
 	 *
 	 * @default 0.4
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
@@ -286,11 +305,10 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	maxPanOut?: number;
 
 	/**
-	 * Setting `true` means that the map will automatically center itself (or go
-	 * to `homeGeoPoint` if set) when fully zoomed out.
-	 *
-	 * `false` would mean that zoom out will be centered around the mouse
-	 * cursor (when zooming using wheel), or current map position.
+	 * Centers the map on its home point (`homeGeoPoint`, or the middle of the
+	 * map) whenever it zooms to `homeZoomLevel`, such as when fully zoomed out.
+	 * Otherwise zooming out keeps the point under the pointer, or the middle of
+	 * the view, in place.
 	 *
 	 * @default true
 	 * @since 5.2.1
@@ -298,12 +316,12 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	centerMapOnZoomOut?: boolean;
 
 	/**
-	 * Setting to `true` will make map zoom in on a double click (or double tap),
-	 * and zoom out on a shift + double click.
+	 * Zooms the map in by `zoomStep` on a double click or double tap, and out
+	 * on Shift + double click.
 	 *
-	 * On maps that are panned by rotating (`panX: "rotateX"` and/or
-	 * `panY: "rotateY"`) the clicked location is rotated to the center of the
-	 * map. Otherwise it stays under the pointer.
+	 * On a map panned by rotating (`panX: "rotateX"` or `panY: "rotateY"`), the
+	 * clicked location turns to the middle. Otherwise it stays under the
+	 * pointer.
 	 *
 	 * @default true
 	 * @since 5.20.2
@@ -311,13 +329,11 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	doubleClickZoom?: boolean;
 
 	/**
-	 * Allows zooming the map to an area drawn with a pointer.
+	 * Zooms the map to a box drawn with the pointer, while this key is held:
+	 * `"drag"` needs no key. A plain drag pans the map, so use `"drag"` with
+	 * `panX` and `panY` set to `"none"`.
 	 *
-	 * The value defines a key that needs to be held down while dragging, with
-	 * `"drag"` meaning that no key is needed. Since a plain drag pans the map,
-	 * `"drag"` should be used with `panX`/`panY` set to `"none"`.
-	 *
-	 * The drawn area is represented by the `boxZoomSelection` element.
+	 * The box is drawn with `boxZoomSelection`.
 	 *
 	 * @default "none"
 	 * @since 5.20.2
@@ -349,14 +365,18 @@ export interface IMapChartPrivate extends ISerialChartPrivate {
 export interface IMapChartEvents extends ISerialChartEvents {
 
 	/**
-	 * Invoked when geo bounds of the map change, usually after map is
-	 * initialized.
+	 * The geographic bounds of the map's geometries changed, as when series
+	 * load their data.
 	 */
 	geoboundschanged: {};
 
 }
 
 
+/**
+ * A map: geographic data drawn in a projection, which can be zoomed, panned
+ * and rotated. Its series draw polygons, lines and points.
+ */
 export class MapChart extends SerialChart {
 	public static className: string = "MapChart";
 	public static classNames: Array<string> = SerialChart.classNames.concat([MapChart.className]);
@@ -379,8 +399,7 @@ export class MapChart extends SerialChart {
 	protected _doubleDownDistance: number = 0;
 
 	/**
-	 * A [[Rectangle]] element that shows the area being drawn when `boxZoom` is
-	 * enabled.
+	 * The box drawn while zooming with `boxZoom`.
 	 *
 	 * @since 5.20.2
 	 */
@@ -420,6 +439,18 @@ export class MapChart extends SerialChart {
 	protected _ph?: number;
 
 	protected _mapFitted: boolean = false;
+	// Fitted with geometries at least once
+	protected _fitted: boolean = false;
+	// goHome() called before that
+	protected _goHomeOnFit?: { duration?: number };
+	protected _homeScheduled: boolean = false;
+	// Where going home on load is headed, and the animations taking it there
+	protected _homeTarget?: { view: Array<number | undefined>, animations: Array<Animation<any> | undefined>, duration?: number };
+
+	// Zoom level announcement waiting for zooming to settle
+	protected _zoomAlert?: IDisposer;
+	// Zooms the map makes for its initial view are not announced
+	protected _silentZoom: boolean = false;
 
 	protected _centerX: number = 0;
 	protected _centerY: number = 0;
@@ -448,25 +479,25 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Returns a geoPoint of the current zoom position.
-	 *
-	 * You can later use it to restore zoom position, e.g.: `chart.zoomToGeoPoint(geoPoint, zoomLevel, true)`.
+	 * Returns the geographic point in the middle of the view. To come back to
+	 * the view later: `chart.zoomToGeoPoint(geoPoint, zoomLevel, true)`.
 	 *
 	 * @since 5.2.19
 	 */
 	public geoPoint() {
-		return this.invert(this.seriesContainer.toGlobal({ x: this.width() / 2, y: this.height() / 2 }));
+		return this.invert({ x: this.innerWidth() / 2, y: this.innerHeight() / 2 });
 	}
 
 	/**
-	 * Returns coordinates to geographical center of the map.
+	 * Returns the geographic center of the map's geometries.
 	 */
 	public geoCentroid() {
 		return this._geoCentroid;
 	}
 
 	/**
-	 * Returns geographical bounds of the map.
+	 * Returns the geographic bounds of the map's geometries, in degrees:
+	 * longitudes `left` and `right`, latitudes `top` and `bottom`.
 	 */
 	public geoBounds() {
 		return this._geoBounds;
@@ -645,7 +676,7 @@ export class MapChart extends SerialChart {
 			return;
 		}
 
-		const level = this.get("zoomLevel", 1) * Math.min(this.width() / width, this.height() / height);
+		const level = this.get("zoomLevel", 1) * Math.min(this.innerWidth() / width, this.innerHeight() / height);
 
 		this._zoomToScreenPoint({ x: (downPoint.x + upPoint.x) / 2, y: (downPoint.y + upPoint.y) / 2 }, level);
 	}
@@ -695,12 +726,17 @@ export class MapChart extends SerialChart {
 		const w = this.innerWidth();
 		const h = this.innerHeight();
 
+		// Before a refit below moves the map
+		const goingHome = this._isGoingHome();
+		let refitted = false;
+
 		const previousGeometries = this._geometryColection.geometries;
 
 		if (this.isDirty("projection")) {
 			this._makeGeoPath();
 			this.markDirtyProjection();
 			this._fitMap();
+			refitted = w > 0 && h > 0;
 
 			projection.scale(this.getPrivate("mapScale") * this.get("zoomLevel", 1));
 			if (projection.rotate) {
@@ -784,15 +820,21 @@ export class MapChart extends SerialChart {
 
 
 			this._fitMap();
+			refitted = w > 0 && h > 0;
 		}
 
 		if (previousGeometries.length != 0 && (w != this._pw || h != this._ph || this._dirtyGeometries)) {
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;
+				refitted = true;
 
 				projection.fitSize([w, h], this._geometryColection);
 				const newScale = projection.scale();
+
+				// Measured unzoomed, as in `_fitMap`: the pan limits apply the zoom themselves
+				const geoPath = this.getPrivate("geoPath");
+				this._mapBounds = geoPath.bounds(this._geometryColection);
 
 				this.setPrivateRaw("mapScale", newScale);
 				projection.scale(newScale * this.get("zoomLevel", 1));
@@ -816,9 +858,6 @@ export class MapChart extends SerialChart {
 				}
 
 				this.markDirtyProjection();
-
-				const geoPath = this.getPrivate("geoPath");
-				this._mapBounds = geoPath.bounds(this._geometryColection);
 			}
 		}
 
@@ -899,6 +938,87 @@ export class MapChart extends SerialChart {
 		if (this.isDirty("pinchZoom") || this.get("panX") || this.get("panY")) {
 			this._setUpTouch();
 		}
+
+		// autoHome or an early goHome() once the map is first fitted; again after a refit on the way
+		if (refitted && this._geometryColection.geometries.length > 0) {
+			const goHomeOnFit = this._goHomeOnFit;
+			const homeTarget = this._homeTarget;
+			if ((!this._fitted && this.get("autoHome")) || goHomeOnFit || goingHome) {
+				this._goHomeOnFit = undefined;
+				// Going again takes as long as it was asked to the first time
+				this._scheduleHome(goHomeOnFit ? goHomeOnFit.duration : goingHome && homeTarget ? homeTarget.duration : undefined);
+			}
+			this._fitted = true;
+		}
+
+		if (this.isDirty("translateX") || this.isDirty("translateY") || this.isDirty("zoomLevel") || this.isDirty("rotationX") || this.isDirty("rotationY") || this.isDirty("rotationZ") || this.isDirty("projection") || this._sizeDirty) {
+			this._scheduleFocusView();
+		}
+	}
+
+	protected _processSeries(series: this["_seriesType"]) {
+		super._processSeries(series);
+		this._disposers.push(series.events.on("datavalidated", () => {
+			this._scheduleFocusView();
+		}));
+	}
+
+	// Check of which focusable map objects are in view, waiting for the map to
+	// stop moving
+	protected _focusViewTimeout?: IDisposer;
+
+	/**
+	 * @ignore
+	 */
+	public _scheduleFocusView(): void {
+		if (this._focusViewTimeout) {
+			this.removeDispose(this._focusViewTimeout);
+			this._focusViewTimeout.dispose();
+		}
+		this._focusViewTimeout = this.setTimeout(() => {
+			this._focusViewTimeout = undefined;
+			this._updateFocusView();
+		}, 100);
+	}
+
+	// A focusable map object entirely outside the visible area is not a TAB stop
+	// until panned or zoomed back. Even partly visible, it stays one
+	protected _updateFocusView(): void {
+		// The map is visible anywhere in the chart's root, or only in its own
+		// area if that masks its content
+		let left = 0;
+		let top = 0;
+		let right = this._root.container.width();
+		let bottom = this._root.container.height();
+
+		const chartContainer = this.chartContainer;
+		if (chartContainer.get("maskContent")) {
+			const p0 = chartContainer.toGlobal({ x: 0, y: 0 });
+			const p1 = chartContainer.toGlobal({ x: chartContainer.width(), y: chartContainer.height() });
+			left = Math.max(left, Math.min(p0.x, p1.x));
+			top = Math.max(top, Math.min(p0.y, p1.y));
+			right = Math.min(right, Math.max(p0.x, p1.x));
+			bottom = Math.min(bottom, Math.max(p0.y, p1.y));
+		}
+
+		const check = (sprite: Sprite | undefined) => {
+			if (sprite && sprite.get("focusable")) {
+				const bounds = sprite._focusBounds();
+				// At least a pixel of it in view
+				const inView = bounds.right - left >= 1 && right - bounds.left >= 1 && bounds.bottom - top >= 1 && bottom - bounds.top >= 1;
+				sprite.setPrivate("focusOutOfView", !inView);
+			}
+		};
+
+		this.series.each((series) => {
+			$array.each(series.dataItems, (dataItem: any) => {
+				check(dataItem.get("mapPolygon"));
+				check(dataItem.get("mapLine"));
+				$array.each(dataItem.bullets || [], (bullet: any) => {
+					check(bullet.get("sprite"));
+				});
+			});
+		});
 	}
 
 
@@ -948,34 +1068,113 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Returns geographical coordinates for calculated or manual center of the
-	 * map.
+	 * Returns the point `goHome()` centers on: `homeGeoPoint` if set, otherwise
+	 * the middle of the map fitted to the chart at the home rotation, whatever
+	 * the current view.
 	 */
 	public homeGeoPoint(): IGeoPoint {
 		let homeGeoPoint = this.get("homeGeoPoint");
 		if (!homeGeoPoint) {
-			const geoPath = this.getPrivate("geoPath");
-			const bounds = geoPath.bounds(this._geometryColection);
-
-			const left = bounds[0][0];
-			const top = bounds[0][1];
-
-			const right = bounds[1][0];
-			const bottom = bounds[1][1];
-
-			homeGeoPoint = this.invert({ x: left + (right - left) / 2, y: top + (bottom - top) / 2 });
+			const projection = this.get("projection")!;
+			const w = this.innerWidth();
+			const h = this.innerHeight();
+			const geometries = this._geometryColection;
+			if (w > 0 && h > 0 && geometries.geometries.length > 0 && projection.invert) {
+				const scale = projection.scale();
+				const translate = projection.translate();
+				const rotate = projection.rotate ? projection.rotate() : undefined;
+				if (rotate) {
+					const rotation = this._homeRotation();
+					projection.rotate([rotation[0], rotation[1], rotate[2]]);
+				}
+				projection.fitSize([w, h], geometries);
+				const center = projection.invert([w / 2, h / 2]);
+				projection.scale(scale);
+				projection.translate(translate);
+				if (rotate) {
+					projection.rotate(rotate);
+				}
+				if (center && $type.isNumber(center[0]) && $type.isNumber(center[1])) {
+					return { longitude: center[0], latitude: center[1] };
+				}
+			}
+			homeGeoPoint = this.invert({ x: w / 2, y: h / 2 });
 		}
 		return homeGeoPoint;
 	}
 
+	// The home rotation; a missing half keeps the current one
+	protected _homeRotation(): [number, number] {
+		return [this.get("homeRotationX", this.get("rotationX", 0)), this.get("homeRotationY", this.get("rotationY", 0))];
+	}
+
+	protected _view(): Array<number | undefined> {
+		return $array.map(homeKeys, (key) => this.get(key) as number | undefined);
+	}
+
+	// Still on the way home from loading (or there): nothing else has moved the map since
+	protected _isGoingHome(): boolean {
+		const target = this._homeTarget;
+		if (target) {
+			const animating = this._animatingSettings as any;
+			const view = this._view();
+			for (let i = 0; i < homeKeys.length; i++) {
+				const animation = animating[homeKeys[i]];
+				const value = view[i];
+				const to = target.view[i];
+				// A finished animation can land a rounding error away
+				const moved = value !== to && !($type.isNumber(value) && $type.isNumber(to) && Math.abs(value - to) < 1e-6);
+				if (animation ? animation !== target.animations[i] : moved) {
+					this._homeTarget = undefined;
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	// Goes home once this frame is drawn, and keeps track of it so a refit on the way can aim again
+	protected _scheduleHome(duration?: number) {
+		if (!this._homeScheduled) {
+			this._homeScheduled = true;
+			this._root.events.once("frameended", () => {
+				this._homeScheduled = false;
+				if (!this.isDisposed()) {
+					// Going home as the map is first fitted sets up its initial view,
+					// which is not announced
+					this._silentZoom = true;
+					this.goHome(duration);
+					this._silentZoom = false;
+					const animating = this._animatingSettings as any;
+					const animations = $array.map(homeKeys, (key) => animating[key]);
+					const view = this._view();
+					this._homeTarget = { view: $array.map(animations, (animation, i) => animation ? animation.to : view[i]), animations: animations, duration: duration };
+				}
+			});
+		}
+	}
+
 	/**
-	 * Repositions the map to the "home" zoom level and center coordinates.
+	 * Zooms and moves the map to its home position: `homeZoomLevel`,
+	 * `homeGeoPoint`, and `homeRotationX` and `homeRotationY` if set. Called
+	 * before the map is loaded, it goes there once it is.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Resetting_position_level} for more info
-	 * @param  duration  Animation duration in milliseconds
+	 * @param  duration  Animation duration in milliseconds; `animationDuration` if not set
 	 */
 	public goHome(duration?: number) {
-		this.zoomToGeoPoint(this.homeGeoPoint(), this.get("homeZoomLevel", 1), true, duration, this.get("homeRotationX"), this.get("homeRotationY"));
+		this.series.each((series) => {
+			series._onGoHome();
+		});
+
+		// Not fitted yet, so there is no home to go to: goes once it is
+		if (!this._fitted) {
+			this._goHomeOnFit = { duration: duration };
+			return;
+		}
+		const rotation = this.get("homeRotationX") != null || this.get("homeRotationY") != null ? this._homeRotation() : [undefined, undefined];
+		this.zoomToGeoPoint(this.homeGeoPoint(), this.get("homeZoomLevel", 1), true, duration, rotation[0], rotation[1]);
 	}
 
 	public _updateChildren() {
@@ -1180,11 +1379,11 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Converts screen coordinates (X and Y) within chart to latitude and
-	 * longitude.
+	 * Converts a point on the map to geographic coordinates. A point with no
+	 * location, such as one off a globe, gives longitude and latitude `0`.
 	 *
-	 * @param  point  Screen coordinates
-	 * @return        Geographical coordinates
+	 * @param  point  Point in pixels, relative to the map's area (the chart inside its padding)
+	 * @return        Geographic coordinates
 	 */
 	public invert(point: IPoint): IGeoPoint {
 		let projection = this.get("projection")!;
@@ -1200,13 +1399,14 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Converts latitude/longitude to screen coordinates (X and Y).
+	 * Converts geographic coordinates to a point on the map. Given one rotation
+	 * only, it takes the other, and `rotationZ`, as `0`.
 	 *
-	 * @param  point  Geographical coordinates
-	 * @param  rotationX  X rotation of a map if different from current
-	 * @param  rotationY  Y rotation of a map if different from current
+	 * @param  point      Geographic coordinates
+	 * @param  rotationX  `rotationX` to convert at instead of the current rotation
+	 * @param  rotationY  `rotationY` to convert at instead of the current rotation
 	 *
-	 * @return Screen coordinates
+	 * @return Point in pixels, relative to the map's area (the chart inside its padding)
 	 */
 	public convert(point: IGeoPoint, rotationX?: number, rotationY?: number): IPoint {
 		let projection = this.get("projection")!;
@@ -1347,25 +1547,31 @@ export class MapChart extends SerialChart {
 							const maxPanOut = this.get("maxPanOut", 0.4);
 							const bounds = this._mapBounds;
 
-							const w = this.width();
-							const h = this.height();
+							const w = this.innerWidth();
+							const h = this.innerHeight();
 
 							const ww = bounds[1][0] - bounds[0][0];
 							const hh = bounds[1][1] - bounds[0][1];
 
+							// A map bigger than the view can always be panned to its edges. A map
+							// already past the limit (e.g. zoomed to a point) does not jump back
+							const downX = x;
+							const downY = y;
 							if (panX == "translateX") {
 								x += local.x - downPoint.x;
 
 								const cx = w / 2 - (w / 2 - this._centerX) * zoomLevel;
-								x = Math.min(x, cx + ww * maxPanOut * zoomLevel);
-								x = Math.max(x, cx - ww * maxPanOut * zoomLevel);
+								const maxX = Math.max(ww * maxPanOut * zoomLevel, (ww * zoomLevel - w) / 2);
+								x = Math.min(x, Math.max(cx + maxX, downX));
+								x = Math.max(x, Math.min(cx - maxX, downX));
 
 							}
 							if (panY == "translateY") {
 								y += local.y - downPoint.y;
 								const cy = h / 2 - (h / 2 - this._centerY) * zoomLevel;
-								y = Math.min(y, cy + hh * maxPanOut * zoomLevel);
-								y = Math.max(y, cy - hh * maxPanOut * zoomLevel);
+								const maxY = Math.max(hh * maxPanOut * zoomLevel, (hh * zoomLevel - h) / 2);
+								y = Math.min(y, Math.max(cy + maxY, downY));
+								y = Math.max(y, Math.min(cy - maxY, downY));
 							}
 
 							this.set("translateX", x);
@@ -1414,17 +1620,18 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Zoom the map to geographical bounds.
+	 * Zooms the map to fit geographic bounds, with a 10% margin. Bounds whose
+	 * `right` is less than `left` take all longitudes.
 	 *
-	 * @param  geoBounds  Bounds
-	 * @param  duration   Animation duration in milliseconds
-	 * @param  rotationX  X rotation of a map at the end of zoom
-	 * @param  rotationY  Y rotation of a map at the end of zoom
+	 * @param  geoBounds  Longitudes `left` and `right`, latitudes `top` and `bottom`, in degrees
+	 * @param  duration   Animation duration in milliseconds; `animationDuration` if not set
+	 * @param  rotationX  `rotationX` to end at
+	 * @param  rotationY  `rotationY` to end at
+	 * @return            Zoom level animation
 	 */
 	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		if (geoBounds.right < geoBounds.left) {
-			geoBounds.right = 180;
-			geoBounds.left = -180;
+			geoBounds = { left: -180, right: 180, top: geoBounds.top, bottom: geoBounds.bottom };
 		}
 
 		const geoPath = this.getPrivate("geoPath");
@@ -1454,19 +1661,21 @@ export class MapChart extends SerialChart {
 		let geoPoint = this.invert({ x, y });
 
 		if (rotationX != null || rotationY != null) {
-			this.rotate(rotationX, rotationY);
+			this.rotate(rotationX, rotationY, duration);
 		}
 
 		return this.zoomToGeoPoint(geoPoint, zoomLevel, true, duration);
 	}
 
 	/**
-	 * Zooms the map to specific screen point.
+	 * Zooms the map in or out at a point on it. With `centerMapOnZoomOut`, a
+	 * zoom to `homeZoomLevel` centers on the home point instead.
 	 *
-	 * @param  point    Point
-	 * @param  level    Zoom level
-	 * @param  center   Center the map
-	 * @param  duration Duration of the animation in milliseconds
+	 * @param  point    Point in pixels, relative to the map's area (the chart inside its padding)
+	 * @param  level    Zoom level, kept within `minZoomLevel` and `maxZoomLevel`
+	 * @param  center   Move the point to the middle; otherwise it stays where it is
+	 * @param  duration Animation duration in milliseconds; `animationDuration` if not set
+	 * @return          Zoom level animation
 	 */
 	public zoomToPoint(point: IPoint, level: number, center?: boolean, duration?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
 		if (level) {
@@ -1480,7 +1689,8 @@ export class MapChart extends SerialChart {
 		const zoomLevel = this.get("zoomLevel", 1);
 
 		if (this.get("centerMapOnZoomOut") && level == this.get("homeZoomLevel", 1)) {
-			point = this.convert(this.homeGeoPoint(), this.get("homeRotationX"), this.get("homeRotationY"));
+			const rotation = this.get("homeRotationX") != null || this.get("homeRotationY") != null ? this._homeRotation() : [undefined, undefined];
+			point = this.convert(this.homeGeoPoint(), rotation[0], rotation[1]);
 			center = true;
 		}
 
@@ -1493,9 +1703,10 @@ export class MapChart extends SerialChart {
 		let cx = x;
 		let cy = y;
 
+		// The middle of the map's area, inside the chart's padding
 		if (center) {
-			cx = this.width() / 2;
-			cy = this.height() / 2;
+			cx = this.innerWidth() / 2;
+			cy = this.innerHeight() / 2;
 		}
 
 		let xx = cx - ((x - tx) / zoomLevel * level);
@@ -1506,22 +1717,36 @@ export class MapChart extends SerialChart {
 		this._tya = this.animate({ key: "translateY", to: yy, duration: duration, easing: easing });
 		this._za = this.animate({ key: "zoomLevel", to: level, duration: duration, easing: easing });
 
-		if (zoomLevel != level) {
-			this._root.readerAlert(this._t("Zoom level changed to %1", this._root.locale, $type.numberToString(level)));
+		if (zoomLevel != level && !this._silentZoom) {
+			this._announceZoom(level);
 		}
 
 		return this._za;
 	}
 
+	// Announces the zoom level once zooming settles, so a wheel or a quick
+	// series of zooms reads out only the level it ends at
+	protected _announceZoom(level: number) {
+		if (this._zoomAlert) {
+			this.removeDispose(this._zoomAlert);
+			this._zoomAlert.dispose();
+		}
+		this._zoomAlert = this.setTimeout(() => {
+			this._zoomAlert = undefined;
+			this._root.readerAlert(this._t("Zoom level changed to %1", this._root.locale, this._root.numberFormatter.format(level, "#.#")));
+		}, 300);
+	}
+
 	/**
-	 * Zooms the map to specific geographical point.
+	 * Zooms the map in or out at a geographic point.
 	 *
-	 * @param  geoPoint  Point
-	 * @param  level     Zoom level
-	 * @param  center    Center the map
-	 * @param  duration  Duration of the animation in milliseconds
-	 * @param  rotationX  X rotation of a map at the end of zoom
-	 * @param  rotationY  Y rotation of a map at the end of zoom
+	 * @param  geoPoint   Geographic point
+	 * @param  level      Zoom level, kept within `minZoomLevel` and `maxZoomLevel`
+	 * @param  center     Move the point to the middle; otherwise it stays where it is
+	 * @param  duration   Animation duration in milliseconds; `animationDuration` if not set
+	 * @param  rotationX  `rotationX` to end at
+	 * @param  rotationY  `rotationY` to end at
+	 * @return            Zoom level animation
 	 *
 	 */
 	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
@@ -1537,6 +1762,14 @@ export class MapChart extends SerialChart {
 		}
 	}
 
+	/**
+	 * Rotates the map to the given angles, in degrees. Does nothing on a
+	 * projection that can't rotate.
+	 *
+	 * @param  rotationX  `rotationX` to end at; unchanged if not set
+	 * @param  rotationY  `rotationY` to end at; unchanged if not set
+	 * @param  duration   Animation duration in milliseconds; `animationDuration` if not set
+	 */
 	public rotate(rotationX?: number, rotationY?: number, duration?: number) {
 		const projection = this.get("projection")!;
 		if (!projection.rotate) {
@@ -1557,15 +1790,12 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Animates the map projection transition from the current projection to
-	 * the target projection over the specified duration.
+	 * Morphs the map from the current projection into `target`.
 	 *
-	 * Since d3-geo does not expose raw projection functions on projection
-	 * instances, you must pass both the target `GeoProjection` and its
-	 * corresponding `GeoRawProjection`. On the first call you must also
-	 * pass `sourceRaw` so the method knows the current projection's raw
-	 * function. Subsequent calls reuse the previous target's raw
-	 * automatically.
+	 * d3-geo projections don't expose their raw functions, so pass `targetRaw`
+	 * along, and on the first call `sourceRaw` for the current projection;
+	 * later calls reuse the previous target's. Without a source raw function,
+	 * or with a zero duration, the projection switches at once.
 	 *
 	 * @param target     Target projection (e.g. `geoOrthographic()`)
 	 * @param targetRaw  Raw projection function (e.g. `geoOrthographicRaw`)
@@ -1695,17 +1925,21 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Zooms the map in.
+	 * Zooms the map in by `zoomStep`, at the middle of the view.
+	 *
+	 * @return Zoom level animation
 	 */
 	public zoomIn(): Animation<this["_settings"]["zoomLevel"]> | undefined {
-		return this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.get("zoomLevel", 1) * this.get("zoomStep", 2));
+		return this.zoomToPoint({ x: this.innerWidth() / 2, y: this.innerHeight() / 2 }, this.get("zoomLevel", 1) * this.get("zoomStep", 2));
 	}
 
 	/**
-	 * Zooms the map out.
+	 * Zooms the map out by `zoomStep`, at the middle of the view.
+	 *
+	 * @return Zoom level animation
 	 */
 	public zoomOut(): Animation<this["_settings"]["zoomLevel"]> | undefined {
-		return this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.get("zoomLevel", 1) / this.get("zoomStep", 2));
+		return this.zoomToPoint({ x: this.innerWidth() / 2, y: this.innerHeight() / 2 }, this.get("zoomLevel", 1) / this.get("zoomStep", 2));
 	}
 
 	public _clearDirty() {
@@ -1715,7 +1949,10 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Returns area of a mapPolygon in square pixels.
+	 * Returns the area a polygon takes on screen at the current zoom.
+	 *
+	 * @param  dataItem  Data item of a [[MapPolygonSeries]]
+	 * @return           Area in square pixels
 	 */
 	public getArea(dataItem: DataItem<IMapPolygonSeriesDataItem>): number {
 		const geoPath = this.getPrivate("geoPath");

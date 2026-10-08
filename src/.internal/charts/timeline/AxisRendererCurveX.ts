@@ -18,17 +18,21 @@ import * as $array from "../../core/util/Array";
 
 export interface IAxisRendererCurveXSettings extends IAxisRendererSettings {
 	/**
-	 * Array of control points to draw axis along.
+	 * Points of the line the axis runs along, from its start to its end. On a
+	 * [[CurveChart]], they are scaled and centered to fit the plot area;
+	 * [[SerpentineChart]] and [[SpiralChart]] set them themselves.
 	 */
 	points?: Array<IPoint>;
 
 	/**
-	 * Y renderer of a Y axis. Must be defined!
+	 * Renderer of the chart's Y axis, which runs across this one. Required.
 	 */
 	yRenderer: AxisRendererCurveY;
 
 	/**
-	 * If labels rotation should be adjusted to the axis rotation
+	 * Rotates the labels to follow the direction of the axis line.
+	 *
+	 * @default false
 	 */
 	rotateLabels?: boolean;
 }
@@ -42,7 +46,8 @@ export interface IAxisRendererCurveXPrivate extends IAxisRendererPrivate {
 }
 
 /**
- * Renderer for [[CurveChart]] "horizontal" axes.
+ * Renderer for the X axis of a [[CurveChart]], which runs along the line
+ * given in `points`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0
@@ -56,11 +61,7 @@ export class AxisRendererCurveX extends AxisRenderer {
 	declare public chart: CurveChart | undefined;
 
 	/**
-	 * A list of labels in the axis.
-	 *
-	 * `labels.template` can be used to configure labels.
-	 *
-	 * @default new ListTemplate<AxisLabelRadial>
+	 * The axis labels. Configure them through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<AxisLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -71,11 +72,8 @@ export class AxisRendererCurveX extends AxisRenderer {
 
 
 	/**
-	 * A list of fills in the axis.
-	 *
-	 * `axisFills.template` can be used to configure axis fills.
-	 *
-	 * @default new ListTemplate<Slice>
+	 * The axis fills: bands between neighboring grid lines, across the whole
+	 * Y axis. Configure them through `axisFills.template`.
 	 */
 	public readonly axisFills: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -256,10 +254,11 @@ export class AxisRendererCurveX extends AxisRenderer {
 	}
 
 	/**
-	 * Converts relative position to angle.
+	 * Returns the angle in degrees across the axis line at a position: the
+	 * line's direction there plus 90.
 	 *
-	 * @param   position  Position
-	 * @return            Angle
+	 * @param   position  Position on the axis, `0` to `1`
+	 * @return            Angle in degrees
 	 */
 	public positionToAngle(position: number): number {
 
@@ -425,10 +424,12 @@ export class AxisRendererCurveX extends AxisRenderer {
 
 
 	/**
-	 * Converts relative position to an X/Y coordinate.
+	 * Converts a position on this axis and one on the Y axis to an X/Y point.
 	 *
-	 * @param   position  Position
-	 * @return            Point
+	 * @param   position   Position on this axis, `0` to `1`
+	 * @param   positionY  Position on the Y axis, `0` to `1`
+	 * @param   doNotFix   `position` is already relative to the visible (zoomed) range
+	 * @return             Point
 	 */
 	public positionToPoint(position: number, positionY?: number, doNotFix?: boolean): IPoint {
 
@@ -648,7 +649,8 @@ export class AxisRendererCurveX extends AxisRenderer {
 
 
 	/**
-	 * Returns axis length in pixels.
+	 * Returns the length of the axis line, measured along `points` before
+	 * they are scaled to fit the chart.
 	 *
 	 * @return Length
 	 */

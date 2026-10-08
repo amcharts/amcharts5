@@ -5,48 +5,38 @@ import { Label, ILabelSettings, ILabelPrivate } from "../../../core/render/Label
 export interface IAxisLabel extends Label {
 
 	/**
-	 * Relative location of the label within the cell.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Where the label sits within its cell, from `0` (start) to `1` (end). A
+	 * cell is a category, a date period, or the span of an axis range.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
 	 */
 	location?: number;
 
 	/**
-	 * Relative location of the label within the cell when it spans multiple
-	 * intervals.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Used instead of `location` when a grid step spans several units, such
+	 * as 5 days, or when only every few categories get a label.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Multi_location} for more info
 	 */
 	multiLocation?: number;
 
 	/**
-	 * If set to `true` the label will be shown inside plot area.
-	 *
-	 * @default false
+	 * Shows the label inside the plot area. If not set, the renderer's
+	 * `inside` applies.
 	 */
 	inside?: boolean | undefined;
 
 	/**
-	 * The minimum relative position within visible axis scope the label can
-	 * appear on.
-	 *
-	 * E.g. `0.1` will mean that label will not be shown if it's closer to the
-	 * beginning of the axis than 10%.
+	 * Hides the label when it is closer to the start of the visible part of
+	 * the axis than this, from `0` to `1`: `0.1` hides labels in the first 10%.
 	 *
 	 * @default 0
 	 */
 	minPosition?: number;
 
 	/**
-	 * The maximum relative position within visible axis scope the label can
-	 * appear on.
-	 *
-	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
-	 * end of the axis than 10%.
+	 * Hides the label when it is closer to the end of the visible part of the
+	 * axis than this, from `0` to `1`: `0.9` hides labels in the last 10%.
 	 *
 	 * @default 1
 	 */
@@ -59,38 +49,34 @@ export interface IAxisLabel extends Label {
 export interface IAxisLabelSettings extends ILabelSettings {
 
 	/**
-	 * Relative location of the label within the cell.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Where the label sits within its cell, from `0` (start) to `1` (end). A
+	 * cell is a category, a date period, or the span of an axis range.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @default 0.5
 	 */
 	location?: number;
 
 	/**
-	 * Relative location of the label within the cell when it spans multiple
-	 * intervals.
-	 *
-	 * `0` - beginning, `0.5` - middle, `1` - end.
+	 * Used instead of `location` when a grid step spans several units, such
+	 * as 5 days, or when only every few categories get a label.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Multi_location} for more info
+	 * @default 0
 	 */
 	multiLocation?: number;
 
 	/**
-	 * If set to `true` the label will be shown inside plot area.
+	 * Shows the label inside the plot area. If not set, the renderer's
+	 * `inside` applies.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
-	 * @default false
 	 */
 	inside?: boolean | undefined;
 
 	/**
-	 * The minimum relative position within visible axis scope the label can
-	 * appear on.
-	 *
-	 * E.g. `0.1` will mean that label will not be shown if it's closer to the
-	 * beginning of the axis than 10%.
+	 * Hides the label when it is closer to the start of the visible part of
+	 * the axis than this, from `0` to `1`: `0.1` hides labels in the first 10%.
 	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
@@ -98,11 +84,8 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	minPosition?: number;
 
 	/**
-	 * The maximum relative position within visible axis scope the label can
-	 * appear on.
-	 *
-	 * E.g. `0.9` will mean that label will not be shown if it's closer to the
-	 * end of the axis than 10%.
+	 * Hides the label when it is closer to the end of the visible part of the
+	 * axis than this, from `0` to `1`: `0.9` hides labels in the last 10%.
 	 *
 	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Start_end_labels_and_ticks} for more info
@@ -115,7 +98,7 @@ export interface IAxisLabelPrivate extends ILabelPrivate {
 }
 
 /**
- * Draws an axis label.
+ * A label on an axis, such as a category name or a value.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels} for more info
  * @important

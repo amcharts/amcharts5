@@ -18,12 +18,12 @@ import * as $utils from "../../core/util/Utils";
 export interface IFunnelSeriesDataItem extends IPercentSeriesDataItem {
 
 	/**
-	 * A related slice element.
+	 * The slice element.
 	 */
 	slice: FunnelSlice;
 
 	/**
-	 * A related slice link element
+	 * The link element that joins this slice to the next one.
 	 */
 	link: FunnelSlice;
 
@@ -37,14 +37,12 @@ export interface IFunnelSeriesDataItem extends IPercentSeriesDataItem {
 export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 
 	/**
-	 * Width of the bottom edge of the slice relative to the top edge of the next
-	 * slice.
-	 *
-	 * `1` - means the full width of the slice, resulting in a rectangle.
-	 * `0` - means using width of the next slice, resulting in a trapezoid.
+	 * Narrows the bottom edge of each slice toward the width of the next
+	 * slice: `0` keeps it as wide as the top, making a rectangle, `1` makes it
+	 * as wide as the next slice, making a trapezoid.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Slice_bottom_width} for more info
-	 * @default 1
+	 * @default 0
 	 */
 	bottomRatio?: number;
 
@@ -57,15 +55,19 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	orientation: "horizontal" | "vertical";
 
 	/**
-	 * If set to `true`, series will not create slices for data items with zero
-	 * value.
+	 * Leaves out items with a zero value: no slice, label or tick, and no
+	 * space for them.
+	 *
+	 * @default false
 	 */
 	ignoreZeroValues?: boolean;
 
 	/**
-	 * Should labels be aligned into columns/rows?
+	 * Lines the labels up in a column to the right of the slices (a row below
+	 * them when horizontal), joined to them by ticks. `false` puts each label
+	 * over its slice.
 	 *
-	 * @default false
+	 * @default true
 	 */
 	alignLabels?: boolean;
 
@@ -80,12 +82,12 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	startLocation?: number;
 
 	/**
-	 * Relative location within area available to series where it should start.
+	 * Relative location within area available to series where it should end.
 	 *
 	 * `0` - beginning, `1` - end, or any intermediate value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
-	 * @default 0
+	 * @default 1
 	 */
 	endLocation?: number;
 
@@ -95,7 +97,8 @@ export interface IFunnelSeriesPrivate extends IPercentSeriesPrivate {
 }
 
 /**
- * Creates a funnel series for use in a [[SlicedChart]].
+ * A funnel series for a [[SlicedChart]]: slices of equal height, each as wide
+ * as its value relative to the largest one.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/} for more info
  * @important
@@ -103,7 +106,7 @@ export interface IFunnelSeriesPrivate extends IPercentSeriesPrivate {
 export class FunnelSeries extends PercentSeries {
 
 	/**
-	 * A chart series is attached to.
+	 * The chart the series belongs to.
 	 */
 	declare public chart: SlicedChart | undefined;
 
@@ -185,7 +188,7 @@ export class FunnelSeries extends PercentSeries {
 	protected _afterNew() {
 		super._afterNew();
 		const slicesContainer = this.slicesContainer;
-		slicesContainer.setAll({ isMeasured: true, position: "relative", width: percent(100), height: percent(100) });
+		slicesContainer._setCAll({ isMeasured: true, position: "relative", width: percent(100), height: percent(100) });
 		slicesContainer.onPrivate("width", () => {
 			this.markDirtySize();
 		})
@@ -485,7 +488,7 @@ export class FunnelSeries extends PercentSeries {
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Hides a slice, with its label, tick and link.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -497,7 +500,7 @@ export class FunnelSeries extends PercentSeries {
 	}
 
 	/**
-	 * Shows series's data item.
+	 * Shows a hidden slice, with its label, tick and link.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds

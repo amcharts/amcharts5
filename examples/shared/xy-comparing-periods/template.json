@@ -1,0 +1,7 @@
+{
+  "title": "Comparing Two Periods",
+  "description": "This period as a solid line and the previous one as a dashed line on the same dates, with one tooltip showing both values.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "date axis", "comparison", "tooltip", "dashed line"]
+}

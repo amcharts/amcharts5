@@ -1,0 +1,7 @@
+{
+  "title": "Spiral Chart",
+  "description": "A spiral chart: three years of monthly values as columns along a date axis that winds outwards, with a value axis across it.",
+  "category": "timeline",
+  "tier": "basic",
+  "tags": ["spiral", "column", "date axis", "value axis"]
+}

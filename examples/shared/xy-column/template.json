@@ -1,0 +1,7 @@
+{
+  "title": "Column Chart with Date Axis",
+  "description": "A column series of daily values on a date axis, with a cursor, a scrollbar and zoom.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["column", "date axis", "cursor", "scrollbar", "zoom"]
+}

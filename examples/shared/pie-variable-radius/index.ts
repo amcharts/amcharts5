@@ -18,36 +18,33 @@ root.setThemes([
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
 const chart = root.container.children.push(am5percent.PieChart.new(root, {
-  layout: root.verticalLayout
+  layout: root.verticalLayout // stacks the pie and the legend added below it
 }));
 
 
 // Create series
 // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
 const series = chart.series.push(am5percent.PieSeries.new(root, {
-  alignLabels: true,
-  calculateAggregates: true,
+  calculateAggregates: true, // works out the highest value, which the radius adapter needs
   valueField: "value",
   categoryField: "category"
 }));
 
+// a 3 px outline in the background color keeps the slices apart
 series.slices.template.setAll({
   strokeWidth: 3,
-  stroke: am5.color(0xffffff)
+  stroke: root.interfaceColors.get("background")
 });
 
-series.labelsContainer.set("paddingTop", 30)
 
-
-// Set up adapters for variable slice radius
+// Scale each slice's radius by its value, relative to the biggest one
 // https://www.amcharts.com/docs/v5/concepts/settings/adapters/
-series.slices.template.adapters.add("radius", (radius, target: any) => {
-  const dataItem = target.dataItem;
-  const high = series.getPrivate("valueHigh");
+series.slices.template.adapters.add("radius", (radius, target) => {
+  const dataItem = target.dataItem as am5.DataItem<am5percent.IPieSeriesDataItem> | undefined;
+  const high = series.getPrivate("valueHigh"); // the biggest value in the data
 
-  if (dataItem) {
-    let value = target.dataItem.get("valueWorking", 0);
-    return radius * value / high
+  if (dataItem && radius != null && high) {
+    return radius * dataItem.get("valueWorking", 0) / high; // the biggest slice keeps the full radius
   }
   return radius;
 });
@@ -55,37 +52,26 @@ series.slices.template.adapters.add("radius", (radius, target: any) => {
 
 // Set data
 // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
-series.data.setAll([{
-  value: 10,
-  category: "One"
-}, {
-  value: 9,
-  category: "Two"
-}, {
-  value: 6,
-  category: "Three"
-}, {
-  value: 5,
-  category: "Four"
-}, {
-  value: 4,
-  category: "Five"
-}, {
-  value: 3,
-  category: "Six"
-}]);
+series.data.setAll([
+  { value: 10, category: "One" },
+  { value: 9, category: "Two" },
+  { value: 6, category: "Three" },
+  { value: 5, category: "Four" },
+  { value: 4, category: "Five" },
+  { value: 3, category: "Six" }
+]);
 
 
 // Create legend
 // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
-  centerX: am5.p50,
-  x: am5.p50,
-  marginTop: 15,
+  centerX: am5.percent(50), // the legend's middle...
+  x: am5.percent(50),       // ...at the middle of the chart: centered
+  marginTop: 15,            // some room between the pie and the legend
   marginBottom: 15
 }));
 
-legend.data.setAll(series.dataItems);
+legend.data.setAll(series.dataItems); // one legend item per slice
 
 
 // Play initial series animation

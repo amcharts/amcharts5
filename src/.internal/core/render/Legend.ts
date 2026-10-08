@@ -12,28 +12,27 @@ import * as $utils from "../../core/util/Utils";
 export interface ILegendDataItem extends ISeriesDataItem {
 
 	/**
-	 * [[Container]] element holding all other legend item elements, labels,
-	 * markers, etc.
+	 * The [[Container]] that holds all elements of the legend item.
 	 */
 	itemContainer: Container;
 
 	/**
-	 * Marker element.
+	 * The marker's container.
 	 */
 	marker: Container;
 
 	/**
-	 * Marker rectangle element.
+	 * The rectangle of the default marker.
 	 */
 	markerRectangle: RoundedRectangle;
 
 	/**
-	 * Label element.
+	 * The label with the item's name.
 	 */
 	label: Label;
 
 	/**
-	 * Value label element.
+	 * The label with the item's value.
 	 */
 	valueLabel: Label;
 
@@ -77,39 +76,40 @@ export interface ILegendItem extends Entity {
 export interface ILegendSettings extends ISeriesSettings {
 
 	/**
-	 * If set to `true` the legend will not try to mimic appearance of the actual
-	 * item but rather show default square marker.
+	 * Shows a plain rectangle marker instead of one that mimics the look of
+	 * the item.
 	 *
 	 * @default false
 	 */
 	useDefaultMarker?: boolean;
 
 	/**
-	 * A key to look up in data for a name of the data item.
+	 * Setting of each legend item (a series or a data item) to take its name
+	 * from.
 	 *
 	 * @default "name"
 	 */
 	nameField?: string;
 
 	/**
-	 * A key to look up in data for a fill of the data item.
+	 * Setting of each legend item to take its marker's fill color from.
 	 *
 	 * @default "fill"
 	 */
 	fillField?: string;
 
 	/**
-	 * A key to look up in data for a stroke of the data item.
+	 * Setting of each legend item to take its marker's stroke color from.
 	 *
 	 * @default "stroke"
 	 */
 	strokeField?: string;
 
 	/**
-	 * Which legend item element will be clickable to toggle related chart item:
+	 * Which part of a legend item toggles the chart item when clicked:
 	 * * `"itemContainer"` - the whole legend item (default).
-	 * * `"marker"` - legend item marker.
-	 * * `"none"` - disables toggling of legend item.
+	 * * `"marker"` - the marker only.
+	 * * `"none"` - nothing; the legend items cannot be toggled.
 	 *
 	 * @default "itemContainer"
 	 * @since 5.0.13
@@ -126,7 +126,8 @@ export interface ILegendEvents extends ISeriesEvents {
 }
 
 /**
- * A universal legend control.
+ * A list of items, one per series or data item, that can be clicked to show
+ * or hide them.
  *
  * @important
  * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/} for more info
@@ -147,9 +148,7 @@ export class Legend extends Series {
 	declare public _events: ILegendEvents;
 
 	/**
-	 * List of all [[Container]] elements for legend items.
-	 *
-	 * @default new ListTemplate<Container>
+	 * The containers of the legend items, one per item.
 	 */
 	public readonly itemContainers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -185,9 +184,7 @@ export class Legend extends Series {
 	}
 
 	/**
-	 * List of legend marker elements.
-	 *
-	 * @default new ListTemplate<Container>
+	 * The markers of the legend items.
 	 */
 	public readonly markers: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -206,9 +203,7 @@ export class Legend extends Series {
 	}
 
 	/**
-	 * List of legend label elements.
-	 *
-	 * @default new ListTemplate<Label>
+	 * The name labels of the legend items.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -227,9 +222,7 @@ export class Legend extends Series {
 	}
 
 	/**
-	 * List of legend value label elements.
-	 *
-	 * @default new ListTemplate<label>
+	 * The value labels of the legend items.
 	 */
 	public readonly valueLabels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -248,9 +241,7 @@ export class Legend extends Series {
 	}
 
 	/**
-	 * List of rectangle elements used for default legend markers.
-	 *
-	 * @default new ListTemplate<RoundedRectangle>
+	 * The rectangles of the default markers.
 	 */
 	public readonly markerRectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -376,6 +367,14 @@ export class Legend extends Series {
 					let clickContainer = itemContainer;
 					if (clickTarget == "marker") {
 						clickContainer = marker;
+
+						// Keyboard focus is on the whole item: ENTER / SPACE on it
+						// toggles as a click on the marker does
+						itemContainer.events.on("click", (ev) => {
+							if (ev.simulated) {
+								marker.events.dispatch("click", { ...ev, target: marker });
+							}
+						});
 					}
 					this._addClickEvents(clickContainer, item, dataItem)
 				}

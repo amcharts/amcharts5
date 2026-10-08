@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "U redu",
+	"Cancel": "Odustani",
+	"Delete": "Izbriši",
+	"Settings": "Postavke",
+	"Expand": "Proširi",
+	"Move Up": "Pomakni gore",
+	"Move Down": "Pomakni dolje"
 };

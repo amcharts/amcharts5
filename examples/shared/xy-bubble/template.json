@@ -1,0 +1,7 @@
+{
+  "title": "Bubble Chart",
+  "description": "Countries as bubbles on two value axes, sized by a heat rule and colored per data row through templateField.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["bubble", "scatter", "heat rules", "templatefield", "value axis"]
+}

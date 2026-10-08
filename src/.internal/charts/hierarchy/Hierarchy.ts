@@ -44,24 +44,25 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	valueWorking: number;
 
 	/**
-	 * Percent value of the node, based on total sum of all nodes in upper level.
+	 * The node's value as a percent of the root node's total (`25` for 25%).
 	 */
 	valuePercentTotal: number;
 
 	/**
-	 * Percent value of the node, based on the value of its direct parent.
+	 * The node's value as a percent of its parent's (`25` for 25%).
 	 *
 	 * @since 5.2.21
 	 */
 	valuePercent: number;
 
 	/**
-	 * Sum of child values.
+	 * The node's total: its own value if the data gives one, or else the sum
+	 * of its children's.
 	 */
 	sum: number;
 
 	/**
-	 * Category.
+	 * The node's category name.
 	 */
 	category: string;
 
@@ -81,22 +82,23 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	parent: DataItem<IHierarchyDataItem>;
 
 	/**
-	 * Node's depth within the hierarchy.
+	 * Depth of the node in the hierarchy: `0` for the root.
 	 */
 	depth: number;
 
 	/**
-	 * A reference to the related [[HierarchyNode]].
+	 * The node element.
 	 */
 	node: HierarchyNode;
 
 	/**
-	 * A reference to node's [[Label]].
+	 * The node's label.
 	 */
 	label: Label;
 
 	/**
-	 * Node's auto-assigned color.
+	 * The node's color: from data (`fillField`), or else the next of `colors`
+	 * for a first-level node and the parent's color for a deeper one.
 	 */
 	fill: Color;
 
@@ -109,7 +111,7 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	fillPattern: Pattern;
 
 	/**
-	 * Indicates if node is currently disabled.
+	 * `true` while the node is collapsed, with its children hidden.
 	 */
 	disabled: boolean;
 
@@ -130,23 +132,25 @@ export interface IHierarchySettings extends ISeriesSettings {
 
 
 	/**
-	 * A field in data that holds numeric value for the node.
+	 * Field in data that holds the node's value.
 	 */
 	valueField?: string;
 
 	/**
-	 * A field in data that holds string-based identificator for node.
+	 * Field in data that holds the node's category name.
 	 */
 	categoryField?: string;
 
 	/**
-	 * A field in data that holds an array of child node data.
+	 * Field in data that holds the array of the node's children.
+	 *
+	 * @default "children"
 	 */
 	childDataField?: string;
 
 	/**
-	 * A field in data that holds the parent node's ID, used with flat
-	 * (tabular) data via [[setFlatData]].
+	 * Field in data that holds the parent node's ID, for flat data passed to
+	 * `setFlatData()`. When not set, `"parentId"` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Flat_data} for more info
 	 * @since 5.16.2
@@ -154,26 +158,25 @@ export interface IHierarchySettings extends ISeriesSettings {
 	parentIdField?: string;
 
 	/**
-	 * A field in data that holds boolean value indicating if node is
-	 * disabled (collapsed).
+	 * Field in data that, when `true`, makes the node start collapsed.
 	 */
 	disabledField?: string;
 
 	/**
-	 * A field in data that holds color used for fills for various elements, such
-	 * as nodes.
+	 * Field in data that holds the node's color.
 	 */
 	fillField?: string;
 
 	/**
-	 * A [[ColorSet]] to use when asigning colors for nodes.
+	 * [[ColorSet]] for the node colors: each first-level node takes the next
+	 * color, and the nodes below it share that color.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Node_colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * A [[PatternSet]] to use when asigning patterns for nodes.
+	 * A [[PatternSet]] to use when assigning patterns for nodes.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
 	 * @since 5.10.0
@@ -181,56 +184,59 @@ export interface IHierarchySettings extends ISeriesSettings {
 	patterns?: PatternSet;
 
 	/**
-	 * Number of child levels to open when clicking on a node.
+	 * Number of child levels a click on a node opens.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
+	 * @default 1
 	 */
 	downDepth?: number;
 
 	/**
-	 * Number of parent levels to show from currently selected node.
+	 * Number of parent levels that stay visible above the selected node.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
 	 */
 	upDepth?: number;
 
 	/**
-	 * Number of levels to show on chart's first load.
+	 * Number of levels opened below the top level (`topDepth`) when the chart
+	 * first loads.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Tree_depth} for more info
+	 * @default 5
 	 */
 	initialDepth?: number;
 
 	/**
-	 * If set, will show nodes starting from set level.
-	 *
-	 * It could be used to eliminate top level branches, that do not need to be
-	 * shown.
+	 * Depth of the first level shown; the levels above it are hidden. For
+	 * example, `1` hides the root node.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Tree_depth} for more info
+	 * @default 0
 	 */
 	topDepth?: number;
 
 	/**
-	 * If set to `true` will make all other branches collapse when some branch is
-	 * expanded.
+	 * Collapses the other branches when a branch is opened.
+	 *
+	 * [[Sunburst]] ignores this setting and always works as if it is `true`.
 	 */
 	singleBranchOnly?: boolean;
 
 	/**
-	 * A data item for currently selected node.
+	 * The selected (drilled-into) node. Set it to drill down to a node.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch} for more info
 	 */
 	selectedDataItem?: DataItem<IHierarchyDataItem>;
 
 	/**
-	 * Duration for all drill animations in milliseconds.
+	 * Duration of the drill-down animations, in milliseconds.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * An easing function to use for drill animations.
+	 * Easing of the drill-down animations.
 	 */
 	animationEasing?: Easing;
 
@@ -239,20 +245,25 @@ export interface IHierarchySettings extends ISeriesSettings {
 export interface IHierarchyPrivate extends ISeriesPrivate {
 
 	/**
-	 * Level count in series.
+	 * Depth of the deepest node.
 	 */
 	maxDepth: number;
 
 }
 
 export interface IHierarchyEvents extends ISeriesEvents {
+	/**
+	 * A node was selected (drilled into), by a click or through
+	 * `selectedDataItem`.
+	 */
 	dataitemselected: {
 		dataItem?: DataItem<IHierarchyDataItem>
 	};
 }
 
 /**
- * A base class for all hierarchy charts.
+ * Base class for the hierarchy series, such as [[Treemap]], [[Sunburst]],
+ * [[Partition]], [[Pack]], [[Tree]] and [[ForceDirected]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/} for more info
  */
@@ -266,9 +277,7 @@ export abstract class Hierarchy extends Series {
 	declare public _events: IHierarchyEvents;
 
 	/**
-	 * A [[Container]] that nodes are placed in.
-	 *
-	 * @default Container.new()
+	 * Container that holds the node elements.
 	 */
 	public readonly nodesContainer = this.children.push(Container.new(this._root, { isMeasured: false }));
 
@@ -289,9 +298,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * A list of nodes in a [[Hierarchy]] chart.
-	 *
-	 * @default new ListTemplate<HierarchyNode>
+	 * List of node elements; configure them all through `nodes.template`.
 	 */
 	public readonly nodes: ListTemplate<HierarchyNode> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -332,9 +339,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * A list of label elements in a [[Hierarchy]] chart.
-	 *
-	 * @default new ListTemplate<Label>
+	 * List of node labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -432,7 +437,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Looks up and returns a data item by its ID.
+	 * Finds a node's data item by its ID, at any depth.
 	 *
 	 * @param   id  ID
 	 * @return      Data item
@@ -583,12 +588,10 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Sets flat (tabular) data for the hierarchy chart.
-	 *
-	 * Converts flat data with parent references into nested hierarchical
-	 * data. Requires [[idField]] and [[parentIdField]] to be set.
-	 *
-	 * The root node should have a `null`/`undefined` parent ID.
+	 * Sets the data from a flat list, in which each item gives its parent's ID
+	 * (in `parentIdField`, matching another item's `idField`; `"parentId"` and
+	 * `"id"` when not set). The item with no parent ID (`null`, `undefined` or
+	 * `""`) becomes the root; if there are several, only the last one is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Flat_data} for more info
 	 * @since 5.16.2
@@ -634,10 +637,12 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Adds children data to the target data item.
+	 * Adds child nodes to a node.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-api/#Dynamically_adding_child_nodes} for more info
 	 * @since 5.4.5
+	 * @param  dataItem  Node to add the children to
+	 * @param  data      Data objects of the new children
 	 */
 	public addChildData(dataItem: DataItem<this["_dataItemSettings"]>, data: Array<any>) {
 		const dataContext = dataItem.dataContext as any;
@@ -815,7 +820,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Hides hierarchy's data item.
+	 * Hides a node with all the nodes below it.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -854,7 +859,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Shows hierarchy's data item.
+	 * Shows a hidden node with all the nodes below it.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -888,9 +893,11 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Enables a disabled data item.
+	 * Expands a collapsed node, opening `maxDepth` levels below it.
 	 *
 	 * @param  dataItem  Target data item
+	 * @param  maxDepth  Number of levels to open (`1` if not given)
+	 * @param  depth     Used internally; leave it out
 	 * @param  duration  Animation duration in milliseconds
 	 */
 	public enableDataItem(dataItem: DataItem<this["_dataItemSettings"]>, maxDepth?: number, depth?: number, duration?: number) {
@@ -964,7 +971,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Disables a data item.
+	 * Collapses a node, hiding all the nodes below it.
 	 *
 	 * @param  dataItem  Target data item
 	 * @param  duration  Animation duration in milliseconds
@@ -1029,7 +1036,7 @@ export abstract class Hierarchy extends Series {
 					dataItem.get("node").hide(0);
 				}
 
-				if (this.get("singleBranchOnly")) {
+				if (this._isSingleBranchOnly()) {
 					this._handleSingle(dataItem);
 				}
 			}
@@ -1044,6 +1051,10 @@ export abstract class Hierarchy extends Series {
 	}
 
 	protected _zoom(_dataItem: DataItem<this["_dataItemSettings"]>) {
+	}
+
+	protected _isSingleBranchOnly(): boolean {
+		return this.get("singleBranchOnly", false);
 	}
 
 	protected _handleSingle(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -1061,7 +1072,8 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Selects specific data item.
+	 * Drills into a node, as a click does. Selecting the node that is already
+	 * selected goes back up to its parent.
 	 *
 	 * @param  dataItem  Target data item
 	 */
@@ -1125,7 +1137,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Triggers hover on a series data item.
+	 * Puts a data item's node in its hover state, unless it is hidden.
 	 *
 	 * @since 5.0.7
 	 * @param  dataItem  Target data item
@@ -1138,7 +1150,7 @@ export abstract class Hierarchy extends Series {
 	}
 
 	/**
-	 * Triggers un-hover on a series data item.
+	 * Takes a data item's node out of its hover state.
 	 *
 	 * @since 5.0.7
 	 * @param  dataItem  Target data item

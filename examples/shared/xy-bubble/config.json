@@ -1,0 +1,585 @@
+{
+  "type": "XYChart",
+  "settings": {
+    "panX": true,
+    "panY": true,
+    "wheelY": "zoomXY",
+    "cursor": {
+      "type": "XYCursor",
+      "settings": {
+        "xAxis": "#axis-0",
+        "yAxis": "#axis-1",
+        "snapToSeries": ["#series-0"]
+      }
+    },
+    "scrollbarX": {
+      "type": "Scrollbar",
+      "settings": { "orientation": "horizontal" }
+    },
+    "scrollbarY": {
+      "type": "Scrollbar",
+      "settings": { "orientation": "vertical" }
+    },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"],
+    "xAxes": ["#axis-0"],
+    "yAxes": ["#axis-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "country": "Afghanistan",
+          "gdp": 1350,
+          "lifeExpectancy": 60.5,
+          "population": 33397058,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Argentina",
+          "gdp": 15714,
+          "lifeExpectancy": 76.1,
+          "population": 41118986,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#86a965" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Australia",
+          "gdp": 36065,
+          "lifeExpectancy": 82.4,
+          "population": 22918688,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#8aabb0" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Bangladesh",
+          "gdp": 1793,
+          "lifeExpectancy": 70.3,
+          "population": 152408774,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Brazil",
+          "gdp": 10384,
+          "lifeExpectancy": 73.7,
+          "population": 198360943,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#86a965" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Canada",
+          "gdp": 35993,
+          "lifeExpectancy": 81.3,
+          "population": 34674708,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#a7a737" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Chile",
+          "gdp": 15404,
+          "lifeExpectancy": 79.7,
+          "population": 17423214,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#86a965" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "China",
+          "gdp": 9502,
+          "lifeExpectancy": 75.2,
+          "population": 1353600687,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Colombia",
+          "gdp": 8036,
+          "lifeExpectancy": 73.8,
+          "population": 47550708,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#86a965" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Congo, Dem. Rep.",
+          "gdp": 403,
+          "lifeExpectancy": 49.6,
+          "population": 69575394,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Cuba",
+          "gdp": 10197,
+          "lifeExpectancy": 79.1,
+          "population": 11249266,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#a7a737" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Egypt",
+          "gdp": 6014,
+          "lifeExpectancy": 70.9,
+          "population": 83958369,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Ethiopia",
+          "gdp": 959,
+          "lifeExpectancy": 63,
+          "population": 86538534,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "France",
+          "gdp": 29896,
+          "lifeExpectancy": 81.7,
+          "population": 63457777,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Germany",
+          "gdp": 34132,
+          "lifeExpectancy": 80.6,
+          "population": 81990837,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Haiti",
+          "gdp": 1180,
+          "lifeExpectancy": 62.7,
+          "population": 10255644,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#a7a737" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "India",
+          "gdp": 3229,
+          "lifeExpectancy": 66.2,
+          "population": 1258350971,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Indonesia",
+          "gdp": 4380,
+          "lifeExpectancy": 70.6,
+          "population": 244769110,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Iran",
+          "gdp": 12325,
+          "lifeExpectancy": 73.7,
+          "population": 75611798,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Italy",
+          "gdp": 25812,
+          "lifeExpectancy": 82.2,
+          "population": 60964145,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Japan",
+          "gdp": 31274,
+          "lifeExpectancy": 83.4,
+          "population": 126434653,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Kenya",
+          "gdp": 1518,
+          "lifeExpectancy": 61.1,
+          "population": 42749418,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Korea, Rep.",
+          "gdp": 26199,
+          "lifeExpectancy": 81.3,
+          "population": 48588326,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Mexico",
+          "gdp": 12030,
+          "lifeExpectancy": 77.3,
+          "population": 116146768,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#a7a737" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Morocco",
+          "gdp": 4515,
+          "lifeExpectancy": 70.7,
+          "population": 32598536,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Mozambique",
+          "gdp": 1058,
+          "lifeExpectancy": 49.9,
+          "population": 24475186,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Nigeria",
+          "gdp": 2484,
+          "lifeExpectancy": 52.1,
+          "population": 166629383,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Pakistan",
+          "gdp": 2681,
+          "lifeExpectancy": 66.4,
+          "population": 179951140,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Papua New Guinea",
+          "gdp": 2392,
+          "lifeExpectancy": 62.3,
+          "population": 7170112,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#8aabb0" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Peru",
+          "gdp": 9278,
+          "lifeExpectancy": 74.5,
+          "population": 29733829,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#86a965" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Philippines",
+          "gdp": 3677,
+          "lifeExpectancy": 68.5,
+          "population": 96471461,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Poland",
+          "gdp": 17852,
+          "lifeExpectancy": 76.2,
+          "population": 38317090,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Russia",
+          "gdp": 15428,
+          "lifeExpectancy": 67.9,
+          "population": 142703181,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "South Africa",
+          "gdp": 9657,
+          "lifeExpectancy": 56.3,
+          "population": 50738255,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Spain",
+          "gdp": 26458,
+          "lifeExpectancy": 82,
+          "population": 46771596,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Tanzania",
+          "gdp": 1330,
+          "lifeExpectancy": 60.9,
+          "population": 47656367,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#de4c4f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Ukraine",
+          "gdp": 6390,
+          "lifeExpectancy": 68.4,
+          "population": 44940268,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "United Kingdom",
+          "gdp": 31295,
+          "lifeExpectancy": 80.4,
+          "population": 62798099,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#d8854f" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "United States",
+          "gdp": 42296,
+          "lifeExpectancy": 78.8,
+          "population": 315791284,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#a7a737" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "country": "Vietnam",
+          "gdp": 3074,
+          "lifeExpectancy": 75.8,
+          "population": 89730274,
+          "bulletSettings": {
+            "fill": { "type": "Color", "value": "#eea638" },
+            "__parse": true
+          },
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "template-0": { "type": "Template" }
+    },
+    {
+      "axis-0": {
+        "type": "ValueAxis",
+        "settings": {
+          "logarithmic": true,
+          "maxDeviation": 1,
+          "renderer": {
+            "type": "AxisRendererX",
+            "settings": { "pan": "zoom" }
+          },
+          "tooltip": { "type": "Tooltip" }
+        },
+        "children": [
+          {
+            "type": "Label",
+            "settings": {
+              "text": "GDP per capita, USD",
+              "x": { "type": "Percent", "value": 50 },
+              "centerX": { "type": "Percent", "value": 50 }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "axis-1": {
+        "type": "ValueAxis",
+        "settings": {
+          "maxDeviation": 1,
+          "renderer": {
+            "type": "AxisRendererY",
+            "settings": { "pan": "zoom" }
+          },
+          "tooltip": { "type": "Tooltip" }
+        },
+        "children": [
+          {
+            "type": "Label",
+            "settings": {
+              "rotation": -90,
+              "text": "Life expectancy, years",
+              "y": { "type": "Percent", "value": 50 },
+              "centerX": { "type": "Percent", "value": 50 }
+            },
+            "index": 0
+          }
+        ]
+      }
+    },
+    {
+      "series-0": {
+        "type": "LineSeries",
+        "settings": {
+          "calculateAggregates": true,
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "valueXField": "gdp",
+          "valueYField": "lifeExpectancy",
+          "valueField": "population",
+          "seriesTooltipTarget": "bullet",
+          "tooltip": {
+            "type": "Tooltip",
+            "settings": {
+              "pointerOrientation": "horizontal",
+              "labelText": "[bold]{country}[/]\nLife expectancy: {valueY.formatNumber('#.0')}\nGDP: {valueX.formatNumber('#,###.')}\nPopulation: {value.formatNumber('#,###.')}"
+            }
+          },
+          "autoAppear": true,
+          "appearDuration": 1000,
+          "heatRules": [
+            {
+              "target": "#template-0",
+              "min": 3,
+              "max": 60,
+              "dataField": "value",
+              "key": "radius",
+              "__parse": true
+            }
+          ]
+        },
+        "properties": {
+          "data": "#data-0",
+          "strokes": {
+            "properties": {
+              "template": {
+                "settings": { "visible": false }
+              }
+            }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": { "radius": 5, "fillOpacity": 0.8, "templateField": "bulletSettings" },
+                  "properties": { "template": "#template-0" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

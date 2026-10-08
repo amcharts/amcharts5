@@ -4,7 +4,8 @@ import * as $object from "./Object";
 import * as $ease from "./Ease";
 
 /**
- * An object representing a collection of setting values to apply as required.
+ * A named set of setting values, such as `"hover"`, that an element takes on
+ * when the state is applied.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/states/} for more info
  */
@@ -28,13 +29,12 @@ export class State<E extends Entity> {
 	}
 
 	/**
-	 * Returns settings value for the specified `key`.
-	 *
-	 * If there is no value, `fallback` is returned instead (if set).
+	 * Returns the state's value for setting `key`, or `fallback` if it has
+	 * none.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
-	 * @param   key       Settings value
-	 * @param   callback  Fallback value
+	 * @param   key       Settings key
+	 * @param   fallback  Value to return if the state has no value
 	 * @return            Value
 	 */
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
@@ -58,17 +58,26 @@ export class State<E extends Entity> {
 	}
 
 	/**
-	 * Sets a setting `value` for the specified `key` to be set when the state
-	 * is applied.
+	 * Sets the value setting `key` takes when the state is applied.
 	 *
 	 * @param   key       Setting key
 	 * @param   value     Setting value
-	 * @return            Setting value
 	 */
 	public set<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
 		this._userSettings[key] = true;
 		delete this._computedSettings[key];
 		this.setRaw(key, value);
+	}
+
+	/**
+	 * Writes a value the library worked out itself, without announcing it - used
+	 * where a state notes what to return to.
+	 *
+	 * @ignore
+	 */
+	public _setCRaw<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
+		this.setRaw(key, value);
+		this._computedSettings[key] = true;
 	}
 
 	/**
@@ -82,17 +91,6 @@ export class State<E extends Entity> {
 	 * @param   key       Setting key
 	 * @param   value     Setting value
 	 */
-	/**
-	 * Writes a value the library worked out itself, without announcing it - used
-	 * where a state notes what to return to.
-	 *
-	 * @ignore
-	 */
-	public _setCRaw<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
-		this.setRaw(key, value);
-		this._computedSettings[key] = true;
-	}
-
 	public _setC<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
 		const authored = !this._computedSettings[key] && this._settings[key] === value;
 		this.set(key, value);
@@ -102,7 +100,7 @@ export class State<E extends Entity> {
 	}
 
 	/**
-	 * Removes a setting value for the specified `key`.
+	 * Removes setting `key` from the state.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
@@ -114,9 +112,8 @@ export class State<E extends Entity> {
 	}
 
 	/**
-	 * Sets multiple settings at once.
-	 *
-	 * `settings` must be an object with key: value pairs.
+	 * Sets several of the state's settings at once, from an object of
+	 * key-value pairs.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param settings Settings
@@ -132,9 +129,8 @@ export class State<E extends Entity> {
 	}
 
 	/**
-	 * Applies the state to the target element.
-	 *
-	 * All setting values are set immediately.
+	 * Applies the state to its element at once, without animation. The values
+	 * the element had before are kept in its `"default"` state, for going back.
 	 */
 	public apply() {
 		const seen: Dirty<E["_settings"]> = {};
@@ -164,12 +160,11 @@ export class State<E extends Entity> {
 
 
 	/**
-	 * Applies the state to the target element.
+	 * Applies the state to its element, animating each setting to its new
+	 * value. Returns the [[Animation]] objects, by setting key.
 	 *
-	 * Returns an object representing all [[Animation]] objects created for
-	 * each setting key transition.
-	 *
-	 * @return           Animations
+	 * @param   duration  Duration in milliseconds; `stateAnimationDuration` of the state or element if not given
+	 * @return            Animations
 	 */
 	public applyAnimate(duration?: number): Animations<E["_settings"]> {
 
@@ -223,7 +218,8 @@ export class State<E extends Entity> {
 }
 
 /**
- * Collection of [[State]] objects for an element.
+ * The [[State]] objects of an element, by name, such as `"hover"` or
+ * `"hidden"`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/states/} for more info
  */
@@ -236,7 +232,7 @@ export class States<E extends Entity> {
 	}
 
 	/**
-	 * Checks if a state by `name` exists. Returns it there is one.
+	 * Returns the state called `name`, or `undefined` if there is none.
 	 *
 	 * @param  name  State name
 	 * @return       State
@@ -246,13 +242,12 @@ export class States<E extends Entity> {
 	}
 
 	/**
-	 * Sets supplied `settings` on a state by the `name`.
-	 *
-	 * If such state does not yet exists, it is created.
+	 * Creates the state called `name` with `settings`, or adds `settings` to
+	 * it if it already exists.
 	 *
 	 * @param   name      State name
 	 * @param   settings  Settings
-	 * @return            New State
+	 * @return            State
 	 */
 	public create(name: string, settings: Partial<E["_settings"]>): State<E> {
 		const state = this._states[name];
@@ -300,7 +295,8 @@ export class States<E extends Entity> {
 	}
 
 	/**
-	 * Applies a named state to the target element.
+	 * Applies the state called `newState` to the element at once, without
+	 * animation.
 	 *
 	 * @param  newState  State name
 	 */
@@ -315,12 +311,12 @@ export class States<E extends Entity> {
 	}
 
 	/**
-	 * Applies a named state to the element.
-	 *
-	 * Returns an object representing all [[Animation]] objects created for
-	 * each setting key transition.
+	 * Applies the state called `newState` to the element, animating each
+	 * setting to its new value. Returns the [[Animation]] objects, by setting
+	 * key, or `undefined` if there is no such state.
 	 *
 	 * @param   newState  State name
+	 * @param   duration  Duration in milliseconds; `stateAnimationDuration` of the state or element if not given
 	 * @return            Animations
 	 */
 	public applyAnimate(newState: string, duration?: number): Animations<E["_settings"]> | undefined {

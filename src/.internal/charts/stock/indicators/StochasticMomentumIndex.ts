@@ -8,22 +8,26 @@ import * as $type from "../../../core/util/Type";
 
 export interface IStochasticMomentumIndexSettings extends IOverboughtOversoldSettings {
 	/**
-	 * A color for "ema" line.
+	 * Color of the signal line.
 	 */
 	emaColor?: Color;
 
 	/**
-	 * K period.
+	 * Not used: the K period is set with `period`.
 	 */
 	kPeriod?: number;
 
 	/**
-	 * D period.
+	 * Period of the two exponential moving averages that smooth the index.
+	 *
+	 * @default 3
 	 */
 	dPeriod?: number;
 
 	/**
-	 * EMA period.
+	 * Period of the signal line, a moving average of the index.
+	 *
+	 * @default 3
 	 */
 	emaPeriod?: number;
 }
@@ -36,7 +40,9 @@ export interface IStochasticMomentumIndexEvents extends IOverboughtOversoldEvent
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Stochastic Momentum Index indicator: where the price is relative to the
+ * middle of the high-low range of the last `period` data items, smoothed and
+ * scaled to `-100` to `100`. Drawn in a panel of its own.
  *
  * @since 5.5.3
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
@@ -50,7 +56,7 @@ export class StochasticMomentumIndex extends OverboughtOversold {
 	declare public _events: IStochasticMomentumIndexEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the signal line (`emaPeriod`).
 	 */
 	public emaSeries!: LineSeries;
 

@@ -32,8 +32,8 @@ export interface IGaplessDateAxisEvents extends IDateAxisEvents {
 }
 
 /**
- * A version of a [[DateAxis]] which removes intervals that don't have any data
- * items in them.
+ * A [[DateAxis]] that leaves out periods without data, such as weekends, so
+ * the data items sit side by side.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/gapless-date-axis/} for more info
  * @important
@@ -143,7 +143,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	/**
-	 * Convers value to a relative position on axis.
+	 * Converts a value (timestamp) to a position on the axis (`0` to `1`).
 	 *
 	 * @param   value  Value
 	 * @return         Relative position
@@ -192,8 +192,9 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	/**
-	 * Converts numeric value from axis scale to index.
-	 * 
+	 * Returns the index, among the axis's dates, of the date at or before a
+	 * timestamp.
+	 *
 	 * @param  value  Value
 	 * @return        Index
 	 */
@@ -215,8 +216,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	/**
-	 * Converts a relative position to a corresponding numeric value from axis
-	 * scale.
+	 * Converts a position on the axis (`0` to `1`) to a value (timestamp).
 	 *
 	 * @param   position  Relative position
 	 * @return            Value
@@ -244,13 +244,11 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	/**
-	 * Zooms the axis to specific `start` and `end` dates.
-	 *
-	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 * Zooms the axis to the range between two dates.
 	 *
 	 * @param  start     Start Date
 	 * @param  end       End Date
-	 * @param  duration  Duration in milliseconds
+	 * @param  duration  Animation duration in milliseconds
 	 */
 
 	public zoomToDates(start: Date, end: Date, duration?: number) {
@@ -271,13 +269,12 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 	}
 
 	/**
-	 * Zooms the axis to specific `start` and `end` values.
-	 *
-	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 * Zooms the axis to the range between two timestamps, in milliseconds,
+	 * kept within the axis's range.
 	 *
 	 * @param  start     Start value
 	 * @param  end       End value
-	 * @param  duration  Duration in milliseconds
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public zoomToValues(start: number, end: number, duration?: number) {
 		const min = this.getPrivate("min", 0);
@@ -586,6 +583,11 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 
 		const root = this._root;
 		const dates = this._getDates();
+
+		// No dates yet (grouped data not ready): no grid
+		if (!dates.length) {
+			return items;
+		}
 
 		let c = count - 1;
 		let previousValue = -Infinity;

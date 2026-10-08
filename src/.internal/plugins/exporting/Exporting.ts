@@ -5,6 +5,7 @@ import { Entity, IEntitySettings, IEntityPrivate, IEntityEvents } from "../../co
 import { Color } from "../../core/util/Color";
 import { Root } from "../../core/Root"
 import { StyleRule } from "../../core/util/Utils"
+import { renderToSVG } from "../../core/render/backend/SvgExport";
 
 import * as $array from "../../core/util/Array";
 import * as $object from "../../core/util/Object";
@@ -56,13 +57,13 @@ async function _pdfmake(): Promise<any> {
 }
 
 export type ExportingTypes = "image" | "data" | "print";
-export type ExportingFormats = "png" | "jpg" | "canvas" | "pdf" | "xlsx" | "csv" | "json" | "html" | "pdfdata" | "print";
+export type ExportingFormats = "png" | "jpg" | "svg" | "canvas" | "pdf" | "xlsx" | "csv" | "json" | "html" | "pdfdata" | "print";
 export type ExportingImageFormats = "png" | "jpg";
 
 export interface IExportingImageSource {
 
 	/**
-	 * A root object of an extra chart to add in export.
+	 * Root element of the extra chart to add to the export.
 	 */
 	source: Root;
 
@@ -87,14 +88,15 @@ export interface IExportingImageSource {
 	marginLeft?: number;
 
 	/**
-	 * Position to place extra image in relation to the main chart.
+	 * Side of the main chart to place the extra chart on.
 	 *
 	 * @default "bottom"
 	 */
 	position?: "left" | "right" | "top" | "bottom";
 
 	/**
-	 * Crop extra image if it's larger than the main chart.
+	 * Keeps the export at the main chart's width (or height, for `"left"` and
+	 * `"right"`), cutting off an extra chart that is larger.
 	 */
 	crop?: boolean;
 
@@ -103,116 +105,110 @@ export interface IExportingImageSource {
 export interface IExportingSettings extends IEntitySettings {
 
 	/**
-	 * A reference to [[ExportingMenu]] object.
+	 * The [[ExportingMenu]] that offers the formats to the user.
 	 */
 	menu?: ExportingMenu;
 
 	/**
-	 * Export will try to determine background color based on the DOM styles.
-	 *
-	 * You can use this setting to explicitly specify background color for
-	 * exported images.
+	 * Background color of exported images. If not set, it is taken from the
+	 * CSS background of the chart's element, or the nearest parent that has
+	 * one; white if none does.
 	 */
 	backgroundColor?: Color;
 
 	/**
-	 * Opacity of the exported image background.
+	 * Opacity of the exported image's background: `0` (transparent) to `1`
+	 * (opaque). JPEG has no transparency.
 	 *
-	 * * 0 - fully transparent.
-	 * * 1 - fully opaque (default).
-	 *
-	 * NOTE: some image formats like JPEG do not support transparency.
-	 *
+	 * @default 1
 	 * @since 5.2.34
 	 */
 	backgroundOpacity?: number;
 
 	/**
-	 * A string to prefix exported files with.
+	 * Name of downloaded files, before the extension.
 	 *
 	 * @default "chart"
 	 */
 	filePrefix?: string;
 
 	/**
-	 * Chart title. Used for print, PDF and Excel exports.
+	 * Title of the export: the heading of a PDF, the page title when printing
+	 * and the sheet name in XLSX.
 	 */
 	title?: string;
 
 	/**
-	 * Charset to use for export.
+	 * Charset of exported files.
 	 *
 	 * @default "utf-8"
 	 */
 	charset?: string;
 
 	/**
-	 * Fields to include in data export.
-	 *
-	 * Key - field in data.
-	 * Value - column name.
+	 * Fields to include in data exports, and their column names: keys are
+	 * fields in the data, values the column names.
 	 */
 	dataFields?: { [index: string]: string },
 
 	/**
-	 * Specifies the order of fields to export in data.
+	 * Order of the fields in data exports.
 	 */
 	dataFieldsOrder?: string[],
 
 	/**
-	 * Fields in data that are numeric.
+	 * Fields whose numbers are formatted with `numberFormat`.
 	 */
 	numericFields?: string[],
 
 	/**
-	 * Use this number format on numeric values.
+	 * Number format for the values in `numericFields`. If not set, they are
+	 * exported as they are.
 	 */
 	numberFormat?: string | Intl.NumberFormatOptions,
 
 	/**
-	 * Fields in data that have date/time value.
+	 * Fields whose numbers are timestamps, exported as dates.
 	 */
 	dateFields?: string[],
 
 	/**
-	 * Use this date format on date values.
+	 * Date format for dates in data exports. If not set, the root's
+	 * [[DateFormatter]] format is used.
 	 */
 	dateFormat?: string | Intl.DateTimeFormatOptions,
 
 	/**
-	 * Fields in data that need to be formatted as "duration" as per `durationFormat`.
+	 * Fields whose numbers are durations, formatted with `durationFormat`.
 	 *
 	 * @since 5.0.16
 	 */
 	durationFields?: string[],
 
 	/**
-	 * Format to use when formatting values in `durationFields`.
-	 *
-	 * If not set, will use `durationFormat` as set in [[DurationFormatter]] of
-	 * the root element.
+	 * Format for the values in `durationFields`. If not set, the root's
+	 * [[DurationFormatter]] format is used.
 	 *
 	 * @since 5.0.16
 	 */
 	durationFormat?: string,
 
 	/**
-	 * Time unit to assume duration values are in.
-	 *
-	 * If not set, will use `baseUnit` as set in [[DurationFormatter]] of
-	 * the root element.
+	 * Time unit the values in `durationFields` are in. If not set, the root's
+	 * [[DurationFormatter]] `baseUnit` is used.
 	 *
 	 * @since 5.0.16
 	 */
 	durationUnit?: TimeUnit;
 
 	/**
-	 * Include these images or other charts in image exports.
+	 * Other charts to add around the main chart in image exports.
 	 */
 	extraImages?: Array<Root | IExportingImageSource>;
 
 	/**
-	 * Data to export.
+	 * Data for data exports: an array of objects. Without it, the data formats
+	 * are not offered.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/#Exporting_data} for more info
 	 */
@@ -229,7 +225,14 @@ export interface IExportingSettings extends IEntitySettings {
 	jpgOptions?: IExportingImageOptions;
 
 	/**
-	 * Canvas format options.
+	 * SVG format options.
+	 *
+	 * @since 5.21.0
+	 */
+	svgOptions?: IExportingSVGOptions;
+
+	/**
+	 * Options for `exportCanvas()`.
 	 */
 	canvasOptions?: IExportingImageOptions;
 
@@ -239,12 +242,12 @@ export interface IExportingSettings extends IEntitySettings {
 	pdfOptions?: IExportingPDFOptions;
 
 	/**
-	 * PDF with data table format options.
+	 * Options for the PDF with a data table.
 	 */
 	pdfdataOptions?: IExportingDataOptions;
 
 	/**
-	 * XSLX format options.
+	 * XLSX format options.
 	 */
 	xlsxOptions?: IExportingXLSXOptions;
 
@@ -276,12 +279,12 @@ export interface IExportingPrivate extends IEntityPrivate {
 export interface IExportEvent {
 
 	/**
-	 * Format.
+	 * Format of the export.
 	 */
 	format: ExportingFormats,
 
 	/**
-	 * Format options.
+	 * Options of the format.
 	 */
 	options: IExportingFormatOptions
 
@@ -290,38 +293,39 @@ export interface IExportEvent {
 export interface IExportingEvents extends IEntityEvents {
 
 	/**
-	 * Invoked when export starts.
+	 * An export started.
 	 */
 	exportstarted: IExportEvent;
 
 	/**
-	 * Invoked when export finishes.
+	 * An export was set off. It is dispatched before the result is ready, so
+	 * to use the result, wait for the promise `export()` returns.
 	 */
 	exportfinished: IExportEvent;
 
 	/**
-	 * Invoked when download of the export starts.
+	 * A download was requested, before its file is generated.
 	 */
 	downloadstarted: IExportEvent & {
 		fileName: string,
 	};
 
 	/**
-	 * Invoked when print starts.
+	 * Printing was requested, before the image to print is generated.
 	 */
 	printstarted: IExportEvent;
 
 	/**
-	 * Invoked when data finishes pre-processing for export.
+	 * The data for a data export is prepared. A listener can still change
+	 * `data`.
 	 */
 	dataprocessed: IExportEvent & {
 		data: any
 	}
 
 	/**
-	 * Invoked when XLSX export finishes preparing a workbook.
-	 *
-	 * At this point it can still be modified for export.
+	 * The XLSX workbook is prepared. A listener can still change it before it
+	 * is written.
 	 */
 	workbookready: IExportEvent & {
 		workbook: any,
@@ -330,9 +334,8 @@ export interface IExportingEvents extends IEntityEvents {
 	}
 
 	/**
-	 * Invoked when PDF export finishes preparing a document.
-	 *
-	 * At this point it can still be modified for export.
+	 * The PDF document definition is prepared. A listener can still change it
+	 * before the PDF is made.
 	 */
 	pdfdocready: IExportEvent & {
 		doc: any
@@ -343,7 +346,7 @@ export interface IExportingEvents extends IEntityEvents {
 export interface IExportingFormatOptions {
 
 	/**
-	 * If set to `true`, this format will not appear in [[ExportMenu]].
+	 * Leaves this format out of the [[ExportingMenu]].
 	 */
 	disabled?: boolean;
 
@@ -352,13 +355,14 @@ export interface IExportingFormatOptions {
 export interface IExportingImageOptions extends IExportingFormatOptions {
 
 	/**
-	 * Quality of the exported image: 0 to 1.
+	 * Quality of the image, `0` to `1`: `1` by default, `0.8` for JPG. Only
+	 * JPEG images use it.
 	 */
 	quality?: number;
 
 	/**
-	 * Export images with hardware resolution (`false`), or the way they appear
-	 * on screen (`true`).
+	 * Exports the image at the chart's size in CSS pixels. When `false`, it is
+	 * exported at the screen's resolution: larger on high-density screens.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/#Pixel_ratio} for more info
 	 * @default false
@@ -395,32 +399,40 @@ export interface IExportingImageOptions extends IExportingFormatOptions {
 
 }
 
+export interface IExportingSVGOptions extends IExportingFormatOptions {
+
+	/**
+	 * Number of decimal places in coordinates.
+	 *
+	 * @default 3
+	 */
+	precision?: number;
+
+}
+
 export interface IExportingPrintOptions extends IExportingImageOptions {
 
 	/**
-	 * A delay in milliseconds to wait before initiating print.
-	 *
-	 * This delay is necessary to ensure DOM is prepared and repainted before
-	 * print dialog kicks in.
+	 * With `"iframe"` printing, how long in milliseconds to wait before
+	 * opening the print dialog, so the image is ready. With `"css"`, how long
+	 * the page stays hidden for printing.
 	 *
 	 * @default 500
 	 */
 	delay?: number;
 
 	/**
-	 * Method to use for printing.
+	 * How to print. If one doesn't work in your setup, try the other.
 	 *
-	 * If one fails for your particular setup, try the other.
-	 *
-	 * "css" - inserts dynamic CSS that hides everything, except the image being printed.
-	 * "iframe" - creates a dynamic `<iframe>` with the image, then prints it.
+	 * * `"iframe"`: prints the image from a hidden `<iframe>`.
+	 * * `"css"`: hides the rest of the page with CSS while it prints.
 	 *
 	 * @default "iframe"
 	 */
 	printMethod?: "css" | "iframe";
 
 	/**
-	 * Image format to use for printing.
+	 * Image format to print.
 	 *
 	 * @default "png"
 	 */
@@ -441,75 +453,72 @@ export type pageSizes = "4A0" | "2A0" | "A0" | "A1" | "A2" | "A3" | "A4" | "A5" 
 export interface IExportingPDFOptions extends IExportingImageOptions {
 
 	/**
-	 * Include data into PDF
+	 * Adds a table of the `dataSource` data below the chart image.
 	 */
 	includeData?: boolean;
 
 	/**
-	 * An image format to use for embedded images in PDF.
+	 * Format of the chart image in the PDF.
 	 *
-	 * See `imageFormats` in [[Export_module]].
+	 * @default "png"
 	 */
 	imageFormat?: "png" | "jpg";
 
 	/**
-	 * Font size to use for all texts.
+	 * Font size of the title, the page URL and the data table.
+	 *
+	 * @default 14
 	 */
 	fontSize?: number;
 
 	/**
-	 * Alignment of the chart image in PDF.
+	 * Horizontal alignment of the chart image on the page: `"left"`,
+	 * `"center"` or `"right"`.
 	 *
-	 * Supported options: `"left"` (default), `"center"`, `"right"`.
-	 *
-	 * @default left
+	 * @default "left"
 	 */
 	align?: "left" | "center" | "middle";
 
 	/**
-	 * Whether to add a URL of the web page the chart has been exported from.
+	 * Adds the URL of the page the chart was exported from.
 	 *
 	 * @default true
 	 */
 	addURL?: boolean;
 
 	/**
-	 * Page size of the exported PDF.
+	 * Page size.
+	 *
+	 * @default "A4"
 	 */
 	pageSize?: pageSizes;
 
 	/**
 	 * Page orientation.
+	 *
+	 * @default "portrait"
 	 */
 	pageOrientation?: "landscape" | "portrait";
 
 	/**
-	 * Page margins.
+	 * Page margins in points (1/72 inch): one number for all four edges,
+	 * `[horizontal, vertical]`, or `[left, top, right, bottom]`.
 	 *
-	 * Can be one of the following:
-	 *
-	 * A single number, in which case it will act as margin setting
-	 * for all four edges of the page.
-	 *
-	 * An array of two numbers `[ horizontal, vertical ]`.
-	 *
-	 * An array of four numbers `[ left, top, right, bottom ]`.
+	 * @default 30
 	 */
 	pageMargins?: number | number[];
 
 	/**
-	 * Font which should be used for the export.
-	 *
-	 * Default font used for PDF includes only Latin-based and Cyrilic
-	 * characters. If you are exporting text in other languages, you might need
-	 * to use some other export font.
+	 * Font of the PDF's text. The default font has only Latin and Cyrillic
+	 * characters, so text in other scripts needs a font that has them.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-pdf/#Fonts} for more info
 	 */
 	font?: IFont;
 
 	/**
-	 * Additional optional fonts which can be used on individual elements.
+	 * More fonts to register, for use by individual elements of the document,
+	 * e.g. from a `pdfdocready` listener. Used only together with `font`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-pdf/#Fonts} for more info
 	 */
@@ -520,31 +529,35 @@ export interface IExportingPDFOptions extends IExportingImageOptions {
 export interface IExportingDataOptions extends IExportingFormatOptions {
 
 	/**
-	 * Replace empty values with this string.
+	 * Text for empty values: `"-"` in HTML by default, an empty string in the
+	 * other formats.
 	 */
 	emptyAs?: string;
 
 	/**
-	 * Use timestamps instead of formatted dates.
+	 * Exports dates as timestamps instead of formatted dates.
 	 *
 	 * @default false
 	 */
 	useTimestamps?: boolean;
 
 	/**
-	 * Use client's locale when formatting dates.
+	 * Formats dates in the browser's locale instead of with `dateFormat`.
 	 *
 	 * @default false
 	 */
 	useLocale?: boolean;
 
 	/**
-	 * If set to `true` will pivot the table so that columns are horizontal.
+	 * Swaps rows and columns, so that each field is a row.
 	 */
 	pivot?: boolean;
 
 	/**
-	 * Will add a line with column names in CSV/HTML/PDF tables.
+	 * Adds the column names as the first row (or column, with `pivot`) in CSV,
+	 * HTML, XLSX and PDF tables.
+	 *
+	 * @default true
 	 */
 	addColumnNames?: boolean;
 
@@ -553,18 +566,15 @@ export interface IExportingDataOptions extends IExportingFormatOptions {
 export interface IExportingJSONOptions extends IExportingDataOptions {
 
 	/**
-	 * If set to a number, each line will be indented by X spaces, maintaining
-	 * hierarchy.
-	 *
-	 * If set to a string, will use that string to indent.
+	 * Indentation of the JSON: a number of spaces, or a string to indent with.
 	 *
 	 * @default 2
 	 */
 	indent?: string | number;
 
 	/**
-	 * If set to `true` and `dataFields` are set to `true`, will rename keys in
-	 * data.
+	 * Uses the column names from `dataFields` as keys, instead of the field
+	 * names. Has no effect without `dataFields`.
 	 *
 	 * @default true
 	 */
@@ -582,36 +592,32 @@ export interface IExportingCSVOptions extends IExportingDataOptions {
 	separator?: string;
 
 	/**
-	 * Force all values to be included in quotes, including numeric.
+	 * Quotes all values, numbers too.
 	 *
 	 * @default false
 	 */
 	forceQuotes?: boolean;
 
 	/**
-	 * Reverse order of the records in data.
+	 * Exports the rows in reverse order.
 	 *
 	 * @default false
 	 */
 	reverse?: boolean;
 
 	/**
-	 * Add BOM character to output file, so that it can be used with UTF-8
-	 * characters properly in Excel.
+	 * Starts the file with a byte order mark, so that Excel reads its UTF-8
+	 * characters correctly.
 	 *
-	 * @default false
+	 * @default true
 	 * @since 5.1.0
 	 */
 	addBOM?: boolean;
 
 	/**
-	 * If set to `false`, disables protection against spreadsheet formula
-	 * injection (a.k.a. "CSV injection").
-	 *
-	 * When enabled (default), string cell values that begin with a character
-	 * that spreadsheet applications could interpret as the start of a formula
-	 * (`=`, `+`, `-`, `@`, tab, or carriage return) are prefixed with a single
-	 * quote so they are imported as plain text.
+	 * Protects against spreadsheet formula injection ("CSV injection"): text
+	 * values that start with `=`, `+`, `-`, `@`, a tab or a carriage return
+	 * get a single quote in front, so they are read as plain text.
 	 *
 	 * @default true
 	 * @since 5.19.0
@@ -623,22 +629,22 @@ export interface IExportingCSVOptions extends IExportingDataOptions {
 export interface IExportingHTMLOptions extends IExportingDataOptions {
 
 	/**
-	 * A `class` attribute for `<table>` tag.
+	 * `class` attribute of the `<table>` tag.
 	 */
 	tableClass?: string;
 
 	/**
-	 * A `class` attribute for `<tr>` tags.
+	 * `class` attribute of the `<tr>` tags.
 	 */
 	rowClass?: string;
 
 	/**
-	 * A `class` attribute for `<th>` tags.
+	 * `class` attribute of the `<th>` tags.
 	 */
 	headerClass?: string;
 
 	/**
-	 * A `class` attribute for `<td>` tags.
+	 * `class` attribute of the `<td>` tags.
 	 */
 	cellClass?: string;
 
@@ -649,13 +655,9 @@ export interface IExportingXLSXOptions extends IExportingDataOptions {
 	//sheets?: string[];
 
 	/**
-	 * If set to `false`, disables protection against spreadsheet formula
-	 * injection (a.k.a. "CSV injection").
-	 *
-	 * When enabled (default), string cell values that begin with a character
-	 * that spreadsheet applications could interpret as the start of a formula
-	 * (`=`, `+`, `-`, `@`, tab, or carriage return) are prefixed with a single
-	 * quote so they are imported as plain text.
+	 * Protects against spreadsheet formula injection: text values that start
+	 * with `=`, `+`, `-`, `@`, a tab or a carriage return get a single quote in
+	 * front, so they are read as plain text.
 	 *
 	 * @default true
 	 * @since 5.19.0
@@ -673,7 +675,8 @@ export interface IExportingXLSXOptions extends IExportingDataOptions {
 const formulaInjectionChars: string[] = ["=", "+", "-", "@", "\t", "\r"];
 
 /**
- * A plugin that can be used to export chart snapshots and data.
+ * A plugin that exports the chart as an image, PDF or print, and its data as
+ * JSON, CSV, XLSX, HTML or a PDF table.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/} for more info
  */
@@ -732,10 +735,11 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Triggers a download of the chart/data in specific format.
+	 * Exports the chart or its data in a format and downloads the file, named
+	 * `filePrefix` plus the format's extension.
 	 *
 	 * @param  format         Format
-	 * @param  customOptions  Format options
+	 * @param  customOptions  Format options, over the format's own options setting
 	 */
 	public async download(format: ExportingFormats, customOptions?: IExportingFormatOptions) {
 		const ext = format == "pdfdata" ? "pdf" : format;
@@ -753,9 +757,9 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Triggers print of the chart.
+	 * Prints the chart.
 	 *
-	 * @param  customOptions  Print options
+	 * @param  customOptions  Print options, over `printOptions`
 	 */
 	public async print(customOptions?: IExportingPrintOptions) {
 		const options = <IExportingPrintOptions>this._getFormatOptions("print", customOptions);
@@ -770,11 +774,11 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns data uri of the chart/data in specific format.
+	 * Exports the chart or its data in a format, as a data URI.
 	 *
 	 * @param          format  Format
-	 * @param   customOptions  Format options
-	 * @return                 Promise
+	 * @param   customOptions  Format options, over the format's own options setting
+	 * @return                 Promise of the data URI
 	 */
 	public async export(format: ExportingFormats, customOptions?: IExportingFormatOptions): Promise<string> {
 		const options = this._getFormatOptions(format, customOptions);
@@ -791,6 +795,10 @@ export class Exporting extends Entity {
 			case "jpg":
 				this._root._runTickerNow();
 				promise = this.exportImage(format, options);
+				break;
+			case "svg":
+				this._root._runTickerNow();
+				promise = this.exportSVG(options);
 				break;
 			case "json":
 				promise = this.exportJSON(options);
@@ -828,7 +836,7 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Returns chart image as a data:uri.
+	 * Returns the chart image as a data URI.
 	 *
 	 * @param   format         Image format
 	 * @param   customOptions  Format options
@@ -843,7 +851,7 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns canvas data.
+	 * Returns the chart image as a PNG data URI, using `canvasOptions`.
 	 *
 	 * @param   customOptions  Image options
 	 * @return                 Promise
@@ -857,7 +865,138 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns a `<canvas>` element with snapshot of the chart.
+	 * Returns the chart image as an SVG data URI, whichever renderer the chart
+	 * uses.
+	 *
+	 * @param   customOptions  Format options
+	 * @return                 Promise
+	 * @since 5.21.0
+	 */
+	public async exportSVG(customOptions?: IExportingSVGOptions): Promise<string> {
+		return "data:" + this.getContentType("svg") + ";" + this.get("charset", "utf-8") + "," + encodeURIComponent(await this.getSVG(customOptions));
+	}
+
+	/**
+	 * Returns the chart image as SVG markup, with `extraImages` placed around
+	 * it.
+	 *
+	 * @param   customOptions  Format options
+	 * @return                 Promise
+	 * @since 5.21.0
+	 */
+	public async getSVG(customOptions?: IExportingSVGOptions): Promise<string> {
+		const options = <IExportingSVGOptions>this._getFormatOptions("svg", customOptions);
+		const precision = options.precision;
+		const extraImages = this.get("extraImages", []);
+
+		// Get background
+		const background = this.get("backgroundColor", this.findBackgroundColor(this._root.dom));
+		const backgroundOpacity = this.get("backgroundOpacity", 1);
+		const fill = background ? background.toCSS(backgroundOpacity) : undefined;
+
+		if (extraImages.length == 0) {
+			return renderToSVG(this._root, { precision, background: fill });
+		}
+
+		const size = (root: Root) => {
+			return {
+				width: root.width() || root._rootContainer.width(),
+				height: root.height() || root._rootContainer.height()
+			};
+		}
+
+		// Same layout as `getCanvas()`
+		const main = size(this._root);
+		let middleLeft = 0;
+		let middleTop = 0;
+		let middleWidth = main.width;
+		let middleHeight = main.height;
+		let extraRight = 0;
+		let extraBottom = 0;
+
+		const extras: Array<{ svg: string, position: string, left: number, top: number, width: number, height: number }> = [];
+
+		$array.each(extraImages, (extraRoot, index) => {
+			const extra: IExportingImageSource = extraRoot instanceof Root ? { source: extraRoot } : extraRoot;
+			const position = extra.position || "bottom";
+			const marginLeft = extra.marginLeft || 0;
+			const marginTop = extra.marginTop || 0;
+			const extraSize = size(extra.source);
+			const extraWidth = extraSize.width + marginLeft + (extra.marginRight || 0);
+			const extraHeight = extraSize.height + marginTop + (extra.marginBottom || 0);
+
+			if (position == "top") {
+				middleWidth = extra.crop ? middleWidth : Math.max(middleWidth, extraWidth);
+				middleTop += extraHeight;
+
+			} else if (position == "right") {
+				middleHeight = extra.crop ? middleHeight : Math.max(middleHeight, extraHeight);
+				extraRight += extraWidth;
+
+			} else if (position == "left") {
+				middleHeight = extra.crop ? middleHeight : Math.max(middleHeight, extraHeight);
+				middleLeft += extraWidth;
+
+			} else if (position == "bottom") {
+				middleWidth = extra.crop ? middleWidth : Math.max(middleWidth, extraWidth);
+				extraBottom += extraHeight;
+			}
+
+			extras.push({
+				// Ids of each chart's defs must not clash
+				svg: renderToSVG(extra.source, { precision, idPrefix: "am5-x" + index + "-" }),
+				position: position,
+				left: marginLeft,
+				top: marginTop,
+				width: extraWidth,
+				height: extraHeight
+			});
+		});
+
+		const width = middleLeft + middleWidth + extraRight;
+		const height = middleTop + middleHeight + extraBottom;
+		const body: Array<string> = [];
+		const place = (svg: string, x: number, y: number) => {
+			body.push("<g transform=\"translate(" + x + "," + y + ")\">" + svg + "</g>");
+		}
+
+		if (background && backgroundOpacity > 0) {
+			body.push("<rect width=\"" + width + "\" height=\"" + height + "\" fill=\"" + background.toCSSHex() + "\"" + (backgroundOpacity < 1 ? " fill-opacity=\"" + backgroundOpacity + "\"" : "") + "/>");
+		}
+
+		let left = middleLeft;
+		let top = middleTop;
+		let right = left + middleWidth;
+		let bottom = top + middleHeight;
+
+		// Radiates outwards from center
+		$array.each(extras, (extra) => {
+			if (extra.position == "top") {
+				top -= extra.height;
+				place(extra.svg, middleLeft + extra.left, top + extra.top);
+
+			} else if (extra.position == "right") {
+				place(extra.svg, right + extra.left, middleTop + extra.top);
+				right += extra.width;
+
+			} else if (extra.position == "left") {
+				left -= extra.width;
+				place(extra.svg, left + extra.left, middleTop + extra.top);
+
+			} else if (extra.position == "bottom") {
+				place(extra.svg, middleLeft + extra.left, bottom + extra.top);
+				bottom += extra.height;
+			}
+		});
+
+		place(renderToSVG(this._root, { precision }), middleLeft, middleTop);
+
+		return "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"" + width + "\" height=\"" + height + "\" viewBox=\"0 0 " + width + " " + height + "\">" + body.join("") + "</svg>";
+	}
+
+	/**
+	 * Returns a `<canvas>` element with an image of the chart and its
+	 * `extraImages`.
 	 *
 	 * @param   options  Image options
 	 * @return           Promise
@@ -904,7 +1043,7 @@ export class Exporting extends Entity {
 			const extraHeight = extraCanvas.height + extra.marginTop + extra.marginBottom;
 
 			if (extra.position == "top") {
-				middleWidth = extra.crop ? middleHeight : Math.max(middleWidth, extraWidth);
+				middleWidth = extra.crop ? middleWidth : Math.max(middleWidth, extraWidth);
 				middleTop += extraHeight;
 
 			} else if (extra.position == "right") {
@@ -916,7 +1055,7 @@ export class Exporting extends Entity {
 				middleLeft += extraWidth;
 
 			} else if (extra.position === "bottom") {
-				middleWidth = extra.crop ? middleHeight : Math.max(middleWidth, extraWidth);
+				middleWidth = extra.crop ? middleWidth : Math.max(middleWidth, extraWidth);
 				extraBottom += extraHeight;
 			}
 
@@ -986,7 +1125,7 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Returns a data:uri representation of a JSON file with chart data.
+	 * Returns the data as a JSON file in a data URI.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -996,7 +1135,7 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns data in JSON format.
+	 * Returns the data as a JSON string.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -1020,7 +1159,7 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Returns a data:uri representation of a CSV file with chart data.
+	 * Returns the data as a CSV file in a data URI.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -1030,7 +1169,7 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns a CSV with export data.
+	 * Returns the data as CSV text.
 	 *
 	 * @param   customOptions  CSV options
 	 * @return                 Promise
@@ -1069,10 +1208,10 @@ export class Exporting extends Entity {
 				let ai = dataFieldsOrder.indexOf(a);
 				let bi = dataFieldsOrder.indexOf(b);
 				if (ai > bi) {
-					return -1;
+					return 1;
 				}
 				else if (ai < bi) {
-					return 1
+					return -1
 				}
 				return 0;
 			});
@@ -1174,7 +1313,7 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Returns a data:uri representation of an HTML file with chart data.
+	 * Returns the data as an HTML table in a data URI.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -1184,7 +1323,7 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns an HTML with a table with export data.
+	 * Returns the data as the markup of an HTML `<table>`.
 	 *
 	 * @param   customOptions  HTML options
 	 * @return                 Promise
@@ -1224,10 +1363,10 @@ export class Exporting extends Entity {
 				let ai = dataFieldsOrder.indexOf(a);
 				let bi = dataFieldsOrder.indexOf(b);
 				if (ai > bi) {
-					return -1;
+					return 1;
 				}
 				else if (ai < bi) {
-					return 1
+					return -1
 				}
 				return 0;
 			});
@@ -1302,8 +1441,9 @@ export class Exporting extends Entity {
 			}
 
 			// Add cell
-			if (options.cellClass) {
-				html += "\n\t\t<" + useTag + " class=\"" + options.cellClass + "\">" + item + "</" + useTag + ">";
+			const cellClass = useTag == "th" ? options.headerClass : options.cellClass;
+			if (cellClass) {
+				html += "\n\t\t<" + useTag + " class=\"" + cellClass + "\">" + item + "</" + useTag + ">";
 			}
 			else {
 				html += "\n\t\t<" + useTag + ">" + item + "</" + useTag + ">";
@@ -1334,7 +1474,7 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Returns a data:uri representation of an XLSX file with chart data.
+	 * Returns the data as an XLSX file in a data URI.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -1344,7 +1484,7 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns a data:uri of XLSX data.
+	 * Returns the data as an XLSX file, Base64-encoded.
 	 *
 	 * @param  customOptions  Format options
 	 * @return                Promise
@@ -1511,7 +1651,8 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Returns a data:uri representation of a PDF file with chart image.
+	 * Returns a PDF of the chart image, with a data table if `includeData` is
+	 * set, as a data URI.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -1521,7 +1662,8 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns a data:uri representation of a PDF file with chart data.
+	 * Returns a PDF of the data as a table, without the chart image, as a data
+	 * URI.
 	 *
 	 * @param   customOptions  Format options
 	 * @return                 Promise
@@ -1531,10 +1673,11 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns Base64-encoded binary data for a PDF file.
+	 * Returns a PDF file, Base64-encoded.
+	 *
 	 * @param   customOptions  PDF options
-	 * @param   includeImage   Include chart snapshot
-	 * @param   includeData    Include data
+	 * @param   includeImage   Include the chart image
+	 * @param   includeData    Include the data table (also added with `includeData` in the options)
 	 * @return                 Promise
 	 */
 	public async getPDF(customOptions?: IExportingPDFOptions, includeImage: boolean = true, includeData: boolean = false): Promise<string> {
@@ -1907,8 +2050,7 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-		* Returns `true` if `dataSource` is set, and the contents are proper
-		* data (array).
+		* Checks whether `dataSource` is a non-empty array.
 		*
 		* @return Has data?
 		*/
@@ -1918,11 +2060,12 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns processed data according to format options.
+	 * Returns the data prepared for export: only the `dataFields`, if set,
+	 * with values formatted per the format's options.
 	 *
 	 * @param   format         Format
 	 * @param   customOptions  Format options
-	 * @param   renameFields   Should fields be renamed?
+	 * @param   renameFields   Use the column names from `dataFields` as keys
 	 * @return                 Processed data
 	 */
 	public getData(format: ExportingFormats, customOptions?: IExportingDataOptions, renameFields: boolean = false): any {
@@ -2073,6 +2216,9 @@ export class Exporting extends Entity {
 			case "jpg":
 				contentType = "image/jpeg";
 				break;
+			case "svg":
+				contentType = "image/svg+xml";
+				break;
 			case "csv":
 				contentType = "text/csv";
 				break;
@@ -2141,12 +2287,12 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Triggers download of the file.
+	 * Downloads a data URI as a file.
 	 *
-	 * @param   uri       data:uri with file content
+	 * @param   uri       Data URI with the file's content
 	 * @param   fileName  File name
-	 * @param   addBOM    Should download include byte order mark?
-	 * @return            Promise
+	 * @param   addBOM    Start the file with a byte order mark
+	 * @return            `false` if the content could not be decoded
 	 */
 	public streamFile(uri: string, fileName: string, addBOM: boolean = false): boolean {
 
@@ -2273,12 +2419,11 @@ export class Exporting extends Entity {
 	 */
 
 	/**
-	 * Initiates print of the chart.
+	 * Prints an image, given as a data URI.
 	 *
-	 * @param   data     data:uri for the image
-	 * @param   options  Options
-	 * @param   title    Optional title to use (uses window's title by default)
-	 * @return           Promise
+	 * @param   data           Data URI of the image
+	 * @param   customOptions  Print options, over `printOptions`
+	 * @param   title          Title for the printed page; the page's own title if not given
 	 */
 	public initiatePrint(data: string, customOptions?: IExportingPrintOptions, title?: string): void {
 		const options = <IExportingPrintOptions>this._getFormatOptions("print", customOptions);
@@ -2356,7 +2501,7 @@ export class Exporting extends Entity {
 
 			// Restore title
 			if (originalTitle) {
-				document.title = document.title;
+				document.title = originalTitle;
 			}
 
 			// Scroll back the document the way it was before
@@ -2424,7 +2569,9 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns a list of formats that can be exported in current browser.
+	 * Returns the formats that can be exported: all that are not `disabled`,
+	 * but the data formats only when there is data and the browser can
+	 * download files.
 	 *
 	 * @return Formats
 	 */
@@ -2432,7 +2579,7 @@ export class Exporting extends Entity {
 		const res: ExportingFormats[] = [];
 		const hasData = this.hasData();
 		const downloadSupport = this.downloadSupport();
-		$array.each(<ExportingFormats[]>["png", "jpg", "canvas", "pdf", "xlsx", "csv", "json", "html", "pdfdata", "print"], (format) => {
+		$array.each(<ExportingFormats[]>["png", "jpg", "svg", "canvas", "pdf", "xlsx", "csv", "json", "html", "pdfdata", "print"], (format) => {
 			const options = this._getFormatOptions(format);
 			if (options.disabled !== true) {
 				if (["xlsx", "csv", "json", "html", "pdfdata"].indexOf(format) == -1 || (hasData && downloadSupport)) {
@@ -2444,7 +2591,8 @@ export class Exporting extends Entity {
 	}
 
 	/**
-	 * Returns a list of supported export types: image or print.
+	 * Returns the export types available: `"image"` and `"print"`, and
+	 * `"data"` when there is data and the browser can download files.
 	 *
 	 * @return Supported types
 	 */

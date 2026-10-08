@@ -8,27 +8,32 @@ import * as $array from "./Array"
 export interface IDataProcessorSettings extends IEntitySettings {
 
 	/**
-	 * Date format used for parsing string-based dates.
+	 * Format of the string dates in `dateFields`, such as `"yyyy-MM-dd"`. Set it
+	 * whenever those fields hold strings.
 	 */
 	dateFormat?: string;
 
 	/**
-	 * A list of fields in data that need to be converted to tiemstamps.
+	 * Data fields to convert to timestamps. A nested field is written as a
+	 * path, such as `"values.date"`.
 	 */
 	dateFields?: string[];
 
 	/**
-	 * A list of fields in data that need to be converted to numbers.
+	 * Data fields to convert to numbers. A nested field is written as a path,
+	 * such as `"values.value"`.
 	 */
 	numericFields?: string[];
 
 	/**
-	 * A list of fields in data that need to be converted to [[Color]] objects.
+	 * Data fields to convert to [[Color]] objects. A nested field is written as
+	 * a path, such as `"values.color"`.
 	 */
 	colorFields?: string[];
 
 	/**
-	 * Replace empty values with this.
+	 * Replaces empty values (`null`, `undefined` or `""`) in any field with
+	 * this value.
 	 */
 	emptyAs?: any;
 
@@ -46,7 +51,8 @@ export interface IDataProcessorEvents extends IEntityEvents {
 }
 
 /**
- * A tool that can process the data before it is being used in charts.
+ * Converts data values, such as string dates and numbers, as data is added to
+ * a component.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data} for more info
  * @important
@@ -104,9 +110,9 @@ export class DataProcessor extends Entity {
 	}
 
 	/**
-	 * Processess entire array of data.
+	 * Processes every row of `data`. Changes the objects in place.
 	 *
-	 * NOTE: calling this will modify original array!
+	 * @param  data  Data rows
 	 */
 	public processMany(data: { [index: string]: any }[]): void {
 		if ($type.isArray(data) && (this._checkDates || this._checkNumbers || this._checkColors || this._checkEmpty)) {
@@ -117,9 +123,10 @@ export class DataProcessor extends Entity {
 	}
 
 	/**
-	 * Processes a row (object) of data.
-	 * 
-	 * NOTE: calling this will modify values of the original object!
+	 * Processes one row (object) of data. Changes the object in place.
+	 *
+	 * @param  row     Data row
+	 * @param  prefix  Path of the row inside a parent row, used for nested fields
 	 */
 	public processRow(row: { [index: string]: any }, prefix: string = ""): void {
 		$object.each(row, (key: any, _value) => {
@@ -157,7 +164,7 @@ export class DataProcessor extends Entity {
 	}
 
 	protected _maybeToEmpty(value: any): any {
-		if ((value == null || value == "") && this.get("emptyAs") != null) {
+		if ((value == null || value === "") && this.get("emptyAs") != null) {
 			return this.get("emptyAs");
 		}
 		return value;

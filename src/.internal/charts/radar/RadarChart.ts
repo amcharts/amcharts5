@@ -20,8 +20,8 @@ import * as $math from "../../core/util/Math";
 export interface IRadarChartSettings extends IXYChartSettings {
 
 	/**
-	 * Outer radius of the chart. Can be set in pixels or percent, relative to
-	 * available space.
+	 * Outer radius of the chart, in pixels or as a percent of the largest
+	 * radius that fits the available space.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Chart_radius} for more info
 	 * @default 80%
@@ -29,17 +29,16 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	radius?: number | Percent;
 
 	/**
-	 * Inner radius of the chart. Can be set in pixels or percent, relative to
-	 * outer radius.
-	 *
-	 * Setting to negative number will mean pixels from outer radius.
+	 * Inner radius of the chart, in pixels or as a percent of the outer
+	 * radius. A negative value is measured in from the outer radius.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Chart_radius} for more info
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Chart start angle in degrees.
+	 * Angle in degrees where the chart's circle starts: `0` points right and
+	 * angles grow clockwise, so `-90` is the top.
 	 *
 	 * @default -90
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
@@ -47,7 +46,8 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	startAngle?: number;
 
 	/**
-	 * Chart end angle in degrees.
+	 * Angle in degrees where the chart's circle ends: `0` points right and
+	 * angles grow clockwise.
 	 *
 	 * @default 270
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
@@ -55,7 +55,7 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	endAngle?: number;
 
 	/**
-	 * [[RadarCursor]] instance.
+	 * The chart's cursor.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor} for more info
 	 */
@@ -83,7 +83,9 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
 }
 
 /**
- * Radar chart.
+ * An XY chart drawn in a circle: one axis runs around it
+ * ([[AxisRendererCircular]]), the other out from the center
+ * ([[AxisRendererRadial]]). Also used for gauges.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/} for more info
  * @important
@@ -91,7 +93,8 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
 export class RadarChart extends XYChart {
 
 	/**
-	 * [[Container]] where radar-related elements go.
+	 * Container at the chart's center that holds its axes, grid, series and
+	 * cursor.
 	 *
 	 * @default Container.new()
 	 */
@@ -107,6 +110,11 @@ export class RadarChart extends XYChart {
 	declare public _seriesType: RadarColumnSeries | RadarLineSeries;
 
 	protected _maxRadius: number = 1;
+
+	// The room the radius was worked out for: a legend inside the chart
+	// changes it without resizing the chart
+	protected _roomWidth: number = 0;
+	protected _roomHeight: number = 0;
 
 	protected _afterNew() {
 		this._defaultThemes.push(RadarDefaultTheme.new(this._root));
@@ -125,6 +133,10 @@ export class RadarChart extends XYChart {
 		gridContainer._setC("mask", Graphics.new(this._root, {}));
 
 		this._disposers.push(this.plotContainer.events.on("boundschanged", () => {
+			const chartContainer = this.chartContainer;
+			if (chartContainer.innerWidth() !== this._roomWidth || chartContainer.innerHeight() !== this._roomHeight) {
+				this.markDirty();
+			}
 			this._updateRadius();
 		}));
 	}
@@ -137,11 +149,13 @@ export class RadarChart extends XYChart {
 	public _prepareChildren() {
 		super._prepareChildren();
 
-		if (this._sizeDirty || this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle")) {
+		const chartContainer = this.chartContainer;
+		const w = chartContainer.innerWidth();
+		const h = chartContainer.innerHeight();
 
-			const chartContainer = this.chartContainer;
-			const w = chartContainer.innerWidth();
-			const h = chartContainer.innerHeight();
+		if (this._sizeDirty || w !== this._roomWidth || h !== this._roomHeight || this.isDirty("radius") || this.isDirty("innerRadius") || this.isDirty("startAngle") || this.isDirty("endAngle")) {
+			this._roomWidth = w;
+			this._roomHeight = h;
 
 			const startAngle = this.get("startAngle", 0);
 			const endAngle = this.get("endAngle", 0);
@@ -155,12 +169,16 @@ export class RadarChart extends XYChart {
 
 			let innerBounds = { left: 0, right: 0, top: 0, bottom: 0 };
 
-			if (innerRadius instanceof Percent) {
+			// 0% has nothing to divide by: like a number, it is used as it is
+			if (innerRadius instanceof Percent && innerRadius.value !== 0) {
 				let value = innerRadius.value;
 				let mr = Math.min(wr, hr);
 				value = Math.max(mr * value, mr - Math.min(h, w)) / mr;
 				innerBounds = $math.getArcBounds(0, 0, startAngle, endAngle, value);
 				this.setPrivateRaw("irModifyer", value / innerRadius.value);
+			}
+			else {
+				this.setPrivateRaw("irModifyer", 1);
 			}
 
 			bounds = $math.mergeBounds([bounds, innerBounds]);

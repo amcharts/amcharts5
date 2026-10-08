@@ -9,17 +9,18 @@ import * as $array from "../../../core/util/Array";
 export interface IMovingAverageDeviationSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Increasing color.
+	 * Color of columns higher than the previous one.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * Decreasing color.
+	 * Color of columns lower than the previous one.
 	 */
 	decreasingColor?: Color;
 
 	/**
-	 * Type of the moving average.
+	 * Kind of moving average: `"simple"`, `"weighted"`, `"exponential"`,
+	 * `"dema"` (double exponential) or `"tema"` (triple exponential).
 	 *
 	 * @default "simple"
 	 */
@@ -34,7 +35,8 @@ export interface IMovingAverageDeviationSettings extends IChartIndicatorSettings
 
 
 	/**
-	 * How units are calculated.
+	 * Unit of the deviation: `"points"` (price units) or `"percent"` of the
+	 * moving average.
 	 *
 	 * @default "points"
 	 */
@@ -50,7 +52,8 @@ export interface IMovingAverageDeviationEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Moving Average Deviation indicator: columns showing how far `field` is from
+ * its moving average over `period`. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -63,7 +66,7 @@ export class MovingAverageDeviation extends ChartIndicator {
 	declare public _events: IMovingAverageDeviationEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: ColumnSeries;
 
@@ -126,6 +129,8 @@ export class MovingAverageDeviation extends ChartIndicator {
 			const decreasing = this.get("decreasingColor");
 			template.states.create("riseFromPrevious", { fill: increasing, stroke: increasing });
 			template.states.create("dropFromPrevious", { fill: decreasing, stroke: decreasing });
+			// The columns take the states only when they are laid out again
+			this.series.markDirtyValues();
 		}
 
 	}

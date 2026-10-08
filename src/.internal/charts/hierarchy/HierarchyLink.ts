@@ -23,12 +23,14 @@ export interface IHierarchyLinkSettings extends IGraphicsSettings {
 	target?: DataItem<IHierarchyDataItem>;
 
 	/**
-	 * Strength of the link.
+	 * How strongly the link pulls its nodes toward `distance`, usually `0` to
+	 * `1`. Used by [[ForceDirected]].
 	 */
 	strength?: number;
 
 	/**
-	 * Distance in pixels.
+	 * Length the link tries to keep, as a multiple of its two nodes' radii
+	 * added together: `1` lets the circles touch. Used by [[ForceDirected]].
 	 */
 	distance?: number;
 
@@ -39,7 +41,7 @@ export interface IHierarchyLinkPrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a link between nodes in a hierarchy series.
+ * A line linking two nodes of a [[LinkedHierarchy]] series.
  */
 export class HierarchyLink extends Graphics {
 	declare public _settings: IHierarchyLinkSettings;
@@ -135,7 +137,7 @@ export class HierarchyLink extends Graphics {
 				}
 			}
 		})
-		return super.hide();
+		return super.hide(duration);
 	}
 
 	public show(duration?: number){
@@ -147,7 +149,7 @@ export class HierarchyLink extends Graphics {
 				}
 			}
 		})
-		return super.show();
+		return super.show(duration);
 	}
 
 	public _beforeChanged() {

@@ -22,11 +22,14 @@ const series = root.container.children.push(am5flow.Chord.new(root, {
   targetIdField: "target",
   valueField: "value"
 }));
+// every second color of the color set, so neighboring nodes differ more
 series.nodes.get("colors")!.set("step", 2);
 
 
 // Set data
 // https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
+// each row is a flow from source to target; a node's arc is as long as all it sends, and the
+// ribbon between two nodes is as wide at each end as what that node sends to the other
 series.data.setAll([
   { source: "Berlin", target: "Amsterdam", value: 14 },
   { source: "Berlin", target: "London", value: 33 },
@@ -56,4 +59,5 @@ series.data.setAll([
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

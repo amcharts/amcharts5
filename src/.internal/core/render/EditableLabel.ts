@@ -3,7 +3,8 @@ import { Container } from "./Container";
 import { RoundedRectangle } from "./RoundedRectangle";
 import { Percent } from "../util/Percent"
 import { color } from "../util/Color";
-import { MultiDisposer } from "../util/Disposer";
+import { MultiDisposer, IDisposer } from "../util/Disposer";
+import { fontSizeToCSS } from "./scene/TextLayout";
 
 
 import * as $utils from "../util/Utils"
@@ -13,22 +14,15 @@ import * as $array from "../util/Array"
 export interface IEditableLabelSettings extends ILabelSettings {
 
 	/**
-	 * Start editing on click (`"click"`; default) or double-click ('"dblclick"').
-	 *
-	 * All available options:
-	 *
-	 * *`"click"` (default)
-	 * *`"dblclick"`
-	 * *`"rightclick"`
-	 * *`"middleclick"`
-	 * *`"none"`
+	 * Which click starts editing: `"click"`, `"dblclick"`, `"rightclick"` or
+	 * `"middleclick"`. With `"none"`, only setting `active` to `true` does.
 	 *
 	 * @default "click"
 	 */
 	editOn?: "click" | "dblclick" | "rightclick" | "middleclick" | "none";
 
 	/**
-	 * Allow multiple lines (`true` - dfault) or no (`false`).
+	 * Allows line breaks in the text. With `false`, ENTER finishes editing.
 	 *
 	 * @default true
 	 * @since 5.9.6
@@ -42,11 +36,16 @@ export interface IEditableLabelPrivate extends ILabelPrivate {
 }
 
 export interface IEditableLabelEvents extends ILabelEvents {
+	/**
+	 * The label's text box was created and is ready for editing.
+	 */
 	inited: {};
 }
 
 /**
- * Editable label.
+ * A label the user can edit in place. Editing starts on `editOn` and ends
+ * when the label loses focus or ESC is pressed; `active` is `true` while it
+ * lasts.
  *
  * @since 5.9.5
  */
@@ -60,6 +59,7 @@ export class EditableLabel extends Label {
 	public static classNames: Array<string> = Label.classNames.concat([EditableLabel.className]);
 
 	protected _editOnEvents?: MultiDisposer;
+	protected _frameDp?: IDisposer;
 
 	protected _afterNew() {
 		super._afterNew();
@@ -155,15 +155,16 @@ export class EditableLabel extends Label {
 
 					// Finish editing on ESC press
 					if ($utils.supports("keyboardevents")) {
-						this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+						this._disposers.push($utils.addEventListener(textarea, "keydown", (ev: KeyboardEvent) => {
 							if ($utils.getEventKey(ev) == "Escape") {
 								this.set("active", false);
 							}
 						}));
 					}
 
-					// Intercept ENTER if necessary
-					this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+					// Intercept ENTER if necessary. Only while typing in the label:
+					// elsewhere on the page ENTER must keep working
+					this._disposers.push($utils.addEventListener(textarea, "keydown", (ev: KeyboardEvent) => {
 						if ($utils.getEventKey(ev) == "Enter" && this.get("multiLine") === false) {
 							// Single-line label, save instead of breaking into new line
 							ev.preventDefault();
@@ -293,11 +294,8 @@ export class EditableLabel extends Label {
 			if (!fontSize) {
 				fontSize = getComputedStyle(el, "font-size").getPropertyValue("font-size");
 			}
-			else if ($type.isNumber(fontSize)) {
-				fontSize = fontSize + "px";
-			}
 			else {
-				fontSize = fontSize;
+				fontSize = fontSizeToCSS(fontSize);
 			}
 			textarea.style.fontSize = fontSize;
 
@@ -327,30 +325,32 @@ export class EditableLabel extends Label {
 				textarea.style.whiteSpace = "nowrap";
 			}
 
-			// Adjust textarea postion based on textAlign setting
-			this._root.events.on("frameended", () => {
+			// Adjust textarea postion based on textAlign setting (one listener, as this runs on every keystroke)
+			if (!this._frameDp) {
+				this._frameDp = this.addDisposer(this._root.events.on("frameended", () => {
 
-				if (textarea.style.minWidth == "") {
-					textarea.style.minWidth = (textarea.scrollWidth + 20) + "px";
-				}
+					if (textarea.style.minWidth == "") {
+						textarea.style.minWidth = (textarea.scrollWidth + 20) + "px";
+					}
 
-				const textAlign = this.get("textAlign", "start");
-				if (textAlign == "center") {
-					textarea.style.textAlign = "center";
-					if (!el.style.transform.match(/translateX/) && !this.get("width")) {
-						el.style.transform += " translateX(-50%)";
+					const textAlign = this.get("textAlign", "start");
+					if (textAlign == "center") {
+						textarea.style.textAlign = "center";
+						if (!el.style.transform.match(/translateX/) && !this.get("width")) {
+							el.style.transform += " translateX(-50%)";
+						}
 					}
-				}
-				else if (textAlign == "end") {
-					textarea.style.textAlign = "right";
-					if (!el.style.transform.match(/translateX/) && !this.get("width")) {
-						el.style.transform += " translateX(-100%)";
+					else if (textAlign == "end") {
+						textarea.style.textAlign = "right";
+						if (!el.style.transform.match(/translateX/) && !this.get("width")) {
+							el.style.transform += " translateX(-100%)";
+						}
 					}
-				}
-				else {
-					textarea.style.textAlign = textAlign;
-				}
-			});
+					else {
+						textarea.style.textAlign = textAlign;
+					}
+				}));
+			}
 
 		}
 	}

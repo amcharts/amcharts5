@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"]
+  "title": "Stock Chart Data Granularity",
+  "description": "A stock chart with an interval control that swaps minute, day, week and month data and sets the matching base interval on the date axis.",
+  "category": "stock",
+  "tier": "technique",
+  "tags": ["interval control", "base interval", "toolbar", "candlestick"],
+  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "chartdiv": { "height": "calc(100vh - 36px)" }
 }

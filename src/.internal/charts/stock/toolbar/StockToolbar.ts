@@ -12,32 +12,29 @@ import * as $utils from "../../../core/util/Utils";
 export interface IStockToolbarSettings extends IEntitySettings {
 
 	/**
-	 * A [[StockChart]] the toolbar is for.
+	 * The [[StockChart]] the toolbar is for.
 	 */
 	stockChart: StockChart;
 
 	/**
-	 * A reference to an element in the document to place tools in.
+	 * The HTML element the toolbar's buttons are placed in.
 	 */
 	container: HTMLElement;
 
 	/**
-	 * A list of tools to show in toolbar.
+	 * Controls to show in the toolbar, in order.
 	 */
 	controls?: StockControl[];
 
 	/**
-	 * If set to `false` the toolbar will not load default CSS.
+	 * Loads the toolbar's default CSS. Set to `false` to style it yourself.
 	 *
 	 * @default true
 	 */
 	useDefaultCSS?: boolean;
 
 	/**
-	 * Menu will disable all interactions for the underlying chart when using
-	 * tools.
-	 *
-	 * @default true
+	 * Has no effect: the toolbar does not use it.
 	 */
 	deactivateRoot?: boolean;
 
@@ -48,7 +45,7 @@ export interface IStockToolbarSettings extends IEntitySettings {
 	 * E.g. buttons will be focusable using TAB key. Lists navigable using arrow
 	 * keys, etc.
 	 *
-	 * @default false
+	 * @default true
 	 */
 	focusable?: boolean;
 
@@ -58,11 +55,15 @@ export interface IStockToolbarPrivate extends IEntityPrivate {
 }
 
 export interface IStockToolbarEvents extends IEntityEvents {
+	/**
+	 * The toolbar was built, with its controls added.
+	 */
 	created: {}
 }
 
 /**
- * Builds a toolbar for [[StockChart]].
+ * A toolbar of [[StockControl]] buttons for a [[StockChart]], placed in an
+ * HTML element outside the chart.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/} for more info
  */

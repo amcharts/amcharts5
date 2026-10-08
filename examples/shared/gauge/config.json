@@ -1,0 +1,56 @@
+{
+  "type": "RadarChart",
+  "settings": {
+    "panX": false,
+    "panY": false,
+    "startAngle": 180,
+    "endAngle": 360,
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "xAxes": ["#axis-0"]
+  },
+  "refs": [
+    {
+      "axis-0": {
+        "type": "ValueAxis",
+        "settings": {
+          "maxDeviation": 0,
+          "min": 0,
+          "max": 100,
+          "strictMinMax": true,
+          "renderer": {
+            "type": "AxisRendererCircular",
+            "settings": { "innerRadius": -10, "strokeOpacity": 0.1 }
+          }
+        }
+      }
+    },
+    {
+      "axisRange-0": {
+        "axis": "#axis-0",
+        "settings": {
+          "value": 65,
+          "bullet": {
+            "type": "AxisBullet",
+            "settings": {
+              "sprite": {
+                "type": "ClockHand",
+                "settings": {
+                  "radius": { "type": "Percent", "value": 99 }
+                }
+              }
+            }
+          },
+          "grid": {
+            "type": "Grid",
+            "settings": { "visible": false }
+          }
+        },
+        "__parseLogic": "axisRange"
+      }
+    }
+  ]
+}

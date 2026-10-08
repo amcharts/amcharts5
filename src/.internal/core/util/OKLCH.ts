@@ -3,15 +3,10 @@ import { Color } from "./Color";
 /**
  * OKLCH color helpers.
  *
- * OKLCH is a perceptually-uniform cylindrical color space (lightness, chroma,
- * hue) derived from Björn Ottosson's OKLab. Unlike HSL, equal steps in OKLCH
- * lightness/hue look equally different to the eye, which makes it ideal for
- * generating balanced categorical palettes from a single seed color.
- *
- * This module is a small, dependency-free converter (sRGB <> OKLab <> OKLCH)
- * plus an sRGB gamut clamp. It is additive: nothing in the existing color
- * pipeline changes. Themes that need perceptual palettes import it to
- * pre-compute a `colors` array.
+ * OKLCH describes a color by lightness, chroma and hue, derived from Björn
+ * Ottosson's OKLab. Unlike in HSL, equal steps of lightness or hue look
+ * equally different to the eye, which suits balanced palettes built from one
+ * color.
  *
  * Ranges:
  * - `l` (lightness): 0 (black) .. 1 (white)
@@ -22,11 +17,11 @@ import { Color } from "./Color";
  */
 
 export interface IOKLCH {
-	/** Lightness, 0 .. 1 */
+	/** Lightness, from `0` (black) to `1` (white). */
 	l: number;
-	/** Chroma, 0 .. ~0.37 */
+	/** Chroma, from `0` (gray) to about `0.37` (most saturated). */
 	c: number;
-	/** Hue, 0 .. 360 degrees */
+	/** Hue, from `0` to `360` degrees. */
 	h: number;
 }
 
@@ -119,11 +114,9 @@ export function colorToOKLCH(color: Color): IOKLCH {
 }
 
 /**
- * Converts OKLCH components to a [[Color]].
- *
- * By default, colors that fall outside the sRGB gamut are brought back in by
- * reducing chroma while holding lightness and hue constant (a binary search),
- * which preserves the intended color far better than a naive per-channel clip.
+ * Converts OKLCH components to a [[Color]]. By default, a color outside the
+ * sRGB range is brought into it by reducing its chroma, keeping lightness and
+ * hue.
  *
  * @param   l      Lightness, 0 .. 1
  * @param   c      Chroma, 0 .. ~0.37

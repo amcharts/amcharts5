@@ -1,0 +1,356 @@
+{
+  "type": "SerpentineChart",
+  "settings": {
+    "levelCount": 3,
+    "startLocation": 0.2,
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1"],
+    "xAxes": ["#axis-0"],
+    "yAxes": ["#axis-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "category": "Module #1",
+          "start": 1547071200000,
+          "end": 1547330400000,
+          "task": "Gathering requirements",
+          "settings": {
+            "fill": { "type": "Color", "value": "#67b7dc" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #1",
+          "start": 1549317600000,
+          "end": 1555534800000,
+          "task": "Development",
+          "settings": {
+            "fill": { "type": "Color", "value": "#67b7dc" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #2",
+          "start": 1546898400000,
+          "end": 1547071200000,
+          "task": "Gathering requirements",
+          "settings": {
+            "fill": { "type": "Color", "value": "#a367dc" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #2",
+          "start": 1547244000000,
+          "end": 1547503200000,
+          "task": "Producing specifications",
+          "settings": {
+            "fill": { "type": "Color", "value": "#a367dc" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #2",
+          "start": 1547589600000,
+          "end": 1549317600000,
+          "task": "Development",
+          "settings": {
+            "fill": { "type": "Color", "value": "#a367dc" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #2",
+          "start": 1549749600000,
+          "end": 1550440800000,
+          "task": "Testing and QA",
+          "settings": {
+            "fill": { "type": "Color", "value": "#a367dc" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #3",
+          "start": 1546293600000,
+          "end": 1547848800000,
+          "task": "Gathering requirements",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dc6788" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #3",
+          "start": 1548972000000,
+          "end": 1549749600000,
+          "task": "Producing specifications",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dc6788" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #3",
+          "start": 1552168800000,
+          "end": 1555275600000,
+          "task": "Development",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dc6788" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #3",
+          "start": 1555707600000,
+          "end": 1556571600000,
+          "task": "Testing and QA",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dc6788" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #4",
+          "start": 1547503200000,
+          "end": 1549922400000,
+          "task": "Gathering requirements",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dcd267" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #4",
+          "start": 1551045600000,
+          "end": 1552168800000,
+          "task": "Development",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dcd267" },
+            "__parse": true
+          },
+          "__parse": true
+        },
+        {
+          "category": "Module #4",
+          "start": 1553292000000,
+          "end": 1556485200000,
+          "task": "Testing and QA",
+          "settings": {
+            "fill": { "type": "Color", "value": "#dcd267" },
+            "__parse": true
+          },
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "data-1": [
+        { "category": "", "date": 1548108000000, "letter": "A" },
+        { "category": "", "date": 1548626400000, "letter": "B" },
+        { "category": "", "date": 1550613600000, "letter": "C" },
+        { "category": "", "date": 1551304800000, "letter": "D" },
+        { "category": "", "date": 1551823200000, "letter": "E" },
+        { "category": "", "date": 1552341600000, "letter": "F" },
+        { "category": "", "date": 1555534800000, "letter": "G" }
+      ]
+    },
+    {
+      "data-2": [
+        { "category": "Module #1" },
+        { "category": "Module #2" },
+        { "category": "" },
+        { "category": "Module #3" },
+        { "category": "Module #4" }
+      ]
+    },
+    {
+      "axis-1": {
+        "type": "CategoryAxis",
+        "settings": {
+          "categoryField": "category",
+          "renderer": {
+            "type": "AxisRendererCurveY",
+            "settings": { "minGridDistance": 10 },
+            "properties": {
+              "labels": {
+                "properties": {
+                  "template": {
+                    "settings": {
+                      "centerY": { "type": "Percent", "value": 50 },
+                      "centerX": { "type": "Percent", "value": 100 },
+                      "fontSize": 11
+                    }
+                  }
+                }
+              },
+              "grid": {
+                "properties": {
+                  "template": {
+                    "settings": { "forceHidden": true }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "properties": { "data": "#data-2" }
+      }
+    },
+    {
+      "axis-0": {
+        "type": "DateAxis",
+        "settings": {
+          "baseInterval": { "timeUnit": "day", "count": 1 },
+          "renderer": {
+            "type": "AxisRendererCurveX",
+            "settings": {
+              "yRenderer": "#axis-1.get('renderer')",
+              "strokeDasharray": [2, 3],
+              "strokeOpacity": 0.5
+            },
+            "properties": {
+              "labels": {
+                "properties": {
+                  "template": {
+                    "settings": {
+                      "centerY": { "type": "Percent", "value": 50 },
+                      "fontSize": 11,
+                      "minPosition": 0.01
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-0": {
+        "type": "CurveColumnSeries",
+        "settings": {
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "baseAxis": "#axis-1",
+          "valueXField": "end",
+          "openValueXField": "start",
+          "categoryYField": "category",
+          "autoAppear": true,
+          "appearDuration": 1000
+        },
+        "properties": {
+          "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "height": { "type": "Percent", "value": 10 },
+                  "strokeOpacity": 0,
+                  "tooltipText": "{category}: {task}",
+                  "templateField": "settings"
+                }
+              }
+            }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "locationX": 0,
+                "sprite": {
+                  "type": "Circle",
+                  "settings": { "radius": 4, "templateField": "settings" }
+                }
+              }
+            },
+            {
+              "type": "Bullet",
+              "settings": {
+                "locationX": 1,
+                "sprite": {
+                  "type": "Circle",
+                  "settings": { "radius": 4, "templateField": "settings" }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "series-1": {
+        "type": "CurveLineSeries",
+        "settings": {
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "valueXField": "date",
+          "categoryYField": "category",
+          "autoAppear": true,
+          "appearDuration": 1000
+        },
+        "properties": {
+          "data": "#data-1",
+          "strokes": {
+            "properties": {
+              "template": {
+                "settings": { "forceHidden": true }
+              }
+            }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Label",
+                  "settings": {
+                    "text": "{letter}",
+                    "populateText": true,
+                    "fontSize": 11,
+                    "textAlign": "center",
+                    "width": 18,
+                    "height": 16,
+                    "centerX": { "type": "Percent", "value": 50 },
+                    "centerY": 32,
+                    "paddingTop": 1,
+                    "paddingBottom": 1,
+                    "paddingLeft": 0,
+                    "paddingRight": 0,
+                    "background": {
+                      "type": "PointedRectangle",
+                      "settings": {
+                        "fill": { "type": "Color", "value": "#ffffff" },
+                        "stroke": { "type": "Color", "value": "#000000" },
+                        "cornerRadius": 0,
+                        "pointerBaseWidth": 6,
+                        "pointerX": 9,
+                        "pointerY": 21
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

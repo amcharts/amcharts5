@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"]
+  "title": "Stock Chart",
+  "description": "A stock chart with candlesticks, volume, a scrollbar with a preview, a legend and a toolbar for indicators, periods, series type and drawing.",
+  "category": "stock",
+  "tier": "showcase",
+  "tags": ["candlestick", "volume", "toolbar", "indicators", "scrollbar", "legend"],
+  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "chartdiv": { "height": "calc(100vh - 36px)" }
 }

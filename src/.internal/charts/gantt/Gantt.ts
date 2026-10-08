@@ -25,14 +25,16 @@ import * as $time from "../../core/util/Time";
 export interface IGanttSettings extends IContainerSettings {
 
 	/**
-	 * If set to `true`, the user will be able to edit the chart via UI.
+	 * Lets the user add, move, resize, link, recolor and delete tasks. When
+	 * `false`, the toolbar's editing buttons, grips and bullets are hidden.
 	 *
 	 * @default true
 	 */
 	editable?: boolean;
 
 	/**
-	 * A unit to be used for when calculating "duration" of Gantt items.
+	 * Time unit of task durations. It is also the base interval of the date
+	 * axes and the unit bars snap to.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Duration_units} for more information
 	 * @default "day"
@@ -40,7 +42,8 @@ export interface IGanttSettings extends IContainerSettings {
 	durationUnit?: "year" | "month" | "week" | "day" | "hour" | "minute" | "second";
 
 	/**
-	 * An array of weekend days, e.g. `[0, 6]` for Sunday and Saturday.
+	 * Days of the week that are not working days: `0` is Sunday, `6` Saturday.
+	 * The lower date axis shades them when it shows days.
 	 *
 	 * @default [0, 6]
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Weekends_and_holidays} for more information
@@ -48,59 +51,64 @@ export interface IGanttSettings extends IContainerSettings {
 	weekends?: Array<number>;
 
 	/**
-	 * An array of dates to treat as a holiday.
+	 * Dates that are not working days. Each covers the 24 hours from its time.
+	 * Used only while `excludeWeekends` is on.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Weekends_and_holidays} for more information
 	 */
 	holidays?: Array<Date>;
 
 	/**
-	 * If set to `true`, weekends will be excluded from the chart.
+	 * Task durations count working days only: a task that would start on one
+	 * of the `weekends` days or on a `holidays` date starts on the next working
+	 * day, and its duration skips them. Set to `false` to count every day.
 	 *
+	 * @default true
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Weekends_and_holidays} for more information
 	 */
 	excludeWeekends?: boolean;
 
 	/**
-	 * An absolute or relative width of the left-side category column.
-	 * 
+	 * Width of the task list on the left, in pixels or as a percent of the
+	 * chart's width. It is never narrower than the task axis's `minWidth`
+	 * (100 pixels if not set).
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_axis_width} for more information
 	 * @default 30%
 	 */
 	sidebarWidth?: number | Percent;
 
 	/**
-	 * A relative vertical cell position to treat as the threshold for snapping
-	 * bars.
+	 * Where within a time unit a dragged or resized bar edge snaps to the next
+	 * unit: `0` is the unit's start, `1` its end. A bar's start snaps forward
+	 * once past `snapThreshold`, its end once past `1 - snapThreshold`, so
+	 * `0.5` snaps both to the nearest unit.
 	 *
-	 * Available range of values: `0` (left) to `1` (right).
-	 *
-	 * This will be used when resizing or dragging a bar. If the position is
-	 * bigger than `snapThreshold` the bar will snap to the right, if it is
-	 * smaller than `snapThreshold`, it will snap to the left.
-	 * 
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Snapping_behavior} for more information
 	 * @default 0.5
 	 */
 	snapThreshold?: number;
 
 	/**
-	 * A [[ColorSet]] to use when asigning colors for series.
+	 * Colors for top-level tasks that have no `color` in data. Subtasks take
+	 * their parent's color.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * Grid intervals.
+	 * Grid intervals of the lower date axis for each time unit of the upper
+	 * axis's grid: while the upper axis shows weeks, the lower one picks from
+	 * the `week` list, and so on.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Timeline_horizontal_axis} for more info
 	 */
 	gridIntervals?: { [index: string]: Array<ITimeInterval> };
 
 	/**
-	 * If this is set to `true`, when a new task is added, it will be automatically linked to the previous task.
-	 * 
+	 * Links each newly added task to the previous task at the same level.
+	 *
 	 * @default true
 	 */
 	linkNewTasks?: boolean;
@@ -109,13 +117,24 @@ export interface IGanttSettings extends IContainerSettings {
 export interface IGanttPrivate extends IContainerPrivate { }
 
 export interface IGanttEvents extends IContainerEvents {
+	/**
+	 * A date was marked on the lower date axis, by a click or by `markDate()`.
+	 */
 	datemarked: { date: number | undefined, dataItem: DataItem<IGanttDateAxisDataItem> };
+	/**
+	 * A date mark was removed, by a click or by `unmarkDate()`.
+	 */
 	dateunmarked: { date: number | undefined, dataItem?: DataItem<IGanttDateAxisDataItem> };
+	/**
+	 * Task values were recalculated, such as after the user edited a task.
+	 * Dispatched only while `editable` is on.
+	 */
 	valueschanged: {};
 }
 
 /**
- * Creates a [[Gantt]] chart.
+ * A Gantt chart: a task list on the left and the tasks' bars, links and
+ * progress on a timeline.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/} for more info
  * @important
@@ -143,44 +162,51 @@ export class Gantt extends Container {
 	})._markC("orientation");
 
 	/**
-	 * A reference to the [[XYChart]] that holds the Gantt chart.
+	 * The [[XYChart]] inside the Gantt that holds the axes and the series.
 	 */
 	public xyChart!: XYChart;
 
 	/**
-	 * A reference to the [[GanttSeries]] that shows the Gantt tasks bars.
+	 * The [[GanttSeries]] that draws the task bars.
 	 */
 	public series!: GanttSeries;
 
 	/**
-	 * A reference to the [[GanttDateAxis]] used as the main X-axis.
+	 * The upper date axis, with the larger time units. The series uses it.
 	 */
 	public xAxis!: GanttDateAxis<GanttDateAxisRenderer>;
 
 	/**
-	 * A reference to the [[GanttDateAxis]] used as the secondary X-axis.
+	 * The lower date axis, with the finer time units. Clicking it marks a
+	 * date.
 	 */
 	public xAxisMinor!: GanttDateAxis<GanttDateAxisRenderer>;
 
 	/**
-	 * A reference to the [[GanttCategoryAxis]] used as the Y-axis.
+	 * The [[GanttCategoryAxis]] that lists the tasks on the left.
 	 */
 	public yAxis!: GanttCategoryAxis<GanttCategoryAxisRenderer>;
 
 	/**
-	 * Controls (add, color picker, expand, collaps, clear buttons) container.
+	 * Toolbar container with the add, color picker, expand, collapse, link,
+	 * edit and clear buttons.
 	 */
 	public controls: Container = Container.new(this._root, {
 		themeTags: ["controls"],
 		layout: this._root.horizontalLayout,
 	})
 
+	/**
+	 * Container with the fit and zoom-out buttons, at the top right of the
+	 * plot area.
+	 */
 	public zoomControls: Container = Container.new(this._root, {
 		themeTagsSelf: ["zoomcontrols"]
 	});
 
 	/**
-	 * The [[Button]] element to add new tasks.
+	 * Button that adds a new task, as a subtask of the selected task if there
+	 * is one.
 	 */
 	public readonly addButton: Button = this.controls.children.push(Button.new(this._root, {
 		themeTags: ["add", "plus"],
@@ -189,7 +215,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[ColorPickerButton]] element to select colors for tasks.
+	 * Button that opens `colorPicker` to choose a task color.
 	 */
 	public readonly colorPickerButton: ColorPickerButton = this.controls.children.push(ColorPickerButton.new(this._root, {
 		disableOpacity: true,
@@ -197,7 +223,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] elements to expand and collapse all tasks.
+	 * Button that expands all tasks.
 	 */
 	public readonly expandButton: Button = this.controls.children.push(Button.new(this._root, {
 		themeTags: ["expand", "secondary", "fixedwidth"],
@@ -206,7 +232,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] elements to collapse all tasks.
+	 * Button that collapses all tasks.
 	 */
 	public readonly collapseButton: Button = this.controls.children.push(Button.new(this._root, {
 		themeTags: ["collapse", "secondary", "fixedwidth"],
@@ -215,7 +241,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] element to toggle `linkNewTasks` setting.
+	 * Toggle button for the `linkNewTasks` setting.
 	 */
 	public readonly linkButton: Button = this.controls.children.push(Button.new(this._root, {
 		themeTags: ["link", "secondary", "fixedwidth"],
@@ -224,7 +250,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] element to horizontally fit visible tasks into a view.
+	 * Button that zooms the date axis to fit the tasks currently in view.
 	 */
 	public readonly fitButton: Button = this.zoomControls.children.push(Button.new(this._root, {
 		themeTags: ["fit", "secondary", "zoombutton"],
@@ -233,7 +259,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] element to zoom out the X axis.
+	 * Button that zooms the date axis fully out.
 	 */
 	public readonly zoomOutButton: Button = this.zoomControls.children.push(Button.new(this._root, {
 		themeTags: ["zoomout", "secondary", "zoombutton"],
@@ -242,7 +268,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] element to toggle edit mode.
+	 * Toggle button for the `editable` setting. Hidden by default.
 	 *
 	 * @since 5.14.1
 	 */
@@ -253,7 +279,7 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[Button]] element to clear all tasks.
+	 * Button that deletes all tasks, once the user confirms.
 	 */
 	public readonly clearButton: ConfirmButton = this.controls.children.push(ConfirmButton.new(this._root, {
 		themeTags: ["clear", "secondary", "confirm"],
@@ -263,7 +289,8 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * The [[ColorPicker]] element to select colors for tasks.
+	 * The color picker opened by `colorPickerButton`. It colors the selected
+	 * task.
 	 */
 	public readonly colorPicker: ColorPicker = this.children.push(ColorPicker.new(this._root, { visible: false }));
 
@@ -618,6 +645,10 @@ export class Gantt extends Container {
 		}
 	}
 
+	/**
+	 * Deletes all tasks and date marks, restarts the colors and resets the
+	 * timeline to start today.
+	 */
 	public clearAll() {
 		this.yAxis.deleteAll();
 		this._customColor = undefined;
@@ -679,14 +710,15 @@ export class Gantt extends Container {
 	}
 
 	/**
-	 * Adds a new task to the Gantt chart.
-	 * 
-	 * @param category        The category name for the task. If not provided, will be auto-generated.
-	 * @param start           The start time of the task in milliseconds. If not provided, will be determined based on context.
-	 * @param duration        The duration of the task. If not provided, defaults to 1.
-	 * @param parentId        The parent category if this is a subtask.
-	 * @param progress        The initial progress of the task (0-1). Defaults to 0.
-	 * @param linkToPrevious  Should the task automatically link to the previous one?
+	 * Adds a new task, with an ID generated for it, and scrolls the task list
+	 * to it.
+	 *
+	 * @param name            Task name; `"New Task"` if not given
+	 * @param start           Start timestamp in milliseconds; if not given, the end of the parent or of the last task
+	 * @param duration        Duration in `durationUnit` units
+	 * @param parentId        ID of the parent task; the selected task if not given
+	 * @param progress        Initial progress, `0` to `1`
+	 * @param linkToPrevious  Link the previous task to this one; `linkNewTasks` if not given
 	 */
 	public addNewTask(name?: string, start?: number, duration: number = 1, parentId?: string, progress: number = 0, linkToPrevious?: boolean) {
 		// Generate a unique ID for the new task
@@ -849,9 +881,10 @@ export class Gantt extends Container {
 	}
 
 	/**
-	 * Marks a date on the minor date axis.
-	 * 
-	 * @param date  Date to be marked
+	 * Marks a date with a dashed line across the plot area, as a click on the
+	 * lower date axis does.
+	 *
+	 * @param date  Timestamp in milliseconds
 	 */
 	public markDate(date: number) {
 
@@ -867,9 +900,9 @@ export class Gantt extends Container {
 	}
 
 	/**
-	 * Unmarks a date on the minor date axis.
-	 * 
-	 * @param date  Date to be unmarked
+	 * Removes the mark of a date set by `markDate()` or a click.
+	 *
+	 * @param date  Timestamp in milliseconds
 	 */
 	public unmarkDate(date: number) {
 		const xAxisMinor = this.xAxisMinor;

@@ -15,7 +15,8 @@ export interface IStandardDeviationEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Standard Deviation indicator: how widely `field` varies around its average
+ * over `period`. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -28,7 +29,7 @@ export class StandardDeviation extends ChartIndicator {
 	declare public _events: IStandardDeviationEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

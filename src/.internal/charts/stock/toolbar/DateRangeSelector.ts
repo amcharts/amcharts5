@@ -10,16 +10,14 @@ import * as $type from "../../../core/util/Type";
 export interface IDateRangeSelectorSettings extends IStockControlSettings {
 
 	/**
-	 * Date format to use for date input fields.
-	 *
-	 * Will use global date format if not set.
+	 * Date format of the input fields and the button label, such as
+	 * `"yyyy-MM-dd"`. Uses the format of the root's date formatter if not set.
 	 */
 	dateFormat?: string;
 
 	/**
-	 * If set to `false` the control will not load default CSS for Flatpickr
-	 * component. This would mean it would be unstyled, and would require
-	 * custom CSS present on the page.
+	 * Loads the default CSS of the date pickers (Flatpickr). Without it, they
+	 * need CSS of your own.
 	 *
 	 * @default true
 	 * @since 5.2.4
@@ -27,10 +25,8 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	useDefaultCSS?: boolean;
 
 	/**
-	 * Minimum date to allow for selection.
-	 *
-	 * Accepts either a `Date` object or `"auto"` (smallest date available in
-	 * chart).
+	 * Earliest date that can be picked: a `Date`, `"auto"` for the first date
+	 * of the data, or `null` for no limit.
 	 *
 	 * @default "auto"
 	 * @since 5.3.7
@@ -38,10 +34,8 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	minDate?: Date | "auto" | null;
 
 	/**
-	 * Maximum date to allow for selection.
-	 *
-	 * Accepts either a `Date` object or `"auto"` (latest date available in
-	 * chart).
+	 * Latest date that can be picked: a `Date`, `"auto"` for the last date of
+	 * the data, or `null` for no limit.
 	 *
 	 * @default "auto"
 	 * @since 5.3.7
@@ -49,8 +43,8 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	maxDate?: Date | "auto" | null;
 
 	/**
-	 * Set to array of days to disable in date picker dropdowns, with Sunday
-	 * starting at 0, Monday - 1, etc.
+	 * Days of the week that can't be picked: `0` is Sunday, `1` Monday, and so
+	 * on.
 	 *
 	 * @default []
 	 * @since 5.11.1
@@ -58,8 +52,8 @@ export interface IDateRangeSelectorSettings extends IStockControlSettings {
 	disableWeekDays?: number[];
 
 	/**
-	 * If set to `false`, typing into date fields will be disabled. Instead,
-	 * user will be able to select a day using arrow keys.
+	 * Lets the user type dates into the fields. When `false`, a day can only
+	 * be picked in the calendar.
 	 *
 	 * @default true
 	 * @since 5.12.3
@@ -82,7 +76,7 @@ export interface IDateRangeSelectorPrivate extends IStockControlPrivate {
 
 export interface IDateRangeSelectorEvents extends IStockControlEvents {
 	/**
-	 * Invoked when user selects certain date range via control.
+	 * A date range was applied with the control's Apply button.
 	 *
 	 * @since 5.8.5
 	 */
@@ -93,7 +87,8 @@ export interface IDateRangeSelectorEvents extends IStockControlEvents {
 }
 
 /**
- * Date range selector control for [[StockChart]].
+ * A [[StockToolbar]] control with two date pickers that zoom the chart to the
+ * picked date range.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/} for more info
  */
@@ -175,7 +170,7 @@ export class DateRangeSelector extends StockControl {
 			fromField.setAttribute("aria-label", this._root.language.translateAny("From date"));
 		}
 		else {
-			fromField.setAttribute("aria-label", this._root.language.translateAny("From date") + "; " + this._root.language.translateAny("Use arrow keys and ENTER to selected a date"));
+			fromField.setAttribute("aria-label", this._root.language.translateAny("From date") + "; " + this._root.language.translateAny("Use arrow keys and ENTER to select a date"));
 		}
 		fromGroup.appendChild(fromField);
 		this.setPrivate("fromField", fromField);
@@ -200,7 +195,7 @@ export class DateRangeSelector extends StockControl {
 			toField.setAttribute("aria-label", this._root.language.translateAny("To date"));
 		}
 		else {
-			toField.setAttribute("aria-label", this._root.language.translateAny("To date") + "; " + this._root.language.translateAny("Use arrow keys and ENTER to selected a date"));
+			toField.setAttribute("aria-label", this._root.language.translateAny("To date") + "; " + this._root.language.translateAny("Use arrow keys and ENTER to select a date"));
 		}
 		toGroup.appendChild(toField);
 		this.setPrivate("toField", toField);
@@ -311,7 +306,7 @@ export class DateRangeSelector extends StockControl {
 
 		const cancelButton = document.createElement("input");
 		cancelButton.type = "button";
-		cancelButton.value = this._root.language.translateAny("Cancel");
+		cancelButton.value = this._root.language.translate("Cancel");
 		cancelButton.className = "am5-modal-button am5-modal-scondary";
 		buttonsColumn.appendChild(cancelButton);
 

@@ -4,7 +4,7 @@ import * as $type from "../../util//Type";
 export interface ILinePatternSettings extends IPatternSettings {
 
 	/**
-	 * Gap between  lines, in pixels.
+	 * Gap between lines, in pixels.
 	 *
 	 * @default 6
 	 */

@@ -1,0 +1,8 @@
+{
+  "title": "Radar Heat Map",
+  "description": "A heat map on a radar chart, hours around the circle and weekdays as rings, with a heat legend that shows the value of the hovered cell.",
+  "category": "radar",
+  "tier": "technique",
+  "tags": ["radar", "heat map", "heat rules", "heat legend", "category axis"],
+  "jsonNote": "Showing the hovered cell's value on the legend takes code."
+}

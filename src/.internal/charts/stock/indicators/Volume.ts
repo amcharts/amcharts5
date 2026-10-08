@@ -9,12 +9,13 @@ import * as $array from "../../../core/util/Array";
 export interface IVolumeSettings extends IChartIndicatorSettings {
 
 	/**
-	 * An icreasing color.
+	 * Color of columns for data items that close at or above the previous
+	 * close.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * A decreasing color.
+	 * Color of columns for data items that close below the previous close.
 	 */
 	decreasingColor?: Color;
 
@@ -27,7 +28,8 @@ export interface IVolumeEvents extends IChartIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Volume indicator: columns of `volumeSeries`, colored by whether the price
+ * closed up or down. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -40,7 +42,7 @@ export class Volume extends ChartIndicator {
 	declare public _events: IVolumeEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: ColumnSeries;
 
@@ -93,6 +95,8 @@ export class Volume extends ChartIndicator {
 	public _prepareChildren() {
 		if (this.isDirty("increasingColor") || this.isDirty("decreasingColor")) {
 			this.markDataDirty();
+			// The fill adapter is read only when the columns are laid out again
+			this.series.markDirtyValues();
 		}
 		super._prepareChildren();
 	}

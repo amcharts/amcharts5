@@ -2,10 +2,8 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Pastel" — a soft, low-saturation light theme on a warm off-white ground, with
- * a muted pastel series palette. Calm and editorial. Pairs with `PastelDark`.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * "Pastel": a soft light theme on a warm off-white background, with muted
+ * pastel series colors. Calm and editorial. Pairs with `PastelDark`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

@@ -48,27 +48,29 @@ import * as $utils from "../../../core/util/Utils";
 export interface IDrawingControlSettings extends IStockControlSettings {
 
 	/**
-	 * List of tools available in drawing mode.
+	 * Tools to list in the tool dropdown.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_list} for more info
 	 */
 	tools?: DrawingTools[];
 
 	/**
-	 * Default tool.
+	 * The tool in use; the one set at the start is the default.
+	 *
+	 * @default "Line"
 	 */
 	tool?: DrawingTools,
 
 	/**
-	 * If set to `true`, the dropdown will fix the height to fit within chart's
-	 * area, with scroll if the contents do not fit.
+	 * Limits the tool list's height to the chart's height minus 100 pixels,
+	 * scrolling the rest.
 	 *
 	 * @since 5.9.5
 	 */
 	scrollable?: boolean;
 
 	/**
-	 * Default settings for drawing tools.
+	 * Settings for the drawing series of each tool, keyed by tool name.
 	 *
 	 * @since 5.5.2
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings} for more info
@@ -76,108 +78,117 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	toolSettings?: { [index: string]: any };
 
 	/**
-	 * Target series for drawing.
+	 * Series to attach drawings to. Each panel's main series (`stockSeries`
+	 * on its panel, the first series on others) is added automatically.
 	 */
 	series?: XYSeries[];
 
 	/**
-	 * Colors to show in color pickers.
+	 * Colors to offer in the color pickers.
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * Default color for lines/borders.
+	 * Line color of new drawings; changing it also restyles the selected ones.
 	 */
 	strokeColor?: Color;
 
 	/**
-	 * Default line/border width in pixels.
+	 * Line width of new drawings, in pixels.
 	 */
 	strokeWidth?: number;
 
 	/**
-	 * Available line widths for user to choose from.
+	 * Line widths to choose from, in pixels.
 	 */
 	strokeWidths?: number[];
 
 	/**
-	 * Default dasharray setting.
+	 * Dash pattern of new drawings' lines, such as `[2, 2]`, or `[]` for a
+	 * solid line.
 	 */
 	strokeDasharray?: number[];
 
 	/**
-	 * Available line dash settings for user to choose from.
+	 * Dash patterns to choose from.
 	 */
 	strokeDasharrays?: number[][];
 
 	/**
-	 * Default line/border opacity.
+	 * Line opacity of new drawings, from `0` to `1`.
 	 */
 	strokeOpacity?: number;
 
 	/**
-	 * Show dotted/thin line extending from both ends of the drawn line?
+	 * Extends new lines with a dotted line beyond both ends.
 	 *
 	 * @default true
 	 */
 	showExtension?: boolean;
 
 	/**
-	 * Default fill color.
+	 * Fill color of new drawings.
 	 */
 	fillColor?: Color;
 
 	/**
-	 * Default fill opacity.
+	 * Fill opacity of new drawings, from `0` to `1`.
 	 */
 	fillOpacity?: number;
 
 	/**
-	 * Default color for labels.
+	 * Text color of new labels and callouts.
 	 */
 	labelFill?: Color;
 
 	/**
-	 * Default label font size.
+	 * Font size of new labels and callouts.
 	 */
 	labelFontSize?: number | string | undefined;
 
 	/**
-	 * Available font sizes.
+	 * Font sizes to choose from.
 	 */
 	labelFontSizes?: Array<number | string>;
 
 	/**
-	 * Default label font.
+	 * Font family of new labels and callouts.
 	 *
-	 * Use reserved value `"inherit"` to use computed style on chart
-	 * container. (since `5.17.3`)
+	 * `"inherit"` uses the computed font of the chart's container (since
+	 * `5.17.3`).
 	 */
 	labelFontFamily?: string;
 
 	/**
-	 * Available fonts for user to choose from.
+	 * Font families to choose from.
 	 */
 	labelFontFamilies?: string[];
 
 	/**
-	 * Default label font weight.
+	 * Font weight of new labels and callouts.
 	 */
 	labelFontWeight?: "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
 
 	/**
-	 * Default label style.
+	 * Font style of new labels and callouts.
 	 */
 	labelFontStyle?: "normal" | "italic" | "oblique";
 
+	/**
+	 * Icon that the icon tool draws.
+	 */
 	drawingIcon?: IIcon;
+	/**
+	 * Icons to choose from for the icon tool.
+	 */
 	drawingIcons?: IIcon[];
 
 	/**
-	 * Should drawings snap to the nearest data point?
+	 * Snaps the points of new drawings to the values of the nearest data
+	 * items.
 	 *
-	 * @default true
+	 * @default false
 	 */
 	snapToData?: boolean;
 
@@ -192,7 +203,7 @@ export interface IDrawingControlPrivate extends IStockControlPrivate {
 	eraserControl?: StockControl;
 
 	/**
-	 * Selector mode toggler.
+	 * The control that turns drawing selection on and off.
 	 *
 	 * @since 5.9.1
 	 */
@@ -221,7 +232,8 @@ export interface IDrawingControlEvents extends IStockControlEvents {
 }
 
 /**
- * A drawing tools control for [[StockChart]].
+ * A [[StockToolbar]] control that turns drawing mode on, with a row of
+ * controls for picking the tool and its colors, lines and fonts.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/} for more info
  */
@@ -479,7 +491,7 @@ export class DrawingControl extends StockControl {
 		strokeWidthControl.events.on("click", this._resetControls, this);
 
 		/**
-		 * Stroke dash cofiguration control
+		 * Stroke dash configuration control
 		 */
 		const strokeDasharrays: IDropdownListItem[] = [];
 		let currentStrokeDasharray: SVGElement | undefined;
@@ -749,7 +761,7 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Enables or disables eraser mode.
+	 * Turns erasing on or off: while on, a click on a drawing deletes it.
 	 *
 	 * @since 5.3.9
 	 * @param  active  Eraser active
@@ -759,7 +771,7 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Clears all drawings.
+	 * Deletes all drawings made with the control's tools.
 	 *
 	 * @since 5.3.9
 	 */
@@ -1336,15 +1348,14 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Serializes all drawings into an array of simple objects or JSON.
-	 *
-	 * `output` parameter can either be `"object"` or `"string"` (default).
+	 * Serializes all drawings of the chart into an array of objects
+	 * (`output: "object"`) or into JSON (`"string"`, the default).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
 	 * @param   output Output format
 	 * @param   indent Line indent in JSON
-	 * @return         Serialized indicators
+	 * @return         Serialized drawings
 	 */
 	public serializeDrawings(output: "object" | "string" = "string", indent?: string): Array<unknown> | string {
 		const res: Array<any> = [];
@@ -1373,8 +1384,7 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Parses data serialized with `serializeDrawings()` and adds drawings to the
-	 * chart.
+	 * Adds drawings to the chart from data made by `serializeDrawings()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
@@ -1440,7 +1450,7 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Returns an object that holds all drawing series, arrange by tool (key).
+	 * The drawing series of each tool, keyed by tool name.
 	 *
 	 * @since 5.8.0
 	 * @readonly
@@ -1450,13 +1460,12 @@ export class DrawingControl extends StockControl {
 	}
 
 	/**
-	 * Adds a line drawing.
-	 *
-	 * Supported tools: `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"`.
+	 * Adds a horizontal line, horizontal ray or vertical line drawing through a
+	 * point, without the pointer.
 	 *
 	 * @param  tool   Drawing tool
 	 * @param  panel  Panel
-	 * @param  point  Point
+	 * @param  point  Point relative to the root
 	 * @since 5.10.2
 	 */
 	public addLine(tool: "Horizontal Line" | "Horizontal Ray" | "Vertical Line", panel: StockPanel, point: IPoint): void {

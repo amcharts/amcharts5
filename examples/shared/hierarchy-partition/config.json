@@ -1,0 +1,72 @@
+{
+  "type": "Partition",
+  "settings": {
+    "orientation": "horizontal",
+    "valueField": "value",
+    "categoryField": "name",
+    "childDataField": "children",
+    "selectedDataItem": "@self.dataItems.0",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": { "data": "#data-0" },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "name": "Budget",
+          "children": [
+            {
+              "name": "Housing",
+              "children": [
+                { "name": "Rent", "value": 900 },
+                {
+                  "name": "Utilities",
+                  "children": [
+                    { "name": "Electricity", "value": 150 },
+                    { "name": "Heating", "value": 200 },
+                    { "name": "Internet", "value": 120 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Food",
+              "children": [
+                { "name": "Groceries", "value": 450 },
+                {
+                  "name": "Eating Out",
+                  "children": [
+                    { "name": "Restaurants", "value": 220 },
+                    { "name": "Coffee", "value": 130 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Transport",
+              "children": [
+                {
+                  "name": "Car",
+                  "children": [
+                    { "name": "Fuel", "value": 200 },
+                    { "name": "Insurance", "value": 150 }
+                  ],
+                  "__parse": true
+                },
+                { "name": "Public Transit", "value": 130 }
+              ],
+              "__parse": true
+            }
+          ],
+          "__parse": true
+        }
+      ]
+    }
+  ]
+}

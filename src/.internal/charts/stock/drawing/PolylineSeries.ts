@@ -14,17 +14,17 @@ export interface IPolylineSeriesDataItem extends IDrawingSeriesDataItem {
 export interface IPolylineSeriesSettings extends IDrawingSeriesSettings {
 
 	/**
-	 * Show a closed color-filled shape instead of polyline.
-	 * 
+	 * Closes the shape and fills it, instead of drawing an open line.
+	 *
 	 * @default false
 	 * @since 5.9.0
 	 */
 	fillShape?: boolean;
 
 	/**
-	 * Number of pre-defined points in a shape.
+	 * Number of points after which the shape is finished automatically, as
+	 * with a triangle.
 	 *
-	 * The shape will finish drawing once number is reached.
 	 * @since 5.9.0
 	 */
 	pointCount?: number;
@@ -34,7 +34,7 @@ export interface IPolylineSeriesPrivate extends IDrawingSeriesPrivate {
 }
 
 /**
- * Draws a multi-point line (polyline).
+ * Draws a line through any number of points (a polyline).
  */
 export class PolylineSeries extends DrawingSeries {
 	public static className: string = "PolylineSeries";
@@ -269,7 +269,7 @@ export class PolylineSeries extends DrawingSeries {
 	}
 
 	/**
-	 * Cancels current drawing
+	 * Cancels the drawing in progress, deleting it.
 	 *
 	 * @since 5.9.0
 	 */

@@ -29,70 +29,70 @@ export interface IMapSankeySeriesPrivate extends IMapPolygonSeriesPrivate {
 export interface IMapSankeySeriesDataItem extends IMapPolygonSeriesDataItem {
 
 	/**
-	 * Source polygon ID (matches id in polygonSeries).
+	 * Id of the polygon in `polygonSeries` the link starts from, at its
+	 * geographic centroid. Also the id of the source node.
 	 */
 	sourceId?: string;
 
 	/**
-	 * Target polygon ID (matches id in polygonSeries).
+	 * Id of the polygon in `polygonSeries` the link ends at, at its geographic
+	 * centroid. Also the id of the target node.
 	 */
 	targetId?: string;
 
 	/**
-	 * Source longitude (if not using sourceId).
+	 * Longitude the link starts at, when `sourceId` names no polygon.
 	 */
 	sourceLongitude?: number;
 
 	/**
-	 * Source latitude (if not using sourceId).
+	 * Latitude the link starts at, when `sourceId` names no polygon.
 	 */
 	sourceLatitude?: number;
 
 	/**
-	 * Target longitude (if not using targetId).
+	 * Longitude the link ends at, when `targetId` names no polygon.
 	 */
 	targetLongitude?: number;
 
 	/**
-	 * Target latitude (if not using targetId).
+	 * Latitude the link ends at, when `targetId` names no polygon.
 	 */
 	targetLatitude?: number;
 
 	/**
-	 * Numeric value controlling band thickness.
+	 * The link's value: its band is as wide as its share of the largest value.
 	 */
 	value?: number;
 
 	/**
-	 * Waypoints for routing the band through intermediate geographic points.
+	 * Points the band passes through on its way, in order.
 	 */
 	waypoints?: Array<IGeoPoint>;
 
 	/**
-	 * Per-link control point distance. Overrides series-level `controlPointDistance`.
+	 * `controlPointDistance` for this link, instead of the series'.
 	 */
 	controlPointDistance?: number;
 
 	/**
-	 * Per-link control point distance at the source end.
-	 * Overrides series-level `controlPointDistanceSource`.
+	 * `controlPointDistanceSource` for this link, instead of the series'.
 	 */
 	controlPointDistanceSource?: number;
 
 	/**
-	 * Per-link control point distance at the target end.
-	 * Overrides series-level `controlPointDistanceTarget`.
+	 * `controlPointDistanceTarget` for this link, instead of the series'.
 	 */
 	controlPointDistanceTarget?: number;
 
 	/**
-	 * Reference to the source node data item.
+	 * The node the link starts from.
 	 * @readonly
 	 */
 	sourceNode?: DataItem<IMapSankeyNodesDataItem>;
 
 	/**
-	 * Reference to the target node data item.
+	 * The node the link ends at.
 	 * @readonly
 	 */
 	targetNode?: DataItem<IMapSankeyNodesDataItem>;
@@ -102,129 +102,123 @@ export interface IMapSankeySeriesDataItem extends IMapPolygonSeriesDataItem {
 export interface IMapSankeySeriesSettings extends IMapPolygonSeriesSettings {
 
 	/**
-	 * A [[MapPolygonSeries]] to use for resolving `sourceId`/`targetId` to geographic centroids.
+	 * The polygon series that `sourceId` and `targetId` refer to.
 	 */
 	polygonSeries?: MapPolygonSeries;
 
 	/**
-	 * Control point distance for bezier curves (0-0.5). Higher values =
-	 * longer straight sections before the S-curve transition.
+	 * How far a band's curve control points sit from its ends, as a share of
+	 * the distance between them, from `0` to `0.5`. Larger values keep the
+	 * band level for longer before its S-bend.
 	 *
-	 * Used as fallback when `controlPointDistanceSource` or
-	 * `controlPointDistanceTarget` are not set.
+	 * Used where `controlPointDistanceSource` or `controlPointDistanceTarget`
+	 * isn't set.
 	 *
 	 * @default 0.5
 	 */
 	controlPointDistance?: number;
 
 	/**
-	 * Control point distance at the source (departure) end.
-	 * Higher values = longer straight section leaving the source node.
-	 *
-	 * Falls back to `controlPointDistance` if not set.
+	 * `controlPointDistance` at the source end: larger values keep the band
+	 * level for longer as it leaves.
 	 */
 	controlPointDistanceSource?: number;
 
 	/**
-	 * Control point distance at the target (arrival) end.
-	 * Higher values = longer straight section approaching the target node.
-	 *
-	 * Falls back to `controlPointDistance` if not set.
+	 * `controlPointDistance` at the target end: larger values keep the band
+	 * level for longer as it arrives.
 	 */
 	controlPointDistanceTarget?: number;
 
 	/**
-	 * Orientation of the S-curve links.
+	 * Which way bands leave and arrive at their nodes:
 	 *
-	 * `"horizontal"` — links depart and arrive horizontally (east/west).
-	 * Bands stack vertically at each endpoint.
-	 * `"vertical"` — links depart and arrive vertically (north/south).
-	 * Bands stack horizontally at each endpoint.
+	 * * `"horizontal"` - east or west, with bands stacked north to south at each node.
+	 * * `"vertical"` - north or south, with bands stacked west to east at each node.
 	 *
 	 * @default "horizontal"
 	 */
 	orientation?: "horizontal" | "vertical";
 
 	/**
-	 * Maximum band width in geographic degrees.
+	 * Width of the band with the largest value, in degrees. Other bands are as
+	 * wide as their share of that value.
+	 *
 	 * @default 5
 	 */
 	maxWidth?: number;
 
 	/**
-	 * Number of sample points per bezier segment. Higher = smoother curves.
+	 * Points worked out along each curve of a band. More is smoother.
+	 *
 	 * @default 50
 	 */
 	resolution?: number;
 
 	/**
-	 * Extra padding added to endpoint nodes in geographic degrees.
-	 * For circles, added to the radius. For bars, added to the half-height.
-	 * Helps avoid subpixel gaps between bands and the node shape.
+	 * How far, in degrees, a node reaches past the bands it holds: added to a
+	 * circle's radius, or to each end of a bar. Hides thin gaps between the
+	 * bands and the node.
+	 *
 	 * @default 0.3
 	 */
 	nodePadding?: number;
 
 	/**
-	 * When `true`, bands at each endpoint are sorted by the latitude of
-	 * their target/source so that bands heading north are stacked above
-	 * bands heading south. This prevents bands from overlapping.
+	 * Stacks the bands at each node by the latitude of their other end, so
+	 * bands heading north sit above those heading south and don't cross.
+	 *
 	 * @default true
 	 */
 	autoSort?: boolean;
 
 	/**
-	 * Controls how links handle the antimeridian (±180° longitude).
+	 * How links without `waypoints` treat the 180th meridian:
 	 *
-	 * `"short"` — links always take the shorter path, crossing the
-	 * antimeridian if needed (e.g. China → US goes east across the Pacific).
-	 * `"long"` — links never cross the antimeridian, always going the
-	 * long way around.
-	 *
-	 * Only applies to links without waypoints; waypoints define the
-	 * route explicitly.
+	 * * `"short"` - take the shorter way, across it if need be (from China to the US, east over the Pacific).
+	 * * `"long"` - never cross it, going the long way round.
 	 *
 	 * @default "short"
 	 */
 	antimeridian?: "short" | "long";
 
 	/**
-	 * Shape of the endpoint node. Styled via `nodes.mapPolygons.template`.
+	 * Shape of the nodes, styled via `nodes.mapPolygons.template`:
 	 *
-	 * `"circle"` — a circle covering all flows at the endpoint.
-	 * `"bar"` — a rectangular bar like in a traditional Sankey diagram.
-	 * Bar orientation is perpendicular to the flow direction.
+	 * * `"circle"` - a circle around all bands at the node.
+	 * * `"bar"` - a bar across the bands, as in a classic Sankey diagram.
 	 *
 	 * @default "circle"
 	 */
 	nodeType?: "circle" | "bar";
 
 	/**
-	 * Width of the bar at endpoint nodes in geographic degrees.
-	 * Only used when `nodeType` is `"bar"`.
+	 * Thickness of a bar node, in degrees, along the way the bands run. Only
+	 * with `nodeType: "bar"`.
+	 *
 	 * @default 1
 	 */
 	nodeWidth?: number;
 
 	/**
-	 * Controls how link bands are colored.
+	 * How bands are colored:
 	 *
-	 * `"solid"` — all links use the template fill (default).
-	 * `"source"` — each link inherits the source node's fill.
-	 * `"target"` — each link inherits the target node's fill.
+	 * * `"solid"` - all with the `mapPolygons.template` fill.
+	 * * `"source"` - each with its source node's fill.
+	 * * `"target"` - each with its target node's fill.
 	 *
 	 * @default "solid"
 	 */
 	linkColorMode?: "solid" | "source" | "target";
 
 	/**
-	 * A field in data that holds the source polygon ID.
+	 * A field in data that holds `sourceId`.
 	 * @default "sourceId"
 	 */
 	sourceIdField?: string;
 
 	/**
-	 * A field in data that holds the target polygon ID.
+	 * A field in data that holds `targetId`.
 	 * @default "targetId"
 	 */
 	targetIdField?: string;
@@ -262,16 +256,6 @@ export interface IMapSankeySeriesSettings extends IMapPolygonSeriesSettings {
 }
 
 /**
- * Creates a map series for displaying Sankey-style flow bands on a map.
- *
- * Generates actual GeoJSON polygon geometries for each flow, so they
- * properly follow the map projection during panning, zooming, and rotation.
- *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/} for more info
- * @since 5.17.0
- * @important
- */
-/**
  * Settings the band and node geometry is generated from: a change to any of them
  * means the shapes have to be worked out again.
  */
@@ -281,6 +265,15 @@ const GEOMETRY_SETTINGS = [
 	"nodeType", "nodeWidth"
 ];
 
+/**
+ * A map series of Sankey-style flow bands between places, each as wide as
+ * its value. The bands are polygons on the map, so they follow it as it is
+ * panned, zoomed and rotated.
+ *
+ * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/} for more info
+ * @since 5.17.0
+ * @important
+ */
 export class MapSankeySeries extends MapPolygonSeries {
 
 	/**
@@ -289,12 +282,9 @@ export class MapSankeySeries extends MapPolygonSeries {
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = [];
 
 	/**
-	 * A sub-series that manages node data items and visuals.
-	 *
-	 * Nodes are auto-created from link data. You can also set
-	 * `nodes.data.setAll([...])` with custom names and fills.
-	 *
-	 * `nodes.mapPolygons.template` configures node appearance.
+	 * The nodes at the ends of the bands. They are made from the link data; set
+	 * `nodes.data.setAll([...])` to give them names and fills of your own.
+	 * Style them via `nodes.mapPolygons.template`.
 	 */
 	public readonly nodes: MapSankeyNodes = this.addDisposer(
 		MapSankeyNodes.new(this._root, {})
@@ -430,6 +420,11 @@ export class MapSankeySeries extends MapPolygonSeries {
 				mapPolygon.markDirtyProjection();
 			}
 		});
+
+		// Bullets ride on the bands: a still one has to move with the map too
+		if (this.bullets.length) {
+			this.markDirty();
+		}
 	}
 
 	/**
@@ -512,15 +507,12 @@ export class MapSankeySeries extends MapPolygonSeries {
 	}
 
 	/**
-	 * Returns a screen-space point at a relative position (0-1) along
-	 * the center-line bezier for the given data item.
+	 * Returns the point at a position along a band's center line, relative to
+	 * the map's area, and the line's angle there in degrees.
 	 *
-	 * Used internally for bullet positioning, but can also be called
-	 * directly to get coordinates along a flow path.
-	 *
-	 * @param   dataItem  Target data item
-	 * @param   location  Relative position (0 = source, 1 = target)
-	 * @return            Screen coordinates and angle
+	 * @param   dataItem  Data item of the link
+	 * @param   location  Position from `0` (source) to `1` (target)
+	 * @return            Point in pixels, and angle
 	 */
 	public getPoint(dataItem: DataItem<IMapSankeySeriesDataItem>, location: number): IOrientationPoint {
 		const segments = this._bezierSegments.get(dataItem);
@@ -551,7 +543,11 @@ export class MapSankeySeries extends MapPolygonSeries {
 	}
 
 	/**
-	 * Returns a geo point at a relative position (0-1) along the center-line bezier.
+	 * Returns the geographic point at a position along a band's center line.
+	 *
+	 * @param   dataItem  Data item of the link
+	 * @param   location  Position from `0` (source) to `1` (target)
+	 * @return            Geographic point
 	 */
 	public getGeoPoint(dataItem: DataItem<IMapSankeySeriesDataItem>, location: number): IGeoPoint | undefined {
 		const segments = this._bezierSegments.get(dataItem);
@@ -562,8 +558,12 @@ export class MapSankeySeries extends MapPolygonSeries {
 	}
 
 	/**
-	 * Returns the approximate arc length of the path for a data item.
-	 * Useful for scaling animation duration proportionally to distance.
+	 * Returns the approximate length of a band's center line, in radians of
+	 * arc on the globe. Useful for making an animation's duration fit the
+	 * distance.
+	 *
+	 * @param   dataItem  Data item of the link
+	 * @return            Length in radians
 	 */
 	public getPathLength(dataItem: DataItem<IMapSankeySeriesDataItem>): number {
 		const cumLengths = this._segmentCumulativeLengths.get(dataItem);
@@ -805,6 +805,13 @@ export class MapSankeySeries extends MapPolygonSeries {
 			this._generateGeometries();
 		}
 		super._prepareChildren();
+
+		// Bands made after the bullets container was placed would cover the bullets
+		const children = this.children;
+		const bulletsContainer = this.bulletsContainer;
+		if (bulletsContainer.parent === this && children.getIndex(children.length - 1) !== bulletsContainer) {
+			children.moveValue(bulletsContainer);
+		}
 	}
 
 	/**
@@ -1121,7 +1128,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 					if (nodeDataItem) {
 						const nodeFill = nodeDataItem.get("fill");
 						if (nodeFill) {
-							mapPolygon.set("fill", nodeFill);
+							mapPolygon._setC("fill", nodeFill);
 						}
 					}
 				}
@@ -1164,7 +1171,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 				if (orientationSetting === "vertical") {
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
-						ring.push([lon - halfSpan + totalWidth * t, lat - halfW]);
+						ring.push([lon - halfSpan + 2 * halfSpan * t, lat - halfW]);
 					}
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
@@ -1172,7 +1179,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 					}
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
-						ring.push([lon + halfSpan - totalWidth * t, lat + halfW]);
+						ring.push([lon + halfSpan - 2 * halfSpan * t, lat + halfW]);
 					}
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
@@ -1182,7 +1189,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 				} else {
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
-						ring.push([lon - halfW, lat - halfSpan + totalWidth * t]);
+						ring.push([lon - halfW, lat - halfSpan + 2 * halfSpan * t]);
 					}
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
@@ -1190,7 +1197,7 @@ export class MapSankeySeries extends MapPolygonSeries {
 					}
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;
-						ring.push([lon + halfW, lat + halfSpan - totalWidth * t]);
+						ring.push([lon + halfW, lat + halfSpan - 2 * halfSpan * t]);
 					}
 					for (let i = 0; i <= steps; i++) {
 						const t = i / steps;

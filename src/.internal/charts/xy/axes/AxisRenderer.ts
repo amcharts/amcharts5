@@ -18,15 +18,17 @@ import * as $utils from "../../../core/util/Utils";
 export interface IAxisRendererSettings extends IGraphicsSettings {
 
 	/**
-	 * The minimum distance between grid lines in pixels.
+	 * The smallest distance between grid lines, in pixels. The axis spaces
+	 * its grid, and so its labels, at least this far apart.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Grid_density} for more info
 	 */
 	minGridDistance?: number;
 
 	/**
-	 * Re-enable display of skipped grid lines due to lack of space and as per
-	 * the `minGridDistance` setting. Not recommended for CategoryAxis with a lot of data items.
+	 * Draws a fainter minor grid between the main grid lines. On a
+	 * [[CategoryAxis]], it marks the categories that `minGridDistance` left
+	 * without grid, so avoid it there with many categories.
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Minor_grid} for more info
@@ -35,7 +37,8 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	minorGridEnabled?: boolean;
 
 	/**
-	 * Enable labels on minor grid. If you enable labels, grid will be enabled automatically.
+	 * Shows labels on the minor grid too. Turns the minor grid on, unless
+	 * `minorGridEnabled` is set to `false`.
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Enabling_minor_grid_labels} for more info
@@ -44,7 +47,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	minorLabelsEnabled?: boolean;
 
 	/**
-	 * Set to `true` to invert direction of the axis.
+	 * Reverses the axis: it runs right to left on X, and top to bottom on Y.
 	 *
 	 * @default false
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Inversed_axes} for more info
@@ -52,9 +55,9 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	inversed?: boolean;
 
 	/**
-	 * Indicates relative position where "usable" space of the cell starts.
-	 *
-	 * `0` - beginning, `1` - end, or anything in-between.
+	 * Where columns start within each cell, from `0` (the cell's start) to
+	 * `1` (its end). With `cellEndLocation`, sets how wide columns are and the
+	 * gap between them.
 	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
@@ -62,9 +65,8 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	cellStartLocation?: number;
 
 	/**
-	 * Indicates relative position where "usable" space of the cell ends.
-	 *
-	 * `0` - beginning, `1` - end, or anything in-between.
+	 * Where columns end within each cell, from `0` (the cell's start) to `1`
+	 * (its end).
 	 *
 	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
@@ -72,14 +74,11 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	cellEndLocation?: number;
 
 	/**
-	 * If set to `"zoom"` will enable axis zoom by panning it in the axis label
-	 * area.
+	 * `"zoom"` lets the user zoom the axis by dragging along its labels.
+	 * Works best with the axis's `maxDeviation` at about `1`.
 	 *
-	 * Works on [[AxisRendererX]] and [[AxisRendererY]] only.
-	 *
-	 * For a better result, set `maxDeviation` to `1` or so on the Axis.
-	 *
-	 * Will not work if `inside` is set to `true`.
+	 * Only [[AxisRendererX]] and [[AxisRendererY]] support it, and not with
+	 * `inside` set to `true`.
 	 *
 	 * @since 5.0.7
 	 * @default "none"
@@ -88,7 +87,8 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 
 
 	/**
-	 * Sensitivity of panning. The higher the number, the more sensitive it is.
+	 * How much dragging along the labels zooms the axis when `pan` is
+	 * `"zoom"`: higher zooms more.
 	 *
 	 * @default 1
 	 */
@@ -104,9 +104,8 @@ export interface IAxisRendererPrivate extends IGraphicsPrivate {
 }
 
 /**
- * Base class for an axis renderer.
- *
- * Should not be used on its own.
+ * Base class for axis renderers, which draw an axis's line, labels, ticks,
+ * grid and fills. Not used on its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
  */
@@ -123,7 +122,7 @@ export abstract class AxisRenderer extends Graphics {
 	protected _minSize: number = 0;
 
 	/**
-	 * Chart the renderer is used in.
+	 * The chart the renderer is used in.
 	 */
 	public chart: XYChart | undefined;
 
@@ -150,11 +149,8 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	/**
-	 * A list of ticks in the axis.
-	 *
-	 * `ticks.template` can be used to configure ticks.
-	 *
-	 * @default new ListTemplate<AxisTick>
+	 * The axis's ticks. Configure them all through `ticks.template`; they are
+	 * hidden by default.
 	 */
 	public readonly ticks: ListTemplate<AxisTick> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -178,11 +174,7 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	/**
-	 * A list of grid elements in the axis.
-	 *
-	 * `grid.template` can be used to configure grid.
-	 *
-	 * @default new ListTemplate<Grid>
+	 * The axis's grid lines. Configure them all through `grid.template`.
 	 */
 	public readonly grid: ListTemplate<Grid> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -206,11 +198,8 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	/**
-	 * A list of fills in the axis.
-	 *
-	 * `axisFills.template` can be used to configure axis fills.
-	 *
-	 * @default new ListTemplate<Graphics>
+	 * The axis's fills: bands between grid lines. Configure them all through
+	 * `axisFills.template`; they are hidden by default.
 	 */
 	public readonly axisFills: ListTemplate<Graphics> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -240,11 +229,7 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	/**
-	 * A list of labels in the axis.
-	 *
-	 * `labels.template` can be used to configure axis labels.
-	 *
-	 * @default new ListTemplate<AxisLabel>
+	 * The axis's labels. Configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<AxisLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -258,10 +243,13 @@ export abstract class AxisRenderer extends Graphics {
 	declare public _privateSettings: IAxisRendererPrivate;
 
 	/**
-	 * An [[Axis]] renderer is for.
+	 * The axis this renderer draws.
 	 */
 	public axis!: Axis<this>;
 
+	/**
+	 * Returns the length of the axis in pixels.
+	 */
 	public axisLength(): number {
 		return 0;
 	}
@@ -309,7 +297,8 @@ export abstract class AxisRenderer extends Graphics {
 
 
 	/**
-	 * A thumb Graphics to be used for panning the axis (the one which shows under the labels when hovered)
+	 * The area over the labels that the user drags to zoom the axis when `pan`
+	 * is `"zoom"`. It shows on hover.
 	 */
 	public readonly thumb?: Graphics;
 
@@ -389,7 +378,9 @@ export abstract class AxisRenderer extends Graphics {
 	}
 
 	/**
-	 * Converts relative position (0-1) on axis to a pixel coordinate.
+	 * Converts a position on the axis (`0` to `1`) to a pixel coordinate along
+	 * it, taking zoom into account. On an X axis, it is measured from the left
+	 * edge.
 	 *
 	 * @param position  Position (0-1)
 	 * @return Coordinate (px)

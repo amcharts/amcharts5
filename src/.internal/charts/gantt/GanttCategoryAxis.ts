@@ -18,28 +18,29 @@ import * as $type from "../../core/util/Type";
 export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICategoryAxisSettings<R> {
 
 	/**
-	 * Currently selected category data item, if any.
+	 * The selected task, if any.
 	 */
 	selectedDataItem?: DataItem<IGanttCategoryAxisDataItem>;
 
 	/**
-	 * A field in data that holds parent id.
-	 * 
+	 * Field in data that holds the ID of the parent task.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_data} for more info
 	 * @default "parentId"
 	 */
 	parentIdField?: string;
 
 	/**
-	 * A field in data that holds status whether the category is collapsed.
-	 * 
+	 * Field in data that holds whether the task's subtasks are collapsed.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_data} for more info
 	 * @default "collapsed"
 	 */
 	collapsedField?: string;
 
 	/**
-	 * Size of child categories relative to the top-level cell height. (`0` - `1`)
+	 * Row height of a subtask relative to its parent's row, `0` to `1`. Each
+	 * deeper level shrinks by the same factor again.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Cell_height_for_child_categories} for more info
 	 * @default 0.8
@@ -47,7 +48,7 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	childCellSize?: number;
 
 	/**
-	 * A shift in pixels to apply to child categories.
+	 * Indent in pixels of a subtask's label, per level of depth.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Cell_height_for_child_categories} for more info
 	 * @default 25
@@ -55,7 +56,8 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	childShift?: number;
 
 	/**
-	 * A minimal height of the cell in pixels.
+	 * Minimum row height in pixels. The axis shows only as many rows as fit at
+	 * this height; scroll to see the rest.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Cell_height} for more info
 	 * @default 70
@@ -63,13 +65,15 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	minCellHeight?: number;
 
 	/**
-	 * Field of a category name
+	 * Field in data that holds the task name.
+	 *
 	 * @default "name"
 	 */
 	nameField?: string;
 
 	/**
-	 * Field of a category color
+	 * Field in data that holds the task color.
+	 *
 	 * @default "color"
 	 */
 	colorField?: string;
@@ -79,77 +83,82 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 export interface IGanttCategoryAxisDataItem extends ICategoryAxisDataItem {
 
 	/**
-	 * A container that holds all other elements of a axis label - label, controls, grip, etc.
+	 * Container for the whole row of the task list: grip, task bullet, label
+	 * and controls.
 	 */
 	container?: Container;
 
 	/**
-	 * A container that holds progress pie and duration stepper.
+	 * Container for the task's duration stepper and progress pie.
 	 */
 	controlsContainer?: Container;
 
 	/**
-	 * A grip for dragging the category.
+	 * The grip for dragging the task to another place in the list.
 	 */
 	grip?: Rectangle;
 
 	/**
-	 * A bullet to the left of a label (circle or triangle, if it has children)
+	 * The bullet left of the label: a triangle that collapses and expands the
+	 * subtasks, or a circle if there are none.
 	 */
 	taskBullet?: Button;
 
 	/**
-	 * A progress pie that shows progress of the task.
+	 * The pie that shows the task's progress.
 	 */
 	progressPie?: ProgressPie;
 
 	/**
-	 * Children of this category, if any.
+	 * Subtasks of this task, if any.
 	 */
 	children?: Array<DataItem<IGanttCategoryAxisDataItem>>;
 
 	/**
-	 * Parent id of data item.
+	 * ID of the parent task.
 	 */
 	parentId?: string;
 
 	/**
-	 * A reference to the parent category data item.
+	 * The parent task's data item.
 	 */
 	parent?: DataItem<IGanttCategoryAxisDataItem>;
 
 	/**
-	 * Progress of the task, from `0` to `1`. If this item has children, this will be the average of all children's progress.
+	 * Progress of the task, from `0` to `1`. For a task with subtasks, the
+	 * average of theirs.
 	 */
 	progress?: number;
 
 	/**
-	 * A stepper that allows to change task duration.
+	 * The stepper that shows and changes the task's duration.
 	 */
 	durationStepper?: NumericStepper;
 
 	/**
-	 * A flag indicating whether the category is collapsed.
+	 * Whether the task's subtasks are collapsed.
 	 */
 	collapsed?: boolean;
 
 	/**
-	 * Duration of the task (in days or other units, depending on `durationUnit` setting of a `Gantt`).
+	 * Duration of the task in the Gantt's `durationUnit` units.
 	 */
 	duration?: number;
 
 	/**
-	 * Color of a task.
+	 * Color of the task, from data, from the Gantt's `colors` or from the
+	 * parent task.
 	 */
 	color?: Color
 
 	/**
-	 * Custom color for the task, if any.
+	 * Color the user picked for the task, if any. It takes precedence over
+	 * `color`.
 	 */
 	customColor?: Color;
 
 	/**
-	 * Displayed name of a category.
+	 * Name of the task, shown in its label.
 	 */
 	name?: string;
 
@@ -159,7 +168,7 @@ export interface IGanttCategoryAxisDataItem extends ICategoryAxisDataItem {
 	deleting?: boolean;
 
 	/**
-	 * A reference to the series data item.
+	 * The task's data item in the [[GanttSeries]].
 	 */
 	seriesDataItem?: DataItem<IGanttSeriesDataItem>;
 }
@@ -171,7 +180,8 @@ export interface IGanttCategoryAxisEvents extends ICategoryAxisEvents { }
 
 
 /**
- * A category axis that is used as a Y (vertical) axis for [[Gantt]] charts.
+ * The vertical axis of a [[Gantt]] chart: the editable task list, with
+ * subtasks, duration steppers and progress pies.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_vertical_axis} for more info
  * @since 5.14.0
@@ -209,7 +219,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	public gantt?: Gantt;
 
 	/**
-	 * A [[Button]] used for deleting categories.
+	 * The delete button shown on the selected task.
 	 */
 	public xButton: Button = this.children.push(Button.new(this._root, {
 		themeTags: ["xbutton"],
@@ -491,8 +501,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 				if (!parentId) {
 					let fill = dataItem.get("customColor", dataItem.get("color"));
 					const dataContext = dataItem.dataContext as any;
-					if (fill === undefined && dataContext && dataContext.color !== undefined) {
-						fill = color(dataContext.color);
+					if (fill === undefined && dataContext && dataContext[this.get("colorField", "color")] !== undefined) {
+						fill = color(dataContext[this.get("colorField", "color")]);
 					}
 
 					if (!fill) {
@@ -516,8 +526,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 
 						let fill = dataItem.get("customColor", dataItem.get("color"));
 						const dataContext = dataItem.dataContext as any;
-						if (fill === undefined && dataContext && dataContext.color !== undefined) {
-							fill = color(dataContext.color);
+						if (fill === undefined && dataContext && dataContext[this.get("colorField", "color")] !== undefined) {
+							fill = color(dataContext[this.get("colorField", "color")]);
 						}
 						if (fill == undefined) {
 							dataItem.setRaw("color", parent.get("customColor", parent.get("color")));
@@ -564,7 +574,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 
 				const color = dataItem.get("customColor", dataItem.get("color"));
 
-				(dataItem.dataContext as any).color = color?.toString();
+				(dataItem.dataContext as any)[this.get("colorField", "color")] = color?.toString();
 				progressPie.slice.set("fill", color);
 				progressPie.backgroundSlice.set("fill", color);
 				progressPie.label.set("fill", color);
@@ -597,6 +607,12 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 		this._treeDirty = false;
 	}
 
+	/**
+	 * Returns the task's data item in the [[GanttSeries]].
+	 *
+	 * @param   dataItem  Task data item of this axis
+	 * @return            Series data item
+	 */
 	public getSeriesDataItem(dataItem: DataItem<IGanttCategoryAxisDataItem>): DataItem<IGanttSeriesDataItem> | undefined {
 		if (dataItem.get("seriesDataItem")) {
 			return dataItem.get("seriesDataItem");
@@ -612,9 +628,8 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Zooms the axis to relative locations.
-	 *
-	 * Both `start` and `end` are relative: 0 means start of the axis, 1 - end.
+	 * Zooms the axis to a range given as positions from `0` (start of the
+	 * axis) to `1` (end).
 	 *
 	 * @param   start     Relative start
 	 * @param   end       Relative end
@@ -1041,7 +1056,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 			const children = dataItem.get("children");
 
 			taskBullet.setAll({
-				marginLeft: this.get("childShift", 20) * depth
+				marginLeft: this.get("childShift", 25) * depth
 			});
 
 			const collapsed = dataItem.get("collapsed", false);
@@ -1053,7 +1068,11 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 			}
 
 			if (icon) {
+				// Only a task with children can be expanded or collapsed, so only
+				// then is it a keyboard stop
+				taskBullet.setPrivate("focusable", hasChildren);
 				if (hasChildren) {
+					taskBullet._setC("ariaExpanded", !collapsed);
 					taskBullet.set("disabled", false);
 					this.root.events.once("frameended", () => {
 						taskBullet.set("active", !collapsed);
@@ -1067,10 +1086,11 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Toggles collapse state of a data item.
-	 * @param dataItem 
-	 * @param collapse 
-	 * @param duration 
+	 * Collapses or expands a task's subtasks, at all levels below it.
+	 *
+	 * @param dataItem  Task data item
+	 * @param collapse  `true` to collapse, `false` to expand
+	 * @param duration  Animation duration in milliseconds
 	 */
 	public toggleCollapse(dataItem: DataItem<IGanttCategoryAxisDataItem>, collapse?: boolean, duration?: number): void {
 		if (dataItem && dataItem.get("collapsed", false) !== collapse) {
@@ -1128,7 +1148,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Expands all categories in the axis.
+	 * Expands all tasks.
 	 */
 	public expandAll(): void {
 		$array.each(this.dataItems, (dataItem) => {
@@ -1139,7 +1159,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Collapses all categories in the axis.
+	 * Collapses all tasks.
 	 */
 	public collapseAll(): void {
 		$array.each(this.dataItems, (dataItem) => {
@@ -1150,7 +1170,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Deletes all data items from the axis.
+	 * Deletes all tasks, from the axis and from the series.
 	 */
 	public deleteAll(): void {
 		this.data.clear();
@@ -1160,9 +1180,11 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 
 
 	/**
-	 * Deletes a data item from the axis.
+	 * Deletes a task with its subtasks, from the axis and from the series,
+	 * after animating it out.
 	 *
-	 * @param dataItem  Data item to delete
+	 * @param dataItem  Task data item
+	 * @param child     `true` when the task goes along with its parent (used internally)
 	 */
 	public deleteDataItem(dataItem: DataItem<IGanttCategoryAxisDataItem>, child?: boolean): void {
 		const series = this.gantt?.series;
@@ -1205,11 +1227,12 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Toggles progress pie for a data item. Toggling means that progress pie
-	 * will animate to 1 if it was less than 1, or animate to previous progress
-	 * value if it was 1.
+	 * Toggles a task between done and its previous progress, as a click on its
+	 * progress pie does: progress below `1` animates to `1`, and `1` back to
+	 * the previous value. For a task with subtasks, it toggles them all.
 	 *
-	 * @param dataItem  Data item to toggle progress pie for
+	 * @param dataItem  Task data item
+	 * @param value     Progress to animate to instead, `0` to `1`
 	 */
 	public toggleProgressPie(dataItem?: DataItem<IGanttCategoryAxisDataItem>, value?: number): void {
 		if (dataItem) {
@@ -1253,10 +1276,11 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Sets a custom color for a data item.
+	 * Sets the `customColor` of a task and its subtasks. A color equal to the
+	 * task's own `color`, or none, clears it.
 	 *
-	 * @param dataItem  Data item to set color for
-	 * @param c         Color to set
+	 * @param dataItem  Task data item
+	 * @param c         Color
 	 */
 	public setDataItemColor(dataItem?: DataItem<IGanttCategoryAxisDataItem>, c?: Color): void {
 		if (dataItem) {
@@ -1280,10 +1304,9 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Hides axis's data item.
+	 * Hides a task's row.
 	 *
 	 * @param   dataItem  Data item
-	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
 	public async hideDataItem(dataItem: DataItem<IGanttCategoryAxisDataItem>): Promise<void> {
@@ -1298,10 +1321,9 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Shows axis's data item.
+	 * Shows a task's row.
 	 *
 	 * @param   dataItem  Data item
-	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
 	public async showDataItem(dataItem: DataItem<IGanttCategoryAxisDataItem>): Promise<void> {
@@ -1389,10 +1411,10 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Selects a data item and shows the delete button. If the data item is
-	 * already selected, it will unselect it.
+	 * Selects a task and shows its delete button; an already selected task is
+	 * unselected. Does nothing while the Gantt is not `editable`.
 	 *
-	 * @param dataItem  Data item to select
+	 * @param dataItem  Task data item
 	 */
 	public selectDataItem(dataItem?: DataItem<IGanttCategoryAxisDataItem>): void {
 		if (!this.gantt?.get("editable", true)) {
@@ -1457,7 +1479,7 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 	}
 
 	/**
-	 * Unselects all data items.
+	 * Unselects the selected task and hides the delete button.
 	 */
 	public unselectDataItems(): void {
 		this.setRaw("selectedDataItem", undefined);

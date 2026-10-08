@@ -28,7 +28,8 @@ interface ITime {
 }
 
 /**
- * New type which allows for conversion from a number into a Time, but not from a Time to a number
+ * Animation progress, from `0` (start) to `1` (end). A number converts to a
+ * `Time`, but a `Time` does not convert back to a number.
  */
 export type Time = number | ITime;
 

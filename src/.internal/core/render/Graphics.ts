@@ -57,7 +57,9 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	strokeGradient?: Gradient;
 
 	/**
-	 * Stroke (border or line) dash settings.
+	 * Dash pattern of the stroke (border or line): lengths in pixels of dashes
+	 * and gaps, e.g. `[4, 2]`. A single number makes dashes and gaps of that
+	 * length.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
 	 */
@@ -71,12 +73,13 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	strokeDashoffset?: number;
 
 	/**
-	 * Opacity of the fill. 0 - fully transparent; 1 - fully opaque.
+	 * Opacity of the fill, from `0` (transparent) to `1` (opaque).
 	 */
 	fillOpacity?: number;
 
 	/**
-	 * Opacity of the stroke (border or line). 0 - fully transparent; 1 - fully opaque.
+	 * Opacity of the stroke (border or line), from `0` (transparent) to `1`
+	 * (opaque).
 	 */
 	strokeOpacity?: number;
 
@@ -88,7 +91,9 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	strokeWidth?: number;
 
 	/**
-	 * Indicates if stroke of a Graphics should stay the same when it's scale changes. Note, this doesn't take into account parent container scale changes.
+	 * Keeps the stroke width the same when the element's `scale` changes. A
+	 * parent's scale still affects it.
+	 *
 	 * @default false
 	 */
 	nonScalingStroke?: boolean;
@@ -112,26 +117,23 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	blendMode?: BlendMode;
 
 	/**
-	 * Draw a shape using an SVG path.
+	 * SVG path data (as in the `d` attribute of a `<path>`) to draw the shape
+	 * from.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths} for more information
 	 */
 	svgPath?: string;
 
 	/**
-	 * Color of the element's shadow.
-	 *
-	 * For this to work at least one of the following needs to be set as well:
-	 * `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`.
+	 * Color of the element's shadow. It shows only when `shadowBlur`,
+	 * `shadowOffsetX` or `shadowOffsetY` is set too.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowColor?: Color | null;
 
 	/**
-	 * Blurriness of the shadow.
-	 *
-	 * The bigger the number, the more blurry shadow will be.
+	 * Blurriness of the shadow: the bigger the number, the blurrier the shadow.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
@@ -152,16 +154,15 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	shadowOffsetY?: number;
 
 	/**
-	 * Opacity of the shadow (0-1).
-	 *
-	 * If not set, will use the same as `fillOpacity` of the element.
+	 * Opacity of the shadow, from `0` to `1`. If not set, the shadow takes the
+	 * opacity of the element's fill.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOpacity?: number;
 
 	/**
-	 * A method to be used on anchor points (joints) of the multi-point line.
+	 * Shape of the joints of a multi-point line.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineJoin} for more info
 	 * @default "miter"
@@ -170,7 +171,7 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	lineJoin?: "miter" | "round" | "bevel";
 
 	/**
-	 * This setting determines the shape used to draw the end points of lines.
+	 * Shape of the end points of lines.
 	 *
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineCap} for more info
 	 * @default "butt"
@@ -188,7 +189,7 @@ export interface IGraphicsEvents extends ISpriteEvents {
 }
 
 /**
- * Base class used for drawing shapes.
+ * An element that draws a shape; the base class of all shapes.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  * @important
@@ -438,6 +439,16 @@ export class Graphics extends Sprite {
 
 			if (this.getPrivate("showingTooltip")) {
 				this.showTooltip();
+			}
+
+			// An unmeasured shape gets no bounds updates, so once it is drawn its
+			// focus element is updated if it gained or lost size (e.g. a map
+			// polygon turning to the far side of a globe), or moved if it has focus
+			if (this.get("focusable") && !this.get("isMeasured")) {
+				const focusElement = this.getPrivate("focusElement");
+				if (focusElement && (this._root.focused(this) || (focusElement.dom.getAttribute("aria-hidden") == "true") == this._root._hasFocusSize(this))) {
+					this.markDirtyAccessibility();
+				}
 			}
 		}
 

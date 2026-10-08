@@ -17,13 +17,26 @@ export interface IMeasureDataItem extends IRectangleSeriesDataItem {
 }
 
 export interface IMeasureSettings extends IRectangleSeriesSettings {
+	/**
+	 * Text of the label, with placeholders `{value}` (price change),
+	 * `{percent}`, `{count}` (data items), `{intervalCount}` and
+	 * `{intervalUnit}`.
+	 */
 	labelText?: string;
+	/**
+	 * Text added to the label when the measured range has volume, with
+	 * `{volume}` for its total.
+	 */
 	labelVolumeText?: string;
 }
 
 export interface IMeasurePrivate extends IRectangleSeriesPrivate {
 }
 
+/**
+ * Measure drawing tool: a rectangle between two points that shows the price
+ * change and the time between them.
+ */
 export class Measure extends RectangleSeries {
 	public static className: string = "Measure";
 	public static classNames: Array<string> = RectangleSeries.classNames.concat([Measure.className]);
@@ -45,11 +58,8 @@ export class Measure extends RectangleSeries {
 	}
 
 	/**
-	 * A list of labels.
-	 *
-	 * `labels.template` can be used to configure axis labels.
-	 *
-	 * @default new ListTemplate<Label>
+	 * Labels of the measurements. Settings on `labels.template` apply to all
+	 * of them.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),

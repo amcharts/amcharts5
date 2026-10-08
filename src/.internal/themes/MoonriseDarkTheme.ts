@@ -2,11 +2,9 @@ import { MoonriseTheme } from "./MoonriseTheme";
 import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
 
 /**
- * "Moonrise Dark" — the earthy `Moonrise` palette on a dark ground. Reuses the
- * Moonrise series colors (lifting the near-black browns at the dark end so they
- * read on the dark ground) and applies a neutral dark set of interface colors.
- *
- * This is a standalone theme; it does not modify the built-in `Moonrise` theme.
+ * "Moonrise Dark": the earthy `Moonrise` palette on a dark background, with
+ * neutral dark interface colors. Its darkest colors are lightened to show on
+ * the background. Use it in place of `Moonrise`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

@@ -36,17 +36,15 @@ import type { ISpritePointerEvent } from "../../core/render/Sprite";
 export interface IStockChartSettings extends IContainerSettings {
 
 	/**
-	 * Main value series.
-	 *
-	 * This series is used to target by settings, as well as calculating
-	 * indicators, and annotations.
+	 * The main price series. Indicators are calculated from it, compared
+	 * series are added to its panel, and drawings snap to it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Setting_main_series}
 	 */
 	stockSeries?: XYSeries;
 
 	/**
-	 * Main volume series.
+	 * The main volume series, used by volume-based indicators.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Setting_main_series}
 	 */
@@ -58,25 +56,24 @@ export interface IStockChartSettings extends IContainerSettings {
 	comparingSeriesSettings?: Partial<IXYSeriesSettings>;
 
 	/**
-	 * Settings to be applied to the the main value series, when chart is
-	 * switched to "percent scale".
+	 * Settings applied to the series on the main series' Y axis while the
+	 * chart is in percent scale mode.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/#Configuring} for more info
 	 */
 	percentScaleSeriesSettings?: Partial<IXYSeriesSettings>;
 
 	/**
-	 * Settings to be applied to the [[ValueAxis]] of the main value series,
-	 * when chart is switched to "percent scale".
+	 * Settings applied to the main series' [[ValueAxis]] while the chart is in
+	 * percent scale mode.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/#Configuring} for more info
 	 */
 	percentScaleValueAxisSettings?: Partial<IValueAxisSettings<AxisRenderer>>;
 
 	/**
-	 * If set to `true`, the chart will go into "percent scale" when compared
-	 * series are added to chart, and will exit it when all of the comparisons
-	 * are removed.
+	 * Turns percent scale mode on when a compared series is added, and off
+	 * when the last one is removed.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/} for more info
 	 * @default true
@@ -84,43 +81,40 @@ export interface IStockChartSettings extends IContainerSettings {
 	autoSetPercentScale?: boolean;
 
 	/**
-	 * This color will be applied to columns/candles on the main value series (series
-	 * set as `stockSeries`) where the open value is lower or equal to the close
-	 * value.
+	 * Color of the `stockSeries` candles or columns that close at or above
+	 * their open.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
 	stockPositiveColor?: Color | null;
 
 	/**
-	 * This color will be applied to columns/candles on the main value series (series
-	 * set as `stockSeries`) where the open value is higher than the close value.
+	 * Color of the `stockSeries` candles or columns that close below their
+	 * open.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
 	stockNegativeColor?: Color | null;
 
 	/**
-	 * This color will be applied to columns/candles on the main volume series (series
-	 * set as `stockSeries`) where the open value is lower or equal to the close
-	 * value.
+	 * Color that `getVolumeColor()` returns for a volume column whose
+	 * `stockSeries` close is at or above the previous close.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
 	volumePositiveColor?: Color | null;
 
 	/**
-	 * This color will be applied to columns/candles on the main volume series (series
-	 * set as `stockSeries`) where the open value is higher than the close value.
+	 * Color that `getVolumeColor()` returns for a volume column whose
+	 * `stockSeries` close is below the previous close.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
 	 */
 	volumeNegativeColor?: Color | null;
 
 	/**
-	 * If set to `true`, all drawings will be selectable.
-	 *
-	 * Selectable drawings can be moved, rotated, or deleted.
+	 * Makes drawings selectable, so they can be moved, rotated or deleted.
+	 * Turns `erasingEnabled` off.
 	 *
 	 * @default false
 	 * @since 5.9.1
@@ -128,7 +122,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	drawingSelectionEnabled?: boolean;
 
 	/**
-	 * If set to `true`, clicking on drawings will delete them.
+	 * Deletes a drawing when it is clicked. Turns drawing selection off.
 	 *
 	 * @default false
 	 * @since 5.9.2
@@ -136,8 +130,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	erasingEnabled?: boolean;
 
 	/**
-	 * If set to `true` drawing grips will be hidden when [[StockChart]] is not
-	 * in drawing mode.
+	 * Hides the drawings' grips while drawing mode is off.
 	 *
 	 * @default false
 	 * @since 5.10.6
@@ -145,8 +138,8 @@ export interface IStockChartSettings extends IContainerSettings {
 	hideDrawingGrips?: boolean;
 
 	/**
-	 * If set to `true`, panel controls will automatically hide when mouse is
-	 * not over the chart.
+	 * Hides each panel's controls until the pointer is over that panel's plot
+	 * area.
 	 *
 	 * @default false
 	 * @since 5.13.0
@@ -158,22 +151,24 @@ export interface IStockChartSettings extends IContainerSettings {
 export interface IStockChartPrivate extends IContainerPrivate {
 
 	/**
-	 * A instance of [[SettingsModal]].
+	 * The [[SettingsModal]] that edits indicators and series.
 	 */
 	settingsModal: SettingsModal;
 
 	/**
-	 * Indicates if chart has currently have any "compared" series set.
+	 * Whether the chart is in percent scale mode, as set by
+	 * `setPercentScale()`.
 	 */
 	comparing?: boolean;
 
 	/**
-	 * A list of compared series.
+	 * Series added with `addComparingSeries()`.
 	 */
 	comparedSeries?: XYSeries[];
 
 	/**
-	 * Main Date axis of a Stock chart
+	 * Date axis of the main series' panel. The date axes of the other panels
+	 * follow its range.
 	 */
 	mainAxis?: DateAxis<AxisRenderer>
 
@@ -183,38 +178,39 @@ export interface IStockChartPrivate extends IContainerPrivate {
 
 export interface IStockChartEvents extends IContainerEvents {
 	/**
-	 * Kicks in when drawings change.
+	 * A drawing was added, changed or removed.
 	 */
 	drawingsupdated: {};
 
 	/**
-	 * Kicks in when indicators change.
+	 * An indicator was added or removed, or one of its editable settings
+	 * changed.
 	 */
 	indicatorsupdated: {};
 
 	/**
-	 * Kicks in when a drawing is added.
+	 * A drawing was added.
 	 *
 	 * @since 5.9.0
 	 */
 	drawingadded: { drawingId: string, series: DrawingSeries, index: number };
 
 	/**
-	 * Kicks in when a drawing is removed.
+	 * A drawing was removed.
 	 *
 	 * @since 5.9.0
 	 */
 	drawingremoved: { drawingId: string, series: DrawingSeries, index: number };
 
 	/**
-	 * Kicks in when a drawing is selected.
+	 * A drawing was selected.
 	 *
 	 * @since 5.9.0
 	 */
 	drawingselected: { drawingId: string, series: DrawingSeries, index: number };
 
 	/**
-	 * Kicks in when a drawing is unselected.
+	 * A drawing was unselected.
 	 *
 	 * @since 5.9.0
 	 */
@@ -223,7 +219,8 @@ export interface IStockChartEvents extends IContainerEvents {
 
 
 /**
- * A main class for the Stock Chart.
+ * The stock chart: [[StockPanel]] charts stacked over one date range, with
+ * indicators, drawings and series comparison.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/} for more info
  * @important
@@ -252,43 +249,38 @@ export class StockChart extends Container {
 	//public _selectionWasOn: boolean = false;
 
 	/**
-	 * A list of stock panels.
+	 * The chart's panels, from top to bottom.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Panels} for more info
 	 */
 	public readonly panels: ListAutoDispose<StockPanel> = new ListAutoDispose();
 
 	/**
-	 * A list of indicators on chart.
+	 * The chart's indicators.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
 	 */
 	public readonly indicators: ListAutoDispose<Indicator> = new ListAutoDispose();
 
 	/**
-	 * A [[Container]], resting on top of the charts, suitable for additional
-	 * tools, like [[Scrollbar]].
-	 *
-	 * @default Container.new()
+	 * A container above the panels for extra tools, such as a [[Scrollbar]].
 	 */
 	public readonly toolsContainer: Container = this.children.push(Container.new(this._root, { width: p100, themeTags: [] }));
 
 	/**
-	 * A [[Container]] where all the stock panels are placed into.
-	 *
-	 * @default Container.new()
+	 * The container the panels are placed in.
 	 */
 	public readonly panelsContainer: Container = this.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.verticalLayout, themeTags: ["chartscontainer"] }));
 
 	/**
-	 * An array of all Stock Controls that are created for this chart.
+	 * All [[StockControl]] elements created for this chart.
 	 *
 	 * @since 5.7.0
 	 */
 	public readonly controls: StockControl[] = [];
 
 	/**
-	 * An instance of [[SpriteResizer]] used for various drawing tools.
+	 * The [[SpriteResizer]] that resizes and rotates icon and label drawings.
 	 *
 	 * @since 5.7.0
 	 */
@@ -385,7 +377,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Forces redrawing of all annotations (drawings).
+	 * Dispatches `drawingsupdated` on the next update.
 	 */
 	public markDirtyDrawings() {
 		this._drawingsChanged = true;
@@ -393,7 +385,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Forces redrawing of Indicators.
+	 * Dispatches `indicatorsupdated` on the next update.
 	 */
 	public markDirtyIndicators() {
 		this._indicatorsChanged = true;
@@ -402,9 +394,11 @@ export class StockChart extends Container {
 
 
 	/**
-	 * Toggles drawing mode on or off.
+	 * Updates the drawings for drawing mode turning on or off: icon and label
+	 * drawings react to the pointer only while it is on, and with
+	 * `hideDrawingGrips`, grips show only while it is on.
 	 *
-	 * @param  enabled  Drawing enabled
+	 * @param  enabled  Drawing mode on
 	 * @since 5.10.6
 	 */
 	public toggleDrawing(enabled?: boolean) {
@@ -586,7 +580,7 @@ export class StockChart extends Container {
 				const stockPositiveColor = this.get("stockPositiveColor", ic.get("positive"));
 				let previous = stockSeries.dataItems[0];
 
-				if (stockPositiveColor && stockPositiveColor) {
+				if (stockPositiveColor && stockNegativeColor) {
 					$array.each(stockSeries.dataItems, (dataItem) => {
 						const column = dataItem.get("graphics");
 						if (column) {
@@ -667,14 +661,12 @@ export class StockChart extends Container {
 
 
 	/**
-	 * Enables or disables percent scale mode.
+	 * Turns percent scale mode on or off. In it, `percentScaleSeriesSettings`
+	 * apply to the series on the main series' Y axis, and
+	 * `percentScaleValueAxisSettings` to that axis. Also turns that axis'
+	 * `logarithmic` off.
 	 *
-	 * If `percentScale` is not set, it will try to determine the status on its own.
-	 *
-	 * In percent scale mode `percentScaleSeriesSettings` and `percentScaleValueAxisSettings` will
-	 * be applied to the regular series on the main panel and its Y axis.
-	 *
-	 * @param  percentScale  Comparison mode active
+	 * @param  percentScale  Percent scale on; if not set, on when there are compared series
 	 */
 	public setPercentScale(percentScale?: boolean): void {
 		const stockSeries = this.get("stockSeries");
@@ -734,10 +726,12 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Adds a "compared" series to chart. Returns the same series.
+	 * Adds a series to compare with `stockSeries`: to its panel, and to its
+	 * legend with a close button. With `autoSetPercentScale`, also turns on
+	 * percent scale mode.
 	 *
 	 * @param   series  Compared series
-	 * @return          Compared series
+	 * @return          The same series
 	 */
 	public addComparingSeries(series: XYSeries): XYSeries {
 		const stockSeries = this.get("stockSeries");
@@ -787,7 +781,8 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Removes compared series.
+	 * Removes a compared series. With `autoSetPercentScale`, turns percent
+	 * scale mode off when no compared series are left.
 	 *
 	 * @param  series  Compared series
 	 */
@@ -828,6 +823,13 @@ export class StockChart extends Container {
 		}
 	}
 
+	/**
+	 * Returns a series setting as it was before percent scale mode changed it.
+	 *
+	 * @param   series   Series
+	 * @param   setting  Setting key
+	 * @return           Value
+	 */
 	public getSeriesDefault(series: XYSeries, setting: keyof IXYSeriesSettings): any {
 		const defaults = series.states.lookup("comparingDefaults");
 		return defaults ? defaults.get(setting) : series.get(setting);
@@ -1144,14 +1146,13 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Returns a color for volume, based on current and previous close.
+	 * Returns the color for a volume column: `positiveColor` if the
+	 * `stockSeries` close at that data item is at or above the previous close,
+	 * `negativeColor` if it is below.
 	 *
-	 * * `positiveColor` - close is greater or equal than close of the previous period.
-	 * * `negativeColor` - close is lower than close of the previous period.
-	 *
-	 * @param   dataItem       Target data item
-	 * @param   negativeColor  "Negative color" (red)
-	 * @param   positiveColor  "Positive color" (green)
+	 * @param   dataItem       Data item of the volume column
+	 * @param   negativeColor  Color for a lower close; `volumeNegativeColor` if not set
+	 * @param   positiveColor  Color for a higher or equal close; `volumePositiveColor` if not set
 	 * @return  Color
 	 */
 	public getVolumeColor(dataItem: DataItem<IXYSeriesDataItem>, negativeColor?: Color, positiveColor?: Color): Color | undefined {
@@ -1199,10 +1200,11 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Returns a first [[StockControl]] of specific type.
+	 * Returns the first [[StockControl]] of a class, such as
+	 * `"DrawingControl"`.
 	 *
 	 * @since 5.7.0
-	 * @param   type  Control name
+	 * @param   type  Class name of the control
 	 * @return        Control
 	 */
 	public getControl(type: string): StockControl | undefined {
@@ -1238,9 +1240,10 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Enables or disables interactivity of annotations (drawings).
+	 * Makes drawings react to the pointer, or not.
 	 *
 	 * @param value Drawings interactive?
+	 * @param except Drawing series to leave as it is
 	 * @since 5.4.9
 	 */
 	public drawingsInteractive(value: boolean, except?: DrawingSeries) {
@@ -1256,8 +1259,9 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Unselect all currently selected drawings.
+	 * Unselects all selected drawings.
 	 *
+	 * @return  Number of drawings unselected
 	 * @since 5.9.0
 	 */
 	public unselectDrawings(): number {
@@ -1276,7 +1280,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Cancels drawing and deletes drawing which is now being drawn.
+	 * Cancels the drawing in progress, deleting it.
 	 *
 	 * @since 5.9.0
 	 */
@@ -1291,7 +1295,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Deletes all currently selected drawings.
+	 * Deletes all selected drawings.
 	 *
 	 * @since 5.9.0
 	 *
@@ -1307,10 +1311,11 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Selects drawing by its ID.
+	 * Selects a drawing by its ID. Works only while drawing selection is on
+	 * (`drawingSelectionEnabled`).
 	 *
 	 * @param  id             Drawing ID
-	 * @param  keepSelection  Keep existing selections
+	 * @param  keepSelection  Keep the drawings already selected
 	 * @since 5.9.0
 	 */
 	public selectDrawing(id: string, keepSelection?: boolean) {
@@ -1324,7 +1329,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Unselects drawing by ID.
+	 * Unselects a drawing by its ID.
 	 *
 	 * @param  id  Drawing ID
 	 * @since 5.9.0
@@ -1340,7 +1345,7 @@ export class StockChart extends Container {
 	}
 
 	/**
-	 * Deletes drawing by drawingId.
+	 * Deletes a drawing by its ID.
 	 *
 	 * @param  id  Drawing ID
 	 * @since 5.9.0
@@ -1358,8 +1363,8 @@ export class StockChart extends Container {
 }
 
 /**
- * Registers a custom class so that objects (e.g. indicators) using it can be
- * serialized and restored later.
+ * Registers a custom class, such as an indicator, so that objects using it
+ * can be serialized and restored.
  *
  * @param  name  Class name
  * @param  ref   Class reference

@@ -9,7 +9,8 @@ export interface ITickSettings extends ILineSettings {
 	length?: number;
 
 	/**
-	 * Location within target space. 0 - beginning, 1 - end.
+	 * Where the tick sits within its target's space, such as an axis cell,
+	 * from `0` (start) to `1` (end).
 	 */
 	location?: number;
 

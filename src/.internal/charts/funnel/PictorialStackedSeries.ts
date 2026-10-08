@@ -22,7 +22,9 @@ export interface IPictorialStackedSeriesPrivate extends IPyramidSeriesPrivate {
 }
 
 /**
- * Creates a pictorial series for use in a [[SlicedChart]].
+ * A series for a [[SlicedChart]] that fills a shape (`svgPath`) with stacked
+ * slices, each as tall as its share of the total. It sets `valueIs` to
+ * `"height"` and `topWidth` and `bottomWidth` to `100%`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/} for more info
  * @important
@@ -38,12 +40,14 @@ export class PictorialStackedSeries extends PyramidSeries {
 	declare public _dataItemSettings: IPictorialStackedSeriesDataItem;
 
 	/**
-	 * A [[Graphics]] element to used as a mask (shape) for the series.
-	 *
-	 * This element is read-only. To modify the mask/shape, use the `svgPath` setting.
+	 * The shape that masks the slices, drawn from `svgPath`. To change it, set
+	 * `svgPath` on the series.
 	 */
 	public readonly seriesMask: Graphics = Graphics.new(this._root, { position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 });
 
+	/**
+	 * The `svgPath` shape drawn behind the slices, as a faint background.
+	 */
 	public readonly seriesGraphics: Graphics = this.slicesContainer.children.push(Graphics.new(this._root, { themeTags: ["pictorial", "background"], position: "absolute", x: p50, y: p50, centerX: p50, centerY: p50 })._markC("themeTags", "position", "x", "y", "centerX", "centerY"));
 
 	protected _afterNew() {

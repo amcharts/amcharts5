@@ -1,5 +1,5 @@
 /**
- * A collection of easing functions
+ * A collection of easing functions.
  *
  * Parts of this collection are taken from D3.js library (https://d3js.org/)
  */
@@ -14,6 +14,10 @@ import * as $math from "./Math";
 import * as $object from "./Object";
 import type { Time } from "./Animation";
 
+/**
+ * An easing function: takes animation progress from `0` to `1` and returns
+ * the eased progress.
+ */
 export type Easing = (time: Time) => Time;
 
 /**
@@ -21,7 +25,7 @@ export type Easing = (time: Time) => Time;
  * and whether it goes there and back. Only functions made from the ones here
  * have one - a hand-written easing cannot be named.
  *
- * @since 5.21.0
+ * @since 5.20.8
  */
 export interface IEasingInfo {
 	easing: string;
@@ -40,7 +44,7 @@ function named(easing: Easing, info: IEasingInfo): Easing {
  *
  * @param   easing  Easing function
  * @return          Its name and options
- * @since 5.21.0
+ * @since 5.20.8
  */
 export function easingInfo(easing: Easing | undefined): IEasingInfo | undefined {
 	return easing ? (easing as any)._easingInfo : undefined;
@@ -82,31 +86,56 @@ export function easingInfo(easing: Easing | undefined): IEasingInfo | undefined 
  */
 
 /**
+ * No easing: the animation runs at a constant speed.
  */
 export function linear(t: Time): Time {
 	return t;
 }
 
+/**
+ * Starts slowly and speeds up (progress squared).
+ */
 export function quad(t: Time): Time {
 	return (t as number) * (t as number);
 }
 
+/**
+ * Starts slowly and speeds up, more sharply than `quad` (progress cubed).
+ */
 export function cubic(t: Time): Time {
 	return (t as number) * (t as number) * (t as number);
 }
 
+/**
+ * Raises progress to the power `e`: `2` is the same as `quad`, `3` as
+ * `cubic`.
+ *
+ * @param   t  Progress, from `0` to `1`
+ * @param   e  Exponent
+ * @return     Eased progress
+ */
 export function pow(t: Time, e: number): Time {
 	return Math.pow(t as number, e);
 }
 
+/**
+ * Barely moves at first, then speeds up sharply (exponential).
+ */
 export function exp(t: Time): Time {
 	return Math.pow(2, 10 * (t as number) - 10);
 }
 
+/**
+ * Starts gently and speeds up, following a sine curve.
+ */
 export function sine(t: Time): Time {
 	return 1 - Math.cos((t as number) * $math.HALFPI);
 }
 
+/**
+ * Starts slowly and speeds up steeply near the end, following a quarter
+ * circle.
+ */
 export function circle(t: Time): Time {
 	return 1 - Math.sqrt(1 - (t as number) * (t as number));
 }
@@ -119,6 +148,11 @@ export function circle(t: Time): Time {
  */
 
 /**
+ * Makes an easing go there and back: it reaches the end halfway through and
+ * returns to the start.
+ *
+ * @param   ease  Easing function
+ * @return        Easing function
  */
 export function yoyo(ease: Easing): Easing {
 	const easing = function (t: Time) {
@@ -133,6 +167,13 @@ export function yoyo(ease: Easing): Easing {
 	return info && !info.yoyo ? named(easing, { ...info, yoyo: true }) : easing;
 }
 
+/**
+ * Turns an easing around, so it starts fast and ends slowly. The easings
+ * here ease in (start slowly) unless wrapped in `out()` or `inOut()`.
+ *
+ * @param   ease  Easing function
+ * @return        Easing function
+ */
 export function out(ease: Easing): Easing {
 	const easing = function (t: Time) {
 		return 1.0 - (ease(1.0 - (t as number)) as number);
@@ -141,6 +182,13 @@ export function out(ease: Easing): Easing {
 	return info && !info.ease && !info.yoyo ? named(easing, { ...info, ease: "out" }) : easing;
 }
 
+/**
+ * Applies an easing at both ends: it eases in for the first half and out for
+ * the second.
+ *
+ * @param   ease  Easing function
+ * @return        Easing function
+ */
 export function inOut(ease: Easing): Easing {
 	const easing = function (t: Time) {
 		if (t as number <= 0.5) {
@@ -171,6 +219,10 @@ let b1 = 4 / 11,
 	b9 = 63 / 64,
 	b0 = 1 / b1 / b1;
 
+/**
+ * Bounces at the start before heading to the end. `out(bounce)` bounces at
+ * the end instead, like a dropped ball.
+ */
 export function bounce(t: Time): Time {
 	return 1 - (bounceOut(1 - (t as number)) as number);
 }
@@ -218,6 +270,10 @@ let period = 0.3 / tau;
  */
 let s = Math.asin(1 / amplitude) * period;
 
+/**
+ * Swings back and forth with growing swings before reaching the end, like a
+ * spring. `out(elastic)` springs past the end and settles instead.
+ */
 export function elastic(t: Time): Time {
 	let v = t as number;
 	return amplitude * Math.pow(2, 10 * --v) * Math.sin((s - v) / period);
@@ -242,7 +298,7 @@ $object.each(namedEasings, (name, easing) => {
  * @param   name  Easing name
  * @param   mode  `"in"` (default), `"out"` or `"inOut"`
  * @return        Easing function
- * @since 5.21.0
+ * @since 5.20.8
  */
 export function byName(name?: string, mode?: "in" | "out" | "inOut"): Easing {
 	const ease = (name && namedEasings[name]) || linear;

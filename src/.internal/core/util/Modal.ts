@@ -167,13 +167,21 @@ export interface IModalSettings extends IEntitySettings {
 	content?: string;
 
 	/**
-	 * When modal is open, all interactions for the underlying chart will be
-	 * disabled.
+	 * Disables interaction with the chart while the modal is open.
 	 *
 	 * @default true
 	 * @since 5.2.11
 	 */
 	deactivateRoot?: boolean;
+
+	/**
+	 * Name of the dialog for screen readers.
+	 *
+	 * If not set, the first heading (`<h1>` - `<h6>`) in the content is used.
+	 *
+	 * @since 5.21.0
+	 */
+	ariaLabel?: string;
 
 }
 
@@ -185,13 +193,23 @@ export interface IModalPrivate extends IEntityPrivate {
 }
 
 export interface IModalEvents extends IEntityEvents {
+	/**
+	 * The modal was opened.
+	 */
 	"opened": {}
+	/**
+	 * The modal was closed with `close()`.
+	 */
 	"closed": {}
+	/**
+	 * The modal was cancelled: closed with `cancel()`, a click outside its
+	 * content, or the Escape key.
+	 */
 	"cancelled": {}
 }
 
 /**
- * Used to display a modal dialog with HTML content.
+ * A modal dialog with HTML content, shown over the chart.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/modal-popups/} for more info
  */
@@ -233,6 +251,10 @@ export class Modal extends Entity {
 
 		const wrapper = document.createElement("div");
 		wrapper.className = "am5-modal-wrapper";
+		wrapper.setAttribute("role", "dialog");
+		wrapper.setAttribute("aria-modal", "true");
+		// Takes focus itself when the content has nothing focusable
+		wrapper.tabIndex = -1;
 		container.appendChild(wrapper);
 		this.setPrivate("wrapper", wrapper);
 
@@ -253,6 +275,66 @@ export class Modal extends Entity {
 					this.cancel();
 				}
 			}));
+
+			// Keep TAB inside the open modal
+			this._disposers.push($utils.addEventListener(wrapper, "keydown", (ev: KeyboardEvent) => {
+				if ($utils.getEventKey(ev) == "Tab") {
+					const focusables = this._getFocusables();
+					if (focusables.length == 0) {
+						ev.preventDefault();
+						return;
+					}
+					const first = focusables[0];
+					const last = focusables[focusables.length - 1];
+					const active = document.activeElement;
+					if (ev.shiftKey && (active === first || active === wrapper)) {
+						ev.preventDefault();
+						last.focus();
+					}
+					else if (!ev.shiftKey && active === last) {
+						ev.preventDefault();
+						first.focus();
+					}
+				}
+			}));
+		}
+	}
+
+	// Element that had focus before the modal opened, to give it back on close
+	protected _opener?: Element | null;
+
+	protected _getFocusables(): Array<HTMLElement> {
+		const elements = this.getPrivate("content").querySelectorAll<HTMLElement>("a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex^='-'])");
+		return Array.prototype.filter.call(elements, (el: HTMLElement) => el.offsetWidth > 0 || el.offsetHeight > 0);
+	}
+
+	// Names the dialog: `ariaLabel`, or else the content's first heading
+	protected _updateLabel(): void {
+		const wrapper = this.getPrivate("wrapper");
+		const label = this.get("ariaLabel");
+		wrapper.removeAttribute("aria-label");
+		wrapper.removeAttribute("aria-labelledby");
+		if (label) {
+			wrapper.setAttribute("aria-label", label);
+		}
+		else {
+			const heading = this.getPrivate("content").querySelector("h1, h2, h3, h4, h5, h6");
+			if (heading) {
+				if (!heading.id) {
+					heading.id = "am5-modal-title-" + this.uid;
+				}
+				wrapper.setAttribute("aria-labelledby", heading.id);
+			}
+		}
+	}
+
+	// Gives focus back to the element that had it before the modal opened
+	protected _restoreFocus(): void {
+		const opener = this._opener as HTMLElement | null | undefined;
+		this._opener = undefined;
+		const active = document.activeElement;
+		if (opener && opener.focus && document.contains(opener) && (!active || active === document.body || $utils.contains(this.getPrivate("container"), active))) {
+			opener.focus();
 		}
 	}
 
@@ -262,10 +344,14 @@ export class Modal extends Entity {
 		if (this.isDirty("content")) {
 			this.getPrivate("content").innerHTML = this._root._sanitizeHTML(this.get("content", ""));
 		}
+
+		if (this.isDirty("content") || this.isDirty("ariaLabel")) {
+			this._updateLabel();
+		}
 	}
 
 	/**
-	 * Returns `true` if modal is currently open.
+	 * Returns `true` if the modal is open.
 	 *
 	 * @return  Modal open?
 	 */
@@ -274,10 +360,19 @@ export class Modal extends Entity {
 	}
 
 	/**
-	 * Opens modal.
+	 * Opens the modal.
 	 */
 	public open(): void {
+		if (!this.isOpen()) {
+			this._opener = document.activeElement;
+		}
 		this.getPrivate("container").style.display = "block";
+		this._updateLabel();
+
+		// Focus goes into the modal
+		const focusables = this._getFocusables();
+		(focusables.length ? focusables[0] : this.getPrivate("wrapper")).focus();
+
 		if (this.get("deactivateRoot")) {
 			this.setTimeout(() => {
 				this._root._renderer.interactionsEnabled = false;
@@ -290,10 +385,11 @@ export class Modal extends Entity {
 	}
 
 	/**
-	 * Closes modal.
+	 * Closes the modal and dispatches `"closed"`.
 	 */
 	public close(): void {
 		this.getPrivate("container").style.display = "none";
+		this._restoreFocus();
 		if (this.get("deactivateRoot")) {
 			this._root._renderer.interactionsEnabled = true;
 		}
@@ -304,10 +400,11 @@ export class Modal extends Entity {
 	}
 
 	/**
-	 * Closes modal and invokes `cancelled` event.
+	 * Closes the modal and dispatches `"cancelled"` instead of `"closed"`.
 	 */
 	public cancel(): void {
 		this.getPrivate("container").style.display = "none";
+		this._restoreFocus();
 		if (this.get("deactivateRoot")) {
 			this._root._renderer.interactionsEnabled = true;
 		}

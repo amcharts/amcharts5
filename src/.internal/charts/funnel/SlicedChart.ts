@@ -10,7 +10,8 @@ export interface ISlicedChartPrivate extends IPercentChartPrivate {
 }
 
 /**
- * Creates a sliced chart for use with [[FunnelSeries]], [[PyramidSeries]], or [[PictorialStackedSeries]].
+ * A chart for [[FunnelSeries]], [[PyramidSeries]] and
+ * [[PictorialStackedSeries]]. Several series in it sit side by side.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/} for more info
  * @important

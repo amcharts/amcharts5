@@ -1,6 +1,7 @@
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import data from "./data.json";
 
 
 // Create root element
@@ -24,63 +25,40 @@ root.dateFormatter.setAll({
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
-  panX: false,
+  panX: false,       // dragging the plot does not pan: the cursor uses the drag to zoom
   panY: false,
-  wheelX: "panX",
-  wheelY: "zoomX"
+  wheelX: "panX",    // a sideways wheel or trackpad swipe moves along the dates...
+  wheelY: "zoomX"    // ...and the vertical wheel zooms in on them
 }));
 
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
-  behavior: "zoomX"
+  behavior: "zoomX" // drag across the plot to zoom in on those days
 }));
-cursor.lineY.set("visible", false);
-
-
-// Generate random data
-let date = new Date();
-date.setHours(0, 0, 0, 0);
-let value = 100;
-
-function generateData() {
-  value = Math.round((Math.random() * 10 - 5) + value);
-  am5.time.add(date, "day", 1);
-  return {
-    date: date.getTime(),
-    value: value
-  };
-}
-
-function generateDatas(count: number) {
-  const data = [];
-  for (let i = 0; i < count; ++i) {
-    data.push(generateData());
-  }
-  return data;
-}
+cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-  maxDeviation: 0.5,
-  baseInterval: {
+  maxDeviation: 0.5,          // panning can go up to half a view past the first or last day
+  baseInterval: {             // one data point per day
     timeUnit: "day",
     count: 1
   },
   renderer: am5xy.AxisRendererX.new(root, {
-    minorGridEnabled: true,
-    pan:"zoom"
+    minorGridEnabled: true,   // fainter grid lines between the labelled ones
+    pan: "zoom"               // drag along the date labels to zoom in or out
   }),
-  tooltip: am5.Tooltip.new(root, {})
+  tooltip: am5.Tooltip.new(root, {}) // shows the cursor's date on the axis
 }));
 
 const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  maxDeviation:1,
+  maxDeviation: 1,            // panning can go past the highest or lowest value by up to a full view
   renderer: am5xy.AxisRendererY.new(root, {
-    pan:"zoom"
+    pan: "zoom"               // drag along the value labels to stretch or squeeze the scale
   })
 }));
 
@@ -94,19 +72,21 @@ const series = chart.series.push(am5xy.LineSeries.new(root, {
   valueYField: "value",
   valueXField: "date",
   tooltip: am5.Tooltip.new(root, {
-    labelText: "{valueX}: {valueY}"
+    labelText: "{valueX}: {valueY}" // date and value, e.g. "2024-01-15: 104"
   })
 }));
 
+
 // Add scrollbar
 // https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// above the plot: drag its ends to zoom, or its middle to move along the dates
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
 }));
 
 
 // Set data
-let data = generateDatas(1200);
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
 series.data.setAll(data);
 
 

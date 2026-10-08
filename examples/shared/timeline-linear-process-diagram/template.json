@@ -1,0 +1,7 @@
+{
+  "title": "Timeline on a Custom Path",
+  "description": "A day as a timeline that follows a hand-made path: a curve chart whose axis runs along a list of points, with an icon pin on every activity.",
+  "category": "timeline",
+  "tier": "showcase",
+  "tags": ["curve chart", "custom path", "bullets", "icons", "scrollbar"]
+}

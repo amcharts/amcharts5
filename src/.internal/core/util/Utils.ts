@@ -17,7 +17,7 @@ import { Disposer, DisposerClass, IDisposer } from "./Disposer";
  */
 
 /**
- * Execute a function when DOM is ready.
+ * Calls `f` when the DOM is ready, or right away if it already is.
  *
  * @since 5.0.2
  * @param  f  Callback
@@ -67,7 +67,8 @@ export function addEventListener<E extends Event>(dom: EventTarget, type: string
 }
 
 /**
- * Function that adds an event listener which is triggered when the browser's zoom changes.
+ * Calls `listener` when the window is resized, which also happens when the
+ * browser's zoom changes.
  *
  * @param listener  Event listener
  * @returns Disposable event
@@ -182,7 +183,8 @@ export function getRendererEvent(key: string): string {
 }
 
 /**
- * Determines if pointer event originated from a touch pointer or mouse.
+ * Returns `true` if the event came from touch or a pen, `false` if from a
+ * mouse.
  *
  * @param ev  Original event
  * @return Touch pointer?
@@ -250,10 +252,11 @@ export function getEventTarget(event: Event | Touch): Node | null {
 }
 
 /**
- * Checks of element `a` contains element `b`.
+ * Checks if element `a` contains element `b`, or is `b`. Looks across shadow
+ * DOM boundaries too.
  *
- * @param a  Aleged ascendant
- * @param b  Aleged descendant
+ * @param a  Alleged ancestor
+ * @param b  Alleged descendant
  * @return Contains?
  */
 export function contains(a: Element, b: Element): boolean {
@@ -283,7 +286,7 @@ export function contains(a: Element, b: Element): boolean {
  *
  * @since 5.2.8
  * @param  event   Event
- * @param  target  Target element
+ * @param  target  Any element of the [[Root]] to check
  */
 export function isLocalEvent(event: IPointerEvent, target: Sprite) {
 	return event.target && contains(target.root.dom, <Element>event.target);
@@ -330,7 +333,7 @@ export function getEventKey(event: KeyboardEvent): string {
 }
 
 /**
- * Returns the shadow root of the element or null
+ * Returns the shadow root the node is in, or `null` if it is not in one.
  *
  * @param a  Node
  * @return Root
@@ -454,8 +457,10 @@ export class StyleRule extends DisposerClass {
 	/**
 	 * Constructor.
 	 *
+	 * @param element   Shadow root to add the rule to, or `null` for the document
 	 * @param selector  CSS selector
 	 * @param styles    An object of style attribute - value pairs
+	 * @param nonce     Nonce for the `<style>` element, for a Content Security Policy
 	 */
 	constructor(element: ShadowRoot | null, selector: string, styles: { [name: string]: string }, nonce: string = "") {
 		super();
@@ -531,7 +536,9 @@ export class StyleSheet extends DisposerClass {
 	/**
 	 * Constructor.
 	 *
-	 * @param text  CSS stylesheet
+	 * @param element  Shadow root to add the style sheet to, or `null` for the document
+	 * @param text     CSS stylesheet
+	 * @param nonce    Nonce for the `<style>` element, for a Content Security Policy
 	 */
 	constructor(element: ShadowRoot | null, text: string, nonce: string = "") {
 		super();
@@ -581,7 +588,7 @@ export function addClass(element: HTMLElement | SVGElement, className: string): 
  *
  * @ignore Exclude from docs
  * @param element    Element
- * @param className  Class name to add
+ * @param className  Class name to remove
  */
 export function removeClass(element: HTMLElement, className: string): void {
 	if (!element) {
@@ -784,7 +791,7 @@ export function truncateTextWithEllipsis(text: string, maxLength: number, breakW
 		}
 
 		if (lastNonAlphanumericIndex >= 0 && breakWords == false) {
-			return text.substring(0, lastNonAlphanumericIndex + 1) + '...';
+			return text.substring(0, lastNonAlphanumericIndex + 1) + ellipsis;
 		} else {
 			// If no non-alphanumeric character found, truncate without breaking words
 			return text.substring(0, maxLength) + ellipsis;
@@ -874,6 +881,22 @@ export function stripTags(text: string): string {
 }
 
 /**
+ * Returns the text of an HTML string: tags removed, entities such as `&amp;`
+ * turned into characters. For attributes like `title` that do not parse HTML.
+ *
+ * @ignore
+ * @param html  Source string
+ * @return Plain text
+ */
+export function htmlToText(html: string): string {
+	if (!html || (html.indexOf("<") == -1 && html.indexOf("&") == -1)) {
+		return html;
+	}
+	// Parsed into a detached document: nothing in it runs or loads
+	return new DOMParser().parseFromString(html, "text/html").documentElement.textContent || "";
+}
+
+/**
  * Strips inline formatting tags (square brackets) from the string.
  *
  * @param text  Source string
@@ -884,9 +907,9 @@ export function stripFormatTags(text: string): string {
 }
 
 /**
- * Removes new lines and tags from a string.
+ * Replaces line breaks in a string with `". "` and removes HTML tags.
  *
- * @param text  String to conver
+ * @param text  String to convert
  * @return Converted string
  */
 export function plainText(text: string): string {
@@ -904,9 +927,8 @@ export function plainText(text: string): string {
 const dangerousHTMLTags: string = "script|iframe|frame|frameset|object|embed|applet|noscript|template|link|meta|base|form";
 
 /**
- * Sanitizes an HTML string by stripping out constructs that are practically
- * only used for cross-site scripting (XSS) attacks, while leaving legitimate
- * markup intact. Specifically it removes:
+ * Removes the parts of an HTML string that are practically only used for
+ * cross-site scripting (XSS), leaving legitimate markup intact:
  *
  * * `<script>`, `<iframe>`, `<object>`, `<embed>` and similar dangerous tags;
  * * inline event handler attributes (`onerror`, `onload`, `onclick`, ...);
@@ -914,10 +936,9 @@ const dangerousHTMLTags: string = "script|iframe|frame|frameset|object|embed|app
  * * inline styles that smuggle in scripts via `expression()`,
  *   `url(javascript:...)`, `behavior`, or `-moz-binding`.
  *
- * This is applied to any HTML that gets injected via `innerHTML` (e.g. `html`
- * and `labelHTML` settings, HTML tooltips, modal content, and export menu
- * labels), because chart data and labels frequently originate from untrusted
- * back-ends.
+ * [[Root]] applies it to the HTML it puts on the page (`html` and `labelHTML`
+ * settings, HTML tooltips, modals, export menu labels), unless its
+ * `sanitizeHTML` setting is `false`.
  *
  * @since 5.19.0
  * @param   html  Source HTML
@@ -948,7 +969,7 @@ export function sanitizeHTML(html: string): string {
 /**
  * Escapes string so it can safely be used in a Regex.
  *
- * @param value  Unsescaped string
+ * @param value  Unescaped string
  * @return Escaped string
  */
 export function escapeForRgex(value: string): string {
@@ -956,7 +977,8 @@ export function escapeForRgex(value: string): string {
 }
 
 /**
- * Adds space before each uppercase letter.
+ * Adds a space before each uppercase letter, except the first character.
+ * Characters without case, such as digits and spaces, count as uppercase.
  *
  * @param   str Input string
  * @return      Output string
@@ -993,7 +1015,7 @@ export function splitString(source: string): string[] {
 	segments.forEach(segment => {
 		if (segment.match(/^\s+$/)) {
 			// If the segment is purely whitespace
-			if (segment = " ") {
+			if (segment === " ") {
 				segment = "  ";
 			}
 			result.push(segment);
@@ -1019,10 +1041,10 @@ export function splitString(source: string): string[] {
  */
 
 /**
- * Returns a year day.
+ * Returns the day of the year, `1` being January 1.
  *
  * @param date  Date
- * @param utc   Assume UTC dates?
+ * @param utc   Not used
  * @return Year day
  */
 export function getYearDay(date: Date, utc: boolean = false): number {
@@ -1035,10 +1057,11 @@ export function getYearDay(date: Date, utc: boolean = false): number {
 }
 
 /**
- * Returns week number for a given date.
+ * Returns the ISO 8601 week number of a date: weeks start on Monday, and
+ * week 1 is the one with the year's first Thursday.
  *
  * @param date  Date
- * @param utc   Assume UTC dates?
+ * @param _utc  Not used
  * @return Week number
  */
 export function getWeek(date: Date, _utc: boolean = false): number {
@@ -1050,10 +1073,11 @@ export function getWeek(date: Date, _utc: boolean = false): number {
 }
 
 /**
- * Returns a "week year" of the given date.
+ * Returns the year that the ISO 8601 week of the date belongs to. Around
+ * January 1 it can differ from the calendar year.
  *
  * @param date  Date
- * @param utc   Assume UTC dates?
+ * @param _utc  Not used
  * @return Year of week
  * @since 5.3.0
  */
@@ -1061,8 +1085,7 @@ export function getWeekYear(date: Date, _utc: boolean = false): number {
 	const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
 	const day = d.getUTCDay() || 7;
 	d.setUTCDate(d.getUTCDate() + 4 - day);
-	const firstDay = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-	return firstDay.getFullYear();
+	return d.getUTCFullYear();
 }
 
 /**
@@ -1103,6 +1126,7 @@ export function getDayFromWeek(week: number, year: number, weekday: number = 1, 
  * Returns 12-hour representation out of the 24-hour hours.
  *
  * @param hours  24-hour number
+ * @param base   Number the hours start from: `1` (default) gives 1-12, `0` gives 0-11
  * @return 12-hour number
  */
 export function get12Hours(hours: number, base?: number): number {
@@ -1118,10 +1142,11 @@ export function get12Hours(hours: number, base?: number): number {
 /**
  * Returns a string name of the time zone.
  *
- * @param date     Date object
- * @param long     Should return long ("Pacific Standard Time") or short abbreviation ("PST")
- * @param savings  Include information if it's in daylight savings mode
- * @param utc      Assume UTC dates
+ * @param date      Date object
+ * @param long      Should return long ("Pacific Standard Time") or short abbreviation ("PST")
+ * @param savings   Include information if it's in daylight savings mode
+ * @param utc       Assume UTC dates
+ * @param timezone  IANA time zone name to use instead of the browser's
  * @return Time zone name
  */
 export function getTimeZone(date: Date, long: boolean = false, savings: boolean = false, utc: boolean = false, timezone?: string): string {
@@ -1143,10 +1168,11 @@ export function getTimeZone(date: Date, long: boolean = false, savings: boolean 
 }
 
 /**
- * Returns the UTC offset in minutes for a given timezone.
+ * Returns the UTC offset in minutes for a given timezone, positive west of
+ * UTC, as with `Date.getTimezoneOffset()`.
  *
  * @param timezone    IANA timezone identifier
- * @param targetDate  Date to check offset for
+ * @param targetDate  Date to check offset for; January 1, 2012 if not set
  * @return Offset in minutes
  */
 export function getTimezoneOffset(timezone: string, targetDate?: Date): number {
@@ -1214,17 +1240,13 @@ export interface iHSV {
 
 
 /**
- * Converts an HSL color value to RGB. Conversion formula
- * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
- * Assumes h, s, and l are contained in the set [0, 1] and
- * returns r, g, and b in the set [0, 255].
+ * Converts an HSL color to RGB: `h`, `s` and `l` from `0` to `1` in, `r`, `g`
+ * and `b` from `0` to `255` out. Alpha is not carried over.
  *
  * Function adapted from:
  * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
  *
- * @param h       The hue
- * @param s       The saturation
- * @param l       The lightness
+ * @param color  HSL color
  * @return The RGB representation
  */
 export function hslToRgb(color: iHSL): iRGB {
@@ -1260,17 +1282,13 @@ export function hslToRgb(color: iHSL): iRGB {
 }
 
 /**
- * Converts an RGB color value to HSL. Conversion formula
- * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
- * Assumes r, g, and b are contained in the set [0, 255] and
- * returns h, s, and l in the set [0, 1].
+ * Converts an RGB color to HSL: `r`, `g` and `b` from `0` to `255` in, `h`,
+ * `s` and `l` from `0` to `1` out. Alpha is not carried over.
  *
  * Function adapted from:
  * http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
  *
- * @param r       The red color value
- * @param g       The green color value
- * @param b       The blue color value
+ * @param color  RGB color
  * @return The HSL representation
  */
 export function rgbToHsl(color: iRGB): iHSL {
@@ -1353,11 +1371,12 @@ export function hslToHsv(hsl: iHSL): iHSV {
 
 
 /**
- * Returns a color that is `percent` brighter than the reference color.
+ * Returns a color lightened by `percent`, from `-1` to `1`: `0.2` moves each
+ * channel 20% of the way to `255`. A negative value darkens it toward `0`.
  *
- * @param color    Reference color
- * @param percent  Brightness percent
- * @return Hex code of the new color
+ * @param rgb      Reference color
+ * @param percent  Amount, from `-1` to `1`
+ * @return New color
  */
 export function lighten(rgb: $type.Optional<iRGB>, percent: number): $type.Optional<iRGB> {
 	if (rgb) {
@@ -1387,10 +1406,11 @@ export function getLightnessStep(value: number, percent: number): number {
 }
 
 /**
- * Returns a color that is `percent` brighter than the source `color`.
+ * Returns a color brightened by `percent`, from `-1` to `1`. Unlike
+ * `lighten()`, it adds the same amount to every channel.
  *
- * @param color    Source color
- * @param percent  Brightness percent
+ * @param rgb      Source color
+ * @param percent  Amount, from `-1` to `1`
  * @return New color
  */
 export function brighten(rgb: $type.Optional<iRGB>, percent: number): $type.Optional<iRGB> {
@@ -1425,9 +1445,8 @@ export function getBrightnessStep(_value: number, percent: number): number {
 }
 
 /**
- * Returns `true` if color is "light". Useful indetermining which contrasting
- * color to use for elements over this color. E.g.: you would want to use
- * black text over light background, and vice versa.
+ * Returns `true` if color is "light", for example to pick dark text to go on
+ * it.
  *
  * @param color  Source color
  * @return Light?
@@ -1437,13 +1456,11 @@ export function isLight(color: iRGB): boolean {
 }
 
 /**
- * Returns a new [[iRGB]] object based on `rgb` parameter with specific
- * saturation applied.
+ * Returns `rgb` with its saturation set to `saturation`, from `0` (grey) to
+ * `1`. The value replaces the color's saturation; `1` returns `rgb`
+ * unchanged.
  *
- * `saturation` can be in the range of 0 (fully desaturated) to 1 (fully
- * saturated).
- *
- * @param color       Base color
+ * @param rgb         Base color
  * @param saturation  Saturation (0-1)
  * @return New color
  */
@@ -1458,14 +1475,15 @@ export function saturate(rgb: $type.Optional<iRGB>, saturation: number): $type.O
 }
 
 /**
- * Returns a color which contrasts more with the source `color`.
+ * Returns `lightAlternative` or `darkAlternative`, whichever contrasts more
+ * with `color`.
  *
  * @param  color             Base color
  * @param  lightAlternative  Light option
  * @param  darkAlternative   Dark option
  * @return New color
  */
-export function alternativeColor(color: iRGB, lightAlternative: iRGB = { r: 255, g: 255, b: 255 }, darkAlternative: iRGB = { r: 255, g: 255, b: 255 }): iRGB {
+export function alternativeColor(color: iRGB, lightAlternative: iRGB = { r: 255, g: 255, b: 255 }, darkAlternative: iRGB = { r: 0, g: 0, b: 0 }): iRGB {
 	let light = lightAlternative;
 	let dark = darkAlternative;
 	if (isLight(darkAlternative)) {

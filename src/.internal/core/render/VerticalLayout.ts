@@ -5,7 +5,9 @@ import type { Container } from "./Container";
 
 
 /**
- * A vertical children layout for [[Container]].
+ * Stacks a [[Container]]'s children from top to bottom. Children with a
+ * percent height share the height the others leave, in proportion to their
+ * percents.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
  */

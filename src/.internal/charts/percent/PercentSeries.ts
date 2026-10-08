@@ -20,12 +20,12 @@ import * as $type from "../../core/util/Type";
 export interface IPercentSeriesDataItem extends ISeriesDataItem {
 
 	/**
-	 * Percent of the series value total.
+	 * The item's share of the series total, in percent (`25` for 25%).
 	 */
 	valuePercentTotal: number;
 
 	/**
-	 * Category.
+	 * The item's category name.
 	 */
 	category: string;
 
@@ -45,12 +45,13 @@ export interface IPercentSeriesDataItem extends ISeriesDataItem {
 	tick: Tick;
 
 	/**
-	 * A related legend data item.
+	 * The item's entry in a legend.
 	 */
 	legendDataItem: DataItem<ILegendDataItem>;
 
 	/**
-	 * Fill color used for the slice and related elements, e.g. legend marker.
+	 * Color of the slice and the elements that follow it, such as the legend
+	 * marker.
 	 */
 	fill: Color;
 
@@ -69,7 +70,8 @@ export interface IPercentSeriesDataItem extends ISeriesDataItem {
 export interface IPercentSeriesSettings extends ISeriesSettings {
 
 	/**
-	 * A [[ColorSet]] to use when assigning colors for slices.
+	 * [[ColorSet]] that gives each slice its color, unless the data sets one
+	 * through `fillField`.
 	 */
 	colors?: ColorSet;
 
@@ -82,17 +84,20 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 	patterns?: PatternSet;
 
 	/**
-	 * A field in data that holds category names.
+	 * Field in data that holds the category names.
 	 */
 	categoryField?: string;
 
 	/**
-	 * Should slice labels be aligned in columns/rows?
+	 * Lines the labels up in columns (or a row) beside the slices, joined to
+	 * them by ticks. `false` places each label at its own slice.
+	 *
+	 * @default true
 	 */
 	alignLabels?: boolean;
 
 	/**
-	 * A field that holds color for slice fill.
+	 * Field in data that holds the slice's color.
 	 */
 	fillField?: string;
 
@@ -101,7 +106,7 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 export interface IPercentSeriesPrivate extends ISeriesPrivate {
 
 	/**
-	 * Calculate average value in series.
+	 * Average value in the series.
 	 */
 	valueAverage?: number;
 
@@ -133,7 +138,8 @@ export interface IPercentSeriesPrivate extends ISeriesPrivate {
 }
 
 /**
- * A base class for any percent chart series.
+ * Base class for the series of percent charts: [[PieSeries]],
+ * [[FunnelSeries]], [[PyramidSeries]] and [[PictorialStackedSeries]].
  */
 export abstract class PercentSeries extends Series {
 	public static className: string = "PercentSeries";
@@ -147,18 +153,16 @@ export abstract class PercentSeries extends Series {
 	declare public _labelType: Label;
 	declare public _tickType: Tick;
 
-	public readonly slicesContainer = this.children.push(Container.new(this._root, { position: "absolute", isMeasured: false }));
-	public readonly labelsContainer = this.children.push(Container.new(this._root, { position: "absolute", isMeasured: false }));
-	public readonly ticksContainer = this.children.push(Container.new(this._root, { position: "absolute", isMeasured: false }));
+	public readonly slicesContainer = this.children.push(Container.new(this._root, { position: "absolute", isMeasured: false })._markC("position", "isMeasured"));
+	public readonly labelsContainer = this.children.push(Container.new(this._root, { position: "absolute", isMeasured: false })._markC("position", "isMeasured"));
+	public readonly ticksContainer = this.children.push(Container.new(this._root, { position: "absolute", isMeasured: false })._markC("position", "isMeasured"));
 
 	protected _lLabels: Array<{ label: Label, y: number }> = [];
 	protected _rLabels: Array<{ label: Label, y: number }> = [];
 	protected _hLabels: Array<{ label: Label, y: number }> = [];
 
 	/**
-	 * A [[ListTemplate]] of all slices in series.
-	 *
-	 * `slices.template` can also be used to configure slices.
+	 * List of slice elements; configure them all through `slices.template`.
 	 */
 	public readonly slices: ListTemplate<this["_sliceType"]> = this.addDisposer(this._makeSlices());
 
@@ -201,9 +205,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * A [[ListTemplate]] of all slice labels in series.
-	 *
-	 * `labels.template` can also be used to configure slice labels.
+	 * List of slice labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<this["_labelType"]> = this.addDisposer(this._makeLabels());
 
@@ -221,9 +223,8 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * A [[ListTemplate]] of all slice ticks in series.
-	 *
-	 * `ticks.template` can also be used to configure slice ticks.
+	 * List of the ticks that join labels to their slices; configure them all
+	 * through `ticks.template`.
 	 */
 	public readonly ticks: ListTemplate<this["_tickType"]> = this.addDisposer(this._makeTicks());
 
@@ -334,7 +335,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * Hide whole series.
+	 * Hides the series.
 	 *
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Animation promise
@@ -407,7 +408,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * Shows series's data item.
+	 * Shows a hidden slice, with its label and tick, growing its value back.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -450,7 +451,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Hides a slice, with its label and tick, shrinking its value to zero.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -513,7 +514,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * Triggers hover on a series data item.
+	 * Puts a data item's slice in its hover state, unless it is hidden.
 	 *
 	 * @since 5.0.7
 	 * @param  dataItem  Target data item
@@ -526,7 +527,7 @@ export abstract class PercentSeries extends Series {
 	}
 
 	/**
-	 * Triggers un-hover on a series data item.
+	 * Takes a data item's slice out of its hover state.
 	 *
 	 * @since 5.0.7
 	 * @param  dataItem  Target data item

@@ -11,22 +11,23 @@ import * as $type from "./Type";
 export interface IDurationFormatterSettings extends IEntitySettings {
 
 	/**
-	 * A universal duration format to use wherever number needs to be formatted
-	 * as a duration.
+	 * Format for every duration that is not given its own format. Overrides
+	 * `durationFormats`.
 	 */
 	durationFormat?: string;
 
 	/**
-	 * A base value. Any number below it will be considered "negative".
+	 * Values below this are negative: they use the negative part of the format
+	 * (after the first `|`) and get a minus sign. A value equal to it uses the
+	 * zero part (after the second `|`).
 	 *
 	 * @default 0
 	 */
 	negativeBase?: number;
 
 	/**
-	 * Identifies what values are used in duration.
-	 *
-	 * Available options: `"millisecond"`, `"second"` (default), `"minute"`, `"hour"`, `"day"`, `"week"`, `"month"`, and `"year"`.
+	 * Unit of the numbers being formatted: `"millisecond"`, `"second"`,
+	 * `"minute"`, `"hour"`, `"day"`, `"week"`, `"month"` or `"year"`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/#Base_unit} for more info
 	 * @default "second"
@@ -34,15 +35,15 @@ export interface IDurationFormatterSettings extends IEntitySettings {
 	baseUnit?: TimeUnit;
 
 	/**
-	 * Time unit dependent duration formats.
-	 *
-	 * Used be [[DurationAxis]].
+	 * Formats picked when `durationFormat` is not set, by base unit and by the
+	 * largest unit the value reaches: `durationFormats[baseUnit][unit]`. Also
+	 * used by [[DurationAxis]].
 	 */
 	durationFormats?: Partial<Record<TimeUnit, Partial<Record<TimeUnit, string>>>>;
 
 	/**
-	 * An array of data fields that hold duration values and should be formatted
-	 * with a [[DurationFormatter]].
+	 * Data fields that hold durations. Text placeholders with these fields are
+	 * formatted as durations even without `formatDuration()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders} for more info
 	 */
@@ -54,13 +55,16 @@ export interface IDurationFormatterPrivate extends IEntityPrivate {
 }
 
 /**
- * A class used to format numberic values as time duration.
+ * Formats numbers as durations, such as `125` seconds as `"02:05"`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/} for more info
  */
 export class DurationFormatter extends Entity {
 	declare public _settings: IDurationFormatterSettings;
 	declare public _privateSettings: IDurationFormatterPrivate;
+
+	public static className: string = "DurationFormatter";
+	public static classNames: Array<string> = Entity.classNames.concat([DurationFormatter.className]);
 
 	protected _setDefaults() {
 		const dmillisecond = "_duration_millisecond";
@@ -77,7 +81,7 @@ export class DurationFormatter extends Entity {
 		const ahour = "_hour";
 		const aday = "_day";
 		const aweek = "_week";
-		const amonth = "_week";
+		const amonth = "_month";
 		const ayear = "_year";
 
 		// Defaults
@@ -159,14 +163,12 @@ export class DurationFormatter extends Entity {
 	}
 
 	/**
-	 * Formats the number as duration.
-	 *
-	 * For example `1000` (base unit seconds) would be converted to `16:40` as in
-	 * 16 minutes and 40 seconds.
+	 * Formats a number as a duration. For example `1000` with base unit
+	 * `"second"` gives `"16:40"`: 16 minutes and 40 seconds.
 	 *
 	 * @param value   Value to format
-	 * @param format  Format to apply
-	 * @param base    Override base unit
+	 * @param format  Format to apply; `durationFormat` or a default from `durationFormats` if not given
+	 * @param base    Base unit of the value; `baseUnit` if not given
 	 * @return Formatted number
 	 */
 	public format(value: number | string, format?: string, base?: TimeUnit): string {
@@ -222,7 +224,7 @@ export class DurationFormatter extends Entity {
 	 * Parses supplied format into structured object which can be used to format
 	 * the number.
 	 *
-	 * @param format  Format string, i.e. "#,###.00"
+	 * @param format  Format string, e.g. "hh:mm:ss"
 	 * @param base    Override base unit
 	 * @return Parsed information
 	 */
@@ -343,10 +345,6 @@ export class DurationFormatter extends Entity {
 					if (matches) {
 						// Populate template
 						for (let x = 0; x < matches.length; x++) {
-							// Is it an alias?
-							if (matches[x] == null) {
-								matches[x] = this._unitAliases[matches[x]];
-							}
 							item.parts.push(matches[x]);
 							chunk.text = chunk.text.replace(matches[x], $type.PLACEHOLDER);
 						}
@@ -487,18 +485,18 @@ export class DurationFormatter extends Entity {
 	}
 
 	/**
-	 * Converts numeric value to timestamp in milliseconds.
+	 * Converts a value in `baseUnit` to milliseconds.
 	 *
 	 * @param value     A source value
-	 * @param baseUnit  Base unit the source value is in: "q", "s", "i", "h", "d", "w", "m", "y"
-	 * @return Value representation as a timestamp in milliseconds
+	 * @param baseUnit  Unit the value is in, such as `"second"`
+	 * @return Value in milliseconds
 	 */
 	public toTimeStamp(value: number, baseUnit: TimeUnit): number {
 		return value * this._getUnitValue(baseUnit);
 	}
 
 	protected _toTimeUnit(code: string): TimeUnit | undefined {
-		switch (code) {
+		switch (this._unitAliases[code] || code) {
 			case "S":
 				return "millisecond";
 			case "s":
@@ -519,22 +517,16 @@ export class DurationFormatter extends Entity {
 	}
 
 	/**
-	 * Returns appropriate default format for the value.
+	 * Returns the format for `value`: `durationFormat` if set, otherwise the
+	 * entry of `durationFormats` for the largest unit the value reaches.
 	 *
-	 * If `maxValue` is sepcified, it will use that value to determine the time
-	 * unit for the format.
-	 *
-	 * For example if your `baseUnit` is `"second"` and you pass in `10`, you
-	 * will get `"10"`.
-	 *
-	 * However, you might want it to be formatted in the context of bigger scale,
-	 * say 10 minutes (600 seconds). If you pass in `600` as `maxValue`, all
-	 * values, including small ones will use format with minutes, e.g.:
-	 * `00:10`, `00:50`, `12: 30`, etc.
+	 * With `maxValue`, the unit comes from the larger of the two, so a range of
+	 * values shares one format. With base unit `"second"`, `10` alone gets
+	 * `"ss"`, but with `maxValue` `600` it gets `"mm:ss"` and shows as `00:10`.
 	 *
 	 * @param value     Value to format
-	 * @param maxValue  Maximum value to be used to determine format
-	 * @param baseUnit  Base unit of the value
+	 * @param maxValue  Largest value of the range, used to pick the unit
+	 * @param baseUnit  Base unit of the value; `baseUnit` if not given
 	 * @return Format
 	 */
 	public getFormat(value: number, maxValue?: number, baseUnit?: TimeUnit): string {
@@ -563,12 +555,12 @@ export class DurationFormatter extends Entity {
 	}
 
 	/**
-	 * Returns value's closest denominator time unit, e.g 100 seconds is
-	 * `"minute"`, while 59 seconds would still be `second`.
+	 * Returns the largest unit the value holds more than one of: 100 seconds
+	 * is `"minute"`, 59 seconds is still `"second"`.
 	 *
 	 * @param value     Source duration value
-	 * @param baseUnit  Base unit
-	 * @return Denominator
+	 * @param baseUnit  Base unit; `baseUnit` setting if not given
+	 * @return Time unit
 	 */
 	public getValueUnit(value: number, baseUnit?: TimeUnit): TimeUnit | undefined {
 
@@ -598,10 +590,10 @@ export class DurationFormatter extends Entity {
 	}
 
 	/**
-	 * Converts value to milliseconds according to `baseUnit`.
+	 * Converts a value in `baseUnit` to milliseconds.
 	 *
 	 * @param value     Source duration value
-	 * @param baseUnit  Base unit
+	 * @param baseUnit  Base unit; `baseUnit` setting if not given
 	 * @return Value in milliseconds
 	 */
 	public getMilliseconds(value: number, baseUnit?: TimeUnit): number {

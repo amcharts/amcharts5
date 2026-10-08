@@ -16,12 +16,13 @@ export interface IFibonacciSeriesDataItem extends ISimpleLineSeriesDataItem {
 export interface IFibonacciSeriesSettings extends ISimpleLineSeriesSettings {
 
 	/**
-	 * Sequence.
+	 * Levels to draw, as fractions of the drawn move: `0` is at the second
+	 * point, `1` at the first, and higher values go beyond it.
 	 */
 	sequence?: Array<number>;
 
 	/**
-	 * Array of colors to use for bands.
+	 * Colors of the levels' lines and bands, in the order of `sequence`.
 	 */
 	colors?: Array<Color>
 
@@ -30,6 +31,9 @@ export interface IFibonacciSeriesSettings extends ISimpleLineSeriesSettings {
 export interface IFibonacciSeriesPrivate extends ISimpleLineSeriesPrivate {
 }
 
+/**
+ * Draws Fibonacci retracement levels between two points.
+ */
 export class FibonacciSeries extends SimpleLineSeries {
 	public static className: string = "FibonacciSeries";
 	public static classNames: Array<string> = SimpleLineSeries.classNames.concat([FibonacciSeries.className]);
@@ -54,11 +58,7 @@ export class FibonacciSeries extends SimpleLineSeries {
 	}
 
 	/**
-	 * A list of labels.
-	 *
-	 * `labels.template` can be used to configure axis labels.
-	 *
-	 * @default new ListTemplate<Label>
+	 * Labels of the levels. Settings on `labels.template` apply to all of them.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),

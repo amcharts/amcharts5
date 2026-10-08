@@ -13,16 +13,12 @@ import * as $array from "../../core/util/Array";
 export interface ICurveCursorSettings extends IXYCursorSettings {
 
 	/**
-	 * A target X-axis.
-	 * 
-	 * Differently from the `XYChart`, this setting is required for cursor to work.
+	 * X axis the cursor works along. Unlike on an [[XYChart]], it is required.
 	 */
 	xAxis: Axis<AxisRendererCurveX>;
 
 	/**
-	 * A target Y-axis.
-	 * 
-	 * Differently from the `XYChart`, this setting is required for cursor to work.
+	 * Y axis the cursor works along. Unlike on an [[XYChart]], it is required.
 	 */
 	yAxis: Axis<AxisRendererCurveY>;
 
@@ -35,8 +31,8 @@ export interface ICurveCursorEvents extends IXYCursorEvents {
 }
 
 /**
- * A chart cursor for use in a [[CurveChart]], [[SerpetineChart]], or
- * a [[SpiralChart]].
+ * Cursor for a [[CurveChart]], [[SerpentineChart]] or [[SpiralChart]]: one
+ * line across the curve and one along it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0
@@ -51,7 +47,7 @@ export class CurveCursor extends XYCursor {
 	declare public _events: ICurveCursorEvents;
 
 	/**
-	 * A chart cursor is attached to.
+	 * The chart the cursor belongs to.
 	 */
 	declare public chart: CurveChart | undefined;
 

@@ -2,12 +2,9 @@ import { ColorblindTheme } from "./ColorblindTheme";
 import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
 
 /**
- * "Colorblind Dark" — the color-vision-deficiency-safe Okabe-Ito palette on a
- * dark ground. Reuses the light theme's palette (lifting its black entry so it
- * reads on the dark ground) and applies a neutral dark set of interface colors.
- *
- * This is a standalone theme; it does not modify the built-in `Colorblind`
- * theme.
+ * "Colorblind Dark": the `Colorblind` palette on a dark background, with
+ * neutral dark interface colors. Colors too dark to show on the background,
+ * such as black, are lightened. Use it in place of `Colorblind`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

@@ -5,6 +5,9 @@ import { DropdownListControl, IDropdownListControlSettings, IDropdownListControl
 import { StockIcons } from "./StockIcons";
 
 export interface IIntervalControlItem extends IDropdownListItem {
+	/**
+	 * Time unit and count of the interval.
+	 */
 	interval: {
 		timeUnit: TimeUnit,
 		count?: number
@@ -23,7 +26,9 @@ export interface IIntervalControlEvents extends IDropdownListControlEvents {
 }
 
 /**
- * A control that is used to change type of the main series of the [[StockChart]].
+ * A dropdown control for picking the data interval of a [[StockChart]], such
+ * as 1 day or 1 week. Applying the picked interval is up to a `selected`
+ * event handler.
  */
 export class IntervalControl extends DropdownListControl {
 	public static className: string = "IntervalControl";

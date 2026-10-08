@@ -24,12 +24,12 @@ export interface IForceDirectedDataObject {
 export interface IForceDirectedDataItem extends ILinkedHierarchyDataItem {
 
 	/**
-	 * An array of data items of child nodes.
+	 * Data items of the child nodes.
 	 */
 	children: Array<DataItem<IForceDirectedDataItem>>;
 
 	/**
-	 * Data item of a parent node.
+	 * Data item of the parent node.
 	 */
 	parent: DataItem<IForceDirectedDataItem>;
 
@@ -39,12 +39,12 @@ export interface IForceDirectedDataItem extends ILinkedHierarchyDataItem {
 	d3ForceNode: d3Force.SimulationNodeDatum;
 
 	/**
-	 * X coordinate.
+	 * Fixed X position of the node, from `xField`.
 	 */
 	x: number | undefined;
 
 	/**
-	 * Y coordinate.
+	 * Fixed Y position of the node, from `yField`.
 	 */
 	y: number | undefined;
 }
@@ -52,24 +52,28 @@ export interface IForceDirectedDataItem extends ILinkedHierarchyDataItem {
 export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 
 	/**
-	 * Minimum gap in pixels between the nodes.
+	 * Room in pixels kept free around each node. It applies to both nodes of a
+	 * pair, so neighbouring nodes stay at least twice this far apart.
+	 *
+	 * @default 0
 	 */
 	nodePadding?: number;
 
 	/**
-	 * A force that attracts (or pushes back) all nodes to the center of the
-	 * chart.
+	 * Pull of every node toward the center of the chart; a negative value
+	 * pushes nodes away from it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
-	 * @default 0.5
+	 * @default 0.8
 	 */
 	centerStrength?: number;
 
 	/**
-	 * A force that attracts (or pushes back) all nodes to each other.
+	 * Force between all nodes, scaled by each node's radius: a negative value
+	 * pushes them apart, a positive one pulls them together.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
-	 * @default -15
+	 * @default -14
 	 */
 	manyBodyStrength?: number;
 
@@ -113,9 +117,8 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	showOnFrame?: number;
 
 	/**
-	 * Smallest possible radius for a node circle.
-	 *
-	 * Can be a fixed pixel value or percent relative to chart size.
+	 * Radius of the circle of the node with the smallest value, in pixels or
+	 * percent of the series' average side ((width + height) / 2).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Sizing_nodes} for more info
 	 * @default 1%
@@ -123,9 +126,8 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	minRadius?: number | Percent;
 
 	/**
-	 * Biggest possible radius for a node circle.
-	 *
-	 * Can be a fixed pixel value or percent relative to chart size.
+	 * Radius of the circle of the node with the largest value, in pixels or
+	 * percent of the series' average side ((width + height) / 2).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Sizing_nodes} for more info
 	 * @default 8%
@@ -133,14 +135,16 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	maxRadius?: number | Percent;
 
 	/**
-	 * Field in data that holds X coordinate of the node.
+	 * Field in data that holds a fixed X position for the node, in pixels or
+	 * percent of the series' width. Such a node doesn't move along X.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Fixed_nodes} for more info
 	 */
 	xField?: string;
 
 	/**
-	 * Field in data that holds Y coordinate of the node.
+	 * Field in data that holds a fixed Y position for the node, in pixels or
+	 * percent of the series' height. Such a node doesn't move along Y.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Fixed_nodes} for more info
 	 */
@@ -155,7 +159,8 @@ export interface IForceDirectedEvents extends ILinkedHierarchyEvents {
 }
 
 /**
- * Creates a force-directed tree.
+ * A force-directed tree: node circles sized by value, which a force
+ * simulation spreads out. Nodes can be dragged.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/} for more info
  * @important
@@ -230,10 +235,10 @@ export class ForceDirected extends LinkedHierarchy {
 			}
 		}
 
-		// `nodePadding` (and the changed radii) feed the collision force in
+		// `nodePadding`, `manyBodyStrength` and the changed radii feed the forces in
 		// `_updateForces`, which also re-reads the accessors and restarts the
 		// simulation so the layout settles with the new sizes/padding.
-		if (this.isDirty("minRadius") || this.isDirty("maxRadius") || this.isDirty("nodePadding")) {
+		if (this.isDirty("minRadius") || this.isDirty("maxRadius") || this.isDirty("nodePadding") || this.isDirty("manyBodyStrength")) {
 			this._updateForces();
 		}
 	}
@@ -308,7 +313,7 @@ export class ForceDirected extends LinkedHierarchy {
 
 		const d3forceSimulation = this.d3forceSimulation;
 
-		if (this._sizeDirty) {
+		if (this._sizeDirty || this.isDirty("centerStrength")) {
 			let w = Math.max(50, this.innerWidth());
 			let h = Math.max(50, this.innerHeight());
 			let pt = this.get("paddingTop", 0);
@@ -318,6 +323,11 @@ export class ForceDirected extends LinkedHierarchy {
 
 			d3forceSimulation.force("x", d3Force.forceX().x(w / 2 + pl).strength(centerStrength * 100 / w));
 			d3forceSimulation.force("y", d3Force.forceY().y(h / 2 + pt).strength(centerStrength * 100 / h));
+
+			// A settled layout takes in a changed strength only when it runs again
+			if (this.isDirty("centerStrength")) {
+				this.restartSimulation(0.3);
+			}
 		}
 
 		if (this._nodesDirty) {
@@ -529,6 +539,10 @@ export class ForceDirected extends LinkedHierarchy {
 		this.linkForce = d3Force.forceLink(this._links);
 		this.d3forceSimulation.force("link", this.linkForce);
 		this.restartSimulation(0.5);
+
+		// Read on every tick, so a settled layout only takes them in when it runs again
+		link.on("distance", () => this.restartSimulation(0.3));
+		link.on("strength", () => this.restartSimulation(0.3));
 	}
 
 	protected _disposeLink(link: HierarchyLink) {

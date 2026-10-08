@@ -1,6 +1,7 @@
 import type { MapChart } from "./MapChart";
 import type { GeoProjection, GeoPath } from "d3-geo";
 import type { DataItem } from "../../core/render/Component";
+import type { Sprite } from "../../core/render/Sprite";
 
 import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
 
@@ -16,12 +17,9 @@ export interface IMapSeriesDataItem extends ISeriesDataItem {
 export interface IMapSeriesSettings extends ISeriesSettings {
 
 	/**
-	 * All map series will determine the actual bounds shown in the [[MapChart]].
-	 *
-	 * If we need a series to be ignored while calculating the bounds, we can set
-	 * this to `false`.
-	 *
-	 * Especially useful for background series.
+	 * Counts the series' geometries when the chart fits the map to its area.
+	 * Turn it off for a background series, so the map fits the rest. Point,
+	 * line and sankey series have it off by default.
 	 *
 	 * @default true
 	 * @since 5.2.36
@@ -34,21 +32,18 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	geoJSON?: GeoJSON.GeoJSON;
 
 	/**
-	 * An array of map object ids from geodata to include in the map.
-	 *
-	 * If set, only those objects listed in `include` will be shown.
+	 * Ids of the geodata objects to show; the others are hidden.
 	 */
 	include?: Array<string>;
 
 	/**
-	 * An array of map object ids from geodata to omit when showing the map.
+	 * Ids of the geodata objects to hide.
 	 */
 	exclude?: Array<string>;
 
 	/**
-	 * A field in series `data` that will hold map object's numeric value.
-	 *
-	 * It can be used in a number of places, e.g. tooltips, heat rules, etc.
+	 * Field in `data` that holds each map object's numeric value, for use in
+	 * tooltips, heat rules and such.
 	 */
 	valueField?: string;
 
@@ -63,18 +58,22 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	geometryTypeField?: string;
 
 	/**
-	 * Names of geodata items, such as countries, to replace by from loaded
-	 * geodata.
-	 *
-	 * Can be used to override built-in English names for countries.
+	 * Names, keyed by id, to replace the names in the geodata with, such as
+	 * translated country names. Read when the series parses `geoJSON`.
 	 *
 	 * ```TypeScript
-	 * import am5geodata_lang_ES from '@amcharts5-geodata/lang/es';
+	 * import am5geodata_lang_ES from "@amcharts/amcharts5-geodata/lang/ES";
 	 * // ...
-	 * map.geodataNames = am5geodata_lang_ES;
+	 * const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+	 *   geoJSON: am5geodata_worldLow,
+	 *   geodataNames: am5geodata_lang_ES
+	 * }));
 	 * ```
 	 * ```JavaScript
-	 * map.geodataNames = am5geodata_lang_ES;
+	 * var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+	 *   geoJSON: am5geodata_worldLow,
+	 *   geodataNames: am5geodata_lang_ES
+	 * }));
 	 * ```
 	 *
 	 * @since 5.1.13
@@ -90,7 +89,7 @@ export interface IMapSeriesPrivate extends ISeriesPrivate {
 export interface IMapSeriesEvents extends ISeriesEvents {
 
 	/**
-	 * Invoked when geodata is finished loading and processed.
+	 * The series finished turning its `geoJSON` into data items.
 	 */
 	geodataprocessed: {};
 
@@ -234,6 +233,13 @@ export abstract class MapSeries extends Series {
 
 	protected _unNotIncludeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
 		this._addGeometry(dataItem.get("geometry"), this);
+	}
+
+	// Hides a map object left out by `include` or `exclude`, and keeps it out of
+	// keyboard navigation and screen readers
+	protected _setExcluded(sprite: Sprite, excluded: boolean) {
+		sprite.setPrivate("visible", !excluded);
+		sprite.setPrivate("focusExcluded", excluded);
 	}
 
 	protected checkInclude(id: string, includes: string[] | undefined, excludes?: string[] | undefined): boolean {
@@ -407,6 +413,12 @@ export abstract class MapSeries extends Series {
 		if (chart) {
 			chart.series.removeValue(this);
 		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _onGoHome() {
 	}
 
 	protected _onDataClear() {

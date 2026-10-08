@@ -14,8 +14,7 @@ export interface IRadarLineSeriesDataItem extends ILineSeriesDataItem {
 export interface IRadarLineSeriesSettings extends ILineSeriesSettings {
 
 	/**
-	 * If set to `true` (default), series will connect its last data point to the
-	 * first one with a line, thus completing full circle.
+	 * Joins the last data point to the first, closing the line into a loop.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-series/#Connecting_ends} for more info
 	 * @default true
@@ -31,7 +30,7 @@ export interface IRadarLineSeriesAxisRange extends ILineSeriesAxisRange {
 }
 
 /**
- * Draws a line series for use in a [[RadarChart]].
+ * A line series for a [[RadarChart]].
  *
  * @important
  */
@@ -43,7 +42,7 @@ export class RadarLineSeries extends LineSeries {
 	declare public _axisRangeType: IRadarLineSeriesAxisRange;
 
 	/**
-	 * A chart series belongs to.
+	 * The chart the series belongs to.
 	 */
 	declare public chart: RadarChart | undefined;
 

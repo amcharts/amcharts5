@@ -1,0 +1,9 @@
+{
+  "title": "Chord Diagram with Moving Bullets",
+  "description": "A chord diagram with thin line links, nodes drawn as circle bullets, and a circle travelling along every link.",
+  "category": "flow",
+  "tier": "technique",
+  "tags": ["chord", "non-ribbon", "bullets", "animations"],
+  "since": "5.21.0",
+  "jsonNote": "Giving each circle the color of its node takes code, so here they are all one color."
+}

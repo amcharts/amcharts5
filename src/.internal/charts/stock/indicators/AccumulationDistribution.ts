@@ -7,12 +7,15 @@ import { LineSeries } from "../../xy/series/LineSeries";
 export interface IAccumulationDistributionSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Main volume series of the [[StockChart]].
+	 * The volume series, used when `useVolume` is on.
 	 */
 	volumeSeries?: XYSeries;
 
 	/**
-	 * Use volume series (if set)?
+	 * Weights each data item by its volume from `volumeSeries`. When off, or
+	 * without a `volumeSeries`, every data item counts the same.
+	 *
+	 * @default true
 	 */
 	useVolume?: boolean;
 
@@ -28,7 +31,8 @@ export interface IAccumulationDistributionEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Accumulation/Distribution indicator: a running total of where each close is
+ * within its high-low range, weighted by volume. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -41,7 +45,7 @@ export class AccumulationDistribution extends ChartIndicator {
 	declare public _events: IAccumulationDistributionEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

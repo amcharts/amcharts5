@@ -48,14 +48,15 @@ export interface IRadarColumnSeriesPrivate extends IBaseColumnSeriesPrivate {
 export interface IRadarColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
 
 	/**
-	 * List of columns in a range.
+	 * Columns of the series within the range.
 	 */
 	columns: ListTemplate<Slice>
 
 }
 
 /**
- * A column series for use in a [[RadarChart]].
+ * A column series for a [[RadarChart]], with each column drawn as a ring
+ * segment ([[Slice]]).
  *
  * @important
  */
@@ -77,10 +78,7 @@ export class RadarColumnSeries extends BaseColumnSeries {
 	}
 
 	/**
-	 * A [[TemplateList]] of all columns in series.
-	 *
-	 * `columns.template` can be used to set default settings for all columns,
-	 * or to change on existing ones.
+	 * Columns of the series. Configure them all through `columns.template`.
 	 *
 	 * @default new ListTemplate<Slice>
 	 */
@@ -96,7 +94,7 @@ export class RadarColumnSeries extends BaseColumnSeries {
 	public static classNames: Array<string> = BaseColumnSeries.classNames.concat([RadarColumnSeries.className]);
 
 	/**
-	 * A chart series belongs to.
+	 * The chart the series belongs to.
 	 */
 	declare public chart: RadarChart | undefined;
 
@@ -115,7 +113,7 @@ export class RadarColumnSeries extends BaseColumnSeries {
 		const yAxis = this.get("yAxis");
 		const xAxis = this.get("xAxis");
 
-		const rendererY = xAxis.get("renderer") as AxisRendererRadial;
+		const rendererY = yAxis.get("renderer") as AxisRendererRadial;
 
 		const radius = yAxis.get("renderer").positionToCoordinate(positionY) + rendererY.getPrivate("innerRadius", 0);
 

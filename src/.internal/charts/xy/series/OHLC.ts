@@ -7,7 +7,8 @@ export interface IOHLCPrivate extends ICandlestickPrivate {
 }
 
 /**
- * Used to plot an OHLC graphic on an [[OHLCSeries]].
+ * A bar of an [[OHLCSeries]]: a line from the low to the high value, with
+ * ticks marking the open and close values.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important

@@ -1,0 +1,7 @@
+{
+  "title": "Multiple Synced Value Axes",
+  "description": "Three line series with a value axis each, colored like their series, with the grids lined up by syncWithAxis.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "multiple axes", "value axis", "syncWithAxis", "date axis"]
+}

@@ -41,7 +41,10 @@ export class HierarchyDefaultTheme extends Theme {
 			toggleKey: "disabled",
 			setStateOnChildren: true,
 			position: "absolute",
-			isMeasured: false,
+			// Measured so that node bounds follow its shape - otherwise the node
+			// keeps its initial (often 0x0) size and focus can't reach it or is
+			// drawn in the wrong place
+			isMeasured: true,
 			cursorOverStyle: "pointer",
 			tooltipText: "{category}: {sum}"
 		});
@@ -85,8 +88,8 @@ export class HierarchyDefaultTheme extends Theme {
 			setColor(rule, "stroke", ic, "grid");
 		}
 
+		// Not absolute, so the circle counts towards node bounds
 		r("Circle", ["linkedhierarchy", "shape"]).setAll({
-			position: "absolute",
 			fillOpacity: 1,
 			strokeOpacity: 0,
 			radius: 15,
@@ -425,7 +428,6 @@ export class HierarchyDefaultTheme extends Theme {
 
 		r("HierarchyNode", ["treemap", "node"]).setAll({
 			tooltipY: percent(40),
-			isMeasured: false,
 			position: "absolute",
 			cursorOverStyle: "pointer"
 		});

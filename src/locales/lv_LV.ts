@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "Labi",
+	"Cancel": "Atcelt",
+	"Delete": "Dzēst",
+	"Settings": "Iestatījumi",
+	"Expand": "Izvērst",
+	"Move Up": "Pārvietot uz augšu",
+	"Move Down": "Pārvietot uz leju"
 };

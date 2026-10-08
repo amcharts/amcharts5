@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Batal",
+	"Delete": "Hapus",
+	"Settings": "Pengaturan",
+	"Expand": "Perluas",
+	"Move Up": "Pindah ke atas",
+	"Move Down": "Pindah ke bawah"
 };

@@ -18,7 +18,7 @@ export interface ITreeDataObject {
 export interface ITreeDataItem extends ILinkedHierarchyDataItem {
 
 	/**
-	 * An array of children data items.
+	 * Data items of the child nodes.
 	 */
 	children: Array<DataItem<ITreeDataItem>>;
 
@@ -33,14 +33,16 @@ export interface ITreeDataItem extends ILinkedHierarchyDataItem {
 export interface ITreeSettings extends ILinkedHierarchySettings {
 
 	/**
-	 * Orientation of the diagram.
+	 * Direction the tree grows in: `"vertical"` from top to bottom,
+	 * `"horizontal"` from left to right.
 	 *
 	 * @default "vertical"
 	 */
 	orientation?: "horizontal" | "vertical";
 
 	/**
-	 * If set to `true`, will flip the tree direction.
+	 * Flips the tree, so it grows from bottom to top, or from right to left
+	 * when horizontal.
 	 *
 	 * @default false
 	 * @since 5.2.4
@@ -48,8 +50,8 @@ export interface ITreeSettings extends ILinkedHierarchySettings {
 	inversed?: boolean;
 
 	/**
-	 * If set to `true`, will use cluster layout (dendrogram) where all leaf
-	 * nodes are placed at the same depth.
+	 * Uses a cluster layout (dendrogram), which lines up all leaf nodes at
+	 * the same depth.
 	 *
 	 * @default false
 	 * @since 5.16.2
@@ -57,21 +59,16 @@ export interface ITreeSettings extends ILinkedHierarchySettings {
 	clustered?: boolean;
 
 	/**
-	 * A function that returns the desired separation between neighboring
-	 * nodes. Receives two data items and should return a numeric value.
-	 *
-	 * Default is `1` for siblings, `2` for non-siblings.
-	 *
-	 * Can be used to create variable node spacing based on value, label
-	 * size, or other data properties.
+	 * Function that returns the spacing between two neighboring nodes, given
+	 * their data items. Without it, siblings get `1` and other neighbors `2`.
 	 *
 	 * @since 5.16.2
 	 */
 	nodeSeparation?: (a: DataItem<ITreeDataItem>, b: DataItem<ITreeDataItem>) => number;
 
 	/**
-	 * If set to `true`, hidden or disabled nodes are excluded from the layout
-	 * so that visible nodes spread out to fill the available chart area.
+	 * Lays out only the visible nodes, so they spread out to fill the chart
+	 * while other nodes are hidden or collapsed.
 	 *
 	 * @default false
 	 * @since 5.18.0
@@ -97,7 +94,8 @@ export interface ITreeEvents extends ILinkedHierarchyEvents {
 }
 
 /**
- * Displays a tree diagram.
+ * A tree diagram: node circles joined by links, each level a row (or a
+ * column, when horizontal).
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/tree/} for more info
  * @important
@@ -211,6 +209,9 @@ export class Tree extends LinkedHierarchy {
 				layout.separation((a: any, b: any) => {
 					return nodeSeparation(a.data.dataItem, b.data.dataItem);
 				});
+			}
+			else {
+				layout.separation((a: any, b: any) => a.parent == b.parent ? 1 : 2);
 			}
 
 			layout(this._rootNode);

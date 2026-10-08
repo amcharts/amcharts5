@@ -5,6 +5,10 @@ import { Triangle } from "../../core/render/Triangle";
 import { color } from "../../core/util/Color";
 
 export interface INumericStepperSettings extends IContainerSettings {
+	/**
+	 * The number shown. The arrows step it by 1, and the down arrow stops at
+	 * `0`.
+	 */
 	value?: number;
 }
 
@@ -12,16 +16,29 @@ export interface INumericStepperPrivate extends IContainerPrivate {
 }
 
 /**
- * Draws an interactive NumericStepper.
+ * A number field with up and down arrows. The number can also be typed in.
  *
  * @important
  * @since 5.14.0
  */
 export class NumericStepper extends Container {
 
+	/**
+	 * The editable label that shows the number.
+	 */
 	public label: EditableLabel = this.children.push(EditableLabel.new(this._root, {}));
+	/**
+	 * The container of the up and down arrows, shown while the pointer is over
+	 * the stepper.
+	 */
 	public buttonsContainer: Container = this.children.push(Container.new(this._root, { themeTags: ["buttons"] }));
+	/**
+	 * The arrow that increases the value.
+	 */
 	public upButton: Triangle = this.buttonsContainer.children.push(Triangle.new(this._root, { themeTags: ["upbutton"] }));
+	/**
+	 * The arrow that decreases the value.
+	 */
 	public downButton: Triangle = this.buttonsContainer.children.push(Triangle.new(this._root, { themeTags: ["downbutton"] }));
 
 	declare public _settings: INumericStepperSettings;

@@ -1,0 +1,7 @@
+{
+  "title": "Gantt Chart with Subtasks",
+  "description": "A Gantt chart with parent tasks and subtasks, set up with parentId in the category data.",
+  "category": "gantt",
+  "tier": "basic",
+  "tags": ["gantt", "subtasks", "parent tasks", "links"]
+}

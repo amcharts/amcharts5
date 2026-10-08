@@ -13,102 +13,85 @@ import * as $utils from "../../../core/util/Utils";
 export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSettings<R> {
 
 	/**
-	 * Override minimum value for the axis scale.
-	 *
-	 * NOTE: the axis might modify the minimum value to fit into its scale better,
-	 * unless `strictMinMax` is set to `true`.
+	 * Lowest value of the axis scale, instead of the lowest series value. The
+	 * axis may round it to fit its grid, unless `strictMinMax` is `true`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	min?: number;
 
 	/**
-	 * Override maximum value for the axis scale.
-	 *
-	 * NOTE: the axis might modify the maximum value to fit into its scale better,
-	 * unless `strictMinMax` is set to `true`.
+	 * Highest value of the axis scale, instead of the highest series value.
+	 * The axis may round it to fit its grid, unless `strictMinMax` is `true`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	max?: number;
 
 	/**
-	 * Force axis scale to be precisely at values as set in `min` and/or `max`.
+	 * Makes the scale start and end exactly at `min` and `max`, or where they
+	 * aren't set, at the lowest and highest series values, without rounding.
+	 * The axis then also stops rescaling to the values in view as the chart
+	 * zooms. To rescale to the exact values in view, use
+	 * `strictMinMaxSelection` instead.
 	 *
-	 * In case `min` and/or `max` is not set, the axis will fix its scale to
-	 * precise lowest and highest values available through all of the series
-	 * attached to it.
-	 *
-	 * This effectively locks the axis from auto-zooming itself when chart
-	 * is zoomed in.
-	 *
-	 * If you need to zoom to actual low/high values within currently visible
-	 * scope, use `strictMinMaxSelection` instead.
-	 *
-	 * Use `extraMin` and `extraMax` to add extra "padding".
+	 * `extraMin` and `extraMax` still add padding.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
 	 */
 	strictMinMax?: boolean;
 
 	/**
-	 * Force axis to auto-zoom to exact lowest and highest values from attached
-	 * series' data items within currently visible range.
+	 * Rescales the axis to exactly the lowest and highest values in view as
+	 * the chart zooms, without rounding. Keeps series of derived values, such
+	 * as `valueYChangeSelection`, from jumping around.
 	 *
-	 * This is a good feature when your series is plotted from derivative values,
-	 * like `valueYChangeSelection` as it helps to avoid frequent jumping of
-	 * series to adjusted min and max of the axis.
-	 *
-	 * This will not work if strictMinMax is set to true (the axis will not zoom at all in this case).
-	 *
-	 * Use `extraMin` and `extraMax` to add extra "padding".
+	 * Has no effect with `strictMinMax`, which stops the rescaling. `extraMin`
+	 * and `extraMax` still add padding.
 	 *
 	 * @since 5.1.11
 	 */
 	strictMinMaxSelection?: boolean;
 
 	/**
-	 * If set to `true` axis will use logarithmic scale.
+	 * Uses a logarithmic scale. It can show only values above zero; see
+	 * `treatZeroAs`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
 	 */
 	logarithmic?: boolean;
 
 	/**
-	 * Treat zero values as some other value.
-	 *
-	 * Useful in situations where zero would result in error, i.e. logarithmic
-	 * scale.
+	 * On a `logarithmic` axis, the value to plot zero and negative values at,
+	 * since the scale can't show them.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
 	 */
 	treatZeroAs?: number;
 
 	/**
-	 * Relative extension to the automatically-calculated minimum value of the
-	 * axis scale.
-	 *
-	 * E..g. `0.1` will extend the scale by 10%, so if max value is `1000` and
-	 * minimum value is `0`, the new minimum value will be `-100`.
+	 * Extends the scale below the lowest value by this share of the value
+	 * range: with values from `0` to `1000`, `0.1` starts the axis at `-100`
+	 * (before rounding to the grid). If not set, a `logarithmic` axis without
+	 * `strictMinMax` uses `0.1`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
 	 */
 	extraMin?: number;
 
 	/**
-	 * Relative extension to the automatically-calculated maximum value of the
-	 * axis scale.
-	 *
-	 * E..g. `0.1` will extend the scale by 10%, so if max value is `1000`, the
-	 * axis will now show maximum value of `1100`.
+	 * Extends the scale above the highest value by this share of the value
+	 * range: with values from `0` to `1000`, `0.1` ends the axis at `1100`
+	 * (before rounding to the grid). If not set, a `logarithmic` axis without
+	 * `strictMinMax` uses `0.2`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
 	 */
 	extraMax?: number;
 
 	/**
-	 * Base value, which indicates the threshold between "positive" and "negative"
-	 * values.
+	 * The value columns grow from, splitting "positive" from "negative"
+	 * values. Its grid line gets the `"base"` theme tag.
 	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Base_value} for more info
@@ -116,75 +99,67 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	baseValue?: number;
 
 	/**
-	 * Maximum number of decimals to allow in axis labels.
-	 *
-	 * This setting not only affects formatting of the labels, but also where and
-	 * how many grid/labels are placed on the axis.
+	 * Most decimal places the labels may have. It also limits the grid step:
+	 * `0` allows whole-number steps only.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
 	 */
 	maxPrecision?: number;
 
 	/**
-	 * A function that can be used to specify how to configure axis fills.
+	 * Function that decides which axis fills show; it is called for each grid
+	 * step. The default fills every other step.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_fills} for more info
 	 */
 	fillRule?: (dataItem: DataItem<IValueAxisDataItem>) => void;
 
 	/**
-	 * Number format to use for axis labels.
-	 *
-	 * If not set, will use format set in global number formatter.
+	 * Number format for the labels. If not set, the number formatter's default
+	 * format is used, with as many decimals as the grid step needs.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
 	 */
 	numberFormat?: string;
 
 	/**
-	 * A numeric format used for numbers displayed in axis tooltip.
+	 * Number format for the axis tooltip. If not set, `numberFormat` is used.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
 	tooltipNumberFormat?: string | Intl.NumberFormatOptions;
 
 	/**
-	 * If set, will use greater precision for the axis tooltip than the one for
-	 * axis' actual labels.
-	 *
-	 * E.g. if axis displays labels with one decimal (`1.0`, `1.1`, `1.2`) setting
-	 * this setting to `1` would allow two decimals in axis tooltip, e.g. `1.15`.
+	 * Extra decimal places for the axis tooltip, beyond those of the labels:
+	 * with labels like `1.1` and `1.2`, `1` lets the tooltip show `1.15`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
 	 */
 	extraTooltipPrecision?: number;
 
 	/**
-	 * If your series relies on dynamically calculated values, like value
-	 * changes, percents, or total sums, set this to `true`.
+	 * Calculates totals across the axis's series for each data item in view:
+	 * `valueYTotal`, `valueYSum` and `valueYTotalPercent` (or the `valueX`
+	 * ones on an X axis), as used by 100% stacked charts. Series with
+	 * `excludeFromTotal` are left out.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Calculated_values} for more info
 	 */
 	calculateTotals?: boolean;
 
 	/**
-	 * This setting can be set to an instance of another [[ValueAxis]].
-	 *
-	 * If set the grid of this axis will be synced with grid of the target axis.
-	 *
-	 * NOTE: this is not 100% guaranteed to work. In some rare cases perfect
-	 * sync might not be possible.
+	 * Another [[ValueAxis]] whose grid this axis lines up with, by adjusting
+	 * its own scale. A perfect match isn't always possible.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid} for more info
 	 */
 	syncWithAxis?: ValueAxis<AxisRenderer>;
 
 	/**
-	 * If set to `true` and `syncWithAxis` is set, the zero line of this axis
-	 * will be aligned with the zero line of the target axis, and the remaining
-	 * grid intervals will be distributed proportionally above and below zero.
-	 *
-	 * Only takes effect when both axes' ranges include zero.
+	 * Lines up this axis's zero with the zero of `syncWithAxis`, spreading the
+	 * other grid lines above and below it. Needs zero within the range of
+	 * `syncWithAxis`, which has to extend to each side where this axis has
+	 * values.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid} for more info
 	 * @default false
@@ -193,11 +168,9 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	syncZeros?: boolean;
 
 	/**
-	 * If set to `false`, the axis won't be auto-zoomed to a selection (this
-	 * works only if the other axis is a `DateAxis` or a `CategoryAxis`).
-	 *
-	 * IMPORTANT: This setting will be ignored if both X and Y axes are
-	 * a `ValueAxis`.
+	 * Rescales the axis to fit the values in view as the chart zooms along the
+	 * other axis. Works only when that axis is not a plain [[ValueAxis]]: a
+	 * [[DateAxis]] or a [[CategoryAxis]], for example.
 	 *
 	 * @since 5.2.20
 	 * @default true
@@ -214,7 +187,7 @@ export interface IValueAxisDataItem extends IAxisDataItem {
 	value?: number;
 
 	/**
-	 * End value for axis items that span multiple values, like axis ranges.
+	 * End value for axis items that span a range of values, like axis ranges.
 	 */
 	endValue?: number;
 
@@ -224,8 +197,8 @@ export interface IValueAxisDataItem extends IAxisDataItem {
 	labelEndValue?: number;
 
 	/**
-	 * If set to `true` the values fo this data item will be factored in when
-	 * calculating scale of the [[ValueAxis]]. Useful for axis ranges.
+	 * Widens the axis scale to include this axis range's `value` and
+	 * `endValue`.
 	 *
 	 * @since 5.1.4
 	 */
@@ -242,82 +215,70 @@ export interface IMinMaxStep {
 export interface IValueAxisPrivate extends IAxisPrivate {
 
 	/**
-	 * Calculated current minimum value of the axis scale.
+	 * Current lowest value of the whole axis scale, not just the part in view.
 	 *
 	 * @readonly
 	 */
 	min?: number;
 
 	/**
-	 * Calculated current maximum value of the axis scale.
+	 * Current highest value of the whole axis scale, not just the part in
+	 * view.
 	 *
 	 * @readonly
 	 */
 	max?: number;
 
 	/**
-	 * A minimum value of the axis scale.
-	 *
-	 * Can be useful in cases where axis zoom is currently being animated, and
-	 * `min` is reflecting current intermediate value, whereas `minFinal` will
-	 * show target value.
+	 * The lowest value of the axis scale once it settles. When the scale
+	 * changes, `min` animates towards it.
 	 *
 	 * @readonly
 	 */
 	minFinal?: number;
 
 	/**
-	 * A maximum value of the axis scale.
-	 *
-	 * Can be useful in cases where axis zoom is currently being animated, and
-	 * `max` is reflecting current intermediate value, whereas `maxFinal` will
-	 * show target value.
+	 * The highest value of the axis scale once it settles. When the scale
+	 * changes, `max` animates towards it.
 	 *
 	 * @readonly
 	 */
 	maxFinal?: number;
 
 	/**
-	 * Calculated minimum value of the currently viewable (zoomed) scope.
+	 * Lowest value of the visible (zoomed) part of the axis. Except on a
+	 * [[DateAxis]], it is rounded down to the grid step.
 	 *
 	 * @readonly
 	 */
 	selectionMin?: number;
 
 	/**
-	 * Calculated maximum value of the currently viewable (zoomed) scope.
+	 * Highest value of the visible (zoomed) part of the axis. Except on a
+	 * [[DateAxis]], it is rounded up to the grid step.
 	 *
 	 * @readonly
 	 */
 	selectionMax?: number;
 
 	/**
-	 * A target minimum value of the viewable value scope.
-	 *
-	 * Can be useful in cases where axis zoom is currently being animated, and
-	 * `selectionMin` is reflecting current intermediate value,
-	 * whereas `selectionMinFinal` will show target value.
+	 * The lowest visible value the axis is zooming to. During a zoom
+	 * animation, `selectionMin` holds the value along the way.
 	 *
 	 * @readonly
 	 */
 	selectionMinFinal?: number;
 
 	/**
-	 * A target maximum value of the viewable value scope.
-	 *
-	 * Can be useful in cases where axis zoom is currently being animated, and
-	 * `selectionMax` is reflecting current intermediate value,
-	 * whereas `selectionMaxFinal` will show target value.
+	 * The highest visible value the axis is zooming to. During a zoom
+	 * animation, `selectionMax` holds the value along the way.
 	 *
 	 * @readonly
 	 */
 	selectionMaxFinal?: number;
 
 	/**
-	 * When selection step changes, it might change during axis zoom animation.
-	 *
-	 * `selectionStepFinal` will show what step will be when animation is
-	 * finished.
+	 * The grid step the axis will have once the zoom animation ends.
 	 *
 	 * @readonly
 	 */
@@ -344,7 +305,7 @@ export interface IValueAxisEvents extends IAxisEvents {
 }
 
 /**
- * Creates a value axis.
+ * An axis with a numeric scale.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/} for more info
  * @important
@@ -361,6 +322,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	protected _dirtyExtremes: boolean = false;
 	protected _dirtySelectionExtremes: boolean = false;
 	protected _dseHandled = false;
+	protected _logWarned = false;
 	protected _deltaMinMax: number = 1;
 	public _minReal: number | undefined;
 	public _maxReal: number | undefined;
@@ -899,8 +861,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Converts a relative position to a corresponding numeric value from axis
-	 * scale.
+	 * Converts a position on the axis (`0` to `1`, regardless of zoom) to a
+	 * value.
 	 *
 	 * @param   position  Relative position
 	 * @return            Value
@@ -918,7 +880,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Convers value to a relative position on axis.
+	 * Converts a value to a position on the axis (`0` to `1`, regardless of
+	 * zoom).
 	 *
 	 * @param   value  Value
 	 * @return         Relative position
@@ -965,10 +928,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns X coordinate in pixels corresponding to specific value.
+	 * Returns the X coordinate in pixels of a value, from the axis's left
+	 * edge.
 	 *
 	 * @param   value     Numeric value
-	 * @param   location  Location
+	 * @param   location  Where between `baseValue` (`0`) and `value` (`1`) to measure
 	 * @param   baseValue Base value
 	 * @return            X coordinate
 	 */
@@ -980,12 +944,12 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns X coordinate in pixels corresponding to specific value.
+	 * Returns the Y coordinate in pixels of a value, from the axis's top edge.
 	 *
 	 * @param   value     Numeric value
-	 * @param   location  Location
+	 * @param   location  Where between `baseValue` (`0`) and `value` (`1`) to measure
 	 * @param   baseValue Base value
-	 * @return            X coordinate
+	 * @return            Y coordinate
 	 */
 	public getY(value: number, location: number, baseValue: number) {
 		value = baseValue + (value - baseValue) * location;
@@ -1045,7 +1009,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns relative position of axis' `baseValue`.
+	 * Returns the position (`0` to `1`) of the axis's base value.
 	 *
 	 * @return  Base value position
 	 */
@@ -1054,8 +1018,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Base value of the [[ValueAxis]], which determines positive and negative
-	 * values.
+	 * Returns the `baseValue` setting, kept within the axis's scale.
 	 *
 	 * @return Base value
 	 */
@@ -1501,8 +1464,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 					min = treatZeroAs;
 				}
 			}
-			if (min <= 0) {
-				new Error("Logarithmic value axis can not have values <= 0.");
+			// Once per axis, so a redraw doesn't flood the console
+			if (min <= 0 && !this._logWarned) {
+				this._logWarned = true;
+				console.warn("ValueAxis: a logarithmic axis can not show values <= 0. Set `treatZeroAs` to show them.");
 			}
 		}
 
@@ -1857,9 +1822,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns text to be used in an axis tooltip for specific relative position.
+	 * Returns the text the axis tooltip shows at a position.
 	 *
-	 * @param   position  Position
+	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Tooltip text
 	 */
 	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
@@ -1878,10 +1843,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns a data item from series that is closest to the `position`.
+	 * Returns the series data item whose value is closest to a position on
+	 * the axis.
 	 *
 	 * @param   series    Series
-	 * @param   position  Relative position
+	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Data item
 	 */
 	public getSeriesItem(series: XYSeries, position: number): DataItem<IXYSeriesDataItem> | undefined {
@@ -1904,13 +1870,11 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Zooms the axis to specific `start` and `end` values.
-	 *
-	 * Optional `duration` specifies duration of zoom animation in milliseconds.
+	 * Zooms the axis to the range between two values.
 	 *
 	 * @param  start     Start value
 	 * @param  end       End value
-	 * @param  duration  Duration in milliseconds
+	 * @param  duration  Animation duration in milliseconds
 	 */
 	public zoomToValues(start: number, end: number, duration?: number) {
 		const min = this.getPrivate("minFinal", this.getPrivate("min", 0));
@@ -2055,9 +2019,10 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 	/**
-	 * Returns relative position between two grid lines of the axis.
+	 * Returns the distance between two grid lines as a share of the visible
+	 * part of the axis.
 	 *
-	 * @return Position
+	 * @return Distance (`0` to `1`)
 	 */
 	public getCellWidthPosition(): number {
 		let max = this.getPrivate("selectionMax", this.getPrivate("max"));

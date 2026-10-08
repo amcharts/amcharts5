@@ -16,12 +16,13 @@ import * as $type from "../../core/util/Type";
 export interface ISettingsModalSettings extends IModalSettings {
 
 	/**
-	 * A target [[StockChart]].
+	 * The [[StockChart]] the modal belongs to.
 	 */
 	stockChart: StockChart;
 
 	/**
-	 * Show the "Reset to default" link?
+	 * Shows a "Reset to default" link, which puts back the values the fields
+	 * had when the modal was first opened for that indicator or series.
 	 *
 	 * @default true
 	 * @since 5.9.0
@@ -29,7 +30,7 @@ export interface ISettingsModalSettings extends IModalSettings {
 	showResetLink?: boolean;
 
 	/**
-	 * Available line widths for user to choose from.
+	 * Line widths to choose from when editing a line series.
 	 *
 	 * @default [1, 2, 4, 10]
 	 * @since 5.11.2
@@ -44,7 +45,8 @@ export interface ISettingsModalPrivate extends IModalPrivate {
 export interface ISettingsModalEvents extends IModalEvents {
 
 	/**
-	 * Invoked when modal is closed/saved.
+	 * The modal was closed: saved, with the changed values in `settings`, or
+	 * canceled, with `settings` set to `null`.
 	 */
 	done: {
 		settings?: any,
@@ -52,9 +54,8 @@ export interface ISettingsModalEvents extends IModalEvents {
 	}
 
 	/**
-	 * Invoked when modal starts generating actual content.
-	 *
-	 * It's a good place to modify settings.
+	 * The modal is about to build its fields. Changing the `settings` array
+	 * here changes which fields it shows.
 	 */
 	initstarted: {
 		settings?: any,
@@ -75,7 +76,7 @@ interface ISeriesEditableSetting extends IIndicatorEditableSetting {
 }
 
 /**
- * Used to display a modal dialog with HTML content.
+ * The modal dialog where the settings of an indicator or series are edited.
  */
 export class SettingsModal extends Modal {
 	public static className: string = "SettingsModal";
@@ -104,9 +105,10 @@ export class SettingsModal extends Modal {
 	}
 
 	/**
-	 * Opens settings modal for an [[Indicator]].
+	 * Opens the modal for an [[Indicator]], with a field for each of its
+	 * editable settings.
 	 *
-	 * @param  target  Target indicator
+	 * @param  target  Indicator
 	 */
 	public openIndicator(target: Indicator): void {
 		this._settingsTarget = target;
@@ -114,9 +116,10 @@ export class SettingsModal extends Modal {
 	}
 
 	/**
-	 * Opens settings editing for the any [[XYSeries]].
+	 * Opens the modal for a series, with fields for its colors (and line
+	 * width, for a line series).
 	 *
-	 * @param  series  target series
+	 * @param  series  Series
 	 */
 	public openSeries(series: XYSeries): void {
 		this._settingsTarget = series;
@@ -468,7 +471,7 @@ export class SettingsModal extends Modal {
 
 		const cancelButton = document.createElement("input");
 		cancelButton.type = "button";
-		cancelButton.value = this._root.language.translateAny("Cancel");
+		cancelButton.value = this._root.language.translate("Cancel");
 		cancelButton.className = "am5-modal-button am5-modal-scondary";
 		content.appendChild(cancelButton);
 
@@ -609,7 +612,8 @@ export class SettingsModal extends Modal {
 	}
 
 	/**
-	 * Closes the modal, saving settings.
+	 * Closes the modal and dispatches `done` with the changed values. It does
+	 * not apply them; the Save button does that before closing.
 	 */
 	public close(): void {
 		super.close();
@@ -622,7 +626,8 @@ export class SettingsModal extends Modal {
 	}
 
 	/**
-	 * Closes the modal without applying any changes.
+	 * Closes the modal without applying any changes, and dispatches `done`
+	 * with `settings` set to `null`.
 	 */
 	public cancel(): void {
 		super.cancel();
@@ -634,7 +639,7 @@ export class SettingsModal extends Modal {
 	}
 
 	/**
-	 * Clears contents of the modal.
+	 * Removes the modal's content.
 	 */
 	public clear(): void {
 		const content = this.getPrivate("content");

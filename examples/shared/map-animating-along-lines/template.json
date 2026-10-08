@@ -1,0 +1,8 @@
+{
+  "title": "Animating Along Lines",
+  "description": "A plane flies back and forth along a line between two cities, moved by the animations setting of its bullet.",
+  "category": "map",
+  "tier": "technique",
+  "tags": ["line series", "point series", "animations", "position on line", "auto rotate"],
+  "since": "5.20.8"
+}

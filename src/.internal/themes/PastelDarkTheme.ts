@@ -2,10 +2,9 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Pastel Dark" — the dark counterpart to `Pastel`: a deep, desaturated ground
- * with soft, chalky pastels that glow gently against it.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * "Pastel Dark": the dark counterpart to `Pastel`, on a deep, muted
+ * background. Its pastels are deeper than those of `Pastel`, so they look rich
+ * rather than chalky on the dark background.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

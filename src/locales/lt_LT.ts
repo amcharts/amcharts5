@@ -179,6 +179,13 @@ export default {
 	// Common actions
 	"Close": "Uždaryti",
 	"Minimize": "Sumažinti",
-	"Confirm": "Patvirtinti"
+	"Confirm": "Patvirtinti",
+	"OK": "Gerai",
+	"Cancel": "Atšaukti",
+	"Delete": "Ištrinti",
+	"Settings": "Nustatymai",
+	"Expand": "Išskleisti",
+	"Move Up": "Perkelti aukštyn",
+	"Move Down": "Perkelti žemyn"
 
 };

@@ -97,7 +97,7 @@ export function smoothedLine(display: IGraphics, points: Array<IPoint>, tensionX
 
 	let closed: boolean = false;
 
-	if ($math.round(first.x, 3) == $math.round(last.x) && $math.round(first.y) == $math.round(last.y)) {
+	if ($math.round(first.x) == $math.round(last.x) && $math.round(first.y) == $math.round(last.y)) {
 		closed = true;
 	}
 
@@ -115,7 +115,7 @@ export function smoothedLine(display: IGraphics, points: Array<IPoint>, tensionX
 
 		if (i === 0) {
 			if (closed) {
-				p0 = points[len - 2];
+				p0 = points[len - 1];
 			}
 			else {
 				p0 = points[0];

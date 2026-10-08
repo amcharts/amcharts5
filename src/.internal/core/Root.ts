@@ -3,7 +3,7 @@ import type { Entity } from "./util/Entity";
 import type { Sprite } from "./render/Sprite";
 import type { Theme } from "./Theme";
 import type { IPoint } from "./util/IPoint";
-import type { IRenderer, IPointerEvent } from "./render/backend/Renderer";
+import type { IRenderer, IRendererClass, IPointerEvent } from "./render/backend/Renderer";
 import type { Timezone } from "./util/Timezone";
 
 import { AnimationState } from "./util/Animation";
@@ -14,7 +14,7 @@ import { VerticalLayout } from "./render/VerticalLayout";
 import { GridLayout } from "./render/GridLayout";
 import { IDisposer, Disposer } from "./util/Disposer";
 import { ResizeSensor } from "./util/ResizeSensor";
-import { InterfaceColors } from "./util/InterfaceColors";
+import { InterfaceColors, IInterfaceColorsSettings } from "./util/InterfaceColors";
 import { Graphics } from "./render/Graphics";
 import { Rectangle } from "./render/Rectangle";
 import { Tooltip } from "./render/Tooltip";
@@ -26,7 +26,7 @@ import { Events, EventDispatcher } from "./util/EventDispatcher";
 import { DefaultTheme } from "../themes/DefaultTheme";
 import { CanvasRenderer } from "./render/backend/CanvasRenderer";
 import { p100, percent, isPercent, Percent } from "./util/Percent";
-import { color } from "./util/Color";
+import { Color, color } from "./util/Color";
 import { populateString } from "./util/PopulateString";
 import { registry } from "./Registry";
 
@@ -76,9 +76,15 @@ export interface ISize {
 
 
 export interface IRootEvents {
+	/**
+	 * A frame started rendering. `timestamp` is the frame's time in milliseconds.
+	 */
 	framestarted: {
 		timestamp: number;
 	};
+	/**
+	 * A frame finished rendering. `timestamp` is the frame's time in milliseconds.
+	 */
 	frameended: {
 		timestamp: number;
 	};
@@ -88,16 +94,17 @@ export interface IRootEvents {
 export interface IRootSettings {
 
 	/**
-	 * Indicates whether chart should use "safe" resolution on some memory-limiting
-	 * platforms such as Safari.
+	 * Draws the chart at a resolution of `1` on iOS and iPadOS devices instead
+	 * of the screen's pixel ratio, to stay within their memory limits. Set to
+	 * `false` for sharper charts there.
 	 *
 	 * @default true
 	 */
 	useSafeResolution?: boolean;
 
 	/**
-	 * Allows defining margins around chart area for tooltips to go outside the
-	 * chart itself.
+	 * Extra space in pixels on each side of the chart where tooltips can still
+	 * be drawn, letting them go outside the chart's container.
 	 *
 	 * @since 5.2.24
 	 */
@@ -134,7 +141,7 @@ export interface IRootSettings {
 	/**
 	 * If set to some string, it will be used as inner `<div>` ARIA-LABEL.
 	 *
-	 * Should be used in conjuction with `focusable`.
+	 * Should be used in conjunction with `focusable`.
 	 *
 	 * @since 5.3.17
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
@@ -150,19 +157,19 @@ export interface IRootSettings {
 	role?: string;
 
 	/**
-	 * Allows for specifying a custom width / height for the chart.
-	 *
-	 * This function will be called automatically when the chart is resized.
+	 * A function that returns the width and height in pixels to draw the chart
+	 * at, given the container's measured box. It runs when the chart is created
+	 * and on every resize.
 	 */
 	calculateSize?: (dimensions: DOMRect) => ISize;
 
 	/**
-	 * If set to `false`, HTML content (e.g. `html`/`labelHTML` settings, HTML
-	 * tooltips, modal content, and export menu labels) will be injected as-is,
-	 * without being sanitized for potentially malicious code.
+	 * Cleans potentially malicious code out of HTML content (`html` and
+	 * `labelHTML` settings, HTML tooltips, modals, export menu labels) before
+	 * it goes on the page.
 	 *
-	 * Only disable this if you fully trust the source of all HTML content, as
-	 * unsanitized HTML coming from untrusted data can lead to XSS attacks.
+	 * Turn it off only if you trust all HTML content: unsanitized HTML from
+	 * untrusted data can lead to XSS attacks.
 	 *
 	 * @default true
 	 * @since 5.19.0
@@ -170,38 +177,132 @@ export interface IRootSettings {
 	sanitizeHTML?: boolean;
 
 	/**
-	 * Default font family for all text elements, unless overridden on an element.
+	 * Font family for all labels. It overrides the theme's, but not a
+	 * `fontFamily` set on a label itself.
 	 *
 	 * @since 5.20.2
 	 */
 	fontFamily?: string;
 
 	/**
-	 * Default font size for all text elements, unless overridden on an element.
+	 * Font size for all labels: a number in pixels, or a CSS size such as
+	 * `"1.2em"`. It overrides the theme's, but not a `fontSize` set on a label
+	 * itself.
 	 *
 	 * @since 5.20.2
 	 */
 	fontSize?: number | string;
 
 	/**
-	 * Default font weight for all text elements, unless overridden on an element.
+	 * Font weight for all labels. It overrides the theme's, but not a
+	 * `fontWeight` set on a label itself.
 	 *
 	 * @since 5.20.2
 	 */
 	fontWeight?: "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900";
+
+	/**
+	 * The renderer that draws the chart. Defaults to `Root.defaultRenderer`,
+	 * which is `CanvasRenderer` unless changed.
+	 *
+	 * To draw with SVG, use `am5.SVGRenderer`:
+	 *
+	 * ```TypeScript
+	 * const root = am5.Root.new("chartdiv", {
+	 *   renderer: am5.SVGRenderer
+	 * });
+	 * ```
+	 * ```JavaScript
+	 * var root = am5.Root.new("chartdiv", {
+	 *   renderer: am5.SVGRenderer
+	 * });
+	 * ```
+	 *
+	 * Can only be set when the Root is created.
+	 *
+	 * @since 5.21.0
+	 */
+	renderer?: IRendererClass;
+
+	/**
+	 * Makes the chart's interface colors (labels, grid, axes, buttons) follow
+	 * the system colors when the page is in a forced colors mode, such as
+	 * Windows High Contrast, so they stay visible. Series colors are kept.
+	 *
+	 * @default true
+	 * @since 5.21.0
+	 */
+	forcedColors?: boolean;
+}
+
+// Interface colors that follow the system colors in a forced colors mode
+const FORCED_COLORS: { [K in keyof IInterfaceColorsSettings]?: string } = {
+	text: "CanvasText",
+	grid: "CanvasText",
+	alternativeBackground: "CanvasText",
+	stroke: "CanvasText",
+	background: "Canvas",
+	alternativeText: "Canvas",
+	fill: "Canvas",
+	// Hover and active stay ButtonFace: ButtonText on Highlight can be unreadable
+	primaryButton: "ButtonFace",
+	primaryButtonHover: "ButtonFace",
+	primaryButtonDown: "ButtonFace",
+	primaryButtonActive: "ButtonFace",
+	primaryButtonDisabled: "ButtonFace",
+	secondaryButton: "ButtonFace",
+	secondaryButtonHover: "ButtonFace",
+	secondaryButtonDown: "ButtonFace",
+	secondaryButtonActive: "ButtonFace",
+	primaryButtonText: "ButtonText",
+	primaryButtonStroke: "ButtonText",
+	secondaryButtonText: "ButtonText",
+	secondaryButtonStroke: "ButtonText",
+	primaryButtonTextDisabled: "GrayText",
+	disabled: "GrayText"
+};
+
+// One media query and one color lookup for all charts on the page
+let forcedColorsQuery: MediaQueryList | null | undefined;
+let systemColors: { [name: string]: Color } | undefined;
+
+function getForcedColorsQuery(): MediaQueryList | null {
+	if (forcedColorsQuery === undefined) {
+		forcedColorsQuery = window.matchMedia ? window.matchMedia("(forced-colors: active)") : null;
+	}
+	return forcedColorsQuery;
+}
+
+// Resolves system color keywords (CanvasText, ...) to colors
+function getSystemColors(): { [name: string]: Color } {
+	if (!systemColors) {
+		const colors: { [name: string]: Color } = {};
+		const probe = document.createElement("div");
+		// Not forced itself, so it reports the system color asked for
+		probe.style.cssText = "position:absolute;width:0;height:0;overflow:hidden;forced-color-adjust:none";
+		document.body.appendChild(probe);
+		$array.each(["Canvas", "CanvasText", "ButtonFace", "ButtonText", "GrayText"], (name) => {
+			probe.style.color = name;
+			colors[name] = Color.fromCSS(getComputedStyle(probe).color);
+		});
+		document.body.removeChild(probe);
+		systemColors = colors;
+	}
+	return systemColors;
 }
 
 
 // TODO implement Disposer
 /**
- * Root element of the chart.
+ * The root of a chart: it ties the chart to an HTML element and holds its
+ * global settings, formatters, locale and themes.
  *
  * @see {@link https://www.amcharts.com/docs/v5/getting-started/#Root_element} for more info
  */
 export class Root implements IDisposer {
 
 	/**
-	 * A reference to original chart container (div element).
+	 * The HTML element the chart is in.
 	 */
 	public dom: HTMLElement;
 	public _inner: HTMLElement;
@@ -237,8 +338,10 @@ export class Root implements IDisposer {
 	public events: EventDispatcher<Events<this, IRootEvents>> = new EventDispatcher();
 
 	/**
+	 * Time in milliseconds of the frame being rendered, or `null` while no
+	 * frames run.
+	 *
 	 * @ignore
-	 * @todo needs description
 	 */
 	public animationTime: number | null = null;
 
@@ -249,12 +352,12 @@ export class Root implements IDisposer {
 	public _rootContainer!: Container;
 
 	/**
-	 * Main content container.
+	 * The main container: charts and other elements go into its `children`.
 	 */
 	public container!: Container;
 
 	/**
-	 * A [[Container]] used to display tooltips in.
+	 * The [[Container]] tooltips are drawn in, above the chart.
 	 */
 	public tooltipContainer!: Container
 	protected _tooltipContainerSettings!: { top: number, left: number, right: number, bottom: number };
@@ -269,7 +372,7 @@ export class Root implements IDisposer {
 	public language: Language = Language.new(this, {});
 
 	/**
-	 * Locale used by the chart.
+	 * Locale for the chart's texts and formatting. English by default.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/}
 	 */
@@ -278,21 +381,20 @@ export class Root implements IDisposer {
 	// Date-time related
 
 	/**
-	 * Use UTC when formatting date/time.
+	 * Treats dates as UTC instead of the user's local time, when formatting
+	 * and parsing them and when placing date axis grid. It takes precedence
+	 * over `timezone`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#utc-and-time-zones} for more info
 	 */
 	public utc: boolean = false;
 
 	/**
-	 * If set, will format date/time in specific time zone.
+	 * Time zone to show dates in, instead of the user's local one. Set it to a
+	 * [[Timezone]] with an IANA name, e.g.
+	 * `am5.Timezone.new("America/Vancouver")`. For UTC, `utc` is faster.
 	 *
-	 * The value should be named time zone, e.g.:
-	 * `"America/Vancouver"`, `"Australia/Sydney"`, `"UTC"`.
-	 *
-	 * NOTE: Using time zone feature may noticeable affect performance of the
-	 * chart, especially with large data sets, since every single date will need
-	 * to be recalculated.
+	 * Every date is converted, which can slow down charts with large data sets.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#time-zone} for more info
 	 * @since 5.1.0
@@ -300,9 +402,8 @@ export class Root implements IDisposer {
 	public timezone?: Timezone;
 
 	/**
-	 * The maximum FPS that the Root will run at.
-	 *
-	 * If `undefined` it will run at the highest FPS.
+	 * Maximum frames per second. When not set, the chart renders on every
+	 * animation frame of the browser.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Performance} for more info
 	 */
@@ -333,7 +434,7 @@ export class Root implements IDisposer {
 	// Accessibility
 
 	/**
-	 * Global tab index for using for the whole chart
+	 * Tab index for the whole chart.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
 	 */
@@ -350,56 +451,55 @@ export class Root implements IDisposer {
 	protected _keyboardDragPoint: IPoint | undefined;
 	protected _tooltipElementContainer: HTMLDivElement | undefined;
 	protected _readerAlertElement: HTMLDivElement | undefined;
-	protected _skipNextGroupJump: boolean = true;
+
+	// Each `focusableGroup` is one TAB stop: the member that is it, and groups
+	// to re-check before the next frame
+	protected _groupStops: { [group: string]: Sprite } = {};
+	protected _dirtyGroups: { [group: string]: string | number } = {};
 
 	public _logo?: Container;
 
 	public _tooltipDiv: HTMLDivElement | undefined;
 
 	/**
-	 * Used for dynamically-created CSS and JavaScript with strict source policies.
+	 * Nonce for the `<style>` elements the chart adds to the page, for pages
+	 * with a strict Content Security Policy.
 	 */
 	public nonce?: string;
 
 	/**
-	 * Special color set to be used for various controls.
+	 * Colors of the chart's interface: text, grid, buttons and other controls.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Interface_colors} for more info
 	 */
 	public interfaceColors: InterfaceColors;
 
 	/**
-	 * An instance of vertical layout object that can be used to set `layout` setting
-	 * of a [[Container]].
+	 * A shared [[VerticalLayout]] for a [[Container]]'s `layout` setting.
 	 *
 	 * @default VerticalLayout.new()
 	 */
 	public verticalLayout: VerticalLayout = VerticalLayout.new(this, {});
 
 	/**
-	 * An instance of horizontal layout object that can be used to set `layout` setting
-	 * of a [[Container]].
+	 * A shared [[HorizontalLayout]] for a [[Container]]'s `layout` setting.
 	 *
 	 * @default HorizontalLayout.new()
 	 */
-	public horizontalLayout: VerticalLayout = HorizontalLayout.new(this, {});
+	public horizontalLayout: HorizontalLayout = HorizontalLayout.new(this, {});
 
 	/**
-	 * An instance of grid layout object that can be used to set `layout` setting
-	 * of a [[Container]].
+	 * A shared [[GridLayout]] for a [[Container]]'s `layout` setting.
 	 *
-	 * @default VerticalLayout.new()
+	 * @default GridLayout.new()
 	 */
-	public gridLayout: VerticalLayout = GridLayout.new(this, {});
+	public gridLayout: GridLayout = GridLayout.new(this, {});
 
 	public _paused: boolean = false;
 
 	/**
-	 * Indicates whether chart should resized automatically when parent container
-	 * width and/or height changes.
-	 *
-	 * If disabled (`autoResize = false`) you can make the chart resize manually
-	 * by calling root element's `resize()` method.
+	 * Resizes the chart automatically when its container's size changes. With
+	 * `false`, call `resize()` to resize it.
 	 */
 	public autoResize: boolean = true;
 
@@ -416,7 +516,7 @@ export class Root implements IDisposer {
 	protected _htmlEnabledContainers: Container[] = [];
 
 	/**
-	 * Entities that have their `id` setting set.
+	 * Objects of this root that have an `id` setting, by that `id`.
 	 *
 	 * @since 5.11.0
 	 */
@@ -452,33 +552,12 @@ export class Root implements IDisposer {
 			resolution = $utils.getSafeResolution();
 		}
 
-		this._renderer = new CanvasRenderer(resolution);
+		const RendererClass = settings.renderer || Root.defaultRenderer;
+		this._renderer = new RendererClass(resolution);
 
-		let dom: HTMLElement | null;
-
-		if (id instanceof HTMLElement) {
-			dom = id;
-		}
-		else {
-			dom = document.getElementById(id);
-		}
-
-		$array.each(registry.rootElements, (root) => {
-			if (root.dom === dom) {
-				if (registry.autoDispose) {
-					root.dispose();
-				}
-				else {
-					throw new Error("You cannot have multiple Roots on the same DOM node");
-				}
-			}
-		});
+		const dom = Root._getDOM(id);
 
 		this.interfaceColors = InterfaceColors.new(this, {});
-
-		if (dom === null) {
-			throw new Error("Could not find HTML element with id `" + id + "`");
-		}
 
 		this.dom = dom;
 
@@ -501,12 +580,57 @@ export class Root implements IDisposer {
 	}
 
 
+	/**
+	 * Renderer for Roots that do not set `renderer`.
+	 *
+	 * @default CanvasRenderer
+	 * @since 5.21.0
+	 */
+	public static defaultRenderer: IRendererClass = CanvasRenderer;
+
+	/**
+	 * Creates a Root in an HTML element. An element can hold only one Root:
+	 * creating another one there throws an error, unless
+	 * `am5.registry.autoDispose` is `true`.
+	 *
+	 * @param   id        The element, or its `id`
+	 * @param   settings  Settings
+	 * @return            Root
+	 */
 	public static new(id: string | HTMLElement, settings?: IRootSettings): Root {
+		// Before the constructor: its fields already start the ticker
+		const dom = Root._getDOM(id);
+
+		$array.each(registry.rootElements, (root) => {
+			if (root.dom === dom) {
+				if (registry.autoDispose) {
+					root.dispose();
+				}
+				else {
+					throw new Error("You cannot have multiple Roots on the same DOM node");
+				}
+			}
+		});
+
 		const root = new Root(id, settings, true);
 		root._init();
 		return root;
 	}
 
+	protected static _getDOM(id: string | HTMLElement): HTMLElement {
+		const dom = id instanceof HTMLElement ? id : document.getElementById(id);
+		if (dom === null) {
+			throw new Error("Could not find HTML element with id `" + id + "`");
+		}
+		return dom;
+	}
+
+	/**
+	 * Moves the chart to another HTML element and resizes it to fit there.
+	 * Nothing happens if no element with that `id` exists.
+	 *
+	 * @param  id  The element, or its `id`
+	 */
 	public moveDOM(id: string | HTMLElement): void {
 		let dom: HTMLElement | null;
 
@@ -704,6 +828,41 @@ export class Root implements IDisposer {
 
 		this._initResizeSensor();
 
+		// Web fonts that finish loading after text was measured
+		const fonts = (<any>document).fonts;
+		if (fonts && fonts.addEventListener) {
+			const loadedFonts = () => {
+				let count = 0;
+				fonts.forEach((font: any) => {
+					if (font.status == "loaded") {
+						count++;
+					}
+				});
+				return count;
+			};
+
+			// Only when a font did load: Firefox also fires loadingdone without one
+			let loaded = loadedFonts();
+			const remeasure = () => {
+				const count = loadedFonts();
+				if (count > loaded && !this._isDisposed) {
+					this._invalidateLabelBounds(this._rootContainer, true);
+					$array.each(this._tooltips, (tooltip) => {
+						this._invalidateLabelBounds(tooltip, true);
+					});
+				}
+				loaded = count;
+			};
+			this._disposers.push($utils.addEventListener(fonts, "loadingdone", remeasure));
+			// WebKit fires no loadingdone
+			this._disposers.push($utils.addEventListener(fonts, "loading", () => {
+				fonts.ready.then(remeasure);
+			}));
+			if (fonts.status == "loading") {
+				fonts.ready.then(remeasure);
+			}
+		}
+
 		// HTML content holder
 		const htmlElementContainer = document.createElement("div");
 		this._htmlElementContainer = htmlElementContainer;
@@ -803,9 +962,13 @@ export class Root implements IDisposer {
 					const focusedSprite = this._focusedSprite;
 					if (focusedSprite) {
 						if (ev.key == "Escape") {
-							// ESC pressed - lose current focus
-							$utils.blur();
-							this._focusedSprite = undefined;
+							// ESC dismisses what focus brought up (a tooltip, a keyboard
+							// drag) but keeps focus where it is
+							if (focusedSprite.isDragging()) {
+								this._stopKeyboardDrag(focusedSprite);
+							}
+							focusedSprite.hideTooltip();
+							return;
 						}
 						let dragOffsetX = 0;
 						let dragOffsetY = 0;
@@ -815,12 +978,14 @@ export class Root implements IDisposer {
 						switch (eventKey) {
 							case "Enter":
 							case " ":
+								// SPACE clicks what a browser would click with it: buttons,
+								// checkboxes and the like
+								if (eventKey == " " && ["button", "checkbox", "switch", "radio", "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio"].indexOf(focusedSprite.get("role", "")) === -1) {
+									return;
+								}
 								const announceText = focusedSprite.get("clickAnnounceText", "");
 								if (announceText !== "") {
 									this.readerAlert(announceText);
-								}
-								if (eventKey == " " && focusedSprite.get("role") != "checkbox") {
-									return;
 								}
 								ev.preventDefault();
 								const downEvent = renderer.getEvent(new MouseEvent("mouse"));
@@ -850,6 +1015,12 @@ export class Root implements IDisposer {
 
 						if (dragOffsetX != 0 || dragOffsetY != 0) {
 							ev.preventDefault();
+
+							// In a focusable group arrow keys move between its members (on
+							// key up); SHIFT + arrows drag a draggable member
+							if (focusedSprite.get("focusableGroup") && !ev.shiftKey && !focusedSprite.isDragging()) {
+								return;
+							}
 
 							if (!focusedSprite.isDragging()) {
 								// Start dragging
@@ -916,33 +1087,14 @@ export class Root implements IDisposer {
 							case "ArrowUp":
 							case "ArrowDown":
 								if (focusedSprite.isDragging()) {
-									// Simulate drag stop
-									const dragPoint = this._keyboardDragPoint!;
-									const upEvent = renderer.getEvent(new MouseEvent("mouseup", {
-										clientX: dragPoint.x,
-										clientY: dragPoint.y
-									}));
-
-									if (focusedSprite.events.isEnabled("globalpointerup")) {
-										focusedSprite.events.dispatch("globalpointerup", {
-											type: "globalpointerup",
-											originalEvent: upEvent.event,
-											point: upEvent.point,
-											simulated: true,
-											target: focusedSprite
-										});
-									}
-									//this._positionFocusElement(focusedSprite);
-									this._keyboardDragPoint = undefined;
-									// @todo dispatch mouseup event instead of calling dragStop?
-									// this._dispatchEvent("globalpointerup", target, upEvent);
+									this._stopKeyboardDrag(focusedSprite);
 									return;
 								}
 								else if (focusedSprite.get("focusableGroup")) {
 									// Find next item in focusable group
 									const group = focusedSprite.get("focusableGroup");
 									const items = this._tabindexes.filter((item) => {
-										return item.get("focusableGroup") == group && item.getPrivate("focusable") !== false && item.isVisibleDeep() ? true : false;
+										return item === focusedSprite || (item.get("focusableGroup") == group && item.isVisibleDeep() && this._canTab(item));
 									});
 									let index = items.indexOf(focusedSprite);
 									const lastIndex = items.length - 1;
@@ -956,16 +1108,6 @@ export class Root implements IDisposer {
 									$utils.focus(items[index].getPrivate("focusElement")!.dom);
 								}
 								break;
-							case "Tab":
-								const group = focusedSprite.get("focusableGroup");
-								if (group && this._isShift) {
-									if (!this._skipNextGroupJump) {
-										this._focusNext(focusedSprite.getPrivate("focusElement")!.dom, -1, group);
-										this._skipNextGroupJump = true;
-									}
-									return;
-								}
-								break;
 						}
 					}
 				}));
@@ -974,6 +1116,7 @@ export class Root implements IDisposer {
 
 		this._startTicker();
 		this.setThemes([]);
+		this._initForcedColors();
 
 		this._addTooltip();
 
@@ -983,7 +1126,8 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Returns an instance of a universal [[Tooltip]] instance.
+	 * A shared [[Tooltip]] (theme tag `"system"`) for interface elements such
+	 * as the logo and buttons, created on first use.
 	 * @since 5.14.0
 	 */
 	public get systemTooltip() {
@@ -1010,8 +1154,8 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * If automatic resizing of char is disabled (`root.autoResize = false`), it
-	 * can be resized manually by calling this method.
+	 * Resizes the chart to fit its container. Call it after the container's
+	 * size changes when `autoResize` is `false`.
 	 */
 	public resize(): void {
 		const rect = this._getRealSize();
@@ -1106,6 +1250,8 @@ export class Root implements IDisposer {
 			}
 		}
 
+		this._updateForcedColors();
+
 		// `focusPadding`, `sanitizeHTML` and `calculateSize` are read from
 		// `_settings` on demand, so they need no explicit re-application.
 
@@ -1125,7 +1271,7 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Root's settings.
+	 * The Root's settings.
 	 */
 	public get settings(): IRootSettings {
 		return this._settings;
@@ -1139,6 +1285,7 @@ export class Root implements IDisposer {
 		this._renderer.render(this._rootContainer._display);
 
 		if (this._focusElementDirty) {
+			this._updateDirtyGroups();
 			this._updateCurrentFocus();
 			this._focusElementDirty = false;
 		}
@@ -1364,14 +1511,15 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Returns whether the root is updating or not.
+	 * Whether the chart updates and redraws.
 	 */
 	public get updateTick(): boolean {
 		return this._updateTick;
 	}
 
 	/**
-	 * Enables or disables the root updating.
+	 * Stops the chart from updating and redrawing with `false`, until set back
+	 * to `true`.
 	 */
 	public set updateTick(value: boolean) {
 		this._updateTick = value;
@@ -1444,6 +1592,13 @@ export class Root implements IDisposer {
 		})
 	}
 
+	/**
+	 * Calls a function on every frame, which keeps the chart rendering, until
+	 * the returned disposer is disposed.
+	 *
+	 * @param   f  Function, given the frame's time in milliseconds
+	 * @return     Disposer that stops the calls
+	 */
 	public eachFrame(f: (currentTime: number) => void): IDisposer {
 		this._tickers.push(f);
 		this._startTicker();
@@ -1453,6 +1608,12 @@ export class Root implements IDisposer {
 		});
 	}
 
+	/**
+	 * Makes every element inside a container update and re-measure on the next
+	 * frame.
+	 *
+	 * @param  container  Container; the main `container` if not given
+	 */
 	public markDirtyGlobal(container?: Container): void {
 		if (!container) {
 			container = this.container;
@@ -1467,7 +1628,8 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Returns width of the target container, in pixels.
+	 * Returns the chart's width in pixels: the container's, or the one from
+	 * `calculateSize` if set.
 	 *
 	 * @return Width
 	 */
@@ -1477,7 +1639,8 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Returns height of the target container, in pixels.
+	 * Returns the chart's height in pixels: the container's, or the one from
+	 * `calculateSize` if set.
 	 *
 	 * @return Height
 	 */
@@ -1487,7 +1650,8 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Disposes root and all the content in it.
+	 * Disposes the Root and everything in it, and removes the chart from the
+	 * page.
 	 */
 	public dispose(): void {
 		if (!this._isDisposed) {
@@ -1512,7 +1676,7 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Returns `true` if root element is disposed.
+	 * Returns `true` if the Root is disposed.
 	 *
 	 * @return Disposed?
 	 */
@@ -1521,7 +1685,7 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Triggers screen reader read out a message.
+	 * Makes screen readers read out a message.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
 	 * @param  text  Alert text
@@ -1538,7 +1702,7 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Sets themes to be used for the chart.
+	 * Sets the chart's themes, replacing any set before.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
 	 * @param  themes  A list of themes
@@ -1582,7 +1746,7 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Accesibility
+	 * Accessibility
 	 */
 
 	public _registerTabindexOrder(target: Sprite): void {
@@ -1590,7 +1754,7 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		if (target.get("focusable")) {
+		if (target.get("focusable") && !target.getPrivate("focusExcluded")) {
 			$array.pushOne(this._tabindexes, target);
 		}
 		else {
@@ -1627,7 +1791,6 @@ export class Root implements IDisposer {
 			}
 		});
 
-		const groups: Array<string | number> = [];
 		$array.each(this._tabindexes, (item, index) => {
 			if (!item.getPrivate("focusElement")) {
 				this._makeFocusElement(index, item);
@@ -1636,18 +1799,65 @@ export class Root implements IDisposer {
 				this._moveFocusElement(index, item);
 			}
 			const group = item.get("focusableGroup");
-			if (group && item.getPrivate("focusable") !== false) {
-				if (groups.indexOf(group) !== -1) {
-					// Non-first element in the group, make it not directly focusable
-					item.getPrivate("focusElement")!.dom.setAttribute("tabindex", "-1");
-				}
-				else {
-					groups.push(group);
-				}
+			if (group) {
+				this._dirtyGroups[group] = group;
 			}
-
 		});
 
+		this._updateDirtyGroups();
+	}
+
+	// Whether the element can take focus now: shown, sized and not opted out.
+	// `ariaHidden` opts out too: a hidden element must not take focus
+	public _canFocus(target: Sprite): boolean {
+		return target.get("visible") && target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.get("ariaHidden") && !target.isHidden() && target.getPrivate("focusable") !== false && this._hasFocusSize(target) ? true : false;
+	}
+
+	// Whether the element is a keyboard stop: it can take focus and is in view.
+	// Out of view (e.g. a map object panned away) it is still there for screen
+	// readers, just not a TAB stop. The focused element stays one until left
+	public _canTab(target: Sprite): boolean {
+		return this._canFocus(target) && (this._focusedSprite === target || !target.getPrivate("focusOutOfView"));
+	}
+
+	protected _invalidateGroup(group: string | number): void {
+		this._dirtyGroups[group] = group;
+		this._focusElementDirty = true;
+	}
+
+	protected _updateDirtyGroups(): void {
+		const groups = this._dirtyGroups;
+		this._dirtyGroups = {};
+		$object.each(groups, (_key, group) => {
+			this._updateGroup(group);
+		});
+	}
+
+	// Gives a group one TAB stop: the member focused last, or the first one
+	// that can take focus. The rest are reached with arrow keys
+	protected _updateGroup(group: string | number): void {
+		const items = this._tabindexes.filter((item) => item.get("focusableGroup") == group && item.getPrivate("focusElement"));
+		let stop: Sprite | undefined = this._groupStops[group];
+		if (!stop || items.indexOf(stop) == -1 || !this._canTab(stop)) {
+			stop = $array.find(items, (item) => this._canTab(item));
+		}
+
+		if (stop) {
+			this._groupStops[group] = stop;
+		}
+		else {
+			delete this._groupStops[group];
+		}
+
+		$array.each(items, (item) => {
+			const dom = item.getPrivate("focusElement")!.dom;
+			if (this._canTab(item)) {
+				dom.setAttribute("tabindex", item === stop ? "" + this.tabindex : "-1");
+			}
+			else {
+				dom.removeAttribute("tabindex");
+			}
+		});
 	}
 
 	public _updateCurrentFocus(): void {
@@ -1676,12 +1886,38 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		const role = target.get("role");
+		// An element clicked to switch a state (`toggleKey`), e.g. a pie slice
+		// pulling out. A figure cannot tell its state, so a focusable one that
+		// toggles is a toggle button to assistive technology
+		const toggleKey = target.get("toggleKey");
+		const toggles = toggleKey == "active" || toggleKey == "disabled";
+		let role = target.get("role");
+		if (role == "figure" && toggles && target.get("focusable")) {
+			role = "button";
+		}
+
 		if (role) {
 			focusElement.setAttribute("role", role);
 		}
 		else {
 			focusElement.removeAttribute("role");
+		}
+
+		// Expanded / collapsed wins over pressed for the same toggle
+		const ariaExpanded = target.get("ariaExpanded");
+		if (ariaExpanded != null) {
+			focusElement.setAttribute("aria-expanded", ariaExpanded ? "true" : "false");
+		}
+		else {
+			focusElement.removeAttribute("aria-expanded");
+		}
+
+		if (role == "button" && toggles && ariaExpanded == null) {
+			const pressed = toggleKey == "disabled" ? !target.get("disabled") : !!target.get("active");
+			focusElement.setAttribute("aria-pressed", pressed ? "true" : "false");
+		}
+		else {
+			focusElement.removeAttribute("aria-pressed");
 		}
 
 		const ariaLabel = target.get("ariaLabel");
@@ -1780,8 +2016,17 @@ export class Root implements IDisposer {
 			focusElement.removeAttribute("aria-controls");
 		}
 
-		if (target.get("visible") && target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.isHidden() && target.getPrivate("focusable") !== false && (target.height() || target.width())) {
-			if (focusElement.getAttribute("tabindex") != "-1") {
+		const group = target.get("focusableGroup");
+		if (this._canFocus(target)) {
+			if (!this._canTab(target)) {
+				// Out of view: readable, not a TAB stop
+				focusElement.removeAttribute("tabindex");
+			}
+			else if (group) {
+				// One TAB stop per group: which member it is is decided per group
+				focusElement.setAttribute("tabindex", this._groupStops[group] === target ? "" + this.tabindex : "-1");
+			}
+			else {
 				focusElement.setAttribute("tabindex", "" + this.tabindex);
 			}
 			focusElement.removeAttribute("aria-hidden");
@@ -1790,6 +2035,100 @@ export class Root implements IDisposer {
 			focusElement.removeAttribute("tabindex");
 			focusElement.setAttribute("aria-hidden", "true");
 		}
+
+		if (group) {
+			// The group's TAB stop may have to move to or away from this member
+			this._invalidateGroup(group);
+		}
+	}
+
+	// Interface colors replaced while a forced colors mode is on, to put back
+	protected _forcedColorsBackup?: { [key: string]: { value: any, user: boolean } };
+
+	protected _initForcedColors(): void {
+		const query = getForcedColorsQuery();
+		if (query && query.addEventListener) {
+			// High Contrast switched on or off, or its theme changed
+			this._disposers.push($utils.addEventListener(query, "change", () => {
+				systemColors = undefined;
+				this._updateForcedColors();
+			}));
+		}
+		this._updateForcedColors();
+	}
+
+	/**
+	 * Applies or removes system interface colors for a forced colors mode.
+	 *
+	 * @ignore
+	 */
+	public _updateForcedColors(): void {
+		const query = getForcedColorsQuery();
+		const active = query && query.matches && this._settings.forcedColors !== false;
+		const ic = this.interfaceColors;
+
+		if (active) {
+			const colors = getSystemColors();
+			if (!this._forcedColorsBackup) {
+				const backup: { [key: string]: { value: any, user: boolean } } = {};
+				$object.each(FORCED_COLORS, (key) => {
+					backup[key] = { value: ic.get(key), user: ic.isUserSetting(key) && !ic.isComputedSetting(key) };
+				});
+				this._forcedColorsBackup = backup;
+			}
+			$object.each(FORCED_COLORS, (key, name) => {
+				ic._setC(key, colors[name!]);
+			});
+		}
+		else if (this._forcedColorsBackup) {
+			// Back to the colors set in code, or else the themes'
+			const backup = this._forcedColorsBackup;
+			this._forcedColorsBackup = undefined;
+			$object.each(backup, (key, saved) => {
+				if (saved.user) {
+					ic.set(<any>key, saved.value);
+				}
+				else {
+					ic.remove(<any>key);
+				}
+			});
+			ic._applyThemes();
+		}
+	}
+
+	// Ends a drag made with arrow keys, as releasing the mouse would
+	protected _stopKeyboardDrag(target: Sprite): void {
+		const dragPoint = this._keyboardDragPoint || { x: 0, y: 0 };
+		const upEvent = this._renderer.getEvent(new MouseEvent("mouseup", {
+			clientX: dragPoint.x,
+			clientY: dragPoint.y
+		}));
+
+		if (target.events.isEnabled("globalpointerup")) {
+			target.events.dispatch("globalpointerup", {
+				type: "globalpointerup",
+				originalEvent: upEvent.event,
+				point: upEvent.point,
+				simulated: true,
+				target: target
+			});
+		}
+		this._keyboardDragPoint = undefined;
+	}
+
+	// A zero-sized element can't be focused. An unmeasured one (a pie slice, a
+	// map polygon) has no width or height, so its shape is measured instead.
+	// The focused element keeps focus even if it loses its size (a polygon
+	// turning to the far side of a globe), until focus moves on
+	public _hasFocusSize(target: Sprite): boolean {
+		if (this._focusedSprite === target || target.height() || target.width()) {
+			return true;
+		}
+		if (!target.get("isMeasured")) {
+			const bounds = target._focusBounds();
+			return bounds.right > bounds.left || bounds.bottom > bounds.top;
+		}
+		return false;
 	}
 
 	public _makeFocusElement(index: number, target: Sprite): void {
@@ -1841,6 +2180,15 @@ export class Root implements IDisposer {
 				x.dispose();
 			});
 			target.removePrivate("focusElement");
+
+			// Its group needs a new TAB stop
+			const group = target.get("focusableGroup");
+			if (group) {
+				if (this._groupStops[group] === target) {
+					delete this._groupStops[group];
+				}
+				this._invalidateGroup(group);
+			}
 		}
 	}
 
@@ -1882,7 +2230,7 @@ export class Root implements IDisposer {
 		}
 		this._focusElementContainer!.scrollTop = 0;
 
-		const bounds = target.globalBounds();
+		const bounds = target._focusBounds();
 
 		let width = bounds.right == bounds.left ? target.width() : bounds.right - bounds.left;
 		let height = bounds.top == bounds.bottom ? target.height() : bounds.bottom - bounds.top;
@@ -1955,8 +2303,12 @@ export class Root implements IDisposer {
 			});
 		}
 
-		if (focused.getPrivate("focusElement")!.dom.tabIndex == -1) {
-			this._skipNextGroupJump = false;
+		// The focused member is its group's TAB stop, so TAB and SHIFT+TAB leave
+		// the group from here and come back to it
+		const group = focused.get("focusableGroup");
+		if (group) {
+			this._groupStops[group] = focused;
+			this._updateGroup(group);
 		}
 	}
 
@@ -2032,6 +2384,11 @@ export class Root implements IDisposer {
 		}
 
 		this._focusedSprite = undefined;
+
+		// It may have lost its size while focused
+		if (focused && !focused.isDisposed() && focused.getPrivate("focusElement")) {
+			this._decorateFocusElement(focused);
+		}
 	}
 
 	/**
@@ -2096,7 +2453,7 @@ export class Root implements IDisposer {
 		}
 		this._focusElementDirty = true;
 		const focusElement = target.getPrivate("focusElement");
-		if (target.get("focusable")) {
+		if (target.get("focusable") && !target.getPrivate("focusExcluded")) {
 			if (focusElement) {
 				this._decorateFocusElement(target);
 				if (this._focusedSprite === target) {
@@ -2124,9 +2481,10 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Converts document coordinates to coordinates withing root element.
+	 * Converts a point from viewport coordinates, such as a pointer event's
+	 * `clientX` and `clientY`, to coordinates within the root.
 	 *
-	 * @param   point  Document point
+	 * @param   point  Viewport point
 	 * @return         Root point
 	 */
 	public documentPointToRoot(point: IPoint): IPoint {
@@ -2143,10 +2501,11 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Converts root coordinates to document
+	 * Converts a point from coordinates within the root to viewport
+	 * coordinates, as in a pointer event's `clientX` and `clientY`.
 	 *
-	 * @param   point  Document point
-	 * @return         Root point
+	 * @param   point  Root point
+	 * @return         Viewport point
 	 */
 	public rootPointToDocument(point: IPoint): IPoint {
 		const rect = this._getRealSize();
@@ -2194,14 +2553,18 @@ export class Root implements IDisposer {
 		}
 	}
 
-	protected _invalidateLabelBounds(target: Sprite): void {
+	protected _invalidateLabelBounds(target: Sprite, remeasure?: boolean): void {
 		if (target instanceof Container) {
 			target.children.each((child) => {
-				this._invalidateLabelBounds(child);
+				this._invalidateLabelBounds(child, remeasure);
 			});
 		}
 		else if (target instanceof Text) {
 			target.markDirtyBounds();
+			if (remeasure) {
+				target._display.invalidateBounds();
+				target.markDirty();
+			}
 		}
 	}
 
@@ -2248,8 +2611,8 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * Set this to `true` if you need chart to require first a tap onto it before
-	 * touch gesture related functionality like zoom/pan is turned on.
+	 * Makes touch gestures such as zoom and pan work only after a tap on the
+	 * chart, so the page can still be scrolled over it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options} for more info
 	 * @default false
@@ -2268,9 +2631,9 @@ export class Root implements IDisposer {
 	}
 
 	/**
-	 * If `tapToActivate` is set to `true`, this setting will determine number
-	 * of milliseconds the chart will stay "active", before releasing the
-	 * controls back to the page.
+	 * How long in milliseconds the chart stays active after the last touch,
+	 * with `tapToActivate`, before handing touch gestures back to the page.
+	 * `0` keeps it active until a tap outside the chart.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options} for more info
 	 * @default 3000

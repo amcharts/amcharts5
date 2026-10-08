@@ -194,5 +194,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "",
+	"Cancel": "",
+	"Delete": "",
+	"Settings": "",
+	"Expand": "",
+	"Move Up": "",
+	"Move Down": ""
 };

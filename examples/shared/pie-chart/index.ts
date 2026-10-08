@@ -18,7 +18,7 @@ root.setThemes([
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
 const chart = root.container.children.push(am5percent.PieChart.new(root, {
-  layout: root.verticalLayout
+  layout: root.verticalLayout // stacks the pie and the legend added below it
 }));
 
 
@@ -46,13 +46,13 @@ series.data.setAll([
 // Create legend
 // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
-  centerX: am5.percent(50),
-  x: am5.percent(50),
-  marginTop: 15,
+  centerX: am5.percent(50), // the legend's middle...
+  x: am5.percent(50),       // ...at the middle of the chart: centered
+  marginTop: 15,            // some room between the pie and the legend
   marginBottom: 15,
 }));
 
-legend.data.setAll(series.dataItems);
+legend.data.setAll(series.dataItems); // one legend item per slice
 
 
 // Play initial series animation

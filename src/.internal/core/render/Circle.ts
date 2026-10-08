@@ -3,7 +3,7 @@ import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 export interface ICircleSettings extends IGraphicsSettings {
 
 	/**
-	 * Circle radius in pixels.
+	 * Radius in pixels.
 	 */
 	radius?: number;
 
@@ -13,7 +13,7 @@ export interface ICirclePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a circle.
+ * Draws a circle centered on its `x` and `y`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  * @important

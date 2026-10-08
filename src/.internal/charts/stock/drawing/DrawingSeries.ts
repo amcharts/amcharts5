@@ -36,47 +36,52 @@ export interface IDrawingSeriesDataItem extends ILineSeriesDataItem {
 export interface IDrawingSeriesSettings extends ILineSeriesSettings {
 
 	/**
-	 * X-Axis.
+	 * The date axis the drawings' points are placed on.
 	 */
 	xAxis: DateAxis<AxisRenderer>;
 
 	/**
-	 * Y-axis.
+	 * The value axis the drawings' points are placed on.
 	 */
 	yAxis: ValueAxis<AxisRenderer>;
 
 	/**
-	 * Color of the lines/borders.
+	 * Line color of new drawings and, when changed, of the selected ones.
 	 */
 	strokeColor?: Color;
 
 	/**
-	 * Color of the fills.
+	 * Fill color of new drawings and, when changed, of the selected ones.
 	 */
 	fillColor?: Color;
 
 	/**
-	 * Opacity of the lines/borders (0-1).
+	 * Line opacity (`0` to `1`) of new drawings and, when changed, of the
+	 * selected ones.
 	 */
 	strokeOpacity?: number;
 
 	/**
-	 * Opacity of the fills (0-1).
+	 * Fill opacity (`0` to `1`) of new drawings and, when changed, of the
+	 * selected ones.
 	 */
 	fillOpacity?: number;
 
 	/**
-	 * Width of the lines/borders in pixels.
+	 * Line width in pixels of new drawings and, when changed, of the selected
+	 * ones.
 	 */
 	strokeWidth?: number;
 
 	/**
-	 * Dash information for lines/borders.
+	 * Dash pattern of the lines, such as `[4, 2]`, for new drawings and, when
+	 * changed, for the selected ones.
 	 */
 	strokeDasharray?: Array<number>;
 
 	/**
-	 * [[XYSeries]] used for drawing.
+	 * The series the drawings snap to with `snapToData`, usually the main
+	 * series. The drawing series also finds its [[StockChart]] through it.
 	 */
 	series?: XYSeries;
 
@@ -87,15 +92,16 @@ export interface IDrawingSeriesSettings extends ILineSeriesSettings {
 	snapToData?: boolean;
 
 	/**
-	 * Value field to use when snapping data or calculating averages/regressions/etc.
+	 * Value of `series` that snapping, averages and regressions use: `"value"`
+	 * (the close), `"open"`, `"low"` or `"high"`.
 	 *
 	 * @default "value"
 	 */
 	field?: "open" | "value" | "low" | "high";
 
 	/**
-	 * Padding of a selector rectangle (how many pixels will be added to each side around the drawing when it's selected)
-	 * @default 5
+	 * Space in pixels between a selected drawing and its selection rectangle.
+	 * @default 10
 	 */
 	selectorPadding?: number;
 }
@@ -105,6 +111,9 @@ export interface IDrawingSeriesPrivate extends ILineSeriesPrivate {
 }
 
 
+/**
+ * Base class for the series that hold the drawings of a [[StockChart]].
+ */
 export class DrawingSeries extends LineSeries {
 	public static className: string = "DrawingSeries";
 	public static classNames: Array<string> = LineSeries.classNames.concat([DrawingSeries.className]);
@@ -158,6 +167,9 @@ export class DrawingSeries extends LineSeries {
 	// point index in segment
 	protected _pIndex: number = 0;
 
+	/**
+	 * Grips on the drawings' points, which can be dragged to reshape them.
+	 */
 	public readonly grips: ListTemplate<Container> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Container._new(this._root, {
@@ -167,12 +179,18 @@ export class DrawingSeries extends LineSeries {
 		}, [this.grips.template]),
 	));
 
+	/**
+	 * Inner circles of the grips.
+	 */
 	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
 		}, [this.circles.template]),
 	));
 
+	/**
+	 * Outer circles of the grips.
+	 */
 	public readonly outerCircles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Circle._new(this._root, {
@@ -180,6 +198,9 @@ export class DrawingSeries extends LineSeries {
 		}, [this.outerCircles.template]),
 	));
 
+	/**
+	 * Rectangles drawn around the selected drawings.
+	 */
 	public readonly selectors: ListTemplate<Rectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Rectangle._new(this._root, {
@@ -359,9 +380,9 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Disposes a drawing with the specified index.
+	 * Deletes the drawing at an index.
 	 *
-	 * @param  index  Index
+	 * @param  index  Index of the drawing
 	 * @since 5.7.7
 	 */
 	public disposeIndex(index: number) {
@@ -370,9 +391,9 @@ export class DrawingSeries extends LineSeries {
 
 
 	/**
-	 * Returns index of a drawing with the specific ID, or `null` if not found.
+	 * Returns the index of the drawing with an ID, or `null` if there is none.
 	 *
-	 * @param   id  ID
+	 * @param   id  Drawing ID
 	 * @return      Index
 	 * @since 5.8.4
 	 */
@@ -397,7 +418,6 @@ export class DrawingSeries extends LineSeries {
 
 		if (dataItems) {
 			let drawingId!: string;
-			let index!: number;
 
 			$object.each(dataItems, (_key, dataItem) => {
 				const dataContext = dataItem.dataContext as any;
@@ -406,9 +426,6 @@ export class DrawingSeries extends LineSeries {
 				if (dataContext) {
 					if (dataContext.drawingId) {
 						drawingId = dataContext.drawingId;
-					}
-					if (dataContext.index) {
-						index = dataContext.index;
 					}
 				}
 			})
@@ -461,6 +478,9 @@ export class DrawingSeries extends LineSeries {
 		this._isSelecting = false;
 	}
 
+	/**
+	 * Deletes all drawings of the series.
+	 */
 	public clearDrawings(): void {
 		$array.each(this._di, (_dataItems, index) => {
 			this._disposeIndex(index);
@@ -501,6 +521,11 @@ export class DrawingSeries extends LineSeries {
 		return c;
 	}
 
+	/**
+	 * Makes the drawings react to the pointer, or not.
+	 *
+	 * @param  value  Interactive
+	 */
 	public setInteractive(value: boolean) {
 		this.strokes.template.set("forceInactive", !value);
 		this.fills.template.set("forceInactive", !value);
@@ -814,6 +839,9 @@ export class DrawingSeries extends LineSeries {
 
 	}
 
+	/**
+	 * Makes the [[StockChart]] dispatch `drawingsupdated`.
+	 */
 	public markDirtyDrawings() {
 		const stockChart = this._getStockChart();
 		if (stockChart) {
@@ -993,6 +1021,9 @@ export class DrawingSeries extends LineSeries {
 
 	}
 
+	/**
+	 * Turns drawing on: the pointer on the plot area draws new drawings.
+	 */
 	public enableDrawing() {
 		const chart = this.chart;
 		this._erasingEnabled = false;
@@ -1037,11 +1068,17 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	/**
+	 * Turns erasing on: a click on a drawing deletes it.
+	 */
 	public enableErasing() {
 		this._erasingEnabled = true;
 		this.setInteractive(true);
 	}
 
+	/**
+	 * Turns erasing off.
+	 */
 	public disableErasing() {
 		this._erasingEnabled = false;
 		if (!this._getStockChart().get("drawingSelectionEnabled")) {
@@ -1049,6 +1086,9 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	/**
+	 * Turns drawing off.
+	 */
 	public disableDrawing() {
 		this._erasingEnabled = false;
 		this._drawingEnabled = false;
@@ -1071,6 +1111,13 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	/**
+	 * Updates the drawings for drawing mode turning on or off. Here, with the
+	 * [[StockChart]] `hideDrawingGrips` on, it shows the grips only while
+	 * drawing mode is on.
+	 *
+	 * @param  enabled  Drawing mode on
+	 */
 	public toggleDrawing(enabled?: boolean) {
 		if (this._getStockChart().get("hideDrawingGrips")) {
 			this.circles.getIndex(0)?.markDirty();
@@ -1326,9 +1373,10 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
+	 * Returns the ID of the drawing at an index.
 	 *
-	 * @param index returns drawingId
-	 * @returns
+	 * @param index Index of the drawing
+	 * @returns Drawing ID
 	 */
 	public indexToDrawingId(index: number): string | undefined {
 		let id: string | undefined;
@@ -1356,6 +1404,12 @@ export class DrawingSeries extends LineSeries {
 		return context;
 	}
 
+	/**
+	 * Returns the data context of a drawing, found by its ID.
+	 *
+	 * @param   id  Drawing ID
+	 * @return      Data context
+	 */
 	public getContext(id: string) {
 		const index = this.getIndex(id);
 		if (index != null) {
@@ -1364,8 +1418,10 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Unselects all currently selected drawings on this series.
+	 * Unselects all selected drawings of the whole [[StockChart]], not only of
+	 * this series.
 	 *
+	 * @return  Number of drawings unselected
 	 * @since 5.9.0
 	 */
 	public unselectAllDrawings(): number {
@@ -1377,8 +1433,9 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Unselects all currently selected drawings of this series.
+	 * Unselects the selected drawings of this series.
 	 *
+	 * @return  Number of drawings unselected
 	 * @since 5.9.0
 	 */
 	public unselectDrawings(): number {
@@ -1391,10 +1448,11 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Selects series' drawing by its ID.
+	 * Selects a drawing of this series by its ID. Works only while drawing
+	 * selection is on (`drawingSelectionEnabled` of the [[StockChart]]).
 	 *
 	 * @param  id             Drawing ID
-	 * @param  keepSelection  Keep existing selections
+	 * @param  keepSelection  Keep the drawings already selected
 	 * @since 5.9.0
 	 */
 	public selectDrawing(id: string, keepSelection?: boolean) {
@@ -1405,7 +1463,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Unselects series' drawing by its ID.
+	 * Unselects a drawing of this series by its ID.
 	 *
 	 * @param  id  Drawing ID
 	 * @since 5.9.0
@@ -1418,7 +1476,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Deletes all currently selected drawings on this series.
+	 * Deletes the selected drawings of this series.
 	 *
 	 * @since 5.9.0
 	 */
@@ -1429,7 +1487,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Deletes a series' drawing by ids ID.
+	 * Deletes a drawing of this series by its ID.
 	 *
 	 * @param  id  Drawing ID
 	 * @since 5.9.0
@@ -1442,7 +1500,7 @@ export class DrawingSeries extends LineSeries {
 	}
 
 	/**
-	 * Cancels current drawing
+	 * Cancels the drawing in progress, deleting it.
 	 *
 	 * @since 5.9.0
 	 */

@@ -23,12 +23,12 @@ export interface IPackDataObject {
 export interface IPackDataItem extends IHierarchyDataItem {
 
 	/**
-	 * An array of data items of node's children.
+	 * Data items of the child nodes.
 	 */
 	children: Array<DataItem<IPackDataItem>>;
 
 	/**
-	 * A data item of node's parent.
+	 * Data item of the parent node.
 	 */
 	parent: DataItem<IPackDataItem>;
 
@@ -38,7 +38,7 @@ export interface IPackDataItem extends IHierarchyDataItem {
 	d3HierarchyNode: d3hierarchy.HierarchyCircularNode<IPackDataObject>;
 
 	/**
-	 * A [[Circle]] element of the node.
+	 * The node's circle.
 	 */
 	circle: Circle;
 
@@ -47,9 +47,11 @@ export interface IPackDataItem extends IHierarchyDataItem {
 export interface IPackSettings extends IHierarchySettings {
 
 	/**
-	 * Gap between nodes, in pixels.
+	 * Gap between neighboring circles, and between a circle and the circles
+	 * inside it, in pixels.
 	 *
 	 * @since 5.2.6
+	 * @default 0
 	 */
 	nodePadding?: number
 
@@ -68,9 +70,10 @@ export interface IPackEvents extends IHierarchyEvents {
 }
 
 /**
- * Builds a pack diagram.
+ * A pack diagram: nodes as circles sized by value, each inside its parent's
+ * circle. A click on a node zooms into it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/sunburst/} for more info
+ * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/pack/} for more info
  * @important
  */
 export class Pack extends Hierarchy {
@@ -89,9 +92,7 @@ export class Pack extends Hierarchy {
 	public _packData: IPackDataObject | undefined;
 
 	/**
-	 * A list of node circle elements in a [[Pack]] chart.
-	 *
-	 * @default new ListTemplate<Circle>
+	 * List of node circles; configure them all through `circles.template`.
 	 */
 	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),

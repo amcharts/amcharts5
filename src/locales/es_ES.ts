@@ -180,5 +180,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "Aceptar",
+	"Cancel": "Cancelar",
+	"Delete": "Eliminar",
+	"Settings": "Configuración",
+	"Expand": "Expandir",
+	"Move Up": "Subir",
+	"Move Down": "Bajar"
 };

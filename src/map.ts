@@ -3,14 +3,18 @@ export { MapChart, IMapChartSettings, IMapChartEvents, IMapChartPrivate, project
 export { MapLine, IMapLineSettings, IMapLinePrivate } from "./.internal/charts/map/MapLine";
 export { MapLineSeries, IMapLineSeriesSettings, IMapLineSeriesDataItem, IMapLineSeriesPrivate } from "./.internal/charts/map/MapLineSeries";
 export { MapPointSeries, IMapPointSeriesSettings, IMapPointSeriesDataItem, IMapPointSeriesPrivate } from "./.internal/charts/map/MapPointSeries";
+export { MapRasterSeries, IMapRasterSeriesSettings, IMapRasterSeriesDataItem, IMapRasterSeriesPrivate, IMapRasterSeriesEvents } from "./.internal/charts/map/MapRasterSeries";
 export { MapPolygon, IMapPolygonSettings, IMapPolygonPrivate } from "./.internal/charts/map/MapPolygon";
 export { MapPolygonSeries, IMapPolygonSeriesSettings, IMapPolygonSeriesDataItem, IMapPolygonSeriesPrivate } from "./.internal/charts/map/MapPolygonSeries";
-export { ClusteredPointSeries, IClusteredPointSeriesSettings, IClusteredPointSeriesDataItem, IClusteredPointSeriesPrivate } from "./.internal/charts/map/ClusteredPointSeries";
+export { ClusteredPointSeries, IClusteredPointSeriesSettings, IClusteredPointSeriesDataItem, IClusteredPointSeriesPrivate, IClusteredDataItem } from "./.internal/charts/map/ClusteredPointSeries";
 export { MapSankeyNodes, IMapSankeyNodesSettings, IMapSankeyNodesDataItem, IMapSankeyNodesPrivate, IMapSankeyNodesEvents } from "./.internal/charts/map/MapSankeyNodes";
 export { MapSankeySeries, IMapSankeySeriesSettings, IMapSankeySeriesDataItem, IMapSankeySeriesPrivate, IBezierSegment } from "./.internal/charts/map/MapSankeySeries";
 export { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesEvents, IMapSeriesPrivate } from "./.internal/charts/map/MapSeries";
+export { NightSeries, INightSeriesSettings, INightSeriesDataItem, INightSeriesPrivate } from "./.internal/charts/map/NightSeries";
+export { ISunSettings } from "./.internal/charts/map/MapSun";
+export { PixelMapSeries, IPixelMapSeriesSettings, IPixelMapSeriesDataItem, IPixelMapSeriesPrivate } from "./.internal/charts/map/PixelMapSeries";
 export { ZoomControl, IZoomControlSettings, IZoomControlPrivate } from "./.internal/charts/map/ZoomControl";
-export { getGeoRectangle, getGeoCircle, normalizeGeoPoint, getGeoCentroid, getGeoBounds, getGeoArea } from "./.internal/charts/map/MapUtils";
+export { getGeoRectangle, getGeoCircle, normalizeGeoPoint, getGeoCentroid, getGeoBounds, getGeoArea, getSunPosition } from "./.internal/charts/map/MapUtils";
 
 import { geoMercator as d3_geoMercator, geoOrthographic as d3_geoOrthographic, geoEquirectangular as d3_geoEquirectangular, geoAlbersUsa as d3_geoAlbersUsa, geoEqualEarth as d3_geoEqualEarth, geoNaturalEarth1 as d3_geoNaturalEarth1 } from "d3-geo";
 import { registerProjection } from "./.internal/charts/map/MapChart";

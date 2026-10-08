@@ -1,0 +1,40 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100,
+    "projectionName": "geoEqualEarth"
+  },
+  "properties": {
+    "series": ["#series-0"]
+  },
+  "children": [
+    {
+      "type": "Label",
+      "settings": {
+        "text": "Imagery: NASA Earth Observatory",
+        "fontSize": 12,
+        "x": { "type": "Percent", "value": 100 },
+        "centerX": { "type": "Percent", "value": 100 },
+        "y": { "type": "Percent", "value": 100 },
+        "centerY": { "type": "Percent", "value": 100 }
+      }
+    }
+  ],
+  "refs": [
+    {
+      "data-0": []
+    },
+    {
+      "series-0": {
+        "type": "MapRasterSeries",
+        "settings": {
+          "src": "https://cdn.amcharts.com/lib/5/geodata/images/earthDay2048.jpg",
+          "nightSrc": "https://cdn.amcharts.com/lib/5/geodata/images/earthNight2048.jpg",
+          "sunDate": "now"
+        }
+      }
+    }
+  ]
+}

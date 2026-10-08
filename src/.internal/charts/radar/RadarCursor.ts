@@ -14,12 +14,15 @@ import * as $utils from "../../core/util/Utils";
 export interface IRadarCursorSettings extends IXYCursorSettings {
 
 	/**
-	 * Cursor's inner radius.
+	 * Inner radius of the area the cursor works in, in pixels or as a percent
+	 * of the chart's radius. A negative value is measured in from the chart's
+	 * radius. If not set, the chart's `innerRadius` is used.
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Cursor's inner radius.
+	 * Outer radius of the area the cursor works in, in pixels or as a percent
+	 * of the chart's radius.
 	 */
 	radius?: number | Percent;
 
@@ -27,12 +30,14 @@ export interface IRadarCursorSettings extends IXYCursorSettings {
 	//yAxis?: Axis<AxisRendererRadial>;
 
 	/**
-	 * Cursor's position angle in degrees.
+	 * Angle in degrees where the area the cursor works in starts. If not set,
+	 * the chart's `startAngle` is used.
 	 */
 	startAngle?: number;
 
 	/**
-	 * Cursor's selection end angle in degrees.
+	 * Angle in degrees where the area the cursor works in ends. If not set,
+	 * the chart's `endAngle` is used.
 	 */
 	endAngle?: number;
 
@@ -66,7 +71,8 @@ export interface IRadarCursorEvents extends IXYCursorEvents {
 }
 
 /**
- * Creates a cursor for a [[RadarChart]].
+ * Cursor for a [[RadarChart]]: a line out from the center and an arc around
+ * it that follow the pointer and show the axis and series tooltips.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor} for more info
  */
@@ -79,7 +85,7 @@ export class RadarCursor extends XYCursor {
 	declare public _events: IRadarCursorEvents;
 
 	/**
-	 * A chart cursor is attached to.
+	 * The chart the cursor belongs to.
 	 */
 	declare public chart: RadarChart | undefined;
 

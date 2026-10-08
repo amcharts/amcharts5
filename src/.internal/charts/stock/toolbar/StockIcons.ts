@@ -5,7 +5,7 @@ export interface StockIcon {
 }
 
 /**
- * A collection of icons used in [[StockChart]].
+ * The icons of the [[StockChart]] toolbar controls.
  */
 export class StockIcons {
 	public static icons: { [index: string]: StockIcon } = {
@@ -65,6 +65,13 @@ export class StockIcons {
 		"Measure": { viewbox: "0 0 50 50", path: "M 3 38 L 35 6 L 46 17 L 14 49 L 3 38 M 10 31 L 16 37 M 16 25 L 20 29 M 22 19 L 26 23 M 28 13 L 34 19 M 50 50" }
 	};
 
+	/**
+	 * Returns an icon as a new SVG element, or the `"Default"` icon if there
+	 * is none with this name.
+	 *
+	 * @param   id  Icon name, such as `"Indicator"`
+	 * @return      SVG element
+	 */
 	public static getIcon(id: string): SVGElement {
 		const icons: any = StockIcons.icons;
 		const icon: any = icons[id] || icons["Default"];

@@ -2,11 +2,9 @@ import { FrozenTheme } from "./FrozenTheme";
 import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
 
 /**
- * "Frozen Dark" — the icy `Frozen` palette on a dark ground. Its pastels are
- * already bright, so the palette comes through essentially unchanged; only a
- * neutral dark set of interface colors is applied.
- *
- * This is a standalone theme; it does not modify the built-in `Frozen` theme.
+ * "Frozen Dark": the icy `Frozen` palette on a dark background, with neutral
+ * dark interface colors. Its darkest colors, the deep violet and purple, are
+ * lightened to show on the background. Use it in place of `Frozen`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

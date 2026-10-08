@@ -14,17 +14,21 @@ export interface IFlowLinkSettings extends IGraphicsSettings {
 	source?: DataItem<IFlowNodesDataItem>;
 
 	/**
-	 * Source node data item.
+	 * Target node data item.
 	 */
 	target?: DataItem<IFlowNodesDataItem>;
 
 	/**
-	 * Type of fill to use for links.
+	 * How the link is filled: `"solid"` with its own `fill`, `"source"` or
+	 * `"target"` with that node's color, `"gradient"` from the source color to
+	 * the target color, or `"none"`.
 	 */
 	fillStyle?: "solid" | "source" | "target" | "gradient" | "none";
 
 	/**
-	 * Type of outline to use for links.
+	 * How the link's outline is colored: `"solid"` with its own `stroke`,
+	 * `"source"` or `"target"` with that node's color, `"gradient"` from the
+	 * source color to the target color, or `"none"`.
 	 */
 	strokeStyle?: "solid" | "source" | "target" | "gradient" | "none";
 
@@ -34,7 +38,7 @@ export interface IFlowLinkPrivate extends IGraphicsPrivate {
 }
 
 /**
- * A base class for a flow link.
+ * Base class for the links of flow series.
  */
 export abstract class FlowLink extends Graphics {
 

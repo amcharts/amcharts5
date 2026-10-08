@@ -2,6 +2,8 @@ import type { DataItem } from "../../core/render/Component";
 import type { Animation } from "../../core/util/Entity";
 import type { IPoint } from "../../core/util/IPoint";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
+import type { IDisposer } from "../../core/util/Disposer";
+import type { MapChart } from "./MapChart";
 
 import { MapSeries, IMapSeriesSettings, IMapSeriesDataItem, IMapSeriesPrivate } from "./MapSeries";
 import { MapPolygon } from "./MapPolygon";
@@ -19,7 +21,7 @@ export interface IMapPolygonSeriesPrivate extends IMapSeriesPrivate {
 export interface IMapPolygonSeriesDataItem extends IMapSeriesDataItem {
 
 	/**
-	 * Related [[MapPolygon]] object.
+	 * The polygon that shows the data item.
 	 */
 	mapPolygon: MapPolygon;
 
@@ -32,20 +34,33 @@ export interface IMapPolygonSeriesDataItem extends IMapSeriesDataItem {
 export interface IMapPolygonSeriesSettings extends IMapSeriesSettings {
 
 	/**
-	 * If set to `true`, the order of coordinates in GeoJSON will be flipped.
-	 *
-	 * Some GeoJSON software produces those in reverse order, so if your custom
-	 * map appears garbled, try this setting.
+	 * Reverses the order of the points in each polygon ring (their winding
+	 * order). Some GeoJSON tools wind polygons the other way, so try this if a
+	 * custom map looks garbled.
 	 *
 	 * @default false
 	 * @since 5.2.42
 	 */
 	reverseGeodata?: boolean;
 
+	/**
+	 * Zooms the map to a polygon when it is clicked, and back to the home
+	 * position when it is clicked again or the map's background is clicked.
+	 *
+	 * On a map panned by rotating (`panX: "rotateX"` or `panY: "rotateY"`),
+	 * the polygon also turns to the middle.
+	 *
+	 * The polygon zoomed to is `active`, so an `"active"` state can mark it.
+	 *
+	 * @default false
+	 * @since 5.21.0
+	 */
+	clickZoom?: boolean;
+
 }
 
 /**
- * Creates a map series for displaying polygons.
+ * A map series of polygons, such as countries or regions.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/} for more info
  * @important
@@ -56,17 +71,29 @@ export class MapPolygonSeries extends MapSeries {
 	 * @ignore
 	 */
 	public makeMapPolygon(dataItem: DataItem<this["_dataItemSettings"]>): MapPolygon {
-		const mapPolygon = this.children.push(this.mapPolygons.make());
+		const mapPolygon = this.children.push(this._newMapPolygon());
 		mapPolygon._setDataItem(dataItem);
 		this._linkSprite(mapPolygon, dataItem);
 		this.mapPolygons.push(mapPolygon);
+		if (this.get("clickZoom")) {
+			this._watchClick(mapPolygon);
+		}
 		return mapPolygon;
 	}
 
+	protected _newMapPolygon(): MapPolygon {
+		return this.mapPolygons.make();
+	}
+
+	// What `clickZoom` listens to, and the chart whose background is among them
+	protected _clickDps: Map<MapPolygon, IDisposer> = new Map();
+	protected _clickBackgroundDp?: IDisposer;
+	protected _clickZoomChart?: MapChart;
+	protected _zoomedDataItem?: DataItem<IMapPolygonSeriesDataItem>;
+
 	/**
-	 * A [[ListTemplate]] of all polygons in series.
-	 *
-	 * `mapPolygons.template` can also be used to configure polygons.
+	 * All polygons of the series. Configure them through
+	 * `mapPolygons.template`.
 	 *
 	 * @default new ListTemplate<MapPolygon>
 	 */
@@ -98,6 +125,10 @@ export class MapPolygonSeries extends MapSeries {
 
 	public _prepareChildren() {
 		super._prepareChildren();
+
+		if (this.isDirty("clickZoom") || this.chart !== this._clickZoomChart) {
+			this._setUpClickZoom();
+		}
 
 		if (this.isDirty("fill")) {
 			this.mapPolygons.template._setC("fill", this.get("fill"));
@@ -150,8 +181,12 @@ export class MapPolygonSeries extends MapSeries {
 		super.disposeDataItem(dataItem);
 		const mapPolygon = dataItem.get("mapPolygon");
 		if (mapPolygon) {
+			this._clickDps.delete(mapPolygon);
 			this.mapPolygons.removeValue(mapPolygon);
 			mapPolygon.dispose();
+		}
+		if (this._zoomedDataItem === dataItem) {
+			this._zoomedDataItem = undefined;
 		}
 		this._removeGeometry(dataItem.get("geometry"));
 	}
@@ -163,7 +198,7 @@ export class MapPolygonSeries extends MapSeries {
 		super._excludeDataItem(dataItem);
 		const mapPolygon = dataItem.get("mapPolygon");
 		if (mapPolygon) {
-			mapPolygon.setPrivate("visible", false);
+			this._setExcluded(mapPolygon, true);
 		}
 	}
 
@@ -174,7 +209,7 @@ export class MapPolygonSeries extends MapSeries {
 		super._unexcludeDataItem(dataItem);
 		const mapPolygon = dataItem.get("mapPolygon");
 		if (mapPolygon) {
-			mapPolygon.setPrivate("visible", true);
+			this._setExcluded(mapPolygon, false);
 		}
 	}
 
@@ -185,7 +220,7 @@ export class MapPolygonSeries extends MapSeries {
 		super._notIncludeDataItem(dataItem);
 		const mapPolygon = dataItem.get("mapPolygon");
 		if (mapPolygon) {
-			mapPolygon.setPrivate("visible", false);
+			this._setExcluded(mapPolygon, true);
 		}
 	}
 
@@ -196,13 +231,15 @@ export class MapPolygonSeries extends MapSeries {
 		super._unNotIncludeDataItem(dataItem);
 		const mapPolygon = dataItem.get("mapPolygon");
 		if (mapPolygon) {
-			mapPolygon.setPrivate("visible", true);
+			this._setExcluded(mapPolygon, false);
 		}
 	}
 
 	/**
-	 * Forces a repaint of the element which relies on data.
+	 * Redraws the series, and the polygon of `dataItem` from its `geometry`,
+	 * such as after the geometry was changed in place.
 	 *
+	 * @param  dataItem  Data item whose polygon to redraw
 	 * @since 5.0.21
 	 */
 	public markDirtyValues(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -215,12 +252,103 @@ export class MapPolygonSeries extends MapSeries {
 		}
 	}
 
+	protected _watchClick(mapPolygon: MapPolygon) {
+		this._clickDps.set(mapPolygon, mapPolygon.events.on("click", () => {
+			this._clickZoomTo(mapPolygon);
+		}));
+	}
+
+	protected _unwatchClicks() {
+		this._clickDps.forEach((disposer) => {
+			disposer.dispose();
+		});
+		this._clickDps.clear();
+
+		if (this._clickBackgroundDp) {
+			this._clickBackgroundDp.dispose();
+			this._clickBackgroundDp = undefined;
+		}
+	}
+
+	// Listens to the polygons there are and to the chart's background, or stops
+	protected _setUpClickZoom() {
+		this._unwatchClicks();
+
+		const chart = this.chart;
+		this._clickZoomChart = chart;
+
+		if (this.get("clickZoom")) {
+			this.mapPolygons.each((mapPolygon) => {
+				this._watchClick(mapPolygon);
+			});
+
+			const background = chart ? chart.chartContainer.get("background") : undefined;
+			if (background) {
+				this._clickBackgroundDp = background.events.on("click", () => {
+					this._clickZoomOut();
+				});
+			}
+		}
+		else {
+			this._markZoomed(undefined);
+		}
+	}
+
 	/**
-	 * Centers and zooms in on the specific polygon.
+	 * @ignore
+	 */
+	public _onGoHome() {
+		this._markZoomed(undefined);
+	}
+
+	protected _dispose() {
+		super._dispose();
+		this._unwatchClicks();
+	}
+
+	protected _clickZoomTo(mapPolygon: MapPolygon) {
+		const chart = this.chart;
+		const dataItem = mapPolygon.dataItem as DataItem<IMapPolygonSeriesDataItem> | undefined;
+		if (chart && dataItem) {
+			if (this._zoomedDataItem === dataItem) {
+				this._clickZoomOut(mapPolygon);
+			}
+			else {
+				this._markZoomed(dataItem, mapPolygon);
+				this.zoomToDataItem(dataItem, chart.get("panX") == "rotateX" || chart.get("panY") == "rotateY");
+			}
+		}
+	}
+
+	protected _clickZoomOut(clicked?: MapPolygon) {
+		const chart = this.chart;
+		if (chart && this._zoomedDataItem) {
+			this._markZoomed(undefined, clicked);
+			chart.goHome();
+		}
+	}
+
+	// `active` follows the polygon zoomed to. A polygon with `toggleKey: "active"`
+	// flips it on its own click, so the clicked one is left to do that
+	protected _markZoomed(dataItem: DataItem<IMapPolygonSeriesDataItem> | undefined, clicked?: MapPolygon) {
+		const previous = this._zoomedDataItem ? this._zoomedDataItem.get("mapPolygon") : undefined;
+		const next = dataItem ? dataItem.get("mapPolygon") : undefined;
+		this._zoomedDataItem = dataItem;
+
+		$array.each([previous, next], (mapPolygon) => {
+			if (mapPolygon && !mapPolygon.isDisposed() && !(mapPolygon === clicked && mapPolygon.get("toggleKey") == "active")) {
+				mapPolygon._setC("active", mapPolygon === next);
+			}
+		});
+	}
+
+	/**
+	 * Zooms the map to fit a polygon, centered.
 	 *
-	 * @param  dataItem  Target data item
+	 * @param  dataItem  Data item of the polygon
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
-	 * @param  rotate If it's true, the map will rotate so that this polygon would be in the center. Mostly usefull with geoOrthographic projection.
+	 * @param  rotate Also rotate the map to bring the polygon's center to the middle, as on a globe
+	 * @return        Zoom level animation
 	 */
 	public zoomToDataItem(dataItem: DataItem<IMapPolygonSeriesDataItem>, rotate?: boolean): Animation<any> | undefined {
 		const polygon = dataItem.get("mapPolygon");
@@ -242,11 +370,11 @@ export class MapPolygonSeries extends MapSeries {
 	}
 
 	/**
-	 * Zooms the map in so that all polygons in the array are visible.
+	 * Zooms the map to fit several polygons.
 	 *
-	 * @param   dataItems  An array of data items to zoom to
-	 * @param   rotate     Rotate the map so it is centered on the selected items
-	 * @return             Animation
+	 * @param   dataItems  Data items of the polygons
+	 * @param   rotate     Also rotate the map to bring the middle of their bounds to the middle of the view
+	 * @return             Zoom level animation
 	 * @since 5.9.0
 	 */
 	public zoomToDataItems(dataItems: Array<DataItem<IMapPolygonSeriesDataItem>>, rotate?: boolean): Animation<any> | undefined {
@@ -301,10 +429,10 @@ export class MapPolygonSeries extends MapSeries {
 	}
 
 	/**
-	 * Returns a [[MapPolygon]] that is under specific X/Y point.
+	 * Returns the polygon of this series drawn at a point, if any.
 	 *
 	 * @since 5.9.8
-	 * @param   point  X/Y
+	 * @param   point  Point in pixels, relative to the root
 	 * @return         Polygon
 	 */
 	public getPolygonByPoint(point: IPoint): MapPolygon | undefined {
@@ -321,7 +449,14 @@ export class MapPolygonSeries extends MapSeries {
 		}
 	}
 
+	/**
+	 * Returns the polygon of this series drawn at a geographic point, if any.
+	 *
+	 * @param   point  Geographic point
+	 * @return         Polygon
+	 */
 	public getPolygonByGeoPoint(point: IGeoPoint): MapPolygon | undefined {
-		return this.getPolygonByPoint(this.chart!.convert(point));
+		const chart = this.chart!;
+		return this.getPolygonByPoint(chart.seriesContainer.toGlobal(chart.convert(point)));
 	}
 }

@@ -1,0 +1,7 @@
+{
+  "title": "Sankey Diagram",
+  "description": "A Sankey diagram: nodes in columns and links whose width shows how much flows between them.",
+  "category": "flow",
+  "tier": "basic",
+  "tags": ["sankey", "flow", "links"]
+}

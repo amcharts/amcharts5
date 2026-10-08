@@ -3,362 +3,375 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5stock from "@amcharts/amcharts5/stock";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
 // Create root element
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-let root = am5.Root.new("chartdiv");
+const root = am5.Root.new("chartdiv");
+
 
 // Set themes
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/concepts/themes/
-root.setThemes([am5themes_Animated.new(root)]);
-
-// Create a stock chart
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
-let stockChart = root.container.children.push(
-  am5stock.StockChart.new(root, {})
-);
+root.setThemes([
+  am5themes_Animated.new(root)
+]);
 
 // Set global number format
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/
 root.numberFormatter.set("numberFormat", "#,###.00");
 
+
+// Create a stock chart
+// https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
+const stockChart = root.container.children.push(am5stock.StockChart.new(root, {}));
+
+
 // Create a main stock panel (chart)
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock-chart/#Adding_panels
-let mainPanel = stockChart.panels.push(
-  am5stock.StockPanel.new(root, {
-    wheelY: "zoomX",
-    panX: true,
-    panY: true
-  })
-);
+const mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
+  wheelY: "zoomX", // the mouse wheel zooms in on the minutes
+  panX: true,      // dragging the plot moves along the minutes...
+  panY: true       // ...and up or down the price scale
+}));
 
-// Create value axis
-// -------------------------------------------------------------------------------
+
+// Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-let valueAxis = mainPanel.yAxes.push(
-  am5xy.ValueAxis.new(root, {
-    renderer: am5xy.AxisRendererY.new(root, {
-      pan: "zoom"
-    }),
-    extraMin: 0.1, // adds some space for for main series
-    tooltip: am5.Tooltip.new(root, {}),
-    numberFormat: "#,###.00",
-    extraTooltipPrecision: 2
-  })
-);
+const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
+  renderer: am5xy.AxisRendererY.new(root, {
+    pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
+  }),
+  tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis...
+  extraTooltipPrecision: 2            // ...with two more decimals than the labels
+}));
 
-let dateAxis = mainPanel.xAxes.push(
-  am5xy.GaplessDateAxis.new(root, {
-    baseInterval: {
-      timeUnit: "minute",
-      count: 1
-    },
-    renderer: am5xy.AxisRendererX.new(root, {
-      minorGridEnabled: true
-    }),
-    tooltip: am5.Tooltip.new(root, {})
-  })
-);
-
-// add range which will show current value
-let currentValueDataItem = valueAxis.createAxisRange(valueAxis.makeDataItem({ value: 0 }));
-let currentLabel = currentValueDataItem.get("label");
-if (currentLabel) {
-  currentLabel.setAll({
-    fill: am5.color(0xffffff),
-    background: am5.Rectangle.new(root, { fill: am5.color(0x000000) })
-  })
-}
-
-let currentGrid = currentValueDataItem.get("grid");
-if (currentGrid) {
-  currentGrid.setAll({ strokeOpacity: 0.5, strokeDasharray: [2, 5] });
-}
+const dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {
+  baseInterval: { // one candle per minute
+    timeUnit: "minute",
+    count: 1
+  },
+  renderer: am5xy.AxisRendererX.new(root, {
+    minorGridEnabled: true // fainter grid lines between the labelled ones
+  }),
+  tooltip: am5.Tooltip.new(root, {}) // shows the cursor's time on the axis
+}));
 
 
 // Add series
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-let valueSeries = mainPanel.series.push(
-  am5xy.CandlestickSeries.new(root, {
-    name: "AMCH",
-    turboMode: true,
-    clustered: false,
-    valueXField: "Date",
-    valueYField: "Close",
-    highValueYField: "High",
-    lowValueYField: "Low",
-    openValueYField: "Open",
-    calculateAggregates: true,
-    xAxis: dateAxis,
-    yAxis: valueAxis,
-    legendValueText:
-      "open: [bold]{openValueY}[/] high: [bold]{highValueY}[/] low: [bold]{lowValueY}[/] close: [bold]{valueY}[/]",
-    legendRangeValueText: ""
-  })
-);
+const valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
+  name: "AMCH",
+  valueXField: "Date",
+  valueYField: "Close",
+  highValueYField: "High",
+  lowValueYField: "Low",
+  openValueYField: "Open",
+  xAxis: dateAxis,
+  yAxis: valueAxis,
+  // the hovered candle's prices in the legend
+  legendValueText: "open: [bold]{openValueY}[/] high: [bold]{highValueY}[/] low: [bold]{lowValueY}[/] close: [bold]{valueY}[/]",
+  legendRangeValueText: "" // no values while the pointer is off the plot
+}));
+
 
 // Set main value series
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
 stockChart.set("stockSeries", valueSeries);
 
-// Add a stock legend
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/stock-chart/stock-legend/
-let valueLegend = mainPanel.plotContainer.children.push(
-  am5stock.StockLegend.new(root, {
-    stockChart: stockChart
-  })
-);
 
-// Set main series
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
+// Add a stock legend
+// https://www.amcharts.com/docs/v5/charts/stock-chart/stock-legend/
+// in the plot container, so it sits over the top left of the plot
+const valueLegend = mainPanel.plotContainer.children.push(am5stock.StockLegend.new(root, {
+  stockChart: stockChart
+}));
+
 valueLegend.data.setAll([valueSeries]);
 
-// Add cursor(s)
-// -------------------------------------------------------------------------------
+
+// Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-mainPanel.set(
-  "cursor",
-  am5xy.XYCursor.new(root, {
-    yAxis: valueAxis,
-    xAxis: dateAxis,
-    snapToSeries: [valueSeries],
-    snapToSeriesBy: "y!"
-  })
-);
+mainPanel.set("cursor", am5xy.XYCursor.new(root, {
+  yAxis: valueAxis,
+  xAxis: dateAxis,
+  snapToSeries: [valueSeries], // the horizontal line jumps to the close of the candle...
+  snapToSeriesBy: "y!"         // ...at the minute under the pointer
+}));
 
-// Add scrollbar
-// -------------------------------------------------------------------------------
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-let scrollbar = mainPanel.set(
-  "scrollbarX",
-  am5xy.XYChartScrollbar.new(root, {
-    orientation: "horizontal",
-    height: 50
-  })
-);
-stockChart.toolsContainer.children.push(scrollbar);
 
-let sbDateAxis = scrollbar.chart.xAxes.push(
-  am5xy.GaplessDateAxis.new(root, {
-    baseInterval: {
-      timeUnit: "minute",
-      count: 1
-    },
-    renderer: am5xy.AxisRendererX.new(root, {})
-  })
-);
+// Set data: 60 candles, one per minute
+const data = [
+  { Date: 1736173800000, Open: 1200, High: 1203.46, Low: 1197.08, Close: 1202.94 },
+  { Date: 1736173860000, Open: 1202.94, High: 1203.16, Low: 1192.44, Close: 1192.44 },
+  { Date: 1736173920000, Open: 1192.44, High: 1201.14, Low: 1191.79, Close: 1201.14 },
+  { Date: 1736173980000, Open: 1201.14, High: 1201.14, Low: 1191.12, Close: 1191.12 },
+  { Date: 1736174040000, Open: 1191.12, High: 1191.54, Low: 1184.79, Close: 1184.79 },
+  { Date: 1736174100000, Open: 1184.79, High: 1187.65, Low: 1183.76, Close: 1185.81 },
+  { Date: 1736174160000, Open: 1185.81, High: 1186.22, Low: 1178.6, Close: 1178.6 },
+  { Date: 1736174220000, Open: 1178.6, High: 1186.49, Low: 1176.8, Close: 1185.67 },
+  { Date: 1736174280000, Open: 1185.67, High: 1194.28, Low: 1185.67, Close: 1194.28 },
+  { Date: 1736174340000, Open: 1194.28, High: 1196.32, Low: 1189.19, Close: 1190.12 },
+  { Date: 1736174400000, Open: 1190.12, High: 1198.44, Low: 1188.7, Close: 1192.88 },
+  { Date: 1736174460000, Open: 1192.88, High: 1200.61, Low: 1190.9, Close: 1199.84 },
+  { Date: 1736174520000, Open: 1199.84, High: 1199.84, Low: 1194.35, Close: 1197.06 },
+  { Date: 1736174580000, Open: 1197.06, High: 1198.72, Low: 1189.68, Close: 1191.5 },
+  { Date: 1736174640000, Open: 1191.5, High: 1195.55, Low: 1190.68, Close: 1191.49 },
+  { Date: 1736174700000, Open: 1191.49, High: 1194.48, Low: 1187.81, Close: 1187.81 },
+  { Date: 1736174760000, Open: 1187.81, High: 1187.81, Low: 1182.6, Close: 1186.33 },
+  { Date: 1736174820000, Open: 1186.33, High: 1186.33, Low: 1177.97, Close: 1179.8 },
+  { Date: 1736174880000, Open: 1179.8, High: 1181.07, Low: 1172.38, Close: 1172.38 },
+  { Date: 1736174940000, Open: 1172.38, High: 1173.79, Low: 1168.36, Close: 1170.08 },
+  { Date: 1736175000000, Open: 1170.08, High: 1174.66, Low: 1168.71, Close: 1174.66 },
+  { Date: 1736175060000, Open: 1174.66, High: 1178.42, Low: 1173.04, Close: 1176.9 },
+  { Date: 1736175120000, Open: 1176.9, High: 1176.9, Low: 1170.44, Close: 1171.66 },
+  { Date: 1736175180000, Open: 1171.66, High: 1171.66, Low: 1159.67, Close: 1167.69 },
+  { Date: 1736175240000, Open: 1167.69, High: 1168.12, Low: 1164.32, Close: 1166.78 },
+  { Date: 1736175300000, Open: 1166.78, High: 1173.11, Low: 1166.32, Close: 1168.92 },
+  { Date: 1736175360000, Open: 1168.92, High: 1173.1, Low: 1165.3, Close: 1165.92 },
+  { Date: 1736175420000, Open: 1165.92, High: 1169.31, Low: 1162.25, Close: 1163.07 },
+  { Date: 1736175480000, Open: 1163.07, High: 1165.3, Low: 1161.65, Close: 1162.6 },
+  { Date: 1736175540000, Open: 1162.6, High: 1166.06, Low: 1161.76, Close: 1165.11 },
+  { Date: 1736175600000, Open: 1165.11, High: 1167.38, Low: 1163.78, Close: 1163.78 },
+  { Date: 1736175660000, Open: 1163.78, High: 1164.07, Low: 1158, Close: 1158 },
+  { Date: 1736175720000, Open: 1158, High: 1162.19, Low: 1158, Close: 1158.95 },
+  { Date: 1736175780000, Open: 1158.95, High: 1159.61, Low: 1154.92, Close: 1159.05 },
+  { Date: 1736175840000, Open: 1159.05, High: 1162.69, Low: 1157.36, Close: 1161.47 },
+  { Date: 1736175900000, Open: 1161.47, High: 1162.39, Low: 1155.42, Close: 1157.74 },
+  { Date: 1736175960000, Open: 1157.74, High: 1157.74, Low: 1153.31, Close: 1154.03 },
+  { Date: 1736176020000, Open: 1154.03, High: 1154.25, Low: 1148.35, Close: 1152.6 },
+  { Date: 1736176080000, Open: 1152.6, High: 1156.46, Low: 1151.49, Close: 1153.55 },
+  { Date: 1736176140000, Open: 1153.55, High: 1154.98, Low: 1140.7, Close: 1141.96 },
+  { Date: 1736176200000, Open: 1141.96, High: 1144.25, Low: 1134.8, Close: 1134.8 },
+  { Date: 1736176260000, Open: 1134.8, High: 1146.09, Low: 1134.44, Close: 1146.09 },
+  { Date: 1736176320000, Open: 1146.09, High: 1147.4, Low: 1130.41, Close: 1130.69 },
+  { Date: 1736176380000, Open: 1130.69, High: 1133.69, Low: 1129.29, Close: 1132.44 },
+  { Date: 1736176440000, Open: 1132.44, High: 1133.58, Low: 1128.31, Close: 1129.35 },
+  { Date: 1736176500000, Open: 1129.35, High: 1135.03, Low: 1129.06, Close: 1134.73 },
+  { Date: 1736176560000, Open: 1134.73, High: 1140.71, Low: 1134.73, Close: 1140.71 },
+  { Date: 1736176620000, Open: 1140.71, High: 1143.03, Low: 1138.83, Close: 1141.63 },
+  { Date: 1736176680000, Open: 1141.63, High: 1141.63, Low: 1135.02, Close: 1135.02 },
+  { Date: 1736176740000, Open: 1135.02, High: 1135.16, Low: 1129.66, Close: 1129.66 },
+  { Date: 1736176800000, Open: 1129.66, High: 1131.73, Low: 1122.89, Close: 1125.39 },
+  { Date: 1736176860000, Open: 1125.39, High: 1125.39, Low: 1119.34, Close: 1119.34 },
+  { Date: 1736176920000, Open: 1119.34, High: 1126.07, Low: 1117.81, Close: 1125.62 },
+  { Date: 1736176980000, Open: 1125.62, High: 1132.83, Low: 1125.62, Close: 1132.83 },
+  { Date: 1736177040000, Open: 1132.83, High: 1133.91, Low: 1128.11, Close: 1130.77 },
+  { Date: 1736177100000, Open: 1130.77, High: 1135.19, Low: 1130.02, Close: 1131.76 },
+  { Date: 1736177160000, Open: 1131.76, High: 1133.4, Low: 1124.67, Close: 1132.92 },
+  { Date: 1736177220000, Open: 1132.92, High: 1134.9, Low: 1126.52, Close: 1126.52 },
+  { Date: 1736177280000, Open: 1126.52, High: 1128.29, Low: 1125.21, Close: 1128.29 },
+  { Date: 1736177340000, Open: 1128.29, High: 1128.44, Low: 1122.95, Close: 1124.51 }
+];
 
-let sbValueAxis = scrollbar.chart.yAxes.push(
-  am5xy.ValueAxis.new(root, {
-    renderer: am5xy.AxisRendererY.new(root, {})
-  })
-);
-
-let sbSeries = scrollbar.chart.series.push(
-  am5xy.LineSeries.new(root, {
-    valueYField: "Close",
-    valueXField: "Date",
-    xAxis: sbDateAxis,
-    yAxis: sbValueAxis
-  })
-);
-
-sbSeries.fills.template.setAll({
-  visible: true,
-  fillOpacity: 0.3
+// The sample data is fixed: move it in time, so that its last candle is the current minute
+const minute = 60000;
+const shift = Math.floor(Date.now() / minute) * minute - data[data.length - 1].Date;
+am5.array.each(data, (item) => {
+  item.Date += shift;
 });
 
+valueSeries.data.setAll(data);
+
+
+// Add an axis range that shows the current value
+// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/
+const currentValueDataItem = valueAxis.createAxisRange(valueAxis.makeDataItem({
+  value: data[data.length - 1].Close
+}));
+
+// the range's label on the axis: contrasting text on a box that showCurrentValue() colors
+const currentLabel = currentValueDataItem.get("label");
+if (currentLabel) {
+  currentLabel.setAll({
+    fill: root.interfaceColors.get("alternativeText"),
+    background: am5.Rectangle.new(root, {})
+  });
+}
+
+// and its grid line across the plot, dashed
+const currentGrid = currentValueDataItem.get("grid");
+if (currentGrid) {
+  currentGrid.setAll({
+    strokeOpacity: 0.5,
+    strokeDasharray: [2, 5] // 2 px dashes, 5 px gaps
+  });
+}
+
+
+// Update data every second
+// https://www.amcharts.com/docs/v5/concepts/data/
+let candle = data[data.length - 1];
+
+setInterval(() => {
+  const date = Date.now();
+
+  // A random step from the last price
+  const value = am5.math.round(candle.Close + (Math.random() - 0.5) * 4, 2);
+
+  // the main series, which the toolbar's series type switcher may have replaced
+  const series = stockChart.get("stockSeries");
+  if (!series) {
+    return;
+  }
+
+  if (am5.time.checkChange(date, candle.Date, "minute")) {
+    // A new minute has started: add a candle
+    candle = {
+      Date: date,
+      Open: value,
+      High: value,
+      Low: value,
+      Close: value
+    };
+    series.data.push(candle);
+  }
+  else {
+    // Update the last candle
+    candle = {
+      Date: candle.Date,
+      Open: candle.Open,
+      High: Math.max(candle.High, value),
+      Low: Math.min(candle.Low, value),
+      Close: value
+    };
+    series.data.setIndex(series.data.length - 1, candle); // replaces the last row
+  }
+
+  showCurrentValue();
+}, 1000);
+
+// Moves the range to the last price and colors its label by the direction of the candle
+function showCurrentValue() {
+  currentValueDataItem.animate({
+    key: "value",
+    to: candle.Close,
+    duration: 500,                       // slides to the new price in half a second...
+    easing: am5.ease.out(am5.ease.cubic) // ...slowing down as it arrives
+  });
+
+  if (currentLabel) {
+    currentLabel.set("text", root.numberFormatter.format(candle.Close));
+
+    const background = currentLabel.get("background");
+    if (background) {
+      background.set("fill", root.interfaceColors.get(candle.Close < candle.Open ? "negative" : "positive"));
+    }
+  }
+}
+
+showCurrentValue();
+
+
 // Set up series type switcher
-// -------------------------------------------------------------------------------
 // https://www.amcharts.com/docs/v5/charts/stock/toolbar/series-type-control/
-let seriesSwitcher = am5stock.SeriesTypeControl.new(root, {
+const seriesSwitcher = am5stock.SeriesTypeControl.new(root, {
   stockChart: stockChart
 });
 
-seriesSwitcher.events.on("selected", function(ev) {
-  setSeriesType(ev.item.id);
+// a pick from the list (line, candles, hollow candles or OHLC) swaps the main series
+seriesSwitcher.events.on("selected", (ev) => {
+  if (!am5.type.isString(ev.item)) {
+    setSeriesType(ev.item.id);
+  }
 });
 
-function getNewSettings(series) {
-  let newSettings = [];
-  am5.array.each(
-    [
-      "name",
-      "valueYField",
-      "highValueYField",
-      "lowValueYField",
-      "openValueYField",
-      "calculateAggregates",
-      "valueXField",
-      "xAxis",
-      "yAxis",
-      "legendValueText",
-      "legendRangeValueText", 
-      "stroke",
-      "fill"
-    ],
-    function(setting) {
-      newSettings[setting] = series.get(setting);
+// Replaces the main series with one of another type
+function setSeriesType(seriesType: string) {
+  const currentSeries = stockChart.get("stockSeries");
+  if (!currentSeries) {
+    return;
+  }
+
+  // The new series takes over the settings of the current one
+  const settings = {
+    name: currentSeries.get("name"),
+    clustered: false,
+    valueXField: currentSeries.get("valueXField"),
+    valueYField: currentSeries.get("valueYField"),
+    highValueYField: currentSeries.get("highValueYField"),
+    lowValueYField: currentSeries.get("lowValueYField"),
+    openValueYField: currentSeries.get("openValueYField"),
+    calculateAggregates: currentSeries.get("calculateAggregates"),
+    xAxis: currentSeries.get("xAxis"),
+    yAxis: currentSeries.get("yAxis"),
+    legendValueText: currentSeries.get("legendValueText"),
+    legendRangeValueText: currentSeries.get("legendRangeValueText"),
+    stroke: currentSeries.get("stroke"),
+    fill: currentSeries.get("fill")
+  };
+
+  // Create the new series
+  let series: am5xy.XYSeries;
+  if (seriesType == "line") {
+    series = am5xy.LineSeries.new(root, settings);
+  }
+  else if (seriesType == "ohlc") {
+    series = am5xy.OHLCSeries.new(root, settings);
+  }
+  else {
+    const candlesticks = am5xy.CandlestickSeries.new(root, settings);
+    if (seriesType == "procandlestick") {
+      // hollow when the close is above the open, colored by the change from the day before
+      candlesticks.columns.template.set("themeTags", ["autocolor", "pro"]);
     }
-  );
-  return newSettings;
-}
+    series = candlesticks;
+  }
 
-function setSeriesType(seriesType) {
-  // Get current series and its settings
-  let currentSeries = stockChart.get("stockSeries");
-  let newSettings = getNewSettings(currentSeries);
-
-  // Remove previous series
-  let data = currentSeries.data.values;
+  // Put it in place of the current one
+  const seriesData = currentSeries.data.values;
   mainPanel.series.removeValue(currentSeries);
+  mainPanel.series.push(series);
+  series.data.setAll(seriesData);
+  stockChart.set("stockSeries", series);
 
-  // Create new series
-  let series;
-  switch (seriesType) {
-    case "line":
-      series = mainPanel.series.push(am5xy.LineSeries.new(root, newSettings));
-      break;
-    case "candlestick":
-    case "procandlestick":
-      newSettings.clustered = false;
-      series = mainPanel.series.push(
-        am5xy.CandlestickSeries.new(root, newSettings)
-      );
-      if (seriesType == "procandlestick") {
-        series.columns.template.get("themeTags").push("pro");
-      }
-      break;
-    case "ohlc":
-      newSettings.clustered = false;
-      series = mainPanel.series.push(am5xy.OHLCSeries.new(root, newSettings));
-      break;
-  }
+  valueLegend.data.removeValue(currentSeries);
+  valueLegend.data.insertIndex(0, series);
 
-  // Set new series as stockSeries
-  if (series) {
-    valueLegend.data.removeValue(currentSeries);
-    series.data.setAll(data);
-    stockChart.set("stockSeries", series);
-    let cursor = mainPanel.get("cursor");
-    if (cursor) {
-      cursor.set("snapToSeries", [series]);
-    }
-    valueLegend.data.insertIndex(0, series);
+  // the cursor snaps to the new series
+  const cursor = mainPanel.get("cursor");
+  if (cursor) {
+    cursor.set("snapToSeries", [series]);
   }
 }
 
-// Data generator
-let firstDate = new Date();
-let lastDate;
-let value = 1200;
 
-// data
-function generateChartData() {
-  let chartData = [];
+// Add stock toolbar
+// https://www.amcharts.com/docs/v5/charts/stock/toolbar/
+am5stock.StockToolbar.new(root, {
+  container: document.getElementById("chartcontrols")!, // the div above the chart that holds the toolbar
+  stockChart: stockChart,
+  controls: [
+    // a searchable list of indicators, such as moving averages or RSI
+    am5stock.IndicatorControl.new(root, {
+      stockChart: stockChart,
+      legend: valueLegend // indicators drawn on the price panel get an entry in this legend
+    }),
+    // from and to dates to zoom to
+    am5stock.DateRangeSelector.new(root, {
+      stockChart: stockChart
+    }),
+    // buttons for 5 days, 1 month and so on, up to all the data
+    am5stock.PeriodSelector.new(root, {
+      stockChart: stockChart
+    }),
+    seriesSwitcher,
+    // tools for drawing lines, shapes and labels on the chart
+    am5stock.DrawingControl.new(root, {
+      stockChart: stockChart
+    }),
+    // removes all drawings and indicators
+    am5stock.ResetControl.new(root, {
+      stockChart: stockChart
+    }),
+    // the price scale (regular, percent change or logarithmic) and saving drawings
+    am5stock.SettingsControl.new(root, {
+      stockChart: stockChart
+    })
+  ]
+});
 
-  for (let i = 0; i < 50; i++) {
-    let newDate = new Date(firstDate);
-    newDate.setMinutes(newDate.getMinutes() - i);
 
-    value += Math.round((Math.random() < 0.49 ? 1 : -1) * Math.random() * 10);
 
-    let open = value + Math.round(Math.random() * 16 - 8);
-    let low = Math.min(value, open) - Math.round(Math.random() * 5);
-    let high = Math.max(value, open) + Math.round(Math.random() * 5);
-
-    chartData.unshift({
-      Date: newDate.getTime(),
-      Close: value,
-      Open: open,
-      Low: low,
-      High: high
-    });
-
-    lastDate = newDate;
-  }
-  return chartData;
-}
-
-let data = generateChartData();
-
-// set data to all series
-valueSeries.data.setAll(data);
-sbSeries.data.setAll(data);
-
-// update data
-let previousDate;
-
-setInterval(function() {
-  let date = Date.now();
-  let lastDataObject = valueSeries.data.getIndex(valueSeries.data.length - 1);
-  if (lastDataObject) {
-    let previousDate = lastDataObject.Date;
-    let previousValue = lastDataObject.Close;
-
-    value = am5.math.round(previousValue + (Math.random() < 0.5 ? 1 : -1) * Math.random() * 2, 2);
-
-    let high = lastDataObject.High;
-    let low = lastDataObject.Low;
-    let open = lastDataObject.Open;
-
-    if (am5.time.checkChange(date, previousDate, "minute")) {
-      open = value;
-      high = value;
-      low = value;
-
-      let dObj1 = {
-        Date: date,
-        Close: value,
-        Open: value,
-        Low: value,
-        High: value
-      };
-
-      valueSeries.data.push(dObj1);
-      sbSeries.data.push(dObj1);
-      previousDate = date;
-    } else {
-      if (value > high) {
-        high = value;
-      }
-
-      if (value < low) {
-        low = value;
-      }
-
-      let dObj2 = {
-        Date: date,
-        Close: value,
-        Open: open,
-        Low: low,
-        High: high
-      };
-
-      valueSeries.data.setIndex(valueSeries.data.length - 1, dObj2);
-      sbSeries.data.setIndex(sbSeries.data.length - 1, dObj2);
-    }
-    // update current value
-    if (currentLabel) {
-      currentValueDataItem.animate({ key: "value", to: value, duration: 500, easing: am5.ease.out(am5.ease.cubic) });
-      currentLabel.set("text", stockChart.getNumberFormatter().format(value));
-      let bg = currentLabel.get("background");
-      if (bg) {
-          if(value < open){      
-            bg.set("fill", root.interfaceColors.get("negative"));
-          }
-          else{
-            bg.set("fill", root.interfaceColors.get("positive"));
-          }
-      }
-    }
-  }
-}, 1000);
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+valueSeries.appear(1000);
+stockChart.appear(1000, 100);

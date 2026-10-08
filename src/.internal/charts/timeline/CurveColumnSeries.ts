@@ -26,15 +26,15 @@ export interface ICurveColumnSeriesPrivate extends IBaseColumnSeriesPrivate {
 export interface ICurveColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
 
 	/**
-	 * List of columns in a range.
+	 * The columns of the axis range.
 	 */
 	columns: ListTemplate<Polygon>
 
 }
 
 /**
- * A column series for use in a [[CurveChart]], [[SerpetineChart]], or
- * a [[SpiralChart]].
+ * A column series for a [[CurveChart]], [[SerpentineChart]] or
+ * [[SpiralChart]]. Its columns bend along the curve.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0
@@ -58,12 +58,8 @@ export class CurveColumnSeries extends BaseColumnSeries {
 	}
 
 	/**
-	 * A [[TemplateList]] of all columns in series.
-	 *
-	 * `columns.template` can be used to set default settings for all columns,
-	 * or to change on existing ones.
-	 *
-	 * @default new ListTemplate<Polygon>
+	 * The columns, drawn as polygons that follow the curve. Configure them
+	 * through `columns.template`.
 	 */
 	public readonly columns: ListTemplate<Polygon> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -77,7 +73,7 @@ export class CurveColumnSeries extends BaseColumnSeries {
 	public static classNames: Array<string> = BaseColumnSeries.classNames.concat([CurveColumnSeries.className]);
 
 	/**
-	 * A chart series belongs to.
+	 * The chart the series belongs to.
 	 */
 	declare public chart: CurveChart | undefined;
 
@@ -85,7 +81,7 @@ export class CurveColumnSeries extends BaseColumnSeries {
 		super._afterNew();
 		this._setC("maskContent", false);
 		this.bulletsContainer._setC("maskContent", false);
-		this.bulletsContainer.set("mask", Graphics.new(this._root, {}));
+		this.bulletsContainer._setC("mask", Graphics.new(this._root, {}));
 	}
 
 	/**

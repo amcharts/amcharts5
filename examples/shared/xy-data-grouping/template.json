@@ -1,0 +1,7 @@
+{
+  "title": "Data Grouping on a Date Axis",
+  "description": "A line of 50,000 hourly values that stays responsive because the date axis groups them into longer periods with groupData.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "date axis", "data grouping", "large data", "zoom"]
+}

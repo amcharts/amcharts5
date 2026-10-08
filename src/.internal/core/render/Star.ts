@@ -5,17 +5,17 @@ import * as $utils from "../../core/util/Utils";
 export interface IStarSettings extends IGraphicsSettings {
 
 	/**
-	 * Star's radius in pixels.
+	 * Radius in pixels to the tips of the spikes.
 	 */
 	radius?: number;
 
 	/**
-	 * Star's inner radius in pixels.
+	 * Radius between the spikes, in pixels or as a percent of `radius`.
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Number of spikes
+	 * Number of spikes.
 	 */
 	spikes?: number;
 
@@ -25,7 +25,7 @@ export interface IStarPrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a Star.
+ * Draws a star centered on its `x` and `y`, with a spike pointing up.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  * @important

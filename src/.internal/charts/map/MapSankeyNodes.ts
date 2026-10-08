@@ -56,7 +56,7 @@ export interface IMapSankeyNodesDataItem extends ISeriesDataItem {
 	latitude: number;
 
 	/**
-	 * Related [[MapPolygon]] object (circle or bar shape).
+	 * The polygon that shows the node: a circle or a bar.
 	 */
 	mapPolygon: MapPolygon;
 }
@@ -64,13 +64,13 @@ export interface IMapSankeyNodesDataItem extends ISeriesDataItem {
 export interface IMapSankeyNodesSettings extends ISeriesSettings {
 
 	/**
-	 * A field in data that holds name for the node.
+	 * A field in data that holds the node's name.
 	 * @default "name"
 	 */
 	nameField?: string;
 
 	/**
-	 * A field in data that holds color used for node fill.
+	 * A field in data that holds the node's fill color.
 	 * @default "fill"
 	 */
 	fillField?: string;
@@ -88,7 +88,7 @@ export interface IMapSankeyNodesSettings extends ISeriesSettings {
 	latitudeField?: string;
 
 	/**
-	 * A [[ColorSet]] that series will use to apply to its nodes.
+	 * Colors for nodes that have no `fill` in data, one after another.
 	 */
 	colors?: ColorSet;
 }
@@ -100,7 +100,7 @@ export interface IMapSankeyNodesEvents extends ISeriesEvents {
 }
 
 /**
- * Holds instances of nodes for a [[MapSankeySeries]].
+ * The nodes of a [[MapSankeySeries]], available as its `nodes`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/} for more info
  * @since 5.17.0
@@ -117,7 +117,7 @@ export class MapSankeyNodes extends Series {
 	declare public _events: IMapSankeyNodesEvents;
 
 	/**
-	 * Related [[MapSankeySeries]].
+	 * The series the nodes belong to.
 	 */
 	public flow: MapSankeySeries | undefined;
 
@@ -129,9 +129,7 @@ export class MapSankeyNodes extends Series {
 	public _userDataSet = false;
 
 	/**
-	 * A [[ListTemplate]] of all node polygons.
-	 *
-	 * `mapPolygons.template` can be used to configure node appearance.
+	 * Polygons of all nodes. Style them through `mapPolygons.template`.
 	 *
 	 * @default new ListTemplate<MapPolygon>
 	 */

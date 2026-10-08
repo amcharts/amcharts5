@@ -7,7 +7,7 @@ export interface ITrianglePatternSettings extends IPatternSettings {
 	/**
 	 * Gap between triangles, in pixels.
 	 *
-	 * @default 6
+	 * @default 0
 	 */
 	gap?: number;
 

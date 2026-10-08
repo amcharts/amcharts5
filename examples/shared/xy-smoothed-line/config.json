@@ -1,0 +1,128 @@
+{
+  "type": "XYChart",
+  "settings": {
+    "panX": false,
+    "panY": false,
+    "wheelX": "panX",
+    "wheelY": "zoomX",
+    "cursor": {
+      "type": "XYCursor",
+      "settings": { "behavior": "zoomX" },
+      "properties": {
+        "lineY": {
+          "settings": { "visible": false }
+        }
+      }
+    },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"],
+    "xAxes": ["#axis-0"],
+    "yAxes": ["#axis-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "date": 1704067200000, "value": 97 },
+        { "date": 1704153600000, "value": 98 },
+        { "date": 1704240000000, "value": 96 },
+        { "date": 1704326400000, "value": 98 },
+        { "date": 1704412800000, "value": 99 },
+        { "date": 1704499200000, "value": 98 },
+        { "date": 1704585600000, "value": 101 },
+        { "date": 1704672000000, "value": 98 },
+        { "date": 1704758400000, "value": 98 },
+        { "date": 1704844800000, "value": 94 },
+        { "date": 1704931200000, "value": 94 },
+        { "date": 1705017600000, "value": 90 },
+        { "date": 1705104000000, "value": 91 },
+        { "date": 1705190400000, "value": 88 },
+        { "date": 1705276800000, "value": 85 },
+        { "date": 1705363200000, "value": 90 },
+        { "date": 1705449600000, "value": 92 },
+        { "date": 1705536000000, "value": 88 },
+        { "date": 1705622400000, "value": 84 },
+        { "date": 1705708800000, "value": 79 },
+        { "date": 1705795200000, "value": 80 },
+        { "date": 1705881600000, "value": 79 },
+        { "date": 1705968000000, "value": 82 },
+        { "date": 1706054400000, "value": 85 },
+        { "date": 1706140800000, "value": 80 },
+        { "date": 1706227200000, "value": 80 },
+        { "date": 1706313600000, "value": 79 },
+        { "date": 1706400000000, "value": 79 },
+        { "date": 1706486400000, "value": 77 },
+        { "date": 1706572800000, "value": 77 }
+      ]
+    },
+    {
+      "axis-0": {
+        "type": "DateAxis",
+        "settings": {
+          "maxDeviation": 0,
+          "baseInterval": { "timeUnit": "day", "count": 1 },
+          "renderer": {
+            "type": "AxisRendererX",
+            "settings": { "minorGridEnabled": true }
+          },
+          "tooltip": { "type": "Tooltip" }
+        }
+      }
+    },
+    {
+      "axis-1": {
+        "type": "ValueAxis",
+        "settings": {
+          "renderer": { "type": "AxisRendererY" }
+        }
+      }
+    },
+    {
+      "series-0": {
+        "type": "SmoothedXLineSeries",
+        "settings": {
+          "name": "Series",
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "valueYField": "value",
+          "valueXField": "date",
+          "tooltip": {
+            "type": "Tooltip",
+            "settings": { "labelText": "{valueY}" }
+          },
+          "autoAppear": true,
+          "appearDuration": 1000
+        },
+        "properties": {
+          "data": "#data-0",
+          "fills": {
+            "properties": {
+              "template": {
+                "settings": { "visible": true, "fillOpacity": 0.2 }
+              }
+            }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 4,
+                    "stroke": { "type": "Color", "value": "#ffffff" },
+                    "strokeWidth": 2,
+                    "fill": "@series.get('fill')"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

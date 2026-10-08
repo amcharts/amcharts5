@@ -14,7 +14,7 @@ import * as $utils from "../../core/util/Utils";
 export interface IBreadcrumbBarSettings extends IContainerSettings {
 
 	/**
-	 * A hierarchy series bar will use to build current selection path.
+	 * The hierarchy series whose path to the selected node the bar shows.
 	 */
 	series: Hierarchy;
 
@@ -27,7 +27,8 @@ export interface IBreadcrumbBarEvents extends IContainerEvents {
 }
 
 /**
- * Creates a breadcrumb navigation control.
+ * A breadcrumb bar for a hierarchy series: a label for each node on the path
+ * from the root to the selected node. Clicking a label selects that node.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/breadcrumbs/} for more info
  * @important
@@ -55,11 +56,7 @@ export class BreadcrumbBar extends Container {
 	}
 
 	/**
-	 * A list of labels in the bar.
-	 *
-	 * `labels.template` can be used to configure label apperance and behavior.
-	 *
-	 * @default new ListTemplate<Label>
+	 * List of the bar's labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),

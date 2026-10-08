@@ -16,63 +16,61 @@ root.setThemes([
 
 
 // Add wrapper container
-let container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
+// https://www.amcharts.com/docs/v5/charts/word-cloud/#Additional_controls
+const container = root.container.children.push(am5.Container.new(root, {
+  width: am5.percent(100),    // fills the chart div
   height: am5.percent(100),
-  layout: root.verticalLayout
+  layout: root.verticalLayout // the title on top, the cloud below it
 }));
 
 
 // Add chart title
-let title = container.children.push(am5.Label.new(root, {
-  text: "Most popular languages on StackOverflow",
-  fontSize: 20,
-  x: am5.percent(50),
+container.children.push(am5.Label.new(root, {
+  text: "Most popular languages on Stack Overflow",
+  fontSize: 20,            // 20 px, a title size
+  x: am5.percent(50),      // centered
   centerX: am5.percent(50)
 }));
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/word-cloud/
-var series = container.children.push(am5wc.WordCloud.new(root, {
+// Angles are taken in turn, not at random, so the cloud is the same on every load
+// https://www.amcharts.com/docs/v5/charts/word-cloud/#Setting_words
+const series = container.children.push(am5wc.WordCloud.new(root, {
   categoryField: "tag",
   valueField: "weight",
-  calculateAggregates: true // this is needed for heat rules to work
+  calculateAggregates: true, // works out the lowest and highest weight for the heat rule
+  angles: [0, 0, 0, -90],    // three words in four level, every fourth on its side
+  randomizeAngles: false
 }));
 
 
-// Set up heat rules
+// Set up heat rules: they need calculateAggregates on the series
 // https://www.amcharts.com/docs/v5/charts/word-cloud/#Via_heat_rules
 series.set("heatRules", [{
   target: series.labels.template,
   dataField: "value",
-  min: am5.color(0xFFD4C2),
-  max: am5.color(0xFF621F),
+  min: am5.color(0xFFD4C2), // pale orange for the lowest weight...
+  max: am5.color(0xFF621F), // ...strong orange for the highest
   key: "fill"
 }]);
 
 
 // Configure labels
+// https://www.amcharts.com/docs/v5/charts/word-cloud/#Configuring
 series.labels.template.setAll({
-  paddingTop: 5,
+  paddingTop: 5,           // 5 px of space kept around each word
   paddingBottom: 5,
   paddingLeft: 5,
   paddingRight: 5,
-  fontFamily: "Courier New",
-  cursorOverStyle: "pointer"
+  fontFamily: "Courier New" // a typewriter-style font, every letter the same width
 });
 
 
-// Add click event on words
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Events
-series.labels.template.events.on("click", (ev: any) => {
-  const category = ev.target.dataItem.get("category");
-  window.open("https://stackoverflow.com/questions/tagged/" + encodeURIComponent(category));
-});
-
-
-// Data from:
+// Set data
+// From the Stack Overflow developer survey of 2021
 // https://insights.stackoverflow.com/survey/2021#section-most-popular-technologies-programming-scripting-and-markup-languages
+// one word per row: the bigger its weight, the bigger the word
 series.data.setAll([
   { tag: "JavaScript", weight: 64.96 },
   { tag: "HTML/CSS", weight: 56.07 },
@@ -111,5 +109,10 @@ series.data.setAll([
   { tag: "Erlang", weight: 0.79 },
   { tag: "APL", weight: 0.65 },
   { tag: "Crystal", weight: 0.56 },
-  { tag: "COBOL", weight: 0.53 },
+  { tag: "COBOL", weight: 0.53 }
 ]);
+
+
+// Play initial series animation
+// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
+series.appear(1000, 100);

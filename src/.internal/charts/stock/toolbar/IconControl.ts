@@ -7,14 +7,32 @@ import { StockIcons } from "./StockIcons";
 import * as $array from "../../../core/util/Array";
 
 export interface IIcon {
+	/**
+	 * SVG path of the icon, drawn in a 50 by 50 box.
+	 */
 	svgPath: string;
+	/**
+	 * Scale of the icon on the chart.
+	 */
 	scale?: number;
+	/**
+	 * Horizontal point of the icon placed on the clicked spot.
+	 */
 	centerX?: Percent;
+	/**
+	 * Vertical point of the icon placed on the clicked spot.
+	 */
 	centerY?: Percent;
+	/**
+	 * Draws the icon without a fill, as an outline only.
+	 */
 	fillDisabled?: boolean;
 }
 
 export interface IIconControlSettings extends IStockControlSettings {
+	/**
+	 * Icons to pick from.
+	 */
 	icons: IIcon[];
 }
 
@@ -23,15 +41,17 @@ export interface IIconControlPrivate extends IStockControlPrivate {
 }
 
 export interface IIconControlEvents extends IStockControlEvents {
+	/**
+	 * An icon was picked, or selected with `setIconByPath()`.
+	 */
 	selected: {
 		icon: IIcon
 	}
 }
 
 /**
- * Shows selection of icons to choose from for annotating [[StockChart]].
- *
- * This class is instantiated automatically, and should not be used standalone.
+ * A dropdown of icons for the icon drawing tool. Created by
+ * [[DrawingControl]]; not meant to be used on its own.
  */
 export class IconControl extends StockControl {
 	public static className: string = "IconControl";
@@ -90,6 +110,11 @@ export class IconControl extends StockControl {
 		this._initIcons();
 	}
 
+	/**
+	 * Shows an icon on the button. Does not dispatch `selected`.
+	 *
+	 * @param  icon  Icon
+	 */
 	public setIcon(icon: IIcon): void {
 		this.getPrivate("icon")!.innerHTML = "";
 		this.getPrivate("icon")!.appendChild(this._getDrawingIcon(icon));
@@ -97,10 +122,11 @@ export class IconControl extends StockControl {
 	}
 
 	/**
-	 * Selects an icon by its SVG path.
+	 * Selects an icon by its SVG path: shows it on the button and dispatches
+	 * `selected`.
 	 *
 	 * @since 5.9.0
-	 * @param  path  Item ID
+	 * @param  path  SVG path of the icon
 	 */
 	public setIconByPath(path: string) {
 		const icon = this.getIconByPath(path);
@@ -116,11 +142,11 @@ export class IconControl extends StockControl {
 	}
 
 	/**
-	 * Returns icon by its SVG path.
-	 * 
+	 * Returns the icon with an SVG path from `icons`.
+	 *
 	 * @since 5.9.0
-	 * @param  id  Item ID
-	 * @return     Dropdown item
+	 * @param  path  SVG path of the icon
+	 * @return       Icon
 	 */
 	public getIconByPath(path: string): IIcon | undefined {
 		let found: IIcon | undefined;

@@ -27,7 +27,7 @@ export interface IFlowDataItem extends ISeriesDataItem {
 	valueWorking: number;
 
 	/**
-	 * Associated link element.
+	 * The link element drawn for this data item.
 	 */
 	link: FlowLink;
 
@@ -42,22 +42,22 @@ export interface IFlowDataItem extends ISeriesDataItem {
 	d3SankeyLink: d3sankey.SankeyLink<d3sankey.SankeyExtraProperties, d3sankey.SankeyExtraProperties>;
 
 	/**
-	 * An ID of the target node.
+	 * ID of the target node.
 	 */
 	targetId: string;
 
 	/**
-	 * An ID of the source node.
+	 * ID of the source node.
 	 */
 	sourceId: string;
 
 	/**
-	 * A data item of the source node.
+	 * Data item of the source node.
 	 */
 	source: DataItem<IFlowNodesDataItem>;
 
 	/**
-	 * A data item of the target node.
+	 * Data item of the target node.
 	 */
 	target: DataItem<IFlowNodesDataItem>;
 
@@ -66,51 +66,44 @@ export interface IFlowDataItem extends ISeriesDataItem {
 export interface IFlowSettings extends ISeriesSettings {
 
 	/**
-	 * A field in data which holds source node ID.
+	 * Field in data that holds the source node's ID.
 	 */
 	sourceIdField?: string;
 
 	/**
-	 * A field in data which holds target node ID.
+	 * Field in data that holds the target node's ID.
 	 */
 	targetIdField?: string;
 
 	/**
-	 * The thickness of node strip in pixels.
+	 * Thickness of the node bars, in pixels. Not used by [[ArcDiagram]].
 	 *
 	 * @default 10
 	 */
 	nodeWidth?: number;
 
 	/**
-	 * Minimum gap between adjacent nodes.
-	 *
-	 * @default 10
+	 * Gap between adjacent nodes, in pixels: `10` in a [[Sankey]], `5` in an
+	 * [[ArcDiagram]]. A [[Chord]] uses `padAngle` instead.
 	 */
 	nodePadding?: number;
 
 	/**
-	 * Minimum size of the link.
-	 * 
-	 * It's a relative value to the sum of all values in the series. If set,
-	 * this relative value will be used for small value nodes when calculating
-	 * their size. For example, if it's set to `0.01`, small nodes will be
-	 * sized like their value is 1% of the total sum of all values in series.
-	 * 
+	 * Smallest size a link is drawn at, as a fraction of the sum of all link
+	 * values. For example, `0.01` draws every link at least as thick as one
+	 * holding 1% of the total, so small links and their nodes stay visible.
+	 *
 	 * @default 0
 	 * @since 5.1.5
 	 */
 	minSize?: number;
 
 	/**
-	 * Relative size of hidden links.
-	 * 
-	 * Links are hidden when user clicks on nodes (if `toggleKey` on nodes is set
-	 * to `"disabled"`).
-	 * 
-	 * This allows hidden node to remain visible so that user could click on it
-	 * again to show it and its links.
-	 * 
+	 * Size a hidden link keeps in the layout, as a fraction of its value. Links
+	 * hide when their node is toggled off with a click (`toggleKey: "disabled"`
+	 * on nodes); a small size keeps that node visible so it can be clicked back
+	 * on.
+	 *
 	 * @default 0.05
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling} for more info
 	 * @since 5.4.1
@@ -118,11 +111,8 @@ export interface IFlowSettings extends ISeriesSettings {
 	hiddenSize?: number;
 
 	/**
-	 * Minimum value of hidden links.
-	 * 
-	 * Links are hidden when user clicks on nodes (if `toggleKey` on nodes is set
-	 * to `"disabled"`).
-	 * 
+	 * Smallest value a hidden link shrinks to, whatever `hiddenSize` gives.
+	 *
 	 * @default 0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling} for more info
 	 * @since 5.4.1
@@ -140,7 +130,7 @@ export interface IFlowEvents extends ISeriesEvents {
 }
 
 /**
- * A base class for all flow type series: [[Sankey]] and [[Chord]].
+ * Base class for the flow series: [[Sankey]], [[Chord]] and [[ArcDiagram]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more info
  */
@@ -159,9 +149,7 @@ export abstract class Flow extends Series {
 	declare public readonly nodes: FlowNodes;
 
 	/**
-	 * Container series will place their links in.
-	 *
-	 * @default Container.new()
+	 * Container that holds the link elements.
 	 */
 	public readonly linksContainer = this.children.push(Container.new(this._root, {}));
 
@@ -268,7 +256,7 @@ export abstract class Flow extends Series {
 					sourceDataItem.set("fill", targetDataItem.get("fill"));
 				}
 
-				dataItem.get("link").set("fillStyle", "gradient");
+				dataItem.get("link")._setC("fillStyle", "gradient");
 			}
 
 
@@ -277,7 +265,7 @@ export abstract class Flow extends Series {
 					targetDataItem.set("fill", sourceDataItem.get("fill"));
 				}
 
-				dataItem.get("link").set("fillStyle", "gradient");
+				dataItem.get("link")._setC("fillStyle", "gradient");
 			}
 
 			this._updateLinkColor(dataItem);
@@ -492,9 +480,10 @@ export abstract class Flow extends Series {
 	}
 
 	/**
-	 * Shows diagram's data item.
+	 * Hides a link: fades its element out and shrinks its value to
+	 * `hiddenSize` (or `minHiddenValue`), so its nodes keep some size.
 	 *
-	 * @param   dataItem  Data item
+	 * @param   dataItem  Link data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
@@ -525,9 +514,9 @@ export abstract class Flow extends Series {
 	}
 
 	/**
-	 * Shows diagram's data item.
+	 * Shows a hidden link, growing it back to its value.
 	 *
-	 * @param   dataItem  Data item
+	 * @param   dataItem  Link data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */

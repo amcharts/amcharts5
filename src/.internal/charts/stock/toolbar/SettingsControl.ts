@@ -11,8 +11,9 @@ export interface ISettingsControlItem extends IDropdownListItem {
 
 export interface ISettingsControlSettings extends IDropdownListControlSettings {
 	/**
-	 * If set to `true`, all changes to chart's drawings and indicators will be
-	 * automatically saved to browser local storage and restored on next load.
+	 * Saves the chart's drawings and indicators to the browser's local storage
+	 * whenever they change, and restores them on the next load. Needs an
+	 * [[IndicatorControl]] or a [[DrawingControl]] on the chart.
 	 *
 	 * @default false
 	 *
@@ -21,11 +22,8 @@ export interface ISettingsControlSettings extends IDropdownListControlSettings {
 	autoSave?: boolean;
 
 	/**
-	 * A unique indentifier for local storage.
-	 *
-	 * Will try to use chart's container ID if not set.
-	 *
-	 * Consider setting it if you have multipl [[StockChart]] on the same page.
+	 * Key for the data in local storage. If not set, the page URL plus the ID
+	 * of the chart's container element is used.
 	 *
 	 * @since 5.4.3
 	 */
@@ -40,7 +38,9 @@ export interface ISettingsControlEvents extends IDropdownListControlEvents {
 }
 
 /**
- * A control that is used to change type of the main series of the [[StockChart]].
+ * A settings dropdown for a [[StockChart]]: X axis fills, the Y axis scale
+ * (regular, percent or logarithmic) and auto-saving of drawings and
+ * indicators.
  */
 export class SettingsControl extends DropdownListControl {
 	public static className: string = "SettingsControl";

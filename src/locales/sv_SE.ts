@@ -269,5 +269,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Avbryt",
+	"Delete": "Ta bort",
+	"Settings": "Inställningar",
+	"Expand": "Expandera",
+	"Move Up": "Flytta upp",
+	"Move Down": "Flytta ned"
 };

@@ -234,10 +234,7 @@ export class Text extends Sprite {
 		}
 
 		if (this.isDirty("fillOpacity")) {
-			let fillOpacity = this.get("fillOpacity", 1);
-			if (fillOpacity) {
-				textStyle.fillOpacity = fillOpacity;
-			}
+			textStyle.fillOpacity = this.get("fillOpacity", 1);
 		}
 
 		if (this.isDirty("maxWidth") || this.isPrivateDirty("maxWidth")) {

@@ -12,17 +12,20 @@ import * as $type from "../../../core/util/Type";
 export interface IAccumulativeSwingIndexSettings extends IChartIndicatorSettings {
 
 	/**
-	 * A "limit move" value.
+	 * Limit move: the largest price change allowed in one data item (`T` in
+	 * Wilder's formula). The swing index is divided by it.
+	 *
+	 * @default 1000
 	 */
 	limitMoveValue?: number;
 
 	/**
-	 * Positive color.
+	 * Color of the line above zero.
 	 */
 	positiveColor?: Color;
 
 	/**
-	 * Negative color.
+	 * Color of the line below zero.
 	 */
 	negativeColor?: Color;
 
@@ -36,7 +39,9 @@ export interface IAccumulativeSwingIndexEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Accumulative Swing Index indicator: a running total of Wilder's swing index,
+ * which compares each data item's open, high, low and close with the previous
+ * one's. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -49,7 +54,7 @@ export class AccumulativeSwingIndex extends ChartIndicator {
 	declare public _events: IAccumulativeSwingIndexEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

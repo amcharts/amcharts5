@@ -7,7 +7,8 @@ export interface ISmoothedRadarLineSeriesDataItem extends IRadarLineSeriesDataIt
 export interface ISmoothedRadarLineSeriesSettings extends IRadarLineSeriesSettings {
 
 	/**
-	 * Tension of curve.
+	 * How tight the curve is, from `0` to `1`: `1` draws straight lines, a
+	 * smaller value a rounder curve.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/#Line_tension} for more info
 	 * @default 0.5
@@ -25,7 +26,8 @@ export interface ISmoothedRadarLineSeriesPrivate extends IRadarLineSeriesPrivate
 }
 
 /**
- * Draws a smoothed line series for use in a [[RadarChart]].
+ * A line series for a [[RadarChart]] that draws a smooth curve through its
+ * data points.
  *
  * @important
  */
@@ -42,29 +44,26 @@ export class SmoothedRadarLineSeries extends RadarLineSeries {
 		super._afterNew();
 	}
 
-	public _prepareChildren() {
-		super._prepareChildren();
-
+	// Here, not in _prepareChildren: setting a new factory there re-runs it endlessly
+	public _updateChildren() {
 		if (this.isDirty("connectEnds")) {
 			const connectEnds = this.get("connectEnds");
 			if (connectEnds) {
-				this.setRaw("curveFactory", curveCardinalClosed.tension(this.get("tension", 0)));
+				this._setC("curveFactory", curveCardinalClosed.tension(this.get("tension", 0)));
 			}
 			else {
-				this.setRaw("curveFactory", curveCardinal.tension(this.get("tension", 0)));
+				this._setC("curveFactory", curveCardinal.tension(this.get("tension", 0)));
 			}
-			// `setRaw` doesn't mark `curveFactory` dirty, so force the line rebuild.
-			this._valuesDirty = true;
 		}
 
 		if (this.isDirty("tension")) {
 			let cf = this.get("curveFactory")!;
 			if (cf) {
-				cf.tension(this.get("tension", 0));
+				this._setC("curveFactory", cf.tension(this.get("tension", 0)));
 			}
-			// The factory is mutated in place, so force the line rebuild.
-			this._valuesDirty = true;
 		}
+
+		super._updateChildren();
 	}
 
 	protected _endLine(_points: Array<Array<number>>, _firstPoint: Array<number>) {

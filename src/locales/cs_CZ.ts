@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Zrušit",
+	"Delete": "Odstranit",
+	"Settings": "Nastavení",
+	"Expand": "Rozbalit",
+	"Move Up": "Posunout nahoru",
+	"Move Down": "Posunout dolů"
 };

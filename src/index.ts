@@ -51,7 +51,7 @@ export { Timezone } from "./.internal/core/util/Timezone";
 export { ZoomTools, IZoomToolsSettings, IZoomToolsPrivate, IZoomToolsEvents } from "./.internal/core/render/ZoomTools";
 
 export { GrainPattern } from "./.internal/core/render/patterns/GrainPattern";
-export { BlendMode } from "./.internal/core/render/backend/Renderer";
+export { BlendMode, IRendererClass } from "./.internal/core/render/backend/Renderer";
 
 export { Gradient, IGradientSettings, IGradientPrivate } from "./.internal/core/render/gradients/Gradient";
 export { LinearGradient, ILinearGradientSettings, ILinearGradientPrivate } from "./.internal/core/render/gradients/LinearGradient";
@@ -85,6 +85,8 @@ export { TextFormatter } from "./.internal/core/util/TextFormatter";
 
 export { SpriteResizer, ISpriteResizerPrivate, ISpriteResizerEvents, ISpriteResizerSettings } from "./.internal/core/render/SpriteResizer";
 export { CanvasRenderer } from "./.internal/core/render/backend/CanvasRenderer";
+export { SVGRenderer } from "./.internal/core/render/backend/SVGRenderer";
+export { renderToSVG, ISvgExportOptions } from "./.internal/core/render/backend/SvgExport";
 export { CanvasLayer } from "./.internal/core/render/backend/CanvasRenderer";
 
 export { NumericStepper, INumericStepperSettings, INumericStepperPrivate } from "./.internal/core/render/NumericStepper";

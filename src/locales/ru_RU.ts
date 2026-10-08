@@ -182,5 +182,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "ОК",
+	"Cancel": "Отмена",
+	"Delete": "Удалить",
+	"Settings": "Настройки",
+	"Expand": "Развернуть",
+	"Move Up": "Переместить вверх",
+	"Move Down": "Переместить вниз"
 };

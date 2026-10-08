@@ -1,0 +1,132 @@
+{
+  "type": "SpiralChart",
+  "settings": {
+    "levelCount": 3,
+    "innerRadius": { "type": "Percent", "value": 35 },
+    "yAxisRadius": { "type": "Percent", "value": 50 },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"],
+    "xAxes": ["#axis-0"],
+    "yAxes": ["#axis-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "date": 1642248000000, "value": 29 },
+        { "date": 1644926400000, "value": 19 },
+        { "date": 1647345600000, "value": 28 },
+        { "date": 1650024000000, "value": 34 },
+        { "date": 1652616000000, "value": 52 },
+        { "date": 1655294400000, "value": 55 },
+        { "date": 1657886400000, "value": 69 },
+        { "date": 1660564800000, "value": 71 },
+        { "date": 1663243200000, "value": 63 },
+        { "date": 1665835200000, "value": 53 },
+        { "date": 1668513600000, "value": 53 },
+        { "date": 1671105600000, "value": 37 },
+        { "date": 1673784000000, "value": 31 },
+        { "date": 1676462400000, "value": 27 },
+        { "date": 1678881600000, "value": 35 },
+        { "date": 1681560000000, "value": 49 },
+        { "date": 1684152000000, "value": 51 },
+        { "date": 1686830400000, "value": 59 },
+        { "date": 1689422400000, "value": 76 },
+        { "date": 1692100800000, "value": 73 },
+        { "date": 1694779200000, "value": 72 },
+        { "date": 1697371200000, "value": 72 },
+        { "date": 1700049600000, "value": 53 },
+        { "date": 1702641600000, "value": 45 },
+        { "date": 1705320000000, "value": 37 },
+        { "date": 1707998400000, "value": 43 },
+        { "date": 1710504000000, "value": 44 },
+        { "date": 1713182400000, "value": 54 },
+        { "date": 1715774400000, "value": 61 },
+        { "date": 1718452800000, "value": 75 },
+        { "date": 1721044800000, "value": 80 },
+        { "date": 1723723200000, "value": 77 },
+        { "date": 1726401600000, "value": 81 },
+        { "date": 1728993600000, "value": 73 },
+        { "date": 1731672000000, "value": 61 },
+        { "date": 1734264000000, "value": 57 }
+      ]
+    },
+    {
+      "axis-1": {
+        "type": "ValueAxis",
+        "settings": {
+          "renderer": {
+            "type": "AxisRendererCurveY",
+            "settings": { "axisLocation": 1.5 },
+            "properties": {
+              "labels": {
+                "properties": {
+                  "template": {
+                    "settings": { "forceHidden": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "axis-0": {
+        "type": "DateAxis",
+        "settings": {
+          "baseInterval": { "timeUnit": "month", "count": 1 },
+          "gridIntervals": [
+            { "timeUnit": "year", "count": 1 }
+          ],
+          "renderer": {
+            "type": "AxisRendererCurveX",
+            "settings": { "yRenderer": "#axis-1.get('renderer')" },
+            "properties": {
+              "labels": {
+                "properties": {
+                  "template": {
+                    "settings": {
+                      "centerX": { "type": "Percent", "value": 50 },
+                      "centerY": { "type": "Percent", "value": 50 },
+                      "fontSize": 11
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-0": {
+        "type": "CurveColumnSeries",
+        "settings": {
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "valueXField": "date",
+          "valueYField": "value",
+          "autoAppear": true,
+          "appearDuration": 1000
+        },
+        "properties": {
+          "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "width": { "type": "Percent", "value": 80 },
+                  "tooltipText": "{valueX.formatDate('MMM yyyy')}: {valueY}"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

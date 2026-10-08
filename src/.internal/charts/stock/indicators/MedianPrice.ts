@@ -16,7 +16,8 @@ export interface IMedianPriceEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Median Price indicator: `field`, by default the median price (`"hl/2"`),
+ * averaged over `period`. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -29,7 +30,7 @@ export class MedianPrice extends ChartIndicator {
 	declare public _events: IMedianPriceEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

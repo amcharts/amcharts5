@@ -1,0 +1,88 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "panX": "translateX",
+    "panY": "translateY",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100,
+    "projectionName": "geoMercator"
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1"]
+  },
+  "refs": [
+    {
+      "data-0": []
+    },
+    {
+      "data-1": [
+        { "sourceId": "BR", "source": "Brazil", "targetId": "US", "target": "United States", "value": 450 },
+        { "sourceId": "BR", "source": "Brazil", "targetId": "DE", "target": "Germany", "value": 350 },
+        { "sourceId": "BR", "source": "Brazil", "targetId": "IT", "target": "Italy", "value": 200 },
+        {
+          "sourceId": "CO",
+          "source": "Colombia",
+          "targetId": "US",
+          "target": "United States",
+          "value": 250
+        },
+        { "sourceId": "CO", "source": "Colombia", "targetId": "DE", "target": "Germany", "value": 80 },
+        { "sourceId": "ET", "source": "Ethiopia", "targetId": "DE", "target": "Germany", "value": 80 },
+        { "sourceId": "VN", "source": "Vietnam", "targetId": "DE", "target": "Germany", "value": 200 },
+        { "sourceId": "VN", "source": "Vietnam", "targetId": "IT", "target": "Italy", "value": 150 },
+        { "sourceId": "VN", "source": "Vietnam", "targetId": "JP", "target": "Japan", "value": 100 },
+        { "sourceId": "ID", "source": "Indonesia", "targetId": "JP", "target": "Japan", "value": 80 },
+        { "sourceId": "ID", "source": "Indonesia", "targetId": "DE", "target": "Germany", "value": 60 }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "MapPolygonSeries",
+        "settings": {
+          "geoJSON": "am5geodata_worldLow",
+          "exclude": ["AQ"]
+        },
+        "properties": {
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#000000" },
+                  "fillOpacity": 0.15
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-1": {
+        "type": "MapSankeySeries",
+        "settings": { "polygonSeries": "#series-0" },
+        "properties": {
+          "data": "#data-1",
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": { "fillOpacity": 0.6, "tooltipText": "{source} > {target}: {value}" }
+              }
+            }
+          },
+          "nodes": {
+            "properties": {
+              "mapPolygons": {
+                "properties": {
+                  "template": {
+                    "settings": { "tooltipText": "{name}: {sum}" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

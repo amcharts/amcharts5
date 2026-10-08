@@ -1,0 +1,7 @@
+{
+  "title": "100% Stacked Column Chart",
+  "description": "Stacked columns shown as shares of each category's total, using valueYShow and calculateTotals.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["column", "stacked", "percent", "category axis", "legend"]
+}

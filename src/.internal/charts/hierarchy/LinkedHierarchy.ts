@@ -29,47 +29,49 @@ export interface ILinkedHierarchyDataObject {
 export interface ILinkedHierarchyDataItem extends IHierarchyDataItem {
 
 	/**
-	 * An array of child data items.
+	 * Data items of the child nodes.
 	 */
 	children: Array<DataItem<ILinkedHierarchyDataItem>>;
 
 	/**
-	 * A data item of a parent node.
+	 * Data item of the parent node.
 	 */
 	parent: DataItem<ILinkedHierarchyDataItem>;
 
 	/**
-	 * A related node.
+	 * The node element.
 	 */
 	node: LinkedHierarchyNode;
 
 	/**
-	 * [[Circle]] element of the related node.
+	 * The node's circle.
 	 */
 	circle: Circle;
 
 	/**
-	 * [[Circle]] element of the related node, representing outer circle.
+	 * The ring around the node's circle, shown when the node has children.
 	 */
 	outerCircle: Circle;
 
 	/**
-	 * A [[HierarchyLink]] leading to parent node.
+	 * The link to the parent node.
 	 */
 	parentLink: HierarchyLink;
 
 	/**
-	 * An [[HierarchyLink]] leading to parent node.
+	 * All links that start or end at this node, `linkWith` ones included.
 	 */
 	links: Array<HierarchyLink>;
 
 	/**
-	 * An array of [[HierarchyLink]] objects leading to child nodes.
+	 * Links that start at this node: to its children and to the nodes in its
+	 * `linkWith`.
 	 */
 	childLinks: Array<HierarchyLink>;
 
 	/**
-	 * An array of IDs of directly linked nodes.
+	 * IDs of other nodes this node is linked with, besides its parent and
+	 * children.
 	 */
 	linkWith: Array<string>;
 
@@ -82,7 +84,8 @@ export interface ILinkedHierarchyDataItem extends IHierarchyDataItem {
 export interface ILinkedHierarchySettings extends IHierarchySettings {
 
 	/**
-	 * A field in data which holds IDs of nodes to link with.
+	 * Field in data that holds an array of IDs of other nodes to link the node
+	 * with, besides its parent and children.
 	 */
 	linkWithField?: string;
 
@@ -95,7 +98,8 @@ export interface ILinkedHierarchyEvents extends IHierarchyEvents {
 }
 
 /**
- * A base class for linked hierarchy series.
+ * Base class for the hierarchy series that draw nodes as circles joined by
+ * links: [[ForceDirected]] and [[Tree]].
  */
 
 export abstract class LinkedHierarchy extends Hierarchy {
@@ -108,6 +112,10 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	declare public _dataItemSettings: ILinkedHierarchyDataItem;
 	declare public _events: ILinkedHierarchyEvents;
 
+	/**
+	 * Bullets for the links: functions that get the root and the link's source
+	 * and target data items, and return a [[Bullet]].
+	 */
 	public linkBullets: List<<D extends DataItem<IHierarchyDataItem>>(root: Root, source: D, target:D) => Bullet | undefined> = new List();
 
 	protected _afterNew() {
@@ -123,9 +131,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	}
 
 	/**
-	 * A list of nodes in a [[LinkedHierarchy]] chart.
-	 *
-	 * @default new ListTemplate<LinkedHierarchyNode>
+	 * List of node elements; configure them all through `nodes.template`.
 	 */
 	public readonly nodes: ListTemplate<LinkedHierarchyNode> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -137,9 +143,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	));
 
 	/**
-	 * A list of node circle elements in a [[LinkedHierarchy]] chart.
-	 *
-	 * @default new ListTemplate<Circle>
+	 * List of node circles; configure them all through `circles.template`.
 	 */
 	public readonly circles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -149,9 +153,8 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	));
 
 	/**
-	 * A list of node outer circle elements in a [[LinkedHierarchy]] chart.
-	 *
-	 * @default new ListTemplate<Circle>
+	 * List of the rings around nodes that have children; configure them all
+	 * through `outerCircles.template`.
 	 */
 	public readonly outerCircles: ListTemplate<Circle> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -161,9 +164,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	));
 
 	/**
-	 * A list of link elements in a [[LinkedHierarchy]] chart.
-	 *
-	 * @default new ListTemplate<HierarchyLink>
+	 * List of link elements; configure them all through `links.template`.
 	 */
 	public readonly links: ListTemplate<HierarchyLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -173,9 +174,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	));
 
 	/**
-	 * A [[Container]] that link elements are placed in.
-	 *
-	 * @default Container.new()
+	 * Container that holds the link elements, behind the nodes.
 	 */
 	public readonly linksContainer = this.children.moveValue(Container.new(this._root, {}), 0);
 
@@ -317,11 +316,11 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	}
 
 	/**
-	 * Link two data items with a link element.
+	 * Links two nodes, or returns the link already between them.
 	 *
 	 * @param   source    Source node data item
 	 * @param   target    Target node data item
-	 * @param   strength  Link strength
+	 * @param   strength  `strength` of a new link
 	 * @return            Link element
 	 */
 	public linkDataItems(source: DataItem<this["_dataItemSettings"]>, target: DataItem<this["_dataItemSettings"]>, strength?: number): HierarchyLink {
@@ -376,7 +375,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 
 
 	/**
-	 * Unlink two linked data items.
+	 * Removes the link between two nodes.
 	 *
 	 * @param   source  Source node data item
 	 * @param   target  Target node data item
@@ -424,7 +423,11 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	}
 
 	/**
-	 * Returns `true` if two nodes are linked with each other.
+	 * Returns `true` if two nodes are linked with each other, either way.
+	 *
+	 * @param   source  Data item of one node
+	 * @param   target  Data item of the other node
+	 * @return          Linked?
 	 */
 	public areLinked(source: DataItem<this["_dataItemSettings"]>, target: DataItem<this["_dataItemSettings"]>): boolean {
 		const sourceLinks = source.get("links");
@@ -468,7 +471,9 @@ export abstract class LinkedHierarchy extends Hierarchy {
 	}
 
 	/**
-	 * Select a data item.
+	 * Selects an expanded node. For a collapsed node, its parent is selected
+	 * instead.
+	 *
 	 * @param  dataItem  Data item
 	 */
 	public selectDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -479,7 +484,7 @@ export abstract class LinkedHierarchy extends Hierarchy {
 		}
 		else {
 			if (parent) {
-				this.setRaw("selectedDataItem", parent);
+				this._setCRaw("selectedDataItem", parent);
 				const type = "dataitemselected";
 				this.events.dispatch(type, { type: type, target: this, dataItem: parent });
 				this.disableDataItem(dataItem);

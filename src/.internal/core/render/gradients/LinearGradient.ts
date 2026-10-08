@@ -12,7 +12,8 @@ import * as $math from "../../util/Math";
 export interface ILinearGradientSettings extends IGradientSettings {
 
 	/**
-	 * Gradient rotation, in degrees.
+	 * Direction of the gradient in degrees: `0` runs from left to right, `90`
+	 * from top to bottom.
 	 *
 	 * @default 90
 	 */
@@ -24,7 +25,7 @@ export interface ILinearGradientPrivate extends IGradientPrivate {
 }
 
 /**
- * Linear gradient.
+ * A gradient that changes color along a straight line.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */

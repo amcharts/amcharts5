@@ -1,0 +1,7 @@
+{
+  "title": "Highlight Line on Legend Hover",
+  "description": "Ten line series with a legend at the side; hovering a legend item dims all the other lines, done with events on the legend item template.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "legend", "hover", "events"]
+}

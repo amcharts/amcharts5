@@ -15,71 +15,89 @@ root.setThemes([
 ]);
 
 
-// Create wrapper container
-const container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
-  height: am5.percent(100),
-  layout: root.verticalLayout
-}));
-
-
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
-const series = container.children.push(am5hierarchy.Sunburst.new(root, {
-  singleBranchOnly: true,
-  downDepth: 10,
-  initialDepth: 10,
+// https://www.amcharts.com/docs/v5/charts/hierarchy/sunburst/
+const series = root.container.children.push(am5hierarchy.Sunburst.new(root, {
+  radius: am5.percent(95), // a little inside the chart's edge (the default is 100%)
   valueField: "value",
   categoryField: "name",
   childDataField: "children"
 }));
 
 
-// Generate and set data
+// Set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
-const maxLevels = 2;
-const maxNodes = 3;
-const maxValue = 100;
+// the top node is the circle in the middle and each level below it one ring further out;
+// only the leaves have a value, and a slice's angle is its share of the parent's
+series.data.setAll([{
+  name: "Visits",
+  children: [
+    {
+      name: "Search",
+      children: [
+        {
+          name: "Organic",
+          children: [
+            { name: "Google", value: 420 },
+            { name: "Bing", value: 90 }
+          ]
+        },
+        {
+          name: "Paid",
+          children: [
+            { name: "Text Ads", value: 100 },
+            { name: "Banners", value: 70 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Social",
+      children: [
+        {
+          name: "Video",
+          children: [
+            { name: "YouTube", value: 110 },
+            { name: "TikTok", value: 70 }
+          ]
+        },
+        {
+          name: "Networks",
+          children: [
+            { name: "Facebook", value: 150 },
+            { name: "Instagram", value: 120 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Direct",
+      children: [
+        {
+          name: "Saved",
+          children: [
+            { name: "Bookmarks", value: 90 },
+            { name: "Shortcuts", value: 60 }
+          ]
+        },
+        {
+          name: "Email",
+          children: [
+            { name: "Newsletter", value: 95 },
+            { name: "Campaigns", value: 60 }
+          ]
+        }
+      ]
+    }
+  ]
+}]);
 
-const data = {
-  name: "Root",
-  children: []
-}
-generateLevel(data, "", 0);
 
-series.data.setAll([data]);
+// Select the root node
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
 series.set("selectedDataItem", series.dataItems[0]);
-
-function generateLevel(data: any, name: string, level: number) {
-  for (let i = 0; i < Math.ceil(maxNodes * Math.random()) + 1; i++) {
-    let nodeName = name + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i];
-    let child;
-    if (level < maxLevels) {
-      child = {
-        name: nodeName + level
-      }
-
-      if (level > 0 && Math.random() < 0.5) {
-        child.value = Math.round(Math.random() * maxValue);
-      }
-      else {
-        child.children = [];
-        generateLevel(child, nodeName + i, level + 1)
-      }
-    }
-    else {
-      child = {
-        name: name + i,
-        value: Math.round(Math.random() * maxValue)
-      }
-    }
-    data.children.push(child);
-  }
-
-  level++;
-  return data;
-}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

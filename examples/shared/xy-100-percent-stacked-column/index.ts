@@ -18,80 +18,39 @@ root.setThemes([
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
-  panX: false,
+  panX: false,                  // dragging the plot does not pan it
   panY: false,
-  wheelX: "panX",
-  wheelY: "zoomX",
-  layout: root.verticalLayout
+  wheelX: "panX",               // a sideways wheel or trackpad swipe moves along the years...
+  wheelY: "zoomX",              // ...and the vertical wheel zooms in on them
+  layout: root.verticalLayout   // the legend, added further down, goes below the plot
 }));
-
-// Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-chart.set("scrollbarX", am5.Scrollbar.new(root, {
-  orientation: "horizontal"
-}));
-
-const data = [{
-  "year": "2021",
-  "europe": 2.5,
-  "namerica": 2.5,
-  "asia": 2.1,
-  "lamerica": 1,
-  "meast": 0.8,
-  "africa": 0.4
-}, {
-  "year": "2022",
-  "europe": 2.6,
-  "namerica": 2.7,
-  "asia": 2.2,
-  "lamerica": 0.5,
-  "meast": 0.4,
-  "africa": 0.3
-}, {
-  "year": "2023",
-  "europe": 2.8,
-  "namerica": 2.9,
-  "asia": 2.4,
-  "lamerica": 0.3,
-  "meast": 0.9,
-  "africa": 0.5
-}]
 
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   categoryField: "year",
-  renderer: am5xy.AxisRendererX.new(root, {}),
-  tooltip: am5.Tooltip.new(root, {})
+  renderer: am5xy.AxisRendererX.new(root, {})
 }));
 
-xAxis.data.setAll(data);
-
+// The value axis works out the total of each category
 const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
-  min: 0,
-  max: 100,
-  numberFormat: "#'%'",
-  strictMinMax: true,
+  min: 0,                 // the scale runs from 0...
+  max: 100,               // ...to 100 percent
+  numberFormat: "#'%'",   // labels like "40%": the values are already percentages
+  strictMinMax: true,     // exactly 0 to 100, with no extra room added above the stacks
   calculateTotals: true,
   renderer: am5xy.AxisRendererY.new(root, {})
-}));
-
-
-// Add legend
-// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
-const legend = chart.children.push(am5.Legend.new(root, {
-  centerX: am5.p50,
-  x: am5.p50
 }));
 
 
 // Add series
 // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
 function makeSeries(name: string, fieldName: string) {
+  // Each column shows its share of the category's total
   const series = chart.series.push(am5xy.ColumnSeries.new(root, {
     name: name,
-    stacked: true,
+    stacked: true, // each region's column sits on top of the previous one's
     xAxis: xAxis,
     yAxis: yAxis,
     valueYField: fieldName,
@@ -99,25 +58,18 @@ function makeSeries(name: string, fieldName: string) {
     categoryXField: "year"
   }));
 
-  series.data.setAll(data);
-
-  // Make stuff animate on load
-  // https://www.amcharts.com/docs/v5/concepts/animations/
-  series.appear();
-
+  // a label in the middle of each column piece with its share of the total
   series.bullets.push(() => {
     return am5.Bullet.new(root, {
       sprite: am5.Label.new(root, {
-        text: "{valueYTotalPercent.formatNumber('#.#p')}",
-        fill: root.interfaceColors.get("alternativeText"),
-        centerY: am5.p50,
+        text: "{valueYTotalPercent.formatNumber('#.#p')}", // e.g. "29.4%": one decimal at most
+        fill: root.interfaceColors.get("alternativeText"),  // white in this theme, to read on the columns
+        centerY: am5.p50,                                   // the label is centered on its spot both ways
         centerX: am5.p50,
-        populateText: true
+        populateText: true                                  // fills in the {placeholder} from the data
       })
     });
   });
-
-  legend.data.push(series);
 }
 
 makeSeries("Europe", "europe");
@@ -128,6 +80,33 @@ makeSeries("Middle East", "meast");
 makeSeries("Africa", "africa");
 
 
+// Set data
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+const data = [
+  { year: "2021", europe: 2.5, namerica: 2.5, asia: 2.1, lamerica: 1, meast: 0.8, africa: 0.4 },
+  { year: "2022", europe: 2.6, namerica: 2.7, asia: 2.2, lamerica: 0.5, meast: 0.4, africa: 0.3 },
+  { year: "2023", europe: 2.8, namerica: 2.9, asia: 2.4, lamerica: 0.3, meast: 0.9, africa: 0.5 }
+];
+
+xAxis.data.setAll(data);
+chart.series.each((series) => {
+  series.data.setAll(data);
+});
+
+
+// Add legend
+// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+const legend = chart.children.push(am5.Legend.new(root, {
+  centerX: am5.p50, // the legend's middle...
+  x: am5.p50        // ...at the middle of the chart
+}));
+
+legend.data.setAll(chart.series.values);
+
+
 // Make stuff animate on load
 // https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+chart.series.each((series) => {
+  series.appear(1000);
+});
 chart.appear(1000, 100);

@@ -1,0 +1,7 @@
+{
+  "title": "Candlestick Chart",
+  "description": "Daily open, high, low and close prices as candles on a date axis; OHLCSeries takes the same settings.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["candlestick", "ohlc", "date axis", "cursor", "scrollbar"]
+}

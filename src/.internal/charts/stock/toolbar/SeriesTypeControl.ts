@@ -10,7 +10,9 @@ export interface ISeriesTypeControlEvents extends IDropdownListControlEvents {
 }
 
 /**
- * A control that is used to change type of the main series of the [[StockChart]].
+ * A dropdown control for picking the type of the main series of a
+ * [[StockChart]], such as line or candles. Applying the picked type is up to a
+ * `selected` event handler.
  */
 export class SeriesTypeControl extends DropdownListControl {
 	public static className: string = "SeriesTypeControl";

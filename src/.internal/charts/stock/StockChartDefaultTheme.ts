@@ -21,7 +21,7 @@ export class StockChartDefaultTheme extends Theme {
 
 		/**
 		 * ========================================================================
-		 * charts/xy
+		 * charts/stock
 		 * ========================================================================
 		 */
 
@@ -252,6 +252,31 @@ export class StockChartDefaultTheme extends Theme {
 			paddingLeft: 0,
 			paddingRight: 0,
 			marginLeft: 6
+		});
+
+		// Names of the icon buttons on panels and legend items
+		r("Button", ["control"]).setAll({
+			role: "button"
+		});
+
+		r("Button", ["control", "close"]).setAll({
+			ariaLabel: l.translate("Close")
+		});
+
+		r("Button", ["control", "settings"]).setAll({
+			ariaLabel: l.translate("Settings")
+		});
+
+		r("Button", ["control", "panel", "up"]).setAll({
+			ariaLabel: l.translate("Move Up")
+		});
+
+		r("Button", ["control", "panel", "down"]).setAll({
+			ariaLabel: l.translate("Move Down")
+		});
+
+		r("Button", ["control", "panel", "expand"]).setAll({
+			ariaLabel: l.translate("Expand")
 		});
 
 		/**
@@ -1506,6 +1531,7 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("SeriesTypeControl").setAll({
+			description: l.translateAny("Type"),
 			currentItem: "candlestick",
 			items: [{
 				id: "line",
@@ -1527,6 +1553,7 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("IntervalControl").setAll({
+			description: l.translateAny("Period"),
 			currentItem: "1 day",
 			items: [
 				{ id: "1 minute", label: "1 " + l.translateAny("minute"), interval: { timeUnit: "minute", count: 1 } },
@@ -1562,7 +1589,7 @@ export class StockChartDefaultTheme extends Theme {
 		});
 
 		r("SettingsControl").setAll({
-			description: l.translateAny("Settings"),
+			description: l.translate("Settings"),
 			togglable: true,
 			fixedLabel: true,
 			//align: "right",

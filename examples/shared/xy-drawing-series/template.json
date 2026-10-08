@@ -1,0 +1,7 @@
+{
+  "title": "Drawing a Series",
+  "description": "Clicking the plot area adds a point to a line series and its bullets can be dragged, by turning pointer coordinates into axis values.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "drawing", "dragging", "bullet", "events"]
+}

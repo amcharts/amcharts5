@@ -35,7 +35,8 @@ export type Select<T, U> = Cond<T, SelectKeys<T, U>>;
 
 
 /**
- * @todo Description
+ * A type with only the public members of `T`.
+ *
  * @ignore Exclude from docs
  */
 export type Public<T> = { [P in keyof T]: T[P] };
@@ -111,7 +112,9 @@ export function assert(condition: boolean, message: string = "Assertion failed")
 
 
 /**
- * Converts any value into a `number`.
+ * Converts any value into a `number`. A string with digits in it loses its
+ * other characters first, so `"$1,200"` becomes `1200`. `null` and
+ * `undefined` are returned as they are.
  *
  * @param value  Source value
  * @return Number representation of value
@@ -284,7 +287,7 @@ export function isString(value: any): value is string {
 }
 
 /**
- * Checks if parameter is `number`.
+ * Checks if parameter is `number`. `NaN` is not counted as one.
  *
  * @param value  Input value
  * @return Is number?

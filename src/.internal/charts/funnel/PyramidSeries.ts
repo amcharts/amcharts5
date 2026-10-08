@@ -30,7 +30,7 @@ export interface IPyramidSeriesSettings extends IFunnelSeriesSettings {
 	 * available to the series.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/#Tip_and_base} for more info
-	 * @default 0
+	 * @default 100%
 	 */
 	bottomWidth?: number | Percent;
 
@@ -48,7 +48,9 @@ export interface IPyramidSeriesPrivate extends IFunnelSeriesPrivate {
 }
 
 /**
- * Creates a pyramid series for use in a [[SlicedChart]].
+ * A pyramid series for a [[SlicedChart]]: one shape, `topWidth` wide at the
+ * top and `bottomWidth` at the bottom, cut into slices by value.
+ * `bottomRatio` has no effect here.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/} for more info
  * @important

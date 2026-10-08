@@ -1,0 +1,7 @@
+{
+  "title": "Stacked Step Line Chart",
+  "description": "Two step line series with fills, one stacked on the other, on a date axis.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["step line", "stacked", "area", "date axis"]
+}

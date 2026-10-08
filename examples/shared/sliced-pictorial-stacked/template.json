@@ -1,0 +1,7 @@
+{
+  "title": "Pictorial Stacked Chart",
+  "description": "A pictorial stacked series: slices fill an SVG shape in proportion to their values.",
+  "category": "percent",
+  "tier": "basic",
+  "tags": ["pictorial", "sliced", "svg path"]
+}

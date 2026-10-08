@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Avbryt",
+	"Delete": "Slett",
+	"Settings": "Innstillinger",
+	"Expand": "Utvid",
+	"Move Up": "Flytt opp",
+	"Move Down": "Flytt ned"
 };

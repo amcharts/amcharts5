@@ -17,73 +17,82 @@ root.setThemes([
 
 // Create series
 // https://www.amcharts.com/docs/v5/charts/flow-charts/
+// ChordNonRibbon draws each link as a thin curve, not a ribbon, and gives every node the same arc
 const series = root.container.children.push(am5flow.ChordNonRibbon.new(root, {
-  sourceIdField: "from",
-  targetIdField: "to",
+  sourceIdField: "source",
+  targetIdField: "target",
   valueField: "value"
 }));
-
+// every second color of the color set, so neighboring nodes differ more
 series.nodes.get("colors")!.set("step", 2);
 
-series.bullets.push((_root, _series, dataItem) => {
-  const bullet = am5.Bullet.new(root, {
-    locationY: Math.random(),
-    sprite: am5.Circle.new(root, {
-      radius: 5,
-      fill: dataItem.get("source").get("fill")
-    })
+
+// Draw each node as a circle with its name inside
+// https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/
+series.nodes.bullets.push((_root, _nodes, dataItem) => {
+  const circle = am5.Circle.new(root, {
+    radius: 24,                // big enough to hold the node's name
+    fill: dataItem.get("fill") // the node's own color
   });
 
-  bullet.animate({
-    key: "locationY",
-    to: 1,
-    from: 0,
-    duration: Math.random() * 1000 + 2000,
-    loops: Infinity,
-    easing: am5.ease.yoyo(am5.ease.cubic)
+  // A node that is clicked off keeps its circle, in gray
+  // https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling
+  circle.states.create("hidden", {
+    fill: root.interfaceColors.get("disabled")
   });
 
-  return bullet;
+  return am5.Bullet.new(root, {
+    sprite: circle
+  });
 });
 
 series.nodes.labels.template.setAll({
-  textType: "regular",
-  fill: root.interfaceColors.get("background"),
-  fontSize: "1.1em",
-  radius: -5
+  textType: "regular",                               // straight text, not bent along the circle
+  fill: root.interfaceColors.get("alternativeText"), // light text that reads on the colored circle
+  radius: -5 // 5 px in from the outer edge: the node's middle, where the circle is
 });
 
-series.nodes.labels.template.states.create("disabled", { fill: am5.color(0xffffff) });
+// a clicked-off node's label stays light, so it still reads on the gray circle
+series.nodes.labels.template.states.create("disabled", {
+  fill: root.interfaceColors.get("alternativeText")
+});
 
-series.nodes.bullets.push(function(_root, _series, dataItem) {
-  const sprite = am5.Circle.new(root, {
-    radius: 20,
-    fill: dataItem.get("fill")
-  });
 
-  sprite.states.create("hidden", { fill: root.interfaceColors.get("disabled") })
-
+// Add a circle that travels along each link and back
+// https://www.amcharts.com/docs/v5/concepts/animations/
+series.bullets.push((_root, _series, dataItem) => {
   return am5.Bullet.new(root, {
-    sprite: sprite
+    // from the source end (0) to the target end (1) and back, forever, slowing at each end
+    animations: [
+      { key: "locationY", from: 0, to: 1, duration: 2000, loops: 0, yoyo: true, easing: "cubic", ease: "inOut" }
+    ],
+    sprite: am5.Circle.new(root, {
+      radius: 5,
+      fill: dataItem.get("source").get("fill") // the color of the link's source node
+    })
   });
 });
 
+// Keep the travelling circles under the nodes
 series.children.moveValue(series.bulletsContainer, 0);
 
 
 // Set data
 // https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
 series.data.setAll([
-  { from: "A", to: "D", value: 10 },
-  { from: "B", to: "D", value: 8 },
-  { from: "B", to: "E", value: 4 },
-  { from: "B", to: "C", value: 2 },
-  { from: "C", to: "E", value: 14 },
-  { from: "E", to: "D", value: 8 },
-  { from: "C", to: "A", value: 4 },
-  { from: "G", to: "A", value: 7 }
+  { source: "LHR", target: "JFK", value: 24 },
+  { source: "LHR", target: "DXB", value: 18 },
+  { source: "LHR", target: "CDG", value: 14 },
+  { source: "CDG", target: "JFK", value: 12 },
+  { source: "CDG", target: "FRA", value: 10 },
+  { source: "FRA", target: "DXB", value: 9 },
+  { source: "FRA", target: "SIN", value: 6 },
+  { source: "DXB", target: "SIN", value: 11 },
+  { source: "JFK", target: "LAX", value: 30 },
+  { source: "LAX", target: "SIN", value: 4 }
 ]);
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

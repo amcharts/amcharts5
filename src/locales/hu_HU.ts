@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Mégse",
+	"Delete": "Törlés",
+	"Settings": "Beállítások",
+	"Expand": "Kibontás",
+	"Move Up": "Mozgatás fel",
+	"Move Down": "Mozgatás le"
 };

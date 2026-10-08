@@ -5,10 +5,15 @@ import type { Color } from "../../../core/util/Color";
 
 export interface IMACrossSettings extends IIndicatorSettings {
 	/**
-	 * A value for "fast" period.
+	 * Period of the fast moving average. `period` sets the slow one.
+	 *
+	 * @default 9
 	 */
 	fastPeriod?: number;
 
+	/**
+	 * Color of the fast moving average line.
+	 */
 	fastColor?: Color;
 }
 
@@ -19,7 +24,8 @@ export interface IMACrossEvents extends IIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Moving Average Cross indicator: a slow (`period`) and a fast (`fastPeriod`)
+ * simple moving average of `field`, drawn over the main series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -32,12 +38,12 @@ export class MACross extends Indicator {
 	declare public _events: IMACrossEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the slow moving average.
 	 */
 	declare public series: LineSeries;
 
 	/**
-	 * Indicator series.
+	 * Series of the fast moving average.
 	 */
 	declare public fastSeries: LineSeries;
 

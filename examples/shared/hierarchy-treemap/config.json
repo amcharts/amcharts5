@@ -1,0 +1,87 @@
+{
+  "type": "Container",
+  "settings": {
+    "width": { "type": "Percent", "value": 100 },
+    "height": { "type": "Percent", "value": 100 },
+    "layout": { "type": "VerticalLayout" }
+  },
+  "children": [
+    "#series-0",
+    {
+      "type": "BreadcrumbBar",
+      "settings": { "series": "#series-0" },
+      "index": 0
+    }
+  ],
+  "refs": [
+    {
+      "data-0": [
+        {
+          "name": "Sales",
+          "children": [
+            {
+              "name": "Electronics",
+              "children": [
+                { "name": "Phones", "value": 86 },
+                { "name": "Laptops", "value": 64 },
+                {
+                  "name": "Audio",
+                  "children": [
+                    { "name": "Headphones", "value": 31 },
+                    { "name": "Speakers", "value": 18 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Home",
+              "children": [
+                { "name": "Furniture", "value": 52 },
+                { "name": "Lighting", "value": 15 },
+                {
+                  "name": "Kitchen",
+                  "children": [
+                    { "name": "Cookware", "value": 22 },
+                    { "name": "Appliances", "value": 37 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Sports",
+              "children": [
+                { "name": "Cycling", "value": 41 },
+                { "name": "Fitness", "value": 28 },
+                { "name": "Outdoor", "value": 23 }
+              ],
+              "__parse": true
+            }
+          ],
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "Treemap",
+        "settings": {
+          "downDepth": 1,
+          "upDepth": 1,
+          "initialDepth": 2,
+          "valueField": "value",
+          "categoryField": "name",
+          "childDataField": "children",
+          "selectedDataItem": "@self.dataItems.0",
+          "autoAppear": true,
+          "appearDuration": 1000,
+          "appearDelay": 100
+        },
+        "properties": { "data": "#data-0" }
+      }
+    }
+  ]
+}

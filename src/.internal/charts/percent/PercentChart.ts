@@ -9,9 +9,9 @@ export interface IPercentChartPrivate extends ISerialChartPrivate {
 }
 
 /**
- * Base class for [[PieChart]].
- *
- * Also used for percent-based series, like [[FunnelSeries]], [[PyramidSeries]], etc.
+ * Base class for the charts of percent series: [[PieChart]] and
+ * [[SlicedChart]] (for [[FunnelSeries]], [[PyramidSeries]] and
+ * [[PictorialStackedSeries]]).
  *
  * @important
  */

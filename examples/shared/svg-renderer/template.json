@@ -1,0 +1,8 @@
+{
+  "title": "SVG Renderer",
+  "description": "A column chart drawn as SVG instead of canvas, by choosing the renderer when the root element is created.",
+  "category": "other",
+  "tier": "basic",
+  "tags": ["svg", "renderer", "column"],
+  "since": "5.21.0"
+}

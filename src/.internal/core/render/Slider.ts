@@ -10,8 +10,8 @@ export interface ISliderEvents extends IScrollbarEvents {
 }
 
 /**
- * A control that allows zooming chart's axes, or other uses requiring range
- * selection.
+ * A slider with a single grip, for picking one value from `0` to `1`, which
+ * it keeps in `start`.
  */
 export class Slider extends Scrollbar {
 

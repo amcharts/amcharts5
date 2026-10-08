@@ -86,14 +86,20 @@ function toUTCDate(timezone: Intl.DateTimeFormat, date: Date): number {
 }
 
 
+/**
+ * A named timezone, such as `"America/New_York"`, used for `root.timezone`.
+ */
 export class Timezone {
 	private _utc: Intl.DateTimeFormat;
 	private _dtf: Intl.DateTimeFormat;
 
+	/**
+	 * The IANA name of the timezone.
+	 */
 	public readonly name: string | undefined;
 
 	/**
-	 * Use this method to create an instance of this class.
+	 * Creates a timezone from its IANA name, such as `"America/New_York"`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
 	 * @param   timezone  IANA timezone
@@ -137,6 +143,13 @@ export class Timezone {
 		} as any);
 	}
 
+	/**
+	 * Returns a copy of `date` shifted so that its local time reads as the
+	 * time in this timezone.
+	 *
+	 * @param   date  Date
+	 * @return        Shifted date
+	 */
 	convertLocal(date: Date): Date {
 		const offset = this.offsetUTC(date);
 		const userOffset = date.getTimezoneOffset();
@@ -152,12 +165,27 @@ export class Timezone {
 		return output;
 	}
 
+	/**
+	 * Returns the timezone's offset from UTC at `date`, in minutes, signed as
+	 * `Date.getTimezoneOffset()` is: positive west of UTC.
+	 *
+	 * @param   date  Date
+	 * @return        Offset in minutes
+	 */
 	offsetUTC(date: Date): number {
 		const utc = toUTCDate(this._utc, date);
 		const dtf = toUTCDate(this._dtf, date);
 		return (utc - dtf) / 60000;
 	}
 
+	/**
+	 * Returns the parts of `date` as seen in this timezone: year, month (from
+	 * `0`), day, hour, minute, second, millisecond and weekday (`0` for
+	 * Sunday).
+	 *
+	 * @param   date  Date
+	 * @return        Date parts
+	 */
 	parseDate(date: Date): ParsedDate {
 		return parseDate(this._dtf, date)
 	}

@@ -12,43 +12,40 @@ import * as $utils from "../../core/util/Utils";
 export interface IClockHandSettings extends IContainerSettings {
 
 	/**
-	 * A width of the tip of the clock hand, in pixels.
+	 * Width of the hand's tip in pixels.
 	 *
 	 * @default 1
 	 */
 	topWidth?: number;
 
 	/**
-	 * A width of the base of the clock hand, in pixels.
+	 * Width of the hand's base in pixels.
 	 *
 	 * @default 10
 	 */
 	bottomWidth?: number;
 
 	/**
-	 * Radius of the hand, in pixels, or percent (relative to the axis radius).
-	 *
-	 * If set to negative number, will mean number of pixels inwards from the
-	 * axis.
+	 * Distance from the center to the hand's tip, in pixels or as a percent of
+	 * the chart's radius. A negative value is measured in from the chart's
+	 * radius.
 	 *
 	 * @default 90%
 	 */
 	radius?: number | Percent;
 
 	/**
-	 * Inner radius of the hand, in pixels, or percent (relative to the axis
-	 * radius).
-	 *
-	 * If set to negative number, will mean number of pixels inwards from the
-	 * axis.
+	 * Distance from the center to the hand's base, in pixels or as a percent
+	 * of the chart's radius. A negative number of pixels is measured back from
+	 * the tip.
 	 *
 	 * @default 0
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Radius of the hand pin (circle at the base of the hand), in pixels, or in
-	 * percent (relative to the axis radius.)
+	 * Radius of the pin, the circle at the center, in pixels or as a percent
+	 * of the chart's radius.
 	 *
 	 * @default 10
 	 */
@@ -60,7 +57,8 @@ export interface IClockHandPrivate extends IContainerPrivate {
 }
 
 /**
- * A clock hand for use with [[RadarChart]].
+ * A gauge needle for a [[RadarChart]]. Set it as the `sprite` of an axis
+ * data item's [[AxisBullet]], and it points at that data item's value.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands} for more info
  * @important
@@ -74,14 +72,14 @@ export class ClockHand extends Container {
 	public static classNames: Array<string> = Container.classNames.concat([ClockHand.className]);
 
 	/**
-	 * A "hand" element.
+	 * The hand itself, a tapered shape from `innerRadius` to `radius`.
 	 *
 	 * @default Graphics.new()
 	 */
 	public readonly hand: Graphics = this.children.push(Graphics.new(this._root, { themeTags: ["hand"] }));
 
 	/**
-	 * A "pin" element (hand's base).
+	 * The pin: a circle at the center, of `pinRadius`.
 	 *
 	 * @default Graphics.new()
 	 */

@@ -17,8 +17,7 @@ import * as $utils from "../../../core/util/Utils";
 export interface IAxisRendererYSettings extends IAxisRendererSettings {
 
 	/**
-	 * If set to `true` the axis will be drawn on the opposite side of the plot
-	 * area.
+	 * Puts the axis on the right of the plot area instead of the left.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_position} for more info
 	 * @default false
@@ -26,8 +25,7 @@ export interface IAxisRendererYSettings extends IAxisRendererSettings {
 	opposite?: boolean;
 
 	/**
-	 * If set to `true`, all axis elements (ticks, labels) will be drawn inside
-	 * plot area.
+	 * Draws the axis's labels and ticks inside the plot area.
 	 *
 	 * @default false
 	 */
@@ -38,7 +36,7 @@ export interface IAxisRendererYPrivate extends IAxisRendererPrivate {
 }
 
 /**
- * Used to render vertical axis.
+ * Renderer for a vertical (Y) axis.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
  * @important
@@ -129,6 +127,8 @@ export class AxisRendererY extends AxisRenderer {
 					axisChildren.moveValue(this);
 				}
 
+				chart._keepScrollbarsInPlace();
+
 				axis.ghostLabel?._applyThemes();
 				this.labels.each((label) => {
 					label._applyThemes();
@@ -164,7 +164,7 @@ export class AxisRendererY extends AxisRenderer {
 		const horizontalLayout = this._root.horizontalLayout;
 		axis._setC("layout", horizontalLayout);
 		axis.labelsContainer.set("height", p100);
-		axis.axisHeader.set("layout", horizontalLayout);
+		axis.axisHeader._setC("layout", horizontalLayout);
 	}
 
 	public _updatePositions() {
@@ -192,7 +192,7 @@ export class AxisRendererY extends AxisRenderer {
 			else {
 				axisHeader._setC("height", height);
 			}
-			axisHeader.setAll({ y: axis.y() - height, x: -1, width: plotContainer.width() + 2 });
+			axisHeader._setCAll({ y: axis.y() - height, x: -1, width: plotContainer.width() + 2 });
 		}
 	}
 
@@ -204,7 +204,8 @@ export class AxisRendererY extends AxisRenderer {
 	}
 
 	/**
-	 * Converts axis relative position to actual coordinate in pixels.
+	 * Converts a position on the axis (`0` to `1`) to a point in pixels,
+	 * relative to the axis.
 	 *
 	 * @param   position  Position
 	 * @return            Point
@@ -365,6 +366,10 @@ export class AxisRendererY extends AxisRenderer {
 						sprite._setC("x", 0);
 					}
 				}
+				else if (sprite.get("x") == null) {
+					// An absolute sprite with no `x` ignores `dx`
+					sprite._setC("x", 0);
+				}
 
 				this.axis._bullets[bulletPosition] = bullet;
 
@@ -421,7 +426,9 @@ export class AxisRendererY extends AxisRenderer {
 	}
 
 	/**
-	 * Converts relative position (0-1) on axis to a pixel coordinate.
+	 * Converts a position on the axis (`0` to `1`, `0` being the bottom unless
+	 * `inversed`) to a pixel coordinate from the axis's top edge, taking zoom
+	 * into account.
 	 *
 	 * @param position  Position (0-1)
 	 * @return Coordinate (px)

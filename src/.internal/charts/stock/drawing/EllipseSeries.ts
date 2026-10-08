@@ -18,6 +18,9 @@ export interface IEllipseSeriesSettings extends IDrawingSeriesSettings {
 export interface IEllipseSeriesPrivate extends IDrawingSeriesPrivate {
 }
 
+/**
+ * Draws ellipses, for the Ellipse tool of a [[StockChart]].
+ */
 export class EllipseSeries extends DrawingSeries {
 	public static className: string = "EllipseSeries";
 	public static classNames: Array<string> = DrawingSeries.classNames.concat([EllipseSeries.className]);
@@ -42,6 +45,9 @@ export class EllipseSeries extends DrawingSeries {
 		return ellipse;
 	}
 
+	/**
+	 * The drawn ellipses.
+	 */
 	public readonly ellipses: ListTemplate<Ellipse> = this.addDisposer(new ListTemplate(
 		Template.new({ radiusX: 0, radiusY: 0 }),
 		() => Ellipse._new(this._root, { radiusX: 0, radiusY: 0, templateField: "settings" }, [this.ellipses.template])

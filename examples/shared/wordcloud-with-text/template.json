@@ -1,0 +1,7 @@
+{
+  "title": "Word Cloud from Text",
+  "description": "A word cloud made from a paragraph of text: the series counts the words and sizes them by how often they are used.",
+  "category": "other",
+  "tier": "basic",
+  "tags": ["word cloud", "text"]
+}

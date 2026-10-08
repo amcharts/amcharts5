@@ -68,6 +68,7 @@ import type { CurveCursor } from "./../../../timeline";
 import type { CurveLineSeries } from "./../../../timeline";
 import type { DataSaveControl } from "./../../../stock";
 import type { DateAxis } from "./../../../xy";
+import type { DateFormatter } from "./../../../index";
 import type { DateRangeSelector } from "./../../../stock";
 import type { DisparityIndex } from "./../../../stock";
 import type { DoodleSeries } from "./../../../stock";
@@ -80,6 +81,7 @@ import type { DropdownControl } from "./../../../stock";
 import type { DropdownList } from "./../../../stock";
 import type { DropdownListControl } from "./../../../stock";
 import type { DurationAxis } from "./../../../xy";
+import type { DurationFormatter } from "./../../../index";
 import type { EditableAxisLabel } from "./../../../xy";
 import type { EditableLabel } from "./../../../index";
 import type { Ellipse } from "./../../../index";
@@ -143,6 +145,7 @@ import type { MapLineSeries } from "./../../../map";
 import type { MapPointSeries } from "./../../../map";
 import type { MapPolygon } from "./../../../map";
 import type { MapPolygonSeries } from "./../../../map";
+import type { MapRasterSeries } from "./../../../map";
 import type { MapSankeyNodes } from "./../../../map";
 import type { MapSankeySeries } from "./../../../map";
 import type { MapSeries } from "./../../../map";
@@ -153,6 +156,8 @@ import type { Momentum } from "./../../../stock";
 import type { MovingAverage } from "./../../../stock";
 import type { MovingAverageDeviation } from "./../../../stock";
 import type { MovingAverageEnvelope } from "./../../../stock";
+import type { NightSeries } from "./../../../map";
+import type { NumberFormatter } from "./../../../index";
 import type { NumericStepper } from "./../../../index";
 import type { OHLC } from "./../../../xy";
 import type { OHLCSeries } from "./../../../xy";
@@ -175,6 +180,7 @@ import type { Picture } from "./../../../index";
 import type { PicturePattern } from "./../../../index";
 import type { PieChart } from "./../../../percent";
 import type { PieSeries } from "./../../../percent";
+import type { PixelMapSeries } from "./../../../map";
 import type { PointedRectangle } from "./../../../index";
 import type { Polygon } from "./../../../index";
 import type { PolylineSeries } from "./../../../stock";
@@ -327,6 +333,7 @@ export interface IClasses {
 	"CurveLineSeries": () => Promise<typeof CurveLineSeries>;
 	"DataSaveControl": () => Promise<typeof DataSaveControl>;
 	"DateAxis": () => Promise<typeof DateAxis>;
+	"DateFormatter": () => Promise<typeof DateFormatter>;
 	"DateRangeSelector": () => Promise<typeof DateRangeSelector>;
 	"DisparityIndex": () => Promise<typeof DisparityIndex>;
 	"DoodleSeries": () => Promise<typeof DoodleSeries>;
@@ -339,6 +346,7 @@ export interface IClasses {
 	"DropdownList": () => Promise<typeof DropdownList>;
 	"DropdownListControl": () => Promise<typeof DropdownListControl>;
 	"DurationAxis": () => Promise<typeof DurationAxis>;
+	"DurationFormatter": () => Promise<typeof DurationFormatter>;
 	"EditableAxisLabel": () => Promise<typeof EditableAxisLabel>;
 	"EditableLabel": () => Promise<typeof EditableLabel>;
 	"Ellipse": () => Promise<typeof Ellipse>;
@@ -402,6 +410,7 @@ export interface IClasses {
 	"MapPointSeries": () => Promise<typeof MapPointSeries>;
 	"MapPolygon": () => Promise<typeof MapPolygon>;
 	"MapPolygonSeries": () => Promise<typeof MapPolygonSeries>;
+	"MapRasterSeries": () => Promise<typeof MapRasterSeries>;
 	"MapSankeyNodes": () => Promise<typeof MapSankeyNodes>;
 	"MapSankeySeries": () => Promise<typeof MapSankeySeries>;
 	"MapSeries": () => Promise<typeof MapSeries>;
@@ -412,6 +421,8 @@ export interface IClasses {
 	"MovingAverage": () => Promise<typeof MovingAverage>;
 	"MovingAverageDeviation": () => Promise<typeof MovingAverageDeviation>;
 	"MovingAverageEnvelope": () => Promise<typeof MovingAverageEnvelope>;
+	"NightSeries": () => Promise<typeof NightSeries>;
+	"NumberFormatter": () => Promise<typeof NumberFormatter>;
 	"NumericStepper": () => Promise<typeof NumericStepper>;
 	"OHLC": () => Promise<typeof OHLC>;
 	"OHLCSeries": () => Promise<typeof OHLCSeries>;
@@ -434,6 +445,7 @@ export interface IClasses {
 	"PicturePattern": () => Promise<typeof PicturePattern>;
 	"PieChart": () => Promise<typeof PieChart>;
 	"PieSeries": () => Promise<typeof PieSeries>;
+	"PixelMapSeries": () => Promise<typeof PixelMapSeries>;
 	"PointedRectangle": () => Promise<typeof PointedRectangle>;
 	"Polygon": () => Promise<typeof Polygon>;
 	"PolylineSeries": () => Promise<typeof PolylineSeries>;
@@ -587,6 +599,7 @@ const classes: IClasses = {
 	"CurveLineSeries": () => import(/* webpackMode: "weak" */ "./../../../timeline").then((m) => m.CurveLineSeries),
 	"DataSaveControl": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.DataSaveControl),
 	"DateAxis": () => import(/* webpackMode: "weak" */ "./../../../xy").then((m) => m.DateAxis),
+	"DateFormatter": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.DateFormatter),
 	"DateRangeSelector": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.DateRangeSelector),
 	"DisparityIndex": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.DisparityIndex),
 	"DoodleSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.DoodleSeries),
@@ -599,6 +612,7 @@ const classes: IClasses = {
 	"DropdownList": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownList),
 	"DropdownListControl": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.DropdownListControl),
 	"DurationAxis": () => import(/* webpackMode: "weak" */ "./../../../xy").then((m) => m.DurationAxis),
+	"DurationFormatter": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.DurationFormatter),
 	"EditableAxisLabel": () => import(/* webpackMode: "weak" */ "./../../../xy").then((m) => m.EditableAxisLabel),
 	"EditableLabel": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.EditableLabel),
 	"Ellipse": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Ellipse),
@@ -662,6 +676,7 @@ const classes: IClasses = {
 	"MapPointSeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapPointSeries),
 	"MapPolygon": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygon),
 	"MapPolygonSeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapPolygonSeries),
+	"MapRasterSeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapRasterSeries),
 	"MapSankeyNodes": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapSankeyNodes),
 	"MapSankeySeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapSankeySeries),
 	"MapSeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.MapSeries),
@@ -672,6 +687,8 @@ const classes: IClasses = {
 	"MovingAverage": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverage),
 	"MovingAverageDeviation": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageDeviation),
 	"MovingAverageEnvelope": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.MovingAverageEnvelope),
+	"NightSeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.NightSeries),
+	"NumberFormatter": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.NumberFormatter),
 	"NumericStepper": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.NumericStepper),
 	"OHLC": () => import(/* webpackMode: "weak" */ "./../../../xy").then((m) => m.OHLC),
 	"OHLCSeries": () => import(/* webpackMode: "weak" */ "./../../../xy").then((m) => m.OHLCSeries),
@@ -694,6 +711,7 @@ const classes: IClasses = {
 	"PicturePattern": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.PicturePattern),
 	"PieChart": () => import(/* webpackMode: "weak" */ "./../../../percent").then((m) => m.PieChart),
 	"PieSeries": () => import(/* webpackMode: "weak" */ "./../../../percent").then((m) => m.PieSeries),
+	"PixelMapSeries": () => import(/* webpackMode: "weak" */ "./../../../map").then((m) => m.PixelMapSeries),
 	"PointedRectangle": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.PointedRectangle),
 	"Polygon": () => import(/* webpackMode: "weak" */ "./../../../index").then((m) => m.Polygon),
 	"PolylineSeries": () => import(/* webpackMode: "weak" */ "./../../../stock").then((m) => m.PolylineSeries),

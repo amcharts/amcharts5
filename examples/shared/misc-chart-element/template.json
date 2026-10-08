@@ -1,0 +1,9 @@
+{
+  "title": "Chart as an HTML Element",
+  "description": "The <am5-chart> element builds a chart from a JSON config, with no root and no chart code: for pages, frameworks and tools where writing chart code is not the point.",
+  "category": "other",
+  "tier": "technique",
+  "tags": ["element", "web component", "custom element", "json"],
+  "since": "5.21.0",
+  "extraScriptImports": ["../../percent.js"]
+}

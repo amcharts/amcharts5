@@ -1,8 +1,6 @@
-import type { Root } from "../../core/Root";
 import type { DataItem } from "../../core/render/Component";
 import type { HierarchyNode } from "./HierarchyNode";
 import type { Bullet } from "../../core/render/Bullet";
-import type { Series } from "../../core/render/Series";
 
 import { Partition, IPartitionPrivate, IPartitionSettings, IPartitionDataItem } from "./Partition";
 import { Template } from "../../core/util/Template";
@@ -35,7 +33,7 @@ export interface ISunburstDataItem extends IPartitionDataItem {
 	children: Array<DataItem<ISunburstDataItem>>;
 
 	/**
-	 * Data item of a parent node.
+	 * Data item of the parent node.
 	 */
 	parent: DataItem<ISunburstDataItem>;
 
@@ -45,7 +43,7 @@ export interface ISunburstDataItem extends IPartitionDataItem {
 	d3PartitionNode: d3hierarchy.HierarchyRectangularNode<ISunburstDataObject>;
 
 	/**
-	 * A [[Slice]] element of the node.
+	 * The node's slice.
 	 */
 	slice: Slice;
 
@@ -54,30 +52,31 @@ export interface ISunburstDataItem extends IPartitionDataItem {
 export interface ISunburstSettings extends IPartitionSettings {
 
 	/**
-	 * Start angle of the series.
+	 * Angle where the sunburst starts, in degrees: `0` is at the right, `-90`
+	 * at the top, and angles grow clockwise.
 	 *
 	 * @default -90
 	 */
 	startAngle?: number;
 
 	/**
-	 * End angle of the series.
+	 * Angle where the sunburst ends, in degrees.
 	 *
 	 * @default 270
 	 */
 	endAngle?: number;
 
 	/**
-	 * Inner radius of the suburst pie.
-	 *
-	 * Setting to negative number will mean pixels from outer radius.
+	 * Inner radius of the sunburst, in pixels or percent of `radius`. A
+	 * negative number is pixels in from the outer radius.
 	 *
 	 * @default 0
 	 */
 	innerRadius?: number | Percent;
 
 	/**
-	 * Outer radius of the sunburst pie.
+	 * Outer radius of the sunburst, in pixels or percent of the largest radius
+	 * that fits the series for its `startAngle` and `endAngle`.
 	 *
 	 * @default 100%
 	 */
@@ -110,7 +109,9 @@ export interface ISunburstPrivate extends IPartitionPrivate {
 }
 
 /**
- * Builds a sunburst diagram.
+ * A sunburst diagram: the hierarchy as rings of slices, each level a ring
+ * further out, each node spanning as much of its ring as its value. A click on
+ * a node zooms into it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/sunburst/} for more info
  * @important
@@ -130,10 +131,11 @@ export class Sunburst extends Partition {
 
 	declare public _rootNode: d3hierarchy.HierarchyRectangularNode<ISunburstDataObject> | undefined;
 
+	protected _dirtySlices: Set<DataItem<this["_dataItemSettings"]>> = new Set();
+	protected _preparing: boolean = false;
+
 	/**
-	 * A list of node slice elements in a [[Sunburst]] chart.
-	 *
-	 * @default new ListTemplate<Slice>
+	 * List of node slices; configure them all through `slices.template`.
 	 */
 	public readonly slices: ListTemplate<Slice> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -143,9 +145,7 @@ export class Sunburst extends Partition {
 	));
 
 	/**
-	 * A list of label elements in a [[Hierarchy]] chart.
-	 *
-	 * @default new ListTemplate<RadialLabel>
+	 * List of node labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<RadialLabel> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -162,27 +162,35 @@ export class Sunburst extends Partition {
 	}
 
 	public _prepareChildren() {
-		super._prepareChildren();
+		this._preparing = true;
+		try {
+			super._prepareChildren();
 
-		// These settings are only consumed in `_updateVisuals` (arc bounds, radius
-		// and per-slice angle math), which the base only runs on value/size
-		// changes — so redraw when they change dynamically.
-		if (this.isDirty("startAngle") || this.isDirty("endAngle") || this.isDirty("radius") || this.isDirty("innerRadius")) {
-			this._updateVisuals();
-		}
+			// These settings are only consumed in `_updateVisuals` (arc bounds, radius
+			// and per-slice angle math), which the base only runs on value/size
+			// changes — so redraw when they change dynamically.
+			if (this.isDirty("startAngle") || this.isDirty("endAngle") || this.isDirty("radius") || this.isDirty("innerRadius")) {
+				this._updateVisuals();
+			}
 
-		if (this.isPrivateDirty("dr") || this.isPrivateDirty("dx")) {
-			if (this._rootNode) {
-				this._updateNodesScale(this._rootNode);
+			if (this.isPrivateDirty("dr") || this.isPrivateDirty("dx")) {
+				if (this._rootNode) {
+					this._updateNodesScale(this._rootNode);
+				}
 			}
 		}
+		finally {
+			// Or later slice changes would queue with nothing left to drain them
+			this._preparing = false;
+		}
+		this._updateDirtySlices();
 	}
 
 	protected _updateVisuals() {
 		if (this._rootNode) {
 			const partitionLayout = this._partitionLayout;
 
-			let bounds = $math.getArcBounds(0, 0, this.get("startAngle", 0), this.get("endAngle", 360), 1);
+			let bounds = $math.getArcBounds(0, 0, this.get("startAngle", -90), this.get("endAngle", 270), 1);
 
 			let w = this.innerWidth();
 			let h = this.innerHeight();
@@ -212,14 +220,17 @@ export class Sunburst extends Partition {
 
 			const nodePadding = this.get("nodePadding");
 
-			if ($type.isNumber(nodePadding)) {
-				partitionLayout.padding(nodePadding);
-			}
+			partitionLayout.padding($type.isNumber(nodePadding) ? nodePadding : 0);
 
 
 			partitionLayout(this._rootNode);
 			this._updateNodes(this._rootNode);
 		}
+	}
+
+	protected _isSingleBranchOnly(): boolean {
+		// Other branches would overlap the zoomed-in one, so always collapse them
+		return true;
 	}
 
 	protected _updateNode(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -229,6 +240,10 @@ export class Sunburst extends Partition {
 		const node = dataItem.get("node");
 
 		node.setAll({ x: 0, y: 0 });
+		// Partition sizes nodes as rectangles; in a sunburst node takes the size
+		// of its slice
+		node.remove("width");
+		node.remove("height");
 		const duration = this.get("animationDuration", 0);
 		const easing = this.get("animationEasing");
 
@@ -329,15 +344,48 @@ export class Sunburst extends Partition {
 
 		slice._setDataItem(dataItem);
 
-		slice.on("arc", () => {
-			this._updateLabel(dataItem);
-		})
-		slice.on("innerRadius", () => {
-			this._updateLabel(dataItem);
-		})
-		slice.on("radius", () => {
-			this._updateLabel(dataItem);
-		})
+		const update = () => {
+			this._markSliceDirty(dataItem);
+		}
+		slice.on("arc", update);
+		// Turning the whole sunburst moves every slice without changing its arc
+		slice.on("startAngle", update);
+		slice.on("innerRadius", update);
+		slice.on("radius", update);
+	}
+
+	// One label and bullet update per slice per frame, however many of its settings change
+	protected _markSliceDirty(dataItem: DataItem<this["_dataItemSettings"]>) {
+		if (this._childrenPrep && !this._preparing) {
+			// This frame's pass is over
+			this._updateSlice(dataItem);
+			return;
+		}
+		this._dirtySlices.add(dataItem);
+		if (!this._preparing) {
+			this._root._addDirtyParent(this);
+		}
+	}
+
+	protected _updateDirtySlices() {
+		const dataItems = this._dirtySlices;
+		if (dataItems.size) {
+			this._dirtySlices = new Set();
+			dataItems.forEach((dataItem) => {
+				if (!dataItem.isDisposed()) {
+					this._updateSlice(dataItem);
+				}
+			});
+		}
+	}
+
+	protected _updateSlice(dataItem: DataItem<this["_dataItemSettings"]>) {
+		this._updateLabel(dataItem);
+		if (dataItem.bullets) {
+			$array.each(dataItem.bullets, (bullet) => {
+				this._positionBullet(bullet);
+			});
+		}
 	}
 
 	protected _updateLabel(dataItem: DataItem<this["_dataItemSettings"]>) {
@@ -480,27 +528,6 @@ export class Sunburst extends Partition {
 
 			sprite.set("x", x);
 			sprite.set("y", y);
-		}
-	}
-
-	protected _makeBullet(dataItem: DataItem<this["_dataItemSettings"]>, bulletFunction: (root: Root, series: Series, dataItem: DataItem<this["_dataItemSettings"]>) => Bullet | undefined, index?: number) {
-		const bullet = super._makeBullet(dataItem, bulletFunction, index);
-
-		if (bullet) {
-			const sprite = bullet.get("sprite");
-			const slice = dataItem.get("slice");
-
-			if (sprite && slice) {
-				slice.on("arc", () => {
-					this._positionBullet(bullet);
-				})
-
-				slice.on("radius", () => {
-					this._positionBullet(bullet);
-				})
-			}
-
-			return bullet;
 		}
 	}
 }

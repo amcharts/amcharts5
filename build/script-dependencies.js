@@ -7,4 +7,5 @@ module.exports = {
     "gantt": ["xy", "plugins/colorPicker"],
     "stock": ["xy"],
     "timeline": ["xy"],
+    "element": ["index", "plugins/json"],
 };

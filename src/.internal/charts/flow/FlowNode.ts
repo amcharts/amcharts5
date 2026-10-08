@@ -15,7 +15,7 @@ export interface IFlowNodePrivate extends IContainerPrivate {
 export class FlowNode extends Container {
 
 	/**
-	 * Related series.
+	 * The nodes series this node belongs to.
 	 */
 	public series: FlowNodes | undefined;
 

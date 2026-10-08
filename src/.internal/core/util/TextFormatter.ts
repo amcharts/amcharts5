@@ -3,22 +3,28 @@ import type { ITextStyle } from "../render/backend/Renderer"
 import * as $type from "./Type";
 
 /**
- * Defines an interface for an object that holds a chunk of text.
+ * A piece of text, as split up by [[TextFormatter]].
  */
 export interface ITextChunk {
 
 	/**
-	 * Type of the chunk.
+	 * Type of the chunk: `"value"` for text to process, `"text"` for quoted
+	 * text shown as it is, `"format"` for a style block such as `[bold]`, or
+	 * `"image"` for an image block.
 	 */
 	"type": "value" | "text" | "format" | "image",
 
 	/**
-	 * Text.
+	 * The chunk's text.
 	 */
 	"text": string
 
 }
 
+/**
+ * Splits text into chunks of plain text and style blocks, such as `[bold]`,
+ * and reads style blocks into text styles.
+ */
 export class TextFormatter {
 
 	public static prefix = "__amcharts__";
@@ -202,6 +208,14 @@ export class TextFormatter {
 		return text.match(/img[ ]?:/) ? true : false;
 	}
 
+	/**
+	 * Reads a style block, such as `[bold #f00 fontSize: 20px]`, into text
+	 * style settings: a font weight, `underline` or `line-through`, a color,
+	 * and any `key: value` pairs.
+	 *
+	 * @param   style  Style block
+	 * @return         Text style
+	 */
 	public static getTextStyle(style: string): ITextStyle {
 
 		// let textStyle: string[] = [];

@@ -9,6 +9,9 @@ import { FlowNodes, IFlowNodesSettings, IFlowNodesDataItem, IFlowNodesPrivate, I
 import { RoundedRectangle } from "../../core/render/RoundedRectangle";
 
 export interface ISankeyNodesDataItem extends IFlowNodesDataItem {
+	/**
+	 * The node's rectangle.
+	 */
 	rectangle: RoundedRectangle;
 }
 
@@ -22,7 +25,7 @@ export interface ISankeyNodesEvents extends IFlowNodesEvents {
 }
 
 /**
- * Holds instances of nodes for a [[Sankey]] series.
+ * Holds the nodes of a [[Sankey]] series. Nodes can be dragged.
  */
 export class SankeyNodes extends FlowNodes {
 	public static className: string = "SankeyNodes";
@@ -34,9 +37,8 @@ export class SankeyNodes extends FlowNodes {
 	declare public _events: ISankeyNodesEvents;
 
 	/**
-	 * List of rectangle elements.
-	 *
-	 * @default new ListTemplate<RoundedRectangle>
+	 * List of node rectangles; configure them all through
+	 * `rectangles.template`.
 	 */
 	public readonly rectangles: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),

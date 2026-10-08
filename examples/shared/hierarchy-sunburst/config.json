@@ -1,0 +1,92 @@
+{
+  "type": "Sunburst",
+  "settings": {
+    "radius": { "type": "Percent", "value": 95 },
+    "valueField": "value",
+    "categoryField": "name",
+    "childDataField": "children",
+    "selectedDataItem": "@self.dataItems.0",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": { "data": "#data-0" },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "name": "Visits",
+          "children": [
+            {
+              "name": "Search",
+              "children": [
+                {
+                  "name": "Organic",
+                  "children": [
+                    { "name": "Google", "value": 420 },
+                    { "name": "Bing", "value": 90 }
+                  ],
+                  "__parse": true
+                },
+                {
+                  "name": "Paid",
+                  "children": [
+                    { "name": "Text Ads", "value": 100 },
+                    { "name": "Banners", "value": 70 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Social",
+              "children": [
+                {
+                  "name": "Video",
+                  "children": [
+                    { "name": "YouTube", "value": 110 },
+                    { "name": "TikTok", "value": 70 }
+                  ],
+                  "__parse": true
+                },
+                {
+                  "name": "Networks",
+                  "children": [
+                    { "name": "Facebook", "value": 150 },
+                    { "name": "Instagram", "value": 120 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            },
+            {
+              "name": "Direct",
+              "children": [
+                {
+                  "name": "Saved",
+                  "children": [
+                    { "name": "Bookmarks", "value": 90 },
+                    { "name": "Shortcuts", "value": 60 }
+                  ],
+                  "__parse": true
+                },
+                {
+                  "name": "Email",
+                  "children": [
+                    { "name": "Newsletter", "value": 95 },
+                    { "name": "Campaigns", "value": 60 }
+                  ],
+                  "__parse": true
+                }
+              ],
+              "__parse": true
+            }
+          ],
+          "__parse": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
   "private": true,
   "name": "@amcharts/amcharts5",
-  "version": "5.20.8",
+  "version": "5.21.0",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
-  "description": "amCharts 5",
-  "homepage": "https://www.amcharts.com/",
+  "description": "JavaScript and TypeScript charts and maps: XY, pie, map, stock, Gantt, hierarchy, flow, radar and timeline charts, on canvas or as SVG",
+  "homepage": "https://www.amcharts.com/docs/v5/",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://www.amcharts.com/support/",
@@ -16,12 +16,26 @@
   },
   "keywords": [
     "amcharts",
-    "javascript",
+    "amcharts5",
     "charts",
+    "chart",
+    "charting-library",
+    "data-visualization",
+    "dataviz",
+    "graph",
+    "maps",
+    "stock-chart",
+    "gantt",
+    "treemap",
+    "sankey",
+    "canvas",
+    "svg",
+    "javascript",
     "typescript"
   ],
   "sideEffects": [
-    "**/map.{ts,js}"
+    "**/map.{ts,js}",
+    "**/element.{ts,js}"
   ],
   "scripts": {
     "build": "node build/build.js -- build",
@@ -29,6 +43,7 @@
     "build:script": "node build/build.js -- build:script",
     "build:geodata": "cross-env NODE_OPTIONS=--max_old_space_size=10240 node build/build.js -- build:geodata",
     "examples": "node build/build.js -- examples",
+    "examples:check": "tsc -p examples",
     "run-example": "node build/build.js -- run-example",
     "typecheck": "node build/build.js -- typecheck",
     "generate-classes": "node build/build.js -- generate-classes",

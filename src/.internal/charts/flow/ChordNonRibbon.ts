@@ -14,10 +14,8 @@ export interface IChordNonRibbonDataItem extends IChordDataItem {
 export interface IChordNonRibbonSettings extends IChordSettings {
 
 	/**
-	 * Type of the link:
-	 *
-	 * `"curve"` (default) will display link as a curved line.
-	 * `"line"` will display link as a straight line.
+	 * Shape of the links: `"curve"` bends them toward the center, `"line"`
+	 * draws them straight.
 	 *
 	 * @default "curve"
 	 */
@@ -32,7 +30,8 @@ export interface IChordNonRibbonEvents extends IChordEvents {
 }
 
 /**
- * Chord series with thin line links.
+ * Chord diagram with thin lines for links instead of ribbons. All nodes get
+ * arcs of the same size, whatever the link values.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important

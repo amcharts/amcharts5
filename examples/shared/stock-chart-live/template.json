@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"]
+  "title": "Live Stock Chart",
+  "description": "A candlestick chart that gets a new price every second: the last candle is updated or a new one is added, and an axis range follows the current value.",
+  "category": "stock",
+  "tier": "technique",
+  "tags": ["live data", "candlestick", "axis range", "data update", "toolbar"],
+  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "chartdiv": { "height": "calc(100vh - 36px)" }
 }

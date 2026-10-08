@@ -17,49 +17,51 @@ import * as $type from "../../core/util/Type";
 export interface IZoomableContainerSettings extends IContainerSettings {
 
 	/**
-	 * Maximum zoom-in level.
-	 * 
+	 * Highest zoom level, as the scale of the contents.
+	 *
 	 * @default 32
 	 */
 	maxZoomLevel?: number;
 
 	/**
-	 * Maximum zoom-out level.
-	 * 
+	 * Lowest zoom level, as the scale of the contents.
+	 *
 	 * @default 1
 	 */
 	minZoomLevel?: number;
 
 	/**
-	 * Zoom level increase/decrease factor with each zoom action.
-	 * 
+	 * Factor each zoom in or out (a button or a wheel step) multiplies or
+	 * divides the zoom level by.
+	 *
 	 * @default 2
 	 */
 	zoomStep?: number;
 
 	/**
-	 * Pinch-zooming is enabled on touch devices.
+	 * Enables zooming with a two-finger pinch on touch devices.
 	 *
 	 * @default true
 	 */
 	pinchZoom?: boolean;
 
 	/**
-	 * Animation duration (ms) for zoom animations.
+	 * Duration of zoom animations in milliseconds.
 	 *
 	 * @default 600
 	 */
 	animationDuration?: number;
 
 	/**
-	 * Easing function to use for zoom animations.
-	 * 
+	 * Easing function of zoom animations.
+	 *
 	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	animationEasing?: (t: Time) => Time;
 
 	/**
-	 * How much of a content can go outside the viewport.
+	 * How far the zoomed-in contents can be panned out of view, as a fraction
+	 * of their width and height.
 	 *
 	 * @default 0.4
 	 */
@@ -74,7 +76,8 @@ export interface IZoomableContainerEvents extends IContainerEvents {
 }
 
 /**
- * A version of [[Container]] which adds zooming capabilities.
+ * A [[Container]] whose `contents` can be zoomed with the wheel, a pinch or
+ * [[ZoomTools]], and panned by dragging.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Zoomable_container} for more info
  * @since 5.8.0
@@ -101,8 +104,8 @@ export class ZoomableContainer extends Container {
 	protected _pinchDP?: IDisposer;
 
 	/**
-	 * All elements must be added to `contents.children` instead of `children` of
-	 * [[ZoomableContainer]].
+	 * The container that zooms and pans. Add elements to `contents.children`,
+	 * not to the ZoomableContainer's own `children`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Zoomable_container} for more info
 	 */
@@ -240,11 +243,12 @@ export class ZoomableContainer extends Container {
 	}
 
 	/**
-	 * Zooms to specific X/Y point.
-	 * 
-	 * @param   point  Center point
+	 * Zooms to a level, keeping the contents under `point` in place. The level
+	 * is kept between `minZoomLevel` and `maxZoomLevel`.
+	 *
+	 * @param   point  Point in the container's coordinates
 	 * @param   level  Zoom level
-	 * @return         Zoom Animation object
+	 * @return         Zoom animation
 	 */
 	public zoomToPoint(point: IPoint, level: number): Animation<this["_settings"]["scale"]> | undefined {
 		if (level) {
@@ -273,27 +277,25 @@ export class ZoomableContainer extends Container {
 	}
 
 	/**
-	 * Zooms the container contents in by `zoomStep`.
-	 * 
-	 * @return Zoom Animation object
+	 * Zooms in by `zoomStep`, around the container's center.
+	 *
+	 * @return Zoom animation
 	 */
 	public zoomIn(): Animation<this["_settings"]["scale"]> | undefined {
 		return this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.contents.get("scale", 1) * this.get("zoomStep", 2));
 	}
 
 	/**
-	 * Zooms the container contents out by `zoomStep`.
-	 * 
-	 * @return Zoom Animation object
+	 * Zooms out by `zoomStep`, around the container's center.
+	 *
+	 * @return Zoom animation
 	 */
 	public zoomOut(): Animation<this["_settings"]["scale"]> | undefined {
 		return this.zoomToPoint({ x: this.width() / 2, y: this.height() / 2 }, this.contents.get("scale", 1) / this.get("zoomStep", 2));
 	}
 
 	/**
-	 * Fully zooms out the container contents.
-	 * 
-	 * @return Zoom Animation object
+	 * Takes the contents back to their home view: scale `1`, not panned.
 	 */
 	public goHome() {
 		return this._animateTo(0, 0, 1);

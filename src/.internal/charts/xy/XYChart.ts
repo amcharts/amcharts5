@@ -33,106 +33,95 @@ import * as $math from "../../core/util/Math";
 export interface IXYChartSettings extends ISerialChartSettings {
 
 	/**
-	 * horizontal scrollbar.
+	 * Horizontal scrollbar that zooms and pans the X axes. It goes above the
+	 * plot area, or below it with the scrollbar's `opposite` set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/} for more info
 	 */
 	scrollbarX?: Scrollbar;
 
 	/**
-	 * Vertical scrollbar.
-	 *
+	 * Vertical scrollbar that zooms and pans the Y axes. It goes right of the
+	 * plot area, or left of it with the scrollbar's `opposite` set.
 	 */
 	scrollbarY?: Scrollbar;
 
 	/**
-	 * A list of stroke widths (in pixels) to cycle through for line series as they
-	 * are added, the same way `colors` cycles series colors. Each added line
-	 * series is given the next width based on its position. Useful for telling
-	 * line series apart without relying on color (e.g. the "Patterns" theme).
+	 * Stroke widths in pixels for line series to cycle through, by each
+	 * series' index in `series`. Helps tell lines apart without color.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for related info
 	 */
 	strokeWidths?: Array<number>;
 
 	/**
-	 * A list of stroke dash arrays to cycle through for line series as they are
-	 * added, the same way `colors` cycles series colors. Each entry is a
-	 * `strokeDasharray` value (an array of dash/gap lengths, or a single number);
-	 * `0` or an empty array is a solid line.
+	 * Dash patterns for line series to cycle through, by each series' index
+	 * in `series`. Each entry is a `strokeDasharray` value; `0` or an empty
+	 * array draws a solid line.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for related info
 	 */
 	strokeDasharrays?: Array<number | Array<number>>;
 
 	/**
-	 * If this is set to `true`, users will be able to pan the chart horizontally
-	 * by dragging plot area.
+	 * Lets the user pan the chart horizontally by dragging the plot area.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Panning} for more info
+	 * @default false
 	 */
 	panX?: boolean;
 
 	/**
-	 * If this is set to `true`, users will be able to pan the chart vertically
-	 * by dragging plot area.
+	 * Lets the user pan the chart vertically by dragging the plot area.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Panning} for more info
+	 * @default false
 	 */
 	panY?: boolean;
 
 	/**
-	 * Indicates what happens when mouse wheel is spinned horizontally while over
-	 * plot area.
+	 * What scrolling the wheel horizontally over the plot area does: zoom or
+	 * pan along X, Y or both.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
 	 */
 	wheelX?: "zoomX" | "zoomY" | "zoomXY" | "panX" | "panY" | "panXY" | "none";
 
 	/**
-	 * Indicates what happens when mouse wheel is spinned vertically while over
-	 * plot area.
+	 * What scrolling the wheel vertically over the plot area does: zoom or pan
+	 * along X, Y or both.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
 	 */
 	wheelY?: "zoomX" | "zoomY" | "zoomXY" | "panX" | "panY" | "panXY" | "none";
 
 	/**
-	 * Indicates the relative "speed" of the mouse wheel.
+	 * How far one wheel step zooms or pans, as a share of the visible range.
 	 *
 	 * @default 0.25
 	 */
 	wheelStep?: number;
 
 	/**
-	 * Chart's cursor.
+	 * The chart's cursor.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/} for more info
 	 */
 	cursor?: XYCursor;
 
 	/**
-	 * If not set (default), cursor will show tooltips for all data items in the
-	 * same category/date.
-	 *
-	 * If set, cursor will select closest data item to pointer (mouse or touch) and
-	 * show tooltip for it.
-	 *
-	 * It will also show tooltips for all data items that are within X pixels
-	 * range (as set in `maxTooltipDistance`).
-	 *
-	 * Tooltips for data items farther then X pixels, will not be shown.
-	 *
-	 * NOTE: set it to `-1` to ensure only one tooltip is displayed, even if there
-	 * are multiple data items in the same place.
+	 * Limits the cursor's series tooltips to the one closest to the pointer,
+	 * plus any within this many pixels of it. `-1` shows only the closest one,
+	 * even when others are at the same spot. If not set, every series shows
+	 * its tooltip.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 */
 	maxTooltipDistance?: number;
 
 	/**
-	 * Indicates how the distance should be measured when assessing distance
-	 * between tooltips as set in `maxTooltipDistance`.
+	 * How `maxTooltipDistance` measures distance: `"xy"` by straight
+	 * distance, `"x"` or `"y"` along one direction only.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @since 5.2.6
@@ -140,10 +129,8 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	maxTooltipDistanceBy?: "xy" | "x" | "y";
 
 	/**
-	 * If set to `false` the chart will not check for overlapping of multiple
-	 * tooltips, and will not arrange them to not overlap.
-	 *
-	 * Will work only if chart has an `XYCursor` enabled.
+	 * Moves the series tooltips shown by the cursor apart vertically so they
+	 * don't overlap. Works only with a `cursor`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @default true
@@ -151,10 +138,8 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	arrangeTooltips?: boolean
 
 	/**
-	 * If set to `true`, using pinch gesture on the chart's plot area will zoom
-	 * chart horizontally.
-	 *
-	 * NOTE: this setting is not supported in a [[RadarChart]].
+	 * Zooms the chart horizontally with a pinch gesture on the plot area. Not
+	 * supported in a [[RadarChart]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
 	 * @since 5.1.8
@@ -163,10 +148,8 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	pinchZoomX?: boolean;
 
 	/**
-	 * If set to `true`, using pinch gesture on the chart's plot area will zoom
-	 * chart vertically.
-	 *
-	 * NOTE: this setting is not supported in a [[RadarChart]].
+	 * Zooms the chart vertically with a pinch gesture on the plot area. Not
+	 * supported in a [[RadarChart]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
 	 * @since 5.1.8
@@ -175,8 +158,9 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	pinchZoomY?: boolean;
 
 	/**
-	 * If set, will use this relative position as a "center" for mouse wheel
-	 * horizontal zooming instead of actual cursor position.
+	 * Position (0-1) to zoom the X axes around with the wheel, instead of the
+	 * pointer's position: `0` keeps the start of the visible range in place,
+	 * `1` the end.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
 	 * @since 5.2.11
@@ -184,8 +168,9 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	wheelZoomPositionX?: number;
 
 	/**
-	 * If set, will use this relative position as a "center" for mouse wheel
-	 * vertical zooming instead of actual cursor position.
+	 * Position (0-1) to zoom the Y axes around with the wheel, instead of the
+	 * pointer's position: `0` keeps the start of the visible range in place,
+	 * `1` the end.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
 	 * @since 5.2.11
@@ -197,14 +182,13 @@ export interface IXYChartSettings extends ISerialChartSettings {
 export interface IXYChartPrivate extends ISerialChartPrivate {
 
 	/**
-	 * A list of [[Series]] that currently have their tooltip being displayed.
+	 * Series whose tooltips the cursor currently shows.
 	 */
 	tooltipSeries?: Array<XYSeries>
 
 	/**
-	 * Array of other [[XYChart]] objects that cursors should be synced with.
-	 *
-	 * Note: cursors will be synced across the vertically stacked charts only.
+	 * Other charts whose plot areas count as this chart's when checking if
+	 * the pointer is over the plot, such as the other panels of a stock chart.
 	 */
 	otherCharts?: Array<XYChart>
 
@@ -214,7 +198,8 @@ export interface IXYChartPrivate extends ISerialChartPrivate {
 export interface IXYChartEvents extends ISerialChartEvents {
 
 	/**
-	 * Invoked when panning starts.
+	 * The pointer was pressed on the plot area, starting a pan (`panX` or
+	 * `panY` is set).
 	 *
 	 * @since 5.0.4
 	 */
@@ -223,7 +208,7 @@ export interface IXYChartEvents extends ISerialChartEvents {
 	};
 
 	/**
-	 * Invoked when panning ends.
+	 * The pointer was released, ending a pan.
 	 *
 	 * @since 5.0.4
 	 */
@@ -232,9 +217,8 @@ export interface IXYChartEvents extends ISerialChartEvents {
 	};
 
 	/**
-	 * Invoked if pointer is pressed down on a chart and released without moving.
-	 *
-	 * `panended` event will still kick in after that.
+	 * The pointer was pressed on the plot area and released without moving,
+	 * so nothing was panned. `panended` follows it.
 	 *
 	 * @since 5.2.19
 	 */
@@ -243,7 +227,7 @@ export interface IXYChartEvents extends ISerialChartEvents {
 	};
 
 	/**
-	 * Invoked when wheel caused zoom ends.
+	 * A zoom or pan by the wheel finished.
 	 *
 	 * @since 5.0.4
 	 */
@@ -252,7 +236,7 @@ export interface IXYChartEvents extends ISerialChartEvents {
 }
 
 /**
- * Creates an XY chart.
+ * A chart with X and Y axes, for line, column, scatter and other XY series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/} for more info
  * @important
@@ -268,18 +252,18 @@ export class XYChart extends SerialChart {
 	declare public _events: IXYChartEvents;
 
 	/**
-	 * A list of horizontal axes.
+	 * The chart's X (horizontal) axes.
 	 */
 	public readonly xAxes: ListAutoDispose<Axis<AxisRenderer>> = new ListAutoDispose();
 
 	/**
-	 * A list of vertical axes.
+	 * The chart's Y (vertical) axes.
 	 */
 	public readonly yAxes: ListAutoDispose<Axis<AxisRenderer>> = new ListAutoDispose();
 
 	/**
-	 * A [[Container]] located on top of the chart, used to store top horizontal
-	 * axes.
+	 * Container above the plot area that holds the X axes with `opposite`
+	 * renderers.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -287,8 +271,8 @@ export class XYChart extends SerialChart {
 	public readonly topAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout })._markC("width", "layout"));
 
 	/**
-	 * A [[Container]] located in the middle the chart, used to store vertical axes
-	 * and plot area container.
+	 * Container in the middle of the chart that holds the Y axes and the plot
+	 * area.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -296,8 +280,7 @@ export class XYChart extends SerialChart {
 	public readonly yAxesAndPlotContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.horizontalLayout })._markC("width", "height", "layout"));
 
 	/**
-	 * A [[Container]] located on bottom of the chart, used to store bottom
-	 * horizontal axes.
+	 * Container below the plot area that holds the X axes.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -305,8 +288,7 @@ export class XYChart extends SerialChart {
 	public readonly bottomAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout })._markC("width", "layout"));
 
 	/**
-	 * A [[Container]] located on left of the chart, used to store left-hand
-	 * vertical axes.
+	 * Container left of the plot area that holds the Y axes.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -314,7 +296,7 @@ export class XYChart extends SerialChart {
 	public readonly leftAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout })._markC("height", "layout"));
 
 	/**
-	 * A [[Container]] located in the middle of the chart, used to store plotContainer and topPlotContainer
+	 * Container that holds `plotContainer` and, over it, `topPlotContainer`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -322,12 +304,10 @@ export class XYChart extends SerialChart {
 	public readonly plotsContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false })._markC("width", "height", "maskContent"));
 
 	/**
-	 * A [[Container]] located in the middle of the chart, used to store actual
-	 * plots (series).
+	 * The plot area, which holds the series, grid and bullets.
 	 *
-	 * NOTE: `plotContainer` will automatically have its `background` preset. If
-	 * you need to modify background or outline for chart's plot area, you can
-	 * use `plotContainer.get("background")` for that.*
+	 * It comes with a `background` already set: to change the plot area's fill
+	 * or outline, configure `plotContainer.get("background")`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -335,8 +315,8 @@ export class XYChart extends SerialChart {
 	public readonly plotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 })._markC("width", "height"));
 
 	/**
-	 * A [[Container]] used for any elements that need to be displayed over
-	 * regular `plotContainer`.
+	 * Container over `plotContainer` for elements drawn on top of the plot
+	 * area, such as the zoom-out button.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -344,7 +324,7 @@ export class XYChart extends SerialChart {
 	public readonly topPlotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 })._markC("width", "height"));
 
 	/**
-	 * A [[Container]] axis grid elements are stored in.
+	 * Container in the plot area that holds the axes' grid, below the series.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -352,7 +332,8 @@ export class XYChart extends SerialChart {
 	public readonly gridContainer: Container = this.plotContainer.children.push(Container.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured"));
 
 	/**
-	 * A [[Container]] axis background grid elements are stored in.
+	 * Container in the plot area that holds the axis grid drawn above the
+	 * series, such as axis ranges with `above` set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -360,8 +341,8 @@ export class XYChart extends SerialChart {
 	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured");
 
 	/**
-	 * A [[Container]] located on right of the chart, used to store right-hand
-	 * vertical axes.
+	 * Container right of the plot area that holds the Y axes with `opposite`
+	 * renderers.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
@@ -369,7 +350,7 @@ export class XYChart extends SerialChart {
 	public readonly rightAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout })._markC("height", "layout"));
 
 	/**
-	 * A [[Container]] axis headers are stored in.
+	 * Container that holds the axis headers.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/} for more info
 	 * @default Container.new()
@@ -377,7 +358,7 @@ export class XYChart extends SerialChart {
 	public readonly axisHeadersContainer: Container = this.plotContainer.children.push(Container.new(this._root, {}));
 
 	/**
-	 * A button that is shown when chart is not fully zoomed out.
+	 * Button that zooms the chart out, shown while any axis is zoomed in.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Zoom_out_button} for more info
 	 * @default Button.new()
@@ -530,11 +511,11 @@ export class XYChart extends SerialChart {
 	}
 
 	/**
-	 * This method is invoked when mouse wheel is used over chart's plot
-	 * container, and handles zooming/pan.
+	 * Zooms or pans the chart for a wheel event, as set in `wheelX` and
+	 * `wheelY`. The chart calls it for the wheel over the plot area; call it
+	 * yourself to give other elements of the chart the same wheel behavior.
 	 *
-	 * You can invoke this method manually, if you need to mimic chart's wheel
-	 * behavior over other elements of the chart.
+	 * @param  event  Wheel event, with `point` relative to the root
 	 */
 	public handleWheel(event: { originalEvent: WheelEvent, point: IPoint, target: Container }) {
 		const wheelX = this.get("wheelX");
@@ -865,7 +846,7 @@ export class XYChart extends SerialChart {
 
 		if (this.get("panX") || this.get("panY")) {
 
-			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= this.height()) {
+			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= plotContainer.height()) {
 				//this._downPoint = local;
 				this._downPoint = { x: originalEvent.clientX, y: originalEvent.clientY };
 
@@ -1291,9 +1272,9 @@ export class XYChart extends SerialChart {
 					}))
 
 					// Used to populate `ariaLabel` with meaningful values
-					scrollbarX.setPrivate("positionTextFunction", (position: number) => {
+					scrollbarX.setPrivate("positionTextFunction", (position: number, isEnd?: boolean) => {
 						const axis = this.xAxes.getIndex(0);
-						return axis ? axis.getTooltipText(position, false) || "" : "";
+						return axis ? axis._scrollbarText(position, isEnd) : "";
 					});
 
 				}
@@ -1326,9 +1307,9 @@ export class XYChart extends SerialChart {
 					}))
 
 					// Used to populate `ariaLabel` with meaningful values
-					scrollbarY.setPrivate("positionTextFunction", (position: number) => {
+					scrollbarY.setPrivate("positionTextFunction", (position: number, isEnd?: boolean) => {
 						const axis = this.yAxes.getIndex(0);
-						return axis ? axis.getTooltipText(position, false) || "" : "";
+						return axis ? axis._scrollbarText(position, isEnd) : "";
 					});
 
 				}
@@ -1343,7 +1324,8 @@ export class XYChart extends SerialChart {
 	 * Puts a scrollbar into one of two containers, depending on its `opposite`
 	 * setting, and moves it over if the setting changes later. `unshift` is for
 	 * the left container, which fills left to right, so the scrollbar has to go
-	 * in at the front to end up outside the axes.
+	 * in at the front to end up outside the axes. `outsideAxes`, when set,
+	 * decides the order instead.
 	 *
 	 * @ignore
 	 */
@@ -1352,7 +1334,9 @@ export class XYChart extends SerialChart {
 			const opposite = scrollbar.get("opposite");
 			const target = opposite ? oppositeContainer : container;
 			const children = target.children;
-			const index = (opposite && unshift) ? 0 : children.length - 1;
+			const outside = scrollbar.get("outsideAxes");
+			const front = outside == null ? !!(opposite && unshift) : this._scrollbarInFront(target, outside);
+			const index = front ? 0 : children.length - 1;
 
 			if (scrollbar.parent != target || children.indexOf(scrollbar) != index) {
 				// A vertical layout only ever sets a child's private `y` and a
@@ -1363,7 +1347,7 @@ export class XYChart extends SerialChart {
 				scrollbar.removePrivate("x");
 				scrollbar.removePrivate("y");
 
-				if (opposite && unshift) {
+				if (front) {
 					children.moveValue(scrollbar, 0);
 				}
 				else {
@@ -1388,6 +1372,13 @@ export class XYChart extends SerialChart {
 		if (!scrollbar.parent) {
 			place();
 		}
+
+		this._disposers.push(scrollbar.on("outsideAxes", () => {
+			const parent = scrollbar.parent;
+			if (parent == container || parent == oppositeContainer) {
+				place();
+			}
+		}));
 
 		this._pushPropertyDisposer(key, scrollbar.on("opposite", () => {
 			// only move scrollbars the chart placed itself
@@ -1558,6 +1549,40 @@ export class XYChart extends SerialChart {
 			} else {
 				throw new Error("Unknown IListEvent type");
 			}
+			this._keepScrollbarsInPlace();
+		});
+	}
+
+	// Whether a scrollbar goes first in an axes container: the top and left
+	// ones fill from the outside in, the bottom and right ones from the plot out
+	protected _scrollbarInFront(container: Container, outside: boolean): boolean {
+		const outerFirst = container === this.topAxesContainer || container === this.leftAxesContainer;
+		return outside ? outerFirst : !outerFirst;
+	}
+
+	/**
+	 * Keeps scrollbars with `outsideAxes` set on their side of the axes when
+	 * axes come or move.
+	 *
+	 * @ignore
+	 */
+	public _keepScrollbarsInPlace() {
+		$array.each([this.get("scrollbarX"), this.get("scrollbarY")], (scrollbar) => {
+			if (scrollbar) {
+				const outside = scrollbar.get("outsideAxes");
+				const parent = scrollbar.parent;
+				if (outside != null && parent && (parent === this.topAxesContainer || parent === this.bottomAxesContainer || parent === this.leftAxesContainer || parent === this.rightAxesContainer)) {
+					const children = parent.children;
+					if (this._scrollbarInFront(parent, outside)) {
+						if (children.indexOf(scrollbar) != 0) {
+							children.moveValue(scrollbar, 0);
+						}
+					}
+					else if (children.indexOf(scrollbar) != children.length - 1) {
+						children.moveValue(scrollbar);
+					}
+				}
+			}
 		});
 	}
 
@@ -1678,10 +1703,10 @@ export class XYChart extends SerialChart {
 	}
 
 	/**
-	 * Checks if point is within plot area.
+	 * Checks if a point is within the plot area.
 	 *
-	 * @param   point  Reference point
-	 * @return         Is within plot area?
+	 * @param   point  Point relative to the plot area
+	 * @return         `true` if the point is within the plot area
 	 */
 	public inPlot(point: IPoint): boolean {
 		const plotContainer = this.plotContainer;
@@ -1933,7 +1958,8 @@ export class XYChart extends SerialChart {
 	}
 
 	/**
-	 * Fully zooms out the chart.
+	 * Zooms the chart fully out, on every axis whose `zoomOut` is not
+	 * `false`.
 	 */
 	public zoomOut() {
 		this.xAxes.each((axis) => {

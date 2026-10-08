@@ -1,0 +1,96 @@
+{
+  "type": "RadarChart",
+  "settings": {
+    "innerRadius": { "type": "Percent", "value": 30 },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"],
+    "xAxes": ["#axis-0"],
+    "yAxes": ["#axis-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "produce": "Leeks", "start": 1757883600000, "end": 1767132000000 },
+        { "produce": "Apples", "start": 1755205200000, "end": 1763157600000 },
+        { "produce": "Tomatoes", "start": 1751317200000, "end": 1760043600000 },
+        { "produce": "Strawberries", "start": 1747688400000, "end": 1752958800000 },
+        { "produce": "Asparagus", "start": 1744664400000, "end": 1750366800000 },
+        { "produce": "Spinach", "start": 1740780000000, "end": 1748638800000 },
+        { "produce": "Spinach", "start": 1756674000000, "end": 1762725600000 }
+      ]
+    },
+    {
+      "data-1": [
+        { "produce": "Leeks" },
+        { "produce": "Apples" },
+        { "produce": "Tomatoes" },
+        { "produce": "Strawberries" },
+        { "produce": "Asparagus" },
+        { "produce": "Spinach" }
+      ]
+    },
+    {
+      "axis-0": {
+        "type": "DateAxis",
+        "settings": {
+          "min": 1735682400000,
+          "max": 1767218400000,
+          "baseInterval": { "timeUnit": "day", "count": 1 },
+          "renderer": { "type": "AxisRendererCircular" }
+        }
+      }
+    },
+    {
+      "axis-1": {
+        "type": "CategoryAxis",
+        "settings": {
+          "categoryField": "produce",
+          "renderer": {
+            "type": "AxisRendererRadial",
+            "settings": { "minGridDistance": 20 }
+          }
+        },
+        "properties": { "data": "#data-1" }
+      }
+    },
+    {
+      "series-0": {
+        "type": "RadarColumnSeries",
+        "settings": {
+          "name": "In season",
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "categoryYField": "produce",
+          "openValueXField": "start",
+          "valueXField": "end",
+          "autoAppear": true,
+          "appearDuration": 1000
+        },
+        "properties": {
+          "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": { "cornerRadius": 25, "tooltipText": "{categoryY}: {openValueX} - {valueX}" }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "root": {
+    "properties": {
+      "dateFormatter": {
+        "settings": {
+          "dateFormat": "MMM d",
+          "dateFields": ["valueX", "openValueX"]
+        }
+      }
+    }
+  }
+}

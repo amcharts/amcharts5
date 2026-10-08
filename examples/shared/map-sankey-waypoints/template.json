@@ -1,3 +1,9 @@
 {
-  "bodyElements": ["<style>body { margin: 0; padding: 0; background: #0a0e12; overflow: hidden; }</style>", "<div id=\"chartdiv\" style=\"width: 100%; height: 100vh; background: #0a0e12;\"></div>"]
+  "title": "Map Sankey with Waypoints",
+  "description": "Oil routes on a globe: MapSankeySeries flows between coordinates, bent through waypoints to stay at sea, with a bullet travelling along each one.",
+  "category": "map",
+  "tier": "showcase",
+  "tags": ["map sankey series", "waypoints", "bullets", "animations", "globe", "auto home"],
+  "since": "5.21.0",
+  "jsonNote": "Giving every drop the same speed and its own start takes code, so here they all take the same time."
 }

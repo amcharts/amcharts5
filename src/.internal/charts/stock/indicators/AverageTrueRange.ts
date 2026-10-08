@@ -17,7 +17,8 @@ export interface IAverageTrueRangeEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Average True Range indicator: volatility, as each data item's true range
+ * averaged over `period`. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -30,7 +31,7 @@ export class AverageTrueRange extends ChartIndicator {
     declare public _events: IAverageTrueRangeEvents;
 
     /**
-     * Indicator series.
+     * The indicator's series.
      */
     declare public series: LineSeries;
 

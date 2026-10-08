@@ -7,7 +7,13 @@ import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
 
 export interface IDropdownColorsSettings extends IDropdownSettings {
+	/**
+	 * Colors to pick from.
+	 */
 	colors?: ColorSet;
+	/**
+	 * Adds opacity choices, from `100%` to `0%`, below the colors.
+	 */
 	useOpacity?: boolean;
 }
 
@@ -19,19 +25,23 @@ export interface IDropdownColorsPrivate extends IDropdownPrivate {
 }
 
 export interface IDropdownColorsEvents extends IDropdownEvents {
+	/**
+	 * A color was clicked.
+	 */
 	invoked: {
 		color: Color;
 	};
 
+	/**
+	 * An opacity was clicked.
+	 */
 	invokedOpacity: {
 		opacity: number;
 	};
 }
 
 /**
- * A dropdown used for color picker control.
- *
- * Should not be used as standalone control.
+ * The dropdown of a [[ColorControl]]. Not meant to be used on its own.
  */
 export class DropdownColors extends Dropdown {
 	public static className: string = "DropdownColors";
@@ -97,6 +107,11 @@ export class DropdownColors extends Dropdown {
 		super._dispose();
 	}
 
+	/**
+	 * Adds a color to the end of the list as shown.
+	 *
+	 * @param  color  Color
+	 */
 	public addItem(color: Color): void {
 		const currentColor = this.getPrivate("color") ? this.getPrivate("color")!.hex : 0;
 		const list = this.getPrivate("list")!;

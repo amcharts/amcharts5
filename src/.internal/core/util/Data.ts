@@ -17,8 +17,8 @@ export interface IDataWithProcessor {
 }
 
 /**
- * A [[List]] that holds components data.
- * 
+ * A [[List]] that holds a component's data.
+ *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/data/} for more info
  */
 export class ListData<T> extends List<T> implements ICounterRef, IDataWithProcessor {
@@ -34,7 +34,8 @@ export class ListData<T> extends List<T> implements ICounterRef, IDataWithProces
 	public decrementRef(): void { }
 
 	/**
-	 * An optional processor for data.
+	 * A [[DataProcessor]] that processes each data item as it is added or
+	 * replaced.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data} for more info
 	 */

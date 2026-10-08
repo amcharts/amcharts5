@@ -9,30 +9,29 @@ import { colorToOKLCH, oklchToColor } from "../core/util/OKLCH";
 export interface IMonochromeThemeSettings {
 
 	/**
-	 * Base color the single-hue ramp is built from. Accepts a hex number, a
-	 * CSS string, or a [[Color]].
-	 *
-	 * If omitted, the ramp defaults to a blue base (`#2e7c9e`).
+	 * Color whose hue the series ramp is made of, as a hex number, a CSS string
+	 * or a [[Color]]. It also colors the primary buttons. If not set, a blue
+	 * `#2e7c9e` is used.
 	 */
 	color?: number | string | Color;
 
 	/**
-	 * Optional accent color applied to the **first** series only, so one series
-	 * stands out against the monochrome ramp (like the "Dataviz" theme's single
-	 * color). Accepts a hex number, a CSS string, or a [[Color]].
+	 * A color put before the ramp, so that the first series stands out. Accepts
+	 * a hex number, a CSS string or a [[Color]]. With more series than colors,
+	 * the colors repeat, accent included.
 	 */
 	accent?: number | string | Color;
 
 	/**
-	 * Produce a dark variant (dark background + interface colors, and a ramp
-	 * that runs light-to-mid so series read on the dark ground).
+	 * Makes a dark theme: dark interface colors, and a ramp from light to mid
+	 * shades that shows on the dark background.
 	 *
 	 * @default false
 	 */
 	dark?: boolean;
 
 	/**
-	 * Number of steps in the series ramp.
+	 * Number of shades in the series ramp.
 	 *
 	 * @default 7
 	 */
@@ -40,11 +39,11 @@ export interface IMonochromeThemeSettings {
 }
 
 /**
- * "Monochrome" — a black-and-white (or single-accent) theme whose series
- * palette is a perceptually-even, single-hue lightness ramp generated in OKLCH.
+ * "Monochrome": a single-hue theme. Its series colors are an even ramp of
+ * shades of one color, from lighter to darker, with an optional `accent`
+ * first.
  *
- * Because a theme cannot take constructor parameters, this ships as a **factory
- * function** rather than a class:
+ * It is a function rather than a class, so that it can take settings:
  *
  * ```TypeScript
  * root.setThemes([
@@ -52,10 +51,7 @@ export interface IMonochromeThemeSettings {
  * ]);
  * ```
  *
- * With nothing set, the theme defaults to a blue ramp (`#2e7c9e`). Pass `color`
- * for a different single-hue ramp, and an optional `accent` to give the first
- * series a distinct pop (like the "Dataviz" theme's single color). This theme is
- * additive; it does not modify any built-in theme.
+ * With nothing set, the ramp is blue (`#2e7c9e`).
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important
@@ -145,10 +141,9 @@ export function MonochromeTheme(root: Root, settings: IMonochromeThemeSettings =
 }
 
 /**
- * Lets the theme be used exactly like the class-based themes -
- * `am5themes_Monochrome.new(root)` - applying the default blue ramp when no
- * options are given. For custom colors, call the factory directly:
- * `am5themes_Monochrome(root, { color: 0x2c6e91 })`.
+ * Same as calling the function, so the theme can be used like the class-based
+ * themes: `am5themes_Monochrome.new(root)`, or with settings,
+ * `am5themes_Monochrome.new(root, { color: 0x2c6e91 })`.
  */
 MonochromeTheme.new = function (root: Root, settings: IMonochromeThemeSettings = {}): Theme {
 	return MonochromeTheme(root, settings);

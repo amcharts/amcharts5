@@ -4,22 +4,26 @@ import * as $math from "../util/Math";
 export interface IPointedRectangleSettings extends IGraphicsSettings {
 
 	/**
-	 * A width of the pointer's (stem's) thick end (base) in pixels.
+	 * Width in pixels of the pointer where it joins the rectangle.
 	 */
 	pointerBaseWidth?: number;
 
 	/**
-	 * A length of the pointer (stem) in pixels.
+	 * Length of the pointer in pixels. A [[Tooltip]] keeps its box this far
+	 * from the point; the shape itself always points to `pointerX` and
+	 * `pointerY`.
 	 */
 	pointerLength?: number;
 
 	/**
-	 * X coordinate the shape is pointing to.
+	 * X of the point the pointer points to, in pixels from the shape's left
+	 * edge.
 	 */
 	pointerX?: number;
 
 	/**
-	 * Y coordinate the shape is pointing to.
+	 * Y of the point the pointer points to, in pixels from the shape's top
+	 * edge.
 	 */
 	pointerY?: number;
 
@@ -33,7 +37,8 @@ export interface IPointedRectanglePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a rectangle with a pointer.
+ * Draws a rectangle with a pointer, such as a tooltip's background. The
+ * pointer comes out of the side facing `pointerX` and `pointerY`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  * @important

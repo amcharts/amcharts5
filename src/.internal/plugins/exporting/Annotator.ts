@@ -9,20 +9,21 @@ import { p100 } from "../../core/util/Percent";
 export interface IAnnotatorSettings extends IEntitySettings {
 
 	/**
-	 * Layer number to use for annotations.
+	 * Layer the annotations are drawn on, above the chart.
 	 *
 	 * @default 1000
 	 */
 	layer?: number;
 
 	/**
-	 * Raw annotation info saved by MarkerJS.
+	 * The annotations, as state saved by MarkerJS. Setting it draws them, e.g.
+	 * to restore annotations saved earlier.
 	 */
 	markerState?: any;
 
 	/**
-	 * MarkerArea settings in form of an object where keys are setting names and
-	 * value is a setting value. E.g.:
+	 * Settings for MarkerJS's `MarkerArea`, as an object of setting names and
+	 * values, e.g.:
 	 *
 	 * ```TypeScript
 	 * let annotator = am5plugins_exporting.Annotator.new(root, {
@@ -47,7 +48,7 @@ export interface IAnnotatorSettings extends IEntitySettings {
 	markerSettings?: {[index: string]: any};
 
 	/**
-	 * MarkerArea style settings for user interface elements. E.g.:
+	 * Style settings for the MarkerJS user interface, e.g.:
 	 *
 	 * ```TypeScript
 	 * let annotator = am5plugins_exporting.Annotator.new(root, {
@@ -82,7 +83,8 @@ export interface IAnnotatorEvents extends IEntityEvents {
 
 
 /**
- * A plugin that can be used to annotate charts.
+ * A plugin that lets the user draw annotations over the chart, using the
+ * MarkerJS library.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/annotator/} for more info
  */
@@ -117,8 +119,8 @@ export class Annotator extends Entity {
 	}
 
 	/**
-	 * Triggers annotation mode on the chart. This will display UI toolbars and
-	 * disable all interactions on the chart itself.
+	 * Opens annotation mode: shows the MarkerJS toolbars and disables
+	 * interaction with the chart.
 	 */
 	public async open() {
 
@@ -144,7 +146,7 @@ export class Annotator extends Entity {
 	}
 
 	/**
-	 * Exists from annotation mode. All annotations remain visible on the chart.
+	 * Exits annotation mode. The annotations stay visible on the chart.
 	 */
 	public async close() {
 		//this._root._renderer.interactionsEnabled = true;
@@ -154,8 +156,7 @@ export class Annotator extends Entity {
 	}
 
 	/**
-	 * Exits from annotation mode. Any changes made during last session of the
-	 * annotation editing are cancelled.
+	 * Exits annotation mode, discarding the changes made since it opened.
 	 */
 	public async cancel() {
 		this._root._renderer.interactionsEnabled = true;
@@ -167,7 +168,7 @@ export class Annotator extends Entity {
 	}
 
 	/**
-	 * All annotations are removed.
+	 * Removes all annotations.
 	 */
 	public clear() {
 		this.set("markerState", undefined);
@@ -176,6 +177,9 @@ export class Annotator extends Entity {
 		}
 	}
 
+	/**
+	 * Opens annotation mode, or closes it if it is open.
+	 */
 	public async toggle() {
 		const markerArea = await this.getMarkerArea();
 		if (markerArea.isOpen) {
@@ -259,7 +263,7 @@ export class Annotator extends Entity {
 	}
 
 	/**
-	 * An instance of MarkerJS's [[MarkerArea]].
+	 * Returns MarkerJS's `MarkerArea`, loading MarkerJS first if needed.
 	 *
 	 * @see {@link https://markerjs.com/docs/getting-started} for more info
 	 * @return MarkerArea

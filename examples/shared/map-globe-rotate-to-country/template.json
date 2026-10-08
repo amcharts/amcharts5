@@ -1,0 +1,8 @@
+{
+  "title": "Globe Rotating to a Country",
+  "description": "A globe that turns and zooms to the clicked country, and back when it is clicked again or the water is clicked: clickZoom on a map that pans by rotating.",
+  "category": "map",
+  "tier": "technique",
+  "tags": ["globe", "orthographic", "rotate", "click", "clickZoom", "active state"],
+  "since": "5.21.0"
+}

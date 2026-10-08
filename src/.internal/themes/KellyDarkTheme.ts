@@ -2,11 +2,9 @@ import { KellyTheme } from "./KellyTheme";
 import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
 
 /**
- * "Kelly Dark" — the `Kelly` maximum-contrast palette on a dark ground. Reuses
- * the Kelly series colors (lifting the few near-black entries so they read on
- * the dark ground) and applies a neutral dark set of interface colors.
- *
- * This is a standalone theme; it does not modify the built-in `Kelly` theme.
+ * "Kelly Dark": the high-contrast `Kelly` palette on a dark background, with
+ * neutral dark interface colors. Its darker colors are lightened to show on
+ * the background. Use it in place of `Kelly`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

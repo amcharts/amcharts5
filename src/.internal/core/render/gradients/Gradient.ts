@@ -8,14 +8,15 @@ import { Entity, IEntitySettings, IEntityPrivate } from "../../util/Entity"
 export interface IGradientSettings extends IEntitySettings {
 
 	/**
-	 * A list of color steps for the gradient.
+	 * The gradient's colors, in order.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
 	 */
 	stops?: Array<IGradientStop>;
 
 	/**
-	 * Gradient target.
+	 * An element whose bounds the gradient spans, instead of the element it
+	 * fills, so that one gradient can run across several elements.
 	 */
 	target?: Sprite;
 

@@ -24,12 +24,13 @@ import * as $utils from "../util/Utils";
 export interface ITooltipSettings extends IContainerSettings {
 
 	/**
-	 * Text to use for tooltip's label.
+	 * Text of the tooltip's label. It can hold data placeholders, such as
+	 * `{valueY}`.
 	 */
 	labelText?: string;
 
 	/**
-	 * HTML content to use for tooltip's label.
+	 * HTML content of the tooltip's label, shown in place of `labelText`.
 	 *
 	 * @since 5.2.11
 	 */
@@ -50,7 +51,9 @@ export interface ITooltipSettings extends IContainerSettings {
 	labelAriaLabel?: string;
 
 	/**
-	 * A direction of the tooltip pointer.
+	 * Which way the tooltip's pointer points: `"down"` puts the tooltip above
+	 * the point, `"up"` below it, `"left"` to its right and `"right"` to its
+	 * left. `"vertical"` and `"horizontal"` pick the side that has room.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Orientation} for more info
 	 * @default "vertical"
@@ -58,8 +61,8 @@ export interface ITooltipSettings extends IContainerSettings {
 	pointerOrientation?: "left" | "right" | "up" | "down" | "vertical" | "horizontal";
 
 	/**
-	 * If set to `true` will use the same `fill` color for its background as
-	 * its `tooltipTarget`.
+	 * Gives the background the `fill` of the `tooltipTarget` (its `stroke`, if
+	 * it has no fill).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
 	 * @default true
@@ -67,8 +70,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	getFillFromSprite?: boolean;
 
 	/**
-	 * If set to `true` will use the same `fillGradient` for its background as
-	 * its `tooltipTarget`.
+	 * Gives the background the `fillGradient` of the `tooltipTarget`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
 	 * @default false
@@ -76,7 +78,9 @@ export interface ITooltipSettings extends IContainerSettings {
 	getFillGradientFromSprite?: boolean;
 
 	/**
-	 * If set to `true` will use the same `fill` color as its `tooltipTarget`.
+	 * Gives the label text the `fill` of the `tooltipTarget` (its `stroke`, if
+	 * it has no fill). Needs `autoTextColor: false`, which otherwise overrides
+	 * it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
 	 * @default false
@@ -84,7 +88,8 @@ export interface ITooltipSettings extends IContainerSettings {
 	getLabelFillFromSprite?: boolean;
 
 	/**
-	 * If set to `true` will use the same `stroke` color as its `tooltipTarget`.
+	 * Gives the background's stroke the `fill` of the `tooltipTarget` (its
+	 * `stroke`, if it has no fill).
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
 	 * @default false
@@ -92,44 +97,45 @@ export interface ITooltipSettings extends IContainerSettings {
 	getStrokeFromSprite?: boolean;
 
 	/**
-	 * Screen bounds to constrain the tooltip within.
+	 * Area to keep the tooltip within, in pixels relative to the root. If not
+	 * set, the whole chart area.
 	 */
 	bounds?: IBounds;
 
 	/**
-	 * If set to `true` tooltip will adjust its text color for better visibility
-	 * on its background.
+	 * Picks a light or dark text color, whichever reads better on the
+	 * background.
 	 *
 	 * @default true
 	 */
 	autoTextColor?: boolean;
 
 	/**
-	 * Screen coordinates the tooltip show point to.
+	 * The point the tooltip points to, relative to the root.
 	 */
 	pointTo?: IPoint;
 
 	/**
-	 * Duration in milliseconds for tooltip position change, e.g. when tooltip
-	 * is jumping from one target to another.
+	 * Duration in milliseconds of the tooltip's move to a new position, e.g.
+	 * from one target to another.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * Easing function for tooltip animation.
+	 * Easing function of the tooltip's moves.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 */
 	animationEasing?: (t: Time) => Time;
 
 	/**
-	 * A target element tooltip is shown for.
+	 * The element the tooltip is shown for.
 	 */
 	tooltipTarget?: Sprite;
 
 	/**
-	 * If set to `true`, tooltip's target element will considered to be hovered
-	 * when mouse pointer is over tooltip itself.
+	 * Keeps the target element hovered while the pointer is over the tooltip
+	 * itself.
 	 *
 	 * @since 5.2.14
 	 */
@@ -150,7 +156,7 @@ export interface ITooltipPrivate extends IContainerPrivate {
 }
 
 /**
- * Creates a tooltip.
+ * A label in a pointed box that points at an element or a point.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/} for more info
  * @important
@@ -228,14 +234,35 @@ export class Tooltip extends Container {
 		this._root._tooltips.push(this);
 	}
 
+	/**
+	 * Shown for a keyboard-focused element (`hoverOnFocus`): announced to
+	 * screen readers even without `readerAnnounce`.
+	 *
+	 * @ignore
+	 */
+	public _focusAnnounce: boolean = false;
+
 	protected _handleReaderAnnouncement() {
-		if (this.get("readerAnnounce") && this.isVisibleDeep()) {
-			this._root.readerAlert(this.label.getAccessibleText());
+		if ((this.get("readerAnnounce") || this._focusAnnounce) && this.isVisibleDeep()) {
+			const text = this.label.getAccessibleText();
+			if (!this.get("readerAnnounce") && this._repeatsTargetLabel(text)) {
+				// The screen reader already reads it as the focused element's name
+				return;
+			}
+			this._root.readerAlert(text);
 		}
 	}
 
+	protected _repeatsTargetLabel(text: string): boolean {
+		const target = this.get("tooltipTarget");
+		const focusElement = target && target.getPrivate("focusElement");
+		const label = focusElement && focusElement.dom.getAttribute("aria-label");
+		const normalize = (value: string) => $utils.stripTags(value).replace(/\s+/g, " ").trim().toLowerCase();
+		return label ? normalize(label) == normalize(text) : false;
+	}
+
 	/**
-	 * A [[Label]] element for the tooltip.
+	 * The tooltip's [[Label]].
 	 *
 	 * @readonly
 	 * @return Label
@@ -342,6 +369,10 @@ export class Tooltip extends Container {
 	}
 
 
+	/**
+	 * Takes the colors from `tooltipTarget` again, as the `get...FromSprite`
+	 * settings say.
+	 */
 	public updateBackgroundColor() {
 		let tooltipTarget = this.get("tooltipTarget");
 		const background = this.get("background");

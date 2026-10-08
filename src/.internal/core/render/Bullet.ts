@@ -5,52 +5,55 @@ import type { Series } from "../../core/render/Series";
 export interface IBulletSettings extends IEntitySettings {
 
 	/**
-	 * Horizontal location within target element.
+	 * Horizontal location within the target element, from `0` (left) to `1`
+	 * (right). In a pie slice it runs along the arc.
 	 *
-	 * 0 - left, 1 - right, or anything in between.
+	 * @default 0.5
 	 */
 	locationX?: number;
 
 	/**
-	 * Vertical location within target element.
+	 * Vertical location within the target element, from `0` (top) to `1`
+	 * (bottom). On XY columns `0` is the column's base and `1` its value end;
+	 * in a pie slice it runs from the inner to the outer radius.
 	 *
-	 * 0 - top, 1 - bottom, or anything in between.
+	 * @default 0.5
 	 */
 	locationY?: number;
 
 	/**
-	 * A visual element of the bullet.
+	 * The element the bullet shows.
 	 */
 	sprite: Sprite;
 
 	/**
-	 * If set to `true`, the bullet will redraw its `sprite` element whenever
-	 * anything in its parent series changes.
+	 * Refreshes the `sprite` (its fill, size and label text, and those of its
+	 * children) each time the series positions its bullets.
 	 *
 	 * @default false
 	 */
 	dynamic?: boolean;
 
 	/**
-	 * If set to `true`, the bullet will be automatically rotated to face
-	 * direction of line it is attached to.
+	 * Rotates the bullet to follow the direction of the line it sits on.
 	 *
-	 * NOTE: Works only in  [[Flow]] and [[MapPointSeries]] (when [[MapPoint]] is
-	 * attached to a [[MapLine]]).
+	 * Works on links of [[Flow]] charts, [[HierarchyLink]] and
+	 * [[MapSankeySeries]], and in [[MapPointSeries]] for points placed on a
+	 * [[MapLine]].
 	 *
 	 * @default false
 	 */
 	autoRotate?: boolean;
 
 	/**
-	 * If `autoRotate` is set to `true`, value of `autoRotateAngle` will be added
-	 * to the automatically-calculated angle.
+	 * Degrees added to the angle that `autoRotate` sets.
 	 */
 	autoRotateAngle?: number;
 
 	/**
-	 * If `field` is set, bullet will be placed at the specific data value, ignoring
-	 * any `locationX` and `locationY` settings.
+	 * Places the bullet at this value of the data item along the value axis,
+	 * in place of the location on that axis. The location across it still
+	 * applies.
 	 *
 	 * **IMPORTANT: this setting works with [[XYSeries]] only.**
 	 *
@@ -60,12 +63,12 @@ export interface IBulletSettings extends IEntitySettings {
 	field?: "open" | "high" | "low" | "value";
 
 	/**
-	 * If set, will stack bullets instead of overlapping them.
+	 * Stacks bullets at the same spot instead of overlapping them.
 	 *
-	 * * `"up` - stacks bullets upwards.
-	 * * `"down` - stacks bullets downwards.
-	 * * `"auto` - stacks bullets in the direction that offers more space.
-	 * 
+	 * * `"up"` - stacks bullets upwards (rightwards on a horizontal series).
+	 * * `"down"` - stacks bullets downwards (leftwards on a horizontal series).
+	 * * `"auto"` - stacks bullets in the direction that offers more space.
+	 *
 	 * **IMPORTANT: this setting works with [[XYSeries]] only.**
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Stacked_bullets} for more info
@@ -79,7 +82,7 @@ export interface IBulletPrivate extends IEntityPrivate {
 }
 
 /**
- * A universal placeholder for bullet elements.
+ * Holds an element (`sprite`) that a series places at a data item.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/} for more info
  */
@@ -94,7 +97,7 @@ export class Bullet extends Entity {
 	public _index?: number;
 
 	/**
-	 * Target series object if it's a bullet for series.
+	 * The series the bullet belongs to, if any.
 	 */
 	public series: Series | undefined;
 
@@ -109,7 +112,11 @@ export class Bullet extends Entity {
 		if (this.isDirty("sprite")) {
 			const sprite = this.get("sprite");
 			if (sprite) {
-				sprite.setAll({ position: "absolute", role: "figure" });
+				sprite._setC("position", "absolute");
+				// "figure" unless the sprite has a role of its own (e.g. a button)
+				if (sprite.get("role") == null) {
+					sprite._setC("role", "figure");
+				}
 				this._disposers.push(sprite);
 			}
 		}

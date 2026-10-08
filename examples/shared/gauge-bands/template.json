@@ -1,0 +1,8 @@
+{
+  "title": "Gauge with Bands",
+  "description": "A gauge with labelled color bands, where the hand and the value label take the color of the band the hand is in.",
+  "category": "radar",
+  "tier": "technique",
+  "tags": ["gauge", "bands", "axis ranges", "clock hand", "animation"],
+  "jsonNote": "Moving the hand and coloring it by its band take code."
+}

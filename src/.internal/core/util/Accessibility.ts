@@ -9,7 +9,7 @@ export interface IAccessibilitySettings {}
 
 
 /**
- * Defines available accessibility roles.
+ * ARIA roles an element can have.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
  */
@@ -93,6 +93,6 @@ export type Role =
 
 
 /**
- * Available options for `aria-live` attribute
+ * Values of the `aria-live` attribute.
  */
 export type AriaLive = "off" | "polite" | "assertive";

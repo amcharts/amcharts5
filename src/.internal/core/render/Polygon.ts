@@ -8,22 +8,23 @@ import type { Animation } from "../util/Entity";
 export interface IPolygonSettings extends IGraphicsSettings {
 
 	/**
-	 * An array of polygon corner coordinates.
+	 * The polygon's corners, in pixels. When they change, the polygon morphs
+	 * from its old shape to the new one.
 	 */
 	points?: Array<IPoint>;
 
 	/**
-	 * Coordinates.
+	 * The corners as `[x, y]` pairs, in pixels. They replace `points`.
 	 */
 	coordinates?: Array<Array<number>>;
 
 	/**
-	 * Number of milliseconds to play morph animation.
+	 * Duration in milliseconds of the morph when `points` change.
 	 */
 	animationDuration?: number;
 
 	/**
-	 * Easing function to use for animations.
+	 * Easing function of the morph.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 */
@@ -48,7 +49,7 @@ export interface IPolygonPrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a polygon.
+ * Draws a closed polygon through `points`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/polygon/} for more info
  * @important
@@ -128,7 +129,7 @@ export class Polygon extends Graphics {
 			let maxY = -Infinity;
 
 			if (points) {
-				for (let i = 1, len = points.length; i < len; i++) {
+				for (let i = 0, len = points.length; i < len; i++) {
 					const point = points[i];
 					minX = Math.min(minX, point.x);
 					maxX = Math.max(maxX, point.x);
@@ -141,7 +142,7 @@ export class Polygon extends Graphics {
 			this.setPrivate("minX", minX);
 			this.setPrivate("maxX", maxX);
 			this.setPrivate("minY", minY);
-			this.setPrivate("maxY", minY);
+			this.setPrivate("maxY", maxY);
 		}
 
 

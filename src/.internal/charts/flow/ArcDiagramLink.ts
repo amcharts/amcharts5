@@ -10,12 +10,12 @@ import * as $math from "../../core/util/Math";
 export interface IArcDiagramLinkSettings extends IFlowLinkSettings {
 
 	/**
-	 * Source data item.
+	 * Source node data item.
 	 */
 	source?: DataItem<IArcDiagramNodesDataItem>;
 
 	/**
-	 * target data item.
+	 * Target node data item.
 	 */
 	target?: DataItem<IArcDiagramNodesDataItem>;
 }
@@ -28,7 +28,8 @@ export interface IArcDiagramLinkPrivate extends IFlowLinkPrivate {
 }
 
 /**
- * A link element used in [[ArcDiagram]] chart.
+ * A link element of an [[ArcDiagram]] series: an arc from one node to
+ * another.
  */
 export class ArcDiagramLink extends FlowLink {
 
@@ -92,10 +93,10 @@ export class ArcDiagramLink extends FlowLink {
 		}
 
 		if (this.get("strokeStyle") == "gradient") {
-			this.set("isMeasured", true);
+			this._setC("isMeasured", true);
 		}
 		else {
-			this.set("isMeasured", false);
+			this._setC("isMeasured", false);
 		}
 	}
 

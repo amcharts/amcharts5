@@ -1,0 +1,8 @@
+{
+  "title": "Voronoi Treemap",
+  "description": "World population as a Voronoi treemap, with theme rules that style each level and a click that zooms to a continent.",
+  "category": "hierarchy",
+  "tier": "showcase",
+  "tags": ["voronoi treemap", "hierarchy", "theme rules", "adapter", "drill-down"],
+  "jsonNote": "Styling by level, names where they fit and the zoom on click take code, so this one shows country codes."
+}

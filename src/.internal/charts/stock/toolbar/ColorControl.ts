@@ -9,7 +9,16 @@ import * as $utils from "../../../core/util/Utils";
 import StockToolbarCSS from "./StockToolbarCSS";
 
 export interface IColorControlSettings extends IStockControlSettings {
+	/**
+	 * Colors to pick from. Without it, the default palette of
+	 * [[DropdownColors]] is used.
+	 */
 	colors?: ColorSet;
+	/**
+	 * Adds opacity choices, from `100%` to `0%`, below the colors.
+	 *
+	 * @default true
+	 */
 	useOpacity?: boolean;
 }
 
@@ -20,16 +29,23 @@ export interface IColorControlPrivate extends IStockControlPrivate {
 }
 
 export interface IColorControlEvents extends IStockControlEvents {
+	/**
+	 * A color was picked, or set with `setColor()`.
+	 */
 	selected: {
 		color: Color
 	}
+	/**
+	 * An opacity was picked, or set with `setOpacity()`.
+	 */
 	selectedOpacity: {
 		opacity: number
 	}
 }
 
 /**
- * Color picker control.
+ * A control with a dropdown for picking a color and, with `useOpacity`, an
+ * opacity.
  */
 export class ColorControl extends StockControl {
 	public static className: string = "ColorControl";
@@ -113,8 +129,8 @@ export class ColorControl extends StockControl {
 	}
 
 	/**
-	 * Sets color.
-	 * 
+	 * Sets the control's color and dispatches `selected`.
+	 *
 	 * @param  color  Color
 	 * @since 5.9.0
 	 */
@@ -128,9 +144,9 @@ export class ColorControl extends StockControl {
 	}
 
 	/**
-	 * Sets opacity.
-	 * 
-	 * @param  opacity  Opacity
+	 * Sets the control's opacity and dispatches `selectedOpacity`.
+	 *
+	 * @param  opacity  Opacity (`0` to `1`)
 	 * @since 5.9.0
 	 */
 	public setOpacity(opacity: number) {

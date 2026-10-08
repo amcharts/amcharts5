@@ -38,11 +38,8 @@ export function indexOf<A>(array: ArrayLike<A>, value: A): number {
 }
 
 /**
- * Calls `test` for each element in `array`.
- *
- * If `test` returns `true` then it immediately returns `true`.
- *
- * If `test` returns `false` for all of the elements in `array` then it returns `false`.
+ * Returns `true` if `test` returns `true` for any item of `array`, stopping
+ * at the first one.
  *
  * @param array  Source array
  * @param test   Function which is called on each element
@@ -130,10 +127,11 @@ export function eachContinue<A>(array: ArrayLike<A>, fn: (value: A, index: numbe
 }
 
 /**
- * Shifts an item at `index` towards beginning of the array.
+ * Removes the first `index` items of `array` in place, moving the rest to the
+ * beginning.
  *
  * @param array  Source array
- * @param index  Target element index
+ * @param index  Number of items to remove
  */
 export function shiftLeft<A>(array: Array<A>, index: number): void {
 	const length = array.length;
@@ -160,20 +158,19 @@ export function last<A>(array: Array<A>): Optional<A> {
  * Returns the first item of the array.
  *
  * @param array  Source array
- * @returns Last item
+ * @returns First item
  */
 export function first<A>(array: Array<A>): Optional<A> {
 	return array[0];
 }
 
 /**
- * Inserts `element` into `array` at `index`.
- *
- * Caps `index` to be between `0` and `array.length`
+ * Inserts `element` into `array` at `index`, clamped to `0` to
+ * `array.length`.
  *
  * @param array    Source array
  * @param element  Item to insert
- * @param array    Index to insert item at
+ * @param index    Index to insert item at
  */
 export function insert<A>(array: Array<A>, element: A, index: number): void {
 	//if (array) {
@@ -188,7 +185,7 @@ export function insert<A>(array: Array<A>, element: A, index: number): void {
  *
  * @param array    Source array
  * @param element  Item
- * @param array    Index to move item to
+ * @param index    Index to move item to
  */
 export function setIndex<A>(array: Array<A>, element: A, index: number): void {
 	remove(array, element);
@@ -218,6 +215,7 @@ export function pushAll<A>(array: Array<A>, input: Array<A>) {
  *
  * @param array    Source array
  * @param element  Item to remove
+ * @returns Whether `element` was found
  */
 export function remove<A>(array: Array<A>, element: A): boolean {
 	let found: boolean = false;
@@ -236,6 +234,13 @@ export function remove<A>(array: Array<A>, element: A): boolean {
 	}
 }
 
+/**
+ * Removes the first copy of `element` from `array`.
+ *
+ * @param array    Source array
+ * @param element  Item to remove
+ * @returns Whether `element` was found
+ */
 export function removeFirst<A>(array: Array<A>, element: A): boolean {
 	let index: number = array.indexOf(element);
 
@@ -249,16 +254,13 @@ export function removeFirst<A>(array: Array<A>, element: A): boolean {
 }
 
 /**
- * Adds an `element` to `array`.
- *
- * If array already contains and item like this, it is removed before adding
- * it again.
- *
- * Optionally `toIndex` can be specified to add element at specific index.
+ * Adds `element` to `array` at `toIndex`, or at the end if `toIndex` is not
+ * set. If `array` already contains `element`, its first copy is removed
+ * first.
  *
  * @param array    Source array
  * @param element  Item to add
- * @param array    Index to move item to
+ * @param toIndex  Index to move item to
  */
 export function move<A>(array: Array<A>, element: A, toIndex?: number): void {
 	// @todo this implementation must be the same as the List.moveValue method
@@ -285,7 +287,7 @@ export function move<A>(array: Array<A>, element: A, toIndex?: number): void {
  *
  * @param array    Source array
  * @param element  Item to add
- * @param array    Index to add item at
+ * @param index    Index to add item at
  */
 export function add<A>(array: Array<A>, element: A, index?: number): void {
 	// Append to the end if index is not set
@@ -318,14 +320,14 @@ export function pushOne<A>(array: Array<A>, element: A): void {
 
 
 /**
- * Removes `element` from `array` (if it exists) and then inserts `element` at
- * `index`.
+ * Removes the first copy of `element` from `array` (if it exists) and then
+ * inserts `element` at `index`.
  *
  * If `index` is not provided, it will insert `element` at the end of `array`.
  *
  * @param array    Source array
- * @param element  Item to remove
- * @param array    Index to move item to
+ * @param element  Item to move
+ * @param index    Index to move item to
  */
 export function replace<A>(array: Array<A>, element: A, index?: number): void {
 	// check if exists
@@ -437,15 +439,6 @@ export function removeIndex<A>(array: Array<A>, index: number): void {
 }
 
 /**
- * @ignore Exclude from docs
- * @todo Description
- */
-export interface SortResult {
-	found: boolean;
-	index: number
-}
-
-/**
  * Searches the array using custom function and returns index of the item if
  * found.
  *
@@ -491,12 +484,8 @@ export function findIndexReverse<A>(array: ArrayLike<A>, matches: (value: A, ind
 }
 
 /**
- * Searches the array using custom function and returns item if found.
- *
- * Will call `matches` function on all items of the array. If return value
- * evaluates to `true`, index is returned.
- *
- * Otherwise returns `undefined`.
+ * Returns the first item for which `matches` returns `true`, or `undefined`
+ * if there is none.
  *
  * @param array    Source array
  * @param matches  Search function
@@ -526,16 +515,12 @@ export function findReverse<A>(array: ArrayLike<A>, matches: (value: A, index: n
 }
 
 /**
- * Searches the array using custom function and returns item if found.
- *
- * Will call `matches` function on all items of the array. If value
- * is not `undefined`, it returns it.
- *
- * Otherwise returns `undefined`.
+ * Calls `matches` on each item and returns the first value it returns that is
+ * not `undefined`, or `undefined` if there is none.
  *
  * @param array    Source array
  * @param matches  Search function
- * @returns Item if found
+ * @returns Value returned by `matches`
  */
 export function findMap<A, B>(array: ArrayLike<A>, matches: (value: A, index: number) => B | undefined): B | undefined {
 	const length = array.length;
@@ -550,11 +535,9 @@ export function findMap<A, B>(array: ArrayLike<A>, matches: (value: A, index: nu
 }
 
 /**
- * Iterates through all items in array and calls `fn` function for each of
- * them.
+ * Shuffles `array` in place into a random order.
  *
  * @param array  Source array
- * @param fn     Callback function
  */
 export function shuffle<A>(array: Array<A>) {
 	// https://stackoverflow.com/a/2450976/449477
@@ -579,8 +562,10 @@ export function shuffle<A>(array: Array<A>) {
 export type Ordering = -1 | 0 | 1;
 
 /**
+ * Result of a binary search: whether a match was found, and its index or the
+ * index to insert the value at.
+ *
  * @ignore Exclude from docs
- * @todo Description
  */
 export interface SortResult {
 	found: boolean;
@@ -588,8 +573,10 @@ export interface SortResult {
 }
 
 /**
- * Orders an array using specific `ordering` function and returns right-most index of
- * the `value`.
+ * Binary-searches a sorted array. `ordering` returns a negative number for an
+ * item before the value searched for, `0` for a match and a positive number
+ * for an item after it. The index is that of the right-most match, or where
+ * the value would be inserted.
  *
  * @ignore Exclude from docs
  * @param array     Source array
@@ -632,8 +619,8 @@ export function getSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) => Or
 
 
 /**
- * Orders an array using specific `ordering` function and returns left-most index of
- * the `value`.
+ * Same as `getSortedIndex`, except that the index is that of the left-most
+ * match.
  *
  * @ignore Exclude from docs
  * @param array     Source array
@@ -673,6 +660,12 @@ export function getFirstSortedIndex<A>(array: ArrayLike<A>, ordering: (left: A) 
 }
 
 
+/**
+ * Removes in place every item for which `keep` returns `false`.
+ *
+ * @param array  Source array
+ * @param keep   Test function
+ */
 export function keepIf<A>(array: Array<A>, keep: (value: A) => boolean): void {
 	let i = array.length;
 

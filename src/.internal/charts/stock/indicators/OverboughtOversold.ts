@@ -16,22 +16,26 @@ import * as $type from "../../../core/util/Type";
 export interface IOverboughtOversoldSettings extends IChartIndicatorSettings {
 
 	/**
-	 * A value for "overbought" threshold.
+	 * Level above which the value counts as overbought. It is drawn as a line
+	 * with a grip that can be dragged to change it.
 	 */
 	overBought?: number;
 
 	/**
-	 * A value for "oversold" threshold.
+	 * Level below which the value counts as oversold. It is drawn as a line
+	 * with a grip that can be dragged to change it.
 	 */
 	overSold?: number;
 
 	/**
-	 * A color for "overbought" section.
+	 * Color of the overbought line, its label and the part of the series above
+	 * it.
 	 */
 	overBoughtColor?: Color;
 
 	/**
-	 * A color for "oversold" section.
+	 * Color of the oversold line, its label and the part of the series below
+	 * it.
 	 */
 	overSoldColor?: Color;
 }
@@ -42,7 +46,8 @@ export interface IOverboughtOversoldEvents extends IChartIndicatorEvents { }
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Base class for indicators with overbought and oversold levels, drawn in a
+ * panel of their own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -54,15 +59,30 @@ export class OverboughtOversold extends ChartIndicator {
 	declare public _privateSettings: IOverboughtOversoldPrivate;
 	declare public _events: IOverboughtOversoldEvents;
 
+	/**
+	 * Y axis data item of the overbought line.
+	 */
 	public overBought!: DataItem<IValueAxisDataItem>;
+	/**
+	 * Y axis data item of the middle line, halfway between the two levels.
+	 */
 	public middle!: DataItem<IValueAxisDataItem>;
+	/**
+	 * Y axis data item of the oversold line.
+	 */
 	public overSold!: DataItem<IValueAxisDataItem>;
 
+	/**
+	 * Axis range that colors the part of the series below `overSold`.
+	 */
 	public overSoldRange!: ILineSeriesAxisRange;
+	/**
+	 * Axis range that colors the part of the series above `overBought`.
+	 */
 	public overBoughtRange!: ILineSeriesAxisRange;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 
@@ -115,10 +135,12 @@ export class OverboughtOversold extends ChartIndicator {
 
 		const overBoughtRB = Button.new(this._root, {
 			themeTags: ["rangegrip", "vertical", side],
+			role: "button",
+			ariaLabel: this._root.language.translateAny("Overbought"),
 			icon: Graphics.new(this._root, {
 				themeTags: ["rangegrip", "icon"]
 			})
-		})
+		})._markC("role", "ariaLabel")
 
 		// restrict from being dragged vertically
 		overBoughtRB.adapters.add("x", function() {
@@ -164,10 +186,12 @@ export class OverboughtOversold extends ChartIndicator {
 
 		const overSoldRB = Button.new(this._root, {
 			themeTags: ["rangegrip", "vertical", side],
+			role: "button",
+			ariaLabel: this._root.language.translateAny("Oversold"),
 			icon: Graphics.new(this._root, {
 				themeTags: ["rangegrip", "icon"]
 			})
-		})
+		})._markC("role", "ariaLabel")
 
 		// restrict from being dragged vertically
 		overSoldRB.adapters.add("x", function() {

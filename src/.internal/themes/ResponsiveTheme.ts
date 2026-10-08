@@ -6,7 +6,8 @@ import type { Template } from "../core/util/Template";
 import * as $array from "../core/util/Array";
 
 /**
- * An interface describing resonsive rule.
+ * A responsive rule: settings for matching elements that apply while the
+ * chart's size meets a condition.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/responsive/} for more info
  * @important
@@ -14,44 +15,45 @@ import * as $array from "../core/util/Array";
 export interface IResponsiveRule {
 
 	/**
-	 * A class name of the elements to apply rule to.
+	 * Class name of the elements the rule applies to, such as `"AxisLabel"`.
 	 */
 	name?: string;
 
 	/**
-	 * A class group of the elements to apply rule to.
+	 * Theme tags the elements must also have.
 	 */
 	tags?: string | string[];
 
 	/**
-	 * Settings to apply when activating the responsive rule.
+	 * Settings for the elements while the rule applies. Needs `name`.
 	 */
 	settings?: any;
 
 	/**
-	 * A callback function which should check and return `true` if rule is
-	 * applicable for current situation.
+	 * Returns `true` while the rule should apply. Gets the root's width and
+	 * height in pixels; the breakpoint functions of [[ResponsiveTheme]], such
+	 * as `ResponsiveTheme.widthM`, fit here.
 	 */
 	relevant: (width: number, height: number) => boolean;
 
 	/**
-	 * A custom callback function which is called when applying the rule.
+	 * Called when the rule starts to apply.
 	 */
 	applying?: () => void;
 
 	/**
-	 * A custom callback function which is called when removing the rule.
+	 * Called when the rule stops applying.
 	 */
 	removing?: () => void;
 
 	/**
-	 * Indicates if rule is currently applied.
+	 * Whether the rule currently applies.
 	 * @readonly
 	 */
 	applied?: boolean;
 
 	/**
-	 * Reference to [[Template]] object associated with the rule.
+	 * The theme rule's [[Template]] that `settings` are set on.
 	 * @readonly
 	 */
 	template?: Template<any>;
@@ -64,135 +66,242 @@ export interface IResponsiveRule {
 }
 
 /**
- * A configurable theme that dynamically adapts chart settings for best fit
- * in available space.
+ * A theme that changes chart settings as the chart's size changes, so charts
+ * fit small spaces. `new()` comes with built-in rules for the common chart
+ * types; `newEmpty()` starts with none, for rules of your own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/responsive/} for more info
  */
 export class ResponsiveTheme extends Theme {
 
 	// Named pixel breakpoints
+	/**
+	 * Breakpoint of 100 pixels.
+	 */
 	static XXS = 100;
+	/**
+	 * Breakpoint of 200 pixels.
+	 */
 	static XS = 200;
+	/**
+	 * Breakpoint of 300 pixels.
+	 */
 	static S = 300;
+	/**
+	 * Breakpoint of 400 pixels.
+	 */
 	static M = 400;
+	/**
+	 * Breakpoint of 600 pixels.
+	 */
 	static L = 600;
+	/**
+	 * Breakpoint of 800 pixels.
+	 */
 	static XL = 800;
+	/**
+	 * Breakpoint of 1000 pixels.
+	 */
 	static XXL = 1000;
 
 	// Breakpoint functions (for use in `relevant` clause of the responsive rules)
 
+	/**
+	 * `true` when the width is at most `XXS` (100 pixels).
+	 */
 	static widthXXS(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.XXS;
 	}
 
+	/**
+	 * `true` when the width is at most `XS` (200 pixels).
+	 */
 	static widthXS(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.XS;
 	}
 
+	/**
+	 * `true` when the width is at most `S` (300 pixels).
+	 */
 	static widthS(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.S;
 	}
 
+	/**
+	 * `true` when the width is at most `M` (400 pixels).
+	 */
 	static widthM(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.M;
 	}
 
+	/**
+	 * `true` when the width is at most `L` (600 pixels).
+	 */
 	static widthL(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.L;
 	}
 
+	/**
+	 * `true` when the width is at most `XL` (800 pixels).
+	 */
 	static widthXL(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.XL;
 	}
 
+	/**
+	 * `true` when the width is at most `XXL` (1000 pixels).
+	 */
 	static widthXXL(width: number, _height: number): boolean {
 		return width <= ResponsiveTheme.XXL;
 	}
 
 
+	/**
+	 * `true` when the height is at most `XXS` (100 pixels).
+	 */
 	static heightXXS(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.XXS;
 	}
 
+	/**
+	 * `true` when the height is at most `XS` (200 pixels).
+	 */
 	static heightXS(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.XS;
 	}
 
+	/**
+	 * `true` when the height is at most `S` (300 pixels).
+	 */
 	static heightS(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.S;
 	}
 
+	/**
+	 * `true` when the height is at most `M` (400 pixels).
+	 */
 	static heightM(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.M;
 	}
 
+	/**
+	 * `true` when the height is at most `L` (600 pixels).
+	 */
 	static heightL(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.L;
 	}
 
+	/**
+	 * `true` when the height is at most `XL` (800 pixels).
+	 */
 	static heightXL(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.XL;
 	}
 
+	/**
+	 * `true` when the height is at most `XXL` (1000 pixels).
+	 */
 	static heightXXL(_width: number, height: number): boolean {
 		return height <= ResponsiveTheme.XXL;
 	}
 
 
+	/**
+	 * `true` when both the width and the height are at most `XXS` (100 pixels).
+	 */
 	static isXXS(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XXS) && (height <= ResponsiveTheme.XXS);
 	}
 
+	/**
+	 * `true` when both the width and the height are at most `XS` (200 pixels).
+	 */
 	static isXS(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XS) && (height <= ResponsiveTheme.XS);
 	}
 
+	/**
+	 * `true` when both the width and the height are at most `S` (300 pixels).
+	 */
 	static isS(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.S) && (height <= ResponsiveTheme.S);
 	}
 
+	/**
+	 * `true` when both the width and the height are at most `M` (400 pixels).
+	 */
 	static isM(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.M) && (height <= ResponsiveTheme.M);
 	}
 
+	/**
+	 * `true` when both the width and the height are at most `L` (600 pixels).
+	 */
 	static isL(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.L) && (height <= ResponsiveTheme.L);
 	}
 
+	/**
+	 * `true` when both the width and the height are at most `XL` (800 pixels).
+	 */
 	static isXL(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XL) && (height <= ResponsiveTheme.XL);
 	}
 
+	/**
+	 * `true` when both the width and the height are at most `XXL` (1000
+	 * pixels).
+	 */
 	static isXXL(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XXL) && (height <= ResponsiveTheme.XXL);
 	}
 
 
+	/**
+	 * `true` when the width or the height is at most `XXS` (100 pixels).
+	 */
 	static maybeXXS(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XXS) || (height <= ResponsiveTheme.XXS);
 	}
 
+	/**
+	 * `true` when the width or the height is at most `XS` (200 pixels).
+	 */
 	static maybeXS(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XS) || (height <= ResponsiveTheme.XS);
 	}
 
+	/**
+	 * `true` when the width or the height is at most `S` (300 pixels).
+	 */
 	static maybeS(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.S) || (height <= ResponsiveTheme.S);
 	}
 
+	/**
+	 * `true` when the width or the height is at most `M` (400 pixels).
+	 */
 	static maybeM(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.M) || (height <= ResponsiveTheme.M);
 	}
 
+	/**
+	 * `true` when the width or the height is at most `L` (600 pixels).
+	 */
 	static maybeL(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.L) || (height <= ResponsiveTheme.L);
 	}
 
+	/**
+	 * `true` when the width or the height is at most `XL` (800 pixels).
+	 */
 	static maybeXL(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XL) || (height <= ResponsiveTheme.XL);
 	}
 
+	/**
+	 * `true` when the width or the height is at most `XXL` (1000 pixels).
+	 */
 	static maybeXXL(width: number, height: number): boolean {
 		return (width <= ResponsiveTheme.XXL) || (height <= ResponsiveTheme.XXL);
 	}
@@ -216,12 +325,12 @@ export class ResponsiveTheme extends Theme {
 	}
 
 	/**
-	 * Currently added rules.
+	 * Rules added to the theme.
 	 */
 	public responsiveRules: IResponsiveRule[] = [];
 
 	/**
-	 * Instantiates the theme without adding default respomsive rules.
+	 * Creates the theme without its built-in rules, for rules of your own.
 	 */
 	static newEmpty<T extends typeof ResponsiveTheme>(this: T, root: Root): InstanceType<T> {
 		return (new this(root, true)) as InstanceType<T>;
@@ -229,7 +338,8 @@ export class ResponsiveTheme extends Theme {
 
 
 	/**
-	 * Adds a responsive rule as well as retuns it.
+	 * Adds a responsive rule and returns it. It applies at once if it is
+	 * relevant.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/responsive/} for more info
 	 * @param   rule  Responsive rule
@@ -246,7 +356,7 @@ export class ResponsiveTheme extends Theme {
 	}
 
 	/**
-	 * Removes the responsive rule.
+	 * Removes a responsive rule from the theme.
 	 *
 	 * @param  rule  Responsive rule
 	 */
@@ -452,7 +562,7 @@ export class ResponsiveTheme extends Theme {
 		addRule({
 			name: "AxisLabel",
 			tags: ["x", "minor"],
-			relevant: ResponsiveTheme.widthXXL,
+			relevant: ResponsiveTheme.widthL,
 			settings: {
 				forceHidden: true
 			}
@@ -470,7 +580,7 @@ export class ResponsiveTheme extends Theme {
 		addRule({
 			name: "AxisLabel",
 			tags: ["y", "minor"],
-			relevant: ResponsiveTheme.heightXXL,
+			relevant: ResponsiveTheme.heightL,
 			settings: {
 				forceHidden: true
 			}

@@ -10,46 +10,46 @@ import * as $utils from "../../core/util/Utils";
 export interface IExportingMenuItem {
 
 	/**
-	 * Indicates type of the menu item:
-	 * * `"format"` - indicates export action
-	 * * `"separator"` - will show horizontal divider.
-	 * * `"custom"` - will invoke custom function when clicked.
+	 * Type of the item:
+	 * * `"format"`: exports in `format` when clicked.
+	 * * `"separator"`: a divider, with `label` as a heading if set.
+	 * * `"custom"`: calls `callback` when clicked.
 	 */
 	type: "format" | "separator" | "custom";
 
 	/**
-	 * If `type` is set to `"format"`, clicking item will initiate export in
-	 * that format.
+	 * Format to export in, for a `"format"` item. `"print"` prints the chart.
 	 */
 	format?: ExportingFormats;
 
 	/**
-	 * Indicates export type: `"image"`, `"data"`, or `"print"`.
+	 * Export type of the item: `"image"`, `"data"` or `"print"`. An item whose
+	 * type is not available, such as `"data"` without data, is left out.
 	 */
 	exportType?: ExportingTypes;
 
 	/**
-	 * Menu label.
+	 * Text of the item.
 	 */
 	label?: string;
 
 	/**
-	 * Additional information.
+	 * Smaller text after the label, such as `"Image"`.
 	 */
 	sublabel?: string;
 
 	/**
-	 * If `type` is set to `"custom"`, this needs to be set to a function.
+	 * Function to call when a `"custom"` item is clicked.
 	 */
 	callback?: (menuItem?: any) => any;
 
 	/**
-	 * A target for callback function.
+	 * `this` inside `callback`; the menu if not set.
 	 */
 	callbackTarget?: any;
 
 	/**
-	 * A DOM element for the menu item.
+	 * The item's DOM element.
 	 *
 	 * @readonly
 	 */
@@ -74,40 +74,39 @@ export interface IExportingMenuSettings extends IEntitySettings {
 	valign?: "top" | "bottom";
 
 	/**
-	 * A reference to an element in the document to place export menu in.
-	 *
-	 * If not set, will use root element's container.
+	 * Element in the document to place the menu in. If not set, the menu goes
+	 * into the chart's own element.
 	 */
 	container?: HTMLElement;
 
 	/**
-	 * A list of menu items.
+	 * Items of the menu. By default, all image and data formats and print.
 	 */
 	items?: IExportingMenuItem[];
 
 	/**
-	 * A reference to related [[Exporting]] object.
+	 * The [[Exporting]] the menu exports with.
 	 */
 	exporting?: Exporting;
 
 	/**
-	 * If set to `false` the menu will not load default CSS.
+	 * Loads the menu's default CSS. Set to `false` to style the menu with
+	 * your own CSS.
 	 *
 	 * @default true
 	 */
 	useDefaultCSS?: boolean;
 
 	/**
-	 * If set to `true` the menu will close automatically when export operation
-	 * is initiated.
+	 * Closes the menu when an export starts from it.
 	 *
 	 * @default true
 	 */
 	autoClose?: boolean;
 
 	/**
-	 * Menu will disable all interactions for the underlying chart when browsing
-	 * the menu.
+	 * Disables interaction with the chart while the menu is open or the
+	 * pointer is over it.
 	 *
 	 * @default true
 	 */
@@ -125,25 +124,35 @@ export interface IExportingMenuSettings extends IEntitySettings {
 export interface IExportingMenuPrivate extends IEntityPrivate {
 
 	/**
-	 * A `<div>` element that acts as a container for other menu elements.
+	 * The `<div>` element that holds the menu's icon and list.
 	 */
 	menuElement?: HTMLDivElement;
 
 	/**
-	 * A top-level `<ul>` element containing menu items.
+	 * The `<ul>` element with the menu items.
 	 */
 	listElement?: HTMLUListElement;
 
 }
 
 export interface IExportingMenuEvents extends IEntityEvents {
+	/**
+	 * The menu's elements were created.
+	 */
 	"menucreated": {}
+	/**
+	 * The menu opened.
+	 */
 	"menuopened": {}
+	/**
+	 * The menu closed.
+	 */
 	"menuclosed": {}
 }
 
 /**
- * Displays a menu for [[Exporting]].
+ * The export menu: an icon on the chart that opens a list of formats to
+ * export with [[Exporting]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/} for more info
  */
@@ -164,6 +173,9 @@ export class ExportingMenu extends Entity {
 	private _cssDisposer?: IDisposer;
 	private _activeItem?: IExportingMenuItem;
 
+	/**
+	 * Whether the menu is open.
+	 */
 	public isOpen: boolean = false;
 
 	private _isOver: boolean = false;
@@ -190,6 +202,12 @@ export class ExportingMenu extends Entity {
 			format: "jpg",
 			exportType: "image",
 			label: this._t("JPG"),
+			sublabel: this._t("Image")
+		}, {
+			type: "format",
+			format: "svg",
+			exportType: "image",
+			label: this._t("SVG"),
 			sublabel: this._t("Image")
 		}, {
 			type: "format",
@@ -256,6 +274,8 @@ export class ExportingMenu extends Entity {
 		iconElement.setAttribute("tabindex", this._root.tabindex.toString());
 		iconElement.setAttribute("aria-label", this.get("ariaLabel", this._t("Export") + "; " + this._t("Press ENTER to open")));
 		iconElement.setAttribute("role", "button");
+		iconElement.setAttribute("aria-haspopup", "menu");
+		iconElement.setAttribute("aria-expanded", "false");
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
@@ -404,6 +424,7 @@ export class ExportingMenu extends Entity {
 
 		this._menuElement!.className = "am5exporting am5exporting-menu am5exporting-align-" + align + " am5exporting-valign-" + valign + " " + status;
 		this._iconElement!.className = "am5exporting am5exporting-icon am5exporting-align-" + align + " am5exporting-valign-" + valign;
+		this._iconElement!.setAttribute("aria-expanded", this.isOpen ? "true" : "false");
 		this._listElement!.className = "am5exporting am5exporting-list am5exporting-align-" + align + " am5exporting-valign-" + valign;
 	}
 
@@ -437,8 +458,9 @@ export class ExportingMenu extends Entity {
 				return;
 			}
 
+			// The focusable link inside is the menu item; the list item only holds it
 			const li = document.createElement("li");
-			li.setAttribute("role", "menuitem");
+			li.setAttribute("role", item.type == "separator" ? "separator" : "none");
 
 			li.className = "am5exporting am5exporting-item am5exporting-type-" + item.type;
 			if (item.format) {
@@ -447,7 +469,7 @@ export class ExportingMenu extends Entity {
 
 			const a = document.createElement("a");
 
-			let ariaLabel = this._t("Export ");
+			let ariaLabel = this._t("Export");
 			if (item.label) {
 				a.innerHTML = this._root._sanitizeHTML(item.label);
 				ariaLabel += " " + item.label;
@@ -460,9 +482,10 @@ export class ExportingMenu extends Entity {
 
 			if (item.callback) {
 				this._itemDisposers.push($utils.addEventListener(a, "click", (_ev) => {
-					item.callback!.call(item.callbackTarget || this)
+					item.callback!.call(item.callbackTarget || this, item)
 				}));
 				a.setAttribute("tabindex", this._root.tabindex.toString());
+				a.setAttribute("role", "menuitem");
 			}
 			else if (item.format && exporting) {
 				this._itemDisposers.push($utils.addEventListener(a, "click", (_ev) => {
@@ -476,6 +499,7 @@ export class ExportingMenu extends Entity {
 				}));
 				a.setAttribute("tabindex", this._root.tabindex.toString());
 				a.setAttribute("aria-label", ariaLabel);
+				a.setAttribute("role", "menuitem");
 			}
 
 			item.element = a;
@@ -538,7 +562,7 @@ export class ExportingMenu extends Entity {
 	}
 
 	/**
-	 * Opens menu.
+	 * Opens the menu.
 	 */
 	public open(): void {
 		this.setTimeout(() => {
@@ -555,14 +579,18 @@ export class ExportingMenu extends Entity {
 	}
 
 	/**
-	 * Closes menu.
+	 * Closes the menu.
 	 */
 	public close(): void {
 		this.isOpen = false;
 		if (this.get("deactivateRoot")) {
 			this._root._renderer.interactionsEnabled = true;
 		}
-		$utils.blur();
+		// Focus inside the closing menu goes back to the icon that opened it
+		const active = document.activeElement;
+		if (active && this._listElement && $utils.contains(this._listElement, active)) {
+			this._iconElement!.focus();
+		}
 		this._applyClassNames();
 		this.events.dispatch("menuclosed", {
 			type: "menuclosed",
@@ -571,7 +599,7 @@ export class ExportingMenu extends Entity {
 	}
 
 	/**
-	 * Toggles menu open and close.
+	 * Opens the menu, or closes it if it is open.
 	 */
 	public toggle(): void {
 		if (this.isOpen) {

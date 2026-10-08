@@ -1,5 +1,6 @@
 import type { Sprite, ISpritePointerEvent } from "./Sprite";
 import type { IDisposer } from "../util/Disposer";
+import { MultiDisposer } from "../util/Disposer";
 import type { Template } from "../util/Template";
 
 import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
@@ -13,18 +14,20 @@ import * as $math from "../util/Math";
 export interface ISpriteResizerSettings extends IContainerSettings {
 
 	/**
-	 * Target [[Sprite]] element.
+	 * The element to resize and rotate. Setting it shows the resizer around
+	 * the element; unsetting it hides the resizer.
 	 */
 	sprite?: Sprite
 
 	/**
-	 * Target [[Template]]. If a template is set, scale and rotation will be set on Template instead of a Sprite.
+	 * A [[Template]] that gets the new scale and rotation instead of `sprite`
+	 * itself.
 	 */
 	spriteTemplate?: Template<Sprite>
 
 	/**
-	 * Rotation increment in degrees.
-	 * 
+	 * Rotation snaps to multiples of this many degrees.
+	 *
 	 * @default 10
 	 */
 	rotationStep?: number;
@@ -39,6 +42,10 @@ export interface ISpriteResizerEvents extends IContainerEvents {
 
 }
 
+/**
+ * A frame with grips around an element: dragging the left or right grip
+ * scales the element, and the top or bottom grip rotates it.
+ */
 export class SpriteResizer extends Container {
 
 	declare public _settings: ISpriteResizerSettings;
@@ -48,10 +55,25 @@ export class SpriteResizer extends Container {
 	public static className: string = "SpriteResizer";
 	public static classNames: Array<string> = Container.classNames.concat([SpriteResizer.className]);
 
+	/**
+	 * The frame drawn around the element.
+	 */
 	public readonly rectangle: Rectangle = this.children.push(Rectangle.new(this._root, { themeTags: ["rectangle"], fillOpacity: 0, fill: color(0xFFFFFF) }));
+	/**
+	 * Left grip, which scales the element.
+	 */
 	public readonly gripL: Container = this._createGrip("left");
+	/**
+	 * Right grip, which scales the element.
+	 */
 	public readonly gripR: Container = this._createGrip("right");
+	/**
+	 * Top grip, which rotates the element.
+	 */
 	public readonly gripT: Container = this._createGrip("top");
+	/**
+	 * Bottom grip, which rotates the element.
+	 */
 	public readonly gripB: Container = this._createGrip("bottom");
 
 	protected _is: number = 1;
@@ -171,6 +193,10 @@ export class SpriteResizer extends Container {
 
 		if (this.isDirty("sprite")) {
 			const sprite = this.get("sprite");
+			if (this._positionDP) {
+				this._positionDP.dispose();
+				this._positionDP = undefined;
+			}
 			if (sprite) {
 				this.show(0);
 				this.setPrivate("visible", true);
@@ -183,21 +209,18 @@ export class SpriteResizer extends Container {
 					parent.children.moveValue(this, 0);
 				}
 
-				this._positionDP = sprite.events.on("positionchanged", () => {
-					this._updatePositions();
-				})
-
-				this._positionDP = sprite.events.on("boundschanged", () => {
-					this._updatePositions();
-				})				
+				this._positionDP = new MultiDisposer([
+					sprite.events.on("positionchanged", () => {
+						this._updatePositions();
+					}),
+					sprite.events.on("boundschanged", () => {
+						this._updatePositions();
+					})
+				]);
 			}
 			else {
 				this.hide(0);
 				this.setPrivate("visible", false);
-
-				if (this._positionDP) {
-					this._positionDP.dispose();
-				}
 			}
 		}
 

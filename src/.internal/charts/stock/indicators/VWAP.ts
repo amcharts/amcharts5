@@ -14,7 +14,9 @@ export interface IVWAPEvents extends IIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Volume-Weighted Average Price indicator: `field` averaged over the last
+ * `period` data items, weighted by volume. Drawn over the main series; needs
+ * a `volumeSeries`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -27,7 +29,7 @@ export class VWAP extends Indicator {
 	declare public _events: IVWAPEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

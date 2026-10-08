@@ -16,7 +16,7 @@ export interface ISimpleLineSeriesDataItem extends IDrawingSeriesDataItem {
 export interface ISimpleLineSeriesSettings extends IDrawingSeriesSettings {
 
 	/**
-	 * Show a dotted line extending from both ends of the drawn line.
+	 * Extends new lines with a dotted line beyond both ends.
 	 *
 	 * @default true
 	 */
@@ -26,6 +26,9 @@ export interface ISimpleLineSeriesSettings extends IDrawingSeriesSettings {
 export interface ISimpleLineSeriesPrivate extends IDrawingSeriesPrivate {
 }
 
+/**
+ * Draws a straight line between two points.
+ */
 export class SimpleLineSeries extends DrawingSeries {
 	public static className: string = "SimpleLineSeries";
 	public static classNames: Array<string> = DrawingSeries.classNames.concat([SimpleLineSeries.className]);
@@ -47,6 +50,9 @@ export class SimpleLineSeries extends DrawingSeries {
 		return line;
 	}
 
+	/**
+	 * Dotted extensions of the lines beyond their ends (`showExtension`).
+	 */
 	public readonly lines: ListTemplate<Line> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Line._new(this._root, {}, [this.lines.template])
@@ -63,6 +69,9 @@ export class SimpleLineSeries extends DrawingSeries {
 		return line;
 	}
 
+	/**
+	 * Invisible wide lines along the drawings that catch the pointer.
+	 */
 	public readonly hitLines: ListTemplate<Line> = this.addDisposer(new ListTemplate(
 		Template.new({}),
 		() => Line._new(this._root, {}, [this.hitLines.template])
@@ -397,11 +406,11 @@ export class SimpleLineSeries extends DrawingSeries {
 	}
 
 	/**
-	 * Adds a line drawing.
+	 * Adds a line drawing through a point, without the pointer. For the series
+	 * of the `"Horizontal Line"`, `"Horizontal Ray"` and `"Vertical Line"`
+	 * tools.
 	 *
-	 * Supported tools: `"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"`.
-	 *
-	 * @param  point Point
+	 * @param  point Point relative to the root
 	 * @since 5.10.2
 	 */
 	public addLine(point: IPoint): void {

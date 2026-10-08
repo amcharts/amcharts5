@@ -25,8 +25,6 @@ export class Theme {
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
 	 * @param   root      Root element
-	 * @param   settings  Settings
-	 * @param   template  Template
 	 * @return            Instantiated object
 	 */
 	static new<T extends typeof Theme>(this: T, root: Root): InstanceType<T> {
@@ -47,24 +45,21 @@ export class Theme {
 	protected _rules: { [type: string]: Array<IRule<Entity>>; } = {};
 
 	/**
-	 * Looks up the rules for a specific theme class.
+	 * Returns the theme's rules for a class.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/themes/} for more info
-	 * @param   themeClass Theme class
-	 * @return             Array<IRule<A>>
+	 * @param   themeClass Class name
+	 * @return             Rules, or `undefined` if there are none
 	 */
 	public _lookupRules<A extends Entity>(themeClass: string): Array<IRule<A>> | undefined {
 		return this._rules[themeClass] as unknown as Array<IRule<A>> | undefined;
 	}
 
 	/**
-	 * Creates a [[Template]] for specific theme class and tags.
-	 *
-	 * NOTE: the difference from `rule()` is that `ruleRaw()` does not do any
-	 * type checks.
+	 * Same as `rule()`, but takes any class name, without type checks.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/themes/} for more info
-	 * @param   themeClass Theme class
+	 * @param   themeClass Class name
 	 * @param   themeTags  Theme tags
 	 * @return             Template
 	 */
@@ -104,10 +99,12 @@ export class Theme {
 	}
 
 	/**
-	 * Creates a [[Template]] for specific theme class and tags.
+	 * Returns the rule for a class and theme tags, as a [[Template]]. Settings
+	 * set on it go to every element of that class (or a class extending it)
+	 * that has all of these tags. The same class and tags return the same rule.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/themes/} for more info
-	 * @param   themeClass Theme class
+	 * @param   themeClass Class name, e.g. `"Label"`
 	 * @param   themeTags  Theme tags
 	 * @return             Template
 	 */

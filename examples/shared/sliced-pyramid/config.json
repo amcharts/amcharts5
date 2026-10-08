@@ -1,0 +1,49 @@
+{
+  "type": "SlicedChart",
+  "settings": {
+    "layout": { "type": "VerticalLayout" },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"]
+  },
+  "children": [
+    {
+      "type": "Legend",
+      "settings": {
+        "centerX": { "type": "Percent", "value": 50 },
+        "x": { "type": "Percent", "value": 50 },
+        "marginTop": 15,
+        "marginBottom": 15
+      },
+      "properties": { "data": "#series-0.dataItems" }
+    }
+  ],
+  "refs": [
+    {
+      "data-0": [
+        { "value": 3, "category": "One" },
+        { "value": 3, "category": "Two" },
+        { "value": 4, "category": "Three" },
+        { "value": 5, "category": "Four" },
+        { "value": 6, "category": "Five" },
+        { "value": 9, "category": "Six" },
+        { "value": 10, "category": "Seven" }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "PyramidSeries",
+        "settings": {
+          "orientation": "vertical",
+          "valueField": "value",
+          "categoryField": "category",
+          "autoAppear": true
+        },
+        "properties": { "data": "#data-0" }
+      }
+    }
+  ]
+}

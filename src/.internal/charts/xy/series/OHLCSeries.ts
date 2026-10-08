@@ -19,14 +19,15 @@ export interface IOHLCSeriesPrivate extends ICandlestickSeriesPrivate {
 export interface IOHLCSeriesAxisRange extends ICandlestickSeriesAxisRange {
 
 	/**
-	 * List of [[OHLC]] columns in a range.
+	 * OHLC bars of the series within the range.
 	 */
 	columns: ListTemplate<OHLC>
 
 }
 
 /**
- * OHLC series.
+ * A series that shows open, high, low and close values as OHLC bars
+ * ([[OHLC]]).
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
@@ -52,9 +53,7 @@ export class OHLCSeries extends CandlestickSeries {
 	}
 
 	/**
-	 * A list of OHLC bars in the series.
-	 *
-	 * `columns.template` can be used to configure OHLC bars.
+	 * OHLC bars of the series. Configure them all through `columns.template`.
 	 *
 	 * @default new ListTemplate<OHLC>
 	 */

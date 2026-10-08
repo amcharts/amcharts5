@@ -301,8 +301,13 @@ class ParserState {
 	protected _globalRefs: Array<IRef> = [];
 	protected _updateTargets: "strict" | "soft";
 
-	constructor(updateTargets: "strict" | "soft" = "strict") {
+	constructor(updateTargets: "strict" | "soft" = "strict", root?: Root) {
 		this._updateTargets = updateTargets;
+		// "@root" for every config, e.g. "@root.interfaceColors.get('background')";
+		// a ref of the config's own with that name comes later and wins
+		if (root) {
+			this._globalRefs.push({ "@root": root });
+		}
 	}
 
 	// When `updateTargets` is "soft" and there is an existing entity target whose
@@ -1013,17 +1018,16 @@ class ParserState {
 export interface IParseSettings {
 
 	/**
-	 * Parent container to place the parsed chart into.
+	 * Container to add the parsed chart to, usually `root.container`. The
+	 * config must then build a [[Sprite]].
 	 */
 	parent?: Container;
 
 	/**
-	 * If set to `"strict"` and source object has `type` set, a new object of
-	 * that type will be created and used in place of existing one.
-	 *
-	 * In case of `"soft"`, parser will check if source and target objects are
-	 * of the same type and overwrite only if types differ. Otherwise only
-	 * settings will be applied, just like if the `type` was not specified at all.
+	 * What a config block with a `type` does to an object that is already
+	 * there: `"strict"` replaces it with a new object of that type; `"soft"`
+	 * replaces it only if its type differs, and otherwise applies the block to
+	 * it, as if the block had no `type`.
 	 *
 	 * @default "strict"
 	 * @since 5.20.3
@@ -1032,7 +1036,7 @@ export interface IParseSettings {
 }
 
 /**
- * A parser for JSON based chart configs.
+ * Builds charts from JSON configs.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/} for more info
  * @since 5.3.0
@@ -1068,13 +1072,15 @@ export class JsonParser {
 	}
 
 	/**
-	 * Parses and creates chart objects from simple objects.
+	 * Builds the chart objects a config describes, loading the classes it
+	 * needs first.
 	 *
-	 * @param   object  Serialized data
-	 * @return          A promise of a target object
+	 * @param   object    Config, as a plain object
+	 * @param   settings  Parse settings
+	 * @return            A promise of the object the config builds, usually the chart
 	 */
 	async parse<E extends Entity>(object: unknown, settings: IParseSettings = {}): Promise<E> {
-		const state = new ParserState(settings.updateTargets);
+		const state = new ParserState(settings.updateTargets, this._root);
 
 		await state.parseAsync(object);
 
@@ -1107,10 +1113,11 @@ export class JsonParser {
 	}
 
 	/**
-	 * Parses and creates chart objects from JSON string.
+	 * Builds the chart objects a config describes, from a JSON string.
 	 *
-	 * @param   string  JSON string
-	 * @return          A promise of a target object
+	 * @param   string    JSON string
+	 * @param   settings  Parse settings
+	 * @return            A promise of the object the config builds, usually the chart
 	 */
 	async parseString<E extends Entity>(string: string, settings: IParseSettings = {}): Promise<E> {
 		return await this.parse(JSON.parse(string), settings);
@@ -1118,10 +1125,10 @@ export class JsonParser {
 }
 
 /**
- * Registers a class so that it can be parsed and instantiated bey JSON parser.
+ * Registers a class so that it can be parsed and instantiated by JSON parser.
  *
  * @param  name  Class name
- * @param  func  Class reference
+ * @param  ref   Class reference
  * @ignore
  */
 export function registerCustomClass(name: string, ref: any): void {

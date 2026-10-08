@@ -2,14 +2,10 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Petroleum" — a restrained, near-monochrome dark theme: gas-flare gold text on
- * a near-black crude ground, with a tight gold palette and a single industrial-
- * green accent.
- *
- * Palette: deep crude `#141a1a`, oil-slick `#1e2824`, pipeline green `#3a5040`,
- * crude amber `#c8890a`, sulfur `#a89050`, gas-flare `#f5d090`.
- *
- * This is a standalone theme; it does not modify any built-in theme.
+ * "Petroleum": a restrained, near-monochrome dark theme, with pale gold text on
+ * a near-black `#0a0e12` background. Its series colors are golds with one green
+ * accent: crude amber `#c8890a`, gas flare `#f5d090`, pipeline green
+ * `#6a8a70`, sulfur `#a89050` and bronze `#8b6914`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important

@@ -2,15 +2,11 @@ import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 
 /**
- * "Colorblind" — a color-vision-deficiency-safe qualitative palette based on
- * the Okabe-Ito eight-color set, which stays distinguishable under the common
- * forms of color blindness (protanopia, deuteranopia, tritanopia).
+ * "Colorblind": a series palette that stays distinguishable under the common
+ * forms of color blindness. It uses the eight Okabe-Ito colors, reordered so
+ * that black comes last, and repeats them rather than making new ones.
  *
- * Like `Dataviz` and `Kelly`, this theme only sets the series palette; it does
- * not change interface colors, so it layers cleanly on top of the default
- * (light) look. The canonical Okabe-Ito order leads with black; here the eight
- * colors are re-ordered to lead with color so the first series reads as a hue,
- * with black kept in the set for later series.
+ * It sets only the series colors and leaves the interface colors alone.
  *
  * @see {@link https://jfly.uni-koeln.de/color/} for the original palette
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info

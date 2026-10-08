@@ -9,12 +9,12 @@ import * as $array from "../../../core/util/Array";
 export interface IAwesomeOscillatorSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Increasing color.
+	 * Color of columns higher than the previous one.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * Decreasing color.
+	 * Color of columns lower than the previous one.
 	 */
 	decreasingColor?: Color;
 
@@ -28,7 +28,9 @@ export interface IAwesomeOscillatorEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Awesome Oscillator indicator: columns of the 5-period minus the 34-period
+ * simple moving average of the median price (high plus low, halved). Drawn in
+ * a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -41,7 +43,7 @@ export class AwesomeOscillator extends ChartIndicator {
 	declare public _events: IAwesomeOscillatorEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: ColumnSeries;
 
@@ -86,6 +88,8 @@ export class AwesomeOscillator extends ChartIndicator {
 			template.states.create("riseFromPrevious", { fill: increasing, stroke: increasing });
 			template.states.create("dropFromPrevious", { fill: decreasing, stroke: decreasing });
 			this.markDataDirty();
+			// The columns take the states only when they are laid out again
+			this.series.markDirtyValues();
 		}
 	}
 

@@ -10,10 +10,14 @@ export interface IGraticuleSeriesPrivate extends IMapLineSeriesPrivate {
 }
 
 export interface IGraticuleSeriesSettings extends IMapLineSeriesSettings {
+	/**
+	 * Limits the grid to the geographic bounds of the map's geometries,
+	 * instead of the whole globe.
+	 */
 	clipExtent?: boolean;
 
 	/**
-	 * Place a grid line every Xth latitude/longitude.
+	 * Degrees between grid lines, of both latitude and longitude.
 	 *
 	 * @default 10
 	 */
@@ -21,7 +25,7 @@ export interface IGraticuleSeriesSettings extends IMapLineSeriesSettings {
 }
 
 /**
- * A [[MapChart]] series to draw a map grid.
+ * A grid of latitude and longitude lines (a graticule) on a [[MapChart]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/graticule-series/} for more info
  * @important

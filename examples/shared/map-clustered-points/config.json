@@ -1,0 +1,158 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "panX": "rotateX",
+    "panY": "translateY",
+    "zoomControl": { "type": "ZoomControl" },
+    "projectionName": "geoMercator",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1"]
+  },
+  "refs": [
+    {
+      "data-0": []
+    },
+    {
+      "data-1": [
+        { "title": "London", "latitude": 51.5, "longitude": -0.13 },
+        { "title": "Paris", "latitude": 48.86, "longitude": 2.35 },
+        { "title": "Brussels", "latitude": 50.84, "longitude": 4.37 },
+        { "title": "Amsterdam", "latitude": 52.37, "longitude": 4.89 },
+        { "title": "Berlin", "latitude": 52.52, "longitude": 13.41 },
+        { "title": "Prague", "latitude": 50.09, "longitude": 14.42 },
+        { "title": "Vienna", "latitude": 48.21, "longitude": 16.37 },
+        { "title": "Budapest", "latitude": 47.5, "longitude": 19.04 },
+        { "title": "Warsaw", "latitude": 52.23, "longitude": 21.01 },
+        { "title": "Kyiv", "latitude": 50.44, "longitude": 30.54 },
+        { "title": "Vilnius", "latitude": 54.69, "longitude": 25.28 },
+        { "title": "Riga", "latitude": 56.95, "longitude": 24.1 },
+        { "title": "Stockholm", "latitude": 59.33, "longitude": 18.06 },
+        { "title": "Oslo", "latitude": 59.91, "longitude": 10.74 },
+        { "title": "Copenhagen", "latitude": 55.68, "longitude": 12.57 },
+        { "title": "Madrid", "latitude": 40.42, "longitude": -3.7 },
+        { "title": "Lisbon", "latitude": 38.71, "longitude": -9.14 },
+        { "title": "Rome", "latitude": 41.9, "longitude": 12.48 },
+        { "title": "Athens", "latitude": 37.98, "longitude": 23.72 },
+        { "title": "Ankara", "latitude": 39.94, "longitude": 32.86 },
+        { "title": "Tehran", "latitude": 35.71, "longitude": 51.44 },
+        { "title": "New Delhi", "latitude": 28.64, "longitude": 77.22 },
+        { "title": "Beijing", "latitude": 39.91, "longitude": 116.4 },
+        { "title": "Seoul", "latitude": 37.51, "longitude": 126.98 },
+        { "title": "Tokyo", "latitude": 35.68, "longitude": 139.68 },
+        { "title": "Hanoi", "latitude": 21.03, "longitude": 105.84 },
+        { "title": "Bangkok", "latitude": 13.76, "longitude": 100.5 },
+        { "title": "Kuala Lumpur", "latitude": 3.15, "longitude": 101.71 },
+        { "title": "Singapore", "latitude": 1.29, "longitude": 103.85 },
+        { "title": "Ottawa", "latitude": 45.42, "longitude": -75.7 },
+        { "title": "Washington, D.C.", "latitude": 38.89, "longitude": -77.02 },
+        { "title": "Mexico City", "latitude": 19.43, "longitude": -99.13 },
+        { "title": "Bogota", "latitude": 4.65, "longitude": -74.1 },
+        { "title": "Lima", "latitude": -12.09, "longitude": -77.05 },
+        { "title": "Buenos Aires", "latitude": -34.61, "longitude": -58.42 },
+        { "title": "Montevideo", "latitude": -34.89, "longitude": -56.07 },
+        { "title": "Algiers", "latitude": 36.78, "longitude": 3.06 },
+        { "title": "Tunis", "latitude": 36.81, "longitude": 10.18 },
+        { "title": "Cairo", "latitude": 30.06, "longitude": 31.23 },
+        { "title": "Accra", "latitude": 5.54, "longitude": -0.21 },
+        { "title": "Nairobi", "latitude": -1.28, "longitude": 36.8 },
+        { "title": "Pretoria", "latitude": -25.75, "longitude": 28.19 }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "MapPolygonSeries",
+        "settings": {
+          "geoJSON": "am5geodata_worldLow",
+          "exclude": ["AQ"]
+        },
+        "properties": {
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#000000" },
+                  "fillOpacity": 0.15
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-1": {
+        "type": "ClusteredPointSeries",
+        "settings": {
+          "clusteredBullet": {
+            "type": "Bullet",
+            "settings": {
+              "sprite": {
+                "type": "Container",
+                "settings": { "cursorOverStyle": "pointer" },
+                "children": [
+                  {
+                    "type": "Circle",
+                    "settings": {
+                      "radius": 16,
+                      "fillOpacity": 0.3,
+                      "fill": { "type": "Color", "value": "#ff8c00" }
+                    }
+                  },
+                  {
+                    "type": "Circle",
+                    "settings": {
+                      "radius": 12,
+                      "fillOpacity": 0.3,
+                      "fill": { "type": "Color", "value": "#ff8c00" }
+                    }
+                  },
+                  {
+                    "type": "Circle",
+                    "settings": {
+                      "radius": 8,
+                      "fill": { "type": "Color", "value": "#ff8c00" }
+                    }
+                  },
+                  {
+                    "type": "Label",
+                    "settings": {
+                      "centerX": { "type": "Percent", "value": 50 },
+                      "centerY": { "type": "Percent", "value": 50 },
+                      "fill": { "type": "Color", "value": "#ffffff" },
+                      "populateText": true,
+                      "fontSize": 8,
+                      "text": "{value}"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "properties": {
+          "data": "#data-1",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 6,
+                    "tooltipY": 0,
+                    "tooltipText": "{title}",
+                    "fill": { "type": "Color", "value": "#ff8c00" }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

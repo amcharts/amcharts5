@@ -8,34 +8,30 @@ import * as $type from "../util/Type";
 export interface IPictureSettings extends ISpriteSettings {
 
 	/**
-	 * A source URI of the image.
-	 *
-	 * Can be relative or absolute URL, or data-uri.
+	 * URL of the image: relative, absolute, or a data URI.
 	 */
 	src?: string;
 
 	/**
-	 * CORS settings for loading the image. Defaults to "anonymous".
+	 * CORS setting for loading the image, as in the image element's
+	 * `crossOrigin`.
 	 *
+	 * @default "anonymous"
 	 * @since 5.3.6
 	 * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/crossOrigin} for more info
 	 */
 	cors?: string | null;
 
 	/**
-	 * Color of the element's shadow.
-	 *
-	 * For this to work at least one of the following needs to be set as well:
-	 * `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`.
+	 * Color of the image's shadow. It shows only when `shadowBlur`,
+	 * `shadowOffsetX` or `shadowOffsetY` is set too.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowColor?: Color | null;
 
 	/**
-	 * Blurriness of the the shadow.
-	 *
-	 * The bigger the number, the more blurry shadow will be.
+	 * Blurriness of the shadow: the bigger the number, the blurrier the shadow.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
@@ -56,10 +52,9 @@ export interface IPictureSettings extends ISpriteSettings {
 	shadowOffsetY?: number;
 
 	/**
-	 * Opacity of the shadow (0-1).
+	 * Opacity of the shadow, from `0` to `1`.
 	 *
-	 * If not set, will use the same as `fillOpacity` of the element.
-	 *
+	 * @default 1
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOpacity?: number;
@@ -72,18 +67,19 @@ export interface IPicturePrivate extends ISpritePrivate {
 export interface IPictureEvents extends ISpriteEvents {
 
 	/**
-	 * Invoked when picture is loaded.
+	 * The image loaded.
 	 */
 	loaded: {};
 
 	/**
-	 * Invoked when picture load error happens.
+	 * The image failed to load.
 	 */
 	loaderror: {};
 }
 
 /**
- * Displays an image.
+ * Displays an image. If only `width` or `height` is set, the other follows
+ * the image's aspect ratio.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/images/} for more info
  * @important

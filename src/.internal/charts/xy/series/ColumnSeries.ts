@@ -15,14 +15,11 @@ export interface IColumnSeriesDataItem extends IBaseColumnSeriesDataItem { }
 export interface IColumnSeriesSettings extends IBaseColumnSeriesSettings {
 
 	/**
-	 * Enables "turbo mode" of rendering.
-	 * 
-	 * If enabled, the columns will be drawn directly on canvas, rather than
-	 * each individually, significantly speeding up the rendering. Especially
-	 * on column-heavy charts.
+	 * Draws all columns as a single shape instead of one element each, which
+	 * renders charts with many columns much faster.
 	 *
-	 * NOTE: this is an experimental feature and may not work in all setups. Some
-	 * features might be disabled, too, e.g. pointer events and rounded corners.
+	 * Experimental: the columns then don't react to the pointer, and some of
+	 * their settings, such as rounded corners, have no effect.
 	 *
 	 * @since 5.14.0
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Turbo_mode} for more info
@@ -35,11 +32,14 @@ export interface IColumnSeriesPrivate extends IBaseColumnSeriesPrivate { }
 
 export interface IColumnSeriesAxisRange extends IBaseColumnSeriesAxisRange {
 	/**
-	 * A list of actual columns in a range.
+	 * Columns of the series within the range.
 	 */
 	columns: ListTemplate<RoundedRectangle>
 }
 
+/**
+ * A series that shows values as columns or bars.
+ */
 export class ColumnSeries extends BaseColumnSeries {
 
 	declare public _settings: IColumnSeriesSettings;
@@ -68,10 +68,8 @@ export class ColumnSeries extends BaseColumnSeries {
 	}
 
 	/**
-	 * A [[TemplateList]] of all columns in series.
-	 *
-	 * `columns.template` can be used to set default settings for all columns,
-	 * or to change on existing ones.
+	 * Columns of the series. Configure them all, existing ones included,
+	 * through `columns.template`.
 	 */
 	public readonly columns: ListTemplate<RoundedRectangle> = this.addDisposer(new ListTemplate(
 		Template.new({}),

@@ -1,0 +1,7 @@
+{
+  "title": "Directed Chord Diagram",
+  "description": "A chord diagram whose links end in arrowheads, so each one shows its direction.",
+  "category": "flow",
+  "tier": "basic",
+  "tags": ["chord", "directed", "flow", "radial labels"]
+}

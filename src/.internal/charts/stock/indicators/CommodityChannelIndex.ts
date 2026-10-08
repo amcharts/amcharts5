@@ -8,7 +8,9 @@ export interface ICommodityChannelIndexPrivate extends IOverboughtOversoldPrivat
 export interface ICommodityChannelIndexEvents extends IOverboughtOversoldEvents { }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Commodity Channel Index indicator: how far the typical price (average of
+ * high, low and close) is from its `period` average, relative to its mean
+ * deviation. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */

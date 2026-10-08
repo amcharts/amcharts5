@@ -2,8 +2,8 @@ import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "./Graphics";
 
 export interface IRectangleSettings extends IGraphicsSettings {
 	/**
-	 * @todo review
-	 * If this is set to `true`, rectangle will be drawn in such a way that its stroke is contained within the rectangle's width and height.
+	 * Draws the rectangle so that its stroke stays within its width and
+	 * height.
 	 */
 	containStroke?: boolean;
 }

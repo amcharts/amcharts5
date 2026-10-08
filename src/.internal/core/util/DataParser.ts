@@ -4,14 +4,14 @@ import * as $object from "./Object"
 export interface IJSONParserOptions {
 
 	/**
-	 * Reverse the order of parsed data.
+	 * Reverses the order of items when the parsed data is an array.
 	 */
 	reverse?: boolean;
 
 }
 
 /**
- * Tool to parse JSON string into structured data.
+ * Parses a JSON string into data.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Parsing} for more info
  * @important
@@ -19,8 +19,9 @@ export interface IJSONParserOptions {
 export class JSONParser {
 
 	/**
-	 * Parses JSON string.
-	 * 
+	 * Parses a JSON string. An array or object is returned as it is, and
+	 * invalid JSON gives `undefined`.
+	 *
 	 * @param   input    JSON
 	 * @param   options  Options
 	 * @return           Data
@@ -55,7 +56,7 @@ export class JSONParser {
 			options = {};
 		}
 		$object.each(defaults, (key, val) => {
-			normalized[key] = options![key] || val;
+			normalized[key] = options![key] != null ? options![key] : val;
 		});
 		return normalized;
 	}
@@ -65,34 +66,35 @@ export class JSONParser {
 export interface ICSVParserOptions {
 
 	/**
-	 * Delimiter used for columns.
-	 * 
+	 * Character that separates the columns.
+	 *
 	 * @default ","
 	 */
 	delimiter?: string;
 
 	/**
-	 * Reverse the order of parsed data.
+	 * Returns the rows in reverse order.
 	 */
 	reverse?: boolean;
 
 	/**
-	 * Skip first X rows.
+	 * Number of rows to skip at the start.
 	 *
 	 * @default 0
 	 */
 	skipRows?: number;
 
 	/**
-	 * Skip empty rows.
+	 * Leaves out empty rows.
 	 *
 	 * @default true
 	 */
 	skipEmpty?: boolean;
 
 	/**
-	 * Use the first row to name the columns.
-	 * 
+	 * Uses the first row (after `skipRows`) as field names. Otherwise the
+	 * fields are named `col0`, `col1`, and so on.
+	 *
 	 * @default false
 	 */
 	useColumnNames?: boolean;
@@ -100,7 +102,7 @@ export interface ICSVParserOptions {
 }
 
 /**
- * Tool to parse JSON string into structured data.
+ * Parses a CSV string into data.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Parsing} for more info
  * @important
@@ -108,8 +110,9 @@ export interface ICSVParserOptions {
 export class CSVParser {
 
 	/**
-	 * Parses CSV string.
-	 * 
+	 * Parses a CSV string into an array of objects, one per row. All values
+	 * are strings.
+	 *
 	 * @param   input    CSV
 	 * @param   options  Options
 	 * @return           Data
@@ -283,7 +286,7 @@ export class CSVParser {
 			options = {};
 		}
 		$object.each(defaults, (key, val) => {
-			normalized[key] = options![key] || val;
+			normalized[key] = options![key] != null ? options![key] : val;
 		});
 		return normalized;
 

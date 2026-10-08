@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "ठीक है",
+	"Cancel": "रद्द करें",
+	"Delete": "हटाएँ",
+	"Settings": "सेटिंग्स",
+	"Expand": "विस्तार करें",
+	"Move Up": "ऊपर ले जाएँ",
+	"Move Down": "नीचे ले जाएँ"
 };

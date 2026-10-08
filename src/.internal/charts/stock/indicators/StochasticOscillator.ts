@@ -8,17 +8,22 @@ import * as $type from "../../../core/util/Type";
 
 export interface IStochasticOscillatorSettings extends IOverboughtOversoldSettings {
 	/**
-	 * A color for "slow" section.
+	 * Color of the slow (%D) line.
 	 */
 	slowColor?: Color;
 
 	/**
-	 * Smoothing "k" parameter.
+	 * Number of data items the main (%K) line is smoothed over, with a simple
+	 * moving average. `1` means no smoothing.
+	 *
+	 * @default 1
 	 */
 	kSmoothing?: number;
 
 	/**
-	 * Smoothing "d" parameter.
+	 * Number of data items the slow (%D) line averages the main line over.
+	 *
+	 * @default 3
 	 */
 	dSmoothing?: number;
 }
@@ -31,7 +36,9 @@ export interface IStochasticOscillatorEvents extends IOverboughtOversoldEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Stochastic Oscillator indicator: where the price is within the high-low
+ * range of the last `period` data items, from `0` to `100`, with a slow line
+ * averaging it. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -44,7 +51,7 @@ export class StochasticOscillator extends OverboughtOversold {
 	declare public _events: IStochasticOscillatorEvents;
 
 	/**
-	 * Indicator series.
+	 * Series of the slow (%D) line.
 	 */
 	public slowSeries!: LineSeries;
 

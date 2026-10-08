@@ -1,0 +1,8 @@
+{
+  "title": "Pixel Map",
+  "description": "A world map drawn as a grid of dots with PixelMapSeries, with countries colored by value using heat rules.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["pixel map", "dots", "heat rules", "tooltip"],
+  "since": "5.21.0"
+}

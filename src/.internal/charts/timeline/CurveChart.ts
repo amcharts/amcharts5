@@ -16,7 +16,7 @@ import { Graphics } from "../../core/render/Graphics";
 export interface ICurveChartSettings extends IXYChartSettings {
 
 	/**
-	 * [[CurveCursor]] instance.
+	 * The chart's cursor, a [[CurveCursor]].
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/timeline-chart/#Cursor} for more info
 	 */
@@ -29,13 +29,11 @@ export interface ICurveChartPrivate extends IXYChartPrivate {
 }
 
 /**
- * Base chart for a Timeline chart.
+ * A timeline chart along any curve: the X axis runs along the `points` of
+ * its [[AxisRendererCurveX]], and the Y axis across it. Also the base of
+ * [[SerpentineChart]] and [[SpiralChart]].
  *
- * For this chart to work, it needs curve points provided via renderer of
- * its X-axis.
- * 
- * Note: it is an experimental chart type and does not support all the
- * functionality of the [[XYChart]].
+ * It is experimental and does not support everything an [[XYChart]] does.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0
@@ -44,9 +42,8 @@ export interface ICurveChartPrivate extends IXYChartPrivate {
 export class CurveChart extends XYChart {
 
 	/**
-	 * [[Container]] where chart elements go.
-	 *
-	 * @default Container.new()
+	 * Container at the center of the plot area with the axes, grid, series,
+	 * bullets and cursor.
 	 */
 	public readonly curveContainer = this.plotContainer.children.push(Container.new(this._root, { x: p50, y: p50 }));
 
@@ -117,7 +114,7 @@ export class CurveChart extends XYChart {
 				this._updateMask(series.bulletsContainer);
 			}
 			else {
-				series.bulletsContainer.set("mask", undefined);
+				series.bulletsContainer._setC("mask", undefined);
 			}
 		})
 

@@ -407,5 +407,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Annuler",
+	"Delete": "Supprimer",
+	"Settings": "Paramètres",
+	"Expand": "Développer",
+	"Move Up": "Monter",
+	"Move Down": "Descendre"
 };

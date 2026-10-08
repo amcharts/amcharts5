@@ -1,0 +1,8 @@
+{
+  "title": "Globe with Surface Bullets",
+  "description": "City pins that lie on the surface of a globe and flatten towards its edge, using the surfaceBullets setting of MapPointSeries.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["globe", "map points", "bullets", "surface", "icon"],
+  "since": "5.21.0"
+}

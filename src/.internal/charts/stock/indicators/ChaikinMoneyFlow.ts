@@ -8,7 +8,7 @@ import * as $array from "../../../core/util/Array";
 
 export interface IChaikinMoneyFlowSettings extends IChartIndicatorSettings {
 	/**
-	 * A volume series indicator will be based on, if it requires one.
+	 * The volume series that weights each data item's money flow. Required.
 	 */
 	volumeSeries: XYSeries;
 }
@@ -21,7 +21,8 @@ export interface IChaikinMoneyFlowEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Chaikin Money Flow indicator: volume-weighted money flow over `period`, from
+ * `-1` to `1`. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -34,7 +35,7 @@ export class ChaikinMoneyFlow extends ChartIndicator {
 	declare public _events: IChaikinMoneyFlowEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

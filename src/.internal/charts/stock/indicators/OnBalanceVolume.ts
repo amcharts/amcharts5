@@ -7,7 +7,7 @@ import { LineSeries } from "../../xy/series/LineSeries";
 export interface IOnBalanceVolumeSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Chart's main volume series.
+	 * The volume series to add up. Required.
 	 */
 	volumeSeries: XYSeries;
 
@@ -21,7 +21,9 @@ export interface IOnBalanceVolumeEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * On Balance Volume indicator: a running total of volume, added on data items
+ * that close higher than the previous one and subtracted on those that close
+ * lower. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -34,7 +36,7 @@ export class OnBalanceVolume extends ChartIndicator {
 	declare public _events: IOnBalanceVolumeEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

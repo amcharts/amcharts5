@@ -410,5 +410,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "Tamam",
+	"Cancel": "İptal",
+	"Delete": "Sil",
+	"Settings": "Ayarlar",
+	"Expand": "Genişlet",
+	"Move Up": "Yukarı taşı",
+	"Move Down": "Aşağı taşı"
 };

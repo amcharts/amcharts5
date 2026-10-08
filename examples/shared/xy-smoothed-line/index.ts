@@ -5,7 +5,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
-var root = am5.Root.new("chartdiv");
+const root = am5.Root.new("chartdiv");
 
 
 // Set themes
@@ -17,106 +17,111 @@ root.setThemes([
 
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/xy-chart/
-var chart = root.container.children.push(am5xy.XYChart.new(root, {
-  panX: false,
+const chart = root.container.children.push(am5xy.XYChart.new(root, {
+  panX: false,       // dragging the plot does not pan: the cursor uses the drag to zoom
   panY: false,
-  wheelX: "panX",
-  wheelY: "zoomX"
+  wheelX: "panX",    // a sideways wheel or trackpad swipe moves along the dates...
+  wheelY: "zoomX"    // ...and the vertical wheel zooms in on them
 }));
+
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
-var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
-  behavior: "zoomX"
+const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+  behavior: "zoomX" // drag across the plot to zoom in on those days
 }));
-cursor.lineY.set("visible", false);
-
-
-// Generate random data
-var date = new Date();
-date.setHours(0, 0, 0, 0);
-var value = 100;
-
-function generateData() {
-  value = Math.round((Math.random() * 10 - 5) + value);
-  am5.time.add(date, "day", 1);
-  return {
-    date: date.getTime(),
-    value: value
-  };
-}
-
-function generateDatas(count) {
-  var data = [];
-  for (var i = 0; i < count; ++i) {
-    data.push(generateData());
-  }
-  return data;
-}
+cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
 // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
-var xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-  maxDeviation: 0,
-  baseInterval: {
+const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+  maxDeviation: 0,            // no scrolling past the first or last day
+  baseInterval: {             // one data point per day
     timeUnit: "day",
     count: 1
   },
   renderer: am5xy.AxisRendererX.new(root, {
-    minorGridEnabled: true
+    minorGridEnabled: true    // fainter grid lines between the labelled ones
   }),
-  tooltip: am5.Tooltip.new(root, {})
+  tooltip: am5.Tooltip.new(root, {}) // shows the cursor's date on the axis
 }));
 
-var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
+const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {})
 }));
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-var series = chart.series.push(am5xy.SmoothedXLineSeries.new(root, {
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/
+// a curve through the points: SmoothedXLineSeries is made for data that runs left to right
+const series = chart.series.push(am5xy.SmoothedXLineSeries.new(root, {
   name: "Series",
   xAxis: xAxis,
   yAxis: yAxis,
   valueYField: "value",
   valueXField: "date",
   tooltip: am5.Tooltip.new(root, {
-    labelText: "{valueY}"
+    labelText: "{valueY}" // the hovered day's value
   })
 }));
 
+// fill the area below the line
 series.fills.template.setAll({
-  visible: true,
-  fillOpacity: 0.2
+  visible: true,   // line series fills are hidden by default
+  fillOpacity: 0.2 // pale, so the grid shows through
 });
 
-series.bullets.push(function() {
+// a dot on every data point
+series.bullets.push(() => {
   return am5.Bullet.new(root, {
-    locationY: 0,
     sprite: am5.Circle.new(root, {
       radius: 4,
-      stroke: root.interfaceColors.get("background"),
-      strokeWidth: 2,
-      fill: series.get("fill")
+      stroke: root.interfaceColors.get("background"), // a ring in the background color...
+      strokeWidth: 2,                                 // ...2 px wide, around each dot
+      fill: series.get("fill")                        // the line's color
     })
   });
 });
 
 
-// Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
-chart.set("scrollbarX", am5.Scrollbar.new(root, {
-  orientation: "horizontal"
-}));
-
-
-var data = generateDatas(50);
-series.data.setAll(data);
+// Set data
+// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+series.data.setAll([
+  { date: 1704067200000, value: 97 },
+  { date: 1704153600000, value: 98 },
+  { date: 1704240000000, value: 96 },
+  { date: 1704326400000, value: 98 },
+  { date: 1704412800000, value: 99 },
+  { date: 1704499200000, value: 98 },
+  { date: 1704585600000, value: 101 },
+  { date: 1704672000000, value: 98 },
+  { date: 1704758400000, value: 98 },
+  { date: 1704844800000, value: 94 },
+  { date: 1704931200000, value: 94 },
+  { date: 1705017600000, value: 90 },
+  { date: 1705104000000, value: 91 },
+  { date: 1705190400000, value: 88 },
+  { date: 1705276800000, value: 85 },
+  { date: 1705363200000, value: 90 },
+  { date: 1705449600000, value: 92 },
+  { date: 1705536000000, value: 88 },
+  { date: 1705622400000, value: 84 },
+  { date: 1705708800000, value: 79 },
+  { date: 1705795200000, value: 80 },
+  { date: 1705881600000, value: 79 },
+  { date: 1705968000000, value: 82 },
+  { date: 1706054400000, value: 85 },
+  { date: 1706140800000, value: 80 },
+  { date: 1706227200000, value: 80 },
+  { date: 1706313600000, value: 79 },
+  { date: 1706400000000, value: 79 },
+  { date: 1706486400000, value: 77 },
+  { date: 1706572800000, value: 77 }
+]);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000);
 chart.appear(1000, 100);

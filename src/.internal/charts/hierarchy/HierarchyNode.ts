@@ -16,7 +16,7 @@ export interface IHierarchyNodePrivate extends IContainerPrivate {
 export class HierarchyNode extends Container {
 
 	/**
-	 * Related series.
+	 * The series the node belongs to.
 	 */
 	public series: Hierarchy | undefined;
 
@@ -46,6 +46,9 @@ export class HierarchyNode extends Container {
 
 			const disabled = this.get("disabled");
 			const series = this.series;
+
+			// A node with children shows (expanded) or hides (collapsed) them
+			this._setC("ariaExpanded", !disabled);
 
 			if (dataItem && series) {
 				if (dataItem.get("disabled") != disabled) {

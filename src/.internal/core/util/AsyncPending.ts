@@ -9,10 +9,10 @@
 import * as $array from "./Array";
 
 /**
- * [Listener description]
+ * A callback queued for a frame, called with the current time in
+ * milliseconds.
  *
  * @ignore Exclude from docs
- * @todo Description
  */
 export type Listener = (now: number) => void;
 
@@ -47,10 +47,10 @@ const idleQueue: Array<Listener> = [];
 const fps = 1000 / 60;
 
 /**
- * [raf description]
+ * Calls `fn` on the next animation frame, or after about 1/60 of a second
+ * where `requestAnimationFrame` is not available.
  *
  * @ignore Exclude from docs
- * @todo Description
  */
 export const raf =
 	(typeof requestAnimationFrame === "function"
@@ -62,10 +62,10 @@ export const raf =
 		});
 
 /**
- * [frameLoop description]
+ * Runs the queued "next", "read" and "write" callbacks, in that order, and
+ * asks for another frame while any remain.
  *
  * @ignore Exclude from docs
- * @todo Description
  */
 function frameLoop(): void {
 	const now = Date.now();
@@ -103,10 +103,9 @@ function frameLoop(): void {
 }
 
 /**
- * [pendFrame description]
+ * Asks for a frame, unless one is already pending.
  *
  * @ignore Exclude from docs
- * @todo Description
  */
 function pendFrame(): void {
 	if (!pendingFrame) {
@@ -118,11 +117,10 @@ function pendFrame(): void {
 
 
 /**
- * [nextFrame description]
+ * Calls `fn` on the next frame, before the read and write callbacks.
  *
  * @ignore Exclude from docs
- * @todo Description
- * @param fn [description]
+ * @param fn  Callback
  */
 export function nextFrame(fn: Listener): void {
 	nextQueue.push(fn);
@@ -130,11 +128,10 @@ export function nextFrame(fn: Listener): void {
 }
 
 /**
- * [readFrame description]
+ * Calls `fn` on the next frame, before the write callbacks.
  *
  * @ignore Exclude from docs
- * @todo Description
- * @param fn [description]
+ * @param fn  Callback
  */
 export function readFrame(fn: Listener): void {
 	readQueue.push(fn);
@@ -142,11 +139,10 @@ export function readFrame(fn: Listener): void {
 }
 
 /**
- * [writeFrame description]
+ * Calls `fn` on the next frame, after the read callbacks.
  *
  * @ignore Exclude from docs
- * @todo Description
- * @param fn [description]
+ * @param fn  Callback
  */
 export function writeFrame(fn: Listener): void {
 	writeQueue.push(fn);
@@ -154,11 +150,10 @@ export function writeFrame(fn: Listener): void {
 }
 
 /**
- * [whenIdle description]
+ * Queues `fn` to be called by the next `triggerIdle()`.
  *
  * @ignore Exclude from docs
- * @todo Description
- * @param fn [description]
+ * @param fn  Callback
  */
 export function whenIdle(fn: Listener): void {
 	idleQueue.push(fn);

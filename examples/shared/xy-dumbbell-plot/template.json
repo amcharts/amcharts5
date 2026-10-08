@@ -1,0 +1,7 @@
+{
+  "title": "Dumbbell Plot",
+  "description": "A range per category drawn as a thin column from the open value to the close value, with a bullet at each end.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["dumbbell", "column", "bullet", "category axis", "range"]
+}

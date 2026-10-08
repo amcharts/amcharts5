@@ -1,0 +1,7 @@
+{
+  "title": "Stacked Column Chart",
+  "description": "Six column series stacked on a category axis, with value labels and a legend.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["column", "stacked", "category axis", "legend"]
+}

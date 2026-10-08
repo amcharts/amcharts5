@@ -1,0 +1,7 @@
+{
+  "title": "Map with Bubbles",
+  "description": "Bubbles placed on countries by their id, with heat rules setting each bubble's size and color from its value.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["bubbles", "point series", "heat rules", "polygon id"]
+}

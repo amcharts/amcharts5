@@ -18,45 +18,47 @@ root.setThemes([
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/
 const chart = root.container.children.push(am5percent.SlicedChart.new(root, {
-  layout: root.verticalLayout
+  layout: root.verticalLayout // stacks the pyramid and the legend, so the legend goes below
 }));
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Series
+// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/
+// each slice's area is its share of the total; the labels line up in a column beside the
+// pyramid, joined to their slices by ticks (alignLabels is on by default)
 const series = chart.series.push(am5percent.PyramidSeries.new(root, {
-  orientation: "vertical",
+  orientation: "vertical", // the tip at the top, the base at the bottom
   valueField: "value",
   categoryField: "category"
 }));
 
 
-// Set data
+// Set data: slices go from the tip down, so the smallest value comes first
 // https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Setting_data
 series.data.setAll([
-  { value: 10, category: "One" },
-  { value: 9, category: "Two" },
-  { value: 6, category: "Three" },
+  { value: 3, category: "One" },
+  { value: 3, category: "Two" },
+  { value: 4, category: "Three" },
   { value: 5, category: "Four" },
-  { value: 4, category: "Five" },
-  { value: 3, category: "Six" },
-  { value: 3, category: "Seven" }
-].reverse());
+  { value: 6, category: "Five" },
+  { value: 9, category: "Six" },
+  { value: 10, category: "Seven" }
+]);
 
 
 // Create legend
 // https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
-  centerX: am5.percent(50),
+  centerX: am5.percent(50), // centered under the pyramid
   x: am5.percent(50),
-  marginTop: 15,
-  marginBottom: 15
+  marginTop: 15,            // some room between the pyramid and the legend...
+  marginBottom: 15          // ...and below it
 }));
 
-legend.data.setAll(am5.array.copy(series.dataItems).reverse());
+legend.data.setAll(series.dataItems);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation#Forcing_appearance_animation
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear();
 chart.appear(1000, 100);

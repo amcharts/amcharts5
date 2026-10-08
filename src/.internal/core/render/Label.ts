@@ -9,12 +9,15 @@ import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } fr
 
 import * as  $array from "../../core/util/Array";
 import * as  $type from "../../core/util/Type";
+import * as  $math from "../../core/util/Math";
 
 
 export interface ILabelSettings extends IContainerSettings {
 
 	/**
-	 * Labels' text.
+	 * The label's text. It can hold in-line formatting and, with
+	 * `populateText`, data placeholders.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/text-styling/} for text styling info
 	 *
 	 */
@@ -26,7 +29,7 @@ export interface ILabelSettings extends IContainerSettings {
 	fill?: Color;
 
 	/**
-	 * Text opacity.
+	 * Text opacity, from `0` (transparent) to `1` (opaque).
 	 *
 	 * @default 1
 	 * @since 5.2.39
@@ -42,22 +45,21 @@ export interface ILabelSettings extends IContainerSettings {
 	fillGradient?: Gradient;
 
 	/**
-	 * Alignment.
+	 * Horizontal alignment of the text's lines.
 	 */
 	textAlign?: "start" | "end" | "left" | "right" | "center";
 
 	/**
-	 * Font family to use for the label.
+	 * Font family, or a comma-separated list of them.
 	 *
-	 * Multiple fonts can be separated by commas.
-	 *
-	 * Use reserved value `"inherit"` to use computed style on chart
-	 * container. (since `5.17.3`)
+	 * `"inherit"` uses the font of the chart's container element (since
+	 * `5.17.3`).
 	 */
 	fontFamily?: string;
 
 	/**
-	 * Font size in misc any supported CSS format (pixel, point, em, etc.).
+	 * Font size: a number in pixels, or any CSS size, such as `"1em"` or
+	 * `"12pt"`.
 	 */
 	fontSize?: string | number;
 
@@ -77,30 +79,27 @@ export interface ILabelSettings extends IContainerSettings {
 	fontVariant?: "normal" | "small-caps";
 
 	/**
-	 * Text decoration.
-	 *
-	 * Supported options `"underline"`, `"line-through"`.
+	 * Text decoration: `"underline"` or `"line-through"`.
 	 *
 	 * @since 5.0.15
 	 */
 	textDecoration?: "underline" | "line-through";
 
 	/**
-	 * Line height in percent or absolute pixels.
+	 * Line height as a multiple of the font's line height: a number, such as
+	 * `1.5`, or a percent, such as `am5.percent(150)`. If not set, it is `1.2`.
 	 */
 	lineHeight?: Percent | number;
 
 	/**
-	 * How much of the height should be considered to go below baseline.
+	 * Share of the line height that lies below the text's baseline.
 	 *
 	 * @default 0.19
 	 */
 	baselineRatio?: number;
 
 	/**
-	 * Opacity of the label.
-	 *
-	 * 0 - fully transparent; 1 - fully opaque.
+	 * Opacity of the label, from `0` (transparent) to `1` (opaque).
 	 */
 	opacity?: number;
 
@@ -112,12 +111,16 @@ export interface ILabelSettings extends IContainerSettings {
 	direction?: "ltr" | "rtl";
 
 	/**
-	 * A base line to use when aligning text chunks vertically.
+	 * The baseline the text is aligned to vertically, as in the canvas
+	 * `textBaseline`.
 	 */
 	textBaseline?: "top" | "hanging" | "middle" | "alphabetic" | "ideographic" | "bottom";
 
 	/**
-	 * How to handle labels that do not fit into its designated space.
+	 * What to do with text that does not fit the label's `maxWidth` (or
+	 * `maxHeight`): `"hide"` it, `"fit"` it by scaling it down, `"wrap"` it
+	 * onto more lines, wrap it without breaking words (`"wrap-no-break"`), or
+	 * `"truncate"` it with an ellipsis.
 	 *
 	 * LIMITATIONS: on circular labels, the only values supported are `"hide"` and
 	 * `"truncate"`. The latter will ignore `breakWords` setting.
@@ -127,18 +130,17 @@ export interface ILabelSettings extends IContainerSettings {
 	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate";
 
 	/**
-	 * Whether words can be broken when truncating or wrapping text.
+	 * Lets truncation cut words in the middle. Wrapping does not use it.
 	 *
 	 * @default false
 	 */
 	breakWords?: boolean;
 
 	/**
-	 * Ellipsis characters to use when truncating text.
+	 * Characters added at the end of truncated text.
 	 *
-	 * Will use Unicode ellipsis symbol (`"…"`) by default, which might not be
-	 * available in all fonts. If ellipsis looks broken, use different
-	 * characters. E.g.:
+	 * The default Unicode ellipsis (`"…"`) is missing from some fonts. If it
+	 * looks broken, use other characters, e.g.:
 	 *
 	 * ```TypeScript
 	 * label.set("ellipsis", "...");
@@ -153,17 +155,14 @@ export interface ILabelSettings extends IContainerSettings {
 	ellipsis?: string;
 
 	/**
-	 * Minimum relative scale allowed for label when scaling down
-	 * when `oversizedBehavior` is set to `"fit"`.
-	 *
-	 * If fitting the label would require it to scale beyond `minScale` it would
-	 * be hidden instead.
+	 * Smallest scale, from `0` to `1`, that `oversizedBehavior: "fit"` may
+	 * shrink the text to. Text that would need to shrink more is hidden.
 	 */
 	minScale?: number;
 
 	/**
-	 * If set to `true` the label will parse `text` for data placeholders and
-	 * will try to populate them with actual data.
+	 * Fills data placeholders in `text`, such as `{value}`, with values from
+	 * the label's data item.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Data_placeholders} for more info
 	 *
@@ -172,27 +171,23 @@ export interface ILabelSettings extends IContainerSettings {
 	populateText?: boolean;
 
 	/**
-	 * If set to `true`, will ignore in-line formatting blocks and will display
-	 * text exactly as it is.
+	 * Shows `text` exactly as it is, without applying in-line formatting
+	 * blocks such as `[bold]`.
 	 *
 	 * @default false
 	 */
 	ignoreFormatting?: boolean;
 
 	/**
-	 * Color of the element's shadow.
-	 *
-	 * For this to work at least one of the following needs to be set as well:
-	 * `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`.
+	 * Color of the text's shadow. It shows only when `shadowBlur`,
+	 * `shadowOffsetX` or `shadowOffsetY` is set too.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowColor?: Color | null;
 
 	/**
-	 * Blurriness of the shadow.
-	 *
-	 * The bigger the number, the more blurry shadow will be.
+	 * Blurriness of the shadow: the bigger the number, the blurrier the shadow.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
@@ -213,19 +208,16 @@ export interface ILabelSettings extends IContainerSettings {
 	shadowOffsetY?: number;
 
 	/**
-	 * Opacity of the shadow (0-1).
-	 *
-	 * If not set, will use the same as `fillOpacity` of the element.
+	 * Opacity of the shadow, from `0` to `1`. If not set, the shadow takes the
+	 * opacity of the text.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOpacity?: number;
 
 	/**
-	 * Maximum number of characters to allow in label.
-	 *
-	 * If the `text` is longer than `maxChars`, the text will be truncated
-	 * using the `breakWords` and `ellipsis` settings.
+	 * Maximum number of characters in the label. A longer `text` is cut, using
+	 * the `breakWords` and `ellipsis` settings.
 	 *
 	 * @since 5.7.2
 	 */
@@ -248,7 +240,8 @@ export interface ILabelEvents extends IContainerEvents {
 }
 
 /**
- * Creates a label with support for in-line styling and data bindings.
+ * A text element with padding and an optional background. Its text can hold
+ * in-line formatting and data placeholders.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/} for more info
  */
@@ -369,7 +362,7 @@ export class Label extends Container {
 			this._text.set(property as any, this._getTextKeyValue(property));
 		})
 
-		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isDirty("rotation")) {
+		if (this.isDirty("maxWidth") || this.isDirty("maxHeight") || this.isDirty("rotation") || this.isDirty("paddingLeft") || this.isDirty("paddingRight") || this.isDirty("paddingTop") || this.isDirty("paddingBottom")) {
 			this._setMaxDimentions();
 		}
 
@@ -427,13 +420,18 @@ export class Label extends Container {
 	}
 
 	protected _setMaxDimentions() {
-		const rotation = this.get("rotation");
-		const vertical = rotation == 90 || rotation == 270 || rotation == -90;
+		const rotation = $math.normalizeAngle(this.get("rotation", 0));
+		const vertical = rotation == 90 || rotation == 270;
 		const text = this._text;
+
+		// Padding is in the label's own frame: its width is padded left and right,
+		// its height top and bottom. Turned upright, its width runs up the screen
+		const paddingAcross = this.get("paddingLeft", 0) + this.get("paddingRight", 0);
+		const paddingUp = this.get("paddingTop", 0) + this.get("paddingBottom", 0);
 
 		const maxWidth = this.get("maxWidth", this.getPrivate("maxWidth", Infinity));
 		if ($type.isNumber(maxWidth)) {
-			text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - this.get("paddingTop", 0) - this.get("paddingBottom", 0));
+			text.set(vertical ? "maxHeight" : "maxWidth", maxWidth - (vertical ? paddingUp : paddingAcross));
 		}
 		else {
 			text.set(vertical ? "maxHeight" : "maxWidth", undefined);
@@ -441,7 +439,7 @@ export class Label extends Container {
 
 		const maxHeight = this.get("maxHeight", this.getPrivate("maxHeight", Infinity));
 		if ($type.isNumber(maxHeight)) {
-			text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - this.get("paddingLeft", 0) - this.get("paddingRight", 0));
+			text.set(vertical ? "maxWidth" : "maxHeight", maxHeight - (vertical ? paddingAcross : paddingUp));
 		}
 		else {
 			text.set(vertical ? "maxWidth" : "maxHeight", undefined);
@@ -467,8 +465,8 @@ export class Label extends Container {
 	}
 
 	/**
-	 * Returns text with populated placeholders and formatting if `populateText` is
-	 * set to `true`.
+	 * Returns the label's text, with data placeholders filled in when
+	 * `populateText` is `true`.
 	 *
 	 * @return Populated text
 	 */

@@ -4,12 +4,17 @@ import { LineSeries } from "../../xy/series/LineSeries";
 
 export interface IZigZagSettings extends IIndicatorSettings {
 	/**
-	 * Percentage of price movement you want to set as your threshold
+	 * Smallest price move, in percent, that starts a new line.
+	 *
+	 * @default 5
 	 */
 	deviation?: number;
 
 	/**
-	 * The minimum number of price bars required where there is no secondary high or low.
+	 * A new turning point must be the highest high (or lowest low) of the last
+	 * `depth` data items.
+	 *
+	 * @default 3
 	 */
 	depth?: number;
 }
@@ -21,7 +26,8 @@ export interface IZigZagEvents extends IIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * ZigZag indicator: straight lines between the price's turning points,
+ * ignoring moves smaller than `deviation`. Drawn over the main series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -34,7 +40,7 @@ export class ZigZag extends Indicator {
 	declare public _events: IZigZagEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: LineSeries;
 

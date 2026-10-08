@@ -9,7 +9,8 @@ import * as $utils from "../../core/util/Utils";
 export interface IChordLinkDirectedSettings extends IChordLinkSettings {
 
 	/**
-	 * Length of the link arrow in pixels.
+	 * Has no effect: the arrowhead length is set by `linkHeadRadius` on the
+	 * [[ChordDirected]] series.
 	 *
 	 * @default 10
 	 */
@@ -21,7 +22,7 @@ export interface IChordLinkDirectedPrivate extends IChordLinkPrivate {
 }
 
 /**
- * A link element used in [[ChordDirected]] chart.
+ * A link element of a [[ChordDirected]] series.
  */
 export class ChordLinkDirected extends ChordLink {
 	declare public _settings: IChordLinkDirectedSettings;

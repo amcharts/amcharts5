@@ -1,0 +1,7 @@
+{
+  "title": "Gantt Chart",
+  "description": "A Gantt chart with a flat list of linked tasks.",
+  "category": "gantt",
+  "tier": "basic",
+  "tags": ["gantt", "tasks", "links"]
+}

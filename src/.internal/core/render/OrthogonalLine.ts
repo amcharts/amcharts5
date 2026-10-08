@@ -4,12 +4,16 @@ import type { IPoint } from "../util/IPoint";
 export interface IOrthogonalLineSettings extends IGraphicsSettings {
 
 	/**
-	 * A list of [[IPoint]] (x/y coordinates) points for the Orthogonal Line.
+	 * Points the line goes through, in pixels. Between two points that differ
+	 * in both x and y it goes horizontally first, then vertically.
 	 */
 	points?: Array<IPoint>;
 
 	/**
-	 * Corner radius between segments.
+	 * Radius in pixels of the rounded corners where the line turns, at most
+	 * half the length of the segments next to a corner.
+	 *
+	 * @default 10
 	 */
 	cornerRadius?: number;
 }
@@ -18,7 +22,8 @@ export interface IOrthogonalLinePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws an Orthogonal line.
+ * Draws a line of horizontal and vertical segments through `points`, with
+ * rounded corners.
  *
  * @important
  * @since 5.14.0
@@ -39,6 +44,13 @@ export class OrthogonalLine extends Graphics {
 		}
 	}
 
+	/**
+	 * Returns the points with a corner added between any two that differ in
+	 * both x and y, so that the path goes horizontally first, then vertically.
+	 *
+	 * @param   points  Points
+	 * @return          Points with only horizontal and vertical segments
+	 */
 	public static makeOrthogonal(points: Array<IPoint>): Array<IPoint> {
 		// Insert intermediate points to ensure only orthogonal (horizontal/vertical) segments
 		if (points.length > 1) {

@@ -1,0 +1,64 @@
+{
+  "type": "ArcDiagram",
+  "settings": {
+    "sourceIdField": "source",
+    "targetIdField": "target",
+    "valueField": "value",
+    "orientation": "horizontal",
+    "paddingBottom": 70,
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "data": "#data-0",
+    "nodes": {
+      "properties": {
+        "labels": {
+          "properties": {
+            "template": {
+              "settings": {
+                "fontSize": "0.85em",
+                "position": "absolute",
+                "y": { "type": "Percent", "value": 50 },
+                "paddingRight": 6
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "source": "Monica", "target": "Rachel", "value": 4 },
+        { "source": "Monica", "target": "Chandler", "value": 63 },
+        { "source": "Monica", "target": "Ross", "value": 16 },
+        { "source": "Monica", "target": "Joey", "value": 9 },
+        { "source": "Monica", "target": "Phoebe", "value": 3 },
+        { "source": "Monica", "target": "Pete", "value": 10 },
+        { "source": "Rachel", "target": "Chandler", "value": 7 },
+        { "source": "Rachel", "target": "Ross", "value": 80 },
+        { "source": "Rachel", "target": "Joey", "value": 30 },
+        { "source": "Rachel", "target": "Phoebe", "value": 6 },
+        { "source": "Rachel", "target": "Tag", "value": 4 },
+        { "source": "Chandler", "target": "Joey", "value": 1 },
+        { "source": "Chandler", "target": "Phoebe", "value": 7 },
+        { "source": "Chandler", "target": "Janice", "value": 11 },
+        { "source": "Chandler", "target": "Kathy", "value": 7 },
+        { "source": "Ross", "target": "Joey", "value": 3 },
+        { "source": "Ross", "target": "Phoebe", "value": 18 },
+        { "source": "Ross", "target": "Carol", "value": 10 },
+        { "source": "Ross", "target": "Emily", "value": 12 },
+        { "source": "Ross", "target": "Mona", "value": 11 },
+        { "source": "Ross", "target": "Charlie", "value": 10 },
+        { "source": "Joey", "target": "Phoebe", "value": 6 },
+        { "source": "Joey", "target": "Janine", "value": 9 },
+        { "source": "Joey", "target": "Charlie", "value": 3 },
+        { "source": "Phoebe", "target": "David", "value": 14 },
+        { "source": "Phoebe", "target": "Mike", "value": 18 }
+      ]
+    }
+  ]
+}

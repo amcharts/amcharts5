@@ -1,0 +1,72 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100,
+    "projectionName": "geoNaturalEarth1"
+  },
+  "properties": {
+    "series": ["#series-0"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "id": "US", "value": 38, "__parse": true },
+        { "id": "CA", "value": 41, "__parse": true },
+        { "id": "MX", "value": 29, "__parse": true },
+        { "id": "BR", "value": 33, "__parse": true },
+        { "id": "AR", "value": 32, "__parse": true },
+        { "id": "RU", "value": 39, "__parse": true },
+        { "id": "KZ", "value": 31, "__parse": true },
+        { "id": "CN", "value": 38, "__parse": true },
+        { "id": "IN", "value": 28, "__parse": true },
+        { "id": "ID", "value": 30, "__parse": true },
+        { "id": "AU", "value": 38, "__parse": true },
+        { "id": "EG", "value": 24, "__parse": true },
+        { "id": "NG", "value": 18, "__parse": true },
+        { "id": "ET", "value": 19, "__parse": true },
+        { "id": "ZA", "value": 28, "__parse": true }
+      ]
+    },
+    {
+      "template-0": {
+        "type": "Template",
+        "settings": {
+          "fill": { "type": "Color", "value": "#adadad" },
+          "tooltipText": "{name}: {value}"
+        }
+      }
+    },
+    {
+      "series-0": {
+        "type": "PixelMapSeries",
+        "settings": {
+          "geoJSON": "am5geodata_worldLow",
+          "exclude": ["AQ"],
+          "pixelType": "circle",
+          "step": 2,
+          "uniform": true,
+          "valueField": "value",
+          "calculateAggregates": true,
+          "heatRules": [
+            {
+              "target": "#template-0",
+              "dataField": "value",
+              "min": { "type": "Color", "value": "#ffd19a" },
+              "max": { "type": "Color", "value": "#b3261e" },
+              "key": "fill",
+              "__parse": true
+            }
+          ]
+        },
+        "properties": {
+          "data": "#data-0",
+          "mapPolygons": {
+            "properties": { "template": "#template-0" }
+          }
+        }
+      }
+    }
+  ]
+}

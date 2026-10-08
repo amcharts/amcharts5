@@ -9,21 +9,23 @@ const FACTOR_SCALE = 1000;
 
 export interface IAccelerationBandsSettings extends IIndicatorSettings {
     /**
-     * A color for upper section.
+     * Color of the upper band.
      */
     upperColor?: Color;
 
     /**
-     * A color for lower section.
+     * Color of the lower band.
      */
     lowerColor?: Color;
 
 
     /**
-     * Band width factor. Stored in thousandths: the default `0.001` yields the
-     * standard Acceleration Bands (the classic `4 * (high - low) / (high + low)`
-     * form). The settings UI shows this as the conventional `1` (= single band
-     * width) via a display scale, but the stored/API value remains in thousandths.
+     * Width of the bands, in thousandths: the default `0.001` gives the standard
+     * Acceleration Bands, `high * (1 + 4 * (high - low) / (high + low))`, and
+     * `0.002` puts them twice as far out. The settings modal shows the value
+     * times 1000, so `0.001` reads `1`.
+     *
+     * @default 0.001
      */
     factor?: number;
 }
@@ -36,7 +38,9 @@ export interface IAccelerationBandsEvents extends IIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Acceleration Bands indicator: bands above the high and below the low that
+ * widen as the high-low range grows, and their middle line, each averaged over
+ * `period`. Drawn over the main series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -49,12 +53,12 @@ export class AccelerationBands extends Indicator {
     declare public _events: IAccelerationBandsEvents;
 
     /**
-     * Indicator series for the upper band.
+     * Series of the upper band.
      */
     public upperBandSeries!: LineSeries;
 
     /**
-     * Indicator series for the lower band.
+     * Series of the lower band.
      */
     public lowerBandSeries!: LineSeries;
 

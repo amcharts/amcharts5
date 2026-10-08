@@ -1,0 +1,8 @@
+{
+  "title": "Zoom to Country",
+  "description": "Click a country to zoom in on it; click it again, the water or the home button to zoom back out. One setting, clickZoom, does it.",
+  "category": "map",
+  "tier": "technique",
+  "tags": ["zoom", "click", "clickZoom", "active state", "zoom control", "home button"],
+  "since": "5.21.0"
+}

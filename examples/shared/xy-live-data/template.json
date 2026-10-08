@@ -1,0 +1,7 @@
+{
+  "title": "Live Data",
+  "description": "A line that gets a new point every second and drops its oldest one, with the new point animated in from the last.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "live data", "date axis", "animation", "bullets"]
+}

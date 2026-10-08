@@ -26,7 +26,7 @@ export interface IFlowNodesDataItem extends ISeriesDataItem {
 	name: string;
 
 	/**
-	 * An associated node instance.
+	 * The node element.
 	 */
 	node: FlowNode;
 
@@ -49,7 +49,8 @@ export interface IFlowNodesDataItem extends ISeriesDataItem {
 	fillPattern: Pattern;
 
 	/**
-	 * Indicates "unknown" node.
+	 * Marks a placeholder node, made for a link that has no source or target
+	 * ID. It is not shown, and its links fade out toward it.
 	 */
 	unknown: boolean;
 
@@ -89,12 +90,12 @@ export interface IFlowNodesDataItem extends ISeriesDataItem {
 	sumWorking: number;
 
 	/**
-	 * A list of incoming link data items.
+	 * Data items of the links that come into the node.
 	 */
 	incomingLinks: Array<DataItem<IFlowDataItem>>;
 
 	/**
-	 * A list of outgoing link data items.
+	 * Data items of the links that go out of the node.
 	 */
 	outgoingLinks: Array<DataItem<IFlowDataItem>>;
 
@@ -108,36 +109,37 @@ export interface IFlowNodesDataItem extends ISeriesDataItem {
 export interface IFlowNodesSettings extends ISeriesSettings {
 
 	/**
-	 * A field in data boolean setting if the node is "unknown".
+	 * Field in data that marks a node as "unknown" (`true`): a hidden
+	 * placeholder that its links fade out toward.
 	 *
 	 * @default "unknown"
 	 */
 	unknownField?: string;
 
 	/**
-	 * A field in data that holds name for the node.
+	 * Field in data that holds the node's name.
 	 *
 	 * @default "id"
 	 */
 	nameField?: string;
 
 	/**
-	 * A field in data that holds boolean value indicating if node is
-	 * disabled (collapsed).
+	 * Field in data that, when `true`, makes the node start toggled off, with
+	 * its links hidden.
 	 *
 	 * @since 5.4.2
 	 */
 	disabledField?: string;
 
 	/**
-	 * A field in data that holds color used for fills nodes.
+	 * Field in data that holds the node's color.
 	 *
 	 * @default "fill"
 	 */
 	fillField?: string;
 
 	/**
-	 * A [[ColorSet]] that series will use to apply to its nodes.
+	 * [[ColorSet]] that gives each node its color, unless the data sets one.
 	 */
 	colors?: ColorSet;
 
@@ -188,9 +190,7 @@ export abstract class FlowNodes extends Series {
 	}	
 
 	/**
-	 * List of label elements.
-	 *
-	 * @default new ListTemplate<Label>
+	 * List of node labels; configure them all through `labels.template`.
 	 */
 	public readonly labels: ListTemplate<Label> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -198,9 +198,7 @@ export abstract class FlowNodes extends Series {
 	));
 
 	/**
-	 * List of node elements.
-	 *
-	 * @default new ListTemplate<FlowNode>
+	 * List of node elements; configure them all through `nodes.template`.
 	 */
 	public readonly nodes: ListTemplate<FlowNode> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -390,9 +388,9 @@ export abstract class FlowNodes extends Series {
 	}
 
 	/**
-	 * Shows node's data item.
+	 * Shows a hidden node, with its label and links.
 	 *
-	 * @param   dataItem  Data item
+	 * @param   dataItem  Node data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
@@ -410,31 +408,31 @@ export abstract class FlowNodes extends Series {
 			let label = dataItem.get("label");
 
 			if (label) {
-				label.show(duration);
+				promises.push(label.show(duration));
 			}
 
 			let links = dataItem.get("outgoingLinks");
 			if (links) {
 				$array.each(links, (link) => {
-					flow.showDataItem(link, duration);
+					promises.push(flow.showDataItem(link, duration));
 				})
 			}
 
 			links = dataItem.get("incomingLinks");
 			if (links) {
 				$array.each(links, (link) => {
-					flow.showDataItem(link, duration);
+					promises.push(flow.showDataItem(link, duration));
 				})
 			}
 		}
 
-		await promises;
+		await Promise.all(promises);
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Hides a node, with its label and links.
 	 *
-	 * @param   dataItem  Data item
+	 * @param   dataItem  Node data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
@@ -453,14 +451,14 @@ export abstract class FlowNodes extends Series {
 			let label = dataItem.get("label");
 
 			if (label) {
-				label.hide(duration);
+				promises.push(label.hide(duration));
 			}
 
 			let links = dataItem.get("outgoingLinks");
 
 			if (links) {
 				$array.each(links, (link) => {
-					flow.hideDataItem(link, duration);
+					promises.push(flow.hideDataItem(link, duration));
 				})
 			}
 
@@ -468,17 +466,18 @@ export abstract class FlowNodes extends Series {
 
 			if (links) {
 				$array.each(links, (link) => {
-					flow.hideDataItem(link, duration);
+					promises.push(flow.hideDataItem(link, duration));
 				})
 			}
 		}
-		await promises;
+		await Promise.all(promises);
 	}
 
 	/**
-	 * Shows node's data item.
+	 * Toggles a node back on, as a click does: clears its disabled state and
+	 * shows its links.
 	 *
-	 * @param   dataItem  Data item
+	 * @param   dataItem  Node data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
@@ -505,25 +504,26 @@ export abstract class FlowNodes extends Series {
 			let links = dataItem.get("outgoingLinks");
 			if (links) {
 				$array.each(links, (link) => {
-					flow.showDataItem(link, duration);
+					promises.push(flow.showDataItem(link, duration));
 				})
 			}
 
 			links = dataItem.get("incomingLinks");
 			if (links) {
 				$array.each(links, (link) => {
-					flow.showDataItem(link, duration);
+					promises.push(flow.showDataItem(link, duration));
 				})
 			}
 		}
 
-		await promises;
+		await Promise.all(promises);
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Toggles a node off, as a click does: the node and its label take the
+	 * disabled state and its links hide. The node itself stays visible.
 	 *
-	 * @param   dataItem  Data item
+	 * @param   dataItem  Node data item
 	 * @param   duration  Animation duration in milliseconds
 	 * @return            Promise
 	 */
@@ -551,7 +551,7 @@ export abstract class FlowNodes extends Series {
 
 			if (links) {
 				$array.each(links, (link) => {
-					flow.hideDataItem(link, duration);
+					promises.push(flow.hideDataItem(link, duration));
 				})
 			}
 
@@ -559,11 +559,11 @@ export abstract class FlowNodes extends Series {
 
 			if (links) {
 				$array.each(links, (link) => {
-					flow.hideDataItem(link, duration);
+					promises.push(flow.hideDataItem(link, duration));
 				})
 			}
 		}
-		await promises;
+		await Promise.all(promises);
 	}
 
 }

@@ -5,7 +5,7 @@ export class Registry {
 	/**
 	 * Currently running version of amCharts.
 	 */
-	readonly version: string = "5.20.8";
+	readonly version: string = "5.21.0";
 
 	/**
 	 * List of applied licenses.
@@ -24,7 +24,8 @@ export class Registry {
 	rootElements: any[] = [];
 
 	/**
-	 * Automatically dispose a [[Root]] element if it exists in the target container.
+	 * Disposes the [[Root]] already in a container when a new one is created
+	 * there, instead of throwing an error.
 	 *
 	 * @since 5.14.4
 	 */
@@ -47,7 +48,7 @@ export class Registry {
 export const registry = new Registry();
 
 /**
- * Adds a license, e.g.:
+ * Adds a license key, e.g.:
  *
  * ```TypeScript
  * am5.addLicense("xxxxxxxx");
@@ -56,7 +57,7 @@ export const registry = new Registry();
  * am5.addLicense("xxxxxxxx");
  * ```
  *
- * Multiple licenses can be added to cover for multiple products.
+ * Call it once per key to add licenses for several products.
  *
  * @param  license  License key
  */
@@ -75,10 +76,10 @@ export function disposeAllRootElements(): void {
 }
 
 /**
- * Finds and returns a `Root` element assigned to a container with `id`.
+ * Returns the [[Root]] whose container element has this `id`.
  *
  * @param   id  Container ID
- * @return      Root
+ * @return      Root, or `undefined` if there is none
  * @since 5.9.2
  */
 export function getRootById(id: string): any {

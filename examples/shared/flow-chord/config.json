@@ -1,0 +1,65 @@
+{
+  "type": "Chord",
+  "settings": {
+    "sourceIdField": "source",
+    "targetIdField": "target",
+    "valueField": "value",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "data": "#data-0",
+    "nodes": {
+      "settings": {
+        "colors": {
+          "type": "ColorSet",
+          "settings": {
+            "step": 2,
+            "passOptions": { "hue": 0.05, "saturation": 0, "lightness": 0 },
+            "colors": [
+              { "type": "Color", "value": "#67b7dc" },
+              { "type": "Color", "value": "#6794dc" },
+              { "type": "Color", "value": "#6771dc" },
+              { "type": "Color", "value": "#8067dc" },
+              { "type": "Color", "value": "#a367dc" },
+              { "type": "Color", "value": "#c767dc" },
+              { "type": "Color", "value": "#dc67ce" },
+              { "type": "Color", "value": "#dc67ab" },
+              { "type": "Color", "value": "#dc6788" }
+            ],
+            "reuse": false,
+            "startIndex": 0,
+            "stateAnimationDuration": 600
+          }
+        }
+      }
+    }
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "source": "Berlin", "target": "Amsterdam", "value": 14 },
+        { "source": "Berlin", "target": "London", "value": 33 },
+        { "source": "Berlin", "target": "Paris", "value": 13 },
+        { "source": "Berlin", "target": "Madrid", "value": 36 },
+        { "source": "Amsterdam", "target": "Berlin", "value": 42 },
+        { "source": "Amsterdam", "target": "London", "value": 20 },
+        { "source": "Amsterdam", "target": "Paris", "value": 19 },
+        { "source": "Amsterdam", "target": "Madrid", "value": 11 },
+        { "source": "London", "target": "Amsterdam", "value": 9 },
+        { "source": "London", "target": "Berlin", "value": 38 },
+        { "source": "London", "target": "Paris", "value": 41 },
+        { "source": "London", "target": "Madrid", "value": 16 },
+        { "source": "Paris", "target": "Amsterdam", "value": 12 },
+        { "source": "Paris", "target": "London", "value": 16 },
+        { "source": "Paris", "target": "Berlin", "value": 21 },
+        { "source": "Paris", "target": "Madrid", "value": 8 },
+        { "source": "Madrid", "target": "Amsterdam", "value": 22 },
+        { "source": "Madrid", "target": "London", "value": 25 },
+        { "source": "Madrid", "target": "Paris", "value": 19 },
+        { "source": "Madrid", "target": "Berlin", "value": 7 }
+      ]
+    }
+  ]
+}

@@ -16,33 +16,44 @@ import * as $math from "../../core/util/Math";
 import * as $utils from "../../core/util/Utils";
 
 export interface IPieSeriesDataItem extends IPercentSeriesDataItem {
+	/**
+	 * The slice element.
+	 */
 	slice: Slice;
+	/**
+	 * The slice's label.
+	 */
 	label: RadialLabel;
 }
 
 export interface IPieSeriesSettings extends IPercentSeriesSettings {
 
 	/**
-	 * Radius of the series in pixels or percent.
+	 * Outer radius of the series, in pixels or percent, measured out from the
+	 * chart's `innerRadius`: `100%` reaches the chart's `radius`. When not set,
+	 * the chart's series share that space equally as concentric rings.
 	 */
 	radius?: Percent | number;
 
 	/**
-	 * Radius of the series in pixels or percent.
-	 *
-	 * Setting to negative number will mean pixels from outer radius.
+	 * Inner radius of the series, in pixels or percent, measured the same way
+	 * as `radius`. A negative number is pixels in from the series' outer
+	 * radius, when the chart has no `innerRadius`.
 	 */
 	innerRadius?: Percent | number;
 
 	/**
-	 * Start angle of the series in degrees.
+	 * Angle where the first slice starts, in degrees: `0` is at the right,
+	 * `-90` at the top, and slices follow clockwise. Set the chart's
+	 * `startAngle` to match, so the pie is fitted and centered for it.
 	 *
 	 * @default -90
 	 */
 	startAngle?: number;
 
 	/**
-	 * End angle of the series in degrees.
+	 * Angle where the last slice ends, in degrees. Set the chart's `endAngle`
+	 * to match.
 	 *
 	 * @default 270
 	 */
@@ -53,14 +64,15 @@ export interface IPieSeriesSettings extends IPercentSeriesSettings {
 export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
 
 	/**
-	 * Actual radius of the series in pixels.
+	 * Outer radius of the series as drawn, in pixels.
 	 */
 	radius?: number;
 
 }
 
 /**
- * Creates a series for a [[PieChart]].
+ * A series of pie slices for a [[PieChart]]. With `alignLabels: false`, the
+ * labels sit around the pie next to their slices instead of in two columns.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
  * @important

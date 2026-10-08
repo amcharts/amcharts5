@@ -7,8 +7,20 @@ import type { DataItem } from "../../../..";
 import * as $array from "../../../core/util/Array";
 
 export interface ISuperTrendSettings extends IIndicatorSettings {
+	/**
+	 * Color of the line above the price, shown in a downtrend, and of its fill.
+	 */
 	upperColor?: Color;
+	/**
+	 * Color of the line below the price, shown in an uptrend, and of its fill.
+	 */
 	lowerColor?: Color;
+	/**
+	 * Distance of the line from the middle of the high-low range, in average
+	 * true ranges.
+	 *
+	 * @default 3
+	 */
 	multiplier?: number;
 }
 
@@ -19,7 +31,9 @@ export interface ISuperTrendEvents extends IIndicatorEvents {
 }
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Super Trend indicator: a line `multiplier` average true ranges (over
+ * `period`) from the price, below it in an uptrend and above it in a
+ * downtrend. Drawn over the main series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -32,17 +46,18 @@ export class SuperTrend extends Indicator {
 	declare public _events: ISuperTrendEvents;
 
 	/**
-	 * Indicator series for the upper band.
+	 * Series of the line above the price (downtrend).
 	 */
 	public upperBandSeries!: LineSeries;
 
 	/**
-	 * Indicator series for the lower band.
+	 * Series of the line below the price (uptrend).
 	 */
 	public lowerBandSeries!: LineSeries;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series, which holds its legend entry. The lines are
+	 * `upperBandSeries` and `lowerBandSeries`.
 	 */
 	declare public series: LineSeries;
 

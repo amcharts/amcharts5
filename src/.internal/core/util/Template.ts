@@ -17,6 +17,9 @@ function disposeSettings(settings: object) {
 }
 
 
+/**
+ * A state of a [[Template]], passed on to every object that uses the template.
+ */
 export class TemplateState<E extends Entity> {
 	public _settings: Partial<E["_settings"]>;
 
@@ -33,6 +36,13 @@ export class TemplateState<E extends Entity> {
 		disposeSettings(this._settings);
 	}
 
+	/**
+	 * Returns the state's value of setting `key`, or `fallback` if it has none.
+	 *
+	 * @param   key       Setting key
+	 * @param   fallback  Value to return if the state has no value
+	 * @return            Value
+	 */
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
@@ -46,18 +56,35 @@ export class TemplateState<E extends Entity> {
 		}
 	}
 
+	/**
+	 * Sets the value setting `key` takes in this state, for every object that
+	 * uses the template.
+	 *
+	 * @param   key    Setting key
+	 * @param   value  Setting value
+	 */
 	public set<Key extends keyof E["_settings"]>(key: Key, value: E["_settings"][Key]) {
 		this._settings[key] = value;
 		// TODO maybe only do this if the value changed ?
 		this._template._stateChanged(this._name);
 	}
 
+	/**
+	 * Removes setting `key` from the state.
+	 *
+	 * @param   key  Setting key
+	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
 		delete this._settings[key];
 		// TODO maybe only do this if the value changed ?
 		this._template._stateChanged(this._name);
 	}
 
+	/**
+	 * Sets several of the state's settings at once.
+	 *
+	 * @param   settings  Settings
+	 */
 	public setAll(settings: this["_settings"]) {
 		$object.keys(settings).forEach((key) => {
 			this._settings[key] = settings[key];
@@ -79,6 +106,9 @@ export class TemplateState<E extends Entity> {
 }
 
 
+/**
+ * The states of a [[Template]], by name.
+ */
 export class TemplateStates<E extends Entity> {
 	private _template: Template<E>;
 	private _states: { [key: string]: TemplateState<E> } = {};
@@ -93,10 +123,24 @@ export class TemplateStates<E extends Entity> {
 		});
 	}
 
+	/**
+	 * Returns the state called `name`, or `undefined` if there is none.
+	 *
+	 * @param   name  State name
+	 * @return        State
+	 */
 	public lookup(name: string): TemplateState<E> | undefined {
 		return this._states[name];
 	}
 
+	/**
+	 * Creates the state called `name` with `settings`, or adds `settings` to
+	 * it if it already exists.
+	 *
+	 * @param   name      State name
+	 * @param   settings  Settings
+	 * @return            State
+	 */
 	public create(name: string, settings: Partial<E["_settings"]>): TemplateState<E> {
 		const state = this._states[name];
 
@@ -112,6 +156,11 @@ export class TemplateStates<E extends Entity> {
 		}
 	}
 
+	/**
+	 * Removes the state called `name`.
+	 *
+	 * @param   name  State name
+	 */
 	public remove(name: string) {
 		delete this._states[name];
 		this._template._stateChanged(name);
@@ -132,9 +181,20 @@ export class TemplateStates<E extends Entity> {
 }
 
 
+/**
+ * Adapters of a [[Template]], added to every object that uses the template.
+ */
 export class TemplateAdapters<E extends Entity> {
 	private _callbacks: { [K in keyof E["_settings"]]?: Array<<O extends E>(value: O["_settings"][K], target: O, key: K) => O["_settings"][K]> } = {};
 
+	/**
+	 * Adds a function that modifies the value of setting `key` each time it is
+	 * read, on the objects that use the template.
+	 *
+	 * @param   key       Setting key
+	 * @param   callback  Takes the value and returns the modified one
+	 * @return            Disposer that removes the adapter
+	 */
 	public add<Key extends keyof E["_settings"]>(key: Key, callback: (value: E["_settings"][Key], target: E, key: Key) => E["_settings"][Key]): IDisposer {
 		let callbacks = this._callbacks[key];
 
@@ -153,6 +213,11 @@ export class TemplateAdapters<E extends Entity> {
 		});
 	}
 
+	/**
+	 * Removes all adapters for setting `key` from the template.
+	 *
+	 * @param   key  Setting key
+	 */
 	public remove<Key extends keyof E["_settings"]>(key: Key) {
 		const callbacks = this._callbacks[key];
 
@@ -183,6 +248,11 @@ export interface ApplyState<E extends Entity> {
 
 
 // TODO maybe extend from Properties ?
+/**
+ * Settings, states, adapters and events shared by many objects, such as all
+ * columns of a series. A setting on the template reaches every object that
+ * uses it, unless the object has its own value.
+ */
 export class Template<E extends Entity> implements IDisposer {
 	private _disposed: boolean = false;
 
@@ -197,21 +267,32 @@ export class Template<E extends Entity> implements IDisposer {
 
 	public _entities: Array<E> = [];
 
+	/**
+	 * States passed on to the objects that use the template.
+	 */
 	public readonly states: TemplateStates<E> = new TemplateStates(this);
 
+	/**
+	 * Adapters added to the objects that use the template.
+	 */
 	public readonly adapters: TemplateAdapters<E> = new TemplateAdapters();
+	/**
+	 * Event listeners added to the objects that use the template.
+	 */
 	public readonly events: EventDispatcher<Events<E, E["_events"]>> = new EventDispatcher();
 
+	/**
+	 * A function called once for each object that uses the template, when the
+	 * template is first applied to it.
+	 */
 	public setup: (<O extends E>(entity: O) => void) | undefined;
 
 	/**
-	 * Use this method to create an instance of this class.
+	 * Creates a template with `settings`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
-	 * @param   root      Root element
 	 * @param   settings  Settings
-	 * @param   template  Template
-	 * @return            Instantiated object
+	 * @return            Template
 	 */
 	public static new<E extends Entity>(settings: E["_settings"]): Template<E> {
 		return new Template<E>(settings, true);
@@ -223,7 +304,7 @@ export class Template<E extends Entity> implements IDisposer {
 	}
 
 	/**
-	 * Returns `true` if this element is disposed.
+	 * Returns `true` if the template has been disposed.
 	 *
 	 * @return Disposed
 	 */
@@ -232,7 +313,7 @@ export class Template<E extends Entity> implements IDisposer {
 	}
 
 	/**
-	 * Disposes this object.
+	 * Disposes the template, along with any disposable objects in its settings.
 	 */
 	public dispose() {
 		if (!this._disposed) {
@@ -248,7 +329,7 @@ export class Template<E extends Entity> implements IDisposer {
 	}
 
 	/**
-	 * Array of all entities using this template.
+	 * The objects that use the template.
 	 */
 	public get entities():Array<E>{
 		return this._entities;
@@ -262,6 +343,14 @@ export class Template<E extends Entity> implements IDisposer {
 		this._settings = settings;
 	}
 
+	/**
+	 * Returns the template's value of setting `key`, or `fallback` if it has
+	 * none.
+	 *
+	 * @param   key       Setting key
+	 * @param   fallback  Value to return if the setting is not set
+	 * @return            Value
+	 */
 	public get<Key extends keyof this["_settings"]>(key: Key): this["_settings"][Key];
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
 	public get<Key extends keyof this["_settings"]>(key: Key, fallback?: any): any {
@@ -277,12 +366,26 @@ export class Template<E extends Entity> implements IDisposer {
 		}
 	}
 
+	/**
+	 * Sets setting `key` on the template only, without passing it on to the
+	 * objects that use it.
+	 *
+	 * @param   key    Setting key
+	 * @param   value  Setting value
+	 */
 	public setRaw<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		this._checkDisposed();
 		delete this._computedSettings[key];
 		this._settings[key] = value;
 	}
 
+	/**
+	 * Sets setting `key` on the template, and on every object that uses it and
+	 * has no value of its own.
+	 *
+	 * @param   key    Setting key
+	 * @param   value  Setting value
+	 */
 	public set<Key extends keyof this["_settings"]>(key: Key, value: this["_settings"][Key]) {
 		this._checkDisposed();
 		delete this._computedSettings[key];
@@ -333,6 +436,12 @@ export class Template<E extends Entity> implements IDisposer {
 		return this;
 	}
 
+	/**
+	 * Removes setting `key` from the template. The objects that use it go back
+	 * to a value from a theme or other template, if there is one.
+	 *
+	 * @param   key  Setting key
+	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key): void {
 		this._checkDisposed();
 
@@ -346,6 +455,9 @@ export class Template<E extends Entity> implements IDisposer {
 		}
 	}
 
+	/**
+	 * Removes all settings from the template, as `remove()` does for each one.
+	 */
 	public removeAll(): void {
 		this._checkDisposed();
 
@@ -354,6 +466,14 @@ export class Template<E extends Entity> implements IDisposer {
 		});
 	}
 
+	/**
+	 * Returns the template's value of private setting `key`, or `fallback` if
+	 * it has none.
+	 *
+	 * @param   key       Private setting key
+	 * @param   fallback  Value to return if the setting is not set
+	 * @return            Value
+	 */
 	public getPrivate<Key extends keyof this["_privateSettings"], F>(key: Key, fallback: F): NonNullable<this["_privateSettings"][Key]> | F;
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key): this["_privateSettings"][Key];
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key, fallback?: any): any {
@@ -369,12 +489,28 @@ export class Template<E extends Entity> implements IDisposer {
 		}
 	}
 
+	/**
+	 * Sets private setting `key` on the template only, without passing it on
+	 * to the objects that use it. Returns `value`.
+	 *
+	 * @param   key    Private setting key
+	 * @param   value  Setting value
+	 * @return         Setting value
+	 */
 	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
 		this._checkDisposed();
 		this._privateSettings[key] = value;
 		return value;
 	}
 
+	/**
+	 * Sets private setting `key` on the template, and on every object that uses
+	 * it and has no value of its own. Returns `value`.
+	 *
+	 * @param   key    Private setting key
+	 * @param   value  Setting value
+	 * @return         Setting value
+	 */
 	public setPrivate<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value): Value {
 		this._checkDisposed();
 
@@ -389,6 +525,11 @@ export class Template<E extends Entity> implements IDisposer {
 		return value;
 	}
 
+	/**
+	 * Removes private setting `key` from the template.
+	 *
+	 * @param   key  Private setting key
+	 */
 	public removePrivate<Key extends keyof this["_privateSettings"]>(key: Key): void {
 		this._checkDisposed();
 
@@ -401,6 +542,11 @@ export class Template<E extends Entity> implements IDisposer {
 		}
 	}
 
+	/**
+	 * Sets several settings at once, as `set()` does for each one.
+	 *
+	 * @param   value  Settings
+	 */
 	public setAll(value: this["_settings"]) {
 		this._checkDisposed();
 
@@ -410,6 +556,14 @@ export class Template<E extends Entity> implements IDisposer {
 	}
 
 	// TODO code duplication with Properties
+	/**
+	 * Calls `callback` each time setting `key` changes on an object that uses
+	 * the template.
+	 *
+	 * @param   key       Setting key
+	 * @param   callback  Callback
+	 * @return            Disposer for event
+	 */
 	public on<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: E, key?: Key) => void): IDisposer {
 		this._checkDisposed();
 
@@ -431,6 +585,14 @@ export class Template<E extends Entity> implements IDisposer {
 	}
 
 	// TODO code duplication with Properties
+	/**
+	 * Calls `callback` each time private setting `key` changes on an object
+	 * that uses the template.
+	 *
+	 * @param   key       Private setting key
+	 * @param   callback  Callback
+	 * @return            Disposer for event
+	 */
 	public onPrivate<Key extends keyof this["_privateSettings"]>(key: Key, callback: (value: this["_privateSettings"][Key], target?: E, key?: Key) => void): IDisposer {
 		this._checkDisposed();
 

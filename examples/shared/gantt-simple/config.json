@@ -1,0 +1,84 @@
+{
+  "type": "Gantt",
+  "settings": { "autoAppear": true, "appearDuration": 1000, "appearDelay": 100 },
+  "properties": {
+    "yAxis": {
+      "properties": { "data": "#data-0" }
+    },
+    "series": {
+      "properties": { "data": "#data-1" }
+    }
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "id": "gantt_0", "name": "Idea", "color": "#6794dc" },
+        { "id": "gantt_1", "name": "Kick-off", "color": "#6771dc" },
+        { "id": "gantt_2", "name": "Planning", "color": "#8067dc" },
+        { "id": "gantt_3", "name": "Development", "color": "#a367dc" },
+        { "id": "gantt_4", "name": "Testing", "color": "#c767dc" },
+        { "id": "gantt_5", "name": "Finalization", "color": "#dc67ce" },
+        { "id": "gantt_6", "name": "Release", "color": "#dc67ab" }
+      ]
+    },
+    {
+      "data-1": [
+        {
+          "id": "gantt_0",
+          "start": 1758142800000,
+          "duration": 0,
+          "progress": 0,
+          "linkTo": ["gantt_1"],
+          "end": 1758142800000,
+          "__parse": true
+        },
+        {
+          "id": "gantt_1",
+          "start": 1758142800000,
+          "duration": 2,
+          "progress": 0,
+          "linkTo": ["gantt_2"],
+          "end": 1758315600000,
+          "__parse": true
+        },
+        {
+          "id": "gantt_2",
+          "start": 1758488400000,
+          "duration": 2,
+          "progress": 0,
+          "linkTo": ["gantt_3"],
+          "end": 1758661200000,
+          "__parse": true
+        },
+        {
+          "id": "gantt_3",
+          "start": 1758661200000,
+          "duration": 1,
+          "progress": 0,
+          "linkTo": ["gantt_4"],
+          "end": 1758747600000,
+          "__parse": true
+        },
+        {
+          "id": "gantt_4",
+          "start": 1758747600000,
+          "duration": 3,
+          "progress": 0,
+          "linkTo": ["gantt_5"],
+          "end": 1759179600000,
+          "__parse": true
+        },
+        {
+          "id": "gantt_5",
+          "start": 1759179600000,
+          "duration": 0,
+          "progress": 0,
+          "linkTo": ["gantt_6"],
+          "end": 1759179600000,
+          "__parse": true
+        },
+        { "id": "gantt_6", "start": 1759179600000, "duration": 4, "progress": 0, "end": 1759525200000 }
+      ]
+    }
+  ]
+}

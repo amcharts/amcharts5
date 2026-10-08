@@ -12,14 +12,14 @@ import * as $array from "../../core/util/Array";
 export interface ISerialChartSettings extends IChartSettings {
 
 	/**
-	 * A [[ColorSet]] to use when asigning colors for series.
+	 * The [[ColorSet]] series take their colors from.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
-	 * A [[PatternSet]] to use when asigning patterns for series.
+	 * The [[PatternSet]] series take their patterns from.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
 	 * @since 5.10.0
@@ -47,14 +47,15 @@ export abstract class SerialChart extends Chart {
 	declare public _events: ISerialChartEvents;
 
 	/**
-	 * A [[Container]] where chart will store all series.
+	 * The [[Container]] the chart's series are drawn in.
 	 *
 	 * @default Container.new()
 	 */
 	public readonly seriesContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured: false });
 
 	/**
-	 * A list of chart's series.
+	 * The chart's series: push a series here to add it to the chart. A series
+	 * removed from the list is disposed.
 	 */
 	public readonly series: ListAutoDispose<this["_seriesType"]> = new ListAutoDispose();
 

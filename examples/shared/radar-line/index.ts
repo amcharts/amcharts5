@@ -4,7 +4,6 @@ import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
-
 // Create root element
 // https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
@@ -20,33 +19,33 @@ root.setThemes([
 // Create chart
 // https://www.amcharts.com/docs/v5/charts/radar-chart/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
-  panX: false,
+  panX: false,    // dragging does not pan: the cursor uses the drag to zoom
   panY: false,
-  wheelX: "panX",
-  wheelY: "zoomX"
+  wheelX: "panX", // a sideways wheel or trackpad swipe moves along the months...
+  wheelY: "zoomX" // ...and the vertical wheel zooms in on them
 }));
+
 
 // Add cursor
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor
 const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
-  behavior: "zoomX"
+  behavior: "zoomX" // drag around the circle to zoom in on those months
 }));
-
-cursor.lineY.set("visible", false);
+cursor.lineY.set("visible", false); // only the spoke to the hovered month, no circle at the pointer
 
 
 // Create axes and their renderers
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
 const xRenderer = am5radar.AxisRendererCircular.new(root, {});
 xRenderer.labels.template.setAll({
-  radius: 10
+  radius: 10 // month names 10 px outside the circle
 });
 
 const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
-  maxDeviation: 0,
-  categoryField: "category",
+  maxDeviation: 0, // no scrolling past January or December
+  categoryField: "month",
   renderer: xRenderer,
-  tooltip: am5.Tooltip.new(root, {})
+  tooltip: am5.Tooltip.new(root, {}) // shows the cursor's month on the axis
 }));
 
 const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
@@ -57,58 +56,49 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 // Create series
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
 const series = chart.series.push(am5radar.RadarLineSeries.new(root, {
-  name: "Series",
+  name: "Rainfall",
   xAxis: xAxis,
   yAxis: yAxis,
-  valueYField: "value",
-  categoryXField: "category",
+  valueYField: "rainfall",
+  categoryXField: "month",
   tooltip: am5.Tooltip.new(root, {
-    labelText: "{valueY}"
+    labelText: "{valueY} mm" // the hovered month's rainfall
   })
 }));
 
+// a dot on each month's value
 series.bullets.push(() => {
   return am5.Bullet.new(root, {
     sprite: am5.Circle.new(root, {
       radius: 5,
-      fill: series.get("fill")
+      fill: series.get("fill") // the line's own color
     })
   });
 });
 
 
-// Add scrollbars
-chart.set("scrollbarX", am5.Scrollbar.new(root, { orientation: "horizontal" }));
-chart.set("scrollbarY", am5.Scrollbar.new(root, { orientation: "vertical" }));
-
-
-// Generate and set data
+// Set data
 // https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
-let i = -1;
-let value = 10;
+const data = [
+  { month: "Jan", rainfall: 100 },
+  { month: "Feb", rainfall: 85 },
+  { month: "Mar", rainfall: 53 },
+  { month: "Apr", rainfall: 68 },
+  { month: "May", rainfall: 54 },
+  { month: "Jun", rainfall: 16 },
+  { month: "Jul", rainfall: 4 },
+  { month: "Aug", rainfall: 6 },
+  { month: "Sep", rainfall: 33 },
+  { month: "Oct", rainfall: 101 },
+  { month: "Nov", rainfall: 128 },
+  { month: "Dec", rainfall: 127 }
+];
 
-function generateData() {
-  value = Math.round((Math.random() * 4 - 2) + value);
-  i++;
-  return {
-    category: "cat" + i,
-    value: value
-  };
-}
-
-function generateDatas(count: number) {
-  const data = [];
-  for (let i = 0; i < count; ++i) {
-    data.push(generateData());
-  }
-  return data;
-}
-let data = generateDatas(12);
 series.data.setAll(data);
-xAxis.data.setAll(data);
+xAxis.data.setAll(data); // the axis takes its months from the same rows
 
 
-// Animate chart and series in
+// Make stuff animate on load
 // https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000);
 chart.appear(1000, 100);

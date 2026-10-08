@@ -183,6 +183,8 @@ async function buildWorldLow(state) {
 
 async function copyFiles(state, output) {
 	await cp(state.path("packages", "shared"), output);
+	// What belongs to the library alone: shared also goes to geodata and fonts
+	await cpMaybe(state.path("packages", "library"), output);
 	await cpMaybe(state.path("packages", "script"), output);
 }
 

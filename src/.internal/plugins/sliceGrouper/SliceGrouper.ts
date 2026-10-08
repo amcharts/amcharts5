@@ -12,26 +12,26 @@ import * as $array from "../../core/util/Array";
 export interface ISliceGrouperSettings extends IEntitySettings {
 
 	/**
-	 * A series that will be used to group slices on.
+	 * The series whose small slices are grouped.
 	 */
 	series?: PercentSeries;
 
 	/**
-	 * If set, plugin will try to manipulate the items in legend, such as
-	 * adding group slice, hiding items for small slices, etc.
+	 * Legend to keep in step with the grouping: it gets an item for the group
+	 * slice, and the items of the grouped slices are hidden.
 	 */
 	legend?: Legend;
 
 	/**
-	 * Any slice which has percent value less than this setting will be grouped.
-	 * 
+	 * Slices whose share of the total is at or below this percent are
+	 * grouped.
+	 *
 	 * @default 5
 	 */
 	threshold?: number;
 
 	/**
-	 * If set, only X first slices will be left as they are. The rest of the
-	 * slices will be grouped.
+	 * Keeps only this many first slices; the rest are grouped.
 	 */
 	limit?: number;
 
@@ -43,11 +43,13 @@ export interface ISliceGrouperSettings extends IEntitySettings {
 	groupName?: string;
 
 	/**
-	 * What happens when group slice is clicked.
+	 * What a click on the group slice does:
 	 *
-	 * * `"none"` (default) - nothing.
-	 * * `"break"` - underlying small slices are shown.
-	 * * `"zoom"` - series shows only small slices (big ones are hidden).
+	 * * `"none"`: nothing.
+	 * * `"break"`: replaces the group slice with the small slices.
+	 * * `"zoom"`: shows only the small slices, hiding the others.
+	 *
+	 * @default "none"
 	 */
 	clickBehavior?: "none" | "break" | "zoom";
 
@@ -80,7 +82,9 @@ export class SliceGrouper extends Entity {
 	declare public _events: ISliceGrouperEvents;
 
 	/**
-	 * A button that is shown when chart small buttons are visible.
+	 * Button shown while the small slices are shown after a click on the
+	 * group slice; it groups them again. Made only when `clickBehavior` is not
+	 * `"none"`.
 	 */
 	public zoomOutButton?: Button;
 
@@ -204,7 +208,7 @@ export class SliceGrouper extends Entity {
 	}
 
 	/**
-	 * Resets slice setup to original grouping state.
+	 * Groups the small slices again, as a click on `zoomOutButton` does.
 	 */
 	public zoomOut(): void {
 		const groupDataItem = this.getPrivate("groupDataItem");
@@ -279,6 +283,9 @@ export class SliceGrouper extends Entity {
 			}
 		});
 
+		if (!this.zoomOutButton) {
+			this.initZoomButton();
+		}
 		this.zoomOutButton!.show();
 	}
 

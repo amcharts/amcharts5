@@ -9,26 +9,28 @@ import * as $array from "../../../core/util/Array";
 export interface IMovingAverageEnvelopeSettings extends IMovingAverageSettings {
 
 	/**
-	 * Shift.
+	 * Distance of the bands from the moving average, in the unit set by
+	 * `shiftType`.
 	 *
 	 * @default 5
 	 */
 	shift?: number;
 
 	/**
-	 * Type of the shift.
+	 * Unit of `shift`: `"percent"` of the moving average, or `"points"` (price
+	 * units).
 	 *
 	 * @default "percent"
 	 */
 	shiftType?: "percent" | "points";
 
 	/**
-	 * A color for upper section.
+	 * Color of the upper band and of the fill between the bands.
 	 */
 	upperColor?: Color;
 
 	/**
-	 *  A color for lower section.
+	 * Color of the lower band.
 	 */
 	lowerColor?: Color;
 
@@ -42,7 +44,8 @@ export interface IMovingAverageEnvelopeEvents extends IMovingAverageEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Moving Average Envelope indicator: a moving average of `field` over
+ * `period`, with bands `shift` above and below it. Drawn over the main series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -55,12 +58,12 @@ export class MovingAverageEnvelope extends MovingAverage {
 	declare public _events: IMovingAverageEnvelopeEvents;
 
 	/**
-	 * Indicator series for the upper band.
+	 * Series of the upper band.
 	 */
 	public upperBandSeries!: LineSeries;
 
 	/**
-	 * Indicator series for the lower band.
+	 * Series of the lower band.
 	 */
 	public lowerBandSeries!: LineSeries;
 
@@ -120,8 +123,8 @@ export class MovingAverageEnvelope extends MovingAverage {
 	}];
 
 	/**
-	 * Keeps the `shift` setting's limits in sync with `shiftType`: percent mode is
-	 * 0.1..20 (%) with a 0.1 step; points mode is 1..5000 with a step of 1.
+	 * Sets the limits of `shift` for the current `shiftType`: `0.1` to `20`
+	 * (step `0.1`) for percent, `1` to `5000` (step `1`) for points.
 	 */
 	protected _updateShiftBounds(): void {
 		let shiftSetting: IIndicatorEditableSetting | undefined;

@@ -1,0 +1,137 @@
+{
+  "type": "MapChart",
+  "settings": {
+    "panX": "rotateX",
+    "panY": "rotateY",
+    "rotationX": -20,
+    "rotationY": -20,
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100,
+    "projectionName": "geoOrthographic"
+  },
+  "properties": {
+    "series": ["#series-0", "#series-1", "#series-2", "#series-3"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        {
+          "geometry": { "type": "GeoRectangle", "north": 90, "east": 180, "south": -90, "west": -180 },
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "data-1": []
+    },
+    {
+      "data-2": [
+        { "id": "london", "title": "London", "latitude": 51.5072, "longitude": -0.1276 },
+        { "id": "new-york", "title": "New York", "latitude": 40.7128, "longitude": -74.006 },
+        { "id": "sao-paulo", "title": "Sao Paulo", "latitude": -23.5505, "longitude": -46.6333 },
+        { "id": "johannesburg", "title": "Johannesburg", "latitude": -26.2041, "longitude": 28.0473 },
+        { "id": "singapore", "title": "Singapore", "latitude": 1.3521, "longitude": 103.8198 }
+      ]
+    },
+    {
+      "data-3": [
+        {
+          "pointIds": ["london", "new-york"],
+          "__parse": true
+        },
+        {
+          "pointIds": ["london", "singapore"],
+          "__parse": true
+        },
+        {
+          "pointIds": ["london", "johannesburg"],
+          "__parse": true
+        },
+        {
+          "pointIds": ["new-york", "sao-paulo"],
+          "__parse": true
+        },
+        {
+          "pointIds": ["sao-paulo", "johannesburg"],
+          "__parse": true
+        },
+        {
+          "pointIds": ["johannesburg", "singapore"],
+          "__parse": true
+        }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "MapPolygonSeries",
+        "properties": {
+          "data": "#data-0",
+          "mapPolygons": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "fill": { "type": "Color", "value": "#000000" },
+                  "fillOpacity": 0.06,
+                  "strokeOpacity": 0
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "series-1": {
+        "type": "MapPolygonSeries",
+        "settings": { "geoJSON": "am5geodata_worldLow" }
+      }
+    },
+    {
+      "series-2": {
+        "type": "MapPointSeries",
+        "settings": { "latitudeField": "latitude", "longitudeField": "longitude" },
+        "properties": {
+          "data": "#data-2",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fill": { "type": "Color", "value": "#ff621f" },
+                    "stroke": { "type": "Color", "value": "#ffffff" },
+                    "strokeWidth": 2,
+                    "tooltipText": "{title}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "series-3": {
+        "type": "MapLineSeries",
+        "settings": { "pointSeries": "#series-2" },
+        "properties": {
+          "data": "#data-3",
+          "mapLines": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "altitude": 1000000,
+                  "stroke": { "type": "Color", "value": "#ff621f" },
+                  "strokeWidth": 2
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

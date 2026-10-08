@@ -23,8 +23,8 @@ export interface ILineSeriesDataItem extends IXYSeriesDataItem {
 export interface ILineSeriesSettings extends IXYSeriesSettings {
 
 	/**
-	 * If set to `true` the line will connect over "gaps" - categories or time
-	 * intervals with no data.
+	 * Draws the line across data items that have no value. With `false`, the
+	 * line breaks there, and also at time gaps longer than `autoGapCount`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Gaps} for more info
 	 * @default true
@@ -32,8 +32,9 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	connect?: boolean;
 
 	/**
-	 * If there are more than `autoGapCount` base time intervals (e.g. days) with
-	 * no data, the line will break and will display gap.
+	 * With `connect` set to `false` and a [[DateAxis]] as the base axis, breaks
+	 * the line where neighboring data items are more than this many base
+	 * intervals (e.g. days) apart.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Auto_gaps_with_dates} for more info
 	 * @default 1.1
@@ -46,12 +47,8 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	curveFactory?: CurveFactory;
 
 	/**
-	 * Allows simplifying the line with many points.
-	 *
-	 * If set, the series will skip points that are closer than X pixels to each
-	 * other.
-	 *
-	 * With many data points, this allows having smoother, less cluttered lines.
+	 * Skips points closer than this many pixels to the last point drawn, which
+	 * simplifies lines with many data points.
 	 *
 	 * @default 0
 	 * @since 5.2.7
@@ -65,27 +62,28 @@ export interface ILineSeriesPrivate extends IXYSeriesPrivate {
 }
 
 /**
- * Interface representing a [[LineSeries]] axis range.
+ * An axis range of a [[LineSeries]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
  */
 export interface ILineSeriesAxisRange extends IXYSeriesAxisRange {
 
 	/**
-	 * A list template to use when applying line settings to the line segments covered
-	 * by an axis range.
+	 * Line segments of the series within the range. Configure them through
+	 * `strokes.template`.
 	 */
 	strokes?: ListTemplate<Graphics>;
 
 	/**
-	 * A list template to use when applying fill settings to the fill segments covered
-	 * by an axis range.
+	 * Fills of the series within the range. Configure them through
+	 * `fills.template`.
 	 */
 	fills?: ListTemplate<Graphics>;
 }
 
 /**
- * Used to plot line and/or area series.
+ * A series drawn as a line, with an optional fill below it for an area
+ * chart.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/} for more info
  * @important
@@ -138,10 +136,8 @@ export class LineSeries extends XYSeries {
 	}
 
 	/**
-	 * A [[TemplateList]] of all line segments in series.
-	 *
-	 * `strokes.template` can be used to set default settings for all line
-	 * segments, or to change on existing ones.
+	 * Line segments of the series. Configure them all, existing ones included,
+	 * through `strokes.template`.
 	 *
 	 * @default new ListTemplate<Graphics>
 	 */
@@ -162,10 +158,8 @@ export class LineSeries extends XYSeries {
 	}
 
 	/**
-	 * A [[TemplateList]] of all segment fills in series.
-	 *
-	 * `fills.template` can be used to set default settings for all segment
-	 * fills, or to change on existing ones.
+	 * Fills below the line segments. They are hidden by default: set
+	 * `visible` and `fillOpacity` on `fills.template` to show them.
 	 *
 	 * @default new ListTemplate<Graphics>
 	 */

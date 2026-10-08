@@ -4,7 +4,7 @@ import { colorToOKLCH, oklchToColor } from "../core/util/OKLCH";
 
 /**
  * Shared building blocks for the "… Dark" variants of the palette themes
- * (Dataviz, Kelly, Material, Moonrise, Spirited, Frozen).
+ * (Colorblind, Dataviz, Frozen, Kelly, Material, Moonrise, Patterns, Spirited).
  *
  * A dark variant reuses its light counterpart's series palette and only swaps in
  * a dark set of interface colors — except that any palette entry too dark to be

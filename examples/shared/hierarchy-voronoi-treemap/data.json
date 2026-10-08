@@ -1,0 +1,120 @@
+{
+  "children": [
+    {
+      "name": "Africa",
+      "children": [
+        { "id": "DZ", "name": "Algeria", "population": 40400000 },
+        { "id": "AO", "name": "Angola", "population": 25868000 },
+        { "id": "BF", "name": "Burkina Faso", "population": 19034397 },
+        { "id": "CM", "name": "Cameroon", "population": 22709892 },
+        { "id": "TD", "name": "Chad", "population": 14497000 },
+        { "id": "CD", "name": "Congo (Kinshasa)", "population": 85026000 },
+        { "id": "EG", "name": "Egypt", "population": 91251890 },
+        { "id": "ET", "name": "Ethiopia", "population": 102403196 },
+        { "id": "GH", "name": "Ghana", "population": 27670174 },
+        { "id": "GN", "name": "Guinea", "population": 12947000 },
+        { "id": "KE", "name": "Kenya", "population": 47251000 },
+        { "id": "MG", "name": "Madagascar", "population": 22434363 },
+        { "id": "MW", "name": "Malawi", "population": 18622104 },
+        { "id": "ML", "name": "Mali", "population": 17994837 },
+        { "id": "MA", "name": "Morocco", "population": 34224455 },
+        { "id": "MZ", "name": "Mozambique", "population": 28829476 },
+        { "id": "NE", "name": "Niger", "population": 21477348 },
+        { "id": "NG", "name": "Nigeria", "population": 186988000 },
+        { "id": "RW", "name": "Rwanda", "population": 11553188 },
+        { "id": "SN", "name": "Senegal", "population": 14799859 },
+        { "id": "SO", "name": "Somalia", "population": 11079000 },
+        { "id": "ZA", "name": "South Africa", "population": 55653654 },
+        { "id": "SS", "name": "South Sudan", "population": 12131000 },
+        { "id": "SD", "name": "Sudan", "population": 39598700 },
+        { "id": "TZ", "name": "Tanzania", "population": 55155000 },
+        { "id": "TN", "name": "Tunisia", "population": 11154400 },
+        { "id": "UG", "name": "Uganda", "population": 39570125 },
+        { "id": "ZM", "name": "Zambia", "population": 15933883 },
+        { "id": "ZW", "name": "Zimbabwe", "population": 14240168 },
+        { "name": "Others", "population": 83693146 }
+      ]
+    },
+    {
+      "name": "Asia",
+      "children": [
+        { "id": "AF", "name": "Afghanistan", "population": 27657145 },
+        { "id": "BD", "name": "Bangladesh", "population": 161006790 },
+        { "id": "KH", "name": "Cambodia", "population": 15626444 },
+        { "id": "CN", "name": "China", "population": 1373540000 },
+        { "id": "IN", "name": "India", "population": 1324171354 },
+        { "id": "ID", "name": "Indonesia", "population": 261115456 },
+        { "id": "IR", "name": "Iran", "population": 79369900 },
+        { "id": "IQ", "name": "Iraq", "population": 37883543 },
+        { "id": "JP", "name": "Japan", "population": 126672000 },
+        { "id": "KZ", "name": "Kazakhstan", "population": 17753200 },
+        { "id": "MY", "name": "Malaysia", "population": 31187265 },
+        { "id": "MM", "name": "Myanmar", "population": 51419420 },
+        { "id": "NP", "name": "Nepal", "population": 28431500 },
+        { "id": "KP", "name": "North Korea", "population": 25000000 },
+        { "id": "PK", "name": "Pakistan", "population": 193203476 },
+        { "id": "PH", "name": "Philippines", "population": 103320222 },
+        { "id": "RU", "name": "Russia", "population": 146599183 },
+        { "id": "SA", "name": "Saudi Arabia", "population": 32248200 },
+        { "id": "KR", "name": "South Korea", "population": 50982212 },
+        { "id": "LK", "name": "Sri Lanka", "population": 20950000 },
+        { "id": "SY", "name": "Syria", "population": 18564000 },
+        { "id": "TW", "name": "Taiwan", "population": 23503349 },
+        { "id": "TH", "name": "Thailand", "population": 65327652 },
+        { "id": "TR", "name": "Turkey", "population": 78741053 },
+        { "id": "UZ", "name": "Uzbekistan", "population": 31910641 },
+        { "id": "VN", "name": "Vietnam", "population": 92700000 },
+        { "id": "YE", "name": "Yemen", "population": 27478000 },
+        { "name": "Others", "population": 99125003 }
+      ]
+    },
+    {
+      "name": "Europe",
+      "children": [
+        { "id": "BE", "name": "Belgium", "population": 11319511 },
+        { "id": "FR", "name": "France", "population": 66710000 },
+        { "id": "DE", "name": "Germany", "population": 82667685 },
+        { "id": "IT", "name": "Italy", "population": 60665551 },
+        { "id": "NL", "name": "Netherlands", "population": 17019800 },
+        { "id": "PL", "name": "Poland", "population": 38437239 },
+        { "id": "RO", "name": "Romania", "population": 19861408 },
+        { "id": "RU", "name": "Russia", "population": 146599183 },
+        { "id": "ES", "name": "Spain", "population": 46438422 },
+        { "id": "UA", "name": "Ukraine", "population": 42692393 },
+        { "id": "GB", "name": "United Kingdom", "population": 65110000 },
+        { "name": "Others", "population": 148353430 }
+      ]
+    },
+    {
+      "name": "North America",
+      "children": [
+        { "id": "CA", "name": "Canada", "population": 36155487 },
+        { "id": "CU", "name": "Cuba", "population": 11239004 },
+        { "id": "GT", "name": "Guatemala", "population": 16176133 },
+        { "id": "MX", "name": "Mexico", "population": 122273473 },
+        { "id": "US", "name": "United States", "population": 326766748 },
+        { "name": "Others", "population": 60717922 }
+      ]
+    },
+    {
+      "name": "South America",
+      "children": [
+        { "id": "AR", "name": "Argentina", "population": 43847430 },
+        { "id": "BR", "name": "Brazil", "population": 209288278 },
+        { "id": "CL", "name": "Chile", "population": 18191900 },
+        { "id": "CO", "name": "Colombia", "population": 49065615 },
+        { "id": "EC", "name": "Ecuador", "population": 16624858 },
+        { "id": "PE", "name": "Peru", "population": 32165485 },
+        { "id": "VE", "name": "Venezuela", "population": 31977065 },
+        { "name": "Others", "population": 22912396 }
+      ]
+    },
+    {
+      "name": "Oceania",
+      "children": [
+        { "id": "AU", "name": "Australia", "population": 24450561 },
+        { "name": "Others", "population": 16213347 }
+      ]
+    }
+  ]
+}

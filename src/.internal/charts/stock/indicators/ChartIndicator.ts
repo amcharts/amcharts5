@@ -24,7 +24,7 @@ export interface IChartIndicatorEvents extends IIndicatorEvents {
 
 
 /**
- * A base class for chart-based [[StockChart]] indicators.
+ * Base class for [[StockChart]] indicators drawn in a panel of their own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -36,8 +36,17 @@ export abstract class ChartIndicator extends Indicator {
 	declare public _privateSettings: IChartIndicatorPrivate;
 	declare public _events: IChartIndicatorEvents;
 
+	/**
+	 * The panel the indicator is drawn in.
+	 */
 	public panel!: StockPanel;
+	/**
+	 * X axis of the indicator's panel.
+	 */
 	public xAxis!: DateAxis<AxisRenderer>;
+	/**
+	 * Y axis of the indicator's panel.
+	 */
 	public yAxis!: ValueAxis<AxisRenderer>;
 	public cursor!: XYCursor;
 	public legend!: StockLegend;
@@ -108,6 +117,7 @@ export abstract class ChartIndicator extends Indicator {
 			const legend = chart.topPlotContainer.children.insertIndex(0,
 				StockLegend.new(root, { stockChart: this.get("stockChart") })
 			);
+			this.legend = legend;
 
 			legend.data.push(series);
 
@@ -123,7 +133,7 @@ export abstract class ChartIndicator extends Indicator {
 				settingsButton.set("forceHidden", true);
 			}
 
-			chart.set("cursor", XYCursor.new(root, { yAxis: yAxis, xAxis: xAxis }));
+			this.cursor = chart.set("cursor", XYCursor.new(root, { yAxis: yAxis, xAxis: xAxis }));
 		}
 	}
 

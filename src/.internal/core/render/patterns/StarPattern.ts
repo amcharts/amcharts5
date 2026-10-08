@@ -10,7 +10,7 @@ export interface IStarPatternSettings extends IPatternSettings {
 	/**
 	 * Gap between stars, in pixels.
 	 *
-	 * @default 6
+	 * @default 0
 	 */
 	gap?: number;
 

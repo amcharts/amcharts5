@@ -1335,7 +1335,20 @@ export class DefaultTheme extends Theme {
 
 		r("Button", ["zoomtools"]).setAll({
 			marginTop: 1,
-			marginBottom: 2
+			marginBottom: 2,
+			role: "button"
+		})
+
+		r("Button", ["zoomtools", "plus"]).setAll({
+			ariaLabel: language.translate("Press ENTER to zoom in")
+		})
+
+		r("Button", ["zoomtools", "minus"]).setAll({
+			ariaLabel: language.translate("Press ENTER to zoom out")
+		})
+
+		r("Button", ["zoomtools", "home"]).setAll({
+			ariaLabel: language.translate("Home")
 		})
 
 		r("ZoomTools").setAll({

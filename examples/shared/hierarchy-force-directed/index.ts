@@ -15,71 +15,71 @@ root.setThemes([
 ]);
 
 
-// Create wrapper container
-const container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
-  height: am5.percent(100),
-  layout: root.verticalLayout
-}));
-
-
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
-const series = container.children.push(am5hierarchy.ForceDirected.new(root, {
-  singleBranchOnly: false,
-  downDepth: 1,
-  initialDepth: 2,
+// https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/
+// a force simulation places the circles: linked ones pull together, the rest push apart;
+// a click on a circle opens or closes its children
+const series = root.container.children.push(am5hierarchy.ForceDirected.new(root, {
+  minRadius: 25,   // the node with the smallest total gets a 25 px radius...
+  maxRadius: 55,   // ...the biggest (the top node) 55 px, the rest in between
+  nodePadding: 10, // 10 px of room around each circle, so they don't touch
   valueField: "value",
   categoryField: "name",
   childDataField: "children"
 }));
 
 
-// Generate and set data
+// Set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
-const maxLevels = 2;
-const maxNodes = 3;
-const maxValue = 100;
+// only the leaves have a value: each parent's total is the sum of its children
+series.data.setAll([{
+  name: "Music",
+  children: [
+    {
+      name: "Rock",
+      children: [
+        { name: "Classic Rock", value: 64 },
+        { name: "Punk", value: 28 },
+        {
+          name: "Metal",
+          children: [
+            { name: "Heavy Metal", value: 35 },
+            { name: "Thrash", value: 17 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Electronic",
+      children: [
+        { name: "House", value: 42 },
+        { name: "Techno", value: 31 },
+        { name: "Ambient", value: 19 }
+      ]
+    },
+    {
+      name: "Jazz",
+      children: [
+        { name: "Swing", value: 24 },
+        { name: "Bebop", value: 33 },
+        {
+          name: "Fusion",
+          children: [
+            { name: "Jazz Rock", value: 14 },
+            { name: "Latin Jazz", value: 21 }
+          ]
+        }
+      ]
+    }
+  ]
+}]);
 
-const data = {
-  name: "Root",
-  children: []
-}
-generateLevel(data, "", 0);
 
-series.data.setAll([data]);
+// Select the root node
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
 series.set("selectedDataItem", series.dataItems[0]);
-
-function generateLevel(data: any, name: string, level: number) {
-  for (let i = 0; i < Math.ceil(maxNodes * Math.random()) + 1; i++) {
-    let nodeName = name + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i];
-    let child;
-    if (level < maxLevels) {
-      child = {
-        name: nodeName + level
-      }
-
-      if (level > 0 && Math.random() < 0.5) {
-        child.value = Math.round(Math.random() * maxValue);
-      }
-      else {
-        child.children = [];
-        generateLevel(child, nodeName + i, level + 1)
-      }
-    }
-    else {
-      child = {
-        name: name + i,
-        value: Math.round(Math.random() * maxValue)
-      }
-    }
-    data.children.push(child);
-  }
-
-  level++;
-  return data;
-}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

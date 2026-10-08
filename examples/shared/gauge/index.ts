@@ -17,55 +17,52 @@ root.setThemes([
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/
+// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
-  panX: false,
+  panX: false,       // the gauge does not move when dragged
   panY: false,
-  startAngle: 180,
-  endAngle: 360
+  startAngle: 180,   // the arc starts on the left...
+  endAngle: 360      // ...and runs over the top to the right: a half circle
 }));
 
 
 // Create axis and its renderer
 // https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
 const axisRenderer = am5radar.AxisRendererCircular.new(root, {
-  innerRadius: -10,
-  strokeOpacity: 0.1
+  innerRadius: -10,  // grid lines only 10 px long, in from the arc, like tick marks
+  strokeOpacity: 0.1 // a faint line along the arc (hidden by default)
 });
 
 const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
-  maxDeviation: 0,
-  min: 0,
-  max: 100,
-  strictMinMax: true,
+  maxDeviation: 0,    // the scale can't be zoomed or moved past its ends
+  min: 0,             // the scale runs from 0...
+  max: 100,           // ...to 100
+  strictMinMax: true, // exactly, without rounding the ends to nicer numbers
   renderer: axisRenderer
 }));
 
 
-// Add clock hand
+// Add clock hand: an axis range with a bullet at the value it shows
 // https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
-const axisDataItem = xAxis.makeDataItem({});
-axisDataItem.set("value", 0);
+const axisDataItem = xAxis.makeDataItem({
+  value: 65 // the value the hand points at
+});
 
-const bullet = axisDataItem.set("bullet", am5xy.AxisBullet.new(root, {
+axisDataItem.set("bullet", am5xy.AxisBullet.new(root, {
   sprite: am5radar.ClockHand.new(root, {
-    radius: am5.percent(99)
+    radius: am5.percent(99) // the tip almost reaches the arc
   })
 }));
 
 xAxis.createAxisRange(axisDataItem);
 
-axisDataItem.get("grid").set("visible", false);
-
-setInterval(() => {
-  axisDataItem.animate({
-    key: "value",
-    to: Math.round(Math.random() * 100),
-    duration: 800,
-    easing: am5.ease.out(am5.ease.cubic)
-  });
-}, 2000);
+// The range's own grid line would show under the hand
+const grid = axisDataItem.get("grid");
+if (grid) {
+  grid.set("visible", false);
+}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 chart.appear(1000, 100);

@@ -260,5 +260,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Annuleren",
+	"Delete": "Verwijderen",
+	"Settings": "Instellingen",
+	"Expand": "Uitvouwen",
+	"Move Up": "Omhoog verplaatsen",
+	"Move Down": "Omlaag verplaatsen"
 };

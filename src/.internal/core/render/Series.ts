@@ -23,64 +23,67 @@ import * as $type from "../../core/util/Type";
 import * as $time from "../../core/util/Time";
 
 /**
- * Defines interface for a heat rule.
+ * A rule that sets a setting of each series element, such as its color or
+ * size, by its data item's value: from `min` at the lowest value to `max` at
+ * the highest.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/} for more info
  */
 export interface IHeatRule {
 
 	/**
-	 * Target template.
+	 * Template of the elements to set, e.g. `series.columns.template`.
 	 */
 	target: Template<any>;
 
 	/**
-	 * The setting value to use for items if the lowest value.
+	 * Setting value for the element with the lowest value.
 	 */
 	min?: any;
 
 	/**
-	 * The setting value to use for items if the highest value.
+	 * Setting value for the element with the highest value.
 	 */
 	max?: any;
 
 	/**
-	 * The setting value to use for items which do not have value at all.
+	 * Setting value for elements whose data item has no value.
 	 */
 	neutral?: any;
 
 	/**
-	 * Which data field to use when determining item's value.
+	 * Data item field that holds the value, e.g. `"value"` or `"valueY"`.
 	 */
 	dataField: string;
 
 	/**
-	 * A setting key to set.
+	 * The setting to set, e.g. `"fill"`.
 	 */
 	key?: string;
 
 	/**
-	 * Custom lowest value.
+	 * Lowest value of the range. If not set, the series' lowest value is used,
+	 * which needs `calculateAggregates`.
 	 */
 	minValue?: number;
 
 	/**
-	 * Custom highest value.
+	 * Highest value of the range. If not set, the series' highest value is
+	 * used, which needs `calculateAggregates`.
 	 */
 	maxValue?: number;
 
 	/**
-	 * Use logarithmic scale when calculating intermediate setting values.
+	 * Spreads the values between `min` and `max` on a logarithmic scale.
 	 *
 	 * @default false
 	 */
 	logarithmic?: boolean;
 
 	/**
-	 * A custom function that will set target element's settings.
-	 *
-	 * Can be used to do custom manipulation on complex objects requiring more
-	 * than modifying a setting.
+	 * A function that sets the element's settings itself, in place of `min`,
+	 * `max` and `key`. It is called for each element, also for one with no
+	 * value.
 	 */
 	customFunction?: (target: Sprite, minValue: number, maxValue: number, value?: any) => void;
 
@@ -131,9 +134,8 @@ export interface ISeriesSettings extends IComponentSettings {
 
 	/**
 	 * A key to look up in data for a URL to open when the data item's element
-	 * (a bullet, column, slice, map polygon or map line) is clicked.
-	 *
-	 * Links are off until this is set.
+	 * (a bullet, column, slice, map polygon or map line) is clicked. Links are
+	 * off until this is set.
 	 *
 	 * @since 5.20.7
 	 */
@@ -150,59 +152,58 @@ export interface ISeriesSettings extends IComponentSettings {
 	linkTarget?: string;
 
 	/**
-	 * A key to look up in data for a numeric value of the data item.
-	 *
-	 * Some series use it to display its elements. It can also be used in heat
-	 * rules.
+	 * A key to look up in data for a numeric value of the data item. Some
+	 * series draw their elements by it; heat rules can use it too.
 	 */
 	valueField?: string;
 
 	/**
-	 * A key to look up in data for a numeric customValue of the data item.
-	 *
-	 * Usually used for storing additional numeric information and heat rules.
+	 * A key to look up in data for an extra numeric value of the data item
+	 * (`customValue`), e.g. for heat rules.
 	 */
 	customValueField?: string;
 
 	/**
-	 * A text template to be used for label in legend.
+	 * Text template for the item's label in a [[Legend]].
 	 */
 	legendLabelText?: string;
 
 	/**
-	 * A text template to be used for value label in legend.
+	 * Text template for the item's value label in a [[Legend]].
 	 */
 	legendValueText?: string;
 
 	/**
-	 * If set to `true` the series initial animation will be played item by item
-	 * rather than all at once.
+	 * Shows and hides the data items one after another instead of all at
+	 * once, including in the initial animation. Works in XY and percent
+	 * series.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series} for more info
 	 */
 	sequencedInterpolation?:boolean;
 
 	/**
-	 * A delay in milliseconds to wait before starting animation of next data
-	 * item.
+	 * Extra delay in milliseconds between the animations of consecutive data
+	 * items, with `sequencedInterpolation`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series} for more info
 	 */
 	sequencedDelay?:number;
 
 	/**
-	 * A list of heat rules to apply on series elements.
+	 * Heat rules to apply to the series' elements. A rule without `minValue`
+	 * and `maxValue` needs `calculateAggregates` to find the value range.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/} for more info
 	 */
 	heatRules?:IHeatRule[];
 
 	/**
-	 * If set to `true`, series will calculate aggregate values, e.g. change
-	 * percent, high, low, etc.
+	 * Makes the series compute aggregate values, such as sums, averages, lows,
+	 * highs and changes.
 	 *
-	 * Do not enable unless you are using such aggregate values in tooltips,
-	 * display data fields, heat rules, or similar.
+	 * Enable it only if they are used, e.g. in tooltips, data fields or heat
+	 * rules.
 	 */
 	calculateAggregates?: boolean;
 
@@ -243,17 +244,15 @@ export interface ISeriesSettings extends IComponentSettings {
 	strokeGradient?: Gradient;
 
 	/**
-	 * A data item representing series in a [[Legend]].
+	 * The series' data item in a [[Legend]].
 	 *
 	 * @readonly
 	 */
 	legendDataItem?: DataItem<ILegendDataItem>;
 
 	/**
-	 * A list of field names to exclude from automatic aggregation
-	 * when `calculateAggregates` is enabled. Use it to optimize
-	 * performance by disabling automatic aggregation for data
-	 * fields where aggregate values are not needed.
+	 * Fields to leave out of `calculateAggregates`, to save work where their
+	 * aggregates are not needed.
 	 *
 	 * @since 5.14.4
 	 */
@@ -270,13 +269,37 @@ export interface ISeriesPrivate extends IComponentPrivate {
 	endIndex?: number;
 	adjustedStartIndex?:number;
 
+	/**
+	 * Average of all data items' values (with `calculateAggregates`).
+	 */
 	valueAverage?: number;
+	/**
+	 * Number of data items with a value (with `calculateAggregates`).
+	 */
 	valueCount?: number;
+	/**
+	 * Sum of all data items' values (with `calculateAggregates`).
+	 */
 	valueSum?: number;
+	/**
+	 * Sum of the absolute values of all data items (with `calculateAggregates`).
+	 */
 	valueAbsoluteSum?: number;
+	/**
+	 * Lowest value of all data items (with `calculateAggregates`).
+	 */
 	valueLow?: number;
+	/**
+	 * Highest value of all data items (with `calculateAggregates`).
+	 */
 	valueHigh?: number;
+	/**
+	 * Value of the first data item that has one (with `calculateAggregates`).
+	 */
 	valueOpen?: number;
+	/**
+	 * Value of the last data item that has one (with `calculateAggregates`).
+	 */
 	valueClose?: number;
 
 	customValueAverage?: number;
@@ -296,7 +319,7 @@ export interface ISeriesEvents extends IComponentEvents {
 }
 
 /**
- * A base class for all series.
+ * Base class of all series.
  */
 export abstract class Series extends Component {
 	public static className: string = "Series";
@@ -317,23 +340,22 @@ export abstract class Series extends Component {
 	protected _baseSeriesDirty: boolean = false;
 
 	/**
-	 * A chart series belongs to.
+	 * The chart the series belongs to.
 	 */
 	public chart:Chart | undefined;
 
 	/**
-	 * List of bullets to use for the series.
+	 * Functions that make the series' bullets: each is called for every data
+	 * item and returns a [[Bullet]], or nothing for no bullet.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/} for more info
 	 */
 	public bullets: List<<D extends DataItem<this["_dataItemSettings"]>>(root: Root, series:Series, dataItem: D) => Bullet | undefined> = new List();
 
 	/**
-	 * A [[Container]] series' bullets are stored in.
-	 *
-	 * @default Container.new()
+	 * The [[Container]] that holds the series' bullets.
 	 */
-	public readonly bulletsContainer: Container = Container.new(this._root, {width:p100, height:p100, position:"absolute"});
+	public readonly bulletsContainer: Container = Container.new(this._root, {width:p100, height:p100, position:"absolute"})._markC("width", "height", "position");
 
 	protected _afterNew() {
 		this.valueFields.push("value", "customValue");
@@ -353,11 +375,17 @@ export abstract class Series extends Component {
 		super._dispose();
 	}
 
+	/**
+	 * Returns the index of the first data item in the visible range.
+	 */
 	public startIndex():number {
 		let len = this.dataItems.length;
 		return Math.min(this.getPrivate("startIndex", 0), len);
 	}
 
+	/**
+	 * Returns the index after the last data item in the visible range.
+	 */
 	public endIndex():number {
 		let len = this.dataItems.length;
 		return Math.max(0, Math.min(this.getPrivate("endIndex", len), len));
@@ -506,12 +534,8 @@ export abstract class Series extends Component {
 	}
 
 	/**
-	 * Adds bullet directly to a data item.
-	 *
-	 * Please note: method accepts [[Bullet]] instance as a paramter, not a
-	 * reference to a function.
-	 *
-	 * You should add Bullet instance, not a method like you do it on series.
+	 * Adds a bullet to one data item. Unlike `series.bullets`, it takes a
+	 * [[Bullet]] instance, not a function.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Adding_directly_to_data_item} for more info
 	 * @since 5.6.0
@@ -526,6 +550,11 @@ export abstract class Series extends Component {
 		if(bullet){
 			this._makeBulletReal(dataItem, bullet);
 		}
+	}
+
+	// autoAppear waits for data: a series that gets it later grows when it does
+	protected _autoAppearReady(): boolean {
+		return this.dataItems.length > 0;
 	}
 
 	public _clearDirty() {
@@ -699,10 +728,13 @@ export abstract class Series extends Component {
 			let changeSelection = key + "ChangeSelection";
 			let changeSelectionPercent = key + "ChangeSelectionPercent";
 
-			let openKey = "valueY";
+			let openKey = key;
 
 			if (key === "valueX" || key.endsWith("ValueX")) {
 				openKey = "valueX";
+			}
+			else if (key === "valueY" || key.endsWith("ValueY")) {
+				openKey = "valueY";
 			}
 
 			const baseValueSeries = this.getPrivate("baseValueSeries");
@@ -856,7 +888,7 @@ export abstract class Series extends Component {
 		this._pei = this.endIndex();
 
 		if(this.isDirty("visible")){
-			this.bulletsContainer.set("visible", this.get("visible"));
+			this.bulletsContainer._setC("visible", this.get("visible"));
 		}
 
 
@@ -865,8 +897,8 @@ export abstract class Series extends Component {
 
 		if (this._valuesDirty && rules && rules.length > 0) {
 			$array.each(rules, (rule) => {
-				const minValue = rule.minValue || this.getPrivate(<any>(rule.dataField + "Low")) || 0;
-				const maxValue = rule.maxValue || this.getPrivate(<any>(rule.dataField + "High")) || 0;
+				const minValue = $type.isNumber(rule.minValue) ? rule.minValue : (this.getPrivate(<any>(rule.dataField + "Low")) || 0);
+				const maxValue = $type.isNumber(rule.maxValue) ? rule.maxValue : (this.getPrivate(<any>(rule.dataField + "High")) || 0);
 
 				$array.each(rule.target._entities, (target) => {
 
@@ -1033,7 +1065,7 @@ export abstract class Series extends Component {
 	}
 
 	/**
-	 * Shows series's data item.
+	 * Shows a data item and its bullets.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds
@@ -1054,7 +1086,7 @@ export abstract class Series extends Component {
 	}
 
 	/**
-	 * Hides series's data item.
+	 * Hides a data item and its bullets.
 	 *
 	 * @param   dataItem  Data item
 	 * @param   duration  Animation duration in milliseconds

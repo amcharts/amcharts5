@@ -8,12 +8,12 @@ import { Graphics } from "../../core/render/Graphics";
 export interface IPanelControlsSettings extends IContainerSettings {
 
 	/**
-	 * A target [[StockChart]].
+	 * The [[StockChart]] the panel belongs to.
 	 */
 	stockChart: StockChart;
 
 	/**
-	 * A target [[StockPanel]].
+	 * The [[StockPanel]] the buttons act on.
 	 */
 	stockPanel: StockPanel
 
@@ -24,7 +24,8 @@ export interface IPanelControlsPrivate extends IContainerPrivate {
 }
 
 /**
- * Creates a button set for [[StockChart]] panels (move up/down, close, etc.)
+ * Buttons on a [[StockChart]] panel that move it up or down, expand it and
+ * close it.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/panels/#Panel_controls} for more info
  */
@@ -37,9 +38,7 @@ export class PanelControls extends Container {
 	public static classNames: Array<string> = Container.classNames.concat([PanelControls.className]);
 
 	/**
-	 * A [[Button]] which moves panel up.
-	 *
-	 * @default Button.new()
+	 * The [[Button]] that moves the panel one place up.
 	 */
 	public upButton = this.children.push(Button.new(this._root, {
 		themeTags: ["up", "control", "panel"],
@@ -49,9 +48,7 @@ export class PanelControls extends Container {
 	}))
 
 	/**
-	 * A [[Button]] which moves panel down.
-	 *
-	 * @default Button.new()
+	 * The [[Button]] that moves the panel one place down.
 	 */
 	public downButton = this.children.push(Button.new(this._root, {
 		themeTags: ["down", "control", "panel"],
@@ -61,9 +58,8 @@ export class PanelControls extends Container {
 	}))
 
 	/**
-	 * A [[Button]] which expands/collapses the panel.
-	 *
-	 * @default Button.new()
+	 * The [[Button]] that expands the panel to fill the chart, or shows the
+	 * other panels again.
 	 */
 	public expandButton = this.children.push(Button.new(this._root, {
 		themeTags: ["expand", "control", "panel"],
@@ -73,9 +69,7 @@ export class PanelControls extends Container {
 	}))
 
 	/**
-	 * A [[Button]] which closes the panel.
-	 *
-	 * @default Button.new()
+	 * The [[Button]] that closes the panel.
 	 */
 	public closeButton = this.children.push(Button.new(this._root, {
 		themeTags: ["close", "control", "panel"],

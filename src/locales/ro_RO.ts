@@ -411,5 +411,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "OK",
+	"Cancel": "Anulează",
+	"Delete": "Șterge",
+	"Settings": "Setări",
+	"Expand": "Extinde",
+	"Move Up": "Mută în sus",
+	"Move Down": "Mută în jos"
 };

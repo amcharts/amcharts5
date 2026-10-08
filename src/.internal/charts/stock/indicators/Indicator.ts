@@ -16,60 +16,60 @@ import * as $type from "../../../core/util/Type";
 export interface IIndicatorEditableSetting {
 
 	/**
-	 * Setting key.
+	 * Key of the indicator setting this field edits.
 	 */
 	key: string;
 
 	/**
-	 * Name of the setting (displayed in edit modal).
-	 *
-	 * Settings with the same name will be grouped in modal.
+	 * Label of the field in the settings modal. Consecutive fields with the
+	 * same name share one row.
 	 */
 	name: string;
 
 	/**
-	 * Type of the control to show for editing the setting in modal.
+	 * Kind of input the settings modal shows for the setting.
 	 */
 	type: "color" | "number" | "dropdown" | "checkbox" | "text";
 
 	/**
-	 * Minimum numeric value allowable in this field.
+	 * Smallest value allowed for a `"number"` setting.
 	 *
 	 * @since 5.8.1
 	 */
 	minValue?: number;
 
 	/**
-	 * Maximum numeric value allowable in this field.
+	 * Largest value allowed for a `"number"` setting.
 	 *
 	 * @since 5.20.0
 	 */
 	maxValue?: number;
 
 	/**
-	 * Step for the numeric input. A step of `1` also marks the setting as an
-	 * integer, so typed decimals are rounded to whole numbers.
+	 * Step of the number input. A step of `1` or more also makes the setting a
+	 * whole number: typed decimals are rounded.
 	 *
 	 * @since 5.20.0
 	 */
 	step?: number;
 
 	/**
-	 * Display multiplier for the settings modal only. The value shown/edited in
-	 * the UI is `stored value × scale`, and it is divided back on save. Use it
-	 * when a setting's stored unit is awkward to show — e.g. Acceleration Bands
-	 * `factor` is stored in thousandths, so `scale: 1000` displays the
-	 * conventional `1` (= single band width) instead of `0.001`.
+	 * Multiplier for showing the value in the settings modal: the input shows
+	 * the stored value times `scale` and divides it back on save. For example,
+	 * Acceleration Bands `factor` is stored in thousandths, so `scale: 1000`
+	 * shows `0.001` as `1`.
 	 *
-	 * Does NOT affect the stored/serialized value, the API, or `minValue`/
-	 * `maxValue`/`step` — those all stay in stored units.
+	 * The stored value, `minValue`, `maxValue` and `step` stay in stored units.
 	 *
 	 * @since 5.20.0
 	 */
 	scale?: number;
 
 	/**
-	 * If `type: "dropdown"`, `options` should contain a list of items it.
+	 * Items of a `"dropdown"`: strings, or objects with a `value` and a `text`.
+	 * An option with `extTarget` (the key of a `"number"` field) sets that
+	 * field to `extTargetValue` when picked, and its limits to
+	 * `extTargetMinValue`, `extTargetMaxValue` and `extTargetStep`.
 	 */
 	options?: Array<string | {
 		value: number | string,
@@ -88,56 +88,54 @@ export interface IIndicatorEditableSetting {
 export interface IIndicatorSettings extends IContainerSettings {
 
 	/**
-	 * An instance of target [[StockChart]].
+	 * The [[StockChart]] the indicator belongs to.
 	 */
 	stockChart: StockChart;
 
 	/**
-	 * A main series indicator will be based on.
+	 * The series whose data the indicator is calculated from.
 	 */
 	stockSeries: XYSeries;
 
 	/**
-	 * A volume series indicator will be based on, if it requires one.
+	 * The volume series, for indicators that use volume.
 	 */
 	volumeSeries?: XYSeries;
 
 	/**
-	 * If set to a reference to [[StockLegend]], indicator will add itself into
-	 * the legend.
+	 * A [[StockLegend]] to add the indicator to.
 	 */
 	legend?: StockLegend;
 
 	/**
-	 * Period.
+	 * Number of data items each value is calculated over.
 	 */
 	period?: number;
 
 	/**
-	 * A value field to use.
+	 * Price to calculate from: `"open"`, `"close"`, `"low"`, `"high"`, or an
+	 * average such as `"hl/2"` (high and low) or `"ohlc/4"` (all four).
 	 */
 	field?: "open" | "close" | "low" | "high" | "hl/2" | "hlc/3" | "hlcc/4" | "ohlc/4";
 
 	/**
-	 * Indicator name, e.g. "Moving Average".
+	 * Name of the indicator, such as "Moving Average".
 	 */
 	name?: string;
 
 	/**
-	 * Short name for the indicator, e.g. "MA" (for "Moving Average").
-	 *
-	 * Mainly used for the legend.
+	 * Short name of the indicator, such as "MA", shown in the legend.
 	 */
 	shortName?: string;
 
 	/**
-	 * A color to use for the indicator series.
+	 * Color of the indicator's series.
 	 */
 	seriesColor?: Color;
 
 	/**
-	 * Should indicator settings modal be opened automatically when indicator
-	 * is added to a chart via [[IndicatorControl]].
+	 * Opens the indicator's settings modal when the indicator is added from an
+	 * [[IndicatorControl]].
 	 *
 	 * @default true
 	 * @since 5.10.6
@@ -175,13 +173,11 @@ export abstract class Indicator extends Container {
 	protected _vDP?: MultiDisposer;
 
 	/**
-	 * Clamps numeric settings that carry `minValue`/`maxValue`/`step` limits in
-	 * `_editableSettings` back into their allowed range, so out-of-range values
-	 * (from the settings modal, deserialized configs, or the API) can never reach
-	 * the heavy `prepareData()` — which, for e.g. Volume Profile, would otherwise
-	 * freeze the page. A `step` of `1` marks an integer setting, so typed decimals
-	 * are rounded. Called with `force` on add/deserialize (nothing is "dirty"
-	 * yet); otherwise only dirty keys are checked.
+	 * Brings numeric settings back within the `minValue`, `maxValue` and `step`
+	 * of their `_editableSettings` entries, so an out-of-range value from the
+	 * modal, a config or the API never reaches `prepareData()` (a huge one can
+	 * freeze the page, as with Volume Profile). With `force`, checks every
+	 * setting; otherwise only changed ones.
 	 */
 	public _clampSettings(force: boolean = false): void {
 		$array.each(this._editableSettings, (setting) => {
@@ -211,9 +207,9 @@ export abstract class Indicator extends Container {
 	}
 
 	/**
-	 * Assigns numeric limits to an editable setting by key. Used for entries that
-	 * are inherited from a base indicator (e.g. overbought/oversold) whose range
-	 * differs per subclass.
+	 * Sets the numeric limits of an editable setting by key, for entries
+	 * inherited from a base indicator (such as overbought and oversold) whose
+	 * range differs per subclass.
 	 */
 	protected _setEditableSettingBounds(key: string, minValue?: number, maxValue?: number, step?: number): void {
 		$array.each(this._editableSettings, (setting) => {
@@ -289,6 +285,9 @@ export abstract class Indicator extends Container {
 		this.markDirty();
 	}
 
+	/**
+	 * Recalculates the indicator's data after the current frame.
+	 */
 	public markDataDirty() {
 		this._root.events.once("frameended", () => {
 			this._markDataDirty();
@@ -399,6 +398,13 @@ export abstract class Indicator extends Container {
 	}
 
 
+	/**
+	 * Stores a value in the indicator series' `customData`, where text such as
+	 * a legend label can show it as `{name}`.
+	 *
+	 * @param  name   Key
+	 * @param  value  Value
+	 */
 	public setCustomData(name: string, value?: any) {
 		const customData = this.series.getPrivate("customData");
 		if (customData) {

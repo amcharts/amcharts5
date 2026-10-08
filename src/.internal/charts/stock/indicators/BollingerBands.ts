@@ -8,17 +8,20 @@ import { LineSeries } from "../../xy/series/LineSeries";
 export interface IBollingerBandsSettings extends IMovingAverageSettings {
 
 	/**
-	 * A value of standard deviations.
+	 * How many standard deviations above and below the moving average the bands
+	 * are.
+	 *
+	 * @default 2
 	 */
 	standardDeviations?: number;
 
 	/**
-	 * A color for upper section.
+	 * Color of the upper band and of the fill between the bands.
 	 */
 	upperColor?: Color;
 
 	/**
-	 * A color for lower section.
+	 * Color of the lower band.
 	 */
 	lowerColor?: Color;
 
@@ -32,7 +35,9 @@ export interface IBollingerBandsEvents extends IMovingAverageEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Bollinger Bands indicator: a moving average of `field` over `period`, with
+ * bands `standardDeviations` standard deviations above and below it. Drawn
+ * over the main series.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -45,12 +50,12 @@ export class BollingerBands extends MovingAverage {
 	declare public _events: IBollingerBandsEvents;
 
 	/**
-	 * Indicator series for the upper band.
+	 * Series of the upper band.
 	 */
 	public upperBandSeries!: LineSeries;
 
 	/**
-	 * Indicator series for the lower band.
+	 * Series of the lower band.
 	 */
 	public lowerBandSeries!: LineSeries;
 

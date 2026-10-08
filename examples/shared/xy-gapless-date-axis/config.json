@@ -1,0 +1,130 @@
+{
+  "type": "XYChart",
+  "settings": {
+    "panX": false,
+    "panY": false,
+    "wheelX": "panX",
+    "wheelY": "zoomX",
+    "cursor": {
+      "type": "XYCursor",
+      "settings": { "behavior": "zoomX" },
+      "properties": {
+        "lineY": {
+          "settings": { "visible": false }
+        }
+      }
+    },
+    "scrollbarX": {
+      "type": "Scrollbar",
+      "settings": { "orientation": "horizontal" }
+    },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"],
+    "xAxes": ["#axis-0"],
+    "yAxes": ["#axis-1"]
+  },
+  "refs": [
+    {
+      "data-0": [
+        { "date": 1704060000000, "value": 102 },
+        { "date": 1704146400000, "value": 103 },
+        { "date": 1704232800000, "value": 102 },
+        { "date": 1704319200000, "value": 104 },
+        { "date": 1704405600000, "value": 112 },
+        { "date": 1704664800000, "value": 105 },
+        { "date": 1704751200000, "value": 110 },
+        { "date": 1704837600000, "value": 107 },
+        { "date": 1704924000000, "value": 106 },
+        { "date": 1705010400000, "value": 109 },
+        { "date": 1705269600000, "value": 107 },
+        { "date": 1705356000000, "value": 112 },
+        { "date": 1705442400000, "value": 108 },
+        { "date": 1705528800000, "value": 120 },
+        { "date": 1705615200000, "value": 127 },
+        { "date": 1705874400000, "value": 128 },
+        { "date": 1705960800000, "value": 133 },
+        { "date": 1706047200000, "value": 133 },
+        { "date": 1706133600000, "value": 135 },
+        { "date": 1706220000000, "value": 136 },
+        { "date": 1706479200000, "value": 137 },
+        { "date": 1706565600000, "value": 141 },
+        { "date": 1706652000000, "value": 136 },
+        { "date": 1706738400000, "value": 140 },
+        { "date": 1706824800000, "value": 144 },
+        { "date": 1707084000000, "value": 147 },
+        { "date": 1707170400000, "value": 157 },
+        { "date": 1707256800000, "value": 156 },
+        { "date": 1707343200000, "value": 152 },
+        { "date": 1707429600000, "value": 150 },
+        { "date": 1707688800000, "value": 147 },
+        { "date": 1707775200000, "value": 144 },
+        { "date": 1707861600000, "value": 145 },
+        { "date": 1707948000000, "value": 145 },
+        { "date": 1708034400000, "value": 153 },
+        { "date": 1708293600000, "value": 146 },
+        { "date": 1708380000000, "value": 144 },
+        { "date": 1708466400000, "value": 139 },
+        { "date": 1708552800000, "value": 138 },
+        { "date": 1708639200000, "value": 138 }
+      ]
+    },
+    {
+      "axis-0": {
+        "type": "GaplessDateAxis",
+        "settings": {
+          "maxDeviation": 0.5,
+          "baseInterval": { "timeUnit": "day", "count": 1 },
+          "renderer": {
+            "type": "AxisRendererX",
+            "settings": { "pan": "zoom", "minorGridEnabled": true },
+            "properties": {
+              "labels": {
+                "properties": {
+                  "template": {
+                    "settings": { "minPosition": 0.01, "maxPosition": 0.99 }
+                  }
+                }
+              }
+            }
+          },
+          "tooltip": { "type": "Tooltip" }
+        }
+      }
+    },
+    {
+      "axis-1": {
+        "type": "ValueAxis",
+        "settings": {
+          "maxDeviation": 1,
+          "renderer": {
+            "type": "AxisRendererY",
+            "settings": { "pan": "zoom" }
+          }
+        }
+      }
+    },
+    {
+      "series-0": {
+        "type": "LineSeries",
+        "settings": {
+          "name": "Series",
+          "xAxis": "#axis-0",
+          "yAxis": "#axis-1",
+          "valueYField": "value",
+          "valueXField": "date",
+          "tooltip": {
+            "type": "Tooltip",
+            "settings": { "labelText": "{valueY}" }
+          },
+          "autoAppear": true,
+          "appearDuration": 1000
+        },
+        "properties": { "data": "#data-0" }
+      }
+    }
+  ]
+}

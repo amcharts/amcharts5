@@ -39,7 +39,7 @@ export interface IPicturePatternPrivate extends IPatternPrivate {
 export interface IPicturePatternEvents extends IPatternEvents {
 
 	/**
-	 * Invoked when related image is loaded.
+	 * The image finished loading.
 	 */
 	loaded: {};
 

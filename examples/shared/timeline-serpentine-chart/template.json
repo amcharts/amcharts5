@@ -1,0 +1,7 @@
+{
+  "title": "Serpentine Timeline",
+  "description": "A serpentine chart: tasks as columns along a date axis that winds back and forth, with a circle at each end of a task and flags for events.",
+  "category": "timeline",
+  "tier": "basic",
+  "tags": ["serpentine", "gantt", "bullets", "flags", "date axis"]
+}

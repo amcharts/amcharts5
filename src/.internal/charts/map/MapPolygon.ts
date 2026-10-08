@@ -1,5 +1,6 @@
 import { Graphics, IGraphicsSettings, IGraphicsPrivate } from "../../core/render/Graphics";
 import type { MapPolygonSeries } from "./MapPolygonSeries";
+import type { MapSeries } from "./MapSeries";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { IPoint } from "../../core/util/IPoint";
 import * as $mapUtils from "./MapUtils";
@@ -9,15 +10,30 @@ import { geoArea } from "d3-geo";
 export interface IMapPolygonSettings extends IGraphicsSettings {
 
 	/**
-	 * A GeoJSON representation of the polygons geometry.
+	 * The polygon's shape, as GeoJSON geometry.
 	 */
 	geometry?: GeoJSON.MultiPolygon | GeoJSON.Polygon;
 
 	/**
-	 * @todo needs description
+	 * How far, in pixels, the drawn edges may stray from the curves the
+	 * projection bends them into (d3-geo's resampling precision). Smaller is
+	 * more accurate but slower.
+	 *
 	 * @default 0.5
 	 */
 	precision?: number;
+
+	/**
+	 * Height of this polygon's columns in a [[PixelMapSeries]], from `0` to `1`
+	 * of the series' `columnHeight`.
+	 *
+	 * Set it with heat rules (`key: "pixelHeight"`) or `templateField`. When
+	 * set, it is used instead of the height the series works out from the
+	 * polygon's value. The series' `pixelHeightFunction` overrides it.
+	 *
+	 * @since 5.21.0
+	 */
+	pixelHeight?: number;
 
 }
 
@@ -42,12 +58,21 @@ export class MapPolygon extends Graphics {
 	}
 
 	/**
-	 * A [[MapPolygonSeries]] polygon belongs to.
+	 * The series the polygon belongs to.
 	 */
 	public series: MapPolygonSeries | undefined;
 
 	public _beforeChanged() {
 		super._beforeChanged();
+
+		// Made focusable: the chart checks whether it is in view
+		if (this.isDirty("focusable") && this.get("focusable")) {
+			const series = this.dataItem && <MapSeries>this.dataItem.component;
+			const chart = series && series.chart;
+			if (chart) {
+				chart._scheduleFocusView();
+			}
+		}
 
 		if (this._projectionDirty || this.isDirty("geometry") || this.isDirty("precision")) {
 			const geometry = this.get("geometry")!;
@@ -94,7 +119,8 @@ export class MapPolygon extends Graphics {
 	}
 
 	/**
-	 * Returns latitude/longitude of the geometrical center of the polygon.
+	 * Returns the polygon's geographic centroid. For an odd shape it can lie
+	 * outside the polygon; `visualCentroid()` can't.
 	 *
 	 * @return Center
 	 */
@@ -109,7 +135,8 @@ export class MapPolygon extends Graphics {
 	}
 
 	/**
-	 * Returns latitude/longitude of the visual center of the polygon.
+	 * Returns the point inside the polygon farthest from its edges, in its
+	 * largest part: where a label fits best. Tooltips point there.
 	 *
 	 * @return Center
 	 */

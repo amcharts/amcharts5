@@ -15,50 +15,57 @@ import * as $math from "../../core/util/Math";
 
 export interface IClusteredDataItem extends IComponentDataItem {
 	/**
-	 * All the data items of this cluster
+	 * Data items of the points in the cluster.
 	 */
 	children?: Array<DataItem<IMapPointSeriesDataItem>>;
 
 	/**
-	 * Bullet of clustered data item
+	 * The bullet that shows the cluster.
 	 */
 	bullet?: Bullet;
 
 	/**
-	 * An ID of a group.
+	 * Group id of the cluster's points.
 	 */
 	groupId?: string
 
 	/**
-	 * Longitude.
+	 * Longitude of the cluster, in degrees.
 	 */
 	longitude?: number;
 
 	/**
-	 * Latitude.
+	 * Latitude of the cluster, in degrees.
 	 */
 	latitude?: number;
+
+	/**
+	 * Average altitude of the cluster's data items, in metres.
+	 *
+	 * @since 5.21.0
+	 */
+	altitude?: number;
 }
 
 export interface IClusteredPointSeriesDataItem extends IMapPointSeriesDataItem {
 	/**
-	 * An ID of a bullet's group.
+	 * Id of the point's group: it clusters only with points of the same group.
 	 */
 	groupId?: string
 
 	/**
-	 * Clustered data item (if available)
+	 * The cluster the point is in, if any.
 	 * @readonly
 	 */
 	cluster?: DataItem<IClusteredDataItem>;
 
 	/**
-	 * How much bullet was moved from its original position
+	 * How far, in pixels, scattering moved the bullet horizontally.
 	 */
 	dx?: number;
 
 	/**
-	 * How much bullet was moved from its original position
+	 * How far, in pixels, scattering moved the bullet vertically.
 	 */
 	dy?: number;
 }
@@ -69,13 +76,8 @@ export interface IClusteredPointSeriesPrivate extends IMapPointSeriesPrivate {
 
 export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	/**
-	 * Series data can contain a field with an ID of a virtual group the bullet
-	 * belongs to.
-	 *
-	 * For example, we might want bullets to group with other bullets from the
-	 * same continent.
-	 *
-	 * `groupIdField` specifies which field in source data holds group IDs.
+	 * Field in `data` that holds the id of the point's group. Points cluster
+	 * only with points of the same group, such as the same continent.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_segregation} for more info
 	 * @default "groupId"
@@ -83,7 +85,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	groupIdField?: string;
 
 	/**
-	 * Bullets that are closer than X pixels apart, will be automatically grouped.
+	 * Points closer than this many pixels to each other are clustered.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Minimal_distance} for more info
 	 * @default 20
@@ -91,24 +93,25 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	minDistance?: number;
 
 	/**
-	 * Set this to a [[Bullet]] instance which will be used to show groups.
+	 * A function that returns the [[Bullet]] to show a cluster with. Without
+	 * it, points aren't clustered.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_bullet} for more info
 	 */
 	clusteredBullet?: (root: Root, series: ClusteredPointSeries, dataItem: DataItem<IClusteredDataItem>) => Bullet | undefined;
 
 	/**
-	 * If bullets are closer to each other than `scatterDistance`, they will be
-	 * scattered so that all are visible.
+	 * Once clustering stops (see `stopClusterZoom`), points closer than this
+	 * many pixels to each other are scattered so that all of them show.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
-	 * @default 5
+	 * @default 3
 	 * @since 5.5.7
 	 */
 	scatterDistance?: number;
 
 	/**
-	 * Presumed radius of a each bullet when scattering them.
+	 * Radius in pixels each bullet is taken to have when scattering them.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
 	 * @default 8
@@ -117,8 +120,8 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	scatterRadius?: number;
 
 	/**
-	 * If a map is zoomed to a maxZoomLevel * stopClusterZoom, clusters will be
-	 * disabled.
+	 * Clustering stops, and scattering starts, once the map is zoomed to
+	 * `maxZoomLevel` times this.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
 	 * @default 0.95
@@ -128,10 +131,8 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 
 
 	/**
-	 * Delay in milliseconds before clustering is made.
-	 *
-	 * This is useful if you have many data items and want to avoid re-clustering
-	 * on every zoom/position change.
+	 * Waits this many milliseconds after the zoom level changes before
+	 * clustering again. Helps with many data items.
 	 *
 	 * @default 0
 	 * @since 5.9.11
@@ -140,8 +141,8 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 }
 
 /**
- * A version of [[MapPointSeries]] which can automatically group closely located
- * bullets into groups.
+ * A [[MapPointSeries]] that groups points close together on screen into
+ * clusters. Clusters are worked out again whenever the zoom level changes.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/} for more info
  * @since 5.5.6
@@ -225,7 +226,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 				const bullet = dataItem.get("bullet" as any);
 				const longitude = dataItem.get("longitude", 0);
 				const latitude = dataItem.get("latitude", 0);
-				this._positionBulletReal(bullet, { type: "Point", coordinates: [longitude, latitude] }, [longitude, latitude]);
+				this._positionBulletReal(bullet, { type: "Point", coordinates: [longitude, latitude] }, [longitude, latitude], undefined, dataItem.get("altitude"));
 			})
 		}
 	}
@@ -281,15 +282,10 @@ export class ClusteredPointSeries extends MapPointSeries {
 	}
 
 	/**
-	 * Zooms to the area so that all clustered data items of a cluster would be
-	 * visible.
+	 * Zooms the map to fit the points of a cluster.
 	 *
-	 * Pass in `true` as a second parameter to rotate that map so that the group
-	 * is in the center. This is especially useful in the maps that use
-	 * Orthographic (globe) projection.
-	 *
-	 * @param  dataItem  Group data item
-	 * @param  rotate    Rotate the map so that group is in the center?
+	 * @param  dataItem  Data item of the cluster
+	 * @param  rotate    Also rotate the map to bring the cluster to the middle, as on a globe
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Drill_down} for more info
 	 */
 	public zoomToCluster(dataItem: DataItem<IClusteredDataItem>, rotate?: boolean) {
@@ -383,6 +379,12 @@ export class ClusteredPointSeries extends MapPointSeries {
 				let sumX = 0;
 				let sumY = 0;
 
+				// For raised points: their average altitude and place on the earth
+				let sumAltitude = 0;
+				let earthX = 0;
+				let earthY = 0;
+				let earthZ = 0;
+
 				let len = cluster.length;
 
 				if (len > 1) {
@@ -425,6 +427,13 @@ export class ClusteredPointSeries extends MapPointSeries {
 							sumY += point.y;
 						}
 
+						const longitude = dataItem.get("longitude", 0) * $math.RADIANS;
+						const latitude = dataItem.get("latitude", 0) * $math.RADIANS;
+						sumAltitude += dataItem.get("altitude", 0);
+						earthX += Math.cos(latitude) * Math.cos(longitude);
+						earthY += Math.cos(latitude) * Math.sin(longitude);
+						earthZ += Math.sin(latitude);
+
 						const bullets = dataItem.bullets;
 						if (bullets) {
 							$array.each(bullets, (bullet) => {
@@ -446,10 +455,17 @@ export class ClusteredPointSeries extends MapPointSeries {
 					const prevLen = clusteredDataItem.get("value" as any);
 					clusteredDataItem.setRaw("value" as any, len);
 
+					const altitude = sumAltitude / len;
+					clusteredDataItem.setRaw("altitude", altitude || undefined);
+
 					const bullet = clusteredDataItem.get("bullet" as any);
 					if (bullet) {
 
-						let geoPoint = this.chart!.invert({ x: averageX, y: averageY });
+						// A raised point is not above the ground at its screen position
+						let geoPoint = altitude ? {
+							longitude: Math.atan2(earthY, earthX) * $math.DEGREES,
+							latitude: Math.atan2(earthZ, Math.sqrt(earthX * earthX + earthY * earthY)) * $math.DEGREES
+						} : this.chart!.invert({ x: averageX, y: averageY });
 						if (geoPoint) {
 							clusteredDataItem.setAll({
 								longitude: geoPoint.longitude,

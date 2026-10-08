@@ -10,32 +10,29 @@ import { colorToOKLCH, oklchToColor, IOKLCH } from "../core/util/OKLCH";
 export interface IAdaptiveThemeSettings {
 
 	/**
-	 * Primary base color. The generated palette and (in dark mode) the interface
-	 * colors are derived from it. Accepts a hex number, a CSS string, or a
-	 * [[Color]].
-	 *
-	 * If omitted, the theme defaults to a green-to-yellow gradient (`#4b8e39`
-	 * first, `#ffdd00` last).
+	 * The color the palette is built from, and its first color, as a hex
+	 * number, a CSS string or a [[Color]]. It also colors the primary buttons,
+	 * and in dark mode tints all interface colors. If not set, green `#4b8e39`
+	 * is used, and `baseColor2` defaults to yellow `#ffdd00`.
 	 */
 	baseColor?: number | string | Color;
 
 	/**
-	 * Optional second base color. When provided, the palette spans the two
-	 * colors (perceptually interpolated in OKLCH) instead of fanning out from a
-	 * single hue.
+	 * A second color: the palette then runs as a gradient from `baseColor` to
+	 * this one, instead of spreading out over the color wheel.
 	 */
 	baseColor2?: number | string | Color;
 
 	/**
-	 * Number of series colors to generate.
+	 * Number of series colors to make.
 	 *
 	 * @default 10
 	 */
 	count?: number;
 
 	/**
-	 * Produce a dark variant: a faintly base-tinted dark background and matching
-	 * interface colors.
+	 * Makes a dark theme, with a dark background and interface colors faintly
+	 * tinted with the hue of `baseColor`.
 	 *
 	 * @default false
 	 */
@@ -71,22 +68,18 @@ function clamp(x: number, lo: number, hi: number): number {
 }
 
 /**
- * "Adaptive" — generates a full palette from one or two base colors, choosing
- * the other colors automatically in OKLCH so they stay perceptually balanced
- * (even lightness/chroma, evenly spread hues).
+ * "Adaptive": makes a whole series palette from one or two colors. With one,
+ * the other colors share an even lightness and spread out over the color
+ * wheel; with two, they run as a gradient between them. The first color is
+ * always `baseColor` itself, so a brand color appears in the chart.
  *
- * Because a theme cannot take constructor parameters, this ships as a **factory
- * function**:
+ * It is a function rather than a class, so that it can take settings:
  *
  * ```TypeScript
  * root.setThemes([
  *   am5themes_Adaptive(root, { baseColor: 0x2c6e91, dark: true })
  * ]);
  * ```
- *
- * The first generated color is the base color itself, so a brand color always
- * appears in the chart. This theme is additive; it does not modify any built-in
- * theme.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
  * @important
@@ -171,10 +164,9 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 }
 
 /**
- * Lets the theme be used exactly like the class-based themes -
- * `am5themes_Adaptive.new(root)` - applying the default green-to-yellow palette
- * when no options are given. For custom colors, call the factory directly:
- * `am5themes_Adaptive(root, { baseColor: 0x2c6e91 })`.
+ * Same as calling the function, so the theme can be used like the class-based
+ * themes: `am5themes_Adaptive.new(root)`, or with settings,
+ * `am5themes_Adaptive.new(root, { baseColor: 0x2c6e91 })`.
  */
 AdaptiveTheme.new = function (root: Root, settings: IAdaptiveThemeSettings = {}): Theme {
 	return AdaptiveTheme(root, settings);

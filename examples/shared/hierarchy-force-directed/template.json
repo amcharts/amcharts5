@@ -1,0 +1,7 @@
+{
+  "title": "Force-Directed Tree",
+  "description": "A force-directed tree: nested data as linked circles that arrange themselves and open on click.",
+  "category": "hierarchy",
+  "tier": "basic",
+  "tags": ["force directed", "hierarchy", "nested data"]
+}

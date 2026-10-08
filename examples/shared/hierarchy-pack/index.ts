@@ -15,71 +15,71 @@ root.setThemes([
 ]);
 
 
-// Create wrapper container
-const container = root.container.children.push(am5.Container.new(root, {
-  width: am5.percent(100),
-  height: am5.percent(100),
-  layout: root.verticalLayout
-}));
-
-
 // Create series
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Adding
-const series = container.children.push(am5hierarchy.Pack.new(root, {
-  singleBranchOnly: false,
-  downDepth: 1,
-  initialDepth: 10,
+// initialDepth: 2 shows two levels at first; a click opens the next
+const series = root.container.children.push(am5hierarchy.Pack.new(root, {
+  initialDepth: 2,
   valueField: "value",
   categoryField: "name",
   childDataField: "children"
 }));
 
 
-// Generate and set data
+// Set data
 // https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
-const maxLevels = 2;
-const maxNodes = 3;
-const maxValue = 100;
+// only the leaves have a value, and a leaf circle's area follows it;
+// a parent's circle is just big enough to hold its children's
+series.data.setAll([{
+  name: "Food",
+  children: [
+    {
+      name: "Fruit",
+      children: [
+        { name: "Apples", value: 40 },
+        { name: "Bananas", value: 36 },
+        {
+          name: "Berries",
+          children: [
+            { name: "Strawberries", value: 18 },
+            { name: "Blueberries", value: 14 },
+            { name: "Raspberries", value: 12 }
+          ]
+        }
+      ]
+    },
+    {
+      name: "Drinks",
+      children: [
+        { name: "Coffee", value: 42 },
+        { name: "Tea", value: 36 },
+        { name: "Juice", value: 39 }
+      ]
+    },
+    {
+      name: "Dairy",
+      children: [
+        { name: "Milk", value: 46 },
+        { name: "Yogurt", value: 38 },
+        {
+          name: "Cheese",
+          children: [
+            { name: "Cheddar", value: 16 },
+            { name: "Gouda", value: 14 },
+            { name: "Brie", value: 12 }
+          ]
+        }
+      ]
+    }
+  ]
+}]);
 
-const data = {
-  name: "Root",
-  children: []
-}
-generateLevel(data, "", 0);
 
-series.data.setAll([data]);
+// Select the root node
+// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
 series.set("selectedDataItem", series.dataItems[0]);
-
-function generateLevel(data: any, name: string, level: number) {
-  for (let i = 0; i < Math.ceil(maxNodes * Math.random()) + 1; i++) {
-    let nodeName = name + "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[i];
-    let child;
-    if (level < maxLevels) {
-      child = {
-        name: nodeName + level
-      }
-
-      if (level > 0 && Math.random() < 0.5) {
-        child.value = Math.round(Math.random() * maxValue);
-      }
-      else {
-        child.children = [];
-        generateLevel(child, nodeName + i, level + 1)
-      }
-    }
-    else {
-      child = {
-        name: name + i,
-        value: Math.round(Math.random() * maxValue)
-      }
-    }
-    data.children.push(child);
-  }
-
-  level++;
-  return data;
-}
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000, 100);

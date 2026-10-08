@@ -3,7 +3,11 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5timeline from "@amcharts/amcharts5/timeline";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
+
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
 const root = am5.Root.new("chartdiv");
+
 
 // Set themes
 // https://www.amcharts.com/docs/v5/concepts/themes/
@@ -12,254 +16,61 @@ root.setThemes([
 ]);
 
 
-// Create chart
+// Create chart: orientation: "horizontal" would lay the timeline out in columns
+// https://www.amcharts.com/docs/v5/charts/timeline/
 const chart = root.container.children.push(am5timeline.SerpentineChart.new(root, {
-  bendCount: 3,
-  startLocation: 0.2,
-  endLocation: 1,
-  wheelY: "zoomX"
+  levelCount: 3,     // the timeline winds across the chart in three runs
+  startLocation: 0.2 // the first run starts a fifth of the way in: room for the row names
 }));
 
-chart.set("scrollbarX", am5.Scrollbar.new(root, {
-  orientation: "horizontal"
-}));
 
-const yRenderer = am5timeline.AxisRendererCurveY.new(root, {});
+// Create axes: the date axis follows the curve, the category axis runs across it
+// https://www.amcharts.com/docs/v5/charts/timeline/
+const yRenderer = am5timeline.AxisRendererCurveY.new(root, {
+  minGridDistance: 10 // a name for every row, even with rows only 10 px apart
+});
 
 yRenderer.labels.template.setAll({
-  centerY: am5.p50,
-  centerX: am5.p100,
+  centerY: am5.p50,  // the row names are centered on their rows...
+  centerX: am5.p100, // ...and end where the timeline starts, so they sit left of it
   fontSize: 11
 });
 
-yRenderer.grid.template.set("forceHidden", true);
+yRenderer.grid.template.set("forceHidden", true); // no grid lines between the rows
 
-// Create axes and their renderers
 const xRenderer = am5timeline.AxisRendererCurveX.new(root, {
   yRenderer: yRenderer,
-  strokeDasharray: [2, 3],
-  strokeOpacity: 0.5,
-  stroke: am5.color(0x000000)
+  strokeDasharray: [2, 3], // the axis line along the curve is dotted: 2 px dashes, 3 px gaps
+  strokeOpacity: 0.5       // and half see-through (axis lines are hidden by default)
 });
 
 xRenderer.labels.template.setAll({
-  centerY: am5.p50,
+  centerY: am5.p50,  // the date labels are centered on the axis line
   fontSize: 11,
-  minPosition: 0.01
+  minPosition: 0.01  // no label right at the start of the curve
 });
 
-xRenderer.labels.template.setup = function(target) {
-  target.set("layer", 30);
-  target.set("background", am5.Rectangle.new(root, {
-    fill: am5.color(0xffffff),
-    fillOpacity: 1
+// Date labels sit on the axis line: a background keeps them readable
+xRenderer.labels.template.setup = (label) => {
+  label.set("background", am5.Rectangle.new(root, {
+    fill: root.interfaceColors.get("background")
   }));
-}
+};
 
 const yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root, {
-  maxDeviation: 0,
   categoryField: "category",
   renderer: yRenderer
 }));
 
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
-  baseInterval: { timeUnit: "day", count: 1 },
-  renderer: xRenderer,
-  tooltip: am5.Tooltip.new(root, {})
+  baseInterval: { // the dates in the data are whole days
+    timeUnit: "day",
+    count: 1
+  },
+  renderer: xRenderer
 }));
 
-// Data
-const colorSet = chart.get("colors");
-
-const data = [{
-  "category": "Module #1",
-  "start": new Date("2019-01-10").getTime(),
-  "end": new Date("2019-01-13").getTime(),
-  "color": colorSet.getIndex(0),
-  "task": "Gathering requirements"
-}, {
-  "category": "Module #1",
-  "start": new Date("2019-02-05").getTime(),
-  "end": new Date("2019-04-18").getTime(),
-  "color": colorSet.getIndex(0),
-  "task": "Development"
-}, {
-  "category": "Module #2",
-  "start": new Date("2019-01-08").getTime(),
-  "end": new Date("2019-01-10").getTime(),
-  "color": colorSet.getIndex(5),
-  "task": "Gathering requirements"
-}, {
-  "category": "Module #2",
-  "start": new Date("2019-01-12").getTime(),
-  "end": new Date("2019-01-15").getTime(),
-  "color": colorSet.getIndex(5),
-  "task": "Producing specifications"
-}, {
-  "category": "Module #2",
-  "start": new Date("2019-01-16").getTime(),
-  "end": new Date("2019-02-05").getTime(),
-  "color": colorSet.getIndex(5),
-  "task": "Development"
-}, {
-  "category": "Module #2",
-  "start": new Date("2019-02-10").getTime(),
-  "end": new Date("2019-02-18").getTime(),
-  "color": colorSet.getIndex(5),
-  "task": "Testing and QA"
-}, {
-  "category": ""
-}, {
-  "category": "Module #3",
-  "start": new Date("2019-01-01").getTime(),
-  "end": new Date("2019-01-19").getTime(),
-  "color": colorSet.getIndex(9),
-  "task": "Gathering requirements"
-}, {
-  "category": "Module #3",
-  "start": new Date("2019-02-01").getTime(),
-  "end": new Date("2019-02-10").getTime(),
-  "color": colorSet.getIndex(9),
-  "task": "Producing specifications"
-}, {
-  "category": "Module #3",
-  "start": new Date("2019-03-10").getTime(),
-  "end": new Date("2019-04-15").getTime(),
-  "color": colorSet.getIndex(9),
-  "task": "Development"
-}, {
-  "category": "Module #3",
-  "start": new Date("2019-04-20").getTime(),
-  "end": new Date("2019-04-30").getTime(),
-  "color": colorSet.getIndex(9),
-  "task": "Testing and QA",
-  "disabled2": false,
-  "image2": "/wp-content/uploads/assets/timeline/rachel.jpg",
-  "location": 0
-}, {
-  "category": "Module #4",
-  "start": new Date("2019-01-15").getTime(),
-  "end": new Date("2019-02-12").getTime(),
-  "color": colorSet.getIndex(15),
-  "task": "Gathering requirements",
-  "disabled1": false,
-  "image1": "/wp-content/uploads/assets/timeline/monica.jpg"
-}, {
-  "category": "Module #4",
-  "start": new Date("2019-02-25").getTime(),
-  "end": new Date("2019-03-10").getTime(),
-  "color": colorSet.getIndex(15),
-  "task": "Development"
-}, {
-  "category": "Module #4",
-  "start": new Date("2019-03-23").getTime(),
-  "end": new Date("2019-04-29").getTime(),
-  "color": colorSet.getIndex(15),
-  "task": "Testing and QA"
-}];
-
-
-// Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
-const series = chart.series.push(am5timeline.CurveColumnSeries.new(root, {
-  xAxis: xAxis,
-  yAxis: yAxis,
-  baseAxis: yAxis,
-  valueXField: "end",
-  openValueXField: "start",
-  categoryYField: "category",
-  layer: 30
-}));
-
-series.columns.template.setAll({
-  height: am5.percent(10),
-  strokeOpacity: 0
-})
-
-series.bullets.push(function(root, series, dataItem) {
-  const circle = am5.Circle.new(root, {
-    radius: 4,
-    fill: chart.get("colors").getIndex(series.dataItems.indexOf(dataItem)),
-    strokeWidth: 2,
-    strokeOpacity: 0.5,
-    layer: 30
-  });
-
-  return am5.Bullet.new(root, {
-    sprite: circle,
-    locationX: 0,
-    locationY: 0.5
-  })
-})
-
-series.bullets.push(function(root, series, dataItem) {
-  const circle = am5.Circle.new(root, {
-    radius: 4,
-    fill: chart.get("colors").getIndex(series.dataItems.indexOf(dataItem)),
-    strokeWidth: 2,
-    strokeOpacity: 0.5,
-    layer: 30
-  });
-
-  return am5.Bullet.new(root, {
-    sprite: circle, locationX: 1
-  })
-})
-
-series.columns.template.adapters.add("fill", function(fill, target) {
-  return chart.get("colors").getIndex(series.dataItems.indexOf(target.dataItem));
-})
-
-// line series for flags
-const lineSeries = chart.series.push(am5timeline.CurveLineSeries.new(root, {
-  xAxis: xAxis, yAxis: yAxis, categoryYField: "category", valueXField: "date"
-}));
-
-lineSeries.strokes.template.set("forceHidden", true);
-
-lineSeries.bullets.push(function(root, series, dataItem) {
-  const flag = am5.Tooltip.new(root, {
-    centerY: 28,
-    paddingBottom: 4, paddingLeft: 7, paddingRight: 7, paddingTop: 4, layer: 30
-  })
-
-  flag.get("background")?.setAll({
-    stroke: am5.color(0x000000), cornerRadius: 0
-  })
-
-  flag.label.setAll({
-    fill: am5.color(0x000000),
-    text: dataItem.dataContext.letter,
-    fontSize: "0.8em"
-  });
-
-  flag.show();
-
-  return am5.Bullet.new(root, {
-    sprite: flag,
-    locationX: 0.5, locationY: 0.5
-  })
-})
-
-lineSeries.data.setAll([
-  { category: "", eventDate: "2019-01-15", letter: "A", description: "Something happened here" },
-  { category: "", date: new Date("2019-01-23").getTime(), letter: "B", description: "Something happened here" },
-  { category: "", date: new Date("2019-02-10").getTime(), letter: "C", description: "Something happened here" },
-  { category: "", date: new Date("2019-02-29").getTime(), letter: "D", description: "Something happened here" },
-  { category: "", date: new Date("2019-03-06").getTime(), letter: "E", description: "Something happened here" },
-  { category: "", date: new Date("2019-03-12").getTime(), letter: "F", description: "Something happened here" },
-  { category: "", date: new Date("2019-03-22").getTime(), letter: "G", description: "Something happened here" }
-]);
-
-
-const cursor = chart.set("cursor", am5timeline.CurveCursor.new(root, {
-  behavior: "zoomX",
-  xAxis: xAxis,
-  yAxis: yAxis
-}));
-
-series.data.setAll(data);
-
+// The empty category leaves the middle of the band to the date labels and the flags
 yAxis.data.setAll([
   { category: "Module #1" },
   { category: "Module #2" },
@@ -268,7 +79,124 @@ yAxis.data.setAll([
   { category: "Module #4" }
 ]);
 
-// Animate chart and series in
-// https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
+
+// Add series
+// https://www.amcharts.com/docs/v5/charts/timeline/
+const series = chart.series.push(am5timeline.CurveColumnSeries.new(root, {
+  xAxis: xAxis,
+  yAxis: yAxis,
+  baseAxis: yAxis, // columns sit in the rows and run along the dates, from start to end
+  valueXField: "end",
+  openValueXField: "start",
+  categoryYField: "category"
+}));
+
+series.columns.template.setAll({
+  height: am5.percent(10),           // thin bars, a tenth as thick as their row
+  strokeOpacity: 0,                  // no outline
+  tooltipText: "{category}: {task}", // the module and the task on hover
+  templateField: "settings"          // each column's fill comes from "settings" in its data row
+});
+
+// A circle at each end of a column, in the column's color
+am5.array.each([0, 1], (locationX) => {
+  series.bullets.push((root) => {
+    return am5.Bullet.new(root, {
+      locationX: locationX, // 0 puts the circle at the column's start, 1 at its end
+      sprite: am5.Circle.new(root, {
+        radius: 4,
+        templateField: "settings" // the same "settings" as the column, so the same fill
+      })
+    });
+  });
+});
+
+// Add flags: a line series that shows only its bullets
+const flagSeries = am5timeline.CurveLineSeries.new(root, {
+  xAxis: xAxis,
+  yAxis: yAxis,
+  valueXField: "date",
+  categoryYField: "category"
+});
+
+flagSeries.strokes.template.set("forceHidden", true); // no line between the flags
+
+// each flag is a label with the event's letter, on a pointed background
+flagSeries.bullets.push((root) => {
+  return am5.Bullet.new(root, {
+    sprite: am5.Label.new(root, {
+      text: "{letter}",
+      populateText: true, // fills in {letter} from the data row
+      fontSize: 11,
+      textAlign: "center",
+      width: 18,          // an 18 x 16 px flag
+      height: 16,
+      centerX: am5.p50,   // centered on the date...
+      centerY: 32,        // ...and lifted 32 px, clear of the axis line it marks
+      paddingTop: 1,      // 1 px above and below the letter, none at the sides
+      paddingBottom: 1,
+      paddingLeft: 0,
+      paddingRight: 0,
+      background: am5.PointedRectangle.new(root, {
+        fill: root.interfaceColors.get("background"), // a flag in the background color...
+        stroke: root.interfaceColors.get("text"),     // ...outlined in the text color
+        cornerRadius: 0,                              // square corners
+        pointerBaseWidth: 6,                          // a pointer 6 px wide at the flag...
+        pointerX: 9,                                  // ...below its middle...
+        pointerY: 21                                  // ...with its tip 5 px below the flag
+      })
+    })
+  });
+});
+
+// chart.series is typed for column series only
+chart.series.push(flagSeries as any);
+
+
+// Set data: the processor turns the date strings into timestamps
+// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+const colors = chart.get("colors")!; // the chart's color set: each module picks its fill from it
+
+series.data.processor = am5.DataProcessor.new(root, {
+  dateFormat: "yyyy-MM-dd",
+  dateFields: ["start", "end"]
+});
+
+series.data.setAll([
+  { category: "Module #1", start: "2019-01-10", end: "2019-01-13", task: "Gathering requirements", settings: { fill: colors.getIndex(0) } },
+  { category: "Module #1", start: "2019-02-05", end: "2019-04-18", task: "Development", settings: { fill: colors.getIndex(0) } },
+  { category: "Module #2", start: "2019-01-08", end: "2019-01-10", task: "Gathering requirements", settings: { fill: colors.getIndex(4) } },
+  { category: "Module #2", start: "2019-01-12", end: "2019-01-15", task: "Producing specifications", settings: { fill: colors.getIndex(4) } },
+  { category: "Module #2", start: "2019-01-16", end: "2019-02-05", task: "Development", settings: { fill: colors.getIndex(4) } },
+  { category: "Module #2", start: "2019-02-10", end: "2019-02-18", task: "Testing and QA", settings: { fill: colors.getIndex(4) } },
+  { category: "Module #3", start: "2019-01-01", end: "2019-01-19", task: "Gathering requirements", settings: { fill: colors.getIndex(8) } },
+  { category: "Module #3", start: "2019-02-01", end: "2019-02-10", task: "Producing specifications", settings: { fill: colors.getIndex(8) } },
+  { category: "Module #3", start: "2019-03-10", end: "2019-04-15", task: "Development", settings: { fill: colors.getIndex(8) } },
+  { category: "Module #3", start: "2019-04-20", end: "2019-04-30", task: "Testing and QA", settings: { fill: colors.getIndex(8) } },
+  { category: "Module #4", start: "2019-01-15", end: "2019-02-12", task: "Gathering requirements", settings: { fill: colors.getIndex(12) } },
+  { category: "Module #4", start: "2019-02-25", end: "2019-03-10", task: "Development", settings: { fill: colors.getIndex(12) } },
+  { category: "Module #4", start: "2019-03-23", end: "2019-04-29", task: "Testing and QA", settings: { fill: colors.getIndex(12) } }
+]);
+
+// the flags go in the empty middle row, so they stand on the axis line
+flagSeries.data.processor = am5.DataProcessor.new(root, {
+  dateFormat: "yyyy-MM-dd",
+  dateFields: ["date"]
+});
+
+flagSeries.data.setAll([
+  { category: "", date: "2019-01-22", letter: "A" },
+  { category: "", date: "2019-01-28", letter: "B" },
+  { category: "", date: "2019-02-20", letter: "C" },
+  { category: "", date: "2019-02-28", letter: "D" },
+  { category: "", date: "2019-03-06", letter: "E" },
+  { category: "", date: "2019-03-12", letter: "F" },
+  { category: "", date: "2019-04-18", letter: "G" }
+]);
+
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 series.appear(1000);
+flagSeries.appear(1000);
 chart.appear(1000, 100);

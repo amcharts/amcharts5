@@ -10,12 +10,12 @@ import * as $type from "../../../core/util/Type";
 export interface IHeikinAshiSettings extends IChartIndicatorSettings {
 
 	/**
-	 * Increasing color.
+	 * Color of candles that close higher than the previous one.
 	 */
 	increasingColor?: Color;
 
 	/**
-	 * Decreasing color.
+	 * Color of candles that close lower than the previous one.
 	 */
 	decreasingColor?: Color;
 
@@ -29,7 +29,8 @@ export interface IHeikinAshiEvents extends IChartIndicatorEvents {
 
 
 /**
- * An implementation of a [[StockChart]] indicator.
+ * Heikin Ashi indicator: candlesticks of averaged prices, which smooth out
+ * noise and show the trend more clearly. Drawn in a panel of its own.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
  */
@@ -42,7 +43,7 @@ export class HeikinAshi extends ChartIndicator {
 	declare public _events: IHeikinAshiEvents;
 
 	/**
-	 * Indicator series.
+	 * The indicator's series.
 	 */
 	declare public series: CandlestickSeries;
 
@@ -90,6 +91,8 @@ export class HeikinAshi extends ChartIndicator {
 			template.states.create("riseFromPrevious", { fill: increasing, stroke: increasing });
 			template.states.create("dropFromPrevious", { fill: decreasing, stroke: decreasing });
 			this.markDataDirty();
+			// The columns take the states only when they are laid out again
+			this.series.markDirtyValues();
 		}
 	}
 

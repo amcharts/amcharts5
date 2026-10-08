@@ -13,7 +13,8 @@ export interface IZoomControlPrivate extends IZoomToolsPrivate {
 }
 
 /**
- * A control that displays button for zooming [[MapChart]] in and out.
+ * Buttons that zoom a [[MapChart]] in and out, set as its `zoomControl`. A
+ * home button is there too, hidden by default.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control} for more information
  * @important

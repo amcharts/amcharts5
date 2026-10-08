@@ -17,152 +17,143 @@ root.setThemes([
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/
+// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
-  panX: false,
+  panX: false,       // the gauge does not move when dragged
   panY: false,
-  startAngle: 160,
-  endAngle: 380
+  startAngle: 160,   // the arc starts a little below the left side...
+  endAngle: 380      // ...and runs over the top to a little below the right
 }));
 
 
 // Create axis and its renderer
 // https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
 const axisRenderer = am5radar.AxisRendererCircular.new(root, {
-  innerRadius: -40
+  innerRadius: -40 // the scale is a ring 40 px wide, measured in from the outer edge
 });
 
 axisRenderer.grid.template.setAll({
-  stroke: root.interfaceColors.get("background"),
+  stroke: root.interfaceColors.get("background"), // in the background color, so grid lines show as gaps
   visible: true,
   strokeOpacity: 0.8,
   strokeWidth: 2,
-  crisp: false
+  crisp: false // no pixel snapping, which can draw lines thinner than set
 });
 
 const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
-  maxDeviation: 0,
-  min: -40,
-  max: 100,
-  strictMinMax: true,
+  maxDeviation: 0,    // the scale can't be zoomed or moved past its ends
+  min: -40,           // the scale runs from -40...
+  max: 100,           // ...to 100
+  strictMinMax: true, // exactly, without rounding the ends to nicer numbers
   renderer: axisRenderer
 }));
 
 
+// Create bands: an axis range with a fill and a label for each
+// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Bands
+const bands = [
+  { title: "Unsustainable", color: 0xee1f25, lowScore: -40, highScore: -20 },
+  { title: "Volatile", color: 0xf04922, lowScore: -20, highScore: 0 },
+  { title: "Foundational", color: 0xfdae19, lowScore: 0, highScore: 20 },
+  { title: "Developing", color: 0xf3eb0c, lowScore: 20, highScore: 40 },
+  { title: "Maturing", color: 0xb0d136, lowScore: 40, highScore: 60 },
+  { title: "Sustainable", color: 0x54b947, lowScore: 60, highScore: 80 },
+  { title: "High Performing", color: 0x0f9747, lowScore: 80, highScore: 100 }
+];
+
+// one axis range per band, covering the scale from its low to its high score
+am5.array.each(bands, (band) => {
+  const axisRange = xAxis.createAxisRange(xAxis.makeDataItem({
+    above: true,              // its fill and grid line go over the axis's regular grid
+    value: band.lowScore,     // the range starts at the band's low score...
+    endValue: band.highScore  // ...and ends at its high score
+  }));
+
+  const axisFill = axisRange.get("axisFill");
+  if (axisFill) {
+    axisFill.setAll({
+      visible: true, // axis fills are hidden by default
+      fill: am5.color(band.color),
+      fillOpacity: 0.8
+    });
+  }
+
+  const label = axisRange.get("label") as am5xy.AxisLabelRadial | undefined;
+  if (label) {
+    label.setAll({
+      text: band.title,
+      inside: true,      // inside the ring, not outside the arc
+      radius: 15,        // 15 px in from the ring's outer edge
+      fontSize: "0.9em",
+      fill: root.interfaceColors.get("background") // the background color reads well on the bands
+    });
+  }
+});
+
+
 // Add clock hand
 // https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
-const axisDataItem = xAxis.makeDataItem({});
+const axisDataItem = xAxis.makeDataItem({
+  value: 50 // where the hand points at the start
+});
 
 const clockHand = am5radar.ClockHand.new(root, {
-  pinRadius: am5.percent(20),
-  radius: am5.percent(100),
-  bottomWidth: 40
-})
+  pinRadius: am5.percent(20), // a big pin, a fifth of the gauge's radius, to hold the value
+  radius: am5.percent(100),   // the tip reaches the outer edge of the scale
+  bottomWidth: 40             // 40 px wide at the base, narrowing to the tip
+});
 
-const bullet = axisDataItem.set("bullet", am5xy.AxisBullet.new(root, {
+// the hand is the bullet of an axis data item: it points at the item's value
+axisDataItem.set("bullet", am5xy.AxisBullet.new(root, {
   sprite: clockHand
 }));
 
 xAxis.createAxisRange(axisDataItem);
 
-const label = chart.radarContainer.children.push(am5.Label.new(root, {
-  fill: am5.color(0xffffff),
-  centerX: am5.percent(50),
-  textAlign: "center",
+// Add label that shows the value, on the hand's pin
+const valueLabel = chart.radarContainer.children.push(am5.Label.new(root, {
+  fill: root.interfaceColors.get("background"), // in the background color, to read on the colored pin
+  centerX: am5.percent(50),                     // centered on the middle of the gauge
   centerY: am5.percent(50),
+  textAlign: "center",
   fontSize: "3em"
 }));
 
-axisDataItem.set("value", 50);
-bullet.get("sprite").on("rotation", () => {
-  let value = axisDataItem.get("value");
-  let text = Math.round(axisDataItem.get("value")).toString();
-  let fill = am5.color(0x000000);
-  xAxis.axisRanges.each((axisRange) => {
-    if (value >= axisRange.get("value") && value <= axisRange.get("endValue")) {
-      fill = axisRange.get("axisFill").get("fill");
+
+// When the hand turns, show its value and take the color of the band it is in
+clockHand.on("rotation", () => {
+  const value = axisDataItem.get("value", 0);
+  let fill = clockHand.hand.get("fill");
+
+  am5.array.each(bands, (band) => {
+    if (value >= band.lowScore && value <= band.highScore) {
+      fill = am5.color(band.color);
     }
-  })
+  });
 
-  label.set("text", Math.round(value).toString());
+  valueLabel.set("text", Math.round(value).toString());
 
-  clockHand.pin.animate({ key: "fill", to: fill, duration: 500, easing: am5.ease.out(am5.ease.cubic) })
-  clockHand.hand.animate({ key: "fill", to: fill, duration: 500, easing: am5.ease.out(am5.ease.cubic) })
+  // fade the pin and the hand to the band's color over half a second
+  clockHand.pin.animate({ key: "fill", to: fill, duration: 500, easing: am5.ease.out(am5.ease.cubic) });
+  clockHand.hand.animate({ key: "fill", to: fill, duration: 500, easing: am5.ease.out(am5.ease.cubic) });
 });
 
+// Move the hand to the next value of a fixed sequence every two seconds
+const values = [50, 72, 91, 34, 8, -27, -12, 15];
+let index = 0;
+
 setInterval(() => {
+  index = (index + 1) % values.length;
+
   axisDataItem.animate({
     key: "value",
-    to: Math.round(Math.random() * 140 - 40),
+    to: values[index],
     duration: 500,
     easing: am5.ease.out(am5.ease.cubic)
   });
-}, 2000)
-
-chart.bulletsContainer.set("mask", undefined);
-
-
-// Create axis ranges bands
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Bands
-const bandsData = [{
-  title: "Unsustainable",
-  color: "#ee1f25",
-  lowScore: -40,
-  highScore: -20
-}, {
-  title: "Volatile",
-  color: "#f04922",
-  lowScore: -20,
-  highScore: 0
-}, {
-  title: "Foundational",
-  color: "#fdae19",
-  lowScore: 0,
-  highScore: 20
-}, {
-  title: "Developing",
-  color: "#f3eb0c",
-  lowScore: 20,
-  highScore: 40
-}, {
-  title: "Maturing",
-  color: "#b0d136",
-  lowScore: 40,
-  highScore: 60
-}, {
-  title: "Sustainable",
-  color: "#54b947",
-  lowScore: 60,
-  highScore: 80
-}, {
-  title: "High Performing",
-  color: "#0f9747",
-  lowScore: 80,
-  highScore: 100
-}];
-
-am5.array.each(bandsData, (data) => {
-  const axisRange = xAxis.createAxisRange(xAxis.makeDataItem({
-    above: true,
-    value: data.lowScore,
-    endValue: data.highScore
-  }));
-
-  axisRange.get("axisFill").setAll({
-    visible: true,
-    fill: am5.color(data.color),
-    fillOpacity: 0.8
-  });
-
-  axisRange.get("label").setAll({
-    text: data.title,
-    inside: true,
-    radius: 15,
-    fontSize: "0.9em",
-    fill: root.interfaceColors.get("background")
-  });
-});
+}, 2000);
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 chart.appear(1000, 100);

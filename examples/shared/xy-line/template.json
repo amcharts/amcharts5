@@ -1,0 +1,7 @@
+{
+  "title": "Line Chart with Date Axis",
+  "description": "A line series on a date axis, with a cursor, a scrollbar and zoom.",
+  "category": "xy",
+  "tier": "basic",
+  "tags": ["line", "date axis", "cursor", "scrollbar", "zoom"]
+}

@@ -1,0 +1,7 @@
+{
+  "title": "Radar Timeline with Slider",
+  "description": "Radar columns that animate through the years with a play button and a slider, and continent ranges that zoom in when clicked.",
+  "category": "radar",
+  "tier": "showcase",
+  "tags": ["radar", "column", "slider", "play button", "axis ranges", "heat rules"]
+}

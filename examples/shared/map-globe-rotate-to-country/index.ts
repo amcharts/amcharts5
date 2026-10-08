@@ -19,68 +19,55 @@ root.setThemes([
 // Create the map chart
 // https://www.amcharts.com/docs/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
-  panX: "rotateX",
-  panY: "rotateY",
-  projection: am5map.geoOrthographic(),
-  paddingBottom: 20,
+  panX: "rotateX",   // dragging sideways spins the globe...
+  panY: "rotateY",   // ...and dragging up or down tilts it
+  projection: am5map.geoOrthographic(), // a globe
+  paddingBottom: 20, // 20 px of room on every side, between the globe and the chart's edges
   paddingTop: 20,
   paddingLeft: 20,
   paddingRight: 20
 }));
 
 
-// Create main polygon series for countries
+// Create series for background fill
+// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
+const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
+
+backgroundSeries.mapPolygons.template.setAll({
+  fill: root.interfaceColors.get("alternativeBackground"), // black on a light theme...
+  fillOpacity: 0.1,  // ...faded to a light grey disc for the sea
+  strokeOpacity: 0   // no outline
+});
+
+backgroundSeries.data.push({
+  geometry: am5map.getGeoRectangle(90, 180, -90, -180) // one polygon over the whole earth
+});
+
+
+// Create main polygon series for countries. clickZoom zooms to the clicked
+// country; on a map that pans by rotating, it turns the globe to it as well
 // https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
-  geoJSON: am5geodata_worldLow as any
+  geoJSON: am5geodata_worldLow,
+  clickZoom: true // a second click on the country, or one on the water, zooms back out
 }));
 
 polygonSeries.mapPolygons.template.setAll({
-  tooltipText: "{name}",
-  toggleKey: "active",
-  interactive: true
+  tooltipText: "{name}", // the country's name, which comes with the map data
+  interactive: true      // the countries react to the pointer: hover and click
 });
 
+// the country under the pointer takes the theme's hover color
 polygonSeries.mapPolygons.template.states.create("hover", {
   fill: root.interfaceColors.get("primaryButtonHover")
 });
 
+// The country zoomed to is active
 polygonSeries.mapPolygons.template.states.create("active", {
-  fill: root.interfaceColors.get("primaryButtonHover")
-});
-
-
-// Create series for background fill
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
-const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
-backgroundSeries.mapPolygons.template.setAll({
-  fill: root.interfaceColors.get("alternativeBackground"),
-  fillOpacity: 0.1,
-  strokeOpacity: 0
-});
-backgroundSeries.data.push({
-  geometry: am5map.getGeoRectangle(90, 180, -90, -180)
-});
-
-
-// Set up events
-let previousPolygon;
-
-polygonSeries.mapPolygons.template.on("active", (active, target) => {
-  if (previousPolygon && previousPolygon != target) {
-    previousPolygon.set("active", false);
-  }
-  if (target.get("active")) {
-    const centroid = target.geoCentroid();
-    if (centroid) {
-      chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-      chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-    }
-  }
-
-  previousPolygon = target;
+  fill: root.interfaceColors.get("primaryButtonActive") // green in the default theme
 });
 
 
 // Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
 chart.appear(1000, 100);

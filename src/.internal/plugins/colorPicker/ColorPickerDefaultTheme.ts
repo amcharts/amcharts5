@@ -11,6 +11,7 @@ export class ColorPickerDefaultTheme extends Theme {
 		super.setupDefaultRules();
 
 		const r = this.rule.bind(this);
+		const l = this._root.language;
 
 		///////////////////////////////////////////////////////
 		// ALL RELATED TO COLOR PICKER ////////////////////////
@@ -204,7 +205,9 @@ export class ColorPickerDefaultTheme extends Theme {
 
 		// tooltip text for no color button
 		r("Button", ["colorpicker", "pickertool", "nocolor"]).setAll({
-			tooltipText: "No color",
+			tooltipText: l.translateAny("No color"),
+			ariaLabel: l.translateAny("No color"),
+			role: "button",
 			marginLeft: 5
 		})
 
@@ -218,7 +221,9 @@ export class ColorPickerDefaultTheme extends Theme {
 
 		// tooltip text for picker button
 		r("Button", ["colorpicker", "picker"]).setAll({
-			tooltipText: "Pick color from screen"
+			tooltipText: l.translateAny("Pick color from screen"),
+			ariaLabel: l.translateAny("Pick color from screen"),
+			role: "button"
 		})
 
 		// picker icon for picker button
@@ -239,17 +244,24 @@ export class ColorPickerDefaultTheme extends Theme {
 		})
 
 		r("Button", ["colorpicker", "button", "ok"]).setAll({
-			marginLeft: 5
+			marginLeft: 5,
+			role: "button",
+			ariaLabel: l.translate("OK")
+		})
+
+		r("Button", ["colorpicker", "button", "cancel"]).setAll({
+			role: "button",
+			ariaLabel: l.translate("Cancel")
 		})
 
 		r("Label", ["colorpicker", "cancel"]).setAll({
-			text: "Cancel",
+			text: l.translate("Cancel"),
 			x: p50,
 			centerX: p50
 		})
 		// ok button for color picker
 		r("Label", ["colorpicker", "ok"]).setAll({
-			text: "OK",
+			text: l.translate("OK"),
 			x: p50,
 			centerX: p50
 		})

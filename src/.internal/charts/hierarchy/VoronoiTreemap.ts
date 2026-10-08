@@ -27,12 +27,12 @@ export interface IVoronoiTreemapDataItem extends IHierarchyDataItem {
 	children: Array<DataItem<IVoronoiTreemapDataItem>>;
 
 	/**
-	 * Data item of a parent node.
+	 * Data item of the parent node.
 	 */
 	parent: DataItem<IVoronoiTreemapDataItem>;
 
 	/**
-	 * A [[Polygon]] element of a node.
+	 * The node's polygon.
 	 */
 	polygon: Polygon;
 
@@ -41,7 +41,8 @@ export interface IVoronoiTreemapDataItem extends IHierarchyDataItem {
 export interface IVoronoiTreemapSettings extends IHierarchySettings {
 
 	/**
-	 * Type of the diagram's shape.
+	 * Outline of the whole diagram: `"polygon"`, a round shape of
+	 * `cornerCount` corners, or `"rectangle"`, which fills the series' area.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/#Diagram_type} for more info
 	 * @default "polygon"
@@ -56,50 +57,34 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	type?: "rectangle" | "polygon"
 
 	/**
-	 * Number of corners when `shapeType` is `"polygon"`.
-	 *
-	 * `120` means the polygon will look like a circle.
-	 *
-	 * NOTE: this setting is ignored if `shapeType="rectangle"`.
+	 * Number of corners of the outline when `shapeType` is `"polygon"`. The
+	 * default `120` looks like a circle.
 	 *
 	 * @default 120
 	 */
 	cornerCount?: number;
 
 	/**
-	 * Minimum weight ratio which allows computing the minimum allowed
-	 * weight (`= [maximum weight] * minWeightRatio`).
-	 *
-	 * Setting very small `minWeightRatio` might result in flickering.
-	 *
-	 * NOTE: the nodes that have smaller weight will be scaled up and will not
-	 * represent their true value correctly.
+	 * Smallest weight a cell may have, as a fraction of the largest. Lighter
+	 * cells are enlarged to it, so they no longer show their true value. Very
+	 * small values can make the layout flicker.
 	 *
 	 * @default 0.005
 	 */
 	minWeightRatio?: number;
 
 	/**
-	 * The convergence ratio in Voronoi treemaps measures how well the treemap
-	 * layout represents the hierarchical structure of the underlying data.
-	 *
-	 * It is calculated as the ratio of the summed area of the smallest enclosing
-	 * rectangle for each cell to the total area of the treemap. A lower
-	 * convergence ratio indicates a better representation of the hierarchy,
-	 * meaning that the cells are closely packed and the treemap effectively
-	 * captures the nested relationships between the data elements.
+	 * How closely the cell areas must match their values before the layout
+	 * stops: it stops once the cells' summed area error is below this
+	 * fraction of the total area. Smaller values are more precise but slower.
 	 *
 	 * @default 0.005
 	 */
 	convergenceRatio?: number;
 
 	/**
-	 * Maximum allowed number of iterations when computing the layout.
-	 *
-	 * Computation is stopped when it number of iterations is reached, even if
-	 * the `convergenceRatio` is not yet reached.
-	 *
-	 * Bigger number means finer results, but slower performance.
+	 * Most iterations the layout runs, even if `convergenceRatio` is not
+	 * reached yet. More iterations give finer results but take longer.
 	 *
 	 * @default 100
 	 */
@@ -111,10 +96,9 @@ export interface IVoronoiTreemapPrivate extends IHierarchyPrivate {
 }
 
 /**
- * A Weighted Voronoi Treemap series.
- *
- * NOTE: Try to avoid a big number of data items with very big value
- * differences. Better group small items into "Other" item.
+ * A weighted Voronoi treemap: nodes as polygon cells sized by value, each
+ * inside its parent's cell. Many items with very different values lay out
+ * poorly; group the small ones into an "Other" item.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/} for more info
  * @since 5.4.0
@@ -131,9 +115,7 @@ export class VoronoiTreemap extends Hierarchy {
 	public static classNames: Array<string> = Hierarchy.classNames.concat([VoronoiTreemap.className]);
 
 	/**
-	 * A list of node graphics elements in a [[VoronoiTreemap]] chart.
-	 *
-	 * @default new ListTemplate<RoundedRectangle>
+	 * List of node polygons; configure them all through `polygons.template`.
 	 */
 	public readonly polygons: ListTemplate<Polygon> = this.addDisposer(new ListTemplate(
 		Template.new({}),

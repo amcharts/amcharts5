@@ -12,19 +12,16 @@ export interface IDataSaveControlItem extends IDropdownListItem {
 
 export interface IDataSaveControlSettings extends IDropdownListControlSettings {
 	/**
-	 * If set to `true`, all changes to chart's drawings and indicators will be
-	 * automatically saved to browser local storage and restored on next load.
+	 * Saves the chart's drawings and indicators to the browser's local storage
+	 * whenever they change, and restores them on the next load.
 	 *
 	 * @default false
 	 */
 	autoSave?: boolean;
 
 	/**
-	 * A unique indentifier for local storage.
-	 *
-	 * Will try to use chart's container ID if not set.
-	 *
-	 * Consider setting it if you have multipl [[StockChart]] on the same page.
+	 * Key for the data in local storage. If not set, the page URL plus the ID
+	 * of the chart's container element is used.
 	 */
 	storageId?: string;
 }
@@ -38,8 +35,8 @@ export interface IDataSaveControlPrivate extends IDropdownListControlPrivate {
 export interface IDataSaveControlEvents extends IDropdownListControlEvents {
 
 	/**
-	 * Invoked when drawing/indicator data is serialized and saved to local
-	 * storage.
+	 * Drawings and indicators were saved to local storage. `drawings` and
+	 * `indicators` hold them as JSON.
 	 */
 	saved: {
 		drawings: string;
@@ -47,8 +44,7 @@ export interface IDataSaveControlEvents extends IDropdownListControlEvents {
 	};
 
 	/**
-	 * Invoked when drawing/indicator data is loaded from local storage and
-	 * restored on chart.
+	 * Drawings and indicators were restored from local storage.
 	 */
 	restored: {
 		drawings: string;
@@ -56,15 +52,15 @@ export interface IDataSaveControlEvents extends IDropdownListControlEvents {
 	};
 
 	/**
-	 * Invoked when local storage is cleared.
+	 * The saved drawings and indicators were removed from local storage.
 	 */
 	cleared: {};
 
 }
 
 /**
- * A control that can be used to serialize indicators and drawings, save them
- * to local storage, and restore as needed.
+ * A control that saves the chart's drawings and indicators to the browser's
+ * local storage, and restores them.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/data-save-control/} for more info
  * @since 5.7.0
@@ -151,6 +147,9 @@ export class DataSaveControl extends DropdownListControl {
 		}
 	}
 
+	/**
+	 * Saves the chart's drawings and indicators to local storage.
+	 */
 	public saveData(): void {
 		if (localStorage) {
 			const drawingControl = this._getDrawingControl();
@@ -178,6 +177,10 @@ export class DataSaveControl extends DropdownListControl {
 		}
 	}
 
+	/**
+	 * Replaces the chart's drawings and indicators with the ones saved in
+	 * local storage.
+	 */
 	public restoreData(): void {
 		if (localStorage) {
 			const stockChart = this.get("stockChart");
@@ -205,6 +208,9 @@ export class DataSaveControl extends DropdownListControl {
 		}
 	}
 
+	/**
+	 * Removes the saved drawings and indicators from local storage.
+	 */
 	public clearData(): void {
 		if (localStorage) {
 			localStorage.removeItem(this._getStorageId("drawings"));

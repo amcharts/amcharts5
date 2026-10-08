@@ -1,0 +1,8 @@
+{
+  "title": "Pulsing Last Bullet",
+  "description": "A line whose last point has a pulsing bullet, switched on for one data item with templateField and animated with the animations setting.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["line", "bullet", "animation", "templatefield"],
+  "since": "5.21.0"
+}

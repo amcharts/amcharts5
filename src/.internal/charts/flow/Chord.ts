@@ -17,7 +17,7 @@ import * as $math from "../../core/util/Math";
 export interface IChordDataItem extends IFlowDataItem {
 
 	/**
-	 * A link element.
+	 * The link element.
 	 */
 	link: ChordLink;
 
@@ -36,40 +36,39 @@ export interface IChordDataItem extends IFlowDataItem {
 export interface IChordSettings extends IFlowSettings {
 
 	/**
-	 * Angle of a gap between each node, in degrees.
+	 * Gap between adjacent nodes, in degrees.
 	 *
 	 * @default 1
 	 */
 	padAngle?: number;
 
 	/**
-	 * Radius of the diagram in percent or pixels.
-	 *
-	 * If set in percent, it will be relative to the whole area available for
-	 * the series.
+	 * Outer radius of the node ring, in pixels or percent. A percent is of
+	 * half the smaller side of the series' area, so `100%` fills it.
 	 *
 	 * @default 90%
 	 */
 	radius?: number | Percent;
 
 	/**
-	 * The thickness of node strip in pixels.
+	 * Thickness of the node ring, in pixels, measured inward from `radius`.
 	 *
 	 * @default 10
 	 */
 	nodeWidth?: number;
 
 	/**
-	 * Starting angle in degrees.
+	 * Angle where the first node starts, in degrees: `0` is at the right,
+	 * `-90` at the top. Nodes follow clockwise. Dragging a node changes it.
 	 *
 	 * @default 0
 	 */
 	startAngle?: number;
 
 	/**
-	 * How to sort nodes by their value.
+	 * How to sort nodes by their value. `"none"` keeps the order of the data.
 	 *
-	 * @default "descending"
+	 * @default "none"
 	 */
 	sort?: "ascending" | "descending" | "none"
 
@@ -82,7 +81,10 @@ export interface IChordEvents extends IFlowEvents {
 }
 
 /**
- * Regular chord series.
+ * Chord diagram: nodes as arcs around a circle, linked by ribbons. A node's
+ * arc shows its outgoing total, and a ribbon is as wide at each end as the
+ * flow out of that end, so a one-way link narrows to a point at its target.
+ * For one-way flows, see [[ChordDirected]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
  * @important
@@ -93,9 +95,7 @@ export class Chord extends Flow {
 	public static classNames: Array<string> = Flow.classNames.concat([Chord.className]);
 
 	/**
-	 * List of link elements.
-	 *
-	 * @default new ListTemplate<ChordLink>
+	 * List of link elements; configure them all through `links.template`.
 	 */
 	public readonly links: ListTemplate<ChordLink> = this.addDisposer(new ListTemplate(
 		Template.new({}),
@@ -103,9 +103,7 @@ export class Chord extends Flow {
 	));
 
 	/**
-	 * A series for all chord nodes.
-	 *
-	 * @default ChordNodes.new()
+	 * The series that holds the chord's nodes.
 	 */
 	public readonly nodes: ChordNodes = this.children.push(ChordNodes.new(this._root, {}));
 
@@ -121,7 +119,7 @@ export class Chord extends Flow {
 	protected _afterNew() {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["chord"]);
 		this.linksContainer.setAll({ x: p50, y: p50 })
-		this.bulletsContainer.setAll({ x: p50, y: p50 });
+		this.bulletsContainer._setCAll({ x: p50, y: p50 });
 		super._afterNew();
 	}
 
@@ -196,6 +194,9 @@ export class Chord extends Flow {
 			}
 			else if (sort === "descending") {
 				this._d3chord.sortGroups(descending);
+			}
+			else {
+				this._d3chord.sortGroups(null);
 			}
 /*
 			this._d3chord.sortSubgroups((a, b)=>{

@@ -5,13 +5,14 @@ import * as $draw from "../util/Draw";
 export interface ILineSettings extends IGraphicsSettings {
 
 	/**
-	 * A list of [[IPoint]] (x/y coordinates) points for the line.
+	 * Points the line goes through, in pixels from the line's position.
 	 */
 	points?: Array<IPoint>;
 
 	/**
-	 * A list of [[IPoint]] arrays for different segments of the line.
-	 * 
+	 * Separate pieces of the line, used when `points` is not set. Each piece is
+	 * a list of point arrays drawn as one continuous stroke.
+	 *
 	 * @since 5.1.4
 	 */
 	segments?: Array<Array<Array<IPoint>>>;
@@ -21,7 +22,9 @@ export interface ILinePrivate extends IGraphicsPrivate {
 }
 
 /**
- * Draws a line.
+ * Draws a line through `points` or `segments`. With neither, it draws a
+ * straight line from its top-left corner to its bottom-right one, at its
+ * `width` and `height`.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
  * @important

@@ -14,7 +14,7 @@ export interface IStockPanelSettings extends IXYChartSettings {
 export interface IStockPanelPrivate extends IXYChartPrivate {
 
 	/**
-	 * A target [[StockChart]].
+	 * The [[StockChart]] the panel belongs to.
 	 */
 	stockChart: StockChart;
 
@@ -22,8 +22,8 @@ export interface IStockPanelPrivate extends IXYChartPrivate {
 
 export interface IStockPanelEvents extends IXYChartEvents {
 	/**
-	 * Kicks in when panel is moved up or down.
-	 * 
+	 * The panel was moved up or down.
+	 *
 	 * @since 5.9.2
 	 */
 	moved: {
@@ -32,21 +32,21 @@ export interface IStockPanelEvents extends IXYChartEvents {
 	};
 
 	/**
-	 * Kicks in when panel is closed (removed).
+	 * The panel was closed, just before it is removed from the chart.
 	 *
 	 * @since 5.9.2
 	 */
 	closed: {};
 
 	/**
-	 * Kicks in when panel is expanded.
+	 * The panel was expanded to fill the chart, hiding the other panels.
 	 *
 	 * @since 5.9.2
 	 */
 	expanded: {};
 
 	/**
-	 * Kicks in when panel is collapsed (returns to normal size).
+	 * The panels returned to normal, showing the hidden ones again.
 	 *
 	 * @since 5.9.2
 	 */
@@ -54,7 +54,7 @@ export interface IStockPanelEvents extends IXYChartEvents {
 }
 
 /**
- * A panel instance for the [[StockChart]].
+ * A panel of a [[StockChart]]: an [[XYChart]] stacked with the other panels.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/stock/panels/} for more info
  * @important
@@ -68,19 +68,20 @@ export class StockPanel extends XYChart {
 	declare public _events: IStockPanelEvents;
 
 	/**
-	 * An instance of [[PanelControls]].
+	 * The panel's buttons for moving, expanding and closing it.
 	 */
 	public panelControls!: PanelControls;
 
 	/**
-	 * Panel resize grip element.
+	 * Grip for dragging the border with the panel above, to resize both.
 	 *
 	 * @since 5.4.7
 	 */
 	public panelResizer?: Rectangle;
 
 	/**
-	 * A list of drawings on panel.
+	 * Drawing series of the panel. Series added here are added to its
+	 * `series` too.
 	 *
 	 */
 	public readonly drawings: ListAutoDispose<XYSeries> = new ListAutoDispose();
@@ -108,7 +109,7 @@ export class StockPanel extends XYChart {
 	}
 
 	/**
-	 * Moves panel up.
+	 * Moves the panel one place up.
 	 */
 	public moveUp(): void {
 		const stockChart = this.getPrivate("stockChart");
@@ -132,7 +133,7 @@ export class StockPanel extends XYChart {
 	}
 
 	/**
-	 * Moves panel down.
+	 * Moves the panel one place down.
 	 */
 	public moveDown(): void {
 		const stockChart = this.getPrivate("stockChart");
@@ -155,7 +156,7 @@ export class StockPanel extends XYChart {
 	}
 
 	/**
-	 * Closes panel.
+	 * Closes the panel, removing it from the chart.
 	 */
 	public close(): void {
 		const stockChart = this.getPrivate("stockChart");
@@ -171,7 +172,8 @@ export class StockPanel extends XYChart {
 	}
 
 	/**
-	 * Toggles "full screen" mode of the panel on and off.
+	 * Expands the panel to fill the chart, hiding the other panels. If any
+	 * panels are hidden, shows them again instead.
 	 */
 	public expand(): void {
 		const stockChart = this.getPrivate("stockChart");

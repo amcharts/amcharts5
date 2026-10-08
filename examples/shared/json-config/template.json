@@ -1,0 +1,8 @@
+{
+  "title": "Chart from a JSON Config",
+  "description": "A pie chart built by passing a JSON config to JsonParser, with refs for its data and series.",
+  "category": "other",
+  "tier": "technique",
+  "tags": ["json", "parser", "config", "refs"],
+  "extraScriptImports": ["../../percent.js"]
+}

@@ -1,0 +1,50 @@
+{
+  "type": "SlicedChart",
+  "settings": {
+    "layout": { "type": "VerticalLayout" },
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
+  "properties": {
+    "series": ["#series-0"]
+  },
+  "children": [
+    {
+      "type": "Legend",
+      "settings": {
+        "centerX": { "type": "Percent", "value": 50 },
+        "x": { "type": "Percent", "value": 50 },
+        "marginTop": 15,
+        "marginBottom": 15
+      },
+      "properties": { "data": "#series-0.dataItems" }
+    }
+  ],
+  "refs": [
+    {
+      "data-0": [
+        { "value": 10, "category": "One" },
+        { "value": 9, "category": "Two" },
+        { "value": 6, "category": "Three" },
+        { "value": 5, "category": "Four" },
+        { "value": 4, "category": "Five" },
+        { "value": 3, "category": "Six" },
+        { "value": 1, "category": "Seven" }
+      ]
+    },
+    {
+      "series-0": {
+        "type": "FunnelSeries",
+        "settings": {
+          "alignLabels": false,
+          "orientation": "vertical",
+          "valueField": "value",
+          "categoryField": "category",
+          "autoAppear": true
+        },
+        "properties": { "data": "#data-0" }
+      }
+    }
+  ]
+}

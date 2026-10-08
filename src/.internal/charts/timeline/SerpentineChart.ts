@@ -13,35 +13,39 @@ import * as $utils from "../../core/util/Utils";
 export interface ISerpentineChartSettings extends ICurveChartSettings {
 
 	/**
-	 * Orientation of the serpentine.
+	 * Which way the serpentine winds: `"vertical"` stacks horizontal runs from
+	 * top to bottom, `"horizontal"` places vertical runs from left to right.
 	 *
 	 * @default "vertical"
 	 */
 	orientation?: "horizontal" | "vertical";
 
 	/**
-	 * Number of levels in the chart.
+	 * Number of runs, joined by half-circle turns.
 	 *
 	 * @default 3
 	 */
 	levelCount?: number;
 
 	/**
-	 * Radius of the Y-axis in `Percent`.
+	 * Length of the Y axis, as a percent of the distance between neighboring
+	 * runs.
 	 *
 	 * @default 50%
 	 */
 	yAxisRadius?: Percent;
 
 	/**
-	 * Relative location (0-1) of the start postion.
+	 * How far into the first run the line starts: `0` uses the whole run, `1`
+	 * none of it.
 	 *
 	 * @default 0
 	 */
 	startLocation?: number;
 
 	/**
-	 * Relative location (0-1) of the end position.
+	 * How far along the last run the line goes: `0` none of it, `1` the whole
+	 * run.
 	 *
 	 * @default 1
 	 */
@@ -53,13 +57,10 @@ export interface ISerpentineChartPrivate extends ICurveChartPrivate {
 }
 
 /**
- * A Serpentine chart.
+ * A timeline that winds back and forth in runs joined by half-circle turns.
+ * It builds the X axis line itself, so the X renderer needs no `points`.
  *
- * For this chart to work, it needs curve points provided via renderer of
- * its X-axis.
- * 
- * Note: it is an experimental chart type and does not support all the
- * functionality of the [[XYChart]].
+ * It is experimental and does not support everything an [[XYChart]] does.
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
  * @since 5.12.0

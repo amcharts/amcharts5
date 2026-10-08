@@ -1,0 +1,8 @@
+{
+  "title": "Globe with Raised Arcs",
+  "description": "Flight routes between cities on a globe, drawn as lines that rise above the surface in an arc with the altitude setting.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["globe", "map lines", "altitude", "arcs", "routes"],
+  "since": "5.21.0"
+}

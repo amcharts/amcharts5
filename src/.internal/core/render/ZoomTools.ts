@@ -13,7 +13,8 @@ export interface IZoomable {
 export interface IZoomToolsSettings extends IContainerSettings {
 
 	/**
-	 * A target element that zoom tools will control, e.g. [[ZoomableContainer]].
+	 * The element the buttons zoom, such as a [[ZoomableContainer]]: anything
+	 * with `zoomIn()`, `zoomOut()` and `goHome()` methods.
 	 */
 	target?: IZoomable;
 
@@ -26,7 +27,7 @@ export interface IZoomToolsEvents extends IContainerEvents {
 }
 
 /**
- * A tool that displays button for zoomable targets.
+ * Home, zoom-in and zoom-out buttons for a zoomable `target`.
  *
  * @since 5.8.0
  * @important
@@ -38,17 +39,17 @@ export class ZoomTools extends Container {
 	declare public _events: IContainerEvents;
 
 	/**
-	 * A [[Button]] for home.
+	 * The [[Button]] that takes the target back to its home view.
 	 */
 	public readonly homeButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["home"] })._markC("width", "height", "themeTags"));
 
 	/**
-	 * A [[Button]] for zoom in.
+	 * The [[Button]] that zooms in.
 	 */
 	public readonly plusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["plus"] })._markC("width", "height", "themeTags"));
 
 	/**
-	 * A [[Button]] for zoom out.
+	 * The [[Button]] that zooms out.
 	 */
 	public readonly minusButton: Button = this.children.push(Button.new(this._root, { width: 35, height: 35, themeTags: ["minus"] })._markC("width", "height", "themeTags"));
 
@@ -88,7 +89,15 @@ export class ZoomTools extends Container {
 		if (this.isDirty("target")) {
 			const target = this.get("target");
 
-			const previous = this._prevSettings.target;
+			if (this._disposer) {
+				this._disposer.dispose();
+				this._disposer = undefined;
+			}
+			if (this._targetDisposer) {
+				this._targetDisposer.dispose();
+				this._targetDisposer = undefined;
+			}
+
 			if (target) {
 				if (target instanceof ZoomableContainer) {
 					this._targetDisposer = this.addDisposer(target.contents.on("scale", (scale) => {
@@ -107,7 +116,7 @@ export class ZoomTools extends Container {
 						}
 					}))
 					this.root.events.once("frameended", () => {
-						if (target.get("scale") == target.get("minZoomLevel")) {
+						if (target.contents.get("scale", 1) == target.get("minZoomLevel")) {
 							this.minusButton._setC("disabled", true)
 						}
 					})
@@ -123,15 +132,6 @@ export class ZoomTools extends Container {
 					this.homeButton.events.on("click", () => {
 						target.goHome()
 					})])
-			}
-
-			if (previous) {
-				if (this._disposer) {
-					this._disposer.dispose();
-				}
-				if (this._targetDisposer) {
-					this._targetDisposer.dispose();
-				}
 			}
 		}
 	}

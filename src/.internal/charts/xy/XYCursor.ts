@@ -23,21 +23,20 @@ import type { IPointerEvent } from "../../core/render/backend/Renderer";
 export interface IXYCursorSettings extends IContainerSettings {
 
 	/**
-	 * Cursor's X axis.
-	 *
-	 * If set, cursor will snap to that axis' cells.
+	 * X axis for the vertical line to snap to. When that axis has a `tooltip`,
+	 * the line follows it from cell to cell, such as from category to category.
 	 */
 	xAxis?: Axis<AxisRenderer>;
 
 	/**
-	 * Cursor's Y axis.
-	 *
-	 * If set, cursor will snap to that axis' cells.
+	 * Y axis for the horizontal line to snap to. When that axis has a
+	 * `tooltip`, the line follows it from cell to cell.
 	 */
 	yAxis?: Axis<AxisRenderer>;
 
 	/**
-	 * What should cursor do when dragged across plot area.
+	 * What dragging across the plot area does: zoom or select along X, Y or
+	 * both.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Behavior} for more info
 	 * @default "none"
@@ -45,46 +44,33 @@ export interface IXYCursorSettings extends IContainerSettings {
 	behavior?: "zoomX" | "zoomY" | "zoomXY" | "selectX" | "selectY" | "selectXY" | "none";
 
 	/**
-	 * Cursor's horizontal position relative to plot area.
-	 *
-	 * If this setting is set, cursor will not react to mouse/touch and will just
-	 * sit at specified position until `positionX` is reset to `undefined`.
-	 *
-	 * `0` - left, `1` - right.
+	 * Pins the cursor at this horizontal position in the plot area: `0` is the
+	 * left edge, `1` the right. While set, the cursor ignores the pointer.
 	 */
 	positionX?: number;
 
 	/**
-	 * Cursor's vertical position relative to plot area.
-	 *
-	 * If this setting is set, cursor will not react to mouse/touch and will just
-	 * sit at specified position until `positionY` is reset to `undefined`.
-	 *
-	 * `0` - left, `1` - right.
+	 * Pins the cursor at this vertical position in the plot area: `0` is the
+	 * top edge, `1` the bottom. While set, the cursor ignores the pointer.
 	 */
 	positionY?: number;
 
 	/**
-	 * If set to `true`, cursor will not be hidden when mouse cursor moves out
-	 * of the plot area.
+	 * Keeps the cursor visible when the pointer leaves the plot area.
 	 *
 	 * @default false
 	 */
 	alwaysShow?: boolean;
 
 	/**
-	 * A list of series to snap cursor to.
-	 *
-	 * If set, the cursor will always snap to the closest data item of listed
-	 * series.
+	 * Series to snap to: the cursor jumps to the nearest data item among them.
 	 */
 	snapToSeries?: Array<XYSeries>;
 
 	/**
-	 * Defines in which direction to look when searching for the nearest data
-	 * item to snap to.
-	 *
-	 * Possible values: `"xy"` (default), `"x"`, `"y"`, `"x!"`, `"y!"`.
+	 * How `snapToSeries` measures "nearest": `"xy"` by straight distance,
+	 * `"x"` or `"y"` along one direction only. `"x!"` and `"y!"` do the same,
+	 * but only among the items under the pointer, one per series.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#snapping-to-series} for more info
 	 * @since 5.0.6
@@ -93,16 +79,11 @@ export interface IXYCursorSettings extends IContainerSettings {
 	snapToSeriesBy?: "xy" | "x" | "y" | "x!" | "y!";
 
 	/**
-	 * An array of other [[XYCursor]] objects to sync this cursor with.
+	 * Cursors of other charts that move along with this one.
 	 *
-	 * If set will automatically move synced cursors to the same position within
-	 * their respective axes as the this cursor assumin same XY coordinates of
-	 * the pointer.
-	 *
-	 * NOTE: Syncing is performed using actual X/Y coordinates of the point of
-	 * mouse cursor's position or touch. It means that they will not sync by axis
-	 * positions, but rather by screen coordinates. For example vertical lines
-	 * will not sync across horizontally laid out charts, and vice versa.
+	 * They sync by position on the page, not by axis value, so vertical lines
+	 * follow each other only between charts stacked one above another, and
+	 * horizontal lines only between charts side by side.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors} for more info
 	 * @since 5.1.4
@@ -110,10 +91,8 @@ export interface IXYCursorSettings extends IContainerSettings {
 	syncWith?: Array<XYCursor>;
 
 	/**
-	 * Minimum distance in pixels between down and up points.
-	 *
-	 * If a distance is less than the value of `moveThreshold`, the zoom or
-	 * selection won't happen.
+	 * How far in pixels the pointer must move between press and release for
+	 * a drag to zoom or select. A shorter move counts as a click.
 	 *
 	 * @since 5.2.20
 	 * @default 1
@@ -121,17 +100,9 @@ export interface IXYCursorSettings extends IContainerSettings {
 	moveThreshold?: number
 
 	/**
-	 * How far (in pixels) outside the plot area a press can start and still
-	 * begin a zoom/selection, when `behavior` is set to a zoom or select mode.
-	 *
-	 * Makes it easier to start selecting near the edges of the plot area. The
-	 * selection still starts on the edge of the plot area (the press point is
-	 * clamped into it). A value of `0` (default) disables this and keeps the
-	 * original behavior: a selection can only start within the plot area.
-	 *
-	 * The tolerance area is not limited to the chart container. A plain click
-	 * within it does not start a selection - it dispatches `"selectcancelled"`,
-	 * same as a click within the plot area.
+	 * How far in pixels outside the plot area a press may start and still begin
+	 * a zoom or selection, which then starts at the plot area's edge. Makes it
+	 * easier to select from the very edge.
 	 *
 	 * @since 5.20.0
 	 * @default 0
@@ -159,17 +130,17 @@ export interface IXYCursorPrivate extends IContainerPrivate {
 	positionY?: number;
 
 	/**
-	 * Horizontal cursor position on the moment when selection started.
+	 * Horizontal position (0-1) where the current selection started.
 	 */
 	downPositionX?: number;
 
 	/**
-	 * Vertical cursor position on the moment when selection started.
+	 * Vertical position (0-1) where the current selection started.
 	 */
 	downPositionY?: number;
 
 	/**
-	 * Last global point to which cursor moved
+	 * The last point the cursor moved to, relative to the root.
 	 */
 	lastPoint?: IPoint;
 }
@@ -177,9 +148,8 @@ export interface IXYCursorPrivate extends IContainerPrivate {
 export interface IXYCursorEvents extends IContainerEvents {
 
 	/**
-	 * Kicks in when cursor selection ends.
-	 *
-	 * Only when `behavior` is set.
+	 * A drag across the plot area ended, zooming or selecting (`behavior` is
+	 * set).
 	 */
 	selectended: {
 		originalEvent: IPointerEvent,
@@ -187,9 +157,8 @@ export interface IXYCursorEvents extends IContainerEvents {
 	};
 
 	/**
-	 * Kicks in when cursor selection starts.
-	 *
-	 * Only when `behavior` is set.
+	 * The pointer was pressed on the plot area, starting a zoom or selection
+	 * (`behavior` is set).
 	 */
 	selectstarted: {
 		originalEvent: IPointerEvent,
@@ -197,7 +166,7 @@ export interface IXYCursorEvents extends IContainerEvents {
 	};
 
 	/**
-	 * Kicks in when cursor's position over plot area changes.
+	 * The cursor moved over the plot area.
 	 */
 	cursormoved: {
 		point: IPoint,
@@ -206,15 +175,15 @@ export interface IXYCursorEvents extends IContainerEvents {
 	};
 
 	/**
-	 * Kicks in when cursor's is hidden when user rolls-out of the plot area
+	 * The cursor was hidden as the pointer left the plot area.
 	 */
 	cursorhidden: {
 		target: XYCursor
 	};
 
 	/**
-	 * Invoked if pointer is pressed down on a plot area and released without
-	 * moving (only when behavior is `"selectX"`).
+	 * A press on the plot area was released without moving past
+	 * `moveThreshold`, so no zoom or selection happened (`behavior` is set).
 	 *
 	 * @since 5.4.7
 	 */
@@ -226,7 +195,8 @@ export interface IXYCursorEvents extends IContainerEvents {
 }
 
 /**
- * Creates a chart cursor for an [[XYChart]].
+ * Crosshair lines over an [[XYChart]] that follow the pointer and show the
+ * axis and series tooltips. Dragging can zoom or select (`behavior`).
  *
  * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/} for more info
  * @important
@@ -242,27 +212,22 @@ export class XYCursor extends Container {
 	protected _alwaysShow: boolean = false;
 
 	/**
-	 * A [[Grid]] elment that used for horizontal line of the cursor crosshair.
-	 *
-	 * @default Grid.new()
+	 * The crosshair's vertical line, which follows the pointer along X.
 	 */
 	public readonly lineX: Grid = this.children.push(Grid.new(this._root, {
 		themeTags: ["x"]
 	}));
 
 	/**
-	 * A [[Grid]] elment that used for horizontal line of the cursor crosshair.
-	 *
-	 * @default Grid.new()
+	 * The crosshair's horizontal line, which follows the pointer along Y.
 	 */
 	public readonly lineY: Grid = this.children.push(Grid.new(this._root, {
 		themeTags: ["y"]
 	}));
 
 	/**
-	 * An element that represents current selection.
-	 *
-	 * @default Graphics.new()
+	 * The shaded area drawn while dragging. With a select `behavior`, it stays
+	 * after the release.
 	 */
 	public readonly selection: Graphics = this.children.push(Graphics.new(this._root, {
 		themeTags: ["selection", "cursor"], layer: 30
@@ -276,7 +241,7 @@ export class XYCursor extends Container {
 	protected _tooltipY: boolean = false;
 
 	/**
-	 * A chart cursor is attached to.
+	 * The chart the cursor belongs to.
 	 */
 	public chart: XYChart | undefined;
 
@@ -509,6 +474,10 @@ export class XYCursor extends Container {
 		})
 	}
 
+	/**
+	 * Places the cursor again at its last point, after the chart under it has
+	 * changed. A cursor with `alwaysShow` goes to `positionX` and `positionY`.
+	 */
 	public updateCursor() {
 		if (this.get("alwaysShow")) {
 			this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
@@ -753,13 +722,11 @@ export class XYCursor extends Container {
 	}
 
 	/**
-	 * Moves the cursor to X/Y coordinates within chart container (`point`).
+	 * Moves the cursor to a point, as if the pointer were there.
 	 *
-	 * If `skipEvent` parameter is set to `true`, the move will not invoke
-	 * the `"cursormoved"` event.
-	 *
-	 * @param  point      X/Y to move cursor to
-	 * @param  skipEvent  Do not fire "cursormoved" event
+	 * @param  point          Point relative to the root; the last point if not given
+	 * @param  skipEvent      Do not dispatch `"cursormoved"`
+	 * @param  originalEvent  The pointer event behind the move, passed on with `"cursormoved"`
 	 */
 	public handleMove(point?: IPoint, skipEvent?: boolean, originalEvent?: IPointerEvent) {
 		if (!point) {

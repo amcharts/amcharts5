@@ -21,7 +21,7 @@ export type Dirty<A> = { [K in keyof A]?: boolean };
 
 
 /**
- * Allows to dynamically modify setting value of its target element.
+ * Functions that modify an element's setting values each time they are read.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/adapters/} for more info
  */
@@ -35,9 +35,13 @@ export class Adapters<E extends Settings> {
 	}
 
 	/**
-	 * Add a function (`callback`) that will modify value for setting `key`.
+	 * Adds a function that modifies the value of setting `key` each time it is
+	 * read.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/adapters/} for more info
+	 * @param   key       Setting key
+	 * @param   callback  Takes the value and returns the modified one
+	 * @return            Disposer that removes the adapter
 	 */
 	public add<Key extends keyof E["_settings"]>(key: Key, callback: (value: E["_settings"][Key], target: E, key: Key) => E["_settings"][Key]): IDisposer {
 		let callbacks = this._callbacks[key];
@@ -58,9 +62,10 @@ export class Adapters<E extends Settings> {
 	}
 
 	/**
-	 * Removes all adapters for the specific key.
+	 * Removes all adapters for setting `key`.
 	 *
 	 * @since 5.1.0
+	 * @param  key  Setting key
 	 */
 	public remove<Key extends keyof E["_settings"]>(key: Key) {
 		const callbacks = this._callbacks[key];
@@ -75,9 +80,10 @@ export class Adapters<E extends Settings> {
 	}
 
 	/**
-	 * Enables (previously disabled) adapters for specific key.
+	 * Turns the adapters for setting `key` back on after `disable()`.
 	 *
 	 * @since 5.1.0
+	 * @param  key  Setting key
 	 */
 	public enable<Key extends keyof E["_settings"]>(key: Key) {
 		if (this._disabled[key]) {
@@ -87,9 +93,10 @@ export class Adapters<E extends Settings> {
 	}
 
 	/**
-	 * Disables all adapters for specific key.
+	 * Turns off all adapters for setting `key` without removing them.
 	 *
 	 * @since 5.1.0
+	 * @param  key  Setting key
 	 */
 	public disable<Key extends keyof E["_settings"]>(key: Key) {
 		if (!this._disabled[key]) {
@@ -120,7 +127,8 @@ export class Adapters<E extends Settings> {
 export interface IEntitySettings {
 
 	/**
-	 * If set to `true` the themes will be ignored when applying settings.
+	 * Ignores themes: no theme rule applies to the element, not even one of the
+	 * default theme.
 	 *
 	 * @default false
 	 * @since 5.15.6
@@ -128,53 +136,50 @@ export interface IEntitySettings {
 	ignoreThemes?: boolean;
 
 	/**
-	 * Tags which can be used by the theme rules.
+	 * Tags that theme rules can target. They also count for the element's
+	 * children, so a rule can match a child by a tag of its parent.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
 	 */
 	themeTags?: Array<string>;
 
 	/**
-	 * Tags which can be used by the theme rules.
-	 *
-	 * These tags only apply to this object, not any children.
+	 * Tags that theme rules can target, like `themeTags`, but only for this
+	 * element, not its children.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
 	 */
 	themeTagsSelf?: Array<string>;
 
 	/**
-	 * A list of themes applied to the element.
+	 * Themes applied to the element and everything inside it.
 	 */
 	themes?: Array<Theme>;
 
 
 	/**
-	 * Duration of transition from one state to another.
+	 * How long, in milliseconds, a switch from one state to another animates.
+	 * `0` switches at once.
 	 *
 	 * @default 0
 	 */
 	stateAnimationDuration?:number;
 
 	/**
-	 * Easing of transition from one state to another.
+	 * Easing of the animated switch from one state to another.
 	 *
 	 * @default out(cubic)
 	 */
 	stateAnimationEasing?:$ease.Easing;
 
 	/**
-	 * A custom string ID for the element.
-	 *
-	 * If set, element can be looked up via `root.entitiesById`.
-	 *
-	 * Will raise error if an element with the same ID already exists.
+	 * A unique ID for looking the element up in `root.entitiesById`. Setting
+	 * an ID that another element already has throws an error.
 	 */
 	id?: string;
 
 	/**
-	 * A storage for any custom user data that needs to be associated with the
-	 * element.
+	 * Any data of your own to keep with the element.
 	 */
 	userData?: any;
 
@@ -195,7 +200,7 @@ export interface IEntitySettings {
 	 * ]);
 	 * ```
 	 *
-	 * @since 5.21.0
+	 * @since 5.20.8
 	 */
 	animations?: Array<IDeclaredAnimation>;
 
@@ -204,7 +209,7 @@ export interface IEntitySettings {
 /**
  * An animation described as data, for the `animations` setting.
  *
- * @since 5.21.0
+ * @since 5.20.8
  */
 export interface IDeclaredAnimation {
 
@@ -287,51 +292,50 @@ export interface IEntityEvents {
 export interface AnimationOptions<Key, Value> {
 
 	/**
-	 * A setting key to animate value for.
+	 * The setting to animate.
 	 */
 	key: Key,
 
 	/**
-	 * Initial value to animate from. If not set, will use current value.
+	 * Value to start from. The current value if not set.
 	 */
 	from?: Value;
 
 	/**
-	 * Target value to animate to.
+	 * Value to animate to.
 	 */
 	to: Value;
 
 	/**
-	 * Animation duration in milliseconds.
+	 * Duration in milliseconds. `0` sets the value at once.
 	 */
 	duration: number;
 
 	/**
-	 * Easing function. Defaults to linear.
+	 * Easing function. Linear if not set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
 	 */
 	easing?: $ease.Easing;
 
 	/**
-	 * How many times to play the animation. Defaults to 1.
+	 * How many times to play the animation; `Infinity` plays it forever.
+	 * Plays once if not set.
 	 */
 	loops?: number;
 }
 
 export interface IAnimationEvents {
 	/**
-	 * Invoked when animation was stopped, which happens in these situations:
-	 * 1. When the animation reached the end.
-	 * 2. When the `stop()` method is called.
-	 * 3. When a new animation starts for the same key.
-	 * 4. When calling `set` for the same key.
+	 * The animation stopped: it reached the end, `stop()` was called, or the
+	 * same setting was set, removed or animated again.
 	 */
 	stopped: {};
 }
 
 /**
- * Animation object.
+ * An animation of a setting, returned by `animate()`. It can be paused,
+ * resumed, stopped or waited for.
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/} for more info
  */
@@ -349,6 +353,9 @@ export class Animation<Value> {
 	public _stopped: boolean = false;
 	public _playing: boolean = true;
 
+	// Started by an `animations` setting, not in code
+	public _declared: boolean = false;
+
 	public events: EventDispatcher<Events<this, IAnimationEvents>> = new EventDispatcher();
 
 	constructor(animation: IStartAnimation, from: Value, to: Value, duration: number, easing: $ease.Easing, loops: number, startingTime: number | null) {
@@ -362,6 +369,9 @@ export class Animation<Value> {
 		this._oldTime = startingTime;
 	}
 
+	/**
+	 * The value the animation goes to.
+	 */
 	public get to() {
 		return this._to;
 	}
@@ -389,18 +399,31 @@ export class Animation<Value> {
 		return this._loops;
 	}
 
+	/**
+	 * The value the animation starts from.
+	 */
 	public get from() {
 		return this._from;
 	}
 
+	/**
+	 * `true` while the animation plays, `false` when it is paused or stopped.
+	 */
 	public get playing() {
 		return this._playing;
 	}
 
+	/**
+	 * `true` once the animation has stopped. A stopped animation can't be
+	 * played again.
+	 */
 	public get stopped() {
 		return this._stopped;
 	}
 
+	/**
+	 * Stops the animation, leaving the setting at its current value.
+	 */
 	public stop(): void {
 		if (!this._stopped) {
 			this._stopped = true;
@@ -415,11 +438,17 @@ export class Animation<Value> {
 		}
 	}
 
+	/**
+	 * Pauses the animation; `play()` resumes it.
+	 */
 	public pause(): void {
 		this._playing = false;
 		this._oldTime = null;
 	}
 
+	/**
+	 * Resumes a paused animation.
+	 */
 	public play(): void {
 		if (!this._stopped && !this._playing) {
 			this._playing = true;
@@ -427,10 +456,18 @@ export class Animation<Value> {
 		}
 	}
 
+	/**
+	 * How far the current loop has played, from `0` to `1`, before easing.
+	 */
 	public get percentage(): Time {
 		return this._time / this._duration;
 	}
 
+	/**
+	 * Returns a promise that resolves when the animation stops.
+	 *
+	 * @return  Promise
+	 */
 	public waitForStop(): Promise<void> {
 		return new Promise((resolve, _reject) => {
 			if (this._stopped) {
@@ -502,18 +539,27 @@ interface IStartAnimation {
  */
 let counter = 0;
 
+/**
+ * The newest `uid` given out: anything made after this call has a higher one.
+ *
+ * @ignore
+ */
+export function _lastUid(): number {
+	return counter;
+}
+
 // How many elements are being built right now
 let constructing = 0;
 
 /**
- * Base class for [[Entity]] objects that support Settings.
+ * Base class for objects with settings, such as [[Entity]].
  *
  * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
  */
 export abstract class Settings implements IDisposer, IAnimation, IStartAnimation {
 
 	/**
-	 * Unique ID.
+	 * A unique number, given to each object as it is created.
 	 */
 	public uid: number = ++counter;
 
@@ -559,7 +605,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	protected _animationWriting: number = 0;
 
 	/**
-	 * If this is set to `false` then disposing does nothing, it's a no-op.
+	 * Set to `false` to make `dispose()` do nothing.
 	 */
 	public enableDispose: boolean = true;
 
@@ -675,8 +721,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a callback function to invoke when specific key of settings changes
-	 * or is set.
+	 * Calls `callback` each time the value of setting `key` changes or is
+	 * removed. Setting the same value again does not call it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Settings key
@@ -702,10 +748,11 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Removes a callback for when value of a setting changes.
+	 * Removes a callback added with `on()`. Without `callback`, removes all of
+	 * them for `key`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
-	 * @param   key       Private settings key
+	 * @param   key       Settings key
 	 * @param   callback  Callback
 	 * @since 5.9.2
 	 */
@@ -720,8 +767,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a callback function to invoke the first time specific key of settings
-	 * changes or is set. The callback is automatically removed after it fires once.
+	 * Like `on()`, but the callback is removed after it is called once.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Settings key
@@ -793,9 +839,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a debounced callback function to invoke when specific key of settings
-	 * changes or is set. The callback fires only once even if the setting is changed
-	 * multiple times within the debounce delay.
+	 * Like `on()`, but waits until setting `key` has not changed for
+	 * `debounceDelay` milliseconds, then calls `callback` once with the latest
+	 * value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key            Settings key
@@ -808,7 +854,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Removes a debounced callback for when value of a setting changes.
+	 * Removes a callback added with `onDebounced()`. Without `callback`,
+	 * removes all of them for `key`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Settings key
@@ -819,9 +866,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a debounced callback function to invoke the first time specific key of
-	 * settings changes or is set. The callback fires only once, after which it is
-	 * automatically removed.
+	 * Like `onDebounced()`, but the callback is removed after it is called once.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key            Settings key
@@ -840,8 +885,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a callback function to invoke when specific key of private settings
-	 * changes or is set.
+	 * Calls `callback` each time the value of private setting `key` changes.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Private settings key
@@ -867,7 +911,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Removes a callback for when value of a private setting changes.
+	 * Removes a callback added with `onPrivate()`. Without `callback`, removes
+	 * all of them for `key`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Private settings key
@@ -885,9 +930,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a debounced callback function to invoke when specific key of private
-	 * settings changes or is set. The callback fires only once even if the setting
-	 * is changed multiple times within the debounce delay.
+	 * Like `onPrivate()`, but waits until private setting `key` has not changed
+	 * for `debounceDelay` milliseconds, then calls `callback` once with the
+	 * latest value.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key            Private settings key
@@ -900,7 +945,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Removes a debounced callback for when value of a private setting changes.
+	 * Removes a callback added with `onPrivateDebounced()`. Without `callback`,
+	 * removes all of them for `key`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Settings_value_change} for more info
 	 * @param   key       Private settings key
@@ -935,7 +981,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Returns `true` if the setting exists.
+	 * Returns `true` if setting `key` is set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key        Settings key
@@ -946,13 +992,11 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Returns settings value for the specified `key`.
-	 *
-	 * If there is no value, `fallback` is returned instead (if set).
+	 * Returns the value of setting `key`, or `fallback` if it is not set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
-	 * @param   key       Settings value
-	 * @param   callback  Fallback value
+	 * @param   key       Settings key
+	 * @param   fallback  Value to return if the setting is not set
 	 * @return  {any}     Value
 	 */
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
@@ -1059,7 +1103,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets a setting `value` for the specified `key`, and returns the same `value`.
+	 * Sets setting `key` to `value` and returns `value`. Stops any animation
+	 * of that setting.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
@@ -1073,7 +1118,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Removes a setting value for the specified `key`;
+	 * Removes the value of setting `key`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
@@ -1092,7 +1137,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Removes all keys;
+	 * Removes all settings, as `remove()` does for each one.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 */
@@ -1113,9 +1158,13 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key): this["_privateSettings"][Key];
 
 	/**
-	 * Returns a value of a private setting.
+	 * Returns the value of private setting `key`: a value the element works
+	 * out itself, such as its size. `fallback` if it is not set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/#Private_settings} for more info
+	 * @param   key       Private setting key
+	 * @param   fallback  Value to return if the setting is not set
+	 * @return            Value
 	 */
 	public getPrivate<Key extends keyof this["_privateSettings"]>(key: Key, fallback?: any): any {
 		const value = (<any>this._privateSettings)[key];
@@ -1197,9 +1246,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Sets multiple settings at once.
-	 *
-	 * `settings` must be an object with key: value pairs.
+	 * Sets several settings at once, from an object of key-value pairs.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param settings Settings
@@ -1210,13 +1257,6 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		});
 	}
 
-	/**
-	 * Animates setting values from current/start values to new ones.
-	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animating_settings} for more info
-	 * @param   options  Animation options
-	 * @return           Animation object
-	 */
 	/**
 	 * Writes a value an animation arrived at.
 	 *
@@ -1239,6 +1279,16 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		}
 	}
 
+	/**
+	 * Animates a setting from its current value (or `from`) to `to`. The
+	 * setting jumps to `from` at once. With `duration` `0`, or no value to
+	 * start from, it is set to `to` at once and the returned animation is
+	 * already stopped.
+	 *
+	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animating_settings} for more info
+	 * @param   options  Animation options
+	 * @return           Animation object
+	 */
 	public animate<Key extends keyof this["_settings"]>(options: AnimationOptions<Key, this["_settings"][Key]>): Animation<this["_settings"][Key]> {
 		const key = options.key;
 		const to = options.to;
@@ -1309,7 +1359,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	protected _dispose() {}
 
 	/**
-	 * Returns `true` if this element is disposed.
+	 * Returns `true` if the object has been disposed.
 	 *
 	 * @return Disposed
 	 */
@@ -1318,7 +1368,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	}
 
 	/**
-	 * Disposes this object.
+	 * Disposes the object, freeing everything it holds. A disposed object
+	 * can't be used again.
 	 */
 	public dispose() {
 		if (this.enableDispose && !this._disposed) {
@@ -1329,7 +1380,8 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 }
 
 /**
- * Base class.
+ * Base class of amCharts objects with settings, states, adapters and events:
+ * elements, series, charts, formatters and more.
  *
  * @important
  */
@@ -1383,6 +1435,13 @@ export class Entity extends Settings implements IDisposer {
 	public _userThemeTags: Array<string> | undefined;
 
 	/**
+	 * Made by the library while building another element, not by the user.
+	 *
+	 * @ignore
+	 */
+	public _builtIn: boolean = false;
+
+	/**
 	 * IMPORTANT! Do not instantiate this class via `new Class()` syntax.
 	 *
 	 * Use static method `Class.new()` instead.
@@ -1404,20 +1463,23 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * Use this method to create an instance of this class.
+	 * Creates an instance of the class. Use it instead of `new Class()`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
 	 * @param   root      Root element
 	 * @param   settings  Settings
-	 * @param   template  Template
+	 * @param   template  Template to apply to the instance
 	 * @return            Instantiated object
 	 */
 	static new<C extends typeof Entity, T extends InstanceType<C>>(this: C, root: Root, settings: T["_settings"], template?: Template<T>): T {
-		// Tags on an element made while another one is being built are the library's
-		const userTags = constructing === 0 && settings.themeTags ? settings.themeTags.slice() : undefined;
+		// An element made while another one is being built is the library's, and
+		// so are its tags
+		const builtIn = constructing > 0;
+		const userTags = !builtIn && settings.themeTags ? settings.themeTags.slice() : undefined;
 		constructing++;
 		try {
 			const x = (new this(root, settings, true)) as T;
+			x._builtIn = builtIn;
 			x._userThemeTags = userTags;
 			x._template = template;
 			x._afterNew();
@@ -1431,6 +1493,7 @@ export class Entity extends Settings implements IDisposer {
 		constructing++;
 		try {
 			const x = (new this(root, settings, true, templates)) as T;
+			x._builtIn = true;
 			x._afterNew();
 			return x;
 		} finally {
@@ -1538,6 +1601,8 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	public _clearDirty() {
+		this._animationsApplied = false;
+
 		$object.keys(this._dirty).forEach((key) => {
 			this._dirty[key] = false;
 		});
@@ -1572,9 +1637,9 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * Checks if element is of certain class (or inherits one).
+	 * Returns `true` if the object is of class `type` or extends it.
 	 *
-	 * @param   type  Class name to check
+	 * @param   type  Class name, such as `"XYSeries"`
 	 * @return {boolean} Is of class?
 	 */
 	public isType<A>(type: string): this is A {
@@ -1606,7 +1671,9 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * @todo needs description
+	 * A [[Template]] applied to the object. Its settings apply where the
+	 * object has none set of its own.
+	 *
 	 * @param  value  Template
 	 */
 	public set template(value: Template<this> | undefined) {
@@ -1650,13 +1717,12 @@ export class Entity extends Settings implements IDisposer {
 	public _applyStateAnimated(_name: string, _duration?: number): void { }
 
 	/**
-	 * Returns settings value for the specified `key`.
-	 *
-	 * If there is no value, `fallback` is returned instead (if set).
+	 * Returns the value of setting `key`, run through any adapters, or
+	 * `fallback` if it is not set.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
-	 * @param   key       Settings value
-	 * @param   callback  Fallback value
+	 * @param   key       Settings key
+	 * @param   fallback  Value to return if the setting is not set
 	 * @return            Value
 	 */
 	public get<Key extends keyof this["_settings"], F>(key: Key, fallback: F): NonNullable<this["_settings"][Key]> | F;
@@ -1680,7 +1746,8 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * Sets a setting `value` for the specified `key`, and returns the same `value`.
+	 * Sets setting `key` to `value` and returns `value`. A value set this way
+	 * overrides themes and templates, and stops any animation of the setting.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
@@ -1793,7 +1860,8 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * Sets a setting `value` for the specified `key` only if the value for this key was not set previously using set method, and returns the same `value`.
+	 * Sets setting `key` to `value` unless it was already set with `set()`.
+	 * Returns `value`.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
@@ -1808,7 +1876,8 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * Removes a setting value for the specified `key`.
+	 * Removes the value set for setting `key`. The setting goes back to the
+	 * value from a theme or template, if one has it.
 	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
@@ -2146,6 +2215,8 @@ export class Entity extends Settings implements IDisposer {
 	// What the `animations` setting started, so it can be stopped again.
 	protected _declaredAnimations: Array<{ target: Settings, key: string, animation: Animation<any> }> = [];
 	protected _declaredTimers: Array<IDisposer> = [];
+	// The `animations` setting was applied in this frame already
+	protected _animationsApplied: boolean = false;
 
 	/**
 	 * Stops what the `animations` setting started and puts back what the
@@ -2216,6 +2287,7 @@ export class Entity extends Settings implements IDisposer {
 					easing: options.yoyo ? $ease.yoyo(easing) : easing,
 					loops
 				});
+				animation._declared = true;
 				this._declaredAnimations.push({ target, key, animation });
 			};
 
@@ -2227,11 +2299,21 @@ export class Entity extends Settings implements IDisposer {
 		});
 	}
 
-	public _beforeChanged(): void {
-
-		if (this.isDirty("animations")) {
+	/**
+	 * Plays the `animations` setting when it changed. A container does this
+	 * before it prepares its children, so that a value an animation starts
+	 * from, or puts back when it is removed, is part of the same frame.
+	 */
+	protected _applyDeclaredAnimations(): void {
+		if (!this._animationsApplied && this.isDirty("animations")) {
+			this._animationsApplied = true;
 			this._playDeclaredAnimations();
 		}
+	}
+
+	public _beforeChanged(): void {
+
+		this._applyDeclaredAnimations();
 
 		if (this.isDirty("id")) {
 			const id = this.get("id")!;
@@ -2305,7 +2387,8 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * Creates and returns a "disposable" timeout.
+	 * Calls `fn` after `delay` milliseconds, unless the object is disposed
+	 * first. Disposing the returned disposer cancels it.
 	 *
 	 * @param   fn     Callback
 	 * @param   delay  Delay in milliseconds
@@ -2400,7 +2483,7 @@ export class Entity extends Settings implements IDisposer {
 	}
 
 	/**
-	 * An instance of [[Root]] object.
+	 * The [[Root]] the object belongs to.
 	 *
 	 * @readonly
 	 * @since 5.0.6

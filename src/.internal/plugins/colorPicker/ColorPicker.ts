@@ -1,7 +1,7 @@
 import type { ColorPickerButton } from "./ColorPickerButton";
-import type { CanvasLayer } from "../../core/render/backend/CanvasRenderer";
 import type { ISpritePointerEvent } from "../../core/render/Sprite";
 
+import { CanvasLayer } from "../../core/render/backend/CanvasRenderer";
 import { ColorPickerDefaultTheme } from "./ColorPickerDefaultTheme";
 import { color, Color } from "../../core/util/Color";
 import { ListTemplate } from "../../core/util/List";
@@ -23,27 +23,30 @@ import * as $type from "../../core/util/Type";
 
 export interface IColorPickerSettings extends IContainerSettings {
 	/**
-	 * Color picker button to use.
+	 * The [[ColorPickerButton]] whose color the picker edits. Setting it opens
+	 * the picker with the button's color, and changes show on the button at
+	 * once; `undefined` closes the picker.
 	 */
 	colorButton?: ColorPickerButton;
 
-	/*
-	* Hue of the color picker.
+	/**
+	 * Hue of the selected color, `0` to `1`; the hue slider sets it.
 	 */
 	hue?: number;
 
 	/**
-	 * Color of the color picker.
+	 * The selected color.
 	 */
 	color?: Color;
 
 	/**
-	 * Opacity of the color.
+	 * Opacity of the selected color, `0` to `1`.
 	 */
 	colorOpacity?: number;
 
 	/**
-	 * Background color of the color picker.
+	 * Color of what the picker sits on, white if not set. It outlines the
+	 * color square and shows through the opacity slider's grip.
 	 */
 	backgroundColor?: Color;
 }
@@ -53,12 +56,21 @@ export interface IColorPickerPrivate extends IContainerPrivate {
 }
 
 export interface IColorPickerEvents extends IContainerEvents {
+	/**
+	 * The user confirmed a color with the OK button, or removed it with the
+	 * no-color button.
+	 */
 	colorchanged: {
 		color?: Color;
 		colorOpacity?: number;
 	}
 }
 
+/**
+ * A color picker with a color square, a hue slider, an eyedropper, a hex
+ * input and an opacity slider. It opens for the [[ColorPickerButton]] set
+ * as its `colorButton`.
+ */
 export class ColorPicker extends Container {
 	public static className: string = "ColorPicker";
 	public static classNames: Array<string> = Container.classNames.concat([ColorPicker.className]);
@@ -86,7 +98,7 @@ export class ColorPicker extends Container {
 
 
 	/**
-	 * Container for color gradients.
+	 * Container with the color square and the hue slider.
 	 */
 	public gradientsContainer: Container = this.children.push(Container.new(this._root, {
 
@@ -119,7 +131,7 @@ export class ColorPicker extends Container {
 
 	/**
 	 * Rectangle that displays the white overlay.
-	 * @ignore* 
+	 * @ignore
 	 */
 	public colorRectangleWhiteOverlay: Rectangle = this.colorGradientsContainer.children.push(Rectangle.new(this._root, {
 		crisp: true,
@@ -140,7 +152,7 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Slider that displays the hue of the color.
+	 * Vertical slider that sets the hue.
 	 */
 	public slider = this.gradientsContainer.children.push(Slider.new(this._root, {
 		orientation: "vertical",
@@ -157,7 +169,8 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Button that shows color picker button.
+	 * Toggle button for the eyedropper: while it is on, the color follows the
+	 * chart pixel under the pointer, and a click keeps it.
 	 */
 	public pickerButton = this.inputContainer.children.push(Button.new(this._root, {
 		themeTags: ["picker", "pickertool"],
@@ -168,7 +181,7 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Button that allows to remove color.
+	 * Button that removes the color and closes the picker.
 	 */
 	public noColorButton = this.inputContainer.children.push(Button.new(this._root, {
 		themeTags: ["nocolor", "pickertool"],
@@ -178,7 +191,7 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Editable label that allows to input color in hex format.
+	 * Editable label that shows the color in hex and takes a typed one.
 	 */
 	public colorInput = this.inputContainer.children.push(EditableLabel.new(this._root, {
 		themeTags: ["input", "color"]
@@ -194,7 +207,8 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Slider that allows to change opacity of the color.
+	 * Slider that sets the color's opacity. Hidden when the `colorButton` has
+	 * `disableOpacity`.
 	 */
 	public opacitySlider = this.opacityContainer.children.push(Slider.new(this._root, {
 		themeTags: ["opacity"],
@@ -202,7 +216,7 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Circle that indicates the target color.
+	 * Circle that marks the selected color on the color square.
 	 */
 	public targetCircle = this.colorGradientsContainer.children.push(Circle.new(this._root, {
 		themeTags: ["circle", "target"],
@@ -222,7 +236,7 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Button that allows to cancel color selection.
+	 * Button that restores the previous color and closes the picker.
 	 */
 	public cancelButton = this.buttonsContainer.children.push(Button.new(this._root, {
 		themeTags: ["cancel"],
@@ -230,7 +244,8 @@ export class ColorPicker extends Container {
 	}));
 
 	/**
-	 * Button that allows to confirm color selection.
+	 * Button that confirms the color, dispatching `colorchanged`, and closes
+	 * the picker.
 	 */
 	public okButton = this.buttonsContainer.children.push(Button.new(this._root, {
 		themeTags: ["ok"],
@@ -241,6 +256,9 @@ export class ColorPicker extends Container {
 	protected _isColorDown: boolean = false;
 	protected _isPicking: boolean = false;
 	protected _isEditing: boolean = false;
+
+	// What the eyedropper samples when the chart is not drawn on canvas
+	protected _pickSnapshot: HTMLCanvasElement | undefined;
 	protected _previousColor: Color | undefined;
 	protected _previousOpacity: number | undefined;
 	protected _prevColor: Color | undefined;
@@ -339,6 +357,7 @@ export class ColorPicker extends Container {
 
 		this.pickerButton.on("active", (active) => {
 			this._isPicking = Boolean(active);
+			this._pickSnapshot = undefined;
 			this.set("forceInactive", active);
 		})
 
@@ -410,7 +429,18 @@ export class ColorPicker extends Container {
 			}
 			if (this._isPicking) {
 				const display = this._root.container._display;
-				const context = (display.getLayer() as CanvasLayer).context;
+				const layer = display.getLayer();
+				let context: CanvasRenderingContext2D;
+				if (layer instanceof CanvasLayer) {
+					context = layer.context;
+
+				} else {
+					// Other renderers have no pixels to read: sample an image of the chart
+					if (!this._pickSnapshot) {
+						this._pickSnapshot = display._renderer.getCanvas(display, {});
+					}
+					context = this._pickSnapshot.getContext("2d", { willReadFrequently: true })! as CanvasRenderingContext2D;
+				}
 				const resolution = display._renderer.resolution;
 				const imageData = context.getImageData(Math.floor(e.point.x * resolution), Math.floor(e.point.y * resolution), 1, 1).data;
 				const fill = Color.fromRGB(imageData[0], imageData[1], imageData[2]);
@@ -661,7 +691,8 @@ export class ColorPicker extends Container {
 	}
 
 	/**
-	 * Cancels color selection and restores previous color.
+	 * Restores the color the button had when the picker opened, and closes
+	 * the picker.
 	 */
 	public cancel() {
 		this.get("colorButton")?.setAll({

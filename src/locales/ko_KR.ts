@@ -368,5 +368,12 @@ export default {
 	// Common actions
 	"Close": "",
 	"Minimize": "",
-	"Confirm": ""
+	"Confirm": "",
+	"OK": "확인",
+	"Cancel": "취소",
+	"Delete": "삭제",
+	"Settings": "설정",
+	"Expand": "확장",
+	"Move Up": "위로 이동",
+	"Move Down": "아래로 이동"
 };

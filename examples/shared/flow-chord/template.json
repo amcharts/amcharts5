@@ -1,0 +1,7 @@
+{
+  "title": "Chord Diagram",
+  "description": "A chord diagram where ribbons between the nodes show how much flows each way.",
+  "category": "flow",
+  "tier": "basic",
+  "tags": ["chord", "flow", "links"]
+}
