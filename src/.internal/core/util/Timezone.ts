@@ -82,16 +82,36 @@ function parseDate(timezone: Intl.DateTimeFormat, date: Date): ParsedDate {
 
 function toUTCDate(timezone: Intl.DateTimeFormat, date: Date): number {
 	const { year, month, day, hour, minute, second, millisecond } = parseDate(timezone, date);
-	return Date.UTC(year, month, day, hour, minute, second, millisecond);
+	return utcTime(year, month, day, hour, minute, second, millisecond);
 }
+
+/**
+ * Same as `Date.UTC()`, but years `0` to `99` are not taken as 1900 to 1999.
+ *
+ * @ignore
+ */
+export function utcTime(year: number, month: number, day: number, hour: number, minute: number, second: number, millisecond: number): number {
+	if (year >= 100 || year < 0) {
+		return Date.UTC(year, month, day, hour, minute, second, millisecond);
+	}
+	// 400 years later has the same calendar
+	const date = new Date(Date.UTC(year + 400, month, day, hour, minute, second, millisecond));
+	date.setUTCFullYear(date.getUTCFullYear() - 400);
+	return date.getTime();
+}
+
+const DAY = 86400000;
 
 
 /**
  * A named timezone, such as `"America/New_York"`, used for `root.timezone`.
  */
 export class Timezone {
-	private _utc: Intl.DateTimeFormat;
 	private _dtf: Intl.DateTimeFormat;
+
+	// Intl is slow, and the offset only changes at DST and rule changes: the
+	// offset of each UTC day used so far, or null for a day it changes in
+	private _offsets: Map<number, number | null> = new Map();
 
 	/**
 	 * The IANA name of the timezone.
@@ -115,19 +135,6 @@ export class Timezone {
 		}
 
 		this.name = timezone;
-
-		this._utc = new Intl.DateTimeFormat("en-US", {
-			hour12: false,
-			timeZone: "UTC",
-			year: "numeric",
-			month: "2-digit",
-			day: "2-digit",
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-			weekday: "short",
-			fractionalSecondDigits: 3,
-		} as any);
 
 		this._dtf = new Intl.DateTimeFormat("en-US", {
 			hour12: false,
@@ -173,9 +180,27 @@ export class Timezone {
 	 * @return        Offset in minutes
 	 */
 	offsetUTC(date: Date): number {
-		const utc = toUTCDate(this._utc, date);
-		const dtf = toUTCDate(this._dtf, date);
-		return (utc - dtf) / 60000;
+		const time = date.getTime();
+		// An invalid date has no offset
+		if (!isFinite(time)) {
+			return NaN;
+		}
+		const day = Math.floor(time / DAY);
+		let offset = this._offsets.get(day);
+		if (offset === undefined) {
+			const start = this._offsetAt(day * DAY);
+			const end = this._offsetAt(day * DAY + DAY - 1);
+			offset = start === end ? start : null;
+			this._offsets.set(day, offset);
+		}
+		return offset === null ? this._offsetAt(time) : offset;
+	}
+
+	/**
+	 * The offset at `time`, worked out with Intl.
+	 */
+	protected _offsetAt(time: number): number {
+		return (time - toUTCDate(this._dtf, new Date(time))) / 60000;
 	}
 
 	/**
@@ -187,6 +212,17 @@ export class Timezone {
 	 * @return        Date parts
 	 */
 	parseDate(date: Date): ParsedDate {
-		return parseDate(this._dtf, date)
+		// The wall clock is the time shifted by the offset, read as UTC
+		const wall = new Date(date.getTime() - Math.round(this.offsetUTC(date) * 60000));
+		return {
+			year: wall.getUTCFullYear(),
+			month: wall.getUTCMonth(),
+			day: wall.getUTCDate(),
+			hour: wall.getUTCHours(),
+			minute: wall.getUTCMinutes(),
+			second: wall.getUTCSeconds(),
+			millisecond: wall.getUTCMilliseconds(),
+			weekday: wall.getUTCDay()
+		};
 	}
 }

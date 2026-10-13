@@ -203,7 +203,11 @@ export class MapSankeyNodes extends Series {
 	public _updateNodeColor(dataItem: DataItem<this["_dataItemSettings"]>) {
 		const mapPolygon = dataItem.get("mapPolygon");
 		if (mapPolygon) {
-			mapPolygon.set("fill", dataItem.get("fill"));
+			mapPolygon._setC("fill", dataItem.get("fill"));
+		}
+		// Bands colored from this node follow it
+		if (this.flow) {
+			this.flow._applyLinkColors();
 		}
 	}
 

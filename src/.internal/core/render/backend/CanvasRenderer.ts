@@ -1683,8 +1683,9 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		const x = originalEvent.clientX || 0;
 		const y = originalEvent.clientY || 0;
 
-		const widthScale = this._calculatedWidth / this._realWidth;
-		const heightScale = this._calculatedHeight / this._realHeight;
+		// From the view's own box, which follows CSS transforms as they change
+		const widthScale = this._calculatedWidth / (bbox.width || this._realWidth);
+		const heightScale = this._calculatedHeight / (bbox.height || this._realHeight);
 
 		const originalPoint: IPoint = {
 			x: x - bbox.left,

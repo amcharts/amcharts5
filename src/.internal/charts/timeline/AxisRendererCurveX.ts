@@ -649,13 +649,13 @@ export class AxisRendererCurveX extends AxisRenderer {
 
 
 	/**
-	 * Returns the length of the axis line, measured along `points` before
-	 * they are scaled to fit the chart.
+	 * Returns the length of the axis line as drawn, in pixels: the length
+	 * along `points` times the scale that fits them into the chart.
 	 *
 	 * @return Length
 	 */
 	public axisLength(): number {
-		return this.getPrivate("axisLength", 0);
+		return this.getPrivate("axisLength", 0) * this.getPrivate("scale", 1);
 	}
 
 	/**

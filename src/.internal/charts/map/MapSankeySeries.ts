@@ -3,6 +3,7 @@ import type { Bullet } from "../../core/render/Bullet";
 import type { IOrientationPoint } from "../../core/util/IPoint";
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
 import type { IDisposer } from "../../core/util/Disposer";
+import type { Color } from "../../core/util/Color";
 
 import { MapPolygonSeries, IMapPolygonSeriesSettings, IMapPolygonSeriesDataItem, IMapPolygonSeriesPrivate } from "./MapPolygonSeries";
 import { MapSankeyNodes, IMapSankeyNodesDataItem } from "./MapSankeyNodes";
@@ -353,6 +354,58 @@ export class MapSankeySeries extends MapPolygonSeries {
 
 		// Initial setup in case polygonSeries was passed in constructor settings.
 		this._setupPolygonSeriesListener();
+
+		// Nodes set after the links replace the ones the links were bound to
+		this._disposers.push(this.nodes.events.on("datavalidated", () => {
+			this._rebindLinks();
+		}));
+	}
+
+	/**
+	 * Colors each band from its source or target node, as `linkColorMode`
+	 * says, or gives it back its own fill for `"solid"`.
+	 *
+	 * @ignore
+	 */
+	public _applyLinkColors() {
+		const linkColorMode = this.get("linkColorMode", "solid");
+		$array.each(this.dataItems, (dataItem) => {
+			const mapPolygon = dataItem.get("mapPolygon");
+			if (!mapPolygon) {
+				return;
+			}
+			let nodeFill: Color | undefined;
+			if (linkColorMode !== "solid") {
+				const nodeDataItem = linkColorMode === "source" ? dataItem.get("sourceNode") : dataItem.get("targetNode");
+				nodeFill = nodeDataItem ? nodeDataItem.get("fill") : undefined;
+			}
+			if (nodeFill) {
+				mapPolygon._setC("fill", nodeFill);
+			}
+			else if (mapPolygon.isComputedSetting("fill")) {
+				// Only a fill set here is taken back; the template's comes back
+				mapPolygon.remove("fill");
+			}
+		});
+	}
+
+	/**
+	 * Unbinds links from nodes that are no longer in `nodes` and binds them
+	 * again, to the current nodes.
+	 */
+	private _rebindLinks() {
+		const nodeDataItems = this.nodes.dataItems;
+		$array.each(this.dataItems, (dataItem) => {
+			const sourceNode = dataItem.get("sourceNode");
+			if (sourceNode && nodeDataItems.indexOf(sourceNode) == -1) {
+				dataItem.setRaw("sourceNode", undefined);
+			}
+			const targetNode = dataItem.get("targetNode");
+			if (targetNode && nodeDataItems.indexOf(targetNode) == -1) {
+				dataItem.setRaw("targetNode", undefined);
+			}
+		});
+		this._resolvePendingDataItems();
 	}
 
 	/**
@@ -726,6 +779,11 @@ export class MapSankeySeries extends MapPolygonSeries {
 					this.nodes.data.push({ id: sourceKey, name, longitude: Number(sourceLon), latitude: Number(sourceLat) });
 					sourceNode = this.nodes.dataItems[this.nodes.dataItems.length - 1];
 				}
+				else if (sourceNode.get("longitude") == null || sourceNode.get("latitude") == null) {
+					// A node from the user's data without a position takes the link's
+					sourceNode.setRaw("longitude", Number(sourceLon));
+					sourceNode.setRaw("latitude", Number(sourceLat));
+				}
 				if (sourceNode) {
 					dataItem.setRaw("sourceNode", sourceNode);
 					this.nodes.addOutgoingLink(sourceNode, dataItem);
@@ -760,6 +818,11 @@ export class MapSankeySeries extends MapPolygonSeries {
 					const name = (ctx && ctx.target) || targetKey;
 					this.nodes.data.push({ id: targetKey, name, longitude: Number(targetLon), latitude: Number(targetLat) });
 					targetNode = this.nodes.dataItems[this.nodes.dataItems.length - 1];
+				}
+				else if (targetNode.get("longitude") == null || targetNode.get("latitude") == null) {
+					// A node from the user's data without a position takes the link's
+					targetNode.setRaw("longitude", Number(targetLon));
+					targetNode.setRaw("latitude", Number(targetLat));
 				}
 				if (targetNode) {
 					dataItem.setRaw("targetNode", targetNode);
@@ -804,6 +867,9 @@ export class MapSankeySeries extends MapPolygonSeries {
 		if (this._valuesDirty || this._sizeDirty) {
 			this._generateGeometries();
 		}
+		else if (this.isDirty("linkColorMode")) {
+			this._applyLinkColors();
+		}
 		super._prepareChildren();
 
 		// Bands made after the bullets container was placed would cover the bullets
@@ -826,7 +892,6 @@ export class MapSankeySeries extends MapPolygonSeries {
 		const cpdSource = Math.min(0.4999, this.get("controlPointDistanceSource", cpdBase));
 		const cpdTarget = Math.min(0.4999, this.get("controlPointDistanceTarget", cpdBase));
 		const resolution = this.get("resolution", 50);
-		const linkColorMode = this.get("linkColorMode", "solid");
 
 		// Find max value
 		let maxValue = 0;
@@ -1120,20 +1185,10 @@ export class MapSankeySeries extends MapPolygonSeries {
 			const mapPolygon = dataItem.get("mapPolygon");
 			if (mapPolygon) {
 				mapPolygon._setC("geometry", geometry);
-
-				if (linkColorMode !== "solid") {
-					const nodeDataItem = linkColorMode === "source"
-						? dataItem.get("sourceNode")
-						: dataItem.get("targetNode");
-					if (nodeDataItem) {
-						const nodeFill = nodeDataItem.get("fill");
-						if (nodeFill) {
-							mapPolygon._setC("fill", nodeFill);
-						}
-					}
-				}
 			}
 		});
+
+		this._applyLinkColors();
 
 		// Compute sums and generate geometries for node shapes
 		const nodeType = this.get("nodeType", "circle");

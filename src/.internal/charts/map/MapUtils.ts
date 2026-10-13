@@ -233,32 +233,76 @@ export function isGlobe(projection: GeoProjection): boolean {
  * @ignore
  */
 export function projectAltitude(projection: GeoProjection, longitude: number, latitude: number, altitude: number): { x: number, y: number, far: boolean, hidden: boolean } | undefined {
-	const xy = projection([longitude, latitude]);
-	if (!xy || !isFinite(xy[0]) || !isFinite(xy[1])) {
-		return;
-	}
-	const lift = altitude / EARTH_RADIUS;
+	return altitudeProjector(projection)(longitude, latitude, altitude);
+}
+
+/**
+ * [[projectAltitude]] for many points in the same view: the projection is
+ * read once, not for every point. With `skipHidden`, points the globe covers
+ * come back `undefined` without being projected.
+ *
+ * @ignore
+ */
+export function altitudeProjector(projection: GeoProjection, skipHidden: boolean = false): (longitude: number, latitude: number, altitude: number) => { x: number, y: number, far: boolean, hidden: boolean } | undefined {
 	const scale = projection.scale();
-	const clipAngle = projection.clipAngle ? projection.clipAngle() : 0;
-	if (isGlobe(projection)) {
-		const translate = projection.translate();
-		const x = translate[0] + (xy[0] - translate[0]) * (1 + lift);
-		const y = translate[1] + (xy[1] - translate[1]) * (1 + lift);
 
-		// The point's direction against the view's center
-		const rotation = projection.rotate();
-		const lon = longitude * $math.RADIANS;
-		const lat = latitude * $math.RADIANS;
-		const centerLon = -rotation[0] * $math.RADIANS;
-		const centerLat = -rotation[1] * $math.RADIANS;
-		const facing = Math.cos(lat) * Math.cos(centerLat) * Math.cos(lon - centerLon) + Math.sin(lat) * Math.sin(centerLat);
-
-		const dx = x - translate[0];
-		const dy = y - translate[1];
-		const far = facing < Math.cos((clipAngle || 90) * $math.RADIANS);
-		return { x, y, far, hidden: far && dx * dx + dy * dy < scale * scale };
+	if (!isGlobe(projection)) {
+		return (longitude, latitude, altitude) => {
+			const xy = projection([longitude, latitude]);
+			if (!xy || !isFinite(xy[0]) || !isFinite(xy[1])) {
+				return;
+			}
+			return { x: xy[0], y: xy[1] - altitude / EARTH_RADIUS * scale, far: false, hidden: false };
+		};
 	}
-	return { x: xy[0], y: xy[1] - lift * scale, far: false, hidden: false };
+
+	const clipAngle = projection.clipAngle ? projection.clipAngle() : 0;
+	const translate = projection.translate();
+	const tx = translate[0];
+	const ty = translate[1];
+	const rotation = projection.rotate();
+	const centerLon = -rotation[0] * $math.RADIANS;
+	const centerLat = -rotation[1] * $math.RADIANS;
+	const sinCenterLat = Math.sin(centerLat);
+	const cosCenterLat = Math.cos(centerLat);
+	const limit = Math.cos((clipAngle || 90) * $math.RADIANS);
+
+	// The point's direction against the view's center
+	const facingOf = (lon: number, lat: number) => Math.cos(lat) * cosCenterLat * Math.cos(lon - centerLon) + Math.sin(lat) * sinCenterLat;
+
+	// Skipping relies on an orthographic globe, where a point at angle a from
+	// the center shows at scale * sin(a): checked on a point 60 degrees east of it
+	let skip = false;
+	if (skipHidden) {
+		const probeLon = centerLon + 60 * $math.RADIANS;
+		const facing = facingOf(probeLon, centerLat);
+		const xy = projection([probeLon / $math.RADIANS, centerLat / $math.RADIANS]);
+		if (xy) {
+			const r = Math.sqrt((xy[0] - tx) * (xy[0] - tx) + (xy[1] - ty) * (xy[1] - ty));
+			skip = Math.abs(r - scale * Math.sqrt(1 - facing * facing)) < 0.001 * scale;
+		}
+	}
+
+	return (longitude, latitude, altitude) => {
+		const lift = altitude / EARTH_RADIUS;
+		const facing = facingOf(longitude * $math.RADIANS, latitude * $math.RADIANS);
+		const far = facing < limit;
+
+		// Behind the globe and too low to show past its edge
+		if (skip && far && (1 - facing * facing) * (1 + lift) * (1 + lift) < 1) {
+			return;
+		}
+
+		const xy = projection([longitude, latitude]);
+		if (!xy || !isFinite(xy[0]) || !isFinite(xy[1])) {
+			return;
+		}
+		const x = tx + (xy[0] - tx) * (1 + lift);
+		const y = ty + (xy[1] - ty) * (1 + lift);
+		const dx = x - tx;
+		const dy = y - ty;
+		return { x, y, far, hidden: far && dx * dx + dy * dy < scale * scale };
+	};
 }
 
 // Lets a config store a shape as the call that made it - the JSON plugin looks

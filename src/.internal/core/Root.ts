@@ -405,6 +405,10 @@ export class Root implements IDisposer {
 	 * Maximum frames per second. When not set, the chart renders on every
 	 * animation frame of the browser.
 	 *
+	 * Each frame waits `1000 / fps` milliseconds after the previous one is
+	 * drawn, then for the screen's next refresh, so the rate achieved is lower:
+	 * `fps: 30` gives about 20 on a 60 Hz screen.
+	 *
 	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Performance} for more info
 	 */
 	public fps: number | undefined;
@@ -503,7 +507,8 @@ export class Root implements IDisposer {
 	 */
 	public autoResize: boolean = true;
 
-	protected _fontHash: string[] = [];
+	protected _fontHash: string = "";
+	protected _styles?: CSSStyleDeclaration;
 
 	protected _isDisposed: boolean = false;
 	protected _disposers: Array<IDisposer> = [];
@@ -646,6 +651,8 @@ export class Root implements IDisposer {
 				dom.appendChild(this.dom.childNodes[0]);
 			}
 			this.dom = dom;
+			// The cached computed style belongs to the old element
+			this._styles = undefined;
 			this._initResizeSensor();
 			this.resize();
 		}
@@ -769,6 +776,13 @@ export class Root implements IDisposer {
 			return this._settings.calculateSize(rect);
 
 		} else {
+			// Drawn at the size before CSS transforms, which the browser then applies
+			const dom = this.dom;
+			const width = dom.offsetWidth;
+			const height = dom.offsetHeight;
+			if (Math.abs(width - rect.width) > 1 || Math.abs(height - rect.height) > 1) {
+				return { width, height };
+			}
 			return {
 				width: rect.width,
 				height: rect.height,
@@ -2529,20 +2543,16 @@ export class Root implements IDisposer {
 	}
 
 	protected _updateComputedStyles(): boolean {
-		const styles = window.getComputedStyle(this.dom);
-		const oldFonts = this._fontHash;
-		const newFonts: string[] = $object.keys(styles).flatMap((k: any) => typeof k === "string" && k.startsWith("font") ? [styles[k as any]?.toString()] : []);
-
-		if (oldFonts.length !== newFonts.length) {
-			this._fontHash = newFonts;
-			return true;
+		// Live: it follows the element's style, so it is read once
+		if (!this._styles) {
+			this._styles = window.getComputedStyle(this.dom);
 		}
+		const styles = this._styles;
+		const fonts = [styles.fontFamily, styles.fontSize, styles.fontStyle, styles.fontWeight, styles.fontVariant, styles.fontStretch].join();
 
-		for (let i = 0; i < oldFonts.length; i++) {
-			if (oldFonts[i] !== newFonts[i]) {
-				this._fontHash = newFonts;
-				return true;
-			}
+		if (fonts !== this._fontHash) {
+			this._fontHash = fonts;
+			return true;
 		}
 		return false;
 	}

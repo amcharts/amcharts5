@@ -516,7 +516,8 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 		const valueB = dataItemB.get("value", 0);
 
 		if (timeUnit == "hour") {
-			if (new Date(valueA).getDate() != new Date(valueB).getDate()) {
+			// A label that starts a new day, in the chart's timezone, wins
+			if ($time.checkChange(valueA, valueB, "day", this._root.utc, this._root.timezone)) {
 				return dataItemA;
 			}
 		}

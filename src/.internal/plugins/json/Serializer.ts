@@ -63,7 +63,7 @@ export interface ISerializerSettings extends IEntitySettings {
 	 * is a function of its own rather than one of amCharts' easings.
 	 *
 	 * @default true
-	 * @since 5.21.0
+	 * @since 5.20.8
 	 */
 	runningAnimations?: boolean;
 

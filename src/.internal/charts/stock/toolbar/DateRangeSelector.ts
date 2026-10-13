@@ -5,6 +5,8 @@ import { StyleSheet } from "../../../core/util/Utils";
 import flatpickr from "flatpickr";
 
 import * as $utils from "../../../core/util/Utils";
+import * as $time from "../../../core/util/Time";
+import { utcTime } from "../../../core/util/Timezone";
 import * as $type from "../../../core/util/Type";
 
 export interface IDateRangeSelectorSettings extends IStockControlSettings {
@@ -284,9 +286,8 @@ export class DateRangeSelector extends StockControl {
 		});
 
 		this._disposers.push($utils.addEventListener(saveButton, "click", () => {
-			const from = this._parseDate(fromField.value);
-			const to = this._parseDate(toField.value);
-			to.setHours(23, 59, 59);
+			const from = this._fromPickerDate(this._parseDate(fromField.value));
+			const to = this._fromPickerDate(this._parseDate(toField.value), true);
 			this.setPrivate("fromDate", from);
 			this.setPrivate("toDate", to);
 			xAxis.zoomToDates(from, to);
@@ -339,13 +340,16 @@ export class DateRangeSelector extends StockControl {
 		this.setPrivate("fromDate", from);
 		this.setPrivate("toDate", to);
 
-		this.getPrivate("fromField").value = this._formatDate(from);
-		this.getPrivate("toField").value = this._formatDate(to);
+		const fromDay = this._toPickerDate(from.getTime());
+		const toDay = this._toPickerDate(to.getTime());
+
+		this.getPrivate("fromField").value = this._formatDate(fromDay);
+		this.getPrivate("toField").value = this._formatDate(toDay);
 
 		const fromPicker = this.getPrivate("fromPicker");
 		const minDate = fromPicker.config.minDate;
-		if (!minDate || (minDate <= from)) {
-			fromPicker.setDate(from);
+		if (!minDate || (minDate <= fromDay)) {
+			fromPicker.setDate(fromDay);
 		}
 		else {
 			fromPicker.setDate(minDate);
@@ -353,8 +357,8 @@ export class DateRangeSelector extends StockControl {
 
 		const toPicker = this.getPrivate("toPicker");
 		const maxDate = toPicker.config.maxDate;
-		if (!maxDate || (maxDate >= to)) {
-			toPicker.setDate(to);
+		if (!maxDate || (maxDate >= toDay)) {
+			toPicker.setDate(toDay);
 		}
 		else {
 			toPicker.setDate(maxDate);
@@ -372,8 +376,8 @@ export class DateRangeSelector extends StockControl {
 		if (minDate == "auto") {
 			const min = xAxis.getPrivate("minFinal");
 			if (min) {
-				fromPicker.set("minDate", new Date(min + 1));
-				toPicker.set("minDate", new Date(min + 1));
+				fromPicker.set("minDate", this._toPickerDate(min + 1));
+				toPicker.set("minDate", this._toPickerDate(min + 1));
 			}
 		}
 		else if (minDate instanceof Date) {
@@ -388,8 +392,8 @@ export class DateRangeSelector extends StockControl {
 		if (maxDate == "auto") {
 			const max = xAxis.getPrivate("maxFinal") - 1;
 			if (max) {
-				fromPicker.set("maxDate", new Date(max));
-				toPicker.set("maxDate", new Date(max));
+				fromPicker.set("maxDate", this._toPickerDate(max));
+				toPicker.set("maxDate", this._toPickerDate(max));
 			}
 		}
 		else if (maxDate instanceof Date) {
@@ -407,12 +411,60 @@ export class DateRangeSelector extends StockControl {
 		const to = this.getPrivate("toDate");
 		let label = "";
 		if (from && to) {
-			label = this._formatDate(from) + " -- " + this._formatDate(to);
+			label = this._formatDate(this._toPickerDate(from.getTime())) + " -- " + this._formatDate(this._toPickerDate(to.getTime()));
 		}
 		else {
 			label = this._root.language.translateAny("Date Range");
 		}
 		this.set("name", label);
+	}
+
+	/**
+	 * The pickers and the fields work with browser-local dates: this returns one
+	 * that reads as the date and time of `time` in the chart's timezone.
+	 */
+	protected _toPickerDate(time: number): Date {
+		const date = new Date(time);
+		const timezone = this._root.timezone;
+		if (this._root.utc) {
+			return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+		}
+		else if (timezone) {
+			const parts = timezone.parseDate(date);
+			return new Date(parts.year, parts.month, parts.day, parts.hour, parts.minute, parts.second);
+		}
+		return date;
+	}
+
+	/**
+	 * The start of the picked day in the chart's timezone, or with `end` the
+	 * last millisecond of it.
+	 */
+	protected _fromPickerDate(date: Date, end?: boolean): Date {
+		if (isNaN(date.getTime())) {
+			return date;
+		}
+		const root = this._root;
+		const timezone = root.timezone;
+		const utc = root.utc;
+		// Noon, as midnight can fall in a DST gap
+		let time: number;
+		if (utc) {
+			time = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+		}
+		else if (timezone) {
+			const noon = utcTime(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0, 0);
+			time = noon + Math.round(timezone.offsetUTC(new Date(noon)) * 60000);
+		}
+		else {
+			time = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12).getTime();
+		}
+		const day = $time.round(new Date(time), "day", 1, root.locale.firstDayOfWeek, utc, undefined, timezone);
+		if (end) {
+			$time.add(day, "day", 1, utc, timezone);
+			day.setTime(day.getTime() - 1);
+		}
+		return day;
 	}
 
 	protected _formatDate(date: Date): string {

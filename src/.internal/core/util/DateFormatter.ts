@@ -131,13 +131,6 @@ export class DateFormatter extends Entity {
 		// get format info (it will also deal with parser caching)
 		let info = this.parseFormat(format);
 
-		// Should we apply custom time zone?
-		const timezone = this._root.timezone;
-		let originalDate = date;
-		if (timezone && !this._root.utc && !ignoreTimezone) {
-			date = timezone.convertLocal(date);
-		}
-
 		// Check if it's a valid date
 		if (!$type.isNumber(date.getTime())) {
 			// TODO translation
@@ -145,8 +138,18 @@ export class DateFormatter extends Entity {
 			return "Invalid date";
 		}
 
+		// Should we apply custom time zone?
+		const timezone = this._root.timezone;
+		let originalDate = date;
+		let utc = this._root.utc && !ignoreTimezone;
+		if (timezone && !this._root.utc && !ignoreTimezone) {
+			// The zone's wall clock, read with the UTC getters, so the browser's own DST plays no part
+			date = new Date(date.getTime() - Math.round(timezone.offsetUTC(date) * 60000));
+			utc = true;
+		}
+
 		// Apply format
-		formatted = this.applyFormat(date, info, ignoreTimezone, originalDate);
+		formatted = this.applyFormat(date, info, ignoreTimezone, originalDate, utc);
 
 		// Capitalize
 		if (this.get("capitalize")) {
@@ -166,7 +169,7 @@ export class DateFormatter extends Entity {
 	 * @param info      Parsed format information
 	 * @return Formatted date string
 	 */
-	protected applyFormat(date: Date, info: DateFormatInfo, ignoreTimezone: boolean = false, originalDate?: Date): string {
+	protected applyFormat(date: Date, info: DateFormatInfo, ignoreTimezone: boolean = false, originalDate?: Date, utc: boolean = this._root.utc && !ignoreTimezone): string {
 
 		// Init return value
 		let res = info.template;
@@ -180,8 +183,8 @@ export class DateFormatter extends Entity {
 			minutes: number,
 			seconds: number,
 			milliseconds: number,
-			timestamp: number = date.getTime();
-		if (this._root.utc && !ignoreTimezone) {
+			timestamp: number = (originalDate || date).getTime();
+		if (utc) {
 			fullYear = date.getUTCFullYear();
 			month = date.getUTCMonth();
 			weekday = date.getUTCDay();
@@ -235,7 +238,7 @@ export class DateFormatter extends Entity {
 				case "YYY":
 				case "YY":
 				case "Y":
-					let year = $utils.getWeekYear(date, this._root.utc);
+					let year = $utils.getWeekYear(date, utc);
 					if (info.parts[i] == "YYYY") {
 						value = Math.abs(year).toString();
 					}
@@ -252,7 +255,7 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "q":
-					value = "" + Math.ceil((date.getMonth() + 1) / 3);
+					value = "" + Math.ceil((month + 1) / 3);
 					break;
 
 				case "MMMMM":
@@ -276,15 +279,15 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "ww":
-					value = $utils.padString($utils.getWeek(date, this._root.utc), 2, "0");
+					value = $utils.padString($utils.getWeek(date, utc), 2, "0");
 					break;
 
 				case "w":
-					value = $utils.getWeek(date, this._root.utc).toString();
+					value = $utils.getWeek(date, utc).toString();
 					break;
 
 				case "W":
-					value = $utils.getMonthWeek(date, this._root.utc).toString();
+					value = $utils.getMonthWeek(date, utc).toString();
 					break;
 
 				case "dd":
@@ -297,11 +300,11 @@ export class DateFormatter extends Entity {
 
 				case "DD":
 				case "DDD":
-					value = $utils.padString($utils.getYearDay(date, this._root.utc).toString(), info.parts[i].length, "0");
+					value = $utils.padString($utils.getYearDay(date, utc).toString(), info.parts[i].length, "0");
 					break;
 
 				case "D":
-					value = $utils.getYearDay(date, this._root.utc).toString();
+					value = $utils.getYearDay(date, utc).toString();
 					break;
 
 				case "F":
@@ -457,14 +460,22 @@ export class DateFormatter extends Entity {
 				case "Z":
 				case "ZZ":
 					let timezone = this._root.utc ? "UTC" : this._root.timezone;
+					let offset: number;
 					if (timezone instanceof Timezone) {
-						timezone = timezone.name;
+						// Exact, unlike reading the zone's time back as a browser-local date
+						offset = timezone.offsetUTC(originalDate || date);
 					}
-					const offset = timezone ? $utils.getTimezoneOffset(timezone, originalDate || date) : date.getTimezoneOffset();
+					else {
+						offset = timezone ? $utils.getTimezoneOffset(timezone, originalDate || date) : date.getTimezoneOffset();
+					}
 
 					let tz = Math.abs(offset) / 60;
 					let tzh = Math.floor(tz);
-					let tzm = tz * 60 - tzh * 60;
+					let tzm = Math.round(tz * 60 - tzh * 60);
+					if (tzm == 60) {
+						tzh++;
+						tzm = 0;
+					}
 
 					if (this._root.utc) {
 						tzh = 0;
@@ -483,11 +494,11 @@ export class DateFormatter extends Entity {
 					break;
 
 				case "i":
-					value = date.toISOString();
+					value = (originalDate || date).toISOString();
 					break;
 
 				case "I":
-					value = date.toUTCString();
+					value = (originalDate || date).toUTCString();
 					break;
 
 			}
@@ -638,6 +649,11 @@ export class DateFormatter extends Entity {
 
 		// Parse format
 		let info = this.parseFormat(format);
+
+		// Without a format an empty pattern would match anything, so let Date read it
+		if (info.parts.length == 0) {
+			return new Date(source);
+		}
 
 		// Init parsed items holder
 		let parsedIndexes = {

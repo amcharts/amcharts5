@@ -321,8 +321,12 @@ export class PeriodSelector extends StockControl {
 			const axis = this._getAxis();
 			let end = this._getMax();
 			let start: Date;
+			const firstDay = this._root.locale.firstDayOfWeek;
+			const timezone = this._root.timezone;
+			const utc = this._root.utc;
 			if (period.timeUnit == "ytd") {
-				start = new Date(end.getFullYear(), 0, 1, 0, 0, 0, 0);
+				// January 1 in the chart's timezone
+				start = $time.round(new Date(end.getTime()), "year", 1, firstDay, utc, undefined, timezone);
 				//end = new Date(axis.getIntervalMax(axis.get("baseInterval")));
 				end = this._getMax();
 				if (axis.get("groupData")) {
@@ -342,10 +346,6 @@ export class PeriodSelector extends StockControl {
 					const interval = axis.getGroupInterval($time.getDuration(timeUnit, period.count))
 					if (interval) {
 
-						const firstDay = this._root.locale.firstDayOfWeek;
-						const timezone = this._root.timezone;
-						const utc = this._root.utc;
-
 						if (fromStart) {
 							start = this._getMin();
 							//let startTime = axis.getIntervalMin(axis.get("baseInterval"));
@@ -358,7 +358,7 @@ export class PeriodSelector extends StockControl {
 								start = $time.round(start, interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
 							}
 
-							end = $time.add(new Date(start), timeUnit, (period.count || 1));
+							end = $time.add(new Date(start), timeUnit, (period.count || 1), utc, timezone);
 						}
 						else {
 							// find max of the base interval
@@ -372,7 +372,7 @@ export class PeriodSelector extends StockControl {
 								end = $time.round(end, interval.timeUnit, interval.count, firstDay, utc, undefined, timezone);
 							}
 
-							start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1);
+							start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1, utc, timezone);
 						}
 
 						if (this._groupChangedDp) {
@@ -402,10 +402,10 @@ export class PeriodSelector extends StockControl {
 
 				if (fromStart) {
 					start = this._getMin();
-					end = $time.add(new Date(start), timeUnit, (period.count || 1));
+					end = $time.add(new Date(start), timeUnit, (period.count || 1), utc, timezone);
 				}
 				else {
-					start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1);
+					start = $time.add(new Date(end), timeUnit, (period.count || 1) * -1, utc, timezone);
 				}
 			}
 

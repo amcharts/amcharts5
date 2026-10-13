@@ -736,6 +736,56 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		return 1.01;
 	}
 
+	/**
+	 * A step of a grid of several hours adds elapsed time, so across a DST
+	 * change it lands off the chart's clock (07:00 in a 6-hour grid). This moves
+	 * it to the next line of the interval on the clock. A line the clocks skip
+	 * (03:00 when they jump from 03:00 to 04:00) is drawn at the jump, with the
+	 * time the clocks show there; a repeated one is drawn once.
+	 */
+	protected _keepOnClock(value: number, endValue: number, interval: ITimeInterval): number {
+		const root = this._root;
+		const count = interval.count;
+		if (interval.timeUnit != "hour" || count < 2 || root.utc) {
+			return endValue;
+		}
+
+		const timezone = root.timezone;
+		const wall = (time: number) => {
+			const offset = timezone ? timezone.offsetUTC(new Date(time)) : new Date(time).getTimezoneOffset();
+			return time - Math.round(offset * 60000);
+		};
+
+		const step = count * 3600000;
+		const sinceMidnight = (time: number) => (time % 86400000 + 86400000) % 86400000;
+		const start = wall(value);
+
+		// No clock change in between, and on the interval
+		if (wall(endValue) - start == endValue - value && sinceMidnight(wall(endValue)) % step == 0) {
+			return endValue;
+		}
+
+		// The interval's next time on the clock, and the first moment that shows it or a later time
+		const target = start - sinceMidnight(start) % step + step;
+		let low = value;
+		let high = value + step + 3 * 3600000;
+		if (wall(high) < target) {
+			return endValue;
+		}
+		while (high - low > 60000) {
+			const middle = low + Math.floor((high - low) / 2);
+			if (wall(middle) >= target) {
+				high = middle;
+			}
+			else {
+				low = middle;
+			}
+		}
+		// The moment found is on a whole minute, the only one in (low, high]
+		const next = Math.floor(high / 60000) * 60000;
+		return next > low && next > value ? next : endValue;
+	}
+
 	protected _getMinorInterval(interval: ITimeInterval): ITimeInterval | undefined {
 		let minorGridInterval: ITimeInterval | undefined;
 		let count = interval.count;
@@ -846,6 +896,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				let endValue = value + $time.getDuration(gridInterval.timeUnit, gridInterval.count * this._getM(gridInterval.timeUnit));
 				//endValue = $time.round(new Date(endValue), gridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
 				endValue = $time.roun(endValue, gridInterval.timeUnit, 1, root);
+				endValue = this._keepOnClock(value, endValue, gridInterval);
 
 				dataItem.setRaw("endValue", endValue);
 
@@ -929,6 +980,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						let minorEndValue = minorValue + $time.getDuration(minorTimeUnit, minorCount * mmm);
 						//minorEndValue = $time.round(new Date(minorEndValue), minorGridInterval.timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
 						minorEndValue = $time.roun(minorEndValue, minorTimeUnit, 1, root);
+						minorEndValue = this._keepOnClock(minorValue, minorEndValue, minorGridInterval);
 
 						minorDataItem.setRaw("endValue", minorEndValue);
 

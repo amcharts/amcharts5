@@ -282,6 +282,11 @@ export interface ISpriteSettings extends IEntitySettings {
 	/**
 	 * Opacity, from `0` (transparent) to `1` (opaque).
 	 *
+	 * The theme's `"default"` state has `opacity: 1`, so `show()`, and leaving a
+	 * state that changes `opacity`, bring it back to `1`, not to a value set
+	 * here. To come back to another value, set it in the `"default"` state too:
+	 * `sprite.states.create("default", { opacity: 0.5 })`.
+	 *
 	 * @default 1
 	 */
 	opacity?: number;

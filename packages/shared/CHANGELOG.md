@@ -5,6 +5,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.21.1] - 2026-10-13
+
+### Changed
+- Raised map lines (`altitude`) draw 3-4 times faster.
+
+### Fixed
+- Charts with `root.timezone` were up to 16 times slower than without it.
+- With `root.timezone`, grid lines, labels, data groups and dates could be an hour off around the viewer's own daylight saving change.
+- With `root.timezone`, adding days, weeks, months or years across a daylight saving change could end up an hour off.
+- `DateAxis`: after a daylight saving change, a grid of several hours ran an hour off (07:00, 13:00...). It now stays on the clock; where the clocks skip a grid time, the line goes at the jump (e.g. 04:00).
+- `GaplessDateAxis`: with `root.timezone` or `root.utc`, crowded hour labels were thinned by the viewer's day instead of the chart's.
+- `PeriodSelector` and `DateRangeSelector` used the viewer's timezone instead of `root.timezone` or `root.utc`.
+- Date formats `Z`, `ZZ`, `x`, `i` and `I` could be wrong with `root.timezone`, and `YYYY`, `ww`, `W` and `DDD` ignored `root.utc`.
+- String dates in `dateFields` without a `dateFormat` were all read as 1 January 1970.
+- `ResponsiveTheme`: on small charts, XY axis ticks were moved inside the plot by a rule meant for radar charts.
+- Charts in a container scaled with CSS (`transform` or `zoom`) were scaled twice, and clicks hit the wrong elements.
+- `RadialGradient` was off-center on map polygons, line and area fills, and some bullets. With `target` set, it now centers on the target.
+- `MapChart`: a `zoomLevel` set before the map loaded was ignored or left the map blank.
+- `MapSankeySeries`: band colors did not follow `linkColorMode` or node fill changes, and nodes without coordinates were not drawn.
+- `Picture`: changing a shadow setting after the image loaded removed the image.
+- `CurveChart`: a path scaled down to fit got far too many labels and grid lines.
+
+
 ## [5.21.0] - 2026-10-08
 
 ### Added
@@ -57,7 +80,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - Exporting: the HTML `headerClass` option was ignored; header cells got `cellClass`.
 - Exporting: CSV and HTML with `pivot: true` listed the fields in reverse `dataFieldsOrder`.
 - Exporting: a cropped `extraImages` entry above or below the chart made the image as wide as the chart was tall.
-- `Gantt`: the category axis' `colorField` and `nameField` had no effect; `color` and `name` were always used.
+- `Gantt`: the category axis' `colorField` had no effect (`color` was always used), and task tooltips took the name from `name` instead of `nameField`.
 - `PieChart`: with a negative `innerRadius` and several series, the rings were sized wrong.
 - `Sunburst`: with only one of `startAngle` and `endAngle` set, the chart was sized for different angles than it was drawn with.
 - `Chord`: setting `sort` back to `"none"` kept the previous order.

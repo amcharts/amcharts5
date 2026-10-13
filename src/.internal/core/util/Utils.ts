@@ -8,6 +8,7 @@ import * as $object from "./Object";
 import type { IBounds } from "./IBounds";
 
 import { Disposer, DisposerClass, IDisposer } from "./Disposer";
+import { utcTime } from "./Timezone";
 
 /**
  * ============================================================================
@@ -1044,12 +1045,13 @@ export function splitString(source: string): string[] {
  * Returns the day of the year, `1` being January 1.
  *
  * @param date  Date
- * @param utc   Not used
+ * @param utc   Read the date's UTC fields
  * @return Year day
  */
 export function getYearDay(date: Date, utc: boolean = false): number {
-	// TODO: utc needed?
-	utc;
+	if (utc) {
+		return Math.floor((date.getTime() - utcTime(date.getUTCFullYear(), 0, 0, 0, 0, 0, 0)) / 86400000);
+	}
 	const start = new Date(date.getFullYear(), 0, 0);
 	const diff = (date.getTime() - start.getTime()) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
 	const oneDay = 1000 * 60 * 60 * 24;
@@ -1061,14 +1063,14 @@ export function getYearDay(date: Date, utc: boolean = false): number {
  * week 1 is the one with the year's first Thursday.
  *
  * @param date  Date
- * @param _utc  Not used
+ * @param utc   Read the date's UTC fields
  * @return Week number
  */
-export function getWeek(date: Date, _utc: boolean = false): number {
-	const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+export function getWeek(date: Date, utc: boolean = false): number {
+	const d = utc ? new Date(utcTime(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0)) : new Date(utcTime(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0));
 	const day = d.getUTCDay() || 7;
 	d.setUTCDate(d.getUTCDate() + 4 - day);
-	const firstDay = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+	const firstDay = new Date(utcTime(d.getUTCFullYear(), 0, 1, 0, 0, 0, 0));
 	return Math.ceil((((d.getTime() - firstDay.getTime()) / 86400000) + 1) / 7);
 }
 
@@ -1077,12 +1079,12 @@ export function getWeek(date: Date, _utc: boolean = false): number {
  * January 1 it can differ from the calendar year.
  *
  * @param date  Date
- * @param _utc  Not used
+ * @param utc   Read the date's UTC fields
  * @return Year of week
  * @since 5.3.0
  */
-export function getWeekYear(date: Date, _utc: boolean = false): number {
-	const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+export function getWeekYear(date: Date, utc: boolean = false): number {
+	const d = utc ? new Date(utcTime(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0, 0)) : new Date(utcTime(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0));
 	const day = d.getUTCDay() || 7;
 	d.setUTCDate(d.getUTCDate() + 4 - day);
 	return d.getUTCFullYear();
@@ -1096,7 +1098,7 @@ export function getWeekYear(date: Date, _utc: boolean = false): number {
  * @return Week number in month
  */
 export function getMonthWeek(date: Date, utc: boolean = false): number {
-	const firstWeek = getWeek(new Date(date.getFullYear(), date.getMonth(), 1), utc);
+	const firstWeek = getWeek(utc ? new Date(utcTime(date.getUTCFullYear(), date.getUTCMonth(), 1, 0, 0, 0, 0)) : new Date(date.getFullYear(), date.getMonth(), 1), utc);
 	let currentWeek = getWeek(date, utc);
 	if (currentWeek == 1) {
 		currentWeek = 53;

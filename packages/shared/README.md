@@ -5,6 +5,19 @@ candlestick charts, pies and funnels, geographic maps, stock charts, Gantt
 charts, treemaps and other hierarchies, Sankey and chord diagrams, radars and
 gauges, timelines, word clouds and Venn diagrams.
 
+<p>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/stock-chart"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/stock-chart.webp" width="24%" alt="Stock chart with volume and a toolbar"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/map-satellite-globe"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/map-satellite-globe.webp" width="24%" alt="Globe with satellite imagery"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/hierarchy-sunburst"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/hierarchy-sunburst.webp" width="24%" alt="Sunburst"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/flow-sankey"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/flow-sankey.webp" width="24%" alt="Sankey diagram"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/gantt-multilevel"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/gantt-multilevel.webp" width="24%" alt="Gantt chart"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/map-pixel-map"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/map-pixel-map.webp" width="24%" alt="Pixel map"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/gauge-bands"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/gauge-bands.webp" width="24%" alt="Gauge with colored bands"></a>
+<a href="https://github.com/amcharts/amcharts5/tree/master/examples/shared/xy-stacked-column"><img src="https://raw.githubusercontent.com/amcharts/amcharts5/master/examples/thumbs/xy-stacked-column.webp" width="24%" alt="Stacked column chart"></a>
+</p>
+
+Each picture links to its example's code.
+
 [Demos](https://www.amcharts.com/demos/) |
 [Documentation](https://www.amcharts.com/docs/v5/) |
 [Class reference](https://www.amcharts.com/docs/v5/reference/) |
@@ -115,6 +128,19 @@ and [others](https://www.amcharts.com/docs/v5/getting-started/integrations/).
 Stock, Gantt, radar and timeline charts are built on XY charts: with script
 tags, load `xy.js` before them. Gantt also needs `plugins/colorPicker.js`.
 
+Also in the library:
+
+* Maps: globes and flat maps, satellite images with day and night, pixel maps,
+  and map files for the world, continents, countries and their regions.
+* Stock charts: over 30 indicators, drawing tools, comparing stocks and period
+  selectors.
+* [Export](https://www.amcharts.com/docs/v5/concepts/exporting/): PNG, JPG,
+  SVG, PDF, CSV, XLSX, JSON and HTML, and printing.
+* [30 themes](https://www.amcharts.com/docs/v5/concepts/themes/), among them
+  dark, colorblind-friendly and responsive ones.
+* [Accessibility](https://www.amcharts.com/docs/v5/concepts/accessibility/):
+  keyboard navigation and screen reader support.
+
 
 ## Examples
 
@@ -196,7 +222,7 @@ If you have a commercial amCharts 5 license, this software is covered by your
 license, which supersedes any other license bundled with this package.
 
 If you don't have a commercial license, the use of this software is covered by
-a freeware license. Refer to included LICENSE file. The license is also
+a freeware license. See the included LICENSE file. The license is also
 [available online](https://github.com/amcharts/amcharts5/blob/master/packages/shared/LICENSE).
 
 In short: the free license allows use in any project, commercial ones
@@ -213,8 +239,8 @@ Found a bug, or have a question? Open an
 [issue on GitHub](https://github.com/amcharts/amcharts5/issues): the amCharts
 team monitors them.
 
-Guaranteed support is for holders of amPlus subscription service. If you have a
-license or subscription, you may
+Guaranteed support comes with the amPlus subscription. If you have a license
+or subscription, you can
 [contact us directly](https://www.amcharts.com/support/support-info/priority-support/).
 If you don't, here are
 [a few more options](https://www.amcharts.com/support/support-info/free-support/).

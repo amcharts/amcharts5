@@ -66,23 +66,24 @@ export class RadialGradient extends Gradient {
 
 		let radius = target.get("radius" as any);
 		if ($type.isNumber(radius)) {
-			x = 0;
-			y = 0;
+			// Drawn around its origin
+			l = 0;
+			t = 0;
 		}
 		else {
 			radius = Math.min(width, height) / 2;
-			x = width / 2;
-			y = height / 2;
+			x = l + width / 2;
+			y = t + height / 2;
 		}
 
 		let ux = this.get("x");
 		let uy = this.get("y");
 		if (ux != null) {
-			x = $utils.relativeToValue(ux, width);
+			x = l + $utils.relativeToValue(ux, width);
 		}
 
 		if (uy != null) {
-			y = $utils.relativeToValue(uy, height);
+			y = t + $utils.relativeToValue(uy, height);
 		}
 
 		const gradient = this._root._renderer.createRadialGradient(x, y, 0, x, y, radius);

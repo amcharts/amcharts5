@@ -7,6 +7,7 @@
 import * as $type from "./Type";
 import * as $utils from "./Utils";
 import type { Timezone } from "./Timezone";
+import { utcTime } from "./Timezone";
 import type { Root } from "../Root";
 
 /**
@@ -193,16 +194,19 @@ export function checkChange(timeOne: number, timeTwo: number, unit: TimeUnit, ut
 
 	let dateOne = new Date(timeOne);
 	let dateTwo = new Date(timeTwo);
+	let asUTC = utc;
 
-	if (timezone) {
-		dateOne = timezone.convertLocal(dateOne);
-		dateTwo = timezone.convertLocal(dateTwo);
+	if (timezone && !utc) {
+		// The zone's wall clocks, read with the UTC getters, so the browser's own DST plays no part
+		dateOne = new Date(timeOne - Math.round(timezone.offsetUTC(dateOne) * 60000));
+		dateTwo = new Date(timeTwo - Math.round(timezone.offsetUTC(dateTwo) * 60000));
+		asUTC = true;
 	}
 
 	let timeZoneOffset1 = 0;
 	let timeZoneOffset2 = 0;
 
-	if (!utc && unit != "millisecond") {
+	if (!asUTC && unit != "millisecond") {
 		timeZoneOffset1 = dateOne.getTimezoneOffset();
 		dateOne.setUTCMinutes(dateOne.getUTCMinutes() - timeZoneOffset1);
 
@@ -286,15 +290,14 @@ export function checkChange(timeOne: number, timeTwo: number, unit: TimeUnit, ut
  * @return Modified date
  */
 export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean, timezone?: Timezone): Date {
+	if (timezone && !utc) {
+		return addInTimezone(date, unit, count, timezone);
+	}
+
 	let timeZoneOffset = 0;
 
 	if (!utc && unit != "millisecond") {
 		timeZoneOffset = date.getTimezoneOffset();
-
-		if (timezone) {
-			timeZoneOffset -= timezone.offsetUTC(date);
-		}
-
 		date.setUTCMinutes(date.getUTCMinutes() - timeZoneOffset);
 	}
 
@@ -355,10 +358,6 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean, ti
 
 			let newTimeZoneOffset = date.getTimezoneOffset();
 
-			if (timezone) {
-				newTimeZoneOffset += timezone.offsetUTC(date);
-			}
-
 			if (newTimeZoneOffset != timeZoneOffset) {
 				let diff = newTimeZoneOffset - timeZoneOffset;
 				date.setUTCMinutes(date.getUTCMinutes() + diff);
@@ -371,6 +370,67 @@ export function add(date: Date, unit: TimeUnit, count: number, utc?: boolean, ti
 		}
 	}
 
+	return date;
+}
+
+/**
+ * `add()` in a named timezone: days, weeks, months and years keep the time of
+ * day on the zone's clock, smaller units add elapsed time.
+ */
+function addInTimezone(date: Date, unit: TimeUnit, count: number, timezone: Timezone): Date {
+	const time = date.getTime();
+	if (isNaN(time)) {
+		return date;
+	}
+
+	if (unit != "day" && unit != "week" && unit != "month" && unit != "year") {
+		date.setTime(time + getDuration(unit, count));
+		return date;
+	}
+
+	// The zone's wall clock, as UTC
+	const offset = Math.round(timezone.offsetUTC(date) * 60000);
+	const wall = new Date(time - offset);
+
+	switch (unit) {
+		case "day":
+			wall.setUTCDate(wall.getUTCDate() + count);
+			break;
+
+		case "week":
+			wall.setUTCDate(wall.getUTCDate() + count * 7);
+			break;
+
+		case "month":
+			// The same day rule as above, in UTC
+			const endDays = wall.getUTCDate();
+			const startDays = new Date(utcTime(wall.getUTCFullYear(), wall.getUTCMonth(), 0, 0, 0, 0, 0)).getUTCDate();
+			if (endDays > startDays) {
+				wall.setUTCMonth(wall.getUTCMonth() + count, startDays);
+			}
+			else {
+				wall.setUTCMonth(wall.getUTCMonth() + count);
+			}
+			break;
+
+		case "year":
+			wall.setUTCFullYear(wall.getUTCFullYear() + count);
+			break;
+	}
+
+	// The same time of day can have another offset after a DST change
+	let result = wall.getTime() + offset;
+	const newOffset = Math.round(timezone.offsetUTC(new Date(result)) * 60000);
+	if (newOffset != offset) {
+		result = wall.getTime() + newOffset;
+		const checkOffset = Math.round(timezone.offsetUTC(new Date(result)) * 60000);
+		// A time skipped by the zone's clock (a DST gap) becomes the time just after it
+		if (checkOffset != newOffset) {
+			result = wall.getTime() + Math.max(newOffset, checkOffset);
+		}
+	}
+
+	date.setTime(result);
 	return date;
 }
 
@@ -549,7 +609,6 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		}
 		let initialTime = date.getTime();
 		let tzoffset = timezone.offsetUTC(date);
-		let timeZoneOffset = date.getTimezoneOffset();
 		let parsedDate = timezone.parseDate(date);
 		let year = parsedDate.year;
 		let month = parsedDate.month;
@@ -560,7 +619,8 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		let millisecond = parsedDate.millisecond;
 		let weekday = parsedDate.weekday;
 
-		let offsetDif = tzoffset - timeZoneOffset;
+		// Worked out in UTC from here, so the browser's own timezone and its DST play no part
+		let offsetDif = tzoffset;
 
 		switch (unit) {
 
@@ -664,7 +724,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 
 
 
-		date = new Date(year, month, day, hour, minute, second, millisecond);
+		date = new Date(utcTime(year, month, day, hour, minute, second, millisecond));
 
 		// fix to solve #101989
 		const newTime = date.getTime();
@@ -680,9 +740,7 @@ export function round(date: Date, unit: TimeUnit, count: number, firstDateOfWeek
 		}
 		// end of fix
 
-		let newTimeZoneOffset = date.getTimezoneOffset();
-		let newTzoffset = timezone.offsetUTC(date);
-		let newDiff = newTzoffset - newTimeZoneOffset;
+		let newDiff = timezone.offsetUTC(date);
 
 		if (newDiff != offsetDif) {
 			date.setTime(date.getTime() + (newDiff - offsetDif) * 60000);

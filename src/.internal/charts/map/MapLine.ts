@@ -7,7 +7,7 @@ import type { IGraphics } from "../../core/render/backend/Renderer";
 import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
 import { Percent } from "../../core/util/Percent";
-import { projectAltitude, isGlobe } from "./MapUtils";
+import { altitudeProjector, isGlobe } from "./MapUtils";
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate, IGraphicsEvents } from "../../core/render/Graphics";
 import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
@@ -15,7 +15,8 @@ import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
 export interface IMapLineSettings extends IGraphicsSettings {
 
 	/**
-	 * The line's path, as GeoJSON geometry.
+	 * The line's path, as GeoJSON geometry. A third value in a point's
+	 * coordinates is its height in metres, used once `altitude` is set.
 	 */
 	geometry?: GeoJSON.LineString | GeoJSON.MultiLineString;
 
@@ -33,10 +34,13 @@ export interface IMapLineSettings extends IGraphicsSettings {
 	 * from one point to the next, rises this many metres in its middle.
 	 * `400000` is about the height of the International Space Station.
 	 *
-	 * Once it is set (`0` included), the ends sit at the `altitude` of the
-	 * points the line connects, or at the third value of their coordinates, in
-	 * metres too. Without it, the line stays on the surface. On flat maps it
-	 * rises up the screen.
+	 * Once it is set (`0` included), every point of the line sits at its own
+	 * height: the third value of its coordinates, or the `altitude` of the map
+	 * point it connects, in metres too. Between points the height changes
+	 * evenly, and this arc is added on top, so `0` follows the heights alone.
+	 * A negative height goes below the surface: inside a globe, hidden where the
+	 * globe covers it. Without `altitude`, the line stays on the surface. On flat
+	 * maps height goes up the screen.
 	 *
 	 * Does not apply to `lineType: "straight"`.
 	 *
@@ -278,6 +282,7 @@ export class MapLine extends Graphics {
 
 		const segments = this._segments();
 		const arc = this.get("altitude", 0);
+		const project = altitudeProjector(projection, !showHidden);
 
 		for (let s = 0; s < segments.length; s++) {
 			const segment = segments[s];
@@ -285,20 +290,20 @@ export class MapLine extends Graphics {
 			for (let p = 1; p < segment.length; p++) {
 				const a = segment[p - 1];
 				const b = segment[p];
-				const length = geoDistance(a as [number, number], b as [number, number]);
 				const interpolate = geoInterpolate(a as [number, number], b as [number, number]);
+				const length: number = (interpolate as any).distance;
 
 				// The point at t (0-1) along this leg, when the globe does not hide it;
 				// each leg is an arc of its own
 				const sample = (t: number): IPoint | undefined => {
 					const location = interpolate(t);
 					const altitude = (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t + arc * 4 * t * (1 - t);
-					const point = projectAltitude(projection, location[0], location[1], altitude);
+					const point = project(location[0], location[1], altitude);
 					return point && (showHidden || !point.hidden) ? point : undefined;
 				};
 
-				// About a degree apart
-				const steps = Math.max(2, Math.ceil(length / $math.RADIANS));
+				// About a degree apart; a raised leg needs a middle for its arc
+				const steps = Math.max(arc ? 2 : 1, Math.ceil(length / $math.RADIANS));
 				let prevT = 0;
 				for (let k = p == 1 ? 0 : 1; k <= steps; k++) {
 					const t = k / steps;

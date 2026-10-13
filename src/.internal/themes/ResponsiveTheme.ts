@@ -643,6 +643,16 @@ export class ResponsiveTheme extends Theme {
 
 		addRule({
 			name: "AxisTick",
+			tags: ["circular"],
+			relevant: ResponsiveTheme.maybeS,
+			settings: {
+				inside: true
+			}
+		});
+
+		addRule({
+			name: "AxisTick",
+			tags: ["radial"],
 			relevant: ResponsiveTheme.maybeS,
 			settings: {
 				inside: true
@@ -655,15 +665,6 @@ export class ResponsiveTheme extends Theme {
 			relevant: ResponsiveTheme.maybeXS,
 			settings: {
 				forceHidden: true
-			}
-		});
-
-		addRule({
-			name: "AxisTick",
-			tags: ["circular"],
-			relevant: ResponsiveTheme.maybeXS,
-			settings: {
-				inside: true
 			}
 		});
 

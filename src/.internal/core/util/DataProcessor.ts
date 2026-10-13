@@ -8,8 +8,9 @@ import * as $array from "./Array"
 export interface IDataProcessorSettings extends IEntitySettings {
 
 	/**
-	 * Format of the string dates in `dateFields`, such as `"yyyy-MM-dd"`. Set it
-	 * whenever those fields hold strings.
+	 * Format of the string dates in `dateFields`, such as `"yyyy-MM-dd"`.
+	 * Without it, strings are read by the browser's `Date`, which takes a
+	 * date-only string such as `"2024-03-15"` as midnight UTC.
 	 */
 	dateFormat?: string;
 

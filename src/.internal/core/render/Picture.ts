@@ -109,28 +109,23 @@ export class Picture extends Sprite {
 		}
 
 		if (this.isDirty("shadowColor")) {
-			this._display.clear();
 			const shadowColor = this.get("shadowColor");
 			this._display.shadowColor = shadowColor == null ? undefined : shadowColor;
 		}
 
 		if (this.isDirty("shadowBlur")) {
-			this._display.clear();
 			this._display.shadowBlur = this.get("shadowBlur");
 		}
 
 		if (this.isDirty("shadowOffsetX")) {
-			this._display.clear();
 			this._display.shadowOffsetX = this.get("shadowOffsetX");
 		}
 
 		if (this.isDirty("shadowOffsetY")) {
-			this._display.clear();
 			this._display.shadowOffsetY = this.get("shadowOffsetY");
 		}
 
 		if (this.isDirty("shadowOpacity")) {
-			this._display.clear();
 			this._display.shadowOpacity = this.get("shadowOpacity");
 		}
 

@@ -738,7 +738,7 @@ export class MapChart extends SerialChart {
 			this._fitMap();
 			refitted = w > 0 && h > 0;
 
-			projection.scale(this.getPrivate("mapScale") * this.get("zoomLevel", 1));
+			this._applyZoom();
 			if (projection.rotate) {
 				projection.rotate([this.get("rotationX", 0), this.get("rotationY", 0), this.get("rotationZ", 0)])
 			}
@@ -820,6 +820,7 @@ export class MapChart extends SerialChart {
 
 
 			this._fitMap();
+			this._applyZoom();
 			refitted = w > 0 && h > 0;
 		}
 
@@ -882,7 +883,7 @@ export class MapChart extends SerialChart {
 		}
 
 		if (this.isDirty("zoomLevel")) {
-			projection.scale(this.getPrivate("mapScale") * this.get("zoomLevel", 1));
+			this._applyZoom();
 			this.markDirtyProjection();
 
 			this.series.each((series) => {
@@ -1021,6 +1022,14 @@ export class MapChart extends SerialChart {
 		});
 	}
 
+
+	// Before the first fit there is no scale to zoom
+	protected _applyZoom() {
+		const mapScale = this.getPrivate("mapScale");
+		if (mapScale) {
+			this.get("projection")!.scale(mapScale * this.get("zoomLevel", 1));
+		}
+	}
 
 	protected _fitMap() {
 		const projection = this.get("projection")!;
@@ -1183,7 +1192,11 @@ export class MapChart extends SerialChart {
 			let w = this.innerWidth();
 			let h = this.innerHeight();
 			if (w > 0 && h > 0) {
-				this._centerLocation = projection.invert([this.innerWidth() / 2, this.innerHeight() / 2]);
+				const center = projection.invert([w / 2, h / 2]);
+				// Not yet fitted, there is no center
+				if (center && isFinite(center[0]) && isFinite(center[1])) {
+					this._centerLocation = center;
+				}
 			}
 		}
 		super._updateChildren();

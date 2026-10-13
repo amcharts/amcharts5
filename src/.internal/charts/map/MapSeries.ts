@@ -19,7 +19,9 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	/**
 	 * Counts the series' geometries when the chart fits the map to its area.
 	 * Turn it off for a background series, so the map fits the rest. Point,
-	 * line and sankey series have it off by default.
+	 * line and sankey series have it off by default. When it is on, adding or
+	 * removing data fits the map again, so keep it off for data that changes
+	 * often.
 	 *
 	 * @default true
 	 * @since 5.2.36
