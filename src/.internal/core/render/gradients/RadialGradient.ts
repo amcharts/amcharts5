@@ -76,14 +76,15 @@ export class RadialGradient extends Gradient {
 			y = t + height / 2;
 		}
 
+		// Pixels are in the element's own space; a percent is across its bounds
 		let ux = this.get("x");
 		let uy = this.get("y");
 		if (ux != null) {
-			x = l + $utils.relativeToValue(ux, width);
+			x = $type.isNumber(ux) ? ux : l + $utils.relativeToValue(ux, width);
 		}
 
 		if (uy != null) {
-			y = t + $utils.relativeToValue(uy, height);
+			y = $type.isNumber(uy) ? uy : t + $utils.relativeToValue(uy, height);
 		}
 
 		const gradient = this._root._renderer.createRadialGradient(x, y, 0, x, y, radius);

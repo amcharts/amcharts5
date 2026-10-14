@@ -535,6 +535,24 @@ export function findMap<A, B>(array: ArrayLike<A>, matches: (value: A, index: nu
 }
 
 /**
+ * Returns a copy of `array` with its two halves taken in turn: 1, 4, 2, 5,
+ * 3, 6. Neighbours come from opposite halves.
+ *
+ * @ignore
+ */
+export function interleave<A>(array: Array<A>): Array<A> {
+	const half = Math.ceil(array.length / 2);
+	const result: Array<A> = [];
+	for (let i = 0; i < half; i++) {
+		result.push(array[i]);
+		if (i + half < array.length) {
+			result.push(array[i + half]);
+		}
+	}
+	return result;
+}
+
+/**
  * Shuffles `array` in place into a random order.
  *
  * @param array  Source array

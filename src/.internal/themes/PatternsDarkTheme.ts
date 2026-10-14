@@ -41,7 +41,8 @@ export class PatternsDarkTheme extends Theme {
 			primaryButtonStroke: Color.fromHex(0xdddddd),
 			primaryButtonText: Color.fromHex(0x111111),
 			positive: Color.fromHex(0xcccccc),
-			negative: Color.fromHex(0x777777)
+			negative: Color.fromHex(0x777777),
+			warning: Color.fromHex(0xa1a1a1)
 		});
 
 		// A ramp of grays for the series: line strokes and fills cycle through them,

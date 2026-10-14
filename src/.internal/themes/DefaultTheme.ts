@@ -73,7 +73,8 @@ export class DefaultTheme extends Theme {
 			alternativeText: Color.fromHex(0xffffff),
 			disabled: Color.fromHex(0xadadad),
 			positive: Color.fromHex(0x50b300),
-			negative: Color.fromHex(0xb30000)
+			negative: Color.fromHex(0xb30000),
+			warning: Color.fromHex(0xf2c230)
 		});
 
 		{

@@ -1,6 +1,24 @@
 import { Entity, IEntitySettings, IEntityPrivate } from "./Entity";
 import { Color } from "./Color";
 
+// A list's length before colors were added to it (color sets share their theme's list)
+const listLengths: WeakMap<Color[], number> = new WeakMap();
+
+function listLength(colors: Color[]): number {
+	let length = listLengths.get(colors);
+	if (length == null) {
+		length = colors.length;
+		listLengths.set(colors, length);
+	}
+	return length;
+}
+
+function gcd(a: number, b: number): number {
+	while (b) {
+		[a, b] = [b, a % b];
+	}
+	return a;
+}
 
 export interface IColorSetSettings extends IEntitySettings {
 
@@ -56,6 +74,11 @@ export interface IColorSetPrivate extends IEntityPrivate {
 
 	currentStep?: number;
 	currentPass?: number;
+
+	/**
+	 * @ignore
+	 */
+	currentCount?: number;
 
 	/**
 	 * @ignore
@@ -118,6 +141,7 @@ export class ColorSet extends Entity {
 		this.setPrivate("currentPass", this.getPrivate("currentPass", 0) + 1)
 		const pass = this.getPrivate("currentPass");
 		const colors = this.get("colors", [this.get("baseColor", Color.fromHex(0xff0000))]);
+		listLength(colors);
 		if (!this.getPrivate("numColors")) {
 			this.setPrivate("numColors", colors.length);
 		}
@@ -169,14 +193,39 @@ export class ColorSet extends Entity {
 
 	/**
 	 * Returns the next [[Color]] in the list, `step` positions after the last
-	 * one. Generates more colors when the list runs out.
+	 * one. Generates more colors when the list runs out. With `reuse`, a `step`
+	 * that would come back to colors already used moves on by one instead, so
+	 * every color in the list is used before any repeats.
 	 *
 	 * @return  Color
 	 */
 	public next() {
-		let currentStep = this.getPrivate("currentStep", this.get("startIndex", 0));
+		const currentStep = this.getPrivate("currentStep", this.get("startIndex", 0));
+		const count = this.getPrivate("currentCount", 0);
 		this.setPrivate("currentStep", currentStep + this.get("step", 1));
-		return this.getIndex(currentStep);
+		this.setPrivate("currentCount", count + 1);
+		return this.getIndex(currentStep + this.reuseOffset(count));
+	}
+
+	/**
+	 * With `reuse`, how many positions the color taken `count`-th with `step`
+	 * moves on, so that a step coming back to colors already used takes the
+	 * next ones instead.
+	 *
+	 * @ignore
+	 */
+	public reuseOffset(count: number): number {
+		const step = this.get("step", 1);
+		if (this.get("reuse") && step > 0 && step % 1 == 0) {
+			const length = listLength(this.get("colors", []));
+			if (length > 1) {
+				const shared = gcd(step, length);
+				if (shared > 1) {
+					return Math.floor(count / (length / shared)) % shared;
+				}
+			}
+		}
+		return 0;
 	}
 
 	/**
@@ -185,5 +234,6 @@ export class ColorSet extends Entity {
 	public reset() {
 		this.setPrivate("currentStep", this.get("startIndex", 0));
 		this.setPrivate("currentPass", 0);
+		this.setPrivate("currentCount", 0);
 	}
 }

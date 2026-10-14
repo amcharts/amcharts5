@@ -43,7 +43,8 @@ export class SavannaTheme extends Theme {
 			alternativeText: Color.fromHex(0xf3ede1),
 			disabled: Color.fromHex(0xb3a789),
 			positive: Color.fromHex(0x7a8c5a), // olive
-			negative: Color.fromHex(0xc0553a) // terracotta
+			negative: Color.fromHex(0xc0553a), // terracotta
+			warning: Color.fromHex(0xd4a84a)
 		});
 
 		// Muted natural accents lifted from the DataViz Dojo palette.

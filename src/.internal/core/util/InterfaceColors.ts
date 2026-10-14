@@ -125,7 +125,13 @@ export interface IInterfaceColorsSettings extends IEntitySettings {
 	/**
 	 * Color for negative values, such as a fall.
 	 */
-	negative?: Color
+	negative?: Color,
+
+	/**
+	 * Color between `negative` and `positive`, such as a warning or the middle
+	 * of a scale from bad to good.
+	 */
+	warning?: Color
 
 }
 

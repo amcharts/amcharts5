@@ -178,6 +178,10 @@ async function buildWorldLow(state) {
 	await mkdir(state.path("dist", "script", "geodata"));
 
 	await writeFile(state.path("dist", "script", "geodata", "worldLow.js"), geodataToScript("_worldLow", file));
+
+	// The US map, for the examples that use it
+	const usaLow = removeTypeScriptTypes(await readFile(state.path("src", "geodata", "usaLow.ts")));
+	await writeFile(state.path("dist", "script", "geodata", "usaLow.js"), geodataToScript("_usaLow", usaLow));
 }
 
 

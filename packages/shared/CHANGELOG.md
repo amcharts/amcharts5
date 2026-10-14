@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.21.2] - 2026-10-14
+
+### Added
+- New interface color `warning`: a yellow between `negative` and `positive`.
+- `am5.Color.interpolateColors()` blends through any number of colors, e.g. red, yellow and green.
+- Heat rules take `stops`, for a scale through more than two values (e.g. red, yellow and green), and `HeatLegend` takes `colors`.
+- `am5themes_Adaptive` and `am5themes_Monochrome`: new settings `interleave` (neighbouring series differ more), `mapShade` (lighter map land) and `keepContrast` (colors stay readable on the background).
+
+### Fixed
+- A color `step` could use only two or three of a theme's colors, e.g. in word clouds and treemaps with Nord, Pastel or Adaptive.
+- `RadialGradient` with `x` and `y` in pixels was off-center on radar fills and similar shapes since 5.21.1.
+
+
 ## [5.21.1] - 2026-10-13
 
 ### Changed

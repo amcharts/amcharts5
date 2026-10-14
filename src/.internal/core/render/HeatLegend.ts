@@ -12,18 +12,29 @@ import { LinearGradient } from "../../core/render/gradients/LinearGradient";
 
 import * as $utils from "../../core/util/Utils";
 import * as $type from "../../core/util/Type";
+import * as $array from "../../core/util/Array";
 
 export interface IHeatLegendSettings extends IContainerSettings {
 
 	/**
 	 * Color at the start of the scale (the lowest value).
 	 */
-	startColor: Color;
+	startColor?: Color;
 
 	/**
 	 * Color at the end of the scale (the highest value).
 	 */
-	endColor: Color;
+	endColor?: Color;
+
+	/**
+	 * Colors for a scale through more than two colors, in place of
+	 * `startColor` and `endColor`. As a gradient (`stepCount` of `1`), they
+	 * are spread evenly along it; as steps, there is one step per color and
+	 * `stepCount` is ignored.
+	 *
+	 * @since 5.21.2
+	 */
+	colors?: Array<Color>;
 
 	/**
 	 * Opacity at the start of the scale (the lowest value).
@@ -162,23 +173,29 @@ export class HeatLegend extends Container {
 
 			let c = (value - startValue) / (endValue - startValue);
 
-			if(c == Infinity || c == -Infinity || isNaN(c)) {
+			if (c == Infinity || c == -Infinity || isNaN(c)) {
 				c = 0.5;
 			}
 
 			const startColor = this.get("startColor")!;
 			const endColor = this.get("endColor")!;
+			const colors = this.get("colors");
 
 			if (!text) {
 				text = this.getNumberFormatter().format(value);
 			}
 
 			if (!color) {
-				color = Color.interpolate(c, startColor, endColor);
+				if (colors && colors.length) {
+					color = Color.interpolateColors(c, colors);
+				}
+				else if (startColor && endColor) {
+					color = Color.interpolate(c, startColor, endColor);
+				}
 			}
 
 			tooltip.label.set("text", text);
-			let p:IPoint;
+			let p: IPoint;
 
 			if (this.get("orientation") == "vertical") {
 				p = this.markerContainer.toGlobal({ x: 0, y: this.innerHeight() * (1 - c) });
@@ -188,11 +205,45 @@ export class HeatLegend extends Container {
 			}
 
 			let background = tooltip.get("background");
-			if (background) {
+			if (background && color) {
 				background.set("fill", color)
 			}
 			tooltip.set("pointTo", p);
 			tooltip.show();
+		}
+	}
+
+	// The scale from `colors`: one step per color, or a gradient through them
+	protected _colorMarkers(colors: Array<Color>, steps: boolean, startOpacity: number, endOpacity: number) {
+		const orientation = this.get("orientation");
+		const last = Math.max(1, colors.length - 1);
+		if (steps) {
+			$array.each(colors, (color, i) => {
+				const marker = this.makeMarker();
+				if (orientation == "vertical") {
+					this.markerContainer.children.moveValue(marker, 0);
+				}
+				else {
+					this.markerContainer.children.push(marker);
+				}
+				marker._setCAll({
+					fill: color,
+					fillOpacity: percent(i / last * 100).interpolate(startOpacity, endOpacity)
+				});
+			});
+		}
+		else {
+			const marker = this.makeMarker();
+			this.markerContainer.children.push(marker);
+			const stops = $array.map(colors, (color, i) => ({ color: color, opacity: percent(i / last * 100).interpolate(startOpacity, endOpacity), offset: 0 }));
+			if (orientation == "vertical") {
+				stops.reverse();
+			}
+			// Explicit offsets, so that a single color still makes a valid gradient
+			$array.each(stops, (stop, i) => {
+				stop.offset = i / last;
+			});
+			marker._setC("fillGradient", LinearGradient.new(this._root, { stops: stops, rotation: orientation == "vertical" ? 90 : 0 }));
 		}
 	}
 
@@ -231,16 +282,22 @@ export class HeatLegend extends Container {
 		// The markers (colors, opacities, gradient rotation, step order) are all
 		// (re)built here, so rebuild on any of the settings they depend on — not
 		// just `stepCount`.
-		if (this.isDirty("stepCount") || this.isDirty("startColor") || this.isDirty("endColor") || this.isDirty("startOpacity") || this.isDirty("endOpacity") || this.isDirty("orientation")) {
+		if (this.isDirty("stepCount") || this.isDirty("startColor") || this.isDirty("endColor") || this.isDirty("colors") || this.isDirty("startOpacity") || this.isDirty("endOpacity") || this.isDirty("orientation")) {
 			const stepCount = this.get("stepCount", 1);
 			const startColor = this.get("startColor")!;
 			const endColor = this.get("endColor")!;
+			const colors = this.get("colors");
 
 			const startOpacity = this.get("startOpacity", 1);
 			const endOpacity = this.get("endOpacity", 1);
 
 			this.markerContainer.children.clear();
-			if (stepCount > 1) {
+			if (colors && colors.length) {
+				if (stepCount >= 1) {
+					this._colorMarkers(colors, stepCount > 1, startOpacity, endOpacity);
+				}
+			}
+			else if (stepCount > 1) {
 				for (let i = 0; i < stepCount; i++) {
 					const marker = this.makeMarker();
 

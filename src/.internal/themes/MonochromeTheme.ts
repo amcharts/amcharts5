@@ -1,7 +1,8 @@
 import { Color } from "../core/util/Color";
 import { Theme } from "../core/Theme";
 import type { Root } from "../core/Root";
-import { colorToOKLCH, oklchToColor } from "../core/util/OKLCH";
+import { colorToOKLCH, oklchToColor, withContrast, fillShade } from "../core/util/OKLCH";
+import * as $array from "../core/util/Array";
 
 /**
  * Options for {@link MonochromeTheme}.
@@ -36,6 +37,32 @@ export interface IMonochromeThemeSettings {
 	 * @default 7
 	 */
 	count?: number;
+
+	/**
+	 * Takes the shades in an alternating order (1, 4, 2, 5, 3, 6), so series
+	 * next to each other differ more. The `accent` stays first.
+	 *
+	 * @default false
+	 */
+	interleave?: boolean;
+
+	/**
+	 * Fills map polygons with a mid shade of `color`, as light as a map's
+	 * default land, instead of `color` itself.
+	 *
+	 * @default false
+	 */
+	mapShade?: boolean;
+
+	/**
+	 * Keeps the shades, the `accent` and the primary buttons at a minimum
+	 * contrast against the background: `true` for 3:1, or a ratio, e.g. `4.5`.
+	 * The end of the ramp nearest the background moves away from it, and the
+	 * other shades spread out evenly up to it.
+	 *
+	 * @default false
+	 */
+	keepContrast?: boolean | number;
 }
 
 /**
@@ -62,26 +89,47 @@ export function MonochromeTheme(root: Root, settings: IMonochromeThemeSettings =
 
 	// With no color set, default to a blue base.
 	const hasColor = settings.color != null;
-	const baseColor = hasColor ? Color.fromAny(settings.color!) : Color.fromHex(0x2e7c9e);
+	let baseColor = hasColor ? Color.fromAny(settings.color!) : Color.fromHex(0x2e7c9e);
 
 	const base = colorToOKLCH(baseColor);
+
+	// With keepContrast, colors too close to the background move away from it
+	const background = Color.fromHex(dark ? 0x121212 : 0xffffff);
+	const ratio = settings.keepContrast === true ? 3 : Number(settings.keepContrast);
+	const fit = (color: Color) => ratio > 1 ? withContrast(color, background, ratio) : color;
 
 	// Even lightness ramp holding the base color's hue and chroma. On light
 	// grounds the ramp runs mid-to-dark; on dark grounds it runs light-to-mid so
 	// every step keeps contrast with the background.
-	const lHi = dark ? 0.86 : 0.74;
-	const lLo = dark ? 0.46 : 0.30;
+	let lHi = dark ? 0.86 : 0.74;
+	let lLo = dark ? 0.46 : 0.30;
 
-	const colors: Array<Color> = [];
+	// The end nearest the background moves, so the shades stay evenly spread
+	if (ratio > 1) {
+		if (dark) {
+			lLo = Math.max(lLo, colorToOKLCH(fit(oklchToColor(lLo, base.c, base.h))).l);
+		}
+		else {
+			lHi = Math.min(lHi, colorToOKLCH(fit(oklchToColor(lHi, base.c, base.h))).l);
+		}
+	}
+
+	let colors: Array<Color> = [];
 	for (let i = 0; i < count; i++) {
 		const t = count === 1 ? 0 : i / (count - 1);
-		colors.push(oklchToColor(lHi + (lLo - lHi) * t, base.c, base.h));
+		colors.push(fit(oklchToColor(lHi + (lLo - lHi) * t, base.c, base.h)));
+	}
+
+	if (settings.interleave) {
+		colors = $array.interleave(colors);
 	}
 
 	// Optional accent: a distinct first color so one series pops off the ramp.
 	if (settings.accent != null) {
-		colors.unshift(Color.fromAny(settings.accent));
+		colors.unshift(fit(Color.fromAny(settings.accent)));
 	}
+
+	baseColor = fit(baseColor);
 
 	const theme = Theme.new(root);
 
@@ -122,7 +170,8 @@ export function MonochromeTheme(root: Root, settings: IMonochromeThemeSettings =
 			alternativeText: Color.fromHex(0x121212),
 			disabled: Color.fromHex(0x6b6b6b),
 			positive: Color.fromHex(0x5cc26e),
-			negative: Color.fromHex(0xe0655c)
+			negative: Color.fromHex(0xe0655c),
+			warning: Color.fromHex(0xf2c94c)
 		});
 	}
 	else {
@@ -135,6 +184,10 @@ export function MonochromeTheme(root: Root, settings: IMonochromeThemeSettings =
 			primaryButtonActive: Color.lighten(baseColor, -0.1),
 			primaryButtonStroke: Color.lighten(baseColor, -0.15)
 		});
+	}
+
+	if (settings.mapShade) {
+		theme.rule("MapPolygon").setAll({ fill: fillShade(base, dark) });
 	}
 
 	return theme;

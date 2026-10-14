@@ -306,6 +306,26 @@ export class Color {
 	}
 
 	/**
+	 * Returns a color on a scale through `colors`, spread evenly: with three
+	 * colors, `0.5` is the middle one. For example, from bad to good:
+	 * `[negative, warning, positive]` from the interface colors.
+	 *
+	 * @param   position  Position on the scale, from `0` (the first color) to `1` (the last)
+	 * @param   colors    Colors, in order
+	 * @param   mode      Mix the `"rgb"` channels or the `"hsl"` values
+	 * @return            Color
+	 */
+	public static interpolateColors(position: number, colors: Array<Color>, mode: "rgb" | "hsl" = "rgb"): Color {
+		const last = colors.length - 1;
+		if (last < 1) {
+			return colors[0];
+		}
+		const at = (position > 0 ? Math.min(1, position) : 0) * last;
+		const index = Math.min(Math.floor(at), last - 1);
+		return Color.interpolate(at - index, colors[index], colors[index + 1], mode);
+	}
+
+	/**
 	 * Returns a new [[Color]] lightened by `percent`, from `-1` to `1`: `0.2`
 	 * moves each channel 20% of the way to white. A negative value darkens it
 	 * toward black.

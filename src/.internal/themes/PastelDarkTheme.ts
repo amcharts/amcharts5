@@ -44,7 +44,8 @@ export class PastelDarkTheme extends Theme {
 			alternativeText: Color.fromHex(0x24222b),
 			disabled: Color.fromHex(0x6d6878),
 			positive: Color.fromHex(0xa8dcc0),
-			negative: Color.fromHex(0xe8aab6)
+			negative: Color.fromHex(0xe8aab6),
+			warning: Color.fromHex(0xf0dc9a)
 		});
 
 		// Deeper, muted pastels — darker than the light theme's so they read as

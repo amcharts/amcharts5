@@ -46,7 +46,8 @@ export class EmberTheme extends Theme {
 			alternativeText: Color.fromHex(0x17140f),
 			disabled: Color.fromHex(0x7d6f5f),
 			positive: Color.fromHex(0x8fb96b),
-			negative: Color.fromHex(0xe0655c)
+			negative: Color.fromHex(0xe0655c),
+			warning: Color.fromHex(0xe8b84a)
 		});
 
 		// Warm-biased palette with a few cool hues for categorical separation.

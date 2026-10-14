@@ -43,7 +43,8 @@ export class PastelTheme extends Theme {
 			alternativeText: Color.fromHex(0xf7f4ee),
 			disabled: Color.fromHex(0xb7b1a8),
 			positive: Color.fromHex(0x9fc4a8),
-			negative: Color.fromHex(0xe39aa6)
+			negative: Color.fromHex(0xe39aa6),
+			warning: Color.fromHex(0xecd58f)
 		});
 
 		// Medium pastels — soft, but saturated enough to read on the cream ground.

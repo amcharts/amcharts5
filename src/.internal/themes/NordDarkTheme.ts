@@ -45,7 +45,8 @@ export class NordDarkTheme extends Theme {
 			alternativeText: Color.fromHex(0x2e3440), // nord0
 			disabled: Color.fromHex(0x4c566a), // nord3
 			positive: Color.fromHex(0xa3be8c), // nord14
-			negative: Color.fromHex(0xbf616a) // nord11
+			negative: Color.fromHex(0xbf616a), // nord11
+			warning: Color.fromHex(0xebcb8b) // nord13
 		});
 
 		// Muted Frost/Aurora accents, bright enough to read on Polar Night.

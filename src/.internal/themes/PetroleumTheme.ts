@@ -50,7 +50,8 @@ export class PetroleumTheme extends Theme {
 			alternativeText: background,
 			disabled: Color.fromHex(0x5a6055),
 			positive: Color.fromHex(0x6a8a70),
-			negative: Color.fromHex(0xb5602a)
+			negative: Color.fromHex(0xb5602a),
+			warning: Color.fromHex(0xc9a03a)
 		});
 
 		// Tight palette: mostly crude-gold tones plus one green accent.

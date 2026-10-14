@@ -48,7 +48,8 @@ export function darkInterfaceColors(): Partial<IInterfaceColorsSettings> {
 		alternativeText: Color.fromHex(0x121212),
 		disabled: Color.fromHex(0x6b6b6b),
 		positive: Color.fromHex(0x5cc26e),
-		negative: Color.fromHex(0xe0655c)
+		negative: Color.fromHex(0xe0655c),
+		warning: Color.fromHex(0xf2c94c)
 	};
 }
 

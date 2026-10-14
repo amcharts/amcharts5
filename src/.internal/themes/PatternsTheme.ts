@@ -112,7 +112,8 @@ export class PatternsTheme extends Theme {
 			alternativeText: Color.fromHex(0xffffff),
 			disabled: Color.fromHex(0x999999),
 			positive: Color.fromHex(0x555555),
-			negative: Color.fromHex(0x222222)
+			negative: Color.fromHex(0x222222),
+			warning: Color.fromHex(0x3b3b3b)
 		});
 
 		// A ramp of grays for the series: line strokes and fills cycle through them,

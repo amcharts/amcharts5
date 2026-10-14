@@ -52,6 +52,18 @@ export interface IHeatRule {
 	neutral?: any;
 
 	/**
+	 * Setting values for a scale through more than two, in place of `min` and
+	 * `max`: the element with the lowest value gets the first, the one with
+	 * the highest the last, and the ones between blend through the stops
+	 * between. Numbers, percents or colors, all of one kind, e.g.
+	 * `[negative, warning, positive]` from the interface colors. Values
+	 * outside `minValue` and `maxValue` get the first or last stop.
+	 *
+	 * @since 5.21.2
+	 */
+	stops?: Array<any>;
+
+	/**
 	 * Data item field that holds the value, e.g. `"value"` or `"valueY"`.
 	 */
 	dataField: string;
@@ -89,6 +101,28 @@ export interface IHeatRule {
 
 }
 
+
+// A value on a scale through `stops`, spread evenly, as `min` and `max` blend
+function interpolateStops(position: number, stops: Array<any>): any {
+	const last = stops.length - 1;
+	if (last < 1) {
+		return stops[0];
+	}
+	const at = (position > 0 ? Math.min(1, position) : 0) * last;
+	const index = Math.min(Math.floor(at), last - 1);
+	const from = stops[index];
+	const to = stops[index + 1];
+	const t = at - index;
+	if ($type.isNumber(from)) {
+		return from + (to - from) * t;
+	}
+	else if (from instanceof Color) {
+		return Color.interpolate(t, from, to);
+	}
+	else if (from instanceof Percent) {
+		return percentInterpolate(t, from, to);
+	}
+}
 
 export interface ISeriesDataItem extends IComponentDataItem {
 	id?: string;
@@ -605,7 +639,7 @@ export abstract class Series extends Component {
 		if(calculateAggregates){
 			if (this._valuesDirty && !this._dataProcessed) {
 				if (!this._aggregatesCalculated) {
-					this._calculateAggregates(0, count);					
+					this._calculateAggregates(0, count);
 					this._aggregatesCalculated = true;
 					if(startIndex != 0){
 						this._psi = undefined;
@@ -939,7 +973,10 @@ export abstract class Series extends Component {
 
 						// fixes problems if all values are the same
 						let propertyValue;
-						if ($type.isNumber(rule.min)) {
+						if (rule.stops && rule.stops.length) {
+							propertyValue = interpolateStops(percent, rule.stops);
+						}
+						else if ($type.isNumber(rule.min)) {
 							propertyValue = rule.min + (rule.max - rule.min) * percent;
 						}
 						else if (rule.min instanceof Color) {

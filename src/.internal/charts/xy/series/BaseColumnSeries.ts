@@ -457,7 +457,7 @@ export abstract class BaseColumnSeries extends XYSeries {
 		const startIndex = colors.get("startIndex", 0);
 
 		$array.each(this.dataItems, (dataItem, index) => {
-			const color = colors.getIndex(startIndex + index * step);
+			const color = colors.getIndex(startIndex + index * step + colors.reuseOffset(index));
 			dataItem.setRaw("fill", color);
 
 			const graphics = dataItem.get("graphics");

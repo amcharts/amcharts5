@@ -45,7 +45,8 @@ export class NordTheme extends Theme {
 			alternativeText: Color.fromHex(0xeceff4), // nord6
 			disabled: Color.fromHex(0x9aa3b2),
 			positive: Color.fromHex(0xa3be8c), // nord14
-			negative: Color.fromHex(0xbf616a) // nord11
+			negative: Color.fromHex(0xbf616a), // nord11
+			warning: Color.fromHex(0xebcb8b) // nord13
 		});
 
 		// Deeper Nord hues first so they read on the light ground; the palest

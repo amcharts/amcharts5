@@ -2,7 +2,8 @@ import { Color } from "../core/util/Color";
 import type { IInterfaceColorsSettings } from "../core/util/InterfaceColors";
 import { Theme } from "../core/Theme";
 import type { Root } from "../core/Root";
-import { colorToOKLCH, oklchToColor, IOKLCH } from "../core/util/OKLCH";
+import { colorToOKLCH, oklchToColor, withContrast, fillShade } from "../core/util/OKLCH";
+import * as $array from "../core/util/Array";
 
 /**
  * Options for {@link AdaptiveTheme}.
@@ -37,6 +38,33 @@ export interface IAdaptiveThemeSettings {
 	 * @default false
 	 */
 	dark?: boolean;
+
+	/**
+	 * Takes the colors in an alternating order (1, 4, 2, 5, 3, 6), so series
+	 * next to each other differ more. Most useful with `baseColor2`, whose
+	 * gradient puts similar colors side by side.
+	 *
+	 * @default false
+	 */
+	interleave?: boolean;
+
+	/**
+	 * Fills map polygons with a mid shade of `baseColor`, as light as a map's
+	 * default land, instead of `baseColor` itself.
+	 *
+	 * @default false
+	 */
+	mapShade?: boolean;
+
+	/**
+	 * Lightens (in dark mode) or darkens colors that would have too little
+	 * contrast with the background, keeping their hue: `true` for at least 3:1,
+	 * or a ratio, e.g. `4.5`. Applies to the series colors, `baseColor` and
+	 * `baseColor2` included, and the primary buttons.
+	 *
+	 * @default false
+	 */
+	keepContrast?: boolean | number;
 }
 
 // Golden-angle hue step (degrees) gives a well-spread single-hue-seeded palette.
@@ -71,7 +99,8 @@ function clamp(x: number, lo: number, hi: number): number {
  * "Adaptive": makes a whole series palette from one or two colors. With one,
  * the other colors share an even lightness and spread out over the color
  * wheel; with two, they run as a gradient between them. The first color is
- * always `baseColor` itself, so a brand color appears in the chart.
+ * `baseColor` itself, so a brand color appears in the chart (unless
+ * `keepContrast` has to change it).
  *
  * It is a function rather than a class, so that it can take settings:
  *
@@ -92,7 +121,15 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 
 	// With no base color set, default to a green-to-yellow gradient.
 	const hasBaseColor = settings.baseColor != null;
-	const baseColor = hasBaseColor ? Color.fromAny(settings.baseColor!) : Color.fromHex(0x4b8e39);
+	let baseColor = hasBaseColor ? Color.fromAny(settings.baseColor!) : Color.fromHex(0x4b8e39);
+	const original = colorToOKLCH(baseColor);
+	const hue = original.h;
+
+	// With keepContrast, colors too close to the background move away from it
+	const background = dark ? oklchToColor(0.16, 0.02, hue) : Color.fromHex(0xffffff);
+	const ratio = settings.keepContrast === true ? 3 : Number(settings.keepContrast);
+	const fit = (color: Color) => ratio > 1 ? withContrast(color, background, ratio) : color;
+	baseColor = fit(baseColor);
 	const base = colorToOKLCH(baseColor);
 
 	// Moderated lightness/chroma for the generated (non-seed) colors, so the
@@ -100,7 +137,7 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 	const genL = clamp(base.l, 0.55, 0.78);
 	const genC = clamp(base.c, 0.09, 0.17);
 
-	const colors: Array<Color> = [baseColor];
+	let colors: Array<Color> = [baseColor];
 
 	// Second anchor: an explicit baseColor2, or a yellow default when no base
 	// color was given (so an unconfigured theme is a green-to-yellow gradient).
@@ -110,7 +147,7 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 		// Two anchors: perceptually interpolate across the OKLCH arc between them,
 		// including both endpoints (needs at least the two endpoints).
 		if (count < 2) { count = 2; }
-		const base2Color = Color.fromAny(base2Input);
+		const base2Color = fit(Color.fromAny(base2Input));
 		const base2 = colorToOKLCH(base2Color);
 		colors.length = 0;
 		for (let i = 0; i < count; i++) {
@@ -122,11 +159,11 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 				colors.push(base2Color);
 			}
 			else {
-				colors.push(oklchToColor(
+				colors.push(fit(oklchToColor(
 					lerp(base.l, base2.l, t),
 					lerp(base.c, base2.c, t),
 					lerpHue(base.h, base2.h, t)
-				));
+				)));
 			}
 		}
 	}
@@ -134,8 +171,12 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 		// Single anchor: fan out by the golden angle at a constant, readable
 		// lightness/chroma.
 		for (let i = 1; i < count; i++) {
-			colors.push(oklchToColor(genL, genC, wrapHue(base.h + i * GOLDEN_ANGLE)));
+			colors.push(fit(oklchToColor(genL, genC, wrapHue(base.h + i * GOLDEN_ANGLE))));
 		}
+	}
+
+	if (settings.interleave) {
+		colors = $array.interleave(colors);
 	}
 
 	const theme = Theme.new(root);
@@ -146,7 +187,7 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 	});
 
 	if (dark) {
-		theme.rule("InterfaceColors").setAll(darkInterface(base, baseColor));
+		theme.rule("InterfaceColors").setAll(darkInterface(hue, baseColor));
 	}
 	else {
 		// Light variant: keep the default look but let the base drive the primary
@@ -158,6 +199,10 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 			primaryButtonActive: Color.lighten(baseColor, -0.1),
 			primaryButtonStroke: Color.lighten(baseColor, -0.15)
 		});
+	}
+
+	if (settings.mapShade) {
+		theme.rule("MapPolygon").setAll({ fill: fillShade(original, dark) });
 	}
 
 	return theme;
@@ -174,10 +219,8 @@ AdaptiveTheme.new = function (root: Root, settings: IAdaptiveThemeSettings = {})
 
 // Builds a dark interface palette faintly tinted toward the base hue for
 // cohesion with the generated series colors.
-function darkInterface(base: IOKLCH, baseColor: Color): Partial<IInterfaceColorsSettings> {
-	const h = base.h;
+function darkInterface(h: number, primary: Color): Partial<IInterfaceColorsSettings> {
 	const l = Color.lighten;
-	const primary = baseColor;
 	const secondary = oklchToColor(0.26, 0.02, h);
 
 	return {
@@ -207,6 +250,7 @@ function darkInterface(base: IOKLCH, baseColor: Color): Partial<IInterfaceColors
 		alternativeText: oklchToColor(0.16, 0.02, h),
 		disabled: oklchToColor(0.5, 0.02, h),
 		positive: Color.fromHex(0x5cc26e),
-		negative: Color.fromHex(0xe0655c)
+		negative: Color.fromHex(0xe0655c),
+		warning: Color.fromHex(0xf2c94c)
 	};
 }

@@ -148,3 +148,54 @@ export function oklchToColor(l: number, c: number, h: number, clamp: boolean = t
 		Math.round(clamp01(toGamma(clamp01(lin[2]))) * 255)
 	);
 }
+
+/**
+ * WCAG contrast ratio of two colors, from `1` (none) to `21` (black on white).
+ *
+ * @ignore
+ */
+export function contrastRatio(a: Color, b: Color): number {
+	const luminance = (color: Color) => 0.2126 * toLinear(color.r / 255) + 0.7152 * toLinear(color.g / 255) + 0.0722 * toLinear(color.b / 255);
+	const la = luminance(a);
+	const lb = luminance(b);
+	return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+}
+
+/**
+ * Returns `color` with its lightness moved away from the background's, just
+ * far enough for `ratio` contrast against it, keeping its hue. A color that
+ * already has it is returned as is.
+ *
+ * @ignore
+ */
+export function withContrast(color: Color, background: Color, ratio: number = 3): Color {
+	if (contrastRatio(color, background) >= ratio) {
+		return color;
+	}
+	const c = colorToOKLCH(color);
+	const dark = contrastRatio(background, Color.fromHex(0x000000)) < contrastRatio(background, Color.fromHex(0xffffff));
+	let lo = c.l;
+	let hi = dark ? 1 : 0;
+	for (let i = 0; i < 20; i++) {
+		const mid = (lo + hi) / 2;
+		if (contrastRatio(oklchToColor(mid, c.c, c.h), background) >= ratio) {
+			hi = mid;
+		}
+		else {
+			lo = mid;
+		}
+	}
+	return oklchToColor(hi, c.c, c.h);
+}
+
+/**
+ * A mid shade of a color for large fills such as map land, about as light as
+ * the land in the light and dark themes.
+ *
+ * @ignore
+ */
+export function fillShade(color: IOKLCH, dark: boolean): Color {
+	return dark
+		? oklchToColor(Math.min(Math.max(color.l, 0.58), 0.66), Math.min(color.c, 0.1), color.h)
+		: oklchToColor(Math.min(Math.max(color.l, 0.62), 0.74), Math.min(color.c, 0.12), color.h);
+}

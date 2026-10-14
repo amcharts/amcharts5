@@ -46,7 +46,8 @@ export class MidnightTheme extends Theme {
 			alternativeText: Color.fromHex(0x0d1520),
 			disabled: Color.fromHex(0x5a6b7d),
 			positive: Color.fromHex(0x5cc26e),
-			negative: Color.fromHex(0xe0655c)
+			negative: Color.fromHex(0xe0655c),
+			warning: Color.fromHex(0xf2c94c)
 		});
 
 		// Generated in OKLCH at a constant deep, subdued level (L 0.63, C 0.10)

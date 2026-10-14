@@ -1,0 +1,8 @@
+{
+  "title": "US Heat Map",
+  "description": "US states colored by value on a red, yellow and green scale, with heat rules and a heat legend that take several colors.",
+  "category": "map",
+  "tier": "basic",
+  "tags": ["heat rules", "heat legend", "choropleth", "usa"],
+  "since": "5.21.2"
+}

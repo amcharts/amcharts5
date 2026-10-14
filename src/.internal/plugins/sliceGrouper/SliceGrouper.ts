@@ -61,6 +61,7 @@ export interface ISliceGrouperPrivate extends IEntityPrivate {
 	smallDataItems?: DataItem<IPercentSeriesDataItem>[];
 	currentStep?: number;
 	currentPass?: number;
+	currentCount?: number;
 }
 
 export interface ISliceGrouperEvents extends IEntityEvents {
@@ -103,6 +104,7 @@ export class SliceGrouper extends Entity {
 			if (colors) {
 				this.setPrivate("currentStep", colors.getPrivate("currentStep"));
 				this.setPrivate("currentPass", colors.getPrivate("currentPass"));
+				this.setPrivate("currentCount", colors.getPrivate("currentCount"));
 			}
 		}
 	}
@@ -147,6 +149,7 @@ export class SliceGrouper extends Entity {
 				if (colors) {
 					colors.setPrivate("currentStep", this.getPrivate("currentStep"));
 					colors.setPrivate("currentPass", this.getPrivate("currentPass"));
+					colors.setPrivate("currentCount", this.getPrivate("currentCount"));
 				}
 				series.data.push(groupSliceData);
 
