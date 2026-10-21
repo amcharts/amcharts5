@@ -64,7 +64,8 @@ export class EmberTheme extends Theme {
 				Color.fromHex(0xd07940), // orange
 				Color.fromHex(0xcf7ea2)  // rose
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

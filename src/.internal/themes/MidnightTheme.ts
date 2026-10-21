@@ -70,7 +70,8 @@ export class MidnightTheme extends Theme {
 				Color.fromHex(0x928c3f), // olive
 				Color.fromHex(0x4e90c1)  // sky blue
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

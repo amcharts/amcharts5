@@ -33,7 +33,8 @@ export class KellyTheme extends Theme {
 				Color.fromHex(0xF2F3F4),
 				Color.fromHex(0x222222)
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

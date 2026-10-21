@@ -57,7 +57,8 @@ export class SavannaTheme extends Theme {
 				Color.fromHex(0xc07f3a), // ochre
 				Color.fromHex(0x9a7b52)  // walnut
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

@@ -51,6 +51,15 @@ export interface IColorSetSettings extends IEntitySettings {
 	reuse?: boolean;
 
 	/**
+	 * With `reuse`, each repeat of the list is this much lighter (HSL
+	 * lightness, `0.1` is 10%; a negative value makes it darker) instead of
+	 * the same colors again.
+	 *
+	 * @since 5.21.3
+	 */
+	repeatLightness?: number;
+
+	/**
 	 * A base color to generate new colors from if `colors` is not set.
 	 */
 	baseColor?: Color;
@@ -117,6 +126,15 @@ export class ColorSet extends Entity {
 	public static className: string = "ColorSet";
 	public static classNames: Array<string> = Entity.classNames.concat([ColorSet.className]);
 
+	/**
+	 * How many colors a list had before any were generated: a palette's own.
+	 *
+	 * @ignore
+	 */
+	public static paletteLength(colors: Color[]): number {
+		return listLength(colors);
+	}
+
 	declare public _settings: IColorSetSettings;
 	declare public _privateSettings: IColorSetPrivate;
 
@@ -151,6 +169,17 @@ export class ColorSet extends Entity {
 		const start = 0;
 		const passOptions = this.get("passOptions")!;
 		const reuse = this.get("reuse");
+		const repeatLightness: number = this.get("repeatLightness", 0);
+		if (reuse && repeatLightness) {
+			// A round lighter than the last, counted on the list, which color sets share
+			const length = listLength(colors);
+			const round = Math.floor(colors.length / length);
+			for (let i = 0; i < length; i++) {
+				const hsl = colors[i].toHSL();
+				colors.push(Color.fromHSL(hsl.h, hsl.s, Math.min(1, Math.max(0, hsl.l + repeatLightness * round))));
+			}
+			return;
+		}
 		for (let i = start; i < len; i++) {
 			if (reuse) {
 				colors.push(colors[i])
@@ -204,7 +233,25 @@ export class ColorSet extends Entity {
 		const count = this.getPrivate("currentCount", 0);
 		this.setPrivate("currentStep", currentStep + this.get("step", 1));
 		this.setPrivate("currentCount", count + 1);
-		return this.getIndex(currentStep + this.reuseOffset(count));
+		return this.getIndex(this.reuseIndex(currentStep, count));
+	}
+
+	/**
+	 * With `reuse`, where the color taken `count`-th, at `index`, comes from:
+	 * one round of the list uses each of its colors, the next round comes
+	 * from the repeats after it, and so on.
+	 *
+	 * @ignore
+	 */
+	public reuseIndex(index: number, count: number): number {
+		if (this.get("reuse") && index % 1 == 0) {
+			const length = listLength(this.get("colors", []));
+			if (length > 0) {
+				const position = ((index + this.reuseOffset(count)) % length + length) % length;
+				return Math.floor(count / length) * length + position;
+			}
+		}
+		return index;
 	}
 
 	/**

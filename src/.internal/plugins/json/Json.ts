@@ -4,6 +4,7 @@ import { Entity } from "../../core/util/Entity";
 import { Sprite } from "../../core/render/Sprite";
 import { Container } from "../../core/render/Container";
 import { Color } from "../../core/util/Color";
+import { ColorSet } from "../../core/util/ColorSet";
 import { Percent } from "../../core/util/Percent";
 import { Template } from "../../core/util/Template";
 import { ListData } from "../../core/util/Data";
@@ -166,9 +167,14 @@ function parseRef<E extends Entity>(value: string, refs: Array<IRef>, fallback?:
 
 				// Supports `#foo.get("bar")` and `#foo.get('bar')` syntax
 				const parsed = /get\((["'])([^\1]*)\1\)/.exec(subpath);
+				// and `@colors.getIndex(3)`
+				const index = /^getIndex\((\d+)\)$/.exec(subpath);
 
 				if (parsed) {
 					object = object.get(parsed[2]);
+
+				} else if (index) {
+					object = object.getIndex(+index[1]);
 
 				} else {
 					object = object[subpath];
@@ -303,10 +309,24 @@ class ParserState {
 
 	constructor(updateTargets: "strict" | "soft" = "strict", root?: Root) {
 		this._updateTargets = updateTargets;
-		// "@root" for every config, e.g. "@root.interfaceColors.get('background')";
-		// a ref of the config's own with that name comes later and wins
+		// "@root" for every config, e.g. "@root.interfaceColors.get('background')"
 		if (root) {
 			this._globalRefs.push({ "@root": root });
+
+			// "@colors", the theme's palette, e.g. "@colors.getIndex(3)"; made when
+			// first used, so that themes set after the parser count
+			let colors: ColorSet | undefined;
+			const palette: IRef = {};
+			Object.defineProperty(palette, "@colors", {
+				enumerable: true,
+				get: () => {
+					if (!colors) {
+						colors = ColorSet.new(root, {});
+					}
+					return colors;
+				}
+			});
+			this._globalRefs.push(palette);
 		}
 	}
 

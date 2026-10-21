@@ -61,7 +61,8 @@ export class PastelTheme extends Theme {
 				Color.fromHex(0xa6b0e0), // periwinkle
 				Color.fromHex(0x9fc4a8)  // sage
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

@@ -30,7 +30,8 @@ export class MaterialTheme extends Theme {
 				Color.fromHex(0x9E9E9E),
 				Color.fromHex(0x607D8B)
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

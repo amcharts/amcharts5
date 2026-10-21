@@ -63,6 +63,16 @@ export interface IMonochromeThemeSettings {
 	 * @default false
 	 */
 	keepContrast?: boolean | number;
+
+	/**
+	 * Once every color has been used, each new round of colors is this much
+	 * lighter (HSL lightness: `0.1` is 10%; a negative value makes it darker)
+	 * instead of the same colors again. `true` is `0.1`; `false` or `0`
+	 * repeats the colors as they are.
+	 *
+	 * @default 0.1
+	 */
+	repeatLightness?: boolean | number;
 }
 
 /**
@@ -135,7 +145,8 @@ export function MonochromeTheme(root: Root, settings: IMonochromeThemeSettings =
 
 	theme.rule("ColorSet").setAll({
 		colors: colors,
-		reuse: true
+		reuse: true,
+		repeatLightness: settings.repeatLightness == null || settings.repeatLightness === true ? 0.1 : (Number(settings.repeatLightness) || 0)
 	});
 
 	if (dark) {

@@ -21,7 +21,8 @@ export class MoonriseTheme extends Theme {
 				Color.fromHex(0x586160),
 				Color.fromHex(0x617983)
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

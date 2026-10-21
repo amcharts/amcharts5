@@ -63,7 +63,8 @@ export class PetroleumTheme extends Theme {
 				Color.fromHex(0xa89050), // sulfur
 				Color.fromHex(0x8b6914)  // bronze
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

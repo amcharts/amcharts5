@@ -63,7 +63,8 @@ export class PastelDarkTheme extends Theme {
 				Color.fromHex(0xcd9e78), // peach
 				Color.fromHex(0x7fa2c8)  // sky
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

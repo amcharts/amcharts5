@@ -8,7 +8,13 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 ### Added
-- `images/`: whole-world day and night images from NASA (2048 and 4096 pixels wide) for `am5map.MapRasterSeries`. See `images/README.md` for credit.
+- `images/`: whole-world day and night images of the Earth from NASA (1024, 2048 and 4096 pixels wide) for `am5map.MapRasterSeries`. See `images/README.md` for credit.
+- `images/moon*`: the Moon, from NASA's Scientific Visualization Studio (LRO camera).
+- `images/mars*`: Mars, from the USGS Viking colorized global mosaic.
+- `images/venus*`: Venus' surface by Magellan radar, with simulated color, from USGS.
+- `images/jupiter*`: Jupiter, from NASA/JPL Cassini maps (1024 and 2048 only).
+- `images/io*`: Io, from the USGS Galileo and Voyager color mosaic.
+- `images/ganymede*`: Ganymede, from the USGS Voyager and Galileo color mosaic.
 
 ### Changed
 - Renamed Nauru to Naoero in world maps and related data.

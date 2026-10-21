@@ -1,4 +1,5 @@
 import { Entity, _lastUid } from "../../core/util/Entity";
+import { ColorSet } from "../../core/util/ColorSet";
 import type { Sprite } from "../../core/render/Sprite";
 import type { SerialChart } from "../../core/render/SerialChart";
 import type { SerialChartContainer } from "../../core/render/SerialChartContainer";
@@ -134,6 +135,7 @@ export class ChartSerializer extends Serializer {
 	 * Call it before serializing again with the same serializer.
 	 */
 	public reset(): void {
+		this._palette = undefined;
 		this._disableDataSerialization = false;
 		this._pendingSeriesRefs = [];
 		this._deferred = [];
@@ -1050,12 +1052,18 @@ export class ChartSerializer extends Serializer {
 				// It stands in for the themed palette rather than merging into it, so
 				// it has to carry what the theme built that one with - a hierarchy's
 				// `step: 2`, the scrollbar preview's `saturation: 0` - or those are
-				// lost and the colours come back different
+				// lost and the colours come back different. Not what any color set
+				// gets from the theme anyway, such as the palette itself
+				const themed = ColorSet.new(this._root, { themeTags: colors.get("themeTags") });
 				$object.each((colors as any)._settings, (key: any, value: any) => {
-					if (serializedColors.settings[key] === undefined) {
+					// A plain object set by the user, such as `passOptions`, came out empty above
+					const written = serializedColors.settings[key];
+					const missing = written === undefined || ($type.isObject(written) && !$type.isArray(written) && $object.keys(written).length == 0);
+					if (missing && themed.get(key) !== value) {
 						serializedColors.settings[key] = this.serialize(value, 0, true);
 					}
 				});
+				themed.dispose();
 
 				this._maybeInit(res, "settings", {});
 				res.settings.colors = serializedColors;
@@ -1325,28 +1333,84 @@ export class ChartSerializer extends Serializer {
 	/**
 	 * A data item's endless animation - a plane flying its route, say - is
 	 * started in code, so nothing on the bullet says it is playing. It is
-	 * written on the bullet's sprite as an `animations` entry aimed at the data
-	 * item, which is what plays it back.
+	 * written as an `animations` entry aimed at the data item, which is what
+	 * plays it back: on the bullet's sprite when every data item plays the same
+	 * one, or in each data item's own data, through the sprite's
+	 * `templateField`, when they differ (moons, each at its own speed). Where
+	 * the data can't hold them, the first one goes on the sprite, as before.
 	 *
 	 * @param   series            Series
+	 * @param   sprite            Bullet sprite
 	 * @param   serializedSprite  Serialized bullet sprite
+	 * @param   properties        Serialized series properties
 	 */
-	private _processDataItemAnimations(series: any, serializedSprite: any): void {
+	private _processDataItemAnimations(series: any, sprite: any, serializedSprite: any, properties: any): void {
 		if (!this.get("runningAnimations", true) || !serializedSprite) {
 			return;
 		}
 
-		// The first one playing: staggered starts may not have reached item 0 yet
-		let entries: Array<any> = [];
-		$array.eachContinue(series.dataItems, (dataItem: any) => {
-			entries = this._runningAnimationEntries(dataItem, 0, "dataItem");
-			return !entries.length;
+		// Each playing data item's entries, by its row in the data
+		const values = series.data.values;
+		const byRow: Array<Array<any>> = [];
+		let first: Array<any> = [];
+		let same = true;
+		let perRow = true;
+		$array.each(series.dataItems, (dataItem: any) => {
+			const entries = this._runningAnimationEntries(dataItem, 0, "dataItem");
+			if (!entries.length) {
+				return;
+			}
+			if (!first.length) {
+				first = entries;
+			}
+			else if (JSON.stringify(entries) !== JSON.stringify(first)) {
+				same = false;
+			}
+			// Rows dropped later (made from geodata) or not parsed (objects) can't hold them
+			const context: any = dataItem.dataContext;
+			const row = values.indexOf(context);
+			const objects = $array.any(entries, (entry: any) => $type.isObject(entry.from) || $type.isObject(entry.to));
+			if (row === -1 || (context && context.madeFromGeoData) || objects) {
+				perRow = false;
+			}
+			else {
+				byRow[row] = entries;
+			}
 		});
 
-		if (entries.length) {
-			const settings = serializedSprite.settings = serializedSprite.settings || {};
-			settings.animations = (settings.animations || []).concat(entries);
+		if (!first.length) {
+			return;
 		}
+
+		const settings = serializedSprite.settings = serializedSprite.settings || {};
+		const dataRef = properties && properties.data;
+		const rows = $type.isString(dataRef) && dataRef[0] === "#" ? this._lists.data[dataRef.substr(1)] : undefined;
+
+		// A template can't add to a sprite's own `animations`, so those go there too
+		if (same || !perRow || !$type.isArray(rows) || settings.animations || sprite.get("animations")) {
+			settings.animations = (settings.animations || []).concat(first);
+			return;
+		}
+
+		// Each item's own, in its data row, under the sprite's templateField
+		let field: string = sprite.get("templateField");
+		if (!$type.isString(field)) {
+			field = "bulletSettings";
+			while ($array.any(rows, (row: any) => $type.isObject(row) && (row as any)[field] !== undefined)) {
+				field += "_";
+			}
+			settings.templateField = field;
+		}
+		$array.each(rows, (row: any, index: number) => {
+			const entries = byRow[index];
+			const item: any = row;
+			if (entries && $type.isObject(row)) {
+				const own: any = $type.isObject(item[field]) ? item[field] : {};
+				const merged: any = $object.copy(own);
+				merged.animations = (own.animations || []).concat(entries);
+				item[field] = merged;
+			}
+		});
 	}
 
 	private _processBullets(series: any, properties: any): void {
@@ -1379,7 +1443,7 @@ export class ChartSerializer extends Serializer {
 
 				// Only the first one, or every bullet animates the same data item
 				if (first) {
-					this._processDataItemAnimations(series, serializedBullet.settings.sprite);
+					this._processDataItemAnimations(series, bulletSprite, serializedBullet.settings.sprite, properties);
 					first = false;
 				}
 

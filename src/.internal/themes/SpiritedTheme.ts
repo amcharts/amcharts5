@@ -21,7 +21,8 @@ export class SpiritedTheme extends Theme {
 				Color.fromHex(0xeba05c),
 				Color.fromHex(0x9b5134)
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

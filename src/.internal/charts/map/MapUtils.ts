@@ -1,8 +1,8 @@
 import type { IGeoPoint } from "../../core/util/IGeoPoint";
-import type { GeoProjection } from "d3-geo";
+import type { GeoProjection, GeoStream } from "d3-geo";
 import { registry } from "../../core/Registry";
 import * as $math from "../../core/util/Math";
-import { geoCircle, geoCentroid, geoBounds, geoArea } from "d3-geo";
+import { geoCircle, geoCentroid, geoBounds, geoArea, geoPath, geoStream } from "d3-geo";
 
 
 /**
@@ -219,6 +219,91 @@ export const EARTH_RADIUS = 6371008.8;
 export function isGlobe(projection: GeoProjection): boolean {
 	const clipAngle = projection.clipAngle ? projection.clipAngle() : 0;
 	return !!clipAngle && clipAngle < 90.5 && !!projection.rotate;
+}
+
+const noopStream: GeoStream = {
+	point() { },
+	lineStart() { },
+	lineEnd() { },
+	polygonStart() { },
+	polygonEnd() { },
+	sphere() { }
+};
+
+/**
+ * Whether a projection draws an outline of its own, as HEALPix, Armadillo,
+ * Berghaus and the interrupted and polyhedral projections of
+ * d3-geo-projection do. d3 does not cut shapes to such an outline, so parts
+ * of them land outside it.
+ *
+ * Composite projections such as `geoAlbersUsa` already clip their insets.
+ *
+ * @ignore
+ */
+export function hasOwnOutline(projection: GeoProjection): boolean {
+	if (!projection.rotate) {
+		return false;
+	}
+	return Object.prototype.hasOwnProperty.call(projection.stream(noopStream), "sphere");
+}
+
+/**
+ * Whether the projection draws `point` rather than clipping it away, as a
+ * globe does with its far side.
+ *
+ * @ignore
+ */
+export function isPointVisible(projection: GeoProjection, point: [number, number]): boolean {
+	if (!isFinite(point[0]) || !isFinite(point[1])) {
+		return false;
+	}
+	let visible = false;
+	const sink: GeoStream = Object.create(noopStream);
+	sink.point = () => { visible = true; };
+	geoStream({ type: "Point", coordinates: point }, projection.stream(sink));
+	return visible;
+}
+
+/**
+ * `bounds` cut to the projection's own outline, if it has one: nothing outside
+ * it is drawn.
+ *
+ * @ignore
+ */
+export function boundsInOutline(projection: GeoProjection, bounds: [[number, number], [number, number]]): [[number, number], [number, number]] {
+	if (hasOwnOutline(projection)) {
+		const outline = geoPath(projection).bounds({ type: "Sphere" });
+		const x0 = Math.max(bounds[0][0], outline[0][0]);
+		const y0 = Math.max(bounds[0][1], outline[0][1]);
+		const x1 = Math.min(bounds[1][0], outline[1][0]);
+		const y1 = Math.min(bounds[1][1], outline[1][1]);
+		if (x0 < x1 && y0 < y1) {
+			return [[x0, y0], [x1, y1]];
+		}
+	}
+	return bounds;
+}
+
+/**
+ * `projection.fitSize()`, but on a projection with an outline of its own it
+ * fits only the part of `object` inside that outline.
+ *
+ * @ignore
+ */
+export function fitProjection(projection: GeoProjection, size: [number, number], object: GeoJSON.GeometryCollection): void {
+	projection.fitSize(size, object);
+	if (hasOwnOutline(projection)) {
+		const b = boundsInOutline(projection, geoPath(projection).bounds(object));
+		const k = Math.min(size[0] / (b[1][0] - b[0][0]), size[1] / (b[1][1] - b[0][1]));
+		if (isFinite(k) && k > 0) {
+			const translate = projection.translate();
+			projection.scale(projection.scale() * k);
+			projection.translate([
+				size[0] / 2 - k * ((b[0][0] + b[1][0]) / 2 - translate[0]),
+				size[1] / 2 - k * ((b[0][1] + b[1][1]) / 2 - translate[1])
+			]);
+		}
+	}
 }
 
 /**

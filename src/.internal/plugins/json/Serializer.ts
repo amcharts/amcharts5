@@ -1,6 +1,7 @@
 import { Entity, Settings, IEntityEvents, IEntitySettings, IEntityPrivate } from "../../core/util/Entity";
 import { Component } from "../../core/render/Component";
 import { Color } from "../../core/util/Color";
+import { ColorSet } from "../../core/util/ColorSet";
 import { Gradient } from "../../core/render/gradients/Gradient";
 import { Percent } from "../../core/util/Percent";
 import { Template } from "../../core/util/Template";
@@ -140,6 +141,26 @@ export class Serializer extends Entity {
 	 */
 	protected _serializingData: boolean = false;
 	protected _inInterfaceColors: boolean = false;
+
+	// The theme's palette: every color set of the root shares this list
+	protected _palette?: Array<Color>;
+
+	// Where this very Color object is in the theme's palette, if it is there,
+	// as `getIndex()` hands out the list's own objects. Only the palette's own
+	// colors: generated ones depend on the order color sets asked for them,
+	// so they stay literal. Not in data
+	protected _paletteIndex(color: Color): number | undefined {
+		if (this._serializingData) {
+			return undefined;
+		}
+		if (!this._palette) {
+			const colorSet = ColorSet.new(this._root, {});
+			this._palette = colorSet.get("colors", []);
+			colorSet.dispose();
+		}
+		const index = this._palette.indexOf(color);
+		return index >= 0 && index < ColorSet.paletteLength(this._palette) ? index : undefined;
+	}
 
 	// Which of the root's interface colours this very Color object is, if any.
 	// Not in data, where a string starting with "@" is escaped as text
@@ -344,6 +365,11 @@ export class Serializer extends Entity {
 			const key = this._interfaceColorKey(source);
 			if (key) {
 				return "@root.interfaceColors.get('" + key + "')";
+			}
+			// The same for a colour taken from the theme's palette with getIndex()
+			const index = this._paletteIndex(source);
+			if (index != null) {
+				return "@colors.getIndex(" + index + ")";
 			}
 			return {
 				type: "Color",

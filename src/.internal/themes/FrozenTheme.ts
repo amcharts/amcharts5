@@ -21,7 +21,8 @@ export class FrozenTheme extends Theme {
 				Color.fromHex(0xfbb8c9),
 				Color.fromHex(0xf8d4d8)
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

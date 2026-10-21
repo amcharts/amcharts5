@@ -64,7 +64,8 @@ export class NordTheme extends Theme {
 				Color.fromHex(0xd08770), // aurora orange
 				Color.fromHex(0x81a1c1)  // frost blue
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }

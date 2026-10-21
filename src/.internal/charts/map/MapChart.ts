@@ -12,6 +12,7 @@ import type { IMapPolygonSeriesDataItem } from "./MapPolygonSeries";
 import { MapChartDefaultTheme } from "./MapChartDefaultTheme";
 import { SerialChart, ISerialChartPrivate, ISerialChartSettings, ISerialChartEvents } from "../../core/render/SerialChart";
 import { Rectangle } from "../../core/render/Rectangle";
+import { Graphics } from "../../core/render/Graphics";
 import { geoPath, geoProjection, geoProjectionMutator } from "d3-geo";
 import { Color } from "../../core/util/Color";
 import { registry } from "../../core/Registry";
@@ -457,6 +458,11 @@ export class MapChart extends SerialChart {
 
 	protected _projectionRaw?: GeoRawProjection;
 	protected _appliedProjectionName?: string;
+
+	// Clips the series to the outline of a projection that draws its own
+	protected _outlineMask?: Graphics;
+	protected _outlineProjection?: GeoProjection;
+	protected _ownOutline: boolean = false;
 	protected _projectionBlendAnim?: Animation<this["_privateSettings"]["projectionBlend"]>;
 	protected _projectionBlendData?: {
 		blended: GeoProjection;
@@ -743,17 +749,18 @@ export class MapChart extends SerialChart {
 				projection.rotate([this.get("rotationX", 0), this.get("rotationY", 0), this.get("rotationZ", 0)])
 			}
 
+			// Zoomed in: keep the same place in the middle, if the new projection shows it
 			let prev = this._prevSettings.projection;
-			if (prev && prev != projection) {
+			if (prev && prev != projection && this.get("zoomLevel", 1) > 1) {
 				let hw = w / 2;
 				let hh = h / 2;
 				if (prev.invert) {
 					let centerLocation = prev.invert([hw, hh]);
 
-					if (centerLocation) {
+					if (centerLocation && $mapUtils.isPointVisible(projection, centerLocation)) {
 
 						let xy = projection(centerLocation);
-						if (xy) {
+						if (xy && isFinite(xy[0]) && isFinite(xy[1])) {
 							let translate = projection.translate();
 
 							let xx = hw - ((xy[0] - translate[0]));
@@ -830,12 +837,12 @@ export class MapChart extends SerialChart {
 				let hh = h / 2;
 				refitted = true;
 
-				projection.fitSize([w, h], this._geometryColection);
+				$mapUtils.fitProjection(projection, [w, h], this._geometryColection);
 				const newScale = projection.scale();
 
 				// Measured unzoomed, as in `_fitMap`: the pan limits apply the zoom themselves
 				const geoPath = this.getPrivate("geoPath");
-				this._mapBounds = geoPath.bounds(this._geometryColection);
+				this._mapBounds = $mapUtils.boundsInOutline(projection, geoPath.bounds(this._geometryColection));
 
 				this.setPrivateRaw("mapScale", newScale);
 				projection.scale(newScale * this.get("zoomLevel", 1));
@@ -1038,7 +1045,7 @@ export class MapChart extends SerialChart {
 		let h = this.innerHeight();
 
 		if (w > 0 && h > 0) {
-			projection.fitSize([w, h], this._geometryColection);
+			$mapUtils.fitProjection(projection, [w, h], this._geometryColection);
 			this.setPrivateRaw("mapScale", projection.scale());
 
 			const translate = projection.translate();
@@ -1050,7 +1057,7 @@ export class MapChart extends SerialChart {
 			this._centerY = translate[1];
 
 			const geoPath = this.getPrivate("geoPath");
-			this._mapBounds = geoPath.bounds(this._geometryColection);
+			this._mapBounds = $mapUtils.boundsInOutline(projection, geoPath.bounds(this._geometryColection));
 
 			this._geoCentroid = $mapUtils.getGeoCentroid(this._geometryColection);
 
@@ -1074,6 +1081,9 @@ export class MapChart extends SerialChart {
 
 			this._mapFitted = true;
 		}
+
+		// Data that comes after the first frame refits here only
+		this._updateOutlineMask();
 	}
 
 	/**
@@ -1096,7 +1106,7 @@ export class MapChart extends SerialChart {
 					const rotation = this._homeRotation();
 					projection.rotate([rotation[0], rotation[1], rotate[2]]);
 				}
-				projection.fitSize([w, h], geometries);
+				$mapUtils.fitProjection(projection, [w, h], geometries);
 				const center = projection.invert([w / 2, h / 2]);
 				projection.scale(scale);
 				projection.translate(translate);
@@ -1235,6 +1245,44 @@ export class MapChart extends SerialChart {
 		this.series.each((series) => {
 			series.markDirtyProjection();
 		})
+		this._updateOutlineMask();
+	}
+
+	// d3 does not cut shapes to such an outline, see `hasOwnOutline()`
+	protected _updateOutlineMask() {
+		const projection = this.get("projection");
+		if (projection && projection !== this._outlineProjection) {
+			this._outlineProjection = projection;
+			this._ownOutline = $mapUtils.hasOwnOutline(projection);
+		}
+
+		const childrenDisplay = this.seriesContainer._childrenDisplay;
+		let mask = this._outlineMask;
+
+		// A mask set on `seriesContainer` wins
+		if (this._ownOutline && !this.seriesContainer.get("mask")) {
+			if (!mask) {
+				mask = Graphics.new(this._root, {});
+				this._outlineMask = mask;
+				childrenDisplay.addChildAt(mask._display, 0);
+				childrenDisplay.mask = mask._display;
+			}
+			// A new function each time, so it redraws
+			mask.set("draw", (display) => {
+				const path = this.getPrivate("geoPath");
+				path.context(display as any);
+				path({ type: "Sphere" });
+				path.context(null);
+			});
+		}
+		else if (mask) {
+			childrenDisplay.removeChild(mask._display);
+			if (childrenDisplay.mask === mask._display) {
+				childrenDisplay.mask = null;
+			}
+			mask.dispose();
+			this._outlineMask = undefined;
+		}
 	}
 
 	protected _afterNew() {
@@ -1648,7 +1696,7 @@ export class MapChart extends SerialChart {
 		}
 
 		const geoPath = this.getPrivate("geoPath");
-		const mapBounds = geoPath.bounds(this._geometryColection);
+		const mapBounds = $mapUtils.boundsInOutline(this.get("projection")!, geoPath.bounds(this._geometryColection));
 
 		let p0 = this.convert({ longitude: geoBounds.left, latitude: geoBounds.top }, rotationX, rotationY);
 		let p1 = this.convert({ longitude: geoBounds.right, latitude: geoBounds.bottom }, rotationX, rotationY);
@@ -1959,6 +2007,14 @@ export class MapChart extends SerialChart {
 		super._clearDirty();
 		this._dirtyGeometries = false;
 		this._mapFitted = false;
+	}
+
+	protected _dispose() {
+		super._dispose();
+		if (this._outlineMask) {
+			this._outlineMask.dispose();
+			this._outlineMask = undefined;
+		}
 	}
 
 	/**

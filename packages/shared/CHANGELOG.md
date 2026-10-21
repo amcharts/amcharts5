@@ -5,6 +5,22 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.21.3] - 2026-10-21
+
+### Added
+- `ColorSet`: `repeatLightness` makes each repeat of a reused list lighter (or darker) instead of the same colors.
+- JSON: a color taken from the theme's palette with `getIndex()` is saved as `"@colors.getIndex(n)"`, so it follows the theme the config is loaded with.
+
+### Changed
+- Themes that repeat their colors (Adaptive, Monochrome, Kelly, Material, Nord, Pastel and others, but not Colorblind or Patterns): once every color has been used, the next round is 10% lighter instead of the same colors again. To repeat them as before, set `repeatLightness: 0` on the chart's colors, or `repeatLightness: false` in Adaptive and Monochrome.
+
+### Fixed
+- JSON: changing a setting such as `step` on a chart's colors saved the theme's whole palette with it, so the colors no longer followed the theme. A `passOptions` set there was lost.
+- `MapChart`: d3 projections with a shape of their own (HEALPix, Armadillo, Berghaus, interrupted and polyhedral) are now displayed properly.
+- `MapChart`: switching projections at zoom level 1 shows the whole map again.
+- JSON: looping animations started in code on each data item, e.g. points each moving at their own speed, were all saved as the first one's.
+
+
 ## [5.21.2] - 2026-10-14
 
 ### Added

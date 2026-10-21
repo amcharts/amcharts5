@@ -63,7 +63,8 @@ export class NordDarkTheme extends Theme {
 				Color.fromHex(0x8fbcbb), // frost teal
 				Color.fromHex(0x9ab4d4)  // light frost
 			],
-			reuse: true
+			reuse: true,
+			repeatLightness: 0.1
 		});
 	}
 }
