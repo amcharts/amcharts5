@@ -182,5 +182,5 @@ whose data changes without making it again, and a chart from a JSON config.
 ## More
 
 - [amCharts 5 documentation](https://www.amcharts.com/docs/v5/) and [demos](https://www.amcharts.com/demos/)
-- [Using amCharts 5 with SvelteKit](https://www.amcharts.com/docs/v5/getting-started/integrations/using-amcharts-5-with-sveltekit/)
+- [Using amCharts 5 with SvelteKit](https://www.amcharts.com/docs/v5/getting-started/integrations/sveltekit/)
 - License: see [License](#license) above.

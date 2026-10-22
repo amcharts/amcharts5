@@ -8,6 +8,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 
+## [5.0.2] - 2026-10-22
+
+### Fixed
+- Homepage and README link to the SvelteKit docs page at its new URL.
+
+
 ## [5.0.1] - 2026-10-22
 
 ### Fixed
