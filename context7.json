@@ -1,0 +1,22 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "url": "https://context7.com/amcharts/amcharts5",
+  "public_key": "pk_5fOM9sdiZtN1a10eiUFSR",
+  "projectTitle": "amCharts 5",
+  "description": "JavaScript/TypeScript charts and maps: XY, pie, maps with 670+ geodata maps, stock, Gantt, hierarchy, flow (Sankey, chord), radar, timeline, word cloud, Venn. Canvas or SVG. Charts can be built from JSON configs. Free with a small logo; a licence removes it.",
+  "folders": ["packages/library", "integrations", "packages/geodata"],
+  "excludeFolders": ["src", "build"],
+  "excludeFiles": [],
+  "rules": [
+    "Use amCharts 5 only: no am4core, am4charts or am5.create(). Every object is made with ClassName.new(root, { ... }), never with new.",
+    "Create one root per element with am5.Root.new(\"chartdiv\"); the element needs a height. Call root.dispose() on unmount or before making another root in the same element.",
+    "Apply themes on the root: root.setThemes([am5themes_Animated.new(root)]).",
+    "Colors and percents are objects: am5.color(0xff0000) and am5.percent(50), not strings.",
+    "Every axis needs a renderer, e.g. renderer: am5xy.AxisRendererX.new(root, {}). A category axis needs the data too: xAxis.data.setAll(data).",
+    "Date axes take timestamps and need a baseInterval; for date strings set series.data.processor = am5.DataProcessor.new(root, { dateFields: [\"date\"], dateFormat: \"yyyy-MM-dd\" }).",
+    "Set data last, after series, axes and templates are configured. Style through settings and templates (series.columns.template.setAll({ ... })), not CSS.",
+    "Maps need the separate @amcharts/amcharts5-geodata package.",
+    "In React, Vue, Angular and Svelte prefer the official packages in integrations/ (@amcharts/amcharts5-react and so on).",
+    "amCharts 5 is free for commercial use as long as the amCharts logo stays on the chart; a commercial licence removes it."
+  ]
+}
