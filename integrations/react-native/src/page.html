@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+html, body, #chart {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	background: transparent;
+}
+body {
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+</style>
+</head>
+<body>
+<div id="chart"></div>
+<script>
+(function () {
+	"use strict";
+
+	// Which script file has each class, and which files a file needs first
+	var classModules = __CLASS_MODULES__;
+	var scriptDependencies = __SCRIPT_DEPENDENCIES__;
+	var modules = {};
+	Object.keys(classModules).forEach(function (name) {
+		modules[classModules[name]] = true;
+	});
+
+	var current = 0;
+	var options;
+	var root;
+	var chart;
+	var result;
+	var update;
+	var scripts = {};
+
+	function send(message) {
+		var text;
+		try {
+			text = JSON.stringify(message);
+		} catch (error) {
+			text = JSON.stringify({ type: "error", message: "Could not send " + message.name + ": " + error.message });
+		}
+		window.ReactNativeWebView.postMessage(text);
+	}
+
+	function post(name, value) {
+		send({ type: "message", name: String(name), value: value });
+	}
+
+	function fail(error) {
+		send({ type: "error", message: String(error && error.message ? error.message : error) });
+	}
+
+	window.addEventListener("error", function (event) {
+		fail(event.error || event.message);
+	});
+
+	window.addEventListener("unhandledrejection", function (event) {
+		fail(event.reason);
+	});
+
+	// A geodata global's file: am5geodata_region_world_europeLow > geodata/region/world/europeLow
+	function geodataModule(name) {
+		return "geodata/" + (/^lang_/.test(name) ? "lang/" + name.slice(5) : name.replace(/_/g, "/"));
+	}
+
+	// A global's file: am5xy > xy, am5plugins_exporting > plugins/exporting,
+	// am5fonts_notosans_sc > fonts/notosans-sc
+	function globalModule(name) {
+		var rest = name.slice(3);
+		var match = /^(themes|plugins|locales)_(.+)$/.exec(rest);
+		if (match) {
+			return match[1] + "/" + match[2];
+		}
+		if (/^fonts_./.test(rest)) {
+			return "fonts/" + rest.slice(6).replace(/_/g, "-");
+		}
+		if (/^geodata_./.test(rest)) {
+			return geodataModule(rest.slice(8));
+		}
+		return modules[rest] ? rest : undefined;
+	}
+
+	function add(list, name) {
+		if (!name || name === "index" || list.indexOf(name) !== -1) {
+			return;
+		}
+		(scriptDependencies[name] || []).forEach(function (dependency) {
+			add(list, dependency);
+		});
+		list.push(name);
+	}
+
+	// The files a config needs: its classes, and geodata named by its global
+	function addConfig(list, value) {
+		if (typeof value === "string") {
+			if (/^am5geodata_[A-Za-z0-9_]+$/.test(value)) {
+				add(list, geodataModule(value.slice(11)));
+			}
+		}
+		else if (Array.isArray(value)) {
+			value.forEach(function (item) {
+				addConfig(list, item);
+			});
+		}
+		else if (value && typeof value === "object") {
+			if (typeof value.type === "string") {
+				add(list, classModules[value.type]);
+			}
+			Object.keys(value).forEach(function (key) {
+				addConfig(list, value[key]);
+			});
+		}
+	}
+
+	// The files code needs, from the globals it uses, and the classes of a
+	// config it gives the JSON parser
+	function addCode(list, code) {
+		(code.match(/\bam5[A-Za-z0-9_]*/g) || []).forEach(function (name) {
+			add(list, globalModule(name));
+		});
+		if (code.indexOf("am5plugins_json") !== -1) {
+			(code.match(/\btype["']?\s*:\s*["'][A-Za-z0-9_]+["']/g) || []).forEach(function (match) {
+				add(list, classModules[/["']([A-Za-z0-9_]+)["']$/.exec(match)[1]]);
+			});
+		}
+	}
+
+	// Its own scope, so that it may declare `data` or `root` itself
+	function compile(names, code) {
+		return new Function(names.join(","), "return (function () {\n" + code + "\n})();");
+	}
+
+	function url(name) {
+		if (/^[a-z]+:/i.test(name)) {
+			return name;
+		}
+		if (name.indexOf("geodata/") === 0) {
+			return options.geodataUrl + name.slice(8) + ".js";
+		}
+		if (name.indexOf("fonts/") === 0) {
+			return options.fontsUrl + name.slice(6) + ".js";
+		}
+		return options.libraryUrl + name + ".js";
+	}
+
+	// Downloaded side by side, run in order
+	function load(src) {
+		if (!scripts[src]) {
+			scripts[src] = new Promise(function (resolve, reject) {
+				var script = document.createElement("script");
+				script.src = src;
+				script.async = false;
+				script.onload = function () {
+					resolve();
+				};
+				script.onerror = function () {
+					delete scripts[src];
+					reject(new Error("Could not load " + src));
+				};
+				document.head.appendChild(script);
+			});
+		}
+		return scripts[src];
+	}
+
+	function dispose() {
+		if (root) {
+			root.dispose();
+		}
+		root = undefined;
+		chart = undefined;
+		result = undefined;
+		update = undefined;
+	}
+
+	function build(next) {
+		var id = ++current;
+		options = next;
+		dispose();
+
+		var list = [];
+		if (next.config !== undefined) {
+			add(list, "plugins/json");
+			addConfig(list, next.config);
+		}
+		else {
+			addCode(list, next.code || "");
+		}
+		next.themes.forEach(function (name) {
+			add(list, "themes/" + name);
+		});
+		next.modules.forEach(function (name) {
+			add(list, name);
+		});
+
+		return Promise.all(["index"].concat(list).map(function (name) {
+			return load(url(name));
+		})).then(function () {
+			if (id !== current) {
+				return;
+			}
+
+			var am5 = window.am5;
+			var settings = {};
+			if (next.renderer === "svg") {
+				if (!am5.SVGRenderer) {
+					throw new Error("renderer=\"svg\" needs amCharts 5.21.0 or later");
+				}
+				settings.renderer = am5.SVGRenderer;
+			}
+
+			var themes = next.themes.map(function (name) {
+				var theme = window["am5themes_" + name];
+				if (!theme) {
+					throw new Error("No theme " + name);
+				}
+				return theme;
+			});
+
+			// Before the root: it decides on the logo when it is made
+			(next.licenses || []).forEach(function (license) {
+				if (am5.registry.licenses.indexOf(license) === -1) {
+					am5.addLicense(license);
+				}
+			});
+
+			root = am5.Root.new("chart", settings);
+			root.setThemes(themes.map(function (theme) {
+				return theme.new(root);
+			}));
+
+			if (next.config !== undefined) {
+				return window.am5plugins_json.JsonParser.new(root).parse(next.config, { parent: root.container }).then(function (parsed) {
+					if (id === current) {
+						chart = parsed;
+						send({ type: "ready" });
+					}
+				});
+			}
+
+			// A promise it returns is waited for
+			return Promise.resolve(compile(["root", "data", "post"], next.code || "")(root, next.data, post)).then(function (value) {
+				if (id === current) {
+					result = value;
+					if (typeof value === "function") {
+						update = value;
+					}
+					send({ type: "ready" });
+				}
+			});
+
+		}).catch(function (error) {
+			if (id === current) {
+				dispose();
+				fail(error);
+			}
+		});
+	}
+
+	window.amChartPage = {
+		build: build,
+
+		// New data: to the function the code returned, or the chart is made
+		// again. A config chart only keeps it, for run()
+		data: function (data) {
+			if (!options) {
+				return;
+			}
+			options.data = data;
+			if (options.config !== undefined) {
+				return;
+			}
+			if (update) {
+				try {
+					update(data);
+				}
+				catch (error) {
+					fail(error);
+				}
+			}
+			else {
+				build(options);
+			}
+		},
+
+		run: function (code) {
+			try {
+				compile(["root", "chart", "result", "data", "post"], code)(root, chart, result, options ? options.data : undefined, post);
+			}
+			catch (error) {
+				fail(error);
+			}
+		}
+	};
+
+	send({ type: "loaded" });
+})();
+</script>
+</body>
+</html>

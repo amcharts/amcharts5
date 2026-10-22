@@ -1,0 +1,25 @@
+{
+  "name": "amcharts5-react-astro-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "start": "node ./dist/server/entry.mjs"
+  },
+  "dependencies": {
+    "@amcharts/amcharts5": "^5.21.0",
+    "@amcharts/amcharts5-react": "^5.0.0",
+    "@astrojs/node": "^11.1.9",
+    "@astrojs/react": "^7.1.0",
+    "astro": "^7.4.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.11",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^6.0.3"
+  }
+}

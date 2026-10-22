@@ -1,0 +1,45 @@
+{
+  "name": "@amcharts/amcharts5-angular",
+  "version": "5.0.0",
+  "description": "Angular component and directive for amCharts 5: a chart from a JSON config, and a chart written in code",
+  "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
+  "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/angular/",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/amcharts/amcharts5/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amcharts/amcharts5.git",
+    "directory": "integrations/angular"
+  },
+  "keywords": [
+    "amcharts",
+    "amcharts5",
+    "angular",
+    "charts",
+    "chart",
+    "data-visualization",
+    "maps"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json -c tsconfig.json && node -e \"require('fs').copyFileSync('../../packages/shared/LICENSE', 'dist/LICENSE')\"",
+    "pack": "npm run build && cd dist && npm pack"
+  },
+  "peerDependencies": {
+    "@amcharts/amcharts5": "^5.21.0",
+    "@angular/core": ">=19.0.0"
+  },
+  "devDependencies": {
+    "@angular/common": "~19.2.0",
+    "@angular/compiler": "~19.2.0",
+    "@angular/compiler-cli": "~19.2.0",
+    "@angular/core": "~19.2.0",
+    "ng-packagr": "~19.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.6.0",
+    "typescript": "~5.7.0",
+    "zone.js": "~0.15.0"
+  }
+}

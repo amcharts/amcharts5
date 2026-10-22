@@ -1,0 +1,32 @@
+{
+  "name": "amcharts5-angular-example",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "ng serve",
+    "build": "ng build",
+    "start": "node dist/angular/server/server.mjs"
+  },
+  "private": true,
+  "dependencies": {
+    "@amcharts/amcharts5": "^5.21.0",
+    "@amcharts/amcharts5-angular": "^5.0.0",
+    "@angular/common": "^22.2.0",
+    "@angular/compiler": "^22.2.0",
+    "@angular/core": "^22.2.0",
+    "@angular/platform-browser": "^22.2.0",
+    "@angular/platform-server": "^22.2.0",
+    "@angular/router": "^22.2.0",
+    "@angular/ssr": "^22.2.3",
+    "express": "^5.1.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.2.3",
+    "@angular/cli": "^22.2.3",
+    "@angular/compiler-cli": "^22.2.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.12.0",
+    "typescript": "~6.0.2"
+  }
+}

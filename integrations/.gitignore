@@ -1,0 +1,11 @@
+# What the examples build and install
+*/examples/*/package-lock.json
+*/examples/*/build
+*/examples/*/.next
+*/examples/*/next-env.d.ts
+*/examples/*/.nuxt
+*/examples/*/.output
+*/examples/*/.angular
+*/examples/*/.svelte-kit
+*/examples/*/.react-router
+*/examples/*/.astro

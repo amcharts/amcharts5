@@ -1,0 +1,17 @@
+---
+import { Charts } from "../components/Charts";
+---
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>amCharts 5 with Astro</title>
+	</head>
+	<body>
+		<main>
+			<h1>amCharts 5 with Astro</h1>
+			<!-- client:load renders the island on the server, then in the browser.
+			     client:only="react" would skip the server -->
+			<Charts client:load />
+		</main>
+	</body>
+</html>

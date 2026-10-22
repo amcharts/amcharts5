@@ -1,0 +1,56 @@
+{
+  "name": "@amcharts/amcharts5-react",
+  "version": "5.0.0",
+  "description": "React components for amCharts 5: a chart from a JSON config, and a hook for charts written in code",
+  "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
+  "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/react/",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/amcharts/amcharts5/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amcharts/amcharts5.git",
+    "directory": "integrations/react"
+  },
+  "keywords": [
+    "amcharts",
+    "amcharts5",
+    "react",
+    "charts",
+    "chart",
+    "data-visualization",
+    "maps"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p .",
+    "prepack": "npm run build && node -e \"require('fs').copyFileSync('../../packages/shared/LICENSE', 'LICENSE')\""
+  },
+  "peerDependencies": {
+    "@amcharts/amcharts5": "^5.21.0",
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "react": "^19.0.0",
+    "typescript": "^5.6.0"
+  }
+}
