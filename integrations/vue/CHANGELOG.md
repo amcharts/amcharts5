@@ -8,6 +8,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 
+## [5.0.1] - 2026-10-22
+
+### Fixed
+- README: Nuxt's dev server needs `vite.optimizeDeps.include` for amCharts, or the charts fail to load the first time it starts.
+
+
 ## [5.0.0] - 2026-10-22
 
 ### Added

@@ -129,8 +129,15 @@ package also tells `svelte-check` about `<am5-chart>` and its events.
 
 ## SvelteKit
 
-Both work in pages that are rendered on a server; nothing has to be
-configured.
+Both work in pages that are rendered on a server. The production build needs
+nothing, but SvelteKit's dev server leaves amCharts to Node, which cannot load
+its files. Add it to the server build in `vite.config.ts`:
+
+```ts
+ssr: {
+  noExternal: ["@amcharts/amcharts5"]
+}
+```
 
 
 ## License

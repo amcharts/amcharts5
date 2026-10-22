@@ -8,6 +8,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 
+## [5.0.1] - 2026-10-22
+
+### Fixed
+- README: SvelteKit's dev server needs `ssr.noExternal` for amCharts; the production build does not.
+
+
 ## [5.0.0] - 2026-10-22
 
 ### Added

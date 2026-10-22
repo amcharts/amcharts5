@@ -111,8 +111,19 @@ the chart.
 ## Nuxt and other server rendering
 
 Both work in pages that are rendered on a server: the library is loaded only
-in the browser, once the component is mounted. In Nuxt, nothing has to be
-configured.
+in the browser, once the component is mounted.
+
+In Nuxt, add this to `nuxt.config.ts`. Without it, the dev server prepares
+amCharts while the first page loads, and the charts fail to load until it is
+started again:
+
+```ts
+vite: {
+  optimizeDeps: {
+    include: ["@amcharts/amcharts5", "@amcharts/amcharts5/element"]
+  }
+}
+```
 
 
 ## License

@@ -13,5 +13,12 @@ export default defineConfig({
 
 			adapter: adapter()
 		})
-	]
+	],
+	// The dev server leaves packages to Node, which cannot load amCharts' files:
+	// they are ES modules without file extensions in their imports. This puts
+	// amCharts into the server build instead. The production build does this
+	// on its own
+	ssr: {
+		noExternal: ['@amcharts/amcharts5']
+	}
 });
