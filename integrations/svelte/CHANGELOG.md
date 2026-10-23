@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.0.3] - 2026-10-23
+
 ### Added
 - `themes`: a theme can come with its settings, e.g. `[am5themes_Adaptive, { baseColor: "#4150a0" }]`.
 - `resources`: the geodata and locales a config names, e.g. `{ am5geodata_worldLow }`, which are not globals with npm imports.

@@ -1,6 +1,6 @@
 {
   "name": "@amcharts/amcharts5-vue",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Vue components for amCharts 5: a chart from a JSON config, and a composable for charts written in code",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/vue/",

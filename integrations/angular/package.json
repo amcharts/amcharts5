@@ -1,6 +1,6 @@
 {
   "name": "@amcharts/amcharts5-angular",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "Angular component and directive for amCharts 5: a chart from a JSON config, and a chart written in code",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/angular/",

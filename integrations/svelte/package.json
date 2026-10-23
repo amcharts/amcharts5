@@ -1,6 +1,6 @@
 {
   "name": "@amcharts/amcharts5-svelte",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "Svelte actions for amCharts 5: a chart written in code, or built from a JSON config",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
   "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/sveltekit/",
