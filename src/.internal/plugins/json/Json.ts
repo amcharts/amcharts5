@@ -306,9 +306,11 @@ class ParserState {
 	// Every ref parsed so far, so a value resolved later sees the whole config
 	protected _globalRefs: Array<IRef> = [];
 	protected _updateTargets: "strict" | "soft";
+	protected _resources: { [name: string]: unknown } | undefined;
 
-	constructor(updateTargets: "strict" | "soft" = "strict", root?: Root) {
+	constructor(updateTargets: "strict" | "soft" = "strict", root?: Root, resources?: { [name: string]: unknown }) {
 		this._updateTargets = updateTargets;
+		this._resources = resources;
 		// "@root" for every config, e.g. "@root.interfaceColors.get('background')"
 		if (root) {
 			this._globalRefs.push({ "@root": root });
@@ -481,10 +483,10 @@ class ParserState {
 		}
 
 		if (key === "geoJSON") {
-			// A geodata pack is a global (`am5geodata_worldLow`), so a config
-			// refers to it by name rather than carrying a megabyte of coordinates
-			if ($type.isString(value) && value.indexOf(GEODATA_PREFIX) === 0 && typeof window !== "undefined") {
-				const geodata = (window as any)[value];
+			// A geodata pack is referred to by name (`am5geodata_worldLow`) rather
+			// than carrying a megabyte of coordinates
+			if ($type.isString(value)) {
+				const geodata = this.named(value, GEODATA_PREFIX);
 				if (geodata) {
 					return geodata;
 				}
@@ -676,6 +678,27 @@ class ParserState {
 		mergeEntity(entity, parsed);
 	}
 
+	// What a config names instead of carrying it, such as a geodata pack: from
+	// `resources`, or else the global of that name, which the script version
+	// defines. A missing pack only warns, as the config may still build
+	named(name: string, prefix: string): unknown {
+		const resources = this._resources;
+		// An empty entry (a wrong import) falls through to the warning
+		if (resources && Object.prototype.hasOwnProperty.call(resources, name) && resources[name] != null) {
+			return resources[name];
+		}
+
+		if (name.indexOf(prefix) === 0) {
+			const found = typeof window !== "undefined" ? (window as any)[name] : undefined;
+			if (found) {
+				return found;
+			}
+			console.warn("JsonParser: \"" + name + "\" was not found. Pass it in the parse settings' `resources`, e.g. `resources: { " + name + " }`, or load its script file first.");
+		}
+
+		return undefined;
+	}
+
 	// Applies a `root` config section to the [[Root]] object. `properties` are set
 	// directly on the `Root`; [[Entity]]-based properties (e.g. `numberFormatter`,
 	// `dateFormatter`) are parsed and merged into the existing instance the same
@@ -690,12 +713,14 @@ class ParserState {
 			$object.each(properties, (key, value) => {
 				// A locale is named rather than copied out, so the pack it names is
 				// looked up the same way a geodata pack is
-				if (key === "locale" && $type.isString(value) && value.indexOf(LOCALE_PREFIX) === 0 && typeof window !== "undefined") {
-					const pack: any = (window as any)[value];
+				if (key === "locale" && $type.isString(value)) {
+					const pack = this.named(value, LOCALE_PREFIX);
 					if (pack) {
 						rootAny.locale = pack;
 					}
-					return;
+					if (pack || value.indexOf(LOCALE_PREFIX) === 0) {
+						return;
+					}
 				}
 
 				const existing = rootAny[key];
@@ -1053,6 +1078,22 @@ export interface IParseSettings {
 	 * @since 5.20.3
 	 */
 	updateTargets?: "strict" | "soft";
+
+	/**
+	 * Objects a config names instead of carrying them, by that name: geodata
+	 * packs (`"geoJSON": "am5geodata_worldLow"`) and locales
+	 * (`"locale": "am5locales_de_DE"`). They are looked up here first, and then
+	 * as globals, which only the script version defines, so with npm imports
+	 * pass them here:
+	 *
+	 * ```TypeScript
+	 * import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
+	 * parser.parse(config, { parent: root.container, resources: { am5geodata_worldLow } });
+	 * ```
+	 *
+	 * @since 5.21.4
+	 */
+	resources?: { [name: string]: unknown };
 }
 
 /**
@@ -1100,7 +1141,7 @@ export class JsonParser {
 	 * @return            A promise of the object the config builds, usually the chart
 	 */
 	async parse<E extends Entity>(object: unknown, settings: IParseSettings = {}): Promise<E> {
-		const state = new ParserState(settings.updateTargets, this._root);
+		const state = new ParserState(settings.updateTargets, this._root, settings.resources);
 
 		await state.parseAsync(object);
 

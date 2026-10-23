@@ -1,5 +1,4 @@
-import type { Theme } from "@amcharts/amcharts5";
-import type { ChartElement } from "@amcharts/amcharts5/element";
+import type { ChartElement, ChartElementTheme } from "@amcharts/amcharts5/element";
 
 /**
  * What `use:amChartConfig` takes.
@@ -18,10 +17,18 @@ export interface AmChartConfigParameter {
 	src?: string;
 
 	/**
-	 * Themes, as theme classes, e.g. `[am5themes_Animated]`. Themes are not
-	 * part of a config.
+	 * Themes, as theme classes, e.g. `[am5themes_Animated]`, or a class with
+	 * its settings: `[am5themes_Adaptive, { baseColor: "#4150a0" }]`. Themes
+	 * are not part of a config.
 	 */
-	themes?: Array<typeof Theme>;
+	themes?: Array<ChartElementTheme>;
+
+	/**
+	 * Geodata and locales the config names, by those names, e.g.
+	 * `{ am5geodata_worldLow }` for `"geoJSON": "am5geodata_worldLow"`. With
+	 * npm imports they are not globals, so the config finds them here.
+	 */
+	resources?: { [name: string]: unknown };
 
 	/**
 	 * Draws the chart as SVG instead of canvas.
@@ -32,25 +39,31 @@ export interface AmChartConfigParameter {
 
 }
 
-// Theme classes are told apart by identity: each gets a number
-const themeKeys = new WeakMap<object, number>();
-let themeCount = 0;
+// Objects are told apart by identity: each gets a number
+const objectKeys = new WeakMap<object, number>();
+let objectCount = 0;
 
-function themeKey(theme: object): number {
-	let key = themeKeys.get(theme);
+function objectKey(value: unknown): number | string {
+	if (value === null || (typeof value !== "object" && typeof value !== "function")) {
+		return typeof value + ":" + String(value);
+	}
+	let key = objectKeys.get(value as object);
 	if (key === undefined) {
-		key = ++themeCount;
-		themeKeys.set(theme, key);
+		key = ++objectCount;
+		objectKeys.set(value as object, key);
 	}
 	return key;
 }
 
 // The same content gives the same key: a config written inline is a new
-// object every time
+// object every time. A theme by its class and its settings by content; each
+// resource by identity, as geodata is too big to compare
 function contentKey(parameter: AmChartConfigParameter): string {
+	const resources = parameter.resources;
 	return JSON.stringify([
 		typeof parameter.config === "string" ? parameter.config : JSON.stringify(parameter.config),
-		parameter.themes ? parameter.themes.map((theme) => themeKey(theme)) : [],
+		parameter.themes ? parameter.themes.map((theme) => Array.isArray(theme) ? [objectKey(theme[0]), theme[1]] : objectKey(theme)) : [],
+		resources ? Object.keys(resources).sort().map((name) => [name, objectKey(resources[name])]) : [],
 		parameter.src,
 		parameter.renderer,
 	]);
@@ -104,6 +117,9 @@ export function amChartConfig(node: HTMLElement, parameter: AmChartConfigParamet
 		// Nothing to nothing would only build the chart again
 		if (current.themes !== undefined || target.themes !== undefined) {
 			target.themes = current.themes;
+		}
+		if (current.resources !== undefined || target.resources !== undefined) {
+			target.resources = current.resources;
 		}
 		if (current.config !== undefined || target.config !== undefined) {
 			target.config = current.config;

@@ -195,12 +195,14 @@ exports.withLinkSource = withLinkSource;
 exports.withLinkTargets = withLinkTargets;
 
 
-function cp(from, to) {
+// `filter`: a RegExp, paths it matches are not copied
+function cp(from, to, filter) {
 	return new Promise(function (resolve, reject) {
 		require("cpr")(from, to, {
 			deleteFirst: false,
 			overwrite: true,
-			confirm: false // TODO maybe make this true ?
+			confirm: false, // TODO maybe make this true ?
+			filter: filter,
 		}, function (err) {
 			if (err) {
 				reject(err);

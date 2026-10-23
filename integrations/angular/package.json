@@ -28,7 +28,7 @@
     "pack": "npm run build && cd dist && npm pack"
   },
   "peerDependencies": {
-    "@amcharts/amcharts5": "^5.21.0",
+    "@amcharts/amcharts5": "^5.21.4",
     "@angular/core": ">=19.0.0"
   },
   "devDependencies": {

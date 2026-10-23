@@ -1,5 +1,7 @@
 # Gantt Chart
 
+> **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
+
 Docs: https://www.amcharts.com/docs/v5/charts/gantt/
 
 Gantt is a standalone chart class (not just a simulated XY chart). It auto-creates axes, series, and toolbar — you only provide data. It supports editable tasks, task linking, progress tracking, collapsible groups, weekends/holidays, and a color picker.
@@ -47,7 +49,7 @@ var chart = root.container.children.push(
 | `editable` | boolean | `true` | Allow user to add, edit, remove, drag tasks |
 | `durationUnit` | string | `"day"` | `"year"`, `"month"`, `"week"`, `"day"`, `"hour"`, `"minute"`, `"second"` |
 | `weekends` | number[] | `[0, 6]` | Non-working days (0=Sun, 1=Mon, ... 6=Sat) |
-| `excludeWeekends` | boolean | `false` | Whether to exclude weekends from task durations |
+| `excludeWeekends` | boolean | `true` | Skips `weekends` and `holidays`: task starts move to the next working day and durations count working days only. Set `false` to count every day |
 | `holidays` | Date[] | `[]` | Specific non-working dates |
 | `snapThreshold` | number | `0.5` | Drag snap position within a period (0–1) |
 | `sidebarWidth` | number \| Percent | `30%` | Sidebar width in pixels or Percent |
@@ -94,9 +96,12 @@ Customize field names:
 ```js
 chart.yAxis.setAll({
   nameField: "task",
+  colorField: "barColor",
   collapsedField: "closed"
 });
 ```
+
+`nameField` and `colorField` are fully honored since 5.21.0. Before, bar colors were always read from (and color-picker changes written to) `color` whatever `colorField` said — on older versions keep the field named `color`.
 
 ### Series data fields
 
@@ -199,6 +204,8 @@ chart.controls.hide(0);
 // Show edit toggle
 chart.editButton.show(0);
 ```
+
+**Keyboard (5.21.0):** tasks with subtasks expose `aria-expanded` (`ariaExpanded`), the expand/collapse button of a task without subtasks is no longer a TAB stop, toolbar and task buttons have screen-reader names, scrollbar grips include the category in their name, and an `EditableLabel` (task names) no longer stops ENTER working elsewhere on the page.
 
 ## Series customization
 

@@ -1,5 +1,7 @@
 # Pie & Sliced Charts — Pie, Donut, Funnel, Pyramid
 
+> **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
+
 
 ## Required imports
 
@@ -55,7 +57,7 @@ chart.appear(1000, 100);
 | Setting | Type | Description |
 |---------|------|-------------|
 | `radius` | percent/number | Outer radius (default: `am5.percent(80)`) |
-| `innerRadius` | percent/number | Inner hole for donut (default: 0). Percent is relative to radius |
+| `innerRadius` | percent/number | Inner hole for donut (default: 0). Percent is relative to radius. `am5.percent(0)` broke the chart before 5.21.0 — use `0` (or omit it) for a plain pie |
 | `startAngle` | number | Start angle in degrees (default: -90) |
 | `endAngle` | number | End angle in degrees (default: 270) |
 
@@ -70,8 +72,8 @@ chart.appear(1000, 100);
 | `alignLabels` | boolean | Align labels in column (default: true). Set false for radial/inside labels |
 | `legendLabelText` | string | Legend label format, e.g. `"{category}"` |
 | `legendValueText` | string | Legend value format, e.g. `"{value}"` |
-| `startAngle` | number | Start angle in degrees (default: inherits from chart). Must match PieChart's startAngle for semi-circle |
-| `endAngle` | number | End angle in degrees (default: inherits from chart). Must match PieChart's endAngle for semi-circle |
+| `startAngle` | number | Start angle in degrees (default: `-90`). Must match PieChart's startAngle for semi-circle |
+| `endAngle` | number | End angle in degrees (default: `270`). Must match PieChart's endAngle for semi-circle |
 
 ### Labels
 
@@ -132,6 +134,15 @@ series.slices.template.adapters.add("fill", function(fill, target) {
 // series.slices.template.set("templateField", "sliceSettings");
 ```
 
+### Changing slice values live
+
+Percent series (pie, funnel, pyramid, pictorial) size slices from each data item's `valueWorking`, not `value`, so `dataItem.set("value", v)` moves nothing, and `series.markDirtyValues()` doesn't help. Change the data row, or set both keys:
+
+```js
+series.data.setIndex(0, { category: "A", value: 80 });        // animates (Animated theme)
+series.dataItems[1].setAll({ value: 5, valueWorking: 5 });    // jumps: for per-frame updates, e.g. a countdown donut
+```
+
 ## Funnel chart setup
 
 ```js
@@ -147,7 +158,7 @@ const series = chart.series.push(
     valueField: "value",
     categoryField: "stage",
     orientation: "vertical",   // "vertical" or "horizontal"
-    bottomRatio: 0,            // 0 = trapezoids (classic funnel), 1 = rectangles
+    bottomRatio: 0,            // 0 = rectangles (default), 1 = each slice narrows to the next (trapezoids)
     alignLabels: true
   })
 );
@@ -164,8 +175,8 @@ series.data.setAll([
 
 | Setting | Type | Description |
 |---------|------|-------------|
-| `orientation` | `"vertical" \| "horizontal"` | Direction of the funnel (required) |
-| `bottomRatio` | number (0–1) | 0 = trapezoids (classic funnel), 1 = rectangles (default) |
+| `orientation` | `"vertical" \| "horizontal"` | Direction of the funnel (default: `"vertical"`) |
+| `bottomRatio` | number (0–1) | 0 = rectangular slices (default); 1 = each slice narrows to the next (trapezoids) |
 | `alignLabels` | boolean | Align labels in a column (default: true) |
 
 ### Slice links (connectors between funnel slices)
@@ -245,7 +256,7 @@ series.data.setAll([
 | `orientation` | `"vertical"` \| `"horizontal"` | Fill direction |
 | `startLocation` | number (0–1) | Where the fill starts within the shape |
 | `endLocation` | number (0–1) | Where the fill ends within the shape |
-| `alignLabels` | boolean | Align labels outside the shape |
+| `alignLabels` | boolean | Align labels in a column outside the shape (default: true), as on funnel and pyramid |
 
 **Getting SVG paths:** Use any vector editor (Adobe Illustrator, Inkscape, Figma) to draw a shape and export as SVG, then extract the `d` attribute from the `<path>` element.
 
@@ -259,6 +270,22 @@ am5percent.PictorialStackedSeries.new(root, {
   // ...
 })
 ```
+
+## Bullets on slices
+
+```js
+series.bullets.push(function(root, series, dataItem) {
+  return am5.Bullet.new(root, {
+    locationX: 0.5, locationY: 0.5,          // fractions of the slice (funnel/pyramid: along the sloping edges since 5.20.2)
+    sprite: am5.Circle.new(root, {
+      radius: 6,
+      fill: am5.color(0xffffff)              // set a paint — an unpainted bullet takes its own slice's color and is invisible
+    })
+  });
+});
+```
+
+Percent series have **no series-level `fill`**: a bullet `Graphics` with no `fill`/`stroke` is auto-colored per data item from its own slice (5.20.0+), so it blends in unless stroked, offset, or given a contrasting fill. Slice tooltips need no `am5.Tooltip` instance — `series.slices.template.set("tooltipText", "{category}: {value}")` uses the root's shared tooltip.
 
 ## Legend (for all percent charts)
 
@@ -304,6 +331,10 @@ outerSeries.data.setAll(outerData);
 innerSeries.data.setAll(innerData);
 ```
 
+A negative `innerRadius` (pixels in from the outer edge, a fixed-width ring) with several series sizes the rings correctly since 5.21.0.
+
+**`calculateAggregates` on pie/funnel series (5.21.0):** with `calculateAggregates: true` the change fields — `{valueChange}`/`{valueChangePercent}` (vs. the first slice) and `{valueChangePrevious}`/`{valueChangePreviousPercent}` (vs. the previous one) — are real numbers; before 5.21.0 they were `NaN` on non-XY series (pie, map heat maps). `{valuePercentTotal}` and the totals were not affected.
+
 ## Data-driven slice colors (templateField)
 
 ```js
@@ -330,9 +361,19 @@ series.slices.template.events.on("pointerover", function(ev) {
 series.slices.template.events.on("pointerout", function(ev) {
   ev.target.set("scale", 1);
 });
+
+// Open a URL on click without a handler (5.20.7) — pie, funnel, pyramid and pictorial slices (and bullets)
+series.set("urlField", "url");          // data row: { category: "A", value: 40, url: "https://…" }
+series.set("linkTarget", "_blank");     // default "_self"
 ```
 
+`urlField` has no default (links off until set); the pointer cursor is set automatically unless you set `cursorOverStyle`; `javascript:`/`data:`/`vbscript:` URLs are never opened; override `series.openUrl(dataItem)` to intercept.
+
+**Keyboard (5.21.0):** `series.slices.template.set("focusable", true)` makes slices TAB-reachable — before 5.21.0 focusable pie slices could not be focused. A focusable slice that toggles on click is exposed as a toggle button (`aria-pressed`).
+
 ## Disposal
+
+In a React, Vue, Angular, Svelte or React Native app, use amCharts' framework package, which disposes the root with the component (index.md, "Frameworks"). Otherwise dispose the root when the component goes away:
 
 ```js
 root.dispose();

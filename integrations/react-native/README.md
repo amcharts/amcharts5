@@ -122,7 +122,7 @@ chartView.current?.run("chart.series.getIndex(0).hide()");
 | `config` | The chart as a JSON config: an object or a JSON string. |
 | `code` | The chart as code, used when there is no `config`. |
 | `data` | Data for `code`, as `data`. It must be JSON. With a `config`, it is only there for `run()`. |
-| `themes` | Theme names, e.g. `["Animated", "Dark"]`: the files in the library's `themes/` folder. |
+| `themes` | Theme names, e.g. `["Animated", "Dark"]`: the files in the library's `themes/` folder. A theme with settings is a pair: `["Adaptive", { baseColor: "#4150a0" }]`. |
 | `renderer` | `"svg"` draws the chart as SVG; the default is canvas. SVG needs amCharts 5.21.0 or later. |
 | `licenses` | amCharts license keys, which remove the logo: see [License](#license). |
 | `modules` | More script files to load before the chart is built, e.g. `"locales/de_DE"` for a locale named only in a config, or full URLs. Chart types, themes, plugins, locales, fonts and geodata named by their global (`am5fonts_notosans_jp`) are loaded without this. |

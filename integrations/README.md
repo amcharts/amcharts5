@@ -13,7 +13,7 @@ the library in the browser only.
 | [`svelte/`](svelte/) | `@amcharts/amcharts5-svelte` | Svelte 4 or later |
 | [`react-native/`](react-native/) | `@amcharts/amcharts5-react-native` | React Native 0.72 and react-native-webview 13 or later |
 
-The web packages need amCharts 5.21.0 or later: their JSON config components
+The web packages need amCharts 5.21.4 or later: their JSON config components
 are built on its `<am5-chart>` element. The React Native package draws the
 chart in a WebView, which loads the library's script files, by default from
 the amCharts CDN.

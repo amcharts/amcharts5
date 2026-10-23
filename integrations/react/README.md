@@ -9,7 +9,7 @@ server (Next.js and others) without loading the library there.
 npm install @amcharts/amcharts5 @amcharts/amcharts5-react
 ```
 
-It needs amCharts 5.21.0 or later and React 18 or later. With an older amCharts,
+It needs amCharts 5.21.4 or later and React 18 or later. With amCharts older than 5.21,
 the build fails with "Cannot resolve `@amcharts/amcharts5/element`".
 
 
@@ -86,7 +86,8 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 |---|---|
 | `config` | The chart as a [JSON config](https://www.amcharts.com/docs/v5/concepts/serializing/): an object or a JSON string. A config with different content makes the chart again; the same content written inline on every render does not. |
 | `src` | A URL to load the config from, used when there is no `config`. |
-| `themes` | Theme classes, e.g. `[am5themes_Animated]`. Themes are not part of a config. |
+| `themes` | Theme classes, e.g. `[am5themes_Animated]`, or a class with its settings: `[[am5themes_Adaptive, { baseColor: "#4150a0" }]]`. Themes are not part of a config. In a variable of its own, type the list as `Array<ChartElementTheme>` (from `@amcharts/amcharts5/element`). |
+| `resources` | Geodata and locales the config names, e.g. `{ am5geodata_worldLow }` for `"geoJSON": "am5geodata_worldLow"`. See below. |
 | `renderer` | `"svg"` draws the chart as SVG; the default is canvas. |
 | `onReady` | Called with `{ root, chart }` when the chart is built. |
 | `onError` | Called when it could not be built. |
@@ -96,6 +97,18 @@ The chart types a config uses are loaded when it is built. `<AmChart>` is the
 library's `<am5-chart>` element: a `ref` on it gives that element, with `root`,
 `chart` and `whenReady()`, once the element's code has loaded (it is `null`
 until then). `onReady` is the simpler way to get the chart.
+
+A map's config names its geodata (`"geoJSON": "am5geodata_worldLow"`), and a
+config may name a locale (`"locale": "am5locales_de_DE"`), instead of
+carrying them. With script tags they are globals; with npm imports, import
+the files the config names and give them in `resources`, under the same
+names:
+
+```tsx
+import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
+
+<AmChart config={mapConfig} resources={{ am5geodata_worldLow }} style={{ height: 400 }} />
+```
 
 
 ## Next.js and other server rendering
@@ -158,7 +171,7 @@ vi.mock("@amcharts/amcharts5-react", () => ({
 Each shows a chart in code whose data changes without making it again, and a
 chart from a JSON config:
 
-- [Vite](examples/vite/)
+- [Vite](examples/vite/), with a map whose geodata is given in `resources`
 - [Next.js](examples/next/), with the config chart in a server component
 - [React Router](examples/react-router/), rendered on the server
 - [Astro](examples/astro/), in a React island

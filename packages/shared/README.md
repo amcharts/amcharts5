@@ -33,6 +33,8 @@ With npm, for a project that uses a bundler:
 npm install @amcharts/amcharts5
 ```
 
+The type definitions come with it, and need TypeScript 5.0 or later.
+
 With script tags, from the CDN or from the files in the
 [zip download](https://www.amcharts.com/download/):
 
@@ -100,8 +102,28 @@ With script tags the code is the same without the three `import` lines: each
 file makes its module a global of the same name (`am5`, `am5xy`,
 `am5themes_Animated`).
 
-In a component (React, Angular, Vue), create the chart when the component is
-mounted and call `root.dispose()` when it is removed. There are guides for
+
+## React, Vue, Angular and Svelte
+
+Each has a package. It creates the chart with the component and disposes it
+with it, works with server rendering (Next.js, Nuxt, SvelteKit, Angular SSR)
+because it loads the library in the browser only, and takes a chart written in
+code or a JSON config:
+
+| Framework | Package | A chart in code | A chart from a JSON config |
+|---|---|---|---|
+| React | [`@amcharts/amcharts5-react`](https://github.com/amcharts/amcharts5/tree/master/integrations/react) | `useAmChart(setup, deps)` | `<AmChart config={config} />` |
+| Vue | [`@amcharts/amcharts5-vue`](https://github.com/amcharts/amcharts5/tree/master/integrations/vue) | `useAmChart(templateRef, setup)` | `<AmChart :config="config" />` |
+| Angular | [`@amcharts/amcharts5-angular`](https://github.com/amcharts/amcharts5/tree/master/integrations/angular) | `<div [amChart]="setup">` | `<am5-chart [config]="config">` |
+| Svelte | [`@amcharts/amcharts5-svelte`](https://github.com/amcharts/amcharts5/tree/master/integrations/svelte) | `<div {@attach attachAmChart(setup)}>` | `<am5-chart {@attach attachAmChartConfig({ config })}>` |
+
+For React Native, [`@amcharts/amcharts5-react-native`](https://github.com/amcharts/amcharts5/tree/master/integrations/react-native)
+draws the chart in a WebView, from a JSON config (`<AmChart config={config} />`)
+or from chart code given as a string (`<AmChart code={code} data={data} />`).
+
+Each package's README has a full example. Without a package, create the chart
+when the component is mounted and call `root.dispose()` when it is removed;
+there are guides for
 [React](https://www.amcharts.com/docs/v5/getting-started/integrations/react/),
 [Angular](https://www.amcharts.com/docs/v5/getting-started/integrations/angular/),
 [Vue](https://www.amcharts.com/docs/v5/getting-started/integrations/vue/),
@@ -177,7 +199,12 @@ The config comes from `src`, from a `config` attribute, or from the `config`
 property. With script tags, load `plugins/json.js` before `element.js`, and
 the file of every chart type the config uses; with npm, `import "@amcharts/amcharts5/element";` defines the element,
 the chart types load by themselves, and themes are given as classes:
-`element.themes = [am5themes_Animated]`. Once the chart is built,
+`element.themes = [am5themes_Animated]`. A theme with settings is a pair,
+`[am5themes_Adaptive, { baseColor: "#4150a0" }]` (in the attribute, JSON:
+`themes='["Animated", ["Adaptive", { "baseColor": "#4150a0" }]]'`). A config
+names its geodata and locale (`"geoJSON": "am5geodata_worldLow"`), which are
+globals with script tags; with npm, give them in `resources`:
+`element.resources = { am5geodata_worldLow }`. Once the chart is built,
 `element.root` and `element.chart` hold it; `element.whenReady()` returns a
 promise of it, and the element dispatches `ready` (or `error`).
 
@@ -210,10 +237,18 @@ and follow it.
 With the script files, point it at the `AGENTS.md` in the amCharts folder
 instead.
 
-There is also an [MCP server](https://www.amcharts.com/docs/v5/ai/mcp/)
-(`npx -y @amcharts/amcharts5-mcp`), a
-[skill](https://github.com/amcharts/amcharts5-skill), and
-[more about amCharts and AI](https://www.amcharts.com/docs/v5/ai/).
+amCharts also runs a hosted [MCP server](https://www.amcharts.com/docs/v5/ai/mcp/)
+with the docs, the API reference, 290+ working examples and the map files, at
+`https://mcp.amcharts.com/mcp`. No account or key is needed:
+
+* Claude: add [amCharts 5 from the Connectors Directory](https://claude.ai/directory/amcharts).
+* Claude Code: `claude mcp add --transport http amcharts5 https://mcp.amcharts.com/mcp`.
+* Cursor, VS Code, Windsurf and other MCP clients: add the URL above, or run
+  it locally with `npx -y @amcharts/amcharts5-mcp`.
+
+There is also a [skill](https://github.com/amcharts/amcharts5-skill) for
+coding agents, amCharts 5 is on [Context7](https://context7.com/amcharts/amcharts5),
+and there is [more about amCharts and AI](https://www.amcharts.com/docs/v5/ai/).
 
 
 ## License

@@ -8,6 +8,25 @@ import { JsonParser } from "../plugins/json/Json";
 const BaseElement: typeof HTMLElement = (typeof HTMLElement !== "undefined" ? HTMLElement : class { } as any);
 
 /**
+ * A theme class, or anything else with a `new(root, settings)` that makes a
+ * theme, such as `am5themes_Adaptive`.
+ *
+ * @since 5.21.4
+ */
+export interface IChartElementThemeClass {
+	new: (root: Root, settings?: any) => Theme;
+}
+
+/**
+ * A theme for `<am5-chart>`: a theme class, e.g. `am5themes_Animated`, or a
+ * theme class with its settings, e.g.
+ * `[am5themes_Adaptive, { baseColor: "#4150a0" }]`.
+ *
+ * @since 5.21.4
+ */
+export type ChartElementTheme = IChartElementThemeClass | [IChartElementThemeClass, object];
+
+/**
  * Details of the element's `ready` event.
  *
  * @since 5.21.0
@@ -54,9 +73,17 @@ export interface IChartElementEventMap {
  *
  * The config is given with the `config` attribute or property (an object or
  * a JSON string), or loaded from a URL with `src`. Themes are not part of a
- * config: set them with the `themes` property (theme classes), or with the
- * `themes` attribute (names, for the script version, where each theme is a
- * global). `renderer="svg"` draws the chart as SVG.
+ * config: set them with the `themes` property (theme classes, or a class with
+ * its settings: `[am5themes_Adaptive, { baseColor: "#4150a0" }]`), or with
+ * the `themes` attribute (names, for the script version, where each theme is
+ * a global: `themes="Animated"`, or as JSON with settings:
+ * `themes='["Animated", ["Adaptive", { "baseColor": "#4150a0" }]]'`).
+ * `renderer="svg"` draws the chart as SVG.
+ *
+ * A config names geodata and locales instead of carrying them
+ * (`"geoJSON": "am5geodata_worldLow"`). The script version defines them as
+ * globals; with npm imports, give them in the `resources` property:
+ * `element.resources = { am5geodata_worldLow }`.
  *
  * With script tags, load `index.js`, `plugins/json.js` and `element.js`, and
  * then the chart types the config uses, e.g. `percent.js`.
@@ -93,7 +120,8 @@ export class ChartElement extends BaseElement {
 	public chart: Entity | undefined;
 
 	protected _config: object | string | undefined;
-	protected _themes: Array<typeof Theme> | undefined;
+	protected _themes: Array<ChartElementTheme> | undefined;
+	protected _resources: { [name: string]: unknown } | undefined;
 	protected _container: HTMLDivElement | undefined;
 	protected _build: number = 0;
 	protected _scheduled: boolean = false;
@@ -158,15 +186,35 @@ export class ChartElement extends BaseElement {
 	}
 
 	/**
-	 * Themes for the chart, as theme classes, e.g. `[am5themes_Animated]`.
+	 * Themes for the chart: theme classes, e.g. `[am5themes_Animated]`, or a
+	 * class with its settings, e.g.
+	 * `[am5themes_Animated, [am5themes_Adaptive, { baseColor: "#4150a0" }]]`.
 	 * Setting them builds the chart again.
 	 */
-	public get themes(): Array<typeof Theme> | undefined {
+	public get themes(): Array<ChartElementTheme> | undefined {
 		return this._themes;
 	}
 
-	public set themes(value: Array<typeof Theme> | undefined) {
+	public set themes(value: Array<ChartElementTheme> | undefined) {
 		this._themes = value;
+		this._rebuild();
+	}
+
+	/**
+	 * Objects the config names instead of carrying them: geodata packs and
+	 * locales, by the names the config uses, e.g.
+	 * `{ am5geodata_worldLow, am5locales_de_DE }`. Needed with npm imports;
+	 * the script version defines them as globals. Setting them builds the
+	 * chart again.
+	 *
+	 * @since 5.21.4
+	 */
+	public get resources(): { [name: string]: unknown } | undefined {
+		return this._resources;
+	}
+
+	public set resources(value: { [name: string]: unknown } | undefined) {
+		this._resources = value;
 		this._rebuild();
 	}
 
@@ -189,7 +237,7 @@ export class ChartElement extends BaseElement {
 	 */
 	public connectedCallback(): void {
 		// A property set before the element was defined hides its accessor
-		for (const key of ["config", "themes"]) {
+		for (const key of ["config", "themes", "resources"]) {
 			if (Object.prototype.hasOwnProperty.call(this, key)) {
 				const value = (this as any)[key];
 				delete (this as any)[key];
@@ -319,7 +367,7 @@ export class ChartElement extends BaseElement {
 			}
 
 			// Before the root, so that a wrong name leaves nothing behind
-			const themes = this._themeClasses();
+			const themes = this._themeEntries();
 
 			const container = document.createElement("div");
 			container.style.width = "100%";
@@ -329,9 +377,9 @@ export class ChartElement extends BaseElement {
 
 			const root = Root.new(container, this.getAttribute("renderer") === "svg" ? { renderer: SVGRenderer } : {});
 			this.root = root;
-			root.setThemes(themes.map((theme) => theme.new(root)));
+			root.setThemes(themes.map(([theme, settings]) => settings ? theme.new(root, settings) : theme.new(root)));
 
-			return JsonParser.new(root).parse(config, { parent: root.container }).then((chart) => {
+			return JsonParser.new(root).parse(config, { parent: root.container, resources: this._resources }).then((chart) => {
 				if (build === this._build) {
 					this._pending = false;
 					const detail = { root: root, chart: chart as Entity };
@@ -378,21 +426,27 @@ export class ChartElement extends BaseElement {
 		return Promise.resolve(undefined);
 	}
 
-	// From the property, or from the names in the attribute: in the script
-	// version a theme is the global am5themes_<name>
-	protected _themeClasses(): Array<typeof Theme> {
+	// Each theme with its settings, if it has any: from the property, or from
+	// the attribute, where a theme is a name (in the script version a theme is
+	// the global am5themes_<name>). The attribute is a list of names, or JSON:
+	// '["Animated", ["Adaptive", { "baseColor": "#4150a0" }]]'
+	protected _themeEntries(): Array<[IChartElementThemeClass, object | undefined]> {
 		if (this._themes) {
-			return this._themes;
+			return this._themes.map((entry) => Array.isArray(entry) ? [entry[0], entry[1]] : [entry, undefined]);
 		}
 
-		const names = (this.getAttribute("themes") || "").split(/[\s,]+/).filter((name) => name !== "");
+		const attribute = (this.getAttribute("themes") || "").trim();
+		const entries: Array<string | [string, object]> = attribute[0] === "["
+			? JSON.parse(attribute)
+			: attribute.split(/[\s,]+/).filter((name) => name !== "");
 
-		return names.map((name) => {
+		return entries.map((entry) => {
+			const name = Array.isArray(entry) ? entry[0] : entry;
 			const theme = (window as any)["am5themes_" + name];
 			if (!theme) {
 				throw new Error("Unknown theme \"" + name + "\": load themes/" + name + ".js first, or set the themes property");
 			}
-			return theme;
+			return [theme, Array.isArray(entry) ? entry[1] : undefined];
 		});
 	}
 }

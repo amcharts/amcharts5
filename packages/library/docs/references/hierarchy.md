@@ -1,5 +1,7 @@
 # Hierarchy Charts — Treemap, Sunburst, Force-Directed
 
+> **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
+
 
 ## Required imports
 
@@ -145,6 +147,10 @@ series.outerCircles.template.setAll({
 series.data.setAll(data);
 ```
 
+On `ForceDirected`, `nodePadding` (default `0`) is room in pixels kept free around each node (its collision radius is its radius + `nodePadding`), so neighbours stay at least twice that apart. It is not the `Sankey` `nodePadding`, which is a real gap between nodes.
+
+Since 5.21.0 changing `manyBodyStrength`, `centerStrength`, or a link's `distance`/`strength` takes effect after the layout has settled (it used to do nothing) — no need to re-set the data to apply new forces.
+
 ## Sunburst
 
 ```js
@@ -163,6 +169,8 @@ series.labels.template.set("forceHidden", true);  // hide labels if crowded
 
 series.data.setAll(data);
 ```
+
+`Sunburst` ignores `singleBranchOnly` since 5.21.0 — drilling down always collapses the other branches (they would overlap the zoomed one), so don't set it. Also fixed in 5.21.0: with only one of `startAngle`/`endAngle` set the chart was sized for other angles; changing the angles on a drawn chart left labels and bullets behind; changing `nodePadding` (also on `Partition`) after drawing had no effect until a resize.
 
 ## Pack (Packed Circles)
 
@@ -319,7 +327,32 @@ series.events.on("datavalidated", function() {
 });
 ```
 
+**Keyboard (5.21.0):** focusable nodes in a `focusableGroup` are one TAB stop; arrow keys move between them even though nodes are draggable, and SHIFT + arrow keys drag them. Nodes with children get `aria-expanded` (the new `ariaExpanded` setting). `Pack`, `ForceDirected` and `Tree` nodes could not be focused before 5.21.0, and a `Sunburst` node's focus outline was misplaced.
+
+## Zoomable / pannable hierarchy — `SerialChartContainer` (5.20.2)
+
+`am5.SerialChartContainer` (exported from the **`am5` root module**, not `am5hierarchy`) is a directly usable `SerialChart` whose `seriesContainer` sits inside a `ZoomableContainer`, so a large `ForceDirected`, `Tree` or `Pack` can be wheel-zoomed and dragged. Prefer it over hand-wrapping the chart in `am5.ZoomableContainer` — it round-trips through `ChartSerializer` with its `zoomTools` wired up. A manual `ZoomableContainer`'s `contents` are saved since 5.21.0 (not before), but a `ZoomTools` added to it comes back pointing at a copy and must be re-targeted after `parse()`.
+
+```js
+const chart = root.container.children.push(am5.SerialChartContainer.new(root, {
+  zoomTools: am5.ZoomTools.new(root, {})      // optional +/−/home buttons, target is wired automatically
+}));
+
+const series = chart.series.push(am5hierarchy.ForceDirected.new(root, {
+  valueField: "value",
+  categoryField: "name",
+  childDataField: "children"
+}));
+series.data.setAll(data);
+
+chart.zoomableContainer.setAll({ maxZoomLevel: 8 });   // the ZoomableContainer holding the series
+```
+
+Bullets on series inside a `SerialChartContainer` are drawn as of 5.20.4, and flow-chart (`Sankey`/`Chord`/`ArcDiagram`) bullets are placed correctly inside one as of 5.20.5.
+
 ## Disposal
+
+In a React, Vue, Angular, Svelte or React Native app, use amCharts' framework package, which disposes the root with the component (index.md, "Frameworks"). Otherwise dispose the root when the component goes away:
 
 ```js
 root.dispose();

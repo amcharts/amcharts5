@@ -90,6 +90,11 @@ body {
 		return modules[rest] ? rest : undefined;
 	}
 
+	// A theme is a name, or [name, settings]
+	function themeName(theme) {
+		return Array.isArray(theme) ? theme[0] : theme;
+	}
+
 	function add(list, name) {
 		if (!name || name === "index" || list.indexOf(name) !== -1) {
 			return;
@@ -196,8 +201,8 @@ body {
 		else {
 			addCode(list, next.code || "");
 		}
-		next.themes.forEach(function (name) {
-			add(list, "themes/" + name);
+		next.themes.forEach(function (theme) {
+			add(list, "themes/" + themeName(theme));
 		});
 		next.modules.forEach(function (name) {
 			add(list, name);
@@ -219,12 +224,13 @@ body {
 				settings.renderer = am5.SVGRenderer;
 			}
 
-			var themes = next.themes.map(function (name) {
+			var themes = next.themes.map(function (entry) {
+				var name = themeName(entry);
 				var theme = window["am5themes_" + name];
 				if (!theme) {
 					throw new Error("No theme " + name);
 				}
-				return theme;
+				return { theme: theme, settings: Array.isArray(entry) ? entry[1] : undefined };
 			});
 
 			// Before the root: it decides on the logo when it is made
@@ -235,8 +241,8 @@ body {
 			});
 
 			root = am5.Root.new("chart", settings);
-			root.setThemes(themes.map(function (theme) {
-				return theme.new(root);
+			root.setThemes(themes.map(function (entry) {
+				return entry.settings ? entry.theme.new(root, entry.settings) : entry.theme.new(root);
 			}));
 
 			if (next.config !== undefined) {

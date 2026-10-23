@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { AmChart, useAmChart } from "@amcharts/amcharts5-react";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5geodata_worldLow from "@amcharts/amcharts5-geodata/worldLow";
 import { buildChart, randomVisits, visits } from "./chart";
 import { config } from "./config";
+import { mapConfig } from "./map";
 
 // A chart written in code
 function CodeChart() {
@@ -43,12 +45,25 @@ function ConfigChart() {
 	);
 }
 
+// A map from a JSON config. The config names its geodata by its global name,
+// "am5geodata_worldLow". With npm imports, that is not a global: give the
+// imported geodata in `resources`, under that name
+function MapConfigChart() {
+	return (
+		<section>
+			<h2>A map from a JSON config</h2>
+			<AmChart id="map-chart" config={mapConfig} resources={{ am5geodata_worldLow }} themes={[am5themes_Animated]} style={{ height: 400 }} />
+		</section>
+	);
+}
+
 export function App() {
 	return (
 		<main>
 			<h1>amCharts 5 with React</h1>
 			<CodeChart />
 			<ConfigChart />
+			<MapConfigChart />
 		</main>
 	);
 }

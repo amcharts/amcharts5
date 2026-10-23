@@ -1,19 +1,41 @@
 import { defineComponent, h, onBeforeUnmount, onMounted, ref, shallowRef, toRaw, watch } from "vue";
 import type { PropType } from "vue";
-import type { Theme } from "@amcharts/amcharts5";
-import type { ChartElement, IChartElementReadyEvent } from "@amcharts/amcharts5/element";
+import type { ChartElement, ChartElementTheme, IChartElementReadyEvent } from "@amcharts/amcharts5/element";
 
-// Theme classes are told apart by identity: each gets a number
-const themeKeys = new WeakMap<object, number>();
-let themeCount = 0;
+// Objects are told apart by identity: each gets a number
+const objectKeys = new WeakMap<object, number>();
+let objectCount = 0;
 
-function themeKey(theme: object): number {
-	let key = themeKeys.get(theme);
+function objectKey(value: unknown): number | string {
+	if (value === null || (typeof value !== "object" && typeof value !== "function")) {
+		return typeof value + ":" + String(value);
+	}
+	let key = objectKeys.get(value as object);
 	if (key === undefined) {
-		key = ++themeCount;
-		themeKeys.set(theme, key);
+		key = ++objectCount;
+		objectKeys.set(value as object, key);
 	}
 	return key;
+}
+
+// The plain objects, not Vue's reactive versions of them
+function rawThemes(themes: Array<ChartElementTheme> | undefined): Array<ChartElementTheme> | undefined {
+	return themes ? toRaw(themes).map((theme) => {
+		const entry = toRaw(theme);
+		return Array.isArray(entry) ? [toRaw(entry[0]), toRaw(entry[1])] as ChartElementTheme : entry;
+	}) : undefined;
+}
+
+function rawResources(resources: { [name: string]: unknown } | undefined): { [name: string]: unknown } | undefined {
+	if (!resources) {
+		return undefined;
+	}
+	const raw: { [name: string]: unknown } = {};
+	const source = toRaw(resources);
+	Object.keys(source).forEach((name) => {
+		raw[name] = toRaw(source[name]);
+	});
+	return raw;
 }
 
 /**
@@ -64,11 +86,22 @@ export const AmChart = defineComponent({
 		},
 
 		/**
-		 * Themes, as theme classes, e.g. `[am5themes_Animated]`. Themes are not
-		 * part of a config.
+		 * Themes, as theme classes, e.g. `[am5themes_Animated]`, or a class with
+		 * its settings: `[am5themes_Adaptive, { baseColor: "#4150a0" }]`.
+		 * Themes are not part of a config.
 		 */
 		themes: {
-			type: Array as PropType<Array<typeof Theme>>,
+			type: Array as PropType<Array<ChartElementTheme>>,
+			default: undefined,
+		},
+
+		/**
+		 * Geodata and locales the config names, by those names, e.g.
+		 * `{ am5geodata_worldLow }` for `"geoJSON": "am5geodata_worldLow"`.
+		 * With npm imports they are not globals, so the config finds them here.
+		 */
+		resources: {
+			type: Object as PropType<{ [name: string]: unknown }>,
 			default: undefined,
 		},
 
@@ -131,10 +164,14 @@ export const AmChart = defineComponent({
 
 			// The plain objects, not Vue's reactive versions of them. Nothing to
 			// nothing would only build the chart again
-			const themes = props.themes ? toRaw(props.themes).map((theme) => toRaw(theme)) : undefined;
+			const themes = rawThemes(props.themes);
+			const resources = rawResources(props.resources);
 			const config = toRaw(props.config);
 			if (themes !== undefined || target.themes !== undefined) {
 				target.themes = themes;
+			}
+			if (resources !== undefined || target.resources !== undefined) {
+				target.resources = resources;
 			}
 			if (config !== undefined || target.config !== undefined) {
 				target.config = config;
@@ -168,13 +205,22 @@ export const AmChart = defineComponent({
 		});
 
 		// Compared by content: a config or a list of themes written inline in a
-		// template is a new object on every render
-		watch(() => JSON.stringify([
-			typeof props.config === "string" ? props.config : JSON.stringify(props.config),
-			props.themes ? props.themes.map((theme) => themeKey(toRaw(theme))) : [],
-			props.src,
-			props.renderer,
-		]), apply);
+		// template is a new object on every render. A theme by its class and its
+		// settings by content; each resource by identity, as geodata is too big
+		// to compare
+		// Read through Vue's reactive versions, so that changes made in place are
+		// seen too; only what is keyed by identity is unwrapped
+		watch(() => {
+			const themes = props.themes;
+			const resources = props.resources;
+			return JSON.stringify([
+				typeof props.config === "string" ? props.config : JSON.stringify(props.config),
+				themes ? themes.map((theme) => Array.isArray(theme) ? [objectKey(toRaw(theme[0])), theme[1]] : objectKey(toRaw(theme))) : [],
+				resources ? Object.keys(resources).sort().map((name) => [name, objectKey(toRaw(resources[name]))]) : [],
+				props.src,
+				props.renderer,
+			]);
+		}, apply);
 
 		expose({ element: exposed });
 

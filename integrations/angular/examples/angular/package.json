@@ -8,7 +8,7 @@
   },
   "private": true,
   "dependencies": {
-    "@amcharts/amcharts5": "^5.21.0",
+    "@amcharts/amcharts5": "^5.21.4",
     "@amcharts/amcharts5-angular": "^5.0.0",
     "@angular/common": "^22.2.0",
     "@angular/compiler": "^22.2.0",

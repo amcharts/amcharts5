@@ -1,5 +1,7 @@
 # Flow Charts — Sankey, Chord, Arc Diagrams
 
+> **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
+
 
 ## Required imports
 
@@ -127,7 +129,7 @@ const series = root.container.children.push(
     padAngle: 2,              // gap between nodes in degrees
     radius: am5.percent(90),
     startAngle: 80,
-    sort: "ascending"         // "ascending" | "descending" | "none"
+    sort: "ascending"         // "ascending" | "descending" | "none" (default: data order)
   })
 );
 
@@ -254,6 +256,14 @@ series.links.template.events.on("click", function(ev) {
 });
 ```
 
+**Keyboard (5.21.0):** in a `focusableGroup`, arrow keys move between nodes even though flow nodes are draggable, and SHIFT + arrow keys drag them. Also fixed: setting a `Chord`'s `sort` back to `"none"` restores the original order.
+
+`urlField` / `linkTarget` (5.20.7) do **not** link flow nodes or links — to open a URL from a node or link, keep a `click` handler like the ones above (e.g. `window.open(ev.target.dataItem.dataContext.url, "_blank", "noopener")`).
+
+## Bullets on nodes (5.20.2)
+
+Bullets pushed to `series.nodes.bullets` are children of the node since 5.20.2: drawn above the node shape and below its label, positioned relative to the node (`locationX`/`locationY` as fractions of it). On `ArcDiagram` they sit on the node circle — before 5.20.2 they were created but never placed. A bullet `Graphics` with no `fill`/`stroke` of its own takes the **node's** color, i.e. the same color as what it sits on — give it a contrasting `fill`, a `stroke`, or an offset or it is invisible. Node/link tooltips need no `am5.Tooltip` instance: set `tooltipText` on `series.nodes.nodes.template` / `series.links.template` and the root's shared tooltip is used.
+
 ## Animated bullets along links
 
 Animated labels/circles that flow along Sankey or Chord links use `series.bullets.push()` — **NOT** `series.links.template.bullets.push()`. The bullet position (0 = source, 1 = target) is animated in a loop, and an adapter fades opacity based on position.
@@ -331,8 +341,11 @@ bullet.on("locationY", function() {
 - Random duration per bullet creates natural asynchronous flow
 - The opacity adapter formula `0.5 - Math.abs(0.5 - location)` gives a bell curve: invisible at edges, max at center
 - `bullet.on("locationX"/"locationY", ...)` is needed to trigger the adapter as position changes
+- Declarative alternative for the loop (5.20.8): `am5.Bullet.new(root, { locationX: 0, sprite: label, autoRotate: true, animations: [{ key: "locationX", from: 0, to: 1, duration: 4000, loops: 0 }] })` instead of `bullet.animate(...)` — it lives in a JSON config; the opacity adapter still does not survive serialization
 
 ## Disposal
+
+In a React, Vue, Angular, Svelte or React Native app, use amCharts' framework package, which disposes the root with the component (index.md, "Frameworks"). Otherwise dispose the root when the component goes away:
 
 ```js
 root.dispose();

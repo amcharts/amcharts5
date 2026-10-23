@@ -1,5 +1,7 @@
 # Venn Diagram
 
+> **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
+
 Docs: https://www.amcharts.com/docs/v5/charts/venn/
 
 Venn diagrams show overlapping relationships between sets. There is NO `VennDiagram` chart class — `am5venn.Venn` is both the series and the visual container, pushed directly into `root.container.children` (or any `Container`).
@@ -147,6 +149,10 @@ series.labels.template.adapters.add("text", function(text, target) {
 });
 ```
 
+## Serialization gotcha: `hoverGraphics` is not captured
+
+`series.hoverGraphics` (the dashed set outline used in the amCharts venn demo) is **not** written by `am5plugins_json.ChartSerializer` as of 5.21.0 — a venn rebuilt from JSON loses that outline. Re-apply `hoverGraphics.setAll({...})` in code after `JsonParser.parse()`. Slice-template states (`slices.template.states.create("hover", …)`) and `slices.template.tooltipText` do round-trip. Before 5.21.0 a `Venn` pushed straight into `root.container` could not be serialized on its own (stack overflow) — wrap it in a `Container` or upgrade.
+
 ## Click events
 
 ```js
@@ -155,6 +161,8 @@ series.slices.template.events.on("click", function(ev) {
   console.log("Clicked:", dataItem.get("category"));
 });
 ```
+
+To open a URL on click, no handler is needed (5.20.7): `am5venn.Venn.new(root, { …, urlField: "url", linkTarget: "_blank" })` (`linkTarget` default `"_self"`) links each slice — sets and intersections — to the `url` in its data row; the pointer cursor is set automatically.
 
 ## Legend
 

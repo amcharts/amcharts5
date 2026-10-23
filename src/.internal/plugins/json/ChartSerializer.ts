@@ -45,6 +45,16 @@ export interface IChartSerializerSettings extends ISerializerSettings {
 	 */
 	includeRoot?: boolean;
 
+	/**
+	 * Objects to write out by name instead of copying them: geodata packs and
+	 * locales, under the names [[JsonParser]] gets them by in its `resources`,
+	 * e.g. `{ am5geodata_worldLow }`. Without them, only packs loaded as
+	 * globals (the script version) are written as names.
+	 *
+	 * @since 5.21.4
+	 */
+	resources?: { [name: string]: unknown };
+
 }
 
 export interface IChartSerializerPrivate extends ISerializerPrivate {
@@ -262,15 +272,11 @@ export class ChartSerializer extends Serializer {
 		// A locale is a pack loaded as a global (`am5locales_de_DE`), so it goes
 		// out as that name - the same as a geodata pack - rather than as a copy of
 		// every translation in it
-		if (root.locale && typeof window !== "undefined") {
-			const global: any = window;
-			$array.eachContinue($object.keys(global), (key: any) => {
-				if (key.indexOf("am5locales_") === 0 && global[key] === root.locale) {
-					result.properties.locale = key;
-					return false;
-				}
-				return true;
-			});
+		if (root.locale) {
+			const name = this._nameOf(root.locale, "am5locales_");
+			if (name !== undefined) {
+				result.properties.locale = name;
+			}
 		}
 
 		// Settings from `Root._settings`, minus the ones the Root filled in for
@@ -504,18 +510,41 @@ export class ChartSerializer extends Serializer {
 		// The live setting, not the serialized copy - the copy has lost the
 		// identity that says which pack it came from
 		const geoJSON = source.get ? source.get("geoJSON") : undefined;
-		if (!geoJSON || !result || !result.settings || !result.settings.geoJSON || typeof window === "undefined") {
+		if (!geoJSON || !result || !result.settings || !result.settings.geoJSON) {
 			return;
 		}
 
-		const global: any = window;
-		$array.eachContinue($object.keys(global), (key: any) => {
-			if (key.indexOf("am5geodata_") === 0 && global[key] === geoJSON) {
-				result.settings.geoJSON = key;
-				return false;
+		const name = this._nameOf(geoJSON, "am5geodata_");
+		if (name !== undefined) {
+			result.settings.geoJSON = name;
+		}
+	}
+
+	// The name an object is known by: its key in `resources`, or else the
+	// global (with the given prefix) it was loaded as
+	private _nameOf(value: unknown, prefix: string): string | undefined {
+		const resources = this.get("resources");
+		if (resources) {
+			const keys = $object.keys(resources);
+			for (let i = 0; i < keys.length; i++) {
+				if (resources[keys[i]] === value) {
+					return keys[i] as string;
+				}
 			}
-			return true;
-		});
+		}
+
+		if (typeof window !== "undefined") {
+			const global: any = window;
+			const keys = $object.keys(global);
+			for (let i = 0; i < keys.length; i++) {
+				const key = keys[i] as string;
+				if (key.indexOf(prefix) === 0 && global[key] === value) {
+					return key;
+				}
+			}
+		}
+
+		return undefined;
 	}
 
 	private _processSeries(series: Series, result: any): string {

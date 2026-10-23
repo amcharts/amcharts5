@@ -34,9 +34,10 @@ export interface AmChartProps {
 	data?: unknown;
 
 	/**
-	 * Theme names, e.g. `["Animated", "Dark"]`.
+	 * Theme names, e.g. `["Animated", "Dark"]`, or a name with the theme's
+	 * settings: `["Adaptive", { baseColor: "#4150a0" }]`. Settings must be JSON.
 	 */
-	themes?: Array<string>;
+	themes?: Array<string | [string, object]>;
 
 	/**
 	 * Draws the chart as SVG instead of canvas.

@@ -6,7 +6,7 @@ amCharts 5 provides built-in interactive UI widgets in the core package. **Prefe
 
 ## Imports
 
-All UI elements are in the core package (`am5`) except ColorPicker.
+All UI elements are in the core package (`am5`) except ColorPicker (and ExportingMenu, which is part of the exporting plugin).
 
 ### CDN / script tags
 ```html
@@ -101,6 +101,8 @@ button.events.on("click", function(ev) {
 
 A single-value slider control. Values range from 0 to 1 (relative positions).
 
+Need the handle on a chart axis instead (a draggable playhead on a date axis)? Use an axis range whose `AxisBullet` holds a `Button` with `themeTags: ["resize", "horizontal"]`, and move the range in the button's `dragged` event — see `examples/line-area/line-chart-with-range-slider`.
+
 ```js
 var slider = container.children.push(am5.Slider.new(root, {
   orientation: "horizontal",  // or "vertical"
@@ -181,6 +183,7 @@ chart.set("scrollbarX", am5xy.XYChartScrollbar.new(root, {
   orientation: "horizontal",
   height: 50
 }));
+// the preview draws nothing until scrollbar.chart gets axes and a series with data: see references/xy.md > Scrollbar
 ```
 
 ### Position
@@ -194,6 +197,8 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
   outsideAxes: true    // below the X axis labels too
 }));
 ```
+
+`opposite` (5.20.2) and `outsideAxes` (5.21.0) work only for scrollbars set as a chart's `scrollbarX`/`scrollbarY` (not to be confused with the axis renderer's `opposite`). A scrollbar hidden with `visible: false`, `forceHidden` or `hide()` no longer leaves an empty band (5.21.0).
 
 ### Styling
 
@@ -296,7 +301,8 @@ An HTML overlay dialog.
 
 ```js
 var modal = am5.Modal.new(root, {
-  content: "<h2>Notice</h2><p>Chart data is loading...</p>"
+  content: "<h2>Notice</h2><p>Chart data is loading...</p>",
+  ariaLabel: "Loading"   // (5.21.0) dialog name for screen readers; default: the first heading in content
 });
 
 modal.open();
@@ -307,6 +313,21 @@ modal.events.on("closed", function() {
 
 // Close programmatically
 modal.close();
+```
+
+Since 5.21.0 a `Modal` (also the one `StockChart` settings use) is a dialog to screen readers: focus moves into it when it opens, TAB stays inside it, and closing it gives focus back.
+
+---
+
+## ExportingMenu
+
+The exporting plugin's menu (`am5plugins_exporting.ExportingMenu`, requires `plugins/exporting.js`) is an HTML overlay too; see index.md > Exporting. Since 5.21.0 it lists an **SVG** image item by default — remove it with `svgOptions: { disabled: true }` on the `Exporting` object — and is accessible: items are menu items to screen readers, the icon tells whether the menu is open, and closing the menu returns focus to the icon.
+
+```js
+am5plugins_exporting.Exporting.new(root, {
+  menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+  svgOptions: { disabled: true }   // no "SVG" item; pngOptions/jpgOptions/pdfOptions take `disabled` too
+});
 ```
 
 ---

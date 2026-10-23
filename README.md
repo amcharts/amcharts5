@@ -57,10 +57,12 @@ npm package or load it with script tags, as below.
   among them dark, colorblind-friendly and responsive ones.
 * **Accessibility**: [keyboard navigation and screen reader support](https://www.amcharts.com/docs/v5/concepts/accessibility/).
 * **TypeScript**: the library is written in it, and the type definitions come
-  with the package.
+  with the package. They need TypeScript 5.0 or later.
 * **AI coding agents**: the npm package includes `AGENTS.md` and a reference
   for every chart type, so that [agents](https://www.amcharts.com/docs/v5/ai/)
-  write code for the current API.
+  write code for the current API. A hosted MCP server,
+  `https://mcp.amcharts.com/mcp`, gives them the docs, examples and map files;
+  in Claude, add it from the [Connectors Directory](https://claude.ai/directory/amcharts).
 
 
 ## Install
@@ -137,8 +139,11 @@ With script tags the code is the same without the three `import` lines: each
 file makes its module a global of the same name (`am5`, `am5xy`,
 `am5themes_Animated`).
 
-In a component (React, Angular, Vue), create the chart when the component is
-mounted and call `root.dispose()` when it is removed. There are guides for
+For React, Vue, Angular, Svelte and React Native there are packages that
+create and dispose the chart with the component: see
+[`integrations/`](integrations/). Without one, create the chart when the
+component is mounted and call `root.dispose()` when it is removed. There are
+guides for
 [React](https://www.amcharts.com/docs/v5/getting-started/integrations/react/),
 [Angular](https://www.amcharts.com/docs/v5/getting-started/integrations/angular/),
 [Vue](https://www.amcharts.com/docs/v5/getting-started/integrations/vue/),
@@ -160,6 +165,7 @@ use amCharts with AI coding agents.
 | `packages/shared/` | What ships beside the code: README, changelog, license |
 | `packages/library/` | `AGENTS.md` and `docs/`, for AI coding agents |
 | `packages/script/` | `START-HERE.html`, the first page of the zip download |
+| `integrations/` | The packages for React, Vue, Angular, Svelte and React Native, each with its README and CHANGELOG |
 | `build/` | The build |
 
 

@@ -1,4 +1,4 @@
-export { ChartElement, IChartElementReadyEvent, IChartElementEventMap, defineChartElement } from "./.internal/element/ChartElement";
+export { ChartElement, IChartElementReadyEvent, IChartElementEventMap, IChartElementThemeClass, ChartElementTheme, defineChartElement } from "./.internal/element/ChartElement";
 
 import { ChartElement, defineChartElement } from "./.internal/element/ChartElement";
 

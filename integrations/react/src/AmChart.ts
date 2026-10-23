@@ -2,8 +2,7 @@
 
 import { createElement, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import type { CSSProperties, ForwardedRef } from "react";
-import type { Theme } from "@amcharts/amcharts5";
-import type { ChartElement, IChartElementReadyEvent } from "@amcharts/amcharts5/element";
+import type { ChartElement, ChartElementTheme, IChartElementReadyEvent } from "@amcharts/amcharts5/element";
 
 /**
  * Props of `<AmChart>`.
@@ -22,10 +21,18 @@ export interface AmChartProps {
 	src?: string;
 
 	/**
-	 * Themes, as theme classes, e.g. `[am5themes_Animated]`. Themes are not part
-	 * of a config.
+	 * Themes, as theme classes, e.g. `[am5themes_Animated]`, or a class with
+	 * its settings: `[am5themes_Adaptive, { baseColor: "#4150a0" }]`. Themes
+	 * are not part of a config.
 	 */
-	themes?: Array<typeof Theme>;
+	themes?: Array<ChartElementTheme>;
+
+	/**
+	 * Geodata and locales the config names, by those names, e.g.
+	 * `{ am5geodata_worldLow }` for `"geoJSON": "am5geodata_worldLow"`. With
+	 * npm imports they are not globals, so the config finds them here.
+	 */
+	resources?: { [name: string]: unknown };
 
 	/**
 	 * Draws the chart as SVG instead of canvas.
@@ -66,17 +73,30 @@ function useSameContent<T>(value: T, key: (value: T) => string): T {
 	return kept.current.value;
 }
 
-// Theme classes are told apart by identity: each gets a number
-const themeKeys = new WeakMap<object, number>();
-let themeCount = 0;
+// Objects are told apart by identity: each gets a number
+const objectKeys = new WeakMap<object, number>();
+let objectCount = 0;
 
-function themeKey(theme: object): number {
-	let key = themeKeys.get(theme);
+function objectKey(value: unknown): number | string {
+	if (value === null || (typeof value !== "object" && typeof value !== "function")) {
+		return typeof value + ":" + String(value);
+	}
+	let key = objectKeys.get(value as object);
 	if (key === undefined) {
-		key = ++themeCount;
-		themeKeys.set(theme, key);
+		key = ++objectCount;
+		objectKeys.set(value as object, key);
 	}
 	return key;
+}
+
+// A theme by its class, and its settings by content
+function themesKey(themes: Array<ChartElementTheme> | undefined): string {
+	return themes ? JSON.stringify(themes.map((theme) => Array.isArray(theme) ? [objectKey(theme[0]), theme[1]] : objectKey(theme))) : "";
+}
+
+// Each resource by identity: geodata is too big to compare
+function resourcesKey(resources: { [name: string]: unknown } | undefined): string {
+	return resources ? JSON.stringify(Object.keys(resources).sort().map((name) => [name, objectKey(resources[name])])) : "";
 }
 
 /**
@@ -153,7 +173,8 @@ export const AmChart = forwardRef(function AmChart(props: AmChartProps, ref: For
 	// content: a config or a list of themes written inline is a new object on
 	// every render
 	const config = useSameContent(props.config, (value) => typeof value === "string" ? value : JSON.stringify(value));
-	const themes = useSameContent(props.themes, (value) => value ? value.map((theme) => themeKey(theme)).join(",") : "");
+	const themes = useSameContent(props.themes, themesKey);
+	const resources = useSameContent(props.resources, resourcesKey);
 	const { src, renderer } = props;
 
 	useEffect(() => {
@@ -180,10 +201,13 @@ export const AmChart = forwardRef(function AmChart(props: AmChartProps, ref: For
 		if (themes !== undefined || target.themes !== undefined) {
 			target.themes = themes;
 		}
+		if (resources !== undefined || target.resources !== undefined) {
+			target.resources = resources;
+		}
 		if (config !== undefined || target.config !== undefined) {
 			target.config = config;
 		}
-	}, [defined, config, src, themes, renderer]);
+	}, [defined, config, src, themes, resources, renderer]);
 
 	// "class": React 18 gives a custom element its props as attributes by name
 	return createElement("am5-chart", {

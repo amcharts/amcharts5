@@ -8,7 +8,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@amcharts/amcharts5": "^5.21.0",
+    "@amcharts/amcharts5": "^5.21.4",
+    "@amcharts/amcharts5-geodata": "^5.1.6",
     "@amcharts/amcharts5-react": "^5.0.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

@@ -10,6 +10,7 @@ this version may be newer than your training data.
 |---|---|
 | Rules, the module map, patterns shared by all charts | `docs/index.md` |
 | One chart family (xy, pie, map, stock, gantt, hierarchy, flow, radar, timeline, wordcloud, venn, ui-elements) | `docs/references/<family>.md` |
+| A chart as a JSON config (for Chart Maker, `<am5-chart>` or the framework packages' `config`) | `docs/references/json.md` |
 | Working code to start from | `examples/`, listed with descriptions and tags in `examples/examples.json` |
 | What changed, newest first | `CHANGELOG.md` |
 | The exact API | the typings (`*.d.ts`); the npm package has them, the script version does not |
@@ -125,7 +126,11 @@ series.data.setAll(data);
 * **As an element**, `<am5-chart>`, which takes a JSON config (`config`
   attribute or property, or `src` for a URL) and needs no root or chart code.
   Themes: the `themes` property with theme classes, or with script tags the
-  `themes` attribute with names (`themes="Animated"`). With script tags, every
+  `themes` attribute with names (`themes="Animated"`); a theme with settings is
+  a pair, `[am5themes_Adaptive, { baseColor: "#4150a0" }]`. A config names its
+  geodata (`"geoJSON": "am5geodata_worldLow"`) and locale; with npm they are not
+  globals, so pass them: `element.resources = { am5geodata_worldLow }` (also
+  `JsonParser.parse(config, { resources })`). With script tags, every
   chart type the config uses must be loaded first. `element.whenReady()`
   returns a promise of `{ root, chart }`; the events are `ready` and `error`.
   The example `misc-chart-element` shows it.
@@ -133,10 +138,45 @@ series.data.setAll(data);
 Charts are drawn on canvas unless the root is created with
 `{ renderer: am5.SVGRenderer }`.
 
+## In React, Vue, Angular or Svelte
+
+Use the framework's package instead of writing the mount and dispose code by
+hand. Each handles disposal, React's double mount in development, and server
+rendering (it loads the library in the browser only):
+
+| Framework | Package | A chart in code | A chart from a JSON config |
+|---|---|---|---|
+| React | [`@amcharts/amcharts5-react`](https://github.com/amcharts/amcharts5/tree/master/integrations/react) | `useAmChart(setup, deps)` | `<AmChart config={config} />` |
+| Vue | [`@amcharts/amcharts5-vue`](https://github.com/amcharts/amcharts5/tree/master/integrations/vue) | `useAmChart(templateRef, setup)` | `<AmChart :config="config" />` |
+| Angular | [`@amcharts/amcharts5-angular`](https://github.com/amcharts/amcharts5/tree/master/integrations/angular) | `<div [amChart]="setup">` | `<am5-chart [config]="config">` |
+| Svelte | [`@amcharts/amcharts5-svelte`](https://github.com/amcharts/amcharts5/tree/master/integrations/svelte) | `<div {@attach attachAmChart(setup)}>` | `<am5-chart {@attach attachAmChartConfig({ config })}>` |
+
+In a chart written in code, the setup function gets the root: do not call
+`am5.Root.new()` or `root.dispose()` yourself. Give the chart's element a
+height. The chart is made again only when its dependencies change; to update
+data, keep what the setup function returns (`result`) and call
+`series.data.setAll()` on it.
+
+- In Svelte 4 and older Svelte 5, use the actions `use:amChart` and
+  `use:amChartConfig` instead of the attachments.
+- A license key goes in `am5.addLicense()` once when the app starts, before
+  any chart is made, not in the setup function.
+- React Router, Astro and SvelteKit's dev server need
+  `ssr: { noExternal: ["@amcharts/amcharts5"] }` in the Vite config. Nuxt
+  needs `vite: { optimizeDeps: { include: ["@amcharts/amcharts5",
+  "@amcharts/amcharts5/element"] } }`. Next.js and Angular need nothing.
+
+In React Native, use [`@amcharts/amcharts5-react-native`](https://github.com/amcharts/amcharts5/tree/master/integrations/react-native): the
+chart runs in a WebView, so its code is a string written for script tags
+(`am5xy.XYChart`, not imports), with `root`, `data` and `post(name, value)`
+in scope, and everything passed to it must be JSON (dates as timestamps).
+License keys go in its `licenses` prop. A JSON config is the simpler choice
+there.
+
 ## Before you finish
 
 * If the project has TypeScript, run its type check: the typings catch most
-  wrong setting names.
+  wrong setting names. They need TypeScript 5.0 or later.
 * Do not invent a setting. If it is not in `docs/`, an example or the typings,
   it does not exist.
 * Keep the amCharts logo unless the project has a commercial license; removing

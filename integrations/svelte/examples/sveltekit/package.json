@@ -9,7 +9,7 @@
 		"prepare": "svelte-kit sync || echo ''"
 	},
 	"dependencies": {
-		"@amcharts/amcharts5": "^5.21.0",
+		"@amcharts/amcharts5": "^5.21.4",
 		"@amcharts/amcharts5-svelte": "^5.0.0"
 	},
 	"devDependencies": {

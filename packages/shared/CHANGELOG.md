@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.21.4] - 2026-10-23
+
+### Added
+- Packages for React, Vue, Angular, Svelte and React Native: `@amcharts/amcharts5-react`, `-vue`, `-angular`, `-svelte` and `-react-native`. See `integrations/` for their READMEs and changelogs.
+- `<am5-chart>`: a theme can come with its settings, e.g. `[am5themes_Adaptive, { baseColor: "#4150a0" }]`, also as JSON in the `themes` attribute.
+- JSON: `resources` gives a config the geodata and locales it names, e.g. `{ am5geodata_worldLow }`, for npm imports, where they are not globals. Taken by `JsonParser.parse()`, `ChartSerializer` and `<am5-chart>`.
+
+### Changed
+- JSON: a geodata or locale name that can't be found now logs a warning.
+
 ## [5.21.3] - 2026-10-21
 
 ### Added
