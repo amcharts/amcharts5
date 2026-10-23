@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.0.1] - 2026-10-23
+
 ### Added
 - `themes`: a theme can come with its settings, e.g. `["Adaptive", { baseColor: "#4150a0" }]`.
 

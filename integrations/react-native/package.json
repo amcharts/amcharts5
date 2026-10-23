@@ -1,6 +1,6 @@
 {
   "name": "@amcharts/amcharts5-react-native",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "libraryVersion": "5.21.4",
   "description": "A React Native component for amCharts 5: charts from a JSON config or from chart code, drawn in a WebView",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
