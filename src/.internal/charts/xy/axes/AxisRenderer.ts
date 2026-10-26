@@ -21,7 +21,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * The smallest distance between grid lines, in pixels. The axis spaces
 	 * its grid, and so its labels, at least this far apart.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Grid_density} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#grid-density} for more info
 	 */
 	minGridDistance?: number;
 
@@ -31,7 +31,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * without grid, so avoid it there with many categories.
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Minor_grid} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#minor-grid} for more info
 	 * @since 5.6.0
 	 */
 	minorGridEnabled?: boolean;
@@ -41,7 +41,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * `minorGridEnabled` is set to `false`.
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Enabling_minor_grid_labels} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#enabling-minor-grid-labels} for more info
 	 * @since 5.6.0
 	 */
 	minorLabelsEnabled?: boolean;
@@ -50,7 +50,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * Reverses the axis: it runs right to left on X, and top to bottom on Y.
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Inversed_axes} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#inversed-axes} for more info
 	 */
 	inversed?: boolean;
 
@@ -60,7 +60,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * gap between them.
 	 *
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#cell-startend-locations} for more info
 	 */
 	cellStartLocation?: number;
 
@@ -69,7 +69,7 @@ export interface IAxisRendererSettings extends IGraphicsSettings {
 	 * (its end).
 	 *
 	 * @default 1
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Cell_start_end_locations} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#cell-startend-locations} for more info
 	 */
 	cellEndLocation?: number;
 
@@ -107,7 +107,7 @@ export interface IAxisRendererPrivate extends IGraphicsPrivate {
  * Base class for axis renderers, which draw an axis's line, labels, ticks,
  * grid and fills. Not used on its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/#axis-renderer} for more info
  */
 export abstract class AxisRenderer extends Graphics {
 	public static className: string = "AxisRenderer";

@@ -9,7 +9,7 @@ import type { Container } from "./Container";
  * percent height share the height the others leave, in proportion to their
  * percents.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#layout} for more info
  */
 export class VerticalLayout extends Layout {
 

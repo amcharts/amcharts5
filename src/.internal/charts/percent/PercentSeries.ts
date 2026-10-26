@@ -58,7 +58,7 @@ export interface IPercentSeriesDataItem extends ISeriesDataItem {
 	/**
 	 * Pattern used for the slice and related elements, e.g. legend marker.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
 	 * @since 5.10.0
 	 */
 	fillPattern: Pattern;
@@ -78,7 +78,7 @@ export interface IPercentSeriesSettings extends ISeriesSettings {
 	/**
 	 * A [[PatternSet]] to use when assigning patterns for slices.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets} for more info
 	 * @since 5.10.0
 	 */
 	patterns?: PatternSet;

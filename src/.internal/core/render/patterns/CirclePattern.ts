@@ -41,7 +41,7 @@ export interface ICirclePatternPrivate extends IPatternPrivate {
 /**
  * Circle pattern.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class CirclePattern extends Pattern {
 

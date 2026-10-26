@@ -6,7 +6,7 @@ import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
  * dark interface colors. Its darkest colors, the deep violet and purple, are
  * lightened to show on the background. Use it in place of `Frozen`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class FrozenDarkTheme extends FrozenTheme {

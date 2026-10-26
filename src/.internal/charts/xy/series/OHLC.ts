@@ -10,7 +10,7 @@ export interface IOHLCPrivate extends ICandlestickPrivate {
  * A bar of an [[OHLCSeries]]: a line from the low to the high value, with
  * ticks marking the open and close values.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
  */
 export class OHLC extends Candlestick {

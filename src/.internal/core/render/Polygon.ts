@@ -26,7 +26,7 @@ export interface IPolygonSettings extends IGraphicsSettings {
 	/**
 	 * Easing function of the morph.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 */
 	animationEasing?: (t: Time) => Time;
 
@@ -51,7 +51,7 @@ export interface IPolygonPrivate extends IGraphicsPrivate {
 /**
  * Draws a closed polygon through `points`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/polygon/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  * @since 5.4.0
  */

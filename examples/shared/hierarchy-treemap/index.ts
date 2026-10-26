@@ -4,12 +4,12 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
@@ -24,7 +24,7 @@ const container = root.container.children.push(am5.Container.new(root, {
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/
+// https://docs.amcharts.com/v5/charts/hierarchy/treemap/
 // a click on a tile zooms into it; the breadcrumbs lead back up
 const series = container.children.push(am5hierarchy.Treemap.new(root, {
   downDepth: 1,    // a click shows one level inside the clicked tile
@@ -37,14 +37,14 @@ const series = container.children.push(am5hierarchy.Treemap.new(root, {
 
 
 // Add breadcrumbs above the chart
-// https://www.amcharts.com/docs/v5/charts/hierarchy/breadcrumbs/
+// https://docs.amcharts.com/v5/charts/hierarchy/breadcrumbs/
 container.children.unshift(am5hierarchy.BreadcrumbBar.new(root, {
   series: series
 }));
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
+// https://docs.amcharts.com/v5/charts/hierarchy/#setting-data
 series.data.setAll([{
   name: "Sales",
   children: [
@@ -89,10 +89,10 @@ series.data.setAll([{
 
 
 // Select the root node
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
+// https://docs.amcharts.com/v5/charts/hierarchy/#pre-selected-branch
 series.set("selectedDataItem", series.dataItems[0]);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

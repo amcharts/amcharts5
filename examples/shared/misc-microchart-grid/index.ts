@@ -7,21 +7,21 @@ import am5themes_Micro from "@amcharts/amcharts5/themes/Micro";
 function createChart(cell: HTMLElement, points: Array<object>, field: string, columns: boolean, color: am5.Color) {
 
   // Create root element: every chart has its own
-  // https://www.amcharts.com/docs/v5/getting-started/#Root_element
+  // https://docs.amcharts.com/v5/getting-started/#root-element
   const root = am5.Root.new(cell.appendChild(document.createElement("div")));
 
   // Set themes: Micro removes padding, axes and grid
-  // https://www.amcharts.com/docs/v5/concepts/themes/
+  // https://docs.amcharts.com/v5/concepts/themes/
   root.setThemes([
     am5themes_Micro.new(root)
   ]);
 
   // Create chart
-  // https://www.amcharts.com/docs/v5/charts/xy-chart/
+  // https://docs.amcharts.com/v5/charts/xy-chart/
   const chart = root.container.children.push(am5xy.XYChart.new(root, {}));
 
   // Create axes: a line uses the whole height, columns start at zero
-  // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+  // https://docs.amcharts.com/v5/charts/xy-chart/axes/
   const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
     baseInterval: { timeUnit: "day", count: 1 }, // one data point per day
     renderer: am5xy.AxisRendererX.new(root, {})
@@ -34,7 +34,7 @@ function createChart(cell: HTMLElement, points: Array<object>, field: string, co
   }));
 
   // Add series
-  // https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+  // https://docs.amcharts.com/v5/charts/xy-chart/series/
   // one set of settings, for either kind of series
   const settings = {
     xAxis: xAxis,

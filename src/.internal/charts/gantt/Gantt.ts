@@ -36,7 +36,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * Time unit of task durations. It is also the base interval of the date
 	 * axes and the unit bars snap to.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Duration_units} for more information
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#duration-units} for more information
 	 * @default "day"
 	 */
 	durationUnit?: "year" | "month" | "week" | "day" | "hour" | "minute" | "second";
@@ -46,7 +46,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * The lower date axis shades them when it shows days.
 	 *
 	 * @default [0, 6]
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Weekends_and_holidays} for more information
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#weekends-and-holidays} for more information
 	 */
 	weekends?: Array<number>;
 
@@ -54,7 +54,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * Dates that are not working days. Each covers the 24 hours from its time.
 	 * Used only while `excludeWeekends` is on.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Weekends_and_holidays} for more information
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#weekends-and-holidays} for more information
 	 */
 	holidays?: Array<Date>;
 
@@ -64,7 +64,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * day, and its duration skips them. Set to `false` to count every day.
 	 *
 	 * @default true
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Weekends_and_holidays} for more information
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#weekends-and-holidays} for more information
 	 */
 	excludeWeekends?: boolean;
 
@@ -73,7 +73,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * chart's width. It is never narrower than the task axis's `minWidth`
 	 * (100 pixels if not set).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_axis_width} for more information
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#category-axis-width} for more information
 	 * @default 30%
 	 */
 	sidebarWidth?: number | Percent;
@@ -84,7 +84,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * once past `snapThreshold`, its end once past `1 - snapThreshold`, so
 	 * `0.5` snaps both to the nearest unit.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Snapping_behavior} for more information
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#snapping-behavior} for more information
 	 * @default 0.5
 	 */
 	snapThreshold?: number;
@@ -93,7 +93,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * Colors for top-level tasks that have no `color` in data. Subtasks take
 	 * their parent's color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#series-colors} for more info
 	 */
 	colors?: ColorSet;
 
@@ -102,7 +102,7 @@ export interface IGanttSettings extends IContainerSettings {
 	 * axis's grid: while the upper axis shows weeks, the lower one picks from
 	 * the `week` list, and so on.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Timeline_horizontal_axis} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#timeline-horizontal-axis} for more info
 	 */
 	gridIntervals?: { [index: string]: Array<ITimeInterval> };
 
@@ -136,7 +136,7 @@ export interface IGanttEvents extends IContainerEvents {
  * A Gantt chart: a task list on the left and the tasks' bars, links and
  * progress on a timeline.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/gantt/} for more info
  * @important
  * @since 5.14.0
  */
@@ -519,7 +519,7 @@ export class Gantt extends Container {
 		});
 
 		// Add series
-		// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+		// https://docs.amcharts.com/v5/charts/xy-chart/series/
 		var series = chart.series.push(GanttSeries.new(root, {
 			xAxis: xAxis,
 			yAxis: yAxis,

@@ -130,7 +130,7 @@ export interface ILegendEvents extends ISeriesEvents {
  * or hide them.
  *
  * @important
- * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/legend/} for more info
  */
 export class Legend extends Series {
 	protected _afterNew() {

@@ -25,7 +25,7 @@ export interface IConfirmButtonEvents extends IButtonEvents {
  * a second click dispatches `"confirmed"`. A click elsewhere or the ESC key
  * cancels.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/buttons/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/buttons/} for more info
  * @important
  * @since 5.14.0
  */

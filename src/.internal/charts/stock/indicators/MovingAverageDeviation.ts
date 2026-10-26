@@ -55,7 +55,7 @@ export interface IMovingAverageDeviationEvents extends IChartIndicatorEvents {
  * Moving Average Deviation indicator: columns showing how far `field` is from
  * its moving average over `period`. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class MovingAverageDeviation extends ChartIndicator {
 	public static className: string = "MovingAverageDeviation";

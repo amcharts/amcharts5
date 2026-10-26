@@ -567,7 +567,7 @@ export class ListAutoDispose<A extends IDisposer> extends List<A> implements IDi
  * A version of a [[List]] that is able to create new elements as well as
  * apply additional settings to newly created items.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/list-templates/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/settings/list-templates/} for more info
  */
 export class ListTemplate<A extends Entity> extends ListAutoDispose<A> {
 	public template: Template<A>;

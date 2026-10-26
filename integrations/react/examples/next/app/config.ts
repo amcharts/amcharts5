@@ -1,7 +1,7 @@
 // A pie chart as a JSON config, in the format the amCharts editor and the
 // JSON plugin's ChartSerializer save. It is plain data, with no amCharts
 // imports: it can come from a file, a server or a database.
-// See https://www.amcharts.com/docs/v5/concepts/serializing/
+// See https://docs.amcharts.com/v5/concepts/serializing/
 export const config = {
 	"type": "PieChart",
 	"settings": {

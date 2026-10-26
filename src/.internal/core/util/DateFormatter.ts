@@ -31,7 +31,7 @@ export interface IDateFormatterSettings extends IEntitySettings {
 	 * for `Intl.DateTimeFormat`.
 	 *
 	 * @default "yyyy-MM-dd"
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	dateFormat?: string | Intl.DateTimeFormatOptions;
 
@@ -39,7 +39,7 @@ export interface IDateFormatterSettings extends IEntitySettings {
 	 * Data fields that hold dates. Text placeholders with these fields, such as
 	 * `{date}`, are formatted as dates even without `formatDate()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/data-placeholders/#formatting-placeholders} for more info
 	 */
 	dateFields?: string[];
 
@@ -63,7 +63,7 @@ type ShortWeekdays = "Sun" | "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat";
 /**
  * Formats dates in labels, tooltips and other text, and parses date strings.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/} for more info
  * @important
  */
 export class DateFormatter extends Entity {

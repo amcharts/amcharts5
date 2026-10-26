@@ -9,7 +9,7 @@ export interface IPatternSettings extends IEntitySettings {
 	 * Rotation of pattern in degrees. Supported values: -90 to 90.
 	 *
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Rotation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#rotation} for more info
 	 */
 	rotation?: number;
 
@@ -17,7 +17,7 @@ export interface IPatternSettings extends IEntitySettings {
 	 * How pattern tiles are repeated when filling the area.
 	 *
 	 * @default "repeat"
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Repetition} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#repetition} for more info
 	 */
 	repetition?: "repeat" | "repeat-x" | "repeat-y" | "no-repeat";
 
@@ -25,7 +25,7 @@ export interface IPatternSettings extends IEntitySettings {
 	 * Width of the pattern tile, in pixels.
 	 *
 	 * @default 50
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Sizing_patterns} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#sizing-patterns} for more info
 	 */
 	width?: number;
 
@@ -33,21 +33,21 @@ export interface IPatternSettings extends IEntitySettings {
 	 * Height of the pattern tile, in pixels.
 	 *
 	 * @default 50
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Sizing_patterns} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#sizing-patterns} for more info
 	 */
 	height?: number;
 
 	/**
 	 * Color of the pattern shape.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#colors} for more info
 	 */
 	color?: Color;
 
 	/**
 	 * Opacity of the pattern shape.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#colors} for more info
 	 */
 	colorOpacity?: number;
 
@@ -61,21 +61,21 @@ export interface IPatternSettings extends IEntitySettings {
 	/**
 	 * Stroke (border or line) dash settings.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/#dashed-lines} for more information
 	 */
 	strokeDasharray?: number[] | number;
 
 	/**
 	 * Stroke (border or line) dash offset.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/#dashed-lines} for more information
 	 */
 	strokeDashoffset?: number;
 
 	/**
 	 * Color to fill gaps between pattern shapes.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#colors} for more info
 	 */
 	fill?: Color;
 
@@ -83,7 +83,7 @@ export interface IPatternSettings extends IEntitySettings {
 	 * Opacity of the fill for gaps between pattern shapes.
 	 *
 	 * @default 1
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#colors} for more info
 	 */
 	fillOpacity?: number;
 
@@ -107,7 +107,7 @@ export interface IPatternEvents extends IEntityEvents {
 /**
  * Base class for patterns.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class Pattern extends Entity {
 	protected _afterNew() {

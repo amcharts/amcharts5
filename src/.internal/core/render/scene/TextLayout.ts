@@ -148,6 +148,47 @@ export function fontSizeToCSS(fontSize: string | number): string {
 	return fontSize;
 }
 
+const RELATIVE_FONT = /[\d.](r?em|%|ex|ch|v[wh])(?![a-z])|\b(smaller|larger|(xx?-)?small|medium|(xx?-)?large)\b/i;
+
+/**
+ * `font` with a relative size (em, %) in pixels, as `context` resolves it.
+ *
+ * @ignore
+ */
+export function resolveFont(context: CanvasRenderingContext2D, font: string): string {
+	if (!RELATIVE_FONT.test(font)) {
+		return font;
+	}
+	context.save();
+	// A font the context rejects leaves this one, so it is easy to tell
+	context.font = "1px am5-unresolved";
+	context.font = font;
+	const resolved = context.font;
+	context.restore();
+	return resolved.indexOf("am5-unresolved") === -1 ? resolved : font;
+}
+
+/**
+ * How far below `baseline` the alphabetic baseline is in `font`, i.e. how much
+ * lower text goes when drawn at the alphabetic baseline instead.
+ *
+ * @ignore
+ */
+export function baselineShift(context: CanvasRenderingContext2D, font: string, baseline: CanvasTextBaseline): number {
+	context.save();
+	context.font = font;
+	context.textBaseline = "alphabetic";
+	const alphabetic: any = context.measureText("Hg");
+	context.textBaseline = baseline;
+	const other: any = context.measureText("Hg");
+	context.restore();
+	// The font's box does not depend on the glyphs, where browsers have it
+	if (alphabetic.fontBoundingBoxAscent != null && other.fontBoundingBoxAscent != null) {
+		return alphabetic.fontBoundingBoxAscent - other.fontBoundingBoxAscent;
+	}
+	return alphabetic.actualBoundingBoxAscent - other.actualBoundingBoxAscent;
+}
+
 /**
  * Safari measures without the font weight.
  *

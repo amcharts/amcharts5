@@ -72,7 +72,7 @@ export interface ISliceGrouperEvents extends IEntityEvents {
  * A plugin that can be used to automatically group small slices on percent
  * charts into a single slice.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/grouping-slices/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/grouping-slices/} for more info
  */
 export class SliceGrouper extends Entity {
 	public static className: string = "SliceGrouper";

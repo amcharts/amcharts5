@@ -1,7 +1,7 @@
 blank_issues_enabled: true
 contact_links:
   - name: Documentation and demos
-    url: https://www.amcharts.com/docs/v5/
+    url: https://docs.amcharts.com/v5/
     about: Tutorials, the class reference and demos answer most "how do I" questions.
   - name: Support with a license or subscription
     url: https://www.amcharts.com/support/support-info/priority-support/

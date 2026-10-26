@@ -15,7 +15,7 @@ export interface ICirclePrivate extends IGraphicsPrivate {
 /**
  * Draws a circle centered on its `x` and `y`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Circle extends Graphics {

@@ -3,7 +3,7 @@
   "version": "5.0.1",
   "description": "React components for amCharts 5: a chart from a JSON config, and a hook for charts written in code",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
-  "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/react/",
+  "homepage": "https://docs.amcharts.com/v5/getting-started/integrations/react/",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://github.com/amcharts/amcharts5/issues"

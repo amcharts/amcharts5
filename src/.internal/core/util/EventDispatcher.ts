@@ -42,7 +42,7 @@ export interface EventListener {
 /**
  * Universal Event Dispatcher.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/events/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/events/} for more info
  */
 export class EventDispatcher<T> implements IDisposer {
 	protected _listeners: Array<EventListener>;
@@ -469,7 +469,7 @@ export class EventDispatcher<T> implements IDisposer {
 	 * @param context        Value of `this` inside `callback`
 	 * @param shouldClone    Whether the listener should be copied when the EventDispatcher is copied
 	 * @returns A disposable event listener
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/#Debounced_events} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/events/#debounced-events} for more info
 	 * @since 5.14.0
 	 */
 	public onDebounced<C, Key extends keyof T>(type: Key, callback: (this: C | undefined, event: T[Key]) => void, debounceDelay: number, context?: C, shouldClone: boolean = true): IDisposer {

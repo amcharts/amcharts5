@@ -63,7 +63,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Pull of every node toward the center of the chart; a negative value
 	 * pushes nodes away from it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#layout-and-force-simulation} for more info
 	 * @default 0.8
 	 */
 	centerStrength?: number;
@@ -72,7 +72,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Force between all nodes, scaled by each node's radius: a negative value
 	 * pushes them apart, a positive one pulls them together.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#layout-and-force-simulation} for more info
 	 * @default -14
 	 */
 	manyBodyStrength?: number;
@@ -81,7 +81,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * A force that attracts (or pushes back) nodes that are linked together
 	 * via `linkWithField`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#layout-and-force-simulation} for more info
 	 * @default 0.5
 	 */
 	linkWithStrength?: number | undefined;
@@ -91,7 +91,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 *
 	 * The greater the value, the more "sluggish" the nodes will be.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#layout-and-force-simulation} for more info
 	 * @default 0.5
 	 */
 	velocityDecay?: number;
@@ -99,7 +99,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	/**
 	 * Length of how long initial force simulation would run in frames.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#layout-and-force-simulation} for more info
 	 * @default 500
 	 */
 	initialFrames?: number;
@@ -111,7 +111,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Can be used to hide initial animations where nodes settle into their
 	 * places.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Layout_and_force_simulation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#layout-and-force-simulation} for more info
 	 * @default 10
 	 */
 	showOnFrame?: number;
@@ -120,7 +120,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Radius of the circle of the node with the smallest value, in pixels or
 	 * percent of the series' average side ((width + height) / 2).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Sizing_nodes} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#sizing-nodes} for more info
 	 * @default 1%
 	 */
 	minRadius?: number | Percent;
@@ -129,7 +129,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Radius of the circle of the node with the largest value, in pixels or
 	 * percent of the series' average side ((width + height) / 2).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Sizing_nodes} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#sizing-nodes} for more info
 	 * @default 8%
 	 */
 	maxRadius?: number | Percent;
@@ -138,7 +138,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Field in data that holds a fixed X position for the node, in pixels or
 	 * percent of the series' width. Such a node doesn't move along X.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Fixed_nodes} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#fixed-nodes} for more info
 	 */
 	xField?: string;
 
@@ -146,7 +146,7 @@ export interface IForceDirectedSettings extends ILinkedHierarchySettings {
 	 * Field in data that holds a fixed Y position for the node, in pixels or
 	 * percent of the series' height. Such a node doesn't move along Y.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/#Fixed_nodes} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/#fixed-nodes} for more info
 	 */
 	yField?: string;
 
@@ -162,7 +162,7 @@ export interface IForceDirectedEvents extends ILinkedHierarchyEvents {
  * A force-directed tree: node circles sized by value, which a force
  * simulation spreads out. Nodes can be dragged.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/force-directed/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/force-directed/} for more info
  * @important
  */
 export class ForceDirected extends LinkedHierarchy {

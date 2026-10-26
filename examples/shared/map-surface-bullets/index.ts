@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   projection: am5map.geoOrthographic(), // a globe
   panX: "rotateX",   // dragging sideways spins the globe...
@@ -26,7 +26,7 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Add globe background
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/#background-polygon
 const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
 
 backgroundSeries.mapPolygons.template.setAll({
@@ -41,14 +41,14 @@ backgroundSeries.data.push({
 
 
 // Add countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow
 }));
 
 
 // Add points: bullets lie on the surface and flatten towards the edge
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-point-series/
 const pointSeries = chart.series.push(am5map.MapPointSeries.new(root, {
   surfaceBullets: true, // the pins turn and squash with the globe, as if painted on it
   latitudeField: "latitude",
@@ -87,5 +87,5 @@ pointSeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

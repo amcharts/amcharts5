@@ -16,7 +16,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Lowest value of the axis scale, instead of the lowest series value. The
 	 * axis may round it to fit its grid, unless `strictMinMax` is `true`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#custom-scope} for more info
 	 */
 	min?: number;
 
@@ -24,7 +24,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Highest value of the axis scale, instead of the highest series value.
 	 * The axis may round it to fit its grid, unless `strictMinMax` is `true`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#custom-scope} for more info
 	 */
 	max?: number;
 
@@ -37,7 +37,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 *
 	 * `extraMin` and `extraMax` still add padding.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Custom_scope} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#custom-scope} for more info
 	 */
 	strictMinMax?: boolean;
 
@@ -57,7 +57,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Uses a logarithmic scale. It can show only values above zero; see
 	 * `treatZeroAs`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#logarithmic-scale} for more info
 	 */
 	logarithmic?: boolean;
 
@@ -65,7 +65,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * On a `logarithmic` axis, the value to plot zero and negative values at,
 	 * since the scale can't show them.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Logarithmic_scale} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#logarithmic-scale} for more info
 	 */
 	treatZeroAs?: number;
 
@@ -75,7 +75,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * (before rounding to the grid). If not set, a `logarithmic` axis without
 	 * `strictMinMax` uses `0.1`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#relative-scope-extension} for more info
 	 */
 	extraMin?: number;
 
@@ -85,7 +85,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * (before rounding to the grid). If not set, a `logarithmic` axis without
 	 * `strictMinMax` uses `0.2`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Relative_scope_extension} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#relative-scope-extension} for more info
 	 */
 	extraMax?: number;
 
@@ -94,7 +94,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * values. Its grid line gets the `"base"` theme tag.
 	 *
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Base_value} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#base-value} for more info
 	 */
 	baseValue?: number;
 
@@ -102,7 +102,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Most decimal places the labels may have. It also limits the grid step:
 	 * `0` allows whole-number steps only.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#label-format} for more info
 	 */
 	maxPrecision?: number;
 
@@ -110,7 +110,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Function that decides which axis fills show; it is called for each grid
 	 * step. The default fills every other step.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_fills} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#axis-fills} for more info
 	 */
 	fillRule?: (dataItem: DataItem<IValueAxisDataItem>) => void;
 
@@ -118,14 +118,14 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Number format for the labels. If not set, the number formatter's default
 	 * format is used, with as many decimals as the grid step needs.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Label_format} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#label-format} for more info
 	 */
 	numberFormat?: string;
 
 	/**
 	 * Number format for the axis tooltip. If not set, `numberFormat` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#tooltip-number-format} for more info
 	 */
 	tooltipNumberFormat?: string | Intl.NumberFormatOptions;
 
@@ -133,7 +133,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Extra decimal places for the axis tooltip, beyond those of the labels:
 	 * with labels like `1.1` and `1.2`, `1` lets the tooltip show `1.15`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Tooltip_number_format} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#tooltip-number-format} for more info
 	 */
 	extraTooltipPrecision?: number;
 
@@ -143,7 +143,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * ones on an X axis), as used by 100% stacked charts. Series with
 	 * `excludeFromTotal` are left out.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Calculated_values} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#calculated-values} for more info
 	 */
 	calculateTotals?: boolean;
 
@@ -151,7 +151,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * Another [[ValueAxis]] whose grid this axis lines up with, by adjusting
 	 * its own scale. A perfect match isn't always possible.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#syncing-grid} for more info
 	 */
 	syncWithAxis?: ValueAxis<AxisRenderer>;
 
@@ -161,7 +161,7 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	 * `syncWithAxis`, which has to extend to each side where this axis has
 	 * values.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#syncing-grid} for more info
 	 * @default false
 	 * @since 5.16.2
 	 */
@@ -307,7 +307,7 @@ export interface IValueAxisEvents extends IAxisEvents {
 /**
  * An axis with a numeric scale.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/} for more info
  * @important
  */
 export class ValueAxis<R extends AxisRenderer> extends Axis<R> {

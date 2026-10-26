@@ -26,28 +26,28 @@ export interface IPictureSettings extends ISpriteSettings {
 	 * Color of the image's shadow. It shows only when `shadowBlur`,
 	 * `shadowOffsetX` or `shadowOffsetY` is set too.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowColor?: Color | null;
 
 	/**
 	 * Blurriness of the shadow: the bigger the number, the blurrier the shadow.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowBlur?: number;
 
 	/**
 	 * Horizontal shadow offset in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOffsetX?: number;
 
 	/**
 	 * Vertical shadow offset in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOffsetY?: number;
 
@@ -55,7 +55,7 @@ export interface IPictureSettings extends ISpriteSettings {
 	 * Opacity of the shadow, from `0` to `1`.
 	 *
 	 * @default 1
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOpacity?: number;
 
@@ -81,7 +81,7 @@ export interface IPictureEvents extends ISpriteEvents {
  * Displays an image. If only `width` or `height` is set, the other follows
  * the image's aspect ratio.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/images/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/images/} for more info
  * @important
  */
 export class Picture extends Sprite {

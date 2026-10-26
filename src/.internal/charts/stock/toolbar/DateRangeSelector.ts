@@ -92,7 +92,7 @@ export interface IDateRangeSelectorEvents extends IStockControlEvents {
  * A [[StockToolbar]] control with two date pickers that zoom the chart to the
  * picked date range.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/date-range-selector/} for more info
  */
 export class DateRangeSelector extends StockControl {
 	public static className: string = "DateRangeSelector";

@@ -12,7 +12,7 @@ export interface IDurationAxisSettings<R extends AxisRenderer> extends IValueAxi
 	 * The time unit the data's values are in: with `"second"`, a value of `90`
 	 * is 1 minute 30 seconds.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/#Base_unit} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-durations/#base-unit} for more info
 	 * @default "second"
 	 */
 	baseUnit?: TimeUnit
@@ -41,7 +41,7 @@ export interface IDurationAxisEvents extends IValueAxisEvents {
  * A value axis whose values are amounts of `baseUnit`, with labels formatted
  * as durations.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/duration-axis/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/duration-axis/} for more info
  * @important
  */
 export class DurationAxis<R extends AxisRenderer> extends ValueAxis<R> {

@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   projection: am5map.geoAlbersUsa(), // Alaska and Hawaii moved in under the other states
   paddingBottom: 60 // room under the map for the heat legend
@@ -25,7 +25,7 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Create polygon series for the states
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_usaLow,
   valueField: "value"
@@ -47,7 +47,7 @@ const colors = [
 
 
 // Color the states by value
-// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+// https://docs.amcharts.com/v5/concepts/settings/heat-rules/
 polygonSeries.set("heatRules", [{
   target: polygonSeries.mapPolygons.template,
   dataField: "value",
@@ -115,7 +115,7 @@ polygonSeries.data.setAll([
 
 
 // Heat legend with the same colors, under the map
-// https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
+// https://docs.amcharts.com/v5/concepts/legend/heat-legend/
 chart.children.push(am5.HeatLegend.new(root, {
   orientation: "horizontal",
   colors: colors,

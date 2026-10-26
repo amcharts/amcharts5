@@ -86,7 +86,7 @@ function isTainted(image: HTMLImageElement): boolean {
 		return false;
 	}
 	catch (err) {
-		console.warn("Image \"" + image.src + "\" is loaded from different host and is not covered by CORS policy. For more information about the implications read here: https://www.amcharts.com/docs/v5/concepts/cors");
+		console.warn("Image \"" + image.src + "\" is loaded from different host and is not covered by CORS policy. For more information about the implications read here: https://docs.amcharts.com/v5/concepts/common-elements/images/#cross-domain-issues");
 		return true;
 	}
 }
@@ -1660,6 +1660,10 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			layer: <CanvasLayer>text.getLayer(),
 			renderer: this,
 		});
+	}
+
+	_textContext(text: SceneText): CanvasRenderingContext2D {
+		return (<CanvasLayer>text.getLayer()).context;
 	}
 
 	// protected _identifyObjectByColor(colorId: number): SceneNode | undefined {

@@ -73,7 +73,7 @@ export function color(input: number | string): Color {
  * A color. Every color setting takes a `Color` object, usually created with
  * `am5.color()`, e.g. `am5.color(0xff0000)`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/} for more info
  * @important
  */
 export class Color {

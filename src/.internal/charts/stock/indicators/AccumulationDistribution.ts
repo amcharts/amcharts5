@@ -34,7 +34,7 @@ export interface IAccumulationDistributionEvents extends IChartIndicatorEvents {
  * Accumulation/Distribution indicator: a running total of where each close is
  * within its high-low range, weighted by volume. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class AccumulationDistribution extends ChartIndicator {
 	public static className: string = "AccumulationDistribution";

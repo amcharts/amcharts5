@@ -62,7 +62,7 @@ export interface ISerpentineChartPrivate extends ICurveChartPrivate {
  *
  * It is experimental and does not support everything an [[XYChart]] does.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/timeline/} for more info
  * @since 5.12.0
  * @important
  */

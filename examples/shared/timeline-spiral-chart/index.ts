@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart: the band of columns takes half of the distance between two turns
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const chart = root.container.children.push(am5timeline.SpiralChart.new(root, {
   levelCount: 3,                // the date axis winds around three times
   innerRadius: am5.percent(35), // the spiral starts at 35% of the radius, leaving the middle empty
@@ -27,7 +27,7 @@ const chart = root.container.children.push(am5timeline.SpiralChart.new(root, {
 
 // Create axes: the date axis follows the spiral, the value axis runs across it.
 // axisLocation: 1.5 puts the date axis and its labels between two turns
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const yRenderer = am5timeline.AxisRendererCurveY.new(root, {
   axisLocation: 1.5
 });
@@ -61,7 +61,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const series = chart.series.push(am5timeline.CurveColumnSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
@@ -76,7 +76,7 @@ series.columns.template.setAll({
 
 
 // Set data: one value per month, 2022 to 2024
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 series.data.setAll([
   { date: 1642248000000, value: 29 },
   { date: 1644926400000, value: 19 },
@@ -118,6 +118,6 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

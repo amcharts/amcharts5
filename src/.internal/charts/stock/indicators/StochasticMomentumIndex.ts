@@ -45,7 +45,7 @@ export interface IStochasticMomentumIndexEvents extends IOverboughtOversoldEvent
  * scaled to `-100` to `100`. Drawn in a panel of its own.
  *
  * @since 5.5.3
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class StochasticMomentumIndex extends OverboughtOversold {
 	public static className: string = "StochasticMomentumIndex";

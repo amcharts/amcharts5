@@ -54,7 +54,7 @@ export interface IPeriodSelectorSettings extends IStockControlSettings {
 	 *
 	 * @default "end"
 	 * @since 5.5.0
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/#Zoom_anchor_point} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/period-selector/#zoom-anchor-point} for more info
 	 */
 	zoomTo?: "end" | "start";
 
@@ -95,7 +95,7 @@ export interface IPeriodSelectorEvents extends IStockControlEvents {
  * A [[StockToolbar]] control with buttons that zoom the chart to preset
  * periods, such as one month or year to date.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/period-selector/} for more info
  */
 export class PeriodSelector extends StockControl {
 	public static className: string = "PeriodSelector";

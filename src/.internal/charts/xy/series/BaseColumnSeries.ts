@@ -23,7 +23,7 @@ export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 	/**
 	 * The column's color, given by the series when `colorByDataItem` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/column-series/} for more info
 	 * @since 5.20.4
 	 */
 	fill?: Color;
@@ -43,7 +43,7 @@ export interface IBaseColumnSeriesDataItem extends IXYSeriesDataItem {
 	 * The [[Legend]] data item for this data item, when the series' data
 	 * items feed a legend.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/#Data_item_list} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/legend/#data-item-list} for more info
 	 */
 	legendDataItem?: DataItem<ILegendDataItem>;
 }
@@ -56,7 +56,7 @@ export interface IBaseColumnSeriesSettings extends IXYSeriesSettings {
 	 * columns take the whole cell and can overlap the others.
 	 *
 	 * @default true
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Clustering} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/column-series/#clustering} for more info
 	 */
 	clustered?: boolean;
 

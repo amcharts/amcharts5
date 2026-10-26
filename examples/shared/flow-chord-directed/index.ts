@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/flow-charts/
+// https://docs.amcharts.com/v5/charts/flow-charts/
 // ChordDirected ends each link in an arrowhead at its target, so every flow shows its direction
 const series = root.container.children.push(am5flow.ChordDirected.new(root, {
   sourceIdField: "source",
@@ -38,7 +38,7 @@ series.links.template.set("fillStyle", "source"); // each link takes its source 
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
+// https://docs.amcharts.com/v5/charts/flow-charts/#setting-data
 series.data.setAll([
   { source: "Monica", target: "Rachel", value: 4 },
   { source: "Monica", target: "Chandler", value: 113 },
@@ -71,5 +71,5 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

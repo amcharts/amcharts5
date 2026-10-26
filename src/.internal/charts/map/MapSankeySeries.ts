@@ -271,7 +271,7 @@ const GEOMETRY_SETTINGS = [
  * its value. The bands are polygons on the map, so they follow it as it is
  * panned, zoomed and rotated.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-sankey-series/} for more info
  * @since 5.17.0
  * @important
  */

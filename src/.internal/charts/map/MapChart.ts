@@ -69,7 +69,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * The projection the map is drawn with, such as `am5map.geoMercator()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Projections} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/#projections} for more info
 	 */
 	projection?: GeoProjection;
 
@@ -118,7 +118,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * comes to the middle, so `-30` centers latitude 30. Needs a projection
 	 * that can rotate.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/#centering-the-map} for more info
 	 * @default 0
 	 */
 	rotationY?: number;
@@ -128,7 +128,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * comes to the middle, so `-74` centers longitude 74. Needs a projection
 	 * that can rotate.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/#centering-the-map} for more info
 	 * @default 0
 	 */
 	rotationX?: number;
@@ -137,7 +137,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * Spins the map around its middle, in degrees. Needs a projection that can
 	 * rotate.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Centering_the_map} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/#centering-the-map} for more info
 	 * @default 0
 	 */
 	rotationZ?: number;
@@ -169,7 +169,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * What dragging the map horizontally does: `"translateX"` moves it,
 	 * `"rotateX"` turns it around the poles (as on a globe), `"none"` nothing.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#panning} for more info
 	 * @default "translateX"
 	 */
 	panX?: "none" | "rotateX" | "translateX";
@@ -178,7 +178,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * What dragging the map vertically does: `"translateY"` moves it,
 	 * `"rotateY"` tilts it north or south (as on a globe), `"none"` nothing.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#panning} for more info
 	 * @default "translateY"
 	 */
 	panY?: "none" | "rotateY" | "translateY";
@@ -186,7 +186,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * Lets users zoom the map with a two-finger pinch on touch devices.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Pinch_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#pinch-zoom} for more info
 	 * @default true
 	 */
 	pinchZoom?: boolean;
@@ -195,7 +195,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * What scrolling horizontally (with a tilting wheel or a touchpad) does to
 	 * the map.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#mouse-wheel-behavior} for more info
 	 * @default "none"
 	 */
 	wheelX?: "none" | "zoom" | "rotateX" | "rotateY";
@@ -203,7 +203,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * What turning the mouse wheel does to the map.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Mouse_wheel_behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#mouse-wheel-behavior} for more info
 	 * @default "zoom"
 	 */
 	wheelY?: "none" | "zoom" | "rotateX" | "rotateY";
@@ -228,7 +228,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * Easing of the rotation a wheel turn makes. Applies only to the
 	 * `"rotateX"` and `"rotateY"` wheel actions.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	wheelEasing?: (t: Time) => Time;
@@ -242,7 +242,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * Easing of zoom and rotation animations.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	animationEasing?: (t: Time) => Time;
@@ -251,14 +251,14 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * Zoom buttons to show on the map.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/#Zoom_control} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/#zoom-control} for more info
 	 */
 	zoomControl?: ZoomControl;
 
 	/**
 	 * Zoom level of the home position, which `goHome()` and `autoHome` go to.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom} for more info
 	 * @default 1
 	 */
 	homeZoomLevel?: number;
@@ -266,14 +266,14 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	/**
 	 * `rotationX` of the home position, which `goHome()` and `autoHome` go to.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom} for more info
 	 */
 	homeRotationX?: number;
 
 	/**
 	 * `rotationY` of the home position, which `goHome()` and `autoHome` go to.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom} for more info
 	 */
 	homeRotationY?: number;
 
@@ -281,7 +281,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * The point `goHome()` and `autoHome` center the map on. If not set, the
 	 * middle of the map is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom} for more info
 	 */
 	homeGeoPoint?: IGeoPoint;
 
@@ -301,7 +301,7 @@ export interface IMapChartSettings extends ISerialChartSettings {
 	 * zoomed larger than the chart can always be dragged to its edges.
 	 *
 	 * @default 0.4
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Panning_outside_viewport} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#panning-outside-viewport} for more info
 	 */
 	maxPanOut?: number;
 
@@ -1179,7 +1179,7 @@ export class MapChart extends SerialChart {
 	 * `homeGeoPoint`, and `homeRotationX` and `homeRotationY` if set. Called
 	 * before the map is loaded, it goes there once it is.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Resetting_position_level} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#resetting-positionlevel} for more info
 	 * @param  duration  Animation duration in milliseconds; `animationDuration` if not set
 	 */
 	public goHome(duration?: number) {

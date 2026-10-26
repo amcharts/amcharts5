@@ -10,7 +10,7 @@ export interface ITrianglePrivate extends IGraphicsPrivate {
  * Draws a triangle pointing up, centered on its `x` and `y`, with its
  * `width` and `height`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Triangle extends Graphics {

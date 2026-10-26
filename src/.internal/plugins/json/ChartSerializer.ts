@@ -70,7 +70,7 @@ export interface IChartSerializerEvents extends ISerializerEvents {
  * [[Serializer]], by default it writes states and adapters, keeps adapter
  * callbacks as functions, and goes 10 levels deep.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/chart-serializer/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/serializing/chart-serializer/} for more info
  * @since 5.15.0
  */
 export class ChartSerializer extends Serializer {

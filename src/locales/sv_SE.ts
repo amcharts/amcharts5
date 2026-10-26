@@ -5,7 +5,7 @@
  * Language: Swedish
  * Author: Bjorn Svensson
  *
- * Follow instructions in [on this page](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
+ * Follow instructions in [on this page](https://docs.amcharts.com/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
  *
  * ---
  * Empty string means no translation, so default "International English"
@@ -35,7 +35,7 @@ export default {
 	// This should reflect official or de facto formatting universally accepted
 	// in the country translation is being made for
 	// Available format codes here:
-	// https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#Format_codes
+	// https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/#format-codes
 	//
 	// This will be used when formatting date/time for particular granularity,
 	// e.g. "_date_hour" will be shown whenever we need to show time as hours.

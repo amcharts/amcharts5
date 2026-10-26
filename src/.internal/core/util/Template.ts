@@ -290,7 +290,7 @@ export class Template<E extends Entity> implements IDisposer {
 	/**
 	 * Creates a template with `settings`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/#new-element-syntax} for more info
 	 * @param   settings  Settings
 	 * @return            Template
 	 */

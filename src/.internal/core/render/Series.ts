@@ -19,6 +19,7 @@ import { Label } from "../../core/render/Label";
 //import { Animations } from "../../core/util/Animation";
 
 import * as $array from "../../core/util/Array";
+import * as $utils from "../../core/util/Utils";
 import * as $type from "../../core/util/Type";
 import * as $time from "../../core/util/Time";
 
@@ -27,7 +28,7 @@ import * as $time from "../../core/util/Time";
  * size, by its data item's value: from `min` at the lowest value to `max` at
  * the highest.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/settings/heat-rules/} for more info
  */
 export interface IHeatRule {
 
@@ -212,7 +213,7 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * once, including in the initial animation. Works in XY and percent
 	 * series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#animation-of-series} for more info
 	 */
 	sequencedInterpolation?:boolean;
 
@@ -220,7 +221,7 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * Extra delay in milliseconds between the animations of consecutive data
 	 * items, with `sequencedInterpolation`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#animation-of-series} for more info
 	 */
 	sequencedDelay?:number;
 
@@ -228,7 +229,7 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * Heat rules to apply to the series' elements. A rule without `minValue`
 	 * and `maxValue` needs `calculateAggregates` to find the value range.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/settings/heat-rules/} for more info
 	 */
 	heatRules?:IHeatRule[];
 
@@ -244,21 +245,21 @@ export interface ISeriesSettings extends IComponentSettings {
 	/**
 	 * Series stroke color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#series-colors} for more info
 	 */
 	stroke?: Color;
 
 	/**
 	 * Series fill color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#series-colors} for more info
 	 */
 	fill?: Color;
 
 	/**
 	 * Series fill pattern.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
 	 * @since 5.10.0
 	 */
 	fillPattern?: Pattern;
@@ -266,14 +267,14 @@ export interface ISeriesSettings extends IComponentSettings {
 	/**
 	 * Series fill gradient.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
 	 */
 	fillGradient?: Gradient;
 
 	/**
 	 * Series stroke gradient.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
 	 */
 	strokeGradient?: Gradient;
 
@@ -364,6 +365,40 @@ export abstract class Series extends Component {
 	declare public _dataItemSettings: ISeriesDataItem;
 	declare public _events: ISeriesEvents;
 
+	/**
+	 * @ignore
+	 */
+	public _exportName(): string | undefined {
+		const name = this.get("name");
+		return name != null && name !== "" ? String(name) : $utils.classNameWords(this.className);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _dataItemName(dataItem: DataItem<this["_dataItemSettings"]>, sprite: Sprite): string | undefined {
+		const item: any = dataItem;
+		const context: any = dataItem.dataContext;
+		let name: string | undefined;
+		$array.eachContinue(["name", "category", "categoryX", "categoryY"], (field) => {
+			const value = item.get(field);
+			if (value != null && value !== "") {
+				name = String(value);
+				return false;
+			}
+			return true;
+		});
+		if (name === undefined && context && context.name != null && context.name !== "") {
+			name = String(context.name);
+		}
+		if (name === undefined && item.get("id") != null && item.get("id") !== "") {
+			name = String(item.get("id"));
+		}
+		// A slice's label and tick, apart from the slice
+		const part = ({ Label: "label", RadialLabel: "label", Tick: "tick" } as { [className: string]: string })[sprite.className];
+		return name !== undefined && part ? name + " " + part : name;
+	}
+
 	protected _aggregatesCalculated: boolean = false;
 	protected _selectionAggregatesCalculated: boolean = false;
 	protected _dataProcessed: boolean = false;
@@ -382,7 +417,7 @@ export abstract class Series extends Component {
 	 * Functions that make the series' bullets: each is called for every data
 	 * item and returns a [[Bullet]], or nothing for no bullet.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/bullets/} for more info
 	 */
 	public bullets: List<<D extends DataItem<this["_dataItemSettings"]>>(root: Root, series:Series, dataItem: D) => Bullet | undefined> = new List();
 
@@ -571,7 +606,7 @@ export abstract class Series extends Component {
 	 * Adds a bullet to one data item. Unlike `series.bullets`, it takes a
 	 * [[Bullet]] instance, not a function.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Adding_directly_to_data_item} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/bullets/#adding-directly-to-data-item} for more info
 	 * @since 5.6.0
 	 *
 	 * @param  dataItem  Target data item

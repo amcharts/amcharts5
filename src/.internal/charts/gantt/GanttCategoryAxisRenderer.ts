@@ -24,7 +24,7 @@ export interface IGanttCategoryAxisRendererPrivate extends IAxisRendererYPrivate
  * Renderer for a [[GanttCategoryAxis]]: draws each task's row with its grip,
  * task bullet, editable label, duration stepper and progress pie.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_vertical_axis} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/gantt/#category-vertical-axis} for more info
  * @since 5.14.0
  * @important
  */

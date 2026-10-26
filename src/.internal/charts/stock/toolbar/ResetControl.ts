@@ -13,7 +13,7 @@ export interface IResetControlEvents extends IStockControlEvents {
 /**
  * A control that removes all drawings and indicators when clicked.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/reset-control/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/reset-control/} for more info
  */
 export class ResetControl extends StockControl {
 	public static className: string = "ResetControl";

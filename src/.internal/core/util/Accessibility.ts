@@ -1,7 +1,7 @@
 ﻿/**
  * Accessibility setting that can be applied to any visual element.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/} for more info
  * @deprecated Since 5.11.2. Moved to ISpriteSettings
  * @ignore
  */
@@ -11,7 +11,7 @@ export interface IAccessibilitySettings {}
 /**
  * ARIA roles an element can have.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/} for more info
  */
 export type Role =
 	"alert"

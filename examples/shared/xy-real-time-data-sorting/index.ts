@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,        // drag the plot sideways to move along the countries...
   panY: true,        // ...or up and down to move along the values
@@ -29,7 +29,7 @@ chart.zoomOutButton.set("forceHidden", true);
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xRenderer = am5xy.AxisRendererX.new(root, {
   minGridDistance: 30 // labels as close as 30 pixels (not 120), so every country gets one
 });
@@ -58,7 +58,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const series = chart.series.push(am5xy.ColumnSeries.new(root, {
   name: "Series 1",
   xAxis: xAxis,
@@ -90,7 +90,7 @@ series.bullets.push(() => {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 const data = [
   { country: "USA", value: 2025 },
   { country: "China", value: 1882 },
@@ -111,7 +111,7 @@ series.data.setAll(data);
 
 
 // Sort the categories by value and animate them to their new places
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-axis/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/category-axis/
 function sortCategoryAxis() {
   // Sort series items by value, descending
   series.dataItems.sort((x, y) => {
@@ -175,6 +175,6 @@ setInterval(() => {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

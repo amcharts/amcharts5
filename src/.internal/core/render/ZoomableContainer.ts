@@ -79,7 +79,7 @@ export interface IZoomableContainerEvents extends IContainerEvents {
  * A [[Container]] whose `contents` can be zoomed with the wheel, a pinch or
  * [[ZoomTools]], and panned by dragging.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Zoomable_container} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#zoomable-container} for more info
  * @since 5.8.0
  * @important
  */
@@ -107,7 +107,7 @@ export class ZoomableContainer extends Container {
 	 * The container that zooms and pans. Add elements to `contents.children`,
 	 * not to the ZoomableContainer's own `children`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Zoomable_container} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#zoomable-container} for more info
 	 */
 	public contents = this.children.push(Container.new(this._root, {
 		width: p100,

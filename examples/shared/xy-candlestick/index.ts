@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,        // drag the plot sideways to move along the dates...
   panY: true,        // ...or up and down to move along the prices
@@ -26,13 +26,13 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 1,            // panning can go past the first or last day by up to a full view
   baseInterval: {             // one candle per day
@@ -56,7 +56,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/
 // OHLCSeries takes the same settings and draws bars instead of candles
 const series = chart.series.push(am5xy.CandlestickSeries.new(root, {
   name: "MDXI",
@@ -75,7 +75,7 @@ const series = chart.series.push(am5xy.CandlestickSeries.new(root, {
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // above the plot: drag its ends to zoom, or its middle to move along the dates
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -83,9 +83,9 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // The dates in the data are strings: the processor turns them into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 series.data.processor = am5.DataProcessor.new(root, {
   dateFormat: "yyyy-MM-dd",
   dateFields: ["date"]
@@ -156,6 +156,6 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

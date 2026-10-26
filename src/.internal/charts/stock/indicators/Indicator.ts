@@ -153,7 +153,7 @@ export interface IIndicatorEvents extends IContainerEvents {
 /**
  * Base class for [[StockChart]] indicators.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export abstract class Indicator extends Container {
 	public static className: string = "Indicator";

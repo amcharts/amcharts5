@@ -18,7 +18,7 @@ export interface IVWAPEvents extends IIndicatorEvents {
  * `period` data items, weighted by volume. Drawn over the main series; needs
  * a `volumeSeries`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class VWAP extends Indicator {
 	public static className: string = "VWAP";

@@ -97,7 +97,7 @@ export interface ITreeEvents extends ILinkedHierarchyEvents {
  * A tree diagram: node circles joined by links, each level a row (or a
  * column, when horizontal).
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/tree/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/tree/} for more info
  * @important
  */
 export class Tree extends LinkedHierarchy {

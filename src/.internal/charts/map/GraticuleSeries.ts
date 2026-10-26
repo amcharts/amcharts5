@@ -27,7 +27,7 @@ export interface IGraticuleSeriesSettings extends IMapLineSeriesSettings {
 /**
  * A grid of latitude and longitude lines (a graticule) on a [[MapChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/graticule-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/graticule-series/} for more info
  * @important
  */
 export class GraticuleSeries extends MapLineSeries {

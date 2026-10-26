@@ -5,7 +5,7 @@
  * Language: Bulgarian
  * Author: Bjorn Svensson
  *
- * Follow instructions in [on this page](https://www.amcharts.com/docs/v5/tutorials/creating-translations/) to make corrections or add new translations.
+ * Follow instructions in [on this page](https://docs.amcharts.com/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
  *
  * ---
  * Edit but leave the header section above this line. You can remove any

@@ -13,7 +13,7 @@ export interface ISlicedChartPrivate extends IPercentChartPrivate {
  * A chart for [[FunnelSeries]], [[PyramidSeries]] and
  * [[PictorialStackedSeries]]. Several series in it sit side by side.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/} for more info
  * @important
  */
 export class SlicedChart extends PercentChart {

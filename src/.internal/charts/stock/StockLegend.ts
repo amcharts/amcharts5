@@ -52,7 +52,7 @@ export interface IStockLegendEvents extends ILegendEvents {
  * A legend for a [[StockChart]] panel, with settings and close buttons on its
  * items.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Legend} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/#legend} for more info
  * @important
  */
 export class StockLegend extends Legend {

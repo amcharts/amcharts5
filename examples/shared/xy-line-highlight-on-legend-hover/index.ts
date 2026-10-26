@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: false,          // dragging the plot does not pan: the cursor uses the drag to zoom
   panY: false,
@@ -27,7 +27,7 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
   behavior: "zoomX" // drag across the plot to zoom in on those days
 }));
@@ -35,7 +35,7 @@ cursor.lineY.set("visible", false); // only the vertical line that follows the d
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0,            // no scrolling past the first or last day
   baseInterval: {             // one data point per day
@@ -54,7 +54,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const lineSeries: am5xy.LineSeries[] = [];
 
 // ten lines, each reading its own field (value1 to value10) from the same data
@@ -77,9 +77,9 @@ for (let i = 1; i <= 10; i++) {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // The dates in the data are strings: the processor turns them into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 const data = [
   { date: "2024-01-01", value1: 1, value2: 3, value3: 2, value4: 5, value5: 4, value6: 1, value7: -2, value8: 2, value9: 3, value10: 0 },
   { date: "2024-01-02", value1: 2, value2: 11, value3: 4, value4: 10, value5: 8, value6: -2, value7: -6, value8: 5, value9: 5, value10: 3 },
@@ -114,7 +114,7 @@ am5.array.each(lineSeries, (series) => {
 
 
 // Add legend
-// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+// https://docs.amcharts.com/v5/charts/xy-chart/legend-xy-series/
 // in the container right of the plot, so the legend sits beside it
 const legend = chart.rightAxesContainer.children.push(am5.Legend.new(root, {
   width: 200,              // a fixed-width column
@@ -131,7 +131,7 @@ legend.valueLabels.template.setAll({
 
 
 // Dim all the other series while a legend item is hovered
-// https://www.amcharts.com/docs/v5/concepts/events/
+// https://docs.amcharts.com/v5/concepts/events/
 legend.itemContainers.template.events.on("pointerover", (ev) => {
   const dataItem = ev.target.dataItem;
   if (dataItem) {
@@ -169,7 +169,7 @@ legend.data.setAll(lineSeries);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 am5.array.each(lineSeries, (series) => {
   series.appear(1000);
 });

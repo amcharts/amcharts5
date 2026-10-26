@@ -34,7 +34,7 @@ export interface IRoundedRectanglePrivate extends IRectanglePrivate {
 /**
  * Draws a rectangle with rounded corners.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class RoundedRectangle extends Rectangle {

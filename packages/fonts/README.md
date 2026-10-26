@@ -1,7 +1,7 @@
 ## amCharts 5 PDF Font Pack
 
 This package is a collection of font files that can be used for PDF export
-in [Exporting plugin](https://www.amcharts.com/docs/v5/concepts/exporting/) of
+in [Exporting plugin](https://docs.amcharts.com/v5/concepts/exporting/) of
 the [amCharts 5](https://www.amcharts.com/javascript-charts/) library.
 
 
@@ -13,13 +13,13 @@ Put contents of this package into your `amcharts5/fonts` folder, or install
 
 ### Documentation
 
-For information on how to use these fonts files check [this documentation page](https://www.amcharts.com/docs/v5/concepts/exporting/exporting-pdf/#Fonts).
+For information on how to use these fonts files check [this documentation page](https://docs.amcharts.com/v5/concepts/exporting/exporting-pdf/#fonts).
 
 
 ### CDN
 
 JavaScript version of the files included in this package is available as a free
-CDN service, accessible via URL `https://www.amcharts.com/lib/5/fonts/...`,
+CDN service, accessible via URL `https://cdn.amcharts.com/lib/5/fonts/...`,
 e.g.:
 
 ```

@@ -16,7 +16,7 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	 * The time interval of the data, such as `{ timeUnit: "day", count: 1 }`
 	 * for daily data.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#data-granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
@@ -25,7 +25,7 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	 * longest. The axis uses the shortest that keeps grid lines at least
 	 * `minGridDistance` apart.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#grid-granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
 
@@ -40,7 +40,7 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	/**
 	 * Date formats for labels, by the time unit of the grid, such as `"day"`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#date-formats} for more info
 	 */
 	dateFormats?: { [index: string]: string };
 
@@ -48,7 +48,7 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	 * Date formats, by time unit, for labels where a new period begins (see
 	 * `markUnitChange`).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#date-formats} for more info
 	 */
 	periodChangeDateFormats?: { [index: string]: string };
 
@@ -56,7 +56,7 @@ export interface ICategoryDateAxisSettings<R extends AxisRenderer> extends ICate
 	 * Date format for the axis tooltip. If not set, the one in `dateFormats`
 	 * for the time unit of `baseInterval` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	tooltipDateFormat?: string;
 
@@ -82,7 +82,7 @@ export interface ICategoryDateAxisEvents extends ICategoryAxisEvents {
  * A category axis whose categories are timestamps. Each data item takes an
  * equal share of the axis, so periods without data leave no gaps.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-date-axis/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/category-date-axis/} for more info
  * @important
  */
 export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {

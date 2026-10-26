@@ -6,7 +6,7 @@ import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
  * neutral dark interface colors. Colors too dark to show on the background,
  * such as black, are lightened. Use it in place of `Colorblind`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class ColorblindDarkTheme extends ColorblindTheme {

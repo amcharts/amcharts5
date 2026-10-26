@@ -74,7 +74,7 @@ export interface IRadarCursorEvents extends IXYCursorEvents {
  * Cursor for a [[RadarChart]]: a line out from the center and an arc around
  * it that follow the pointer and show the axis and series tooltips.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/#cursor} for more info
  */
 export class RadarCursor extends XYCursor {
 	public static className: string = "RadarCursor";

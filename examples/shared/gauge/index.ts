@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
   panX: false,       // the gauge does not move when dragged
   panY: false,
@@ -27,7 +27,7 @@ const chart = root.container.children.push(am5radar.RadarChart.new(root, {
 
 
 // Create axis and its renderer
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/#axes
 const axisRenderer = am5radar.AxisRendererCircular.new(root, {
   innerRadius: -10,  // grid lines only 10 px long, in from the arc, like tick marks
   strokeOpacity: 0.1 // a faint line along the arc (hidden by default)
@@ -43,7 +43,7 @@ const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add clock hand: an axis range with a bullet at the value it shows
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/#clock-hands
 const axisDataItem = xAxis.makeDataItem({
   value: 65 // the value the hand points at
 });
@@ -64,5 +64,5 @@ if (grid) {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

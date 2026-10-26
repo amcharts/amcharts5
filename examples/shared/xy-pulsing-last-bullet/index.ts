@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,      // drag the plot to move around it, sideways...
   panY: true,      // ...and up and down
@@ -26,13 +26,13 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0.3,          // can be dragged up to 30% of the view past the first or last day
   baseInterval: {             // one data point per day
@@ -52,7 +52,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const series = chart.series.push(am5xy.LineSeries.new(root, {
   name: "Series",
   xAxis: xAxis,
@@ -68,7 +68,7 @@ series.strokes.template.set("strokeWidth", 2); // a 2 px line, thicker than the 
 
 
 // Add bullet
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#bullets
 // Hidden, unless a data row shows its own through "bulletSettings"
 const bulletTemplate: am5.Template<am5.Container> = am5.Template.new({
   visible: false
@@ -104,7 +104,7 @@ series.bullets.push(() => {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 series.data.setAll([
   { date: new Date(2024, 5, 1).getTime(), value: 50 },
   { date: new Date(2024, 5, 2).getTime(), value: 53 },
@@ -125,6 +125,6 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

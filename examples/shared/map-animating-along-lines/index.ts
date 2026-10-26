@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   panX: "translateX",  // dragging moves the map sideways...
   panY: "translateY",  // ...and up and down
@@ -26,7 +26,7 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Create main polygon series for countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow,
   exclude: ["AQ"] // no Antarctica, which Mercator stretches across the bottom
@@ -39,7 +39,7 @@ polygonSeries.mapPolygons.template.setAll({
 
 
 // Create point series for cities
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-point-series/
 const citySeries = chart.series.push(am5map.MapPointSeries.new(root, {}));
 
 // a dot for each city
@@ -63,7 +63,7 @@ citySeries.data.setAll([
 
 
 // Create line series for the route between the cities
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-line-series/
 const lineSeries = chart.series.push(am5map.MapLineSeries.new(root, {
   pointSeries: citySeries // the pointIds in the data are the ids of these cities
 }));
@@ -80,11 +80,11 @@ lineSeries.data.setAll([
 
 
 // Create point series for the plane, placed on the line
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-point-series/
 const planeSeries = chart.series.push(am5map.MapPointSeries.new(root, {}));
 
 // The animation moves the data item along the line and back, forever
-// https://www.amcharts.com/docs/v5/concepts/animations/
+// https://docs.amcharts.com/v5/concepts/animations/
 planeSeries.bullets.push(() => {
   return am5.Bullet.new(root, {
     sprite: am5.Graphics.new(root, {
@@ -108,5 +108,5 @@ planeSeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

@@ -79,7 +79,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * Field in `data` that holds the id of the point's group. Points cluster
 	 * only with points of the same group, such as the same continent.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_segregation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#group-segregation} for more info
 	 * @default "groupId"
 	 */
 	groupIdField?: string;
@@ -87,7 +87,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	/**
 	 * Points closer than this many pixels to each other are clustered.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Minimal_distance} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#minimal-distance} for more info
 	 * @default 20
 	 */
 	minDistance?: number;
@@ -96,7 +96,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * A function that returns the [[Bullet]] to show a cluster with. Without
 	 * it, points aren't clustered.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_bullet} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#group-bullet} for more info
 	 */
 	clusteredBullet?: (root: Root, series: ClusteredPointSeries, dataItem: DataItem<IClusteredDataItem>) => Bullet | undefined;
 
@@ -104,7 +104,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * Once clustering stops (see `stopClusterZoom`), points closer than this
 	 * many pixels to each other are scattered so that all of them show.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#scatter-settings} for more info
 	 * @default 3
 	 * @since 5.5.7
 	 */
@@ -113,7 +113,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	/**
 	 * Radius in pixels each bullet is taken to have when scattering them.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#scatter-settings} for more info
 	 * @default 8
 	 * @since 5.5.7
 	 */
@@ -123,7 +123,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
 	 * Clustering stops, and scattering starts, once the map is zoomed to
 	 * `maxZoomLevel` times this.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#scatter-settings} for more info
 	 * @default 0.95
 	 * @since 5.5.7
 	 */
@@ -144,7 +144,7 @@ export interface IClusteredPointSeriesSettings extends IMapPointSeriesSettings {
  * A [[MapPointSeries]] that groups points close together on screen into
  * clusters. Clusters are worked out again whenever the zoom level changes.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/} for more info
  * @since 5.5.6
  * @important
  */
@@ -286,7 +286,7 @@ export class ClusteredPointSeries extends MapPointSeries {
 	 *
 	 * @param  dataItem  Data item of the cluster
 	 * @param  rotate    Also rotate the map to bring the cluster to the middle, as on a globe
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Drill_down} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#drill-down} for more info
 	 */
 	public zoomToCluster(dataItem: DataItem<IClusteredDataItem>, rotate?: boolean) {
 		this.zoomToDataItems(dataItem.get("children", []), rotate);

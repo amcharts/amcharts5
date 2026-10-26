@@ -113,7 +113,7 @@ export interface ISunburstPrivate extends IPartitionPrivate {
  * further out, each node spanning as much of its ring as its value. A click on
  * a node zooms into it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/sunburst/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/sunburst/} for more info
  * @important
  */
 export class Sunburst extends Partition {

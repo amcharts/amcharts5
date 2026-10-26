@@ -120,7 +120,7 @@ function clamp(x: number, lo: number, hi: number): number {
  * ]);
  * ```
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {}): Theme {
@@ -197,18 +197,21 @@ export function AdaptiveTheme(root: Root, settings: IAdaptiveThemeSettings = {})
 		repeatLightness: settings.repeatLightness == null || settings.repeatLightness === true ? 0.1 : (Number(settings.repeatLightness) || 0)
 	});
 
+	// A copy, so that a saved chart can tell the button color from the first series color
+	const button = Color.fromHex(baseColor.hex);
+
 	if (dark) {
-		theme.rule("InterfaceColors").setAll(darkInterface(hue, baseColor));
+		theme.rule("InterfaceColors").setAll(darkInterface(hue, button));
 	}
 	else {
 		// Light variant: keep the default look but let the base drive the primary
 		// button so the UI adopts the brand hue.
 		theme.rule("InterfaceColors").setAll({
-			primaryButton: baseColor,
-			primaryButtonHover: Color.lighten(baseColor, 0.1),
-			primaryButtonDown: Color.lighten(baseColor, -0.1),
-			primaryButtonActive: Color.lighten(baseColor, -0.1),
-			primaryButtonStroke: Color.lighten(baseColor, -0.15)
+			primaryButton: button,
+			primaryButtonHover: Color.lighten(button, 0.1),
+			primaryButtonDown: Color.lighten(button, -0.1),
+			primaryButtonActive: Color.lighten(button, -0.1),
+			primaryButtonStroke: Color.lighten(button, -0.15)
 		});
 	}
 

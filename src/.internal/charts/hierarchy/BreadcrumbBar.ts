@@ -30,7 +30,7 @@ export interface IBreadcrumbBarEvents extends IContainerEvents {
  * A breadcrumb bar for a hierarchy series: a label for each node on the path
  * from the root to the selected node. Clicking a label selects that node.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/breadcrumbs/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/breadcrumbs/} for more info
  * @important
  */
 export class BreadcrumbBar extends Container {

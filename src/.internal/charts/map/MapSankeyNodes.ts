@@ -102,7 +102,7 @@ export interface IMapSankeyNodesEvents extends ISeriesEvents {
 /**
  * The nodes of a [[MapSankeySeries]], available as its `nodes`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-sankey-series/} for more info
  * @since 5.17.0
  * @important
  */

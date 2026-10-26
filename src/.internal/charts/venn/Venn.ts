@@ -55,7 +55,7 @@ export interface IVennDataItem extends ISeriesDataItem {
 	/**
 	 * Fill pattern used for the slice and related elements, e.g. legend marker.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
 	 * @since 5.10.0
 	 */
 	fillPattern: Pattern;
@@ -78,7 +78,7 @@ export interface IVennSettings extends ISeriesSettings {
 	/**
 	 * Patterns for slices with no `fillPattern`, one after another.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets} for more info
 	 * @since 5.10.0
 	 */
 	patterns?: PatternSet;
@@ -102,7 +102,7 @@ export interface IVennPrivate extends ISeriesPrivate {
  * A Venn diagram: circles sized by their values, overlapping as much as the
  * values of their overlaps say.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/venn/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/venn/} for more info
  * @important
  */
 export class Venn extends Series {

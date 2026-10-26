@@ -62,7 +62,7 @@ export interface IAxisRendererCurveYPrivate extends IAxisRendererPrivate {
  * Renderer for the Y axis of a [[CurveChart]], which runs across the X axis
  * line all along it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/timeline/} for more info
  * @since 5.12.0
  * @important
  */

@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   panX: "translateX",  // dragging moves the map sideways...
   panY: "translateY",  // ...and up and down
@@ -26,7 +26,7 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Create main polygon series for countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow,
   exclude: ["AQ"] // no Antarctica, which Mercator stretches across the bottom
@@ -39,7 +39,7 @@ polygonSeries.mapPolygons.template.setAll({
 
 
 // Create Map Sankey series: flows between countries, found by their ids
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-sankey-series/
 const sankeySeries = chart.series.push(am5map.MapSankeySeries.new(root, {
   polygonSeries: polygonSeries // where sourceId and targetId are found: flows end at country centers
 }));
@@ -57,7 +57,7 @@ sankeySeries.nodes.mapPolygons.template.setAll({
 
 
 // Set data: coffee exports, in thousands of tonnes
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-sankey-series/
 sankeySeries.data.setAll([
   { sourceId: "BR", source: "Brazil", targetId: "US", target: "United States", value: 450 },
   { sourceId: "BR", source: "Brazil", targetId: "DE", target: "Germany", value: 350 },
@@ -74,5 +74,5 @@ sankeySeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

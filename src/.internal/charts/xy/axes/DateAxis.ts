@@ -20,7 +20,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * The time interval of the data, such as `{ timeUnit: "day", count: 1 }`
 	 * for daily data. Each data item takes up one such period on the axis.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Data_granularity} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#data-granularity} for more info
 	 */
 	baseInterval: ITimeInterval;
 
@@ -46,7 +46,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * zooms in.
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 */
 	groupData?: boolean;
 
@@ -55,7 +55,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * longer interval.
 	 *
 	 * @default 500
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 */
 	groupCount?: number;
 
@@ -63,14 +63,14 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * Groups data into this interval at any zoom, when `groupData` is on. It
 	 * must be one of `groupIntervals`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 */
 	groupInterval?: ITimeInterval;
 
 	/**
 	 * Intervals `groupData` can group data into, from shortest to longest.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 */
 	groupIntervals?: Array<ITimeInterval>;
 
@@ -79,7 +79,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * longest. The axis uses the shortest that keeps grid lines at least
 	 * `minGridDistance` apart.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Grid_granularity} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#grid-granularity} for more info
 	 */
 	gridIntervals?: Array<ITimeInterval>;
 
@@ -94,7 +94,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	/**
 	 * Date formats for labels, by the time unit of the grid, such as `"day"`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#date-formats} for more info
 	 */
 	dateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
@@ -102,7 +102,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * Date formats for minor grid labels, by time unit. If not set,
 	 * `dateFormats` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Minor_grid_formats} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#minor-grid-formats} for more info
 	 * @since 5.6.0
 	 */
 	minorDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
@@ -111,14 +111,14 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * Date formats, by time unit, for labels where a new period begins (see
 	 * `markUnitChange`).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Date_formats} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#date-formats} for more info
 	 */
 	periodChangeDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
 
 	/**
 	 * Date format for the axis tooltip. Overrides `tooltipDateFormats`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#axis-tooltip} for more info
 	 */
 	tooltipDateFormat?: string | Intl.DateTimeFormatOptions;
 
@@ -126,7 +126,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * Date formats for the axis tooltip, by the time unit of the current base
 	 * interval (the group interval while data is grouped).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#axis-tooltip} for more info
 	 * @since 5.1.4
 	 */
 	tooltipDateFormats?: { [index: string]: string | Intl.DateTimeFormatOptions };
@@ -136,7 +136,7 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * `1`. If not set, it is minus `tooltipLocation` (`-0.5` by default), so a
 	 * tooltip pointing at the middle of a period shows the period's start.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#axis-tooltip} for more info
 	 * @since 5.1.4
 	 */
 	tooltipIntervalOffset?: number;
@@ -198,7 +198,7 @@ export interface IDateAxisEvents extends IValueAxisEvents {
 /**
  * An axis of dates and times, placing each data item at its time.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/} for more info
  * @important
  */
 export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {

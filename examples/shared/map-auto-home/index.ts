@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart: it goes to its home position once it loads
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom
+// https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   projection: am5map.geoMercator(),              // the common flat world map
   homeGeoPoint: { longitude: 14, latitude: 51 }, // home is centered on central Europe...
@@ -27,13 +27,13 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Add zoom control with a home button
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
+// https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#zoom-control
 const zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
 zoomControl.homeButton.set("visible", true); // hidden by default; a click goes back home
 
 
 // Add countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow,
   exclude: ["AQ"] // no Antarctica, which Mercator stretches across the bottom
@@ -45,5 +45,5 @@ polygonSeries.mapPolygons.template.setAll({
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

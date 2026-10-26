@@ -35,7 +35,7 @@ export interface IChordDirectedEvents extends IChordEvents {
  * outgoing totals together, and each link keeps its width all the way to the
  * target, where it ends in an arrowhead.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/} for more information
  * @important
  */
 export class ChordDirected extends Chord {

@@ -1528,3 +1528,13 @@ export function sameBounds(a: IBounds, b?: IBounds): boolean {
 	}
 	return true;
 }
+
+/**
+ * A class name as words, e.g. "PieSeries" as "Pie series".
+ *
+ * @ignore
+ */
+export function classNameWords(className: string): string {
+	const words = className.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
+	return words.charAt(0).toUpperCase() + words.slice(1);
+}

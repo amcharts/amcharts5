@@ -4,24 +4,24 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/
+// https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/
 const chart = root.container.children.push(am5percent.SlicedChart.new(root, {}));
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/
+// https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/
 const series = chart.series.push(am5percent.PictorialStackedSeries.new(root, {
   orientation: "vertical", // slices stacked top to bottom, the first data row on top
   valueField: "value",
@@ -35,7 +35,7 @@ series.ticks.template.set("location", 0.6);
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/#setting-data
 series.data.setAll([
   { value: 10, category: "One" },
   { value: 9, category: "Two" },
@@ -48,6 +48,6 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear();
 chart.appear(1000, 100);

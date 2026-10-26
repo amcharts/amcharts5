@@ -33,7 +33,7 @@ export interface IChordNonRibbonEvents extends IChordEvents {
  * Chord diagram with thin lines for links instead of ribbons. All nodes get
  * arcs of the same size, whatever the link values.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/} for more information
  * @important
  */
 export class ChordNonRibbon extends Chord {

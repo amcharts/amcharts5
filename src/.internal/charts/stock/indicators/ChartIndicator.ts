@@ -26,7 +26,7 @@ export interface IChartIndicatorEvents extends IIndicatorEvents {
 /**
  * Base class for [[StockChart]] indicators drawn in a panel of their own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export abstract class ChartIndicator extends Indicator {
 	public static className: string = "ChartIndicator";

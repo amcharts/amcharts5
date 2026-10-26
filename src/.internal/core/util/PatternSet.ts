@@ -26,7 +26,7 @@ export interface IPatternSetSettings extends IEntitySettings {
 	 * Color of the built-in patterns, used when `patterns` is not set. Changing
 	 * it after the set is created has no effect.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#colors} for more info
 	 */
 	color?: Color;
 
@@ -53,7 +53,7 @@ export interface IPatternSetPrivate extends IEntityPrivate {
 /**
  * A list of [[Pattern]] objects that series and other elements take in turn.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets} for more info
  * @since 5.10.0
  */
 export class PatternSet extends Entity {

@@ -5,18 +5,18 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 // Set date fields, so that they are formatted as dates in tooltips
-// https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders
+// https://docs.amcharts.com/v5/concepts/formatters/data-placeholders/#formatting-placeholders
 root.dateFormatter.setAll({
   dateFormat: "MMM d",
   dateFields: ["valueX", "openValueX"]
@@ -24,14 +24,14 @@ root.dateFormatter.setAll({
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/
+// https://docs.amcharts.com/v5/charts/radar-chart/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
   innerRadius: am5.percent(30) // a hole in the middle, so the innermost ring is not squeezed to a dot
 }));
 
 
 // Create axes and their renderers: one year around the circle, a ring per category
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-axes
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   min: new Date(2025, 0, 1).getTime(),         // the circle shows all of 2025 (months count from 0)...
   max: new Date(2026, 0, 1).getTime(),         // ...and closes where it started, on January 1
@@ -48,7 +48,7 @@ const yAxis = chart.yAxes.push(am5xy.CategoryAxis.new(root, {
 
 
 // Create series: a column goes from its open value to its value
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-series
 const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
   name: "In season",
   xAxis: xAxis,
@@ -65,7 +65,7 @@ series.columns.template.setAll({
 
 
 // Set data: the processor turns the date strings into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 series.data.processor = am5.DataProcessor.new(root, {
   dateFormat: "yyyy-MM-dd",
   dateFields: ["start", "end"]
@@ -93,6 +93,6 @@ yAxis.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

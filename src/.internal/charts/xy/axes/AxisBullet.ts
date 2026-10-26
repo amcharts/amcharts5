@@ -37,7 +37,7 @@ export interface IAxisBulletPrivate extends IEntityPrivate {
 /**
  * Draws a bullet on an axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_bullets} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#axis-bullets} for more info
  */
 export class AxisBullet extends Entity {
 

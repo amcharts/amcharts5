@@ -2,7 +2,7 @@
 
 > **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
 
-Docs: https://www.amcharts.com/docs/v5/charts/venn/
+Docs: https://docs.amcharts.com/v5/charts/venn/
 
 Venn diagrams show overlapping relationships between sets. There is NO `VennDiagram` chart class — `am5venn.Venn` is both the series and the visual container, pushed directly into `root.container.children` (or any `Container`).
 

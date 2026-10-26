@@ -27,7 +27,7 @@ export interface IPanelControlsPrivate extends IContainerPrivate {
  * Buttons on a [[StockChart]] panel that move it up or down, expand it and
  * close it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/panels/#Panel_controls} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/panels/#panel-controls} for more info
  */
 export class PanelControls extends Container {
 

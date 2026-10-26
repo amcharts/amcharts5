@@ -4,6 +4,9 @@ import { Color } from "./Color";
 // A list's length before colors were added to it (color sets share their theme's list)
 const listLengths: WeakMap<Color[], number> = new WeakMap();
 
+// The color set that made each color added to a list
+const generators: WeakMap<Color, ColorSet> = new WeakMap();
+
 function listLength(colors: Color[]): number {
 	let length = listLengths.get(colors);
 	if (length == null) {
@@ -120,7 +123,7 @@ export interface IColorSetStepOptions {
  * A list of colors that series and other elements take in turn. When the
  * list runs out, it generates more.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Color_sets} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/#color-sets} for more info
  */
 export class ColorSet extends Entity {
 	public static className: string = "ColorSet";
@@ -157,49 +160,67 @@ export class ColorSet extends Entity {
 	 */
 	public generateColors(): void {
 		this.setPrivate("currentPass", this.getPrivate("currentPass", 0) + 1)
-		const pass = this.getPrivate("currentPass");
 		const colors = this.get("colors", [this.get("baseColor", Color.fromHex(0xff0000))]);
-		listLength(colors);
+		// Rounds are counted on the list, which color sets share: each one goes
+		// on from the last, whichever set made it, so a color's index fixes it
+		const length = listLength(colors);
+		const pass = Math.floor(colors.length / length);
 		if (!this.getPrivate("numColors")) {
-			this.setPrivate("numColors", colors.length);
+			this.setPrivate("numColors", length);
 		}
-		//const len = colors.length;
-		const len = this.getPrivate("numColors")!;
-		//const start = len - this.getPrivate("numColors")!;
-		const start = 0;
 		const passOptions = this.get("passOptions")!;
 		const reuse = this.get("reuse");
 		const repeatLightness: number = this.get("repeatLightness", 0);
+		const add = (color: Color) => {
+			generators.set(color, this);
+			colors.push(color);
+		};
 		if (reuse && repeatLightness) {
-			// A round lighter than the last, counted on the list, which color sets share
-			const length = listLength(colors);
-			const round = Math.floor(colors.length / length);
+			// A round lighter than the last
 			for (let i = 0; i < length; i++) {
 				const hsl = colors[i].toHSL();
-				colors.push(Color.fromHSL(hsl.h, hsl.s, Math.min(1, Math.max(0, hsl.l + repeatLightness * round))));
+				add(Color.fromHSL(hsl.h, hsl.s, Math.min(1, Math.max(0, hsl.l + repeatLightness * pass))));
 			}
 			return;
 		}
-		for (let i = start; i < len; i++) {
+		for (let i = 0; i < length; i++) {
 			if (reuse) {
 				colors.push(colors[i])
 			}
 			else {
 				const hsl = colors[i]!.toHSL();
-				let h = hsl.h + (passOptions.hue || 0) * pass!;
+				let h = hsl.h + (passOptions.hue || 0) * pass;
 				while (h > 1) h -= 1;
 
-				let s = hsl.s + (passOptions.saturation || 0) * pass!;
+				let s = hsl.s + (passOptions.saturation || 0) * pass;
 				//if (s > 1) s -= Math.floor(s);
 				if (s > 1) s = 1;
 				if (s < 0) s = 0;
 
-				let l = hsl.l + (passOptions.lightness || 0) * pass!;
+				let l = hsl.l + (passOptions.lightness || 0) * pass;
 				//if (l > 1) l -= Math.floor(l);
 				while (l > 1) l -= 1;
-				colors.push(Color.fromHSL(h, s, l));
+				add(Color.fromHSL(h, s, l));
 			}
 		}
+	}
+
+	/**
+	 * Whether `color`, made by a color set past its list, is the color a new
+	 * color set of this root would make at that index: made the same way.
+	 *
+	 * @ignore
+	 */
+	public static generatedLike(color: Color, colorSet: ColorSet): boolean {
+		const generator = generators.get(color);
+		if (!generator) {
+			return false;
+		}
+		const a = generator.get("passOptions") || {};
+		const b = colorSet.get("passOptions") || {};
+		return !!generator.get("reuse") == !!colorSet.get("reuse") &&
+			generator.get("repeatLightness", 0) == colorSet.get("repeatLightness", 0) &&
+			(a.hue || 0) == (b.hue || 0) && (a.saturation || 0) == (b.saturation || 0) && (a.lightness || 0) == (b.lightness || 0);
 	}
 
 	/**

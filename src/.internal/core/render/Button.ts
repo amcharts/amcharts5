@@ -30,7 +30,7 @@ export interface IButtonEvents extends IContainerEvents {
 /**
  * Draws an interactive button.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/buttons/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/buttons/} for more info
  * @important
  */
 export class Button extends Container {

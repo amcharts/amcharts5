@@ -154,7 +154,7 @@ export interface IExportingMenuEvents extends IEntityEvents {
  * The export menu: an icon on the chart that opens a list of formats to
  * export with [[Exporting]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/exporting/} for more info
  */
 export class ExportingMenu extends Entity {
 	public static className: string = "ExportingMenu";

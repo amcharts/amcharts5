@@ -3,7 +3,7 @@
   "version": "5.0.3",
   "description": "Svelte actions for amCharts 5: a chart written in code, or built from a JSON config",
   "author": "amCharts <contact@amcharts.com> (https://www.amcharts.com/)",
-  "homepage": "https://www.amcharts.com/docs/v5/getting-started/integrations/sveltekit/",
+  "homepage": "https://docs.amcharts.com/v5/getting-started/integrations/sveltekit/",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://github.com/amcharts/amcharts5/issues"

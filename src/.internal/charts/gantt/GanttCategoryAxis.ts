@@ -25,7 +25,7 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	/**
 	 * Field in data that holds the ID of the parent task.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#category-data} for more info
 	 * @default "parentId"
 	 */
 	parentIdField?: string;
@@ -33,7 +33,7 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	/**
 	 * Field in data that holds whether the task's subtasks are collapsed.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#category-data} for more info
 	 * @default "collapsed"
 	 */
 	collapsedField?: string;
@@ -42,7 +42,7 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	 * Row height of a subtask relative to its parent's row, `0` to `1`. Each
 	 * deeper level shrinks by the same factor again.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Cell_height_for_child_categories} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#cell-height-for-child-categories} for more info
 	 * @default 0.8
 	 */
 	childCellSize?: number;
@@ -50,7 +50,7 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	/**
 	 * Indent in pixels of a subtask's label, per level of depth.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Cell_height_for_child_categories} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#cell-height-for-child-categories} for more info
 	 * @default 25
 	 */
 	childShift?: number;
@@ -59,7 +59,7 @@ export interface IGanttCategoryAxisSettings<R extends AxisRenderer> extends ICat
 	 * Minimum row height in pixels. The axis shows only as many rows as fit at
 	 * this height; scroll to see the rest.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Cell_height} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#cell-height} for more info
 	 * @default 70
 	 */
 	minCellHeight?: number;
@@ -183,7 +183,7 @@ export interface IGanttCategoryAxisEvents extends ICategoryAxisEvents { }
  * The vertical axis of a [[Gantt]] chart: the editable task list, with
  * subtasks, duration steppers and progress pies.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Category_vertical_axis} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/gantt/#category-vertical-axis} for more info
  * @since 5.14.0
  * @important
  */

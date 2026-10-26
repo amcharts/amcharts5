@@ -453,7 +453,7 @@ function getProgram(shared: ISharedGL): IRasterProgram | undefined {
  * The series counts as the whole world in the map's bounds. On a regional
  * map, set `affectsBounds: false` to keep the map fitted to the region.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-raster-series/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-raster-series/} for more information
  * @since 5.21.0
  * @important
  */

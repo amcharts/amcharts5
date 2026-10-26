@@ -39,14 +39,14 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * The main price series. Indicators are calculated from it, compared
 	 * series are added to its panel, and drawings snap to it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Setting_main_series}
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#setting-main-series}
 	 */
 	stockSeries?: XYSeries;
 
 	/**
 	 * The main volume series, used by volume-based indicators.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Setting_main_series}
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#setting-main-series}
 	 */
 	volumeSeries?: XYSeries;
 
@@ -59,7 +59,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Settings applied to the series on the main series' Y axis while the
 	 * chart is in percent scale mode.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/#Configuring} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/percent-mode/#configuring} for more info
 	 */
 	percentScaleSeriesSettings?: Partial<IXYSeriesSettings>;
 
@@ -67,7 +67,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Settings applied to the main series' [[ValueAxis]] while the chart is in
 	 * percent scale mode.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/#Configuring} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/percent-mode/#configuring} for more info
 	 */
 	percentScaleValueAxisSettings?: Partial<IValueAxisSettings<AxisRenderer>>;
 
@@ -75,7 +75,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Turns percent scale mode on when a compared series is added, and off
 	 * when the last one is removed.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/percent-mode/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/percent-mode/} for more info
 	 * @default true
 	 */
 	autoSetPercentScale?: boolean;
@@ -84,7 +84,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Color of the `stockSeries` candles or columns that close at or above
 	 * their open.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#positivenegative-colors} for more info
 	 */
 	stockPositiveColor?: Color | null;
 
@@ -92,7 +92,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Color of the `stockSeries` candles or columns that close below their
 	 * open.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#positivenegative-colors} for more info
 	 */
 	stockNegativeColor?: Color | null;
 
@@ -100,7 +100,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Color that `getVolumeColor()` returns for a volume column whose
 	 * `stockSeries` close is at or above the previous close.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#positivenegative-colors} for more info
 	 */
 	volumePositiveColor?: Color | null;
 
@@ -108,7 +108,7 @@ export interface IStockChartSettings extends IContainerSettings {
 	 * Color that `getVolumeColor()` returns for a volume column whose
 	 * `stockSeries` close is below the previous close.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Positive_negative_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#positivenegative-colors} for more info
 	 */
 	volumeNegativeColor?: Color | null;
 
@@ -222,7 +222,7 @@ export interface IStockChartEvents extends IContainerEvents {
  * The stock chart: [[StockPanel]] charts stacked over one date range, with
  * indicators, drawings and series comparison.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/} for more info
  * @important
  */
 export class StockChart extends Container {
@@ -251,14 +251,14 @@ export class StockChart extends Container {
 	/**
 	 * The chart's panels, from top to bottom.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/#Panels} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/#panels} for more info
 	 */
 	public readonly panels: ListAutoDispose<StockPanel> = new ListAutoDispose();
 
 	/**
 	 * The chart's indicators.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
 	 */
 	public readonly indicators: ListAutoDispose<Indicator> = new ListAutoDispose();
 

@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/
+// https://docs.amcharts.com/v5/charts/radar-chart/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
   panX: false,    // dragging does not pan: the cursor uses the drag to zoom
   panY: false,
@@ -27,7 +27,7 @@ const chart = root.container.children.push(am5radar.RadarChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor
+// https://docs.amcharts.com/v5/charts/radar-chart/#cursor
 const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
   behavior: "zoomX" // drag around the circle to zoom in on those months
 }));
@@ -35,7 +35,7 @@ cursor.lineY.set("visible", false); // only the spoke to the hovered month, no c
 
 
 // Create axes and their renderers
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-axes
 const xRenderer = am5radar.AxisRendererCircular.new(root, {});
 xRenderer.labels.template.setAll({
   radius: 10 // month names 10 px outside the circle
@@ -54,7 +54,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-series
 const series = chart.series.push(am5radar.RadarLineSeries.new(root, {
   name: "Rainfall",
   xAxis: xAxis,
@@ -78,7 +78,7 @@ series.bullets.push(() => {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/radar-chart/#setting-data
 const data = [
   { month: "Jan", rainfall: 100 },
   { month: "Feb", rainfall: 85 },
@@ -99,6 +99,6 @@ xAxis.data.setAll(data); // the axis takes its months from the same rows
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

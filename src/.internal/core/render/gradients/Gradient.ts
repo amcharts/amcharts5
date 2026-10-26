@@ -10,7 +10,7 @@ export interface IGradientSettings extends IEntitySettings {
 	/**
 	 * The gradient's colors, in order.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
 	 */
 	stops?: Array<IGradientStop>;
 
@@ -28,7 +28,7 @@ export interface IGradientPrivate extends IEntityPrivate {
 /**
  * Base class for gradients.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export abstract class Gradient extends Entity {
 

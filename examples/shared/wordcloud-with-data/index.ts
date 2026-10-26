@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Add wrapper container
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Additional_controls
+// https://docs.amcharts.com/v5/charts/word-cloud/#additional-controls
 const container = root.container.children.push(am5.Container.new(root, {
   width: am5.percent(100),    // fills the chart div
   height: am5.percent(100),
@@ -35,7 +35,7 @@ container.children.push(am5.Label.new(root, {
 
 // Add series
 // Angles are taken in turn, not at random, so the cloud is the same on every load
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Setting_words
+// https://docs.amcharts.com/v5/charts/word-cloud/#setting-words
 const series = container.children.push(am5wc.WordCloud.new(root, {
   categoryField: "tag",
   valueField: "weight",
@@ -46,7 +46,7 @@ const series = container.children.push(am5wc.WordCloud.new(root, {
 
 
 // Set up heat rules: they need calculateAggregates on the series
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Via_heat_rules
+// https://docs.amcharts.com/v5/charts/word-cloud/#via-heat-rules
 series.set("heatRules", [{
   target: series.labels.template,
   dataField: "value",
@@ -57,7 +57,7 @@ series.set("heatRules", [{
 
 
 // Configure labels
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Configuring
+// https://docs.amcharts.com/v5/charts/word-cloud/#configuring
 series.labels.template.setAll({
   paddingTop: 5,           // 5 px of space kept around each word
   paddingBottom: 5,
@@ -114,5 +114,5 @@ series.data.setAll([
 
 
 // Play initial series animation
-// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
+// https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

@@ -29,7 +29,7 @@ export interface IDurationFormatterSettings extends IEntitySettings {
 	 * Unit of the numbers being formatted: `"millisecond"`, `"second"`,
 	 * `"minute"`, `"hour"`, `"day"`, `"week"`, `"month"` or `"year"`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/#Base_unit} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-durations/#base-unit} for more info
 	 * @default "second"
 	 */
 	baseUnit?: TimeUnit;
@@ -45,7 +45,7 @@ export interface IDurationFormatterSettings extends IEntitySettings {
 	 * Data fields that hold durations. Text placeholders with these fields are
 	 * formatted as durations even without `formatDuration()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/data-placeholders/#formatting-placeholders} for more info
 	 */
 	durationFields?: string[];
 
@@ -57,7 +57,7 @@ export interface IDurationFormatterPrivate extends IEntityPrivate {
 /**
  * Formats numbers as durations, such as `125` seconds as `"02:05"`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-durations/} for more info
  */
 export class DurationFormatter extends Entity {
 	declare public _settings: IDurationFormatterSettings;

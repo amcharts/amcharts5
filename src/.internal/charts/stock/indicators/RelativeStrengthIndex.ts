@@ -28,7 +28,7 @@ export interface IRelativeStrengthIndexEvents extends IOverboughtOversoldEvents 
  * average gains with average losses over `period`. Drawn in a panel of its
  * own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class RelativeStrengthIndex extends OverboughtOversold {
 	public static className: string = "RelativeStrengthIndex";

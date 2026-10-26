@@ -9,7 +9,7 @@ import { Theme } from "../core/Theme";
  * It sets only the series colors and leaves the interface colors alone.
  *
  * @see {@link https://jfly.uni-koeln.de/color/} for the original palette
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class ColorblindTheme extends Theme {

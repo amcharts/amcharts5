@@ -58,7 +58,7 @@ export interface IPathPatternPrivate extends IPatternPrivate {
  * is the tile, as before 5.20.0.
  *
  * @since 5.2.33
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class PathPattern extends Pattern {
 	declare public _settings: IPathPatternSettings;

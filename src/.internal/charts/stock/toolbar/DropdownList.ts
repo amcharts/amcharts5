@@ -106,7 +106,7 @@ export interface IDropdownListEvents extends IDropdownEvents {
 /**
  * A dropdown list for the controls of a [[StockToolbar]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-list-control/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/dropdown-list-control/} for more info
  */
 export class DropdownList extends Dropdown {
 	public static className: string = "DropdownList";

@@ -35,7 +35,7 @@ export interface ISuperTrendEvents extends IIndicatorEvents {
  * `period`) from the price, below it in an uptrend and above it in a
  * downtrend. Drawn over the main series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class SuperTrend extends Indicator {
 	public static className: string = "SuperTrend";

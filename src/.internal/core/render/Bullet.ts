@@ -57,7 +57,7 @@ export interface IBulletSettings extends IEntitySettings {
 	 *
 	 * **IMPORTANT: this setting works with [[XYSeries]] only.**
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#By_data_field} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/bullets/#by-data-field} for more info
 	 * @since 5.6.0
 	 */
 	field?: "open" | "high" | "low" | "value";
@@ -71,7 +71,7 @@ export interface IBulletSettings extends IEntitySettings {
 	 *
 	 * **IMPORTANT: this setting works with [[XYSeries]] only.**
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Stacked_bullets} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/bullets/#stacked-bullets} for more info
 	 * @since 5.6.0
 	 */
 	stacked?: "up" | "down" | "auto";
@@ -84,7 +84,7 @@ export interface IBulletPrivate extends IEntityPrivate {
 /**
  * Holds an element (`sprite`) that a series places at a data item.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/bullets/} for more info
  */
 export class Bullet extends Entity {
 	public static className: string = "Bullet";

@@ -5,6 +5,7 @@ import * as $array from "../util/Array";
 import * as $object from "../util/Object";
 import type * as $ease from "../util/Ease";
 import type { Bullet } from "./Bullet";
+import type { Sprite } from "./Sprite";
 
 /**
  * One item of a [[Component]]'s data, holding its values and settings.
@@ -113,7 +114,7 @@ export interface IComponentSettings extends IContainerSettings {
 	 * Duration in milliseconds of the animation from old values to new ones,
 	 * e.g. when data changes.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Animating_data_values} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#animating-data-values} for more info
 	 * @default 0
 	 */
 	interpolationDuration?: number;
@@ -121,7 +122,7 @@ export interface IComponentSettings extends IContainerSettings {
 	/**
 	 * Easing function of the animation from old values to new ones.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 */
 	interpolationEasing?: $ease.Easing;
 }
@@ -151,6 +152,16 @@ export abstract class Component extends Container {
 	declare public _privateSettings: IComponentPrivate;
 	declare public _dataItemSettings: IComponentDataItem;
 	declare public _events: IComponentEvents;
+
+	/**
+	 * The layer name an SVG document gives `sprite`, an element shown for one
+	 * of this component's data items.
+	 *
+	 * @ignore
+	 */
+	public _dataItemName(_dataItem: DataItem<this["_dataItemSettings"]>, _sprite: Sprite): string | undefined {
+		return undefined;
+	}
 
 	protected _data: ListData<unknown> = new ListData();
 
@@ -182,7 +193,7 @@ export abstract class Component extends Container {
 	 * The component's data: a list of data objects, each made into a data
 	 * item.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/data/} for more info
 	 */
 	public set data(data: ListData<unknown>) {
 		data.incrementRef();

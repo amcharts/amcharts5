@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart: a globe that turns to its home view once it loads
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom
+// https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   panX: "rotateX",     // dragging sideways spins the globe...
   panY: "rotateY",     // ...and dragging up or down tilts it
@@ -30,13 +30,13 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Add zoom control
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
+// https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#zoom-control
 const zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
 zoomControl.homeButton.set("visible", true); // hidden by default; a click goes back home
 
 
 // Create series for background fill
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/#background-polygon
 const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
 
 backgroundSeries.mapPolygons.template.setAll({
@@ -51,7 +51,7 @@ backgroundSeries.data.push({
 
 
 // Create graticule series
-// https://www.amcharts.com/docs/v5/charts/map-chart/graticule-series/
+// https://docs.amcharts.com/v5/charts/map-chart/graticule-series/
 // lines of latitude and longitude, every 10 degrees by default
 const graticuleSeries = chart.series.push(am5map.GraticuleSeries.new(root, {}));
 
@@ -62,7 +62,7 @@ graticuleSeries.mapLines.template.setAll({
 
 
 // Create main polygon series for countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow
 }));
@@ -76,7 +76,7 @@ polygonSeries.mapPolygons.template.setAll({
 
 
 // Create Map Sankey series: flows between coordinates
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-sankey-series/
 const oilColor = am5.color(0xc8890a); // an amber for both the flows and the ports
 
 const sankeySeries = chart.series.push(am5map.MapSankeySeries.new(root, {
@@ -103,7 +103,7 @@ sankeySeries.nodes.mapPolygons.template.setAll({
 
 
 // Add a drop that travels along each flow, at the same speed on every route
-// https://www.amcharts.com/docs/v5/concepts/animations/
+// https://docs.amcharts.com/v5/concepts/animations/
 sankeySeries.bullets.push((root, series, dataItem) => {
   // 5 s for every radian of route (about 6,400 km), so longer routes take longer
   const duration = sankeySeries.getPathLength(dataItem) * 5000;
@@ -215,5 +215,5 @@ sankeySeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

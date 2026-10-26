@@ -62,7 +62,7 @@ export interface IWordCloudSettings extends ISeriesSettings {
 	/**
 	 * Easing of words moving to their new places.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 * @default am5.ease.out(am5.ease.cubic)
 	 */
 	animationEasing?: (t: Time) => Time;
@@ -264,7 +264,7 @@ interface IWordPlacement {
  * A word cloud: words sized by their values, from `data` or counted in
  * `text`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/word-cloud/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/word-cloud/} for more info
  * @important
  */
 export class WordCloud extends Series {

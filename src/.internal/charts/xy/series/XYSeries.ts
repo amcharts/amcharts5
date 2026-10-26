@@ -44,7 +44,7 @@ function max(left: number | undefined, right: number | undefined): number | unde
  * An axis range of a series: a stretch of an axis within which the series
  * can look different.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-ranges/#series-axis-ranges} for more info
  */
 export interface IXYSeriesAxisRange {
 
@@ -237,7 +237,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Hides the bullets while data items are, on average, closer than this
 	 * many pixels to each other along the base axis.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#bullets} for more info
 	 */
 	minBulletDistance?: number;
 
@@ -261,7 +261,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Stacking goes by data item index, so all stacked series need the same
 	 * data items (dates or categories), in the same order.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Stacked_series} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#stacked-series} for more info
 	 */
 	stacked?: boolean;
 
@@ -270,7 +270,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * positive on positive, so the stack grows away from zero both ways. With
 	 * `false`, each value goes on the one right below it, whatever its sign.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Negative_value_stacking} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#negative-value-stacking} for more info
 	 */
 	stackToNegative?: boolean;
 
@@ -279,21 +279,21 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * series; the other axis holds its values. If not set, the chart picks the
 	 * Y axis when it is a category or date axis, and the X axis otherwise.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Base_axis} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#base-axis} for more info
 	 */
 	baseAxis?: IXYAxis;
 
 	/**
 	 * Data field with the X value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	valueXField?: string;
 
 	/**
 	 * Data field with the Y value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	valueYField?: string;
 
@@ -311,7 +311,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * since the first visible data item (`"valueXChangeSelection"`) or its
 	 * percent of the total (`"valueXTotalPercent"`).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 * @default "valueXWorking"
 	 */
 	valueXShow?: "valueXWorking" | "valueXChange" | "valueXChangePercent" | "valueXChangeSelection" | "valueXChangeSelectionPercent" | "valueXChangePrevious" | "valueXChangePreviousPercent" | "valueXTotal" | "valueXTotalPercent" | "valueXSum";
@@ -322,7 +322,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * since the first visible data item (`"valueYChangeSelection"`) or its
 	 * percent of the total (`"valueYTotalPercent"`).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 * @default "valueYWorking"
 	 */
 	valueYShow?: "valueYWorking" | "valueYChange" | "valueYChangePercent" | "valueYChangeSelection" | "valueYChangeSelectionPercent" | "valueYChangePrevious" | "valueYChangePreviousPercent" | "valueYTotal" | "valueYTotalPercent" | "valueYSum";
@@ -332,7 +332,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * items it groups into one: `"open"` takes the first, `"close"` the last,
 	 * `"extreme"` the one farthest from zero, and the rest as named.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 * @default "close"
 	 */
 	valueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
@@ -342,7 +342,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * items it groups into one: `"open"` takes the first, `"close"` the last,
 	 * `"extreme"` the one farthest from zero, and the rest as named.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 * @default "close"
 	 */
 	valueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
@@ -351,35 +351,35 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Data field with the open X value, such as where a horizontal column
 	 * starts.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	openValueXField?: string;
 
 	/**
 	 * Data field with the open Y value, such as where a column starts.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	openValueYField?: string;
 
 	/**
 	 * Which form of the open X value the series plots; see `valueXShow`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	openValueXShow?: "openValueXWorking" | "openValueXChange" | "openValueXChangePercent" | "openValueXChangeSelection" | "openValueXChangeSelectionPercent" | "openValueXChangePrevious" | "openValueXChangePreviousPercent";
 
 	/**
 	 * Which form of the open Y value the series plots; see `valueYShow`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	openValueYShow?: "openValueYWorking" | "openValueYChange" | "openValueYChangePercent" | "openValueYChangeSelection" | "openValueYChangeSelectionPercent" | "openValueYChangePrevious" | "openValueYChangePreviousPercent";
 
 	/**
 	 * How grouping combines the open X values; see `valueXGrouped`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 * @default "open"
 	 */
 	openValueXGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
@@ -387,7 +387,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	/**
 	 * How grouping combines the open Y values; see `valueYGrouped`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping} for more info
 	 * @default "open"
 	 */
 	openValueYGrouped?: "open" | "close" | "low" | "high" | "average" | "sum" | "extreme";
@@ -397,28 +397,28 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	/**
 	 * Data field with the low X value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	lowValueXField?: string;
 
 	/**
 	 * Data field with the low Y value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	lowValueYField?: string;
 
 	/**
 	 * Data field with the high X value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	highValueXField?: string;
 
 	/**
 	 * Data field with the high Y value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
 	 */
 	highValueYField?: string;
 
@@ -510,14 +510,14 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	/**
 	 * Data field with the X category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	categoryXField?: string;
 
 	/**
 	 * Data field with the Y category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	categoryYField?: string;
 
@@ -525,7 +525,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Data field with the X category a column starts at, so that it can span
 	 * several categories.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	openCategoryXField?: string;
 
@@ -533,7 +533,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Data field with the Y category a column starts at, so that it can span
 	 * several categories.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Data_fields} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#data-fields} for more info
 	 */
 	openCategoryYField?: string;
 
@@ -559,7 +559,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Data_item_location} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/line-series/#data-item-location} for more info
 	 * @default 0.5
 	 */
 	locationX?: number;
@@ -569,7 +569,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 *
 	 * `0` - beginning, `0.5` - middle, `1` - end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Data_item_location} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/line-series/#data-item-location} for more info
 	 * @default 0.5
 	 */
 	locationY?: number;
@@ -666,7 +666,7 @@ export interface IXYSeriesSettings extends ISeriesSettings {
 	 * Function called for each grouped data item once it is complete, to set
 	 * values of your own. Its `originals` hold the source data items.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Custom_aggregation_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#custom-aggregation-functions} for more info
 	 * @since 5.1.11
 	 */
 	groupDataCallback?: (dataItem: DataItem<IXYSeriesDataItem>, interval: ITimeInterval) => void;
@@ -840,7 +840,7 @@ export interface IXYSeriesPrivate extends ISeriesPrivate {
 /**
  * Base class for all XY chart series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/} for more info
  */
 export abstract class XYSeries extends Series {
 	public static className: string = "XYSeries";
@@ -892,7 +892,7 @@ export abstract class XYSeries extends Series {
 	/**
 	 * Axis ranges of the series, added with `createAxisRange()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 */
 	public readonly axisRanges: List<this["_axisRangeType"]> = new List();
 
@@ -2503,7 +2503,7 @@ export abstract class XYSeries extends Series {
 	 * Adds an axis range to the series and returns it. Make its data item
 	 * with the axis's `makeDataItem()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-ranges/} for more info
 	 * @param   axisDataItem  Axis data item
 	 * @return                Axis range
 	 */

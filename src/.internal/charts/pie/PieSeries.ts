@@ -74,7 +74,7 @@ export interface IPieSeriesPrivate extends IPercentSeriesPrivate {
  * A series of pie slices for a [[PieChart]]. With `alignLabels: false`, the
  * labels sit around the pie next to their slices instead of in two columns.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/} for more info
  * @important
  */
 export class PieSeries extends PercentSeries {

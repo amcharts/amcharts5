@@ -43,7 +43,7 @@ export interface IMovingAverageEvents extends IIndicatorEvents {
  * Moving Average indicator: a line over the main series, averaging `field`
  * over the last `period` data items.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class MovingAverage extends Indicator {
 	public static className: string = "MovingAverage";

@@ -86,7 +86,7 @@ export interface IPartitionPrivate extends IHierarchyPrivate {
  * when horizontal), and each node spans as much of it as its value. A click
  * on a node zooms into it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/partition/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/partition/} for more info
  */
 export class Partition extends Hierarchy {
 

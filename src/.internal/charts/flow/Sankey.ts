@@ -93,7 +93,7 @@ export interface ISankeyEvents extends IFlowEvents {
  * Sankey diagram: nodes in columns, linked by bands as wide as the values
  * they carry.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/} for more information
  * @important
  */
 export class Sankey extends Flow {

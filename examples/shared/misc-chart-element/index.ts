@@ -8,7 +8,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 // With npm, the chart types a config uses are loaded when it is built. With
 // script tags their files have to be on the page first, after plugins/json.js
 // and element.js: here, percent.js.
-// https://www.amcharts.com/docs/v5/concepts/serializing/
+// https://docs.amcharts.com/v5/concepts/serializing/
 const element = document.createElement("am5-chart");
 
 

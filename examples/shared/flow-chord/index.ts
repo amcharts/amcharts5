@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/flow-charts/
+// https://docs.amcharts.com/v5/charts/flow-charts/
 const series = root.container.children.push(am5flow.Chord.new(root, {
   sourceIdField: "source",
   targetIdField: "target",
@@ -27,7 +27,7 @@ series.nodes.get("colors")!.set("step", 2);
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
+// https://docs.amcharts.com/v5/charts/flow-charts/#setting-data
 // each row is a flow from source to target; a node's arc is as long as all it sends, and the
 // ribbon between two nodes is as wide at each end as what that node sends to the other
 series.data.setAll([
@@ -59,5 +59,5 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

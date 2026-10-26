@@ -6,7 +6,7 @@ export interface IGridSettings extends IGraphicsSettings {
 	 * Where the grid line sits within its cell, from `0` (start) to `1` (end).
 	 * A cell is a category, a date period, or the span of an axis range.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Location_of_axis_elements} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#location-of-axis-elements} for more info
 	 * @default 0
 	 */
 	location?: number;
@@ -19,7 +19,7 @@ export interface IGridPrivate extends IGraphicsPrivate {
 /**
  * A grid line of an axis, drawn across the plot area.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Grid} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#grid} for more info
  * @important
  */
 export class Grid extends Graphics {

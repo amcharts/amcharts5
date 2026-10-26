@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.21.5] - 2026-10-26
+
+### Added
+- `am5.renderToSVG()`: new `includeNonExportable` option also writes elements marked `exportable: false`, such as scrollbar grips.
+
+### Changed
+- `am5.renderToSVG()`: SVG that design tools such as Figma read correctly. Fonts are attributes with sizes in pixels, text is placed without `dominant-baseline`, patterns are drawn as shapes, and layers are named after series, data items, axes and the legend.
+- JSON: theme colors in data, e.g. a column's `fill` from a `templateField`, are now saved as references (`"@colors.getIndex(n)"`, `"@root.interfaceColors.get(...)"`) like in settings, so they follow the theme.
+- JSON: colors a color set makes after its theme's list runs out are saved as references too.
+- Documentation links in the typings, README and examples now go to the new docs site, docs.amcharts.com.
+
+### Fixed
+- `ColorSet`: when color sets of one chart made more colors than their theme's list has, a set could repeat colors another had already made instead of going on to new ones.
+- JSON: with `am5themes_Adaptive`, the palette's first color was saved as the primary button color, so with another theme it took that theme's button color.
+- npm: esbuild dropped `import "@amcharts/amcharts5/element"`, so `<am5-chart>` was never defined in apps it bundles.
+
+
 ## [5.21.4] - 2026-10-23
 
 ### Added
@@ -70,23 +87,23 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.21.0] - 2026-10-08
 
 ### Added
-- Charts can be drawn as SVG instead of canvas: set `renderer: am5.SVGRenderer` in `Root.new()` settings, or `am5.Root.defaultRenderer = am5.SVGRenderer` for every chart on the page. Canvas stays the default. Blend modes `DST_OVER`, `SRC_ATOP` and `XOR` are canvas-only. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#renderer)
-- `am5.renderToSVG(root)`: a chart as an SVG document, whichever renderer draws it. Pass an element instead (e.g. `series.pixels`) to export just that element. Fully transparent elements are left out. Screen readers read it as one image, titled by the chart's `ariaLabel` or the `title` option. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/exporting-svg/)
-- `am5map.MapRasterSeries`: a whole-world image, such as a satellite photo, reprojected as the map rotates and zooms (WebGL where available). With `nightSrc` and `sunDate` or `sunPosition` it shows day and night; `am5map.getSunPosition(date)` finds where the sun is overhead. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-raster-series/)
-- `am5map.NightSeries`: shades the part of a map where it is night, with twilight in steps, and shows the sun. Set `sunDate` (e.g. `"now"`) or `sunPosition`; `sunAltitude` keeps the sun in view past a globe's edge. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/night-series/)
-- `am5map.PixelMapSeries`: map polygons drawn as a grid of pixels (squares, circles, diamonds or hexagons) that rotate and zoom with the map, with heat rules, states and tooltips as in `MapPolygonSeries`. `uniform: true` gives an even grid, `columnHeight` raises pixels into 3D columns. Pixels take their polygon's `stroke` when `strokeWidth` is set, and in SVG export each polygon's pixels are a group with its `id` and name. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/pixel-map-series/)
-- Map lines and points can float above the ground: `altitude` on a `MapLine` raises each leg, from one point to the next, into an arc, and `altitudeField` on a `MapPointSeries` raises points by a data value, in metres. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/#Altitude)
-- `MapPointSeries`: new `surfaceBullets` setting lays bullets onto the map's surface, so they turn and stretch with the projection. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/#Surface_bullets)
-- `MapChart`: new `autoHome` setting sends the map to its home position once it loads, so a map loaded from JSON can start at home without calling `goHome()`. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Initial_position_and_zoom)
-- `MapPolygonSeries`: new `clickZoom` setting zooms the map to a clicked polygon (a globe also turns to it); clicking it again or the background goes back home. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object)
-- `<am5-chart>`: a chart as an HTML element, built from a JSON config (`config` or `src`), with `themes` and `renderer="svg"`. Load `element.js` after `plugins/json.js`, or `import "@amcharts/amcharts5/element"`. [More info](https://www.amcharts.com/docs/v5/getting-started/integrations/am5-chart-element/)
-- Charts follow Windows High Contrast (forced colors): labels, grid, axes and buttons take the system colors, so they stay visible; series colors are kept. `Root` setting `forcedColors: false` turns it off. [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#High_contrast_mode)
-- New `autoAppear` setting (with `appearDuration` and `appearDelay`): an element plays its `appear()` animation when first drawn, so a JSON config can have the opening animation too. A series waits for its first data. [More info](https://www.amcharts.com/docs/v5/concepts/animations/#Automatic_appearance)
+- Charts can be drawn as SVG instead of canvas: set `renderer: am5.SVGRenderer` in `Root.new()` settings, or `am5.Root.defaultRenderer = am5.SVGRenderer` for every chart on the page. Canvas stays the default. Blend modes `DST_OVER`, `SRC_ATOP` and `XOR` are canvas-only. [More info](https://docs.amcharts.com/v5/getting-started/root-element/#renderer)
+- `am5.renderToSVG(root)`: a chart as an SVG document, whichever renderer draws it. Pass an element instead (e.g. `series.pixels`) to export just that element. Fully transparent elements are left out. Screen readers read it as one image, titled by the chart's `ariaLabel` or the `title` option. [More info](https://docs.amcharts.com/v5/concepts/exporting/exporting-svg/)
+- `am5map.MapRasterSeries`: a whole-world image, such as a satellite photo, reprojected as the map rotates and zooms (WebGL where available). With `nightSrc` and `sunDate` or `sunPosition` it shows day and night; `am5map.getSunPosition(date)` finds where the sun is overhead. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-raster-series/)
+- `am5map.NightSeries`: shades the part of a map where it is night, with twilight in steps, and shows the sun. Set `sunDate` (e.g. `"now"`) or `sunPosition`; `sunAltitude` keeps the sun in view past a globe's edge. [More info](https://docs.amcharts.com/v5/charts/map-chart/night-series/)
+- `am5map.PixelMapSeries`: map polygons drawn as a grid of pixels (squares, circles, diamonds or hexagons) that rotate and zoom with the map, with heat rules, states and tooltips as in `MapPolygonSeries`. `uniform: true` gives an even grid, `columnHeight` raises pixels into 3D columns. Pixels take their polygon's `stroke` when `strokeWidth` is set, and in SVG export each polygon's pixels are a group with its `id` and name. [More info](https://docs.amcharts.com/v5/charts/map-chart/pixel-map-series/)
+- Map lines and points can float above the ground: `altitude` on a `MapLine` raises each leg, from one point to the next, into an arc, and `altitudeField` on a `MapPointSeries` raises points by a data value, in metres. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-line-series/#altitude)
+- `MapPointSeries`: new `surfaceBullets` setting lays bullets onto the map's surface, so they turn and stretch with the projection. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-point-series/#surface-bullets)
+- `MapChart`: new `autoHome` setting sends the map to its home position once it loads, so a map loaded from JSON can start at home without calling `goHome()`. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#initial-position-and-zoom)
+- `MapPolygonSeries`: new `clickZoom` setting zooms the map to a clicked polygon (a globe also turns to it); clicking it again or the background goes back home. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#zooming-to-clicked-object)
+- `<am5-chart>`: a chart as an HTML element, built from a JSON config (`config` or `src`), with `themes` and `renderer="svg"`. Load `element.js` after `plugins/json.js`, or `import "@amcharts/amcharts5/element"`. [More info](https://docs.amcharts.com/v5/getting-started/integrations/am5-chart-element/)
+- Charts follow Windows High Contrast (forced colors): labels, grid, axes and buttons take the system colors, so they stay visible; series colors are kept. `Root` setting `forcedColors: false` turns it off. [More info](https://docs.amcharts.com/v5/concepts/accessibility/#high-contrast-mode)
+- New `autoAppear` setting (with `appearDuration` and `appearDelay`): an element plays its `appear()` animation when first drawn, so a JSON config can have the opening animation too. A series waits for its first data. [More info](https://docs.amcharts.com/v5/concepts/animations/#automatic-appearance)
 - The examples were rewritten: each is one `index.html`, 61 also come as a JSON config, and `examples/index.html` is a gallery showing each chart above its source, on canvas or as SVG. In the npm package they are plain sources (`examples/<name>/index.ts`). Comments in the code explain most settings.
-- The npm package and the download now include `AGENTS.md` and a `docs/` folder with a reference for every chart type, for AI coding agents. [More info](https://www.amcharts.com/docs/v5/ai/)
+- The npm package and the download now include `AGENTS.md` and a `docs/` folder with a reference for every chart type, for AI coding agents. [More info](https://docs.amcharts.com/v5/ai/)
 - New locale prompts, translated in all locales: "OK", "Cancel", "Delete", "Settings", "Expand", "Move Up", "Move Down".
-- `Scrollbar`: new `outsideAxes` setting puts a chart's scrollbar beyond its axes (`true`) or between them and the plot (`false`), on any side. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/#Inside_or_outside_the_axes)
-- `ChartSerializer`/`JsonParser`: a colour taken from `root.interfaceColors` is saved as a reference (`"@root.interfaceColors.get('background')"`), so a chart parsed with another theme uses that theme's colour. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/chart-serializer/#Theme_colors)
+- `Scrollbar`: new `outsideAxes` setting puts a chart's scrollbar beyond its axes (`true`) or between them and the plot (`false`), on any side. [More info](https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/#inside-or-outside-the-axes)
+- `ChartSerializer`/`JsonParser`: a colour taken from `root.interfaceColors` is saved as a reference (`"@root.interfaceColors.get('background')"`), so a chart parsed with another theme uses that theme's colour. [More info](https://docs.amcharts.com/v5/concepts/serializing/chart-serializer/#theme-colors)
 
 ### Changed
 - Responsive theme: minor axis labels are hidden only on charts 600 px or smaller (was 1000 px), so a chart that turns them on shows them.
@@ -323,11 +340,11 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.20.0] - 2026-07-22
 
 ### Added
-- New `StarPattern` and `TrianglePattern` fill patterns added. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/)
+- New `StarPattern` and `TrianglePattern` fill patterns added. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/)
 - `RectanglePattern` now supports a `rotateShapes` setting. When `true`, `rotation` rotates each rectangle around its own center instead of the whole grid which makes it faster.
 - New themes: `Midnight`, `Ember`, `Nord`, `NordDark`, `Pastel`, `PastelDark`, `Colorblind`, `ColorblindDark` (Okabe-Ito, color-blindness safe), `Patterns`, `PatternsDark`, `Petroleum`, `Savanna`.
 - New dark variants of the existing themes: `DatavizDark`, `KellyDark`, `MaterialDark`, `MoonriseDark`, `SpiritedDark`, `FrozenDark`.
-- Two new parameterized themes : `Monochrome` (a single-hue lightness ramp with an optional `accent`) and `Adaptive` (generates a full palette from one or two base colors). [More info](https://www.amcharts.com/docs/v5/concepts/themes/)
+- Two new parameterized themes : `Monochrome` (a single-hue lightness ramp with an optional `accent`) and `Adaptive` (generates a full palette from one or two base colors). [More info](https://docs.amcharts.com/v5/concepts/themes/)
 - `XYChart` has new `strokeWidths` and `strokeDasharrays` settings — arrays cycled across line series as they are added, the same way `colors` cycles series colors.
 - `XYCursor` has a new `clickTolerance` setting: how far outside the plot area (in pixels) a press can start and still begin a zoom/selection (the selection still starts on the plot edge). Default: `0` (current behavior).
 - New `globalpointerdown` event on all elements, fired on a press anywhere on the chart surface (mirrors `globalpointermove`/`globalpointerup`).
@@ -336,7 +353,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - The Volume Profile indicator now distributes each bar's volume across the full high/low price range it traded, instead of placing the whole bar at its closing price.
 - `Label`'s `oversizedBehavior: "truncate"` now ignores `maxHeight` setting (because there's no way to truncate text vertically).
 - Stock chart indicators now enforce sensible min/max limits on their numeric settings, so extreme values can no longer freeze the page (e.g. a Volume Profile row count of 24000) or break an indicator. `IIndicatorEditableSetting` gains `maxValue` and `step`.
-- New properties on Indicator editable settings: `scale`, `maxValue`, `step`. [More info](https://www.amcharts.com/docs/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#Setting_up_the_modal)
+- New properties on Indicator editable settings: `scale`, `maxValue`, `step`. [More info](https://docs.amcharts.com/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#setting-up-the-modal)
 - Acceleration Bands' `factor` now displays as the conventional `1` instead of `0.001`.
 - If a bullet's `Graphics` has no paint settings set (`fill`, `fillGradient`, `fillPattern`, `stroke`, `strokeGradient`) it will inherit all those from parent series.
 - New `Series` settings: `fillGradient`/`strokeGradient`.
@@ -404,7 +421,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - `fitNodes` (default: `false`) setting added to `Tree` chart. If set to `true`, hidden nodes will excluded from the layout, giving more space for visible ones.
 
 ### Changed
-- `pdfmake` dependency updated to `^0.3.9`. For those using only amCharts Exporting API, nothing changes. Only if you are accessing pdfmake object directly, there are some breaking API changes. [More info](https://www.amcharts.com/docs/v5/tutorials/pdfmake-upgrade-notice-02-03/).
+- `pdfmake` dependency updated to `^0.3.9`. For those using only amCharts Exporting API, nothing changes. Only if you are accessing pdfmake object directly, there are some breaking API changes. [More info](https://docs.amcharts.com/v5/tutorials/pdfmake-upgrade-notice-02-03/).
 - Renamed `type` setting to `maType` on moving average indicators (`MovingAverage`, `MovingAverageDeviation`, `MovingAverageEnvelope`, `BollingerBands`). (setting `type` will work as well, but it's deprecated)
 - Renamed `type` setting to `shapeType` on `VoronoiTreemap`. (setting `type` will work as well, but it's deprecated)
 
@@ -443,7 +460,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.17.0] - 2026-04-06
 
 ### Added
-- `MapSankeySeries` added. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-sankey-series/)
+- `MapSankeySeries` added. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-sankey-series/)
 
 ### Fixed
 - Added safeguards to avoid floating point errors when animating values.
@@ -532,8 +549,8 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Added
 - `updateData(data)` method added to `Component`. Updates existing data in the component without disposing old data items. If there are more data items than before, new ones will be created. If there are less, old ones will be removed.
-- New class in JSON plugin: `ChartSerializer`. Allows serializing whole chart objects into a JSON. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/chart-serializer/).
-- New functionality in JSON parser: states, adapters, `templateField`, axis bullets, axis ranges. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/).
+- New class in JSON plugin: `ChartSerializer`. Allows serializing whole chart objects into a JSON. [More info](https://docs.amcharts.com/v5/concepts/serializing/chart-serializer/).
+- New functionality in JSON parser: states, adapters, `templateField`, axis bullets, axis ranges. [More info](https://docs.amcharts.com/v5/concepts/serializing/).
 
 ### Changed
 - Stock indicators now use `updateData()` method which makes them work much faster when data is added or updated.
@@ -589,7 +606,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.14.1] - 2025-09-30
 
 ### Added
-- `editButton` added to `Gantt` chart. The button is hidden by default. Unhide to enable users toggle between edit and read-only modes. [More info](https://www.amcharts.com/docs/v5/charts/gantt/#Control_buttons).
+- `editButton` added to `Gantt` chart. The button is hidden by default. Unhide to enable users toggle between edit and read-only modes. [More info](https://docs.amcharts.com/v5/charts/gantt/#control-buttons).
 
 ### Fixed
 - Links were active in read-only mode (`editable: false`) of `Gantt` chart.
@@ -599,11 +616,11 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.14.0] - 2025-09-30
 
 ### Added
-- New chart type: `Gantt`. [More info](https://www.amcharts.com/docs/v5/charts/gantt/).
+- New chart type: `Gantt`. [More info](https://docs.amcharts.com/v5/charts/gantt/).
 - Two new settings added to `HeatLegend`: `startOpacity` (default: `1`) and `endOpacity` (default: `1`).
 - New plugin: `colorPicker`.
-- New method to add debounced events: `events.onDebounced()`. [More info](https://www.amcharts.com/docs/v5/concepts/events/#Debounced_events).
-- New setting added to `ColumnSeries`: `turboMode` (default: `false`). If set to `true`, the series will render columns directly on canvas, speeding up column-heavy charts. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Turbo_mode).
+- New method to add debounced events: `events.onDebounced()`. [More info](https://docs.amcharts.com/v5/concepts/events/#debounced-events).
+- New setting added to `ColumnSeries`: `turboMode` (default: `false`). If set to `true`, the series will render columns directly on canvas, speeding up column-heavy charts. [More info](https://docs.amcharts.com/v5/charts/xy-chart/series/column-series/#turbo-mode).
 - New setting added to `DateAxis`: `skipFirstMinor` (default: `true`). If set to `true`, the axis will skip the first minor grid line and label.
 - New setting added to `DateAxis`: `weekLabelLocation` (default: `true`). A relative location of weekly labels.
 - New setting added to `Axis`: `minorAxisFillsEnabled` (default: `true`).
@@ -667,7 +684,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.13.2] - 2025-06-06
 
 ### Added
-- Event added to `SettingsModal`: `initstarted`. Use it to modify settings contents. [More info](https://www.amcharts.com/docs/v5/tutorials/modifying-series-indicator-settings-modal/).
+- Event added to `SettingsModal`: `initstarted`. Use it to modify settings contents. [More info](https://docs.amcharts.com/v5/tutorials/modifying-series-indicator-settings-modal/).
 
 ### Changed
 - `StockChart`'s "Label" and "Callout" drawings now are draggable/selectable right after creation without the select tool.
@@ -731,7 +748,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.12.0] - 2025-04-12
 
 ### Added
-- Timeline chart type family added: `CurveChart`, `SerpentineChart`, `SpiralChart`. [More info](https://www.amcharts.com/docs/v5/charts/timeline/).
+- Timeline chart type family added: `CurveChart`, `SerpentineChart`, `SpiralChart`. [More info](https://docs.amcharts.com/v5/charts/timeline/).
 
 ### Changed
 - Using `swap()` method on a `ListDispose` will not longer auto-dispose items being swapped, even if `autoDispose = true`.
@@ -743,7 +760,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.11.3] - 2025-04-09
 
 ### Added
-- A "text" field type support added to custom Indicator's `_editableSettings`. [More info](https://www.amcharts.com/docs/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#Editable_settings).
+- A "text" field type support added to custom Indicator's `_editableSettings`. [More info](https://docs.amcharts.com/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#editable-settings).
 
 ### Fixed
 - `"frameended"` event would trigger indefinitely when a `Sprite` with `tooltipPosition: "pointer"` was being hovered, even if cursor was not moving.
@@ -935,7 +952,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - `panSensitivity` added to `AxisRenderer` (default: `1`).
 - `maxPanOut` added to `ZoomableContainer` (default: `0.4`).
-- Method `addLine(tool, panel, point)` added `DrawingControl`. Allows adding line drawings via API. Supports (`"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"` tools). [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Adding_line_drawings).
+- Method `addLine(tool, panel, point)` added `DrawingControl`. Allows adding line drawings via API. Supports (`"Horizontal Line"`, `"Horizontal Ray"`, `"Vertical Line"` tools). [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/#adding-line-drawings).
 
 ### Fixed
 - Fast mouse wheel zooming of stock chart could cause browser to hang in some cases.
@@ -962,8 +979,8 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Added
 - A second parameter (`dataContext`) added to `Component`'s methods `pushDataItem` and `makeDataItem`, allowing to pass in a data context object related to the data item.
-- New class `PatternSet` added. Allows serving patterns similarly to `ColorSet`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets).
-- New setting `patterns` added to `Hierarchy`, `PercentSeries`, `Venn`, `SerialChart`, `FlowNodes`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets).
+- New class `PatternSet` added. Allows serving patterns similarly to `ColorSet`. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets).
+- New setting `patterns` added to `Hierarchy`, `PercentSeries`, `Venn`, `SerialChart`, `FlowNodes`. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets).
 - New setting `fillPattern` added to `IFlowNodesDataItem`, `IHierarchyDataItem`, `IPercentSeriesDataItem`, `IVennDataItem`, `ISeriesSettings`.
 
 ### Fixed
@@ -1095,7 +1112,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.9.3] - 2024-04-23
 
 ### Added
-- Added possibility to add bullets to links in a linked hierarchy charts, like Force-directed and Tree. [More info](https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-link-bullets/).
+- Added possibility to add bullets to links in a linked hierarchy charts, like Force-directed and Tree. [More info](https://docs.amcharts.com/v5/charts/hierarchy/hierarchy-link-bullets/).
 - New `IndicatorControl` method: `clearIndicators()`. Allows clearing all indicators from the chart at once.
 
 ### Changed
@@ -1121,8 +1138,8 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - Accessibility: New `Label` method: `getAccessibleText()`. Returns populated `arialLabel` text if set, or regular `text` content.
 - New `Sprite` method: `compositeScale()`. Returns actual scale of an element, compounded based on scale of its own and all of its ancestors.
 - Net global function `am5.getRootById(id)`. Returns `Root` instance stored in a `<div>` with specific id.
-- 4 new `StockPanel` events added: `moved`, `closed`, `collapsed`, and `expanded`. [More details](https://www.amcharts.com/docs/v5/charts/stock/panels/#Events).
-- 2 new `Entity` methods added: `off(key, callback?)` and `offPrivate(key, callback?)`. Allows removing setting/private setting value change events set via `on()`/`onPrivate()`. [More details](https://www.amcharts.com/docs/v5/concepts/events/#Removing).
+- 4 new `StockPanel` events added: `moved`, `closed`, `collapsed`, and `expanded`. [More details](https://docs.amcharts.com/v5/charts/stock/panels/#events).
+- 2 new `Entity` methods added: `off(key, callback?)` and `offPrivate(key, callback?)`. Allows removing setting/private setting value change events set via `on()`/`onPrivate()`. [More details](https://docs.amcharts.com/v5/concepts/events/#removing).
 - New `StockChart` setting: `erasingEnabled`. If set to `true`, the chart will go into "eraser" mode - same as clicking on an Eraser tool in stock toolbar.
 
 ### Changed
@@ -1274,7 +1291,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.8.0] - 2024-02-01
 
 ### Added
-- New container type `ZoomableContainer` added, which allows adding zoom capabilities to virtually any chart. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Zoomable_container).
+- New container type `ZoomableContainer` added, which allows adding zoom capabilities to virtually any chart. [More info](https://docs.amcharts.com/v5/concepts/common-elements/containers/#zoomable-container).
 - New class `ZoomTools` added. Can be used to quickly add zoom support for elements compatible with `IZoomable` interface, e.g. `ZoomableContainer`.
 - New read-only property of `DrawingControl`: `drawingSeries`. Contains an object where key is a drawing tool name and values are array with references to actual drawing series.
 
@@ -1302,7 +1319,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.7.7] - 2024-01-18
 
 ### Added
-- New setting in `StockToolbar`: `focusable` (default: `false`). If set to `true`, will make all toolbar controls navigable/editable using keyboard. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/#Accessibility).
+- New setting in `StockToolbar`: `focusable` (default: `false`). If set to `true`, will make all toolbar controls navigable/editable using keyboard. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/#accessibility).
 
 ### Changed
 - `ariaChecked` setting will be ignored if the element also has `role` set to one of these: `"checkbox"`, `"option"`, `"radio"`, `"menuitemcheckbox"`, `"menuitemradio"`, `"treeitem"`.
@@ -1326,7 +1343,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.7.5] - 2024-01-04
 
 ### Added
-- New `Annotator` setting: `markerStyleSettings`. Allows setting default settings for UI styles of `MarkerArea`. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/annotator/#Configuring_UI).
+- New `Annotator` setting: `markerStyleSettings`. Allows setting default settings for UI styles of `MarkerArea`. [More info](https://docs.amcharts.com/v5/concepts/exporting/annotator/#configuring-ui).
 - "Moving Average Cross" (MACross) and "Price Volume Trend" (PVT) indicators added to `StockChart`.
 - `ZoomControl` now has a new property: `homeButton`. It holds an instance of a button which zooms out the map to its initial position. It is hidden by default, so if needed, needs to unhide it by setting `zoomControl.homeButton.set("visible", true)`.
 
@@ -1340,7 +1357,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.7.4] - 2024-01-02
 
 ### Added
-- New `Annotator` setting: `markerSettings`. Allows setting default settings for `MarkerArea`. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/annotator/#Configuring_UI).
+- New `Annotator` setting: `markerSettings`. Allows setting default settings for `MarkerArea`. [More info](https://docs.amcharts.com/v5/concepts/exporting/annotator/#configuring-ui).
 
 ### Changed
 - Heat rules are now set on the default state of a target, too.
@@ -1390,7 +1407,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Added
 - New `Serializer` setting: `fullSettings`. Will ignore depth settings for keys listed in `fullSettings`.
-- New `StockAxis` toolbar control: `DataSaveControl`. Allows to automatically or manually save all drawings and indicators to browser's local storage, as well as restore them across sessions. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/data-save-control/).
+- New `StockAxis` toolbar control: `DataSaveControl`. Allows to automatically or manually save all drawings and indicators to browser's local storage, as well as restore them across sessions. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/data-save-control/).
 - Added additional item in `SettingsControl`: Auto-save drawings and indicators.
 - New setting in `SettingsControl`: `autoSave`. Enables user to toggle auto-saving of indicators/drawings via Settings dropdown.
 - New setting in `DropdownList` and `DropdownListControl`: `exclude`. Can be set to an array of item IDs that should not appear in the list. Can be used to disable default list items.
@@ -1443,12 +1460,12 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.6.0] - 2023-11-26
 
 ### Added
-- `addBullet(dataItem, bullet)` method added to `Series`. Allows adding a `Bullet` directly to a particular data item instead of adding bullet function to the series. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Adding_directly_to_data_item).
-- `stacked` (available values: `"up"`, `"down"`,  `"auto"`) setting added to `Bullet`. Allows enabling of automatically stacking bullets on an `XYSeries`. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#Stacked_bullets).
-- `field` (available values: `"open"`, `"high"`, `"low"`, `"value"`) setting added to `Bullet`. Works with `XYSeries` only. Allows setting a particular data field where the bullet should displayed at. Note: `locationX``locationY` settings will be ignored if `field` is set. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/#By_data_field).
+- `addBullet(dataItem, bullet)` method added to `Series`. Allows adding a `Bullet` directly to a particular data item instead of adding bullet function to the series. [More info](https://docs.amcharts.com/v5/concepts/common-elements/bullets/#adding-directly-to-data-item).
+- `stacked` (available values: `"up"`, `"down"`,  `"auto"`) setting added to `Bullet`. Allows enabling of automatically stacking bullets on an `XYSeries`. [More info](https://docs.amcharts.com/v5/concepts/common-elements/bullets/#stacked-bullets).
+- `field` (available values: `"open"`, `"high"`, `"low"`, `"value"`) setting added to `Bullet`. Works with `XYSeries` only. Allows setting a particular data field where the bullet should displayed at. Note: `locationX``locationY` settings will be ignored if `field` is set. [More info](https://docs.amcharts.com/v5/concepts/common-elements/bullets/#by-data-field).
 - New `Root` element setting: `focusPadding` (default: `2`). Allows specifying distance between focused element and the focus outline.
-- Minor grid/labels added on `AxisRenderer` with new settings `minorGridEnabled` and `minorLabelsEnabled` (default: `false`). [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Minor_grid).
-- New setting `minorDateFormats` added to `DateAxis`. Allows setting different formats for minor grid labels. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Minor_grid_formats).
+- Minor grid/labels added on `AxisRenderer` with new settings `minorGridEnabled` and `minorLabelsEnabled` (default: `false`). [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/#minor-grid).
+- New setting `minorDateFormats` added to `DateAxis`. Allows setting different formats for minor grid labels. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#minor-grid-formats).
 
 ### Changed
 - When `DateAxis` is in weekly grid mode, it will now use `multiLocation` for labels instead of `location`.
@@ -1464,7 +1481,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.5.7] - 2023-11-17
 
 ### Added
-- Two new settings on a `ClusteredPointSeries`: `scatterDistance` and `scatterRadius`. Allow exploding clusters of very close points when further zoom-in is no longer possible. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Scatter_settings).
+- Two new settings on a `ClusteredPointSeries`: `scatterDistance` and `scatterRadius`. Allow exploding clusters of very close points when further zoom-in is no longer possible. [More info](https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#scatter-settings).
 
 ### Fixed
 - `PieSeries` was not issuing proper colors for its slices with some JSON config setups.
@@ -1478,7 +1495,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ### Added
 - Each `<canvas>` element in chart will now have its `class` set to reflect its layer/order, so it can be targeted with CSS. E.g. `am5-layer-0`.
-- `ClusteredPointSeries` added. Allows automatically clustering closely-located bullets into groups. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/).
+- `ClusteredPointSeries` added. Allows automatically clustering closely-located bullets into groups. [More info](https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/).
 - `zoomToDataItems()` method added to `MapPointSeries`. Can be used to zoom to a number of series data items so all of them are visible.
 
 ### Fixed
@@ -1512,7 +1529,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ### Added
 - New indicator "Stochastic Momentum Index" added.
 - All `StockChart` indicators with OverBought/Oversold ranges (Commodity Channel Index, Relative Strength Index, Stochastic Momentum Index, Stochastic Oscilator and Williams R) have now middle line between oversold/overbought. Also a draggable grip added to oversold/overbought ranges which allows user to change values by dragging these grips.
-- New `StockChart` toolbar control: `DropdownControl`. Can use to add any content to be displayed in a dropdown when clicked. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-control/).
+- New `StockChart` toolbar control: `DropdownControl`. Can use to add any content to be displayed in a dropdown when clicked. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/dropdown-control/).
 
 ### Changed
 - Changed defaults on a `StockPanel`: `wheelY: "zoomX"`, `panX: true`, `panY: true`. Previously, those were hardcoded in `ChartIndicator`, which prevented a possibility to change them via a theme.
@@ -1536,7 +1553,7 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 - While drawing polygon in a `StockChart`, a line is drawn from the previous point to mouse pointer.
 - New setting `scrollable` (default: `false`) added to `StockChart`'s `DropdownList` and `DropdownListControl` (as well as other controls that extend those, e.g. `ComparisonControl`). If set to `true`, will automatically limit dropdown height to fit into chart, and will show scrollbar if the contents do not fit.
 - Measure tool added to `StockChart` (as a drawing item).
-- `toolSettings` setting added to `DrawingControl`. Allows passing in default settings for each drawing tool. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings).
+- `toolSettings` setting added to `DrawingControl`. Allows passing in default settings for each drawing tool. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/#tool-settings).
 
 ### Changed
 - Printing via `ExportingMenu` print functionality using "CSS" print method will now temporarily remove all margins and padding on `body` so that images that do not fit into single page do not produce a blank page.
@@ -1568,10 +1585,10 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [5.5.0] - 2023-10-17
 
 ### Added
-- `zoomTo` (values: `"start"` and `"end"` (default)) added to `PeriodSelector`. If set to `"start"`, period buttons will selectg from the start of the data, not from the end. `"YTD"` will still select to the end. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/#Zoom_anchor_point).
-- `PeriodSelector` now supports `"custom"` periods. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/period-selector/#Custom_periods).
-- New filter settings added to `Sprite`: `blur`, `brightness`, `contrast`, `saturate`, `sepia`, `invert`, `hue`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/#Built_in_filters). **These filters are not supported by Safari browsers.**
-- New `GrainPattern` added. Allows adding grainniness effect to any element. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Grain_patterns).
+- `zoomTo` (values: `"start"` and `"end"` (default)) added to `PeriodSelector`. If set to `"start"`, period buttons will selectg from the start of the data, not from the end. `"YTD"` will still select to the end. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/period-selector/#zoom-anchor-point).
+- `PeriodSelector` now supports `"custom"` periods. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/period-selector/#custom-periods).
+- New filter settings added to `Sprite`: `blur`, `brightness`, `contrast`, `saturate`, `sepia`, `invert`, `hue`. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/#built-in-filters). **These filters are not supported by Safari browsers.**
+- New `GrainPattern` added. Allows adding grainniness effect to any element. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#grain-patterns).
 - New private setting `trustBounds` added to `Sprite`. If set to `true`, the Sprite will check if a mouse pointer is within bounds of a Sprite before dispatching its pointer events. This helps to solve ghost tooltips problem which sometimes appears while moving the pointer over interactive objects. It is set to `true` by default on `Rectangle` and `Circle`.
 
 ### Changed
@@ -1655,7 +1672,7 @@ patterns with gradient fills.
 ## [5.4.5] - 2023-08-26
 
 ### Added
-- New method `addChildData()` added to `Hierarchy`. [More info](https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-api/#Dynamically_adding_child_nodes).
+- New method `addChildData()` added to `Hierarchy`. [More info](https://docs.amcharts.com/v5/charts/hierarchy/hierarchy-api/#dynamically-adding-child-nodes).
 
 ### Fixed
 - Vertical wheel-scrolling is no longer prevented if `wheelY: "none"` is set, regardless of the `wheelX` setting.
@@ -1701,12 +1718,12 @@ patterns with gradient fills.
 ## [5.4.1] - 2023-07-18
 
 ### Added
-- All Flow (Sankey, Chord and Arc) nodes can be toggled (on by default). [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).
-- New `Flow` settings added: `hiddenSize` and `minHiddenValue`. [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).
+- All Flow (Sankey, Chord and Arc) nodes can be toggled (on by default). [More info](https://docs.amcharts.com/v5/charts/flow-charts/#node-toggling).
+- New `Flow` settings added: `hiddenSize` and `minHiddenValue`. [More info](https://docs.amcharts.com/v5/charts/flow-charts/#node-toggling).
 - Deviation added to editable `BolingerBand` settings (`StockChart`).
 
 ### Changed
-- `Chord`'s default value of `"sort"` changed from `"descending"` to `"none"`.  This change was necessary for the new feature of [toggling nodes](https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling).
+- `Chord`'s default value of `"sort"` changed from `"descending"` to `"none"`.  This change was necessary for the new feature of [toggling nodes](https://docs.amcharts.com/v5/charts/flow-charts/#node-toggling).
 
 ### Fixed
 - `Label` with wrapping/truncation, containing only symbols like question mark could make the whole chart break in a dead loop.
@@ -1717,8 +1734,8 @@ patterns with gradient fills.
 ## [5.4.0] - 2023-07-04
 
 ### Added
-- New hierarchy-based series: Voronoi Treemap. [More info](https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/).
-- New flow-based series: Arc Diagram. [More info](https://www.amcharts.com/docs/v5/charts/flow-charts/arc-diagram/).
+- New hierarchy-based series: Voronoi Treemap. [More info](https://docs.amcharts.com/v5/charts/hierarchy/voronoi-treemap/).
+- New flow-based series: Arc Diagram. [More info](https://docs.amcharts.com/v5/charts/flow-charts/arc-diagram/).
 
 ### Changed
 - Label wrapping mechanism will now treat a [zero-width space](https://en.wikipedia.org/wiki/Zero-width_space) character as a word break.
@@ -1728,7 +1745,7 @@ patterns with gradient fills.
 
 ### Added
 - `getTooltipText()` method on `Axis` has a second parameter `adjustPosition` (default: `true`). Affects only `DateAxis`. If set to `false` will not adjust position before formatting date by base interval.
-- `Root` element now has three additional settings: `focusable`, `ariaLabel`, and `role` (all are empty by default). [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element).
+- `Root` element now has three additional settings: `focusable`, `ariaLabel`, and `role` (all are empty by default). [More info](https://docs.amcharts.com/v5/concepts/accessibility/#accessibility-of-root-element).
 
 ### Changed
 - Accessibility: The `role` of the `<div>` element that holds focusable elements is changed to `graphics-document` (was `application`) to better reflect interactive element. [More info](https://www.w3.org/TR/graphics-aria-1.0/#graphics-document).
@@ -1739,7 +1756,7 @@ patterns with gradient fills.
 - `ariaLabel` on horizontal scrollbar grips were being populated to a slightly wider range than actual range of the related `DateAxis`.
 - `ExportingMenu` methods `open()` and `toggle()` were not working when attached to click events on external elements.
 - Stock charts `DateRangeSelector` was allowing pickers to go outside selectable date range.
-- The JSON plugin can now change properties on a `ListTemplate` (like `grid`). [More info](https://www.amcharts.com/docs/v5/concepts/serializing/#Templates).
+- The JSON plugin can now change properties on a `ListTemplate` (like `grid`). [More info](https://docs.amcharts.com/v5/concepts/serializing/#templates).
 - Tooltip was not always hidden when `sprite.hideTooltip()` was called.
 - If a mouse pointer was over a `Sprite` and `tooltipPosition` was changed from `"fixed"` to `"pointer"`, it was not following mouse unless you unhovered and then hovered over sprite again.
 
@@ -1848,7 +1865,7 @@ patterns with gradient fills.
 - HTML-based tooltips were not being properly sized on first show unless Animated theme was enabled
 - HTML-based tooltips were sometimes ignoring `keepTargetHover: true`.
 - Tooltip positions were off when exporting a chart with `tooltipContainerBounds` set.
-- `DrawingControl` can now be used completely standalone. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Standalone_usage_API).
+- `DrawingControl` can now be used completely standalone. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/#standalone-usage--api).
 - Internal tweaks that were occasionally interfering with some drag-and-drop libs.
 - Horizontal columns were not being properly highlighted when gaining focus.
 - Old bullets of data item were not being cleared if `series.data.setIndex` was used to update old data (since 5.3.7).
@@ -1858,12 +1875,12 @@ patterns with gradient fills.
 ## [5.3.7] - 2023-03-09
 
 ### Added
-- New `calculateSize` setting on `Root`. This is needed if you are using a `transform: scale(...)` CSS style. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#Custom_sizing_function).
-- New settings on `DateRangeSelector`: `minDate` and `maxDate`. Allows restricting date selection to specific date ranges. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/#Restricting_date_range).
-- New events on `StockChart`: `drawingsupdated` and `indicatorsupdated`. Events kick in when drawings or indicators are added, updated, or removed. [More info](https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/#Events).
+- New `calculateSize` setting on `Root`. This is needed if you are using a `transform: scale(...)` CSS style. [More info](https://docs.amcharts.com/v5/getting-started/root-element/#custom-sizing-function).
+- New settings on `DateRangeSelector`: `minDate` and `maxDate`. Allows restricting date selection to specific date ranges. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/date-range-selector/#restricting-date-range).
+- New events on `StockChart`: `drawingsupdated` and `indicatorsupdated`. Events kick in when drawings or indicators are added, updated, or removed. [More info](https://docs.amcharts.com/v5/charts/stock/serializing-indicators-annotations/#events).
 
 ### Changed
-- `DateRangeSelector` will now limit dates to actual range of data. To disable set `minDate` and `maxDate` to `null`. [More info](https://www.amcharts.com/docs/v5/charts/stock/toolbar/date-range-selector/#Restricting_date_range).
+- `DateRangeSelector` will now limit dates to actual range of data. To disable set `minDate` and `maxDate` to `null`. [More info](https://docs.amcharts.com/v5/charts/stock/toolbar/date-range-selector/#restricting-date-range).
 
 ### Fixed
 - `XYSeries` were creating `Bullet` objects even if distance between them was less than `minBulletDistance` which was not efficient and could slow the browser down.
@@ -1913,7 +1930,7 @@ patterns with gradient fills.
 ## [5.3.3] - 2023-02-08
 
 ### Added
-- New method on `Language`: `addTranslationsAny()`. Allows adding custom translations to locale. [More info](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts).
+- New method on `Language`: `addTranslationsAny()`. Allows adding custom translations to locale. [More info](https://docs.amcharts.com/v5/concepts/locales/creating-translations/#extending-locale-with-custom-prompts).
 
 ### Fixed
 - In `StockChart` if "Reset" button was pressed when there were drawings present on the chart, it could freeze.
@@ -1950,8 +1967,8 @@ patterns with gradient fills.
 ## [5.3.0] - 2023-01-27
 
 ### Added
-- New plugin: `json`, which allows serializing and parsing serialized (JSON) configs into charts. [More info](https://www.amcharts.com/docs/v5/concepts/serializing/).
-- New methods added to `StockChart`'s' `IndicatorControl` and `DrawingControl` used for serializing user-added indicators and annotations. [More info](https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/).
+- New plugin: `json`, which allows serializing and parsing serialized (JSON) configs into charts. [More info](https://docs.amcharts.com/v5/concepts/serializing/).
+- New methods added to `StockChart`'s' `IndicatorControl` and `DrawingControl` used for serializing user-added indicators and annotations. [More info](https://docs.amcharts.com/v5/charts/stock/serializing-indicators-annotations/).
 - `crisp` (default: `false`) setting added to `Sprite`. If set to `true`, will adjust `strokeWidth` to match screen zoom (retina) as well as its positions will be rounded up, so the lines look crisper. It's primarily meant for straight lines, but can work on other objects, too. Use with care, as coordinate rounding might produce overlapping or gaps between shapes that should be adjacent.
 - New `Root` property: `accessible` (default: `true`).
 - New `Root` property: `updateTick` (default: `true`). Set it to `false` to temporarily disable all rendering on `Root`. Reset back to `true` to resume rendering. Useful when need to do a bunch of async operations that might result in errors if rendering started before all of them finish.
@@ -2136,7 +2153,7 @@ patterns with gradient fills.
 ## [5.2.33] - 2022-11-18
 
 ### Added
-- New pattern type `PathPattern`. Allows using SVG paths as patterns. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/).
+- New pattern type `PathPattern`. Allows using SVG paths as patterns. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/).
 
 ### Changed
 - Circular labels (`RadialLabel` with `textType: "circular"`) now have a limited support for `oversizedBehavior`. `"hide"` and `"truncate"` are now supported. The latter will not respect `breakWords` setting, though.
@@ -2164,7 +2181,7 @@ patterns with gradient fills.
 ## [5.2.31] - 2022-10-18
 
 ### Changed
-- The logic behind `"pro"` tag in `CandlestickSeries` has been updated to more commonly accepted standards. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/#Professional_candlesticks).
+- The logic behind `"pro"` tag in `CandlestickSeries` has been updated to more commonly accepted standards. [More info](https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/#professional-candlesticks).
 - "Pro Candlesticks" was renamed to "Hollow Candlesticks" in series type switcher in `StockChart`.
 
 ### Fixed
@@ -2343,7 +2360,7 @@ patterns with gradient fills.
 ## [5.2.17] - 2022-08-17
 
 ### Added
-- `IndicatorControl` setting `indicators` now accepts objects. [More info](https://www.amcharts.com/docs/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#Adding_to_toolbar).
+- `IndicatorControl` setting `indicators` now accepts objects. [More info](https://docs.amcharts.com/v5/tutorials/creating-custom-indicators-for-a-stock-chart/#adding-to-toolbar).
 - `getArea()` method added to `MapChart`. Returns area of a `MapPolygon` in square pixels.
 
 
@@ -2366,7 +2383,7 @@ patterns with gradient fills.
 ## [5.2.15] - 2022-08-06
 
 ### Added
-- Added `PicturePattern` that allows using external images as patterns. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Image_patterns).
+- Added `PicturePattern` that allows using external images as patterns. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#image-patterns).
 
 ### Fixed
 - Fixing issue where chart scrollbar would break when zooming.
@@ -2410,9 +2427,9 @@ patterns with gradient fills.
 
 ### Added
 - A new setting `deactivateRoot` (default: `true`) added to `Modal`. Indicates if any interactivity on the underlying chart should be disabled when modal is open.
-- A new setting `html` added to `Container`. Set it to a string with HTML to be used as container's content. Will work on any element inheriting from `Container`, e.g. `Label`. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/).
-- A new setting `labelHTML` added to `Tooltip`. If set, will ne used as HTML content for the tooltip. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/).
-- A new setting `tooltipHTML` added to `Sprite`. If set, will ne used as HTML content for the tooltip when element is hovered. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/).
+- A new setting `html` added to `Container`. Set it to a string with HTML to be used as container's content. Will work on any element inheriting from `Container`, e.g. `Label`. [More info](https://docs.amcharts.com/v5/concepts/common-elements/html-content/).
+- A new setting `labelHTML` added to `Tooltip`. If set, will ne used as HTML content for the tooltip. [More info](https://docs.amcharts.com/v5/concepts/common-elements/html-content/).
+- A new setting `tooltipHTML` added to `Sprite`. If set, will ne used as HTML content for the tooltip when element is hovered. [More info](https://docs.amcharts.com/v5/concepts/common-elements/html-content/).
 - `wheelZoomPositionX` and `wheelZoomPositionY` added to `XYChart`. This value is not set by default, but you can use it to fix wheel zooming, to the end (if you set it to 1) or to the start (0) or middle (0.5). In `StockChart`, it is set to 1 by default, as this is common practice in financial charts.
 - "Volume-Weighted Average Price (VWAP)" indicator added to `StockChart`.
 
@@ -2444,7 +2461,7 @@ patterns with gradient fills.
 ## [5.2.9] - 2022-06-21
 
 ### Added
-- New properties on `Root`: `tapToActivate` (default: `false`) - if enabled, requires to tap on chart pefore gesture-based functionality (zoom/pan) works, and `tapToActivateTimeout` (default: `3000`) - milliseconds of inactivity before chart becomes "inactive" for touch gestures. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options).
+- New properties on `Root`: `tapToActivate` (default: `false`) - if enabled, requires to tap on chart pefore gesture-based functionality (zoom/pan) works, and `tapToActivateTimeout` (default: `3000`) - milliseconds of inactivity before chart becomes "inactive" for touch gestures. [More info](https://docs.amcharts.com/v5/getting-started/root-element/#touch-related-options).
 
 ### Changed
 - If there are no pan/zoom functionality set on charts, they should not prevent scrolling of the page by touch anymore.
@@ -2570,7 +2587,7 @@ patterns with gradient fills.
 ## [5.2.0] - 2022-04-29
 
 ### Added
-- Initial (beta) version of `StockChart` added. Check [documentation](https://www.amcharts.com/docs/v5/charts/stock/) and [product info](https://www.amcharts.com/stock-chart/).
+- Initial (beta) version of `StockChart` added. Check [documentation](https://docs.amcharts.com/v5/charts/stock/) and [product info](https://www.amcharts.com/stock-chart/).
 
 ### Fixed
 - Week numbers for "leap weeks" were not being formated properly.
@@ -2594,7 +2611,7 @@ patterns with gradient fills.
 
 ### Added
 - `useLastColorForLegendMarker` setting added to `BaseColumnSeries` (applicable to all column-based series like `ColumnSeries`, `CandlestickSeries`)
-- `geodataNames` setting added to `MapSeries`. Allows setting translations to map features, e.g. countries. [More info](https://www.amcharts.com/docs/v5/charts/map-chart/map-translations/).
+- `geodataNames` setting added to `MapSeries`. Allows setting translations to map features, e.g. countries. [More info](https://docs.amcharts.com/v5/charts/map-chart/map-translations/).
 - Read-only private setting `gridInterval` added to `DateAxis`.
 
 ### Fixed
@@ -2611,7 +2628,7 @@ patterns with gradient fills.
 ## [5.1.11] - 2022-04-06
 
 ### Added
-- `groupDataWithOriginals` and `groupDataCallback` settings added to `XYSeries`. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Custom_aggregation_functions).
+- `groupDataWithOriginals` and `groupDataCallback` settings added to `XYSeries`. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#custom-aggregation-functions).
 - `strictMinMaxSelection` setting added to `ValueAxis`. When set to `true`, the axis won't round `min` and `max` of a selection to the nearest round values, but will use actual min and max (`extraMin` and `extraMax` will still be added if set). This is a good feature when your series displays not actual but derivative values, like `valueYChangeSelection` as it helps to avoid frequent jumping of series to adjusted min and max of the axis.
 
 ### Changed
@@ -2724,9 +2741,9 @@ patterns with gradient fills.
 ### Added
 - `affectsMinMax` added to value axis range.
 - `segments` property added to `Line` class. Allows passing multiple segments instead of continous line.
-- `tooltipIntervalOffset` setting added to `DateAxis`. If not set, axis' tooltip will use value of the `-tooltipLocation` (cell start timestamp by default), so that tooltip would should rounded value, like 06:00 instead of 06:30 when interval is hourly. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip).
-- `tooltipDateFormats` setting added to `DateAxis`. Allows specifying axis' tooltip date formats for time each time unit, different from `dateFormats`. NOTE: `tooltipDateFormat` will override the format if set. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Axis_tooltip).
-- `syncWith` setting added to `XYCursor`. Set it to an array of other `XYCursor` objects to automatically position them as the cursor moves. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors).
+- `tooltipIntervalOffset` setting added to `DateAxis`. If not set, axis' tooltip will use value of the `-tooltipLocation` (cell start timestamp by default), so that tooltip would should rounded value, like 06:00 instead of 06:30 when interval is hourly. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#axis-tooltip).
+- `tooltipDateFormats` setting added to `DateAxis`. Allows specifying axis' tooltip date formats for time each time unit, different from `dateFormats`. NOTE: `tooltipDateFormat` will override the format if set. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#axis-tooltip).
+- `syncWith` setting added to `XYCursor`. Set it to an array of other `XYCursor` objects to automatically position them as the cursor moves. [More info](https://docs.amcharts.com/v5/charts/xy-chart/cursor/#syncing-cursors).
 
 ### Changed
 - Default tooltip date formats have changed slightly for `DateAxis`. Previously, it was using formats from `dateFormats`. Now it uses defaults/user values from newly-introduced `tooltipDateFormats` setting.
@@ -2742,7 +2759,7 @@ patterns with gradient fills.
 ## [5.1.3] - 2022-02-03
 
 ### Added
-- Added second parameter to `Root` constructor which contains settings object. For now, there's only one setting: `useSafeResolution` (default: `true`). [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#settings).
+- Added second parameter to `Root` constructor which contains settings object. For now, there's only one setting: `useSafeResolution` (default: `true`). [More info](https://docs.amcharts.com/v5/getting-started/root-element/#settings).
 
 ### Fixed
 - Dynamic data updates on `MapPolygonSeries` were not working in some cases.
@@ -2769,7 +2786,7 @@ vertical distance and looking at the data items which are at the current X axis 
 - TypeScript: Settings interfaces for all objects are now being exposed via bundled re-export files like `index.ts`, `xy.ts`, etc.
 - New class `am5.Modal`.
 - New `Container` setting: `reverseChildren`. If set to `true`, will start rendering from the last child, effectively flipping the order in how children of the cotainer are laid out. Useful for [right-to-left setups](
-https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
+https://docs.amcharts.com/v5/concepts/locales/right-to-left-support/).
 
 ### Changed
 - Charts on iOS devices will now automatically use lesser resolution to work around canvas memory restriction introduced in iOS 15 Safari.
@@ -2790,8 +2807,8 @@ https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
 - New `Root` setting: `timezone`. E.g. `"America/Vancouver"`, `"Australia/Sydney"`, `"UTC"`.
 - New export CSV option: `addBOM` (default: `true`). Indicates whether to add BOM characters at start of CSV output so that data viewer (e.g. Excel) knows we're exporting UTF-8 data.
 - New methods for `Adapters`: `remove(key)`, `disable(key)`, and `enable(key)`.
-- `GaplessDateAxis` added. It's a version of `DateAxis` that removes data-less intervals from its scale. `CategoryAxis` is being deprecated in favor of `GaplessDateAxis`. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/gapless-date-axis/).
-- Timezone support added. [More info](https://www.amcharts.com/docs/v5/getting-started/root-element/#Time_zone).
+- `GaplessDateAxis` added. It's a version of `DateAxis` that removes data-less intervals from its scale. `CategoryAxis` is being deprecated in favor of `GaplessDateAxis`. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/gapless-date-axis/).
+- Timezone support added. [More info](https://docs.amcharts.com/v5/getting-started/root-element/#time-zone).
 - New `Component` method: `markDirtyValues()`. Will re-evaluate elements of the component that are data-reliant, such as axis labels.
 
 ### Fixed
@@ -2835,7 +2852,7 @@ https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
 
 ### Added
 - `groupDataDisabled` setting added to XYSeries. If set to `false` will exclude series from data grouping mechanism, even if it is enabled on related `DateSeries`.
-- New plugin `SliceGrouper`. Can be used to automatically group small slices on percent charts like Pie, Funnel, etc. [More info](https://www.amcharts.com/docs/v5/charts/percent-charts/grouping-slices/).
+- New plugin `SliceGrouper`. Can be used to automatically group small slices on percent charts like Pie, Funnel, etc. [More info](https://docs.amcharts.com/v5/charts/percent-charts/grouping-slices/).
 
 ### Fixed
 - If data was added to percent series after initial data was already processed, the bew slices would get colors from the start of the color set.
@@ -2874,7 +2891,7 @@ https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
 ### Added
 - `tooltipPositionX` and `tooltipPositionY` added to `XYSeries` (possible values: `"value"`, `"open"`, `"low"`, and `"high"`). Indicates which data item value tooltip should be anchored to.
 - New settings added to `Exporting` for formatting durations: `durationFields`, `durationFormat`, and `durationUnit`.
-- `showTooltipOn` (default: `"hover"`) added to `Sprite`. Another option is `"always"` which will show tooltip without any interaction with the element. [More info](https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Sticky_tooltips).
+- `showTooltipOn` (default: `"hover"`) added to `Sprite`. Another option is `"always"` which will show tooltip without any interaction with the element. [More info](https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#sticky-tooltips).
 
 ### Changed
 - `Hierarchy` will now set bottom-level node's `cursorOverStyle: "default"` via theme, instead of hardocding it, so that it can be overridden via node templates.
@@ -3006,7 +3023,7 @@ https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
 ## [5.0.6] - 2021-11-18
 
 ### Added
-- Accessibility: new setting on `Sprite`: `focusableGroup`. If set, TAB key will iterate through first elements of each focusable group, allowing user to select within group using arrow keys. [More info](https://www.amcharts.com/docs/v5/concepts/accessibility/#Grouping_focusable_elements).
+- Accessibility: new setting on `Sprite`: `focusableGroup`. If set, TAB key will iterate through first elements of each focusable group, allowing user to select within group using arrow keys. [More info](https://docs.amcharts.com/v5/concepts/accessibility/#grouping-focusable-elements).
 - New `Root` setting: `autoResize` (default: `true`). If set to `false`, the chart will not automtically resize itself when width/height of its container change. Use `resize()` method to resize manually.
 - New `Root` method: `resize()`. Resizes chart to fit container dimensions, if automatic resizing is disabled (`root.autoResize = false`).
 - Global `am5.p0` shortcut function added which returns `Percent(0)`.
@@ -3166,8 +3183,8 @@ https://www.amcharts.com/docs/v5/concepts/locales/right-to-left-support/).
 ## [5.0.0-beta.36] - 2021-10-25
 
 ### Added
-- New chart type: Venn. [More info](https://www.amcharts.com/docs/v5/charts/venn/).
-- New chart type: WordCloud. [More info](https://www.amcharts.com/docs/v5/charts/word-cloud/).
+- New chart type: Venn. [More info](https://docs.amcharts.com/v5/charts/venn/).
+- New chart type: WordCloud. [More info](https://docs.amcharts.com/v5/charts/word-cloud/).
 
 ### Changed
 - `XYSeries` will now automatically set the first bullet of a data item as the series' `tooltipTarget`. This will make the series tooltip background to change color to
@@ -3182,10 +3199,10 @@ the bullet's fill.
 ## [5.0.0-beta.35] - 2021-10-15
 
 ### Added
-- New axis type: `DurationAxis`. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/duration-axis/).
-- New formatter type: `DurationFormatter`. [More info](https://www.amcharts.com/docs/v5/concepts/formatters/formatting-durations/).
+- New axis type: `DurationAxis`. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/duration-axis/).
+- New formatter type: `DurationFormatter`. [More info](https://docs.amcharts.com/v5/concepts/formatters/formatting-durations/).
 - New `Root` element property: `durationFormatter`. Holds a global instance of `DurationFormatter` which is used by `DurationAxis`.
-- `Annotator` tool added to `Exporting` plugin. [More info](https://www.amcharts.com/docs/v5/concepts/exporting/annotator/).
+- `Annotator` tool added to `Exporting` plugin. [More info](https://docs.amcharts.com/v5/concepts/exporting/annotator/).
 
 ### Fixed
 - Circular labels with `inside = true` where not properly handling line-breaks.
@@ -3244,7 +3261,7 @@ the bullet's fill.
 ## [5.0.0-beta.29] - 2021-10-01
 
 ### Added
-- Wherever date or number format can be set (`DateFormatter`, `NumberFormatter`, `DateAxis`, `ValueAxis`, `Exporting`) it can now be set as `Intl.DateTimeFormatOptions` (for date format) or `Intl.NumberFormatOptions` (for number format) object in additional to string-based format. [More info](https://www.amcharts.com/docs/v5/tutorials/formatting-date-time-and-numbers-using-intl-object/).
+- Wherever date or number format can be set (`DateFormatter`, `NumberFormatter`, `DateAxis`, `ValueAxis`, `Exporting`) it can now be set as `Intl.DateTimeFormatOptions` (for date format) or `Intl.NumberFormatOptions` (for number format) object in additional to string-based format. [More info](https://docs.amcharts.com/v5/tutorials/formatting-date-time-and-numbers-using-intl-object/).
 - New list type `ListAutoDispose` added.
 
 ### Changed
@@ -3265,7 +3282,7 @@ the bullet's fill.
 
 ### Added
 - Two new settings in `Pattern`: `strokeDasharray` and `strokeDashoffset`.
-- `Graphics` and `Picture` can now have shadows with additional settings: `shadowColor`, `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`, and `shadowOpacity`. [More info](https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/).
+- `Graphics` and `Picture` can now have shadows with additional settings: `shadowColor`, `shadowBlur`, `shadowOffsetX`, `shadowOffsetY`, and `shadowOpacity`. [More info](https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/).
 - New setting in `ListTemplate`: `autoDispose` (default: `true`). If set to `true` will dispose items removed from the list.
 
 ### Changed
@@ -3300,7 +3317,7 @@ the bullet's fill.
 - New `Entity` setting: `userData`. Use it to store any kind of proprietary data with any object in amCharts 5 that extends `Entity`.
 
 ### Changed
-- Series axis range will now have `visible: false` set for all axis elements (grid, fill, label, tick) by deafult. If you need to enable them, set `visible: true` on a respective range element. [More info](https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Elements_on_a_series_range).
+- Series axis range will now have `visible: false` set for all axis elements (grid, fill, label, tick) by deafult. If you need to enable them, set `visible: true` on a respective range element. [More info](https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-ranges/#elements-on-a-series-range).
 
 ### Fixed
 - Improperly closed in-line text style blocks could cause label palcement issues.

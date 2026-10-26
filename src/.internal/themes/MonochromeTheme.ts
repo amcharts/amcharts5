@@ -90,7 +90,7 @@ export interface IMonochromeThemeSettings {
  *
  * With nothing set, the ramp is blue (`#2e7c9e`).
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export function MonochromeTheme(root: Root, settings: IMonochromeThemeSettings = {}): Theme {

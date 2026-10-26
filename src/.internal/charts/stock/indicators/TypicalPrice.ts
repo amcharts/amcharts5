@@ -20,7 +20,7 @@ export interface ITypicalPriceEvents extends IChartIndicatorEvents {
  * the average of high, low and close), averaged over `period`. Drawn in a
  * panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class TypicalPrice extends ChartIndicator {
 	public static className: string = "TypicalPrice";

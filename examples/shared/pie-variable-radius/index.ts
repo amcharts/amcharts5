@@ -4,26 +4,26 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/
+// https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/
 const chart = root.container.children.push(am5percent.PieChart.new(root, {
   layout: root.verticalLayout // stacks the pie and the legend added below it
 }));
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Series
+// https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/#series
 const series = chart.series.push(am5percent.PieSeries.new(root, {
   calculateAggregates: true, // works out the highest value, which the radius adapter needs
   valueField: "value",
@@ -38,7 +38,7 @@ series.slices.template.setAll({
 
 
 // Scale each slice's radius by its value, relative to the biggest one
-// https://www.amcharts.com/docs/v5/concepts/settings/adapters/
+// https://docs.amcharts.com/v5/concepts/settings/adapters/
 series.slices.template.adapters.add("radius", (radius, target) => {
   const dataItem = target.dataItem as am5.DataItem<am5percent.IPieSeriesDataItem> | undefined;
   const high = series.getPrivate("valueHigh"); // the biggest value in the data
@@ -51,7 +51,7 @@ series.slices.template.adapters.add("radius", (radius, target) => {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/#setting-data
 series.data.setAll([
   { value: 10, category: "One" },
   { value: 9, category: "Two" },
@@ -63,7 +63,7 @@ series.data.setAll([
 
 
 // Create legend
-// https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+// https://docs.amcharts.com/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
   centerX: am5.percent(50), // the legend's middle...
   x: am5.percent(50),       // ...at the middle of the chart: centered
@@ -75,5 +75,5 @@ legend.data.setAll(series.dataItems); // one legend item per slice
 
 
 // Play initial series animation
-// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
+// https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

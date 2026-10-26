@@ -45,7 +45,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	 * Element drawn behind the container's content, sized to fill the
 	 * container.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Background} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#background} for more info
 	 */
 	background?: Graphics;
 
@@ -54,14 +54,14 @@ export interface IContainerSettings extends ISpriteSettings {
 	 * `root.verticalLayout` or `root.gridLayout`. Without a layout, children
 	 * are placed by their own `x` and `y`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Layout} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#layout} for more info
 	 */
 	layout?: Layout | null;
 
 	/**
 	 * An element whose shape clips the container's children.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Masks} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#masks} for more info
 	 */
 	mask?: Graphics | null;
 
@@ -81,7 +81,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	/**
 	 * Applies every state set on the container to its children too.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#States} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/} for more info
 	 *
 	 * @default false
 	 */
@@ -91,7 +91,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	 * A [[Scrollbar]] that scrolls the content vertically when it does not fit
 	 * in the container.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/containers/#Scrollbar} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#scrollbar} for more info
 	 */
 	verticalScrollbar?: Scrollbar;
 
@@ -106,7 +106,7 @@ export interface IContainerSettings extends ISpriteSettings {
 	 * HTML content of the container. It can hold data placeholders, such as
 	 * `{category}`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/html-content/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/html-content/} for more info
 	 * @since 5.2.11
 	 */
 	html?: string;
@@ -141,7 +141,7 @@ export interface IContainerPrivate extends ISpritePrivate {
  *
  * Its children can be any [[Sprite]], from basic shapes to whole charts.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/} for more info
  * @important
  */
 export class Container extends Sprite {
@@ -701,6 +701,17 @@ export class Container extends Sprite {
 				verticalScrollbar.animate({ key: "start", to: pos, duration: verticalScrollbar.get("animationDuration", 0), easing: verticalScrollbar.get("animationEasing") });
 			}
 		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _nameForExport(parentName?: string): string | undefined {
+		const name = super._nameForExport(parentName);
+		this.children.each((child) => {
+			child._nameForExport(name);
+		});
+		return name;
 	}
 
 	public _updateChildren() {

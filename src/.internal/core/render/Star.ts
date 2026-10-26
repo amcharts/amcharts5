@@ -27,7 +27,7 @@ export interface IStarPrivate extends IGraphicsPrivate {
 /**
  * Draws a star centered on its `x` and `y`, with a spike pointing up.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Star extends Graphics {

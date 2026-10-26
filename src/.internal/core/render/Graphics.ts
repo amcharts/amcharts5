@@ -17,42 +17,42 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	/**
 	 * Fill color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/} for more information
 	 */
 	fill?: Color;
 
 	/**
 	 * Stroke (border or line) color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/} for more information
 	 */
 	stroke?: Color;
 
 	/**
 	 * Fill pattern.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more information
 	 */
 	fillPattern?: Pattern;
 
 	/**
 	 * Stroke (border or line) pattern.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more information
 	 */
 	strokePattern?: Pattern;
 
 	/**
 	 * Fill gradient.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
 	 */
 	fillGradient?: Gradient;
 
 	/**
 	 * Stroke (border or line) gradient.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
 	 */
 	strokeGradient?: Gradient;
 
@@ -61,14 +61,14 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 * and gaps, e.g. `[4, 2]`. A single number makes dashes and gaps of that
 	 * length.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/#dashed-lines} for more information
 	 */
 	strokeDasharray?: number[] | number;
 
 	/**
 	 * Stroke (border or line) dash offset.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Dashed_lines} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/#dashed-lines} for more information
 	 */
 	strokeDashoffset?: number;
 
@@ -103,7 +103,7 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 *
 	 * Must use renderer (`display` parameter) methods to draw.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/#Custom_draw_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/#custom-draw-functions} for more info
 	 */
 	draw?: (display: IGraphics, graphics: Graphics) => void;
 
@@ -128,28 +128,28 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 * Color of the element's shadow. It shows only when `shadowBlur`,
 	 * `shadowOffsetX` or `shadowOffsetY` is set too.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowColor?: Color | null;
 
 	/**
 	 * Blurriness of the shadow: the bigger the number, the blurrier the shadow.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowBlur?: number;
 
 	/**
 	 * Horizontal shadow offset in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOffsetX?: number;
 
 	/**
 	 * Vertical shadow offset in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOffsetY?: number;
 
@@ -157,7 +157,7 @@ export interface IGraphicsSettings extends ISpriteSettings {
 	 * Opacity of the shadow, from `0` to `1`. If not set, the shadow takes the
 	 * opacity of the element's fill.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOpacity?: number;
 
@@ -191,7 +191,7 @@ export interface IGraphicsEvents extends ISpriteEvents {
 /**
  * An element that draws a shape; the base class of all shapes.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Graphics extends Sprite {

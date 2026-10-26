@@ -4,25 +4,25 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create Gantt chart
-// https://www.amcharts.com/docs/v5/charts/gantt/
+// https://docs.amcharts.com/v5/charts/gantt/
 // with no settings, tasks can be edited with the mouse and durations count days, skipping weekends
 const gantt = root.container.children.push(am5gantt.Gantt.new(root, {}));
 
 
 // Set category data: parentId puts a task under another one
-// https://www.amcharts.com/docs/v5/charts/gantt/#Category_data
+// https://docs.amcharts.com/v5/charts/gantt/#category-data
 gantt.yAxis.data.setAll([
   { id: "kickoff", name: "Kick-off" },
   { id: "design", name: "Design" },
@@ -37,7 +37,7 @@ gantt.yAxis.data.setAll([
 
 
 // Set series data: a parent task takes its dates from its subtasks
-// https://www.amcharts.com/docs/v5/charts/gantt/#Series_data
+// https://docs.amcharts.com/v5/charts/gantt/#series-data
 // start is a timestamp in ms and duration a number of working days (0 draws a diamond);
 // progress is the share done, 0 to 1; linkTo draws an arrow to the task that follows
 gantt.series.data.setAll([
@@ -54,5 +54,5 @@ gantt.series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 gantt.appear(1000, 100);

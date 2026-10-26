@@ -7,7 +7,7 @@ import { Theme } from "../core/Theme";
  * Cool and deliberately low in contrast. Pairs with `NordDark`.
  *
  * @see {@link https://www.nordtheme.com/} for the original palette
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class NordTheme extends Theme {

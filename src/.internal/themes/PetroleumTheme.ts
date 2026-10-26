@@ -7,7 +7,7 @@ import { Theme } from "../core/Theme";
  * accent: crude amber `#c8890a`, gas flare `#f5d090`, pipeline green
  * `#6a8a70`, sulfur `#a89050` and bronze `#8b6914`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class PetroleumTheme extends Theme {

@@ -18,7 +18,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 * The label's text. It can hold in-line formatting and, with
 	 * `populateText`, data placeholders.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/text-styling/} for text styling info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/text-styling/} for text styling info
 	 *
 	 */
 	text?: string;
@@ -39,7 +39,7 @@ export interface ILabelSettings extends IContainerSettings {
 	/**
 	 * Fill gradient.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
 	 * @since 5.10.1
 	 */
 	fillGradient?: Gradient;
@@ -125,7 +125,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 * LIMITATIONS: on circular labels, the only values supported are `"hide"` and
 	 * `"truncate"`. The latter will ignore `breakWords` setting.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Oversized_text} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/labels/#oversized-text} for more info
 	 */
 	oversizedBehavior?: "none" | "hide" | "fit" | "wrap" | "wrap-no-break" | "truncate";
 
@@ -164,7 +164,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 * Fills data placeholders in `text`, such as `{value}`, with values from
 	 * the label's data item.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/#Data_placeholders} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/labels/#data-placeholders} for more info
 	 *
 	 * @default false
 	 */
@@ -182,28 +182,28 @@ export interface ILabelSettings extends IContainerSettings {
 	 * Color of the text's shadow. It shows only when `shadowBlur`,
 	 * `shadowOffsetX` or `shadowOffsetY` is set too.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowColor?: Color | null;
 
 	/**
 	 * Blurriness of the shadow: the bigger the number, the blurrier the shadow.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowBlur?: number;
 
 	/**
 	 * Horizontal shadow offset in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOffsetX?: number;
 
 	/**
 	 * Vertical shadow offset in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOffsetY?: number;
 
@@ -211,7 +211,7 @@ export interface ILabelSettings extends IContainerSettings {
 	 * Opacity of the shadow, from `0` to `1`. If not set, the shadow takes the
 	 * opacity of the text.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/shadows/} for more info
 	 */
 	shadowOpacity?: number;
 
@@ -243,7 +243,7 @@ export interface ILabelEvents extends IContainerEvents {
  * A text element with padding and an optional background. Its text can hold
  * in-line formatting and data placeholders.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/labels/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/labels/} for more info
  */
 export class Label extends Container {
 

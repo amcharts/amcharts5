@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   panX: "rotateX",   // dragging sideways spins the globe...
   panY: "rotateY",   // ...and dragging up or down tilts it
@@ -28,7 +28,7 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Create series for background fill
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/#background-polygon
 const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
 
 backgroundSeries.mapPolygons.template.setAll({
@@ -43,7 +43,7 @@ backgroundSeries.data.push({
 
 
 // Create main polygon series for countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow
 }));
@@ -58,7 +58,7 @@ polygonSeries.mapPolygons.template.setAll({
 
 // Create point series for circles, each placed on the country with its id.
 // surfaceBullets lays them on the globe, so they flatten towards its edge
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-point-series/
 const circleSeries = chart.series.push(am5map.MapPointSeries.new(root, {
   surfaceBullets: true,
   calculateAggregates: true, // works out the lowest and highest value, which the heat rule needs
@@ -84,7 +84,7 @@ circleSeries.bullets.push(() => {
 
 
 // Size circles by value
-// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+// https://docs.amcharts.com/v5/concepts/settings/heat-rules/
 circleSeries.set("heatRules", [{
   target: circleTemplate,
   dataField: "value",
@@ -141,5 +141,5 @@ circleSeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

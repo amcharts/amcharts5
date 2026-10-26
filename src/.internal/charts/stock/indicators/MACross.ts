@@ -27,7 +27,7 @@ export interface IMACrossEvents extends IIndicatorEvents {
  * Moving Average Cross indicator: a slow (`period`) and a fast (`fastPeriod`)
  * simple moving average of `field`, drawn over the main series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class MACross extends Indicator {
 	public static className: string = "MACross";

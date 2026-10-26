@@ -11,7 +11,7 @@ export interface IWilliamsREvents extends IOverboughtOversoldEvents { }
  * last `period` data items, from `0` (at the high) to `-100` (at the low).
  * Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class WilliamsR extends OverboughtOversold {
 	public static className: string = "WilliamsR";

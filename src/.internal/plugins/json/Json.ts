@@ -1099,7 +1099,7 @@ export interface IParseSettings {
 /**
  * Builds charts from JSON configs.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/serializing/} for more info
  * @since 5.3.0
  */
 export class JsonParser {
@@ -1110,7 +1110,7 @@ export class JsonParser {
 	 *
 	 * Use static method `Class.new()` instead.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/#new-element-syntax} for more info
 	 * @ignore
 	 */
 	constructor(root: Root, isReal: boolean) {
@@ -1124,7 +1124,7 @@ export class JsonParser {
 	/**
 	 * Use this method to create an instance of this class.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/#new-element-syntax} for more info
 	 * @param   root      Root element
 	 * @return            Instantiated object
 	 */

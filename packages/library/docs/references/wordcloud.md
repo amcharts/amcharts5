@@ -2,7 +2,7 @@
 
 > **As a JSON config:** see `references/json.md`. The settings below go into each object's `"settings"` there.
 
-Docs: https://www.amcharts.com/docs/v5/charts/word-cloud/
+Docs: https://docs.amcharts.com/v5/charts/word-cloud/
 
 Word Cloud displays words/tags sized by their value/weight. It's a "container-less" chart — the series is pushed directly to `root.container.children` (no wrapper chart object).
 

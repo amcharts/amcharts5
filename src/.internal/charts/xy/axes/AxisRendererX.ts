@@ -19,7 +19,7 @@ export interface IAxisRendererXSettings extends IAxisRendererSettings {
 	/**
 	 * Puts the axis above the plot area instead of below it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_position} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#axis-position} for more info
 	 * @default false
 	 */
 	opposite?: boolean;
@@ -27,7 +27,7 @@ export interface IAxisRendererXSettings extends IAxisRendererSettings {
 	/**
 	 * Draws the axis's labels and ticks inside the plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Labels_ticks_inside_plot_area} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#labelsticks-inside-plot-area} for more info
 	 * @default false
 	 */
 	inside?: boolean;
@@ -39,7 +39,7 @@ export interface IAxisRendererXPrivate extends IAxisRendererPrivate {
 /**
  * Renderer for a horizontal (X) axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/#axis-renderer} for more info
  * @important
  */
 export class AxisRendererX extends AxisRenderer {

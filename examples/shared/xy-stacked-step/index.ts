@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,      // drag the plot to move around it, sideways...
   panY: true,      // ...and up and down
@@ -26,13 +26,13 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   baseInterval: {             // one data point per day, so each step is a day wide
     timeUnit: "day",
@@ -53,7 +53,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/step-line-series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/step-line-series/
 // a step line holds each value flat for the whole day, then jumps to the next one
 const series1 = chart.series.push(am5xy.StepLineSeries.new(root, {
   name: "Series 1",
@@ -73,7 +73,7 @@ series1.fills.template.setAll({
 });
 
 // The second series is stacked on top of the first one
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Stacked_series
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#stacked-series
 const series2 = chart.series.push(am5xy.StepLineSeries.new(root, {
   name: "Series 2",
   stacked: true,
@@ -94,7 +94,7 @@ series2.fills.template.setAll({
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // above the plot: drag its ends to zoom, or its middle to move along the dates
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -102,7 +102,7 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 const data = [
   { date: 1704067200000, value1: 102, value2: 21 },
   { date: 1704153600000, value1: 104, value2: 19 },
@@ -141,7 +141,7 @@ series2.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series1.appear(1000);
 series2.appear(1000);
 chart.appear(1000, 100);

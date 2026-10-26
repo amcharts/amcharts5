@@ -5,7 +5,7 @@ import { Theme } from "../core/Theme";
  * "Pastel": a soft light theme on a warm off-white background, with muted
  * pastel series colors. Calm and editorial. Pairs with `PastelDark`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class PastelTheme extends Theme {

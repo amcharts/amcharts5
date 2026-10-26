@@ -81,7 +81,7 @@ export interface IArcDiagramEvents extends IFlowEvents {
  * Arc diagram: nodes as circles in a row or column, sized by their values and
  * linked by arcs.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/} for more information
  * @important
  */
 export class ArcDiagram extends Flow {

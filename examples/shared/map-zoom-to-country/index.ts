@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   panX: "translateX",  // dragging moves the map sideways...
   panY: "translateY",  // ...and up and down
@@ -26,14 +26,14 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Add zoom control
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
+// https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#zoom-control
 const zoomControl = chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
 zoomControl.homeButton.set("visible", true); // hidden by default; a click zooms back out to the world
 
 
 // Create main polygon series for countries. clickZoom zooms to the clicked
 // country, and back out when it is clicked again or the water is clicked
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow,
   exclude: ["AQ"], // no Antarctica, which Mercator stretches across the bottom
@@ -57,5 +57,5 @@ polygonSeries.mapPolygons.template.states.create("active", {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

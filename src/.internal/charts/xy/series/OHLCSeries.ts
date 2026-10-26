@@ -29,7 +29,7 @@ export interface IOHLCSeriesAxisRange extends ICandlestickSeriesAxisRange {
  * A series that shows open, high, low and close values as OHLC bars
  * ([[OHLC]]).
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
  */
 export class OHLCSeries extends CandlestickSeries {

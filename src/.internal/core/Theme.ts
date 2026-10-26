@@ -13,7 +13,7 @@ export interface IRule<A extends Entity> {
 /**
  * A base class for an amCharts theme.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class Theme {
@@ -23,7 +23,7 @@ export class Theme {
 	/**
 	 * Use this method to create an instance of this class.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/#new-element-syntax} for more info
 	 * @param   root      Root element
 	 * @return            Instantiated object
 	 */
@@ -47,7 +47,7 @@ export class Theme {
 	/**
 	 * Returns the theme's rules for a class.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/themes/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
 	 * @param   themeClass Class name
 	 * @return             Rules, or `undefined` if there are none
 	 */
@@ -58,7 +58,7 @@ export class Theme {
 	/**
 	 * Same as `rule()`, but takes any class name, without type checks.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/themes/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
 	 * @param   themeClass Class name
 	 * @param   themeTags  Theme tags
 	 * @return             Template
@@ -103,7 +103,7 @@ export class Theme {
 	 * set on it go to every element of that class (or a class extending it)
 	 * that has all of these tags. The same class and tags return the same rule.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/themes/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
 	 * @param   themeClass Class name, e.g. `"Label"`
 	 * @param   themeTags  Theme tags
 	 * @return             Template

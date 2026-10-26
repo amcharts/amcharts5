@@ -49,7 +49,7 @@ export interface IOverboughtOversoldEvents extends IChartIndicatorEvents { }
  * Base class for indicators with overbought and oversold levels, drawn in a
  * panel of their own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class OverboughtOversold extends ChartIndicator {
 	public static className: string = "OverboughtOversold";

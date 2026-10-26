@@ -10,7 +10,7 @@ export interface IDataWithProcessor {
 	/**
 	 * An optional processor for data.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/data/#pre-processing-data} for more info
 	 */
 	processor?: DataProcessor;
 
@@ -19,7 +19,7 @@ export interface IDataWithProcessor {
 /**
  * A [[List]] that holds a component's data.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/data/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/data/} for more info
  */
 export class ListData<T> extends List<T> implements ICounterRef, IDataWithProcessor {
 
@@ -37,7 +37,7 @@ export class ListData<T> extends List<T> implements ICounterRef, IDataWithProces
 	 * A [[DataProcessor]] that processes each data item as it is added or
 	 * replaced.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/data/#pre-processing-data} for more info
 	 */
 	public processor?: DataProcessor;
 

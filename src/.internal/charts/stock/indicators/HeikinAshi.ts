@@ -32,7 +32,7 @@ export interface IHeikinAshiEvents extends IChartIndicatorEvents {
  * Heikin Ashi indicator: candlesticks of averaged prices, which smooth out
  * noise and show the trend more clearly. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class HeikinAshi extends ChartIndicator {
 	public static className: string = "HeikinAshi";

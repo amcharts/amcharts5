@@ -14,14 +14,14 @@ export interface ISerialChartSettings extends IChartSettings {
 	/**
 	 * The [[ColorSet]] series take their colors from.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#series-colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
 	 * The [[PatternSet]] series take their patterns from.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets} for more info
 	 * @since 5.10.0
 	 */
 	patterns?: PatternSet;

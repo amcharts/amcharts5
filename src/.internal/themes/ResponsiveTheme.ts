@@ -9,7 +9,7 @@ import * as $array from "../core/util/Array";
  * A responsive rule: settings for matching elements that apply while the
  * chart's size meets a condition.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/responsive/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/responsive/} for more info
  * @important
  */
 export interface IResponsiveRule {
@@ -70,7 +70,7 @@ export interface IResponsiveRule {
  * fit small spaces. `new()` comes with built-in rules for the common chart
  * types; `newEmpty()` starts with none, for rules of your own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/responsive/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/responsive/} for more info
  */
 export class ResponsiveTheme extends Theme {
 
@@ -341,7 +341,7 @@ export class ResponsiveTheme extends Theme {
 	 * Adds a responsive rule and returns it. It applies at once if it is
 	 * relevant.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/responsive/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/responsive/} for more info
 	 * @param   rule  Responsive rule
 	 * @return        Responsive rule
 	 */

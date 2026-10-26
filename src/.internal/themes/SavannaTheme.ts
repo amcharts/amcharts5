@@ -5,7 +5,7 @@ import { Theme } from "../core/Theme";
  * "Savanna": a warm, editorial light theme on a cream background, with muted
  * natural series colors: amber gold, terracotta, olive, plum, ochre and walnut.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class SavannaTheme extends Theme {

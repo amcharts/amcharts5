@@ -28,8 +28,8 @@ npm package or load it with script tags, as below.
 
 [Demos](https://www.amcharts.com/demos/) |
 [Examples](examples/shared) |
-[Documentation](https://www.amcharts.com/docs/v5/) |
-[Class reference](https://www.amcharts.com/docs/v5/reference/) |
+[Documentation](https://docs.amcharts.com/v5/) |
+[Class reference](https://docs.amcharts.com/v5/reference/) |
 [Changelog](packages/shared/CHANGELOG.md) |
 [Download](https://www.amcharts.com/download/)
 
@@ -42,7 +42,7 @@ npm package or load it with script tags, as below.
   `renderer: am5.SVGRenderer`. `am5.renderToSVG(root)` returns a chart as SVG
   markup.
 * **Charts from JSON**: a chart can be described as
-  [a JSON config](https://www.amcharts.com/docs/v5/concepts/serializing/) and
+  [a JSON config](https://docs.amcharts.com/v5/concepts/serializing/) and
   built from it in code or by an `<am5-chart>` element, and a running chart can
   be saved as one.
 * **Maps**: globes and flat maps (six projections built in, and any other
@@ -51,15 +51,15 @@ npm package or load it with script tags, as below.
   continents, countries and their regions.
 * **Stock charts**: over 30 indicators, drawing tools, comparing stocks,
   period selectors, and data grouping for large data sets.
-* **Export**: [images, PDF, data and printing](https://www.amcharts.com/docs/v5/concepts/exporting/):
+* **Export**: [images, PDF, data and printing](https://docs.amcharts.com/v5/concepts/exporting/):
   PNG, JPG, SVG, PDF, CSV, XLSX, JSON and HTML.
-* **Themes**: [30 of them](https://www.amcharts.com/docs/v5/concepts/themes/),
+* **Themes**: [30 of them](https://docs.amcharts.com/v5/concepts/themes/),
   among them dark, colorblind-friendly and responsive ones.
-* **Accessibility**: [keyboard navigation and screen reader support](https://www.amcharts.com/docs/v5/concepts/accessibility/).
+* **Accessibility**: [keyboard navigation and screen reader support](https://docs.amcharts.com/v5/concepts/accessibility/).
 * **TypeScript**: the library is written in it, and the type definitions come
   with the package. They need TypeScript 5.0 or later.
 * **AI coding agents**: the npm package includes `AGENTS.md` and a reference
-  for every chart type, so that [agents](https://www.amcharts.com/docs/v5/ai/)
+  for every chart type, so that [agents](https://docs.amcharts.com/v5/ai/)
   write code for the current API. A hosted MCP server,
   `https://mcp.amcharts.com/mcp`, gives them the docs, examples and map files;
   in Claude, add it from the [Connectors Directory](https://claude.ai/directory/amcharts).
@@ -144,11 +144,11 @@ create and dispose the chart with the component: see
 [`integrations/`](integrations/). Without one, create the chart when the
 component is mounted and call `root.dispose()` when it is removed. There are
 guides for
-[React](https://www.amcharts.com/docs/v5/getting-started/integrations/react/),
-[Angular](https://www.amcharts.com/docs/v5/getting-started/integrations/angular/),
-[Vue](https://www.amcharts.com/docs/v5/getting-started/integrations/vue/),
-[Next.js](https://www.amcharts.com/docs/v5/getting-started/integrations/next-js/)
-and [others](https://www.amcharts.com/docs/v5/getting-started/integrations/).
+[React](https://docs.amcharts.com/v5/getting-started/integrations/react/),
+[Angular](https://docs.amcharts.com/v5/getting-started/integrations/angular/),
+[Vue](https://docs.amcharts.com/v5/getting-started/integrations/vue/),
+[Next.js](https://docs.amcharts.com/v5/getting-started/integrations/next-js/)
+and [others](https://docs.amcharts.com/v5/getting-started/integrations/).
 
 The [package README](packages/shared/README.md) has the list of chart types
 and their modules, where the examples are, charts from JSON, SVG, and how to

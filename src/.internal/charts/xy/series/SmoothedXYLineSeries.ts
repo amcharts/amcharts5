@@ -31,7 +31,7 @@ export interface SmoothedXYLineSeriesPrivate extends ILineSeriesPrivate {
  * A line series drawn as a smooth curve that can run in any direction, for
  * XY (scatter) charts.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/smoothed-series/} for more info
  */
 export class SmoothedXYLineSeries extends LineSeries {
 	public static className: string = "SmoothedXYLineSeries";

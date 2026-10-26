@@ -108,6 +108,12 @@ export interface ISerializerSettings extends IEntitySettings {
 export interface ISerializerPrivate extends IEntityPrivate {
 }
 
+// A reference written into data, kept apart from the data's own strings
+// until those are escaped
+class DataRef {
+	constructor(public ref: string) { }
+}
+
 export interface ISerializerEvents extends IEntityEvents {
 }
 
@@ -116,7 +122,7 @@ export interface ISerializerEvents extends IEntityEvents {
  * Serializes charts or individual elements into plain objects, which can be
  * saved as JSON.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/serializing/} for more info
  * @since 5.3.0
  */
 export class Serializer extends Entity {
@@ -142,31 +148,38 @@ export class Serializer extends Entity {
 	protected _serializingData: boolean = false;
 	protected _inInterfaceColors: boolean = false;
 
-	// The theme's palette: every color set of the root shares this list
+	// A color set as the theme makes it, and its list, which every color set of
+	// the root shares
+	protected _paletteSet?: ColorSet;
 	protected _palette?: Array<Color>;
 
 	// Where this very Color object is in the theme's palette, if it is there,
-	// as `getIndex()` hands out the list's own objects. Only the palette's own
-	// colors: generated ones depend on the order color sets asked for them,
-	// so they stay literal. Not in data
+	// as `getIndex()` hands out the list's own objects. A color generated past
+	// the list counts if it was made as a new color set would make it
 	protected _paletteIndex(color: Color): number | undefined {
-		if (this._serializingData) {
+		if (!this._paletteSet) {
+			this._paletteSet = ColorSet.new(this._root, {});
+			this._palette = this._paletteSet.get("colors", []);
+		}
+		const palette = this._palette!;
+		const index = palette.indexOf(color);
+		if (index < 0) {
 			return undefined;
 		}
-		if (!this._palette) {
-			const colorSet = ColorSet.new(this._root, {});
-			this._palette = colorSet.get("colors", []);
-			colorSet.dispose();
-		}
-		const index = this._palette.indexOf(color);
-		return index >= 0 && index < ColorSet.paletteLength(this._palette) ? index : undefined;
+		return index < ColorSet.paletteLength(palette) || ColorSet.generatedLike(color, this._paletteSet) ? index : undefined;
 	}
 
-	// Which of the root's interface colours this very Color object is, if any.
-	// Not in data, where a string starting with "@" is escaped as text
+	protected _dispose(): void {
+		super._dispose();
+		if (this._paletteSet) {
+			this._paletteSet.dispose();
+		}
+	}
+
+	// Which of the root's interface colours this very Color object is, if any
 	protected _interfaceColorKey(color: Color): string | undefined {
 		const interfaceColors: any = this._root.interfaceColors;
-		if (this._serializingData || this._inInterfaceColors || !interfaceColors) {
+		if (this._inInterfaceColors || !interfaceColors) {
 			return undefined;
 		}
 		const settings = interfaceColors._settings;
@@ -192,29 +205,31 @@ export class Serializer extends Entity {
 	 * those. It walks data the way the parser does: through every array, and
 	 * into an object only when that object is marked `__parse`. Anywhere else a
 	 * string comes back as it was written, so escaping it would leave a stray
-	 * `##` in the data.
+	 * `##` in the data. References the serializer made go in as they are.
 	 */
-	private _escapeParsed(value: any): void {
+	private _escapeParsed(value: any, parsed: boolean = true): void {
 		if ($type.isArray(value)) {
 			$array.each(value, (item, index) => {
-				if ($type.isString(item)) {
-					value[index] = this._escapeText(item);
-				}
-				else {
-					this._escapeParsed(item);
-				}
+				value[index] = this._escapeItem(item, parsed);
 			});
 		}
-		else if ($type.isObject(value) && (value as any).__parse === true) {
+		else if ($type.isObject(value)) {
+			const read = parsed && (value as any).__parse === true;
 			$object.each(value as any, (key, item) => {
-				if ($type.isString(item)) {
-					(value as any)[key] = this._escapeText(item);
-				}
-				else {
-					this._escapeParsed(item);
-				}
+				(value as any)[key] = this._escapeItem(item, read);
 			});
 		}
+	}
+
+	private _escapeItem(item: any, parsed: boolean): any {
+		if (item instanceof DataRef) {
+			return item.ref;
+		}
+		if ($type.isString(item)) {
+			return parsed ? this._escapeText(item) : item;
+		}
+		this._escapeParsed(item, parsed);
+		return item;
 	}
 
 	/**
@@ -363,13 +378,12 @@ export class Serializer extends Entity {
 			// A colour taken from the root's interface colours goes out as a
 			// reference, so it follows the theme the config is parsed with
 			const key = this._interfaceColorKey(source);
-			if (key) {
-				return "@root.interfaceColors.get('" + key + "')";
-			}
+			const index = key ? undefined : this._paletteIndex(source);
 			// The same for a colour taken from the theme's palette with getIndex()
-			const index = this._paletteIndex(source);
-			if (index != null) {
-				return "@colors.getIndex(" + index + ")";
+			const ref = key ? "@root.interfaceColors.get('" + key + "')" : index != null ? "@colors.getIndex(" + index + ")" : undefined;
+			if (ref) {
+				// Its row then reads as one to parse, and the ref is not escaped
+				return this._serializingData ? new DataRef(ref) : ref;
 			}
 			return {
 				type: "Color",

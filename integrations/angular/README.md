@@ -1,6 +1,6 @@
 # amCharts 5 for Angular
 
-An Angular component and directive for [amCharts 5](https://www.amcharts.com/docs/v5/):
+An Angular component and directive for [amCharts 5](https://docs.amcharts.com/v5/):
 a chart from a JSON config, and a chart written in code. They create and
 dispose the chart with the element, render on a server (Angular SSR) without
 loading the library there, and keep the chart's animation frames out of
@@ -99,7 +99,7 @@ export class DashboardComponent {
 
 | Input or event | What it is |
 |---|---|
-| `[config]` | The chart as a [JSON config](https://www.amcharts.com/docs/v5/concepts/serializing/): an object or a JSON string. A config with different content makes the chart again; one built in the template with the same content does not. |
+| `[config]` | The chart as a [JSON config](https://docs.amcharts.com/v5/concepts/serializing/): an object or a JSON string. A config with different content makes the chart again; one built in the template with the same content does not. |
 | `[src]` | A URL to load the config from, used when there is no `config`. |
 | `[themes]` | Theme classes, e.g. `[am5themes_Animated]`, or a class with its settings: `[[am5themes_Adaptive, { baseColor: "#4150a0" }]]`. Themes are not part of a config. In a variable of its own, type the list as `Array<ChartElementTheme>` (from `@amcharts/amcharts5/element`). |
 | `[resources]` | Geodata and locales the config names, e.g. `{ am5geodata_worldLow }` for `"geoJSON": "am5geodata_worldLow"`. See below. |
@@ -165,6 +165,6 @@ config.
 
 ## More
 
-- [amCharts 5 documentation](https://www.amcharts.com/docs/v5/) and [demos](https://www.amcharts.com/demos/)
-- [Using amCharts 5 with Angular](https://www.amcharts.com/docs/v5/getting-started/integrations/angular/)
+- [amCharts 5 documentation](https://docs.amcharts.com/v5/) and [demos](https://www.amcharts.com/demos/)
+- [Using amCharts 5 with Angular](https://docs.amcharts.com/v5/getting-started/integrations/angular/)
 - License: see [License](#license) above.

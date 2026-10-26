@@ -40,7 +40,7 @@ export interface IStochasticOscillatorEvents extends IOverboughtOversoldEvents {
  * range of the last `period` data items, from `0` to `100`, with a slow line
  * averaging it. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class StochasticOscillator extends OverboughtOversold {
 	public static className: string = "StochasticOscillator";

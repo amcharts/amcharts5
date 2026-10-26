@@ -14,7 +14,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 * Outer radius of the pie, in pixels or percent. A percent is of the
 	 * largest radius that fits the chart for its `startAngle` and `endAngle`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/#pie-radius} for more info
 	 * @default 80%
 	 */
 	radius?: number | Percent;
@@ -24,7 +24,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 * value makes a donut. A negative number is pixels in from the outer
 	 * radius.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Pie_radius} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/#pie-radius} for more info
 	 */
 	innerRadius?: number | Percent;
 
@@ -34,7 +34,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 * pie; the series' own `startAngle` sets where its slices start, so set
 	 * both.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Start_end_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/#startend-angles} for more info
 	 * @default -90
 	 */
 	startAngle?: number;
@@ -43,7 +43,7 @@ export interface IPieChartSettings extends IPercentChartSettings {
 	 * Angle where the pie ends, in degrees. Like `startAngle`, it fits and
 	 * centers the pie; set the series' `endAngle` to match.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/#Start_end_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/#startend-angles} for more info
 	 * @default 270
 	 */
 	endAngle?: number;
@@ -64,7 +64,7 @@ export interface IPieChartPrivate extends IPercentChartPrivate {
  * between `innerRadius` and `radius` into concentric rings, unless they set
  * their own radii.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/pie-chart/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/pie-chart/} for more info
  * @important
  */
 export class PieChart extends PercentChart {

@@ -103,7 +103,7 @@ export interface IMapLineSeriesSettings extends IMapSeriesSettings {
  * A map series of lines, such as routes: from GeoJSON geometries, or
  * connecting the points of a [[MapPointSeries]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-line-series/} for more info
  * @important
  */
 export class MapLineSeries extends MapSeries {

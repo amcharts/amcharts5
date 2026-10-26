@@ -65,7 +65,7 @@ export interface IStockToolbarEvents extends IEntityEvents {
  * A toolbar of [[StockControl]] buttons for a [[StockChart]], placed in an
  * HTML element outside the chart.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/} for more info
  */
 export class StockToolbar extends Entity {
 	public static className: string = "StockToolbar";

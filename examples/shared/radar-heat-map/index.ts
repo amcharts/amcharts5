@@ -6,19 +6,19 @@ import data from "./data.json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/
+// https://docs.amcharts.com/v5/charts/radar-chart/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
   innerRadius: am5.percent(50), // an empty middle half, so the inner rings are not tiny
   layout: root.verticalLayout   // the heat legend added below goes under the circle
@@ -26,7 +26,7 @@ const chart = root.container.children.push(am5radar.RadarChart.new(root, {
 
 
 // Create axes and their renderers
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-axes
 // weekdays as rings, Sunday outermost
 const yRenderer = am5radar.AxisRendererRadial.new(root, {
   visible: false,      // no axis line
@@ -70,7 +70,7 @@ const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-series
 const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
   calculateAggregates: true,                      // works out the lowest and highest value for the colors
   stroke: root.interfaceColors.get("background"), // cell outlines in the background color, as gaps
@@ -91,7 +91,7 @@ series.columns.template.setAll({
 
 
 // Set up heat rules: the legend uses the same two colors
-// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+// https://docs.amcharts.com/v5/concepts/settings/heat-rules/
 const minColor = am5.color(0xfffb77); // pale yellow for the lowest value...
 const maxColor = am5.color(0xfe131a); // ...red for the highest
 
@@ -105,7 +105,7 @@ series.set("heatRules", [{
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/radar-chart/#setting-data
 series.data.setAll(data);
 
 // both axes get their categories in order, Sunday first and midnight first
@@ -148,7 +148,7 @@ xAxis.data.setAll([
 
 
 // Add heat legend
-// https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/
+// https://docs.amcharts.com/v5/concepts/legend/heat-legend/
 const heatLegend = chart.children.push(am5.HeatLegend.new(root, {
   orientation: "horizontal", // a bar under the circle
   startColor: minColor,      // the same colors as the heat rule
@@ -172,6 +172,6 @@ series.columns.template.events.on("pointerover", (event) => {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

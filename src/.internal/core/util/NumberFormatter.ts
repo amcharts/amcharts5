@@ -91,7 +91,7 @@ export interface INumberFormatterPrivate extends IEntityPrivate {
 /**
  * Formats numbers in labels, tooltips and other text.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-numbers/} for more info
  * @important
  */
 export class NumberFormatter extends Entity {

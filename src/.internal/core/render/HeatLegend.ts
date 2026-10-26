@@ -76,7 +76,7 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	 * Number of color steps. At `1` the scale is a smooth gradient.
 	 *
 	 * @default 1
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Gradient_or_steps} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/legend/heat-legend/#gradient-or-steps} for more info
 	 */
 	stepCount?: number;
 
@@ -84,7 +84,7 @@ export interface IHeatLegendSettings extends IContainerSettings {
 	 * Orientation of the scale: `"horizontal"` runs from start on the left to
 	 * end on the right, `"vertical"` from start at the bottom to end at the top.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/#Orientation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/legend/heat-legend/#orientation} for more info
 	 */
 	orientation: "horizontal" | "vertical";
 
@@ -97,7 +97,7 @@ export interface IHeatLegendPrivate extends IContainerPrivate {
  * A legend that shows a color scale from `startColor` to `endColor`, with the
  * values at its ends.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/legend/heat-legend/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/legend/heat-legend/} for more info
  */
 export class HeatLegend extends Container {
 

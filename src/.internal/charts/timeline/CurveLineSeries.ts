@@ -22,7 +22,7 @@ export interface ICurveLineSeriesAxisRange extends ILineSeriesAxisRange {
 /**
  * A line series for a [[CurveChart]], [[SerpentineChart]] or [[SpiralChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/timeline/} for more info
  * @since 5.12.0
  * @important
  */

@@ -64,7 +64,7 @@ export interface ISlicePrivate extends IGraphicsPrivate {
 /**
  * A slice of a circle or ring, as in a pie chart.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  */
 export class Slice extends Graphics {
 

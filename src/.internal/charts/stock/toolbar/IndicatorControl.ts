@@ -102,7 +102,7 @@ export interface IIndicatorControlEvents extends IDropdownListControlEvents {
 /**
  * A [[StockToolbar]] control for adding indicators to a [[StockChart]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/indicator-control/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/indicator-control/} for more info
  */
 export class IndicatorControl extends DropdownListControl {
 	public static className: string = "IndicatorControl";
@@ -516,7 +516,7 @@ export class IndicatorControl extends DropdownListControl {
 	 * Serializes the chart's indicators into an array of objects
 	 * (`output: "object"`) or into JSON (`"string"`, the default).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
 	 * @param   output Output format
 	 * @param   indent Line indent in JSON
@@ -562,7 +562,7 @@ export class IndicatorControl extends DropdownListControl {
 	/**
 	 * Adds indicators to the chart from data made by `serializeIndicators()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
 	 * @param  data Serialized data
 	 */

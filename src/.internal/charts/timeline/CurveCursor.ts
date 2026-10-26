@@ -34,7 +34,7 @@ export interface ICurveCursorEvents extends IXYCursorEvents {
  * Cursor for a [[CurveChart]], [[SerpentineChart]] or [[SpiralChart]]: one
  * line across the curve and one along it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/timeline/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/timeline/} for more info
  * @since 5.12.0
  * @important
  */

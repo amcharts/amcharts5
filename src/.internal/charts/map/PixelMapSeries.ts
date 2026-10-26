@@ -248,7 +248,7 @@ export interface IPixelMapSeriesSettings extends IMapPolygonSeriesSettings {
  * towards the edge. With `uniform: true` they sit on an even grid on screen
  * instead.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/pixel-map-series/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/pixel-map-series/} for more information
  * @important
  * @since 5.21.0
  */

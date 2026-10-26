@@ -55,7 +55,7 @@ export interface INightSeriesSettings extends IMapPolygonSeriesSettings, ISunSet
  * Set `sunDate` (e.g. `"now"`) or `sunPosition`. The night is styled through
  * `mapPolygons.template`: `fill`, and `fillOpacity` for how dark full night is.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/night-series/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/night-series/} for more information
  * @since 5.21.0
  * @important
  */

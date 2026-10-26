@@ -24,7 +24,7 @@ export interface IChaikinMoneyFlowEvents extends IChartIndicatorEvents {
  * Chaikin Money Flow indicator: volume-weighted money flow over `period`, from
  * `-1` to `1`. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class ChaikinMoneyFlow extends ChartIndicator {
 	public static className: string = "ChaikinMoneyFlow";

@@ -6,7 +6,7 @@ import { darkInterfaceColors, liftDarkColors } from "./DarkVariant";
  * neutral dark interface colors. Its darkest colors are lightened to show on
  * the background. Use it in place of `Moonrise`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class MoonriseDarkTheme extends MoonriseTheme {

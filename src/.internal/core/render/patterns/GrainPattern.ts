@@ -73,7 +73,7 @@ export interface IGrainPatternPrivate extends IPatternPrivate {
  * 
  * Note, rotation setting is not supported by this pattern.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Grain_patterns} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#grain-patterns} for more info
  * @since 5.5.0
  */
 export class GrainPattern extends Pattern {

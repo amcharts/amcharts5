@@ -62,7 +62,7 @@ export interface IDataSaveControlEvents extends IDropdownListControlEvents {
  * A control that saves the chart's drawings and indicators to the browser's
  * local storage, and restores them.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/data-save-control/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/data-save-control/} for more info
  * @since 5.7.0
  */
 export class DataSaveControl extends DropdownListControl {

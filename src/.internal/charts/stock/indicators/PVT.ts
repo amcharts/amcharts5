@@ -25,7 +25,7 @@ export interface IPVTEvents extends IChartIndicatorEvents {
  * Price Volume Trend indicator: a running total of each close's percentage
  * change from the previous one, times volume. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class PVT extends ChartIndicator {
 	public static className: string = "PVT";

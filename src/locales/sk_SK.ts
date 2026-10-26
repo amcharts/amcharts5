@@ -5,7 +5,7 @@
  * Language: Slovak
  * Author: Jakub Vyskoc
  *
- * Follow instructions in [on this page](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
+ * Follow instructions in [on this page](https://docs.amcharts.com/v5/concepts/locales/creating-translations/) to make corrections or add new translations.
  */
 export default {
 	// Number formatting options.

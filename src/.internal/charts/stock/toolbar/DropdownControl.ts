@@ -30,7 +30,7 @@ export interface IDropdownControlEvents extends IStockControlEvents {
  *
  * Can be used in a [[StockToolbar]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/dropdown-list-control/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/dropdown-list-control/} for more info
  */
 export class DropdownControl extends StockControl {
 	public static className: string = "DropdownControl";

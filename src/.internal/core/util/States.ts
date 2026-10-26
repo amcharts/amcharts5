@@ -7,7 +7,7 @@ import * as $ease from "./Ease";
  * A named set of setting values, such as `"hover"`, that an element takes on
  * when the state is applied.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/states/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/settings/states/} for more info
  */
 export class State<E extends Entity> {
 	private _entity: E;
@@ -32,7 +32,7 @@ export class State<E extends Entity> {
 	 * Returns the state's value for setting `key`, or `fallback` if it has
 	 * none.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/settings/} for more info
 	 * @param   key       Settings key
 	 * @param   fallback  Value to return if the state has no value
 	 * @return            Value
@@ -102,7 +102,7 @@ export class State<E extends Entity> {
 	/**
 	 * Removes setting `key` from the state.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/settings/} for more info
 	 * @param   key       Setting key
 	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key) {
@@ -115,7 +115,7 @@ export class State<E extends Entity> {
 	 * Sets several of the state's settings at once, from an object of
 	 * key-value pairs.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/settings/} for more info
 	 * @param settings Settings
 	 */
 	public setAll(settings: this["_settings"]) {
@@ -221,7 +221,7 @@ export class State<E extends Entity> {
  * The [[State]] objects of an element, by name, such as `"hover"` or
  * `"hidden"`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/states/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/settings/states/} for more info
  */
 export class States<E extends Entity> {
 	private _states: { [key: string]: State<E> } = {};

@@ -14,7 +14,7 @@ export interface IRectanglePrivate extends IGraphicsPrivate {
 /**
  * Draws a rectangle.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Rectangle extends Graphics {

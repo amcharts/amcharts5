@@ -1,4 +1,5 @@
 import type { DataItem } from "../../core/render/Component";
+import type { Sprite } from "../../core/render/Sprite";
 import type { Color } from "../../core/util/Color";
 import type { FlowLink } from "./FlowLink";
 import type { FlowNodes, IFlowNodesDataItem } from "./FlowNodes";
@@ -105,7 +106,7 @@ export interface IFlowSettings extends ISeriesSettings {
 	 * on.
 	 *
 	 * @default 0.05
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/#node-toggling} for more info
 	 * @since 5.4.1
 	 */
 	hiddenSize?: number;
@@ -114,7 +115,7 @@ export interface IFlowSettings extends ISeriesSettings {
 	 * Smallest value a hidden link shrinks to, whatever `hiddenSize` gives.
 	 *
 	 * @default 0
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/#node-toggling} for more info
 	 * @since 5.4.1
 	 */
 	minHiddenValue?: number;
@@ -132,7 +133,7 @@ export interface IFlowEvents extends ISeriesEvents {
 /**
  * Base class for the flow series: [[Sankey]], [[Chord]] and [[ArcDiagram]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/} for more info
  */
 export abstract class Flow extends Series {
 	public static className: string = "Flow";
@@ -141,6 +142,18 @@ export abstract class Flow extends Series {
 	declare public _settings: IFlowSettings;
 	declare public _privateSettings: IFlowPrivate;
 	declare public _dataItemSettings: IFlowDataItem;
+
+	/**
+	 * @ignore
+	 */
+	public _dataItemName(dataItem: DataItem<this["_dataItemSettings"]>, sprite: Sprite): string | undefined {
+		const source = dataItem.get("source");
+		const target = dataItem.get("target");
+		if (source && target) {
+			return (source.get("name") || dataItem.get("sourceId")) + " > " + (target.get("name") || dataItem.get("targetId"));
+		}
+		return super._dataItemName(dataItem, sprite);
+	}
 	declare public _events: IFlowEvents;
 
 	/**

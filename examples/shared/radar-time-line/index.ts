@@ -6,12 +6,12 @@ import data from "./data.json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes: the custom one makes labels smaller and the grid fainter
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 const myTheme = am5.Theme.new(root);
 myTheme.rule("Label").set("fontSize", 10);
 myTheme.rule("Grid").set("strokeOpacity", 0.06);
@@ -22,7 +22,7 @@ root.setThemes([
 ]);
 
 // Set number format: positive, negative and zero values
-// https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/
+// https://docs.amcharts.com/v5/concepts/formatters/formatting-numbers/
 root.numberFormatter.set("numberFormat", "+#.0°C|#.0°C|0.0°C");
 
 
@@ -37,7 +37,7 @@ const maxColor = am5.color(0xf44336);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/
+// https://docs.amcharts.com/v5/charts/radar-chart/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
   panX: false,                  // dragging does not pan: the cursor uses the drag to zoom
   panY: false,
@@ -51,7 +51,7 @@ const chart = root.container.children.push(am5radar.RadarChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor
+// https://docs.amcharts.com/v5/charts/radar-chart/#cursor
 const cursor = chart.set("cursor", am5radar.RadarCursor.new(root, {
   behavior: "zoomX",       // drag around the circle to zoom in on those countries
   radius: am5.percent(40), // the cursor works only in a ring that ends at the plot's inner edge...
@@ -61,7 +61,7 @@ cursor.lineY.set("visible", false); // no circle at the pointer, only the spoke
 
 
 // Create axes and their renderers
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_axes
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-axes
 const xRenderer = am5radar.AxisRendererCircular.new(root, {
   minGridDistance: 10,   // labels may be 10 px apart (default 100), so most countries get one
   minorGridEnabled: true // fainter grid lines for the countries whose label is skipped
@@ -96,7 +96,7 @@ const valueAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Adding_series
+// https://docs.amcharts.com/v5/charts/radar-chart/#adding-series
 const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
   calculateAggregates: true, // works out the lowest and highest value, which the heat rule needs
   name: "Series",
@@ -112,7 +112,7 @@ const series = chart.series.push(am5radar.RadarColumnSeries.new(root, {
 series.columns.template.set("strokeOpacity", 0); // no outlines on the columns
 
 // Set up heat rules
-// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+// https://docs.amcharts.com/v5/concepts/settings/heat-rules/
 series.set("heatRules", [{
   target: series.columns.template,
   key: "fill",
@@ -134,7 +134,7 @@ const yearLabel = chart.radarContainer.children.push(am5.Label.new(root, {
 
 
 // Set data: the series starts with the values of the current year
-// https://www.amcharts.com/docs/v5/charts/radar-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/radar-chart/#setting-data
 const yearData = am5.array.map(data, (row) => {
   return {
     country: row.country,
@@ -156,7 +156,7 @@ am5.array.each(data, (row) => {
 });
 
 // Create an axis range for each continent, from its first country to its last
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-ranges/
 const colors = am5.ColorSet.new(root, {});
 
 am5.array.each(continents, (continent, index) => {
@@ -208,7 +208,7 @@ am5.array.each(continents, (continent, index) => {
 
 
 // Create controls: a play button and a slider that sets the year
-// https://www.amcharts.com/docs/v5/concepts/common-elements/containers/
+// https://docs.amcharts.com/v5/concepts/common-elements/containers/
 const container = chart.children.push(am5.Container.new(root, {
   y: am5.p100,                  // at the bottom of the chart...
   centerY: am5.p100,
@@ -277,6 +277,6 @@ function showYear(year: number) {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

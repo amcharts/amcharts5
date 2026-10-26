@@ -55,7 +55,7 @@ export interface IDataProcessorEvents extends IEntityEvents {
  * Converts data values, such as string dates and numbers, as data is added to
  * a component.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/data/#pre-processing-data} for more info
  * @important
  */
 export class DataProcessor extends Entity {

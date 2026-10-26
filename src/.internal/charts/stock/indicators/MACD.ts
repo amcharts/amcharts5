@@ -59,7 +59,7 @@ export interface IMACDEvents extends IChartIndicatorEvents {
  * slow exponential moving average of `field`, with a signal line and columns
  * of the difference between the two. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class MACD extends ChartIndicator {
 	public static className: string = "MACD";

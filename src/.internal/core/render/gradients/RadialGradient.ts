@@ -37,7 +37,7 @@ export interface IRadialGradientPrivate extends IGradientPrivate {
 /**
  * A gradient that changes color outward from a center point.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export class RadialGradient extends Gradient {
 

@@ -1,6 +1,7 @@
 import type { Matrix } from "../../util/Matrix";
 import type { IBounds } from "../../util/IBounds";
-import type { GraphicsPaint, GraphicsData } from "../scene/GraphicsData";
+import type { GraphicsPaint, GraphicsData, IPathSink } from "../scene/GraphicsData";
+import type { IPoint } from "../../util/IPoint";
 import type { Shadow, GraphicsImage } from "../scene/GraphicsData";
 import type { ILayer, IDisplayObject } from "./Renderer";
 import type { ISceneHost } from "../scene/SceneNode";
@@ -9,7 +10,7 @@ import type { Sprite } from "../Sprite";
 import { SceneNode, SceneContainer, SceneGraphics, SceneText, SceneRadialText, SceneImage } from "../scene/SceneNode";
 import { SvgPathSink } from "../scene/SvgPathSink";
 import { LinearGradientDef, RadialGradientDef, PatternDef, RasterPatternDef } from "../scene/Paint";
-import { getFontStyle } from "../scene/TextLayout";
+import { getFontStyle, resolveFont, baselineShift } from "../scene/TextLayout";
 import { Color } from "../../util/Color";
 import { TextFormatter } from "../../util/TextFormatter";
 import * as $array from "../../util/Array";
@@ -63,6 +64,15 @@ export interface ISvgExportOptions {
 	 * @since 5.21.0
 	 */
 	background?: string;
+
+	/**
+	 * Also write elements marked `exportable: false`, such as scrollbar grips,
+	 * as the chart shows them.
+	 *
+	 * @default false
+	 * @since 5.21.5
+	 */
+	includeNonExportable?: boolean;
 }
 
 /**
@@ -175,6 +185,13 @@ export class SvgDocument {
 
 	protected _paints: Map<object, string> = new Map();
 	protected _p: number;
+
+	// Fonts in pixels, and baseline shifts, by font
+	public _fonts: Map<string, string> = new Map();
+	public _shifts: Map<string, number> = new Map();
+
+	// Elements marked `exportable: false` are written too
+	public nonExportable: boolean = false;
 
 	// An exported file is also read by tools that only know the older attribute
 	public href: string;
@@ -375,7 +392,7 @@ export class SvgDocument {
 			});
 			cache.clip = sink.d;
 		}
-		return this.defs.id("c", "<clipPath><path transform=\"" + this.matrix(mask._matrix) + "\" d=\"" + cache.clip + "\"/></clipPath>");
+		return this.defs.id("c", "<clipPath" + (this.live ? "" : " data-name=\"Mask\"") + "><path transform=\"" + this.matrix(mask._matrix) + "\" d=\"" + cache.clip + "\"/></clipPath>");
 	}
 }
 
@@ -491,16 +508,17 @@ function pathEntry(g: SceneGraphics, precision: number): IPathCache {
  *
  * @ignore
  */
-function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter: string | undefined, out: Array<string>): void {
+function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter: string | undefined, out: Array<string>, tiles?: ITileCopies): void {
 	// Path data is reused while the ops are unchanged: moving, fading or
-	// restyling a shape does not trace it again
-	const cache = pathEntry(g, doc.precision);
-	const traced = !cache.paths;
-	const paths = cache.paths || (cache.paths = []);
+	// restyling a shape does not trace it again. A tile drawn as copies is not
+	const cache = tiles ? undefined : pathEntry(g, doc.precision);
+	const traced = !cache || !cache.paths;
+	const paths = cache ? (cache.paths || (cache.paths = [])) : [];
 	let pathIndex = 0;
-	const nextPath = (): string => {
+	let pathOps: Array<IPathOp> = [];
+	const nextPath = (kind: "fill" | "stroke"): string => {
 		if (traced) {
-			paths.push(sink.d);
+			paths.push(tiles ? (tiles.clip ? clippedTilesPath(doc, pathOps, tiles, kind, dash, dashOffset) : copiesPath(pathOps, tiles.copies, doc.precision)) : sink.d);
 		}
 		return paths[pathIndex++];
 	};
@@ -516,6 +534,10 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 	let shadow: Shadow | undefined;
 
 	const attrs = (withShadow: boolean) => {
+		// Clipped tile copies are already in the shape's space
+		if (tiles && tiles.clip) {
+			return alpha < 1 ? " opacity=\"" + doc.n(alpha) + "\"" : "";
+		}
 		const shadowId = (withShadow && shadow) ? doc.shadow(shadow.color, shadow.blur, shadow.offsetX, shadow.offsetY, g._matrix, g.getLocalBounds(), width * 5) : undefined;
 		return leafAttrs(doc, g, alpha, filter, shadowId);
 	};
@@ -528,6 +550,7 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 			case "beginPath":
 				if (traced) {
 					sink = new SvgPathSink(doc.precision);
+					pathOps = [];
 				}
 				break;
 			case "beginFill":
@@ -552,8 +575,12 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 				break;
 			}
 			case "endFill": {
-				const d = nextPath();
-				if (d && (doc.live || !invisible(fill))) {
+				const d = nextPath("fill");
+				if (d && !doc.live && fill instanceof PatternDef && !tiles) {
+					const plain = attrs(false);
+					const shadowed = attrs(true);
+					writePatternFill(doc, g, d, fill, plain, shadowed != plain ? shadowed : undefined, out);
+				} else if (d && (doc.live || !invisible(fill))) {
 					out.push("<path" + attrs(true) + " d=\"" + d + "\" " + doc.paint("fill", fill) + "/>");
 				}
 				if (op.clearShadow) {
@@ -577,7 +604,7 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 				}
 				break;
 			case "endStroke": {
-				const d = nextPath();
+				const d = nextPath("stroke");
 				if (d && (doc.live || !invisible(stroke))) {
 					let s = " fill=\"none\" " + doc.paint("stroke", stroke) + " stroke-width=\"" + doc.n(width) + "\" stroke-miterlimit=\"10\"";
 					if (join != "miter") {
@@ -586,7 +613,8 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 					if (cap != "butt") {
 						s += " stroke-linecap=\"" + cap + "\"";
 					}
-					if (dash.length) {
+					// Cut tile copies have their dashes drawn in already
+					if (dash.length && !(tiles && tiles.clip)) {
 						s += " stroke-dasharray=\"" + dash.map((x) => doc.n(x)).join(" ") + "\"";
 						if (dashOffset) {
 							s += " stroke-dashoffset=\"" + doc.n(dashOffset) + "\"";
@@ -611,11 +639,21 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 				shadow = op;
 				break;
 			case "image":
-				writeImageOp(doc, g, op, alpha, filter, out);
+				if (tiles) {
+					$array.each(tiles.copies, (copy) => {
+						writeImageOp(doc, g, <GraphicsImage><any>{ image: op.image, x: op.x + copy.x, y: op.y + copy.y, width: op.width, height: op.height }, alpha, filter, out);
+					});
+				} else {
+					writeImageOp(doc, g, op, alpha, filter, out);
+				}
 				break;
 			default:
 				if (traced) {
-					op.path(sink);
+					if (tiles) {
+						pathOps.push(op);
+					} else {
+						op.path(sink);
+					}
 				}
 		}
 	});
@@ -677,6 +715,435 @@ function writeImageOp(doc: SvgDocument, g: SceneGraphics, op: GraphicsImage, alp
 		return;
 	}
 	out.push("<image" + leafAttrs(doc, g, alpha, filter) + " x=\"" + doc.n(op.x) + "\" y=\"" + doc.n(op.y) + "\" width=\"" + doc.n(op.width) + "\" height=\"" + doc.n(op.height) + "\" " + doc.href + "=\"" + escapeXML(href) + "\" preserveAspectRatio=\"none\"/>");
+}
+
+// A path moved by `dx`, `dy`
+function offsetSink(sink: IPathSink, dx: number, dy: number): IPathSink {
+	return {
+		moveTo: (x, y) => sink.moveTo(x + dx, y + dy),
+		lineTo: (x, y) => sink.lineTo(x + dx, y + dy),
+		closePath: () => sink.closePath(),
+		rect: (x, y, w, h) => sink.rect(x + dx, y + dy, w, h),
+		arc: (cx, cy, r, a0, a1, ccw) => sink.arc(cx + dx, cy + dy, r, a0, a1, ccw),
+		arcTo: (x1, y1, x2, y2, r) => sink.arcTo(x1 + dx, y1 + dy, x2 + dx, y2 + dy, r),
+		ellipse: (x, y, rx, ry, rotation, a0, a1, ccw) => sink.ellipse(x + dx, y + dy, rx, ry, rotation, a0, a1, ccw),
+		bezierCurveTo: (x1, y1, x2, y2, x, y) => sink.bezierCurveTo(x1 + dx, y1 + dy, x2 + dx, y2 + dy, x + dx, y + dy),
+		quadraticCurveTo: (x1, y1, x, y) => sink.quadraticCurveTo(x1 + dx, y1 + dy, x + dx, y + dy)
+	};
+}
+
+// Path ops drawn once at each offset, each copy starting its own subpaths
+function copiesPath(ops: Array<IPathOp>, copies: Array<IPoint>, precision: number): string {
+	let d = "";
+	$array.each(copies, (copy) => {
+		const sink = new SvgPathSink(precision);
+		const moved = offsetSink(sink, copy.x, copy.y);
+		$array.each(ops, (op) => {
+			op.path(moved);
+		});
+		d += sink.d;
+	});
+	return d;
+}
+
+/**
+ * A pattern fill as shapes, for design tools, which ignore `<pattern>`: the
+ * tile's paths, repeated over the shape and clipped to it. Within one path the
+ * copies' overlaps (lines drawn past the tile's edge) do not show twice.
+ *
+ * @ignore
+ */
+function writePatternFill(doc: SvgDocument, g: SceneGraphics, d: string, pattern: PatternDef, attrs: string, shadowAttrs: string | undefined, out: Array<string>): void {
+	const w = pattern.width;
+	const h = pattern.height;
+	const bounds = g.getLocalBounds();
+	const left = Math.floor(bounds.left / w);
+	const top = Math.floor(bounds.top / h);
+	const cols = Math.ceil(bounds.right / w) - left;
+	const rows = Math.ceil(bounds.bottom / h) - top;
+
+	// Too many tiles to draw one by one, or a tile not repeated both ways: the
+	// pattern stays a definition
+	if (!(w > 0 && h > 0 && cols > 0 && rows > 0) || cols * rows > 2500 || (pattern.repetition && pattern.repetition != "repeat")) {
+		out.push("<path" + (shadowAttrs || attrs) + " d=\"" + d + "\" " + doc.paint("fill", pattern) + "/>");
+		return;
+	}
+
+	const copies: Array<IPoint> = [];
+	for (let i = 0; i < cols; i++) {
+		for (let j = 0; j < rows; j++) {
+			copies.push({ x: (left + i) * w, y: (top + j) * h });
+		}
+	}
+
+	const parts: Array<string> = [];
+	writeTile(doc, <SceneGraphics>pattern.background, copies, w, h, bounds, parts);
+	writeTile(doc, <SceneGraphics>pattern.graphics, copies, w, h, bounds, parts);
+	if (parts.length) {
+		const clip = doc.defs.id("c", "<clipPath data-name=\"Mask\"><path d=\"" + d + "\"/></clipPath>");
+		// A shadow goes outside the clip, which would cut it off
+		if (shadowAttrs) {
+			out.push("<g" + shadowAttrs + "><g clip-path=\"url(#" + clip + ")\" data-name=\"Pattern\">" + parts.join("") + "</g></g>");
+		} else {
+			out.push("<g" + attrs + " clip-path=\"url(#" + clip + ")\" data-name=\"Pattern\">" + parts.join("") + "</g>");
+		}
+	}
+}
+
+/**
+ * Where a pattern tile is drawn.
+ *
+ * @ignore
+ */
+interface ITileCopies {
+	// Offsets in the tile's own space, so its transform stays as it is
+	copies: Array<IPoint>;
+
+	// Copies cut where they reach past the tile's edges, as canvas does, or past
+	// the shape: offsets in the shape's space, the tile's size and transform,
+	// and the shape's bounds
+	clip?: { copies: Array<IPoint>, width: number, height: number, matrix: Matrix, bounds: IBounds };
+}
+
+type IPathOp = { path(sink: IPathSink): void };
+
+// A tile's graphics at each copy's offset. Nothing reaches past the shape, not
+// even hidden by its mask: a design tool would still select it there
+function writeTile(doc: SvgDocument, tile: SceneGraphics, copies: Array<IPoint>, width: number, height: number, bounds: IBounds, out: Array<string>): void {
+	if (!tile.visible) {
+		return;
+	}
+	tile._setMatrix();
+	const m = tile._matrix;
+	const det = m.a * m.d - m.b * m.c;
+	if (!det) {
+		return;
+	}
+	const local = (list: Array<IPoint>) => list.map((copy) => ({ x: (m.d * copy.x - m.c * copy.y) / det, y: (m.a * copy.y - m.b * copy.x) / det }));
+
+	// The tile's graphics in its own box
+	const b = tile.getContentBounds();
+	let left = Infinity;
+	let top = Infinity;
+	let right = -Infinity;
+	let bottom = -Infinity;
+	$array.each([{ x: b.left, y: b.top }, { x: b.right, y: b.top }, { x: b.right, y: b.bottom }, { x: b.left, y: b.bottom }], (p) => {
+		const x = m.a * p.x + m.c * p.y + m.tx;
+		const y = m.b * p.x + m.d * p.y + m.ty;
+		left = Math.min(left, x);
+		top = Math.min(top, y);
+		right = Math.max(right, x);
+		bottom = Math.max(bottom, y);
+	});
+	const e = 0.01;
+
+	// Graphics past the tile's edges (lines drawn long, a rotation) are cut in
+	// every copy; others only in copies at the shape's edges. Copies inside keep
+	// their exact curves
+	const bleeds = left < -e || top < -e || right > width + e || bottom > height + e;
+	const inner: Array<IPoint> = [];
+	const edge: Array<IPoint> = [];
+	$array.each(copies, (copy) => {
+		const inside = !bleeds && copy.x + left >= bounds.left - e && copy.y + top >= bounds.top - e && copy.x + right <= bounds.right + e && copy.y + bottom <= bounds.bottom + e;
+		(inside ? inner : edge).push(copy);
+	});
+
+	const alpha = tile.compoundAlpha * tile.alpha;
+	if (inner.length) {
+		writeGraphics(doc, tile, alpha, tile.filter, out, { copies: local(inner) });
+	}
+	if (edge.length) {
+		writeGraphics(doc, tile, alpha, tile.filter, out, { copies: local(edge), clip: { copies: edge, width, height, matrix: m, bounds } });
+	}
+}
+
+// Path ops as points, curves in short segments, for cutting
+class PolySink implements IPathSink {
+	public paths: Array<{ points: Array<IPoint>, closed: boolean }> = [];
+	protected _path: { points: Array<IPoint>, closed: boolean } | undefined;
+	protected _x = 0;
+	protected _y = 0;
+	protected _restart: IPoint | undefined;
+
+	public moveTo(x: number, y: number): void {
+		if (!isFinite(x) || !isFinite(y)) {
+			return;
+		}
+		this._path = { points: [{ x, y }], closed: false };
+		this.paths.push(this._path);
+		this._x = x;
+		this._y = y;
+		this._restart = undefined;
+	}
+
+	public lineTo(x: number, y: number): void {
+		if (!isFinite(x) || !isFinite(y)) {
+			return;
+		}
+		if (!this._path) {
+			// After closePath a path goes on from the closed one's start
+			const start = this._restart || { x, y };
+			this.moveTo(start.x, start.y);
+		}
+		this._path!.points.push({ x, y });
+		this._x = x;
+		this._y = y;
+	}
+
+	public closePath(): void {
+		if (this._path) {
+			this._path.closed = true;
+			this._restart = this._path.points[0];
+			this._path = undefined;
+		}
+	}
+
+	public rect(x: number, y: number, width: number, height: number): void {
+		this.moveTo(x, y);
+		this.lineTo(x + width, y);
+		this.lineTo(x + width, y + height);
+		this.lineTo(x, y + height);
+		this.closePath();
+	}
+
+	public arc(cx: number, cy: number, radius: number, startAngle: number, endAngle: number, anticlockwise?: boolean): void {
+		this.ellipse(cx, cy, radius, radius, 0, startAngle, endAngle, anticlockwise);
+	}
+
+	public ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number, anticlockwise?: boolean): void {
+		// The sweep as canvas takes it
+		const full = Math.PI * 2;
+		let sweep = endAngle - startAngle;
+		if (!anticlockwise) {
+			sweep = sweep >= full ? full : ((sweep % full) + full) % full;
+		} else {
+			sweep = sweep <= -full ? -full : -((((-sweep) % full) + full) % full);
+		}
+		const steps = Math.max(1, Math.ceil(Math.abs(sweep) / (Math.PI / 16)));
+		const cos = Math.cos(rotation);
+		const sin = Math.sin(rotation);
+		for (let i = 0; i <= steps; i++) {
+			const a = startAngle + sweep * i / steps;
+			const px = radiusX * Math.cos(a);
+			const py = radiusY * Math.sin(a);
+			const pointX = x + px * cos - py * sin;
+			const pointY = y + px * sin + py * cos;
+			if (i == 0 && !this._path && !this._restart) {
+				this.moveTo(pointX, pointY);
+			} else {
+				this.lineTo(pointX, pointY);
+			}
+		}
+	}
+
+	public arcTo(x1: number, y1: number, _x2: number, _y2: number, _radius: number): void {
+		// Not used by patterns: the corner without its rounding
+		this.lineTo(x1, y1);
+	}
+
+	public bezierCurveTo(cpX: number, cpY: number, cpX2: number, cpY2: number, toX: number, toY: number): void {
+		const x0 = this._x;
+		const y0 = this._y;
+		for (let i = 1; i <= 16; i++) {
+			const t = i / 16;
+			const u = 1 - t;
+			this.lineTo(u * u * u * x0 + 3 * u * u * t * cpX + 3 * u * t * t * cpX2 + t * t * t * toX, u * u * u * y0 + 3 * u * u * t * cpY + 3 * u * t * t * cpY2 + t * t * t * toY);
+		}
+	}
+
+	public quadraticCurveTo(cpX: number, cpY: number, toX: number, toY: number): void {
+		const x0 = this._x;
+		const y0 = this._y;
+		for (let i = 1; i <= 12; i++) {
+			const t = i / 12;
+			const u = 1 - t;
+			this.lineTo(u * u * x0 + 2 * u * t * cpX + t * t * toX, u * u * y0 + 2 * u * t * cpY + t * t * toY);
+		}
+	}
+}
+
+type IClipEdge = [(p: IPoint) => boolean, (a: IPoint, b: IPoint) => IPoint];
+
+// A polygon cut to a rectangle (Sutherland-Hodgman)
+function clipPolygon(points: Array<IPoint>, left: number, top: number, right: number, bottom: number): Array<IPoint> {
+	const edges: Array<IClipEdge> = [
+		[(p) => p.x >= left, (a, b) => ({ x: left, y: a.y + (b.y - a.y) * (left - a.x) / (b.x - a.x) })],
+		[(p) => p.x <= right, (a, b) => ({ x: right, y: a.y + (b.y - a.y) * (right - a.x) / (b.x - a.x) })],
+		[(p) => p.y >= top, (a, b) => ({ x: a.x + (b.x - a.x) * (top - a.y) / (b.y - a.y), y: top })],
+		[(p) => p.y <= bottom, (a, b) => ({ x: a.x + (b.x - a.x) * (bottom - a.y) / (b.y - a.y), y: bottom })]
+	];
+	let result = points;
+	$array.each(edges, (edge) => {
+		const inside = edge[0];
+		const cross = edge[1];
+		const input = result;
+		result = [];
+		$array.each(input, (current, i) => {
+			const previous = input[(i + input.length - 1) % input.length];
+			if (inside(current)) {
+				if (!inside(previous)) {
+					result.push(cross(previous, current));
+				}
+				result.push(current);
+			} else if (inside(previous)) {
+				result.push(cross(previous, current));
+			}
+		});
+	});
+	return result;
+}
+
+// The parts of a polyline inside a rectangle (Liang-Barsky), as polylines
+function clipPolyline(points: Array<IPoint>, left: number, top: number, right: number, bottom: number): Array<Array<IPoint>> {
+	const lines: Array<Array<IPoint>> = [];
+	let line: Array<IPoint> | undefined;
+	for (let i = 1; i < points.length; i++) {
+		const a = points[i - 1];
+		const b = points[i];
+		const dx = b.x - a.x;
+		const dy = b.y - a.y;
+		let t0 = 0;
+		let t1 = 1;
+		let visible = true;
+		$array.each([[-dx, a.x - left], [dx, right - a.x], [-dy, a.y - top], [dy, bottom - a.y]], (edge) => {
+			const p = edge[0];
+			const q = edge[1];
+			if (p == 0) {
+				if (q < 0) {
+					visible = false;
+				}
+			} else {
+				const t = q / p;
+				if (p < 0) {
+					t0 = Math.max(t0, t);
+				} else {
+					t1 = Math.min(t1, t);
+				}
+			}
+		});
+		if (!visible || t0 > t1) {
+			line = undefined;
+			continue;
+		}
+		const start = { x: a.x + dx * t0, y: a.y + dy * t0 };
+		const end = { x: a.x + dx * t1, y: a.y + dy * t1 };
+		if (!line || t0 > 0) {
+			line = [start];
+			lines.push(line);
+		}
+		line.push(end);
+		if (t1 < 1) {
+			line = undefined;
+		}
+	}
+	// A piece of no length would show as a dot with round caps
+	return lines.filter((points) => $array.any(points, (p) => p.x != points[0].x || p.y != points[0].y));
+}
+
+// A polyline as its dashes, as canvas strokes it: the dash list starts at the
+// polyline's start, moved by `offset`, and an odd list is used twice
+function dashPolyline(points: Array<IPoint>, dash: Array<number>, offset: number): Array<Array<IPoint>> {
+	const pattern = dash.length % 2 ? dash.concat(dash) : dash;
+	let total = 0;
+	$array.each(pattern, (x) => {
+		total += x;
+	});
+	if (!(total > 0) || points.length < 2) {
+		return [points];
+	}
+
+	let index = 0;
+	let into = ((offset % total) + total) % total;
+	while (into >= pattern[index]) {
+		into -= pattern[index];
+		index = (index + 1) % pattern.length;
+	}
+	let remaining = pattern[index] - into;
+	let on = index % 2 == 0;
+
+	const pieces: Array<Array<IPoint>> = [];
+	let piece: Array<IPoint> | undefined = on ? [points[0]] : undefined;
+	for (let i = 1; i < points.length; i++) {
+		const a = points[i - 1];
+		const b = points[i];
+		const dx = b.x - a.x;
+		const dy = b.y - a.y;
+		const length = Math.sqrt(dx * dx + dy * dy);
+		let t = 0;
+		while (length - t > remaining) {
+			t += remaining;
+			const p = { x: a.x + dx * t / length, y: a.y + dy * t / length };
+			if (on) {
+				piece!.push(p);
+				pieces.push(piece!);
+				piece = undefined;
+			} else {
+				piece = [p];
+			}
+			on = !on;
+			index = (index + 1) % pattern.length;
+			remaining = pattern[index];
+		}
+		remaining -= length - t;
+		if (on) {
+			piece!.push(b);
+		}
+	}
+	if (on && piece && piece.length > 1) {
+		pieces.push(piece);
+	}
+	return pieces;
+}
+
+// Path data of tile copies cut at the tile's edges, in the shape's space
+function clippedTilesPath(doc: SvgDocument, ops: Array<IPathOp>, tiles: ITileCopies, kind: "fill" | "stroke", dash: Array<number>, dashOffset: number): string {
+	const clip = tiles.clip!;
+	const m = clip.matrix;
+	const sink = new PolySink();
+	$array.each(ops, (op) => {
+		op.path(sink);
+	});
+
+	// A stroke's dashes, in the tile's own space, as canvas draws them before the tile cuts them
+	const strokes = kind == "stroke" ? sink.paths.map((path) => {
+		const points = path.closed && path.points.length > 1 ? path.points.concat([path.points[0]]) : path.points;
+		return dash.length ? dashPolyline(points, dash, dashOffset) : [points];
+	}) : [];
+	let d = "";
+	$array.each(clip.copies, (copy) => {
+		// The copy's tile, within the shape
+		const left = Math.max(copy.x, clip.bounds.left);
+		const top = Math.max(copy.y, clip.bounds.top);
+		const right = Math.min(copy.x + clip.width, clip.bounds.right);
+		const bottom = Math.min(copy.y + clip.height, clip.bounds.bottom);
+		if (right <= left || bottom <= top) {
+			return;
+		}
+		const place = (points: Array<IPoint>) => points.map((p) => ({ x: m.a * p.x + m.c * p.y + m.tx + copy.x, y: m.b * p.x + m.d * p.y + m.ty + copy.y }));
+		if (kind == "fill") {
+			$array.each(sink.paths, (path) => {
+				const polygon = clipPolygon(place(path.points), left, top, right, bottom);
+				// A shape cut down to a line along the edge has no area left
+				let area = 0;
+				$array.each(polygon, (p, i) => {
+					const q = polygon[(i + 1) % polygon.length];
+					area += p.x * q.y - q.x * p.y;
+				});
+				if (polygon.length > 2 && Math.abs(area) > 1e-6) {
+					d += "M" + polygon.map((p) => doc.n(p.x) + " " + doc.n(p.y)).join("L") + "Z";
+				}
+			});
+		} else {
+			$array.each(strokes, (pieces) => {
+				$array.each(pieces, (piece) => {
+					$array.each(clipPolyline(place(piece), left, top, right, bottom), (line) => {
+						d += "M" + line.map((p) => doc.n(p.x) + " " + doc.n(p.y)).join("L");
+					});
+				});
+			});
+		}
+	});
+	return d;
 }
 
 /**
@@ -772,7 +1239,7 @@ function writeText(doc: SvgDocument, text: SceneText, alpha: number, filter: str
 		attrs += " text-anchor=\"" + anchor + "\"";
 	}
 	const baseline = dominantBaseline(style.textBaseline);
-	if (baseline) {
+	if (baseline && doc.live) {
 		attrs += " dominant-baseline=\"" + baseline + "\"";
 	}
 	if (rtl) {
@@ -782,7 +1249,7 @@ function writeText(doc: SvgDocument, text: SceneText, alpha: number, filter: str
 	const parts: Array<string> = [];
 	$array.each(lines, (line) => {
 		$array.each(line.textChunks, (chunk) => {
-			const font = chunk.style || baseFont;
+			const font = textFont(doc, text, chunk.style || baseFont);
 			const fill = chunk.fill ? doc.color("fill", chunk.fill.toCSS()) : baseFill;
 			const x = chunk.offsetX;
 			const y = line.offsetY + chunk.offsetY;
@@ -792,7 +1259,8 @@ function writeText(doc: SvgDocument, text: SceneText, alpha: number, filter: str
 				return;
 			}
 			if (chunk.text !== "") {
-				parts.push("<text x=\"" + doc.n(x) + "\" y=\"" + doc.n(y) + "\" " + fill + " style=\"font:" + escapeXML(font) + ";white-space:pre\">" + escapeXML(chunk.text) + "</text>");
+				const textY = baseline && !doc.live ? y + textShift(doc, text, font, style.textBaseline!) : y;
+				parts.push("<text x=\"" + doc.n(x) + "\" y=\"" + doc.n(textY) + "\" " + fill + " " + fontAttrs(doc, font) + ">" + escapeXML(chunk.text) + "</text>");
 			}
 
 			// Decorations are drawn as lines, like the canvas renderer does
@@ -852,9 +1320,57 @@ function writeText(doc: SvgDocument, text: SceneText, alpha: number, filter: str
 		});
 	});
 
-	if (parts.length) {
+	// One text takes the attributes itself: a group around it is one more layer in a design tool
+	if (parts.length == 1 && !doc.live && /^<text /.test(parts[0]) && attrs.indexOf(" style=") == -1) {
+		out.push("<text" + attrs + parts[0].slice(5));
+	} else if (parts.length) {
 		out.push("<g" + attrs + ">" + parts.join("") + "</g>");
 	}
+}
+
+// A standalone document has no page to resolve relative font sizes against
+function textFont(doc: SvgDocument, text: SceneText, font: string): string {
+	if (doc.live) {
+		return font;
+	}
+	let resolved = doc._fonts.get(font);
+	if (resolved === undefined) {
+		resolved = resolveFont(text._renderer._textContext(text), font);
+		doc._fonts.set(font, resolved);
+	}
+	return resolved;
+}
+
+// Design tools ignore dominant-baseline, so a document moves the text instead
+function textShift(doc: SvgDocument, text: SceneText, font: string, baseline: CanvasTextBaseline): number {
+	const key = baseline + " " + font;
+	let shift = doc._shifts.get(key);
+	if (shift === undefined) {
+		shift = baselineShift(text._renderer._textContext(text), font, baseline);
+		doc._shifts.set(key, shift);
+	}
+	return shift;
+}
+
+const FONT_SIZE = /^(.*?)\s*(\d*\.?\d+(?:px|pt|pc|in|cm|mm|q|r?em|%|ex|ch|v[wh]))(?:\/\S+)?\s+(.+)$/i;
+
+// A live chart writes the font as CSS; a document as attributes, the only form design tools read
+function fontAttrs(doc: SvgDocument, font: string): string {
+	const match = doc.live ? null : FONT_SIZE.exec(font.trim());
+	if (!match) {
+		return "style=\"font:" + escapeXML(font) + ";white-space:pre\"";
+	}
+	let attrs = "font-family=\"" + escapeXML(match[3]) + "\" font-size=\"" + escapeXML(match[2]) + "\"";
+	$array.each(match[1].split(/\s+/), (token) => {
+		if (/^(bold|bolder|lighter|\d{3})$/i.test(token)) {
+			attrs += " font-weight=\"" + token + "\"";
+		} else if (/^(italic|oblique)$/i.test(token)) {
+			attrs += " font-style=\"" + token + "\"";
+		} else if (/^small-caps$/i.test(token)) {
+			attrs += " font-variant=\"" + token + "\"";
+		}
+	});
+	return attrs + " style=\"white-space:pre\"";
 }
 
 /**
@@ -871,9 +1387,11 @@ function writeCircularText(doc: SvgDocument, text: SceneRadialText, inward: bool
 		if (!isFinite(y)) {
 			return;
 		}
-		const font = chunk.style || baseFont;
+		const font = textFont(doc, text, chunk.style || baseFont);
 		const fill = chunk.fill ? doc.color("fill", chunk.fill.toCSS()) : baseFill;
-		parts.push("<text transform=\"rotate(" + doc.n(angle * $math.DEGREES) + ")\" x=\"0\" y=\"" + doc.n(y) + "\" text-anchor=\"middle\" dominant-baseline=\"central\" " + fill + " style=\"font:" + escapeXML(font) + ";white-space:pre\">" + escapeXML(chunk.text) + "</text>");
+		const baseline = doc.live ? " dominant-baseline=\"central\"" : "";
+		const glyphY = doc.live ? y : y + textShift(doc, text, font, "middle");
+		parts.push("<text transform=\"rotate(" + doc.n(angle * $math.DEGREES) + ")\" x=\"0\" y=\"" + doc.n(glyphY) + "\" text-anchor=\"middle\"" + baseline + " " + fill + " " + fontAttrs(doc, font) + ">" + escapeXML(chunk.text) + "</text>");
 	});
 
 	if (parts.length) {
@@ -935,7 +1453,7 @@ export type ISvgItem = ISvgLeaf | ISvgClip;
  * @ignore
  */
 function writeNode(doc: SvgDocument, node: SceneNode, layer: ILayer, nodeLayer: ILayer, alpha: number, filter: string | undefined, out: Array<ISvgItem>): void {
-	if (!node.visible || (node.exportable === false && !doc.live)) {
+	if (!node.visible || (node.exportable === false && !doc.live && !doc.nonExportable)) {
 		return;
 	}
 
@@ -984,6 +1502,18 @@ function writeNode(doc: SvgDocument, node: SceneNode, layer: ILayer, nodeLayer: 
 		}
 	}
 
+	// A document names the layers it can, for design tools
+	const name = doc.live ? undefined : node.exportName;
+	if (name && inner.length) {
+		let items = inner;
+		if (node.mask) {
+			node.mask._setMatrix();
+			items = [{ node, clip: doc.clip(node.mask), items: inner }];
+		}
+		out.push({ node, markup: namedMarkup(itemsMarkup(items), name) });
+		return;
+	}
+
 	if (inner.length) {
 		const mask = node.mask;
 		if (mask) {
@@ -996,6 +1526,34 @@ function writeNode(doc: SvgDocument, node: SceneNode, layer: ILayer, nodeLayer: 
 			});
 		}
 	}
+}
+
+// The name on `markup`'s one element, or a group named `name` around it
+function namedMarkup(markup: string, name: string): string {
+	const attr = " data-name=\"" + escapeXML(name) + "\"";
+	let depth = 0;
+	let elements = 0;
+	const tag = /<(\/?)[a-zA-Z][^>]*?(\/?)>/g;
+	let match: RegExpExecArray | null;
+	while ((match = tag.exec(markup))) {
+		if (match[1]) {
+			depth--;
+		} else if (match[2]) {
+			if (depth == 0) {
+				elements++;
+			}
+		} else {
+			if (depth == 0) {
+				elements++;
+			}
+			depth++;
+		}
+	}
+	// An element with a name of its own keeps it, inside a group
+	if (elements == 1 && !/^<[^>]* data-name="/.test(markup)) {
+		return markup.replace(/^<([a-zA-Z][\w:-]*)/, (_all: string, tag: string) => "<" + tag + attr);
+	}
+	return "<g" + attr + ">" + markup + "</g>";
 }
 
 /**
@@ -1065,7 +1623,7 @@ export function layerStyle(blend: boolean): string {
  * @param  target   A `Root`, an element of a chart, or a display object (then `width` and `height` are needed)
  * @param  options  Size, precision, id prefix, title and background
  * @return          SVG markup
- * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-svg/} for more information
+ * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-svg/} for more information
  * @since 5.21.0
  */
 export function renderToSVG(target: Root | Sprite | IDisplayObject, options: ISvgExportOptions = {}): string {
@@ -1088,6 +1646,9 @@ export function renderToSVG(target: Root | Sprite | IDisplayObject, options: ISv
 		// Up to date, including text laid out since the last frame
 		chart._renderer.render(top);
 
+		// Layer names for design tools
+		("_rootContainer" in target ? (<Root>target)._rootContainer : <Sprite>target)._nameForExport();
+
 		// A hidden chart has no size in the page: keep the one it was laid out at
 		if (width == null) {
 			width = chart.width() || chart._rootContainer.width();
@@ -1099,6 +1660,7 @@ export function renderToSVG(target: Root | Sprite | IDisplayObject, options: ISv
 
 	const defs = new SvgDefs(options.idPrefix != null ? options.idPrefix : "am5-");
 	const doc = new SvgDocument(options.precision != null ? options.precision : 3, defs);
+	doc.nonExportable = !!options.includeNonExportable;
 	const renderer = <ISceneHost>root._renderer;
 	const body: Array<string> = [];
 
@@ -1111,14 +1673,14 @@ export function renderToSVG(target: Root | Sprite | IDisplayObject, options: ISv
 		}
 	}
 
+	// Layers in order, in one group: a layer is a group of its own only where
+	// its blend modes have to stay within it
 	$array.each(renderer.layers, (layer) => {
 		if (layer.visible) {
 			doc.blend = false;
 			const content = itemsMarkup(writeLayer(doc, root, layer, rootLayer, rootAlpha));
 			if (content) {
-				const style = layerStyle(doc.blend);
-				// Hidden from screen readers: the SVG is read as one image, by its title
-				body.push("<g class=\"am5-layer-" + layer.order + "\"" + (style ? " style=\"" + style + "\"" : "") + " aria-hidden=\"true\">" + content + "</g>");
+				body.push(doc.blend ? "<g class=\"am5-layer-" + layer.order + "\" style=\"" + layerStyle(true) + "\">" + content + "</g>" : content);
 			}
 		}
 	});
@@ -1131,6 +1693,7 @@ export function renderToSVG(target: Root | Sprite | IDisplayObject, options: ISv
 		(title ? "<title>" + escapeXML(title) + "</title>" : "") +
 		(defsMarkup ? "<defs>" + defsMarkup + "</defs>" : "") +
 		(options.background ? "<rect width=\"" + w + "\" height=\"" + h + "\" " + doc.color("fill", options.background) + " aria-hidden=\"true\"/>" : "") +
-		body.join("") +
+		// Hidden from screen readers: the SVG is read as one image, by its title
+		(body.length ? "<g data-name=\"Chart\" aria-hidden=\"true\">" + body.join("") + "</g>" : "") +
 		"</svg>";
 }

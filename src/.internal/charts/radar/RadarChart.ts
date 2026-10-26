@@ -23,7 +23,7 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	 * Outer radius of the chart, in pixels or as a percent of the largest
 	 * radius that fits the available space.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Chart_radius} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/#chart-radius} for more info
 	 * @default 80%
 	 */
 	radius?: number | Percent;
@@ -32,7 +32,7 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	 * Inner radius of the chart, in pixels or as a percent of the outer
 	 * radius. A negative value is measured in from the outer radius.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Chart_radius} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/#chart-radius} for more info
 	 */
 	innerRadius?: number | Percent;
 
@@ -41,7 +41,7 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	 * angles grow clockwise, so `-90` is the top.
 	 *
 	 * @default -90
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/#startend-angles} for more info
 	 */
 	startAngle?: number;
 
@@ -50,14 +50,14 @@ export interface IRadarChartSettings extends IXYChartSettings {
 	 * angles grow clockwise.
 	 *
 	 * @default 270
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Start_end_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/#startend-angles} for more info
 	 */
 	endAngle?: number;
 
 	/**
 	 * The chart's cursor.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/#Cursor} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/#cursor} for more info
 	 */
 	cursor?: RadarCursor;
 
@@ -87,7 +87,7 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
  * ([[AxisRendererCircular]]), the other out from the center
  * ([[AxisRendererRadial]]). Also used for gauges.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/} for more info
  * @important
  */
 export class RadarChart extends XYChart {

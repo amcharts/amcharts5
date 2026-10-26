@@ -126,7 +126,7 @@ export interface IRootSettings {
 	 *
 	 * @since 5.3.17
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#accessibility-of-root-element} for more info
 	 */
 	focusable?: boolean;
 
@@ -144,7 +144,7 @@ export interface IRootSettings {
 	 * Should be used in conjunction with `focusable`.
 	 *
 	 * @since 5.3.17
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#accessibility-of-root-element} for more info
 	 */
 	ariaLabel?: string;
 
@@ -152,7 +152,7 @@ export interface IRootSettings {
 	 * Allows setting a "role" for the inner `<div>`.
 	 *
 	 * @since 5.3.17
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Accessibility_of_Root_element} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#accessibility-of-root-element} for more info
 	 */
 	role?: string;
 
@@ -297,7 +297,7 @@ function getSystemColors(): { [name: string]: Color } {
  * The root of a chart: it ties the chart to an HTML element and holds its
  * global settings, formatters, locale and themes.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/#Root_element} for more info
+ * @see {@link https://docs.amcharts.com/v5/getting-started/#root-element} for more info
  */
 export class Root implements IDisposer {
 
@@ -333,7 +333,7 @@ export class Root implements IDisposer {
 	/**
 	 * Root's event dispatcher.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/events/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/events/} for more info
 	 */
 	public events: EventDispatcher<Events<this, IRootEvents>> = new EventDispatcher();
 
@@ -374,7 +374,7 @@ export class Root implements IDisposer {
 	/**
 	 * Locale for the chart's texts and formatting. English by default.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/}
+	 * @see {@link https://docs.amcharts.com/v5/concepts/locales/}
 	 */
 	public locale: ILocale = en;
 
@@ -385,7 +385,7 @@ export class Root implements IDisposer {
 	 * and parsing them and when placing date axis grid. It takes precedence
 	 * over `timezone`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/#utc-and-time-zones} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/#utc-and-time-zones} for more info
 	 */
 	public utc: boolean = false;
 
@@ -396,7 +396,7 @@ export class Root implements IDisposer {
 	 *
 	 * Every date is converted, which can slow down charts with large data sets.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#time-zone} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/root-element/#time-zone} for more info
 	 * @since 5.1.0
 	 */
 	public timezone?: Timezone;
@@ -409,28 +409,28 @@ export class Root implements IDisposer {
 	 * drawn, then for the screen's next refresh, so the rate achieved is lower:
 	 * `fps: 30` gives about 20 on a 60 Hz screen.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Performance} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/root-element/#performance} for more info
 	 */
 	public fps: number | undefined;
 
 	/**
 	 * Number formatter.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-numbers/} for more info
 	 */
 	public numberFormatter: NumberFormatter = NumberFormatter.new(this, {});
 
 	/**
 	 * Date/time formatter.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	public dateFormatter: DateFormatter = DateFormatter.new(this, {});
 
 	/**
 	 * Duration formatter.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/formatters/formatting-dates/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/formatting-dates/} for more info
 	 */
 	public durationFormatter: DurationFormatter = DurationFormatter.new(this, {});
 
@@ -440,7 +440,7 @@ export class Root implements IDisposer {
 	/**
 	 * Tab index for the whole chart.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/} for more info
 	 */
 	public tabindex: number = 0;
 
@@ -474,7 +474,7 @@ export class Root implements IDisposer {
 	/**
 	 * Colors of the chart's interface: text, grid, buttons and other controls.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/#Interface_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/#interface-colors} for more info
 	 */
 	public interfaceColors: InterfaceColors;
 
@@ -1701,7 +1701,7 @@ export class Root implements IDisposer {
 	/**
 	 * Makes screen readers read out a message.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/} for more info
 	 * @param  text  Alert text
 	 */
 	public readerAlert(text: string): void {
@@ -1718,7 +1718,7 @@ export class Root implements IDisposer {
 	/**
 	 * Sets the chart's themes, replacing any set before.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
 	 * @param  themes  A list of themes
 	 */
 	public setThemes(themes: Array<Theme>): void {
@@ -2624,7 +2624,7 @@ export class Root implements IDisposer {
 	 * Makes touch gestures such as zoom and pan work only after a tap on the
 	 * chart, so the page can still be scrolled over it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/root-element/#touch-related-options} for more info
 	 * @default false
 	 * @since 5.2.9
 	 * @param  value  Needs a tap to activate touch functions
@@ -2645,7 +2645,7 @@ export class Root implements IDisposer {
 	 * with `tapToActivate`, before handing touch gestures back to the page.
 	 * `0` keeps it active until a tap outside the chart.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#Touch_related_options} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/root-element/#touch-related-options} for more info
 	 * @default 3000
 	 * @since 5.2.9
 	 * @param  value  Timeout

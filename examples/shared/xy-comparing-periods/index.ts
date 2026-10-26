@@ -4,18 +4,18 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 // Specify date fields, so that they are formatted accordingly in tooltips
-// https://www.amcharts.com/docs/v5/concepts/formatters/data-placeholders/#Formatting_placeholders
+// https://docs.amcharts.com/v5/concepts/formatters/data-placeholders/#formatting-placeholders
 root.dateFormatter.setAll({
   dateFormat: "MMM d", // e.g. "Jun 15"
   dateFields: ["valueX", "previousDate"]
@@ -23,7 +23,7 @@ root.dateFormatter.setAll({
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,        // drag the plot sideways to move along the dates...
   panY: true,        // ...or up and down to move along the values
@@ -33,13 +33,13 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0.3,          // panning can go up to 30% of a view past the first or last day
   baseInterval: {             // one data point per day
@@ -59,7 +59,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 // This period: its tooltip shows the previous period's value as well
 const series = chart.series.push(am5xy.LineSeries.new(root, {
   name: "This period",
@@ -100,7 +100,7 @@ previousSeries.strokes.template.setAll({
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // A row holds a day of this period and the matching day of the previous one
 const data = [
   { date: new Date(2024, 5, 15).getTime(), value: 50, previousDate: new Date(2024, 5, 1).getTime(), previousValue: 48 },
@@ -124,7 +124,7 @@ previousSeries.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 previousSeries.appear(1000);
 chart.appear(1000, 100);

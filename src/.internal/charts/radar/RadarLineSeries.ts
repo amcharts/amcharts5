@@ -16,7 +16,7 @@ export interface IRadarLineSeriesSettings extends ILineSeriesSettings {
 	/**
 	 * Joins the last data point to the first, closing the line into a loop.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-series/#Connecting_ends} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/radar-series/#connecting-ends} for more info
 	 * @default true
 	 */
 	connectEnds?: boolean;

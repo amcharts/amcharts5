@@ -35,7 +35,7 @@ export interface IGaplessDateAxisEvents extends IDateAxisEvents {
  * A [[DateAxis]] that leaves out periods without data, such as weekends, so
  * the data items sit side by side.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/gapless-date-axis/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/gapless-date-axis/} for more info
  * @important
  */
 export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {

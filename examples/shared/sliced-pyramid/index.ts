@@ -4,26 +4,26 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/
+// https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/
 const chart = root.container.children.push(am5percent.SlicedChart.new(root, {
   layout: root.verticalLayout // stacks the pyramid and the legend, so the legend goes below
 }));
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pyramid-series/
+// https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/pyramid-series/
 // each slice's area is its share of the total; the labels line up in a column beside the
 // pyramid, joined to their slices by ticks (alignLabels is on by default)
 const series = chart.series.push(am5percent.PyramidSeries.new(root, {
@@ -34,7 +34,7 @@ const series = chart.series.push(am5percent.PyramidSeries.new(root, {
 
 
 // Set data: slices go from the tip down, so the smallest value comes first
-// https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/#setting-data
 series.data.setAll([
   { value: 3, category: "One" },
   { value: 3, category: "Two" },
@@ -47,7 +47,7 @@ series.data.setAll([
 
 
 // Create legend
-// https://www.amcharts.com/docs/v5/charts/percent-charts/legend-percent-series/
+// https://docs.amcharts.com/v5/charts/percent-charts/legend-percent-series/
 const legend = chart.children.push(am5.Legend.new(root, {
   centerX: am5.percent(50), // centered under the pyramid
   x: am5.percent(50),
@@ -59,6 +59,6 @@ legend.data.setAll(series.dataItems);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear();
 chart.appear(1000, 100);

@@ -22,7 +22,7 @@ export interface ILinkPrivate extends IContainerPrivate {
  * A connector made of horizontal and vertical segments through `points`, with
  * an arrow at each end, such as a dependency line in a Gantt chart.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Link extends Container {

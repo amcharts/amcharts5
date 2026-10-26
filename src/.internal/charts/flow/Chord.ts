@@ -86,7 +86,7 @@ export interface IChordEvents extends IFlowEvents {
  * flow out of that end, so a one-way link narrows to a point at its target.
  * For one-way flows, see [[ChordDirected]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/flow-charts/} for more information
+ * @see {@link https://docs.amcharts.com/v5/charts/flow-charts/} for more information
  * @important
  */
 export class Chord extends Flow {

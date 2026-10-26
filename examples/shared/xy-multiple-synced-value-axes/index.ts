@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: false,       // dragging the plot does not pan: the cursor uses the drag to zoom
   panY: false,
@@ -29,7 +29,7 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
   behavior: "zoomX" // drag across the plot to zoom in on those days
 }));
@@ -37,7 +37,7 @@ cursor.lineY.set("visible", false); // only the vertical line that follows the d
 
 
 // Create X axis
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0.1,          // the view can go a little past the first and last day
   baseInterval: {             // one data point per day
@@ -52,7 +52,7 @@ const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
 
 
 // Create a Y axis and its series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/value-axis/#Syncing_grid
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#syncing-grid
 function createAxisAndSeries(name: string, field: string, opposite: boolean, syncWithAxis?: am5xy.ValueAxis<am5xy.AxisRenderer>) {
   const yRenderer = am5xy.AxisRendererY.new(root, {
     opposite: opposite // true puts the axis right of the plot instead of left
@@ -94,9 +94,9 @@ createAxisAndSeries("Hits", "value3", true, firstAxis);
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // The dates in the data are strings: the processor turns them into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 const data = [
   { date: "2024-01-01", value1: 100, value2: 985, value3: 8086 },
   { date: "2024-01-02", value1: 103, value2: 952, value3: 7888 },
@@ -141,7 +141,7 @@ chart.series.each((series) => {
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // above the plot: drag its ends to zoom, or its middle to move along the dates
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -149,7 +149,7 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.series.each((series) => {
   series.appear(1000);
 });

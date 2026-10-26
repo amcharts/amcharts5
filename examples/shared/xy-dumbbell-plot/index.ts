@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,        // drag the plot sideways to move along the names...
   panY: true,        // ...or up and down to move along the values
@@ -26,13 +26,13 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false); // only the vertical line that follows the names
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xRenderer = am5xy.AxisRendererX.new(root, {
   minGridDistance: 30,     // labels as close as 30 pixels (not 120), as the upright names allow
   minorGridEnabled: true   // fainter grid lines between the labelled ones
@@ -59,7 +59,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 // A column from the open value to the close value, as thin as a line
 const series = chart.series.push(am5xy.ColumnSeries.new(root, {
   name: "Series",
@@ -77,7 +77,7 @@ series.columns.template.set("width", 0.5); // half a pixel: a plain number is pi
 
 
 // Add bullets
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#bullets
 // One at the open value, in the series' color
 series.bullets.push(() => {
   return am5.Bullet.new(root, {
@@ -105,7 +105,7 @@ series.bullets.push(() => {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 const data = [
   { category: "Raina", open: 104, close: 108 },
   { category: "Demarcus", open: 100, close: 110 },
@@ -143,6 +143,6 @@ series.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

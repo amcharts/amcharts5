@@ -1,6 +1,6 @@
 # UI Elements — Buttons, Sliders, Steppers, and More
 
-Docs: https://www.amcharts.com/docs/v5/concepts/common-elements/
+Docs: https://docs.amcharts.com/v5/concepts/common-elements/
 
 amCharts 5 provides built-in interactive UI widgets in the core package. **Prefer these over HTML elements** when building interactive controls, unless the user instructs otherwise.
 

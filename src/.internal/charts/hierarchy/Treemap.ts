@@ -28,7 +28,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	/**
 	 * Gap between neighboring nodes, in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/#margins}
 	 */
 	nodePaddingInner?: number;
 
@@ -38,7 +38,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * `nodePaddingTop`, `nodePaddingRight`, `nodePaddingBottom` and
 	 * `nodePaddingLeft`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/#margins}
 	 */
 	nodePaddingOuter?: number;
 
@@ -46,7 +46,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * Gap between a node's top edge and the nodes inside it, in pixels.
 	 * Ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/#margins}
 	 */
 	nodePaddingTop?: number;
 
@@ -54,7 +54,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * Gap between a node's bottom edge and the nodes inside it, in pixels.
 	 * Ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/#margins}
 	 */
 	nodePaddingBottom?: number;
 
@@ -62,7 +62,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * Gap between a node's left edge and the nodes inside it, in pixels.
 	 * Ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/#margins}
 	 */
 	nodePaddingLeft?: number;
 
@@ -70,7 +70,7 @@ export interface ITreemapSettings extends IHierarchySettings {
 	 * Gap between a node's right edge and the nodes inside it, in pixels.
 	 * Ignored if `nodePaddingOuter` is set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/#Margins}
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/#margins}
 	 */
 	nodePaddingRight?: number;
 
@@ -104,7 +104,7 @@ export interface ITreemapPrivate extends IHierarchyPrivate {
  * A treemap: nodes as rectangles sized by value, each inside its parent's
  * rectangle. A click on a node zooms into it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/treemap/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/treemap/} for more info
  */
 export class Treemap extends Hierarchy {
 

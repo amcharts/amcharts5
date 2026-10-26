@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: false,                // dragging the plot does not move it
   panY: false,
@@ -35,7 +35,7 @@ const data = [
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   categoryField: "year",
   renderer: am5xy.AxisRendererX.new(root, {})
@@ -50,7 +50,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Stacked_series
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#stacked-series
 function makeSeries(name: string, fieldName: string) {
   const series = chart.series.push(am5xy.ColumnSeries.new(root, {
     name: name,
@@ -92,7 +92,7 @@ makeSeries("Africa", "africa");
 
 
 // Add legend
-// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+// https://docs.amcharts.com/v5/charts/xy-chart/legend-xy-series/
 const legend = chart.children.push(am5.Legend.new(root, {
   centerX: am5.p50, // the legend's middle...
   x: am5.p50        // ...at the middle of the chart, so it is centered
@@ -102,7 +102,7 @@ legend.data.setAll(chart.series.values);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.series.each((series) => {
   series.appear(1000);
 });

@@ -1,6 +1,6 @@
 # amCharts 5 for React Native
 
-A React Native component for [amCharts 5](https://www.amcharts.com/docs/v5/).
+A React Native component for [amCharts 5](https://docs.amcharts.com/v5/).
 The chart is drawn by the library itself, in a WebView, so every chart type,
 theme and feature works as it does on the web, on canvas or as SVG.
 
@@ -26,7 +26,7 @@ import { AmChart } from "@amcharts/amcharts5-react-native";
 <AmChart config={config} themes={["Animated"]} style={{ height: 300 }} />
 ```
 
-The config is a [JSON config](https://www.amcharts.com/docs/v5/concepts/serializing/),
+The config is a [JSON config](https://docs.amcharts.com/v5/concepts/serializing/),
 as an object or a string. The chart types it uses are loaded for it, and so
 is map geodata it names by its global name (`"geoJSON": "am5geodata_worldLow"`).
 A config with different content makes the chart again; the same content
@@ -190,5 +190,5 @@ JSON config with `run()`, and a map.
 
 ## More
 
-- [amCharts 5 documentation](https://www.amcharts.com/docs/v5/) and [demos](https://www.amcharts.com/demos/)
+- [amCharts 5 documentation](https://docs.amcharts.com/v5/) and [demos](https://www.amcharts.com/demos/)
 - License: see [License](#license) above.

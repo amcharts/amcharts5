@@ -12,7 +12,7 @@ export interface IPictorialStackedSeriesSettings extends IPyramidSeriesSettings 
 	/**
 	 * An SVG path that will define the shape of the pictorial series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/#Shape_of_the_series} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/#shape-of-the-series} for more info
 	 */
 	svgPath?: string;
 
@@ -26,7 +26,7 @@ export interface IPictorialStackedSeriesPrivate extends IPyramidSeriesPrivate {
  * slices, each as tall as its share of the total. It sets `valueIs` to
  * `"height"` and `topWidth` and `bottomWidth` to `100%`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/pictorial-stacked-series/} for more info
  * @important
  */
 export class PictorialStackedSeries extends PyramidSeries {

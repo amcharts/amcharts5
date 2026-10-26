@@ -6,28 +6,28 @@ import data from "./data.json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 // Set global number format
-// https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/
+// https://docs.amcharts.com/v5/concepts/formatters/formatting-numbers/
 root.numberFormatter.set("numberFormat", "#,###.00");
 
 
 // Create a stock chart
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
+// https://docs.amcharts.com/v5/charts/stock/#instantiating-the-chart
 const stockChart = root.container.children.push(am5stock.StockChart.new(root, {}));
 
 
 // Create a main stock panel (chart)
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Adding_panels
+// https://docs.amcharts.com/v5/charts/stock/
 const mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
   wheelY: "zoomX", // the mouse wheel zooms in on the dates
   panX: true,      // dragging the plot moves along the dates...
@@ -36,7 +36,7 @@ const mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {
     pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
@@ -47,7 +47,7 @@ const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
 
 // With groupData the axis shows daily data as weeks or months while more
 // than groupCount (500) days are in view, and as days once zoomed in
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/date-axis/#Dynamic_data_item_grouping
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#dynamic-data-item-grouping
 const dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {
   groupData: true,
   baseInterval: { // the data has one row per trading day
@@ -65,7 +65,7 @@ dateAxis.get("renderer").labels.template.set("minPosition", 0.01);
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
   name: "MSFT",
   valueXField: "Date",
@@ -82,12 +82,12 @@ const valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
 
 
 // Set main value series
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
+// https://docs.amcharts.com/v5/charts/stock/#setting-main-series
 stockChart.set("stockSeries", valueSeries);
 
 
 // Add a stock legend
-// https://www.amcharts.com/docs/v5/charts/stock-chart/stock-legend/
+// https://docs.amcharts.com/v5/charts/stock/stock-legend/
 // in the plot container, so it sits over the top left of the plot
 const valueLegend = mainPanel.plotContainer.children.push(am5stock.StockLegend.new(root, {
   stockChart: stockChart
@@ -97,7 +97,7 @@ valueLegend.data.setAll([valueSeries]);
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 mainPanel.set("cursor", am5xy.XYCursor.new(root, {
   yAxis: valueAxis,
   xAxis: dateAxis,
@@ -107,7 +107,7 @@ mainPanel.set("cursor", am5xy.XYCursor.new(root, {
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // drag its ends to zoom in until the candles switch from weeks to days
 const scrollbar = mainPanel.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -118,12 +118,12 @@ stockChart.toolsContainer.children.push(scrollbar);
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/stock/
 valueSeries.data.setAll(data);
 
 
 // Set up series type switcher
-// https://www.amcharts.com/docs/v5/charts/stock/toolbar/series-type-control/
+// https://docs.amcharts.com/v5/charts/stock/toolbar/series-type-control/
 const seriesSwitcher = am5stock.SeriesTypeControl.new(root, {
   stockChart: stockChart
 });
@@ -196,7 +196,7 @@ function setSeriesType(seriesType: string) {
 
 
 // Add stock toolbar
-// https://www.amcharts.com/docs/v5/charts/stock/toolbar/
+// https://docs.amcharts.com/v5/charts/stock/toolbar/
 am5stock.StockToolbar.new(root, {
   container: document.getElementById("chartcontrols")!, // the div above the chart that holds the toolbar
   stockChart: stockChart,
@@ -233,6 +233,6 @@ am5stock.StockToolbar.new(root, {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 valueSeries.appear(1000);
 stockChart.appear(1000, 100);

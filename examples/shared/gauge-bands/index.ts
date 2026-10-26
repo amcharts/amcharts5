@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/
 const chart = root.container.children.push(am5radar.RadarChart.new(root, {
   panX: false,       // the gauge does not move when dragged
   panY: false,
@@ -27,7 +27,7 @@ const chart = root.container.children.push(am5radar.RadarChart.new(root, {
 
 
 // Create axis and its renderer
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Axes
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/#axes
 const axisRenderer = am5radar.AxisRendererCircular.new(root, {
   innerRadius: -40 // the scale is a ring 40 px wide, measured in from the outer edge
 });
@@ -50,7 +50,7 @@ const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Create bands: an axis range with a fill and a label for each
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Bands
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/#bands
 const bands = [
   { title: "Unsustainable", color: 0xee1f25, lowScore: -40, highScore: -20 },
   { title: "Volatile", color: 0xf04922, lowScore: -20, highScore: 0 },
@@ -92,7 +92,7 @@ am5.array.each(bands, (band) => {
 
 
 // Add clock hand
-// https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands
+// https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/#clock-hands
 const axisDataItem = xAxis.makeDataItem({
   value: 50 // where the hand points at the start
 });
@@ -155,5 +155,5 @@ setInterval(() => {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

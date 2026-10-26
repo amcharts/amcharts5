@@ -3,7 +3,7 @@ const { cp, rm, mkdir, readdir, readFile, writeFile, posixPath, exists, removeTy
 const dependencies = require("../script-dependencies");
 
 
-const geodata_message = `Map geodata could not be loaded. Please download the latest <a href=\\"https://www.amcharts.com/download/download-v5/\\">amcharts geodata</a> and extract its contents into the same directory as your amCharts files.`;
+const geodata_message = `Map geodata could not be loaded. Please download the latest <a href=\\"https://www.amcharts.com/download/\\">amcharts geodata</a> and extract its contents into the same directory as your amCharts files.`;
 
 
 function showCSS(name, object) {
@@ -176,12 +176,12 @@ ${geodata.map((x) => `(window as any).${x.name} = ${x.name};
 `).join("")}
 
 ` : ""}// Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 ${themes.length ? `
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
 ${themes.map((x) => `  ${x.name}.new(root)`).join(`,
 `)}
@@ -189,7 +189,7 @@ ${themes.map((x) => `  ${x.name}.new(root)`).join(`,
 
 ` : ""}
 // Build the chart from its JSON config
-// https://www.amcharts.com/docs/v5/concepts/serializing/
+// https://docs.amcharts.com/v5/concepts/serializing/
 am5plugins_json.JsonParser.new(root).parse(config, {
   parent: root.container
 });
@@ -202,7 +202,7 @@ const JSON_FORMAT_NOTE = `// how a config reads:
 // "properties" fill in its parts: lists such as series and axes, or templates such as columns.template
 // "refs" holds objects used in more than one place: "#series-0" stands for the one named series-0
 // a string starting with "@" takes a value from another object, such as "@series.get('fill')"
-// https://www.amcharts.com/docs/v5/concepts/serializing/`;
+// https://docs.amcharts.com/v5/concepts/serializing/`;
 
 // The script version already has geodata as globals
 function jsonLoaderScript(source) {
@@ -283,7 +283,7 @@ function examples_readme(entries) {
 	lines.push("`series` and `axes`, or templates such as `columns.template`. `refs` holds");
 	lines.push("objects used in more than one place, and `\"#series-0\"` stands for the one named");
 	lines.push("`series-0`. A string starting with `@` takes a value from another object, such");
-	lines.push("as `\"@series.get('fill')\"`. More: https://www.amcharts.com/docs/v5/concepts/serializing/");
+	lines.push("as `\"@series.get('fill')\"`. More: https://docs.amcharts.com/v5/concepts/serializing/");
 	lines.push("");
 	lines.push("Themes are not part of a config: set the ones the example's `index.ts` sets. A");
 	lines.push("map config names its geodata by its global name, so make it one first:");

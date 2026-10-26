@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/flow-charts/
+// https://docs.amcharts.com/v5/charts/flow-charts/
 // ChordNonRibbon draws each link as a thin curve, not a ribbon, and gives every node the same arc
 const series = root.container.children.push(am5flow.ChordNonRibbon.new(root, {
   sourceIdField: "source",
@@ -28,7 +28,7 @@ series.nodes.get("colors")!.set("step", 2);
 
 
 // Draw each node as a circle with its name inside
-// https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/
+// https://docs.amcharts.com/v5/concepts/common-elements/bullets/
 series.nodes.bullets.push((_root, _nodes, dataItem) => {
   const circle = am5.Circle.new(root, {
     radius: 24,                // big enough to hold the node's name
@@ -36,7 +36,7 @@ series.nodes.bullets.push((_root, _nodes, dataItem) => {
   });
 
   // A node that is clicked off keeps its circle, in gray
-  // https://www.amcharts.com/docs/v5/charts/flow-charts/#Node_toggling
+  // https://docs.amcharts.com/v5/charts/flow-charts/#node-toggling
   circle.states.create("hidden", {
     fill: root.interfaceColors.get("disabled")
   });
@@ -59,7 +59,7 @@ series.nodes.labels.template.states.create("disabled", {
 
 
 // Add a circle that travels along each link and back
-// https://www.amcharts.com/docs/v5/concepts/animations/
+// https://docs.amcharts.com/v5/concepts/animations/
 series.bullets.push((_root, _series, dataItem) => {
   return am5.Bullet.new(root, {
     // from the source end (0) to the target end (1) and back, forever, slowing at each end
@@ -78,7 +78,7 @@ series.children.moveValue(series.bulletsContainer, 0);
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
+// https://docs.amcharts.com/v5/charts/flow-charts/#setting-data
 series.data.setAll([
   { source: "LHR", target: "JFK", value: 24 },
   { source: "LHR", target: "DXB", value: 18 },
@@ -94,5 +94,5 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

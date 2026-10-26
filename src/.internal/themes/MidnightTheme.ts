@@ -6,7 +6,7 @@ import { Theme } from "../core/Theme";
  * even depth tuned to show on it. It sets all interface colors, so use it
  * instead of `Dark`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class MidnightTheme extends Theme {

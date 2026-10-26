@@ -19,8 +19,8 @@ gauges, timelines, word clouds and Venn diagrams.
 Each picture links to its example's code.
 
 [Demos](https://www.amcharts.com/demos/) |
-[Documentation](https://www.amcharts.com/docs/v5/) |
-[Class reference](https://www.amcharts.com/docs/v5/reference/) |
+[Documentation](https://docs.amcharts.com/v5/) |
+[Class reference](https://docs.amcharts.com/v5/reference/) |
 [Changelog](https://github.com/amcharts/amcharts5/blob/master/packages/shared/CHANGELOG.md) |
 [Download](https://www.amcharts.com/download/)
 
@@ -124,28 +124,28 @@ or from chart code given as a string (`<AmChart code={code} data={data} />`).
 Each package's README has a full example. Without a package, create the chart
 when the component is mounted and call `root.dispose()` when it is removed;
 there are guides for
-[React](https://www.amcharts.com/docs/v5/getting-started/integrations/react/),
-[Angular](https://www.amcharts.com/docs/v5/getting-started/integrations/angular/),
-[Vue](https://www.amcharts.com/docs/v5/getting-started/integrations/vue/),
-[Next.js](https://www.amcharts.com/docs/v5/getting-started/integrations/next-js/)
-and [others](https://www.amcharts.com/docs/v5/getting-started/integrations/).
+[React](https://docs.amcharts.com/v5/getting-started/integrations/react/),
+[Angular](https://docs.amcharts.com/v5/getting-started/integrations/angular/),
+[Vue](https://docs.amcharts.com/v5/getting-started/integrations/vue/),
+[Next.js](https://docs.amcharts.com/v5/getting-started/integrations/next-js/)
+and [others](https://docs.amcharts.com/v5/getting-started/integrations/).
 
 
 ## Chart types
 
 | Charts | Module | Script file |
 |---|---|---|
-| [XY](https://www.amcharts.com/docs/v5/charts/xy-chart/): line, area, column, bar, scatter, candlestick | `@amcharts/amcharts5/xy` | `xy.js` |
-| [Pie and sliced](https://www.amcharts.com/docs/v5/charts/percent-charts/): pie, donut, funnel, pyramid | `@amcharts/amcharts5/percent` | `percent.js` |
-| [Map](https://www.amcharts.com/docs/v5/charts/map-chart/) | `@amcharts/amcharts5/map` | `map.js` |
-| [Stock](https://www.amcharts.com/docs/v5/charts/stock/) | `@amcharts/amcharts5/stock` | `stock.js` |
-| [Gantt](https://www.amcharts.com/docs/v5/charts/gantt/) | `@amcharts/amcharts5/gantt` | `gantt.js` |
-| [Hierarchy](https://www.amcharts.com/docs/v5/charts/hierarchy/): treemap, sunburst, force-directed, tree, pack | `@amcharts/amcharts5/hierarchy` | `hierarchy.js` |
-| [Flow](https://www.amcharts.com/docs/v5/charts/flow-charts/): Sankey, chord, arc diagram | `@amcharts/amcharts5/flow` | `flow.js` |
-| [Radar and gauges](https://www.amcharts.com/docs/v5/charts/radar-chart/) | `@amcharts/amcharts5/radar` | `radar.js` |
-| [Timeline](https://www.amcharts.com/docs/v5/charts/timeline/): serpentine, spiral, curve | `@amcharts/amcharts5/timeline` | `timeline.js` |
-| [Word cloud](https://www.amcharts.com/docs/v5/charts/word-cloud/) | `@amcharts/amcharts5/wc` | `wc.js` |
-| [Venn](https://www.amcharts.com/docs/v5/charts/venn/) | `@amcharts/amcharts5/venn` | `venn.js` |
+| [XY](https://docs.amcharts.com/v5/charts/xy-chart/): line, area, column, bar, scatter, candlestick | `@amcharts/amcharts5/xy` | `xy.js` |
+| [Pie and sliced](https://docs.amcharts.com/v5/charts/percent-charts/): pie, donut, funnel, pyramid | `@amcharts/amcharts5/percent` | `percent.js` |
+| [Map](https://docs.amcharts.com/v5/charts/map-chart/) | `@amcharts/amcharts5/map` | `map.js` |
+| [Stock](https://docs.amcharts.com/v5/charts/stock/) | `@amcharts/amcharts5/stock` | `stock.js` |
+| [Gantt](https://docs.amcharts.com/v5/charts/gantt/) | `@amcharts/amcharts5/gantt` | `gantt.js` |
+| [Hierarchy](https://docs.amcharts.com/v5/charts/hierarchy/): treemap, sunburst, force-directed, tree, pack | `@amcharts/amcharts5/hierarchy` | `hierarchy.js` |
+| [Flow](https://docs.amcharts.com/v5/charts/flow-charts/): Sankey, chord, arc diagram | `@amcharts/amcharts5/flow` | `flow.js` |
+| [Radar and gauges](https://docs.amcharts.com/v5/charts/radar-chart/) | `@amcharts/amcharts5/radar` | `radar.js` |
+| [Timeline](https://docs.amcharts.com/v5/charts/timeline/): serpentine, spiral, curve | `@amcharts/amcharts5/timeline` | `timeline.js` |
+| [Word cloud](https://docs.amcharts.com/v5/charts/word-cloud/) | `@amcharts/amcharts5/wc` | `wc.js` |
+| [Venn](https://docs.amcharts.com/v5/charts/venn/) | `@amcharts/amcharts5/venn` | `venn.js` |
 
 Stock, Gantt, radar and timeline charts are built on XY charts: with script
 tags, load `xy.js` before them. Gantt also needs `plugins/colorPicker.js`.
@@ -156,11 +156,11 @@ Also in the library:
   and map files for the world, continents, countries and their regions.
 * Stock charts: over 30 indicators, drawing tools, comparing stocks and period
   selectors.
-* [Export](https://www.amcharts.com/docs/v5/concepts/exporting/): PNG, JPG,
+* [Export](https://docs.amcharts.com/v5/concepts/exporting/): PNG, JPG,
   SVG, PDF, CSV, XLSX, JSON and HTML, and printing.
-* [30 themes](https://www.amcharts.com/docs/v5/concepts/themes/), among them
+* [30 themes](https://docs.amcharts.com/v5/concepts/themes/), among them
   dark, colorblind-friendly and responsive ones.
-* [Accessibility](https://www.amcharts.com/docs/v5/concepts/accessibility/):
+* [Accessibility](https://docs.amcharts.com/v5/concepts/accessibility/):
   keyboard navigation and screen reader support.
 
 
@@ -178,7 +178,7 @@ About 80 examples come with the library, one small chart each.
 
 ## Charts from JSON, and SVG
 
-A chart can be described as [a JSON config](https://www.amcharts.com/docs/v5/concepts/serializing/)
+A chart can be described as [a JSON config](https://docs.amcharts.com/v5/concepts/serializing/)
 and built with `JsonParser`, and a running chart can be saved as one. Most
 examples come with their config.
 
@@ -237,7 +237,7 @@ and follow it.
 With the script files, point it at the `AGENTS.md` in the amCharts folder
 instead.
 
-amCharts also runs a hosted [MCP server](https://www.amcharts.com/docs/v5/ai/mcp/)
+amCharts also runs a hosted [MCP server](https://docs.amcharts.com/v5/ai/mcp/)
 with the docs, the API reference, 290+ working examples and the map files, at
 `https://mcp.amcharts.com/mcp`. No account or key is needed:
 
@@ -248,7 +248,7 @@ with the docs, the API reference, 290+ working examples and the map files, at
 
 There is also a [skill](https://github.com/amcharts/amcharts5-skill) for
 coding agents, amCharts 5 is on [Context7](https://context7.com/amcharts/amcharts5),
-and there is [more about amCharts and AI](https://www.amcharts.com/docs/v5/ai/).
+and there is [more about amCharts and AI](https://docs.amcharts.com/v5/ai/).
 
 
 ## License
@@ -287,6 +287,6 @@ Anything else: contact@amcharts.com.
 
 * [amCharts 5 changelog](https://github.com/amcharts/amcharts5/blob/master/packages/shared/CHANGELOG.md),
   also in this package as `CHANGELOG.md`
-* [Documentation changelog](https://www.amcharts.com/docs/v5/changelog/)
-* [Creating translations](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/)
+* [Documentation changelog](https://docs.amcharts.com/v5/changelog/)
+* [Creating translations](https://docs.amcharts.com/v5/concepts/locales/creating-translations/)
 * [Source code on GitHub](https://github.com/amcharts/amcharts5)

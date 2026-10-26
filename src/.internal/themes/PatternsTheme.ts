@@ -76,8 +76,8 @@ export const PATTERN_GRAYS: Array<Color> = [
  * As series differ by texture and tone rather than hue, it prints cleanly and
  * stays legible for all forms of color blindness.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class PatternsTheme extends Theme {

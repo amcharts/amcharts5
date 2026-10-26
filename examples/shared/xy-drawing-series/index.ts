@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 // The color set skips colors, so the two series are easy to tell apart
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,       // drag the plot to move around it, sideways...
@@ -30,13 +30,13 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 const cursor = chart.set("cursor", am5xy.XYCursor.new(root, {}));
 cursor.lineY.set("visible", false); // only the vertical line that follows the dates
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
   maxDeviation: 0.3,          // can be dragged 30% of the view past the data, to draw there
   baseInterval: {             // one data point per day
@@ -56,7 +56,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const series = chart.series.push(am5xy.LineSeries.new(root, {
   name: "Series",
   xAxis: xAxis,
@@ -79,7 +79,7 @@ const drawingSeries = chart.series.push(am5xy.LineSeries.new(root, {
 
 
 // Add bullets
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#bullets
 // An invisible bullet takes the drag, so the visible one does not flicker
 drawingSeries.bullets.push(() => {
   const circle = am5.Circle.new(root, {
@@ -122,16 +122,16 @@ drawingSeries.bullets.push(() => {
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
 }));
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // The dates in the data are strings: the processor turns them into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 const processor = am5.DataProcessor.new(root, {
   dateFormat: "yyyy-MM-dd",
   dateFields: ["date"]
@@ -191,7 +191,7 @@ drawingSeries.data.setAll([
 
 
 // Add a point where the plot area is clicked
-// https://www.amcharts.com/docs/v5/concepts/events/
+// https://docs.amcharts.com/v5/concepts/events/
 const plotBackground = chart.plotContainer.get("background");
 if (plotBackground) {
   plotBackground.events.on("click", (e) => {
@@ -221,7 +221,7 @@ chart.plotContainer.children.push(am5.Label.new(root, {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 drawingSeries.appear(1000);
 chart.appear(1000, 100);

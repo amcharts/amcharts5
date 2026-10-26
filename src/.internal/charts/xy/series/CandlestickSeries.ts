@@ -33,7 +33,7 @@ export interface ICandlestickSeriesAxisRange extends IColumnSeriesAxisRange {
  * ([[Candlestick]]). A candle that closes below its open takes the
  * `negative` interface color, the others the `positive` one.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/candlestick-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/candlestick-series/} for more info
  * @important
  */
 export class CandlestickSeries extends ColumnSeries {

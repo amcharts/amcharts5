@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/flow-charts/arc-diagram/
+// https://docs.amcharts.com/v5/charts/flow-charts/arc-diagram/
 // orientation: "vertical" puts the nodes in a column
 // paddingBottom leaves room for the labels under the nodes
 const series = root.container.children.push(am5flow.ArcDiagram.new(root, {
@@ -30,7 +30,7 @@ const series = root.container.children.push(am5flow.ArcDiagram.new(root, {
 
 // Put each label under its node: half the node's height down is where the
 // circle ends. position: "absolute" keeps the label out of that height
-// https://www.amcharts.com/docs/v5/charts/flow-charts/arc-diagram/#Labels
+// https://docs.amcharts.com/v5/charts/flow-charts/arc-diagram/#labels
 series.nodes.labels.template.setAll({
   fontSize: "0.85em", // a little smaller than the chart's default text
   position: "absolute",
@@ -40,7 +40,7 @@ series.nodes.labels.template.setAll({
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/flow-charts/#Setting_data
+// https://docs.amcharts.com/v5/charts/flow-charts/#setting-data
 // each row is one link, drawn as an arc between two nodes; a node's circle
 // grows with the total of all its links, in and out
 series.data.setAll([
@@ -74,5 +74,5 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

@@ -41,7 +41,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	 * slice: `0` keeps it as wide as the top, making a rectangle, `1` makes it
 	 * as wide as the next slice, making a trapezoid.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Slice_bottom_width} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/funnel-series/#slice-bottom-width} for more info
 	 * @default 0
 	 */
 	bottomRatio?: number;
@@ -49,7 +49,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	/**
 	 * Orientation of the series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/#Series_orientation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/} for more info
 	 * @default "vertical"
 	 */
 	orientation: "horizontal" | "vertical";
@@ -76,7 +76,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	 *
 	 * `0` - beginning, `1` - end, or any intermediate value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/funnel-series/#startend-locations} for more info
 	 * @default 0
 	 */
 	startLocation?: number;
@@ -86,7 +86,7 @@ export interface IFunnelSeriesSettings extends IPercentSeriesSettings {
 	 *
 	 * `0` - beginning, `1` - end, or any intermediate value.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Start_end_locations} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/funnel-series/#startend-locations} for more info
 	 * @default 1
 	 */
 	endLocation?: number;
@@ -100,7 +100,7 @@ export interface IFunnelSeriesPrivate extends IPercentSeriesPrivate {
  * A funnel series for a [[SlicedChart]]: slices of equal height, each as wide
  * as its value relative to the largest one.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/funnel-series/} for more info
  * @important
  */
 export class FunnelSeries extends PercentSeries {
@@ -148,7 +148,7 @@ export class FunnelSeries extends PercentSeries {
 	 *
 	 * `links.template` can also be used to configure slice links.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/percent-charts/sliced-chart/funnel-series/#Slice_links} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/percent-charts/sliced-chart/funnel-series/#slice-links} for more info
 	 */
 	public readonly links: ListTemplate<this["_sliceType"]> = this.addDisposer(this._makeLinks());
 

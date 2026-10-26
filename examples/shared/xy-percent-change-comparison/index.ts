@@ -5,19 +5,19 @@ import data from "./data.json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,       // drag the plot to move along the dates...
   panY: false,      // ...but not up and down
@@ -30,12 +30,12 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 chart.set("cursor", am5xy.XYCursor.new(root, {}));
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 // a gapless date axis leaves out the days with no data, so the lines have no gaps
 const dateAxis = chart.xAxes.push(am5xy.GaplessDateAxis.new(root, {
   baseInterval: {             // one data point per day
@@ -79,13 +79,13 @@ volumeAxis.axisHeader.set("paddingTop", 10); // a gap above the volume legend, b
 
 
 // Stack axes vertically
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Stacked_axes
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/#stacked-axes
 chart.leftAxesContainer.set("layout", root.verticalLayout);
 
 
 // Add series
 // Each price is shown as percent change from the first value in the zoomed range
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Display_fields
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#display-fields
 function makeValueSeries(name: string, fieldName: string) {
   return chart.series.push(am5xy.LineSeries.new(root, {
     name: name,
@@ -122,7 +122,7 @@ const volumeSeries = chart.series.push(am5xy.ColumnSeries.new(root, {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // all three series read their own fields from the same rows
 valueSeries1.data.setAll(data);
 valueSeries2.data.setAll(data);
@@ -130,7 +130,7 @@ volumeSeries.data.setAll(data);
 
 
 // Add legends to axis headers
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-headers/
 const valueLegend = valueAxis.axisHeader.children.push(am5.Legend.new(root, {
   useDefaultMarker: true // plain square markers, not small copies of the series
 }));
@@ -143,7 +143,7 @@ volumeLegend.data.setAll([volumeSeries]);
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // above the plot: drag its ends to zoom, or its middle to move along the dates
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -151,7 +151,7 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 valueSeries1.appear(1000);
 valueSeries2.appear(1000);
 volumeSeries.appear(1000);

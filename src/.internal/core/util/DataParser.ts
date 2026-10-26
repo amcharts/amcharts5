@@ -13,7 +13,7 @@ export interface IJSONParserOptions {
 /**
  * Parses a JSON string into data.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Parsing} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/data/#parsing} for more info
  * @important
  */
 export class JSONParser {
@@ -104,7 +104,7 @@ export interface ICSVParserOptions {
 /**
  * Parses a CSV string into data.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/data/#Parsing} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/data/#parsing} for more info
  * @important
  */
 export class CSVParser {

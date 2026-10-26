@@ -36,7 +36,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Horizontal scrollbar that zooms and pans the X axes. It goes above the
 	 * plot area, or below it with the scrollbar's `opposite` set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/} for more info
 	 */
 	scrollbarX?: Scrollbar;
 
@@ -50,7 +50,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Stroke widths in pixels for line series to cycle through, by each
 	 * series' index in `series`. Helps tell lines apart without color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for related info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#series-colors} for related info
 	 */
 	strokeWidths?: Array<number>;
 
@@ -59,14 +59,14 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * in `series`. Each entry is a `strokeDasharray` value; `0` or an empty
 	 * array draws a solid line.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Series_colors} for related info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/#series-colors} for related info
 	 */
 	strokeDasharrays?: Array<number | Array<number>>;
 
 	/**
 	 * Lets the user pan the chart horizontally by dragging the plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Panning} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#panning} for more info
 	 * @default false
 	 */
 	panX?: boolean;
@@ -74,7 +74,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	/**
 	 * Lets the user pan the chart vertically by dragging the plot area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Panning} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#panning} for more info
 	 * @default false
 	 */
 	panY?: boolean;
@@ -83,7 +83,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * What scrolling the wheel horizontally over the plot area does: zoom or
 	 * pan along X, Y or both.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#mouse-wheel-behavior} for more info
 	 */
 	wheelX?: "zoomX" | "zoomY" | "zoomXY" | "panX" | "panY" | "panXY" | "none";
 
@@ -91,7 +91,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * What scrolling the wheel vertically over the plot area does: zoom or pan
 	 * along X, Y or both.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#mouse-wheel-behavior} for more info
 	 */
 	wheelY?: "zoomX" | "zoomY" | "zoomXY" | "panX" | "panY" | "panXY" | "none";
 
@@ -105,7 +105,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	/**
 	 * The chart's cursor.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/} for more info
 	 */
 	cursor?: XYCursor;
 
@@ -115,7 +115,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * even when others are at the same spot. If not set, every series shows
 	 * its tooltip.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 */
 	maxTooltipDistance?: number;
 
@@ -123,7 +123,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * How `maxTooltipDistance` measures distance: `"xy"` by straight
 	 * distance, `"x"` or `"y"` along one direction only.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @since 5.2.6
 	 */
 	maxTooltipDistanceBy?: "xy" | "x" | "y";
@@ -132,7 +132,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Moves the series tooltips shown by the cursor apart vertically so they
 	 * don't overlap. Works only with a `cursor`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#tooltips} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/#tooltips} for more info
 	 * @default true
 	 */
 	arrangeTooltips?: boolean
@@ -141,7 +141,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Zooms the chart horizontally with a pinch gesture on the plot area. Not
 	 * supported in a [[RadarChart]].
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#pinch-zoom} for more info
 	 * @since 5.1.8
 	 * @default false
 	 */
@@ -151,7 +151,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * Zooms the chart vertically with a pinch gesture on the plot area. Not
 	 * supported in a [[RadarChart]].
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Pinch_zoom} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#pinch-zoom} for more info
 	 * @since 5.1.8
 	 * @default false
 	 */
@@ -162,7 +162,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * pointer's position: `0` keeps the start of the visible range in place,
 	 * `1` the end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#mouse-wheel-behavior} for more info
 	 * @since 5.2.11
 	 */
 	wheelZoomPositionX?: number;
@@ -172,7 +172,7 @@ export interface IXYChartSettings extends ISerialChartSettings {
 	 * pointer's position: `0` keeps the start of the visible range in place,
 	 * `1` the end.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Mouse_wheel_behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#mouse-wheel-behavior} for more info
 	 * @since 5.2.11
 	 */
 	wheelZoomPositionY?: number;
@@ -238,7 +238,7 @@ export interface IXYChartEvents extends ISerialChartEvents {
 /**
  * A chart with X and Y axes, for line, column, scatter and other XY series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/} for more info
  * @important
  */
 export class XYChart extends SerialChart {
@@ -265,7 +265,7 @@ export class XYChart extends SerialChart {
 	 * Container above the plot area that holds the X axes with `opposite`
 	 * renderers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly topAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout })._markC("width", "layout"));
@@ -274,7 +274,7 @@ export class XYChart extends SerialChart {
 	 * Container in the middle of the chart that holds the Y axes and the plot
 	 * area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly yAxesAndPlotContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, height: p100, layout: this._root.horizontalLayout })._markC("width", "height", "layout"));
@@ -282,7 +282,7 @@ export class XYChart extends SerialChart {
 	/**
 	 * Container below the plot area that holds the X axes.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly bottomAxesContainer: Container = this.chartContainer.children.push(Container.new(this._root, { width: p100, layout: this._root.verticalLayout })._markC("width", "layout"));
@@ -290,7 +290,7 @@ export class XYChart extends SerialChart {
 	/**
 	 * Container left of the plot area that holds the Y axes.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly leftAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout })._markC("height", "layout"));
@@ -298,7 +298,7 @@ export class XYChart extends SerialChart {
 	/**
 	 * Container that holds `plotContainer` and, over it, `topPlotContainer`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly plotsContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { width: p100, height: p100, maskContent: false })._markC("width", "height", "maskContent"));
@@ -309,7 +309,7 @@ export class XYChart extends SerialChart {
 	 * It comes with a `background` already set: to change the plot area's fill
 	 * or outline, configure `plotContainer.get("background")`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly plotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 })._markC("width", "height"));
@@ -318,7 +318,7 @@ export class XYChart extends SerialChart {
 	 * Container over `plotContainer` for elements drawn on top of the plot
 	 * area, such as the zoom-out button.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly topPlotContainer: Container = this.plotsContainer.children.push(Container.new(this._root, { width: p100, height: p100 })._markC("width", "height"));
@@ -326,7 +326,7 @@ export class XYChart extends SerialChart {
 	/**
 	 * Container in the plot area that holds the axes' grid, below the series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly gridContainer: Container = this.plotContainer.children.push(Container.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured"));
@@ -335,7 +335,7 @@ export class XYChart extends SerialChart {
 	 * Container in the plot area that holds the axis grid drawn above the
 	 * series, such as axis ranges with `above` set.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly topGridContainer: Container = Container.new(this._root, { width: p100, height: p100, isMeasured: false })._markC("width", "height", "isMeasured");
@@ -344,7 +344,7 @@ export class XYChart extends SerialChart {
 	 * Container right of the plot area that holds the Y axes with `opposite`
 	 * renderers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/xy-chart-containers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/xy-chart-containers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly rightAxesContainer: Container = this.yAxesAndPlotContainer.children.push(Container.new(this._root, { height: p100, layout: this._root.horizontalLayout })._markC("height", "layout"));
@@ -352,7 +352,7 @@ export class XYChart extends SerialChart {
 	/**
 	 * Container that holds the axis headers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-headers/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-headers/} for more info
 	 * @default Container.new()
 	 */
 	public readonly axisHeadersContainer: Container = this.plotContainer.children.push(Container.new(this._root, {}));
@@ -360,7 +360,7 @@ export class XYChart extends SerialChart {
 	/**
 	 * Button that zooms the chart out, shown while any axis is zoomed in.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/zoom-and-pan/#Zoom_out_button} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/zoom-and-pan/#zoom-out-button} for more info
 	 * @default Button.new()
 	 */
 	public readonly zoomOutButton: Button = this.topPlotContainer.children.push(Button.new(this._root, {

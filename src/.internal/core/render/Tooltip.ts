@@ -55,7 +55,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * the point, `"up"` below it, `"left"` to its right and `"right"` to its
 	 * left. `"vertical"` and `"horizontal"` pick the side that has room.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Orientation} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#orientation} for more info
 	 * @default "vertical"
 	 */
 	pointerOrientation?: "left" | "right" | "up" | "down" | "vertical" | "horizontal";
@@ -64,7 +64,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * Gives the background the `fill` of the `tooltipTarget` (its `stroke`, if
 	 * it has no fill).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#colors} for more info
 	 * @default true
 	 */
 	getFillFromSprite?: boolean;
@@ -72,7 +72,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	/**
 	 * Gives the background the `fillGradient` of the `tooltipTarget`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#colors} for more info
 	 * @default false
 	 */
 	getFillGradientFromSprite?: boolean;
@@ -82,7 +82,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * it has no fill). Needs `autoTextColor: false`, which otherwise overrides
 	 * it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#colors} for more info
 	 * @default false
 	 */
 	getLabelFillFromSprite?: boolean;
@@ -91,7 +91,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	 * Gives the background's stroke the `fill` of the `tooltipTarget` (its
 	 * `stroke`, if it has no fill).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#colors} for more info
 	 * @default false
 	 */
 	getStrokeFromSprite?: boolean;
@@ -124,7 +124,7 @@ export interface ITooltipSettings extends IContainerSettings {
 	/**
 	 * Easing function of the tooltip's moves.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 */
 	animationEasing?: (t: Time) => Time;
 
@@ -158,7 +158,7 @@ export interface ITooltipPrivate extends IContainerPrivate {
 /**
  * A label in a pointed box that points at an element or a point.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/} for more info
  * @important
  */
 export class Tooltip extends Container {

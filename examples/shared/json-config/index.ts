@@ -4,19 +4,19 @@ import * as am5plugins_json from "@amcharts/amcharts5/plugins/json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Describe the chart as a JSON config
-// https://www.amcharts.com/docs/v5/concepts/serializing/
+// https://docs.amcharts.com/v5/concepts/serializing/
 // refs are named parts, used as "#name"; a block can use the ones before it
 const config = {
   refs: [{
@@ -66,7 +66,7 @@ const config = {
 
 
 // Build the chart from the config; parse() returns a promise of the chart
-// https://www.amcharts.com/docs/v5/concepts/serializing/
+// https://docs.amcharts.com/v5/concepts/serializing/
 const parser = am5plugins_json.JsonParser.new(root);
 
 parser.parse(config, {

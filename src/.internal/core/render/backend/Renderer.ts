@@ -12,7 +12,7 @@ export interface IGradient {
 /**
  * A color stop in a gradient.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more info
  */
 export interface IGradientStop {
 
@@ -38,7 +38,7 @@ export interface IGradientStop {
 	 * Lightens the color by this amount, from `-1` to `1`: `0.2` moves it 20%
 	 * of the way to white. A negative value darkens it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/#Brightness} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/#brightness} for more info
 	 */
 	lighten?: number;
 
@@ -46,7 +46,7 @@ export interface IGradientStop {
 	 * Brightens the color by this amount, from `-1` to `1`, adding the same
 	 * amount to each channel. A negative value dims it.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/#Brightness} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/#brightness} for more info
 	 */
 	brighten?: number;
 
@@ -130,6 +130,11 @@ export interface IDisplayObject extends IDisposer {
 	filter?: string;
 	cursorOverStyle?: string;
 	exportable?: boolean;
+
+	/**
+	 * The layer name an SVG document gives this object, as `data-name`.
+	 */
+	exportName?: string;
 
 	_setMatrix(): void;
 	getLayer(): ILayer;

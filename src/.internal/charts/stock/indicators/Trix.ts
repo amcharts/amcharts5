@@ -32,7 +32,7 @@ export interface ITrixEvents extends IChartIndicatorEvents {
  * Trix indicator: the percentage change of a triple exponential moving average
  * of `field` over `period`, with a signal line. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class Trix extends ChartIndicator {
 	public static className: string = "Trix";

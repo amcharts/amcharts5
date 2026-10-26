@@ -79,7 +79,7 @@ export interface IMapSeriesSettings extends ISeriesSettings {
 	 * ```
 	 *
 	 * @since 5.1.13
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-translations/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-translations/} for more info
 	 */
 	geodataNames?: { [index: string]: string };
 

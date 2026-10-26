@@ -23,7 +23,7 @@ export interface ISmoothedYLineSeriesPrivate extends ILineSeriesPrivate {
  * A line series drawn as a smooth curve, for data that runs along the Y
  * axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/smoothed-series/} for more info
  */
 export class SmoothedYLineSeries extends LineSeries {
 	public static className: string = "SmoothedYLineSeries";

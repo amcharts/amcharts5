@@ -60,7 +60,7 @@ export interface IClockHandPrivate extends IContainerPrivate {
  * A gauge needle for a [[RadarChart]]. Set it as the `sprite` of an axis
  * data item's [[AxisBullet]], and it points at that data item's value.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/gauge-charts/#Clock_hands} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/gauge-charts/#clock-hands} for more info
  * @important
  */
 export class ClockHand extends Container {

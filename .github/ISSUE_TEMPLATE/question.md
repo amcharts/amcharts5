@@ -15,7 +15,7 @@ assignees: ''
 
  - Search amCharts 5 documentation website. It contains hundreds of step-by-step
     articles, detailed tutorials, and even very niche demos:
-    https://www.amcharts.com/docs/v5/
+    https://docs.amcharts.com/v5/
 
  - Realize that this is not a support forum. Unclear, too complicated questions, or those that require debugging custom code, may not be answered.
 -->

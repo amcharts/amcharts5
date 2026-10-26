@@ -56,7 +56,7 @@ export interface IStockPanelEvents extends IXYChartEvents {
 /**
  * A panel of a [[StockChart]]: an [[XYChart]] stacked with the other panels.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/panels/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/panels/} for more info
  * @important
  */
 export class StockPanel extends XYChart {

@@ -41,6 +41,11 @@ export interface ISceneHost extends IRenderer {
 	 */
 	_measureText(text: SceneText): IBounds;
 
+	/**
+	 * The context `text` is measured with.
+	 */
+	_textContext(text: SceneText): CanvasRenderingContext2D;
+
 	_removeObject(node: SceneNode): void;
 }
 
@@ -101,6 +106,7 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 	public mask: SceneGraphics | null = null;
 	public visible: boolean = true;
 	public exportable?: boolean = true;
+	public exportName?: string;
 	public interactive: boolean = false;
 	public inactive: boolean | null = null;
 	public wheelable: boolean = false;

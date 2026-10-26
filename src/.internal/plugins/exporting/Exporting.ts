@@ -210,7 +210,7 @@ export interface IExportingSettings extends IEntitySettings {
 	 * Data for data exports: an array of objects. Without it, the data formats
 	 * are not offered.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/#Exporting_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/#exporting-data} for more info
 	 */
 	dataSource?: any;
 
@@ -364,7 +364,7 @@ export interface IExportingImageOptions extends IExportingFormatOptions {
 	 * Exports the image at the chart's size in CSS pixels. When `false`, it is
 	 * exported at the screen's resolution: larger on high-density screens.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/#Pixel_ratio} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-images/#pixel-ratio} for more info
 	 * @default false
 	 */
 	maintainPixelRatio?: boolean;
@@ -372,28 +372,28 @@ export interface IExportingImageOptions extends IExportingFormatOptions {
 	/**
 	 * Minimal width of exported image, in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/#Sizing_exported_image} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-images/#sizing-exported-image} for more info
 	 */
 	minWidth?: number;
 
 	/**
 	 * Maximal width of exported image, in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/#Sizing_exported_image} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-images/#sizing-exported-image} for more info
 	 */
 	maxWidth?: number;
 
 	/**
 	 * Minimal height of exported image, in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/#Sizing_exported_image} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-images/#sizing-exported-image} for more info
 	 */
 	minHeight?: number;
 
 	/**
 	 * Maximal height of exported image, in pixels.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-images/#Sizing_exported_image} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-images/#sizing-exported-image} for more info
 	 */
 	maxHeight?: number;
 
@@ -512,7 +512,7 @@ export interface IExportingPDFOptions extends IExportingImageOptions {
 	 * Font of the PDF's text. The default font has only Latin and Cyrillic
 	 * characters, so text in other scripts needs a font that has them.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-pdf/#Fonts} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-pdf/#fonts} for more info
 	 */
 	font?: IFont;
 
@@ -520,7 +520,7 @@ export interface IExportingPDFOptions extends IExportingImageOptions {
 	 * More fonts to register, for use by individual elements of the document,
 	 * e.g. from a `pdfdocready` listener. Used only together with `font`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/exporting-pdf/#Fonts} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/exporting/exporting-pdf/#fonts} for more info
 	 */
 	extraFonts?: Array<IFont>;
 
@@ -678,7 +678,7 @@ const formulaInjectionChars: string[] = ["=", "+", "-", "@", "\t", "\r"];
  * A plugin that exports the chart as an image, PDF or print, and its data as
  * JSON, CSV, XLSX, HTML or a PDF table.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/exporting/} for more info
  */
 export class Exporting extends Entity {
 	public static className: string = "Exporting";

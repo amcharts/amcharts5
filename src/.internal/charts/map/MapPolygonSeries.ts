@@ -62,7 +62,7 @@ export interface IMapPolygonSeriesSettings extends IMapSeriesSettings {
 /**
  * A map series of polygons, such as countries or regions.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/} for more info
  * @important
  */
 export class MapPolygonSeries extends MapSeries {
@@ -346,7 +346,7 @@ export class MapPolygonSeries extends MapSeries {
 	 * Zooms the map to fit a polygon, centered.
 	 *
 	 * @param  dataItem  Data item of the polygon
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zooming_to_clicked_object} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#zooming-to-clicked-object} for more info
 	 * @param  rotate Also rotate the map to bring the polygon's center to the middle, as on a globe
 	 * @return        Zoom level animation
 	 */

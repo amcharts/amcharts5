@@ -12,7 +12,7 @@ export interface ICommodityChannelIndexEvents extends IOverboughtOversoldEvents 
  * high, low and close) is from its `period` average, relative to its mean
  * deviation. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class CommodityChannelIndex extends OverboughtOversold {
 	public static className: string = "CommodityChannelIndex";

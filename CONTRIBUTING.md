@@ -5,7 +5,7 @@
 The amCharts team monitors the issues in this repository, so a question can be
 asked there. Guaranteed support is for holders of amPlus subscription service.
 
-* The [documentation](https://www.amcharts.com/docs/v5/) and the
+* The [documentation](https://docs.amcharts.com/v5/) and the
   [demos](https://www.amcharts.com/demos/) answer most "how do I" questions.
 * With a license or subscription:
   [contact support directly](https://www.amcharts.com/support/support-info/priority-support/).
@@ -40,7 +40,7 @@ yarn examples        # the examples, into both; needs build:script first
 Where things are:
 
 * `src/`: the library. `src/locales/` has the translations;
-  [this tutorial](https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/)
+  [this tutorial](https://docs.amcharts.com/v5/concepts/locales/creating-translations/)
   explains how a locale file is made.
 * `examples/shared/<name>/`: one bundled example. `index.ts` is the chart,
   `template/` holds anything else it ships with, and the build makes the

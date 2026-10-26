@@ -97,7 +97,7 @@ export interface INetRequestOptions {
  * ```
  *
  * @async
- * @see {@link https://www.amcharts.com/docs/v5/concepts/data/net-load-utility/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/data/net-load-utility/} for more info
  * @param url      URL for the file to load
  * @param target   Any object, passed back as `target` in the result
  * @param options  Request options

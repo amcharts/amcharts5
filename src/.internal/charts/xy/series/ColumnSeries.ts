@@ -22,7 +22,7 @@ export interface IColumnSeriesSettings extends IBaseColumnSeriesSettings {
 	 * their settings, such as rounded corners, have no effect.
 	 *
 	 * @since 5.14.0
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/column-series/#Turbo_mode} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/column-series/#turbo-mode} for more info
 	 */
 	turboMode?: boolean;
 

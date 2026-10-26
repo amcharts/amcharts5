@@ -39,7 +39,7 @@ export interface IBollingerBandsEvents extends IMovingAverageEvents {
  * bands `standardDeviations` standard deviations above and below it. Drawn
  * over the main series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class BollingerBands extends MovingAverage {
 	public static className: string = "BollingerBands";

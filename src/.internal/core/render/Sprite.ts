@@ -29,7 +29,7 @@ import * as $math from "../util/Math";
 /**
  * An [[EventDispatcher]] for [[Sprite]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/events/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/events/} for more info
  */
 class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> extends EventDispatcher<E> {
 	protected static RENDERER_EVENTS: { [K in keyof IRendererEvents]?: <E extends Events<Sprite, ISpriteEvents>>(this: SpriteEventDispatcher<Sprite, E>, event: IRendererEvents[K]) => void } = {
@@ -430,7 +430,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * Field in the data item's data object that holds settings for this
 	 * element, applied over its template's.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/settings/template-fields/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/settings/template-fields/} for more info
 	 */
 	templateField?: string;
 
@@ -449,21 +449,21 @@ export interface ISpriteSettings extends IEntitySettings {
 	/**
 	 * A [[NumberFormatter]] to use for this element instead of the root's.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/} for more info
 	 */
 	numberFormatter?: NumberFormatter | undefined;
 
 	/**
 	 * A [[DateFormatter]] to use for this element instead of the root's.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/} for more info
 	 */
 	dateFormatter?: DateFormatter | undefined;
 
 	/**
 	 * A [[DurationFormatter]] to use for this element instead of the root's.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/} for more info
 	 */
 	durationFormatter?: DurationFormatter | undefined;
 
@@ -489,7 +489,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: SVG filters are not supported in some browsers, e.g. Safari.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/#SVG_filters} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/#svg-filters} for more info
 	 * @ignore todo: figure out if we still need this
 	 */
 	filter?: string;
@@ -551,7 +551,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * ```
 	 *
 	 * @default false
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/} for more info
 	 * @since 5.21.0
 	 */
 	autoAppear?: boolean;
@@ -590,7 +590,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * * `"click"` - after a click or tap on the element, until a click
 	 *   anywhere else on the page.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/tooltips/#Sticky_tooltips} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/tooltips/#sticky-tooltips} for more info
 	 * @default "hover"
 	 * @since 5.0.16
 	 */
@@ -614,7 +614,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	blur?: number;
@@ -628,7 +628,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	brightness?: number;
@@ -642,7 +642,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	contrast?: number;
@@ -656,7 +656,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	saturate?: number;
@@ -666,7 +666,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	sepia?: number;
@@ -676,7 +676,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	invert?: number;
@@ -686,7 +686,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 *
 	 * IMPORTANT: This setting is not supported in Safari browsers.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/filters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/filters/} for more info
 	 * @since 5.5.0
 	 */
 	hue?: number;
@@ -695,7 +695,7 @@ export interface ISpriteSettings extends IEntitySettings {
  * An internal order by which focusable elements will be selected within the
  * chart.
  * 
- * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#focusing-elements} for more info
  */
 	tabindexOrder?: number;
 
@@ -703,14 +703,14 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * Simulate hover on an element when it gains focus, including changing hover
 	 * appearance and displaying a tooltip if applicable.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#focusing-elements} for more info
 	 */
 	hoverOnFocus?: boolean;
 
 	/**
 	 * Can element be focused, i.e. selected using TAB key.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Focusing_elements} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#focusing-elements} for more info
 	 */
 	focusable?: boolean;
 
@@ -728,7 +728,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	 * the element, which advertises this capability and provides adequate
 	 * instructions.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Grouping_focusable_elements} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#grouping-focusable-elements} for more info
 	 * @since 5.0.6
 	 */
 	focusableGroup?: string | number;
@@ -744,7 +744,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	/**
 	 * Element's role.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Roles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#roles} for more info
 	 */
 	role?: Role;
 
@@ -802,7 +802,7 @@ export interface ISpriteSettings extends IEntitySettings {
 	/**
 	 * Label for the element to use for screen readers.
 	 * 
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/accessibility/#Screen_reader} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#screen-reader} for more info
 	 */
 	ariaLabel?: string;
 
@@ -1330,6 +1330,32 @@ export abstract class Sprite extends Entity {
 				}
 			}
 		}
+	}
+
+	/**
+	 * The layer name an SVG document gives this element, e.g. a column by its
+	 * category.
+	 *
+	 * @ignore
+	 */
+	public _exportName(): string | undefined {
+		const dataItem = this._dataItem;
+		if (dataItem && dataItem.component) {
+			return dataItem.component._dataItemName(dataItem, this);
+		}
+		return undefined;
+	}
+
+	/**
+	 * Names the element's layer, and those of what it holds, for an SVG
+	 * document. A name its group already has is not repeated.
+	 *
+	 * @ignore
+	 */
+	public _nameForExport(parentName?: string): string | undefined {
+		const name = this._exportName();
+		this._display.exportName = name !== parentName ? name : undefined;
+		return name || parentName;
 	}
 
 	protected _addPercentageSizeChildren() {
@@ -3184,7 +3210,7 @@ export abstract class Sprite extends Entity {
 	 * Returns the [[NumberFormatter]] of the element: its own
 	 * `numberFormatter`, or else the one of the [[Root]].
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/} for more info
 	 * @return NumberFormatter instance
 	 */
 	public getNumberFormatter(): NumberFormatter {
@@ -3195,7 +3221,7 @@ export abstract class Sprite extends Entity {
 	 * Returns the [[DateFormatter]] of the element: its own `dateFormatter`,
 	 * or else the one of the [[Root]].
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/} for more info
 	 * @return DateFormatter instance
 	 */
 	public getDateFormatter(): DateFormatter {
@@ -3206,7 +3232,7 @@ export abstract class Sprite extends Entity {
 	 * Returns the [[DurationFormatter]] of the element: its own
 	 * `durationFormatter`, or else the one of the [[Root]].
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/using-formatters/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/formatters/} for more info
 	 * @return DurationFormatter instance
 	 */
 	public getDurationFormatter(): DurationFormatter {

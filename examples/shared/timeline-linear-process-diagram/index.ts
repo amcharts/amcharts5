@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const chart = root.container.children.push(am5timeline.CurveChart.new(root, {
   wheelY: "zoomX" // the mouse wheel zooms in on part of the day
 }));
@@ -56,7 +56,7 @@ function addArc(points: am5.IPoint[], x: number, y: number, radius: number, star
 
 
 // Create axes: the date axis follows the path, the category axis runs across it
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const yRenderer = am5timeline.AxisRendererCurveY.new(root, {
   axisLocation: -0.1 // both rows sit on one side of the path, a little off it, not across it
 });
@@ -105,7 +105,7 @@ yAxis.data.setAll([
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const series = chart.series.push(am5timeline.CurveColumnSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
@@ -123,7 +123,7 @@ series.columns.template.setAll({
 });
 
 // Add a pin with an icon to each activity
-// https://www.amcharts.com/docs/v5/concepts/common-elements/bullets/
+// https://docs.amcharts.com/v5/concepts/common-elements/bullets/
 series.bullets.push((root) => {
   const pin = am5.Container.new(root, {});
 
@@ -159,7 +159,7 @@ series.bullets.push((root) => {
 
 
 // Add scrollbar
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // drag its ends to zoom in on part of the day, or its middle to move along it
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -167,7 +167,7 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 
 
 // Set data: the processor turns the date strings into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 const colors = chart.get("colors")!; // the chart's color set: each row picks its fill from it
 
 series.data.processor = am5.DataProcessor.new(root, {
@@ -197,6 +197,6 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

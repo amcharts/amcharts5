@@ -6,7 +6,7 @@ import { Theme } from "../core/Theme";
  * colors leaning to golds, oranges and reds, plus a few cool hues to tell
  * series apart. It sets all interface colors, so use it instead of `Dark`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class EmberTheme extends Theme {

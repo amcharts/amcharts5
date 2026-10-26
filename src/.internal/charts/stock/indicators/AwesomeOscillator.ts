@@ -32,7 +32,7 @@ export interface IAwesomeOscillatorEvents extends IChartIndicatorEvents {
  * simple moving average of the median price (high plus low, halved). Drawn in
  * a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class AwesomeOscillator extends ChartIndicator {
 	public static className: string = "AwesomeOscillator";

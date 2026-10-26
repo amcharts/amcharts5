@@ -38,7 +38,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * What dragging across the plot area does: zoom or select along X, Y or
 	 * both.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#Behavior} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/#behavior} for more info
 	 * @default "none"
 	 */
 	behavior?: "zoomX" | "zoomY" | "zoomXY" | "selectX" | "selectY" | "selectXY" | "none";
@@ -72,7 +72,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * `"x"` or `"y"` along one direction only. `"x!"` and `"y!"` do the same,
 	 * but only among the items under the pointer, one per series.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#snapping-to-series} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/#snapping-to-series} for more info
 	 * @since 5.0.6
 	 * @default "xy"
 	 */
@@ -85,7 +85,7 @@ export interface IXYCursorSettings extends IContainerSettings {
 	 * follow each other only between charts stacked one above another, and
 	 * horizontal lines only between charts side by side.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/#syncing-cursors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/#syncing-cursors} for more info
 	 * @since 5.1.4
 	 */
 	syncWith?: Array<XYCursor>;
@@ -198,7 +198,7 @@ export interface IXYCursorEvents extends IContainerEvents {
  * Crosshair lines over an [[XYChart]] that follow the pointer and show the
  * axis and series tooltips. Dragging can zoom or select (`behavior`).
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/cursor/} for more info
  * @important
  */
 export class XYCursor extends Container {

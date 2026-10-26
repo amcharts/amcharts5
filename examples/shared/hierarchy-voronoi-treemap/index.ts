@@ -5,7 +5,7 @@ import data from "./data.json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
@@ -51,7 +51,7 @@ myTheme.rule("Label", ["node", "depth1"]).setAll({
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root),
   myTheme
@@ -59,7 +59,7 @@ root.setThemes([
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/
+// https://docs.amcharts.com/v5/charts/hierarchy/voronoi-treemap/
 // population sets each polygon's area: a country's own, a continent's the sum of its countries
 const series = root.container.children.push(am5hierarchy.VoronoiTreemap.new(root, {
   paddingLeft: 5,         // a 5 px margin, so the thick continent outlines aren't cut off
@@ -103,15 +103,15 @@ series.nodes.template.events.on("click", (ev) => {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Setting_data
+// https://docs.amcharts.com/v5/charts/hierarchy/#setting-data
 series.data.setAll([data]);
 
 
 // Select the root node
-// https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch
+// https://docs.amcharts.com/v5/charts/hierarchy/#pre-selected-branch
 series.set("selectedDataItem", series.dataItems[0]);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

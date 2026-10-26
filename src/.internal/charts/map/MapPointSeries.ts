@@ -227,7 +227,7 @@ export interface IMapPointSeriesSettings extends IMapSeriesSettings {
  * A map series of points, shown as bullets. A point sits at a longitude and
  * latitude, in a polygon, or on a line.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/map-chart/map-point-series/} for more info
  * @important
  */
 export class MapPointSeries extends MapSeries {

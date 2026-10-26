@@ -211,7 +211,7 @@ export interface IModalEvents extends IEntityEvents {
 /**
  * A modal dialog with HTML content, shown over the chart.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/modal-popups/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/modal-popups/} for more info
  */
 export class Modal extends Entity {
 	public static className: string = "Modal";

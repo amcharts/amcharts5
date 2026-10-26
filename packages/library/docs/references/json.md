@@ -135,7 +135,7 @@ Built-in `@` refs: `@root` (the Root), `@colors` (the theme's palette), `@series
 
 - `"geoJSON": "am5geodata_worldLow"` (a string) names the geodata. The name is `am5geodata_` plus the path under `geodata/`, with `/` written as `_` (`geodata/region/usa/caLow.js` > `am5geodata_region_usa_caLow`; see `references/map.md`).
   - With script tags, load the geodata's script (`geodata/worldLow.js`) first; it defines a global of that name.
-  - With npm, import it and pass it in `resources` (5.21.4+): `JsonParser.new(root).parse(config, { parent: root.container, resources: { am5geodata_worldLow } })`, `element.resources = { am5geodata_worldLow }` on an `<am5-chart>`, or the framework packages' `resources` prop (their releases for 5.21.4). Before 5.21.4, set `window.am5geodata_worldLow = am5geodata_worldLow` after importing it.
+  - With npm, import it and pass it in `resources` (5.21.4+): `JsonParser.new(root).parse(config, { parent: root.container, resources: { am5geodata_worldLow } })`, `element.resources = { am5geodata_worldLow }` on an `<am5-chart>`, or the framework packages' `resources` prop (react 5.0.1, vue 5.0.2, angular 5.0.1, svelte 5.0.3). Before 5.21.4, set `window.am5geodata_worldLow = am5geodata_worldLow` after importing it.
   - If the geodata isn't found, the map is blank. Since 5.21.4 the parser logs a warning; before that, no error appears.
 - The projection is a name in `settings`: `"projectionName": "geoNaturalEarth1"` for `am5map.geoNaturalEarth1()`. Next to `type` it is ignored.
 - Heat rules are plain objects, not amCharts objects, so each one needs `"__parse": true`. Without it, `target` and the colors stay unread and the chart throws. The series also needs `"calculateAggregates": true` unless the rule sets `minValue` and `maxValue`. Without either, every country gets the middle color. The `target` is a `Template` in `refs`, which the series also uses as its `mapPolygons` template (see "Countries colored by value" under "Maps").
@@ -477,6 +477,8 @@ Load the scripts, then put the config in the `config` attribute:
 - Load the files each family needs (see "Where a config goes").
 - The attribute is single-quoted, so write a `'` inside the config as `&#39;`, e.g. `get(&#39;background&#39;)`.
 - For a long config, use `src="chart.json"` or set the element's `config` property from a script: `document.querySelector("am5-chart").config = { … }`.
+- A theme with its settings (5.21.4) goes in the attribute as JSON: `themes='["Animated", ["Adaptive", { "baseColor": "#4150a0" }]]'`.
+- With npm, import `defineChartElement` from `@amcharts/amcharts5/element` and call it (esbuild drops a bare `import "@amcharts/amcharts5/element"`). Then set the properties: `element.themes = [am5themes_Animated]`, `element.resources = { am5geodata_worldLow }` for a map (5.21.4, rule 8), and `element.config = config`.
 - See index.md "Serializing to JSON" for `renderer="svg"`, `whenReady()` and the `ready`/`error` events.
 
 ### Chart Maker link
@@ -498,4 +500,4 @@ const url = "https://live.amcharts.com/open#config=" + encodeURIComponent(JSON.s
 `@amcharts/amcharts5-react`, `-vue`, `-angular`, `-svelte` and `-react-native` each take a config as a prop or input, plus themes beside it. See index.md "Frameworks".
 
 - For a map in React, Vue, Angular or Svelte, give the chart its geodata as in rule 8: the `resources` prop (5.21.4+), or a global set before the chart is built.
-- React Native loads the geodata a config names by itself.
+- React Native loads the geodata a config names by itself, but not a locale: give it `modules={["locales/de_DE"]}`.

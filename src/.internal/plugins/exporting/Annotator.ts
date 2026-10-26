@@ -86,7 +86,7 @@ export interface IAnnotatorEvents extends IEntityEvents {
  * A plugin that lets the user draw annotations over the chart, using the
  * MarkerJS library.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/exporting/annotator/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/exporting/annotator/} for more info
  */
 export class Annotator extends Entity {
 	public static className: string = "Annotator";

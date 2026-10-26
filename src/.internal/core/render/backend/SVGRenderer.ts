@@ -113,7 +113,7 @@ export class SvgLayer implements ILayer {
  * Blend modes `DST_OVER`, `SRC_ATOP` and `XOR` are canvas-only: SVG draws
  * them as `NORMAL`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/root-element/#renderer} for more information
+ * @see {@link https://docs.amcharts.com/v5/getting-started/root-element/#renderer} for more information
  * @since 5.21.0
  */
 export class SVGRenderer extends ArrayDisposer implements ISceneHost {
@@ -687,6 +687,10 @@ export class SVGRenderer extends ArrayDisposer implements ISceneHost {
 			canvas.style.width = this._calculatedWidth + "px";
 			canvas.style.height = this._calculatedHeight + "px";
 		}
+	}
+
+	_textContext(_text: SceneText): CanvasRenderingContext2D {
+		return this._measureContext;
 	}
 
 	/**

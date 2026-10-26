@@ -20,7 +20,7 @@ export interface IEllipsePrivate extends IGraphicsPrivate {
 /**
  * Draws an ellipse centered on its `x` and `y`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Ellipse extends Graphics {

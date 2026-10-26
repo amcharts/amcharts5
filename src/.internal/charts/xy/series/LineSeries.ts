@@ -26,7 +26,7 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	 * Draws the line across data items that have no value. With `false`, the
 	 * line breaks there, and also at time gaps longer than `autoGapCount`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Gaps} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/line-series/#gaps} for more info
 	 * @default true
 	 */
 	connect?: boolean;
@@ -36,7 +36,7 @@ export interface ILineSeriesSettings extends IXYSeriesSettings {
 	 * the line where neighboring data items are more than this many base
 	 * intervals (e.g. days) apart.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/#Auto_gaps_with_dates} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/line-series/#auto-gaps-with-dates} for more info
 	 * @default 1.1
 	 */
 	autoGapCount?: number;
@@ -64,7 +64,7 @@ export interface ILineSeriesPrivate extends IXYSeriesPrivate {
 /**
  * An axis range of a [[LineSeries]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/axis-ranges/#Series_axis_ranges} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/axis-ranges/#series-axis-ranges} for more info
  */
 export interface ILineSeriesAxisRange extends IXYSeriesAxisRange {
 
@@ -85,7 +85,7 @@ export interface ILineSeriesAxisRange extends IXYSeriesAxisRange {
  * A series drawn as a line, with an optional fill below it for an area
  * chart.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/line-series/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/line-series/} for more info
  * @important
  */
 export class LineSeries extends XYSeries {

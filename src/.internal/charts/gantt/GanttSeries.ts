@@ -130,7 +130,7 @@ export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 	/**
 	 * Field in data that holds the task's progress, `0` to `1`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Series_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#series-data} for more info
 	 * @default "progress"
 	 */
 	progressField?: string;
@@ -139,7 +139,7 @@ export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 	 * Field in data that holds the task's duration, in the Gantt's
 	 * `durationUnit` units.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Series_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#series-data} for more info
 	 * @default "duration"
 	 */
 	durationField?: string;
@@ -148,7 +148,7 @@ export interface IGanttSeriesSettings extends IColumnSeriesSettings {
 	 * Field in data that holds an array of IDs of the tasks this task links
 	 * to.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Series_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/gantt/#series-data} for more info
 	 * @default "linkTo"
 	 */
 	linkToField?: string;
@@ -191,7 +191,7 @@ export interface IGanttSeriesAxisRange extends IColumnSeriesAxisRange {
  * Series of a [[Gantt]] chart: draws the task bars, their progress and the
  * links between tasks, and lets the user drag and resize them.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Gantt_series} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/gantt/#gantt-series} for more info
  * @important
  * @since 5.14.0
  */

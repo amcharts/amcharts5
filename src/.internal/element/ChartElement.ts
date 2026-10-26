@@ -96,8 +96,8 @@ export interface IChartElementEventMap {
  * Without a height of its own, from CSS or its parent, the element is 400
  * pixels high.
  *
- * @see {@link https://www.amcharts.com/docs/v5/getting-started/integrations/am5-chart-element/} for more information
- * @see {@link https://www.amcharts.com/docs/v5/concepts/serializing/} for the config format
+ * @see {@link https://docs.amcharts.com/v5/getting-started/integrations/am5-chart-element/} for more information
+ * @see {@link https://docs.amcharts.com/v5/concepts/serializing/} for the config format
  * @since 5.21.0
  */
 export class ChartElement extends BaseElement {

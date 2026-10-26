@@ -44,7 +44,7 @@ export interface IVoronoiTreemapSettings extends IHierarchySettings {
 	 * Outline of the whole diagram: `"polygon"`, a round shape of
 	 * `cornerCount` corners, or `"rectangle"`, which fills the series' area.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/#Diagram_type} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/voronoi-treemap/} for more info
 	 * @default "polygon"
 	 */
 	shapeType?: "rectangle" | "polygon"
@@ -100,7 +100,7 @@ export interface IVoronoiTreemapPrivate extends IHierarchyPrivate {
  * inside its parent's cell. Many items with very different values lay out
  * poorly; group the small ones into an "Other" item.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/voronoi-treemap/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/voronoi-treemap/} for more info
  * @since 5.4.0
  */
 export class VoronoiTreemap extends Hierarchy {

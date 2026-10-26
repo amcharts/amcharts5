@@ -42,7 +42,7 @@ export interface IAccelerationBandsEvents extends IIndicatorEvents {
  * widen as the high-low range grows, and their middle line, each averaged over
  * `period`. Drawn over the main series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class AccelerationBands extends Indicator {
     public static className: string = "AccelerationBands";

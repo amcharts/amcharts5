@@ -7,7 +7,7 @@ import * as $array from "./Array";
 /**
  * A version of [[List]] to hold children of the [[Container]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/} for more info
  */
 export class Children<A extends Sprite> extends List<A> implements IDisposer {
 	private _disposed: boolean = false;

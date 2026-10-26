@@ -6,7 +6,7 @@ import { Theme } from "../core/Theme";
  * background. Its pastels are deeper than those of `Pastel`, so they look rich
  * rather than chalky on the dark background.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/themes/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/themes/} for more info
  * @important
  */
 export class PastelDarkTheme extends Theme {

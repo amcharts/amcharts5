@@ -50,7 +50,7 @@ export interface IPicturePatternEvents extends IPatternEvents {
  *
  * @since 5.2.15
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
  */
 export class PicturePattern extends Pattern {
 	declare public _settings: IPicturePatternSettings;

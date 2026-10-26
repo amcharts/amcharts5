@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create the map chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   panX: "rotateX",     // dragging sideways turns the world, so it wraps around endlessly...
   panY: "translateY",  // ...while up and down it just moves
@@ -26,12 +26,12 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Add zoom control
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-pan-zoom/#Zoom_control
+// https://docs.amcharts.com/v5/charts/map-chart/map-pan-zoom/#zoom-control
 chart.set("zoomControl", am5map.ZoomControl.new(root, {}));
 
 
 // Create main polygon series for countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 const polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow,
   exclude: ["AQ"] // no Antarctica, which Mercator stretches across the bottom
@@ -44,7 +44,7 @@ polygonSeries.mapPolygons.template.setAll({
 
 
 // Create clustered point series for cities
-// https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/
+// https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/
 // cities closer than 20 px on screen (the default minDistance) merge into one cluster
 const pointSeries = chart.series.push(am5map.ClusteredPointSeries.new(root, {}));
 
@@ -62,7 +62,7 @@ pointSeries.bullets.push(() => {
 
 
 // Set clustered bullet: shows how many cities it holds, zooms in on click
-// https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Group_bullet
+// https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#group-bullet
 pointSeries.set("clusteredBullet", (root, series, dataItem) => {
   const container = am5.Container.new(root, {
     cursorOverStyle: "pointer" // a hand cursor, as the cluster can be clicked
@@ -95,7 +95,7 @@ pointSeries.set("clusteredBullet", (root, series, dataItem) => {
     text: "{value}"     // the number of cities in the cluster
   }));
 
-  // https://www.amcharts.com/docs/v5/charts/map-chart/clustered-point-series/#Drill_down
+  // https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#drill-down
   // a click zooms in until the cluster's cities fill the map
   container.events.on("click", () => {
     series.zoomToCluster(dataItem);
@@ -155,5 +155,5 @@ pointSeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

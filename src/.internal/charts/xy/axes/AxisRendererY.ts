@@ -19,7 +19,7 @@ export interface IAxisRendererYSettings extends IAxisRendererSettings {
 	/**
 	 * Puts the axis on the right of the plot area instead of the left.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_position} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#axis-position} for more info
 	 * @default false
 	 */
 	opposite?: boolean;
@@ -38,7 +38,7 @@ export interface IAxisRendererYPrivate extends IAxisRendererPrivate {
 /**
  * Renderer for a vertical (Y) axis.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/#Axis_renderer} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/#axis-renderer} for more info
  * @important
  */
 export class AxisRendererY extends AxisRenderer {

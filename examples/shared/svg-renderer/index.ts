@@ -5,26 +5,26 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 // Create root element, drawn as SVG instead of canvas
 // am5.renderToSVG(root) returns the chart as SVG markup
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv", {
   renderer: am5.SVGRenderer // set only when the root is created; the default draws on a canvas
 });
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {}));
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   categoryField: "country",
   renderer: am5xy.AxisRendererX.new(root, {
@@ -38,7 +38,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const series = chart.series.push(am5xy.ColumnSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
@@ -51,7 +51,7 @@ const series = chart.series.push(am5xy.ColumnSeries.new(root, {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 const data = [
   { country: "USA", value: 2025 },
   { country: "China", value: 1882 },
@@ -67,6 +67,6 @@ series.data.setAll(data);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

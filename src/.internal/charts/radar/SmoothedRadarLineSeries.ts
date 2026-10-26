@@ -10,7 +10,7 @@ export interface ISmoothedRadarLineSeriesSettings extends IRadarLineSeriesSettin
 	 * How tight the curve is, from `0` to `1`: `1` draws straight lines, a
 	 * smaller value a rounder curve.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/series/smoothed-series/#Line_tension} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/series/smoothed-series/#line-tension} for more info
 	 * @default 0.5
 	 */
 	tension?: number;

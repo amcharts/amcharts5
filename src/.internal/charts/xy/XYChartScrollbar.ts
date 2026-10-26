@@ -14,7 +14,7 @@ export interface IXYChartScrollbarPrivate extends IScrollbarPrivate {
  * A scrollbar with a small preview chart in it. Add axes and series to its
  * `chart` to draw the preview.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/#Scrollbar_with_chart_preview} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/#scrollbar-with-chart-preview} for more info
  * @important
  */
 export class XYChartScrollbar extends Scrollbar {

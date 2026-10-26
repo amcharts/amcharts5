@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/map-chart/
+// https://docs.amcharts.com/v5/charts/map-chart/
 const chart = root.container.children.push(am5map.MapChart.new(root, {
   projection: am5map.geoOrthographic(), // a globe
   panX: "rotateX",   // dragging sideways spins the globe...
@@ -28,7 +28,7 @@ const chart = root.container.children.push(am5map.MapChart.new(root, {
 
 
 // Add globe background
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/#Background_polygon
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/#background-polygon
 const backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {}));
 
 backgroundSeries.mapPolygons.template.setAll({
@@ -43,14 +43,14 @@ backgroundSeries.data.push({
 
 
 // Add countries
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-polygon-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-polygon-series/
 chart.series.push(am5map.MapPolygonSeries.new(root, {
   geoJSON: am5geodata_worldLow
 }));
 
 
 // Add cities
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-point-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-point-series/
 const pointSeries = chart.series.push(am5map.MapPointSeries.new(root, {
   latitudeField: "latitude",
   longitudeField: "longitude"
@@ -79,7 +79,7 @@ pointSeries.data.setAll([
 
 
 // Add routes: altitude raises the middle of each line, in metres
-// https://www.amcharts.com/docs/v5/charts/map-chart/map-line-series/
+// https://docs.amcharts.com/v5/charts/map-chart/map-line-series/
 const lineSeries = chart.series.push(am5map.MapLineSeries.new(root, {
   pointSeries: pointSeries // the pointIds in the data are the ids of these cities
 }));
@@ -101,5 +101,5 @@ lineSeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

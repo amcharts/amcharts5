@@ -4,12 +4,12 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
@@ -31,7 +31,7 @@ const text = "'Tis sweet and commendable in your nature, Hamlet, to give these m
 
 // Add series
 // Angles are taken in turn, not at random, so the cloud is the same on every load
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Setting_words
+// https://docs.amcharts.com/v5/charts/word-cloud/#setting-words
 const series = root.container.children.push(am5wc.WordCloud.new(root, {
   text: text,
   maxCount: 100,                // at most the 100 most used words
@@ -45,7 +45,7 @@ const series = root.container.children.push(am5wc.WordCloud.new(root, {
 
 
 // Configure labels
-// https://www.amcharts.com/docs/v5/charts/word-cloud/#Configuring
+// https://docs.amcharts.com/v5/charts/word-cloud/#configuring
 series.labels.template.setAll({
   paddingTop: 5,           // 5 px of space kept around each word
   paddingBottom: 5,
@@ -56,5 +56,5 @@ series.labels.template.setAll({
 
 
 // Play initial series animation
-// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
+// https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

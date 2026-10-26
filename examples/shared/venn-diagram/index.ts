@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create wrapper container
-// https://www.amcharts.com/docs/v5/charts/venn/#Additional_controls
+// https://docs.amcharts.com/v5/charts/venn/#additional-controls
 const container = root.container.children.push(am5.Container.new(root, {
   width: am5.p100,            // fills the chart div
   height: am5.p100,
@@ -25,7 +25,7 @@ const container = root.container.children.push(am5.Container.new(root, {
 
 
 // Create series
-// https://www.amcharts.com/docs/v5/charts/venn/#Venn_series
+// https://docs.amcharts.com/v5/charts/venn/#venn-series
 const series = container.children.push(am5venn.Venn.new(root, {
   categoryField: "name",
   valueField: "value",
@@ -37,11 +37,11 @@ const series = container.children.push(am5venn.Venn.new(root, {
 }));
 
 // Set tooltip content
-// https://www.amcharts.com/docs/v5/charts/venn/#Tooltips
+// https://docs.amcharts.com/v5/charts/venn/#tooltips
 series.slices.template.set("tooltipText", "{category}: {value}");
 
 // Set up hover appearance
-// https://www.amcharts.com/docs/v5/charts/venn/#Hovers
+// https://docs.amcharts.com/v5/charts/venn/#hovers
 // hoverGraphics is drawn over the hovered circle or overlap, outlining its exact shape
 series.hoverGraphics.setAll({
   strokeDasharray: [3, 3],                        // dashed: 3 px dash, 3 px gap
@@ -51,7 +51,7 @@ series.hoverGraphics.setAll({
 
 
 // Set data: an item with sets is the intersection of those circles
-// https://www.amcharts.com/docs/v5/charts/venn/#Setting_data
+// https://docs.amcharts.com/v5/charts/venn/#setting-data
 // the values set the circles' areas and, as near as the layout can, the overlaps'
 series.data.setAll([
   { name: "A", value: 10 },
@@ -65,7 +65,7 @@ series.data.setAll([
 
 
 // Add legend
-// https://www.amcharts.com/docs/v5/charts/venn/#Legend
+// https://docs.amcharts.com/v5/charts/venn/#legend
 const legend = container.children.push(am5.Legend.new(root, {
   centerX: am5.p50, // centered under the diagram
   x: am5.p50
@@ -75,5 +75,5 @@ legend.data.setAll(series.dataItems);
 
 
 // Play initial series animation
-// https://www.amcharts.com/docs/v5/concepts/animations/#Animation_of_series
+// https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

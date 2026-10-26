@@ -26,7 +26,7 @@ export interface IGanttDateAxisEvents extends IDateAxisEvents {
  * A date axis of a [[Gantt]] chart. The Gantt has two, both above the plot
  * area: `xAxis` with the larger time units and `xAxisMinor` below it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/gantt/#Timeline_horizontal_axis} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/gantt/#timeline-horizontal-axis} for more info
  * @since 5.14.0
  * @important
  */

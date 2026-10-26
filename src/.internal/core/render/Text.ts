@@ -25,7 +25,7 @@ export interface ITextSettings extends ISpriteSettings {
 	/**
 	 * Fill gradient.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/gradients/} for more information
 	 * @since 5.10.1
 	 */
 	fillGradient?: Gradient;

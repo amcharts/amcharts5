@@ -121,7 +121,7 @@ export class Timezone {
 	/**
 	 * Creates a timezone from its IANA name, such as `"America/New_York"`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/getting-started/#New_element_syntax} for more info
+	 * @see {@link https://docs.amcharts.com/v5/getting-started/#new-element-syntax} for more info
 	 * @param   timezone  IANA timezone
 	 * @return            Instantiated object
 	 */

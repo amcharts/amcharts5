@@ -5,19 +5,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart: orientation: "horizontal" would lay the timeline out in columns
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const chart = root.container.children.push(am5timeline.SerpentineChart.new(root, {
   levelCount: 3,     // the timeline winds across the chart in three runs
   startLocation: 0.2 // the first run starts a fifth of the way in: room for the row names
@@ -25,7 +25,7 @@ const chart = root.container.children.push(am5timeline.SerpentineChart.new(root,
 
 
 // Create axes: the date axis follows the curve, the category axis runs across it
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const yRenderer = am5timeline.AxisRendererCurveY.new(root, {
   minGridDistance: 10 // a name for every row, even with rows only 10 px apart
 });
@@ -81,7 +81,7 @@ yAxis.data.setAll([
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/timeline/
+// https://docs.amcharts.com/v5/charts/timeline/
 const series = chart.series.push(am5timeline.CurveColumnSeries.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
@@ -154,7 +154,7 @@ chart.series.push(flagSeries as any);
 
 
 // Set data: the processor turns the date strings into timestamps
-// https://www.amcharts.com/docs/v5/concepts/data/#Parsing_dates
+// https://docs.amcharts.com/v5/concepts/data/#parsing-dates
 const colors = chart.get("colors")!; // the chart's color set: each module picks its fill from it
 
 series.data.processor = am5.DataProcessor.new(root, {
@@ -196,7 +196,7 @@ flagSeries.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 flagSeries.appear(1000);
 chart.appear(1000, 100);

@@ -40,7 +40,7 @@ export interface IPointedRectanglePrivate extends IGraphicsPrivate {
  * Draws a rectangle with a pointer, such as a tooltip's background. The
  * pointer comes out of the side facing `pointerX` and `pointerY`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class PointedRectangle extends Graphics {

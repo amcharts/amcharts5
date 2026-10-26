@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: true,      // drag the plot to move around it, sideways...
   panY: true,      // ...and up and down
@@ -25,7 +25,7 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
   logarithmic: true, // GDPs range from hundreds to tens of thousands: a log scale fits them
   maxDeviation: 1,   // can be moved or zoomed out up to a whole axis length past the data
@@ -60,7 +60,7 @@ yAxis.children.unshift(am5.Label.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 // The tooltip takes its color from the bubble it points at
 const series = chart.series.push(am5xy.LineSeries.new(root, {
   calculateAggregates: true, // works out the lowest and highest population, which the heat rule needs
@@ -80,7 +80,7 @@ series.strokes.template.set("visible", false); // no line joining the points: on
 
 
 // Add bullet
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Bullets
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#bullets
 // Each row colors its own bubble through "bulletSettings"
 // one template shared by all the bubbles, which the heat rule below targets
 const circleTemplate: am5.Template<am5.Circle> = am5.Template.new({});
@@ -98,7 +98,7 @@ series.bullets.push(() => {
 
 
 // Add heat rule: the bubble's size shows the population
-// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+// https://docs.amcharts.com/v5/concepts/settings/heat-rules/
 series.set("heatRules", [{
   target: circleTemplate,
   min: 3,  // radius in pixels for the least populous country...
@@ -109,7 +109,7 @@ series.set("heatRules", [{
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 chart.set("cursor", am5xy.XYCursor.new(root, {
   xAxis: xAxis,
   yAxis: yAxis,
@@ -118,7 +118,7 @@ chart.set("cursor", am5xy.XYCursor.new(root, {
 
 
 // Add scrollbars
-// https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/
+// https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/
 // above the plot: drag its ends to zoom, or its middle to move along the GDP axis
 chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
@@ -131,9 +131,9 @@ chart.set("scrollbarY", am5.Scrollbar.new(root, {
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 // The colors in the data are strings: the processor turns them into colors
-// https://www.amcharts.com/docs/v5/concepts/data/#Pre_processing_data
+// https://docs.amcharts.com/v5/concepts/data/#pre-processing-data
 series.data.processor = am5.DataProcessor.new(root, {
   colorFields: ["bulletSettings.fill"]
 });
@@ -183,6 +183,6 @@ series.data.setAll([
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);
 chart.appear(1000, 100);

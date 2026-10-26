@@ -4,19 +4,19 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 
 // Create chart
-// https://www.amcharts.com/docs/v5/charts/xy-chart/
+// https://docs.amcharts.com/v5/charts/xy-chart/
 const chart = root.container.children.push(am5xy.XYChart.new(root, {
   panX: false,                  // dragging the plot does not pan it
   panY: false,
@@ -27,7 +27,7 @@ const chart = root.container.children.push(am5xy.XYChart.new(root, {
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 // The cell locations leave a gap between the clusters
 const xAxis = chart.xAxes.push(am5xy.CategoryAxis.new(root, {
   categoryField: "year",
@@ -43,7 +43,7 @@ const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 function makeSeries(name: string, fieldName: string) {
   // column series are clustered by default: each year's columns stand side by side
   const series = chart.series.push(am5xy.ColumnSeries.new(root, {
@@ -84,7 +84,7 @@ makeSeries("Africa", "africa");
 
 
 // Set data
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/#Setting_data
+// https://docs.amcharts.com/v5/charts/xy-chart/series/#setting-data
 const data = [
   { year: "2021", europe: 2.5, namerica: 2.5, asia: 2.1, lamerica: 1, meast: 0.8, africa: 0.4 },
   { year: "2022", europe: 2.6, namerica: 2.7, asia: 2.2, lamerica: 0.5, meast: 0.4, africa: 0.3 },
@@ -98,7 +98,7 @@ chart.series.each((series) => {
 
 
 // Add legend
-// https://www.amcharts.com/docs/v5/charts/xy-chart/legend-xy-series/
+// https://docs.amcharts.com/v5/charts/xy-chart/legend-xy-series/
 const legend = chart.children.push(am5.Legend.new(root, {
   centerX: am5.p50, // the legend's middle...
   x: am5.p50        // ...at the middle of the chart
@@ -108,7 +108,7 @@ legend.data.setAll(chart.series.values);
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.series.each((series) => {
   series.appear(1000);
 });

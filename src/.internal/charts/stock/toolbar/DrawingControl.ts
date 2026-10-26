@@ -50,7 +50,7 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	/**
 	 * Tools to list in the tool dropdown.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_list} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/#tool-list} for more info
 	 */
 	tools?: DrawingTools[];
 
@@ -73,7 +73,7 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 	 * Settings for the drawing series of each tool, keyed by tool name.
 	 *
 	 * @since 5.5.2
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Tool_settings} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/#tool-settings} for more info
 	 */
 	toolSettings?: { [index: string]: any };
 
@@ -85,7 +85,7 @@ export interface IDrawingControlSettings extends IStockControlSettings {
 
 	/**
 	 * Colors to offer in the color pickers.
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/#Colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/#colors} for more info
 	 */
 	colors?: ColorSet;
 
@@ -235,7 +235,7 @@ export interface IDrawingControlEvents extends IStockControlEvents {
  * A [[StockToolbar]] control that turns drawing mode on, with a row of
  * controls for picking the tool and its colors, lines and fonts.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/toolbar/drawing-control/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/toolbar/drawing-control/} for more info
  */
 export class DrawingControl extends StockControl {
 	public static className: string = "DrawingControl";
@@ -1351,7 +1351,7 @@ export class DrawingControl extends StockControl {
 	 * Serializes all drawings of the chart into an array of objects
 	 * (`output: "object"`) or into JSON (`"string"`, the default).
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
 	 * @param   output Output format
 	 * @param   indent Line indent in JSON
@@ -1386,7 +1386,7 @@ export class DrawingControl extends StockControl {
 	/**
 	 * Adds drawings to the chart from data made by `serializeDrawings()`.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/stock/serializing-indicators-annotations/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/stock/serializing-indicators-annotations/} for more info
 	 * @since 5.3.0
 	 * @param  data Serialized data
 	 */

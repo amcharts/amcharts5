@@ -105,7 +105,7 @@ export interface IHierarchyDataItem extends ISeriesDataItem {
 	/**
 	 * Node's auto-assigned pattern.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/} for more info
 	 * @since 5.10.0
 	 */
 	fillPattern: Pattern;
@@ -152,7 +152,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	 * Field in data that holds the parent node's ID, for flat data passed to
 	 * `setFlatData()`. When not set, `"parentId"` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Flat_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#flat-data} for more info
 	 * @since 5.16.2
 	 */
 	parentIdField?: string;
@@ -171,14 +171,14 @@ export interface IHierarchySettings extends ISeriesSettings {
 	 * [[ColorSet]] for the node colors: each first-level node takes the next
 	 * color, and the nodes below it share that color.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Node_colors} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#node-colors} for more info
 	 */
 	colors?: ColorSet;
 
 	/**
 	 * A [[PatternSet]] to use when assigning patterns for nodes.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/colors-gradients-and-patterns/patterns/#Pattern_sets} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/colors-gradients-and-patterns/patterns/#pattern-sets} for more info
 	 * @since 5.10.0
 	 */
 	patterns?: PatternSet;
@@ -186,7 +186,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	/**
 	 * Number of child levels a click on a node opens.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#drill-down} for more info
 	 * @default 1
 	 */
 	downDepth?: number;
@@ -194,7 +194,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	/**
 	 * Number of parent levels that stay visible above the selected node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Drill_down} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#drill-down} for more info
 	 */
 	upDepth?: number;
 
@@ -202,7 +202,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	 * Number of levels opened below the top level (`topDepth`) when the chart
 	 * first loads.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Tree_depth} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#tree-depth} for more info
 	 * @default 5
 	 */
 	initialDepth?: number;
@@ -211,7 +211,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	 * Depth of the first level shown; the levels above it are hidden. For
 	 * example, `1` hides the root node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Tree_depth} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#tree-depth} for more info
 	 * @default 0
 	 */
 	topDepth?: number;
@@ -226,7 +226,7 @@ export interface IHierarchySettings extends ISeriesSettings {
 	/**
 	 * The selected (drilled-into) node. Set it to drill down to a node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Pre_selected_branch} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#pre-selected-branch} for more info
 	 */
 	selectedDataItem?: DataItem<IHierarchyDataItem>;
 
@@ -265,7 +265,7 @@ export interface IHierarchyEvents extends ISeriesEvents {
  * Base class for the hierarchy series, such as [[Treemap]], [[Sunburst]],
  * [[Partition]], [[Pack]], [[Tree]] and [[ForceDirected]].
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/} for more info
  */
 export abstract class Hierarchy extends Series {
 	public static className: string = "Hierarchy";
@@ -593,7 +593,7 @@ export abstract class Hierarchy extends Series {
 	 * `"id"` when not set). The item with no parent ID (`null`, `undefined` or
 	 * `""`) becomes the root; if there are several, only the last one is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/#Flat_data} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/#flat-data} for more info
 	 * @since 5.16.2
 	 * @param  flatData  Array of flat data objects
 	 */
@@ -639,7 +639,7 @@ export abstract class Hierarchy extends Series {
 	/**
 	 * Adds child nodes to a node.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/hierarchy-api/#Dynamically_adding_child_nodes} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/hierarchy-api/#dynamically-adding-child-nodes} for more info
 	 * @since 5.4.5
 	 * @param  dataItem  Node to add the children to
 	 * @param  data      Data objects of the new children

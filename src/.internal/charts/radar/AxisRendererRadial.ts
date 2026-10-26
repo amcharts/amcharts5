@@ -24,7 +24,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 * Outer radius of the axis, in pixels or as a percent of the chart's
 	 * radius. A negative value is measured in from the chart's radius.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/radar-axes/#axis-radii-and-angles} for more info
 	 */
 	radius?: number | Percent;
 
@@ -33,7 +33,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 * radius. A negative value is measured in from the axis's outer radius.
 	 * If not set, the chart's `innerRadius` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/radar-axes/#axis-radii-and-angles} for more info
 	 */
 	innerRadius?: number | Percent;
 
@@ -41,7 +41,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 * Angle in degrees where the axis's grid circles and fills start. If not
 	 * set, the chart's `startAngle` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/radar-axes/#axis-radii-and-angles} for more info
 	 */
 	startAngle?: number;
 
@@ -49,7 +49,7 @@ export interface IAxisRendererRadialSettings extends IAxisRendererSettings {
 	 * Angle in degrees where the axis's grid circles and fills end. If not
 	 * set, the chart's `endAngle` is used.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/radar-chart/radar-axes/#Axis_radii_and_angles} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/radar-chart/radar-axes/#axis-radii-and-angles} for more info
 	 */
 	endAngle?: number;
 

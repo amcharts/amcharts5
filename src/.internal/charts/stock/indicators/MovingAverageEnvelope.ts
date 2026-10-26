@@ -47,7 +47,7 @@ export interface IMovingAverageEnvelopeEvents extends IMovingAverageEvents {
  * Moving Average Envelope indicator: a moving average of `field` over
  * `period`, with bands `shift` above and below it. Drawn over the main series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class MovingAverageEnvelope extends MovingAverage {
 	public static className: string = "MovingAverageEnvelope";

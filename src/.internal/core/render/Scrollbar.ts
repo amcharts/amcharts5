@@ -41,7 +41,7 @@ export interface IScrollbarSettings extends IContainerSettings {
 	/**
 	 * Easing function of scroll animations.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/animations/#Easing_functions} for more info
+	 * @see {@link https://docs.amcharts.com/v5/concepts/animations/#easing-functions} for more info
 	 */
 	animationEasing?: (t: Time) => Time;
 
@@ -102,7 +102,7 @@ export interface IScrollbarEvents extends IContainerEvents {
  * A control for selecting a range, such as the zoom of a chart's axes: the
  * grips resize the range, the thumb between them moves it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/scrollbars/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/} for more info
  */
 export class Scrollbar extends Container {
 

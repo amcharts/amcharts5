@@ -29,7 +29,7 @@ export interface IZigZagEvents extends IIndicatorEvents {
  * ZigZag indicator: straight lines between the price's turning points,
  * ignoring moves smaller than `deviation`. Drawn over the main series.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class ZigZag extends Indicator {
 	public static className: string = "ZigZag";

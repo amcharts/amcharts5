@@ -373,7 +373,7 @@ export class Language extends Entity {
 	/**
 	 * Adds a custom prompt and its translation to a locale.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts}
+	 * @see {@link https://docs.amcharts.com/v5/concepts/locales/creating-translations/#extending-locale-with-custom-prompts}
 	 * @param  prompt       Source prompt
 	 * @param  translation  Translation
 	 * @param  locale       Target locale; the root's locale if not given
@@ -388,7 +388,7 @@ export class Language extends Entity {
 	 * translations.
 	 *
 	 * @since 5.3.3
-	 * @see {@link https://www.amcharts.com/docs/v5/concepts/locales/creating-translations/#Extending_locale_with_custom_prompts}
+	 * @see {@link https://docs.amcharts.com/v5/concepts/locales/creating-translations/#extending-locale-with-custom-prompts}
 	 * @param  translations  Translations
 	 * @param  locale        Target locale; the root's locale if not given
 	 */

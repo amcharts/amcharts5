@@ -18,7 +18,7 @@ export interface ICategoryAxisSettings<R extends AxisRenderer> extends IAxisSett
 	 * Function that decides which axis fills show; it is called for each
 	 * category with its index. The default fills every other category.
 	 *
-	 * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/#Axis_fills} for more info
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/#axis-fills} for more info
 	 */
 	fillRule?: (dataItem: DataItem<ICategoryAxisDataItem>, index?: number) => void;
 
@@ -133,7 +133,7 @@ export interface ICategoryAxisEvents extends IAxisEvents {
  * An axis of named categories, each taking an equal share of the axis unless
  * `cellSizeField` sets their sizes.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/xy-chart/axes/category-axis/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/category-axis/} for more info
  * @important
  */
 export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {

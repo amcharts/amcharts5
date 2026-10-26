@@ -28,7 +28,7 @@ export interface IDisparityIndexEvents extends IChartIndicatorEvents {
  * Disparity Index indicator: how far `field` is from its moving average over
  * `period`, in percent of the average. Drawn in a panel of its own.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  */
 export class DisparityIndex extends ChartIndicator {
 	public static className: string = "DisparityIndex";

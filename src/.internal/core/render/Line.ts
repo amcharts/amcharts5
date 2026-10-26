@@ -26,7 +26,7 @@ export interface ILinePrivate extends IGraphicsPrivate {
  * straight line from its top-left corner to its bottom-right one, at its
  * `width` and `height`.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/graphics/} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/graphics/} for more info
  * @important
  */
 export class Line extends Graphics {

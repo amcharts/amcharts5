@@ -78,7 +78,7 @@ export interface IVolumeProfileEvents extends IIndicatorEvents {
  * much volume traded at each price in the visible range, split into up and
  * down volume.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/stock/indicators/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/stock/indicators/} for more info
  * @since 5.7.0
  */
 export class VolumeProfile extends Indicator {

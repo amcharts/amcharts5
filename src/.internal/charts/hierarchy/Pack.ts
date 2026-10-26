@@ -73,7 +73,7 @@ export interface IPackEvents extends IHierarchyEvents {
  * A pack diagram: nodes as circles sized by value, each inside its parent's
  * circle. A click on a node zooms into it.
  *
- * @see {@link https://www.amcharts.com/docs/v5/charts/hierarchy/pack/} for more info
+ * @see {@link https://docs.amcharts.com/v5/charts/hierarchy/pack/} for more info
  * @important
  */
 export class Pack extends Hierarchy {

@@ -6,28 +6,28 @@ import data from "./data.json";
 
 
 // Create root element
-// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+// https://docs.amcharts.com/v5/getting-started/#root-element
 const root = am5.Root.new("chartdiv");
 
 
 // Set themes
-// https://www.amcharts.com/docs/v5/concepts/themes/
+// https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
   am5themes_Animated.new(root)
 ]);
 
 // Set global number format
-// https://www.amcharts.com/docs/v5/concepts/formatters/formatting-numbers/
+// https://docs.amcharts.com/v5/concepts/formatters/formatting-numbers/
 root.numberFormatter.set("numberFormat", "#,###.00");
 
 
 // Create a stock chart
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Instantiating_the_chart
+// https://docs.amcharts.com/v5/charts/stock/#instantiating-the-chart
 const stockChart = root.container.children.push(am5stock.StockChart.new(root, {}));
 
 
 // Create a main stock panel (chart)
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Adding_panels
+// https://docs.amcharts.com/v5/charts/stock/
 const mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
   wheelY: "zoomX", // the mouse wheel zooms in on the dates
   panX: true,      // dragging the plot moves along the dates...
@@ -36,7 +36,7 @@ const mainPanel = stockChart.panels.push(am5stock.StockPanel.new(root, {
 
 
 // Create axes
-// https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
+// https://docs.amcharts.com/v5/charts/xy-chart/axes/
 const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {
     pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
@@ -62,7 +62,7 @@ dateAxis.get("renderer").labels.template.set("minPosition", 0.01);
 
 
 // Add series
-// https://www.amcharts.com/docs/v5/charts/xy-chart/series/
+// https://docs.amcharts.com/v5/charts/xy-chart/series/
 const valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
   name: "MSFT",
   valueXField: "Date",
@@ -79,12 +79,12 @@ const valueSeries = mainPanel.series.push(am5xy.CandlestickSeries.new(root, {
 
 
 // Set main value series
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_main_series
+// https://docs.amcharts.com/v5/charts/stock/#setting-main-series
 stockChart.set("stockSeries", valueSeries);
 
 
 // Add a stock legend
-// https://www.amcharts.com/docs/v5/charts/stock-chart/stock-legend/
+// https://docs.amcharts.com/v5/charts/stock/stock-legend/
 // in the plot container, so it sits over the top left of the plot
 const valueLegend = mainPanel.plotContainer.children.push(am5stock.StockLegend.new(root, {
   stockChart: stockChart
@@ -94,7 +94,7 @@ valueLegend.data.setAll([valueSeries]);
 
 
 // Add cursor
-// https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
+// https://docs.amcharts.com/v5/charts/xy-chart/cursor/
 mainPanel.set("cursor", am5xy.XYCursor.new(root, {
   yAxis: valueAxis,
   xAxis: dateAxis,
@@ -104,12 +104,12 @@ mainPanel.set("cursor", am5xy.XYCursor.new(root, {
 
 
 // Set data: data.json has one dataset per interval, the chart starts with the daily one
-// https://www.amcharts.com/docs/v5/charts/stock-chart/#Setting_data
+// https://docs.amcharts.com/v5/charts/stock/
 valueSeries.data.setAll(data.day);
 
 
 // Set up interval switcher: the id of an item is the name of its dataset
-// https://www.amcharts.com/docs/v5/charts/stock/toolbar/interval-control/
+// https://docs.amcharts.com/v5/charts/stock/toolbar/interval-control/
 const intervalSwitcher = am5stock.IntervalControl.new(root, {
   stockChart: stockChart,
   currentItem: "day", // the control starts on "1 day", to match the data loaded above
@@ -140,7 +140,7 @@ intervalSwitcher.events.on("selected", (ev) => {
 
 
 // Add stock toolbar
-// https://www.amcharts.com/docs/v5/charts/stock/toolbar/
+// https://docs.amcharts.com/v5/charts/stock/toolbar/
 am5stock.StockToolbar.new(root, {
   container: document.getElementById("chartcontrols")!, // the div above the chart that holds the toolbar
   stockChart: stockChart,
@@ -151,6 +151,6 @@ am5stock.StockToolbar.new(root, {
 
 
 // Make stuff animate on load
-// https://www.amcharts.com/docs/v5/concepts/animations/#Forcing_appearance_animation
+// https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 valueSeries.appear(1000);
 stockChart.appear(1000, 100);

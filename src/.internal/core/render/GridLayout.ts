@@ -27,7 +27,7 @@ export interface IGridLayoutPrivate extends ILayoutPrivate {
  * Lays out a [[Container]]'s children in rows from left to right, with as
  * many columns as fit its width.
  *
- * @see {@link https://www.amcharts.com/docs/v5/concepts/common-elements/containers/#Layout} for more info
+ * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#layout} for more info
  */
 export class GridLayout extends Layout {
 
