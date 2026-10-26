@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.0.2] - 2026-10-26
+
 ### Changed
 - Loads amCharts 5.21.5.
 
