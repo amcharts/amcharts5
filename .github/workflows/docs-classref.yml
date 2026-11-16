@@ -1,0 +1,19 @@
+# Tells amcharts/docs to regenerate its class reference when a release is published.
+# Needs secret DOCS_DISPATCH_TOKEN: a fine-grained token with Contents: read and write on amcharts/docs.
+name: "Update docs class reference"
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+    - env:
+        GH_TOKEN: ${{ secrets.DOCS_DISPATCH_TOKEN }}
+        VERSION: ${{ github.event.release.tag_name }}
+      run: |
+        gh api repos/amcharts/docs/dispatches \
+          -f event_type=amcharts5-release \
+          -f "client_payload[version]=${VERSION#v}"
