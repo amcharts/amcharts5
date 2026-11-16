@@ -1,5 +1,6 @@
 import "@amcharts/amcharts5/element";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 
 
 // The <am5-chart> element builds a chart from a JSON config, with no root and
@@ -13,8 +14,8 @@ const element = document.createElement("am5-chart");
 
 
 // Themes are not part of a config: give the element theme classes. With script
-// tags, the attribute themes="Animated" does the same.
-element.themes = [am5themes_Animated];
+// tags, the attribute themes="Animated ResponsiveMax" does the same.
+element.themes = [am5themes_Animated, am5themes_ResponsiveMax];
 
 
 // The chart as a JSON config. It can also be an attribute

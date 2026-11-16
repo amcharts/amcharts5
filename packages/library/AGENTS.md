@@ -30,8 +30,11 @@ and `CHANGELOG.md` disagree, the changelog is right.
 2. **One root per element.** `const root = am5.Root.new("chartdiv");` comes
    first, and the element needs a height. Call `root.dispose()` when the
    element goes away (component unmount), or before making another root in it.
-3. **Themes go on the root:**
-   `root.setThemes([am5themes_Animated.new(root)]);`
+3. **Themes go on the root**, Animated and ResponsiveMax in every chart:
+   `root.setThemes([am5themes_Animated.new(root), am5themes_ResponsiveMax.new(root)]);`
+   ResponsiveMax (since 5.22.0) fits the chart to the space it gets: labels
+   spaced to fit, legends that shrink, then scroll, scrollbars that give way
+   to pinch zoom on phones. A palette or dark theme goes after them.
 4. **Colors and percents are objects:** `am5.color(0xff0000)` and
    `am5.percent(50)`, not strings.
 5. **Every axis needs a renderer**, e.g.
@@ -68,10 +71,40 @@ the same name.
 | `@amcharts/amcharts5/wc` | `am5wc` | `wc.js` |
 | `@amcharts/amcharts5/venn` | `am5venn` | `venn.js` |
 | `@amcharts/amcharts5/themes/Animated` | `am5themes_Animated` | `themes/Animated.js` |
+| `@amcharts/amcharts5/themes/ResponsiveMax` | `am5themes_ResponsiveMax` | `themes/ResponsiveMax.js` |
 | `@amcharts/amcharts5/plugins/exporting` | `am5plugins_exporting` | `plugins/exporting.js` |
 | `@amcharts/amcharts5/plugins/json` | `am5plugins_json` | `plugins/json.js` |
 | `@amcharts/amcharts5/element` (defines `<am5-chart>`) | `am5element` | `element.js` (after `plugins/json.js`) |
 | `@amcharts/amcharts5/locales/de_DE` | `am5locales_de_DE` | `locales/de_DE.js` |
+
+## Plain HTML, no bundler
+
+The script files above load with `<script>` tags, `index.js` first. The npm
+package has them in `dist/`. From an npm CDN, pin the version and load every
+file from it:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/ResponsiveMax.js"></script>
+```
+
+The same files are at `node_modules/@amcharts/amcharts5/dist/`, on unpkg
+(`https://unpkg.com/@amcharts/amcharts5@5.22.0/dist/index.js`) and on the
+amCharts CDN (`https://cdn.amcharts.com/lib/5/index.js`). A sandbox that allows
+scripts only from npm CDNs (jsDelivr, unpkg) can use the first two. Use plain
+script tags, not `type="module"`: the lazy parts (the exporting plugin's PDF,
+Excel and annotation code) load from the `deps/` folder beside `index.js`.
+`dist/geodata/worldLow.js` makes `am5geodata_worldLow`; other maps are in the
+`@amcharts/amcharts5-geodata` package's `dist/`, on unpkg but not jsDelivr
+(the package is over jsDelivr's 150 MB limit).
+
+When bundling, keep code splitting on. With the exporting plugin, the stock
+toolbar's drawing or indicator controls, `<am5-chart>`, the JSON plugin, or the
+whole `am5stock` module kept (e.g. assigned to `window`), a single-file bundle
+inlines the exporting plugin's lazy parts (PDF, Excel, annotations), about
+1 MB gzipped more. A stock chart without those controls does not.
 
 ## A chart that works
 
@@ -79,11 +112,13 @@ the same name.
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 
 const root = am5.Root.new("chartdiv");
 
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  am5themes_ResponsiveMax.new(root)
 ]);
 
 const chart = root.container.children.push(am5xy.XYChart.new(root, {}));
@@ -122,11 +157,14 @@ series.data.setAll(data);
   Any example with a `config.json` shows the format. Themes are set in code,
   not in the config. A config cannot call `appear()`: for the opening
   animation, set `"autoAppear": true` (with `appearDuration`, `appearDelay`)
-  on the chart and on each series.
+  on the chart and on each series. A config is data: its refs and `properties`
+  reach only chart objects and plain data, and its `root` section cannot set
+  `sanitizeHTML: false`. `trusted: true` in the parse settings lifts that, only
+  for a config you wrote yourself.
 * **As an element**, `<am5-chart>`, which takes a JSON config (`config`
   attribute or property, or `src` for a URL) and needs no root or chart code.
   Themes: the `themes` property with theme classes, or with script tags the
-  `themes` attribute with names (`themes="Animated"`); a theme with settings is
+  `themes` attribute with names (`themes="Animated ResponsiveMax"`); a theme with settings is
   a pair, `[am5themes_Adaptive, { baseColor: "#4150a0" }]`. A config names its
   geodata (`"geoJSON": "am5geodata_worldLow"`) and locale; with npm they are not
   globals, so pass them: `element.resources = { am5geodata_worldLow }` (also

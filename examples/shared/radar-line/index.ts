@@ -2,6 +2,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 
 
 // Create root element
@@ -12,7 +13,8 @@ const root = am5.Root.new("chartdiv");
 // Set themes
 // https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  am5themes_ResponsiveMax.new(root) // fits the chart to small screens
 ]);
 
 

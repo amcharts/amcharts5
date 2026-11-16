@@ -188,7 +188,6 @@ export class MapPolygonSeries extends MapSeries {
 		if (this._zoomedDataItem === dataItem) {
 			this._zoomedDataItem = undefined;
 		}
-		this._removeGeometry(dataItem.get("geometry"));
 	}
 
 	/**
@@ -358,13 +357,13 @@ export class MapPolygonSeries extends MapSeries {
 
 			if (geometry && chart) {
 
+				// the polygon's own outline is fitted, as drawn
 				if (rotate) {
 					const centroid = $mapUtils.getGeoCentroid(geometry);
-					chart.rotate(-centroid.longitude, -centroid.latitude);
-					return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry), undefined, -centroid.longitude, -centroid.latitude);
+					return chart._zoomToGeometry(geometry, undefined, -centroid.longitude, -centroid.latitude);
 				}
 
-				return chart.zoomToGeoBounds($mapUtils.getGeoBounds(geometry),);
+				return chart._zoomToGeometry(geometry);
 			}
 		}
 	}
@@ -382,6 +381,7 @@ export class MapPolygonSeries extends MapSeries {
 		let right!: number;
 		let top!: number;
 		let bottom!: number;
+		const geometries: Array<any> = [];
 
 		$array.each(dataItems, (dataItem) => {
 
@@ -389,6 +389,7 @@ export class MapPolygonSeries extends MapSeries {
 			if (polygon) {
 				const geometry = polygon.get("geometry");
 				if (geometry) {
+					geometries.push(geometry);
 					let bounds = $mapUtils.getGeoBounds(geometry);
 
 					if (left == null) {
@@ -415,15 +416,15 @@ export class MapPolygonSeries extends MapSeries {
 		if (left != null && right != null && top != null && bottom != null) {
 			const chart = this.chart;
 			if (chart) {
+				// the polygons' own outlines are fitted, as drawn
+				const collection = { type: "GeometryCollection", geometries: geometries };
 				if (rotate) {
 					const rx = left + (right - left) / 2;
 					const ry = bottom + (top - bottom) / 2;
-
-					chart.rotate(-rx, -ry);
-					return chart.zoomToGeoBounds({ left, right, top, bottom }, undefined, -rx, -ry);
+					return chart._zoomToGeometry(collection, undefined, -rx, -ry);
 				}
 
-				return chart.zoomToGeoBounds({ left, right, top, bottom });
+				return chart._zoomToGeometry(collection);
 			}
 		}
 	}

@@ -5,7 +5,7 @@ import * as $array from "../util/Array";
 import * as $object from "../util/Object";
 import type * as $ease from "../util/Ease";
 import type { Bullet } from "./Bullet";
-import type { Sprite } from "./Sprite";
+import { Sprite } from "./Sprite";
 
 /**
  * One item of a [[Component]]'s data, holding its values and settings.
@@ -261,6 +261,7 @@ export abstract class Component extends Container {
 				});
 
 				dataItem.dataContext = change.newValue;
+				this._processTemplateFields(dataItem);
 
 			} else if (change.type === "insertIndex") {
 				const dataItem = new DataItem(this, change.newValue, this._makeDataItem(change.newValue));
@@ -283,6 +284,21 @@ export abstract class Component extends Container {
 
 			this._afterDataChange();
 		}));
+	}
+
+	// The data item's elements take their `templateField` settings from its new data
+	protected _processTemplateFields(dataItem: DataItem<this["_dataItemSettings"]>) {
+		$object.each(dataItem._settings as any, (_key, value: any) => {
+			if (value instanceof Sprite && value.dataItem === dataItem) {
+				value._processTemplateField();
+			}
+		});
+		$array.each(dataItem.bullets || [], (bullet) => {
+			const sprite = bullet.get("sprite");
+			if (sprite) {
+				sprite._processTemplateField();
+			}
+		});
 	}
 
 	protected _postUpdateData() {
@@ -313,6 +329,7 @@ export abstract class Component extends Container {
 					});
 				}
 
+				this._processTemplateFields(dataItem);
 				const properties = this._makeDataItem(dataContext);
 
 				$object.entries(properties).forEach(([key, value]) => {

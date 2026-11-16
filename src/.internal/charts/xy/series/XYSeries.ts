@@ -1537,6 +1537,10 @@ export abstract class XYSeries extends Series {
 					this._showBullets = false;
 				}
 			}
+			else {
+				// set back to 0 or removed: bullets show again
+				this._showBullets = true;
+			}
 
 			if ((this._psi != startIndex || this._pei != endIndex || this.isDirty("vcx") || this.isDirty("vcy") || this.isPrivateDirty("adjustedStartIndex") || this._stackDirty || this._valuesDirty) && !this._selectionProcessed) {
 				this._selectionProcessed = true;

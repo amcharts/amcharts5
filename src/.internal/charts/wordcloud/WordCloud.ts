@@ -696,7 +696,8 @@ export class WordCloud extends Series {
 
 		for (let i = 0; i < this.dataItems.length; i++) {
 			const dataItem = this.dataItems[i];
-			const text = dataItem.get("category", "");
+			// a number, such as a year, is a word too
+			const text = String(dataItem.get("category", ""));
 			const label = dataItem.get("label");
 			const fontSize = dataItem.get("fontSize", 0) * shrink;
 			let angle = dataItem.get("angle", 0);

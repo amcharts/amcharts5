@@ -412,7 +412,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		const minorLabelsEnabled = renderer.get("minorLabelsEnabled");
 		const minorGridEnabled = renderer.get("minorGridEnabled", minorLabelsEnabled);
 
-		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1);
+		let maxCount = renderer.axisLength() / Math.max(renderer.gridDistance(), 1);
 
 		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
 
@@ -433,8 +433,35 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		let f = this.dataItems[startIndex].get("index", 0);
 
-		for (let i = startIndex; i < endIndex; i = i + frequency) {
+		// `autoLabels`: a category with no label starts the count again, so groups set apart by
+		// empty categories are labelled alike
+		let shown: { [index: number]: boolean } | undefined;
+		if (frequency > 1 && renderer.get("autoLabels") && endIndex - startIndex <= 300) {
+			shown = {};
+			let n = 0;
+			for (let i = startIndex; i < endIndex; i++) {
+				const dataItem = this.dataItems[i];
+				if (!dataItem.get("label")) {
+					this._createAssets(dataItem, []);
+					this._toggleDataItem(dataItem, false);
+				}
+				// the label's own text: a new label passes it to what it draws only when drawn
+				const label = dataItem.get("label");
+				const text = label ? label.get("text", "") : "";
+				if (label && label.get("html", "") === "" && (label.get("populateText") ? populateString(label, text) : text) === "") {
+					n = 0;
+				}
+				else if (n++ % frequency == 0) {
+					shown[i] = true;
+				}
+			}
+		}
+
+		for (let i = startIndex; i < endIndex; i = shown ? i + 1 : i + frequency) {
 			let dataItem = this.dataItems[i];
+			if (shown && !shown[i]) {
+				continue;
+			}
 
 			this._createAssets(dataItem, []);
 			this._toggleDataItem(dataItem, true);
@@ -452,7 +479,7 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		if (renderer.get("minorGridEnabled")) {
 			for (let i = startIndex; i < endIndex; i++) {
 				let dataItem = this.dataItems[i];
-				if (i % frequency != 0) {
+				if (shown ? !shown[i] : i % frequency != 0) {
 					this._createAssets(dataItem, ["minor"], true);
 					this._toggleDataItem(dataItem, true);
 					this._prepareDataItem(dataItem, 0, 1);
@@ -513,9 +540,11 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 
 		fillEndPosition = this.indexToPosition(fillEndIndex, endCategoryLocation);
 
-		renderer.updateLabel(dataItem.get("label"), position, endPosition, count);
+		// `autoLabels`: a label stays in the middle of its category when others are skipped, and its tick with it
+		const labelCount = renderer.get("autoLabels") && !dataItem.get("isRange") ? 1 : count;
+		renderer.updateLabel(dataItem.get("label"), position, endPosition, labelCount);
 		renderer.updateGrid(dataItem.get("grid"), position, endPosition);
-		renderer.updateTick(dataItem.get("tick"), position, endPosition, count);
+		renderer.updateTick(dataItem.get("tick"), position, endPosition, labelCount);
 		renderer.updateFill(dataItem.get("axisFill"), position, fillEndPosition);
 
 		this._processBullet(dataItem);
@@ -694,6 +723,46 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 
 		return position;
+	}
+
+	/**
+	 * `indexToPosition(index, location)` for every index at once. With
+	 * `cellSizeField`, each single call adds up the cells before it, so code
+	 * that needs them all takes this.
+	 *
+	 * @ignore
+	 */
+	public _indexPositions(location: number): Array<number> {
+		const dataItems = this.dataItems;
+		const len = dataItems.length;
+		const positions: Array<number> = [];
+		if (!this.get("cellSizeField")) {
+			for (let i = 0; i < len; i++) {
+				positions.push(this.indexToPosition(i, location));
+			}
+			return positions;
+		}
+		if (len == 0) {
+			return positions;
+		}
+		// as indexToPosition(), in the same order, so the sums come out the same
+		const startLocation = this.get("startLocation", 0);
+		const endLocation = this.get("endLocation", 1);
+		let modCount = 0;
+		$array.each(dataItems, (dataItem) => {
+			modCount += dataItem.get("cellSize", 1);
+		});
+		const first = dataItems[0].get("cellSize", 1);
+		modCount -= startLocation * first;
+		modCount -= (1 - endLocation) * dataItems[len - 1].get("cellSize", 1);
+		let acc = 0;
+		for (let i = 0; i < len; i++) {
+			const dataItem = dataItems[i];
+			const cellSize = dataItem.get("cellSize", 1);
+			positions.push((acc + location * cellSize - startLocation * first) / modCount + dataItem.get("deltaPosition", 0));
+			acc += cellSize;
+		}
+		return positions;
 	}
 
 	/**

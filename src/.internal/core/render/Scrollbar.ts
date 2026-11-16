@@ -69,9 +69,32 @@ export interface IScrollbarSettings extends IContainerSettings {
 	 */
 	outsideAxes?: boolean;
 
+	/**
+	 * Hides the scrollbar where the chart is this many pixels across it or
+	 * less: a vertical scrollbar when the chart is that narrow, a horizontal
+	 * one when it is that low, so the plot gets the room. While it is hidden,
+	 * the chart turns on `pinchZoomX` or `pinchZoomY`, unless that is set in
+	 * code, as on a phone a chart is zoomed by pinching. A scrollbar with
+	 * `forceHidden` set in code is left alone. On a stock chart, the whole
+	 * stock chart is measured, not the panel the scrollbar is on.
+	 *
+	 * Works only for scrollbars set as a chart's `scrollbarX` or `scrollbarY`.
+	 *
+	 * @since 5.22.0
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/scrollbars/#hiding-on-small-charts} for more info
+	 */
+	autoHide?: number;
+
 }
 
 export interface IScrollbarPrivate extends IContainerPrivate {
+
+	/**
+	 * Whether `autoHide` hides the scrollbar.
+	 *
+	 * @ignore
+	 */
+	autoHidden?: boolean;
 
 	/**
 	 * @ignore
@@ -308,27 +331,27 @@ export class Scrollbar extends Container {
 			startGrip._setC("x", 0);
 			endGrip._setC("x", 0);
 
-			this._disposers.push(thumb.adapters.add("y", (value) => {
+			this._disposers.push(thumb.adapters._addInternal("y", (value) => {
 				return Math.max(Math.min(Number(value), this.height() - thumb.height()), 0);
 			}))
 
-			this._disposers.push(thumb.adapters.add("x", (_value) => {
+			this._disposers.push(thumb.adapters._addInternal("x", (_value) => {
 				return this.width() / 2;
 			}))
 
-			this._disposers.push(startGrip.adapters.add("x", (_value) => {
+			this._disposers.push(startGrip.adapters._addInternal("x", (_value) => {
 				return this.width() / 2;
 			}))
 
-			this._disposers.push(endGrip.adapters.add("x", (_value) => {
+			this._disposers.push(endGrip.adapters._addInternal("x", (_value) => {
 				return this.width() / 2;
 			}))
 
-			this._disposers.push(startGrip.adapters.add("y", (value) => {
+			this._disposers.push(startGrip.adapters._addInternal("y", (value) => {
 				return Math.max(Math.min(Number(value), this.height()), 0);
 			}))
 
-			this._disposers.push(endGrip.adapters.add("y", (value) => {
+			this._disposers.push(endGrip.adapters._addInternal("y", (value) => {
 				return Math.max(Math.min(Number(value), this.height()), 0);
 			}))
 		}
@@ -336,27 +359,27 @@ export class Scrollbar extends Container {
 			startGrip._setC("y", 0);
 			endGrip._setC("y", 0);
 
-			this._disposers.push(thumb.adapters.add("x", (value) => {
+			this._disposers.push(thumb.adapters._addInternal("x", (value) => {
 				return Math.max(Math.min(Number(value), this.width() - thumb.width()), 0);
 			}))
 
-			this._disposers.push(thumb.adapters.add("y", (_value) => {
+			this._disposers.push(thumb.adapters._addInternal("y", (_value) => {
 				return this.height() / 2;
 			}))
 
-			this._disposers.push(startGrip.adapters.add("y", (_value) => {
+			this._disposers.push(startGrip.adapters._addInternal("y", (_value) => {
 				return this.height() / 2;
 			}))
 
-			this._disposers.push(endGrip.adapters.add("y", (_value) => {
+			this._disposers.push(endGrip.adapters._addInternal("y", (_value) => {
 				return this.height() / 2;
 			}))
 
-			this._disposers.push(startGrip.adapters.add("x", (value) => {
+			this._disposers.push(startGrip.adapters._addInternal("x", (value) => {
 				return Math.max(Math.min(Number(value), this.width()), 0);
 			}))
 
-			this._disposers.push(endGrip.adapters.add("x", (value) => {
+			this._disposers.push(endGrip.adapters._addInternal("x", (value) => {
 				return Math.max(Math.min(Number(value), this.width()), 0);
 			}))
 		}
@@ -368,6 +391,7 @@ export class Scrollbar extends Container {
 		if (this.isDirty("end") || this.isDirty("start") || this._sizeDirty) {
 			this.updateGrips();
 		}
+
 	}
 
 	public _changed() {

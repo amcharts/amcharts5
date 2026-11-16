@@ -255,8 +255,18 @@ export class AxisRendererY extends AxisRenderer {
 				}
 			}
 
+			let kept: number | null | undefined = null;
 			if ($type.isNumber(endPosition) && endPosition != position) {
+				const start = position;
 				position = position + (endPosition - position) * location;
+				kept = this._keepInView(label, position, start, endPosition, location);
+			}
+			if (kept === undefined) {
+				label.setPrivate("visible", false);
+				return;
+			}
+			if (kept !== null) {
+				position = kept;
 			}
 
 			label._setC("y", this.positionToCoordinate(position));

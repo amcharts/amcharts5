@@ -1,3 +1,5 @@
+import type { IBounds } from "../../core/util/IBounds";
+
 import { PyramidSeries, IPyramidSeriesSettings, IPyramidSeriesDataItem, IPyramidSeriesPrivate } from "./PyramidSeries";
 import { Graphics } from "../../core/render/Graphics";
 import { p100, p50 } from "../../core/util/Percent"
@@ -72,13 +74,13 @@ export class PictorialStackedSeries extends PyramidSeries {
 
 		let mw = bounds.right - bounds.left;
 		let mh = bounds.bottom - bounds.top;
-		if (this.get("orientation") == "horizontal") {
-			scale = w / mw;
-		}
-		else {
-			scale = h / mh;
-		}
+		// the whole shape fits
+		scale = Math.min(w / mw, h / mh);
 		if (scale != Infinity && !Number.isNaN(scale)) {
+			if (scale != seriesMask.get("scale")) {
+				// the slices are laid out in the shape's box
+				this.markDirtySize();
+			}
 			seriesMask.set("scale", scale);
 			seriesMask.set("x", w / 2);
 			seriesMask.set("y", h / 2);
@@ -87,6 +89,26 @@ export class PictorialStackedSeries extends PyramidSeries {
 			seriesGraphics._setC("x", w / 2);
 			seriesGraphics._setC("y", h / 2);
 		}
+	}
+
+	/**
+	 * The shape's box, centered in the slices container: the slices fill it, so
+	 * a tick starts on the shape.
+	 *
+	 * @ignore
+	 */
+	public _sliceBox(): IBounds {
+		const box = super._sliceBox();
+		const bounds = this.seriesMask.localBounds();
+		const scale = this.seriesMask.get("scale", 1);
+		const w = (bounds.right - bounds.left) * scale;
+		const h = (bounds.bottom - bounds.top) * scale;
+		if (!(w > 0 && h > 0)) {
+			return box;
+		}
+		const x = (box.left + box.right) / 2;
+		const y = (box.top + box.bottom) / 2;
+		return { left: x - w / 2, right: x + w / 2, top: y - h / 2, bottom: y + h / 2 };
 	}
 
 	public _prepareChildren() {

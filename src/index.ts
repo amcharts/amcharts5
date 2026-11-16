@@ -3,7 +3,7 @@ export { Theme } from "./.internal/core/Theme";
 export { addLicense, registry, disposeAllRootElements, getRootById } from "./.internal/core/Registry";
 export { ready } from "./.internal/core/util/Utils";
 export { Modal, IModalSettings } from "./.internal/core/util/Modal";
-export { Entity, IEntitySettings, IEntityEvents, IEntityPrivate } from "./.internal/core/util/Entity";
+export { Entity, IEntitySettings, IEntityEvents, IEntityPrivate, Animation } from "./.internal/core/util/Entity";
 export { IDisposer, Disposer, ArrayDisposer, MultiDisposer, MutableValueDisposer, CounterDisposer } from "./.internal/core/util/Disposer";
 
 export { Bullet, IBulletSettings, IBulletPrivate } from "./.internal/core/render/Bullet";
@@ -51,7 +51,7 @@ export { Timezone } from "./.internal/core/util/Timezone";
 export { ZoomTools, IZoomToolsSettings, IZoomToolsPrivate, IZoomToolsEvents } from "./.internal/core/render/ZoomTools";
 
 export { GrainPattern } from "./.internal/core/render/patterns/GrainPattern";
-export { BlendMode, IRendererClass } from "./.internal/core/render/backend/Renderer";
+export { BlendMode, IRendererClass, IGraphics } from "./.internal/core/render/backend/Renderer";
 
 export { Gradient, IGradientSettings, IGradientPrivate } from "./.internal/core/render/gradients/Gradient";
 export { LinearGradient, ILinearGradientSettings, ILinearGradientPrivate } from "./.internal/core/render/gradients/LinearGradient";

@@ -1160,6 +1160,7 @@ export abstract class Sprite extends Entity {
 	protected _dataItem: DataItem<IComponentDataItem> | undefined;
 
 	protected _templateField: Template<this> | undefined;
+	protected _templateFieldRaw: unknown;
 
 	protected _sizeDirty: boolean = false;
 
@@ -1244,6 +1245,7 @@ export abstract class Sprite extends Entity {
 
 	public _processTemplateField(): void {
 		let template;
+		let raw;
 
 		const field = this.get("templateField");
 
@@ -1252,13 +1254,20 @@ export abstract class Sprite extends Entity {
 			if (dataItem) {
 				const context = dataItem.dataContext;
 				if (context) {
-					template = (context as any)[field];
-
-					if (!(template instanceof Template) && template) {
-						template = Template.new(template);
-					}
+					raw = (context as any)[field];
 				}
 			}
+		}
+
+		// the same settings object as last time: a new template from it would only apply it again
+		if (raw === this._templateFieldRaw) {
+			return;
+		}
+		this._templateFieldRaw = raw;
+
+		template = raw;
+		if (!(template instanceof Template) && template) {
+			template = Template.new(template);
 		}
 
 		if (this._templateField !== template) {

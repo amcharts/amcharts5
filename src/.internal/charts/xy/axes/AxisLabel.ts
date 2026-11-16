@@ -92,6 +92,20 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 */
 	maxPosition?: number;
 
+	/**
+	 * Where the label's cell is only partly in view, slides the label into the
+	 * part that is, and hides it where that part is too short for it: the first
+	 * month on a date axis keeps its label while the month goes on in view.
+	 * For labels placed inside their cell (`location` or `multiLocation`
+	 * above `0` and below `1`): with a grid step of several periods, such as
+	 * every 2 months, labels sit on the grid lines (`multiLocation: 0`) unless
+	 * `multiLocation` is set. Rotated labels are left where they are.
+	 *
+	 * @default false
+	 * @since 5.22.0
+	 */
+	keepInView?: boolean;
+
 }
 
 export interface IAxisLabelPrivate extends ILabelPrivate {
@@ -112,4 +126,12 @@ export class AxisLabel extends Label implements IAxisLabel {
 
 	public static className: string = "AxisLabel";
 	public static classNames: Array<string> = Label.classNames.concat([AxisLabel.className]);
+
+	/**
+	 * Set by `keepInView` while the label's cell is partly in view: placed
+	 * again when its text changes size.
+	 *
+	 * @ignore
+	 */
+	public _keepInView?: () => void;
 }

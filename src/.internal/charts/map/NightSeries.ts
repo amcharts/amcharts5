@@ -114,7 +114,7 @@ export class NightSeries extends MapPolygonSeries {
 	// The night never counts towards the map's bounds
 	protected _addGeometry(_geometry: any, _series: MapSeries) { }
 
-	protected _removeGeometry(_geometry: any) { }
+	protected _removeGeometry(_geometry: any): boolean { return false; }
 
 	public _prepareChildren() {
 		super._prepareChildren();

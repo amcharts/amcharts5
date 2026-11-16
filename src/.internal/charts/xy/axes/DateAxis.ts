@@ -826,6 +826,61 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		return minorGridInterval;
 	}
 
+	/**
+	 * The grid interval for `duration` milliseconds in view.
+	 *
+	 * @ignore
+	 */
+	public _chooseGridInterval(duration: number, gridCount: number, intervals: Array<ITimeInterval>): ITimeInterval {
+		if (!this.get("renderer").get("autoLabels")) {
+			return $time.chooseInterval(0, duration, gridCount, intervals);
+		}
+		// `autoLabels`: as `chooseInterval`, each interval judged by the size of its own labels
+		const last = intervals.length - 1;
+		for (let i = 0; i < last; i++) {
+			const interval = intervals[i];
+			const intervalDuration = $time.getIntervalDuration(interval);
+			if (duration < intervalDuration && i > 0) {
+				return { ...intervals[i - 1] };
+			}
+			if (Math.ceil(duration / intervalDuration) <= this._intervalGridCount(interval, gridCount)) {
+				return { ...interval };
+			}
+		}
+		return { ...intervals[last] };
+	}
+
+	/**
+	 * How many grid steps of `interval` fit the axis with `autoLabels`: by the
+	 * size its labels were drawn at or, never drawn, the drawn labels' size
+	 * scaled by how long its text is against theirs.
+	 *
+	 * @ignore
+	 */
+	public _intervalGridCount(interval: ITimeInterval, gridCount: number): number {
+		const renderer = this.get("renderer");
+		if (!renderer.get("autoLabels")) {
+			return gridCount;
+		}
+		const extents = renderer._intervalExtents;
+		let extent = extents[interval.timeUnit + interval.count];
+		if (!(extent > 0)) {
+			const current = this.getPrivate("gridInterval");
+			const drawn = current ? extents[current.timeUnit + current.count] : 0;
+			if (current && drawn > 0) {
+				extent = drawn * this._sampleLength(interval) / Math.max(this._sampleLength(current), 1);
+			}
+		}
+		return extent > 0 ? renderer._gridCountAt(extent) : gridCount;
+	}
+
+	// The length of a label's text for `interval`, on a date with two-digit numbers
+	protected _sampleLength(interval: ITimeInterval): number {
+		const formats: any = this.get("dateFormats");
+		const format = formats ? formats[interval.timeUnit] : undefined;
+		return format ? this._root.dateFormatter.format(new Date(2026, 11, 28, 22, 58, 58, 888), format).length : 0;
+	}
+
 	protected _prepareAxisItems() {
 		const min = this.getPrivate("min");
 		const max = this.getPrivate("max");
@@ -841,7 +896,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			let i = 0;
 
 			const intervals = this.get("gridIntervals")!;
-			let gridInterval = $time.chooseInterval(0, selectionMax - selectionMin, renderer.gridCount(), intervals);
+			let gridInterval = this._chooseGridInterval(selectionMax - selectionMin, renderer.gridCount(), intervals);
 
 			if ($time.getIntervalDuration(gridInterval) < this._baseDuration) {
 				gridInterval = { ...baseInterval };

@@ -254,6 +254,13 @@ export class Text extends Sprite {
 			}
 		})
 
+		// Without a direction of its own, text takes the root's, so it is drawn and measured the same way
+		const direction = this._direction();
+		if (textStyle.direction !== direction) {
+			textStyle.direction = direction;
+			this.markDirtyBounds();
+		}
+
 		textStyle["fontSize"] = this.get("fontSize");
 		textStyle["fontFamily"] = this.get("fontFamily");
 		this._display.style = textStyle;
@@ -277,6 +284,59 @@ export class Text extends Sprite {
 			return this.get("populateText") ? populateString(this, ariaLabel) : ariaLabel;
 		}
 		return this._getText();
+	}
+
+	/**
+	 * Bounds of the lines drawn. Wrapped or truncated text takes all of
+	 * `maxWidth` in its bounds; its lines may be narrower, or wider where a
+	 * word can't be wrapped.
+	 *
+	 * @ignore
+	 */
+	public _drawnBounds(): IBounds {
+		const bounds = this.localBounds();
+		const display: any = this._display;
+		const lines: Array<{ left: number, right: number }> | undefined = display._textInfo;
+		let left = bounds.left;
+		let right = bounds.right;
+		if (lines && lines.length && display.textVisible && right > left) {
+			let l = 0;
+			let r = 0;
+			$array.each(lines, (line) => {
+				l = Math.max(l, line.left);
+				r = Math.max(r, line.right);
+			});
+			// right-to-left text runs the other way from its x, except with `left` or `right`, which are sides
+			const align = this.get("textAlign");
+			const mirror = this._direction() == "rtl" && align != "left" && align != "right";
+			left = mirror ? -r : -l;
+			right = mirror ? l : r;
+			if (!(right > left)) {
+				left = bounds.left;
+				right = bounds.right;
+			}
+		}
+		return { left: left, right: right, top: bounds.top, bottom: bounds.bottom };
+	}
+
+	/**
+	 * The text's direction: its own, else the root's (its `direction`, or the
+	 * chart element's).
+	 *
+	 * @ignore
+	 */
+	public _direction(): "ltr" | "rtl" {
+		const direction: "ltr" | "rtl" | undefined = this.get("direction");
+		return direction || this._root._direction();
+	}
+
+	/**
+	 * Global bounds of the lines drawn, see `_drawnBounds()`.
+	 *
+	 * @ignore
+	 */
+	public _drawnGlobalBounds(): IBounds {
+		return this._toGlobalBounds(this._drawnBounds());
 	}
 
 	/**

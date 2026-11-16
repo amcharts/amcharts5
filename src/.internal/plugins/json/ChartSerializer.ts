@@ -636,6 +636,8 @@ export class ChartSerializer extends Serializer {
 		const heatRules = series.get("heatRules");
 		if (heatRules) {
 
+			// The rules may be the series' only setting
+			this._maybeInit(this._lists.series[seriesId], "settings", {});
 			this._lists.series[seriesId].settings.heatRules = [];
 			heatRules.forEach((rule: any) => {
 

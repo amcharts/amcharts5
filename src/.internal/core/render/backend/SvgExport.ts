@@ -608,10 +608,10 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 				if (d && (doc.live || !invisible(stroke))) {
 					let s = " fill=\"none\" " + doc.paint("stroke", stroke) + " stroke-width=\"" + doc.n(width) + "\" stroke-miterlimit=\"10\"";
 					if (join != "miter") {
-						s += " stroke-linejoin=\"" + join + "\"";
+						s += " stroke-linejoin=\"" + escapeXML(join) + "\"";
 					}
 					if (cap != "butt") {
-						s += " stroke-linecap=\"" + cap + "\"";
+						s += " stroke-linecap=\"" + escapeXML(cap) + "\"";
 					}
 					// Cut tile copies have their dashes drawn in already
 					if (dash.length && !(tiles && tiles.clip)) {
@@ -640,9 +640,7 @@ function writeGraphics(doc: SvgDocument, g: SceneGraphics, alpha: number, filter
 				break;
 			case "image":
 				if (tiles) {
-					$array.each(tiles.copies, (copy) => {
-						writeImageOp(doc, g, <GraphicsImage><any>{ image: op.image, x: op.x + copy.x, y: op.y + copy.y, width: op.width, height: op.height }, alpha, filter, out);
-					});
+					writeImageCopies(doc, g, op, tiles.copies, alpha, filter, out);
 				} else {
 					writeImageOp(doc, g, op, alpha, filter, out);
 				}
@@ -709,12 +707,32 @@ function writeImageOp(doc: SvgDocument, g: SceneGraphics, op: GraphicsImage, alp
 	if (!isFinite(op.x) || !isFinite(op.y) || !isFinite(op.width) || !isFinite(op.height)) {
 		return;
 	}
-	const image = op.image;
-	const href = image instanceof HTMLCanvasElement ? imageOpURL(g, image) : image.src;
+	const href = imageOpHref(g, op);
 	if (!href) {
 		return;
 	}
 	out.push("<image" + leafAttrs(doc, g, alpha, filter) + " x=\"" + doc.n(op.x) + "\" y=\"" + doc.n(op.y) + "\" width=\"" + doc.n(op.width) + "\" height=\"" + doc.n(op.height) + "\" " + doc.href + "=\"" + escapeXML(href) + "\" preserveAspectRatio=\"none\"/>");
+}
+
+// A pattern tile's picture at each copy: defined once, as its data can be large
+function writeImageCopies(doc: SvgDocument, g: SceneGraphics, op: GraphicsImage, copies: Array<IPoint>, alpha: number, filter: string | undefined, out: Array<string>): void {
+	if (!isFinite(op.x) || !isFinite(op.y) || !isFinite(op.width) || !isFinite(op.height)) {
+		return;
+	}
+	const href = imageOpHref(g, op);
+	if (!href) {
+		return;
+	}
+	const id = doc.defs.id("i", "<image width=\"" + doc.n(op.width) + "\" height=\"" + doc.n(op.height) + "\" " + doc.href + "=\"" + escapeXML(href) + "\" preserveAspectRatio=\"none\"/>");
+	const attrs = leafAttrs(doc, g, alpha, filter);
+	$array.each(copies, (copy) => {
+		out.push("<use" + attrs + " x=\"" + doc.n(op.x + copy.x) + "\" y=\"" + doc.n(op.y + copy.y) + "\" " + doc.href + "=\"#" + id + "\"/>");
+	});
+}
+
+function imageOpHref(g: SceneGraphics, op: GraphicsImage): string {
+	const image = op.image;
+	return image instanceof HTMLCanvasElement ? imageOpURL(g, image) : image.src;
 }
 
 // A path moved by `dx`, `dy`

@@ -151,15 +151,17 @@ export class Gantt extends Container {
 	 * A scrollbar for horizontal scrolling.
 	 */
 	public scrollbarX: Scrollbar = Scrollbar.new(this._root, {
-		orientation: "horizontal"
-	})._markC("orientation");
+		orientation: "horizontal",
+		autoHide: 0 // the Gantt is moved through with its scrollbars
+	})._markC("orientation", "autoHide");
 
 	/**
 	 * A scrollbar for vertical scrolling.
 	 */
 	public scrollbarY: Scrollbar = Scrollbar.new(this._root, {
-		orientation: "vertical"
-	})._markC("orientation");
+		orientation: "vertical",
+		autoHide: 0
+	})._markC("orientation", "autoHide");
 
 	/**
 	 * The [[XYChart]] inside the Gantt that holds the axes and the series.
@@ -342,7 +344,9 @@ export class Gantt extends Container {
 			yAxis: this.yAxis
 		})._markC("xAxis", "yAxis"));
 
-		const yRenderer = GanttCategoryAxisRenderer.new(root, {});
+		// every task has a row of its own and the rows scroll, so no row label is ever skipped: fitting them
+		// (`autoLabels`, e.g. from ResponsiveMax) only costs time
+		const yRenderer = GanttCategoryAxisRenderer.new(root, { autoLabels: false })._markC("autoLabels");
 
 		// to prevent moving horizontally while dragging
 		yRenderer.containers.template.adapters.add("x", () => {
@@ -927,11 +931,16 @@ export class Gantt extends Container {
 
 		this.series.markDirtyValues();
 
-		// All of this follows from `editable`, so it is the Gantt's own doing
-		this.addButton._setC(forceHidden, !value);
-		this.colorPickerButton._setC(forceHidden, !value);
-		this.clearButton._setC(forceHidden, !value);
-		this.linkButton._setC(forceHidden, !value);
+		// All of this follows from `editable`, so it is the Gantt's own doing. Editable, the buttons are left to
+		// their theme (ResponsiveMax hides some on a narrow chart) and to the user, not forced visible
+		$array.each([this.addButton, this.colorPickerButton, this.clearButton, this.linkButton], (button: Container) => {
+			if (!value) {
+				button._setC(forceHidden, true);
+			}
+			else if (button.isComputedSetting(forceHidden)) {
+				button.remove(forceHidden);
+			}
+		});
 
 		const renderer = this.yAxis.get("renderer");
 		renderer.labels.template._setC(forceInactive, !value);

@@ -86,6 +86,15 @@ export class StockPanel extends XYChart {
 	 */
 	public readonly drawings: ListAutoDispose<XYSeries> = new ListAutoDispose();
 
+	// `autoHide` measures the whole stock chart: its scrollbar is the stock chart's navigator, not the panel's
+	protected _autoHideSize(vertical: boolean): number {
+		const stockChart = this.getPrivate("stockChart");
+		if (stockChart && !stockChart.isDisposed()) {
+			return vertical ? stockChart.width() : stockChart.height();
+		}
+		return super._autoHideSize(vertical);
+	}
+
 	protected _afterNew() {
 		super._afterNew();
 

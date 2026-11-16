@@ -11,4 +11,18 @@ module.exports = async (state) => {
     await writeFile(path, file.replace(/readonly +version: *string *= *"[^"]*";/, (_) => {
         return `readonly version: string = "${json.version}";`
     }));
+
+    // The docs give version-pinned script tags (jsDelivr, unpkg)
+    await Promise.all([
+        state.path("README.md"),
+        state.path("packages", "shared", "README.md"),
+        state.path("packages", "library", "AGENTS.md"),
+    ].map(async (doc) => {
+        const text = await readFile(doc);
+        const updated = text.replace(/(@amcharts\/amcharts5@)\d+\.\d+\.\d+/g, "$1" + json.version);
+
+        if (updated !== text) {
+            await writeFile(doc, updated);
+        }
+    }));
 };

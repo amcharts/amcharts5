@@ -233,6 +233,38 @@ export interface IRootSettings {
 	 * @since 5.21.0
 	 */
 	forcedColors?: boolean;
+
+	/**
+	 * The chart's text and legend direction. Set to `"rtl"` for a
+	 * right-to-left language: text with no `direction` of its own is drawn
+	 * right to left, and legends lay out from the right, each marker on the
+	 * right of its name. `"ltr"` keeps everything left to right, e.g. an
+	 * English chart on a `dir="rtl"` page.
+	 *
+	 * Not set, text follows the CSS direction of the chart's element and
+	 * legends stay left to right.
+	 *
+	 * Unlike a container's `direction`, which lays out its children only, this
+	 * applies to text and legends across the chart.
+	 *
+	 * ```TypeScript
+	 * const root = am5.Root.new("chartdiv", {
+	 *   direction: "rtl"
+	 * });
+	 * ```
+	 * ```JavaScript
+	 * var root = am5.Root.new("chartdiv", {
+	 *   direction: "rtl"
+	 * });
+	 * ```
+	 *
+	 * Set it when the Root is created (or in a JSON config's `root` section);
+	 * it has no setter of its own.
+	 *
+	 * @see {@link https://docs.amcharts.com/v5/concepts/locales/right-to-left-support/} for more info
+	 * @since 5.22.0
+	 */
+	direction?: "ltr" | "rtl";
 }
 
 // Interface colors that follow the system colors in a forced colors mode
@@ -401,6 +433,34 @@ export class Root implements IDisposer {
 	 */
 	public timezone?: Timezone;
 
+	protected _pageDirection?: "ltr" | "rtl";
+
+	/**
+	 * Direction of text with no `direction` of its own: the `direction`
+	 * setting, else the chart element's, as the browser would draw it.
+	 *
+	 * @ignore
+	 */
+	public _direction(): "ltr" | "rtl" {
+		const own = this._settings.direction;
+		if (own == "rtl" || own == "ltr") {
+			return own;
+		}
+		if (this._pageDirection == null) {
+			let direction: "ltr" | "rtl" = "ltr";
+			try {
+				if (getComputedStyle(this.dom).direction == "rtl") {
+					direction = "rtl";
+				}
+			}
+			catch (e) {
+				// no style to read, as on a server
+			}
+			this._pageDirection = direction;
+		}
+		return this._pageDirection;
+	}
+
 	/**
 	 * Maximum frames per second. When not set, the chart renders on every
 	 * animation frame of the browser.
@@ -511,6 +571,21 @@ export class Root implements IDisposer {
 	protected _styles?: CSSStyleDeclaration;
 
 	protected _isDisposed: boolean = false;
+
+	/**
+	 * Counts the web fonts loaded after text was measured.
+	 *
+	 * @ignore
+	 */
+	public _fontLoads: number = 0;
+
+	/**
+	 * Counts the frames in which every fitting pass runs, and waits for the next.
+	 *
+	 * @ignore
+	 */
+	public _passRound: number = 0;
+	public _passTimer?: IDisposer;
 	protected _disposers: Array<IDisposer> = [];
 
 	protected _resizeSensorDisposer?: IDisposer;
@@ -860,6 +935,7 @@ export class Root implements IDisposer {
 			const remeasure = () => {
 				const count = loadedFonts();
 				if (count > loaded && !this._isDisposed) {
+					this._fontLoads++;
 					this._invalidateLabelBounds(this._rootContainer, true);
 					$array.each(this._tooltips, (tooltip) => {
 						this._invalidateLabelBounds(tooltip, true);
@@ -1277,6 +1353,8 @@ export class Root implements IDisposer {
 			this._rootContainer.markDirty();
 			this._rootContainer.walkChildren((child) => {
 				child.markDirty();
+				// a `direction` from a config moves text and legend items
+				child.markDirtyBounds();
 			});
 		}
 
@@ -2586,7 +2664,7 @@ export class Root implements IDisposer {
 	 * licenses for removal of amCharts branding from charts.
 	 *
 	 * The only legit way to do so is to purchase a commercial license for amCharts:
-	 * https://www.amcharts.com/online-store/
+	 * https://www.amcharts.com/pricing/
 	 *
 	 * Removing or altering this code, or disabling amCharts branding in any other
 	 * way is against the license and thus illegal.
@@ -2754,6 +2832,14 @@ export class Root implements IDisposer {
 
 		const htmlElement = target.getPrivate("htmlElement");
 		if (htmlElement) {
+
+			// hidden: nothing to place, and measuring it would force a page layout every frame
+			if (!target.isVisibleDeep()) {
+				if (htmlElement.style.display != "none") {
+					htmlElement.style.display = "none";
+				}
+				return;
+			}
 
 			// Translate settings
 			const visualSettings = [

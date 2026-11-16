@@ -12,6 +12,7 @@ import type { Root } from "../../../core/Root";
 
 import { DataItem } from "../../../core/render/Component";
 import type { Sprite } from "../../../core/render/Sprite";
+import type { Template } from "../../../core/util/Template";
 import { Component, IComponentSettings, IComponentPrivate, IComponentEvents, IComponentDataItem } from "../../../core/render/Component";
 import { Container } from "../../../core/render/Container";
 import { p100 } from "../../../core/util/Percent";
@@ -933,84 +934,49 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 
 	public _createAssets(dataItem: DataItem<this["_dataItemSettings"]>, tags: Array<string>, minor?: boolean) {
 		const renderer = this.get("renderer");
-		let m = "minor";
+		const m = "minor";
+		// where the renderer is tagged "minor" (a Gantt's row of days), every label, grid line and tick is
+		// too, so the tag can't tell them apart: they would be made again on every pass
+		const always = $array.indexOf(renderer.get("themeTags", []), m) != -1;
+		const otherKind = (sprite: Sprite, template: Template<any>) => {
+			if (always || $array.indexOf(template.get("themeTags", []), m) != -1) {
+				return false;
+			}
+			const themeTags = sprite.get("themeTags");
+			return minor ? themeTags?.indexOf(m) == -1 : themeTags?.indexOf(m) != -1;
+		};
 
 		const label = dataItem.get("label");
 		if (!label) {
 			renderer.makeLabel(dataItem, tags);
 		}
-		else {
-			let themeTags = label.get("themeTags");
-			let remove = false;
-			if (minor) {
-				if (themeTags?.indexOf(m) == -1) {
-					remove = true;
-				}
-			}
-			else {
-				if (themeTags?.indexOf(m) != -1) {
-					remove = true;
-				}
-			}
-
-			if (remove) {
-				label.parent?.children.removeValue(label);
-				renderer.makeLabel(dataItem, tags);
-				label.dispose();
-				renderer.labels.removeValue(label);
-			}
+		else if (otherKind(label, renderer.labels.template)) {
+			label.parent?.children.removeValue(label);
+			renderer.makeLabel(dataItem, tags);
+			label.dispose();
+			renderer.labels.removeValue(label);
 		}
 
 		const grid = dataItem.get("grid");
-
 		if (!grid) {
 			renderer.makeGrid(dataItem, tags);
 		}
-		else {
-			let themeTags = grid.get("themeTags");
-			let remove = false;
-			if (minor) {
-				if (themeTags?.indexOf(m) == -1) {
-					remove = true;
-				}
-			}
-			else {
-				if (themeTags?.indexOf(m) != -1) {
-					remove = true;
-				}
-			}
-
-			if (remove) {
-				grid.parent?.children.removeValue(grid);
-				renderer.makeGrid(dataItem, tags);
-				grid.dispose();
-				renderer.grid.removeValue(grid);
-			}
+		else if (otherKind(grid, renderer.grid.template)) {
+			grid.parent?.children.removeValue(grid);
+			renderer.makeGrid(dataItem, tags);
+			grid.dispose();
+			renderer.grid.removeValue(grid);
 		}
 
 		const tick = dataItem.get("tick");
 		if (!tick) {
 			renderer.makeTick(dataItem, tags);
 		}
-		else {
-			let remove = false;
-			let themeTags = tick.get("themeTags");
-			if (minor) {
-				if (themeTags?.indexOf(m) == -1) {
-					remove = true;
-				}
-			}
-			else {
-				if (themeTags?.indexOf(m) != -1) {
-					remove = true;
-				}
-			}
-			if (remove) {
-				tick.parent?.children.removeValue(tick);
-				renderer.makeTick(dataItem, tags);
-				tick.dispose();
-				renderer.ticks.removeValue(tick);
-			}
+		else if (otherKind(tick, renderer.ticks.template)) {
+			tick.parent?.children.removeValue(tick);
+			renderer.makeTick(dataItem, tags);
+			tick.dispose();
+			renderer.ticks.removeValue(tick);
 		}
 
 		if (!minor && !dataItem.get("axisFill")) {

@@ -349,6 +349,17 @@ export class MapPointSeries extends MapSeries {
 				}
 			}
 		})
+
+		// made while zoomed: the chart scales bullets only when the zoom changes
+		const chart = this.chart;
+		if (chart && this.get("autoScale")) {
+			$array.each(dataItem.bullets, (bullet) => {
+				const sprite = bullet.get("sprite");
+				if (sprite) {
+					sprite._setC("scale", chart.get("zoomLevel", 1));
+				}
+			})
+		}
 	}
 
 	protected _setBulletParent(bullet?: Bullet) {

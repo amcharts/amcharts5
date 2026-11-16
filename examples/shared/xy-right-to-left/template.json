@@ -1,0 +1,8 @@
+{
+  "title": "Right-to-Left Line Chart",
+  "description": "A Hebrew line chart with Root direction set to rtl: text reads right to left, and the legend, with values that follow the cursor, wraps over several rows from the right.",
+  "category": "xy",
+  "tier": "technique",
+  "tags": ["rtl", "direction", "legend", "legend values", "cursor", "line"],
+  "since": "5.22.0"
+}

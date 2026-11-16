@@ -3,10 +3,11 @@ import type { Chart } from "./Chart";
 import type { Bullet } from "./Bullet";
 import type { Graphics } from "../../core/render/Graphics";
 import type { ILegendDataItem } from "./Legend";
-import type { Template } from "../../core/util/Template";
+import { Template } from "../../core/util/Template";
 import type { Sprite } from "../../core/render/Sprite";
 import type { Pattern } from "./patterns/Pattern";
 import type { Gradient } from "./gradients/Gradient";
+import type { IBounds } from "../../core/util/IBounds";
 
 import { Component, IComponentSettings, IComponentPrivate, DataItem, IComponentEvents, IComponentDataItem } from "../../core/render/Component";
 import { List } from "../../core/util/List";
@@ -16,12 +17,49 @@ import { Percent } from "../../core/util/Percent";
 import { p100 } from "../../core/util/Percent";
 import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
+import { LabelFit, inside, overlap, passLater } from "../../core/util/Fit";
 //import { Animations } from "../../core/util/Animation";
 
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
 import * as $type from "../../core/util/Type";
 import * as $time from "../../core/util/Time";
+
+// `autoLabels`: label boxes on the page, kept in cells to find overlaps fast
+class LabelBoxes {
+	protected _cells: { [key: string]: Array<IBounds> } = {};
+
+	public hits(box: IBounds): boolean {
+		let hit = false;
+		this._cellsOf(box, (key) => {
+			const cell = this._cells[key];
+			if (!hit && cell) {
+				hit = $array.any(cell, (other) => overlap(box, other));
+			}
+		});
+		return hit;
+	}
+
+	public add(box: IBounds) {
+		this._cellsOf(box, (key) => {
+			(this._cells[key] || (this._cells[key] = [])).push(box);
+		});
+	}
+
+	protected _cellsOf(box: IBounds, f: (key: string) => void) {
+		if (!isFinite(box.left) || !isFinite(box.right) || !isFinite(box.top) || !isFinite(box.bottom)) {
+			return;
+		}
+		const size = 64;
+		const right = Math.floor(box.right / size);
+		const bottom = Math.floor(box.bottom / size);
+		for (let x = Math.floor(box.left / size); x <= right; x++) {
+			for (let y = Math.floor(box.top / size); y <= bottom; y++) {
+				f(x + "," + y);
+			}
+		}
+	}
+}
 
 /**
  * A rule that sets a setting of each series element, such as its color or
@@ -76,18 +114,20 @@ export interface IHeatRule {
 
 	/**
 	 * Lowest value of the range. If not set, the series' lowest value is used,
-	 * which needs `calculateAggregates`.
+	 * which needs `calculateAggregates`. Lower values get `min`.
 	 */
 	minValue?: number;
 
 	/**
 	 * Highest value of the range. If not set, the series' highest value is
-	 * used, which needs `calculateAggregates`.
+	 * used, which needs `calculateAggregates`. Higher values get `max`.
 	 */
 	maxValue?: number;
 
 	/**
 	 * Spreads the values between `min` and `max` on a logarithmic scale.
+	 * Values of zero or less get `min`. If `minValue` is zero or less, the
+	 * lowest value above zero is used instead.
 	 *
 	 * @default false
 	 */
@@ -102,6 +142,9 @@ export interface IHeatRule {
 
 }
 
+
+// Series settings a bullet with no paint of its own takes
+const bulletPaintKeys: Array<"fill" | "fillGradient" | "fillPattern" | "stroke" | "strokeGradient"> = ["fill", "fillGradient", "fillPattern", "stroke", "strokeGradient"];
 
 // A value on a scale through `stops`, spread evenly, as `min` and `max` blend
 function interpolateStops(position: number, stops: Array<any>): any {
@@ -292,6 +335,23 @@ export interface ISeriesSettings extends IComponentSettings {
 	 * @since 5.14.4
 	 */
 	excludeFromAggregate?: Array<string>;
+
+	/**
+	 * Hides a label in the series' bullets where it would overlap a label
+	 * shown before it, or be cut off at the edge of the area it is drawn in.
+	 * Labels of the chart's earlier series come first, then those of earlier
+	 * data items. A hidden label comes back once it fits.
+	 *
+	 * Only labels are hidden: a bullet's circle or other shape stays. A label
+	 * with its own `forceHidden`, or in a bullet with `stacked` set, is left
+	 * as it is. Labels of series without this setting are never hidden, and
+	 * the others make room for them.
+	 *
+	 * @default false
+	 * @since 5.22.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/bullets/#hiding-overlapping-labels} for more info
+	 */
+	autoLabels?: boolean;
 }
 
 export interface ISeriesPrivate extends IComponentPrivate {
@@ -408,6 +468,15 @@ export abstract class Series extends Component {
 
 	protected _baseSeriesDirty: boolean = false;
 
+	protected _bulletPaint?: Template<Graphics>;
+
+	// `autoLabels`: the bullet labels hidden for not fitting
+	protected _labelFit?: LabelFit;
+	// fitting passes: frames left to run after a change, and the size and time of the last one
+	public _passFrames: number = 0;
+	protected _passKey?: string;
+	protected _passTime: number = 0;
+
 	/**
 	 * The chart the series belongs to.
 	 */
@@ -442,6 +511,240 @@ export abstract class Series extends Component {
 	protected _dispose(){
 		this.bulletsContainer.dispose(); // can be in a different parent
 		super._dispose();
+	}
+
+	// `autoLabels`: each label in the bullets of the data items in range, in order
+	protected _eachBulletLabel(f: (label: Label, bullet: Bullet) => void) {
+		const dataItems = this.dataItems;
+		const count = dataItems.length;
+		let start = this.startIndex();
+		let end = this.endIndex();
+		if (start > 0) {
+			start--;
+		}
+		if (end < count) {
+			end++;
+		}
+		const visit = (sprite: Sprite, bullet: Bullet) => {
+			if (sprite instanceof Label) {
+				f(sprite, bullet);
+			}
+			else if (sprite instanceof Container) {
+				sprite.children.each((child) => visit(child, bullet));
+			}
+		};
+		for (let i = start; i < end; i++) {
+			const bullets = dataItems[i].bullets;
+			if (bullets) {
+				$array.each(bullets, (bullet) => {
+					const sprite = bullet.get("sprite");
+					if (sprite && !sprite.isDisposed()) {
+						visit(sprite, bullet);
+					}
+				});
+			}
+		}
+	}
+
+	// `autoLabels`: whether a bullet label would be drawn, leaving the setting aside;
+	// `drawn` keeps whether its containers are drawn, for the pass
+	protected _bulletLabelShown(label: Label, drawn: { [uid: number]: boolean }): boolean {
+		if (label.isDisposed()) {
+			return false;
+		}
+		if (label.isComputedSetting("forceHidden")) {
+			if (!label.get("visible") || !label.getPrivate("visible")) {
+				return false;
+			}
+		}
+		else if (!label._display.visible) {
+			return false;
+		}
+		const parent = label.parent;
+		if (!parent || !this._bulletDrawn(parent, drawn) || label.get("opacity", 1) <= 0) {
+			return false;
+		}
+		return label.text._display.text !== "" || label.get("html", "") !== "";
+	}
+
+	// `autoLabels`: whether a container and all around it are drawn
+	protected _bulletDrawn(sprite: Sprite, drawn: { [uid: number]: boolean }): boolean {
+		let known = drawn[sprite.uid];
+		if (known === undefined) {
+			const parent = sprite.parent;
+			known = sprite._display.visible && (!parent || this._bulletDrawn(parent, drawn));
+			drawn[sprite.uid] = known;
+		}
+		return known;
+	}
+
+	// `autoLabels`: a bullet label's box on the page, or nothing while its text is not drawn
+	protected _bulletLabelBox(label: Label): IBounds | undefined {
+		const radial: any = label;
+		let box: IBounds | undefined = radial._arcGlobalBounds ? radial._arcGlobalBounds() : undefined;
+		if (!box) {
+			box = label.text._drawnGlobalBounds();
+			// an HTML label's, or a label's background, is what shows
+			if (label.get("html", "") !== "" || (box.right - box.left > 0 && label.get("background"))) {
+				box = label.globalBounds();
+			}
+		}
+		return box.right - box.left > 0 && box.bottom - box.top > 0 ? box : undefined;
+	}
+
+	// `autoLabels`: the chart's first series with the setting fits the labels of all its series
+	protected _fitBulletLabels() {
+		const chart: any = this.chart;
+		let group: Array<Series> = chart && chart.series ? chart.series.values : [this];
+		if (group.indexOf(this) < 0) {
+			group = [this];
+		}
+		if ($array.find(group, (series) => !series.isDisposed() && series.get("autoLabels", false)) !== this) {
+			return;
+		}
+		const area = this._root.container.globalBounds();
+		if (!this._passDue(group, [area.left, area.top, area.right, area.bottom, this._root._fontLoads].join())) {
+			return;
+		}
+
+		const placed = new LabelBoxes();
+		const drawn: { [uid: number]: boolean } = {};
+		const clips: { [uid: number]: IBounds } = {};
+		// labels of series without the setting stay where they are: the others make room for them
+		$array.each([false, true], (own) => {
+			$array.each(group, (series) => {
+				if (!series.isDisposed() && series.get("autoLabels", false) == own) {
+					series._fitOwnBulletLabels(placed, area, clips, drawn);
+				}
+			});
+		});
+	}
+
+	// `autoLabels`: hides this series' labels that do not fit; a hidden one comes back
+	// once its box would fit. Without the setting, its labels are only in the way of the others
+	protected _fitOwnBulletLabels(placed: LabelBoxes, area: IBounds, clips: { [uid: number]: IBounds }, drawn: { [uid: number]: boolean }) {
+		const fit = this.get("autoLabels") ? this._labelFit : undefined;
+		if (!this.bullets.length) {
+			this._releaseBulletLabels();
+			return;
+		}
+		// the area a label is cut off at: the nearest container that masks its content, within the root's
+		const clipOf = (label: Label): IBounds => {
+			const parent = label.parent;
+			if (!parent) {
+				return area;
+			}
+			let clip = clips[parent.uid];
+			if (!clip) {
+				clip = area;
+				for (let p: Container | undefined = parent; p; p = p.parent) {
+					if (p.get("maskContent")) {
+						const a = p.toGlobal({ x: 0, y: 0 });
+						const b = p.toGlobal({ x: p.width(), y: p.height() });
+						clip = {
+							left: Math.max(area.left, Math.min(a.x, b.x)),
+							right: Math.min(area.right, Math.max(a.x, b.x)),
+							top: Math.max(area.top, Math.min(a.y, b.y)),
+							bottom: Math.min(area.bottom, Math.max(a.y, b.y))
+						};
+						break;
+					}
+				}
+				clips[parent.uid] = clip;
+			}
+			return clip;
+		};
+
+		let current: Label | undefined;
+		const fits = (box: IBounds) => {
+			const ok = inside(box, clipOf(current!)) && !placed.hits(box);
+			if (ok) {
+				placed.add(box);
+			}
+			return ok;
+		};
+		this._eachBulletLabel((label, bullet) => {
+			const shown = this._bulletLabelShown(label, drawn);
+			let hidden = false;
+			if (fit && fit.out[label.uid]) {
+				if (label.isComputedSetting("forceHidden")) {
+					hidden = true;
+				}
+				else {
+					delete fit.out[label.uid];
+				}
+			}
+			if (!shown) {
+				return;
+			}
+			if (bullet._moving()) {
+				// on its way across the others: neither hidden nor in their way
+				if (hidden) {
+					label.remove("forceHidden");
+					delete fit!.out[label.uid];
+				}
+				return;
+			}
+			const box = hidden ? undefined : this._bulletLabelBox(label);
+			if (!fit || bullet.get("stacked") || (label.isUserSetting("forceHidden") && !label.isComputedSetting("forceHidden"))) {
+				// not ours to hide: only in the way of the others
+				if (box) {
+					placed.add(box);
+				}
+				return;
+			}
+			current = label;
+			const result = fit.check(label, box, fits);
+			if (result > 0) {
+				label._setC("forceHidden", true);
+			}
+			else if (result < 0) {
+				label.remove("forceHidden");
+				// checked again where it is drawn now, which takes two passes to hide it
+				this._passFrames = Math.max(this._passFrames, 2);
+			}
+		});
+
+		// one more frame to check again
+		const last = current as Label | undefined;
+		if (fit && fit.end() && last) {
+			last.markDirty();
+			this._passFrames = Math.max(this._passFrames, 1);
+		}
+	}
+
+	// Whether a fitting pass is due: for a few frames after any of `group` changed or
+	// `key` (a size) did, and otherwise twice a second, for what moves without a change
+	public _passDue(group: Array<Series>, key: string): boolean {
+		let frames = 0;
+		$array.each(group, (series) => {
+			frames = Math.max(frames, series._passFrames);
+			series._passFrames = Math.max(0, series._passFrames - 1);
+		});
+		const now = Date.now();
+		key += "|" + this._root._passRound;
+		if (frames > 0 || key !== this._passKey || now - this._passTime >= 500) {
+			this._passKey = key;
+			this._passTime = now;
+			return true;
+		}
+		// what moved in a frame passed over gets a pass once the half second is up
+		passLater(this._root, 500 - (now - this._passTime));
+		return false;
+	}
+
+	// `autoLabels`: shows the labels the setting hid
+	protected _releaseBulletLabels() {
+		const fit = this._labelFit;
+		if (fit) {
+			for (const uid in fit.out) {
+				const label = fit.out[uid].label;
+				if (!label.isDisposed() && label.isComputedSetting("forceHidden")) {
+					label.remove("forceHidden");
+				}
+			}
+			fit.out = {};
+		}
 	}
 
 	/**
@@ -593,12 +896,46 @@ export abstract class Series extends Component {
 				// pie slices, flow nodes and hierarchy nodes hold their color on the data item
 				const itemFill = dataItem ? (dataItem as any).get("fill") : undefined;
 
-				sprite.set("fill", itemFill != null ? itemFill : this.get("fill"));
-				sprite.set("fillGradient", this.get("fillGradient"));
-				sprite.set("fillPattern", this.get("fillPattern"));
-				sprite.set("stroke", this.get("stroke"));
-				sprite.set("strokeGradient", this.get("strokeGradient"));
+				if (itemFill != null) {
+					sprite.set("fill", itemFill);
+					sprite.set("fillGradient", this.get("fillGradient"));
+					sprite.set("fillPattern", this.get("fillPattern"));
+					sprite.set("stroke", this.get("stroke"));
+					sprite.set("strokeGradient", this.get("strokeGradient"));
+				}
+				else {
+					// lowest template, so the bullet's own template wins, also when colored later
+					sprite._addBaseTemplate(this._getBulletPaint() as any);
+				}
 			}
+		}
+	}
+
+	/**
+	 * Template with the series' paint, for bullets that have none of their own.
+	 *
+	 * @ignore
+	 */
+	public _getBulletPaint(): Template<Graphics> {
+		if (!this._bulletPaint) {
+			this._bulletPaint = Template.new({});
+			this._syncBulletPaint();
+		}
+		return this._bulletPaint;
+	}
+
+	protected _syncBulletPaint() {
+		const template = this._bulletPaint;
+		if (template) {
+			$array.each(bulletPaintKeys, (key) => {
+				const value = this.get(key);
+				if (value != null) {
+					template._setC(key, value as any);
+				}
+				else {
+					template.remove(key);
+				}
+			});
 		}
 	}
 
@@ -635,6 +972,24 @@ export abstract class Series extends Component {
 
 	public _prepareChildren(){
 		super._prepareChildren();
+
+		this._passFrames = 3;
+		if (this.get("autoLabels") && !this._labelFit) {
+			this._labelFit = new LabelFit();
+			this._disposers.push(this._root.events.on("frameended", () => {
+				if (this.get("autoLabels")) {
+					this._fitBulletLabels();
+				}
+				else {
+					this._releaseBulletLabels();
+				}
+			}));
+		}
+
+		// bullets painted by the series follow it
+		if (this._bulletPaint && $array.any(bulletPaintKeys, (key) => this.isDirty(key))) {
+			this._syncBulletPaint();
+		}
 
 		const dataItems = this.dataItems;
 		const count = dataItems.length;
@@ -966,8 +1321,22 @@ export abstract class Series extends Component {
 
 		if (this._valuesDirty && rules && rules.length > 0) {
 			$array.each(rules, (rule) => {
-				const minValue = $type.isNumber(rule.minValue) ? rule.minValue : (this.getPrivate(<any>(rule.dataField + "Low")) || 0);
+				let minValue = $type.isNumber(rule.minValue) ? rule.minValue : (this.getPrivate(<any>(rule.dataField + "Low")) || 0);
 				const maxValue = $type.isNumber(rule.maxValue) ? rule.maxValue : (this.getPrivate(<any>(rule.dataField + "High")) || 0);
+
+				// A logarithmic scale starts at the lowest value above zero
+				if (rule.logarithmic && !rule.customFunction && minValue <= 0) {
+					let lowest = Infinity;
+					$array.each(rule.target._entities, (target) => {
+						const value = target.dataItem ? target.dataItem.get(rule.dataField) : undefined;
+						if ($type.isNumber(value) && value > 0 && value < lowest) {
+							lowest = value;
+						}
+					});
+					if (lowest < Infinity) {
+						minValue = lowest;
+					}
+				}
 
 				$array.each(rule.target._entities, (target) => {
 
@@ -1002,9 +1371,16 @@ export abstract class Series extends Component {
 							percent = (value - minValue) / (maxValue - minValue);
 						}
 
+						if (rule.logarithmic && value <= 0) {
+							percent = 0;
+						}
+
 						if ($type.isNumber(value) && (!$type.isNumber(percent) || Math.abs(percent) == Infinity)) {
 							percent = 0.5;
 						}
+
+						// Values outside `minValue` and `maxValue` get `min` or `max`
+						percent = Math.max(0, Math.min(1, percent));
 
 						// fixes problems if all values are the same
 						let propertyValue;

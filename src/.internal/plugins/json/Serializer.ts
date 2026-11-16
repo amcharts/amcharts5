@@ -607,16 +607,21 @@ export class Serializer extends Entity {
 		if (this.get("includeAdapters", false)) {
 			const asString = this.get("functionsAs", "string") == "string";
 			const callbacks = source.adapters._callbacks;
-			if (Object.keys(callbacks).length > 0) {
-				res.adapters = [];
-				$object.each(callbacks, (key, callbackList) => {
-					callbackList.forEach((callback: any) => {
-						res.adapters.push({
-							key: key,
-							callback: asString ? callback.toString() : callback
-						});
+			const adapters: Array<any> = [];
+			$object.each(callbacks, (key, callbackList) => {
+				callbackList.forEach((callback: any) => {
+					// the library's own, not configuration
+					if (source.adapters._isInternal && source.adapters._isInternal(callback)) {
+						return;
+					}
+					adapters.push({
+						key: key,
+						callback: asString ? callback.toString() : callback
 					});
 				});
+			});
+			if (adapters.length > 0) {
+				res.adapters = adapters;
 			}
 		}
 	}

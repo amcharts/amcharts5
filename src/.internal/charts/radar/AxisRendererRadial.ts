@@ -375,6 +375,24 @@ export class AxisRendererRadial extends AxisRenderer {
 		return this.getPrivate("radius", 0) - this.getPrivate("innerRadius", 0);
 	}
 
+	// On a radar chart one axis's labels are not hidden for overlapping the other's: where they
+	// meet, at the end of the radial axis, hiding them reads as a gap
+	protected _givesWayTo(_other: AxisRenderer): boolean {
+		return false;
+	}
+
+	// The axis runs out along `axisAngle`, which a `"radial"` label's text follows
+	public _labelTurn(label: AxisLabelRadial): number {
+		const axisAngle = this.get("axisAngle", 0);
+		const text = label.get("textType") == "radial" ? axisAngle : label.get("rotation", 0);
+		return text - axisAngle;
+	}
+
+	// A curved label lies across the radius: its thickness is its size along the axis
+	public _arcExtent(_label: AxisLabelRadial, size: { length: number, height: number }): number {
+		return size.height;
+	}
+
 	/**
 	 * @ignore
 	 */

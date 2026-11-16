@@ -1,12 +1,13 @@
 import type { Root } from "../../core/Root";
 
-import { Entity } from "../../core/util/Entity";
+import { Entity, Settings } from "../../core/util/Entity";
 import { Sprite } from "../../core/render/Sprite";
 import { Container } from "../../core/render/Container";
 import { Color } from "../../core/util/Color";
 import { ColorSet } from "../../core/util/ColorSet";
 import { Percent } from "../../core/util/Percent";
 import { Template } from "../../core/util/Template";
+import { List } from "../../core/util/List";
 import { ListData } from "../../core/util/Data";
 
 import * as $type from "../../core/util/Type";
@@ -30,6 +31,30 @@ function isObject(value: any): value is { [key: string]: any } {
 function isObjectParsed(value: object): boolean {
 	return value instanceof Entity || value instanceof Color || value instanceof Percent || value instanceof Template;
 }
+
+// Keys an untrusted config cannot step through or write: private ones and the prototype's
+function isPrivateKey(key: string): boolean {
+	return key[0] === "_" || key === "constructor" || key === "prototype";
+}
+
+// What an untrusted config's refs and `properties` can reach: chart objects and plain data
+function isChartData(value: unknown): boolean {
+	if (typeof value === "function") {
+		return false;
+	}
+	if (value === null || typeof value !== "object") {
+		return true;
+	}
+	const proto = Object.getPrototypeOf(value);
+	return proto === Object.prototype || proto === null || $type.isArray(value)
+		|| value instanceof Settings || value instanceof Template || value instanceof List || value instanceof Color || value instanceof Percent;
+}
+
+// The `root` properties an untrusted config can set: the ones the serializer writes
+const ROOT_PROPERTIES = ["locale", "utc", "fps", "tabindex", "numberFormatter", "dateFormatter", "durationFormatter", "interfaceColors"];
+
+// What a refused ref gives: the key, item or child it is in is then left out
+const REFUSED = {};
 
 // Detects a type-less, entity-shaped config object, e.g. a serialized `background`
 // whose `type` was stripped so that it configures the existing sub-object in place
@@ -148,54 +173,6 @@ const GEODATA_PREFIX = "am5geodata_";
 const LOCALE_PREFIX = "am5locales_";
 
 
-function parseRef<E extends Entity>(value: string, refs: Array<IRef>, fallback?: Array<IRef>): IParsed<E> {
-	if (value[0] === "#" || value[0] === "@") {
-		if (value[1] === value[0]) {
-			// "##foo" or "@@foo" gets escaped into the literal strings "#foo" or "@foo"
-			return {
-				isValue: true,
-				value: value.slice(1),
-			};
-
-		} else {
-			const path = value.split(/\./g);
-
-			let object = lookupRef(refs, path[0], fallback);
-
-			for (let i = 1; i < path.length; ++i) {
-				const subpath = path[i];
-
-				// Supports `#foo.get("bar")` and `#foo.get('bar')` syntax
-				const parsed = /get\((["'])([^\1]*)\1\)/.exec(subpath);
-				// and `@colors.getIndex(3)`
-				const index = /^getIndex\((\d+)\)$/.exec(subpath);
-
-				if (parsed) {
-					object = object.get(parsed[2]);
-
-				} else if (index) {
-					object = object.getIndex(+index[1]);
-
-				} else {
-					object = object[subpath];
-				}
-			}
-
-			return {
-				isValue: true,
-				value: object,
-			};
-		}
-
-	} else {
-		return {
-			isValue: true,
-			value,
-		};
-	}
-}
-
-
 function mergeObject<E extends Entity>(entity: object, parsed: IParsedEntity<E>): void {
 	if (parsed.properties) {
 		$array.each(parsed.properties, (fn) => {
@@ -226,6 +203,9 @@ function mergeEntity<E extends Entity>(entity: E, parsed: IParsedEntity<E>): voi
 	if (entity instanceof Container) {
 		if (parsed.children) {
 			parsed.children.forEach((child) => {
+				if ((child.value as unknown) === REFUSED) {
+					return;
+				}
 				if (child.index == null || child.index >= entity.children.length) {
 					entity.children.push(child.value);
 
@@ -307,10 +287,13 @@ class ParserState {
 	protected _globalRefs: Array<IRef> = [];
 	protected _updateTargets: "strict" | "soft";
 	protected _resources: { [name: string]: unknown } | undefined;
+	protected _trusted: boolean;
+	protected _warned: { [message: string]: boolean } = {};
 
-	constructor(updateTargets: "strict" | "soft" = "strict", root?: Root, resources?: { [name: string]: unknown }) {
+	constructor(updateTargets: "strict" | "soft" = "strict", root?: Root, resources?: { [name: string]: unknown }, trusted: boolean = false) {
 		this._updateTargets = updateTargets;
 		this._resources = resources;
+		this._trusted = trusted;
 		// "@root" for every config, e.g. "@root.interfaceColors.get('background')"
 		if (root) {
 			this._globalRefs.push({ "@root": root });
@@ -348,6 +331,75 @@ class ParserState {
 		this._delayed.forEach((f) => {
 			f();
 		});
+	}
+
+	// Says once per parse what an untrusted config was not allowed to do
+	protected _refuse(message: string): void {
+		if (!this._warned[message]) {
+			this._warned[message] = true;
+			console.warn("JsonParser: " + message + " If the config is your own, parse it with `trusted: true`.");
+		}
+	}
+
+	// A "__proto__" key would swap the object's prototype rather than add a key
+	protected _swapsPrototype(key: string): boolean {
+		if (key === "__proto__" && !this._trusted) {
+			this._refuse("\"__proto__\" is not set.");
+			return true;
+		}
+		return false;
+	}
+
+	parseRef<E extends Entity>(value: string, refs: Array<IRef>, fallback?: Array<IRef>): IParsed<E> {
+		if (value[0] === "#" || value[0] === "@") {
+			if (value[1] === value[0]) {
+				// "##foo" or "@@foo" gets escaped into the literal strings "#foo" or "@foo"
+				return {
+					isValue: true,
+					value: value.slice(1),
+				};
+
+			} else {
+				const path = value.split(/\./g);
+
+				let object = lookupRef(refs, path[0], fallback);
+
+				for (let i = 1; i < path.length && object !== REFUSED; ++i) {
+					const subpath = path[i];
+
+					// Supports `#foo.get("bar")` and `#foo.get('bar')` syntax
+					const parsed = /get\((["'])([^\1]*)\1\)/.exec(subpath);
+					// and `@colors.getIndex(3)`
+					const index = /^getIndex\((\d+)\)$/.exec(subpath);
+
+					if (parsed) {
+						object = object.get(parsed[2]);
+
+					} else if (index) {
+						object = object.getIndex(+index[1]);
+
+					} else {
+						object = object[subpath];
+					}
+
+					if (!this._trusted && (isPrivateKey(subpath) || !isChartData(object))) {
+						this._refuse("\"" + value + "\" stops at \"" + subpath + "\": a ref goes only through chart objects and data.");
+						object = REFUSED;
+					}
+				}
+
+				return {
+					isValue: true,
+					value: object,
+				};
+			}
+
+		} else {
+			return {
+				isValue: true,
+				value,
+			};
+		}
 	}
 
 
@@ -437,17 +489,27 @@ class ParserState {
 
 		$array.each($object.keys(object), (key) => {
 			// Our own marker, not part of the object
-			if (key === "__parse") {
+			if (key === "__parse" || this._swapsPrototype(key)) {
 				return;
 			}
-			output[key] = this.parse(root, object[key], refs);
+			const parsed = this.parse(root, object[key], refs);
+			if (parsed !== REFUSED) {
+				output[key] = parsed;
+			}
 		});
 
 		return output;
 	}
 
 	parseArray(root: Root, value: Array<unknown>, refs: Array<IRef>): Array<unknown> {
-		return $array.map(value, (value) => this.parse(root, value, refs));
+		const output: Array<unknown> = [];
+		$array.each(value, (item) => {
+			const parsed = this.parse(root, item, refs);
+			if (parsed !== REFUSED) {
+				output.push(parsed);
+			}
+		});
+		return output;
 	}
 
 	parseChildren(root: Root, value: Array<{ [key: string]: any } | string>, refs: Array<IRef>): Array<IChild> {
@@ -510,8 +572,14 @@ class ParserState {
 		const settings: { [key: string]: any } = {};
 
 		$array.each($object.keys(object), (key) => {
+			if (this._swapsPrototype(key)) {
+				return;
+			}
 			try {
-				settings[key] = this.parseSetting(root, key, object[key], refs);
+				const parsed = this.parseSetting(root, key, object[key], refs);
+				if (parsed !== REFUSED) {
+					settings[key] = parsed;
+				}
 			} catch (e) {
 				// A ref further down the config: hold the raw value and set it once
 				// everything is parsed
@@ -554,8 +622,16 @@ class ParserState {
 			const rawValue = object[key];
 
 			return (entity: object) => {
+				if (!this._trusted && (isPrivateKey(key) || !isChartData(entity))) {
+					this._refuse("\"" + key + "\" is not set: a config sets only public properties of chart objects and data.");
+					return;
+				}
+
 				const run = () => {
 					const parsed = this.parseValue(root, rawValue, refs);
+					if (parsed.value === REFUSED) {
+						return;
+					}
 					// Usually a property, but a block may also name a setting that
 					// already holds an entity - an axis' `renderer`, say - and then it
 					// configures the one that is there rather than replacing it
@@ -711,6 +787,11 @@ class ParserState {
 		const properties = config.properties;
 		if (isObject(properties)) {
 			$object.each(properties, (key, value) => {
+				if (!this._trusted && ROOT_PROPERTIES.indexOf(key as string) === -1) {
+					this._refuse("root property \"" + (key as string) + "\" is not set: a config sets only " + ROOT_PROPERTIES.join(", ") + ".");
+					return;
+				}
+
 				// A locale is named rather than copied out, so the pack it names is
 				// looked up the same way a geodata pack is
 				if (key === "locale" && $type.isString(value)) {
@@ -723,11 +804,20 @@ class ParserState {
 					}
 				}
 
+				// The page writes some translations as HTML, so a config only names its locale
+				if (key === "locale" && !this._trusted) {
+					this._refuse("root property \"locale\" is not set: a config names its locale, e.g. \"am5locales_de_DE\".");
+					return;
+				}
+
 				const existing = rootAny[key];
 				if (existing instanceof Entity && isObject(value)) {
 					this.mergeExistingEntity(root, existing, this.parseEntity(root, value, []), []);
 				} else {
-					rootAny[key] = this.parse(root, value, []);
+					const parsed = this.parse(root, value, []);
+					if (parsed !== REFUSED) {
+						rootAny[key] = parsed;
+					}
 				}
 			});
 		}
@@ -735,9 +825,17 @@ class ParserState {
 		const settings = config.settings;
 		if (isObject(settings) && $object.keys(settings).length > 0) {
 			$object.each(settings, (key, value) => {
-				rootAny._settings[key] = this.parse(root, value, []);
-				// Asked for now, whatever the Root filled in for itself earlier
-				delete rootAny._computedSettings[key];
+				if (!this._trusted && (isPrivateKey(key as string) || (key === "sanitizeHTML" && value !== true))) {
+					this._refuse("root setting \"" + (key as string) + "\" is not set" + (key === "sanitizeHTML" ? ": a config cannot turn HTML sanitizing off." : "."));
+					return;
+				}
+
+				const parsed = this.parse(root, value, []);
+				if (parsed !== REFUSED) {
+					rootAny._settings[key] = parsed;
+					// Asked for now, whatever the Root filled in for itself earlier
+					delete rootAny._computedSettings[key];
+				}
 			});
 			// Non-destructive re-apply (does NOT re-run `_init()`, which would
 			// duplicate containers, DOM nodes and event listeners).
@@ -832,7 +930,7 @@ class ParserState {
 		if ($type.isString(value)) {
 			return {
 				index: undefined,
-				value: parseRef<Sprite>(value, refs).value,
+				value: this.parseRef<Sprite>(value, refs).value,
 			};
 
 		} else if (value.ref != null) {
@@ -840,7 +938,7 @@ class ParserState {
 
 			return {
 				index,
-				value: parseRef<Sprite>(value.ref, refs).value,
+				value: this.parseRef<Sprite>(value.ref, refs).value,
 			};
 
 		} else {
@@ -901,7 +999,9 @@ class ParserState {
 				this._delayed.push(() => {
 					$array.each($object.keys(pendingSettings), (key) => {
 						const parsed = this.parseValue(root, pendingSettings[key], refs);
-						(entity as any).set(key, parsed.isValue ? parsed.value : constructEntity(root, parsed));
+						if (parsed.value !== REFUSED) {
+							(entity as any).set(key, parsed.isValue ? parsed.value : constructEntity(root, parsed));
+						}
 					});
 				});
 			};
@@ -914,7 +1014,9 @@ class ParserState {
 					const newRefs = refs.concat([{ "@self": entity }]);
 					$array.each($object.keys(selfSettings), (key) => {
 						const parsed = this.parseValue(root, selfSettings[key], newRefs);
-						(entity as any).set(key, parsed.isValue ? parsed.value : constructEntity(root, parsed));
+						if (parsed.value !== REFUSED) {
+							(entity as any).set(key, parsed.isValue ? parsed.value : constructEntity(root, parsed));
+						}
 					});
 				});
 			};
@@ -1038,7 +1140,7 @@ class ParserState {
 			}
 
 		} else if ($type.isString(value)) {
-			return parseRef(value, refs, this._globalRefs);
+			return this.parseRef(value, refs, this._globalRefs);
 
 		} else {
 			return {
@@ -1094,6 +1196,21 @@ export interface IParseSettings {
 	 * @since 5.21.4
 	 */
 	resources?: { [name: string]: unknown };
+
+	/**
+	 * Parses the config as code you wrote yourself. Its refs and `properties`
+	 * can then reach any object, and its `root` section can set anything on
+	 * the [[Root]], `sanitizeHTML` included.
+	 *
+	 * By default a config is data, so one from users or other sites cannot run
+	 * script: refs and `properties` go only through chart objects and plain
+	 * data, and the `root` section sets only what [[ChartSerializer]] writes.
+	 * Anything left out is named in a console warning.
+	 *
+	 * @default false
+	 * @since 5.22.0
+	 */
+	trusted?: boolean;
 }
 
 /**
@@ -1141,7 +1258,7 @@ export class JsonParser {
 	 * @return            A promise of the object the config builds, usually the chart
 	 */
 	async parse<E extends Entity>(object: unknown, settings: IParseSettings = {}): Promise<E> {
-		const state = new ParserState(settings.updateTargets, this._root, settings.resources);
+		const state = new ParserState(settings.updateTargets, this._root, settings.resources, settings.trusted);
 
 		await state.parseAsync(object);
 

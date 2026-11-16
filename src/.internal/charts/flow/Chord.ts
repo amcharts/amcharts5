@@ -2,7 +2,7 @@ import type { DataItem } from "../../core/render/Component";
 
 import { Flow, IFlowSettings, IFlowDataItem, IFlowPrivate, IFlowEvents } from "./Flow";
 import { chord, ribbon, RibbonGenerator, RibbonSubgroup, Ribbon } from "d3-chord";
-import { ascending, descending } from "d3";
+import { ascending, descending } from "d3-array";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
 import { ChordNodes, IChordNodesDataItem } from "./ChordNodes";

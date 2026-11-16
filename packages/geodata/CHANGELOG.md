@@ -8,17 +8,15 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 ## [UNRELEASED] - ????-??-??
 
 ### Added
-- `images/`: whole-world day and night images of the Earth from NASA (1024, 2048 and 4096 pixels wide) for `am5map.MapRasterSeries`. See `images/README.md` for credit.
-- `images/moon*`: the Moon, from NASA's Scientific Visualization Studio (LRO camera).
-- `images/mars*`: Mars, from the USGS Viking colorized global mosaic.
-- `images/venus*`: Venus' surface by Magellan radar, with simulated color, from USGS.
-- `images/jupiter*`: Jupiter, from NASA/JPL Cassini maps (1024 and 2048 only).
-- `images/io*`: Io, from the USGS Galileo and Voyager color mosaic.
-- `images/ganymede*`: Ganymede, from the USGS Voyager and Galileo color mosaic.
+- The npm package now includes the CDN script files in `dist/`, for `<script>` tags from `node_modules` or unpkg.
+- `images/`: day and night images of the Earth, and images of the Moon, Mars, Venus, Jupiter, Io and Ganymede, from NASA and USGS, for `am5map.MapRasterSeries`. Credits are in `images/README.md`.
 
 ### Changed
+- The maps of Kenya, Cambodia, Malawi, Equatorial Guinea, Lesotho and Slovenia are 4 to 20 times smaller (e.g. `kenyaHigh` 191 KB instead of 3.8 MB), with the same outlines at normal zoom.
 - Renamed Nauru to Naoero in world maps and related data.
-- Fixed map of North Korea.
+
+### Fixed
+- Map of North Korea.
 
 
 ## [5.1.6] - 2026-07-27

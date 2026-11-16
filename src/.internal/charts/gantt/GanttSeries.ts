@@ -662,9 +662,10 @@ export class GanttSeries extends ColumnSeries {
 			maskedContainer.hide(0);
 		}
 		else {
+			// made as it scrolls into view: shown at once, like its row
 			if (dataItem.get("duration", 0) > 0) {
-				column.appear();
-				maskedContainer.appear();
+				column.show(0);
+				maskedContainer.show(0);
 			}
 		}
 
@@ -1127,9 +1128,9 @@ export class GanttSeries extends ColumnSeries {
 			if (this.getDepth(item) != depth) {
 				$array.move(itemsToDisable, item);
 			}
-			// also if already connected, disable
-			const links = dataItem.get("links");
-			if (links && links[item.get("id")!]) {
+			// also if already connected, disable (by linkTo: a link out of view isn't made yet)
+			const linkTo = dataItem.get("linkTo");
+			if (linkTo && linkTo.indexOf(item.get("id")!) != -1) {
 				$array.move(itemsToDisable, item);
 			}
 
@@ -1149,8 +1150,8 @@ export class GanttSeries extends ColumnSeries {
 		const id = dataItem.get("id")!;
 		const checkIfConnected = (id: string) => {
 			$array.each(this.dataItems, (item) => {
-				const links = item.get("links");
-				if (links && links[id]) {
+				const linkTo = item.get("linkTo");
+				if (linkTo && linkTo.indexOf(id) != -1) {
 					itemsToDisable.push(item);
 					checkIfConnected(item.get("id")!);
 				}
@@ -1363,6 +1364,24 @@ export class GanttSeries extends ColumnSeries {
 			maxHeight = column.get("maxHeight", Infinity) * cos * cos;
 		}
 
+		// every row's position worked out once: with rows of their own sizes, each one alone adds up the rows above it
+		const middles = yAxis._indexPositions(0.5);
+		const tops = yAxis._indexPositions(0);
+		const bottoms = yAxis._indexPositions(1);
+		const rowAt = (positions: Array<number>, index: number, location: number) => {
+			const position = positions[index];
+			return position !== undefined ? position : yAxis.indexToPosition(index, location);
+		};
+		const categoryAt = (category: string) => {
+			const index = yAxis.categoryToIndex(category);
+			return $type.isNaN(index) ? NaN : rowAt(middles, index, 0.5);
+		};
+
+		const width = xAxis.get("renderer").axisLength();
+		const height = yRenderer.axisLength();
+		// room for the arrows and the line width
+		const margin = 20;
+
 		$array.each(this.dataItems, (dataItem) => {
 			const linkTo = dataItem.get("linkTo");
 
@@ -1378,14 +1397,115 @@ export class GanttSeries extends ColumnSeries {
 						links = dataItem.set("links", {});
 					}
 
-					let link = links[dataItemId];
+					const points: Array<IPoint> = [];
+
+					const positionX = xAxis.valueToPosition(dataItem.get("valueX", 0));
+					const positionY = categoryAt(dataItem.get("categoryY")!);
+
+					const point = this.getPoint(positionX, positionY);
+
+					let firstPoint = { x: point.x + endRadius, y: point.y };
+
+					if (dataItem.get("duration", 0) === 0) {
+						let y0 = rowAt(tops, categoryDataItem.get("index", 0), 0);
+						let y1 = rowAt(bottoms, categoryDataItem.get("index", 0), 1);
+						y0 = yRenderer.positionToCoordinate(y0);
+						y1 = yRenderer.positionToCoordinate(y1);
+
+						let h = (y1 - y0) * r;
+						h = $math.fitToRange(h, minHeight, maxHeight);
+
+						firstPoint.x += h - endRadius;
+					}
+
+					points.push(firstPoint);
+					points.push({ x: firstPoint.x + linkHorizontalOffset, y: firstPoint.y });
+
+					const targetDataItem = this.getDataItemById(dataItemId) as DataItem<IGanttSeriesDataItem>;
+
+					if (targetDataItem) {
+
+						const positionX = xAxis.valueToPosition(targetDataItem.get("openValueX", 0));
+						const positionY = categoryAt(targetDataItem.get("categoryY")!);
+
+						const point = this.getPoint(positionX, positionY);
+
+						let x = point.x;
+						let y = point.y;
+
+						let lastPoint = { x: x, y: y };
+
+						if (targetDataItem.get("duration", 0) === 0) {
+							let targetCategoryDataItem = targetDataItem.get("categoryAxisDataItem") as DataItem<IGanttCategoryAxisDataItem>;
+							if (targetCategoryDataItem) {
+								let y0 = rowAt(tops, targetCategoryDataItem.get("index", 0), 0);
+								let y1 = rowAt(bottoms, targetCategoryDataItem.get("index", 0), 1);
+								y0 = yRenderer.positionToCoordinate(y0);
+								y1 = yRenderer.positionToCoordinate(y1);
+
+								let h = (y1 - y0) * r;
+
+
+
+								h = $math.fitToRange(h, minHeight, maxHeight);
+								lastPoint.x -= h;
+							}
+						}
+
+						if (lastPoint.x - linkHorizontalOffset < firstPoint.x + linkHorizontalOffset) {
+							const category = dataItem.get("categoryY");
+							const yAxis = this.get("yAxis") as CategoryAxis<AxisRendererY>;
+
+							if (category) {
+								let index = yAxis.categoryToIndex(category);
+
+								const position0 = rowAt(middles, index, 0.5);
+								const position1 = rowAt(bottoms, index, 1);
+
+								if (yAxis && category) {
+
+									let sign = -1;
+									if (lastPoint.y > firstPoint.y) {
+										sign = 1;
+									}
+
+									let y = yAxis.get("renderer").positionToCoordinate(categoryAt(category) + (position1 - position0) * sign);
+
+									points.push({ x: firstPoint.x + linkHorizontalOffset, y: y });
+								}
+							}
+						}
+
+						points.push({ x: lastPoint.x - linkHorizontalOffset, y: lastPoint.y });
+						points.push(lastPoint);
+
+					}
+					// a link that doesn't reach the plot is not drawn, nor made until it does
+					let left = Infinity, right = -Infinity, top = Infinity, bottom = -Infinity;
+					$array.each(points, (p) => {
+						left = Math.min(left, p.x);
+						right = Math.max(right, p.x);
+						top = Math.min(top, p.y);
+						bottom = Math.max(bottom, p.y);
+					});
+					let link = links![dataItemId];
+					if (right < -margin || left > width + margin || bottom < -margin || top > height + margin) {
+						// not made until it comes into view
+						if (link) {
+							link.setPrivate("visible", false);
+						}
+						return;
+					}
 
 					if (!link) {
 						link = this.links.make();
 						links[dataItemId] = link;
 						this.links.push(link);
 						this.linksContainer.children.push(link);
-						link.appear();
+						// drawn at once, or hidden with its task
+						if (dataItem.isHidden() || (targetDataItem && targetDataItem.isHidden())) {
+							link.hide(0);
+						}
 
 						link.events.on("click", () => {
 							if (link.get("active")) {
@@ -1408,89 +1528,7 @@ export class GanttSeries extends ColumnSeries {
 						})
 					}
 
-					const points: Array<IPoint> = [];
-
-					const positionX = xAxis.valueToPosition(dataItem.get("valueX", 0));
-					const positionY = yAxis.categoryToPosition(dataItem.get("categoryY")!);
-
-					const point = this.getPoint(positionX, positionY);
-
-					let firstPoint = { x: point.x + endRadius, y: point.y };
-
-					if (dataItem.get("duration", 0) === 0) {
-						let y0 = yAxis.indexToPosition(categoryDataItem.get("index", 0), 0);
-						let y1 = yAxis.indexToPosition(categoryDataItem.get("index", 0), 1);
-						y0 = yRenderer.positionToCoordinate(y0);
-						y1 = yRenderer.positionToCoordinate(y1);
-
-						let h = (y1 - y0) * r;
-						h = $math.fitToRange(h, minHeight, maxHeight);
-
-						firstPoint.x += h - endRadius;
-					}
-
-					points.push(firstPoint);
-					points.push({ x: firstPoint.x + linkHorizontalOffset, y: firstPoint.y });
-
-					const targetDataItem = this.getDataItemById(dataItemId) as DataItem<IGanttSeriesDataItem>;
-
-					if (targetDataItem) {
-
-						const positionX = xAxis.valueToPosition(targetDataItem.get("openValueX", 0));
-						const positionY = yAxis.categoryToPosition(targetDataItem.get("categoryY")!);
-
-						const point = this.getPoint(positionX, positionY);
-
-						let x = point.x;
-						let y = point.y;
-
-						let lastPoint = { x: x, y: y };
-
-						if (targetDataItem.get("duration", 0) === 0) {
-							let targetCategoryDataItem = targetDataItem.get("categoryAxisDataItem") as DataItem<IGanttCategoryAxisDataItem>;
-							if (targetCategoryDataItem) {
-								let y0 = yAxis.indexToPosition(targetCategoryDataItem.get("index", 0), 0);
-								let y1 = yAxis.indexToPosition(targetCategoryDataItem.get("index", 0), 1);
-								y0 = yRenderer.positionToCoordinate(y0);
-								y1 = yRenderer.positionToCoordinate(y1);
-
-								let h = (y1 - y0) * r;
-
-
-
-								h = $math.fitToRange(h, minHeight, maxHeight);
-								lastPoint.x -= h;
-							}
-						}
-
-						if (lastPoint.x - linkHorizontalOffset < firstPoint.x + linkHorizontalOffset) {
-							const category = dataItem.get("categoryY");
-							const yAxis = this.get("yAxis") as CategoryAxis<AxisRendererY>;
-
-							if (category) {
-								let index = yAxis.categoryToIndex(category);
-
-								const position0 = yAxis.indexToPosition(index);
-								const position1 = yAxis.indexToPosition(index, 1);
-
-								if (yAxis && category) {
-
-									let sign = -1;
-									if (lastPoint.y > firstPoint.y) {
-										sign = 1;
-									}
-
-									let y = yAxis.get("renderer").positionToCoordinate(yAxis.categoryToPosition(category) + (position1 - position0) * sign);
-
-									points.push({ x: firstPoint.x + linkHorizontalOffset, y: y });
-								}
-							}
-						}
-
-						points.push({ x: lastPoint.x - linkHorizontalOffset, y: lastPoint.y });
-						points.push(lastPoint);
-
-					}
+					link.setPrivate("visible", true);
 					link.set("points", points);
 				});
 			}

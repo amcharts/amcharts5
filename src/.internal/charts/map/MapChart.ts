@@ -444,6 +444,8 @@ export class MapChart extends SerialChart {
 	protected _fitted: boolean = false;
 	// goHome() called before that
 	protected _goHomeOnFit?: { duration?: number };
+	// a zoom to a place called before that
+	protected _zoomOnFit?: () => void;
 	protected _homeScheduled: boolean = false;
 	// Where going home on load is headed, and the animations taking it there
 	protected _homeTarget?: { view: Array<number | undefined>, animations: Array<Animation<any> | undefined>, duration?: number };
@@ -818,20 +820,30 @@ export class MapChart extends SerialChart {
 		if (this.isDirty("wheelX") || this.isDirty("wheelY")) {
 			this._handleSetWheel();
 		}
+		let geometriesChanged = false;
 		if (this._dirtyGeometries) {
-			this._geometryColection.geometries = [];
-
+			const geometries: Array<GeoJSON.Geometry> = [];
 			this.series.each((series) => {
-				$array.pushAll(this._geometryColection.geometries, series._geometries);
+				if (series.get("affectsBounds", true)) {
+					$array.pushAll(geometries, series._geometries);
+				}
 			})
 
-
-			this._fitMap();
-			this._applyZoom();
-			refitted = w > 0 && h > 0;
+			// refits only when what the map is fitted to has changed
+			geometriesChanged = geometries.length != previousGeometries.length;
+			if (!geometriesChanged) {
+				const previous = new Set(previousGeometries);
+				geometriesChanged = $array.any(geometries, (geometry) => !previous.has(geometry));
+			}
+			if (geometriesChanged) {
+				this._geometryColection.geometries = geometries;
+				this._fitMap();
+				this._applyZoom();
+				refitted = w > 0 && h > 0;
+			}
 		}
 
-		if (previousGeometries.length != 0 && (w != this._pw || h != this._ph || this._dirtyGeometries)) {
+		if (previousGeometries.length != 0 && (w != this._pw || h != this._ph || geometriesChanged)) {
 			if (w > 0 && h > 0) {
 				let hw = w / 2;
 				let hh = h / 2;
@@ -880,7 +892,8 @@ export class MapChart extends SerialChart {
 				if (previous) {
 					previous.dispose();
 				}
-				if (zoomControl) {
+				// added once: the setting stays dirty through several passes in a frame
+				if (zoomControl && zoomControl.parent !== this) {
 					zoomControl.setPrivate("chart", this);
 					this.children.push(zoomControl);
 				}
@@ -943,7 +956,7 @@ export class MapChart extends SerialChart {
 			}
 		}
 
-		if (this.isDirty("pinchZoom") || this.get("panX") || this.get("panY")) {
+		if (this.isDirty("pinchZoom") || this.isDirty("panX") || this.isDirty("panY")) {
 			this._setUpTouch();
 		}
 
@@ -951,12 +964,23 @@ export class MapChart extends SerialChart {
 		if (refitted && this._geometryColection.geometries.length > 0) {
 			const goHomeOnFit = this._goHomeOnFit;
 			const homeTarget = this._homeTarget;
-			if ((!this._fitted && this.get("autoHome")) || goHomeOnFit || goingHome) {
+			const zoomOnFit = this._zoomOnFit;
+			if (((!this._fitted && this.get("autoHome")) || goHomeOnFit || goingHome) && !zoomOnFit) {
 				this._goHomeOnFit = undefined;
 				// Going again takes as long as it was asked to the first time
 				this._scheduleHome(goHomeOnFit ? goHomeOnFit.duration : goingHome && homeTarget ? homeTarget.duration : undefined);
 			}
 			this._fitted = true;
+			// an early zoom to a place goes there instead of home, once the fit is drawn
+			if (zoomOnFit) {
+				this._zoomOnFit = undefined;
+				this._goHomeOnFit = undefined;
+				this._root.events.once("frameended", () => {
+					if (!this.isDisposed()) {
+						zoomOnFit();
+					}
+				});
+			}
 		}
 
 		if (this.isDirty("translateX") || this.isDirty("translateY") || this.isDirty("zoomLevel") || this.isDirty("rotationX") || this.isDirty("rotationY") || this.isDirty("rotationZ") || this.isDirty("projection") || this._sizeDirty) {
@@ -966,9 +990,16 @@ export class MapChart extends SerialChart {
 
 	protected _processSeries(series: this["_seriesType"]) {
 		super._processSeries(series);
+		// its data may have come before it was added, and before the theme set `affectsBounds`
+		this.markDirtyGeometries();
 		this._disposers.push(series.events.on("datavalidated", () => {
 			this._scheduleFocusView();
 		}));
+	}
+
+	protected _removeSeries(series: this["_seriesType"]) {
+		super._removeSeries(series);
+		this.markDirtyGeometries();
 	}
 
 	// Check of which focusable map objects are in view, waiting for the map to
@@ -1029,6 +1060,12 @@ export class MapChart extends SerialChart {
 		});
 	}
 
+
+	// The zoom level the projection is at, which trails `zoomLevel` until the next frame
+	protected _drawnZoom(): number {
+		const mapScale = this.getPrivate("mapScale");
+		return mapScale ? this.get("projection")!.scale() / mapScale : this.get("zoomLevel", 1);
+	}
 
 	// Before the first fit there is no scale to zoom
 	protected _applyZoom() {
@@ -1116,6 +1153,12 @@ export class MapChart extends SerialChart {
 				if (center && $type.isNumber(center[0]) && $type.isNumber(center[1])) {
 					return { longitude: center[0], latitude: center[1] };
 				}
+				// the middle falls where nothing is drawn, such as between an interrupted projection's
+				// lobes: the point the home rotation turns to the middle
+				if (rotate) {
+					const rotation = this._homeRotation();
+					return { longitude: -rotation[0], latitude: -rotation[1] };
+				}
 			}
 			homeGeoPoint = this.invert({ x: w / 2, y: h / 2 });
 		}
@@ -1190,6 +1233,8 @@ export class MapChart extends SerialChart {
 		// Not fitted yet, so there is no home to go to: goes once it is
 		if (!this._fitted) {
 			this._goHomeOnFit = { duration: duration };
+			// the last call wins
+			this._zoomOnFit = undefined;
 			return;
 		}
 		const rotation = this.get("homeRotationX") != null || this.get("homeRotationY") != null ? this._homeRotation() : [undefined, undefined];
@@ -1224,9 +1269,17 @@ export class MapChart extends SerialChart {
 	}
 
 	protected _setUpTouch(): void {
-		if (!this.chartContainer._display.cancelTouch) {
-			this.chartContainer._display.cancelTouch = (this.get("pinchZoom") || this.get("panX") || this.get("panY")) ? true : false;
-		}
+		this.chartContainer._display.cancelTouch = (this.get("pinchZoom") || this._canPan()) ? true : false;
+	}
+
+	/**
+	 * Whether dragging moves or turns the map: `"none"` is a value of `panX`
+	 * and `panY`, so a plain truthy test is not enough.
+	 */
+	protected _canPan(): boolean {
+		const panX = this.get("panX");
+		const panY = this.get("panY");
+		return (!!panX && panX != "none") || (!!panY && panY != "none");
 	}
 
 
@@ -1400,7 +1453,7 @@ export class MapChart extends SerialChart {
 				bg.events.enableType("click");
 			}
 
-			if (this.get("panX") || this.get("panY")) {
+			if (this._canPan()) {
 
 				if (this._za) {
 					this._za.stop();
@@ -1442,6 +1495,8 @@ export class MapChart extends SerialChart {
 	/**
 	 * Converts a point on the map to geographic coordinates. A point with no
 	 * location, such as one off a globe, gives longitude and latitude `0`.
+	 * It reads the map as drawn: a zoom, pan or rotation set since counts from
+	 * the next frame.
 	 *
 	 * @param  point  Point in pixels, relative to the map's area (the chart inside its padding)
 	 * @return        Geographic coordinates
@@ -1461,7 +1516,8 @@ export class MapChart extends SerialChart {
 
 	/**
 	 * Converts geographic coordinates to a point on the map. Given one rotation
-	 * only, it takes the other, and `rotationZ`, as `0`.
+	 * only, it takes the other as `0`; `rotationZ` stays as it is. It reads the
+	 * map as drawn: a zoom, pan or rotation set since counts from the next frame.
 	 *
 	 * @param  point      Geographic coordinates
 	 * @param  rotationX  `rotationX` to convert at instead of the current rotation
@@ -1486,7 +1542,7 @@ export class MapChart extends SerialChart {
 				rotationY = 0;
 			}
 			let rotation = projection.rotate();
-			projection.rotate([rotationX, rotationY, 0]);
+			projection.rotate([rotationX, rotationY, rotation[2]]);
 			xy = projection([point.longitude, point.latitude]);
 			projection.rotate(rotation);
 		}
@@ -1681,8 +1737,10 @@ export class MapChart extends SerialChart {
 	}
 
 	/**
-	 * Zooms the map to fit geographic bounds, with a 10% margin. Bounds whose
-	 * `right` is less than `left` take all longitudes.
+	 * Zooms the map to fit geographic bounds as they are drawn, with a 10%
+	 * margin. Bounds across the date line have `right` less than `left`, such
+	 * as 170 to -170 (or 170 to 190, or -190 to -170). A flat map shows them at
+	 * both of its edges unless it is turned: pass `rotationX`, -180 here.
 	 *
 	 * @param  geoBounds  Longitudes `left` and `right`, latitudes `top` and `bottom`, in degrees
 	 * @param  duration   Animation duration in milliseconds; `animationDuration` if not set
@@ -1691,41 +1749,84 @@ export class MapChart extends SerialChart {
 	 * @return            Zoom level animation
 	 */
 	public zoomToGeoBounds(geoBounds: { left: number, right: number, top: number, bottom: number }, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
-		if (geoBounds.right < geoBounds.left) {
-			geoBounds = { left: -180, right: 180, top: geoBounds.top, bottom: geoBounds.bottom };
+		let left = geoBounds.left;
+		let right = geoBounds.right;
+		// the span eastward from `left`, moved so that `left` is in -180..180
+		if (right < left) {
+			right += 360;
+		}
+		if (right - left >= 360) {
+			left = -180;
+			right = 180;
+		}
+		while (left < -180) {
+			left += 360;
+			right += 360;
+		}
+		while (left >= 180) {
+			left -= 360;
+			right -= 360;
+		}
+		let box: any = $mapUtils.getGeoRectangle(geoBounds.top, Math.min(right, 180), geoBounds.bottom, left);
+		if (right > 180) {
+			// across the date line: east of `left` up to it, and on from it to `right`
+			const west = $mapUtils.getGeoRectangle(geoBounds.top, right - 360, geoBounds.bottom, -180);
+			box = { type: "MultiPolygon", coordinates: box.coordinates.concat(west.coordinates) };
+		}
+		return this._zoomToGeometry(box, duration, rotationX, rotationY);
+	}
+
+	/**
+	 * Zooms the map to fit a geometry as it is drawn, with a 10% margin.
+	 *
+	 * @ignore
+	 */
+	public _zoomToGeometry(geometry: any, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
+		// Not fitted yet, so there is no map to measure: zooms once it is
+		if (!this._fitted) {
+			this._zoomOnFit = () => this._zoomToGeometry(geometry, duration, rotationX, rotationY);
+			this._goHomeOnFit = undefined;
+			return;
 		}
 
+		const projection = this.get("projection")!;
 		const geoPath = this.getPrivate("geoPath");
-		const mapBounds = $mapUtils.boundsInOutline(this.get("projection")!, geoPath.bounds(this._geometryColection));
+		const mapBounds = $mapUtils.boundsInOutline(projection, geoPath.bounds(this._geometryColection));
 
-		let p0 = this.convert({ longitude: geoBounds.left, latitude: geoBounds.top }, rotationX, rotationY);
-		let p1 = this.convert({ longitude: geoBounds.right, latitude: geoBounds.bottom }, rotationX, rotationY);
-
-		if (p0.y < mapBounds[0][1]) {
-			p0.y = mapBounds[0][1];
+		// The geometry as drawn where the map ends up: on a curved projection a box's edges bulge past its
+		// corners, and a globe shows only its near side
+		const rotation = projection.rotate ? projection.rotate() : undefined;
+		const rotate = rotation && (rotationX != null || rotationY != null);
+		if (rotate) {
+			rotationX = rotationX != null ? rotationX : rotation![0];
+			rotationY = rotationY != null ? rotationY : rotation![1];
+			projection.rotate([rotationX, rotationY, rotation![2]]);
+		}
+		const box = geoPath.bounds(geometry);
+		const bounds = { left: box[0][0], right: box[1][0], top: Math.max(box[0][1], mapBounds[0][1]), bottom: Math.min(box[1][1], mapBounds[1][1]) };
+		const middle = projection.invert ? projection.invert([(bounds.left + bounds.right) / 2, (bounds.top + bounds.bottom) / 2]) : null;
+		if (rotate) {
+			projection.rotate(rotation!);
 		}
 
-		if (p1.y > mapBounds[1][1]) {
-			p1.y = mapBounds[1][1];
+		const zl = this._drawnZoom();
+		const seriesContainer = this.seriesContainer;
+		const zoomLevel = .9 * Math.min(seriesContainer.innerWidth() / (bounds.right - bounds.left) * zl, seriesContainer.innerHeight() / (bounds.bottom - bounds.top) * zl);
+
+		// nothing of it is on the map
+		if (!(zoomLevel > 0 && isFinite(zoomLevel))) {
+			return;
 		}
 
-		let zl = this.get("zoomLevel", 1);
-
-		let bounds = { left: p0.x, right: p1.x, top: p0.y, bottom: p1.y };
-
-		let seriesContainer = this.seriesContainer;
-
-		let zoomLevel = .9 * Math.min(seriesContainer.innerWidth() / (bounds.right - bounds.left) * zl, seriesContainer.innerHeight() / (bounds.bottom - bounds.top) * zl);
-		let x = bounds.left + (bounds.right - bounds.left) / 2;
-		let y = bounds.top + (bounds.bottom - bounds.top) / 2;
-
-		let geoPoint = this.invert({ x, y });
-
-		if (rotationX != null || rotationY != null) {
-			this.rotate(rotationX, rotationY, duration);
+		if (!middle || !isFinite(middle[0]) || !isFinite(middle[1])) {
+			// a middle with no place, such as between an interrupted projection's lobes: the point as drawn
+			if (!rotate) {
+				return this.zoomToPoint({ x: (bounds.left + bounds.right) / 2, y: (bounds.top + bounds.bottom) / 2 }, zoomLevel, true, duration);
+			}
+			return;
 		}
 
-		return this.zoomToGeoPoint(geoPoint, zoomLevel, true, duration);
+		return this.zoomToGeoPoint({ longitude: middle[0], latitude: middle[1] }, zoomLevel, true, duration, rotate ? rotationX : undefined, rotate ? rotationY : undefined);
 	}
 
 	/**
@@ -1758,8 +1859,11 @@ export class MapChart extends SerialChart {
 		let x = point.x;
 		let y = point.y;
 
-		let tx = this.get("translateX", 0);
-		let ty = this.get("translateY", 0);
+		// the point is on the map as drawn, which a change in this tick has not reached yet
+		const translate = this.get("projection")!.translate();
+		let tx = translate[0];
+		let ty = translate[1];
+		const drawnZoom = this._drawnZoom();
 
 		let cx = x;
 		let cy = y;
@@ -1770,8 +1874,8 @@ export class MapChart extends SerialChart {
 			cy = this.innerHeight() / 2;
 		}
 
-		let xx = cx - ((x - tx) / zoomLevel * level);
-		let yy = cy - ((y - ty) / zoomLevel * level);
+		let xx = cx - ((x - tx) / drawnZoom * level);
+		let yy = cy - ((y - ty) / drawnZoom * level);
 
 
 		this._txa = this.animate({ key: "translateX", to: xx, duration: duration, easing: easing });
@@ -1807,10 +1911,16 @@ export class MapChart extends SerialChart {
 	 * @param  duration   Animation duration in milliseconds; `animationDuration` if not set
 	 * @param  rotationX  `rotationX` to end at
 	 * @param  rotationY  `rotationY` to end at
-	 * @return            Zoom level animation
+	 * @return            Zoom level animation; none if called before the map is drawn, as it zooms once it is
 	 *
 	 */
 	public zoomToGeoPoint(geoPoint: IGeoPoint, level: number, center?: boolean, duration?: number, rotationX?: number, rotationY?: number): Animation<this["_settings"]["zoomLevel"]> | undefined {
+		// Not fitted yet, so the point has no place on the map: zooms once it has
+		if (!this._fitted) {
+			this._zoomOnFit = () => this.zoomToGeoPoint(geoPoint, level, center, duration, rotationX, rotationY);
+			this._goHomeOnFit = undefined;
+			return;
+		}
 
 		let xy = this.convert(geoPoint, rotationX, rotationY);
 

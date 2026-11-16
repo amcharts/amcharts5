@@ -103,6 +103,24 @@ export interface IContainerSettings extends ISpriteSettings {
 	reverseChildren?: boolean;
 
 	/**
+	 * With `"rtl"`, a horizontal or grid layout places the children from right
+	 * to left, as a mirror image of `"ltr"`: a child's `marginLeft` ends up on
+	 * its right. Rows of a grid still go from top to bottom. A vertical layout
+	 * lines up children with no `x` of their own on the right. For right-to-left
+	 * languages, e.g. on a legend:
+	 * `am5.Legend.new(root, { direction: "rtl" })`.
+	 *
+	 * A container with a width of its own starts at its right edge; one sized
+	 * by its content keeps its size.
+	 *
+	 * Not set, a legend follows the root element's `direction`, and a legend's
+	 * items follow their legend; other containers are left to right.
+	 *
+	 * @since 5.22.0
+	 */
+	direction?: "ltr" | "rtl";
+
+	/**
 	 * HTML content of the container. It can hold data placeholders, such as
 	 * `{category}`.
 	 *
@@ -178,6 +196,9 @@ export class Container extends Sprite {
 
 	protected _hsbd0: IDisposer | undefined;
 	protected _hsbd1: IDisposer | undefined;
+
+	// what the author set that a `verticalScrollbar` takes over, to put back when it goes
+	protected _scrollbarRestore: { maskContent?: boolean, paddingRight?: number } | undefined;
 
 	public _childrenPrep: boolean = false;
 	public _childrenUpdt: boolean = false;
@@ -257,6 +278,14 @@ export class Container extends Sprite {
 			}
 		}
 
+		if (this.isDirty("direction")) {
+			this.markDirtyBounds();
+			// children that follow this direction, such as a legend's items, lay out again
+			this.children.each((child) => {
+				child.markDirtyBounds();
+			});
+		}
+
 		if (this.isDirty("paddingTop") || this.isDirty("paddingBottom") || this.isDirty("paddingLeft") || this.isDirty("paddingRight")) {
 			this.children.each((child) => {
 				child.markDirtyPosition();
@@ -333,8 +362,17 @@ export class Container extends Sprite {
 				}
 			}
 
+			// in its own units: a size measured from its content includes its scale
 			let width = this.width();
 			let height = this.height();
+			if (this.get("scale", 1) != 1) {
+				if (this.get("width") == null && this.getPrivate("width") == null) {
+					width = w;
+				}
+				if (this.get("height") == null && this.getPrivate("height") == null) {
+					height = h;
+				}
+			}
 
 			if (background) {
 				background._setCAll({ width: w, height: h, x: x, y: y });
@@ -350,8 +388,9 @@ export class Container extends Sprite {
 
 			const verticalScrollbar = this.get("verticalScrollbar")!;
 			if (verticalScrollbar) {
-				verticalScrollbar.set("height", height);
-				verticalScrollbar.set("x", width - verticalScrollbar.width() - verticalScrollbar.get("marginRight", 0));
+				// placed by the container
+				verticalScrollbar._setC("height", height);
+				verticalScrollbar._setC("x", width - verticalScrollbar.width() - verticalScrollbar.get("marginRight", 0));
 
 				const visibleRatio = Math.min(1, height / this._contentHeight);
 				const maxStart = Math.max(0, 1 - visibleRatio);
@@ -370,7 +409,7 @@ export class Container extends Sprite {
 				verticalScrollbar._setC("end", start + visibleRatio);
 				const bg = verticalScrollbar.get("background");
 				if (bg) {
-					bg.setAll({ width: verticalScrollbar.width(), height: height })
+					bg._setCAll({ width: verticalScrollbar.width(), height: height })
 				}
 
 				let visible = true;
@@ -474,6 +513,8 @@ export class Container extends Sprite {
 				const paddingTop = this.get("paddingTop", 0);
 				const paddingRight = this.get("paddingRight", 0);
 				const paddingBottom = this.get("paddingBottom", 0);
+				// a right-to-left layout mirrors the children with their margins
+				const rtl = horizontal && this._isRtl();
 
 				this.children.each((child) => {
 					// A hidden child takes no room, as the layouts already skip it
@@ -487,8 +528,8 @@ export class Container extends Sprite {
 						let cb = childY + childBounds.bottom;
 
 						if (horizontal) {
-							cl -= child.get("marginLeft", 0);
-							cr += child.get("marginRight", 0);
+							cl -= child.get(rtl ? "marginRight" : "marginLeft", 0);
+							cr += child.get(rtl ? "marginLeft" : "marginRight", 0);
 						}
 
 						if (vertical) {
@@ -591,6 +632,30 @@ export class Container extends Sprite {
 				this._contentHeight = bounds.bottom - bounds.top;
 			}
 		}
+	}
+
+	/**
+	 * Whether a horizontal or grid layout places the children from the right:
+	 * the container's own `direction`, else the root's for a legend, and the
+	 * legend's for its items.
+	 *
+	 * @ignore
+	 */
+	public _isRtl(): boolean {
+		const direction = this.get("direction");
+		if (direction) {
+			return direction == "rtl";
+		}
+		const parent = this.parent;
+		const tags: Array<string> | undefined = this.get("themeTagsSelf");
+		if (this.isType("Legend")) {
+			return this._root.settings.direction == "rtl";
+		}
+		// a legend's items follow their legend
+		if (parent && parent.isType("Legend") && tags && tags.indexOf("itemcontainer") != -1) {
+			return parent._isRtl();
+		}
+		return false;
 	}
 
 	public _updateBounds() {
@@ -730,14 +795,23 @@ export class Container extends Sprite {
 				verticalScrollbar.startGrip.setPrivate("visible", false);
 				verticalScrollbar.endGrip.setPrivate("visible", false);
 
-				this.set("maskContent", true);
-				this.set("paddingRight", verticalScrollbar.width() + verticalScrollbar.get("marginRight", 0) + verticalScrollbar.get("marginLeft", 0));
+				// the room the scrollbar takes is the container's own doing; what the
+				// author set is kept to be put back when the scrollbar goes
+				if (!this._scrollbarRestore) {
+					const own = (key: "maskContent" | "paddingRight") => this.isUserSetting(key) && !this.isComputedSetting(key);
+					this._scrollbarRestore = {
+						maskContent: own("maskContent") ? this.get("maskContent") : undefined,
+						paddingRight: own("paddingRight") ? this.get("paddingRight") : undefined
+					};
+				}
+				this._setC("maskContent", true);
+				this._setC("paddingRight", verticalScrollbar.width() + verticalScrollbar.get("marginRight", 0) + verticalScrollbar.get("marginLeft", 0));
 
 				this._setDefaultTagged("background", ["background"], () => {
 					return Rectangle.new(this._root, {
 						fillOpacity: 0,
 						fill: this._root.interfaceColors.get("alternativeBackground")
-					});
+					})._markC("fillOpacity", "fill");
 				});
 
 				this._vsbd0 = this.events.on("wheel", (event) => {
@@ -796,16 +870,37 @@ export class Container extends Sprite {
 					this._display.removeChild(previous._display);
 					if (this._vsbd0) {
 						this._vsbd0.dispose();
+						$array.remove(this._disposers, this._vsbd0);
+						this._vsbd0 = undefined;
 					}
 					if (this._vsbd1) {
 						this._vsbd1.dispose();
+						$array.remove(this._disposers, this._vsbd1);
+						this._vsbd1 = undefined;
 					}
 					const childrenDisplay = this._childrenDisplay;
 					childrenDisplay.y = 0;
 
 					this.setPrivate("height", undefined);
-					this.set("maskContent", false);
-					this.set("paddingRight", undefined);
+					// back to what the author, or else a theme, set
+					const restore = this._scrollbarRestore || {};
+					this._scrollbarRestore = undefined;
+					if (this.isComputedSetting("maskContent")) {
+						if (restore.maskContent != null) {
+							this.set("maskContent", restore.maskContent);
+						}
+						else {
+							this.remove("maskContent");
+						}
+					}
+					if (this.isComputedSetting("paddingRight")) {
+						if (restore.paddingRight != null) {
+							this.set("paddingRight", restore.paddingRight);
+						}
+						else {
+							this.remove("paddingRight");
+						}
+					}
 				}
 			}
 

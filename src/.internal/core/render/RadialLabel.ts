@@ -3,6 +3,11 @@ import { p50, Percent } from "../util/Percent";
 import { Label, ILabelPrivate, ILabelSettings } from "./Label";
 import { RadialText } from "./RadialText";
 
+import type { IBounds } from "../util/IBounds";
+
+import { lineSizes } from "../util/Fit";
+
+import * as $array from "../util/Array";
 import * as $math from "../util/Math";
 import * as $utils from "../util/Utils";
 
@@ -143,6 +148,74 @@ export class RadialLabel extends Label {
 		return this.baseRadius() + this.get("radius", 0) * (inside ? -1 : 1);
 	}
 
+	/**
+	 * For a `"circular"` label, its length along the arc and its height, as
+	 * last laid out; `undefined` for other labels, or before it is drawn.
+	 *
+	 * @ignore
+	 */
+	public _arcSize(): { length: number, height: number } | undefined {
+		if (this.get("textType") != "circular") {
+			return undefined;
+		}
+		const size = lineSizes(this._text);
+		// spacing follows every letter
+		const length = size.widest + (size.count ? this.get("kerning", 0) * (this._text._display.text || "").length : 0);
+		return length > 0 ? { length: length, height: size.height } : undefined;
+	}
+
+	/**
+	 * For a `"circular"` label, the angles in degrees its arc runs between and
+	 * the radii of its two edges, at its radius or at another one.
+	 *
+	 * @ignore
+	 */
+	public _arc(size: { length: number, height: number }, radius?: number): { start: number, end: number, inner: number, outer: number } {
+		if (radius == null) {
+			radius = this.radius();
+		}
+		const inside = this.get("inside", false);
+		const edge = inside ? radius - size.height : radius + size.height;
+		const middle = this.get("labelAngle", 0);
+		// letters are spaced along the text's inner edge, as `RadialText` draws them
+		const pitch = Math.min(radius, edge);
+		const span = pitch > 0 ? size.length / pitch * $math.DEGREES : 0;
+		// centered on its angle, running on from it, or running back from it
+		const align = this._text.get("textAlign", "left");
+		const start = align == "center" ? middle - span / 2 : align == "left" ? middle : middle - span;
+		return { start: start, end: start + span, inner: pitch, outer: Math.max(radius, edge) };
+	}
+
+	/**
+	 * For a `"circular"` label, the box its arc covers on the page, as last
+	 * laid out; `undefined` for other labels, or before it is drawn.
+	 *
+	 * @ignore
+	 */
+	public _arcGlobalBounds(): IBounds | undefined {
+		const size = this._arcSize();
+		const parent = this.parent;
+		if (!size || !parent) {
+			return undefined;
+		}
+		const arc = this._arc(size);
+		// its ends, and where it crosses an axis
+		const angles = [arc.start, arc.end];
+		for (let angle = Math.ceil(arc.start / 90) * 90; angle < arc.end; angle += 90) {
+			angles.push(angle);
+		}
+		const xs: Array<number> = [];
+		const ys: Array<number> = [];
+		$array.each(angles, (angle) => {
+			$array.each([arc.inner, arc.outer], (r) => {
+				const point = parent.toGlobal({ x: r * $math.cos(angle), y: r * $math.sin(angle) });
+				xs.push(point.x);
+				ys.push(point.y);
+			});
+		});
+		return { left: Math.min(...xs), right: Math.max(...xs), top: Math.min(...ys), bottom: Math.max(...ys) };
+	}
+
 	public _updateChildren() {
 		super._updateChildren();
 
@@ -227,6 +300,18 @@ export class RadialLabel extends Label {
 		}
 	}
 
+
+	public _updateBounds(): void {
+		const before = this._localBounds;
+		super._updateBounds();
+		const after = this._localBounds;
+		// placed by its size: placed again when only its size changes, e.g. its
+		// text wraps or a font loads
+		const textType = this.get("textType");
+		if ((textType == "adjusted" || textType == "radial") && before && after && (Math.abs((after.right - after.left) - (before.right - before.left)) > 0.01 || Math.abs((after.bottom - after.top) - (before.bottom - before.top)) > 0.01)) {
+			this.markDirtyPosition();
+		}
+	}
 
 	public _updatePosition() {
 

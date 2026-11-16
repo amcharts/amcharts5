@@ -1,5 +1,5 @@
 const $path = require("path");
-const { cp, cpMaybe, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, geodataToScript, removeTypeScriptTypes } = require("../util");
+const { cp, cpMaybe, cpScriptFiles, rm, mkdir, readdir, readFile, writeFile, posixPath, webpack, geodataToScript, removeTypeScriptTypes } = require("../util");
 const dependencies = require("../script-dependencies");
 
 
@@ -81,7 +81,6 @@ export default function () {
 
 				const file = `import fixPolyfills from "./polyfill.js";
 import "./core-js.js";
-import "regenerator-runtime/runtime.js";
 import * as m from "./${importPath}";
 
 export const ${mangledName} = m;
@@ -162,7 +161,8 @@ async function getEntries(input, output) {
 	const files = await readdir(input);
 
 	await Promise.all(files.map(async (name) => {
-		if (name[0] !== "." && name !== "examples") {
+		// dist/ is the copy of an earlier script build (see copyToPackage)
+		if (name[0] !== "." && name !== "examples" && name !== "dist") {
 			const defaultImport = name === "lang" || name === "themes" || name === "locales";
 			await getEntriesSub(entries, $path.join(input, name), $path.join(output, name), name, defaultImport);
 		}
@@ -193,15 +193,52 @@ async function copyFiles(state, output) {
 }
 
 
-async function removeError(output) {
-	const dir = $path.join(output, "index.js");
+// The npm package carries the same script files in dist/, so a page can load them with script tags
+// from node_modules or an npm CDN (jsDelivr, unpkg); the package has its own examples and docs
+async function copyToPackage(state, output) {
+	const target = state.path("dist", "es2015", "dist");
 
-	const file = await readFile(dir);
+	await rm(target);
+	await cpScriptFiles(output, target, ["examples", "docs"]);
+}
 
-	await writeFile(dir, file.replace(
-		/function\(\) *\{\s*if\(![_a-zA-Z]+\.m\[\d+\]\) *\{ *var [a-zA-Z]+ *= *new Error\("Module '[^\(\n\r]+\(weak dependency\)"\);[^\}\n\r]+\} *return ([^;\}\n\r]+);?\s*\}/g,
-		"()=>$1"
-	));
+
+// Replaces the "weak dependency" error stubs in index.js with a plain getter, after
+// minifying and before the source map is made, so the map stays exact
+class RemoveWeakErrors {
+	apply(compiler) {
+		const { Compilation, sources } = compiler.webpack;
+
+		compiler.hooks.thisCompilation.tap("RemoveWeakErrors", (compilation) => {
+			compilation.hooks.processAssets.tap({ name: "RemoveWeakErrors", stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE + 1 }, () => {
+				const asset = compilation.getAsset("index.js");
+
+				if (asset) {
+					const text = asset.source.source().toString();
+					const stub = /(?:function\(\) *|\(\) *=> *)\{\s*if\(![_a-zA-Z]+\.m\[\d+\]\) *\{ *var [a-zA-Z]+ *= *new Error\("Module '[^\(\n\r]+\(weak dependency\)"\);[^\}\n\r]+\} *return ([^;\}\n\r]+);?\s*\}/g;
+					let source = null;
+					let match;
+					let count = 0;
+
+					while ((match = stub.exec(text)) !== null) {
+						source = source || new sources.ReplaceSource(asset.source);
+						source.replace(match.index, match.index + match[0].length - 1, "()=>" + match[1]);
+						count++;
+					}
+
+					if (source) {
+						compilation.updateAsset("index.js", source);
+					}
+
+					// a stub the pattern no longer recognises would quietly stay in the minified bundle
+					const stubs = (text.match(/\(weak dependency\)/g) || []).length;
+					if (compiler.options.optimization.minimize && count < stubs) {
+						compilation.errors.push(new compiler.webpack.WebpackError(`RemoveWeakErrors: ${stubs - count} of ${stubs} weak-dependency stubs in index.js were not replaced; update the pattern`));
+					}
+				}
+			});
+		});
+	}
 }
 
 
@@ -235,7 +272,7 @@ module.exports = async (state) => {
 
 		stats: "errors-warnings",
 
-		target: ["web", "es5"],
+		target: ["web", "es2015"],
 
 		context: $path.resolve(state.cwd),
 
@@ -320,6 +357,7 @@ module.exports = async (state) => {
 				ignore: [/\/\.internal\/themes\//],
 			}),
 			new $webpack.NormalModuleReplacementPlugin(/^\.\/Classes$/, "./Classes-script"),
+			new RemoveWeakErrors(),
 		],
 
 		module: {
@@ -356,7 +394,8 @@ module.exports = async (state) => {
 	await Promise.all([
 		buildWorldLow(state),
 		removeFiles(output),
-		removeError(output),
 		copyFiles(state, output),
 	]);
+
+	await copyToPackage(state, output);
 };

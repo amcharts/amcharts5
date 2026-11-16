@@ -113,6 +113,8 @@ export abstract class MapSeries extends Series {
 	protected _types: Array<GeoJSON.GeoJsonGeometryTypes> = [];
 
 	public _geometries: Array<GeoJSON.Geometry> = [];
+	// where each geometry is in `_geometries`: it is added once, and removed without a search
+	protected _geometryIndex: Map<GeoJSON.Geometry, number> = new Map();
 	protected _geoJSONparsed: boolean = false;
 
 	protected _excluded: Array<DataItem<IMapSeriesDataItem>> = [];
@@ -131,6 +133,12 @@ export abstract class MapSeries extends Series {
 			}
 		})
 
+		this.on("affectsBounds", () => {
+			if (this.chart) {
+				this.chart.markDirtyGeometries();
+			}
+		})
+
 		super._afterNew();
 	}
 
@@ -143,13 +151,19 @@ export abstract class MapSeries extends Series {
 			this._geoJSONparsed = false;
 		}
 
-		if (!this._geoJSONparsed) {
+		// parsed only once there is a geoJSON, so one set later is not skipped
+		if (!this._geoJSONparsed && geoJSON) {
 			this._parseGeoJSON();
 			this._geoJSONparsed = true;
 		}
 	}
 
 	public _prepareChildren() {
+		// the data items made from the geoJSON exist before the values are aggregated
+		if (this.get("geoJSON") && (this._valuesDirty || this.isDirty("geoJSON"))) {
+			this._handleDirties();
+		}
+
 		super._prepareChildren();
 
 		if (this._valuesDirty) {
@@ -163,6 +177,16 @@ export abstract class MapSeries extends Series {
 			const chart = this.chart;
 
 			const exclude = this.get("exclude");
+			const include = this.get("include");
+			// an item comes back only if the other setting doesn't leave it out too
+			const excluded = (dataItem: DataItem<this["_dataItemSettings"]>) => {
+				const id = dataItem.get("id");
+				return !!exclude && id != null && exclude.indexOf(id) != -1;
+			};
+			const notIncluded = (dataItem: DataItem<this["_dataItemSettings"]>) => {
+				const id = dataItem.get("id");
+				return !!include && !!id && include.indexOf(id) == -1;
+			};
 
 			if (exclude) {
 				if (chart) {
@@ -178,7 +202,7 @@ export abstract class MapSeries extends Series {
 				$array.each(this._excluded, (dataItem) => {
 					const id = dataItem.get("id");
 					if (id) {
-						if (exclude.indexOf(id) == -1) {
+						if (exclude.indexOf(id) == -1 && !notIncluded(dataItem)) {
 							this._unexcludeDataItem(dataItem)
 						}
 					}
@@ -188,12 +212,13 @@ export abstract class MapSeries extends Series {
 
 			if (!exclude || exclude.length == 0) {
 				$array.each(this._excluded, (dataItem) => {
-					this._unexcludeDataItem(dataItem)
+					if (!notIncluded(dataItem)) {
+						this._unexcludeDataItem(dataItem)
+					}
 				})
 				this._excluded = [];
 			}
 
-			const include = this.get("include");
 			if (include) {
 				if (chart) {
 					chart._centerLocation = null;
@@ -203,7 +228,7 @@ export abstract class MapSeries extends Series {
 					if (id && include.indexOf(id) == -1) {
 						this._notIncludeDataItem(dataItem);
 					}
-					else {
+					else if (!excluded(dataItem)) {
 						this._unNotIncludeDataItem(dataItem);
 					}
 				})
@@ -211,7 +236,9 @@ export abstract class MapSeries extends Series {
 
 			if (!include) {
 				$array.each(this._notIncluded, (dataItem) => {
-					this._unNotIncludeDataItem(dataItem);
+					if (!excluded(dataItem)) {
+						this._unNotIncludeDataItem(dataItem);
+					}
 				})
 				this._notIncluded = [];
 			}
@@ -297,8 +324,11 @@ export abstract class MapSeries extends Series {
 						let type = geometry.type;
 						let id: string = feature[idField];
 
+						// GeoJSON allows `"properties": null`
+						const properties: any = feature.properties || {};
+
 						if (geodataNames && geodataNames[id]) {
-							feature.properties.name = geodataNames[id];
+							properties.name = geodataNames[id];
 						}
 
 						if (this._types.indexOf(type) != -1) {
@@ -325,6 +355,8 @@ export abstract class MapSeries extends Series {
 							if (!dataItem) {
 								dataObject = { geometry: geometry, geometryType: type, madeFromGeoData: true };
 								dataObject[idField] = id;
+								// before the push, so fields like `valueField` are read from them
+								$object.softCopyProperties(properties, dataObject);
 								this.data.push(dataObject);
 							}
 							// in case found
@@ -340,7 +372,7 @@ export abstract class MapSeries extends Series {
 							}
 
 							// copy properties data to datacontext
-							$object.softCopyProperties(feature.properties, dataObject);
+							$object.softCopyProperties(properties, dataObject);
 						}
 					}
 				}
@@ -386,8 +418,10 @@ export abstract class MapSeries extends Series {
 		}
 	}
 
-	protected _addGeometry(geometry: any, series: MapSeries) {
-		if (geometry && series.get("affectsBounds", true)) {
+	// kept whatever `affectsBounds` is: the chart counts them only while it is on
+	protected _addGeometry(geometry: any, _series: MapSeries) {
+		if (geometry && !this._geometryIndex.has(geometry)) {
+			this._geometryIndex.set(geometry, this._geometries.length);
 			this._geometries.push(geometry);
 
 			const chart = this.chart;
@@ -397,15 +431,33 @@ export abstract class MapSeries extends Series {
 		}
 	}
 
-	protected _removeGeometry(geometry: any) {
-		if (geometry) {
-			$array.remove(this._geometries, geometry);
-
-			const chart = this.chart;
-			if (chart) {
-				chart.markDirtyGeometries();
-			}
+	protected _removeGeometry(geometry: any): boolean {
+		const index = geometry ? this._geometryIndex.get(geometry) : undefined;
+		if (index === undefined) {
+			return false;
 		}
+		// the last one takes its place: the order doesn't count
+		const geometries = this._geometries;
+		const last = geometries.pop()!;
+		if (last !== geometry) {
+			geometries[index] = last;
+			this._geometryIndex.set(last, index);
+		}
+		this._geometryIndex.delete(geometry);
+
+		const chart = this.chart;
+		if (chart) {
+			chart.markDirtyGeometries();
+		}
+		return true;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public disposeDataItem(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super.disposeDataItem(dataItem);
+		this._removeGeometry(dataItem.get("geometry"));
 	}
 
 	protected _dispose() {

@@ -1,10 +1,12 @@
-import { Layout, eachChildren } from "./Layout";
+import { Layout, eachChildren, placeX } from "./Layout";
+import type { IPlaced } from "./Layout";
 import * as $type from "../util/Type";
 import { Percent } from "../util/Percent";
 import type { Container } from "./Container";
 
 /**
- * Lays out a [[Container]]'s children side by side, from left to right.
+ * Lays out a [[Container]]'s children side by side, from left to right, or
+ * from right to left with the container's `direction: "rtl"`.
  * Children with a percent width share the width the others leave, in
  * proportion to their percents.
  *
@@ -83,6 +85,8 @@ export class HorizontalLayout extends Layout {
 		//}
 
 		let prevX = paddingLeft;
+		const rtl = container._isRtl();
+		const placed: Array<IPlaced> = [];
 
 		eachChildren(container, (child) => {
 
@@ -103,7 +107,12 @@ export class HorizontalLayout extends Layout {
 					}
 
 					let x = prevX + marginLeft - left;
-					child.setPrivate("x", x);
+					if (rtl) {
+						placed.push({ child, x, left, right });
+					}
+					else {
+						child.setPrivate("x", x);
+					}
 					prevX = x + right + marginRight;
 				}
 				else {
@@ -111,5 +120,9 @@ export class HorizontalLayout extends Layout {
 				}
 			}
 		});
+
+		if (rtl) {
+			placeX(container, placed, prevX);
+		}
 	}
 }

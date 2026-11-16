@@ -1,4 +1,5 @@
 import type { PieSeries } from "./PieSeries";
+import type { IBounds } from "../../core/util/IBounds";
 
 import { Percent } from "../../core/util/Percent";
 import { PercentChart, IPercentChartPrivate, IPercentChartSettings } from "../percent/PercentChart";
@@ -6,6 +7,7 @@ import { p50 } from "../../core/util/Percent";
 
 import * as $utils from "../../core/util/Utils";
 import * as $math from "../../core/util/Math";
+import * as $object from "../../core/util/Object";
 
 
 export interface IPieChartSettings extends IPercentChartSettings {
@@ -78,6 +80,51 @@ export class PieChart extends PercentChart {
 
 	public _maxRadius: number = 1;
 
+	// What series with `autoLabels` ask of the pie, by series uid: the most its radius may be, and a move sideways
+	protected _fits: { [uid: number]: { radius: number, dx: number } } = {};
+
+	/**
+	 * Caps the pie's radius and moves it sideways for a series' labels, or
+	 * gives both back with no radius.
+	 *
+	 * @ignore
+	 */
+	public _fitPie(series: PieSeries, radius?: number, dx: number = 0) {
+		const fits = this._fits;
+		const before = fits[series.uid];
+		if (radius == null) {
+			if (!before) {
+				return;
+			}
+			delete fits[series.uid];
+		}
+		else {
+			// half a pixel either way is no change, so the pie settles
+			if (before && Math.abs(before.radius - radius) < 0.5 && Math.abs(before.dx - dx) < 0.5) {
+				return;
+			}
+			fits[series.uid] = { radius: radius, dx: dx };
+		}
+		this.markDirtyKey("radius");
+	}
+
+	/**
+	 * The radius from the `radius` setting, before any cap.
+	 *
+	 * @ignore
+	 */
+	public _fullRadius(): number {
+		return $utils.relativeToValue(this.get("radius", 0), this._maxRadius);
+	}
+
+	/**
+	 * The box the pie's arc covers around its center, for a radius of 1: the
+	 * pie is moved so that this box is centered.
+	 *
+	 * @ignore
+	 */
+	public _arcBounds: IBounds = { left: -1, right: 1, top: -1, bottom: 1 };
+
 	protected _afterNew() {
 		super._afterNew();
 		this.seriesContainer.setAll({ x: p50, y: p50 });
@@ -121,13 +168,22 @@ export class PieChart extends PercentChart {
 		}
 
 		bounds = $math.mergeBounds([bounds, innerBounds]);
+		this._arcBounds = bounds;
 
 		const prevRadius = this._maxRadius;
 		this._maxRadius = Math.min(wr, hr);
 
-		const radius = $utils.relativeToValue(this.get("radius", 0), this._maxRadius);
+		const radius = this.radius();
+		// the first series that moves the pie, in series order
+		let shift = 0;
+		this.series.each((series) => {
+			const fit = this._fits[series.uid];
+			if (fit && !shift) {
+				shift = fit.dx;
+			}
+		});
 		this.seriesContainer.setAll({
-			dy: -radius * (bounds.bottom + bounds.top) / 2, dx: -radius * (bounds.right + bounds.left) / 2
+			dy: -radius * (bounds.bottom + bounds.top) / 2, dx: -radius * (bounds.right + bounds.left) / 2 + shift
 		})
 
 		if (this.isDirty("startAngle") || this.isDirty("endAngle") || prevRadius != this._maxRadius) {
@@ -151,7 +207,10 @@ export class PieChart extends PercentChart {
 	 */
 	public radius(series?: PieSeries): number {
 
-		let radius = $utils.relativeToValue(this.get("radius", 0), this._maxRadius);
+		let radius = this._fullRadius();
+		$object.each(this._fits, (_uid, fit) => {
+			radius = Math.min(radius, fit.radius);
+		});
 		let innerRadius = $utils.relativeToValue(this.get("innerRadius", 0), radius);
 
 		if (innerRadius < 0) {

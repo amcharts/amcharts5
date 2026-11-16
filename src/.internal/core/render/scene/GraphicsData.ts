@@ -244,9 +244,8 @@ export class DrawEllipse extends Op {
 	public readonly type = "drawEllipse";
 	constructor(public x: number, public y: number, public radiusX: number, public radiusY: number) { super(); }
 
-	// TODO ignores x/y (all callers pass 0, 0); bounds use them
 	public path(sink: IPathSink): void {
-		sink.ellipse(0, 0, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
+		sink.ellipse(this.x, this.y, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
 	}
 
 	// TODO handle skewing and rotation

@@ -97,6 +97,16 @@ export class Bullet extends Entity {
 	public _index?: number;
 
 	/**
+	 * Whether its place is being animated, such as an amount floating along a band.
+	 *
+	 * @ignore
+	 */
+	public _moving(): boolean {
+		const animating = this._animatingSettings;
+		return !!(animating.locationX || animating.locationY);
+	}
+
+	/**
 	 * The series the bullet belongs to, if any.
 	 */
 	public series: Series | undefined;

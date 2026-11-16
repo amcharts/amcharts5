@@ -33,21 +33,49 @@ With npm, for a project that uses a bundler:
 npm install @amcharts/amcharts5
 ```
 
-The type definitions come with it, and need TypeScript 5.0 or later.
+The type definitions come with it, and need TypeScript 5.0 or later. When you
+bundle it yourself, keep code splitting on. The export plugin loads its PDF,
+Excel and annotation code only when needed, and so do the parts that can reach
+it: the stock toolbar's drawing and indicator controls, `<am5-chart>` and the
+JSON plugin. A single-file bundle with any of them, or with the whole stock
+module kept (e.g. assigned to `window`), takes that code in up front, about
+1 MB more gzipped; a stock chart without those controls does not.
 
-With script tags, from the CDN or from the files in the
+Maps need map files (geodata), which are a separate package:
+[npm](https://www.npmjs.com/package/@amcharts/amcharts5-geodata),
+[GitHub](https://github.com/amcharts/amcharts5-geodata),
+[zip](https://www.amcharts.com/download/).
+
+
+## Plain HTML, no bundler
+
+With script tags, from the amCharts CDN or from the files in the
 [zip download](https://www.amcharts.com/download/):
 
 ```html
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/ResponsiveMax.js"></script>
 ```
 
-Maps need map files (geodata), which are a separate package:
-[npm](https://www.npmjs.com/package/@amcharts/amcharts5-geodata),
-[GitHub](https://github.com/amcharts/amcharts5-geodata),
-[zip](https://www.amcharts.com/download/).
+The npm package has the same files in `dist/`, so a page can also load them
+from `node_modules/@amcharts/amcharts5/dist/` or from an npm CDN such as
+jsDelivr or unpkg:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/ResponsiveMax.js"></script>
+```
+
+Load every file from the same version, with plain script tags (not
+`type="module"`). The parts loaded on first use, such as the export plugin's
+PDF and Excel code, come from the `deps/` folder beside `index.js`, wherever it
+is served from. `dist/geodata/worldLow.js` is the world map
+(`am5geodata_worldLow`); other maps are in the geodata package's `dist/`, on
+unpkg (jsDelivr does not serve a package that large).
 
 
 ## A first chart
@@ -62,11 +90,13 @@ The page needs an element with a height:
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 
 const root = am5.Root.new("chartdiv");
 
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  am5themes_ResponsiveMax.new(root)
 ]);
 
 const chart = root.container.children.push(am5xy.XYChart.new(root, {}));
@@ -98,9 +128,10 @@ xAxis.data.setAll(data);
 series.data.setAll(data);
 ```
 
-With script tags the code is the same without the three `import` lines: each
+With script tags the code is the same without the four `import` lines: each
 file makes its module a global of the same name (`am5`, `am5xy`,
-`am5themes_Animated`).
+`am5themes_Animated`, `am5themes_ResponsiveMax`). ResponsiveMax fits the chart
+to the space it gets, down to a phone.
 
 
 ## React, Vue, Angular and Svelte
@@ -158,7 +189,7 @@ Also in the library:
   selectors.
 * [Export](https://docs.amcharts.com/v5/concepts/exporting/): PNG, JPG,
   SVG, PDF, CSV, XLSX, JSON and HTML, and printing.
-* [30 themes](https://docs.amcharts.com/v5/concepts/themes/), among them
+* [31 themes](https://docs.amcharts.com/v5/concepts/themes/), among them
   dark, colorblind-friendly and responsive ones.
 * [Accessibility](https://docs.amcharts.com/v5/concepts/accessibility/):
   keyboard navigation and screen reader support.
@@ -182,6 +213,10 @@ A chart can be described as [a JSON config](https://docs.amcharts.com/v5/concept
 and built with `JsonParser`, and a running chart can be saved as one. Most
 examples come with their config.
 
+A config is read as data, so one from users or another site cannot run script
+on the page. A config of your own that reaches further needs `trusted: true`
+in the parse settings.
+
 The `<am5-chart>` element builds a chart from a config with no chart code at
 all, which suits plain pages, frameworks and tools that only take HTML:
 
@@ -191,15 +226,16 @@ all, which suits plain pages, frameworks and tools that only take HTML:
 <script src="https://cdn.amcharts.com/lib/5/element.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
 <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/ResponsiveMax.js"></script>
 
-<am5-chart themes="Animated" style="height: 400px" src="chart.json"></am5-chart>
+<am5-chart themes="Animated ResponsiveMax" style="height: 400px" src="chart.json"></am5-chart>
 ```
 
 The config comes from `src`, from a `config` attribute, or from the `config`
 property. With script tags, load `plugins/json.js` before `element.js`, and
 the file of every chart type the config uses; with npm, `import "@amcharts/amcharts5/element";` defines the element,
 the chart types load by themselves, and themes are given as classes:
-`element.themes = [am5themes_Animated]`. A theme with settings is a pair,
+`element.themes = [am5themes_Animated, am5themes_ResponsiveMax]`. A theme with settings is a pair,
 `[am5themes_Adaptive, { baseColor: "#4150a0" }]` (in the attribute, JSON:
 `themes='["Animated", ["Adaptive", { "baseColor": "#4150a0" }]]'`). A config
 names its geodata and locale (`"geoJSON": "am5geodata_worldLow"`), which are
@@ -241,8 +277,12 @@ amCharts also runs a hosted [MCP server](https://docs.amcharts.com/v5/ai/mcp/)
 with the docs, the API reference, 290+ working examples and the map files, at
 `https://mcp.amcharts.com/mcp`. No account or key is needed:
 
-* Claude: add [amCharts 5 from the Connectors Directory](https://claude.ai/directory/amcharts).
-* Claude Code: `claude mcp add --transport http amcharts5 https://mcp.amcharts.com/mcp`.
+* Claude (claude.ai, the Desktop app and Claude Code): install the
+  [amCharts 5 plugin](https://claude.ai/customize/plugins/id/88417dfb-479c-409d-8571-796c3a299aac%40anthropic-plugin-directory), which adds
+  this server and the amCharts skill together. In Claude Code:
+  `/plugin install amcharts5@anthropic-plugin-directory`.
+* The server alone: in Claude, add [amCharts 5 from the Connectors Directory](https://claude.ai/directory/amcharts);
+  in Claude Code, `claude mcp add --transport http amcharts5 https://mcp.amcharts.com/mcp`.
 * Cursor, VS Code, Windsurf and other MCP clients: add the URL above, or run
   it locally with `npx -y @amcharts/amcharts5-mcp`.
 
@@ -264,7 +304,7 @@ In short: the free license allows use in any project, commercial ones
 included, as long as the amCharts logo stays on the charts and the LICENSE file
 stays with the files. It does not allow selling the library or distributing it
 on its own. The LICENSE file has the exact terms, and
-[commercial licenses](https://www.amcharts.com/online-store/) cover what it
+[commercial licenses](https://www.amcharts.com/pricing/) cover what it
 does not.
 
 

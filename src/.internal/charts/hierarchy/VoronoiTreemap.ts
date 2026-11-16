@@ -7,7 +7,7 @@ import { ListTemplate } from "../../core/util/List";
 import { Polygon } from "../../core/render/Polygon";
 import { p50 } from "../../core/util/Percent";
 import { voronoiTreemap } from 'd3-voronoi-treemap';
-import seedrandom from "seedrandom";
+import seedrandom from "seedrandom/seedrandom.js";
 
 import * as $utils from "../../core/util/Utils";
 import * as $array from "../../core/util/Array";

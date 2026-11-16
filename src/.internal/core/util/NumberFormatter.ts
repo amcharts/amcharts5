@@ -370,8 +370,8 @@ export class NumberFormatter extends Entity {
 								item.modSpacing = matches[0].match(/[ ]{1}[abespABESP%‰!]{1}$/) ? true : false;
 							}
 
-							// break the format up
-							let a = matches[0].split(".");
+							// break the format up, without the modifier, which is not part of the last group
+							let a = matches[0].match(/^[#0.,]+/)![0].split(".");
 
 							// Deal with thousands
 							if (a[0] === "") {

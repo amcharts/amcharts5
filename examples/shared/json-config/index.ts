@@ -1,5 +1,6 @@
 import * as am5 from "@amcharts/amcharts5";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 import * as am5plugins_json from "@amcharts/amcharts5/plugins/json";
 
 
@@ -11,7 +12,8 @@ const root = am5.Root.new("chartdiv");
 // Set themes
 // https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  am5themes_ResponsiveMax.new(root) // fits the chart to small screens
 ]);
 
 

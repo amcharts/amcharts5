@@ -81,7 +81,6 @@ export class PyramidSeries extends FunnelSeries {
 
 	protected decorateSlice(dataItem: DataItem<this["_dataItemSettings"]>) {
 		const orientation = this.get("orientation");
-		const slicesContainer = this.slicesContainer;
 
 		const slice = dataItem.get("slice");
 		const label = dataItem.get("label");
@@ -106,17 +105,20 @@ export class PyramidSeries extends FunnelSeries {
 		let sliceHeight: number;
 		let sliceBottomWidth: number;
 
-		let pyramidHeight = slicesContainer.innerHeight();
-		let pyramidWidth = slicesContainer.innerWidth();
+		const box = this._sliceBox();
+		let pyramidHeight = box.bottom - box.top;
+		let pyramidWidth = box.right - box.left;
+		let across = box.left;
 		let linkWidth = link.width();
 		let linkHeight = link.height();
 
 		if (orientation == "horizontal") {
 			[pyramidWidth, pyramidHeight] = [pyramidHeight, pyramidWidth];
 			[linkWidth, linkHeight] = [linkHeight, linkWidth];
+			across = box.top;
 		}
 
-		const center = pyramidWidth / 2;
+		const center = across + pyramidWidth / 2;
 
 		let d = 1;
 		if (value != 0) {
@@ -174,16 +176,18 @@ export class PyramidSeries extends FunnelSeries {
 		let linkX = center;
 		let linkY = sliceY + sliceHeight;
 
+		// only aligned labels are spread apart; others stay on their slices, as in a funnel
+		const aligned = this.get("alignLabels") && label.get("opacity") > 0;
 		if (orientation == "vertical") {
 			label.set("y", labelCoord);
-			if (label.get("opacity") > 0) {
+			if (aligned) {
 				this._rLabels.push({ label: label, y: labelCoord });
 			}
 			slice.set("height", sliceHeight);
 		}
 		else {
 			label.set("x", labelCoord);
-			if (label.get("opacity") > 0) {
+			if (aligned) {
 				this._hLabels.push({ label: label, y: labelCoord });
 			}
 			[sliceX, sliceY] = [sliceY, sliceX];

@@ -2,6 +2,7 @@ import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5stock from "@amcharts/amcharts5/stock";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 
 // Daily prices: each file sets a global variable, e.g. window["AAPL_day"]
 import "./data/AAPL_day.js";
@@ -22,7 +23,8 @@ const root = am5.Root.new("chartdiv");
 // Set themes
 // https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  am5themes_ResponsiveMax.new(root) // fits the chart to small screens
 ]);
 
 // Set global number format

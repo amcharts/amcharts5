@@ -313,7 +313,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			if (endIndex < len - 1) {
 				endIndex++;
 			}
-			let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
+			let maxCount = renderer.axisLength() / Math.max(renderer.gridDistance(), 1 / Number.MAX_SAFE_INTEGER);
 			let frequency = Math.min(len, Math.ceil((endIndex - startIndex) / maxCount));
 			frequency = Math.max(1, frequency);
 
@@ -332,7 +332,7 @@ export class GaplessDateAxis<R extends AxisRenderer> extends DateAxis<R> {
 			let realDuration = (endTime - startTime) - ((endTime - startTime) / baseDuration - (endIndex - startIndex)) * baseDuration;
 
 			// if all items are on axis
-			let gridInterval = $time.chooseInterval(0, realDuration, maxCount, this.get("gridIntervals")!);
+			let gridInterval = this._chooseGridInterval(realDuration, maxCount, this.get("gridIntervals")!);
 
 			const baseInterval = this.getPrivate("baseInterval");
 			let intervalDuration = $time.getIntervalDuration(gridInterval);

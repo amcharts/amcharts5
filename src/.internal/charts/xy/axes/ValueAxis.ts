@@ -1146,7 +1146,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		const min = this.getPrivate("minFinal");
 		const max = this.getPrivate("maxFinal");
 
-		const minDefined = this.get("min");
+		const minDefined = this._minDefined();
 		const maxDefined = this.get("max");
 
 		let extraMin = this.get("extraMin", 0);
@@ -1389,8 +1389,18 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	}
 
 
+	// `min`, unless it is 0 or less on a logarithmic axis, which can't show it: `treatZeroAs` then, if set
+	protected _minDefined(): number | undefined {
+		const min = this.get("min");
+		if (this.get("logarithmic") && $type.isNumber(min) && min <= 0) {
+			const treatZeroAs = this.get("treatZeroAs");
+			return $type.isNumber(treatZeroAs) ? treatZeroAs : undefined;
+		}
+		return min;
+	}
+
 	protected _getMinMax() {
-		let minDefined = this.get("min");
+		let minDefined = this._minDefined();
 		let maxDefined = this.get("max");
 
 		let min = Infinity;

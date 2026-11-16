@@ -1,6 +1,7 @@
 import type { DataItem } from "../../core/render/Component";
 import type { SlicedChart } from "./SlicedChart";
 import type { Bullet } from "../../core/render/Bullet";
+import type { IBounds } from "../../core/util/IBounds";
 
 import { PercentSeries, IPercentSeriesSettings, IPercentSeriesDataItem, IPercentSeriesPrivate } from "../percent/PercentSeries";
 import { Template } from "../../core/util/Template";
@@ -283,17 +284,13 @@ export class FunnelSeries extends PercentSeries {
 		// slices below (and in `decorateSlice`), so re-run this pass when they change.
 		if (this._total > 0 && (this._valuesDirty || this._sizeDirty || this.isDirty("bottomRatio") || this.isDirty("startLocation") || this.isDirty("endLocation"))) {
 
-			const slicesContainer = this.slicesContainer;
-
-			let h: number;
+			const box = this._sliceBox();
 			if (this.get("orientation") == "vertical") {
-				h = slicesContainer.innerHeight();
+				this._nextCoord = box.top + this.get("startLocation", 0) * (box.bottom - box.top);
 			}
 			else {
-				h = slicesContainer.innerWidth();
+				this._nextCoord = box.left + this.get("startLocation", 0) * (box.right - box.left);
 			}
-
-			this._nextCoord = this.get("startLocation", 0) * h;
 
 			this.markDirtyBounds();
 
@@ -412,10 +409,10 @@ export class FunnelSeries extends PercentSeries {
 		const label = dataItem.get("label");
 		const link = dataItem.get("link");
 
-		const slicesContainer = this.slicesContainer;
+		const box = this._sliceBox();
 
-		let maxWidth = slicesContainer.innerWidth();
-		let maxHeight = slicesContainer.innerHeight();
+		let maxWidth = box.right - box.left;
+		let maxHeight = box.bottom - box.top;
 
 		let maxSize = maxWidth;
 		if (orientation == "horizontal") {
@@ -462,12 +459,12 @@ export class FunnelSeries extends PercentSeries {
 
 			let height = Math.min(100000, Math.max(0, maxHeight / this._count * d / this._total - linkHeight));
 
-			slice._setCAll({ height, x: maxWidth / 2 });
+			slice._setCAll({ height, x: box.left + maxWidth / 2 });
 			let labelY = this._nextCoord + height / 2;
 			label._setC("y", labelY);
 
 			this._nextCoord += height + linkHeight;
-			link._setCAll({ y: this._nextCoord - linkHeight, x: maxWidth / 2 });
+			link._setCAll({ y: this._nextCoord - linkHeight, x: box.left + maxWidth / 2 });
 		}
 		else {
 			let linkHeight = link.width() * d;
@@ -478,12 +475,12 @@ export class FunnelSeries extends PercentSeries {
 
 			let width = Math.min(100000, Math.max(0, maxWidth / this._count * d / this._total - linkHeight));
 
-			slice._setCAll({ width, y: maxHeight / 2 });
+			slice._setCAll({ width, y: box.top + maxHeight / 2 });
 			const labelX = this._nextCoord + width / 2;
 			label._setC("x", labelX);
 
 			this._nextCoord += width + linkHeight;
-			link._setCAll({ x: this._nextCoord - linkHeight, y: maxHeight / 2 });
+			link._setCAll({ x: this._nextCoord - linkHeight, y: box.top + maxHeight / 2 });
 		}
 	}
 
@@ -511,8 +508,25 @@ export class FunnelSeries extends PercentSeries {
 		return super.showDataItem(dataItem, duration)
 	}
 
+	/**
+	 * The box the slices are laid out in, in the slices container.
+	 *
+	 * @ignore
+	 */
+	public _sliceBox(): IBounds {
+		const slicesContainer = this.slicesContainer;
+		return { left: 0, top: 0, right: slicesContainer.innerWidth(), bottom: slicesContainer.innerHeight() };
+	}
+
 	protected _updateTick(dataItem: DataItem<this["_dataItemSettings"]>) {
-		if (this.get("alignLabels")) {
+		if (!this.get("alignLabels")) {
+			// labels on their slices have no ticks: clear any left from an aligned layout
+			const tick = dataItem.get("tick");
+			if (tick) {
+				tick._setC("points", []);
+			}
+		}
+		else {
 			const tick = dataItem.get("tick");
 			const label = dataItem.get("label");
 			const slice = dataItem.get("slice");

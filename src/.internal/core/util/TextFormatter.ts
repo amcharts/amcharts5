@@ -234,6 +234,9 @@ export class TextFormatter {
 			}
 		}
 
+		// a list stays one value, e.g. fontFamily: 'Source Code Pro', monospace
+		style = style.replace(/,\s+/g, ",");
+
 		// Get style parts
 		let b: string[] | null = style.match(/([\w\-]*:[\s]?[^;\s\]]*)|(\#[\w]{1,6})|([\w\-]+)|(\/)/gi);
 
@@ -260,7 +263,7 @@ export class TextFormatter {
 				format.fill = Color.fromString(b[i]);
 			}
 			else {
-				const p = b[i].replace("+", " ").split(/:[ ]*/);
+				const p = b[i].replace(/\+/g, " ").split(/:[ ]*/);
 				(<any>format)[p[0]] = p[1];
 				//textStyle.push(b[i].replace(/^[a-zA-Z]:[ ]*/, ""));
 				//b[i] = b[i].replace(/\+/g, " ");

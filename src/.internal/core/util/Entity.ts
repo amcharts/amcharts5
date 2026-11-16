@@ -35,6 +35,26 @@ export class Adapters<E extends Settings> {
 	}
 
 	/**
+	 * Adds an adapter the library needs for its own workings. It works as
+	 * `add()` does, and `ChartSerializer` does not write it out.
+	 *
+	 * @ignore
+	 */
+	public _addInternal<Key extends keyof E["_settings"]>(key: Key, callback: (value: E["_settings"][Key], target: E, key: Key) => E["_settings"][Key]): IDisposer {
+		(callback as any)._amInternal = true;
+		return this.add(key, callback);
+	}
+
+	/**
+	 * Whether an adapter was added with `_addInternal()`.
+	 *
+	 * @ignore
+	 */
+	public _isInternal(callback: Function): boolean {
+		return (callback as any)._amInternal === true;
+	}
+
+	/**
 	 * Adds a function that modifies the value of setting `key` each time it is
 	 * read.
 	 *
@@ -1929,6 +1949,21 @@ export class Entity extends Settings implements IDisposer {
 			if (template === match) {
 				super.setPrivate(key, value);
 			}
+		}
+	}
+
+	/**
+	 * Adds a template below the element's own template and the ones it was
+	 * made with, for values the library supplies when nothing else does.
+	 *
+	 * @ignore
+	 */
+	public _addBaseTemplate(template: Template<this>): void {
+		if (this._internalTemplates.indexOf(template) === -1) {
+			// a new array: the one given to the constructor may be shared
+			this._internalTemplates = [template].concat(this._internalTemplates);
+			template._setObjectTemplate(this);
+			this._applyTemplates();
 		}
 	}
 

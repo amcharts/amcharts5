@@ -5,6 +5,71 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.22.0] - 2026-11-16
+
+### Added
+- The npm package now includes the CDN script files in `dist/`, for `<script>` tags from `node_modules`, jsDelivr or unpkg.
+- Axis renderers: new `autoLabels` setting. Labels are spaced by their own size, so a category axis shows every label that fits, and a label that would be cut off or overlap is hidden.
+- Pie series: new `autoLabels` setting. The pie makes room for its labels, and labels that still do not fit are wrapped, shortened or hidden.
+- Series: new `autoLabels` setting hides a bullet's label while it would overlap another label or be cut off.
+- Scrollbar: new `autoHide` setting, in pixels. The scrollbar hides when the chart is that small, and pinch zoom takes over.
+- Legend: new `autoFit` setting. A legend that does not fit gets smaller, then scrolls, and long names are shortened.
+- New theme `am5themes_ResponsiveMax` fits charts into small spaces with the settings above.
+- Root: new `direction` setting for right-to-left languages: `am5.Root.new("chartdiv", { direction: "rtl" })` draws text right to left and lays legends out from the right. Remove `reverseChildren` from legend items if you used it for the same.
+- Containers: new `direction` setting. With `"rtl"`, children are laid out from the right.
+- Axis labels: new `keepInView` setting keeps the label of a partly visible cell, such as the first month on a date axis, in view.
+
+### Changed
+- JSON plugin: a config is now read as data, so one from users or another site cannot run script. For a config of your own that needs more, parse it with the new `trusted: true` setting.
+- `MapChart.zoomToGeoBounds()`: bounds with `right` less than `left`, or past -180 or 180, now cross the date line instead of taking all longitudes.
+- Pie charts: a label hidden with `forceHidden` no longer leaves a gap in its column.
+- Bullets that take the series color now follow it when it changes.
+- Script builds (the CDN files) are smaller: `index.js` by about 50 KB (10 KB gzipped). They no longer define the global `regeneratorRuntime`, which amCharts did not use.
+- The npm package no longer installs the whole `d3`, only the d3 modules it uses.
+- The bundled examples use the new `ResponsiveMax` theme.
+
+### Fixed
+- `am5.SVGRenderer` and `renderToSVG()`: `lineJoin` and `lineCap` are now escaped, so a value from a config cannot run script.
+- `drawEllipse(x, y, radiusX, radiusY)` drew the ellipse at 0,0.
+- TypeScript: `am5.IGraphics` and `am5.Animation` can now be used as types.
+- Text formatting: font names with spaces, and font lists such as `[fontFamily: 'Source Code Pro', monospace]`, were read wrong.
+- Wrapped or truncated text aligned center or right drew bold or colored parts out of place.
+- On a page with `dir="rtl"`, labels were placed off by their own width.
+- A label with a `width` drew right-to-left text, or text with `textAlign: "end"`, outside its box. `start` and `end` now follow the text direction.
+- Number formats: a modifier right after the digits, as in `#,###s`, broke the thousands separator.
+- `ColorSet` with an empty `colors` list crashed. It now starts from `baseColor`.
+- `LinearGradient` with a `rotation` outside 0-90 now runs across the whole shape.
+- `PicturePattern` the same size as its picture showed nothing.
+- `data.setIndex()` and `updateData()` now apply the row's `templateField` settings.
+- A scaled container with no size of its own cut off its content.
+- Axis labels with `html` kept their old values after the grid step changed, e.g. on resize.
+- `ValueAxis`: `min: 0` on a logarithmic axis left it empty. It now starts at `treatZeroAs`, or where the data starts.
+- XY series: setting `minBulletDistance` back to 0 left the bullets hidden.
+- Legend: a line series bullet whose template got its colors after the legend was made showed the series color.
+- Labels beside their point, e.g. pie labels with `alignLabels: false`, now move when their size changes, such as when a font loads.
+- `PictorialStackedSeries`: the shape now fits narrow and short charts, and a gradient fill runs across the shape, not the whole chart.
+- Hierarchy charts: after `data.setAll()` a `VoronoiTreemap` drew nothing, and a drilled-down Treemap or Sunburst stayed zoomed in.
+- Word cloud: a number as a category, such as a year, no longer throws.
+- Gantt charts with many tasks load several times faster and scroll two to three times as fast.
+- Gantt: on narrow charts the top row's labels no longer overlap, the zoom buttons are no longer cut off when the vertical scrollbar is hidden, and rows no longer fade in while scrolling.
+- `PyramidSeries` and `PictorialStackedSeries` with `alignLabels: false`: labels could leave the chart. They now stay on their slices.
+- Funnel, pyramid and pictorial series: after `alignLabels` was turned off, the ticks kept their old lines.
+- Heat rules: values outside `minValue` and `maxValue` now get `min` or `max` instead of going past the ends of the scale. On a `logarithmic` scale, zero and below get `min`.
+- `MapChart`: zooming to bounds or polygons now fits what is drawn, also on globes and across the date line.
+- `MapChart`: zooming to bounds or to a point before the map loaded broke the zoom or missed the point. It now zooms once the map is loaded.
+- `MapChart`: two `zoomToGeoPoint()` or `zoomToPoint()` calls in a row without animation ended in the wrong place.
+- `MapChart`: zooming reset `rotationZ` to 0.
+- `MapChart`: the `zoomControl` was drawn twice.
+- `MapChart` with panning and `pinchZoom` off no longer blocks page scrolling on touch screens.
+- Map series: `include` no longer brings back items that `exclude` leaves out.
+- `MapPointSeries` and `MapLineSeries` with `affectsBounds: true`: removed data items no longer count toward the map's bounds.
+- `MapPointSeries` with `include` could hang the page.
+- `MapPointSeries` with `autoScale`: bullets made while the map was zoomed started at the wrong size.
+- Map series: GeoJSON feature properties can now be used as data fields, e.g. by heat rules, and a feature with `"properties": null` no longer throws.
+- Map series with heat rules drew nothing when their `geoJSON` was set later, as in a drill-down map.
+- JSON: `ChartSerializer` failed on a series whose only setting was `heatRules`.
+- JSON: a container with a `verticalScrollbar` no longer saves the settings the scrollbar sets up for itself.
+
 ## [5.21.5] - 2026-10-26
 
 ### Added

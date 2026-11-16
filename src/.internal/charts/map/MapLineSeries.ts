@@ -383,7 +383,12 @@ export class MapLineSeries extends MapSeries {
 
 					let geometry: any = { type: "LineString", coordinates: coordinates };
 
+					const previous = dataItem.get("geometry");
 					dataItem.setRaw("geometry", geometry);
+					// counted toward the map's bounds, it is counted by its new shape
+					if (this._removeGeometry(previous)) {
+						this._addGeometry(geometry, this);
+					}
 					mapLine._setC("geometry", geometry);
 				}
 				else {

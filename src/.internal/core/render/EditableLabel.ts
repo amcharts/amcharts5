@@ -128,7 +128,11 @@ export class EditableLabel extends Label {
 		};
 
 		this._syncText();
-		this._syncStyle();
+		// the textarea shows only while editing, and restyling it is costly (a reset of every CSS property, then a
+		// layout); starting to edit and typing restyle it themselves
+		if (this.get("active")) {
+			this._syncStyle();
+		}
 	}
 
 	protected _maybeInitTextarea() {

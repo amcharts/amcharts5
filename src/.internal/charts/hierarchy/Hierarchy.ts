@@ -392,6 +392,15 @@ export abstract class Hierarchy extends Series {
 			this._updateVisuals();
 		}
 
+		// new data after the old one's selection was dropped (waits out frames with none): from the top
+		const first = this.dataItems[0];
+		if (this._selectionDropped && this._rootNode && first) {
+			this._selectionDropped = false;
+			if (!this.get("selectedDataItem")) {
+				this._selectDataItem(first, Math.max(0, Math.min(this.get("initialDepth", 1), this.getPrivate("maxDepth", 1) - this.get("topDepth", 0))));
+			}
+		}
+
 		if (this._sizeDirty) {
 			const dataItem = this.get("selectedDataItem");
 			if (dataItem) {
@@ -492,8 +501,14 @@ export abstract class Hierarchy extends Series {
 		this._updateVisuals();
 	}
 
+	protected _selectionDropped = false;
+
 	protected _onDataClear() {
 		super._onDataClear();
+		if (this.get("selectedDataItem")) {
+			this._setCRaw("selectedDataItem", undefined);
+			this._selectionDropped = true;
+		}
 		const colors = this.get("colors");
 		if (colors) {
 			colors.reset();

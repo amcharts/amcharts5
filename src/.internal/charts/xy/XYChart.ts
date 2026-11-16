@@ -28,6 +28,8 @@ import * as $type from "../../core/util/Type";
 import * as $order from "../../core/util/Order";
 import * as $object from "../../core/util/Object";
 import * as $utils from "../../core/util/Utils";
+import { Disposer } from "../../core/util/Disposer";
+import { setFit } from "../../core/util/Fit";
 import * as $math from "../../core/util/Math";
 
 export interface IXYChartSettings extends ISerialChartSettings {
@@ -1329,7 +1331,54 @@ export class XYChart extends SerialChart {
 	 *
 	 * @ignore
 	 */
+	/**
+	 * The size `autoHide` compares: the chart's width for a vertical scrollbar, its height for a horizontal one.
+	 *
+	 * @ignore
+	 */
+	protected _autoHideSize(vertical: boolean): number {
+		return vertical ? this.width() : this.height();
+	}
+
+	// `autoHide`: a scrollbar is hidden by the chart's size across it, which its going does not
+	// change; pinching zooms while it is hidden
+	protected _autoHideScrollbar(key: "scrollbarX" | "scrollbarY", scrollbar: Scrollbar, release?: boolean) {
+		const autoHide = scrollbar.get("autoHide");
+		let hide = false;
+		if (!release && autoHide != null && !scrollbar.isDisposed() && !(scrollbar.isUserSetting("forceHidden") && !scrollbar.isComputedSetting("forceHidden"))) {
+			const across = this._autoHideSize(scrollbar.get("orientation") == "vertical");
+			hide = across > 0 && across <= autoHide;
+		}
+		if (hide != !!scrollbar.getPrivate("autoHidden")) {
+			if (!scrollbar.isDisposed()) {
+				setFit(scrollbar, "forceHidden", hide ? true : undefined);
+				scrollbar.setPrivate("autoHidden", hide);
+			}
+			if (!this.isDisposed()) {
+				setFit(this, key == "scrollbarX" ? "pinchZoomX" : "pinchZoomY", hide ? true : undefined);
+			}
+		}
+	}
+
 	protected _placeScrollbar(key: "scrollbarX" | "scrollbarY", scrollbar: Scrollbar, container: Container, oppositeContainer: Container, unshift?: boolean) {
+		// a chart's scrollbar, for theme rules, but not the scrollbars of what is inside it
+		if (!scrollbar.hasTag("chart")) {
+			scrollbar._setC("themeTagsSelf", $utils.mergeTags(scrollbar.get("themeTagsSelf"), ["chart"]));
+			if (scrollbar.parent) {
+				scrollbar._applyThemes();
+			}
+		}
+		// `autoHide`: checked when the chart's size or the scrollbar's settings change
+		const check = () => this._autoHideScrollbar(key, scrollbar);
+		this._pushPropertyDisposer(key, this.onPrivate("width", check));
+		this._pushPropertyDisposer(key, this.onPrivate("height", check));
+		this._pushPropertyDisposer(key, scrollbar.on("autoHide", check));
+		this._pushPropertyDisposer(key, scrollbar.on("forceHidden", check));
+		this._pushPropertyDisposer(key, new Disposer(() => {
+			this._autoHideScrollbar(key, scrollbar, true);
+		}));
+		check();
+
 		const place = () => {
 			const opposite = scrollbar.get("opposite");
 			const target = opposite ? oppositeContainer : container;

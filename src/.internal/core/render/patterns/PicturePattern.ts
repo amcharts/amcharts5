@@ -135,7 +135,8 @@ export class PicturePattern extends Pattern {
 			image.src = src!;
 			image.decode().then(() => {
 				this._image = image;
-				this._draw();
+				// rebuilds the pattern with the picture, also when its size stays the same
+				this.markDirty();
 				if (this.events.isEnabled("loaded")) {
 					this.events.dispatch("loaded", { type: "loaded", target: this });
 				}

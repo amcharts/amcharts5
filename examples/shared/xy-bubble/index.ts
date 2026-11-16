@@ -1,6 +1,7 @@
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import am5themes_ResponsiveMax from "@amcharts/amcharts5/themes/ResponsiveMax";
 
 
 // Create root element
@@ -11,7 +12,8 @@ const root = am5.Root.new("chartdiv");
 // Set themes
 // https://docs.amcharts.com/v5/concepts/themes/
 root.setThemes([
-  am5themes_Animated.new(root)
+  am5themes_Animated.new(root),
+  am5themes_ResponsiveMax.new(root) // fits the chart to small screens
 ]);
 
 
@@ -124,7 +126,8 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
   orientation: "horizontal"
 }));
 
-// right of the plot: the same for life expectancy
+// right of the plot: the same for life expectancy (ResponsiveMax hides it on charts 400 px wide or less, where
+// pinching zooms instead)
 chart.set("scrollbarY", am5.Scrollbar.new(root, {
   orientation: "vertical"
 }));

@@ -19,7 +19,11 @@ async function writePackage(state) {
 			main: "index.js",
 			module: "index.js",
 			types: "index.d.ts",
-			sideEffects: root.sideEffects,
+			// The script files, which build:script copies into dist/
+			unpkg: "dist/index.js",
+			jsdelivr: "dist/index.js",
+			// the script files set globals, so a bundler must keep them when imported
+			sideEffects: root.sideEffects.concat(["dist/**"]),
 			dependencies: root.dependencies,
 		}, null, 2),
 	);

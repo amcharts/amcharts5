@@ -160,7 +160,13 @@ export class ColorSet extends Entity {
 	 */
 	public generateColors(): void {
 		this.setPrivate("currentPass", this.getPrivate("currentPass", 0) + 1)
-		const colors = this.get("colors", [this.get("baseColor", Color.fromHex(0xff0000))]);
+		let list: Array<Color> | undefined = this.get("colors");
+		// an unset or empty list starts from `baseColor`, kept so the colors made from it are too
+		if (!list || list.length == 0) {
+			list = [this.get("baseColor", Color.fromHex(0xff0000))];
+			this._setCRaw("colors", list);
+		}
+		const colors = list;
 		// Rounds are counted on the list, which color sets share: each one goes
 		// on from the last, whichever set made it, so a color's index fixes it
 		const length = listLength(colors);

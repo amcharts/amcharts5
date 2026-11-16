@@ -330,8 +330,24 @@ function exists(path) {
 	});
 }
 
+// Copies the files of a script build (.js, .js.map and its folders) from `from` to `to`, without
+// the folders in `skip` and the text files beside them
+async function cpScriptFiles(from, to, skip) {
+	const names = await readdir(from);
+
+	await Promise.all(names.map(async (name) => {
+		const path = $path.join(from, name);
+		const isDir = (await readdir(path)) !== null;
+
+		if (isDir ? skip.indexOf(name) === -1 : /\.js(\.map)?$/.test(name)) {
+			await cp(path, $path.join(to, name));
+		}
+	}));
+}
+
 exports.cp = cp;
 exports.cpMaybe = cpMaybe;
+exports.cpScriptFiles = cpScriptFiles;
 exports.mv = mv;
 exports.rm = rm;
 exports.readFile = readFile;

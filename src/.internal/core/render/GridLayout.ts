@@ -1,4 +1,5 @@
-import { Layout, ILayoutSettings, ILayoutPrivate, eachChildren } from "./Layout";
+import { Layout, ILayoutSettings, ILayoutPrivate, eachChildren, placeX } from "./Layout";
+import type { IPlaced } from "./Layout";
 import * as $array from "../util/Array";
 import * as $math from "../util/Math";
 import type { Container } from "./Container";
@@ -25,7 +26,8 @@ export interface IGridLayoutPrivate extends ILayoutPrivate {
 
 /**
  * Lays out a [[Container]]'s children in rows from left to right, with as
- * many columns as fit its width.
+ * many columns as fit its width. With the container's `direction: "rtl"`,
+ * rows go from right to left, so a partly filled last row is on the right.
  *
  * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#layout} for more info
  */
@@ -95,6 +97,9 @@ export class GridLayout extends Layout {
 		columnCount = columnWidths.length;
 
 		let prevX = paddingLeft;
+		const rtl = container._isRtl();
+		const placed: Array<IPlaced> = [];
+		let contentRight = paddingLeft;
 
 		eachChildren(container, (child) => {
 			if (child.get("position") == "relative" && child.isVisible()) {
@@ -108,10 +113,16 @@ export class GridLayout extends Layout {
 				let x = prevX + marginLeft - bounds.left;
 				let y = prevY + marginTop - bounds.top;
 
-				child.setPrivate("x", x);
+				if (rtl) {
+					placed.push({ child, x, left: bounds.left, right: bounds.right });
+				}
+				else {
+					child.setPrivate("x", x);
+				}
 				child.setPrivate("y", y);
 
 				prevX += columnWidths[column] + marginRight;
+				contentRight = Math.max(contentRight, prevX);
 
 				maxRowHeight = Math.max(maxRowHeight, child.height() + marginTop + marginBottom);
 
@@ -125,6 +136,10 @@ export class GridLayout extends Layout {
 				}
 			}
 		});
+
+		if (rtl) {
+			placeX(container, placed, contentRight);
+		}
 	}
 
 	/**

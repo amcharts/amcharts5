@@ -444,6 +444,25 @@ export class AxisRendererCircular extends AxisRenderer {
 		return Math.abs(this.getPrivate("radius", 0) * Math.PI * 2 * (this.getPrivate("endAngle", 360) - this.getPrivate("startAngle", 0)) / 360);
 	}
 
+	// On a radar chart one axis's labels are not hidden for overlapping the other's: where they
+	// meet, at the end of the radial axis, hiding them reads as a gap
+	protected _givesWayTo(_other: AxisRenderer): boolean {
+		return false;
+	}
+
+	// The axis runs round the circle: a `"radial"` label's text runs out along its radius, across it
+	public _labelTurn(label: AxisLabelRadial): number {
+		const angle = label.get("labelAngle", 0);
+		const text = label.get("textType") == "radial" ? angle : label.get("rotation", 0);
+		return text - angle - 90;
+	}
+
+	// The angle a curved label spans, measured on the axis' circle
+	public _arcExtent(label: AxisLabelRadial, size: { length: number, height: number }): number {
+		const arc = label._arc(size);
+		return (arc.end - arc.start) / $math.DEGREES * this.getPrivate("radius", 0);
+	}
+
 	/**
 	 * @ignore
 	 */

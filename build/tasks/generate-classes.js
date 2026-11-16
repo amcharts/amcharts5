@@ -95,7 +95,8 @@ async function writeJson(state, classes, keys) {
 	const imports = [];
 	const types = [];
 	const properties = [];
-	const propertiesScript = [];
+	// class names per chunk, so the script build has one loader per chunk
+	const chunks = {};
 
 	keys.forEach((key) => {
 		const { path, className } = classes[key];
@@ -107,7 +108,14 @@ async function writeJson(state, classes, keys) {
 		imports.push(`import type { ${className} } from "./${chunk}";`);
 		types.push(`\t"${key}": () => Promise<typeof ${className}>;`);
 		properties.push(`\t"${key}": () => import(/* webpackChunkName: "json_${chunkName(chunk)}" */ "./${chunk}").then((m) => m.${className}),`);
-		propertiesScript.push(`\t"${key}": () => import(/* webpackMode: "weak" */ "./${chunk}").then((m) => m.${className}),`);
+		if (key !== className) {
+			throw new Error(`Class map: "${key}" is exported as "${className}"; the script build needs them to match`);
+		}
+		(chunks[chunk] = chunks[chunk] || []).push(key);
+	});
+
+	const propertiesScript = Object.keys(chunks).map((chunk) => {
+		return `add(() => import(/* webpackMode: "weak" */ "./${chunk}"), "${chunks[chunk].join(",")}");`;
 	});
 
 	await writeFile(state.dir("src", ".internal", "plugins", "json", "Classes.ts"), `/**
@@ -139,9 +147,16 @@ export interface IClasses {
 ${types.join("\n")}
 }
 
-const classes: IClasses = {
+const classes = {} as IClasses;
+
+// Each name loads its class from the chunk that holds it
+function add(load: () => Promise<any>, names: string): void {
+	names.split(",").forEach((name) => {
+		(classes as any)[name] = () => load().then((m) => m[name]);
+	});
+}
+
 ${propertiesScript.join("\n")}
-};
 
 export default classes;
 `);

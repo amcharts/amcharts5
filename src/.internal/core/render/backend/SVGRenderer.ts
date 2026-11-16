@@ -183,6 +183,8 @@ export class SVGRenderer extends ArrayDisposer implements ISceneHost {
 		svg.style.top = "0px";
 		svg.style.left = "0px";
 		svg.style.overflow = "visible";
+		// text runs left to right unless it says otherwise, whatever the page's direction
+		svg.style.direction = "ltr";
 
 		// A transparent composited layer, like a canvas: text gets grayscale
 		// anti-aliasing as on canvas, not LCD

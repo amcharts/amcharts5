@@ -136,7 +136,7 @@ export class CategoryDateAxis<R extends AxisRenderer> extends CategoryAxis<R> {
 			endIndex++;
 		}
 
-		let maxCount = renderer.axisLength() / Math.max(renderer.get("minGridDistance")!, 1 / Number.MAX_SAFE_INTEGER);
+		let maxCount = renderer.axisLength() / Math.max(renderer.gridDistance(), 1 / Number.MAX_SAFE_INTEGER);
 
 		let frequency = Math.max(1, Math.min(len, Math.ceil((endIndex - startIndex) / maxCount)));
 		if (!$type.isNumber(frequency)) {

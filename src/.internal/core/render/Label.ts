@@ -328,6 +328,9 @@ export class Label extends Container {
 		});
 	}
 
+	// the direction the text was last placed for
+	protected _rtlPlaced?: boolean;
+
 	public _makeText() {
 		this._text = this.children.push(Text.new(this._root, {}));
 	}
@@ -369,6 +372,16 @@ export class Label extends Container {
 		// Do not show regular text if HTML is used
 		if (this.get("html", "") !== "") {
 			text.set("text", "");
+
+			// HTML is otherwise re-rendered only when `html` itself is dirty. Axes
+			// reuse their labels and only set a new `text` when ticks change (e.g.
+			// on resize), so without this an `html` adapter or `{value}`
+			// placeholder would keep showing the old tick. Affects only labels
+			// with `html` whose `text` changed: axis labels and tooltips, or a
+			// user's own `set("text")`
+			if (this.isDirty("text") && !this.isDirty("html")) {
+				this._updateHTMLContent();
+			}
 		}
 		else {
 			text.set("text", this.get("text"));
@@ -379,15 +392,19 @@ export class Label extends Container {
 			this._maybeUpdateHTMLColor();
 		}
 
-		if (this.isDirty("textAlign") || this.isDirty("width")) {
+		// the text's direction: its own, or the root's (which can change without this label)
+		const rtl = text._direction() == "rtl";
+		if (this.isDirty("textAlign") || this.isDirty("width") || this.isDirty("direction") || rtl !== this._rtlPlaced) {
+			this._rtlPlaced = rtl;
 			const textAlign = this.get("textAlign");
 			let x: number | Percent | undefined;
 			if (this.get("width") != null) {
-				if (textAlign == "right") {
-					x = p100;
-				}
-				else if (textAlign == "center") {
+				// the side the text sits on: `left` and `right` are sides, `start` and `end` follow the direction
+				if (textAlign == "center") {
 					x = p50;
+				}
+				else if (textAlign == "right" || (textAlign == "end" && !rtl) || (rtl && textAlign != "left" && textAlign != "end")) {
+					x = p100;
 				}
 				else {
 					x = 0;

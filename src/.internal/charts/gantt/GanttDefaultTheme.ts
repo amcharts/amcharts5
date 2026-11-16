@@ -67,6 +67,8 @@ export class GanttDefaultTheme extends Theme {
 			x: percent(100),
 			centerX: percent(100),
 			y: 10,
+			// clear of the plot's edge, which is the chart's own when the vertical scrollbar is hidden
+			paddingRight: 10,
 			layout: this._root.verticalLayout,
 		});
 
@@ -217,7 +219,9 @@ export class GanttDefaultTheme extends Theme {
 		// X axis labels
 		r("AxisLabel", ["x"]).setAll({
 			paddingBottom: 15,
-			multiLocation: 0.5
+			multiLocation: 0.5,
+			// a month or week running out of view keeps its label
+			keepInView: true
 		});
 
 

@@ -52,8 +52,12 @@ export class LinearGradient extends Gradient {
 		let cos = $math.cos(rotation);
 		let sin = $math.sin(rotation);
 
-		let w = cos * (r - l);
-		let h = sin * (b - t);
+		// from the corner it points away from, so any angle runs across the whole box
+		const x0 = cos < 0 ? r : l;
+		const y0 = sin < 0 ? b : t;
+
+		let w = Math.abs(cos) * (r - l);
+		let h = Math.abs(sin) * (b - t);
 
 		if (w == 0) {
 			w = 1;
@@ -66,10 +70,10 @@ export class LinearGradient extends Gradient {
 		let longer = Math.max(w, h);
 
 		const gradient = this._root._renderer.createLinearGradient(
-			l,
-			t,
-			l + longer * cos,
-			t + longer * sin
+			x0,
+			y0,
+			x0 + longer * cos,
+			y0 + longer * sin
 		);
 
 		const stops = this.get("stops")!;

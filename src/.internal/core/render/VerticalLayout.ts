@@ -1,13 +1,18 @@
-import { Layout, eachChildren } from "./Layout";
+import { Layout, eachChildren, placeX } from "./Layout";
 import * as $type from "../util/Type";
 import { Percent } from "../util/Percent";
 import type { Container } from "./Container";
+import type { IPlaced } from "./Layout";
+import type { Sprite } from "./Sprite";
 
+// children this layout lined up on the right, so it can let them go back to the left
+const rightAligned: WeakSet<Sprite> = new WeakSet();
 
 /**
  * Stacks a [[Container]]'s children from top to bottom. Children with a
  * percent height share the height the others leave, in proportion to their
- * percents.
+ * percents. With the container's `direction: "rtl"`, children with no `x` of
+ * their own line up on the right.
  *
  * @see {@link https://docs.amcharts.com/v5/concepts/common-elements/containers/#layout} for more info
  */
@@ -86,10 +91,28 @@ export class VerticalLayout extends Layout {
 
 		let prevY = paddingTop;
 
+		const rtl = container._isRtl();
+		const paddingLeft = container.get("paddingLeft", 0);
+		const placed: Array<IPlaced> = [];
+		let contentRight = paddingLeft;
+
 		eachChildren(container, (child) => {
 			if (child.get("position") == "relative") {
 				if (child.isVisible()) {
 					let bounds = child.adjustedLocalBounds();
+
+					if (child.get("x") == null) {
+						if (rtl) {
+							placed.push({ child: child, x: paddingLeft, left: bounds.left, right: bounds.right });
+							contentRight = Math.max(contentRight, paddingLeft + bounds.right);
+							rightAligned.add(child);
+						}
+						else if (rightAligned.has(child)) {
+							rightAligned.delete(child);
+							child.setPrivate("x", undefined);
+						}
+					}
+
 					let marginTop = child.get("marginTop", 0);
 
 					let top = bounds.top;
@@ -112,5 +135,9 @@ export class VerticalLayout extends Layout {
 				}
 			}
 		});
+
+		if (placed.length) {
+			placeX(container, placed, contentRight);
+		}
 	}
 }

@@ -336,6 +336,8 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 	let styleRestored = true;
 	let minX = 0;
 	let maxX = 0;
+	// a chunk was cut to fit: wrapped or truncated text takes all of maxWidth
+	let cut = false;
 
 	// Iterate through the lines
 	let offsetY = 0;
@@ -443,6 +445,9 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 					// Measure
 					const metrics = measureText(chunk.text, context, style);
 					let chunkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+					let chunkLeft = metrics.actualBoundingBoxLeft;
+					let chunkRight = metrics.actualBoundingBoxRight;
+					const uncut = chunk.text;
 
 					// Check for fit
 					if (truncate) {
@@ -533,6 +538,15 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 
 					}
 
+					// a chunk cut to fit is as wide as what is left of it; the line keeps its height
+					if (chunk.text !== uncut) {
+						cut = true;
+						const cutMetrics = measureText(chunk.text, context, style);
+						chunkLeft = cutMetrics.actualBoundingBoxLeft;
+						chunkRight = cutMetrics.actualBoundingBoxRight;
+						chunkWidth = chunkLeft + chunkRight;
+					}
+
 					// Chunk width?
 					let leftBoundMod = 1;
 					let rightBoundMod = 1;
@@ -564,16 +578,16 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 					}
 
 					lineInfo.width += chunkWidth;
-					lineInfo.left += metrics.actualBoundingBoxLeft / leftBoundMod;
-					lineInfo.right += metrics.actualBoundingBoxRight / rightBoundMod;
+					lineInfo.left += chunkLeft / leftBoundMod;
+					lineInfo.right += chunkRight / rightBoundMod;
 					lineInfo.textChunks.push({
 						style: currentStyle,
 						fill: currentFill,
 						text: chunk.text,
 						width: chunkWidth,
 						height: chunkHeight,
-						left: metrics.actualBoundingBoxLeft,
-						right: metrics.actualBoundingBoxRight,
+						left: chunkLeft,
+						right: chunkRight,
 						ascent: metrics.actualBoundingBoxAscent,
 						offsetX: 0,
 						offsetY: 0,
@@ -640,10 +654,12 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 		});
 	});
 
+	// Right-to-left text runs the other way from its x, except with `left` or `right`, which are sides
+	const mirror = rtl && style.textAlign != "left" && style.textAlign != "right";
 	const bounds = {
-		left: rtl ? -maxX : -minX,
+		left: mirror ? -maxX : -minX,
 		top: 0,
-		right: rtl ? minX : maxX,
+		right: mirror ? minX : maxX,
 		bottom: offsetY,
 	};
 
@@ -651,7 +667,7 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 	// We need to fit?
 	if (oversizedBehavior !== "none") {
 		const ratio = fitRatio(style, bounds, oversizedBehavior == "truncate");
-		if (ratio < 1) {
+		if (ratio < 1 || cut) {
 			if (oversizedBehavior == "fit") {
 				if ($type.isNumber(style.minScale) && (ratio < style.minScale)) {
 					state.textVisible = false;
@@ -676,19 +692,19 @@ export function layoutText(context: ITextMeasureContext, text: string, style: IL
 				bounds.bottom = 0;
 			}
 			else {
-				switch (style.textAlign) {
-					case "right":
-					case "end":
-						bounds.left = rtl ? maxWidth : -maxWidth;
-						bounds.right = 0;
-						break;
-					case "center":
-						bounds.left = -maxWidth / 2;
-						bounds.right = maxWidth / 2;
-						break;
-					default:
-						bounds.left = 0;
-						bounds.right = rtl ? -maxWidth : maxWidth;
+				// the text runs left from its x with `right`, `end` left to right, or `start` right to left
+				const align = style.textAlign;
+				if (align == "center") {
+					bounds.left = -maxWidth / 2;
+					bounds.right = maxWidth / 2;
+				}
+				else if (align == "right" || (align == "end" ? !rtl : rtl && align != "left")) {
+					bounds.left = -maxWidth;
+					bounds.right = 0;
+				}
+				else {
+					bounds.left = 0;
+					bounds.right = maxWidth;
 				}
 
 				state.scale = state.originalScale || 1;

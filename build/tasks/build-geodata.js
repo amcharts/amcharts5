@@ -1,5 +1,5 @@
 const $path = require("path");
-const { mkdir, cp, rm, tsc, readdir, readFile, writeFile, geodataToScript, mapFiles, eachFileRecursive, splitPath, posixPath } = require("../util");
+const { mkdir, cp, cpScriptFiles, rm, tsc, readdir, readFile, writeFile, geodataToScript, mapFiles, eachFileRecursive, splitPath, posixPath } = require("../util");
 
 
 async function generateJson(from, to_es2015, to_script) {
@@ -87,6 +87,19 @@ module.exports = async (state) => {
 		]);
 	}
 
+	// The script maps copied in by an earlier run would be read as geodata
+	await rm(state.path("dist", "geodata", "es2015", "dist"));
+
+	// The README gives version-pinned script tags
+	const readme = state.path("packages", "geodata", "README.md");
+	const version = JSON.parse(await readFile(state.path("packages", "geodata", "package.json"))).version;
+	const text = await readFile(readme);
+	const updated = text.replace(/(@amcharts\/amcharts5-geodata@)\d+\.\d+\.\d+/g, "$1" + version);
+
+	if (updated !== text) {
+		await writeFile(readme, updated);
+	}
+
 	await tsc(state.cwd, "tsconfig.geodata.json", state.clean);
 
 	await mapFiles(state.path("dist", "geodata", "es2015"), state.path("dist", "geodata", "script"), (name, file) => {
@@ -112,4 +125,8 @@ module.exports = async (state) => {
 
 	await cp(state.path("packages", "shared"), state.path("dist", "geodata", "script"));
 	await cp(state.path("packages", "geodata"), state.path("dist", "geodata", "script"));
+
+	// The npm package carries the script maps in dist/, for script tags from node_modules or an npm CDN;
+	// json/ and images/ are in the package already
+	await cpScriptFiles(state.path("dist", "geodata", "script"), state.path("dist", "geodata", "es2015", "dist"), ["json", "images"]);
 };

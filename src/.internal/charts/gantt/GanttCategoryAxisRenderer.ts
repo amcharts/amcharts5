@@ -240,7 +240,8 @@ export class GanttCategoryAxisRenderer extends AxisRendererY {
 
 		axis._updateBullet(dataItem);
 
-		container.appear();
+		// rows are made as they scroll into view: shown at once, as fading each in only slows scrolling
+		container.show(0);
 
 		return label;
 	}

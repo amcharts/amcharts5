@@ -5,8 +5,13 @@ import { Label } from "../../core/render/Label";
 import { RoundedRectangle } from "../../core/render/RoundedRectangle";
 import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
+import { Scrollbar } from "../../core/render/Scrollbar";
+import { HorizontalLayout } from "../../core/render/HorizontalLayout";
+import { setFit, fontKey } from "../../core/util/Fit";
 import type { Entity, IEntitySettings } from "../../core/util/Entity";
 import type { Color } from "../../core/util/Color";
+import * as $array from "../../core/util/Array";
+import * as $type from "../../core/util/Type";
 import * as $utils from "../../core/util/Utils";
 
 export interface ILegendDataItem extends ISeriesDataItem {
@@ -116,6 +121,26 @@ export interface ILegendSettings extends ISeriesSettings {
 	 */
 	clickTarget?: "itemContainer" | "marker" | "none"
 
+	/**
+	 * Fits the legend into the chart, a step at a time as room runs out:
+	 *
+	 * * Empty value labels give their room back.
+	 * * Then the legend gets smaller, down to three quarters of its size.
+	 * * Then an item label still too wide for the legend is shortened, and
+	 *   a legend still too tall scrolls.
+	 * * When not even one row fits, the legend is hidden.
+	 *
+	 * Above or below the chart, the legend takes at most 30% of the chart's
+	 * height; beside it, at most 40% of its width. A `width`, `height`,
+	 * `maxWidth`, `maxHeight`, `scale` or `verticalScrollbar` set on the legend
+	 * is kept.
+	 *
+	 * @default false
+	 * @since 5.22.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/legend/#fitting-into-the-chart} for more info
+	 */
+	autoFit?: boolean;
+
 }
 
 export interface ILegendPrivate extends ISeriesPrivate {
@@ -146,6 +171,173 @@ export class Legend extends Series {
 	declare public _privateSettings: ILegendPrivate;
 	declare public _dataItemSettings: ILegendDataItem;
 	declare public _events: ILegendEvents;
+
+	// `autoFit`: whether it was ever on, and whether the legend is fitted now
+	protected _fitOn: boolean = false;
+	protected _fitted: boolean = false;
+	// `autoFit`: each item label's full width, for its text
+	protected _labelWidths: { [uid: number]: { text: string, width: number, font: string } } = {};
+	// `autoFit`: the scrollbar it adds
+	protected _fitScrollbar?: Scrollbar;
+
+	public _beforeChanged() {
+		super._beforeChanged();
+		if (this.get("autoFit") && !this._fitOn) {
+			this._fitOn = true;
+			// fitted once a frame is drawn, as settings written while it is prepared can get lost
+			this._disposers.push(this._root.events.on("frameended", () => {
+				const on = this.get("autoFit", false);
+				const parent = this.parent;
+				if ((on || this._fitted) && parent && this._passDue([this], [parent.innerWidth(), parent.innerHeight(), this._contentWidth, this._contentHeight, this._root.width(), this._root.height(), this._root._fontLoads].join())) {
+					this._fitted = on;
+					this._fitItems(on);
+				}
+			}));
+		}
+	}
+
+	// a legend has no bullet labels to fit
+	protected _fitBulletLabels() {
+	}
+
+	protected _dispose() {
+		const scrollbar = this._fitScrollbar;
+		if (scrollbar && !scrollbar.isDisposed()) {
+			scrollbar.dispose();
+		}
+		super._dispose();
+	}
+
+	// `autoFit`: fits the legend into its room, see the setting; gives back what it set when not `on`
+	protected _fitItems(on: boolean): void {
+		const parent = this.parent;
+		if (this.isDisposed() || !parent) {
+			return;
+		}
+		if (on) {
+			// hidden by the author or a theme: left alone
+			if (!this.get("visible") || (this.get("forceHidden") && !this.isComputedSetting("forceHidden"))) {
+				return;
+			}
+			if (this.isShowing() || this.isHiding()) {
+				this.markDirty();
+				return;
+			}
+		}
+
+		// the room: part of the chart's width beside it, part of its height above or below it
+		const side = parent.get("layout") instanceof HorizontalLayout;
+		const room = (key: "width" | "height") => {
+			let container = parent;
+			while (container.parent && container.get(key) == null && container.getPrivate(key) == null) {
+				container = container.parent;
+			}
+			return key == "width" ? container.innerWidth() : container.innerHeight();
+		};
+		const authored = (key: "width" | "height" | "maxWidth") => $type.isNumber(this.get(key)) && !this.isComputedSetting(key);
+		// beside the chart, the legend is laid out in the room it gets here
+		const bound = on && side && !authored("width") && !authored("maxWidth") ? room("width") * 0.4 : undefined;
+		if (bound == null) {
+			setFit(this, "maxWidth", undefined);
+		}
+		const roomW = bound || this.maxWidth();
+		const maxHeight = this.get("maxHeight");
+		const roomH = Math.min(authored("height") ? this.height() : side ? parent.innerHeight() : room("height") * 0.3, $type.isNumber(maxHeight) ? maxHeight : Infinity);
+		if (!(roomW > 0 && roomH > 0)) {
+			return;
+		}
+
+		const least = 0.75;
+		const readable = 40;
+		const padding = this.get("paddingLeft", 0) + this.get("paddingRight", 0);
+		const inRow = this.get("layout") instanceof HorizontalLayout;
+		// the width its items need with their labels in full: all in a row, or else the widest
+		let width = 0;
+		const widths: { [uid: number]: { text: string, width: number, font: string } } = {};
+		const labels: Array<{ label: Label, item: Container, text: string, known?: { text: string, width: number }, margins: number }> = [];
+		let row = 0;
+		$array.each(this.dataItems, (dataItem) => {
+			const item = dataItem.get("itemContainer");
+			if (!item || item.isDisposed() || !item.isVisible()) {
+				return;
+			}
+			if (!row) {
+				row = item.height() + item.get("marginTop", 0) + item.get("marginBottom", 0);
+			}
+			const margins = item.get("marginLeft", 0) + item.get("marginRight", 0);
+			let full = item.width();
+			// a value label with no text, and none to come from its item, gives its room back
+			const value = dataItem.get("valueLabel");
+			const context: any = dataItem.dataContext;
+			const source: any = context && context.component ? context.component : context;
+			if (value && !value.isDisposed()) {
+				setFit(value, "forceHidden", on && !value.get("text") && !(source && source.get && (source.get("legendValueText") || source.get("legendRangeValueText"))) ? true : undefined);
+			}
+			const label = dataItem.get("label");
+			if (label && !label.isDisposed()) {
+				const text = label.text._getText();
+				const font = fontKey(label);
+				let known: { text: string, width: number, font: string } | undefined = this._labelWidths[label.uid];
+				if (!label.isComputedSetting("maxWidth")) {
+					known = { text: text, width: label.width(), font: font };
+				}
+				else if (known && known.font !== font) {
+					// measured in another font: given back, and measured again
+					known = undefined;
+				}
+				if (known) {
+					widths[label.uid] = known;
+					if (known.text == text) {
+						full += known.width - label.width();
+					}
+				}
+				labels.push({ label: label, item: item, text: text, known: known, margins: margins });
+			}
+			width = inRow ? width + full + margins : Math.max(width, full + margins);
+		});
+		this._labelWidths = widths;
+
+		// smaller, then shortened and scrolling at its own size, then hidden when not even one row fits;
+		// only beside the chart does a smaller legend get more room for its items
+		width += padding;
+		const height = this._contentHeight;
+		const scroll = on && height * least > roomH + 0.5 && (this.get("verticalScrollbar") == null || this.isComputedSetting("verticalScrollbar"));
+		// the width it is laid out in follows the item widths only, so it can not feed back
+		// into the height it gets smaller for
+		const scaleW = Math.max(least, Math.min(1, bound != null || inRow ? roomW / width : 1));
+		const scale = Math.max(least, Math.min(scaleW, roomH / (scroll ? row : height)));
+		if (bound != null) {
+			setFit(this, "maxWidth", bound / scaleW, 0.5);
+		}
+		// a label too wide for the legend at this size is shortened
+		const inner = (bound != null ? bound / scaleW : roomW) - padding;
+		let narrow = false;
+		$array.each(labels, (entry) => {
+			const most = inner - (entry.item.width() - entry.label.width()) - entry.margins;
+			const shorten = on && entry.known != null && entry.known.text == entry.text && entry.known.width > most + 0.5;
+			if (shorten && most < readable) {
+				narrow = true;
+			}
+			// no narrower than readable: below that the legend goes
+			setFit(entry.label, "maxWidth", shorten ? Math.max(most, readable) : undefined, 0.5);
+			setFit(entry.label, "oversizedBehavior", shorten ? "truncate" : undefined);
+		});
+		setFit(this, "forceHidden", on && (narrow || row * least > roomH + 0.5 || (inRow && width * least > roomW + 1)) ? true : undefined);
+		setFit(this, "scale", on && scale < 0.995 ? scale : undefined);
+		setFit(this, "height", scroll ? roomH / scale : undefined, 0.5);
+		if (scroll) {
+			if (!this._fitScrollbar) {
+				// slim, as the legend has little room
+				this._fitScrollbar = Scrollbar.new(this._root, { orientation: "vertical", marginLeft: 4, marginRight: 0 })._markC("orientation", "marginLeft", "marginRight");
+			}
+			if (this.get("verticalScrollbar") !== this._fitScrollbar) {
+				this._setC("verticalScrollbar", this._fitScrollbar);
+			}
+		}
+		else if (this.isComputedSetting("verticalScrollbar")) {
+			this.remove("verticalScrollbar");
+		}
+	}
 
 	/**
 	 * The containers of the legend items, one per item.
