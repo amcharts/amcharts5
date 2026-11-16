@@ -11,13 +11,17 @@ const libraryVersion = require(path.join(here, "package.json")).libraryVersion;
 const dependencies = require(path.join(library, "build", "script-dependencies.js"));
 const classesFile = fs.readFileSync(path.join(library, "src", ".internal", "plugins", "json", "Classes-script.ts"), "utf8");
 
-// The classes outside index.js, with their script file
+// The classes outside index.js, with their script file. Each line adds the
+// classes of one script file:
+// add(() => import(/* webpackMode: "weak" */ "./../../../stock"), "StockChart,StockPanel");
 const classes = {};
-const re = /^\s*"([A-Za-z0-9_]+)": \(\) => import\(.*?"\.\/\.\.\/\.\.\/\.\.\/([^"]+)"\)/gm;
+const re = /^\s*add\(\(\) => import\(.*?"\.\/\.\.\/\.\.\/\.\.\/([^"]+)"\), "([^"]+)"\);/gm;
 let match;
 while ((match = re.exec(classesFile))) {
-	if (match[2] !== "index") {
-		classes[match[1]] = match[2];
+	if (match[1] !== "index") {
+		match[2].split(",").forEach((name) => {
+			classes[name] = match[1];
+		});
 	}
 }
 
