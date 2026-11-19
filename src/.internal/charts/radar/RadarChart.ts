@@ -93,6 +93,16 @@ export interface IRadarChartPrivate extends IXYChartPrivate {
 export class RadarChart extends XYChart {
 
 	/**
+	 * @ignore
+	 */
+	public _setUpTouch(): void {
+		super._setUpTouch();
+		// a radar cursor selects by angle, which a finger traces in any direction
+		this.plotContainer._display.touchAxis = "xy";
+	}
+
+
+	/**
 	 * Container at the chart's center that holds its axes, grid, series and
 	 * cursor.
 	 *

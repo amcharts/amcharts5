@@ -7,6 +7,7 @@ import StockToolbarCSS from "./StockToolbarCSS";
 
 import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
+import { ResizeSensor } from "../../../core/util/ResizeSensor";
 //import * as $type from "../../../core/util/Type";
 
 export interface IStockToolbarSettings extends IEntitySettings {
@@ -32,6 +33,18 @@ export interface IStockToolbarSettings extends IEntitySettings {
 	 * @default true
 	 */
 	useDefaultCSS?: boolean;
+
+	/**
+	 * Folds the controls when they do not fit in one row, a step at a time:
+	 * first the labels of Indicators, Draw, Comparison and the series type
+	 * control, which keep their icons, then the period buttons, into one
+	 * button that opens them as a list. Needs the default CSS. The
+	 * ResponsiveMax theme turns it on.
+	 *
+	 * @default false
+	 * @since 5.23.0
+	 */
+	autoFit?: boolean;
 
 	/**
 	 * Has no effect: the toolbar does not use it.
@@ -76,6 +89,8 @@ export class StockToolbar extends Entity {
 	declare public _events: IStockToolbarEvents;
 
 	private _cssDisposer?: IDisposer;
+	private _resizeSensor?: ResizeSensor;
+	private _fitFrame?: number;
 
 	protected _afterNew() {
 		super._afterNew();
@@ -86,6 +101,14 @@ export class StockToolbar extends Entity {
 
 		this._initControls();
 		this.loadDefaultCSS();
+
+		const container = this.get("container");
+		if (container) {
+			this._resizeSensor = new ResizeSensor(container, () => {
+				this._fitLater();
+			});
+		}
+		this._fitLater();
 
 		this._root.addDisposer(this);
 
@@ -115,6 +138,9 @@ export class StockToolbar extends Entity {
 			this._initControls();
 		}
 
+		if (this.isDirty("controls") || this.isDirty("autoFit") || this.isDirty("useDefaultCSS")) {
+			this._fitLater();
+		}
 	}
 
 	protected _dispose(): void {
@@ -122,6 +148,13 @@ export class StockToolbar extends Entity {
 
 		if (this._cssDisposer) {
 			this._cssDisposer.dispose();
+		}
+
+		if (this._resizeSensor) {
+			this._resizeSensor.dispose();
+		}
+		if (this._fitFrame !== undefined) {
+			cancelAnimationFrame(this._fitFrame);
 		}
 
 		const controls = this.get("controls", []);
@@ -139,6 +172,62 @@ export class StockToolbar extends Entity {
 				this.get("container")!.appendChild(control.getPrivate("button")!);
 			}
 		});
+	}
+
+	// after the layout, so the fit is measured once per frame and a fold does not resize the container mid-callback
+	protected _fitLater(): void {
+		if (this._fitFrame === undefined && !this.isDisposed()) {
+			this._fitFrame = requestAnimationFrame(() => {
+				this._fitFrame = undefined;
+				this.fit();
+			});
+		}
+	}
+
+	/**
+	 * Folds the controls step by step until they fit in one row (see
+	 * `autoFit`). The toolbar does this itself when its container is resized
+	 * or its controls change; call it after changing a control's label.
+	 *
+	 * @since 5.23.0
+	 */
+	public fit(): void {
+		const container = this.get("container");
+		if (!container || this.isDisposed()) {
+			return;
+		}
+		const folds = ["am5stock-fold-labels", "am5stock-fold-periods"];
+		$array.each(folds, (fold) => {
+			$utils.removeClass(container, fold);
+		});
+		let folded = 0;
+		if (this.get("autoFit") && this.get("useDefaultCSS") !== false) {
+			while (folded < folds.length && !this._inOneRow()) {
+				$utils.addClass(container, folds[folded]);
+				folded++;
+			}
+		}
+		if (folded < 2) {
+			// the period list is shown as buttons again
+			$array.each(container.querySelectorAll(".am5stock-periods-open"), (button) => {
+				$utils.removeClass(button as HTMLElement, "am5stock-periods-open");
+			});
+		}
+	}
+
+	// whether the shown buttons are in one row: each overlaps the shortest vertically
+	protected _inOneRow(): boolean {
+		let maxTop = -Infinity;
+		let minBottom = Infinity;
+		$array.each(this.get("controls", []), (control) => {
+			const button = control.getPrivate("button");
+			if (button && button.getClientRects().length) {
+				const rect = button.getBoundingClientRect();
+				maxTop = Math.max(maxTop, rect.top);
+				minBottom = Math.min(minBottom, rect.bottom);
+			}
+		});
+		return maxTop < minBottom;
 	}
 
 	/**

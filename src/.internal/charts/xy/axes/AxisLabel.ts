@@ -99,7 +99,8 @@ export interface IAxisLabelSettings extends ILabelSettings {
 	 * For labels placed inside their cell (`location` or `multiLocation`
 	 * above `0` and below `1`): with a grid step of several periods, such as
 	 * every 2 months, labels sit on the grid lines (`multiLocation: 0`) unless
-	 * `multiLocation` is set. Rotated labels are left where they are.
+	 * `multiLocation` is set. Rotated labels, and those of edge cells cut by
+	 * the axis' `startLocation` or `endLocation`, are left where they are.
 	 *
 	 * @default false
 	 * @since 5.22.0

@@ -7,6 +7,7 @@ import { Template } from "../../core/util/Template";
 import { ListTemplate } from "../../core/util/List";
 import { Scrollbar } from "../../core/render/Scrollbar";
 import { HorizontalLayout } from "../../core/render/HorizontalLayout";
+import { GridLayout } from "../../core/render/GridLayout";
 import { setFit, fontKey } from "../../core/util/Fit";
 import type { Entity, IEntitySettings } from "../../core/util/Entity";
 import type { Color } from "../../core/util/Color";
@@ -237,10 +238,13 @@ export class Legend extends Series {
 		const authored = (key: "width" | "height" | "maxWidth") => $type.isNumber(this.get(key)) && !this.isComputedSetting(key);
 		// beside the chart, the legend is laid out in the room it gets here
 		const bound = on && side && !authored("width") && !authored("maxWidth") ? room("width") * 0.4 : undefined;
-		if (bound == null) {
-			setFit(this, "maxWidth", undefined);
+		let roomW = bound || this.maxWidth();
+		if (bound == null && this.isComputedSetting("maxWidth")) {
+			// the width it gets without the one fitting gave it
+			const given = this.getPrivate("maxWidth");
+			const ownWidth = this.get("width");
+			roomW = $type.isNumber(given) ? given : $type.isNumber(ownWidth) ? ownWidth : parent.innerWidth();
 		}
-		const roomW = bound || this.maxWidth();
 		const maxHeight = this.get("maxHeight");
 		const roomH = Math.min(authored("height") ? this.height() : side ? parent.innerHeight() : room("height") * 0.3, $type.isNumber(maxHeight) ? maxHeight : Infinity);
 		if (!(roomW > 0 && roomH > 0)) {
@@ -255,6 +259,8 @@ export class Legend extends Series {
 		let width = 0;
 		const widths: { [uid: number]: { text: string, width: number, font: string } } = {};
 		const labels: Array<{ label: Label, item: Container, text: string, known?: { text: string, width: number }, margins: number }> = [];
+		// each item's width with its label in full
+		const fullWidths: { [uid: number]: number } = {};
 		let row = 0;
 		$array.each(this.dataItems, (dataItem) => {
 			const item = dataItem.get("itemContainer");
@@ -290,6 +296,7 @@ export class Legend extends Series {
 					if (known.text == text) {
 						full += known.width - label.width();
 					}
+					fullWidths[item.uid] = full;
 				}
 				labels.push({ label: label, item: item, text: text, known: known, margins: margins });
 			}
@@ -301,16 +308,63 @@ export class Legend extends Series {
 		// only beside the chart does a smaller legend get more room for its items
 		width += padding;
 		const height = this._contentHeight;
-		const scroll = on && height * least > roomH + 0.5 && (this.get("verticalScrollbar") == null || this.isComputedSetting("verticalScrollbar"));
+
+		// a grid made smaller is laid out as much wider, so it fits more items in a row: the largest
+		// size at which its rows fit, with the columns the grid makes at that size
+		const layout = this.get("layout");
+		const grid = on && bound == null && !inRow && layout instanceof GridLayout && !authored("width") && !authored("maxWidth") && !(this.isUserSetting("scale") && !this.isComputedSetting("scale")) ? layout : undefined;
+		let fits = roomH / height;
+		let fullHeight = height;
+		if (grid) {
+			const columns = (scale: number) => {
+				const inner = roomW / scale - padding;
+				// each item as wide as it gets at this size: its label in full, or shortened to the legend
+				return grid._columns(this, inner, (child) => {
+					const full = fullWidths[child.uid];
+					return full == null ? 0 : Math.min(full, inner - child.get("marginLeft", 0) - child.get("marginRight", 0)) - child.width();
+				}).length;
+			};
+			// what the content has besides the rows stays as it is
+			const rest = height - grid._rowsHeight(this, grid._columns(this, this.maxWidth() - padding).length);
+			const heightWith = (count: number) => rest + grid._rowsHeight(this, count);
+			const first = columns(1);
+			const most = columns(least);
+			fits = 0;
+			for (let count = first; count <= most; count++) {
+				// the largest size with at least this many columns
+				let top = 1;
+				if (count > first) {
+					let low = least;
+					for (let i = 0; i < 30; i++) {
+						const mid = (low + top) / 2;
+						if (columns(mid) >= count) {
+							low = mid;
+						}
+						else {
+							top = mid;
+						}
+					}
+					top = low;
+				}
+				fits = Math.max(fits, Math.min(top, roomH / heightWith(count)));
+			}
+			fullHeight = heightWith(most);
+		}
+
 		// the width it is laid out in follows the item widths only, so it can not feed back
 		// into the height it gets smaller for
+		const scroll = on && fullHeight * least > roomH + 0.5 && (this.get("verticalScrollbar") == null || this.isComputedSetting("verticalScrollbar"));
 		const scaleW = Math.max(least, Math.min(1, bound != null || inRow ? roomW / width : 1));
-		const scale = Math.max(least, Math.min(scaleW, roomH / (scroll ? row : height)));
+		const scale = Math.max(least, Math.min(scaleW, scroll ? roomH / row : fits));
+		const shown = on && scale < 0.995 ? scale : 1;
 		if (bound != null) {
 			setFit(this, "maxWidth", bound / scaleW, 0.5);
 		}
+		else {
+			setFit(this, "maxWidth", grid && shown < 1 ? roomW / shown : undefined, 0.5);
+		}
 		// a label too wide for the legend at this size is shortened
-		const inner = (bound != null ? bound / scaleW : roomW) - padding;
+		const inner = (bound != null ? bound / scaleW : grid ? roomW / shown : roomW) - padding;
 		let narrow = false;
 		$array.each(labels, (entry) => {
 			const most = inner - (entry.item.width() - entry.label.width()) - entry.margins;

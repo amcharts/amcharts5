@@ -363,6 +363,7 @@ export interface ISeriesPrivate extends IComponentPrivate {
 	startIndex?: number;
 	endIndex?: number;
 	adjustedStartIndex?:number;
+	adjustedEndIndex?:number;
 
 	/**
 	 * Average of all data items' values (with `calculateAggregates`).
@@ -460,11 +461,25 @@ export abstract class Series extends Component {
 	}
 
 	protected _aggregatesCalculated: boolean = false;
-	protected _selectionAggregatesCalculated: boolean = false;
 	protected _dataProcessed: boolean = false;
 
 	protected _psi: number | undefined;
 	protected _pei: number | undefined;
+
+	// the range the aggregates in view were last worked out for
+	protected _aggregatesStart: number | undefined;
+	protected _aggregatesEnd: number | undefined;
+	protected _aggregatesAdjustedStart: number | undefined;
+	protected _aggregatesAdjustedEnd: number | undefined;
+	// what the pass over all data wrote as the aggregates in view, and whether every pass in view since then
+	// started at the first item (so the change values it wrote are the same)
+	protected _aggregatesOfAll?: Array<[string, number]>;
+	protected _aggregatesSameOpen: boolean = false;
+	// aggregates put off until the data shown has settled (see `_aggregatesDeferred`), and forced after a frame
+	protected _aggregatesPending: boolean = false;
+	protected _aggregatesForced: boolean = false;
+	// put off since the legend was last told: the legend is refreshed once they are in
+	protected _aggregatesLate: boolean = false;
 
 	protected _baseSeriesDirty: boolean = false;
 
@@ -967,7 +982,6 @@ export abstract class Series extends Component {
 		super._clearDirty();
 		this._aggregatesCalculated = false;
 		this._baseSeriesDirty = false;
-		this._selectionAggregatesCalculated = false;
 	}
 
 	public _prepareChildren(){
@@ -1027,24 +1041,61 @@ export abstract class Series extends Component {
 
 		const calculateAggregates = this.get("calculateAggregates");
 		if(calculateAggregates){
-			if (this._valuesDirty && !this._dataProcessed) {
+			if ((this._valuesDirty && !this._dataProcessed) || this.isDirty("calculateAggregates") || this._aggregatesPending) {
 				if (!this._aggregatesCalculated) {
-					this._calculateAggregates(0, count);
-					this._aggregatesCalculated = true;
-					if(startIndex != 0){
-						this._psi = undefined;
+					if (this._aggregatesDeferred() && !this._aggregatesForced) {
+						// the data shown is about to change (e.g. grouped): worked out for that, or after this frame at the latest
+						if (!this._aggregatesPending) {
+							this._aggregatesPending = true;
+							this._aggregatesLate = true;
+							this._root.events.once("frameended", () => {
+								if (this._aggregatesPending && !this.isDisposed()) {
+									this._aggregatesForced = true;
+									// a values pass: what is drawn from the aggregates is worked out again too
+									this.markDirtyValues();
+								}
+							});
+						}
+					}
+					else {
+						this._aggregatesPending = false;
+						this._aggregatesForced = false;
+						this._calculateAggregates(0, count, true);
+						this._aggregatesCalculated = true;
+						if(startIndex != 0){
+							this._psi = undefined;
+						}
+						// the values in view are worked out again after the ones of all data
+						this._aggregatesStart = undefined;
+						this._aggregatesSameOpen = true;
 					}
 				}
 			}
 
-			if ((this._psi != startIndex || this._pei != endIndex || this.isPrivateDirty("adjustedStartIndex")) && !this._selectionAggregatesCalculated) {
-				if (startIndex === 0 && endIndex === count && this._aggregatesCalculated) {
-					// void
+			// worked out again whenever the range in view differs from the one they were worked out for,
+			// also when the axes move it later in the same frame
+			const adjustedStartIndex = this.getPrivate("adjustedStartIndex", startIndex);
+			const adjustedEndIndex = this.getPrivate("adjustedEndIndex", endIndex);
+			if (!this._aggregatesPending && (this._aggregatesStart !== startIndex || this._aggregatesEnd !== endIndex || this._aggregatesAdjustedStart !== adjustedStartIndex || this._aggregatesAdjustedEnd !== adjustedEndIndex)) {
+				const aggregatesOfAll = this._aggregatesOfAll;
+				if (startIndex === 0 && endIndex === count && adjustedStartIndex === 0 && adjustedEndIndex === count && this._aggregatesSameOpen && aggregatesOfAll && !this.getPrivate("baseValueSeries")) {
+					// all data is in view: the pass over all data worked them out
+					for (let i = 0, len = aggregatesOfAll.length; i < len; i++) {
+						this.setPrivate(<any>aggregatesOfAll[i][0], aggregatesOfAll[i][1]);
+					}
 				}
 				else {
 					this._calculateAggregates(startIndex, endIndex);
+					this._aggregatesSameOpen = this._aggregatesSameOpen && adjustedStartIndex === 0 && startIndex === 0;
 				}
-				this._selectionAggregatesCalculated = true;
+				this._aggregatesStart = startIndex;
+				this._aggregatesEnd = endIndex;
+				this._aggregatesAdjustedStart = adjustedStartIndex;
+				this._aggregatesAdjustedEnd = adjustedEndIndex;
+				if (this._aggregatesLate) {
+					this._aggregatesLate = false;
+					this._aggregatesChanged();
+				}
 			}
 		}
 
@@ -1109,7 +1160,37 @@ export abstract class Series extends Component {
 		return index;
 	}
 
-	protected _calculateAggregates(startIndex: number, endIndex: number) {
+	/**
+	 * @ignore
+	 */
+	public _adjustEndIndex(index:number):number{
+		return index;
+	}
+
+	/**
+	 * Whether the data shown is about to be replaced in this frame, so
+	 * aggregates worked out now would be thrown away.
+	 *
+	 * @ignore
+	 */
+	public _aggregatesDeferred(): boolean {
+		return false;
+	}
+
+	/**
+	 * Called after the aggregates in view were worked out again.
+	 *
+	 * @ignore
+	 */
+	public _aggregatesChanged(): void {
+	}
+
+	/**
+	 * Works out the aggregates of the data items in view (from `startIndex`
+	 * to `endIndex`), or with `all`, of all data items (`startIndex` 0 and
+	 * `endIndex` the number of data items).
+	 */
+	protected _calculateAggregates(startIndex: number, endIndex: number, all?: boolean) {
 
 		let fields = this._valueFields;
 		if (!fields) {
@@ -1143,6 +1224,22 @@ export abstract class Series extends Component {
 		const dataItems = this.dataItems;
 		const len = dataItems.length;
 
+		// the range in view counts the items really in view; all data counts every item
+		const adjustedStartIndex = all ? 0 : this.getPrivate("adjustedStartIndex", startIndex);
+		const adjustedEndIndex = all ? len : Math.max(adjustedStartIndex, Math.min(endIndex, this.getPrivate("adjustedEndIndex", endIndex)));
+		// the item before the range in view gets change values too
+		const beforeIndex = startIndex > 0 ? startIndex - 1 : 0;
+
+		// change values go straight in; through setRaw only where someone listens for that key
+		const write = (dataItem: any, key: string, value: number) => {
+			if (dataItem._settingEvents[key] || dataItem._debouncedSettingEvents[key]) {
+				dataItem.setRaw(key, value);
+			}
+			else {
+				dataItem._settings[key] = value;
+			}
+		};
+
 		for(let f = 0, flen = fields.length; f < flen; f++){
 			let key = fields[f];
 			let change = key + "Change";
@@ -1162,27 +1259,26 @@ export abstract class Series extends Component {
 			}
 
 			const baseValueSeries = this.getPrivate("baseValueSeries");
-			const adjustedStartIndex = this.getPrivate("adjustedStartIndex", startIndex);
 
 			const calculateChangesForItem = (dataItem: any, value:number, key: string) => {
-				if (startIndex === 0) {
+				if (all) {
 					const openValue = open[openKey];
 					const changeValue = value - openValue;
-					dataItem.setRaw(<any>(change), changeValue);
-					dataItem.setRaw(<any>(changePercent), changeValue / openValue * 100);
+					write(dataItem, change, changeValue);
+					write(dataItem, changePercent, changeValue / openValue * 100);
 				}
 
 				const changePreviousValue = value - previous[openKey];
 				const changeSelectionValue = value - open[openKey];
-				dataItem.setRaw(<any>(changePrevious), changePreviousValue);
-				dataItem.setRaw(<any>(changePreviousPercent), changePreviousValue / previous[openKey] * 100);
-				dataItem.setRaw(<any>(changeSelection), changeSelectionValue);
-				dataItem.setRaw(<any>(changeSelectionPercent), changeSelectionValue / open[openKey] * 100);
+				write(dataItem, changePrevious, changePreviousValue);
+				write(dataItem, changePreviousPercent, changePreviousValue / previous[openKey] * 100);
+				write(dataItem, changeSelection, changeSelectionValue);
+				write(dataItem, changeSelectionPercent, changeSelectionValue / open[openKey] * 100);
 				previous[key] = value;
 			};
 
 			// find first non-null value to initialize open, low, high instead of checking in loop
-			for (let i = adjustedStartIndex; i < endIndex; i++) {
+			for (let i = adjustedStartIndex; i < adjustedEndIndex; i++) {
 				const dataItem = dataItems[i];
 				if(dataItem){
 					let value = dataItem.get(<any>key)
@@ -1209,6 +1305,21 @@ export abstract class Series extends Component {
 				}
 			}
 
+			// no item's middle is in view: the change values count from the first value in the range
+			if (open[key] == null) {
+				for (let i = adjustedEndIndex; i < endIndex; i++) {
+					const dataItem = dataItems[i];
+					const value = dataItem ? dataItem.get(<any>key) : undefined;
+					if (value != null) {
+						open[key] = value;
+						previous[key] = value;
+						if (baseValueSeries) {
+							open[openKey] = baseValueSeries._getBase(openKey);
+						}
+						break;
+					}
+				}
+			}
 
 			for (let i = adjustedStartIndex; i < endIndex; i++) {
 				const dataItem = dataItems[i];
@@ -1216,19 +1327,22 @@ export abstract class Series extends Component {
 					let value = (dataItem._settings as any)[key];
 
 					if (value != null) {
-						count[key]++;
-						sum[key] += value;
+						// items past the end of the view get change values, but are not counted
+						if (i < adjustedEndIndex) {
+							count[key]++;
+							sum[key] += value;
 
-						absSum[key] += Math.abs(value);
+							absSum[key] += Math.abs(value);
 
-						if (low[key] > value) {
-							low[key] = value;
+							if (low[key] > value) {
+								low[key] = value;
+							}
+							if (high[key] < value) {
+								high[key] = value;
+							}
+
+							close[key] = value;
 						}
-						if (high[key] < value) {
-							high[key] = value;
-						}
-
-						close[key] = value;
 						calculateChangesForItem(dataItem, value, key);
 					}
 				}
@@ -1256,13 +1370,9 @@ export abstract class Series extends Component {
 				}
 			}
 
-			if (startIndex > 0) {
-				startIndex--;
-			}
-
 			delete previous[key];
 
-			for (let i = startIndex; i < adjustedStartIndex; i++) {
+			for (let i = beforeIndex; i < adjustedStartIndex; i++) {
 				const dataItem = dataItems[i];
 				if(dataItem) {
 					let value = dataItem.get(<any>key);
@@ -1290,7 +1400,16 @@ export abstract class Series extends Component {
 			this.setPrivate(<any>(key + "CloseSelection"), close[key]);
 		}
 
-		if (startIndex === 0 && endIndex === len) {
+		if (all) {
+			// kept, to be put back when all data comes into view again
+			const aggregatesOfAll: Array<[string, number]> = [];
+			for(let f = 0, flen = fields.length; f < flen; f++){
+				let key = fields[f];
+				aggregatesOfAll.push([key + "AverageSelection", average[key]], [key + "CountSelection", count[key]], [key + "SumSelection", sum[key]], [key + "AbsoluteSumSelection", absSum[key]],
+					[key + "LowSelection", low[key]], [key + "HighSelection", high[key]], [key + "OpenSelection", open[key]], [key + "CloseSelection", close[key]]);
+			}
+			this._aggregatesOfAll = aggregatesOfAll;
+
 			for(let f = 0, flen = fields.length; f < flen; f++){
 				let key = fields[f];
 				this.setPrivate(<any>(key + "Average"), average[key]);

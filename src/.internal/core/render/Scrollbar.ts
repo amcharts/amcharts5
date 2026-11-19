@@ -6,6 +6,7 @@ import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } fr
 import { Graphics } from "./Graphics";
 import { Button } from "./Button";
 
+import * as $array from "../util/Array";
 import * as $type from "../util/Type";
 import * as $utils from "../util/Utils";
 
@@ -105,6 +106,16 @@ export interface IScrollbarPrivate extends IContainerPrivate {
 	 * @ignore
 	 */
 	positionTextFunction?: (position: number, isEnd?: boolean) => string;
+
+	/**
+	 * Returns `true` if values go against the scrollbar's direction (bottom to
+	 * top on a vertical one). Screen readers then read the start grip as the
+	 * end of the range and the end grip as its start, and `positionTextFunction`
+	 * gets positions flipped (`1 - position`).
+	 *
+	 * @ignore
+	 */
+	reversedFunction?: () => boolean;
 
 }
 
@@ -431,33 +442,56 @@ export class Scrollbar extends Container {
 			endGrip._setC("x", width * this.get("end", 1));
 		}
 
+		const readout = this._readout();
+
+		// When reversed, the start grip is where the range ends
+		const fromGrip = readout.reversed ? endGrip : startGrip;
+		const toGrip = readout.reversed ? startGrip : endGrip;
+
+		fromGrip._setC("ariaLabel", this._t("From %1", undefined, readout.fromText));
+		fromGrip._setC("ariaValueNow", "" + readout.from);
+		fromGrip._setC("ariaValueText", readout.from + "%");
+
+		toGrip._setC("ariaLabel", this._t("To %1", undefined, readout.toText));
+		toGrip._setC("ariaValueNow", "" + readout.to);
+		toGrip._setC("ariaValueText", readout.to + "%");
+
+		$array.each([startGrip, endGrip], (grip) => {
+			grip._setC("ariaValueMin", "0");
+			grip._setC("ariaValueMax", "100");
+		});
+	}
+
+	/**
+	 * The selected range as screen readers read it: percentages and texts for
+	 * its start and end, in the direction values go.
+	 */
+	protected _readout(): { from: number, to: number, fromText: string, toText: string, reversed: boolean } {
+		const reversedFunction = this.getPrivate("reversedFunction");
+		const reversed = reversedFunction ? reversedFunction.call(this) : false;
+
+		const start = this.get("start", 0);
+		const end = this.get("end", 1);
+
+		const fromPosition = reversed ? 1 - end : start;
+		const toPosition = reversed ? 1 - start : end;
+
+		const from = Math.round(fromPosition * 100);
+		const to = Math.round(toPosition * 100);
+
 		const valueFunction = this.getPrivate("positionTextFunction");
-		const from = Math.round(this.get("start", 0) * 100);
-		const to = Math.round(this.get("end", 0) * 100);
-		let fromValue: string;
-		let toValue: string;
+		let fromText: string;
+		let toText: string;
 		if (valueFunction) {
-			fromValue = valueFunction.call(this, this.get("start", 0));
-			toValue = valueFunction.call(this, this.get("end", 0), true);
+			fromText = valueFunction.call(this, fromPosition);
+			toText = valueFunction.call(this, toPosition, true);
 		}
 		else {
-			fromValue = from + "%";
-			toValue = to + "%";
+			fromText = from + "%";
+			toText = to + "%";
 		}
 
-		startGrip._setC("ariaLabel", this._t("From %1", undefined, fromValue));
-		startGrip._setC("ariaValueNow", "" + from);
-		startGrip._setC("ariaValueText", from + "%");
-
-		startGrip._setC("ariaValueMin", "0");
-		startGrip._setC("ariaValueMax", "100");
-
-		endGrip._setC("ariaLabel", this._t("To %1", undefined, toValue));
-		endGrip._setC("ariaValueNow", "" + to);
-		endGrip._setC("ariaValueText", to + "%");
-
-		endGrip._setC("ariaValueMin", "0");
-		endGrip._setC("ariaValueMax", "100");
+		return { from, to, fromText, toText, reversed };
 	}
 
 	protected _updateThumb() {
@@ -503,23 +537,10 @@ export class Scrollbar extends Container {
 			this._setC("end", end);
 		}
 
-		const valueFunction = this.getPrivate("positionTextFunction");
-		const from = Math.round(this.get("start", 0) * 100);
-		const to = Math.round(this.get("end", 0) * 100);
-		let fromValue: string;
-		let toValue: string;
-		if (valueFunction) {
-			fromValue = valueFunction.call(this, this.get("start", 0));
-			toValue = valueFunction.call(this, this.get("end", 0), true);
-		}
-		else {
-			fromValue = from + "%";
-			toValue = to + "%";
-		}
-
-		thumb._setC("ariaLabel", this._t("From %1 to %2", undefined, fromValue, toValue));
-		thumb._setC("ariaValueNow", "" + from);
-		thumb._setC("ariaValueText", from + "%");
+		const readout = this._readout();
+		thumb._setC("ariaLabel", this._t("From %1 to %2", undefined, readout.fromText, readout.toText));
+		thumb._setC("ariaValueNow", "" + readout.from);
+		thumb._setC("ariaValueText", readout.from + "%");
 	}
 
 

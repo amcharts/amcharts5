@@ -2,6 +2,7 @@ import type { Entity } from "./util/Entity";
 import { Template } from "./util/Template";
 import type { Root } from "./Root";
 import type { IClasses } from "./Classes";
+import type { TouchGestures } from "./render/backend/Renderer";
 import * as $order from "./util/Order";
 import * as $array from "./util/Array";
 
@@ -41,6 +42,14 @@ export class Theme {
 	}
 
 	protected setupDefaultRules(): void {}
+
+	/**
+	 * The root's `touchGestures` while the theme is used, unless it is set
+	 * in code. The last theme that has one wins.
+	 *
+	 * @ignore
+	 */
+	public _touchGestures?: TouchGestures;
 
 	protected _rules: { [type: string]: Array<IRule<Entity>>; } = {};
 

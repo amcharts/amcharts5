@@ -1,6 +1,6 @@
 /** @ignore *//** */
 
-import type { IMargin, ILayer, ICanvasOptions, IPointerEvent, ITextStyle } from "./Renderer";
+import type { IMargin, ILayer, ICanvasOptions, IPointerEvent, ITextStyle, TouchGestures } from "./Renderer";
 import type { ISceneHost } from "../scene/SceneNode";
 import type { ISvgItem } from "./SvgExport";
 import type { IBounds } from "../../util/IBounds";
@@ -249,6 +249,20 @@ export class SVGRenderer extends ArrayDisposer implements ISceneHost {
 	 */
 	public set tapToActivate(value: boolean) {
 		this._interaction.tapToActivate = value;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public get touchGestures(): TouchGestures {
+		return this._interaction.touchGestures;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public set touchGestures(value: TouchGestures) {
+		this._interaction.touchGestures = value;
 	}
 
 	/**

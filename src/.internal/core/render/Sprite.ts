@@ -147,6 +147,7 @@ class SpriteEventDispatcher<Target, E extends Events<Target, ISpriteEvents>> ext
 			point: event.point,
 			simulated: event.simulated,
 			native: event.native,
+			cancelled: event.cancelled,
 			target: this._sprite
 		};
 	}
@@ -1006,6 +1007,15 @@ export interface ISpritePointerEvent {
 	native?: boolean;
 
 	/**
+	 * `true` on a `pointerup` or `globalpointerup` that ends a gesture without
+	 * effect: the browser took it over (for example to scroll the page), or it
+	 * was a swipe that `touchGestures` left to the page.
+	 *
+	 * @since 5.23.0
+	 */
+	cancelled?: boolean;
+
+	/**
 	 * The element on which the event occurred.
 	 */
 	target: Sprite;
@@ -1421,7 +1431,8 @@ export abstract class Sprite extends Entity {
 
 		if (this.isDirty("tooltip")) {
 			const previous = this._prevSettings.tooltip;
-			if (previous) {
+			// the root's system tooltip is shared by the logo and interface buttons
+			if (previous && previous !== this._root._systemTooltip) {
 				previous.dispose();
 			}
 		}
@@ -2704,7 +2715,7 @@ export abstract class Sprite extends Entity {
 		this._root._removeFocusElement(this);
 
 		const tooltip = this.get("tooltip");
-		if (tooltip) {
+		if (tooltip && tooltip !== this._root._systemTooltip) {
 			tooltip.dispose();
 		}
 
@@ -3278,14 +3289,9 @@ export abstract class Sprite extends Entity {
 
 	public _getDownPointId(): number | undefined {
 		if (this._downPoints) {
+			// pointer ids as numbers: as text, a 10th touch would sort before a 9th
 			return $object.keysOrdered(this._downPoints, (a, b) => {
-				if (a > b) {
-					return 1;
-				}
-				if (a < b) {
-					return -1;
-				}
-				return 0;
+				return +a - +b;
 			})[0];
 		}
 	}

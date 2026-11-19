@@ -1,7 +1,7 @@
 /** @ignore *//** */
 
 import type { IPoint } from "../../util/IPoint";
-import type { IRendererEvent, IRendererEvents, IPointerEvent, Id } from "../backend/Renderer";
+import type { IRendererEvent, IRendererEvents, IPointerEvent, Id, TouchGestures } from "../backend/Renderer";
 import { ArrayDisposer, Disposer, IDisposer, CounterDisposer, MultiDisposer } from "../../util/Disposer";
 import * as $utils from "../../util/Utils";
 import * as $array from "../../util/Array";
@@ -120,8 +120,14 @@ function onPointerEvent(element: EventTarget, name: string, f: (event: Array<IPo
 export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisposer {
 	public interactionsEnabled: boolean = true;
 
-	public tapToActivate: boolean = false;
+	protected _touchGestures: TouchGestures = "chart";
 	public tapToActivateTimeout: number = 3000;
+
+	// touches on the chart it does not take at touchstart, while it is not yet clear the page will not take
+	// them: their pointerdown and moves wait, so a swipe the page scrolls with never reaches the chart
+	protected _pending: { [id: number]: { x: number, y: number, last?: IPointerEvent, far: number, released: boolean, down?: { event: IPointerEvent, target: Node | null } } } = {};
+	// gesture ends that are cancelled: the browser took the gesture, or it was a swipe the chart never got
+	protected _cancelledEnds: WeakMap<object, boolean> = new WeakMap();
 	public _touchActive: boolean = false;
 	protected _touchActiveTimeout?: number;
 
@@ -204,6 +210,142 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 				}
 			}, { passive: false }));
 		}
+	}
+
+	/**
+	 * Who gets a touch gesture on the chart, see `Root.touchGestures`.
+	 */
+	public get touchGestures(): TouchGestures {
+		return this._touchGestures;
+	}
+
+	public set touchGestures(value: TouchGestures) {
+		this._touchGestures = value;
+		// "auto": the browser scrolls the page with vertical swipes and leaves sideways ones to the chart
+		$utils.setStyle(this._host.view, "touchAction", value == "auto" ? "pan-y" : "");
+	}
+
+	public get tapToActivate(): boolean {
+		return this._touchGestures == "tap";
+	}
+
+	public set tapToActivate(value: boolean) {
+		if (value) {
+			this.touchGestures = "tap";
+		}
+		else if (this._touchGestures == "tap") {
+			this.touchGestures = "chart";
+		}
+	}
+
+	// whether touches not taken at touchstart wait: in "auto", and in "tap" until the chart is tapped
+	protected _holdsTouches(): boolean {
+		return this._touchGestures == "auto" || (this._touchGestures == "tap" && !this._touchActive);
+	}
+
+	// whether anything listens to `key` on `node`
+	protected _listens(key: keyof IRendererEvents, node: N): boolean {
+		const events = this._events[key];
+		return events !== undefined && events.callbacks.some((callback) => !callback.disposed && callback.object === node);
+	}
+
+	// on a pointerdown: whether a touch on the chart that it does not take at touchstart waits, its
+	// pointerdown held back until the touch turns out to be the chart's
+	protected _defersDown(ev: IPointerEvent, originalTarget: Node | null): boolean {
+		const event = ev as PointerEvent;
+		if ((event.pointerType !== "touch" && event.pointerType !== "pen") || !this._holdsTouches()) {
+			return false;
+		}
+		if ($object.keys(this._pending).length && this._touchGestures == "auto") {
+			// a second finger: in "auto" a pinch is the chart's (pan-y leaves pinching to it); in "tap" it waits too
+			$object.each(this._pending, (_id, pending) => {
+				this._release(pending);
+			});
+			return false;
+		}
+		const hit = this._host.getEvent(ev);
+		const target = this._host._getHitTarget(hit.originalPoint, hit.bbox, originalTarget);
+		if (target === undefined) {
+			// not on the chart
+			return false;
+		}
+		// the element the pointerdown would drag, as in _dispatchMousedown; if it takes the touch,
+		// the touchstart listener stops the browser from taking the gesture, so it starts now
+		let taker = undefined as N | undefined;
+		if (target) {
+			eachTargets(target, (obj) => {
+				if (this._listens("pointerdown", obj)) {
+					taker = obj;
+					return false;
+				}
+				return true;
+			});
+		}
+		if (taker && taker.shouldCancelTouch()) {
+			return false;
+		}
+		this._pending[event.pointerId] = { x: event.clientX, y: event.clientY, far: 0, released: false, down: { event: ev, target: originalTarget } };
+		return true;
+	}
+
+	// a waiting touch turned out to be the chart's: its pointerdown now, its moves from here on
+	protected _release(pending: { released: boolean, down?: { event: IPointerEvent, target: Node | null } }): void {
+		pending.released = true;
+		const down = pending.down;
+		if (down) {
+			pending.down = undefined;
+			this._dispatchMousedown(down.event, down.target);
+		}
+	}
+
+	// whether a move of a waiting touch is held back; decided once per event, as two listeners ask
+	protected _holds(ev: IPointerEvent): boolean {
+		const event = ev as PointerEvent;
+		if (event.type == "pointerdown") {
+			return false;
+		}
+		const pending = this._pending[event.pointerId];
+		if (!pending || pending.released) {
+			return false;
+		}
+		if (pending.last !== ev) {
+			pending.last = ev;
+			const dx = event.clientX - pending.x;
+			const dy = event.clientY - pending.y;
+			const far = dx * dx + dy * dy;
+			pending.far = Math.max(pending.far, far);
+			// sideways: the page does not scroll that way (pan-y), so the gesture is the chart's
+			if (far >= 64 && this._touchGestures == "auto" && Math.abs(dx) > Math.abs(dy)) {
+				this._release(pending);
+			}
+		}
+		return !pending.released;
+	}
+
+	// whether a pointerup or pointercancel ends the gesture without effect; decided once per event
+	protected _endsCancelled(ev: IPointerEvent): boolean {
+		const known = this._cancelledEnds.get(ev);
+		if (known !== undefined) {
+			return known;
+		}
+		const event = ev as PointerEvent;
+		let cancelled = event.type == "pointercancel";
+		const pending = this._pending[event.pointerId];
+		if (pending) {
+			delete this._pending[event.pointerId];
+			if (!pending.released && !cancelled) {
+				if (pending.far >= 576) {
+					// a swipe the chart never got (24 px or more)
+					cancelled = true;
+				}
+				else {
+					// a tap, even a slightly sloppy one: the chart gets its pointerdown, then this up
+					this._release(pending);
+				}
+			}
+		}
+		this._cancelledEnds.set(ev, cancelled);
+		return cancelled;
 	}
 
 	protected _delayTouchDeactivate(): void {
@@ -388,9 +530,10 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 		}
 	}
 
-	_dispatchGlobalMouseup(originalEvent: IPointerEvent, native: boolean): void {
+	_dispatchGlobalMouseup(originalEvent: IPointerEvent, native: boolean, cancelled?: boolean): void {
 		const event = this._host.getEvent(originalEvent);
 		event.native = native;
+		event.cancelled = cancelled;
 		this._dispatchEventAll("globalpointerup", event);
 	}
 
@@ -407,7 +550,7 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 		}
 	}
 
-	_dispatchDragEnd(originalEvent: IPointerEvent, originalTarget: Node | null): void {
+	_dispatchDragEnd(originalEvent: IPointerEvent, originalTarget: Node | null, cancelled?: boolean): void {
 		const button = (<PointerEvent>originalEvent).button;
 		let clickevent: "click" | "rightclick" | "middleclick";
 		if (button == 0 || button === undefined) {
@@ -426,9 +569,11 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 
 		const event = this._host.getEvent(originalEvent);
 		const id = event.id;
+		event.cancelled = cancelled;
 
 		if (this._mousedown.length !== 0) {
-			const target = this._host._getHitTarget(event.originalPoint, event.bbox, originalTarget);
+			// a cancelled gesture is no click
+			const target = cancelled ? undefined : this._host._getHitTarget(event.originalPoint, event.bbox, originalTarget);
 
 			if (target) {
 				this._mousedown.forEach((obj) => {
@@ -544,6 +689,11 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 			case "pointerout":
 				return this._makeSharedEvent("pointermove", () => {
 					const listener = (events: Array<IPointerEvent>, target: Node | null, native: boolean) => {
+						// moves of a waiting touch are held back (and not remembered for hover after a render)
+						events = events.filter((event) => !this._holds(event));
+						if (!events.length) {
+							return;
+						}
 						this._lastPointerMoveEvent = { events, target, native };
 
 						$array.each(events, (event) => {
@@ -560,14 +710,14 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 				return this._makeSharedEvent("pointerup", () => {
 					const mouseup = this._onPointerEvent("pointerup", (events, target, native) => {
 						$array.each(events, (event) => {
-							this._dispatchGlobalMouseup(event, native);
+							this._dispatchGlobalMouseup(event, native, this._endsCancelled(event));
 						});
 						this._lastPointerMoveEvent = { events, target, native };
 					});
 
 					const pointercancel = this._onPointerEvent("pointercancel", (events, target, native) => {
 						$array.each(events, (event) => {
-							this._dispatchGlobalMouseup(event, native);
+							this._dispatchGlobalMouseup(event, native, this._endsCancelled(event));
 						});
 						this._lastPointerMoveEvent = { events, target, native };
 					});
@@ -589,26 +739,30 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 				return this._makeSharedEvent("pointerdown", () => {
 					const mousedown = this._onPointerEvent("pointerdown", (events, target) => {
 						$array.each(events, (ev) => {
-							this._dispatchMousedown(ev, target);
+							if (!this._defersDown(ev, target)) {
+								this._dispatchMousedown(ev, target);
+							}
 						});
 					});
 
 					// TODO handle throttling properly for multitouch
 					const mousemove = this._onPointerEvent("pointermove", (ev: Array<IPointerEvent>) => {
 						$array.each(ev, (ev) => {
-							this._dispatchDragMove(ev);
+							if (!this._holds(ev)) {
+								this._dispatchDragMove(ev);
+							}
 						});
 					});
 
 					const mouseup = this._onPointerEvent("pointerup", (ev: Array<IPointerEvent>, target) => {
 						$array.each(ev, (ev) => {
-							this._dispatchDragEnd(ev, target);
+							this._dispatchDragEnd(ev, target, this._endsCancelled(ev));
 						});
 					});
 
 					const pointercancel = this._onPointerEvent("pointercancel", (ev: Array<IPointerEvent>, target) => {
 						$array.each(ev, (ev) => {
-							this._dispatchDragEnd(ev, target);
+							this._dispatchDragEnd(ev, target, this._endsCancelled(ev));
 						});
 					});
 

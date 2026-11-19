@@ -116,7 +116,13 @@ export class CandlestickSeries extends ColumnSeries {
 			let startLocation = this._aLocationX0 + openLocationX - 0.5;
 			let endLocation = this._aLocationX1 + locationX - 0.5;
 
-			lx0 = xAxis.getDataItemPositionX(dataItem, this._xField, startLocation + (endLocation - startLocation) / 2, vcx);
+			if (this._xOpenField !== this._xField) {
+				// a body from the open field to the field: the wick goes halfway, also on a value axis
+				lx0 = (xAxis.getDataItemPositionX(dataItem, this._xOpenField, startLocation, vcx) + xAxis.getDataItemPositionX(dataItem, this._xField, endLocation, vcx)) / 2;
+			}
+			else {
+				lx0 = xAxis.getDataItemPositionX(dataItem, this._xField, startLocation + (endLocation - startLocation) / 2, vcx);
+			}
 			lx1 = lx0;
 			hx0 = lx0;
 			hx1 = lx0;
@@ -136,7 +142,12 @@ export class CandlestickSeries extends ColumnSeries {
 			let startLocation = this._aLocationY0 + openLocationY - 0.5;
 			let endLocation = this._aLocationY1 + locationY - 0.5;
 
-			ly0 = yAxis.getDataItemPositionY(dataItem, this._yField, startLocation + (endLocation - startLocation) / 2, vcy);
+			if (this._yOpenField !== this._yField) {
+				ly0 = (yAxis.getDataItemPositionY(dataItem, this._yOpenField, startLocation, vcy) + yAxis.getDataItemPositionY(dataItem, this._yField, endLocation, vcy)) / 2;
+			}
+			else {
+				ly0 = yAxis.getDataItemPositionY(dataItem, this._yField, startLocation + (endLocation - startLocation) / 2, vcy);
+			}
 			ly1 = ly0;
 			hy0 = ly0;
 			hy1 = ly0;

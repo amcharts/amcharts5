@@ -4,7 +4,6 @@ import { Theme } from "../core/Theme";
 import { p100, p50, percent } from "../core/util/Percent";
 import { color, Color } from "../core/util/Color";
 import { GridLayout } from "../core/render/GridLayout";
-import { Label } from "../core/render/Label";
 
 import * as $ease from "../core/util/Ease";
 
@@ -751,11 +750,7 @@ export class DefaultTheme extends Theme {
 
 		r("ConfirmButton").setAll({
 			toggleKey: "active",
-			setStateOnChildren: true,
-			label: Label.new(this._root, {
-				text: language.translate("Confirm"),
-				forceHidden: true
-			})
+			setStateOnChildren: true
 		});
 
 		{

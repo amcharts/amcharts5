@@ -1269,7 +1269,10 @@ export class MapChart extends SerialChart {
 	}
 
 	protected _setUpTouch(): void {
-		this.chartContainer._display.cancelTouch = (this.get("pinchZoom") || this._canPan()) ? true : false;
+		const display = this.chartContainer._display;
+		display.cancelTouch = (this.get("pinchZoom") || this._canPan()) ? true : false;
+		// with touchGestures "auto" a swipe that starts sideways or uses two fingers moves the map, up and down too
+		display.touchAxis = "x";
 	}
 
 	/**
@@ -1445,6 +1448,27 @@ export class MapChart extends SerialChart {
 				if (movePoint) {
 					this.chartContainer._downPoints[downId] = movePoint;
 				}
+
+				// two fingers turn the map by their centre: degrees per pixel there, at this zoom level
+				const first = this.chartContainer._downPoints[downId];
+				const projection = this.get("projection")!;
+				if (first && projection.invert) {
+					const display = this.chartContainer._display;
+					const a = display.toLocal(first);
+					const b = display.toLocal(event.point);
+					const c = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+					const l0 = projection.invert([c.x, c.y]);
+					const l1 = projection.invert([c.x + 1, c.y + 1]);
+					if (l0 && l1) {
+						const pLon = Math.abs(l1[0] - l0[0]);
+						const pLat = Math.abs(l1[1] - l0[1]);
+						// off a globe there is nothing to measure
+						if (isFinite(pLon) && isFinite(pLat)) {
+							this._pLon = pLon;
+							this._pLat = pLat;
+						}
+					}
+				}
 			}
 		}
 		else if (count == 0) {
@@ -1607,12 +1631,25 @@ export class MapChart extends SerialChart {
 
 				let zoomLevel = this._downZoomLevel;
 
-				let xx = moveCenter.x - (- tx + downCenter.x) / zoomLevel * level;
-				let yy = moveCenter.y - (- ty + downCenter.y) / zoomLevel * level;
+				// two fingers turn a map that turns, rather than moving it off center
+				const rotateX = this.get("panX") == "rotateX";
+				const rotateY = this.get("panY") == "rotateY";
+
+				let xx = (rotateX ? downCenter.x : moveCenter.x) - (- tx + downCenter.x) / zoomLevel * level;
+				let yy = (rotateY ? downCenter.y : moveCenter.y) - (- ty + downCenter.y) / zoomLevel * level;
 
 				this.set("zoomLevel", level);
 				this.set("translateX", xx);
 				this.set("translateY", yy);
+
+				// degrees per pixel were measured at the zoom level the fingers went down at
+				const perPixel = zoomLevel / level;
+				if (rotateX) {
+					this.set("rotationX", this._downRotationX! + (moveCenter.x - downCenter.x) * this._pLon * perPixel);
+				}
+				if (rotateY) {
+					this.set("rotationY", this._downRotationY! - (moveCenter.y - downCenter.y) * this._pLat * perPixel);
+				}
 			}
 		}
 	}
@@ -1625,14 +1662,13 @@ export class MapChart extends SerialChart {
 
 		const pointerId = originalEvent.pointerId;
 
-		if (this.get("pinchZoom")) {
-			if (pointerId) {
-				this._movePoints[pointerId] = event.point;
+		if (pointerId) {
+			// also without pinchZoom: a second finger starts the move again from here
+			this._movePoints[pointerId] = event.point;
 
-				if ($object.keys(chartContainer._downPoints).length > 1) {
-					this._handlePinch();
-					return;
-				}
+			if (this.get("pinchZoom") && $object.keys(chartContainer._downPoints).length > 1) {
+				this._handlePinch();
+				return;
 			}
 		}
 

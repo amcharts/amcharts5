@@ -108,13 +108,54 @@ export class PeriodSelector extends StockControl {
 	protected _groupChangedDp: IDisposer | undefined;
 	protected _groupChangedTo: IDisposer | undefined;
 
+	// on narrow screens (see the toolbar CSS) the links fold into one button showing the period chosen
+	protected _summary?: HTMLSpanElement;
+
 	protected _afterNew() {
 		super._afterNew();
 
 		const button = this.getPrivate("button")!;
 		button.className = button.className + " am5stock-no-hover";
 
+		this._makeSummary();
 		this._initPeriodButtons();
+	}
+
+	// the one button the links fold into on narrow screens: hidden here, shown only by the toolbar's own
+	// CSS, so a toolbar styled without it (useDefaultCSS: false) never shows it
+	protected _makeSummary(): void {
+		const button = this.getPrivate("button")!;
+		const summary = document.createElement("span");
+		summary.className = "am5stock-period-summary";
+		summary.style.display = "none";
+		button.insertBefore(summary, this.getPrivate("label")!);
+		this._summary = summary;
+		this._updateSummary();
+
+		this._disposers.push($utils.addEventListener(summary, "click", () => {
+			if (button.classList.contains("am5stock-periods-open")) {
+				$utils.removeClass(button, "am5stock-periods-open");
+			}
+			else {
+				$utils.addClass(button, "am5stock-periods-open");
+			}
+		}));
+
+		// a tap anywhere else closes the list
+		this._disposers.push($utils.addEventListener(document, "click", (ev: MouseEvent) => {
+			if (!$utils.contains(button, ev.target as Element)) {
+				$utils.removeClass(button, "am5stock-periods-open");
+			}
+		}));
+	}
+
+	// the folded button's text: the period chosen, or "Period" while none is
+	protected _updateSummary(): void {
+		const summary = this._summary;
+		if (summary) {
+			const active = this.getPrivate("label")!.getElementsByClassName("am5stock-active");
+			summary.innerHTML = (active.length ? active[0].innerHTML : this._root.language.translateAny("Period")) + " &#9662;";
+		}
 	}
 
 	protected _initPeriodButtons(): void {
@@ -139,6 +180,8 @@ export class PeriodSelector extends StockControl {
 				this.selectPeriod(period);
 				this.setPrivate("deferReset", true);
 				$utils.addClass(button, "am5stock-active");
+				$utils.removeClass(this.getPrivate("button")!, "am5stock-periods-open");
+				this._updateSummary();
 				const timeout = this.getPrivate("deferTimeout");
 				if (timeout) {
 					timeout.dispose();
@@ -194,6 +237,7 @@ export class PeriodSelector extends StockControl {
 			$array.each(buttons, (b) => {
 				$utils.removeClass(<HTMLElement>b, "am5stock-active");
 			});
+			this._updateSummary();
 
 			let axis = this.getPrivate("axis");
 			if (!axis) {

@@ -201,6 +201,24 @@ export interface IDateAxisEvents extends IValueAxisEvents {
  * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/} for more info
  * @important
  */
+// Where grouping into one interval stopped: the last group, its running values, and the row each group starts at
+interface IGroupRun {
+	previousTime: number;
+	newDataItem?: DataItem<IXYSeriesDataItem>;
+	sum: { [index: string]: number };
+	count: { [index: string]: number };
+	current: { [index: string]: any };
+	starts: Array<number>;
+}
+
+interface IGroupState {
+	dataSets: { [index: string]: Array<DataItem<IXYSeriesDataItem>> };
+	signature: string;
+	rows: number;
+	sorted: number;
+	runs: { [index: string]: IGroupRun };
+}
+
 export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public static className: string = "DateAxis";
 	public static classNames: Array<string> = ValueAxis.classNames.concat([DateAxis.className]);
@@ -212,6 +230,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 	protected _dataGrouped: boolean = false;
 	protected _seriesDataGrouped: boolean = false;
+	protected _groupStates: WeakMap<XYSeries, IGroupState> = new WeakMap();
 	protected _groupingCalculated: boolean = false;
 	protected _intervalDuration: number = 1;
 	protected _baseDuration: number = 1;
@@ -290,6 +309,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 					this._handleRangeChange();
 				}
 			}
+			else if (this.isDirty("groupIntervals") && !this._intervalsRepicked) {
+				// other intervals to choose from: the one to show is picked again (once; the setting stays dirty all frame)
+				this._intervalsRepicked = true;
+				this._groupingCalculated = false;
+				this._handleRangeChange();
+			}
 
 			if (this.isDirty("groupData")) {
 				if (!this._dataGrouped) {
@@ -319,7 +344,69 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 
-	public _groupSeriesData(series: XYSeries) {
+	/**
+	 * How far past a group's start the next group surely starts, but the one
+	 * after it surely does not: rounding that point gives the next group's
+	 * start. 0 when that can't be told (sub-day periods off UTC, where a
+	 * 30-minute daylight saving shift makes them uneven).
+	 */
+	protected _groupSpan(interval: ITimeInterval): number {
+		const root = this._root;
+		const utc = root.utc && !root.timezone;
+		const unit = interval.timeUnit;
+		const count = interval.count;
+		const day = 86400000;
+		// longer than a daylight saving shift, far shorter than a day
+		const margin = 7200000;
+		if (!(count >= 1)) {
+			return 0;
+		}
+		// only where rounding a date honours the count (see $time.round): a group then really is this long
+		switch (unit) {
+			case "millisecond":
+				return utc && count < 1000 ? $time.getDuration(unit, count) : 0;
+			case "second":
+			case "minute":
+				return utc && count < 60 ? $time.getDuration(unit, count) : 0;
+			case "hour":
+				return utc && count < 24 ? $time.getDuration(unit, count) : 0;
+			// several days or weeks off UTC are counted from the first row's date and are not evenly long
+			case "day":
+				return utc ? count * day : (count == 1 ? day + margin : 0);
+			case "week":
+				return utc ? count * 7 * day : (count == 1 ? 7 * day + margin : 0);
+			case "month":
+				return (count <= 4 || count == 6) ? count * 31 * day + margin : 0;
+			case "year":
+				return count * 366 * day + margin;
+		}
+		return 0;
+	}
+
+	/**
+	 * Groups the data for the interval `id` the first time it is shown.
+	 *
+	 * @ignore
+	 */
+	public _makeDataSet(series: XYSeries, id: string) {
+		const baseInterval = this.get("baseInterval");
+		if (id === baseInterval.timeUnit + baseInterval.count) {
+			// the rows themselves, once the series has grouped sets
+			if ($object.keys(series._dataSets).length > 0) {
+				series._dataSets[id] = series._mainDataItems;
+			}
+			return;
+		}
+		if (this.get("groupData")) {
+			this._groupSeriesData(series, id);
+		}
+	}
+
+	/**
+	 * @ignore
+	 * @param  onlyId  Group only for this interval, now first shown (data unchanged since the last grouping)
+	 */
+	public _groupSeriesData(series: XYSeries, onlyId?: string) {
 		if (this.get("groupData") && !series.get("groupDataDisabled")) {
 
 			let groupIntervals = this.get("groupIntervals")!;
@@ -329,12 +416,17 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			// connected to the root. Leaving before the flags below means grouping
 			// is retried once the setting arrives, rather than counted as done.
 			if (!groupIntervals) {
+				if (!onlyId) {
+					this._groupStates.delete(series);
+				}
 				return;
 			}
 
-			this._dataGrouped = true; // helps to avoid double grouping
+			if (!onlyId) {
+				this._dataGrouped = true; // helps to avoid double grouping
 
-			this._seriesDataGrouped = true;
+				this._seriesDataGrouped = true;
+			}
 
 			// make array of intervals which will be used;
 			let intervals: ITimeInterval[] = [];
@@ -347,22 +439,8 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				}
 			})
 
-			// Dispose previously grouped data items (and their bullets) before
-			// rebuilding the data sets, otherwise they (and their bullets) are
-			// orphaned on every regroup and leak. The main data set is owned by
-			// the series and must not be disposed here.
-			$object.each(series._dataSets, (_id, dataSet) => {
-				if (dataSet != series._mainDataItems) {
-					$array.each(dataSet, (dataItem) => {
-						dataItem.dispose();
-					})
-				}
-			})
-
-			series._dataSets = {};
-
 			const key = this.getPrivate("name")! + this.get("renderer").getPrivate("letter")!;
-			let fields: Array<string>;
+			let fields: Array<string> = [];
 
 			const baseAxis = series.get("baseAxis");
 
@@ -377,153 +455,419 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			let baseInterval = this.get("baseInterval");
 			let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 
-			series._dataSets[mainDataSetId] = dataItems;
-
 			const groupCallback = series.get("groupDataCallback");
 			let groupOriginals = series.get("groupDataWithOriginals", false);
 			if (groupCallback) {
 				groupOriginals = true;
 			}
 
-			$array.each(intervals, (interval) => {
-				let previousTime = -Infinity;
+			const rowCount = dataItems.length;
+			const timeAt = (i: number): any => dataItems[i].get(key as any);
+
+			let firstTime: any;
+			if (rowCount > 0) {
+				firstTime = timeAt(0);
+			}
+
+			// Data only added at the end, or taken off the end, since it was last grouped: the groups
+			// carry on from where they stopped instead of being made again from all the data
+			const root = this._root;
+			const timezone: any = root.timezone;
+			const signature = [
+				key, mainDataSetId, fields.join(),
+				fields.map((field) => series.get((field + "Grouped") as any)).join(),
+				intervals.map((interval) => interval.timeUnit + interval.count).join(),
+				groupOriginals, !!groupCallback, root.utc, timezone ? timezone.name : "", root.locale.firstDayOfWeek
+			].join("|");
+			const kept = series._groupKeptRows;
+			const dropped = series._groupDroppedRows;
+			let state = this._groupStates.get(series);
+			const tail = state !== undefined && !groupCallback && kept > 0 && dropped < state.rows && kept <= state.rows - dropped
+				&& kept <= rowCount && state.dataSets === series._dataSets && state.signature === signature;
+
+			// only intervals that are shown get grouped: the one shown now, the ones made before (kept up to date),
+			// and the others when they are first shown (`_makeDataSet`)
+			let use: Array<ITimeInterval>;
+			if (onlyId) {
+				if ((series as any)._dataGrouped === false || series._dataSets[onlyId]) {
+					// data changed since the last grouping: the series' next grouping makes it
+					return;
+				}
+				if (!state || state.dataSets !== series._dataSets || state.signature !== signature || state.rows !== rowCount) {
+					// grouping settings changed since the last grouping, or items were added without a data change: all of it again
+					this._groupSeriesData(series);
+					if (!series._dataSets[onlyId] && this._groupStates.get(series)) {
+						this._groupSeriesData(series, onlyId);
+					}
+					return;
+				}
+				use = intervals.filter((interval) => interval.timeUnit + interval.count === onlyId);
+				if (use.length == 0) {
+					return;
+				}
+			}
+			else {
+				const current = this.getPrivate("groupInterval");
+				const wantedId = current ? current.timeUnit + current.count : series._dataSetId;
+				use = intervals.filter((interval) => {
+					const id = interval.timeUnit + interval.count;
+					return id === wantedId || (tail && series._dataSets[id] !== undefined);
+				});
+			}
+
+			if (!tail && !onlyId) {
+				// Dispose previously grouped data items (and their bullets) before
+				// rebuilding the data sets, otherwise they (and their bullets) are
+				// orphaned on every regroup and leak. The main data set is owned by
+				// the series and must not be disposed here.
+				$object.each(series._dataSets, (_id, dataSet) => {
+					if (dataSet != series._mainDataItems) {
+						$array.each(dataSet, (dataItem) => {
+							dataItem.dispose();
+						})
+					}
+				})
+
+				series._dataSets = {};
+				state = { dataSets: series._dataSets, signature: signature, rows: 0, sorted: 0, runs: {} };
+				this._groupStates.set(series, state);
+			}
+			const groupState = state!;
+
+			series._dataSets[mainDataSetId] = dataItems;
+
+			// rows from the last grouping still there, and how many of them from the start were in date order
+			const oldRows = tail ? groupState.rows - dropped : 0;
+			const sortedNow = tail ? Math.max(groupState.sorted - dropped, 0) : 0;
+
+			$array.each(use, (interval) => {
 				let dataSetId = interval.timeUnit + interval.count;
-				series._dataSets[dataSetId] = [];
-
-				let newDataItem: DataItem<IXYSeriesDataItem>;
-
-				let sum: { [index: string]: number } = {};
-				let count: { [index: string]: number } = {};
+				let run = groupState.runs[dataSetId];
 
 				let groupFieldValues: { [index: string]: string } = {};
 				let workingFields: { [index: string]: string } = {};
 
 				$array.each(fields, (field) => {
-					sum[field] = 0;
-					count[field] = 0;
 					groupFieldValues[field] = series.get((field + "Grouped") as any);
 					workingFields[field] = field + "Working";
 				})
 
 				let intervalDuration = $time.getDuration(interval.timeUnit);
+				const fieldCount = fields.length;
+				const span = this._groupSpan(interval);
 
-				let firstItem = dataItems[0];
-				let firstTime: any;
-				if (firstItem) {
-					firstTime = dataItems[0].get(key as any);
+				const newRun = (): IGroupRun => {
+					const made: IGroupRun = { previousTime: -Infinity, sum: {}, count: {}, current: {}, starts: [] };
+					$array.each(fields, (field) => {
+						made.sum[field] = 0;
+						made.count[field] = 0;
+					})
+					return made;
+				};
+
+				// Groups rows `from` to `to` into `target`, carrying on from where `run` stopped
+				const groupRows = (run: IGroupRun, target: Array<DataItem<IXYSeriesDataItem>>, from: number, to: number, fastEnd: number, fastTime: number) => {
+					const sum = run.sum;
+					const count = run.count;
+					const current = run.current;
+					const starts = run.starts;
+					let previousTime = run.previousTime;
+					let newDataItem = run.newDataItem as DataItem<IXYSeriesDataItem>;
+					let prevNewDataItem: DataItem<IXYSeriesDataItem> | undefined;
+
+					// The group takes the data of its last merged row, copied once when the group ends
+					let hasPending = false;
+					let pendingContext: unknown;
+					let pendingTime: number = 0;
+					const flushContext = () => {
+						if (hasPending) {
+							const dataContext: any = $object.copy(pendingContext);
+							dataContext[key as any] = pendingTime;
+							newDataItem.dataContext = dataContext;
+							hasPending = false;
+							pendingContext = undefined;
+						}
+					};
+
+					// Merged rows are worked out here and written to the group once, when it ends
+					const changed: { [index: string]: boolean } = {};
+					const touched: { [index: string]: boolean } = {};
+					const flushValues = () => {
+						if (newDataItem) {
+							$array.each(fields, (field) => {
+								if (changed[field]) {
+									newDataItem.setRaw(field as any, current[field]);
+									changed[field] = false;
+								}
+								if (touched[field]) {
+									newDataItem.setRaw(workingFields[field] as any, current[field]);
+									touched[field] = false;
+								}
+							});
+						}
+					};
+
+					// rows from a group's start to the next group's start round to the group's date: rounded once per group
+					let spanStart = Infinity;
+					let spanEnd = -Infinity;
+
+					for (let i = from; i < to; i++) {
+						const dataItem = dataItems[i];
+						let time = dataItem.get(key as any);
+						//let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, firstDay, utc, firstDate, timezone).getTime();
+						let roundedTime: number;
+						if (i < fastEnd) {
+							roundedTime = fastTime;
+						}
+						else if (time >= spanStart && time < spanEnd) {
+							roundedTime = spanStart;
+						}
+						else {
+							roundedTime = $time.roun(time, interval.timeUnit, interval.count, root, firstTime);
+							if (span > 0) {
+								spanStart = roundedTime;
+								spanEnd = $time.roun(roundedTime + span, interval.timeUnit, interval.count, root, firstTime);
+							}
+						}
+						let dataContext: any;
+
+						if (previousTime < roundedTime - intervalDuration / 24) {
+							flushValues();
+							flushContext();
+							dataContext = $object.copy(dataItem.dataContext);
+
+							newDataItem = new DataItem(series, dataContext, series._makeDataItem(dataContext));
+							newDataItem.setRaw(key as any, roundedTime);
+
+							target.push(newDataItem);
+							starts.push(i);
+
+							for (let f = 0; f < fieldCount; f++) {
+								const field = fields[f];
+								let value = dataItem.get(field as any);
+								if ($type.isNumber(value)) {
+									newDataItem.setRaw(field as any, value);
+									newDataItem.setRaw(workingFields[field] as any, value);
+									count[field] = 1;
+									sum[field] = value;
+								}
+								else {
+									sum[field] = 0;
+									count[field] = 0;
+								}
+								current[field] = newDataItem.get(field as any);
+							}
+
+							if (groupOriginals) {
+								newDataItem.set("originals", [dataItem]);
+							}
+
+							if (groupCallback && prevNewDataItem) {
+								groupCallback(prevNewDataItem, interval);
+							}
+
+							prevNewDataItem = newDataItem;
+						}
+						else {
+							let hasValue = false;
+							for (let f = 0; f < fieldCount; f++) {
+								const field = fields[f];
+								let groupKey = groupFieldValues[field];
+								let value = dataItem.get(field as any);
+
+								if (value != null) {
+									hasValue = true;
+
+									let currentValue = current[field];
+
+									switch (groupKey) {
+										case "close":
+											current[field] = value;
+											changed[field] = true;
+											break;
+
+										case "sum":
+											current[field] = currentValue + value;
+											changed[field] = true;
+											break;
+
+										case "open":
+											break;
+
+										case "low":
+											if (value < currentValue) {
+												current[field] = value;
+												changed[field] = true;
+											}
+											break;
+
+										case "high":
+											if (value > currentValue) {
+												current[field] = value;
+												changed[field] = true;
+											}
+											break;
+
+										case "average":
+											count[field]++;
+											sum[field] += value;
+											current[field] = sum[field] / count[field];
+											changed[field] = true;
+											break;
+
+										case "extreme":
+											if (Math.abs(value) > Math.abs(currentValue)) {
+												current[field] = value;
+												changed[field] = true;
+											}
+											break;
+									}
+
+									touched[field] = true;
+								}
+							}
+
+							if (hasValue) {
+								hasPending = true;
+								pendingContext = dataItem.dataContext;
+								pendingTime = roundedTime;
+							}
+
+							if (groupOriginals) {
+								newDataItem.get("originals")!.push(dataItem);
+							}
+						}
+						previousTime = roundedTime;
+					}
+
+					flushValues();
+					flushContext();
+
+					if (groupCallback && prevNewDataItem) {
+						groupCallback(prevNewDataItem, interval);
+					}
+
+					run.previousTime = previousTime;
+					run.newDataItem = newDataItem;
+				};
+
+				let fresh = !tail || !run || !series._dataSets[dataSetId] || onlyId !== undefined;
+				// counted from the first row: made again when that changes
+				if (!fresh && dropped > 0 && interval.count > 1 && (interval.timeUnit == "day" || interval.timeUnit == "week")) {
+					$array.each(series._dataSets[dataSetId], (dataItem) => {
+						dataItem.dispose();
+					})
+					fresh = true;
 				}
 
-				let prevNewDataItem: DataItem<IXYSeriesDataItem> | undefined;
-				$array.each(dataItems, (dataItem) => {
-					let time = dataItem.get(key as any);
-					//let roundedTime = $time.round(new Date(time), interval.timeUnit, interval.count, firstDay, utc, firstDate, timezone).getTime();
-					let roundedTime = $time.roun(time, interval.timeUnit, interval.count, this._root, firstTime);
-					let dataContext: any;
+				if (fresh) {
+					const target: Array<DataItem<IXYSeriesDataItem>> = [];
+					series._dataSets[dataSetId] = target;
+					run = newRun();
+					groupState.runs[dataSetId] = run;
+					groupRows(run, target, 0, rowCount, 0, 0);
+					return;
+				}
 
-					if (previousTime < roundedTime - intervalDuration / 24) {
-						dataContext = $object.copy(dataItem.dataContext);
+				const dataSet = series._dataSets[dataSetId];
+				const starts = run.starts;
+				let rewindFirst = false;
 
-						newDataItem = new DataItem(series, dataContext, series._makeDataItem(dataContext));
-						newDataItem.setRaw(key as any, roundedTime);
-
-						series._dataSets[dataSetId].push(newDataItem);
-
-						$array.each(fields, (field) => {
-							let value = dataItem.get(field as any);
-							if ($type.isNumber(value)) {
-								newDataItem.setRaw(field as any, value);
-								newDataItem.setRaw(workingFields[field] as any, value);
-								count[field] = 1;
-								sum[field] = value;
-							}
-							else {
-								sum[field] = 0;
-								count[field] = 0;
-							}
-						})
-
-						if (groupOriginals) {
-							newDataItem.set("originals", [dataItem]);
+				if (dropped > 0 && starts.length > 0) {
+					// rows were taken off the start: groups with none of their rows left go, and the rest move up
+					let g = 0;
+					while (g < starts.length - 1 && starts[g + 1] <= dropped) {
+						g++;
+					}
+					for (let i = 0; i < g; i++) {
+						dataSet[i].dispose();
+					}
+					dataSet.splice(0, g);
+					starts.splice(0, g);
+					const cut = starts[0] < dropped;
+					for (let i = 0; i < starts.length; i++) {
+						starts[i] = Math.max(starts[i] - dropped, 0);
+					}
+					if (cut) {
+						if (starts.length == 1 || kept < starts[1]) {
+							// it is also the last group, or changes at the end reach it: made again below, with the rows after it
+							rewindFirst = true;
 						}
-
-						if (groupCallback && prevNewDataItem) {
-							groupCallback(prevNewDataItem, interval);
+						else {
+							// the first group lost rows: made again from what is left of it
+							const end = starts[1];
+							const first = newRun();
+							const made: Array<DataItem<IXYSeriesDataItem>> = [];
+							const ordered = interval.count == 1 && sortedNow >= end;
+							groupRows(first, made, 0, end, ordered ? end : 0, ordered ? dataSet[0].get(key as any) : 0);
+							dataSet[0].dispose();
+							dataSet.splice(0, 1, ...made);
+							starts.splice(0, 1, ...first.starts);
 						}
+					}
+				}
 
-						prevNewDataItem = newDataItem;
+				let startIndex = oldRows;
+				let fastEnd = 0;
+				let fastTime = 0;
+
+				if (rewindFirst || kept < oldRows) {
+					if (starts.length == 0) {
+						// no group made yet: all of it again
+						startIndex = 0;
+						run.newDataItem = undefined;
+						run.previousTime = -Infinity;
 					}
 					else {
-						let hasValue = false;
-						$array.each(fields, (field) => {
-							let groupKey = groupFieldValues[field];
-							let value = dataItem.get(field as any);
-
-							if (value != null) {
-								hasValue = true;
-
-								let currentValue = newDataItem.get(field as any);
-
-								switch (groupKey) {
-									case "close":
-										newDataItem.setRaw(field as any, value);
-										break;
-
-									case "sum":
-										newDataItem.setRaw(field as any, currentValue + value);
-										break;
-
-									case "open":
-										break;
-
-									case "low":
-										if (value < currentValue) {
-											newDataItem.setRaw(field as any, value);
-										}
-										break;
-
-									case "high":
-										if (value > currentValue) {
-											newDataItem.setRaw(field as any, value);
-										}
-										break;
-
-									case "average":
-										count[field]++;
-										sum[field] += value;
-										let average = sum[field] / count[field];
-										newDataItem.setRaw(field as any, average);
-										break;
-
-									case "extreme":
-										if (Math.abs(value) > Math.abs(currentValue)) {
-											newDataItem.setRaw(field as any, value);
-										}
-										break;
-								}
-
-								newDataItem.setRaw(workingFields[field] as any, newDataItem.get(field as any));
-							}
-						})
-
-						if (hasValue) {
-							let dataContext: any = $object.copy(dataItem.dataContext);
-							dataContext[key as any] = roundedTime;
-							newDataItem.dataContext = dataContext;
+						// rows changed at the end: the groups from the one holding the last kept row are made again
+						let g = starts.length - 1;
+						while (g > 0 && (rewindFirst || starts[g] > kept - 1)) {
+							g--;
 						}
-
-						if (groupOriginals) {
-							newDataItem.get("originals")!.push(dataItem);
+						startIndex = starts[g];
+						// rows in date order all round to their group's own date (not exact over DST for several units)
+						if (interval.count == 1 && sortedNow >= kept && dataSet[g]) {
+							fastEnd = kept;
+							fastTime = dataSet[g].get(key as any);
 						}
+						for (let i = g; i < dataSet.length; i++) {
+							dataSet[i].dispose();
+						}
+						dataSet.length = g;
+						starts.length = g;
+						run.newDataItem = undefined;
+						run.previousTime = startIndex > 0 ? $time.roun(timeAt(startIndex - 1), interval.timeUnit, interval.count, root, firstTime) : -Infinity;
 					}
-					previousTime = roundedTime;
-				})
-
-				if (groupCallback && prevNewDataItem) {
-					groupCallback(prevNewDataItem, interval);
 				}
+
+				groupRows(run, dataSet, startIndex, rowCount, fastEnd, fastTime);
 			})
 
-			if (series._dataSetId && series._dataSets[series._dataSetId]) {
+			if (onlyId) {
+				// made for an interval now shown: the caller shows it
+				return;
+			}
+
+			groupState.rows = rowCount;
+
+			// how many rows from the start are in date order
+			let sorted = tail ? Math.min(sortedNow, kept) : 0;
+			if (sorted < 1) {
+				sorted = Math.min(1, rowCount);
+			}
+			while (sorted > 0 && sorted < rowCount && timeAt(sorted) >= timeAt(sorted - 1)) {
+				sorted++;
+			}
+			groupState.sorted = sorted;
+			series._groupKeptRows = rowCount;
+			series._groupDroppedRows = 0;
+
+			const currentInterval = this.getPrivate("groupInterval");
+			const currentId = currentInterval ? currentInterval.timeUnit + currentInterval.count : undefined;
+			if (currentId && series._dataSets[currentId]) {
+				series.setDataSet(currentId);
+			}
+			else if (series._dataSetId && series._dataSets[series._dataSetId]) {
 				series.setDataSet(series._dataSetId);
 			}
 			else {
@@ -540,13 +884,21 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				})
 			}
 		}
+		else {
+			// not grouped here: nothing kept to carry on from
+			this._groupStates.delete(series);
+		}
 	}
 
 	public _clearDirty() {
 		super._clearDirty();
 		this._groupingCalculated = false;
 		this._dataGrouped = false;
+		this._intervalsRepicked = false;
 	}
+
+	// the interval to show was picked again this frame because `groupIntervals` changed
+	protected _intervalsRepicked: boolean = false;
 
 	/**
 	 * Returns the interval the axis would group data into to show a time span
@@ -700,6 +1052,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						})
 					}
 					series.setPrivate("endIndex", endIndex);
+					series.setPrivate("adjustedEndIndex", series._adjustEndIndex(endIndex));
 
 				}
 			})
@@ -1176,24 +1529,34 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			dataItem.close = {};
 		}
 
-		$array.each(fields, (field) => {
+		const timeUnit = baseInterval.timeUnit;
+		const count = baseInterval.count;
+		const root = this._root;
+		// a period that always lasts the same ends one length on, with no rounding
+		const fixed = count * (this._getM(timeUnit) - 1) < 1 && (timeUnit == "second" || timeUnit == "minute" || ((timeUnit == "hour" || timeUnit == "day" || timeUnit == "week") && root.utc && !root.timezone));
+
+		for (let f = 0, len = fields.length; f < len; f++) {
+			const field = fields[f];
 			let value = dataItem.get(field as any);
 			if ($type.isNumber(value)) {
 				let startTime = dataItem.open![field];
 				let endTime = dataItem.close![field];
-				// this is done to save cpu, as rounding is quite expensive, especially with timezone set. 
+				// this is done to save cpu, as rounding is quite expensive, especially with timezone set.
 				// if value is between prev start and end, it means it didn't change, all is fine.
 				if (value >= startTime && value <= endTime) {
 
 				}
 				else {
-					const timeUnit = baseInterval.timeUnit;
-					const count = baseInterval.count;
 					//startTime = $time.round(new Date(value), timeUnit, count, firstDay, utc, undefined, timezone).getTime();
-					startTime = $time.roun(value, timeUnit, count, this._root);
-					endTime = startTime + $time.getDuration(timeUnit, count * this._getM(timeUnit));
-					//endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
-					endTime = $time.roun(endTime, timeUnit, 1, this._root);
+					startTime = $time.roun(value, timeUnit, count, root);
+					if (fixed) {
+						endTime = startTime + $time.getDuration(timeUnit, count);
+					}
+					else {
+						endTime = startTime + $time.getDuration(timeUnit, count * this._getM(timeUnit));
+						//endTime = $time.round(new Date(endTime), timeUnit, 1, firstDay, utc, undefined, timezone).getTime();
+						endTime = $time.roun(endTime, timeUnit, 1, root);
+					}
 
 					dataItem.open![field] = startTime;
 					dataItem.close![field] = endTime;
@@ -1201,7 +1564,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 
 				this._updateDates(startTime, dataItem.component as XYSeries);
 			}
-		})
+		}
 	}
 
 	protected _handleSizeDirty() {

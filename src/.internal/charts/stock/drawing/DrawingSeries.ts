@@ -7,6 +7,7 @@ import type { AxisRenderer } from "../../xy/axes/AxisRenderer";
 import type { Sprite } from "../../../core/render/Sprite";
 import type { DataItem } from "../../../core/render/Component";
 import type { XYSeries } from "../../xy/series/XYSeries";
+import type { XYChart } from "../../xy/XYChart";
 import type { StockChart } from "../StockChart";
 import type { ISpritePointerEvent } from "../../../core/render/Sprite";
 import type { Graphics } from "../../../core/render/Graphics";
@@ -123,6 +124,8 @@ export class DrawingSeries extends LineSeries {
 	declare public _dataItemSettings: IDrawingSeriesDataItem;
 
 	protected _clickDp?: IDisposer;
+	// the chart this drawing took touches on, in drawing mode
+	protected _touchChart?: XYChart;
 	protected _moveDp?: IDisposer;
 	protected _downDp?: IDisposer;
 	protected _upDp?: IDisposer;
@@ -1029,6 +1032,19 @@ export class DrawingSeries extends LineSeries {
 		this._erasingEnabled = false;
 		this._drawingEnabled = true;
 		if (chart) {
+			// a finger on the plot area draws, whichever way it goes
+			if (this._touchChart && this._touchChart !== chart) {
+				// moved to another chart: its listeners go with it
+				this._releaseTouch();
+				$array.each([this._clickDp, this._downDp, this._upDp, this._moveDp], (dp) => {
+					if (dp) {
+						dp.dispose();
+					}
+				});
+				this._clickDp = this._downDp = this._upDp = this._moveDp = undefined;
+			}
+			chart._drawingTouch(this, true);
+			this._touchChart = chart;
 			if (!this._clickDp) {
 				this._clickDp = chart.plotContainer.events.on("click", (e) => {
 					const originalEvent = e.originalEvent as any;
@@ -1068,6 +1084,19 @@ export class DrawingSeries extends LineSeries {
 		}
 	}
 
+	protected _releaseTouch(): void {
+		const chart = this._touchChart;
+		if (chart) {
+			this._touchChart = undefined;
+			chart._drawingTouch(this, false);
+		}
+	}
+
+	protected _dispose() {
+		this._releaseTouch();
+		super._dispose();
+	}
+
 	/**
 	 * Turns erasing on: a click on a drawing deletes it.
 	 */
@@ -1094,6 +1123,7 @@ export class DrawingSeries extends LineSeries {
 		this._drawingEnabled = false;
 		this._hideResizer();
 		this.isDrawing(false);
+		this._releaseTouch();
 
 		if (this._clickDp) {
 			this._clickDp.dispose();

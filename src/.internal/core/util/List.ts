@@ -93,6 +93,15 @@ export class List<T> {
 	public events: EventDispatcher<Events<this, IListEvents<T>>> = new EventDispatcher();
 
 	/**
+	 * Above zero while `setAll()` adds its items.
+	 *
+	 * @ignore
+	 */
+	public _batchDepth: number = 0;
+
+	protected _batchPending: Array<() => void> | undefined;
+
+	/**
 	 * Constructor
 	 *
 	 * @param initial  Initial list of values to add to list
@@ -446,12 +455,59 @@ export class List<T> {
 	public setAll(newArray: Array<T>): void {
 		const old = this._values;
 		this._values = [];
-		this._onClear(old);
+		this._batchDepth++;
 
-		$array.each(newArray, (value) => {
-			this._values.push(value);
-			this._onPush(value);
-		});
+		try {
+			this._onClear(old);
+
+			$array.each(newArray, (value) => {
+				this._values.push(value);
+				this._onPush(value);
+			});
+
+		} finally {
+			if (--this._batchDepth === 0) {
+				this._runBatchEnd();
+			}
+		}
+	}
+
+	/**
+	 * Calls `f` once the running `setAll()` has added all its items.
+	 *
+	 * @ignore
+	 */
+	public _onBatchEnd(f: () => void): void {
+		if (this._batchPending) {
+			this._batchPending.push(f);
+		} else {
+			this._batchPending = [f];
+		}
+	}
+
+	protected _runBatchEnd(): void {
+		const pending = this._batchPending;
+		if (pending) {
+			this._batchPending = undefined;
+
+			// All of them run even if one throws; the first error is rethrown
+			let failed = false;
+			let error: unknown;
+			$array.each(pending, (f) => {
+				try {
+					f();
+				} catch (e) {
+					if (!failed) {
+						failed = true;
+						error = e;
+					}
+				}
+			});
+
+			if (failed) {
+				throw error;
+			}
+		}
 	}
 
 	/**

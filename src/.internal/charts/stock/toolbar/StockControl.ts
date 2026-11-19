@@ -159,7 +159,8 @@ export class StockControl extends Entity {
 	}
 
 	protected _applyClassNames(): void {
-		this.getPrivate("button")!.className = "am5stock am5stock-control am5stock-control-button";
+		// a class per control, e.g. am5stock-control-PeriodSelector, for CSS that treats controls differently
+		this.getPrivate("button")!.className = "am5stock am5stock-control am5stock-control-button am5stock-control-" + this.className;
 		this.getPrivate("label")!.className = "am5stock-control-label";
 		this.getPrivate("icon")!.className = "am5stock-control-icon";
 	}

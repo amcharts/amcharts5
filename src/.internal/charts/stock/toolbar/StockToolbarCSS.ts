@@ -1,6 +1,6 @@
 import type { Root } from "../../../core/Root"
 
-import { StyleRule } from "../../../core/util/Utils"
+import { StyleRule, StyleSheet } from "../../../core/util/Utils"
 import { MultiDisposer, IDisposer, CounterDisposer } from "../../../core/util/Disposer";
 
 /**
@@ -389,6 +389,49 @@ export default function (element: ShadowRoot | null, root: Root, _prefix?: strin
 				"width": "250px",
 				"min-height": "50px",
 			}, root.nonce),
+
+			// A toolbar too wide for one row folds (StockToolbar.fit): first labels that repeat an icon,
+			// then the period links, into one button that opens them as a list
+			new StyleSheet(element, `.am5stock-fold-labels > .am5stock-control-IndicatorControl > .am5stock-control-label,
+.am5stock-fold-labels > .am5stock-control-DrawingControl > .am5stock-control-label,
+.am5stock-fold-labels > .am5stock-control-ComparisonControl > .am5stock-control-label,
+.am5stock-fold-labels > .am5stock-control-SeriesTypeControl > .am5stock-control-label {
+	display: none;
+}
+.am5stock-fold-periods > .am5stock-control-PeriodSelector > .am5stock-period-summary {
+	display: inline-block !important;
+	margin: 0 5px 0 0;
+	cursor: pointer;
+}
+.am5stock-fold-periods > .am5stock-control-PeriodSelector > .am5stock-control-label {
+	display: none;
+}
+.am5stock-fold-periods > .am5stock-control-PeriodSelector.am5stock-periods-open {
+	z-index: 3;
+}
+.am5stock-fold-periods > .am5stock-control-PeriodSelector.am5stock-periods-open > .am5stock-control-label {
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 100%;
+	margin: 6px 0 0 0;
+	padding: 4px 0;
+	min-width: 100%;
+	background: ${bg};
+	border: 1px solid ${border};
+	border-radius: 3px;
+}
+.am5stock-fold-periods > .am5stock-control-PeriodSelector.am5stock-periods-open .am5stock-link {
+	display: block;
+	margin: 0;
+	padding: 5px 12px;
+	border-radius: 0;
+	white-space: nowrap;
+}
+.am5stock-fold-periods > .am5stock-control-PeriodSelector .am5stock-link.am5stock-hidden {
+	display: none;
+}
+`, root.nonce),
 
 		]);
 

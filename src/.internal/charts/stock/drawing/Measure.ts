@@ -3,6 +3,7 @@ import type { Line } from "../../../core/render/Line";
 import type { XYSeries } from "../../xy/series/XYSeries";
 import type { StockPanel } from "../StockPanel";
 import type { Graphics } from "../../../core/render/Graphics";
+import type { IDrawingSeriesDataItem } from "./DrawingSeries";
 
 import { RectangleSeries, IRectangleSeriesSettings, IRectangleSeriesPrivate, IRectangleSeriesDataItem } from "./RectangleSeries";
 import { Template } from "../../../core/util/Template";
@@ -81,8 +82,8 @@ export class Measure extends RectangleSeries {
 		return label;
 	}
 
-	protected _createElements(index: number) {
-		super._createElements(index);
+	protected _createElements(index: number, dataItem?: DataItem<IDrawingSeriesDataItem>) {
+		super._createElements(index, dataItem);
 		if (!this._labels[index]) {
 			const label = this.makeLabel();
 			this._labels[index] = label;

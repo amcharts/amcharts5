@@ -7,6 +7,9 @@ adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
 ## [UNRELEASED] - ????-??-??
 
+
+## [5.2.0] - 2026-11-16
+
 ### Added
 - The npm package now includes the CDN script files in `dist/`, for `<script>` tags from `node_modules` or unpkg.
 - `images/`: day and night images of the Earth, and images of the Moon, Mars, Venus, Jupiter, Io and Ganymede, from NASA and USGS, for `am5map.MapRasterSeries`. Credits are in `images/README.md`.

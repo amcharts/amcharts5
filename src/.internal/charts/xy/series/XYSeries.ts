@@ -866,6 +866,9 @@ export abstract class XYSeries extends Series {
 	public _stackDirty: boolean = false;
 
 	protected _selectionProcessed = false;
+	// the range the values in view (selection extremes, totals) were last worked out for
+	protected _processedStart: number | undefined;
+	protected _processedEnd: number | undefined;
 
 	declare public chart: XYChart | undefined;
 
@@ -1017,17 +1020,22 @@ export abstract class XYSeries extends Series {
 
 		this.states._createC("hidden", <any>{ opacity: 1, visible: false });
 
-		this.onPrivate("startIndex", () => {
+		// The range in view changed: the legend shows it again, unless the cursor is over the chart, which then shows its item again
+		const rangeChanged = () => {
 			this.root.events.once("frameended", () => {
-				this.updateLegendValue();
+				// a series that fills its legend itself (e.g. a volume profile) is not driven by the cursor
+				if (!this._cursorShown() || this.getPrivate("doNotUpdateLegend")) {
+					this.updateLegendValue();
+				}
 			})
-		})
+			const chart = this.chart;
+			if (chart) {
+				chart._updateCursorLater();
+			}
+		}
 
-		this.onPrivate("endIndex", () => {
-			this.root.events.once("frameended", () => {
-				this.updateLegendValue();
-			})
-		})
+		this.onPrivate("startIndex", rangeChanged);
+		this.onPrivate("endIndex", rangeChanged);
 
 		this._makeFieldNames();
 
@@ -1377,6 +1385,14 @@ export abstract class XYSeries extends Series {
 			this._valuesDirty = true;
 		}
 
+		// values grouped another way: grouped again (once; the settings stay dirty all frame)
+		const groupedDirty = (field: string) => this.isDirty((field + "Grouped") as any);
+		if (!this._regroupedForSettings && ($array.any(this._valueYFields, groupedDirty) || $array.any(this._valueXFields, groupedDirty))) {
+			this._regroupedForSettings = true;
+			this._markDirtyGroup();
+			this._valuesDirty = true;
+		}
+
 		// Location settings are read while (re)building points/columns in
 		// `_updateChildren` (gated by `_valuesDirty`), so force that rebuild when
 		// they change dynamically.
@@ -1542,8 +1558,12 @@ export abstract class XYSeries extends Series {
 				this._showBullets = true;
 			}
 
-			if ((this._psi != startIndex || this._pei != endIndex || this.isDirty("vcx") || this.isDirty("vcy") || this.isPrivateDirty("adjustedStartIndex") || this._stackDirty || this._valuesDirty) && !this._selectionProcessed) {
+			// worked out again when the axes moved the range since, also later in the same frame (they do after data changes)
+			const rangeProcessed = this._selectionProcessed && this._processedStart === startIndex && this._processedEnd === endIndex;
+			if ((this._psi != startIndex || this._pei != endIndex || this.isDirty("vcx") || this.isDirty("vcy") || this.isPrivateDirty("adjustedStartIndex") || this._stackDirty || this._valuesDirty) && !rangeProcessed) {
 				this._selectionProcessed = true;
+				this._processedStart = startIndex;
+				this._processedEnd = endIndex;
 
 				const vcx = this.get("vcx", 1);
 				const vcy = this.get("vcy", 1);
@@ -1762,6 +1782,7 @@ export abstract class XYSeries extends Series {
 		this._reallyStackedTo = {};
 
 		$array.each(this.dataItems, (dataItem) => {
+			let stacked = false;
 			for (let s = 0; s < len; s++) {
 				let stackToSeries = this._couldStackTo[s];
 				let stackToItem = stackToSeries.dataItems[index];
@@ -1781,12 +1802,14 @@ export abstract class XYSeries extends Series {
 									dataItem.setRaw(stackToItemKey, stackToItem);
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 									stackToSeries._stackedSeries[this.uid] = this;
+									stacked = true;
 									break;
 								}
 								if (value < 0 && stackValue < 0) {
 									dataItem.setRaw(stackToItemKey, stackToItem);
 									this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 									stackToSeries._stackedSeries[this.uid] = this;
+									stacked = true;
 									break;
 								}
 							}
@@ -1800,10 +1823,16 @@ export abstract class XYSeries extends Series {
 							dataItem.setRaw(stackToItemKey, stackToItem);
 							this._reallyStackedTo[stackToSeries.uid] = stackToSeries;
 							stackToSeries._stackedSeries[this.uid] = this;
+							stacked = true;
 							break;
 						}
 					}
 				}
+			}
+
+			// nothing to stack on now: a link from earlier data (an item kept by grouping) must not stay
+			if (!stacked && dataItem.get(stackToItemKey)) {
+				dataItem.setRaw(stackToItemKey, undefined);
 			}
 
 			index++;
@@ -1900,6 +1929,21 @@ export abstract class XYSeries extends Series {
 	public _markDirtyAxes() {
 		this._axesDirty = true;
 		this.markDirty();
+		// the axes moved the items (zoom, a scale that animates): a shown cursor snaps to where its item is now
+		const chart = this.chart;
+		if (chart) {
+			chart._updateCursorLater();
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _dataItemKeyChanged(_dataItem: DataItem<this["_dataItemSettings"]>, key: string) {
+		// a row's value or date changed in place (e.g. setIndex animating it): the next grouping starts over
+		if (this._groupKeptRows != -1 && (this._valueXFields.indexOf(key) != -1 || this._valueYFields.indexOf(key) != -1)) {
+			this._groupKeptRows = -1;
+		}
 	}
 
 	public _markDataSetDirty() {
@@ -1916,7 +1960,11 @@ export abstract class XYSeries extends Series {
 		this._selectionProcessed = false;
 		this._stackDirty = false;
 		this._dataProcessed = false;
+		this._regroupedForSettings = false;
 	}
+
+	// grouped again this frame because a `*Grouped` setting changed
+	protected _regroupedForSettings: boolean = false;
 
 	public _positionBullet(bullet: Bullet) {
 		let sprite = bullet.get("sprite");
@@ -2092,7 +2140,20 @@ export abstract class XYSeries extends Series {
 	 * @ignore
 	 */
 	public setDataSet(id: string) {
+		if (!this._dataSets[id]) {
+			// a date axis groups the data for an interval only when it is first shown
+			const baseAxis: any = this.get("baseAxis");
+			if (baseAxis && baseAxis._makeDataSet) {
+				const switches = this._dataSetSwitches;
+				baseAxis._makeDataSet(this, id);
+				if (this._dataSetSwitches !== switches && this._dataSetId === id && this._dataItems === this._dataSets[id]) {
+					// a full regroup switched to it already
+					return;
+				}
+			}
+		}
 		if (this._dataSets[id]) {
+			this._dataSetSwitches++;
 			this._handleDataSetChange();
 			this._dataItems = this._dataSets[id];
 			this._markDataSetDirty();
@@ -2484,6 +2545,17 @@ export abstract class XYSeries extends Series {
 		this.get("xAxis")._markDirtyKey("start");
 		this.get("yAxis")._markDirtyKey("start");
 		this.resetExtremes();
+		// data changed under the cursor: its item, legend and snap are found again once the new data is drawn
+		const chart = this.chart;
+		if (chart) {
+			chart._updateCursorLater();
+		}
+	}
+
+	protected _cursorShown(): boolean {
+		const chart = this.chart;
+		const cursor = chart ? chart.get("cursor") : undefined;
+		return cursor !== undefined && !cursor.isHidden();
 	}
 
 
@@ -2558,6 +2630,72 @@ export abstract class XYSeries extends Series {
 					else {
 						break;
 					}
+				}
+				else {
+					break;
+				}
+			}
+		}
+
+		return index;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _aggregatesDeferred(): boolean {
+		const baseAxis: any = this.get("baseAxis");
+		// only before the date axis has picked its first group interval: data set on a chart already shown
+		// gets its aggregates right away, so what is drawn from them is worked out in the same pass
+		if (baseAxis && baseAxis.get("groupData") && !this.get("groupDataDisabled") && baseAxis.isType("DateAxis") && !baseAxis.getPrivate("groupInterval")) {
+			// the date axis groups this data in this frame, then picks the group interval to show
+			return !this._dataGrouped || baseAxis._seriesDataGrouped;
+		}
+		return false;
+	}
+
+	protected _legendAfterAggregates?: IDisposer;
+
+	// how many times the data set was switched (see `setDataSet`)
+	protected _dataSetSwitches: number = 0;
+
+	/**
+	 * @ignore
+	 */
+	public _aggregatesChanged(): void {
+		// they can arrive after the range in view refreshed the legend (put off while the data is grouped)
+		if (!this._legendAfterAggregates) {
+			this._legendAfterAggregates = this.root.events.once("frameended", () => {
+				this._legendAfterAggregates = undefined;
+				if (!this.isDisposed() && (!this._cursorShown() || this.getPrivate("doNotUpdateLegend"))) {
+					this.updateLegendValue();
+				}
+			});
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _adjustEndIndex(index: number): number {
+		const xAxis = this.get("xAxis");
+		const baseAxis = this.get("baseAxis");
+
+		// as at the start: an item counts as in view while its middle is
+		if (baseAxis == xAxis && xAxis.isType<DateAxis<any>>("DateAxis")) {
+			const baseDuration = xAxis.baseDuration();
+			const maxSelection = xAxis.getPrivate("selectionMax", xAxis.getPrivate("max", 0));
+			const dl = baseDuration * this.get("locationX", 0.5);
+
+			while (index > 0) {
+				const dataItem = this.dataItems[index - 1];
+				if (!dataItem) {
+					break;
+				}
+				const open = dataItem.open;
+				const value = (open ? open["valueX"] : dataItem.get("valueX", 0)) + dl;
+				if (value > maxSelection) {
+					index--;
 				}
 				else {
 					break;

@@ -71,7 +71,7 @@ from `node_modules/@amcharts/amcharts5-geodata/dist/` or from unpkg (jsDelivr
 does not serve this package: it is over jsDelivr's 150 MB limit):
 
 ```
-<script src="https://unpkg.com/@amcharts/amcharts5-geodata@5.1.6/dist/worldLow.js"></script>
+<script src="https://unpkg.com/@amcharts/amcharts5-geodata@5.2.0/dist/worldLow.js"></script>
 ```
 
 

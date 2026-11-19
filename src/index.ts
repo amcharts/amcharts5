@@ -51,7 +51,7 @@ export { Timezone } from "./.internal/core/util/Timezone";
 export { ZoomTools, IZoomToolsSettings, IZoomToolsPrivate, IZoomToolsEvents } from "./.internal/core/render/ZoomTools";
 
 export { GrainPattern } from "./.internal/core/render/patterns/GrainPattern";
-export { BlendMode, IRendererClass, IGraphics } from "./.internal/core/render/backend/Renderer";
+export { BlendMode, IRendererClass, IGraphics, TouchGestures } from "./.internal/core/render/backend/Renderer";
 
 export { Gradient, IGradientSettings, IGradientPrivate } from "./.internal/core/render/gradients/Gradient";
 export { LinearGradient, ILinearGradientSettings, ILinearGradientPrivate } from "./.internal/core/render/gradients/LinearGradient";

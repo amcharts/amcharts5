@@ -111,6 +111,7 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 	public inactive: boolean | null = null;
 	public wheelable: boolean = false;
 	public cancelTouch: boolean = false;
+	public touchAxis: "x" | "xy" = "xy";
 	public isMeasured: boolean = false;
 	public buttonMode: boolean = false;
 	public alpha: number = 1;
@@ -367,11 +368,13 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 
 	public shouldCancelTouch(): boolean {
 		const interaction = this._renderer._interaction;
-		if (interaction.tapToActivate && !interaction._touchActive) {
+		const gestures = interaction.touchGestures;
+		if (gestures == "tap" && !interaction._touchActive) {
 			return false;
 		}
 		if (this.cancelTouch) {
-			return true;
+			// "auto": an "x" area waits for a sideways swipe or a second finger and leaves vertical swipes to the page (pan-y)
+			return !(gestures == "auto" && this.touchAxis == "x");
 		}
 		else if (this._parent) {
 			return this._parent.shouldCancelTouch();

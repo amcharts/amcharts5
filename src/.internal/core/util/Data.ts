@@ -61,6 +61,51 @@ export class ListData<T> extends List<T> implements ICounterRef, IDataWithProces
 		}
 		super._onSetIndex(index, oldValue, newValue);
 	}
+
+	/**
+	 * Components that take all rows of a `setAll()` at once instead of a push
+	 * event per row: `callback` is their data listener, `pushed` gets the rows.
+	 *
+	 * @ignore
+	 */
+	public _bulk: Array<{ callback: any, pushed: (rows: Array<T>) => void }> = [];
+
+	public setAll(newArray: Array<T>): void {
+		const bulk = this._bulk;
+		// a push event per row, unless only those components hear them
+		if (bulk.length == 0 || !this.events.isEnabled("push") || !this.events._onlyCallbacks("push", bulk.map((b) => b.callback))) {
+			super.setAll(newArray);
+			return;
+		}
+
+		const old = this._values;
+		this._values = [];
+		this._batchDepth++;
+
+		try {
+			this._onClear(old);
+
+			const values = this._values;
+			const processor = this.processor;
+			for (let i = 0, len = newArray.length; i < len; i++) {
+				const value = newArray[i];
+				values.push(value);
+				if (processor) {
+					processor.processRow(value);
+				}
+			}
+
+			const targets = bulk.slice();
+			for (let i = 0; i < targets.length; i++) {
+				targets[i].pushed(values);
+			}
+
+		} finally {
+			if (--this._batchDepth === 0) {
+				this._runBatchEnd();
+			}
+		}
+	}
 }
 
 /**

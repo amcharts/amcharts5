@@ -3,6 +3,7 @@ import type { IPlaced } from "./Layout";
 import * as $array from "../util/Array";
 import * as $math from "../util/Math";
 import type { Container } from "./Container";
+import type { Sprite } from "./Sprite";
 
 
 export interface IGridLayoutSettings extends ILayoutSettings {
@@ -55,46 +56,14 @@ export class GridLayout extends Layout {
 
 		let availableWidth = container.maxWidth() - paddingLeft - paddingRight;
 
-		let minCellWidth = availableWidth;
-		let maxCellWidth = 1;
-
-		eachChildren(container, (child) => {
-			if(child.get("visible") && child.getPrivate("visible") && !child.get("forceHidden")){
-				if (child.get("position") != "absolute") {
-					let childWidth = child.width();
-
-					if (childWidth < minCellWidth) {
-						minCellWidth = childWidth;
-					}
-					if (childWidth > maxCellWidth) {
-						maxCellWidth = childWidth;
-					}
-				}
-			}
-		});
-
-		minCellWidth = $math.fitToRange(minCellWidth, 1, availableWidth);
-		maxCellWidth = $math.fitToRange(maxCellWidth, 1, availableWidth);
-
-		let columnCount = 1;
-		if (this.get("fixedWidthGrid")) {
-			columnCount = availableWidth / maxCellWidth;
-		}
-		else {
-			columnCount = availableWidth / minCellWidth;
-		}
-
-		columnCount = Math.max(1, Math.floor(columnCount));
-		columnCount = Math.min(this.get("maxColumns", Number.MAX_VALUE), columnCount);
-
-		let columnWidths = this.getColumnWidths(container, columnCount, maxCellWidth, availableWidth);
+		let columnWidths = this._columns(container, availableWidth);
 
 		let prevY = paddingTop;
 
 		let column = 0;
 		let maxRowHeight = 0;
 
-		columnCount = columnWidths.length;
+		let columnCount = columnWidths.length;
 
 		let prevX = paddingLeft;
 		const rtl = container._isRtl();
@@ -145,7 +114,74 @@ export class GridLayout extends Layout {
 	/**
 	 * @ignore
 	 */
-	public getColumnWidths(container: Container, columnCount: number, maxCellWidth: number, availableWidth: number): number[] {
+	/**
+	 * The widths of the columns the container's children are placed in, when
+	 * `availableWidth` is the width inside its padding; `extra` says how much
+	 * wider than now a child would be.
+	 *
+	 * @ignore
+	 */
+	public _columns(container: Container, availableWidth: number, extra?: (child: Sprite) => number): number[] {
+		let minCellWidth = availableWidth;
+		let maxCellWidth = 1;
+
+		eachChildren(container, (child) => {
+			if(child.get("visible") && child.getPrivate("visible") && !child.get("forceHidden")){
+				if (child.get("position") != "absolute") {
+					let childWidth = child.width() + (extra ? extra(child) : 0);
+
+					if (childWidth < minCellWidth) {
+						minCellWidth = childWidth;
+					}
+					if (childWidth > maxCellWidth) {
+						maxCellWidth = childWidth;
+					}
+				}
+			}
+		});
+
+		minCellWidth = $math.fitToRange(minCellWidth, 1, availableWidth);
+		maxCellWidth = $math.fitToRange(maxCellWidth, 1, availableWidth);
+
+		let columnCount = 1;
+		if (this.get("fixedWidthGrid")) {
+			columnCount = availableWidth / maxCellWidth;
+		}
+		else {
+			columnCount = availableWidth / minCellWidth;
+		}
+
+		columnCount = Math.max(1, Math.floor(columnCount));
+		columnCount = Math.min(this.get("maxColumns", Number.MAX_VALUE), columnCount);
+
+		return this.getColumnWidths(container, columnCount, maxCellWidth, availableWidth, extra);
+	}
+
+	/**
+	 * The height of the rows the container's children take in `columnCount`
+	 * columns, margins included.
+	 *
+	 * @ignore
+	 */
+	public _rowsHeight(container: Container, columnCount: number): number {
+		let total = 0;
+		let column = 0;
+		let maxRowHeight = 0;
+		eachChildren(container, (child) => {
+			if (child.get("position") == "relative" && child.isVisible()) {
+				maxRowHeight = Math.max(maxRowHeight, child.height() + child.get("marginTop", 0) + child.get("marginBottom", 0));
+				column++;
+				if (column >= columnCount) {
+					column = 0;
+					total += maxRowHeight;
+					maxRowHeight = 0;
+				}
+			}
+		});
+		return total + maxRowHeight;
+	}
+
+	public getColumnWidths(container: Container, columnCount: number, maxCellWidth: number, availableWidth: number, extra?: (child: Sprite) => number): number[] {
 		let totalWidth = 0;
 		let columnWidths: Array<number> = [];
 		let column = 0;
@@ -157,7 +193,7 @@ export class GridLayout extends Layout {
 					columnWidths[column] = maxCellWidth;
 				}
 				else {
-					columnWidths[column] = Math.max(columnWidths[column] | 0, bounds.right - bounds.left + child.get("marginLeft", 0) + child.get("marginRight", 0));
+					columnWidths[column] = Math.max(columnWidths[column] | 0, bounds.right - bounds.left + (extra ? extra(child) : 0) + child.get("marginLeft", 0) + child.get("marginRight", 0));
 				}
 
 				if (column < container.children.length - 1) {
@@ -176,7 +212,7 @@ export class GridLayout extends Layout {
 		if (totalWidth > availableWidth) {
 			if (columnCount > 2) {
 				columnCount -= 1;
-				return this.getColumnWidths(container, columnCount, maxCellWidth, availableWidth);
+				return this.getColumnWidths(container, columnCount, maxCellWidth, availableWidth, extra);
 			}
 			else {
 				return [availableWidth];

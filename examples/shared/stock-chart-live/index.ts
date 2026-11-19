@@ -19,7 +19,7 @@ root.setThemes([
 
 // Set global number format
 // https://docs.amcharts.com/v5/concepts/formatters/formatting-numbers/
-root.numberFormatter.set("numberFormat", "#,###.00");
+root.numberFormatter.set("numberFormat", "#,###.00##"); // prices: cents, and up to 4 decimals for small ones
 
 
 // Create a stock chart
@@ -43,7 +43,8 @@ const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
     pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
   }),
   tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis...
-  extraTooltipPrecision: 2            // ...with two more decimals than the labels
+  extraTooltipPrecision: 2,           // ...with two more decimals than the grid step
+  preferredDecimals: [0, 2]           // prices: whole numbers, or cents
 }));
 
 const dateAxis = mainPanel.xAxes.push(am5xy.GaplessDateAxis.new(root, {

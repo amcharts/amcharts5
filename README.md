@@ -88,9 +88,9 @@ also load them from `node_modules` or from jsDelivr or unpkg, all from one
 version:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/xy.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/themes/Animated.js"></script>
 ```
 
 When you bundle amCharts yourself, keep code splitting on. The export plugin

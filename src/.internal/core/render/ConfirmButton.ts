@@ -1,4 +1,5 @@
 import { IButtonSettings, IButtonPrivate, IButtonEvents, Button } from "./Button";
+import { Label } from "./Label";
 
 import * as $utils from "../util/Utils";
 
@@ -44,6 +45,12 @@ export class ConfirmButton extends Button {
 		super._afterNew();
 
 		this.addTag("confirm");
+
+		// a label of its own: one made in a theme rule is shared by every button
+		this._setDefaultFn("label", () => Label.new(this._root, {
+			text: this._root.language.translate("Confirm"),
+			forceHidden: true
+		})._markC("text", "forceHidden"));
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {

@@ -4,6 +4,7 @@
   "category": "stock",
   "tier": "showcase",
   "tags": ["candlestick", "volume", "toolbar", "indicators", "scrollbar", "legend"],
-  "bodyElements": ["<div id=\"chartcontrols\" style=\"padding-left:15px\"></div>", "<div id=\"chartdiv\"></div>"],
+  "bodyElements": ["<div id=\"chartcontrols\"></div>", "<div id=\"chartdiv\"></div>"],
+  "extraCSS": "#chartcontrols {\n  padding-left: 15px;\n}\n\n/* on a phone ResponsiveMax gives the stock chart less padding, so the toolbar lines up with the plot again */\n@media (max-width: 400px) {\n  #chartcontrols {\n    padding-left: 4px;\n  }\n}",
   "chartdiv": { "height": "calc(100vh - 36px)" }
 }

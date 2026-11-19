@@ -2,6 +2,7 @@ import type { Graphics } from "../../../core/render/Graphics";
 import type { DataItem } from "../../../core/render/Component";
 import type { Color } from "../../../core/util/Color";
 import type { Sprite } from "../../../core/render/Sprite";
+import type { IDrawingSeriesDataItem } from "./DrawingSeries";
 
 import { SimpleLineSeries, ISimpleLineSeriesSettings, ISimpleLineSeriesPrivate, ISimpleLineSeriesDataItem } from "./SimpleLineSeries";
 import { Label } from "../../../core/render/Label";
@@ -166,8 +167,8 @@ export class FibonacciSeries extends SimpleLineSeries {
 		}
 	}
 
-	protected _createElements(index: number) {
-		super._createElements(index);
+	protected _createElements(index: number, dataItem?: DataItem<IDrawingSeriesDataItem>) {
+		super._createElements(index, dataItem);
 
 		if (!this._fills[index]) {
 

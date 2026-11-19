@@ -69,12 +69,19 @@ export type IPointerEvent = PointerEvent | MouseEvent | Touch;
 
 export type Id = number | null;
 
+/**
+ * Who gets a touch gesture on the chart, see `Root.touchGestures`.
+ */
+export type TouchGestures = "chart" | "tap" | "auto";
+
 export interface IRendererEvent<E> {
 	event: E;
 	point: IPoint;
 	id: Id;
 	simulated: boolean;
 	native: boolean;
+	// the browser took the gesture over (e.g. to scroll the page), so it ends without effect
+	cancelled?: boolean;
 }
 
 export interface IRendererEvents {
@@ -113,6 +120,8 @@ export interface IDisplayObject extends IDisposer {
 	inactive: boolean | null;
 	wheelable: boolean;
 	cancelTouch: boolean;
+	// with `touchGestures` "auto": "x" takes a swipe that starts sideways or uses two fingers and leaves vertical ones to the page, "xy" takes any
+	touchAxis: "x" | "xy";
 	isMeasured: boolean;
 	buttonMode: boolean;
 	alpha: number;
@@ -316,6 +325,7 @@ export interface IRenderer extends IDisposer {
 	debugGhostView: boolean;
 	tapToActivate: boolean;
 	tapToActivateTimeout: number;
+	touchGestures: TouchGestures;
 	resolution: number;
 	removeHovering(graphics:IDisplayObject):void;
 	interactionsEnabled: boolean;

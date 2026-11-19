@@ -438,6 +438,40 @@ function addInTimezone(date: Date, unit: TimeUnit, count: number, timezone: Time
  * @ignore
  */
 export function roun(time: number, unit: TimeUnit, count: number, root: Root, firstTime?: number): number {
+	// Periods of fixed length in UTC are rounded without making a Date
+	if (root.utc && !root.timezone && typeof time == "number" && count >= 1 && Number.isInteger(count)) {
+		let duration = 0;
+		if (unit == "millisecond") {
+			if (1000 % count == 0) {
+				duration = count;
+			}
+		}
+		else if (unit == "second") {
+			if (60 % count == 0) {
+				duration = count * 1000;
+			}
+		}
+		else if (unit == "minute") {
+			if (60 % count == 0) {
+				duration = count * 60000;
+			}
+		}
+		else if (unit == "hour") {
+			if (24 % count == 0) {
+				duration = count * 3600000;
+			}
+		}
+		else if (unit == "day" && count == 1) {
+			duration = 86400000;
+		}
+
+		// Outside the range of a Date the original path gives NaN
+		if (duration && Number.isInteger(time) && Math.abs(time) <= 8.64e15) {
+			const rest = time % duration;
+			return rest < 0 ? time - rest - duration : time - rest;
+		}
+	}
+
 	let firstDate;
 	if (firstTime != null) {
 		firstDate = new Date(firstTime);

@@ -1,7 +1,7 @@
 /** @ignore *//** */
 
 import type {
-	IRenderer, IMargin, IRendererEvent, ILayer, ICanvasOptions, IPointerEvent, Id
+	IRenderer, IMargin, IRendererEvent, ILayer, ICanvasOptions, IPointerEvent, Id, TouchGestures
 } from "./Renderer";
 import type { GraphicsOp, GraphicsPaint } from "../scene/GraphicsData";
 import { LinearGradientDef, RadialGradientDef, PatternDef, RasterPatternDef } from "../scene/Paint";
@@ -1339,6 +1339,14 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 		this._interaction.tapToActivate = value;
 	}
 
+	public get touchGestures(): TouchGestures {
+		return this._interaction.touchGestures;
+	}
+
+	public set touchGestures(value: TouchGestures) {
+		this._interaction.touchGestures = value;
+	}
+
 	public get tapToActivateTimeout(): number {
 		return this._interaction.tapToActivateTimeout;
 	}
@@ -1969,15 +1977,18 @@ class GhostLayer {
 	}
 
 	getImageArray(point: IPoint): Array<number> {
+		// the layer is painted shifted by its margin; a point off the canvas (or an empty one) hits nothing
+		const x = Math.round((point.x + this.margin.left) * this._resolution);
+		const y = Math.round((point.y + this.margin.top) * this._resolution);
+		if (!(x >= 0 && y >= 0 && x < this._width && y < this._height)) {
+			return [0, 0, 0, 0];
+		}
 
 		if (!this.imageArray) {
 			this.imageArray = this.context.getImageData(0, 0, this._width, this._height).data;
 		}
 
 		const data = this.imageArray;
-
-		const x = Math.round(point.x * this._resolution);
-		const y = Math.round(point.y * this._resolution);
 
 		const i = (y * this._width + x) * 4;
 		return [data[i], data[i + 1], data[i + 2], data[i + 3]];

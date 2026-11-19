@@ -23,14 +23,23 @@ import * as $object from "../core/util/Object";
  * * `autoLabels` on other series: bullet labels that would overlap or be cut
  *   off are hidden. Drawings on a stock chart are left alone.
  * * `autoFit` on legends: smaller, then scrolling, with long names shortened.
+ * * `autoFit` on stock toolbars: controls that do not fit in one row fold,
+ *   labels that repeat an icon first, then the period buttons.
  * * `autoHide` on chart scrollbars: a vertical one goes on a chart 400 px wide
- *   or narrower, a horizontal one on a chart 300 px tall or lower (a stock
- *   chart is measured whole, not by panel); pinching zooms instead.
+ *   or narrower, a horizontal one on a chart 300 px tall or lower, or 400 px
+ *   wide or narrower (a stock chart is measured whole, not by panel); pinching
+ *   zooms instead.
+ * * `touchGestures: "auto"` on the root, when the theme is set on the root
+ *   and `touchGestures` is not set in code: a vertical swipe on a chart
+ *   scrolls the page, one that starts sideways or uses two fingers works
+ *   the chart.
  *
  * Below 400 px, text is drawn at 85% of its size, and axis labels, legend
  * items and word cloud words get less padding; scrollbars get smaller margins.
- * Charts keep their padding. Funnel, pyramid and pictorial labels stay unless
- * the chart is tiny, and radar labels stay outside the circle.
+ * Charts keep their padding, except stock charts 400 px wide or narrower:
+ * their panels sit 6 px from the chart's edges and from each other. Funnel,
+ * pyramid and pictorial labels stay unless the chart is tiny, and radar
+ * labels stay outside the circle.
  *
  * Labels added in code with their own font size, such as a title, are drawn
  * smaller on charts under 600 × 450 px instead, down to three quarters of
@@ -200,10 +209,13 @@ export class ResponsiveMaxTheme extends ResponsiveBaseTheme {
 		// Not the Responsive theme's rules: the settings below do the work of
 		// most of them, which hid labels and legends outright.
 
+		this._touchGestures = "auto";
+
 		this.rule("AxisRenderer").set("autoLabels", true);
 		this.rule("Series").set("autoLabels", true);
 		this.rule("DrawingSeries").set("autoLabels", false);
 		this.rule("Legend").set("autoFit", true);
+		this.rule("StockToolbar").set("autoFit", true);
 		// a desktop chart is often 300-400 px tall but seldom 400 px wide, and a mouse can't pinch
 		this.rule("Scrollbar", ["chart", "vertical"]).set("autoHide", 400);
 		this.rule("Scrollbar", ["chart", "horizontal"]).set("autoHide", 300);
@@ -236,6 +248,14 @@ export class ResponsiveMaxTheme extends ResponsiveBaseTheme {
 		add("Scrollbar", ["horizontal"], ResponsiveBaseTheme.heightM, { marginTop: 6, marginBottom: 6 });
 
 		add("Scrollbar", ["vertical"], ResponsiveBaseTheme.widthM, { marginLeft: 6, marginRight: 6 });
+
+		// on a phone-wide chart a horizontal scrollbar costs label room and is hard to hit: pinching zooms instead
+		// (tags of its own, as taking the rule back clears its template)
+		add("Scrollbar", ["chart", "horizontal", "scrollbar"], ResponsiveBaseTheme.widthM, { autoHide: Infinity });
+
+		// a stock chart on a phone: its padding and the gap above each panel take a lot of a small screen
+		add("StockChart", none, ResponsiveBaseTheme.widthM, { paddingLeft: 6, paddingRight: 6, paddingTop: 0, paddingBottom: 6 });
+		add("XYChart", ["stock"], ResponsiveBaseTheme.widthM, { paddingTop: 6 });
 
 
 		/**

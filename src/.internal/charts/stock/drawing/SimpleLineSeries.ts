@@ -292,7 +292,7 @@ export class SimpleLineSeries extends DrawingSeries {
 		}
 	}
 
-	protected _createElements(index: number) {
+	protected _createElements(index: number, dataItem?: DataItem<IDrawingSeriesDataItem>) {
 		if (!this._lines[index]) {
 			const line = this.makeLine();
 			this._lines[index] = line;
@@ -300,7 +300,7 @@ export class SimpleLineSeries extends DrawingSeries {
 			const hitLine = this.makeHitLine();
 			this._hitLines[index] = hitLine;
 
-			const dataContext = this.dataItems[this.dataItems.length - 1].dataContext as any;
+			const dataContext = (dataItem || this.dataItems[this.dataItems.length - 1]).dataContext as any;
 			dataContext.sprite = line;
 
 			let showExtension = this.get("showExtension", true);

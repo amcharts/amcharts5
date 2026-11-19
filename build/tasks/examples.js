@@ -465,6 +465,7 @@ function script_page(config, dir, suffix, scripts, data, code) {
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>amCharts 5 Example - ${htmlEscape(example_title(config, dir))}${suffix}</title>${config.extraHeadElements.map((x) => `
     ${x}`).join("")}
 

@@ -806,6 +806,11 @@ export abstract class AxisRenderer extends Graphics {
 		if ((a > -0.5 && b < length + 0.5) || b <= 0 || a >= length) {
 			return null;
 		}
+		// cut by the axis' own `startLocation` or `endLocation`, not by zoom: the label stays on the edge
+		const axis: any = this.axis;
+		if ((Math.min(start, end) < 0 && axis.get("startLocation", 0) > 0 && axis.get("start", 0) <= 0) || (Math.max(start, end) > 1 && axis.get("endLocation", 1) < 1 && axis.get("end", 1) >= 1)) {
+			return null;
+		}
 
 		// placed by its text, which is measured while the label is hidden too; when that changes size, placed again
 		const text = label.text;

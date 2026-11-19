@@ -5,6 +5,43 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.23.0] - 2026-11-19
+
+### Added
+- Root: new `touchGestures` setting. With `"auto"`, which the ResponsiveMax theme sets, a vertical swipe scrolls the page and a sideways or two-finger swipe works the chart, so phones need no tap first.
+- Value axis: new `preferredDecimals` setting, the decimal counts labels may show. With `[0, 2]`, as the bundled stock examples use for prices, labels read 48.50 and 49.00 instead of 48.5 and 49.0, and whole prices stay whole.
+- Stock toolbar: new `autoFit` setting, which the ResponsiveMax theme turns on. Controls that do not fit in one row fold a step at a time: first to icons, then the period buttons into one.
+
+### Changed
+- ResponsiveMax: stock charts 400 px wide or narrower get less padding, and less space above each panel.
+- ResponsiveMax: horizontal chart scrollbars also hide on charts 400 px wide or narrower; pinching zooms instead.
+- Large data sets on a date axis with data grouping load several times faster. Only the group interval in view is made at first, the others when they are first needed.
+- Series with `calculateAggregates`, such as stock charts, load faster and use less memory.
+- Live data on a date axis with data grouping updates faster: adding data at the end, or removing it from the start or the end, no longer regroups all the data.
+- XY chart: with `pinchZoomX` and `panY`, or `pinchZoomY` and `panX`, two fingers also pan the way they do not zoom.
+
+### Fixed
+- Data grouping: changing `valueYGrouped` and similar settings, `groupIntervals` or `groupInterval` at runtime, or adding data with `pushDataItem()`, now regroups the data instead of keeping old groups.
+- Touch: with `tapToActivate`, a swipe that scrolls the page no longer drags a scrollbar grip, pans a chart or turns a globe a little before the page takes over.
+- Touch: a gesture the browser takes over, for example to scroll the page, no longer zooms with the cursor or counts as a click.
+- Touch: a second finger on a chart that pans without pinch zoom, such as a stock chart, no longer makes the pan jump, and lifting one of two fingers no longer stops the pan.
+- Touch: a pinch on a map no longer jumps once the page has had ten or more touches.
+- XY cursor with a zoom or select behavior: a pinch with two fingers no longer ends in a selection zoom; a second finger calls the selection off.
+- Map: two fingers on a globe turn it instead of moving it off center.
+- Axis labels: `keepInView` no longer hides or moves the first and last labels on axes with `startLocation` or `endLocation`.
+- Number formats without decimals, such as `#,###`, no longer show floating-point noise: 6708.044000000005 is shown as 6,708.044.
+- Candlestick and OHLC series: a candle whose width comes from `openValueXField` and `valueXField` on a value axis has its wick in the middle, not on its edge.
+- XY cursor: when data changed under a still pointer, the legend went empty or kept old values, and a snapped cursor could disappear.
+- Series with `calculateAggregates`: when zoomed in, values for all data, such as `valueYSum`, left out the data before the view. Values in view, such as `valueYSumSelection`, could count an item past the end of the view or miss data just added.
+- XY cursor with `clickTolerance`: dragging the scrollbar started a selection and fired `selectended`.
+- Stacked series on a grouped date axis with `calculateTotals`: after `data.setAll()`, most items had no totals, so 100% stacked columns were not drawn.
+- Gantt: a chart with a single row no longer draws it cut off, without its task bar, when the Animated theme is not used.
+- Gantt: a Gantt chart made on a root after another one was disposed threw an error and had no button tooltips. With two Gantt charts on one root, the first one's Clear button lost its "Confirm" label.
+- XY chart scrollbars: screen readers read the grips the wrong way round on a vertical scrollbar (top grip read as "From" with the axis minimum) and on a horizontal one with an inversed X axis.
+- Legend `autoFit`: a legend made smaller to fit now puts more items in a row, so it uses the full width instead of leaving half of it empty.
+- Value axis: labels on a narrow range, such as prices under a cent, no longer repeat or show as zero when the number format keeps fewer decimals than the grid needs.
+
+
 ## [5.22.0] - 2026-11-16
 
 ### Added

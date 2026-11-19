@@ -34,7 +34,9 @@ and `CHANGELOG.md` disagree, the changelog is right.
    `root.setThemes([am5themes_Animated.new(root), am5themes_ResponsiveMax.new(root)]);`
    ResponsiveMax (since 5.22.0) fits the chart to the space it gets: labels
    spaced to fit, legends that shrink, then scroll, scrollbars that give way
-   to pinch zoom on phones. A palette or dark theme goes after them.
+   to pinch zoom on phones, a stock toolbar that folds to fit. On phones a
+   vertical swipe over the chart scrolls the page (it sets `root.touchGestures`
+   to `"auto"`), so do not set `root.tapToActivate`. A palette or dark theme goes after them.
 4. **Colors and percents are objects:** `am5.color(0xff0000)` and
    `am5.percent(50)`, not strings.
 5. **Every axis needs a renderer**, e.g.
@@ -84,14 +86,14 @@ package has them in `dist/`. From an npm CDN, pin the version and load every
 file from it:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/xy.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/Animated.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.22.0/dist/themes/ResponsiveMax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/themes/ResponsiveMax.js"></script>
 ```
 
 The same files are at `node_modules/@amcharts/amcharts5/dist/`, on unpkg
-(`https://unpkg.com/@amcharts/amcharts5@5.22.0/dist/index.js`) and on the
+(`https://unpkg.com/@amcharts/amcharts5@5.23.0/dist/index.js`) and on the
 amCharts CDN (`https://cdn.amcharts.com/lib/5/index.js`). A sandbox that allows
 scripts only from npm CDNs (jsDelivr, unpkg) can use the first two. Use plain
 script tags, not `type="module"`: the lazy parts (the exporting plugin's PDF,

@@ -1,6 +1,7 @@
 import { Settings } from "../util/Entity";
 import { Container, IContainerSettings, IContainerPrivate, IContainerEvents } from "./Container";
 import { ListData } from "../util/Data";
+import { Disposer } from "../util/Disposer";
 import * as $array from "../util/Array";
 import * as $object from "../util/Object";
 import type * as $ease from "../util/Ease";
@@ -41,12 +42,14 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 	public close: { [index: string]: any } | undefined;
 
 	constructor(component: Component, dataContext: unknown, settings: P) {
-		super(settings);
+		super(settings, true);
 
 		this.dataContext = dataContext;
 		this.component = component;
 		this._settings.visible = true;
-		this._checkDirty();
+
+		// Marks the component dirty once, not once per setting
+		this.markDirty();
 	}
 
 	/**
@@ -54,6 +57,14 @@ export class DataItem<P extends IComponentDataItem> extends Settings {
 	 */
 	public markDirty(): void {
 		this.component.markDirtyValues(this);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
+		super._markDirtyKey(key);
+		this.component._dataItemKeyChanged(this, key as string);
 	}
 
 	public _startAnimation(): void {
@@ -185,6 +196,24 @@ export abstract class Component extends Container {
 	protected _dataGrouped = false;
 
 	/**
+	 * Rows at the start of the data unchanged since it was last grouped; -1
+	 * after a change anywhere but the end.
+	 *
+	 * @ignore
+	 */
+	public _groupKeptRows: number = -1;
+
+	/**
+	 * Rows taken off the start of the data since it was last grouped.
+	 *
+	 * @ignore
+	 */
+	public _groupDroppedRows: number = 0;
+
+	// An _afterDataChange call waits for the data's setAll() to finish
+	protected _afterDataChangeQueued: boolean = false;
+
+	/**
 	 * Becomes `true` after the component's first update.
 	 */
 	public inited: boolean = false;
@@ -223,10 +252,20 @@ export abstract class Component extends Container {
 		this._data.incrementRef();
 		this._updateFields();
 
-		this._disposers.push(this.data.events.onAll((change) => {
+		const data = this._data;
+		const onChange = (change: any) => {
 			const dataItems = this._mainDataItems;
+			// a row added at the end, or the last one taken off: grouping can carry on from where it stopped
+			const atEnd = change.type === "push" || (change.type === "removeIndex" && change.index === dataItems.length - 1);
+			// the first row taken off: the groups move up
+			const atStart = !atEnd && change.type === "removeIndex" && change.index === 0;
 			this.markDirtyValues();
-			this._markDirtyGroup();
+			if (atEnd || atStart) {
+				this._dataGrouped = false;
+			}
+			else {
+				this._markDirtyGroup();
+			}
 			this._dataChanged = true;
 			if (change.type === "clear") {
 				$array.each(dataItems, (dataItem) => {
@@ -282,8 +321,64 @@ export abstract class Component extends Container {
 				throw new Error("Unknown IStreamEvent type");
 			}
 
-			this._afterDataChange();
+			if (atEnd && this._groupKeptRows > dataItems.length) {
+				this._groupKeptRows = dataItems.length;
+			}
+			else if (atStart) {
+				if (this._groupKeptRows > 0) {
+					this._groupKeptRows--;
+				}
+				this._groupDroppedRows++;
+			}
+
+			this._queueAfterDataChange(data);
+		};
+		this._disposers.push(data.events.onAll(onChange));
+
+		// all rows of a setAll() at once, as a push of each
+		const bulk = { callback: onChange, pushed: (rows: Array<unknown>) => this._rowsPushed(data, rows) };
+		data._bulk.push(bulk);
+		this._disposers.push(new Disposer(() => {
+			$array.remove(data._bulk, bulk);
 		}));
+	}
+
+	protected _queueAfterDataChange(data: ListData<unknown>) {
+		if (data._batchDepth > 0) {
+			// Once for the whole setAll(), when it finishes
+			if (!this._afterDataChangeQueued) {
+				this._afterDataChangeQueued = true;
+				data._onBatchEnd(() => {
+					this._afterDataChangeQueued = false;
+					if (!this.isDisposed()) {
+						this._afterDataChange();
+					}
+				});
+			}
+		} else {
+			this._afterDataChange();
+		}
+	}
+
+	// rows added by a setAll(), all at once: what a push of each does
+	protected _rowsPushed(data: ListData<unknown>, rows: Array<unknown>) {
+		if (rows.length == 0) {
+			return;
+		}
+		this.markDirtyValues();
+		this._dataGrouped = false;
+		this._dataChanged = true;
+		const dataItems = this._mainDataItems;
+		for (let i = 0, len = rows.length; i < len; i++) {
+			const row = rows[i];
+			const dataItem = new DataItem(this, row, this._makeDataItem(row));
+			dataItems.push(dataItem);
+			this.processDataItem(dataItem);
+		}
+		if (this._groupKeptRows > dataItems.length) {
+			this._groupKeptRows = dataItems.length;
+		}
+		this._queueAfterDataChange(data);
 	}
 
 	// The data item's elements take their `templateField` settings from its new data
@@ -356,6 +451,7 @@ export abstract class Component extends Container {
 	}
 
 	protected _updateFields() {
+		this._fieldsResolved = undefined;
 		if (this.valueFields) {
 			this._valueFields = [];
 			this._valueFieldsF = {};
@@ -398,22 +494,59 @@ export abstract class Component extends Container {
 	public _makeDataItem(data: unknown): this["_dataItemSettings"] {
 		//const output: this["_dataItemSettings"] = {};
 		const output: any = {}; // temporary to solve error
-		if (this._valueFields) {
-			$array.each(this._valueFields, (key) => {
-				const field = this.get(<any>(this._valueFieldsF[key].fieldKey));
-				output[key] = (data as any)[field];
-
-				output[this._valueFieldsF[key].workingKey] = output[key];
-			});
+		const resolved = this._resolveFields();
+		const row: any = data;
+		const valueKeys = resolved.valueKeys;
+		for (let i = 0, len = valueKeys.length; i < len; i++) {
+			const value = row[resolved.valueFields[i]];
+			output[valueKeys[i]] = value;
+			output[resolved.workingKeys[i]] = value;
 		}
-		if (this._fields) {
-			$array.each(this._fields, (key) => {
-				const field = this.get(<any>(this._fieldsF[key]));
-				output[key] = (data as any)[field];
-			});
+		const keys = resolved.keys;
+		for (let i = 0, len = keys.length; i < len; i++) {
+			output[keys[i]] = row[resolved.fields[i]];
 		}
 
 		return output;
+	}
+
+	// the fields' names, worked out once for a whole setAll() instead of for every row
+	protected _fieldsResolved?: { valueKeys: Array<string>, valueFields: Array<string>, workingKeys: Array<string>, keys: Array<string>, fields: Array<string> };
+
+	/**
+	 * Each value key's and field key's data field name, e.g. `valueY` > `"close"`.
+	 *
+	 * @ignore
+	 */
+	public _resolveFields() {
+		let resolved = this._fieldsResolved;
+		if (!resolved) {
+			resolved = { valueKeys: [], valueFields: [], workingKeys: [], keys: [], fields: [] };
+			if (this._valueFields) {
+				for (let i = 0, len = this._valueFields.length; i < len; i++) {
+					const key = this._valueFields[i] as string;
+					const names = this._valueFieldsF[key];
+					resolved.valueKeys.push(key);
+					resolved.valueFields.push(this.get(<any>names.fieldKey));
+					resolved.workingKeys.push(names.workingKey);
+				}
+			}
+			if (this._fields) {
+				for (let i = 0, len = this._fields.length; i < len; i++) {
+					const key = this._fields[i] as string;
+					resolved.keys.push(key);
+					resolved.fields.push(this.get(<any>this._fieldsF[key]));
+				}
+			}
+			const list: any = this._data;
+			if (list && list._batchDepth > 0) {
+				this._fieldsResolved = resolved;
+				list._onBatchEnd(() => {
+					this._fieldsResolved = undefined;
+				});
+			}
+		}
+		return resolved;
 	}
 
 	/**
@@ -440,6 +573,8 @@ export abstract class Component extends Container {
 	public pushDataItem(data: this["_dataItemSettings"], dataContext?: any): DataItem<this["_dataItemSettings"]> {
 		const dataItem = this.makeDataItem(data, dataContext);
 		this._mainDataItems.push(dataItem);
+		// grouping carries on with it, as with a row added at the end
+		this._dataGrouped = false;
 		return dataItem;
 	}
 
@@ -507,12 +642,26 @@ export abstract class Component extends Container {
 	 * @since 5.0.21
 	 */
 	public markDirtyValues(_dataItem?: DataItem<this["_dataItemSettings"]>) {
+		// Already waiting for the next frame
+		if (this._valuesDirty && this._root._isQueuedDirty(this)) {
+			return;
+		}
 		this.markDirty();
 		this._valuesDirty = true;
 	}
 
 	public _markDirtyGroup() {
 		this._dataGrouped = false;
+		this._groupKeptRows = -1;
+		this._groupDroppedRows = 0;
+	}
+
+	/**
+	 * A setting of one of the component's data items changed.
+	 *
+	 * @ignore
+	 */
+	public _dataItemKeyChanged(_dataItem: DataItem<this["_dataItemSettings"]>, _key: string) {
 	}
 
 	/**

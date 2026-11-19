@@ -234,10 +234,18 @@ export class XYCursor extends Container {
 	})._markC("themeTags", "layer"));
 
 	protected _movePoint: IPoint | undefined;
+
+	// Where the pointer, or a caller, last put the cursor; snapping moves `_movePoint` to a data item instead
+	protected _pointerPoint: IPoint | undefined;
+
+	protected _snapping: boolean = false;
+	protected _refreshing: boolean = false;
 	protected _lastPoint: IPoint = { x: 0, y: 0 };
 	protected _lastPoint2: IPoint = { x: 0, y: 0 };
 
 	protected _tooltipX: boolean = false;
+	// the finger a selection follows
+	protected _selectPointerId?: number;
 	protected _tooltipY: boolean = false;
 
 	/**
@@ -284,9 +292,10 @@ export class XYCursor extends Container {
 	}
 
 	protected _setUpTouch(): void {
+		// the chart works out what a touch on its plot area needs, its own panning included
 		const chart = this.chart;
 		if (chart) {
-			chart.plotContainer._display.cancelTouch = this.get("behavior") != "none" ? true : false;
+			chart._setUpTouch();
 		}
 	}
 
@@ -377,6 +386,10 @@ export class XYCursor extends Container {
 	public _prepareChildren() {
 		super._prepareChildren();
 
+		if (this.isDirty("behavior")) {
+			this._setUpTouch();
+		}
+
 		if (this.isDirty("xAxis")) {
 			this._tooltipX = false;
 			const xAxis = this.get("xAxis");
@@ -441,8 +454,8 @@ export class XYCursor extends Container {
 				this.hide(0);
 			}
 			else {
-				this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
-				this.handleMove();
+				// passed as the point, so a refresh after data changes goes back here
+				this.handleMove(this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0))));
 			}
 		}
 	}
@@ -476,13 +489,77 @@ export class XYCursor extends Container {
 
 	/**
 	 * Places the cursor again at its last point, after the chart under it has
-	 * changed. A cursor with `alwaysShow` goes to `positionX` and `positionY`.
+	 * changed. A cursor with `alwaysShow` goes to `positionX` and `positionY`
+	 * if they are set.
 	 */
 	public updateCursor() {
 		if (this.get("alwaysShow")) {
-			this._movePoint = this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
+			this._movePoint = this._alwaysShowPoint();
 		}
 		this.handleMove();
+	}
+
+	// positionX/positionY when set, otherwise the pointer or where the cursor is drawn (not the top-left corner)
+	protected _alwaysShowPoint(): IPoint {
+		if (this.get("positionX") == null && this.get("positionY") == null) {
+			const pointer = this._pointerPoint;
+			if (pointer && this._inPlot(this._display.toLocal(pointer))) {
+				return pointer;
+			}
+			const shown = this.getPrivate("point");
+			if (shown) {
+				return this.toGlobal(shown);
+			}
+		}
+		return this.toGlobal(this._getPoint(this.get("positionX", 0), this.get("positionY", 0)));
+	}
+
+	/**
+	 * Finds the data items under the cursor again, with their legend values
+	 * and snap point, as `updateCursor()` does, but without a `"cursormoved"`
+	 * event: the pointer did not move.
+	 *
+	 * @ignore
+	 */
+	public _refresh() {
+		let point: IPoint | undefined;
+		if (this.get("alwaysShow")) {
+			this._movePoint = this._alwaysShowPoint();
+		}
+		else {
+			// from where the pointer is, not where the last snap put the cursor
+			point = this._pointerPoint;
+		}
+		this.handleMove(point, true);
+		const chart = this.chart;
+		if (chart && !this.isHidden()) {
+			this._refreshing = true;
+			try {
+				chart._handleCursorPosition();
+			}
+			finally {
+				this._refreshing = false;
+			}
+		}
+	}
+
+	/**
+	 * Moves the cursor onto a data item's point (`snapToSeries`).
+	 *
+	 * @ignore
+	 */
+	public _snapTo(point: IPoint) {
+		// the pointer did not move: a point the axes have not caught up with yet (outside the plot) does not hide the cursor
+		if (this._refreshing && !this._inPlot(this._display.toLocal(point))) {
+			return;
+		}
+		this._snapping = true;
+		try {
+			this.handleMove(point, true);
+		}
+		finally {
+			this._snapping = false;
+		}
 	}
 
 	public _setChart(chart: XYChart): void {
@@ -509,8 +586,8 @@ export class XYCursor extends Container {
 					this._handleMove(event);
 				}
 			}));
-			this._setUpTouch();
 		}
+		this._setUpTouch();
 
 		this._disposers.push(plotContainer.events.on("pointerdown", (event) => {
 			this._handleCursorDown(event);
@@ -605,11 +682,21 @@ export class XYCursor extends Container {
 		const w = this.width();
 		const h = this.height();
 
+		// a hidden chart (no size) has nothing to select
+		if (!(w > 0 && h > 0)) {
+			return;
+		}
+
 		// How far outside the plot rectangle the press is, per axis.
 		const dx = Math.max(0, -local.x, local.x - w);
 		const dy = Math.max(0, -local.y, local.y - h);
 
 		if (dx > tolerance || dy > tolerance) {
+			return;
+		}
+
+		// a press another element takes (a scrollbar, a legend, an axis that pans) is not a selection
+		if (this._pressedOther(event.point)) {
 			return;
 		}
 
@@ -620,8 +707,46 @@ export class XYCursor extends Container {
 		this._startSelection(local, event);
 	}
 
+	/**
+	 * Whether a press at `point` (relative to the root) landed on an
+	 * interactive element other than the chart's own containers.
+	 */
+	protected _pressedOther(point: IPoint): boolean {
+		// the plot container and the containers around it (with their backgrounds) are the chart's own
+		const own: Array<any> = [];
+		let container: Container | undefined = this.chart ? this.chart.plotContainer : undefined;
+		while (container) {
+			own.push(container._display);
+			const background = container.get("background");
+			if (background) {
+				own.push(background._display);
+			}
+			container = container.parent;
+		}
+
+		// from the element hit up to the chart: the first one that is interactive itself, not only inside an interactive container, takes the press
+		let node: any = this._root._renderer.getObjectAtPoint(point);
+		while (node) {
+			if (own.indexOf(node) !== -1) {
+				return false;
+			}
+			if (node.interactive) {
+				return true;
+			}
+			node = node._parent;
+		}
+		return false;
+	}
+
 	protected _startSelection(local: IPoint, event: ISpritePointerEvent) {
+		const originalEvent = event.originalEvent as any;
+		// a second finger: two fingers pan or pinch, so the selection is called off
+		if (this._downPoint && originalEvent.pointerId !== this._selectPointerId && originalEvent.isPrimary !== true) {
+			this._cancelSelection(event);
+			return;
+		}
 		this._downPoint = local;
+		this._selectPointerId = originalEvent.pointerId;
 
 		if (this.get("behavior") != "none") {
 			this.selection.show();
@@ -639,8 +764,23 @@ export class XYCursor extends Container {
 		this.setPrivate("downPositionY", positionY);
 	}
 
+	// a selection called off before it ended, e.g. by a second finger
+	protected _cancelSelection(event: ISpritePointerEvent) {
+		this._downPoint = undefined;
+		if (this.get("behavior", "none") != "none") {
+			this.selection.hide();
+			const type = "selectcancelled";
+			if (this.events.isEnabled(type)) {
+				this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
+			}
+		}
+	}
+
 	protected _handleCursorUp(event: ISpritePointerEvent) {
-		// TODO: handle multitouch
+		// only the finger that selects ends the selection
+		if (this._downPoint && (event.originalEvent as any).pointerId !== this._selectPointerId) {
+			return;
+		}
 		if (this._downPoint) {
 			const behavior = this.get("behavior", "none");
 			if (behavior != "none") {
@@ -673,7 +813,7 @@ export class XYCursor extends Container {
 						}
 					}
 
-					if (dispatch) {
+					if (dispatch && !event.cancelled) {
 						const type = "selectended";
 						if (this.events.isEnabled(type)) {
 							this.events.dispatch(type, { type: type, target: this, originalEvent: event.originalEvent });
@@ -729,6 +869,9 @@ export class XYCursor extends Container {
 	 * @param  originalEvent  The pointer event behind the move, passed on with `"cursormoved"`
 	 */
 	public handleMove(point?: IPoint, skipEvent?: boolean, originalEvent?: IPointerEvent) {
+		if (point && !this._snapping) {
+			this._pointerPoint = point;
+		}
 		if (!point) {
 			point = this._movePoint;
 		}

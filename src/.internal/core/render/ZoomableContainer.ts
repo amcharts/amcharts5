@@ -190,6 +190,8 @@ export class ZoomableContainer extends Container {
 		}
 
 		this.contents._display.cancelTouch = this.get("pinchZoom", false);
+		// with touchGestures "auto" a swipe that starts sideways or uses two fingers moves the contents
+		this.contents._display.touchAxis = "x";
 	}
 
 

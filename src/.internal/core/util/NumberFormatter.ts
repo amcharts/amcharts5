@@ -154,7 +154,7 @@ export class NumberFormatter extends Entity {
 	 *
 	 * @param value      Value to format
 	 * @param format     Format string or `Intl.NumberFormat` options; `numberFormat` if not given
-	 * @param precision  Minimum number of decimals, padded with zeros; ignored for a format with a modifier
+	 * @param precision  Minimum number of decimals, padded with zeros, shown even where the format keeps fewer; ignored for a format with a modifier
 	 * @return Formatted number
 	 */
 	public format(value: number | string, format?: string | Intl.NumberFormatOptions, precision?: number): string {
@@ -207,10 +207,14 @@ export class NumberFormatter extends Entity {
 				details = info.zero;
 			}
 
-			// Adjust precision
+			// Adjust precision: a format that keeps fewer decimals would round them away and pad zeros
 			if (precision != null && !details.mod) {
 				details = $object.copy(details);
-				details.decimals.active = source == 0 ? 0 : precision;
+				const decimals = details.decimals = $object.copy(details.decimals);
+				decimals.active = source == 0 ? 0 : precision;
+				if (decimals.passive >= 0 && decimals.passive < decimals.active) {
+					decimals.passive = decimals.active;
+				}
 			}
 
 			// Format
@@ -223,6 +227,21 @@ export class NumberFormatter extends Entity {
 		}
 
 		return formatted;
+	}
+
+	/**
+	 * The most decimal places `format` shows, or `undefined` when it does not
+	 * limit them: no decimal part, or a modifier such as `a` or `%` that changes
+	 * the number before it is shown.
+	 *
+	 * @ignore
+	 */
+	public _maxDecimals(format: string): number | undefined {
+		const details = this.parseFormat($utils.cleanFormat(format), this._root.language).positive;
+		if (details.mod || !(details.decimals.passive >= 0)) {
+			return undefined;
+		}
+		return details.decimals.passive;
 	}
 
 	/**
@@ -524,6 +543,10 @@ export class NumberFormatter extends Entity {
 				const d = Math.pow(10, details.decimals.passive);
 				value = Math.round(parseFloat((value * d).toFixed(decimals))) / d;
 			}
+		}
+		else if (!Number.isInteger(value)) {
+			// no decimals in the format: only floating-point noise is dropped (6708.044000000005 > 6708.044)
+			value = parseFloat(value.toPrecision(13));
 		}
 
 		// Init return value

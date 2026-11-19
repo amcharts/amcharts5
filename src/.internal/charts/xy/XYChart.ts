@@ -380,6 +380,22 @@ export class XYChart extends SerialChart {
 
 	protected _movePoints: { [index: number]: IPoint } = {};
 
+	// the finger a pan follows, so a second one does not make it jump, and where it is now
+	protected _panPointerId?: number;
+	protected _panAt?: IPoint;
+	// where the pan started, for telling a pan from a press that did not move
+	protected _panFrom?: IPoint;
+
+	// where each finger of a pinch started from: the first may have moved before the second came down
+	protected _pinchFrom: { [index: number]: IPoint } = {};
+
+	/**
+	 * Drawings in drawing mode, which take every touch on the plot area.
+	 *
+	 * @ignore
+	 */
+	public _touchDrawings: Array<object> = [];
+
 	protected _downStartX?: number;
 	protected _downEndX?: number;
 
@@ -444,15 +460,44 @@ export class XYChart extends SerialChart {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("pinchZoomX") || this.isDirty("pinchZoomY") || this.get("panX") || this.get("panY")) {
+		if (this.isDirty("pinchZoomX") || this.isDirty("pinchZoomY") || this.isDirty("panX") || this.isDirty("panY") || this.isDirty("cursor")) {
 			this._setUpTouch();
 		}
 
 	}
 
-	protected _setUpTouch(): void {
-		if (!this.plotContainer._display.cancelTouch) {
-			this.plotContainer._display.cancelTouch = (this.get("pinchZoomX") || this.get("pinchZoomY") || this.get("panX") || this.get("panY")) ? true : false;
+	/**
+	 * What a touch on the plot area needs: it pans, zooms by pinching, selects
+	 * with the cursor or draws. With `touchGestures: "auto"` a swipe that
+	 * starts sideways or uses two fingers is the chart's, unless the cursor
+	 * selects only up and down or a drawing is being drawn: those take any.
+	 *
+	 * @ignore
+	 */
+	public _setUpTouch(): void {
+		const cursor = this.get("cursor");
+		const behavior = cursor ? cursor.get("behavior", "none") : "none";
+		const drawing = this._touchDrawings.length > 0;
+		const display = this.plotContainer._display;
+		display.cancelTouch = (drawing || this.get("pinchZoomX") || this.get("pinchZoomY") || this.get("panX") || this.get("panY") || behavior != "none") ? true : false;
+		display.touchAxis = (drawing || behavior == "zoomY" || behavior == "selectY") ? "xy" : "x";
+	}
+
+	/**
+	 * A drawing turns its drawing mode on or off.
+	 *
+	 * @ignore
+	 */
+	public _drawingTouch(drawing: object, on: boolean): void {
+		const had = this._touchDrawings.length;
+		if (on) {
+			$array.pushOne(this._touchDrawings, drawing);
+		}
+		else {
+			$array.remove(this._touchDrawings, drawing);
+		}
+		if (had != this._touchDrawings.length) {
+			this._setUpTouch();
 		}
 	}
 
@@ -463,6 +508,8 @@ export class XYChart extends SerialChart {
 
 	protected _removeSeries(series: this["_seriesType"]) {
 		series._unstack();
+		// a drawing taken out in drawing mode no longer takes the plot's touches
+		this._drawingTouch(series, false);
 
 		if (series._posXDp) {
 			series._posXDp.dispose();
@@ -842,15 +889,45 @@ export class XYChart extends SerialChart {
 						this._downStartY = yAxis.get("start", 0);
 						this._downEndY = yAxis.get("end", 1);
 					}
+
+					// the first finger may have moved since it went down
+					this._pinchFrom = {};
+					$object.each(plotContainer._downPoints, (id, point) => {
+						this._pinchFrom[id] = this._movePoints[id] || point;
+					});
+
+					// two fingers also pan the way they do not zoom, from where the axes are now
+					if (!this.get("pinchZoomX") && this.get("panX")) {
+						this.xAxes.each((axis) => {
+							axis._panStart = axis.get("start")!;
+							axis._panEnd = axis.get("end")!;
+						})
+					}
+					if (!this.get("pinchZoomY") && this.get("panY")) {
+						this.yAxes.each((axis) => {
+							axis._panStart = axis.get("start")!;
+							axis._panEnd = axis.get("end")!;
+						})
+					}
 				}
+				this._movePoints[pointerId] = event.point;
 			}
 		}
 
-		if (this.get("panX") || this.get("panY")) {
+		// a first finger: the end of an earlier pan may never have come
+		if (this._downPoint && originalEvent.pointerId !== this._panPointerId && originalEvent.isPrimary === true) {
+			this._downPoint = undefined;
+		}
+
+		// a second finger leaves the pan to the first
+		if ((this.get("panX") || this.get("panY")) && !(this._downPoint && originalEvent.pointerId !== this._panPointerId)) {
 
 			if (local.x >= 0 && local.y >= 0 && local.x <= plotContainer.width() && local.y <= plotContainer.height()) {
 				//this._downPoint = local;
 				this._downPoint = { x: originalEvent.clientX, y: originalEvent.clientY };
+				this._panPointerId = originalEvent.pointerId;
+				this._panAt = undefined;
+				this._panFrom = this._downPoint;
 
 				const panX = this.get("panX");
 				const panY = this.get("panY");
@@ -896,9 +973,16 @@ export class XYChart extends SerialChart {
 
 	protected _handlePlotUp(event: ISpritePointerEvent) {
 		const downPoint = this._downPoint;
+		if (downPoint && (event.originalEvent as any).pointerId !== this._panPointerId) {
+			// another finger lifted: the pan goes on with its own finger, from where that is now
+			this._downPoint = this._panAt || downPoint;
+			this._anchorPan(!!this.get("panX"), !!this.get("panY"));
+			return;
+		}
 		if (downPoint) {
 			if (this.get("panX") || this.get("panY")) {
-				if (event.originalEvent.clientX == downPoint.x && event.originalEvent.clientY == downPoint.y) {
+				const from = this._panFrom || downPoint;
+				if (event.cancelled || (event.originalEvent.clientX == from.x && event.originalEvent.clientY == from.y)) {
 					const eventType = "pancancelled";
 					if (this.events.isEnabled(eventType)) {
 						this.events.dispatch(eventType, { type: eventType, target: this, originalEvent: event.originalEvent });
@@ -922,8 +1006,28 @@ export class XYChart extends SerialChart {
 		})
 	}
 
+	// a pan starts again from where the axes are now
+	protected _anchorPan(panX: boolean, panY: boolean) {
+		if (panX) {
+			this.xAxes.each((axis) => {
+				axis._panStart = axis.get("start")!;
+				axis._panEnd = axis.get("end")!;
+			})
+		}
+		if (panY) {
+			this.yAxes.each((axis) => {
+				axis._panStart = axis.get("start")!;
+				axis._panEnd = axis.get("end")!;
+			})
+		}
+	}
+
 	protected _handlePlotMove(event: ISpritePointerEvent) {
 		const plotContainer = this.plotContainer;
+		const originalEvent = event.originalEvent as any;
+		if (this._downPoint && originalEvent.pointerId === this._panPointerId) {
+			this._panAt = { x: originalEvent.clientX, y: originalEvent.clientY };
+		}
 
 		if (this.get("pinchZoomX") || this.get("pinchZoomY")) {
 			const touchEvent = event.originalEvent as any;
@@ -941,7 +1045,7 @@ export class XYChart extends SerialChart {
 
 		let downPoint = this._downPoint!;
 
-		if (downPoint) {
+		if (downPoint && (event.originalEvent as any).pointerId === this._panPointerId) {
 
 			downPoint = plotContainer.toLocal(this._root.documentPointToRoot(downPoint));
 			let local = plotContainer.toLocal(event.point);
@@ -949,72 +1053,77 @@ export class XYChart extends SerialChart {
 			const panX = this.get("panX");
 			const panY = this.get("panY");
 
-			if (panX) {
+			this._panAxes(downPoint, local, !!panX, !!panY);
+		}
+	}
 
-				let scrollbarX = this.get("scrollbarX");
-				if (scrollbarX) {
-					scrollbarX.events.disableType("rangechanged");
-				}
+	// pans the axes as if a pointer moved from `downPoint` to `local`, both in the plot area
+	protected _panAxes(downPoint: IPoint, local: IPoint, panX: boolean, panY: boolean) {
+		const plotContainer = this.plotContainer;
+		if (panX) {
 
-				this.xAxes.each((axis) => {
-					if (axis.get("panX")) {
-						axis._isPanning = true;
-						//const maxDeviation = axis.get("maxDeviation", 0);
-						let panStart = axis._panStart;
-						let panEnd = axis._panEnd;
-						let difference = (panEnd - panStart);
-						let deltaX = difference * (downPoint.x - local.x) / plotContainer.width();
-
-						if (axis.get("renderer").get("inversed")) {
-							deltaX *= -1;
-						}
-						let start = panStart + deltaX;
-						let end = panEnd + deltaX;
-
-						if (end - start < 1 + axis.get("maxDeviation", 1) * 2) {
-							axis.set("start", start);
-							axis.set("end", end);
-						}
-					}
-				})
-				if (scrollbarX) {
-					scrollbarX.events.enableType("rangechanged");
-				}
-			}
-			if (panY) {
-
-				let scrollbarY = this.get("scrollbarY");
-				if (scrollbarY) {
-					scrollbarY.events.disableType("rangechanged");
-				}
-
-				this.yAxes.each((axis) => {
-					if (axis.get("panY")) {
-						axis._isPanning = true;
-						//const maxDeviation = axis.get("maxDeviation", 0);
-
-						let panStart = axis._panStart;
-						let panEnd = axis._panEnd;
-						let difference = (panEnd - panStart);
-						let deltaY = difference * (downPoint.y - local.y) / plotContainer.height();
-						if (axis.get("renderer").get("inversed")) {
-							deltaY *= -1;
-						}
-						let start = panStart - deltaY;
-						let end = panEnd - deltaY;
-
-						if (end - start < 1 + axis.get("maxDeviation", 1) * 2) {
-							axis.set("start", start);
-							axis.set("end", end);
-						}
-					}
-				})
-
-				if (scrollbarY) {
-					scrollbarY.events.enableType("rangechanged");
-				}
+			let scrollbarX = this.get("scrollbarX");
+			if (scrollbarX) {
+				scrollbarX.events.disableType("rangechanged");
 			}
 
+			this.xAxes.each((axis) => {
+				if (axis.get("panX")) {
+					axis._isPanning = true;
+					//const maxDeviation = axis.get("maxDeviation", 0);
+					let panStart = axis._panStart;
+					let panEnd = axis._panEnd;
+					let difference = (panEnd - panStart);
+					let deltaX = difference * (downPoint.x - local.x) / plotContainer.width();
+
+					if (axis.get("renderer").get("inversed")) {
+						deltaX *= -1;
+					}
+					let start = panStart + deltaX;
+					let end = panEnd + deltaX;
+
+					if (end - start < 1 + axis.get("maxDeviation", 1) * 2) {
+						axis.set("start", start);
+						axis.set("end", end);
+					}
+				}
+			})
+			if (scrollbarX) {
+				scrollbarX.events.enableType("rangechanged");
+			}
+		}
+		if (panY) {
+
+			let scrollbarY = this.get("scrollbarY");
+			if (scrollbarY) {
+				scrollbarY.events.disableType("rangechanged");
+			}
+
+			this.yAxes.each((axis) => {
+				if (axis.get("panY")) {
+					axis._isPanning = true;
+					//const maxDeviation = axis.get("maxDeviation", 0);
+
+					let panStart = axis._panStart;
+					let panEnd = axis._panEnd;
+					let difference = (panEnd - panStart);
+					let deltaY = difference * (downPoint.y - local.y) / plotContainer.height();
+					if (axis.get("renderer").get("inversed")) {
+						deltaY *= -1;
+					}
+					let start = panStart - deltaY;
+					let end = panEnd - deltaY;
+
+					if (end - start < 1 + axis.get("maxDeviation", 1) * 2) {
+						axis.set("start", start);
+						axis.set("end", end);
+					}
+				}
+			})
+
+			if (scrollbarY) {
+				scrollbarY.events.enableType("rangechanged");
+			}
 
 		}
 	}
@@ -1026,7 +1135,7 @@ export class XYChart extends SerialChart {
 		let movePoints: Array<IPoint> = [];
 
 		$object.each(plotContainer._downPoints, (k, point) => {
-			downPoints[i] = point;
+			downPoints[i] = this._pinchFrom[k] || point;
 			let movePoint = this._movePoints[k];
 			if (movePoint) {
 				movePoints[i] = movePoint;
@@ -1120,6 +1229,14 @@ export class XYChart extends SerialChart {
 						})
 					}
 				}
+
+				const panX = !this.get("pinchZoomX") && !!this.get("panX");
+				const panY = !this.get("pinchZoomY") && !!this.get("panY");
+				if (panX || panY) {
+					const downCenter = { x: (downPoint0.x + downPoint1.x) / 2, y: (downPoint0.y + downPoint1.y) / 2 };
+					const moveCenter = { x: (movePoint0.x + movePoint1.x) / 2, y: (movePoint0.y + movePoint1.y) / 2 };
+					this._panAxes(downCenter, moveCenter, panX, panY);
+				}
 			}
 		}
 	}
@@ -1135,7 +1252,7 @@ export class XYChart extends SerialChart {
 				snapToSeries = undefined;
 			}
 
-			if (snapToSeries && cursorPoint) {
+			if (snapToSeries && cursorPoint && !this._snapLater) {
 				const snapToSeriesBy = cursor.get("snapToSeriesBy");
 				const dataItems: Array<DataItem<IXYSeriesDataItem>> = [];
 				$array.each(snapToSeries, (series) => {
@@ -1199,7 +1316,7 @@ export class XYChart extends SerialChart {
 					if (point) {
 
 						// removing x and y to solve #72225
-						cursor.handleMove(series.toGlobal({ x: point.x - series.x(), y: point.y - series.y() }), true);
+						cursor._snapTo(series.toGlobal({ x: point.x - series.x(), y: point.y - series.y() }));
 					}
 				}
 			}
@@ -1209,7 +1326,36 @@ export class XYChart extends SerialChart {
 	public _updateCursor() {
 		let cursor = this.get("cursor");
 		if (cursor) {
-			cursor.updateCursor();
+			// the series still sit where the old zoom put them: snapping waits for the frame to end
+			this._snapLater = true;
+			try {
+				cursor.updateCursor();
+			}
+			finally {
+				this._snapLater = false;
+			}
+			this._updateCursorLater();
+		}
+	}
+
+	protected _snapLater: boolean = false;
+	protected _cursorLater?: IDisposer;
+
+	/**
+	 * Once the frame is drawn, a shown cursor finds its data item, legend
+	 * values and snap point again, e.g. after data changed under it.
+	 *
+	 * @ignore
+	 */
+	public _updateCursorLater() {
+		if (!this._cursorLater) {
+			this._cursorLater = this._root.events.once("frameended", () => {
+				this._cursorLater = undefined;
+				const cursor = this.get("cursor");
+				if (!this.isDisposed() && cursor && !cursor.isHidden()) {
+					cursor._refresh();
+				}
+			});
 		}
 	}
 
@@ -1279,6 +1425,12 @@ export class XYChart extends SerialChart {
 						return axis ? axis._scrollbarText(position, isEnd) : "";
 					});
 
+					// An inversed axis has its values going right to left
+					scrollbarX.setPrivate("reversedFunction", () => {
+						const axis = this.xAxes.getIndex(0);
+						return axis ? axis.fixPosition(0) == 1 : false;
+					});
+
 				}
 
 				this._prevSettings.scrollbarX = scrollbarX;
@@ -1312,6 +1464,12 @@ export class XYChart extends SerialChart {
 					scrollbarY.setPrivate("positionTextFunction", (position: number, isEnd?: boolean) => {
 						const axis = this.yAxes.getIndex(0);
 						return axis ? axis._scrollbarText(position, isEnd) : "";
+					});
+
+					// Values go bottom to top unless the axis is inversed
+					scrollbarY.setPrivate("reversedFunction", () => {
+						const axis = this.yAxes.getIndex(0);
+						return axis ? axis.fixPosition(0) == 1 : false;
 					});
 
 				}

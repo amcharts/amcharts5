@@ -123,6 +123,21 @@ export interface IValueAxisSettings<R extends AxisRenderer> extends IAxisSetting
 	numberFormat?: string;
 
 	/**
+	 * Decimal counts the labels may show, such as `[0, 2]` for prices. Each
+	 * label gets the fewest in the list that the grid step needs: 80 and 100,
+	 * or 48.50 and 49.00 instead of 48.5 and 49.0. A step finer than the last
+	 * count keeps its own decimals, such as 0.0012. The axis tooltip shows the
+	 * step's decimals plus `extraTooltipPrecision`, rounded up to the list too.
+	 *
+	 * Used only for labels formatted without the axis's own `numberFormat`.
+	 * Logarithmic axes ignore it.
+	 *
+	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#label-format} for more info
+	 * @since 5.23.0
+	 */
+	preferredDecimals?: number[];
+
+	/**
 	 * Number format for the axis tooltip. If not set, `numberFormat` is used.
 	 *
 	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/value-axis/#tooltip-number-format} for more info
@@ -406,7 +421,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		}
 
 		let someDirty = false;
-		if (this.isDirty("min") || this.isDirty("max") || this.isDirty("maxPrecision") || this.isDirty("numberFormat")) {
+		if (this.isDirty("min") || this.isDirty("max") || this.isDirty("maxPrecision") || this.isDirty("numberFormat") || this.isDirty("preferredDecimals")) {
 			someDirty = true;
 			this.ghostLabel?.set("text", "");
 		}
@@ -530,7 +545,8 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				text = formatter.format(value, "#,###." + new Array(logDecimals + 1).join("#"));
 			}
 			else {
-				text = formatter.format(value, undefined, this.getPrivate("stepDecimalPlaces"));
+				const stepDecimals = this.getPrivate("stepDecimalPlaces");
+				text = formatter.format(value, undefined, stepDecimals === undefined ? undefined : this._shownDecimals(stepDecimals));
 			}
 		}
 		return text;
@@ -1787,6 +1803,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 				}
 			}
 		}
+		step = this._stepShown(step);
 
 		let decCount: number = 0;
 		// in case numbers are smaller than 1
@@ -1841,7 +1858,7 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		const numberFormat = this.get("tooltipNumberFormat", this.get("numberFormat"));
 		const formatter = this.getNumberFormatter();
 		const extraDecimals = this.get("extraTooltipPrecision", 0);
-		const decimals = this.getPrivate("stepDecimalPlaces", 0) + extraDecimals;
+		const decimals = this._shownDecimals(this.getPrivate("stepDecimalPlaces", 0) + extraDecimals);
 		const value = $math.round(this.positionToValue(position), decimals);
 
 		if (numberFormat) {
@@ -1850,6 +1867,23 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 		else {
 			return formatter.format(value, undefined, decimals);
 		}
+	}
+
+	// the decimals shown for `decimals` the grid step needs: the fewest in `preferredDecimals` that cover them
+	protected _shownDecimals(decimals: number): number {
+		const preferred = this.get("preferredDecimals");
+		if (preferred && !this.get("logarithmic")) {
+			let shown: number | undefined;
+			$array.each(preferred, (count) => {
+				if (count >= decimals && (shown === undefined || count < shown)) {
+					shown = count;
+				}
+			});
+			if (shown !== undefined) {
+				return shown;
+			}
+		}
+		return decimals;
 	}
 
 	/**
@@ -2025,6 +2059,22 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			}
 		}
 
+		return this._stepShown(step);
+	}
+
+	// A grid step no finer than `numberFormat` shows: with two decimals, a step of 0.005 would label
+	// 1.005 and 1.01 both "1.01"
+	protected _stepShown(step: number): number {
+		const numberFormat = this.get("numberFormat");
+		if (numberFormat && $type.isString(numberFormat) && !this.get("logarithmic")) {
+			const decimals = this.getNumberFormatter()._maxDecimals(numberFormat);
+			if ($type.isNumber(decimals)) {
+				const least = Math.pow(10, -decimals);
+				if (step < least * 0.999) {
+					return least;
+				}
+			}
+		}
 		return step;
 	}
 

@@ -559,6 +559,9 @@ interface IStartAnimation {
  */
 let counter = 0;
 
+// shared by data items for the maps they seldom write; frozen, so a write that skips making its own map throws
+const LEAN: any = Object.freeze({});
+
 /**
  * The newest `uid` given out: anything made after this call has a higher one.
  *
@@ -584,24 +587,24 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	public uid: number = ++counter;
 
 	public _settings: {};
-	public _privateSettings: {} = {};
+	public _privateSettings: {};
 
-	public _settingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K], O extends this>(value: V, target?: O, key?: K) => void> } = {};
-	public _privateSettingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K], O extends this>(value: V, target?: O, key?: K) => void> } = {};
+	public _settingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K], O extends this>(value: V, target?: O, key?: K) => void> };
+	public _privateSettingEvents: { [K in keyof this["_settings"]]?: Array<<V extends this["_settings"][K], O extends this>(value: V, target?: O, key?: K) => void> };
 
-	public _debouncedSettingEvents: { [K in keyof this["_settings"]]?: Array<{ cb: (value: any, target?: any, key?: any) => void; delay: number; timeout?: number }> } = {};
-	public _debouncedPrivateSettingEvents: { [K in keyof this["_settings"]]?: Array<{ cb: (value: any, target?: any, key?: any) => void; delay: number; timeout?: number }> } = {};
+	public _debouncedSettingEvents: { [K in keyof this["_settings"]]?: Array<{ cb: (value: any, target?: any, key?: any) => void; delay: number; timeout?: number }> };
+	public _debouncedPrivateSettingEvents: { [K in keyof this["_settings"]]?: Array<{ cb: (value: any, target?: any, key?: any) => void; delay: number; timeout?: number }> };
 
-	public _prevSettings: this["_settings"] = {};
-	public _prevPrivateSettings: this["_privateSettings"] = {};
+	public _prevSettings: this["_settings"];
+	public _prevPrivateSettings: this["_privateSettings"];
 
-	protected _animatingSettings: Animated<this["_settings"]> = {};
-	protected _animatingPrivateSettings: Animated<this["_privateSettings"]> = {};
+	protected _animatingSettings: Animated<this["_settings"]>;
+	protected _animatingPrivateSettings: Animated<this["_privateSettings"]>;
 
 	private _disposed: boolean = false;
 
 	// TODO move this into Entity
-	protected _userProperties: Dirty<this["_settings"]> = {};
+	protected _userProperties: Dirty<this["_settings"]>;
 
 	// Settings the library worked out for itself. Anything written through
 	// `_setC` is flagged in `_userProperties` as well, so that everything which
@@ -609,7 +612,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	// that cares about provenance (serializing) tells them apart. Defaults
 	// (`_setDefault` and friends) are flagged here alone, since they never
 	// counted as user properties in the first place.
-	protected _computedProperties: Dirty<this["_settings"]> = {};
+	protected _computedProperties: Dirty<this["_settings"]>;
 
 	/**
 	 * What a setting held before an `animations` entry took it over, and where
@@ -618,7 +621,7 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 *
 	 * @ignore
 	 */
-	public _animationBases: { [key: string]: { value: any, user: boolean, computed: boolean } } = {};
+	public _animationBases: { [key: string]: { value: any, user: boolean, computed: boolean } };
 
 	// Above zero while an animation is writing a value, so that write is not
 	// mistaken for someone setting it.
@@ -629,11 +632,47 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 */
 	public enableDispose: boolean = true;
 
-	constructor(settings: Settings["_settings"]) {
+	/**
+	 * @param  lean  A data item: the maps it seldom writes share one empty object until the first write, and
+	 *               previous values are not kept (nothing reads them for data items)
+	 */
+	constructor(settings: Settings["_settings"], lean?: boolean) {
 		this._settings = settings;
+		if (lean) {
+			// nothing reads whether a data item's setting was set by someone
+			this._userProperties = LEAN;
+			this._privateSettings = LEAN;
+			this._settingEvents = LEAN;
+			this._privateSettingEvents = LEAN;
+			this._debouncedSettingEvents = LEAN;
+			this._debouncedPrivateSettingEvents = LEAN;
+			this._prevSettings = LEAN;
+			this._prevPrivateSettings = LEAN;
+			this._animatingSettings = LEAN;
+			this._animatingPrivateSettings = LEAN;
+			this._computedProperties = LEAN;
+			this._animationBases = LEAN;
+		}
+		else {
+			this._userProperties = {};
+			this._privateSettings = {};
+			this._settingEvents = {};
+			this._privateSettingEvents = {};
+			this._debouncedSettingEvents = {};
+			this._debouncedPrivateSettingEvents = {};
+			this._prevSettings = {};
+			this._prevPrivateSettings = {};
+			this._animatingSettings = {};
+			this._animatingPrivateSettings = {};
+			this._computedProperties = {};
+			this._animationBases = {};
+		}
 	}
 
 	protected _checkDirty(): void {
+		if (this._userProperties === LEAN) {
+			this._userProperties = {};
+		}
 		$object.keys(this._settings).forEach((key) => {
 			(this._userProperties as any)[key] = true;
 			this._markDirtyKey(key);
@@ -750,6 +789,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @return            Disposer for event
 	 */
 	public on<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: this, key?: Key) => void): IDisposer {
+		if (this._settingEvents === LEAN) {
+			this._settingEvents = {};
+		}
 		let events = this._settingEvents[key];
 
 		if (events === undefined) {
@@ -870,6 +912,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @return                 Disposer for event
 	 */
 	public onDebounced<Key extends keyof this["_settings"]>(key: Key, callback: (value: this["_settings"][Key], target?: this, key?: Key) => void, debounceDelay: number): IDisposer {
+		if (this._debouncedSettingEvents === LEAN) {
+			this._debouncedSettingEvents = {};
+		}
 		return this._onDebouncedHelper(this._debouncedSettingEvents, key, callback, debounceDelay);
 	}
 
@@ -913,6 +958,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @return            Disposer for event
 	 */
 	public onPrivate<Key extends keyof this["_privateSettings"]>(key: Key, callback: (value: this["_privateSettings"][Key], target?: this, key?: Key) => void): IDisposer {
+		if (this._privateSettingEvents === LEAN) {
+			this._privateSettingEvents = {};
+		}
 		let events = this._privateSettingEvents[key];
 
 		if (events === undefined) {
@@ -961,6 +1009,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @return                 Disposer for event
 	 */
 	public onPrivateDebounced<Key extends keyof this["_privateSettings"]>(key: Key, callback: (value: this["_privateSettings"][Key], target?: this, key?: Key) => void, debounceDelay: number): IDisposer {
+		if (this._debouncedPrivateSettingEvents === LEAN) {
+			this._debouncedPrivateSettingEvents = {};
+		}
 		return this._onDebouncedHelper(this._debouncedPrivateSettingEvents, key, callback, debounceDelay);
 	}
 
@@ -1081,7 +1132,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @ignore
 	 */
 	private _setRaw<Key extends keyof this["_settings"], Value extends this["_settings"][Key]>(key: Key, old: Value, value: Value) {
-		this._prevSettings[key] = old;
+		if (this._prevSettings !== LEAN) {
+			this._prevSettings[key] = old;
+		}
 		this._sendKeyEvent(key, value);
 	}
 
@@ -1145,7 +1198,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 */
 	public remove<Key extends keyof this["_settings"]>(key: Key): void {
 		if (key in this._settings) {
-			this._prevSettings[key] = (<any>this._settings)[key];
+			if (this._prevSettings !== LEAN) {
+				this._prevSettings[key] = (<any>this._settings)[key];
+			}
 
 			delete (<any>this._settings)[key];
 
@@ -1201,7 +1256,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 * @ignore
 	 */
 	private _setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, old: Value, value: Value) {
-		this._prevPrivateSettings[key] = old;
+		if (this._prevPrivateSettings !== LEAN) {
+			this._prevPrivateSettings[key] = old;
+		}
 		this._sendPrivateKeyEvent(key, value);
 	}
 
@@ -1211,6 +1268,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	public setPrivateRaw<Key extends keyof this["_privateSettings"], Value extends this["_privateSettings"][Key]>(key: Key, value: Value) {
 		const old = (<any>this._privateSettings)[key];
 
+		if (this._privateSettings === LEAN) {
+			this._privateSettings = {};
+		}
 		(<any>this._privateSettings)[key] = value;
 
 		if (old !== value) {
@@ -1224,6 +1284,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	private _setPrivate<Key extends keyof this["_privateSettings"]>(key: Key, value: this["_privateSettings"][Key]) {
 		const old = (<any>this._privateSettings)[key];
 
+		if (this._privateSettings === LEAN) {
+			this._privateSettings = {};
+		}
 		(<any>this._privateSettings)[key] = value;
 
 		if (old !== value) {
@@ -1255,7 +1318,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	 */
 	public removePrivate<Key extends keyof this["_privateSettings"]>(key: Key): void {
 		if (key in this._privateSettings) {
-			this._prevPrivateSettings[key] = (<any>this._privateSettings)[key];
+			if (this._prevPrivateSettings !== LEAN) {
+				this._prevPrivateSettings[key] = (<any>this._privateSettings)[key];
+			}
 
 			delete (<any>this._privateSettings)[key];
 
@@ -1295,6 +1360,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 		}
 
 		if (!authored) {
+			if (this._computedProperties === LEAN) {
+				this._computedProperties = {};
+			}
 			this._computedProperties[key] = true;
 		}
 	}
@@ -1328,6 +1396,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 			} else {
 				this._setAnimated(key, from);
 
+				if (this._animatingSettings === LEAN) {
+					this._animatingSettings = {};
+				}
 				const animation = this._animatingSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
 
 				this._startAnimation();
@@ -1363,6 +1434,9 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 			} else {
 				this.setPrivate(key, from);
 
+				if (this._animatingPrivateSettings === LEAN) {
+					this._animatingPrivateSettings = {};
+				}
 				const animation = this._animatingPrivateSettings[key] = new Animation(this, from, to, duration, easing, loops, this._animationTime());
 
 				this._startAnimation();
@@ -1822,6 +1896,9 @@ export class Entity extends Settings implements IDisposer {
 		const authored = this._userProperties[key] && !this._computedProperties[key] && (this._settings as any)[key] === value;
 		this.setRaw(key, value);
 		if (!authored) {
+			if (this._computedProperties === LEAN) {
+				this._computedProperties = {};
+			}
 			this._computedProperties[key] = true;
 		}
 	}

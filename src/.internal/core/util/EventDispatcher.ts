@@ -217,6 +217,22 @@ export class EventDispatcher<T> implements IDisposer {
 	}
 
 	/**
+	 * Whether every listener that hears `type` is one of `callbacks`.
+	 *
+	 * @ignore
+	 */
+	public _onlyCallbacks<Key extends keyof T>(type: Key, callbacks: Array<any>): boolean {
+		const listeners = this._listeners;
+		for (let i = 0, len = listeners.length; i < len; i++) {
+			const listener = listeners[i];
+			if (!listener.killed && (listener.type === null || listener.type === type) && callbacks.indexOf(listener.callback) === -1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Removes all listeners of a particular event type.
 	 *
 	 * @param type  Listener's type

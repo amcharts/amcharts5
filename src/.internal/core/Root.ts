@@ -3,7 +3,7 @@ import type { Entity } from "./util/Entity";
 import type { Sprite } from "./render/Sprite";
 import type { Theme } from "./Theme";
 import type { IPoint } from "./util/IPoint";
-import type { IRenderer, IRendererClass, IPointerEvent } from "./render/backend/Renderer";
+import type { IRenderer, IRendererClass, IPointerEvent, TouchGestures } from "./render/backend/Renderer";
 import type { Timezone } from "./util/Timezone";
 
 import { AnimationState } from "./util/Animation";
@@ -602,7 +602,10 @@ export class Root implements IDisposer {
 	 */
 	public entitiesById: { [index: string]: any } = {};
 
-	protected _systemTooltip!: Tooltip;
+	/**
+	 * @ignore
+	 */
+	public _systemTooltip?: Tooltip;
 
 	protected constructor(id: string | HTMLElement, settings: IRootSettings = {}, isReal: boolean) {
 
@@ -901,6 +904,9 @@ export class Root implements IDisposer {
 		});
 		this._rootContainer = rootContainer;
 		this._rootContainer._defaultThemes.push(DefaultTheme.new(this));
+		rootContainer.on("themes", () => {
+			this._themeTouchGestures();
+		});
 
 		// the size is needed to rebuild this from a config, `visible` is the default
 		const container = rootContainer.children.push(Container.new(this, { width: p100, height: p100 }));
@@ -1221,7 +1227,7 @@ export class Root implements IDisposer {
 	 * @since 5.14.0
 	 */
 	public get systemTooltip() {
-		if (!this._systemTooltip) {
+		if (!this._systemTooltip || this._systemTooltip.isDisposed()) {
 			const tooltip = Tooltip.new(this, {
 				themeTags: ["system"]
 			});
@@ -1619,6 +1625,16 @@ export class Root implements IDisposer {
 		if (value) {
 			this._startTicker();
 		}
+	}
+
+	/**
+	 * Returns `true` if `entity` is already queued, as an entity and as a
+	 * parent, for the next frame.
+	 *
+	 * @ignore
+	 */
+	public _isQueuedDirty(entity: Entity): boolean {
+		return this._isDirty && this._ticker !== null && this._dirty[entity.uid] !== undefined && this._dirtyParents[entity.uid] !== undefined;
 	}
 
 	public _addDirtyEntity(entity: Entity) {
@@ -2702,13 +2718,94 @@ export class Root implements IDisposer {
 	 * Makes touch gestures such as zoom and pan work only after a tap on the
 	 * chart, so the page can still be scrolled over it.
 	 *
+	 * The same as setting `touchGestures` to `"tap"`; `false` sets it back to
+	 * `"chart"`, or to `"auto"` with the ResponsiveMax theme (an `"auto"` is
+	 * left as it is).
+	 *
 	 * @see {@link https://docs.amcharts.com/v5/getting-started/root-element/#touch-related-options} for more info
 	 * @default false
 	 * @since 5.2.9
 	 * @param  value  Needs a tap to activate touch functions
 	 */
 	public set tapToActivate(value: boolean) {
-		this._renderer.tapToActivate = value;
+		if (value) {
+			if (!this._renderer.tapToActivate) {
+				// what turning it off goes back to: a value set in code, or else the themes' choice
+				this._touchGesturesBefore = this._touchGesturesSet ? this._renderer.touchGestures : undefined;
+			}
+			this._touchGesturesSet = true;
+			this._renderer.tapToActivate = true;
+		}
+		else if (this._renderer.tapToActivate) {
+			this._renderer.tapToActivate = false;
+			const before = this._touchGesturesBefore;
+			this._touchGesturesBefore = undefined;
+			if (before) {
+				this._renderer.touchGestures = before;
+			}
+			else {
+				this._touchGesturesSet = false;
+				this._themeTouchGestures();
+			}
+		}
+	}
+
+	/**
+	 * Who gets a touch gesture that starts on the chart, the chart or the page
+	 * around it:
+	 *
+	 * * `"chart"`: the chart, wherever it drags, pans, zooms or selects.
+	 * * `"tap"`: the page, until the chart is tapped; then the chart, until
+	 *   `tapToActivateTimeout` passes without a touch (as `tapToActivate`).
+	 * * `"auto"`: a vertical swipe scrolls the page. A swipe that starts
+	 *   sideways, and any made with two fingers, goes to the chart, which
+	 *   then follows it both ways: a chart that pans vertically, a map or a
+	 *   globe also moves or turns up and down. Scrollbar grips, buttons and
+	 *   other things that are dragged, drawing on a stock chart, a cursor
+	 *   selecting only up and down and a radar chart take any swipe that
+	 *   starts on them.
+	 *
+	 * With `"tap"` and `"auto"`, a swipe the page scrolls with does not move
+	 * the chart.
+	 *
+	 * The ResponsiveMax theme, set on the root with `setThemes()`, sets
+	 * `"auto"`, unless `touchGestures` or `tapToActivate` is set in code.
+	 * Turning `tapToActivate` off again goes back to what was there before it:
+	 * the value set in code, or else the theme's choice.
+	 *
+	 * @default "chart"
+	 * @since 5.23.0
+	 * @param  value  Who gets touch gestures
+	 */
+	public set touchGestures(value: TouchGestures) {
+		this._touchGesturesSet = true;
+		this._renderer.touchGestures = value;
+	}
+
+	// set in code, so the themes' choice is not used
+	protected _touchGesturesSet: boolean = false;
+	protected _touchGesturesBefore?: TouchGestures;
+
+	// the themes' choice of touchGestures while code has not set it
+	protected _themeTouchGestures(): void {
+		if (!this._touchGesturesSet) {
+			let value: TouchGestures = "chart";
+			$array.each(this._rootContainer.get("themes", []), (theme) => {
+				if (theme._touchGestures) {
+					value = theme._touchGestures;
+				}
+			});
+			if (this._renderer.touchGestures != value) {
+				this._renderer.touchGestures = value;
+			}
+		}
+	}
+
+	/**
+	 * @return Who gets touch gestures
+	 */
+	public get touchGestures(): TouchGestures {
+		return this._renderer.touchGestures;
 	}
 
 	/**
