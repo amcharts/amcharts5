@@ -57,7 +57,7 @@ export class PercentDefaultTheme extends Theme {
 			tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00p')}",
 			strokeWidth: 1,
 			strokeOpacity: 1,
-			role: "figure",
+			role: "img",
 			lineJoin:"round"
 		});
 
@@ -109,6 +109,7 @@ export class PercentDefaultTheme extends Theme {
 		r("FunnelSlice").setAll({
 			interactive: true,
 			expandDistance: 0,
+			role: "img",
 			//tooltipText: "{category}: {valuePercentTotal.formatNumber('0.00p')}"
 		});
 

@@ -170,6 +170,34 @@ legend.itemContainers.template.events.on("pointerout", () => {
 legend.data.setAll(lineSeries);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart of ten series over 20 days, January 1 to 20, 2024. Tab to the lines, then move along them with the up and down arrow keys"
+});
+// invisible points on the lines: ten series, so one Tab stop for all of them
+am5.array.each(lineSeries, (series) => {
+  series.bullets.push(() => {
+    return am5.Bullet.new(root, {
+      sprite: am5.Circle.new(root, {
+        radius: 5,
+        fillOpacity: 0, // not painted: the lines look as before
+        strokeOpacity: 0,
+        focusable: true,
+        focusableGroup: "points",
+        ariaLabel: "{name}, {valueX.formatDate('MMMM d')}: {valueY}"
+      })
+    });
+  });
+});
+// the legend: one Tab stop, after the lines
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 am5.array.each(lineSeries, (series) => {

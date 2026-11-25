@@ -60,10 +60,28 @@ export class Dropdown extends Entity {
 		this._initElements();
 		this._root.addDisposer(this);
 
-		// Close on ESC
+		const container = this.getPrivate("container")!;
+
 		if ($utils.supports("keyboardevents")) {
+			// Close on ESC
 			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
 				if (this.isOpen() && ev.keyCode == 27) {
+					this.hide();
+				}
+			}));
+
+			// Arrow keys between the items
+			this._disposers.push($utils.addEventListener(container, "keydown", (ev: KeyboardEvent) => {
+				if (this.isAccessible()) {
+					this._handleKey(ev);
+				}
+			}));
+
+			// Tabbing out of the dropdown closes it
+			this._disposers.push($utils.addEventListener(container, "focusout", (ev: FocusEvent) => {
+				const to = ev.relatedTarget as Element | null;
+				const button = this.get("control").getPrivate("button");
+				if (to && this.isOpen() && button && !$utils.contains(button, to) && !$utils.contains(container, to)) {
 					this.hide();
 				}
 			}));
@@ -80,6 +98,9 @@ export class Dropdown extends Entity {
 				this.hide();
 			}
 		}));
+
+		this._maybeMakeAccessible();
+		this.get("control")._setDropdown(this);
 	}
 
 	protected _initElements(): void {
@@ -149,6 +170,7 @@ export class Dropdown extends Entity {
 	public hide(): void {
 		const arrow = this.getPrivate("arrow")!;
 		const container = this.getPrivate("container")!;
+		const focused = document.activeElement && $utils.contains(container, document.activeElement);
 		container.style.display = "none";
 		this.events.dispatch("closed", {
 			type: "closed",
@@ -157,6 +179,11 @@ export class Dropdown extends Entity {
 
 		container.style.marginLeft = "";
 		arrow.style.marginLeft = "";
+
+		// focus does not drop to the page when its element is hidden
+		if (focused) {
+			this.get("control")._focus();
+		}
 	}
 
 	/**
@@ -187,6 +214,12 @@ export class Dropdown extends Entity {
 			type: "opened",
 			target: this
 		});
+
+		// opened from its button: focus moves in
+		const button = this.get("control").getPrivate("button");
+		if (button && document.activeElement && $utils.contains(button, document.activeElement) && !$utils.contains(container, document.activeElement) && this.isAccessible()) {
+			this._focusFirst();
+		}
 	}
 
 	/**
@@ -202,14 +235,95 @@ export class Dropdown extends Entity {
 		}
 	}
 
-	protected _maybeMakeAccessible() {
-		if (this.isAccessible()) {
+	/**
+	 * @ignore
+	 */
+	public _maybeMakeAccessible(): void {
+		const element = this._ariaElement();
+		if (element) {
+			if (!element.id) {
+				element.id = "am5stock-popup-" + this.uid;
+			}
+			element.setAttribute("role", this._ariaRole());
+			const title = this.get("control").getPrivate("button")!.getAttribute("title");
+			if (title) {
+				element.setAttribute("aria-label", title);
+			}
+			if (this._ariaRole() == "dialog") {
+				element.setAttribute("tabindex", "-1");
+			}
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _ariaRole(): "menu" | "dialog" {
+		return "dialog";
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _ariaElement(): HTMLElement | undefined {
+		return this.getPrivate("container");
+	}
+
+	// Items the arrow keys move between
+	protected _getNavItems(): HTMLElement[] {
+		return [];
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _focusFirst(): void {
+		const container = this.getPrivate("container")!;
+		const first = container.querySelector<HTMLElement>("input:not([type='hidden']):not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex^='-'])");
+		$utils.focus(first || container);
+	}
+
+	protected _handleKey(ev: KeyboardEvent): void {
+		const items = this._getNavItems();
+		if (!items.length) {
+			return;
+		}
+		const key = $utils.getEventKey(ev);
+		const active = document.activeElement as HTMLElement;
+		const index = items.indexOf(active);
+		const inInput = active && (active.tagName == "INPUT" || active.tagName == "SELECT" || active.tagName == "TEXTAREA");
+		let next: number | undefined;
+		if (key == "ArrowDown" || (key == "ArrowRight" && !inInput)) {
+			next = index + 1;
+		}
+		else if (key == "ArrowUp" || (key == "ArrowLeft" && !inInput)) {
+			next = index == -1 ? items.length - 1 : index - 1;
+		}
+		else if (key == "Home" && !inInput) {
+			next = 0;
+		}
+		else if (key == "End" && !inInput) {
+			next = items.length - 1;
+		}
+		else if ((key == "Enter" || key == " ") && index != -1) {
+			ev.preventDefault();
+			active.click();
+			return;
+		}
+		if (next !== undefined) {
+			ev.preventDefault();
+			if (next < 0) {
+				next = items.length - 1;
+			}
+			else if (next >= items.length) {
+				next = 0;
+			}
+			$utils.focus(items[next]);
 		}
 	}
 
 	public isAccessible(): boolean {
-		const toolbar = this.get("control").getPrivate("toolbar");
-		return toolbar && toolbar.get("focusable", true) ? true : false;
+		return this.get("control").isAccessible();
 	}
 
 }

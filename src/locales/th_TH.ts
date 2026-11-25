@@ -305,7 +305,7 @@ export default {
 	"Legend": "คำอธิบายสัญลักษณ์",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "กด ENTER เพื่อสลับ",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "กำลังโหลด",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "แผนภูมิ",
+	"Serial chart": "แผนภูมิแบบอนุกรม",
+	"X/Y chart": "แผนภูมิ X/Y",
+	"Pie chart": "แผนภูมิวงกลม",
+	"Gauge chart": "แผนภูมิมาตรวัด",
+	"Radar chart": "แผนภูมิเรดาร์",
+	"Sankey diagram": "แผนภาพแซงคีย์",
+	"Flow diagram": "แผนภาพการไหล",
+	"Chord diagram": "แผนภาพคอร์ด",
+	"TreeMap chart": "แผนภูมิทรีแมป",
+	"Force directed tree": "แผนผังต้นไม้แบบใช้แรง",
+	"Sliced chart": "แผนภูมิแบบแบ่งส่วน",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "ชุดข้อมูล",
+	"Candlestick Series": "ชุดข้อมูลแท่งเทียน",
+	"OHLC Series": "ชุดข้อมูล OHLC",
+	"Column Series": "ชุดข้อมูลคอลัมน์",
+	"Line Series": "ชุดข้อมูลเส้น",
+	"Pie Slice Series": "ชุดข้อมูลชิ้นวงกลม",
+	"Funnel Series": "ชุดข้อมูลกรวย",
+	"Pyramid Series": "ชุดข้อมูลพีระมิด",
+	"X/Y Series": "ชุดข้อมูล X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "แผนที่",
+	"Press ENTER to zoom in": "กด ENTER เพื่อซูมเข้า",
+	"Press ENTER to zoom out": "กด ENTER เพื่อซูมออก",
+	"Use arrow keys to zoom in and out": "ใช้ปุ่มลูกศรเพื่อซูมเข้าและออก",
+	"Use plus and minus keys on your keyboard to zoom in and out": "ใช้ปุ่มบวกและลบบนแป้นพิมพ์เพื่อซูมเข้าและออก",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "พิมพ์",
+	"Export": "ส่งออก",
 	"Image": "รูปภาพ",
 	"Data": "ข้อมูล",
 	"Print": "พิมพ์",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "กด ENTER หรือใช้ปุ่มลูกศรเพื่อนำทาง",
+	"Press ENTER to open": "กด ENTER เพื่อเปิด",
+	"Press ENTER to print.": "กด ENTER เพื่อพิมพ์",
+	"Press ENTER to export as %1.": "กด ENTER เพื่อส่งออกเป็น %1",
+	"(Press ESC to close this message)": "(กด ESC เพื่อปิดข้อความนี้)",
+	"Image Export Complete": "ส่งออกรูปภาพเสร็จสมบูรณ์",
+	"Export operation took longer than expected. Something might have gone wrong.": "การส่งออกใช้เวลานานกว่าที่คาดไว้ อาจมีบางอย่างผิดพลาด",
+	"Saved from": "บันทึกจาก",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "ใช้ TAB เพื่อเลือกปุ่มจับ หรือใช้ลูกศรซ้ายและขวาเพื่อเปลี่ยนส่วนที่เลือก",
+	"Use left and right arrows to move selection": "ใช้ลูกศรซ้ายและขวาเพื่อย้ายส่วนที่เลือก",
+	"Use left and right arrows to move left selection": "ใช้ลูกศรซ้ายและขวาเพื่อย้ายส่วนที่เลือกด้านซ้าย",
+	"Use left and right arrows to move right selection": "ใช้ลูกศรซ้ายและขวาเพื่อย้ายส่วนที่เลือกด้านขวา",
+	"Use TAB select grip buttons or up and down arrows to change selection": "ใช้ TAB เพื่อเลือกปุ่มจับ หรือใช้ลูกศรขึ้นและลงเพื่อเปลี่ยนส่วนที่เลือก",
+	"Use up and down arrows to move selection": "ใช้ลูกศรขึ้นและลงเพื่อย้ายส่วนที่เลือก",
+	"Use up and down arrows to move lower selection": "ใช้ลูกศรขึ้นและลงเพื่อย้ายส่วนที่เลือกด้านล่าง",
+	"Use up and down arrows to move upper selection": "ใช้ลูกศรขึ้นและลงเพื่อย้ายส่วนที่เลือกด้านบน",
 	"From %1 to %2": "จาก %1 ถึง %2",
 	"From %1": "จาก %1",
 	"To %1": "ถึง %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "ค่า: %1",
+	"Highest: %1": "สูงสุด: %1",
+	"Lowest: %1": "ต่ำสุด: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "หมวดหมู่",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "ผลลัพธ์: %1",
+	"No results": "ไม่พบผลลัพธ์",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "เฉดสี",
+	"Opacity": "ความทึบ",
+	"Color": "สี",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "ไม่มีตัวแยกวิเคราะห์สำหรับไฟล์: %1",
+	"Error parsing file: %1": "เกิดข้อผิดพลาดในการแยกวิเคราะห์ไฟล์: %1",
+	"Unable to load file: %1": "ไม่สามารถโหลดไฟล์: %1",
+	"Invalid date": "วันที่ไม่ถูกต้อง",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "ปิด",
+	"Minimize": "ย่อขนาด",
+	"Confirm": "ยืนยัน",
 	"OK": "ตกลง",
 	"Cancel": "ยกเลิก",
 	"Delete": "ลบ",

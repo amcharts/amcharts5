@@ -139,6 +139,10 @@ flagSeries.bullets.push((root) => {
       paddingBottom: 1,
       paddingLeft: 0,
       paddingRight: 0,
+      // keyboard: one Tab stop for the flags, after the tasks; the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "flags",
+      ariaLabel: "Event {letter}: {valueX.formatDate('MMMM d')}",
       background: am5.PointedRectangle.new(root, {
         fill: root.interfaceColors.get("background"), // a flag in the background color...
         stroke: root.interfaceColors.get("text"),     // ...outlined in the text color
@@ -195,6 +199,22 @@ flagSeries.data.setAll([
   { category: "", date: "2019-03-12", letter: "F" },
   { category: "", date: "2019-04-18", letter: "G" }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Serpentine timeline of 13 tasks in four modules, from January to April 2019, with seven events lettered A to G, on a band that winds across the chart, one row per module. Tab to the tasks, then to the events, and move between them with the up and down arrow keys"
+});
+// the tasks: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "tasks",
+  // no hoverOnFocus: the tooltip of a task that bends round a turn would show in the turn, off the task
+  ariaLabel: "{category}: {task}, {openValueX.formatDate('MMMM d')} to {valueX.formatDate('MMMM d')}"
+});
+// the events: set up in the flag bullet function above
 
 
 // Make stuff animate on load

@@ -13,6 +13,8 @@
         }
       }
     },
+    "focusable": true,
+    "ariaLabel": "Line chart of a daily value over June 1 to 15, 2024, the last day marked with a pulsing dot. Tab to the line, then move along it with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -111,16 +113,13 @@
                   "children": [
                     {
                       "type": "Circle",
-                      "settings": {
-                        "radius": 5,
-                        "fill": { "type": "Color", "value": "#67b7dc" }
-                      }
+                      "settings": { "radius": 5, "fill": "@colors.getIndex(0)" }
                     },
                     {
                       "type": "Circle",
                       "settings": {
                         "radius": 5,
-                        "fill": { "type": "Color", "value": "#67b7dc" },
+                        "fill": "@colors.getIndex(0)",
                         "animations": [
                           {
                             "key": "scale",
@@ -145,6 +144,22 @@
                     }
                   ],
                   "properties": { "template": "#template-0" }
+                }
+              }
+            },
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "points",
+                    "ariaLabel": "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                  }
                 }
               }
             }

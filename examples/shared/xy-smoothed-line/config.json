@@ -14,6 +14,8 @@
         }
       }
     },
+    "focusable": true,
+    "ariaLabel": "Smoothed line chart of a daily value over the 30 days from January 1, 2024. Tab to the points, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -113,9 +115,12 @@
                   "type": "Circle",
                   "settings": {
                     "radius": 4,
-                    "stroke": { "type": "Color", "value": "#ffffff" },
+                    "stroke": "@root.interfaceColors.get('background')",
                     "strokeWidth": 2,
-                    "fill": "@series.get('fill')"
+                    "fill": "@series.get('fill')",
+                    "focusable": true,
+                    "focusableGroup": "points",
+                    "ariaLabel": "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
                   }
                 }
               }

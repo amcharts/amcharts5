@@ -49,7 +49,8 @@ export class WordCloudDefaultTheme extends Theme {
 				centerY: p50,
 				position: "absolute",
 				lineHeight: p100,
-				populateText: true
+				populateText: true,
+				role: "img"
 			});
 
 			rule.setup = (target) => {

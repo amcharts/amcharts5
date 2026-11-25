@@ -202,12 +202,12 @@ export default {
 	// 
 	// All three need to to be translated even if they are all the same. Some
 	// users might use one, some the other.
-	"A": "",
-	"P": "",
-	"AM": "",
-	"PM": "",
-	"A.M.": "",
-	"P.M.": "",
+	"A": "A",
+	"P": "P",
+	"AM": "AM",
+	"PM": "PM",
+	"A.M.": "a.m.",
+	"P.M.": "p.m.",
 
 	// Date-related stuff.
 	// 
@@ -315,6 +315,7 @@ export default {
 	"Flow diagram": "Diagramma di flusso",
 	"Chord diagram": "Diagramma a corda",
 	"TreeMap chart": "Mappa ad albero",
+	"Force directed tree": "Albero a forze dirette",
 	"Sliced chart": "Grafico a fette",
 
 	// Series types.
@@ -351,6 +352,7 @@ export default {
 	"Image": "Immagine",
 	"Data": "Dati",
 	"Print": "Stampa",
+	"Press ENTER or use arrow keys to navigate": "Premi ENTER o usa i tasti freccia per navigare",
 	"Press ENTER to open": "Clicca, tappa o premi ENTER per aprire",
 	"Press ENTER to print.": "Clicca, tappa o premi ENTER per stampare.",
 	"Press ENTER to export as %1.": "Clicca, tappa o premi ENTER per esportare come %1.",
@@ -390,6 +392,25 @@ export default {
 	"From %1": "Da %1",
 	"To %1": "a %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Valori: %1",
+	"Highest: %1": "Massimo: %1",
+	"Lowest: %1": "Minimo: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Categoria",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Risultati: %1",
+	"No results": "Nessun risultato",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Tonalità",
+	"Opacity": "Opacità",
+	"Color": "Colore",
+
 	// Data loader-related.
 	"No parser available for file: %1": "Nessun parser disponibile per il file: %1",
 	"Error parsing file: %1": "Errore durante l'analisi del file: %1",
@@ -397,9 +418,9 @@ export default {
 	"Invalid date": "Data non valida",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Chiudi",
+	"Minimize": "Riduci",
+	"Confirm": "Conferma",
 	"OK": "OK",
 	"Cancel": "Annulla",
 	"Delete": "Elimina",

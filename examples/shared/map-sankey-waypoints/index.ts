@@ -216,6 +216,28 @@ sankeySeries.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the globe, and a screen reader names it
+  ariaLabel: "Globe of oil exports from six terminals in the Persian Gulf to ports in Asia and Europe, in thousands of barrels a day, drawn as flows along sea lanes. Tab to the flows or the ports, then move between them with the up and down arrow keys"
+});
+// the flows: one Tab stop, the up and down arrow keys step through them
+sankeySeries.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "flows",
+  hoverOnFocus: true, // the focused flow shows its tooltip
+  ariaLabel: "{source} to {target}: {value} thousand barrels a day"
+});
+// the ports: one Tab stop too
+sankeySeries.nodes.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "ports",
+  hoverOnFocus: true,
+  ariaLabel: "{name}: {sum} thousand barrels a day"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

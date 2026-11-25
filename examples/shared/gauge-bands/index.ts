@@ -156,6 +156,27 @@ setInterval(() => {
 }, 2000);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+// the gauge has no parts to step through: its name gives the reading and its band, and follows the hand
+const gaugeName = (value: number) => {
+  let title = "";
+  am5.array.each(bands, (band) => {
+    if (value >= band.lowScore && value <= band.highScore) {
+      title = band.title;
+    }
+  });
+  return "Gauge of a score from -40 to 100 in seven bands, from Unsustainable to High Performing, now at " + Math.round(value) + ", " + title + ". The hand moves to a new score every two seconds";
+};
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: gaugeName(axisDataItem.get("value", 0))
+});
+axisDataItem.on("value", (value) => {
+  chart.set("ariaLabel", gaugeName(value || 0));
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

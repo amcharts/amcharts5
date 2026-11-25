@@ -24,7 +24,11 @@ element.config = {
   type: "PieChart", // the class to create, by its name
   settings: {
     layout: { type: "VerticalLayout" },         // as root.verticalLayout: parts stacked top to bottom
-    innerRadius: { type: "Percent", value: 50 } // am5.percent(50): a hole half the pie's radius, a donut
+    innerRadius: { type: "Percent", value: 50 }, // am5.percent(50): a hole half the pie's radius, a donut
+    // Accessibility: Tab reaches the chart, and a screen reader names it
+    // https://docs.amcharts.com/v5/concepts/accessibility/
+    focusable: true,
+    ariaLabel: "Donut chart of seven categories and their share. Tab to the slices, then move between them with the up and down arrow keys"
   },
   properties: {
     series: [{ // created, then pushed into chart.series
@@ -40,7 +44,20 @@ element.config = {
           { value: 4, category: "Five" },
           { value: 3, category: "Six" },
           { value: 1, category: "Seven" }
-        ]
+        ],
+        // the slices, for the keyboard: one Tab stop, the up and down arrow keys step through them
+        slices: {
+          properties: {
+            template: {
+              settings: {
+                focusable: true,
+                focusableGroup: "slices",
+                hoverOnFocus: true, // a focused slice shows its tooltip
+                ariaLabel: "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+              }
+            }
+          }
+        }
       }
     }]
   }

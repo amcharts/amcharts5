@@ -601,6 +601,23 @@ export abstract class Settings implements IDisposer, IAnimation, IStartAnimation
 	protected _animatingSettings: Animated<this["_settings"]>;
 	protected _animatingPrivateSettings: Animated<this["_privateSettings"]>;
 
+	/**
+	 * The settings, with those being animated at the values they animate to.
+	 *
+	 * @ignore
+	 */
+	public _finalSettings(): this["_settings"] {
+		const settings: any = this._settings;
+		let result: any = settings;
+		$object.each(this._animatingSettings, (key, animation) => {
+			if (result === settings) {
+				result = $object.copy(settings);
+			}
+			result[key] = (animation as Animation<any>).to;
+		});
+		return result;
+	}
+
 	private _disposed: boolean = false;
 
 	// TODO move this into Entity

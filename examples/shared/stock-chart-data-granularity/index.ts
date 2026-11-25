@@ -43,8 +43,7 @@ const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {
     pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
   }),
-  tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis...
-  extraTooltipPrecision: 2,           // ...with two more decimals than the grid step
+  tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis, with the labels' decimals
   preferredDecimals: [0, 2]           // prices: whole numbers, or cents
 }));
 
@@ -151,6 +150,32 @@ am5stock.StockToolbar.new(root, {
     intervalSwitcher
   ]
 });
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+stockChart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Stock chart of Microsoft (MSFT) prices as candlesticks, one per day from April 2021 to March 2022. Tab to the candles, then move between them with the up and down arrow keys. The toolbar above the chart switches to minute, weekly or monthly candles"
+});
+// the candles: one Tab stop, the up and down arrow keys step through them
+const candleLabel = (dateFormat: string) => {
+  return "{valueX.formatDate('" + dateFormat + "')}: open {openValueY}, high {highValueY}, low {lowValueY}, close {valueY}";
+};
+valueSeries.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "prices",
+  ariaLabel: candleLabel("MMMM d, yyyy")
+});
+// minute candles say the time too
+intervalSwitcher.events.on("selected", (ev) => {
+  const item = ev.item as am5stock.IIntervalControlItem;
+  valueSeries.columns.template.set("ariaLabel", candleLabel(item.id == "minute" ? "MMMM d, HH:mm" : "MMMM d, yyyy"));
+});
+// the legend, with its settings and close buttons: after the candles
+valueLegend.itemContainers.template.set("tabindexOrder", 10); // focus runs from low to high (0 if not set)
+valueLegend.settingsButtons.template.set("tabindexOrder", 10);
+valueLegend.closeButtons.template.set("tabindexOrder", 10);
 
 
 // Make stuff animate on load

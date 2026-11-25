@@ -47,7 +47,8 @@ export class FlowDefaultTheme extends Theme {
 		r("FlowNode").setAll({
 			setStateOnChildren: true,
 			cursorOverStyle: "pointer",
-			toggleKey: "disabled"
+			toggleKey: "disabled",
+			role: "img"
 		})
 
 
@@ -69,7 +70,8 @@ export class FlowDefaultTheme extends Theme {
 
 		r("FlowLink").setAll({
 			fillStyle: "gradient",
-			strokeStyle: "gradient"
+			strokeStyle: "gradient",
+			role: "img"
 		});
 
 		r("FlowLink", ["source", "unknown"]).setAll({

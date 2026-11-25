@@ -141,7 +141,12 @@ series.bullets.push((root) => {
     strokeOpacity: 0,         // no outline
     tooltipText: "{text}",    // the activity's name on hover
     tooltipY: 0,              // the tooltip points at the top of the box
-    templateField: "settings" // the box takes the activity's color from its data row
+    templateField: "settings", // the box takes the activity's color from its data row
+    // keyboard: one Tab stop for the activities, the up and down arrow keys step through them
+    focusable: true,
+    focusableGroup: "activities",
+    hoverOnFocus: true, // the focused pin shows its tooltip
+    ariaLabel: "{text}, {openValueX.formatDate('HH:mm')} to {valueX.formatDate('HH:mm')}"
   }));
 
   // cors: null lets the icon files load when the page is opened from disk
@@ -196,6 +201,15 @@ series.data.setAll([
   { category: "break", start: "2019-01-10 15:00", end: "2019-01-10 15:15", text: "Coffee", icon: { src: "icons/coffee.svg" }, settings: { fill: colors.getIndex(10) } },
   { category: "break", start: "2019-01-10 20:15", end: "2019-01-10 21:00", text: "Read a bit", icon: { src: "icons/book.svg" }, settings: { fill: colors.getIndex(7) } }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Timeline of one day in 17 activities, from waking up at 6:00 to bed at 2:00, along a path that winds across the chart, with the breaks in a second row. Zoom with the scrollbar or the mouse wheel. Tab to the activities, then move between them with the up and down arrow keys"
+});
+// the activities: set up in the pin bullet function above
 
 
 // Make stuff animate on load

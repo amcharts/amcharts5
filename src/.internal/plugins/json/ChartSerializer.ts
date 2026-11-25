@@ -598,7 +598,7 @@ export class ChartSerializer extends Serializer {
 			this._stripType(serializedNodes);
 			this._maybeInit(serializedNodes, "properties", {});
 			this._populateTemplates(nodes, serializedNodes.properties, [
-				"rectangles", "slices", "circles", "labels", "mapPolygons"
+				"nodes", "rectangles", "slices", "circles", "labels", "mapPolygons"
 			]);
 			this._processBullets(nodes, serializedNodes.properties);
 			this._lists.series[seriesId].properties.nodes = serializedNodes;

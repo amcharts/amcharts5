@@ -4,34 +4,41 @@
     "sourceIdField": "source",
     "targetIdField": "target",
     "valueField": "value",
+    "focusable": true,
+    "ariaLabel": "Chord diagram of the flows between five European cities, both ways. Tab to the cities or the flows, then move through them with the up and down arrow keys; Enter on a city hides or shows its flows",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
   "properties": {
     "data": "#data-0",
+    "links": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "links",
+            "tabindexOrder": 5,
+            "hoverOnFocus": true,
+            "ariaLabel": "{sourceId} to {targetId}: {value}"
+          }
+        }
+      }
+    },
     "nodes": {
+      "properties": {
+        "nodes": {
+          "properties": {
+            "template": {
+              "settings": { "focusable": true, "focusableGroup": "nodes", "ariaLabel": "{name}: {sum} in all" }
+            }
+          }
+        }
+      },
       "settings": {
         "colors": {
           "type": "ColorSet",
-          "settings": {
-            "step": 2,
-            "passOptions": { "hue": 0.05, "saturation": 0, "lightness": 0 },
-            "colors": [
-              { "type": "Color", "value": "#67b7dc" },
-              { "type": "Color", "value": "#6794dc" },
-              { "type": "Color", "value": "#6771dc" },
-              { "type": "Color", "value": "#8067dc" },
-              { "type": "Color", "value": "#a367dc" },
-              { "type": "Color", "value": "#c767dc" },
-              { "type": "Color", "value": "#dc67ce" },
-              { "type": "Color", "value": "#dc67ab" },
-              { "type": "Color", "value": "#dc6788" }
-            ],
-            "reuse": false,
-            "startIndex": 0,
-            "stateAnimationDuration": 600
-          }
+          "settings": { "step": 2 }
         }
       }
     }

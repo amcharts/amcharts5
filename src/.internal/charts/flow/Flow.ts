@@ -177,6 +177,14 @@ export abstract class Flow extends Series {
 	protected _nodesDataSet: boolean = false;
 
 	protected _linksByIndex: { [index: string]: any } = {};
+	// A link is named by the nodes at its ends
+	protected _summaryLabel(dataItem: DataItem<this["_dataItemSettings"]>): string {
+		const source = dataItem.get("source");
+		const target = dataItem.get("target");
+		const name = (node: any) => node ? "" + (node.get("name") != null ? node.get("name") : node.get("id")) : "";
+		return name(source) + " > " + name(target);
+	}
+
 	protected _afterNew() {
 		this._defaultThemes.push(FlowDefaultTheme.new(this._root));
 

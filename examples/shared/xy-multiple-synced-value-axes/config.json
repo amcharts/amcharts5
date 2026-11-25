@@ -22,6 +22,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Line chart of daily visits, views and hits over January 2024, each on its own value axis. Tab to a line, then move along it with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -86,18 +88,12 @@
         "settings": {
           "renderer": {
             "type": "AxisRendererY",
-            "settings": {
-              "opposite": false,
-              "strokeOpacity": 1,
-              "stroke": { "type": "Color", "value": "#67b7dc" }
-            },
+            "settings": { "opposite": false, "strokeOpacity": 1, "stroke": "@colors.getIndex(0)" },
             "properties": {
               "labels": {
                 "properties": {
                   "template": {
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#67b7dc" }
-                    }
+                    "settings": { "fill": "@colors.getIndex(0)" }
                   }
                 }
               },
@@ -120,18 +116,12 @@
           "syncWithAxis": "#axis-1",
           "renderer": {
             "type": "AxisRendererY",
-            "settings": {
-              "opposite": true,
-              "strokeOpacity": 1,
-              "stroke": { "type": "Color", "value": "#8067dc" }
-            },
+            "settings": { "opposite": true, "strokeOpacity": 1, "stroke": "@colors.getIndex(3)" },
             "properties": {
               "labels": {
                 "properties": {
                   "template": {
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#8067dc" }
-                    }
+                    "settings": { "fill": "@colors.getIndex(3)" }
                   }
                 }
               },
@@ -154,18 +144,12 @@
           "syncWithAxis": "#axis-1",
           "renderer": {
             "type": "AxisRendererY",
-            "settings": {
-              "opposite": true,
-              "strokeOpacity": 1,
-              "stroke": { "type": "Color", "value": "#dc67ce" }
-            },
+            "settings": { "opposite": true, "strokeOpacity": 1, "stroke": "@colors.getIndex(6)" },
             "properties": {
               "labels": {
                 "properties": {
                   "template": {
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#dc67ce" }
-                    }
+                    "settings": { "fill": "@colors.getIndex(6)" }
                   }
                 }
               },
@@ -197,7 +181,27 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "Visits",
+                    "ariaLabel": "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     },
     {
@@ -216,7 +220,27 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "Views",
+                    "ariaLabel": "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     },
     {
@@ -235,7 +259,27 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "Hits",
+                    "ariaLabel": "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     }
   ]

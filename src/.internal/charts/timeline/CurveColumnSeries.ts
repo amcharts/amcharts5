@@ -207,7 +207,7 @@ export class CurveColumnSeries extends BaseColumnSeries {
 			Template.new({}),
 			() => Polygon._new(this._root, {
 				position: "absolute",
-				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["curves", "series", "column"]),
+				themeTags: $utils.mergeTags(axisRange.columns.template.get("themeTags", []), ["curve", "series", "column"]),
 			}, [this.columns.template, axisRange.columns.template])
 		);
 	}

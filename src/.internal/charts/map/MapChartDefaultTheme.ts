@@ -65,7 +65,7 @@ export class MapChartDefaultTheme extends Theme {
 
 			rule.setAll({
 				precision: 0.5,
-				role: "figure",
+				role: "img",
 			});
 
 			setColor(rule, "stroke", ic, "grid");
@@ -104,7 +104,7 @@ export class MapChartDefaultTheme extends Theme {
 			rule.setAll({
 				precision: 0.5,
 				isMeasured: false,
-				role: "figure",
+				role: "img",
 				fillOpacity: 1,
 				position: "absolute",
 				strokeWidth: 0.2,

@@ -79,7 +79,12 @@ circleSeries.bullets.push(() => {
       fillOpacity: 0.7, // see-through, so the country and overlapping circles show
       stroke: root.interfaceColors.get("background"), // a thin ring in the background color
       strokeWidth: 1,
-      tooltipText: "{name}: {value.formatNumber('#.0a')}" // e.g. "Brazil: 196.7M"
+      tooltipText: "{name}: {value.formatNumber('#.0a')}", // e.g. "Brazil: 196.7M"
+      // keyboard: one Tab stop for all the circles, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "circles",
+      hoverOnFocus: true, // the focused circle shows its tooltip
+      ariaLabel: "{name}: population {value.formatNumber('#,###')}"
     }, circleTemplate)
   });
 });
@@ -140,6 +145,15 @@ circleSeries.data.setAll([
   { id: "SA", name: "Saudi Arabia", value: 28100000 },
   { id: "AU", name: "Australia", value: 22600000 }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the globe, and a screen reader names it
+  ariaLabel: "Globe with circles on 40 countries, sized by population, lying flat on its surface. Tab to the circles, then move between them with the up and down arrow keys"
+});
+// the circles: set up in their bullet function above
 
 
 // Make stuff animate on load

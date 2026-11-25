@@ -120,6 +120,20 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Column chart of a daily value over the 30 days of January 2024. Tab to the columns, then move between them with the up and down arrow keys"
+});
+// the columns: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "columns",
+  ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

@@ -144,6 +144,20 @@ xAxis.data.setAll(data);
 series.data.setAll(data);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Dumbbell plot of 29 people, each with a value that went from an open to a close value. Tab to the people, then move between them with the up and down arrow keys"
+});
+// the dumbbells: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "dumbbells",
+  ariaLabel: "{categoryX}: from {openValueY} to {valueY}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

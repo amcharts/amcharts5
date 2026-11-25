@@ -17,6 +17,8 @@ import { ResizeSensor } from "./util/ResizeSensor";
 import { InterfaceColors, IInterfaceColorsSettings } from "./util/InterfaceColors";
 import { Graphics } from "./render/Graphics";
 import { Rectangle } from "./render/Rectangle";
+import { RoundedRectangle } from "./render/RoundedRectangle";
+import { Label } from "./render/Label";
 import { Tooltip } from "./render/Tooltip";
 import { NumberFormatter } from "./util/NumberFormatter";
 import { DateFormatter } from "./util/DateFormatter";
@@ -25,7 +27,7 @@ import { ILocale, Language } from "./util/Language";
 import { Events, EventDispatcher } from "./util/EventDispatcher";
 import { DefaultTheme } from "../themes/DefaultTheme";
 import { CanvasRenderer } from "./render/backend/CanvasRenderer";
-import { p100, percent, isPercent, Percent } from "./util/Percent";
+import { p100, isPercent, Percent } from "./util/Percent";
 import { Color, color } from "./util/Color";
 import { populateString } from "./util/PopulateString";
 import { registry } from "./Registry";
@@ -40,6 +42,19 @@ import * as $ease from "./util/Ease";
 
 import en from "../../locales/en";
 
+
+// Sets an attribute, or removes it for `null`, only if that changes it: a
+// write that changes nothing still costs the browser work
+function setAttr(element: Element, name: string, value: string | null): void {
+	if (element.getAttribute(name) !== value) {
+		if (value === null) {
+			element.removeAttribute(name);
+		}
+		else {
+			element.setAttribute(name, value);
+		}
+	}
+}
 
 function rAF(fps: number | undefined, callback: (currentTime: number) => void): void {
 	if (fps == null) {
@@ -165,8 +180,8 @@ export interface IRootSettings {
 
 	/**
 	 * Cleans potentially malicious code out of HTML content (`html` and
-	 * `labelHTML` settings, HTML tooltips, modals, export menu labels) before
-	 * it goes on the page.
+	 * `labelHTML` settings, HTML tooltips, modals, export menu labels, stock
+	 * toolbar labels) before it goes on the page.
 	 *
 	 * Turn it off only if you trust all HTML content: unsanitized HTML from
 	 * untrusted data can lead to XSS attacks.
@@ -175,6 +190,16 @@ export interface IRootSettings {
 	 * @since 5.19.0
 	 */
 	sanitizeHTML?: boolean;
+
+	/**
+	 * The corner of the chart that shows the amCharts logo, when there is no
+	 * licence: `"bl"` (bottom left), `"br"` (bottom right), `"tl"` (top left)
+	 * or `"tr"` (top right).
+	 *
+	 * @default "bl"
+	 * @since 5.24.0
+	 */
+	logoPosition?: "bl" | "br" | "tl" | "tr";
 
 	/**
 	 * Font family for all labels. It overrides the theme's, but not a
@@ -325,6 +350,341 @@ function getSystemColors(): { [name: string]: Color } {
 
 
 // TODO implement Disposer
+/**
+ * The amCharts logo of a chart without a licence, kept here and not on the root.
+ */
+interface IBranding {
+	// amCharts keys known when it was first shown
+	keys: number;
+	started: boolean;
+	licensed: boolean;
+	small: boolean;
+	// a label that says where the chart was made, after the logo was taken away
+	label: boolean;
+	// corner it is in: "bl", "br", "tl" or "tr"
+	corner: string;
+	mark?: Container;
+	checks: Array<(introOver: boolean) => boolean>;
+	introEnd: number;
+	timer?: number;
+	listener?: IDisposer;
+}
+
+const brandings: WeakMap<Root, IBranding> = new WeakMap();
+
+function brandingOf(root: Root): IBranding {
+	let state = brandings.get(root);
+	if (!state) {
+		state = { keys: 0, started: false, licensed: false, small: false, label: false, corner: "bl", checks: [], introEnd: 0 };
+		brandings.set(root, state);
+	}
+	return state;
+}
+
+// amCharts licence keys added so far
+function brandingKeys(): number {
+	let count = 0;
+	$array.each(registry.licenses, (key) => {
+		if (/^AM5[A-Z].{5,}/i.test(String(key))) {
+			count++;
+		}
+	});
+	return count;
+}
+
+// taken out of `parent`, hidden or faded
+function brandingPartOff(sprite: Sprite, parent?: Container): boolean {
+	return sprite.isDisposed() || (parent !== undefined && parent.children.indexOf(sprite) == -1) || !!sprite.get("forceHidden") || sprite.get("visible") === false || sprite.isHidden() || sprite.get("opacity", 1) < 1 || sprite.get("scale", 1) !== 1 || sprite.get("dy", 0) !== 0;
+}
+
+function brandingColor(sprite: Sprite, key: "fill" | "stroke"): number | undefined {
+	const value: any = (sprite as any).get(key);
+	return value instanceof Color ? value.hex : undefined;
+}
+
+// the corner the root's `logoPosition` asks for
+function brandingCorner(root: Root): string {
+	const corner = (root as any)._settings.logoPosition;
+	return corner == "br" || corner == "tl" || corner == "tr" ? corner : "bl";
+}
+
+function brandingRight(state: IBranding): boolean {
+	return state.corner.charAt(1) == "r";
+}
+
+function brandingTop(state: IBranding): boolean {
+	return state.corner.charAt(0) == "t";
+}
+
+// puts it in its corner, a label a little in from the edges
+function placeBranding(mark: Container, state: IBranding): void {
+	const right = brandingRight(state);
+	const top = brandingTop(state);
+	mark.setAll({
+		x: right ? p100 : 0,
+		centerX: right ? p100 : 0,
+		y: top ? 0 : p100,
+		centerY: top ? 0 : p100,
+		tooltipX: right ? 0 : p100,
+		tooltipY: top ? p100 : (state.label ? 0 : 10)
+	});
+	if (state.label) {
+		mark.setAll({
+			paddingLeft: right ? 0 : 6,
+			paddingRight: right ? 6 : 0,
+			paddingTop: top ? 6 : 0,
+			paddingBottom: top ? 0 : 6
+		});
+	}
+}
+
+// at 0 (or not set), or at the far end (100%)
+function brandingAt(value: any, end: boolean): boolean {
+	return end ? (value instanceof Percent && value.value == 1) : (value == null || value === 0);
+}
+
+function buildBranding(root: Root, state: IBranding): void {
+	const tooltipContainer = root.tooltipContainer;
+	const common = {
+		interactive: true,
+		interactiveChildren: false,
+		position: "absolute" as const,
+		tooltipText: "Created using amCharts 5",
+		cursorOverStyle: "pointer"
+	};
+
+	let mark: Container;
+	if (state.label) {
+		mark = tooltipContainer.children.push(Container.new(root, Object.assign({
+			// what the pointer hits
+			background: Rectangle.new(root, {
+				fill: color(0x474758),
+				fillOpacity: 0
+			})
+		}, common)));
+
+		const background = RoundedRectangle.new(root, {
+			fill: color(0x000000),
+			fillOpacity: 0.7,
+			stroke: color(0xffffff),
+			strokeOpacity: 0.35,
+			cornerRadiusTL: 4,
+			cornerRadiusTR: 4,
+			cornerRadiusBL: 4,
+			cornerRadiusBR: 4
+		});
+		const pill = mark.children.push(Container.new(root, {
+			paddingTop: 3,
+			paddingBottom: 3,
+			paddingLeft: 7,
+			paddingRight: 7,
+			background: background
+		}));
+		const text = "Made with amCharts";
+		const label = pill.children.push(Label.new(root, {
+			text: text,
+			fill: color(0xffffff),
+			fontSize: 11,
+			paddingTop: 0,
+			paddingBottom: 0,
+			paddingLeft: 0,
+			paddingRight: 0
+		}));
+
+		state.checks = [() => {
+			return brandingPartOff(pill, mark) || pill.get("dx", 0) !== 0 || label.get("dx", 0) !== 0 ||
+				pill.get("background") !== background || background.isDisposed() || background.get("visible") === false || !!background.get("forceHidden") ||
+				background.get("fillOpacity", 1) < 0.7 || brandingColor(background, "fill") !== 0x000000 ||
+				brandingPartOff(label, pill) || label.get("text") !== text || label.get("fontSize") !== 11 || brandingColor(label, "fill") !== 0xffffff;
+		}];
+		state.introEnd = 0;
+	}
+	else {
+		mark = tooltipContainer.children.push(Container.new(root, Object.assign({
+			setStateOnChildren: true,
+			paddingTop: 9,
+			paddingRight: 9,
+			paddingBottom: 9,
+			paddingLeft: 9,
+			scale: .6,
+			background: Rectangle.new(root, {
+				fill: color(0x474758),
+				fillOpacity: 0,
+				tooltipY: 5
+			})
+		}, common)));
+
+		mark.states.create("hover", {});
+
+		const m = mark.children.push(Graphics.new(root, {
+			stroke: color(0xcccccc),
+			strokeWidth: 3,
+			svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6",
+			dx: -50,
+			strokeOpacity: 0
+		}));
+
+		m.states._createC("hover", { stroke: color(0x3CABFF) });
+
+		const a = mark.children.push(Graphics.new(root, {
+			stroke: color(0x888888),
+			strokeWidth: 3,
+			svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0",
+			dx: 50,
+			strokeOpacity: 0
+		}));
+
+		a.states.create("hover", { stroke: color(0x474758) });
+
+		const easing = $ease.out($ease.cubic);
+		const duration = 1500;
+
+		mark.setTimeout(() => {
+			$array.each([a, m], (part) => {
+				part.animate({ key: "strokeOpacity", to: 1, duration: duration, easing: easing });
+				part.animate({ key: "dx", to: 0, duration: duration, easing: easing });
+			});
+		}, 3000);
+
+		const parts = [m, a].map((part) => ({ part, path: part.get("svgPath")! }));
+		// its lines: taken out, hidden or changed; faded or moved only once their intro is over
+		state.checks = [(introOver: boolean) => {
+			return parts.some(({ part, path }) => {
+				return brandingPartOff(part, mark) || part.get("strokeWidth", 0) < 3 || part.get("svgPath") !== path ||
+					(introOver && (part.get("strokeOpacity", 0) < 1 || part.get("dx", 0) !== 0));
+			});
+		}];
+		// the lines fade and slide in from 3 s for 1.5 s
+		state.introEnd = Date.now() + 5000;
+	}
+
+	state.corner = brandingCorner(root);
+	placeBranding(mark, state);
+
+	mark.set("tooltip", root.systemTooltip);
+	// tagged so the website's analytics can count logo and label clicks
+	mark.events.on("click", () => {
+		window.open("https://www.amcharts.com/?utm_source=amcharts-chart&utm_medium=referral&utm_campaign=chart-logo&utm_content=" + (state.label ? "label" : "logo"), "_blank", "noopener");
+	});
+
+	state.mark = mark;
+	brandingSize(root);
+}
+
+// gone, hidden, moved or changed
+function brandingOff(root: Root, state: IBranding): boolean {
+	const mark = state.mark;
+	if (!mark || mark.isDisposed() || root.tooltipContainer.children.indexOf(mark) == -1) {
+		return true;
+	}
+	const right = brandingRight(state);
+	const top = brandingTop(state);
+	if (mark.get("forceHidden") || mark.get("scale", 1) !== (state.label ? 1 : .6) || mark.get("dx", 0) !== 0 || mark.get("dy", 0) !== 0 ||
+		!brandingAt(mark.get("x"), right) || !brandingAt(mark.get("centerX"), right) || !brandingAt(mark.get("y"), !top) || !brandingAt(mark.get("centerY"), !top)) {
+		return true;
+	}
+	if (state.small) {
+		return false;
+	}
+	if (mark.get("visible") === false || mark.isHidden() || mark.get("opacity", 1) < 1) {
+		return true;
+	}
+	const introOver = Date.now() > state.introEnd;
+	return $array.any(state.checks, (check) => check(introOver));
+}
+
+function brandingGone(root: Root, state: IBranding): boolean {
+	return !state.licensed && !root.isDisposed() && brandingOff(root, state) && brandingKeys() <= state.keys;
+}
+
+// after each frame; shown again a little later if it is still gone then, as a label from then on
+function checkBranding(root: Root, state: IBranding): void {
+	// `logoPosition` changed after the chart was made, e.g. by a JSON config
+	const corner = brandingCorner(root);
+	const mark = state.mark;
+	if (corner !== state.corner && mark && !mark.isDisposed()) {
+		state.corner = corner;
+		placeBranding(mark, state);
+	}
+	if (state.timer === undefined && brandingGone(root, state)) {
+		state.timer = setTimeout(() => {
+			state.timer = undefined;
+			const tooltipContainer = root.tooltipContainer;
+			if (brandingGone(root, state) && tooltipContainer && !tooltipContainer.isDisposed()) {
+				// only taken out of the chart: code may still hold it
+				const mark = state.mark;
+				if (mark && !mark.isDisposed()) {
+					tooltipContainer.children.removeValue(mark);
+				}
+				state.mark = undefined;
+				state.label = true;
+				buildBranding(root, state);
+			}
+		}, 3000) as any;
+	}
+}
+
+function showBranding(root: Root): void {
+	const state = brandingOf(root);
+	if (!state.started) {
+		state.started = true;
+		state.keys = brandingKeys();
+		state.listener = root.events.on("frameended", () => {
+			checkBranding(root, state);
+		});
+		// code that reaches for the logo gets a placeholder
+		root._logo = root.tooltipContainer.children.push(Container.new(root, { position: "absolute", isMeasured: false }));
+	}
+	if (!state.mark) {
+		buildBranding(root, state);
+	}
+}
+
+// hidden on a small root
+function brandingSize(root: Root): void {
+	const state = brandings.get(root);
+	const mark = state && state.mark;
+	if (state && mark) {
+		const w = root.dom.offsetWidth;
+		const h = root.dom.offsetHeight;
+		state.small = (w <= 150) || (h <= 60);
+		if (state.small) {
+			mark.hide();
+		}
+		else {
+			mark.show();
+		}
+	}
+}
+
+function endBranding(root: Root): void {
+	const state = brandings.get(root);
+	if (state) {
+		if (state.timer !== undefined) {
+			clearTimeout(state.timer);
+			state.timer = undefined;
+		}
+		if (state.listener) {
+			state.listener.dispose();
+		}
+		brandings.delete(root);
+	}
+}
+
+/**
+ * A chart of a product that has a licence on the page: its root shows no
+ * logo.
+ *
+ * @ignore
+ */
+export function _brandingLicensed(root: Root): void {
+	const state = brandingOf(root);
+	state.licensed = true;
+	if (state.mark) {
+		state.mark.set("forceHidden", true);
+	}
+}
+
 /**
  * The root of a chart: it ties the chart to an HTML element and holds its
  * global settings, formatters, locale and themes.
@@ -513,14 +873,40 @@ export class Root implements IDisposer {
 	protected _focusedSprite: Sprite | undefined;
 	protected _isShift: boolean | undefined;
 	protected _keyboardDragPoint: IPoint | undefined;
+
+	/**
+	 * The step of the last arrow key move (x and y: -6, 0 or 6), for elements
+	 * that move a whole step whichever way the key points
+	 *
+	 * @ignore
+	 */
+	public _keyboardDragStep: IPoint = { x: 0, y: 0 };
+
+	// The arrow key last pressed to move in a focusable group, until released
+	protected _groupKey: string | undefined;
 	protected _tooltipElementContainer: HTMLDivElement | undefined;
 	protected _readerAlertElement: HTMLDivElement | undefined;
 
 	// Each `focusableGroup` is one TAB stop: the member that is it, and groups
 	// to re-check before the next frame
 	protected _groupStops: { [group: string]: Sprite } = {};
+	// Groups left with no TAB stop until one of their members is focused
+	protected _groupNoStop: { [group: string]: boolean } = {};
+	// Groups whose TAB stop was focused or set: kept. Otherwise it is the
+	// first member that can take focus
+	protected _groupStopKept: { [group: string]: boolean } = {};
 	protected _dirtyGroups: { [group: string]: string | number } = {};
 
+	// Focus work is collected and done once per frame: the TAB order, and
+	// elements to decorate in full (`true`) or only re-check whether they can
+	// take focus (`false`)
+	protected _tabindexesDirty: boolean = false;
+	protected _dirtyA11y: { [uid: number]: { target: Sprite, full: boolean } } = {};
+	protected _focusElementSprites: WeakMap<Element, Sprite> = new WeakMap();
+
+	/**
+	 * @ignore
+	 */
 	public _logo?: Container;
 
 	public _tooltipDiv: HTMLDivElement | undefined;
@@ -739,110 +1125,11 @@ export class Root implements IDisposer {
 
 
 	protected _handleLogo(): void {
-		if (this._logo) {
-			const w = this.dom.offsetWidth;
-			const h = this.dom.offsetHeight;
-			if ((w <= 150) || (h <= 60)) {
-				this._logo.hide();
-			}
-			else {
-				this._logo.show();
-			}
-		}
+		brandingSize(this);
 	}
 
 	public _showBranding(): void {
-		if (!this._logo) {
-			const logo = this.tooltipContainer.children.push(Container.new(this, {
-				interactive: true,
-				interactiveChildren: false,
-				position: "absolute",
-				setStateOnChildren: true,
-				paddingTop: 9,
-				paddingRight: 9,
-				paddingBottom: 9,
-				paddingLeft: 9,
-				scale: .6,
-				y: percent(100),
-				centerY: p100,
-				tooltipY: 10,
-				tooltipText: "Created using amCharts 5",
-				tooltipX: p100,
-				cursorOverStyle: "pointer",
-				background: Rectangle.new(this, {
-					fill: color(0x474758),
-					fillOpacity: 0,
-					tooltipY: 5
-				})
-			}));
-
-
-			logo.set("tooltip", this.systemTooltip);
-
-			logo.events.on("click", () => {
-				window.open("https://www.amcharts.com/", "_blank");
-			});
-
-			logo.states.create("hover", {});
-
-			const m = logo.children.push(Graphics.new(this, {
-				stroke: color(0xcccccc),
-				strokeWidth: 3,
-				svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6",
-				dx: -50,
-				strokeOpacity: 0
-			}));
-
-			m.states._createC("hover", { stroke: color(0x3CABFF) });
-
-			const a = logo.children.push(Graphics.new(this, {
-				stroke: color(0x888888),
-				strokeWidth: 3,
-				svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0",
-				dx: 50,
-				strokeOpacity: 0
-			}));
-
-			const easing = $ease.out($ease.cubic);
-			const duration = 1500;
-
-			logo.setTimeout(() => {
-				a.animate({
-					key: "strokeOpacity",
-					to: 1,
-					duration: duration,
-					easing: easing
-				});
-
-				a.animate({
-					key: "dx",
-					to: 0,
-					duration: duration,
-					easing: easing
-				});
-
-				m.animate({
-					key: "dx",
-					to: 0,
-					duration: duration,
-					easing: easing
-				});
-
-				m.animate({
-					key: "strokeOpacity",
-					to: 1,
-					duration: duration,
-					easing: easing
-				});
-			}, 3000);
-
-			a.states.create("hover", { stroke: color(0x474758) });
-
-			this._logo = logo;
-
-			this._handleLogo();
-
-		}
+		showBranding(this);
 	}
 
 	protected _getRealSize(): DOMRect {
@@ -1113,27 +1400,28 @@ export class Root implements IDisposer {
 							ev.preventDefault();
 
 							// In a focusable group arrow keys move between its members (on
-							// key up); SHIFT + arrows drag a draggable member
-							if (focusedSprite.get("focusableGroup") && !ev.shiftKey && !focusedSprite.isDragging()) {
-								return;
+							// key up); SHIFT + arrows drag a draggable member. In a vertical
+							// group up and down move between members, left and right drag
+							if (focusedSprite.get("focusableGroup") && !focusedSprite.isDragging()) {
+								if (focusedSprite.getPrivate("focusGroupVertical") ? dragOffsetY != 0 : !ev.shiftKey) {
+									this._groupKey = eventKey;
+									return;
+								}
 							}
 
 							if (!focusedSprite.isDragging()) {
-								// Start dragging
-								this._keyboardDragPoint = {
-									x: 0,
-									y: 0
-								}
+								// Start dragging, as if pressed in the middle of the element, so
+								// that events carry pointer positions where it is
+								const bounds = focusedSprite._focusBounds();
+								this._keyboardDragPoint = this.rootPointToDocument({
+									x: (bounds.left + bounds.right) / 2,
+									y: (bounds.top + bounds.bottom) / 2
+								});
 
 								const downEvent = renderer.getEvent(new MouseEvent("mousedown", {
-									clientX: 0,
-									clientY: 0
+									clientX: this._keyboardDragPoint.x,
+									clientY: this._keyboardDragPoint.y
 								}));
-
-								downEvent.point = {
-									x: 0,
-									y: 0
-								};
 
 								if (focusedSprite.events.isEnabled("pointerdown")) {
 									focusedSprite.events.dispatch("pointerdown", {
@@ -1152,13 +1440,16 @@ export class Root implements IDisposer {
 							}
 
 							// Move incrementally
+							this._keyboardDragStep = { x: dragOffsetX, y: dragOffsetY };
 							const dragPoint = this._keyboardDragPoint!;
 							dragPoint.x += dragOffsetX;
 							dragPoint.y += dragOffsetY;
+							// measured from the chart, as the press is, so a step is exactly
+							// the offset whatever the page around the chart
 							const moveEvent = renderer.getEvent(new MouseEvent("mousemove", {
 								clientX: dragPoint.x,
 								clientY: dragPoint.y
-							}), false);
+							}));
 
 							if (focusedSprite.events.isEnabled("globalpointermove")) {
 								focusedSprite.events.dispatch("globalpointermove", {
@@ -1182,15 +1473,21 @@ export class Root implements IDisposer {
 							case "ArrowRight":
 							case "ArrowUp":
 							case "ArrowDown":
+								// Only a key whose press the page got too: in browse mode a
+								// screen reader keeps the press and moves its own cursor (and
+								// with it the focus), but lets the release through
+								const pressed = this._groupKey === eventKey;
+								this._groupKey = undefined;
 								if (focusedSprite.isDragging()) {
 									this._stopKeyboardDrag(focusedSprite);
 									return;
 								}
-								else if (focusedSprite.get("focusableGroup")) {
+								else if (pressed && focusedSprite.get("focusableGroup") && !(focusedSprite.getPrivate("focusGroupVertical") && (eventKey == "ArrowLeft" || eventKey == "ArrowRight"))) {
 									// Find next item in focusable group
+									this._updateTabindexes();
 									const group = focusedSprite.get("focusableGroup");
 									const items = this._tabindexes.filter((item) => {
-										return item === focusedSprite || (item.get("focusableGroup") == group && item.isVisibleDeep() && this._canTab(item));
+										return item === focusedSprite || (item.get("focusableGroup") == group && item.getPrivate("focusElement") && this._canTab(item));
 									});
 									let index = items.indexOf(focusedSprite);
 									const lastIndex = items.length - 1;
@@ -1383,8 +1680,12 @@ export class Root implements IDisposer {
 		this._renderer.render(this._rootContainer._display);
 
 		if (this._focusElementDirty) {
-			this._updateDirtyGroups();
+			this._visibleMemo = {};
+			this._updateTabindexes();
+			this._updateDirtyA11y();
 			this._updateCurrentFocus();
+			this._updateDirtyGroups();
+			this._visibleMemo = undefined;
 			this._focusElementDirty = false;
 		}
 	}
@@ -1764,6 +2065,7 @@ export class Root implements IDisposer {
 	public dispose(): void {
 		if (!this._isDisposed) {
 			this._isDisposed = true;
+			endBranding(this);
 
 			this._rootContainer.dispose();
 			this._renderer.dispose();
@@ -1863,10 +2165,16 @@ export class Root implements IDisposer {
 		}
 
 		if (target.get("focusable") && !target.getPrivate("focusExcluded")) {
-			$array.pushOne(this._tabindexes, target);
+			if (!this._tabindexUids[target.uid]) {
+				this._tabindexUids[target.uid] = true;
+				this._tabindexes.push(target);
+				if (this._tabindexRanks[target.uid] === undefined) {
+					this._tabindexRanks[target.uid] = this._tabindexRank++;
+				}
+			}
 		}
 		else {
-			$array.remove(this._tabindexes, target);
+			this._removeTabindex(target);
 		}
 		this._invalidateTabindexes();
 	}
@@ -1876,56 +2184,114 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		$array.remove(this._tabindexes, target);
+		this._removeTabindex(target);
 		this._invalidateTabindexes();
 	}
 
+	protected _tabindexUids: { [uid: number]: boolean } = {};
+
+	// The order elements first became focusable in: one made focusable again
+	// (e.g. Gantt task names when editing is turned back on) goes back to its place
+	protected _tabindexRanks: { [uid: number]: number } = {};
+	protected _tabindexRank: number = 0;
+
+	protected _removeTabindex(target: Sprite): void {
+		if (this._tabindexUids[target.uid]) {
+			delete this._tabindexUids[target.uid];
+			$array.remove(this._tabindexes, target);
+		}
+	}
+
+	/**
+	 * The TAB order is worked out again before the next frame.
+	 *
+	 * @ignore
+	 */
 	public _invalidateTabindexes(): void {
 		if (this._a11yD == true) {
 			return;
 		}
+		this._tabindexesDirty = true;
+		this._focusElementDirty = true;
+	}
 
+	// Sorts the focusable elements by `tabindexOrder` and puts their focus
+	// elements in that order, moving only those out of place
+	protected _updateTabindexes(): void {
+		if (!this._tabindexesDirty || this._a11yD == true) {
+			return;
+		}
+		this._tabindexesDirty = false;
+
+		// Equal `tabindexOrder` keeps the order elements first became focusable in
+		const order = this._tabindexRanks;
 		this._tabindexes.sort((a: Sprite, b: Sprite) => {
 			const aindex = a.get("tabindexOrder", 0);
 			const bindex = b.get("tabindexOrder", 0);
 			if (aindex == bindex) {
-				return 0;
+				return order[a.uid] - order[b.uid];
 			}
-			else if (aindex > bindex) {
-				return 1;
-			}
-			else {
-				return -1;
-			}
+			return aindex > bindex ? 1 : -1;
 		});
 
-		$array.each(this._tabindexes, (item, index) => {
-			if (!item.getPrivate("focusElement")) {
-				this._makeFocusElement(index, item);
+		const container = this._focusElementContainer!;
+		let next: ChildNode | null = container.firstChild;
+		$array.each(this._tabindexes, (item) => {
+			let focusElement = item.getPrivate("focusElement");
+			if (!focusElement) {
+				this._makeFocusElement(item);
+				focusElement = item.getPrivate("focusElement")!;
+			}
+			const dom = focusElement.dom;
+			if (dom === next) {
+				next = next.nextSibling;
 			}
 			else {
-				this._moveFocusElement(index, item);
+				container.insertBefore(dom, next);
 			}
 			const group = item.get("focusableGroup");
 			if (group) {
 				this._dirtyGroups[group] = group;
 			}
 		});
-
-		this._updateDirtyGroups();
 	}
 
-	// Whether the element can take focus now: shown, sized and not opted out.
-	// `ariaHidden` opts out too: a hidden element must not take focus
+	// Whether the element can take focus now: shown (with all its parents),
+	// sized and not opted out. `ariaHidden` opts out too: a hidden element must
+	// not take focus
 	public _canFocus(target: Sprite): boolean {
-		return target.get("visible") && target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.get("ariaHidden") && !target.isHidden() && target.getPrivate("focusable") !== false && this._hasFocusSize(target) ? true : false;
+		return target.get("opacity") !== 0 && target.get("role") != "tooltip" && !target.get("ariaHidden") && !target.isHidden() && target.getPrivate("focusable") !== false && this._isVisibleDeep(target) && this._hasFocusSize(target) ? true : false;
 	}
 
 	// Whether the element is a keyboard stop: it can take focus and is in view.
 	// Out of view (e.g. a map object panned away) it is still there for screen
 	// readers, just not a TAB stop. The focused element stays one until left
-	public _canTab(target: Sprite): boolean {
-		return this._canFocus(target) && (this._focusedSprite === target || !target.getPrivate("focusOutOfView"));
+	public _canTab(target: Sprite, canFocus?: boolean): boolean {
+		return (canFocus != null ? canFocus : this._canFocus(target)) && (this._focusedSprite === target || (!target.getPrivate("focusOutOfView") && !target.getPrivate("focusDisabled")));
+	}
+
+	// Visibility of containers, remembered while focus elements are updated
+	// for a frame: many elements share the same parents
+	protected _visibleMemo: { [uid: number]: boolean } | undefined;
+
+	protected _isVisibleDeep(target: Sprite): boolean {
+		const memo = this._visibleMemo;
+		if (!memo) {
+			return target.isVisibleDeep();
+		}
+		if (!target.isVisible()) {
+			return false;
+		}
+		const parent = target.parent;
+		if (!parent) {
+			return true;
+		}
+		let visible = memo[parent.uid];
+		if (visible === undefined) {
+			visible = this._isVisibleDeep(parent);
+			memo[parent.uid] = visible;
+		}
+		return visible;
 	}
 
 	protected _invalidateGroup(group: string | number): void {
@@ -1935,19 +2301,49 @@ export class Root implements IDisposer {
 
 	protected _updateDirtyGroups(): void {
 		const groups = this._dirtyGroups;
+		const keys = Object.keys(groups);
+		if (keys.length == 0) {
+			return;
+		}
 		this._dirtyGroups = {};
-		$object.each(groups, (_key, group) => {
-			this._updateGroup(group);
+
+		// Members of all dirty groups, in one pass
+		const members: { [group: string]: Sprite[] } = {};
+		$array.each(keys, (key) => {
+			members[key] = [];
+		});
+		$array.each(this._tabindexes, (item) => {
+			const group = item.get("focusableGroup");
+			if (group != null) {
+				const list = members[group];
+				if (list && item.getPrivate("focusElement")) {
+					list.push(item);
+				}
+			}
+		});
+
+		$array.each(keys, (key) => {
+			this._updateGroup(groups[key], members[key]);
 		});
 	}
 
 	// Gives a group one TAB stop: the member focused last, or the first one
 	// that can take focus. The rest are reached with arrow keys
-	protected _updateGroup(group: string | number): void {
-		const items = this._tabindexes.filter((item) => item.get("focusableGroup") == group && item.getPrivate("focusElement"));
+	protected _updateGroup(group: string | number, items?: Sprite[]): void {
+		if (!items) {
+			items = this._tabindexes.filter((item) => item.get("focusableGroup") == group && item.getPrivate("focusElement"));
+		}
+
+		const canTab = $array.map(items, (item) => this._canTab(item));
+
 		let stop: Sprite | undefined = this._groupStops[group];
-		if (!stop || items.indexOf(stop) == -1 || !this._canTab(stop)) {
-			stop = $array.find(items, (item) => this._canTab(item));
+		const stopIndex = stop ? items.indexOf(stop) : -1;
+		if (this._groupNoStop[group]) {
+			stop = undefined;
+		}
+		else if (stopIndex == -1 || (stop !== this._focusedSprite && (!canTab[stopIndex] || !this._groupStopKept[group]))) {
+			const index = canTab.indexOf(true);
+			stop = index == -1 ? undefined : items[index];
 		}
 
 		if (stop) {
@@ -1957,13 +2353,10 @@ export class Root implements IDisposer {
 			delete this._groupStops[group];
 		}
 
-		$array.each(items, (item) => {
+		$array.each(items, (item, index) => {
 			const dom = item.getPrivate("focusElement")!.dom;
-			if (this._canTab(item)) {
-				dom.setAttribute("tabindex", item === stop ? "" + this.tabindex : "-1");
-			}
-			else {
-				dom.removeAttribute("tabindex");
+			if (canTab[index] || item !== this._focusedSprite) {
+				setAttr(dom, "tabindex", canTab[index] ? (item === stop ? "" + this.tabindex : "-1") : null);
 			}
 		});
 	}
@@ -1987,7 +2380,8 @@ export class Root implements IDisposer {
 
 		// Decorate with proper accessibility attributes
 		if (!focusElement) {
-			focusElement = target.getPrivate("focusElement")!.dom;
+			const element = target.getPrivate("focusElement");
+			focusElement = element && element.dom;
 		}
 
 		if (!focusElement) {
@@ -1995,157 +2389,122 @@ export class Root implements IDisposer {
 		}
 
 		// An element clicked to switch a state (`toggleKey`), e.g. a pie slice
-		// pulling out. A figure cannot tell its state, so a focusable one that
-		// toggles is a toggle button to assistive technology
+		// pulling out. An image (or figure) cannot tell its state, so a
+		// focusable one that toggles is a toggle button to assistive technology
 		const toggleKey = target.get("toggleKey");
 		const toggles = toggleKey == "active" || toggleKey == "disabled";
 		let role = target.get("role");
-		if (role == "figure" && toggles && target.get("focusable")) {
+		// A focusable element with no role of its own (e.g. a shape made
+		// focusable by hand) is read as an image, the role every screen reader
+		// reads the name of; without one its name isn't allowed or not read
+		if (!role && target.get("focusable")) {
+			role = "img";
+		}
+		if ((role == "img" || role == "figure") && toggles && target.get("focusable")) {
 			role = "button";
 		}
 
-		if (role) {
-			focusElement.setAttribute("role", role);
-		}
-		else {
-			focusElement.removeAttribute("role");
-		}
+		setAttr(focusElement, "role", role || null);
 
 		// Expanded / collapsed wins over pressed for the same toggle
 		const ariaExpanded = target.get("ariaExpanded");
-		if (ariaExpanded != null) {
-			focusElement.setAttribute("aria-expanded", ariaExpanded ? "true" : "false");
-		}
-		else {
-			focusElement.removeAttribute("aria-expanded");
-		}
+		setAttr(focusElement, "aria-expanded", ariaExpanded != null ? (ariaExpanded ? "true" : "false") : null);
 
+		let pressed: string | null = null;
 		if (role == "button" && toggles && ariaExpanded == null) {
-			const pressed = toggleKey == "disabled" ? !target.get("disabled") : !!target.get("active");
-			focusElement.setAttribute("aria-pressed", pressed ? "true" : "false");
+			pressed = (toggleKey == "disabled" ? !target.get("disabled") : !!target.get("active")) ? "true" : "false";
 		}
-		else {
-			focusElement.removeAttribute("aria-pressed");
-		}
+		setAttr(focusElement, "aria-pressed", pressed);
+		setAttr(focusElement, "aria-disabled", target.getPrivate("focusDisabled") ? "true" : null);
 
 		const ariaLabel = target.get("ariaLabel");
-		if (ariaLabel) {
-			const label = populateString(target, ariaLabel);
-			focusElement.setAttribute("aria-label", label);
-		}
-		else {
-			focusElement.removeAttribute("aria-label");
-		}
+		// values being animated are read as they will be, not in between
+		setAttr(focusElement, "aria-label", ariaLabel ? populateString(target, ariaLabel, true) : null);
 
-		const ariaLive = target.get("ariaLive");
-		if (ariaLive) {
-			focusElement.setAttribute("aria-live", ariaLive);
-		}
-		else {
-			focusElement.removeAttribute("aria-live");
-		}
+		setAttr(focusElement, "aria-live", target.get("ariaLive") || null);
 
 		const ariaChecked = target.get("ariaChecked");
-		if (ariaChecked != null && role && ["checkbox", "option", "radio", "menuitemcheckbox", "menuitemradio", "treeitem"].indexOf(role) !== -1) {
-			focusElement.setAttribute("aria-checked", ariaChecked ? "true" : "false");
-		}
-		else {
-			focusElement.removeAttribute("aria-checked");
-		}
+		setAttr(focusElement, "aria-checked", ariaChecked != null && role && ["checkbox", "option", "radio", "menuitemcheckbox", "menuitemradio", "treeitem"].indexOf(role) !== -1 ? (ariaChecked ? "true" : "false") : null);
 
 		const ariaCurrent = target.get("ariaCurrent");
-		if (ariaCurrent != null) {
-			focusElement.setAttribute("aria-current", ariaCurrent);
-		}
-		else {
-			focusElement.removeAttribute("aria-current");
-		}
+		setAttr(focusElement, "aria-current", ariaCurrent != null ? ariaCurrent : null);
 
 		const ariaSelected = target.get("ariaSelected");
-		if (ariaSelected != null && role && ["gridcell", "option", "row", "tab", "columnheader", "rowheader", "treeitem"].indexOf(role) !== -1) {
-			focusElement.setAttribute("aria-selected", ariaSelected ? "true" : "false");
+		setAttr(focusElement, "aria-selected", ariaSelected != null && role && ["gridcell", "option", "row", "tab", "columnheader", "rowheader", "treeitem"].indexOf(role) !== -1 ? (ariaSelected ? "true" : "false") : null);
+
+		setAttr(focusElement, "aria-orientation", target.get("ariaOrientation") || null);
+		setAttr(focusElement, "aria-valuenow", target.get("ariaValueNow") || null);
+		setAttr(focusElement, "aria-valuemin", target.get("ariaValueMin") || null);
+		setAttr(focusElement, "aria-valuemax", target.get("ariaValueMax") || null);
+		setAttr(focusElement, "aria-valuetext", target.get("ariaValueText") || null);
+		setAttr(focusElement, "aria-controls", target.get("ariaControls") || null);
+
+		// A description is text in a hidden element the focus element points to:
+		// screen readers read it after the label, but not on its own
+		const ariaDescription = target.get("ariaDescription");
+		let description = <HTMLElement | null>focusElement.querySelector(".am5-description");
+		if (ariaDescription) {
+			if (!description) {
+				description = document.createElement("div");
+				description.className = "am5-description";
+				description.id = "am5-description-" + target.uid;
+				description.hidden = true;
+				focusElement.appendChild(description);
+			}
+			const text = populateString(target, ariaDescription, true);
+			if (description.textContent !== text) {
+				description.textContent = text;
+			}
+			setAttr(focusElement, "aria-describedby", description.id);
 		}
-		else {
-			focusElement.removeAttribute("aria-selected");
+		else if (description) {
+			focusElement.removeChild(description);
+			setAttr(focusElement, "aria-describedby", null);
 		}
 
-		if (target.get("ariaHidden")) {
-			focusElement.setAttribute("aria-hidden", "true");
-		}
-		else {
-			focusElement.removeAttribute("aria-hidden");
-		}
+		this._updateFocusStatus(target, focusElement);
+	}
 
-		const ariaOrientation = target.get("ariaOrientation");
-		if (ariaOrientation) {
-			focusElement.setAttribute("aria-orientation", ariaOrientation);
-		}
-		else {
-			focusElement.removeAttribute("aria-orientation");
-		}
-
-		const ariaValueNow = target.get("ariaValueNow");
-		if (ariaValueNow) {
-			focusElement.setAttribute("aria-valuenow", ariaValueNow);
-		}
-		else {
-			focusElement.removeAttribute("aria-valuenow");
-		}
-
-		const ariaValueMin = target.get("ariaValueMin");
-		if (ariaValueMin) {
-			focusElement.setAttribute("aria-valuemin", ariaValueMin);
-		}
-		else {
-			focusElement.removeAttribute("aria-valuemin");
-		}
-
-		const ariaValueMax = target.get("ariaValueMax");
-		if (ariaValueMax) {
-			focusElement.setAttribute("aria-valuemax", ariaValueMax);
-		}
-		else {
-			focusElement.removeAttribute("aria-valuemax");
-		}
-
-		const ariaValueText = target.get("ariaValueText");
-		if (ariaValueText) {
-			focusElement.setAttribute("aria-valuetext", ariaValueText);
-		}
-		else {
-			focusElement.removeAttribute("aria-valuetext");
-		}
-
-		const ariaControls = target.get("ariaControls");
-		if (ariaControls) {
-			focusElement.setAttribute("aria-controls", ariaControls);
-		}
-		else {
-			focusElement.removeAttribute("aria-controls");
-		}
-
+	// Whether the element can take focus and is a TAB stop: `tabindex` and
+	// `aria-hidden`. Cheaper than decorating it in full, so it is all that is
+	// done when only its size, position or visibility changed
+	protected _updateFocusStatus(target: Sprite, focusElement: HTMLDivElement): void {
 		const group = target.get("focusableGroup");
-		if (this._canFocus(target)) {
-			if (!this._canTab(target)) {
+		const canFocus = this._canFocus(target);
+		const canTab = this._canTab(target, canFocus);
+		if (canFocus) {
+			if (!canTab) {
 				// Out of view: readable, not a TAB stop
-				focusElement.removeAttribute("tabindex");
+				setAttr(focusElement, "tabindex", null);
 			}
 			else if (group) {
 				// One TAB stop per group: which member it is is decided per group
-				focusElement.setAttribute("tabindex", this._groupStops[group] === target ? "" + this.tabindex : "-1");
+				setAttr(focusElement, "tabindex", this._groupStops[group] === target ? "" + this.tabindex : "-1");
 			}
 			else {
-				focusElement.setAttribute("tabindex", "" + this.tabindex);
+				setAttr(focusElement, "tabindex", "" + this.tabindex);
 			}
-			focusElement.removeAttribute("aria-hidden");
-		}
-		else {
-			focusElement.removeAttribute("tabindex");
-			focusElement.setAttribute("aria-hidden", "true");
-		}
+			setAttr(focusElement, "aria-hidden", null);
 
-		if (group) {
-			// The group's TAB stop may have to move to or away from this member
+			// A group with no TAB stop gets this one, as does a group whose stop
+			// was not chosen and comes after it
+			if (group && canTab && !this._groupNoStop[group]) {
+				const stop = this._groupStops[group];
+				if (!stop || (stop !== target && !this._groupStopKept[group] && this._tabindexRanks[target.uid] < this._tabindexRanks[stop.uid])) {
+					this._invalidateGroup(group);
+				}
+			}
+		}
+		else if (this._focusedSprite !== target) {
+			setAttr(focusElement, "tabindex", null);
+			setAttr(focusElement, "aria-hidden", "true");
+		}
+		// The focused element keeps focus while it can't take it, e.g. a Gantt
+		// task moved off the plot until the axis catches up: without a tabindex
+		// the browser would drop focus to the page
+
+		// The group's TAB stop can no longer take focus: it moves to another member
+		if (group && this._groupStops[group] === target && !canTab) {
 			this._invalidateGroup(group);
 		}
 	}
@@ -2224,22 +2583,21 @@ export class Root implements IDisposer {
 		this._keyboardDragPoint = undefined;
 	}
 
-	// A zero-sized element can't be focused. An unmeasured one (a pie slice, a
-	// map polygon) has no width or height, so its shape is measured instead.
+	// A zero-sized element can't be focused. One with no width or height (an
+	// unmeasured pie slice or map polygon, or a radar column whose percent size
+	// is of a parent with none) is measured by what it draws instead.
 	// The focused element keeps focus even if it loses its size (a polygon
 	// turning to the far side of a globe), until focus moves on
 	public _hasFocusSize(target: Sprite): boolean {
 		if (this._focusedSprite === target || target.height() || target.width()) {
 			return true;
 		}
-		if (!target.get("isMeasured")) {
-			const bounds = target._focusBounds();
-			return bounds.right > bounds.left || bounds.bottom > bounds.top;
-		}
-		return false;
+		const bounds = target._focusBounds();
+		return bounds.right > bounds.left || bounds.bottom > bounds.top;
 	}
 
-	public _makeFocusElement(index: number, target: Sprite): void {
+	// Creates the element's focus element. The caller puts it in the container
+	public _makeFocusElement(target: Sprite): void {
 
 		if (target.getPrivate("focusElement") || this._a11yD == true) {
 			return;
@@ -2260,7 +2618,10 @@ export class Root implements IDisposer {
 			disposers,
 		});
 
+		this._focusElementSprites.set(focusElement, target);
+
 		this._decorateFocusElement(target);
+		delete this._dirtyA11y[target.uid];
 
 		disposers.push($utils.addEventListener(focusElement, "focus", (ev: FocusEvent) => {
 			this._handleFocus(ev);
@@ -2269,9 +2630,6 @@ export class Root implements IDisposer {
 		disposers.push($utils.addEventListener(focusElement, "blur", (ev: FocusEvent) => {
 			this._handleBlur(ev);
 		}));
-
-		this._moveFocusElement(index, target);
-
 	}
 
 	public _removeFocusElement(target: Sprite): void {
@@ -2279,11 +2637,18 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		$array.remove(this._tabindexes, target);
+		this._removeTabindex(target);
+		delete this._dirtyA11y[target.uid];
+		if (target.isDisposed()) {
+			delete this._tabindexRanks[target.uid];
+		}
 		const focusElement = target.getPrivate("focusElement");
 		if (focusElement) {
 			const container = this._focusElementContainer!;
-			container.removeChild(focusElement.dom);
+			if (focusElement.dom.parentNode === container) {
+				container.removeChild(focusElement.dom);
+			}
+			this._focusElementSprites.delete(focusElement.dom);
 			$array.each(focusElement.disposers, (x) => {
 				x.dispose();
 			});
@@ -2307,29 +2672,6 @@ export class Root implements IDisposer {
 
 		const focusElement = target.getPrivate("focusElement")!;
 		focusElement.dom.style.display = "none";
-	}
-
-	protected _moveFocusElement(index: number, target: Sprite): void {
-		if (this._a11yD == true) {
-			return;
-		}
-
-		// Get container
-		const container = this._focusElementContainer!;
-		const focusElement = target.getPrivate("focusElement")!.dom;
-
-		if (focusElement === this._focusElementContainer!.children[index]) {
-			// Nothing to do
-			return;
-		}
-
-		const next = this._focusElementContainer!.children[index + 1];
-		if (next) {
-			container.insertBefore(focusElement, next);
-		}
-		else {
-			container.append(focusElement);
-		}
 	}
 
 	protected _positionFocusElement(target: Sprite): void {
@@ -2367,15 +2709,7 @@ export class Root implements IDisposer {
 	}
 
 	protected _getSpriteByFocusElement(target: any): Sprite | undefined {
-		let found: Sprite | undefined;
-		$array.eachContinue(this._tabindexes, (item, _index) => {
-			if (item.getPrivate("focusElement")!.dom === target) {
-				found = item;
-				return false;
-			}
-			return true;
-		});
-		return found;
+		return target ? this._focusElementSprites.get(target) : undefined;
 	}
 
 	protected _handleFocus(ev: FocusEvent): void {
@@ -2399,9 +2733,11 @@ export class Root implements IDisposer {
 
 		// Size and position
 		this._positionFocusElement(focused);
-		//this._decorateFocusElement(focused);
 
 		this._focusedSprite = focused;
+
+		// The label may use values that changed since it was last filled in
+		this._decorateFocusElement(focused);
 
 		if (focused.events.isEnabled("focus")) {
 			focused.events.dispatch("focus", {
@@ -2416,6 +2752,8 @@ export class Root implements IDisposer {
 		const group = focused.get("focusableGroup");
 		if (group) {
 			this._groupStops[group] = focused;
+			this._groupStopKept[group] = true;
+			delete this._groupNoStop[group];
 			this._updateGroup(group);
 		}
 	}
@@ -2555,27 +2893,84 @@ export class Root implements IDisposer {
 		}
 	}
 
-	public _invalidateAccessibility(target: Sprite): void {
+	/**
+	 * The element's focus element is updated before the next frame: in full, or
+	 * with `statusOnly` only whether it can take focus and is a TAB stop (for a
+	 * change of size, position or visibility).
+	 *
+	 * @ignore
+	 */
+	public _invalidateAccessibility(target: Sprite, statusOnly?: boolean): void {
 		if (this._a11yD == true) {
 			return;
 		}
-		this._focusElementDirty = true;
-		const focusElement = target.getPrivate("focusElement");
 		if (target.get("focusable") && !target.getPrivate("focusExcluded")) {
+			const dirty = this._dirtyA11y[target.uid];
+			if (dirty) {
+				dirty.full = dirty.full || !statusOnly;
+			}
+			else {
+				this._dirtyA11y[target.uid] = { target, full: !statusOnly };
+			}
+			this._focusElementDirty = true;
+		}
+		else if (target.getPrivate("focusElement")) {
+			this._removeFocusElement(target);
+			this._focusElementDirty = true;
+		}
+	}
+
+	/**
+	 * Focusable elements inside `container` are checked again before the next
+	 * frame, as it was shown or hidden.
+	 *
+	 * @ignore
+	 */
+	public _invalidateFocusInside(container: Sprite): void {
+		if (this._a11yD == true) {
+			return;
+		}
+		// Collected for the frame: many containers can change at once (bullets
+		// hidden on zoom), and the focusable elements are walked through once
+		this._dirtyFocusContainers[container.uid] = true;
+		this._focusElementDirty = true;
+	}
+
+	protected _dirtyFocusContainers: { [uid: number]: boolean } = {};
+
+	protected _updateDirtyA11y(): void {
+		const containers = this._dirtyFocusContainers;
+		if (Object.keys(containers).length) {
+			this._dirtyFocusContainers = {};
+			$array.each(this._tabindexes, (item) => {
+				let parent = item.parent;
+				while (parent) {
+					if (containers[parent.uid]) {
+						this._invalidateAccessibility(item, true);
+						break;
+					}
+					parent = parent.parent;
+				}
+			});
+		}
+
+		const dirty = this._dirtyA11y;
+		this._dirtyA11y = {};
+		$object.each(dirty, (_uid, entry) => {
+			const target = entry.target;
+			if (target.isDisposed()) {
+				return;
+			}
+			const focusElement = target.getPrivate("focusElement");
 			if (focusElement) {
-				this._decorateFocusElement(target);
-				if (this._focusedSprite === target) {
-					this._positionFocusElement(target);
+				if (entry.full) {
+					this._decorateFocusElement(target);
+				}
+				else {
+					this._updateFocusStatus(target, focusElement.dom);
 				}
 			}
-			// else {
-			// 	this._renderer._makeFocusElement(0, this);
-			// }
-		}
-		else if (focusElement) {
-			this._removeFocusElement(target);
-		}
-		//this.updateCurrentFocus();
+		});
 	}
 
 	/**
@@ -2586,6 +2981,112 @@ export class Root implements IDisposer {
 	 */
 	public focused(target: Sprite): boolean {
 		return this._focusedSprite === target;
+	}
+
+	/**
+	 * Makes `target` the TAB stop of `group`, if it can take focus. With no
+	 * `target`, the group has no TAB stop until one of its members is focused.
+	 *
+	 * @ignore
+	 */
+	public _setGroupStop(group: string | number, target?: Sprite): void {
+		if (target) {
+			if (this._groupStops[group] === target && !this._groupNoStop[group]) {
+				return;
+			}
+			this._groupStops[group] = target;
+			this._groupStopKept[group] = true;
+			delete this._groupNoStop[group];
+		}
+		else {
+			if (this._groupNoStop[group]) {
+				return;
+			}
+			this._groupNoStop[group] = true;
+		}
+		// now, as a TAB right after the focus that set it must find it
+		this._updateTabindexes();
+		this._updateGroup(group);
+	}
+
+	/**
+	 * Moves keyboard focus to `target` after the next frame, once its focus
+	 * element can take it.
+	 *
+	 * @ignore
+	 */
+	public _focusSprite(target: Sprite): void {
+		this.events.once("frameended", () => {
+			const focusElement = target.getPrivate("focusElement");
+			if (focusElement && !target.isDisposed()) {
+				$utils.focus(focusElement.dom);
+			}
+		});
+	}
+
+	protected _readerContainer: HTMLDivElement | undefined;
+
+	/**
+	 * A container for content only screen readers get, such as data tables:
+	 * hidden from view but not from them. `undefined` with `accessible: false`.
+	 *
+	 * @ignore
+	 */
+	public _getReaderContainer(): HTMLDivElement | undefined {
+		if (this._a11yD == true) {
+			return;
+		}
+		if (!this._readerContainer) {
+			const container = document.createElement("div");
+			container.className = "am5-reader-container";
+			const style = container.style;
+			style.position = "absolute";
+			style.width = "1px";
+			style.height = "1px";
+			style.overflow = "hidden";
+			style.clip = "rect(1px, 1px, 1px, 1px)";
+			style.whiteSpace = "nowrap";
+			$utils.setInteractive(container, false);
+			this._inner.appendChild(container);
+			this._readerContainer = container;
+		}
+		return this._readerContainer;
+	}
+
+	/**
+	 * Moves `point` onto the part of `target` that is in view: inside the root
+	 * and any container above it that masks its content. Left as it is if no
+	 * part of `target` is in view.
+	 *
+	 * @ignore
+	 */
+	public _pointInView(target: Sprite, point: IPoint): IPoint {
+		const bounds = target._focusBounds();
+		let left = Math.max(bounds.left, 0);
+		let top = Math.max(bounds.top, 0);
+		let right = Math.min(bounds.right, this.width());
+		let bottom = Math.min(bounds.bottom, this.height());
+
+		let parent = target.parent;
+		while (parent) {
+			if (parent.get("maskContent") || parent.get("mask")) {
+				const p0 = parent.toGlobal({ x: 0, y: 0 });
+				const p1 = parent.toGlobal({ x: parent.width(), y: parent.height() });
+				left = Math.max(left, Math.min(p0.x, p1.x));
+				top = Math.max(top, Math.min(p0.y, p1.y));
+				right = Math.min(right, Math.max(p0.x, p1.x));
+				bottom = Math.min(bottom, Math.max(p0.y, p1.y));
+			}
+			parent = parent.parent;
+		}
+
+		if (right < left || bottom < top) {
+			return point;
+		}
+		return {
+			x: Math.max(left, Math.min(right, point.x)),
+			y: Math.max(top, Math.min(bottom, point.y))
+		};
 	}
 
 	/**
@@ -2694,10 +3195,11 @@ export class Root implements IDisposer {
 		return false;
 	}
 
+	/**
+	 * @ignore
+	 */
 	public _licenseApplied(): void {
-		if (this._logo) {
-			this._logo.set("forceHidden", true);
-		}
+		// charts with a licence of their own call _brandingLicensed()
 	}
 
 	/**

@@ -238,6 +238,29 @@ resizeButton.events.on("dragged", () => {
 });
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Area chart of a daily value over January and February 2024, drawn red after a handle that can be dragged along the dates. Tab to the days, then move between them with the up and down arrow keys"
+});
+// invisible points on the line: one Tab stop, the up and down arrow keys step through them
+series.bullets.push(() => {
+  return am5.Bullet.new(root, {
+    sprite: am5.Circle.new(root, {
+      radius: 5,
+      fillOpacity: 0, // not painted: the line looks as before
+      strokeOpacity: 0,
+      focusable: true,
+      focusableGroup: "days",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+    })
+  });
+});
+// the handle is focusable already, and the left and right arrow keys drag it
+resizeButton.set("ariaLabel", "Handle where the line turns red. Use left and right arrows to move it");
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

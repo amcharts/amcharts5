@@ -82,6 +82,21 @@ series.data.setAll([{
 series.set("selectedDataItem", series.dataItems[0]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Tree chart of a company, Acme, and its departments, Product, Sales and Support, down to their teams. Tab to the nodes, move between them with the up and down arrow keys, and press Enter to fold or open a branch"
+});
+// the nodes: one Tab stop, the up and down arrow keys step through them
+series.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  hoverOnFocus: true, // the focused node shows its tooltip
+  ariaLabel: "{category}: {sum}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

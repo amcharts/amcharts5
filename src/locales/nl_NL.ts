@@ -180,15 +180,20 @@ export default {
 	"Chord diagram": "Chord-diagram",
 	"Flow diagram": "Flow-diagram",
 	"TreeMap chart": "Treemap-grafiek",
+	"Force directed tree": "Krachtgestuurde boom",
+	"Sliced chart": "Segmentgrafiek",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
 	"Series": "Reeks",
 	"Candlestick Series": "Candlestick-reeks",
+	"OHLC Series": "OHLC-reeks",
 	"Column Series": "Kolomreeks",
 	"Line Series": "Lijnreeks",
 	"Pie Slice Series": "Taartpuntreeks",
+	"Funnel Series": "Trechterreeks",
+	"Pyramid Series": "Piramidereeks",
 	"X/Y Series": "XY reeks",
 
 	// Map-related stuff.
@@ -212,6 +217,7 @@ export default {
 	"Image": "Afbeelding",
 	"Data": "Data",
 	"Print": "Printen",
+	"Press ENTER or use arrow keys to navigate": "Druk op Enter of gebruik de pijltjestoetsen om te navigeren",
 	"Press ENTER to open": "Klik, tik of druk op Enter om te openen",
 	"Press ENTER to print.": "Klik, tik of druk op Enter om te printen",
 	"Press ENTER to export as %1.": "Klik, tik of druk op Enter om te exporteren als %1",
@@ -251,6 +257,25 @@ export default {
 	"From %1": "Van %1",
 	"To %1": "Tot %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Waarden: %1",
+	"Highest: %1": "Hoogste: %1",
+	"Lowest: %1": "Laagste: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Categorie",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Resultaten: %1",
+	"No results": "Geen resultaten",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Tint",
+	"Opacity": "Dekking",
+	"Color": "Kleur",
+
 	// Data loader-related.
 	"No parser available for file: %1": "Geen data-parser beschikbaar voor dit bestand: %1",
 	"Error parsing file: %1": "Fout tijdens parsen van bestand: %1",
@@ -258,9 +283,9 @@ export default {
 	"Invalid date": "Ongeldige datum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Sluiten",
+	"Minimize": "Minimaliseren",
+	"Confirm": "Bevestigen",
 	"OK": "OK",
 	"Cancel": "Annuleren",
 	"Delete": "Verwijderen",

@@ -136,7 +136,16 @@ export class DefaultTheme extends Theme {
 		r("Chart").setAll({
 			width: p100,
 			height: p100,
-			interactiveChildren: false
+			interactiveChildren: false,
+			// read as one image when focusable, named by `ariaLabel`: the role
+			// every screen reader reads the name of
+			role: "img"
+		});
+
+		// A series is the chart itself when added straight to the root (flow,
+		// hierarchy, word cloud, Venn): read as one image too when focusable
+		r("Series").setAll({
+			role: "img"
 		});
 
 		r("ZoomableContainer").setAll({
@@ -683,7 +692,8 @@ export class DefaultTheme extends Theme {
 			layout: horizontalLayout,
 			interactiveChildren: false,
 			setStateOnChildren: true,
-			focusable: true
+			focusable: true,
+			role: "button"
 		});
 
 		r("Button").states.create("hover", {});
@@ -947,7 +957,8 @@ export class DefaultTheme extends Theme {
 		});
 
 		r("Button", ["resize", "horizontal"]).setAll({
-			cursorOverStyle: "ew-resize"
+			cursorOverStyle: "ew-resize",
+			ariaLabel: language.translate("Use left and right arrows to move selection")
 		});
 
 

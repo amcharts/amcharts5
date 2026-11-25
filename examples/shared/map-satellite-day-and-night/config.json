@@ -1,6 +1,8 @@
 {
   "type": "MapChart",
   "settings": {
+    "focusable": true,
+    "ariaLabel": "World map from satellite images, showing the Earth by day where the sun is up right now and city lights at night where it is down",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,

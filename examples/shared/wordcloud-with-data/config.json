@@ -3,7 +3,9 @@
   "settings": {
     "width": { "type": "Percent", "value": 100 },
     "height": { "type": "Percent", "value": 100 },
-    "layout": { "type": "VerticalLayout" }
+    "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Word cloud of 38 programming languages from the Stack Overflow survey of 2021, each sized and colored by the share of developers who use it. Tab to the words, then move between them with the up and down arrow keys"
   },
   "children": [
     {
@@ -68,7 +70,10 @@
           "paddingBottom": 5,
           "paddingLeft": 5,
           "paddingRight": 5,
-          "fontFamily": "Courier New"
+          "fontFamily": "Courier New",
+          "focusable": true,
+          "focusableGroup": "words",
+          "ariaLabel": "{category}: {value}%"
         }
       }
     },

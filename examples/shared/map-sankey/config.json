@@ -3,6 +3,8 @@
   "settings": {
     "panX": "translateX",
     "panY": "translateY",
+    "focusable": true,
+    "ariaLabel": "World map of coffee exports from Brazil, Colombia, Ethiopia, Vietnam and Indonesia to the United States, Germany, Italy and Japan, in thousands of tonnes, drawn as flows as wide as their value. Tab to the flows or the countries, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -47,10 +49,7 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
-                  "fillOpacity": 0.15
-                }
+                "settings": { "fill": "@root.interfaceColors.get('alternativeBackground')", "fillOpacity": 0.15 }
               }
             }
           }
@@ -66,7 +65,14 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": { "fillOpacity": 0.6, "tooltipText": "{source} > {target}: {value}" }
+                "settings": {
+                  "fillOpacity": 0.6,
+                  "tooltipText": "{source} > {target}: {value}",
+                  "focusable": true,
+                  "focusableGroup": "flows",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{source} to {target}: {value} thousand tonnes"
+                }
               }
             }
           },
@@ -75,7 +81,13 @@
               "mapPolygons": {
                 "properties": {
                   "template": {
-                    "settings": { "tooltipText": "{name}: {sum}" }
+                    "settings": {
+                      "tooltipText": "{name}: {sum}",
+                      "focusable": true,
+                      "focusableGroup": "countries",
+                      "hoverOnFocus": true,
+                      "ariaLabel": "{name}: {sum} thousand tonnes in and out"
+                    }
                   }
                 }
               }

@@ -62,6 +62,14 @@ chart.children.push(am5.Label.new(root, {
 }));
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the globe, and a screen reader names it
+  ariaLabel: "Globe covered with a satellite image of the Earth, turning slowly, with the country borders on top"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

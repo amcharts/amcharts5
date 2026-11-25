@@ -6,6 +6,8 @@
     "wheelX": "panX",
     "wheelY": "zoomX",
     "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Stacked column chart of six regions over 2021, 2022 and 2023. Tab to a region's columns, then move between its years with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -23,7 +25,14 @@
         "x": { "type": "Percent", "value": 50 }
       },
       "properties": {
-        "data": ["#series-0", "#series-1", "#series-2", "#series-3", "#series-4", "#series-5"]
+        "data": ["#series-0", "#series-1", "#series-2", "#series-3", "#series-4", "#series-5"],
+        "itemContainers": {
+          "properties": {
+            "template": {
+              "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+            }
+          }
+        }
       }
     }
   ],
@@ -98,7 +107,11 @@
               "template": {
                 "settings": {
                   "tooltipText": "{name}, {categoryX}: {valueY}",
-                  "tooltipY": { "type": "Percent", "value": 10 }
+                  "tooltipY": { "type": "Percent", "value": 10 },
+                  "focusable": true,
+                  "focusableGroup": "Europe",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}, {categoryX}: {valueY}"
                 }
               }
             }
@@ -111,7 +124,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueY}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -143,7 +156,11 @@
               "template": {
                 "settings": {
                   "tooltipText": "{name}, {categoryX}: {valueY}",
-                  "tooltipY": { "type": "Percent", "value": 10 }
+                  "tooltipY": { "type": "Percent", "value": 10 },
+                  "focusable": true,
+                  "focusableGroup": "North America",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}, {categoryX}: {valueY}"
                 }
               }
             }
@@ -156,7 +173,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueY}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -188,7 +205,11 @@
               "template": {
                 "settings": {
                   "tooltipText": "{name}, {categoryX}: {valueY}",
-                  "tooltipY": { "type": "Percent", "value": 10 }
+                  "tooltipY": { "type": "Percent", "value": 10 },
+                  "focusable": true,
+                  "focusableGroup": "Asia",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}, {categoryX}: {valueY}"
                 }
               }
             }
@@ -201,7 +222,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueY}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -233,7 +254,11 @@
               "template": {
                 "settings": {
                   "tooltipText": "{name}, {categoryX}: {valueY}",
-                  "tooltipY": { "type": "Percent", "value": 10 }
+                  "tooltipY": { "type": "Percent", "value": 10 },
+                  "focusable": true,
+                  "focusableGroup": "Latin America",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}, {categoryX}: {valueY}"
                 }
               }
             }
@@ -246,7 +271,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueY}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -278,7 +303,11 @@
               "template": {
                 "settings": {
                   "tooltipText": "{name}, {categoryX}: {valueY}",
-                  "tooltipY": { "type": "Percent", "value": 10 }
+                  "tooltipY": { "type": "Percent", "value": 10 },
+                  "focusable": true,
+                  "focusableGroup": "Middle East",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}, {categoryX}: {valueY}"
                 }
               }
             }
@@ -291,7 +320,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueY}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -323,7 +352,11 @@
               "template": {
                 "settings": {
                   "tooltipText": "{name}, {categoryX}: {valueY}",
-                  "tooltipY": { "type": "Percent", "value": 10 }
+                  "tooltipY": { "type": "Percent", "value": 10 },
+                  "focusable": true,
+                  "focusableGroup": "Africa",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}, {categoryX}: {valueY}"
                 }
               }
             }
@@ -336,7 +369,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueY}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true

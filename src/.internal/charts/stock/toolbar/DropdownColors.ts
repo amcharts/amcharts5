@@ -55,7 +55,6 @@ export class DropdownColors extends Dropdown {
 
 	protected _afterNew() {
 		super._afterNew();
-		this._setupKeyboardNav();
 		this._root.addDisposer(this);
 	}
 
@@ -76,6 +75,7 @@ export class DropdownColors extends Dropdown {
 
 	protected _initItems(): void {
 		const list = this.getPrivate("list")!;
+		const focused = document.activeElement && $utils.contains(list, document.activeElement);
 		list.innerHTML = "";
 
 		let cs = this.get("colors");
@@ -88,6 +88,9 @@ export class DropdownColors extends Dropdown {
 		});
 		this._initOpacity();
 		this._maybeMakeAccessible();
+		if (focused) {
+			this._focusFirst();
+		}
 	}
 
 	public _beforeChanged() {
@@ -117,6 +120,9 @@ export class DropdownColors extends Dropdown {
 		const list = this.getPrivate("list")!;
 		const item = document.createElement("li");
 		item.className = "am5stock-control-color";
+		item.setAttribute("role", "menuitemradio");
+		item.setAttribute("aria-checked", currentColor == color.hex ? "true" : "false");
+		item.setAttribute("aria-label", this.root.language.translateAny("Selection") + " #" + (list.getElementsByClassName("am5stock-control-color").length + 1));
 		if (currentColor == color.hex) {
 			item.className += " am5stock-control-active";
 		}
@@ -139,6 +145,7 @@ export class DropdownColors extends Dropdown {
 			const currentOpacity = this.getPrivate("opacity", 1);
 			const list = this.getPrivate("list")!;
 			const hr = document.createElement("hr");
+			hr.setAttribute("role", "separator");
 			list.appendChild(hr);
 
 			for (let opacity = 100; opacity >= 0; opacity -= 25) {
@@ -146,6 +153,8 @@ export class DropdownColors extends Dropdown {
 				const item = document.createElement("li");
 				item.innerHTML = opacity + "%";
 				item.className = "am5stock-control-opacity am5stock-control-opacity-" + opacity;
+				item.setAttribute("role", "menuitemradio");
+				item.setAttribute("aria-checked", currentOpacity * 100 == opacity ? "true" : "false");
 				if (currentOpacity * 100 == opacity) {
 					item.className += " am5stock-control-active";
 				}
@@ -165,54 +174,52 @@ export class DropdownColors extends Dropdown {
 		}
 	}
 
-	protected _setupKeyboardNav(): void {
-		if ($utils.supports("keyboardevents")) {
-			const button = this.get("control").getPrivate("button")!;
-			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-				if (this.isAccessible()) {
-					if (document.activeElement && (document.activeElement === button || $utils.contains(button, document.activeElement))) {
-						if (ev.keyCode == 13) {
-							// ENTER
-							if (document.activeElement !== button) {
-								(document.activeElement as HTMLElement).click();
-							}
-						}
-						else if ([37, 38, 39, 40].indexOf(ev.keyCode) !== -1) {
-							const dir = ev.keyCode == 37 || ev.keyCode == 38 ? -1 : 1;
-							const items = this._getActiveItems();
-							const selected = button.querySelectorAll(".am5stock-control-color:focus, .am5stock-control-opacity:focus");
-							let index: number = -1;
-							if (selected.length > 0) {
-								items.forEach((item, key) => {
-									if (item === selected.item(0)) {
-										index = key;
-									}
-								});
-							}
-							index += dir;
-							if (index < 0) {
-								index = items.length - 1;
-							}
-							else if (index >= items.length) {
-								index = 0;
-							}
-							$utils.focus(items.item(index) as HTMLElement);
-						}
-					}
-				}
-			}));
+	/**
+	 * @ignore
+	 */
+	public _ariaRole(): "menu" | "dialog" {
+		return "menu";
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _ariaElement(): HTMLElement | undefined {
+		return this.getPrivate("list");
+	}
+
+	protected _getNavItems(): HTMLElement[] {
+		const items: HTMLElement[] = [];
+		this._getActiveItems().forEach((item) => {
+			items.push(item as HTMLElement);
+		});
+		return items;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _focusFirst(): void {
+		const items = this._getNavItems();
+		let first = items[0];
+		$array.each(items, (item) => {
+			if (item.getAttribute("aria-checked") == "true" && item.className.indexOf("am5stock-control-color") != -1) {
+				first = item;
+			}
+		});
+		if (first) {
+			$utils.focus(first);
 		}
 	}
 
-	protected _maybeMakeAccessible(): void {
+	/**
+	 * @ignore
+	 */
+	public _maybeMakeAccessible(): void {
 		super._maybeMakeAccessible();
-		if (this.isAccessible()) {
-			//const tabindex = this._root.tabindex.toString();
-			//const list = this.getPrivate("list")!;
-			const items = this._getActiveItems();
-			items.forEach((item, key) => {
+		if (this.isAccessible() && this.getPrivate("list")) {
+			this._getActiveItems().forEach((item) => {
 				(item as HTMLElement).setAttribute("tabindex", "-1");
-				(item as HTMLElement).setAttribute("aria-label", this.root.language.translateAny("Selection") + " #" + (key + 1));
 			});
 		}
 	}

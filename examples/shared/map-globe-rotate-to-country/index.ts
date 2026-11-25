@@ -70,6 +70,21 @@ polygonSeries.mapPolygons.template.states.create("active", {
 });
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the globe, and a screen reader names it
+  ariaLabel: "Globe of the world's countries. Tab to the countries, move between them with the up and down arrow keys, and press Enter to turn the globe to one and zoom in, or back out"
+});
+// the countries: one Tab stop, the up and down arrow keys step through them
+polygonSeries.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "countries",
+  hoverOnFocus: true, // the focused country shows its tooltip
+  ariaLabel: "{name}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

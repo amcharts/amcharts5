@@ -114,6 +114,22 @@ series.data.setAll([data]);
 series.set("selectedDataItem", series.dataItems[0]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Voronoi treemap of the world's population: six continents and their countries, each area sized by its people. Tab to the areas, move between them with the up and down arrow keys, and press Enter to zoom into a continent"
+});
+// the continents and countries: one Tab stop, the up and down arrow keys step through them
+series.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  ariaLabel: "{category}: {sum} people"
+});
+// the root around everything isn't drawn, so it isn't focused either
+series.dataItems[0].get("node").set("focusable", false);
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

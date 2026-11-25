@@ -117,12 +117,12 @@ export default {
 	"_era_ad": "AD",
 	"_era_bc": "BC",
 
-	"A": "",
-	"P": "",
-	"AM": "",
-	"PM": "",
-	"A.M.": "",
-	"P.M.": "",
+	"A": "пр",
+	"P": "сл",
+	"AM": "пр.об.",
+	"PM": "сл.об.",
+	"A.M.": "преди обяд",
+	"P.M.": "след обяд",
 
 	// Months -- from intl "long" and "short"
 	"January": "януари",
@@ -141,6 +141,7 @@ export default {
 	"Feb": "февруари",
 	"Mar": "март",
 	"Apr": "април",
+	"May(short)": "май",
 	"May (short)": "май",
 	"Jun": "юни",
 	"Jul": "юли",
@@ -160,6 +161,7 @@ export default {
 	"Saturday": "събота",
 	"Sun": "нд",
 	"Mon": "пн",
+	"Tue": "вт",
 	"Tues": "вт",
 	"Wed": "ср",
 	"Thu": "чт",
@@ -198,57 +200,57 @@ export default {
 	"Zoom Out": "Отдалечаване",
 
 	// Timeline buttons
-	"Play": "",
-	"Stop": "",
+	"Play": "Пусни",
+	"Stop": "Спри",
 
 	// Chart's Legend screen reader title.
-	"Legend": "",
+	"Legend": "Легенда",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Натиснете ENTER за превключване",
 
 	// Shown when the chart is busy loading something.
-	"Loading": "",
+	"Loading": "Зареждане",
 
 	// Shown as the first button in the breadcrumb navigation, e.g.:
 	// Home > First level > ...
-	"Home": "",
+	"Home": "Начало",
 
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Force directed tree": "",
-	"Sliced chart": "",
+	"Chart": "Диаграма",
+	"Serial chart": "Серийна диаграма",
+	"X/Y chart": "Диаграма X/Y",
+	"Pie chart": "Кръгова диаграма",
+	"Gauge chart": "Диаграма-скала",
+	"Radar chart": "Радарна диаграма",
+	"Sankey diagram": "Диаграма на Санки",
+	"Flow diagram": "Диаграма на потоци",
+	"Chord diagram": "Хордова диаграма",
+	"TreeMap chart": "Дървовидна карта",
+	"Force directed tree": "Силово насочено дърво",
+	"Sliced chart": "Секторна диаграма",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Серия",
+	"Candlestick Series": "Серия свещи",
+	"OHLC Series": "Серия OHLC",
+	"Column Series": "Серия колони",
+	"Line Series": "Линейна серия",
+	"Pie Slice Series": "Серия сектори",
+	"Funnel Series": "Серия фуния",
+	"Pyramid Series": "Серия пирамида",
+	"X/Y Series": "Серия X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Карта",
+	"Press ENTER to zoom in": "Натиснете ENTER за увеличаване",
+	"Press ENTER to zoom out": "Натиснете ENTER за отдалечаване",
+	"Use arrow keys to zoom in and out": "Използвайте стрелките за увеличаване и отдалечаване",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Използвайте клавишите плюс и минус на клавиатурата за увеличаване и отдалечаване",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -260,18 +262,18 @@ export default {
 	// 
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "",
-	"Image": "",
-	"Data": "",
-	"Print": "",
-	"Press ENTER or use arrow keys to navigate": "",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Export": "Експорт",
+	"Image": "Изображение",
+	"Data": "Данни",
+	"Print": "Печат",
+	"Press ENTER or use arrow keys to navigate": "Натиснете ENTER или използвайте стрелките за навигация",
+	"Press ENTER to open": "Натиснете ENTER за отваряне",
+	"Press ENTER to print.": "Натиснете ENTER за печат.",
+	"Press ENTER to export as %1.": "Натиснете ENTER за експорт като %1.",
+	"(Press ESC to close this message)": "(Натиснете ESC, за да затворите това съобщение)",
+	"Image Export Complete": "Експортът на изображението завърши",
+	"Export operation took longer than expected. Something might have gone wrong.": "Експортът отне повече време от очакваното. Може би нещо се е объркало.",
+	"Saved from": "Запазено от",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -292,28 +294,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	// 
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Използвайте TAB, за да изберете плъзгачите, или стрелките наляво и надясно, за да промените селекцията",
+	"Use left and right arrows to move selection": "Използвайте стрелките наляво и надясно, за да преместите селекцията",
+	"Use left and right arrows to move left selection": "Използвайте стрелките наляво и надясно, за да преместите лявата граница на селекцията",
+	"Use left and right arrows to move right selection": "Използвайте стрелките наляво и надясно, за да преместите дясната граница на селекцията",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Използвайте TAB, за да изберете плъзгачите, или стрелките нагоре и надолу, за да промените селекцията",
+	"Use up and down arrows to move selection": "Използвайте стрелките нагоре и надолу, за да преместите селекцията",
+	"Use up and down arrows to move lower selection": "Използвайте стрелките нагоре и надолу, за да преместите долната граница на селекцията",
+	"Use up and down arrows to move upper selection": "Използвайте стрелките нагоре и надолу, за да преместите горната граница на селекцията",
 	"From %1 to %2": "От %1 до %2",
 	"From %1": "От %1",
 	"To %1": "До %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Стойности: %1",
+	"Highest: %1": "Най-висока: %1",
+	"Lowest: %1": "Най-ниска: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Категория",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Резултати: %1",
+	"No results": "Няма резултати",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Нюанс",
+	"Opacity": "Непрозрачност",
+	"Color": "Цвят",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Няма наличен анализатор за файла: %1",
+	"Error parsing file: %1": "Грешка при анализа на файла: %1",
+	"Unable to load file: %1": "Файлът не може да бъде зареден: %1",
+	"Invalid date": "Невалидна дата",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Затваряне",
+	"Minimize": "Минимизиране",
+	"Confirm": "Потвърждаване",
 	"OK": "ОК",
 	"Cancel": "Отказ",
 	"Delete": "Изтриване",

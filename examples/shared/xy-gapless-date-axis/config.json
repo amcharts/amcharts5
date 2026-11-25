@@ -18,6 +18,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Line chart of a daily value over 40 weekdays in January and February 2024, the weekends left out of the axis. Tab to the line, then move along it with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -123,7 +125,27 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "points",
+                    "ariaLabel": "{valueX.formatDate('EEEE, MMMM d, yyyy')}: {valueY}"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     }
   ]

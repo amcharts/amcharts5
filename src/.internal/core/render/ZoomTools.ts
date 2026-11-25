@@ -101,23 +101,12 @@ export class ZoomTools extends Container {
 			if (target) {
 				if (target instanceof ZoomableContainer) {
 					this._targetDisposer = this.addDisposer(target.contents.on("scale", (scale) => {
-						if (scale == target.get("minZoomLevel")) {
-							this.minusButton._setC("disabled", true)
-						}
-						else {
-							this.minusButton._setC("disabled", false)
-						}
-
-						if (scale == target.get("maxZoomLevel")) {
-							this.plusButton._setC("disabled", true)
-						}
-						else {
-							this.plusButton._setC("disabled", false)
-						}
+						this._setDisabled(this.minusButton, scale == target.get("minZoomLevel"));
+						this._setDisabled(this.plusButton, scale == target.get("maxZoomLevel"));
 					}))
 					this.root.events.once("frameended", () => {
 						if (target.contents.get("scale", 1) == target.get("minZoomLevel")) {
-							this.minusButton._setC("disabled", true)
+							this._setDisabled(this.minusButton, true);
 						}
 					})
 				}
@@ -134,5 +123,11 @@ export class ZoomTools extends Container {
 					})])
 			}
 		}
+	}
+
+	// At the zoom limit: greyed out, and not a TAB stop for keyboard users
+	protected _setDisabled(button: Button, disabled: boolean): void {
+		button._setC("disabled", disabled);
+		button.setPrivate("focusDisabled", disabled);
 	}
 }

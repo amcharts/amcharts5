@@ -10,9 +10,10 @@ import { TextFormatter } from "./TextFormatter";
  *
  * @param target Target Sprite
  * @param string Target text
+ * @param final Use the values animations are going to, not the current ones
  * @returns Populated text
  */
-export function populateString(target: Sprite, string: string): string {
+export function populateString(target: Sprite, string: string, final?: boolean): string {
 	if (string != null) {
 		string = "" + string;
 		string = TextFormatter.escape(string);
@@ -21,7 +22,7 @@ export function populateString(target: Sprite, string: string): string {
 		if (tags) {
 			for (i = 0; i < tags.length; i++) {
 				let tag = tags[i].replace(/\{([^}]+)\}/, "$1");
-				let value = getTagValue(target, tag, "");
+				let value = getTagValue(target, tag, "", final);
 
 				if (value == null) {
 					value = "";
@@ -49,7 +50,7 @@ export function populateString(target: Sprite, string: string): string {
  * @param format Format for the value
  * @returns Value
  */
-export function getTagValue(target: Sprite, tagName: string, format?: string): string {
+export function getTagValue(target: Sprite, tagName: string, format?: string, final?: boolean): string {
 	let value: any;
 	const dataItem = target.dataItem;
 
@@ -124,7 +125,8 @@ export function getTagValue(target: Sprite, tagName: string, format?: string): s
 
 
 		// Check values
-		value = getTagValueFromObject(target, parts, dataItem._settings);
+		// `final`: values being animated as they will be (screen readers)
+		value = getTagValueFromObject(target, parts, final ? dataItem._finalSettings() : dataItem._settings);
 
 		// Check properties
 		if (value == null || $type.isObject(value)) { // isObject helps to solve problem with date axis, as for example dateX will get dateX from values object and won't get to the dateX date.

@@ -210,6 +210,21 @@ export abstract class Component extends Container {
 	 */
 	public _groupDroppedRows: number = 0;
 
+	/**
+	 * Changes to the rows other than one added at the end, taken off the start
+	 * or given new values.
+	 *
+	 * @ignore
+	 */
+	public _rowsRewritten: number = 0;
+
+	/**
+	 * Rows taken off the start of the data.
+	 *
+	 * @ignore
+	 */
+	public _rowsDropped: number = 0;
+
 	// An _afterDataChange call waits for the data's setAll() to finish
 	protected _afterDataChangeQueued: boolean = false;
 
@@ -331,6 +346,13 @@ export abstract class Component extends Container {
 				this._groupDroppedRows++;
 			}
 
+			if (atStart) {
+				this._rowsDropped++;
+			}
+			else if (change.type !== "push" && change.type !== "setIndex") {
+				this._rowsRewritten++;
+			}
+
 			this._queueAfterDataChange(data);
 		};
 		this._disposers.push(data.events.onAll(onChange));
@@ -445,6 +467,11 @@ export abstract class Component extends Container {
 			const dataItem = this.dataItems[i];
 			$array.remove(this.dataItems, dataItem);
 			dataItem.dispose();
+		}
+
+		// the rows leave the data too, so it keeps matching the data items
+		if (this._dataItems === this._mainDataItems && this.data.length > ii + 1) {
+			this.data.values.length = ii + 1;
 		}
 
 		this._postUpdateData();

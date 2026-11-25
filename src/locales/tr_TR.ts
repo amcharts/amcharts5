@@ -304,7 +304,7 @@ export default {
 	"Legend": "Gösterge",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Değiştirmek için ENTER'a basın",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Yükleniyor",
@@ -316,37 +316,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Grafik",
+	"Serial chart": "Seri grafik",
+	"X/Y chart": "X/Y grafiği",
+	"Pie chart": "Pasta grafik",
+	"Gauge chart": "Gösterge grafiği",
+	"Radar chart": "Radar grafiği",
+	"Sankey diagram": "Sankey diyagramı",
+	"Flow diagram": "Akış diyagramı",
+	"Chord diagram": "Kiriş diyagramı",
+	"TreeMap chart": "Ağaç haritası grafiği",
+	"Force directed tree": "Kuvvet yönlendirmeli ağaç",
+	"Sliced chart": "Dilimli grafik",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Seri",
+	"Candlestick Series": "Mum serisi",
+	"OHLC Series": "OHLC serisi",
+	"Column Series": "Sütun serisi",
+	"Line Series": "Çizgi serisi",
+	"Pie Slice Series": "Pasta dilimi serisi",
+	"Funnel Series": "Huni serisi",
+	"Pyramid Series": "Piramit serisi",
+	"X/Y Series": "X/Y serisi",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Harita",
+	"Press ENTER to zoom in": "Yakınlaştırmak için ENTER'a basın",
+	"Press ENTER to zoom out": "Uzaklaştırmak için ENTER'a basın",
+	"Use arrow keys to zoom in and out": "Yakınlaştırmak ve uzaklaştırmak için ok tuşlarını kullanın",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Yakınlaştırmak ve uzaklaştırmak için klavyedeki artı ve eksi tuşlarını kullanın",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -358,17 +359,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Yazdır",
+	"Export": "Dışa aktar",
 	"Image": "Görüntü",
 	"Data": "Veri",
 	"Print": "Yazdır",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Gezinmek için ENTER'a basın veya ok tuşlarını kullanın",
+	"Press ENTER to open": "Açmak için ENTER'a basın",
+	"Press ENTER to print.": "Yazdırmak için ENTER'a basın.",
+	"Press ENTER to export as %1.": "%1 olarak dışa aktarmak için ENTER'a basın.",
+	"(Press ESC to close this message)": "(Bu mesajı kapatmak için ESC'ye basın)",
+	"Image Export Complete": "Görüntü dışa aktarıldı",
+	"Export operation took longer than expected. Something might have gone wrong.": "Dışa aktarma beklenenden uzun sürdü. Bir sorun oluşmuş olabilir.",
+	"Saved from": "Kaydedildiği yer",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -389,28 +391,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Tutamaçları seçmek için TAB'ı, seçimi değiştirmek için sol ve sağ okları kullanın",
+	"Use left and right arrows to move selection": "Seçimi taşımak için sol ve sağ okları kullanın",
+	"Use left and right arrows to move left selection": "Seçimin sol kenarını taşımak için sol ve sağ okları kullanın",
+	"Use left and right arrows to move right selection": "Seçimin sağ kenarını taşımak için sol ve sağ okları kullanın",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Tutamaçları seçmek için TAB'ı, seçimi değiştirmek için yukarı ve aşağı okları kullanın",
+	"Use up and down arrows to move selection": "Seçimi taşımak için yukarı ve aşağı okları kullanın",
+	"Use up and down arrows to move lower selection": "Seçimin alt kenarını taşımak için yukarı ve aşağı okları kullanın",
+	"Use up and down arrows to move upper selection": "Seçimin üst kenarını taşımak için yukarı ve aşağı okları kullanın",
 	"From %1 to %2": "Kaynak %1 hedef %2",
 	"From %1": "Kaynak %1",
 	"To %1": "Hedef %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Değerler: %1",
+	"Highest: %1": "En yüksek: %1",
+	"Lowest: %1": "En düşük: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategori",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Sonuçlar: %1",
+	"No results": "Sonuç yok",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Ton",
+	"Opacity": "Opaklık",
+	"Color": "Renk",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Dosya için ayrıştırıcı yok: %1",
+	"Error parsing file: %1": "Dosya ayrıştırılamadı: %1",
+	"Unable to load file: %1": "Dosya yüklenemedi: %1",
+	"Invalid date": "Geçersiz tarih",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Kapat",
+	"Minimize": "Küçült",
+	"Confirm": "Onayla",
 	"OK": "Tamam",
 	"Cancel": "İptal",
 	"Delete": "Sil",

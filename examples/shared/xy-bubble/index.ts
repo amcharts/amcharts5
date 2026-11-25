@@ -93,7 +93,11 @@ series.bullets.push(() => {
     sprite: am5.Circle.new(root, {
       radius: 5,        // a starting size: the heat rule sets each bubble's radius
       fillOpacity: 0.8, // a little see-through, so overlapping bubbles show
-      templateField: "bulletSettings"
+      templateField: "bulletSettings",
+      // keyboard: one Tab stop for all the bubbles, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "bubbles",
+      ariaLabel: "{country}: life expectancy {valueY.formatNumber('#.0')} years, GDP per capita {valueX.formatNumber('#,###.')} USD, population {value.formatNumber('#,###.')}"
     }, circleTemplate)
   });
 });
@@ -183,6 +187,15 @@ series.data.setAll([
   { country: "United States", gdp: 42296, lifeExpectancy: 78.8, population: 315791284, bulletSettings: { fill: "#a7a737" } },
   { country: "Vietnam", gdp: 3074, lifeExpectancy: 75.8, population: 89730274, bulletSettings: { fill: "#eea638" } }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Bubble chart of 40 countries: GDP per capita across, life expectancy up, population as the bubble's size. Tab to the bubbles, then move between them with the up and down arrow keys"
+});
+// the bubbles: set up in their bullet function above
 
 
 // Make stuff animate on load

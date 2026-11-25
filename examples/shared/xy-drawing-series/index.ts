@@ -117,7 +117,11 @@ drawingSeries.bullets.push(() => {
   return am5.Bullet.new(root, {
     sprite: am5.Circle.new(root, {
       radius: 5,
-      fill: drawingSeries.get("fill") // the color of the drawn line
+      fill: drawingSeries.get("fill"), // the color of the drawn line
+      // keyboard: one Tab stop for the drawn points, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "drawing",
+      ariaLabel: "Drawn point, {valueX.formatDate('MMMM d, yyyy')}: {valueY.formatNumber('#.')}"
     })
   });
 });
@@ -220,6 +224,28 @@ chart.plotContainer.children.push(am5.Label.new(root, {
   centerY: am5.p100,  // ...by its own bottom edge, so it sits just inside
   text: "Click the plot area to add a point; drag a point to move it"
 }));
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart of a daily value over 40 days from January 1, 2024, with a second line drawn by clicking the plot. Tab to the days or the drawn points, then move between them with the up and down arrow keys"
+});
+// invisible points on the data line: one Tab stop, the up and down arrow keys step through them
+series.bullets.push(() => {
+  return am5.Bullet.new(root, {
+    sprite: am5.Circle.new(root, {
+      radius: 5,
+      fillOpacity: 0, // not painted: the line looks as before
+      strokeOpacity: 0,
+      focusable: true,
+      focusableGroup: "days",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+    })
+  });
+});
+// the drawn points: set up in their bullet function above
 
 
 // Make stuff animate on load

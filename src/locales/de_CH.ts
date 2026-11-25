@@ -154,12 +154,12 @@ export default {
 	//
 	// All three need to to be translated even if they are all the same. Some
 	// users might use one, some the other.
-	"A": "",
-	"P": "",
-	"AM": "",
-	"PM": "",
-	"A.M.": "",
-	"P.M.": "",
+	"A": "AM",
+	"P": "PM",
+	"AM": "AM",
+	"PM": "PM",
+	"A.M.": "AM",
+	"P.M.": "PM",
 
 	// Date-related stuff.
 	//
@@ -258,18 +258,23 @@ export default {
 	"Gauge chart": "Messdiagramm",
 	"Radar chart": "Netzdiagramm",
 	"Sankey diagram": "Sankey-Diagramm",
-	"Chord diagram": "",
+	"Chord diagram": "Sehnendiagramm",
 	"Flow diagram": "Flussdiagramm",
 	"TreeMap chart": "Baumdiagramm",
+	"Force directed tree": "Kräftebasierter Baum",
+	"Sliced chart": "Segmentdiagramm",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
 	"Series": "Serie",
 	"Candlestick Series": "Kerzendiagramm",
+	"OHLC Series": "OHLC-Diagramm",
 	"Column Series": "Balkendiagramm",
 	"Line Series": "Liniendiagramm",
 	"Pie Slice Series": "Kreisdiagramm",
+	"Funnel Series": "Trichterdiagramm",
+	"Pyramid Series": "Pyramidendiagramm",
 	"X/Y Series": "Punktdiagramm",
 
 	// Map-related stuff.
@@ -293,10 +298,11 @@ export default {
 	"Image": "Bild",
 	"Data": "Daten",
 	"Print": "Drucken",
+	"Press ENTER or use arrow keys to navigate": "ENTER drücken oder Pfeiltasten zum Navigieren nutzen",
 	"Press ENTER to open": "Zum Öffnen klicken, tippen oder ENTER drücken",
 	"Press ENTER to print.": "Zum Drucken klicken, tippen oder ENTER drücken.",
 	"Press ENTER to export as %1.": "Klicken, tippen oder ENTER drücken um als %1 zu exportieren",
-	"(Press ESC to close this message)": "ESC drücken um diese Nachricht zu schließen",
+	"(Press ESC to close this message)": "ESC drücken, um diese Nachricht zu schliessen",
 	"Image Export Complete": "Bildexport komplett",
 	"Export operation took longer than expected. Something might have gone wrong.": "Der Export dauert länger als geplant. Vielleicht ist etwas schiefgelaufen.",
 	"Saved from": "Gespeichert von",
@@ -332,6 +338,25 @@ export default {
 	"From %1": "Von %1",
 	"To %1": "Bis %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Werte: %1",
+	"Highest: %1": "Höchstwert: %1",
+	"Lowest: %1": "Tiefstwert: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategorie",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Ergebnisse: %1",
+	"No results": "Keine Ergebnisse",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Farbton",
+	"Opacity": "Deckkraft",
+	"Color": "Farbe",
+
 	// Data loader-related.
 	"No parser available for file: %1": "Kein Parser für Datei %1 verfügbar",
 	"Error parsing file: %1": "Fehler beim Parsen von Datei %1",
@@ -339,9 +364,9 @@ export default {
 	"Invalid date": "Kein Datum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Schliessen",
+	"Minimize": "Minimieren",
+	"Confirm": "Bestätigen",
 	"OK": "OK",
 	"Cancel": "Abbrechen",
 	"Delete": "Löschen",

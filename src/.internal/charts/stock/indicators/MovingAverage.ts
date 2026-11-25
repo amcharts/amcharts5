@@ -167,7 +167,7 @@ export class MovingAverage extends Indicator {
 			const offset = this.get("offset", 0);
 
 
-			if (offset != 0) {
+			if (offset != 0 && dataItems.length > 0) {
 				let i = 0;
 				const baseDuration = (this.series.get("xAxis") as DateAxis<AxisRenderer>).baseDuration();
 				const len = dataItems.length;

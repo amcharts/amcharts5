@@ -126,6 +126,21 @@ bubbleSeries.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "World map with bubbles on 40 countries, sized and colored by population. Tab to the bubbles, then move between them with the up and down arrow keys"
+});
+// the bubbles, through the template they share: one Tab stop, the up and down arrow keys step through them
+circleTemplate.setAll({
+  focusable: true,
+  focusableGroup: "bubbles",
+  hoverOnFocus: true, // the focused bubble shows its tooltip
+  ariaLabel: "{name}: population {value.formatNumber('#,###')}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

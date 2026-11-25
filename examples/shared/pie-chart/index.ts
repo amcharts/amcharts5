@@ -57,6 +57,26 @@ const legend = chart.children.push(am5.Legend.new(root, {
 legend.data.setAll(series.dataItems); // one legend item per slice
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Pie chart of seven categories, One to Seven, and their share of the total. Tab to the slices, then move between them with the up and down arrow keys; Enter pulls a slice out"
+});
+// the slices: one Tab stop, the up and down arrow keys step through them
+series.slices.template.setAll({
+  focusable: true,
+  focusableGroup: "slices",
+  hoverOnFocus: true, // the focused slice shows its tooltip
+  ariaLabel: "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+});
+// the legend: one Tab stop, after the slices
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+
+
 // Play initial series animation
 // https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

@@ -20,6 +20,10 @@ export class VennDefaultTheme extends Theme {
 		});
 
 
+		r("Graphics", ["venn", "series"]).setAll({
+			role: "img"
+		});
+
 		r("Label", ["venn"]).setAll({
 			text: "{category}",
 			populateText: true,

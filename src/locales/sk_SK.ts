@@ -244,6 +244,7 @@ export default {
 
 	// Chart's Legend screen reader title.
 	"Legend": "Legenda",
+	"Press ENTER to toggle": "Stlačením klávesu ENTER prepnete",
 
 	// Legend's item screen reader indicator.
 	"Click, tap or press ENTER to toggle": "",
@@ -258,37 +259,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Graf",
+	"Serial chart": "Sériový graf",
+	"X/Y chart": "Graf X/Y",
+	"Pie chart": "Koláčový graf",
+	"Gauge chart": "Ručičkový graf",
+	"Radar chart": "Radarový graf",
+	"Sankey diagram": "Sankeyho diagram",
+	"Flow diagram": "Tokový diagram",
+	"Chord diagram": "Tetivový diagram",
+	"TreeMap chart": "Stromová mapa",
+	"Force directed tree": "Silovo orientovaný strom",
+	"Sliced chart": "Segmentový graf",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Rad",
+	"Candlestick Series": "Rad sviečok",
+	"OHLC Series": "Rad OHLC",
+	"Column Series": "Stĺpcový rad",
+	"Line Series": "Čiarový rad",
+	"Pie Slice Series": "Rad výsekov koláča",
+	"Funnel Series": "Lievikový rad",
+	"Pyramid Series": "Pyramídový rad",
+	"X/Y Series": "Rad X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Mapa",
+	"Press ENTER to zoom in": "Stlačením klávesu ENTER priblížite",
+	"Press ENTER to zoom out": "Stlačením klávesu ENTER oddialite",
+	"Use arrow keys to zoom in and out": "Šípkami približujete a odďaľujete",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Klávesmi plus a mínus na klávesnici približujete a odďaľujete",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -304,12 +306,17 @@ export default {
 	"Image": "Obrázok",
 	"Data": "Data",
 	"Print": "Tlač",
+	"Press ENTER or use arrow keys to navigate": "Stlačte ENTER alebo sa pohybujte šípkami",
+	"Press ENTER to open": "Stlačením klávesu ENTER otvoríte",
+	"Press ENTER to print.": "Stlačením klávesu ENTER vytlačíte.",
+	"Press ENTER to export as %1.": "Stlačením klávesu ENTER exportujete ako %1.",
+	"(Press ESC to close this message)": "(Stlačením klávesu ESC zatvoríte túto správu)",
 	"Click, tap or press ENTER to open": "",
 	"Click, tap or press ENTER to print.": "",
 	"Click, tap or press ENTER to export as %1.": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Image Export Complete": "Export obrázka dokončený",
+	"Export operation took longer than expected. Something might have gone wrong.": "Export trval dlhšie, ako sa očakávalo. Niečo sa mohlo pokaziť.",
+	"Saved from": "Uložené z",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -330,28 +337,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Klávesom TAB vyberte úchyty alebo šípkami doľava a doprava zmeňte výber",
+	"Use left and right arrows to move selection": "Šípkami doľava a doprava posuniete výber",
+	"Use left and right arrows to move left selection": "Šípkami doľava a doprava posuniete ľavý okraj výberu",
+	"Use left and right arrows to move right selection": "Šípkami doľava a doprava posuniete pravý okraj výberu",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Klávesom TAB vyberte úchyty alebo šípkami nahor a nadol zmeňte výber",
+	"Use up and down arrows to move selection": "Šípkami nahor a nadol posuniete výber",
+	"Use up and down arrows to move lower selection": "Šípkami nahor a nadol posuniete dolný okraj výberu",
+	"Use up and down arrows to move upper selection": "Šípkami nahor a nadol posuniete horný okraj výberu",
 	"From %1 to %2": "Od %1 do %2",
 	"From %1": "Od %1",
 	"To %1": "Do %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Hodnoty: %1",
+	"Highest: %1": "Najvyššia: %1",
+	"Lowest: %1": "Najnižšia: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategória",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Výsledky: %1",
+	"No results": "Žiadne výsledky",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Odtieň",
+	"Opacity": "Nepriehľadnosť",
+	"Color": "Farba",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Pre súbor nie je k dispozícii analyzátor: %1",
+	"Error parsing file: %1": "Chyba pri analýze súboru: %1",
+	"Unable to load file: %1": "Súbor sa nepodarilo načítať: %1",
+	"Invalid date": "Neplatný dátum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Zavrieť",
+	"Minimize": "Minimalizovať",
+	"Confirm": "Potvrdiť",
 	"OK": "OK",
 	"Cancel": "Zrušiť",
 	"Delete": "Odstrániť",

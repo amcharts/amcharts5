@@ -13,6 +13,8 @@
         }
       }
     },
+    "focusable": true,
+    "ariaLabel": "Line chart comparing 14 days of a value, June 15 to 28, with the 14 days before them, drawn dashed. Tab to the days, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -93,7 +95,25 @@
                 "settings": { "strokeWidth": 2 }
               }
             }
-          }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "days",
+                    "ariaLabel": "{valueX}: {valueY}, previous period {previousDate}: {previousValue}"
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     },
@@ -106,7 +126,7 @@
           "yAxis": "#axis-1",
           "valueYField": "previousValue",
           "valueXField": "date",
-          "stroke": { "type": "Color", "value": "#67b7dc" },
+          "stroke": "@colors.getIndex(0)",
           "autoAppear": true,
           "appearDuration": 1000
         },

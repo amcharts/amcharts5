@@ -20,6 +20,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "vertical" }
     },
+    "focusable": true,
+    "ariaLabel": "Bubble chart of 40 countries: GDP per capita across, life expectancy up, population as the bubble's size. Tab to the bubbles, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -572,7 +574,14 @@
               "settings": {
                 "sprite": {
                   "type": "Circle",
-                  "settings": { "radius": 5, "fillOpacity": 0.8, "templateField": "bulletSettings" },
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0.8,
+                    "templateField": "bulletSettings",
+                    "focusable": true,
+                    "focusableGroup": "bubbles",
+                    "ariaLabel": "{country}: life expectancy {valueY.formatNumber('#.0')} years, GDP per capita {valueX.formatNumber('#,###.')} USD, population {value.formatNumber('#,###.')}"
+                  },
                   "properties": { "template": "#template-0" }
                 }
               }

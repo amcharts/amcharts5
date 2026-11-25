@@ -317,30 +317,31 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Grafik",
+	"Serial chart": "Grafik serial",
+	"X/Y chart": "Grafik X/Y",
+	"Pie chart": "Grafik pai",
+	"Gauge chart": "Grafik pengukur",
+	"Radar chart": "Grafik radar",
+	"Sankey diagram": "Diagram Sankey",
+	"Flow diagram": "Diagram alir",
+	"Chord diagram": "Diagram chord",
+	"TreeMap chart": "Grafik TreeMap",
+	"Force directed tree": "Pohon berarah gaya",
+	"Sliced chart": "Grafik irisan",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Seri",
+	"Candlestick Series": "Seri candlestick",
+	"OHLC Series": "Seri OHLC",
+	"Column Series": "Seri kolom",
+	"Line Series": "Seri garis",
+	"Pie Slice Series": "Seri irisan pai",
+	"Funnel Series": "Seri corong",
+	"Pyramid Series": "Seri piramida",
+	"X/Y Series": "Seri X/Y",
 
 	// Map-related stuff.
 	"Map": "Peta",
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Cetak",
+	"Export": "Ekspor",
 	"Image": "Gambar",
 	"Data": "Data",
 	"Print": "Cetak",
+	"Press ENTER or use arrow keys to navigate": "Tekan ENTER atau gunakan tombol panah untuk bernavigasi",
 	"Press ENTER to open": "Klik, ketuk atau tekan ENTER untuk membuka",
 	"Press ENTER to print.": "Klik, ketuk atau tekan ENTER untuk mencetak",
 	"Press ENTER to export as %1.": "Klik, ketuk atau tekan ENTER untuk mengekspor sebagai %1",
 	"(Press ESC to close this message)": "Tekan ESC untuk menutup pesan ini",
 	"Image Export Complete": "Ekspor gambar selesai",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Export operation took longer than expected. Something might have gone wrong.": "Operasi ekspor memakan waktu lebih lama dari perkiraan. Mungkin terjadi kesalahan.",
+	"Saved from": "Disimpan dari",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Gunakan TAB untuk memilih tombol pegangan atau panah kiri dan kanan untuk mengubah pilihan",
+	"Use left and right arrows to move selection": "Gunakan panah kiri dan kanan untuk memindahkan pilihan",
+	"Use left and right arrows to move left selection": "Gunakan panah kiri dan kanan untuk memindahkan pilihan kiri",
+	"Use left and right arrows to move right selection": "Gunakan panah kiri dan kanan untuk memindahkan pilihan kanan",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Gunakan TAB untuk memilih tombol pegangan atau panah atas dan bawah untuk mengubah pilihan",
+	"Use up and down arrows to move selection": "Gunakan panah atas dan bawah untuk memindahkan pilihan",
+	"Use up and down arrows to move lower selection": "Gunakan panah atas dan bawah untuk memindahkan pilihan bawah",
+	"Use up and down arrows to move upper selection": "Gunakan panah atas dan bawah untuk memindahkan pilihan atas",
 	"From %1 to %2": "Dari %1 ke %2",
 	"From %1": "Dari %1",
 	"To %1": "Ke %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Nilai: %1",
+	"Highest: %1": "Tertinggi: %1",
+	"Lowest: %1": "Terendah: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategori",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Hasil: %1",
+	"No results": "Tidak ada hasil",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Rona",
+	"Opacity": "Opasitas",
+	"Color": "Warna",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Tidak ada parser untuk file: %1",
+	"Error parsing file: %1": "Kesalahan saat mengurai file: %1",
+	"Unable to load file: %1": "Tidak dapat memuat file: %1",
+	"Invalid date": "Tanggal tidak valid",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Tutup",
+	"Minimize": "Minimalkan",
+	"Confirm": "Konfirmasi",
 	"OK": "OK",
 	"Cancel": "Batal",
 	"Delete": "Hapus",

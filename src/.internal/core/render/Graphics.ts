@@ -296,15 +296,66 @@ export class Graphics extends Sprite {
 		}
 	}
 
+	/**
+	 * Fills the path drawn so far with the fill, gradient or pattern.
+	 *
+	 * @ignore
+	 */
+	protected _applyFill() {
+		const fill = this.get("fill");
+		const fillGradient = this.get("fillGradient");
+		const fillPattern = this.get("fillPattern");
+		const fillOpacity = this.get("fillOpacity");
+
+		if (fill && !fillGradient) {
+			this._display.beginFill(fill, fillOpacity);
+			this._display.endFill();
+		}
+
+		if (fillGradient) {
+			if (fill) {
+				const stops = fillGradient.get("stops", []);
+				if (stops.length) {
+					$array.each(stops, (stop: any) => {
+						if ((!stop.color || stop.colorInherited) && fill) {
+							stop.color = fill;
+							stop.colorInherited = true;
+						}
+
+						if (stop.opacity == null || stop.opacityInherited) {
+							stop.opacity = fillOpacity;
+							stop.opacityInherited = true;
+						}
+					})
+				}
+			}
+			const gradient = fillGradient.getFill(this);
+			if (gradient) {
+				this._display.beginFill(gradient, fillOpacity);
+				this._display.endFill();
+			}
+		}
+
+		if (fillPattern) {
+			const pattern = fillPattern.pattern;
+			if (pattern) {
+				this._display.beginFill(pattern, fillOpacity);
+				this._display.endFill();
+
+				if (fillPattern instanceof PicturePattern) {
+					fillPattern.events.once("loaded", () => {
+						this._clear = true;
+						this.markDirty();
+					});
+				}
+			}
+		}
+	}
+
 	public _afterChanged() {
 		super._afterChanged();
 
 		if (this._clear) {
-			const fill = this.get("fill");
-			const fillGradient = this.get("fillGradient");
-			const fillPattern = this.get("fillPattern");
-			const fillOpacity = this.get("fillOpacity");
-
 			const stroke = this.get("stroke");
 			const strokeGradient = this.get("strokeGradient");
 			const strokePattern = this.get("strokePattern");
@@ -319,49 +370,7 @@ export class Graphics extends Sprite {
 				this._display.shadow(shadowColor, shadowBlur, shadowOffsetX, shadowOffsetY, shadowOpacity);
 			}
 
-			if (fill && !fillGradient) {
-				this._display.beginFill(fill, fillOpacity);
-				this._display.endFill();
-			}
-
-			if (fillGradient) {
-				if (fill) {
-					const stops = fillGradient.get("stops", []);
-					if (stops.length) {
-						$array.each(stops, (stop: any) => {
-							if ((!stop.color || stop.colorInherited) && fill) {
-								stop.color = fill;
-								stop.colorInherited = true;
-							}
-
-							if (stop.opacity == null || stop.opacityInherited) {
-								stop.opacity = fillOpacity;
-								stop.opacityInherited = true;
-							}
-						})
-					}
-				}
-				const gradient = fillGradient.getFill(this);
-				if (gradient) {
-					this._display.beginFill(gradient, fillOpacity);
-					this._display.endFill();
-				}
-			}
-
-			if (fillPattern) {
-				const pattern = fillPattern.pattern;
-				if (pattern) {
-					this._display.beginFill(pattern, fillOpacity);
-					this._display.endFill();
-
-					if (fillPattern instanceof PicturePattern) {
-						fillPattern.events.once("loaded", () => {
-							this._clear = true;
-							this.markDirty();
-						});
-					}
-				}
-			}
+			this._applyFill();
 
 			if (stroke || strokeGradient || strokePattern) {
 				const strokeOpacity = this.get("strokeOpacity");
@@ -447,7 +456,7 @@ export class Graphics extends Sprite {
 			if (this.get("focusable") && !this.get("isMeasured")) {
 				const focusElement = this.getPrivate("focusElement");
 				if (focusElement && (this._root.focused(this) || (focusElement.dom.getAttribute("aria-hidden") == "true") == this._root._hasFocusSize(this))) {
-					this.markDirtyAccessibility();
+					this.markDirtyAccessibility(true);
 				}
 			}
 		}

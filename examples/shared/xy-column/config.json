@@ -18,6 +18,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Column chart of a daily value over the 30 days of January 2024. Tab to the columns, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -101,7 +103,20 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "columns",
+                  "ariaLabel": "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]

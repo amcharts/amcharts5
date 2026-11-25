@@ -150,6 +150,29 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 }));
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart of daily visits, views and hits over January 2024, each on its own value axis. Tab to a line, then move along it with the up and down arrow keys"
+});
+// invisible points on each line: one Tab stop per line, the up and down arrow keys step through it
+chart.series.each((series) => {
+  series.bullets.push(() => {
+    return am5.Bullet.new(root, {
+      sprite: am5.Circle.new(root, {
+        radius: 5,
+        fillOpacity: 0, // not painted: the lines look as before
+        strokeOpacity: 0,
+        focusable: true,
+        focusableGroup: series.get("name"),
+        ariaLabel: "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+      })
+    });
+  });
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.series.each((series) => {

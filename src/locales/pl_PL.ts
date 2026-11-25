@@ -305,7 +305,7 @@ export default {
 	"Legend": "Legenda",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Naciśnij ENTER, aby przełączyć",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Wczytywanie",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Wykres",
+	"Serial chart": "Wykres seryjny",
+	"X/Y chart": "Wykres X/Y",
+	"Pie chart": "Wykres kołowy",
+	"Gauge chart": "Wykres wskaźnikowy",
+	"Radar chart": "Wykres radarowy",
+	"Sankey diagram": "Diagram Sankeya",
+	"Flow diagram": "Diagram przepływu",
+	"Chord diagram": "Diagram cięciw",
+	"TreeMap chart": "Wykres TreeMap",
+	"Force directed tree": "Drzewo siłowe",
+	"Sliced chart": "Wykres dzielony",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Seria",
+	"Candlestick Series": "Seria świecowa",
+	"OHLC Series": "Seria OHLC",
+	"Column Series": "Seria kolumnowa",
+	"Line Series": "Seria liniowa",
+	"Pie Slice Series": "Seria wycinków koła",
+	"Funnel Series": "Seria lejkowa",
+	"Pyramid Series": "Seria piramidalna",
+	"X/Y Series": "Seria X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Mapa",
+	"Press ENTER to zoom in": "Naciśnij ENTER, aby powiększyć",
+	"Press ENTER to zoom out": "Naciśnij ENTER, aby pomniejszyć",
+	"Use arrow keys to zoom in and out": "Użyj strzałek, aby powiększyć lub pomniejszyć",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Użyj klawiszy plus i minus na klawiaturze, aby powiększyć lub pomniejszyć",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Drukuj",
+	"Export": "Eksportuj",
 	"Image": "Obraz",
 	"Data": "Dane",
 	"Print": "Drukuj",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Naciśnij ENTER lub użyj strzałek, aby nawigować",
+	"Press ENTER to open": "Naciśnij ENTER, aby otworzyć",
+	"Press ENTER to print.": "Naciśnij ENTER, aby wydrukować.",
+	"Press ENTER to export as %1.": "Naciśnij ENTER, aby wyeksportować jako %1.",
+	"(Press ESC to close this message)": "(Naciśnij ESC, aby zamknąć ten komunikat)",
+	"Image Export Complete": "Eksport obrazu zakończony",
+	"Export operation took longer than expected. Something might have gone wrong.": "Eksport trwał dłużej, niż oczekiwano. Coś mogło pójść nie tak.",
+	"Saved from": "Zapisano z",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Użyj TAB, aby wybrać uchwyty, lub strzałek w lewo i w prawo, aby zmienić zaznaczenie",
+	"Use left and right arrows to move selection": "Użyj strzałek w lewo i w prawo, aby przesunąć zaznaczenie",
+	"Use left and right arrows to move left selection": "Użyj strzałek w lewo i w prawo, aby przesunąć lewą granicę zaznaczenia",
+	"Use left and right arrows to move right selection": "Użyj strzałek w lewo i w prawo, aby przesunąć prawą granicę zaznaczenia",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Użyj TAB, aby wybrać uchwyty, lub strzałek w górę i w dół, aby zmienić zaznaczenie",
+	"Use up and down arrows to move selection": "Użyj strzałek w górę i w dół, aby przesunąć zaznaczenie",
+	"Use up and down arrows to move lower selection": "Użyj strzałek w górę i w dół, aby przesunąć dolną granicę zaznaczenia",
+	"Use up and down arrows to move upper selection": "Użyj strzałek w górę i w dół, aby przesunąć górną granicę zaznaczenia",
 	"From %1 to %2": "Od %1 do %2",
 	"From %1": "Od %1",
 	"To %1": "Do %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Wartości: %1",
+	"Highest: %1": "Najwyższa: %1",
+	"Lowest: %1": "Najniższa: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategoria",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Wyniki: %1",
+	"No results": "Brak wyników",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Odcień",
+	"Opacity": "Krycie",
+	"Color": "Kolor",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Brak parsera dla pliku: %1",
+	"Error parsing file: %1": "Błąd analizy pliku: %1",
+	"Unable to load file: %1": "Nie można wczytać pliku: %1",
+	"Invalid date": "Nieprawidłowa data",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Zamknij",
+	"Minimize": "Minimalizuj",
+	"Confirm": "Potwierdź",
 	"OK": "OK",
 	"Cancel": "Anuluj",
 	"Delete": "Usuń",

@@ -43,8 +43,7 @@ const valueAxis = mainPanel.yAxes.push(am5xy.ValueAxis.new(root, {
   renderer: am5xy.AxisRendererY.new(root, {
     pan: "zoom" // drag the price labels up or down to stretch or squeeze the scale
   }),
-  tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis...
-  extraTooltipPrecision: 2,           // ...with two more decimals than the grid step
+  tooltip: am5.Tooltip.new(root, {}), // shows the cursor's price on the axis, with the labels' decimals
   preferredDecimals: [0, 2]           // prices: whole numbers, or cents
 }));
 
@@ -233,6 +232,30 @@ am5stock.StockToolbar.new(root, {
   ]
 });
 
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+stockChart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Stock chart of three years of daily Microsoft (MSFT) prices, May 2019 to April 2022, as candlesticks; zoomed out, the days merge into weekly candles. Tab to the candles, then move between them with the up and down arrow keys. The toolbar above the chart adds indicators and drawings"
+});
+// the candles: one Tab stop, the up and down arrow keys step through them. A candle or OHLC series picked in the
+// toolbar replaces the main series and gets the same; a line has no candles to focus
+const focusCandles = (series: am5xy.XYSeries | undefined) => {
+  if (series instanceof am5xy.BaseColumnSeries) {
+    series.columns.template.setAll({
+      focusable: true,
+      focusableGroup: "prices",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: open {openValueY}, high {highValueY}, low {lowValueY}, close {valueY}"
+    });
+  }
+};
+focusCandles(valueSeries);
+stockChart.on("stockSeries", focusCandles);
+// the legend, with its settings and close buttons: after the candles
+valueLegend.itemContainers.template.set("tabindexOrder", 10); // focus runs from low to high (0 if not set)
+valueLegend.settingsButtons.template.set("tabindexOrder", 10);
+valueLegend.closeButtons.template.set("tabindexOrder", 10);
 
 
 // Make stuff animate on load

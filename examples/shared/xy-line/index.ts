@@ -92,6 +92,17 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 series.data.setAll(data);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart of a daily value over 500 days from January 2024. Zoom with the scrollbar or the mouse wheel. The line has too many points to step through with the keyboard",
+  ariaSummary: true, // a screen reader also hears the first, last, highest and lowest values
+  ariaDataTable: true // and can read the values as a table
+});
+// no focusable points on the line: 500 are too many to step through one by one
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

@@ -68,6 +68,20 @@ xAxis.data.setAll(data); // the axis takes its categories from the same rows
 series.data.setAll(data);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Column chart of a value for seven countries. Tab to the columns, then move between them with the up and down arrow keys"
+});
+// the columns: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "columns",
+  ariaLabel: "{categoryX}: {valueY}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

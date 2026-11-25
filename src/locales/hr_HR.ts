@@ -305,7 +305,7 @@ export default {
 	"Legend": "Legenda",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Pritisnite ENTER za uključivanje/isključivanje",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Učitavanje",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Grafikon",
+	"Serial chart": "Serijski grafikon",
+	"X/Y chart": "X/Y grafikon",
+	"Pie chart": "Kružni grafikon",
+	"Gauge chart": "Grafikon mjerača",
+	"Radar chart": "Radarski grafikon",
+	"Sankey diagram": "Sankeyjev dijagram",
+	"Flow diagram": "Dijagram toka",
+	"Chord diagram": "Tetivni dijagram",
+	"TreeMap chart": "TreeMap grafikon",
+	"Force directed tree": "Stablo usmjereno silama",
+	"Sliced chart": "Isječeni grafikon",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Niz",
+	"Candlestick Series": "Niz svijeća",
+	"OHLC Series": "OHLC niz",
+	"Column Series": "Niz stupaca",
+	"Line Series": "Linijski niz",
+	"Pie Slice Series": "Niz kružnih isječaka",
+	"Funnel Series": "Niz lijevka",
+	"Pyramid Series": "Niz piramide",
+	"X/Y Series": "X/Y niz",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Karta",
+	"Press ENTER to zoom in": "Pritisnite ENTER za povećanje",
+	"Press ENTER to zoom out": "Pritisnite ENTER za smanjenje",
+	"Use arrow keys to zoom in and out": "Koristite strelice za povećanje i smanjenje",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Koristite tipke plus i minus na tipkovnici za povećanje i smanjenje",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Ispis",
+	"Export": "Izvoz",
 	"Image": "Slika",
 	"Data": "Podaci",
 	"Print": "Ispis",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Pritisnite ENTER ili koristite strelice za navigaciju",
+	"Press ENTER to open": "Pritisnite ENTER za otvaranje",
+	"Press ENTER to print.": "Pritisnite ENTER za ispis.",
+	"Press ENTER to export as %1.": "Pritisnite ENTER za izvoz kao %1.",
+	"(Press ESC to close this message)": "(Pritisnite ESC da biste zatvorili ovu poruku)",
+	"Image Export Complete": "Izvoz slike je dovršen",
+	"Export operation took longer than expected. Something might have gone wrong.": "Izvoz je trajao dulje nego što je očekivano. Možda je nešto pošlo po zlu.",
+	"Saved from": "Spremljeno s",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Koristite TAB za odabir ručica ili strelice lijevo i desno za promjenu odabira",
+	"Use left and right arrows to move selection": "Koristite strelice lijevo i desno za pomicanje odabira",
+	"Use left and right arrows to move left selection": "Koristite strelice lijevo i desno za pomicanje lijeve granice odabira",
+	"Use left and right arrows to move right selection": "Koristite strelice lijevo i desno za pomicanje desne granice odabira",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Koristite TAB za odabir ručica ili strelice gore i dolje za promjenu odabira",
+	"Use up and down arrows to move selection": "Koristite strelice gore i dolje za pomicanje odabira",
+	"Use up and down arrows to move lower selection": "Koristite strelice gore i dolje za pomicanje donje granice odabira",
+	"Use up and down arrows to move upper selection": "Koristite strelice gore i dolje za pomicanje gornje granice odabira",
 	"From %1 to %2": "Od %1 do %2",
 	"From %1": "Od %1",
 	"To %1": "Do %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Vrijednosti: %1",
+	"Highest: %1": "Najviša: %1",
+	"Lowest: %1": "Najniža: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategorija",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Rezultati: %1",
+	"No results": "Nema rezultata",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Nijansa",
+	"Opacity": "Neprozirnost",
+	"Color": "Boja",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Nema dostupnog parsera za datoteku: %1",
+	"Error parsing file: %1": "Pogreška pri raščlanjivanju datoteke: %1",
+	"Unable to load file: %1": "Nije moguće učitati datoteku: %1",
+	"Invalid date": "Nevažeći datum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Zatvori",
+	"Minimize": "Minimiziraj",
+	"Confirm": "Potvrdi",
 	"OK": "U redu",
 	"Cancel": "Odustani",
 	"Delete": "Izbriši",

@@ -46,6 +46,21 @@ polygonSeries.mapPolygons.template.setAll({
 });
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "World map that opens zoomed in on Europe. Tab to the countries, then move between them with the up and down arrow keys"
+});
+// the countries: one Tab stop, the up and down arrow keys step through them
+polygonSeries.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "countries",
+  hoverOnFocus: true, // the focused country shows its tooltip
+  ariaLabel: "{name}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

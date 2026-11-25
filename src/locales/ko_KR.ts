@@ -320,6 +320,7 @@ export default {
 	"Image": "이미지",
 	"Data": "데이터",
 	"Print": "인쇄",
+	"Press ENTER or use arrow keys to navigate": "탐색하려면 엔터를 누르거나 방향키를 이용하세요.",
 	"Press ENTER to open": "열려면, 클릭, 탭 또는 엔터를 누르세요.",
 	"Press ENTER to print.": "출력하려면, 클릭, 탭 또는 엔터를 누르세요.",
 	"Press ENTER to export as %1.": "%1(으)로 내보내려면 클릭, 탭 또는 엔터를 누르세요.",
@@ -359,6 +360,25 @@ export default {
 	"From %1": "%1 부터",
 	"To %1": "%1 까지",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "데이터 수: %1",
+	"Highest: %1": "최고: %1",
+	"Lowest: %1": "최저: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "범주",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "검색 결과: %1개",
+	"No results": "결과 없음",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "색조",
+	"Opacity": "불투명도",
+	"Color": "색상",
+
 	// Data loader-related.
 	"No parser available for file: %1": "파일 파싱 불가능: %1",
 	"Error parsing file: %1": "파일 파싱 오류: %1",
@@ -366,9 +386,9 @@ export default {
 	"Invalid date": "날짜 올바르지 않음",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "닫기",
+	"Minimize": "최소화",
+	"Confirm": "확인",
 	"OK": "확인",
 	"Cancel": "취소",
 	"Delete": "삭제",

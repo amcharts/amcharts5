@@ -2,6 +2,8 @@
   "type": "SlicedChart",
   "settings": {
     "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Pyramid chart of seven values, One to Seven, from the smallest at the tip to the largest at the base. Tab to the levels, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -18,7 +20,16 @@
         "marginTop": 15,
         "marginBottom": 15
       },
-      "properties": { "data": "#series-0.dataItems" }
+      "properties": {
+        "data": "#series-0.dataItems",
+        "itemContainers": {
+          "properties": {
+            "template": {
+              "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+            }
+          }
+        }
+      }
     }
   ],
   "refs": [
@@ -42,7 +53,20 @@
           "categoryField": "category",
           "autoAppear": true
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "slices": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "slices",
+                  "ariaLabel": "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]

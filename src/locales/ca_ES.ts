@@ -305,7 +305,7 @@ export default {
 	"Legend": "Llegenda",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Premeu ENTER per commutar",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "S'està carregant",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Gràfic",
+	"Serial chart": "Gràfic seriat",
+	"X/Y chart": "Gràfic X/Y",
+	"Pie chart": "Gràfic circular",
+	"Gauge chart": "Gràfic d'indicador",
+	"Radar chart": "Gràfic de radar",
+	"Sankey diagram": "Diagrama de Sankey",
+	"Flow diagram": "Diagrama de flux",
+	"Chord diagram": "Diagrama de cordes",
+	"TreeMap chart": "Mapa d'arbre",
+	"Force directed tree": "Arbre dirigit per forces",
+	"Sliced chart": "Gràfic de seccions",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Sèrie",
+	"Candlestick Series": "Sèrie d'espelmes",
+	"OHLC Series": "Sèrie OHLC",
+	"Column Series": "Sèrie de columnes",
+	"Line Series": "Sèrie de línies",
+	"Pie Slice Series": "Sèrie de sectors",
+	"Funnel Series": "Sèrie d'embut",
+	"Pyramid Series": "Sèrie de piràmide",
+	"X/Y Series": "Sèrie X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Mapa",
+	"Press ENTER to zoom in": "Premeu ENTER per apropar",
+	"Press ENTER to zoom out": "Premeu ENTER per allunyar",
+	"Use arrow keys to zoom in and out": "Useu les fletxes per apropar i allunyar",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Useu les tecles més i menys del teclat per apropar i allunyar",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Imprimeix",
+	"Export": "Exporta",
 	"Image": "Imatge",
 	"Data": "Dades",
 	"Print": "Imprimeix",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Premeu ENTER o useu les fletxes per navegar",
+	"Press ENTER to open": "Premeu ENTER per obrir",
+	"Press ENTER to print.": "Premeu ENTER per imprimir.",
+	"Press ENTER to export as %1.": "Premeu ENTER per exportar com a %1.",
+	"(Press ESC to close this message)": "(Premeu ESC per tancar aquest missatge)",
+	"Image Export Complete": "Exportació de la imatge completada",
+	"Export operation took longer than expected. Something might have gone wrong.": "L'exportació ha trigat més del previst. Potser alguna cosa ha fallat.",
+	"Saved from": "Desat des de",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Useu TAB per seleccionar els botons de control o les fletxes esquerra i dreta per canviar la selecció",
+	"Use left and right arrows to move selection": "Useu les fletxes esquerra i dreta per moure la selecció",
+	"Use left and right arrows to move left selection": "Useu les fletxes esquerra i dreta per moure la selecció esquerra",
+	"Use left and right arrows to move right selection": "Useu les fletxes esquerra i dreta per moure la selecció dreta",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Useu TAB per seleccionar els botons de control o les fletxes amunt i avall per canviar la selecció",
+	"Use up and down arrows to move selection": "Useu les fletxes amunt i avall per moure la selecció",
+	"Use up and down arrows to move lower selection": "Useu les fletxes amunt i avall per moure la selecció inferior",
+	"Use up and down arrows to move upper selection": "Useu les fletxes amunt i avall per moure la selecció superior",
 	"From %1 to %2": "De %1 a %2",
 	"From %1": "De %1",
 	"To %1": "A %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Valors: %1",
+	"Highest: %1": "Màxim: %1",
+	"Lowest: %1": "Mínim: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Categoria",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Resultats: %1",
+	"No results": "Cap resultat",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "To",
+	"Opacity": "Opacitat",
+	"Color": "Color",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "No hi ha cap analitzador per al fitxer: %1",
+	"Error parsing file: %1": "Error en analitzar el fitxer: %1",
+	"Unable to load file: %1": "No s'ha pogut carregar el fitxer: %1",
+	"Invalid date": "Data no vàlida",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Tanca",
+	"Minimize": "Minimitza",
+	"Confirm": "Confirma",
 	"OK": "D'acord",
 	"Cancel": "Cancel·la",
 	"Delete": "Suprimeix",

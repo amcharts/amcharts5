@@ -1,5 +1,6 @@
 import type { Animation } from "../util/Entity";
 import type { Time } from "../util/Animation";
+import type { Sprite } from "./Sprite";
 
 import { RoundedRectangle } from "../render/RoundedRectangle";
 import { Container, IContainerPrivate, IContainerSettings, IContainerEvents } from "./Container";
@@ -448,18 +449,26 @@ export class Scrollbar extends Container {
 		const fromGrip = readout.reversed ? endGrip : startGrip;
 		const toGrip = readout.reversed ? startGrip : endGrip;
 
-		fromGrip._setC("ariaLabel", this._t("From %1", undefined, readout.fromText));
-		fromGrip._setC("ariaValueNow", "" + readout.from);
-		fromGrip._setC("ariaValueText", readout.from + "%");
+		this._setAria(fromGrip, "ariaLabel", this._t("From %1", undefined, readout.fromText));
+		this._setAria(fromGrip, "ariaValueNow", "" + readout.from);
+		this._setAria(fromGrip, "ariaValueText", readout.from + "%");
 
-		toGrip._setC("ariaLabel", this._t("To %1", undefined, readout.toText));
-		toGrip._setC("ariaValueNow", "" + readout.to);
-		toGrip._setC("ariaValueText", readout.to + "%");
+		this._setAria(toGrip, "ariaLabel", this._t("To %1", undefined, readout.toText));
+		this._setAria(toGrip, "ariaValueNow", "" + readout.to);
+		this._setAria(toGrip, "ariaValueText", readout.to + "%");
 
 		$array.each([startGrip, endGrip], (grip) => {
-			grip._setC("ariaValueMin", "0");
-			grip._setC("ariaValueMax", "100");
+			this._setAria(grip, "ariaValueMin", "0");
+			this._setAria(grip, "ariaValueMax", "100");
 		});
+	}
+
+	// Fills in a grip's or the thumb's screen reader text, unless it was set in
+	// code: then it stays as set
+	protected _setAria(target: Sprite, key: "ariaLabel" | "ariaValueNow" | "ariaValueText" | "ariaValueMin" | "ariaValueMax", value: string): void {
+		if (!target.isUserSetting(key) || target.isComputedSetting(key)) {
+			target._setC(key, value);
+		}
 	}
 
 	/**
@@ -480,14 +489,18 @@ export class Scrollbar extends Container {
 		const to = Math.round(toPosition * 100);
 
 		const valueFunction = this.getPrivate("positionTextFunction");
-		let fromText: string;
-		let toText: string;
+		let fromText = "";
+		let toText = "";
 		if (valueFunction) {
 			fromText = valueFunction.call(this, fromPosition);
 			toText = valueFunction.call(this, toPosition, true);
 		}
-		else {
+
+		// An axis with no tooltip has no text for a position
+		if (!fromText) {
 			fromText = from + "%";
+		}
+		if (!toText) {
 			toText = to + "%";
 		}
 
@@ -538,9 +551,9 @@ export class Scrollbar extends Container {
 		}
 
 		const readout = this._readout();
-		thumb._setC("ariaLabel", this._t("From %1 to %2", undefined, readout.fromText, readout.toText));
-		thumb._setC("ariaValueNow", "" + readout.from);
-		thumb._setC("ariaValueText", readout.from + "%");
+		this._setAria(thumb, "ariaLabel", this._t("From %1 to %2", undefined, readout.fromText, readout.toText));
+		this._setAria(thumb, "ariaValueNow", "" + readout.from);
+		this._setAria(thumb, "ariaValueText", readout.from + "%");
 	}
 
 

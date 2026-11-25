@@ -100,6 +100,21 @@ series.data.setAll([{
 series.set("selectedDataItem", series.dataItems[0]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Sunburst chart of website visits by where they came from: search, social and direct, then their kinds and sources, one ring per level. Tab to the slices, move between them with the up and down arrow keys, and press Enter to zoom into one; Enter on the middle goes back"
+});
+// the slices: one Tab stop, the up and down arrow keys step through them
+series.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  hoverOnFocus: true, // the focused slice shows its tooltip
+  ariaLabel: "{category}: {sum}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

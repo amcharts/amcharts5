@@ -14,6 +14,8 @@
         }
       }
     },
+    "focusable": true,
+    "ariaLabel": "Radar chart of monthly rainfall in millimetres, January to December. Tab to the months, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -95,7 +97,13 @@
               "settings": {
                 "sprite": {
                   "type": "Circle",
-                  "settings": { "radius": 5, "fill": "@series.get('fill')" }
+                  "settings": {
+                    "radius": 5,
+                    "fill": "@series.get('fill')",
+                    "focusable": true,
+                    "focusableGroup": "months",
+                    "ariaLabel": "{categoryX}: {valueY} mm"
+                  }
                 }
               }
             }

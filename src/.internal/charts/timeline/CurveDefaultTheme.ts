@@ -39,7 +39,13 @@ export class CurveDefaultTheme extends Theme {
 
 		r("Slice", ["curve", "column", "series"]).setAll({
 			width: percent(50),
-			height: percent(50)
+			height: percent(50),
+			role: "img"
+		});
+
+		// curve columns are polygons
+		r("Polygon", ["curve", "column", "series"]).setAll({
+			role: "img"
 		});
 
 		r("AxisRendererCurveY").setAll({

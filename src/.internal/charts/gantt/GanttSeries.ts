@@ -8,6 +8,7 @@ import type { GanttCategoryAxis, IGanttCategoryAxisDataItem } from "./GanttCateg
 import type { GanttCategoryAxisRenderer } from "./GanttCategoryAxisRenderer";
 import type { GanttDateAxis } from "./GanttDateAxis";
 import type { GanttDateAxisRenderer } from "./GanttDateAxisRenderer";
+import type { Sprite } from "../../core/render/Sprite";
 
 import { ColumnSeries, IColumnSeriesPrivate, IColumnSeriesSettings, IColumnSeriesDataItem, IColumnSeriesAxisRange } from "../xy/series/ColumnSeries";
 import { Container } from "../../core/render/Container";
@@ -380,9 +381,19 @@ export class GanttSeries extends ColumnSeries {
 		this.columns.template.events.on("dragstart", (e) => {
 			this._columnDragStartX = e.target.x();
 			this._columnDragStartY = e.target.y();
+			this._keyOpenValueX = e.simulated ? (e.target.dataItem as DataItem<IGanttSeriesDataItem>).get("openValueX", 0) : undefined;
 		})
 
 		this.columns.template.events.on("dragged", (e) => {
+			const keyOpenValueX = this._keyOpenValueX;
+			if (e.simulated && keyOpenValueX !== undefined) {
+				// a key press moves the task a whole step, even a short tap
+				const column = e.target;
+				const openValueX = this._keyStepStart(keyOpenValueX, this._keyDirection());
+				this._keyOpenValueX = openValueX;
+				const xAxis = this.get("xAxis") as ValueAxis<AxisRendererX>;
+				column.set("x", xAxis.get("renderer").positionToCoordinate(xAxis.valueToPosition(openValueX)));
+			}
 			this._handleColumnDragged(e);
 		})
 
@@ -390,22 +401,29 @@ export class GanttSeries extends ColumnSeries {
 			const xAxis = this.get("xAxis") as ValueAxis<AxisRendererX>;
 			const dataItem = e.target.dataItem as DataItem<IGanttSeriesDataItem>;
 
-			const openValueX = dataItem.get("openValueX", 0);
-			let newOpenValueX = xAxis.positionToValue(xAxis.coordinateToPosition(e.target.x()));
-
-			const valueX = dataItem.get("valueX", 0);
-
-			let diff = newOpenValueX - openValueX;
-			dataItem.set("openValueX", newOpenValueX);
-			dataItem.set("valueX", valueX + diff);
-
-			dataItem.set("openValueXWorking", newOpenValueX);
-			dataItem.set("valueXWorking", valueX + diff);
-
-			this._fixValues(dataItem, "duration");
-
-			this._moveChildValues(dataItem, diff);
+			// moved with keys: where the steps got to, as a redraw can put the
+			// column back before the key is released
+			const keyOpenValueX = this._keyOpenValueX;
+			this._keyOpenValueX = undefined;
+			this._moveTask(dataItem, e.simulated && keyOpenValueX !== undefined ? keyOpenValueX : xAxis.positionToValue(xAxis.coordinateToPosition(e.target.x())));
 		})
+	}
+
+	// Moves a task, and its subtasks, so that it starts at `newOpenValueX`
+	protected _moveTask(dataItem: DataItem<IGanttSeriesDataItem>, newOpenValueX: number): void {
+		const openValueX = dataItem.get("openValueX", 0);
+		const valueX = dataItem.get("valueX", 0);
+
+		let diff = newOpenValueX - openValueX;
+		dataItem.set("openValueX", newOpenValueX);
+		dataItem.set("valueX", valueX + diff);
+
+		dataItem.set("openValueXWorking", newOpenValueX);
+		dataItem.set("valueXWorking", valueX + diff);
+
+		this._fixValues(dataItem, "duration");
+
+		this._moveChildValues(dataItem, diff);
 	}
 
 
@@ -419,7 +437,7 @@ export class GanttSeries extends ColumnSeries {
 		}
 		const snapCount = this.get("snapCount", 1);
 		const xAxis = this.get("xAxis") as DateAxis<AxisRendererX>;
-		const baseInterval = xAxis.get("baseInterval");
+		const baseInterval = xAxis.baseMainInterval();
 		return $time.roun(value + this.getUnitDuration() * threshold, baseInterval.timeUnit, baseInterval.count * snapCount, this._root);
 	}
 
@@ -465,6 +483,16 @@ export class GanttSeries extends ColumnSeries {
 		});
 
 		zeroRectangle.events.on("dragged", (e) => {
+			if (e.simulated) {
+				// a key press moves the milestone a whole step (the column it
+				// drags along gets no key presses)
+				this._moveTask(dataItem, this._keyStepStart(dataItem.get("openValueX", 0), this._keyDirection()));
+				e.target.setAll({
+					x: 0,
+					y: zy
+				});
+				return;
+			}
 			this._handleColumnDragged(e);
 
 			e.target.setAll({
@@ -501,6 +529,13 @@ export class GanttSeries extends ColumnSeries {
 		dataItem.setRaw("mask", mask);
 		maskedContainer._setC("mask", mask);
 
+		// --- Grips (start/end) ---
+
+		// made before the progress grip: TAB goes task, start, progress, end
+		const startGrip = this.startGrips.make();
+		this.startGrips.push(startGrip);
+		container.children.push(startGrip);
+
 		// --- Progress elements ---
 		const progressRectangle = maskedContainer.children.push(this.progressRectangles.make());
 		this.progressRectangles.push(progressRectangle);
@@ -509,18 +544,21 @@ export class GanttSeries extends ColumnSeries {
 		this.progressGrips.push(progressGrip);
 		maskedContainer.children.push(progressGrip);
 
-		progressGrip.events.on("dragged", () => {
+		progressGrip.events.on("dragged", (e) => {
+			const width = column.getPrivate("width", 0);
+			if (e.simulated) {
+				// a key press: 5% at a time
+				const step = 0.05 * this._keyDirection();
+				const progress = $math.fitToRange(Math.round((dataItem.get("progress", 0) + step) * 20) / 20, 0, 1);
+				progressGrip.setAll({ x: width * progress, y: column.getPrivate("height", 0) });
+				dataItem.set("progress", progress);
+				return;
+			}
 			let x = progressGrip.x();
-			x = $math.fitToRange(x, 0, column.getPrivate("width", 0));
+			x = $math.fitToRange(x, 0, width);
 			progressGrip.setAll({ x: x, y: column.getPrivate("height", 0) });
-			dataItem.set("progress", progressGrip.x() / column.getPrivate("width", 0));
+			dataItem.set("progress", progressGrip.x() / width);
 		});
-
-		// --- Grips (start/end) ---
-
-		const startGrip = this.startGrips.make();
-		this.startGrips.push(startGrip);
-		container.children.push(startGrip);
 
 		const endGrip = this.endGrips.make();
 		this.endGrips.push(endGrip);
@@ -528,6 +566,27 @@ export class GanttSeries extends ColumnSeries {
 
 		dataItem.setRaw("startGrip", startGrip);
 		dataItem.setRaw("endGrip", endGrip);
+
+		if (!this._gripStopsReset) {
+			this._gripStopsReset = true;
+			this._resetGripStops([startGrip, progressGrip, endGrip]);
+		}
+
+		// Keyboard: up and down move to the same element of the next or previous
+		// task, left and right move the element. TAB goes through the focused
+		// task's elements only, so all of them follow it
+		$array.each([column, zeroRectangle, startGrip, progressGrip, endGrip], (element) => {
+			element.setPrivate("focusGroupVertical", true);
+			element.events.on("focus", () => {
+				this._focusedTaskElement = element;
+				this._syncTaskStops(element);
+			});
+			element.events.on("blur", () => {
+				if (this._focusedTaskElement === element) {
+					this._focusedTaskElement = undefined;
+				}
+			});
+		});
 
 		// --- Axis reference ---
 		const xAxis = this.get("xAxis") as ValueAxis<AxisRendererX>;
@@ -548,10 +607,11 @@ export class GanttSeries extends ColumnSeries {
 				column.states.applyAnimate("default");
 			}
 		});
-		startGrip.events.on("dragged", () => {
+		startGrip.events.on("dragged", (e) => {
 			startGrip.set("y", 0);
 			const x = startGrip.x() + startX;
-			let openValueX = xAxis.positionToValue(xAxis.coordinateToPosition(x));
+			// a key press moves a whole step; the pointer, where it is
+			let openValueX = e.simulated ? this._keyStepStart(dataItem.get("openValueX", 0), this._keyDirection()) : xAxis.positionToValue(xAxis.coordinateToPosition(x));
 			let minStart = this._findMinStart(dataItem);
 
 			openValueX = Math.max(openValueX, minStart);
@@ -582,10 +642,11 @@ export class GanttSeries extends ColumnSeries {
 				column.states.applyAnimate("default");
 			}
 		});
-		endGrip.events.on("dragged", () => {
+		endGrip.events.on("dragged", (e) => {
 			endGrip.set("y", 0);
 			const x = endGrip.x() + endX;
-			let valueX = xAxis.positionToValue(xAxis.coordinateToPosition(x));
+			// a key press moves a whole step; the pointer, where it is
+			let valueX = e.simulated ? this._keyStepEnd(dataItem.get("valueX", 0), this._keyDirection()) : xAxis.positionToValue(xAxis.coordinateToPosition(x));
 			valueX = Math.max(valueX, dataItem.get("openValueX", 0));
 			dataItem.set("valueX", valueX);
 			dataItem.set("valueXWorking", valueX);
@@ -900,6 +961,12 @@ export class GanttSeries extends ColumnSeries {
 					}
 				}
 			});
+
+			// the focused task may have become a milestone, or stopped being one
+			const focusedTaskElement = this._focusedTaskElement;
+			if (focusedTaskElement && !focusedTaskElement.isDisposed()) {
+				this._syncTaskStops(focusedTaskElement);
+			}
 
 			$array.each(this.dataItems, (dataItem) => {
 				this._adjustLinkValues(dataItem);
@@ -1608,6 +1675,8 @@ export class GanttSeries extends ColumnSeries {
 			});
 		}
 
+		this._updateGripAria(dataItem);
+
 		// update progress rectangle
 		const progressRectangle = dataItem.get("progressRectangle");
 		if (progressRectangle) {
@@ -1879,6 +1948,139 @@ export class GanttSeries extends ColumnSeries {
 	 *
 	 * @return Duration in milliseconds
 	 */
+	protected _gripAriaKeys: WeakMap<DataItem<any>, string> = new WeakMap();
+
+	protected _gripStopsReset: boolean = false;
+	protected _focusedTaskElement?: Sprite;
+
+	// The TAB stops of the other groups go to the same task as `element`: its
+	// element in each, or none if it has none (a milestone has no progress grip)
+	protected _syncTaskStops(element: Sprite): void {
+		const dataItem = element.dataItem as DataItem<this["_dataItemSettings"]>;
+		if (!dataItem) {
+			return;
+		}
+		const group = element.get("focusableGroup");
+		const stops: { [group: string]: Sprite | undefined } = {};
+		const elements: Array<Sprite | undefined> = [dataItem.get("graphics"), dataItem.get("zeroRectangle"), dataItem.get("startGrip"), dataItem.get("progressGrip"), dataItem.get("endGrip")];
+		$array.each(elements, (other) => {
+			const otherGroup = other && other.get("focusableGroup");
+			if (other && otherGroup != null && otherGroup !== group && !stops[otherGroup]) {
+				stops[otherGroup] = this._canFocusTaskElement(other) ? other : undefined;
+			}
+		});
+		$array.each($object.keys(stops), (otherGroup) => {
+			this._root._setGroupStop(otherGroup, stops[otherGroup]);
+		});
+	}
+
+	// Whether a task's element can take focus, and is not being hidden with
+	// its parent (a task becoming a milestone hides its bar and progress)
+	protected _canFocusTaskElement(element: Sprite): boolean {
+		let sprite: Sprite | undefined = element;
+		while (sprite && sprite !== this) {
+			if (sprite.isHidden() || sprite.isHiding()) {
+				return false;
+			}
+			sprite = sprite.parent;
+		}
+		return this._root._canFocus(element);
+	}
+
+	/**
+	 * Grips are not TAB stops until a task is focused: TAB then goes through
+	 * that task's bar and grips.
+	 *
+	 * @ignore
+	 */
+	public _resetGripStops(grips?: Array<Graphics | undefined>): void {
+		const dataItem = this.dataItems[0];
+		if (!grips && dataItem) {
+			grips = [dataItem.get("startGrip"), dataItem.get("progressGrip"), dataItem.get("endGrip")];
+		}
+		$array.each(grips || [], (grip) => {
+			const group = grip && grip.get("focusableGroup");
+			if (group != null) {
+				this._root._setGroupStop(group);
+			}
+		});
+	}
+
+	// The start of a task moved with keys
+	protected _keyOpenValueX?: number;
+
+	// One snap step (`snapCount` of the axis's base interval) for a key press
+	protected _keyStep(): number {
+		const baseInterval = (this.get("xAxis") as DateAxis<AxisRendererX>).baseMainInterval();
+		return $time.getDuration(baseInterval.timeUnit, baseInterval.count * this.get("snapCount", 1));
+	}
+
+	// Which way an arrow key moves a task or grip: 1 later, -1 earlier. From
+	// the key, as the element's position isn't updated yet when it is dragged
+	protected _keyDirection(): number {
+		return this._root._keyboardDragStep.x < 0 ? -1 : 1;
+	}
+
+	// A start moved by a key press, past weekends and holidays
+	protected _keyStepStart(value: number, direction: number): number {
+		const step = this._keyStep() * direction;
+		value += step;
+		for (let i = 0; i < 366 && this.isHoliday(value); i++) {
+			value += step;
+		}
+		return value;
+	}
+
+	// An end moved by a key press, so that it adds or removes a working day
+	protected _keyStepEnd(value: number, direction: number): number {
+		const step = this._keyStep();
+		value += step * direction;
+		for (let i = 0; i < 366 && this.isHoliday(value - step); i++) {
+			value += step * direction;
+		}
+		return value;
+	}
+
+	// The start, end and progress grips read their values to screen readers
+	protected _updateGripAria(dataItem: DataItem<this["_dataItemSettings"]>): void {
+		// only grips that can take focus, and only when a value changed
+		if (!this.gantt.get("editable", true)) {
+			return;
+		}
+		const key = dataItem.get("openValueX") + "|" + dataItem.get("valueX") + "|" + dataItem.get("progress", 0);
+		if (this._gripAriaKeys.get(dataItem) === key) {
+			return;
+		}
+		this._gripAriaKeys.set(dataItem, key);
+		const language = this._root.language;
+		const formatter = this._root.dateFormatter;
+		const format = language.translate("_date_day_full");
+		const setValue = (grip: Graphics | undefined, now: number, text: string) => {
+			if (grip && grip.get("ariaValueText") !== text) {
+				grip._setCAll({
+					ariaValueNow: "" + now,
+					ariaValueText: text
+				});
+			}
+		};
+		const openValueX = dataItem.get("openValueX");
+		const valueX = dataItem.get("valueX");
+		if ($type.isNumber(openValueX)) {
+			const start = formatter.format(new Date(openValueX), format);
+			setValue(dataItem.get("startGrip"), openValueX, language.translate("From %1", undefined, start));
+			// the bar and the milestone (sliders while editable) read their dates
+			setValue(dataItem.get("zeroRectangle"), openValueX, start);
+			if ($type.isNumber(valueX)) {
+				setValue(dataItem.get("graphics"), openValueX, start + " - " + formatter.format(new Date(valueX), format));
+			}
+		}
+		if ($type.isNumber(valueX)) {
+			setValue(dataItem.get("endGrip"), valueX, language.translate("To %1", undefined, formatter.format(new Date(valueX), format)));
+		}
+		const progress = Math.round(dataItem.get("progress", 0) * 100);
+		setValue(dataItem.get("progressGrip"), progress, progress + "%");
+	}
+
 	public getUnitDuration(): number {
 		return $time.getDuration(this.gantt.get("durationUnit", "day"));
 	}

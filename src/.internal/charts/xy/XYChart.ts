@@ -2055,7 +2055,14 @@ export class XYChart extends SerialChart {
 			}
 		})
 
-		this.setPrivate("tooltipSeries", tooltipSeries);
+		// an equal list does not mark the chart, and so all its series, for a redraw
+		const shownSeries = this.getPrivate("tooltipSeries");
+		if (!shownSeries || shownSeries.length !== tooltipSeries.length || $array.findIndex(shownSeries, (s, i) => s !== tooltipSeries[i]) !== -1) {
+			this.setPrivate("tooltipSeries", tooltipSeries);
+		}
+		else {
+			this.setPrivateRaw("tooltipSeries", tooltipSeries);
+		}
 
 		if (this.get("arrangeTooltips")) {
 

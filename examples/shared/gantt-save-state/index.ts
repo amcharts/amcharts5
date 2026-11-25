@@ -89,6 +89,28 @@ gantt.events.on("datemarked", saveState);
 gantt.events.on("dateunmarked", saveState);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+gantt.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Gantt chart of a project's tasks that keeps your changes for your next visit. Tab to the tasks, then move between them with the up and down arrow keys. Left and right arrow keys move a task"
+});
+// the tasks, bars and milestone diamonds: one Tab stop; up and down arrow keys step through them, left and right move them
+// (sliders while the chart is editable, which read their dates as the value, so the names leave them out)
+gantt.series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "tasks",
+  hoverOnFocus: true, // a focused task shows its tooltip
+  ariaLabel: "{name}, {progress.formatNumber('#.%')} done"
+});
+gantt.series.zeroRectangles.template.setAll({
+  focusable: true,
+  focusableGroup: "tasks",
+  hoverOnFocus: true,
+  ariaLabel: "{name}, milestone"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 gantt.appear(1000, 100);

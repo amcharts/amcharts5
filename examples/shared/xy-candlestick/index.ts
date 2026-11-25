@@ -157,6 +157,20 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Candlestick chart of a daily price over January and February 2024. Tab to the candles, then move between them with the up and down arrow keys"
+});
+// the candles: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "candles",
+  ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: open {openValueY}, high {highValueY}, low {lowValueY}, close {valueY}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

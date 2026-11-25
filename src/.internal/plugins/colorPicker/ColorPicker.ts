@@ -256,6 +256,7 @@ export class ColorPicker extends Container {
 	protected _isColorDown: boolean = false;
 	protected _isPicking: boolean = false;
 	protected _isEditing: boolean = false;
+	protected _openedFrom?: ColorPickerButton;
 
 	// What the eyedropper samples when the chart is not drawn on canvas
 	protected _pickSnapshot: HTMLCanvasElement | undefined;
@@ -353,6 +354,9 @@ export class ColorPicker extends Container {
 
 				this.colorInput.set("text", text);
 			}
+			// the field reads the color it shows, e.g. "Color #a367dc"
+			const name = this._root.language.translate("Color");
+			this.colorInput._setC("ariaLabel", text ? name + " " + text : name);
 		})
 
 		this.pickerButton.on("active", (active) => {
@@ -363,8 +367,9 @@ export class ColorPicker extends Container {
 
 		if ($utils.supports("keyboardevents")) {
 			this._disposers.push($utils.addEventListener(document, "keyup", (e: KeyboardEvent) => {
-				if (e.key === "Escape") {
-					this.set("colorButton", undefined);
+				// ESC in the color field only ends typing
+				if (e.key === "Escape" && this.get("colorButton") && !((e.target as HTMLElement).tagName == "TEXTAREA")) {
+					this.cancel();
 				}
 			}));
 		}
@@ -487,11 +492,25 @@ export class ColorPicker extends Container {
 				hidden = false;
 				this.show();
 
+				// opened from the keyboard: focus moves to the color field, and back
+				// to the button when the picker closes
+				if (this._root.focused(colorButton)) {
+					this._openedFrom = colorButton;
+					this._root._focusSprite(this.colorInput);
+				}
+
 				this.set("color", colorButton.get("color", colorButton.getPrivate("color")));
 				this.set("colorOpacity", colorButton.get("colorOpacity") || 1);
 			}
 			else {
 				this.hide();
+				const openedFrom = this._openedFrom;
+				if (openedFrom) {
+					this._openedFrom = undefined;
+					if (!openedFrom.isDisposed()) {
+						this._root._focusSprite(openedFrom);
+					}
+				}
 			}
 
 			this._clickOverlay.set("forceHidden", hidden);

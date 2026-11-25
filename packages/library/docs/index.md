@@ -776,12 +776,13 @@ Attributes: `config` (JSON) or `src` (URL of a JSON file), `themes`, `renderer="
 ```js
 series.columns.template.setAll({
   focusable: true,
-  ariaLabel: "{categoryX}: {valueY}",
-  role: "figure"
+  focusableGroup: "series1", // one TAB stop; up and down arrow keys move within the group
+  ariaLabel: "{categoryX}: {valueY}"
 });
 // Keyboard: TAB to navigate focusable elements, ENTER to click
-// focusableGroup: "series1" — TAB to first, arrows within group
 ```
+
+Focusable data items and charts have the `"img"` role by default (since 5.24.0; `"figure"` before), the one role whose name every major screen reader reads on focus. Tell users to move through a group with the up and down arrow keys: in their browse mode, screen readers use left and right to read the name letter by letter.
 
 **High contrast (5.21.0):** in a forced-colors mode such as Windows High Contrast, labels, grid, axes and buttons take the system colors so they stay visible; series colors are kept. It is on by default — `am5.Root.new("chartdiv", { forcedColors: false })` keeps the chart's own interface colors.
 

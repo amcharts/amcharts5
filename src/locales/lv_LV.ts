@@ -305,7 +305,7 @@ export default {
 	"Legend": "Apzīmējumi",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Nospiediet ENTER, lai pārslēgtu",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Ielādē",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Diagramma",
+	"Serial chart": "Sērijveida diagramma",
+	"X/Y chart": "X/Y diagramma",
+	"Pie chart": "Sektoru diagramma",
+	"Gauge chart": "Mērinstrumenta diagramma",
+	"Radar chart": "Radara diagramma",
+	"Sankey diagram": "Sankey diagramma",
+	"Flow diagram": "Plūsmas diagramma",
+	"Chord diagram": "Hordu diagramma",
+	"TreeMap chart": "TreeMap diagramma",
+	"Force directed tree": "Spēku virzīts koks",
+	"Sliced chart": "Sadalīta diagramma",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Sērija",
+	"Candlestick Series": "Sveču sērija",
+	"OHLC Series": "OHLC sērija",
+	"Column Series": "Stabiņu sērija",
+	"Line Series": "Līniju sērija",
+	"Pie Slice Series": "Sektoru sērija",
+	"Funnel Series": "Piltuves sērija",
+	"Pyramid Series": "Piramīdas sērija",
+	"X/Y Series": "X/Y sērija",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Karte",
+	"Press ENTER to zoom in": "Nospiediet ENTER, lai tuvinātu",
+	"Press ENTER to zoom out": "Nospiediet ENTER, lai tālinātu",
+	"Use arrow keys to zoom in and out": "Tuviniet un tāliniet ar bulttaustiņiem",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Tuviniet un tāliniet ar tastatūras plusa un mīnusa taustiņiem",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Drukāt",
+	"Export": "Eksportēt",
 	"Image": "Attēls",
 	"Data": "Dati",
 	"Print": "Drukāt",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Nospiediet ENTER vai pārvietojieties ar bulttaustiņiem",
+	"Press ENTER to open": "Nospiediet ENTER, lai atvērtu",
+	"Press ENTER to print.": "Nospiediet ENTER, lai drukātu.",
+	"Press ENTER to export as %1.": "Nospiediet ENTER, lai eksportētu kā %1.",
+	"(Press ESC to close this message)": "(Nospiediet ESC, lai aizvērtu šo ziņojumu)",
+	"Image Export Complete": "Attēla eksports pabeigts",
+	"Export operation took longer than expected. Something might have gone wrong.": "Eksportēšana ilga ilgāk, nekā gaidīts. Iespējams, radās kļūda.",
+	"Saved from": "Saglabāts no",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Ar TAB atlasiet turus vai ar kreiso un labo bultiņu mainiet atlasi",
+	"Use left and right arrows to move selection": "Ar kreiso un labo bultiņu pārvietojiet atlasi",
+	"Use left and right arrows to move left selection": "Ar kreiso un labo bultiņu pārvietojiet atlases kreiso malu",
+	"Use left and right arrows to move right selection": "Ar kreiso un labo bultiņu pārvietojiet atlases labo malu",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Ar TAB atlasiet turus vai ar augšup un lejup bultiņu mainiet atlasi",
+	"Use up and down arrows to move selection": "Ar augšup un lejup bultiņu pārvietojiet atlasi",
+	"Use up and down arrows to move lower selection": "Ar augšup un lejup bultiņu pārvietojiet atlases apakšējo malu",
+	"Use up and down arrows to move upper selection": "Ar augšup un lejup bultiņu pārvietojiet atlases augšējo malu",
 	"From %1 to %2": "No %1 līdz %2",
 	"From %1": "No %1",
 	"To %1": "Līdz %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Vērtības: %1",
+	"Highest: %1": "Augstākā: %1",
+	"Lowest: %1": "Zemākā: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategorija",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Rezultāti: %1",
+	"No results": "Nav rezultātu",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Nokrāsa",
+	"Opacity": "Necaurredzamība",
+	"Color": "Krāsa",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Failam nav pieejams parsētājs: %1",
+	"Error parsing file: %1": "Kļūda, parsējot failu: %1",
+	"Unable to load file: %1": "Nevar ielādēt failu: %1",
+	"Invalid date": "Nederīgs datums",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Aizvērt",
+	"Minimize": "Minimizēt",
+	"Confirm": "Apstiprināt",
 	"OK": "Labi",
 	"Cancel": "Atcelt",
 	"Delete": "Dzēst",

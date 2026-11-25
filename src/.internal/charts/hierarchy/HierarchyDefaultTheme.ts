@@ -46,7 +46,8 @@ export class HierarchyDefaultTheme extends Theme {
 			// drawn in the wrong place
 			isMeasured: true,
 			cursorOverStyle: "pointer",
-			tooltipText: "{category}: {sum}"
+			tooltipText: "{category}: {sum}",
+			role: "img"
 		});
 
 		r("HierarchyNode", ["last"]).setAll({
@@ -133,6 +134,9 @@ export class HierarchyDefaultTheme extends Theme {
 				cursorOverStyle: "pointer",
 				populateText: true,
 				text: "{category}:",
+				focusable: true,
+				role: "button",
+				ariaLabel: "{category}"
 			});
 
 			setColor(rule, "fill", ic, "primaryButton");
@@ -155,7 +159,8 @@ export class HierarchyDefaultTheme extends Theme {
 				populateText: true,
 				text: "{category}",
 				fontWeight: "bold",
-				cursorOverStyle: "default"
+				cursorOverStyle: "default",
+				focusable: false
 			});
 
 			setColor(rule, "fill", ic, "primaryButton");

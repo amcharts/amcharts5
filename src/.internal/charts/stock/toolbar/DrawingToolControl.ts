@@ -97,6 +97,10 @@ export class DrawingToolControl extends StockControl {
 		this.getPrivate("icon")!.appendChild(this._getToolIcon(tool));
 		//this.getPrivate("label")!.innerHTML = tool;
 		this._setLabel(this._root.language.translateAny(tool));
+		const list = this.getPrivate("list");
+		if (list) {
+			list.setPrivate("currentId", tool);
+		}
 	}
 
 	protected _initTools(): void {

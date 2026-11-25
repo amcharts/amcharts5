@@ -678,6 +678,17 @@ export class Container extends Sprite {
 		this._root._addDirtyParent(this);
 	}
 
+	/**
+	 * Lays the children out again. Unlike `markDirty()`, it leaves the
+	 * container's layer alone: whatever moves marks its own.
+	 *
+	 * @ignore
+	 */
+	public _markDirtyLayout(): void {
+		this._root._addDirtyEntity(this);
+		this._root._addDirtyParent(this);
+	}
+
 	public _prepareChildren() {
 
 		this._applyDeclaredAnimations();
@@ -852,7 +863,8 @@ export class Container extends Sprite {
 					const contentMask = this._contentMask;
 
 					childrenDisplay.y = -verticalScrollbar.get("start", 0) * h;
-					childrenDisplay.markDirtyLayer();
+					// children on other layers move too
+					childrenDisplay.markDirtyLayer(true);
 
 					if (contentMask) {
 						contentMask._display.y = -childrenDisplay.y;

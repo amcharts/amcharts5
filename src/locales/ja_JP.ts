@@ -305,7 +305,7 @@ export default {
 	"Legend": "凡例",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "ENTERキーを押して切り替えます",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "読み込んでいます",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "チャート",
+	"Serial chart": "シリアルチャート",
+	"X/Y chart": "X/Yチャート",
+	"Pie chart": "円グラフ",
+	"Gauge chart": "ゲージチャート",
+	"Radar chart": "レーダーチャート",
+	"Sankey diagram": "サンキーダイアグラム",
+	"Flow diagram": "フローダイアグラム",
+	"Chord diagram": "コードダイアグラム",
+	"TreeMap chart": "ツリーマップチャート",
+	"Force directed tree": "フォース指向ツリー",
+	"Sliced chart": "スライスチャート",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "シリーズ",
+	"Candlestick Series": "ローソク足シリーズ",
+	"OHLC Series": "OHLCシリーズ",
+	"Column Series": "縦棒シリーズ",
+	"Line Series": "折れ線シリーズ",
+	"Pie Slice Series": "円スライスシリーズ",
+	"Funnel Series": "ファネルシリーズ",
+	"Pyramid Series": "ピラミッドシリーズ",
+	"X/Y Series": "X/Yシリーズ",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "地図",
+	"Press ENTER to zoom in": "ENTERキーを押して拡大します",
+	"Press ENTER to zoom out": "ENTERキーを押して縮小します",
+	"Use arrow keys to zoom in and out": "矢印キーで拡大・縮小します",
+	"Use plus and minus keys on your keyboard to zoom in and out": "キーボードのプラスキーとマイナスキーで拡大・縮小します",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "印刷",
+	"Export": "エクスポート",
 	"Image": "イメージ",
 	"Data": "データ",
 	"Print": "印刷",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "ENTERキーを押すか矢印キーで移動します",
+	"Press ENTER to open": "ENTERキーを押して開きます",
+	"Press ENTER to print.": "ENTERキーを押して印刷します。",
+	"Press ENTER to export as %1.": "ENTERキーを押して%1としてエクスポートします。",
+	"(Press ESC to close this message)": "(ESCキーを押してこのメッセージを閉じます)",
+	"Image Export Complete": "画像のエクスポートが完了しました",
+	"Export operation took longer than expected. Something might have gone wrong.": "エクスポートに予想以上の時間がかかりました。問題が発生した可能性があります。",
+	"Saved from": "保存元",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "TABキーでグリップボタンを選択するか、左右の矢印キーで選択範囲を変更します",
+	"Use left and right arrows to move selection": "左右の矢印キーで選択範囲を移動します",
+	"Use left and right arrows to move left selection": "左右の矢印キーで左側の選択範囲を移動します",
+	"Use left and right arrows to move right selection": "左右の矢印キーで右側の選択範囲を移動します",
+	"Use TAB select grip buttons or up and down arrows to change selection": "TABキーでグリップボタンを選択するか、上下の矢印キーで選択範囲を変更します",
+	"Use up and down arrows to move selection": "上下の矢印キーで選択範囲を移動します",
+	"Use up and down arrows to move lower selection": "上下の矢印キーで下側の選択範囲を移動します",
+	"Use up and down arrows to move upper selection": "上下の矢印キーで上側の選択範囲を移動します",
 	"From %1 to %2": "始点 %1 終点 %2",
 	"From %1": "始点 %1",
 	"To %1": "終点 %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "データ数: %1",
+	"Highest: %1": "最大: %1",
+	"Lowest: %1": "最小: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "カテゴリ",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "検索結果: %1 件",
+	"No results": "該当なし",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "色相",
+	"Opacity": "不透明度",
+	"Color": "色",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "ファイルのパーサーがありません: %1",
+	"Error parsing file: %1": "ファイルの解析エラー: %1",
+	"Unable to load file: %1": "ファイルを読み込めません: %1",
+	"Invalid date": "無効な日付",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "閉じる",
+	"Minimize": "最小化",
+	"Confirm": "確認",
 	"OK": "OK",
 	"Cancel": "キャンセル",
 	"Delete": "削除",

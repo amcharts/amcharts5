@@ -26,6 +26,7 @@ export class StockChartDefaultTheme extends Theme {
 		 */
 
 		r("StockChart").setAll({
+			role: "img", // read as one image when focusable, as charts are
 			paddingLeft: 18,
 			paddingRight: 18,
 			paddingTop: 5,

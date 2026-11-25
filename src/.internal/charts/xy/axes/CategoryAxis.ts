@@ -204,6 +204,9 @@ export class CategoryAxis<R extends AxisRenderer> extends Axis<R> {
 				this._updateAxisRanges();
 			}
 		}
+		else if (this._rangesDirty && this.dataItems.length > 0) {
+			this._updateAxisRanges();
+		}
 	}
 
 	/**

@@ -305,7 +305,7 @@ export default {
 	"Legend": "Chú giải",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Nhấn ENTER để bật/tắt",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Đang tải",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Biểu đồ",
+	"Serial chart": "Biểu đồ chuỗi",
+	"X/Y chart": "Biểu đồ X/Y",
+	"Pie chart": "Biểu đồ tròn",
+	"Gauge chart": "Biểu đồ đồng hồ đo",
+	"Radar chart": "Biểu đồ radar",
+	"Sankey diagram": "Biểu đồ Sankey",
+	"Flow diagram": "Biểu đồ luồng",
+	"Chord diagram": "Biểu đồ dây cung",
+	"TreeMap chart": "Biểu đồ TreeMap",
+	"Force directed tree": "Cây định hướng lực",
+	"Sliced chart": "Biểu đồ phân lát",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Chuỗi dữ liệu",
+	"Candlestick Series": "Chuỗi nến",
+	"OHLC Series": "Chuỗi OHLC",
+	"Column Series": "Chuỗi cột",
+	"Line Series": "Chuỗi đường",
+	"Pie Slice Series": "Chuỗi lát tròn",
+	"Funnel Series": "Chuỗi phễu",
+	"Pyramid Series": "Chuỗi kim tự tháp",
+	"X/Y Series": "Chuỗi X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Bản đồ",
+	"Press ENTER to zoom in": "Nhấn ENTER để phóng to",
+	"Press ENTER to zoom out": "Nhấn ENTER để thu nhỏ",
+	"Use arrow keys to zoom in and out": "Dùng phím mũi tên để phóng to và thu nhỏ",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Dùng phím cộng và trừ trên bàn phím để phóng to và thu nhỏ",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "In",
+	"Export": "Xuất",
 	"Image": "Hình ảnh",
 	"Data": "Dữ liệu",
 	"Print": "In",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Nhấn ENTER hoặc dùng phím mũi tên để điều hướng",
+	"Press ENTER to open": "Nhấn ENTER để mở",
+	"Press ENTER to print.": "Nhấn ENTER để in.",
+	"Press ENTER to export as %1.": "Nhấn ENTER để xuất dưới dạng %1.",
+	"(Press ESC to close this message)": "(Nhấn ESC để đóng thông báo này)",
+	"Image Export Complete": "Đã xuất hình ảnh xong",
+	"Export operation took longer than expected. Something might have gone wrong.": "Quá trình xuất mất nhiều thời gian hơn dự kiến. Có thể đã xảy ra lỗi.",
+	"Saved from": "Đã lưu từ",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Dùng TAB để chọn nút kéo hoặc mũi tên trái và phải để thay đổi vùng chọn",
+	"Use left and right arrows to move selection": "Dùng mũi tên trái và phải để di chuyển vùng chọn",
+	"Use left and right arrows to move left selection": "Dùng mũi tên trái và phải để di chuyển vùng chọn bên trái",
+	"Use left and right arrows to move right selection": "Dùng mũi tên trái và phải để di chuyển vùng chọn bên phải",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Dùng TAB để chọn nút kéo hoặc mũi tên lên và xuống để thay đổi vùng chọn",
+	"Use up and down arrows to move selection": "Dùng mũi tên lên và xuống để di chuyển vùng chọn",
+	"Use up and down arrows to move lower selection": "Dùng mũi tên lên và xuống để di chuyển vùng chọn phía dưới",
+	"Use up and down arrows to move upper selection": "Dùng mũi tên lên và xuống để di chuyển vùng chọn phía trên",
 	"From %1 to %2": "Từ %1 đến %2",
 	"From %1": "Từ %1",
 	"To %1": "Đến %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Giá trị: %1",
+	"Highest: %1": "Cao nhất: %1",
+	"Lowest: %1": "Thấp nhất: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Danh mục",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Kết quả: %1",
+	"No results": "Không có kết quả",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Sắc độ",
+	"Opacity": "Độ mờ đục",
+	"Color": "Màu",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Không có trình phân tích cho tệp: %1",
+	"Error parsing file: %1": "Lỗi phân tích tệp: %1",
+	"Unable to load file: %1": "Không thể tải tệp: %1",
+	"Invalid date": "Ngày không hợp lệ",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Đóng",
+	"Minimize": "Thu nhỏ",
+	"Confirm": "Xác nhận",
 	"OK": "OK",
 	"Cancel": "Hủy",
 	"Delete": "Xóa",

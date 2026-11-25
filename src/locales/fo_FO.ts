@@ -312,7 +312,7 @@ export default {
 	"Legend": "Greiðir",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Trýst ENTER at skifta",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Løða",
@@ -324,38 +324,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Force directed tree": "",
-	"Sliced chart": "",
+	"Chart": "Diagram",
+	"Serial chart": "Raðdiagram",
+	"X/Y chart": "X/Y-diagram",
+	"Pie chart": "Kakudiagram",
+	"Gauge chart": "Mátaradiagram",
+	"Radar chart": "Radardiagram",
+	"Sankey diagram": "Sankey-diagram",
+	"Flow diagram": "Streymsdiagram",
+	"Chord diagram": "Strongjadiagram",
+	"TreeMap chart": "Trækort",
+	"Force directed tree": "Kraftstýrt træ",
+	"Sliced chart": "Býtt diagram",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Røð",
+	"Candlestick Series": "Ljósastakarøð",
+	"OHLC Series": "OHLC-røð",
+	"Column Series": "Súlurøð",
+	"Line Series": "Linjurøð",
+	"Pie Slice Series": "Kakubitarøð",
+	"Funnel Series": "Trektarøð",
+	"Pyramid Series": "Pyramiderøð",
+	"X/Y Series": "X/Y-røð",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Kort",
+	"Press ENTER to zoom in": "Trýst ENTER at zooma inn",
+	"Press ENTER to zoom out": "Trýst ENTER at zooma út",
+	"Use arrow keys to zoom in and out": "Brúka pílaknøttarnar at zooma inn og út",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Brúka plus- og minusknøttarnar á knappaborðinum at zooma inn og út",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -370,15 +370,15 @@ export default {
 	"Export": "Útflutningur",
 	"Image": "Mynd",
 	"Data": "Data",
-	"Print": "Útflutningur",
-	"Press ENTER or use arrow keys to navigate": "",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Print": "Prenta",
+	"Press ENTER or use arrow keys to navigate": "Trýst ENTER ella brúka pílaknøttarnar at navigera",
+	"Press ENTER to open": "Trýst ENTER at opna",
+	"Press ENTER to print.": "Trýst ENTER at prenta.",
+	"Press ENTER to export as %1.": "Trýst ENTER at útflyta sum %1.",
+	"(Press ESC to close this message)": "(Trýst ESC at lukka hesi boðini)",
+	"Image Export Complete": "Myndaútflutningur liðugur",
+	"Export operation took longer than expected. Something might have gone wrong.": "Útflutningurin tók longri tíð enn væntað. Okkurt kann vera farið skeivt.",
+	"Saved from": "Goymt frá",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -399,28 +399,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	// 
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
-	"From %1 to %2": "",
-	"From %1": "",
-	"To %1": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Brúka TAB at velja handtøkini ella vinstru og høgru pílarnar at broyta valið",
+	"Use left and right arrows to move selection": "Brúka vinstru og høgru pílarnar at flyta valið",
+	"Use left and right arrows to move left selection": "Brúka vinstru og høgru pílarnar at flyta vinstra valið",
+	"Use left and right arrows to move right selection": "Brúka vinstru og høgru pílarnar at flyta høgra valið",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Brúka TAB at velja handtøkini ella pílarnar upp og niður at broyta valið",
+	"Use up and down arrows to move selection": "Brúka pílarnar upp og niður at flyta valið",
+	"Use up and down arrows to move lower selection": "Brúka pílarnar upp og niður at flyta niðara valið",
+	"Use up and down arrows to move upper selection": "Brúka pílarnar upp og niður at flyta ovara valið",
+	"From %1 to %2": "Frá %1 til %2",
+	"From %1": "Frá %1",
+	"To %1": "Til %1",
+
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Virði: %1",
+	"Highest: %1": "Hægst: %1",
+	"Lowest: %1": "Lægst: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Bólkur",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Úrslit: %1",
+	"No results": "Eingi úrslit",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Litblær",
+	"Opacity": "Ógjøgnumskygni",
+	"Color": "Litur",
 
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Eingin parsari tøkur fyri fíluna: %1",
+	"Error parsing file: %1": "Feilur við tulking av fíluni: %1",
+	"Unable to load file: %1": "Kann ikki heinta fíluna: %1",
+	"Invalid date": "Ógildur dagfestingur",
 
 	// Common actions
 	"Close": "Lukka",
 	"Minimize": "Minimera",
-	"Confirm": "",
+	"Confirm": "Vátta",
 	"OK": "OK",
 	"Cancel": "Ógilda",
 	"Delete": "Strika",

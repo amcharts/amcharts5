@@ -11,6 +11,8 @@
         }
       }
     },
+    "focusable": true,
+    "ariaLabel": "World map of countries that zooms to the one you pick. Tab to the countries, move between them with the up and down arrow keys, and press Enter to zoom to one or back out",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -35,19 +37,22 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": { "tooltipText": "{name}", "interactive": true },
+                "settings": {
+                  "tooltipText": "{name}",
+                  "interactive": true,
+                  "focusable": true,
+                  "focusableGroup": "countries",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}"
+                },
                 "states": [
                   {
                     "key": "hover",
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#6771dc" }
-                    }
+                    "settings": { "fill": "@root.interfaceColors.get('primaryButtonHover')" }
                   },
                   {
                     "key": "active",
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#68dc76" }
-                    }
+                    "settings": { "fill": "@root.interfaceColors.get('primaryButtonActive')" }
                   }
                 ]
               }

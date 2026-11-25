@@ -66,7 +66,12 @@ pointSeries.bullets.push(() => {
       fill: am5.color(0xff621f),                     // the same orange as the routes
       stroke: root.interfaceColors.get("background"), // a ring in the background color
       strokeWidth: 2,
-      tooltipText: "{title}"                         // the city's name from the data
+      tooltipText: "{title}",                        // the city's name from the data
+      // keyboard: one Tab stop for all the cities, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "cities",
+      hoverOnFocus: true, // the focused city shows its tooltip
+      ariaLabel: "{title}"
     })
   });
 });
@@ -100,6 +105,15 @@ lineSeries.data.setAll([
   { pointIds: ["sao-paulo", "johannesburg"] },
   { pointIds: ["johannesburg", "singapore"] },
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the globe, and a screen reader names it
+  ariaLabel: "Globe with six routes between London, New York, Sao Paulo, Johannesburg and Singapore, drawn as arcs raised above the surface. Tab to the cities, then move between them with the up and down arrow keys"
+});
+// the cities: set up in their bullet function above
 
 
 // Make stuff animate on load

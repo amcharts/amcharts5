@@ -6,6 +6,8 @@
     "valueField": "value",
     "radius": { "type": "Percent", "value": 75 },
     "startAngle": 80,
+    "focusable": true,
+    "ariaLabel": "Directed chord diagram of 27 links from the six Friends characters to the people around them. Tab to the people or the links, then move through them with the up and down arrow keys; Enter on a person hides or shows their links",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -15,12 +17,26 @@
     "links": {
       "properties": {
         "template": {
-          "settings": { "fillStyle": "source" }
+          "settings": {
+            "fillStyle": "source",
+            "focusable": true,
+            "focusableGroup": "links",
+            "tabindexOrder": 5,
+            "hoverOnFocus": true,
+            "ariaLabel": "{sourceId} to {targetId}: {value}"
+          }
         }
       }
     },
     "nodes": {
       "properties": {
+        "nodes": {
+          "properties": {
+            "template": {
+              "settings": { "focusable": true, "focusableGroup": "nodes", "ariaLabel": "{name}: {sum} in all" }
+            }
+          }
+        },
         "labels": {
           "properties": {
             "template": {

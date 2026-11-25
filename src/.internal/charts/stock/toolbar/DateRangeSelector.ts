@@ -4,6 +4,7 @@ import { StockIcons } from "./StockIcons";
 import { StyleSheet } from "../../../core/util/Utils";
 import flatpickr from "flatpickr";
 
+import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
 import * as $time from "../../../core/util/Time";
 import { utcTime } from "../../../core/util/Timezone";
@@ -245,6 +246,12 @@ export class DateRangeSelector extends StockControl {
 
 		this.setPrivate("toPicker", toPicker);
 
+		if (allowInput) {
+			// a date is typed into the field: the calendars are only for the mouse
+			this._hideCalendar(fromPicker);
+			this._hideCalendar(toPicker);
+		}
+
 
 		// Buttons
 		const buttons = document.createElement("div")
@@ -319,6 +326,26 @@ export class DateRangeSelector extends StockControl {
 
 	protected _getDefaultIcon(): SVGElement {
 		return StockIcons.getIcon("Calendar");
+	}
+
+	// hidden from screen readers and out of the TAB order
+	protected _hideCalendar(picker: any): void {
+		const calendar: HTMLElement = picker.calendarContainer;
+		if (calendar) {
+			calendar.setAttribute("aria-hidden", "true");
+			const update = () => {
+				$array.each(calendar.querySelectorAll("input, select, button, a, [tabindex]"), (el) => {
+					(el as HTMLElement).setAttribute("tabindex", "-1");
+				});
+			};
+			update();
+			$array.each(["onMonthChange", "onYearChange", "onChange", "onOpen"], (hook) => {
+				const hooks = picker.config[hook];
+				if (hooks && hooks.push) {
+					hooks.push(update);
+				}
+			});
+		}
 	}
 
 	public _afterChanged() {

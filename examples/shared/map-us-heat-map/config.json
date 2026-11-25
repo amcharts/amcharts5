@@ -2,6 +2,8 @@
   "type": "MapChart",
   "settings": {
     "paddingBottom": 60,
+    "focusable": true,
+    "ariaLabel": "Heat map of the United States, each state colored by its customer satisfaction score, from red at 50 through yellow to green at 100. Tab to the states, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -92,7 +94,11 @@
         "settings": {
           "tooltipText": "{name}: {value}",
           "stroke": "@root.interfaceColors.get('background')",
-          "strokeWidth": 1
+          "strokeWidth": 1,
+          "focusable": true,
+          "focusableGroup": "states",
+          "hoverOnFocus": true,
+          "ariaLabel": "{name}: score {value}"
         }
       }
     },

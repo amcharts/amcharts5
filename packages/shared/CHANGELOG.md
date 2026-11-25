@@ -5,6 +5,47 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.24.0] - 2026-11-25
+
+### Added
+- Accessibility: new `ariaSummary` setting on charts and series: a summary of each series for screen readers (how many values, first and last, highest and lowest), also on legend items. `series.getSummary()` returns it as data.
+- Accessibility: new `ariaDescription` setting on all elements, read after the label.
+- Accessibility: new `ariaDataTable` setting on charts and series: the data as a table hidden from view, by category or date, grouped dates by their groups.
+- Date axis: `baseInterval` is now optional; the axis works it out from the data. New `baseMainInterval()` returns the interval in use. TypeScript: `get("baseInterval")` can now be `undefined`.
+- Map line: new `fillToSurface` setting. On flat maps, a raised line's fill reaches the ground.
+- Root: new `logoPosition` setting for the logo of a chart without a licence: `"bl"` (default), `"br"`, `"tl"` or `"tr"`.
+- New language prompts: "Hue", "Opacity", "Color", "Results: %1" and "No results".
+
+### Changed
+- Faster: a change repaints only the canvas layers it affects, the XY cursor no longer redraws the plot on each move, charts with many focusable elements load and zoom much faster, and map lines with `altitude` draw short flat stretches several times faster.
+- Accessibility: charts (stock and Gantt charts and series used as charts, such as Sankey or treemap, too) and focusable data items and bullets have the `"img"` role by default, instead of `"figure"` (charts had none), as JAWS doesn't read a focused figure. Items that toggle, such as pie slices, are toggle buttons.
+- Accessibility: `Button` has the `"button"` role by default, and any other focusable element with no role of its own is read as `"img"`.
+- Bundled examples work with a keyboard and a screen reader. Their names say to move through items with the up and down arrow keys, which also work in screen readers' browse mode.
+- Gantt, accessibility: task names, expand and collapse buttons, task bars, milestones and grips work with the keyboard. While editable, bars, milestones and grips are sliders: TAB goes through the focused task's bar and grips, up and down arrow keys move between tasks, and left and right move the task or grip one snap step (progress 5%). ENTER renames a focused task name.
+- Gantt: "Expand all" and "Collapse all" are disabled while no task has subtasks. Toolbar icons have 3:1 contrast.
+- Stock toolbar: a control's icon and label are now in an inner element, `am5stock-control-trigger` (private `trigger`), which takes focus. CSS that targets them as direct children of `.am5stock-control-button` needs updating.
+- Stock toolbar, accessibility: buttons are named by their visible text and say whether their dropdown is open. Dropdowns are menus: they take focus when opened from the keyboard, HOME and END go to the first and last item, and ESC returns focus to the button. The period selector is one TAB stop. Date calendars are skipped when dates can be typed in. Searching a list announces how many items were found. Fields and color pickers in dialogs can be reached and are named, and dialog buttons have readable contrast.
+- Color picker, accessibility: opened from the keyboard, it moves focus to the color field and back when it closes; its fields are named; ENTER applies a typed color and ESC restores the previous one.
+- `Slider`: `ariaLabel` names its grip, which reads its value. `EditableLabel`: when focusable, ENTER edits it. Hierarchy breadcrumb labels can be reached with TAB.
+- Bundled locales: prompts that were left in English are translated in all 41 non-English locales. "Export" no longer reads as "Print" in 26 of them.
+
+### Fixed
+- Accessibility, TAB order: hidden series and elements in hidden containers (such as a `forceHidden` scrollbar) are no longer TAB stops; zoomed XY charts no longer skip a group; a group starts at its first member; an element made focusable again keeps its place; hierarchy nodes above `topDepth` and `ZoomTools` buttons at the zoom limit are skipped; the Gantt toolbar is in order.
+- Accessibility, keys: arrow keys in a focusable group move one item per press under screen readers (JAWS moved two); SHIFT + arrow drags no longer lose steps when held, and their events carry the element's position; the focused element keeps focus while briefly hidden.
+- Accessibility, labels: `ariaLabel` is filled in again on focus, and reads an animating value as it will be; scrollbar and slider grips keep an `ariaLabel` set in code and read their value; XY cursor lines have `aria-valuenow`; a horizontal resize button names the right arrow keys.
+- Accessibility: focusable bullets hidden by `minBulletDistance` stay reachable by keyboard; `focusable` works through an adapter; radar columns take focus without `isMeasured: false`; a `hoverOnFocus` tooltip on a partly visible element points at the visible part.
+- Exporting: XLSX export no longer fails on some `title` values (over 30 characters, blank, "History", or with an apostrophe at either end), and elements left out of an export no longer get pointer events while it runs.
+- `updateData()` with fewer rows also removes them from `data`: stock indicators no longer keep old rows, and Bollinger Bands no longer throw an error.
+- Stock: a moving average with `offset` added before the data, and the Settings dropdown on a toolbar with no indicator or drawing controls, no longer throw errors.
+- Gantt: `addNewTask()` no longer throws an error when some rows have no task.
+- Date axis: a date moved with `setIndex()` to exactly the end of its period goes to the next period.
+- JSON: settings on flow nodes (`series.nodes.nodes.template`) are serialized.
+
+### Security
+- HTML content (`html`, `labelHTML`, `tooltipHTML`, modals, the export menu, and now stock toolbar names) is sanitized by parsing it, so code no longer slips through, e.g. `<img/onerror=...>` or an encoded `javascript:` link. `<style>` elements and attributes that tie a button to a form elsewhere are removed too.
+- Exporting: class names in `htmlOptions` are escaped in the HTML table export.
+
+
 ## [5.23.0] - 2026-11-19
 
 ### Added

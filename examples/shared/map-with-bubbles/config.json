@@ -3,6 +3,8 @@
   "settings": {
     "panX": "translateX",
     "panY": "translateY",
+    "focusable": true,
+    "ariaLabel": "World map with bubbles on 40 countries, sized and colored by population. Tab to the bubbles, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -60,7 +62,15 @@
       ]
     },
     {
-      "template-0": { "type": "Template" }
+      "template-0": {
+        "type": "Template",
+        "settings": {
+          "focusable": true,
+          "focusableGroup": "bubbles",
+          "hoverOnFocus": true,
+          "ariaLabel": "{name}: population {value.formatNumber('#,###')}"
+        }
+      }
     },
     {
       "series-0": {
@@ -74,10 +84,10 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.15,
                   "strokeWidth": 0.5,
-                  "stroke": { "type": "Color", "value": "#ffffff" }
+                  "stroke": "@root.interfaceColors.get('background')"
                 }
               }
             }

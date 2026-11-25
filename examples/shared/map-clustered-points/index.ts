@@ -57,7 +57,12 @@ pointSeries.bullets.push(() => {
       radius: 6,
       tooltipY: 0,            // the tooltip points at the top of the dot, not its middle
       tooltipText: "{title}", // the city's name from the data
-      fill: am5.color(0xff8c00)
+      fill: am5.color(0xff8c00),
+      // keyboard: one Tab stop for the cities and clusters, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "cities",
+      hoverOnFocus: true, // the focused city shows its tooltip
+      ariaLabel: "{title}"
     })
   });
 });
@@ -67,7 +72,12 @@ pointSeries.bullets.push(() => {
 // https://docs.amcharts.com/v5/charts/map-chart/clustered-point-series/#group-bullet
 pointSeries.set("clusteredBullet", (root, series, dataItem) => {
   const container = am5.Container.new(root, {
-    cursorOverStyle: "pointer" // a hand cursor, as the cluster can be clicked
+    cursorOverStyle: "pointer", // a hand cursor, as the cluster can be clicked
+    // keyboard: in the cities' Tab stop; Enter zooms in, as a click does
+    focusable: true,
+    focusableGroup: "cities",
+    role: "button",
+    ariaLabel: "A cluster of {value} cities"
   });
 
   // two see-through rings around a solid dot
@@ -154,6 +164,15 @@ pointSeries.data.setAll([
   { title: "Nairobi", latitude: -1.28, longitude: 36.8 },
   { title: "Pretoria", latitude: -25.75, longitude: 28.19 }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "World map of 42 capital cities, where cities close together merge into clusters. Tab to the cities, move between them with the up and down arrow keys, and press Enter on a cluster to zoom in until it breaks up"
+});
+// the cities and clusters: set up in their bullet functions above
 
 
 // Make stuff animate on load

@@ -60,6 +60,25 @@ const legend = chart.children.push(am5.Legend.new(root, {
 legend.data.setAll(series.dataItems);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Pyramid chart of seven values, One to Seven, from the smallest at the tip to the largest at the base. Tab to the levels, then move between them with the up and down arrow keys"
+});
+// the slices: one Tab stop, the up and down arrow keys step through them
+series.slices.template.setAll({
+  focusable: true,
+  focusableGroup: "slices",
+  ariaLabel: "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+});
+// the legend: one Tab stop, after the slices
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear();

@@ -95,6 +95,21 @@ series.data.setAll([{
 series.set("selectedDataItem", series.dataItems[0]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+container.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Treemap of sales in three departments, Electronics, Home and Sports, and their products, each tile sized by its sales. Tab to the tiles, move between them with the up and down arrow keys, and press Enter to open one; the breadcrumbs above lead back up"
+});
+// the tiles: one Tab stop, the up and down arrow keys step through them
+series.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  hoverOnFocus: true, // the focused tile shows its tooltip
+  ariaLabel: "{category}: {sum}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

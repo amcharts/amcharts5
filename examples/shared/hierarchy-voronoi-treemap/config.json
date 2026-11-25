@@ -14,6 +14,8 @@
     "idField": "id",
     "childDataField": "children",
     "selectedDataItem": "@self.dataItems.0",
+    "focusable": true,
+    "ariaLabel": "Voronoi treemap of the world's population: six continents and their countries, each area sized by its people. Tab to the areas, move between them with the up and down arrow keys, and press Enter to zoom into a continent",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -24,6 +26,13 @@
       "properties": {
         "template": {
           "settings": { "text": "{id}", "fontSize": 11, "minScale": 0.7 }
+        }
+      }
+    },
+    "nodes": {
+      "properties": {
+        "template": {
+          "settings": { "focusable": true, "focusableGroup": "nodes", "ariaLabel": "{category}: {sum} people" }
         }
       }
     }

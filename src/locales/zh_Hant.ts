@@ -305,7 +305,7 @@ export default {
 	"Legend": "圖例",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "按 ENTER 鍵切換",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "正在載入",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "圖表",
+	"Serial chart": "序列圖",
+	"X/Y chart": "X/Y 圖表",
+	"Pie chart": "圓餅圖",
+	"Gauge chart": "量表圖",
+	"Radar chart": "雷達圖",
+	"Sankey diagram": "桑基圖",
+	"Flow diagram": "流程圖",
+	"Chord diagram": "弦圖",
+	"TreeMap chart": "矩形樹狀圖",
+	"Force directed tree": "力導向樹",
+	"Sliced chart": "切片圖",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "數列",
+	"Candlestick Series": "K線數列",
+	"OHLC Series": "OHLC 數列",
+	"Column Series": "直條數列",
+	"Line Series": "折線數列",
+	"Pie Slice Series": "圓餅切片數列",
+	"Funnel Series": "漏斗數列",
+	"Pyramid Series": "金字塔數列",
+	"X/Y Series": "X/Y 數列",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "地圖",
+	"Press ENTER to zoom in": "按 ENTER 鍵放大",
+	"Press ENTER to zoom out": "按 ENTER 鍵縮小",
+	"Use arrow keys to zoom in and out": "使用方向鍵放大和縮小",
+	"Use plus and minus keys on your keyboard to zoom in and out": "使用鍵盤上的加號和減號鍵放大和縮小",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "列印",
+	"Export": "匯出",
 	"Image": "影像",
 	"Data": "資料",
 	"Print": "列印",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "按 ENTER 鍵或使用方向鍵瀏覽",
+	"Press ENTER to open": "按 ENTER 鍵開啟",
+	"Press ENTER to print.": "按 ENTER 鍵列印。",
+	"Press ENTER to export as %1.": "按 ENTER 鍵匯出為 %1。",
+	"(Press ESC to close this message)": "（按 ESC 鍵關閉此訊息）",
+	"Image Export Complete": "影像匯出完成",
+	"Export operation took longer than expected. Something might have gone wrong.": "匯出作業耗時超出預期。可能發生了問題。",
+	"Saved from": "儲存自",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "使用 TAB 鍵選取控點按鈕，或使用左右方向鍵變更選取範圍",
+	"Use left and right arrows to move selection": "使用左右方向鍵移動選取範圍",
+	"Use left and right arrows to move left selection": "使用左右方向鍵移動左側選取範圍",
+	"Use left and right arrows to move right selection": "使用左右方向鍵移動右側選取範圍",
+	"Use TAB select grip buttons or up and down arrows to change selection": "使用 TAB 鍵選取控點按鈕，或使用上下方向鍵變更選取範圍",
+	"Use up and down arrows to move selection": "使用上下方向鍵移動選取範圍",
+	"Use up and down arrows to move lower selection": "使用上下方向鍵移動下方選取範圍",
+	"Use up and down arrows to move upper selection": "使用上下方向鍵移動上方選取範圍",
 	"From %1 to %2": "從 %1 至 %2",
 	"From %1": "從 %1",
 	"To %1": "至 %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "資料個數：%1",
+	"Highest: %1": "最高：%1",
+	"Lowest: %1": "最低：%1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "類別",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "搜尋結果：%1",
+	"No results": "無結果",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "色相",
+	"Opacity": "不透明度",
+	"Color": "顏色",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "沒有可用於檔案的剖析器：%1",
+	"Error parsing file: %1": "剖析檔案時發生錯誤：%1",
+	"Unable to load file: %1": "無法載入檔案：%1",
+	"Invalid date": "無效日期",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "關閉",
+	"Minimize": "最小化",
+	"Confirm": "確認",
 	"OK": "確定",
 	"Cancel": "取消",
 	"Delete": "刪除",

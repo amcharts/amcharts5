@@ -2,7 +2,9 @@
   "type": "PieChart",
   "settings": {
     "layout": { "type": "VerticalLayout" },
-    "innerRadius": { "type": "Percent", "value": 50 }
+    "innerRadius": { "type": "Percent", "value": 50 },
+    "focusable": true,
+    "ariaLabel": "Donut chart of seven categories, One to Seven, and their share of the total. Tab to the slices, then move between them with the up and down arrow keys; Enter pulls a slice out"
   },
   "properties": {
     "series": ["#series-0"]
@@ -16,7 +18,16 @@
         "marginTop": 15,
         "marginBottom": 15
       },
-      "properties": { "data": "#series-0.dataItems" }
+      "properties": {
+        "data": "#series-0.dataItems",
+        "itemContainers": {
+          "properties": {
+            "template": {
+              "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+            }
+          }
+        }
+      }
     }
   ],
   "refs": [
@@ -41,7 +52,21 @@
           "appearDuration": 1000,
           "appearDelay": 100
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "slices": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "slices",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]

@@ -20,9 +20,13 @@ export interface IDateAxisSettings<R extends AxisRenderer> extends IValueAxisSet
 	 * The time interval of the data, such as `{ timeUnit: "day", count: 1 }`
 	 * for daily data. Each data item takes up one such period on the axis.
 	 *
+	 * If not set, the axis works it out from the smallest gap between dates in
+	 * the data and updates it when the data changes. `baseMainInterval()`
+	 * returns the interval in use.
+	 *
 	 * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/#data-granularity} for more info
 	 */
-	baseInterval: ITimeInterval;
+	baseInterval?: ITimeInterval;
 
 	/**
 	 * Where within the first period the axis starts, from `0` (its start) to
@@ -178,6 +182,13 @@ export interface IDateAxisPrivate extends IValueAxisPrivate {
 	baseInterval: ITimeInterval;
 
 	/**
+	 * The interval worked out from the data when `baseInterval` is not set.
+	 *
+	 * @since 5.24.0
+	 */
+	autoBaseInterval?: ITimeInterval;
+
+	/**
 	 * The interval between grid lines at the current zoom.
 	 */
 	gridInterval: ITimeInterval;
@@ -195,12 +206,6 @@ export interface IDateAxisEvents extends IValueAxisEvents {
 
 }
 
-/**
- * An axis of dates and times, placing each data item at its time.
- *
- * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/} for more info
- * @important
- */
 // Where grouping into one interval stopped: the last group, its running values, and the row each group starts at
 interface IGroupRun {
 	previousTime: number;
@@ -219,6 +224,43 @@ interface IGroupState {
 	runs: { [index: string]: IGroupRun };
 }
 
+// A series' dates as last read, to work out `baseInterval`
+interface ISeriesGap {
+	gap: number;
+	rows: number;
+	last: number;
+	sorted: boolean;
+	// rows taken off the start since all were read
+	dropped: number;
+	// the series' counters when last read
+	droppedAt: number;
+	rewritten: number;
+	// rows from the start already checked against the picked interval
+	checked: number;
+	// read from the start since the interval was last picked
+	whole: boolean;
+	// a date changed in place
+	moved: boolean;
+	dirty: boolean;
+}
+
+// What an axis without `baseInterval` can pick, longest first; days work out their own count
+const AUTO_INTERVALS: Array<[TimeUnit, Array<number>]> = [
+	["year", [100, 50, 20, 10, 5, 2, 1]],
+	["month", [6, 3, 2, 1]],
+	["day", []],
+	["hour", [12, 8, 6, 4, 3, 2, 1]],
+	["minute", [30, 20, 15, 10, 5, 2, 1]],
+	["second", [30, 20, 15, 10, 5, 2, 1]],
+	["millisecond", [500, 200, 100, 50, 20, 10, 5, 2, 1]]
+];
+
+/**
+ * An axis of dates and times, placing each data item at its time.
+ *
+ * @see {@link https://docs.amcharts.com/v5/charts/xy-chart/axes/date-axis/} for more info
+ * @important
+ */
 export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	public static className: string = "DateAxis";
 	public static classNames: Array<string> = ValueAxis.classNames.concat([DateAxis.className]);
@@ -234,6 +276,11 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	protected _groupingCalculated: boolean = false;
 	protected _intervalDuration: number = 1;
 	protected _baseDuration: number = 1;
+	protected _autoInterval: ITimeInterval = { timeUnit: "day", count: 1 };
+	protected _autoGap: number = Infinity;
+	protected _seriesGaps: WeakMap<XYSeries, ISeriesGap> = new WeakMap();
+	protected _datesMoved: boolean = false;
+	protected _datesWatched: boolean = false;
 
 	protected _intervalMax: { [index: string]: number } = {};
 	protected _intervalMin: { [index: string]: number } = {};
@@ -242,15 +289,350 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		this._settings.themeTags = $utils.mergeTags(this._settings.themeTags, ["axis"]);
 		super._afterNew();
 		this.addTag("date");
-		this._setBaseInterval(this.get("baseInterval"));
-		this.on("baseInterval", () => {
-			this._setBaseInterval(this.get("baseInterval"));
+		this._setBaseInterval(this.baseMainInterval());
+		this.on("baseInterval", (value) => {
+			if (value) {
+				this._setBaseInterval(value);
+			}
+			else {
+				this._seriesGaps = new WeakMap();
+				this._detectBaseInterval(true);
+			}
 		})
 	}
 
 	protected _setBaseInterval(interval: ITimeInterval) {
 		this.setPrivateRaw("baseInterval", interval);
 		this._baseDuration = $time.getIntervalDuration(interval);
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _seriesDataChanged(series: XYSeries, rewritten?: boolean) {
+		if (!this._settings.baseInterval && this._countsForInterval(series)) {
+			const state = this._seriesGaps.get(series);
+			if (state) {
+				state.dirty = true;
+				state.moved = state.moved || !!rewritten;
+			}
+			this._detectBaseInterval();
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _seriesDateMoved(series: XYSeries) {
+		if (!this._settings.baseInterval && this._countsForInterval(series)) {
+			const state = this._seriesGaps.get(series);
+			if (state) {
+				state.dirty = true;
+				state.moved = true;
+			}
+			this._datesMoved = true;
+			if (!this._datesWatched) {
+				this._datesWatched = true;
+				this._watchDates();
+			}
+		}
+	}
+
+	// Works the interval out again once dates have stopped moving (they can be animated)
+	protected _watchDates() {
+		this._datesMoved = false;
+		this.markDirty();
+		this._root.events.once("frameended", () => {
+			if (this.isDisposed()) {
+				return;
+			}
+			if (this._datesMoved) {
+				this._watchDates();
+			}
+			else {
+				this._datesWatched = false;
+				if (!this._settings.baseInterval) {
+					this._detectBaseInterval();
+				}
+			}
+		});
+	}
+
+	// Indicators' lines come from the main series, and some have dates made from this interval
+	protected _countsForInterval(series: XYSeries): boolean {
+		return !series.get("ignoreMinMax") && !series.hasTag("indicator");
+	}
+
+	// Works out the interval from the data; a series' dates are rounded again if it changed
+	protected _detectBaseInterval(force?: boolean) {
+		let gap = Infinity;
+		let onlyAdded = !force;
+		$array.each(this.series, (series) => {
+			if (this._countsForInterval(series)) {
+				const state = this._seriesGap(series);
+				gap = Math.min(gap, state.gap);
+				onlyAdded = onlyAdded && !state.whole;
+			}
+		});
+
+		const current = this._autoInterval;
+		let interval = current;
+		if (gap < Infinity) {
+			// rows added at the end can't make a longer interval fit
+			if (!onlyAdded || gap !== this._autoGap || !this._intervalHolds(current)) {
+				interval = this._pickInterval(gap);
+			}
+		}
+		this._autoGap = gap;
+
+		$array.each(this.series, (series) => {
+			const state = this._seriesGaps.get(series);
+			if (state) {
+				state.whole = false;
+				state.checked = state.rows;
+			}
+		});
+
+		if (force || interval.timeUnit !== current.timeUnit || interval.count !== current.count) {
+			this._autoInterval = interval;
+			this.setPrivateRaw("groupInterval", undefined);
+			this._setBaseInterval(interval);
+			this._groupingCalculated = false;
+
+			$array.each(this.series, (series) => {
+				$array.each(series._mainDataItems, (dataItem) => {
+					dataItem.open = undefined;
+					dataItem.close = undefined;
+				});
+				series._markDirtyGroup();
+				series._markDataSetDirty();
+			});
+
+			this.markDirtyExtremes();
+			this.markDirtySize();
+			this.setPrivate("autoBaseInterval", interval);
+		}
+	}
+
+	// The smallest gap between two different dates of a series
+	protected _seriesGap(series: XYSeries): ISeriesGap {
+		let state = this._seriesGaps.get(series);
+		if (state && !state.dirty) {
+			return state;
+		}
+
+		const field: any = series.get("xAxis") === (this as any) ? "valueX" : "valueY";
+		const dataItems = series._mainDataItems;
+		const rows = dataItems.length;
+		const droppedAt = series._rowsDropped;
+		const rewritten = series._rowsRewritten;
+
+		// Reads rows from `from` on; false if they are not in date order
+		let gap = Infinity;
+		let last = -Infinity;
+		const read = (from: number): boolean => {
+			for (let i = from; i < rows; i++) {
+				const time = dataItems[i].get(field);
+				if ($type.isNumber(time)) {
+					if (time < last) {
+						return false;
+					}
+					const difference = time - last;
+					if (difference > 0 && difference < gap) {
+						gap = difference;
+					}
+					last = time;
+				}
+			}
+			return true;
+		};
+
+		// Rows only added at the end or taken off the start: just the new ones are read.
+		// The smallest gap may have left with those taken off, so all is read once as many have gone as there are rows
+		if (state && state.sorted && !state.moved && state.rewritten === rewritten) {
+			const dropped = droppedAt - state.droppedAt;
+			const kept = state.rows - dropped;
+			if (kept > 0 && kept <= rows && state.dropped + dropped < rows) {
+				gap = state.gap;
+				last = state.last;
+				if (read(kept)) {
+					state.gap = gap;
+					state.last = last;
+					state.rows = rows;
+					state.dropped += dropped;
+					state.droppedAt = droppedAt;
+					state.checked = kept;
+					state.dirty = false;
+					return state;
+				}
+			}
+		}
+
+		gap = Infinity;
+		last = -Infinity;
+		const sorted = read(0);
+		if (!sorted) {
+			const times: Array<number> = [];
+			for (let i = 0; i < rows; i++) {
+				const time = dataItems[i].get(field);
+				if ($type.isNumber(time)) {
+					times.push(time);
+				}
+			}
+			times.sort((a, b) => a - b);
+			gap = Infinity;
+			for (let i = 1; i < times.length; i++) {
+				const difference = times[i] - times[i - 1];
+				if (difference > 0 && difference < gap) {
+					gap = difference;
+				}
+			}
+			last = times[times.length - 1];
+		}
+
+		state = { gap: gap, rows: rows, last: last, sorted: sorted, dropped: 0, droppedAt: droppedAt, rewritten: rewritten, checked: 0, whole: true, moved: false, dirty: false };
+		this._seriesGaps.set(series, state);
+		return state;
+	}
+
+	// Whether rows not yet checked keep the picked interval
+	protected _intervalHolds(interval: ITimeInterval): boolean {
+		const timeUnit = interval.timeUnit;
+		if (interval.count == 1) {
+			if (timeUnit == "year" || timeUnit == "month" || timeUnit == "day") {
+				return this._datesApart(timeUnit, true);
+			}
+			if (timeUnit != "week") {
+				return true;
+			}
+		}
+		return this._datesStay(timeUnit, interval.count, timeUnit == "week" ? "day" : timeUnit, true);
+	}
+
+	// The longest interval that fits the gap and keeps every date in its own unit
+	protected _pickInterval(gap: number): ITimeInterval {
+		const hour = $time.getDuration("hour");
+		const day = $time.getDuration("day");
+
+		for (let u = 0; u < AUTO_INTERVALS.length; u++) {
+			const timeUnit = AUTO_INTERVALS[u][0];
+
+			if (timeUnit == "day") {
+				// an hour of slack: a day can be 23 hours long over a clock change
+				const days = Math.floor((gap + hour) / day);
+				if (days >= 1) {
+					if (days == 7 && this._datesStay("week", 1, "day")) {
+						return { timeUnit: "week", count: 1 };
+					}
+					if (days > 1 && this._datesStay("day", days, "day")) {
+						return { timeUnit: "day", count: days };
+					}
+					if (this._datesApart("day")) {
+						return { timeUnit: "day", count: 1 };
+					}
+				}
+				continue;
+			}
+
+			// a month can be 28 days long; readings can come slightly early
+			const fit = timeUnit == "month" ? 0.9 : (timeUnit == "year" ? 0.95 : 0.98);
+			const counts = AUTO_INTERVALS[u][1];
+			for (let c = 0; c < counts.length; c++) {
+				const count = counts[c];
+				if (gap >= $time.getDuration(timeUnit, count) * fit) {
+					const calendar = timeUnit == "year" || timeUnit == "month";
+					if (count == 1 ? (!calendar || this._datesApart(timeUnit)) : this._datesStay(timeUnit, count, timeUnit)) {
+						return { timeUnit: timeUnit, count: count };
+					}
+				}
+			}
+		}
+		return { timeUnit: "millisecond", count: 1 };
+	}
+
+	// Whether rounding to the interval leaves every date in its own `unit`; several days are counted from the series' first date
+	protected _datesStay(timeUnit: TimeUnit, count: number, unit: TimeUnit, onlyNew?: boolean): boolean {
+		const root = this._root;
+		const day = $time.getDuration("day");
+		for (let s = 0; s < this.series.length; s++) {
+			const series = this.series[s];
+			if (!this._countsForInterval(series)) {
+				continue;
+			}
+			const field: any = series.get("xAxis") === (this as any) ? "valueX" : "valueY";
+			const dataItems = series._mainDataItems;
+			const len = dataItems.length;
+			const state = onlyNew ? this._seriesGaps.get(series) : undefined;
+
+			let first: number | undefined;
+			if (timeUnit == "day") {
+				for (let i = 0; i < len && first === undefined; i++) {
+					const time = dataItems[i].get(field);
+					if ($type.isNumber(time)) {
+						first = time;
+					}
+				}
+			}
+
+			for (let i = state ? state.checked : 0; i < len; i++) {
+				const time = dataItems[i].get(field);
+				if ($type.isNumber(time)) {
+					if (timeUnit == "day") {
+						if (Math.round((time - first!) / day) % count !== 0) {
+							return false;
+						}
+					}
+					else if ($time.roun(time, timeUnit, count, root) !== $time.roun(time, unit, 1, root)) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+	// Whether no two different dates of a series fall in the same period
+	protected _datesApart(timeUnit: TimeUnit, onlyNew?: boolean): boolean {
+		const root = this._root;
+		for (let s = 0; s < this.series.length; s++) {
+			const series = this.series[s];
+			if (!this._countsForInterval(series)) {
+				continue;
+			}
+			const field: any = series.get("xAxis") === (this as any) ? "valueX" : "valueY";
+			const dataItems = series._mainDataItems;
+			const state = this._seriesGaps.get(series);
+			const sorted = !state || state.sorted;
+
+			let times: Array<number> | undefined;
+			if (!sorted) {
+				times = [];
+				for (let i = 0; i < dataItems.length; i++) {
+					const time = dataItems[i].get(field);
+					if ($type.isNumber(time)) {
+						times.push(time);
+					}
+				}
+				times.sort((a, b) => a - b);
+			}
+
+			const len = times ? times.length : dataItems.length;
+			let previous: number | undefined;
+			let period: number | undefined;
+			// the last row already checked is compared with the first new one
+			for (let i = onlyNew && state && sorted ? Math.max(state.checked - 1, 0) : 0; i < len; i++) {
+				const time = times ? times[i] : dataItems[i].get(field);
+				if ($type.isNumber(time)) {
+					const rounded = $time.roun(time, timeUnit, 1, root);
+					if (previous !== undefined && time !== previous && rounded === period) {
+						return false;
+					}
+					previous = time;
+					period = rounded;
+				}
+			}
+		}
+		return true;
 	}
 
 	public _prepareChildren() {
@@ -298,7 +680,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				this._setBaseInterval(groupInterval);
 			}
 			else {
-				this._setBaseInterval(this.get("baseInterval"));
+				this._setBaseInterval(this.baseMainInterval());
 			}
 
 
@@ -326,7 +708,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 						this._handleRangeChange();
 					}
 					else {
-						let baseInterval = this.get("baseInterval");
+						let baseInterval = this.baseMainInterval();
 						let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 						$array.each(this.series, (series) => {
 							series.setDataSet(mainDataSetId);
@@ -389,7 +771,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @ignore
 	 */
 	public _makeDataSet(series: XYSeries, id: string) {
-		const baseInterval = this.get("baseInterval");
+		const baseInterval = this.baseMainInterval();
 		if (id === baseInterval.timeUnit + baseInterval.count) {
 			// the rows themselves, once the series has grouped sets
 			if ($object.keys(series._dataSets).length > 0) {
@@ -452,7 +834,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 			}
 
 			let dataItems = series._mainDataItems;
-			let baseInterval = this.get("baseInterval");
+			let baseInterval = this.baseMainInterval();
 			let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 
 			const groupCallback = series.get("groupDataCallback");
@@ -909,7 +1291,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @return            Group interval
 	 */
 	public getGroupInterval(duration: number): ITimeInterval {
-		let baseInterval = this.get("baseInterval");
+		let baseInterval = this.baseMainInterval();
 		let groupInterval = $time.chooseInterval(0, duration, this.get("groupCount", Infinity), this.get("groupIntervals")!);
 		if ($time.getIntervalDuration(groupInterval) < $time.getIntervalDuration(baseInterval)) {
 			groupInterval = { ...baseInterval };
@@ -1074,7 +1456,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		let groupInterval = this.getPrivate("groupInterval");
 
 		if (!groupInterval) {
-			groupInterval = this.get("baseInterval");
+			groupInterval = this.baseMainInterval();
 		}
 
 		let id = groupInterval.timeUnit + groupInterval.count;
@@ -1490,7 +1872,12 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	public _handleSeriesRemoved() {
-		this.setPrivate("baseInterval", this.get("baseInterval"));
+		if (!this._settings.baseInterval) {
+			// a longer interval may fit without it, even with the same smallest gap
+			this._autoGap = NaN;
+			this._detectBaseInterval();
+		}
+		this.setPrivate("baseInterval", this.baseMainInterval());
 		this.setPrivate("min", undefined);
 		this.setPrivate("minFinal", undefined);
 	}
@@ -1507,13 +1894,25 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	}
 
 	/**
+	 * Returns the interval of the data, whatever the grouping: the
+	 * `baseInterval` setting or, if it is not set, the one worked out from the
+	 * data.
+	 *
+	 * @since 5.24.0
+	 * @return Interval
+	 */
+	public baseMainInterval(): ITimeInterval {
+		return this.get("baseInterval", this._autoInterval) as ITimeInterval;
+	}
+
+	/**
 	 * Returns the duration of the `baseInterval` setting in milliseconds,
 	 * whatever the grouping.
 	 *
 	 * @return Duration
 	 */
 	public baseMainDuration(): number {
-		return $time.getIntervalDuration(this.get("baseInterval"));
+		return $time.getIntervalDuration(this.baseMainInterval());
 	}
 
 	/**
@@ -1543,7 +1942,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 				let endTime = dataItem.close![field];
 				// this is done to save cpu, as rounding is quite expensive, especially with timezone set.
 				// if value is between prev start and end, it means it didn't change, all is fine.
-				if (value >= startTime && value <= endTime) {
+				if (value >= startTime && value < endTime) {
 
 				}
 				else {
@@ -1679,6 +2078,15 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 	 * @param  adjustPosition  `false` to skip the shift
 	 * @return                 Tooltip text
 	 */
+	public _summaryText(value: any, interval?: ITimeInterval): string {
+		if ($type.isNumber(value)) {
+			const baseInterval = interval || this.baseMainInterval();
+			const format = baseInterval ? this.get("tooltipDateFormats")![baseInterval.timeUnit] : undefined;
+			return this._root.dateFormatter.format(new Date(value), this.get("tooltipDateFormat", format));
+		}
+		return super._summaryText(value);
+	}
+
 	public getTooltipText(position: number, adjustPosition?: boolean): string | undefined {
 		//@todo number formatter + tag
 		if (this.getPrivate("min") != null) {
@@ -1808,7 +2216,7 @@ export class DateAxis<R extends AxisRenderer> extends ValueAxis<R> {
 		if (this.getPrivate("min") != null && this.getPrivate("max") != null) {
 			if (this.get("groupData")) {
 				const futureGroupInterval = this.getGroupInterval(end - start);
-				const baseInterval = this.get("baseInterval");
+				const baseInterval = this.baseMainInterval();
 
 				let baseMin = this.getIntervalMin(baseInterval);
 				let baseMax = this.getIntervalMax(baseInterval) - 1;

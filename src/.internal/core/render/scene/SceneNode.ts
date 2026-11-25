@@ -32,6 +32,12 @@ export interface ISceneHost extends IRenderer {
 	_useLayer(order: number, margin: IMargin | undefined): ILayer;
 
 	/**
+	 * What can be hit may have changed (a node shown, hidden or made
+	 * interactive), for a backend that keeps a hit-test canvas.
+	 */
+	_hitChanged?(): void;
+
+	/**
 	 * The canvas a layer paints on, for code that needs a raster element.
 	 */
 	_layerCanvas(layer: ILayer): HTMLCanvasElement;
@@ -103,12 +109,30 @@ export class ScenePivot implements IPoint {
 export class SceneNode extends DisposerClass implements IDisplayObject, IDisposer {
 	public _layer?: ILayer;
 
-	public mask: SceneGraphics | null = null;
-	public visible: boolean = true;
+	/**
+	 * Changed since the hit canvas last looked at it.
+	 *
+	 * @ignore
+	 */
+	public _hitDirty: boolean = true;
+
+	/**
+	 * As `_hitDirty`, kept for the node this one masks.
+	 *
+	 * @ignore
+	 */
+	public _maskDirty: boolean = true;
+
+	/**
+	 * The node this one masks.
+	 *
+	 * @ignore
+	 */
+	public _maskOf: SceneNode | undefined;
+
+	protected _mask: SceneGraphics | null = null;
 	public exportable?: boolean = true;
 	public exportName?: string;
-	public interactive: boolean = false;
-	public inactive: boolean | null = null;
 	public wheelable: boolean = false;
 	public cancelTouch: boolean = false;
 	public touchAxis: "x" | "xy" = "xy";
@@ -160,12 +184,81 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 	// The canvas backend's hit-test color
 	public _colorId: string | undefined;
 
+	// Its transform when the canvas backend last painted it for hit tests
+	public _hitMatrix: Matrix | undefined;
+
+	protected _visible: boolean = true;
+	protected _interactive: boolean = false;
+	protected _inactive: boolean | null = null;
+
 	constructor(renderer: ISceneHost) {
 		super();
 		this._renderer = renderer;
 	}
 
+	public get mask(): SceneGraphics | null {
+		return this._mask;
+	}
+
+	public set mask(value: SceneGraphics | null) {
+		const previous = this._mask;
+		if (previous !== value) {
+			if (previous && previous._maskOf === this) {
+				previous._maskOf = undefined;
+			}
+			this._mask = value;
+			if (value) {
+				value._maskOf = this;
+			}
+			this._hitChanged();
+			this.markDirtyPaint(true);
+		}
+	}
+
+	public get visible(): boolean {
+		return this._visible;
+	}
+
+	public set visible(value: boolean) {
+		if (this._visible !== value) {
+			this._visible = value;
+			this._hitChanged();
+		}
+	}
+
+	public get interactive(): boolean {
+		return this._interactive;
+	}
+
+	public set interactive(value: boolean) {
+		if (this._interactive !== value) {
+			this._interactive = value;
+			this._hitChanged();
+		}
+	}
+
+	public get inactive(): boolean | null {
+		return this._inactive;
+	}
+
+	public set inactive(value: boolean | null) {
+		if (this._inactive !== value) {
+			this._inactive = value;
+			this._hitChanged();
+		}
+	}
+
+	// what can be hit may have changed
+	protected _hitChanged(): void {
+		if (this._renderer._hitChanged) {
+			this._renderer._hitChanged();
+		}
+	}
+
 	protected _dispose(): void {
+		if (this._mask && this._mask._maskOf === this) {
+			this._mask._maskOf = undefined;
+		}
 		this._renderer._removeObject(this);
 		this.getLayer().dirty = true;
 	}
@@ -191,6 +284,8 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 	}
 
 	public setLayer(order: number | undefined, margin: IMargin | undefined): void {
+		this._hitChanged();
+
 		if (order == null) {
 			this._layer = undefined;
 
@@ -203,7 +298,24 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 		}
 	}
 
-	public markDirtyLayer(): void {
+	public markDirtyLayer(_deep?: boolean): void {
+		this._hitDirty = true;
+		this._maskDirty = true;
+		this.markDirtyPaint();
+
+		// what a mask clips can be on other layers
+		if (this._maskOf) {
+			this._maskOf.markDirtyPaint(true);
+		}
+	}
+
+	/**
+	 * Redraws the node's layer, for a change the hit canvas does not show
+	 * (opacity).
+	 *
+	 * @ignore
+	 */
+	public markDirtyPaint(_deep?: boolean): void {
 		this.getLayer().dirty = true;
 	}
 
@@ -385,33 +497,125 @@ export class SceneNode extends DisposerClass implements IDisplayObject, IDispose
 }
 
 /**
+ * Whether a visible interactive node is in the subtree.
+ *
+ * @ignore
+ */
+function canBeHit(node: SceneNode): boolean {
+	if (!node.visible) {
+		return false;
+	}
+	if (node.interactive) {
+		return true;
+	}
+	if (node instanceof SceneContainer) {
+		const children = node._children;
+		for (let i = 0; i < children.length; i++) {
+			if (canBeHit(children[i])) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
+ * Whether the hit canvas has painted a node of the subtree.
+ *
+ * @ignore
+ */
+function wasHit(node: SceneNode): boolean {
+	if (node._colorId !== undefined) {
+		return true;
+	}
+	if (node instanceof SceneContainer) {
+		const children = node._children;
+		for (let i = 0; i < children.length; i++) {
+			if (wasHit(children[i])) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
  * @ignore
  */
 export class SceneContainer extends SceneNode implements IContainer {
-	public interactiveChildren: boolean = true;
-	private _childLayers?: ILayer[];
+	private _interactiveChildren: boolean = true;
+
+	/**
+	 * Layers set on nodes below this one.
+	 *
+	 * @ignore
+	 */
+	public _childLayers?: ILayer[];
+
+	public get interactiveChildren(): boolean {
+		return this._interactiveChildren;
+	}
+
+	public set interactiveChildren(value: boolean) {
+		if (this._interactiveChildren !== value) {
+			this._interactiveChildren = value;
+			this._hitChanged();
+		}
+	}
 
 	public _children: Array<SceneNode> = [];
 
 	addChild(child: SceneNode): void {
 		child._parent = this;
 		this._children.push(child);
-		if (child._layer) {
-			this.registerChildLayer(child._layer);
-		}
+		this._registerLayersOf(child);
+		this._childAdded(child);
 	}
 
 	addChildAt(child: SceneNode, index: number): void {
 		child._parent = this;
 		this._children.splice(index, 0, child);
+		this._registerLayersOf(child);
+		this._childAdded(child);
+	}
+
+	// only what a hit test can find changes the hit canvas (a tooltip moved to the front does not)
+	private _childAdded(child: SceneNode): void {
+		// built elsewhere, it has not marked the layers it now shows on
+		child.markDirtyPaint(true);
+
+		if (canBeHit(child) || this._hitsChildren()) {
+			this._hitChanged();
+		}
+	}
+
+	// paints its children on the hit canvas, interactive or not
+	private _hitsChildren(): boolean {
+		for (let node: SceneContainer | undefined = this; node; node = node._parent) {
+			if (node.interactive && node.interactiveChildren) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// a child's own layer and the layers below it
+	private _registerLayersOf(child: SceneNode): void {
 		if (child._layer) {
 			this.registerChildLayer(child._layer);
+		}
+		if (child instanceof SceneContainer && child._childLayers) {
+			$array.each(child._childLayers, (layer) => this.registerChildLayer(layer));
 		}
 	}
 
 	removeChild(child: SceneNode): void {
+		child.markDirtyPaint(true);
 		child._parent = undefined;
 		$array.removeFirst(this._children, child);
+		if (wasHit(child)) {
+			this._hitChanged();
+		}
 	}
 
 	registerChildLayer(layer: ILayer): void {
@@ -426,6 +630,15 @@ export class SceneContainer extends SceneNode implements IContainer {
 
 	public markDirtyLayer(deep: boolean = false): void {
 		super.markDirtyLayer();
+		this._markChildLayers(deep);
+	}
+
+	public markDirtyPaint(deep: boolean = false): void {
+		super.markDirtyPaint();
+		this._markChildLayers(deep);
+	}
+
+	private _markChildLayers(deep: boolean): void {
 		if (deep && this._childLayers) {
 			$array.each(this._childLayers, (layer) => layer.dirty = true);
 		}

@@ -1,5 +1,5 @@
 import { Dropdown, IDropdownSettings, IDropdownPrivate, IDropdownEvents } from "./Dropdown"
-//import type { IDisposer } from "../../../core/util/Disposer";
+import type { IDisposer } from "../../../core/util/Disposer";
 
 import * as $array from "../../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
@@ -116,13 +116,14 @@ export class DropdownList extends Dropdown {
 	declare public _privateSettings: IDropdownListPrivate;
 	declare public _events: IDropdownListEvents;
 
-	private _currentSelectedIndex?: number;
+	// the item each list element shows
+	protected _itemInfo: WeakMap<HTMLElement, IDropdownListItem> = new WeakMap();
+	protected _announceTimeout?: IDisposer;
 
 	// private _itemDisposers: Array<IDisposer> = [];
 
 	protected _afterNew() {
 		super._afterNew();
-		this._setupKeyboardNav();
 		this._root.addDisposer(this);
 	}
 
@@ -167,6 +168,7 @@ export class DropdownList extends Dropdown {
 
 	protected _initItems(items?: IDropdownListItem[]): void {
 		const list = this.getPrivate("list")!;
+		const focused = document.activeElement && $utils.contains(list, document.activeElement);
 		list.innerHTML = "";
 
 		if (!items) {
@@ -185,6 +187,10 @@ export class DropdownList extends Dropdown {
 		}
 
 		this._maybeMakeAccessible();
+		this._updateChecked();
+		if (focused) {
+			this._focusFirst();
+		}
 	}
 
 	protected _initSearch(): void {
@@ -200,14 +206,11 @@ export class DropdownList extends Dropdown {
 				const input = document.createElement("input");
 				input.type = "text";
 				input.placeholder = this._root.language.translateAny("Search");
+				input.setAttribute("aria-label", input.placeholder);
 				searchBox.appendChild(input);
 
 				this._disposers.push($utils.addEventListener(input, "input", (_ev) => {
 					this._filterItems(input.value);
-				}));
-
-				this._disposers.push($utils.addEventListener(input, "focus", (_ev) => {
-					this._currentSelectedIndex = undefined;
 				}));
 			}
 		}
@@ -219,7 +222,7 @@ export class DropdownList extends Dropdown {
 	public _beforeChanged() {
 		super._beforeChanged();
 
-		if (this.isDirty("items")) {
+		if (this.isDirty("items") || this.isDirty("exclude")) {
 			this._initItems();
 		}
 
@@ -228,7 +231,7 @@ export class DropdownList extends Dropdown {
 		}
 
 		if (this.isPrivateDirty("currentId")) {
-			// @todo
+			this._updateChecked();
 		}
 
 		if (this.isDirty("control")) {
@@ -278,6 +281,30 @@ export class DropdownList extends Dropdown {
 				});
 			}
 		}
+		this._announceResults(search);
+	}
+
+	// tells screen readers how many items a search found, once typing pauses
+	protected _announceResults(search?: string): void {
+		if (this._announceTimeout) {
+			this._announceTimeout.dispose();
+			this._announceTimeout = undefined;
+		}
+		if (search && this.isAccessible()) {
+			this._announceTimeout = this.setTimeout(() => {
+				this._announceTimeout = undefined;
+				if (this.isOpen()) {
+					let count = 0;
+					$array.each(this._getNavItems(), (item) => {
+						if (item.tagName == "LI") {
+							count++;
+						}
+					});
+					const language = this._root.language;
+					this._root.readerAlert(count ? language.translate("Results: %1", undefined, "" + count) : language.translate("No results"));
+				}
+			}, 500);
+		}
 	}
 
 	/**
@@ -291,6 +318,7 @@ export class DropdownList extends Dropdown {
 		const item = document.createElement("li");
 		item.className = "am5stock-list-item";
 		item.setAttribute("title", $utils.htmlToText(info.subLabel || info.label));
+		this._itemInfo.set(item, info);
 
 		if (info.className) {
 			item.className += " " + info.className;
@@ -306,6 +334,10 @@ export class DropdownList extends Dropdown {
 			inputId = "am5stock-list-" + info.id;
 			input.type = info.form;
 			input.setAttribute("tabindex", "-1");
+			// the item is the checkbox or radio button: the input is only drawn, and a
+			// click on it goes to the item
+			input.setAttribute("aria-hidden", "true");
+			input.setAttribute("inert", "");
 			if (info.value) {
 				input.value = info.value;
 			}
@@ -324,6 +356,7 @@ export class DropdownList extends Dropdown {
 				if (ev.target !== input) {
 					input.checked = !input.checked;
 				}
+				item.setAttribute("aria-checked", input.checked ? "true" : "false");
 				this.events.dispatch("changed", {
 					type: "changed",
 					item: info,
@@ -337,7 +370,7 @@ export class DropdownList extends Dropdown {
 		}
 
 		const label = document.createElement("label");
-		label.innerHTML = info.label;
+		label.innerHTML = this._root._sanitizeHTML(info.label);
 		if (info.label == "") {
 			label.style.display = "none";
 		}
@@ -346,7 +379,7 @@ export class DropdownList extends Dropdown {
 		if (info.subLabel) {
 			const subLabel = document.createElement("label");
 			subLabel.className = "am5stock-list-sub";
-			subLabel.innerHTML = info.subLabel;
+			subLabel.innerHTML = this._root._sanitizeHTML(info.subLabel);
 			item.appendChild(subLabel);
 		}
 
@@ -355,10 +388,12 @@ export class DropdownList extends Dropdown {
 		}
 
 		list.appendChild(item);
+		this._setItemRole(item, info);
 
 		// Add click event
 		if (info.disabled) {
 			item.className += " am5stock-disabled";
+			item.setAttribute("aria-disabled", "true");
 		}
 		else {
 			this._disposers.push($utils.addEventListener(item, "click", (_ev) => {
@@ -390,59 +425,118 @@ export class DropdownList extends Dropdown {
 				this._initItems();
 			}
 		}
-
-		this._currentSelectedIndex = undefined;
 	}
 
-	protected _setupKeyboardNav(): void {
-		if ($utils.supports("keyboardevents")) {
-			const button = this.get("control").getPrivate("button")!;
-			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-				if (this.isAccessible()) {
-					if (document.activeElement && (document.activeElement === button || $utils.contains(button, document.activeElement))) {
-						if (ev.keyCode == 13) {
-							// ENTER
-							if (document.activeElement !== button) {
-								(document.activeElement as HTMLElement).click();
-							}
-						}
-						else if (ev.keyCode == 38 || ev.keyCode == 40) {
-							const dir = ev.keyCode == 38 ? -1 : 1;
-							let index: number | undefined = this._currentSelectedIndex;
-							if (index === undefined) {
-								index = 0;
-							}
-							else {
-								index += dir;
-							}
-							const items = this._getActiveItems();
-							if (index < 0) {
-								index = items.length - 1;
-							}
-							else if (index >= items.length) {
-								index = 0;
-							}
+	public show(): void {
+		this._updateChecked();
+		super.show();
+	}
 
-							this.setTimeout(() => {
-								$utils.focus(items.item(index!) as HTMLElement);
-								this._currentSelectedIndex = index;
-							}, 15);
-						}
-					}
-				}
-			}));
+	protected _setItemRole(item: HTMLElement, info: IDropdownListItem): void {
+		const className = info.className || "";
+		if (info.id == "separator") {
+			item.setAttribute("role", "separator");
+		}
+		else if (className.indexOf("am5stock-list-info") != -1 || className.indexOf("am5stock-list-heading") != -1) {
+			item.setAttribute("role", "presentation");
+		}
+		else {
+			item.setAttribute("role", info.form == "checkbox" ? "menuitemcheckbox" : (info.form == "radio" ? "menuitemradio" : "menuitem"));
+			const name = ($utils.htmlToText(info.label) || "").trim();
+			if (name) {
+				item.setAttribute("aria-label", name);
+			}
+			else {
+				// an icon only
+				const index = this.getPrivate("list")!.getElementsByTagName("li").length;
+				item.setAttribute("aria-label", this._root.language.translateAny("Selection") + " #" + index);
+			}
 		}
 	}
 
-	protected _maybeMakeAccessible(): void {
+	// The checked state of checkboxes and radio buttons, and of the current
+	// item of a list that shows one on its button
+	protected _updateChecked(): void {
+		const list = this.getPrivate("list");
+		if (!list) {
+			return;
+		}
+		const currentId = this.getPrivate("currentId");
+		$array.each(list.getElementsByTagName("li"), (item) => {
+			const info = this._itemInfo.get(item);
+			if (!info || item.getAttribute("role") == "separator" || item.getAttribute("role") == "presentation") {
+				return;
+			}
+			const input = item.getElementsByTagName("input")[0];
+			if (info.form && input) {
+				item.setAttribute("aria-checked", input.checked ? "true" : "false");
+			}
+			else if (currentId !== undefined) {
+				item.setAttribute("role", "menuitemradio");
+				item.setAttribute("aria-checked", info.id == currentId ? "true" : "false");
+			}
+		});
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _ariaRole(): "menu" | "dialog" {
+		return "menu";
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _ariaElement(): HTMLElement | undefined {
+		return this.getPrivate("list");
+	}
+
+	protected _getNavItems(): HTMLElement[] {
+		const items: HTMLElement[] = [];
+		const search = this.getPrivate("search");
+		if (search && search.style.display != "none") {
+			const input = search.getElementsByTagName("input")[0];
+			if (input) {
+				items.push(input);
+			}
+		}
+		$array.each(this._getActiveItems(), (item) => {
+			if ((item as HTMLElement).style.display != "none") {
+				items.push(item as HTMLElement);
+			}
+		});
+		return items;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _focusFirst(): void {
+		const items = this._getNavItems();
+		let first = items[0];
+		$array.each(items, (item) => {
+			if (item.getAttribute("aria-checked") == "true" && first.tagName != "INPUT") {
+				first = item;
+			}
+		});
+		if (first) {
+			$utils.focus(first);
+		}
+		else {
+			super._focusFirst();
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _maybeMakeAccessible(): void {
 		super._maybeMakeAccessible();
-		if (this.isAccessible()) {
-			//const tabindex = this._root.tabindex.toString();
-			//const list = this.getPrivate("list")!;
+		if (this.isAccessible() && this.getPrivate("list")) {
 			const items = this._getActiveItems();
 			items.forEach((item) => {
 				(item as HTMLElement).setAttribute("tabindex", "-1");
-				(item as HTMLElement).setAttribute("aria-label", (item as HTMLElement).getAttribute("title") || "");
 			});
 		}
 	}

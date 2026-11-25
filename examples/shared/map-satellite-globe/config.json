@@ -6,6 +6,8 @@
     "animations": [
       { "key": "rotationX", "from": 0, "to": 360, "duration": 120000, "loops": 0 }
     ],
+    "focusable": true,
+    "ariaLabel": "Globe covered with a satellite image of the Earth, turning slowly, with the country borders on top",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -50,7 +52,7 @@
               "template": {
                 "settings": {
                   "fillOpacity": 0,
-                  "stroke": { "type": "Color", "value": "#ffffff" },
+                  "stroke": "@root.interfaceColors.get('background')",
                   "strokeWidth": 0.5,
                   "strokeOpacity": 0.6
                 }

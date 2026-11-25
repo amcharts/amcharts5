@@ -138,15 +138,63 @@ export class PeriodSelector extends StockControl {
 			}
 			else {
 				$utils.addClass(button, "am5stock-periods-open");
+				if (document.activeElement === summary) {
+					this._focusPeriod();
+				}
 			}
+			this._updateAria();
 		}));
+
+		if ($utils.supports("keyboardevents")) {
+			this._disposers.push($utils.addEventListener(summary, "keydown", (ev: KeyboardEvent) => {
+				const key = $utils.getEventKey(ev);
+				if (key == "Enter" || key == " " || (key == "ArrowDown" && !button.classList.contains("am5stock-periods-open"))) {
+					ev.preventDefault();
+					summary.click();
+				}
+				else if (key == "Escape") {
+					$utils.removeClass(button, "am5stock-periods-open");
+					this._updateAria();
+				}
+			}));
+		}
 
 		// a tap anywhere else closes the list
 		this._disposers.push($utils.addEventListener(document, "click", (ev: MouseEvent) => {
 			if (!$utils.contains(button, ev.target as Element)) {
 				$utils.removeClass(button, "am5stock-periods-open");
+				this._updateAria();
 			}
 		}));
+	}
+
+	protected _makeTrigger(_button: HTMLDivElement): HTMLDivElement | undefined {
+		// the periods are the buttons
+		return undefined;
+	}
+
+	// focuses the active period, or the first one shown
+	protected _focusPeriod(): void {
+		const items = this._getShownPeriodButtons();
+		let item = items[0];
+		$array.each(items, (b) => {
+			if (b.classList.contains("am5stock-active")) {
+				item = b;
+			}
+		});
+		if (item) {
+			$utils.focus(item);
+		}
+	}
+
+	protected _getShownPeriodButtons(): HTMLElement[] {
+		const items: HTMLElement[] = [];
+		this._getPeriodButtons().forEach((item) => {
+			if (!(item as HTMLElement).classList.contains("am5stock-hidden")) {
+				items.push(item as HTMLElement);
+			}
+		});
+		return items;
 	}
 
 	// the folded button's text: the period chosen, or "Period" while none is
@@ -154,7 +202,7 @@ export class PeriodSelector extends StockControl {
 		const summary = this._summary;
 		if (summary) {
 			const active = this.getPrivate("label")!.getElementsByClassName("am5stock-active");
-			summary.innerHTML = (active.length ? active[0].innerHTML : this._root.language.translateAny("Period")) + " &#9662;";
+			summary.innerHTML = this._root._sanitizeHTML((active.length ? active[0].innerHTML : this._root.language.translateAny("Period")) + " <span aria-hidden=\"true\">&#9662;</span>");
 		}
 	}
 
@@ -169,7 +217,7 @@ export class PeriodSelector extends StockControl {
 		$array.each(periods, (period) => {
 			const button = document.createElement("a");
 			const unit = period.timeUnit;
-			button.innerHTML = period.name || (unit.toUpperCase() + (unit == "ytd" || unit == "max" || unit == "custom" ? "" : (period.count || 1)));
+			button.innerHTML = this._root._sanitizeHTML(period.name || (unit.toUpperCase() + (unit == "ytd" || unit == "max" || unit == "custom" ? "" : (period.count || 1))));
 			button.className = "am5stock-link";
 			button.setAttribute("data-period", period.timeUnit + (period.count || ""));
 			container.appendChild(button);
@@ -182,6 +230,12 @@ export class PeriodSelector extends StockControl {
 				$utils.addClass(button, "am5stock-active");
 				$utils.removeClass(this.getPrivate("button")!, "am5stock-periods-open");
 				this._updateSummary();
+				this._updateAria();
+				// in the folded list, focus goes back to the button that opened it
+				const summary = this._summary;
+				if (document.activeElement === button && summary && summary.offsetParent) {
+					$utils.focus(summary);
+				}
 				const timeout = this.getPrivate("deferTimeout");
 				if (timeout) {
 					timeout.dispose();
@@ -191,36 +245,40 @@ export class PeriodSelector extends StockControl {
 		});
 
 		if ($utils.supports("keyboardevents")) {
-			this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
+			this._disposers.push($utils.addEventListener(container, "keydown", (ev: KeyboardEvent) => {
 				if (this.isAccessible()) {
-					const button = this.getPrivate("button")!;
-					if (document.activeElement && (document.activeElement === button || $utils.contains(button, document.activeElement))) {
-						if ([37, 38, 39, 40].indexOf(ev.keyCode) !== -1) {
-							const dir = ev.keyCode == 37 || ev.keyCode == 38 ? -1 : 1;
-							const items = this._getPeriodButtons();
-							const selected = container.querySelectorAll(".am5stock-link:focus");
-							let index: number = -1;
-							if (selected.length > 0) {
-								//index = items.entries().indexOf(selected.item(0));
-								items.forEach((item, key) => {
-									if (item === selected.item(0)) {
-										index = key;
-									}
-								})
-							}
-							index += dir;
-							if (index < 0) {
-								index = items.length - 1;
-							}
-							else if (index >= items.length) {
-								index = 0;
-							}
-							$utils.focus(items.item(index) as HTMLElement);
-						}
-						else if (ev.keyCode == 13) {
-							// ENTER
-							(document.activeElement as HTMLElement).click();
-						}
+					const items = this._getShownPeriodButtons();
+					const index = items.indexOf(document.activeElement as HTMLElement);
+					if (index == -1) {
+						return;
+					}
+					const key = $utils.getEventKey(ev);
+					let next: number | undefined;
+					if (key == "ArrowLeft" || key == "ArrowUp") {
+						next = index == 0 ? items.length - 1 : index - 1;
+					}
+					else if (key == "ArrowRight" || key == "ArrowDown") {
+						next = index == items.length - 1 ? 0 : index + 1;
+					}
+					else if (key == "Home") {
+						next = 0;
+					}
+					else if (key == "End") {
+						next = items.length - 1;
+					}
+					else if (key == "Enter" || key == " ") {
+						ev.preventDefault();
+						items[index].click();
+					}
+					else if (key == "Escape" && this._summary && this._summary.offsetParent) {
+						$utils.removeClass(this.getPrivate("button")!, "am5stock-periods-open");
+						this._updateAria();
+						$utils.focus(this._summary);
+					}
+					if (next !== undefined) {
+						ev.preventDefault();
+						$utils.focus(items[next]);
+						this._updateTabStop(items[next]);
 					}
 				}
 			}));
@@ -238,6 +296,7 @@ export class PeriodSelector extends StockControl {
 				$utils.removeClass(<HTMLElement>b, "am5stock-active");
 			});
 			this._updateSummary();
+			this._updateAria();
 
 			let axis = this.getPrivate("axis");
 			if (!axis) {
@@ -283,6 +342,7 @@ export class PeriodSelector extends StockControl {
 				}
 			}
 		}
+		this._updateAria();
 	}
 
 	// protected _getDefaultIcon(): SVGElement {
@@ -311,7 +371,7 @@ export class PeriodSelector extends StockControl {
 		let val = axis.getPrivate(which);
 		if (series && (series.dataItems.length > 0)) {
 			// Get last data item
-			let baseInterval = axis.get("baseInterval");
+			let baseInterval = axis.baseMainInterval();
 			let mainDataSetId: string = baseInterval.timeUnit + baseInterval.count;
 			const dataSet = series._dataSets[mainDataSetId] || series.dataItems;
 			const dataItem = dataSet[which == "min" ? 0 : dataSet.length - 1];
@@ -470,19 +530,88 @@ export class PeriodSelector extends StockControl {
 				$utils.removeClass(button, "am5stock-active");
 			}
 		}
+		this._updateAria();
 	}
 
 	protected _maybeMakeAccessible(): void {
-		super._maybeMakeAccessible();
-		if (this.isAccessible()) {
-			const button = this.getPrivate("button")!;
-			button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
-			const items = this._getPeriodButtons();
-			items.forEach((item) => {
-				(item as HTMLElement).setAttribute("tabindex", "-1");
-				(item as HTMLElement).setAttribute("aria-label", (item as HTMLElement).getAttribute("title") || "");
-			});
+		// a group of buttons, one TAB stop
+		const button = this.getPrivate("button")!;
+		button.removeAttribute("tabindex");
+		const accessible = this.isAccessible();
+		if (accessible) {
+			button.setAttribute("role", "group");
 		}
+		else {
+			button.removeAttribute("role");
+		}
+		this._getPeriodButtons().forEach((item) => {
+			if (accessible) {
+				(item as HTMLElement).setAttribute("role", "button");
+			}
+			else {
+				(item as HTMLElement).removeAttribute("role");
+				(item as HTMLElement).removeAttribute("tabindex");
+			}
+		});
+		const summary = this._summary;
+		if (summary) {
+			if (accessible) {
+				const label = this.getPrivate("label")!;
+				if (!label.id) {
+					label.id = "am5stock-periods-" + this.uid;
+				}
+				summary.setAttribute("role", "button");
+				summary.setAttribute("tabindex", this._root.tabindex.toString());
+				summary.setAttribute("aria-controls", label.id);
+			}
+			else {
+				summary.removeAttribute("role");
+				summary.removeAttribute("tabindex");
+			}
+		}
+		this._updateAria();
+	}
+
+	protected _updateAria(): void {
+		const button = this.getPrivate("button");
+		if (!button || !this.getPrivate("label")) {
+			return;
+		}
+		const title = button.getAttribute("title");
+		if (title) {
+			button.setAttribute("aria-label", title);
+		}
+		if (!this.isAccessible()) {
+			return;
+		}
+		let active: HTMLElement | undefined;
+		this._getPeriodButtons().forEach((item) => {
+			const pressed = (item as HTMLElement).classList.contains("am5stock-active");
+			(item as HTMLElement).setAttribute("aria-pressed", pressed ? "true" : "false");
+			if (pressed) {
+				active = item as HTMLElement;
+			}
+		});
+		const focused = this._getShownPeriodButtons().indexOf(document.activeElement as HTMLElement) != -1;
+		if (!focused) {
+			this._updateTabStop(active);
+		}
+		const summary = this._summary;
+		if (summary) {
+			summary.setAttribute("aria-expanded", button.classList.contains("am5stock-periods-open") ? "true" : "false");
+		}
+	}
+
+	// the one period button TAB stops at
+	protected _updateTabStop(item?: HTMLElement): void {
+		const items = this._getShownPeriodButtons();
+		if (!item || items.indexOf(item) == -1) {
+			item = items[0];
+		}
+		const tabindex = this._root.tabindex.toString();
+		this._getPeriodButtons().forEach((b) => {
+			(b as HTMLElement).setAttribute("tabindex", b === item ? tabindex : "-1");
+		})
 	}
 
 	protected _getPeriodButtons(): NodeList {

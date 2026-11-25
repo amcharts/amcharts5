@@ -3,7 +3,6 @@ import { DropdownList, IDropdownListItem } from "./DropdownList";
 
 import * as $array from "../../../core/util/Array";
 import * as $type from "../../../core/util/Type";
-import * as $utils from "../../../core/util/Utils";
 
 export interface IDropdownListControlSettings extends IStockControlSettings {
 
@@ -173,9 +172,13 @@ export class DropdownListControl extends StockControl {
 	 */
 	public setItem(item: string | IDropdownListItem): void {
 		if (this.get("fixedLabel") !== true) {
+			const dropdown = this.getPrivate("dropdown");
+			if (dropdown) {
+				dropdown.setPrivate("currentId", $type.isString(item) ? item : item.id);
+			}
 			const label = this.getPrivate("label")!;
 			if ($type.isString(item)) {
-				label.innerHTML = item;
+				label.innerHTML = this._root._sanitizeHTML(item);
 			}
 			else {
 				if (item.icon) {
@@ -189,7 +192,7 @@ export class DropdownListControl extends StockControl {
 				}
 
 				if (item.label) {
-					label.innerHTML = item.label;
+					label.innerHTML = this._root._sanitizeHTML(item.label);
 					label.style.display = "";
 				}
 				else {
@@ -197,6 +200,7 @@ export class DropdownListControl extends StockControl {
 					label.style.display = "none";
 				}
 			}
+			this._updateAria();
 		}
 	}
 
@@ -271,27 +275,5 @@ export class DropdownListControl extends StockControl {
 	protected _dispose(): void {
 		super._dispose();
 	}
-
-	protected _maybeMakeAccessible(): void {
-		super._maybeMakeAccessible();
-		if (this.isAccessible()) {
-			const button = this.getPrivate("button")!;
-			button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER or use arrow keys to navigate"));
-
-			if ($utils.supports("keyboardevents")) {
-				this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-					if (document.activeElement == button) {
-						if (ev.keyCode == 38 || ev.keyCode == 40) {
-							// Open on arrows
-							if (!this.get("active")) {
-								this._handleClick();
-							}
-						}
-					}
-				}));
-			}
-		}
-	}
-
 
 }

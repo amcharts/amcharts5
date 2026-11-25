@@ -73,7 +73,11 @@ series.bullets.push(() => {
   return am5.Bullet.new(root, {
     sprite: am5.Circle.new(root, {
       radius: 5,
-      fill: series.get("fill") // the line's own color
+      fill: series.get("fill"), // the line's own color
+      // for the keyboard (see Accessibility below): one Tab stop, the up and down arrow keys step through the months
+      focusable: true,
+      focusableGroup: "months",
+      ariaLabel: "{categoryX}: {valueY} mm"
     })
   });
 });
@@ -98,6 +102,15 @@ const data = [
 
 series.data.setAll(data);
 xAxis.data.setAll(data); // the axis takes its months from the same rows
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Radar chart of monthly rainfall in millimetres, January to December. Tab to the months, then move between them with the up and down arrow keys"
+});
+// the months' dots: set up for the keyboard where they are made, in the bullet function above
 
 
 // Make stuff animate on load

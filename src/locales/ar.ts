@@ -305,7 +305,7 @@ export default {
 	"Legend": "وسيلة الإيضاح",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "اضغط ENTER للتبديل",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "تحميل",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "مخطط",
+	"Serial chart": "مخطط تسلسلي",
+	"X/Y chart": "مخطط X/Y",
+	"Pie chart": "مخطط دائري",
+	"Gauge chart": "مخطط مقياس",
+	"Radar chart": "مخطط راداري",
+	"Sankey diagram": "مخطط سانكي",
+	"Flow diagram": "مخطط تدفق",
+	"Chord diagram": "مخطط وتري",
+	"TreeMap chart": "مخطط خريطة شجرية",
+	"Force directed tree": "الشجرة الموجهة بالقوة",
+	"Sliced chart": "مخطط مقسّم",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "سلسلة",
+	"Candlestick Series": "سلسلة الشموع",
+	"OHLC Series": "سلسلة OHLC",
+	"Column Series": "سلسلة أعمدة",
+	"Line Series": "سلسلة خطية",
+	"Pie Slice Series": "سلسلة شرائح دائرية",
+	"Funnel Series": "سلسلة قمعية",
+	"Pyramid Series": "سلسلة هرمية",
+	"X/Y Series": "سلسلة X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "خريطة",
+	"Press ENTER to zoom in": "اضغط ENTER للتكبير",
+	"Press ENTER to zoom out": "اضغط ENTER للتصغير",
+	"Use arrow keys to zoom in and out": "استخدم مفاتيح الأسهم للتكبير والتصغير",
+	"Use plus and minus keys on your keyboard to zoom in and out": "استخدم مفتاحي الجمع والطرح في لوحة المفاتيح للتكبير والتصغير",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "طباعة",
+	"Export": "تصدير",
 	"Image": "صورة",
 	"Data": "بيانات",
 	"Print": "طباعة",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "اضغط ENTER أو استخدم مفاتيح الأسهم للتنقل",
+	"Press ENTER to open": "اضغط ENTER للفتح",
+	"Press ENTER to print.": "اضغط ENTER للطباعة.",
+	"Press ENTER to export as %1.": "اضغط ENTER للتصدير بتنسيق %1.",
+	"(Press ESC to close this message)": "(اضغط ESC لإغلاق هذه الرسالة)",
+	"Image Export Complete": "اكتمل تصدير الصورة",
+	"Export operation took longer than expected. Something might have gone wrong.": "استغرقت عملية التصدير وقتًا أطول من المتوقع. ربما حدث خطأ ما.",
+	"Saved from": "تم الحفظ من",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "استخدم TAB لتحديد أزرار المقبض أو السهمين الأيسر والأيمن لتغيير التحديد",
+	"Use left and right arrows to move selection": "استخدم السهمين الأيسر والأيمن لتحريك التحديد",
+	"Use left and right arrows to move left selection": "استخدم السهمين الأيسر والأيمن لتحريك التحديد الأيسر",
+	"Use left and right arrows to move right selection": "استخدم السهمين الأيسر والأيمن لتحريك التحديد الأيمن",
+	"Use TAB select grip buttons or up and down arrows to change selection": "استخدم TAB لتحديد أزرار المقبض أو السهمين لأعلى ولأسفل لتغيير التحديد",
+	"Use up and down arrows to move selection": "استخدم السهمين لأعلى ولأسفل لتحريك التحديد",
+	"Use up and down arrows to move lower selection": "استخدم السهمين لأعلى ولأسفل لتحريك التحديد السفلي",
+	"Use up and down arrows to move upper selection": "استخدم السهمين لأعلى ولأسفل لتحريك التحديد العلوي",
 	"From %1 to %2": "من %1 إلى %2",
 	"From %1": "من %1",
 	"To %1": "إلى %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "القيم: %1",
+	"Highest: %1": "الأعلى: %1",
+	"Lowest: %1": "الأدنى: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "الفئة",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "النتائج: %1",
+	"No results": "لا توجد نتائج",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "تدرج اللون",
+	"Opacity": "العتامة",
+	"Color": "لون",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "لا يتوفر محلل للملف: %1",
+	"Error parsing file: %1": "خطأ في تحليل الملف: %1",
+	"Unable to load file: %1": "تعذر تحميل الملف: %1",
+	"Invalid date": "تاريخ غير صالح",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "إغلاق",
+	"Minimize": "تصغير",
+	"Confirm": "تأكيد",
 	"OK": "موافق",
 	"Cancel": "إلغاء",
 	"Delete": "حذف",

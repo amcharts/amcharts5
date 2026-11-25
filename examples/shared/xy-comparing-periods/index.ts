@@ -125,6 +125,27 @@ series.data.setAll(data);
 previousSeries.data.setAll(data);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart comparing 14 days of a value, June 15 to 28, with the 14 days before them, drawn dashed. Tab to the days, then move between them with the up and down arrow keys"
+});
+// invisible points on this period's line, each reading both periods: one Tab stop, the up and down arrow keys step through them
+series.bullets.push(() => {
+  return am5.Bullet.new(root, {
+    sprite: am5.Circle.new(root, {
+      radius: 5,
+      fillOpacity: 0, // not painted: the line looks as before
+      strokeOpacity: 0,
+      focusable: true,
+      focusableGroup: "days",
+      ariaLabel: "{valueX}: {valueY}, previous period {previousDate}: {previousValue}"
+    })
+  });
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

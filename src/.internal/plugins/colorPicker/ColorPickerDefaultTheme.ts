@@ -23,7 +23,9 @@ export class ColorPickerDefaultTheme extends Theme {
 			width: 35,
 			height: 35,
 			marginRight: 0,
-			cursorOverStyle: "pointer"
+			cursorOverStyle: "pointer",
+			focusable: true,
+			role: "button"
 		})
 
 		r("Graphics", ["colorpickerbutton", "icon"]).setAll({
@@ -105,7 +107,8 @@ export class ColorPickerDefaultTheme extends Theme {
 		// gradient slider
 		r("Slider", ["colorpicker", "gradient"]).setAll({
 			marginLeft: 15,
-			marginRight: 0
+			marginRight: 0,
+			ariaLabel: l.translate("Hue")
 		})
 
 		// gradient slider background (with all the colors as gradient)
@@ -156,7 +159,8 @@ export class ColorPickerDefaultTheme extends Theme {
 		r("Slider", ["colorpicker", "opacity"]).setAll({
 			centerY: p50,
 			y: p50,
-			width: p100
+			width: p100,
+			ariaLabel: l.translate("Opacity")
 		})
 
 		// opacity slider background stroke
@@ -179,7 +183,10 @@ export class ColorPickerDefaultTheme extends Theme {
 		});
 
 		r("EditableLabel", ["colorpicker", "color", "input"]).setAll({
-			maxChars: 7
+			maxChars: 7,
+			multiLine: false,
+			focusable: true,
+			role: "button"
 		});
 
 		r("RoundedRectangle", ["colorpicker", "background", "input"]).setAll({

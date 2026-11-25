@@ -3,7 +3,9 @@
   "settings": {
     "width": { "type": "Percent", "value": 100 },
     "height": { "type": "Percent", "value": 100 },
-    "layout": { "type": "VerticalLayout" }
+    "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Venn diagram of three sets, A, B and C, and their overlaps X, Y, Z and Q, each area sized by its value. Tab to the areas, then move between them with the up and down arrow keys"
   },
   "children": [
     "#series-0",
@@ -13,7 +15,16 @@
         "centerX": { "type": "Percent", "value": 50 },
         "x": { "type": "Percent", "value": 50 }
       },
-      "properties": { "data": "#series-0.dataItems" }
+      "properties": {
+        "data": "#series-0.dataItems",
+        "itemContainers": {
+          "properties": {
+            "template": {
+              "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+            }
+          }
+        }
+      }
     }
   ],
   "refs": [
@@ -68,7 +79,13 @@
           "slices": {
             "properties": {
               "template": {
-                "settings": { "tooltipText": "{category}: {value}" }
+                "settings": {
+                  "tooltipText": "{category}: {value}",
+                  "focusable": true,
+                  "focusableGroup": "areas",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{category}: {value}"
+                }
               }
             }
           }

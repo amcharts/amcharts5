@@ -10,7 +10,7 @@ import type { ITimeInterval } from "../../../core/util/Time";
 import type { IDisposer } from "../../../core/util/Disposer";
 
 import { DataItem } from "../../../core/render/Component";
-import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../../core/render/Series";
+import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents, ISeriesSummaryItem } from "../../../core/render/Series";
 import { List } from "../../../core/util/List";
 import { Container } from "../../../core/render/Container";
 import { Graphics } from "../../../core/render/Graphics";
@@ -914,6 +914,10 @@ export abstract class XYSeries extends Series {
 
 	protected _showBullets: boolean = true;
 
+	// Whether the bullets take keyboard focus (undefined: none made yet). Then
+	// they are made, not drawn, while the series is too dense for them
+	protected _focusableBullets?: boolean;
+
 	protected valueXFields = [
 		"valueX",
 		"openValueX",
@@ -952,6 +956,11 @@ export abstract class XYSeries extends Series {
 	protected _afterNew() {
 		this.fields.push("categoryX", "categoryY", "openCategoryX", "openCategoryY");
 		this.valueFields.push("valueX", "valueY", "openValueX", "openValueY", "lowValueX", "lowValueY", "highValueX", "highValueY");
+
+		// other bullets: whether they take focus is seen again
+		this._disposers.push(this.bullets.events.onAll(() => {
+			this._focusableBullets = undefined;
+		}));
 
 		this._setRawDefault("vcx", 1);
 		this._setRawDefault("vcy", 1);
@@ -1196,20 +1205,24 @@ export abstract class XYSeries extends Series {
 		}
 
 		const minBulletDistance = this.get("minBulletDistance", 0);
-		if (minBulletDistance > 0) {
+		// too dense: no bullets, unless they take keyboard focus (made, not drawn)
+		if (minBulletDistance > 0 && this._focusableBullets !== true) {
 			let startIndex = this.startIndex();
 			let endIndex = this.endIndex();
 
 			let count = endIndex - startIndex;
 
+			// not known yet: one is made to see
+			const unknown = this._focusableBullets === undefined;
+
 			if (xAxis == baseAxis) {
 				if (this._xRenderer.axisLength() / count < minBulletDistance / 5) {
-					return false;
+					return unknown;
 				}
 			}
 			else if (yAxis == baseAxis) {
 				if (this._yRenderer.axisLength() / count < minBulletDistance / 5) {
-					return false;
+					return unknown;
 				}
 			}
 		}
@@ -1469,6 +1482,12 @@ export abstract class XYSeries extends Series {
 			}
 		}
 
+		// a date axis may work out its interval from the data
+		if (!this._dataGrouped) {
+			xAxis._seriesDataChanged(this);
+			yAxis._seriesDataChanged(this);
+		}
+
 		if (this._valuesDirty && !this._dataProcessed) {
 			this._dataProcessed = true;
 
@@ -1644,7 +1663,10 @@ export abstract class XYSeries extends Series {
 		const yAxis = this.get("yAxis");
 
 		xAxis._seriesValuesDirty = true;
-		yAxis._seriesValuesDirty = true;		
+		yAxis._seriesValuesDirty = true;
+
+		xAxis._seriesDataChanged(this, true);
+		yAxis._seriesDataChanged(this, true);
 
 		$array.each(this.dataItems, (dataItem) => {
 			dataItem.open = undefined;
@@ -1944,6 +1966,12 @@ export abstract class XYSeries extends Series {
 		if (this._groupKeptRows != -1 && (this._valueXFields.indexOf(key) != -1 || this._valueYFields.indexOf(key) != -1)) {
 			this._groupKeptRows = -1;
 		}
+		if (key === "valueX") {
+			this.get("xAxis")?._seriesDateMoved(this);
+		}
+		else if (key === "valueY") {
+			this.get("yAxis")?._seriesDateMoved(this);
+		}
 	}
 
 	public _markDataSetDirty() {
@@ -1996,7 +2024,15 @@ export abstract class XYSeries extends Series {
 			let w = right - left;
 			let h = bottom - top;
 
-			if (this._shouldShowBullet(positionX, positionY)) {
+			const show = this._shouldShowBullet(positionX, positionY);
+			// too dense to draw (`minBulletDistance`): a focusable bullet stays for
+			// the keyboard, not drawn
+			const keyboardOnly = !show && !this._showBullets && sprite.get("focusable") ? true : false;
+			if (sprite.getPrivate("drawHidden", false) !== keyboardOnly) {
+				sprite.setPrivate("drawHidden", keyboardOnly);
+			}
+
+			if (show || keyboardOnly) {
 				sprite.setPrivate("visible", !bullet.getPrivate("hidden"));
 
 				let field = bullet.get("field");
@@ -2130,6 +2166,85 @@ export abstract class XYSeries extends Series {
 				sprite.setPrivate("visible", false);
 			}
 		}
+	}
+
+	protected _makeBullets(dataItem: DataItem<this["_dataItemSettings"]>) {
+		super._makeBullets(dataItem);
+		const bullets = dataItem.bullets;
+		if (this._focusableBullets === undefined && bullets && bullets.length > 0) {
+			this._focusableBullets = false;
+			$array.each(bullets, (bullet) => {
+				const sprite = bullet.get("sprite");
+				if (sprite && sprite.get("focusable")) {
+					this._focusableBullets = true;
+				}
+			});
+		}
+	}
+
+	// Each data item's value along the value axis, labelled by the base axis
+	// (a category or date), both as the axes' tooltips show them
+	protected _summaryItems(dataItems: Array<DataItem<this["_dataItemSettings"]>> = this._mainDataItems): Array<ISeriesSummaryItem> {
+		const xAxis = this.get("xAxis");
+		const yAxis = this.get("yAxis");
+		const items: Array<ISeriesSummaryItem> = [];
+		if (!xAxis || !yAxis) {
+			return items;
+		}
+
+		const field = (axis: Axis<AxisRenderer>) => axis.getPrivate("name")! + axis.get("renderer").getPrivate("letter")!;
+		const baseAxis = this.get("baseAxis", xAxis);
+		const valueAxis = baseAxis === yAxis ? xAxis : yAxis;
+		const labelField = field(baseAxis);
+		const valueField = field(valueAxis);
+		// Both axes of categories (a heat map): the value is in `valueField`
+		const ownValue = !$type.isNumber(dataItems.length && (<any>dataItems[0]).get(valueField));
+
+		$array.each(dataItems, (dataItem: any) => {
+			const value = dataItem.get(ownValue ? "value" : valueField);
+			if ($type.isNumber(value)) {
+				let label = baseAxis._summaryText(dataItem.get(labelField), dataItems === this._mainDataItems ? undefined : this._tableInterval);
+				if (ownValue) {
+					label += ", " + valueAxis._summaryText(dataItem.get(field(valueAxis)));
+				}
+				items.push({
+					label: label,
+					value: value,
+					text: ownValue ? this.getNumberFormatter().format(value) : valueAxis._summaryText(value)
+				});
+			}
+		});
+		return items;
+	}
+
+	protected _summaryOrdered(): boolean {
+		return true;
+	}
+
+	// The group interval of the data table's data items, for their dates
+	protected _tableInterval: ITimeInterval | undefined;
+
+	// With grouped dates, the groups for the whole range, as zoomed out all
+	// the way: the table does not change with the zoom
+	protected _tableDataItems(): Array<DataItem<this["_dataItemSettings"]>> {
+		const axis: any = this.get("baseAxis");
+		if (axis && axis.isType("DateAxis") && axis.get("groupData")) {
+			const min = axis.getPrivate("min");
+			const max = axis.getPrivate("max");
+			if ($type.isNumber(min) && $type.isNumber(max)) {
+				const interval = axis.getGroupInterval(max - min);
+				const id = interval.timeUnit + interval.count;
+				if (!this._dataSets[id]) {
+					axis._makeDataSet(this, id);
+				}
+				const dataItems = this._dataSets[id];
+				if (dataItems) {
+					this._tableInterval = interval;
+					return dataItems;
+				}
+			}
+		}
+		return super._tableDataItems();
 	}
 
 	protected _shouldShowBullet(_positionX: number, _positionY: number): boolean {

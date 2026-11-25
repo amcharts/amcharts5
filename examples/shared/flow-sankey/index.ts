@@ -48,6 +48,28 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the diagram, and a screen reader names it
+  ariaLabel: "Sankey diagram of 11 flows between nine nodes, lettered A to J, from left to right. Tab to the nodes or the flows, then move through them with the up and down arrow keys; Enter on a node hides or shows its flows"
+});
+// the nodes: one Tab stop, the up and down arrow keys step through them
+series.nodes.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  ariaLabel: "{name}: {sumIncoming} in, {sumOutgoing} out"
+});
+// the flows: one Tab stop, after the nodes
+series.links.template.setAll({
+  focusable: true,
+  focusableGroup: "links",
+  tabindexOrder: 5,   // focus runs from low to high (0 if not set)
+  hoverOnFocus: true, // the focused flow shows its tooltip
+  ariaLabel: "{sourceId} to {targetId}: {value}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

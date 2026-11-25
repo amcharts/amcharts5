@@ -131,5 +131,20 @@ chart.children.push(am5.HeatLegend.new(root, {
 }));
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "Heat map of the United States, each state colored by its customer satisfaction score, from red at 50 through yellow to green at 100. Tab to the states, then move between them with the up and down arrow keys"
+});
+// the states: one Tab stop, the up and down arrow keys step through them
+polygonSeries.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "states",
+  hoverOnFocus: true, // the focused state shows its tooltip
+  ariaLabel: "{name}: score {value}"
+});
+
+
 // Make stuff animate on load
 chart.appear(1000, 100);

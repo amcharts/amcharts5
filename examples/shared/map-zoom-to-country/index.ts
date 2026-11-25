@@ -58,6 +58,21 @@ polygonSeries.mapPolygons.template.states.create("active", {
 });
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "World map of countries that zooms to the one you pick. Tab to the countries, move between them with the up and down arrow keys, and press Enter to zoom to one or back out"
+});
+// the countries: one Tab stop, the up and down arrow keys step through them
+polygonSeries.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "countries",
+  hoverOnFocus: true, // the focused country shows its tooltip
+  ariaLabel: "{name}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

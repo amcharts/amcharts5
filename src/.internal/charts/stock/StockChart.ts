@@ -1,3 +1,4 @@
+import { _brandingLicensed } from "../../core/Root";
 import type { StockPanel } from "./StockPanel";
 import type { StockLegend, IStockLegendDataItem } from "./StockLegend";
 import type { Axis } from "../xy/axes/Axis";
@@ -364,7 +365,7 @@ export class StockChart extends Container {
 			this._root._showBranding();
 		}
 		else {
-			this._root._licenseApplied();
+			_brandingLicensed(this._root);
 		}
 	}
 
@@ -507,13 +508,24 @@ export class StockChart extends Container {
 						if (this._baseDP) {
 							this._baseDP.dispose();
 						}
-						this._baseDP = xAxis.on("baseInterval", (baseInterval) => {
+						const syncBaseInterval = () => {
+							const baseInterval = xAxis.baseMainInterval();
 							this.indicators.each((indicator) => {
 								if (indicator.isType<ChartIndicator>("ChartIndicator")) {
-									indicator.xAxis.set("baseInterval", baseInterval);
+									indicator.xAxis._setC("baseInterval", baseInterval);
 								}
 							})
-						})
+						};
+						this._baseDP = new MultiDisposer([
+							xAxis.on("baseInterval", syncBaseInterval),
+							xAxis.onPrivate("autoBaseInterval", () => {
+								syncBaseInterval();
+								// an offset moving average makes dates from the interval
+								this.indicators.each((indicator) => {
+									indicator.markDataDirty();
+								})
+							})
+						]);
 
 						this._syncExtremesDp = new MultiDisposer([
 							xAxis.onPrivate("max", () => {

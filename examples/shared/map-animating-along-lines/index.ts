@@ -53,7 +53,12 @@ citySeries.bullets.push(() => {
       tooltipY: 0,            // the tooltip points at the top of the dot, not its middle
       fill: am5.color(0xffba00),
       stroke: root.interfaceColors.get("background"), // a ring in the background color
-      strokeWidth: 2
+      strokeWidth: 2,
+      // keyboard: one Tab stop for both cities, the up and down arrow keys step between them
+      focusable: true,
+      focusableGroup: "cities",
+      hoverOnFocus: true, // the focused city shows its tooltip
+      ariaLabel: "{title}"
     })
   });
 });
@@ -107,6 +112,15 @@ planeSeries.bullets.push(() => {
 planeSeries.data.setAll([
   { lineId: "route", positionOnLine: 0, autoRotate: true }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "World map of a plane flying back and forth along a route between Los Angeles and Paris. Tab to the cities, then move between them with the up and down arrow keys"
+});
+// the cities: set up in their bullet function above
 
 
 // Make stuff animate on load

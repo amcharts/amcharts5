@@ -65,7 +65,12 @@ pointSeries.bullets.push(() => {
       fill: am5.color(0xff621f),
       stroke: root.interfaceColors.get("background"), // a thin outline in the background color
       strokeWidth: 1,
-      tooltipText: "{title}" // the city's name from the data
+      tooltipText: "{title}", // the city's name from the data
+      // keyboard: one Tab stop for all the cities, the up and down arrow keys step through them. No tooltip
+      // on focus: on a pin lying on the globe it shows away from it
+      focusable: true,
+      focusableGroup: "cities",
+      ariaLabel: "{title}"
     })
   });
 });
@@ -86,6 +91,15 @@ pointSeries.data.setAll([
   { title: "Tokyo", latitude: 35.6895, longitude: 139.6917 },
   { title: "Sydney", latitude: -33.8688, longitude: 151.2093 },
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the globe, and a screen reader names it
+  ariaLabel: "Globe with twelve city pins that lie flat on its surface. Tab to the cities, then move between them with the up and down arrow keys"
+});
+// the cities: set up in their bullet function above
 
 
 // Make stuff animate on load

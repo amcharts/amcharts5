@@ -120,13 +120,18 @@ export default {
 	"Chord diagram": "Диаграмма Chord",
 	"Flow diagram": "Диаграмма флоу",
 	"TreeMap chart": "Иерархическая диаграмма",
+	"Force directed tree": "Силовое дерево",
+	"Sliced chart": "Секционная диаграмма",
 
 	// Series types
 	"Series": "Серия",
 	"Candlestick Series": "Серия-подсвечник",
+	"OHLC Series": "Серия OHLC",
 	"Column Series": "Столбчатая серия",
 	"Line Series": "Линейная серия",
 	"Pie Slice Series": "Круговая серия",
+	"Funnel Series": "Воронкообразная серия",
+	"Pyramid Series": "Пирамидальная серия",
 	"X/Y Series": "X/Y серия",
 
 	// Map-related
@@ -141,6 +146,7 @@ export default {
 	"Image": "Изображение",
 	"Data": "Данные",
 	"Print": "Печатать",
+	"Press ENTER or use arrow keys to navigate": "Нажмите ВВОД или используйте клавиши-стрелки для навигации",
 	"Press ENTER to open": "Щелкните, коснитесь или нажмите ВВОД чтобы открыть",
 	"Press ENTER to print.": "Щелкните, коснитесь или нажмите ВВОД чтобы распечатать",
 	"Press ENTER to export as %1.": "Щелкните, коснитесь или нажмите ВВОД чтобы экспортировать как %1",
@@ -173,6 +179,25 @@ export default {
 	"From %1": "От %1",
 	"To %1": "До %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Значения: %1",
+	"Highest: %1": "Максимум: %1",
+	"Lowest: %1": "Минимум: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Категория",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Результаты: %1",
+	"No results": "Нет результатов",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Оттенок",
+	"Opacity": "Непрозрачность",
+	"Color": "Цвет",
+
 	// Data loader-related
 	"No parser available for file: %1": "Нет анализатора для файла: %1",
 	"Error parsing file: %1": "Ошибка при разборе файла: %1",
@@ -180,9 +205,9 @@ export default {
 	"Invalid date": "Некорректная дата",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Закрыть",
+	"Minimize": "Свернуть",
+	"Confirm": "Подтвердить",
 	"OK": "ОК",
 	"Cancel": "Отмена",
 	"Delete": "Удалить",

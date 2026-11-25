@@ -305,7 +305,7 @@ export default {
 	"Legend": "Legenda",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Stisknutím klávesy ENTER přepnete",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Načítání",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Graf",
+	"Serial chart": "Sériový graf",
+	"X/Y chart": "Graf X/Y",
+	"Pie chart": "Koláčový graf",
+	"Gauge chart": "Ručičkový graf",
+	"Radar chart": "Paprskový graf",
+	"Sankey diagram": "Sankeyův diagram",
+	"Flow diagram": "Tokový diagram",
+	"Chord diagram": "Tětivový diagram",
+	"TreeMap chart": "Stromová mapa",
+	"Force directed tree": "Silově orientovaný strom",
+	"Sliced chart": "Segmentový graf",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Řada",
+	"Candlestick Series": "Řada svíček",
+	"OHLC Series": "Řada OHLC",
+	"Column Series": "Sloupcová řada",
+	"Line Series": "Spojnicová řada",
+	"Pie Slice Series": "Řada výsečí koláče",
+	"Funnel Series": "Trychtýřová řada",
+	"Pyramid Series": "Pyramidová řada",
+	"X/Y Series": "Řada X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Mapa",
+	"Press ENTER to zoom in": "Stisknutím klávesy ENTER přiblížíte",
+	"Press ENTER to zoom out": "Stisknutím klávesy ENTER oddálíte",
+	"Use arrow keys to zoom in and out": "Šipkami přibližujete a oddalujete",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Klávesami plus a minus na klávesnici přibližujete a oddalujete",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Tisk",
+	"Export": "Export",
 	"Image": "Snímek",
 	"Data": "Data",
 	"Print": "Tisk",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Stiskněte ENTER nebo se pohybujte šipkami",
+	"Press ENTER to open": "Stisknutím klávesy ENTER otevřete",
+	"Press ENTER to print.": "Stisknutím klávesy ENTER vytisknete.",
+	"Press ENTER to export as %1.": "Stisknutím klávesy ENTER exportujete jako %1.",
+	"(Press ESC to close this message)": "(Stisknutím klávesy ESC zavřete tuto zprávu)",
+	"Image Export Complete": "Export obrázku dokončen",
+	"Export operation took longer than expected. Something might have gone wrong.": "Export trval déle, než se čekalo. Něco se mohlo pokazit.",
+	"Saved from": "Uloženo z",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Klávesou TAB vyberte úchyty nebo šipkami doleva a doprava změňte výběr",
+	"Use left and right arrows to move selection": "Šipkami doleva a doprava posunete výběr",
+	"Use left and right arrows to move left selection": "Šipkami doleva a doprava posunete levý okraj výběru",
+	"Use left and right arrows to move right selection": "Šipkami doleva a doprava posunete pravý okraj výběru",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Klávesou TAB vyberte úchyty nebo šipkami nahoru a dolů změňte výběr",
+	"Use up and down arrows to move selection": "Šipkami nahoru a dolů posunete výběr",
+	"Use up and down arrows to move lower selection": "Šipkami nahoru a dolů posunete dolní okraj výběru",
+	"Use up and down arrows to move upper selection": "Šipkami nahoru a dolů posunete horní okraj výběru",
 	"From %1 to %2": "Od %1 do %2",
 	"From %1": "Od %1",
 	"To %1": "Do %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Hodnoty: %1",
+	"Highest: %1": "Nejvyšší: %1",
+	"Lowest: %1": "Nejnižší: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategorie",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Výsledky: %1",
+	"No results": "Žádné výsledky",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Odstín",
+	"Opacity": "Neprůhlednost",
+	"Color": "Barva",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Pro soubor není k dispozici analyzátor: %1",
+	"Error parsing file: %1": "Chyba při analýze souboru: %1",
+	"Unable to load file: %1": "Soubor se nepodařilo načíst: %1",
+	"Invalid date": "Neplatné datum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Zavřít",
+	"Minimize": "Minimalizovat",
+	"Confirm": "Potvrdit",
 	"OK": "OK",
 	"Cancel": "Zrušit",
 	"Delete": "Odstranit",

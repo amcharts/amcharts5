@@ -305,7 +305,7 @@ export default {
 	"Legend": "Legend",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Vajuta ENTER, et lülitada",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Laadin",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Diagramm",
+	"Serial chart": "Seeriadiagramm",
+	"X/Y chart": "X/Y diagramm",
+	"Pie chart": "Sektordiagramm",
+	"Gauge chart": "Näidikudiagramm",
+	"Radar chart": "Radardiagramm",
+	"Sankey diagram": "Sankey diagramm",
+	"Flow diagram": "Voodiagramm",
+	"Chord diagram": "Kõõldiagramm",
+	"TreeMap chart": "TreeMap diagramm",
+	"Force directed tree": "Jõupõhine puu",
+	"Sliced chart": "Viilutatud diagramm",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Seeria",
+	"Candlestick Series": "Küünlaseeria",
+	"OHLC Series": "OHLC seeria",
+	"Column Series": "Tulpseeria",
+	"Line Series": "Joonseeria",
+	"Pie Slice Series": "Sektorseeria",
+	"Funnel Series": "Lehterseeria",
+	"Pyramid Series": "Püramiidseeria",
+	"X/Y Series": "X/Y seeria",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Kaart",
+	"Press ENTER to zoom in": "Vajuta ENTER, et suurendada",
+	"Press ENTER to zoom out": "Vajuta ENTER, et vähendada",
+	"Use arrow keys to zoom in and out": "Suurenda ja vähenda nooleklahvidega",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Suurenda ja vähenda klaviatuuri pluss- ja miinusklahviga",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Prindi",
+	"Export": "Ekspordi",
 	"Image": "Pilt",
 	"Data": "Andmed",
 	"Print": "Prindi",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Vajuta ENTER või liigu nooleklahvidega",
+	"Press ENTER to open": "Vajuta ENTER, et avada",
+	"Press ENTER to print.": "Vajuta ENTER, et printida.",
+	"Press ENTER to export as %1.": "Vajuta ENTER, et eksportida vormingus %1.",
+	"(Press ESC to close this message)": "(Vajuta ESC, et see teade sulgeda)",
+	"Image Export Complete": "Pildi eksport lõpetatud",
+	"Export operation took longer than expected. Something might have gone wrong.": "Eksport kestis oodatust kauem. Midagi võis valesti minna.",
+	"Saved from": "Salvestatud asukohast",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Vali pidemed TAB-klahviga või muuda valikut vasak- ja paremnoolega",
+	"Use left and right arrows to move selection": "Liiguta valikut vasak- ja paremnoolega",
+	"Use left and right arrows to move left selection": "Liiguta valiku vasakut serva vasak- ja paremnoolega",
+	"Use left and right arrows to move right selection": "Liiguta valiku paremat serva vasak- ja paremnoolega",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Vali pidemed TAB-klahviga või muuda valikut üles- ja allanoolega",
+	"Use up and down arrows to move selection": "Liiguta valikut üles- ja allanoolega",
+	"Use up and down arrows to move lower selection": "Liiguta valiku alumist serva üles- ja allanoolega",
+	"Use up and down arrows to move upper selection": "Liiguta valiku ülemist serva üles- ja allanoolega",
 	"From %1 to %2": "Alates %1 kuni %2",
 	"From %1": "Alates %1",
 	"To %1": "Kuni %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Väärtused: %1",
+	"Highest: %1": "Kõrgeim: %1",
+	"Lowest: %1": "Madalaim: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategooria",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Tulemused: %1",
+	"No results": "Tulemusi pole",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Toon",
+	"Opacity": "Läbipaistmatus",
+	"Color": "Värv",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Faili jaoks pole parserit: %1",
+	"Error parsing file: %1": "Viga faili parsimisel: %1",
+	"Unable to load file: %1": "Faili ei saa laadida: %1",
+	"Invalid date": "Vigane kuupäev",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Sulge",
+	"Minimize": "Minimeeri",
+	"Confirm": "Kinnita",
 	"OK": "OK",
 	"Cancel": "Tühista",
 	"Delete": "Kustuta",

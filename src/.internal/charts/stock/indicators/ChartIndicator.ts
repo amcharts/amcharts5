@@ -78,15 +78,15 @@ export abstract class ChartIndicator extends Indicator {
 			// xAxis
 			const xRenderer = AxisRendererX.new(root, {});
 			let xAxis: DateAxis<AxisRenderer> | GaplessDateAxis<AxisRenderer> | undefined;
-			let baseInterval = seriesXAxis.get("baseInterval");
+			let baseInterval = seriesXAxis.baseMainInterval();
 			let start = seriesXAxis.get("start");
 			let end = seriesXAxis.get("end");
 
 			if (seriesXAxis instanceof GaplessDateAxis) {
-				xAxis = chart.xAxes.push(GaplessDateAxis.new(root, { renderer: xRenderer, baseInterval: baseInterval }));
+				xAxis = chart.xAxes.push(GaplessDateAxis.new(root, { renderer: xRenderer, baseInterval: baseInterval })._markC("baseInterval"));
 			}
 			else {
-				xAxis = chart.xAxes.push(DateAxis.new(root, { renderer: xRenderer, baseInterval: baseInterval }));
+				xAxis = chart.xAxes.push(DateAxis.new(root, { renderer: xRenderer, baseInterval: baseInterval })._markC("baseInterval"));
 			}
 
 			xRenderer.set("minorGridEnabled", seriesXAxis.get("renderer")?.get("minorGridEnabled"));

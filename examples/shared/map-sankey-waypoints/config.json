@@ -15,10 +15,12 @@
         }
       }
     },
-    "projectionName": "geoOrthographic",
+    "focusable": true,
+    "ariaLabel": "Globe of oil exports from six terminals in the Persian Gulf to ports in Asia and Europe, in thousands of barrels a day, drawn as flows along sea lanes. Tab to the flows or the ports, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
-    "appearDelay": 100
+    "appearDelay": 100,
+    "projectionName": "geoOrthographic"
   },
   "properties": {
     "series": ["#series-0", "#series-1", "#series-2", "#series-3"]
@@ -436,7 +438,7 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.1,
                   "strokeOpacity": 0
                 }
@@ -453,10 +455,7 @@
           "mapLines": {
             "properties": {
               "template": {
-                "settings": {
-                  "stroke": { "type": "Color", "value": "#000000" },
-                  "strokeOpacity": 0.08
-                }
+                "settings": { "stroke": "@root.interfaceColors.get('alternativeBackground')", "strokeOpacity": 0.08 }
               }
             }
           }
@@ -472,10 +471,10 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.15,
                   "strokeWidth": 0.5,
-                  "stroke": { "type": "Color", "value": "#ffffff" }
+                  "stroke": "@root.interfaceColors.get('background')"
                 }
               }
             }
@@ -496,7 +495,11 @@
                   "fill": { "type": "Color", "value": "#c8890a" },
                   "fillOpacity": 0.5,
                   "strokeOpacity": 0,
-                  "tooltipText": "{source} > {target}: {value}k barrels a day"
+                  "tooltipText": "{source} > {target}: {value}k barrels a day",
+                  "focusable": true,
+                  "focusableGroup": "flows",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{source} to {target}: {value} thousand barrels a day"
                 }
               }
             }
@@ -508,9 +511,13 @@
                   "template": {
                     "settings": {
                       "fill": { "type": "Color", "value": "#c8890a" },
-                      "stroke": { "type": "Color", "value": "#ffffff" },
+                      "stroke": "@root.interfaceColors.get('background')",
                       "strokeWidth": 1.5,
-                      "tooltipText": "{name}: {sum}k barrels a day"
+                      "tooltipText": "{name}: {sum}k barrels a day",
+                      "focusable": true,
+                      "focusableGroup": "ports",
+                      "hoverOnFocus": true,
+                      "ariaLabel": "{name}: {sum} thousand barrels a day"
                     }
                   }
                 }
@@ -532,7 +539,7 @@
                   "settings": {
                     "svgPath": "M0,-7 C2,-4 5,0 5,3 C5,6 3,8 0,8 C-3,8 -5,6 -5,3 C-5,0 -2,-4 0,-7 Z",
                     "scale": 0.5,
-                    "fill": { "type": "Color", "value": "#000000" }
+                    "fill": "@root.interfaceColors.get('text')"
                   }
                 }
               }

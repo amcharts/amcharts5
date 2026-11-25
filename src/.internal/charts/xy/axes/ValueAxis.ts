@@ -474,6 +474,9 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 			this._prepareAxisItems();
 			this._updateAxisRanges();
 		}
+		else if (this._rangesDirty) {
+			this._updateAxisRanges();
+		}
 
 		this._baseValue = this.baseValue();
 
@@ -1854,6 +1857,14 @@ export class ValueAxis<R extends AxisRenderer> extends Axis<R> {
 	 * @param   position  Position on the axis (`0` to `1`)
 	 * @return            Tooltip text
 	 */
+	public _summaryText(value: any): string {
+		if ($type.isNumber(value)) {
+			const numberFormat = this.get("tooltipNumberFormat", this.get("numberFormat"));
+			return this.getNumberFormatter().format(value, numberFormat);
+		}
+		return super._summaryText(value);
+	}
+
 	public getTooltipText(position: number, _adjustPosition?: boolean): string | undefined {
 		const numberFormat = this.get("tooltipNumberFormat", this.get("numberFormat"));
 		const formatter = this.getNumberFormatter();

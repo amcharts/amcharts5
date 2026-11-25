@@ -8,11 +8,27 @@
     "categoryField": "name",
     "childDataField": "children",
     "selectedDataItem": "@self.dataItems.0",
+    "focusable": true,
+    "ariaLabel": "Force-directed tree of music: three genres, Rock, Electronic and Jazz, and their styles, each circle sized by its total. Tab to the circles, move between them with the up and down arrow keys, and press Enter to open or close a circle's children",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
-  "properties": { "data": "#data-0" },
+  "properties": {
+    "data": "#data-0",
+    "nodes": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "nodes",
+            "hoverOnFocus": true,
+            "ariaLabel": "{category}: {sum}"
+          }
+        }
+      }
+    }
+  },
   "refs": [
     {
       "data-0": [

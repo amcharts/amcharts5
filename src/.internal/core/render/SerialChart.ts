@@ -7,6 +7,8 @@ import type { ColorSet } from "../../core/util/ColorSet";
 import type { PatternSet } from "../../core/util/PatternSet";
 import type { Series } from "./Series";
 
+import { setSummaryDescription, renderDataTable, IDataTableColumn } from "./Series";
+
 import * as $array from "../../core/util/Array";
 
 export interface ISerialChartSettings extends IChartSettings {
@@ -25,6 +27,35 @@ export interface ISerialChartSettings extends IChartSettings {
 	 * @since 5.10.0
 	 */
 	patterns?: PatternSet;
+
+	/**
+	 * Describes the chart's data to screen readers: for each series, how many
+	 * values it has, its highest and lowest, and where the data has an order
+	 * (XY series) its first and last. Each series' summary also goes to its
+	 * legend item.
+	 *
+	 * The chart has to be `focusable` for screen readers to read it. A series
+	 * with `ariaSummary: false` is left out.
+	 *
+	 * @since 5.24.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#data-summary} for more info
+	 */
+	ariaSummary?: boolean;
+
+	/**
+	 * Gives screen readers the chart's data as a table, hidden from view: a
+	 * row for each category or date, a column for each series. Screen readers
+	 * can move through it by row and column. It is captioned with the chart's
+	 * `ariaLabel`.
+	 *
+	 * With grouped data (a date axis with `groupData`), the table has the
+	 * groups shown when the chart is zoomed out all the way, whatever the
+	 * zoom. A series with `ariaDataTable: false` is left out.
+	 *
+	 * @since 5.24.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#data-table} for more info
+	 */
+	ariaDataTable?: boolean;
 
 }
 
@@ -116,6 +147,7 @@ export abstract class SerialChart extends Chart {
 	protected _processSeries(series: this["_seriesType"]) {
 		series.chart = this;
 		series._placeBulletsContainer(this);
+		series._scheduleSummary();
 	}
 
 	protected _removeSeries(series: this["_seriesType"]) {
@@ -124,5 +156,70 @@ export abstract class SerialChart extends Chart {
 			this.seriesContainer.children.removeValue(series);
 			series._removeBulletsContainer();
 		}
+		this._updateSummary();
+		this._updateDataTable();
+	}
+
+	public _prepareChildren() {
+		super._prepareChildren();
+
+		if (this.isDirty("ariaSummary") || this.isDirty("ariaDataTable")) {
+			this.series.each((series) => {
+				series._scheduleSummary();
+			});
+			this._updateSummary();
+			this._updateDataTable();
+		}
+
+		if (this.isDirty("ariaLabel") && this._dataTable) {
+			this._updateDataTable();
+		}
+	}
+
+	protected _dataTable: HTMLTableElement | undefined;
+
+	/**
+	 * Builds the chart's data table from its series' columns, or takes it away.
+	 *
+	 * @ignore
+	 */
+	public _updateDataTable(): void {
+		const columns: Array<IDataTableColumn> = [];
+		if (this.get("ariaDataTable") && !this.isDisposed()) {
+			this.series.each((series, index) => {
+				const items = series._tableItems;
+				if (items && !series.isDisposed()) {
+					columns.push({ name: "" + (series.get("name") || this._t("Series") + " " + (index + 1)), items: items });
+				}
+			});
+		}
+		this._dataTable = renderDataTable(this, this._dataTable, columns);
+	}
+
+	protected _dispose() {
+		renderDataTable(this, this._dataTable, []);
+		super._dispose();
+	}
+
+	/**
+	 * Puts the series' summaries together as the chart's `ariaDescription`.
+	 *
+	 * @ignore
+	 */
+	public _updateSummary(): void {
+		if (this.isDisposed()) {
+			return;
+		}
+		const texts: Array<string> = [];
+		if (this.get("ariaSummary")) {
+			this.series.each((series) => {
+				const text = series._summaryText;
+				if (text && !series.isDisposed()) {
+					const name = series.get("name");
+					texts.push(name ? name + ". " + text : text);
+				}
+			});
+		}
+		setSummaryDescription(this, texts.join(" "));
 	}
 }

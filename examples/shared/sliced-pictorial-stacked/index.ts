@@ -49,6 +49,21 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Pictorial chart of seven values, One to Seven, stacked inside the outline of a person from head to feet. Tab to the parts, then move between them with the up and down arrow keys"
+});
+// the slices: one Tab stop, the up and down arrow keys step through them
+series.slices.template.setAll({
+  focusable: true,
+  focusableGroup: "slices",
+  hoverOnFocus: true, // the focused slice shows its tooltip
+  ariaLabel: "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear();

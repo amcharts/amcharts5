@@ -2,6 +2,8 @@
   "type": "SlicedChart",
   "settings": {
     "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Funnel chart of seven steps, One to Seven, from the largest value at the top to the smallest at the bottom. Tab to the steps, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -18,7 +20,16 @@
         "marginTop": 15,
         "marginBottom": 15
       },
-      "properties": { "data": "#series-0.dataItems" }
+      "properties": {
+        "data": "#series-0.dataItems",
+        "itemContainers": {
+          "properties": {
+            "template": {
+              "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+            }
+          }
+        }
+      }
     }
   ],
   "refs": [
@@ -43,7 +54,16 @@
           "categoryField": "category",
           "autoAppear": true
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "slices": {
+            "properties": {
+              "template": {
+                "settings": { "focusable": true, "focusableGroup": "slices", "ariaLabel": "{category}: {value}" }
+              }
+            }
+          }
+        }
       }
     }
   ]

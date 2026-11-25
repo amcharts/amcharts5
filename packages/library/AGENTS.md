@@ -43,8 +43,9 @@ and `CHANGELOG.md` disagree, the changelog is right.
    `renderer: am5xy.AxisRendererX.new(root, {})`.
 6. **A category axis needs the data too:** `xAxis.data.setAll(data)` as well as
    `series.data.setAll(data)`.
-7. **Date axes take timestamps** (numbers), not `Date` objects or strings, and
-   need a `baseInterval`, e.g. `{ timeUnit: "day", count: 1 }`. For date strings,
+7. **Date axes take timestamps** (numbers), not `Date` objects or strings. Set
+   `baseInterval`, e.g. `{ timeUnit: "day", count: 1 }`, when the data's interval
+   is known; if left out, the axis works it out from the data. For date strings,
    give the series a processor before setting its data:
    `series.data.processor = am5.DataProcessor.new(root, { dateFields: ["date"], dateFormat: "yyyy-MM-dd" });`
 8. **Set data last**, after the series, axes and templates are configured.
@@ -86,14 +87,14 @@ package has them in `dist/`. From an npm CDN, pin the version and load every
 file from it:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/xy.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/themes/Animated.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.23.0/dist/themes/ResponsiveMax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/themes/ResponsiveMax.js"></script>
 ```
 
 The same files are at `node_modules/@amcharts/amcharts5/dist/`, on unpkg
-(`https://unpkg.com/@amcharts/amcharts5@5.23.0/dist/index.js`) and on the
+(`https://unpkg.com/@amcharts/amcharts5@5.24.0/dist/index.js`) and on the
 amCharts CDN (`https://cdn.amcharts.com/lib/5/index.js`). A sandbox that allows
 scripts only from npm CDNs (jsDelivr, unpkg) can use the first two. Use plain
 script tags, not `type="module"`: the lazy parts (the exporting plugin's PDF,

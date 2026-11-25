@@ -48,12 +48,12 @@ export default {
 	"_era_bc": "AC",
 
 	// Period
-	"A": "",
-	"P": "",
-	"AM": "",
-	"PM": "",
-	"A.M.": "",
-	"P.M.": "",
+	"A": "a",
+	"P": "p",
+	"AM": "a. m.",
+	"PM": "p. m.",
+	"A.M.": "a. m.",
+	"P.M.": "p. m.",
 
 	// Dates
 	"January": "Enero",
@@ -120,13 +120,18 @@ export default {
 	"Chord diagram": "Diagrama de cuerdas",
 	"Flow diagram": "Diagrama de flujo",
 	"TreeMap chart": "Gráfico de mapa de árbol",
+	"Force directed tree": "Árbol dirigido por fuerzas",
+	"Sliced chart": "Gráfico segmentado",
 
 	// Series types
 	"Series": "Series",
 	"Candlestick Series": "Series de velas",
+	"OHLC Series": "Series OHLC",
 	"Column Series": "Series de columnas",
 	"Line Series": "Series de líneas",
 	"Pie Slice Series": "Series de trozos circular",
+	"Funnel Series": "Series de embudo",
+	"Pyramid Series": "Series de pirámide",
 	"X/Y Series": "Series de X/Y",
 
 	// Map-related
@@ -141,6 +146,7 @@ export default {
 	"Image": "Imagen",
 	"Data": "Datos",
 	"Print": "Imprimir",
+	"Press ENTER or use arrow keys to navigate": "Presione ENTER o use las flechas para navegar",
 	"Press ENTER to open": "Haga clic, toque o presione ENTER para abrir",
 	"Press ENTER to print.": "Haga clic, toque o presione ENTER para imprimir",
 	"Press ENTER to export as %1.": "Haga clic, toque o presione ENTER para exportar como %1.",
@@ -171,6 +177,25 @@ export default {
 	"From %1": "Desde %1",
 	"To %1": "Hasta %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Valores: %1",
+	"Highest: %1": "Máximo: %1",
+	"Lowest: %1": "Mínimo: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Categoría",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Resultados: %1",
+	"No results": "No hay resultados",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Tono",
+	"Opacity": "Opacidad",
+	"Color": "Color",
+
 	// Data loader-related
 	"No parser available for file: %1": "No hay analizador disponible para el archivo: %1",
 	"Error parsing file: %1": "Error al analizar el archivo: %1",
@@ -178,9 +203,9 @@ export default {
 	"Invalid date": "Fecha inválida",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Cerrar",
+	"Minimize": "Minimizar",
+	"Confirm": "Confirmar",
 	"OK": "Aceptar",
 	"Cancel": "Cancelar",
 	"Delete": "Eliminar",

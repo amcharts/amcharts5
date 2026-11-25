@@ -17,6 +17,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Stacked step line chart of two series over the 30 days from January 1, 2024. Tab to a series, then move along it with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -109,7 +111,25 @@
                 "settings": { "fillOpacity": 0.5, "visible": true }
               }
             }
-          }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "Series 1",
+                    "ariaLabel": "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     },
@@ -138,7 +158,25 @@
                 "settings": { "fillOpacity": 0.5, "visible": true }
               }
             }
-          }
+          },
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "Series 2",
+                    "ariaLabel": "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+                  }
+                }
+              }
+            }
+          ]
         }
       }
     }

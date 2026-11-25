@@ -305,7 +305,7 @@ export default {
 	"Legend": "Tegnforklaring",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Trykk ENTER for å slå av/på",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Laster inn",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Diagram",
+	"Serial chart": "Seriediagram",
+	"X/Y chart": "X/Y-diagram",
+	"Pie chart": "Sektordiagram",
+	"Gauge chart": "Målerdiagram",
+	"Radar chart": "Radardiagram",
+	"Sankey diagram": "Sankey-diagram",
+	"Flow diagram": "Flytdiagram",
+	"Chord diagram": "Akkorddiagram",
+	"TreeMap chart": "Trekart",
+	"Force directed tree": "Kraftstyrt tre",
+	"Sliced chart": "Oppdelt diagram",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Serie",
+	"Candlestick Series": "Lysestakeserie",
+	"OHLC Series": "OHLC-serie",
+	"Column Series": "Søyleserie",
+	"Line Series": "Linjeserie",
+	"Pie Slice Series": "Sektorserie",
+	"Funnel Series": "Traktserie",
+	"Pyramid Series": "Pyramideserie",
+	"X/Y Series": "X/Y-serie",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Kart",
+	"Press ENTER to zoom in": "Trykk ENTER for å zoome inn",
+	"Press ENTER to zoom out": "Trykk ENTER for å zoome ut",
+	"Use arrow keys to zoom in and out": "Bruk piltastene for å zoome inn og ut",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Bruk pluss- og minustastene på tastaturet for å zoome inn og ut",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Skriv ut",
+	"Export": "Eksporter",
 	"Image": "Bilde",
 	"Data": "Data",
 	"Print": "Skriv ut",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Trykk ENTER eller bruk piltastene for å navigere",
+	"Press ENTER to open": "Trykk ENTER for å åpne",
+	"Press ENTER to print.": "Trykk ENTER for å skrive ut.",
+	"Press ENTER to export as %1.": "Trykk ENTER for å eksportere som %1.",
+	"(Press ESC to close this message)": "(Trykk ESC for å lukke denne meldingen)",
+	"Image Export Complete": "Bildeeksport fullført",
+	"Export operation took longer than expected. Something might have gone wrong.": "Eksporten tok lengre tid enn forventet. Noe kan ha gått galt.",
+	"Saved from": "Lagret fra",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Bruk TAB for å velge håndtakene eller venstre og høyre pil for å endre utvalget",
+	"Use left and right arrows to move selection": "Bruk venstre og høyre pil for å flytte utvalget",
+	"Use left and right arrows to move left selection": "Bruk venstre og høyre pil for å flytte venstre utvalg",
+	"Use left and right arrows to move right selection": "Bruk venstre og høyre pil for å flytte høyre utvalg",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Bruk TAB for å velge håndtakene eller pil opp og ned for å endre utvalget",
+	"Use up and down arrows to move selection": "Bruk pil opp og ned for å flytte utvalget",
+	"Use up and down arrows to move lower selection": "Bruk pil opp og ned for å flytte nedre utvalg",
+	"Use up and down arrows to move upper selection": "Bruk pil opp og ned for å flytte øvre utvalg",
 	"From %1 to %2": "Fra %1 til %2",
 	"From %1": "Fra %1",
 	"To %1": "Til %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Verdier: %1",
+	"Highest: %1": "Høyeste: %1",
+	"Lowest: %1": "Laveste: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategori",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Resultater: %1",
+	"No results": "Ingen resultater",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Fargetone",
+	"Opacity": "Opasitet",
+	"Color": "Farge",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Ingen parser tilgjengelig for filen: %1",
+	"Error parsing file: %1": "Feil ved tolking av filen: %1",
+	"Unable to load file: %1": "Kan ikke laste inn filen: %1",
+	"Invalid date": "Ugyldig dato",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Lukk",
+	"Minimize": "Minimer",
+	"Confirm": "Bekreft",
 	"OK": "OK",
 	"Cancel": "Avbryt",
 	"Delete": "Slett",

@@ -60,6 +60,8 @@ export class EditableLabel extends Label {
 
 	protected _editOnEvents?: MultiDisposer;
 	protected _frameDp?: IDisposer;
+	// editing ended with ENTER or ESC: focus goes back to the label
+	protected _endedByKey: boolean = false;
 
 	protected _afterNew() {
 		super._afterNew();
@@ -71,6 +73,13 @@ export class EditableLabel extends Label {
 
 		input.hide();
 		this.setPrivate("input", input);
+
+		// ENTER on the focused label starts editing, whatever `editOn` is
+		this.events.on("click", (ev) => {
+			if ((ev as any).simulated && this.get("editOn", "click") != "none" && !this.get("active")) {
+				this.set("active", true);
+			}
+		});
 
 		// Set background
 		this._setDefaultTagged("background", ["editablelabel", "background"], () => {
@@ -161,6 +170,7 @@ export class EditableLabel extends Label {
 					if ($utils.supports("keyboardevents")) {
 						this._disposers.push($utils.addEventListener(textarea, "keydown", (ev: KeyboardEvent) => {
 							if ($utils.getEventKey(ev) == "Escape") {
+								this._endedByKey = true;
 								this.set("active", false);
 							}
 						}));
@@ -172,6 +182,7 @@ export class EditableLabel extends Label {
 						if ($utils.getEventKey(ev) == "Enter" && this.get("multiLine") === false) {
 							// Single-line label, save instead of breaking into new line
 							ev.preventDefault();
+							this._endedByKey = true;
 							this.set("active", false);
 						}
 					}));
@@ -204,6 +215,10 @@ export class EditableLabel extends Label {
 				this.set("text", " ");
 			}
 			input.show(0);
+			// named as the label is
+			const focusElement = this.getPrivate("focusElement");
+			const name = (focusElement && focusElement.dom.getAttribute("aria-label")) || this.get("ariaLabel") || this.get("text", "");
+			textarea.setAttribute("aria-label", $utils.stripTags(name || ""));
 			this.setTimeout(() => {
 				// size textarea to fit its actual content
 				this._syncStyle();
@@ -225,6 +240,10 @@ export class EditableLabel extends Label {
 			this.set("text", textarea.value);
 			input.hide(0);
 			this._text.set("opacity", 1);
+			if (this._endedByKey && this.get("focusable")) {
+				this._root._focusSprite(this);
+			}
+			this._endedByKey = false;
 		}
 	}
 

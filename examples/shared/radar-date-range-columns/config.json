@@ -2,6 +2,8 @@
   "type": "RadarChart",
   "settings": {
     "innerRadius": { "type": "Percent", "value": 30 },
+    "focusable": true,
+    "ariaLabel": "Radar chart of the 2025 seasons of six kinds of produce, one ring each, with the months around the circle. Tab to the seasons, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -75,7 +77,14 @@
           "columns": {
             "properties": {
               "template": {
-                "settings": { "cornerRadius": 25, "tooltipText": "{categoryY}: {openValueX} - {valueX}" }
+                "settings": {
+                  "cornerRadius": 25,
+                  "tooltipText": "{categoryY}: {openValueX} - {valueX}",
+                  "focusable": true,
+                  "focusableGroup": "seasons",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{categoryY}: {openValueX} to {valueX}"
+                }
               }
             }
           }

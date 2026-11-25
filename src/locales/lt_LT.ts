@@ -120,13 +120,18 @@ export default {
 	"Chord diagram": "Chord diagrama",
 	"Flow diagram": "Flow diagrama",
 	"TreeMap chart": "TreeMap grafikas",
+	"Force directed tree": "Jėgomis valdomas medis",
+	"Sliced chart": "Padalintas grafikas",
 
 	// Series types
 	"Series": "Serija",
 	"Candlestick Series": "\"Candlestick\" tipo grafiko serija",
+	"OHLC Series": "OHLC serija",
 	"Column Series": "Stulpelinio grafiko serija",
 	"Line Series": "Linijinio grafiko serija",
 	"Pie Slice Series": "Pyrago tipo serija",
+	"Funnel Series": "Piltuvo tipo serija",
+	"Pyramid Series": "Piramidės tipo serija",
 	"X/Y Series": "X/Y serija",
 
 	// Map-related
@@ -141,9 +146,11 @@ export default {
 	"Image": "Vaizdas",
 	"Data": "Duomenys",
 	"Print": "Spausdinti",
+	"Press ENTER or use arrow keys to navigate": "Spauskite ENTER arba naudokitės rodyklėmis, kad naršytumėte",
 	"Press ENTER to open": "Spragtelkite arba spauskite ENTER, kad atidarytumėte",
 	"Press ENTER to print.": "Spragtelkite arba spauskite ENTER, kad spausdintumėte.",
 	"Press ENTER to export as %1.": "Spragtelkite arba spauskite ENTER, kad eksportuotumėte kaip %1.",
+	"(Press ESC to close this message)": "(Spauskite ESC, kad uždarytumėte šį pranešimą)",
 	"Image Export Complete": "Paveiksliuko eksportas baigtas",
 	"Export operation took longer than expected. Something might have gone wrong.": "Eksportas užtruko ilgiau negu turėtų. Greičiausiai įvyko klaida.",
 	"Saved from": "Išsaugota iš",
@@ -169,6 +176,25 @@ export default {
 	"From %1 to %2": "Nuo %1 iki %2",
 	"From %1": "Nuo %1",
 	"To %1": "Iki %1",
+
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Reikšmės: %1",
+	"Highest: %1": "Didžiausia: %1",
+	"Lowest: %1": "Mažiausia: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategorija",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Rezultatai: %1",
+	"No results": "Rezultatų nėra",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Atspalvis",
+	"Opacity": "Neskaidrumas",
+	"Color": "Spalva",
 
 	// Data loader-related
 	"No parser available for file: %1": "Failui %1 neturime tinkamo dešifruotojo",

@@ -52,7 +52,7 @@ export class DropdownControl extends StockControl {
 		if (this.isDirty("html")) {
 			const container = this.getPrivate("container");
 			if (container) {
-				this.getPrivate("container")!.innerHTML = this.get("html", "");
+				this.getPrivate("container")!.innerHTML = this._root._sanitizeHTML(this.get("html", ""));
 			}
 		}
 	}
@@ -77,7 +77,7 @@ export class DropdownControl extends StockControl {
 		this.setPrivate("container", container);
 
 		const html = this.get("html", "");
-		container.innerHTML = html;
+		container.innerHTML = this._root._sanitizeHTML(html);
 
 		dropdown.events.on("closed", (_ev) => {
 			this.set("active", false);

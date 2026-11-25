@@ -119,6 +119,21 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Spiral chart of a monthly value from January 2022 to December 2024, one turn a year, winding outward. Tab to the months, then move between them with the up and down arrow keys"
+});
+// the months: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "months",
+  hoverOnFocus: true, // the focused month shows its tooltip
+  ariaLabel: "{valueX.formatDate('MMMM yyyy')}: {valueY}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

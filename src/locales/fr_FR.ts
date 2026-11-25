@@ -323,6 +323,7 @@ export default {
 	"Flow diagram": "représentation schématique",
 	"Chord diagram": "diagramme d'accord",
 	"TreeMap chart": "carte de l'arbre",
+	"Force directed tree": "Arbre à forces dirigées",
 	"Sliced chart": "graphique en tranches",
 
 	// Series types.
@@ -359,6 +360,7 @@ export default {
 	"Image": "Image",
 	"Data": "Data",
 	"Print": "Imprimer",
+	"Press ENTER or use arrow keys to navigate": "Appuyez sur ENTER ou utilisez les flèches pour naviguer",
 	"Press ENTER to open": "Cliquez, appuyez ou appuyez sur ENTER pour ouvrir",
 	"Press ENTER to print.": "Cliquez, appuyez ou appuyez sur ENTER pour imprimer",
 	"Press ENTER to export as %1.": "Cliquez, appuyez ou appuyez sur ENTER pour exporter comme %1",
@@ -398,6 +400,25 @@ export default {
 	"From %1": "De %1",
 	"To %1": "à %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Valeurs : %1",
+	"Highest: %1": "Maximum : %1",
+	"Lowest: %1": "Minimum : %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Catégorie",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Résultats : %1",
+	"No results": "Aucun résultat",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Teinte",
+	"Opacity": "Opacité",
+	"Color": "Couleur",
+
 	// Data loader-related.
 	"No parser available for file: %1": "Aucun analyseur disponible pour le fichier: %1",
 	"Error parsing file: %1": "Erreur d'analyse du fichier: %1",
@@ -405,9 +426,9 @@ export default {
 	"Invalid date": "Date invalide",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Fermer",
+	"Minimize": "Réduire",
+	"Confirm": "Confirmer",
 	"OK": "OK",
 	"Cancel": "Annuler",
 	"Delete": "Supprimer",

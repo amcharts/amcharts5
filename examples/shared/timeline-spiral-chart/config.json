@@ -4,6 +4,8 @@
     "levelCount": 3,
     "innerRadius": { "type": "Percent", "value": 35 },
     "yAxisRadius": { "type": "Percent", "value": 50 },
+    "focusable": true,
+    "ariaLabel": "Spiral chart of a monthly value from January 2022 to December 2024, one turn a year, winding outward. Tab to the months, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -120,7 +122,11 @@
               "template": {
                 "settings": {
                   "width": { "type": "Percent", "value": 80 },
-                  "tooltipText": "{valueX.formatDate('MMM yyyy')}: {valueY}"
+                  "tooltipText": "{valueX.formatDate('MMM yyyy')}: {valueY}",
+                  "focusable": true,
+                  "focusableGroup": "months",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{valueX.formatDate('MMMM yyyy')}: {valueY}"
                 }
               }
             }

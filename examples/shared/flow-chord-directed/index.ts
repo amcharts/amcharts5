@@ -72,6 +72,28 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the diagram, and a screen reader names it
+  ariaLabel: "Directed chord diagram of 27 links from the six Friends characters to the people around them. Tab to the people or the links, then move through them with the up and down arrow keys; Enter on a person hides or shows their links"
+});
+// the people: one Tab stop, the up and down arrow keys step through them
+series.nodes.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  ariaLabel: "{name}: {sum} in all"
+});
+// the links: one Tab stop, after the people
+series.links.template.setAll({
+  focusable: true,
+  focusableGroup: "links",
+  tabindexOrder: 5,   // focus runs from low to high (0 if not set)
+  hoverOnFocus: true, // the focused link shows its tooltip
+  ariaLabel: "{sourceId} to {targetId}: {value}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

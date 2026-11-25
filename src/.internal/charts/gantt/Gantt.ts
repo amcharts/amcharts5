@@ -1,3 +1,4 @@
+import { _brandingLicensed } from "../../core/Root";
 import type { ITimeInterval } from "../../core/util/Time";
 import type { Grid } from "../xy/axes/Grid";
 
@@ -252,24 +253,6 @@ export class Gantt extends Container {
 	}));
 
 	/**
-	 * Button that zooms the date axis to fit the tasks currently in view.
-	 */
-	public readonly fitButton: Button = this.zoomControls.children.push(Button.new(this._root, {
-		themeTags: ["fit", "secondary", "zoombutton"],
-		icon: Graphics.new(this._root, { themeTags: ["icon"] }),
-		tooltip: this.root.systemTooltip
-	}));
-
-	/**
-	 * Button that zooms the date axis fully out.
-	 */
-	public readonly zoomOutButton: Button = this.zoomControls.children.push(Button.new(this._root, {
-		themeTags: ["zoomout", "secondary", "zoombutton"],
-		icon: Graphics.new(this._root, { themeTags: ["icon"] }),
-		tooltip: this.root.systemTooltip
-	}));
-
-	/**
 	 * Toggle button for the `editable` setting. Hidden by default.
 	 *
 	 * @since 5.14.1
@@ -288,6 +271,26 @@ export class Gantt extends Container {
 		icon: Graphics.new(this._root, { themeTags: ["icon"] }),
 		tooltip: this.root.systemTooltip,
 		active: false
+	}));
+
+	// Created after the toolbar buttons, so TAB reaches them after the toolbar
+
+	/**
+	 * Button that zooms the date axis to fit the tasks currently in view.
+	 */
+	public readonly fitButton: Button = this.zoomControls.children.push(Button.new(this._root, {
+		themeTags: ["fit", "secondary", "zoombutton"],
+		icon: Graphics.new(this._root, { themeTags: ["icon"] }),
+		tooltip: this.root.systemTooltip
+	}));
+
+	/**
+	 * Button that zooms the date axis fully out.
+	 */
+	public readonly zoomOutButton: Button = this.zoomControls.children.push(Button.new(this._root, {
+		themeTags: ["zoomout", "secondary", "zoombutton"],
+		icon: Graphics.new(this._root, { themeTags: ["icon"] }),
+		tooltip: this.root.systemTooltip
 	}));
 
 	/**
@@ -556,6 +559,7 @@ export class Gantt extends Container {
 
 		const eventType = "valueschanged";
 		this.series.events.on(eventType, () => {
+			this._updateExpandButtons();
 			if (this.get("editable")) {
 				if (this.events.isEnabled(eventType)) {
 					this.events.dispatch(eventType, { type: eventType, target: this });
@@ -637,7 +641,7 @@ export class Gantt extends Container {
 			this._root._showBranding();
 		}
 		else {
-			this._root._licenseApplied();
+			_brandingLicensed(this._root);
 		}
 	}
 	// end _afterNew()
@@ -850,9 +854,23 @@ export class Gantt extends Container {
 			}
 		}
 
-		this.series.data.moveValue(seriesDataObject, index - 1);
+		// rows without a task have no series item
+		const taskIds: { [id: string]: boolean } = {};
+		$array.each(this.series.dataItems, (dataItem) => {
+			taskIds[dataItem.get("id")!] = true;
+		});
 
-		const newSeriesDataItem = this.series.dataItems[index - 1];
+		let seriesIndex = 0;
+		const rows = this.yAxis.dataItems;
+		for (let i = 0; i < rows.length && rows[i].get("id") !== uid; i++) {
+			if (taskIds[rows[i].get("id")!]) {
+				seriesIndex++;
+			}
+		}
+
+		this.series.data.moveValue(seriesDataObject, seriesIndex);
+
+		const newSeriesDataItem = this.series.dataItems[seriesIndex];
 		newSeriesDataItem.animate({ key: "valueX", to: start + baseDuration * duration, duration: this.series.get("interpolationDuration", 0), easing: this.series.get("interpolationEasing") });
 
 		this.yAxis._disposeXHideDP();
@@ -924,6 +942,23 @@ export class Gantt extends Container {
 		}
 	}
 
+	// Expand all and Collapse all are disabled while no task has subtasks: greyed
+	// out, not clickable (the disabled state) and skipped by TAB
+	protected _updateExpandButtons(): void {
+		let nested = false;
+		$array.eachContinue(this.series.dataItems, (dataItem) => {
+			const children = dataItem.get("children");
+			nested = !!(children && children.length > 0);
+			return !nested;
+		});
+		$array.each([this.expandButton, this.collapseButton], (button) => {
+			if (button.get("disabled", false) === nested) {
+				button._setC("disabled", !nested);
+				button.setPrivate("focusDisabled", !nested);
+			}
+		});
+	}
+
 	protected _toggleEditable(value: boolean) {
 		const forceHidden = "forceHidden";
 		const forceInactive = "forceInactive";
@@ -944,6 +979,7 @@ export class Gantt extends Container {
 
 		const renderer = this.yAxis.get("renderer");
 		renderer.labels.template._setC(forceInactive, !value);
+		renderer.labels.template._setC("focusable", value);
 
 		renderer.grips.template._setC(forceHidden, !value);
 		renderer.containers.template._setC(draggable, value);
@@ -951,9 +987,31 @@ export class Gantt extends Container {
 		renderer.controlsContainers.template._setC(forceInactive, !value);
 
 		this.series.columns.template._setC(draggable, value);
+
+		// Editable, a task bar or milestone is a slider: screen readers then pass
+		// the arrow keys to the chart, which moves it with left and right
+		$array.each([this.series.columns.template, this.series.zeroRectangles.template], (template) => {
+			// a role set on the template is left alone
+			const computed = template._computedSettings.role;
+			if (value) {
+				if (template.get("role") == null || computed) {
+					template._setC("role", "slider");
+				}
+			}
+			else if (computed) {
+				template.remove("role");
+			}
+		});
 		this.series.startGrips.template._setC(forceHidden, !value);
 		this.series.endGrips.template._setC(forceHidden, !value);
 		this.series.progressGrips.template._setC(forceHidden, !value);
+
+		if (value) {
+			this.series._resetGripStops();
+		}
+		this.series.startGrips.template._setC("focusable", value);
+		this.series.endGrips.template._setC("focusable", value);
+		this.series.progressGrips.template._setC("focusable", value);
 
 		this.series.startBullets.template._setC(forceHidden, !value);
 		this.series.endBullets.template._setC(forceHidden, !value);

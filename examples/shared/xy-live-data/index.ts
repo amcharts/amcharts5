@@ -79,8 +79,12 @@ series.bullets.push(() => {
   return am5.Bullet.new(root, {
     locationX: undefined,
     sprite: am5.Circle.new(root, {
-      radius: 4,               // a dot 8 pixels across...
-      fill: series.get("fill") // ...in the line's color
+      radius: 4,                // a dot 8 pixels across...
+      fill: series.get("fill"), // ...in the line's color
+      // keyboard: one Tab stop for all the dots, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "points",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
     })
   });
 });
@@ -155,6 +159,15 @@ function addData() {
 setInterval(() => {
   addData();
 }, 1000);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart of a daily value over the last 16 days, a new day added every second. Tab to the points, then move between them with the up and down arrow keys"
+});
+// the points: set up in their bullet function above
 
 
 // Make stuff animate on load

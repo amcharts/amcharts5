@@ -315,6 +315,7 @@ export default {
 	"Flow diagram": "Prikaz poteka",
 	"Chord diagram": "Kolobarni diagram",
 	"TreeMap chart": "Drevesi graf",
+	"Force directed tree": "Drevo, usmerjeno s silami",
 	"Sliced chart": "Sliced graf",
 
 	// Series types.
@@ -351,6 +352,7 @@ export default {
 	"Image": "Slika",
 	"Data": "Podatki",
 	"Print": "Natisni",
+	"Press ENTER or use arrow keys to navigate": "Pritisni ENTER ali se premikaj s smernimi tipkami",
 	"Press ENTER to open": "Klikni, tapni ali pritisni ENTER da odpreš.",
 	"Press ENTER to print.": "Klikni, tapni ali pritisni ENTER za tiskanje.",
 	"Press ENTER to export as %1.": "Klikni, tapni ali pritisni ENTER da izvoziš kot %1.",
@@ -390,6 +392,25 @@ export default {
 	"From %1": "Od %1",
 	"To %1": "Do %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Vrednosti: %1",
+	"Highest: %1": "Najvišja: %1",
+	"Lowest: %1": "Najnižja: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategorija",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Rezultati: %1",
+	"No results": "Ni rezultatov",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Odtenek",
+	"Opacity": "Prekrivnost",
+	"Color": "Barva",
+
 	// Data loader-related.
 	"No parser available for file: %1": "Nobenega parserja ni na voljo za datoteko: %1",
 	"Error parsing file: %1": "Napaka pri parsanju datoteke: %1",
@@ -397,9 +418,9 @@ export default {
 	"Invalid date": "Neveljaven datum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Zapri",
+	"Minimize": "Pomanjšaj",
+	"Confirm": "Potrdi",
 	"OK": "V redu",
 	"Cancel": "Prekliči",
 	"Delete": "Izbriši",

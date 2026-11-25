@@ -76,6 +76,26 @@ const legend = container.children.push(am5.Legend.new(root, {
 legend.data.setAll(series.dataItems);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+container.setAll({
+  focusable: true, // Tab reaches the diagram, and a screen reader names it
+  ariaLabel: "Venn diagram of three sets, A, B and C, and their overlaps X, Y, Z and Q, each area sized by its value. Tab to the areas, then move between them with the up and down arrow keys"
+});
+// the circles and overlaps: one Tab stop, the up and down arrow keys step through them
+series.slices.template.setAll({
+  focusable: true,
+  focusableGroup: "areas",
+  hoverOnFocus: true, // the focused area shows its tooltip
+  ariaLabel: "{category}: {value}"
+});
+// the legend: one Tab stop, after the areas
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+
+
 // Play initial series animation
 // https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

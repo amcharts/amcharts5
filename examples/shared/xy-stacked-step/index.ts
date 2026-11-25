@@ -142,6 +142,29 @@ series1.data.setAll(data);
 series2.data.setAll(data);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Stacked step line chart of two series over the 30 days from January 1, 2024. Tab to a series, then move along it with the up and down arrow keys"
+});
+// invisible points on each line: one Tab stop per series, the up and down arrow keys step through it
+chart.series.each((series) => {
+  series.bullets.push(() => {
+    return am5.Bullet.new(root, {
+      sprite: am5.Circle.new(root, {
+        radius: 5,
+        fillOpacity: 0, // not painted: the lines look as before
+        strokeOpacity: 0,
+        focusable: true,
+        focusableGroup: series.get("name"),
+        ariaLabel: "{name}, {valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+      })
+    });
+  });
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series1.appear(1000);

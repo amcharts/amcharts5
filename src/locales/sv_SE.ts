@@ -189,15 +189,20 @@ export default {
 	"Chord diagram": "Strängdiagram",
 	"Flow diagram": "Flödesschema",
 	"TreeMap chart": "Träddiagram ",
+	"Force directed tree": "Kraftstyrt träd",
+	"Sliced chart": "Uppdelat diagram",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
 	"Series": "Serier",
 	"Candlestick Series": "Candlestick-serier",
+	"OHLC Series": "OHLC-serier",
 	"Column Series": "Kolumnserier",
 	"Line Series": "Linjeserier",
 	"Pie Slice Series": "Tårtserier",
+	"Funnel Series": "Trattserier",
+	"Pyramid Series": "Pyramidserier",
 	"X/Y Series": "X/Y-serier",
 
 	// Map-related stuff.
@@ -221,12 +226,13 @@ export default {
 	"Image": "Bild",
 	"Data": "Data",
 	"Print": "Skriv ut",
+	"Press ENTER or use arrow keys to navigate": "Tryck ENTER eller använd pilknapparna för att navigera",
 	"Press ENTER to open": "Klicka eller tryck ENTER för att öppna",
 	"Press ENTER to print.": "Klicka eller tryck ENTER för att skriva ut.",
 	"Press ENTER to export as %1.": "Klicka eller tryck ENTER för att exportera till %1.",
 	"(Press ESC to close this message)": "(Tryck ESC för att stänga)",
 	"Image Export Complete": "Bildexport klar",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
+	"Export operation took longer than expected. Something might have gone wrong.": "Exporten tog längre tid än väntat. Något kan ha gått fel.",
 	"Saved from": "Sparad från",
 	"PNG": "",
 	"JPG": "",
@@ -248,11 +254,11 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Använd TAB för att välja handtagen eller vänster och höger pilknappar för att ändra urvalet",
 	"Use left and right arrows to move selection": "Använd vänster och höger pilknappar för att flytta urvalet",
 	"Use left and right arrows to move left selection": "Använd vänster och höger pilknappar för att flytta vänsterurval",
 	"Use left and right arrows to move right selection": "Använd vänster och höger pilknappar för att flytta högerurval",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Använd TAB för att välja handtagen eller upp och ner pilknappar för att ändra urvalet",
 	"Use up and down arrows to move selection": "Använd upp och ner pilknappar för att flytta urvalet",
 	"Use up and down arrows to move lower selection": "Använd upp och ner pilknappar för att flytta nedre urvalet",
 	"Use up and down arrows to move upper selection": "Använd upp och ner pilknappar för att flytta övre urvalet",
@@ -260,16 +266,35 @@ export default {
 	"From %1": "Från %1",
 	"To %1": "Till %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Värden: %1",
+	"Highest: %1": "Högsta: %1",
+	"Lowest: %1": "Lägsta: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Kategori",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Resultat: %1",
+	"No results": "Inga resultat",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Nyans",
+	"Opacity": "Opacitet",
+	"Color": "Färg",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
+	"No parser available for file: %1": "Ingen tolk tillgänglig för filen: %1",
+	"Error parsing file: %1": "Fel vid tolkning av filen: %1",
+	"Unable to load file: %1": "Kunde inte läsa in filen: %1",
 	"Invalid date": "Ogiltigt datum",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Stäng",
+	"Minimize": "Minimera",
+	"Confirm": "Bekräfta",
 	"OK": "OK",
 	"Cancel": "Avbryt",
 	"Delete": "Ta bort",

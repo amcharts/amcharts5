@@ -5,6 +5,8 @@
     "panY": "rotateY",
     "rotationX": -80,
     "rotationY": -25,
+    "focusable": true,
+    "ariaLabel": "Globe with circles on 40 countries, sized by population, lying flat on its surface. Tab to the circles, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -81,7 +83,7 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.1,
                   "strokeOpacity": 0
                 }
@@ -100,10 +102,10 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.15,
                   "strokeWidth": 0.5,
-                  "stroke": { "type": "Color", "value": "#ffffff" }
+                  "stroke": "@root.interfaceColors.get('background')"
                 }
               }
             }
@@ -142,9 +144,13 @@
                   "settings": {
                     "fill": { "type": "Color", "value": "#ff621f" },
                     "fillOpacity": 0.7,
-                    "stroke": { "type": "Color", "value": "#ffffff" },
+                    "stroke": "@root.interfaceColors.get('background')",
                     "strokeWidth": 1,
-                    "tooltipText": "{name}: {value.formatNumber('#.0a')}"
+                    "tooltipText": "{name}: {value.formatNumber('#.0a')}",
+                    "focusable": true,
+                    "focusableGroup": "circles",
+                    "hoverOnFocus": true,
+                    "ariaLabel": "{name}: population {value.formatNumber('#,###')}"
                   },
                   "properties": { "template": "#template-0" }
                 }

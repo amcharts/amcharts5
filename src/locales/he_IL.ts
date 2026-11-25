@@ -305,7 +305,7 @@ export default {
 	"Legend": "מקרא",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "הקש ENTER כדי להחליף מצב",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "טעינה",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "תרשים",
+	"Serial chart": "תרשים סדרתי",
+	"X/Y chart": "תרשים X/Y",
+	"Pie chart": "תרשים עוגה",
+	"Gauge chart": "תרשים מד",
+	"Radar chart": "תרשים מכ״ם",
+	"Sankey diagram": "דיאגרמת סנקי",
+	"Flow diagram": "דיאגרמת זרימה",
+	"Chord diagram": "דיאגרמת מיתרים",
+	"TreeMap chart": "תרשים מפת עץ",
+	"Force directed tree": "עץ מכוון כוח",
+	"Sliced chart": "תרשים פרוס",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "סדרה",
+	"Candlestick Series": "סדרת נרות",
+	"OHLC Series": "סדרת OHLC",
+	"Column Series": "סדרת עמודות",
+	"Line Series": "סדרת קווים",
+	"Pie Slice Series": "סדרת פרוסות עוגה",
+	"Funnel Series": "סדרת משפך",
+	"Pyramid Series": "סדרת פירמידה",
+	"X/Y Series": "סדרת X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "מפה",
+	"Press ENTER to zoom in": "הקש ENTER כדי להגדיל",
+	"Press ENTER to zoom out": "הקש ENTER כדי להקטין",
+	"Use arrow keys to zoom in and out": "השתמש במקשי החיצים כדי להגדיל ולהקטין",
+	"Use plus and minus keys on your keyboard to zoom in and out": "השתמש במקשי הפלוס והמינוס במקלדת כדי להגדיל ולהקטין",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "הדפס",
+	"Export": "ייצוא",
 	"Image": "תמונה",
 	"Data": "נתונים",
 	"Print": "הדפס",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "הקש ENTER או השתמש במקשי החיצים כדי לנווט",
+	"Press ENTER to open": "הקש ENTER כדי לפתוח",
+	"Press ENTER to print.": "הקש ENTER כדי להדפיס.",
+	"Press ENTER to export as %1.": "הקש ENTER כדי לייצא כ-%1.",
+	"(Press ESC to close this message)": "(הקש ESC כדי לסגור הודעה זו)",
+	"Image Export Complete": "ייצוא התמונה הושלם",
+	"Export operation took longer than expected. Something might have gone wrong.": "פעולת הייצוא נמשכה זמן רב מהצפוי. ייתכן שמשהו השתבש.",
+	"Saved from": "נשמר מתוך",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "השתמש ב-TAB כדי לבחור את כפתורי האחיזה או בחיצים שמאלה וימינה כדי לשנות את הבחירה",
+	"Use left and right arrows to move selection": "השתמש בחיצים שמאלה וימינה כדי להזיז את הבחירה",
+	"Use left and right arrows to move left selection": "השתמש בחיצים שמאלה וימינה כדי להזיז את הבחירה השמאלית",
+	"Use left and right arrows to move right selection": "השתמש בחיצים שמאלה וימינה כדי להזיז את הבחירה הימנית",
+	"Use TAB select grip buttons or up and down arrows to change selection": "השתמש ב-TAB כדי לבחור את כפתורי האחיזה או בחיצים למעלה ולמטה כדי לשנות את הבחירה",
+	"Use up and down arrows to move selection": "השתמש בחיצים למעלה ולמטה כדי להזיז את הבחירה",
+	"Use up and down arrows to move lower selection": "השתמש בחיצים למעלה ולמטה כדי להזיז את הבחירה התחתונה",
+	"Use up and down arrows to move upper selection": "השתמש בחיצים למעלה ולמטה כדי להזיז את הבחירה העליונה",
 	"From %1 to %2": "מ %1 עד %2",
 	"From %1": "מ %1",
 	"To %1": "עד %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "ערכים: %1",
+	"Highest: %1": "הגבוה ביותר: %1",
+	"Lowest: %1": "הנמוך ביותר: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "קטגוריה",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "תוצאות: %1",
+	"No results": "אין תוצאות",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "גוון",
+	"Opacity": "אטימות",
+	"Color": "צבע",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "אין מנתח זמין לקובץ: %1",
+	"Error parsing file: %1": "שגיאה בניתוח הקובץ: %1",
+	"Unable to load file: %1": "לא ניתן לטעון את הקובץ: %1",
+	"Invalid date": "תאריך לא חוקי",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "סגירה",
+	"Minimize": "מזעור",
+	"Confirm": "אישור",
 	"OK": "אישור",
 	"Cancel": "ביטול",
 	"Delete": "מחיקה",

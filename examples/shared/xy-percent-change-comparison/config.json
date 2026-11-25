@@ -14,6 +14,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Line chart comparing the daily prices of XTD and BTD as percent change, with their volume below, over 150 trading days from September 2023 to April 2024. Tab to the days, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -227,7 +229,14 @@
                 "type": "Legend",
                 "settings": { "useDefaultMarker": true },
                 "properties": {
-                  "data": ["#series-0", "#series-1"]
+                  "data": ["#series-0", "#series-1"],
+                  "itemContainers": {
+                    "properties": {
+                      "template": {
+                        "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+                      }
+                    }
+                  }
                 }
               }
             ]
@@ -267,7 +276,14 @@
                 "type": "Legend",
                 "settings": { "useDefaultMarker": true },
                 "properties": {
-                  "data": ["#series-2"]
+                  "data": ["#series-2"],
+                  "itemContainers": {
+                    "properties": {
+                      "template": {
+                        "settings": { "tabindexOrder": 10 }
+                      }
+                    }
+                  }
                 }
               }
             ]
@@ -297,7 +313,27 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "bullets": [
+            {
+              "type": "Bullet",
+              "settings": {
+                "sprite": {
+                  "type": "Circle",
+                  "settings": {
+                    "radius": 5,
+                    "fillOpacity": 0,
+                    "strokeOpacity": 0,
+                    "focusable": true,
+                    "focusableGroup": "days",
+                    "ariaLabel": "{valueX.formatDate('MMMM d, yyyy')}: XTD {price1}, BTD {price2}, volume {quantity}"
+                  }
+                }
+              }
+            }
+          ]
+        }
       }
     },
     {

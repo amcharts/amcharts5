@@ -8,6 +8,7 @@ import type { Sprite } from "../../core/render/Sprite";
 import type { Pattern } from "./patterns/Pattern";
 import type { Gradient } from "./gradients/Gradient";
 import type { IBounds } from "../../core/util/IBounds";
+import type { IDisposer } from "../../core/util/Disposer";
 
 import { Component, IComponentSettings, IComponentPrivate, DataItem, IComponentEvents, IComponentDataItem } from "../../core/render/Component";
 import { List } from "../../core/util/List";
@@ -19,6 +20,8 @@ import { Container } from "../../core/render/Container";
 import { Label } from "../../core/render/Label";
 import { LabelFit, inside, overlap, passLater } from "../../core/util/Fit";
 //import { Animations } from "../../core/util/Animation";
+
+import { populateString } from "../../core/util/PopulateString";
 
 import * as $array from "../../core/util/Array";
 import * as $utils from "../../core/util/Utils";
@@ -198,12 +201,223 @@ export interface ISeriesDataItem extends IComponentDataItem {
 	customValueChangePreviousPercent?: number;
 }
 
+/**
+ * One data item in a series' summary for screen readers.
+ */
+export interface ISeriesSummaryItem {
+
+	/**
+	 * What the value is for: a category, date or name.
+	 */
+	label: string;
+
+	/**
+	 * The value.
+	 */
+	value: number;
+
+	/**
+	 * The value, formatted.
+	 */
+	text: string;
+
+}
+
+/**
+ * A summary of a series' data, as returned by `getSummary()`.
+ */
+export interface ISeriesSummary {
+
+	/**
+	 * Number of data items with a value.
+	 */
+	count: number;
+
+	/**
+	 * The first data item with a value (series whose data has an order, like
+	 * XY series).
+	 */
+	first?: ISeriesSummaryItem;
+
+	/**
+	 * The last data item with a value (series whose data has an order).
+	 */
+	last?: ISeriesSummaryItem;
+
+	/**
+	 * The data item with the highest value.
+	 */
+	highest: ISeriesSummaryItem;
+
+	/**
+	 * The data item with the lowest value.
+	 */
+	lowest: ISeriesSummaryItem;
+
+	/**
+	 * All of it in a few short sentences, as screen readers read it.
+	 */
+	text: string;
+
+}
+
+/**
+ * Sets an element's `ariaDescription` to a summary the library worked out,
+ * unless one was set in code. No text takes it away.
+ *
+ * @ignore
+ */
+export function setSummaryDescription(target: Sprite | undefined, text: string | undefined): void {
+	if (!target || target.isDisposed() || (target.isUserSetting("ariaDescription") && !target.isComputedSetting("ariaDescription"))) {
+		return;
+	}
+	if (text) {
+		target._setC("ariaDescription", text);
+	}
+	else if (target.get("ariaDescription") != null) {
+		target.remove("ariaDescription");
+	}
+}
+
+/**
+ * One column of a data table for screen readers: a heading and its values.
+ *
+ * @ignore
+ */
+export interface IDataTableColumn {
+	name: string;
+	items: Array<ISeriesSummaryItem>;
+}
+
+/**
+ * Builds or updates a data table for screen readers, hidden from view, for
+ * `owner` (a chart, or a series not in a chart): a row for each category or
+ * date, a column for each series. No columns take it away. Returns the table.
+ *
+ * @ignore
+ */
+export function renderDataTable(owner: Sprite, table: HTMLTableElement | undefined, columns: Array<IDataTableColumn>): HTMLTableElement | undefined {
+	const container = owner._root._getReaderContainer();
+	if (!container || !columns.length || owner.isDisposed()) {
+		if (table && table.parentNode) {
+			table.parentNode.removeChild(table);
+		}
+		return;
+	}
+
+	// Rows in the order the categories or dates first come
+	const labels: Array<string> = [];
+	const rows: { [label: string]: Array<string> } = {};
+	$array.each(columns, (column, index) => {
+		$array.each(column.items, (item) => {
+			let row = rows[item.label];
+			if (!row) {
+				row = [];
+				rows[item.label] = row;
+				labels.push(item.label);
+			}
+			row[index] = item.text;
+		});
+	});
+
+	if (!table) {
+		table = document.createElement("table");
+		table.className = "am5-data-table";
+	}
+	if (table.parentNode !== container) {
+		container.appendChild(table);
+	}
+
+	// Built again only if anything in it changed (zooming marks values dirty)
+	const ariaLabel = owner.get("ariaLabel");
+	const key = JSON.stringify([ariaLabel, $array.map(columns, (column) => column.name), labels, $array.map(labels, (label) => rows[label])]);
+	if ((<any>table)._am5Key === key) {
+		return table;
+	}
+	(<any>table)._am5Key = key;
+
+	while (table.firstChild) {
+		table.removeChild(table.firstChild);
+	}
+
+	if (ariaLabel) {
+		const caption = document.createElement("caption");
+		caption.textContent = populateString(owner, ariaLabel);
+		table.appendChild(caption);
+	}
+
+	const cell = (tag: string, text: string, scope?: string) => {
+		const element = document.createElement(tag);
+		element.textContent = text;
+		if (scope) {
+			element.setAttribute("scope", scope);
+		}
+		return element;
+	};
+
+	const head = document.createElement("thead");
+	const headRow = document.createElement("tr");
+	headRow.appendChild(cell("th", owner._root.language.translate("Category"), "col"));
+	$array.each(columns, (column) => {
+		headRow.appendChild(cell("th", column.name, "col"));
+	});
+	head.appendChild(headRow);
+	table.appendChild(head);
+
+	const body = document.createElement("tbody");
+	$array.each(labels, (label) => {
+		const tr = document.createElement("tr");
+		tr.appendChild(cell("th", label, "row"));
+		const row = rows[label];
+		$array.each(columns, (_column, index) => {
+			tr.appendChild(cell("td", row[index] || ""));
+		});
+		body.appendChild(tr);
+	});
+	table.appendChild(body);
+
+	return table;
+}
+
 export interface ISeriesSettings extends IComponentSettings {
 
 	/**
 	 * Name of the series.
 	 */
 	name?: string;
+
+	/**
+	 * Describes the series' data to screen readers in a few short sentences:
+	 * how many values it has, its highest and lowest, and where the data has
+	 * an order (XY series), its first and last.
+	 *
+	 * The summary goes to the series' legend item, and to the series itself
+	 * when it is not in a chart (a hierarchy, flow or word cloud), for which
+	 * the series has to be `focusable`. In a chart, set `ariaSummary` on the
+	 * chart instead: then `false` here leaves this series out.
+	 *
+	 * @since 5.24.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#data-summary} for more info
+	 */
+	ariaSummary?: boolean;
+
+	/**
+	 * Gives screen readers the series' data as a table, hidden from view: a
+	 * row for each category or date, with its value. Screen readers can move
+	 * through it by row and column.
+	 *
+	 * With grouped data (a date axis with `groupData`), the table has the
+	 * groups shown when the chart is zoomed out all the way, whatever the zoom.
+	 *
+	 * In a chart, set `ariaDataTable` on the chart instead, for one table with
+	 * a column for each series: then `false` here leaves this series out.
+	 * A series not in a chart (a hierarchy, flow or word cloud) with `true`
+	 * gets a table of its own.
+	 *
+	 * @since 5.24.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#data-table} for more info
+	 */
+	ariaDataTable?: boolean;
 
 	/**
 	 * A key to look up in data for an id of the data item.
@@ -525,7 +739,175 @@ export abstract class Series extends Component {
 
 	protected _dispose(){
 		this.bulletsContainer.dispose(); // can be in a different parent
+		renderDataTable(this, this._dataTable, []);
 		super._dispose();
+	}
+
+	protected _summaryTimer: IDisposer | undefined;
+
+	/**
+	 * The series' summary text, as last worked out for its chart.
+	 *
+	 * @ignore
+	 */
+	public _summaryText: string | undefined;
+
+	/**
+	 * Returns a summary of the series' data: how many values it has, its
+	 * highest and lowest, and where the data has an order its first and last,
+	 * with a text for screen readers. `undefined` if it has no values.
+	 *
+	 * @since 5.24.0
+	 * @return Summary
+	 */
+	public getSummary(): ISeriesSummary | undefined {
+		const items = this._summaryItems();
+		const count = items.length;
+		if (!count) {
+			return;
+		}
+
+		let highest = items[0];
+		let lowest = items[0];
+		$array.each(items, (item) => {
+			if (item.value > highest.value) {
+				highest = item;
+			}
+			if (item.value < lowest.value) {
+				lowest = item;
+			}
+		});
+
+		const summary: ISeriesSummary = { count, highest, lowest, text: "" };
+
+		const itemText = (item: ISeriesSummaryItem) => {
+			return item.label ? item.label + " (" + item.text + ")" : item.text;
+		};
+
+		const parts = [this._t("Values: %1", undefined, this.getNumberFormatter().format(count, "#,###"))];
+		if (this._summaryOrdered()) {
+			summary.first = items[0];
+			summary.last = items[count - 1];
+			if (count > 1) {
+				parts.push(this._t("From %1 to %2", undefined, itemText(summary.first), itemText(summary.last)));
+			}
+		}
+		parts.push(this._t("Highest: %1", undefined, itemText(highest)));
+		if (count > 1) {
+			parts.push(this._t("Lowest: %1", undefined, itemText(lowest)));
+		}
+		summary.text = parts.join(". ") + ".";
+
+		return summary;
+	}
+
+	// The data items that have a value, with a label for each: a category,
+	// date or name
+	protected _summaryItems(dataItems: Array<DataItem<this["_dataItemSettings"]>> = this._mainDataItems): Array<ISeriesSummaryItem> {
+		const items: Array<ISeriesSummaryItem> = [];
+		$array.each(dataItems, (dataItem) => {
+			const value = dataItem.get("value");
+			if ($type.isNumber(value)) {
+				items.push({ label: this._summaryLabel(dataItem), value, text: this._summaryValueText(value, dataItem) });
+			}
+		});
+		return items;
+	}
+
+	protected _summaryLabel(dataItem: DataItem<this["_dataItemSettings"]>): string {
+		const context: any = dataItem.dataContext;
+		const label = (<any>dataItem).get("category") || (<any>dataItem).get("name") || (context && context.name) || dataItem.get("id");
+		return label != null ? "" + label : "";
+	}
+
+	protected _summaryValueText(value: number, _dataItem: DataItem<this["_dataItemSettings"]>): string {
+		return this.getNumberFormatter().format(value);
+	}
+
+	// Whether the data has an order, so that its first and last values mean
+	// something
+	protected _summaryOrdered(): boolean {
+		return false;
+	}
+
+	// Whether the summary is shown: the chart's `ariaSummary`, or the series'
+	// own. `false` on the series leaves it out
+	protected _summaryWanted(): boolean {
+		const own = this.get("ariaSummary");
+		if (own === false) {
+			return false;
+		}
+		const chart: any = this.chart;
+		return own === true || (chart && chart.get("ariaSummary")) ? true : false;
+	}
+
+	// The data items for the data table: all of them, unless the series groups
+	// its data
+	protected _tableDataItems(): Array<DataItem<this["_dataItemSettings"]>> {
+		return this._mainDataItems;
+	}
+
+	// Whether the data table is shown: the chart's `ariaDataTable`, or the
+	// series' own if it is not in a chart. `false` on the series leaves it out
+	protected _tableWanted(): boolean {
+		const own = this.get("ariaDataTable");
+		if (own === false) {
+			return false;
+		}
+		const chart: any = this.chart;
+		return chart ? !!chart.get("ariaDataTable") : own === true;
+	}
+
+	/**
+	 * The series' column of the data table, as last worked out for its chart.
+	 *
+	 * @ignore
+	 */
+	public _tableItems: Array<ISeriesSummaryItem> | undefined;
+
+	protected _dataTable: HTMLTableElement | undefined;
+
+	/**
+	 * The summary and the data table are worked out again a little later:
+	 * values can change many times in a row.
+	 *
+	 * @ignore
+	 */
+	public _scheduleSummary(): void {
+		if (this._summaryTimer || (this._summaryText === undefined && this._tableItems === undefined && !this._summaryWanted() && !this._tableWanted())) {
+			return;
+		}
+		this._summaryTimer = this.setTimeout(() => {
+			this._summaryTimer = undefined;
+			this._applySummary();
+		}, 100);
+	}
+
+	protected _applySummary(): void {
+		if (this.isDisposed()) {
+			return;
+		}
+		const summary = this._summaryWanted() ? this.getSummary() : undefined;
+		const text = summary ? summary.text : undefined;
+		this._summaryText = text;
+
+		const legendDataItem = this.get("legendDataItem");
+		if (legendDataItem) {
+			setSummaryDescription(legendDataItem.get("itemContainer"), text);
+		}
+
+		this._tableItems = this._tableWanted() ? this._summaryItems(this._tableDataItems()) : undefined;
+
+		const chart: any = this.chart;
+		if (chart && chart._updateSummary) {
+			chart._updateSummary();
+			chart._updateDataTable();
+		}
+		else if (!chart) {
+			setSummaryDescription(this, text);
+			const items = this._tableItems;
+			this._dataTable = renderDataTable(this, this._dataTable, items ? [{ name: "" + (this.get("name") || this._t("Series")), items: items }] : []);
+		}
 	}
 
 	// `autoLabels`: each label in the bullets of the data items in range, in order
@@ -986,6 +1368,10 @@ export abstract class Series extends Component {
 
 	public _prepareChildren(){
 		super._prepareChildren();
+
+		if (this._valuesDirty || this.isDirty("ariaSummary") || this.isDirty("ariaDataTable") || this.isDirty("name") || this.isDirty("legendDataItem")) {
+			this._scheduleSummary();
+		}
 
 		this._passFrames = 3;
 		if (this.get("autoLabels") && !this._labelFit) {

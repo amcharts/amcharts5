@@ -106,6 +106,27 @@ const legend = chart.children.push(am5.Legend.new(root, {
 legend.data.setAll(chart.series.values);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "100% stacked column chart of six regions' shares over 2021 to 2023. Tab to a region's columns, then move between its years with the up and down arrow keys"
+});
+// each region's columns: one Tab stop, the up and down arrow keys step through them
+chart.series.each((series) => {
+  (series as am5xy.ColumnSeries).columns.template.setAll({
+    focusable: true,
+    focusableGroup: series.get("name"),
+    ariaLabel: "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+  });
+});
+// the legend: one Tab stop, after the columns
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.series.each((series) => {

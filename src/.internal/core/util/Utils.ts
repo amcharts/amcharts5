@@ -918,28 +918,188 @@ export function plainText(text: string): string {
 }
 
 /**
- * HTML tags that [[sanitizeHTML]] strips out entirely (together with their
- * contents where applicable). They can execute scripts or pull in
- * external/malicious resources and have no legitimate use inside chart labels,
- * tooltips, modal content, or export menu items.
+ * Elements that [[sanitizeHTML]] removes together with their content: they run
+ * script, load other documents, restyle the whole page, or keep their content
+ * as raw text that can turn into markup when the result is parsed again.
  *
  * @ignore
  */
-const dangerousHTMLTags: string = "script|iframe|frame|frameset|object|embed|applet|noscript|template|link|meta|base|form";
+const blockedHTMLElements: { [name: string]: boolean } = {};
+$array.each(["script", "iframe", "frame", "frameset", "object", "embed", "applet", "portal", "noscript", "template", "link", "meta", "base", "form", "style", "xmp", "noembed", "noframes", "plaintext", "math", "handler", "listener"], (name) => {
+	blockedHTMLElements[name] = true;
+});
 
 /**
- * Removes the parts of an HTML string that are practically only used for
- * cross-site scripting (XSS), leaving legitimate markup intact:
+ * SVG animation elements: removed when they animate a link or an event handler.
  *
- * * `<script>`, `<iframe>`, `<object>`, `<embed>` and similar dangerous tags;
- * * inline event handler attributes (`onerror`, `onload`, `onclick`, ...);
- * * `javascript:` / `vbscript:` (and similar) protocol URLs in attributes;
- * * inline styles that smuggle in scripts via `expression()`,
- *   `url(javascript:...)`, `behavior`, or `-moz-binding`.
+ * @ignore
+ */
+const animationElements: { [name: string]: boolean } = { animate: true, set: true, animatemotion: true, animatetransform: true, animatecolor: true };
+
+/**
+ * Attributes holding a URL, checked by [[sanitizeHTML]].
+ *
+ * @ignore
+ */
+const urlAttributes: { [name: string]: boolean } = {};
+$array.each(["href", "src", "action", "formaction", "data", "background", "poster", "ping", "codebase", "cite", "longdesc", "lowsrc", "dynsrc", "usemap", "manifest", "icon", "archive", "profile", "classid"], (name) => {
+	urlAttributes[name] = true;
+});
+
+/**
+ * URL protocols that cannot run script.
+ *
+ * @ignore
+ */
+const safeProtocols: { [name: string]: boolean } = {};
+$array.each(["http", "https", "mailto", "tel", "sms", "callto", "ftp", "sftp", "file", "skype", "whatsapp", "viber", "geo", "maps", "sip", "sips", "xmpp", "matrix", "webcal"], (name) => {
+	safeProtocols[name] = true;
+});
+
+/**
+ * Attributes that tie a button or input to a form elsewhere on the page.
+ *
+ * @ignore
+ */
+const formAttributes: { [name: string]: boolean } = { form: true, formaction: true, formmethod: true, formtarget: true, formenctype: true, formnovalidate: true };
+
+function safeURL(value: string, attribute: string, element: string): boolean {
+	// The browser ignores control characters and whitespace when it reads the protocol
+	const url = value.replace(/[\u0000- \u007F- ]/g, "").toLowerCase();
+	const protocol = /^([a-z][a-z0-9+.\-]*):/.exec(url);
+	if (!protocol || safeProtocols[protocol[1]]) {
+		return true;
+	}
+	if (attribute == "src" || attribute == "poster" || attribute == "background" || element == "image" || element == "feimage") {
+		// An image may also come from a blob or a data URL
+		return protocol[1] == "blob" || /^data:image\/[a-z0-9.+\-]+[;,]/.test(url);
+	}
+	return false;
+}
+
+// The values an SVG animation sets
+const animatedValues: { [name: string]: boolean } = { values: true, to: true, from: true, by: true };
+
+// Cleans the attributes; false when the element has to go
+function cleanAttributes(element: Element, name: string): boolean {
+	const attributes = element.attributes;
+	if (attributes.length > 200) {
+		return false;
+	}
+	for (let i = attributes.length - 1; i >= 0; i--) {
+		const attribute = attributes[i];
+		const key = attribute.localName.toLowerCase();
+		const value = attribute.value;
+		let remove = key.indexOf("on") === 0 || key == "srcdoc" || formAttributes[key]
+			// a name or id the document already has would replace it, e.g. `document.createElement`
+			|| ((key == "id" || key == "name") && value in document)
+			|| (key == "style" && /expression\s*\(|javascript:|vbscript:|(?:^|[;\s{])behavior\s*:|-moz-binding/i.test(value));
+		if (!remove && animatedValues[key]) {
+			// what an animation sets, whatever attribute it names
+			$array.each(value.split(";"), (part) => {
+				if (!safeURL(part, key, name)) {
+					remove = true;
+				}
+			});
+		}
+		if (!remove && urlAttributes[key] && !safeURL(value, key, name)) {
+			if (key == "href") {
+				attribute.value = "#";
+			}
+			else {
+				remove = true;
+			}
+		}
+		if (remove) {
+			element.removeAttributeNode(attribute);
+		}
+	}
+	return true;
+}
+
+function cleanNode(parent: Node): void {
+	// A form's own properties can be replaced by its fields, so nothing is read from one
+	const nodes = Array.prototype.slice.call(parent.childNodes) as Array<Node>;
+	$array.each(nodes, (node) => {
+		if (node instanceof HTMLFormElement) {
+			parent.removeChild(node);
+		}
+		else if (node.nodeType === 1) {
+			const element = node as Element;
+			const name = element.localName.toLowerCase();
+			const target = (element.getAttribute("attributeName") || "").replace(/\s+/g, "").toLowerCase();
+			if (blockedHTMLElements[name] || (animationElements[name] && (/href$/.test(target) || target.indexOf("on") === 0)) || !cleanAttributes(element, name)) {
+				parent.removeChild(element);
+			}
+			else {
+				cleanNode(element);
+			}
+		}
+		else if (node.nodeType !== 3) {
+			// comments and anything else that is not text
+			parent.removeChild(node);
+		}
+	});
+}
+
+// A document without a window: nothing parsed into it loads or runs
+let inertDocument: Document | undefined;
+
+function sanitizeOnce(html: string): string {
+	if (!inertDocument) {
+		inertDocument = document.implementation.createHTMLDocument("");
+	}
+	// Parsed in a div, as the HTML goes into one on the page
+	const holder = inertDocument.createElement("div");
+	holder.innerHTML = html;
+	cleanNode(holder);
+	return holder.innerHTML;
+}
+
+function sanitizeStable(html: string): string {
+	let result = sanitizeOnce(html);
+	if (result === html) {
+		// Already what parsing gives, so parsing it again gives the same
+		return result;
+	}
+	// Parsing the result again must give the same: a change means the markup
+	// would mean something else on the page, so it is cleaned again
+	for (let i = 0; i < 3; i++) {
+		const again = sanitizeOnce(result);
+		if (again === result) {
+			return result;
+		}
+		result = again;
+	}
+	return result.replace(/</g, "&lt;");
+}
+
+// Recent results, as the same tooltip or label HTML is set again and again
+const sanitizedHTML: Map<string, string> = new Map();
+
+/**
+ * Removes the parts of an HTML string that can run script or take over the
+ * page, leaving legitimate markup intact. The string is parsed by the browser
+ * into an inert document and the result is cleaned element by element:
+ *
+ * * `<script>`, `<iframe>`, `<object>`, `<embed>`, `<form>`, `<style>`,
+ *   `<noscript>`, `<math>` and similar elements are removed together with
+ *   their content;
+ * * SVG `<animate>` and `<set>` elements that animate a link or an event
+ *   handler are removed;
+ * * event handler attributes (`onerror`, `onload`, `onclick`, ...) are removed,
+ *   whatever separates them from the rest of the tag, and so are attributes
+ *   that tie a button to a form elsewhere on the page;
+ * * URLs are checked after the browser has decoded them: a URL with a
+ *   protocol that can run script (`javascript:`, `vbscript:`, `data:` except
+ *   images, ...) is removed, and a link's becomes `#`;
+ * * an `id` or `name` that would replace a property of `document` is removed;
+ * * inline styles that smuggle in scripts via `expression()`, `javascript:`,
+ *   `behavior`, or `-moz-binding` are removed, and so are comments.
  *
  * [[Root]] applies it to the HTML it puts on the page (`html` and `labelHTML`
- * settings, HTML tooltips, modals, export menu labels), unless its
- * `sanitizeHTML` setting is `false`.
+ * settings, HTML tooltips, modals, export menu labels, stock toolbar labels),
+ * unless its `sanitizeHTML` setting is `false`.
  *
  * @since 5.19.0
  * @param   html  Source HTML
@@ -949,22 +1109,33 @@ export function sanitizeHTML(html: string): string {
 	if (html == null || html === "") {
 		return html;
 	}
-
-	return ("" + html)
-		// Remove dangerous tag blocks together with their content
-		.replace(new RegExp("<\\s*(" + dangerousHTMLTags + ")\\b[^>]*>[\\s\\S]*?<\\s*\\/\\s*\\1\\s*>", "gi"), "")
-		// Remove any leftover or self-closing dangerous tags
-		.replace(new RegExp("<\\s*\\/?\\s*(?:" + dangerousHTMLTags + ")\\b[^>]*>", "gi"), "")
-		// Remove inline event handler attributes (on*=...), quoted or unquoted
-		.replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-		// Neutralize script protocols in URL-bearing attributes. Whitespace and
-		// control characters are tolerated between the chars since browsers
-		// ignore them when resolving a protocol (e.g. `java\tscript:`).
-		.replace(/((?:href|src|xlink:href|action|formaction|data|background|poster|srcdoc|ping)\s*=\s*)(?:"[\s]*j[\s]*a[\s]*v[\s]*a[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t[\s]*:[^"]*"|'[\s]*j[\s]*a[\s]*v[\s]*a[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t[\s]*:[^']*'|(?:javascript|vbscript|livescript|mocha):[^\s>]*)/gi, "$1\"#\"")
-		// Drop srcdoc entirely, as it always carries embedded markup
-		.replace(/\ssrcdoc\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
-		// Remove inline styles that can execute scripts
-		.replace(/\sstyle\s*=\s*(?:"[^"]*(?:expression|javascript:|vbscript:|behavior|-moz-binding)[^"]*"|'[^']*(?:expression|javascript:|vbscript:|behavior|-moz-binding)[^']*')/gi, "");
+	html = "" + html;
+	if (html.indexOf("<") === -1) {
+		// Without a tag, entities only ever give text
+		return html;
+	}
+	if (typeof document === "undefined") {
+		return html.replace(/</g, "&lt;");
+	}
+	const cached = sanitizedHTML.get(html);
+	if (cached !== undefined) {
+		return cached;
+	}
+	let result: string;
+	try {
+		result = sanitizeStable(html);
+	}
+	catch (e) {
+		// Markup that breaks the cleaning is shown as text
+		result = html.replace(/</g, "&lt;");
+	}
+	if (html.length < 10000) {
+		if (sanitizedHTML.size >= 200) {
+			sanitizedHTML.delete(sanitizedHTML.keys().next().value!);
+		}
+		sanitizedHTML.set(html, result);
+	}
+	return result;
 }
 
 /**

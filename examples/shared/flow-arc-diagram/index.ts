@@ -75,6 +75,27 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the diagram, and a screen reader names it
+  ariaLabel: "Arc diagram of 26 links between the six Friends characters and the people around them, each circle sized by the total of its links. Tab to the people or the links, then move through them with the up and down arrow keys; Enter on a person hides or shows their links"
+});
+// the people: one Tab stop, the up and down arrow keys step through them
+series.nodes.nodes.template.setAll({
+  focusable: true,
+  focusableGroup: "nodes",
+  ariaLabel: "{name}: {sum} in all"
+});
+// the links: one Tab stop, after the people
+series.links.template.setAll({
+  focusable: true,
+  focusableGroup: "links",
+  tabindexOrder: 5, // focus runs from low to high (0 if not set)
+  ariaLabel: "{sourceId} to {targetId}: {value}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000, 100);

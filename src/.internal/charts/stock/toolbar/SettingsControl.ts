@@ -91,10 +91,11 @@ export class SettingsControl extends DropdownListControl {
 			let dataSaveControl = stockChart.getControl("DataSaveControl");
 
 			if (!serializableTools) {
-				const exclude: any = dropdown.get("exclude", []);
-				exclude.push("save");
-				exclude.push("autosave");
-				dropdown.set("exclude", ["save", "autosave"]);
+				// nothing to save: no auto-save item
+				const exclude: string[] = (<any>dropdown.get("exclude")) || [];
+				if (exclude.indexOf("save") == -1 || exclude.indexOf("autosave") == -1) {
+					dropdown.set("exclude", exclude.concat(["save", "autosave"]));
+				}
 			}
 			else {
 				if (!dataSaveControl) {
@@ -126,7 +127,8 @@ export class SettingsControl extends DropdownListControl {
 			const input = inputs[i];
 			switch (input.id) {
 				case "am5stock-list-autosave":
-					input.checked = this.get("autoSave", this.getPrivate("dataSaveControl")!.get("autoSave", false));
+					const dataSaveControl = this.getPrivate("dataSaveControl");
+					input.checked = this.get("autoSave", dataSaveControl ? dataSaveControl.get("autoSave", false) : false);
 					break;
 				case "am5stock-list-fills":
 					input.checked = this._getFillEnabled()

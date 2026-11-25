@@ -5,6 +5,7 @@ import { Theme } from "../../core/Theme";
 import { p50, p100, percent } from "../../core/util/Percent";
 import { LinePattern } from "../../core/render/patterns/LinePattern";
 import { setColor } from "../../themes/DefaultTheme";
+import { withContrast } from "../../core/util/OKLCH";
 import { color, ColorSet, DataItem } from "../../..";
 
 import * as $time from "../../core/util/Time";
@@ -23,6 +24,7 @@ export class GanttDefaultTheme extends Theme {
 		const defaultDateFormat = l.translate("_date_day_full");
 
 		r("Gantt").setAll({
+			role: "img", // read as one image when focusable, as charts are
 			editable: true,
 			layout: this._root.verticalLayout,
 			colors: ColorSet.new(this._root, {}),
@@ -311,7 +313,11 @@ export class GanttDefaultTheme extends Theme {
 		// label itself
 		r("EditableLabel", ["categorylabel"]).setAll({
 			minWidth: 100,
-			multiLine: false
+			multiLine: false,
+			// focusable while the Gantt is editable: ENTER renames the task
+			role: "button",
+			ariaLabel: "{name}",
+			focusableGroup: "tasknames"
 		});
 
 		// container which holds numeric stepper, progress pie
@@ -410,6 +416,7 @@ export class GanttDefaultTheme extends Theme {
 
 		// zero duration rectangle
 		r("RoundedRectangle", ["zerorectangle"]).setAll({
+			role: "img",
 			draggable: true,
 			cornerRadiusBL: 2,
 			cornerRadiusTL: 2,
@@ -440,7 +447,7 @@ export class GanttDefaultTheme extends Theme {
 			stroke: ic.get("alternativeBackground"),
 			fillOpacity: 1,
 			cursorOverStyle: "pointer",
-			role: "figure",
+			role: "img",
 			interactive: true,
 			visible: false
 		});
@@ -455,7 +462,7 @@ export class GanttDefaultTheme extends Theme {
 			stroke: ic.get("alternativeBackground"),
 			fillOpacity: 1,
 			cursorOverStyle: "pointer",
-			role: "figure",
+			role: "img",
 			interactive: true
 		});
 
@@ -498,7 +505,13 @@ export class GanttDefaultTheme extends Theme {
 			strokeOpacity: 0,
 			fillOpacity: 1,
 			y: p100,
-			centerY: p100
+			centerY: p100,
+			// focusable while the Gantt is editable: left and right arrow keys set the progress
+			role: "slider",
+			ariaLabel: "{name}",
+			ariaValueMin: "0",
+			ariaValueMax: "100",
+			focusableGroup: "taskprogress"
 		});
 
 		// grip for resizing column - start (the dashed vertical one)
@@ -517,7 +530,11 @@ export class GanttDefaultTheme extends Theme {
 			draggable: true,
 			fillOpacity: 0,
 			strokeOpacity: 0,
-			cursorOverStyle: "ew-resize"
+			cursorOverStyle: "ew-resize",
+			// focusable while the Gantt is editable: left and right arrow keys move the start
+			role: "slider",
+			ariaLabel: "{name}",
+			focusableGroup: "taskstarts"
 		});
 
 		// grip for resizing column - end (the dashed vertical one)
@@ -537,7 +554,11 @@ export class GanttDefaultTheme extends Theme {
 			draggable: true,
 			fillOpacity: 0,
 			strokeOpacity: 0,
-			cursorOverStyle: "ew-resize"
+			cursorOverStyle: "ew-resize",
+			// focusable while the Gantt is editable: left and right arrow keys move the end
+			role: "slider",
+			ariaLabel: "{name}",
+			focusableGroup: "taskends"
 		});
 
 
@@ -663,13 +684,28 @@ export class GanttDefaultTheme extends Theme {
 		}
 
 		{
+			// disabled: as it is normally, only its icon is faint
+			const rule = r("RoundedRectangle", ["background", "secondary", "button"]).states.create("disabled", {});
+			setColor(rule, "fill", ic, "background");
+			setColor(rule, "stroke", ic, "secondaryButton");
+		}
+
+		{
 			const rule = r("RoundedRectangle", ["background", "secondary", "button"]).states.create("down", { stateAnimationDuration: 0 });
 			setColor(rule, "fill", ic, "secondaryButtonDown");
 		}
 
 		{
+			// all toolbar icons: the secondary button color, darkened (or lightened on a
+			// dark background) for 3:1 contrast. A disabled button keeps the faint color
 			const rule = r("Graphics", ["icon", "secondary", "button"]);
-			setColor(rule, "stroke", ic, "secondaryButton");
+			const setStroke = () => {
+				rule.set("stroke", withContrast(ic.get("secondaryButton")!, ic.get("background")!, 3));
+			};
+			setStroke();
+			ic.on("secondaryButton", setStroke);
+			ic.on("background", setStroke);
+			setColor(rule.states.create("disabled", {}), "stroke", ic, "secondaryButton");
 		}
 
 
@@ -682,7 +718,8 @@ export class GanttDefaultTheme extends Theme {
 			height: 30,
 			cursorOverStyle: "pointer",
 			role: "button",
-			ariaLabel: "{name}; " + l.translate("Press ENTER to toggle")
+			ariaLabel: "{name}",
+			focusableGroup: "taskbullets"
 		})
 
 		r("Graphics", ["taskbullet", "icon"]).states.create("default", {
@@ -770,7 +807,6 @@ export class GanttDefaultTheme extends Theme {
 			rule.setAll({
 				svgPath: "M 11 -1 L 17 5 L 8 14 L 2 14 L 2 8 L 11 -1 M 7 11 L 15 3 M 5 9 L 13 1 M 2 8 L 5 9 L 5 11 L 7 11 L 8 14 M 2 12 L 4 14"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 		// expand button
@@ -785,7 +821,6 @@ export class GanttDefaultTheme extends Theme {
 			rule.setAll({
 				svgPath: "M -6 -4 L 0 2 L 6 -4 M -6 2 L 0 8 L 6 2"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 		// collapse button
@@ -800,7 +835,6 @@ export class GanttDefaultTheme extends Theme {
 			rule.setAll({
 				svgPath: "M -6 6 L 0 0 L 6 6 M -6 0 L 0 -6 L 6 0"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 		// auto-link button
@@ -817,7 +851,6 @@ export class GanttDefaultTheme extends Theme {
 				dy: 1,
 				svgPath: "M 5 4 L 13 4 C 17 4 17 11 13 11 L 8 11 C 4 11 4 18 8 18 L 16 18 L 14 16 L 14 20 L 16 18"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 		// clear button
@@ -835,7 +868,6 @@ export class GanttDefaultTheme extends Theme {
 				marginRight: 1,
 				svgPath: "M 2.4 4 L 4.8 19.2 L 15.2 19.2 L 17.6 4 L 2.4 4 M 5.6 5.6 L 7.2 17.2 M 10 5.6 L 10 17.2 M 14.4 5.6 L 12.8 17.2 M 2.4 3.2 L 17.6 3.2 M 8.4 3.2 L 8.4 1.2 L 12 1.2 L 12 3.2"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 		// fit button
@@ -850,7 +882,6 @@ export class GanttDefaultTheme extends Theme {
 			rule.setAll({
 				svgPath: "M 8 0 L 2 0 M 6 -4 L 2 0 L 6 4 M -2 0 L -8 0 M -6 -4 L -2 0 L -6 4"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 		r("Button", ["zoomout"]).setAll({
@@ -864,7 +895,6 @@ export class GanttDefaultTheme extends Theme {
 			rule.setAll({
 				svgPath: "M 8 0 L 2 0 M 4 -4 L 8 0 L 4 4 M -2 0 L -8 0 M -4 -4 L -8 0 L -4 4"
 			});
-			setColor(rule, "stroke", ic, "secondaryButton");
 		}
 
 

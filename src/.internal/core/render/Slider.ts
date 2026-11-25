@@ -39,5 +39,18 @@ export class Slider extends Scrollbar {
 		const startGrip = this.startGrip;
 		this.endGrip.setAll({ x: startGrip.x(), y: startGrip.y() });
 		this.setRaw("end", this.get("start"));
+
+		// One grip: it reads its value, not the start of a range
+		const readout = this._readout();
+		const text = readout.reversed ? readout.toText : readout.fromText;
+		const label = this.get("ariaLabel");
+		if (label) {
+			// the slider's name, and the value
+			this._setAria(startGrip, "ariaLabel", label);
+			this._setAria(startGrip, "ariaValueText", text);
+		}
+		else {
+			this._setAria(startGrip, "ariaLabel", text);
+		}
 	}
 }

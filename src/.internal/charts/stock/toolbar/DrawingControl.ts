@@ -810,7 +810,7 @@ export class DrawingControl extends StockControl {
 				}
 				this._setTool(this.get("tool"));
 				if (isInited) {
-					$utils.focus(this.getPrivate("toolControl")!.getPrivate("button") as HTMLElement);
+					this.getPrivate("toolControl")!._focus();
 				}
 			}
 			else {

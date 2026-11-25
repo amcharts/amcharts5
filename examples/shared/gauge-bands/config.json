@@ -5,6 +5,8 @@
     "panY": false,
     "startAngle": 160,
     "endAngle": 380,
+    "focusable": true,
+    "ariaLabel": "Gauge of a score from -40 to 100 in seven bands, from Unsustainable to High Performing, now at 84, High Performing",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -16,12 +18,12 @@
         {
           "type": "Label",
           "settings": {
-            "fill": { "type": "Color", "value": "#ffffff" },
+            "fill": "@root.interfaceColors.get('background')",
             "centerX": { "type": "Percent", "value": 50 },
             "centerY": { "type": "Percent", "value": 50 },
             "textAlign": "center",
             "fontSize": "3em",
-            "text": "82"
+            "text": "84"
           }
         }
       ]
@@ -44,7 +46,7 @@
                 "properties": {
                   "template": {
                     "settings": {
-                      "stroke": { "type": "Color", "value": "#ffffff" },
+                      "stroke": "@root.interfaceColors.get('background')",
                       "visible": true,
                       "strokeOpacity": 0.8,
                       "strokeWidth": 2,
@@ -71,7 +73,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "Unsustainable"
             }
           },
@@ -100,7 +102,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "Volatile"
             }
           },
@@ -129,7 +131,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "Foundational"
             }
           },
@@ -158,7 +160,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "Developing"
             }
           },
@@ -187,7 +189,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "Maturing"
             }
           },
@@ -216,7 +218,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "Sustainable"
             }
           },
@@ -245,7 +247,7 @@
               "radius": 15,
               "inside": true,
               "fontSize": "0.9em",
-              "fill": { "type": "Color", "value": "#ffffff" },
+              "fill": "@root.interfaceColors.get('background')",
               "text": "High Performing"
             }
           },
@@ -265,7 +267,7 @@
       "axisRange-7": {
         "axis": "#axis-0",
         "settings": {
-          "value": 82.43356914899199,
+          "value": 84.483,
           "bullet": {
             "type": "AxisBullet",
             "settings": {

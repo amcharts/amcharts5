@@ -139,7 +139,7 @@ export class InteractionManager<N extends IInteractiveNode<N>> extends ArrayDisp
 	protected _listeners: { [key: string]: CounterDisposer } = {};
 	protected _events: { [Key in keyof IRendererEvents]?: IEvents<N, Key> } = {};
 
-	protected _lastPointerMoveEvent: { events: Array<IPointerEvent>, target: Node | null, native: boolean } | undefined;
+	public _lastPointerMoveEvent: { events: Array<IPointerEvent>, target: Node | null, native: boolean } | undefined;
 
 	constructor(protected _host: IInteractionHost<N>) {
 		super();

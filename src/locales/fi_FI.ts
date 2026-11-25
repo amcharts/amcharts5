@@ -305,7 +305,7 @@ export default {
 	"Legend": "Selite",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Paina ENTER vaihtaaksesi",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Ladataan",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Kaavio",
+	"Serial chart": "Sarjakaavio",
+	"X/Y chart": "X/Y-kaavio",
+	"Pie chart": "Ympyräkaavio",
+	"Gauge chart": "Mittarikaavio",
+	"Radar chart": "Sädekaavio",
+	"Sankey diagram": "Sankey-kaavio",
+	"Flow diagram": "Vuokaavio",
+	"Chord diagram": "Jännekaavio",
+	"TreeMap chart": "Puukarttakaavio",
+	"Force directed tree": "Voimaohjattu puu",
+	"Sliced chart": "Viipalekaavio",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Sarja",
+	"Candlestick Series": "Kynttiläsarja",
+	"OHLC Series": "OHLC-sarja",
+	"Column Series": "Pylvässarja",
+	"Line Series": "Viivasarja",
+	"Pie Slice Series": "Sektorisarja",
+	"Funnel Series": "Suppilosarja",
+	"Pyramid Series": "Pyramidisarja",
+	"X/Y Series": "X/Y-sarja",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Kartta",
+	"Press ENTER to zoom in": "Paina ENTER lähentääksesi",
+	"Press ENTER to zoom out": "Paina ENTER loitontaaksesi",
+	"Use arrow keys to zoom in and out": "Lähennä ja loitonna nuolinäppäimillä",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Lähennä ja loitonna näppäimistön plus- ja miinusnäppäimillä",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Tulosta",
+	"Export": "Vie",
 	"Image": "kuva",
 	"Data": "Data",
 	"Print": "Tulosta",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Paina ENTER tai liiku nuolinäppäimillä",
+	"Press ENTER to open": "Paina ENTER avataksesi",
+	"Press ENTER to print.": "Paina ENTER tulostaaksesi.",
+	"Press ENTER to export as %1.": "Paina ENTER viedäksesi muodossa %1.",
+	"(Press ESC to close this message)": "(Sulje tämä viesti painamalla ESC)",
+	"Image Export Complete": "Kuvan vienti valmis",
+	"Export operation took longer than expected. Something might have gone wrong.": "Vienti kesti odotettua kauemmin. Jokin saattoi mennä vikaan.",
+	"Saved from": "Tallennettu sivulta",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Valitse kahvat TAB-näppäimellä tai muuta valintaa vasemmalla ja oikealla nuolella",
+	"Use left and right arrows to move selection": "Siirrä valintaa vasemmalla ja oikealla nuolella",
+	"Use left and right arrows to move left selection": "Siirrä valinnan vasenta reunaa vasemmalla ja oikealla nuolella",
+	"Use left and right arrows to move right selection": "Siirrä valinnan oikeaa reunaa vasemmalla ja oikealla nuolella",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Valitse kahvat TAB-näppäimellä tai muuta valintaa ylä- ja alanuolella",
+	"Use up and down arrows to move selection": "Siirrä valintaa ylä- ja alanuolella",
+	"Use up and down arrows to move lower selection": "Siirrä valinnan alareunaa ylä- ja alanuolella",
+	"Use up and down arrows to move upper selection": "Siirrä valinnan yläreunaa ylä- ja alanuolella",
 	"From %1 to %2": "Mistä %1 mihin %2",
 	"From %1": "Mistä %1",
 	"To %1": "Mihin %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Arvot: %1",
+	"Highest: %1": "Suurin: %1",
+	"Lowest: %1": "Pienin: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Luokka",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Tuloksia: %1",
+	"No results": "Ei tuloksia",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Sävy",
+	"Opacity": "Peittävyys",
+	"Color": "Väri",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Tiedostolle ei ole jäsennintä: %1",
+	"Error parsing file: %1": "Virhe tiedoston jäsentämisessä: %1",
+	"Unable to load file: %1": "Tiedostoa ei voi ladata: %1",
+	"Invalid date": "Virheellinen päivämäärä",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Sulje",
+	"Minimize": "Pienennä",
+	"Confirm": "Vahvista",
 	"OK": "OK",
 	"Cancel": "Peruuta",
 	"Delete": "Poista",

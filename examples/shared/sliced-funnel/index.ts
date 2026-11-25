@@ -61,6 +61,25 @@ const legend = chart.children.push(am5.Legend.new(root, {
 legend.data.setAll(series.dataItems);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Funnel chart of seven steps, One to Seven, from the largest value at the top to the smallest at the bottom. Tab to the steps, then move between them with the up and down arrow keys"
+});
+// the slices: one Tab stop, the up and down arrow keys step through them
+series.slices.template.setAll({
+  focusable: true,
+  focusableGroup: "slices",
+  ariaLabel: "{category}: {value}"
+});
+// the legend: one Tab stop, after the slices
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear();

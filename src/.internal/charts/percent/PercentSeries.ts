@@ -249,6 +249,13 @@ export abstract class PercentSeries extends Series {
 		return tick;
 	}
 
+	// The value and its share of the total
+	protected _summaryValueText(value: number, dataItem: DataItem<this["_dataItemSettings"]>): string {
+		const text = super._summaryValueText(value, dataItem);
+		const percent = dataItem.get("valuePercentTotal");
+		return $type.isNumber(percent) ? text + ", " + this.getNumberFormatter().format(percent, "#.#") + "%" : text;
+	}
+
 	protected _afterNew() {
 		this.fields.push("category", "fill");
 		super._afterNew();

@@ -17,6 +17,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Candlestick chart of a daily price over January and February 2024. Tab to the candles, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -139,7 +141,20 @@
           "autoAppear": true,
           "appearDuration": 1000
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "candles",
+                  "ariaLabel": "{valueX.formatDate('MMMM d, yyyy')}: open {openValueY}, high {highValueY}, low {lowValueY}, close {valueY}"
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]

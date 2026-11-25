@@ -5,6 +5,8 @@
     "panY": "rotateY",
     "rotationX": -20,
     "rotationY": -20,
+    "focusable": true,
+    "ariaLabel": "Globe with six routes between London, New York, Sao Paulo, Johannesburg and Singapore, drawn as arcs raised above the surface. Tab to the cities, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -71,7 +73,7 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.06,
                   "strokeOpacity": 0
                 }
@@ -102,9 +104,13 @@
                   "settings": {
                     "radius": 5,
                     "fill": { "type": "Color", "value": "#ff621f" },
-                    "stroke": { "type": "Color", "value": "#ffffff" },
+                    "stroke": "@root.interfaceColors.get('background')",
                     "strokeWidth": 2,
-                    "tooltipText": "{title}"
+                    "tooltipText": "{title}",
+                    "focusable": true,
+                    "focusableGroup": "cities",
+                    "hoverOnFocus": true,
+                    "ariaLabel": "{title}"
                   }
                 }
               }

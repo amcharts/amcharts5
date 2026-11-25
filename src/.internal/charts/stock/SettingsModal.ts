@@ -278,6 +278,7 @@ export class SettingsModal extends Modal {
 		const settingsWithTarget: { [index: string]: any } = {};
 		let prevName = "";
 		let prevLine: HTMLDivElement;
+		let prevHeading: HTMLDivElement;
 		$array.each(settings, (setting) => {
 			const key = this._getSettingKey(setting);
 			const keyTarget = setting.target || target;
@@ -292,6 +293,7 @@ export class SettingsModal extends Modal {
 			}
 
 			let element: HTMLElement | undefined;
+			let field: HTMLElement | undefined;
 			switch (setting.type) {
 				case "dropdown":
 					element = this.getDropdown(setting, currentValue);
@@ -345,6 +347,7 @@ export class SettingsModal extends Modal {
 				case "color":
 					const control = this.getColor(setting, currentValue);
 					element = control.getPrivate("button")!;
+					field = control._getFocusElement();
 					controls[key] = control;
 					break;
 				case "checkbox":
@@ -360,19 +363,25 @@ export class SettingsModal extends Modal {
 			if (element) {
 
 				let line: HTMLDivElement;
+				let heading: HTMLDivElement;
 				if (setting.name == prevName && prevLine) {
 					line = prevLine;
+					heading = prevHeading;
 				}
 				else {
 					line = document.createElement("div");
 					line.className = "am5-modal-table-row";
 					table.appendChild(line);
 
-					const heading = document.createElement("div");
+					heading = document.createElement("div");
 					heading.className = "am5-modal-table-heading";
-					heading.innerHTML = setting.name;
+					heading.id = "am5-modal-heading-" + this.uid + "-" + table.children.length;
+					heading.innerHTML = this._root._sanitizeHTML(setting.name);
 					line.appendChild(heading);
 				}
+
+				// the row's heading names the field
+				(field || element).setAttribute("aria-labelledby", heading.id);
 
 				const cell = document.createElement("div");
 				cell.className = "am5-modal-table-cell";
@@ -381,6 +390,7 @@ export class SettingsModal extends Modal {
 
 				prevName = setting.name;
 				prevLine = line;
+				prevHeading = heading;
 			}
 		});
 
@@ -389,7 +399,17 @@ export class SettingsModal extends Modal {
 			const resetLink = document.createElement("a");
 			resetLink.className = "am5-modal-link am5-modal-table-cell am5-modal-link-reset";
 			resetLink.innerHTML = this._root.language.translateAny("Reset to default");
+			resetLink.setAttribute("role", "button");
+			resetLink.setAttribute("tabindex", "0");
 			table.appendChild(resetLink);
+
+			this._disposers.push($utils.addEventListener(resetLink, "keydown", (ev: KeyboardEvent) => {
+				const key = $utils.getEventKey(ev);
+				if (key == "Enter" || key == " ") {
+					ev.preventDefault();
+					resetLink.click();
+				}
+			}));
 
 			this._disposers.push($utils.addEventListener(resetLink, "click", () => {
 				const defaults = target.get("userData")["__defaults"];

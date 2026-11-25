@@ -2,6 +2,7 @@ import type { Root } from "../../../core/Root"
 
 import { StyleRule, StyleSheet } from "../../../core/util/Utils"
 import { MultiDisposer, IDisposer, CounterDisposer } from "../../../core/util/Disposer";
+import { withContrast } from "../../../core/util/OKLCH";
 
 /**
  * @ignore
@@ -20,7 +21,8 @@ export default function (element: ShadowRoot | null, root: Root, _prefix?: strin
 	const textDisabled = ic.get("disabled")!.toCSS();
 	const border = ic.get("secondaryButtonActive")!.toCSS();
 	const bg = ic.get("background")!.toCSS();
-	const link = ic.get("primaryButton")!.toCSS();
+	// readable on the background
+	const link = withContrast(ic.get("primaryButton")!, ic.get("background")!, 4.5).toCSS();
 
 	if (!rules) {
 		const disposer = new MultiDisposer([
@@ -164,6 +166,10 @@ export default function (element: ShadowRoot | null, root: Root, _prefix?: strin
 			new StyleRule(element, ".am5stock-control-label", {
 				"display": "inline-block",
 				"margin": "0 5px 0 0"
+			}, root.nonce),
+
+			new StyleRule(element, ".am5stock-control-trigger", {
+				"display": "inline-block"
 			}, root.nonce),
 
 			new StyleRule(element, ".am5stock-control-list-container", {
@@ -392,10 +398,10 @@ export default function (element: ShadowRoot | null, root: Root, _prefix?: strin
 
 			// A toolbar too wide for one row folds (StockToolbar.fit): first labels that repeat an icon,
 			// then the period links, into one button that opens them as a list
-			new StyleSheet(element, `.am5stock-fold-labels > .am5stock-control-IndicatorControl > .am5stock-control-label,
-.am5stock-fold-labels > .am5stock-control-DrawingControl > .am5stock-control-label,
-.am5stock-fold-labels > .am5stock-control-ComparisonControl > .am5stock-control-label,
-.am5stock-fold-labels > .am5stock-control-SeriesTypeControl > .am5stock-control-label {
+			new StyleSheet(element, `.am5stock-fold-labels > .am5stock-control-IndicatorControl > .am5stock-control-trigger > .am5stock-control-label,
+.am5stock-fold-labels > .am5stock-control-DrawingControl > .am5stock-control-trigger > .am5stock-control-label,
+.am5stock-fold-labels > .am5stock-control-ComparisonControl > .am5stock-control-trigger > .am5stock-control-label,
+.am5stock-fold-labels > .am5stock-control-SeriesTypeControl > .am5stock-control-trigger > .am5stock-control-label {
 	display: none;
 }
 .am5stock-fold-periods > .am5stock-control-PeriodSelector > .am5stock-period-summary {

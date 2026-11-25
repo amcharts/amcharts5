@@ -211,6 +211,9 @@ export class XYChartDefaultTheme extends Theme {
 				strokeOpacity: 0.8,
 				strokeDasharray: [2, 2],
 				role: "slider",
+				ariaValueMin: "0",
+				ariaValueMax: "100",
+				ariaValueNow: "0",
 				ariaLabel: language.translate("Use left and right arrows to move selection")
 			});
 
@@ -225,6 +228,9 @@ export class XYChartDefaultTheme extends Theme {
 				strokeOpacity: 0.8,
 				strokeDasharray: [2, 2],
 				role: "slider",
+				ariaValueMin: "0",
+				ariaValueMax: "100",
+				ariaValueNow: "0",
 				ariaLabel: language.translate("Use up and down arrows to move selection")
 			});
 
@@ -671,7 +677,7 @@ export class XYChartDefaultTheme extends Theme {
 			cornerRadiusBR: 0,
 			cornerRadiusTR: 0,
 			fillOpacity: 1,
-			role: "figure"
+			role: "img"
 		});
 
 		r("LineSeries").setAll({
@@ -757,7 +763,7 @@ export class XYChartDefaultTheme extends Theme {
 			cornerRadiusBR: 0,
 			cornerRadiusTR: 0,
 			fillOpacity: 1,
-			role: "figure"
+			role: "img"
 		});
 
 		r("OHLC").setAll({

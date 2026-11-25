@@ -94,6 +94,21 @@ yAxis.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Radar chart of the 2025 seasons of six kinds of produce, one ring each, with the months around the circle. Tab to the seasons, then move between them with the up and down arrow keys"
+});
+// the seasons: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "seasons",
+  hoverOnFocus: true, // a focused season shows its tooltip
+  ariaLabel: "{categoryY}: {openValueX} to {valueX}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

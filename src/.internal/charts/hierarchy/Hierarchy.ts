@@ -7,7 +7,7 @@ import type { PatternSet } from "../../core/util/PatternSet";
 import type { Pattern } from "../../core/render/patterns/Pattern";
 
 import { HierarchyDefaultTheme } from "./HierarchyDefaultTheme";
-import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents } from "../../core/render/Series";
+import { Series, ISeriesSettings, ISeriesDataItem, ISeriesPrivate, ISeriesEvents, ISeriesSummaryItem } from "../../core/render/Series";
 import { DataItem } from "../../core/render/Component";
 import { HierarchyNode } from "./HierarchyNode";
 import { Container } from "../../core/render/Container";
@@ -350,6 +350,25 @@ export abstract class Hierarchy extends Series {
 
 	public _currentDownDepth: number | undefined;
 
+	// The nodes of the top level shown (below `topDepth`), each with its sum
+	protected _summaryItems(dataItems: Array<DataItem<this["_dataItemSettings"]>> = this._mainDataItems): Array<ISeriesSummaryItem> {
+		const items: Array<ISeriesSummaryItem> = [];
+		const level = this.get("topDepth", 0) + 1;
+		const collect = (dataItem: DataItem<this["_dataItemSettings"]>) => {
+			if (dataItem.get("depth") == level) {
+				const value = dataItem.get("sum");
+				if ($type.isNumber(value)) {
+					items.push({ label: this._summaryLabel(dataItem), value: value, text: this._summaryValueText(value, dataItem) });
+				}
+			}
+			else if (dataItem.get("depth") < level) {
+				$array.each(dataItem.get("children") || [], collect);
+			}
+		};
+		$array.each(dataItems, collect);
+		return items;
+	}
+
 	protected _afterNew() {
 		this._defaultThemes.push(HierarchyDefaultTheme.new(this._root));
 		this.fields.push("category", "childData", "disabled", "fill");
@@ -555,6 +574,12 @@ export abstract class Hierarchy extends Series {
 
 		this.makeNode(dataItem);
 		this._processDataItem(dataItem);
+
+		// Above `topDepth` (a sunburst's middle) a node is not one of the chart's
+		// items: TAB does not stop on it
+		if (depth < topDepth) {
+			dataItem.get("node").setPrivate("focusable", false);
+		}
 
 		if (childData) {
 			const children: Array<DataItem<this["_dataItemSettings"]>> = [];

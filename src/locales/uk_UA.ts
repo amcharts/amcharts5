@@ -291,7 +291,7 @@ export default {
 	"Legend": "Легенда",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Натисніть ENTER, щоб перемкнути",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Завантажується",
@@ -303,37 +303,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Діаграма",
+	"Serial chart": "Послідовна діаграма",
+	"X/Y chart": "Діаграма X/Y",
+	"Pie chart": "Кругова діаграма",
+	"Gauge chart": "Діаграма-шкала",
+	"Radar chart": "Пелюсткова діаграма",
+	"Sankey diagram": "Діаграма Санкі",
+	"Flow diagram": "Діаграма потоків",
+	"Chord diagram": "Хордова діаграма",
+	"TreeMap chart": "Деревоподібна карта",
+	"Force directed tree": "Силове дерево",
+	"Sliced chart": "Секційна діаграма",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Серія",
+	"Candlestick Series": "Серія свічок",
+	"OHLC Series": "Серія OHLC",
+	"Column Series": "Серія стовпців",
+	"Line Series": "Лінійна серія",
+	"Pie Slice Series": "Серія секторів",
+	"Funnel Series": "Серія воронки",
+	"Pyramid Series": "Серія піраміди",
+	"X/Y Series": "Серія X/Y",
 
 	// Map-related stuff.
 	"Map": "карта",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Press ENTER to zoom in": "Натисніть ENTER, щоб збільшити",
+	"Press ENTER to zoom out": "Натисніть ENTER, щоб зменшити",
+	"Use arrow keys to zoom in and out": "Використовуйте стрілки, щоб збільшити або зменшити",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Використовуйте клавіші плюс і мінус на клавіатурі, щоб збільшити або зменшити",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -345,17 +346,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Друк",
+	"Export": "Експорт",
 	"Image": "Зображення",
 	"Data": "Дані",
 	"Print": "Друк",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Натисніть ENTER або використовуйте стрілки для навігації",
+	"Press ENTER to open": "Натисніть ENTER, щоб відкрити",
+	"Press ENTER to print.": "Натисніть ENTER, щоб надрукувати.",
+	"Press ENTER to export as %1.": "Натисніть ENTER, щоб експортувати як %1.",
+	"(Press ESC to close this message)": "(Натисніть ESC, щоб закрити це повідомлення)",
+	"Image Export Complete": "Експорт зображення завершено",
+	"Export operation took longer than expected. Something might have gone wrong.": "Експорт тривав довше, ніж очікувалося. Можливо, щось пішло не так.",
+	"Saved from": "Збережено з",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -376,28 +378,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Використовуйте TAB, щоб вибрати повзунки, або стрілки вліво і вправо, щоб змінити виділення",
+	"Use left and right arrows to move selection": "Використовуйте стрілки вліво і вправо, щоб перемістити виділення",
+	"Use left and right arrows to move left selection": "Використовуйте стрілки вліво і вправо, щоб перемістити ліву межу виділення",
+	"Use left and right arrows to move right selection": "Використовуйте стрілки вліво і вправо, щоб перемістити праву межу виділення",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Використовуйте TAB, щоб вибрати повзунки, або стрілки вгору і вниз, щоб змінити виділення",
+	"Use up and down arrows to move selection": "Використовуйте стрілки вгору і вниз, щоб перемістити виділення",
+	"Use up and down arrows to move lower selection": "Використовуйте стрілки вгору і вниз, щоб перемістити нижню межу виділення",
+	"Use up and down arrows to move upper selection": "Використовуйте стрілки вгору і вниз, щоб перемістити верхню межу виділення",
 	"From %1 to %2": "Від %1 до %2",
 	"From %1": "Від %1",
 	"To %1": "До %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Значення: %1",
+	"Highest: %1": "Максимум: %1",
+	"Lowest: %1": "Мінімум: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Категорія",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Результати: %1",
+	"No results": "Немає результатів",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Відтінок",
+	"Opacity": "Непрозорість",
+	"Color": "Колір",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Немає аналізатора для файлу: %1",
+	"Error parsing file: %1": "Помилка розбору файлу: %1",
+	"Unable to load file: %1": "Не вдалося завантажити файл: %1",
+	"Invalid date": "Недійсна дата",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Закрити",
+	"Minimize": "Згорнути",
+	"Confirm": "Підтвердити",
 	"OK": "ОК",
 	"Cancel": "Скасувати",
 	"Delete": "Видалити",

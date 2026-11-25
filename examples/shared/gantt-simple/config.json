@@ -1,12 +1,44 @@
 {
   "type": "Gantt",
-  "settings": { "autoAppear": true, "appearDuration": 1000, "appearDelay": 100 },
+  "settings": {
+    "focusable": true,
+    "ariaLabel": "Gantt chart of seven project tasks from September 18 to early October 2025. Tab to the tasks, then move between them with the up and down arrow keys. Left and right arrow keys move a task",
+    "autoAppear": true,
+    "appearDuration": 1000,
+    "appearDelay": 100
+  },
   "properties": {
     "yAxis": {
       "properties": { "data": "#data-0" }
     },
     "series": {
-      "properties": { "data": "#data-1" }
+      "properties": {
+        "data": "#data-1",
+        "columns": {
+          "properties": {
+            "template": {
+              "settings": {
+                "focusable": true,
+                "focusableGroup": "tasks",
+                "hoverOnFocus": true,
+                "ariaLabel": "{name}, {progress.formatNumber('#.%')} done"
+              }
+            }
+          }
+        },
+        "zeroRectangles": {
+          "properties": {
+            "template": {
+              "settings": {
+                "focusable": true,
+                "focusableGroup": "tasks",
+                "hoverOnFocus": true,
+                "ariaLabel": "{name}, milestone"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "refs": [

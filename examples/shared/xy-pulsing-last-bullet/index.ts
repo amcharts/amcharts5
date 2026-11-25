@@ -126,6 +126,27 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart of a daily value over June 1 to 15, 2024, the last day marked with a pulsing dot. Tab to the line, then move along it with the up and down arrow keys"
+});
+// invisible points on the line (the pulsing bullet shows on the last day only): one Tab stop, the up and down arrow keys step through them
+series.bullets.push(() => {
+  return am5.Bullet.new(root, {
+    sprite: am5.Circle.new(root, {
+      radius: 5,
+      fillOpacity: 0, // not painted: the line looks as before
+      strokeOpacity: 0,
+      focusable: true,
+      focusableGroup: "points",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
+    })
+  });
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

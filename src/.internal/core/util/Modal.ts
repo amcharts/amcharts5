@@ -5,6 +5,7 @@ import { StyleRule } from "./Utils"
 import { MultiDisposer, IDisposer, CounterDisposer } from "../../core/util/Disposer";
 
 import * as $utils from "./Utils"
+import { withContrast } from "./OKLCH";
 
 
 /**
@@ -137,14 +138,15 @@ function modalCSS(element: ShadowRoot | null, root: Root, _prefix?: string): IDi
 				"background": ic.get("secondaryButtonHover")!.toCSS()
 			}, root.nonce),
 
+			// the background darkened or lightened as needed for readable text
 			new StyleRule(element, ".am5-modal-button.am5-modal-primary", {
 				"color": ic.get("primaryButtonText")!.toCSS(),
 				"border": "1px solid " + ic.get("primaryButtonStroke")!.toCSS(),
-				"background": ic.get("primaryButton")!.toCSS()
+				"background": withContrast(ic.get("primaryButton")!, ic.get("primaryButtonText")!, 4.5).toCSS()
 			}, root.nonce),
 
 			new StyleRule(element, ".am5-modal-button.am5-modal-primary:hover", {
-				"background": ic.get("primaryButtonHover")!.toCSS()
+				"background": withContrast(ic.get("primaryButtonHover")!, ic.get("primaryButtonText")!, 4.5).toCSS()
 			}, root.nonce),
 
 		]);

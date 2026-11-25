@@ -118,6 +118,10 @@ export class IconControl extends StockControl {
 	public setIcon(icon: IIcon): void {
 		this.getPrivate("icon")!.innerHTML = "";
 		this.getPrivate("icon")!.appendChild(this._getDrawingIcon(icon));
+		const list = this.getPrivate("list");
+		if (list) {
+			list.setPrivate("currentId", JSON.stringify(icon));
+		}
 		//this.getPrivate("label")!.style.display = "none";
 	}
 

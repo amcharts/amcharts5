@@ -4,28 +4,44 @@
     "sourceIdField": "source",
     "targetIdField": "target",
     "valueField": "value",
+    "focusable": true,
+    "ariaLabel": "Chord diagram of ten routes between seven airports, drawn as thin lines. Tab to the airports or the routes, then move through them with the up and down arrow keys; Enter on an airport hides or shows its routes",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
   "properties": {
     "data": "#data-0",
+    "links": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "links",
+            "tabindexOrder": 5,
+            "hoverOnFocus": true,
+            "ariaLabel": "{sourceId} to {targetId}: {value}"
+          }
+        }
+      }
+    },
     "nodes": {
       "properties": {
+        "nodes": {
+          "properties": {
+            "template": {
+              "settings": { "focusable": true, "focusableGroup": "nodes", "ariaLabel": "{name}: {sum} in all" }
+            }
+          }
+        },
         "labels": {
           "properties": {
             "template": {
-              "settings": {
-                "textType": "regular",
-                "fill": { "type": "Color", "value": "#ffffff" },
-                "radius": -5
-              },
+              "settings": { "textType": "regular", "fill": "@root.interfaceColors.get('alternativeText')", "radius": -5 },
               "states": [
                 {
                   "key": "disabled",
-                  "settings": {
-                    "fill": { "type": "Color", "value": "#ffffff" }
-                  }
+                  "settings": { "fill": "@root.interfaceColors.get('alternativeText')" }
                 }
               ]
             }
@@ -37,16 +53,11 @@
             "settings": {
               "sprite": {
                 "type": "Circle",
-                "settings": {
-                  "radius": 24,
-                  "fill": { "type": "Color", "value": "#67b7dc" }
-                },
+                "settings": { "radius": 24, "fill": "@colors.getIndex(0)" },
                 "states": [
                   {
                     "key": "hidden",
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#adadad" }
-                    }
+                    "settings": { "fill": "@root.interfaceColors.get('disabled')" }
                   }
                 ]
               }
@@ -57,28 +68,7 @@
       "settings": {
         "colors": {
           "type": "ColorSet",
-          "settings": {
-            "step": 2,
-            "passOptions": { "hue": 0.05, "saturation": 0, "lightness": 0 },
-            "colors": [
-              { "type": "Color", "value": "#67b7dc" },
-              { "type": "Color", "value": "#6794dc" },
-              { "type": "Color", "value": "#6771dc" },
-              { "type": "Color", "value": "#8067dc" },
-              { "type": "Color", "value": "#a367dc" },
-              { "type": "Color", "value": "#c767dc" },
-              { "type": "Color", "value": "#dc67ce" },
-              { "type": "Color", "value": "#dc67ab" },
-              { "type": "Color", "value": "#dc6788" },
-              { "type": "Color", "value": "#dc6967" },
-              { "type": "Color", "value": "#dc8c67" },
-              { "type": "Color", "value": "#dcaf67" },
-              { "type": "Color", "value": "#dcd267" }
-            ],
-            "reuse": false,
-            "startIndex": 0,
-            "stateAnimationDuration": 600
-          }
+          "settings": { "step": 2 }
         }
       }
     },
@@ -100,10 +90,7 @@
           ],
           "sprite": {
             "type": "Circle",
-            "settings": {
-              "radius": 5,
-              "fill": { "type": "Color", "value": "#67b7dc" }
-            }
+            "settings": { "radius": 5, "fill": "@colors.getIndex(0)" }
           }
         }
       }

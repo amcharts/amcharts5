@@ -18,6 +18,10 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Line chart of a daily value over 500 days from January 2024. Zoom with the scrollbar or the mouse wheel. The line has too many points to step through with the keyboard",
+    "ariaSummary": true,
+    "ariaDataTable": true,
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100

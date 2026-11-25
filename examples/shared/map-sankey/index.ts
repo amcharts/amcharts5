@@ -75,6 +75,28 @@ sankeySeries.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the map, and a screen reader names it
+  ariaLabel: "World map of coffee exports from Brazil, Colombia, Ethiopia, Vietnam and Indonesia to the United States, Germany, Italy and Japan, in thousands of tonnes, drawn as flows as wide as their value. Tab to the flows or the countries, then move between them with the up and down arrow keys"
+});
+// the flows: one Tab stop, the up and down arrow keys step through them
+sankeySeries.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "flows",
+  hoverOnFocus: true, // the focused flow shows its tooltip
+  ariaLabel: "{source} to {target}: {value} thousand tonnes"
+});
+// the countries at the ends of the flows: one Tab stop too
+sankeySeries.nodes.mapPolygons.template.setAll({
+  focusable: true,
+  focusableGroup: "countries",
+  hoverOnFocus: true,
+  ariaLabel: "{name}: {sum} thousand tonnes in and out"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 chart.appear(1000, 100);

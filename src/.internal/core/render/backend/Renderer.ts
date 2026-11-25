@@ -149,6 +149,7 @@ export interface IDisplayObject extends IDisposer {
 	getLayer(): ILayer;
 	setLayer(order: number | undefined, margin: IMargin | undefined): void;
 	markDirtyLayer(deep?: boolean): void;
+	markDirtyPaint(deep?: boolean): void;
 	clear(): void;
 	invalidateBounds(): void;
 	toLocal(point: IPoint): IPoint;

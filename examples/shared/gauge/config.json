@@ -5,6 +5,8 @@
     "panY": false,
     "startAngle": 180,
     "endAngle": 360,
+    "focusable": true,
+    "ariaLabel": "Gauge with a hand on a dial from 0 to 100, pointing at 65",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100

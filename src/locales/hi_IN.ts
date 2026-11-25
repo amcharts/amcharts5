@@ -305,7 +305,7 @@ export default {
 	"Legend": "लिजेंड",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "टॉगल करने के लिए ENTER दबाएँ",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "लोड हो रहा है",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "चार्ट",
+	"Serial chart": "सीरियल चार्ट",
+	"X/Y chart": "X/Y चार्ट",
+	"Pie chart": "पाई चार्ट",
+	"Gauge chart": "गेज चार्ट",
+	"Radar chart": "रडार चार्ट",
+	"Sankey diagram": "सैंकी आरेख",
+	"Flow diagram": "फ़्लो आरेख",
+	"Chord diagram": "कॉर्ड आरेख",
+	"TreeMap chart": "ट्रीमैप चार्ट",
+	"Force directed tree": "फ़ोर्स डायरेक्टेड ट्री",
+	"Sliced chart": "स्लाइस्ड चार्ट",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "सीरीज़",
+	"Candlestick Series": "कैंडलस्टिक सीरीज़",
+	"OHLC Series": "OHLC सीरीज़",
+	"Column Series": "कॉलम सीरीज़",
+	"Line Series": "लाइन सीरीज़",
+	"Pie Slice Series": "पाई स्लाइस सीरीज़",
+	"Funnel Series": "फ़नल सीरीज़",
+	"Pyramid Series": "पिरामिड सीरीज़",
+	"X/Y Series": "X/Y सीरीज़",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "मानचित्र",
+	"Press ENTER to zoom in": "ज़ूम इन करने के लिए ENTER दबाएँ",
+	"Press ENTER to zoom out": "ज़ूम आउट करने के लिए ENTER दबाएँ",
+	"Use arrow keys to zoom in and out": "ज़ूम इन और आउट करने के लिए तीर कुंजियों का उपयोग करें",
+	"Use plus and minus keys on your keyboard to zoom in and out": "ज़ूम इन और आउट करने के लिए अपने कीबोर्ड पर प्लस और माइनस कुंजियों का उपयोग करें",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "प्रिंट करें",
+	"Export": "निर्यात करें",
 	"Image": "छवि",
 	"Data": "डेटा",
 	"Print": "प्रिंट करें",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "नेविगेट करने के लिए ENTER दबाएँ या तीर कुंजियों का उपयोग करें",
+	"Press ENTER to open": "खोलने के लिए ENTER दबाएँ",
+	"Press ENTER to print.": "प्रिंट करने के लिए ENTER दबाएँ।",
+	"Press ENTER to export as %1.": "%1 के रूप में निर्यात करने के लिए ENTER दबाएँ।",
+	"(Press ESC to close this message)": "(इस संदेश को बंद करने के लिए ESC दबाएँ)",
+	"Image Export Complete": "छवि निर्यात पूर्ण",
+	"Export operation took longer than expected. Something might have gone wrong.": "निर्यात में अपेक्षा से अधिक समय लगा। कुछ गड़बड़ हो सकती है।",
+	"Saved from": "यहाँ से सहेजा गया",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
-	"From %1 to %2": "से %1 में %2",
-	"From %1": "से %1",
-	"To %1": "में %1",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "ग्रिप बटन चुनने के लिए TAB या चयन बदलने के लिए बाएँ और दाएँ तीरों का उपयोग करें",
+	"Use left and right arrows to move selection": "चयन खिसकाने के लिए बाएँ और दाएँ तीरों का उपयोग करें",
+	"Use left and right arrows to move left selection": "बायाँ चयन खिसकाने के लिए बाएँ और दाएँ तीरों का उपयोग करें",
+	"Use left and right arrows to move right selection": "दायाँ चयन खिसकाने के लिए बाएँ और दाएँ तीरों का उपयोग करें",
+	"Use TAB select grip buttons or up and down arrows to change selection": "ग्रिप बटन चुनने के लिए TAB या चयन बदलने के लिए ऊपर और नीचे तीरों का उपयोग करें",
+	"Use up and down arrows to move selection": "चयन खिसकाने के लिए ऊपर और नीचे तीरों का उपयोग करें",
+	"Use up and down arrows to move lower selection": "निचला चयन खिसकाने के लिए ऊपर और नीचे तीरों का उपयोग करें",
+	"Use up and down arrows to move upper selection": "ऊपरी चयन खिसकाने के लिए ऊपर और नीचे तीरों का उपयोग करें",
+	"From %1 to %2": "%1 से %2 तक",
+	"From %1": "%1 से",
+	"To %1": "%1 तक",
+
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "मान: %1",
+	"Highest: %1": "उच्चतम: %1",
+	"Lowest: %1": "न्यूनतम: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "श्रेणी",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "परिणाम: %1",
+	"No results": "कोई परिणाम नहीं",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "रंगत",
+	"Opacity": "अपारदर्शिता",
+	"Color": "रंग",
 
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "फ़ाइल के लिए कोई पार्सर उपलब्ध नहीं: %1",
+	"Error parsing file: %1": "फ़ाइल पार्स करने में त्रुटि: %1",
+	"Unable to load file: %1": "फ़ाइल लोड नहीं हो सकी: %1",
+	"Invalid date": "अमान्य तिथि",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "बंद करें",
+	"Minimize": "छोटा करें",
+	"Confirm": "पुष्टि करें",
 	"OK": "ठीक है",
 	"Cancel": "रद्द करें",
 	"Delete": "हटाएँ",

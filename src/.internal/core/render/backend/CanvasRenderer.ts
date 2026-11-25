@@ -11,6 +11,7 @@ import { SceneNode, SceneContainer, SceneGraphics, SceneText, SceneTextStyle, Sc
 import type { IBounds } from "../../util/IBounds";
 import type { IPoint } from "../../util/IPoint";
 import { Color } from "../../util/Color";
+import { Matrix } from "../../util/Matrix";
 //import { Throttler } from "../../util/Throttler";
 import { ArrayDisposer, Disposer, IDisposer } from "../../util/Disposer";
 import { TextFormatter } from "../../util/TextFormatter";
@@ -360,7 +361,89 @@ function ghostOnly(targetGhostLayer: number = 0): boolean {
 function drawGhost(node: SceneNode, status: IStatus, targetGhostLayer: number = 0): boolean {
 	const interactive = isInteractive(node, status);
 	const order = status.layer.order || 0;
-	return interactive && ((order == 0 && !ghostOnly(targetGhostLayer)) || order == targetGhostLayer) ? true : false;
+	return interactive && !rendererOf(node, status)._noGhost && ((order == 0 && !ghostOnly(targetGhostLayer)) || order == targetGhostLayer) ? true : false;
+}
+
+/**
+ * Whether the hit canvas may no longer match a node: an interactive node that
+ * changed, or one painted there that has moved since.
+ *
+ * @ignore
+ */
+function hitStale(node: SceneNode, status: IStatus): boolean {
+	const mask = node.mask;
+	const clipped = mask && isInteractiveMask(node, status);
+	if (status.layer.dirty && node._hitDirty && (clipped || isInteractive(node, status))) {
+		// a shape only if what the hit canvas paints of it changed, not its colors
+		if (clipped || !(node instanceof SceneGraphics) || node._colorId === undefined || node._data.hitChanged()) {
+			return true;
+		}
+	}
+
+	// The mask is checked here: its own visit may come first
+	if (mask && clipped && (mask._maskDirty || hitMoved(mask))) {
+		return true;
+	}
+
+	// one no longer interactive keeps the matrix of its last paint
+	return isInteractive(node, status) && hitMoved(node);
+}
+
+/**
+ * Whether a node has moved since the hit canvas painted it.
+ *
+ * @ignore
+ */
+function hitMoved(node: SceneNode): boolean {
+	const was = node._hitMatrix;
+	if (was) {
+		const m = node._matrix;
+		return was.a !== m.a || was.b !== m.b || was.c !== m.c || was.d !== m.d || was.tx !== m.tx || was.ty !== m.ty;
+	}
+
+	return false;
+}
+
+/**
+ * Notes where the hit canvas painted a node, or clipped with it.
+ *
+ * @ignore
+ */
+function keepHitMatrix(node: SceneNode): void {
+	if (!node._hitMatrix) {
+		node._hitMatrix = new Matrix();
+	}
+	node._hitMatrix.copyFrom(node._matrix);
+}
+
+/**
+ * Whether a node, or a node below it, is on a layer being redrawn (order
+ * `null`) or on the layer of the given order.
+ *
+ * @ignore
+ */
+function onLayer(node: SceneNode, status: IStatus, order: number | null): boolean {
+	if (layerMatches(status.layer, order)) {
+		return true;
+	}
+
+	if (node instanceof SceneContainer && node._childLayers) {
+		const below = node._childLayers;
+		for (let i = 0; i < below.length; i++) {
+			if (layerMatches(below[i], order)) {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
+ * @ignore
+ */
+function layerMatches(layer: ILayer, order: number | null): boolean {
+	return order === null ? layer.dirty : (layer.order || 0) == order;
 }
 
 /**
@@ -432,9 +515,14 @@ function renderNode(node: SceneNode, status: IStatus, targetGhostLayer: number =
 	const renderer = rendererOf(node, status);
 
 	if (node.visible && (node.exportable !== false || !renderer._omitTainted)) {
-		node._setMatrix();
-
 		const sub = subStatus(node, status);
+
+		// Leaves out a branch with nothing to paint in this pass
+		if (renderer._noGhost ? !onLayer(node, sub, null) : (targetGhostLayer > 0 && !onLayer(node, sub, targetGhostLayer))) {
+			return;
+		}
+
+		node._setMatrix();
 
 		const resolution = renderer.resolution;
 
@@ -448,9 +536,12 @@ function renderNode(node: SceneNode, status: IStatus, targetGhostLayer: number =
 			mask._setMatrix();
 		}
 
-		// TODO improve this
+		// A group sets up every layer being redrawn, for its mask, filter and children; a single shape only its own
+		const group = node instanceof SceneContainer;
+		const used = (layer: CanvasLayer) => layer && (group || layer === sub.layer);
+
 		$array.each(layers, (layer) => {
-			if (layer) {
+			if (used(layer)) {
 				const context = layer.context;
 				context.save();
 
@@ -471,25 +562,58 @@ function renderNode(node: SceneNode, status: IStatus, targetGhostLayer: number =
 			}
 		});
 
-		ghostContext.save();
+		// The hit canvas has a pass of its own (_paintGhost); in it a single shape is set up only if it is painted
+		let ghost = false;
 
-		// We must apply the mask before we transform the element
-		if (mask && isInteractiveMask(node, sub)) {
-			transformMargin(mask, ghostContext, resolution, ghostLayer.margin);
-			runPath(mask, ghostContext);
-			ghostContext.clip();
+		if (renderer._noGhost) {
+			if (!renderer._hitStale && hitStale(node, sub)) {
+				renderer._hitStale = true;
+			}
+
+			if (sub.layer.dirty) {
+				node._hitDirty = false;
+				if (node instanceof SceneGraphics) {
+					node._data.hitSeen();
+				}
+			}
+			if (mask) {
+				mask._maskDirty = false;
+			}
+
+		} else {
+			ghost = group || drawGhost(node, sub, targetGhostLayer);
+
+			if ((sub.layer.order > 0) && !targetGhostLayer && isInteractive(node, sub)) {
+				$array.move(renderer._deferredGhostLayers, sub.layer.order);
+			}
 		}
 
-		transformMargin(node, ghostContext, resolution, ghostLayer.margin);
-		if ((sub.layer.order > 0) && !targetGhostLayer) {
-			$array.move(renderer._deferredGhostLayers, sub.layer.order);
+		if (ghost) {
+			ghostContext.save();
+
+			// We must apply the mask before we transform the element
+			if (mask && isInteractiveMask(node, sub)) {
+				transformMargin(mask, ghostContext, resolution, ghostLayer.margin);
+				runPath(mask, ghostContext);
+				ghostContext.clip();
+				keepHitMatrix(mask);
+			}
+
+			transformMargin(node, ghostContext, resolution, ghostLayer.margin);
+
+			if (!group) {
+				keepHitMatrix(node);
+			}
 		}
+
 		paintNode(node, sub, targetGhostLayer);
 
-		ghostContext.restore();
+		if (ghost) {
+			ghostContext.restore();
+		}
 
 		$array.each(layers, (layer) => {
-			if (layer) {
+			if (used(layer)) {
 				layer.context.restore();
 			}
 		});
@@ -562,11 +686,10 @@ function paintGraphics(graphics: SceneGraphics, status: IStatus, targetGhostLaye
 	markTainted(graphics, status);
 
 	const layerDirty = status.layer.dirty;
-	const interactive = isInteractive(graphics, status);
 	const onlyGhost = ghostOnly(targetGhostLayer);
 	const withGhost = drawGhost(graphics, status, targetGhostLayer);
 
-	if (layerDirty || interactive || onlyGhost) {
+	if ((layerDirty && !onlyGhost) || withGhost) {
 
 		const context = status.layer.context;
 		const ghostContext = rendererOf(graphics, status)._ghostLayer.context;
@@ -815,8 +938,10 @@ function paintText(text: SceneText, status: IStatus, targetGhostLayer: number = 
 		if (drawLayer) {
 			context.save();
 		}
-		ghostContext.save();
-		prerenderText(text, status, false, false, !drawLayer);
+		if (withGhost) {
+			ghostContext.save();
+		}
+		prerenderText(text, status, !withGhost, false, !drawLayer);
 
 		// Process text info produced by the layout
 		$array.each(text._textInfo!, (line, _index) => {
@@ -829,8 +954,8 @@ function paintText(text: SceneText, status: IStatus, targetGhostLayer: number = 
 						context.font = chunk.style;
 					}
 
-					ghostContext.save();
-					if (isInteractive(text, status)) {
+					if (withGhost) {
+						ghostContext.save();
 						ghostContext.font = chunk.style;
 					}
 				}
@@ -931,7 +1056,9 @@ function paintText(text: SceneText, status: IStatus, targetGhostLayer: number = 
 					if (drawLayer) {
 						context.restore();
 					}
-					ghostContext.restore();
+					if (withGhost) {
+						ghostContext.restore();
+					}
 				}
 
 			});
@@ -940,7 +1067,9 @@ function paintText(text: SceneText, status: IStatus, targetGhostLayer: number = 
 		if (drawLayer) {
 			context.restore();
 		}
-		ghostContext.restore();
+		if (withGhost) {
+			ghostContext.restore();
+		}
 	}
 }
 
@@ -963,13 +1092,15 @@ function paintRadialText(text: SceneRadialText, status: IStatus, targetGhostLaye
  */
 function paintCircularText(text: SceneRadialText, status: IStatus, targetGhostLayer: number = 0): void {
 	if (text.textVisible) {
-		const interactive = isInteractive(text, status);
 		const context = status.layer.context;
 		const layerDirty = status.layer.dirty;
 		const ghostContext = rendererOf(text, status)._ghostLayer.context;
 
 		const onlyGhost = ghostOnly(targetGhostLayer);
 		const withGhost = drawGhost(text, status, targetGhostLayer);
+
+		// the hit canvas is set up only when the text is painted there
+		const interactive = withGhost;
 
 		// Layer context is touched only when it is redrawn: state calls on idle canvases leak in Chrome 153
 		const drawLayer = layerDirty && !onlyGhost;
@@ -987,7 +1118,7 @@ function paintCircularText(text: SceneRadialText, status: IStatus, targetGhostLa
 			ghostContext.save();
 		}
 
-		prerenderText(text, status, false, false, !drawLayer);
+		prerenderText(text, status, !withGhost, false, !drawLayer);
 
 		// We need measurements in order to properly position text for alignment
 		if (!text._textInfo) {
@@ -1273,6 +1404,18 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	public _forceInteractive: number = 0;
 	public _omitTainted: boolean = false;
 
+	// The hit canvas is painted in its own pass, when a hit test needs it
+	public _noGhost: boolean = false;
+	public _hitStale: boolean = true;
+	protected _ghostRoot: SceneNode | undefined;
+
+	/**
+	 * @ignore
+	 */
+	public _hitChanged(): void {
+		this._hitStale = true;
+	}
+
 	public resetImageArray() {
 		this._ghostLayer.imageArray = undefined;
 	}
@@ -1301,6 +1444,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 			clearCanvas(this._ghostLayer.view);
 			clearCanvas(this._patternCanvas);
+			this._ghostRoot = undefined;
 		}));
 
 		/*
@@ -1479,6 +1623,8 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 
 	resizeGhost() {
 		this._ghostLayer.resize(this._calculatedWidth, this._calculatedHeight, this._calculatedWidth, this._calculatedHeight, this.resolution);
+		// resizing clears it
+		this._hitStale = true;
 	}
 
 	resize(realWidth: number, realHeight: number, calculatedWidth: number, calculatedHeight: number): void {
@@ -1583,7 +1729,6 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	render(root: SceneNode): void {
 
 		this._dirtyLayers.length = 0;
-		this._deferredGhostLayers = [];
 
 		$array.each(this.layers, (layer) => {
 			if (layer) {
@@ -1594,34 +1739,85 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			}
 		});
 
-		this._ghostLayer.clear();
+		// Layers only: the walk notes whether the hit canvas still matches
+		this._ghostRoot = root;
+		this._noGhost = true;
 
-		renderNode(root, {
-			inactive: null,
-			layer: this.defaultLayer,
-			renderer: this,
-		});
-
-		const deferredGhostLayers = this._deferredGhostLayers;
-		if (deferredGhostLayers.length) {
-			deferredGhostLayers.sort((a, b) => a - b);
-			$array.each(deferredGhostLayers, (layerx) => {
-				renderNode(root, {
-					inactive: null,
-					layer: this.defaultLayer,
-					renderer: this,
-				}, layerx);
+		try {
+			renderNode(root, {
+				inactive: null,
+				layer: this.defaultLayer,
+				renderer: this,
 			});
-		}
 
-		this._ghostLayer.context.restore();
+		} finally {
+			this._noGhost = false;
+		}
 
 		$array.each(this._dirtyLayers, (layer) => {
 			layer.context.restore();
 			layer.dirty = false;
 		});
 
+		this._dirtyLayers.length = 0;
+
+		// The hit canvas waits for a hit test, unless a pointer is over the chart
+		if (this.debugGhostView || this._pointerOver()) {
+			this._paintGhost();
+		}
+
 		this._interaction.afterRender();
+	}
+
+	protected _pointerOver(): boolean {
+		const pointer = this._interaction._lastPointerMoveEvent;
+		return !!(pointer && pointer.target && this._layerDom.contains(pointer.target));
+	}
+
+	/**
+	 * Paints the hit-test canvas, if it no longer matches what was rendered.
+	 *
+	 * @ignore
+	 */
+	public _paintGhost(): void {
+		const root = this._ghostRoot;
+
+		// Not while exporting: that render leaves out what isn't exported
+		if (root && this._hitStale && !this._omitTainted) {
+			const ghostLayer = this._ghostLayer;
+
+			this._hitStale = false;
+			ghostLayer.imageArray = undefined;
+
+			// Layers waiting for the next render are not drawn on now
+			const waiting = this.layers.filter((layer) => layer && layer.dirty);
+			$array.each(waiting, (layer) => layer.dirty = false);
+
+			this._deferredGhostLayers = [];
+			ghostLayer.clear();
+
+			const status = {
+				inactive: null,
+				layer: this.defaultLayer,
+				renderer: this,
+			};
+
+			try {
+				renderNode(root, status);
+
+				const deferredGhostLayers = this._deferredGhostLayers;
+				if (deferredGhostLayers.length) {
+					deferredGhostLayers.sort((a, b) => a - b);
+					$array.each(deferredGhostLayers, (layerx) => {
+						renderNode(root, status, layerx);
+					});
+				}
+
+			} finally {
+				this._ghostLayer.context.restore();
+				$array.each(waiting, (layer) => layer.dirty = true);
+			}
+		}
 	}
 
 	paintId(obj: SceneNode): string {
@@ -1634,6 +1830,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	_removeObject(obj: SceneNode): void {
 		if (obj._colorId !== undefined) {
 			delete this._colorMap[obj._colorId];
+			this._hitStale = true;
 		}
 
 		if (obj instanceof SceneImage && obj._imageMask) {
@@ -1726,6 +1923,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 			return;
 		}
 
+		this._paintGhost();
 		const pixel = this._ghostLayer.getImageData(point, bbox);
 
 		if (pixel.data[0] === 0 && pixel.data[1] === 0 && pixel.data[2] === 0) {
@@ -1738,6 +1936,7 @@ export class CanvasRenderer extends ArrayDisposer implements IRenderer, IDispose
 	}
 
 	getObjectAtPoint(point: IPoint): SceneNode | undefined {
+		this._paintGhost();
 		const data = this._ghostLayer.getImageArray(point);
 
 		if (data[0] === 0 && data[1] === 0 && data[2] === 0) {

@@ -3,8 +3,9 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Micro from "@amcharts/amcharts5/themes/Micro";
 
 
-// Creates a chart in a table cell: a line, or columns if "columns" is set
-function createChart(cell: HTMLElement, points: Array<object>, field: string, columns: boolean, color: am5.Color) {
+// Creates a chart in a table cell: a line, or columns if "columns" is set;
+// "name" is what a screen reader says for it
+function createChart(cell: HTMLElement, points: Array<object>, field: string, columns: boolean, color: am5.Color, name: string) {
 
   // Create root element: every chart has its own
   // https://docs.amcharts.com/v5/getting-started/#root-element
@@ -54,6 +55,13 @@ function createChart(cell: HTMLElement, points: Array<object>, field: string, co
     series.strokes.template.set("strokeWidth", 2); // a 2 px line, to stand out at this size
     series.data.setAll(points);
   }
+
+  // Accessibility: Tab reaches the chart, and a screen reader names it
+  // https://docs.amcharts.com/v5/concepts/accessibility/
+  chart.setAll({
+    focusable: true,
+    ariaLabel: name
+  });
 }
 
 
@@ -146,6 +154,10 @@ am5.array.each(data, (item) => {
   changeCell.textContent = (change > 0 ? "+" : "") + change + "%";
   changeCell.style.color = color.toCSSHex();
 
-  createChart(row.insertCell(), points, "value", false, color);    // a line of the values
-  createChart(row.insertCell(), points, "volume", true, neutral);  // grey columns of the volumes
+  // a line of the values, and grey columns of the volumes
+  const last = item.values.length - 1;
+  createChart(row.insertCell(), points, "value", false, color,
+    item.name + " revenue over 20 days, from " + item.values[0] + " to " + item.values[last]);
+  createChart(row.insertCell(), points, "volume", true, neutral,
+    item.name + " orders over 20 days, from " + item.volumes[0] + " to " + item.volumes[last]);
 });

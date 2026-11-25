@@ -240,6 +240,23 @@ export interface ILocaleSettings {
 	"From %1"?: string;
 	"To %1"?: string;
 
+	// Data summary for screen readers
+	"Values: %1"?: string;
+	"Highest: %1"?: string;
+	"Lowest: %1"?: string;
+
+	// Data table for screen readers
+	"Category"?: string;
+
+	// Stock toolbar search, for screen readers
+	"Results: %1"?: string;
+	"No results"?: string;
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue"?: string;
+	"Opacity"?: string;
+	"Color"?: string;
+
 	// Data loader-related
 	"No parser available for file: %1"?: string;
 	"Error parsing file: %1"?: string;

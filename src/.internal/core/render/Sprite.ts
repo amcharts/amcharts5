@@ -837,8 +837,17 @@ export interface ISpriteSettings extends IEntitySettings {
 	 */
 	ariaControls?: string;
 
-	//ariaDescription?: string;
-	//readerControls?: string;
+	/**
+	 * A longer description of the element for screen readers, read after its
+	 * `ariaLabel` (`aria-describedby`). Can use data placeholders.
+	 *
+	 * A chart or series with `ariaSummary` fills it in with a summary of the
+	 * data.
+	 *
+	 * @since 5.24.0
+	 * @see {@link https://docs.amcharts.com/v5/concepts/accessibility/#screen-reader} for more info
+	 */
+	ariaDescription?: string;
 
 }
 
@@ -958,6 +967,32 @@ export interface ISpritePrivate extends IEntityPrivate {
 	 * @ignore
 	 */
 	focusOutOfView?: boolean;
+
+	/**
+	 * If set to `true`, only up and down arrow keys move between the members of
+	 * the sprite's `focusableGroup`. Left and right drag it, without SHIFT.
+	 *
+	 * @ignore
+	 */
+	focusGroupVertical?: boolean;
+
+	/**
+	 * If set to `true`, the element can't be used now (e.g. a zoom button at
+	 * the zoom limit): it is not a TAB stop, unless focused, and screen readers
+	 * hear it as disabled.
+	 *
+	 * @ignore
+	 */
+	focusDisabled?: boolean;
+
+	/**
+	 * If set to `true`, the element is transparent (and can't be hovered or
+	 * clicked) but can still take keyboard focus, e.g. focusable bullets of a
+	 * series too dense for them (`minBulletDistance`).
+	 *
+	 * @ignore
+	 */
+	drawHidden?: boolean;
 
 	/**
 	 * Checks that the pointer is within the element's bounds before
@@ -1177,6 +1212,9 @@ export abstract class Sprite extends Entity {
 	// Will be true only when dragging
 	public _isDragging: boolean = false;
 
+	// a change that only repaints, leaving the hit canvas as it is
+	protected _paintOnly: boolean = false;
+
 	// The event when the dragging starts
 	protected _dragEvent: ISpritePointerEvent | undefined;
 
@@ -1204,6 +1242,9 @@ export abstract class Sprite extends Entity {
 
 	protected _focusDp: MultiDisposer | undefined;
 
+	// `focusable` was looked at once: one coming from an adapter never gets dirty
+	protected _focusableChecked: boolean = false;
+
 	protected _tooltipMoveDp: IDisposer | undefined;
 
 	protected _tooltipPointerDp: MultiDisposer | undefined;
@@ -1228,7 +1269,10 @@ export abstract class Sprite extends Entity {
 	}
 
 	public _markDirtyKey<Key extends keyof this["_settings"]>(key: Key) {
+		// the hit canvas ignores opacity
+		this._paintOnly = key == "opacity";
 		super._markDirtyKey(key);
+		this._paintOnly = false;
 		if (key == "x" || key == "y" || key == "dx" || key == "dy") {
 			this.markDirtyBounds();
 			this._addPercentagePositionChildren();
@@ -1409,14 +1453,23 @@ export abstract class Sprite extends Entity {
 	protected updatePivotPoint() {
 		const bounds = this._localBounds;
 		if (bounds) {
+			const pivot = this._display.pivot;
+			const x = pivot.x;
+			const y = pivot.y;
+
 			const centerX = this.get("centerX");
 			if (centerX != null) {
-				this._display.pivot.x = bounds.left + $utils.relativeToValue(centerX!, bounds.right - bounds.left);
+				pivot.x = bounds.left + $utils.relativeToValue(centerX!, bounds.right - bounds.left);
 			}
 
 			const centerY = this.get("centerY");
 			if (centerY != null) {
-				this._display.pivot.y = bounds.top + $utils.relativeToValue(centerY!, bounds.bottom - bounds.top);
+				pivot.y = bounds.top + $utils.relativeToValue(centerY!, bounds.bottom - bounds.top);
+			}
+
+			// a new pivot moves the element
+			if (pivot.x !== x || pivot.y !== y) {
+				this.markDirtyLayer();
 			}
 		}
 	}
@@ -1526,6 +1579,9 @@ export abstract class Sprite extends Entity {
 		const display = this._display;
 		const events = this.events;
 
+		// marked again as applied: a change made late in the last frame was drawn before it got here
+		this._markApplied();
+
 		if (this.isDirty("draggable")) {
 			const draggable = this.get("draggable");
 			if (draggable) {
@@ -1617,10 +1673,12 @@ export abstract class Sprite extends Entity {
 		}
 
 
-		if (this.isDirty("opacity")) {
-			display.alpha = Math.max(0, this.get("opacity", 1));
+		if (this.isDirty("opacity") || this.isPrivateDirty("drawHidden")) {
+			// `drawHidden`: transparent, and out of reach of the pointer (below), but
+			// still measured, so it can take keyboard focus
+			display.alpha = this.getPrivate("drawHidden") ? 0 : Math.max(0, this.get("opacity", 1));
 			if (this.get("focusable")) {
-				this.markDirtyAccessibility();
+				this.markDirtyAccessibility(true);
 			}
 		}
 
@@ -1655,7 +1713,12 @@ export abstract class Sprite extends Entity {
 
 			this.markDirtyBounds();
 			if (this.get("focusable")) {
-				this.markDirtyAccessibility();
+				this.markDirtyAccessibility(true);
+			}
+
+			// Focusable elements inside take focus or not with it
+			if ((<any>this).children) {
+				this._root._invalidateFocusInside(this);
 			}
 		}
 
@@ -1782,7 +1845,9 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		if (this.isDirty("focusable")) {
+		const focusableChecked = this._focusableChecked;
+		this._focusableChecked = true;
+		if (this.isDirty("focusable") || (!focusableChecked && this.get("focusable"))) {
 			if (this.get("focusable")) {
 				this._root._registerTabindexOrder(this);
 			}
@@ -1796,15 +1861,19 @@ export abstract class Sprite extends Entity {
 			this._disposers.push(events.once("boundschanged", () => {
 				// We might need to do this to re-evaluate accessibility attributes
 				// once the element gains size (bounds)
-				this.markDirtyAccessibility();
+				this.markDirtyAccessibility(true);
 			}));
 		}
 
 		if (this.isPrivateDirty("focusable") || this.isPrivateDirty("focusOutOfView")) {
+			this.markDirtyAccessibility(true);
+		}
+
+		if (this.isPrivateDirty("focusDisabled")) {
 			this.markDirtyAccessibility();
 		}
 
-		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaCurrent") || this.isDirty("ariaSelected") || this.isDirty("ariaExpanded") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueMin") || this.isDirty("ariaValueMax") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel") || this.isDirty("ariaControls")) {
+		if (this.isDirty("role") || this.isDirty("ariaLive") || this.isDirty("ariaChecked") || this.isDirty("ariaCurrent") || this.isDirty("ariaSelected") || this.isDirty("ariaExpanded") || this.isDirty("ariaHidden") || this.isDirty("ariaOrientation") || this.isDirty("ariaValueNow") || this.isDirty("ariaValueMin") || this.isDirty("ariaValueMax") || this.isDirty("ariaValueText") || this.isDirty("ariaLabel") || this.isDirty("ariaControls") || this.isDirty("ariaDescription")) {
 			// display.accessibility.ariaLabel = populateString(this, this.get("ariaLabel", ""));
 			// @todo make sure ariaLabel gets populated in Root
 			this.markDirtyAccessibility();
@@ -1888,8 +1957,8 @@ export abstract class Sprite extends Entity {
 			}
 		}
 
-		if (this.isDirty("forceInactive")) {
-			this._display.inactive = this.get("forceInactive", null);
+		if (this.isDirty("forceInactive") || this.isPrivateDirty("drawHidden")) {
+			this._display.inactive = this.getPrivate("drawHidden") ? true : this.get("forceInactive", null);
 		}
 
 		if (this.get("showTooltipOn") == "always" && this._display.visible) {
@@ -2078,8 +2147,10 @@ export abstract class Sprite extends Entity {
 			const events = this.events;
 
 			if (dragEvent.simulated && !this._isDragging) {
+				// A drag with arrow keys starts on its first step, which is applied
+				// below. Moves stay measured from where the keys started it, as
+				// `_dragPoint` is, or the next step would bring it back
 				this._isDragging = true;
-				this._dragEvent = e;
 
 				this._dragPoint = {
 					x: this.x(),
@@ -2196,18 +2267,20 @@ export abstract class Sprite extends Entity {
 			}
 
 			if (this.get("focusable")) {
-				this.markDirtyAccessibility();
+				this.markDirtyAccessibility(true);
 			}
 		}
 	}
 
 	/**
+	 * Updates the element's focus element before the next frame. With
+	 * `statusOnly`, only whether it can take focus and is a TAB stop: enough
+	 * when its size, position or visibility changed.
+	 *
 	 * @ignore
 	 */
-	public markDirtyAccessibility(): void {
-		//if (this._root.focused(this)) {
-		this._root._invalidateAccessibility(this);
-		//}
+	public markDirtyAccessibility(statusOnly?: boolean): void {
+		this._root._invalidateAccessibility(this, statusOnly);
 	}
 
 	/**
@@ -2215,7 +2288,12 @@ export abstract class Sprite extends Entity {
 	 */
 	public markDirtyLayer() {
 		//this._display.markDirtyLayer(this.isDirty("opacity") || this.isDirty("visible")); https://codepen.io/team/amcharts/pen/gOWZPmP <- problems
-		this._display.markDirtyLayer(true);
+		if (this._paintOnly) {
+			this._display.markDirtyPaint(true);
+		}
+		else {
+			this._display.markDirtyLayer(true);
+		}
 	}
 
 	/**
@@ -2224,6 +2302,37 @@ export abstract class Sprite extends Entity {
 	public markDirty() {
 		super.markDirty();
 		this.markDirtyLayer();
+	}
+
+	// the layer is drawn again, without the hit canvas when only opacity changed; nothing to apply, nothing drawn
+	protected _markApplied(): void {
+		const dirty = this._dirty as { [key: string]: boolean | undefined };
+		let any = false;
+		let paintOnly = true;
+		for (const key in dirty) {
+			if (dirty[key]) {
+				any = true;
+				if (key !== "opacity") {
+					paintOnly = false;
+					break;
+				}
+			}
+		}
+		if (paintOnly) {
+			const dirtyPrivate = this._dirtyPrivate as { [key: string]: boolean | undefined };
+			for (const key in dirtyPrivate) {
+				if (dirtyPrivate[key]) {
+					any = true;
+					paintOnly = false;
+					break;
+				}
+			}
+		}
+		if (any) {
+			this._paintOnly = paintOnly;
+			this.markDirtyLayer();
+			this._paintOnly = false;
+		}
 	}
 
 	public _updateBounds() {
@@ -2256,7 +2365,7 @@ export abstract class Sprite extends Entity {
 				this.events.dispatch(eventType, { type: eventType, target: this });
 			}
 			if (this.parent) {
-				this.parent.markDirty();
+				this.parent._markDirtyLayout();
 				this.parent.markDirtyBounds();
 			}
 
@@ -2268,7 +2377,7 @@ export abstract class Sprite extends Entity {
 			// Accessibility depends on size (zero-sized elements are hidden from
 			// screen readers), so re-evaluate it now that bounds are known
 			if (this.get("focusable")) {
-				this.markDirtyAccessibility();
+				this.markDirtyAccessibility(true);
 			}
 		}
 	}
@@ -2449,6 +2558,12 @@ export abstract class Sprite extends Entity {
 				if (tooltipPosition == "fixed" || !point) {
 					this._display._setMatrix();
 					point = this.toGlobal(tooltipTarget._getTooltipPoint());
+
+					// Focused and partly out of view (zoomed in on): the tooltip points
+					// at the part that can be seen
+					if (this._root.focused(this)) {
+						point = this._root._pointInView(this, point);
+					}
 				}
 
 				if (tooltipPosition == "pointer") {
@@ -2622,6 +2737,7 @@ export abstract class Sprite extends Entity {
 			display.invalidateBounds();
 			display.x = xx;
 			display.y = yy;
+			this.markDirtyLayer();
 
 			const eventType = "positionchanged";
 			if (this.events.isEnabled(eventType)) {

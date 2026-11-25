@@ -462,6 +462,49 @@ export type GraphicsOp =
 	BezierCurveTo | QuadraticCurveTo | Shadow | GraphicsImage | BeginGroup | EndGroup;
 
 /**
+ * Whether two ops paint the same on the hit canvas, where colors, opacities
+ * and shadows do not count.
+ *
+ * @ignore
+ */
+function sameForHit(a: GraphicsOp, other: GraphicsOp): boolean {
+	if (a.type !== other.type) {
+		return false;
+	}
+
+	const b = other as any;
+
+	switch (a.type) {
+		case "lineStyle":
+			return a.width === b.width && a.lineJoin === b.lineJoin && a.lineCap === b.lineCap;
+		case "lineDash":
+			return a.dash.length === b.dash.length && a.dash.every((value, i) => value === b.dash[i]);
+		case "lineDashOffset":
+			return a.dashOffset === b.dashOffset;
+		case "drawRect":
+		case "image":
+			return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
+		case "drawCircle":
+			return a.x === b.x && a.y === b.y && a.radius === b.radius;
+		case "drawEllipse":
+			return a.x === b.x && a.y === b.y && a.radiusX === b.radiusX && a.radiusY === b.radiusY;
+		case "arc":
+			return a.cx === b.cx && a.cy === b.cy && a.radius === b.radius && a.startAngle === b.startAngle && a.endAngle === b.endAngle && a.anticlockwise === b.anticlockwise;
+		case "arcTo":
+			return a.x1 === b.x1 && a.y1 === b.y1 && a.x2 === b.x2 && a.y2 === b.y2 && a.radius === b.radius;
+		case "lineTo":
+		case "moveTo":
+			return a.x === b.x && a.y === b.y;
+		case "bezierCurveTo":
+			return a.cpX === b.cpX && a.cpY === b.cpY && a.cpX2 === b.cpX2 && a.cpY2 === b.cpY2 && a.toX === b.toX && a.toY === b.toY;
+		case "quadraticCurveTo":
+			return a.cpX === b.cpX && a.cpY === b.cpY && a.toX === b.toX && a.toY === b.toY;
+	}
+
+	return true;
+}
+
+/**
  * What an `IGraphics` records: geometry and paint ops, in call order.
  *
  * Renderer-neutral: backends replay `ops`.
@@ -474,13 +517,55 @@ export class GraphicsData {
 	// Changes on `clear()`; with `ops.length` it tells whether ops changed
 	public version: number = 0;
 
+	// The ops when the renderer last looked, kept only until it looks again
+	protected _hitOps: Array<GraphicsOp> | undefined;
+	protected _hitLength: number = 0;
+
+	/**
+	 * Whether what a hit test paints of the shape changed since `hitSeen()`.
+	 */
+	public hitChanged(): boolean {
+		const was = this._hitOps;
+		const ops = this.ops;
+
+		if (!was) {
+			return ops.length !== this._hitLength;
+		}
+
+		if (was.length !== ops.length) {
+			return true;
+		}
+
+		for (let i = 0; i < ops.length; i++) {
+			if (!sameForHit(was[i], ops[i])) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * The renderer has looked at the shape.
+	 */
+	public hitSeen(): void {
+		this._hitOps = undefined;
+		this._hitLength = this.ops.length;
+	}
+
 	protected _hasShadows: boolean = false;
 	protected _fillAlpha?: number;
 	protected _strokeAlpha?: number;
 	protected _strokeWidth: number = 1;
 
 	public clear(): void {
-		this.ops.length = 0;
+		if (this._hitOps) {
+			this.ops.length = 0;
+
+		} else {
+			this._hitOps = this.ops;
+			this.ops = [];
+		}
 		this._strokeWidth = 1;
 		++this.version;
 	}

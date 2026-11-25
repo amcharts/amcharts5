@@ -299,13 +299,13 @@ export default {
 
 	// Timeline buttons
 	"Play": "Αναπαραγωγή",
-	"Stop": "Στάση",
+	"Stop": "Διακοπή",
 
 	// Chart's Legend screen reader title.
 	"Legend": "Υπόμνημα",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Πατήστε ENTER για εναλλαγή",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Φόρτωση",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Γράφημα",
+	"Serial chart": "Σειριακό γράφημα",
+	"X/Y chart": "Γράφημα X/Y",
+	"Pie chart": "Γράφημα πίτας",
+	"Gauge chart": "Γράφημα μετρητή",
+	"Radar chart": "Γράφημα ραντάρ",
+	"Sankey diagram": "Διάγραμμα Sankey",
+	"Flow diagram": "Διάγραμμα ροής",
+	"Chord diagram": "Διάγραμμα χορδών",
+	"TreeMap chart": "Γράφημα TreeMap",
+	"Force directed tree": "Δέντρο κατευθυνόμενο από δυνάμεις",
+	"Sliced chart": "Τμηματικό γράφημα",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Σειρά",
+	"Candlestick Series": "Σειρά κεριών",
+	"OHLC Series": "Σειρά OHLC",
+	"Column Series": "Σειρά στηλών",
+	"Line Series": "Σειρά γραμμών",
+	"Pie Slice Series": "Σειρά τομέων πίτας",
+	"Funnel Series": "Σειρά χωνιού",
+	"Pyramid Series": "Σειρά πυραμίδας",
+	"X/Y Series": "Σειρά X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Χάρτης",
+	"Press ENTER to zoom in": "Πατήστε ENTER για μεγέθυνση",
+	"Press ENTER to zoom out": "Πατήστε ENTER για σμίκρυνση",
+	"Use arrow keys to zoom in and out": "Χρησιμοποιήστε τα βελάκια για μεγέθυνση και σμίκρυνση",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Χρησιμοποιήστε τα πλήκτρα συν και πλην του πληκτρολογίου για μεγέθυνση και σμίκρυνση",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Εκτύπωση",
-	"Image": "Image",
+	"Export": "Εξαγωγή",
+	"Image": "Εικόνα",
 	"Data": "Δεδομένα",
 	"Print": "Εκτύπωση",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Πατήστε ENTER ή χρησιμοποιήστε τα βελάκια για πλοήγηση",
+	"Press ENTER to open": "Πατήστε ENTER για άνοιγμα",
+	"Press ENTER to print.": "Πατήστε ENTER για εκτύπωση.",
+	"Press ENTER to export as %1.": "Πατήστε ENTER για εξαγωγή ως %1.",
+	"(Press ESC to close this message)": "(Πατήστε ESC για να κλείσει αυτό το μήνυμα)",
+	"Image Export Complete": "Η εξαγωγή εικόνας ολοκληρώθηκε",
+	"Export operation took longer than expected. Something might have gone wrong.": "Η εξαγωγή διήρκεσε περισσότερο από το αναμενόμενο. Ίσως κάτι πήγε στραβά.",
+	"Saved from": "Αποθηκεύτηκε από",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Χρησιμοποιήστε το TAB για να επιλέξετε τις λαβές ή τα βελάκια αριστερά και δεξιά για να αλλάξετε την επιλογή",
+	"Use left and right arrows to move selection": "Χρησιμοποιήστε τα βελάκια αριστερά και δεξιά για να μετακινήσετε την επιλογή",
+	"Use left and right arrows to move left selection": "Χρησιμοποιήστε τα βελάκια αριστερά και δεξιά για να μετακινήσετε την αριστερή επιλογή",
+	"Use left and right arrows to move right selection": "Χρησιμοποιήστε τα βελάκια αριστερά και δεξιά για να μετακινήσετε τη δεξιά επιλογή",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Χρησιμοποιήστε το TAB για να επιλέξετε τις λαβές ή τα βελάκια πάνω και κάτω για να αλλάξετε την επιλογή",
+	"Use up and down arrows to move selection": "Χρησιμοποιήστε τα βελάκια πάνω και κάτω για να μετακινήσετε την επιλογή",
+	"Use up and down arrows to move lower selection": "Χρησιμοποιήστε τα βελάκια πάνω και κάτω για να μετακινήσετε την κάτω επιλογή",
+	"Use up and down arrows to move upper selection": "Χρησιμοποιήστε τα βελάκια πάνω και κάτω για να μετακινήσετε την πάνω επιλογή",
 	"From %1 to %2": "Από %1 έως %2",
 	"From %1": "Από %1",
 	"To %1": "Έως %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Τιμές: %1",
+	"Highest: %1": "Μέγιστη: %1",
+	"Lowest: %1": "Ελάχιστη: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Κατηγορία",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Αποτελέσματα: %1",
+	"No results": "Κανένα αποτέλεσμα",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Απόχρωση",
+	"Opacity": "Αδιαφάνεια",
+	"Color": "Χρώμα",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Δεν υπάρχει διαθέσιμος αναλυτής για το αρχείο: %1",
+	"Error parsing file: %1": "Σφάλμα ανάλυσης αρχείου: %1",
+	"Unable to load file: %1": "Αδυναμία φόρτωσης αρχείου: %1",
+	"Invalid date": "Μη έγκυρη ημερομηνία",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Κλείσιμο",
+	"Minimize": "Ελαχιστοποίηση",
+	"Confirm": "Επιβεβαίωση",
 	"OK": "OK",
 	"Cancel": "Ακύρωση",
 	"Delete": "Διαγραφή",

@@ -411,6 +411,25 @@ export default {
 	"From %1": "",
 	"To %1": "",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "",
+	"Highest: %1": "",
+	"Lowest: %1": "",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "",
+
+	// Stock toolbar search, for screen readers: how many items a search found.
+	"Results: %1": "",
+	"No results": "",
+
+	// Color picker, for screen readers: its sliders and color field.
+	"Hue": "",
+	"Opacity": "",
+	"Color": "",
+
 	// Data loader-related.
 	"No parser available for file: %1": "",
 	"Error parsing file: %1": "",

@@ -81,7 +81,11 @@ series.bullets.push(() => {
       radius: 4,
       stroke: root.interfaceColors.get("background"), // a ring in the background color...
       strokeWidth: 2,                                 // ...2 px wide, around each dot
-      fill: series.get("fill")                        // the line's color
+      fill: series.get("fill"),                       // the line's color
+      // keyboard: one Tab stop for all the dots, the up and down arrow keys step through them
+      focusable: true,
+      focusableGroup: "points",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: {valueY}"
     })
   });
 });
@@ -121,6 +125,15 @@ series.data.setAll([
   { date: 1706486400000, value: 77 },
   { date: 1706572800000, value: 77 }
 ]);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Smoothed line chart of a daily value over the 30 days from January 1, 2024. Tab to the points, then move between them with the up and down arrow keys"
+});
+// the points: set up in their bullet function above
 
 
 // Make stuff animate on load

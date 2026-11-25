@@ -3,6 +3,8 @@
   "settings": {
     "innerRadius": { "type": "Percent", "value": 50 },
     "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Radial heat map of a value for each hour of the week: the 24 hours run around the ring, the seven days from the outside in. Tab to the cells, then move through them with the up and down arrow keys, hour by hour from Sunday to Saturday",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -244,7 +246,11 @@
           "strokeOpacity": 1,
           "strokeWidth": 2,
           "width": { "type": "Percent", "value": 100 },
-          "height": { "type": "Percent", "value": 100 }
+          "height": { "type": "Percent", "value": 100 },
+          "focusable": true,
+          "focusableGroup": "cells",
+          "hoverOnFocus": true,
+          "ariaLabel": "{categoryY}, {categoryX}: {value}"
         }
       }
     },
@@ -311,15 +317,15 @@
       "series-0": {
         "type": "RadarColumnSeries",
         "settings": {
-          "autoAppear": true,
-          "appearDuration": 1000,
           "calculateAggregates": true,
-          "stroke": { "type": "Color", "value": "#ffffff" },
+          "stroke": "@root.interfaceColors.get('background')",
           "xAxis": "#axis-0",
           "yAxis": "#axis-1",
           "categoryXField": "hour",
           "categoryYField": "weekday",
           "valueField": "value",
+          "autoAppear": true,
+          "appearDuration": 1000,
           "heatRules": [
             {
               "target": "#template-0",

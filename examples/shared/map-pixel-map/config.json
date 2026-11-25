@@ -1,6 +1,8 @@
 {
   "type": "MapChart",
   "settings": {
+    "focusable": true,
+    "ariaLabel": "World map drawn as a grid of dots, 15 countries colored by median age, from 18 years in Nigeria to 41 in Canada: the older, the darker",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -32,10 +34,7 @@
     {
       "template-0": {
         "type": "Template",
-        "settings": {
-          "fill": { "type": "Color", "value": "#adadad" },
-          "tooltipText": "{name}: {value}"
-        }
+        "settings": { "fill": "@root.interfaceColors.get('disabled')", "tooltipText": "{name}: {value}" }
       }
     },
     {

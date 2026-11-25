@@ -6,11 +6,27 @@
     "categoryField": "name",
     "childDataField": "children",
     "selectedDataItem": "@self.dataItems.0",
+    "focusable": true,
+    "ariaLabel": "Sunburst chart of website visits by where they came from: search, social and direct, then their kinds and sources, one ring per level. Tab to the slices, move between them with the up and down arrow keys, and press Enter to zoom into one; Enter on the middle goes back",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
-  "properties": { "data": "#data-0" },
+  "properties": {
+    "data": "#data-0",
+    "nodes": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "nodes",
+            "hoverOnFocus": true,
+            "ariaLabel": "{category}: {sum}"
+          }
+        }
+      }
+    }
+  },
   "refs": [
     {
       "data-0": [

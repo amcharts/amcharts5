@@ -305,7 +305,7 @@ export default {
 	"Legend": "Legendă",
 
 	// Legend's item screen reader indicator.
-	"Press ENTER to toggle": "",
+	"Press ENTER to toggle": "Apăsați ENTER pentru a comuta",
 
 	// Shown when the chart is busy loading something.
 	"Loading": "Se încarcă",
@@ -317,37 +317,38 @@ export default {
 	// Chart types.
 	// Those are used as default screen reader titles for the main chart element
 	// unless developer has set some more descriptive title.
-	"Chart": "",
-	"Serial chart": "",
-	"X/Y chart": "",
-	"Pie chart": "",
-	"Gauge chart": "",
-	"Radar chart": "",
-	"Sankey diagram": "",
-	"Flow diagram": "",
-	"Chord diagram": "",
-	"TreeMap chart": "",
-	"Sliced chart": "",
+	"Chart": "Diagramă",
+	"Serial chart": "Diagramă serială",
+	"X/Y chart": "Diagramă X/Y",
+	"Pie chart": "Diagramă circulară",
+	"Gauge chart": "Diagramă indicator",
+	"Radar chart": "Diagramă radar",
+	"Sankey diagram": "Diagramă Sankey",
+	"Flow diagram": "Diagramă de flux",
+	"Chord diagram": "Diagramă coardă",
+	"TreeMap chart": "Diagramă TreeMap",
+	"Force directed tree": "Arbore direcționat de forțe",
+	"Sliced chart": "Diagramă secționată",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
-	"Series": "",
-	"Candlestick Series": "",
-	"OHLC Series": "",
-	"Column Series": "",
-	"Line Series": "",
-	"Pie Slice Series": "",
-	"Funnel Series": "",
-	"Pyramid Series": "",
-	"X/Y Series": "",
+	"Series": "Serie",
+	"Candlestick Series": "Serie de lumânări",
+	"OHLC Series": "Serie OHLC",
+	"Column Series": "Serie de coloane",
+	"Line Series": "Serie de linii",
+	"Pie Slice Series": "Serie de sectoare",
+	"Funnel Series": "Serie pâlnie",
+	"Pyramid Series": "Serie piramidă",
+	"X/Y Series": "Serie X/Y",
 
 	// Map-related stuff.
-	"Map": "",
-	"Press ENTER to zoom in": "",
-	"Press ENTER to zoom out": "",
-	"Use arrow keys to zoom in and out": "",
-	"Use plus and minus keys on your keyboard to zoom in and out": "",
+	"Map": "Hartă",
+	"Press ENTER to zoom in": "Apăsați ENTER pentru a mări",
+	"Press ENTER to zoom out": "Apăsați ENTER pentru a micșora",
+	"Use arrow keys to zoom in and out": "Folosiți săgețile pentru a mări și micșora",
+	"Use plus and minus keys on your keyboard to zoom in and out": "Folosiți tastele plus și minus de pe tastatură pentru a mări și micșora",
 
 	// Export-related stuff.
 	// These prompts are used in Export menu labels.
@@ -359,17 +360,18 @@ export default {
 	//
 	// Leave actual format untranslated, unless you absolutely know that they
 	// would convey more meaning in some other way.
-	"Export": "Imprimare",
+	"Export": "Exportare",
 	"Image": "Imagine",
 	"Data": "Date",
 	"Print": "Imprimare",
-	"Press ENTER to open": "",
-	"Press ENTER to print.": "",
-	"Press ENTER to export as %1.": "",
-	"(Press ESC to close this message)": "",
-	"Image Export Complete": "",
-	"Export operation took longer than expected. Something might have gone wrong.": "",
-	"Saved from": "",
+	"Press ENTER or use arrow keys to navigate": "Apăsați ENTER sau folosiți săgețile pentru a naviga",
+	"Press ENTER to open": "Apăsați ENTER pentru a deschide",
+	"Press ENTER to print.": "Apăsați ENTER pentru a imprima.",
+	"Press ENTER to export as %1.": "Apăsați ENTER pentru a exporta ca %1.",
+	"(Press ESC to close this message)": "(Apăsați ESC pentru a închide acest mesaj)",
+	"Image Export Complete": "Exportul imaginii s-a încheiat",
+	"Export operation took longer than expected. Something might have gone wrong.": "Exportul a durat mai mult decât era de așteptat. Este posibil să fi apărut o eroare.",
+	"Saved from": "Salvat de pe",
 	"PNG": "",
 	"JPG": "",
 	"GIF": "",
@@ -390,28 +392,47 @@ export default {
 	// Prompts change in relation to whether Scrollbar is vertical or horizontal.
 	//
 	// The final section is used to indicate the current range of selection.
-	"Use TAB to select grip buttons or left and right arrows to change selection": "",
-	"Use left and right arrows to move selection": "",
-	"Use left and right arrows to move left selection": "",
-	"Use left and right arrows to move right selection": "",
-	"Use TAB select grip buttons or up and down arrows to change selection": "",
-	"Use up and down arrows to move selection": "",
-	"Use up and down arrows to move lower selection": "",
-	"Use up and down arrows to move upper selection": "",
+	"Use TAB to select grip buttons or left and right arrows to change selection": "Folosiți TAB pentru a selecta mânerele sau săgețile stânga și dreapta pentru a modifica selecția",
+	"Use left and right arrows to move selection": "Folosiți săgețile stânga și dreapta pentru a muta selecția",
+	"Use left and right arrows to move left selection": "Folosiți săgețile stânga și dreapta pentru a muta marginea stângă a selecției",
+	"Use left and right arrows to move right selection": "Folosiți săgețile stânga și dreapta pentru a muta marginea dreaptă a selecției",
+	"Use TAB select grip buttons or up and down arrows to change selection": "Folosiți TAB pentru a selecta mânerele sau săgețile sus și jos pentru a modifica selecția",
+	"Use up and down arrows to move selection": "Folosiți săgețile sus și jos pentru a muta selecția",
+	"Use up and down arrows to move lower selection": "Folosiți săgețile sus și jos pentru a muta marginea de jos a selecției",
+	"Use up and down arrows to move upper selection": "Folosiți săgețile sus și jos pentru a muta marginea de sus a selecției",
 	"From %1 to %2": "Din %1 la %2",
 	"From %1": "Din %1",
 	"To %1": "La %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Valori: %1",
+	"Highest: %1": "Maxim: %1",
+	"Lowest: %1": "Minim: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Categorie",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Rezultate: %1",
+	"No results": "Niciun rezultat",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Nuanță",
+	"Opacity": "Opacitate",
+	"Color": "Culoare",
+
 	// Data loader-related.
-	"No parser available for file: %1": "",
-	"Error parsing file: %1": "",
-	"Unable to load file: %1": "",
-	"Invalid date": "",
+	"No parser available for file: %1": "Niciun parser disponibil pentru fișierul: %1",
+	"Error parsing file: %1": "Eroare la analiza fișierului: %1",
+	"Unable to load file: %1": "Fișierul nu poate fi încărcat: %1",
+	"Invalid date": "Dată nevalidă",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Închide",
+	"Minimize": "Minimizează",
+	"Confirm": "Confirmă",
 	"OK": "OK",
 	"Cancel": "Anulează",
 	"Delete": "Șterge",

@@ -6,8 +6,9 @@ import type { IPoint } from "../../core/util/IPoint";
 import type { IGraphics } from "../../core/render/backend/Renderer";
 import * as $type from "../../core/util/Type";
 import * as $math from "../../core/util/Math";
+import * as $array from "../../core/util/Array";
 import { Percent } from "../../core/util/Percent";
-import { altitudeProjector, isGlobe } from "./MapUtils";
+import { altitudeProjector, isGlobe, EARTH_RADIUS } from "./MapUtils";
 
 import { Graphics, IGraphicsSettings, IGraphicsPrivate, IGraphicsEvents } from "../../core/render/Graphics";
 import { geoLength, geoInterpolate, geoDistance } from "d3-geo";
@@ -47,6 +48,17 @@ export interface IMapLineSettings extends IGraphicsSettings {
 	 * @since 5.21.0
 	 */
 	altitude?: number;
+
+	/**
+	 * Fills the area between the raised line and the surface below it with the
+	 * line's `fill`, and strokes only the raised line. Lines added later cover
+	 * those added before, so lines ordered from back to front hide what is
+	 * behind them, like ridgelines. Works on flat maps, with `altitude` set.
+	 *
+	 * @default false
+	 * @since 5.24.0
+	 */
+	fillToSurface?: boolean;
 }
 
 export interface IMapLinePrivate extends IGraphicsPrivate {
@@ -108,7 +120,7 @@ export class MapLine extends Graphics {
 			}
 		}
 
-		if (this._projectionDirty || this.isDirty("geometry") || this.isDirty("precision") || this.isDirty("altitude")) {
+		if (this._projectionDirty || this.isDirty("geometry") || this.isDirty("precision") || this.isDirty("altitude") || this.isDirty("fillToSurface")) {
 			const geometry = this.get("geometry")!;
 			if (geometry) {
 				const series = this.getPrivate("series");
@@ -284,12 +296,63 @@ export class MapLine extends Graphics {
 		const arc = this.get("altitude", 0);
 		const project = altitudeProjector(projection, !showHidden);
 
+		// Filled down to the surface (flat maps only): stretches are kept as x, y and height, and drawn at the end
+		const toSurface = !globe && this.get("fillToSurface", false);
+		const runs: Array<Array<number>> = [];
+		let run: Array<number> | undefined;
+		let height = 0;
+
+		const moveTo = (point: IPoint) => {
+			if (toSurface) {
+				run = [point.x, point.y, height];
+				runs.push(run);
+			}
+			else {
+				display.moveTo(point.x, point.y);
+			}
+		};
+
+		const lineTo = (point: IPoint) => {
+			if (toSurface) {
+				if (run) {
+					run.push(point.x, point.y, height);
+				}
+			}
+			else {
+				display.lineTo(point.x, point.y);
+			}
+		};
+
 		for (let s = 0; s < segments.length; s++) {
 			const segment = segments[s];
 			let prev: IPoint | undefined;
 			for (let p = 1; p < segment.length; p++) {
 				const a = segment[p - 1];
 				const b = segment[p];
+
+				// On a flat map a short leg with no arc is drawn straight, without sampling its great circle
+				if (!globe && !arc && Math.abs(b[0] - a[0]) <= 2 && Math.abs(b[1] - a[1]) <= 2) {
+					if (p == 1) {
+						height = a[2] || 0;
+						prev = project(a[0], a[1], height);
+						if (prev) {
+							moveTo(prev);
+						}
+					}
+					height = b[2] || 0;
+					const point = project(b[0], b[1], height);
+					if (point) {
+						if (prev && Math.abs(point.x - prev.x) < wrap) {
+							lineTo(point);
+						}
+						else {
+							moveTo(point);
+						}
+					}
+					prev = point;
+					continue;
+				}
+
 				const interpolate = geoInterpolate(a as [number, number], b as [number, number]);
 				const length: number = (interpolate as any).distance;
 
@@ -297,8 +360,8 @@ export class MapLine extends Graphics {
 				// each leg is an arc of its own
 				const sample = (t: number): IPoint | undefined => {
 					const location = interpolate(t);
-					const altitude = (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t + arc * 4 * t * (1 - t);
-					const point = project(location[0], location[1], altitude);
+					height = (a[2] || 0) + ((b[2] || 0) - (a[2] || 0)) * t + arc * 4 * t * (1 - t);
+					const point = project(location[0], location[1], height);
 					return point && (showHidden || !point.hidden) ? point : undefined;
 				};
 
@@ -310,17 +373,17 @@ export class MapLine extends Graphics {
 					const point = sample(t);
 					if (point) {
 						if (prev && (globe || Math.abs(point.x - prev.x) < wrap)) {
-							display.lineTo(point.x, point.y);
+							lineTo(point);
 						}
 						else {
 							// Coming out from behind the globe: start at its edge
 							const edge = !prev && k > 0 && globe ? edgePoint(sample, t, prevT) : undefined;
 							if (edge) {
-								display.moveTo(edge.x, edge.y);
-								display.lineTo(point.x, point.y);
+								moveTo(edge);
+								lineTo(point);
 							}
 							else {
-								display.moveTo(point.x, point.y);
+								moveTo(point);
 							}
 						}
 					}
@@ -328,7 +391,7 @@ export class MapLine extends Graphics {
 						// Going behind the globe: end at its edge
 						const edge = edgePoint(sample, prevT, t);
 						if (edge) {
-							display.lineTo(edge.x, edge.y);
+							lineTo(edge);
 						}
 					}
 					prev = point;
@@ -336,6 +399,50 @@ export class MapLine extends Graphics {
 				}
 			}
 		}
+
+		if (toSurface) {
+			// The area down to the surface, filled; a flat map's surface is straight below each point
+			const lift = projection.scale() / EARTH_RADIUS;
+			$array.each(runs, (points) => {
+				const last = points.length - 3;
+				if (last > 0) {
+					display.moveTo(points[0], points[1]);
+					for (let i = 3; i <= last; i += 3) {
+						display.lineTo(points[i], points[i + 1]);
+					}
+					for (let i = last; i >= 0; i -= 3) {
+						display.lineTo(points[i], points[i + 1] + points[i + 2] * lift);
+					}
+					display.closePath();
+				}
+			});
+
+			super._applyFill();
+			this._surfaceFilled = true;
+
+			// Then the raised line alone, for the stroke; nothing to trace when no stroke shows
+			display.beginPath();
+			const stroked = !!(this.get("stroke") || this.get("strokeGradient") || this.get("strokePattern")) && this.get("strokeOpacity", 1) > 0 && this.get("strokeWidth", 1) > 0;
+			if (stroked) {
+				$array.each(runs, (points) => {
+					display.moveTo(points[0], points[1]);
+					for (let i = 3; i < points.length; i += 3) {
+						display.lineTo(points[i], points[i + 1]);
+					}
+				});
+			}
+		}
+	}
+
+	// Filled down to the surface while drawing, so the drawn line is only stroked
+	protected _surfaceFilled: boolean = false;
+
+	protected _applyFill() {
+		if (this._surfaceFilled) {
+			this._surfaceFilled = false;
+			return;
+		}
+		super._applyFill();
 	}
 
 	public _getTooltipPoint(): IPoint {

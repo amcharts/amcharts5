@@ -180,7 +180,13 @@ am5.array.each(continents, (continent, index) => {
     cursorOverStyle: "pointer", // a hand cursor shows it can be clicked
     fill: colors.getIndex(index * 3),
     visible: true,              // axis fills are hidden by default
-    innerRadius: -25            // a 25 px band along the outer edge of the circle
+    innerRadius: -25,           // a 25 px band along the outer edge of the circle
+    // for the keyboard (see Accessibility below): one Tab stop, after the countries; Enter zooms as a click does
+    focusable: true,
+    focusableGroup: "continents",
+    tabindexOrder: 5,
+    role: "button",
+    ariaLabel: continent
   });
 
   const label = axisRange.get("label") as am5xy.AxisLabelRadial;
@@ -276,6 +282,29 @@ function showYear(year: number) {
     });
   }
 }
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Radial column chart of the temperature change of 104 countries in one year, 1973 to 2016, grouped by continent; the year is shown in the middle. Tab to the countries or the continents, then move through them with the up and down arrow keys; Enter on a continent zooms in on it. The play button and the slider change the year"
+});
+// the countries' columns: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "countries",
+  ariaLabel: "{categoryX}: {valueY}"
+});
+// the continent bands: set up for the keyboard where they are made, above
+// the slider's grip: a screen reader says the year, not a percent
+slider.startGrip.setAll({
+  ariaLabel: "Year",
+  ariaValueText: currentYear.toString()
+});
+slider.events.on("rangechanged", () => {
+  slider.startGrip.set("ariaValueText", currentYear.toString());
+});
 
 
 // Make stuff animate on load

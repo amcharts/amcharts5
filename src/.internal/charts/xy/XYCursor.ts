@@ -306,6 +306,7 @@ export class XYCursor extends Container {
 			visible = false;
 		}
 		this.lineX.setPrivate("visible", visible);
+		this._setLineValue(this.lineX, x / this.width());
 	}
 
 	protected _handleYLine() {
@@ -315,6 +316,16 @@ export class XYCursor extends Container {
 			visible = false;
 		}
 		this.lineY.setPrivate("visible", visible);
+		this._setLineValue(this.lineY, 1 - y / this.height());
+	}
+
+	// A line is a slider to screen readers: where it is, in percent of the plot
+	// area. Kept as set if set in code
+	protected _setLineValue(line: Grid, position: number): void {
+		if (!line.isUserSetting("ariaValueNow") || line.isComputedSetting("ariaValueNow")) {
+			const value = $type.isNumber(position) && isFinite(position) ? Math.round(Math.max(0, Math.min(1, position)) * 100) : 0;
+			line._setC("ariaValueNow", "" + value);
+		}
 	}
 
 	protected _handleLineMove(key: string, ctrlKey?: boolean) {

@@ -25,6 +25,11 @@ export interface IFont {
 	bolditalics?: IFile;
 }
 
+// A class name from the options, safe inside a quoted attribute
+function classAttribute(value: string): string {
+	return ("" + value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
 /**
  * This is used to cache the pdfmake loading.
  *
@@ -1334,7 +1339,7 @@ export class Exporting extends Entity {
 		// Init output
 		let html = "<table>";
 		if (options.tableClass) {
-			html = "<table class=\"" + options.tableClass + "\">";
+			html = "<table class=\"" + classAttribute(options.tableClass) + "\">";
 		}
 
 		// Get data
@@ -1404,7 +1409,7 @@ export class Exporting extends Entity {
 		// Init output
 		let html = "\t<tr>";
 		if (options.rowClass) {
-			html = "\t<tr class=\"" + options.rowClass + "\">";
+			html = "\t<tr class=\"" + classAttribute(options.rowClass) + "\">";
 		}
 
 		// Data fields
@@ -1443,7 +1448,7 @@ export class Exporting extends Entity {
 			// Add cell
 			const cellClass = useTag == "th" ? options.headerClass : options.cellClass;
 			if (cellClass) {
-				html += "\n\t\t<" + useTag + " class=\"" + cellClass + "\">" + item + "</" + useTag + ">";
+				html += "\n\t\t<" + useTag + " class=\"" + classAttribute(cellClass) + "\">" + item + "</" + useTag + ">";
 			}
 			else {
 				html += "\n\t\t<" + useTag + ">" + item + "</" + useTag + ">";
@@ -1580,7 +1585,22 @@ export class Exporting extends Entity {
 
 	private _normalizeExcelSheetName(name: string): string {
 		name = name.replace(/([:\\\/?*\[\]]+)/g, " ");
-		return name.length > 30 ? name.substr(0, 30) + "..." : name;
+
+		// Excel rejects apostrophes at either end, a blank name and "History"
+		name = name.replace(/^'+|'+$/g, "");
+		if (name.trim() == "") {
+			name = this._t("Data");
+		}
+		else if (name.toLowerCase() == "history") {
+			name += " data";
+		}
+
+		if (name.length > 31) {
+			// Excel allows 31 characters; an emoji is two, and is not cut in half
+			const code = name.charCodeAt(27);
+			name = name.substr(0, code >= 0xD800 && code <= 0xDBFF ? 27 : 28) + "...";
+		}
+		return name;
 	}
 
 	/**

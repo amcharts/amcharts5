@@ -6,14 +6,35 @@
     "valueField": "value",
     "orientation": "horizontal",
     "paddingBottom": 70,
+    "focusable": true,
+    "ariaLabel": "Arc diagram of 26 links between the six Friends characters and the people around them, each circle sized by the total of its links. Tab to the people or the links, then move through them with the up and down arrow keys; Enter on a person hides or shows their links",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
   "properties": {
     "data": "#data-0",
+    "links": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "links",
+            "tabindexOrder": 5,
+            "ariaLabel": "{sourceId} to {targetId}: {value}"
+          }
+        }
+      }
+    },
     "nodes": {
       "properties": {
+        "nodes": {
+          "properties": {
+            "template": {
+              "settings": { "focusable": true, "focusableGroup": "nodes", "ariaLabel": "{name}: {sum} in all" }
+            }
+          }
+        },
         "labels": {
           "properties": {
             "template": {

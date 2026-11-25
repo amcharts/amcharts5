@@ -3,6 +3,8 @@
   "settings": {
     "panX": "rotateX",
     "panY": "rotateY",
+    "focusable": true,
+    "ariaLabel": "Globe with twelve city pins that lie flat on its surface. Tab to the cities, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -48,7 +50,7 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.06,
                   "strokeOpacity": 0
                 }
@@ -79,9 +81,12 @@
                   "settings": {
                     "svgPath": "M0,0 C-5,-7 -9,-11 -9,-17 A9,9 0 1 1 9,-17 C9,-11 5,-7 0,0 Z M0,-20.5 A3.5,3.5 0 1 0 0,-13.5 A3.5,3.5 0 1 0 0,-20.5 Z",
                     "fill": { "type": "Color", "value": "#ff621f" },
-                    "stroke": { "type": "Color", "value": "#ffffff" },
+                    "stroke": "@root.interfaceColors.get('background')",
                     "strokeWidth": 1,
-                    "tooltipText": "{title}"
+                    "tooltipText": "{title}",
+                    "focusable": true,
+                    "focusableGroup": "cities",
+                    "ariaLabel": "{title}"
                   }
                 }
               }

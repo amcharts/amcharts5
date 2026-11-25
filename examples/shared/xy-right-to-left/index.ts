@@ -122,7 +122,11 @@ branches.forEach((branch) => {
     return am5.Bullet.new(root, {
       sprite: am5.Circle.new(root, {
         radius: 4,
-        fill: series.get("fill")
+        fill: series.get("fill"),
+        // keyboard: 12 lines, so one Tab stop for all the points; the up and down arrow keys step through them
+        focusable: true,
+        focusableGroup: "points",
+        ariaLabel: "{name}, {categoryX}: {valueY} אלפי ₪" // thousands of shekels
       })
     });
   });
@@ -147,6 +151,22 @@ const legend = chart.children.push(am5.Legend.new(root, {
 }));
 
 legend.data.setAll(chart.series.values);
+
+
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  // Line chart of monthly sales in 12 branches, January to June 2026. Tab to the points, then move between them
+  // with the up and down arrow keys
+  ariaLabel: "תרשים קווים של מכירות חודשיות ב-12 סניפים, ינואר עד יוני 2026. הקישו Tab כדי להגיע לנקודות, ועברו ביניהן בעזרת מקשי החצים למעלה ולמטה"
+});
+// the points: set up in their bullet function above
+// the legend: one Tab stop, after the points
+legend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
 
 
 // Make stuff animate on load

@@ -72,12 +72,12 @@ export default {
 	//
 	// All three need to to be translated even if they are all the same. Some
 	// users might use one, some the other.
-	"A": "",
-	"P": "",
-	"AM": "",
-	"PM": "",
-	"A.M.": "",
-	"P.M.": "",
+	"A": "a",
+	"P": "p",
+	"AM": "AM",
+	"PM": "PM",
+	"A.M.": "a.m.",
+	"P.M.": "p.m.",
 
 	// Date-related stuff.
 	//
@@ -176,15 +176,20 @@ export default {
 	"Chord diagram": "Diagram Chord",
 	"Flow diagram": "Diagrama Flow",
 	"TreeMap chart": "Gráfico de Mapa de Árvore",
+	"Force directed tree": "Árvore direcionada por forças",
+	"Sliced chart": "Gráfico fatiado",
 
 	// Series types.
 	// Used to name series by type for screen readers if they do not have their
 	// name set.
 	"Series": "Séries",
 	"Candlestick Series": "Séries do Candlestick",
+	"OHLC Series": "Séries OHLC",
 	"Column Series": "Séries de Colunas",
 	"Line Series": "Séries de Linhas",
 	"Pie Slice Series": "Séries de Fatias de Pizza",
+	"Funnel Series": "Séries de Funil",
+	"Pyramid Series": "Séries de Pirâmide",
 	"X/Y Series": "Séries de XY",
 
 	// Map-related stuff.
@@ -208,6 +213,7 @@ export default {
 	"Image": "Imagem",
 	"Data": "Dados",
 	"Print": "Imprimir",
+	"Press ENTER or use arrow keys to navigate": "Pressione ENTER ou use as setas para navegar",
 	"Press ENTER to open": "Clique, toque ou pressione ENTER para abrir",
 	"Press ENTER to print.": "Clique, toque ou pressione ENTER para imprimir",
 	"Press ENTER to export as %1.": "Clique, toque ou pressione ENTER para exportar como %1.",
@@ -247,6 +253,25 @@ export default {
 	"From %1": "De %1",
 	"To %1": "Até %1",
 
+	// Data summary for screen readers: how many values a series has, and its
+	// highest and lowest one (e.g. "Highest: Mar 3 (210)").
+	"Values: %1": "Valores: %1",
+	"Highest: %1": "Máximo: %1",
+	"Lowest: %1": "Mínimo: %1",
+
+	// Data table for screen readers: heading of the column of categories or
+	// dates the values are for.
+	"Category": "Categoria",
+
+	// Stock toolbar search, for screen readers: how many items a search found
+	"Results: %1": "Resultados: %1",
+	"No results": "Nenhum resultado",
+
+	// Color picker, for screen readers: its sliders and color field
+	"Hue": "Matiz",
+	"Opacity": "Opacidade",
+	"Color": "Cor",
+
 	// Data loader-related.
 	"No parser available for file: %1": "Não há um interpretador para este arquivo: %1",
 	"Error parsing file: %1": "Erro analizando o arquivo: %1",
@@ -254,9 +279,9 @@ export default {
 	"Invalid date": "Data inválida",
 
 	// Common actions
-	"Close": "",
-	"Minimize": "",
-	"Confirm": "",
+	"Close": "Fechar",
+	"Minimize": "Minimizar",
+	"Confirm": "Confirmar",
 	"OK": "OK",
 	"Cancel": "Cancelar",
 	"Delete": "Excluir",

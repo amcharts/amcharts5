@@ -115,6 +115,20 @@ series.data.setAll([
 ]);
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+container.setAll({
+  focusable: true, // Tab reaches the cloud, and a screen reader names it
+  ariaLabel: "Word cloud of 38 programming languages from the Stack Overflow survey of 2021, each sized and colored by the share of developers who use it. Tab to the words, then move between them with the up and down arrow keys"
+});
+// the words: one Tab stop, the up and down arrow keys step through them
+series.labels.template.setAll({
+  focusable: true,
+  focusableGroup: "words",
+  ariaLabel: "{category}: {value}%"
+});
+
+
 // Play initial series animation
 // https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

@@ -12,6 +12,8 @@
         }
       }
     },
+    "focusable": true,
+    "ariaLabel": "World map that opens zoomed in on Europe. Tab to the countries, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -35,7 +37,13 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": { "tooltipText": "{name}" }
+                "settings": {
+                  "tooltipText": "{name}",
+                  "focusable": true,
+                  "focusableGroup": "countries",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}"
+                }
               }
             }
           }

@@ -173,6 +173,21 @@ series.columns.template.events.on("pointerover", (event) => {
 });
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Radial heat map of a value for each hour of the week: the 24 hours run around the ring, the seven days from the outside in. Tab to the cells, then move through them with the up and down arrow keys, hour by hour from Sunday to Saturday"
+});
+// the cells: one Tab stop, the up and down arrow keys step through them
+series.columns.template.setAll({
+  focusable: true,
+  focusableGroup: "cells",
+  hoverOnFocus: true, // a focused cell shows its tooltip
+  ariaLabel: "{categoryY}, {categoryX}: {value}"
+});
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 series.appear(1000);

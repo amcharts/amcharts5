@@ -1,3 +1,4 @@
+import type { ITimeInterval } from "../../../core/util/Time";
 import type { AxisRenderer } from "./AxisRenderer";
 import type { AxisLabel } from "./AxisLabel";
 import type { AxisTick } from "./AxisTick";
@@ -715,6 +716,29 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	/**
 	 * @ignore
 	 */
+	public markDirtyValues(dataItem?: DataItem<this["_dataItemSettings"]>) {
+		// a range that does not widen the scale or cut a series is placed again on its own
+		if (dataItem && dataItem.get("isRange") && !dataItem.get("affectsMinMax" as any) && this._seriesAxisRanges.indexOf(dataItem) == -1) {
+			this._rangesDirty = true;
+			this.markDirty();
+			return;
+		}
+
+		super.markDirtyValues(dataItem);
+	}
+
+	public _dataItemKeyChanged(dataItem: DataItem<this["_dataItemSettings"]>, key: string) {
+		super._dataItemKeyChanged(dataItem, key);
+
+		// a range that stopped widening the scale: the scale is worked out again
+		if (key == "affectsMinMax") {
+			super.markDirtyValues(dataItem);
+		}
+	}
+
+	/**
+	 * @ignore
+	 */
 	public markDirtyExtremes() {
 	}
 
@@ -1174,6 +1198,17 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	/**
+	 * A data value as text for a screen reader summary of the data, formatted
+	 * as the axis tooltip would show it. A date axis formats dates for
+	 * `interval` (grouped data), or else its `baseInterval`.
+	 *
+	 * @ignore
+	 */
+	public _summaryText(value: any, _interval?: ITimeInterval): string {
+		return value == null ? "" : "" + value;
+	}
+
+	/**
 	 * @ignore
 	 */
 	public roundAxisPosition(position: number, _location: number): number {
@@ -1181,6 +1216,18 @@ export abstract class Axis<R extends AxisRenderer> extends Component {
 	}
 
 	public _handleSeriesRemoved() {
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _seriesDataChanged(_series: XYSeries, _rewritten?: boolean) {
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _seriesDateMoved(_series: XYSeries) {
 	}
 
 	/**

@@ -6,6 +6,8 @@
     "wheelX": "panX",
     "wheelY": "zoomX",
     "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "100% stacked column chart of six regions' shares over 2021 to 2023. Tab to a region's columns, then move between its years with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -23,7 +25,14 @@
         "x": { "type": "Percent", "value": 50 }
       },
       "properties": {
-        "data": ["#series-0", "#series-1", "#series-2", "#series-3", "#series-4", "#series-5"]
+        "data": ["#series-0", "#series-1", "#series-2", "#series-3", "#series-4", "#series-5"],
+        "itemContainers": {
+          "properties": {
+            "template": {
+              "settings": { "focusableGroup": "legend", "tabindexOrder": 10 }
+            }
+          }
+        }
       }
     }
   ],
@@ -98,6 +107,17 @@
         },
         "properties": {
           "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "Europe",
+                  "ariaLabel": "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+                }
+              }
+            }
+          },
           "bullets": [
             {
               "type": "Bullet",
@@ -106,7 +126,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueYTotalPercent.formatNumber('#.#p')}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -134,6 +154,17 @@
         },
         "properties": {
           "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "North America",
+                  "ariaLabel": "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+                }
+              }
+            }
+          },
           "bullets": [
             {
               "type": "Bullet",
@@ -142,7 +173,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueYTotalPercent.formatNumber('#.#p')}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -170,6 +201,17 @@
         },
         "properties": {
           "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "Asia",
+                  "ariaLabel": "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+                }
+              }
+            }
+          },
           "bullets": [
             {
               "type": "Bullet",
@@ -178,7 +220,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueYTotalPercent.formatNumber('#.#p')}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -206,6 +248,17 @@
         },
         "properties": {
           "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "Latin America",
+                  "ariaLabel": "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+                }
+              }
+            }
+          },
           "bullets": [
             {
               "type": "Bullet",
@@ -214,7 +267,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueYTotalPercent.formatNumber('#.#p')}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -242,6 +295,17 @@
         },
         "properties": {
           "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "Middle East",
+                  "ariaLabel": "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+                }
+              }
+            }
+          },
           "bullets": [
             {
               "type": "Bullet",
@@ -250,7 +314,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueYTotalPercent.formatNumber('#.#p')}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true
@@ -278,6 +342,17 @@
         },
         "properties": {
           "data": "#data-0",
+          "columns": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "Africa",
+                  "ariaLabel": "{name}, {categoryX}: {valueYTotalPercent.formatNumber('#.#p')}"
+                }
+              }
+            }
+          },
           "bullets": [
             {
               "type": "Bullet",
@@ -286,7 +361,7 @@
                   "type": "Label",
                   "settings": {
                     "text": "{valueYTotalPercent.formatNumber('#.#p')}",
-                    "fill": { "type": "Color", "value": "#ffffff" },
+                    "fill": "@root.interfaceColors.get('alternativeText')",
                     "centerY": { "type": "Percent", "value": 50 },
                     "centerX": { "type": "Percent", "value": 50 },
                     "populateText": true

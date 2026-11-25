@@ -7,6 +7,8 @@
     "paddingTop": 20,
     "paddingLeft": 20,
     "paddingRight": 20,
+    "focusable": true,
+    "ariaLabel": "Globe of the world's countries. Tab to the countries, move between them with the up and down arrow keys, and press Enter to turn the globe to one and zoom in, or back out",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -36,7 +38,7 @@
             "properties": {
               "template": {
                 "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
+                  "fill": "@root.interfaceColors.get('alternativeBackground')",
                   "fillOpacity": 0.1,
                   "strokeOpacity": 0
                 }
@@ -54,19 +56,22 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": { "tooltipText": "{name}", "interactive": true },
+                "settings": {
+                  "tooltipText": "{name}",
+                  "interactive": true,
+                  "focusable": true,
+                  "focusableGroup": "countries",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{name}"
+                },
                 "states": [
                   {
                     "key": "hover",
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#6771dc" }
-                    }
+                    "settings": { "fill": "@root.interfaceColors.get('primaryButtonHover')" }
                   },
                   {
                     "key": "active",
-                    "settings": {
-                      "fill": { "type": "Color", "value": "#68dc76" }
-                    }
+                    "settings": { "fill": "@root.interfaceColors.get('primaryButtonActive')" }
                   }
                 ]
               }

@@ -4,6 +4,7 @@ import { StockIcons } from "./StockIcons";
 import type { IPointerEvent } from "../../../core/render/backend/Renderer";
 import type { StockToolbar } from "./StockToolbar";
 import type { StockChart } from "../StockChart";
+import type { Dropdown } from "./Dropdown";
 
 //import * as $array from "../../core/util/Array";
 import * as $utils from "../../../core/util/Utils";
@@ -74,6 +75,13 @@ export interface IStockControlSettings extends IEntitySettings {
 export interface IStockControlPrivate extends IEntityPrivate {
 	toolbar: StockToolbar;
 	button?: HTMLDivElement;
+	/**
+	 * The focusable part of the button: holds its icon and label, and has
+	 * the button's role and name.
+	 *
+	 * @since 5.24.0
+	 */
+	trigger?: HTMLDivElement;
 	icon?: HTMLElement;
 	label?: HTMLDivElement;
 }
@@ -100,6 +108,9 @@ export class StockControl extends Entity {
 
 	// private _itemDisposers: Array<IDisposer> = [];
 
+	public _dropdown?: Dropdown;
+	protected _keysAdded: boolean = false;
+
 	protected _afterNew() {
 		super._afterNew();
 
@@ -122,23 +133,27 @@ export class StockControl extends Entity {
 		button.setAttribute("title", $utils.htmlToText(this.get("description", this.get("name", ""))));
 		this.setPrivate("button", button);
 
+		// The focusable part, so a dropdown placed in the button is not inside it
+		const holder = this._makeTrigger(button) || button;
+
 		// Create icon
 		const icon = document.createElement("div");
+		icon.setAttribute("aria-hidden", "true");
 		icon.appendChild(this._getIcon());
 		if (this.get("icon") == "none") {
 			icon.style.display = "none";
 		}
-		button.appendChild(icon);
+		holder.appendChild(icon);
 		this.setPrivate("icon", icon);
 
 		// Create label
 		const name = this.get("name", "");
 		const label = document.createElement("div");
-		label.innerHTML = name;
+		label.innerHTML = this._root._sanitizeHTML(name);
 		if (name == "") {
 			label.style.display = "none";
 		}
-		button.appendChild(label);
+		holder.appendChild(label);
 		this.setPrivate("label", label);
 
 		// Add click event
@@ -158,10 +173,28 @@ export class StockControl extends Entity {
 		}));
 	}
 
+	protected _makeTrigger(button: HTMLDivElement): HTMLDivElement | undefined {
+		const trigger = document.createElement("div");
+		button.appendChild(trigger);
+		this.setPrivate("trigger", trigger);
+		return trigger;
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _getFocusElement(): HTMLElement | undefined {
+		return this.getPrivate("trigger") || this.getPrivate("button");
+	}
+
 	protected _applyClassNames(): void {
 		// a class per control, e.g. am5stock-control-PeriodSelector, for CSS that treats controls differently
 		this.getPrivate("button")!.className = "am5stock am5stock-control am5stock-control-button am5stock-control-" + this.className;
 		this.getPrivate("label")!.className = "am5stock-control-label";
+		const trigger = this.getPrivate("trigger");
+		if (trigger) {
+			trigger.className = "am5stock-control-trigger";
+		}
 		this.getPrivate("icon")!.className = "am5stock-control-icon";
 	}
 
@@ -200,6 +233,7 @@ export class StockControl extends Entity {
 			else {
 				$utils.removeClass(button, "am5stock-control-button-active");
 			}
+			this._updateAria();
 		}
 
 		if (this.isDirty("align")) {
@@ -225,7 +259,7 @@ export class StockControl extends Entity {
 
 	protected _setLabel(name: string): void {
 		const label = this.getPrivate("label")!;
-		label.innerHTML = name;
+		label.innerHTML = this._root._sanitizeHTML(name);
 		if (name == "") {
 			label.style.display = "none";
 		}
@@ -235,6 +269,7 @@ export class StockControl extends Entity {
 
 		const button = this.getPrivate("button")!;
 		button.setAttribute("title", $utils.htmlToText(this.get("description", this.get("name", ""))));
+		this._updateAria();
 	}
 
 	/**
@@ -258,32 +293,124 @@ export class StockControl extends Entity {
 	}
 
 	protected _maybeMakeAccessible() {
+		const target = this._getFocusElement();
+		if (!target) {
+			return;
+		}
 		if (this.isAccessible()) {
-			const button = this.getPrivate("button")!;
-			button.setAttribute("tabindex", this._root.tabindex.toString());
-			button.setAttribute("role", "button");
+			target.setAttribute("tabindex", this._root.tabindex.toString());
+			target.setAttribute("role", "button");
 
-			if ($utils.supports("keyboardevents")) {
-				button.setAttribute("aria-label", button.getAttribute("title") + "; " + this._t("Press ENTER to toggle"));
-				this._disposers.push($utils.addEventListener(document, "keydown", (ev: KeyboardEvent) => {
-					if (document.activeElement == button && (ev.keyCode == 13 || ev.keyCode == 32)) {
-						// ENTER or SPACE, as on a native button
+			if (!this._keysAdded && $utils.supports("keyboardevents")) {
+				this._keysAdded = true;
+				this._disposers.push($utils.addEventListener(target, "keydown", (ev: KeyboardEvent) => {
+					if (ev.target !== target || !this.isAccessible()) {
+						return;
+					}
+					const key = $utils.getEventKey(ev);
+					const dropdown = this._dropdown;
+					if (key == "Enter" || key == " ") {
+						// as on a native button
 						ev.preventDefault();
 						if (this.get("togglable")) {
 							this._handleClick();
 						}
 						else {
-							(document.activeElement as HTMLElement).click();
+							target.click();
+						}
+					}
+					else if ((key == "ArrowDown" || key == "ArrowUp") && dropdown && dropdown._ariaRole() == "menu") {
+						// arrows open a menu, or move into an open one
+						ev.preventDefault();
+						if (dropdown.isOpen()) {
+							dropdown._focusFirst();
+						}
+						else {
+							this.set("active", true);
 						}
 					}
 				}));
 			}
 		}
+		else {
+			target.removeAttribute("tabindex");
+			target.removeAttribute("role");
+		}
+		this._updateAria();
+		if (this._dropdown) {
+			this._dropdown._maybeMakeAccessible();
+		}
 	}
 
+	/**
+	 * @ignore
+	 */
+	public _setDropdown(dropdown: Dropdown): void {
+		this._dropdown = dropdown;
+		dropdown.events.on("opened", () => this._updateAria());
+		dropdown.events.on("closed", () => this._updateAria());
+		this._updateAria();
+	}
+
+	/**
+	 * @ignore
+	 */
+	public _focus(): void {
+		const target = this._getFocusElement();
+		if (target) {
+			$utils.focus(target);
+		}
+	}
+
+	// The button's name, containing its visible text, and its state
+	protected _updateAria(): void {
+		const target = this._getFocusElement();
+		const button = this.getPrivate("button");
+		const label = this.getPrivate("label");
+		if (!target || !button || !label) {
+			return;
+		}
+
+		const title = button.getAttribute("title") || "";
+		const text = label.style.display == "none" ? "" : ($utils.htmlToText(label.innerHTML) || "").trim();
+		let name = title;
+		if (text && title.toLowerCase().indexOf(text.toLowerCase()) == -1) {
+			name = text.toLowerCase().indexOf(title.toLowerCase()) != -1 ? text : title + ": " + text;
+		}
+		if (name) {
+			target.setAttribute("aria-label", name);
+		}
+		else {
+			target.removeAttribute("aria-label");
+		}
+
+		const dropdown = this._dropdown;
+		if (dropdown) {
+			const popup = dropdown._ariaElement();
+			target.setAttribute("aria-haspopup", dropdown._ariaRole());
+			target.setAttribute("aria-expanded", dropdown.isOpen() ? "true" : "false");
+			if (popup && popup.id) {
+				target.setAttribute("aria-controls", popup.id);
+			}
+			target.removeAttribute("aria-pressed");
+		}
+		else if (this.get("togglable") !== false) {
+			target.setAttribute("aria-pressed", this.get("active") ? "true" : "false");
+		}
+		else {
+			target.removeAttribute("aria-pressed");
+		}
+	}
+
+	/**
+	 * Returns `true` if the control can be used with a keyboard: it is not in
+	 * a toolbar, or its toolbar is `focusable`.
+	 *
+	 * @return Accessible?
+	 */
 	public isAccessible(): boolean {
 		const toolbar = this.getPrivate("toolbar");
-		return toolbar && toolbar.get("focusable", true) ? true : false;
+		return !toolbar || toolbar.get("focusable", true) ? true : false;
 	}
 
 }

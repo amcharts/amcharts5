@@ -1,3 +1,4 @@
+import { _brandingLicensed } from "../../core/Root";
 import type { MapSeries } from "./MapSeries";
 import type { MapPointSeries } from "./MapPointSeries";
 import type { GeoProjection, GeoPath, GeoRawProjection } from "d3-geo";
@@ -1410,7 +1411,7 @@ export class MapChart extends SerialChart {
 			this._root._showBranding();
 		}
 		else {
-			this._root._licenseApplied();
+			_brandingLicensed(this._root);
 		}
 
 		this._setUpTouch();

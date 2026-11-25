@@ -6,6 +6,8 @@
       "type": "Scrollbar",
       "settings": { "orientation": "horizontal" }
     },
+    "focusable": true,
+    "ariaLabel": "Timeline of one day in 17 activities, from waking up at 6:00 to bed at 2:00, along a path that winds across the chart, with the breaks in a second row. Zoom with the scrollbar or the mouse wheel. Tab to the activities, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -24,10 +26,7 @@
           "end": 1547095200000,
           "text": "Wake up!",
           "icon": { "src": "icons/alarm.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#7ddc67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(15)", "__parse": true },
           "__parse": true
         },
         {
@@ -36,10 +35,7 @@
           "end": 1547097600000,
           "text": "Drink water",
           "icon": { "src": "icons/water.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#a0dc67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(14)", "__parse": true },
           "__parse": true
         },
         {
@@ -48,10 +44,7 @@
           "end": 1547100000000,
           "text": "Exercise",
           "icon": { "src": "icons/exercise.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#c3dc67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(13)", "__parse": true },
           "__parse": true
         },
         {
@@ -60,10 +53,7 @@
           "end": 1547102400000,
           "text": "Have breakfast",
           "icon": { "src": "icons/breakfast.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dcd267" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(12)", "__parse": true },
           "__parse": true
         },
         {
@@ -72,10 +62,7 @@
           "end": 1547104800000,
           "text": "Drive to work",
           "icon": { "src": "icons/car.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dcaf67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(11)", "__parse": true },
           "__parse": true
         },
         {
@@ -84,10 +71,7 @@
           "end": 1547134200000,
           "text": "Work",
           "icon": { "src": "icons/work.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc8c67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(10)", "__parse": true },
           "__parse": true
         },
         {
@@ -96,10 +80,7 @@
           "end": 1547136600000,
           "text": "Drive home",
           "icon": { "src": "icons/car.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc6788" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(8)", "__parse": true },
           "__parse": true
         },
         {
@@ -108,10 +89,7 @@
           "end": 1547146800000,
           "text": "Home!",
           "icon": { "src": "icons/home.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc67ab" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(7)", "__parse": true },
           "__parse": true
         },
         {
@@ -120,10 +98,7 @@
           "end": 1547150400000,
           "text": "Have a beer",
           "icon": { "src": "icons/beer.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc67ce" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(6)", "__parse": true },
           "__parse": true
         },
         {
@@ -132,10 +107,7 @@
           "end": 1547154000000,
           "text": "Dance!",
           "icon": { "src": "icons/dance.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#c767dc" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(5)", "__parse": true },
           "__parse": true
         },
         {
@@ -144,10 +116,7 @@
           "end": 1547157600000,
           "text": "Martini!",
           "icon": { "src": "icons/drink.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#a367dc" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(4)", "__parse": true },
           "__parse": true
         },
         {
@@ -156,10 +125,7 @@
           "end": 1547161200000,
           "text": "Damn...",
           "icon": { "src": "icons/drunk.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#6771dc" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(2)", "__parse": true },
           "__parse": true
         },
         {
@@ -168,10 +134,7 @@
           "end": 1547164800000,
           "text": "Bye bye",
           "icon": { "src": "icons/bed.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#6794dc" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(1)", "__parse": true },
           "__parse": true
         },
         {
@@ -180,10 +143,7 @@
           "end": 1547109900000,
           "text": "Coffee",
           "icon": { "src": "icons/coffee.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc8c67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(10)", "__parse": true },
           "__parse": true
         },
         {
@@ -192,10 +152,7 @@
           "end": 1547118000000,
           "text": "Lunch",
           "icon": { "src": "icons/dinner.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc8c67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(10)", "__parse": true },
           "__parse": true
         },
         {
@@ -204,10 +161,7 @@
           "end": 1547126100000,
           "text": "Coffee",
           "icon": { "src": "icons/coffee.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc8c67" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(10)", "__parse": true },
           "__parse": true
         },
         {
@@ -216,10 +170,7 @@
           "end": 1547146800000,
           "text": "Read a bit",
           "icon": { "src": "icons/book.svg" },
-          "settings": {
-            "fill": { "type": "Color", "value": "#dc67ab" },
-            "__parse": true
-          },
+          "settings": { "fill": "@colors.getIndex(7)", "__parse": true },
           "__parse": true
         }
       ]
@@ -495,7 +446,11 @@
                         "strokeOpacity": 0,
                         "tooltipText": "{text}",
                         "tooltipY": 0,
-                        "templateField": "settings"
+                        "templateField": "settings",
+                        "focusable": true,
+                        "focusableGroup": "activities",
+                        "hoverOnFocus": true,
+                        "ariaLabel": "{text}, {openValueX.formatDate('HH:mm')} to {valueX.formatDate('HH:mm')}"
                       }
                     },
                     {

@@ -57,6 +57,20 @@ series.labels.template.setAll({
 });
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+series.setAll({
+  focusable: true, // Tab reaches the cloud, and a screen reader names it
+  ariaLabel: "Word cloud of the king's speech to Hamlet, each word sized by how often it is used. Tab to the words, then move between them with the up and down arrow keys"
+});
+// the words: one Tab stop, the up and down arrow keys step through them
+series.labels.template.setAll({
+  focusable: true,
+  focusableGroup: "words",
+  ariaLabel: "{category}: {value} times"
+});
+
+
 // Play initial series animation
 // https://docs.amcharts.com/v5/concepts/animations/#animation-of-series
 series.appear(1000, 100);

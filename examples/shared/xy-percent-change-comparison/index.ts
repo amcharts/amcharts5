@@ -152,6 +152,33 @@ chart.set("scrollbarX", am5.Scrollbar.new(root, {
 }));
 
 
+// Accessibility: keyboard and screen reader support
+// https://docs.amcharts.com/v5/concepts/accessibility/
+chart.setAll({
+  focusable: true, // Tab reaches the chart, and a screen reader names it
+  ariaLabel: "Line chart comparing the daily prices of XTD and BTD as percent change, with their volume below, over 150 trading days from September 2023 to April 2024. Tab to the days, then move between them with the up and down arrow keys"
+});
+// invisible points on the XTD line, each reading the whole day: one Tab stop, the up and down arrow keys step through them
+valueSeries1.bullets.push(() => {
+  return am5.Bullet.new(root, {
+    sprite: am5.Circle.new(root, {
+      radius: 5,
+      fillOpacity: 0, // not painted: the line looks as before
+      strokeOpacity: 0,
+      focusable: true,
+      focusableGroup: "days",
+      ariaLabel: "{valueX.formatDate('MMMM d, yyyy')}: XTD {price1}, BTD {price2}, volume {quantity}"
+    })
+  });
+});
+// the legends: one Tab stop each, after the days
+valueLegend.itemContainers.template.setAll({
+  focusableGroup: "legend",
+  tabindexOrder: 10 // focus runs from low to high (0 if not set)
+});
+volumeLegend.itemContainers.template.set("tabindexOrder", 10);
+
+
 // Make stuff animate on load
 // https://docs.amcharts.com/v5/concepts/animations/#forcing-appearance-animation
 valueSeries1.appear(1000);

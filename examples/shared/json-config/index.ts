@@ -37,14 +37,31 @@ const config = {
         autoAppear: true, // the series animates in on load, as series.appear(1000) would
         appearDuration: 1000
       },
-      properties: {   // set on the series once it exists
-        data: "#data" // the rows from the first ref, as series.data.setAll() would
+      properties: {    // set on the series once it exists
+        data: "#data", // the rows from the first ref, as series.data.setAll() would
+        // the slices, for the keyboard: one Tab stop, the up and down arrow keys step through them
+        slices: {
+          properties: {
+            template: {
+              settings: {
+                focusable: true,
+                focusableGroup: "slices",
+                hoverOnFocus: true, // a focused slice shows its tooltip
+                ariaLabel: "{category}: {value}, {valuePercentTotal.formatNumber('0.0')}%"
+              }
+            }
+          }
+        }
       }
     }
   }],
   type: "PieChart", // the top level is the chart itself
   settings: {
     layout: "vertical", // root.verticalLayout: the pie above the legend
+    // Accessibility: Tab reaches the chart, and a screen reader names it
+    // https://docs.amcharts.com/v5/concepts/accessibility/
+    focusable: true,
+    ariaLabel: "Pie chart of sales in France, Spain and the United Kingdom. Tab to the slices, then move between them with the up and down arrow keys",
     // Animate on load: what appear() does in code
     autoAppear: true,
     appearDuration: 1000, // for one second...
@@ -61,7 +78,18 @@ const config = {
       layout: "horizontal"                     // all items in one row, not the default wrapping grid
     },
     properties: {
-      data: "#series.dataItems" // one legend item per slice, as legend.data.setAll() would
+      data: "#series.dataItems", // one legend item per slice, as legend.data.setAll() would
+      // the legend, for the keyboard: one Tab stop, after the slices
+      itemContainers: {
+        properties: {
+          template: {
+            settings: {
+              focusableGroup: "legend",
+              tabindexOrder: 10 // focus runs from low to high (0 if not set)
+            }
+          }
+        }
+      }
     }
   }]
 };

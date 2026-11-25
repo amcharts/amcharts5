@@ -7,12 +7,26 @@
     "categoryField": "name",
     "childDataField": "children",
     "selectedDataItem": "@self.dataItems.0",
+    "focusable": true,
+    "ariaLabel": "Tree chart of a company, Acme, and its departments, Product, Sales and Support, down to their teams. Tab to the nodes, move between them with the up and down arrow keys, and press Enter to fold or open a branch",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
   "properties": {
     "data": "#data-0",
+    "nodes": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "nodes",
+            "hoverOnFocus": true,
+            "ariaLabel": "{category}: {sum}"
+          }
+        }
+      }
+    },
     "circles": {
       "properties": {
         "template": {

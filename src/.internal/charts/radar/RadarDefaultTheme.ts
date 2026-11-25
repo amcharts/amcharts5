@@ -34,7 +34,8 @@ export class RadarDefaultTheme extends Theme {
 
 		r("Slice", ["radar", "column", "series"]).setAll({
 			width: percent(80),
-			height: percent(80)
+			height: percent(80),
+			role: "img"
 		});
 
 		r("RadarLineSeries").setAll({

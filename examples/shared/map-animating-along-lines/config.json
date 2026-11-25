@@ -3,6 +3,8 @@
   "settings": {
     "panX": "translateX",
     "panY": "translateY",
+    "focusable": true,
+    "ariaLabel": "World map of a plane flying back and forth along a route between Los Angeles and Paris. Tab to the cities, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100,
@@ -46,10 +48,7 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
-                  "fillOpacity": 0.15
-                }
+                "settings": { "fill": "@root.interfaceColors.get('alternativeBackground')", "fillOpacity": 0.15 }
               }
             }
           }
@@ -72,8 +71,12 @@
                     "tooltipText": "{title}",
                     "tooltipY": 0,
                     "fill": { "type": "Color", "value": "#ffba00" },
-                    "stroke": { "type": "Color", "value": "#ffffff" },
-                    "strokeWidth": 2
+                    "stroke": "@root.interfaceColors.get('background')",
+                    "strokeWidth": 2,
+                    "focusable": true,
+                    "focusableGroup": "cities",
+                    "hoverOnFocus": true,
+                    "ariaLabel": "{title}"
                   }
                 }
               }
@@ -92,7 +95,7 @@
             "properties": {
               "template": {
                 "settings": {
-                  "stroke": { "type": "Color", "value": "#000000" },
+                  "stroke": "@root.interfaceColors.get('alternativeBackground')",
                   "strokeOpacity": 0.4,
                   "strokeWidth": 2
                 }
@@ -118,7 +121,7 @@
                     "scale": 0.06,
                     "centerX": { "type": "Percent", "value": 50 },
                     "centerY": { "type": "Percent", "value": 50 },
-                    "fill": { "type": "Color", "value": "#000000" },
+                    "fill": "@root.interfaceColors.get('text')",
                     "animations": [
                       {
                         "key": "positionOnLine",

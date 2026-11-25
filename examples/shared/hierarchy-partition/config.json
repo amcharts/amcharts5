@@ -6,11 +6,27 @@
     "categoryField": "name",
     "childDataField": "children",
     "selectedDataItem": "@self.dataItems.0",
+    "focusable": true,
+    "ariaLabel": "Partition chart of a budget of 2,650: housing, food and transport and what each is spent on, one column per level. Tab to the boxes, move between them with the up and down arrow keys, and press Enter to zoom into one or back out",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
   },
-  "properties": { "data": "#data-0" },
+  "properties": {
+    "data": "#data-0",
+    "nodes": {
+      "properties": {
+        "template": {
+          "settings": {
+            "focusable": true,
+            "focusableGroup": "nodes",
+            "hoverOnFocus": true,
+            "ariaLabel": "{category}: {sum}"
+          }
+        }
+      }
+    }
+  },
   "refs": [
     {
       "data-0": [

@@ -9,6 +9,8 @@
     "maxFontSize": { "type": "Percent", "value": 25 },
     "angles": [0, 0, -90],
     "randomizeAngles": false,
+    "focusable": true,
+    "ariaLabel": "Word cloud of the king's speech to Hamlet, each word sized by how often it is used. Tab to the words, then move between them with the up and down arrow keys",
     "autoAppear": true,
     "appearDuration": 1000,
     "appearDelay": 100
@@ -22,7 +24,10 @@
             "paddingBottom": 5,
             "paddingLeft": 5,
             "paddingRight": 5,
-            "fontFamily": "Courier New"
+            "fontFamily": "Courier New",
+            "focusable": true,
+            "focusableGroup": "words",
+            "ariaLabel": "{category}: {value} times"
           }
         }
       }

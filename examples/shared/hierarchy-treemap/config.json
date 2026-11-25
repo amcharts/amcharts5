@@ -3,7 +3,9 @@
   "settings": {
     "width": { "type": "Percent", "value": 100 },
     "height": { "type": "Percent", "value": 100 },
-    "layout": { "type": "VerticalLayout" }
+    "layout": { "type": "VerticalLayout" },
+    "focusable": true,
+    "ariaLabel": "Treemap of sales in three departments, Electronics, Home and Sports, and their products, each tile sized by its sales. Tab to the tiles, move between them with the up and down arrow keys, and press Enter to open one; the breadcrumbs above lead back up"
   },
   "children": [
     "#series-0",
@@ -80,7 +82,21 @@
           "appearDuration": 1000,
           "appearDelay": 100
         },
-        "properties": { "data": "#data-0" }
+        "properties": {
+          "data": "#data-0",
+          "nodes": {
+            "properties": {
+              "template": {
+                "settings": {
+                  "focusable": true,
+                  "focusableGroup": "nodes",
+                  "hoverOnFocus": true,
+                  "ariaLabel": "{category}: {sum}"
+                }
+              }
+            }
+          }
+        }
       }
     }
   ]

@@ -4,10 +4,12 @@
     "panX": "rotateX",
     "panY": "translateY",
     "zoomControl": { "type": "ZoomControl" },
-    "projectionName": "geoMercator",
+    "focusable": true,
+    "ariaLabel": "World map of 42 capital cities, where cities close together merge into clusters. Tab to the cities, move between them with the up and down arrow keys, and press Enter on a cluster to zoom in until it breaks up",
     "autoAppear": true,
     "appearDuration": 1000,
-    "appearDelay": 100
+    "appearDelay": 100,
+    "projectionName": "geoMercator"
   },
   "properties": {
     "series": ["#series-0", "#series-1"]
@@ -73,10 +75,7 @@
           "mapPolygons": {
             "properties": {
               "template": {
-                "settings": {
-                  "fill": { "type": "Color", "value": "#000000" },
-                  "fillOpacity": 0.15
-                }
+                "settings": { "fill": "@root.interfaceColors.get('alternativeBackground')", "fillOpacity": 0.15 }
               }
             }
           }
@@ -92,7 +91,13 @@
             "settings": {
               "sprite": {
                 "type": "Container",
-                "settings": { "cursorOverStyle": "pointer" },
+                "settings": {
+                  "cursorOverStyle": "pointer",
+                  "focusable": true,
+                  "focusableGroup": "cities",
+                  "role": "button",
+                  "ariaLabel": "A cluster of {value} cities"
+                },
                 "children": [
                   {
                     "type": "Circle",
@@ -122,7 +127,7 @@
                     "settings": {
                       "centerX": { "type": "Percent", "value": 50 },
                       "centerY": { "type": "Percent", "value": 50 },
-                      "fill": { "type": "Color", "value": "#ffffff" },
+                      "fill": "@root.interfaceColors.get('alternativeText')",
                       "populateText": true,
                       "fontSize": 8,
                       "text": "{value}"
@@ -145,7 +150,11 @@
                     "radius": 6,
                     "tooltipY": 0,
                     "tooltipText": "{title}",
-                    "fill": { "type": "Color", "value": "#ff8c00" }
+                    "fill": { "type": "Color", "value": "#ff8c00" },
+                    "focusable": true,
+                    "focusableGroup": "cities",
+                    "hoverOnFocus": true,
+                    "ariaLabel": "{title}"
                   }
                 }
               }
