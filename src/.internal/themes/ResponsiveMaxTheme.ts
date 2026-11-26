@@ -301,6 +301,13 @@ export class ResponsiveMaxTheme extends ResponsiveBaseTheme {
 		add("Button", ["gantt", "controls", "expand"], ResponsiveBaseTheme.widthL, forceHidden);
 		add("Button", ["gantt", "controls", "collapse"], ResponsiveBaseTheme.widthL, forceHidden);
 		add("ColorPickerButton", ["gantt", "controls"], ResponsiveBaseTheme.widthL, forceHidden);
+		// Its task names get more room: no grip (the whole row drags), no up/down buttons by the duration
+		// (it can still be typed in, or the bar resized), a narrower triangle and a smaller indent for subtasks
+		add("Rectangle", ["gantt", "grip", "axislabel"], ResponsiveBaseTheme.widthL, forceHidden);
+		add("Container", ["durationstepper", "buttons"], ResponsiveBaseTheme.widthL, forceHidden);
+		add("EditableLabel", ["axis"], ResponsiveBaseTheme.widthL, { paddingLeft: 2, paddingRight: 2 });
+		add("Button", ["taskbullet"], ResponsiveBaseTheme.widthL, { width: 20, paddingLeft: 2, paddingRight: 2 });
+		add("GanttCategoryAxis", none, ResponsiveBaseTheme.widthL, { childShift: 12 });
 		add("Scrollbar", ["gantt", "horizontal"], (w, h) => w <= 500 || ResponsiveBaseTheme.heightM(w, h), forceHidden);
 		add("Scrollbar", ["gantt", "vertical"], (w) => w <= 500, forceHidden);
 		add("AxisLabel", ["y", "minor"], ResponsiveBaseTheme.heightL, forceHidden);

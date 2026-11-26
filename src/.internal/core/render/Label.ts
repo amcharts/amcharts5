@@ -308,6 +308,9 @@ export class Label extends Container {
 
 		this._makeText();
 
+		// The label is read by screen readers, not its text
+		this._text.setPrivate("focusExcluded", true);
+
 		$array.each(this._textKeys, (property) => {
 			const propValue = this._getTextKeyValue(property);
 			if (propValue != undefined) {

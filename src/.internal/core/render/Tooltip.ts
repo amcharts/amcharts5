@@ -366,6 +366,12 @@ export class Tooltip extends Container {
 	protected _onShow() {
 		super._onShow();
 		this.updateBackgroundColor();
+		this._root._updateTooltipElementHidden(this.label.text);
+	}
+
+	protected _onHide() {
+		super._onHide();
+		this._root._updateTooltipElementHidden(this.label.text);
 	}
 
 

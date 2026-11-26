@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 Please note, that this project, while following numbering syntax, it DOES NOT
 adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html) rules.
 
+## [5.24.1] - 2026-11-26
+
+### Changed
+- ResponsiveMax: a Gantt chart 600 px wide or less gives task names more room: no drag grips (the row still drags), no up/down buttons by the duration, a narrower expand/collapse triangle, a smaller indent for subtasks and less padding around names and durations.
+- Accessibility: an element that isn't focusable but has an `ariaLabel` set (e.g. an axis title) is now read by screen readers, without being a TAB stop. With no `role`, it is read as plain text.
+
+### Fixed
+- Gantt: changing `childShift` after the chart was drawn did not re-indent subtasks, and grips hidden by a theme came back while the chart was editable.
+- Accessibility: the text of a hidden tooltip stayed readable by screen readers (e.g. "empty tooltip" in VoiceOver).
+- Accessibility: SPACE did not click focusable elements that toggle (pie and funnel slices, hierarchy nodes and others), which screen readers announce as buttons; only ENTER did.
+
+
 ## [5.24.0] - 2026-11-25
 
 ### Added

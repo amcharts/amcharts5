@@ -1760,6 +1760,17 @@ export abstract class Sprite extends Entity {
 			this.markDirtyAccessibility();
 		}
 
+		// An `ariaLabel` set on an element that isn't focusable makes it
+		// readable by screen readers (or no longer)
+		if ((this.isDirty("ariaLabel") || !this._focusableChecked) && !this.get("focusable")) {
+			if (this._root._isReadable(this)) {
+				this._root._registerTabindexOrder(this);
+			}
+			else {
+				this._root._unregisterTabindexOrder(this);
+			}
+		}
+
 		if (this.isDirty("tabindexOrder") || this.isDirty("focusableGroup")) {
 			if (this.get("focusable")) {
 				this._root._registerTabindexOrder(this);
@@ -1848,7 +1859,8 @@ export abstract class Sprite extends Entity {
 		const focusableChecked = this._focusableChecked;
 		this._focusableChecked = true;
 		if (this.isDirty("focusable") || (!focusableChecked && this.get("focusable"))) {
-			if (this.get("focusable")) {
+			// No longer focusable, it may still be readable
+			if (this.get("focusable") || this._root._isReadable(this)) {
 				this._root._registerTabindexOrder(this);
 			}
 			else {

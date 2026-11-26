@@ -17,8 +17,6 @@ import { ResizeSensor } from "./util/ResizeSensor";
 import { InterfaceColors, IInterfaceColorsSettings } from "./util/InterfaceColors";
 import { Graphics } from "./render/Graphics";
 import { Rectangle } from "./render/Rectangle";
-import { RoundedRectangle } from "./render/RoundedRectangle";
-import { Label } from "./render/Label";
 import { Tooltip } from "./render/Tooltip";
 import { NumberFormatter } from "./util/NumberFormatter";
 import { DateFormatter } from "./util/DateFormatter";
@@ -359,8 +357,6 @@ interface IBranding {
 	started: boolean;
 	licensed: boolean;
 	small: boolean;
-	// a label that says where the chart was made, after the logo was taken away
-	label: boolean;
 	// corner it is in: "bl", "br", "tl" or "tr"
 	corner: string;
 	mark?: Container;
@@ -375,7 +371,7 @@ const brandings: WeakMap<Root, IBranding> = new WeakMap();
 function brandingOf(root: Root): IBranding {
 	let state = brandings.get(root);
 	if (!state) {
-		state = { keys: 0, started: false, licensed: false, small: false, label: false, corner: "bl", checks: [], introEnd: 0 };
+		state = { keys: 0, started: false, licensed: false, small: false, corner: "bl", checks: [], introEnd: 0 };
 		brandings.set(root, state);
 	}
 	return state;
@@ -397,11 +393,6 @@ function brandingPartOff(sprite: Sprite, parent?: Container): boolean {
 	return sprite.isDisposed() || (parent !== undefined && parent.children.indexOf(sprite) == -1) || !!sprite.get("forceHidden") || sprite.get("visible") === false || sprite.isHidden() || sprite.get("opacity", 1) < 1 || sprite.get("scale", 1) !== 1 || sprite.get("dy", 0) !== 0;
 }
 
-function brandingColor(sprite: Sprite, key: "fill" | "stroke"): number | undefined {
-	const value: any = (sprite as any).get(key);
-	return value instanceof Color ? value.hex : undefined;
-}
-
 // the corner the root's `logoPosition` asks for
 function brandingCorner(root: Root): string {
 	const corner = (root as any)._settings.logoPosition;
@@ -416,7 +407,7 @@ function brandingTop(state: IBranding): boolean {
 	return state.corner.charAt(0) == "t";
 }
 
-// puts it in its corner, a label a little in from the edges
+// puts it in its corner
 function placeBranding(mark: Container, state: IBranding): void {
 	const right = brandingRight(state);
 	const top = brandingTop(state);
@@ -426,16 +417,8 @@ function placeBranding(mark: Container, state: IBranding): void {
 		y: top ? 0 : p100,
 		centerY: top ? 0 : p100,
 		tooltipX: right ? 0 : p100,
-		tooltipY: top ? p100 : (state.label ? 0 : 10)
+		tooltipY: top ? p100 : 10
 	});
-	if (state.label) {
-		mark.setAll({
-			paddingLeft: right ? 0 : 6,
-			paddingRight: right ? 6 : 0,
-			paddingTop: top ? 6 : 0,
-			paddingBottom: top ? 0 : 6
-		});
-	}
 }
 
 // at 0 (or not set), or at the far end (100%)
@@ -443,99 +426,53 @@ function brandingAt(value: any, end: boolean): boolean {
 	return end ? (value instanceof Percent && value.value == 1) : (value == null || value === 0);
 }
 
-function buildBranding(root: Root, state: IBranding): void {
-	const tooltipContainer = root.tooltipContainer;
-	const common = {
+// `again`: shown again after it was taken away, at once without the intro
+function buildBranding(root: Root, state: IBranding, again?: boolean): void {
+	const mark = root.tooltipContainer.children.push(Container.new(root, {
 		interactive: true,
 		interactiveChildren: false,
-		position: "absolute" as const,
+		position: "absolute",
 		tooltipText: "Created using amCharts 5",
-		cursorOverStyle: "pointer"
-	};
+		cursorOverStyle: "pointer",
+		setStateOnChildren: true,
+		paddingTop: 9,
+		paddingRight: 9,
+		paddingBottom: 9,
+		paddingLeft: 9,
+		scale: .6,
+		background: Rectangle.new(root, {
+			fill: color(0x474758),
+			fillOpacity: 0,
+			tooltipY: 5
+		})
+	}));
 
-	let mark: Container;
-	if (state.label) {
-		mark = tooltipContainer.children.push(Container.new(root, Object.assign({
-			// what the pointer hits
-			background: Rectangle.new(root, {
-				fill: color(0x474758),
-				fillOpacity: 0
-			})
-		}, common)));
+	mark.states.create("hover", {});
 
-		const background = RoundedRectangle.new(root, {
-			fill: color(0x000000),
-			fillOpacity: 0.7,
-			stroke: color(0xffffff),
-			strokeOpacity: 0.35,
-			cornerRadiusTL: 4,
-			cornerRadiusTR: 4,
-			cornerRadiusBL: 4,
-			cornerRadiusBR: 4
-		});
-		const pill = mark.children.push(Container.new(root, {
-			paddingTop: 3,
-			paddingBottom: 3,
-			paddingLeft: 7,
-			paddingRight: 7,
-			background: background
-		}));
-		const text = "Made with amCharts";
-		const label = pill.children.push(Label.new(root, {
-			text: text,
-			fill: color(0xffffff),
-			fontSize: 11,
-			paddingTop: 0,
-			paddingBottom: 0,
-			paddingLeft: 0,
-			paddingRight: 0
-		}));
+	const m = mark.children.push(Graphics.new(root, {
+		stroke: color(0xcccccc),
+		strokeWidth: 3,
+		svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6",
+		dx: again ? 0 : -50,
+		strokeOpacity: again ? 1 : 0
+	}));
 
-		state.checks = [() => {
-			return brandingPartOff(pill, mark) || pill.get("dx", 0) !== 0 || label.get("dx", 0) !== 0 ||
-				pill.get("background") !== background || background.isDisposed() || background.get("visible") === false || !!background.get("forceHidden") ||
-				background.get("fillOpacity", 1) < 0.7 || brandingColor(background, "fill") !== 0x000000 ||
-				brandingPartOff(label, pill) || label.get("text") !== text || label.get("fontSize") !== 11 || brandingColor(label, "fill") !== 0xffffff;
-		}];
+	m.states._createC("hover", { stroke: color(0x3CABFF) });
+
+	const a = mark.children.push(Graphics.new(root, {
+		stroke: color(0x888888),
+		strokeWidth: 3,
+		svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0",
+		dx: again ? 0 : 50,
+		strokeOpacity: again ? 1 : 0
+	}));
+
+	a.states.create("hover", { stroke: color(0x474758) });
+
+	if (again) {
 		state.introEnd = 0;
 	}
 	else {
-		mark = tooltipContainer.children.push(Container.new(root, Object.assign({
-			setStateOnChildren: true,
-			paddingTop: 9,
-			paddingRight: 9,
-			paddingBottom: 9,
-			paddingLeft: 9,
-			scale: .6,
-			background: Rectangle.new(root, {
-				fill: color(0x474758),
-				fillOpacity: 0,
-				tooltipY: 5
-			})
-		}, common)));
-
-		mark.states.create("hover", {});
-
-		const m = mark.children.push(Graphics.new(root, {
-			stroke: color(0xcccccc),
-			strokeWidth: 3,
-			svgPath: "M5 25 L13 25h13.6c3.4 0 6 0 10.3-4.3s5.2-12 8.6-12c3.4 0 4.3 8.6 7.7 8.6M83.4 25H79.8c-3.4 0-6 0-10.3-4.3s-5.2-12-8.6-12-4.3 8.6-7.7 8.6",
-			dx: -50,
-			strokeOpacity: 0
-		}));
-
-		m.states._createC("hover", { stroke: color(0x3CABFF) });
-
-		const a = mark.children.push(Graphics.new(root, {
-			stroke: color(0x888888),
-			strokeWidth: 3,
-			svgPath: "M83.4 25h-31C37 25 39.5 4.4 28.4 4.4S18.9 24.2 4.3 25H0",
-			dx: 50,
-			strokeOpacity: 0
-		}));
-
-		a.states.create("hover", { stroke: color(0x474758) });
-
 		const easing = $ease.out($ease.cubic);
 		const duration = 1500;
 
@@ -546,25 +483,26 @@ function buildBranding(root: Root, state: IBranding): void {
 			});
 		}, 3000);
 
-		const parts = [m, a].map((part) => ({ part, path: part.get("svgPath")! }));
-		// its lines: taken out, hidden or changed; faded or moved only once their intro is over
-		state.checks = [(introOver: boolean) => {
-			return parts.some(({ part, path }) => {
-				return brandingPartOff(part, mark) || part.get("strokeWidth", 0) < 3 || part.get("svgPath") !== path ||
-					(introOver && (part.get("strokeOpacity", 0) < 1 || part.get("dx", 0) !== 0));
-			});
-		}];
 		// the lines fade and slide in from 3 s for 1.5 s
 		state.introEnd = Date.now() + 5000;
 	}
+
+	const parts = [m, a].map((part) => ({ part, path: part.get("svgPath")! }));
+	// its lines: taken out, hidden or changed; faded or moved only once their intro is over
+	state.checks = [(introOver: boolean) => {
+		return parts.some(({ part, path }) => {
+			return brandingPartOff(part, mark) || part.get("strokeWidth", 0) < 3 || part.get("svgPath") !== path ||
+				(introOver && (part.get("strokeOpacity", 0) < 1 || part.get("dx", 0) !== 0));
+		});
+	}];
 
 	state.corner = brandingCorner(root);
 	placeBranding(mark, state);
 
 	mark.set("tooltip", root.systemTooltip);
-	// tagged so the website's analytics can count logo and label clicks
+	// tagged so the website's analytics can count logo clicks
 	mark.events.on("click", () => {
-		window.open("https://www.amcharts.com/?utm_source=amcharts-chart&utm_medium=referral&utm_campaign=chart-logo&utm_content=" + (state.label ? "label" : "logo"), "_blank", "noopener");
+		window.open("https://www.amcharts.com/?utm_source=amcharts-chart&utm_medium=referral&utm_campaign=chart-logo&utm_content=logo", "_blank", "noopener");
 	});
 
 	state.mark = mark;
@@ -579,7 +517,7 @@ function brandingOff(root: Root, state: IBranding): boolean {
 	}
 	const right = brandingRight(state);
 	const top = brandingTop(state);
-	if (mark.get("forceHidden") || mark.get("scale", 1) !== (state.label ? 1 : .6) || mark.get("dx", 0) !== 0 || mark.get("dy", 0) !== 0 ||
+	if (mark.get("forceHidden") || mark.get("scale", 1) !== .6 || mark.get("dx", 0) !== 0 || mark.get("dy", 0) !== 0 ||
 		!brandingAt(mark.get("x"), right) || !brandingAt(mark.get("centerX"), right) || !brandingAt(mark.get("y"), !top) || !brandingAt(mark.get("centerY"), !top)) {
 		return true;
 	}
@@ -597,7 +535,7 @@ function brandingGone(root: Root, state: IBranding): boolean {
 	return !state.licensed && !root.isDisposed() && brandingOff(root, state) && brandingKeys() <= state.keys;
 }
 
-// after each frame; shown again a little later if it is still gone then, as a label from then on
+// after each frame; shown again a little later if it is still gone then
 function checkBranding(root: Root, state: IBranding): void {
 	// `logoPosition` changed after the chart was made, e.g. by a JSON config
 	const corner = brandingCorner(root);
@@ -617,8 +555,7 @@ function checkBranding(root: Root, state: IBranding): void {
 					tooltipContainer.children.removeValue(mark);
 				}
 				state.mark = undefined;
-				state.label = true;
-				buildBranding(root, state);
+				buildBranding(root, state, true);
 			}
 		}, 3000) as any;
 	}
@@ -1362,8 +1299,11 @@ export class Root implements IDisposer {
 							case "Enter":
 							case " ":
 								// SPACE clicks what a browser would click with it: buttons,
-								// checkboxes and the like
-								if (eventKey == " " && ["button", "checkbox", "switch", "radio", "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio"].indexOf(focusedSprite.get("role", "")) === -1) {
+								// checkboxes and the like. The role is the one written to the
+								// page, e.g. "button" for a focusable slice that toggles
+								const focusDom = focusedSprite.getPrivate("focusElement");
+								const domRole = (focusDom && focusDom.dom.getAttribute("role")) || "";
+								if (eventKey == " " && ["button", "checkbox", "switch", "radio", "tab", "option", "menuitem", "menuitemcheckbox", "menuitemradio"].indexOf(domRole) === -1) {
 									return;
 								}
 								const announceText = focusedSprite.get("clickAnnounceText", "");
@@ -1688,6 +1628,16 @@ export class Root implements IDisposer {
 			this._visibleMemo = undefined;
 			this._focusElementDirty = false;
 		}
+
+		// Readable elements never take focus, so they are placed over their
+		// elements here, wherever layout moved them: screen readers highlight
+		// what they read
+		$array.each(this._readables, (item) => {
+			const focusElement = item.getPrivate("focusElement");
+			if (focusElement && focusElement.dom.getAttribute("aria-hidden") != "true") {
+				this._positionFocusElement(item);
+			}
+		});
 	}
 
 	private _runTickers(currentTime: number) {
@@ -2164,7 +2114,7 @@ export class Root implements IDisposer {
 			return;
 		}
 
-		if (target.get("focusable") && !target.getPrivate("focusExcluded")) {
+		if (this._hasFocusElement(target)) {
 			if (!this._tabindexUids[target.uid]) {
 				this._tabindexUids[target.uid] = true;
 				this._tabindexes.push(target);
@@ -2172,11 +2122,40 @@ export class Root implements IDisposer {
 					this._tabindexRanks[target.uid] = this._tabindexRank++;
 				}
 			}
+			// Readable (not focusable) or no longer
+			const readable = !target.get("focusable");
+			if (readable != (this._readables.indexOf(target) != -1)) {
+				if (readable) {
+					this._readables.push(target);
+				}
+				else {
+					$array.remove(this._readables, target);
+				}
+			}
 		}
 		else {
 			this._removeTabindex(target);
 		}
 		this._invalidateTabindexes();
+	}
+
+	// Not focusable, but read by screen readers: its `ariaLabel` was set by
+	// the user (not by a theme or the library), e.g. an axis title. It gets
+	// a focus element that is not a TAB stop
+	public _isReadable(target: Sprite): boolean {
+		if (target.get("focusable") || !target.get("ariaLabel") || target.get("role") == "tooltip") {
+			return false;
+		}
+		if (target.isUserSetting("ariaLabel") && !target.isComputedSetting("ariaLabel")) {
+			return true;
+		}
+		const template = target.template;
+		return template && template.get("ariaLabel") && !template._computedSettings.ariaLabel ? true : false;
+	}
+
+	// Whether the element gets a focus element: focusable or readable
+	protected _hasFocusElement(target: Sprite): boolean {
+		return (target.get("focusable") || this._isReadable(target)) && !target.getPrivate("focusExcluded") ? true : false;
 	}
 
 	public _unregisterTabindexOrder(target: Sprite): void {
@@ -2190,6 +2169,9 @@ export class Root implements IDisposer {
 
 	protected _tabindexUids: { [uid: number]: boolean } = {};
 
+	// The readable elements in `_tabindexes` (not focusable)
+	protected _readables: Sprite[] = [];
+
 	// The order elements first became focusable in: one made focusable again
 	// (e.g. Gantt task names when editing is turned back on) goes back to its place
 	protected _tabindexRanks: { [uid: number]: number } = {};
@@ -2199,6 +2181,7 @@ export class Root implements IDisposer {
 		if (this._tabindexUids[target.uid]) {
 			delete this._tabindexUids[target.uid];
 			$array.remove(this._tabindexes, target);
+			$array.remove(this._readables, target);
 		}
 	}
 
@@ -2267,7 +2250,7 @@ export class Root implements IDisposer {
 	// Out of view (e.g. a map object panned away) it is still there for screen
 	// readers, just not a TAB stop. The focused element stays one until left
 	public _canTab(target: Sprite, canFocus?: boolean): boolean {
-		return (canFocus != null ? canFocus : this._canFocus(target)) && (this._focusedSprite === target || (!target.getPrivate("focusOutOfView") && !target.getPrivate("focusDisabled")));
+		return (canFocus != null ? canFocus : this._canFocus(target)) && !!target.get("focusable") && (this._focusedSprite === target || (!target.getPrivate("focusOutOfView") && !target.getPrivate("focusDisabled")));
 	}
 
 	// Visibility of containers, remembered while focus elements are updated
@@ -2419,7 +2402,35 @@ export class Root implements IDisposer {
 
 		const ariaLabel = target.get("ariaLabel");
 		// values being animated are read as they will be, not in between
-		setAttr(focusElement, "aria-label", ariaLabel ? populateString(target, ariaLabel, true) : null);
+		const labelText = ariaLabel ? populateString(target, ariaLabel, true) : "";
+
+		// A readable element with no role is plain text: its label is the text
+		// of a visually hidden child (`aria-label` is not read on plain elements)
+		let readerText = <HTMLElement | null>focusElement.querySelector(".am5-reader-text");
+		if (!role && !target.get("focusable")) {
+			setAttr(focusElement, "aria-label", null);
+			if (!readerText) {
+				readerText = document.createElement("span");
+				readerText.className = "am5-reader-text";
+				const style = readerText.style;
+				style.position = "absolute";
+				style.width = "1px";
+				style.height = "1px";
+				style.overflow = "hidden";
+				style.whiteSpace = "nowrap";
+				style.clip = "rect(1px, 1px, 1px, 1px)";
+				focusElement.insertBefore(readerText, focusElement.firstChild);
+			}
+			if (readerText.textContent !== labelText) {
+				readerText.textContent = labelText;
+			}
+		}
+		else {
+			if (readerText) {
+				focusElement.removeChild(readerText);
+			}
+			setAttr(focusElement, "aria-label", labelText || null);
+		}
 
 		setAttr(focusElement, "aria-live", target.get("ariaLive") || null);
 
@@ -2605,7 +2616,7 @@ export class Root implements IDisposer {
 
 		// Init
 		const focusElement = document.createElement("div");
-		if (target.get("role") != "tooltip") {
+		if (target.get("role") != "tooltip" && target.get("focusable")) {
 			focusElement.tabIndex = this.tabindex;
 		}
 		focusElement.style.position = "absolute";
@@ -2854,11 +2865,31 @@ export class Root implements IDisposer {
 			if (tooltipElement.innerHTML != text) {
 				tooltipElement.innerHTML = text!;
 			}
-			tooltipElement.setAttribute("aria-hidden", target.isVisibleDeep() ? "false" : "true");
+			this._updateTooltipElementHidden(target);
 		}
 		else if (tooltipElement) {
 			tooltipElement.remove();
 			target.removePrivate("tooltipElement");
+		}
+	}
+
+	/**
+	 * Hides a tooltip's text from screen readers while the tooltip is hidden,
+	 * so reading through the page doesn't find the last one shown.
+	 *
+	 * @ignore
+	 */
+	public _updateTooltipElementHidden(target: Text): void {
+		const tooltipElement = target.getPrivate("tooltipElement");
+		if (tooltipElement) {
+			// hidden with `hide()` (a tooltip fading out) or not visible
+			let hidden = !target.isVisibleDeep();
+			let sprite: Sprite | undefined = target;
+			while (sprite && !hidden) {
+				hidden = sprite.isHidden();
+				sprite = sprite.parent;
+			}
+			tooltipElement.setAttribute("aria-hidden", hidden ? "true" : "false");
 		}
 	}
 
@@ -2904,7 +2935,7 @@ export class Root implements IDisposer {
 		if (this._a11yD == true) {
 			return;
 		}
-		if (target.get("focusable") && !target.getPrivate("focusExcluded")) {
+		if (this._hasFocusElement(target)) {
 			const dirty = this._dirtyA11y[target.uid];
 			if (dirty) {
 				dirty.full = dirty.full || !statusOnly;

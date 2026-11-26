@@ -87,14 +87,14 @@ package has them in `dist/`. From an npm CDN, pin the version and load every
 file from it:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/xy.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/themes/Animated.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/themes/ResponsiveMax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/themes/ResponsiveMax.js"></script>
 ```
 
 The same files are at `node_modules/@amcharts/amcharts5/dist/`, on unpkg
-(`https://unpkg.com/@amcharts/amcharts5@5.24.0/dist/index.js`) and on the
+(`https://unpkg.com/@amcharts/amcharts5@5.24.1/dist/index.js`) and on the
 amCharts CDN (`https://cdn.amcharts.com/lib/5/index.js`). A sandbox that allows
 scripts only from npm CDNs (jsDelivr, unpkg) can use the first two. Use plain
 script tags, not `type="module"`: the lazy parts (the exporting plugin's PDF,

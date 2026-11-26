@@ -981,7 +981,14 @@ export class Gantt extends Container {
 		renderer.labels.template._setC(forceInactive, !value);
 		renderer.labels.template._setC("focusable", value);
 
-		renderer.grips.template._setC(forceHidden, !value);
+		// editable, grips are left to their theme too (ResponsiveMax hides them on a narrow chart)
+		const grips = renderer.grips.template;
+		if (!value) {
+			grips._setC(forceHidden, true);
+		}
+		else if (grips._computedSettings[forceHidden]) {
+			grips.remove(forceHidden);
+		}
 		renderer.containers.template._setC(draggable, value);
 
 		renderer.controlsContainers.template._setC(forceInactive, !value);

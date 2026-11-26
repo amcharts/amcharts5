@@ -64,10 +64,10 @@ from `node_modules/@amcharts/amcharts5/dist/` or from an npm CDN such as
 jsDelivr or unpkg:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/index.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/xy.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/themes/Animated.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.0/dist/themes/ResponsiveMax.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/xy.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/themes/Animated.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@amcharts/amcharts5@5.24.1/dist/themes/ResponsiveMax.js"></script>
 ```
 
 Load every file from the same version, with plain script tags (not

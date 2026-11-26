@@ -477,6 +477,12 @@ export class GanttCategoryAxis<R extends GanttCategoryAxisRenderer> extends Cate
 		if (this.isDirty("selectedDataItem")) {
 			this.selectDataItem(this.get("selectedDataItem"));
 		}
+		// subtasks indent anew, e.g. when a responsive rule changes it
+		if (this.isDirty("childShift")) {
+			$array.each(this.dataItems, (dataItem) => {
+				this._updateBullet(dataItem);
+			});
+		}
 	}
 
 	protected _processBullet(dataItem: DataItem<IGanttCategoryAxisDataItem>) {
